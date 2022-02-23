@@ -1,0 +1,9 @@
+opg-sirius-lpa-frontend
+cypress/screenshots
+cypress/videos
+logs/
+node_modules/
+pacts/
+web/static
+.idea
+log/
