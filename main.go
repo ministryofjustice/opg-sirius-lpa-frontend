@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
 	"os"
@@ -13,6 +12,14 @@ import (
 )
 
 func main() {
+	logger := logging.New(os.Stdout, "opg-sirius-lpa-frontend")
+
+	port := getEnv("PORT", "8080")
+	webDir := getEnv("WEB_DIR", "web")
+	siriusURL := getEnv("SIRIUS_URL", "http://localhost:8080")
+	siriusPublicURL := getEnv("SIRIUS_PUBLIC_URL", "")
+	prefix := getEnv("PREFIX", "")
+
 	layouts, err := template.New("").Funcs(map[string]interface{}{
 		"sirius": func(s string) string {
 			return s
@@ -21,8 +28,9 @@ func main() {
 			return s
 		},
 	}).ParseGlob("./web/template/layouts/*")
+
 	if err != nil {
-		fmt.Print(err)
+		logger.Fatal(err)
 	}
 
 	files, _ := filepath.Glob("./web/template/*.gohtml")
@@ -32,8 +40,24 @@ func main() {
 		tmpls[filepath.Base(file)] = template.Must(template.Must(layouts.Clone()).ParseFiles(file))
 	}
 
-	logger := logging.New(os.Stdout, "opg-sirius-lpa-frontend")
+	client := sirius.NewClient(http.DefaultClient, siriusURL)
 
-	response := server.New(logger, sirius.NewClient(http.DefaultClient, os.Getenv("SIRIUS_URL")), tmpls, "", os.Getenv("SIRIUS_PUBLIC_URL"), "web")
-	http.ListenAndServe(":8888", response)
+	server := &http.Server{
+		Addr:    ":" + port,
+		Handler: server.New(logger, client, tmpls, prefix, siriusPublicURL, webDir),
+	}
+
+	go func() {
+		if err := server.ListenAndServe(); err != nil {
+			logger.Fatal(err)
+		}
+	}()
+}
+
+func getEnv(key, def string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+
+	return def
 }

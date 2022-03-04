@@ -2,7 +2,6 @@ package server
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -65,14 +64,12 @@ func TestGetWarning(t *testing.T) {
 		},
 	}).Return(nil)
 
-	req, err := http.NewRequest(http.MethodGet, "/?id=89", nil)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	req, _ := http.NewRequest(http.MethodGet, "/?id=89", nil)
 
 	w := httptest.NewRecorder()
-	Warning(siriusClient, template)(w, req)
+	err := Warning(siriusClient, template)(w, req)
 
+	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusOK, result.StatusCode)
 }
@@ -103,20 +100,16 @@ func TestPostWarning(t *testing.T) {
 
 	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "Some random warning notes").Return(nil)
 
-	req, err := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
+	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
 		"warning-type":  {"Complaint Recieved"},
 		"warning-notes": {"Some random warning notes"},
 	}.Encode()))
 
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
 	w := httptest.NewRecorder()
-	Warning(siriusClient, template)(w, req)
-
+	err := Warning(siriusClient, template)(w, req)
+	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusOK, result.StatusCode)
 }
@@ -150,20 +143,16 @@ func TestPostWarningValidationErrors(t *testing.T) {
 		ValidationErr: v,
 	}).Return(nil)
 
-	req, err := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
+	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
 		"warning-type":  {"Complaint Recieved"},
 		"warning-notes": {""},
 	}.Encode()))
 
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
 	w := httptest.NewRecorder()
-	Warning(siriusClient, template)(w, req)
-
+	err := Warning(siriusClient, template)(w, req)
+	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusBadRequest, result.StatusCode)
 }
@@ -184,20 +173,15 @@ func TestCreateWarningReturnsError(t *testing.T) {
 
 	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "Some notes").Return(e)
 
-	req, err := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
+	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
 		"warning-type":  {"Complaint Recieved"},
 		"warning-notes": {"Some notes"},
 	}.Encode()))
 
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
 	w := httptest.NewRecorder()
-	err = Warning(siriusClient, nil)(w, req)
-
+	err := Warning(siriusClient, nil)(w, req)
 	assert.Equal(t, e, err)
 }
 
@@ -206,19 +190,15 @@ func TestGetWarningTypesFail(t *testing.T) {
 	siriusClient := new(SiriusClientMock)
 	siriusClient.On("WarningTypes", mock.Anything).Return(nil, expectedErr)
 
-	req, err := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
+	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
 		"warning-type":  {"Complaint Recieved"},
 		"warning-notes": {"Some notes"},
 	}.Encode()))
 
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
 	w := httptest.NewRecorder()
-	err = Warning(siriusClient, nil)(w, req)
+	err := Warning(siriusClient, nil)(w, req)
 
 	assert.Equal(t, expectedErr, err)
 }

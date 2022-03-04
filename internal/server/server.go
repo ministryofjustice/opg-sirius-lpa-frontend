@@ -54,7 +54,7 @@ func New(logger Logger, client Client, templates map[string]*template.Template, 
 	mux.Handle("/assets/", http.FileServer(http.Dir("web/static")))
 	mux.Handle("/javascript/", http.FileServer(http.Dir("web/static")))
 	mux.Handle("/stylesheets/", http.FileServer(http.Dir("web/static")))
-	return mux
+	return http.StripPrefix(prefix, securityHeaders(mux))
 }
 
 func securityHeaders(h http.Handler) http.HandlerFunc {
