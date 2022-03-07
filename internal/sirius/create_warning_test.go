@@ -39,7 +39,7 @@ func TestCreateWarning(t *testing.T) {
 					UponReceiving("A request to create a warning").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/persons/89/warnings"),
+						Path:   dsl.String("/api/v1/persons/189/warnings"),
 						Body: dsl.Like(map[string]interface{}{
 							"warningType": "Complaint Received",
 							"warningText": "Some warning notes",
@@ -70,7 +70,7 @@ func TestCreateWarning(t *testing.T) {
 					UponReceiving("A request to create a warning without entering any notes").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/persons/89/warnings"),
+						Path:   dsl.String("/api/v1/persons/189/warnings"),
 						Body: dsl.Like(map[string]interface{}{
 							"warningType": "Complaint Received",
 							"warningText": "",
@@ -84,7 +84,7 @@ func TestCreateWarning(t *testing.T) {
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusBadRequest,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/problem+json")},
 						Body: dsl.Like(map[string]interface{}{
 							"validation_errors": dsl.Like(map[string]interface{}{
 								"warningText": dsl.Like(map[string]interface{}{
@@ -117,7 +117,7 @@ func TestCreateWarning(t *testing.T) {
 					UponReceiving("A request to create a warning without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/persons/89/warnings"),
+						Path:   dsl.String("/api/v1/persons/189/warnings"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -126,7 +126,7 @@ func TestCreateWarning(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/persons/89/warnings", port),
+					URL:    fmt.Sprintf("http://localhost:%d/api/v1/persons/189/warnings", port),
 					Method: http.MethodPost,
 				}
 			},
@@ -140,7 +140,7 @@ func TestCreateWarning(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.CreateWarning(getContext(tc.cookies), 89, "Complaint Received", "Some warning notes")
+				err := client.CreateWarning(getContext(tc.cookies), 189, "Complaint Received", "Some warning notes")
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {
