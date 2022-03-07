@@ -44,8 +44,8 @@ func TestGetWarning(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.On("ExecuteTemplate", mock.Anything, "page", warningData{
-		WasWarningCreated: false,
-		XSRFToken:         "",
+		Success:   false,
+		XSRFToken: "",
 		WarningTypes: []sirius.RefDataItem{
 			{
 				Handle: "Complaint Received",
@@ -78,8 +78,8 @@ func TestPostWarning(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.On("ExecuteTemplate", mock.Anything, "page", warningData{
-		WasWarningCreated: true,
-		XSRFToken:         "",
+		Success:   true,
+		XSRFToken: "",
 		WarningTypes: []sirius.RefDataItem{
 			{
 				Handle: "Complaint Received",
@@ -116,21 +116,25 @@ func TestPostWarningValidationErrors(t *testing.T) {
 		nil,
 	)
 
-	v := sirius.ValidationError{}
+	v := sirius.ValidationError{
+		Errors: sirius.ValidationErrors{
+			"x": {"y": "z"},
+		},
+	}
 
 	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "").Return(v)
 
 	template := &mockTemplate{}
 	template.On("ExecuteTemplate", mock.Anything, "page", warningData{
-		WasWarningCreated: false,
-		XSRFToken:         "",
+		Success:   false,
+		XSRFToken: "",
 		WarningTypes: []sirius.RefDataItem{
 			{
 				Handle: "Complaint Received",
 				Label:  "Complaint Received",
 			},
 		},
-		ValidationErr: v,
+		Errors: v.Errors,
 	}).Return(nil)
 
 	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{

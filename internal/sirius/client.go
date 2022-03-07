@@ -74,8 +74,10 @@ func (e StatusError) Data() interface{} {
 	return e
 }
 
+type ValidationErrors map[string]map[string]string
+
 type ValidationError struct {
-	Errors map[string]map[string]string `json:"validation_errors"`
+	Errors ValidationErrors `json:"validation_errors"`
 }
 
 func (ValidationError) Error() string {

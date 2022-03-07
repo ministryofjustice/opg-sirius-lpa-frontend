@@ -1,75 +1,52 @@
 {{ template "page" . }}
 
-{{ define "title" }}Create Warning{{ end }}
+{{ define "title" }}{{ if .Errors }}Error: {{ end }}Create Warning{{ end }}
 
 {{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Errors }}
 
-<h2 class="govuk-heading-l">Create Warning</h2>
+      {{ if .Success }}
+        {{ template "success-banner" "You have successfully created a warning." }}
+      {{ end }}
+      
+      <h1 class="govuk-heading-l">Create Warning</h1>
 
-{{ if .WasWarningCreated }}
-<div class="moj-banner moj-banner--success">
-    <svg class="moj-banner__icon" fill="currentColor" role="presentation" focusable="false"
-        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" height="25" width="25">
-        <path d="M25,6.2L8.7,23.2L0,14.1l4-4.2l4.7,4.9L21,2L25,6.2z" />
-    </svg>
-    <div class="moj-banner__message">
-        <span class="moj-banner__assistive">Success</span>You have successfully created a warning
-    </div>
-</div>
-{{ end }}
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-
-{{ if .Error }}
-    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
-    <h2 class="govuk-error-summary__title" id="error-summary-title">
-        There is a problem
-    </h2>
-    <div class="govuk-error-summary__body">
-        <ul class="govuk-list govuk-error-summary__list">
-            {{ if .ValidationErr }}
-                {{ range $key, $val := .ValidationErr.Errors }}
-                    {{ range $val }}
-                        <li>
-                            <a href="#{{ $key }}">{{ . }}</a>
-                        </li>
-                    {{ end }}
-                {{ end }}
-            {{ else }}
-            <li>
-                {{ .Error }}
-            </li>
+        <div class="govuk-form-group {{ if .Errors.warningType }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-warningType">
+            Warning type
+          </label>
+          {{ range .Errors.warningType }}
+            <p class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ . }}
+            </p>
+          {{ end }}
+          <select class="govuk-select {{ if .Errors.warningType }}govuk-select--error{{ end }}" id="f-warningType" name="warning-type">
+            {{ range .WarningTypes }}
+              <option value="{{ .Handle }}">{{ .Label }}</option>
             {{ end }}
-        </ul>
-    </div>
-    </div>
-{{ end }}
-
-<form method="POST">
-    <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-            <div class="govuk-form-group">
-                <label class="govuk-label" for="warningType">
-                    Warning type:
-                </label>
-                <select class="govuk-select" id="warningType" name="warning-type">
-                    {{ range .WarningTypes }}
-                        <option value="{{ .Handle }}">{{ .Label }}</option>
-                    {{ end }}
-                </select>
-            </div>
-
-            <div class="govuk-form-group">
-                <label class="govuk-label" for="warningText">Notes:</label>
-                <textarea class="govuk-textarea" name="warning-notes" rows="5" id="warningText"></textarea>
-            </div>
-
-            <div class="govuk-button-group">
-                <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
-                <a class="govuk-link" href="#">Cancel</a>
-            </div>
+          </select>
         </div>
-    </div>
-</form>
 
+        <div class="govuk-form-group {{ if .Errors.warningText }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-warningText">Notes</label>
+          {{ range .Errors.warningText }}
+            <p class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ . }}
+            </p>
+          {{ end }}
+          <textarea class="govuk-textarea {{ if .Errors.warningText }}govuk-textarea--error{{ end }}" name="warning-notes" rows="5" id="f-warningText"></textarea>
+        </div>
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+          <a class="govuk-link" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
 {{ end }}
