@@ -48,12 +48,16 @@ func New(logger Logger, client Client, templates map[string]*template.Template, 
 	wrap := errorHandler(logger, templates["error.gohtml"], prefix, siriusPublicURL)
 
 	mux := http.NewServeMux()
+
 	mux.Handle("/", http.NotFoundHandler())
 	mux.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {})
 	mux.Handle("/create-warning", wrap(Warning(client, templates["warning.gohtml"])))
-	mux.Handle("/assets/", http.FileServer(http.Dir("web/static")))
-	mux.Handle("/javascript/", http.FileServer(http.Dir("web/static")))
-	mux.Handle("/stylesheets/", http.FileServer(http.Dir("web/static")))
+
+	static := http.FileServer(http.Dir("web/static"))
+	mux.Handle("/assets/", static)
+	mux.Handle("/javascript/", static)
+	mux.Handle("/stylesheets/", static)
+
 	return http.StripPrefix(prefix, securityHeaders(mux))
 }
 
