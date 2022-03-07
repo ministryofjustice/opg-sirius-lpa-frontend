@@ -263,7 +263,7 @@ jobs:
       - name: Push Container
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: sirius-lpa-frontend
+          ECR_REPOSITORY: sirius/sirius-lpa-frontend
         run: |
           docker tag sirius-lpa-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker tag sirius-lpa-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.bump_version.outputs.tag }}
