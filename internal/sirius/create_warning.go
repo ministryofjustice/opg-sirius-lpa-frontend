@@ -31,7 +31,7 @@ func (c *Client) CreateWarning(ctx Context, personId int, warningType string, wa
 		return err
 	}
 
-	res, err := http.DefaultClient.Do(req)
+	res, err := c.http.Do(req)
 	if err != nil {
 		return err
 	}
@@ -50,12 +50,4 @@ func (c *Client) CreateWarning(ctx Context, personId int, warningType string, wa
 		return newStatusError(res)
 	}
 	return nil
-}
-
-type ValidationError struct {
-	Errors map[string]map[string]string `json:"validation_errors"`
-}
-
-func (v ValidationError) Error() string {
-	return "Validation error!"
 }

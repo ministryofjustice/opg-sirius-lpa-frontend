@@ -12,7 +12,7 @@ type WarningClient interface {
 	CreateWarning(ctx sirius.Context, personId int, warningType, warningNote string) error
 }
 
-type WarningData struct {
+type warningData struct {
 	WasWarningCreated bool
 	Error             error
 	ValidationErr     sirius.ValidationError
@@ -30,12 +30,11 @@ func Warning(client WarningClient, t Template) Handler {
 		ctx := getContext(r)
 
 		warningTypes, err := client.WarningTypes(ctx)
-
 		if err != nil {
 			return err
 		}
 
-		result := WarningData{
+		data := warningData{
 			WasWarningCreated: false,
 			Error:             err,
 			XSRFToken:         ctx.XSRFToken,
@@ -50,14 +49,14 @@ func Warning(client WarningClient, t Template) Handler {
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
-				result.ValidationErr = ve
+				data.ValidationErr = ve
 			} else if err != nil {
 				return err
 			} else {
-				result.WasWarningCreated = true
+				data.WasWarningCreated = true
 			}
 		}
 
-		return t.ExecuteTemplate(w, "page", result)
+		return t.ExecuteTemplate(w, "page", data)
 	}
 }

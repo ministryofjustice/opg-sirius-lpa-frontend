@@ -75,9 +75,8 @@ type Handler func(w http.ResponseWriter, r *http.Request) error
 type errorVars struct {
 	SiriusURL string
 	Path      string
-
-	Code  int
-	Error string
+	Code      int
+	Error     string
 }
 
 type unauthorizedError interface {

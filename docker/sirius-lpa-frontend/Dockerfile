@@ -20,10 +20,8 @@ COPY go.sum .
 
 RUN go mod download
 
-COPY internal internal
-
 COPY main.go main.go
-COPY web/template web/template
+COPY internal internal
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o /go/bin/opg-sirius-lpa-frontend
 
@@ -37,8 +35,8 @@ RUN apk --update --no-cache add \
     && rm -rf /var/cache/apk/*
 
 COPY --from=build-env /go/bin/opg-sirius-lpa-frontend opg-sirius-lpa-frontend
-COPY --from=build-env /app/web/template web/template
 COPY --from=asset-env /app/web/static web/static
+COPY web/template web/template
 
 RUN addgroup -S app && \
     adduser -S -g app app && \

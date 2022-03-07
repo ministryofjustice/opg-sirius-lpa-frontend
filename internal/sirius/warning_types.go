@@ -6,8 +6,6 @@ import (
 )
 
 func (c *Client) WarningTypes(ctx Context) ([]RefDataItem, error) {
-	var v RefData
-
 	req, err := c.newRequest(
 		ctx,
 		http.MethodGet,
@@ -19,7 +17,7 @@ func (c *Client) WarningTypes(ctx Context) ([]RefDataItem, error) {
 		return nil, err
 	}
 
-	res, err := http.DefaultClient.Do(req)
+	res, err := c.http.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -29,6 +27,7 @@ func (c *Client) WarningTypes(ctx Context) ([]RefDataItem, error) {
 		return nil, newStatusError(res)
 	}
 
+	var v refData
 	if err := json.NewDecoder(res.Body).Decode(&v); err != nil {
 		return nil, err
 	}
@@ -41,6 +40,6 @@ type RefDataItem struct {
 	Label  string `json:"label"`
 }
 
-type RefData struct {
+type refData struct {
 	WarningTypes []RefDataItem `json:"warningType"`
 }

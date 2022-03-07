@@ -66,10 +66,18 @@ func (e StatusError) Error() string {
 	return fmt.Sprintf("%s %s returned %d", e.Method, e.URL, e.Code)
 }
 
-func (e StatusError) Title() string {
+func (StatusError) Title() string {
 	return "unexpected response from Sirius"
 }
 
 func (e StatusError) Data() interface{} {
 	return e
+}
+
+type ValidationError struct {
+	Errors map[string]map[string]string `json:"validation_errors"`
+}
+
+func (ValidationError) Error() string {
+	return "validation error"
 }

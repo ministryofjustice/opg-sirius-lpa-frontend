@@ -2,7 +2,6 @@ package server
 
 import (
 	"errors"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -14,25 +13,16 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type SiriusClientMock struct {
+type mockWarningClient struct {
 	mock.Mock
 }
 
-type TemplateMock struct {
-	mock.Mock
-}
-
-func (s *SiriusClientMock) CreateWarning(ctx sirius.Context, personId int, warningType, warningNote string) error {
+func (s *mockWarningClient) CreateWarning(ctx sirius.Context, personId int, warningType, warningNote string) error {
 	args := s.Called(ctx, personId, warningType, warningNote)
 	return args.Error(0)
 }
 
-func (t *TemplateMock) ExecuteTemplate(w io.Writer, temp string, tempData interface{}) error {
-	args := t.Called(w, temp, tempData)
-	return args.Error(0)
-}
-
-func (s *SiriusClientMock) WarningTypes(ctx sirius.Context) ([]sirius.RefDataItem, error) {
+func (s *mockWarningClient) WarningTypes(ctx sirius.Context) ([]sirius.RefDataItem, error) {
 	args := s.Called(ctx)
 	if args.Get(0) != nil {
 		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
@@ -41,7 +31,7 @@ func (s *SiriusClientMock) WarningTypes(ctx sirius.Context) ([]sirius.RefDataIte
 }
 
 func TestGetWarning(t *testing.T) {
-	siriusClient := new(SiriusClientMock)
+	siriusClient := &mockWarningClient{}
 	siriusClient.On("WarningTypes", mock.Anything).Return(
 		[]sirius.RefDataItem{
 			{
@@ -52,8 +42,8 @@ func TestGetWarning(t *testing.T) {
 		nil,
 	)
 
-	template := new(TemplateMock)
-	template.On("ExecuteTemplate", mock.Anything, "page", WarningData{
+	template := &mockTemplate{}
+	template.On("ExecuteTemplate", mock.Anything, "page", warningData{
 		WasWarningCreated: false,
 		XSRFToken:         "",
 		WarningTypes: []sirius.RefDataItem{
@@ -75,7 +65,7 @@ func TestGetWarning(t *testing.T) {
 }
 
 func TestPostWarning(t *testing.T) {
-	siriusClient := new(SiriusClientMock)
+	siriusClient := &mockWarningClient{}
 	siriusClient.On("WarningTypes", mock.Anything).Return(
 		[]sirius.RefDataItem{
 			{
@@ -86,8 +76,8 @@ func TestPostWarning(t *testing.T) {
 		nil,
 	)
 
-	template := new(TemplateMock)
-	template.On("ExecuteTemplate", mock.Anything, "page", WarningData{
+	template := &mockTemplate{}
+	template.On("ExecuteTemplate", mock.Anything, "page", warningData{
 		WasWarningCreated: true,
 		XSRFToken:         "",
 		WarningTypes: []sirius.RefDataItem{
@@ -115,7 +105,7 @@ func TestPostWarning(t *testing.T) {
 }
 
 func TestPostWarningValidationErrors(t *testing.T) {
-	siriusClient := new(SiriusClientMock)
+	siriusClient := &mockWarningClient{}
 	siriusClient.On("WarningTypes", mock.Anything).Return(
 		[]sirius.RefDataItem{
 			{
@@ -130,8 +120,8 @@ func TestPostWarningValidationErrors(t *testing.T) {
 
 	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "").Return(v)
 
-	template := new(TemplateMock)
-	template.On("ExecuteTemplate", mock.Anything, "page", WarningData{
+	template := &mockTemplate{}
+	template.On("ExecuteTemplate", mock.Anything, "page", warningData{
 		WasWarningCreated: false,
 		XSRFToken:         "",
 		WarningTypes: []sirius.RefDataItem{
@@ -158,7 +148,7 @@ func TestPostWarningValidationErrors(t *testing.T) {
 }
 
 func TestCreateWarningReturnsError(t *testing.T) {
-	siriusClient := new(SiriusClientMock)
+	siriusClient := &mockWarningClient{}
 	siriusClient.On("WarningTypes", mock.Anything).Return(
 		[]sirius.RefDataItem{
 			{
@@ -187,7 +177,7 @@ func TestCreateWarningReturnsError(t *testing.T) {
 
 func TestGetWarningTypesFail(t *testing.T) {
 	expectedErr := errors.New("Failed to get warning types")
-	siriusClient := new(SiriusClientMock)
+	siriusClient := &mockWarningClient{}
 	siriusClient.On("WarningTypes", mock.Anything).Return(nil, expectedErr)
 
 	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
