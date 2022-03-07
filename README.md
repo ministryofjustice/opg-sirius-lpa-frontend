@@ -14,7 +14,6 @@ Frontend forms for Sirius.
 - [docker-compose](https://docs.docker.com/compose/install/) (>= 1.29.2)
 - [Node](https://nodejs.org/en/) (>= 14.15.1)
 
-
 ### Running the application
 
 ```
@@ -30,7 +29,6 @@ Alternatively the application can be run without the use of Docker
 yarn && yarn build
 SIRIUS_PUBLIC_URL=http://localhost:8080 SIRIUS_URL=http://localhost:8080 PORT=8888 go run main.go
 ```
-
 
 ### Testing
 
@@ -55,7 +53,6 @@ the stub service, and open Cypress in the current project run the following:
 docker-compose -f docker/docker-compose.cypress.yml up -d --build
 yarn && yarn cypress
 ```
-
 
 ## Development
 

@@ -3,7 +3,7 @@ name: Generate Scan Report
 on:
   schedule:
     # Every Friday at 16:30 UTC
-    - cron: '30 16 * * 5'
+    - cron: "30 16 * * 5"
 
 jobs:
   run:
