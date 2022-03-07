@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 )
 
@@ -76,7 +77,7 @@ func (q Request) String() string {
 	return fmt.Sprintf("method=%s path=%s query=%s headers=%v body=%v", q.Method, q.Path, q.Query, q.Headers, q.Body)
 }
 
-func (q Request) Match(r *http.Request) bool {
+func (q Request) Match(r *http.Request, body interface{}) bool {
 	if q.Method != r.Method {
 		return false
 	}
@@ -106,6 +107,13 @@ func (q Request) Match(r *http.Request) bool {
 			}
 		} else if r.Header.Get(k) != v {
 			log.Println("HX", q)
+			return false
+		}
+	}
+
+	if body != nil {
+		if !reflect.DeepEqual(body, q.Body) {
+			log.Println("BX", q)
 			return false
 		}
 	}
@@ -158,8 +166,24 @@ type Server struct {
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("-> method=%s path=%s query=%s headers=%v body=%v\n", r.Method, r.URL.Path, r.URL.Query().Encode(), r.Header, nil)
 
+	// check for the body first, if none match then will try without it
+	if r.Header.Get("Content-Type") == "application/json" {
+		var body interface{}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			log.Println("body could not be decoded to json")
+			body = nil
+		}
+
+		for _, interaction := range s.interactions {
+			if interaction.Request.Match(r, body) {
+				interaction.Response.Send(w)
+				return
+			}
+		}
+	}
+
 	for _, interaction := range s.interactions {
-		if interaction.Request.Match(r) {
+		if interaction.Request.Match(r, nil) {
 			interaction.Response.Send(w)
 			return
 		}
