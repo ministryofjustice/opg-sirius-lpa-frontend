@@ -26,10 +26,10 @@ func main() {
 
 	layouts, err := template.New("").Funcs(map[string]interface{}{
 		"sirius": func(s string) string {
-			return s
+			return siriusPublicURL + s
 		},
 		"prefix": func(s string) string {
-			return s
+			return prefix + s
 		},
 	}).ParseGlob(webDir + "/template/layouts/*")
 
