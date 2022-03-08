@@ -5,14 +5,13 @@ import (
 	"net/http"
 )
 
-func (c *Client) WarningTypes(ctx Context) ([]RefDataItem, error) {
-	req, err := c.newRequest(
-		ctx,
-		http.MethodGet,
-		"/api/v1/reference-data?filter=warningType",
-		nil,
-	)
+type RefDataItem struct {
+	Handle string `json:"handle"`
+	Label  string `json:"label"`
+}
 
+func (c *Client) WarningTypes(ctx Context) ([]RefDataItem, error) {
+	req, err := c.newRequest(ctx, http.MethodGet, "/api/v1/reference-data/warningType", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -27,19 +26,10 @@ func (c *Client) WarningTypes(ctx Context) ([]RefDataItem, error) {
 		return nil, newStatusError(res)
 	}
 
-	var v refData
+	var v []RefDataItem
 	if err := json.NewDecoder(res.Body).Decode(&v); err != nil {
 		return nil, err
 	}
 
-	return v.WarningTypes, nil
-}
-
-type RefDataItem struct {
-	Handle string `json:"handle"`
-	Label  string `json:"label"`
-}
-
-type refData struct {
-	WarningTypes []RefDataItem `json:"warningType"`
+	return v, nil
 }

@@ -29,7 +29,7 @@ services:
       - app
       - pact-stub
     environment:
-      - LHCI_BUILD_CONTEXT__CURRENT_HASH=$CIRCLE_SHA1
+      - LHCI_BUILD_CONTEXT__CURRENT_HASH=$GITHUB_SHA
       - LHCI_BUILD_CONTEXT__GITHUB_REPO_SLUG=ministryofjustice/opg-sirius-lpa-frontend
       - LHCI_GITHUB_APP_TOKEN
 

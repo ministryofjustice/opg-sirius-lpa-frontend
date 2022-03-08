@@ -37,10 +37,7 @@ func TestWarningTypes(t *testing.T) {
 					UponReceiving("A request for warning types").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/reference-data"),
-						Query: dsl.MapMatcher{
-							"filter": dsl.String("warningType"),
-						},
+						Path:   dsl.String("/api/v1/reference-data/warningType"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -49,12 +46,10 @@ func TestWarningTypes(t *testing.T) {
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"warningType": dsl.EachLike(map[string]interface{}{
-								"handle": dsl.String("Complaint Received"),
-								"label":  dsl.String("Complaint Received"),
-							}, 1),
-						}),
+						Body: dsl.EachLike(map[string]interface{}{
+							"handle": dsl.String("Complaint Received"),
+							"label":  dsl.String("Complaint Received"),
+						}, 1),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
@@ -78,10 +73,7 @@ func TestWarningTypes(t *testing.T) {
 					UponReceiving("A request for warning types without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/reference-data"),
-						Query: dsl.MapMatcher{
-							"filter": dsl.String("warningType"),
-						},
+						Path:   dsl.String("/api/v1/reference-data/warningType"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -90,7 +82,7 @@ func TestWarningTypes(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/reference-data?filter=warningType", port),
+					URL:    fmt.Sprintf("http://localhost:%d/api/v1/reference-data/warningType", port),
 					Method: http.MethodGet,
 				}
 			},
