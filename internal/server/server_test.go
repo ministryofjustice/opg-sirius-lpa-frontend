@@ -15,8 +15,8 @@ type mockTemplate struct {
 	mock.Mock
 }
 
-func (t *mockTemplate) ExecuteTemplate(w io.Writer, name string, data interface{}) error {
-	args := t.Called(w, name, data)
+func (t *mockTemplate) Func(w io.Writer, data interface{}) error {
+	args := t.Called(w, data)
 	return args.Error(0)
 }
 
@@ -44,26 +44,6 @@ func TestNew(t *testing.T) {
 	assert.Implements(t, (*http.Handler)(nil), New(nil, nil, nil, "", "", ""))
 }
 
-func TestSecurityHeaders(t *testing.T) {
-	assert := assert.New(t)
-
-	handler := securityHeaders(http.NotFoundHandler())
-
-	w := httptest.NewRecorder()
-	r, _ := http.NewRequest("GET", "/path", nil)
-
-	handler.ServeHTTP(w, r)
-
-	resp := w.Result()
-
-	assert.Equal("default-src 'self'", resp.Header.Get("Content-Security-Policy"))
-	assert.Equal("same-origin", resp.Header.Get("Referrer-Policy"))
-	assert.Equal("max-age=31536000; includeSubDomains; preload", resp.Header.Get("Strict-Transport-Security"))
-	assert.Equal("nosniff", resp.Header.Get("X-Content-Type-Options"))
-	assert.Equal("SAMEORIGIN", resp.Header.Get("X-Frame-Options"))
-	assert.Equal("1; mode=block", resp.Header.Get("X-XSS-Protection"))
-}
-
 func TestErrorHandlerError(t *testing.T) {
 	assert := assert.New(t)
 
@@ -75,14 +55,14 @@ func TestErrorHandlerError(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("ExecuteTemplate", mock.Anything, "page", errorVars{
+		On("Func", mock.Anything, errorVars{
 			SiriusURL: "http://sirius",
 			Code:      http.StatusInternalServerError,
 			Error:     "hey",
 		}).
 		Return(nil)
 
-	handler := errorHandler(logger, template, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
+	handler := errorHandler(logger, template.Func, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
 		return expectedErr
 	})
 

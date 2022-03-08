@@ -43,7 +43,7 @@ func TestGetWarning(t *testing.T) {
 	)
 
 	template := &mockTemplate{}
-	template.On("ExecuteTemplate", mock.Anything, "page", warningData{
+	template.On("Func", mock.Anything, warningData{
 		Success:   false,
 		XSRFToken: "",
 		WarningTypes: []sirius.RefDataItem{
@@ -57,7 +57,7 @@ func TestGetWarning(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/?id=89", nil)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template)(w, req)
+	err := Warning(siriusClient, template.Func)(w, req)
 
 	assert.Nil(t, err)
 	result := w.Result()
@@ -77,7 +77,7 @@ func TestPostWarning(t *testing.T) {
 	)
 
 	template := &mockTemplate{}
-	template.On("ExecuteTemplate", mock.Anything, "page", warningData{
+	template.On("Func", mock.Anything, warningData{
 		Success:   true,
 		XSRFToken: "",
 		WarningTypes: []sirius.RefDataItem{
@@ -98,7 +98,7 @@ func TestPostWarning(t *testing.T) {
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template)(w, req)
+	err := Warning(siriusClient, template.Func)(w, req)
 	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusOK, result.StatusCode)
@@ -125,7 +125,7 @@ func TestPostWarningValidationErrors(t *testing.T) {
 	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "").Return(v)
 
 	template := &mockTemplate{}
-	template.On("ExecuteTemplate", mock.Anything, "page", warningData{
+	template.On("Func", mock.Anything, warningData{
 		Success:   false,
 		XSRFToken: "",
 		WarningTypes: []sirius.RefDataItem{
@@ -145,7 +145,7 @@ func TestPostWarningValidationErrors(t *testing.T) {
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template)(w, req)
+	err := Warning(siriusClient, template.Func)(w, req)
 	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusBadRequest, result.StatusCode)
