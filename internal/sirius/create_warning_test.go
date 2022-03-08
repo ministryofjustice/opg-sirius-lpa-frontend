@@ -62,53 +62,6 @@ func TestCreateWarning(t *testing.T) {
 			},
 		},
 		{
-			name: "Validation error",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("A donor exists").
-					UponReceiving("A request to create a warning without entering any notes").
-					WithRequest(dsl.Request{
-						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/persons/189/warnings"),
-						Body: dsl.Like(map[string]interface{}{
-							"warningType": "Complaint Received",
-							"warningText": "",
-						}),
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-							"Content-Type":        dsl.String("application/json"),
-						},
-					}).
-					WillRespondWith(dsl.Response{
-						Status:  http.StatusBadRequest,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/problem+json")},
-						Body: dsl.Like(map[string]interface{}{
-							"validation_errors": dsl.Like(map[string]interface{}{
-								"warningText": dsl.Like(map[string]interface{}{
-									"isEmpty": dsl.String("Notes cannot be empty"),
-								}),
-							}),
-						}),
-					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
-			},
-			expectedError: func(int) error {
-				return ValidationError{
-					Errors: map[string]map[string]string{
-						"warningText": {
-							"isEmpty": "Notes cannot be empty",
-						},
-					},
-				}
-			},
-		},
-		{
 			name: "Unauthorized",
 			setup: func() {
 				pact.

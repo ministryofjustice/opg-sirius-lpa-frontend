@@ -14,9 +14,4 @@ describe("Create a warning", () => {
     cy.get("button[type=submit]").click();
     cy.get(".moj-banner").should("exist");
   });
-
-  it("errors if missing notes", () => {
-    cy.get("button[type=submit]").click();
-    cy.contains("Notes cannot be empty");
-  });
 });
