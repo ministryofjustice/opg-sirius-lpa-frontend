@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
@@ -19,7 +20,7 @@ type warningData struct {
 	Errors       sirius.ValidationErrors
 }
 
-func Warning(client WarningClient, t Template) Handler {
+func Warning(client WarningClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		personId, err := strconv.Atoi(r.FormValue("id"))
 		if err != nil {
@@ -55,6 +56,6 @@ func Warning(client WarningClient, t Template) Handler {
 			}
 		}
 
-		return t.ExecuteTemplate(w, "page", data)
+		return tmpl(w, data)
 	}
 }
