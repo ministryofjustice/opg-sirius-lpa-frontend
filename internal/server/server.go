@@ -1,11 +1,11 @@
 package server
 
 import (
-	"html/template"
-	"io"
 	"net/http"
 	"net/url"
 
+	"github.com/ministryofjustice/opg-go-common/securityheaders"
+	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
@@ -36,42 +36,25 @@ func getContext(r *http.Request) sirius.Context {
 	}
 }
 
-type Template interface {
-	ExecuteTemplate(io.Writer, string, interface{}) error
-}
-
 type Client interface {
 	WarningClient
 }
 
-func New(logger Logger, client Client, templates map[string]*template.Template, prefix, siriusPublicURL, webDir string) http.Handler {
-	wrap := errorHandler(logger, templates["error.gohtml"], prefix, siriusPublicURL)
+func New(logger Logger, client Client, templates template.Templates, prefix, siriusPublicURL, webDir string) http.Handler {
+	wrap := errorHandler(logger, templates.Get("error.gohtml"), prefix, siriusPublicURL)
 
 	mux := http.NewServeMux()
 
 	mux.Handle("/", http.NotFoundHandler())
 	mux.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {})
-	mux.Handle("/create-warning", wrap(Warning(client, templates["warning.gohtml"])))
+	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))
 	mux.Handle("/assets/", static)
 	mux.Handle("/javascript/", static)
 	mux.Handle("/stylesheets/", static)
 
-	return http.StripPrefix(prefix, securityHeaders(mux))
-}
-
-func securityHeaders(h http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Security-Policy", "default-src 'self'")
-		w.Header().Add("Referrer-Policy", "same-origin")
-		w.Header().Add("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
-		w.Header().Add("X-Content-Type-Options", "nosniff")
-		w.Header().Add("X-Frame-Options", "SAMEORIGIN")
-		w.Header().Add("X-XSS-Protection", "1; mode=block")
-
-		h.ServeHTTP(w, r)
-	}
+	return http.StripPrefix(prefix, securityheaders.Use(mux))
 }
 
 type Handler func(w http.ResponseWriter, r *http.Request) error
@@ -87,7 +70,7 @@ type unauthorizedError interface {
 	IsUnauthorized() bool
 }
 
-func errorHandler(logger Logger, tmplError Template, prefix, siriusURL string) func(next Handler) http.Handler {
+func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL string) func(next Handler) http.Handler {
 	return func(next Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if err := next(w, r); err != nil {
@@ -101,7 +84,7 @@ func errorHandler(logger Logger, tmplError Template, prefix, siriusURL string) f
 				code := http.StatusInternalServerError
 
 				w.WriteHeader(code)
-				err = tmplError.ExecuteTemplate(w, "page", errorVars{
+				err = tmplError(w, errorVars{
 					SiriusURL: siriusURL,
 					Path:      "",
 					Code:      code,
