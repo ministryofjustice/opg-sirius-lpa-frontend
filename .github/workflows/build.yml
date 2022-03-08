@@ -1,0 +1,306 @@
+name: Test & Build
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache Images
+        uses: actions/cache@v2
+        with:
+          path: /tmp/images
+          key: ${{ runner.os }}-images-${{ github.run_id }}-${{ github.run_number }}
+      - name: Build Images
+        run: |
+          make build
+          mkdir -p /tmp/images
+          docker save -o /tmp/images/app.tar sirius-lpa-frontend:latest
+          docker save -o /tmp/images/pact-stub.tar docker_pact-stub:latest
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.7
+      - uses: unfor19/install-aws-cli-action@v1
+
+      - name: Cache Dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install modules
+        run: |
+          go mod download
+
+      - name: Setup gotestsum
+        uses: autero1/action-gotestsum@v1.0.0
+        with:
+          gotestsum_version: 1.6.4
+      - run: mkdir -p /tmp/test-results
+
+      - name: Set Pact Standalone version
+        run: |
+          echo "pact_version=1.88.82" >> $GITHUB_ENV
+      - name: Cache Pact
+        id: cache-pact
+        uses: actions/cache@v2
+        with:
+          path: ./pact/
+          key: ${{ runner.os }}-pact-${{ env.pact_version }}
+      - name: Add Pact to Path
+        if: steps.cache-pact.outputs.cache-hit == 'true'
+        run: |
+          echo "$PWD/pact/bin" >> $GITHUB_PATH
+      - name: Download pact tools
+        if: steps.cache-pact.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://github.com/pact-foundation/pact-ruby-standalone/releases/download/v${{ env.pact_version }}/pact-${{ env.pact_version }}-linux-x86_64.tar.gz
+          tar xzf pact-${{ env.pact_version }}-linux-x86_64.tar.gz
+          echo "$PWD/pact/bin" >> $GITHUB_PATH
+
+      - name: Run Tests
+        run: |
+          gotestsum --junitfile /tmp/test-results/unit-tests.xml -- ./... -coverprofile=/tmp/test-coverage.txt
+
+      - name: Define Pact tag
+        id: pact_tag
+        run: |
+          if [ $GITHUB_EVENT_NAME == "pull_request" ]; then
+              echo "::set-output name=TAG::${{github.event.pull_request.head.sha}}"
+              echo "::set-output name=BRANCH::${{github.head_ref}}"
+          else
+              echo "::set-output name=TAG::${{github.sha}}"
+              echo "::set-output name=BRANCH::main"
+          fi
+      - name: Publish pacts
+        if: github.actor != 'dependabot[bot]'
+        run: |
+          pact-broker publish ./pacts/sirius-lpa-frontend-sirius.json \
+            --consumer-app-version ${{ steps.pact_tag.outputs.TAG }} \
+            --tag ${{ steps.pact_tag.outputs.BRANCH }} \
+            --broker-base-url https://pact-broker.api.opg.service.justice.gov.uk \
+            --broker-username admin \
+            --broker-password ${{ secrets.PACT_BROKER_PASSWORD }}
+      - name: Compare pacts
+        if: github.actor == 'dependabot[bot]'
+        env:
+          PACT_DIR: ./pacts
+          PACT_BROKER_URL: https://pact-broker.api.opg.service.justice.gov.uk
+        run: |
+          curl ${PACT_BROKER_URL}/pacts/provider/sirius/consumer/sirius-lpa-frontend/latest > /tmp/latest-pact.json
+          (diff <(jq --sort-keys . ${PACT_DIR}/sirius-lpa-frontend-sirius.json) <(jq --sort-keys . /tmp/latest-pact.json) || true) | (! grep '<')
+      - name: Upload Code Coverage
+        uses: codecov/codecov-action@v1
+        with:
+          files: /tmp/test-coverage.txt
+          fail_ci_if_error: true
+          verbose: true
+      - name: Persist Pacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: pacts
+          path: |
+            ./pacts/sirius-lpa-frontend-sirius.json
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run linting
+        uses: golangci/golangci-lint-action@v2
+
+  acceptance-test:
+    name: Acceptance Testing
+    runs-on: ubuntu-latest
+    needs:
+      - build
+      - test
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache Images
+        uses: actions/cache@v2
+        with:
+          path: /tmp/images
+          key: ${{ runner.os }}-images-${{ github.run_id }}-${{ github.run_number }}
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: pacts
+          path: ./pacts
+
+      - name: Restore Images
+        run: |
+          docker load -i /tmp/images/app.tar
+          docker load -i /tmp/images/pact-stub.tar
+
+      - name: Run pa11y
+        run: |
+          make pa11y
+
+      - name: Run Lighthouse
+        run: |
+          make lighthouse
+
+  cypress:
+    name: Cypress
+    runs-on: ubuntu-latest
+    needs:
+      - build
+      - test
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache Images
+        uses: actions/cache@v2
+        with:
+          path: /tmp/images
+          key: ${{ runner.os }}-images-${{ github.run_id }}-${{ github.run_number }}
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: pacts
+          path: ./pacts
+
+      - name: Restore images
+        run: |
+          docker load -i /tmp/images/app.tar
+          docker load -i /tmp/images/pact-stub.tar
+
+      - name: Run cypress
+        run: |
+          make cypress
+
+  push:
+    name: Push Images
+    runs-on: ubuntu-latest
+    needs: ["build", "test", "lint", "acceptance-test", "cypress"]
+    if: github.actor != 'dependabot[bot]'
+    outputs:
+      branch: ${{ steps.set-outputs.outputs.branch }}
+      tag: ${{ steps.bump_version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: Extract branch name
+        run: |
+          if [ "$GITHUB_EVENT_NAME" == "push" ]; then
+            echo BRANCH_NAME=main >> $GITHUB_ENV
+          else
+            echo BRANCH_NAME=${{ github.head_ref }} >> $GITHUB_ENV
+          fi
+        id: extract_branch
+      - uses: unfor19/install-aws-cli-action@v1
+
+      - name: Cache Images
+        uses: actions/cache@v2
+        with:
+          path: /tmp/images
+          key: ${{ runner.os }}-images-${{ github.run_id }}-${{ github.run_number }}
+
+      - name: Restore Image
+        run: |
+          docker load -i /tmp/images/app.tar
+
+      - name: Trivy Image Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: sirius-lpa-frontend:latest
+          format: "template"
+          template: "@/contrib/sarif.tpl"
+          output: "trivy-results.sarif"
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        if: always()
+        with:
+          sarif_file: "trivy-results.sarif"
+
+      - name: Bump version
+        id: bump_version
+        uses: anothrNick/github-tag-action@1.33.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INITIAL_VERSION: 1.0.0
+          DEFAULT_BUMP: minor
+          PRERELEASE_SUFFIX: ${{ env.BRANCH_NAME }}
+          RELEASE_BRANCHES: main
+          WITH_V: true
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_ACTIONS }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ACTIONS }}
+          aws-region: eu-west-1
+          role-to-assume: arn:aws:iam::311462405659:role/sirius-actions-ci
+          role-duration-seconds: 3600
+          role-session-name: GitHubActions
+
+      - name: ECR Login
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registries: 311462405659
+
+      - name: Push Container
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: sirius/sirius-lpa-frontend
+        run: |
+          docker tag sirius-lpa-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker tag sirius-lpa-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.bump_version.outputs.tag }}
+          if [ $BRANCH_NAME == "main" ]; then
+            # We want all of the tags pushed
+            docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
+          else
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.bump_version.outputs.tag }}
+          fi
+
+  push-tags:
+    runs-on: ubuntu-latest
+    needs: push
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_ACTIONS }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ACTIONS }}
+          aws-region: eu-west-1
+          role-to-assume: arn:aws:iam::997462338508:role/sirius-actions-ci
+          role-duration-seconds: 3600
+          role-session-name: GitHubActions
+
+      - name: Install AWS CLI
+        id: install-aws-cli
+        uses: unfor19/install-aws-cli-action@v1
+
+      - name: Push Tag to Parameter Store
+        run: |
+          aws ssm put-parameter --name "opg-sirius-lpa-frontend-latest-green-build" --type "String" --value "${{ needs.push.outputs.tag}}" --overwrite --region=eu-west-1
+
+      - name: Trigger Dev Deploy
+        shell: bash
+        run: curl -u ${{ secrets.JENKINS_API_USER }}:${{ secrets.JENKINS_API_TOKEN }} "https://${{ secrets.JENKINS_URL }}/job/Sirius/job/Deploy_to_Development/build?token=${{ secrets.JENKINS_API_TOKEN_NAME }}&cause=Triggered+by+opg-sirius-lpa-frontend"

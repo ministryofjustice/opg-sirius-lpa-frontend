@@ -1,0 +1,52 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Errors }}Error: {{ end }}Create Warning{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Errors }}
+
+      {{ if .Success }}
+        {{ template "success-banner" "You have successfully created a warning." }}
+      {{ end }}
+      
+      <h1 class="govuk-heading-l">Create Warning</h1>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+        <div class="govuk-form-group {{ if .Errors.warningType }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-warningType">
+            Warning type
+          </label>
+          {{ range .Errors.warningType }}
+            <p class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ . }}
+            </p>
+          {{ end }}
+          <select class="govuk-select {{ if .Errors.warningType }}govuk-select--error{{ end }}" id="f-warningType" name="warning-type">
+            {{ range .WarningTypes }}
+              <option value="{{ .Handle }}">{{ .Label }}</option>
+            {{ end }}
+          </select>
+        </div>
+
+        <div class="govuk-form-group {{ if .Errors.warningText }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-warningText">Notes</label>
+          {{ range .Errors.warningText }}
+            <p class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ . }}
+            </p>
+          {{ end }}
+          <textarea class="govuk-textarea {{ if .Errors.warningText }}govuk-textarea--error{{ end }}" name="warning-notes" rows="5" id="f-warningText"></textarea>
+        </div>
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+          <a class="govuk-link" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}

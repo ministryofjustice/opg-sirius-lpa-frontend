@@ -1,0 +1,32 @@
+{
+  "name": "opg-sirius-lpa-frontend",
+  "version": "0.1.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "webpack",
+    "cypress": "cypress open",
+    "prettier": "prettier --write ."
+  },
+  "dependencies": {
+    "@ministryofjustice/frontend": "1.2.0",
+    "cypress": "9.4.1",
+    "govuk-frontend": "^4.0.1",
+    "jquery": "^3.6.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
+    "babel-loader": "^8.1.0",
+    "copy-webpack-plugin": "^9.0.1",
+    "css-loader": "^4.3.0",
+    "mini-css-extract-plugin": "^0.11.2",
+    "prettier": "^2.5.1",
+    "sass": "^1.26.11",
+    "sass-loader": "^10.0.2",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.8.0"
+  },
+  "resolutions": {
+    "colors": "1.4.0"
+  }
+}
