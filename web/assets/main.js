@@ -15,3 +15,25 @@ GOVUKFrontend.Tabs.prototype.setup = () => {};
 
 GOVUKFrontend.initAll();
 MOJFrontend.initAll();
+
+if (window.self !== window.top) {
+  document.body.className += " app-!-embedded";
+
+  const success = document.querySelector(".moj-banner--success");
+  if (success) {
+    window.top.postMessage(
+      "form-done",
+      `${window.location.protocol}//${window.location.host}`
+    );
+  }
+
+  document.querySelectorAll("[data-app-iframe-cancel]").forEach((el) => {
+    el.addEventListener("click", (event) => {
+      window.top.postMessage(
+        "form-cancel",
+        `${window.location.protocol}//${window.location.host}`
+      );
+      event.preventDefault();
+    });
+  });
+}
