@@ -12,7 +12,7 @@ COPY web/assets web/assets
 COPY webpack.config.js .
 RUN yarn build
 
-FROM golang:1.17.7 as build-env
+FROM golang:1.17.8 as build-env
 
 WORKDIR /app
 
