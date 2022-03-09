@@ -16,12 +16,12 @@ GOVUKFrontend.Tabs.prototype.setup = () => {};
 GOVUKFrontend.initAll();
 MOJFrontend.initAll();
 
-if (window.self !== window.top) {
+if (window.self !== window.parent) {
   document.body.className += " app-!-embedded";
 
   const success = document.querySelector(".moj-banner--success");
   if (success) {
-    window.top.postMessage(
+    window.parent.postMessage(
       "form-done",
       `${window.location.protocol}//${window.location.host}`
     );
@@ -29,7 +29,7 @@ if (window.self !== window.top) {
 
   document.querySelectorAll("[data-app-iframe-cancel]").forEach((el) => {
     el.addEventListener("click", (event) => {
-      window.top.postMessage(
+      window.parent.postMessage(
         "form-cancel",
         `${window.location.protocol}//${window.location.host}`
       );
