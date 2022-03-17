@@ -9,7 +9,6 @@ COPY yarn.lock .
 RUN yarn
 
 COPY web/assets web/assets
-COPY webpack.config.js .
 RUN yarn build
 
 FROM golang:1.17.7 as build-env
