@@ -1,7 +1,6 @@
 import MOJFrontend from "@ministryofjustice/frontend/moj/all.js";
 import GOVUKFrontend from "govuk-frontend/govuk/all.js";
 import $ from "jquery";
-import "./main.scss";
 
 document.body.className = document.body.className
   ? document.body.className + " js-enabled"

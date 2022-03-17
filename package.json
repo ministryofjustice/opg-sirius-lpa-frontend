@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
-    "build": "webpack",
+    "build": "yarn build:js && yarn build:css && yarn build:images",
+    "build:js": "esbuild --bundle web/assets/main.js --minify --outfile=web/static/javascript/all.js --sourcemap",
+    "build:css": "sass --load-path . --style compressed web/assets/main.scss web/static/stylesheets/all.css",
+    "build:images": "mkdir -p web/static/assets/images && cp node_modules/govuk-frontend/govuk/assets/images/* node_modules/@ministryofjustice/frontend/moj/assets/images/* web/static/assets/images",
+    "clean": "rm -rf web/static",
     "cypress": "cypress open",
     "prettier": "prettier --write ."
   },
@@ -14,17 +18,9 @@
     "jquery": "^3.6.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.11.6",
-    "@babel/preset-env": "^7.11.5",
-    "babel-loader": "^8.1.0",
-    "copy-webpack-plugin": "^9.0.1",
-    "css-loader": "^4.3.0",
-    "mini-css-extract-plugin": "^0.11.2",
+    "esbuild": "^0.14.27",
     "prettier": "^2.5.1",
-    "sass": "^1.26.11",
-    "sass-loader": "^10.0.2",
-    "webpack": "^5.65.0",
-    "webpack-cli": "^4.8.0"
+    "sass": "^1.26.11"
   },
   "resolutions": {
     "colors": "1.4.0"
