@@ -26,6 +26,7 @@
             </p>
           {{ end }}
           <select class="govuk-select {{ if .Errors.warningType }}govuk-select--error{{ end }}" id="f-warningType" name="warning-type">
+            <option hidden selected disabled></option>
             {{ range .WarningTypes }}
               <option value="{{ .Handle }}">{{ .Label }}</option>
             {{ end }}
