@@ -37,6 +37,7 @@ func getContext(r *http.Request) sirius.Context {
 }
 
 type Client interface {
+	EventClient
 	WarningClient
 }
 
@@ -48,6 +49,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/", http.NotFoundHandler())
 	mux.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {})
 	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning.gohtml"))))
+	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))
 	mux.Handle("/assets/", static)
