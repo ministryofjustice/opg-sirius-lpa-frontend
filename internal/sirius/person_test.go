@@ -9,15 +9,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateWarning(t *testing.T) {
+func TestPerson(t *testing.T) {
 	pact := newPact()
 	defer pact.Teardown()
 
 	testCases := []struct {
-		name          string
-		setup         func()
-		cookies       []*http.Cookie
-		expectedError func(int) error
+		name             string
+		setup            func()
+		cookies          []*http.Cookie
+		expectedResponse Person
+		expectedError    func(int) error
 	}{
 		{
 			name: "OK",
@@ -25,23 +26,22 @@ func TestCreateWarning(t *testing.T) {
 				pact.
 					AddInteraction().
 					Given("A donor exists").
-					UponReceiving("A request to create a warning").
+					UponReceiving("A request for the person").
 					WithRequest(dsl.Request{
-						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/persons/189/warnings"),
-						Body: dsl.Like(map[string]interface{}{
-							"warningType": "Complaint Received",
-							"warningText": "Some warning notes",
-						}),
+						Method: http.MethodGet,
+						Path:   dsl.String("/api/v1/persons/189"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
 							"OPG-Bypass-Membrane": dsl.String("1"),
-							"Content-Type":        dsl.String("application/json"),
 						},
 					}).
 					WillRespondWith(dsl.Response{
-						Status:  http.StatusCreated,
+						Status: http.StatusOK,
+						Body: dsl.Like(map[string]interface{}{
+							"firstname": dsl.String("John"),
+							"surname":   dsl.String("Doe"),
+						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
@@ -49,6 +49,7 @@ func TestCreateWarning(t *testing.T) {
 				{Name: "XSRF-TOKEN", Value: "abcde"},
 				{Name: "Other", Value: "other"},
 			},
+			expectedResponse: Person{Firstname: "John", Surname: "Doe"},
 		},
 		{
 			name: "Unauthorized",
@@ -56,10 +57,10 @@ func TestCreateWarning(t *testing.T) {
 				pact.
 					AddInteraction().
 					Given("A donor exists").
-					UponReceiving("A request to create a warning without cookies").
+					UponReceiving("A request for the person without cookies").
 					WithRequest(dsl.Request{
-						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/persons/189/warnings"),
+						Method: http.MethodGet,
+						Path:   dsl.String("/api/v1/persons/189"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -68,8 +69,8 @@ func TestCreateWarning(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/persons/189/warnings", port),
-					Method: http.MethodPost,
+					URL:    fmt.Sprintf("http://localhost:%d/api/v1/persons/189", port),
+					Method: http.MethodGet,
 				}
 			},
 		},
@@ -82,8 +83,10 @@ func TestCreateWarning(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.CreateWarning(getContext(tc.cookies), 189, "Complaint Received", "Some warning notes")
-				if (tc.expectedError) == nil {
+				caseitem, err := client.Person(getContext(tc.cookies), 189)
+
+				assert.Equal(t, tc.expectedResponse, caseitem)
+				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
 					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
