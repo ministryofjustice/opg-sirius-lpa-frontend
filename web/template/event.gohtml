@@ -1,0 +1,75 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Errors }}Error: {{ end }}Create Event{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
+
+      {{ template "error-summary" .Errors }}
+
+      {{ if .Success }}
+        {{ template "success-banner" "You have successfully created an event." }}
+      {{ end }}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">Create Event</h1>
+
+      <form class="form" enctype="multipart/form-data" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+        <div class="govuk-form-group {{ if .Errors.type }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-type">
+            Event type
+          </label>
+          {{ range .Errors.type }}
+            <p class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ . }}
+            </p>
+          {{ end }}
+          <select class="govuk-select {{ if .Errors.type }}govuk-select--error{{ end }}" id="f-type" name="type">
+            <option hidden {{ if eq "" .Type }}selected{{ end }} disabled></option>
+            {{ range .NoteTypes }}
+              <option value="{{ . }}" {{ if eq . $.Type }}selected{{ end }} >{{ . }}</option>
+            {{ end }}
+          </select>
+        </div>
+
+        <div class="govuk-form-group {{ if .Errors.name }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-name">Subject</label>
+          {{ range .Errors.name }}
+            <p class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ . }}
+            </p>
+          {{ end }}
+          <input class="govuk-input {{ if .Errors.name }}govuk-input--error{{ end }}" id="f-name" name="name" value="{{ .Name }}" />
+        </div>
+
+        <div class="govuk-form-group {{ if .Errors.description }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-description">Notes</label>
+          {{ range .Errors.description }}
+            <p class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ . }}
+            </p>
+          {{ end }}
+          <textarea class="govuk-textarea {{ if .Errors.description }}govuk-textarea--error{{ end }}" id="f-description" name="description">{{ .Description }}</textarea>
+        </div>
+
+        <div class="govuk-form-group {{ if .Errors.file  }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-file">File upload</label>
+          {{ range .Errors.file }}
+            <p class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ . }}
+            </p>
+          {{ end }}
+          <input class="govuk-file-upload {{ if .Errors.file }}govuk-file-upload--error{{ end }}" type="file" name="file" id="f-file" />
+        </div>
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}

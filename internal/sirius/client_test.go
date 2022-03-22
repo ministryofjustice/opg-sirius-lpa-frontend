@@ -5,8 +5,20 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/stretchr/testify/assert"
 )
+
+func newPact() *dsl.Pact {
+	return &dsl.Pact{
+		Consumer:          "sirius-lpa-frontend",
+		Provider:          "sirius",
+		Host:              "localhost",
+		PactFileWriteMode: "merge",
+		LogDir:            "../../logs",
+		PactDir:           "../../pacts",
+	}
+}
 
 func getContext(cookies []*http.Cookie) Context {
 	return Context{
