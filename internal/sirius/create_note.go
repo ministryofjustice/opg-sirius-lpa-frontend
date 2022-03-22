@@ -3,6 +3,7 @@ package sirius
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 )
@@ -13,6 +14,27 @@ type NoteFile struct {
 	Type   string `json:"type"`
 }
 
+type EntityType string
+
+const (
+	EntityTypeLpa    = EntityType("lpa")
+	EntityTypeEpa    = EntityType("epa")
+	EntityTypePerson = EntityType("person")
+)
+
+func ParseEntityType(s string) (EntityType, error) {
+	switch s {
+	case "lpa":
+		return EntityTypeLpa, nil
+	case "epa":
+		return EntityTypeEpa, nil
+	case "person":
+		return EntityTypePerson, nil
+	}
+
+	return EntityType(""), errors.New("could not parse entity type")
+}
+
 type noteRequest struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
@@ -20,7 +42,7 @@ type noteRequest struct {
 	File        *NoteFile `json:"file,omitempty"`
 }
 
-func (c *Client) CreateNote(ctx Context, entityID int, entityType, noteType, name, description string, file *NoteFile) error {
+func (c *Client) CreateNote(ctx Context, entityID int, entityType EntityType, noteType, name, description string, file *NoteFile) error {
 	data, err := json.Marshal(noteRequest{
 		Name:        name,
 		Description: description,

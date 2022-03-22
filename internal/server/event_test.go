@@ -17,7 +17,7 @@ type mockEventClient struct {
 	mock.Mock
 }
 
-func (m *mockEventClient) CreateNote(ctx sirius.Context, entityID int, entityType, noteType, name, description string, file *sirius.NoteFile) error {
+func (m *mockEventClient) CreateNote(ctx sirius.Context, entityID int, entityType sirius.EntityType, noteType, name, description string, file *sirius.NoteFile) error {
 	args := m.Called(ctx, entityID, entityType, noteType, name, description, file)
 	return args.Error(0)
 }
@@ -183,7 +183,7 @@ func TestPostEvent(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
 	client.
-		On("CreateNote", mock.Anything, 123, "person", "Application processing", "Something", "More words", (*sirius.NoteFile)(nil)).
+		On("CreateNote", mock.Anything, 123, sirius.EntityTypePerson, "Application processing", "Something", "More words", (*sirius.NoteFile)(nil)).
 		Return(nil)
 
 	template := &mockTemplate{}
@@ -222,7 +222,7 @@ func TestPostEventWithFile(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
 	client.
-		On("CreateNote", mock.Anything, 123, "person", "Application processing", "Something", "More words",
+		On("CreateNote", mock.Anything, 123, sirius.EntityTypePerson, "Application processing", "Something", "More words",
 			&sirius.NoteFile{Name: "test.txt", Type: "application/octet-stream", Source: "SGV5"}).
 		Return(nil)
 
@@ -290,7 +290,7 @@ func TestPostEventWhenCreateNoteFails(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
 	client.
-		On("CreateNote", mock.Anything, 123, "person", "Application processing", "Something", "More words", (*sirius.NoteFile)(nil)).
+		On("CreateNote", mock.Anything, 123, sirius.EntityTypePerson, "Application processing", "Something", "More words", (*sirius.NoteFile)(nil)).
 		Return(expectedError)
 
 	template := &mockTemplate{}
@@ -331,7 +331,7 @@ func TestPostEventWhenValidationError(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
 	client.
-		On("CreateNote", mock.Anything, 123, "person", "Application processing", "Something", "More words", (*sirius.NoteFile)(nil)).
+		On("CreateNote", mock.Anything, 123, sirius.EntityTypePerson, "Application processing", "Something", "More words", (*sirius.NoteFile)(nil)).
 		Return(sirius.ValidationError{Errors: expectedErrors})
 
 	template := &mockTemplate{}

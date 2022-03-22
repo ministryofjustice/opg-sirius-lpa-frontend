@@ -18,7 +18,7 @@ const Megabyte = 1024 * 1024
 
 type EventClient interface {
 	NoteTypes(ctx sirius.Context) ([]string, error)
-	CreateNote(ctx sirius.Context, entityID int, entityType, noteType, name, description string, file *sirius.NoteFile) error
+	CreateNote(ctx sirius.Context, entityID int, entityType sirius.EntityType, noteType, name, description string, file *sirius.NoteFile) error
 	Person(ctx sirius.Context, id int) (sirius.Person, error)
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
 }
@@ -42,9 +42,9 @@ func Event(client EventClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		entityType := r.FormValue("entity")
-		if entityType != "person" && entityType != "lpa" && entityType != "epa" {
-			return fmt.Errorf("entity must be one of 'person', 'lpa' or 'epa'")
+		entityType, err := sirius.ParseEntityType(r.FormValue("entity"))
+		if err != nil {
+			return err
 		}
 
 		ctx := getContext(r)
@@ -64,13 +64,13 @@ func Event(client EventClient, tmpl template.Template) Handler {
 
 		group.Go(func() error {
 			switch entityType {
-			case "person":
+			case sirius.EntityTypePerson:
 				person, err := client.Person(ctx.With(groupCtx), entityID)
 				if err != nil {
 					return err
 				}
 				data.Entity = fmt.Sprintf("%s %s", person.Firstname, person.Surname)
-			case "lpa", "epa":
+			case sirius.EntityTypeLpa, sirius.EntityTypeEpa:
 				caseitem, err := client.Case(ctx.With(groupCtx), entityID)
 				if err != nil {
 					return err
