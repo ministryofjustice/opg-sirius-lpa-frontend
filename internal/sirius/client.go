@@ -2,6 +2,7 @@ package sirius
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -50,6 +51,25 @@ func (c *Client) newRequest(ctx Context, method, path string, body io.Reader) (*
 	}
 
 	return req, err
+}
+
+func (c *Client) get(ctx Context, path string, v interface{}) error {
+	req, err := c.newRequest(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return newStatusError(resp)
+	}
+
+	return json.NewDecoder(resp.Body).Decode(&v)
 }
 
 type StatusError struct {
