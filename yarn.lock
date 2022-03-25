@@ -42,11 +42,6 @@
     govuk-frontend "^3.0.0 || ^4.0.0"
     moment "^2.27.0"
 
-"@orchidjs/sifter@^0.9.1":
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/@orchidjs/sifter/-/sifter-0.9.1.tgz#20580cb75bcc1de3c9b9c021e0e546eb59ff2813"
-  integrity sha512-bdW8vKTlWXfoAvUud0a4OeVPrtdvHH8gTshKqndzxAI6bXGPBejgry2wvIz0OZOqOuWuFAJWgNCjq/6S85U77A==
-
 "@types/node@*":
   version "17.0.21"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.21.tgz#864b987c0c68d07b4345845c3e63b75edd143644"
@@ -73,6 +68,13 @@
   integrity sha512-8uALY5LTvSuHgloDVUvWP3pIauILm+8/0pDMokuDYIoNsOkSwd5AiHBTSEJjKTDcZr5z8UpgOWZkxBF4iJftoA==
   dependencies:
     "@types/node" "*"
+
+accessible-autocomplete@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/accessible-autocomplete/-/accessible-autocomplete-2.0.4.tgz#e295256c8d268b97c5ab456a1cb084b553ed3eb0"
+  integrity sha512-2p0txrSpvs5wXFUeQJHMheDPTZVSEmiUHWlEPb7vJnv2Dd1xPfoLnBQQMfNbTSit2pL/9sSQYESuD2Yyohd4Yw==
+  dependencies:
+    preact "^8.3.1"
 
 aggregate-error@^3.0.0:
   version "3.1.0"
@@ -1089,6 +1091,11 @@ pify@^2.2.0:
   resolved "https://registry.yarnpkg.com/pify/-/pify-2.3.0.tgz#ed141a6ac043a849ea588498e7dca8b15330e90c"
   integrity sha1-7RQaasBDqEnqWISY59yosVMw6Qw=
 
+preact@^8.3.1:
+  version "8.5.3"
+  resolved "https://registry.yarnpkg.com/preact/-/preact-8.5.3.tgz#78c2a5562fcecb1fed1d0055fa4ac1e27bde17c1"
+  integrity sha512-O3kKP+1YdgqHOFsZF2a9JVdtqD+RPzCQc3rP+Ualf7V6rmRDchZ9MJbiGTT7LuyqFKZqlHSOyO/oMFmI2lVTsw==
+
 prettier@^2.5.1:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.5.1.tgz#fff75fa9d519c54cf0fce328c1017d94546bc56a"
@@ -1307,13 +1314,6 @@ to-regex-range@^5.0.1:
   integrity sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==
   dependencies:
     is-number "^7.0.0"
-
-tom-select@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/tom-select/-/tom-select-2.0.1.tgz#e3a6e6de61070274f746543f177107970a36b878"
-  integrity sha512-HTFf0OTwA2k8YCUqIZOenvr+ZrV4LMOUjCn3n5XS8wIpigcxKVvs5XRhBSGedhRJ8s+VmemIqy6rnabgBYX+6w==
-  dependencies:
-    "@orchidjs/sifter" "^0.9.1"
 
 tough-cookie@~2.5.0:
   version "2.5.0"

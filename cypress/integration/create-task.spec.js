@@ -13,8 +13,8 @@ describe("Create a task", () => {
     cy.get("#f-name").type("A title");
     cy.get("#f-description").type("More words");
     cy.get("#f-assignTo").check();
-    cy.get(".ts-control").type("admin");
-    cy.get(".ts-dropdown").contains("system admin").click();
+    cy.get("#f-assigneeUser").type("admin");
+    cy.get(".autocomplete__menu").contains("system admin").click();
     cy.get("#f-dueDate").type("9999-03-04");
     cy.get("button[type=submit]").click();
     cy.get(".moj-banner").should("exist");
