@@ -1,6 +1,7 @@
 import MOJFrontend from "@ministryofjustice/frontend/moj/all.js";
 import GOVUKFrontend from "govuk-frontend/govuk/all.js";
 import $ from "jquery";
+import TomSelect from "tom-select";
 
 document.body.className = document.body.className
   ? document.body.className + " js-enabled"
@@ -14,6 +15,34 @@ GOVUKFrontend.Tabs.prototype.setup = () => {};
 
 GOVUKFrontend.initAll();
 MOJFrontend.initAll();
+
+const prefix = document.body.getAttribute("data-prefix");
+
+const selectUser = document.querySelector("[data-select-user]");
+if (selectUser) {
+  new TomSelect("[data-select-user]", {
+    maxItems: 1,
+    create: false,
+    valueField: "id",
+    labelField: "displayName",
+    searchField: "displayName",
+    load(query, callback) {
+      fetch(`${prefix}/search-users?q=${encodeURIComponent(query)}`)
+        .then((response) => response.json())
+        .then((json) => {
+          callback(
+            json.map(({ id, displayName }) => ({
+              id: id + ":" + displayName,
+              displayName,
+            }))
+          );
+        })
+        .catch(() => {
+          callback();
+        });
+    },
+  });
+}
 
 if (window.self !== window.parent) {
   document.body.className += " app-!-embedded";
