@@ -12,7 +12,7 @@ describe("Create a task", () => {
     cy.get("#f-taskType").select("Check Application");
     cy.get("#f-name").type("A title");
     cy.get("#f-description").type("More words");
-    cy.get("#f-assignTo").check();
+    cy.contains(".govuk-radios__item", "User").find("input").check();
     cy.get("#f-assigneeUser").type("admin");
     cy.get(".autocomplete__menu").contains("system admin").click();
     cy.get("#f-dueDate").type("9999-03-04");
@@ -26,7 +26,7 @@ describe("Create a task", () => {
     cy.get("#f-taskType").select("Check Application");
     cy.get("#f-name").type("A title");
     cy.get("#f-description").type("More words");
-    cy.get("#f-assignTo-2").check();
+    cy.contains(".govuk-radios__item", "Team").find("input").check();
     cy.get("#f-assigneeTeam").select("Cool Team");
     cy.get("#f-dueDate").type("9999-03-04");
     cy.get("button[type=submit]").click();
