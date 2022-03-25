@@ -41,7 +41,6 @@ func (c *Client) CreateTask(ctx Context, task Task) error {
 	if err != nil {
 		return err
 	}
-
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusBadRequest {

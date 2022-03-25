@@ -20,6 +20,19 @@ func TestDateString(t *testing.T) {
 	assert.Equal(t, fromSirius, string(data))
 }
 
+func TestDateStringNull(t *testing.T) {
+	fromSirius := `null`
+
+	var v DateString
+	err := json.Unmarshal([]byte(fromSirius), &v)
+	assert.Nil(t, err)
+	assert.Equal(t, "", string(v))
+
+	data, err := json.Marshal(v)
+	assert.Nil(t, err)
+	assert.Equal(t, fromSirius, string(data))
+}
+
 func TestDateStringErrors(t *testing.T) {
 	fromSirius := `"03/04"`
 
