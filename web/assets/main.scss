@@ -4,46 +4,12 @@ $moj-page-width: 1220px;
 
 @import "node_modules/govuk-frontend/govuk/all";
 @import "node_modules/@ministryofjustice/frontend/moj/all";
-@import "node_modules/tom-select/dist/scss/tom-select";
+@import "node_modules/accessible-autocomplete/src/autocomplete";
 
 .app-\!-embedded .app-\!-embedded-hide {
   display: none;
 }
 
-.ts-wrapper .ts-control {
-  border-radius: 0;
-  @extend .govuk-select;
-
-  > input {
-    font-size: inherit;
-    color: inherit;
-  }
-}
-
-.ts-dropdown {
-  @include govuk-font($size: 19, $line-height: 1.25);
-  color: inherit;
-
-  .ts-dropdown-content {
-    font-size: inherit;
-  }
-
-  .option:not(.active),
-  .no-results {
+.autocomplete__wrapper {
     font-family: $govuk-font-family;
-    font-size: inherit;
-    color: inherit;
-    background-color: inherit;
-  }
-
-  .option.active {
-    font-family: $govuk-font-family;
-    font-size: inherit;
-  }
-}
-
-.ts-wrapper.govuk-select--error {
-  .ts-control {
-    border-color: $govuk-error-colour;
-  }
 }

@@ -59,12 +59,14 @@
                 </label>
               </div>
               <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-assignTo">        
-                <div class="govuk-form-group {{ if .Errors.assigneeUser }}govuk-form-group--error{{ end }}">
+                <div class="govuk-!-width-one-half govuk-form-group {{ if .Errors.assigneeUser }}govuk-form-group--error{{ end }}">
                   <label class="govuk-label" for="f-assigneeUser">User</label>
                   {{ template "errors" .Errors.assigneeUser }}
-                  <select class="govuk-!-width-one-half {{ if .Errors.assigneeUser }}govuk-select--error{{ end }}" id="f-assigneeUser" name="assigneeUser" data-select-user autocomplete="off">
+                  <select class="govuk-select {{ if .Errors.assigneeUser }}govuk-select--error{{ end }}" id="f-assigneeUser" name="assigneeUser" data-select-user>
                     {{ if .Task.AssigneeID }}
-                      <option value="{{ .Task.AssigneeID }}:{{ $.AssigneeUserName }}">{{ $.AssigneeUserName }}</option>
+                      <option value="{{ .Task.AssigneeID }}:{{ .AssigneeUserName }}" selected>{{ .AssigneeUserName }}</option>
+                    {{ else }}
+                      <option value="" selected></option>
                     {{ end }}
                   </select>
                 </div>
