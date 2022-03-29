@@ -1,4 +1,5 @@
 import MOJFrontend from "@ministryofjustice/frontend/moj/all.js";
+import accessibleAutocomplete from "accessible-autocomplete";
 import GOVUKFrontend from "govuk-frontend/govuk/all.js";
 import $ from "jquery";
 
@@ -14,6 +15,40 @@ GOVUKFrontend.Tabs.prototype.setup = () => {};
 
 GOVUKFrontend.initAll();
 MOJFrontend.initAll();
+
+const prefix = document.body.getAttribute("data-prefix");
+
+const selectUser = document.querySelector("[data-select-user]");
+if (selectUser) {
+  accessibleAutocomplete.enhanceSelectElement({
+    selectElement: selectUser,
+    minLength: 3,
+    confirmOnBlur: false,
+    source(query, callback) {
+      fetch(`${prefix}/search-users?q=${encodeURIComponent(query)}`)
+        .then((response) => response.json())
+        .then((json) => {
+          callback(
+            json.map(({ id, displayName }) => ({ id, text: displayName }))
+          );
+        })
+        .catch(() => {
+          callback([]);
+        });
+    },
+    templates: {
+      inputValue(value) {
+        return !value ? "" : value.text;
+      },
+      suggestion(value) {
+        return value.text;
+      },
+    },
+    onConfirm(selected) {
+      selectUser.innerHTML = `<option value="${selected.id}:${selected.text}" selected>${selected.text}</option>`;
+    },
+  });
+}
 
 if (window.self !== window.parent) {
   document.body.className += " app-!-embedded";
