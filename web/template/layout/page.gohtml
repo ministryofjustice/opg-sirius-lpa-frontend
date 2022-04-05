@@ -16,7 +16,7 @@
       <link rel="apple-touch-icon" sizes="152x152" href="{{ prefix "/assets/images/govuk-apple-touch-icon-152x152.png" }}">
       <link rel="apple-touch-icon" href="{{ prefix "/assets/images/govuk-apple-touch-icon.png" }}">
 
-      <link href="{{ prefix "/stylesheets/all.css?v1" }}" rel="stylesheet">
+      <link href="{{ prefixAsset "/stylesheets/all.css" }}" rel="stylesheet">
     </head>
 
     <body class="govuk-template__body app-body-class" data-prefix="{{ prefix "" }}">
@@ -34,7 +34,7 @@
 
       <footer class="govuk-footer app-!-embedded-hide" role="contentinfo"></footer>
 
-      <script src="{{ prefix "/javascript/all.js?v1" }}"></script>
+      <script src="{{ prefixAsset "/javascript/all.js" }}"></script>
     </body>
   </html>
 {{ end }}

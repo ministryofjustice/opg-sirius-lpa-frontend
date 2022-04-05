@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,6 +14,7 @@ import (
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/server"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"golang.org/x/mod/sumdb/dirhash"
 )
 
 func main() {
@@ -24,12 +26,24 @@ func main() {
 	siriusPublicURL := env.Get("SIRIUS_PUBLIC_URL", "")
 	prefix := env.Get("PREFIX", "")
 
+	staticHash, err := dirhash.HashDir(webDir+"/static", webDir, dirhash.DefaultHash)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
 	tmpls, err := template.Parse(webDir+"/template", map[string]interface{}{
 		"sirius": func(s string) string {
 			return siriusPublicURL + s
 		},
 		"prefix": func(s string) string {
 			return prefix + s
+		},
+		"prefixAsset": func(s string) string {
+			if len(staticHash) >= 11 {
+				return prefix + s + "?" + url.QueryEscape(staticHash[3:11])
+			} else {
+				return prefix + s
+			}
 		},
 	})
 	if err != nil {
