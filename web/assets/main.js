@@ -51,6 +51,7 @@ if (selectUser) {
 }
 
 if (window.self !== window.parent) {
+  document.documentElement.className += " app-!-html-class--embedded";
   document.body.className += " app-!-embedded";
 
   const success = document.querySelector(".moj-banner--success");
