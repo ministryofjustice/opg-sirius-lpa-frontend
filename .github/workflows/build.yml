@@ -235,13 +235,9 @@ jobs:
         with:
           sarif_file: "trivy-results.sarif"
 
-
-      - name: Git work around for versioning
-        run : sudo chown root .
-
       - name: Bump version
         id: bump_version
-        uses: anothrNick/github-tag-action@1.33.0
+        uses: anothrNick/github-tag-action@1.36.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           INITIAL_VERSION: 1.0.0
