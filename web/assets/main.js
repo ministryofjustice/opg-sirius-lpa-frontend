@@ -3,10 +3,6 @@ import accessibleAutocomplete from "accessible-autocomplete";
 import GOVUKFrontend from "govuk-frontend/govuk/all.js";
 import $ from "jquery";
 
-document.body.className = document.body.className
-  ? document.body.className + " js-enabled"
-  : "js-enabled";
-
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
 
@@ -51,9 +47,6 @@ if (selectUser) {
 }
 
 if (window.self !== window.parent) {
-  document.documentElement.className += " app-!-html-class--embedded";
-  document.body.className += " app-!-embedded";
-
   const success = document.querySelector(".moj-banner--success");
   if (success) {
     window.parent.postMessage(
