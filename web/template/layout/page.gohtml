@@ -20,6 +20,7 @@
     </head>
 
     <body class="govuk-template__body app-body-class" data-prefix="{{ prefix "" }}">
+      <script src="{{ prefixAsset "/javascript/load-classes.js" }}"></script>
       <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
 
       {{ template "header" . }}
@@ -34,7 +35,7 @@
 
       <footer class="govuk-footer app-!-embedded-hide" role="contentinfo"></footer>
 
-      <script src="{{ prefixAsset "/javascript/all.js" }}"></script>
+      <script src="{{ prefixAsset "/javascript/main.js" }}"></script>
     </body>
   </html>
 {{ end }}
