@@ -60,4 +60,18 @@ $sirius-bg-color: #29292e;
     background-color: $sirius-bg-color;
     color: govuk-colour("white");
   }
+
+  .autocomplete__menu {
+    background-color: $sirius-bg-color;
+    color: govuk-colour("white");
+  }
+
+  .autocomplete__option--odd {
+    background-color: govuk-colour("black");
+  }
+
+  .autocomplete__option--focused,
+  .autocomplete__option:hover {
+    background-color: govuk-colour("blue");
+  }
 }
