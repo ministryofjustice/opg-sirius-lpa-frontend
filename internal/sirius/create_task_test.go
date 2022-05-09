@@ -48,6 +48,10 @@ func TestCreateTask(t *testing.T) {
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusCreated,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Body: dsl.Like(map[string]interface{}{
+							"uId":      dsl.String("7000-0000-0000"),
+							"caseType": dsl.String("LPA"),
+						}),
 					})
 			},
 			cookies: []*http.Cookie{
