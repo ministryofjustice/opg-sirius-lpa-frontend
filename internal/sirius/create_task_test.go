@@ -36,7 +36,7 @@ func TestCreateTask(t *testing.T) {
 							"type":        dsl.String("Change of Address"),
 							"name":        dsl.String("Something"),
 							"description": dsl.String("More words"),
-							"dueDate":     dsl.Term("04/05/2022", `^\d{1,2}/\d{1,2}/\d{4}$`),
+							"dueDate":     dsl.Term("04/05/2731", `^\d{1,2}/\d{1,2}/\d{4}$`),
 						},
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
