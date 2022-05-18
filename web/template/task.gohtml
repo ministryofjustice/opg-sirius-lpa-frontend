@@ -40,7 +40,7 @@
         <div class="govuk-form-group {{ if .Errors.description }}govuk-form-group--error{{ end }}">
           <label class="govuk-label" for="f-description">Notes</label>
           {{ template "errors" .Errors.description }}
-          <textarea class="govuk-textarea {{ if .Errors.description }}govuk-textarea--error{{ end }}" id="f-description auto-resize-textarea" name="description">{{ .Task.Description }}</textarea>
+          <textarea class="govuk-textarea js-auto-resize-textarea {{ if .Errors.description }}govuk-textarea--error{{ end }}" id="f-description" name="description">{{ .Task.Description }}</textarea>
         </div>
                 
         <div class="govuk-form-group {{ if .Errors.assignTo }}govuk-form-group--error{{ end }}">

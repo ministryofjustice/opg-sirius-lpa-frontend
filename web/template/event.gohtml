@@ -52,7 +52,7 @@
               <span class="govuk-visually-hidden">Error:</span> {{ . }}
             </p>
           {{ end }}
-          <textarea class="govuk-textarea {{ if .Errors.description }}govuk-textarea--error{{ end }}" id="f-description auto-resize-textarea" name="description">{{ .Description }}</textarea>
+          <textarea class="govuk-textarea js-auto-resize-textarea {{ if .Errors.description }}govuk-textarea--error{{ end }}" id="f-description" name="description">{{ .Description }}</textarea>
         </div>
 
         <div class="govuk-form-group {{ if .Errors.file  }}govuk-form-group--error{{ end }}">

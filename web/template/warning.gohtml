@@ -40,7 +40,7 @@
               <span class="govuk-visually-hidden">Error:</span> {{ . }}
             </p>
           {{ end }}
-          <textarea class="govuk-textarea {{ if .Errors.warningText }}govuk-textarea--error{{ end }}" name="warning-notes" rows="5" id="f-warningText auto-resize-textarea"></textarea>
+          <textarea class="govuk-textarea js-auto-resize-textarea {{ if .Errors.warningText }}govuk-textarea--error{{ end }}" name="warning-notes" rows="5" id="f-warningText"></textarea>
         </div>
 
         <div class="govuk-button-group">
