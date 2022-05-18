@@ -2,6 +2,7 @@ import MOJFrontend from "@ministryofjustice/frontend/moj/all.js";
 import accessibleAutocomplete from "accessible-autocomplete";
 import GOVUKFrontend from "govuk-frontend/govuk/all.js";
 import $ from "jquery";
+import autoResizeTextArea from "./auto-resize-text-area.js"
 
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
@@ -11,6 +12,7 @@ GOVUKFrontend.Tabs.prototype.setup = () => {};
 
 GOVUKFrontend.initAll();
 MOJFrontend.initAll();
+autoResizeTextArea();
 
 const prefix = document.body.getAttribute("data-prefix");
 
