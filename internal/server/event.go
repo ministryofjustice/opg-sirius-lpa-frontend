@@ -28,7 +28,7 @@ type eventData struct {
 	NoteTypes []string
 	Entity    string
 	Success   bool
-	Errors    sirius.ValidationErrors
+	Error     sirius.ValidationError
 
 	Type        string
 	Name        string
@@ -104,7 +104,7 @@ func Event(client EventClient, tmpl template.Template) Handler {
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
-				data.Errors = ve.Errors
+				data.Error = ve
 				data.Type = noteType
 				data.Name = name
 				data.Description = description
