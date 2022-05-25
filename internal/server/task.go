@@ -24,7 +24,7 @@ type taskData struct {
 	Today     string
 	Entity    string
 	Success   bool
-	Errors    sirius.ValidationErrors
+	Error     sirius.ValidationError
 
 	TaskTypes        []string
 	Teams            []sirius.Team
@@ -110,17 +110,17 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Task = task
 				data.AssignTo = assignTo
-				data.Errors = ve.Errors
+				data.Error = ve
 
 				switch data.AssignTo {
 				case "user":
-					data.Errors["assigneeUser"] = data.Errors["assigneeId"]
+					data.Error.Field["assigneeUser"] = data.Error.Field["assigneeId"]
 				case "team":
-					data.Errors["assigneeTeam"] = data.Errors["assigneeId"]
+					data.Error.Field["assigneeTeam"] = data.Error.Field["assigneeId"]
 				default:
-					data.Errors["assignTo"] = map[string]string{"": "Assignee not set"}
+					data.Error.Field["assignTo"] = map[string]string{"": "Assignee not set"}
 				}
-				delete(data.Errors, "assigneeId")
+				delete(data.Error.Field, "assigneeId")
 			} else if err != nil {
 				return err
 			} else {

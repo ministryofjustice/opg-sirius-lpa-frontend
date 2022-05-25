@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateTask(t *testing.T) {
+func TestCreatePersonReference(t *testing.T) {
 	pact := newPact()
 	defer pact.Teardown()
 
@@ -18,25 +18,20 @@ func TestCreateTask(t *testing.T) {
 		setup         func()
 		cookies       []*http.Cookie
 		expectedError func(int) error
-		file          *NoteFile
 	}{
 		{
 			name: "OK",
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a pending case assigned").
-					UponReceiving("A request to create a task").
+					Given("A donor exists to be referenced").
+					UponReceiving("A request to create a person reference").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/tasks"),
+						Path:   dsl.String("/api/v1/persons/189/references"),
 						Body: map[string]interface{}{
-							"caseId":      dsl.Like(800),
-							"assigneeId":  dsl.Like(1),
-							"type":        dsl.String("Change of Address"),
-							"name":        dsl.String("Something"),
-							"description": dsl.String("More words"),
-							"dueDate":     dsl.Term("04/05/2731", `^\d{1,2}/\d{1,2}/\d{4}$`),
+							"referencedUid": dsl.Like("7000-9999-0001"),
+							"reason":        dsl.Like("Mother"),
 						},
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
@@ -60,11 +55,15 @@ func TestCreateTask(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a pending case assigned").
-					UponReceiving("A request to create a task without cookies").
+					Given("A donor exists to be referenced").
+					UponReceiving("A request to create a person reference without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/tasks"),
+						Path:   dsl.String("/api/v1/persons/189/references"),
+						Body: map[string]interface{}{
+							"referencedUid": dsl.Like("7000-9999-0001"),
+							"reason":        dsl.Like("Mother"),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -73,7 +72,7 @@ func TestCreateTask(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/tasks", port),
+					URL:    fmt.Sprintf("http://localhost:%d/api/v1/persons/189/references", port),
 					Method: http.MethodPost,
 				}
 			},
@@ -87,14 +86,7 @@ func TestCreateTask(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.CreateTask(getContext(tc.cookies), Task{
-					CaseID:      800,
-					AssigneeID:  1,
-					Type:        "Change of Address",
-					Name:        "Something",
-					Description: "More words",
-					DueDate:     "9999-05-04",
-				})
+				err := client.CreatePersonReference(getContext(tc.cookies), 189, "7000-9999-0001", "Mother")
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {
@@ -104,19 +96,4 @@ func TestCreateTask(t *testing.T) {
 			}))
 		})
 	}
-}
-
-func TestCreateTaskWithEmptyDescription(t *testing.T) {
-	client := NewClient(http.DefaultClient, "")
-
-	err := client.CreateTask(Context{}, Task{
-		CaseID:      800,
-		AssigneeID:  1,
-		Type:        "Change of Address",
-		Name:        "Something",
-		Description: "  ",
-		DueDate:     "9999-05-04",
-	})
-
-	assert.Equal(t, ValidationError{Field: FieldErrors{"description": {"": "Value can't be empty"}}}, err)
 }
