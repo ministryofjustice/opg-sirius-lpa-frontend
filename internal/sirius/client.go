@@ -102,10 +102,15 @@ func (e StatusError) Data() interface{} {
 	return e
 }
 
-type ValidationErrors map[string]map[string]string
+type FieldErrors map[string]map[string]string
 
 type ValidationError struct {
-	Errors ValidationErrors `json:"validation_errors"`
+	Detail string      `json:"detail"`
+	Field  FieldErrors `json:"validation_errors"`
+}
+
+func (e ValidationError) Any() bool {
+	return len(e.Detail) > 0 || len(e.Field) > 0
 }
 
 func (ValidationError) Error() string {
