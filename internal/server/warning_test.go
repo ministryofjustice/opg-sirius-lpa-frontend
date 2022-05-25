@@ -116,13 +116,13 @@ func TestPostWarningValidationErrors(t *testing.T) {
 		nil,
 	)
 
-	v := sirius.ValidationError{
-		Errors: sirius.ValidationErrors{
+	ve := sirius.ValidationError{
+		Field: sirius.FieldErrors{
 			"x": {"y": "z"},
 		},
 	}
 
-	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "").Return(v)
+	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "").Return(ve)
 
 	template := &mockTemplate{}
 	template.On("Func", mock.Anything, warningData{
@@ -134,7 +134,7 @@ func TestPostWarningValidationErrors(t *testing.T) {
 				Label:  "Complaint Received",
 			},
 		},
-		Errors: v.Errors,
+		Error: ve,
 	}).Return(nil)
 
 	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
