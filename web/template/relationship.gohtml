@@ -1,0 +1,46 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create Relationship{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
+
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        {{ template "success-banner" "You have successfully created a relationship." }}
+      {{ end }}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">Create Relationship</h1>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+        <div class="govuk-form-group {{ if .Error.Field.search }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-search">Search</label>
+          {{ template "errors" .Error.Field.search }}
+          <select class="govuk-select {{ if .Error.Field.search }}govuk-select--error{{ end }}" id="f-search" name="search" data-select-person>
+            {{ if .SearchUID }}
+              <option value="{{ .SearchUID }}:{{ .SearchName }}" selected>{{ .SearchName }}</option>
+            {{ else }}
+              <option value="" selected></option>
+            {{ end }}
+          </select>
+        </div>
+
+        <div class="govuk-form-group {{ if .Error.Field.reason }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-reason">Relationship</label>
+          {{ template "errors" .Error.Field.reason }}
+          <input class="govuk-input {{ if .Error.Field.reason }}govuk-input--error{{ end }}" id="f-reason" name="reason" value="{{ .Reason }}" />
+        </div>
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
