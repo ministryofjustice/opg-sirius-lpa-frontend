@@ -17,7 +17,7 @@ type warningData struct {
 	XSRFToken    string
 	WarningTypes []sirius.RefDataItem
 	Success      bool
-	Errors       sirius.ValidationErrors
+	Error        sirius.ValidationError
 }
 
 func Warning(client WarningClient, tmpl template.Template) Handler {
@@ -48,7 +48,7 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
-				data.Errors = ve.Errors
+				data.Error = ve
 			} else if err != nil {
 				return err
 			} else {

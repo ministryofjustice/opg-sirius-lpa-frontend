@@ -1,11 +1,11 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Errors }}Error: {{ end }}Create Warning{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create Warning{{ end }}
 
 {{ define "main" }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      {{ template "error-summary" .Errors }}
+      {{ template "error-summary" .Error }}
 
       {{ if .Success }}
         {{ template "success-banner" "You have successfully created a warning." }}
@@ -16,16 +16,16 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        <div class="govuk-form-group {{ if .Errors.warningType }}govuk-form-group--error{{ end }}">
+        <div class="govuk-form-group {{ if .Error.Field.warningType }}govuk-form-group--error{{ end }}">
           <label class="govuk-label" for="f-warningType">
             Warning type
           </label>
-          {{ range .Errors.warningType }}
+          {{ range .Error.Field.warningType }}
             <p class="govuk-error-message">
               <span class="govuk-visually-hidden">Error:</span> {{ . }}
             </p>
           {{ end }}
-          <select class="govuk-select {{ if .Errors.warningType }}govuk-select--error{{ end }}" id="f-warningType" name="warning-type">
+          <select class="govuk-select {{ if .Error.Field.warningType }}govuk-select--error{{ end }}" id="f-warningType" name="warning-type">
             <option hidden selected disabled></option>
             {{ range .WarningTypes }}
               <option value="{{ .Handle }}">{{ .Label }}</option>
@@ -33,14 +33,14 @@
           </select>
         </div>
 
-        <div class="govuk-form-group {{ if .Errors.warningText }}govuk-form-group--error{{ end }}">
+        <div class="govuk-form-group {{ if .Error.Field.warningText }}govuk-form-group--error{{ end }}">
           <label class="govuk-label" for="f-warningText">Notes</label>
-          {{ range .Errors.warningText }}
+          {{ range .Error.Field.warningText }}
             <p class="govuk-error-message">
               <span class="govuk-visually-hidden">Error:</span> {{ . }}
             </p>
           {{ end }}
-          <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .Errors.warningText }}govuk-textarea--error{{ end }}" name="warning-notes" rows="5" id="f-warningText"></textarea>
+          <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .Error.Field.warningText }}govuk-textarea--error{{ end }}" name="warning-notes" rows="5" id="f-warningText"></textarea>
         </div>
 
         <div class="govuk-button-group">
