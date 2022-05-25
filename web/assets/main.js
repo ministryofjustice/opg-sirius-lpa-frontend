@@ -1,6 +1,6 @@
 import MOJFrontend from "@ministryofjustice/frontend/moj/all.js";
 import accessibleAutocomplete from "accessible-autocomplete";
-import GOVUKFrontend from "govuk-frontend/govuk/all.js";
+import * as GOVUKFrontend from "govuk-frontend";
 import $ from "jquery";
 import autoResizeTextArea from "./auto-resize-text-area.js"
 
