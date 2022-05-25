@@ -1,13 +1,13 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Errors }}Error: {{ end }}Create Task{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create Task{{ end }}
 
 {{ define "main" }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
 
-      {{ template "error-summary" .Errors }}
+      {{ template "error-summary" .Error }}
 
       {{ if .Success }}
         {{ template "success-banner" "You have successfully created a task." }}
@@ -18,12 +18,12 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        <div class="govuk-form-group {{ if .Errors.taskType }}govuk-form-group--error{{ end }}">
+        <div class="govuk-form-group {{ if .Error.Field.taskType }}govuk-form-group--error{{ end }}">
           <label class="govuk-label" for="f-taskType">
             Task type
           </label>
-          {{ template "errors" .Errors.taskType }}
-          <select class="govuk-select {{ if .Errors.taskType }}govuk-select--error{{ end }}" id="f-taskType" name="type">
+          {{ template "errors" .Error.Field.taskType }}
+          <select class="govuk-select {{ if .Error.Field.taskType }}govuk-select--error{{ end }}" id="f-taskType" name="type">
             <option hidden {{ if eq "" .Task.Type }}selected{{ end }} disabled></option>
             {{ range .TaskTypes }}
               <option value="{{ . }}" {{ if eq . $.Task.Type }}selected{{ end }} >{{ . }}</option>
@@ -31,26 +31,26 @@
           </select>
         </div>
 
-        <div class="govuk-form-group {{ if .Errors.name }}govuk-form-group--error{{ end }}">
+        <div class="govuk-form-group {{ if .Error.Field.name }}govuk-form-group--error{{ end }}">
           <label class="govuk-label" for="f-name">Task</label>
-          {{ template "errors" .Errors.name }}
-          <input class="govuk-input {{ if .Errors.name }}govuk-input--error{{ end }}" id="f-name" name="name" value="{{ .Task.Name }}" />
+          {{ template "errors" .Error.Field.name }}
+          <input class="govuk-input {{ if .Error.Field.name }}govuk-input--error{{ end }}" id="f-name" name="name" value="{{ .Task.Name }}" />
         </div>
 
-        <div class="govuk-form-group {{ if .Errors.description }}govuk-form-group--error{{ end }}">
+        <div class="govuk-form-group {{ if .Error.Field.description }}govuk-form-group--error{{ end }}">
           <label class="govuk-label" for="f-description">Notes</label>
-          {{ template "errors" .Errors.description }}
-          <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .Errors.description }}govuk-textarea--error{{ end }}" id="f-description" name="description">{{ .Task.Description }}</textarea>
+          {{ template "errors" .Error.Field.description }}
+          <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .Error.Field.description }}govuk-textarea--error{{ end }}" id="f-description" name="description">{{ .Task.Description }}</textarea>
         </div>
                 
-        <div class="govuk-form-group {{ if .Errors.assignTo }}govuk-form-group--error{{ end }}">
+        <div class="govuk-form-group {{ if .Error.Field.assignTo }}govuk-form-group--error{{ end }}">
           <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend">
               <h1 class="govuk-fieldset__heading">
                 Assign to
               </h1>
             </legend>
-            {{ template "errors" .Errors.assignTo }}
+            {{ template "errors" .Error.Field.assignTo }}
             <div class="govuk-radios" data-module="govuk-radios">
               <div class="govuk-radios__item">
                 <input class="govuk-radios__input" id="f-assignTo" name="assignTo" type="radio" value="user" data-aria-controls="conditional-assignTo" {{ if eq "user" .AssignTo }}checked{{ end }}>
@@ -59,10 +59,10 @@
                 </label>
               </div>
               <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-assignTo">        
-                <div class="govuk-!-width-one-half govuk-form-group {{ if .Errors.assigneeUser }}govuk-form-group--error{{ end }}">
+                <div class="govuk-!-width-one-half govuk-form-group {{ if .Error.Field.assigneeUser }}govuk-form-group--error{{ end }}">
                   <label class="govuk-label" for="f-assigneeUser">User</label>
-                  {{ template "errors" .Errors.assigneeUser }}
-                  <select class="govuk-select {{ if .Errors.assigneeUser }}govuk-select--error{{ end }}" id="f-assigneeUser" name="assigneeUser" data-select-user>
+                  {{ template "errors" .Error.Field.assigneeUser }}
+                  <select class="govuk-select {{ if .Error.Field.assigneeUser }}govuk-select--error{{ end }}" id="f-assigneeUser" name="assigneeUser" data-select-user>
                     {{ if .Task.AssigneeID }}
                       <option value="{{ .Task.AssigneeID }}:{{ .AssigneeUserName }}" selected>{{ .AssigneeUserName }}</option>
                     {{ else }}
@@ -79,12 +79,12 @@
                 </label>
               </div>
               <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-assignTo-2">
-                <div class="govuk-form-group {{ if .Errors.assigneeTeam }}govuk-form-group--error{{ end }}">
+                <div class="govuk-form-group {{ if .Error.Field.assigneeTeam }}govuk-form-group--error{{ end }}">
                   <label class="govuk-label" for="f-assigneeTeam">
                     Team
                   </label>
-                  {{ template "errors" .Errors.assigneeTeam }}
-                  <select class="govuk-select {{ if .Errors.assigneeTeam }}govuk-select--error{{ end }}" id="f-assigneeTeam" name="assigneeTeam">
+                  {{ template "errors" .Error.Field.assigneeTeam }}
+                  <select class="govuk-select {{ if .Error.Field.assigneeTeam }}govuk-select--error{{ end }}" id="f-assigneeTeam" name="assigneeTeam">
                     <option hidden {{ if eq 0 .Task.AssigneeID }}selected{{ end }} disabled></option>
                     {{ range .Teams }}
                       <option value="{{ .ID }}" {{ if eq .ID $.Task.AssigneeID }}selected{{ end }}>{{ .DisplayName }}</option>
@@ -96,10 +96,10 @@
           </fieldset>
         </div>
         
-        <div class="govuk-form-group {{ if .Errors.dueDate }}govuk-form-group--error{{ end }}">
+        <div class="govuk-form-group {{ if .Error.Field.dueDate }}govuk-form-group--error{{ end }}">
           <label class="govuk-label" for="f-dueDate">Due date</label>
-          {{ template "errors" .Errors.dueDate }}
-          <input class="govuk-input govuk-!-width-one-third {{ if .Errors.dueDate }}govuk-input--error{{ end }}" type="date" id="f-dueDate" name="dueDate" value="{{ .Task.DueDate }}" min="{{ .Today }}" />
+          {{ template "errors" .Error.Field.dueDate }}
+          <input class="govuk-input govuk-!-width-one-third {{ if .Error.Field.dueDate }}govuk-input--error{{ end }}" type="date" id="f-dueDate" name="dueDate" value="{{ .Task.DueDate }}" min="{{ .Today }}" />
         </div>
 
         <div class="govuk-button-group">

@@ -21,7 +21,7 @@ func (c *Client) CreateTask(ctx Context, task Task) error {
 	// validate it server-side as Supervision allow it to be empty.
 	if strings.TrimSpace(task.Description) == "" {
 		return ValidationError{
-			Errors: ValidationErrors{
+			Field: FieldErrors{
 				"description": {"": "Value can't be empty"},
 			},
 		}
