@@ -293,7 +293,7 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 	client.
 		On("CreateTask", mock.Anything, mock.Anything).
 		Return(sirius.ValidationError{
-			Errors: sirius.ValidationErrors{
+			Field: sirius.FieldErrors{
 				"assigneeId": {"empty": "Not set"},
 			},
 		})
@@ -305,8 +305,10 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Today:     time.Now().Format("2006-01-02"),
 			Entity:    "LPA 7000-0000-0000",
-			Errors: sirius.ValidationErrors{
-				"assignTo": {"": "Assignee not set"},
+			Error: sirius.ValidationError{
+				Field: sirius.FieldErrors{
+					"assignTo": {"": "Assignee not set"},
+				},
 			},
 			Task: sirius.Task{
 				CaseID:      123,
@@ -368,12 +370,12 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 				Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
 			client.
 				On("CreateTask", mock.Anything, mock.Anything).
-				Return(sirius.ValidationError{Errors: sirius.ValidationErrors{
+				Return(sirius.ValidationError{Field: sirius.FieldErrors{
 					"field":      {"reason": "Description"},
 					"assigneeId": {"problem": "Because"},
 				}})
 
-			expectedErrors := sirius.ValidationErrors{
+			expectedErrors := sirius.FieldErrors{
 				"field": {"reason": "Description"},
 			}
 			expectedErrors[tc.field] = map[string]string{"problem": "Because"}
@@ -386,7 +388,7 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 					Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 					Today:     time.Now().Format("2006-01-02"),
 					Entity:    "LPA 7000-0000-0000",
-					Errors:    expectedErrors,
+					Error:     sirius.ValidationError{Field: expectedErrors},
 					Task: sirius.Task{
 						CaseID:      123,
 						Type:        "Some task type",
