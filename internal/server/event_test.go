@@ -319,8 +319,10 @@ func TestPostEventWhenCreateNoteFails(t *testing.T) {
 }
 
 func TestPostEventWhenValidationError(t *testing.T) {
-	expectedErrors := sirius.ValidationErrors{
-		"field": {"reason": "Description"},
+	expectedErrors := sirius.ValidationError{
+		Field: sirius.FieldErrors{
+			"field": {"reason": "Description"},
+		},
 	}
 
 	client := &mockEventClient{}
@@ -332,14 +334,14 @@ func TestPostEventWhenValidationError(t *testing.T) {
 		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
 	client.
 		On("CreateNote", mock.Anything, 123, sirius.EntityTypePerson, "Application processing", "Something", "More words", (*sirius.NoteFile)(nil)).
-		Return(sirius.ValidationError{Errors: expectedErrors})
+		Return(expectedErrors)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, eventData{
 			Success:     false,
 			NoteTypes:   []string{"a", "b"},
-			Errors:      expectedErrors,
+			Error:       expectedErrors,
 			Entity:      "John Doe",
 			Type:        "Application processing",
 			Name:        "Something",
