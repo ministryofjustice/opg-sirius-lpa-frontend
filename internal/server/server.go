@@ -37,6 +37,7 @@ func getContext(r *http.Request) sirius.Context {
 }
 
 type Client interface {
+	DeleteRelationshipClient
 	EventClient
 	RelationshipClient
 	SearchDonorsClient
@@ -57,6 +58,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"))))
 	mux.Handle("/create-task", wrap(Task(client, templates.Get("task.gohtml"))))
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("relationship.gohtml"))))
+	mux.Handle("/delete-relationship", wrap(DeleteRelationship(client, templates.Get("delete_relationship.gohtml"))))
 
 	mux.Handle("/search-users", wrap(SearchUsers(client)))
 	mux.Handle("/search-persons", wrap(SearchDonors(client)))
