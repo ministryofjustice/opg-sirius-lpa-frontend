@@ -1,0 +1,46 @@
+{{ template "page" . }}
+
+{{ define "title" }}Delete Relationship{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
+
+      {{ if .Success }}
+        {{ template "success-banner" "You have successfully deleted a relationship." }}
+      {{ end }}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">Delete Relationship</h1>
+
+      {{ if eq 0 (len .PersonReferences) }}
+        <p class="govuk-body">No relationships</p>
+      {{ else }}
+        <form class="form" method="POST">
+          <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+          <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend">Existing relationships</legend>
+              <div class="govuk-radios" data-module="govuk-radios">
+                {{ range $i, $v := .PersonReferences }}
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="reference-id-{{ $i }}" name="reference-id" type="radio" value="{{ $v.ReferenceID }}">
+                    <label class="govuk-label govuk-radios__label" for="reference-id-{{ $i }}">
+                      {{ $v.DisplayName }}
+                    </label>
+                  </div>
+                {{ end }}
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="govuk-button-group">
+            <button class="govuk-button" data-module="govuk-button" type="submit">Delete</button>
+            <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+          </div>
+        </form>
+      {{ end }}
+    </div>
+  </div>
+{{ end }}
