@@ -8,16 +8,23 @@ import (
 )
 
 func TestDateString(t *testing.T) {
-	fromSirius := `"03/04/2022"`
+	testcases := map[string]string{
+		"normal":  `"03/04/2022"`,
+		"escaped": `"03\/04\/2022"`,
+	}
 
-	var v DateString
-	err := json.Unmarshal([]byte(fromSirius), &v)
-	assert.Nil(t, err)
-	assert.Equal(t, "2022-04-03", string(v))
+	for name, fromSirius := range testcases {
+		t.Run(name, func(t *testing.T) {
+			var v DateString
+			err := json.Unmarshal([]byte(fromSirius), &v)
+			assert.Nil(t, err)
+			assert.Equal(t, "2022-04-03", string(v))
 
-	data, err := json.Marshal(v)
-	assert.Nil(t, err)
-	assert.Equal(t, fromSirius, string(data))
+			data, err := json.Marshal(v)
+			assert.Nil(t, err)
+			assert.Equal(t, `"03/04/2022"`, string(data))
+		})
+	}
 }
 
 func TestDateStringNull(t *testing.T) {
