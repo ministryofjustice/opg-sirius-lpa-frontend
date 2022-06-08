@@ -3,8 +3,16 @@ package sirius
 import "fmt"
 
 type Case struct {
-	UID      string `json:"uId"`
-	CaseType string `json:"caseType"`
+	UID              string     `json:"uId"`
+	CaseType         string     `json:"caseType"`
+	CancellationDate DateString `json:"cancellationDate"`
+	DispatchDate     DateString `json:"dispatchDate"`
+	DueDate          DateString `json:"dueDate"`
+	InvalidDate      DateString `json:"invalidDate"`
+	ReceiptDate      DateString `json:"receiptDate"`
+	RegistrationDate DateString `json:"registrationDate"`
+	RejectedDate     DateString `json:"rejectedDate"`
+	WithdrawnDate    DateString `json:"withdrawnDate"`
 }
 
 func (c *Client) Case(ctx Context, id int) (Case, error) {
