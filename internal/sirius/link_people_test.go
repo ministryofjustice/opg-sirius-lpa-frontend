@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEditDates(t *testing.T) {
+func TestLinkPeople(t *testing.T) {
 	pact := newPact()
 	defer pact.Teardown()
 
@@ -24,23 +24,24 @@ func TestEditDates(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a pending case assigned").
-					UponReceiving("A request to edit the dates").
+					Given("2 donors exist").
+					UponReceiving("A request to link two people").
 					WithRequest(dsl.Request{
-						Method: http.MethodPut,
-						Path:   dsl.String("/api/v1/lpas/800"),
+						Method: http.MethodPost,
+						Path:   dsl.String("/api/v1/person-links"),
+						Body: map[string]interface{}{
+							"parentId": dsl.Like(189),
+							"childId":  dsl.Like(190),
+						},
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
 							"OPG-Bypass-Membrane": dsl.String("1"),
-						},
-						Body: map[string]interface{}{
-							"rejectedDate": "04/03/2022",
+							"Content-Type":        dsl.String("application/json"),
 						},
 					}).
 					WillRespondWith(dsl.Response{
-						Status: http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Status:  http.StatusCreated,
 					})
 			},
 			cookies: []*http.Cookie{
@@ -53,11 +54,15 @@ func TestEditDates(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a pending case assigned").
-					UponReceiving("A request to edit the dates without cookies").
+					Given("2 donors exist").
+					UponReceiving("A request to link two people without cookies").
 					WithRequest(dsl.Request{
-						Method: http.MethodPut,
-						Path:   dsl.String("/api/v1/lpas/800"),
+						Method: http.MethodPost,
+						Path:   dsl.String("/api/v1/person-links"),
+						Body: map[string]interface{}{
+							"parentId": dsl.Like(189),
+							"childId":  dsl.Like(190),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -66,8 +71,8 @@ func TestEditDates(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/lpas/800", port),
-					Method: http.MethodPut,
+					URL:    fmt.Sprintf("http://localhost:%d/api/v1/person-links", port),
+					Method: http.MethodPost,
 				}
 			},
 		},
@@ -80,9 +85,8 @@ func TestEditDates(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.EditDates(getContext(tc.cookies), 800, "lpa", Dates{RejectedDate: DateString("2022-03-04")})
-
-				if tc.expectedError == nil {
+				err := client.LinkPeople(getContext(tc.cookies), 189, 190)
+				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {
 					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
