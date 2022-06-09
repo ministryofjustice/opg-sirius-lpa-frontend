@@ -9,42 +9,39 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPerson(t *testing.T) {
+func TestLinkPeople(t *testing.T) {
 	pact := newPact()
 	defer pact.Teardown()
 
 	testCases := []struct {
-		name             string
-		setup            func()
-		cookies          []*http.Cookie
-		expectedResponse Person
-		expectedError    func(int) error
+		name          string
+		setup         func()
+		cookies       []*http.Cookie
+		expectedError func(int) error
 	}{
 		{
 			name: "OK",
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A donor exists").
-					UponReceiving("A request for the person").
+					Given("2 donors exist").
+					UponReceiving("A request to link two people").
 					WithRequest(dsl.Request{
-						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/persons/189"),
+						Method: http.MethodPost,
+						Path:   dsl.String("/api/v1/person-links"),
+						Body: map[string]interface{}{
+							"parentId": dsl.Like(189),
+							"childId":  dsl.Like(190),
+						},
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
 							"OPG-Bypass-Membrane": dsl.String("1"),
+							"Content-Type":        dsl.String("application/json"),
 						},
 					}).
 					WillRespondWith(dsl.Response{
-						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"id":         dsl.Like(103),
-							"uid":        dsl.Term("7000-0000-0001", `7\d{3}-\d{4}-\d{4}`),
-							"firstname":  dsl.String("John"),
-							"surname":    dsl.String("Doe"),
-							"dob":        dsl.Term("01/01/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
-						}),
+						Status:  http.StatusCreated,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
@@ -52,18 +49,21 @@ func TestPerson(t *testing.T) {
 				{Name: "XSRF-TOKEN", Value: "abcde"},
 				{Name: "Other", Value: "other"},
 			},
-			expectedResponse: Person{ID: 103, UID: "7000-0000-0001", Firstname: "John", Surname: "Doe", DateOfBirth: DateString("1970-01-01")},
 		},
 		{
 			name: "Unauthorized",
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A donor exists").
-					UponReceiving("A request for the person without cookies").
+					Given("2 donors exist").
+					UponReceiving("A request to link two people without cookies").
 					WithRequest(dsl.Request{
-						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/persons/189"),
+						Method: http.MethodPost,
+						Path:   dsl.String("/api/v1/person-links"),
+						Body: map[string]interface{}{
+							"parentId": dsl.Like(189),
+							"childId":  dsl.Like(190),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -72,8 +72,8 @@ func TestPerson(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/persons/189", port),
-					Method: http.MethodGet,
+					URL:    fmt.Sprintf("http://localhost:%d/api/v1/person-links", port),
+					Method: http.MethodPost,
 				}
 			},
 		},
@@ -86,10 +86,8 @@ func TestPerson(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				caseitem, err := client.Person(getContext(tc.cookies), 189)
-
-				assert.Equal(t, tc.expectedResponse, caseitem)
-				if tc.expectedError == nil {
+				err := client.LinkPeople(getContext(tc.cookies), 189, 190)
+				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {
 					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
