@@ -3,11 +3,13 @@ package sirius
 import "fmt"
 
 type Person struct {
-	ID         int    `json:"id"`
-	UID        string `json:"uid"`
-	Salutation string `json:"salutation"`
-	Firstname  string `json:"firstname"`
-	Surname    string `json:"surname"`
+	ID          int        `json:"id"`
+	UID         string     `json:"uId"`
+	Salutation  string     `json:"salutation"`
+	Firstname   string     `json:"firstname"`
+	Surname     string     `json:"surname"`
+	DateOfBirth DateString `json:"dob"`
+	Children    []Person   `json:"children"`
 }
 
 func (c *Client) Person(ctx Context, id int) (Person, error) {
