@@ -12,7 +12,7 @@ import (
 type DateString string
 
 func (s *DateString) UnmarshalJSON(text []byte) error {
-	if bytes.Equal([]byte("null"), text) {
+	if bytes.Equal([]byte("null"), text) || bytes.Equal([]byte(`""`), text) {
 		*s = DateString("")
 		return nil
 	}

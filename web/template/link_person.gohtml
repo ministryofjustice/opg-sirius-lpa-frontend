@@ -1,0 +1,91 @@
+{{ template "page" . }}
+
+{{ define "title" }}Link record{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body"><strong>{{ .Entity.Firstname }} {{ .Entity.Surname }}</strong></p>
+
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        {{ template "success-banner" "You have successfully linked these records." }}
+      {{ end }}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">Link record</h1>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+        {{ if .OtherPerson.ID }}
+          <input type="hidden" name="uid" value="{{ .OtherPerson.UID }}" />
+
+          <table class="govuk-table">
+            <tbody class="govuk-table__body">
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Name</th>
+                <td class="govuk-table__cell">{{ .Entity.Firstname }} {{ .Entity.Surname }}</td>
+                <td class="govuk-table__cell">{{ .OtherPerson.Firstname }} {{ .OtherPerson.Surname }}</td>
+              </tr>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Contact ref #</th>
+                <td class="govuk-table__cell">{{ .Entity.UID }}</td>
+                <td class="govuk-table__cell">{{ .OtherPerson.UID }}</td>
+              </tr>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Date of Birth</th>
+                <td class="govuk-table__cell">{{ .Entity.DateOfBirth }}</td>
+                <td class="govuk-table__cell">{{ .OtherPerson.DateOfBirth }}</td>
+              </tr>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Number of links</th>
+                <td class="govuk-table__cell">{{ len .Entity.Children }}</td>
+                <td class="govuk-table__cell">{{ len .OtherPerson.Children }}</td>
+              </tr>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Primary record</th>
+                <td class="govuk-table__cell">
+                  {{ if not .CanChangePrimary }}
+                    <input id="f-primary-id-hidden" name="primary-id" type="hidden" value="{{ .PrimaryId }}">
+                  {{ end }}
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-primary-id-1" name="primary-id" type="radio" value="{{ .Entity.ID }}" {{ if not .CanChangePrimary }}disabled{{ end }} {{ if eq .Entity.ID .PrimaryId }}checked{{ end }}>
+                    <label class="govuk-label govuk-radios__label" for="f-primary-id-1">
+                      <span class="govuk-visually-hidden">Make "{{ .Entity.Firstname }} {{ .Entity.Surname }}" the primary record</span>
+                    </label>
+                  </div>
+                </td>
+                <td class="govuk-table__cell">
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-primary-id-2" name="primary-id" type="radio" value="{{ .OtherPerson.ID }}" {{ if not .CanChangePrimary }}disabled{{ end }} {{ if eq .OtherPerson.ID .PrimaryId }}checked{{ end }}>
+                    <label class="govuk-label govuk-radios__label" for="f-primary-id-2">
+                      <span class="govuk-visually-hidden">Make "{{ .OtherPerson.Firstname }} {{ .OtherPerson.Surname }}" the primary record</span>
+                    </label>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        {{ else }}
+          <div class="govuk-form-group {{ if .Error.Field.uid }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-name">Person UID</label>
+            {{ template "errors" .Error.Field.uid }}
+            <input class="govuk-input {{ if .Error.Field.uid }}govuk-input--error{{ end }}" id="f-uid" name="uid" value="{{ .OtherPerson.UID }}" />
+          </div>
+        {{ end }}
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">
+            {{ if .OtherPerson.ID }}
+              Link records
+            {{ else }}
+              Search
+            {{ end }}
+          </button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
