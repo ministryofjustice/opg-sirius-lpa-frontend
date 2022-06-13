@@ -1,7 +1,8 @@
-FROM golang:1.14
+FROM golang:1.18.3
 
 WORKDIR /app
 
+COPY go.mod .
 COPY pact_stub.go .
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o /go/bin/pact_stub
