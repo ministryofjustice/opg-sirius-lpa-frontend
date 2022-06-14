@@ -40,6 +40,7 @@ type Client interface {
 	DeleteRelationshipClient
 	EditDatesClient
 	EventClient
+	LinkPersonClient
 	RelationshipClient
 	SearchDonorsClient
 	SearchUsersClient
@@ -61,6 +62,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("relationship.gohtml"))))
 	mux.Handle("/delete-relationship", wrap(DeleteRelationship(client, templates.Get("delete_relationship.gohtml"))))
 	mux.Handle("/edit-dates", wrap(EditDates(client, templates.Get("edit_dates.gohtml"))))
+	mux.Handle("/link-person", wrap(LinkPerson(client, templates.Get("link_person.gohtml"))))
 
 	mux.Handle("/search-users", wrap(SearchUsers(client)))
 	mux.Handle("/search-persons", wrap(SearchDonors(client)))
