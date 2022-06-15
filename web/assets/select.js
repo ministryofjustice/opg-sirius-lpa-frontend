@@ -54,9 +54,9 @@ function fetchPerson(prefix) {
       .then((response) => response.json())
       .then((json) => {
         callback(
-          json.map(({ uid, firstname, surname }) => ({
-            id: uid,
-            text: `${firstname} ${surname} (${uid})`,
+          json.map(({ uId, firstname, surname }) => ({
+            id: uId,
+            text: `${firstname} ${surname} (${uId})`,
           }))
         );
       })
