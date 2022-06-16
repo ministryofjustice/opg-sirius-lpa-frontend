@@ -10,6 +10,8 @@ import (
 )
 
 func TestPerson(t *testing.T) {
+	t.Parallel()
+
 	pact := newPact()
 	defer pact.Teardown()
 
@@ -39,11 +41,11 @@ func TestPerson(t *testing.T) {
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
 						Body: dsl.Like(map[string]interface{}{
-							"id":         dsl.Like(103),
-							"uId":        dsl.Term("7000-0000-0001", `7\d{3}-\d{4}-\d{4}`),
-							"firstname":  dsl.String("John"),
-							"surname":    dsl.String("Doe"),
-							"dob":        dsl.Term("01/01/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
+							"id":        dsl.Like(103),
+							"uId":       dsl.Term("7000-0000-0001", `7\d{3}-\d{4}-\d{4}`),
+							"firstname": dsl.String("John"),
+							"surname":   dsl.String("Doe"),
+							"dob":       dsl.Term("01/01/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})

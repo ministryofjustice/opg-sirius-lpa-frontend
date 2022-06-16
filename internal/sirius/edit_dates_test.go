@@ -10,6 +10,8 @@ import (
 )
 
 func TestEditDates(t *testing.T) {
+	t.Parallel()
+
 	pact := newPact()
 	defer pact.Teardown()
 
@@ -39,7 +41,7 @@ func TestEditDates(t *testing.T) {
 						},
 					}).
 					WillRespondWith(dsl.Response{
-						Status: http.StatusOK,
+						Status:  http.StatusOK,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
