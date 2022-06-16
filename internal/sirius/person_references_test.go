@@ -10,6 +10,8 @@ import (
 )
 
 func TestPersonReferences(t *testing.T) {
+	t.Parallel()
+
 	pact := newPact()
 	defer pact.Teardown()
 
