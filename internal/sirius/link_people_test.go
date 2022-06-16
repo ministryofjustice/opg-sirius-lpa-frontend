@@ -10,6 +10,8 @@ import (
 )
 
 func TestLinkPeople(t *testing.T) {
+	t.Parallel()
+
 	pact := newPact()
 	defer pact.Teardown()
 
@@ -41,7 +43,7 @@ func TestLinkPeople(t *testing.T) {
 						},
 					}).
 					WillRespondWith(dsl.Response{
-						Status:  http.StatusNoContent,
+						Status: http.StatusNoContent,
 					})
 			},
 			cookies: []*http.Cookie{
