@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
@@ -55,7 +54,6 @@ func TestGetTask(t *testing.T) {
 		On("Func", mock.Anything, taskData{
 			TaskTypes: []string{"a", "b"},
 			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
-			Today:     time.Now().Format("2006-01-02"),
 			Entity:    "LPA 7000-0000-0000",
 		}).
 		Return(nil)
@@ -209,7 +207,6 @@ func TestPostTask(t *testing.T) {
 			Success:          true,
 			TaskTypes:        []string{"a", "b"},
 			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
-			Today:            time.Now().Format("2006-01-02"),
 			AssigneeUserName: "System user",
 			Entity:           "LPA 7000-0000-0000",
 		}).
@@ -257,7 +254,6 @@ func TestPostTaskWhenCreateTaskFails(t *testing.T) {
 		On("Func", mock.Anything, taskData{
 			TaskTypes: []string{"a", "b"},
 			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
-			Today:     time.Now().Format("2006-01-02"),
 			Entity:    "LPA 7000-0000-0000",
 		}).
 		Return(nil)
@@ -303,7 +299,6 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 		On("Func", mock.Anything, taskData{
 			TaskTypes: []string{"a", "b"},
 			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
-			Today:     time.Now().Format("2006-01-02"),
 			Entity:    "LPA 7000-0000-0000",
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{
@@ -386,7 +381,6 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 					AssignTo:  name,
 					TaskTypes: []string{"a", "b"},
 					Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
-					Today:     time.Now().Format("2006-01-02"),
 					Entity:    "LPA 7000-0000-0000",
 					Error:     sirius.ValidationError{Field: expectedErrors},
 					Task: sirius.Task{

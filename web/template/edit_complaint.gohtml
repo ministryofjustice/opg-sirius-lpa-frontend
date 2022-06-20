@@ -1,0 +1,148 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Edit Complaint{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        {{ template "success-banner" "You have successfully edited a complaint." }}
+      {{ end }}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">Edit Complaint</h1>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+        <div class="govuk-form-group {{ if .Error.Field.severity }}govuk-form-group--error{{ end }}">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend">
+              <h1 class="govuk-fieldset__heading">
+                Severity
+              </h1>
+            </legend>
+            {{ template "errors" .Error.Field.severity }}
+            <div class="govuk-radios" data-module="govuk-radios">
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="f-severity" name="severity" type="radio" value="Minor" {{ if eq "Minor" .Complaint.Severity }}checked{{ end }}>
+                <label class="govuk-label govuk-radios__label" for="f-severity">
+                  Minor
+                </label>
+              </div>
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="f-severity-2" name="severity" type="radio" value="Major" {{ if eq "Major" .Complaint.Severity }}checked{{ end }}>
+                <label class="govuk-label govuk-radios__label" for="f-severity-2">
+                  Major
+                </label>
+              </div>
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="f-severity-3" name="severity" type="radio" value="Security Breach" {{ if eq "Security Breach" .Complaint.Severity }}checked{{ end }}>
+                <label class="govuk-label govuk-radios__label" for="f-severity-3">
+                  Security Breach
+                </label>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="govuk-form-group {{ if .Error.Field.summary }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-summary">Title</label>
+          {{ template "errors" .Error.Field.summary }}
+          <input class="govuk-input {{ if .Error.Field.summary }}govuk-input--error{{ end }}" id="f-summary" name="summary" value="{{ .Complaint.Summary }}" />
+        </div>
+
+        <div class="govuk-form-group {{ if .Error.Field.description }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-description">Description</label>
+          {{ template "errors" .Error.Field.description }}
+          <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .Error.Field.description }}govuk-textarea--error{{ end }}" id="f-description" name="description">{{ .Complaint.Description }}</textarea>
+        </div>
+
+        <div class="govuk-form-group {{ if .Error.Field.receivedDate }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-receivedDate">Received date</label>
+          {{ template "errors" .Error.Field.receivedDate }}
+          <input class="govuk-input govuk-!-width-one-third {{ if .Error.Field.receivedDate }}govuk-input--error{{ end }}" type="date" id="f-receivedDate" name="receivedDate" value="{{ .Complaint.ReceivedDate }}" max="{{ today }}" />
+        </div>
+
+        <div class="govuk-form-group {{ if .Error.Field.category }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-category">
+            Complaint category
+          </label>
+          {{ template "errors" .Error.Field.category }}
+          
+          <div class="govuk-radios" data-module="govuk-radios">
+            {{ range $k, $v := .Categories }}
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="f-category-{{ $k }}" name="category" type="radio" value="{{ $k }}" data-aria-controls="conditional-category-{{ $k }}" {{ if eq $k $.Complaint.Category }}checked{{ end }}>
+                <label class="govuk-label govuk-radios__label" for="f-category-{{ $k }}">
+                  {{ $v.Label }}
+                </label>
+              </div>
+              <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-category-{{ $k }}">
+                <div class="govuk-!-width-one-half govuk-form-group {{ if $.Error.Field.subCategory }}govuk-form-group--error{{ end }}">
+                  <label class="govuk-label" for="f-subCategory-{{ $k }}">Subcategory</label>
+                  {{ template "errors" $.Error.Field.subCategory }}
+                  <select class="govuk-select {{ if $.Error.Field.subCategory }}govuk-select--error{{ end }}" id="f-subCategory-{{ $k }}" name="subCategory">
+                    <option hidden {{ if eq "" $.Complaint.SubCategory }}selected{{ end }} disabled></option>
+                    {{ range $id, $label := $v.Children }}
+                      <option value="{{ $id }}" {{ if eq $id $.Complaint.SubCategory }}selected{{ end }} >{{ $label }}</option>
+                    {{ end }}
+                  </select>
+                </div>
+              </div>
+            {{ end }}
+          </div>         
+        </div>
+          
+        <div class="govuk-form-group {{ if .Error.Field.resolutionDate }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-resolutionDate">Resolution date</label>
+          {{ template "errors" .Error.Field.resolutionDate }}
+          <input class="govuk-input govuk-!-width-one-third {{ if .Error.Field.resolutionDate }}govuk-input--error{{ end }}" type="date" id="f-resolutionDate" name="resolutionDate" value="{{ .Complaint.ResolutionDate }}" />
+        </div>
+
+        <div class="govuk-form-group {{ if .Error.Field.resolution }}govuk-form-group--error{{ end }}">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend">
+              <h1 class="govuk-fieldset__heading">
+                Resolution state
+              </h1>
+            </legend>
+            {{ template "errors" .Error.Field.resolution }}
+            <div class="govuk-radios" data-module="govuk-radios">
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="f-resolution" name="resolution" type="radio" value="complaint upheld" {{ if eq "complaint upheld" .Complaint.Resolution }}checked{{ end }}>
+                <label class="govuk-label govuk-radios__label" for="f-resolution">
+                  Complaint Upheld
+                </label>
+              </div>
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="f-resolution-2" name="resolution" type="radio" value="complaint partially upheld" {{ if eq "complaint partially upheld" .Complaint.Resolution }}checked{{ end }}>
+                <label class="govuk-label govuk-radios__label" for="f-resolution-2">
+                  Complaint Partially Upheld
+                </label>
+              </div>
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="f-resolution-3" name="resolution" type="radio" value="complaint not upheld" {{ if eq "complaint not upheld" .Complaint.Resolution }}checked{{ end }}>
+                <label class="govuk-label govuk-radios__label" for="f-resolution-3">
+                  Complaint Not Upheld
+                </label>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+        
+        <div class="govuk-form-group {{ if .Error.Field.resolutionInfo }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-resolutionInfo">Resolution notes</label>
+          {{ template "errors" .Error.Field.resolutionInfo }}
+          <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .Error.Field.resolutionInfo }}govuk-textarea--error{{ end }}" id="f-resolutionInfo" name="resolutionInfo">{{ .Complaint.ResolutionInfo }}</textarea>
+        </div>
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>        
+      </form>
+    </div>
+  </div>
+{{ end }}
