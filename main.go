@@ -45,6 +45,9 @@ func main() {
 				return prefix + s
 			}
 		},
+		"today": func() string {
+			return time.Now().Format("2006-01-02")
+		},
 	})
 	if err != nil {
 		logger.Fatal(err)
