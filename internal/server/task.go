@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -21,7 +20,6 @@ type TaskClient interface {
 
 type taskData struct {
 	XSRFToken string
-	Today     string
 	Entity    string
 	Success   bool
 	Error     sirius.ValidationError
@@ -43,7 +41,6 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 		ctx := getContext(r)
 		data := taskData{
 			XSRFToken: ctx.XSRFToken,
-			Today:     time.Now().Format("2006-01-02"),
 		}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
