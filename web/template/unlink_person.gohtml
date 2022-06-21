@@ -1,0 +1,100 @@
+{{ template "page" . }}
+
+{{ define "title" }}Unlink Record{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            {{ if .Success }}
+                {{ template "success-banner" "You have successfully unlinked the record(s)." }}
+            {{ end }}
+
+            <h1 class="govuk-heading-l app-!-embedded-hide">Unlink Record</h1>
+
+                <table class="govuk-table">
+                    <caption class="govuk-table__caption govuk-table__caption--m">Primary record</caption>
+                    <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Name</th>
+                        <td class="govuk-table__cell">{{ .Entity.Firstname }} {{ .Entity.Surname }}</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Contact ref #</th>
+                        <td class="govuk-table__cell">{{ .Entity.UID }}</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Address</th>
+                        <td class="govuk-table__cell">{{ .Entity.AddressLine1 }}</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Date of birth</th>
+                        <td class="govuk-table__cell">{{ .Entity.DateOfBirth }}</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Number of links</th>
+                        <td class="govuk-table__cell">{{ len .Entity.Children }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+                <p class="govuk-heading-m">Secondary records</p>
+
+                    <div class="govuk-form-group {{ if .Error.Field.child }}govuk-form-group--error{{ end }}">
+                        <fieldset class="govuk-fieldset">
+                            {{ range .Error.Field.child }}
+                                <p class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>{{ . }}
+                                </p>
+                            {{ end }}
+
+                            <div class="govuk-radios" data-module="govuk-radios">
+                                {{ range $i, $e := .Entity.Children }}
+                                    <div class="govuk-radios__item">
+                                        <input class="govuk-radios__input" id="child-id-{{ $i }}" name="child-id" type="radio" value="{{ $e.ID }}">
+                                        <label class="govuk-label govuk-radios__label unlink-table__label" for="child-id-{{ $i }}">
+
+                                            <table class="govuk-table">
+                                                <tbody class="govuk-table__body">
+                                                <tr class="govuk-table__row">
+                                                    <th scope="row" class="govuk-table__header">Name</th>
+                                                    <td class="govuk-table__cell">{{ .Firstname }} {{ .Surname }}</td>
+                                                </tr>
+                                                <tr class="govuk-table__row">
+                                                    <th scope="row" class="govuk-table__header">Contact ref #</th>
+                                                    <td class="govuk-table__cell">{{ .UID }}</td>
+                                                </tr>
+                                                <tr class="govuk-table__row">
+                                                    <th scope="row" class="govuk-table__header">Address</th>
+                                                    <td class="govuk-table__cell">{{ .AddressLine1 }}</td>
+                                                </tr>
+                                                <tr class="govuk-table__row">
+                                                    <th scope="row" class="govuk-table__header">Date of birth</th>
+                                                    <td class="govuk-table__cell">{{ .DateOfBirth }}</td>
+                                                </tr>
+                                                <tr class="govuk-table__row">
+                                                    <th scope="row" class="govuk-table__header">Number of links</th>
+                                                    <td class="govuk-table__cell">{{ len .Children }}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+
+                                        </label>
+                                    </div>
+                                {{ end }}
+                            </div>
+                        </fieldset>
+                    </div>
+
+
+                <div class="govuk-button-group">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Unlink</button>
+                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{{ end }}
