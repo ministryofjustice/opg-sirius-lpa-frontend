@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
@@ -10,7 +9,7 @@ import (
 
 type UnlinkPersonClient interface {
 	Person(sirius.Context, int) (sirius.Person, error)
-	UnlinkPerson(sirius.Context, int, []int) error
+	UnlinkPerson(sirius.Context, int, int) error
 }
 
 type unlinkPersonData struct {
@@ -36,21 +35,12 @@ func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		var childIds []int
+		var childId int
 
 		if r.Method == http.MethodPost {
-			for i := range data.Entity.Children {
-				id := r.FormValue(fmt.Sprintf("child-%d", i))
-				if id != "" {
-					id, err := strconv.Atoi(id)
-					if err != nil {
-						return err
-					}
-					childIds = append(childIds, id)
-				}
-			}
+			id := r.FormValue("child-id")
 
-			if len(childIds) == 0 {
+			if id == "" {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = sirius.ValidationError{
 					Field: sirius.FieldErrors{
@@ -58,13 +48,18 @@ func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template) Handler {
 					},
 				}
 			} else {
-				err = client.UnlinkPerson(ctx, parentID, childIds)
+				childId, err = strconv.Atoi(id)
+				if err != nil {
+					return err
+				}
+				err = client.UnlinkPerson(ctx, parentID, childId)
 				if err != nil {
 					return err
 				} else {
 					data.Success = true
 				}
 			}
+
 		}
 
 		return tmpl(w, data)

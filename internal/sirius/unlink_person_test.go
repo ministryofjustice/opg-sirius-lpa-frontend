@@ -34,7 +34,7 @@ func TestUnlinkPerson(t *testing.T) {
 							"OPG-Bypass-Membrane": dsl.String("1"),
 						},
 						Body: map[string]interface{}{
-							"childIds": dsl.Like([]int{5, 6}),
+							"childIds": dsl.Like([]int{5}),
 						},
 					}).
 					WillRespondWith(dsl.Response{
@@ -58,7 +58,7 @@ func TestUnlinkPerson(t *testing.T) {
 						Method: http.MethodDelete,
 						Path:   dsl.String("/api/v1/person-links/189"),
 						Body: map[string]interface{}{
-							"childIds": dsl.Like([]int{5, 6}),
+							"childIds": dsl.Like([]int{5}),
 						},
 					}).
 					WillRespondWith(dsl.Response{
@@ -82,7 +82,7 @@ func TestUnlinkPerson(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.UnlinkPerson(getContext(tc.cookies), 189, []int{5, 6})
+				err := client.UnlinkPerson(getContext(tc.cookies), 189, 5)
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)

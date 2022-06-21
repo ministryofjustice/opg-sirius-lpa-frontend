@@ -21,8 +21,8 @@ func (m *mockUnlinkPerson) Person(ctx sirius.Context, id int) (sirius.Person, er
 	return args.Get(0).(sirius.Person), args.Error(1)
 }
 
-func (m *mockUnlinkPerson) UnlinkPerson(ctx sirius.Context, parentId int, childIds []int) error {
-	return m.Called(ctx, parentId, childIds).Error(0)
+func (m *mockUnlinkPerson) UnlinkPerson(ctx sirius.Context, parentId int, childId int) error {
+	return m.Called(ctx, parentId, childId).Error(0)
 }
 
 func TestUnlinkPerson(t *testing.T) {
@@ -31,13 +31,6 @@ func TestUnlinkPerson(t *testing.T) {
 			ID:         5,
 			Salutation: "Mr",
 			Firstname:  "First",
-			Surname:    "Child",
-			Children:   nil,
-		},
-		{
-			ID:         6,
-			Salutation: "Mr",
-			Firstname:  "Second",
 			Surname:    "Child",
 			Children:   nil,
 		},
@@ -54,7 +47,7 @@ func TestUnlinkPerson(t *testing.T) {
 	}
 
 	client := &mockUnlinkPerson{}
-	client.On("UnlinkPerson", mock.Anything, 189, []int{5, 6}).Return(nil)
+	client.On("UnlinkPerson", mock.Anything, 189, 5).Return(nil)
 
 	client.
 		On("Person", mock.Anything, 189).
@@ -167,7 +160,7 @@ func TestUnlinkPersonWhenValidationError(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"childIds": {"5", "6"},
+		"childIds": {"5"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=189", strings.NewReader(form.Encode()))
@@ -190,13 +183,6 @@ func TestPostUnlinkPerson(t *testing.T) {
 			Surname:    "Child",
 			Children:   nil,
 		},
-		{
-			ID:         6,
-			Salutation: "Mr",
-			Firstname:  "Second",
-			Surname:    "Child",
-			Children:   nil,
-		},
 	}
 
 	parent := sirius.Person{
@@ -213,7 +199,7 @@ func TestPostUnlinkPerson(t *testing.T) {
 		Return(parent, nil)
 
 	client.
-		On("UnlinkPerson", mock.Anything, 189, []int{5, 6}).
+		On("UnlinkPerson", mock.Anything, 189, 5).
 		Return(nil)
 
 	template := &mockTemplate{}
@@ -225,8 +211,7 @@ func TestPostUnlinkPerson(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"child-0": {"5"},
-		"child-1": {"6"},
+		"child-id": {"5"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=189", strings.NewReader(form.Encode()))

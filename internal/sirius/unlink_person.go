@@ -7,11 +7,11 @@ import (
 	"net/http"
 )
 
-func (c *Client) UnlinkPerson(ctx Context, parentId int, childIds []int) error {
+func (c *Client) UnlinkPerson(ctx Context, parentId int, childId int) error {
 	data, err := json.Marshal(struct {
 		ChildIds []int `json:"childIds"`
 	}{
-		ChildIds: childIds,
+		ChildIds: []int{childId},
 	})
 
 	if err != nil {
