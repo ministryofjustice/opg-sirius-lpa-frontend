@@ -7,10 +7,10 @@ describe("Unlink records", () => {
     });
 
     it("unlinks the persons records", () => {
-        cy.contains("Unlink record");
+        cy.contains("Unlink Record");
         cy.contains("John Doe");
         cy.get(".moj-banner").should("not.exist");
-        cy.get("#child-id").click();
+        cy.get("#child-id-0").click();
         cy.get("button[type=submit]").click();
         cy.get(".moj-banner").should("exist");
     });

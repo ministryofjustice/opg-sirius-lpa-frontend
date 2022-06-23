@@ -9,6 +9,8 @@ import (
 )
 
 func TestUnlinkPerson(t *testing.T) {
+	t.Parallel()
+
 	pact := newPact()
 	defer pact.Teardown()
 
@@ -23,7 +25,7 @@ func TestUnlinkPerson(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a case linked with another").
+					Given("A donor exists with children").
 					UponReceiving("A request to unlink those cases").
 					WithRequest(dsl.Request{
 						Method: http.MethodDelete,
