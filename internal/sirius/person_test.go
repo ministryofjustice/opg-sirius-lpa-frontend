@@ -27,8 +27,8 @@ func TestPerson(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A donor exists").
-					UponReceiving("A request for the person").
+					Given("A donor exists with children").
+					UponReceiving("A request for the person with children").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/api/v1/persons/189"),
@@ -46,6 +46,13 @@ func TestPerson(t *testing.T) {
 							"firstname": dsl.String("John"),
 							"surname":   dsl.String("Doe"),
 							"dob":       dsl.Term("01/01/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
+							"children": dsl.Like([]map[string]interface{}{{
+								"id":        dsl.Like(105),
+								"uId":       dsl.Term("7000-0000-0002", `7\d{3}-\d{4}-\d{4}`),
+								"firstname": dsl.String("Child"),
+								"surname":   dsl.String("One"),
+								"dob":       dsl.Term("05/05/1980", `^\d{1,2}/\d{1,2}/\d{4}$`),
+							}}),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
@@ -54,7 +61,22 @@ func TestPerson(t *testing.T) {
 				{Name: "XSRF-TOKEN", Value: "abcde"},
 				{Name: "Other", Value: "other"},
 			},
-			expectedResponse: Person{ID: 103, UID: "7000-0000-0001", Firstname: "John", Surname: "Doe", DateOfBirth: DateString("1970-01-01")},
+			expectedResponse: Person{
+				ID:          103,
+				UID:         "7000-0000-0001",
+				Firstname:   "John",
+				Surname:     "Doe",
+				DateOfBirth: DateString("1970-01-01"),
+				Children: []Person{
+					{
+						ID:          105,
+						UID:         "7000-0000-0002",
+						Firstname:   "Child",
+						Surname:     "One",
+						DateOfBirth: DateString("1980-05-05"),
+					},
+				},
+			},
 		},
 		{
 			name: "Unauthorized",
