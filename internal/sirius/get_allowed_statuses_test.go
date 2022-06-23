@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCase(t *testing.T) {
+func TestGetAllowedStatuses(t *testing.T) {
 	t.Parallel()
 
 	pact := newPact()
@@ -19,19 +19,20 @@ func TestCase(t *testing.T) {
 		name             string
 		setup            func()
 		cookies          []*http.Cookie
-		expectedResponse Case
+		caseType         CaseType
+		expectedResponse []string
 		expectedError    func(int) error
 	}{
 		{
-			name: "OK",
+			name: "OK LPA",
 			setup: func() {
 				pact.
 					AddInteraction().
 					Given("I have a pending case assigned").
-					UponReceiving("A request for the case").
+					UponReceiving("A request for the LPA's available statuses").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/cases/800"),
+						Path:   dsl.String("/api/v1/lpas/800/available-statuses"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -39,12 +40,8 @@ func TestCase(t *testing.T) {
 						},
 					}).
 					WillRespondWith(dsl.Response{
-						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"uId":      dsl.String("7000-0000-0000"),
-							"caseType": dsl.String("LPA"),
-							"status":   dsl.String("Pending"),
-						}),
+						Status:  http.StatusOK,
+						Body:    dsl.EachLike(dsl.String("Pending"), 1),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
@@ -52,7 +49,37 @@ func TestCase(t *testing.T) {
 				{Name: "XSRF-TOKEN", Value: "abcde"},
 				{Name: "Other", Value: "other"},
 			},
-			expectedResponse: Case{UID: "7000-0000-0000", CaseType: "LPA", Status: "Pending"},
+			caseType:         CaseTypeLpa,
+			expectedResponse: []string{"Pending"},
+		},
+		{
+			name: "OK EPA",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have a pending EPA assigned").
+					UponReceiving("A request for the EPA's available statuses").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String("/api/v1/epas/800/available-statuses"),
+						Headers: dsl.MapMatcher{
+							"X-XSRF-TOKEN":        dsl.String("abcde"),
+							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
+							"OPG-Bypass-Membrane": dsl.String("1"),
+						},
+					}).
+					WillRespondWith(dsl.Response{
+						Status:  http.StatusOK,
+						Body:    dsl.EachLike(dsl.String("Pending"), 1),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			cookies: []*http.Cookie{
+				{Name: "XSRF-TOKEN", Value: "abcde"},
+				{Name: "Other", Value: "other"},
+			},
+			caseType:         CaseTypeEpa,
+			expectedResponse: []string{"Pending"},
 		},
 		{
 			name: "Unauthorized",
@@ -60,19 +87,20 @@ func TestCase(t *testing.T) {
 				pact.
 					AddInteraction().
 					Given("I have a pending case assigned").
-					UponReceiving("A request for the case without cookies").
+					UponReceiving("A request for the case's available statuses without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/cases/800"),
+						Path:   dsl.String("/api/v1/lpas/800/available-statuses"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
 					})
 			},
+			caseType: CaseTypeLpa,
 			expectedError: func(port int) error {
 				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/cases/800", port),
+				Code:   http.StatusUnauthorized,
+					URL:    fmt.Sprintf("http://localhost:%d/api/v1/lpas/800/available-statuses", port),
 					Method: http.MethodGet,
 				}
 			},
@@ -86,7 +114,7 @@ func TestCase(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				caseitem, err := client.Case(getContext(tc.cookies), 800)
+				caseitem, err := client.GetAllowedStatuses(getContext(tc.cookies), 800, tc.caseType)
 
 				assert.Equal(t, tc.expectedResponse, caseitem)
 				if tc.expectedError == nil {
