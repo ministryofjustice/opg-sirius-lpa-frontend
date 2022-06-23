@@ -17,7 +17,7 @@ type unlinkPersonData struct {
 	Success   bool
 	Error     sirius.ValidationError
 
-	Entity sirius.Person
+	Person sirius.Person
 }
 
 func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template) Handler {
@@ -30,7 +30,7 @@ func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template) Handler {
 		ctx := getContext(r)
 		data := unlinkPersonData{XSRFToken: ctx.XSRFToken}
 
-		data.Entity, err = client.Person(ctx, parentID)
+		data.Person, err = client.Person(ctx, parentID)
 		if err != nil {
 			return err
 		}
@@ -53,11 +53,15 @@ func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template) Handler {
 					return err
 				}
 				err = client.UnlinkPerson(ctx, parentID, childId)
-				if err != nil {
+				if ve, ok := err.(sirius.ValidationError); ok {
+					w.WriteHeader(http.StatusBadRequest)
+					data.Error = ve
+				} else if err != nil {
 					return err
 				} else {
 					data.Success = true
 				}
+
 			}
 
 		}

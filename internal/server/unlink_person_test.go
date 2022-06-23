@@ -47,8 +47,6 @@ func TestUnlinkPerson(t *testing.T) {
 	}
 
 	client := &mockUnlinkPerson{}
-	client.On("UnlinkPerson", mock.Anything, 189, 5).Return(nil)
-
 	client.
 		On("Person", mock.Anything, 189).
 		Return(person, nil)
@@ -56,7 +54,7 @@ func TestUnlinkPerson(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, unlinkPersonData{
-			Entity: person,
+			Person: person,
 		}).
 		Return(nil)
 
@@ -68,29 +66,25 @@ func TestUnlinkPerson(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestUnlinkPersonNoID(t *testing.T) {
-	person := sirius.Person{ID: 189, Firstname: "John", Surname: "Doe"}
+	testCases := map[string]string{
+		"no-id":  "/?id=123",
+		"bad-id": "/?id=test",
+	}
 
-	client := &mockUnlinkPerson{}
-	client.
-		On("Person", mock.Anything, 189).
-		Return(person, nil)
+	for name, testUrl := range testCases {
+		t.Run(name, func(t *testing.T) {
+			r, _ := http.NewRequest(http.MethodGet, testUrl, nil)
+			w := httptest.NewRecorder()
 
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, unlinkPersonData{
-			Entity: person,
-		}).
-		Return(nil)
+			err := EditDates(nil, nil)(w, r)
 
-	r, _ := http.NewRequest(http.MethodGet, "/", nil)
-	w := httptest.NewRecorder()
-
-	err := UnlinkPerson(client, template.Func)(w, r)
-
-	assert.NotNil(t, err)
+			assert.NotNil(t, err)
+		})
+	}
 }
 
 func TestUnlinkPersonsWhenFailure(t *testing.T) {
@@ -101,17 +95,13 @@ func TestUnlinkPersonsWhenFailure(t *testing.T) {
 		On("Person", mock.Anything, 189).
 		Return(sirius.Person{}, expectedError)
 
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, unlinkPersonData{}).
-		Return(nil)
-
 	r, _ := http.NewRequest(http.MethodGet, "/?id=189", nil)
 	w := httptest.NewRecorder()
 
-	err := UnlinkPerson(client, template.Func)(w, r)
+	err := UnlinkPerson(client, nil)(w, r)
 
 	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
 }
 
 func TestUnlinkPersonWhenTemplateErrors(t *testing.T) {
@@ -126,7 +116,7 @@ func TestUnlinkPersonWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, unlinkPersonData{
-			Entity: person,
+			Person: person,
 		}).
 		Return(expectedError)
 
@@ -136,9 +126,10 @@ func TestUnlinkPersonWhenTemplateErrors(t *testing.T) {
 	err := UnlinkPerson(client, template.Func)(w, r)
 
 	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestUnlinkPersonWhenValidationError(t *testing.T) {
+func TestPostUnlinkPersonWhenChildNotSelected(t *testing.T) {
 	person := sirius.Person{ID: 189, Firstname: "John", Surname: "Doe"}
 	validationError := sirius.ValidationError{
 		Field: sirius.FieldErrors{
@@ -154,13 +145,54 @@ func TestUnlinkPersonWhenValidationError(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, unlinkPersonData{
-			Entity: person,
-			Error:  validationError,
+			Person:  person,
+			Error:   validationError,
+			Success: false,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=189", nil)
+	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	w := httptest.NewRecorder()
+
+	err := UnlinkPerson(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestUnlinkPersonWhenValidationError(t *testing.T) {
+	parent := sirius.Person{
+		ID:         189,
+		Salutation: "Mrs",
+		Firstname:  "Parent",
+		Surname:    "Person",
+	}
+
+	validationError := sirius.ValidationError{Detail: "Cannot unlink records"}
+
+	client := &mockUnlinkPerson{}
+	client.
+		On("Person", mock.Anything, 189).
+		Return(parent, nil)
+
+	client.
+		On("UnlinkPerson", mock.Anything, 189, 5).
+		Return(validationError)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, unlinkPersonData{
+			Person:  parent,
+			Error:   validationError,
+			Success: false,
 		}).
 		Return(nil)
 
 	form := url.Values{
-		"childIds": {"5"},
+		"child-id": {"5"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=189", strings.NewReader(form.Encode()))
@@ -172,6 +204,7 @@ func TestUnlinkPersonWhenValidationError(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestPostUnlinkPerson(t *testing.T) {
@@ -205,7 +238,7 @@ func TestPostUnlinkPerson(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, unlinkPersonData{
-			Entity:  parent,
+			Person:  parent,
 			Success: true,
 		}).
 		Return(nil)
@@ -223,4 +256,5 @@ func TestPostUnlinkPerson(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
 }

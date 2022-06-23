@@ -17,23 +17,23 @@
                     <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Name</th>
-                        <td class="govuk-table__cell">{{ .Entity.Firstname }} {{ .Entity.Surname }}</td>
+                        <td class="govuk-table__cell">{{ .Person.Firstname }} {{ .Person.Surname }}</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Contact ref #</th>
-                        <td class="govuk-table__cell">{{ .Entity.UID }}</td>
+                        <td class="govuk-table__cell">{{ .Person.UID }}</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Address</th>
-                        <td class="govuk-table__cell">{{ .Entity.AddressLine1 }}</td>
+                        <td class="govuk-table__cell">{{ .Person.AddressLine1 }}</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Date of birth</th>
-                        <td class="govuk-table__cell">{{ .Entity.DateOfBirth }}</td>
+                        <td class="govuk-table__cell">{{ .Person.DateOfBirth }}</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Number of links</th>
-                        <td class="govuk-table__cell">{{ len .Entity.Children }}</td>
+                        <td class="govuk-table__cell">{{ len .Person.Children }}</td>
                     </tr>
                     </tbody>
                 </table>
@@ -51,7 +51,7 @@
                             </p>
                         {{ end }}
                         <div class="govuk-radios" data-module="govuk-radios">
-                            {{ range $i, $e := .Entity.Children }}
+                            {{ range $i, $e := .Person.Children }}
                                 <div class="govuk-radios__item">
                                     <input class="govuk-radios__input" id="child-id-{{ $i }}" name="child-id" type="radio" value="{{ $e.ID }}">
                                     <label class="govuk-label govuk-radios__label unlink-table__label" for="child-id-{{ $i }}">

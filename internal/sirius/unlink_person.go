@@ -29,6 +29,14 @@ func (c *Client) UnlinkPerson(ctx Context, parentId int, childId int) error {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode == http.StatusBadRequest {
+		var v ValidationError
+		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
+			return err
+		}
+		return v
+	}
+
 	if resp.StatusCode != http.StatusNoContent {
 		return newStatusError(resp)
 	}

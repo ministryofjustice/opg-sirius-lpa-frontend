@@ -3,7 +3,6 @@ package sirius
 import "fmt"
 
 type Case struct {
-	ID               int        `json:"id"`
 	UID              string     `json:"uId"`
 	CaseType         string     `json:"caseType"`
 	CancellationDate DateString `json:"cancellationDate"`
@@ -14,7 +13,6 @@ type Case struct {
 	RegistrationDate DateString `json:"registrationDate"`
 	RejectedDate     DateString `json:"rejectedDate"`
 	WithdrawnDate    DateString `json:"withdrawnDate"`
-	Children         []Case     `json:"children"`
 }
 
 func (c *Client) Case(ctx Context, id int) (Case, error) {
