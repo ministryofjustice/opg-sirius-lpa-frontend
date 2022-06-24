@@ -41,7 +41,6 @@ func TestUnlinkPerson(t *testing.T) {
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusNoContent,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
 			cookies: []*http.Cookie{
@@ -54,7 +53,7 @@ func TestUnlinkPerson(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a case linked with another").
+					Given("A donor exists with children").
 					UponReceiving("A request to unlink those cases without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodDelete,
