@@ -230,7 +230,7 @@ jobs:
           output: "trivy-results.sarif"
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v1
+        uses: github/codeql-action/upload-sarif@v2
         if: always()
         with:
           sarif_file: "trivy-results.sarif"
@@ -275,6 +275,8 @@ jobs:
           else
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.bump_version.outputs.tag }}
           fi
+
+          echo "Container tag: ${{ steps.bump_version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
 
   push-tags:
     runs-on: ubuntu-latest

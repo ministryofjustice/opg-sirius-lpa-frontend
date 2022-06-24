@@ -30,7 +30,7 @@ func TestEditDates(t *testing.T) {
 					UponReceiving("A request to edit the dates").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/api/v1/lpas/800"),
+						Path:   dsl.String("/api/v1/lpas/800/edit-dates"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -59,7 +59,7 @@ func TestEditDates(t *testing.T) {
 					UponReceiving("A request to edit the dates without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/api/v1/lpas/800"),
+						Path:   dsl.String("/api/v1/lpas/800/edit-dates"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -68,7 +68,7 @@ func TestEditDates(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/lpas/800", port),
+					URL:    fmt.Sprintf("http://localhost:%d/api/v1/lpas/800/edit-dates", port),
 					Method: http.MethodPut,
 				}
 			},
