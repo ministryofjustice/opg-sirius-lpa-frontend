@@ -1,0 +1,45 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Change status{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
+
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        {{ template "success-banner" (printf "Status changed to %s" .NewStatus) }}
+      {{ end }}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">Change status</h1>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+        <div class="govuk-form-group {{ if .Error.Field.status }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-status">
+            Status
+          </label>
+          {{ range .Error.Field.status }}
+            <p class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ . }}
+            </p>
+          {{ end }}
+          <select class="govuk-select {{ if .Error.Field.status }}govuk-select--error{{ end }}" id="f-status" name="status">
+            <option hidden selected disabled></option>
+            {{ range .AvailableStatuses }}
+              <option value="{{ . }}" {{ if eq $.NewStatus . }}selected{{ end }}>{{ . }}</option>
+            {{ end }}
+          </select>
+        </div>
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Submit</button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
