@@ -36,7 +36,7 @@ func TestUnlinkPerson(t *testing.T) {
 							"OPG-Bypass-Membrane": dsl.String("1"),
 						},
 						Body: map[string]interface{}{
-							"childIds": dsl.Like([]int{5}),
+							"childIds": dsl.EachLike(5, 1),
 						},
 					}).
 					WillRespondWith(dsl.Response{
@@ -60,7 +60,7 @@ func TestUnlinkPerson(t *testing.T) {
 						Method: http.MethodDelete,
 						Path:   dsl.String("/api/v1/person-links/189"),
 						Body: map[string]interface{}{
-							"childIds": dsl.Like([]int{5}),
+							"childIds": dsl.EachLike(5, 1),
 						},
 					}).
 					WillRespondWith(dsl.Response{
