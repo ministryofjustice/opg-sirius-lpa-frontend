@@ -30,14 +30,8 @@ func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template) Handler {
 		ctx := getContext(r)
 		data := unlinkPersonData{XSRFToken: ctx.XSRFToken}
 
-		data.Person, err = client.Person(ctx, parentID)
-		if err != nil {
-			return err
-		}
-
-		var childId int
-
 		if r.Method == http.MethodPost {
+			var childId int
 			id := r.FormValue("child-id")
 
 			if id == "" {
@@ -63,7 +57,11 @@ func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template) Handler {
 				}
 
 			}
+		}
 
+		data.Person, err = client.Person(ctx, parentID)
+		if err != nil {
+			return err
 		}
 
 		return tmpl(w, data)
