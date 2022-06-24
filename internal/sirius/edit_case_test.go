@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEditDates(t *testing.T) {
+func TestEditCase(t *testing.T) {
 	t.Parallel()
 
 	pact := newPact()
@@ -19,25 +19,26 @@ func TestEditDates(t *testing.T) {
 		name          string
 		setup         func()
 		cookies       []*http.Cookie
+		caseType      CaseType
 		expectedError func(int) error
 	}{
 		{
-			name: "OK",
+			name: "OK LPA",
 			setup: func() {
 				pact.
 					AddInteraction().
 					Given("I have a pending case assigned").
-					UponReceiving("A request to edit the dates").
+					UponReceiving("A request to edit the LPA").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/api/v1/lpas/800/edit-dates"),
+						Path:   dsl.String("/api/v1/lpas/800"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
 							"OPG-Bypass-Membrane": dsl.String("1"),
 						},
 						Body: map[string]interface{}{
-							"rejectedDate": "04/03/2022",
+							"status": "Suspended",
 						},
 					}).
 					WillRespondWith(dsl.Response{
@@ -49,6 +50,37 @@ func TestEditDates(t *testing.T) {
 				{Name: "XSRF-TOKEN", Value: "abcde"},
 				{Name: "Other", Value: "other"},
 			},
+			caseType: CaseTypeLpa,
+		},
+		{
+			name: "OK EPA",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have a pending EPA assigned").
+					UponReceiving("A request to edit the EPA").
+					WithRequest(dsl.Request{
+						Method: http.MethodPut,
+						Path:   dsl.String("/api/v1/epas/800"),
+						Headers: dsl.MapMatcher{
+							"X-XSRF-TOKEN":        dsl.String("abcde"),
+							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
+							"OPG-Bypass-Membrane": dsl.String("1"),
+						},
+						Body: map[string]interface{}{
+							"status": "Suspended",
+						},
+					}).
+					WillRespondWith(dsl.Response{
+						Status:  http.StatusOK,
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			cookies: []*http.Cookie{
+				{Name: "XSRF-TOKEN", Value: "abcde"},
+				{Name: "Other", Value: "other"},
+			},
+			caseType: CaseTypeEpa,
 		},
 		{
 			name: "Unauthorized",
@@ -56,10 +88,10 @@ func TestEditDates(t *testing.T) {
 				pact.
 					AddInteraction().
 					Given("I have a pending case assigned").
-					UponReceiving("A request to edit the dates without cookies").
+					UponReceiving("A request to edit the LPA without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/api/v1/lpas/800/edit-dates"),
+						Path:   dsl.String("/api/v1/lpas/800"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -68,10 +100,11 @@ func TestEditDates(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/lpas/800/edit-dates", port),
+					URL:    fmt.Sprintf("http://localhost:%d/api/v1/lpas/800", port),
 					Method: http.MethodPut,
 				}
 			},
+			caseType: CaseTypeLpa,
 		},
 	}
 
@@ -82,7 +115,7 @@ func TestEditDates(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.EditDates(getContext(tc.cookies), 800, "lpa", Dates{RejectedDate: DateString("2022-03-04")})
+				err := client.EditCase(getContext(tc.cookies), 800, tc.caseType, Case{Status: "Suspended"})
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
