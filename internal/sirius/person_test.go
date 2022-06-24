@@ -23,7 +23,7 @@ func TestPerson(t *testing.T) {
 		expectedError    func(int) error
 	}{
 		{
-			name: "OK",
+			name: "OK with children",
 			setup: func() {
 				pact.
 					AddInteraction().
@@ -46,13 +46,13 @@ func TestPerson(t *testing.T) {
 							"firstname": dsl.String("John"),
 							"surname":   dsl.String("Doe"),
 							"dob":       dsl.Term("01/01/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
-							"children": dsl.EachLike([]map[string]interface{}{{
+							"children": dsl.Like([]map[string]interface{}{{
 								"id":        dsl.Like(105),
 								"uId":       dsl.Term("7000-0000-0002", `7\d{3}-\d{4}-\d{4}`),
 								"firstname": dsl.String("Child"),
 								"surname":   dsl.String("One"),
 								"dob":       dsl.Term("05/05/1980", `^\d{1,2}/\d{1,2}/\d{4}$`),
-							}}, 1),
+							}}),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
