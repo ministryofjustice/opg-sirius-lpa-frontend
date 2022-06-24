@@ -2,10 +2,11 @@ package sirius
 
 import (
 	"fmt"
-	"github.com/pact-foundation/pact-go/dsl"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+
+	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestUnlinkPerson(t *testing.T) {
@@ -54,7 +55,7 @@ func TestUnlinkPerson(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a case linked with another").
+					Given("A donor exists with children").
 					UponReceiving("A request to unlink those cases without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodDelete,
