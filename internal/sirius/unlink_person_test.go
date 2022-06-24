@@ -21,35 +21,6 @@ func TestUnlinkPerson(t *testing.T) {
 		expectedError func(int) error
 	}{
 		{
-			name: "OK",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("A donor exists with children").
-					UponReceiving("A request to unlink those cases").
-					WithRequest(dsl.Request{
-						Method: http.MethodDelete,
-						Path:   dsl.String("/api/v1/person-links/189"),
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-						},
-						Body: map[string]interface{}{
-							"childIds": dsl.Like([]int{5}),
-						},
-					}).
-					WillRespondWith(dsl.Response{
-						Status:  http.StatusNoContent,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
-			},
-		},
-		{
 			name: "Unauthorized",
 			setup: func() {
 				pact.
