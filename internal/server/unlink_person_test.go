@@ -71,7 +71,7 @@ func TestUnlinkPerson(t *testing.T) {
 
 func TestUnlinkPersonNoID(t *testing.T) {
 	testCases := map[string]string{
-		"no-id":  "/?id=123",
+		"no-id":  "/",
 		"bad-id": "/?id=test",
 	}
 
