@@ -6,7 +6,8 @@ lint:
 	docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint:latest golangci-lint run -v
 
 go-test:
-	go test ./...
+	rm -f pacts/sirius-lpa-frontend-sirius.json
+	go test -count 1 ./...
 
 build:
 	docker-compose -f docker/docker-compose.ci.yml build --parallel app pact-stub
