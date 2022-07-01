@@ -38,6 +38,7 @@ func getContext(r *http.Request) sirius.Context {
 
 type Client interface {
 	AddComplaintClient
+	AllocateCasesClient
 	ChangeStatusClient
 	DeleteRelationshipClient
 	EditComplaintClient
@@ -71,6 +72,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/edit-complaint", wrap(EditComplaint(client, templates.Get("edit_complaint.gohtml"))))
 	mux.Handle("/unlink-person", wrap(UnlinkPerson(client, templates.Get("unlink_person.gohtml"))))
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change_status.gohtml"))))
+	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate_cases.gohtml"))))
 	mux.Handle("/search-users", wrap(SearchUsers(client)))
 	mux.Handle("/search-persons", wrap(SearchDonors(client)))
 
