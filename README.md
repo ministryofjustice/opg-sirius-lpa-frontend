@@ -42,7 +42,7 @@ brew install pact-ruby-standalone
 Then to run the tests:
 
 ```
-go test ./...
+make go-test
 ```
 
 The tests will produce a `./pacts` directory which is then used to provide a
