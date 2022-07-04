@@ -154,7 +154,7 @@ func TestPostEditComplaint(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := EditComplaint(client, template.Func)(w, r)
@@ -195,7 +195,7 @@ func TestPostEditComplaintWhenEditComplaintValidationError(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := EditComplaint(client, template.Func)(w, r)
@@ -221,7 +221,7 @@ func TestPostEditComplaintWhenEditComplaintOtherError(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := EditComplaint(client, nil)(w, r)

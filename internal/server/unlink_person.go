@@ -1,10 +1,11 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-go-common/template"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
 	"strconv"
+
+	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
 type UnlinkPersonClient interface {
@@ -32,7 +33,7 @@ func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template) Handler {
 
 		if r.Method == http.MethodPost {
 			var childId int
-			id := r.FormValue("child-id")
+			id := postFormString(r, "child-id")
 
 			if id == "" {
 				w.WriteHeader(http.StatusBadRequest)

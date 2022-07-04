@@ -222,7 +222,7 @@ func TestPostTask(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := Task(client, template.Func)(w, r)
@@ -268,7 +268,7 @@ func TestPostTaskWhenCreateTaskFails(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := Task(client, template.Func)(w, r)
@@ -324,7 +324,7 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := Task(client, template.Func)(w, r)
@@ -405,7 +405,7 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 			form.Add(tc.field, tc.value)
 
 			r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
 			err := Task(client, template.Func)(w, r)

@@ -154,7 +154,7 @@ func TestPostAddComplaint(t *testing.T) {
 			}
 
 			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
 			err := AddComplaint(client, template.Func)(w, r)
@@ -198,7 +198,7 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123&case=lpa", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := AddComplaint(client, template.Func)(w, r)
@@ -227,7 +227,7 @@ func TestPostAddComplaintWhenAddComplaintOtherError(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123&case=lpa", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := AddComplaint(client, nil)(w, r)

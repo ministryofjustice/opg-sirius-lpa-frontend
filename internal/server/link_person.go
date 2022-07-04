@@ -40,7 +40,7 @@ func LinkPerson(client LinkPersonClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			data.OtherPerson, err = client.PersonByUid(ctx, r.FormValue("uid"))
+			data.OtherPerson, err = client.PersonByUid(ctx, postFormString(r, "uid"))
 			if ve, ok := err.(sirius.StatusError); ok && ve.Code == http.StatusNotFound {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = sirius.ValidationError{
@@ -66,9 +66,9 @@ func LinkPerson(client LinkPersonClient, tmpl template.Template) Handler {
 				data.CanChangePrimary = true
 			}
 
-			if r.FormValue("primary-id") != "" {
+			if postFormString(r, "primary-id") != "" {
 				if data.CanChangePrimary {
-					data.PrimaryId, err = strconv.Atoi(r.FormValue("primary-id"))
+					data.PrimaryId, err = postFormInt(r, "primary-id")
 					if err != nil {
 						return err
 					}

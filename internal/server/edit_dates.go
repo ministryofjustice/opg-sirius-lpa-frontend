@@ -39,14 +39,14 @@ func EditDates(client EditDatesClient, tmpl template.Template) Handler {
 
 		if r.Method == http.MethodPost {
 			dates := sirius.Dates{
-				CancellationDate: sirius.DateString(r.FormValue("cancellationDate")),
-				DispatchDate:     sirius.DateString(r.FormValue("dispatchDate")),
-				DueDate:          sirius.DateString(r.FormValue("dueDate")),
-				InvalidDate:      sirius.DateString(r.FormValue("invalidDate")),
-				ReceiptDate:      sirius.DateString(r.FormValue("receiptDate")),
-				RegistrationDate: sirius.DateString(r.FormValue("registrationDate")),
-				RejectedDate:     sirius.DateString(r.FormValue("rejectedDate")),
-				WithdrawnDate:    sirius.DateString(r.FormValue("withdrawnDate")),
+				CancellationDate: postFormDateString(r, "cancellationDate"),
+				DispatchDate:     postFormDateString(r, "dispatchDate"),
+				DueDate:          postFormDateString(r, "dueDate"),
+				InvalidDate:      postFormDateString(r, "invalidDate"),
+				ReceiptDate:      postFormDateString(r, "receiptDate"),
+				RegistrationDate: postFormDateString(r, "registrationDate"),
+				RejectedDate:     postFormDateString(r, "rejectedDate"),
+				WithdrawnDate:    postFormDateString(r, "withdrawnDate"),
 			}
 
 			err = client.EditDates(ctx, caseID, caseType, dates)

@@ -95,7 +95,7 @@ func TestPostWarning(t *testing.T) {
 		"warning-notes": {"Some random warning notes"},
 	}.Encode()))
 
-	req.Header.Add("content-type", "application/x-www-form-urlencoded")
+	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
 	err := Warning(siriusClient, template.Func)(w, req)
@@ -142,7 +142,7 @@ func TestPostWarningValidationErrors(t *testing.T) {
 		"warning-notes": {""},
 	}.Encode()))
 
-	req.Header.Add("content-type", "application/x-www-form-urlencoded")
+	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
 	err := Warning(siriusClient, template.Func)(w, req)
@@ -172,7 +172,7 @@ func TestCreateWarningReturnsError(t *testing.T) {
 		"warning-notes": {"Some notes"},
 	}.Encode()))
 
-	req.Header.Add("content-type", "application/x-www-form-urlencoded")
+	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
 	err := Warning(siriusClient, nil)(w, req)
@@ -189,7 +189,7 @@ func TestGetWarningTypesFail(t *testing.T) {
 		"warning-notes": {"Some notes"},
 	}.Encode()))
 
-	req.Header.Add("content-type", "application/x-www-form-urlencoded")
+	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
 	err := Warning(siriusClient, nil)(w, req)

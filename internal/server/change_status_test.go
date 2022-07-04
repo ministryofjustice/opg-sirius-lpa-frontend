@@ -190,7 +190,7 @@ func TestPostChangeStatus(t *testing.T) {
 			}
 
 			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
 			err := ChangeStatus(client, template.Func)(w, r)
@@ -227,7 +227,7 @@ func TestPostChangeStatusWhenChangeStatusErrors(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123&case=lpa", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := ChangeStatus(client, nil)(w, r)

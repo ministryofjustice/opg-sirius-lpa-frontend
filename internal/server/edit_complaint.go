@@ -39,15 +39,15 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 
 		if r.Method == http.MethodPost {
 			complaint := sirius.Complaint{
-				Category:       r.FormValue("category"),
-				Description:    r.FormValue("description"),
-				ReceivedDate:   sirius.DateString(r.FormValue("receivedDate")),
-				Severity:       r.FormValue("severity"),
-				SubCategory:    getValidSubcategory(r.FormValue("category"), r.PostForm["subCategory"]),
-				Summary:        r.FormValue("summary"),
-				Resolution:     r.FormValue("resolution"),
-				ResolutionInfo: r.FormValue("resolutionInfo"),
-				ResolutionDate: sirius.DateString(r.FormValue("resolutionDate")),
+				Category:       postFormString(r, "category"),
+				Description:    postFormString(r, "description"),
+				ReceivedDate:   postFormDateString(r, "receivedDate"),
+				Severity:       postFormString(r, "severity"),
+				SubCategory:    getValidSubcategory(postFormString(r, "category"), r.PostForm["subCategory"]),
+				Summary:        postFormString(r, "summary"),
+				Resolution:     postFormString(r, "resolution"),
+				ResolutionInfo: postFormString(r, "resolutionInfo"),
+				ResolutionDate: postFormDateString(r, "resolutionDate"),
 			}
 
 			err = client.EditComplaint(ctx, id, complaint)

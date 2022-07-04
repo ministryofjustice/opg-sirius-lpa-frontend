@@ -3,6 +3,8 @@ package server
 import (
 	"net/http"
 	"net/url"
+	"strconv"
+	"strings"
 
 	"github.com/ministryofjustice/opg-go-common/securityheaders"
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -125,4 +127,16 @@ func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL 
 			}
 		})
 	}
+}
+
+func postFormString(r *http.Request, name string) string {
+	return strings.TrimSpace(r.PostFormValue(name))
+}
+
+func postFormInt(r *http.Request, name string) (int, error) {
+	return strconv.Atoi(postFormString(r, name))
+}
+
+func postFormDateString(r *http.Request, name string) sirius.DateString {
+	return sirius.DateString(postFormString(r, name))
 }
