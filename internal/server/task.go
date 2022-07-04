@@ -81,23 +81,23 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 		if r.Method == http.MethodPost {
 			task := sirius.Task{
 				CaseID:      caseID,
-				Type:        r.FormValue("type"),
-				DueDate:     sirius.DateString(r.FormValue("dueDate")),
-				Name:        r.FormValue("name"),
-				Description: r.FormValue("description"),
+				Type:        postFormString(r, "type"),
+				DueDate:     postFormDateString(r, "dueDate"),
+				Name:        postFormString(r, "name"),
+				Description: postFormString(r, "description"),
 			}
-			assignTo := r.FormValue("assignTo")
+			assignTo := postFormString(r, "assignTo")
 
 			switch assignTo {
 			case "user":
-				parts := strings.SplitN(r.FormValue("assigneeUser"), ":", 2)
+				parts := strings.SplitN(postFormString(r, "assigneeUser"), ":", 2)
 				if len(parts) == 2 {
 					assigneeID, _ := strconv.Atoi(parts[0])
 					task.AssigneeID = assigneeID
 					data.AssigneeUserName = parts[1]
 				}
 			case "team":
-				assigneeID, _ := strconv.Atoi(r.FormValue("assigneeTeam"))
+				assigneeID, _ := postFormInt(r, "assigneeTeam")
 				task.AssigneeID = assigneeID
 			}
 

@@ -207,7 +207,7 @@ func TestPostAllocateCases(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := AllocateCases(client, template.Func)(w, r)
@@ -257,7 +257,7 @@ func TestPostAllocateCasesMultiple(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123&id=456", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := AllocateCases(client, template.Func)(w, r)
@@ -288,7 +288,7 @@ func TestPostAllocateCasesWhenAllocateCasesFails(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := AllocateCases(client, nil)(w, r)
@@ -331,7 +331,7 @@ func TestPostAllocateCasesWhenAssignToNotSet(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := AllocateCases(client, template.Func)(w, r)
@@ -396,7 +396,7 @@ func TestPostAllocateCasesWhenValidationError(t *testing.T) {
 			form.Add(tc.field, tc.value)
 
 			r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
 			err := AllocateCases(client, template.Func)(w, r)

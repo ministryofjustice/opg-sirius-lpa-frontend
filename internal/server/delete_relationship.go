@@ -35,7 +35,7 @@ func DeleteRelationship(client DeleteRelationshipClient, tmpl template.Template)
 		data := deleteRelationshipData{XSRFToken: ctx.XSRFToken}
 
 		if r.Method == http.MethodPost {
-			referenceID, err := strconv.Atoi(r.FormValue("reference-id"))
+			referenceID, err := postFormInt(r, "reference-id")
 			if err != nil {
 				return err
 			}

@@ -47,12 +47,12 @@ func Relationship(client RelationshipClient, tmpl template.Template) Handler {
 
 		if r.Method == http.MethodPost {
 			var (
-				reason     = r.FormValue("reason")
+				reason     = postFormString(r, "reason")
 				searchUID  string
 				searchName string
 			)
 
-			parts := strings.SplitN(r.FormValue("search"), ":", 2)
+			parts := strings.SplitN(postFormString(r, "search"), ":", 2)
 			if len(parts) == 2 {
 				searchUID = parts[0]
 				searchName = parts[1]

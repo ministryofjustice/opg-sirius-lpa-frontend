@@ -7,9 +7,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
+
+const formUrlEncoded = "application/x-www-form-urlencoded"
 
 type mockTemplate struct {
 	mock.Mock
@@ -139,7 +142,7 @@ func TestGetContextForPostRequest(t *testing.T) {
 	assert := assert.New(t)
 
 	r, _ := http.NewRequest("POST", "/", strings.NewReader("xsrfToken=the-real-one"))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	r.AddCookie(&http.Cookie{Name: "XSRF-TOKEN", Value: "z3tVRZ00yx4dHz3KWYv3boLWHZ4/RsCsVAKbvo2SBNc%3D"})
 	r.AddCookie(&http.Cookie{Name: "another", Value: "one"})
 
@@ -147,4 +150,27 @@ func TestGetContextForPostRequest(t *testing.T) {
 	assert.Equal(r.Context(), ctx.Context)
 	assert.Equal(r.Cookies(), ctx.Cookies)
 	assert.Equal("the-real-one", ctx.XSRFToken)
+}
+
+func TestPostFormString(t *testing.T) {
+	r, _ := http.NewRequest(http.MethodPost, "/?name=ignored", strings.NewReader("name=%20%20%09%0Ahello%0A%0A%20%20%09%09"))
+	r.Header.Add("Content-Type", formUrlEncoded)
+
+	assert.Equal(t, "hello", postFormString(r, "name"))
+}
+
+func TestPostFormInt(t *testing.T) {
+	r, _ := http.NewRequest(http.MethodPost, "/?name=ignored", strings.NewReader("name=%20%20%09%0A123%0A%0A%20%20%09%09"))
+	r.Header.Add("Content-Type", formUrlEncoded)
+
+	n, err := postFormInt(r, "name")
+	assert.Equal(t, 123, n)
+	assert.Nil(t, err)
+}
+
+func TestPostFormDateString(t *testing.T) {
+	r, _ := http.NewRequest(http.MethodPost, "/?name=ignored", strings.NewReader("name=%20%20%09%0A2022-01-02%0A%0A%20%20%09%09"))
+	r.Header.Add("Content-Type", formUrlEncoded)
+
+	assert.Equal(t, sirius.DateString("2022-01-02"), postFormDateString(r, "name"))
 }

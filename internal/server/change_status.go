@@ -53,7 +53,7 @@ func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
 			XSRFToken:         ctx.XSRFToken,
 			Entity:            fmt.Sprintf("%s %s", caseitem.CaseType, caseitem.UID),
 			AvailableStatuses: availableStatuses,
-			NewStatus:         r.FormValue("status"),
+			NewStatus:         postFormString(r, "status"),
 		}
 
 		if r.Method == http.MethodPost {
