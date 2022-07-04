@@ -41,8 +41,8 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			warningType := r.FormValue("warning-type")
-			warningNotes := r.FormValue("warning-notes")
+			warningType := postFormString(r, "warning-type")
+			warningNotes := postFormString(r, "warning-notes")
 
 			err := client.CreateWarning(ctx, personId, warningType, warningNotes)
 

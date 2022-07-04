@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -89,7 +90,8 @@ var complaintCategories = map[string]complaintCategory{
 
 func getValidSubcategory(category string, subCategories []string) string {
 	if category, ok := complaintCategories[category]; ok {
-		for _, s := range subCategories {
+		for _, subCategory := range subCategories {
+			s := strings.TrimSpace(subCategory)
 			if _, ok := category.Children[s]; ok {
 				return s
 			}
@@ -136,12 +138,12 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 
 		if r.Method == http.MethodPost {
 			complaint := sirius.Complaint{
-				Category:     r.FormValue("category"),
-				Description:  r.FormValue("description"),
-				ReceivedDate: sirius.DateString(r.FormValue("receivedDate")),
-				Severity:     r.FormValue("severity"),
-				SubCategory:  getValidSubcategory(r.FormValue("category"), r.PostForm["subCategory"]),
-				Summary:      r.FormValue("summary"),
+				Category:     postFormString(r, "category"),
+				Description:  postFormString(r, "description"),
+				ReceivedDate: postFormDateString(r, "receivedDate"),
+				Severity:     postFormString(r, "severity"),
+				SubCategory:  getValidSubcategory(postFormString(r, "category"), r.PostForm["subCategory"]),
+				Summary:      postFormString(r, "summary"),
 			}
 
 			err = client.AddComplaint(ctx, caseID, caseType, complaint)

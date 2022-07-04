@@ -140,7 +140,7 @@ func TestPostRelationship(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := Relationship(client, template.Func)(w, r)
@@ -181,7 +181,7 @@ func TestPostRelationshipWhenCreatePersonReferenceValidationError(t *testing.T) 
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := Relationship(client, template.Func)(w, r)
@@ -208,7 +208,7 @@ func TestPostRelationshipWhenCreatePersonReferenceOtherError(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := Relationship(client, nil)(w, r)

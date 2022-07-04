@@ -91,9 +91,9 @@ func Event(client EventClient, tmpl template.Template) Handler {
 			}
 
 			var (
-				noteType    = r.FormValue("type")
-				name        = r.FormValue("name")
-				description = r.FormValue("description")
+				noteType    = postFormString(r, "type")
+				name        = postFormString(r, "name")
+				description = postFormString(r, "description")
 				file, err   = findNoteFile(r.MultipartForm, "file")
 			)
 			if err != nil {

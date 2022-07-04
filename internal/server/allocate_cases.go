@@ -93,17 +93,17 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
 
 		if r.Method == http.MethodPost {
 			var assigneeID int
-			assignTo := r.FormValue("assignTo")
+			assignTo := postFormString(r, "assignTo")
 
 			switch assignTo {
 			case "user":
-				parts := strings.SplitN(r.FormValue("assigneeUser"), ":", 2)
+				parts := strings.SplitN(postFormString(r, "assigneeUser"), ":", 2)
 				if len(parts) == 2 {
 					assigneeID, _ = strconv.Atoi(parts[0])
 					data.AssigneeUserName = parts[1]
 				}
 			case "team":
-				assigneeID, _ = strconv.Atoi(r.FormValue("assigneeTeam"))
+				assigneeID, _ = postFormInt(r, "assigneeTeam")
 			}
 
 			err := client.AllocateCases(ctx, assigneeID, allocations)

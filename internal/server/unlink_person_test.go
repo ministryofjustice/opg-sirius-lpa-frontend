@@ -2,14 +2,15 @@ package server
 
 import (
 	"errors"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockUnlinkPerson struct {
@@ -152,7 +153,7 @@ func TestPostUnlinkPersonWhenChildNotSelected(t *testing.T) {
 		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=189", nil)
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := UnlinkPerson(client, template.Func)(w, r)
@@ -196,7 +197,7 @@ func TestUnlinkPersonWhenValidationError(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=189", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := UnlinkPerson(client, template.Func)(w, r)
@@ -248,7 +249,7 @@ func TestPostUnlinkPerson(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=189", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := UnlinkPerson(client, template.Func)(w, r)
