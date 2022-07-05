@@ -108,7 +108,7 @@ jobs:
           PACT_BROKER_URL: https://pact-broker.api.opg.service.justice.gov.uk
         run: |
           curl ${PACT_BROKER_URL}/pacts/provider/sirius/consumer/sirius-lpa-frontend/latest > /tmp/latest-pact.json
-          (diff <(jq --sort-keys . ${PACT_DIR}/sirius-lpa-frontend-sirius.json) <(jq --sort-keys . /tmp/latest-pact.json) || true) | (! grep '<')
+          (diff <(jq --sort-keys '.interactions|=sort_by(.description)' ${PACT_DIR}/sirius-lpa-frontend-sirius.json) <(jq --sort-keys '.interactions|=sort_by(.description)' /tmp/latest-pact.json) || true) | (! grep '<')
       - name: Upload Code Coverage
         uses: codecov/codecov-action@v1
         with:
