@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateTask(t *testing.T) {
+func TestAssignTasks(t *testing.T) {
 	t.Parallel()
 
 	pact := newPact()
@@ -19,27 +19,19 @@ func TestCreateTask(t *testing.T) {
 		name          string
 		setup         func()
 		cookies       []*http.Cookie
+		taskIDs       []int
 		expectedError func(int) error
-		file          *NoteFile
 	}{
 		{
 			name: "OK",
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a pending case assigned").
-					UponReceiving("A request to create a task").
+					Given("I have a case with an open task assigned").
+					UponReceiving("A request to assign a task").
 					WithRequest(dsl.Request{
-						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/tasks"),
-						Body: map[string]interface{}{
-							"caseId":      dsl.Like(800),
-							"assigneeId":  dsl.Like(1),
-							"type":        dsl.String("Change of Address"),
-							"name":        dsl.String("Something"),
-							"description": dsl.String("More words"),
-							"dueDate":     dsl.Term("04/05/2731", `^\d{1,2}/\d{1,2}/\d{4}$`),
-						},
+						Method: http.MethodPut,
+						Path:   dsl.String("/api/v1/users/47/tasks/990"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -48,7 +40,7 @@ func TestCreateTask(t *testing.T) {
 						},
 					}).
 					WillRespondWith(dsl.Response{
-						Status:  http.StatusCreated,
+						Status:  http.StatusOK,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
@@ -56,27 +48,57 @@ func TestCreateTask(t *testing.T) {
 				{Name: "XSRF-TOKEN", Value: "abcde"},
 				{Name: "Other", Value: "other"},
 			},
+			taskIDs: []int{990},
+		},
+		{
+			name: "OK",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("Multiple tasks exist").
+					UponReceiving("A request to assign multiple tasks").
+					WithRequest(dsl.Request{
+						Method: http.MethodPut,
+						Path:   dsl.String("/api/v1/users/47/tasks/990+991"),
+						Headers: dsl.MapMatcher{
+							"X-XSRF-TOKEN":        dsl.String("abcde"),
+							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
+							"OPG-Bypass-Membrane": dsl.String("1"),
+							"Content-Type":        dsl.String("application/json"),
+						},
+					}).
+					WillRespondWith(dsl.Response{
+						Status:  http.StatusOK,
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			cookies: []*http.Cookie{
+				{Name: "XSRF-TOKEN", Value: "abcde"},
+				{Name: "Other", Value: "other"},
+			},
+			taskIDs: []int{990, 991},
 		},
 		{
 			name: "Unauthorized",
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a pending case assigned").
-					UponReceiving("A request to create a task without cookies").
+					Given("I have a case with an open task assigned").
+					UponReceiving("A request to assign a task without cookies").
 					WithRequest(dsl.Request{
-						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/tasks"),
+						Method: http.MethodPut,
+						Path:   dsl.String("/api/v1/users/47/tasks/990"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
 					})
 			},
+			taskIDs: []int{990},
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/tasks", port),
-					Method: http.MethodPost,
+					URL:    fmt.Sprintf("http://localhost:%d/api/v1/users/47/tasks/990", port),
+					Method: http.MethodPut,
 				}
 			},
 		},
@@ -89,15 +111,9 @@ func TestCreateTask(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.CreateTask(getContext(tc.cookies), TaskRequest{
-					CaseID:      800,
-					AssigneeID:  1,
-					Type:        "Change of Address",
-					Name:        "Something",
-					Description: "More words",
-					DueDate:     "9999-05-04",
-				})
-				if (tc.expectedError) == nil {
+				err := client.AssignTasks(getContext(tc.cookies), 47, tc.taskIDs)
+
+				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
 					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
@@ -106,19 +122,4 @@ func TestCreateTask(t *testing.T) {
 			}))
 		})
 	}
-}
-
-func TestCreateTaskWithEmptyDescription(t *testing.T) {
-	client := NewClient(http.DefaultClient, "")
-
-	err := client.CreateTask(Context{}, TaskRequest{
-		CaseID:      800,
-		AssigneeID:  1,
-		Type:        "Change of Address",
-		Name:        "Something",
-		Description: "  ",
-		DueDate:     "9999-05-04",
-	})
-
-	assert.Equal(t, ValidationError{Field: FieldErrors{"description": {"": "Value can't be empty"}}}, err)
 }
