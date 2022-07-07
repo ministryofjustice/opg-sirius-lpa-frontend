@@ -3,7 +3,6 @@ package server
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -69,13 +68,13 @@ func Event(client EventClient, tmpl template.Template) Handler {
 				if err != nil {
 					return err
 				}
-				data.Entity = fmt.Sprintf("%s %s", person.Firstname, person.Surname)
+				data.Entity = person.Summary()
 			case sirius.EntityTypeLpa, sirius.EntityTypeEpa:
 				caseitem, err := client.Case(ctx.With(groupCtx), entityID)
 				if err != nil {
 					return err
 				}
-				data.Entity = fmt.Sprintf("%s %s", caseitem.CaseType, caseitem.UID)
+				data.Entity = caseitem.Summary()
 			}
 
 			return nil
