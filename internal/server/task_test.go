@@ -17,7 +17,7 @@ type mockTaskClient struct {
 	mock.Mock
 }
 
-func (m *mockTaskClient) CreateTask(ctx sirius.Context, task sirius.Task) error {
+func (m *mockTaskClient) CreateTask(ctx sirius.Context, task sirius.TaskRequest) error {
 	args := m.Called(ctx, task)
 	return args.Error(0)
 }
@@ -191,7 +191,7 @@ func TestPostTask(t *testing.T) {
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
 	client.
-		On("CreateTask", mock.Anything, sirius.Task{
+		On("CreateTask", mock.Anything, sirius.TaskRequest{
 			CaseID:      123,
 			Type:        "Some task type",
 			DueDate:     "2022-03-04",
@@ -305,7 +305,7 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 					"assignTo": {"": "Assignee not set"},
 				},
 			},
-			Task: sirius.Task{
+			Task: sirius.TaskRequest{
 				CaseID:      123,
 				Type:        "Some task type",
 				DueDate:     "2022-03-04",
@@ -383,7 +383,7 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 					Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 					Entity:    "LPA 7000-0000-0000",
 					Error:     sirius.ValidationError{Field: expectedErrors},
-					Task: sirius.Task{
+					Task: sirius.TaskRequest{
 						CaseID:      123,
 						Type:        "Some task type",
 						DueDate:     "2022-03-04",

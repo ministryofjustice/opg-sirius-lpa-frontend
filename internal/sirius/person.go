@@ -13,6 +13,10 @@ type Person struct {
 	Children     []Person   `json:"children"`
 }
 
+func (p Person) Summary() string {
+	return fmt.Sprintf("%s %s", p.Firstname, p.Surname)
+}
+
 func (c *Client) Person(ctx Context, id int) (Person, error) {
 	var v Person
 	err := c.get(ctx, fmt.Sprintf("/api/v1/persons/%d", id), &v)

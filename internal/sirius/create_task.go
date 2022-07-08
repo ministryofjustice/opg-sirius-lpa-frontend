@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-type Task struct {
+type TaskRequest struct {
 	CaseID      int        `json:"caseId"`
 	AssigneeID  int        `json:"assigneeId"`
 	Type        string     `json:"type"`
@@ -16,7 +16,7 @@ type Task struct {
 	DueDate     DateString `json:"dueDate"`
 }
 
-func (c *Client) CreateTask(ctx Context, task Task) error {
+func (c *Client) CreateTask(ctx Context, task TaskRequest) error {
 	// In the old forms description is checked to enable the save button. We can't
 	// validate it server-side as Supervision allow it to be empty.
 	if strings.TrimSpace(task.Description) == "" {

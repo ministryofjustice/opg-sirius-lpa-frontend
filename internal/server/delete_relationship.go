@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -56,7 +55,7 @@ func DeleteRelationship(client DeleteRelationshipClient, tmpl template.Template)
 				return err
 			}
 
-			data.Entity = fmt.Sprintf("%s %s", person.Firstname, person.Surname)
+			data.Entity = person.Summary()
 			return nil
 		})
 

@@ -12,13 +12,13 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type AllocateCasesClient interface {
-	AllocateCases(ctx sirius.Context, assigneeID int, allocations []sirius.CaseAllocation) error
-	Case(ctx sirius.Context, id int) (sirius.Case, error)
+type AssignTaskClient interface {
+	AssignTasks(ctx sirius.Context, assigneeID int, taskIDs []int) error
+	Task(ctx sirius.Context, id int) (sirius.Task, error)
 	Teams(ctx sirius.Context) ([]sirius.Team, error)
 }
 
-type allocateCasesData struct {
+type assignTaskData struct {
 	XSRFToken string
 	Entities  []string
 	Success   bool
@@ -29,27 +29,27 @@ type allocateCasesData struct {
 	AssigneeUserName string
 }
 
-func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
+func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
 			return err
 		}
 
-		var caseIDs []int
+		var taskIDs []int
 		for _, id := range r.Form["id"] {
-			caseID, err := strconv.Atoi(id)
+			taskID, err := strconv.Atoi(id)
 			if err != nil {
 				return err
 			}
-			caseIDs = append(caseIDs, caseID)
+			taskIDs = append(taskIDs, taskID)
 		}
 
-		if len(caseIDs) == 0 {
-			return errors.New("no cases selected")
+		if len(taskIDs) == 0 {
+			return errors.New("no tasks selected")
 		}
 
 		ctx := getContext(r)
-		data := allocateCasesData{XSRFToken: ctx.XSRFToken}
+		data := assignTaskData{XSRFToken: ctx.XSRFToken}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
@@ -63,25 +63,20 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
 			return nil
 		})
 
-		var casesMu sync.Mutex
-		var allocations []sirius.CaseAllocation
+		var tasksMu sync.Mutex
 
-		for _, caseID := range caseIDs {
-			caseID := caseID
+		for _, taskID := range taskIDs {
+			taskID := taskID
 
 			group.Go(func() error {
-				caseitem, err := client.Case(ctx.With(groupCtx), caseID)
+				task, err := client.Task(ctx.With(groupCtx), taskID)
 				if err != nil {
 					return err
 				}
 
-				casesMu.Lock()
-				data.Entities = append(data.Entities, caseitem.Summary())
-				allocations = append(allocations, sirius.CaseAllocation{
-					ID:       caseID,
-					CaseType: caseitem.CaseType,
-				})
-				casesMu.Unlock()
+				tasksMu.Lock()
+				data.Entities = append(data.Entities, task.Summary())
+				tasksMu.Unlock()
 				return nil
 			})
 		}
@@ -105,7 +100,7 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
 				assigneeID, _ = postFormInt(r, "assigneeTeam")
 			}
 
-			err := client.AllocateCases(ctx, assigneeID, allocations)
+			err := client.AssignTasks(ctx, assigneeID, taskIDs)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
