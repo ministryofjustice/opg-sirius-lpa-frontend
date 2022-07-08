@@ -5,7 +5,7 @@
 {{ define "main" }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <p class="govuk-body"><strong>{{ .Entity.Firstname }} {{ .Entity.Surname }}</strong></p>
+      <p class="govuk-body"><strong>{{ .Entity.Summary }}</strong></p>
 
       {{ template "error-summary" .Error }}
 

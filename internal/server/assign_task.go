@@ -10,49 +10,34 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type TaskClient interface {
-	CreateTask(ctx sirius.Context, task sirius.TaskRequest) error
-	TaskTypes(ctx sirius.Context) ([]string, error)
+type AssignTaskClient interface {
+	AssignTask(ctx sirius.Context, assigneeID, taskID int) error
+	Task(ctx sirius.Context, id int) (sirius.Task, error)
 	Teams(ctx sirius.Context) ([]sirius.Team, error)
-	Case(ctx sirius.Context, id int) (sirius.Case, error)
 }
 
-type taskData struct {
+type assignTaskData struct {
 	XSRFToken string
 	Entity    string
 	Success   bool
 	Error     sirius.ValidationError
 
-	TaskTypes        []string
 	Teams            []sirius.Team
-	Task             sirius.TaskRequest
 	AssignTo         string
 	AssigneeUserName string
 }
 
-func Task(client TaskClient, tmpl template.Template) Handler {
+func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		caseID, err := strconv.Atoi(r.FormValue("id"))
+		taskID, err := strconv.Atoi(r.FormValue("id"))
 		if err != nil {
 			return err
 		}
 
 		ctx := getContext(r)
-		data := taskData{
-			XSRFToken: ctx.XSRFToken,
-		}
+		data := assignTaskData{XSRFToken: ctx.XSRFToken}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
-
-		group.Go(func() error {
-			taskTypes, err := client.TaskTypes(ctx.With(groupCtx))
-			if err != nil {
-				return err
-			}
-
-			data.TaskTypes = taskTypes
-			return nil
-		})
 
 		group.Go(func() error {
 			teams, err := client.Teams(ctx.With(groupCtx))
@@ -65,11 +50,12 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 		})
 
 		group.Go(func() error {
-			caseitem, err := client.Case(ctx.With(groupCtx), caseID)
+			task, err := client.Task(ctx.With(groupCtx), taskID)
 			if err != nil {
 				return err
 			}
-			data.Entity = caseitem.Summary()
+
+			data.Entity = task.Summary()
 			return nil
 		})
 
@@ -78,35 +64,26 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			task := sirius.TaskRequest{
-				CaseID:      caseID,
-				Type:        postFormString(r, "type"),
-				DueDate:     postFormDateString(r, "dueDate"),
-				Name:        postFormString(r, "name"),
-				Description: postFormString(r, "description"),
-			}
+			var assigneeID int
 			assignTo := postFormString(r, "assignTo")
 
 			switch assignTo {
 			case "user":
 				parts := strings.SplitN(postFormString(r, "assigneeUser"), ":", 2)
 				if len(parts) == 2 {
-					assigneeID, _ := strconv.Atoi(parts[0])
-					task.AssigneeID = assigneeID
+					assigneeID, _ = strconv.Atoi(parts[0])
 					data.AssigneeUserName = parts[1]
 				}
 			case "team":
-				assigneeID, _ := postFormInt(r, "assigneeTeam")
-				task.AssigneeID = assigneeID
+				assigneeID, _ = postFormInt(r, "assigneeTeam")
 			}
 
-			err = client.CreateTask(ctx, task)
+			err := client.AssignTask(ctx, assigneeID, taskID)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
-				data.Task = task
-				data.AssignTo = assignTo
 				data.Error = ve
+				data.AssignTo = assignTo
 
 				switch data.AssignTo {
 				case "user":
