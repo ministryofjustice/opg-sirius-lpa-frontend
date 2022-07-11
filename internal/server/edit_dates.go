@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -63,7 +62,7 @@ func EditDates(client EditDatesClient, tmpl template.Template) Handler {
 		}
 
 		data.Case = caseitem
-		data.Entity = fmt.Sprintf("%s %s", caseitem.CaseType, caseitem.UID)
+		data.Entity = caseitem.Summary()
 
 		return tmpl(w, data)
 	}

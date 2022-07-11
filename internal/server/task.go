@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -12,7 +11,7 @@ import (
 )
 
 type TaskClient interface {
-	CreateTask(ctx sirius.Context, task sirius.Task) error
+	CreateTask(ctx sirius.Context, task sirius.TaskRequest) error
 	TaskTypes(ctx sirius.Context) ([]string, error)
 	Teams(ctx sirius.Context) ([]sirius.Team, error)
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
@@ -26,7 +25,7 @@ type taskData struct {
 
 	TaskTypes        []string
 	Teams            []sirius.Team
-	Task             sirius.Task
+	Task             sirius.TaskRequest
 	AssignTo         string
 	AssigneeUserName string
 }
@@ -70,7 +69,7 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 			if err != nil {
 				return err
 			}
-			data.Entity = fmt.Sprintf("%s %s", caseitem.CaseType, caseitem.UID)
+			data.Entity = caseitem.Summary()
 			return nil
 		})
 
@@ -79,7 +78,7 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			task := sirius.Task{
+			task := sirius.TaskRequest{
 				CaseID:      caseID,
 				Type:        postFormString(r, "type"),
 				DueDate:     postFormDateString(r, "dueDate"),

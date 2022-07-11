@@ -41,6 +41,7 @@ func getContext(r *http.Request) sirius.Context {
 type Client interface {
 	AddComplaintClient
 	AllocateCasesClient
+	AssignTaskClient
 	ChangeStatusClient
 	DeleteRelationshipClient
 	EditComplaintClient
@@ -51,8 +52,8 @@ type Client interface {
 	SearchDonorsClient
 	SearchUsersClient
 	TaskClient
-	WarningClient
 	UnlinkPersonClient
+	WarningClient
 }
 
 func New(logger Logger, client Client, templates template.Templates, prefix, siriusPublicURL, webDir string) http.Handler {
@@ -75,6 +76,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/unlink-person", wrap(UnlinkPerson(client, templates.Get("unlink_person.gohtml"))))
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change_status.gohtml"))))
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate_cases.gohtml"))))
+	mux.Handle("/assign-task", wrap(AssignTask(client, templates.Get("assign_task.gohtml"))))
 	mux.Handle("/search-users", wrap(SearchUsers(client)))
 	mux.Handle("/search-persons", wrap(SearchDonors(client)))
 

@@ -16,6 +16,10 @@ type Case struct {
 	WithdrawnDate    DateString `json:"withdrawnDate,omitempty"`
 }
 
+func (c Case) Summary() string {
+	return fmt.Sprintf("%s %s", c.CaseType, c.UID)
+}
+
 func (c *Client) Case(ctx Context, id int) (Case, error) {
 	var v Case
 	err := c.get(ctx, fmt.Sprintf("/api/v1/cases/%d", id), &v)
