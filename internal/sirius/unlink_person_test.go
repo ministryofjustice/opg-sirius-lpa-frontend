@@ -3,10 +3,9 @@ package sirius
 import (
 	"fmt"
 	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestUnlinkPerson(t *testing.T) {
@@ -29,20 +28,20 @@ func TestUnlinkPerson(t *testing.T) {
 					Given("A donor exists with children").
 					UponReceiving("A request to unlink those cases").
 					WithRequest(dsl.Request{
-						Method: http.MethodDelete,
+						Method: http.MethodPatch,
 						Path:   dsl.String("/api/v1/person-links/189"),
 						Body: map[string]interface{}{
-							"childIds": dsl.Like([]int{105}),
+							"childIds": []int{105},
 						},
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
 							"OPG-Bypass-Membrane": dsl.String("1"),
+							"Content-Type":        dsl.String("application/json"),
 						},
 					}).
 					WillRespondWith(dsl.Response{
-						Status:  http.StatusNoContent,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Status: http.StatusNoContent,
 					})
 			},
 			cookies: []*http.Cookie{
@@ -58,10 +57,10 @@ func TestUnlinkPerson(t *testing.T) {
 					Given("A donor exists with children").
 					UponReceiving("A request to unlink those cases without cookies").
 					WithRequest(dsl.Request{
-						Method: http.MethodDelete,
+						Method: http.MethodPatch,
 						Path:   dsl.String("/api/v1/person-links/189"),
 						Body: map[string]interface{}{
-							"childIds": dsl.Like([]int{105}),
+							"childIds": []int{105},
 						},
 					}).
 					WillRespondWith(dsl.Response{
@@ -72,7 +71,7 @@ func TestUnlinkPerson(t *testing.T) {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
 					URL:    fmt.Sprintf("http://localhost:%d/api/v1/person-links/189", port),
-					Method: http.MethodDelete,
+					Method: http.MethodPatch,
 				}
 			},
 		},

@@ -41,18 +41,19 @@ func TestPerson(t *testing.T) {
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
 						Body: dsl.Like(map[string]interface{}{
-							"id":        dsl.Like(103),
+							"id":        dsl.Like(189),
 							"uId":       dsl.Term("7000-0000-0001", `7\d{3}-\d{4}-\d{4}`),
 							"firstname": dsl.String("John"),
 							"surname":   dsl.String("Doe"),
 							"dob":       dsl.Term("01/01/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
-							"children": dsl.EachLike(map[string]interface{}{
-								"id":        dsl.Like(105),
-								"uId":       dsl.Term("7000-0000-0002", `7\d{3}-\d{4}-\d{4}`),
-								"firstname": dsl.String("Child"),
-								"surname":   dsl.String("One"),
-								"dob":       dsl.Term("05/05/1980", `^\d{1,2}/\d{1,2}/\d{4}$`),
-							}, 1),
+							"children": dsl.Like([]map[string]interface{}{
+								{
+									"id":        dsl.Like(105),
+									"uId":       dsl.Term("7000-0000-0002", `7\d{3}-\d{4}-\d{4}`),
+									"firstname": dsl.String("Child"),
+									"surname":   dsl.String("One"),
+								},
+							}),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
@@ -62,18 +63,17 @@ func TestPerson(t *testing.T) {
 				{Name: "Other", Value: "other"},
 			},
 			expectedResponse: Person{
-				ID:          103,
+				ID:          189,
 				UID:         "7000-0000-0001",
 				Firstname:   "John",
 				Surname:     "Doe",
 				DateOfBirth: DateString("1970-01-01"),
 				Children: []Person{
 					{
-						ID:          105,
-						UID:         "7000-0000-0002",
-						Firstname:   "Child",
-						Surname:     "One",
-						DateOfBirth: DateString("1980-05-05"),
+						ID:        105,
+						UID:       "7000-0000-0002",
+						Firstname: "Child",
+						Surname:   "One",
 					},
 				},
 			},
