@@ -18,7 +18,7 @@ func (c *Client) UnlinkPerson(ctx Context, parentId int, childId int) error {
 		return err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodDelete, fmt.Sprintf("/api/v1/person-links/%d", parentId), bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPatch, fmt.Sprintf("/api/v1/person-links/%d", parentId), bytes.NewReader(data))
 	if err != nil {
 		return err
 	}
