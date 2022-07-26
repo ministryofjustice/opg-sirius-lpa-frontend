@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -43,6 +44,7 @@ type Client interface {
 	AllocateCasesClient
 	AssignTaskClient
 	ChangeStatusClient
+	CreateDonorClient
 	DeleteRelationshipClient
 	EditComplaintClient
 	EditDatesClient
@@ -68,6 +70,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"))))
 	mux.Handle("/create-task", wrap(Task(client, templates.Get("task.gohtml"))))
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("relationship.gohtml"))))
+	mux.Handle("/create-donor", wrap(CreateDonor(client, templates.Get("donor.gohtml"))))
 	mux.Handle("/delete-relationship", wrap(DeleteRelationship(client, templates.Get("delete_relationship.gohtml"))))
 	mux.Handle("/edit-dates", wrap(EditDates(client, templates.Get("edit_dates.gohtml"))))
 	mux.Handle("/link-person", wrap(LinkPerson(client, templates.Get("link_person.gohtml"))))
@@ -133,6 +136,17 @@ func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL 
 
 func postFormString(r *http.Request, name string) string {
 	return strings.TrimSpace(r.PostFormValue(name))
+}
+
+func postFormCheckboxChecked(r *http.Request, name string, value string) bool {
+	for i, val := range r.PostForm[name] {
+		fmt.Println(name, i, val, value)
+		if val == value {
+			return true
+		}
+	}
+
+	return false
 }
 
 func postFormInt(r *http.Request, name string) (int, error) {
