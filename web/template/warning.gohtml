@@ -20,11 +20,7 @@
           <label class="govuk-label" for="f-warningType">
             Warning type
           </label>
-          {{ range .Error.Field.warningType }}
-            <p class="govuk-error-message">
-              <span class="govuk-visually-hidden">Error:</span> {{ . }}
-            </p>
-          {{ end }}
+          {{ template "errors" .Error.Field.warningType }}
           <select class="govuk-select {{ if .Error.Field.warningType }}govuk-select--error{{ end }}" id="f-warningType" name="warning-type">
             <option hidden selected disabled></option>
             {{ range .WarningTypes }}
@@ -35,11 +31,7 @@
 
         <div class="govuk-form-group {{ if .Error.Field.warningText }}govuk-form-group--error{{ end }}">
           <label class="govuk-label" for="f-warningText">Notes</label>
-          {{ range .Error.Field.warningText }}
-            <p class="govuk-error-message">
-              <span class="govuk-visually-hidden">Error:</span> {{ . }}
-            </p>
-          {{ end }}
+          {{ template "errors" .Error.Field.warningText }}
           <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .Error.Field.warningText }}govuk-textarea--error{{ end }}" name="warning-notes" rows="5" id="f-warningText"></textarea>
         </div>
 

@@ -22,11 +22,7 @@
           <label class="govuk-label" for="f-status">
             Status
           </label>
-          {{ range .Error.Field.status }}
-            <p class="govuk-error-message">
-              <span class="govuk-visually-hidden">Error:</span> {{ . }}
-            </p>
-          {{ end }}
+          {{ template "errors" .Error.Field.status }}
           <select class="govuk-select {{ if .Error.Field.status }}govuk-select--error{{ end }}" id="f-status" name="status">
             <option hidden selected disabled></option>
             {{ range .AvailableStatuses }}

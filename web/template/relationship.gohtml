@@ -30,11 +30,7 @@
           </select>
         </div>
 
-        <div class="govuk-form-group {{ if .Error.Field.reason }}govuk-form-group--error{{ end }}">
-          <label class="govuk-label" for="f-reason">Relationship</label>
-          {{ template "errors" .Error.Field.reason }}
-          <input class="govuk-input {{ if .Error.Field.reason }}govuk-input--error{{ end }}" id="f-reason" name="reason" value="{{ .Reason }}" />
-        </div>
+        {{ template "input" (field "reason" "Relationship" .Reason .Error.Field.reason) }}
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
