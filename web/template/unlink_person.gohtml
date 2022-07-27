@@ -48,11 +48,7 @@
 
                     <div class="govuk-form-group {{ if .Error.Field.child }}govuk-form-group--error{{ end }}">
                         <fieldset class="govuk-fieldset">
-                            {{ range .Error.Field.child }}
-                                <p class="govuk-error-message">
-                                    <span class="govuk-visually-hidden">Error:</span>{{ . }}
-                                </p>
-                            {{ end }}
+                            {{ template "errors" .Error.Field.child }}
                             <div class="govuk-radios" data-module="govuk-radios">
                                 {{ range $i, $e := .Person.Children }}
                                     <div class="govuk-radios__item">
