@@ -39,7 +39,7 @@
           {{ template "input" (field "firstname" "First name" .Donor.Firstname .Error.Field.firstname) }}
           {{ template "input" (field "middlenames" "Middlenames" .Donor.Middlenames .Error.Field.middlenames) }}
           {{ template "input" (field "surname" "Surname" .Donor.Surname .Error.Field.surname) }}
-          {{ template "input" (field "dob" "Date of birth" .Donor.DateOfBirth .Error.Field.dob) }}
+          {{ template "input-date" (field "dob" "Date of birth" .Donor.DateOfBirth .Error.Field.dob) }}
           {{ template "input" (field "previousNames" "Previously known as" .Donor.PreviouslyKnownAs .Error.Field.previousNames) }}
           {{ template "input" (field "otherNames" "Also known as" .Donor.AlsoKnownAs .Error.Field.otherNames) }}
           {{ template "input" (field "addressLine1" "Address 1" .Donor.AddressLine1 .Error.Field.addressLine1) }}
