@@ -14,7 +14,7 @@ func (c *Client) EditCase(ctx Context, caseID int, caseType CaseType, caseDetail
 		return err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/api/v1/%ss/%d", strings.ToLower(string(caseType)), caseID), bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/lpa-api/v1/%ss/%d", strings.ToLower(string(caseType)), caseID), bytes.NewReader(data))
 	if err != nil {
 		return err
 	}

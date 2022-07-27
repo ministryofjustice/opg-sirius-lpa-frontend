@@ -31,7 +31,7 @@ func TestPersonByUid(t *testing.T) {
 					UponReceiving("A request for the person by UID").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/persons/by-uid/7000-0000-0001"),
+						Path:   dsl.String("/lpa-api/v1/persons/by-uid/7000-0000-0001"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -71,7 +71,7 @@ func TestPersonByUid(t *testing.T) {
 					UponReceiving("A request for the person by UID").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/persons/by-uid/7000-0000-0001"),
+						Path:   dsl.String("/lpa-api/v1/persons/by-uid/7000-0000-0001"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -119,7 +119,7 @@ func TestPersonByUid(t *testing.T) {
 					UponReceiving("A request for the person by UID without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/persons/by-uid/7000-0000-0001"),
+						Path:   dsl.String("/lpa-api/v1/persons/by-uid/7000-0000-0001"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -128,7 +128,7 @@ func TestPersonByUid(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/persons/by-uid/7000-0000-0001", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/persons/by-uid/7000-0000-0001", port),
 					Method: http.MethodGet,
 				}
 			},

@@ -31,7 +31,7 @@ func TestTaskTypes(t *testing.T) {
 					UponReceiving("A request for task types").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/tasktypes/lpa"),
+						Path:   dsl.String("/lpa-api/v1/tasktypes/lpa"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -63,7 +63,7 @@ func TestTaskTypes(t *testing.T) {
 					UponReceiving("A request for task types without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/tasktypes/lpa"),
+						Path:   dsl.String("/lpa-api/v1/tasktypes/lpa"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -72,7 +72,7 @@ func TestTaskTypes(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/tasktypes/lpa", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/tasktypes/lpa", port),
 					Method: http.MethodGet,
 				}
 			},

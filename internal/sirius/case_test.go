@@ -31,7 +31,7 @@ func TestCase(t *testing.T) {
 					UponReceiving("A request for the case").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/cases/800"),
+						Path:   dsl.String("/lpa-api/v1/cases/800"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -63,7 +63,7 @@ func TestCase(t *testing.T) {
 					UponReceiving("A request for the case without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/cases/800"),
+						Path:   dsl.String("/lpa-api/v1/cases/800"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -72,7 +72,7 @@ func TestCase(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/cases/800", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/cases/800", port),
 					Method: http.MethodGet,
 				}
 			},

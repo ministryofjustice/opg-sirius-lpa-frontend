@@ -31,7 +31,7 @@ func TestSearchUsers(t *testing.T) {
 					UponReceiving("A search for admin users").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/search/users"),
+						Path:   dsl.String("/lpa-api/v1/search/users"),
 						Query: dsl.MapMatcher{
 							"query": dsl.String("admin"),
 						},
@@ -71,7 +71,7 @@ func TestSearchUsers(t *testing.T) {
 					UponReceiving("A search for admin users without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/search/users"),
+						Path:   dsl.String("/lpa-api/v1/search/users"),
 						Query: dsl.MapMatcher{
 							"query": dsl.String("admin"),
 						},
@@ -86,7 +86,7 @@ func TestSearchUsers(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/search/users?query=admin", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/search/users?query=admin", port),
 					Method: http.MethodGet,
 				}
 			},

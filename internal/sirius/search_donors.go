@@ -26,7 +26,7 @@ func (c *Client) SearchDonors(ctx Context, term string) ([]Person, error) {
 		return nil, err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPost, "/api/v1/search/persons", bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPost, "/lpa-api/v1/search/persons", bytes.NewReader(data))
 	if err != nil {
 		return nil, err
 	}

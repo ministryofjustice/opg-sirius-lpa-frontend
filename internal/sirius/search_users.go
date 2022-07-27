@@ -27,7 +27,7 @@ func (c *Client) SearchUsers(ctx Context, term string) ([]User, error) {
 
 	var v []apiUser
 
-	err := c.get(ctx, fmt.Sprintf("/api/v1/search/users?query=%s", url.QueryEscape(term)), &v)
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/search/users?query=%s", url.QueryEscape(term)), &v)
 	if err != nil {
 		return nil, err
 	}

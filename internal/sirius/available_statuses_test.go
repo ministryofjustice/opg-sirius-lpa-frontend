@@ -32,7 +32,7 @@ func TestAvailableStatuses(t *testing.T) {
 					UponReceiving("A request for the LPA's available statuses").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/lpas/800/available-statuses"),
+						Path:   dsl.String("/lpa-api/v1/lpas/800/available-statuses"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -61,7 +61,7 @@ func TestAvailableStatuses(t *testing.T) {
 					UponReceiving("A request for the EPA's available statuses").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/epas/800/available-statuses"),
+						Path:   dsl.String("/lpa-api/v1/epas/800/available-statuses"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -90,7 +90,7 @@ func TestAvailableStatuses(t *testing.T) {
 					UponReceiving("A request for the case's available statuses without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/lpas/800/available-statuses"),
+						Path:   dsl.String("/lpa-api/v1/lpas/800/available-statuses"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -100,7 +100,7 @@ func TestAvailableStatuses(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/lpas/800/available-statuses", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/lpas/800/available-statuses", port),
 					Method: http.MethodGet,
 				}
 			},

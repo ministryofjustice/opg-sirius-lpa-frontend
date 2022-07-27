@@ -7,7 +7,7 @@ type RefDataItem struct {
 
 func (c *Client) WarningTypes(ctx Context) ([]RefDataItem, error) {
 	var v []RefDataItem
-	err := c.get(ctx, "/api/v1/reference-data/warningType", &v)
+	err := c.get(ctx, "/lpa-api/v1/reference-data/warningType", &v)
 
 	return v, err
 }

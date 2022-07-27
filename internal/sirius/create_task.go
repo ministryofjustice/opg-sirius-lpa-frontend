@@ -32,7 +32,7 @@ func (c *Client) CreateTask(ctx Context, task TaskRequest) error {
 		return err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPost, "/api/v1/tasks", bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPost, "/lpa-api/v1/tasks", bytes.NewReader(data))
 	if err != nil {
 		return err
 	}

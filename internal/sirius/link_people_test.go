@@ -30,7 +30,7 @@ func TestLinkPeople(t *testing.T) {
 					UponReceiving("A request to link two people").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/person-links"),
+						Path:   dsl.String("/lpa-api/v1/person-links"),
 						Body: map[string]interface{}{
 							"parentId": dsl.Like(189),
 							"childId":  dsl.Like(190),
@@ -60,7 +60,7 @@ func TestLinkPeople(t *testing.T) {
 					UponReceiving("A request to link two people without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/person-links"),
+						Path:   dsl.String("/lpa-api/v1/person-links"),
 						Body: map[string]interface{}{
 							"parentId": dsl.Like(189),
 							"childId":  dsl.Like(190),
@@ -73,7 +73,7 @@ func TestLinkPeople(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/person-links", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/person-links", port),
 					Method: http.MethodPost,
 				}
 			},

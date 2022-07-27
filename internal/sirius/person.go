@@ -37,7 +37,7 @@ func (p Person) Summary() string {
 
 func (c *Client) Person(ctx Context, id int) (Person, error) {
 	var v Person
-	err := c.get(ctx, fmt.Sprintf("/api/v1/persons/%d", id), &v)
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%d", id), &v)
 
 	return v, err
 }

@@ -30,7 +30,7 @@ func TestAddComplaint(t *testing.T) {
 					UponReceiving("A request to add a complaint to the case").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/lpas/800/complaints"),
+						Path:   dsl.String("/lpa-api/v1/lpas/800/complaints"),
 						Body: dsl.Like(map[string]interface{}{
 							"category":     "01",
 							"description":  "This is seriously bad",
@@ -66,7 +66,7 @@ func TestAddComplaint(t *testing.T) {
 					UponReceiving("A request to add a complaint to the case without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/lpas/800/complaints"),
+						Path:   dsl.String("/lpa-api/v1/lpas/800/complaints"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -75,7 +75,7 @@ func TestAddComplaint(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/lpas/800/complaints", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/lpas/800/complaints", port),
 					Method: http.MethodPost,
 				}
 			},
