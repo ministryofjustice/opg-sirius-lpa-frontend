@@ -47,11 +47,7 @@
           </fieldset>
         </div>
 
-        <div class="govuk-form-group {{ if .Error.Field.summary }}govuk-form-group--error{{ end }}">
-          <label class="govuk-label" for="f-summary">Title</label>
-          {{ template "errors" .Error.Field.summary }}
-          <input class="govuk-input {{ if .Error.Field.summary }}govuk-input--error{{ end }}" id="f-summary" name="summary" value="{{ .Complaint.Summary }}" />
-        </div>
+        {{ template "input" (field "summary" "Title" .Complaint.Summary .Error.Field.summary) }}
 
         <div class="govuk-form-group {{ if .Error.Field.description }}govuk-form-group--error{{ end }}">
           <label class="govuk-label" for="f-description">Description</label>

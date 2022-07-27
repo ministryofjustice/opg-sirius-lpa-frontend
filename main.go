@@ -48,6 +48,14 @@ func main() {
 		"today": func() string {
 			return time.Now().Format("2006-01-02")
 		},
+		"field": func(name, label string, value interface{}, error map[string]string) map[string]interface{} {
+			return map[string]interface{}{
+				"name":  name,
+				"label": label,
+				"value": value,
+				"error": error,
+			}
+		},
 	})
 	if err != nil {
 		logger.Fatal(err)
