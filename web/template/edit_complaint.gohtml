@@ -55,18 +55,14 @@
           <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .Error.Field.description }}govuk-textarea--error{{ end }}" id="f-description" name="description">{{ .Complaint.Description }}</textarea>
         </div>
 
-        <div class="govuk-form-group {{ if .Error.Field.receivedDate }}govuk-form-group--error{{ end }}">
-          <label class="govuk-label" for="f-receivedDate">Received date</label>
-          {{ template "errors" .Error.Field.receivedDate }}
-          <input class="govuk-input govuk-!-width-one-third {{ if .Error.Field.receivedDate }}govuk-input--error{{ end }}" type="date" id="f-receivedDate" name="receivedDate" value="{{ .Complaint.ReceivedDate }}" max="{{ today }}" />
-        </div>
+        {{ template "input-date" (field "receivedDate" "Received date" .Complaint.ReceivedDate .Error.Field.receivedDate "max" today) }}
 
         <div class="govuk-form-group {{ if .Error.Field.category }}govuk-form-group--error{{ end }}">
           <label class="govuk-label" for="f-category">
             Complaint category
           </label>
           {{ template "errors" .Error.Field.category }}
-          
+
           <div class="govuk-radios" data-module="govuk-radios">
             {{ range $k, $v := .Categories }}
               <div class="govuk-radios__item">
@@ -88,14 +84,10 @@
                 </div>
               </div>
             {{ end }}
-          </div>         
+          </div>
         </div>
-          
-        <div class="govuk-form-group {{ if .Error.Field.resolutionDate }}govuk-form-group--error{{ end }}">
-          <label class="govuk-label" for="f-resolutionDate">Resolution date</label>
-          {{ template "errors" .Error.Field.resolutionDate }}
-          <input class="govuk-input govuk-!-width-one-third {{ if .Error.Field.resolutionDate }}govuk-input--error{{ end }}" type="date" id="f-resolutionDate" name="resolutionDate" value="{{ .Complaint.ResolutionDate }}" />
-        </div>
+
+        {{ template "input-date" (field "resolutionDate" "Resolution date" .Complaint.ResolutionDate .Error.Field.resolutionDate) }}
 
         <div class="govuk-form-group {{ if .Error.Field.resolution }}govuk-form-group--error{{ end }}">
           <fieldset class="govuk-fieldset">
@@ -127,7 +119,7 @@
             </div>
           </fieldset>
         </div>
-        
+
         <div class="govuk-form-group {{ if .Error.Field.resolutionInfo }}govuk-form-group--error{{ end }}">
           <label class="govuk-label" for="f-resolutionInfo">Resolution notes</label>
           {{ template "errors" .Error.Field.resolutionInfo }}
@@ -137,7 +129,7 @@
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
           <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
-        </div>        
+        </div>
       </form>
     </div>
   </div>

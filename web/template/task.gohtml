@@ -88,11 +88,7 @@
           </fieldset>
         </div>
 
-        <div class="govuk-form-group {{ if .Error.Field.dueDate }}govuk-form-group--error{{ end }}">
-          <label class="govuk-label" for="f-dueDate">Due date</label>
-          {{ template "errors" .Error.Field.dueDate }}
-          <input class="govuk-input govuk-!-width-one-third {{ if .Error.Field.dueDate }}govuk-input--error{{ end }}" type="date" id="f-dueDate" name="dueDate" value="{{ .Task.DueDate }}" min="{{ today }}" />
-        </div>
+        {{ template "input-date" (field "dueDate" "Due date" .Task.DueDate .Error.Field.dueDate "min" today) }}
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
