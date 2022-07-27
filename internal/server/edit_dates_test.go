@@ -29,7 +29,7 @@ func (m *mockEditDatesClient) EditDates(ctx sirius.Context, caseID int, caseType
 func TestGetEditDates(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseitem := sirius.Case{CaseType: caseType, UID: "700700"}
+			caseitem := sirius.Case{CaseType: caseType, UID: "700700", CancellationDate: sirius.DateString("2021-01-01")}
 
 			client := &mockEditDatesClient{}
 			client.
@@ -40,7 +40,7 @@ func TestGetEditDates(t *testing.T) {
 			template.
 				On("Func", mock.Anything, editDatesData{
 					Entity: caseType + " 700700",
-					Case:   caseitem,
+					Dates:  sirius.Dates{CancellationDate: sirius.DateString("2021-01-01")},
 				}).
 				Return(nil)
 
@@ -107,7 +107,6 @@ func TestGetEditDatesWhenTemplateErrors(t *testing.T) {
 	template.
 		On("Func", mock.Anything, editDatesData{
 			Entity: "PFA 700700",
-			Case:   caseitem,
 		}).
 		Return(expectedError)
 
@@ -123,7 +122,7 @@ func TestGetEditDatesWhenTemplateErrors(t *testing.T) {
 func TestPostEditDates(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseitem := sirius.Case{CaseType: caseType, UID: "700700"}
+			caseitem := sirius.Case{CaseType: caseType, UID: "700700", CancellationDate: sirius.DateString("2021-01-01")}
 
 			client := &mockEditDatesClient{}
 			client.
@@ -147,7 +146,7 @@ func TestPostEditDates(t *testing.T) {
 				On("Func", mock.Anything, editDatesData{
 					Success: true,
 					Entity:  caseType + " 700700",
-					Case:    caseitem,
+					Dates:   sirius.Dates{CancellationDate: sirius.DateString("2021-01-01")},
 				}).
 				Return(nil)
 

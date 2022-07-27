@@ -35,6 +35,14 @@ func (c *Client) EditDates(ctx Context, caseID int, caseType CaseType, dates Dat
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode == http.StatusBadRequest {
+		var v ValidationError
+		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
+			return err
+		}
+		return v
+	}
+
 	if resp.StatusCode != http.StatusOK {
 		return newStatusError(resp)
 	}
