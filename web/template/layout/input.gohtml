@@ -1,0 +1,7 @@
+{{ define "input" }}
+  <div class="govuk-form-group {{ if .error }}govuk-form-group--error{{ end }}">
+    <label class="govuk-label" for="f-{{ .name }}">{{ .label }}</label>
+    {{ template "errors" .error }}
+    <input class="govuk-input {{ if .error }}govuk-input--error{{ end }}" id="f-{{ .name }}" name="{{ .name }}" value="{{ .value }}" />
+  </div>
+{{ end }}
