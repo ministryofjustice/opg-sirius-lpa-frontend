@@ -29,7 +29,7 @@ func (m *mockEditDatesClient) EditDates(ctx sirius.Context, caseID int, caseType
 func TestGetEditDates(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseitem := sirius.Case{CaseType: caseType, UID: "700700"}
+			caseitem := sirius.Case{CaseType: caseType, UID: "700700", CancellationDate: sirius.DateString("2021-01-01")}
 
 			client := &mockEditDatesClient{}
 			client.
@@ -40,7 +40,7 @@ func TestGetEditDates(t *testing.T) {
 			template.
 				On("Func", mock.Anything, editDatesData{
 					Entity: caseType + " 700700",
-					Case:   caseitem,
+					Dates:  sirius.Dates{CancellationDate: sirius.DateString("2021-01-01")},
 				}).
 				Return(nil)
 
@@ -107,7 +107,6 @@ func TestGetEditDatesWhenTemplateErrors(t *testing.T) {
 	template.
 		On("Func", mock.Anything, editDatesData{
 			Entity: "PFA 700700",
-			Case:   caseitem,
 		}).
 		Return(expectedError)
 
@@ -123,7 +122,7 @@ func TestGetEditDatesWhenTemplateErrors(t *testing.T) {
 func TestPostEditDates(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseitem := sirius.Case{CaseType: caseType, UID: "700700"}
+			caseitem := sirius.Case{CaseType: caseType, UID: "700700", CancellationDate: sirius.DateString("2021-01-01")}
 
 			client := &mockEditDatesClient{}
 			client.
@@ -147,7 +146,7 @@ func TestPostEditDates(t *testing.T) {
 				On("Func", mock.Anything, editDatesData{
 					Success: true,
 					Entity:  caseType + " 700700",
-					Case:    caseitem,
+					Dates:   sirius.Dates{CancellationDate: sirius.DateString("2021-01-01")},
 				}).
 				Return(nil)
 
@@ -198,4 +197,48 @@ func TestPostEditDatesWhenEditDatesErrors(t *testing.T) {
 
 	assert.Equal(t, expectedError, err)
 	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestPostEditDatesWhenValidationError(t *testing.T) {
+	caseitem := sirius.Case{CaseType: "LPA", UID: "700700", CancellationDate: sirius.DateString("2021-01-01")}
+
+	expectedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{
+			"x": {"y": "z"},
+		},
+	}
+
+	client := &mockEditDatesClient{}
+	client.
+		On("EditDates", mock.Anything, 123, sirius.CaseTypeLpa, sirius.Dates{
+			RegistrationDate: sirius.DateString("2022-01-03"),
+		}).
+		Return(expectedError)
+	client.
+		On("Case", mock.Anything, 123).
+		Return(caseitem, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, editDatesData{
+			Entity: "LPA 700700",
+			Dates:  sirius.Dates{RegistrationDate: sirius.DateString("2022-01-03")},
+			Error:  expectedError,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"registrationDate": {"2022-01-03"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&case=lpa", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := EditDates(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
 }

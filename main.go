@@ -48,13 +48,23 @@ func main() {
 		"today": func() string {
 			return time.Now().Format("2006-01-02")
 		},
-		"field": func(name, label string, value interface{}, error map[string]string) map[string]interface{} {
-			return map[string]interface{}{
+		"field": func(name, label string, value interface{}, error map[string]string, attrs ...interface{}) map[string]interface{} {
+			field := map[string]interface{}{
 				"name":  name,
 				"label": label,
 				"value": value,
 				"error": error,
 			}
+
+			if len(attrs)%2 != 0 {
+				panic("must have even number of attrs")
+			}
+
+			for i := 0; i < len(attrs); i += 2 {
+				field[attrs[i].(string)] = attrs[i+1]
+			}
+
+			return field
 		},
 	})
 	if err != nil {

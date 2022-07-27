@@ -16,45 +16,14 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        <div class="govuk-form-group">
-          <label class="govuk-label" for="f-receiptDate">Receipt date</label>
-          <input class="govuk-input govuk-!-width-one-third" type="date" id="f-receiptDate" name="receiptDate" value="{{ .Case.ReceiptDate }}" />
-        </div>
-
-        <div class="govuk-form-group">
-          <label class="govuk-label" for="f-dueDate">Registration due date</label>
-          <input class="govuk-input govuk-!-width-one-third" type="date" id="f-dueDate" name="dueDate" value="{{ .Case.DueDate }}" />
-        </div>
-
-        <div class="govuk-form-group">
-          <label class="govuk-label" for="f-registrationDate">Registration date</label>
-          <input class="govuk-input govuk-!-width-one-third" type="date" id="f-registrationDate" name="registrationDate" value="{{ .Case.RegistrationDate }}" />
-        </div>
-
-        <div class="govuk-form-group">
-          <label class="govuk-label" for="f-dispatchDate">Dispatch date</label>
-          <input class="govuk-input govuk-!-width-one-third" type="date" id="f-dispatchDate" name="dispatchDate" value="{{ .Case.DispatchDate }}" />
-        </div>
-
-        <div class="govuk-form-group">
-          <label class="govuk-label" for="f-cancellationDate">Date cancelled</label>
-          <input class="govuk-input govuk-!-width-one-third" type="date" id="f-cancellationDate" name="cancellationDate" value="{{ .Case.CancellationDate }}" />
-        </div>
-
-        <div class="govuk-form-group">
-          <label class="govuk-label" for="f-rejectedDate">Date rejected</label>
-          <input class="govuk-input govuk-!-width-one-third" type="date" id="f-rejectedDate" name="rejectedDate" value="{{ .Case.RejectedDate }}" />
-        </div>
-
-        <div class="govuk-form-group">
-          <label class="govuk-label" for="f-invalidDate">Date invalidated</label>
-          <input class="govuk-input govuk-!-width-one-third" type="date" id="f-invalidDate" name="invalidDate" value="{{ .Case.InvalidDate }}" />
-        </div>
-
-        <div class="govuk-form-group">
-          <label class="govuk-label" for="f-withdrawnDate">Date withdrawn</label>
-          <input class="govuk-input govuk-!-width-one-third" type="date" id="f-withdrawnDate" name="withdrawnDate" value="{{ .Case.WithdrawnDate }}" />
-        </div>
+        {{ template "input-date" (field "receiptDate" "Receipt date" .Dates.ReceiptDate .Error.Field.receiptDate) }}
+        {{ template "input-date" (field "dueDate" "Registration due date" .Dates.DueDate .Error.Field.dueDate) }}
+        {{ template "input-date" (field "registrationDate" "Registration date" .Dates.RegistrationDate .Error.Field.registrationDate) }}
+        {{ template "input-date" (field "dispatchDate" "Dispatch date" .Dates.DispatchDate .Error.Field.dispatchDate) }}
+        {{ template "input-date" (field "cancellationDate" "Date cancelled" .Dates.CancellationDate .Error.Field.cancellationDate) }}
+        {{ template "input-date" (field "rejectedDate" "Date rejected" .Dates.RejectedDate .Error.Field.rejectedDate) }}
+        {{ template "input-date" (field "invalidDate" "Date invalidated" .Dates.InvalidDate .Error.Field.invalidDate) }}
+        {{ template "input-date" (field "withdrawnDate" "Date withdrawn" .Dates.WithdrawnDate .Error.Field.withdrawnDate) }}
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>

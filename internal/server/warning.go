@@ -18,6 +18,9 @@ type warningData struct {
 	WarningTypes []sirius.RefDataItem
 	Success      bool
 	Error        sirius.ValidationError
+
+	WarningType string
+	WarningText string
 }
 
 func Warning(client WarningClient, tmpl template.Template) Handler {
@@ -41,14 +44,16 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			warningType := postFormString(r, "warning-type")
-			warningNotes := postFormString(r, "warning-notes")
+			warningType := postFormString(r, "warningType")
+			warningText := postFormString(r, "warningText")
 
-			err := client.CreateWarning(ctx, personId, warningType, warningNotes)
+			err := client.CreateWarning(ctx, personId, warningType, warningText)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
+				data.WarningType = warningType
+				data.WarningText = warningText
 			} else if err != nil {
 				return err
 			} else {
