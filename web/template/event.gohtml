@@ -22,11 +22,7 @@
           <label class="govuk-label" for="f-type">
             Event type
           </label>
-          {{ range .Error.Field.type }}
-            <p class="govuk-error-message">
-              <span class="govuk-visually-hidden">Error:</span> {{ . }}
-            </p>
-          {{ end }}
+          {{ template "errors" .Error.Field.type }}
           <select class="govuk-select {{ if .Error.Field.type }}govuk-select--error{{ end }}" id="f-type" name="type">
             <option hidden {{ if eq "" .Type }}selected{{ end }} disabled></option>
             {{ range .NoteTypes }}
@@ -35,33 +31,17 @@
           </select>
         </div>
 
-        <div class="govuk-form-group {{ if .Error.Field.name }}govuk-form-group--error{{ end }}">
-          <label class="govuk-label" for="f-name">Subject</label>
-          {{ range .Error.Field.name }}
-            <p class="govuk-error-message">
-              <span class="govuk-visually-hidden">Error:</span> {{ . }}
-            </p>
-          {{ end }}
-          <input class="govuk-input {{ if .Error.Field.name }}govuk-input--error{{ end }}" id="f-name" name="name" value="{{ .Name }}" />
-        </div>
+        {{ template "input" (field "name" "Subject" .Name .Error.Field.name) }}
 
         <div class="govuk-form-group {{ if .Error.Field.description }}govuk-form-group--error{{ end }}">
           <label class="govuk-label" for="f-description">Notes</label>
-          {{ range .Error.Field.description }}
-            <p class="govuk-error-message">
-              <span class="govuk-visually-hidden">Error:</span> {{ . }}
-            </p>
-          {{ end }}
+          {{ template "errors" .Error.Field.description }}
           <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .Error.Field.description }}govuk-textarea--error{{ end }}" id="f-description" name="description">{{ .Description }}</textarea>
         </div>
 
         <div class="govuk-form-group {{ if .Error.Field.file  }}govuk-form-group--error{{ end }}">
           <label class="govuk-label" for="f-file">File upload</label>
-          {{ range .Error.Field.file }}
-            <p class="govuk-error-message">
-              <span class="govuk-visually-hidden">Error:</span> {{ . }}
-            </p>
-          {{ end }}
+          {{ template "errors" .Error.Field.file }}
           <input class="govuk-file-upload {{ if .Error.Field.file }}govuk-file-upload--error{{ end }}" type="file" name="file" id="f-file" />
         </div>
 

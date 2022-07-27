@@ -68,11 +68,7 @@
             </tbody>
           </table>
         {{ else }}
-          <div class="govuk-form-group {{ if .Error.Field.uid }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-name">Person UID</label>
-            {{ template "errors" .Error.Field.uid }}
-            <input class="govuk-input {{ if .Error.Field.uid }}govuk-input--error{{ end }}" id="f-uid" name="uid" value="{{ .OtherPerson.UID }}" />
-          </div>
+          {{ template "input" (field "uid" "Person UID" .OtherPerson.UID .Error.Field.uid) }}
         {{ end }}
 
         <div class="govuk-button-group">

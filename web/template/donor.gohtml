@@ -35,89 +35,20 @@
         <form class="form" method="POST">
           <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-          <div class="govuk-form-group {{ if .Error.Field.salutation }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-salutation">Salutation</label>
-            {{ template "errors" .Error.Field.salutation }}
-            <input class="govuk-input {{ if .Error.Field.salutation }}govuk-input--error{{ end }}" id="f-salutation" name="salutation" value="{{ .Donor.Salutation }}" />
-          </div>
-
-          <div class="govuk-form-group {{ if .Error.Field.firstname }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-firstname">First name</label>
-            {{ template "errors" .Error.Field.firstname }}
-            <input class="govuk-input {{ if .Error.Field.firstname }}govuk-input--error{{ end }}" id="f-firstname" name="firstname" value="{{ .Donor.Firstname }}" />
-          </div>
-
-          <div class="govuk-form-group {{ if .Error.Field.middlenames }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-middlenames">Middlenames</label>
-            {{ template "errors" .Error.Field.middlenames }}
-            <input class="govuk-input {{ if .Error.Field.middlenames }}govuk-input--error{{ end }}" id="f-middlenames" name="middlenames" value="{{ .Donor.Middlenames }}" />
-          </div>
-
-          <div class="govuk-form-group {{ if .Error.Field.surname }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-surname">Surname</label>
-            {{ template "errors" .Error.Field.surname }}
-            <input class="govuk-input {{ if .Error.Field.surname }}govuk-input--error{{ end }}" id="f-surname" name="surname" value="{{ .Donor.Surname }}" />
-          </div>
-
-          <div class="govuk-form-group {{ if .Error.Field.dob }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-dob">Date of birth</label>
-            {{ template "errors" .Error.Field.dob }}
-            <input class="govuk-input govuk-input--width-10 {{ if .Error.Field.dob }}govuk-input--error{{ end }}" type="date" id="f-dob" name="dob" value="{{ .Donor.DateOfBirth }}" max="{{ today }}" />
-          </div>
-
-          <div class="govuk-form-group {{ if .Error.Field.previousNames }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-previousNames">Previously known as</label>
-            {{ template "errors" .Error.Field.previousNames }}
-            <input class="govuk-input {{ if .Error.Field.previousNames }}govuk-input--error{{ end }}" id="f-previousNames" name="previousNames" value="{{ .Donor.PreviouslyKnownAs }}" />
-          </div>
-
-          <div class="govuk-form-group {{ if .Error.Field.otherNames }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-otherNames">Also known as</label>
-            {{ template "errors" .Error.Field.otherNames }}
-            <input class="govuk-input {{ if .Error.Field.otherNames }}govuk-input--error{{ end }}" id="f-otherNames" name="otherNames" value="{{ .Donor.AlsoKnownAs }}" />
-          </div>
-
-          <div class="govuk-form-group {{ if .Error.Field.addressLine1 }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-addressLine1">Address 1</label>
-            {{ template "errors" .Error.Field.addressLine1 }}
-            <input class="govuk-input {{ if .Error.Field.addressLine1 }}govuk-input--error{{ end }}" id="f-addressLine1" name="addressLine1" value="{{ .Donor.AddressLine1 }}" />
-          </div>
-
-          <div class="govuk-form-group {{ if .Error.Field.addressLine2 }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-addressLine2">Address 2</label>
-            {{ template "errors" .Error.Field.addressLine2 }}
-            <input class="govuk-input {{ if .Error.Field.addressLine2 }}govuk-input--error{{ end }}" id="f-addressLine2" name="addressLine2" value="{{ .Donor.AddressLine2 }}" />
-          </div>
-
-          <div class="govuk-form-group {{ if .Error.Field.addressLine3 }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-addressLine3">Address 3</label>
-            {{ template "errors" .Error.Field.addressLine3 }}
-            <input class="govuk-input {{ if .Error.Field.addressLine3 }}govuk-input--error{{ end }}" id="f-addressLine3" name="addressLine3" value="{{ .Donor.AddressLine3 }}" />
-          </div>
-
-          <div class="govuk-form-group {{ if .Error.Field.town }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-town">Town</label>
-            {{ template "errors" .Error.Field.town }}
-            <input class="govuk-input {{ if .Error.Field.town }}govuk-input--error{{ end }}" id="f-town" name="town" value="{{ .Donor.Town }}" />
-          </div>
-
-          <div class="govuk-form-group {{ if .Error.Field.county }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-county">County</label>
-            {{ template "errors" .Error.Field.county }}
-            <input class="govuk-input {{ if .Error.Field.county }}govuk-input--error{{ end }}" id="f-county" name="county" value="{{ .Donor.County }}" />
-          </div>
-
-          <div class="govuk-form-group {{ if .Error.Field.postcode }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-postcode">Postcode</label>
-            {{ template "errors" .Error.Field.postcode }}
-            <input class="govuk-input {{ if .Error.Field.postcode }}govuk-input--error{{ end }}" id="f-postcode" name="postcode" value="{{ .Donor.Postcode }}" />
-          </div>
-
-          <div class="govuk-form-group {{ if .Error.Field.country }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-country">Country</label>
-            {{ template "errors" .Error.Field.country }}
-            <input class="govuk-input {{ if .Error.Field.country }}govuk-input--error{{ end }}" id="f-country" name="country" value="{{ .Donor.Country }}" />
-          </div>
+          {{ template "input" (field "salutation" "Salutation" .Donor.Salutation .Error.Field.salutation) }}
+          {{ template "input" (field "firstname" "First name" .Donor.Firstname .Error.Field.firstname) }}
+          {{ template "input" (field "middlenames" "Middlenames" .Donor.Middlenames .Error.Field.middlenames) }}
+          {{ template "input" (field "surname" "Surname" .Donor.Surname .Error.Field.surname) }}
+          {{ template "input" (field "dob" "Date of birth" .Donor.DateOfBirth .Error.Field.dob) }}
+          {{ template "input" (field "previousNames" "Previously known as" .Donor.PreviouslyKnownAs .Error.Field.previousNames) }}
+          {{ template "input" (field "otherNames" "Also known as" .Donor.AlsoKnownAs .Error.Field.otherNames) }}
+          {{ template "input" (field "addressLine1" "Address 1" .Donor.AddressLine1 .Error.Field.addressLine1) }}
+          {{ template "input" (field "addressLine2" "Address 2" .Donor.AddressLine2 .Error.Field.addressLine2) }}
+          {{ template "input" (field "addressLine3" "Address 3" .Donor.AddressLine3 .Error.Field.addressLine3) }}
+          {{ template "input" (field "town" "Town" .Donor.Town .Error.Field.town) }}
+          {{ template "input" (field "county" "County" .Donor.County .Error.Field.county) }}
+          {{ template "input" (field "postcode" "Postcode" .Donor.Postcode .Error.Field.postcode) }}
+          {{ template "input" (field "country" "Country" .Donor.Country .Error.Field.country) }}
 
           <div class="govuk-form-group {{ if .Error.Field.isAirmailRequired }}govuk-form-group--error{{ end }}">
             <fieldset class="govuk-fieldset">
@@ -144,23 +75,9 @@
             </fieldset>
           </div>
 
-          <div class="govuk-form-group {{ if .Error.Field.phoneNumber }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-phoneNumber">Daytime telephone</label>
-            {{ template "errors" .Error.Field.phoneNumber }}
-            <input class="govuk-input {{ if .Error.Field.phoneNumber }}govuk-input--error{{ end }}" id="f-phoneNumber" name="phoneNumber" value="{{ .Donor.PhoneNumber }}" />
-          </div>
-
-          <div class="govuk-form-group {{ if .Error.Field.email }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-email">Email</label>
-            {{ template "errors" .Error.Field.email }}
-            <input class="govuk-input {{ if .Error.Field.email }}govuk-input--error{{ end }}" id="f-email" name="email" value="{{ .Donor.Email }}" />
-          </div>
-
-          <div class="govuk-form-group {{ if .Error.Field.sageId }}govuk-form-group--error{{ end }}">
-            <label class="govuk-label" for="f-sageId">Sage ID</label>
-            {{ template "errors" .Error.Field.sageId }}
-            <input class="govuk-input {{ if .Error.Field.sageId }}govuk-input--error{{ end }}" id="f-sageId" name="sageId" value="{{ .Donor.SageId }}" />
-          </div>
+          {{ template "input" (field "phoneNumber" "Daytime telephone" .Donor.PhoneNumber .Error.Field.phoneNumber) }}
+          {{ template "input" (field "email" "Email" .Donor.Email .Error.Field.email) }}
+          {{ template "input" (field "sageId" "Sage ID" .Donor.SageId .Error.Field.sageId) }}
 
           <div class="govuk-form-group {{ if .Error.Field.correspondenceBy }}govuk-form-group--error{{ end }}">
             <fieldset class="govuk-fieldset">
