@@ -1,0 +1,235 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create Donor{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+          <div class="govuk-notification-banner__header">
+            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+              Success
+            </h2>
+          </div>
+          <div class="govuk-notification-banner__content">
+            <h3 class="govuk-notification-banner__heading">
+              Person {{ .Donor.UID }} was created
+            </h3>
+            <p class="govuk-body">
+              <a class="govuk-button" href="{{ sirius (printf "/lpa/person/%d" .Donor.ID) }}" target="_top">
+                View donor
+              </a>
+              <a class="govuk-button govuk-button--secondary" data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">
+                Back
+              </a>
+            </p>
+          </div>
+        </div>
+      {{ else }}
+        <h1 class="govuk-heading-l app-!-embedded-hide">Create Donor</h1>
+
+        <form class="form" method="POST">
+          <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+          <div class="govuk-form-group {{ if .Error.Field.salutation }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-salutation">Salutation</label>
+            {{ template "errors" .Error.Field.salutation }}
+            <input class="govuk-input {{ if .Error.Field.salutation }}govuk-input--error{{ end }}" id="f-salutation" name="salutation" value="{{ .Donor.Salutation }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.firstname }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-firstname">First name</label>
+            {{ template "errors" .Error.Field.firstname }}
+            <input class="govuk-input {{ if .Error.Field.firstname }}govuk-input--error{{ end }}" id="f-firstname" name="firstname" value="{{ .Donor.Firstname }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.middlenames }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-middlenames">Middlenames</label>
+            {{ template "errors" .Error.Field.middlenames }}
+            <input class="govuk-input {{ if .Error.Field.middlenames }}govuk-input--error{{ end }}" id="f-middlenames" name="middlenames" value="{{ .Donor.Middlenames }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.surname }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-surname">Surname</label>
+            {{ template "errors" .Error.Field.surname }}
+            <input class="govuk-input {{ if .Error.Field.surname }}govuk-input--error{{ end }}" id="f-surname" name="surname" value="{{ .Donor.Surname }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.dob }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-dob">Date of birth</label>
+            {{ template "errors" .Error.Field.dob }}
+            <input class="govuk-input govuk-input--width-10 {{ if .Error.Field.dob }}govuk-input--error{{ end }}" type="date" id="f-dob" name="dob" value="{{ .Donor.DateOfBirth }}" max="{{ today }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.previousNames }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-previousNames">Previously known as</label>
+            {{ template "errors" .Error.Field.previousNames }}
+            <input class="govuk-input {{ if .Error.Field.previousNames }}govuk-input--error{{ end }}" id="f-previousNames" name="previousNames" value="{{ .Donor.PreviouslyKnownAs }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.otherNames }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-otherNames">Also known as</label>
+            {{ template "errors" .Error.Field.otherNames }}
+            <input class="govuk-input {{ if .Error.Field.otherNames }}govuk-input--error{{ end }}" id="f-otherNames" name="otherNames" value="{{ .Donor.AlsoKnownAs }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.addressLine1 }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-addressLine1">Address 1</label>
+            {{ template "errors" .Error.Field.addressLine1 }}
+            <input class="govuk-input {{ if .Error.Field.addressLine1 }}govuk-input--error{{ end }}" id="f-addressLine1" name="addressLine1" value="{{ .Donor.AddressLine1 }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.addressLine2 }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-addressLine2">Address 2</label>
+            {{ template "errors" .Error.Field.addressLine2 }}
+            <input class="govuk-input {{ if .Error.Field.addressLine2 }}govuk-input--error{{ end }}" id="f-addressLine2" name="addressLine2" value="{{ .Donor.AddressLine2 }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.addressLine3 }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-addressLine3">Address 3</label>
+            {{ template "errors" .Error.Field.addressLine3 }}
+            <input class="govuk-input {{ if .Error.Field.addressLine3 }}govuk-input--error{{ end }}" id="f-addressLine3" name="addressLine3" value="{{ .Donor.AddressLine3 }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.town }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-town">Town</label>
+            {{ template "errors" .Error.Field.town }}
+            <input class="govuk-input {{ if .Error.Field.town }}govuk-input--error{{ end }}" id="f-town" name="town" value="{{ .Donor.Town }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.county }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-county">County</label>
+            {{ template "errors" .Error.Field.county }}
+            <input class="govuk-input {{ if .Error.Field.county }}govuk-input--error{{ end }}" id="f-county" name="county" value="{{ .Donor.County }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.postcode }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-postcode">Postcode</label>
+            {{ template "errors" .Error.Field.postcode }}
+            <input class="govuk-input {{ if .Error.Field.postcode }}govuk-input--error{{ end }}" id="f-postcode" name="postcode" value="{{ .Donor.Postcode }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.country }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-country">Country</label>
+            {{ template "errors" .Error.Field.country }}
+            <input class="govuk-input {{ if .Error.Field.country }}govuk-input--error{{ end }}" id="f-country" name="country" value="{{ .Donor.Country }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.isAirmailRequired }}govuk-form-group--error{{ end }}">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend">
+                <h1 class="govuk-fieldset__heading">
+                  Is airmail required
+                </h1>
+              </legend>
+              {{ template "errors" .Error.Field.isAirmailRequired }}
+              <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="f-isAirmailRequired" name="isAirmailRequired" type="radio" value="Yes" {{ if .Donor.IsAirmailRequired }}checked{{ end }}>
+                  <label class="govuk-label govuk-radios__label" for="f-isAirmailRequired">
+                    Yes
+                  </label>
+                </div>
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="f-isAirmailRequired-2" name="isAirmailRequired" type="radio" value="No" {{ if not .Donor.IsAirmailRequired }}checked{{ end }}>
+                  <label class="govuk-label govuk-radios__label" for="f-isAirmailRequired-2">
+                    No
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.phoneNumber }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-phoneNumber">Daytime telephone</label>
+            {{ template "errors" .Error.Field.phoneNumber }}
+            <input class="govuk-input {{ if .Error.Field.phoneNumber }}govuk-input--error{{ end }}" id="f-phoneNumber" name="phoneNumber" value="{{ .Donor.PhoneNumber }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.email }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-email">Email</label>
+            {{ template "errors" .Error.Field.email }}
+            <input class="govuk-input {{ if .Error.Field.email }}govuk-input--error{{ end }}" id="f-email" name="email" value="{{ .Donor.Email }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.sageId }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-sageId">Sage ID</label>
+            {{ template "errors" .Error.Field.sageId }}
+            <input class="govuk-input {{ if .Error.Field.sageId }}govuk-input--error{{ end }}" id="f-sageId" name="sageId" value="{{ .Donor.SageId }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.correspondenceBy }}govuk-form-group--error{{ end }}">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend">
+                <h1 class="govuk-fieldset__heading">
+                  Correspondence by
+                </h1>
+              </legend>
+              {{ template "errors" .Error.Field.correspondenceBy }}
+              <div class="govuk-checkboxes govuk-checkboxes--inline" data-module="govuk-checkboxes">
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="f-correspondenceBy-post" name="correspondenceBy" type="checkbox" value="post" {{ if .Donor.CorrespondenceByPost }}checked{{ end }}>
+                  <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-post">
+                    Post
+                  </label>
+                </div>
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="f-correspondenceBy-email" name="correspondenceBy" type="checkbox" value="email" {{ if .Donor.CorrespondenceByEmail }}checked{{ end }}>
+                  <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-email">
+                    Email
+                  </label>
+                </div>
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="f-correspondenceBy-phone" name="correspondenceBy" type="checkbox" value="phone" {{ if .Donor.CorrespondenceByPhone }}checked{{ end }}>
+                  <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-phone">
+                    Phone
+                  </label>
+                </div>
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="f-correspondenceBy-welsh" name="correspondenceBy" type="checkbox" value="welsh" {{ if .Donor.CorrespondenceByWelsh }}checked{{ end }}>
+                  <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-welsh">
+                    Welsh
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.researchOptOut }}govuk-form-group--error{{ end }}">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend">
+                <h1 class="govuk-fieldset__heading">
+                  Research opt-out
+                </h1>
+              </legend>
+              {{ template "errors" .Error.Field.researchOptOut }}
+              <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="f-researchOptOut" name="researchOptOut" type="radio" value="Yes" {{ if .Donor.ResearchOptOut }}checked{{ end }}>
+                  <label class="govuk-label govuk-radios__label" for="f-researchOptOut">
+                    Yes
+                  </label>
+                </div>
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="f-researchOptOut-2" name="researchOptOut" type="radio" value="No" {{ if not .Donor.ResearchOptOut }}checked{{ end }}>
+                  <label class="govuk-label govuk-radios__label" for="f-researchOptOut-2">
+                    No
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="govuk-button-group">
+            <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+            <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+          </div>
+        </form>
+      {{ end }}
+    </div>
+  </div>
+{{ end }}

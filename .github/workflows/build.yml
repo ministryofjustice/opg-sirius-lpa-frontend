@@ -82,6 +82,13 @@ jobs:
         run: |
           gotestsum --junitfile /tmp/test-results/unit-tests.xml -- ./... -coverprofile=/tmp/test-coverage.txt
 
+      - name: Run SonarQube Scanner
+        if: github.actor != 'dependabot[bot]'
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
       - name: Define Pact tag
         id: pact_tag
         run: |
