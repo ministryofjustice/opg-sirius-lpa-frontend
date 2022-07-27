@@ -6,7 +6,7 @@ import (
 )
 
 func (c *Client) DeletePersonReference(ctx Context, referenceID int) error {
-	req, err := c.newRequest(ctx, http.MethodDelete, fmt.Sprintf("/api/v1/person-references/%d", referenceID), nil)
+	req, err := c.newRequest(ctx, http.MethodDelete, fmt.Sprintf("/lpa-api/v1/person-references/%d", referenceID), nil)
 	if err != nil {
 		return err
 	}

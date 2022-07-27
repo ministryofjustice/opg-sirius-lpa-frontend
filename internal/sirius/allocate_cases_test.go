@@ -32,7 +32,7 @@ func TestAllocateCases(t *testing.T) {
 					UponReceiving("A request to change the assignee of the case").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/api/v1/users/47/cases/800"),
+						Path:   dsl.String("/lpa-api/v1/users/47/cases/800"),
 						Body: map[string]interface{}{
 							"data": []map[string]interface{}{{
 								"id":       800,
@@ -66,7 +66,7 @@ func TestAllocateCases(t *testing.T) {
 					UponReceiving("A request to change the assignee of multiple cases").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/api/v1/users/47/cases/800+801+802"),
+						Path:   dsl.String("/lpa-api/v1/users/47/cases/800+801+802"),
 						Body: map[string]interface{}{
 							"data": []map[string]interface{}{{
 								"id":       800,
@@ -106,7 +106,7 @@ func TestAllocateCases(t *testing.T) {
 					UponReceiving("A request to change the assignee of the case without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/api/v1/users/47/cases/800"),
+						Path:   dsl.String("/lpa-api/v1/users/47/cases/800"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -116,7 +116,7 @@ func TestAllocateCases(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/users/47/cases/800", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/users/47/cases/800", port),
 					Method: http.MethodPut,
 				}
 			},

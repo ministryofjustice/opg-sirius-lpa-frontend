@@ -31,7 +31,7 @@ func TestCreateNote(t *testing.T) {
 					UponReceiving("A request to create a note").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/lpas/800/notes"),
+						Path:   dsl.String("/lpa-api/v1/lpas/800/notes"),
 						Body: dsl.Like(map[string]interface{}{
 							"name":        "Something",
 							"description": "More words",
@@ -63,7 +63,7 @@ func TestCreateNote(t *testing.T) {
 					UponReceiving("A request to create a note with a file").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/lpas/800/notes"),
+						Path:   dsl.String("/lpa-api/v1/lpas/800/notes"),
 						Body: dsl.Like(map[string]interface{}{
 							"name":        "Something",
 							"description": "More words",
@@ -105,7 +105,7 @@ func TestCreateNote(t *testing.T) {
 					UponReceiving("A request to create a note without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/lpas/800/notes"),
+						Path:   dsl.String("/lpa-api/v1/lpas/800/notes"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -114,7 +114,7 @@ func TestCreateNote(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/lpas/800/notes", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/lpas/800/notes", port),
 					Method: http.MethodPost,
 				}
 			},

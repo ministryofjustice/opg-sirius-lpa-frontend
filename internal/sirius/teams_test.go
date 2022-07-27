@@ -31,7 +31,7 @@ func TestTeams(t *testing.T) {
 					UponReceiving("A request for teams").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/teams"),
+						Path:   dsl.String("/lpa-api/v1/teams"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -67,7 +67,7 @@ func TestTeams(t *testing.T) {
 					UponReceiving("A request for teams without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/teams"),
+						Path:   dsl.String("/lpa-api/v1/teams"),
 						Headers: dsl.MapMatcher{
 							"OPG-Bypass-Membrane": dsl.String("1"),
 						},
@@ -79,7 +79,7 @@ func TestTeams(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/teams", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/teams", port),
 					Method: http.MethodGet,
 				}
 			},

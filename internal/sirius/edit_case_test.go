@@ -31,7 +31,7 @@ func TestEditCase(t *testing.T) {
 					UponReceiving("A request to edit the LPA").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/api/v1/lpas/800"),
+						Path:   dsl.String("/lpa-api/v1/lpas/800"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -61,7 +61,7 @@ func TestEditCase(t *testing.T) {
 					UponReceiving("A request to edit the EPA").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/api/v1/epas/800"),
+						Path:   dsl.String("/lpa-api/v1/epas/800"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -91,7 +91,7 @@ func TestEditCase(t *testing.T) {
 					UponReceiving("A request to edit the LPA without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/api/v1/lpas/800"),
+						Path:   dsl.String("/lpa-api/v1/lpas/800"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -100,7 +100,7 @@ func TestEditCase(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/lpas/800", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/lpas/800", port),
 					Method: http.MethodPut,
 				}
 			},

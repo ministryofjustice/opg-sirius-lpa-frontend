@@ -30,7 +30,7 @@ func TestCreateWarning(t *testing.T) {
 					UponReceiving("A request to create a warning").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/persons/189/warnings"),
+						Path:   dsl.String("/lpa-api/v1/persons/189/warnings"),
 						Body: dsl.Like(map[string]interface{}{
 							"warningType": "Complaint Received",
 							"warningText": "Some warning notes",
@@ -61,7 +61,7 @@ func TestCreateWarning(t *testing.T) {
 					UponReceiving("A request to create a warning without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/persons/189/warnings"),
+						Path:   dsl.String("/lpa-api/v1/persons/189/warnings"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -70,7 +70,7 @@ func TestCreateWarning(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/persons/189/warnings", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/persons/189/warnings", port),
 					Method: http.MethodPost,
 				}
 			},

@@ -31,7 +31,7 @@ func TestNoteTypes(t *testing.T) {
 					UponReceiving("A request for note types").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/note-types/lpa"),
+						Path:   dsl.String("/lpa-api/v1/note-types/lpa"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -59,7 +59,7 @@ func TestNoteTypes(t *testing.T) {
 					UponReceiving("A request for note types without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/note-types/lpa"),
+						Path:   dsl.String("/lpa-api/v1/note-types/lpa"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -68,7 +68,7 @@ func TestNoteTypes(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/note-types/lpa", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/note-types/lpa", port),
 					Method: http.MethodGet,
 				}
 			},

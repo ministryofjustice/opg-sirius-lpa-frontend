@@ -21,7 +21,7 @@ func (c *Client) CreatePersonReference(ctx Context, personID int, referencedUID,
 		return err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("/api/v1/persons/%d/references", personID), bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("/lpa-api/v1/persons/%d/references", personID), bytes.NewReader(data))
 	if err != nil {
 		return err
 	}

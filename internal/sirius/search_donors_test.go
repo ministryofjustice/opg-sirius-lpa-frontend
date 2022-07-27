@@ -31,7 +31,7 @@ func TestSearchDonors(t *testing.T) {
 					UponReceiving("A search for donors").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/search/persons"),
+						Path:   dsl.String("/lpa-api/v1/search/persons"),
 						Body: dsl.Like(map[string]interface{}{
 							"term":        "7000-9999-0001",
 							"personTypes": []string{"Donor"},
@@ -78,7 +78,7 @@ func TestSearchDonors(t *testing.T) {
 					UponReceiving("A search for donors without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/search/persons"),
+						Path:   dsl.String("/lpa-api/v1/search/persons"),
 						Body: dsl.Like(map[string]interface{}{
 							"term":        "7000-9999-0001",
 							"personTypes": []string{"Donor"},
@@ -94,7 +94,7 @@ func TestSearchDonors(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/search/persons", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/search/persons", port),
 					Method: http.MethodPost,
 				}
 			},

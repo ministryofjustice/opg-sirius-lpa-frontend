@@ -14,7 +14,7 @@ func (c *Client) AssignTasks(ctx Context, assigneeID int, taskIDs []int) error {
 		urlIDs += "+" + strconv.Itoa(taskID)
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/api/v1/users/%d/tasks/%s", assigneeID, urlIDs), strings.NewReader(""))
+	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/lpa-api/v1/users/%d/tasks/%s", assigneeID, urlIDs), strings.NewReader(""))
 	if err != nil {
 		return err
 	}

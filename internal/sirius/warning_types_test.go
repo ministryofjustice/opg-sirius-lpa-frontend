@@ -31,7 +31,7 @@ func TestWarningTypes(t *testing.T) {
 					UponReceiving("A request for warning types").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/reference-data/warningType"),
+						Path:   dsl.String("/lpa-api/v1/reference-data/warningType"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -67,7 +67,7 @@ func TestWarningTypes(t *testing.T) {
 					UponReceiving("A request for warning types without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/reference-data/warningType"),
+						Path:   dsl.String("/lpa-api/v1/reference-data/warningType"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -76,7 +76,7 @@ func TestWarningTypes(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/reference-data/warningType", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/reference-data/warningType", port),
 					Method: http.MethodGet,
 				}
 			},
