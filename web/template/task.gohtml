@@ -33,11 +33,7 @@
 
         {{ template "input" (field "name" "Task" .Task.Name .Error.Field.name) }}
 
-        <div class="govuk-form-group {{ if .Error.Field.description }}govuk-form-group--error{{ end }}">
-          <label class="govuk-label" for="f-description">Notes</label>
-          {{ template "errors" .Error.Field.description }}
-          <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .Error.Field.description }}govuk-textarea--error{{ end }}" id="f-description" name="description">{{ .Task.Description }}</textarea>
-        </div>
+        {{ template "textarea" (field "description" "Notes" .Task.Description .Error.Field.description) }}
 
         <div class="govuk-form-group {{ if .Error.Field.assignTo }}govuk-form-group--error{{ end }}">
           <fieldset class="govuk-fieldset">

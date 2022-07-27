@@ -10,7 +10,7 @@
       {{ if .Success }}
         {{ template "success-banner" "You have successfully created a warning." }}
       {{ end }}
-      
+
       <h1 class="govuk-heading-l app-!-embedded-hide">Create Warning</h1>
 
       <form class="form" method="POST">
@@ -21,19 +21,15 @@
             Warning type
           </label>
           {{ template "errors" .Error.Field.warningType }}
-          <select class="govuk-select {{ if .Error.Field.warningType }}govuk-select--error{{ end }}" id="f-warningType" name="warning-type">
+          <select class="govuk-select {{ if .Error.Field.warningType }}govuk-select--error{{ end }}" id="f-warningType" name="warningType">
             <option hidden selected disabled></option>
             {{ range .WarningTypes }}
-              <option value="{{ .Handle }}">{{ .Label }}</option>
+              <option value="{{ .Handle }}" {{ if eq .Handle $.WarningType }}selected{{ end }}>{{ .Label }}</option>
             {{ end }}
           </select>
         </div>
 
-        <div class="govuk-form-group {{ if .Error.Field.warningText }}govuk-form-group--error{{ end }}">
-          <label class="govuk-label" for="f-warningText">Notes</label>
-          {{ template "errors" .Error.Field.warningText }}
-          <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .Error.Field.warningText }}govuk-textarea--error{{ end }}" name="warning-notes" rows="5" id="f-warningText"></textarea>
-        </div>
+        {{ template "textarea" (field "warningText" "Notes" .WarningText .Error.Field.warningText) }}
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>

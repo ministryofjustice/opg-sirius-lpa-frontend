@@ -49,11 +49,7 @@
 
         {{ template "input" (field "summary" "Title" .Complaint.Summary .Error.Field.summary) }}
 
-        <div class="govuk-form-group {{ if .Error.Field.description }}govuk-form-group--error{{ end }}">
-          <label class="govuk-label" for="f-description">Description</label>
-          {{ template "errors" .Error.Field.description }}
-          <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .Error.Field.description }}govuk-textarea--error{{ end }}" id="f-description" name="description">{{ .Complaint.Description }}</textarea>
-        </div>
+        {{ template "textarea" (field "description" "Description" .Complaint.Description .Error.Field.description) }}
 
         {{ template "input-date" (field "receivedDate" "Received date" .Complaint.ReceivedDate .Error.Field.receivedDate "max" today) }}
 
@@ -120,11 +116,7 @@
           </fieldset>
         </div>
 
-        <div class="govuk-form-group {{ if .Error.Field.resolutionInfo }}govuk-form-group--error{{ end }}">
-          <label class="govuk-label" for="f-resolutionInfo">Resolution notes</label>
-          {{ template "errors" .Error.Field.resolutionInfo }}
-          <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .Error.Field.resolutionInfo }}govuk-textarea--error{{ end }}" id="f-resolutionInfo" name="resolutionInfo">{{ .Complaint.ResolutionInfo }}</textarea>
-        </div>
+        {{ template "textarea" (field "resolutionInfo" "Resolution notes" .Complaint.ResolutionInfo .Error.Field.resolutionInfo) }}
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
