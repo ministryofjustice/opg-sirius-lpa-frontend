@@ -91,8 +91,8 @@ func TestPostWarning(t *testing.T) {
 	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "Some random warning notes").Return(nil)
 
 	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
-		"warning-type":  {"Complaint Recieved"},
-		"warning-notes": {"Some random warning notes"},
+		"warningType": {"Complaint Recieved"},
+		"warningText": {"Some random warning notes"},
 	}.Encode()))
 
 	req.Header.Add("content-type", formUrlEncoded)
@@ -122,7 +122,7 @@ func TestPostWarningValidationErrors(t *testing.T) {
 		},
 	}
 
-	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "").Return(ve)
+	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Received", "").Return(ve)
 
 	template := &mockTemplate{}
 	template.On("Func", mock.Anything, warningData{
@@ -134,12 +134,13 @@ func TestPostWarningValidationErrors(t *testing.T) {
 				Label:  "Complaint Received",
 			},
 		},
-		Error: ve,
+		Error:       ve,
+		WarningType: "Complaint Received",
 	}).Return(nil)
 
 	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
-		"warning-type":  {"Complaint Recieved"},
-		"warning-notes": {""},
+		"warningType": {"Complaint Received"},
+		"warningText": {""},
 	}.Encode()))
 
 	req.Header.Add("content-type", formUrlEncoded)
@@ -168,8 +169,8 @@ func TestCreateWarningReturnsError(t *testing.T) {
 	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "Some notes").Return(e)
 
 	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
-		"warning-type":  {"Complaint Recieved"},
-		"warning-notes": {"Some notes"},
+		"warningType": {"Complaint Recieved"},
+		"warningText": {"Some notes"},
 	}.Encode()))
 
 	req.Header.Add("content-type", formUrlEncoded)
@@ -185,8 +186,8 @@ func TestGetWarningTypesFail(t *testing.T) {
 	siriusClient.On("WarningTypes", mock.Anything).Return(nil, expectedErr)
 
 	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
-		"warning-type":  {"Complaint Recieved"},
-		"warning-notes": {"Some notes"},
+		"warningType": {"Complaint Recieved"},
+		"warningText": {"Some notes"},
 	}.Encode()))
 
 	req.Header.Add("content-type", formUrlEncoded)

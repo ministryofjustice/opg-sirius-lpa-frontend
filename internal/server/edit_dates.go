@@ -17,8 +17,9 @@ type editDatesData struct {
 	XSRFToken string
 	Entity    string
 	Success   bool
+	Error     sirius.ValidationError
 
-	Case sirius.Case
+	Dates sirius.Dates
 }
 
 func EditDates(client EditDatesClient, tmpl template.Template) Handler {
@@ -49,11 +50,15 @@ func EditDates(client EditDatesClient, tmpl template.Template) Handler {
 			}
 
 			err = client.EditDates(ctx, caseID, caseType, dates)
-			if err != nil {
+			if ve, ok := err.(sirius.ValidationError); ok {
+				w.WriteHeader(http.StatusBadRequest)
+				data.Error = ve
+				data.Dates = dates
+			} else if err != nil {
 				return err
+			} else {
+				data.Success = true
 			}
-
-			data.Success = true
 		}
 
 		caseitem, err := client.Case(ctx, caseID)
@@ -61,7 +66,18 @@ func EditDates(client EditDatesClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data.Case = caseitem
+		if r.Method != http.MethodPost || data.Success {
+			data.Dates = sirius.Dates{
+				CancellationDate: caseitem.CancellationDate,
+				DispatchDate:     caseitem.DispatchDate,
+				DueDate:          caseitem.DueDate,
+				InvalidDate:      caseitem.InvalidDate,
+				ReceiptDate:      caseitem.ReceiptDate,
+				RegistrationDate: caseitem.RegistrationDate,
+				RejectedDate:     caseitem.RejectedDate,
+				WithdrawnDate:    caseitem.WithdrawnDate,
+			}
+		}
 		data.Entity = caseitem.Summary()
 
 		return tmpl(w, data)
