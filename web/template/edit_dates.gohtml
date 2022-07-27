@@ -16,14 +16,14 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        {{ template "input-date" (field "receiptDate" "Receipt date" .Case.ReceiptDate nil) }}
-        {{ template "input-date" (field "dueDate" "Registration due date" .Case.DueDate nil) }}
-        {{ template "input-date" (field "registrationDate" "Registration date" .Case.RegistrationDate nil) }}
-        {{ template "input-date" (field "dispatchDate" "Dispatch date" .Case.DispatchDate nil) }}
-        {{ template "input-date" (field "cancellationDate" "Date cancelled" .Case.CancellationDate nil) }}
-        {{ template "input-date" (field "rejectedDate" "Date rejected" .Case.RejectedDate nil) }}
-        {{ template "input-date" (field "invalidDate" "Date invalidated" .Case.InvalidDate nil) }}
-        {{ template "input-date" (field "withdrawnDate" "Date withdrawn" .Case.WithdrawnDate nil) }}
+        {{ template "input-date" (field "receiptDate" "Receipt date" .Dates.ReceiptDate .Error.Field.receiptDate) }}
+        {{ template "input-date" (field "dueDate" "Registration due date" .Dates.DueDate .Error.Field.dueDate) }}
+        {{ template "input-date" (field "registrationDate" "Registration date" .Dates.RegistrationDate .Error.Field.registrationDate) }}
+        {{ template "input-date" (field "dispatchDate" "Dispatch date" .Dates.DispatchDate .Error.Field.dispatchDate) }}
+        {{ template "input-date" (field "cancellationDate" "Date cancelled" .Dates.CancellationDate .Error.Field.cancellationDate) }}
+        {{ template "input-date" (field "rejectedDate" "Date rejected" .Dates.RejectedDate .Error.Field.rejectedDate) }}
+        {{ template "input-date" (field "invalidDate" "Date invalidated" .Dates.InvalidDate .Error.Field.invalidDate) }}
+        {{ template "input-date" (field "withdrawnDate" "Date withdrawn" .Dates.WithdrawnDate .Error.Field.withdrawnDate) }}
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
