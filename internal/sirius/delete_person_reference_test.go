@@ -30,7 +30,7 @@ func TestDeletePersonReferences(t *testing.T) {
 					UponReceiving("A request to delete the person reference").
 					WithRequest(dsl.Request{
 						Method: http.MethodDelete,
-						Path:   dsl.String("/api/v1/person-references/768"),
+						Path:   dsl.String("/lpa-api/v1/person-references/768"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -55,7 +55,7 @@ func TestDeletePersonReferences(t *testing.T) {
 					UponReceiving("A request to delete the person reference without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodDelete,
-						Path:   dsl.String("/api/v1/person-references/768"),
+						Path:   dsl.String("/lpa-api/v1/person-references/768"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -64,7 +64,7 @@ func TestDeletePersonReferences(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/person-references/768", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/person-references/768", port),
 					Method: http.MethodDelete,
 				}
 			},

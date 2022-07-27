@@ -16,7 +16,7 @@ type Complaint struct {
 
 func (c *Client) Complaint(ctx Context, id int) (Complaint, error) {
 	var v Complaint
-	err := c.get(ctx, fmt.Sprintf("/api/v1/complaints/%d", id), &v)
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/complaints/%d", id), &v)
 
 	return v, err
 }

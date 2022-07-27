@@ -6,7 +6,7 @@ func (c *Client) TaskTypes(ctx Context) ([]string, error) {
 	var v struct {
 		TaskTypes map[string]struct{} `json:"task_types"`
 	}
-	if err := c.get(ctx, "/api/v1/tasktypes/lpa", &v); err != nil {
+	if err := c.get(ctx, "/lpa-api/v1/tasktypes/lpa", &v); err != nil {
 		return nil, err
 	}
 

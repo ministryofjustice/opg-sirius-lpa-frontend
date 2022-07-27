@@ -31,7 +31,7 @@ func TestAssignTasks(t *testing.T) {
 					UponReceiving("A request to assign a task").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/api/v1/users/47/tasks/990"),
+						Path:   dsl.String("/lpa-api/v1/users/47/tasks/990"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -59,7 +59,7 @@ func TestAssignTasks(t *testing.T) {
 					UponReceiving("A request to assign multiple tasks").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/api/v1/users/47/tasks/990+991"),
+						Path:   dsl.String("/lpa-api/v1/users/47/tasks/990+991"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -87,7 +87,7 @@ func TestAssignTasks(t *testing.T) {
 					UponReceiving("A request to assign a task without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/api/v1/users/47/tasks/990"),
+						Path:   dsl.String("/lpa-api/v1/users/47/tasks/990"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -97,7 +97,7 @@ func TestAssignTasks(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/users/47/tasks/990", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/users/47/tasks/990", port),
 					Method: http.MethodPut,
 				}
 			},

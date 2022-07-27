@@ -23,7 +23,7 @@ func (c *Client) CreateWarning(ctx Context, personId int, warningType string, wa
 	req, err := c.newRequest(
 		ctx,
 		http.MethodPost,
-		fmt.Sprintf("/api/v1/persons/%d/warnings", personId),
+		fmt.Sprintf("/lpa-api/v1/persons/%d/warnings", personId),
 		bytes.NewReader(postData),
 	)
 

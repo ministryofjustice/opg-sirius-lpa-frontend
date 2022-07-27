@@ -22,7 +22,7 @@ func (c Case) Summary() string {
 
 func (c *Client) Case(ctx Context, id int) (Case, error) {
 	var v Case
-	err := c.get(ctx, fmt.Sprintf("/api/v1/cases/%d", id), &v)
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/cases/%d", id), &v)
 
 	return v, err
 }

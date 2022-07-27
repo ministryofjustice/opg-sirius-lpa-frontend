@@ -30,7 +30,7 @@ func TestCreatePersonReference(t *testing.T) {
 					UponReceiving("A request to create a person reference").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/persons/189/references"),
+						Path:   dsl.String("/lpa-api/v1/persons/189/references"),
 						Body: map[string]interface{}{
 							"referencedUid": dsl.Like("7000-9999-0001"),
 							"reason":        dsl.Like("Mother"),
@@ -61,7 +61,7 @@ func TestCreatePersonReference(t *testing.T) {
 					UponReceiving("A request to create a person reference without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/persons/189/references"),
+						Path:   dsl.String("/lpa-api/v1/persons/189/references"),
 						Body: map[string]interface{}{
 							"referencedUid": dsl.Like("7000-9999-0001"),
 							"reason":        dsl.Like("Mother"),
@@ -74,7 +74,7 @@ func TestCreatePersonReference(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/persons/189/references", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/persons/189/references", port),
 					Method: http.MethodPost,
 				}
 			},

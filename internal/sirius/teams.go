@@ -7,7 +7,7 @@ type Team struct {
 
 func (c *Client) Teams(ctx Context) ([]Team, error) {
 	var v []Team
-	err := c.get(ctx, "/api/v1/teams", &v)
+	err := c.get(ctx, "/lpa-api/v1/teams", &v)
 
 	return v, err
 }

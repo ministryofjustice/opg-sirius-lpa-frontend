@@ -24,7 +24,7 @@ func (c *Client) EditDates(ctx Context, caseID int, caseType CaseType, dates Dat
 		return err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/api/v1/%ss/%d/edit-dates", caseType, caseID), bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/lpa-api/v1/%ss/%d/edit-dates", caseType, caseID), bytes.NewReader(data))
 	if err != nil {
 		return err
 	}

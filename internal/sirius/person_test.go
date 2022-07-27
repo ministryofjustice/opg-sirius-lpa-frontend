@@ -31,7 +31,7 @@ func TestPerson(t *testing.T) {
 					UponReceiving("A request for the person with children").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/persons/189"),
+						Path:   dsl.String("/lpa-api/v1/persons/189"),
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
 							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
@@ -87,7 +87,7 @@ func TestPerson(t *testing.T) {
 					UponReceiving("A request for the person without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/v1/persons/189"),
+						Path:   dsl.String("/lpa-api/v1/persons/189"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -96,7 +96,7 @@ func TestPerson(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/persons/189", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/persons/189", port),
 					Method: http.MethodGet,
 				}
 			},

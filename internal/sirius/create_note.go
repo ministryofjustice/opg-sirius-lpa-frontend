@@ -31,7 +31,7 @@ func (c *Client) CreateNote(ctx Context, entityID int, entityType EntityType, no
 		return err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("/api/v1/%ss/%d/notes", entityType, entityID), bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("/lpa-api/v1/%ss/%d/notes", entityType, entityID), bytes.NewReader(data))
 	if err != nil {
 		return err
 	}

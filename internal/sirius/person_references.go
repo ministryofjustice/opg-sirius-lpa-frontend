@@ -14,7 +14,7 @@ type PersonReference struct {
 
 func (c *Client) PersonReferences(ctx Context, personID int) ([]PersonReference, error) {
 	var v []PersonReference
-	err := c.get(ctx, fmt.Sprintf("/api/v1/persons/%d/references", personID), &v)
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%d/references", personID), &v)
 
 	return v, err
 }

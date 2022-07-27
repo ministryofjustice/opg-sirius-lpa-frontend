@@ -13,7 +13,7 @@ func (c *Client) EditComplaint(ctx Context, id int, complaint Complaint) error {
 		return err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/api/v1/complaints/%d", id), bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/lpa-api/v1/complaints/%d", id), bytes.NewReader(data))
 	if err != nil {
 		return err
 	}

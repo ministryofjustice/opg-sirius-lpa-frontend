@@ -22,7 +22,7 @@ func (c *Client) LinkPeople(ctx Context, parentId int, childId int) error {
 	req, err := c.newRequest(
 		ctx,
 		http.MethodPost,
-		"/api/v1/person-links",
+		"/lpa-api/v1/person-links",
 		bytes.NewReader(postData),
 	)
 

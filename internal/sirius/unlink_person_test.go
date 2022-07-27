@@ -2,10 +2,11 @@ package sirius
 
 import (
 	"fmt"
-	"github.com/pact-foundation/pact-go/dsl"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+
+	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestUnlinkPerson(t *testing.T) {
@@ -29,7 +30,7 @@ func TestUnlinkPerson(t *testing.T) {
 					UponReceiving("A request to unlink those cases").
 					WithRequest(dsl.Request{
 						Method: http.MethodPatch,
-						Path:   dsl.String("/api/v1/person-links/189"),
+						Path:   dsl.String("/lpa-api/v1/person-links/189"),
 						Body: map[string]interface{}{
 							"childIds": []int{105},
 						},
@@ -58,7 +59,7 @@ func TestUnlinkPerson(t *testing.T) {
 					UponReceiving("A request to unlink those cases without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPatch,
-						Path:   dsl.String("/api/v1/person-links/189"),
+						Path:   dsl.String("/lpa-api/v1/person-links/189"),
 						Body: map[string]interface{}{
 							"childIds": []int{105},
 						},
@@ -70,7 +71,7 @@ func TestUnlinkPerson(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/person-links/189", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/person-links/189", port),
 					Method: http.MethodPatch,
 				}
 			},

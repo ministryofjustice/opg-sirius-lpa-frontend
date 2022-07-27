@@ -28,7 +28,7 @@ func (c *Client) AllocateCases(ctx Context, assigneeID int, allocations []CaseAl
 		caseIDs += "+" + strconv.Itoa(allocation.ID)
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/api/v1/users/%d/cases/%s", assigneeID, caseIDs), bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/lpa-api/v1/users/%d/cases/%s", assigneeID, caseIDs), bytes.NewReader(data))
 	if err != nil {
 		return err
 	}

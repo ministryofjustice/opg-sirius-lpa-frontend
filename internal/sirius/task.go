@@ -16,7 +16,7 @@ func (t Task) Summary() string {
 
 func (c *Client) Task(ctx Context, id int) (Task, error) {
 	var v Task
-	err := c.get(ctx, fmt.Sprintf("/api/v1/tasks/%d", id), &v)
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/tasks/%d", id), &v)
 
 	return v, err
 }

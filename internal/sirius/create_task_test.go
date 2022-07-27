@@ -31,7 +31,7 @@ func TestCreateTask(t *testing.T) {
 					UponReceiving("A request to create a task").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/tasks"),
+						Path:   dsl.String("/lpa-api/v1/tasks"),
 						Body: map[string]interface{}{
 							"caseId":      dsl.Like(800),
 							"assigneeId":  dsl.Like(1),
@@ -66,7 +66,7 @@ func TestCreateTask(t *testing.T) {
 					UponReceiving("A request to create a task without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/api/v1/tasks"),
+						Path:   dsl.String("/lpa-api/v1/tasks"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,
@@ -75,7 +75,7 @@ func TestCreateTask(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/v1/tasks", port),
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/tasks", port),
 					Method: http.MethodPost,
 				}
 			},
