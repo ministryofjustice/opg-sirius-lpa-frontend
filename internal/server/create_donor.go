@@ -11,19 +11,21 @@ type CreateDonorClient interface {
 	CreateDonor(ctx sirius.Context, donor sirius.Person) (sirius.Person, error)
 }
 
-type createDonorData struct {
+type donorData struct {
 	XSRFToken string
 	Success   bool
 	Error     sirius.ValidationError
 	Donor     sirius.Person
+	IsNew     bool
 }
 
 func CreateDonor(client CreateDonorClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
-		data := createDonorData{
+		data := donorData{
 			XSRFToken: ctx.XSRFToken,
+			IsNew:     true,
 		}
 
 		if r.Method == http.MethodPost {

@@ -1,6 +1,6 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create Donor{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ if .IsNew }}Create Donor{{ else }}Edit Donor{{ end }}{{ end }}
 
 {{ define "main" }}
   <div class="govuk-grid-row">
@@ -9,28 +9,34 @@
       {{ template "error-summary" .Error }}
 
       {{ if .Success }}
-        <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
-          <div class="govuk-notification-banner__header">
-            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
-              Success
-            </h2>
+        {{ if .IsNew }}
+          <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+            <div class="govuk-notification-banner__header">
+              <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                Success
+              </h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+              <h3 class="govuk-notification-banner__heading">
+                Person {{ .Donor.UID }} was created
+              </h3>
+              <p class="govuk-body">
+                <a class="govuk-button" href="{{ sirius (printf "/lpa/person/%d" .Donor.ID) }}" target="_top">
+                  View donor
+                </a>
+                <a class="govuk-button govuk-button--secondary" data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">
+                  Back
+                </a>
+              </p>
+            </div>
           </div>
-          <div class="govuk-notification-banner__content">
-            <h3 class="govuk-notification-banner__heading">
-              Person {{ .Donor.UID }} was created
-            </h3>
-            <p class="govuk-body">
-              <a class="govuk-button" href="{{ sirius (printf "/lpa/person/%d" .Donor.ID) }}" target="_top">
-                View donor
-              </a>
-              <a class="govuk-button govuk-button--secondary" data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">
-                Back
-              </a>
-            </p>
-          </div>
-        </div>
+        {{ else }}
+          {{ template "success-banner" "Donor was edited" }}
+        {{ end }}
       {{ else }}
-        <h1 class="govuk-heading-l app-!-embedded-hide">Create Donor</h1>
+        <h1 class="govuk-heading-l app-!-embedded-hide">
+          {{ if .IsNew }}Create Donor{{ else }}Edit Donor{{ end }}
+        </h1>
 
         <form class="form" method="POST">
           <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
