@@ -33,6 +33,8 @@ describe("Create donor", () => {
 
     cy.get("button[type=submit]").click();
     cy.get(".govuk-notification-banner").should("exist");
-    cy.get(".govuk-notification-banner").contains("Person 7000-0290-0192 was created");
+    cy.get(".govuk-notification-banner").contains(
+      "Person 7000-0290-0192 was created"
+    );
   });
 });
