@@ -8,7 +8,8 @@
       {{ if .Download }}
         <a href="mi-reporting?reportType={{ .ReportType }}" class="govuk-back-link">Back</a>
 
-        <h1 class="govuk-heading-l app-!-embedded-hide">MI Reporting: {{ .ReportName }}</h1>
+        <h1 class="govuk-heading-l app-!-embedded-hide">MI Reporting</h1>
+        <h2 class="govuk-heading-m">{{ .ReportName }}</h2>
 
         <p class="govuk-heading-xl">{{ .ResultCount }}</p>
 
@@ -20,7 +21,8 @@
       {{ else if .ReportType }}
         <a href="mi-reporting" class="govuk-back-link">Back</a>
 
-        <h1 class="govuk-heading-l app-!-embedded-hide">MI Reporting: {{ .ReportName }}</h1>
+        <h1 class="govuk-heading-l app-!-embedded-hide">MI Reporting</h1>
+        <h2 class="govuk-heading-m">{{ .ReportName }}</h2>
 
         <form class="form" method="POST">
           <input type="hidden" name="reportType" value="{{ .ReportType }}" />
