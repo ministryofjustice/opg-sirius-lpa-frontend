@@ -41,10 +41,19 @@ func (s DateString) MarshalJSON() ([]byte, error) {
 		return []byte(`null`), nil
 	}
 
-	parts := strings.Split(string(s), "-")
-	if len(parts) != 3 {
-		return nil, errors.New("failed to marshal non-date")
+	date, err := s.ToSirius()
+	if err != nil {
+		return nil, err
 	}
 
-	return []byte(fmt.Sprintf(`"%s/%s/%s"`, parts[2], parts[1], parts[0])), nil
+	return []byte(`"` + date + `"`), nil
+}
+
+func (s DateString) ToSirius() (string, error) {
+	parts := strings.Split(string(s), "-")
+	if len(parts) != 3 {
+		return "", errors.New("failed to format non-date")
+	}
+
+	return fmt.Sprintf(`%s/%s/%s`, parts[2], parts[1], parts[0]), nil
 }

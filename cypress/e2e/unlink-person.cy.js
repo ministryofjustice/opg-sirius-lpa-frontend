@@ -12,6 +12,6 @@ describe("Unlink records", () => {
     cy.get(".moj-banner").should("not.exist");
     cy.get("#child-id-0").click();
     cy.get("button[type=submit]").click();
-    // cy.get(".moj-banner").should("exist");
+    cy.get(".moj-banner").should("exist");
   });
 });
