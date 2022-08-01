@@ -50,6 +50,7 @@ type Client interface {
 	EditDonorClient
 	EventClient
 	LinkPersonClient
+	MiReportingClient
 	RelationshipClient
 	SearchDonorsClient
 	SearchUsersClient
@@ -81,6 +82,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change_status.gohtml"))))
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate_cases.gohtml"))))
 	mux.Handle("/assign-task", wrap(AssignTask(client, templates.Get("assign_task.gohtml"))))
+	mux.Handle("/mi-reporting", wrap(MiReporting(client, templates.Get("mi_reporting.gohtml"))))
 	mux.Handle("/search-users", wrap(SearchUsers(client)))
 	mux.Handle("/search-persons", wrap(SearchDonors(client)))
 
