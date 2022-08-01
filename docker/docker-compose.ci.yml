@@ -41,3 +41,5 @@ services:
     depends_on:
       - app
       - pact-stub
+    volumes:
+      - ../cypress/screenshots:/root/cypress/screenshots
