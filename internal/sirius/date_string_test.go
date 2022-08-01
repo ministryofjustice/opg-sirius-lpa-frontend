@@ -20,6 +20,10 @@ func TestDateString(t *testing.T) {
 			assert.Nil(t, err)
 			assert.Equal(t, "2022-04-03", string(v))
 
+			s, err := v.ToSirius()
+			assert.Nil(t, err)
+			assert.Equal(t, "03/04/2022", s)
+
 			data, err := json.Marshal(v)
 			assert.Nil(t, err)
 			assert.Equal(t, `"03/04/2022"`, string(data))
@@ -35,6 +39,9 @@ func TestDateStringNull(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "", string(v))
 
+	_, err = v.ToSirius()
+	assert.NotNil(t, err)
+
 	data, err := json.Marshal(v)
 	assert.Nil(t, err)
 	assert.Equal(t, fromSirius, string(data))
@@ -48,6 +55,9 @@ func TestDateStringEmpty(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "", string(v))
 
+	_, err = v.ToSirius()
+	assert.NotNil(t, err)
+
 	data, err := json.Marshal(v)
 	assert.Nil(t, err)
 	assert.Equal(t, "null", string(data))
@@ -58,6 +68,9 @@ func TestDateStringErrors(t *testing.T) {
 
 	var v DateString
 	err := json.Unmarshal([]byte(fromSirius), &v)
+	assert.NotNil(t, err)
+
+	_, err = v.ToSirius()
 	assert.NotNil(t, err)
 
 	_, err = json.Marshal(DateString("2022-03"))

@@ -1,0 +1,86 @@
+{{ template "page" . }}
+
+{{ define "title" }}Mi Reporting{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ if .Download }}
+        <a href="mi-reporting?reportType={{ .ReportType }}" class="govuk-back-link">Back</a>
+
+        <h1 class="govuk-heading-l app-!-embedded-hide">Mi Reporting: {{ .ReportName }}</h1>
+
+        <p class="govuk-heading-xl">{{ .ResultCount }}</p>
+
+        <div class="govuk-button-group">
+          <a class="govuk-button" data-module="govuk-button" href="{{ sirius .Download }}">Download</a>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+
+      {{ else if .ReportType }}
+        <a href="mi-reporting" class="govuk-back-link">Back</a>
+
+        <h1 class="govuk-heading-l app-!-embedded-hide">Mi Reporting: {{ .ReportName }}</h1>
+
+        <form class="form" method="POST">
+          <input type="hidden" name="reportType" value="{{ .ReportType }}" />
+
+          {{ range .Controls }}
+            {{ if eq .Properties.Format "date" }}
+              <div class="govuk-form-group">
+                <label class="govuk-label" for="f-{{ .Name }}">{{ .Label }}</label>
+                <input class="govuk-input govuk-!-width-one-third" type="date" id="f-{{ .Name }}" name="{{ .Name }}" {{ if eq .Properties.FormatMaximum "today" }}max="{{ today }}"{{ end }} />
+              </div>
+            {{ end }}
+
+            {{ if eq .Properties.Description "checkbox" }}
+              <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                  <legend class="govuk-fieldset__legend">{{ .Label }}</legend>
+                  <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                    {{ $name := .Name }}
+                    {{ range $i, $e := .Properties.Enum }}
+                      <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" id="{{ $name }}-{{ $i }}" name="{{ $name }}" type="checkbox" value="{{ $e.Name }}">
+                        <label class="govuk-label govuk-checkboxes__label" for="{{ $name }}-{{ $i }}">
+                          {{ $e.Description }}
+                        </label>
+                      </div>
+                    {{ end }}
+                  </div>
+                </fieldset>
+              </div>
+            {{ end }}
+
+          {{ end }}
+
+          <div class="govuk-button-group">
+            <button class="govuk-button" data-module="govuk-button" type="submit">Generate</button>
+            <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+          </div>
+        </form>
+      {{ else }}
+        <h1 class="govuk-heading-l app-!-embedded-hide">Mi Reporting</h1>
+
+        <form class="form" method="GET">
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="reportType">
+              Report type
+            </label>
+            <select class="govuk-select" id="reportType" name="reportType">
+              <option value="" selected></option>
+              {{ range .ReportTypes }}
+                <option value="{{ .Name }}">{{ .Description }}</option>
+              {{ end }}
+            </select>
+          </div>
+
+          <div class="govuk-button-group">
+            <button class="govuk-button" data-module="govuk-button" type="submit">Select</button>
+            <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+          </div>
+        </form>
+      {{ end }}
+    </div>
+  </div>
+{{ end }}
