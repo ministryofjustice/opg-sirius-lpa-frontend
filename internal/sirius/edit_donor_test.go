@@ -76,6 +76,7 @@ func TestEditDonor(t *testing.T) {
 							"email":                 "docniesborella@mail.test",
 							"correspondenceByPost":  true,
 							"correspondenceByEmail": true,
+							"correspondenceByPhone": false,
 							"correspondenceByWelsh": true,
 							"researchOptOut":        true,
 						},
@@ -113,6 +114,12 @@ func TestEditDonor(t *testing.T) {
 						Body: map[string]interface{}{
 							"firstname": "Will",
 							"surname":   "Niesborella",
+							"isAirmailRequired":     false,
+							"correspondenceByPost":  false,
+							"correspondenceByEmail": false,
+							"correspondenceByPhone": false,
+							"correspondenceByWelsh": false,
+							"researchOptOut":        false,
 						},
 					}).
 					WillRespondWith(dsl.Response{
