@@ -75,8 +75,10 @@ func TestCreateDonor(t *testing.T) {
 							"isAirmailRequired":     true,
 							"phoneNumber":           "072345678",
 							"email":                 "m.vancolkenburg@ca.test",
+							"correspondenceByPost":  false,
 							"correspondenceByEmail": true,
 							"correspondenceByPhone": true,
+							"correspondenceByWelsh": false,
 							"researchOptOut":        true,
 						},
 						Headers: dsl.MapMatcher{
@@ -119,9 +121,14 @@ func TestCreateDonor(t *testing.T) {
 						Method: http.MethodPost,
 						Path:   dsl.String("/lpa-api/v1/donors"),
 						Body: map[string]interface{}{
-							"firstname": "Guillermo",
-							"surname":   "Prothero",
-						},
+							"firstname":             "Guillermo",
+							"surname":               "Prothero",
+							"isAirmailRequired":     false,
+							"correspondenceByPost":  false,
+							"correspondenceByEmail": false,
+							"correspondenceByPhone": false,
+							"correspondenceByWelsh": false,
+							"researchOptOut":        false},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusUnauthorized,

@@ -19,15 +19,15 @@ type Person struct {
 	County                string     `json:"county,omitempty"`
 	Postcode              string     `json:"postcode,omitempty"`
 	Country               string     `json:"country,omitempty"`
-	IsAirmailRequired     bool       `json:"isAirmailRequired,omitempty"`
+	IsAirmailRequired     bool       `json:"isAirmailRequired"`
 	PhoneNumber           string     `json:"phoneNumber,omitempty"`
 	Email                 string     `json:"email,omitempty"`
 	SageId                string     `json:"sageId,omitempty"`
-	CorrespondenceByPost  bool       `json:"correspondenceByPost,omitempty"`
-	CorrespondenceByEmail bool       `json:"correspondenceByEmail,omitempty"`
-	CorrespondenceByPhone bool       `json:"correspondenceByPhone,omitempty"`
-	CorrespondenceByWelsh bool       `json:"correspondenceByWelsh,omitempty"`
-	ResearchOptOut        bool       `json:"researchOptOut,omitempty"`
+	CorrespondenceByPost  bool       `json:"correspondenceByPost"`
+	CorrespondenceByEmail bool       `json:"correspondenceByEmail"`
+	CorrespondenceByPhone bool       `json:"correspondenceByPhone"`
+	CorrespondenceByWelsh bool       `json:"correspondenceByWelsh"`
+	ResearchOptOut        bool       `json:"researchOptOut"`
 	Children              []Person   `json:"children,omitempty"`
 }
 
