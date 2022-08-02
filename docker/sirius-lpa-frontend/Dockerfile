@@ -11,7 +11,7 @@ RUN yarn
 COPY web/assets web/assets
 RUN yarn build
 
-FROM golang:1.18.4 as build-env
+FROM golang:1.18.5 as build-env
 
 WORKDIR /app
 
