@@ -11,10 +11,10 @@ describe("MI Reporting", () => {
     cy.get("#reportType").select("Number of EPAs received");
     cy.contains("button", "Select").click();
 
-    cy.contains("MI Reporting: Number of EPAs received");
+    cy.contains("Number of EPAs received");
     cy.contains("button", "Generate").click();
 
-    cy.contains("MI Reporting: Number of EPAs received");
+    cy.contains("Number of EPAs received");
     cy.contains("10");
   });
 });
