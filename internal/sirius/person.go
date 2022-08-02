@@ -5,24 +5,24 @@ import "fmt"
 type Person struct {
 	ID                    int        `json:"id,omitempty"`
 	UID                   string     `json:"uId,omitempty"`
-	Salutation            string     `json:"salutation,omitempty"`
+	Salutation            string     `json:"salutation"`
 	Firstname             string     `json:"firstname"`
-	Middlenames           string     `json:"middlenames,omitempty"`
+	Middlenames           string     `json:"middlenames"`
 	Surname               string     `json:"surname"`
-	DateOfBirth           DateString `json:"dob,omitempty"`
-	PreviouslyKnownAs     string     `json:"previousNames,omitempty"`
-	AlsoKnownAs           string     `json:"otherNames,omitempty"`
-	AddressLine1          string     `json:"addressLine1,omitempty"`
-	AddressLine2          string     `json:"addressLine2,omitempty"`
-	AddressLine3          string     `json:"addressLine3,omitempty"`
-	Town                  string     `json:"town,omitempty"`
-	County                string     `json:"county,omitempty"`
-	Postcode              string     `json:"postcode,omitempty"`
-	Country               string     `json:"country,omitempty"`
+	DateOfBirth           DateString `json:"dob"`
+	PreviouslyKnownAs     string     `json:"previousNames"`
+	AlsoKnownAs           string     `json:"otherNames"`
+	AddressLine1          string     `json:"addressLine1"`
+	AddressLine2          string     `json:"addressLine2"`
+	AddressLine3          string     `json:"addressLine3"`
+	Town                  string     `json:"town"`
+	County                string     `json:"county"`
+	Postcode              string     `json:"postcode"`
+	Country               string     `json:"country"`
 	IsAirmailRequired     bool       `json:"isAirmailRequired"`
-	PhoneNumber           string     `json:"phoneNumber,omitempty"`
-	Email                 string     `json:"email,omitempty"`
-	SageId                string     `json:"sageId,omitempty"`
+	PhoneNumber           string     `json:"phoneNumber"`
+	Email                 string     `json:"email"`
+	SageId                string     `json:"sageId"`
 	CorrespondenceByPost  bool       `json:"correspondenceByPost"`
 	CorrespondenceByEmail bool       `json:"correspondenceByEmail"`
 	CorrespondenceByPhone bool       `json:"correspondenceByPhone"`
