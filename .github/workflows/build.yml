@@ -196,6 +196,13 @@ jobs:
         run: |
           make cypress
 
+      - name: Upload Screenshots
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: Test Screenshots
+          path: ./cypress/screenshots
+
   push:
     name: Push Images
     runs-on: ubuntu-latest
