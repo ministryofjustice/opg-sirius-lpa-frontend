@@ -105,7 +105,9 @@ func MiReporting(client MiReportingClient, tmpl template.Template) Handler {
 
 			for _, key := range []string{"applicationType", "paymentSource", "source", "status", "state"} {
 				if form.Has(key) {
-					form.Set(key+"[]", form.Get(key))
+					for _, value := range form[key] {
+						form.Add(key+"[]", value)
+					}
 					form.Del(key)
 				}
 			}

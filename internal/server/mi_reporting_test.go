@@ -181,7 +181,7 @@ func TestPostMiReporting(t *testing.T) {
 	client.
 		On("MiReport", mock.Anything, url.Values{
 			"reportType":        {"lpaReport"},
-			"applicationType[]": {"HW"},
+			"applicationType[]": {"HW", "PFA"},
 			"startDate":         {"02/01/2020"},
 		}).
 		Return(&sirius.MiReportResponse{
@@ -196,13 +196,13 @@ func TestPostMiReporting(t *testing.T) {
 			ResultCount: 10,
 			ReportType:  "lpaReport",
 			ReportName:  "LPA Report",
-			Download:    "/api/reporting/export?OPG-Bypass-Membrane=1&applicationType%5B%5D=HW&reportType=lpaReport&startDate=02%2F01%2F2020",
+			Download:    "/api/reporting/export?OPG-Bypass-Membrane=1&applicationType%5B%5D=HW&applicationType%5B%5D=PFA&reportType=lpaReport&startDate=02%2F01%2F2020",
 		}).
 		Return(nil)
 
 	form := url.Values{
 		"reportType":      {"lpaReport"},
-		"applicationType": {"HW"},
+		"applicationType": {"HW", "PFA"},
 		"startDate":       {"2020-01-02"},
 	}
 
