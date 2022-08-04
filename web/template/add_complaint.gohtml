@@ -1,8 +1,52 @@
-{{ template "page" . }}
+{{ define "page" }}<!DOCTYPE html>
+<html lang="en" class="govuk-template ">
+  <head>
+    <meta charset="utf-8">
+    <title>
+  {{ if .Error.Any }}Error: {{ end }}Add Complaint
+</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0c0c"> 
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add Complaint{{ end }}
+    
+      <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="/assets/images/favicon.ico" type="image/x-icon">
+      <link rel="mask-icon" href="/assets/images/govuk-mask-icon.svg" color="#0b0c0c"> 
+      <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/govuk-apple-touch-icon-180x180.png">
+      <link rel="apple-touch-icon" sizes="167x167" href="/assets/images/govuk-apple-touch-icon-167x167.png">
+      <link rel="apple-touch-icon" sizes="152x152" href="/assets/images/govuk-apple-touch-icon-152x152.png">
+      <link rel="apple-touch-icon" href="/assets/images/govuk-apple-touch-icon.png">
+    
 
-{{ define "main" }}
+    
+  <!--[if !IE 8]><!-->
+    <link href="{{ prefixAsset "/stylesheets/all.css" }}" rel="stylesheet">
+  <!--<![endif]-->
+
+    
+    
+    <meta property="og:image" content="/assets/images/govuk-opengraph-image.png">
+  </head>
+  <body class="govuk-template__body ">
+    <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+    
+
+    
+      <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
+
+    
+
+    
+  <script src="{{ prefixAsset "/javascript/load-classes.js" }}"></script>
+  {{ template "header" . }}
+
+
+    
+      <div class="govuk-width-container ">
+        
+        <main class="govuk-main-wrapper " id="main-content" role="main">
+          
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
@@ -18,37 +62,95 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        <div class="govuk-form-group {{ if .Error.Field.severity }}govuk-form-group--error{{ end }}">
-          <fieldset class="govuk-fieldset">
-            <legend class="govuk-fieldset__legend">
-              <h1 class="govuk-fieldset__heading">
-                Severity
-              </h1>
-            </legend>
-            {{ template "errors" .Error.Field.severity }}
-            <div class="govuk-radios" data-module="govuk-radios">
-              <div class="govuk-radios__item">
-                <input class="govuk-radios__input" id="f-severity" name="severity" type="radio" value="Minor" {{ if eq "Minor" .Complaint.Severity }}checked{{ end }}>
-                <label class="govuk-label govuk-radios__label" for="f-severity">
-                  Minor
-                </label>
-              </div>
-              <div class="govuk-radios__item">
-                <input class="govuk-radios__input" id="f-severity-2" name="severity" type="radio" value="Major" {{ if eq "Major" .Complaint.Severity }}checked{{ end }}>
-                <label class="govuk-label govuk-radios__label" for="f-severity-2">
-                  Major
-                </label>
-              </div>
-              <div class="govuk-radios__item">
-                <input class="govuk-radios__input" id="f-severity-3" name="severity" type="radio" value="Security Breach" {{ if eq "Security Breach" .Complaint.Severity }}checked{{ end }}>
-                <label class="govuk-label govuk-radios__label" for="f-severity-3">
-                  Security Breach
-                </label>
-              </div>
-            </div>
-          </fieldset>
-        </div>
+        
 
+<div class="govuk-form-group {{ if .Error.Field.severity }}govuk-form-group--error{{ end }}">
+
+  <fieldset class="govuk-fieldset" aria-describedby="f-severity-error">
+  
+  <legend class="govuk-fieldset__legend">
+  
+    Severity
+  
+  </legend>
+  
+
+  {{ template "errors" .Error.Field.severity }}
+
+  <div class="govuk-radios"
+    data-module="govuk-radios">
+    
+      
+          
+        
+        
+        
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="f-severity" name="severity" type="radio" value="Minor">
+          <label class="govuk-label govuk-radios__label" for="f-severity">
+        Minor
+      </label>
+          
+        </div>
+        
+        
+      
+    
+      
+        
+        
+        
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="f-severity-2" name="severity" type="radio" value="Major">
+          <label class="govuk-label govuk-radios__label" for="f-severity-2">
+        Major
+      </label>
+          
+        </div>
+        
+        
+      
+    
+      
+        
+        
+        
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="f-severity-3" name="severity" type="radio" value="Security Breach">
+          <label class="govuk-label govuk-radios__label" for="f-severity-3">
+        Security Breach
+      </label>
+          
+        </div>
+        
+        
+      
+    
+  </div>
+  
+
+</fieldset>
+
+
+</div>
+
+
+        
+
+<div class="govuk-form-group {{ if .Error.Field.summary }}govuk-form-group--error{{ end }}">
+  <label class="govuk-label" for="summary">
+    Title
+  </label>
+
+
+  
+  
+  {{ template "errors" .Error.Field.summary }}
+<input class="govuk-input govuk-input--error" id="summary" name="summary" type="text" value="{{ .Complaint.Summary }}" aria-describedby="summary-error">
+
+</div>
+
+        
         {{ template "input" (field "summary" "Title" .Complaint.Summary .Error.Field.summary) }}
 
         {{ template "textarea" (field "description" "Description" .Complaint.Description .Error.Field.description) }}
@@ -92,4 +194,18 @@
       </form>
     </div>
   </div>
+
+        </main>
+      </div>
+    
+
+    
+  <footer class="govuk-footer app-!-embedded-hide" role="contentinfo"></footer>
+
+
+    
+  <script src="{{ prefixAsset "/javascript/main.js" }}"></script>
+
+  </body>
+</html>
 {{ end }}
