@@ -1,0 +1,128 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+{% extends "govuk/template.njk" %}
+
+{% block pageTitle %}
+  {! if .Error.Any !}Error: {! end !}Add Complaint
+{% endblock %}
+
+{% block head %}
+  <!--[if !IE 8]><!-->
+    <link href="{! prefixAsset "/stylesheets/all.css" !}" rel="stylesheet">
+  <!--<![endif]-->
+{% endblock %}
+
+{% block header %}
+  <script src="{! prefixAsset "/javascript/load-classes.js" !}"></script>
+  {! template "header" . !}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body"><strong>{! .Entity !}</strong></p>
+
+      {! template "error-summary" .Error !}
+
+      {! if .Success !}
+        {! template "success-banner" "You have successfully added a complaint." !}
+      {! end !}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">Add Complaint</h1>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{! .XSRFToken !}"/>
+
+        {{ govukRadios({
+          idPrefix: "f-severity",
+          name: "severity",
+          fieldset: {
+            legend: {
+              text: "Severity"
+            }
+          },
+          items: [
+            {
+              value: "Minor",
+              text: "Minor"
+            },
+            {
+              value: "Major",
+              text: "Major"
+            },
+            {
+              value: "Security Breach",
+              text: "Security Breach"
+            }
+          ],
+          errorMessage: {
+            html: ".Error.Field.severity"
+          }
+        }) }}
+
+        {{ govukInput({
+          label: {
+            text: "Title"
+          },
+          id: "summary",
+          name: "summary",
+          value: "{! .Complaint.Summary !}",
+          errorMessage: {
+            html: ".Error.Field.summary"
+          }
+        }) }}
+        
+        {! template "input" (field "summary" "Title" .Complaint.Summary .Error.Field.summary) !}
+
+        {! template "textarea" (field "description" "Description" .Complaint.Description .Error.Field.description) !}
+
+        {! template "input-date" (field "receivedDate" "Received date" .Complaint.ReceivedDate .Error.Field.receivedDate "max" today) !}
+
+        <div class="govuk-form-group {! if .Error.Field.category !}govuk-form-group--error{! end !}">
+          <label class="govuk-label" for="f-category">
+            Complaint category
+          </label>
+          {! template "errors" .Error.Field.category !}
+
+          <div class="govuk-radios" data-module="govuk-radios">
+            {! range $k, $v := .Categories !}
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="f-category-{! $k !}" name="category" type="radio" value="{! $k !}" data-aria-controls="conditional-category-{! $k !}" {! if eq $k $.Complaint.Category !}checked{! end !}>
+                <label class="govuk-label govuk-radios__label" for="f-category-{! $k !}">
+                  {! $v.Label !}
+                </label>
+              </div>
+              <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-category-{! $k !}">
+                <div class="govuk-!-width-one-half govuk-form-group {! if $.Error.Field.subCategory !}govuk-form-group--error{! end !}">
+                  <label class="govuk-label" for="f-subCategory-{! $k !}">Subcategory</label>
+                  {! template "errors" $.Error.Field.subCategory !}
+                  <select class="govuk-select {! if $.Error.Field.subCategory !}govuk-select--error{! end !}" id="f-subCategory-{! $k !}" name="subCategory">
+                    <option hidden {! if eq "" $.Complaint.SubCategory !}selected{! end !} disabled></option>
+                    {! range $id, $label := $v.Children !}
+                      <option value="{! $id !}" {! if eq $id $.Complaint.SubCategory !}selected{! end !} >{! $label !}</option>
+                    {! end !}
+                  </select>
+                </div>
+              </div>
+            {! end !}
+          </div>
+        </div>
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer %}
+  <footer class="govuk-footer app-!-embedded-hide" role="contentinfo"></footer>
+{% endblock %}
+
+{% block bodyEnd %}
+  <script src="{! prefixAsset "/javascript/main.js" !}"></script>
+{% endblock %}
