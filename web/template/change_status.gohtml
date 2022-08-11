@@ -23,7 +23,7 @@
             Status
           </label>
           {{ template "errors" .Error.Field.status }}
-          <select class="govuk-select {{ if .Error.Field.status }}govuk-select--error{{ end }}" id="f-status" name="status">
+          <select class="govuk-select {{ if .Error.Field.status }}govuk-select--error{{ end }}" id="f-status" name="status" required>
             <option hidden selected disabled></option>
             {{ range .AvailableStatuses }}
               <option value="{{ . }}" {{ if eq $.NewStatus . }}selected{{ end }}>{{ . }}</option>
