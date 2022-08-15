@@ -55,7 +55,7 @@ func TestGetPayments(t *testing.T) {
 		On("Func", mock.Anything, getPaymentsData{
 			Payments:  payments,
 			Case:      caseItem,
-			TotalPaid: 5538,
+			TotalPaid: "55.38",
 		}).
 		Return(nil)
 
@@ -162,7 +162,7 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, getPaymentsData{
 			Payments:  payments,
 			Case:      caseItem,
-			TotalPaid: 4100,
+			TotalPaid: "41.00",
 		}).
 		Return(expectedError)
 
