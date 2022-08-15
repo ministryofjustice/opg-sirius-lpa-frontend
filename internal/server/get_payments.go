@@ -39,6 +39,7 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		if err != nil {
 			return err
 		}
+
 		data.Payments = payments
 
 		total := 0
