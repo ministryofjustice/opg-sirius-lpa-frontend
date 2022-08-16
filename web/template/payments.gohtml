@@ -12,7 +12,7 @@
                 <details class="govuk-details" data-module="govuk-details" open>
                     <summary class="govuk-details__summary">
                 <span class="govuk-details__summary-text">
-                  Payment {{ $i }}
+                  Payment {{ plus1 $i }}
                 </span>
                     </summary>
                     <div class="govuk-details__text">
@@ -21,7 +21,7 @@
                         <p class="govuk-body">Method: {{ .Source.Name }}</p>
                     </div>
                 </details>
-            {{ end}}
+            {{ end }}
 
             <a class="govuk-button govuk-button--secondary" href="{{ (printf "/add-payment?id=%d" .Case.ID) }}">
                 Add a payment

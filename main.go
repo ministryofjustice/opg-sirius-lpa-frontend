@@ -66,6 +66,9 @@ func main() {
 
 			return field
 		},
+		"plus1": func(index int) int {
+			return index + 1
+		},
 	})
 	if err != nil {
 		logger.Fatal(err)
