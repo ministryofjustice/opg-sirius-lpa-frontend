@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"testing"
 )
 
@@ -30,13 +29,13 @@ func TestGetPayments(t *testing.T) {
 		{
 			ID:     2,
 			CaseID: 4,
-			Amount: sirius.FeeString(strconv.Itoa(4100)),
+			Amount: "41.00",
 			Locked: false,
 		},
 		{
 			ID:     3,
 			CaseID: 4,
-			Amount: sirius.FeeString(strconv.Itoa(1438)),
+			Amount: "14.38",
 			Locked: false,
 		},
 	}
@@ -119,9 +118,12 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 				Name:  "Phone",
 				Value: "PHONE",
 			},
-			Amount:      sirius.FeeString(strconv.Itoa(4100)),
+			Amount:      "41.00",
 			PaymentDate: sirius.DateString("2022-08-23T14:55:20+00:00"),
-			Type:        "Card",
+			Type: sirius.TypeOfPayment{
+				Name:  "Card",
+				Value: "CARD",
+			},
 			CreatedDate: sirius.DateString("2022-08-24T14:55:20+00:00"),
 			Locked:      false,
 		},

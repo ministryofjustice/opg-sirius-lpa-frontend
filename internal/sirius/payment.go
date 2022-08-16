@@ -8,13 +8,18 @@ type Payment struct {
 	Source      PaymentSource `json:"source"`
 	Amount      FeeString     `json:"amount"`
 	PaymentDate DateString    `json:"paymentdate"`
-	Type        string        `json:"type"`
+	Type        TypeOfPayment `json:"type"`
 	CreatedDate DateString    `json:"createddate"`
 	Locked      bool          `json:"locked,omitempty"`
 	CreatedByID int           `json:"createdby_id"`
 }
 
 type PaymentSource struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+type TypeOfPayment struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
 }

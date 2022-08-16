@@ -5,7 +5,6 @@ import (
 	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/stretchr/testify/assert"
 	"net/http"
-	"strconv"
 	"testing"
 )
 
@@ -40,22 +39,23 @@ func TestPayment(t *testing.T) {
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"results": dsl.EachLike(map[string]interface{}{
-								"id":      dsl.Like(2),
-								"case_id": dsl.Like(9),
-								"source": dsl.Like(map[string]interface{}{
-									"name":  "Phone",
-									"value": "PHONE",
-								}),
-								"amount":       dsl.String("8200"),
-								"paymentdate":  dsl.String("2022-03-24T15:04:05+00:00"),
-								"type":         dsl.String("Card"),
-								"createddate":  dsl.String("2022-03-23T15:04:05+00:00"),
-								"locked":       dsl.Like(false),
-								"createdby_id": dsl.Like(123),
-							}, 1),
-						}),
+						Body: dsl.EachLike(map[string]interface{}{
+							"id":      dsl.Like(2),
+							"case_id": dsl.Like(9),
+							"source": dsl.Like(map[string]interface{}{
+								"name":  "Phone",
+								"value": "PHONE",
+							}),
+							"amount":      dsl.Like(4100),
+							"paymentdate": dsl.String("2022-08-23T00:00:00+00:00"),
+							"type": dsl.Like(map[string]interface{}{
+								"name":  "Card",
+								"value": "CARD",
+							}),
+							"createddate":  dsl.String("2022-08-24T00:00:00+00:00"),
+							"locked":       dsl.Like(false),
+							"createdby_id": dsl.Like(123),
+						}, 1),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
@@ -71,11 +71,15 @@ func TestPayment(t *testing.T) {
 						Name:  "Phone",
 						Value: "PHONE",
 					},
-					Amount:      FeeString(strconv.Itoa(4100)),
-					PaymentDate: DateString("2022-08-23T14:55:20+00:00"),
-					Type:        "Card",
-					CreatedDate: DateString("2022-08-24T14:55:20+00:00"),
+					Amount:      FeeString("41.00"),
+					PaymentDate: DateString("2022-08-23"),
+					Type: TypeOfPayment{
+						Name:  "Card",
+						Value: "CARD",
+					},
+					CreatedDate: DateString("2022-08-24"),
 					Locked:      false,
+					CreatedByID: 123,
 				},
 			},
 		},
@@ -111,9 +115,9 @@ func TestPayment(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				task, err := client.Payments(getContext(tc.cookies), 9)
+				payments, err := client.Payments(getContext(tc.cookies), 9)
 
-				assert.Equal(t, tc.expectedResponse, task)
+				assert.Equal(t, tc.expectedResponse, payments)
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
