@@ -14,19 +14,44 @@ func TestFeeString(t *testing.T) {
 		"0":    "0.00",
 	}
 
-	for pence, decimal := range testcases {
+	for pence, pounds := range testcases {
 		t.Run(pence, func(t *testing.T) {
 			var v FeeString
 			err := json.Unmarshal([]byte(pence), &v)
 			assert.Nil(t, err)
-			assert.Equal(t, decimal, string(v))
+			assert.Equal(t, pounds, string(v))
+
+			s, err := v.ToPence()
+			assert.Nil(t, err)
+			assert.Equal(t, pence, s)
+
+			data, err := json.Marshal(v)
+
+			assert.Equal(t, `"`+pence+`"`, string(data))
+			assert.Nil(t, err)
 		})
 	}
 }
 
 func TestFeeStringEmpty(t *testing.T) {
-	var f FeeString
-	err := json.Unmarshal([]byte(`""`), &f)
+	var v FeeString
+	err := json.Unmarshal([]byte(`""`), &v)
 	assert.Nil(t, err)
-	assert.Equal(t, "", string(f))
+	assert.Equal(t, "", string(v))
+}
+
+func TestFeeStringNull(t *testing.T) {
+	var v FeeString
+	err := json.Unmarshal([]byte(`null`), &v)
+	assert.Nil(t, err)
+	assert.Equal(t, "", string(v))
+}
+
+func TestFeeStringErrors(t *testing.T) {
+	var v FeeString
+	err := json.Unmarshal([]byte(`"hello"`), &v)
+	assert.NotNil(t, err)
+
+	_, err = json.Marshal(FeeString("hello"))
+	assert.NotNil(t, err)
 }
