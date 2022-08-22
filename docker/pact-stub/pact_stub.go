@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -21,7 +22,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := http.ListenAndServe(":"+port, &Server{interactions: interactions}); err != nil {
+	server := &http.Server{
+		Addr:              ":" + port,
+		Handler:           &Server{interactions: interactions},
+		ReadHeaderTimeout: 10 * time.Second,
+	}
+
+	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
 }
