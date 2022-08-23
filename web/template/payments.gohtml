@@ -6,7 +6,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <p class="govuk-body"><strong>{{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "lpa" }}LPA{{ end }} {{ .Case.UID }}</strong></p>
-            <p class="govuk-body"><strong>Total paid: £{{ .TotalPaid }}</strong></p>
+            <p class="govuk-body"><strong>Total paid: £{{ fee .TotalPaid }}</strong></p>
 
             {{ range $i, $p := .Payments }}
                 <details class="govuk-details" data-module="govuk-details" open>
@@ -16,9 +16,32 @@
                 </span>
                     </summary>
                     <div class="govuk-details__text">
-                        <p class="govuk-body">Amount: £{{ .Amount }}</p>
-                        <p class="govuk-body">Date: {{ .PaymentDate }}</p>
-                        <p class="govuk-body">Method: {{ .Source.Name }}</p>
+                        <dl class="govuk-summary-list govuk-summary-list--no-border">
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    Amount:
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                    £{{ fee .Amount }}
+                                </dd>
+                            </div>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    Date:
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                    {{ .PaymentDate }}
+                                </dd>
+                            </div>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">
+                                    Method:
+                                </dt>
+                                <dd class="govuk-summary-list__value">
+                                    {{ .Source.Name }}
+                                </dd>
+                            </div>
+                        </dl>
                     </div>
                 </details>
             {{ end }}

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
@@ -20,7 +19,7 @@ type getPaymentsData struct {
 
 	Case      sirius.Case
 	Payments  []sirius.Payment
-	TotalPaid string
+	TotalPaid int
 }
 
 func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
@@ -44,15 +43,11 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		}
 		data.Payments = payments
 
-		total := 0.00
+		total := 0
 		for _, p := range payments {
-			amount, err := strconv.ParseFloat(string(p.Amount), 64)
-			if err != nil {
-				return err
-			}
-			total = total + amount
+			total = total + p.Amount
 		}
-		data.TotalPaid = fmt.Sprintf("%.2f", total)
+		data.TotalPaid = total
 
 		return tmpl(w, data)
 	}

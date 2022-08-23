@@ -28,15 +28,11 @@ func TestGetPayments(t *testing.T) {
 	payments := []sirius.Payment{
 		{
 			ID:     2,
-			CaseID: 4,
-			Amount: "41.00",
-			Locked: false,
+			Amount: 4100,
 		},
 		{
 			ID:     3,
-			CaseID: 4,
-			Amount: "14.38",
-			Locked: false,
+			Amount: 1438,
 		},
 	}
 
@@ -59,7 +55,7 @@ func TestGetPayments(t *testing.T) {
 		On("Func", mock.Anything, getPaymentsData{
 			Payments:  payments,
 			Case:      caseItem,
-			TotalPaid: "55.38",
+			TotalPaid: 5538,
 		}).
 		Return(nil)
 
@@ -112,20 +108,13 @@ func TestGetPaymentsWhenFailure(t *testing.T) {
 func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 	payments := []sirius.Payment{
 		{
-			ID:     2,
-			CaseID: 4,
+			ID: 2,
 			Source: sirius.PaymentSource{
 				Name:  "Phone",
 				Value: "PHONE",
 			},
-			Amount:      "41.00",
+			Amount:      4100,
 			PaymentDate: sirius.DateString("2022-08-23T14:55:20+00:00"),
-			Type: sirius.TypeOfPayment{
-				Name:  "Card",
-				Value: "CARD",
-			},
-			CreatedDate: sirius.DateString("2022-08-24T14:55:20+00:00"),
-			Locked:      false,
 		},
 	}
 
@@ -150,7 +139,7 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, getPaymentsData{
 			Payments:  payments,
 			Case:      caseItem,
-			TotalPaid: "41.00",
+			TotalPaid: 4100,
 		}).
 		Return(expectedError)
 

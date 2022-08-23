@@ -4,22 +4,12 @@ import "fmt"
 
 type Payment struct {
 	ID          int           `json:"id,omitempty"`
-	CaseID      int           `json:"case_id,omitempty"`
 	Source      PaymentSource `json:"source"`
-	Amount      FeeString     `json:"amount"`
-	PaymentDate DateString    `json:"paymentdate"`
-	Type        TypeOfPayment `json:"type"`
-	CreatedDate DateString    `json:"createddate"`
-	Locked      bool          `json:"locked,omitempty"`
-	CreatedByID int           `json:"createdby_id"`
+	Amount      int           `json:"amount"`
+	PaymentDate DateString    `json:"paymentDate"`
 }
 
 type PaymentSource struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
-}
-
-type TypeOfPayment struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
 }

@@ -40,21 +40,13 @@ func TestPayment(t *testing.T) {
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
 						Body: dsl.EachLike(map[string]interface{}{
-							"id":      dsl.Like(2),
-							"case_id": dsl.Like(9),
+							"id": dsl.Like(2),
 							"source": dsl.Like(map[string]interface{}{
 								"name":  "Phone",
 								"value": "PHONE",
 							}),
 							"amount":      dsl.Like(4100),
-							"paymentdate": dsl.String("2022-08-23T00:00:00+00:00"),
-							"type": dsl.Like(map[string]interface{}{
-								"name":  "Card",
-								"value": "CARD",
-							}),
-							"createddate":  dsl.String("2022-08-24T00:00:00+00:00"),
-							"locked":       dsl.Like(false),
-							"createdby_id": dsl.Like(123),
+							"paymentDate": dsl.String("2022-08-23T00:00:00+00:00"),
 						}, 1),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
@@ -65,21 +57,13 @@ func TestPayment(t *testing.T) {
 			},
 			expectedResponse: []Payment{
 				{
-					ID:     2,
-					CaseID: 9,
+					ID: 2,
 					Source: PaymentSource{
 						Name:  "Phone",
 						Value: "PHONE",
 					},
-					Amount:      FeeString("41.00"),
+					Amount:      4100,
 					PaymentDate: DateString("2022-08-23"),
-					Type: TypeOfPayment{
-						Name:  "Card",
-						Value: "CARD",
-					},
-					CreatedDate: DateString("2022-08-24"),
-					Locked:      false,
-					CreatedByID: 123,
 				},
 			},
 		},
