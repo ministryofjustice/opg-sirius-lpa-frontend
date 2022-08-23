@@ -108,11 +108,8 @@ func TestGetPaymentsWhenFailure(t *testing.T) {
 func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 	payments := []sirius.Payment{
 		{
-			ID: 2,
-			Source: sirius.PaymentSource{
-				Name:  "Phone",
-				Value: "PHONE",
-			},
+			ID:          2,
+			Source:      "PHONE",
 			Amount:      4100,
 			PaymentDate: sirius.DateString("2022-08-23T14:55:20+00:00"),
 		},

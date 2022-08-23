@@ -3,15 +3,10 @@ package sirius
 import "fmt"
 
 type Payment struct {
-	ID          int           `json:"id,omitempty"`
-	Source      PaymentSource `json:"source"`
-	Amount      int           `json:"amount"`
-	PaymentDate DateString    `json:"paymentDate"`
-}
-
-type PaymentSource struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
+	ID          int        `json:"id,omitempty"`
+	Source      string     `json:"source"`
+	Amount      int        `json:"amount"`
+	PaymentDate DateString `json:"paymentDate"`
 }
 
 func (c *Client) Payments(ctx Context, id int) ([]Payment, error) {

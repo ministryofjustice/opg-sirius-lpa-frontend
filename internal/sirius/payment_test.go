@@ -40,13 +40,10 @@ func TestPayment(t *testing.T) {
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
 						Body: dsl.EachLike(map[string]interface{}{
-							"id": dsl.Like(2),
-							"source": dsl.Like(map[string]interface{}{
-								"name":  "Phone",
-								"value": "PHONE",
-							}),
+							"id":          dsl.Like(2),
+							"source":      dsl.Like("MAKE"),
 							"amount":      dsl.Like(4100),
-							"paymentDate": dsl.String("2022-08-23T00:00:00+00:00"),
+							"paymentDate": dsl.String("23/01/2022"),
 						}, 1),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
@@ -57,13 +54,10 @@ func TestPayment(t *testing.T) {
 			},
 			expectedResponse: []Payment{
 				{
-					ID: 2,
-					Source: PaymentSource{
-						Name:  "Phone",
-						Value: "PHONE",
-					},
+					ID:          2,
+					Source:      "MAKE",
 					Amount:      4100,
-					PaymentDate: DateString("2022-08-23"),
+					PaymentDate: DateString("2022-01-23"),
 				},
 			},
 		},
