@@ -5,34 +5,41 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 )
 
 // DateString is a date in the format "YYYY-MM-DD" that will unmarshal from and
 // marshal to the Sirius format of "DD/MM/YYYY"
 type DateString string
 
+var formats = []string{
+	"2006-01-02T15:04:05-07:00", // format from payments table
+	"02/01/2006",
+}
+
 func (s *DateString) UnmarshalJSON(text []byte) error {
 	if bytes.Equal([]byte("null"), text) || bytes.Equal([]byte(`""`), text) {
-		*s = DateString("")
+		*s = ""
 		return nil
 	}
 
 	if text[0] != '"' || text[len(text)-1] != '"' {
 		return errors.New("failed to unmarshal non-date")
 	}
+
 	text = text[1 : len(text)-1]
 
 	// Sirius gives dates as "03\/04\/2022", which pointlessly escapes the forward
 	// slashes, we can safely remove them
 	text = bytes.ReplaceAll(text, []byte{'\\'}, []byte{})
 
-	parts := bytes.Split(text, []byte{'/'})
-
-	if len(parts) != 3 {
-		return errors.New("failed to unmarshal non-date")
+	t, err := parseTime(string(text))
+	if err != nil {
+		return errors.New(err.Error())
 	}
 
-	*s = DateString(fmt.Sprintf("%s-%s-%s", parts[2], parts[1], parts[0]))
+	layout := "2006-01-02"
+	*s = DateString(t.Format(layout))
 	return nil
 }
 
@@ -56,4 +63,14 @@ func (s DateString) ToSirius() (string, error) {
 	}
 
 	return fmt.Sprintf(`%s/%s/%s`, parts[2], parts[1], parts[0]), nil
+}
+
+func parseTime(input string) (time.Time, error) {
+	for _, format := range formats {
+		t, err := time.Parse(format, input)
+		if err == nil {
+			return t, nil
+		}
+	}
+	return time.Time{}, errors.New("failed to unmarshal non-date, unrecognised format")
 }

@@ -3,9 +3,11 @@ package sirius
 import "fmt"
 
 type Case struct {
+	ID               int        `json:"id,omitempty"`
 	UID              string     `json:"uId,omitempty"`
 	Status           string     `json:"status"`
 	CaseType         string     `json:"caseType,omitempty"`
+	SubType          string     `json:"caseSubtype,omitempty"`
 	CancellationDate DateString `json:"cancellationDate,omitempty"`
 	DispatchDate     DateString `json:"dispatchDate,omitempty"`
 	DueDate          DateString `json:"dueDate,omitempty"`
