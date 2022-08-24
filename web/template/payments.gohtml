@@ -9,11 +9,11 @@
             <p class="govuk-body"><strong>Total paid: £{{ fee .TotalPaid }}</strong></p>
 
             {{ range $i, $p := .Payments }}
-                <details class="govuk-details" data-module="govuk-details" open>
+                <details class="govuk-details" data-module="govuk-details">
                     <summary class="govuk-details__summary">
-                <span class="govuk-details__summary-text">
-                  Payment {{ plus1 $i }}
-                </span>
+                        <span class="govuk-details__summary-text">
+                            Payment {{ plus1 $i }}
+                        </span>
                     </summary>
                     <div class="govuk-details__text">
                         <dl class="govuk-summary-list govuk-summary-list--no-border">

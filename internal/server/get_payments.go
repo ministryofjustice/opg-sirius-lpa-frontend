@@ -14,8 +14,6 @@ type GetPaymentsClient interface {
 
 type getPaymentsData struct {
 	XSRFToken string
-	Success   bool
-	Error     sirius.ValidationError
 
 	Case      sirius.Case
 	Payments  []sirius.Payment

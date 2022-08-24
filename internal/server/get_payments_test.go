@@ -88,13 +88,39 @@ func TestGetPaymentsNoID(t *testing.T) {
 	}
 }
 
-func TestGetPaymentsWhenFailure(t *testing.T) {
+func TestGetPaymentsWhenFailureOnGetCase(t *testing.T) {
 	expectedError := errors.New("err")
 
 	client := &mockGetPayments{}
 	client.
 		On("Case", mock.Anything, 4).
 		Return(sirius.Case{}, expectedError)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
+	w := httptest.NewRecorder()
+
+	err := GetPayments(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestGetPaymentsWhenFailureOnGetPayments(t *testing.T) {
+	expectedError := errors.New("err")
+
+	caseItem := sirius.Case{
+		UID:     "7000-0000-0021",
+		SubType: "pfa",
+	}
+
+	client := &mockGetPayments{}
+	client.
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil)
+
+	client.
+		On("Payments", mock.Anything, 4).
+		Return([]sirius.Payment{}, expectedError)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
 	w := httptest.NewRecorder()
