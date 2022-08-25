@@ -25,7 +25,7 @@ func TestAddPayment(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A case exists").
+					Given("I have a pending case assigned").
 					UponReceiving("A request to create a payment").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
@@ -57,7 +57,7 @@ func TestAddPayment(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A case exists").
+					Given("I have a pending case assigned").
 					UponReceiving("A request to create a payment without cookies").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
