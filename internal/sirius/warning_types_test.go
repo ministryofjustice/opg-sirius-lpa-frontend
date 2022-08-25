@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -18,7 +19,6 @@ func TestWarningTypes(t *testing.T) {
 	testCases := []struct {
 		name             string
 		setup            func()
-		cookies          []*http.Cookie
 		expectedResponse []RefDataItem
 		expectedError    func(int) error
 	}{
@@ -32,11 +32,6 @@ func TestWarningTypes(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/reference-data/warningType"),
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
@@ -47,38 +42,11 @@ func TestWarningTypes(t *testing.T) {
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
-			},
 			expectedResponse: []RefDataItem{
 				{
 					Handle: "Complaint Received",
 					Label:  "Complaint Received",
 				},
-			},
-		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("Some warning types exist").
-					UponReceiving("A request for warning types without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/reference-data/warningType"),
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/reference-data/warningType", port),
-					Method: http.MethodGet,
-				}
 			},
 		},
 	}
@@ -90,7 +58,9 @@ func TestWarningTypes(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				types, err := client.WarningTypes(getContext(tc.cookies))
+				types, err := client.WarningTypes(Context{
+					Context: context.Background(),
+				})
 
 				assert.Equal(t, tc.expectedResponse, types)
 				if tc.expectedError == nil {
