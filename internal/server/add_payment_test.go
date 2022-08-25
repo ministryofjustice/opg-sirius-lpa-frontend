@@ -39,10 +39,7 @@ func TestGetAddPayment(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addPaymentData{
-			Case:        caseItem,
-			Amount:      4100,
-			Source:      "MAKE",
-			PaymentDate: sirius.DateString("2022-01-23"),
+			Case: caseItem,
 		}).
 		Return(nil)
 
