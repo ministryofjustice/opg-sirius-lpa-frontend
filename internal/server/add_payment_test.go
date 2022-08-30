@@ -158,3 +158,51 @@ func TestPostAddPayment(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
+
+func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
+	for _, amount := range []string{"41", "41.5", "41.555", ".45"} {
+		t.Run(amount, func(t *testing.T) {
+			caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
+
+			client := &mockAddPaymentClient{}
+			client.
+				On("Case", mock.Anything, 123).
+				Return(caseitem, nil)
+
+			validationError := sirius.ValidationError{
+				Field: sirius.FieldErrors{
+					"amount": {"reason": "Please enter the amount to 2 decimal places"},
+				},
+			}
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, addPaymentData{
+					Success:     false,
+					Case:        caseitem,
+					Amount:      amount,
+					Source:      "MAKE",
+					PaymentDate: sirius.DateString("2022-01-23"),
+					Error:       validationError,
+				}).
+				Return(nil)
+
+			form := url.Values{
+				"amount":      {amount},
+				"source":      {"MAKE"},
+				"paymentDate": {"2022-01-23"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := AddPayment(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}

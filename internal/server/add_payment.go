@@ -45,7 +45,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			m, err := regexp.Match(`^\d*\.\d{2}$`, []byte(data.Amount))
+			m, err := regexp.Match(`^\d+\.\d{2}$`, []byte(data.Amount))
 			if err != nil {
 				return err
 			}

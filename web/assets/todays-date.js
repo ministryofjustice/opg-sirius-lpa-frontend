@@ -5,8 +5,9 @@ const todaysDate = () => {
     if (selectTodayLink !== null && datePicker !== null) {
         selectTodayLink.addEventListener(
             "click",
-            function () {
-                datePicker.value = new Date().toJSON().slice(0, 10)
+            function (e) {
+                e.preventDefault();
+                datePicker.value = new Date().toJSON().slice(0, 10);
             }, false
         );
     }
