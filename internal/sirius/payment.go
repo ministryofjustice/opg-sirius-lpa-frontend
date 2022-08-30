@@ -19,3 +19,7 @@ func (c *Client) Payments(ctx Context, id int) ([]Payment, error) {
 
 	return p, nil
 }
+
+func PoundsToPence(pounds float64) int {
+	return int(pounds * 100)
+}

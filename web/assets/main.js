@@ -3,6 +3,7 @@ import * as GOVUKFrontend from "govuk-frontend";
 import $ from "jquery";
 import autoResizeTextArea from "./auto-resize-text-area.js";
 import select from "./select.js";
+import todaysDate from "./todays-date.js";
 
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
@@ -16,6 +17,7 @@ GOVUKFrontend.initAll();
 MOJFrontend.initAll();
 autoResizeTextArea();
 select(prefix);
+todaysDate();
 
 if (window.self !== window.parent) {
   const success = document.querySelector(".moj-banner--success");
