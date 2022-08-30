@@ -10,8 +10,8 @@ describe("Add a payment", () => {
         cy.contains("Add a payment");
         cy.contains("7000-0000-0000");
         cy.get(".moj-banner").should("not.exist");
-        cy.get("#amount").type("41.00");
-        cy.get("#source").select("PHONE");
+        cy.get("#f-amount").type("41.00");
+        cy.get("#f-source").select("PHONE");
         cy.get("#f-paymentDate").type("2022-03-25");
         cy.get("button[type=submit]").click();
         cy.get(".moj-banner").should("exist");
