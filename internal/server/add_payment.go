@@ -19,7 +19,7 @@ type addPaymentData struct {
 	Error     sirius.ValidationError
 
 	Case        sirius.Case
-	Amount      int
+	Amount      string
 	Source      string
 	PaymentDate sirius.DateString
 }
@@ -34,6 +34,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		ctx := getContext(r)
 		data := addPaymentData{
 			XSRFToken:   ctx.XSRFToken,
+			Amount:      postFormString(r, "amount"),
 			Source:      postFormString(r, "source"),
 			PaymentDate: postFormDateString(r, "paymentDate"),
 		}
@@ -44,8 +45,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			amountString := r.FormValue("amount")
-			m, err := regexp.Match(`^\d*\.\d{2}$`, []byte(amountString))
+			m, err := regexp.Match(`^\d*\.\d{2}$`, []byte(data.Amount))
 			if err != nil {
 				return err
 			}
@@ -60,14 +60,14 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 				return tmpl(w, data)
 			}
 
-			amountFloat, err := strconv.ParseFloat(amountString, 64)
+			amountFloat, err := strconv.ParseFloat(data.Amount, 64)
 			if err != nil {
 				return err
 			}
 
-			data.Amount = sirius.PoundsToPence(amountFloat)
+			amountInPence := sirius.PoundsToPence(amountFloat)
 
-			err = client.AddPayment(ctx, caseID, data.Amount, data.Source, data.PaymentDate)
+			err = client.AddPayment(ctx, caseID, amountInPence, data.Source, data.PaymentDate)
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve

@@ -135,7 +135,7 @@ func TestPostAddPayment(t *testing.T) {
 		On("Func", mock.Anything, addPaymentData{
 			Success:     true,
 			Case:        caseitem,
-			Amount:      4100,
+			Amount:      "41.00",
 			Source:      "MAKE",
 			PaymentDate: sirius.DateString("2022-01-23"),
 		}).
