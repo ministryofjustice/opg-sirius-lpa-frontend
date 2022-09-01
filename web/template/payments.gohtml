@@ -41,10 +41,21 @@
                                     {{ if eq .Source "PHONE" }}
                                         Over the phone
                                     {{ else if eq .Source "MAKE" }}
-                                        Online - Make an LPA
+                                        Online - Make
+                                    {{ else if eq .Source "ONLINE" }}
+                                        Online - Notify
                                     {{ end }}
                                 </dd>
                             </div>
+                            {{ if or (eq .Source "PHONE") (eq .Source "ONLINE") }}
+                                <div class="govuk-summary-list__row">
+                                    <dt class="govuk-summary-list__key">
+                                        <a class="govuk-link" href="{{ (printf "/edit-payment?id=%d&payment=%d" $.Case.ID .ID) }}">
+                                            Edit payment {{ plus1 $i }}
+                                        </a>
+                                    </dt>
+                                </div>
+                            {{ end }}
                         </dl>
                     </div>
                 </details>

@@ -1,0 +1,61 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Edit payment{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <p class="govuk-body"><strong>{{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "lpa" }}LPA{{ end }} {{ .Case.UID }}</strong></p>
+
+            {{ template "error-summary" .Error }}
+
+            {{ if .Success }}
+                {{ template "success-banner" ("Payment edited!") }}
+            {{ end }}
+
+            <h1 class="govuk-heading-l app-!-embedded-hide">Edit payment {{ .PaymentID }}</h1>
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+                <div class="govuk-form-group">
+                    <h3 class="govuk-label-wrapper">
+                        <label class="govuk-label" for="f-amount">
+                            Enter amount
+                        </label>
+                    </h3>
+                    {{ template "errors" .Error.Field.amount }}
+                    <div class="govuk-input__wrapper">
+                        <div class="govuk-input__prefix" aria-hidden="true">£</div>
+                        <input class="govuk-input govuk-input--width-5 {{ if .Error.Field.amount }}govuk-input--error{{ end }}" id="f-amount" name="amount" type="number" step="0.01" value="{{ if ne .Amount "0" }}{{ .Amount }}{{ end }}">
+                    </div>
+                </div>
+
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="f-source">
+                        Payment method
+                    </label>
+                    {{ template "errors" .Error.Field.source }}
+                    <select class="govuk-select {{ if .Error.Field.source }}govuk-select--error{{ end }}" id="f-source" name="source">
+                        <option hidden selected disabled></option>
+                        <option value="PHONE" {{ if eq .Source "PHONE" }}selected{{ end }}>Paid over the phone</option>
+                        <option value="ONLINE" {{ if eq .Source "ONLINE" }}selected{{ end }}>Paid online - Notify</option>
+                    </select>
+                </div>
+
+                <div class="govuk-form-group govuk-!-display-inline-block govuk-!-padding-right-4 {{ if .Error.Field.paymentDate }}govuk-form-group--error{{ end }}">
+                    <label class="govuk-label" for="f-paymentDate">Date of payment</label>
+                    {{ template "errors" .Error.Field.paymentDate }}
+                    <input class="govuk-input date-picker {{ if .Error.Field.paymentDate }}govuk-input--error{{ end }}" type="date" id="f-paymentDate" name="paymentDate" value="{{ .PaymentDate }}"/>
+                </div>
+
+                <a href="#" class="govuk-link govuk-link--no-visited-state govuk-!-display-inline-block" data-module="select-todays-date">Use today's date</a>
+
+                <div class="govuk-button-group">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+{{ end }}
