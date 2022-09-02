@@ -31,10 +31,10 @@ func TestEditPayment(t *testing.T) {
 						Method: http.MethodPut,
 						Path:   dsl.String("/lpa-api/v1/payments/123"),
 						Body: map[string]interface{}{
-							"id":          123,
-							"amount":      2550,
-							"source":      "PHONE",
-							"paymentDate": "27/04/2022",
+							"id":          dsl.Like(123),
+							"amount":      dsl.Like(2550),
+							"source":      dsl.String("PHONE"),
+							"paymentDate": dsl.Term("27/04/2022", `^\d{1,2}/\d{1,2}/\d{4}$`),
 						},
 						Headers: dsl.MapMatcher{
 							"X-XSRF-TOKEN":        dsl.String("abcde"),
@@ -64,10 +64,10 @@ func TestEditPayment(t *testing.T) {
 						Method: http.MethodPut,
 						Path:   dsl.String("/lpa-api/v1/payments/123"),
 						Body: map[string]interface{}{
-							"id":          123,
-							"amount":      2550,
-							"source":      "PHONE",
-							"paymentDate": "27/04/2022",
+							"id":          dsl.Like(123),
+							"amount":      dsl.Like(2550),
+							"source":      dsl.String("PHONE"),
+							"paymentDate": dsl.Term("27/04/2022", `^\d{1,2}/\d{1,2}/\d{4}$`),
 						},
 					}).
 					WillRespondWith(dsl.Response{
