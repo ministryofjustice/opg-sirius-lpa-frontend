@@ -13,7 +13,7 @@
                 {{ template "success-banner" ("Payment edited!") }}
             {{ end }}
 
-            <h1 class="govuk-heading-l app-!-embedded-hide">Edit payment {{ .PaymentID }}</h1>
+            <h1 class="govuk-heading-l app-!-embedded-hide">Edit payment</h1>
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>

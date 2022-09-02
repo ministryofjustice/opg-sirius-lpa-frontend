@@ -39,7 +39,6 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-
 		p, err := client.PaymentByID(ctx, paymentID)
 		if err != nil {
 			return err
