@@ -50,7 +50,7 @@
                             {{ if or (eq .Source "PHONE") (eq .Source "ONLINE") }}
                                 <div class="govuk-summary-list__row">
                                     <dt class="govuk-summary-list__key">
-                                        <a class="govuk-link" href="{{ (printf "/edit-payment?id=%d&payment=%d" $.Case.ID .ID) }}">
+                                        <a class="govuk-link" href="{{ prefix (printf "/edit-payment?id=%d&payment=%d" $.Case.ID .ID) }}">
                                             Edit payment
                                         </a>
                                     </dt>
@@ -61,7 +61,7 @@
                 </details>
             {{ end }}
 
-            <a class="govuk-button govuk-button--secondary" href="{{ (printf "/add-payment?id=%d" .Case.ID) }}">
+            <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}">
                 Add a payment
             </a>
         </div>
