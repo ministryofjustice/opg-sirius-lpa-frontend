@@ -4,7 +4,6 @@ import (
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
-	"regexp"
 	"strconv"
 )
 
@@ -45,12 +44,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			m, err := regexp.Match(`^\d+\.\d{2}$`, []byte(data.Amount))
-			if err != nil {
-				return err
-			}
-
-			if !m {
+			if !sirius.IsAmountValid(data.Amount) {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = sirius.ValidationError{
 					Field: sirius.FieldErrors{

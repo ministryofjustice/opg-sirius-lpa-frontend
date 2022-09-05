@@ -1,6 +1,9 @@
 package sirius
 
-import "fmt"
+import (
+	"fmt"
+	"regexp"
+)
 
 type Payment struct {
 	ID          int        `json:"id,omitempty"`
@@ -33,4 +36,12 @@ func PoundsToPence(pounds float64) int {
 
 func PenceToPounds(pence int) float64 {
 	return float64(pence) / 100
+}
+
+func IsAmountValid(amount string) bool {
+	m, err := regexp.Match(`^\d+\.\d{2}$`, []byte(amount))
+	if err != nil {
+		return false
+	}
+	return m
 }

@@ -21,8 +21,8 @@ func (m *mockEditPaymentClient) PaymentByID(ctx sirius.Context, id int) (sirius.
 	return args.Get(0).(sirius.Payment), args.Error(1)
 }
 
-func (m *mockEditPaymentClient) EditPayment(ctx sirius.Context, payment sirius.Payment) error {
-	return m.Called(ctx, payment).Error(0)
+func (m *mockEditPaymentClient) EditPayment(ctx sirius.Context, paymentID int, payment sirius.Payment) error {
+	return m.Called(ctx, paymentID, payment).Error(0)
 }
 
 func (m *mockEditPaymentClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
@@ -251,7 +251,6 @@ func TestPostEditPayment(t *testing.T) {
 	}
 
 	editedPayment := sirius.Payment{
-		ID:          123,
 		Amount:      3300,
 		Source:      "PHONE",
 		PaymentDate: sirius.DateString("2022-02-18"),
@@ -265,7 +264,7 @@ func TestPostEditPayment(t *testing.T) {
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
 	client.
-		On("EditPayment", mock.Anything, editedPayment).
+		On("EditPayment", mock.Anything, 123, editedPayment).
 		Return(nil)
 
 	template := &mockTemplate{}

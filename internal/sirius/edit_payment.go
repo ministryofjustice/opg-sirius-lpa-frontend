@@ -7,13 +7,13 @@ import (
 	"net/http"
 )
 
-func (c *Client) EditPayment(ctx Context, payment Payment) error {
+func (c *Client) EditPayment(ctx Context, paymentID int, payment Payment) error {
 	data, err := json.Marshal(payment)
 	if err != nil {
 		return err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/lpa-api/v1/payments/%d", payment.ID), bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/lpa-api/v1/payments/%d", paymentID), bytes.NewReader(data))
 	if err != nil {
 		return err
 	}

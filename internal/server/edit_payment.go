@@ -5,12 +5,11 @@ import (
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
-	"regexp"
 	"strconv"
 )
 
 type EditPaymentClient interface {
-	EditPayment(ctx sirius.Context, payment sirius.Payment) error
+	EditPayment(ctx sirius.Context, paymentID int, payment sirius.Payment) error
 	Case(sirius.Context, int) (sirius.Case, error)
 	PaymentByID(ctx sirius.Context, id int) (sirius.Payment, error)
 }
@@ -62,12 +61,7 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 			data.Source = postFormString(r, "source")
 			data.PaymentDate = postFormDateString(r, "paymentDate")
 
-			m, err := regexp.Match(`^\d+\.\d{2}$`, []byte(data.Amount))
-			if err != nil {
-				return err
-			}
-
-			if !m {
+			if !sirius.IsAmountValid(data.Amount) {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = sirius.ValidationError{
 					Field: sirius.FieldErrors{
@@ -85,13 +79,12 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 			amountInPence := sirius.PoundsToPence(amountFloat)
 
 			paymentEdit := sirius.Payment{
-				ID:          paymentID,
 				Amount:      amountInPence,
 				Source:      data.Source,
 				PaymentDate: data.PaymentDate,
 			}
 
-			err = client.EditPayment(ctx, paymentEdit)
+			err = client.EditPayment(ctx, paymentID, paymentEdit)
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve

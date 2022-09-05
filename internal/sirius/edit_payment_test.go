@@ -31,7 +31,6 @@ func TestEditPayment(t *testing.T) {
 						Method: http.MethodPut,
 						Path:   dsl.String("/lpa-api/v1/payments/123"),
 						Body: map[string]interface{}{
-							"id":          dsl.Like(123),
 							"amount":      dsl.Like(2550),
 							"source":      dsl.String("PHONE"),
 							"paymentDate": dsl.Term("27/04/2022", `^\d{1,2}/\d{1,2}/\d{4}$`),
@@ -64,7 +63,6 @@ func TestEditPayment(t *testing.T) {
 						Method: http.MethodPut,
 						Path:   dsl.String("/lpa-api/v1/payments/123"),
 						Body: map[string]interface{}{
-							"id":          dsl.Like(123),
 							"amount":      dsl.Like(2550),
 							"source":      dsl.String("PHONE"),
 							"paymentDate": dsl.Term("27/04/2022", `^\d{1,2}/\d{1,2}/\d{4}$`),
@@ -91,7 +89,7 @@ func TestEditPayment(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.EditPayment(getContext(tc.cookies), Payment{ID: 123, Amount: 2550, Source: "PHONE", PaymentDate: DateString("2022-04-27")})
+				err := client.EditPayment(getContext(tc.cookies), 123, Payment{Amount: 2550, Source: "PHONE", PaymentDate: DateString("2022-04-27")})
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
