@@ -1,41 +1,54 @@
 package server
 
 import (
+	"fmt"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
 	"strconv"
 )
 
-type AddPaymentClient interface {
-	AddPayment(ctx sirius.Context, caseID int, amount int, source string, paymentDate sirius.DateString) error
+type EditPaymentClient interface {
+	EditPayment(ctx sirius.Context, paymentID int, payment sirius.Payment) error
 	Case(sirius.Context, int) (sirius.Case, error)
+	PaymentByID(ctx sirius.Context, id int) (sirius.Payment, error)
 }
 
-type addPaymentData struct {
+type editPaymentData struct {
 	XSRFToken string
 	Success   bool
 	Error     sirius.ValidationError
 
 	Case        sirius.Case
+	PaymentID   int
 	Amount      string
 	Source      string
 	PaymentDate sirius.DateString
 }
 
-func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
+func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strconv.Atoi(r.FormValue("id"))
 		if err != nil {
 			return err
 		}
+		paymentID, err := strconv.Atoi(r.FormValue("payment"))
+		if err != nil {
+			return err
+		}
 
 		ctx := getContext(r)
-		data := addPaymentData{
+		p, err := client.PaymentByID(ctx, paymentID)
+		if err != nil {
+			return err
+		}
+
+		data := editPaymentData{
 			XSRFToken:   ctx.XSRFToken,
-			Amount:      postFormString(r, "amount"),
-			Source:      postFormString(r, "source"),
-			PaymentDate: postFormDateString(r, "paymentDate"),
+			PaymentID:   paymentID,
+			Amount:      fmt.Sprintf("%.2f", sirius.PenceToPounds(p.Amount)),
+			Source:      p.Source,
+			PaymentDate: p.PaymentDate,
 		}
 
 		data.Case, err = client.Case(ctx, caseID)
@@ -44,6 +57,10 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
+			data.Amount = postFormString(r, "amount")
+			data.Source = postFormString(r, "source")
+			data.PaymentDate = postFormDateString(r, "paymentDate")
+
 			if !sirius.IsAmountValid(data.Amount) {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = sirius.ValidationError{
@@ -61,7 +78,13 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 
 			amountInPence := sirius.PoundsToPence(amountFloat)
 
-			err = client.AddPayment(ctx, caseID, amountInPence, data.Source, data.PaymentDate)
+			paymentEdit := sirius.Payment{
+				Amount:      amountInPence,
+				Source:      data.Source,
+				PaymentDate: data.PaymentDate,
+			}
+
+			err = client.EditPayment(ctx, paymentID, paymentEdit)
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve

@@ -1,6 +1,6 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add payment{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Edit payment{{ end }}
 
 {{ define "main" }}
     <div class="govuk-grid-row">
@@ -10,10 +10,10 @@
             {{ template "error-summary" .Error }}
 
             {{ if .Success }}
-                {{ template "success-banner" ("Payment added!") }}
+                {{ template "success-banner" ("Payment edited!") }}
             {{ end }}
 
-            <h1 class="govuk-heading-l app-!-embedded-hide">Add a payment</h1>
+            <h1 class="govuk-heading-l app-!-embedded-hide">Edit payment</h1>
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
