@@ -45,7 +45,7 @@
                 <div class="govuk-form-group govuk-!-display-inline-block govuk-!-padding-right-4 {{ if .Error.Field.paymentDate }}govuk-form-group--error{{ end }}">
                     <label class="govuk-label" for="f-paymentDate">Date of payment</label>
                     {{ template "errors" .Error.Field.paymentDate }}
-                    <input class="govuk-input date-picker {{ if .Error.Field.paymentDate }}govuk-input--error{{ end }}" type="date" id="f-paymentDate" name="paymentDate" value="{{ .PaymentDate }}"/>
+                    <input class="govuk-input date-picker {{ if .Error.Field.paymentDate }}govuk-input--error{{ end }}" type="date" id="f-paymentDate" name="paymentDate" value="{{ .PaymentDate }}" max="{{ today }}"/>
                 </div>
 
                 <a href="#" class="govuk-link govuk-link--no-visited-state govuk-!-display-inline-block" data-module="select-todays-date">Use today's date</a>
