@@ -27,6 +27,7 @@ $sirius-bg-color: #29292e;
     color: govuk-colour("white");
   }
 
+  .govuk-details__summary-text,
   .govuk-link:link {
     color: lighten(govuk-colour("light-blue"), 20%);
   }
@@ -49,6 +50,8 @@ $sirius-bg-color: #29292e;
 
   .govuk-label,
   .govuk-file-upload,
+  .govuk-summary-list__key,
+  .govuk-summary-list__value,
   .moj-banner__message {
     color: govuk-colour("white");
   }
@@ -67,6 +70,7 @@ $sirius-bg-color: #29292e;
     color: govuk-colour("white");
   }
 
+  .govuk-input__prefix,
   .autocomplete__option--odd {
     background-color: govuk-colour("black");
   }
