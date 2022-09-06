@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -32,10 +33,6 @@ func TestMiConfig(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/api/reporting/config"),
-						Headers: dsl.MapMatcher{
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
@@ -58,10 +55,6 @@ func TestMiConfig(t *testing.T) {
 						}),
 					})
 			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
-			},
 			expectedResult: map[string]MiConfigProperty{
 				"reportType": {
 					Description: "radio",
@@ -70,29 +63,6 @@ func TestMiConfig(t *testing.T) {
 						{Name: "epasReceived", Description: "Number of EPAs received"},
 					},
 				},
-			},
-		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("I have a pending case assigned").
-					UponReceiving("A request for the MI config without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodGet,
-						Path:   dsl.String("/api/reporting/config"),
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/reporting/config", port),
-					Method: http.MethodGet,
-				}
 			},
 		},
 	}
@@ -104,7 +74,7 @@ func TestMiConfig(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				config, err := client.MiConfig(getContext(tc.cookies))
+				config, err := client.MiConfig(Context{Context: context.Background()})
 
 				assert.Equal(t, tc.expectedResult, config)
 				if tc.expectedError == nil {

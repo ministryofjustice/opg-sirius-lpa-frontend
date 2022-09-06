@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -36,10 +37,6 @@ func TestMiReport(t *testing.T) {
 						Query: dsl.MapMatcher{
 							"reportType": dsl.String("epasReceived"),
 						},
-						Headers: dsl.MapMatcher{
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
@@ -53,40 +50,10 @@ func TestMiReport(t *testing.T) {
 						}),
 					})
 			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
-			},
 			expectedResult: &MiReportResponse{
 				ResultCount:       10,
 				ReportType:        "epasReceived",
 				ReportDescription: "Number of EPAs received",
-			},
-		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("I have a pending case assigned").
-					UponReceiving("A request for an MI report without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodGet,
-						Path:   dsl.String("/api/reporting/applications"),
-						Query: dsl.MapMatcher{
-							"reportType": dsl.String("epasReceived"),
-						},
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/api/reporting/applications?reportType=epasReceived", port),
-					Method: http.MethodGet,
-				}
 			},
 		},
 	}
@@ -101,7 +68,7 @@ func TestMiReport(t *testing.T) {
 				form := url.Values{
 					"reportType": {"epasReceived"},
 				}
-				result, err := client.MiReport(getContext(tc.cookies), form)
+				result, err := client.MiReport(Context{Context: context.Background()}, form)
 
 				assert.Equal(t, tc.expectedResult, result)
 				if tc.expectedError == nil {

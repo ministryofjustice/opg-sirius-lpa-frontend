@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -35,11 +36,6 @@ func TestSearchUsers(t *testing.T) {
 						Query: dsl.MapMatcher{
 							"query": dsl.String("admin"),
 						},
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
@@ -50,45 +46,11 @@ func TestSearchUsers(t *testing.T) {
 						}, 1),
 					})
 			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
-			},
 			expectedResponse: []User{
 				{
 					ID:          47,
 					DisplayName: "system admin",
 				},
-			},
-		},
-
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("User exists").
-					UponReceiving("A search for admin users without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/search/users"),
-						Query: dsl.MapMatcher{
-							"query": dsl.String("admin"),
-						},
-						Headers: dsl.MapMatcher{
-							"OPG-Bypass-Membrane": dsl.String("1"),
-						},
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/search/users?query=admin", port),
-					Method: http.MethodGet,
-				}
 			},
 		},
 	}
@@ -100,7 +62,7 @@ func TestSearchUsers(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				users, err := client.SearchUsers(getContext(tc.cookies), "admin")
+				users, err := client.SearchUsers(Context{Context: context.Background()}, "admin")
 				assert.Equal(t, tc.expectedResponse, users)
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
