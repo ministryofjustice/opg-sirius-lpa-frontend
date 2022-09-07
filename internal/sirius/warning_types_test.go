@@ -58,29 +58,6 @@ func TestWarningTypes(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("Some warning types exist").
-					UponReceiving("A request for warning types without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/reference-data/warningType"),
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/reference-data/warningType", port),
-					Method: http.MethodGet,
-				}
-			},
-		},
 	}
 
 	for _, tc := range testCases {

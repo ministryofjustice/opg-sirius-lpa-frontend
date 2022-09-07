@@ -50,29 +50,6 @@ func TestNoteTypes(t *testing.T) {
 			},
 			expectedResponse: []string{"Application processing"},
 		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("Some note types exist").
-					UponReceiving("A request for note types without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/note-types/lpa"),
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/note-types/lpa", port),
-					Method: http.MethodGet,
-				}
-			},
-		},
 	}
 
 	for _, tc := range testCases {

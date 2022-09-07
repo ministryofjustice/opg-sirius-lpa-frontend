@@ -52,29 +52,6 @@ func TestCreateWarning(t *testing.T) {
 				{Name: "Other", Value: "other"},
 			},
 		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("A donor exists").
-					UponReceiving("A request to create a warning without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/persons/189/warnings"),
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/persons/189/warnings", port),
-					Method: http.MethodPost,
-				}
-			},
-		},
 	}
 
 	for _, tc := range testCases {

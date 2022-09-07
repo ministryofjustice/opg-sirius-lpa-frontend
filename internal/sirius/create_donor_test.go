@@ -107,58 +107,6 @@ func TestCreateDonor(t *testing.T) {
 				UID: "7000-0290-0192",
 			},
 		},
-		{
-			name: "Unauthorized",
-			personData: Person{
-				Firstname: "Guillermo",
-				Surname:   "Prothero",
-			},
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("I am a Lay Team user").
-					UponReceiving("A request to create a donor without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/donors"),
-						Body: map[string]interface{}{
-							"salutation":            "",
-							"firstname":             "Guillermo",
-							"middlenames":           "",
-							"surname":               "Prothero",
-							"dob":                   nil,
-							"previousNames":         "",
-							"otherNames":            "",
-							"addressLine1":          "",
-							"addressLine2":          "",
-							"addressLine3":          "",
-							"town":                  "",
-							"county":                "",
-							"postcode":              "",
-							"country":               "",
-							"phoneNumber":           "",
-							"email":                 "",
-							"sageId":                "",
-							"isAirmailRequired":     false,
-							"correspondenceByPost":  false,
-							"correspondenceByEmail": false,
-							"correspondenceByPhone": false,
-							"correspondenceByWelsh": false,
-							"researchOptOut":        false,
-						},
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/donors", port),
-					Method: http.MethodPost,
-				}
-			},
-		},
 	}
 
 	for _, tc := range testCases {

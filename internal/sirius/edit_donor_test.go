@@ -98,58 +98,6 @@ func TestEditDonor(t *testing.T) {
 				{Name: "Other", Value: "other"},
 			},
 		},
-		{
-			name: "Unauthorized",
-			personData: Person{
-				Firstname: "Will",
-				Surname:   "Niesborella",
-			},
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("A donor exists").
-					UponReceiving("A request to edit a donor without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/donors/189"),
-						Body: map[string]interface{}{
-							"salutation":            "",
-							"firstname":             "Will",
-							"middlenames":           "",
-							"surname":               "Niesborella",
-							"dob":                   nil,
-							"previousNames":         "",
-							"otherNames":            "",
-							"addressLine1":          "",
-							"addressLine2":          "",
-							"addressLine3":          "",
-							"town":                  "",
-							"county":                "",
-							"postcode":              "",
-							"country":               "",
-							"phoneNumber":           "",
-							"email":                 "",
-							"sageId":                "",
-							"isAirmailRequired":     false,
-							"correspondenceByPost":  false,
-							"correspondenceByEmail": false,
-							"correspondenceByPhone": false,
-							"correspondenceByWelsh": false,
-							"researchOptOut":        false,
-						},
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/donors/189", port),
-					Method: http.MethodPut,
-				}
-			},
-		},
 	}
 
 	for _, tc := range testCases {

@@ -61,29 +61,6 @@ func TestPayment(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("I have an lpa which has been paid for").
-					UponReceiving("A request for the payments without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/cases/9/payments"),
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/cases/9/payments", port),
-					Method: http.MethodGet,
-				}
-			},
-		},
 	}
 
 	for _, tc := range testCases {
@@ -156,29 +133,6 @@ func TestPaymentByID(t *testing.T) {
 				Source:      "PHONE",
 				Amount:      4100,
 				PaymentDate: DateString("2022-01-23"),
-			},
-		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("I have an lpa which has been paid for").
-					UponReceiving("A request for that payment by ID without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/payments/123"),
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/payments/123", port),
-					Method: http.MethodGet,
-				}
 			},
 		},
 	}
