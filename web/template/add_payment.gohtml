@@ -10,17 +10,17 @@
             {{ template "error-summary" .Error }}
 
             {{ if .Success }}
-                {{ template "success-banner" ("Payment added!") }}
+                {{ template "success-banner" ("Payment added") }}
             {{ end }}
 
-            <h1 class="govuk-heading-l app-!-embedded-hide">Add a payment</h1>
+            <h1 class="govuk-heading-l">Add a payment</h1>
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
                 <div class="govuk-form-group">
                     <h3 class="govuk-label-wrapper">
                         <label class="govuk-label" for="f-amount">
-                            Enter amount
+                            Enter amount paid
                         </label>
                     </h3>
                     {{ template "errors" .Error.Field.amount }}
@@ -37,8 +37,8 @@
                     {{ template "errors" .Error.Field.source }}
                     <select class="govuk-select {{ if .Error.Field.source }}govuk-select--error{{ end }}" id="f-source" name="source">
                         <option hidden selected disabled></option>
-                        <option value="PHONE" {{ if eq .Source "PHONE" }}selected{{ end }}>Paid over the phone</option>
-                        <option value="ONLINE" {{ if eq .Source "ONLINE" }}selected{{ end }}>Paid online - Notify</option>
+                        <option value="PHONE" {{ if eq .Source "PHONE" }}selected{{ end }}>Telephone</option>
+                        <option value="ONLINE" {{ if eq .Source "ONLINE" }}selected{{ end }}>Online - Notify</option>
                     </select>
                 </div>
 
@@ -50,9 +50,9 @@
 
                 <a href="#" class="govuk-link govuk-link--no-visited-state govuk-!-display-inline-block" data-module="select-todays-date">Use today's date</a>
 
-                <div class="govuk-button-group">
+                <div class="govuk-button-group govuk-!-padding-top-6">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
-                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/payments?id=%d" .Case.ID) }}">Cancel</a>
                 </div>
             </form>
 
