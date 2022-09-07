@@ -97,30 +97,6 @@ func TestAllocateCases(t *testing.T) {
 			},
 			allocations: []CaseAllocation{{ID: 800, CaseType: "LPA"}, {ID: 801, CaseType: "LPA"}, {ID: 802, CaseType: "EPA"}},
 		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("I have a pending case assigned").
-					UponReceiving("A request to change the assignee of the case without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/users/47/cases/800"),
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			allocations: []CaseAllocation{{ID: 800, CaseType: "LPA"}},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/users/47/cases/800", port),
-					Method: http.MethodPut,
-				}
-			},
-		},
 	}
 
 	for _, tc := range testCases {

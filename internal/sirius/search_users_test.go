@@ -61,36 +61,6 @@ func TestSearchUsers(t *testing.T) {
 				},
 			},
 		},
-
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("User exists").
-					UponReceiving("A search for admin users without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/search/users"),
-						Query: dsl.MapMatcher{
-							"query": dsl.String("admin"),
-						},
-						Headers: dsl.MapMatcher{
-							"OPG-Bypass-Membrane": dsl.String("1"),
-						},
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/search/users?query=admin", port),
-					Method: http.MethodGet,
-				}
-			},
-		},
 	}
 
 	for _, tc := range testCases {

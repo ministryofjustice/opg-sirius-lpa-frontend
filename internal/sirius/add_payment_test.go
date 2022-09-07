@@ -52,34 +52,6 @@ func TestAddPayment(t *testing.T) {
 				{Name: "Other", Value: "other"},
 			},
 		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("I have a pending case assigned").
-					UponReceiving("A request to create a payment without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/cases/800/payments"),
-						Body: map[string]interface{}{
-							"amount":      4100,
-							"source":      "MAKE",
-							"paymentDate": "25/04/2022",
-						},
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/cases/800/payments", port),
-					Method: http.MethodPost,
-				}
-			},
-		},
 	}
 
 	for _, tc := range testCases {
