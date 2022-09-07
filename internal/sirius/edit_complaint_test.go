@@ -1,7 +1,6 @@
 package sirius
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -43,11 +42,44 @@ func TestEditComplaint(t *testing.T) {
 							"resolutionInfo": "We did stuff",
 							"resolutionDate": "07/06/2022",
 						}),
+						Headers: dsl.MapMatcher{
+							"X-XSRF-TOKEN":        dsl.String("abcde"),
+							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
+							"OPG-Bypass-Membrane": dsl.String("1"),
+							"Content-Type":        dsl.String("application/json"),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
+			},
+			cookies: []*http.Cookie{
+				{Name: "XSRF-TOKEN", Value: "abcde"},
+				{Name: "Other", Value: "other"},
+			},
+		},
+		{
+			name: "Unauthorized",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A complaint exists").
+					UponReceiving("A request to edit the complaint without cookies").
+					WithRequest(dsl.Request{
+						Method: http.MethodPut,
+						Path:   dsl.String("/lpa-api/v1/complaints/986"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusUnauthorized,
+					})
+			},
+			expectedError: func(port int) error {
+				return StatusError{
+					Code:   http.StatusUnauthorized,
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/complaints/986", port),
+					Method: http.MethodPut,
+				}
 			},
 		},
 	}
@@ -59,7 +91,7 @@ func TestEditComplaint(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.EditComplaint(Context{Context: context.Background()}, 986, Complaint{
+				err := client.EditComplaint(getContext(tc.cookies), 986, Complaint{
 					Category:       "01",
 					Description:    "This is seriously bad",
 					ReceivedDate:   DateString("2022-04-05"),

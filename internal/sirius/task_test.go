@@ -1,7 +1,6 @@
 package sirius
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -33,6 +32,11 @@ func TestTask(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/tasks/990"),
+						Headers: dsl.MapMatcher{
+							"X-XSRF-TOKEN":        dsl.String("abcde"),
+							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
+							"OPG-Bypass-Membrane": dsl.String("1"),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
@@ -49,6 +53,10 @@ func TestTask(t *testing.T) {
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
+			cookies: []*http.Cookie{
+				{Name: "XSRF-TOKEN", Value: "abcde"},
+				{Name: "Other", Value: "other"},
+			},
 			expectedResponse: Task{
 				ID:      990,
 				Status:  "Not Started",
@@ -60,6 +68,29 @@ func TestTask(t *testing.T) {
 				}},
 			},
 		},
+		{
+			name: "Unauthorized",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have a case with an open task assigned").
+					UponReceiving("A request for a task without cookies").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String("/lpa-api/v1/tasks/990"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusUnauthorized,
+					})
+			},
+			expectedError: func(port int) error {
+				return StatusError{
+					Code:   http.StatusUnauthorized,
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/tasks/990", port),
+					Method: http.MethodGet,
+				}
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -69,7 +100,7 @@ func TestTask(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				task, err := client.Task(Context{Context: context.Background()}, 990)
+				task, err := client.Task(getContext(tc.cookies), 990)
 
 				assert.Equal(t, tc.expectedResponse, task)
 				if tc.expectedError == nil {

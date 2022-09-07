@@ -1,7 +1,6 @@
 package sirius
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -33,6 +32,11 @@ func TestComplaint(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/complaints/986"),
+						Headers: dsl.MapMatcher{
+							"X-XSRF-TOKEN":        dsl.String("abcde"),
+							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
+							"OPG-Bypass-Membrane": dsl.String("1"),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
@@ -47,6 +51,10 @@ func TestComplaint(t *testing.T) {
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
+			cookies: []*http.Cookie{
+				{Name: "XSRF-TOKEN", Value: "abcde"},
+				{Name: "Other", Value: "other"},
+			},
 			expectedResponse: Complaint{
 				Category:     "01",
 				Description:  "This is seriously bad",
@@ -54,6 +62,29 @@ func TestComplaint(t *testing.T) {
 				Severity:     "Major",
 				SubCategory:  "07",
 				Summary:      "This and that",
+			},
+		},
+		{
+			name: "Unauthorized",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A complaint exists").
+					UponReceiving("A request for the complaint without cookies").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String("/lpa-api/v1/complaints/986"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusUnauthorized,
+					})
+			},
+			expectedError: func(port int) error {
+				return StatusError{
+					Code:   http.StatusUnauthorized,
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/complaints/986", port),
+					Method: http.MethodGet,
+				}
 			},
 		},
 	}
@@ -65,7 +96,7 @@ func TestComplaint(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				complaint, err := client.Complaint(Context{Context: context.Background()}, 986)
+				complaint, err := client.Complaint(getContext(tc.cookies), 986)
 
 				assert.Equal(t, tc.expectedResponse, complaint)
 				if tc.expectedError == nil {

@@ -1,7 +1,6 @@
 package sirius
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -33,6 +32,11 @@ func TestPersonByUid(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/persons/by-uid/7000-0000-0001"),
+						Headers: dsl.MapMatcher{
+							"X-XSRF-TOKEN":        dsl.String("abcde"),
+							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
+							"OPG-Bypass-Membrane": dsl.String("1"),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
@@ -45,6 +49,10 @@ func TestPersonByUid(t *testing.T) {
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
+			},
+			cookies: []*http.Cookie{
+				{Name: "XSRF-TOKEN", Value: "abcde"},
+				{Name: "Other", Value: "other"},
 			},
 			expectedResponse: Person{
 				ID:          103,
@@ -64,6 +72,11 @@ func TestPersonByUid(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/persons/by-uid/7000-0000-0001"),
+						Headers: dsl.MapMatcher{
+							"X-XSRF-TOKEN":        dsl.String("abcde"),
+							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
+							"OPG-Bypass-Membrane": dsl.String("1"),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
@@ -80,6 +93,10 @@ func TestPersonByUid(t *testing.T) {
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
+			cookies: []*http.Cookie{
+				{Name: "XSRF-TOKEN", Value: "abcde"},
+				{Name: "Other", Value: "other"},
+			},
 			expectedResponse: Person{
 				ID:          103,
 				UID:         "7000-0000-0001",
@@ -93,6 +110,29 @@ func TestPersonByUid(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "Unauthorized",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A donor exists").
+					UponReceiving("A request for the person by UID without cookies").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String("/lpa-api/v1/persons/by-uid/7000-0000-0001"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusUnauthorized,
+					})
+			},
+			expectedError: func(port int) error {
+				return StatusError{
+					Code:   http.StatusUnauthorized,
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/persons/by-uid/7000-0000-0001", port),
+					Method: http.MethodGet,
+				}
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -102,7 +142,7 @@ func TestPersonByUid(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				caseitem, err := client.PersonByUid(Context{Context: context.Background()}, "7000-0000-0001")
+				caseitem, err := client.PersonByUid(getContext(tc.cookies), "7000-0000-0001")
 
 				assert.Equal(t, tc.expectedResponse, caseitem)
 				if tc.expectedError == nil {

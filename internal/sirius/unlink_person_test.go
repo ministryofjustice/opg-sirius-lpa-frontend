@@ -1,7 +1,6 @@
 package sirius
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -35,10 +34,46 @@ func TestUnlinkPerson(t *testing.T) {
 						Body: map[string]interface{}{
 							"childIds": []int{105},
 						},
+						Headers: dsl.MapMatcher{
+							"X-XSRF-TOKEN":        dsl.String("abcde"),
+							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
+							"OPG-Bypass-Membrane": dsl.String("1"),
+							"Content-Type":        dsl.String("application/json"),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusNoContent,
 					})
+			},
+			cookies: []*http.Cookie{
+				{Name: "XSRF-TOKEN", Value: "abcde"},
+				{Name: "Other", Value: "other"},
+			},
+		},
+		{
+			name: "Unauthorized",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A donor exists with children").
+					UponReceiving("A request to unlink those cases without cookies").
+					WithRequest(dsl.Request{
+						Method: http.MethodPatch,
+						Path:   dsl.String("/lpa-api/v1/person-links/189"),
+						Body: map[string]interface{}{
+							"childIds": []int{105},
+						},
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusUnauthorized,
+					})
+			},
+			expectedError: func(port int) error {
+				return StatusError{
+					Code:   http.StatusUnauthorized,
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/person-links/189", port),
+					Method: http.MethodPatch,
+				}
 			},
 		},
 	}
@@ -50,7 +85,7 @@ func TestUnlinkPerson(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.UnlinkPerson(Context{Context: context.Background()}, 189, 105)
+				err := client.UnlinkPerson(getContext(tc.cookies), 189, 105)
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)

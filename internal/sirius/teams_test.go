@@ -1,7 +1,6 @@
 package sirius
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -33,6 +32,11 @@ func TestTeams(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/teams"),
+						Headers: dsl.MapMatcher{
+							"X-XSRF-TOKEN":        dsl.String("abcde"),
+							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
+							"OPG-Bypass-Membrane": dsl.String("1"),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
@@ -42,6 +46,10 @@ func TestTeams(t *testing.T) {
 							"displayName": dsl.Like("Cool Team"),
 						}, 1),
 					})
+			},
+			cookies: []*http.Cookie{
+				{Name: "XSRF-TOKEN", Value: "abcde"},
+				{Name: "Other", Value: "other"},
 			},
 			expectedResponse: []Team{
 				{
@@ -85,7 +93,7 @@ func TestTeams(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				users, err := client.Teams(Context{Context: context.Background()})
+				users, err := client.Teams(getContext(tc.cookies))
 				assert.Equal(t, tc.expectedResponse, users)
 				if tc.expectedError == nil {
 					assert.Nil(t, err)

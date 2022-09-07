@@ -1,7 +1,6 @@
 package sirius
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -83,6 +82,12 @@ func TestCreateDonor(t *testing.T) {
 							"correspondenceByWelsh": false,
 							"researchOptOut":        true,
 						},
+						Headers: dsl.MapMatcher{
+							"X-XSRF-TOKEN":        dsl.String("abcde"),
+							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
+							"OPG-Bypass-Membrane": dsl.String("1"),
+							"Content-Type":        dsl.String("application/json"),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusCreated,
@@ -93,9 +98,65 @@ func TestCreateDonor(t *testing.T) {
 						},
 					})
 			},
+			cookies: []*http.Cookie{
+				{Name: "XSRF-TOKEN", Value: "abcde"},
+				{Name: "Other", Value: "other"},
+			},
 			expectedPerson: Person{
 				ID:  771,
 				UID: "7000-0290-0192",
+			},
+		},
+		{
+			name: "Unauthorized",
+			personData: Person{
+				Firstname: "Guillermo",
+				Surname:   "Prothero",
+			},
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I am a Lay Team user").
+					UponReceiving("A request to create a donor without cookies").
+					WithRequest(dsl.Request{
+						Method: http.MethodPost,
+						Path:   dsl.String("/lpa-api/v1/donors"),
+						Body: map[string]interface{}{
+							"salutation":            "",
+							"firstname":             "Guillermo",
+							"middlenames":           "",
+							"surname":               "Prothero",
+							"dob":                   nil,
+							"previousNames":         "",
+							"otherNames":            "",
+							"addressLine1":          "",
+							"addressLine2":          "",
+							"addressLine3":          "",
+							"town":                  "",
+							"county":                "",
+							"postcode":              "",
+							"country":               "",
+							"phoneNumber":           "",
+							"email":                 "",
+							"sageId":                "",
+							"isAirmailRequired":     false,
+							"correspondenceByPost":  false,
+							"correspondenceByEmail": false,
+							"correspondenceByPhone": false,
+							"correspondenceByWelsh": false,
+							"researchOptOut":        false,
+						},
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusUnauthorized,
+					})
+			},
+			expectedError: func(port int) error {
+				return StatusError{
+					Code:   http.StatusUnauthorized,
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/donors", port),
+					Method: http.MethodPost,
+				}
 			},
 		},
 	}
@@ -107,7 +168,7 @@ func TestCreateDonor(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				person, err := client.CreateDonor(Context{Context: context.Background()}, tc.personData)
+				person, err := client.CreateDonor(getContext(tc.cookies), tc.personData)
 				if (tc.expectedError) == nil {
 					assert.Equal(t, tc.expectedPerson, person)
 					assert.Nil(t, err)

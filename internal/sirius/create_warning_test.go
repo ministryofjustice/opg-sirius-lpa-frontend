@@ -1,7 +1,6 @@
 package sirius
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -36,11 +35,44 @@ func TestCreateWarning(t *testing.T) {
 							"warningType": "Complaint Received",
 							"warningText": "Some warning notes",
 						}),
+						Headers: dsl.MapMatcher{
+							"X-XSRF-TOKEN":        dsl.String("abcde"),
+							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
+							"OPG-Bypass-Membrane": dsl.String("1"),
+							"Content-Type":        dsl.String("application/json"),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusCreated,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
+			},
+			cookies: []*http.Cookie{
+				{Name: "XSRF-TOKEN", Value: "abcde"},
+				{Name: "Other", Value: "other"},
+			},
+		},
+		{
+			name: "Unauthorized",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A donor exists").
+					UponReceiving("A request to create a warning without cookies").
+					WithRequest(dsl.Request{
+						Method: http.MethodPost,
+						Path:   dsl.String("/lpa-api/v1/persons/189/warnings"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusUnauthorized,
+					})
+			},
+			expectedError: func(port int) error {
+				return StatusError{
+					Code:   http.StatusUnauthorized,
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/persons/189/warnings", port),
+					Method: http.MethodPost,
+				}
 			},
 		},
 	}
@@ -52,7 +84,7 @@ func TestCreateWarning(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.CreateWarning(Context{Context: context.Background()}, 189, "Complaint Received", "Some warning notes")
+				err := client.CreateWarning(getContext(tc.cookies), 189, "Complaint Received", "Some warning notes")
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {

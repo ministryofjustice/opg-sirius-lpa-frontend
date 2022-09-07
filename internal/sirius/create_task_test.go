@@ -1,7 +1,6 @@
 package sirius
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -41,11 +40,44 @@ func TestCreateTask(t *testing.T) {
 							"description": dsl.String("More words"),
 							"dueDate":     dsl.Term("04/05/2731", `^\d{1,2}/\d{1,2}/\d{4}$`),
 						},
+						Headers: dsl.MapMatcher{
+							"X-XSRF-TOKEN":        dsl.String("abcde"),
+							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
+							"OPG-Bypass-Membrane": dsl.String("1"),
+							"Content-Type":        dsl.String("application/json"),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusCreated,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
+			},
+			cookies: []*http.Cookie{
+				{Name: "XSRF-TOKEN", Value: "abcde"},
+				{Name: "Other", Value: "other"},
+			},
+		},
+		{
+			name: "Unauthorized",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have a pending case assigned").
+					UponReceiving("A request to create a task without cookies").
+					WithRequest(dsl.Request{
+						Method: http.MethodPost,
+						Path:   dsl.String("/lpa-api/v1/tasks"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusUnauthorized,
+					})
+			},
+			expectedError: func(port int) error {
+				return StatusError{
+					Code:   http.StatusUnauthorized,
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/tasks", port),
+					Method: http.MethodPost,
+				}
 			},
 		},
 	}
@@ -57,7 +89,7 @@ func TestCreateTask(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.CreateTask(Context{Context: context.Background()}, TaskRequest{
+				err := client.CreateTask(getContext(tc.cookies), TaskRequest{
 					CaseID:      800,
 					AssigneeID:  1,
 					Type:        "Change of Address",

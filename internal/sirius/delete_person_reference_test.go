@@ -1,7 +1,6 @@
 package sirius
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -32,10 +31,42 @@ func TestDeletePersonReferences(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodDelete,
 						Path:   dsl.String("/lpa-api/v1/person-references/768"),
+						Headers: dsl.MapMatcher{
+							"X-XSRF-TOKEN":        dsl.String("abcde"),
+							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
+							"OPG-Bypass-Membrane": dsl.String("1"),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusNoContent,
 					})
+			},
+			cookies: []*http.Cookie{
+				{Name: "XSRF-TOKEN", Value: "abcde"},
+				{Name: "Other", Value: "other"},
+			},
+		},
+		{
+			name: "Unauthorized",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A donor with a reference").
+					UponReceiving("A request to delete the person reference without cookies").
+					WithRequest(dsl.Request{
+						Method: http.MethodDelete,
+						Path:   dsl.String("/lpa-api/v1/person-references/768"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusUnauthorized,
+					})
+			},
+			expectedError: func(port int) error {
+				return StatusError{
+					Code:   http.StatusUnauthorized,
+					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/person-references/768", port),
+					Method: http.MethodDelete,
+				}
 			},
 		},
 	}
@@ -47,7 +78,7 @@ func TestDeletePersonReferences(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.DeletePersonReference(Context{Context: context.Background()}, 768)
+				err := client.DeletePersonReference(getContext(tc.cookies), 768)
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
