@@ -1,5 +1,8 @@
 describe("Edit complaint", () => {
   beforeEach(() => {
+    cy.setCookie("Other", "other");
+    cy.setCookie("XSRF-TOKEN", "abcde");
+    cy.setCookie("OPG-Bypass-Membrane", "1");
     cy.visit("/edit-complaint?id=986");
   });
 

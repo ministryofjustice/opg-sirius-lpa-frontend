@@ -1,5 +1,8 @@
 describe("Unlink records", () => {
   beforeEach(() => {
+    cy.setCookie("Other", "other");
+    cy.setCookie("XSRF-TOKEN", "abcde");
+    cy.setCookie("OPG-Bypass-Membrane", "1");
     cy.visit("/unlink-person?id=189");
   });
 

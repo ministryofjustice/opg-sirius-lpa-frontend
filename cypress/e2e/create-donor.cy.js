@@ -1,5 +1,8 @@
 describe("Create donor", () => {
   beforeEach(() => {
+    cy.setCookie("Other", "other");
+    cy.setCookie("XSRF-TOKEN", "abcde");
+    cy.setCookie("OPG-Bypass-Membrane", "1");
     cy.visit("/create-donor");
   });
 
