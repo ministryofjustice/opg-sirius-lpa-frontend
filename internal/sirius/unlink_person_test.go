@@ -50,32 +50,6 @@ func TestUnlinkPerson(t *testing.T) {
 				{Name: "Other", Value: "other"},
 			},
 		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("A donor exists with children").
-					UponReceiving("A request to unlink those cases without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodPatch,
-						Path:   dsl.String("/lpa-api/v1/person-links/189"),
-						Body: map[string]interface{}{
-							"childIds": []int{105},
-						},
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/person-links/189", port),
-					Method: http.MethodPatch,
-				}
-			},
-		},
 	}
 
 	for _, tc := range testCases {

@@ -78,30 +78,6 @@ func TestAssignTasks(t *testing.T) {
 			},
 			taskIDs: []int{990, 991},
 		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("I have a case with an open task assigned").
-					UponReceiving("A request to assign a task without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/users/47/tasks/990"),
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			taskIDs: []int{990},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/users/47/tasks/990", port),
-					Method: http.MethodPut,
-				}
-			},
-		},
 	}
 
 	for _, tc := range testCases {

@@ -96,29 +96,6 @@ func TestCreateNote(t *testing.T) {
 				Source: "SGVsbG8gdGhlcmUK",
 			},
 		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("I have a pending case assigned").
-					UponReceiving("A request to create a note without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/lpas/800/notes"),
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/lpas/800/notes", port),
-					Method: http.MethodPost,
-				}
-			},
-		},
 	}
 
 	for _, tc := range testCases {

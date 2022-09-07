@@ -59,29 +59,6 @@ func TestEditComplaint(t *testing.T) {
 				{Name: "Other", Value: "other"},
 			},
 		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("A complaint exists").
-					UponReceiving("A request to edit the complaint without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/complaints/986"),
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/complaints/986", port),
-					Method: http.MethodPut,
-				}
-			},
-		},
 	}
 
 	for _, tc := range testCases {

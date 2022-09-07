@@ -81,30 +81,6 @@ func TestAvailableStatuses(t *testing.T) {
 			caseType:         CaseTypeEpa,
 			expectedResponse: []string{"Perfect"},
 		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("I have a pending case assigned").
-					UponReceiving("A request for the case's available statuses without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/lpas/800/available-statuses"),
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			caseType: CaseTypeLpa,
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/lpas/800/available-statuses", port),
-					Method: http.MethodGet,
-				}
-			},
-		},
 	}
 
 	for _, tc := range testCases {
