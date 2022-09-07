@@ -5,64 +5,72 @@
 {{ define "main" }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <p class="govuk-body"><strong>{{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "lpa" }}LPA{{ end }} {{ .Case.UID }}</strong></p>
-            <p class="govuk-body"><strong>Total paid: £{{ fee .TotalPaid }}</strong></p>
+            <h1 class="govuk-heading-s govuk-!-padding-bottom-2"><strong>{{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "lpa" }}LPA{{ end }} {{ .Case.UID }}</strong></h1>
 
-            {{ range $i, $p := .Payments }}
-                <details class="govuk-details" data-module="govuk-details">
-                    <summary class="govuk-details__summary">
-                        <span class="govuk-details__summary-text">
-                            Payment {{ plus1 $i }}
-                        </span>
-                    </summary>
-                    <div class="govuk-details__text">
-                        <dl class="govuk-summary-list govuk-summary-list--no-border">
-                            <div class="govuk-summary-list__row">
-                                <dt class="govuk-summary-list__key">
-                                    Amount:
-                                </dt>
-                                <dd class="govuk-summary-list__value">
-                                    £{{ fee .Amount }}
-                                </dd>
-                            </div>
-                            <div class="govuk-summary-list__row">
-                                <dt class="govuk-summary-list__key">
-                                    Date:
-                                </dt>
-                                <dd class="govuk-summary-list__value">
-                                    {{ .PaymentDate }}
-                                </dd>
-                            </div>
-                            <div class="govuk-summary-list__row">
-                                <dt class="govuk-summary-list__key">
-                                    Method:
-                                </dt>
-                                <dd class="govuk-summary-list__value">
+            {{ if not .Payments }}
+            <h2 class="govuk-body govuk-!-padding-top-7 govuk-!-padding-bottom-7"><strong>There is currently no fee data available to display.</strong></h2>
+            {{ else }}
+            <table class="govuk-table my-table table__no-border">
+                <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header govuk-!-font-size-24">Total paid:</th>
+                    <td class="govuk-table__cell govuk-!-font-size-24"><strong>£{{ fee .TotalPaid }}</strong></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <h3 class="govuk-heading-m govuk-!-padding-top-3 govuk-!-padding-bottom-2"><strong>Fee details</strong></h3>
+
+            <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">
+                        Payments
+                    </span>
+                </summary>
+                <div class="govuk-details__text">
+
+                    {{ range $i, $p := .Payments }}
+                    <table class="govuk-table my-table table__no-border">
+                        <tbody class="govuk-table__body">
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Amount:</th>
+                                <td class="govuk-table__cell"><strong>£{{ fee .Amount }}</strong></td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Date:</th>
+                                <td class="govuk-table__cell">{{ .PaymentDate }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Method:</th>
+                                <td class="govuk-table__cell">
                                     {{ if eq .Source "PHONE" }}
-                                        Over the phone
+                                        Telephone
                                     {{ else if eq .Source "MAKE" }}
                                         Online - Make
                                     {{ else if eq .Source "ONLINE" }}
                                         Online - Notify
                                     {{ end }}
-                                </dd>
-                            </div>
+                                </td>
+                            </tr>
                             {{ if or (eq .Source "PHONE") (eq .Source "ONLINE") }}
-                                <div class="govuk-summary-list__row">
-                                    <dt class="govuk-summary-list__key">
-                                        <a class="govuk-link" href="{{ prefix (printf "/edit-payment?id=%d&payment=%d" $.Case.ID .ID) }}">
-                                            Edit payment
-                                        </a>
-                                    </dt>
-                                </div>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header table-row__no-border">
+                                    <a class="govuk-link" href="{{ prefix (printf "/edit-payment?id=%d&payment=%d" $.Case.ID .ID) }}">
+                                        Edit payment
+                                    </a>
+                                </th>
+                            </tr>
                             {{ end }}
-                        </dl>
-                    </div>
-                </details>
+                        </tbody>
+                    </table>
+                    {{ end }}
+
+                </div>
+            </details>
             {{ end }}
 
             <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}">
-                Add a payment
+                Add payment
             </a>
         </div>
     </div>

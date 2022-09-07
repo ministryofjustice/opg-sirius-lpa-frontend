@@ -68,6 +68,16 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 						"amount": {"reason": "Please enter the amount to 2 decimal places"},
 					},
 				}
+				if data.Source == "" {
+					data.Error.Field["source"] = map[string]string{
+						"reason": "Value is required and can't be empty",
+					}
+				}
+				if data.PaymentDate == "" {
+					data.Error.Field["paymentDate"] = map[string]string{
+						"reason": "Value is required and can't be empty",
+					}
+				}
 				return tmpl(w, data)
 			}
 
