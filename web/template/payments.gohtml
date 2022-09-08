@@ -8,7 +8,7 @@
             <h1 class="govuk-heading-s govuk-!-padding-bottom-2"><strong>{{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "lpa" }}LPA{{ end }} {{ .Case.UID }}</strong></h1>
 
             {{ if not .Payments }}
-            <h2 class="govuk-body govuk-!-padding-top-7 govuk-!-padding-bottom-7"><strong>There is currently no fee data available to display.</strong></h2>
+            <p class="govuk-!-padding-top-7 govuk-!-padding-bottom-7"><strong>There is currently no fee data available to display.</strong></p>
             {{ else }}
             <table class="govuk-table my-table table__no-border">
                 <tbody class="govuk-table__body">
@@ -19,7 +19,7 @@
                 </tbody>
             </table>
 
-            <h3 class="govuk-heading-m govuk-!-padding-top-3 govuk-!-padding-bottom-2"><strong>Fee details</strong></h3>
+            <h2 class="govuk-heading-m govuk-!-padding-top-3 govuk-!-padding-bottom-2">Fee details</h2>
 
             <details class="govuk-details" data-module="govuk-details">
                 <summary class="govuk-details__summary">
@@ -30,7 +30,7 @@
                 <div class="govuk-details__text">
 
                     {{ range $i, $p := .Payments }}
-                    <table class="govuk-table my-table table__no-border">
+                    <table class="govuk-table table__no-border">
                         <tbody class="govuk-table__body">
                             <tr class="govuk-table__row">
                                 <th scope="row" class="govuk-table__header">Amount:</th>
