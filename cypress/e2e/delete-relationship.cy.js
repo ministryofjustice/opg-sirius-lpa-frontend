@@ -1,8 +1,5 @@
 describe("Delete a relationship", () => {
   beforeEach(() => {
-    cy.setCookie("Other", "other");
-    cy.setCookie("XSRF-TOKEN", "abcde");
-    cy.setCookie("OPG-Bypass-Membrane", "1");
     cy.visit("/delete-relationship?id=189");
   });
 

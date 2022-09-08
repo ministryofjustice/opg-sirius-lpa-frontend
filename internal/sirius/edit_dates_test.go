@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -18,7 +19,6 @@ func TestEditDates(t *testing.T) {
 	testCases := []struct {
 		name          string
 		setup         func()
-		cookies       []*http.Cookie
 		expectedError func(int) error
 	}{
 		{
@@ -31,11 +31,6 @@ func TestEditDates(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
 						Path:   dsl.String("/lpa-api/v1/lpas/800/edit-dates"),
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-						},
 						Body: map[string]interface{}{
 							"rejectedDate": "04/03/2022",
 						},
@@ -44,10 +39,6 @@ func TestEditDates(t *testing.T) {
 						Status:  http.StatusOK,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 		},
 	}
@@ -59,7 +50,7 @@ func TestEditDates(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.EditDates(getContext(tc.cookies), 800, "lpa", Dates{RejectedDate: DateString("2022-03-04")})
+				err := client.EditDates(Context{Context: context.Background()}, 800, "lpa", Dates{RejectedDate: DateString("2022-03-04")})
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)

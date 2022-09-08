@@ -1,7 +1,6 @@
 package sirius
 
 import (
-	"context"
 	"net/http"
 	"testing"
 
@@ -17,14 +16,6 @@ func newPact() *dsl.Pact {
 		PactFileWriteMode: "merge",
 		LogDir:            "../../logs",
 		PactDir:           "../../pacts",
-	}
-}
-
-func getContext(cookies []*http.Cookie) Context {
-	return Context{
-		Context:   context.Background(),
-		Cookies:   cookies,
-		XSRFToken: "abcde",
 	}
 }
 
