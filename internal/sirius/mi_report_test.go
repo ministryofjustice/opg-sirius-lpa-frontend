@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -19,7 +20,6 @@ func TestMiReport(t *testing.T) {
 	testCases := []struct {
 		name           string
 		setup          func()
-		cookies        []*http.Cookie
 		expectedResult *MiReportResponse
 		expectedError  func(int) error
 	}{
@@ -36,10 +36,6 @@ func TestMiReport(t *testing.T) {
 						Query: dsl.MapMatcher{
 							"reportType": dsl.String("epasReceived"),
 						},
-						Headers: dsl.MapMatcher{
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
@@ -52,10 +48,6 @@ func TestMiReport(t *testing.T) {
 							}),
 						}),
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 			expectedResult: &MiReportResponse{
 				ResultCount:       10,
@@ -75,7 +67,7 @@ func TestMiReport(t *testing.T) {
 				form := url.Values{
 					"reportType": {"epasReceived"},
 				}
-				result, err := client.MiReport(getContext(tc.cookies), form)
+				result, err := client.MiReport(Context{Context: context.Background()}, form)
 
 				assert.Equal(t, tc.expectedResult, result)
 				if tc.expectedError == nil {

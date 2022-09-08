@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -18,7 +19,6 @@ func TestAvailableStatuses(t *testing.T) {
 	testCases := []struct {
 		name             string
 		setup            func()
-		cookies          []*http.Cookie
 		caseType         CaseType
 		expectedResponse []string
 		expectedError    func(int) error
@@ -33,21 +33,12 @@ func TestAvailableStatuses(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/lpas/800/available-statuses"),
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
 						Body:    dsl.EachLike(dsl.String("Perfect"), 1),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 			caseType:         CaseTypeLpa,
 			expectedResponse: []string{"Perfect"},
@@ -62,21 +53,12 @@ func TestAvailableStatuses(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/epas/800/available-statuses"),
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
 						Body:    dsl.EachLike(dsl.String("Perfect"), 1),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 			caseType:         CaseTypeEpa,
 			expectedResponse: []string{"Perfect"},
@@ -90,7 +72,7 @@ func TestAvailableStatuses(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				caseitem, err := client.AvailableStatuses(getContext(tc.cookies), 800, tc.caseType)
+				caseitem, err := client.AvailableStatuses(Context{Context: context.Background()}, 800, tc.caseType)
 
 				assert.Equal(t, tc.expectedResponse, caseitem)
 				if tc.expectedError == nil {

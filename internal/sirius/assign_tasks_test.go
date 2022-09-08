@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -18,7 +19,6 @@ func TestAssignTasks(t *testing.T) {
 	testCases := []struct {
 		name          string
 		setup         func()
-		cookies       []*http.Cookie
 		taskIDs       []int
 		expectedError func(int) error
 	}{
@@ -32,21 +32,11 @@ func TestAssignTasks(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
 						Path:   dsl.String("/lpa-api/v1/users/47/tasks/990"),
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-							"Content-Type":        dsl.String("application/json"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 			taskIDs: []int{990},
 		},
@@ -60,21 +50,11 @@ func TestAssignTasks(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
 						Path:   dsl.String("/lpa-api/v1/users/47/tasks/990+991"),
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-							"Content-Type":        dsl.String("application/json"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 			taskIDs: []int{990, 991},
 		},
@@ -87,7 +67,7 @@ func TestAssignTasks(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.AssignTasks(getContext(tc.cookies), 47, tc.taskIDs)
+				err := client.AssignTasks(Context{Context: context.Background()}, 47, tc.taskIDs)
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)

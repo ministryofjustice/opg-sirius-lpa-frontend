@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -18,7 +19,6 @@ func TestAllocateCases(t *testing.T) {
 	testCases := []struct {
 		name          string
 		setup         func()
-		cookies       []*http.Cookie
 		allocations   []CaseAllocation
 		expectedError func(int) error
 		file          *NoteFile
@@ -39,21 +39,11 @@ func TestAllocateCases(t *testing.T) {
 								"caseType": "LPA",
 							}},
 						},
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-							"Content-Type":        dsl.String("application/json"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 			allocations: []CaseAllocation{{ID: 800, CaseType: "LPA"}},
 		},
@@ -79,21 +69,11 @@ func TestAllocateCases(t *testing.T) {
 								"caseType": "EPA",
 							}},
 						},
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-							"Content-Type":        dsl.String("application/json"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 			allocations: []CaseAllocation{{ID: 800, CaseType: "LPA"}, {ID: 801, CaseType: "LPA"}, {ID: 802, CaseType: "EPA"}},
 		},
@@ -106,7 +86,7 @@ func TestAllocateCases(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.AllocateCases(getContext(tc.cookies), 47, tc.allocations)
+				err := client.AllocateCases(Context{Context: context.Background()}, 47, tc.allocations)
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {

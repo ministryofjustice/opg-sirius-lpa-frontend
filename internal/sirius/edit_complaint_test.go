@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -18,7 +19,6 @@ func TestEditComplaint(t *testing.T) {
 	testCases := []struct {
 		name          string
 		setup         func()
-		cookies       []*http.Cookie
 		expectedError func(int) error
 	}{
 		{
@@ -42,21 +42,11 @@ func TestEditComplaint(t *testing.T) {
 							"resolutionInfo": "We did stuff",
 							"resolutionDate": "07/06/2022",
 						}),
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-							"Content-Type":        dsl.String("application/json"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 		},
 	}
@@ -68,7 +58,7 @@ func TestEditComplaint(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.EditComplaint(getContext(tc.cookies), 986, Complaint{
+				err := client.EditComplaint(Context{Context: context.Background()}, 986, Complaint{
 					Category:       "01",
 					Description:    "This is seriously bad",
 					ReceivedDate:   DateString("2022-04-05"),

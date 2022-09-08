@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -18,7 +19,6 @@ func TestUnlinkPerson(t *testing.T) {
 	testCases := []struct {
 		name          string
 		setup         func()
-		cookies       []*http.Cookie
 		expectedError func(int) error
 	}{
 		{
@@ -34,20 +34,10 @@ func TestUnlinkPerson(t *testing.T) {
 						Body: map[string]interface{}{
 							"childIds": []int{105},
 						},
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-							"Content-Type":        dsl.String("application/json"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusNoContent,
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 		},
 	}
@@ -59,7 +49,7 @@ func TestUnlinkPerson(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.UnlinkPerson(getContext(tc.cookies), 189, 105)
+				err := client.UnlinkPerson(Context{Context: context.Background()}, 189, 105)
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)

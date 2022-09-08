@@ -1,8 +1,5 @@
 describe("Edit a payment", () => {
     beforeEach(() => {
-        cy.setCookie("Other", "other");
-        cy.setCookie("XSRF-TOKEN", "abcde");
-        cy.setCookie("OPG-Bypass-Membrane", "1");
         cy.visit("/edit-payment?id=800&payment=123");
     });
 
