@@ -67,9 +67,6 @@ func main() {
 
 			return field
 		},
-		"plus1": func(index int) int {
-			return index + 1
-		},
 		"fee": func(amount int) string {
 			float := float64(amount)
 			return fmt.Sprintf("%.2f", float/100)
