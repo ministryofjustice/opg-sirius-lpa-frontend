@@ -82,30 +82,6 @@ func TestEditCase(t *testing.T) {
 			},
 			caseType: CaseTypeEpa,
 		},
-		{
-			name: "Unauthorized",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("I have a pending case assigned").
-					UponReceiving("A request to edit the LPA without cookies").
-					WithRequest(dsl.Request{
-						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/lpas/800"),
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusUnauthorized,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:   http.StatusUnauthorized,
-					URL:    fmt.Sprintf("http://localhost:%d/lpa-api/v1/lpas/800", port),
-					Method: http.MethodPut,
-				}
-			},
-			caseType: CaseTypeLpa,
-		},
 	}
 
 	for _, tc := range testCases {
