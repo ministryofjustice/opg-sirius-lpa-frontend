@@ -73,16 +73,18 @@ func (c *Client) get(ctx Context, path string, v interface{}) error {
 }
 
 type StatusError struct {
-	Code   int    `json:"code"`
-	URL    string `json:"url"`
-	Method string `json:"method"`
+	Code          int    `json:"code"`
+	URL           string `json:"url"`
+	Method        string `json:"method"`
+	CorrelationId string
 }
 
 func newStatusError(resp *http.Response) StatusError {
 	return StatusError{
-		Code:   resp.StatusCode,
-		URL:    resp.Request.URL.String(),
-		Method: resp.Request.Method,
+		Code:          resp.StatusCode,
+		URL:           resp.Request.URL.String(),
+		Method:        resp.Request.Method,
+		CorrelationId: resp.Header.Get("Correlation-Id"),
 	}
 }
 

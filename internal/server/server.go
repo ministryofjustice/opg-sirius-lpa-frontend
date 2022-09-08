@@ -103,10 +103,11 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 type Handler func(w http.ResponseWriter, r *http.Request) error
 
 type errorVars struct {
-	SiriusURL string
-	Path      string
-	Code      int
-	Error     string
+	SiriusURL     string
+	Path          string
+	Code          int
+	Error         string
+	CorrelationId string
 }
 
 type unauthorizedError interface {
@@ -125,13 +126,19 @@ func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL 
 				logger.Request(r, err)
 
 				code := http.StatusInternalServerError
+				correlationId := ""
+
+				if statusError, ok := err.(sirius.StatusError); ok {
+					correlationId = statusError.CorrelationId
+				}
 
 				w.WriteHeader(code)
 				err = tmplError(w, errorVars{
-					SiriusURL: siriusURL,
-					Path:      "",
-					Code:      code,
-					Error:     err.Error(),
+					SiriusURL:     siriusURL,
+					Path:          "",
+					Code:          code,
+					Error:         err.Error(),
+					CorrelationId: correlationId,
 				})
 
 				if err != nil {

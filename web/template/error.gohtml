@@ -40,6 +40,9 @@ Sorry, there is a problem with the service
         {{ if .Error }}
         <p class="govuk-body"><strong>Further information:</strong> {{ .Error }}</p>
         {{ end }}
+        {{ if .CorrelationId }}
+        <p class="govuk-body"><strong>Correlation ID:</strong> {{ .CorrelationId }}</p>
+        {{ end }}
         {{ end }}
     </div>
 </div>
