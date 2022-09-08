@@ -8,7 +8,7 @@
             <h1 class="govuk-heading-s govuk-!-padding-bottom-2"><strong>{{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "lpa" }}LPA{{ end }} {{ .Case.UID }}</strong></h1>
 
             {{ if not .Payments }}
-            <p class="govuk-!-padding-top-7 govuk-!-padding-bottom-7"><strong>There is currently no fee data available to display.</strong></p>
+            <p class="govuk-body govuk-!-padding-top-7 govuk-!-padding-bottom-7"><strong>There is currently no fee data available to display.</strong></p>
             {{ else }}
             <table class="govuk-table my-table table__no-border">
                 <tbody class="govuk-table__body">
