@@ -31,6 +31,9 @@ func TestCreatePersonReference(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
 						Path:   dsl.String("/lpa-api/v1/persons/189/references"),
+						Headers: dsl.MapMatcher{
+							"Content-Type": dsl.String("application/json"),
+						},
 						Body: map[string]interface{}{
 							"referencedUid": dsl.Like("7000-9999-0001"),
 							"reason":        dsl.Like("Mother"),

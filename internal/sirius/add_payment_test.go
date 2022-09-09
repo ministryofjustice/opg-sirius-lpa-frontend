@@ -30,6 +30,9 @@ func TestAddPayment(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
 						Path:   dsl.String("/lpa-api/v1/cases/800/payments"),
+						Headers: dsl.MapMatcher{
+							"Content-Type": dsl.String("application/json"),
+						},
 						Body: map[string]interface{}{
 							"amount":      4100,
 							"source":      "MAKE",

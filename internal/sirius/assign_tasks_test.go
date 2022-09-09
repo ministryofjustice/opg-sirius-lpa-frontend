@@ -32,6 +32,9 @@ func TestAssignTasks(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
 						Path:   dsl.String("/lpa-api/v1/users/47/tasks/990"),
+						Headers: dsl.MapMatcher{
+							"Content-Type": dsl.String("application/json"),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
@@ -50,6 +53,9 @@ func TestAssignTasks(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
 						Path:   dsl.String("/lpa-api/v1/users/47/tasks/990+991"),
+						Headers: dsl.MapMatcher{
+							"Content-Type": dsl.String("application/json"),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,

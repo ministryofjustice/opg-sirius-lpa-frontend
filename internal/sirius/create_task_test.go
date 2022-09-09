@@ -32,6 +32,9 @@ func TestCreateTask(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
 						Path:   dsl.String("/lpa-api/v1/tasks"),
+						Headers: dsl.MapMatcher{
+							"Content-Type": dsl.String("application/json"),
+						},
 						Body: map[string]interface{}{
 							"caseId":      dsl.Like(800),
 							"assigneeId":  dsl.Like(1),

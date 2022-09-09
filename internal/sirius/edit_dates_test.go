@@ -31,6 +31,9 @@ func TestEditDates(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
 						Path:   dsl.String("/lpa-api/v1/lpas/800/edit-dates"),
+						Headers: dsl.MapMatcher{
+							"Content-Type": dsl.String("application/json"),
+						},
 						Body: map[string]interface{}{
 							"rejectedDate": "04/03/2022",
 						},

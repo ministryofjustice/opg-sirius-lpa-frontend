@@ -31,6 +31,9 @@ func TestAddComplaint(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
 						Path:   dsl.String("/lpa-api/v1/lpas/800/complaints"),
+						Headers: dsl.MapMatcher{
+							"Content-Type": dsl.String("application/json"),
+						},
 						Body: dsl.Like(map[string]interface{}{
 							"category":     "01",
 							"description":  "This is seriously bad",

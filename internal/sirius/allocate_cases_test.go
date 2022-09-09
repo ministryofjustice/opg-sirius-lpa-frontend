@@ -33,6 +33,9 @@ func TestAllocateCases(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
 						Path:   dsl.String("/lpa-api/v1/users/47/cases/800"),
+						Headers: dsl.MapMatcher{
+							"Content-Type": dsl.String("application/json"),
+						},
 						Body: map[string]interface{}{
 							"data": []map[string]interface{}{{
 								"id":       800,
@@ -57,6 +60,9 @@ func TestAllocateCases(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
 						Path:   dsl.String("/lpa-api/v1/users/47/cases/800+801+802"),
+						Headers: dsl.MapMatcher{
+							"Content-Type": dsl.String("application/json"),
+						},
 						Body: map[string]interface{}{
 							"data": []map[string]interface{}{{
 								"id":       800,

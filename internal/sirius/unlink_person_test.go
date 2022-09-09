@@ -31,6 +31,9 @@ func TestUnlinkPerson(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPatch,
 						Path:   dsl.String("/lpa-api/v1/person-links/189"),
+						Headers: dsl.MapMatcher{
+							"Content-Type": dsl.String("application/json"),
+						},
 						Body: map[string]interface{}{
 							"childIds": []int{105},
 						},
