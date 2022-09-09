@@ -1,8 +1,5 @@
 describe("Edit dates", () => {
   beforeEach(() => {
-    cy.setCookie("Other", "other");
-    cy.setCookie("XSRF-TOKEN", "abcde");
-    cy.setCookie("OPG-Bypass-Membrane", "1");
     cy.visit("/edit-dates?id=800&case=lpa");
   });
 

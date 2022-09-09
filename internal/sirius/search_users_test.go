@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -18,7 +19,6 @@ func TestSearchUsers(t *testing.T) {
 	testCases := []struct {
 		name             string
 		setup            func()
-		cookies          []*http.Cookie
 		expectedResponse []User
 		expectedError    func(int) error
 	}{
@@ -35,11 +35,6 @@ func TestSearchUsers(t *testing.T) {
 						Query: dsl.MapMatcher{
 							"query": dsl.String("admin"),
 						},
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
@@ -49,10 +44,6 @@ func TestSearchUsers(t *testing.T) {
 							"displayName": dsl.String("system admin"),
 						}, 1),
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 			expectedResponse: []User{
 				{
@@ -70,7 +61,7 @@ func TestSearchUsers(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				users, err := client.SearchUsers(getContext(tc.cookies), "admin")
+				users, err := client.SearchUsers(Context{Context: context.Background()}, "admin")
 				assert.Equal(t, tc.expectedResponse, users)
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
@@ -86,7 +77,7 @@ func TestSearchUsers(t *testing.T) {
 func TestSearchUsersTooShort(t *testing.T) {
 	client := NewClient(http.DefaultClient, "")
 
-	users, err := client.SearchUsers(getContext(nil), "ad")
+	users, err := client.SearchUsers(Context{Context: context.Background()}, "ad")
 	assert.Nil(t, users)
 	assert.Equal(t, fmt.Errorf("Search term must be at least three characters"), err)
 }

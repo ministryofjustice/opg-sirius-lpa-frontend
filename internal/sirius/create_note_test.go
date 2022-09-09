@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -18,7 +19,6 @@ func TestCreateNote(t *testing.T) {
 	testCases := []struct {
 		name          string
 		setup         func()
-		cookies       []*http.Cookie
 		expectedError func(int) error
 		file          *NoteFile
 	}{
@@ -38,20 +38,13 @@ func TestCreateNote(t *testing.T) {
 							"type":        "Application processing",
 						}),
 						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-							"Content-Type":        dsl.String("application/json"),
+							"Content-Type": dsl.String("application/json"),
 						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusCreated,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 		},
 		{
@@ -64,6 +57,9 @@ func TestCreateNote(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
 						Path:   dsl.String("/lpa-api/v1/lpas/800/notes"),
+						Headers: dsl.MapMatcher{
+							"Content-Type": dsl.String("application/json"),
+						},
 						Body: dsl.Like(map[string]interface{}{
 							"name":        "Something",
 							"description": "More words",
@@ -74,21 +70,11 @@ func TestCreateNote(t *testing.T) {
 								"source": "SGVsbG8gdGhlcmUK",
 							}),
 						}),
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-							"Content-Type":        dsl.String("application/json"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusCreated,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 			file: &NoteFile{
 				Name:   "words.txt",
@@ -105,7 +91,7 @@ func TestCreateNote(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.CreateNote(getContext(tc.cookies), 800, "lpa", "Application processing", "Something", "More words", tc.file)
+				err := client.CreateNote(Context{Context: context.Background()}, 800, "lpa", "Application processing", "Something", "More words", tc.file)
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {
