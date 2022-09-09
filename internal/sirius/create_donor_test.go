@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -19,7 +20,6 @@ func TestCreateDonor(t *testing.T) {
 		name           string
 		personData     Person
 		setup          func()
-		cookies        []*http.Cookie
 		expectedPerson Person
 		expectedError  func(int) error
 	}{
@@ -57,6 +57,9 @@ func TestCreateDonor(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
 						Path:   dsl.String("/lpa-api/v1/donors"),
+						Headers: dsl.MapMatcher{
+							"Content-Type": dsl.String("application/json"),
+						},
 						Body: map[string]interface{}{
 							"salutation":            "Prof",
 							"firstname":             "Melanie",
@@ -82,12 +85,6 @@ func TestCreateDonor(t *testing.T) {
 							"correspondenceByWelsh": false,
 							"researchOptOut":        true,
 						},
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-							"Content-Type":        dsl.String("application/json"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusCreated,
@@ -97,10 +94,6 @@ func TestCreateDonor(t *testing.T) {
 							"uId": dsl.Like("7000-0290-0192"),
 						},
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 			expectedPerson: Person{
 				ID:  771,
@@ -116,7 +109,7 @@ func TestCreateDonor(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				person, err := client.CreateDonor(getContext(tc.cookies), tc.personData)
+				person, err := client.CreateDonor(Context{Context: context.Background()}, tc.personData)
 				if (tc.expectedError) == nil {
 					assert.Equal(t, tc.expectedPerson, person)
 					assert.Nil(t, err)

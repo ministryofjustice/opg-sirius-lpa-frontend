@@ -1,8 +1,5 @@
 describe("Create an event", () => {
   beforeEach(() => {
-    cy.setCookie("Other", "other");
-    cy.setCookie("XSRF-TOKEN", "abcde");
-    cy.setCookie("OPG-Bypass-Membrane", "1");
     cy.visit("/create-event?id=800&entity=lpa");
   });
 

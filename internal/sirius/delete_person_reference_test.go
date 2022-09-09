@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -18,7 +19,6 @@ func TestDeletePersonReferences(t *testing.T) {
 	testCases := []struct {
 		name          string
 		setup         func()
-		cookies       []*http.Cookie
 		expectedError func(int) error
 	}{
 		{
@@ -31,19 +31,10 @@ func TestDeletePersonReferences(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodDelete,
 						Path:   dsl.String("/lpa-api/v1/person-references/768"),
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusNoContent,
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 		},
 	}
@@ -55,7 +46,7 @@ func TestDeletePersonReferences(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.DeletePersonReference(getContext(tc.cookies), 768)
+				err := client.DeletePersonReference(Context{Context: context.Background()}, 768)
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)

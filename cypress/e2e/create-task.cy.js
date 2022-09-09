@@ -1,8 +1,5 @@
 describe("Create a task", () => {
   beforeEach(() => {
-    cy.setCookie("Other", "other");
-    cy.setCookie("XSRF-TOKEN", "abcde");
-    cy.setCookie("OPG-Bypass-Membrane", "1");
     cy.visit("/create-task?id=800");
   });
 

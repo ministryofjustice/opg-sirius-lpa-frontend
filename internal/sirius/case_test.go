@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -18,7 +19,6 @@ func TestCase(t *testing.T) {
 	testCases := []struct {
 		name             string
 		setup            func()
-		cookies          []*http.Cookie
 		expectedResponse Case
 		expectedError    func(int) error
 	}{
@@ -32,11 +32,6 @@ func TestCase(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/cases/800"),
-						Headers: dsl.MapMatcher{
-							"X-XSRF-TOKEN":        dsl.String("abcde"),
-							"Cookie":              dsl.String("XSRF-TOKEN=abcde; Other=other"),
-							"OPG-Bypass-Membrane": dsl.String("1"),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
@@ -47,10 +42,6 @@ func TestCase(t *testing.T) {
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
-			},
-			cookies: []*http.Cookie{
-				{Name: "XSRF-TOKEN", Value: "abcde"},
-				{Name: "Other", Value: "other"},
 			},
 			expectedResponse: Case{UID: "7000-0000-0000", CaseType: "LPA", Status: "Pending"},
 		},
@@ -63,7 +54,7 @@ func TestCase(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				caseitem, err := client.Case(getContext(tc.cookies), 800)
+				caseitem, err := client.Case(Context{Context: context.Background()}, 800)
 
 				assert.Equal(t, tc.expectedResponse, caseitem)
 				if tc.expectedError == nil {

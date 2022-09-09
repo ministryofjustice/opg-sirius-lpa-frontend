@@ -1,8 +1,5 @@
 describe("Allocate cases", () => {
   beforeEach(() => {
-    cy.setCookie("Other", "other");
-    cy.setCookie("XSRF-TOKEN", "abcde");
-    cy.setCookie("OPG-Bypass-Membrane", "1");
     cy.visit("/allocate-cases?id=800");
   });
 
