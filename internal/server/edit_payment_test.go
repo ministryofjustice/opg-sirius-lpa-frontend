@@ -16,9 +16,9 @@ type mockEditPaymentClient struct {
 	mock.Mock
 }
 
-func (m *mockEditPaymentClient) PaymentByID(ctx sirius.Context, id int) (sirius.PaymentDetails, error) {
+func (m *mockEditPaymentClient) PaymentByID(ctx sirius.Context, id int) (sirius.Payment, error) {
 	args := m.Called(ctx, id)
-	return args.Get(0).(sirius.PaymentDetails), args.Error(1)
+	return args.Get(0).(sirius.Payment), args.Error(1)
 }
 
 func (m *mockEditPaymentClient) EditPayment(ctx sirius.Context, paymentID int, payment sirius.Payment) error {
@@ -36,14 +36,11 @@ func TestGetEditPayment(t *testing.T) {
 		SubType: "pfa",
 	}
 
-	paymentDetails := sirius.PaymentDetails{
-		CaseId: 4,
-		Payment: sirius.Payment{
-			ID:          123,
-			Amount:      8200,
-			Source:      "PHONE",
-			PaymentDate: sirius.DateString("2022-07-23"),
-		},
+	payment := sirius.Payment{
+		ID:          123,
+		Amount:      8200,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-07-23"),
 	}
 
 	client := &mockEditPaymentClient{}
@@ -52,7 +49,7 @@ func TestGetEditPayment(t *testing.T) {
 		Return(caseItem, nil)
 	client.
 		On("PaymentByID", mock.Anything, 123).
-		Return(paymentDetails, nil)
+		Return(payment, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -103,7 +100,7 @@ func TestEditPaymentWhenFailureOnGetPaymentByID(t *testing.T) {
 	client := &mockEditPaymentClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
-		Return(sirius.PaymentDetails{}, expectedError)
+		Return(sirius.Payment{}, expectedError)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=4&payment=123", nil)
 	w := httptest.NewRecorder()
@@ -117,20 +114,17 @@ func TestEditPaymentWhenFailureOnGetPaymentByID(t *testing.T) {
 func TestEditPaymentWhenFailureOnGetCase(t *testing.T) {
 	expectedError := errors.New("err")
 
-	paymentDetails := sirius.PaymentDetails{
-		CaseId: 4,
-		Payment: sirius.Payment{
-			ID:          123,
-			Amount:      8200,
-			Source:      "PHONE",
-			PaymentDate: sirius.DateString("2022-07-23"),
-		},
+	payment := sirius.Payment{
+		ID:          123,
+		Amount:      8200,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-07-23"),
 	}
 
 	client := &mockEditPaymentClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
-		Return(paymentDetails, nil)
+		Return(payment, nil)
 	client.
 		On("Case", mock.Anything, 4).
 		Return(sirius.Case{}, expectedError)
@@ -150,20 +144,17 @@ func TestEditPaymentWhenTemplateErrors(t *testing.T) {
 		SubType: "pfa",
 	}
 
-	paymentDetails := sirius.PaymentDetails{
-		CaseId: 4,
-		Payment: sirius.Payment{
-			ID:          123,
-			Amount:      8200,
-			Source:      "PHONE",
-			PaymentDate: sirius.DateString("2022-07-23"),
-		},
+	payment := sirius.Payment{
+		ID:          123,
+		Amount:      8200,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-07-23"),
 	}
 
 	client := &mockEditPaymentClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
-		Return(paymentDetails, nil)
+		Return(payment, nil)
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
@@ -195,20 +186,17 @@ func TestPostEditPaymentAmountIncorrectFormat(t *testing.T) {
 		t.Run(amount, func(t *testing.T) {
 			caseItem := sirius.Case{CaseType: "lpa", UID: "700700"}
 
-			paymentDetails := sirius.PaymentDetails{
-				CaseId: 4,
-				Payment: sirius.Payment{
-					ID:          123,
-					Amount:      8200,
-					Source:      "PHONE",
-					PaymentDate: sirius.DateString("2022-07-23"),
-				},
+			payment := sirius.Payment{
+				ID:          123,
+				Amount:      8200,
+				Source:      "PHONE",
+				PaymentDate: sirius.DateString("2022-07-23"),
 			}
 
 			client := &mockEditPaymentClient{}
 			client.
 				On("PaymentByID", mock.Anything, 123).
-				Return(paymentDetails, nil)
+				Return(payment, nil)
 			client.
 				On("Case", mock.Anything, 4).
 				Return(caseItem, nil)
@@ -255,14 +243,11 @@ func TestPostEditPaymentAmountIncorrectFormat(t *testing.T) {
 func TestPostEditPayment(t *testing.T) {
 	caseItem := sirius.Case{CaseType: "lpa", UID: "700700"}
 
-	paymentDetails := sirius.PaymentDetails{
-		CaseId: 4,
-		Payment: sirius.Payment{
-			ID:          123,
-			Amount:      8200,
-			Source:      "PHONE",
-			PaymentDate: sirius.DateString("2022-02-18"),
-		},
+	payment := sirius.Payment{
+		ID:          123,
+		Amount:      8200,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-02-18"),
 	}
 
 	editedPayment := sirius.Payment{
@@ -274,7 +259,7 @@ func TestPostEditPayment(t *testing.T) {
 	client := &mockEditPaymentClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
-		Return(paymentDetails, nil)
+		Return(payment, nil)
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
