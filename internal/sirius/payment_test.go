@@ -86,7 +86,7 @@ func TestPaymentByID(t *testing.T) {
 		setup            func()
 		cookies          []*http.Cookie
 		expectedError    func(int) error
-		expectedResponse Payment
+		expectedResponse PaymentDetails
 	}{
 		{
 			name: "OK",
@@ -102,19 +102,25 @@ func TestPaymentByID(t *testing.T) {
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
 						Body: dsl.Like(map[string]interface{}{
-							"id":          dsl.Like(123),
-							"source":      dsl.Like("PHONE"),
-							"amount":      dsl.Like(4100),
-							"paymentDate": dsl.String("23/01/2022"),
+							"caseId":          dsl.Like(1),
+							"payment": dsl.Like(map[string]interface{}{
+								"id":          dsl.Like(123),
+								"source":      dsl.Like("PHONE"),
+								"amount":      dsl.Like(4100),
+								"paymentDate": dsl.String("23/01/2022"),
+							}),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
-			expectedResponse: Payment{
-				ID:          123,
-				Source:      "PHONE",
-				Amount:      4100,
-				PaymentDate: DateString("2022-01-23"),
+			expectedResponse: PaymentDetails{
+				1,
+				Payment{
+					ID:          123,
+					Source:      "PHONE",
+					Amount:      4100,
+					PaymentDate: DateString("2022-01-23"),
+				},
 			},
 		},
 	}

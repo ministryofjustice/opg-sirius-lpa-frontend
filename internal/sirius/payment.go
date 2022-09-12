@@ -12,6 +12,11 @@ type Payment struct {
 	PaymentDate DateString `json:"paymentDate"`
 }
 
+type PaymentDetails struct {
+	CaseId      int     `json:"caseId"`
+	Payment     Payment `json:"payment"`
+}
+
 func (c *Client) Payments(ctx Context, id int) ([]Payment, error) {
 	var p []Payment
 
@@ -23,8 +28,8 @@ func (c *Client) Payments(ctx Context, id int) ([]Payment, error) {
 	return p, nil
 }
 
-func (c *Client) PaymentByID(ctx Context, id int) (Payment, error) {
-	var p Payment
+func (c *Client) PaymentByID(ctx Context, id int) (PaymentDetails, error) {
+	var p PaymentDetails
 	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/payments/%d", id), &p)
 
 	return p, err

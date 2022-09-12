@@ -11,7 +11,7 @@ import (
 type EditPaymentClient interface {
 	EditPayment(ctx sirius.Context, paymentID int, payment sirius.Payment) error
 	Case(sirius.Context, int) (sirius.Case, error)
-	PaymentByID(ctx sirius.Context, id int) (sirius.Payment, error)
+	PaymentByID(ctx sirius.Context, id int) (sirius.PaymentDetails, error)
 }
 
 type editPaymentData struct {
@@ -28,7 +28,7 @@ type editPaymentData struct {
 
 func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		caseID, err := strconv.Atoi(r.FormValue("id"))
+		_, err := strconv.Atoi(r.FormValue("id"))
 		if err != nil {
 			return err
 		}
@@ -38,7 +38,7 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-		p, err := client.PaymentByID(ctx, paymentID)
+		pd, err := client.PaymentByID(ctx, paymentID)
 		if err != nil {
 			return err
 		}
@@ -46,12 +46,12 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 		data := editPaymentData{
 			XSRFToken:   ctx.XSRFToken,
 			PaymentID:   paymentID,
-			Amount:      fmt.Sprintf("%.2f", sirius.PenceToPounds(p.Amount)),
-			Source:      p.Source,
-			PaymentDate: p.PaymentDate,
+			Amount:      fmt.Sprintf("%.2f", sirius.PenceToPounds(pd.Payment.Amount)),
+			Source:      pd.Payment.Source,
+			PaymentDate: pd.Payment.PaymentDate,
 		}
 
-		data.Case, err = client.Case(ctx, caseID)
+		data.Case, err = client.Case(ctx, pd.CaseId)
 		if err != nil {
 			return err
 		}
