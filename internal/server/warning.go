@@ -31,7 +31,7 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-		warningTypes, err := client.RefDataByCategory(ctx, "warningType")
+		warningTypes, err := client.RefDataByCategory(ctx, sirius.WarningTypeCategory)
 		if err != nil {
 			return err
 		}

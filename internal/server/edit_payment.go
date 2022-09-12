@@ -58,7 +58,7 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data.PaymentSources, err = client.RefDataByCategory(ctx, "paymentSource")
+		data.PaymentSources, err = client.RefDataByCategory(ctx, sirius.PaymentSourceCategory)
 		if err != nil {
 			return err
 		}

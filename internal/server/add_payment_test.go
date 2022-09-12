@@ -52,7 +52,7 @@ func TestGetAddPayment(t *testing.T) {
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
 	client.
-		On("RefDataByCategory", mock.Anything, "paymentSource").
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil)
 
 	template := &mockTemplate{}
@@ -128,7 +128,7 @@ func TestAddPaymentWhenTemplateErrors(t *testing.T) {
 		On("Case", mock.Anything, 123).
 		Return(caseItem, nil)
 	client.
-		On("RefDataByCategory", mock.Anything, "paymentSource").
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil)
 
 	expectedError := errors.New("err")
@@ -163,7 +163,7 @@ func TestAddPaymentWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 		On("Case", mock.Anything, 123).
 		Return(caseItem, nil)
 	client.
-		On("RefDataByCategory", mock.Anything, "paymentSource").
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return([]sirius.RefDataItem{}, expectedError)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
@@ -194,7 +194,7 @@ func TestPostAddPayment(t *testing.T) {
 		On("Case", mock.Anything, 123).
 		Return(caseitem, nil)
 	client.
-		On("RefDataByCategory", mock.Anything, "paymentSource").
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil)
 
 	template := &mockTemplate{}
@@ -245,7 +245,7 @@ func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
 				On("Case", mock.Anything, 123).
 				Return(caseitem, nil)
 			client.
-				On("RefDataByCategory", mock.Anything, "paymentSource").
+				On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 				Return(paymentSources, nil)
 
 			validationError := sirius.ValidationError{

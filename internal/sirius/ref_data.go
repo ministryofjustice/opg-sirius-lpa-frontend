@@ -2,6 +2,11 @@ package sirius
 
 import "fmt"
 
+const (
+	PaymentSourceCategory string = "paymentSource"
+	WarningTypeCategory          = "warningType"
+)
+
 type RefDataItem struct {
 	Handle         string `json:"handle"`
 	Label          string `json:"label"`

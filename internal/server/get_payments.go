@@ -43,7 +43,7 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		}
 		data.Payments = payments
 
-		data.PaymentSources, err = client.RefDataByCategory(ctx, "paymentSource")
+		data.PaymentSources, err = client.RefDataByCategory(ctx, sirius.PaymentSourceCategory)
 		if err != nil {
 			return err
 		}

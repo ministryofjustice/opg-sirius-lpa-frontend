@@ -58,7 +58,7 @@ func TestRefDataByCategory(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				types, err := client.RefDataByCategory(Context{Context: context.Background()}, "warningType")
+				types, err := client.RefDataByCategory(Context{Context: context.Background()}, WarningTypeCategory)
 
 				assert.Equal(t, tc.expectedResponse, types)
 				if tc.expectedError == nil {

@@ -64,7 +64,7 @@ func TestGetPayments(t *testing.T) {
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
 	client.
-		On("RefDataByCategory", mock.Anything, "paymentSource").
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil)
 
 	template := &mockTemplate{}
@@ -174,7 +174,7 @@ func TestGetPaymentsWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 		On("Payments", mock.Anything, 4).
 		Return(payments, nil)
 	client.
-		On("RefDataByCategory", mock.Anything, "paymentSource").
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return([]sirius.RefDataItem{}, expectedError)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
@@ -216,7 +216,7 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
 	client.
-		On("RefDataByCategory", mock.Anything, "paymentSource").
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil)
 
 	expectedError := errors.New("err")
