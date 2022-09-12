@@ -43,12 +43,8 @@
                             <tr class="govuk-table__row">
                                 <th scope="row" class="govuk-table__header">Method:</th>
                                 <td class="govuk-table__cell">
-                                    {{ if eq .Source "PHONE" }}
-                                        Telephone
-                                    {{ else if eq .Source "MAKE" }}
-                                        Online - Make
-                                    {{ else if eq .Source "ONLINE" }}
-                                        Online - Notify
+                                    {{ range $.PaymentSources }}
+                                        {{ if eq .Handle $p.Source }}{{ .Label }}{{ end }}
                                     {{ end }}
                                 </td>
                             </tr>

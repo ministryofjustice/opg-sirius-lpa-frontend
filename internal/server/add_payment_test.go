@@ -25,21 +25,41 @@ func (m *mockAddPaymentClient) Case(ctx sirius.Context, id int) (sirius.Case, er
 	return args.Get(0).(sirius.Case), args.Error(1)
 }
 
+func (m *mockAddPaymentClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
+	args := m.Called(ctx, category)
+	if args.Get(0) != nil {
+		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
 func TestGetAddPayment(t *testing.T) {
 	caseItem := sirius.Case{
 		UID:     "7000-0000-0021",
 		SubType: "pfa",
 	}
 
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
 	client := &mockAddPaymentClient{}
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, "paymentSource").
+		Return(paymentSources, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addPaymentData{
-			Case: caseItem,
+			Case:           caseItem,
+			PaymentSources: paymentSources,
 		}).
 		Return(nil)
 
@@ -95,17 +115,29 @@ func TestAddPaymentWhenTemplateErrors(t *testing.T) {
 		SubType: "pfa",
 	}
 
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
 	client := &mockAddPaymentClient{}
 	client.
 		On("Case", mock.Anything, 123).
 		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, "paymentSource").
+		Return(paymentSources, nil)
 
 	expectedError := errors.New("err")
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addPaymentData{
-			Case: caseItem,
+			Case:           caseItem,
+			PaymentSources: paymentSources,
 		}).
 		Return(expectedError)
 
@@ -118,26 +150,62 @@ func TestAddPaymentWhenTemplateErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestAddPaymentWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
+	caseItem := sirius.Case{
+		UID:     "7000-0000-0021",
+		SubType: "pfa",
+	}
+
+	expectedError := errors.New("err")
+
+	client := &mockAddPaymentClient{}
+	client.
+		On("Case", mock.Anything, 123).
+		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, "paymentSource").
+		Return([]sirius.RefDataItem{}, expectedError)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := AddPayment(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
 func TestPostAddPayment(t *testing.T) {
 	caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
 
 	client := &mockAddPaymentClient{}
 	client.
 		On("AddPayment", mock.Anything, 123, 4100, "MAKE", sirius.DateString("2022-01-23")).
 		Return(nil)
-
 	client.
 		On("Case", mock.Anything, 123).
 		Return(caseitem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, "paymentSource").
+		Return(paymentSources, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addPaymentData{
-			Success:     true,
-			Case:        caseitem,
-			Amount:      "41.00",
-			Source:      "MAKE",
-			PaymentDate: sirius.DateString("2022-01-23"),
+			Success:        true,
+			Case:           caseitem,
+			Amount:         "41.00",
+			Source:         "MAKE",
+			PaymentDate:    sirius.DateString("2022-01-23"),
+			PaymentSources: paymentSources,
 		}).
 		Return(nil)
 
@@ -164,10 +232,21 @@ func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
 		t.Run(amount, func(t *testing.T) {
 			caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
 
+			paymentSources := []sirius.RefDataItem{
+				{
+					Handle:         "PHONE",
+					Label:          "Paid over the phone",
+					UserSelectable: true,
+				},
+			}
+
 			client := &mockAddPaymentClient{}
 			client.
 				On("Case", mock.Anything, 123).
 				Return(caseitem, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, "paymentSource").
+				Return(paymentSources, nil)
 
 			validationError := sirius.ValidationError{
 				Field: sirius.FieldErrors{
@@ -178,12 +257,13 @@ func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, addPaymentData{
-					Success:     false,
-					Case:        caseitem,
-					Amount:      amount,
-					Source:      "MAKE",
-					PaymentDate: sirius.DateString("2022-01-23"),
-					Error:       validationError,
+					Success:        false,
+					Case:           caseitem,
+					Amount:         amount,
+					Source:         "MAKE",
+					PaymentDate:    sirius.DateString("2022-01-23"),
+					Error:          validationError,
+					PaymentSources: paymentSources,
 				}).
 				Return(nil)
 

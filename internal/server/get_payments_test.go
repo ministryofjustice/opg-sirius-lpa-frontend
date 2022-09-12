@@ -24,6 +24,14 @@ func (m *mockGetPayments) Case(ctx sirius.Context, id int) (sirius.Case, error) 
 	return args.Get(0).(sirius.Case), args.Error(1)
 }
 
+func (m *mockGetPayments) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
+	args := m.Called(ctx, category)
+	if args.Get(0) != nil {
+		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
 func TestGetPayments(t *testing.T) {
 	payments := []sirius.Payment{
 		{
@@ -41,21 +49,31 @@ func TestGetPayments(t *testing.T) {
 		SubType: "pfa",
 	}
 
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle: "PHONE",
+			Label:  "Paid over the phone",
+		},
+	}
+
 	client := &mockGetPayments{}
 	client.
 		On("Payments", mock.Anything, 4).
 		Return(payments, nil)
-
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, "paymentSource").
+		Return(paymentSources, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getPaymentsData{
-			Payments:  payments,
-			Case:      caseItem,
-			TotalPaid: 5538,
+			Payments:       payments,
+			PaymentSources: paymentSources,
+			Case:           caseItem,
+			TotalPaid:      5538,
 		}).
 		Return(nil)
 
@@ -131,7 +149,9 @@ func TestGetPaymentsWhenFailureOnGetPayments(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
+func TestGetPaymentsWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
+	expectedError := errors.New("err")
+
 	payments := []sirius.Payment{
 		{
 			ID:          2,
@@ -148,21 +168,66 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 
 	client := &mockGetPayments{}
 	client.
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil)
+	client.
 		On("Payments", mock.Anything, 4).
 		Return(payments, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, "paymentSource").
+		Return([]sirius.RefDataItem{}, expectedError)
 
+	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
+	w := httptest.NewRecorder()
+
+	err := GetPayments(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
+	payments := []sirius.Payment{
+		{
+			ID:          2,
+			Source:      "PHONE",
+			Amount:      4100,
+			PaymentDate: sirius.DateString("2022-08-23T14:55:20+00:00"),
+		},
+	}
+
+	caseItem := sirius.Case{
+		UID:     "7000-0000-0021",
+		SubType: "pfa",
+	}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle: "PHONE",
+			Label:  "Paid over the phone",
+		},
+	}
+
+	client := &mockGetPayments{}
+	client.
+		On("Payments", mock.Anything, 4).
+		Return(payments, nil)
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, "paymentSource").
+		Return(paymentSources, nil)
 
 	expectedError := errors.New("err")
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getPaymentsData{
-			Payments:  payments,
-			Case:      caseItem,
-			TotalPaid: 4100,
+			Payments:       payments,
+			PaymentSources: paymentSources,
+			Case:           caseItem,
+			TotalPaid:      4100,
 		}).
 		Return(expectedError)
 

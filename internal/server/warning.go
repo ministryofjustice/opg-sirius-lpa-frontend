@@ -9,7 +9,7 @@ import (
 )
 
 type WarningClient interface {
-	WarningTypes(ctx sirius.Context) ([]sirius.RefDataItem, error)
+	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	CreateWarning(ctx sirius.Context, personId int, warningType, warningNote string) error
 }
 
@@ -31,8 +31,7 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-
-		warningTypes, err := client.WarningTypes(ctx)
+		warningTypes, err := client.RefDataByCategory(ctx, "warningType")
 		if err != nil {
 			return err
 		}

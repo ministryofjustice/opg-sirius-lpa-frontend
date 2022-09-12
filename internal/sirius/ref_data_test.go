@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestWarningTypes(t *testing.T) {
+func TestRefDataByCategory(t *testing.T) {
 	t.Parallel()
 
 	pact := newPact()
@@ -58,7 +58,7 @@ func TestWarningTypes(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				types, err := client.WarningTypes(Context{Context: context.Background()})
+				types, err := client.RefDataByCategory(Context{Context: context.Background()}, "warningType")
 
 				assert.Equal(t, tc.expectedResponse, types)
 				if tc.expectedError == nil {

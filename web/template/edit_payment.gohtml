@@ -37,8 +37,11 @@
                     {{ template "errors" .Error.Field.source }}
                     <select class="govuk-select {{ if .Error.Field.source }}govuk-select--error{{ end }}" id="f-source" name="source">
                         <option hidden selected disabled></option>
-                        <option value="PHONE" {{ if eq .Source "PHONE" }}selected{{ end }}>Telephone</option>
-                        <option value="ONLINE" {{ if eq .Source "ONLINE" }}selected{{ end }}>Online - Notify</option>
+                        {{ range .PaymentSources }}
+                            {{ if .UserSelectable }}
+                                <option value="{{ .Handle }}" {{ if eq .Handle $.Source }}selected{{ end }}>{{ .Label }}</option>
+                            {{ end }}
+                        {{ end }}
                     </select>
                 </div>
 

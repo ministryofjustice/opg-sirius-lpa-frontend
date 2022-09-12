@@ -22,8 +22,8 @@ func (s *mockWarningClient) CreateWarning(ctx sirius.Context, personId int, warn
 	return args.Error(0)
 }
 
-func (s *mockWarningClient) WarningTypes(ctx sirius.Context) ([]sirius.RefDataItem, error) {
-	args := s.Called(ctx)
+func (s *mockWarningClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
+	args := s.Called(ctx, category)
 	if args.Get(0) != nil {
 		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
 	}
@@ -31,27 +31,21 @@ func (s *mockWarningClient) WarningTypes(ctx sirius.Context) ([]sirius.RefDataIt
 }
 
 func TestGetWarning(t *testing.T) {
-	siriusClient := &mockWarningClient{}
-	siriusClient.On("WarningTypes", mock.Anything).Return(
-		[]sirius.RefDataItem{
-			{
-				Handle: "Complaint Received",
-				Label:  "Complaint Received",
-			},
+	warningTypes := []sirius.RefDataItem{
+		{
+			Handle: "Complaint Received",
+			Label:  "Complaint Received",
 		},
-		nil,
-	)
+	}
+
+	siriusClient := &mockWarningClient{}
+	siriusClient.On("RefDataByCategory", mock.Anything, "warningType").Return(warningTypes, nil)
 
 	template := &mockTemplate{}
 	template.On("Func", mock.Anything, warningData{
-		Success:   false,
-		XSRFToken: "",
-		WarningTypes: []sirius.RefDataItem{
-			{
-				Handle: "Complaint Received",
-				Label:  "Complaint Received",
-			},
-		},
+		Success:      false,
+		XSRFToken:    "",
+		WarningTypes: warningTypes,
 	}).Return(nil)
 
 	req, _ := http.NewRequest(http.MethodGet, "/?id=89", nil)
@@ -66,7 +60,7 @@ func TestGetWarning(t *testing.T) {
 
 func TestPostWarning(t *testing.T) {
 	siriusClient := &mockWarningClient{}
-	siriusClient.On("WarningTypes", mock.Anything).Return(
+	siriusClient.On("RefDataByCategory", mock.Anything, "warningType").Return(
 		[]sirius.RefDataItem{
 			{
 				Handle: "Complaint Received",
@@ -106,7 +100,7 @@ func TestPostWarning(t *testing.T) {
 
 func TestPostWarningValidationErrors(t *testing.T) {
 	siriusClient := &mockWarningClient{}
-	siriusClient.On("WarningTypes", mock.Anything).Return(
+	siriusClient.On("RefDataByCategory", mock.Anything, "warningType").Return(
 		[]sirius.RefDataItem{
 			{
 				Handle: "Complaint Received",
@@ -154,7 +148,7 @@ func TestPostWarningValidationErrors(t *testing.T) {
 
 func TestCreateWarningReturnsError(t *testing.T) {
 	siriusClient := &mockWarningClient{}
-	siriusClient.On("WarningTypes", mock.Anything).Return(
+	siriusClient.On("RefDataByCategory", mock.Anything, "warningType").Return(
 		[]sirius.RefDataItem{
 			{
 				Handle: "Complaint Received",
@@ -183,7 +177,8 @@ func TestCreateWarningReturnsError(t *testing.T) {
 func TestGetWarningTypesFail(t *testing.T) {
 	expectedErr := errors.New("Failed to get warning types")
 	siriusClient := &mockWarningClient{}
-	siriusClient.On("WarningTypes", mock.Anything).Return(nil, expectedErr)
+	siriusClient.
+		On("RefDataByCategory", mock.Anything, "warningType").Return(nil, expectedErr)
 
 	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
 		"warningType": {"Complaint Recieved"},
