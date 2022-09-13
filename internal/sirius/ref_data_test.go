@@ -98,7 +98,7 @@ func TestRefDataByCategoryPaymentSources(t *testing.T) {
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
-						Body: dsl.EachLike([]map[string]interface{}{
+						Body: dsl.Like([]map[string]interface{}{
 							{
 								"handle":         dsl.String("PHONE"),
 								"label":          dsl.String("Paid over the phone"),
@@ -109,7 +109,7 @@ func TestRefDataByCategoryPaymentSources(t *testing.T) {
 								"label":          dsl.String("Paid online"),
 								"userSelectable": true,
 							},
-						}, 1),
+						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
@@ -117,6 +117,11 @@ func TestRefDataByCategoryPaymentSources(t *testing.T) {
 				{
 					Handle:         "PHONE",
 					Label:          "Paid over the phone",
+					UserSelectable: true,
+				},
+				{
+					Handle:         "ONLINE",
+					Label:          "Paid online",
 					UserSelectable: true,
 				},
 			},
