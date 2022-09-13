@@ -41,6 +41,7 @@ func TestGetEditPayment(t *testing.T) {
 		Amount:      8200,
 		Source:      "PHONE",
 		PaymentDate: sirius.DateString("2022-07-23"),
+		Case:        &sirius.Case{ID: 4},
 	}
 
 	client := &mockEditPaymentClient{}
@@ -119,6 +120,7 @@ func TestEditPaymentWhenFailureOnGetCase(t *testing.T) {
 		Amount:      8200,
 		Source:      "PHONE",
 		PaymentDate: sirius.DateString("2022-07-23"),
+		Case:        &sirius.Case{ID: 4},
 	}
 
 	client := &mockEditPaymentClient{}
@@ -149,6 +151,7 @@ func TestEditPaymentWhenTemplateErrors(t *testing.T) {
 		Amount:      8200,
 		Source:      "PHONE",
 		PaymentDate: sirius.DateString("2022-07-23"),
+		Case:        &sirius.Case{ID: 4},
 	}
 
 	client := &mockEditPaymentClient{}
@@ -191,6 +194,7 @@ func TestPostEditPaymentAmountIncorrectFormat(t *testing.T) {
 				Amount:      8200,
 				Source:      "PHONE",
 				PaymentDate: sirius.DateString("2022-07-23"),
+				Case:        &sirius.Case{ID: 4},
 			}
 
 			client := &mockEditPaymentClient{}
@@ -248,6 +252,7 @@ func TestPostEditPayment(t *testing.T) {
 		Amount:      8200,
 		Source:      "PHONE",
 		PaymentDate: sirius.DateString("2022-02-18"),
+		Case:        &sirius.Case{ID: 4},
 	}
 
 	editedPayment := sirius.Payment{
