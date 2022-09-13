@@ -39,6 +39,9 @@ func TestPayment(t *testing.T) {
 							"source":      dsl.Like("MAKE"),
 							"amount":      dsl.Like(4100),
 							"paymentDate": dsl.String("23/01/2022"),
+							"case": dsl.Like(map[string]interface{}{
+								"id": dsl.Like(9),
+							}),
 						}, 1),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
@@ -49,6 +52,7 @@ func TestPayment(t *testing.T) {
 					Source:      "MAKE",
 					Amount:      4100,
 					PaymentDate: DateString("2022-01-23"),
+					Case:        &Case{ID: 9},
 				},
 			},
 		},
@@ -106,6 +110,9 @@ func TestPaymentByID(t *testing.T) {
 							"source":      dsl.Like("PHONE"),
 							"amount":      dsl.Like(4100),
 							"paymentDate": dsl.String("23/01/2022"),
+							"case": dsl.Like(map[string]interface{}{
+								"id": dsl.Like(800),
+							}),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
@@ -115,6 +122,7 @@ func TestPaymentByID(t *testing.T) {
 				Source:      "PHONE",
 				Amount:      4100,
 				PaymentDate: DateString("2022-01-23"),
+				Case:        &Case{ID: 800},
 			},
 		},
 	}
