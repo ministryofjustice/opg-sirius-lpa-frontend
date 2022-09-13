@@ -1,6 +1,6 @@
 describe("Edit a payment", () => {
     beforeEach(() => {
-        cy.visit("/edit-payment?id=800&payment=123");
+        cy.visit("/edit-payment?payment=123");
     });
 
     it("edits a payment on the case", () => {

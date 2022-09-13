@@ -63,7 +63,7 @@ func TestGetEditPayment(t *testing.T) {
 		}).
 		Return(nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=4&payment=123", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/?payment=123", nil)
 	w := httptest.NewRecorder()
 
 	err := EditPayment(client, template.Func)(w, r)
@@ -74,27 +74,6 @@ func TestGetEditPayment(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestEditPaymentInvalidURLParams(t *testing.T) {
-	testCases := map[string]string{
-		"no-params":      "/",
-		"no-case-id":     "/?payment=123",
-		"no-payment-id":  "/?id=2",
-		"bad-case- id":   "/?id=test&payment=123",
-		"bad-payment-id": "/?id=2&payment=test",
-	}
-
-	for name, testUrl := range testCases {
-		t.Run(name, func(t *testing.T) {
-			r, _ := http.NewRequest(http.MethodGet, testUrl, nil)
-			w := httptest.NewRecorder()
-
-			err := EditPayment(nil, nil)(w, r)
-
-			assert.NotNil(t, err)
-		})
-	}
-}
-
 func TestEditPaymentWhenFailureOnGetPaymentByID(t *testing.T) {
 	expectedError := errors.New("err")
 
@@ -103,7 +82,7 @@ func TestEditPaymentWhenFailureOnGetPaymentByID(t *testing.T) {
 		On("PaymentByID", mock.Anything, 123).
 		Return(sirius.Payment{}, expectedError)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=4&payment=123", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/?payment=123", nil)
 	w := httptest.NewRecorder()
 
 	err := EditPayment(client, nil)(w, r)
@@ -131,7 +110,7 @@ func TestEditPaymentWhenFailureOnGetCase(t *testing.T) {
 		On("Case", mock.Anything, 4).
 		Return(sirius.Case{}, expectedError)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=4&payment=123", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/?payment=123", nil)
 	w := httptest.NewRecorder()
 
 	err := EditPayment(client, nil)(w, r)
@@ -175,7 +154,7 @@ func TestEditPaymentWhenTemplateErrors(t *testing.T) {
 		}).
 		Return(expectedError)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=4&payment=123", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/?payment=123", nil)
 	w := httptest.NewRecorder()
 
 	err := EditPayment(client, template.Func)(w, r)
@@ -230,7 +209,7 @@ func TestPostEditPaymentAmountIncorrectFormat(t *testing.T) {
 				"paymentDate": {"2022-01-23"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=4&payment=123", strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/?payment=123", strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
@@ -290,7 +269,7 @@ func TestPostEditPayment(t *testing.T) {
 		"paymentDate": {"2022-02-18"},
 	}
 
-	r, _ := http.NewRequest(http.MethodPost, "/?id=4&payment=123", strings.NewReader(form.Encode()))
+	r, _ := http.NewRequest(http.MethodPost, "/?payment=123", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 

@@ -28,10 +28,6 @@ type editPaymentData struct {
 
 func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		_, err := strconv.Atoi(r.FormValue("id"))
-		if err != nil {
-			return err
-		}
 		paymentID, err := strconv.Atoi(r.FormValue("payment"))
 		if err != nil {
 			return err
