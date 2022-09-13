@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRefDataByCategory(t *testing.T) {
+func TestRefDataByCategoryWarningTypes(t *testing.T) {
 	t.Parallel()
 
 	pact := newPact()
@@ -31,7 +31,7 @@ func TestRefDataByCategory(t *testing.T) {
 					UponReceiving("A request for warning types").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/reference-data/warningType"),
+						Path:   dsl.String(fmt.Sprintf("/lpa-api/v1/reference-data/%s", WarningTypeCategory)),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
@@ -59,6 +59,71 @@ func TestRefDataByCategory(t *testing.T) {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
 				types, err := client.RefDataByCategory(Context{Context: context.Background()}, WarningTypeCategory)
+
+				assert.Equal(t, tc.expectedResponse, types)
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+
+}
+
+func TestRefDataByCategoryPaymentSources(t *testing.T) {
+	t.Parallel()
+
+	pact := newPact()
+	defer pact.Teardown()
+
+	testCases := []struct {
+		name             string
+		setup            func()
+		expectedResponse []RefDataItem
+		expectedError    func(int) error
+	}{
+		{
+			name: "OK",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("Some payment sources exist").
+					UponReceiving("A request for payment source ref data").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String(fmt.Sprintf("/lpa-api/v1/reference-data/%s", PaymentSourceCategory)),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.EachLike(map[string]interface{}{
+							"handle":         dsl.String("PHONE"),
+							"label":          dsl.String("Paid over the phone"),
+							"userSelectable": true,
+						}, 1),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: []RefDataItem{
+				{
+					Handle:         "PHONE",
+					Label:          "Paid over the phone",
+					UserSelectable: true,
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.Verify(func() error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+
+				types, err := client.RefDataByCategory(Context{Context: context.Background()}, PaymentSourceCategory)
 
 				assert.Equal(t, tc.expectedResponse, types)
 				if tc.expectedError == nil {

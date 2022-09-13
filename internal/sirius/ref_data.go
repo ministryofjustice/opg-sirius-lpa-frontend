@@ -4,7 +4,7 @@ import "fmt"
 
 const (
 	PaymentSourceCategory string = "paymentSource"
-	WarningTypeCategory          = "warningType"
+	WarningTypeCategory   string = "warningType"
 )
 
 type RefDataItem struct {
