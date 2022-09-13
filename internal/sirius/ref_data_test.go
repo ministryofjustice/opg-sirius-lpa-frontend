@@ -98,7 +98,7 @@ func TestRefDataByCategoryPaymentSources(t *testing.T) {
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
-						Body: dsl.EachLike([]map[string]interface{}{
+						Body: dsl.Like([]map[string]interface{}{
 							{
 								"handle":         dsl.String("PHONE"),
 								"label":          dsl.String("Paid over the phone"),
@@ -109,7 +109,22 @@ func TestRefDataByCategoryPaymentSources(t *testing.T) {
 								"label":          dsl.String("Paid online"),
 								"userSelectable": true,
 							},
-						}, 1),
+							{
+								"handle":         dsl.String("MAKE"),
+								"label":          dsl.String("Paid through Make an LPA"),
+								"userSelectable": false,
+							},
+							{
+								"handle":         dsl.String("OTHER"),
+								"label":          dsl.String("Paid through other method"),
+								"userSelectable": false,
+							},
+							{
+								"handle":         dsl.String("MIGRATED"),
+								"label":          dsl.String("Payment was migrated"),
+								"userSelectable": false,
+							},
+						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
@@ -123,6 +138,21 @@ func TestRefDataByCategoryPaymentSources(t *testing.T) {
 					Handle:         "ONLINE",
 					Label:          "Paid online",
 					UserSelectable: true,
+				},
+				{
+					Handle:         "MAKE",
+					Label:          "Paid through Make an LPA",
+					UserSelectable: false,
+				},
+				{
+					Handle:         "OTHER",
+					Label:          "Paid through other method",
+					UserSelectable: false,
+				},
+				{
+					Handle:         "MIGRATED",
+					Label:          "Payment was migrated",
+					UserSelectable: false,
 				},
 			},
 		},
