@@ -34,8 +34,18 @@ function enhanceElement(element, source) {
 }
 
 function fetchUser(prefix) {
+  let controller = { abort: () => {} };
+  const fetchOptions = {};
+
   return (query, callback) => {
-    fetch(`${prefix}/search-users?q=${encodeURIComponent(query)}`)
+    controller.abort();
+
+    if ("AbortController" in window) {
+      controller = new AbortController();
+      fetchOptions.signal = controller.signal;
+    }
+
+    fetch(`${prefix}/search-users?q=${encodeURIComponent(query)}`, fetchOptions)
       .then((response) => response.json())
       .then((json) => {
         callback(
@@ -49,8 +59,21 @@ function fetchUser(prefix) {
 }
 
 function fetchPerson(prefix) {
+  let controller = { abort: () => {} };
+  const fetchOptions = {};
+
   return (query, callback) => {
-    fetch(`${prefix}/search-persons?q=${encodeURIComponent(query)}`)
+    controller.abort();
+
+    if ("AbortController" in window) {
+      controller = new AbortController();
+      fetchOptions.signal = controller.signal;
+    }
+
+    fetch(
+      `${prefix}/search-persons?q=${encodeURIComponent(query)}`,
+      fetchOptions
+    )
       .then((response) => response.json())
       .then((json) => {
         callback(
