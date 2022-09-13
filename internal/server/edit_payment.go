@@ -12,6 +12,7 @@ type EditPaymentClient interface {
 	EditPayment(ctx sirius.Context, paymentID int, payment sirius.Payment) error
 	Case(sirius.Context, int) (sirius.Case, error)
 	PaymentByID(ctx sirius.Context, id int) (sirius.Payment, error)
+	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
 type editPaymentData struct {
@@ -19,11 +20,12 @@ type editPaymentData struct {
 	Success   bool
 	Error     sirius.ValidationError
 
-	Case        sirius.Case
-	PaymentID   int
-	Amount      string
-	Source      string
-	PaymentDate sirius.DateString
+	Case           sirius.Case
+	PaymentID      int
+	Amount         string
+	Source         string
+	PaymentDate    sirius.DateString
+	PaymentSources []sirius.RefDataItem
 }
 
 func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
@@ -52,6 +54,11 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 		}
 
 		data.Case, err = client.Case(ctx, caseID)
+		if err != nil {
+			return err
+		}
+
+		data.PaymentSources, err = client.RefDataByCategory(ctx, sirius.PaymentSourceCategory)
 		if err != nil {
 			return err
 		}

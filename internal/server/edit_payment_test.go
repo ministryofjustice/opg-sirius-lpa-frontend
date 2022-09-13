@@ -30,6 +30,14 @@ func (m *mockEditPaymentClient) Case(ctx sirius.Context, id int) (sirius.Case, e
 	return args.Get(0).(sirius.Case), args.Error(1)
 }
 
+func (m *mockEditPaymentClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
+	args := m.Called(ctx, category)
+	if args.Get(0) != nil {
+		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
 func TestGetEditPayment(t *testing.T) {
 	caseItem := sirius.Case{
 		UID:     "7000-0000-0021",
@@ -43,6 +51,14 @@ func TestGetEditPayment(t *testing.T) {
 		PaymentDate: sirius.DateString("2022-07-23"),
 	}
 
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
 	client := &mockEditPaymentClient{}
 	client.
 		On("Case", mock.Anything, 4).
@@ -50,15 +66,19 @@ func TestGetEditPayment(t *testing.T) {
 	client.
 		On("PaymentByID", mock.Anything, 123).
 		Return(payment, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, editPaymentData{
-			Case:        caseItem,
-			PaymentID:   123,
-			Amount:      "82.00",
-			Source:      "PHONE",
-			PaymentDate: sirius.DateString("2022-07-23"),
+			Case:           caseItem,
+			PaymentID:      123,
+			Amount:         "82.00",
+			Source:         "PHONE",
+			PaymentDate:    sirius.DateString("2022-07-23"),
+			PaymentSources: paymentSources,
 		}).
 		Return(nil)
 
@@ -138,6 +158,41 @@ func TestEditPaymentWhenFailureOnGetCase(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
+func TestEditPaymentWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
+	caseItem := sirius.Case{
+		UID:     "7000-0000-0021",
+		SubType: "pfa",
+	}
+
+	payment := sirius.Payment{
+		ID:          123,
+		Amount:      8200,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-07-23"),
+	}
+
+	expectedError := errors.New("err")
+
+	client := &mockEditPaymentClient{}
+	client.
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil)
+	client.
+		On("PaymentByID", mock.Anything, 123).
+		Return(payment, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return([]sirius.RefDataItem{}, expectedError)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=4&payment=123", nil)
+	w := httptest.NewRecorder()
+
+	err := EditPayment(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
 func TestEditPaymentWhenTemplateErrors(t *testing.T) {
 	caseItem := sirius.Case{
 		UID:     "7000-0000-0021",
@@ -151,6 +206,14 @@ func TestEditPaymentWhenTemplateErrors(t *testing.T) {
 		PaymentDate: sirius.DateString("2022-07-23"),
 	}
 
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
 	client := &mockEditPaymentClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
@@ -158,17 +221,21 @@ func TestEditPaymentWhenTemplateErrors(t *testing.T) {
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
 
 	expectedError := errors.New("err")
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, editPaymentData{
-			Case:        caseItem,
-			PaymentID:   123,
-			Amount:      "82.00",
-			Source:      "PHONE",
-			PaymentDate: sirius.DateString("2022-07-23"),
+			Case:           caseItem,
+			PaymentID:      123,
+			Amount:         "82.00",
+			Source:         "PHONE",
+			PaymentDate:    sirius.DateString("2022-07-23"),
+			PaymentSources: paymentSources,
 		}).
 		Return(expectedError)
 
@@ -193,6 +260,14 @@ func TestPostEditPaymentAmountIncorrectFormat(t *testing.T) {
 				PaymentDate: sirius.DateString("2022-07-23"),
 			}
 
+			paymentSources := []sirius.RefDataItem{
+				{
+					Handle:         "PHONE",
+					Label:          "Paid over the phone",
+					UserSelectable: true,
+				},
+			}
+
 			client := &mockEditPaymentClient{}
 			client.
 				On("PaymentByID", mock.Anything, 123).
@@ -200,6 +275,9 @@ func TestPostEditPaymentAmountIncorrectFormat(t *testing.T) {
 			client.
 				On("Case", mock.Anything, 4).
 				Return(caseItem, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+				Return(paymentSources, nil)
 
 			validationError := sirius.ValidationError{
 				Field: sirius.FieldErrors{
@@ -210,13 +288,14 @@ func TestPostEditPaymentAmountIncorrectFormat(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, editPaymentData{
-					Success:     false,
-					Case:        caseItem,
-					PaymentID:   123,
-					Amount:      amount,
-					Source:      "MAKE",
-					PaymentDate: sirius.DateString("2022-01-23"),
-					Error:       validationError,
+					Success:        false,
+					Case:           caseItem,
+					PaymentID:      123,
+					Amount:         amount,
+					Source:         "MAKE",
+					PaymentDate:    sirius.DateString("2022-01-23"),
+					PaymentSources: paymentSources,
+					Error:          validationError,
 				}).
 				Return(nil)
 
@@ -256,6 +335,14 @@ func TestPostEditPayment(t *testing.T) {
 		PaymentDate: sirius.DateString("2022-02-18"),
 	}
 
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
 	client := &mockEditPaymentClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
@@ -264,18 +351,22 @@ func TestPostEditPayment(t *testing.T) {
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
+	client.
 		On("EditPayment", mock.Anything, 123, editedPayment).
 		Return(nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, editPaymentData{
-			Success:     true,
-			Case:        caseItem,
-			PaymentID:   123,
-			Amount:      "33.00",
-			Source:      "PHONE",
-			PaymentDate: sirius.DateString("2022-02-18"),
+			Success:        true,
+			Case:           caseItem,
+			PaymentID:      123,
+			Amount:         "33.00",
+			Source:         "PHONE",
+			PaymentDate:    sirius.DateString("2022-02-18"),
+			PaymentSources: paymentSources,
 		}).
 		Return(nil)
 

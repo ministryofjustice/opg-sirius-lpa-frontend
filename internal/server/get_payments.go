@@ -8,6 +8,7 @@ import (
 )
 
 type GetPaymentsClient interface {
+	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	Payments(ctx sirius.Context, id int) ([]sirius.Payment, error)
 	Case(sirius.Context, int) (sirius.Case, error)
 }
@@ -15,9 +16,10 @@ type GetPaymentsClient interface {
 type getPaymentsData struct {
 	XSRFToken string
 
-	Case      sirius.Case
-	Payments  []sirius.Payment
-	TotalPaid int
+	Case           sirius.Case
+	Payments       []sirius.Payment
+	PaymentSources []sirius.RefDataItem
+	TotalPaid      int
 }
 
 func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
@@ -40,6 +42,11 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 			return err
 		}
 		data.Payments = payments
+
+		data.PaymentSources, err = client.RefDataByCategory(ctx, sirius.PaymentSourceCategory)
+		if err != nil {
+			return err
+		}
 
 		total := 0
 		for _, p := range payments {
