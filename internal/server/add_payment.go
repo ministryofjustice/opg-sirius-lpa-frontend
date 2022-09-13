@@ -8,6 +8,7 @@ import (
 )
 
 type AddPaymentClient interface {
+	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	AddPayment(ctx sirius.Context, caseID int, amount int, source string, paymentDate sirius.DateString) error
 	Case(sirius.Context, int) (sirius.Case, error)
 }
@@ -17,10 +18,11 @@ type addPaymentData struct {
 	Success   bool
 	Error     sirius.ValidationError
 
-	Case        sirius.Case
-	Amount      string
-	Source      string
-	PaymentDate sirius.DateString
+	Case           sirius.Case
+	Amount         string
+	Source         string
+	PaymentDate    sirius.DateString
+	PaymentSources []sirius.RefDataItem
 }
 
 func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
@@ -39,6 +41,11 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		}
 
 		data.Case, err = client.Case(ctx, caseID)
+		if err != nil {
+			return err
+		}
+
+		data.PaymentSources, err = client.RefDataByCategory(ctx, sirius.PaymentSourceCategory)
 		if err != nil {
 			return err
 		}
