@@ -33,14 +33,22 @@ function enhanceElement(element, source) {
   }
 }
 
-function fetchUser(prefix) {
+function fetchForAutocomplete(url, mapFunction) {
+  let controller = { abort: () => {} };
+  const fetchOptions = {};
+
   return (query, callback) => {
-    fetch(`${prefix}/search-users?q=${encodeURIComponent(query)}`)
+    controller.abort();
+
+    if ("AbortController" in window) {
+      controller = new AbortController();
+      fetchOptions.signal = controller.signal;
+    }
+
+    fetch(url(query), fetchOptions)
       .then((response) => response.json())
       .then((json) => {
-        callback(
-          json.map(({ id, displayName }) => ({ id, text: displayName }))
-        );
+        callback(json.map(mapFunction));
       })
       .catch(() => {
         callback([]);
@@ -48,20 +56,19 @@ function fetchUser(prefix) {
   };
 }
 
+function fetchUser(prefix) {
+  return fetchForAutocomplete(
+    (query) => `${prefix}/search-users?q=${encodeURIComponent(query)}`,
+    ({ id, displayName }) => ({ id, text: displayName })
+  );
+}
+
 function fetchPerson(prefix) {
-  return (query, callback) => {
-    fetch(`${prefix}/search-persons?q=${encodeURIComponent(query)}`)
-      .then((response) => response.json())
-      .then((json) => {
-        callback(
-          json.map(({ uId, firstname, surname }) => ({
-            id: uId,
-            text: `${firstname} ${surname} (${uId})`,
-          }))
-        );
-      })
-      .catch(() => {
-        callback([]);
-      });
-  };
+  return fetchForAutocomplete(
+    (query) => `${prefix}/search-persons?q=${encodeURIComponent(query)}`,
+    ({ uId, firstname, surname }) => ({
+      id: uId,
+      text: `${firstname} ${surname} (${uId})`,
+    })
+  );
 }
