@@ -2,14 +2,15 @@ package server
 
 import (
 	"errors"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockEditPaymentClient struct {
@@ -150,6 +151,9 @@ func TestEditPaymentWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 		Amount:      8200,
 		Source:      "PHONE",
 		PaymentDate: sirius.DateString("2022-07-23"),
+		Case: &sirius.Case{
+			ID: 4,
+		},
 	}
 
 	expectedError := errors.New("err")
