@@ -124,6 +124,16 @@ func TestRefDataByCategoryPaymentSources(t *testing.T) {
 								"label":          dsl.String("Payment was migrated"),
 								"userSelectable": false,
 							},
+							{
+								"handle":         dsl.String("FEE_REDUCTION"),
+								"label":          dsl.String("Fee reduction"),
+								"userSelectable": false,
+							},
+							{
+								"handle":         dsl.String("CHEQUE"),
+								"label":          dsl.String("Paid by cheque"),
+								"userSelectable": true,
+							},
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
@@ -153,6 +163,16 @@ func TestRefDataByCategoryPaymentSources(t *testing.T) {
 					Handle:         "MIGRATED",
 					Label:          "Payment was migrated",
 					UserSelectable: false,
+				},
+				{
+					Handle:         "FEE_REDUCTION",
+					Label:          "Fee reduction",
+					UserSelectable: false,
+				},
+				{
+					Handle:         "CHEQUE",
+					Label:          "Paid by cheque",
+					UserSelectable: true,
 				},
 			},
 		},
