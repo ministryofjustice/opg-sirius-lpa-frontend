@@ -48,10 +48,10 @@
                                     {{ end }}
                                 </td>
                             </tr>
-                            {{ if or (eq .Source "PHONE") (eq .Source "ONLINE") }}
+                            {{ if not .Locked }}
                             <tr class="govuk-table__row">
                                 <th scope="row" class="govuk-table__header table-row__no-border">
-                                    <a class="govuk-link" href="{{ prefix (printf "/edit-payment?id=%d&payment=%d" $.Case.ID .ID) }}">
+                                    <a class="govuk-link" href="{{ prefix (printf "/edit-payment?id=%d" .ID) }}">
                                         Edit payment
                                     </a>
                                 </th>

@@ -11,6 +11,7 @@ type Payment struct {
 	Amount      int        `json:"amount"`
 	PaymentDate DateString `json:"paymentDate"`
 	Case        *Case      `json:"case,omitempty"`
+	Locked      bool       `json:"locked,omitempty"`
 }
 
 func (c *Client) Payments(ctx Context, id int) ([]Payment, error) {
