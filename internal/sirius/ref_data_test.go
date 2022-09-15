@@ -98,43 +98,11 @@ func TestRefDataByCategoryPaymentSources(t *testing.T) {
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like([]map[string]interface{}{
-							{
-								"handle":         dsl.String("PHONE"),
-								"label":          dsl.String("Paid over the phone"),
-								"userSelectable": true,
-							},
-							{
-								"handle":         dsl.String("ONLINE"),
-								"label":          dsl.String("Paid online"),
-								"userSelectable": true,
-							},
-							{
-								"handle":         dsl.String("MAKE"),
-								"label":          dsl.String("Paid through Make an LPA"),
-								"userSelectable": false,
-							},
-							{
-								"handle":         dsl.String("OTHER"),
-								"label":          dsl.String("Paid through other method"),
-								"userSelectable": false,
-							},
-							{
-								"handle":         dsl.String("MIGRATED"),
-								"label":          dsl.String("Payment was migrated"),
-								"userSelectable": false,
-							},
-							{
-								"handle":         dsl.String("FEE_REDUCTION"),
-								"label":          dsl.String("Fee reduction"),
-								"userSelectable": false,
-							},
-							{
-								"handle":         dsl.String("CHEQUE"),
-								"label":          dsl.String("Paid by cheque"),
-								"userSelectable": true,
-							},
-						}),
+						Body: dsl.EachLike(map[string]interface{}{
+							"handle":         dsl.String("PHONE"),
+							"label":          dsl.String("Paid over the phone"),
+							"userSelectable": true,
+						}, 1),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
@@ -142,36 +110,6 @@ func TestRefDataByCategoryPaymentSources(t *testing.T) {
 				{
 					Handle:         "PHONE",
 					Label:          "Paid over the phone",
-					UserSelectable: true,
-				},
-				{
-					Handle:         "ONLINE",
-					Label:          "Paid online",
-					UserSelectable: true,
-				},
-				{
-					Handle:         "MAKE",
-					Label:          "Paid through Make an LPA",
-					UserSelectable: false,
-				},
-				{
-					Handle:         "OTHER",
-					Label:          "Paid through other method",
-					UserSelectable: false,
-				},
-				{
-					Handle:         "MIGRATED",
-					Label:          "Payment was migrated",
-					UserSelectable: false,
-				},
-				{
-					Handle:         "FEE_REDUCTION",
-					Label:          "Fee reduction",
-					UserSelectable: false,
-				},
-				{
-					Handle:         "CHEQUE",
-					Label:          "Paid by cheque",
 					UserSelectable: true,
 				},
 			},
