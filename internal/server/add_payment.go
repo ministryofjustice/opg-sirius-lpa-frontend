@@ -18,11 +18,15 @@ type addPaymentData struct {
 	Success   bool
 	Error     sirius.ValidationError
 
-	Case           sirius.Case
-	Amount         string
-	Source         string
-	PaymentDate    sirius.DateString
-	PaymentSources []sirius.RefDataItem
+	Case              sirius.Case
+	Amount            string
+	Source            string
+	PaymentEvidence   string
+	FeeReductionType  string
+	PaymentDate       sirius.DateString
+	AppliedDate       sirius.DateString
+	PaymentSources    []sirius.RefDataItem
+	FeeReductionTypes []sirius.RefDataItem
 }
 
 func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
@@ -34,10 +38,13 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 
 		ctx := getContext(r)
 		data := addPaymentData{
-			XSRFToken:   ctx.XSRFToken,
-			Amount:      postFormString(r, "amount"),
-			Source:      postFormString(r, "source"),
-			PaymentDate: postFormDateString(r, "paymentDate"),
+			XSRFToken:        ctx.XSRFToken,
+			Amount:           postFormString(r, "amount"),
+			Source:           postFormString(r, "source"),
+			PaymentDate:      postFormDateString(r, "paymentDate"),
+			PaymentEvidence:  postFormString(r, "paymentEvidence"),
+			FeeReductionType: postFormString(r, "feeReductionType"),
+			AppliedDate:      postFormDateString(r, "appliedDate"),
 		}
 
 		data.Case, err = client.Case(ctx, caseID)
@@ -46,6 +53,8 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		}
 
 		data.PaymentSources, err = client.RefDataByCategory(ctx, sirius.PaymentSourceCategory)
+		data.FeeReductionTypes, err = client.RefDataByCategory(ctx, sirius.FeeReductionTypeCategory)
+
 		if err != nil {
 			return err
 		}
