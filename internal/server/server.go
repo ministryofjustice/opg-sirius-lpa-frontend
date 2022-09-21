@@ -45,6 +45,7 @@ type Client interface {
 	AssignTaskClient
 	ChangeStatusClient
 	CreateDonorClient
+	DeletePaymentClient
 	DeleteRelationshipClient
 	EditComplaintClient
 	EditDatesClient
@@ -87,6 +88,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/assign-task", wrap(AssignTask(client, templates.Get("assign_task.gohtml"))))
 	mux.Handle("/mi-reporting", wrap(MiReporting(client, templates.Get("mi_reporting.gohtml"))))
 	mux.Handle("/add-payment", wrap(AddPayment(client, templates.Get("add_payment.gohtml"))))
+	mux.Handle("/delete-payment", wrap(DeletePayment(client, templates.Get("delete_payment.gohtml"))))
 	mux.Handle("/edit-payment", wrap(EditPayment(client, templates.Get("edit_payment.gohtml"))))
 	mux.Handle("/payments", wrap(GetPayments(client, templates.Get("payments.gohtml"))))
 	mux.Handle("/search-users", wrap(SearchUsers(client)))

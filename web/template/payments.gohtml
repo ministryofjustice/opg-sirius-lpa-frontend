@@ -56,6 +56,13 @@
                                     </a>
                                 </th>
                             </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header table-row__no-border">
+                                    <a class="govuk-link govuk-link--no-visited-state colour-text-red" href="{{ prefix (printf "/delete-payment?id=%d" .ID) }}">
+                                        Delete payment
+                                    </a>
+                                </th>
+                            </tr>
                             {{ end }}
                         </tbody>
                     </table>
