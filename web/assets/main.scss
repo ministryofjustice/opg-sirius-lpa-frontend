@@ -26,3 +26,7 @@ $moj-page-width: 1220px;
 .table-row__no-border {
    border-bottom: none;
  }
+
+.app-\!-colour-text-red {
+   color: govuk-colour("red") !important;
+}
