@@ -16,8 +16,9 @@ type apiUserTeam struct {
 }
 
 type User struct {
-	ID          int    `json:"id"`
-	DisplayName string `json:"displayName"`
+	ID          int      `json:"id"`
+	DisplayName string   `json:"displayName"`
+	Roles       []string `json:"roles"`
 }
 
 func (c *Client) SearchUsers(ctx Context, term string) ([]User, error) {
