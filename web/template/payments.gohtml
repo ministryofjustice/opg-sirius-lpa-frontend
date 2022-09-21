@@ -68,13 +68,11 @@
             <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}">
                 Add payment
             </a>
-            <p>{{.IsReducedFeesUser}}</p>
-            <p>{{.User}}</p>
-{{/*            {{ if .IsReducedFeesUser }}*/}}
+            {{ if .IsReducedFeesUser }}
                 <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/apply-fee-reduction?id=%d" .Case.ID) }}">
                     Apply fee reduction
                 </a>
-{{/*            {{ end }}*/}}
+            {{ end }}
         </div>
     </div>
 {{ end }}
