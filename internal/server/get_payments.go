@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
@@ -62,9 +61,6 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		if err != nil {
 			return err
 		}
-
-		fmt.Println(user)
-		data.User = user
 
 		data.IsReducedFeesUser = user.HasRole("Reduced Fees User")
 

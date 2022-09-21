@@ -7,16 +7,10 @@ import (
 	"net/http"
 )
 
-func (c *Client) AddPayment(ctx Context, caseID int, amount int, source string, paymentDate DateString) error {
-	postData, err := json.Marshal(struct {
-		Amount      int        `json:"amount"`
-		Source      string     `json:"source"`
-		PaymentDate DateString `json:"paymentDate"`
-	}{
-		Amount:      amount,
-		Source:      source,
-		PaymentDate: paymentDate,
-	})
+const FeeReductionSource = "FEE_REDUCTION"
+
+func (c *Client) AddPayment(ctx Context, caseID int, amount int, source string, paymentDate DateString, feeReductionType string, paymentEvidence string, appliedDate DateString) error {
+	postData, err := GetPostData(amount, source, paymentDate, feeReductionType, paymentEvidence, appliedDate)
 
 	if err != nil {
 		return err
@@ -46,4 +40,30 @@ func (c *Client) AddPayment(ctx Context, caseID int, amount int, source string, 
 	}
 
 	return nil
+}
+
+func GetPostData(amount int, source string, paymentDate DateString, feeReductionType string, paymentEvidence string, appliedDate DateString) ([]byte, error) {
+	if source == FeeReductionSource {
+		return json.Marshal(struct {
+			Source           string     `json:"source"`
+			PaymentEvidence  string     `json:"paymentEvidence"`
+			FeeReductionType string     `json:"feeReductionType"`
+			AppliedDate      DateString `json:"appliedDate"`
+		}{
+			Source:           source,
+			PaymentEvidence:  paymentEvidence,
+			FeeReductionType: feeReductionType,
+			AppliedDate:      appliedDate,
+		})
+	} else {
+		return json.Marshal(struct {
+			Amount      int        `json:"amount"`
+			Source      string     `json:"source"`
+			PaymentDate DateString `json:"paymentDate"`
+		}{
+			Amount:      amount,
+			Source:      source,
+			PaymentDate: paymentDate,
+		})
+	}
 }
