@@ -71,6 +71,12 @@ func main() {
 			float := float64(amount)
 			return fmt.Sprintf("%.2f", float/100)
 		},
+		"formatDate": func(s sirius.DateString) (string, error) {
+			if s != "" {
+				return s.ToSirius()
+			}
+			return "", nil
+		},
 	})
 	if err != nil {
 		logger.Fatal(err)
