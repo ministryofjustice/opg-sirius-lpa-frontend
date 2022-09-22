@@ -9,7 +9,7 @@ import (
 
 type AddPaymentClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
-	AddPayment(ctx sirius.Context, caseID int, amount int, source string, paymentDate sirius.DateString, feeReductionType string, paymentEvidence string, appliedDate sirius.DateString) error
+	AddPayment(ctx sirius.Context, caseID int, amount int, source string, paymentDate sirius.DateString) error
 	Case(sirius.Context, int) (sirius.Case, error)
 }
 
@@ -18,18 +18,12 @@ type addPaymentData struct {
 	Success   bool
 	Error     sirius.ValidationError
 
-	Case              sirius.Case
-	Amount            string
-	Source            string
-	PaymentEvidence   string
-	FeeReductionType  string
-	PaymentDate       sirius.DateString
-	AppliedDate       sirius.DateString
-	PaymentSources    []sirius.RefDataItem
-	FeeReductionTypes []sirius.RefDataItem
+	Case           sirius.Case
+	Amount         string
+	Source         string
+	PaymentDate    sirius.DateString
+	PaymentSources []sirius.RefDataItem
 }
-
-const FeeReductionSource = "FEE_REDUCTION"
 
 func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
@@ -40,13 +34,10 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 
 		ctx := getContext(r)
 		data := addPaymentData{
-			XSRFToken:        ctx.XSRFToken,
-			Amount:           postFormString(r, "amount"),
-			Source:           postFormString(r, "source"),
-			PaymentDate:      postFormDateString(r, "paymentDate"),
-			PaymentEvidence:  postFormString(r, "paymentEvidence"),
-			FeeReductionType: postFormString(r, "feeReductionType"),
-			AppliedDate:      postFormDateString(r, "appliedDate"),
+			XSRFToken:   ctx.XSRFToken,
+			Amount:      postFormString(r, "amount"),
+			Source:      postFormString(r, "source"),
+			PaymentDate: postFormDateString(r, "paymentDate"),
 		}
 
 		data.Case, err = client.Case(ctx, caseID)
@@ -59,17 +50,8 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data.FeeReductionTypes, err = client.RefDataByCategory(ctx, sirius.FeeReductionTypeCategory)
-		if err != nil {
-			return err
-		}
-
 		if r.Method == http.MethodPost {
-			if r.URL.Path == "/apply-fee-reduction" {
-				data.Source = FeeReductionSource
-			}
-
-			if !sirius.IsAmountValid(data.Amount) && data.Source != FeeReductionSource {
+			if !sirius.IsAmountValid(data.Amount) {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = sirius.ValidationError{
 					Field: sirius.FieldErrors{
@@ -89,17 +71,14 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 				return tmpl(w, data)
 			}
 
-			var amountInPence int
-			if data.Source != FeeReductionSource {
-				amountFloat, err := strconv.ParseFloat(data.Amount, 64)
-				if err != nil {
-					return err
-				}
-
-				amountInPence = sirius.PoundsToPence(amountFloat)
+			amountFloat, err := strconv.ParseFloat(data.Amount, 64)
+			if err != nil {
+				return err
 			}
 
-			err = client.AddPayment(ctx, caseID, amountInPence, data.Source, data.PaymentDate, data.FeeReductionType, data.PaymentEvidence, data.AppliedDate)
+			amountInPence := sirius.PoundsToPence(amountFloat)
+
+			err = client.AddPayment(ctx, caseID, amountInPence, data.Source, data.PaymentDate)
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
