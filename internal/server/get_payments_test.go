@@ -32,6 +32,12 @@ func (m *mockGetPayments) RefDataByCategory(ctx sirius.Context, category string)
 	return nil, args.Error(1)
 }
 
+func (m *mockGetPayments) GetUserDetails(ctx sirius.Context) (sirius.User, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(sirius.User), args.Error(1)
+}
+
+
 func TestGetPayments(t *testing.T) {
 	payments := []sirius.Payment{
 		{
@@ -56,6 +62,8 @@ func TestGetPayments(t *testing.T) {
 		},
 	}
 
+	user := sirius.User{ID: 1, DisplayName: "Test User", Roles: []string{"OPG User", "Reduced Fees User"}}
+
 	client := &mockGetPayments{}
 	client.
 		On("Payments", mock.Anything, 4).
@@ -66,6 +74,9 @@ func TestGetPayments(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil)
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(user, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -74,6 +85,7 @@ func TestGetPayments(t *testing.T) {
 			PaymentSources: paymentSources,
 			Case:           caseItem,
 			TotalPaid:      5538,
+			IsReducedFeesUser: true,
 		}).
 		Return(nil)
 
@@ -208,6 +220,8 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 		},
 	}
 
+	user := sirius.User{ID: 1, DisplayName: "Test User", Roles: []string{"OPG User", "Case Manager"}}
+
 	client := &mockGetPayments{}
 	client.
 		On("Payments", mock.Anything, 4).
@@ -218,6 +232,9 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil)
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(user, nil)
 
 	expectedError := errors.New("err")
 
@@ -228,6 +245,7 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 			PaymentSources: paymentSources,
 			Case:           caseItem,
 			TotalPaid:      4100,
+			IsReducedFeesUser: false,
 		}).
 		Return(expectedError)
 
