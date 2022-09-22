@@ -35,8 +35,8 @@
               </tr>
               <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Date of Birth</th>
-                <td class="govuk-table__cell">{{ .Entity.DateOfBirth }}</td>
-                <td class="govuk-table__cell">{{ .OtherPerson.DateOfBirth }}</td>
+                <td class="govuk-table__cell">{{ formatDate .Entity.DateOfBirth }}</td>
+                <td class="govuk-table__cell">{{ formatDate .OtherPerson.DateOfBirth }}</td>
               </tr>
               <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Number of links</th>

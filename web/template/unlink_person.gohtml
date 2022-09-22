@@ -29,7 +29,7 @@
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Date of birth</th>
-                        <td class="govuk-table__cell">{{ .Person.DateOfBirth }}</td>
+                        <td class="govuk-table__cell">{{ formatDate .Person.DateOfBirth }}</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Number of links</th>
@@ -70,7 +70,7 @@
                                                 </tr>
                                                 <tr class="govuk-table__row">
                                                     <th scope="row" class="govuk-table__header">Date of birth</th>
-                                                    <td class="govuk-table__cell">{{ .DateOfBirth }}</td>
+                                                    <td class="govuk-table__cell">{{ formatDate .DateOfBirth }}</td>
                                                 </tr>
                                                 <tr class="govuk-table__row">
                                                     <th scope="row" class="govuk-table__header">Number of links</th>
