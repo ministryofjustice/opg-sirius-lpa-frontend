@@ -19,21 +19,11 @@ describe("View a payment", () => {
             cy.contains("Fee details");
             cy.contains("Payments");
             cy.get('.govuk-details__summary-text').click();
-            cy.get(".govuk-table__body > :nth-child(1) > .govuk-table__header").contains(
-                "Amount"
-            );
-            cy.get(".govuk-table__body > :nth-child(1) > .govuk-table__cell").contains(
-                "£41.00"
-            );
-            cy.get(".govuk-table__body > :nth-child(2) > .govuk-table__header").contains(
-                "Date of payment:"
-            );
-            cy.get(".govuk-table__body > :nth-child(2) > .govuk-table__cell").contains(
-                "2022-01-23"
-            );
-            cy.get(".govuk-table__body > :nth-child(3) > .govuk-table__header").contains(
-                "Method"
-            );
+            cy.contains("Amount");
+            cy.contains("£41.00");
+            cy.contains("Date of payment:");
+            cy.contains("2022-01-23");
+            cy.contains("Method");
             cy.get(".govuk-link").contains("Edit payment");
         });
 
