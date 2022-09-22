@@ -22,7 +22,7 @@ describe("View a payment", () => {
             cy.contains("Amount");
             cy.contains("£41.00");
             cy.contains("Date of payment:");
-            cy.contains("2022-01-23");
+            cy.contains("23/01/2022");
             cy.contains("Method");
             cy.get(".govuk-link").contains("Edit payment");
         });
