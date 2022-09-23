@@ -7,17 +7,17 @@ import (
 	"net/http"
 )
 
-func (c *Client) ApplyFeeReduction(ctx Context, caseID int, source string, feeReductionType string, paymentEvidence string, appliedDate DateString) error {
+func (c *Client) ApplyFeeReduction(ctx Context, caseID int, source string, feeReductionType string, paymentEvidence string, paymentDate DateString) error {
 	postData, err := json.Marshal(struct {
 		Source           string     `json:"source"`
 		PaymentEvidence  string     `json:"paymentEvidence"`
 		FeeReductionType string     `json:"feeReductionType"`
-		AppliedDate      DateString `json:"appliedDate"`
+		PaymentDate      DateString `json:"paymentDate"`
 	}{
 		Source:           source,
 		PaymentEvidence:  paymentEvidence,
 		FeeReductionType: feeReductionType,
-		AppliedDate:      appliedDate,
+		PaymentDate:      paymentDate,
 	})
 
 	if err != nil {
