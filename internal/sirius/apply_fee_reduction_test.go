@@ -36,7 +36,7 @@ func TestApplyFeeReduction(t *testing.T) {
 						Body: map[string]interface{}{
 							"feeReductionType": "REMISSION",
 							"source":           "FEE_REDUCTION",
-							"appliedDate":      "25/04/2022",
+							"paymentDate":      "25/04/2022",
 							"paymentEvidence":  "Test evidence",
 						},
 					}).
