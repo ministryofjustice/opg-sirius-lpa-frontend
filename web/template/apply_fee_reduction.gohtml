@@ -1,0 +1,57 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Apply fee reduction{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <p class="govuk-body"><strong>{{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "lpa" }}LPA{{ end }} {{ .Case.UID }}</strong></p>
+
+            {{ template "error-summary" .Error }}
+
+            {{ if .Success }}
+                {{ template "success-banner" ("Fee reduction added") }}
+            {{ end }}
+
+            <h1 class="govuk-heading-l">Apply a fee reduction</h1>
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+                <div class="govuk-form-group {{ if .Error.Field.feeReductionType }}govuk-form-group--error{{ end }}">
+                    <label class="govuk-label" for="f-feeReductionType">
+                        Reduction type
+                    </label>
+                    {{ template "errors" .Error.Field.feeReductionType }}
+                    <select class="govuk-select {{ if .Error.Field.feeReductionType }}govuk-select--error{{ end }}" id="f-feeReductionType" name="feeReductionType">
+                        <option hidden selected disabled></option>
+                        {{ range .FeeReductionTypes }}
+                            <option value="{{ .Handle }}" {{ if eq .Handle $.FeeReductionType }}selected{{ end }}>{{ .Label }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+
+                <div class="govuk-form-group {{ if .Error.Field.paymentEvidence }}govuk-form-group--error{{ end }}">
+                    <label class="govuk-label" for="f-paymentEvidence">Evidence used to determine reduction</label>
+                    <div class="govuk-hint" id="payment-evidence-hint">For example, income calculations</div>
+                    {{ template "errors" .Error.Field.paymentEvidence }}
+                    <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .Error.Field.paymentEvidence }}govuk-textarea--error{{ end }}" id="f-paymentEvidence" name="paymentEvidence">{{.PaymentEvidence}}</textarea>
+                </div>
+
+                <div class="govuk-form-group govuk-!-display-inline-block govuk-!-padding-right-4 {{ if .Error.Field.paymentDate }}govuk-form-group--error{{ end }}">
+                    <label class="govuk-label" for="f-paymentDate">Date fee reduction applied</label>
+                    {{ template "errors" .Error.Field.paymentDate }}
+                    <input class="govuk-input date-picker {{ if .Error.Field.paymentDate }}govuk-input--error{{ end }}" type="date" id="f-paymentDate" name="paymentDate" value="{{ .PaymentDate }}" max="{{ today }}"/>
+                </div>
+
+                <a href="#" class="govuk-link govuk-link--no-visited-state govuk-!-display-inline-block" data-module="select-todays-date">Use today's date</a>
+
+                <div class="govuk-button-group govuk-!-padding-top-6">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/payments?id=%d" .Case.ID) }}">Cancel</a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+{{ end }}

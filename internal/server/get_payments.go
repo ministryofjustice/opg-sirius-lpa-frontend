@@ -11,15 +11,18 @@ type GetPaymentsClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	Payments(ctx sirius.Context, id int) ([]sirius.Payment, error)
 	Case(sirius.Context, int) (sirius.Case, error)
+	GetUserDetails(sirius.Context) (sirius.User, error)
 }
 
 type getPaymentsData struct {
 	XSRFToken string
 
-	Case           sirius.Case
-	Payments       []sirius.Payment
-	PaymentSources []sirius.RefDataItem
-	TotalPaid      int
+	Case              sirius.Case
+	Payments          []sirius.Payment
+	PaymentSources    []sirius.RefDataItem
+	User              sirius.User
+	IsReducedFeesUser bool
+	TotalPaid         int
 }
 
 func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
@@ -53,6 +56,13 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 			total = total + p.Amount
 		}
 		data.TotalPaid = total
+
+		user, err := client.GetUserDetails(ctx)
+		if err != nil {
+			return err
+		}
+
+		data.IsReducedFeesUser = user.HasRole("Reduced Fees User")
 
 		return tmpl(w, data)
 	}
