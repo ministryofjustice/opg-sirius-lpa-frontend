@@ -38,7 +38,7 @@ func TestGetUserDetails(t *testing.T) {
 						Body: dsl.Like(map[string]interface{}{
 							"id":          dsl.Like(103),
 							"displayName": dsl.String("Test User"),
-							"roles":       dsl.Like([]string{"OPG User", "Case Manager", "Reduced Fees User"}),
+							"roles":       dsl.Like([]string{"OPG User", "Case Manager"}),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
@@ -46,7 +46,34 @@ func TestGetUserDetails(t *testing.T) {
 			expectedResponse: User{
 				ID:          103,
 				DisplayName: "Test User",
-				Roles:       []string{"OPG User", "Case Manager", "Reduced Fees User"},
+				Roles:       []string{"OPG User", "Case Manager"},
+			},
+		},
+		{
+			name: "OK",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A donor exists - logged in as the reduced fees user").
+					UponReceiving("A request for the current user").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String("/lpa-api/v1/users/current"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.Like(map[string]interface{}{
+							"id":          dsl.Like(104),
+							"displayName": dsl.String("Test User"),
+							"roles":       dsl.Like([]string{"OPG User", "Reduced Fees User"}),
+						}),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: User{
+				ID:          104,
+				DisplayName: "Test User",
+				Roles:       []string{"OPG User", "Reduced Fees User"},
 			},
 		},
 	}

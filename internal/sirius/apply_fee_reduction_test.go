@@ -25,11 +25,11 @@ func TestApplyFeeReduction(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a pending case assigned").
+					Given("I have another pending case assigned").
 					UponReceiving("A request to create a fee reduction").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/cases/800/payments"),
+						Path:   dsl.String("/lpa-api/v1/cases/801/payments"),
 						Headers: dsl.MapMatcher{
 							"Content-Type": dsl.String("application/json"),
 						},
@@ -55,7 +55,7 @@ func TestApplyFeeReduction(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.ApplyFeeReduction(Context{Context: context.Background()}, 800, "FEE_REDUCTION", "REMISSION", "Test evidence", DateString("2022-04-25"))
+				err := client.ApplyFeeReduction(Context{Context: context.Background()}, 801, "FEE_REDUCTION", "REMISSION", "Test evidence", DateString("2022-04-25"))
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)

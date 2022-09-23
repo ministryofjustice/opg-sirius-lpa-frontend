@@ -1,7 +1,7 @@
 describe("View a payment", () => {
     describe("No payments on case", () => {
         it("displays default message when there are no payments on the case", () => {
-            cy.visit("/payments?id=999");
+            cy.visit("/payments?id=801");
             cy.contains("7000-0000-0001");
             cy.contains("There is currently no fee data available to display.");
         });
@@ -29,7 +29,7 @@ describe("View a payment", () => {
 
         it("displays add payment and apply fee reduction buttons", () => {
             cy.get(".govuk-button").contains("Add payment");
-            cy.get(".govuk-button").contains("Apply fee reduction");
+            cy.get("#f-apply-fee-reduction-button").should("not.exist");
         });
     });
 });
