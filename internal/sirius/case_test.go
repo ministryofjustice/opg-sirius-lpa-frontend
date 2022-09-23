@@ -89,7 +89,7 @@ func TestCaseNoPayments(t *testing.T) {
 					UponReceiving("A request for the case").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/cases/999"),
+						Path:   dsl.String("/lpa-api/v1/cases/801"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
@@ -112,7 +112,7 @@ func TestCaseNoPayments(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				caseitem, err := client.Case(Context{Context: context.Background()}, 999)
+				caseitem, err := client.Case(Context{Context: context.Background()}, 801)
 
 				assert.Equal(t, tc.expectedResponse, caseitem)
 				if tc.expectedError == nil {

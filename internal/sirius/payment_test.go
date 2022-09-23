@@ -96,11 +96,11 @@ func TestNoPaymentOnCase(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have an lpa which has not been paid for").
+					Given("I have another pending case assigned").
 					UponReceiving("A request for the payments by case").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/cases/999/payments"),
+						Path:   dsl.String("/lpa-api/v1/cases/801/payments"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
@@ -119,7 +119,7 @@ func TestNoPaymentOnCase(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				payments, err := client.Payments(Context{Context: context.Background()}, 999)
+				payments, err := client.Payments(Context{Context: context.Background()}, 801)
 
 				assert.Equal(t, tc.expectedResponse, payments)
 				if tc.expectedError == nil {
