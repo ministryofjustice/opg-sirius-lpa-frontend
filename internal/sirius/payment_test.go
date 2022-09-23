@@ -96,7 +96,7 @@ func TestNoPaymentOnCase(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have another pending case assigned").
+					Given("I have a pending case with no payment assigned").
 					UponReceiving("A request for the payments by case").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
