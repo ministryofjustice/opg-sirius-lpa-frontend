@@ -9,7 +9,7 @@ import (
 
 type ApplyFeeReductionClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
-	ApplyFeeReduction(ctx sirius.Context, caseID int, source string, feeReductionType string, paymentEvidence string, paymentDate sirius.DateString) error
+	ApplyFeeReduction(ctx sirius.Context, caseID int, feeReductionType string, paymentEvidence string, paymentDate sirius.DateString) error
 	Case(sirius.Context, int) (sirius.Case, error)
 }
 
@@ -19,7 +19,6 @@ type applyFeeReductionData struct {
 	Error     sirius.ValidationError
 
 	Case              sirius.Case
-	Source            string
 	PaymentEvidence   string
 	FeeReductionType  string
 	PaymentDate       sirius.DateString
@@ -52,9 +51,7 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) H
 		}
 
 		if r.Method == http.MethodPost {
-			data.Source = "FEE_REDUCTION"
-
-			err = client.ApplyFeeReduction(ctx, caseID, data.Source, data.FeeReductionType, data.PaymentEvidence, data.PaymentDate)
+			err = client.ApplyFeeReduction(ctx, caseID, data.FeeReductionType, data.PaymentEvidence, data.PaymentDate)
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve

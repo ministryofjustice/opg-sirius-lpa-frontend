@@ -16,8 +16,8 @@ type mockApplyFeeReductionClient struct {
 	mock.Mock
 }
 
-func (m *mockApplyFeeReductionClient) ApplyFeeReduction(ctx sirius.Context, caseID int, source string, feeReductionType string, paymentEvidence string, paymentDate sirius.DateString) error {
-	return m.Called(ctx, caseID, source, feeReductionType, paymentEvidence, paymentDate).Error(0)
+func (m *mockApplyFeeReductionClient) ApplyFeeReduction(ctx sirius.Context, caseID int, feeReductionType string, paymentEvidence string, paymentDate sirius.DateString) error {
+	return m.Called(ctx, caseID, feeReductionType, paymentEvidence, paymentDate).Error(0)
 }
 
 func (m *mockApplyFeeReductionClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
@@ -185,7 +185,7 @@ func TestPostFeeReduction(t *testing.T) {
 
 	client := &mockApplyFeeReductionClient{}
 	client.
-		On("ApplyFeeReduction", mock.Anything, 123, "FEE_REDUCTION", "REMISSION", "Test evidence", sirius.DateString("2022-01-23")).
+		On("ApplyFeeReduction", mock.Anything, 123, "REMISSION", "Test evidence", sirius.DateString("2022-01-23")).
 		Return(nil)
 	client.
 		On("Case", mock.Anything, 123).
@@ -200,7 +200,6 @@ func TestPostFeeReduction(t *testing.T) {
 			Success:           true,
 			Case:              caseitem,
 			FeeReductionType:  "REMISSION",
-			Source:            "FEE_REDUCTION",
 			PaymentDate:       "2022-01-23",
 			PaymentEvidence:   "Test evidence",
 			FeeReductionTypes: feeReductionTypes,
@@ -209,7 +208,6 @@ func TestPostFeeReduction(t *testing.T) {
 
 	form := url.Values{
 		"feeReductionType": {"REMISSION"},
-		"source":           {"FEE_REDUCTION"},
 		"paymentDate":      {"2022-01-23"},
 		"paymentEvidence":  {"Test evidence"},
 	}

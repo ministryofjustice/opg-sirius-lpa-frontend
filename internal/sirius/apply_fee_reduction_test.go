@@ -35,7 +35,7 @@ func TestApplyFeeReduction(t *testing.T) {
 						},
 						Body: map[string]interface{}{
 							"feeReductionType": "REMISSION",
-							"source":           "FEE_REDUCTION",
+							"source":           feeReductionSource,
 							"paymentDate":      "25/04/2022",
 							"paymentEvidence":  "Test evidence",
 						},
@@ -55,7 +55,7 @@ func TestApplyFeeReduction(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.ApplyFeeReduction(Context{Context: context.Background()}, 801, "FEE_REDUCTION", "REMISSION", "Test evidence", DateString("2022-04-25"))
+				err := client.ApplyFeeReduction(Context{Context: context.Background()}, 801, "REMISSION", "Test evidence", DateString("2022-04-25"))
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
