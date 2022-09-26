@@ -35,7 +35,12 @@
                         <th scope="row" class="govuk-table__header">Total paid:</th>
                         <td class="govuk-table__cell">£{{ fee .TotalPaid }}</td>
                     </tr>
-
+                    {{ if .TotalRefunds }}
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header govuk-!-font-size-24">Total refunds:</th>
+                            <td class="govuk-table__cell govuk-!-font-size-24"><strong>-£{{ fee .TotalRefunds }}</strong></td>
+                        </tr>
+                    {{ end }}
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Fee reduction type:</th>
                         <td class="govuk-table__cell">
@@ -60,7 +65,43 @@
                 {{if .FeeReductions}}
                     {{ template "fee-reduction" . }}
                 {{end}}
+                {{ if .Refunds }}
+                    <details class="govuk-details" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                                Refunds
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
+
+                            {{ range $i, $p := .Refunds }}
+                                <table class="govuk-table table__no-border">
+                                    <tbody class="govuk-table__body">
+                                    <tr class="govuk-table__row">
+                                        <th scope="row" class="govuk-table__header">Amount:</th>
+                                        <td class="govuk-table__cell"><strong>£{{ fee (abs .Amount) }}</strong></td>
+                                    </tr>
+                                    <tr class="govuk-table__row">
+                                        <th scope="row" class="govuk-table__header">Date of refund:</th>
+                                        <td class="govuk-table__cell">{{ formatDate .PaymentDate }}</td>
+                                    </tr>
+                                    <tr class="govuk-table__row">
+                                        <th scope="row" class="govuk-table__header">Method:</th>
+                                        <td class="govuk-table__cell">
+                                            {{ range $.PaymentSources }}
+                                                {{ if eq .Handle $p.Source }}{{ .Label }}{{ end }}
+                                            {{ end }}
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            {{ end }}
+
+                        </div>
+                    </details>
+                {{ end }}
             {{ end }}
+        </div>
 
             <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}">
                 Add payment

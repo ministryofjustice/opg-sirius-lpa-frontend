@@ -20,12 +20,14 @@ type getPaymentsData struct {
 
 	Case              sirius.Case
 	Payments          []sirius.Payment
+	Refunds           []sirius.Payment
 	FeeReductions     []sirius.Payment
 	PaymentSources    []sirius.RefDataItem
 	ReferenceTypes    []sirius.RefDataItem
 	FeeReductionTypes []sirius.RefDataItem
 	IsReducedFeesUser bool
 	TotalPaid         int
+	TotalRefunds      int
 	OutstandingFee    int
 	RefundAmount      int
 	FlashMessage      FlashNotification
@@ -102,6 +104,16 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		data.IsReducedFeesUser = user.HasRole("Reduced Fees User")
 
 		data.FlashMessage, _ = GetFlash(w, r)
+
+		for _, p := range payments {
+			if p.Amount < 0 {
+				data.Refunds = append(data.Refunds, p)
+				data.TotalRefunds = data.TotalRefunds + (p.Amount * -1)
+			} else {
+				data.Payments = append(data.Payments, p)
+				data.TotalPaid = data.TotalPaid + p.Amount
+			}
+		}
 
 		return tmpl(w, data)
 	}
