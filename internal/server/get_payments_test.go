@@ -2,12 +2,13 @@ package server
 
 import (
 	"errors"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockGetPayments struct {
@@ -56,6 +57,13 @@ func TestGetPayments(t *testing.T) {
 		},
 	}
 
+	referenceTypes := []sirius.RefDataItem{
+		{
+			Handle: "GOVUK",
+			Label:  "GOV.UK Pay",
+		},
+	}
+
 	client := &mockGetPayments{}
 	client.
 		On("Payments", mock.Anything, 4).
@@ -65,13 +73,16 @@ func TestGetPayments(t *testing.T) {
 		Return(caseItem, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
-		Return(paymentSources, nil)
+		Return(paymentSources, nil).
+		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
+		Return(referenceTypes, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getPaymentsData{
 			Payments:       payments,
 			PaymentSources: paymentSources,
+			ReferenceTypes: referenceTypes,
 			Case:           caseItem,
 			TotalPaid:      5538,
 		}).
@@ -208,6 +219,13 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 		},
 	}
 
+	referenceTypes := []sirius.RefDataItem{
+		{
+			Handle: "GOVUK",
+			Label:  "GOV.UK Pay",
+		},
+	}
+
 	client := &mockGetPayments{}
 	client.
 		On("Payments", mock.Anything, 4).
@@ -217,7 +235,9 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 		Return(caseItem, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
-		Return(paymentSources, nil)
+		Return(paymentSources, nil).
+		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
+		Return(referenceTypes, nil)
 
 	expectedError := errors.New("err")
 
@@ -226,6 +246,7 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, getPaymentsData{
 			Payments:       payments,
 			PaymentSources: paymentSources,
+			ReferenceTypes: referenceTypes,
 			Case:           caseItem,
 			TotalPaid:      4100,
 		}).

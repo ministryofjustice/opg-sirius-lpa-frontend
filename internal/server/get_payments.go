@@ -1,10 +1,11 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-go-common/template"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
 	"strconv"
+
+	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
 type GetPaymentsClient interface {
@@ -19,6 +20,7 @@ type getPaymentsData struct {
 	Case           sirius.Case
 	Payments       []sirius.Payment
 	PaymentSources []sirius.RefDataItem
+	ReferenceTypes []sirius.RefDataItem
 	TotalPaid      int
 }
 
@@ -44,6 +46,11 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		data.Payments = payments
 
 		data.PaymentSources, err = client.RefDataByCategory(ctx, sirius.PaymentSourceCategory)
+		if err != nil {
+			return err
+		}
+
+		data.ReferenceTypes, err = client.RefDataByCategory(ctx, sirius.PaymentReferenceType)
 		if err != nil {
 			return err
 		}
