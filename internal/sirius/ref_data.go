@@ -5,6 +5,7 @@ import "fmt"
 const (
 	PaymentSourceCategory string = "paymentSource"
 	WarningTypeCategory   string = "warningType"
+	PaymentReferenceType  string = "paymentReferenceType"
 )
 
 type RefDataItem struct {
