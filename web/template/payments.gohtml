@@ -6,7 +6,6 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <h1 class="govuk-heading-s govuk-!-padding-bottom-2"><strong>{{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "lpa" }}LPA{{ end }} {{ .Case.UID }}</strong></h1>
-
             {{ if not .Payments }}
             <p class="govuk-body govuk-!-padding-top-7 govuk-!-padding-bottom-7"><strong>There is currently no fee data available to display.</strong></p>
             {{ else }}
@@ -75,6 +74,11 @@
             <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}">
                 Add payment
             </a>
+            {{ if .IsReducedFeesUser }}
+                <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/apply-fee-reduction?id=%d" .Case.ID) }}">
+                    Apply fee reduction
+                </a>
+            {{ end }}
         </div>
     </div>
 {{ end }}
