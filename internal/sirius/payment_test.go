@@ -79,6 +79,60 @@ func TestPayment(t *testing.T) {
 	}
 }
 
+func TestNoPaymentOnCase(t *testing.T) {
+	t.Parallel()
+
+	pact := newPact()
+	defer pact.Teardown()
+
+	testCases := []struct {
+		name             string
+		setup            func()
+		expectedError    func(int) error
+		expectedResponse []Payment
+	}{
+		{
+			name: "OK",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have a pending case with no payment assigned").
+					UponReceiving("A request for the payments by case").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String("/lpa-api/v1/cases/801/payments"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.EachLike(map[string]interface{}{}, 0),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: []Payment{},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.Verify(func() error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+
+				payments, err := client.Payments(Context{Context: context.Background()}, 801)
+
+				assert.Equal(t, tc.expectedResponse, payments)
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}
+
 func TestPaymentByID(t *testing.T) {
 	t.Parallel()
 
