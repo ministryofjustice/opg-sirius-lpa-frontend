@@ -67,6 +67,12 @@ func main() {
 
 			return field
 		},
+		"abs": func(num int) int {
+			if num < 0 {
+				return -num
+			}
+			return num
+		},
 		"fee": func(amount int) string {
 			float := float64(amount)
 			return fmt.Sprintf("%.2f", float/100)
