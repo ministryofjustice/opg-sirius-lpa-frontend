@@ -46,7 +46,11 @@ func TestPayment(t *testing.T) {
 							"id":               dsl.Like(3),
 							"source":           dsl.Like(FeeReductionSource),
 							"feeReductionType": dsl.Like("REMISSION"),
+<<<<<<< HEAD
 							"paymentEvidence":  dsl.Like("Test\nmultiple\nline evidence"),
+=======
+							"paymentEvidence":  dsl.Like("Test evidence"),
+>>>>>>> c7178f2 (VEGA-1469 display fee reduction details)
 							"paymentDate":      dsl.String("24/01/2022"),
 							"case": dsl.Like(map[string]interface{}{
 								"id": dsl.Like(800),
@@ -68,7 +72,11 @@ func TestPayment(t *testing.T) {
 					ID:               3,
 					Source:           FeeReductionSource,
 					FeeReductionType: "REMISSION",
+<<<<<<< HEAD
 					PaymentEvidence:  "Test\nmultiple\nline evidence",
+=======
+					PaymentEvidence:  "Test evidence",
+>>>>>>> c7178f2 (VEGA-1469 display fee reduction details)
 					PaymentDate:      DateString("2022-01-24"),
 					Case:             &Case{ID: 800},
 				},
