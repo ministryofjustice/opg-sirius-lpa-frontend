@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	htemplate "html/template"
 	"net/http"
 	"net/url"
 	"os"
@@ -87,6 +88,9 @@ func main() {
 			return tmplHandle
 		},
 		"ToLower": strings.ToLower,
+		"replaceNewline": func(s string) htemplate.HTML {
+			return htemplate.HTML(strings.Replace(htemplate.HTMLEscapeString(s), "\n", "<br>", -1))
+		},
 	})
 	if err != nil {
 		logger.Fatal(err)

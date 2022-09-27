@@ -34,7 +34,7 @@ func TestPayment(t *testing.T) {
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
-						Body: dsl.EachLike(map[string]interface{}{
+						Body: []map[string]interface{}{{
 							"id":          dsl.Like(2),
 							"source":      dsl.Like("MAKE"),
 							"amount":      dsl.Like(4100),
@@ -42,7 +42,17 @@ func TestPayment(t *testing.T) {
 							"case": dsl.Like(map[string]interface{}{
 								"id": dsl.Like(800),
 							}),
-						}, 1),
+						}, {
+							"id":               dsl.Like(3),
+							"source":           dsl.Like(FeeReductionSource),
+							"feeReductionType": dsl.Like("REMISSION"),
+							"paymentEvidence":  dsl.Like("Test evidence"),
+							"paymentDate":      dsl.String("24/01/2022"),
+							"case": dsl.Like(map[string]interface{}{
+								"id": dsl.Like(800),
+							}),
+						},
+						},
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
@@ -53,6 +63,14 @@ func TestPayment(t *testing.T) {
 					Amount:      4100,
 					PaymentDate: DateString("2022-01-23"),
 					Case:        &Case{ID: 800},
+				},
+				{
+					ID:               3,
+					Source:           FeeReductionSource,
+					FeeReductionType: "REMISSION",
+					PaymentEvidence:  "Test evidence",
+					PaymentDate:      DateString("2022-01-24"),
+					Case:             &Case{ID: 800},
 				},
 			},
 		},
