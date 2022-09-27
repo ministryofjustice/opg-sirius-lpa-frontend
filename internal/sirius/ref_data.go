@@ -5,9 +5,10 @@ import (
 )
 
 const (
-	PaymentSourceCategory string = "paymentSource"
-	WarningTypeCategory   string = "warningType"
-	PaymentReferenceType  string = "paymentReferenceType"
+	PaymentSourceCategory    string = "paymentSource"
+	WarningTypeCategory      string = "warningType"
+	FeeReductionTypeCategory string = "feeReductionType"
+	PaymentReferenceType     string = "paymentReferenceType"
 )
 
 type RefDataItem struct {

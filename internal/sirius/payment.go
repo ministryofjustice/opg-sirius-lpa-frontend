@@ -11,12 +11,12 @@ type PaymentReference struct {
 }
 
 type Payment struct {
-	ID          int                `json:"id,omitempty"`
-	Source      string             `json:"source"`
-	Amount      int                `json:"amount"`
-	PaymentDate DateString         `json:"paymentDate"`
-	Case        *Case              `json:"case,omitempty"`
-	Locked      bool               `json:"locked,omitempty"`
+	ID          int        `json:"id,omitempty"`
+	Source      string     `json:"source,omitempty"`
+	Amount      int        `json:"amount,omitempty"`
+	PaymentDate DateString `json:"paymentDate,omitempty"`
+	Case        *Case      `json:"case,omitempty"`
+	Locked      bool       `json:"locked,omitempty"`
 	References  []PaymentReference `json:"references,omitempty"`
 }
 
