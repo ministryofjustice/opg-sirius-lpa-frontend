@@ -33,7 +33,6 @@ describe("View a payment", () => {
             cy.contains("Date reduction approved:");
             cy.contains("24/01/2022");
             cy.contains("Evidence:");
-
             cy.get(".govuk-link").contains("Edit fee reduction");
             cy.get(".govuk-link").contains("Delete fee reduction");
         });
