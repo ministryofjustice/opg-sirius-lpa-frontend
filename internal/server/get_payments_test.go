@@ -38,7 +38,6 @@ func (m *mockGetPayments) GetUserDetails(ctx sirius.Context) (sirius.User, error
 	return args.Get(0).(sirius.User), args.Error(1)
 }
 
-
 func TestGetPayments(t *testing.T) {
 	payments := []sirius.Payment{
 		{
@@ -94,11 +93,11 @@ func TestGetPayments(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getPaymentsData{
-			Payments:       payments,
-			PaymentSources: paymentSources,
-			ReferenceTypes: referenceTypes,
-			Case:           caseItem,
-			TotalPaid:      5538,
+			Payments:          payments,
+			PaymentSources:    paymentSources,
+			ReferenceTypes:    referenceTypes,
+			Case:              caseItem,
+			TotalPaid:         5538,
 			IsReducedFeesUser: true,
 		}).
 		Return(nil)
@@ -313,11 +312,11 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getPaymentsData{
-			Payments:       payments,
-			PaymentSources: paymentSources,
-			ReferenceTypes: referenceTypes,
-			Case:           caseItem,
-			TotalPaid:      4100,
+			Payments:          payments,
+			PaymentSources:    paymentSources,
+			ReferenceTypes:    referenceTypes,
+			Case:              caseItem,
+			TotalPaid:         4100,
 			IsReducedFeesUser: false,
 		}).
 		Return(expectedError)

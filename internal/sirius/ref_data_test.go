@@ -172,8 +172,8 @@ func TestRefDataByCategoryFeeReductionType(t *testing.T) {
 			},
 			expectedResponse: []RefDataItem{
 				{
-					Handle:         "REMISSION",
-					Label:          "Remission",
+					Handle: "REMISSION",
+					Label:  "Remission",
 				},
 			},
 		},

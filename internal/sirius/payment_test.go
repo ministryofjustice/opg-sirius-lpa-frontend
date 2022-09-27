@@ -103,8 +103,8 @@ func TestNoPaymentOnCase(t *testing.T) {
 						Path:   dsl.String("/lpa-api/v1/cases/801/payments"),
 					}).
 					WillRespondWith(dsl.Response{
-						Status: http.StatusOK,
-						Body: dsl.EachLike(map[string]interface{}{}, 0),
+						Status:  http.StatusOK,
+						Body:    dsl.EachLike(map[string]interface{}{}, 0),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},

@@ -21,8 +21,7 @@ type getPaymentsData struct {
 	Case              sirius.Case
 	Payments          []sirius.Payment
 	PaymentSources    []sirius.RefDataItem
-	ReferenceTypes 	  []sirius.RefDataItem
-	User              sirius.User
+	ReferenceTypes    []sirius.RefDataItem
 	IsReducedFeesUser bool
 	TotalPaid         int
 }
