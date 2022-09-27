@@ -25,7 +25,7 @@ func TestApplyFeeReduction(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a pending case assigned with no payment").
+					Given("I have a pending case with no payment assigned").
 					UponReceiving("A request to create a fee reduction").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
