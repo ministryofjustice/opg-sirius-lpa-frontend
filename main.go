@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	htemplate "html/template"
 	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -76,6 +78,9 @@ func main() {
 				return s.ToSirius()
 			}
 			return "", nil
+		},
+		"replaceNewline": func(s string) htemplate.HTML {
+			return htemplate.HTML(strings.Replace(htemplate.HTMLEscapeString(s), "\n", "<br>", -1))
 		},
 	})
 	if err != nil {
