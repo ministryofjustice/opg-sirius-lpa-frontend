@@ -28,7 +28,7 @@
                 </summary>
                 <div class="govuk-details__text">
 
-                    {{ range $i, $p := .Payments }}
+                    {{ range $p := .Payments }}
                     <table class="govuk-table table__no-border">
                         <tbody class="govuk-table__body">
                             <tr class="govuk-table__row">
@@ -47,6 +47,16 @@
                                     {{ end }}
                                 </td>
                             </tr>
+                            {{ range $r := .References }}
+                                <tr class="govuk-table__row">
+                                    <th scope="row" class="govuk-table__header">
+                                    {{ range $.ReferenceTypes }}
+                                        {{ if eq .Handle $r.Type }}{{ .Label }}{{ end }}
+                                    {{ end }} reference:
+                                    </th>
+                                    <td class="govuk-table__cell">{{ .Reference }}</td>
+                                </tr>
+                            {{ end }}
                             {{ if not .Locked }}
                             <tr class="govuk-table__row">
                                 <th scope="row" class="govuk-table__header table-row__no-border" colspan="2">

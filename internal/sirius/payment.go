@@ -5,6 +5,11 @@ import (
 	"regexp"
 )
 
+type PaymentReference struct {
+	Reference string `json:"reference"`
+	Type      string `json:"type"`
+}
+
 type Payment struct {
 	ID          int        `json:"id,omitempty"`
 	Source      string     `json:"source,omitempty"`
@@ -12,6 +17,7 @@ type Payment struct {
 	PaymentDate DateString `json:"paymentDate,omitempty"`
 	Case        *Case      `json:"case,omitempty"`
 	Locked      bool       `json:"locked,omitempty"`
+	References  []PaymentReference `json:"references,omitempty"`
 }
 
 func (c *Client) Payments(ctx Context, id int) ([]Payment, error) {

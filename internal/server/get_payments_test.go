@@ -2,12 +2,13 @@ package server
 
 import (
 	"errors"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockGetPayments struct {
@@ -64,6 +65,13 @@ func TestGetPayments(t *testing.T) {
 
 	user := sirius.User{ID: 1, DisplayName: "Test User", Roles: []string{"OPG User", "Reduced Fees User"}}
 
+	referenceTypes := []sirius.RefDataItem{
+		{
+			Handle: "GOVUK",
+			Label:  "GOV.UK Pay",
+		},
+	}
+
 	client := &mockGetPayments{}
 	client.
 		On("Payments", mock.Anything, 4).
@@ -74,6 +82,11 @@ func TestGetPayments(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil)
+
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
+		Return(referenceTypes, nil)
+
 	client.
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil)
@@ -83,6 +96,7 @@ func TestGetPayments(t *testing.T) {
 		On("Func", mock.Anything, getPaymentsData{
 			Payments:       payments,
 			PaymentSources: paymentSources,
+			ReferenceTypes: referenceTypes,
 			Case:           caseItem,
 			TotalPaid:      5538,
 			IsReducedFeesUser: true,
@@ -198,6 +212,52 @@ func TestGetPaymentsWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
+func TestGetPaymentsWhenFailureOnGetReferenceTypeRefData(t *testing.T) {
+	expectedError := errors.New("err")
+
+	payments := []sirius.Payment{
+		{
+			ID:          2,
+			Source:      "PHONE",
+			Amount:      4100,
+			PaymentDate: sirius.DateString("2022-08-23T14:55:20+00:00"),
+		},
+	}
+
+	caseItem := sirius.Case{
+		UID:     "7000-0000-0021",
+		SubType: "pfa",
+	}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle: "PHONE",
+			Label:  "Paid over the phone",
+		},
+	}
+
+	client := &mockGetPayments{}
+	client.
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil)
+	client.
+		On("Payments", mock.Anything, 4).
+		Return(payments, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil).
+		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
+		Return([]sirius.RefDataItem{}, expectedError)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
+	w := httptest.NewRecorder()
+
+	err := GetPayments(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
 func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 	payments := []sirius.Payment{
 		{
@@ -222,6 +282,13 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 
 	user := sirius.User{ID: 1, DisplayName: "Test User", Roles: []string{"OPG User", "Case Manager"}}
 
+	referenceTypes := []sirius.RefDataItem{
+		{
+			Handle: "GOVUK",
+			Label:  "GOV.UK Pay",
+		},
+	}
+
 	client := &mockGetPayments{}
 	client.
 		On("Payments", mock.Anything, 4).
@@ -232,6 +299,11 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil)
+
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
+		Return(referenceTypes, nil)
+
 	client.
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil)
@@ -243,6 +315,7 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, getPaymentsData{
 			Payments:       payments,
 			PaymentSources: paymentSources,
+			ReferenceTypes: referenceTypes,
 			Case:           caseItem,
 			TotalPaid:      4100,
 			IsReducedFeesUser: false,

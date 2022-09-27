@@ -3,9 +3,10 @@ package sirius
 import "fmt"
 
 const (
-	PaymentSourceCategory string = "paymentSource"
-	WarningTypeCategory   string = "warningType"
+	PaymentSourceCategory    string = "paymentSource"
+	WarningTypeCategory      string = "warningType"
 	FeeReductionTypeCategory string = "feeReductionType"
+	PaymentReferenceType     string = "paymentReferenceType"
 )
 
 type RefDataItem struct {
