@@ -81,3 +81,43 @@ func TestTask(t *testing.T) {
 		})
 	}
 }
+
+func TestTaskSummary(t *testing.T) {
+	task := Task{
+		Name: "Review case details",
+		CaseItems: []Case{
+			{
+				CaseType: "LPA",
+				UID:      "7000-0420-0130",
+			},
+		},
+	}
+
+	assert.Equal(t, task.Summary(), "LPA 7000-0420-0130: Review case details")
+}
+
+func TestTaskSummaryMultipleCases(t *testing.T) {
+	task := Task{
+		Name: "Review case details",
+		CaseItems: []Case{
+			{
+				CaseType: "LPA",
+				UID:      "7000-0420-0130",
+			},
+			{
+				CaseType: "LPA",
+				UID:      "7000-2839-1010",
+			},
+		},
+	}
+
+	assert.Equal(t, task.Summary(), "LPA 7000-0420-0130: Review case details")
+}
+
+func TestTaskSummaryNoCase(t *testing.T) {
+	task := Task{
+		Name: "Review case details",
+	}
+
+	assert.Equal(t, task.Summary(), "Review case details")
+}
