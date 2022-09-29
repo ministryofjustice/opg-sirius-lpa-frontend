@@ -11,13 +11,15 @@ type PaymentReference struct {
 }
 
 type Payment struct {
-	ID          int                `json:"id,omitempty"`
-	Source      string             `json:"source,omitempty"`
-	Amount      int                `json:"amount,omitempty"`
-	PaymentDate DateString         `json:"paymentDate,omitempty"`
-	Case        *Case              `json:"case,omitempty"`
-	Locked      bool               `json:"locked,omitempty"`
-	References  []PaymentReference `json:"references,omitempty"`
+	ID               int                `json:"id,omitempty"`
+	Source           string             `json:"source,omitempty"`
+	Amount           int                `json:"amount,omitempty"`
+	PaymentDate      DateString         `json:"paymentDate,omitempty"`
+	PaymentEvidence  string             `json:"paymentEvidence,omitempty"`
+	FeeReductionType string             `json:"feeReductionType,omitempty"`
+	Case             *Case              `json:"case,omitempty"`
+	Locked           bool               `json:"locked,omitempty"`
+	References       []PaymentReference `json:"references,omitempty"`
 }
 
 func (c *Client) Payments(ctx Context, id int) ([]Payment, error) {
