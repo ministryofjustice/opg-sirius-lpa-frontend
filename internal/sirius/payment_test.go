@@ -26,7 +26,7 @@ func TestPayment(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have an lpa which has been paid for").
+					Given("I have an lpa which has a payment and fee reduction").
 					UponReceiving("A request for the payments by case").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
@@ -169,7 +169,7 @@ func TestPaymentByID(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have an lpa which has been paid for").
+					Given("I have an lpa which has a payment and fee reduction").
 					UponReceiving("A request for that payment by ID").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
