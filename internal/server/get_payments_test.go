@@ -39,7 +39,7 @@ func (m *mockGetPayments) GetUserDetails(ctx sirius.Context) (sirius.User, error
 }
 
 func TestGetPayments(t *testing.T) {
-	payments := []sirius.Payment{
+	allPayments := []sirius.Payment{
 		{
 			ID:     2,
 			Amount: 4100,
@@ -47,6 +47,34 @@ func TestGetPayments(t *testing.T) {
 		{
 			ID:     3,
 			Amount: 1438,
+		},
+		{
+			ID:               3,
+			Source:           sirius.FeeReductionSource,
+			FeeReductionType: "REMISSION",
+			PaymentEvidence:  "Test",
+			PaymentDate:      "2022-04-05",
+		},
+	}
+
+	nonReductionPayments := []sirius.Payment{
+		{
+			ID:     2,
+			Amount: 4100,
+		},
+		{
+			ID:     3,
+			Amount: 1438,
+		},
+	}
+
+	feeReductions := []sirius.Payment{
+		{
+			ID:               3,
+			Source:           sirius.FeeReductionSource,
+			FeeReductionType: "REMISSION",
+			PaymentEvidence:  "Test",
+			PaymentDate:      "2022-04-05",
 		},
 	}
 
@@ -62,6 +90,13 @@ func TestGetPayments(t *testing.T) {
 		},
 	}
 
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
+		},
+	}
+
 	user := sirius.User{ID: 1, DisplayName: "Test User", Roles: []string{"OPG User", "Reduced Fees User"}}
 
 	referenceTypes := []sirius.RefDataItem{
@@ -74,18 +109,19 @@ func TestGetPayments(t *testing.T) {
 	client := &mockGetPayments{}
 	client.
 		On("Payments", mock.Anything, 4).
-		Return(payments, nil)
+		Return(allPayments, nil)
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil)
-
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
 		Return(referenceTypes, nil)
-
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil)
 	client.
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil)
@@ -93,9 +129,11 @@ func TestGetPayments(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getPaymentsData{
-			Payments:          payments,
 			PaymentSources:    paymentSources,
 			ReferenceTypes:    referenceTypes,
+			Payments:          nonReductionPayments,
+			FeeReductions:     feeReductions,
+			FeeReductionTypes: feeReductionTypes,
 			Case:              caseItem,
 			TotalPaid:         5538,
 			IsReducedFeesUser: true,
@@ -257,6 +295,61 @@ func TestGetPaymentsWhenFailureOnGetReferenceTypeRefData(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
+func TestGetPaymentsWhenFailureOnFeeReductionTypesRefData(t *testing.T) {
+	expectedError := errors.New("err")
+
+	payments := []sirius.Payment{
+		{
+			ID:          2,
+			Source:      "PHONE",
+			Amount:      4100,
+			PaymentDate: sirius.DateString("2022-08-23T14:55:20+00:00"),
+		},
+	}
+
+	caseItem := sirius.Case{
+		UID:     "7000-0000-0021",
+		SubType: "pfa",
+	}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle: "PHONE",
+			Label:  "Paid over the phone",
+		},
+	}
+
+	referenceTypes := []sirius.RefDataItem{
+		{
+			Handle: "GOVUK",
+			Label:  "GOV.UK Pay",
+		},
+	}
+
+	client := &mockGetPayments{}
+	client.
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil)
+	client.
+		On("Payments", mock.Anything, 4).
+		Return(payments, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil).
+		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
+		Return(referenceTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return([]sirius.RefDataItem{}, expectedError)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
+	w := httptest.NewRecorder()
+
+	err := GetPayments(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
 func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 	payments := []sirius.Payment{
 		{
@@ -276,6 +369,13 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 		{
 			Handle: "PHONE",
 			Label:  "Paid over the phone",
+		},
+	}
+
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
 		},
 	}
 
@@ -304,6 +404,9 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 		Return(referenceTypes, nil)
 
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil)
+	client.
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil)
 
@@ -318,6 +421,7 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 			Case:              caseItem,
 			TotalPaid:         4100,
 			IsReducedFeesUser: false,
+			FeeReductionTypes: feeReductionTypes,
 		}).
 		Return(expectedError)
 
