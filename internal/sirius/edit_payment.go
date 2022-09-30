@@ -12,6 +12,7 @@ func (c *Client) EditPayment(ctx Context, paymentID int, payment Payment) error 
 	if err != nil {
 		return err
 	}
+	fmt.Println(payment)
 
 	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/lpa-api/v1/payments/%d", paymentID), bytes.NewReader(data))
 	if err != nil {
