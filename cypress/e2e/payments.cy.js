@@ -47,5 +47,18 @@ describe("View a payment", () => {
             cy.get(".govuk-link").contains("Edit fee reduction");
             cy.get(".govuk-link").contains("Delete fee reduction");
         });
+
+        it("displays fee reduction information", () => {
+            cy.contains("Fee reductions");
+            cy.get('#f-fee-reductions-tab').click();
+            cy.contains("Reduction type");
+            cy.contains("Remission");
+            cy.contains("Date reduction approved:");
+            cy.contains("24/01/2022");
+            cy.contains("Evidence:");
+            cy.contains("Test multiple line evidence");
+            cy.get(".govuk-link").contains("Edit fee reduction");
+            cy.get(".govuk-link").contains("Delete fee reduction");
+        });
     });
 });
