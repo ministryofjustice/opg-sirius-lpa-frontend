@@ -11,13 +11,15 @@ type DeletePaymentClient interface {
 	PaymentByID(ctx sirius.Context, id int) (sirius.Payment, error)
 	Case(sirius.Context, int) (sirius.Case, error)
 	DeletePayment(ctx sirius.Context, paymentID int) error
+	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
 type deletePaymentData struct {
-	XSRFToken string
-	Success   bool
-	Payment   sirius.Payment
-	Case      sirius.Case
+	XSRFToken         string
+	Success           bool
+	Payment           sirius.Payment
+	Case              sirius.Case
+	FeeReductionTypes []sirius.RefDataItem
 }
 
 func DeletePayment(client DeletePaymentClient, tmpl template.Template) Handler {
@@ -40,6 +42,11 @@ func DeletePayment(client DeletePaymentClient, tmpl template.Template) Handler {
 		}
 
 		data.Case, err = client.Case(ctx, p.Case.ID)
+		if err != nil {
+			return err
+		}
+
+		data.FeeReductionTypes, err = client.RefDataByCategory(ctx, sirius.FeeReductionTypeCategory)
 		if err != nil {
 			return err
 		}

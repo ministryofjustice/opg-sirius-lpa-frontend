@@ -273,3 +273,74 @@ func TestPaymentByID(t *testing.T) {
 		})
 	}
 }
+
+func TestFeeReductionByID(t *testing.T) {
+	t.Parallel()
+
+	pact := newPact()
+	defer pact.Teardown()
+
+	testCases := []struct {
+		name             string
+		setup            func()
+		cookies          []*http.Cookie
+		expectedError    func(int) error
+		expectedResponse Payment
+	}{
+		{
+			name: "OK",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have an lpa which has a fee reduction").
+					UponReceiving("A request for that fee reduction by ID").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String("/lpa-api/v1/payments/124"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.Like(map[string]interface{}{
+							"id":               dsl.Like(124),
+							"source":           dsl.Like("FEE_REDUCTION"),
+							"paymentEvidence":  dsl.String("Test evidence"),
+							"feeReductionType": dsl.String("REMISSION"),
+							"paymentDate":      dsl.String("23/01/2022"),
+							"case": dsl.Like(map[string]interface{}{
+								"id": dsl.Like(802),
+							}),
+						}),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: Payment{
+				ID:               124,
+				Source:           "FEE_REDUCTION",
+				PaymentEvidence:  "Test evidence",
+				FeeReductionType: "REMISSION",
+				PaymentDate:      DateString("2022-01-23"),
+				Case:             &Case{ID: 802},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.Verify(func() error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+
+				payment, err := client.PaymentByID(Context{Context: context.Background()}, 124)
+
+				assert.Equal(t, tc.expectedResponse, payment)
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}

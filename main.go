@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -77,6 +78,15 @@ func main() {
 			}
 			return "", nil
 		},
+		"translateRefData": func(types []sirius.RefDataItem, tmplHandle string) string {
+			for _, refDataType := range types {
+				if refDataType.Handle == tmplHandle {
+					return refDataType.Label
+				}
+			}
+			return tmplHandle
+		},
+		"ToLower": strings.ToLower,
 	})
 	if err != nil {
 		logger.Fatal(err)
