@@ -97,6 +97,78 @@ func TestPayment(t *testing.T) {
 	}
 }
 
+func TestPaymentWithFeeReduction(t *testing.T) {
+	t.Parallel()
+
+	pact := newPact()
+	defer pact.Teardown()
+
+	testCases := []struct {
+		name             string
+		setup            func()
+		expectedError    func(int) error
+		expectedResponse []Payment
+	}{
+		{
+			name: "OK",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have an lpa which has a fee reduction").
+					UponReceiving("A request for the fee reduction by case").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String("/lpa-api/v1/cases/802/payments"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.EachLike(map[string]interface{}{
+							"id":               dsl.Like(3),
+							"source":           dsl.Like(FeeReductionSource),
+							"feeReductionType": dsl.Like("REMISSION"),
+							"paymentEvidence":  dsl.Like("Test\nmultiple\nline evidence"),
+							"paymentDate":      dsl.String("24/01/2022"),
+							"case": dsl.Like(map[string]interface{}{
+								"id": dsl.Like(802),
+							}),
+						}, 1),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: []Payment{
+				{
+					ID:               3,
+					Source:           FeeReductionSource,
+					FeeReductionType: "REMISSION",
+					PaymentEvidence:  "Test\nmultiple\nline evidence",
+					PaymentDate:      DateString("2022-01-24"),
+					Case:             &Case{ID: 802},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.Verify(func() error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+
+				payments, err := client.Payments(Context{Context: context.Background()}, 802)
+
+				assert.Equal(t, tc.expectedResponse, payments)
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}
+
 func TestNoPaymentOnCase(t *testing.T) {
 	t.Parallel()
 

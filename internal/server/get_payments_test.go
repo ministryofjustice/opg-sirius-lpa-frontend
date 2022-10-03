@@ -49,7 +49,7 @@ func TestGetPayments(t *testing.T) {
 			Amount: 1438,
 		},
 		{
-			ID:               3,
+			ID:               4,
 			Source:           sirius.FeeReductionSource,
 			FeeReductionType: "REMISSION",
 			PaymentEvidence:  "Test",
@@ -70,7 +70,7 @@ func TestGetPayments(t *testing.T) {
 
 	feeReductions := []sirius.Payment{
 		{
-			ID:               3,
+			ID:               4,
 			Source:           sirius.FeeReductionSource,
 			FeeReductionType: "REMISSION",
 			PaymentEvidence:  "Test",

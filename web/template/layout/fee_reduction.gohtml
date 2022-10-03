@@ -6,7 +6,7 @@
                     </span>
         </summary>
         <div class="govuk-details__text">
-            {{ range $i, $p := .FeeReductions }}
+            {{ range $p := .FeeReductions }}
                 <table class="govuk-table table__no-border">
                     <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
@@ -25,7 +25,7 @@
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Evidence:</th>
-                        <td class="govuk-table__cell" style="white-space:pre-wrap;">{{ .PaymentEvidence }}</td>
+                        <td class="govuk-table__cell app-!-pre-wrap">{{ .PaymentEvidence }}</td>
                     </tr>
                     {{ if not .Locked }}
                         <tr class="govuk-table__row">

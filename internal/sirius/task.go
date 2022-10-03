@@ -11,7 +11,11 @@ type Task struct {
 }
 
 func (t Task) Summary() string {
-	return fmt.Sprintf("%s: %s", t.CaseItems[0].Summary(), t.Name)
+	if len(t.CaseItems) > 0 {
+		return fmt.Sprintf("%s: %s", t.CaseItems[0].Summary(), t.Name)
+	} else {
+		return t.Name
+	}
 }
 
 func (c *Client) Task(ctx Context, id int) (Task, error) {
