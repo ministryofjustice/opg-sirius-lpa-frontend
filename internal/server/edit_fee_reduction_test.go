@@ -222,6 +222,74 @@ func TestEditFeeReductionWhenTemplateErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestPostEditFeeReductionValidationError(t *testing.T) {
+	caseItem := sirius.Case{ID: 4, CaseType: "lpa", UID: "700700"}
+
+	feeReduction := sirius.Payment{
+		ID:               123,
+		PaymentEvidence:  "",
+		FeeReductionType: "REMISSION",
+		PaymentDate:      sirius.DateString("2022-07-23"),
+		Source:           sirius.FeeReductionSource,
+		Case:             &caseItem,
+	}
+
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
+		},
+	}
+
+	validationError := sirius.ValidationError{
+		Field: sirius.FieldErrors{
+			"paymentEvidence": {"reason": "Value is required and cannot be empty"},
+		},
+	}
+
+	client := &mockEditFeeReductionClient{}
+	client.
+		On("PaymentByID", mock.Anything, 123).
+		Return(feeReduction, nil).
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil).
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil).
+		On("EditPayment", mock.Anything, 123, feeReduction).
+		Return(validationError)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, editFeeReductionData{
+			Success:           false,
+			Case:              caseItem,
+			PaymentID:         123,
+			FeeReduction:      feeReduction,
+			FeeReductionTypes: feeReductionTypes,
+			Error:             validationError,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"id":               {"123"},
+		"source":           {sirius.FeeReductionSource},
+		"paymentEvidence":  {""},
+		"paymentDate":      {"2022-07-23"},
+		"feeReductionType": {"REMISSION"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := EditFeeReduction(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestPostEditFeeReduction(t *testing.T) {
 	caseItem := sirius.Case{ID: 4, CaseType: "lpa", UID: "700700"}
 
