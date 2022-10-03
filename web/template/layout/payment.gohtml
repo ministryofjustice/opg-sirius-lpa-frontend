@@ -1,0 +1,64 @@
+{{ define "payment" }}
+    <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text" id="f-payments-tab">
+                        Payments
+                    </span>
+        </summary>
+        <div class="govuk-details__text">
+
+            {{ range $p := .Payments }}
+                <table class="govuk-table table__no-border">
+                    <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Amount:</th>
+                        <td class="govuk-table__cell"><strong>£{{ fee .Amount }}</strong></td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Date of payment:</th>
+                        <td class="govuk-table__cell">{{ formatDate .PaymentDate }}</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Method:</th>
+                        <td class="govuk-table__cell">
+                            {{ range $.PaymentSources }}
+                                {{ if eq .Handle $p.Source }}{{ .Label }}{{ end }}
+                            {{ end }}
+                        </td>
+                    </tr>
+                    {{ range $r := .References }}
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">
+                                {{ range $.ReferenceTypes }}
+                                    {{ if eq .Handle $r.Type }}{{ .Label }}{{ end }}
+                                {{ end }} reference:
+                            </th>
+                            <td class="govuk-table__cell">{{ .Reference }}</td>
+                        </tr>
+                    {{ end }}
+                    {{ if not .Locked }}
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header table-row__no-border"
+                                colspan="2">
+                                <a class="govuk-link"
+                                   href="{{ prefix (printf "/edit-payment?id=%d" .ID) }}">
+                                    Edit payment
+                                </a>
+                            </th>
+                        </tr>
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header table-row__no-border"
+                                colspan="2">
+                                <a class="govuk-link govuk-link--no-visited-state app-!-colour-text-red"
+                                   href="{{ prefix (printf "/delete-payment?id=%d" .ID) }}">
+                                    Delete payment
+                                </a>
+                            </th>
+                        </tr>
+                    {{ end }}
+                    </tbody>
+                </table>
+            {{ end }}
+        </div>
+    </details>
+{{end}}
