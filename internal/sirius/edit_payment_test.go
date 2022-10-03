@@ -25,7 +25,7 @@ func TestEditPayment(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have an lpa which has a payment and fee reduction").
+					Given("I have an lpa which has been paid for").
 					UponReceiving("A request to edit a payment").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
