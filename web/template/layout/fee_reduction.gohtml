@@ -1,0 +1,55 @@
+{{ define "fee-reduction" }}
+    <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text" id="f-fee-reductions-tab">
+                        Fee reductions
+                    </span>
+        </summary>
+        <div class="govuk-details__text">
+            {{ range $i, $p := .FeeReductions }}
+                <table class="govuk-table table__no-border">
+                    <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Reduction type:</th>
+                        <td class="govuk-table__cell">
+                            <strong>
+                                {{ range $.FeeReductionTypes }}
+                                    {{ if eq .Handle $p.FeeReductionType }}{{ .Label }}{{ end }}
+                                {{ end }}
+                            </strong>
+                        </td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Date reduction approved:</th>
+                        <td class="govuk-table__cell">{{ formatDate .PaymentDate }}</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Evidence:</th>
+                        <td class="govuk-table__cell app-!-pre-wrap">{{ .PaymentEvidence }}</td>
+                    </tr>
+                    {{ if not .Locked }}
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header table-row__no-border"
+                                colspan="2">
+                                <a class="govuk-link"
+                                   href="{{ prefix (printf "/edit-fee-reduction?id=%d" .ID) }}">
+                                    Edit fee reduction
+                                </a>
+                            </th>
+                        </tr>
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header table-row__no-border"
+                                colspan="2">
+                                <a class="govuk-link govuk-link--no-visited-state app-!-colour-text-red"
+                                   href="{{ prefix (printf "/delete-fee-reduction?id=%d" .ID) }}">
+                                    Delete fee reduction
+                                </a>
+                            </th>
+                        </tr>
+                    {{ end }}
+                    </tbody>
+                </table>
+            {{ end }}
+        </div>
+    </details>
+{{end}}
