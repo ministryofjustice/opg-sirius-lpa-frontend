@@ -114,7 +114,7 @@ jobs:
           PACT_DIR: ./pacts
           PACT_BROKER_URL: https://pact-broker.api.opg.service.justice.gov.uk
         run: |
-          LATEST_MAIN_COMMIT=$(git log -n 1 main --pretty=format:"%H")
+          LATEST_MAIN_COMMIT=$(git log -n 1 origin/main --pretty=format:"%H")
           curl ${PACT_BROKER_URL}/pacts/provider/sirius/consumer/sirius-lpa-frontend/version/$LATEST_MAIN_COMMIT > /tmp/latest-pact.json
           (diff <(jq --sort-keys '.interactions|=sort_by(.description)' ${PACT_DIR}/sirius-lpa-frontend-sirius.json) <(jq --sort-keys '.interactions|=sort_by(.description)' /tmp/latest-pact.json) || true) | (! grep '<')
       - name: Upload Code Coverage
