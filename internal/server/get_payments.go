@@ -20,8 +20,10 @@ type getPaymentsData struct {
 
 	Case              sirius.Case
 	Payments          []sirius.Payment
+	FeeReductions     []sirius.Payment
 	PaymentSources    []sirius.RefDataItem
 	ReferenceTypes    []sirius.RefDataItem
+	FeeReductionTypes []sirius.RefDataItem
 	IsReducedFeesUser bool
 	TotalPaid         int
 }
@@ -45,7 +47,19 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		if err != nil {
 			return err
 		}
-		data.Payments = payments
+
+		var feeReductions []sirius.Payment
+		var nonReductionPayments []sirius.Payment
+
+		for _, p := range payments {
+			if p.Source == sirius.FeeReductionSource {
+				feeReductions = append(feeReductions, p)
+			} else {
+				nonReductionPayments = append(nonReductionPayments, p)
+			}
+		}
+		data.FeeReductions = feeReductions
+		data.Payments = nonReductionPayments
 
 		data.PaymentSources, err = client.RefDataByCategory(ctx, sirius.PaymentSourceCategory)
 		if err != nil {
@@ -53,6 +67,11 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		}
 
 		data.ReferenceTypes, err = client.RefDataByCategory(ctx, sirius.PaymentReferenceType)
+		if err != nil {
+			return err
+		}
+
+		data.FeeReductionTypes, err = client.RefDataByCategory(ctx, sirius.FeeReductionTypeCategory)
 		if err != nil {
 			return err
 		}
