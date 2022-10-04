@@ -1,6 +1,6 @@
 describe("Edit a fee reduction", () => {
     beforeEach(() => {
-        cy.visit("/edit-fee-reduction?id=123");
+        cy.visit("/edit-fee-reduction?id=124");
     });
 
     it("edits an existing fee reduction", () => {
