@@ -83,11 +83,11 @@ func TestEditFeeReduction(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have an lpa which has a payment and fee reduction").
+					Given("I have an lpa which has a fee reduction").
 					UponReceiving("A request to edit a fee reduction").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/payments/123"),
+						Path:   dsl.String("/lpa-api/v1/payments/124"),
 						Headers: dsl.MapMatcher{
 							"Content-Type": dsl.String("application/json"),
 						},
@@ -114,7 +114,7 @@ func TestEditFeeReduction(t *testing.T) {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
 				err := client.EditPayment(Context{Context: context.Background()},
-					123,
+					124,
 					Payment{
 						PaymentEvidence:  "Edited test evidence",
 						FeeReductionType: "REMISSION",
