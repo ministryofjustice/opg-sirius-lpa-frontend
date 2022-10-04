@@ -5,7 +5,7 @@ describe("Edit a fee reduction", () => {
 
     it("edits an existing fee reduction", () => {
         cy.contains("Edit fee reduction");
-        cy.contains("7000-0000-0000");
+        cy.contains("7000-0000-0001");
         cy.get(".moj-banner").should("not.exist");
         cy.get("#f-feeReductionType" ).select("Remission");
         cy.get("#f-paymentEvidence").type("Edited test evidence");
