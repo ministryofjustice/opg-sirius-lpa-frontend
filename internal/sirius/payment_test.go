@@ -332,8 +332,8 @@ func TestFeeReductionByID(t *testing.T) {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
 				payment, err := client.PaymentByID(Context{Context: context.Background()}, 124)
-
 				assert.Equal(t, tc.expectedResponse, payment)
+
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
