@@ -1,0 +1,33 @@
+{{ template "page" . }}
+
+{{ define "title" }}Delete {{ (translateRefData .FeeReductionTypes .Payment.FeeReductionType) | ToLower }}{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <p class="govuk-body"><strong>{{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "lpa" }}LPA{{ end }} {{ .Case.UID }}</strong></p>
+            {{$feeReductionTypeLabel := translateRefData .FeeReductionTypes .Payment.FeeReductionType}}
+
+            {{ if .Success }}
+                {{ template "success-banner" (printf "%s deleted" $feeReductionTypeLabel) }}
+            {{ end }}
+
+            <h1 class="govuk-heading-l">Delete {{$feeReductionTypeLabel | ToLower}}</h1>
+
+            <p class="govuk-body govuk-!-padding-bottom-6">Are you sure you want to delete the <strong>{{$feeReductionTypeLabel | ToLower }}</strong>?</p>
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+                <div class="govuk-button-group">
+                    <button class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit">
+                        Delete
+                    </button>
+
+                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/payments?id=%d" .Case.ID) }}">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+{{ end }}

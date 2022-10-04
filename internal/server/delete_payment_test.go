@@ -28,6 +28,14 @@ func (m *mockDeletePaymentClient) DeletePayment(ctx sirius.Context, paymentID in
 	return m.Called(ctx, paymentID).Error(0)
 }
 
+func (m *mockDeletePaymentClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
+	args := m.Called(ctx, category)
+	if args.Get(0) != nil {
+		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
 func TestGetDeletePayment(t *testing.T) {
 	caseItem := sirius.Case{
 		UID:     "7000-0000-0021",
@@ -42,6 +50,13 @@ func TestGetDeletePayment(t *testing.T) {
 		Case:        &sirius.Case{ID: 4},
 	}
 
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
+		},
+	}
+
 	client := &mockDeletePaymentClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
@@ -49,12 +64,16 @@ func TestGetDeletePayment(t *testing.T) {
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, deletePaymentData{
-			Case:    caseItem,
-			Payment: payment,
+			Case:              caseItem,
+			Payment:           payment,
+			FeeReductionTypes: feeReductionTypes,
 		}).
 		Return(nil)
 
@@ -114,6 +133,42 @@ func TestDeletePaymentWhenFailureOnGetCase(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
+func TestDeletePaymentWhenFailureOnGetFeeReductionTypes(t *testing.T) {
+	caseItem := sirius.Case{
+		UID:     "7000-0000-0021",
+		SubType: "pfa",
+	}
+
+	payment := sirius.Payment{
+		ID:          123,
+		Amount:      8200,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-07-23"),
+		Case:        &sirius.Case{ID: 4},
+	}
+
+	expectedError := errors.New("err")
+
+	client := &mockDeletePaymentClient{}
+	client.
+		On("PaymentByID", mock.Anything, 123).
+		Return(payment, nil)
+	client.
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return([]sirius.RefDataItem{}, expectedError)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := DeletePayment(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
 func TestDeletePaymentWhenTemplateErrors(t *testing.T) {
 	caseItem := sirius.Case{
 		UID:     "7000-0000-0021",
@@ -128,6 +183,13 @@ func TestDeletePaymentWhenTemplateErrors(t *testing.T) {
 		Case:        &sirius.Case{ID: 4},
 	}
 
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
+		},
+	}
+
 	client := &mockDeletePaymentClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
@@ -135,14 +197,18 @@ func TestDeletePaymentWhenTemplateErrors(t *testing.T) {
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil)
 
 	expectedError := errors.New("err")
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, deletePaymentData{
-			Case:    caseItem,
-			Payment: payment,
+			Case:              caseItem,
+			Payment:           payment,
+			FeeReductionTypes: feeReductionTypes,
 		}).
 		Return(expectedError)
 
@@ -166,6 +232,13 @@ func TestPostDeletePayment(t *testing.T) {
 		Case:        &sirius.Case{ID: 4},
 	}
 
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
+		},
+	}
+
 	client := &mockDeletePaymentClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
@@ -173,7 +246,9 @@ func TestPostDeletePayment(t *testing.T) {
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
-
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil)
 	client.
 		On("DeletePayment", mock.Anything, 123).
 		Return(nil)
@@ -181,9 +256,10 @@ func TestPostDeletePayment(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, deletePaymentData{
-			Success: true,
-			Case:    caseItem,
-			Payment: payment,
+			Success:           true,
+			Case:              caseItem,
+			Payment:           payment,
+			FeeReductionTypes: feeReductionTypes,
 		}).
 		Return(nil)
 
