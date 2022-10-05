@@ -48,13 +48,6 @@ func TestGetPayments(t *testing.T) {
 			ID:     3,
 			Amount: 1438,
 		},
-		{
-			ID:               4,
-			Source:           sirius.FeeReductionSource,
-			FeeReductionType: "REMISSION",
-			PaymentEvidence:  "Test",
-			PaymentDate:      "2022-04-05",
-		},
 	}
 
 	nonReductionPayments := []sirius.Payment{
@@ -65,16 +58,6 @@ func TestGetPayments(t *testing.T) {
 		{
 			ID:     3,
 			Amount: 1438,
-		},
-	}
-
-	feeReductions := []sirius.Payment{
-		{
-			ID:               4,
-			Source:           sirius.FeeReductionSource,
-			FeeReductionType: "REMISSION",
-			PaymentEvidence:  "Test",
-			PaymentDate:      "2022-04-05",
 		},
 	}
 
@@ -132,7 +115,6 @@ func TestGetPayments(t *testing.T) {
 			PaymentSources:    paymentSources,
 			ReferenceTypes:    referenceTypes,
 			Payments:          nonReductionPayments,
-			FeeReductions:     feeReductions,
 			FeeReductionTypes: feeReductionTypes,
 			Case:              caseItem,
 			TotalPaid:         5538,
@@ -433,5 +415,113 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 	err := GetPayments(client, template.Func)(w, r)
 
 	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetPaymentWhenRefundDue(t *testing.T) {
+	allPayments := []sirius.Payment{
+		{
+			ID:     2,
+			Amount: 5000,
+		},
+		{
+			ID:               4,
+			Source:           sirius.FeeReductionSource,
+			FeeReductionType: "REMISSION",
+			PaymentEvidence:  "Test",
+			PaymentDate:      "2022-04-05",
+			Amount:           4100,
+		},
+	}
+
+	nonReductionPayments := []sirius.Payment{
+		{
+			ID:     2,
+			Amount: 5000,
+		},
+	}
+
+	feeReductions := []sirius.Payment{
+		{
+			ID:               4,
+			Source:           sirius.FeeReductionSource,
+			FeeReductionType: "REMISSION",
+			PaymentEvidence:  "Test",
+			PaymentDate:      "2022-04-05",
+			Amount:           4100,
+		},
+	}
+
+	caseItem := sirius.Case{
+		UID:     "7000-0000-0021",
+		SubType: "pfa",
+	}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle: "PHONE",
+			Label:  "Paid over the phone",
+		},
+	}
+
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
+		},
+	}
+
+	user := sirius.User{ID: 1, DisplayName: "Test User", Roles: []string{"OPG User", "Reduced Fees User"}}
+
+	referenceTypes := []sirius.RefDataItem{
+		{
+			Handle: "GOVUK",
+			Label:  "GOV.UK Pay",
+		},
+	}
+
+	client := &mockGetPayments{}
+	client.
+		On("Payments", mock.Anything, 4).
+		Return(allPayments, nil)
+	client.
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
+		Return(referenceTypes, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil)
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(user, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, getPaymentsData{
+			PaymentSources:    paymentSources,
+			ReferenceTypes:    referenceTypes,
+			Payments:          nonReductionPayments,
+			FeeReductions:     feeReductions,
+			FeeReductionTypes: feeReductionTypes,
+			Case:              caseItem,
+			TotalPaid:         5000,
+			IsReducedFeesUser: true,
+			RefundAmount:      900,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
+	w := httptest.NewRecorder()
+
+	err := GetPayments(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
