@@ -87,6 +87,9 @@ func main() {
 			return tmplHandle
 		},
 		"ToLower": strings.ToLower,
+		"toPositive": func(amount int) int {
+			return amount * -1
+		},
 	})
 	if err != nil {
 		logger.Fatal(err)
