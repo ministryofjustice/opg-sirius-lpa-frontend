@@ -137,6 +137,7 @@ func TestGetPayments(t *testing.T) {
 			Case:              caseItem,
 			TotalPaid:         5538,
 			IsReducedFeesUser: true,
+			OutstandingFee:    2662,
 		}).
 		Return(nil)
 
@@ -422,6 +423,7 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 			TotalPaid:         4100,
 			IsReducedFeesUser: false,
 			FeeReductionTypes: feeReductionTypes,
+			OutstandingFee:    4100,
 		}).
 		Return(expectedError)
 
