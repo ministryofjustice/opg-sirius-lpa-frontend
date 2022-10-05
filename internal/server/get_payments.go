@@ -26,6 +26,7 @@ type getPaymentsData struct {
 	FeeReductionTypes []sirius.RefDataItem
 	IsReducedFeesUser bool
 	TotalPaid         int
+	OutstandingFee    int
 }
 
 func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
@@ -76,11 +77,16 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		total := 0
+		totalPaid := 0
+		totalPaidAndReductions := 0
 		for _, p := range payments {
-			total = total + p.Amount
+			if p.Source != sirius.FeeReductionSource {
+				totalPaid = totalPaid + p.Amount
+			}
+			totalPaidAndReductions = totalPaidAndReductions + p.Amount
 		}
-		data.TotalPaid = total
+		data.TotalPaid = totalPaid
+		data.OutstandingFee = 8200 - totalPaidAndReductions
 
 		user, err := client.GetUserDetails(ctx)
 		if err != nil {
