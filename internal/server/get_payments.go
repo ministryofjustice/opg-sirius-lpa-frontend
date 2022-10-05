@@ -78,19 +78,17 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		totalPaid := 0
 		totalPaidAndReductions := 0
 		for _, p := range payments {
 			if p.Source != sirius.FeeReductionSource {
-				totalPaid = totalPaid + p.Amount
+				data.TotalPaid = data.TotalPaid + p.Amount
 			}
 			totalPaidAndReductions = totalPaidAndReductions + p.Amount
 		}
-		data.TotalPaid = totalPaid
 
 		outstandingFeeOrRefund := 8200 - totalPaidAndReductions
 		if outstandingFeeOrRefund < 0 {
-			data.RefundAmount = outstandingFeeOrRefund * -1 /*to convert to pos num for display*/
+			data.RefundAmount = outstandingFeeOrRefund * -1 /*convert to pos num for display*/
 		} else {
 			data.OutstandingFee = outstandingFeeOrRefund
 		}
