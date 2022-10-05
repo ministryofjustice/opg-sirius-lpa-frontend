@@ -17,10 +17,10 @@
                     <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
                         {{ if gt .OutstandingFee 0 }}
-                            <td class="govuk-table__header govuk-!-padding-top-3 govuk-!-padding-bottom-8 govuk-!-font-size-24 app-!-border-bottom-black">Outstanding fee due:</td>
+                            <th scope="row" class="govuk-table__header govuk-!-padding-top-3 govuk-!-padding-bottom-8 govuk-!-font-size-24 app-!-border-bottom-black">Outstanding fee due:</th>
                             <td class="govuk-table__cell govuk-!-padding-top-3 govuk-!-padding-bottom-8 govuk-!-font-size-24 govuk-!-font-weight-bold app-!-border-bottom-black">£{{ fee .OutstandingFee }}</td>
                         {{else if .RefundAmount }}
-                            <td class="govuk-table__header govuk-!-padding-top-3 govuk-!-padding-bottom-8 govuk-!-font-size-24 app-!-border-bottom-black">Refund due:</td>
+                            <th scope="row" class="govuk-table__header govuk-!-padding-top-3 govuk-!-padding-bottom-8 govuk-!-font-size-24 app-!-border-bottom-black">Refund due:</th>
                             <td class="govuk-table__cell govuk-!-padding-top-3 govuk-!-padding-bottom-8 govuk-!-font-size-24 govuk-!-font-weight-bold app-!-border-bottom-black">£{{ fee .RefundAmount }}
                             </td>
                         {{ else }}
