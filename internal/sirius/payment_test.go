@@ -79,7 +79,7 @@ func TestPayment(t *testing.T) {
 	}
 }
 
-func TestPaymentWithFeeReduction(t *testing.T) {
+func TestFeeReductionOnCase(t *testing.T) {
 	t.Parallel()
 
 	pact := newPact()
@@ -113,6 +113,7 @@ func TestPaymentWithFeeReduction(t *testing.T) {
 							"case": dsl.Like(map[string]interface{}{
 								"id": dsl.Like(802),
 							}),
+							"amount": dsl.Like(4100),
 						}, 1),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
@@ -125,6 +126,7 @@ func TestPaymentWithFeeReduction(t *testing.T) {
 					PaymentEvidence:  "Test\nmultiple\nline evidence",
 					PaymentDate:      DateString("2022-01-24"),
 					Case:             &Case{ID: 802},
+					Amount:           4100,
 				},
 			},
 		},
@@ -309,6 +311,7 @@ func TestFeeReductionByID(t *testing.T) {
 							"case": dsl.Like(map[string]interface{}{
 								"id": dsl.Like(802),
 							}),
+							"amount": dsl.Like(4100),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
@@ -320,6 +323,7 @@ func TestFeeReductionByID(t *testing.T) {
 				FeeReductionType: "REMISSION",
 				PaymentDate:      DateString("2022-01-23"),
 				Case:             &Case{ID: 802},
+				Amount:           4100,
 			},
 		},
 	}
