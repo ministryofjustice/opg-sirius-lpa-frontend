@@ -16,27 +16,25 @@
                 <table class="govuk-table my-table table__no-border">
                     <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
-                        {{ if eq .OutstandingFee 0 }}
+                        {{ if gt .OutstandingFee 0 }}
+                            <th scope="row" class="govuk-table__header">
+                                <h2 class="govuk-heading-m govuk-!-padding-top-3 govuk-!-padding-bottom-2">Outstanding fee due: </h2>
+                            </th>
+                            <td class="govuk-table__cell">
+                                <h2 class="govuk-heading-m govuk-!-padding-top-3">£{{ fee .OutstandingFee }}</h2>
+                            </td>
+                        {{else if .RefundAmount }}
+                            <th scope="row" class="govuk-table__header">
+                                <h2 class="govuk-heading-m govuk-!-padding-top-3 govuk-!-padding-bottom-2">Refund due: </h2>
+                            </th>
+                            <td class="govuk-table__cell">
+                                <h2 class="govuk-heading-m govuk-!-padding-top-3">£{{ fee .RefundAmount }}</h2>
+                            </td>
+                        {{ else }}
                             <th scope="row" class="govuk-table__header">
                                 <h2 class="govuk-heading-m govuk-!-padding-top-3 govuk-!-padding-bottom-2">No further fees due</h2>
                             </th>
                             <td class="govuk-table__cell">{{/*required for table styling*/}}</td>
-                        {{ else }}
-                            {{ if gt .OutstandingFee 0 }}
-                                <th scope="row" class="govuk-table__header">
-                                    <h2 class="govuk-heading-m govuk-!-padding-top-3 govuk-!-padding-bottom-2">Outstanding fee due: </h2>
-                                </th>
-                                <td class="govuk-table__cell">
-                                    <h2 class="govuk-heading-m govuk-!-padding-top-3">£{{ fee .OutstandingFee }}</h2>
-                                </td>
-                            {{ else }}
-                                <th scope="row" class="govuk-table__header">
-                                    <h2 class="govuk-heading-m govuk-!-padding-top-3 govuk-!-padding-bottom-2">Refund due: </h2>
-                                </th>
-                                <td class="govuk-table__cell">
-                                    <h2 class="govuk-heading-m govuk-!-padding-top-3">£{{ fee (toPositive .OutstandingFee) }}</h2>
-                                </td>
-                            {{ end }}
                         {{ end }}
                     </tr>
                     <tr class="govuk-table__row">

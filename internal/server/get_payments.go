@@ -27,6 +27,7 @@ type getPaymentsData struct {
 	IsReducedFeesUser bool
 	TotalPaid         int
 	OutstandingFee    int
+	RefundAmount      int
 }
 
 func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
@@ -86,7 +87,13 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 			totalPaidAndReductions = totalPaidAndReductions + p.Amount
 		}
 		data.TotalPaid = totalPaid
-		data.OutstandingFee = 8200 - totalPaidAndReductions
+
+		outstandingFeeOrRefund := 8200 - totalPaidAndReductions
+		if outstandingFeeOrRefund < 0 {
+			data.RefundAmount = outstandingFeeOrRefund * -1 /*to convert to pos num for display*/
+		} else {
+			data.OutstandingFee = outstandingFeeOrRefund
+		}
 
 		user, err := client.GetUserDetails(ctx)
 		if err != nil {
