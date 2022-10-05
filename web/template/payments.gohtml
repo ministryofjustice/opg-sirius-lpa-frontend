@@ -16,8 +16,34 @@
                 <table class="govuk-table my-table table__no-border">
                     <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header govuk-!-font-size-24">Total paid:</th>
-                        <td class="govuk-table__cell govuk-!-font-size-24"><strong>£{{ fee .TotalPaid }}</strong></td>
+                        {{ if gt .OutstandingFee 0 }}
+                            <td class="govuk-table__header govuk-!-padding-top-3 govuk-!-padding-bottom-8 govuk-!-font-size-24 app-!-border-bottom-black">Outstanding fee due:</td>
+                            <td class="govuk-table__cell govuk-!-padding-top-3 govuk-!-padding-bottom-8 govuk-!-font-size-24 govuk-!-font-weight-bold app-!-border-bottom-black">£{{ fee .OutstandingFee }}</td>
+                        {{else if .RefundAmount }}
+                            <td class="govuk-table__header govuk-!-padding-top-3 govuk-!-padding-bottom-8 govuk-!-font-size-24 app-!-border-bottom-black">Refund due:</td>
+                            <td class="govuk-table__cell govuk-!-padding-top-3 govuk-!-padding-bottom-8 govuk-!-font-size-24 govuk-!-font-weight-bold app-!-border-bottom-black">£{{ fee .RefundAmount }}
+                            </td>
+                        {{ else }}
+                            <td class="govuk-table__cell govuk-!-font-size-24 govuk-!-font-weight-bold govuk-!-padding-top-3 govuk-!-padding-bottom-8 app-!-border-bottom-black" colspan="2">No further fees due</td>
+                        {{ end }}
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Total paid:</th>
+                        <td class="govuk-table__cell">£{{ fee .TotalPaid }}</td>
+                    </tr>
+
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Fee reduction type:</th>
+                        <td class="govuk-table__cell">
+                            {{ $feeReductionTypes := .FeeReductionTypes }}
+                            {{ if .FeeReductions }}
+                                {{ range .FeeReductions }}
+                                    {{ translateRefData $feeReductionTypes .FeeReductionType }}
+                                {{ end }}
+                            {{ else }}
+                                None applied
+                            {{ end }}
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -35,8 +61,8 @@
             <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}">
                 Add payment
             </a>
-            {{ if .IsReducedFeesUser }}
-                <a class="govuk-button govuk-button--secondary"
+            {{ if and (.IsReducedFeesUser) (not .FeeReductions) }}
+                <a class="govuk-button govuk-button--secondary" id="f-apply-fee-reduction-button"
                    href="{{ prefix (printf "/apply-fee-reduction?id=%d" .Case.ID) }}">
                     Apply fee reduction
                 </a>

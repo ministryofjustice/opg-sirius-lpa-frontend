@@ -34,3 +34,7 @@ $moj-page-width: 1220px;
 .app-\!-pre-wrap {
     white-space: pre-wrap;
 }
+
+.app-\!-border-bottom-black {
+    border-bottom-color: govuk-colour("black") !important ;
+}
