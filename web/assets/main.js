@@ -2,6 +2,7 @@ import MOJFrontend from "@ministryofjustice/frontend/moj/all.js";
 import * as GOVUKFrontend from "govuk-frontend";
 import $ from "jquery";
 import autoResizeTextArea from "./auto-resize-text-area.js";
+import loadingButton from "./loading-button.js";
 import select from "./select.js";
 import todaysDate from "./todays-date.js";
 
@@ -18,6 +19,7 @@ MOJFrontend.initAll();
 autoResizeTextArea();
 select(prefix);
 todaysDate();
+loadingButton();
 
 if (window.self !== window.parent) {
   const success = document.querySelector(".moj-banner--success");
