@@ -13,8 +13,14 @@
 
         <p class="govuk-heading-xl">{{ .ResultCount }}</p>
 
+        <div class="govuk-notification-banner govuk-!-display-none" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner" id="download-warning-message">
+          <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">Your download will open in a new window when ready</p>
+          </div>
+        </div>
+
         <div class="govuk-button-group">
-          <a class="govuk-button" data-module="govuk-button" href="{{ sirius .Download }}">Download</a>
+          <a class="govuk-button" data-module="app-loading-button" data-loading-button-message="#download-warning-message" href="{{ sirius .Download }}">Download</a>
           <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
         </div>
 
