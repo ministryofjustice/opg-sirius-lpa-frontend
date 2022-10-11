@@ -119,11 +119,10 @@ jobs:
           curl ${PACT_BROKER_URL}/pacts/provider/sirius/consumer/sirius-lpa-frontend/version/$LATEST_MAIN_COMMIT > /tmp/latest-pact.json
           (diff <(jq --sort-keys '.interactions|=sort_by(.description)' ${PACT_DIR}/sirius-lpa-frontend-sirius.json) <(jq --sort-keys '.interactions|=sort_by(.description)' /tmp/latest-pact.json) || true) | (! grep '<')
       - name: Upload Code Coverage
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           files: /tmp/test-coverage.txt
           fail_ci_if_error: true
-          verbose: true
       - name: Persist Pacts
         uses: actions/upload-artifact@v2
         with:
