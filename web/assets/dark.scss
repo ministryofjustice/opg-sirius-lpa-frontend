@@ -65,6 +65,11 @@ $sirius-bg-color: #29292e;
     color: govuk-colour("white");
   }
 
+  .govuk-notification-banner__content {
+    background-color: $sirius-bg-color;
+    color: govuk-colour("white");
+  }
+
   .autocomplete__menu {
     background-color: $sirius-bg-color;
     color: govuk-colour("white");
