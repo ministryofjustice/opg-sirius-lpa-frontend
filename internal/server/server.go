@@ -120,12 +120,27 @@ type unauthorizedError interface {
 	IsUnauthorized() bool
 }
 
+type RedirectError string
+
+func (e RedirectError) Error() string {
+	return "redirect to " + string(e)
+}
+
+func (e RedirectError) To() string {
+	return string(e)
+}
+
 func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL string) func(next Handler) http.Handler {
 	return func(next Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if err := next(w, r); err != nil {
 				if v, ok := err.(unauthorizedError); ok && v.IsUnauthorized() {
 					http.Redirect(w, r, siriusURL+"/auth", http.StatusFound)
+					return
+				}
+
+				if redirect, ok := err.(RedirectError); ok {
+					http.Redirect(w, r, prefix+redirect.To(), http.StatusFound)
 					return
 				}
 
@@ -176,4 +191,13 @@ func postFormInt(r *http.Request, name string) (int, error) {
 
 func postFormDateString(r *http.Request, name string) sirius.DateString {
 	return sirius.DateString(postFormString(r, name))
+}
+
+func translateRefData(types []sirius.RefDataItem, tmplHandle string) string {
+	for _, refDataType := range types {
+		if refDataType.Handle == tmplHandle {
+			return refDataType.Label
+		}
+	}
+	return tmplHandle
 }

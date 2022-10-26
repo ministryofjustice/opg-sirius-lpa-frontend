@@ -9,10 +9,6 @@
 
             {{ template "error-summary" .Error }}
 
-            {{ if .Success }}
-                {{ template "success-banner" ("Fee reduction edited") }}
-            {{ end }}
-
             <h1 class="govuk-heading-l">Edit fee reduction</h1>
 
             <form class="form" method="POST">

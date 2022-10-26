@@ -1,10 +1,12 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-go-common/template"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
 type AddPaymentClient interface {
@@ -15,7 +17,6 @@ type AddPaymentClient interface {
 
 type addPaymentData struct {
 	XSRFToken string
-	Success   bool
 	Error     sirius.ValidationError
 
 	Case           sirius.Case
@@ -85,7 +86,11 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 			} else if err != nil {
 				return err
 			} else {
-				data.Success = true
+				SetFlash(w, FlashNotification{
+					Title:       "Payment added",
+					Description: "Please clear the task if you have completed it",
+				})
+				return RedirectError(fmt.Sprintf("/payments?id=%d", caseID))
 			}
 		}
 

@@ -261,7 +261,6 @@ func TestPostEditFeeReductionValidationError(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, editFeeReductionData{
-			Success:           false,
 			Case:              caseItem,
 			PaymentID:         123,
 			FeeReduction:      feeReduction,
@@ -330,15 +329,6 @@ func TestPostEditFeeReduction(t *testing.T) {
 		Return(nil)
 
 	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, editFeeReductionData{
-			Success:           true,
-			Case:              caseItem,
-			PaymentID:         123,
-			FeeReduction:      editedFeeReduction,
-			FeeReductionTypes: feeReductionTypes,
-		}).
-		Return(nil)
 
 	form := url.Values{
 		"id":               {"123"},
@@ -355,7 +345,7 @@ func TestPostEditFeeReduction(t *testing.T) {
 	err := EditFeeReduction(client, template.Func)(w, r)
 	resp := w.Result()
 
-	assert.Nil(t, err)
+	assert.Equal(t, RedirectError("/payments?id=4"), err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
