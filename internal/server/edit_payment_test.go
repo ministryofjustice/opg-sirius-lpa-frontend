@@ -273,7 +273,6 @@ func TestPostEditPaymentAmountIncorrectFormat(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, editPaymentData{
-					Success:        false,
 					Case:           caseItem,
 					PaymentID:      123,
 					Amount:         amount,
@@ -344,17 +343,6 @@ func TestPostEditPayment(t *testing.T) {
 		Return(nil)
 
 	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, editPaymentData{
-			Success:        true,
-			Case:           caseItem,
-			PaymentID:      123,
-			Amount:         "33.00",
-			Source:         "PHONE",
-			PaymentDate:    sirius.DateString("2022-02-18"),
-			PaymentSources: paymentSources,
-		}).
-		Return(nil)
 
 	form := url.Values{
 		"amount":      {"33.00"},
@@ -369,7 +357,7 @@ func TestPostEditPayment(t *testing.T) {
 	err := EditPayment(client, template.Func)(w, r)
 	resp := w.Result()
 
-	assert.Nil(t, err)
+	assert.Equal(t, RedirectError("/payments?id=4"), err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

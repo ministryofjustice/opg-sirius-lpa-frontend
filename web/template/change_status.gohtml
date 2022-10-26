@@ -10,6 +10,7 @@
       {{ template "error-summary" .Error }}
 
       {{ if .Success }}
+        <meta data-app-reload="page" />
         {{ template "success-banner" (printf "Status changed to %s" .NewStatus) }}
       {{ end }}
 
