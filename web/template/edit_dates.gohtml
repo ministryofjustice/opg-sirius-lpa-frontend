@@ -8,6 +8,7 @@
       <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
 
       {{ if .Success }}
+        <meta data-app-reload="page" />
         {{ template "success-banner" "You have successfully edited the dates." }}
       {{ end }}
 

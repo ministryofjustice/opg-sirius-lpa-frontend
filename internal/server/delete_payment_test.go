@@ -254,14 +254,6 @@ func TestPostDeletePayment(t *testing.T) {
 		Return(nil)
 
 	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, deletePaymentData{
-			Success:           true,
-			Case:              caseItem,
-			Payment:           payment,
-			FeeReductionTypes: feeReductionTypes,
-		}).
-		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", nil)
 	r.Header.Add("Content-Type", formUrlEncoded)
@@ -270,7 +262,7 @@ func TestPostDeletePayment(t *testing.T) {
 	err := DeletePayment(client, template.Func)(w, r)
 	resp := w.Result()
 
-	assert.Nil(t, err)
+	assert.Equal(t, RedirectError("/payments?id=4"), err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

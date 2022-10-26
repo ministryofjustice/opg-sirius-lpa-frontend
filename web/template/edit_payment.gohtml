@@ -9,10 +9,6 @@
 
             {{ template "error-summary" .Error }}
 
-            {{ if .Success }}
-                {{ template "success-banner" ("Payment saved") }}
-            {{ end }}
-
             <h1 class="govuk-heading-l">Edit payment</h1>
 
             <form class="form" method="POST">
