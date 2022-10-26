@@ -28,6 +28,7 @@ type getPaymentsData struct {
 	TotalPaid         int
 	OutstandingFee    int
 	RefundAmount      int
+	FlashMessage      FlashNotification
 }
 
 func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
@@ -99,6 +100,8 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		}
 
 		data.IsReducedFeesUser = user.HasRole("Reduced Fees User")
+
+		data.FlashMessage, _ = GetFlash(w, r)
 
 		return tmpl(w, data)
 	}
