@@ -1,10 +1,12 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-go-common/template"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
 type ApplyFeeReductionClient interface {
@@ -15,7 +17,6 @@ type ApplyFeeReductionClient interface {
 
 type applyFeeReductionData struct {
 	XSRFToken string
-	Success   bool
 	Error     sirius.ValidationError
 
 	Case              sirius.Case
@@ -58,7 +59,11 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) H
 			} else if err != nil {
 				return err
 			} else {
-				data.Success = true
+				SetFlash(w, FlashNotification{
+					Title:       fmt.Sprintf("%s approved", translateRefData(data.FeeReductionTypes, data.FeeReductionType)),
+					Description: "Please clear the task if you have completed it",
+				})
+				return RedirectError(fmt.Sprintf("/payments?id=%d", caseID))
 			}
 		}
 

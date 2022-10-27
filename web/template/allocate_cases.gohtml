@@ -15,6 +15,7 @@
       {{ template "error-summary" .Error }}
 
       {{ if .Success }}
+        <meta data-app-reload="page" />
         {{ template "success-banner" "You have successfully allocated cases." }}
       {{ end }}
 
