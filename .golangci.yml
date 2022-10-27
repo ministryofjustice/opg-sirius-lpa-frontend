@@ -1,0 +1,4 @@
+issues:
+  exclude-rules:
+    - path: "internal\\server\\flash.go"
+      text: "nonsense"
