@@ -22,7 +22,7 @@ todaysDate();
 loadingButton();
 
 if (window.self !== window.parent) {
-  const success = document.querySelector(".moj-banner--success");
+  const success = document.querySelector("[data-app-reload~=\"page\"]");
   if (success) {
     window.parent.postMessage(
       "form-done",
