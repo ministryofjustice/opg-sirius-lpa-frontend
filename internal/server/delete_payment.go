@@ -1,10 +1,12 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-go-common/template"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
 type DeletePaymentClient interface {
@@ -16,7 +18,6 @@ type DeletePaymentClient interface {
 
 type deletePaymentData struct {
 	XSRFToken         string
-	Success           bool
 	Payment           sirius.Payment
 	Case              sirius.Case
 	FeeReductionTypes []sirius.RefDataItem
@@ -57,7 +58,16 @@ func DeletePayment(client DeletePaymentClient, tmpl template.Template) Handler {
 				return err
 			}
 
-			data.Success = true
+			item := "Payment"
+			if p.Source == sirius.FeeReductionSource {
+				item = translateRefData(data.FeeReductionTypes, p.FeeReductionType)
+			}
+
+			SetFlash(w, FlashNotification{
+				Title:       fmt.Sprintf("%s deleted", item),
+				Description: "Please clear the task if you have completed it",
+			})
+			return RedirectError(fmt.Sprintf("/payments?id=%d", p.Case.ID))
 		}
 
 		return tmpl(w, data)

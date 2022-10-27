@@ -198,16 +198,6 @@ func TestPostAddPayment(t *testing.T) {
 		Return(paymentSources, nil)
 
 	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, addPaymentData{
-			Success:        true,
-			Case:           caseitem,
-			Amount:         "41.00",
-			Source:         "MAKE",
-			PaymentDate:    sirius.DateString("2022-01-23"),
-			PaymentSources: paymentSources,
-		}).
-		Return(nil)
 
 	form := url.Values{
 		"amount":      {"41.00"},
@@ -222,7 +212,7 @@ func TestPostAddPayment(t *testing.T) {
 	err := AddPayment(client, template.Func)(w, r)
 	resp := w.Result()
 
-	assert.Nil(t, err)
+	assert.Equal(t, RedirectError("/payments?id=123"), err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
@@ -257,7 +247,6 @@ func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, addPaymentData{
-					Success:        false,
 					Case:           caseitem,
 					Amount:         amount,
 					Source:         "MAKE",
