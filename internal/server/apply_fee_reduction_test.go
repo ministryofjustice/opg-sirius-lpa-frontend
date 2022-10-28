@@ -195,16 +195,6 @@ func TestPostFeeReduction(t *testing.T) {
 		Return(feeReductionTypes, nil)
 
 	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, applyFeeReductionData{
-			Success:           true,
-			Case:              caseitem,
-			FeeReductionType:  "REMISSION",
-			PaymentDate:       "2022-01-23",
-			PaymentEvidence:   "Test evidence",
-			FeeReductionTypes: feeReductionTypes,
-		}).
-		Return(nil)
 
 	form := url.Values{
 		"feeReductionType": {"REMISSION"},
@@ -219,7 +209,7 @@ func TestPostFeeReduction(t *testing.T) {
 	err := ApplyFeeReduction(client, template.Func)(w, r)
 	resp := w.Result()
 
-	assert.Nil(t, err)
+	assert.Equal(t, RedirectError("/payments?id=123"), err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
