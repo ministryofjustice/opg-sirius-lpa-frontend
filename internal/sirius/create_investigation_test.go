@@ -41,8 +41,7 @@ func TestCreateInvestigation(t *testing.T) {
 						}),
 					}).
 					WillRespondWith(dsl.Response{
-						Status:  http.StatusCreated,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Status: http.StatusCreated,
 					})
 			},
 		},
