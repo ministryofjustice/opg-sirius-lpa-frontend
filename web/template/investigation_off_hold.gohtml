@@ -1,0 +1,42 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Investigation off hold{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            {{ template "error-summary" .Error }}
+
+            {{ if .Success }}
+                {{ template "success-banner" "You have taken the investigation off hold." }}
+            {{ end }}
+
+            <h1 class="govuk-heading-l app-!-embedded-hide">Investigation off hold</h1>
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+                <table class="govuk-table table__no-border">
+                    <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Title</th>
+                        <td class="govuk-table__cell">{{ .Investigation.Title }}</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Type</th>
+                        <td class="govuk-table__cell">{{ .Investigation.Type }}</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Date Received</th>
+                        <td class="govuk-table__cell">{{ formatDate .Investigation.DateReceived }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="govuk-button-group govuk-!-padding-top-5">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Take off hold</button>
+                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{{ end }}
