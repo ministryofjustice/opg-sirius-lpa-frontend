@@ -25,7 +25,7 @@ func TestCreateInvestigation(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a pending case assigned").
+					Given("I am an investigations user with a pending case assigned").
 					UponReceiving("A request to create an investigation on the case").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
@@ -43,7 +43,6 @@ func TestCreateInvestigation(t *testing.T) {
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusCreated,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-						Body:    dsl.Like(map[string]interface{}{"id": dsl.Integer()}),
 					})
 			},
 		},
