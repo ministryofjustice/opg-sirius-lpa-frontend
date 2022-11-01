@@ -40,7 +40,9 @@ func TestCreateInvestigation(t *testing.T) {
 							"investigationReceivedDate": dsl.String("05/04/2022"),
 						}),
 					}).
-					WillRespondWith(dsl.Response{Status: http.StatusCreated})
+					WillRespondWith(dsl.Response{
+						Status: http.StatusCreated,
+					})
 			},
 		},
 	}
