@@ -40,7 +40,6 @@ func TestInvestigation(t *testing.T) {
 							"additionalInformation":     dsl.String("Some test info"),
 							"type":                      dsl.String("Normal"),
 							"investigationReceivedDate": dsl.String("23/01/2022"),
-							"isOnHold":                  dsl.Like(false),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
@@ -51,7 +50,6 @@ func TestInvestigation(t *testing.T) {
 				Information:  "Some test info",
 				Type:         "Normal",
 				DateReceived: DateString("2022-01-23"),
-				IsOnHold:     false,
 			},
 		},
 	}

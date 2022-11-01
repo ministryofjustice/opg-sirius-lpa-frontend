@@ -8,6 +8,7 @@
             {{ template "error-summary" .Error }}
 
             {{ if .Success }}
+                <meta data-app-reload="page" />
                 {{ template "success-banner" "You have placed the investigation on hold." }}
             {{ end }}
 
@@ -21,6 +22,14 @@
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Title</th>
                         <td class="govuk-table__cell">{{ .Investigation.Title }}</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Type</th>
+                        <td class="govuk-table__cell">{{ .Investigation.Type }}</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Date Received</th>
+                        <td class="govuk-table__cell">{{ formatDate .Investigation.DateReceived }}</td>
                     </tr>
                     </tbody>
                 </table>
