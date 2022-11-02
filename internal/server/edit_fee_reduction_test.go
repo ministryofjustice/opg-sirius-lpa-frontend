@@ -1,15 +1,15 @@
 package server
 
 import (
-	"errors"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockEditFeeReductionClient struct {
@@ -91,8 +91,6 @@ func TestGetEditFeeReduction(t *testing.T) {
 }
 
 func TestEditFeeReductionWhenFailureOnGetPaymentByID(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockEditFeeReductionClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
@@ -108,8 +106,6 @@ func TestEditFeeReductionWhenFailureOnGetPaymentByID(t *testing.T) {
 }
 
 func TestEditFeeReductionWhenFailureOnGetCase(t *testing.T) {
-	expectedError := errors.New("err")
-
 	feeReduction := sirius.Payment{
 		ID:               123,
 		PaymentEvidence:  "Test evidence",
@@ -149,8 +145,6 @@ func TestEditFeeReductionWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 		PaymentDate:      sirius.DateString("2022-07-23"),
 		Case:             &sirius.Case{ID: 4},
 	}
-
-	expectedError := errors.New("err")
 
 	client := &mockEditFeeReductionClient{}
 	client.
@@ -200,8 +194,6 @@ func TestEditFeeReductionWhenTemplateErrors(t *testing.T) {
 		Return(caseItem, nil).
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return(feeReductionTypes, nil)
-
-	expectedError := errors.New("err")
 
 	template := &mockTemplate{}
 	template.

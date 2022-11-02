@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -71,8 +70,6 @@ func TestGetEditComplaintNoID(t *testing.T) {
 }
 
 func TestGetEditComplaintWhenComplaintErrors(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockEditComplaintClient{}
 	client.
 		On("Complaint", mock.Anything, 123).
@@ -88,8 +85,6 @@ func TestGetEditComplaintWhenComplaintErrors(t *testing.T) {
 }
 
 func TestGetEditComplaintWhenTemplateErrors(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockEditComplaintClient{}
 	client.
 		On("Complaint", mock.Anything, 123).
@@ -207,8 +202,6 @@ func TestPostEditComplaintWhenEditComplaintValidationError(t *testing.T) {
 }
 
 func TestPostEditComplaintWhenEditComplaintOtherError(t *testing.T) {
-	expectedError := errors.New("err")
-
 	complaint := sirius.Complaint{Description: "This is a complaint"}
 
 	client := &mockEditComplaintClient{}

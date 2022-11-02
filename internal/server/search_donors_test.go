@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -46,8 +45,6 @@ func TestGetSearchDonors(t *testing.T) {
 }
 
 func TestGetSearchDonorsWhenError(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockSearchDonorsClient{}
 	client.
 		On("SearchDonors", mock.Anything, "something").

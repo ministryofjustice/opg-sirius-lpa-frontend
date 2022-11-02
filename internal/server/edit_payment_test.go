@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -96,8 +95,6 @@ func TestGetEditPayment(t *testing.T) {
 }
 
 func TestEditPaymentWhenFailureOnGetPaymentByID(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockEditPaymentClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
@@ -113,8 +110,6 @@ func TestEditPaymentWhenFailureOnGetPaymentByID(t *testing.T) {
 }
 
 func TestEditPaymentWhenFailureOnGetCase(t *testing.T) {
-	expectedError := errors.New("err")
-
 	payment := sirius.Payment{
 		ID:          123,
 		Amount:      8200,
@@ -153,8 +148,6 @@ func TestEditPaymentWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 		PaymentDate: sirius.DateString("2022-07-23"),
 		Case:        &sirius.Case{ID: 4},
 	}
-
-	expectedError := errors.New("err")
 
 	client := &mockEditPaymentClient{}
 	client.
@@ -208,8 +201,6 @@ func TestEditPaymentWhenTemplateErrors(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil)
-
-	expectedError := errors.New("err")
 
 	template := &mockTemplate{}
 	template.

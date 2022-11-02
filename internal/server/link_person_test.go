@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -81,8 +80,6 @@ func TestLinkPersonNoID(t *testing.T) {
 }
 
 func TestLinkPersonGetFails(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockLinkPersonClient{}
 	client.
 		On("Person", mock.Anything, 123).
@@ -103,7 +100,6 @@ func TestLinkPersonGetFails(t *testing.T) {
 
 func TestLinkPersonTemplateErrors(t *testing.T) {
 	person := sirius.Person{Firstname: "John", Surname: "Doe"}
-	expectedError := errors.New("err")
 
 	client := &mockLinkPersonClient{}
 	client.

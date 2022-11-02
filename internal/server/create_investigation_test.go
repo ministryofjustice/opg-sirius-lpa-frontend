@@ -1,15 +1,15 @@
 package server
 
 import (
-	"errors"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockCreateInvestigationClient struct {
@@ -75,8 +75,6 @@ func TestGetCreateInvestigationBadQuery(t *testing.T) {
 }
 
 func TestGetCreateInvestigationWhenCaseErrors(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockCreateInvestigationClient{}
 	client.
 		On("Case", mock.Anything, 123).
@@ -92,8 +90,6 @@ func TestGetCreateInvestigationWhenCaseErrors(t *testing.T) {
 }
 
 func TestGetCreateInvestigationWhenTemplateErrors(t *testing.T) {
-	expectedError := errors.New("err")
-
 	caseItem := sirius.Case{CaseType: "lpa", UID: "7000"}
 
 	client := &mockCreateInvestigationClient{}
@@ -208,8 +204,6 @@ func TestPostCreateInvestigationWhenValidationError(t *testing.T) {
 }
 
 func TestPostCreateInvestigationWhenOtherError(t *testing.T) {
-	expectedError := errors.New("err")
-
 	caseItem := sirius.Case{CaseType: "lpa", UID: "7000"}
 	investigation := sirius.Investigation{
 		Type: "Priority",

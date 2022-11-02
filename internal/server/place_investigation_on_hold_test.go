@@ -1,15 +1,15 @@
 package server
 
 import (
-	"errors"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockPlaceInvestigationOnHoldClient struct {
@@ -77,8 +77,6 @@ func TestGetPlaceInvestigationOnHoldBadQuery(t *testing.T) {
 }
 
 func TestGetPlaceInvestigationOnHoldWhenInvestigationErrors(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockPlaceInvestigationOnHoldClient{}
 	client.
 		On("Investigation", mock.Anything, 123).
@@ -94,8 +92,6 @@ func TestGetPlaceInvestigationOnHoldWhenInvestigationErrors(t *testing.T) {
 }
 
 func TestGetPlaceInvestigationOnHoldWhenTemplateErrors(t *testing.T) {
-	expectedError := errors.New("err")
-
 	investigation := sirius.Investigation{
 		ID:           123,
 		Title:        "Test title",
@@ -207,8 +203,6 @@ func TestPostPlaceInvestigationOnHoldWhenValidationError(t *testing.T) {
 }
 
 func TestPostPlaceInvestigationOnHoldWhenOtherError(t *testing.T) {
-	expectedError := errors.New("err")
-
 	investigation := sirius.Investigation{
 		Type: "Priority",
 	}

@@ -1,13 +1,13 @@
 package server
 
 import (
-	"errors"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockDeletePaymentClient struct {
@@ -89,8 +89,6 @@ func TestGetDeletePayment(t *testing.T) {
 }
 
 func TestDeletePaymentWhenFailureOnGetPaymentByID(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockDeletePaymentClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
@@ -106,8 +104,6 @@ func TestDeletePaymentWhenFailureOnGetPaymentByID(t *testing.T) {
 }
 
 func TestDeletePaymentWhenFailureOnGetCase(t *testing.T) {
-	expectedError := errors.New("err")
-
 	payment := sirius.Payment{
 		ID:          123,
 		Amount:      8200,
@@ -146,8 +142,6 @@ func TestDeletePaymentWhenFailureOnGetFeeReductionTypes(t *testing.T) {
 		PaymentDate: sirius.DateString("2022-07-23"),
 		Case:        &sirius.Case{ID: 4},
 	}
-
-	expectedError := errors.New("err")
 
 	client := &mockDeletePaymentClient{}
 	client.
@@ -200,8 +194,6 @@ func TestDeletePaymentWhenTemplateErrors(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return(feeReductionTypes, nil)
-
-	expectedError := errors.New("err")
 
 	template := &mockTemplate{}
 	template.

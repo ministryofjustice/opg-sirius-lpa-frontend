@@ -1,15 +1,15 @@
 package server
 
 import (
-	"errors"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockAddPaymentClient struct {
@@ -93,8 +93,6 @@ func TestAddPaymentNoID(t *testing.T) {
 }
 
 func TestAddPaymentWhenFailureOnGetCase(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockAddPaymentClient{}
 	client.
 		On("Case", mock.Anything, 4).
@@ -131,8 +129,6 @@ func TestAddPaymentWhenTemplateErrors(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil)
 
-	expectedError := errors.New("err")
-
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addPaymentData{
@@ -155,8 +151,6 @@ func TestAddPaymentWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 		UID:     "7000-0000-0021",
 		SubType: "pfa",
 	}
-
-	expectedError := errors.New("err")
 
 	client := &mockAddPaymentClient{}
 	client.

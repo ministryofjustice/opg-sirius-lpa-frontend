@@ -2,7 +2,6 @@ package server
 
 import (
 	"bytes"
-	"errors"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -132,8 +131,6 @@ func TestGetEventBadQueryString(t *testing.T) {
 }
 
 func TestGetEventWhenNoteTypeErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockEventClient{}
 	client.
 		On("NoteTypes", mock.Anything).
@@ -151,8 +148,6 @@ func TestGetEventWhenNoteTypeErrors(t *testing.T) {
 }
 
 func TestGetEventWhenTemplateErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockEventClient{}
 	client.
 		On("NoteTypes", mock.Anything).
@@ -280,8 +275,6 @@ func TestPostEventWithBadForm(t *testing.T) {
 }
 
 func TestPostEventWhenCreateNoteFails(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockEventClient{}
 	client.
 		On("NoteTypes", mock.Anything).
