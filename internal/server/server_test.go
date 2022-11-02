@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -13,6 +14,8 @@ import (
 )
 
 const formUrlEncoded = "application/x-www-form-urlencoded"
+
+var expectedError = errors.New("error")
 
 type mockTemplate struct {
 	mock.Mock

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -127,8 +126,6 @@ func TestGetMiReportingWhenReportTypeSelected(t *testing.T) {
 }
 
 func TestGetMiReportingWhenConfigErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockMiReportingClient{}
 	client.
 		On("MiConfig", mock.Anything).
@@ -144,8 +141,6 @@ func TestGetMiReportingWhenConfigErrors(t *testing.T) {
 }
 
 func TestGetMiReportingWhenTemplateErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	reportTypes := []sirius.MiConfigEnum{
 		{Name: "epaReport", Description: "EPA Report"},
 		{Name: "lpaReport", Description: "LPA Report"},
@@ -219,8 +214,6 @@ func TestPostMiReporting(t *testing.T) {
 }
 
 func TestPostMiReportingWhenError(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockMiReportingClient{}
 	client.
 		On("MiReport", mock.Anything, url.Values{}).

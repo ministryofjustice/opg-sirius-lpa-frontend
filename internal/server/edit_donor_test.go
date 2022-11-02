@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -135,8 +134,6 @@ func TestPostEditDonor(t *testing.T) {
 }
 
 func TestPostEditDonorWhenAPIFails(t *testing.T) {
-	expectedError := errors.New("failed to create donor")
-
 	client := &mockEditDonorClient{}
 	client.
 		On("Person", mock.Anything, 123).

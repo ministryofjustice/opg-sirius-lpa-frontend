@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -76,8 +75,6 @@ func TestGetAddComplaintBadQuery(t *testing.T) {
 }
 
 func TestGetAddComplaintWhenCaseErrors(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockAddComplaintClient{}
 	client.
 		On("Case", mock.Anything, 123).
@@ -93,8 +90,6 @@ func TestGetAddComplaintWhenCaseErrors(t *testing.T) {
 }
 
 func TestGetAddComplaintWhenTemplateErrors(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockAddComplaintClient{}
 	client.
 		On("Case", mock.Anything, 123).
@@ -210,8 +205,6 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 }
 
 func TestPostAddComplaintWhenAddComplaintOtherError(t *testing.T) {
-	expectedError := errors.New("err")
-
 	complaint := sirius.Complaint{Description: "This is a complaint"}
 
 	client := &mockAddComplaintClient{}

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -115,8 +114,6 @@ func TestGetAllocateCasesBadQueryString(t *testing.T) {
 }
 
 func TestGetAllocateCasesWhenTeamsErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockAllocateCasesClient{}
 	client.
 		On("Teams", mock.Anything).
@@ -135,8 +132,6 @@ func TestGetAllocateCasesWhenTeamsErrors(t *testing.T) {
 }
 
 func TestGetAllocateCasesWhenCaseErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockAllocateCasesClient{}
 	client.
 		On("Teams", mock.Anything).
@@ -155,8 +150,6 @@ func TestGetAllocateCasesWhenCaseErrors(t *testing.T) {
 }
 
 func TestGetAllocateCasesWhenTemplateErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockAllocateCasesClient{}
 	client.
 		On("Teams", mock.Anything).
@@ -269,8 +262,6 @@ func TestPostAllocateCasesMultiple(t *testing.T) {
 }
 
 func TestPostAllocateCasesWhenAllocateCasesFails(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockAllocateCasesClient{}
 	client.
 		On("Teams", mock.Anything).

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -77,7 +76,6 @@ func TestGetEditDatesNoID(t *testing.T) {
 }
 
 func TestGetEditDatesWhenCaseErrors(t *testing.T) {
-	expectedError := errors.New("err")
 	caseitem := sirius.Case{CaseType: "PFA", UID: "700700"}
 
 	client := &mockEditDatesClient{}
@@ -95,7 +93,6 @@ func TestGetEditDatesWhenCaseErrors(t *testing.T) {
 }
 
 func TestGetEditDatesWhenTemplateErrors(t *testing.T) {
-	expectedError := errors.New("err")
 	caseitem := sirius.Case{CaseType: "PFA", UID: "700700"}
 
 	client := &mockEditDatesClient{}
@@ -176,8 +173,6 @@ func TestPostEditDates(t *testing.T) {
 }
 
 func TestPostEditDatesWhenEditDatesErrors(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockEditDatesClient{}
 	client.
 		On("EditDates", mock.Anything, 123, sirius.CaseTypeLpa, sirius.Dates{

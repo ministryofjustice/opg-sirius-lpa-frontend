@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -153,8 +152,6 @@ func TestGetPaymentsNoID(t *testing.T) {
 }
 
 func TestGetPaymentsWhenFailureOnGetCase(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockGetPayments{}
 	client.
 		On("Case", mock.Anything, 4).
@@ -170,8 +167,6 @@ func TestGetPaymentsWhenFailureOnGetCase(t *testing.T) {
 }
 
 func TestGetPaymentsWhenFailureOnGetPayments(t *testing.T) {
-	expectedError := errors.New("err")
-
 	caseItem := sirius.Case{
 		UID:     "7000-0000-0021",
 		SubType: "pfa",
@@ -196,8 +191,6 @@ func TestGetPaymentsWhenFailureOnGetPayments(t *testing.T) {
 }
 
 func TestGetPaymentsWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
-	expectedError := errors.New("err")
-
 	payments := []sirius.Payment{
 		{
 			ID:          2,
@@ -233,8 +226,6 @@ func TestGetPaymentsWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 }
 
 func TestGetPaymentsWhenFailureOnGetReferenceTypeRefData(t *testing.T) {
-	expectedError := errors.New("err")
-
 	payments := []sirius.Payment{
 		{
 			ID:          2,
@@ -279,8 +270,6 @@ func TestGetPaymentsWhenFailureOnGetReferenceTypeRefData(t *testing.T) {
 }
 
 func TestGetPaymentsWhenFailureOnFeeReductionTypesRefData(t *testing.T) {
-	expectedError := errors.New("err")
-
 	payments := []sirius.Payment{
 		{
 			ID:          2,
@@ -392,8 +381,6 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 	client.
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil)
-
-	expectedError := errors.New("err")
 
 	template := &mockTemplate{}
 	template.

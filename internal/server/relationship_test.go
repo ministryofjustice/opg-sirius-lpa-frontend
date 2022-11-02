@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -72,8 +71,6 @@ func TestGetRelationshipNoID(t *testing.T) {
 }
 
 func TestGetRelationshipWhenPersonErrors(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockRelationshipClient{}
 	client.
 		On("Person", mock.Anything, 123).
@@ -95,8 +92,6 @@ func TestGetRelationshipWhenPersonErrors(t *testing.T) {
 }
 
 func TestGetRelationshipWhenTemplateErrors(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockRelationshipClient{}
 	client.
 		On("Person", mock.Anything, 123).
@@ -192,8 +187,6 @@ func TestPostRelationshipWhenCreatePersonReferenceValidationError(t *testing.T) 
 }
 
 func TestPostRelationshipWhenCreatePersonReferenceOtherError(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockRelationshipClient{}
 	client.
 		On("Person", mock.Anything, 123).

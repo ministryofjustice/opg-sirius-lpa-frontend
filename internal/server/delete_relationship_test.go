@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -69,8 +68,6 @@ func TestGetDeleteRelationshipNoID(t *testing.T) {
 }
 
 func TestGetDeleteRelationshipWhenPersonErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockDeleteRelationshipClient{}
 	client.
 		On("Person", mock.Anything, 123).
@@ -89,8 +86,6 @@ func TestGetDeleteRelationshipWhenPersonErrors(t *testing.T) {
 }
 
 func TestGetDeleteRelationshipWhenPersonReferencesErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockDeleteRelationshipClient{}
 	client.
 		On("Person", mock.Anything, 123).
@@ -109,8 +104,6 @@ func TestGetDeleteRelationshipWhenPersonReferencesErrors(t *testing.T) {
 }
 
 func TestGetDeleteRelationshipWhenTemplateErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockDeleteRelationshipClient{}
 	client.
 		On("Person", mock.Anything, 123).
@@ -174,8 +167,6 @@ func TestPostDeleteRelationship(t *testing.T) {
 }
 
 func TestPostDeleteRelationshipWhenDeletePersonReferenceErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockDeleteRelationshipClient{}
 	client.
 		On("DeletePersonReference", mock.Anything, 1).
