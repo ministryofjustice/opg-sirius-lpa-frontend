@@ -27,24 +27,11 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"today": func() string {
 			return time.Now().Format("2006-01-02")
 		},
-		"field": func(name, label string, value interface{}, error map[string]string, attrs ...interface{}) map[string]interface{} {
-			field := map[string]interface{}{
-				"name":  name,
-				"label": label,
-				"value": value,
-				"error": error,
-			}
-
-			if len(attrs)%2 != 0 {
-				panic("must have even number of attrs")
-			}
-
-			for i := 0; i < len(attrs); i += 2 {
-				field[attrs[i].(string)] = attrs[i+1]
-			}
-
-			return field
-		},
+		"field":    field,
+		"items":    items,
+		"item":     item,
+		"fieldID":  fieldID,
+		"contains": contains,
 		"fee": func(amount int) string {
 			float := float64(amount)
 			return fmt.Sprintf("%.2f", float/100)
@@ -65,4 +52,90 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		},
 		"ToLower": strings.ToLower,
 	}
+}
+
+type fieldData struct {
+	Name  string
+	Label string
+	Value interface{}
+	Error map[string]string
+	Attrs map[string]interface{}
+}
+
+func field(name, label string, value interface{}, error map[string]string, attrs ...interface{}) fieldData {
+	field := fieldData{
+		Name:  name,
+		Label: label,
+		Value: value,
+		Error: error,
+		Attrs: map[string]interface{}{},
+	}
+
+	if len(attrs)%2 != 0 {
+		panic("must have even number of attrs")
+	}
+
+	for i := 0; i < len(attrs); i += 2 {
+		field.Attrs[attrs[i].(string)] = attrs[i+1]
+	}
+
+	return field
+}
+
+type itemsData struct {
+	Name   string
+	Value  interface{}
+	Errors map[string]string
+	Items  []itemData
+}
+
+func items(name string, value interface{}, errors map[string]string, items ...itemData) itemsData {
+	return itemsData{
+		Name:   name,
+		Value:  value,
+		Errors: errors,
+		Items:  items,
+	}
+}
+
+type itemData struct {
+	Value string
+	Label string
+	Attrs map[string]interface{}
+}
+
+func item(value, label string, attrs ...interface{}) itemData {
+	item := itemData{
+		Value: value,
+		Label: label,
+		Attrs: map[string]interface{}{},
+	}
+
+	if len(attrs)%2 != 0 {
+		panic("must have even number of attrs")
+	}
+
+	for i := 0; i < len(attrs); i += 2 {
+		item.Attrs[attrs[i].(string)] = attrs[i+1]
+	}
+
+	return item
+}
+
+func fieldID(name string, i int) string {
+	if i == 0 {
+		return name
+	}
+
+	return fmt.Sprintf("%s-%d", name, i+1)
+}
+
+func contains(needle string, list []string) bool {
+	for _, item := range list {
+		if item == needle {
+			return true
+		}
+	}
+
+	return false
 }

@@ -1,7 +1,7 @@
 {{ define "input-date" }}
-  <div class="govuk-form-group {{ if .error }}govuk-form-group--error{{ end }}">
-    <label class="govuk-label" for="f-{{ .name }}">{{ .label }}</label>
-    {{ template "errors" .error }}
-    <input class="govuk-input govuk-!-width-one-third {{ if .error }}govuk-input--error{{ end }}" type="date" id="f-{{ .name }}" name="{{ .name }}" value="{{ .value }}" {{ if .max }}max="{{ .max }}"{{ end }} {{ if .min }}min="{{ .min }}"{{ end }} />
+  <div class="govuk-form-group {{ if .Error }}govuk-form-group--error{{ end }}">
+    <label class="govuk-label" for="f-{{ .Name }}">{{ .Label }}</label>
+    {{ template "errors" .Error }}
+    <input class="govuk-input govuk-!-width-one-third {{ if .Error }}govuk-input--error{{ end }}" type="date" id="f-{{ .Name }}" name="{{ .Name }}" value="{{ .Value }}" {{ if .Attrs.max }}max="{{ .Attrs.max }}"{{ end }} {{ if .Attrs.min }}min="{{ .Attrs.min }}"{{ end }} />
   </div>
 {{ end }}
