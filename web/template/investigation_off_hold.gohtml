@@ -8,6 +8,7 @@
             {{ template "error-summary" .Error }}
 
             {{ if .Success }}
+                <meta data-app-reload="page" />
                 {{ template "success-banner" "You have taken the investigation off hold." }}
             {{ end }}
 
@@ -19,15 +20,19 @@
                     <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Title</th>
-                        <td class="govuk-table__cell">{{ .Investigation.Title }}</td>
+                        <td class="govuk-table__cell">{{ .HoldPeriod.Investigation.Title }}</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Type</th>
-                        <td class="govuk-table__cell">{{ .Investigation.Type }}</td>
+                        <td class="govuk-table__cell">{{ .HoldPeriod.Investigation.Type }}</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Date Received</th>
-                        <td class="govuk-table__cell">{{ formatDate .Investigation.DateReceived }}</td>
+                        <td class="govuk-table__cell">{{ formatDate .HoldPeriod.Investigation.DateReceived }}</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Reason</th>
+                        <td class="govuk-table__cell">{{ .HoldPeriod.Reason }}</td>
                     </tr>
                     </tbody>
                 </table>

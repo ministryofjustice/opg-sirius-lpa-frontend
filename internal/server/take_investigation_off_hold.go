@@ -13,11 +13,10 @@ type TakeInvestigationOffHoldClient interface {
 }
 
 type takeInvestigationOffHoldData struct {
-	XSRFToken     string
-	Success       bool
-	Error         sirius.ValidationError
-	HoldPeriod    sirius.HoldPeriod
-	Investigation sirius.Investigation
+	XSRFToken  string
+	Success    bool
+	Error      sirius.ValidationError
+	HoldPeriod sirius.HoldPeriod
 }
 
 func TakeInvestigationOffHold(client TakeInvestigationOffHoldClient, tmpl template.Template) Handler {
@@ -35,9 +34,8 @@ func TakeInvestigationOffHold(client TakeInvestigationOffHoldClient, tmpl templa
 		}
 
 		data := takeInvestigationOffHoldData{
-			XSRFToken:     ctx.XSRFToken,
-			HoldPeriod:    holdPeriod,
-			Investigation: holdPeriod.Investigation,
+			XSRFToken:  ctx.XSRFToken,
+			HoldPeriod: holdPeriod,
 		}
 
 		if r.Method == http.MethodPost {
@@ -47,7 +45,6 @@ func TakeInvestigationOffHold(client TakeInvestigationOffHoldClient, tmpl templa
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
 				data.HoldPeriod = holdPeriod
-				data.Investigation = holdPeriod.Investigation
 			} else if err != nil {
 				return err
 			} else {

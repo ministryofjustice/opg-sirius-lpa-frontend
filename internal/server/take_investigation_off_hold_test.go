@@ -38,10 +38,7 @@ func TestGetTakeInvestigationOffHold(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, takeInvestigationOffHoldData{
-			HoldPeriod:    holdPeriod,
-			Investigation: holdPeriod.Investigation,
-		}).
+		On("Func", mock.Anything, takeInvestigationOffHoldData{HoldPeriod: holdPeriod}).
 		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
@@ -106,10 +103,7 @@ func TestGetTakeInvestigationOffHoldWhenTemplateErrors(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, takeInvestigationOffHoldData{
-			HoldPeriod:    holdPeriod,
-			Investigation: holdPeriod.Investigation,
-		}).
+		On("Func", mock.Anything, takeInvestigationOffHoldData{HoldPeriod: holdPeriod}).
 		Return(expectedError)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
@@ -138,9 +132,8 @@ func TestPostTakeInvestigationOffHold(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, takeInvestigationOffHoldData{
-			Success:       true,
-			HoldPeriod:    holdPeriod,
-			Investigation: holdPeriod.Investigation,
+			Success:    true,
+			HoldPeriod: holdPeriod,
 		}).
 		Return(nil)
 
@@ -177,10 +170,9 @@ func TestPostTakeInvestigationOffHoldWhenValidationError(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, takeInvestigationOffHoldData{
-			Success:       false,
-			Error:         expectedError,
-			HoldPeriod:    holdPeriod,
-			Investigation: holdPeriod.Investigation,
+			Success:    false,
+			Error:      expectedError,
+			HoldPeriod: holdPeriod,
 		}).
 		Return(nil)
 
