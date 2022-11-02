@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -71,8 +70,6 @@ func TestGetTakeInvestigationOffHoldBadQuery(t *testing.T) {
 }
 
 func TestGetTakeInvestigationOffHoldWhenHoldPeriodErrors(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockTakeInvestigationOffHoldClient{}
 	client.
 		On("HoldPeriod", mock.Anything, 123).
@@ -88,8 +85,6 @@ func TestGetTakeInvestigationOffHoldWhenHoldPeriodErrors(t *testing.T) {
 }
 
 func TestGetTakeInvestigationOffHoldWhenTemplateErrors(t *testing.T) {
-	expectedError := errors.New("err")
-
 	holdPeriod := sirius.HoldPeriod{
 		ID:            123,
 		Reason:        "Police Investigation",
@@ -189,8 +184,6 @@ func TestPostTakeInvestigationOffHoldWhenValidationError(t *testing.T) {
 }
 
 func TestPostTakeInvestigationOffHoldWhenOtherError(t *testing.T) {
-	expectedError := errors.New("err")
-
 	holdPeriod := sirius.HoldPeriod{
 		ID:            123,
 		Reason:        "Police Investigation",
