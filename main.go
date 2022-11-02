@@ -11,6 +11,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/aws/aws-xray-sdk-go/awsplugins/ecs"
+	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/ministryofjustice/opg-go-common/env"
 	"github.com/ministryofjustice/opg-go-common/logging"
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -92,7 +94,10 @@ func main() {
 		logger.Fatal(err)
 	}
 
-	client := sirius.NewClient(http.DefaultClient, siriusURL)
+	ecs.Init()
+	_ = xray.Configure(xray.Config{})
+
+	client := sirius.NewClient(xray.Client(nil), siriusURL)
 
 	server := &http.Server{
 		Addr:              ":" + port,

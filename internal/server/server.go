@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/aws/aws-xray-sdk-go/xray"
 	"github.com/ministryofjustice/opg-go-common/securityheaders"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -136,42 +137,44 @@ func (e RedirectError) To() string {
 
 func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL string) func(next Handler) http.Handler {
 	return func(next Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if err := next(w, r); err != nil {
-				if v, ok := err.(unauthorizedError); ok && v.IsUnauthorized() {
-					http.Redirect(w, r, siriusURL+"/auth", http.StatusFound)
-					return
-				}
+		return xray.Handler(xray.NewFixedSegmentNamer("opg-sirius-lpa-frontend"),
+			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if err := next(w, r); err != nil {
+					if v, ok := err.(unauthorizedError); ok && v.IsUnauthorized() {
+						http.Redirect(w, r, siriusURL+"/auth", http.StatusFound)
+						return
+					}
 
-				if redirect, ok := err.(RedirectError); ok {
-					http.Redirect(w, r, prefix+redirect.To(), http.StatusFound)
-					return
-				}
+					if redirect, ok := err.(RedirectError); ok {
+						http.Redirect(w, r, prefix+redirect.To(), http.StatusFound)
+						return
+					}
 
-				logger.Request(r, err)
-
-				code := http.StatusInternalServerError
-				correlationId := ""
-
-				if statusError, ok := err.(sirius.StatusError); ok {
-					correlationId = statusError.CorrelationId
-				}
-
-				w.WriteHeader(code)
-				err = tmplError(w, errorVars{
-					SiriusURL:     siriusURL,
-					Path:          "",
-					Code:          code,
-					Error:         err.Error(),
-					CorrelationId: correlationId,
-				})
-
-				if err != nil {
 					logger.Request(r, err)
-					http.Error(w, "Could not generate error template", http.StatusInternalServerError)
+
+					code := http.StatusInternalServerError
+					correlationId := ""
+
+					if statusError, ok := err.(sirius.StatusError); ok {
+						correlationId = statusError.CorrelationId
+					}
+
+					w.WriteHeader(code)
+					err = tmplError(w, errorVars{
+						SiriusURL:     siriusURL,
+						Path:          "",
+						Code:          code,
+						Error:         err.Error(),
+						CorrelationId: correlationId,
+					})
+
+					if err != nil {
+						logger.Request(r, err)
+						http.Error(w, "Could not generate error template", http.StatusInternalServerError)
+					}
 				}
-			}
-		})
+			}),
+		)
 	}
 }
 
