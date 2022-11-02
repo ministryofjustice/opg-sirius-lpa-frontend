@@ -1,7 +1,7 @@
 {{ define "textarea" }}
-  <div class="govuk-form-group {{ if .error }}govuk-form-group--error{{ end }}">
-    <label class="govuk-label" for="f-{{ .name }}">{{ .label }}</label>
-    {{ template "errors" .error }}
-    <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .error }}govuk-textarea--error{{ end }}" id="f-{{ .name }}" name="{{ .name }}">{{ .value }}</textarea>
+  <div class="govuk-form-group {{ if .Error }}govuk-form-group--error{{ end }}">
+    <label class="govuk-label" for="f-{{ .Name }}">{{ .Label }}</label>
+    {{ template "errors" .Error }}
+    <textarea data-module="app-auto-resize" class="govuk-textarea {{ if .Error }}govuk-textarea--error{{ end }}" id="f-{{ .Name }}" name="{{ .Name }}">{{ .Value }}</textarea>
   </div>
 {{ end }}
