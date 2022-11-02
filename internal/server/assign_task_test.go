@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -114,8 +113,6 @@ func TestGetAssignTaskBadQueryString(t *testing.T) {
 }
 
 func TestGetAssignTaskWhenTeamsErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockAssignTaskClient{}
 	client.
 		On("Teams", mock.Anything).
@@ -134,8 +131,6 @@ func TestGetAssignTaskWhenTeamsErrors(t *testing.T) {
 }
 
 func TestGetAssignTaskWhenTaskErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockAssignTaskClient{}
 	client.
 		On("Teams", mock.Anything).
@@ -154,8 +149,6 @@ func TestGetAssignTaskWhenTaskErrors(t *testing.T) {
 }
 
 func TestGetAssignTaskWhenTemplateErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockAssignTaskClient{}
 	client.
 		On("Teams", mock.Anything).
@@ -266,8 +259,6 @@ func TestPostAssignTaskMultiple(t *testing.T) {
 }
 
 func TestPostAssignTaskWhenAssignTaskFails(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockAssignTaskClient{}
 	client.
 		On("Teams", mock.Anything).

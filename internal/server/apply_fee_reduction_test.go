@@ -1,15 +1,15 @@
 package server
 
 import (
-	"errors"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockApplyFeeReductionClient struct {
@@ -92,8 +92,6 @@ func TestApplyFeeReductionNoID(t *testing.T) {
 }
 
 func TestApplyFeeReductionWhenFailureOnGetCase(t *testing.T) {
-	expectedError := errors.New("err")
-
 	client := &mockApplyFeeReductionClient{}
 	client.
 		On("Case", mock.Anything, 4).
@@ -129,8 +127,6 @@ func TestApplyFeeReductionWhenTemplateErrors(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return(feeReductionTypes, nil)
 
-	expectedError := errors.New("err")
-
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, applyFeeReductionData{
@@ -153,8 +149,6 @@ func TestApplyFeeReductionWhenFailureOnGetFeeReductionTypesRefData(t *testing.T)
 		UID:     "7000-0000-0021",
 		SubType: "pfa",
 	}
-
-	expectedError := errors.New("err")
 
 	client := &mockApplyFeeReductionClient{}
 	client.

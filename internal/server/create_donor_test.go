@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -120,8 +119,6 @@ func TestPostCreateDonor(t *testing.T) {
 }
 
 func TestPostCreateDonorWhenAPIFails(t *testing.T) {
-	expectedError := errors.New("failed to create donor")
-
 	client := &mockCreateDonorClient{}
 	client.
 		On("CreateDonor", mock.Anything, sirius.Person{

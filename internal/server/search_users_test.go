@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -46,8 +45,6 @@ func TestGetSearchUsers(t *testing.T) {
 }
 
 func TestGetSearchUsersWhenError(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockSearchUsersClient{}
 	client.
 		On("SearchUsers", mock.Anything, "something").

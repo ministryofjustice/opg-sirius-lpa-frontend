@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -87,8 +86,6 @@ func TestGetTaskBadQueryString(t *testing.T) {
 }
 
 func TestGetTaskWhenTaskTypeErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockTaskClient{}
 	client.
 		On("TaskTypes", mock.Anything).
@@ -109,8 +106,6 @@ func TestGetTaskWhenTaskTypeErrors(t *testing.T) {
 }
 
 func TestGetTaskWhenTeamsErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockTaskClient{}
 	client.
 		On("TaskTypes", mock.Anything).
@@ -131,8 +126,6 @@ func TestGetTaskWhenTeamsErrors(t *testing.T) {
 }
 
 func TestGetTaskWhenCaseErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockTaskClient{}
 	client.
 		On("TaskTypes", mock.Anything).
@@ -153,8 +146,6 @@ func TestGetTaskWhenCaseErrors(t *testing.T) {
 }
 
 func TestGetTaskWhenTemplateErrors(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockTaskClient{}
 	client.
 		On("TaskTypes", mock.Anything).
@@ -233,8 +224,6 @@ func TestPostTask(t *testing.T) {
 }
 
 func TestPostTaskWhenCreateTaskFails(t *testing.T) {
-	expectedError := errors.New("hmm")
-
 	client := &mockTaskClient{}
 	client.
 		On("TaskTypes", mock.Anything).

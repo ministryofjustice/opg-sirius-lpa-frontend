@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -86,7 +85,6 @@ func TestGetChangeStatusNoID(t *testing.T) {
 }
 
 func TestGetChangeStatusWhenCaseErrors(t *testing.T) {
-	expectedError := errors.New("err")
 	caseitem := sirius.Case{CaseType: "PFA", UID: "700700"}
 
 	client := &mockChangeStatusClient{}
@@ -104,7 +102,6 @@ func TestGetChangeStatusWhenCaseErrors(t *testing.T) {
 }
 
 func TestGetChangeStatusWhenAvailableStatusesErrors(t *testing.T) {
-	expectedError := errors.New("err")
 	caseitem := sirius.Case{CaseType: "PFA", UID: "700700"}
 
 	client := &mockChangeStatusClient{}
@@ -126,7 +123,6 @@ func TestGetChangeStatusWhenAvailableStatusesErrors(t *testing.T) {
 }
 
 func TestGetChangeStatusWhenTemplateErrors(t *testing.T) {
-	expectedError := errors.New("err")
 	caseitem := sirius.Case{CaseType: "PFA", UID: "700700"}
 
 	client := &mockChangeStatusClient{}
@@ -204,7 +200,6 @@ func TestPostChangeStatus(t *testing.T) {
 }
 
 func TestPostChangeStatusWhenChangeStatusErrors(t *testing.T) {
-	expectedError := errors.New("err")
 	caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
 
 	client := &mockChangeStatusClient{}
