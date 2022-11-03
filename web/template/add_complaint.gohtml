@@ -19,17 +19,11 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        <div class="govuk-form-group {{ if .Error.Field.severity }}govuk-form-group--error{{ end }}">
-          <fieldset class="govuk-fieldset">
-            <legend class="govuk-fieldset__legend">Severity</legend>
-            {{ template "errors" .Error.Field.severity }}
-            {{ template "radios" (items "severity" .Complaint.Severity .Error.Field.severity
-              (item "Minor" "Minor")
-              (item "Major" "Major")
-              (item "Security Breach" "Security Breach")
-            ) }}
-          </fieldset>
-        </div>
+        {{ template "radios" (radios "severity" "Severity" .Complaint.Severity .Error.Field.severity
+          (item "Minor" "Minor")
+          (item "Major" "Major")
+          (item "Security Breach" "Security Breach")
+        ) }}
 
         {{ template "input" (field "summary" "Title" .Complaint.Summary .Error.Field.summary) }}
 
