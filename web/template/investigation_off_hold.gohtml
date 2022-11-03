@@ -32,7 +32,7 @@
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Reason</th>
-                        <td class="govuk-table__cell">{{ .HoldPeriod.Reason }}</td>
+                        <td class="govuk-table__cell">{{ if eq .HoldPeriod.Reason "LA Investigation" }}Local Authority Investigation{{ else }}{{ .HoldPeriod.Reason }}{{ end }}</td>
                     </tr>
                     </tbody>
                 </table>
