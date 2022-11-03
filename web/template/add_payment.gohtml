@@ -25,20 +25,7 @@
                     </div>
                 </div>
 
-                <div class="govuk-form-group {{ if .Error.Field.source }}govuk-form-group--error{{ end }}">
-                    <label class="govuk-label" for="f-source">
-                        Payment method
-                    </label>
-                    {{ template "errors" .Error.Field.source }}
-                    <select class="govuk-select {{ if .Error.Field.source }}govuk-select--error{{ end }}" id="f-source" name="source">
-                        <option hidden selected disabled></option>
-                        {{ range .PaymentSources }}
-                            {{ if .UserSelectable }}
-                                <option value="{{ .Handle }}" {{ if eq .Handle $.Source }}selected{{ end }}>{{ .Label }}</option>
-                            {{ end }}
-                        {{ end }}
-                    </select>
-                </div>
+                {{ template "select" (select "source" "Payment method" .Source .Error.Field.source (options .PaymentSources "filterSelectable" true)) }}
 
                 {{ template "input-date" (field "paymentDate" "Date of payment" .PaymentDate .Error.Field.paymentDate "max" today "selectToday" true) }}
 

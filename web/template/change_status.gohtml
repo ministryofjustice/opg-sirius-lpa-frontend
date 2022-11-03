@@ -19,18 +19,7 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        <div class="govuk-form-group {{ if .Error.Field.status }}govuk-form-group--error{{ end }}">
-          <label class="govuk-label" for="f-status">
-            Status
-          </label>
-          {{ template "errors" .Error.Field.status }}
-          <select class="govuk-select {{ if .Error.Field.status }}govuk-select--error{{ end }}" id="f-status" name="status" required>
-            <option hidden selected disabled></option>
-            {{ range .AvailableStatuses }}
-              <option value="{{ . }}" {{ if eq $.NewStatus . }}selected{{ end }}>{{ . }}</option>
-            {{ end }}
-          </select>
-        </div>
+        {{ template "select" (select "status" "Status" .NewStatus .Error.Field.status (options .AvailableStatuses) "required" true) }}
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Submit</button>

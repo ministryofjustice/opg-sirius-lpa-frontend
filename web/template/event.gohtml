@@ -19,18 +19,7 @@
       <form class="form" enctype="multipart/form-data" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        <div class="govuk-form-group {{ if .Error.Field.type }}govuk-form-group--error{{ end }}">
-          <label class="govuk-label" for="f-type">
-            Event type
-          </label>
-          {{ template "errors" .Error.Field.type }}
-          <select class="govuk-select {{ if .Error.Field.type }}govuk-select--error{{ end }}" id="f-type" name="type">
-            <option hidden {{ if eq "" .Type }}selected{{ end }} disabled></option>
-            {{ range .NoteTypes }}
-              <option value="{{ . }}" {{ if eq . $.Type }}selected{{ end }} >{{ . }}</option>
-            {{ end }}
-          </select>
-        </div>
+        {{ template "select" (select "type" "Event type" .Type .Error.Field.type (options .NoteTypes)) }}
 
         {{ template "input" (field "name" "Subject" .Name .Error.Field.name) }}
 

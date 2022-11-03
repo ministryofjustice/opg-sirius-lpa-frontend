@@ -17,18 +17,7 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        <div class="govuk-form-group {{ if .Error.Field.warningType }}govuk-form-group--error{{ end }}">
-          <label class="govuk-label" for="f-warningType">
-            Warning type
-          </label>
-          {{ template "errors" .Error.Field.warningType }}
-          <select class="govuk-select {{ if .Error.Field.warningType }}govuk-select--error{{ end }}" id="f-warningType" name="warningType">
-            <option hidden selected disabled></option>
-            {{ range .WarningTypes }}
-              <option value="{{ .Handle }}" {{ if eq .Handle $.WarningType }}selected{{ end }}>{{ .Label }}</option>
-            {{ end }}
-          </select>
-        </div>
+        {{ template "select" (select "warningType" "Warning type" .WarningType .Error.Field.warningType (options .WarningTypes)) }}
 
         {{ template "textarea" (field "warningText" "Notes" .WarningText .Error.Field.warningText) }}
 
