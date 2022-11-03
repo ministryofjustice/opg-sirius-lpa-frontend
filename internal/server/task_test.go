@@ -206,7 +206,7 @@ func TestPostTask(t *testing.T) {
 	form := url.Values{
 		"assignTo":     {"user"},
 		"assigneeUser": {"66:System user"},
-		"type":         {"Some task type"},
+		"taskType":     {"Some task type"},
 		"dueDate":      {"2022-03-04"},
 		"name":         {"Do this"},
 		"description":  {"Please"},
@@ -250,7 +250,7 @@ func TestPostTaskWhenCreateTaskFails(t *testing.T) {
 	form := url.Values{
 		"assignTo":     {"user"},
 		"assigneeUser": {"66"},
-		"type":         {"Some task type"},
+		"taskType":     {"Some task type"},
 		"dueDate":      {"2022-03-04"},
 		"name":         {"Do this"},
 		"description":  {"Please"},
@@ -306,7 +306,7 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 
 	form := url.Values{
 		"assigneeUser": {"66"},
-		"type":         {"Some task type"},
+		"taskType":     {"Some task type"},
 		"dueDate":      {"2022-03-04"},
 		"name":         {"Do this"},
 		"description":  {"Please"},
@@ -386,7 +386,7 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 
 			form := url.Values{
 				"assignTo":    {name},
-				"type":        {"Some task type"},
+				"taskType":    {"Some task type"},
 				"dueDate":     {"2022-03-04"},
 				"name":        {"Do this"},
 				"description": {"Please"},

@@ -14,18 +14,7 @@
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-                <div class="govuk-form-group {{ if .Error.Field.feeReductionType }}govuk-form-group--error{{ end }}">
-                    <label class="govuk-label" for="f-feeReductionType">
-                        Reduction type
-                    </label>
-                    {{ template "errors" .Error.Field.feeReductionType }}
-                    <select class="govuk-select {{ if .Error.Field.feeReductionType }}govuk-select--error{{ end }}" id="f-feeReductionType" name="feeReductionType">
-                        <option hidden selected disabled></option>
-                        {{ range .FeeReductionTypes }}
-                            <option value="{{ .Handle }}" {{ if eq .Handle $.FeeReduction.FeeReductionType }}selected{{ end }}>{{ .Label }}</option>
-                        {{ end }}
-                    </select>
-                </div>
+                {{ template "select" (select "feeReductionType" "Reduction type" .FeeReduction.FeeReductionType .Error.Field.feeReductionType (options .FeeReductionTypes)) }}
 
                 {{ template "textarea" (field "paymentEvidence" "Evidence used to determine reduction" .FeeReduction.PaymentEvidence .Error.Field.paymentEvidence "hint" "For example, income calculations") }}
 

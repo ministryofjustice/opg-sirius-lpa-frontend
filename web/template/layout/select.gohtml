@@ -1,0 +1,14 @@
+{{ define "select" }}
+  <div class="govuk-form-group {{ if .Errors }}govuk-form-group--error{{ end }}">
+    <label class="govuk-label" for="f-{{ .Name }}">
+      {{ .Label }}
+    </label>
+    {{ template "errors" .Errors }}
+    <select class="govuk-select {{ if .Errors }}govuk-select--error{{ end }}" id="f-{{ .Name }}" name="{{ .Name }}" {{ if .Attrs.required }}required{{ end }}>
+      <option hidden {{ if not .Value }}selected{{ end }} disabled></option>
+      {{ range .Options }}
+        <option value="{{ .Value }}" {{ if eq .Value $.Value }}selected{{ end }} >{{ .Label }}</option>
+      {{ end }}
+    </select>
+  </div>
+{{ end }}

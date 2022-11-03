@@ -71,17 +71,7 @@
         <h1 class="govuk-heading-l app-!-embedded-hide">MI Reporting</h1>
 
         <form class="form" method="GET">
-          <div class="govuk-form-group">
-            <label class="govuk-label" for="reportType">
-              Report type
-            </label>
-            <select class="govuk-select" id="reportType" name="reportType">
-              <option value="" selected></option>
-              {{ range .ReportTypes }}
-                <option value="{{ .Name }}">{{ .Description }}</option>
-              {{ end }}
-            </select>
-          </div>
+          {{ template "select" (select "reportType" "Report type" nil nil (options .ReportTypes)) }}
 
           <div class="govuk-button-group">
             <button class="govuk-button" data-module="govuk-button" type="submit">Select</button>

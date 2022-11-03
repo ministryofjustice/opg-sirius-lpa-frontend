@@ -31,6 +31,8 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"items":   items,
 		"item":    item,
 		"fieldID": fieldID,
+		"select":  select_,
+		"options": options,
 		"fee": func(amount int) string {
 			float := float64(amount)
 			return fmt.Sprintf("%.2f", float/100)
@@ -62,23 +64,13 @@ type fieldData struct {
 }
 
 func field(name, label string, value interface{}, error map[string]string, attrs ...interface{}) fieldData {
-	field := fieldData{
+	return fieldData{
 		Name:  name,
 		Label: label,
 		Value: value,
 		Error: error,
-		Attrs: map[string]interface{}{},
+		Attrs: collectAttrs(attrs),
 	}
-
-	if len(attrs)%2 != 0 {
-		panic("must have even number of attrs")
-	}
-
-	for i := 0; i < len(attrs); i += 2 {
-		field.Attrs[attrs[i].(string)] = attrs[i+1]
-	}
-
-	return field
 }
 
 type itemsData struct {
@@ -104,21 +96,11 @@ type itemData struct {
 }
 
 func item(value, label string, attrs ...interface{}) itemData {
-	item := itemData{
+	return itemData{
 		Value: value,
 		Label: label,
-		Attrs: map[string]interface{}{},
+		Attrs: collectAttrs(attrs),
 	}
-
-	if len(attrs)%2 != 0 {
-		panic("must have even number of attrs")
-	}
-
-	for i := 0; i < len(attrs); i += 2 {
-		item.Attrs[attrs[i].(string)] = attrs[i+1]
-	}
-
-	return item
 }
 
 func fieldID(name string, i int) string {
@@ -127,4 +109,83 @@ func fieldID(name string, i int) string {
 	}
 
 	return fmt.Sprintf("%s-%d", name, i+1)
+}
+
+type selectData struct {
+	Name    string
+	Label   string
+	Value   interface{} // string|int
+	Errors  map[string]string
+	Options []optionData
+	Attrs   map[string]interface{}
+}
+
+func select_(name, label string, value interface{}, errors map[string]string, options []optionData, attrs ...interface{}) selectData {
+	return selectData{
+		Name:    name,
+		Label:   label,
+		Value:   value,
+		Errors:  errors,
+		Options: options,
+		Attrs:   collectAttrs(attrs),
+	}
+}
+
+type optionData struct {
+	Value interface{} // string|int
+	Label string
+}
+
+func options(list interface{}, attrs ...interface{}) []optionData {
+	attributes := collectAttrs(attrs)
+	var datas []optionData
+
+	switch v := list.(type) {
+	case []string:
+		datas = make([]optionData, len(v))
+		for i, item := range v {
+			datas[i] = optionData{Value: item, Label: item}
+		}
+
+	case []sirius.MiConfigEnum:
+		datas = make([]optionData, len(v))
+		for i, item := range v {
+			datas[i] = optionData{Value: item.Name, Label: item.Description}
+		}
+
+	case []sirius.RefDataItem:
+		if attributes["filterSelectable"] == true {
+			for _, item := range v {
+				if item.UserSelectable {
+					datas = append(datas, optionData{Value: item.Handle, Label: item.Label})
+				}
+			}
+		} else {
+			datas = make([]optionData, len(v))
+			for i, item := range v {
+				datas[i] = optionData{Value: item.Handle, Label: item.Label}
+			}
+		}
+
+	case []sirius.Team:
+		datas = make([]optionData, len(v))
+		for i, item := range v {
+			datas[i] = optionData{Value: item.ID, Label: item.DisplayName}
+		}
+	}
+
+	return datas
+}
+
+func collectAttrs(attrs []interface{}) map[string]interface{} {
+	attributes := map[string]interface{}{}
+	if len(attrs)%2 != 0 {
+		panic("must have even number of attrs")
+	}
+
+	for i := 0; i < len(attrs); i += 2 {
+		attributes[attrs[i].(string)] = attrs[i+1]
+	}
+
+	return attributes
 }
