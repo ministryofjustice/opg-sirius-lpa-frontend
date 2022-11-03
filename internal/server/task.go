@@ -80,7 +80,7 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 		if r.Method == http.MethodPost {
 			task := sirius.TaskRequest{
 				CaseID:      caseID,
-				Type:        postFormString(r, "type"),
+				Type:        postFormString(r, "taskType"),
 				DueDate:     postFormDateString(r, "dueDate"),
 				Name:        postFormString(r, "name"),
 				Description: postFormString(r, "description"),

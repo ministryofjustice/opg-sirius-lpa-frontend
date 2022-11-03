@@ -34,30 +34,10 @@
                     </tbody>
                 </table>
 
-                <div class="govuk-form-group {{ if .Error.Field.reason }}govuk-form-group--error{{ end }}">
-                    <fieldset class="govuk-fieldset">
-                        <legend class="govuk-fieldset__legend">
-                            <h1 class="govuk-fieldset__heading">
-                                Reason
-                            </h1>
-                        </legend>
-                        {{ template "errors" .Error.Field.reason }}
-                        <div class="govuk-radios" data-module="govuk-radios">
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="f-reason" name="reason" type="radio" value="Police Investigation" {{ if eq "Police Investigation" .Reason }}checked{{ end }}>
-                                <label class="govuk-label govuk-radios__label" for="f-reason">
-                                    Police Investigation
-                                </label>
-                            </div>
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="f-reason-2" name="reason" type="radio" value="LA Investigation" {{ if eq "LA Investigation" .Reason }}checked{{ end }}>
-                                <label class="govuk-label govuk-radios__label" for="f-reason-2">
-                                    Local Authority Investigation
-                                </label>
-                            </div>
-                        </div>
-                    </fieldset>
-                </div>
+                {{ template "radios" (radios "reason" "Reason" .Reason .Error.Field.reason
+                  (item "Police Investigation" "Police Investigation")
+                  (item "LA Investigation" "Local Authority Investigation")
+                ) }}
 
                 <div class="govuk-button-group govuk-!-padding-top-5">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Place on hold</button>
