@@ -20,7 +20,7 @@
                 <table class="govuk-table table__no-border">
                     <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header">Title</th>
+                        <th scope="row" class="govuk-table__header">Investigation</th>
                         <td class="govuk-table__cell">{{ .Investigation.Title }}</td>
                     </tr>
                     <tr class="govuk-table__row">
@@ -52,7 +52,7 @@
                             <div class="govuk-radios__item">
                                 <input class="govuk-radios__input" id="f-reason-2" name="reason" type="radio" value="LA Investigation" {{ if eq "LA Investigation" .Reason }}checked{{ end }}>
                                 <label class="govuk-label govuk-radios__label" for="f-reason-2">
-                                    LA Investigation
+                                    Local Authority Investigation
                                 </label>
                             </div>
                         </div>
