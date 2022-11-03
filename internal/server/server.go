@@ -9,6 +9,7 @@ import (
 	"github.com/ministryofjustice/opg-go-common/securityheaders"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 type Logger interface {
@@ -107,7 +108,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/javascript/", static)
 	mux.Handle("/stylesheets/", static)
 
-	return http.StripPrefix(prefix, securityheaders.Use(mux))
+	return otelhttp.NewHandler(http.StripPrefix(prefix, securityheaders.Use(mux)), "lpa-frontend")
 }
 
 type Handler func(w http.ResponseWriter, r *http.Request) error
