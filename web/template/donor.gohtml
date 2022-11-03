@@ -59,11 +59,7 @@
 
           <div class="govuk-form-group {{ if .Error.Field.isAirmailRequired }}govuk-form-group--error{{ end }}">
             <fieldset class="govuk-fieldset">
-              <legend class="govuk-fieldset__legend">
-                <h1 class="govuk-fieldset__heading">
-                  Is airmail required
-                </h1>
-              </legend>
+              <legend class="govuk-fieldset__legend">Is airmail required</legend>
               {{ template "errors" .Error.Field.isAirmailRequired }}
               <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
                 <div class="govuk-radios__item">
@@ -88,11 +84,7 @@
 
           <div class="govuk-form-group {{ if .Error.Field.correspondenceBy }}govuk-form-group--error{{ end }}">
             <fieldset class="govuk-fieldset">
-              <legend class="govuk-fieldset__legend">
-                <h1 class="govuk-fieldset__heading">
-                  Correspondence by
-                </h1>
-              </legend>
+              <legend class="govuk-fieldset__legend">Correspondence by</legend>
               {{ template "errors" .Error.Field.correspondenceBy }}
               <div class="govuk-checkboxes govuk-checkboxes--inline" data-module="govuk-checkboxes">
                 <div class="govuk-checkboxes__item">
@@ -125,11 +117,7 @@
 
           <div class="govuk-form-group {{ if .Error.Field.researchOptOut }}govuk-form-group--error{{ end }}">
             <fieldset class="govuk-fieldset">
-              <legend class="govuk-fieldset__legend">
-                <h1 class="govuk-fieldset__heading">
-                  Research opt-out
-                </h1>
-              </legend>
+              <legend class="govuk-fieldset__legend">Research opt-out</legend>
               {{ template "errors" .Error.Field.researchOptOut }}
               <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
                 <div class="govuk-radios__item">

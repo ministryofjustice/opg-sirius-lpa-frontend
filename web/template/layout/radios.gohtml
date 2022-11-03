@@ -1,0 +1,23 @@
+{{ define "radios" }}
+  <div class="govuk-form-group {{ if .Errors }}govuk-form-group--error{{ end }}">
+    <fieldset class="govuk-fieldset">
+      <legend class="govuk-fieldset__legend">{{ .Label }}</legend>
+      {{ template "errors" .Errors }}
+      <div class="govuk-radios {{ if .Errors }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+        {{ range $i, $e := .Items }}
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="f-{{ fieldID $.Name $i }}" name="{{ $.Name }}" type="radio" value="{{ $e.Value }}" {{ if eq $.Value $e.Value }}checked{{ end }} {{ if $e.Attrs.hint }}aria-describedby="{{ fieldID $.Name $i }}-item-hint"{{ end }}>
+            <label class="govuk-label govuk-radios__label" for="f-{{ fieldID $.Name $i }}">
+              {{ $e.Label }}
+            </label>
+            {{ if $e.Attrs.hint }}
+              <div id="{{ fieldID $.Name $i }}-item-hint" class="govuk-hint govuk-radios__hint">
+                {{ $e.Attrs.hint }}
+              </div>
+            {{ end }}
+          </div>
+        {{ end }}
+      </div>
+    </fieldset>
+  </div>
+{{ end }}

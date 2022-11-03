@@ -19,18 +19,7 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        <div class="govuk-form-group {{ if .Error.Field.taskType }}govuk-form-group--error{{ end }}">
-          <label class="govuk-label" for="f-taskType">
-            Task type
-          </label>
-          {{ template "errors" .Error.Field.taskType }}
-          <select class="govuk-select {{ if .Error.Field.taskType }}govuk-select--error{{ end }}" id="f-taskType" name="type">
-            <option hidden {{ if eq "" .Task.Type }}selected{{ end }} disabled></option>
-            {{ range .TaskTypes }}
-              <option value="{{ . }}" {{ if eq . $.Task.Type }}selected{{ end }} >{{ . }}</option>
-            {{ end }}
-          </select>
-        </div>
+        {{ template "select" (select "taskType" "Task type" .Task.Type .Error.Field.taskType (options .TaskTypes)) }}
 
         {{ template "input" (field "name" "Task" .Task.Name .Error.Field.name) }}
 
@@ -68,18 +57,7 @@
                 </label>
               </div>
               <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-assignTo-2">
-                <div class="govuk-form-group {{ if .Error.Field.assigneeTeam }}govuk-form-group--error{{ end }}">
-                  <label class="govuk-label" for="f-assigneeTeam">
-                    Team
-                  </label>
-                  {{ template "errors" .Error.Field.assigneeTeam }}
-                  <select class="govuk-select {{ if .Error.Field.assigneeTeam }}govuk-select--error{{ end }}" id="f-assigneeTeam" name="assigneeTeam">
-                    <option hidden {{ if eq 0 .Task.AssigneeID }}selected{{ end }} disabled></option>
-                    {{ range .Teams }}
-                      <option value="{{ .ID }}" {{ if eq .ID $.Task.AssigneeID }}selected{{ end }}>{{ .DisplayName }}</option>
-                    {{ end }}
-                  </select>
-                </div>
+                {{ template "select" (select "assigneeTeam" "Team" .Task.AssigneeID .Error.Field.assigneeTeam (options .Teams)) }}
               </div>
             </div>
           </fieldset>

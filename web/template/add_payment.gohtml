@@ -13,6 +13,7 @@
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
                 <div class="govuk-form-group {{ if .Error.Field.amount }}govuk-form-group--error{{ end }}">
                     <label class="govuk-label" for="f-amount">
                         Enter amount paid
@@ -24,28 +25,9 @@
                     </div>
                 </div>
 
-                <div class="govuk-form-group {{ if .Error.Field.source }}govuk-form-group--error{{ end }}">
-                    <label class="govuk-label" for="f-source">
-                        Payment method
-                    </label>
-                    {{ template "errors" .Error.Field.source }}
-                    <select class="govuk-select {{ if .Error.Field.source }}govuk-select--error{{ end }}" id="f-source" name="source">
-                        <option hidden selected disabled></option>
-                        {{ range .PaymentSources }}
-                            {{ if .UserSelectable }}
-                                <option value="{{ .Handle }}" {{ if eq .Handle $.Source }}selected{{ end }}>{{ .Label }}</option>
-                            {{ end }}
-                        {{ end }}
-                    </select>
-                </div>
+                {{ template "select" (select "source" "Payment method" .Source .Error.Field.source (options .PaymentSources "filterSelectable" true)) }}
 
-                <div class="govuk-form-group govuk-!-display-inline-block govuk-!-padding-right-4 {{ if .Error.Field.paymentDate }}govuk-form-group--error{{ end }}">
-                    <label class="govuk-label" for="f-paymentDate">Date of payment</label>
-                    {{ template "errors" .Error.Field.paymentDate }}
-                    <input class="govuk-input date-picker {{ if .Error.Field.paymentDate }}govuk-input--error{{ end }}" type="date" id="f-paymentDate" name="paymentDate" value="{{ .PaymentDate }}" max="{{ today }}"/>
-                </div>
-
-                <a href="#" class="govuk-link govuk-link--no-visited-state govuk-!-display-inline-block" data-module="select-todays-date">Use today's date</a>
+                {{ template "input-date" (field "paymentDate" "Date of payment" .PaymentDate .Error.Field.paymentDate "max" today "selectToday" true) }}
 
                 <div class="govuk-button-group govuk-!-padding-top-6">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
