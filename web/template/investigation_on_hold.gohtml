@@ -34,17 +34,10 @@
                     </tbody>
                 </table>
 
-                <div class="govuk-form-group {{ if .Error.Field.reason }}govuk-form-group--error{{ end }}">
-                    <fieldset class="govuk-fieldset">
-                        <legend class="govuk-fieldset__legend">Reason</legend>
-                        {{ template "errors" .Error.Field.reason }}
-
-                        {{ template "radios" (items "reason" .Reason .Error.Field.reason
-                          (item "Police Investigation" "Police Investigation")
-                          (item "LA Investigation" "Local Authority Investigation")
-                        ) }}
-                    </fieldset>
-                </div>
+                {{ template "radios" (radios "reason" "Reason" .Reason .Error.Field.reason
+                  (item "Police Investigation" "Police Investigation")
+                  (item "LA Investigation" "Local Authority Investigation")
+                ) }}
 
                 <div class="govuk-button-group govuk-!-padding-top-5">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Place on hold</button>

@@ -28,7 +28,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			return time.Now().Format("2006-01-02")
 		},
 		"field":   field,
-		"items":   items,
+		"radios":  radios,
 		"item":    item,
 		"fieldID": fieldID,
 		"select":  select_,
@@ -73,16 +73,18 @@ func field(name, label string, value interface{}, error map[string]string, attrs
 	}
 }
 
-type itemsData struct {
+type radiosData struct {
 	Name   string
+	Label  string
 	Value  interface{}
 	Errors map[string]string
 	Items  []itemData
 }
 
-func items(name string, value interface{}, errors map[string]string, items ...itemData) itemsData {
-	return itemsData{
+func radios(name, label string, value interface{}, errors map[string]string, items ...itemData) radiosData {
+	return radiosData{
 		Name:   name,
+		Label:  label,
 		Value:  value,
 		Errors: errors,
 		Items:  items,

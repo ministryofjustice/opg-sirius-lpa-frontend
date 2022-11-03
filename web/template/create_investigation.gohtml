@@ -23,18 +23,11 @@
 
                 {{ template "textarea" (field "information" "Information" .Investigation.Information .Error.Field.additionalInformation) }}
 
-                <div class="govuk-form-group {{ if .Error.Field.type }}govuk-form-group--error{{ end }}">
-                    <fieldset class="govuk-fieldset">
-                        <legend class="govuk-fieldset__legend">Type</legend>
-                        {{ template "errors" .Error.Field.type }}
-
-                        {{ template "radios" (items "type" .Investigation.Type .Error.Field.type
-                          (item "Aspect" "Aspect")
-                          (item "Normal" "Normal")
-                          (item "Priority" "Priority")
-                        ) }}
-                    </fieldset>
-                </div>
+                {{ template "radios" (radios "type" "Type" .Investigation.Type .Error.Field.type
+                  (item "Aspect" "Aspect")
+                  (item "Normal" "Normal")
+                  (item "Priority" "Priority")
+                ) }}
 
                 {{ template "input-date" (field "dateReceived" "Date Recieved" .Investigation.DateReceived .Error.Field.investigationReceivedDate "max" today) }}
 
