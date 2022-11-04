@@ -1,10 +1,10 @@
 describe("Puts an investigation on hold", () => {
     beforeEach(() => {
-        cy.visit("/place-investigation-on-hold?id=300");
+        cy.visit("/investigation-hold?id=300");
     });
 
     it("places an investigation on hold", () => {
-        cy.contains("Investigation on hold");
+        cy.contains("Place investigation on hold");
         cy.get(".moj-banner").should("not.exist");
         cy.contains("Test title");
         cy.contains("Normal");
