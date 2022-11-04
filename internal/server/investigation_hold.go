@@ -1,18 +1,20 @@
 package server
 
 import (
+	"errors"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
 	"strconv"
 )
 
-type PlaceInvestigationOnHoldClient interface {
+type InvestigationHoldClient interface {
 	PlaceInvestigationOnHold(ctx sirius.Context, investigationID int, reason string) error
+	TakeInvestigationOffHold(ctx sirius.Context, investigationID int) error
 	Investigation(ctx sirius.Context, id int) (sirius.Investigation, error)
 }
 
-type placeInvestigationOnHoldData struct {
+type investigationHoldData struct {
 	XSRFToken     string
 	Success       bool
 	Error         sirius.ValidationError
@@ -20,7 +22,7 @@ type placeInvestigationOnHoldData struct {
 	Reason        string
 }
 
-func PlaceInvestigationOnHold(client PlaceInvestigationOnHoldClient, tmpl template.Template) Handler {
+func InvestigationHold(client InvestigationHoldClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		id, err := strconv.Atoi(r.FormValue("id"))
 		if err != nil {
@@ -29,20 +31,37 @@ func PlaceInvestigationOnHold(client PlaceInvestigationOnHoldClient, tmpl templa
 
 		ctx := getContext(r)
 		investigation, err := client.Investigation(ctx, id)
-
 		if err != nil {
 			return err
 		}
 
-		data := placeInvestigationOnHoldData{
+		data := investigationHoldData{
 			XSRFToken:     ctx.XSRFToken,
 			Investigation: investigation,
 		}
 
-		if r.Method == http.MethodPost {
-			reason := postFormString(r, "reason")
+		var hpID int
+		if investigation.IsOnHold {
+			for _, hp := range investigation.HoldPeriods {
+				if hp.EndDate == "" {
+					hpID = hp.ID
+					data.Reason = hp.Reason
+				}
+			}
+			if hpID == 0 {
+				w.WriteHeader(http.StatusInternalServerError)
+				return errors.New("could not find open hold period on investigation")
+			}
+		}
 
-			err = client.PlaceInvestigationOnHold(ctx, id, reason)
+		if r.Method == http.MethodPost {
+			if investigation.IsOnHold {
+				err = client.TakeInvestigationOffHold(ctx, hpID)
+			} else {
+				reason := postFormString(r, "reason")
+				data.Reason = reason
+				err = client.PlaceInvestigationOnHold(ctx, id, reason)
+			}
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
@@ -53,6 +72,7 @@ func PlaceInvestigationOnHold(client PlaceInvestigationOnHoldClient, tmpl templa
 			} else {
 				data.Success = true
 			}
+
 		}
 
 		return tmpl(w, data)
