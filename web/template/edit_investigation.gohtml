@@ -27,13 +27,15 @@
                   (item "Priority" "Priority")
                 ) }}
 
-                {{ template "input-date" (field "dateReceived" "Date Recieved" .Investigation.DateReceived .Error.Field.investigationReceivedDate "max" today) }}
+                {{ template "input-date" (field "dateReceived" "Date recieved" .Investigation.DateReceived .Error.Field.investigationReceivedDate "max" today) }}
 
-                {{ template "input-date" (field "approvalDate" "Approval Date" .Investigation.ApprovalDate .Error.Field.investigationApprovalDate "max" today) }}
+                {{ template "input-date" (field "riskAssessmentDate" "Date of risk assessment" .Investigation.RiskAssessmentDate .Error.Field.riskAssessmentDate "max" today) }}
 
-                {{ template "select" (select "approvalOutcome" "Approval Outcome" .Investigation.ApprovalOutcome .Error.Field.approvalOutcome (options .ApprovalOutcomeTypes)) }}
+                {{ template "input-date" (field "approvalDate" "Approval date" .Investigation.ApprovalDate .Error.Field.investigationApprovalDate "max" today) }}
 
-                {{ template "input-date" (field "investigationClosureDate" "Investigation Closure Date" .Investigation.ApprovalDate .Error.Field.investigationApprovalDate "max" today) }}
+                {{ template "select" (select "approvalOutcome" "Approval outcome" .Investigation.ApprovalOutcome .Error.Field.approvalOutcome (options .ApprovalOutcomeTypes)) }}
+
+                {{ template "input-date" (field "investigationClosureDate" "Investigation closure date" .Investigation.ApprovalDate .Error.Field.investigationApprovalDate "max" today) }}
 
                 <div class="govuk-button-group govuk-!-padding-top-5">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>

@@ -10,8 +10,9 @@ type Investigation struct {
 	DateReceived             DateString   `json:"investigationReceivedDate"`
 	HoldPeriods              []HoldPeriod `json:"holdPeriods,omitempty"`
 	IsOnHold                 bool         `json:"isOnHold,omitempty"`
-	ApprovalDate             DateString   `json:"approvalDate,omitempty"`
-	ApprovalOutcome          string       `json:"approvalOutcome,omitempty"`
+	ApprovalDate             DateString   `json:"reportApprovalDate,omitempty"`
+	RiskAssessmentDate       DateString   `json:"riskAssessmentDate,omitempty"`
+	ApprovalOutcome          string       `json:"reportApprovalOutcome,omitempty"`
 	InvestigationClosureDate DateString   `json:"investigationClosureDate,omitempty"`
 }
 

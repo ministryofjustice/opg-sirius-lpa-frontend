@@ -43,6 +43,7 @@ func EditInvestigation(client EditInvestigationClient, tmpl template.Template) H
 				Type:                     postFormString(r, "type"),
 				DateReceived:             postFormDateString(r, "dateReceived"),
 				ApprovalDate:             postFormDateString(r, "approvalDate"),
+				RiskAssessmentDate:       postFormDateString(r, "riskAssessmentDate"),
 				ApprovalOutcome:          postFormString(r, "approvalOutcome"),
 				InvestigationClosureDate: postFormDateString(r, "investigationClosureDate"),
 			}

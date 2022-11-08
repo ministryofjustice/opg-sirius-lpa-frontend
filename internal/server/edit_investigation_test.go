@@ -108,6 +108,7 @@ func TestPostEditInvestigation(t *testing.T) {
 		Type:                     "Priority",
 		DateReceived:             sirius.DateString("2022-04-05"),
 		ApprovalDate:             sirius.DateString("2022-04-05"),
+		RiskAssessmentDate:       sirius.DateString("2022-04-05"),
 		ApprovalOutcome:          "Court Application",
 		InvestigationClosureDate: sirius.DateString("2022-04-05"),
 	}
@@ -135,6 +136,7 @@ func TestPostEditInvestigation(t *testing.T) {
 		"type":                     {"Priority"},
 		"dateReceived":             {"2022-04-05"},
 		"approvalDate":             {"2022-04-05"},
+		"riskAssessmentDate":       {"2022-04-05"},
 		"approvalOutcome":          {"Court Application"},
 		"investigationClosureDate": {"2022-04-05"},
 	}

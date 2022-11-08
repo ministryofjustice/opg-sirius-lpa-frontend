@@ -38,8 +38,9 @@ func TestEditInvestigation(t *testing.T) {
 							"additionalInformation":     "Some test info",
 							"type":                      "Normal",
 							"investigationReceivedDate": "23/01/2022",
-							"approvalDate":              "05/04/2022",
-							"approvalOutcome":           "Court Application",
+							"reportApprovalDate":        "05/04/2022",
+							"riskAssessmentDate":        "05/04/2022",
+							"reportApprovalOutcome":     "Court Application",
 							"investigationClosureDate":  "05/04/2022",
 						}),
 					}).
@@ -64,6 +65,7 @@ func TestEditInvestigation(t *testing.T) {
 					Type:                     "Normal",
 					DateReceived:             DateString("2022-01-23"),
 					ApprovalDate:             DateString("2022-04-05"),
+					RiskAssessmentDate:       DateString("2022-04-05"),
 					ApprovalOutcome:          "Court Application",
 					InvestigationClosureDate: DateString("2022-04-05"),
 				})
