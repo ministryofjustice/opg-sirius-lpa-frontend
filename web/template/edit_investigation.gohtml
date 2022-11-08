@@ -1,0 +1,45 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Edit Investigation{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            {{ template "error-summary" .Error }}
+
+            {{ if .Success }}
+                <meta data-app-reload="page" />
+                {{ template "success-banner" "You have successfully edited an investigation." }}
+            {{ end }}
+
+            <h1 class="govuk-heading-l app-!-embedded-hide">Edit Investigation</h1>
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+                {{ template "input" (field "title" "Title" .Investigation.Title .Error.Field.investigationTitle) }}
+
+                {{ template "textarea" (field "information" "Information" .Investigation.Information .Error.Field.additionalInformation) }}
+
+                {{ template "radios" (radios "type" "Type" .Investigation.Type .Error.Field.type
+                  (item "Aspect" "Aspect")
+                  (item "Normal" "Normal")
+                  (item "Priority" "Priority")
+                ) }}
+
+                {{ template "input-date" (field "dateReceived" "Date Recieved" .Investigation.DateReceived .Error.Field.investigationReceivedDate "max" today) }}
+
+                {{ template "input-date" (field "approvalDate" "Approval Date" .Investigation.ApprovalDate .Error.Field.investigationApprovalDate "max" today) }}
+
+                {{ template "select" (select "approvalOutcome" "Approval Outcome" .Investigation.ApprovalOutcome .Error.Field.approvalOutcome (options .ApprovalOutcomeTypes)) }}
+
+                {{ template "input-date" (field "investigationClosureDate" "Investigation Closure Date" .Investigation.ApprovalDate .Error.Field.investigationApprovalDate "max" today) }}
+
+                <div class="govuk-button-group govuk-!-padding-top-5">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{{ end }}
