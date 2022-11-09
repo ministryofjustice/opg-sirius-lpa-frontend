@@ -3,13 +3,17 @@ package sirius
 import "fmt"
 
 type Investigation struct {
-	ID           int          `json:"id,omitempty"`
-	Title        string       `json:"investigationTitle"`
-	Information  string       `json:"additionalInformation"`
-	Type         string       `json:"type"`
-	DateReceived DateString   `json:"investigationReceivedDate"`
-	HoldPeriods  []HoldPeriod `json:"holdPeriods,omitempty"`
-	IsOnHold     bool         `json:"isOnHold,omitempty"`
+	ID                       int          `json:"id,omitempty"`
+	Title                    string       `json:"investigationTitle"`
+	Information              string       `json:"additionalInformation"`
+	Type                     string       `json:"type"`
+	DateReceived             DateString   `json:"investigationReceivedDate"`
+	HoldPeriods              []HoldPeriod `json:"holdPeriods,omitempty"`
+	IsOnHold                 bool         `json:"isOnHold,omitempty"`
+	ApprovalDate             DateString   `json:"reportApprovalDate,omitempty"`
+	RiskAssessmentDate       DateString   `json:"riskAssessmentDate,omitempty"`
+	ApprovalOutcome          string       `json:"reportApprovalOutcome,omitempty"`
+	InvestigationClosureDate DateString   `json:"investigationClosureDate,omitempty"`
 }
 
 func (c *Client) Investigation(ctx Context, id int) (Investigation, error) {

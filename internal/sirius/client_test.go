@@ -50,3 +50,11 @@ func TestStatusErrorIsUnauthorized(t *testing.T) {
 	assert.Equal(t, err, err.Data())
 	assert.True(t, err.IsUnauthorized())
 }
+
+func TestFormatToValidationErr(t *testing.T) {
+	unformattedErr := SiriusValidationError{Errors: SiriusFieldErrors{"riskAssessmentDate": []string{"This field is required"}, "reportApprovalDate": []string{"This field is required"}}}
+	result := FormatToValidationError(unformattedErr)
+	formattedErr := ValidationError{Field: FieldErrors{"riskAssessmentDate": {"": "This field is required"}, "reportApprovalDate": {"": "This field is required"}}}
+
+	assert.Equal(t, formattedErr, result)
+}
