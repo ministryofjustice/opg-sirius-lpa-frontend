@@ -25,11 +25,11 @@ func (c *Client) EditInvestigation(ctx Context, investigationID int, investigati
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusBadRequest {
-		var v ValidationError
+		var v SiriusValidationError
 		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
 			return err
 		}
-		return v
+		return FormatToValidationError(v)
 	}
 
 	if resp.StatusCode != http.StatusOK {

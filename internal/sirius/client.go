@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 type Context struct {
@@ -109,6 +110,21 @@ type FieldErrors map[string]map[string]string
 type ValidationError struct {
 	Detail string      `json:"detail"`
 	Field  FieldErrors `json:"validation_errors"`
+}
+
+type SiriusFieldErrors map[string][]string
+
+type SiriusValidationError struct {
+	Errors SiriusFieldErrors `json:"validation_errors"`
+}
+
+func FormatToValidationError(originalErr SiriusValidationError) ValidationError {
+	formattedErr := ValidationError{Field: FieldErrors{}}
+
+	for k, v := range originalErr.Errors {
+		formattedErr.Field[k] = map[string]string{"": strings.Join(v, "")}
+	}
+	return formattedErr
 }
 
 func (e ValidationError) Any() bool {

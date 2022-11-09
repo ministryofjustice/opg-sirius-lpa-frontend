@@ -31,11 +31,11 @@
 
                 {{ template "input-date" (field "riskAssessmentDate" "Date of risk assessment" .Investigation.RiskAssessmentDate .Error.Field.riskAssessmentDate "max" today) }}
 
-                {{ template "input-date" (field "approvalDate" "Approval date" .Investigation.ApprovalDate .Error.Field.investigationApprovalDate "max" today) }}
+                {{ template "input-date" (field "approvalDate" "Approval date" .Investigation.ApprovalDate .Error.Field.reportApprovalDate "max" today) }}
 
-                {{ template "select" (select "approvalOutcome" "Approval outcome" .Investigation.ApprovalOutcome .Error.Field.approvalOutcome (options .ApprovalOutcomeTypes)) }}
+                {{ template "select" (select "approvalOutcome" "Approval outcome" .Investigation.ApprovalOutcome .Error.Field.reportApprovalOutcome (options .ApprovalOutcomeTypes)) }}
 
-                {{ template "input-date" (field "investigationClosureDate" "Investigation closure date" .Investigation.ApprovalDate .Error.Field.investigationApprovalDate "max" today) }}
+                {{ template "input-date" (field "investigationClosureDate" "Investigation closure date" .Investigation.InvestigationClosureDate .Error.Field.investigationClosureDate "max" today) }}
 
                 <div class="govuk-button-group govuk-!-padding-top-5">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
