@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/ministryofjustice/opg-go-common v0.0.0-20220308143936-cab4e8742f40
 	github.com/pact-foundation/pact-go v1.7.0
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.1
 	go.opentelemetry.io/contrib/detectors/aws/ecs v1.11.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.36.4
 	go.opentelemetry.io/contrib/propagators/aws v1.11.1
@@ -28,7 +28,7 @@ require (
 	github.com/hashicorp/go-version v1.5.0 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/objx v0.4.0 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.11.1 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.11.1 // indirect
 	go.opentelemetry.io/otel/metric v0.33.0 // indirect
