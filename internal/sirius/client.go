@@ -3,9 +3,11 @@ package sirius
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 type Context struct {
@@ -105,10 +107,40 @@ func (e StatusError) Data() interface{} {
 }
 
 type FieldErrors map[string]map[string]string
+type FlexibleFields map[string]json.RawMessage
 
 type ValidationError struct {
 	Detail string      `json:"detail"`
 	Field  FieldErrors `json:"validation_errors"`
+}
+
+func formatToFieldErrors(x FlexibleFields) (FieldErrors, error) {
+	s := FieldErrors{}
+	for k, v := range x {
+		// to avoid formatting unrequired fields in the response body
+		if k != "validation_errors" {
+			continue
+		}
+
+		var asMapSlice map[string][]string
+		if err := json.Unmarshal(v, &asMapSlice); err == nil {
+			for key, value := range asMapSlice {
+				s[key] = map[string]string{"": strings.Join(value, "")}
+			}
+			continue
+		}
+
+		var asFieldErrors map[string]map[string]string
+		if err := json.Unmarshal(v, &asFieldErrors); err == nil {
+			for key, value := range asFieldErrors {
+				s[key] = value
+			}
+			continue
+		}
+
+		return nil, errors.New("could not parse field validation_errors")
+	}
+	return s, nil
 }
 
 func (e ValidationError) Any() bool {
