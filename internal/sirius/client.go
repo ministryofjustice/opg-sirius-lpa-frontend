@@ -107,34 +107,26 @@ func (e StatusError) Data() interface{} {
 }
 
 type FieldErrors map[string]map[string]string
-type FlexibleFields map[string]json.RawMessage
+type flexibleFieldErrors map[string]json.RawMessage
 
 type ValidationError struct {
 	Detail string      `json:"detail"`
 	Field  FieldErrors `json:"validation_errors"`
 }
 
-func formatToFieldErrors(x FlexibleFields) (FieldErrors, error) {
+func (f flexibleFieldErrors) toFieldErrors() (FieldErrors, error) {
 	s := FieldErrors{}
-	for k, v := range x {
-		// to avoid formatting unrequired fields in the response body
-		if k != "validation_errors" {
+
+	for k, v := range f {
+		var asSlice []string
+		if err := json.Unmarshal(v, &asSlice); err == nil {
+			s[k] = map[string]string{"": strings.Join(asSlice, "")}
 			continue
 		}
 
-		var asMapSlice map[string][]string
-		if err := json.Unmarshal(v, &asMapSlice); err == nil {
-			for key, value := range asMapSlice {
-				s[key] = map[string]string{"": strings.Join(value, "")}
-			}
-			continue
-		}
-
-		var asFieldErrors map[string]map[string]string
-		if err := json.Unmarshal(v, &asFieldErrors); err == nil {
-			for key, value := range asFieldErrors {
-				s[key] = value
-			}
+		var asMap map[string]string
+		if err := json.Unmarshal(v, &asMap); err == nil {
+			s[k] = asMap
 			continue
 		}
 
