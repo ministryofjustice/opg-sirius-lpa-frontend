@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -24,12 +25,24 @@ func (c *Client) EditInvestigation(ctx Context, investigationID int, investigati
 	}
 	defer resp.Body.Close()
 
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
 	if resp.StatusCode == http.StatusBadRequest {
-		var v SiriusValidationError
-		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
+		var v ValidationError
+		var x FlexibleFields
+		if err := json.Unmarshal(body, &x); err != nil {
 			return err
 		}
-		return FormatToValidationError(v)
+		formattedFieldErrors, err := formatToFieldErrors(x)
+		if err != nil {
+			return err
+		}
+		v.Field = formattedFieldErrors
+		v.Detail = "Payload failed validation"
+		return v
 	}
 
 	if resp.StatusCode != http.StatusOK {

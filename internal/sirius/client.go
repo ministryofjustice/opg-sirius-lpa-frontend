@@ -3,6 +3,7 @@ package sirius
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -106,25 +107,40 @@ func (e StatusError) Data() interface{} {
 }
 
 type FieldErrors map[string]map[string]string
+type FlexibleFields map[string]json.RawMessage
 
 type ValidationError struct {
 	Detail string      `json:"detail"`
 	Field  FieldErrors `json:"validation_errors"`
 }
 
-type SiriusFieldErrors map[string][]string
+func formatToFieldErrors(x FlexibleFields) (FieldErrors, error) {
+	s := FieldErrors{}
+	for k, v := range x {
+		// to avoid formatting unrequired fields in the response body
+		if k != "validation_errors" {
+			continue
+		}
 
-type SiriusValidationError struct {
-	Errors SiriusFieldErrors `json:"validation_errors"`
-}
+		var asMapSlice map[string][]string
+		if err := json.Unmarshal(v, &asMapSlice); err == nil {
+			for key, value := range asMapSlice {
+				s[key] = map[string]string{"": strings.Join(value, "")}
+			}
+			continue
+		}
 
-func FormatToValidationError(originalErr SiriusValidationError) ValidationError {
-	formattedErr := ValidationError{Field: FieldErrors{}}
+		var asFieldErrors map[string]map[string]string
+		if err := json.Unmarshal(v, &asFieldErrors); err == nil {
+			for key, value := range asFieldErrors {
+				s[key] = value
+			}
+			continue
+		}
 
-	for k, v := range originalErr.Errors {
-		formattedErr.Field[k] = map[string]string{"": strings.Join(v, "")}
+		return nil, errors.New("could not parse field validation_errors")
 	}
-	return formattedErr
+	return s, nil
 }
 
 func (e ValidationError) Any() bool {
