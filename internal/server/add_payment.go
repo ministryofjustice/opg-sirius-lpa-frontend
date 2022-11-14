@@ -87,8 +87,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 				return err
 			} else {
 				SetFlash(w, FlashNotification{
-					Title:       "Payment added",
-					Description: "Please clear the task if you have completed it",
+					Title: "Payment added",
 				})
 				return RedirectError(fmt.Sprintf("/payments?id=%d", caseID))
 			}
