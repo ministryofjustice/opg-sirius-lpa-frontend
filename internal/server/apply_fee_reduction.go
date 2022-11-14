@@ -60,8 +60,7 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) H
 				return err
 			} else {
 				SetFlash(w, FlashNotification{
-					Title:       fmt.Sprintf("%s approved", translateRefData(data.FeeReductionTypes, data.FeeReductionType)),
-					Description: "Please clear the task if you have completed it",
+					Title: fmt.Sprintf("%s approved", translateRefData(data.FeeReductionTypes, data.FeeReductionType)),
 				})
 				return RedirectError(fmt.Sprintf("/payments?id=%d", caseID))
 			}

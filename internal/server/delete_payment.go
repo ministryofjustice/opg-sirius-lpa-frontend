@@ -64,8 +64,7 @@ func DeletePayment(client DeletePaymentClient, tmpl template.Template) Handler {
 			}
 
 			SetFlash(w, FlashNotification{
-				Title:       fmt.Sprintf("%s deleted", item),
-				Description: "Please clear the task if you have completed it",
+				Title: fmt.Sprintf("%s deleted", item),
 			})
 			return RedirectError(fmt.Sprintf("/payments?id=%d", p.Case.ID))
 		}
