@@ -1,6 +1,8 @@
 package sirius
 
 import (
+	"encoding/json"
+	"errors"
 	"net/http"
 	"testing"
 
@@ -49,4 +51,29 @@ func TestStatusErrorIsUnauthorized(t *testing.T) {
 	assert.Equal(t, "unexpected response from Sirius", err.Title())
 	assert.Equal(t, err, err.Data())
 	assert.True(t, err.IsUnauthorized())
+}
+
+func TestToFieldErrors(t *testing.T) {
+	var unformattedErr flexibleFieldErrors
+	err := json.Unmarshal([]byte(`{"riskAssessmentDate":["This field is required"],"reportApprovalDate":["This field is required"]}`), &unformattedErr)
+	if err != nil {
+		return
+	}
+	result, err := unformattedErr.toFieldErrors()
+	formattedErr := FieldErrors{"riskAssessmentDate": {"": "This field is required"}, "reportApprovalDate": {"": "This field is required"}}
+
+	assert.Equal(t, formattedErr, result)
+	assert.Nil(t, err)
+}
+
+func TestToFieldErrorsThrowsError(t *testing.T) {
+	var unformattedErr flexibleFieldErrors
+	err := json.Unmarshal([]byte(`{"test":123}`), &unformattedErr)
+	if err != nil {
+		return
+	}
+	result, err := unformattedErr.toFieldErrors()
+
+	assert.Equal(t, err, errors.New("could not parse field validation_errors"))
+	assert.Nil(t, result)
 }
