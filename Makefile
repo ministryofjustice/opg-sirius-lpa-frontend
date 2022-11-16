@@ -26,7 +26,7 @@ lighthouse:
 
 .PHONY: cypress
 cypress:
-	docker-compose -f docker/docker-compose.ci.yml run cypress
+	docker-compose -f docker/docker-compose.ci.yml run cypress --browser firefox
 
 down:
 	docker-compose -f docker/docker-compose.ci.yml down
