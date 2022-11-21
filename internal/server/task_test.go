@@ -16,8 +16,8 @@ type mockTaskClient struct {
 	mock.Mock
 }
 
-func (m *mockTaskClient) CreateTask(ctx sirius.Context, task sirius.TaskRequest) error {
-	args := m.Called(ctx, task)
+func (m *mockTaskClient) CreateTask(ctx sirius.Context, caseID int, task sirius.TaskRequest) error {
+	args := m.Called(ctx, caseID, task)
 	return args.Error(0)
 }
 
@@ -182,8 +182,7 @@ func TestPostTask(t *testing.T) {
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
 	client.
-		On("CreateTask", mock.Anything, sirius.TaskRequest{
-			CaseID:      123,
+		On("CreateTask", mock.Anything, 123, sirius.TaskRequest{
 			Type:        "Some task type",
 			DueDate:     "2022-03-04",
 			Name:        "Do this",
@@ -235,7 +234,7 @@ func TestPostTaskWhenCreateTaskFails(t *testing.T) {
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
 	client.
-		On("CreateTask", mock.Anything, mock.Anything).
+		On("CreateTask", mock.Anything, mock.Anything, mock.Anything).
 		Return(expectedError)
 
 	template := &mockTemplate{}
@@ -276,7 +275,7 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
 	client.
-		On("CreateTask", mock.Anything, mock.Anything).
+		On("CreateTask", mock.Anything, mock.Anything, mock.Anything).
 		Return(sirius.ValidationError{
 			Field: sirius.FieldErrors{
 				"assigneeId": {"empty": "Not set"},
@@ -295,7 +294,6 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 				},
 			},
 			Task: sirius.TaskRequest{
-				CaseID:      123,
 				Type:        "Some task type",
 				DueDate:     "2022-03-04",
 				Name:        "Do this",
@@ -353,7 +351,7 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 				On("Case", mock.Anything, 123).
 				Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
 			client.
-				On("CreateTask", mock.Anything, mock.Anything).
+				On("CreateTask", mock.Anything, mock.Anything, mock.Anything).
 				Return(sirius.ValidationError{Field: sirius.FieldErrors{
 					"field":      {"reason": "Description"},
 					"assigneeId": {"problem": "Because"},
@@ -373,7 +371,6 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 					Entity:    "LPA 7000-0000-0000",
 					Error:     sirius.ValidationError{Field: expectedErrors},
 					Task: sirius.TaskRequest{
-						CaseID:      123,
 						Type:        "Some task type",
 						DueDate:     "2022-03-04",
 						Name:        "Do this",
