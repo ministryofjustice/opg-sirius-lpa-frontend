@@ -31,12 +31,11 @@ func TestCreateTask(t *testing.T) {
 					UponReceiving("A request to create a task").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/tasks"),
+						Path:   dsl.String("/lpa-api/v1/cases/800/tasks"),
 						Headers: dsl.MapMatcher{
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"caseId":      dsl.Like(800),
 							"assigneeId":  dsl.Like(1),
 							"type":        dsl.String("Change of Address"),
 							"name":        dsl.String("Something"),
@@ -59,8 +58,7 @@ func TestCreateTask(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.CreateTask(Context{Context: context.Background()}, TaskRequest{
-					CaseID:      800,
+				err := client.CreateTask(Context{Context: context.Background()}, 800, TaskRequest{
 					AssigneeID:  1,
 					Type:        "Change of Address",
 					Name:        "Something",
@@ -76,19 +74,4 @@ func TestCreateTask(t *testing.T) {
 			}))
 		})
 	}
-}
-
-func TestCreateTaskWithEmptyDescription(t *testing.T) {
-	client := NewClient(http.DefaultClient, "")
-
-	err := client.CreateTask(Context{}, TaskRequest{
-		CaseID:      800,
-		AssigneeID:  1,
-		Type:        "Change of Address",
-		Name:        "Something",
-		Description: "  ",
-		DueDate:     "9999-05-04",
-	})
-
-	assert.Equal(t, ValidationError{Field: FieldErrors{"description": {"": "Value can't be empty"}}}, err)
 }

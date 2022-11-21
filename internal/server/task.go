@@ -11,7 +11,7 @@ import (
 )
 
 type TaskClient interface {
-	CreateTask(ctx sirius.Context, task sirius.TaskRequest) error
+	CreateTask(ctx sirius.Context, caseID int, task sirius.TaskRequest) error
 	TaskTypes(ctx sirius.Context) ([]string, error)
 	Teams(ctx sirius.Context) ([]sirius.Team, error)
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
@@ -79,7 +79,6 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 
 		if r.Method == http.MethodPost {
 			task := sirius.TaskRequest{
-				CaseID:      caseID,
 				Type:        postFormString(r, "taskType"),
 				DueDate:     postFormDateString(r, "dueDate"),
 				Name:        postFormString(r, "name"),
@@ -100,7 +99,7 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 				task.AssigneeID = assigneeID
 			}
 
-			err = client.CreateTask(ctx, task)
+			err = client.CreateTask(ctx, caseID, task)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
