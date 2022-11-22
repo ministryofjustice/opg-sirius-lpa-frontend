@@ -3,12 +3,11 @@ package sirius
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
-	"strings"
 )
 
 type TaskRequest struct {
-	CaseID      int        `json:"caseId"`
 	AssigneeID  int        `json:"assigneeId"`
 	Type        string     `json:"type"`
 	Name        string     `json:"name"`
@@ -16,23 +15,13 @@ type TaskRequest struct {
 	DueDate     DateString `json:"dueDate"`
 }
 
-func (c *Client) CreateTask(ctx Context, task TaskRequest) error {
-	// In the old forms description is checked to enable the save button. We can't
-	// validate it server-side as Supervision allow it to be empty.
-	if strings.TrimSpace(task.Description) == "" {
-		return ValidationError{
-			Field: FieldErrors{
-				"description": {"": "Value can't be empty"},
-			},
-		}
-	}
-
+func (c *Client) CreateTask(ctx Context, caseID int, task TaskRequest) error {
 	data, err := json.Marshal(task)
 	if err != nil {
 		return err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPost, "/lpa-api/v1/tasks", bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("/lpa-api/v1/cases/%d/tasks", caseID), bytes.NewReader(data))
 	if err != nil {
 		return err
 	}
