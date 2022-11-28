@@ -1,0 +1,61 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create Document{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <p class="govuk-body"><strong>{{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "lpa" }}LPA{{ end }} {{ .Case.UID }}</strong></p>
+
+            {{ template "error-summary" .Error }}
+
+            {{ if .TemplateId  }}
+            <a href="create-document?id={{ .Case.ID }}&case={{ .Case.CaseType }}" class="govuk-back-link">Back</a>
+
+            <h1 class="govuk-heading-l app-!-embedded-hide">Create Draft</h1>
+            <h2 class="govuk-heading-m">{{ .TemplateId }}</h2>
+
+            <form class="form" method="GET">
+                <input type="hidden" name="id" value="{{ .Case.ID }}"/>
+                <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
+                <input type="hidden" name="templateId" value="{{ .TemplateId }}"/>
+
+                <div class="govuk-button-group govuk-!-padding-top-5">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Select insert</button>
+                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+                </div>
+            </form>
+
+            {{ else }}
+            <h1 class="govuk-heading-l app-!-embedded-hide">Create Draft</h1>
+
+            <form class="form" method="GET">
+                <input type="hidden" name="id" value="{{ .Case.ID }}"/>
+                <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset">
+                        <div class="govuk-form-group {{ if .Error.Field.templateId }}govuk-form-group--error{{ end }}">
+                            <label class="govuk-label" for="f-templateId">
+                                Select a template
+                            </label>
+                            {{ template "errors" .Error.Field.templateId }}
+                            <select class="govuk-select {{ if .Error.Field.templateId }}govuk-select--error{{ end }}" id="f-templateId" name="templateId" required>
+                                <option hidden {{ if not nil }}selected{{ end }} disabled></option>
+                                {{ range .DocumentTemplateTypes }}
+                                    <option value="{{ .Handle }}" {{ if eq .Handle nil }}selected{{ end }}>{{ .Handle }}: {{ .Label }}</option>
+                                {{ end }}
+                            </select>
+                        </div>
+                    </fieldset>
+                </div>
+
+
+                <div class="govuk-button-group govuk-!-padding-top-5">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Select template</button>
+                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+                </div>
+            </form>
+            {{ end }}
+        </div>
+    </div>
+{{ end }}

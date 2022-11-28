@@ -9,6 +9,10 @@ export default function select(prefix) {
     document.querySelector("[data-select-person]"),
     fetchPerson(prefix)
   );
+  accessibleAutocomplete.enhanceSelectElement({
+    selectElement: document.querySelector('#f-templateId'),
+    showAllValues: true,
+  })
 }
 
 function enhanceElement(element, source) {

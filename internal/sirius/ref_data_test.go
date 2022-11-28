@@ -261,3 +261,65 @@ func TestRefDataByCategoryPaymentReferenceType(t *testing.T) {
 		})
 	}
 }
+
+func TestRefDataByCategoryDocumentTemplateId(t *testing.T) {
+	t.Parallel()
+
+	pact := newPact()
+	defer pact.Teardown()
+
+	testCases := []struct {
+		name             string
+		setup            func()
+		expectedResponse []RefDataItem
+		expectedError    func(int) error
+	}{
+		{
+			name: "OK",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("Some document template ids types exist").
+					UponReceiving("A request for document template id ref data").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String(fmt.Sprintf("/lpa-api/v1/reference-data/%s", DocumentTemplateIdCategory)),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.EachLike(map[string]interface{}{
+							"handle": dsl.String("EP(BB)"),
+							"label":  dsl.String("EP(bb): Blank Template"),
+						}, 1),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: []RefDataItem{
+				{
+					Handle: "EP(BB)",
+					Label:  "EP(bb): Blank Template",
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.Verify(func() error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+
+				types, err := client.RefDataByCategory(Context{Context: context.Background()}, DocumentTemplateIdCategory)
+
+				assert.Equal(t, tc.expectedResponse, types)
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}
