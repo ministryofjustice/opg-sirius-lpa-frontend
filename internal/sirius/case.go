@@ -16,6 +16,7 @@ type Case struct {
 	RegistrationDate DateString `json:"registrationDate,omitempty"`
 	RejectedDate     DateString `json:"rejectedDate,omitempty"`
 	WithdrawnDate    DateString `json:"withdrawnDate,omitempty"`
+	//Donor            Person     `json:"donor"`
 }
 
 func (c Case) Summary() string {

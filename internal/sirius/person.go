@@ -1,6 +1,9 @@
 package sirius
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Person struct {
 	ID                    int        `json:"id,omitempty"`
@@ -28,11 +31,26 @@ type Person struct {
 	CorrespondenceByPhone bool       `json:"correspondenceByPhone"`
 	CorrespondenceByWelsh bool       `json:"correspondenceByWelsh"`
 	ResearchOptOut        bool       `json:"researchOptOut"`
+	PersonType            string     `json:"personType,omitempty"`
 	Children              []Person   `json:"children,omitempty"`
+	//Cases                 []Case     `json:"cases"`
 }
 
 func (p Person) Summary() string {
 	return fmt.Sprintf("%s %s", p.Firstname, p.Surname)
+}
+
+func (p Person) AddressSummary() string {
+	i := 0
+	s := []string{p.AddressLine1, p.AddressLine2, p.AddressLine3, p.Town, p.County, p.Postcode, p.Country}
+	for _, x := range s {
+		if x != "" {
+			s[i] = x
+			i++
+		}
+	}
+	s = s[:i]
+	return fmt.Sprintf(strings.Join(s, ", "))
 }
 
 func (c *Client) Person(ctx Context, id int) (Person, error) {

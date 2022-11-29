@@ -1,0 +1,116 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Search{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">Search results</h1>
+        </div>
+    </div>
+
+    <div class="moj-filter-layout">
+        {{ template "search-filter" . }}
+
+        <div class="moj-filter-layout__content govuk-!-padding-left-2 govuk-!-padding-right-2">
+            <div class="moj-action-bar govuk">
+                <div class="moj-action-bar__filter govuk-!-margin-bottom-0">
+                </div>
+            </div>
+
+            <h3 class="govuk-heading-s govuk-!-margin-bottom-6">You searched for:  {{ .SearchTerm }}</h3>
+            {{ if eq .Total 0 }}
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-one-half">
+                        <h2 class="govuk-heading-m">No cases were found</h2>
+                        <p class="govuk-body">This could be because:</p>
+                        <ul class="govuk-list govuk-list--bullet">
+                            <li>the paper LPA hasn't been scanned yet</li>
+                            <li>the name is spelt incorrectly or differently on the paper LPA which means a match can't be found</li>
+                            <li>if your filter selections included the role 'Client' as well as an LPA case type (since Clients have Orders, not LPAs)</li>
+                        </ul>
+
+                        <p class="govuk-body">For the best search results try searching with the case number.</p>
+
+                        <p class="govuk-body">If you don't have the case number try searching by:</p>
+                        <ul class="govuk-list govuk-list--bullet">
+                            <li>full name and date of birth, or</li>
+                            <li>full name and postcode</li>
+                        </ul>
+                    </div>
+                </div>
+            {{ else }}
+                {{ template "pagination" .Pagination }}
+
+                <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-top-5">
+
+                <table class="govuk-table" data-module="moj-sortable-table">
+                    <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header" aria-sort="none">Case number</th>
+                        <th scope="col" class="govuk-table__header" aria-sort="none">Name/Role</th>
+                        <th scope="col" class="govuk-table__header" aria-sort="none">Date of birth</th>
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-third" aria-sort="none">Address</th>
+                        <th scope="col" class="govuk-table__header" aria-sort="none">Type</th>
+                        <th scope="col" class="govuk-table__header" aria-sort="none">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody class="govuk-table__body">
+                        {{ range $r := (slice .Results 0 (len .Results)) }}
+                        <tr class="govuk-table__row">
+                            {{ if .Cases }}
+                                <td class="govuk-table__cell govuk-link--no-visited-state">
+                                    {{ if eq (ToLower .PersonType) "donor" }}
+                                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%d/%d" .ID (index .Cases 0).ID) }}">{{ .UID }}</a>
+                                    {{ else if eq (ToLower .PersonType) "client" }}
+                                        <a class="govuk-link" href="{{ sirius (printf "/supervision#/clients/%d?order=%d" .ID (index .Cases 0).ID) }}">{{ .UID }}</a>
+                                    {{ else }}
+                                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%d/%d" (index .Cases 0).Donor.ID (index .Cases 0).ID) }}">{{ .UID }}</a>
+                                    {{ end }}
+                                </td>
+                                <td class="govuk-table__cell govuk-link--no-visited-state">
+                                    <strong>
+                                        {{ if eq (ToLower .PersonType) "donor" }}
+                                            <a class="govuk-link govuk-link--no-underline" href="{{ sirius (printf "/lpa/person/%d" .ID) }}">{{ .Summary }}</a>
+                                        {{ else if or (eq (ToLower .PersonType) "deputy") (eq (ToLower .PersonType) "client") }}
+                                            <a class="govuk-link govuk-link--no-underline" href="{{ sirius (printf "/supervision#/clients/%d" .ID) }}">{{ .Summary }}</a>
+                                        {{ else }}
+                                            <a class="govuk-link govuk-link--no-underline" href="{{ sirius (printf "/lpa/person/%d"  (index .Cases 0).Donor.ID) }}">{{ .Summary }}</a>
+                                        {{ end }}
+                                        <br>{{ .PersonType }}
+                                    </strong>
+                                </td>
+                                <td class="govuk-table__cell">{{ formatDate .DateOfBirth }}</td>
+                                <td class="govuk-table__cell">{{ .AddressSummary }}</td>
+                                <td class="govuk-table__cell">{{ (index .Cases 0).CaseType }} - {{ ToUpper (index .Cases 0).SubType }}</td>
+                                <td class="govuk-table__cell">
+                                    {{ $status := (ToLower (index .Cases 0).Status) }}
+                                    {{ if $status }}
+                                        {{ template "status-tag" $status }}
+                                    {{ end }}
+                                </td>
+                            {{ else }}
+                                <td class="govuk-table__cell">
+                                    Not associated with a case
+                                </td>
+                                <td class="govuk-table__cell">
+                                    <strong><a class="govuk-link govuk-link--no-underline" href="{{ sirius (printf "/lpa/person/%d" .ID) }}">{{ .Summary }}</a>
+                                        <br>{{ .PersonType }}
+                                    </strong>
+                                </td>
+                                <td class="govuk-table__cell">{{ formatDate .DateOfBirth }}</td>
+                                <td class="govuk-table__cell">{{ .AddressSummary }}</td>
+                                <td class="govuk-table__cell">N/A</td>
+                                <td class="govuk-table__cell">N/A</td>
+                            {{ end }}
+                        </tr>
+                    {{ end }}
+                    </tbody>
+                </table>
+
+                {{ template "duplicate-pagination" .Pagination }}
+
+            {{ end }}
+        </div>
+    </div>
+{{ end }}

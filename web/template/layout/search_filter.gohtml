@@ -1,0 +1,106 @@
+{{ define "search-filter" }}
+    <div class="moj-filter-layout__filter">
+        <div class="moj-filter">
+            <div class="moj-filter__header">
+                <div class="moj-filter__header-title">
+                    <h2 class="govuk-heading-m">Filter</h2>
+                </div>
+            </div>
+
+            <div class="moj-filter__content">
+                {{ if .Filters.PersonType }}
+                    <div class="moj-filter__selected">
+                        <div class="moj-filter__selected-heading">
+                            <div class="moj-filter__heading-title">
+                                <h2 class="govuk-heading-m">Selected filters</h2>
+                            </div>
+                            <div class="moj-filter__heading-action">
+                                <p><a class="govuk-link govuk-link--no-visited-state" href="{{ .Pagination.SearchTerm }}">Clear filters</a></p>
+                            </div>
+                        </div>
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-0">Role</h3>
+                        <ul class="moj-filter-tags">
+                            {{ $query := printf "%s%s" .Pagination.SearchTerm .Pagination.Filters }}
+                            {{ range $r := .Filters.PersonType }}
+                                {{ $toBeReplaced := (printf "&person-type=%s" (replace $r " " "+")) }}
+                                <li><a class="moj-filter__tag" href="{{ replace $query $toBeReplaced "" }}"><span class="govuk-visually-hidden">Remove this filter</span>{{ $r }}</a></li>
+                            {{ end }}
+                        </ul>
+                    </div>
+                {{ end }}
+
+                <div class="moj-filter__options">
+                    <form class="form" method="get" id="search-filters">
+                        <input type="hidden" name="term" value="{{ .SearchTerm }}"/>
+                        <button class="govuk-button" data-module="govuk-button">
+                            Apply filters
+                        </button>
+
+                        <div class="govuk-form-group">
+                            <fieldset class="govuk-fieldset">
+                                <legend class="govuk-fieldset__legend">Roles</legend>
+                                <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                    {{ $personType := .Aggregations.PersonType }}
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input" id="f-person-type-donor" name="person-type" type="checkbox" value="Donor" {{ if contains .Filters.PersonType "Donor" }}checked{{ end }}>
+                                        <label class="govuk-label govuk-checkboxes__label" for="f-person-type-donor">
+                                            Donor ({{ with $personType.Donor }}{{ . }}{{ else }}0{{ end }})
+                                        </label>
+                                    </div>
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input" id="f-person-type-client" name="person-type" type="checkbox" value="Client" {{ if contains .Filters.PersonType "Client"  }}checked{{ end }}>
+                                        <label class="govuk-label govuk-checkboxes__label" for="f-person-type-client">
+                                            Client ({{ with $personType.Client }}{{ . }}{{ else }}0{{ end }})
+                                        </label>
+                                    </div>
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input" id="f-person-type-deputy" name="person-type" type="checkbox" value="Deputy" {{ if contains .Filters.PersonType "Deputy"  }}checked{{ end }}>
+                                        <label class="govuk-label govuk-checkboxes__label" for="f-person-type-deputy">
+                                            Deputy ({{ with $personType.Deputy }}{{ . }}{{ else }}0{{ end }})
+                                        </label>
+                                    </div>
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input" id="f-person-type-attorney" name="person-type" type="checkbox" value="Attorney" {{ if contains .Filters.PersonType "Attorney"  }}checked{{ end }}>
+                                        <label class="govuk-label govuk-checkboxes__label" for="f-person-type-attorney">
+                                            Attorney ({{ with $personType.Attorney }}{{ . }}{{ else }}0{{ end }})
+                                        </label>
+                                    </div>
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input" id="f-person-type-replacement-attorney" name="person-type" type="checkbox" value="Replacement Attorney" {{ if contains .Filters.PersonType "Replacement Attorney"  }}checked{{ end }}>
+                                        <label class="govuk-label govuk-checkboxes__label" for="f-person-type-replacement-attorney">
+                                            Replacement attorney ({{ with (index $personType "Replacement Attorney") }}{{ . }}{{ else }}0{{ end }})
+                                        </label>
+                                    </div>
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input" id="f-person-type-trust-corporation" name="person-type" type="checkbox" value="Trust Corporation" {{ if contains .Filters.PersonType "Trust Corporation"  }}checked{{ end }}>
+                                        <label class="govuk-label govuk-checkboxes__label" for="f-person-type-trust-corporation">
+                                           Trust corporation ({{ with (index $personType "Trust Corporation") }}{{ . }}{{ else }}0{{ end }})
+                                        </label>
+                                    </div>
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input" id="f-person-type-trust-corporation" name="person-type" type="checkbox" value="Notified Person" {{ if contains .Filters.PersonType "Notified Person"  }}checked{{ end }}>
+                                        <label class="govuk-label govuk-checkboxes__label" for="f-person-type-notified-person">
+                                            Notified person ({{ with (index $personType "Notified Person") }}{{ . }}{{ else }}0{{ end }})
+                                        </label>
+                                    </div>
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input" id="f-person-type-certificate-provider" name="person-type" type="checkbox" value="Certificate Provider" {{ if contains .Filters.PersonType "Certificate Provider"  }}checked{{ end }}>
+                                        <label class="govuk-label govuk-checkboxes__label" for="f-person-type-certificate-provider">
+                                            Certificate provider ({{ with (index $personType "Certificate Provider") }}{{ . }}{{ else }}0{{ end }})
+                                        </label>
+                                    </div>
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input" id="f-person-type-correspondent" name="person-type" type="checkbox" value="Correspondent" {{ if contains .Filters.PersonType "Correspondent"  }}checked{{ end }}>
+                                        <label class="govuk-label govuk-checkboxes__label" for="f-person-type-correspondent">
+                                            Correspondent ({{ with $personType.Correspondent }}{{ . }}{{ else }}0{{ end }})
+                                        </label>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{{ end }}

@@ -52,6 +52,37 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			return tmplHandle
 		},
 		"ToLower": strings.ToLower,
+		"ToUpper": strings.ToUpper,
+		"contains": func(xs []string, needle string) bool {
+			for _, x := range xs {
+				if x == needle {
+					return true
+				}
+			}
+			return false
+		},
+		"minus1": func(i int) int {
+			return i - 1
+		},
+		"statusColour": func(s string) string {
+			switch s {
+			case "registered":
+				return "green"
+			case "perfect":
+				return "turquoise"
+			case "pending":
+				return "blue"
+			case "payment pending", "reduced fees pending":
+				return "purple"
+			case "cancelled", "rejected", "revoked", "withdrawn", "return unpaid", "deleted":
+				return "red"
+			default:
+				return "grey"
+			}
+		},
+		"replace": func(s, find, replace string) string {
+			return strings.ReplaceAll(s, find, replace)
+		},
 	}
 }
 
