@@ -30,7 +30,7 @@ type DocumentTemplateApiData struct {
 }
 
 type Insert struct {
-	Key      string // all/pending/imperfect/perfect/withdrawn
+	Key      string
 	InsertId string
 	UniversalTemplateData
 }

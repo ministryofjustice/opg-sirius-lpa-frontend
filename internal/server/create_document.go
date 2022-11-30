@@ -3,7 +3,6 @@ package server
 import (
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
@@ -25,7 +24,6 @@ type createDocumentData struct {
 	DocumentTemplateTypes   []sirius.RefDataItem
 	DocumentTemplateRefData []sirius.RefDataItem
 	DocumentInsertTypes     []InsertDisplayData
-	InsertCategories        []string
 	TemplateSelected        sirius.DocumentTemplateData
 }
 
@@ -104,7 +102,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 				}
 			}
 			if data.TemplateSelected.TemplateId != "" {
-				data.DocumentInsertTypes, data.InsertCategories = translateInsertData(data.TemplateSelected.Inserts, data.DocumentTemplateRefData)
+				data.DocumentInsertTypes = translateInsertData(data.TemplateSelected.Inserts, data.DocumentTemplateRefData)
 			}
 
 			//inserts := r.Form["insert"]
@@ -132,13 +130,9 @@ func translateDocumentData(documentTemplateData []sirius.DocumentTemplateData, d
 	return documentTemplateTypes
 }
 
-func translateInsertData(selectedTemplateInserts []sirius.Insert, documentTemplateRefData []sirius.RefDataItem) ([]InsertDisplayData, []string) {
+func translateInsertData(selectedTemplateInserts []sirius.Insert, documentTemplateRefData []sirius.RefDataItem) []InsertDisplayData {
 	var documentTemplateInserts []InsertDisplayData
-	var insertCategories []string
 	for _, in := range selectedTemplateInserts {
-		if !slices.Contains(insertCategories, in.Key) {
-			insertCategories = append(insertCategories, in.Key)
-		}
 		for _, refData := range documentTemplateRefData {
 			if refData.Handle == in.OnScreenSummary {
 				translatedRefDataItem := InsertDisplayData{
@@ -150,5 +144,5 @@ func translateInsertData(selectedTemplateInserts []sirius.Insert, documentTempla
 			}
 		}
 	}
-	return documentTemplateInserts, insertCategories
+	return documentTemplateInserts
 }
