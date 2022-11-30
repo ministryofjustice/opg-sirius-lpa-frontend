@@ -1,9 +1,9 @@
 package server
 
 import (
-	"fmt"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
@@ -24,12 +24,22 @@ type createDocumentData struct {
 	DocumentTemplates       []sirius.DocumentTemplateData
 	DocumentTemplateTypes   []sirius.RefDataItem
 	DocumentTemplateRefData []sirius.RefDataItem
-	TemplateId              string
+	DocumentInsertTypes     []InsertDisplayData
+	InsertCategories        []string
 	TemplateSelected        sirius.DocumentTemplateData
+}
+
+type InsertDisplayData struct {
+	Handle string
+	Label  string
+	Key    string
 }
 
 func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
+		if err := r.ParseForm(); err != nil {
+			return err
+		}
 		ctx := getContext(r)
 		data := createDocumentData{
 			XSRFToken: ctx.XSRFToken,
@@ -84,22 +94,20 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 
 			data.DocumentTemplateTypes = translateDocumentData(data.DocumentTemplates, data.DocumentTemplateRefData)
 
-			data.TemplateId = r.FormValue("templateId")
-
-			fmt.Println(data.TemplateSelected)
-
-			if data.TemplateId != "" {
+			templateId := r.FormValue("templateId")
+			if templateId != "" {
 				for _, dt := range data.DocumentTemplates {
-					if dt.TemplateId == data.TemplateId {
+					if dt.TemplateId == templateId {
 						data.TemplateSelected = dt
 						break
 					}
 				}
 			}
+			if data.TemplateSelected.TemplateId != "" {
+				data.DocumentInsertTypes, data.InsertCategories = translateInsertData(data.TemplateSelected.Inserts, data.DocumentTemplateRefData)
+			}
 
-			fmt.Println(data.TemplateSelected)
-
-		case http.MethodPost:
+			//inserts := r.Form["insert"]
 		}
 
 		return tmpl(w, data)
@@ -122,4 +130,25 @@ func translateDocumentData(documentTemplateData []sirius.DocumentTemplateData, d
 	}
 
 	return documentTemplateTypes
+}
+
+func translateInsertData(selectedTemplateInserts []sirius.Insert, documentTemplateRefData []sirius.RefDataItem) ([]InsertDisplayData, []string) {
+	var documentTemplateInserts []InsertDisplayData
+	var insertCategories []string
+	for _, in := range selectedTemplateInserts {
+		if !slices.Contains(insertCategories, in.Key) {
+			insertCategories = append(insertCategories, in.Key)
+		}
+		for _, refData := range documentTemplateRefData {
+			if refData.Handle == in.OnScreenSummary {
+				translatedRefDataItem := InsertDisplayData{
+					Handle: in.InsertId,
+					Label:  refData.Label,
+					Key:    in.Key,
+				}
+				documentTemplateInserts = append(documentTemplateInserts, translatedRefDataItem)
+			}
+		}
+	}
+	return documentTemplateInserts, insertCategories
 }

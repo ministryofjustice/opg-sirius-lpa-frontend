@@ -9,21 +9,39 @@
 
             {{ template "error-summary" .Error }}
 
-            {{ if .TemplateId  }}
-            <a href="create-document?id={{ .Case.ID }}&case={{ .Case.CaseType }}" class="govuk-back-link">Back</a>
+            {{ if .TemplateSelected.TemplateId }}
+                <a href="create-document?id={{ .Case.ID }}&case={{ .Case.CaseType }}" class="govuk-back-link">Back</a>
 
-            <h1 class="govuk-heading-l app-!-embedded-hide">Create Draft</h1>
-            <h2 class="govuk-heading-m">{{ .TemplateId }}</h2>
+                <h1 class="govuk-heading-l app-!-embedded-hide">Create Draft</h1>
+                <h2 class="govuk-heading-m">Template: {{ .TemplateSelected.TemplateId }}</h2>
 
-            <form class="form" method="GET">
+                <form class="form" method="GET">
                 <input type="hidden" name="id" value="{{ .Case.ID }}"/>
                 <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
-                <input type="hidden" name="templateId" value="{{ .TemplateId }}"/>
+                <input type="hidden" name="templateId" value="{{ .TemplateSelected.TemplateId }}"/>
 
+                {{ if eq (len .DocumentInsertTypes) 0 }}
+                    <p class="govuk-body">No inserts available for this template</p>
+                    <div class="govuk-button-group govuk-!-padding-top-5">
+                        <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
+                        <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+                    </div>
+                {{ else }}
+                <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                    {{ range $.DocumentInsertTypes }}
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="f-{{ .Handle }}" name="insert" type="checkbox" value="{{ .Handle }}"/>
+                                <label class="govuk-label govuk-checkboxes__label" for="f-{{ .Handle }}">
+                                    {{ .Handle }}: {{ .Label }}
+                                </label>
+                            </div>
+                        {{ end }}
+                </div>
                 <div class="govuk-button-group govuk-!-padding-top-5">
-                    <button class="govuk-button" data-module="govuk-button" type="submit">Select insert</button>
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Select inserts</button>
                     <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
                 </div>
+                {{ end }}
             </form>
 
             {{ else }}
