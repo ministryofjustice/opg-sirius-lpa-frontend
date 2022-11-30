@@ -81,9 +81,9 @@ func TestDocumentTypes(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				types, err := client.TaskTypes(Context{Context: context.Background()})
+				documentTemplateTypes, err := client.DocumentTemplates(Context{Context: context.Background()}, CaseTypeLpa)
 
-				assert.Equal(t, tc.expectedResponse, types)
+				assert.Equal(t, tc.expectedResponse, documentTemplateTypes)
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
