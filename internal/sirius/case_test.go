@@ -36,6 +36,7 @@ func TestCase(t *testing.T) {
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
 						Body: dsl.Like(map[string]interface{}{
+							"ID":       800,
 							"uId":      dsl.String("7000-0000-0000"),
 							"caseType": dsl.String("LPA"),
 							"status":   dsl.String("Pending"),
@@ -43,7 +44,7 @@ func TestCase(t *testing.T) {
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
-			expectedResponse: Case{UID: "7000-0000-0000", CaseType: "LPA", Status: "Pending"},
+			expectedResponse: Case{ID: 800, UID: "7000-0000-0000", CaseType: "LPA", Status: "Pending"},
 		},
 	}
 

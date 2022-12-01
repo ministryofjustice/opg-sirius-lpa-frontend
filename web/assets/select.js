@@ -1,21 +1,29 @@
 import accessibleAutocomplete from "accessible-autocomplete";
 
 export default function select(prefix) {
-  enhanceElement(
+  enhanceUserPersonSearchElement(
     document.querySelector("[data-select-user]"),
     fetchUser(prefix)
   );
-  enhanceElement(
+  enhanceUserPersonSearchElement(
     document.querySelector("[data-select-person]"),
     fetchPerson(prefix)
   );
-  accessibleAutocomplete.enhanceSelectElement({
-    selectElement: document.querySelector('#f-templateId'),
-    showAllValues: true,
-  })
+  enhanceTemplateSearchElement(
+      document.querySelector('[data-select-template]')
+  );
 }
 
-function enhanceElement(element, source) {
+function enhanceTemplateSearchElement(element){
+  if (element) {
+    accessibleAutocomplete.enhanceSelectElement({
+      selectElement: element,
+      showAllValues: true,
+    });
+  }
+}
+
+function enhanceUserPersonSearchElement(element, source) {
   if (element) {
     accessibleAutocomplete.enhanceSelectElement({
       selectElement: element,

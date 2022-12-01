@@ -15,7 +15,7 @@
                 <h1 class="govuk-heading-l app-!-embedded-hide">Create Draft</h1>
                 <h2 class="govuk-heading-m">Template: {{ .TemplateSelected.TemplateId }}</h2>
 
-                <form class="form" method="GET">
+            <form class="form" method="GET">
                 <input type="hidden" name="id" value="{{ .Case.ID }}"/>
                 <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
                 <input type="hidden" name="templateId" value="{{ .TemplateSelected.TemplateId }}"/>
@@ -35,7 +35,7 @@
                                     {{ .Handle }}: {{ .Label }}
                                 </label>
                             </div>
-                        {{ end }}
+                    {{ end }}
                 </div>
                 <div class="govuk-button-group govuk-!-padding-top-5">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Select inserts</button>
@@ -57,7 +57,7 @@
                                 Select a template
                             </label>
                             {{ template "errors" .Error.Field.templateId }}
-                            <select class="govuk-select {{ if .Error.Field.templateId }}govuk-select--error{{ end }}" id="f-templateId" name="templateId" required>
+                            <select class="govuk-select {{ if .Error.Field.templateId }}govuk-select--error{{ end }}" id="f-templateId" name="templateId" required data-select-template>
                                 <option hidden {{ if not nil }}selected{{ end }} disabled></option>
                                 {{ range .DocumentTemplateTypes }}
                                     <option value="{{ .Handle }}" {{ if eq .Handle nil }}selected{{ end }}>{{ .Handle }}: {{ .Label }}</option>

@@ -287,17 +287,25 @@ func TestRefDataByCategoryDocumentTemplateId(t *testing.T) {
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
-						Body: dsl.EachLike(map[string]interface{}{
-							"handle": dsl.String("EP(BB)"),
-							"label":  dsl.String("EP(bb): Blank Template"),
-						}, 1),
+						Body: dsl.Like([]map[string]interface{}{{
+							"handle": dsl.String("DDONSCREENSUMMARY"),
+							"label":  dsl.String("Donor deceased: Blank template"),
+						}, {
+							"handle": dsl.String("DD1LPAINSERTONSCREENSUMMARY"),
+							"label":  dsl.String("DD1 - Case complete"),
+						},
+						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
 			expectedResponse: []RefDataItem{
 				{
-					Handle: "EP(BB)",
-					Label:  "EP(bb): Blank Template",
+					Handle: "DDONSCREENSUMMARY",
+					Label:  "Donor deceased: Blank template",
+				},
+				{
+					Handle: "DD1LPAINSERTONSCREENSUMMARY",
+					Label:  "DD1 - Case complete",
 				},
 			},
 		},
