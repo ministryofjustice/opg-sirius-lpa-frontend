@@ -50,10 +50,28 @@ func (s DateString) MarshalJSON() ([]byte, error) {
 }
 
 func (s DateString) ToSirius() (string, error) {
-	parts := strings.Split(string(s), "-")
-	if len(parts) != 3 {
-		return "", errors.New("failed to format non-date")
+	parts, err := s.SplitDateString()
+	if err != nil {
+		return "", err
 	}
 
 	return fmt.Sprintf(`%s/%s/%s`, parts[2], parts[1], parts[0]), nil
+}
+
+func (s DateString) SplitDateString() ([]string, error) {
+	parts := strings.Split(string(s), "-")
+	if len(parts) != 3 {
+		return []string{}, errors.New("failed to format non-date")
+	}
+
+	return parts, nil
+}
+
+func (s DateString) GetYear() (string, error) {
+	parts, err := s.SplitDateString()
+	if err != nil {
+		return "", err
+	}
+
+	return parts[0], nil
 }

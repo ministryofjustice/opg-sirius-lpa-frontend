@@ -22,6 +22,4 @@ describe("Add a payment", () => {
         cy.get('[data-module="select-todays-date"]').click();
         cy.get("#f-paymentDate").should('have.value', "2022-02-25")
     });
-
-
 });

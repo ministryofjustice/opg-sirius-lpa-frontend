@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-const PageLimit = 10
+const PageLimit = 25
 
 type searchRequest struct {
 	Term        string   `json:"term"`
@@ -17,8 +17,8 @@ type searchRequest struct {
 	From        int      `json:"from"`
 }
 
-type AggregationsResult struct {
-	PersonType map[string]interface{} `json:"personType"`
+type Aggregations struct {
+	PersonType map[string]int `json:"personType"`
 }
 
 type SearchTotal struct {
@@ -26,10 +26,9 @@ type SearchTotal struct {
 }
 
 type SearchResponse struct {
-	Results            []Person           `json:"results"`
-	RawAggregations    json.RawMessage    `json:"aggregations"`
-	AggregationsObject AggregationsResult `json:"-"`
-	Total              SearchTotal        `json:"total"`
+	Results      []Person     `json:"results"`
+	Aggregations Aggregations `json:"aggregations,omitempty"`
+	Total        SearchTotal  `json:"total"`
 }
 
 var AllPersonTypes = []string{
@@ -75,14 +74,6 @@ func (c *Client) Search(ctx Context, term string, page int, personTypeFilters []
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
-		return v, nil, err
-	}
-
-	if v.RawAggregations[0] != '[' {
-		err = json.Unmarshal(v.RawAggregations, &v.AggregationsObject)
-	}
-
-	if err != nil {
 		return v, nil, err
 	}
 

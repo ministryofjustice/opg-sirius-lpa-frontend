@@ -83,6 +83,12 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"replace": func(s, find, replace string) string {
 			return strings.ReplaceAll(s, find, replace)
 		},
+		"dateYear": func(s sirius.DateString) (string, error) {
+			if s != "" {
+				return s.GetYear()
+			}
+			return "", nil
+		},
 	}
 }
 

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
@@ -12,10 +13,9 @@ type SearchClient interface {
 }
 
 type searchData struct {
-	Error        sirius.ValidationError
 	Results      []sirius.Person
 	Total        int
-	Aggregations sirius.AggregationsResult
+	Aggregations sirius.Aggregations
 	Filters      searchFilters
 	SearchTerm   string
 	Pagination   *Pagination
@@ -60,6 +60,9 @@ func Search(client SearchClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 		searchTerm := r.FormValue("term")
+		if searchTerm == "" {
+			return errors.New("search term required")
+		}
 		sv := url.Values{}
 		sv.Add("term", r.FormValue("term"))
 
@@ -77,8 +80,8 @@ func Search(client SearchClient, tmpl template.Template) Handler {
 
 		data.Results = results.Results
 		data.Total = results.Total.Count
-		data.Aggregations = results.AggregationsObject
-		data.Pagination = newPaginationWithQuery(pagination, sv.Encode(), filters.Encode())
+		data.Aggregations = results.Aggregations
+		data.Pagination = newPagination(pagination, sv.Encode(), filters.Encode())
 
 		return tmpl(w, data)
 	}

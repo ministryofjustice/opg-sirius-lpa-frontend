@@ -32,13 +32,13 @@
                 <div class="moj-filter__options">
                     <form class="form" method="get" id="search-filters">
                         <input type="hidden" name="term" value="{{ .SearchTerm }}"/>
-                        <button class="govuk-button" data-module="govuk-button">
+                        <button class="govuk-button" data-module="govuk-button" type="submit">
                             Apply filters
                         </button>
 
                         <div class="govuk-form-group">
                             <fieldset class="govuk-fieldset">
-                                <legend class="govuk-fieldset__legend">Roles</legend>
+                                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">Role</legend>
                                 <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                                     {{ $personType := .Aggregations.PersonType }}
                                     <div class="govuk-checkboxes__item">

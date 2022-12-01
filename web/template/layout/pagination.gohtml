@@ -28,13 +28,7 @@
     {{ end }}
 {{ end }}
 
-{{ define "pagination" }}
-    <nav class="moj-pagination" aria-label="Pagination navigation">
-        {{ template "pagination-inner" . }}
-    </nav>
-{{ end }}
-
-{{ define "duplicate-pagination" }}
+{{ define "pagination-footer" }}
     <nav class="moj-pagination" aria-label="Pagination navigation (in footer)">
         {{ template "pagination-inner" . }}
     </nav>

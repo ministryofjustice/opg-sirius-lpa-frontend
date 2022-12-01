@@ -33,7 +33,7 @@ type Person struct {
 	ResearchOptOut        bool       `json:"researchOptOut"`
 	PersonType            string     `json:"personType,omitempty"`
 	Children              []Person   `json:"children,omitempty"`
-	//Cases                 []Case     `json:"cases"`
+	Cases                 []*Case    `json:"cases,omitempty"`
 }
 
 func (p Person) Summary() string {

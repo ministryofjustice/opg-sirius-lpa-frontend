@@ -13,7 +13,7 @@ type Pagination struct {
 	PageSize    int
 }
 
-func newPaginationWithQuery(p *sirius.Pagination, s, f string) *Pagination {
+func newPagination(p *sirius.Pagination, s, f string) *Pagination {
 	if p == nil {
 		return nil
 	}
