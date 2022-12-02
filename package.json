@@ -19,7 +19,7 @@
     "jquery": "^3.6.1"
   },
   "devDependencies": {
-    "esbuild": "^0.14.27",
+    "esbuild": "^0.15.0",
     "prettier": "^2.5.1",
     "sass": "^1.26.11"
   },
