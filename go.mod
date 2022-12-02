@@ -3,7 +3,7 @@ module github.com/ministryofjustice/opg-sirius-lpa-frontend
 go 1.17
 
 require (
-	github.com/ministryofjustice/opg-go-common v0.0.0-20220308143936-cab4e8742f40
+	github.com/ministryofjustice/opg-go-common v0.0.0-20220816144329-763497f29f90
 	github.com/pact-foundation/pact-go v1.7.0
 	github.com/stretchr/testify v1.8.1
 	go.opentelemetry.io/contrib/detectors/aws/ecs v1.11.1
