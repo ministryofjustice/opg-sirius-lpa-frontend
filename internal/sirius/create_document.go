@@ -7,7 +7,11 @@ import (
 	"net/http"
 )
 
-func (c *Client) CreateDraftDocument(ctx Context, caseID, correspondentID int, templateID string, inserts []string) error {
+type DocumentData struct {
+	DocumentID int `json:"id"`
+}
+
+func (c *Client) CreateDocument(ctx Context, caseID, correspondentID int, templateID string, inserts []string) (*DocumentData, error) {
 	data, err := json.Marshal(struct {
 		TemplateID      string   `json:"templateId"`
 		Inserts         []string `json:"inserts"`
@@ -19,31 +23,36 @@ func (c *Client) CreateDraftDocument(ctx Context, caseID, correspondentID int, t
 	})
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("/lpa-api/v1/lpas/%d/documents/draft", caseID), bytes.NewReader(data))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v ValidationError
 		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
-			return err
+			return nil, err
 		}
-		return v
+		return nil, v
 	}
 
 	if resp.StatusCode != http.StatusCreated {
-		return newStatusError(resp)
+		return nil, newStatusError(resp)
 	}
 
-	return nil
+	var v DocumentData
+	if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
+		return nil, err
+	}
+
+	return &v, nil
 }

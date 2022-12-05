@@ -10,7 +10,7 @@
             {{ template "error-summary" .Error }}
 
             {{ if .HasViewedInsertPage }}
-                <a href="create-document?id={{ .Case.ID }}&case={{ .Case.CaseType }}&templateId={{ .TemplateSelected.TemplateId }}&hasViewedInserts=true&insert={{.SelectedInserts}}" class="govuk-back-link">Back</a>
+                <a href="create-document?id={{ .Case.ID }}&case={{ .Case.CaseType }}&templateId={{ .TemplateSelected.TemplateId }}" class="govuk-back-link">Back</a>
 
                 <h1 class="govuk-heading-l app-!-embedded-hide">Create Draft</h1>
                 <div class="govuk-form-group {{ if .Error.Field.selectOrGenerateRecipient }}govuk-form-group--error{{ end }}">
@@ -33,6 +33,9 @@
                                     </label>
                                 </div>
                                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-recipientControls">
+                                    {{ if eq (len .Recipients) 0 }}
+                                        <p class="govuk-body">No recipients available to select</p>
+                                    {{ else }}
                                     <div class="govuk-!-width-one-half govuk-form-group {{ if .Error.Field.selectRecipient }}govuk-form-group--error{{ end }}">
                                         <div class="govuk-form-group {{ if .Error.Field.selectRecipient }}govuk-form-group--error{{ end }}">
                                             <label class="govuk-label" for="f-selectRecipient">
@@ -43,7 +46,11 @@
                                                 <option hidden {{ if not nil }}selected{{ end }} disabled></option>
                                                 {{ range $r := .Recipients }}
                                                     <option value="{{ .ID }}" {{ if eq .ID $r.ID }}selected{{ end }} >
-                                                        {{ .Salutation }} {{ .Firstname }} {{ .Surname }} ({{ .Type }}) -
+                                                        {{ if .CompanyName  }}
+                                                            {{ .CompanyName }} ({{ .PersonType }}) -
+                                                        {{ else }}
+                                                            {{ .Salutation }} {{ .Firstname }} {{ .Surname }} ({{ .PersonType }}) -
+                                                        {{ end }}
                                                         {{ .AddressLine1 }}, {{ .AddressLine2 }}, {{ .AddressLine3 }}, {{ .Town }}, {{ .County }}, {{ .Postcode }}.
                                                     </option>
                                                 {{ end }}
@@ -53,6 +60,7 @@
                                     <div class="govuk-button-group">
                                         <button class="govuk-button" data-module="govuk-button" type="submit">Select recipient</button>
                                     </div>
+                                    {{ end }}
                                 </div>
                                 <div class="govuk-radios__item">
                                     <input class="govuk-radios__input" id="f-recipientControls-2" name="recipientControls" type="radio" value="generate" data-aria-controls="conditional-recipientControls-2" {{ if eq "generate" .RecipientControls }}checked{{ end }}>

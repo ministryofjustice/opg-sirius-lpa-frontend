@@ -31,7 +31,7 @@ type Person struct {
 	Children              []Person   `json:"children,omitempty"`
 	CompanyName           string     `json:"companyName,omitempty"`
 	CompanyReference      string     `json:"companyReference,omitempty"`
-	Type                  string     `json:"type"`
+	PersonType            string     `json:"personType"`
 }
 
 func (p Person) Summary() string {

@@ -13,7 +13,7 @@ type CreateDocumentClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
 	CreateContact(ctx sirius.Context, contact sirius.Person) (sirius.Person, error)
-	CreateDraftDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) error
+	CreateDraftDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (*sirius.DocumentData, error)
 }
 
 type createDocumentData struct {
@@ -113,7 +113,11 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 		if hasViewedInsertPage == "true" {
 			data.HasViewedInsertPage = true
 			inserts := r.Form["insert"]
-			data.SelectedInserts = inserts
+			if len(inserts) == 0 {
+				data.SelectedInserts = []string{}
+			} else {
+				data.SelectedInserts = inserts
+			}
 		}
 
 		switch r.Method {
@@ -127,7 +131,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 					return err
 				}
 
-				err = client.CreateDraftDocument(ctx, caseID, selectedRecipientID, data.TemplateSelected.TemplateId, data.SelectedInserts)
+				_, err = client.CreateDraftDocument(ctx, caseID, selectedRecipientID, data.TemplateSelected.TemplateId, data.SelectedInserts)
 				if err != nil {
 					return err
 				}
