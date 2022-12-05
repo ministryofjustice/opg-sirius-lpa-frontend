@@ -1,0 +1,30 @@
+{{ define "deleted-case" }}
+    <table class="govuk-table">
+        <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">UID</th>
+            <th scope="col" class="govuk-table__header">Online LPA ID</th>
+            <th scope="col" class="govuk-table__header">Deleted on</th>
+            <th scope="col" class="govuk-table__header">Reason</th>
+            <th scope="col" class="govuk-table__header">Type</th>
+            <th scope="col" class="govuk-table__header">Status (was)</th>
+        </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+            {{ range . }}
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">{{ .UID }}</td>
+                    <td class="govuk-table__cell">{{ .OnlineLpaId }}</td>
+                    <td class="govuk-table__cell">{{ .DeletedAt }}</td>
+                    <td class="govuk-table__cell">{{ .Reason }}</td>
+                    <td class="govuk-table__cell">{{ .Type }}</td>
+                    <td class="govuk-table__cell">
+                        {{ if .Status }}
+                            {{ template "status-tag" (ToLower .Status) }}
+                        {{ end }}
+                    </td>
+                </tr>
+            {{ end }}
+        </tbody>
+    </table>
+{{ end }}

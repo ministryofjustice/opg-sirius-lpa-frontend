@@ -6,10 +6,12 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
 	"net/url"
+	"regexp"
 )
 
 type SearchClient interface {
 	Search(ctx sirius.Context, term string, page int, personTypeFilters []string) (sirius.SearchResponse, *sirius.Pagination, error)
+	DeletedCases(ctx sirius.Context, uid string) ([]sirius.DeletedCase, error)
 }
 
 type searchData struct {
@@ -19,6 +21,7 @@ type searchData struct {
 	Filters      searchFilters
 	SearchTerm   string
 	Pagination   *Pagination
+	DeletedCases []sirius.DeletedCase
 }
 
 type searchFilters struct {
@@ -76,6 +79,22 @@ func Search(client SearchClient, tmpl template.Template) Handler {
 		results, pagination, err := client.Search(ctx, searchTerm, getPage(r), filters.PersonType)
 		if err != nil {
 			return err
+		}
+
+		if results.Total.Count == 0 {
+			re := regexp.MustCompile(`\D+`)
+			formattedTerm := re.ReplaceAllString(searchTerm, "")
+			isUid, err := regexp.MatchString(`^\d{12}$`, re.ReplaceAllString(formattedTerm, ""))
+			if err != nil {
+				return err
+			}
+
+			if isUid {
+				data.DeletedCases, err = client.DeletedCases(ctx, formattedTerm)
+				if err != nil {
+					return err
+				}
+			}
 		}
 
 		data.Results = results.Results
