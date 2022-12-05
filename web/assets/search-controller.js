@@ -4,6 +4,7 @@ const searchController = () => {
 
     if (searchForm && searchInput) {
         searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
             if (searchInput.value.length !== 0) {
                 window.location.href = window.location.origin + "/search?term=" + searchInput.value;
             }

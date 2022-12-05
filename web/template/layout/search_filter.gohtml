@@ -78,7 +78,7 @@
                                         </label>
                                     </div>
                                     <div class="govuk-checkboxes__item">
-                                        <input class="govuk-checkboxes__input" id="f-person-type-trust-corporation" name="person-type" type="checkbox" value="Notified Person" {{ if contains .Filters.PersonType "Notified Person"  }}checked{{ end }}>
+                                        <input class="govuk-checkboxes__input" id="f-person-type-notified-person" name="person-type" type="checkbox" value="Notified Person" {{ if contains .Filters.PersonType "Notified Person"  }}checked{{ end }}>
                                         <label class="govuk-label govuk-checkboxes__label" for="f-person-type-notified-person">
                                             Notified person ({{ with (index $personType "Notified Person") }}{{ . }}{{ else }}0{{ end }})
                                         </label>
