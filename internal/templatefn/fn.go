@@ -74,7 +74,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "blue"
 			case "payment pending", "reduced fees pending":
 				return "purple"
-			case "cancelled", "rejected", "revoked", "withdrawn", "return unpaid", "deleted":
+			case "cancelled", "rejected", "revoked", "withdrawn", "return - unpaid", "deleted":
 				return "red"
 			default:
 				return "grey"
