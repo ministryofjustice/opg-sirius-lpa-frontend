@@ -26,7 +26,7 @@ type SearchTotal struct {
 }
 
 type SearchResponse struct {
-	Results      []Person     `json:"results"`
+	Results      []Person     `json:"results,omitempty"`
 	Aggregations Aggregations `json:"aggregations,omitempty"`
 	Total        SearchTotal  `json:"total"`
 }

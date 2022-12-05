@@ -83,14 +83,14 @@ func Search(client SearchClient, tmpl template.Template) Handler {
 
 		if results.Total.Count == 0 {
 			re := regexp.MustCompile(`\D+`)
-			formattedTerm := re.ReplaceAllString(searchTerm, "")
-			isUid, err := regexp.MatchString(`^\d{12}$`, re.ReplaceAllString(formattedTerm, ""))
+			input := re.ReplaceAllString(searchTerm, "")
+			isUid, err := regexp.MatchString(`^\d{12}$`, re.ReplaceAllString(input, ""))
 			if err != nil {
 				return err
 			}
 
 			if isUid {
-				data.DeletedCases, err = client.DeletedCases(ctx, formattedTerm)
+				data.DeletedCases, err = client.DeletedCases(ctx, input)
 				if err != nil {
 					return err
 				}
