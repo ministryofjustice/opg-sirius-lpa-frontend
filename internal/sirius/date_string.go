@@ -61,7 +61,7 @@ func (s DateString) ToSirius() (string, error) {
 func (s DateString) SplitDateString() ([]string, error) {
 	parts := strings.Split(string(s), "-")
 	if len(parts) != 3 {
-		return []string{}, errors.New("failed to format non-date")
+		return nil, errors.New("failed to format non-date")
 	}
 
 	return parts, nil

@@ -66,8 +66,8 @@ func Search(client SearchClient, tmpl template.Template) Handler {
 		if searchTerm == "" {
 			return errors.New("search term required")
 		}
-		sv := url.Values{}
-		sv.Add("term", r.FormValue("term"))
+		search := url.Values{}
+		search.Add("term", r.FormValue("term"))
 
 		filters := newSearchFilters(r.Form)
 
@@ -100,7 +100,7 @@ func Search(client SearchClient, tmpl template.Template) Handler {
 		data.Results = results.Results
 		data.Total = results.Total.Count
 		data.Aggregations = results.Aggregations
-		data.Pagination = newPagination(pagination, sv.Encode(), filters.Encode())
+		data.Pagination = newPagination(pagination, search.Encode(), filters.Encode())
 
 		return tmpl(w, data)
 	}
