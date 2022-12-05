@@ -7,13 +7,22 @@ import (
 	"net/http"
 )
 
-func (c *Client) CreateInvestigation(ctx Context, caseID int, caseType CaseType, investigation Investigation) error {
-	data, err := json.Marshal(investigation)
+func (c *Client) CreateDraftDocument(ctx Context, caseID, correspondentID int, templateID string, inserts []string) error {
+	data, err := json.Marshal(struct {
+		TemplateID      string   `json:"templateId"`
+		Inserts         []string `json:"inserts"`
+		CorrespondentID int      `json:"correspondentId"`
+	}{
+		TemplateID:      templateID,
+		Inserts:         inserts,
+		CorrespondentID: correspondentID,
+	})
+
 	if err != nil {
 		return err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("/lpa-api/v1/%ss/%d/investigations", caseType, caseID), bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("/lpa-api/v1/lpas/%d/documents/draft", caseID), bytes.NewReader(data))
 	if err != nil {
 		return err
 	}

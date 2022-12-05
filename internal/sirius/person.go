@@ -9,9 +9,9 @@ type Person struct {
 	Firstname             string     `json:"firstname"`
 	Middlenames           string     `json:"middlenames"`
 	Surname               string     `json:"surname"`
-	DateOfBirth           DateString `json:"dob"`
-	PreviouslyKnownAs     string     `json:"previousNames"`
-	AlsoKnownAs           string     `json:"otherNames"`
+	DateOfBirth           DateString `json:"dob,omitempty"`
+	PreviouslyKnownAs     string     `json:"previousNames,omitempty"`
+	AlsoKnownAs           string     `json:"otherNames,omitempty"`
 	AddressLine1          string     `json:"addressLine1"`
 	AddressLine2          string     `json:"addressLine2"`
 	AddressLine3          string     `json:"addressLine3"`
@@ -27,8 +27,11 @@ type Person struct {
 	CorrespondenceByEmail bool       `json:"correspondenceByEmail"`
 	CorrespondenceByPhone bool       `json:"correspondenceByPhone"`
 	CorrespondenceByWelsh bool       `json:"correspondenceByWelsh"`
-	ResearchOptOut        bool       `json:"researchOptOut"`
+	ResearchOptOut        bool       `json:"researchOptOut,omitempty"`
 	Children              []Person   `json:"children,omitempty"`
+	CompanyName           string     `json:"companyName,omitempty"`
+	CompanyReference      string     `json:"companyReference,omitempty"`
+	Type                  string     `json:"type"`
 }
 
 func (p Person) Summary() string {

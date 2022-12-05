@@ -9,7 +9,121 @@
 
             {{ template "error-summary" .Error }}
 
-            {{ if .TemplateSelected.TemplateId }}
+            {{ if .HasViewedInsertPage }}
+                <a href="create-document?id={{ .Case.ID }}&case={{ .Case.CaseType }}&templateId={{ .TemplateSelected.TemplateId }}&hasViewedInserts=true&insert={{.SelectedInserts}}" class="govuk-back-link">Back</a>
+
+                <h1 class="govuk-heading-l app-!-embedded-hide">Create Draft</h1>
+                <div class="govuk-form-group {{ if .Error.Field.selectOrGenerateRecipient }}govuk-form-group--error{{ end }}">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend">Select or generate a recipient</legend>
+                        {{ template "errors" .Error.Field.selectOrGenerateRecipient }}
+
+                        <form class="form" method="POST">
+                            <input type="hidden" name="id" value="{{ .Case.ID }}"/>
+                            <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
+                            <input type="hidden" name="templateId" value="{{ .TemplateSelected.TemplateId }}"/>
+                            <input type="hidden" name="hasViewedInserts" value="true"/>
+                            <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+                            <div class="govuk-radios" data-module="govuk-radios">
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="f-recipientControls" name="recipientControls" type="radio" value="select" data-aria-controls="conditional-recipientControls" {{ if eq "select" .RecipientControls }}checked{{ end }}>
+                                    <label class="govuk-label govuk-radios__label" for="f-recipientControls">
+                                        Select
+                                    </label>
+                                </div>
+                                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-recipientControls">
+                                    <div class="govuk-!-width-one-half govuk-form-group {{ if .Error.Field.selectRecipient }}govuk-form-group--error{{ end }}">
+                                        <div class="govuk-form-group {{ if .Error.Field.selectRecipient }}govuk-form-group--error{{ end }}">
+                                            <label class="govuk-label" for="f-selectRecipient">
+                                                Select recipient
+                                            </label>
+                                            {{ template "errors" .Error.Field.selectRecipient }}
+                                            <select class="govuk-select {{ if .Error.Field.selectRecipient }}govuk-select--error{{ end }}" id="f-selectRecipient" name="selectRecipient">
+                                                <option hidden {{ if not nil }}selected{{ end }} disabled></option>
+                                                {{ range $r := .Recipients }}
+                                                    <option value="{{ .ID }}" {{ if eq .ID $r.ID }}selected{{ end }} >
+                                                        {{ .Salutation }} {{ .Firstname }} {{ .Surname }} ({{ .Type }}) -
+                                                        {{ .AddressLine1 }}, {{ .AddressLine2 }}, {{ .AddressLine3 }}, {{ .Town }}, {{ .County }}, {{ .Postcode }}.
+                                                    </option>
+                                                {{ end }}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="govuk-button-group">
+                                        <button class="govuk-button" data-module="govuk-button" type="submit">Select recipient</button>
+                                    </div>
+                                </div>
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="f-recipientControls-2" name="recipientControls" type="radio" value="generate" data-aria-controls="conditional-recipientControls-2" {{ if eq "generate" .RecipientControls }}checked{{ end }}>
+                                    <label class="govuk-label govuk-radios__label" for="f-recipientControls-2">
+                                        Generate
+                                    </label>
+                                </div>
+                                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-recipientControls-2">
+                                    <div class="govuk-!-width-one-half govuk-form-group {{ if .Error.Field.generateRecipient }}govuk-form-group--error{{ end }}">
+                                        {{ template "input" (field "salutation" "Salutation" nil .Error.Field.contactSalutation) }}
+                                        {{ template "input" (field "firstName" "First Name" nil .Error.Field.contactFirstname) }}
+                                        {{ template "input" (field "middlename" "Middle Name" nil .Error.Field.contactMiddlenames) }}
+                                        {{ template "input" (field "surname" "Last Name" nil .Error.Field.contactSurname) }}
+                                        {{ template "input" (field "companyName" "Company Name" nil .Error.Field.companyName) }}
+                                        {{ template "input" (field "companyReference" "Company Reference" nil .Error.Field.companyReference) }}
+                                        {{ template "input" (field "addressLine1" "Address 1" nil .Error.Field.addressLine1) }}
+                                        {{ template "input" (field "addressLine2" "Address 2" nil .Error.Field.addressLine2) }}
+                                        {{ template "input" (field "addressLine3" "Address 3" nil .Error.Field.addressLine3) }}
+                                        {{ template "input" (field "cityOrTown" "City/town" nil .Error.Field.cityOrTown) }}
+                                        {{ template "input" (field "county" "County" nil .Error.Field.county) }}
+                                        {{ template "input" (field "postcode" "Postcode" nil .Error.Field.postcode) }}
+                                        {{ template "radios" (radios "isAirmailRequired" "Is airmail required" nil .Error.Field.isAirmailRequired
+                                        (item "Yes" "Yes")
+                                        (item "No" "No")
+                                        ) }}
+                                        {{ template "input" (field "phoneNumber" "Daytime telephone" nil .Error.Field.phoneNumber) }}
+                                        {{ template "input" (field "email" "Email address" nil .Error.Field.email) }}
+                                        <div class="govuk-form-group {{ if .Error.Field.correspondenceBy }}govuk-form-group--error{{ end }}">
+                                        <fieldset class="govuk-fieldset">
+                                            <legend class="govuk-fieldset__legend">Correspondence by</legend>
+                                            {{ template "errors" .Error.Field.correspondenceBy }}
+                                            <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                                                <div class="govuk-checkboxes__item">
+                                                    <input class="govuk-checkboxes__input" id="f-correspondenceBy-post" name="correspondenceBy" type="checkbox" value="post">
+                                                    <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-post">
+                                                        Post
+                                                    </label>
+                                                </div>
+                                                <div class="govuk-checkboxes__item">
+                                                    <input class="govuk-checkboxes__input" id="f-correspondenceBy-email" name="correspondenceBy" type="checkbox" value="email">
+                                                    <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-email">
+                                                        Email
+                                                    </label>
+                                                </div>
+                                                <div class="govuk-checkboxes__item">
+                                                    <input class="govuk-checkboxes__input" id="f-correspondenceBy-phone" name="correspondenceBy" type="checkbox" value="phone">
+                                                    <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-phone">
+                                                        Phone
+                                                    </label>
+                                                </div>
+                                                <div class="govuk-checkboxes__item">
+                                                    <input class="govuk-checkboxes__input" id="f-correspondenceBy-welsh" name="correspondenceBy" type="checkbox" value="welsh">
+                                                    <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-welsh">
+                                                        Welsh
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                        </div>
+                                    </div>
+                                    <div class="govuk-button-group govuk-!-padding-top-5">
+                                        <button class="govuk-button" data-module="govuk-button" type="submit">Create new recipient</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                    </fieldset>
+                </div>
+
+            {{ else if .TemplateSelected.TemplateId }}
                 <a href="create-document?id={{ .Case.ID }}&case={{ .Case.CaseType }}" class="govuk-back-link">Back</a>
 
                 <h1 class="govuk-heading-l app-!-embedded-hide">Create Draft</h1>
@@ -19,6 +133,7 @@
                 <input type="hidden" name="id" value="{{ .Case.ID }}"/>
                 <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
                 <input type="hidden" name="templateId" value="{{ .TemplateSelected.TemplateId }}"/>
+                <input type="hidden" name="hasViewedInserts" value="true"/>
 
                 {{ if eq (len .DocumentInsertTypes) 0 }}
                     <p class="govuk-body">No inserts available for this template</p>

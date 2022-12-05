@@ -12,6 +12,8 @@ type CreateDocumentClient interface {
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
+	CreateContact(ctx sirius.Context, contact sirius.Person) (sirius.Person, error)
+	CreateDraftDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) error
 }
 
 type createDocumentData struct {
@@ -25,6 +27,10 @@ type createDocumentData struct {
 	DocumentTemplateRefData []sirius.RefDataItem
 	DocumentInsertTypes     []InsertDisplayData
 	TemplateSelected        sirius.DocumentTemplateData
+	HasViewedInsertPage     bool
+	SelectedInserts         []string
+	RecipientControls       string
+	Recipients              []sirius.Person
 }
 
 type InsertDisplayData struct {
@@ -43,69 +49,135 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 			XSRFToken: ctx.XSRFToken,
 		}
 
+		caseID, err := strconv.Atoi(r.FormValue("id"))
+		if err != nil {
+			return err
+		}
+
+		caseType, err := sirius.ParseCaseType(r.FormValue("case"))
+		if err != nil {
+			return err
+		}
+
+		group, groupCtx := errgroup.WithContext(ctx.Context)
+
+		group.Go(func() error {
+			caseItem, err := client.Case(ctx.With(groupCtx), caseID)
+			if err != nil {
+				return err
+			}
+
+			data.Case = caseItem
+			return nil
+		})
+
+		group.Go(func() error {
+			documentTemplates, err := client.DocumentTemplates(ctx.With(groupCtx), caseType)
+			if err != nil {
+				return err
+			}
+
+			data.DocumentTemplates = documentTemplates
+			return nil
+		})
+
+		group.Go(func() error {
+			documentTemplateRefData, err := client.RefDataByCategory(ctx, sirius.DocumentTemplateIdCategory)
+			if err != nil {
+				return err
+			}
+			data.DocumentTemplateRefData = documentTemplateRefData
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
+			return err
+		}
+
+		data.DocumentTemplateTypes = translateDocumentData(data.DocumentTemplates, data.DocumentTemplateRefData)
+
+		templateId := r.FormValue("templateId")
+		if templateId != "" {
+			for _, dt := range data.DocumentTemplates {
+				if dt.TemplateId == templateId {
+					data.TemplateSelected = dt
+					break
+				}
+			}
+		}
+		if data.TemplateSelected.TemplateId != "" {
+			data.DocumentInsertTypes = translateInsertData(data.TemplateSelected.Inserts, data.DocumentTemplateRefData)
+		}
+
+		hasViewedInsertPage := r.FormValue("hasViewedInserts")
+		if hasViewedInsertPage == "true" {
+			data.HasViewedInsertPage = true
+			inserts := r.Form["insert"]
+			data.SelectedInserts = inserts
+		}
+
 		switch r.Method {
-		case http.MethodGet:
-			caseID, err := strconv.Atoi(r.FormValue("id"))
-			if err != nil {
-				return err
-			}
+		case http.MethodPost:
+			recipientControls := postFormString(r, "recipientControls")
 
-			caseType, err := sirius.ParseCaseType(r.FormValue("case"))
-			if err != nil {
-				return err
-			}
-
-			group, groupCtx := errgroup.WithContext(ctx.Context)
-
-			group.Go(func() error {
-				caseItem, err := client.Case(ctx.With(groupCtx), caseID)
+			switch recipientControls {
+			case "select":
+				selectedRecipientID, err := strconv.Atoi(postFormString(r, "selectRecipient"))
 				if err != nil {
 					return err
 				}
 
-				data.Case = caseItem
-				return nil
-			})
-
-			group.Go(func() error {
-				documentTemplates, err := client.DocumentTemplates(ctx.With(groupCtx), caseType)
+				err = client.CreateDraftDocument(ctx, caseID, selectedRecipientID, data.TemplateSelected.TemplateId, data.SelectedInserts)
 				if err != nil {
 					return err
 				}
 
-				data.DocumentTemplates = documentTemplates
-				return nil
-			})
-
-			group.Go(func() error {
-				documentTemplateRefData, err := client.RefDataByCategory(ctx, sirius.DocumentTemplateIdCategory)
-				if err != nil {
+				if ve, ok := err.(sirius.ValidationError); ok {
+					w.WriteHeader(http.StatusBadRequest)
+					data.Error = ve
+				} else if err != nil {
 					return err
+				} else {
+					data.Success = true
+					// redirect
 				}
-				data.DocumentTemplateRefData = documentTemplateRefData
-				return nil
-			})
 
-			if err := group.Wait(); err != nil {
-				return err
-			}
+			case "generate":
+				contact := sirius.Person{
+					Salutation:            postFormString(r, "salutation"),
+					Firstname:             postFormString(r, "firstname"),
+					Middlenames:           postFormString(r, "middlenames"),
+					Surname:               postFormString(r, "surname"),
+					DateOfBirth:           postFormDateString(r, "dob"),
+					AddressLine1:          postFormString(r, "addressLine1"),
+					AddressLine2:          postFormString(r, "addressLine2"),
+					AddressLine3:          postFormString(r, "addressLine3"),
+					Town:                  postFormString(r, "town"),
+					County:                postFormString(r, "county"),
+					Postcode:              postFormString(r, "postcode"),
+					Country:               postFormString(r, "country"),
+					IsAirmailRequired:     postFormString(r, "isAirmailRequired") == "Yes",
+					PhoneNumber:           postFormString(r, "phoneNumber"),
+					Email:                 postFormString(r, "email"),
+					CorrespondenceByPost:  postFormCheckboxChecked(r, "correspondenceBy", "post"),
+					CorrespondenceByEmail: postFormCheckboxChecked(r, "correspondenceBy", "email"),
+					CorrespondenceByPhone: postFormCheckboxChecked(r, "correspondenceBy", "phone"),
+					CorrespondenceByWelsh: postFormCheckboxChecked(r, "correspondenceBy", "welsh"),
+					ResearchOptOut:        postFormString(r, "researchOptOut") == "Yes",
+				}
 
-			data.DocumentTemplateTypes = translateDocumentData(data.DocumentTemplates, data.DocumentTemplateRefData)
+				createdContact, err := client.CreateContact(ctx, contact)
 
-			templateId := r.FormValue("templateId")
-			if templateId != "" {
-				for _, dt := range data.DocumentTemplates {
-					if dt.TemplateId == templateId {
-						data.TemplateSelected = dt
-						break
-					}
+				if ve, ok := err.(sirius.ValidationError); ok {
+					w.WriteHeader(http.StatusBadRequest)
+					data.Error = ve
+					data.Recipients = append(data.Recipients, contact)
+				} else if err != nil {
+					return err
+				} else {
+					data.Recipients = append(data.Recipients, createdContact)
 				}
 			}
-			if data.TemplateSelected.TemplateId != "" {
-				data.DocumentInsertTypes = translateInsertData(data.TemplateSelected.Inserts, data.DocumentTemplateRefData)
-			}
-
-			//inserts := r.Form["insert"]
 		}
 
 		return tmpl(w, data)
