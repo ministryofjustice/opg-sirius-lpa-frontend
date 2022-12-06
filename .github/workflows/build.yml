@@ -151,7 +151,7 @@ jobs:
           path: /tmp/images
           key: ${{ runner.os }}-images-${{ github.run_id }}-${{ github.run_number }}
       - name: Download Artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: pacts
           path: ./pacts
@@ -183,7 +183,7 @@ jobs:
           path: /tmp/images
           key: ${{ runner.os }}-images-${{ github.run_id }}-${{ github.run_number }}
       - name: Download Artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: pacts
           path: ./pacts
