@@ -50,7 +50,7 @@ func (p Person) AddressSummary() string {
 		}
 	}
 	s = s[:i]
-	return fmt.Sprintf(strings.Join(s, ", "))
+	return strings.Join(s, ", ")
 }
 
 func (c *Client) Person(ctx Context, id int) (Person, error) {
