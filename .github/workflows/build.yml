@@ -124,7 +124,7 @@ jobs:
           files: /tmp/test-coverage.txt
           fail_ci_if_error: true
       - name: Persist Pacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: pacts
           path: |
