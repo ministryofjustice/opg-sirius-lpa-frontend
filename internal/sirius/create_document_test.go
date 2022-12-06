@@ -18,7 +18,7 @@ func TestCreateDocument(t *testing.T) {
 	testCases := []struct {
 		name           string
 		setup          func()
-		expectedResult *DocumentData
+		expectedResult DocumentData
 		expectedError  func(int) error
 	}{
 		{
@@ -48,7 +48,7 @@ func TestCreateDocument(t *testing.T) {
 						}),
 					})
 			},
-			expectedResult: &DocumentData{
+			expectedResult: DocumentData{
 				DocumentID: 1,
 			},
 		},

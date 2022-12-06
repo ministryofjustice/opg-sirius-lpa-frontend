@@ -3,6 +3,8 @@ package server
 import (
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -30,6 +32,16 @@ func (m *mockCreateDocumentClient) Case(ctx sirius.Context, id int) (sirius.Case
 func (m *mockCreateDocumentClient) DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error) {
 	args := m.Called(ctx, caseType)
 	return args.Get(0).([]sirius.DocumentTemplateData), args.Error(1)
+}
+
+func (m *mockCreateDocumentClient) CreateContact(ctx sirius.Context, contact sirius.Person) (sirius.Person, error) {
+	args := m.Called(ctx, contact)
+	return args.Get(0).(sirius.Person), args.Error(1)
+}
+
+func (m *mockCreateDocumentClient) CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.DocumentData, error) {
+	args := m.Called(ctx, caseID, correspondentID, templateID, inserts)
+	return args.Get(0).(sirius.DocumentData), args.Error(1)
 }
 
 func TestGetCreateDocument(t *testing.T) {
@@ -76,6 +88,202 @@ func TestGetCreateDocument(t *testing.T) {
 				Return(nil)
 
 			r, _ := http.NewRequest(http.MethodGet, "/?id=123&case="+caseType, nil)
+			w := httptest.NewRecorder()
+
+			err := CreateDocument(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
+func TestPostCreateDocument(t *testing.T) {
+	for _, caseType := range []string{"lpa", "epa"} {
+		t.Run(caseType, func(t *testing.T) {
+			caseItem := sirius.Case{CaseType: caseType, UID: "7000", Donor: sirius.Person{ID: 1}}
+
+			documentTemplates := []sirius.RefDataItem{
+				{
+					Handle: "DD",
+					Label:  "DD Template Label",
+				},
+			}
+
+			documentTemplateData := []sirius.DocumentTemplateData{
+				{
+					Inserts: []sirius.Insert{{
+						Key:      "All",
+						InsertId: "DDINSERT",
+						UniversalTemplateData: sirius.UniversalTemplateData{
+							Location:        `lpa\/DD.html.twig`,
+							OnScreenSummary: "DDINSERTONSCREENSUMMARY",
+						},
+					},
+					},
+					TemplateId: "DD",
+					UniversalTemplateData: sirius.UniversalTemplateData{
+						Location:        "DD.html.twig",
+						OnScreenSummary: "DDONSCREENSUMMARY",
+					},
+				},
+			}
+
+			client := &mockCreateDocumentClient{}
+			client.
+				On("Case", mock.Anything, 123).
+				Return(caseItem, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.DocumentTemplateIdCategory).
+				Return(documentTemplates, nil)
+			client.
+				On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
+				Return(documentTemplateData, nil)
+			client.
+				On("CreateDocument", mock.Anything, 123, 1, "DD", []string{"DDINSERT"}).
+				Return(sirius.DocumentData{}, nil)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, createDocumentData{
+					Case:                    caseItem,
+					DocumentTemplateRefData: documentTemplates,
+					DocumentTemplates:       documentTemplateData,
+					TemplateSelected:        documentTemplateData[0],
+					Success:                 true,
+					SelectedInserts:         []string{"DDINSERT"},
+					HasViewedInsertPage:     true,
+					Recipients:              []sirius.Person{{ID: 1}},
+				}).
+				Return(nil)
+
+			form := url.Values{
+				"id":                {"123"},
+				"case":              {caseType},
+				"templateId":        {"DD"},
+				"hasViewedInserts":  {"true"},
+				"selectRecipient":   {"1"},
+				"recipientControls": {"select"},
+				"insert":            {"DDINSERT"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := CreateDocument(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
+func TestPostCreateDocumentGenerateNewRecipient(t *testing.T) {
+	for _, caseType := range []string{"lpa", "epa"} {
+		t.Run(caseType, func(t *testing.T) {
+			caseItem := sirius.Case{CaseType: caseType, UID: "7000"}
+
+			documentTemplates := []sirius.RefDataItem{
+				{
+					Handle: "DD",
+					Label:  "DD Template Label",
+				},
+			}
+
+			documentTemplateData := []sirius.DocumentTemplateData{
+				{
+					Inserts: []sirius.Insert{{
+						Key:      "All",
+						InsertId: "DDINSERT",
+						UniversalTemplateData: sirius.UniversalTemplateData{
+							Location:        `lpa\/DD.html.twig`,
+							OnScreenSummary: "DDINSERTONSCREENSUMMARY",
+						},
+					},
+					},
+					TemplateId: "DD",
+					UniversalTemplateData: sirius.UniversalTemplateData{
+						Location:        "DD.html.twig",
+						OnScreenSummary: "DDONSCREENSUMMARY",
+					},
+				},
+			}
+
+			contact := sirius.Person{
+				CompanyName:           "Test Company Name",
+				CompanyReference:      "Test Company Reference",
+				AddressLine1:          "278 Nicole Lock",
+				AddressLine2:          "Toby Court",
+				AddressLine3:          "",
+				Town:                  "Russellstad",
+				County:                "Cumbria",
+				Postcode:              "HP19 9BW",
+				Country:               "",
+				IsAirmailRequired:     false,
+				PhoneNumber:           "072345678",
+				Email:                 "test.company@uk.test",
+				CorrespondenceByPost:  true,
+				CorrespondenceByEmail: true,
+				CorrespondenceByPhone: false,
+				CorrespondenceByWelsh: false,
+			}
+
+			client := &mockCreateDocumentClient{}
+			client.
+				On("Case", mock.Anything, 123).
+				Return(caseItem, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.DocumentTemplateIdCategory).
+				Return(documentTemplates, nil)
+			client.
+				On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
+				Return(documentTemplateData, nil)
+			client.
+				On("CreateContact", mock.Anything, contact).
+				Return(contact, nil)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, createDocumentData{
+					Case:                    caseItem,
+					DocumentTemplateRefData: documentTemplates,
+					DocumentTemplates:       documentTemplateData,
+					TemplateSelected:        documentTemplateData[0],
+					Success:                 true,
+					SelectedInserts:         []string{"DDINSERT"},
+					HasViewedInsertPage:     true,
+					Recipients:              []sirius.Person{{}, contact},
+				}).
+				Return(nil)
+
+			form := url.Values{
+				"id":                {"123"},
+				"case":              {caseType},
+				"templateId":        {"DD"},
+				"hasViewedInserts":  {"true"},
+				"recipientControls": {"generate"},
+				"insert":            {"DDINSERT"},
+				"companyName":       {"Test Company Name"},
+				"companyReference":  {"Test Company Reference"},
+				"addressLine1":      {"278 Nicole Lock"},
+				"addressLine2":      {"Toby Court"},
+				"addressLine3":      {""},
+				"town":              {"Russellstad"},
+				"county":            {"Cumbria"},
+				"postcode":          {"HP19 9BW"},
+				"isAirmailRequired": {"false"},
+				"phoneNumber":       {"072345678"},
+				"email":             {"test.company@uk.test"},
+				"correspondenceBy":  {"post", "email"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
 			err := CreateDocument(client, template.Func)(w, r)
@@ -279,9 +487,9 @@ func TestTranslateDocumentData(t *testing.T) {
 	}
 
 	documentTemplateTypes := translateDocumentData(documentTemplateData, documentTemplateRefData)
-	assert.Equal(t, documentTemplateTypes[0].Label, "DD Template Label")
-	assert.Equal(t, documentTemplateTypes[0].Handle, "DD")
-	assert.Equal(t, documentTemplateTypes[0].UserSelectable, false)
+	assert.Equal(t, "DD Template Label", documentTemplateTypes[0].Label)
+	assert.Equal(t, "DD", documentTemplateTypes[0].Handle)
+	assert.Equal(t, false, documentTemplateTypes[0].UserSelectable)
 }
 
 func TestTranslateInsertData(t *testing.T) {
@@ -304,7 +512,17 @@ func TestTranslateInsertData(t *testing.T) {
 	}
 
 	translatedInsert := translateInsertData(selectedTemplateInserts, documentTemplateRefData)
-	assert.Equal(t, translatedInsert[0].Label, "DD Insert label")
-	assert.Equal(t, translatedInsert[0].Handle, "DDINSERT")
-	assert.Equal(t, translatedInsert[0].Key, "All")
+	assert.Equal(t, "DD Insert label", translatedInsert[0].Label)
+	assert.Equal(t, "DDINSERT", translatedInsert[0].Handle)
+	assert.Equal(t, "All", translatedInsert[0].Key)
+}
+
+func TestGetRecipients(t *testing.T) {
+	caseItem := sirius.Case{Donor: sirius.Person{ID: 1}, TrustCorporations: []sirius.Person{{ID: 2}}, Attorneys: []sirius.Person{{ID: 3}}}
+
+	recipients := getRecipients(caseItem)
+	assert.Equal(t, 3, len(recipients))
+	assert.Equal(t, recipients[0].ID, 1)
+	assert.Equal(t, recipients[1].ID, 2)
+	assert.Equal(t, recipients[2].ID, 3)
 }

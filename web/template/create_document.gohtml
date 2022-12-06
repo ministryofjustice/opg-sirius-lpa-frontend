@@ -9,6 +9,11 @@
 
             {{ template "error-summary" .Error }}
 
+            {{ if .Success }}
+                <meta data-app-reload="page" />
+                {{ template "success-banner" "You have successfully created a recipient." }}
+            {{ end }}
+
             {{ if .HasViewedInsertPage }}
                 <a href="create-document?id={{ .Case.ID }}&case={{ .Case.CaseType }}&templateId={{ .TemplateSelected.TemplateId }}" class="govuk-back-link">Back</a>
 
@@ -27,7 +32,7 @@
 
                             <div class="govuk-radios" data-module="govuk-radios">
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="f-recipientControls" name="recipientControls" type="radio" value="select" data-aria-controls="conditional-recipientControls" {{ if eq "select" .RecipientControls }}checked{{ end }}>
+                                    <input class="govuk-radios__input" id="f-recipientControls" name="recipientControls" type="radio" value="select" data-aria-controls="conditional-recipientControls">
                                     <label class="govuk-label govuk-radios__label" for="f-recipientControls">
                                         Select
                                     </label>
@@ -63,7 +68,7 @@
                                     {{ end }}
                                 </div>
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="f-recipientControls-2" name="recipientControls" type="radio" value="generate" data-aria-controls="conditional-recipientControls-2" {{ if eq "generate" .RecipientControls }}checked{{ end }}>
+                                    <input class="govuk-radios__input" id="f-recipientControls-2" name="recipientControls" type="radio" value="generate" data-aria-controls="conditional-recipientControls-2">
                                     <label class="govuk-label govuk-radios__label" for="f-recipientControls-2">
                                         Generate
                                     </label>
@@ -71,15 +76,15 @@
                                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-recipientControls-2">
                                     <div class="govuk-!-width-one-half govuk-form-group {{ if .Error.Field.generateRecipient }}govuk-form-group--error{{ end }}">
                                         {{ template "input" (field "salutation" "Salutation" nil .Error.Field.contactSalutation) }}
-                                        {{ template "input" (field "firstName" "First Name" nil .Error.Field.contactFirstname) }}
-                                        {{ template "input" (field "middlename" "Middle Name" nil .Error.Field.contactMiddlenames) }}
-                                        {{ template "input" (field "surname" "Last Name" nil .Error.Field.contactSurname) }}
-                                        {{ template "input" (field "companyName" "Company Name" nil .Error.Field.companyName) }}
-                                        {{ template "input" (field "companyReference" "Company Reference" nil .Error.Field.companyReference) }}
+                                        {{ template "input" (field "firstName" "First name" nil .Error.Field.contactFirstname) }}
+                                        {{ template "input" (field "middlenames" "Middle name" nil .Error.Field.contactMiddlenames) }}
+                                        {{ template "input" (field "surname" "Last name" nil .Error.Field.contactSurname) }}
+                                        {{ template "input" (field "companyName" "Company name" nil .Error.Field.companyName) }}
+                                        {{ template "input" (field "companyReference" "Company reference" nil .Error.Field.companyReference) }}
                                         {{ template "input" (field "addressLine1" "Address 1" nil .Error.Field.addressLine1) }}
                                         {{ template "input" (field "addressLine2" "Address 2" nil .Error.Field.addressLine2) }}
                                         {{ template "input" (field "addressLine3" "Address 3" nil .Error.Field.addressLine3) }}
-                                        {{ template "input" (field "cityOrTown" "City/town" nil .Error.Field.cityOrTown) }}
+                                        {{ template "input" (field "town" "City/town" nil .Error.Field.town) }}
                                         {{ template "input" (field "county" "County" nil .Error.Field.county) }}
                                         {{ template "input" (field "postcode" "Postcode" nil .Error.Field.postcode) }}
                                         {{ template "radios" (radios "isAirmailRequired" "Is airmail required" nil .Error.Field.isAirmailRequired

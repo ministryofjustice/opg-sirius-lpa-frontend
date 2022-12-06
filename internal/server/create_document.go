@@ -13,7 +13,7 @@ type CreateDocumentClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
 	CreateContact(ctx sirius.Context, contact sirius.Person) (sirius.Person, error)
-	CreateDraftDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (*sirius.DocumentData, error)
+	CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.DocumentData, error)
 }
 
 type createDocumentData struct {
@@ -29,7 +29,6 @@ type createDocumentData struct {
 	TemplateSelected        sirius.DocumentTemplateData
 	HasViewedInsertPage     bool
 	SelectedInserts         []string
-	RecipientControls       string
 	Recipients              []sirius.Person
 }
 
@@ -118,6 +117,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 			} else {
 				data.SelectedInserts = inserts
 			}
+			data.Recipients = getRecipients(data.Case)
 		}
 
 		switch r.Method {
@@ -131,7 +131,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 					return err
 				}
 
-				_, err = client.CreateDraftDocument(ctx, caseID, selectedRecipientID, data.TemplateSelected.TemplateId, data.SelectedInserts)
+				_, err = client.CreateDocument(ctx, caseID, selectedRecipientID, data.TemplateSelected.TemplateId, data.SelectedInserts)
 				if err != nil {
 					return err
 				}
@@ -152,14 +152,14 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 					Firstname:             postFormString(r, "firstname"),
 					Middlenames:           postFormString(r, "middlenames"),
 					Surname:               postFormString(r, "surname"),
-					DateOfBirth:           postFormDateString(r, "dob"),
+					CompanyName:           postFormString(r, "companyName"),
+					CompanyReference:      postFormString(r, "companyReference"),
 					AddressLine1:          postFormString(r, "addressLine1"),
 					AddressLine2:          postFormString(r, "addressLine2"),
 					AddressLine3:          postFormString(r, "addressLine3"),
 					Town:                  postFormString(r, "town"),
 					County:                postFormString(r, "county"),
 					Postcode:              postFormString(r, "postcode"),
-					Country:               postFormString(r, "country"),
 					IsAirmailRequired:     postFormString(r, "isAirmailRequired") == "Yes",
 					PhoneNumber:           postFormString(r, "phoneNumber"),
 					Email:                 postFormString(r, "email"),
@@ -167,7 +167,6 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 					CorrespondenceByEmail: postFormCheckboxChecked(r, "correspondenceBy", "email"),
 					CorrespondenceByPhone: postFormCheckboxChecked(r, "correspondenceBy", "phone"),
 					CorrespondenceByWelsh: postFormCheckboxChecked(r, "correspondenceBy", "welsh"),
-					ResearchOptOut:        postFormString(r, "researchOptOut") == "Yes",
 				}
 
 				createdContact, err := client.CreateContact(ctx, contact)
@@ -179,6 +178,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 				} else if err != nil {
 					return err
 				} else {
+					data.Success = true
 					data.Recipients = append(data.Recipients, createdContact)
 				}
 			}
@@ -186,6 +186,15 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 
 		return tmpl(w, data)
 	}
+}
+
+func getRecipients(caseItem sirius.Case) []sirius.Person {
+	var recipients []sirius.Person
+	recipients = append(recipients, caseItem.Donor)
+	recipients = append(recipients, caseItem.TrustCorporations...)
+	recipients = append(recipients, caseItem.Attorneys...)
+
+	return recipients
 }
 
 func translateDocumentData(documentTemplateData []sirius.DocumentTemplateData, documentTemplateRefData []sirius.RefDataItem) []sirius.RefDataItem {
