@@ -1,6 +1,6 @@
 module github.com/ministryofjustice/opg-sirius-lpa-frontend
 
-go 1.17
+go 1.19
 
 require (
 	github.com/ministryofjustice/opg-go-common v0.0.0-20220816144329-763497f29f90
