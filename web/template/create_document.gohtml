@@ -49,8 +49,8 @@
                                             {{ template "errors" .Error.Field.selectRecipient }}
                                             <select class="govuk-select {{ if .Error.Field.selectRecipient }}govuk-select--error{{ end }}" id="f-selectRecipient" name="selectRecipient">
                                                 <option hidden {{ if not nil }}selected{{ end }} disabled></option>
-                                                {{ range $r := .Recipients }}
-                                                    <option value="{{ .ID }}" {{ if eq .ID $r.ID }}selected{{ end }} >
+                                                {{ range .Recipients }}
+                                                    <option value="{{ .ID }}" {{ if eq nil .ID }}selected{{ end }} >
                                                         {{ if .CompanyName  }}
                                                             {{ .CompanyName }} ({{ .PersonType }}) -
                                                         {{ else }}
