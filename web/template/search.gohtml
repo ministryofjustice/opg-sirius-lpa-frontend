@@ -93,7 +93,10 @@
                                 <td class="govuk-table__cell">{{ if .Cases }}{{ (index .Cases 0).CaseType }} - {{ ToUpper (index .Cases 0).SubType }}{{ end }}</td>
                                 <td class="govuk-table__cell" {{ if .Cases }}data-sort-value="{{ (ToLower (index .Cases 0).Status) }}"{{ end }}>
                                     {{ if .Cases }}
-                                        {{ template "status-tag" (ToLower (index .Cases 0).Status) }}
+                                        {{ $status := (ToLower (index .Cases 0).Status) }}
+                                        {{ if $status }}
+                                            {{ template "status-tag" (ToLower (index .Cases 0).Status) }}
+                                        {{ end }}
                                     {{ end }}
                                 </td>
                             </tr>

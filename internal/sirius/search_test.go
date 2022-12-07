@@ -27,7 +27,7 @@ func TestSearch(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A donor exists to be referenced by name").
+					Given("An lpa exists to be referenced by donor name").
 					UponReceiving("A search request for bob").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
@@ -45,12 +45,11 @@ func TestSearch(t *testing.T) {
 						Body: dsl.Like(map[string]interface{}{
 							"aggregations": dsl.Like(map[string]interface{}{
 								"personType": map[string]int{
-									"Donor":    3,
-									"Attorney": 2,
+									"Donor": 1,
 								},
 							}),
 							"total": dsl.Like(map[string]interface{}{
-								"count": dsl.Like(5),
+								"count": dsl.Like(1),
 							}),
 							"results": dsl.EachLike(map[string]interface{}{
 								"id":           dsl.Like(36),
@@ -88,16 +87,15 @@ func TestSearch(t *testing.T) {
 				},
 				Aggregations: Aggregations{
 					PersonType: map[string]int{
-						"Donor":    3,
-						"Attorney": 2,
+						"Donor": 1,
 					},
 				},
 				Total: SearchTotal{
-					Count: 5,
+					Count: 1,
 				},
 			},
 			expectedPagination: &Pagination{
-				TotalItems:  5,
+				TotalItems:  1,
 				CurrentPage: 1,
 				TotalPages:  1,
 				PageSize:    PageLimit,
