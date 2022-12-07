@@ -103,7 +103,7 @@ func TestGetCreateDocument(t *testing.T) {
 func TestPostCreateDocument(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseItem := sirius.Case{CaseType: caseType, UID: "7000", Donor: sirius.Person{ID: 1}}
+			caseItem := sirius.Case{CaseType: caseType, UID: "7000", Donor: &sirius.Person{ID: 1}}
 
 			documentTemplates := []sirius.RefDataItem{
 				{
@@ -186,7 +186,7 @@ func TestPostCreateDocument(t *testing.T) {
 func TestPostCreateDocumentGenerateNewRecipient(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseItem := sirius.Case{CaseType: caseType, UID: "7000"}
+			caseItem := sirius.Case{CaseType: caseType, UID: "7000", Donor: &sirius.Person{ID: 1}}
 
 			documentTemplates := []sirius.RefDataItem{
 				{
@@ -257,7 +257,7 @@ func TestPostCreateDocumentGenerateNewRecipient(t *testing.T) {
 					Success:                 true,
 					SelectedInserts:         []string{"DDINSERT"},
 					HasViewedInsertPage:     true,
-					Recipients:              []sirius.Person{{}, contact},
+					Recipients:              []sirius.Person{{ID: 1}, contact},
 				}).
 				Return(nil)
 
@@ -518,7 +518,7 @@ func TestTranslateInsertData(t *testing.T) {
 }
 
 func TestGetRecipients(t *testing.T) {
-	caseItem := sirius.Case{Donor: sirius.Person{ID: 1}, TrustCorporations: []sirius.Person{{ID: 2}}, Attorneys: []sirius.Person{{ID: 3}}}
+	caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, TrustCorporations: []sirius.Person{{ID: 2}}, Attorneys: []sirius.Person{{ID: 3}}}
 
 	recipients := getRecipients(caseItem)
 	assert.Equal(t, 3, len(recipients))
