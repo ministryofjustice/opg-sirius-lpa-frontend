@@ -36,14 +36,42 @@ func TestCase(t *testing.T) {
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
 						Body: dsl.Like(map[string]interface{}{
+							"id":       800,
 							"uId":      dsl.String("7000-0000-0000"),
 							"caseType": dsl.String("LPA"),
 							"status":   dsl.String("Pending"),
+							"donor": dsl.Like(map[string]interface{}{
+								"id":           dsl.Like(771),
+								"uId":          dsl.String("7000-0290-0192"),
+								"salutation":   dsl.String("Prof"),
+								"firstname":    dsl.String("Melanie"),
+								"surname":      dsl.String("Vanvolkenburg"),
+								"addressLine1": dsl.String("29737 Andrew Plaza"),
+								"addressLine2": dsl.String("Apt. 814"),
+								"addressLine3": dsl.String("Gislasonside"),
+								"town":         dsl.String("Hirthehaven"),
+								"county":       dsl.String("Saskatchewan"),
+								"postcode":     dsl.String("S7R 9F9"),
+								"personType":   dsl.String("Donor"),
+							}),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
-			expectedResponse: Case{UID: "7000-0000-0000", CaseType: "LPA", Status: "Pending"},
+			expectedResponse: Case{ID: 800, UID: "7000-0000-0000", CaseType: "LPA", Status: "Pending", Donor: &Person{
+				ID:           771,
+				UID:          "7000-0290-0192",
+				Salutation:   "Prof",
+				Firstname:    "Melanie",
+				Surname:      "Vanvolkenburg",
+				AddressLine1: "29737 Andrew Plaza",
+				AddressLine2: "Apt. 814",
+				AddressLine3: "Gislasonside",
+				Town:         "Hirthehaven",
+				County:       "Saskatchewan",
+				Postcode:     "S7R 9F9",
+				PersonType:   "Donor",
+			}},
 		},
 	}
 

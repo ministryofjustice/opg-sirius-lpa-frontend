@@ -38,3 +38,11 @@ $moj-page-width: 1220px;
 .app-\!-border-bottom-black {
     border-bottom-color: govuk-colour("black") !important ;
 }
+
+.autocomplete__input {
+    z-index: 1;
+}
+
+.autocomplete__dropdown-arrow-down {
+    z-index: 0;
+}
