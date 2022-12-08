@@ -36,13 +36,13 @@ func TestCase(t *testing.T) {
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
 						Body: dsl.Like(map[string]interface{}{
-							"ID":       800,
+							"id":       800,
 							"uId":      dsl.String("7000-0000-0000"),
 							"caseType": dsl.String("LPA"),
 							"status":   dsl.String("Pending"),
 							"donor": dsl.Like(map[string]interface{}{
 								"id":           dsl.Like(771),
-								"uid":          dsl.String("7000-0290-0192"),
+								"uId":          dsl.String("7000-0290-0192"),
 								"salutation":   dsl.String("Prof"),
 								"firstname":    dsl.String("Melanie"),
 								"surname":      dsl.String("Vanvolkenburg"),
