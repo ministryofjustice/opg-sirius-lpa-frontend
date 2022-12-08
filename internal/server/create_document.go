@@ -44,9 +44,6 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 			return err
 		}
 		ctx := getContext(r)
-		data := createDocumentData{
-			XSRFToken: ctx.XSRFToken,
-		}
 
 		caseID, err := strconv.Atoi(r.FormValue("id"))
 		if err != nil {
@@ -58,69 +55,65 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 			return err
 		}
 
-		group, groupCtx := errgroup.WithContext(ctx.Context)
-
-		group.Go(func() error {
-			caseItem, err := client.Case(ctx.With(groupCtx), caseID)
-			if err != nil {
-				return err
-			}
-
-			data.Case = caseItem
-			return nil
-		})
-
-		group.Go(func() error {
-			documentTemplates, err := client.DocumentTemplates(ctx.With(groupCtx), caseType)
-			if err != nil {
-				return err
-			}
-
-			data.DocumentTemplates = documentTemplates
-			return nil
-		})
-
-		group.Go(func() error {
-			documentTemplateRefData, err := client.RefDataByCategory(ctx, sirius.DocumentTemplateIdCategory)
-			if err != nil {
-				return err
-			}
-			data.DocumentTemplateRefData = documentTemplateRefData
-			return nil
-		})
-
-		if err := group.Wait(); err != nil {
+		caseItem, err := client.Case(ctx, caseID)
+		if err != nil {
 			return err
 		}
 
-		data.DocumentTemplateTypes = translateDocumentData(data.DocumentTemplates, data.DocumentTemplateRefData)
-
-		templateId := r.FormValue("templateId")
-		if templateId != "" {
-			for _, dt := range data.DocumentTemplates {
-				if dt.TemplateId == templateId {
-					data.TemplateSelected = dt
-					break
-				}
-			}
-		}
-		if data.TemplateSelected.TemplateId != "" {
-			data.DocumentInsertTypes = translateInsertData(data.TemplateSelected.Inserts, data.DocumentTemplateRefData)
-		}
-
-		hasViewedInsertPage := r.FormValue("hasViewedInserts")
-		if hasViewedInsertPage == "true" {
-			data.HasViewedInsertPage = true
-			inserts := r.Form["insert"]
-			if len(inserts) == 0 {
-				data.SelectedInserts = []string{}
-			} else {
-				data.SelectedInserts = inserts
-			}
-			data.Recipients = getRecipients(data.Case)
+		data := createDocumentData{
+			XSRFToken: ctx.XSRFToken,
+			Case:      caseItem,
 		}
 
 		switch r.Method {
+		case http.MethodGet:
+			group, groupCtx := errgroup.WithContext(ctx.Context)
+
+			group.Go(func() error {
+				documentTemplates, err := client.DocumentTemplates(ctx.With(groupCtx), caseType)
+				if err != nil {
+					return err
+				}
+
+				data.DocumentTemplates = documentTemplates
+				return nil
+			})
+
+			group.Go(func() error {
+				documentTemplateRefData, err := client.RefDataByCategory(ctx, sirius.DocumentTemplateIdCategory)
+				if err != nil {
+					return err
+				}
+				data.DocumentTemplateRefData = documentTemplateRefData
+				return nil
+			})
+
+			if err := group.Wait(); err != nil {
+				return err
+			}
+
+			data.DocumentTemplateTypes = translateDocumentData(data.DocumentTemplates, data.DocumentTemplateRefData)
+
+			templateId := r.FormValue("templateId")
+			if templateId != "" {
+				for _, dt := range data.DocumentTemplates {
+					if dt.TemplateId == templateId {
+						data.TemplateSelected = dt
+						break
+					}
+				}
+			}
+			if data.TemplateSelected.TemplateId != "" {
+				data.DocumentInsertTypes = translateInsertData(data.TemplateSelected.Inserts, data.DocumentTemplateRefData)
+			}
+
+			hasViewedInsertPage := r.FormValue("hasViewedInserts")
+			if hasViewedInsertPage == "true" {
+				data.HasViewedInsertPage = true
+				data.SelectedInserts = r.Form["insert"]
+				data.Recipients = getRecipients(data.Case)
+			}
+
 		case http.MethodPost:
 			recipientControls := postFormString(r, "recipientControls")
 
@@ -131,7 +124,13 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 					return err
 				}
 
-				_, err = client.CreateDocument(ctx, caseID, selectedRecipientID, data.TemplateSelected.TemplateId, data.SelectedInserts)
+				templateId := r.FormValue("templateId")
+				inserts := r.Form["insert"]
+				if len(inserts) == 0 {
+					inserts = []string{}
+				}
+
+				_, err = client.CreateDocument(ctx, caseID, selectedRecipientID, templateId, inserts)
 				if err != nil {
 					return err
 				}
@@ -179,6 +178,10 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 					return err
 				} else {
 					data.Success = true
+					data.TemplateSelected.TemplateId = r.FormValue("templateId")
+					data.SelectedInserts = r.Form["insert"]
+					data.HasViewedInsertPage = true
+					data.Recipients = getRecipients(data.Case)
 					data.Recipients = append(data.Recipients, createdContact)
 				}
 			}

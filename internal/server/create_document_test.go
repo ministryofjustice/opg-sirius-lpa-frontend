@@ -103,44 +103,12 @@ func TestGetCreateDocument(t *testing.T) {
 func TestPostCreateDocument(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseItem := sirius.Case{CaseType: caseType, UID: "7000", Donor: &sirius.Person{ID: 1}}
-
-			documentTemplates := []sirius.RefDataItem{
-				{
-					Handle: "DD",
-					Label:  "DD Template Label",
-				},
-			}
-
-			documentTemplateData := []sirius.DocumentTemplateData{
-				{
-					Inserts: []sirius.Insert{{
-						Key:      "All",
-						InsertId: "DDINSERT",
-						UniversalTemplateData: sirius.UniversalTemplateData{
-							Location:        `lpa\/DD.html.twig`,
-							OnScreenSummary: "DDINSERTONSCREENSUMMARY",
-						},
-					},
-					},
-					TemplateId: "DD",
-					UniversalTemplateData: sirius.UniversalTemplateData{
-						Location:        "DD.html.twig",
-						OnScreenSummary: "DDONSCREENSUMMARY",
-					},
-				},
-			}
+			caseItem := sirius.Case{CaseType: caseType, UID: "7000"}
 
 			client := &mockCreateDocumentClient{}
 			client.
 				On("Case", mock.Anything, 123).
 				Return(caseItem, nil)
-			client.
-				On("RefDataByCategory", mock.Anything, sirius.DocumentTemplateIdCategory).
-				Return(documentTemplates, nil)
-			client.
-				On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
-				Return(documentTemplateData, nil)
 			client.
 				On("CreateDocument", mock.Anything, 123, 1, "DD", []string{"DDINSERT"}).
 				Return(sirius.DocumentData{}, nil)
@@ -148,14 +116,8 @@ func TestPostCreateDocument(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, createDocumentData{
-					Case:                    caseItem,
-					DocumentTemplateRefData: documentTemplates,
-					DocumentTemplates:       documentTemplateData,
-					TemplateSelected:        documentTemplateData[0],
-					Success:                 true,
-					SelectedInserts:         []string{"DDINSERT"},
-					HasViewedInsertPage:     true,
-					Recipients:              []sirius.Person{{ID: 1}},
+					Case:    caseItem,
+					Success: true,
 				}).
 				Return(nil)
 
@@ -163,7 +125,6 @@ func TestPostCreateDocument(t *testing.T) {
 				"id":                {"123"},
 				"case":              {caseType},
 				"templateId":        {"DD"},
-				"hasViewedInserts":  {"true"},
 				"selectRecipient":   {"1"},
 				"recipientControls": {"select"},
 				"insert":            {"DDINSERT"},
@@ -188,30 +149,8 @@ func TestPostCreateDocumentGenerateNewRecipient(t *testing.T) {
 		t.Run(caseType, func(t *testing.T) {
 			caseItem := sirius.Case{CaseType: caseType, UID: "7000", Donor: &sirius.Person{ID: 1}}
 
-			documentTemplates := []sirius.RefDataItem{
-				{
-					Handle: "DD",
-					Label:  "DD Template Label",
-				},
-			}
-
-			documentTemplateData := []sirius.DocumentTemplateData{
-				{
-					Inserts: []sirius.Insert{{
-						Key:      "All",
-						InsertId: "DDINSERT",
-						UniversalTemplateData: sirius.UniversalTemplateData{
-							Location:        `lpa\/DD.html.twig`,
-							OnScreenSummary: "DDINSERTONSCREENSUMMARY",
-						},
-					},
-					},
-					TemplateId: "DD",
-					UniversalTemplateData: sirius.UniversalTemplateData{
-						Location:        "DD.html.twig",
-						OnScreenSummary: "DDONSCREENSUMMARY",
-					},
-				},
+			selectedTemplate := sirius.DocumentTemplateData{
+				TemplateId: "DD",
 			}
 
 			contact := sirius.Person{
@@ -238,26 +177,18 @@ func TestPostCreateDocumentGenerateNewRecipient(t *testing.T) {
 				On("Case", mock.Anything, 123).
 				Return(caseItem, nil)
 			client.
-				On("RefDataByCategory", mock.Anything, sirius.DocumentTemplateIdCategory).
-				Return(documentTemplates, nil)
-			client.
-				On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
-				Return(documentTemplateData, nil)
-			client.
 				On("CreateContact", mock.Anything, contact).
 				Return(contact, nil)
 
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, createDocumentData{
-					Case:                    caseItem,
-					DocumentTemplateRefData: documentTemplates,
-					DocumentTemplates:       documentTemplateData,
-					TemplateSelected:        documentTemplateData[0],
-					Success:                 true,
-					SelectedInserts:         []string{"DDINSERT"},
-					HasViewedInsertPage:     true,
-					Recipients:              []sirius.Person{{ID: 1}, contact},
+					Case:                caseItem,
+					TemplateSelected:    selectedTemplate,
+					Success:             true,
+					SelectedInserts:     []string{"DDINSERT"},
+					HasViewedInsertPage: true,
+					Recipients:          []sirius.Person{{ID: 1}, contact},
 				}).
 				Return(nil)
 
@@ -265,7 +196,6 @@ func TestPostCreateDocumentGenerateNewRecipient(t *testing.T) {
 				"id":                {"123"},
 				"case":              {caseType},
 				"templateId":        {"DD"},
-				"hasViewedInserts":  {"true"},
 				"recipientControls": {"generate"},
 				"insert":            {"DDINSERT"},
 				"companyName":       {"Test Company Name"},
@@ -317,29 +247,6 @@ func TestGetCreateDocumentBadQuery(t *testing.T) {
 
 func TestGetCreateDocumentWhenCaseErrors(t *testing.T) {
 	client := &mockCreateDocumentClient{}
-	documentTemplates := []sirius.RefDataItem{
-		{
-			Handle: "DD",
-			Label:  "Donor deceased: Blank template",
-		},
-	}
-
-	documentTemplateData := []sirius.DocumentTemplateData{
-		{
-			Inserts:    nil,
-			TemplateId: "DD",
-			UniversalTemplateData: sirius.UniversalTemplateData{
-				Location:        `lpa\/DD.html.twig`,
-				OnScreenSummary: "DDONSCREENSUMMARY",
-			},
-		},
-	}
-	client.
-		On("RefDataByCategory", mock.Anything, sirius.DocumentTemplateIdCategory).
-		Return(documentTemplates, nil)
-	client.
-		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
-		Return(documentTemplateData, nil)
 	client.
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{}, expectedError)
