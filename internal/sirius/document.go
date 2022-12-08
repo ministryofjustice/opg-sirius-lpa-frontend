@@ -24,7 +24,7 @@ type UniversalTemplateData struct {
 	OnScreenSummary string `json:"onScreenSummary"`
 }
 
-type DocumentTemplateApiData struct {
+type documentTemplateApiData struct {
 	Inserts insertApiResponse `json:"inserts"`
 	UniversalTemplateData
 }
@@ -48,7 +48,7 @@ func (d documentTemplateApiResponse) toDocumentData() ([]DocumentTemplateData, e
 		var asDocumentTemplateData DocumentTemplateData
 		asDocumentTemplateData.TemplateId = k
 
-		var asDocumentTemplateApiData DocumentTemplateApiData
+		var asDocumentTemplateApiData documentTemplateApiData
 		if err := json.Unmarshal(v, &asDocumentTemplateApiData); err == nil {
 			inserts, err := asDocumentTemplateApiData.Inserts.toInsertData()
 			if err != nil {
