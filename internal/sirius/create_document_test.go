@@ -37,7 +37,7 @@ func TestCreateDocument(t *testing.T) {
 						Body: dsl.Like(map[string]interface{}{
 							"templateId":      dsl.String("DD"),
 							"inserts":         []string{"DD1"},
-							"correspondentId": 771,
+							"correspondentId": 189,
 						}),
 					}).
 					WillRespondWith(dsl.Response{
