@@ -14,7 +14,7 @@ describe("Create a document", () => {
 
     it("creates a document on the case by selecting a recipient", () => {
         cy.contains(".govuk-radios__item", "Select").find("input").check();
-        cy.get("#f-selectRecipient").select("771");
+        cy.get("#f-771").click();
         cy.contains("button", "Select recipient").click();
     });
 

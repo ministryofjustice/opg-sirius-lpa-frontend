@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
@@ -119,20 +120,23 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 
 			switch recipientControls {
 			case "select":
-				selectedRecipientID, err := strconv.Atoi(postFormString(r, "selectRecipient"))
-				if err != nil {
-					return err
-				}
-
 				templateId := r.FormValue("templateId")
 				inserts := r.Form["insert"]
 				if len(inserts) == 0 {
 					inserts = []string{}
 				}
 
-				_, err = client.CreateDocument(ctx, caseID, selectedRecipientID, templateId, inserts)
+				selectedRecipientIDs, err := sliceAtoi(r.Form["selectRecipients"])
 				if err != nil {
 					return err
+				}
+
+				fmt.Println(selectedRecipientIDs)
+				for _, recipientID := range selectedRecipientIDs {
+					_, err = client.CreateDocument(ctx, caseID, recipientID, templateId, inserts)
+					if err != nil {
+						return err
+					}
 				}
 
 				if ve, ok := err.(sirius.ValidationError); ok {
@@ -193,7 +197,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 
 func getRecipients(caseItem sirius.Case) []sirius.Person {
 	var recipients []sirius.Person
-	recipients = append(recipients, caseItem.Donor)
+	recipients = append(recipients, *caseItem.Donor)
 	recipients = append(recipients, caseItem.TrustCorporations...)
 	recipients = append(recipients, caseItem.Attorneys...)
 
@@ -233,4 +237,18 @@ func translateInsertData(selectedTemplateInserts []sirius.Insert, documentTempla
 		}
 	}
 	return documentTemplateInserts
+}
+
+func sliceAtoi(strSlice []string) ([]int, error) {
+	intSlice := make([]int, len(strSlice))
+
+	for idx, s := range strSlice {
+		intEl, err := strconv.Atoi(s)
+		if err != nil {
+			return intSlice, err
+		}
+		intSlice[idx] = intEl
+	}
+
+	return intSlice, nil
 }

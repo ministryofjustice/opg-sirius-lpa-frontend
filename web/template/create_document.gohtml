@@ -44,22 +44,24 @@
                                     <div class="govuk-!-width-one-half govuk-form-group {{ if .Error.Field.selectRecipient }}govuk-form-group--error{{ end }}">
                                         <div class="govuk-form-group {{ if .Error.Field.selectRecipient }}govuk-form-group--error{{ end }}">
                                             <label class="govuk-label" for="f-selectRecipient">
-                                                Select recipient
+                                                Select recipient(s)
                                             </label>
                                             {{ template "errors" .Error.Field.selectRecipient }}
-                                            <select class="govuk-select {{ if .Error.Field.selectRecipient }}govuk-select--error{{ end }}" id="f-selectRecipient" name="selectRecipient">
-                                                <option hidden {{ if not nil }}selected{{ end }} disabled></option>
+                                            <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                                 {{ range .Recipients }}
-                                                    <option value="{{ .ID }}" {{ if eq nil .ID }}selected{{ end }} >
-                                                        {{ if .CompanyName  }}
-                                                            {{ .CompanyName }} ({{ .PersonType }}) -
-                                                        {{ else }}
-                                                            {{ .Salutation }} {{ .Firstname }} {{ .Surname }} ({{ .PersonType }}) -
-                                                        {{ end }}
-                                                        {{ .AddressLine1 }}, {{ .AddressLine2 }}, {{ .AddressLine3 }}, {{ .Town }}, {{ .County }}, {{ .Postcode }}.
-                                                    </option>
+                                                    <div class="govuk-checkboxes__item">
+                                                        <input class="govuk-checkboxes__input" id="f-{{ .ID }}" name="selectRecipients" type="checkbox" value="{{ .ID }}"/>
+                                                        <label class="govuk-label govuk-checkboxes__label" id="f-{{ .ID }}">
+                                                            {{ if .CompanyName  }}
+                                                                {{ .CompanyName }} ({{ .PersonType }}) -
+                                                            {{ else }}
+                                                                {{ .Salutation }} {{ .Firstname }} {{ .Surname }} ({{ .PersonType }}) -
+                                                            {{ end }}
+                                                            {{ .AddressLine1 }}, {{ .AddressLine2 }}, {{ .AddressLine3 }}, {{ .Town }}, {{ .County }}, {{ .Postcode }}.
+                                                        </label>
+                                                    </div>
                                                 {{ end }}
-                                            </select>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="govuk-button-group">

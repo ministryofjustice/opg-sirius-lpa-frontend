@@ -125,7 +125,7 @@ func TestPostCreateDocument(t *testing.T) {
 				"id":                {"123"},
 				"case":              {caseType},
 				"templateId":        {"DD"},
-				"selectRecipient":   {"1"},
+				"selectRecipients":  {"1"},
 				"recipientControls": {"select"},
 				"insert":            {"DDINSERT"},
 			}
@@ -147,7 +147,7 @@ func TestPostCreateDocument(t *testing.T) {
 func TestPostCreateDocumentGenerateNewRecipient(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseItem := sirius.Case{CaseType: caseType, UID: "7000", Donor: sirius.Person{ID: 1}}
+			caseItem := sirius.Case{CaseType: caseType, UID: "7000", Donor: &sirius.Person{ID: 1}}
 
 			selectedTemplate := sirius.DocumentTemplateData{
 				TemplateId: "DD",
@@ -425,11 +425,19 @@ func TestTranslateInsertData(t *testing.T) {
 }
 
 func TestGetRecipients(t *testing.T) {
-	caseItem := sirius.Case{Donor: sirius.Person{ID: 1}, TrustCorporations: []sirius.Person{{ID: 2}}, Attorneys: []sirius.Person{{ID: 3}}}
+	caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, TrustCorporations: []sirius.Person{{ID: 2}}, Attorneys: []sirius.Person{{ID: 3}}}
 
 	recipients := getRecipients(caseItem)
 	assert.Equal(t, 3, len(recipients))
 	assert.Equal(t, recipients[0].ID, 1)
 	assert.Equal(t, recipients[1].ID, 2)
 	assert.Equal(t, recipients[2].ID, 3)
+}
+
+func TestSliceAtoi(t *testing.T) {
+	testSliceStr := []string{"1", "2", "3"}
+	result, err := sliceAtoi(testSliceStr)
+
+	assert.Equal(t, nil, err)
+	assert.Equal(t, []int{1, 2, 3}, result)
 }
