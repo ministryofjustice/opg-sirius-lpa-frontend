@@ -58,7 +58,7 @@ func TestCase(t *testing.T) {
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
-			expectedResponse: Case{ID: 800, UID: "7000-0000-0000", CaseType: "LPA", Status: "Pending", Donor: &Person{
+			expectedResponse: Case{ID: 800, UID: "7000-0000-0000", CaseType: "LPA", Status: "Pending", Donor: Person{
 				ID:           771,
 				UID:          "7000-0290-0192",
 				Salutation:   "Prof",

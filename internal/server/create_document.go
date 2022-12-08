@@ -193,7 +193,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 
 func getRecipients(caseItem sirius.Case) []sirius.Person {
 	var recipients []sirius.Person
-	recipients = append(recipients, *caseItem.Donor)
+	recipients = append(recipients, caseItem.Donor)
 	recipients = append(recipients, caseItem.TrustCorporations...)
 	recipients = append(recipients, caseItem.Attorneys...)
 

@@ -147,7 +147,7 @@ func TestPostCreateDocument(t *testing.T) {
 func TestPostCreateDocumentGenerateNewRecipient(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseItem := sirius.Case{CaseType: caseType, UID: "7000", Donor: &sirius.Person{ID: 1}}
+			caseItem := sirius.Case{CaseType: caseType, UID: "7000", Donor: sirius.Person{ID: 1}}
 
 			selectedTemplate := sirius.DocumentTemplateData{
 				TemplateId: "DD",
@@ -425,7 +425,7 @@ func TestTranslateInsertData(t *testing.T) {
 }
 
 func TestGetRecipients(t *testing.T) {
-	caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, TrustCorporations: []sirius.Person{{ID: 2}}, Attorneys: []sirius.Person{{ID: 3}}}
+	caseItem := sirius.Case{Donor: sirius.Person{ID: 1}, TrustCorporations: []sirius.Person{{ID: 2}}, Attorneys: []sirius.Person{{ID: 3}}}
 
 	recipients := getRecipients(caseItem)
 	assert.Equal(t, 3, len(recipients))
