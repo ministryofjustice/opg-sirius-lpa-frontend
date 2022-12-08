@@ -26,7 +26,7 @@ func TestCreateDocument(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a pending case assigned").
+					Given("A donor exists").
 					UponReceiving("A request to create a draft document on the case").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
@@ -37,7 +37,7 @@ func TestCreateDocument(t *testing.T) {
 						Body: dsl.Like(map[string]interface{}{
 							"templateId":      dsl.String("DD"),
 							"inserts":         []string{"DD1"},
-							"correspondentId": 771,
+							"correspondentId": 189,
 						}),
 					}).
 					WillRespondWith(dsl.Response{
