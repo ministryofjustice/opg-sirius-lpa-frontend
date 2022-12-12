@@ -8,7 +8,7 @@ describe("Create a document", () => {
         cy.contains("button", "Select template").click();
         cy.contains("Template: DD");
         // cy.get("#f-DD1").click();
-        cy.contains("button", "Select inserts").click();
+        cy.contains("button", "Continue").click();
     });
 
 
