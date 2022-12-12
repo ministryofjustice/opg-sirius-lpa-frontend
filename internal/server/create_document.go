@@ -1,16 +1,17 @@
 package server
 
 import (
-	"fmt"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
+	"sync"
 )
 
 type CreateDocumentClient interface {
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
+	Person(ctx sirius.Context, id int) (sirius.Person, error)
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
 	CreateContact(ctx sirius.Context, contact sirius.Person) (sirius.Person, error)
@@ -112,7 +113,10 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 			if hasViewedInsertPage == "true" {
 				data.HasViewedInsertPage = true
 				data.SelectedInserts = r.Form["insert"]
-				data.Recipients = getRecipients(data.Case)
+				data.Recipients, err = getRecipients(ctx, client, data.Case)
+				if err != nil {
+					return err
+				}
 			}
 
 		case http.MethodPost:
@@ -131,7 +135,6 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 					return err
 				}
 
-				fmt.Println(selectedRecipientIDs)
 				for _, recipientID := range selectedRecipientIDs {
 					_, err = client.CreateDocument(ctx, caseID, recipientID, templateId, inserts)
 					if err != nil {
@@ -185,7 +188,10 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 					data.TemplateSelected.TemplateId = r.FormValue("templateId")
 					data.SelectedInserts = r.Form["insert"]
 					data.HasViewedInsertPage = true
-					data.Recipients = getRecipients(data.Case)
+					data.Recipients, err = getRecipients(ctx, client, data.Case)
+					if err != nil {
+						return err
+					}
 					data.Recipients = append(data.Recipients, createdContact)
 				}
 			}
@@ -195,13 +201,46 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 	}
 }
 
-func getRecipients(caseItem sirius.Case) []sirius.Person {
-	var recipients []sirius.Person
-	recipients = append(recipients, *caseItem.Donor)
-	recipients = append(recipients, caseItem.TrustCorporations...)
-	recipients = append(recipients, caseItem.Attorneys...)
+func getRecipients(ctx sirius.Context, client CreateDocumentClient, caseItem sirius.Case) ([]sirius.Person, error) {
+	var recipientIds []int
+	donor := *caseItem.Donor
+	recipientIds = append(recipientIds, donor.ID)
+	recipientIds = append(recipientIds, getPersonIds(caseItem.TrustCorporations)...)
+	recipientIds = append(recipientIds, getPersonIds(caseItem.Attorneys)...)
 
-	return recipients
+	var recipients []sirius.Person
+	group, groupCtx := errgroup.WithContext(ctx.Context)
+	var personsMu sync.Mutex
+
+	for _, recipientID := range recipientIds {
+		recipientID := recipientID
+
+		group.Go(func() error {
+			person, err := client.Person(ctx.With(groupCtx), recipientID)
+			if err != nil {
+				return err
+			}
+
+			personsMu.Lock()
+			recipients = append(recipients, person)
+			personsMu.Unlock()
+			return nil
+		})
+	}
+
+	if err := group.Wait(); err != nil {
+		return nil, err
+	}
+
+	return recipients, nil
+}
+
+func getPersonIds(persons []sirius.Person) []int {
+	var personIds []int
+	for _, person := range persons {
+		personIds = append(personIds, person.ID)
+	}
+	return personIds
 }
 
 func translateDocumentData(documentTemplateData []sirius.DocumentTemplateData, documentTemplateRefData []sirius.RefDataItem) []sirius.RefDataItem {
