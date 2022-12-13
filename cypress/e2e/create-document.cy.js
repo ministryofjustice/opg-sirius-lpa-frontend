@@ -7,8 +7,8 @@ describe("Create a document", () => {
         cy.get(".autocomplete__menu").contains("DD: Donor deceased: Blank template").click();
         cy.contains("button", "Select template").click();
         cy.contains("Template: DD");
-        // cy.get("#f-DD1").click();
-        cy.contains("button", "Continue").click();
+        cy.get("#f-DD1").click();
+        cy.contains("button", "Select inserts").click();
     });
 
 
