@@ -155,11 +155,6 @@ jobs:
         with:
           name: pacts
           path: ./pacts
-      - name: Retrieve pact
-        run: |
-          docker container create --name temp -v pacts_data:/root hello-world
-          docker cp ./pacts/ignored-ignored.json temp:/root/ignored-ignored.json
-          docker cp ./pacts/sirius-lpa-frontend-sirius.json temp:/root/sirius-lpa-frontend-sirius.json
 
       - name: Restore Images
         run: |
