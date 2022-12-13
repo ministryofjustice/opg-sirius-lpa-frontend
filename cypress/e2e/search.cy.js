@@ -1,24 +1,22 @@
 describe("Search", () => {
     describe("Searching by name", () => {
         beforeEach(() => {
-            cy.visit("/search", {
-                qs: {'term': 'bob'}
-            });
+            cy.visit("/search?term=bob")
         });
 
-        it("finds a person when searching by name", () => {
+        it("finds a person when searching by uid", () => {
             cy.contains("You searched for: bob");
             cy.contains("Showing 1 to 1 of 1 cases");
             cy.contains("Donor (1)");
             const $row = cy.get("table > tbody > tr");
-            $row
-                .contains("7000-8548-8461")
-                .should("have.attr", "href")
-                .should("contain", "/person/36/23");
             $row.should("contain", "bob smith");
             $row.should("contain", "123 Somewhere Road");
             $row.should("contain", "perfect");
             $row.should("contain", "LPA - PFA");
+            $row
+                .contains("7000-8548-8461")
+                .should("have.attr", "href")
+                .should("contain", "/person/36/23");
         });
 
         it("it cannot find any results", () => {
@@ -31,9 +29,7 @@ describe("Search", () => {
 
     describe("Search with filters", () => {
         beforeEach(() => {
-            cy.visit("/search", {
-                qs: { 'term': 'jack' }
-            });
+            cy.visit("/search?term=jack");
         });
 
         it("finds an attorney when filtered", () => {
@@ -54,9 +50,7 @@ describe("Search", () => {
 
     describe("Search donor not associated with case", () => {
         beforeEach(() => {
-            cy.visit("/search", {
-                qs: { 'term': 'daniel' }
-            });
+            cy.visit("/search?term=daniel");
         });
 
         it("finds a donor not associated with a case", () => {

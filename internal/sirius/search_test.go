@@ -27,16 +27,16 @@ func TestSearch(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("An lpa exists to be referenced by donor name").
+					Given("A donor exists to be referenced by name").
 					UponReceiving("A search request for bob").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
 						Path:   dsl.String("/lpa-api/v1/search/persons"),
 						Body: dsl.Like(map[string]interface{}{
-							"term":        dsl.String("bob"),
-							"personTypes": dsl.Like(AllPersonTypes),
-							"size":        dsl.Like(PageLimit),
-							"from":        dsl.Like(0),
+							"term":        "bob",
+							"personTypes": AllPersonTypes,
+							"size":        PageLimit,
+							"from":        0,
 						}),
 					}).
 					WillRespondWith(dsl.Response{
@@ -51,22 +51,21 @@ func TestSearch(t *testing.T) {
 							"total": dsl.Like(map[string]interface{}{
 								"count": dsl.Like(1),
 							}),
-							"results": dsl.Like([]map[string]interface{}{
-								{
-									"id":           dsl.Like(36),
-									"uId":          dsl.Term("7000-8548-8461", `\d{4}-\d{4}-\d{4}`),
-									"firstname":    dsl.Like("bob"),
-									"surname":      dsl.Like("smith"),
-									"addressLine1": dsl.Like("123 Somewhere Road"),
-									"personType":   dsl.Like("Donor"),
-									"cases": dsl.EachLike(map[string]interface{}{
-										"id":          dsl.Like(23),
-										"uId":         dsl.Term("7000-5382-4438", `\d{4}-\d{4}-\d{4}`),
-										"caseSubtype": dsl.Term("pfa", "hw|pfa"),
-										"status":      dsl.Like("Perfect"),
-									}, 1),
-								},
-							}),
+							"results": dsl.EachLike(map[string]interface{}{
+								"id":           dsl.Like(36),
+								"uId":          dsl.Term("7000-8548-8461", `\d{4}-\d{4}-\d{4}`),
+								"firstname":    dsl.Like("bob"),
+								"surname":      dsl.Like("smith"),
+								"addressLine1": dsl.Like("123 Somewhere Road"),
+								"personType":   dsl.Like("Donor"),
+								"cases": dsl.EachLike(map[string]interface{}{
+									"id":          dsl.Like(23),
+									"uId":         dsl.Term("7000-5382-4438", `\d{4}-\d{4}-\d{4}`),
+									"caseSubtype": dsl.Term("pfa", "hw|pfa"),
+									"status":      dsl.Like("Perfect"),
+									"caseType":    dsl.Like("LPA"),
+								}, 1),
+							}, 1),
 						}),
 					})
 			},
@@ -81,10 +80,11 @@ func TestSearch(t *testing.T) {
 						PersonType:   "Donor",
 						Cases: []*Case{
 							{
-								ID:      23,
-								UID:     "7000-5382-4438",
-								SubType: "pfa",
-								Status:  "Perfect",
+								ID:       23,
+								UID:      "7000-5382-4438",
+								CaseType: "LPA",
+								SubType:  "pfa",
+								Status:   "Perfect",
 							},
 						},
 					},
