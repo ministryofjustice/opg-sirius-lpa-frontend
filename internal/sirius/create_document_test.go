@@ -26,7 +26,7 @@ func TestCreateDocument(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a pending case assigned").
+					Given("A donor exists").
 					UponReceiving("A request to create a draft document on the case").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
@@ -37,7 +37,7 @@ func TestCreateDocument(t *testing.T) {
 						Body: dsl.Like(map[string]interface{}{
 							"templateId":      dsl.String("DD"),
 							"inserts":         []string{"DD1"},
-							"correspondentId": 189,
+							"correspondentId": 141,
 						}),
 					}).
 					WillRespondWith(dsl.Response{
@@ -61,7 +61,7 @@ func TestCreateDocument(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				result, err := client.CreateDocument(Context{Context: context.Background()}, 800, 189, "DD", []string{"DD1"})
+				result, err := client.CreateDocument(Context{Context: context.Background()}, 800, 141, "DD", []string{"DD1"})
 
 				assert.Equal(t, tc.expectedResult, result)
 				if tc.expectedError == nil {
