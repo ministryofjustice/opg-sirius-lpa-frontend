@@ -208,13 +208,3 @@ func TestSearchDeletedCase(t *testing.T) {
 		})
 	}
 }
-
-func TestSearchTooShort(t *testing.T) {
-	client := NewClient(http.DefaultClient, "")
-	var res []Person
-
-	results, pagination, err := client.Search(Context{Context: context.Background()}, "ad", 1, []string{})
-	assert.Equal(t, results.Results, res)
-	assert.Nil(t, pagination)
-	assert.Equal(t, fmt.Errorf("Search term must be at least three characters"), err)
-}
