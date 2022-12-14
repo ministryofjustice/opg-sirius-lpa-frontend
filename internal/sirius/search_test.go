@@ -36,7 +36,7 @@ func TestSearch(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"term":        "bob",
+							"term":        dsl.Like("bob"),
 							"personTypes": dsl.Like(AllPersonTypes),
 							"size":        dsl.Like(PageLimit),
 							"from":        dsl.Like(0),
