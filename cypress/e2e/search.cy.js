@@ -1,10 +1,8 @@
 describe("Search", () => {
     describe("Searching by name", () => {
-        beforeEach(() => {
-            cy.visit("/search?term=bob")
-        });
 
-        it("finds a person when searching by uid", () => {
+        it("finds a person with associated case", () => {
+            cy.visit("/search?term=bob")
             cy.contains("You searched for: bob");
             cy.contains("Showing 1 to 1 of 1 cases");
             cy.contains("Donor (1)");
@@ -20,9 +18,7 @@ describe("Search", () => {
         });
 
         it("it cannot find any results", () => {
-            cy.visit("/search", {
-                qs: { 'term': 'abcde' }
-            });
+            cy.visit("/search?term=abcde");
             cy.contains("No cases were found");
         });
     });
