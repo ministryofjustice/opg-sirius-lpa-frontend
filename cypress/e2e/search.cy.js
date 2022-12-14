@@ -18,20 +18,6 @@ describe("Search", () => {
         });
     });
 
-    describe("Search deleted case", () => {
-        it("finds a deleted case when searching by uid", () => {
-            cy.visit("/search?term=700000005555");
-            cy.contains("Search results");
-            const $row = cy.get("table > tbody > tr");
-            $row.should("contain", "7000-0000-5555");
-            $row.should("contain", "LPA");
-            $row.should("contain", "02/12/2022");
-            $row.should("contain", "return - unpaid");
-            $row.should("contain", "LPA was not paid for after 12 months");
-        });
-    });
-
-
     describe("Search features", () => {
         beforeEach(() => {
             cy.visit("/search?term=abcdefg");

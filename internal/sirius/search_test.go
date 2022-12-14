@@ -32,15 +32,12 @@ func TestSearch(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
 						Path:   dsl.String("/lpa-api/v1/search/persons"),
-						Headers: dsl.MapMatcher{
-							"Content-Type": dsl.String("application/json"),
-						},
-						Body: map[string]interface{}{
+						Body: dsl.Like(map[string]interface{}{
 							"term":        dsl.Like("bob"),
 							"personTypes": dsl.Like(AllPersonTypes),
 							"size":        dsl.Like(PageLimit),
 							"from":        dsl.Like(0),
-						},
+						}),
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
@@ -117,85 +114,7 @@ func TestSearch(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				results, pagination, err := client.Search(Context{Context: context.Background()}, "bob", 1, AllPersonTypes)
-				assert.Equal(t, tc.expectedResponse, results)
-				assert.Equal(t, tc.expectedPagination, pagination)
-				if tc.expectedError == nil {
-					assert.Nil(t, err)
-				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
-				}
-				return nil
-			}))
-		})
-	}
-}
-
-func TestSearchDeletedCase(t *testing.T) {
-	t.Parallel()
-
-	pact := newPact()
-	defer pact.Teardown()
-
-	testCases := []struct {
-		name               string
-		setup              func()
-		expectedResponse   SearchResponse
-		expectedPagination *Pagination
-		expectedError      func(int) error
-	}{
-		{
-			name: "OK",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("I have deleted a case").
-					UponReceiving("A search request for the deleted case uid").
-					WithRequest(dsl.Request{
-						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/search/persons"),
-						Headers: dsl.MapMatcher{
-							"Content-Type": dsl.String("application/json"),
-						},
-						Body: map[string]interface{}{
-							"term":        "700000005555",
-							"personTypes": AllPersonTypes,
-							"size":        PageLimit,
-							"from":        0,
-						},
-					}).
-					WillRespondWith(dsl.Response{
-						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-						Body: dsl.Like(map[string]interface{}{
-							"total": dsl.Like(map[string]interface{}{
-								"count": dsl.Like(0),
-							}),
-						}),
-					})
-			},
-			expectedResponse: SearchResponse{
-				Total: SearchTotal{
-					Count: 0,
-				},
-			},
-			expectedPagination: &Pagination{
-				TotalItems:  0,
-				CurrentPage: 1,
-				TotalPages:  0,
-				PageSize:    PageLimit,
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.setup()
-
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
-
-				results, pagination, err := client.Search(Context{Context: context.Background()}, "700000005555", 1, AllPersonTypes)
+				results, pagination, err := client.Search(Context{Context: context.Background()}, "bob", 1, []string{})
 				assert.Equal(t, tc.expectedResponse, results)
 				assert.Equal(t, tc.expectedPagination, pagination)
 				if tc.expectedError == nil {
