@@ -72,6 +72,40 @@ func TestDocumentTypes(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "OK - template with no inserts",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("Some document templates exist").
+					UponReceiving("A request for document templates (no inserts)").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String("/lpa-api/v1/templates/lpa"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.Like(map[string]interface{}{
+							"DD": dsl.Like(map[string]interface{}{
+								"onScreenSummary": dsl.Like("DDONSCREENSUMMARY"),
+								"location":        dsl.Like(`lpa\/DD.html.twig`),
+								"inserts":         dsl.Like(map[string]interface{}{}),
+							}),
+						}),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: []DocumentTemplateData{
+				{
+					Inserts: []Insert(nil),
+					UniversalTemplateData: UniversalTemplateData{
+						Location:        `lpa\/DD.html.twig`,
+						OnScreenSummary: "DDONSCREENSUMMARY",
+					},
+					TemplateId: "DD",
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {

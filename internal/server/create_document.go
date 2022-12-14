@@ -82,7 +82,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 			})
 
 			group.Go(func() error {
-				documentTemplateRefData, err := client.RefDataByCategory(ctx, sirius.DocumentTemplateIdCategory)
+				documentTemplateRefData, err := client.RefDataByCategory(ctx.With(groupCtx), sirius.DocumentTemplateIdCategory)
 				if err != nil {
 					return err
 				}
@@ -254,6 +254,7 @@ func translateDocumentData(documentTemplateData []sirius.DocumentTemplateData, d
 					UserSelectable: false,
 				}
 				documentTemplateTypes = append(documentTemplateTypes, translatedRefDataItem)
+				break
 			}
 		}
 	}
@@ -272,6 +273,7 @@ func translateInsertData(selectedTemplateInserts []sirius.Insert, documentTempla
 					Key:    in.Key,
 				}
 				documentTemplateInserts = append(documentTemplateInserts, translatedRefDataItem)
+				break
 			}
 		}
 	}
