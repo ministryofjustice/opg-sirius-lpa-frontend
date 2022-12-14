@@ -18,20 +18,6 @@ describe("Search", () => {
         });
     });
 
-    describe("Search donor not associated with case", () => {
-        it("finds a donor not associated with a case", () => {
-            cy.visit("/search?term=daniel");
-            cy.contains("Showing 1 to 1 of 1 cases");
-            const $row = cy.get("table > tbody > tr");
-            $row.should("contain", "Not associated with a case");
-            $row.should("contain", "22 Test Road");
-            $row
-                .contains("Daniel Jones")
-                .should("have.attr", "href")
-                .should("contain", "/person/33");
-        });
-    });
-
     describe("Search deleted case", () => {
         it("finds a deleted case when searching by uid", () => {
             cy.visit("/search?term=700000005555");
