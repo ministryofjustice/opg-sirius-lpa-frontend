@@ -159,9 +159,9 @@ func TestSearchDonorNotAssociatedWithCase(t *testing.T) {
 						},
 						Body: map[string]interface{}{
 							"term":        "daniel",
-							"personTypes": AllPersonTypes,
-							"size":        PageLimit,
-							"from":        0,
+							"personTypes": dsl.Like(AllPersonTypes),
+							"size":        dsl.Like(PageLimit),
+							"from":        dsl.Like(0),
 						},
 					}).
 					WillRespondWith(dsl.Response{
