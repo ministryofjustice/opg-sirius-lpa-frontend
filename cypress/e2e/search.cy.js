@@ -2,7 +2,7 @@ describe("Search", () => {
     describe("Searching by name", () => {
 
         it("finds a person with associated case", () => {
-            cy.visit("/search?term=bob")
+            cy.visit("/search?term=bob");
             cy.contains("You searched for: bob");
             cy.contains("Showing 1 to 1 of 1 cases");
             cy.contains("Donor (1)");
@@ -16,11 +16,6 @@ describe("Search", () => {
                 .should("have.attr", "href")
                 .should("contain", "/person/36/23");
         });
-
-        it("it cannot find any results", () => {
-            cy.visit("/search?term=abcde");
-            cy.contains("No cases were found");
-        });
     });
 
     describe("Search donor not associated with case", () => {
@@ -29,11 +24,11 @@ describe("Search", () => {
             cy.contains("Showing 1 to 1 of 1 cases");
             const $row = cy.get("table > tbody > tr");
             $row.should("contain", "Not associated with a case");
+            $row.should("contain", "22 Test Road");
             $row
                 .contains("Daniel Jones")
                 .should("have.attr", "href")
                 .should("contain", "/person/33");
-            $row.should("contain", "22 Test Road");
         });
     });
 
