@@ -1,0 +1,35 @@
+{{ define "pagination-inner" }}
+    <p class="moj-pagination__results">Showing <b>{{ .Start }}</b> to <b>{{ .End }}</b> of <b>{{ .TotalItems }}</b> cases</p>
+
+    {{ if ne 1 .TotalPages }}
+        <ul class="moj-pagination__list">
+            {{ if .HasPrevious }}
+                <li class="moj-pagination__item  moj-pagination__item--prev">
+                    <a class="moj-pagination__link" href="{{ .SearchTerm }}{{ .Filters }}&page={{ .PreviousPage }}">Previous<span class="govuk-visually-hidden"> page</span></a>
+                </li>
+            {{ end }}
+
+            {{ range .Pages }}
+                {{ if eq . -1 }}
+                    <li class="moj-pagination__item">&hellip;</li>
+                {{ else if eq . $.CurrentPage }}
+                    <li class="moj-pagination__item moj-pagination__item--active"><span class="govuk-visually-hidden">Page </span>{{ . }}<span class="govuk-visually-hidden"> of {{ $.TotalPages }}</span></li>
+                {{ else }}
+                    <li class="moj-pagination__item"><a class="moj-pagination__link" href="{{ $.SearchTerm }}{{ $.Filters }}&page={{ . }}"><span class="govuk-visually-hidden">Page </span>{{ . }}<span class="govuk-visually-hidden"> of {{ $.TotalPages }}</span></a></li>
+                {{ end }}
+            {{ end }}
+
+            {{ if .HasNext }}
+                <li class="moj-pagination__item  moj-pagination__item--next">
+                    <a class="moj-pagination__link" href="{{ .SearchTerm }}{{ .Filters }}&page={{ .NextPage }}">Next<span class="govuk-visually-hidden"> page</span></a>
+                </li>
+            {{ end }}
+        </ul>
+    {{ end }}
+{{ end }}
+
+{{ define "pagination-footer" }}
+    <nav class="moj-pagination" aria-label="Pagination navigation">
+        {{ template "pagination-inner" . }}
+    </nav>
+{{ end }}

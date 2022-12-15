@@ -76,3 +76,14 @@ func TestDateStringErrors(t *testing.T) {
 	_, err = json.Marshal(DateString("2022-03"))
 	assert.NotNil(t, err)
 }
+
+func TestDateStringGetYear(t *testing.T) {
+	var v DateString
+	err := json.Unmarshal([]byte(`"03/04/2022"`), &v)
+	assert.Nil(t, err)
+	assert.Equal(t, "2022-04-03", string(v))
+
+	y, err := v.GetYear()
+	assert.Nil(t, err)
+	assert.Equal(t, "2022", y)
+}
