@@ -55,6 +55,7 @@ func readInteractions(dir string) ([]Interaction, error) {
 		}
 
 		interactions = append(interactions, v.Interactions...)
+		interactions = getIgnoredInteractionsForCypressTesting(interactions)
 	}
 
 	return interactions, err
@@ -173,4 +174,25 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Error(w, "No matching pact interaction", http.StatusNotFound)
+}
+
+func getIgnoredInteractionsForCypressTesting(interactions []Interaction) []Interaction {
+	// We need this test to produce specific data in the response so that Cypress tests will pass.
+	// Since Pact won't let us return multiple array entries from `dsl.EachLike`
+	// we modify pact stub to return the desired output.
+	var updatedInteractions []Interaction
+	for _, i := range interactions {
+		switch i.ProviderState {
+		case "Some document template ids types exist":
+			i.Response.Body = []map[string]interface{}{{
+				"handle": "DDONSCREENSUMMARY",
+				"label":  "Donor deceased: Blank template",
+			}, {
+				"handle": "DD1LPAINSERTONSCREENSUMMARY",
+				"label":  "DD1 - Case complete",
+			}}
+		}
+		updatedInteractions = append(updatedInteractions, i)
+	}
+	return updatedInteractions
 }
