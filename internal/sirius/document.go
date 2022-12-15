@@ -25,20 +25,23 @@ type UniversalTemplateData struct {
 }
 
 type documentTemplateApiData struct {
-	Inserts insertApiResponse `json:"inserts"`
-	UniversalTemplateData
+	Inserts         insertApiResponse `json:"inserts"`
+	Location        string            `json:"location"`
+	OnScreenSummary string            `json:"onScreenSummary"`
 }
 
 type Insert struct {
-	Key      string
-	InsertId string
-	UniversalTemplateData
+	Key             string
+	InsertId        string
+	Location        string `json:"location"`
+	OnScreenSummary string `json:"onScreenSummary"`
 }
 
 type DocumentTemplateData struct {
-	Inserts    []Insert
-	TemplateId string
-	UniversalTemplateData
+	Inserts         []Insert
+	TemplateId      string
+	Location        string `json:"location"`
+	OnScreenSummary string `json:"onScreenSummary"`
 }
 
 func (d documentTemplateApiResponse) toDocumentData() ([]DocumentTemplateData, error) {
@@ -85,7 +88,8 @@ func (i insertApiResponse) toInsertData() ([]Insert, error) {
 		if err := json.Unmarshal(v, &asInsertKeyApiResponse); err == nil {
 			for insertId, insertData := range asInsertKeyApiResponse {
 				insert.InsertId = insertId
-				insert.UniversalTemplateData = insertData
+				insert.Location = insertData.Location
+				insert.OnScreenSummary = insertData.OnScreenSummary
 				inserts = append(inserts, insert)
 			}
 			continue

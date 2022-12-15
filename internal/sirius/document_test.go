@@ -56,19 +56,15 @@ func TestDocumentTypes(t *testing.T) {
 				{
 					Inserts: []Insert{
 						{
-							Key:      "all",
-							InsertId: "DD1",
-							UniversalTemplateData: UniversalTemplateData{
-								Location:        `lpa\/inserts\/DD1.html.twig`,
-								OnScreenSummary: "DD1LPAINSERTONSCREENSUMMARY",
-							},
+							Key:             "all",
+							InsertId:        "DD1",
+							Location:        `lpa\/inserts\/DD1.html.twig`,
+							OnScreenSummary: "DD1LPAINSERTONSCREENSUMMARY",
 						},
 					},
-					UniversalTemplateData: UniversalTemplateData{
-						Location:        `lpa\/DD.html.twig`,
-						OnScreenSummary: "DDONSCREENSUMMARY",
-					},
-					TemplateId: "DD",
+					Location:        `lpa\/DD.html.twig`,
+					OnScreenSummary: "DDONSCREENSUMMARY",
+					TemplateId:      "DD",
 				},
 			},
 		},
@@ -86,10 +82,10 @@ func TestDocumentTypes(t *testing.T) {
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
 						Body: dsl.Like(map[string]interface{}{
-							"DD": dsl.Like(map[string]interface{}{
-								"onScreenSummary": dsl.Like("DDONSCREENSUMMARY"),
-								"location":        dsl.Like(`lpa\/DD.html.twig`),
-								"inserts":         dsl.Like(map[string]interface{}{}),
+							"CT-bb": dsl.Like(map[string]interface{}{
+								"onScreenSummary": dsl.Like("CTBBONSCREENSUMMARY"),
+								"location":        dsl.Like(`complaints/CT-bb.html.twig`),
+								"inserts":         dsl.Like([]interface{}{}),
 							}),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
@@ -97,12 +93,10 @@ func TestDocumentTypes(t *testing.T) {
 			},
 			expectedResponse: []DocumentTemplateData{
 				{
-					Inserts: []Insert(nil),
-					UniversalTemplateData: UniversalTemplateData{
-						Location:        `lpa\/DD.html.twig`,
-						OnScreenSummary: "DDONSCREENSUMMARY",
-					},
-					TemplateId: "DD",
+					Inserts:         []Insert(nil),
+					Location:        `complaints/CT-bb.html.twig`,
+					OnScreenSummary: "CTBBONSCREENSUMMARY",
+					TemplateId:      "CT-bb",
 				},
 			},
 		},
