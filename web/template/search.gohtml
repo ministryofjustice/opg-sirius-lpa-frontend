@@ -61,11 +61,11 @@
                                 <td class="govuk-table__cell govuk-link--no-visited-state">
                                     {{ if .Cases }}
                                         {{ if eq (ToLower .PersonType) "donor" }}
-                                            <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" .ID (index .Cases 0).ID) }}">{{ .UID }}</a>
+                                            <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" .ID (index .Cases 0).ID) }}">{{ (index .Cases 0).UID }}</a>
                                         {{ else if or (eq (ToLower .PersonType) "client") (eq (ToLower .PersonType) "deputy") }}
-                                            <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/supervision#/clients/%d?order=%d" .ID (index .Cases 0).ID) }}">{{ .UID }}</a>
+                                            <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/supervision#/clients/%d?order=%d" .ID (index .Cases 0).ID) }}">{{ (index .Cases 0).UID }}</a>
                                         {{ else }}
-                                            <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" (index .Cases 0).Donor.ID (index .Cases 0).ID) }}">{{ .UID }}</a>
+                                            <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" (index .Cases 0).Donor.ID (index .Cases 0).ID) }}">{{ (index .Cases 0).UID }}</a>
                                         {{ end }}
                                     {{ else }}
                                         Not associated with a case

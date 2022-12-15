@@ -2,19 +2,19 @@ describe("Search", () => {
     describe("Searching by name", () => {
 
         it("finds a person with associated case", () => {
-            cy.visit("/search?term=bob");
-            cy.contains("You searched for: bob");
+            cy.visit("/search?term=john");
+            cy.contains("You searched for: john");
             cy.contains("Showing 1 to 1 of 1 cases");
             cy.contains("Donor (1)");
             const $row = cy.get("table > tbody > tr");
-            $row.should("contain", "bob smith");
+            $row.should("contain", "John Doe");
             $row.should("contain", "123 Somewhere Road");
             $row.should("contain", "perfect");
             $row.should("contain", "LPA - PFA");
             $row
                 .contains("7000-8548-8461")
                 .should("have.attr", "href")
-                .should("contain", "/person/36/23");
+                .should("contain", "/person/47/23");
         });
     });
 

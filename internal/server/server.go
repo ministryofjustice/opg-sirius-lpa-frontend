@@ -210,17 +210,3 @@ func translateRefData(types []sirius.RefDataItem, tmplHandle string) string {
 	}
 	return tmplHandle
 }
-
-func getPage(r *http.Request) int {
-	page := r.FormValue("page")
-	if page == "" {
-		return 1
-	}
-
-	v, err := strconv.Atoi(page)
-	if err != nil {
-		return 1
-	}
-
-	return v
-}

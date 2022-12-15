@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"strconv"
 )
 
 type SearchClient interface {
@@ -84,7 +85,7 @@ func Search(client SearchClient, tmpl template.Template) Handler {
 		if results.Total.Count == 0 {
 			re := regexp.MustCompile(`\D+`)
 			input := re.ReplaceAllString(searchTerm, "")
-			isUid, err := regexp.MatchString(`^\d{12}$`, re.ReplaceAllString(input, ""))
+			isUid, err := regexp.MatchString(`^\d{12}$`, input)
 			if err != nil {
 				return err
 			}
@@ -104,4 +105,18 @@ func Search(client SearchClient, tmpl template.Template) Handler {
 
 		return tmpl(w, data)
 	}
+}
+
+func getPage(r *http.Request) int {
+	page := r.FormValue("page")
+	if page == "" {
+		return 1
+	}
+
+	v, err := strconv.Atoi(page)
+	if err != nil {
+		return 1
+	}
+
+	return v
 }
