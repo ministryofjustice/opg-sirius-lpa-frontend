@@ -27,8 +27,22 @@ $moj-page-width: 1220px;
    border-bottom: none;
  }
 
+.moj-search__button{
+    background-color: $govuk-brand-colour;
+    margin: 0;
+    border: none;
+}
+
+.moj-search__button:hover{
+    background-color: $govuk-link-hover-colour;
+}
+
 .app-\!-colour-text-red {
    color: govuk-colour("red") !important;
+}
+
+.app-\!-colour-text-blue {
+   color: govuk-colour("blue") !important;
 }
 
 .app-\!-pre-wrap {

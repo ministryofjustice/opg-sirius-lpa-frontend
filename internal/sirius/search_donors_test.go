@@ -35,6 +35,8 @@ func TestSearchDonors(t *testing.T) {
 						Body: dsl.Like(map[string]interface{}{
 							"term":        "7000-9999-0001",
 							"personTypes": []string{"Donor"},
+							"size":        PageLimit,
+							"from":        0,
 						}),
 					}).
 					WillRespondWith(dsl.Response{
@@ -42,20 +44,48 @@ func TestSearchDonors(t *testing.T) {
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 						Body: dsl.Like(map[string]interface{}{
 							"results": dsl.EachLike(map[string]interface{}{
-								"id":        dsl.Like(47),
-								"uId":       dsl.Like("7000-0000-0003"),
-								"firstname": dsl.Like("John"),
-								"surname":   dsl.Like("Doe"),
+								"id":           dsl.Like(47),
+								"uId":          dsl.Like("7000-0000-0003"),
+								"firstname":    dsl.Like("John"),
+								"surname":      dsl.Like("Doe"),
+								"addressLine1": dsl.Like("123 Somewhere Road"),
+								"personType":   dsl.Like("Donor"),
+								"cases": dsl.EachLike(map[string]interface{}{
+									"id":          dsl.Like(23),
+									"uId":         dsl.Term("7000-8548-8461", `\d{4}-\d{4}-\d{4}`),
+									"caseSubtype": dsl.Term("pfa", "hw|pfa"),
+									"status":      dsl.Like("Perfect"),
+									"caseType":    dsl.Like("LPA"),
+								}, 1),
 							}, 1),
+							"aggregations": dsl.Like(map[string]interface{}{
+								"personType": map[string]int{
+									"Donor": 1,
+								},
+							}),
+							"total": dsl.Like(map[string]interface{}{
+								"count": dsl.Like(1),
+							}),
 						}),
 					})
 			},
 			expectedResponse: []Person{
 				{
-					ID:        47,
-					UID:       "7000-0000-0003",
-					Firstname: "John",
-					Surname:   "Doe",
+					ID:           47,
+					UID:          "7000-0000-0003",
+					Firstname:    "John",
+					Surname:      "Doe",
+					AddressLine1: "123 Somewhere Road",
+					PersonType:   "Donor",
+					Cases: []*Case{
+						{
+							ID:       23,
+							UID:      "7000-8548-8461",
+							CaseType: "LPA",
+							SubType:  "pfa",
+							Status:   "Perfect",
+						},
+					},
 				},
 			},
 		},

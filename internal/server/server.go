@@ -63,6 +63,7 @@ type Client interface {
 	MiReportingClient
 	RelationshipClient
 	SearchDonorsClient
+	SearchClient
 	SearchUsersClient
 	TaskClient
 	UnlinkPersonClient
@@ -106,6 +107,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/payments", wrap(GetPayments(client, templates.Get("payments.gohtml"))))
 	mux.Handle("/search-users", wrap(SearchUsers(client)))
 	mux.Handle("/search-persons", wrap(SearchDonors(client)))
+	mux.Handle("/search", wrap(Search(client, templates.Get("search.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))
 	mux.Handle("/assets/", static)
