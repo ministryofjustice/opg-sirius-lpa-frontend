@@ -56,19 +56,15 @@ func TestDocumentTypes(t *testing.T) {
 				{
 					Inserts: []Insert{
 						{
-							Key:      "all",
-							InsertId: "DD1",
-							UniversalTemplateData: UniversalTemplateData{
-								Location:        `lpa\/inserts\/DD1.html.twig`,
-								OnScreenSummary: "DD1LPAINSERTONSCREENSUMMARY",
-							},
+							Key:             "all",
+							InsertId:        "DD1",
+							Location:        `lpa\/inserts\/DD1.html.twig`,
+							OnScreenSummary: "DD1LPAINSERTONSCREENSUMMARY",
 						},
 					},
-					UniversalTemplateData: UniversalTemplateData{
-						Location:        `lpa\/DD.html.twig`,
-						OnScreenSummary: "DDONSCREENSUMMARY",
-					},
-					TemplateId: "DD",
+					Location:        `lpa\/DD.html.twig`,
+					OnScreenSummary: "DDONSCREENSUMMARY",
+					TemplateId:      "DD",
 				},
 			},
 		},
@@ -89,7 +85,7 @@ func TestDocumentTypes(t *testing.T) {
 							"DD": dsl.Like(map[string]interface{}{
 								"onScreenSummary": dsl.Like("DDONSCREENSUMMARY"),
 								"location":        dsl.Like(`lpa\/DD.html.twig`),
-								"inserts":         dsl.Like(map[string]interface{}{}),
+								"inserts":         dsl.Like([]interface{}{}),
 							}),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
@@ -97,12 +93,10 @@ func TestDocumentTypes(t *testing.T) {
 			},
 			expectedResponse: []DocumentTemplateData{
 				{
-					Inserts: []Insert(nil),
-					UniversalTemplateData: UniversalTemplateData{
-						Location:        `lpa\/DD.html.twig`,
-						OnScreenSummary: "DDONSCREENSUMMARY",
-					},
-					TemplateId: "DD",
+					Inserts:         []Insert(nil),
+					Location:        `lpa\/DD.html.twig`,
+					OnScreenSummary: "DDONSCREENSUMMARY",
+					TemplateId:      "DD",
 				},
 			},
 		},

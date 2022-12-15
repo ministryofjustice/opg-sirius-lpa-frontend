@@ -63,12 +63,10 @@ func TestGetCreateDocument(t *testing.T) {
 
 			documentTemplateData := []sirius.DocumentTemplateData{
 				{
-					Inserts:    nil,
-					TemplateId: "DD",
-					UniversalTemplateData: sirius.UniversalTemplateData{
-						Location:        "DD.html.twig",
-						OnScreenSummary: "DDONSCREENSUMMARY",
-					},
+					Inserts:         nil,
+					TemplateId:      "DD",
+					Location:        "DD.html.twig",
+					OnScreenSummary: "DDONSCREENSUMMARY",
 				},
 			}
 
@@ -274,12 +272,10 @@ func TestGetCreateDocumentWhenFailureOnGetDocumentRefData(t *testing.T) {
 
 	documentTemplateData := []sirius.DocumentTemplateData{
 		{
-			Inserts:    nil,
-			TemplateId: "DD",
-			UniversalTemplateData: sirius.UniversalTemplateData{
-				Location:        `lpa\/DD.html.twig`,
-				OnScreenSummary: "DDONSCREENSUMMARY",
-			},
+			Inserts:         nil,
+			TemplateId:      "DD",
+			Location:        `lpa\/DD.html.twig`,
+			OnScreenSummary: "DDONSCREENSUMMARY",
 		},
 	}
 
@@ -345,12 +341,10 @@ func TestGetCreateDocumentWhenTemplateErrors(t *testing.T) {
 
 	documentTemplateData := []sirius.DocumentTemplateData{
 		{
-			Inserts:    nil,
-			TemplateId: "DD",
-			UniversalTemplateData: sirius.UniversalTemplateData{
-				Location:        `lpa\/DD.html.twig`,
-				OnScreenSummary: "DDONSCREENSUMMARY",
-			},
+			Inserts:         nil,
+			TemplateId:      "DD",
+			Location:        `lpa\/DD.html.twig`,
+			OnScreenSummary: "DDONSCREENSUMMARY",
 		},
 	}
 
@@ -395,12 +389,10 @@ func TestGetCreateDocumentWhenPersonErrors(t *testing.T) {
 
 	documentTemplateData := []sirius.DocumentTemplateData{
 		{
-			Inserts:    nil,
-			TemplateId: "DD",
-			UniversalTemplateData: sirius.UniversalTemplateData{
-				Location:        `lpa\/DD.html.twig`,
-				OnScreenSummary: "DDONSCREENSUMMARY",
-			},
+			Inserts:         nil,
+			TemplateId:      "DD",
+			Location:        `lpa\/DD.html.twig`,
+			OnScreenSummary: "DDONSCREENSUMMARY",
 		},
 	}
 
@@ -437,12 +429,10 @@ func TestTranslateDocumentData(t *testing.T) {
 
 	documentTemplateData := []sirius.DocumentTemplateData{
 		{
-			Inserts:    nil,
-			TemplateId: "DD",
-			UniversalTemplateData: sirius.UniversalTemplateData{
-				Location:        `DD.html.twig`,
-				OnScreenSummary: "DDONSCREENSUMMARY",
-			},
+			Inserts:         nil,
+			TemplateId:      "DD",
+			Location:        `DD.html.twig`,
+			OnScreenSummary: "DDONSCREENSUMMARY",
 		},
 	}
 
@@ -462,12 +452,10 @@ func TestTranslateInsertData(t *testing.T) {
 
 	selectedTemplateInserts := []sirius.Insert{
 		{
-			Key:      "All",
-			InsertId: "DDINSERT",
-			UniversalTemplateData: sirius.UniversalTemplateData{
-				Location:        `lpa\/DD.html.twig`,
-				OnScreenSummary: "DDINSERTONSCREENSUMMARY",
-			},
+			Key:             "All",
+			InsertId:        "DDINSERT",
+			Location:        `lpa\/DD.html.twig`,
+			OnScreenSummary: "DDINSERTONSCREENSUMMARY",
 		},
 	}
 
