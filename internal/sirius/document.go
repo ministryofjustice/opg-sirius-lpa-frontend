@@ -1,125 +1,39 @@
 package sirius
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
-	"net/http"
 )
 
 type Document struct {
-	ID              int    `json:"id,omitempty"`
-	CorrespondentID int    `json:"correspondentID"`
-	Type            string `json:"type"`
-	SystemType      string `json:"systemType"`
-	FileName        string `json:"fileName,omitempty"`
-	Content         string `json:"content"`
+	ID                  int    `json:"id,omitempty"`
+	UUID                string `json:"uuid,omitempty"`
+	Type                string `json:"type"`
+	FriendlyDescription string `json:"friendlyDescription"`
+	CreatedDate         string `json:"createdDate"`
+	Direction           string `json:"direction"`
+	MimeType            string `json:"mimeType"`
+	SystemType          string `json:"systemType"`
+	FileName            string `json:"fileName,omitempty"`
+	Content             string `json:"content,omitempty"`
+	Correspondent       Person `json:"correspondent"`
+	ChildCount          int    `json:"childCount"`
+	CaseItems           []Case `json:"caseItems"`
 }
 
-type documentTemplateApiResponse map[string]json.RawMessage
-type insertApiResponse map[string]json.RawMessage
+func (c *Client) Documents(ctx Context, caseType CaseType, caseId int) ([]Document, error) {
+	var d []Document
 
-type UniversalTemplateData struct {
-	Location        string `json:"location"`
-	OnScreenSummary string `json:"onScreenSummary"`
-}
-
-type documentTemplateApiData struct {
-	Inserts         insertApiResponse `json:"inserts"`
-	Location        string            `json:"location"`
-	OnScreenSummary string            `json:"onScreenSummary"`
-}
-
-type Insert struct {
-	Key             string
-	InsertId        string
-	Location        string `json:"location"`
-	OnScreenSummary string `json:"onScreenSummary"`
-}
-
-type DocumentTemplateData struct {
-	Inserts         []Insert
-	TemplateId      string
-	Location        string `json:"location"`
-	OnScreenSummary string `json:"onScreenSummary"`
-}
-
-func (d documentTemplateApiResponse) toDocumentData() ([]DocumentTemplateData, error) {
-	var s []DocumentTemplateData
-
-	for k, v := range d {
-		var asDocumentTemplateData DocumentTemplateData
-		asDocumentTemplateData.TemplateId = k
-
-		var asDocumentTemplateApiData documentTemplateApiData
-		if err := json.Unmarshal(v, &asDocumentTemplateApiData); err == nil {
-			inserts, err := asDocumentTemplateApiData.Inserts.toInsertData()
-			if err != nil {
-				return nil, err
-			}
-			asDocumentTemplateData.Location = asDocumentTemplateApiData.Location
-			asDocumentTemplateData.OnScreenSummary = asDocumentTemplateApiData.OnScreenSummary
-			asDocumentTemplateData.Inserts = inserts
-			s = append(s, asDocumentTemplateData)
-			continue
-		} else {
-			// handle when inserts = []
-			var universalTemplateData UniversalTemplateData
-			if err := json.Unmarshal(v, &universalTemplateData); err == nil {
-				asDocumentTemplateData.Location = universalTemplateData.Location
-				asDocumentTemplateData.OnScreenSummary = universalTemplateData.OnScreenSummary
-				s = append(s, asDocumentTemplateData)
-				continue
-			}
-		}
-
-		return nil, errors.New("could not format document template data")
-	}
-	return s, nil
-}
-
-func (i insertApiResponse) toInsertData() ([]Insert, error) {
-	var inserts []Insert
-
-	for k, v := range i {
-		var insert Insert
-		insert.Key = k
-		var asInsertKeyApiResponse map[string]UniversalTemplateData
-		if err := json.Unmarshal(v, &asInsertKeyApiResponse); err == nil {
-			for insertId, insertData := range asInsertKeyApiResponse {
-				insert.InsertId = insertId
-				insert.Location = insertData.Location
-				insert.OnScreenSummary = insertData.OnScreenSummary
-				inserts = append(inserts, insert)
-			}
-			continue
-		}
-
-		return nil, errors.New("could not format insert data")
-	}
-	return inserts, nil
-}
-
-func (c *Client) DocumentTemplates(ctx Context, caseType CaseType) ([]DocumentTemplateData, error) {
-	req, err := c.newRequest(ctx, http.MethodGet, fmt.Sprintf("/lpa-api/v1/templates/%s", caseType), nil)
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/%s/%d/documents", caseType+"s", caseId), &d)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := c.http.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	return d, err
+}
 
-	var v documentTemplateApiResponse
-	if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
-		return nil, err
-	}
+func (c *Client) DocumentByUUID(ctx Context, uuid string) (Document, error) {
+	var d Document
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/documents/%s", uuid), &d)
 
-	data, err := v.toDocumentData()
-	if err != nil {
-		return nil, err
-	}
-	return data, err
+	return d, err
 }

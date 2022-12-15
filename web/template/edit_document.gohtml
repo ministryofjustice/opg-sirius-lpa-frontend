@@ -1,0 +1,37 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Edit Document{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            {{ template "error-summary" .Error }}
+
+            {{ if .Success }}
+                <meta data-app-reload="page" />
+                {{ template "success-banner" "You have successfully published a document." }}
+            {{ end }}
+
+            <h1 class="govuk-heading-l app-!-embedded-hide">Edit Draft</h1>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <div class="govuk-form-group {{ if .Error.Field.templateId }}govuk-form-group--error{{ end }}">
+                        <label class="govuk-label" for="f-document">
+                            Select draft document to edit
+                        </label>
+                        {{ template "errors" .Error.Field.document }}
+                        <select class="govuk-select {{ if .Error.Field.document }}govuk-select--error{{ end }}" id="f-document" name="document">
+                            <option hidden {{ if not nil }}selected{{ end }} disabled></option>
+                            {{ range .Documents }}
+                                <option value="{{ .ID }}" {{ if eq .ID nil }}selected{{ end }}>{{ .ID }}: {{ formatDate .CreatedDate }}: {{ .Correspondent.Firstname }} {{ .Correspondent.Surname }}: {{ .SystemType }}</option>
+                            {{ end }}
+                        </select>
+                    </div>
+                </fieldset>
+            </div>
+
+
+        </div>
+    </div>
+{{ end }}
