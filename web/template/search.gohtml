@@ -59,15 +59,16 @@
                         {{ range $r := (slice .Results 0 (len .Results)) }}
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell govuk-link--no-visited-state">
-                                    {{ if .Cases }}
-                                        {{ if eq (ToLower .PersonType) "donor" }}
-                                            <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" .ID (index .Cases 0).ID) }}">{{ (index .Cases 0).UID }}</a>
-                                        {{ else if or (eq (ToLower .PersonType) "client") (eq (ToLower .PersonType) "deputy") }}
-                                            <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/supervision#/clients/%d?order=%d" .ID (index .Cases 0).ID) }}">{{ (index .Cases 0).UID }}</a>
+                                    {{ range $case := .Cases }}
+                                        {{ if eq (ToLower $r.PersonType) "donor" }}
+                                            <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" $r.ID $case.ID) }}">{{ $case.UID }}</a><br>
+                                        {{ else if or (eq (ToLower $r.PersonType) "client") (eq (ToLower $r.PersonType) "deputy") }}
+                                            <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/supervision#/clients/%d?order=%d" $r.ID $case.ID) }}">{{ $case.UID }}</a><br>
                                         {{ else }}
-                                            <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" (index .Cases 0).Donor.ID (index .Cases 0).ID) }}">{{ (index .Cases 0).UID }}</a>
+                                            <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" $case.Donor.ID $case.ID) }}">{{ $case.UID }}</a><br>
                                         {{ end }}
-                                    {{ else }}
+                                    {{ end }}
+                                    {{ if eq 0 (len .Cases) }}
                                         Not associated with a case
                                     {{ end }}
                                 </td>
@@ -90,12 +91,16 @@
                                 </td>
                                 <td class="govuk-table__cell" data-sort-value="{{ dateYear .DateOfBirth }}">{{ formatDate .DateOfBirth }}</td>
                                 <td class="govuk-table__cell">{{ .AddressSummary }}</td>
-                                <td class="govuk-table__cell">{{ if .Cases }}{{ (index .Cases 0).CaseType }} - {{ ToUpper (index .Cases 0).SubType }}{{ end }}</td>
+                                <td class="govuk-table__cell">
+                                    {{ range $case := .Cases }}
+                                        {{ $case.CaseType }} - {{ ToUpper $case.SubType }}<br>
+                                    {{ end }}
+                                </td>
                                 <td class="govuk-table__cell" {{ if .Cases }}data-sort-value="{{ (ToLower (index .Cases 0).Status) }}"{{ end }}>
-                                    {{ if .Cases }}
-                                        {{ $status := (ToLower (index .Cases 0).Status) }}
+                                    {{ range $case := .Cases }}
+                                        {{ $status := (ToLower $case.Status) }}
                                         {{ if $status }}
-                                            {{ template "status-tag" (ToLower (index .Cases 0).Status) }}
+                                            {{ template "status-tag" (ToLower $case.Status) }}<br>
                                         {{ end }}
                                     {{ end }}
                                 </td>
