@@ -5,6 +5,9 @@ import autoResizeTextArea from "./auto-resize-text-area.js";
 import loadingButton from "./loading-button.js";
 import select from "./select.js";
 import todaysDate from "./todays-date.js";
+import showHideFilter from "./show-hide-filter";
+import fullWidthContainer from "./full-width-container";
+import searchController from "./search-controller";
 
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
@@ -20,6 +23,9 @@ autoResizeTextArea();
 select(prefix);
 todaysDate();
 loadingButton();
+searchController();
+showHideFilter();
+fullWidthContainer();
 
 if (window.self !== window.parent) {
   const success = document.querySelector("[data-app-reload~=\"page\"]");
