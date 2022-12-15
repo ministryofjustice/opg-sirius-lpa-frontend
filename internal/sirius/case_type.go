@@ -11,9 +11,9 @@ const (
 
 func ParseCaseType(s string) (CaseType, error) {
 	switch s {
-	case "lpa":
+	case "lpa", "LPA":
 		return CaseTypeLpa, nil
-	case "epa":
+	case "epa", "EPA":
 		return CaseTypeEpa, nil
 	}
 
