@@ -14,24 +14,31 @@
 
             <h1 class="govuk-heading-l app-!-embedded-hide">Edit Draft</h1>
 
-            <div class="govuk-form-group">
-                <fieldset class="govuk-fieldset">
-                    <div class="govuk-form-group {{ if .Error.Field.templateId }}govuk-form-group--error{{ end }}">
-                        <label class="govuk-label" for="f-document">
-                            Select draft document to edit
-                        </label>
-                        {{ template "errors" .Error.Field.document }}
-                        <select class="govuk-select {{ if .Error.Field.document }}govuk-select--error{{ end }}" id="f-document" name="document">
-                            <option hidden {{ if not nil }}selected{{ end }} disabled></option>
-                            {{ range .Documents }}
-                                <option value="{{ .ID }}" {{ if eq .ID nil }}selected{{ end }}>{{ .ID }}: {{ formatDate .CreatedDate }}: {{ .Correspondent.Firstname }} {{ .Correspondent.Surname }}: {{ .SystemType }}</option>
-                            {{ end }}
-                        </select>
+            <form class="form" method="GET">
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset">
+                        <div class="govuk-form-group {{ if .Error.Field.document }}govuk-form-group--error{{ end }}">
+                            <label class="govuk-label" for="f-document">
+                                Select draft document to edit
+                            </label>
+                            {{ template "errors" .Error.Field.document }}
+                            <select class="govuk-select {{ if .Error.Field.document }}govuk-select--error{{ end }}" id="f-document" name="document">
+                                <option hidden {{ if not nil }}selected{{ end }} disabled></option>
+                                {{ $documentID := .Document.ID }}
+                                {{ range .Documents }}
+                                    <option value="{{ .ID }}" {{ if eq .ID $documentID }}selected{{ end }}>{{ .ID }}: {{ .CreatedDate }}: {{ .Correspondent.Firstname }} {{ .Correspondent.Surname }}: {{ .SystemType }}</option>
+                                {{ end }}
+                            </select>
+                        </div>
+                    </fieldset>
+                    <div class="govuk-button-group govuk-!-padding-top-5">
+                        <button class="govuk-button" data-module="govuk-button" type="submit">Select draft</button>
                     </div>
-                </fieldset>
+                </div>
+            </form>
+            <div class="govuk-form-group {{ if .Error.Field.documentTextEditor }}govuk-form-group--error{{ end }}">
+                <textarea id="documentTextEditor" name="documentTextEditor">{{ .Document.Content }}</textarea>
             </div>
-
-
         </div>
     </div>
 {{ end }}
