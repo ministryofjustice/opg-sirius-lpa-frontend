@@ -23,7 +23,7 @@ describe("Create a document", () => {
         cy.contains(".govuk-radios__item", "Generate").find("input").check();
 
         cy.get("#f-salutation").type("Prof");
-        cy.get("#f-firstName").type("Melanie");
+        cy.get("#f-firstname").type("Melanie");
         cy.get("#f-middlenames").type("Josefina");
         cy.get("#f-surname").type("Vanvolkenburg");
         cy.get("#f-addressLine1").type("29737 Andrew Plaza");

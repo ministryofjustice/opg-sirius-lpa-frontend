@@ -66,6 +66,18 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				return err
 			}
 			data.Document = document
+		case http.MethodPost:
+			documentControls := postFormString(r, "documentControls")
+
+			switch documentControls {
+			case "save":
+
+			case "preview":
+			case "delete":
+			case "publish":
+			case "cancel":
+			case "saveAndExit":
+			}
 		}
 
 		return tmpl(w, data)

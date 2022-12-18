@@ -39,9 +39,18 @@
                     </div>
                 </div>
             </form>
-            <div class="govuk-form-group {{ if .Error.Field.documentTextEditor }}govuk-form-group--error{{ end }}">
-                <textarea id="documentTextEditor" name="documentTextEditor">{{ .Document.Content }}</textarea>
-            </div>
+            <form class="form" method="POST">
+                <div class="govuk-form-group {{ if .Error.Field.documentTextEditor }}govuk-form-group--error{{ end }}">
+                    <textarea id="documentTextEditor" name="documentTextEditor">{{ .Document.Content }}</textarea>
+                </div>
+                <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit" value="publish">Publish draft</button>
+                <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit" value="delete">Delete draft</button>
+                <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit" value="save">Save draft</button>
+                <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit" value="preview">Preview</button>
+                <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit" value="cancel">Cancel</button>
+                <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit" value="saveAndExit">Save and exit</button>
+
+            </form>
         </div>
     </div>
 {{ end }}

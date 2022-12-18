@@ -17,7 +17,7 @@ type Document struct {
 	Content             string `json:"content,omitempty"`
 	Correspondent       Person `json:"correspondent"`
 	ChildCount          int    `json:"childCount"`
-	CaseItems           []Case `json:"caseItems"`
+	CaseItems           []Case `json:"caseItems,omitempty"`
 }
 
 func (c *Client) Documents(ctx Context, caseType CaseType, caseId int) ([]Document, error) {
