@@ -15,6 +15,9 @@
             <h1 class="govuk-heading-l app-!-embedded-hide">Edit Draft</h1>
 
             <form class="form" method="GET">
+                <input type="hidden" name="id" value="{{ .Case.ID }}"/>
+                <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
+
                 <div class="govuk-form-group">
                     <fieldset class="govuk-fieldset">
                         <div class="govuk-form-group {{ if .Error.Field.document }}govuk-form-group--error{{ end }}">

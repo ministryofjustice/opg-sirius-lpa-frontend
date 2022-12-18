@@ -32,7 +32,6 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 
 		switch r.Method {
 		case http.MethodGet:
-
 			caseID, err := strconv.Atoi(r.FormValue("id"))
 			if err != nil {
 				return err
@@ -53,13 +52,19 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				return err
 			}
 
-			document, err := client.DocumentByUUID(ctx, documents[0].UUID)
+			data.Case = caseItem
+			data.Documents = documents
+
+			defaultDocumentUUID := documents[0].UUID
+			selectedDocumentUUID := r.FormValue("document")
+			if selectedDocumentUUID != "" {
+				defaultDocumentUUID = selectedDocumentUUID
+
+			}
+			document, err := client.DocumentByUUID(ctx, defaultDocumentUUID)
 			if err != nil {
 				return err
 			}
-
-			data.Case = caseItem
-			data.Documents = documents
 			data.Document = document
 		}
 
