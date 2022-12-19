@@ -1,22 +1,16 @@
-import MOJFrontend from "@ministryofjustice/frontend/moj/all.js";
-import $ from "jquery";
-
 export default function showHideFilter(prefix) {
-    new MOJFrontend.FilterToggleButton({
-        bigModeMediaQuery: "(min-width: 48.063em)",
-        startHidden: false,
-        toggleButton: {
-            container: $(".moj-action-bar__filter"),
-            showText: "Show filter",
-            hideText: "Hide filter",
-            classes: "govuk-button--secondary",
-        },
-        closeButton: {
-            container: $(".moj-filter__header-action"),
-            text: "Close",
-        },
-        filter: {
-            container: $(".moj-filter"),
-        },
-    });
+    const button = document.querySelector("button[data-filter-toggle]");
+    const filters = document.querySelector(".moj-filter-layout__filter");
+
+    if (button && filters) {
+        button.onclick = () => {
+            if (button.innerText === "Hide filters") {
+                button.innerText = "Show filters";
+                filters.classList.add("govuk-!-display-none");
+            } else {
+                button.innerText = "Hide filters";
+                filters.classList.remove("govuk-!-display-none");
+            }
+        };
+    }
 }
