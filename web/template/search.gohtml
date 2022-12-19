@@ -13,9 +13,9 @@
         {{ template "search-filter" . }}
 
         <div class="moj-filter-layout__content govuk-!-padding-left-2 govuk-!-padding-right-2">
-            <div class="moj-action-bar govuk">
-                <div class="moj-action-bar__filter govuk-!-margin-bottom-0"></div>
-            </div>
+            <button class="govuk-button govuk-button--secondary" aria-controls="app-filters" data-filter-toggle>
+                {{ if .Filters.Set }}Hide{{ else }}Show{{ end }} filters
+            </button>
 
             <h3 class="govuk-heading-s govuk-!-margin-bottom-6">You searched for:  {{ .SearchTerm }}</h3>
 
@@ -41,7 +41,7 @@
                 </div>
             {{ else }}
 
-                <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-top-5">
+                <p class="moj-pagination__results govuk-!-padding-0 govuk-!-margin-bottom-6">Showing <b>{{ .Pagination.Start }}</b> to <b>{{ .Pagination.End }}</b> of <b>{{ .Pagination.TotalItems }}</b> cases</p>
 
                 {{ if eq 0 (len .DeletedCases) }}
                     <table class="govuk-table" data-module="moj-sortable-table">

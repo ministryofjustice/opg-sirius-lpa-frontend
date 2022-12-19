@@ -24,9 +24,9 @@ describe("Search", () => {
         });
 
         it("it shows/hides filter panel", () => {
-            cy.contains(".govuk-button", "Hide filter").click();
+            cy.contains(".govuk-button", "Hide filters").click();
             cy.contains("Apply filters").should("not.be.visible");
-            cy.contains(".govuk-button", "Show filter").click();
+            cy.contains(".govuk-button", "Show filters").click();
             cy.contains("Apply filters").should("be.visible");
         });
 
