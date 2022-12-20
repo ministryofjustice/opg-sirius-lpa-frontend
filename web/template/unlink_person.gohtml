@@ -54,7 +54,7 @@
                                 {{ range $i, $e := .Person.Children }}
                                     <div class="govuk-radios__item">
                                         <input class="govuk-radios__input" id="child-id-{{ $i }}" name="child-id" type="radio" value="{{ $e.ID }}">
-                                        <label class="govuk-label govuk-radios__label unlink-table__label" for="child-id-{{ $i }}">
+                                        <label class="govuk-label govuk-radios__label app-!-unlink-table__label" for="child-id-{{ $i }}">
                                             <table class="govuk-table">
                                                 <tbody class="govuk-table__body">
                                                 <tr class="govuk-table__row">
