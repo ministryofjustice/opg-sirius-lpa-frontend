@@ -40,11 +40,11 @@
                 {{ if eq 0 (len .DeletedCases) }}
                     <table class="govuk-table" data-module="moj-sortable-table">
                         <thead class="govuk-table__head">
-                        <tr class="govuk-table__row">
+                        <tr class="govuk-table__row" id="search-results-table">
                             <th scope="col" class="govuk-table__header" aria-sort="none">Case number</th>
                             <th scope="col" class="govuk-table__header" aria-sort="none">Name/Role</th>
                             <th scope="col" class="govuk-table__header" aria-sort="none">Date of birth</th>
-                            <th scope="col" class="govuk-table__header govuk-!-width-one-third app-!-colour-text-blue">Address</th>
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-third">Address</th>
                             <th scope="col" class="govuk-table__header" aria-sort="none">Type</th>
                             <th scope="col" class="govuk-table__header" aria-sort="none">Status</th>
                         </tr>
