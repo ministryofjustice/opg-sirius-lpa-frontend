@@ -41,10 +41,6 @@ $moj-page-width: 1220px;
    color: govuk-colour("red") !important;
 }
 
-.app-\!-colour-text-blue {
-   color: govuk-colour("blue") !important;
-}
-
 .app-\!-pre-wrap {
     white-space: pre-wrap;
 }
@@ -63,4 +59,9 @@ $moj-page-width: 1220px;
 
 .moj-filter-layout__filter {
     width: fit-content;
+}
+
+.app-\!-search-results-table th,
+.app-\!-search-results-table th button {
+    color: govuk-colour("blue");
 }
