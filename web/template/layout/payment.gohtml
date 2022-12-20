@@ -38,7 +38,7 @@
                     {{ end }}
                     {{ if not .Locked }}
                         <tr class="govuk-table__row">
-                            <th scope="row" class="govuk-table__header table-row__no-border"
+                            <th scope="row" class="govuk-table__header app-!-table-row__no-border"
                                 colspan="2">
                                 <a class="govuk-link"
                                    href="{{ prefix (printf "/edit-payment?id=%d" .ID) }}">
@@ -47,7 +47,7 @@
                             </th>
                         </tr>
                         <tr class="govuk-table__row">
-                            <th scope="row" class="govuk-table__header table-row__no-border"
+                            <th scope="row" class="govuk-table__header app-!-table-row__no-border"
                                 colspan="2">
                                 <a class="govuk-link govuk-link--no-visited-state app-!-colour-text-red"
                                    href="{{ prefix (printf "/delete-payment?id=%d" .ID) }}">
