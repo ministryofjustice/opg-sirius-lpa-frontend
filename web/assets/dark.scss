@@ -5,7 +5,7 @@ $sirius-bg-color: #29292e;
   color: govuk-colour("white");
   color-scheme: dark;
 
-  footer,
+  .govuk-footer,
   body.govuk-template__body,
   .govuk-template {
     background-color: $sirius-bg-color;
@@ -75,9 +75,9 @@ $sirius-bg-color: #29292e;
   }
 
   .moj-pagination__link,
-  #search-results-table th,
-  #search-results-table th button {
-      color: govuk-colour("light-blue");
+  .app-\!-search-results-table th,
+  .app-\!-search-results-table th button {
+    color: govuk-colour("light-blue");
   }
 
   .govuk-notification-banner__content {

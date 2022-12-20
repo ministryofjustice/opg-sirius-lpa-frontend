@@ -61,7 +61,7 @@ $moj-page-width: 1220px;
     width: fit-content;
 }
 
-#search-results-table th,
-#search-results-table th button {
+.app-\!-search-results-table th,
+.app-\!-search-results-table th button {
     color: govuk-colour("blue");
 }
