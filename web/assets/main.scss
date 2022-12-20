@@ -15,25 +15,21 @@ $moj-page-width: 1220px;
   font-size: 0.875em;
 }
 
-.autocomplete__wrapper {
-  font-family: $govuk-font-family;
-}
-
-.unlink-table__label {
+.app-\!-unlink-table__label {
   width: 100%;
 }
 
-.table-row__no-border {
+.app-\!-table-row__no-border {
    border-bottom: none;
  }
 
-.moj-search__button{
+.app-\!-moj-search__button{
     background-color: $govuk-brand-colour;
     margin: 0;
     border: none;
 }
 
-.moj-search__button:hover{
+.app-\!-moj-search__button:hover{
     background-color: $govuk-link-hover-colour;
 }
 
@@ -57,7 +53,11 @@ $moj-page-width: 1220px;
     z-index: 0;
 }
 
-.moj-filter-layout__filter {
+.autocomplete__wrapper {
+  font-family: $govuk-font-family;
+}
+
+.app-\!-width-fit-content {
     width: fit-content;
 }
 
