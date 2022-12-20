@@ -5,6 +5,7 @@ $sirius-bg-color: #29292e;
   color: govuk-colour("white");
   color-scheme: dark;
 
+  .govuk-footer,
   body.govuk-template__body,
   .govuk-template {
     background-color: $sirius-bg-color;
@@ -23,6 +24,7 @@ $sirius-bg-color: #29292e;
   .govuk-heading-s,
   .govuk-heading-xs,
   p,
+  legend,
   .govuk-list {
     color: govuk-colour("white");
   }
@@ -60,9 +62,22 @@ $sirius-bg-color: #29292e;
   .govuk-textarea,
   .govuk-select,
   .govuk-table,
+  .moj-filter,
+  .moj-filter__selected,
   .autocomplete__input {
     background-color: $sirius-bg-color;
     color: govuk-colour("white");
+  }
+
+  .moj-pagination__link::before,
+  .moj-pagination__link::after {
+    filter: invert(100%);
+  }
+
+  .moj-pagination__link,
+  .app-\!-search-results-table th,
+  .app-\!-search-results-table th button {
+    color: govuk-colour("light-blue");
   }
 
   .govuk-notification-banner__content {
