@@ -1,4 +1,4 @@
-const toggleInsertCheckboxes = () => {
+const handleInsertCheckboxes = () => {
     /*Insert checkboxes may appear twice and therefore js is needed to make sure
     that a check in one tab is displayed in the other*/
 
@@ -20,4 +20,4 @@ const toggleInsertCheckboxes = () => {
     }
 };
 
-export default toggleInsertCheckboxes;
+export default handleInsertCheckboxes;

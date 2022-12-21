@@ -1,4 +1,4 @@
-const toggleTabs = () => {
+const selectTab = () => {
     /** @type NodeList|null tabs */
     const tabs = document.querySelectorAll(
         '[data-module="tab-link"]'
@@ -33,5 +33,5 @@ const toggleTabs = () => {
     }
 };
 
-export default toggleTabs;
+export default selectTab;
 
