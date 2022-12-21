@@ -114,7 +114,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = sirius.ValidationError{
 					Field: sirius.FieldErrors{
-						"templateId": {"reason": "Please select a document template"},
+						"templateId": {"reason": "Please select a document template to continue"},
 					},
 				}
 			}
