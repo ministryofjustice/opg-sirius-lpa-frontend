@@ -1,0 +1,68 @@
+{{ define "add-recipient" }}
+    <div class="govuk-form-group {{ if .Error.Field.addNewRecipient }}govuk-form-group--error{{ end }}">
+        <div class="govuk-!-width-one-half govuk-form-group {{ if .Error.Field.addNewRecipient }}govuk-form-group--error{{ end }}">
+            {{ template "input" (field "salutation" "Salutation" nil .Error.Field.contactSalutation) }}
+            {{ template "input" (field "firstname" "First name" nil .Error.Field.contactFirstname) }}
+            {{ template "input" (field "middlenames" "Middle name" nil .Error.Field.contactMiddlenames) }}
+            {{ template "input" (field "surname" "Last name" nil .Error.Field.contactSurname) }}
+            {{ template "input" (field "companyName" "Company name" nil .Error.Field.companyName) }}
+            {{ template "input" (field "companyReference" "Company reference" nil .Error.Field.companyReference) }}
+            {{ template "input" (field "addressLine1" "Address 1" nil .Error.Field.addressLine1) }}
+            {{ template "input" (field "addressLine2" "Address 2" nil .Error.Field.addressLine2) }}
+            {{ template "input" (field "addressLine3" "Address 3" nil .Error.Field.addressLine3) }}
+            {{ template "input" (field "town" "City/town" nil .Error.Field.town) }}
+            {{ template "input" (field "county" "County" nil .Error.Field.county) }}
+            {{ template "input" (field "postcode" "Postcode" nil .Error.Field.postcode) }}
+            {{ template "radios" (radios "isAirmailRequired" "Is airmail required" nil .Error.Field.isAirmailRequired
+            (item "Yes" "Yes")
+            (item "No" "No")
+            ) }}
+            {{ template "input" (field "phoneNumber" "Daytime telephone" nil .Error.Field.phoneNumber) }}
+            {{ template "input" (field "email" "Email address" nil .Error.Field.email) }}
+            <div class="govuk-form-group {{ if .Error.Field.correspondenceBy }}govuk-form-group--error{{ end }}">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend">Correspondence by</legend>
+                    {{ template "errors" .Error.Field.correspondenceBy }}
+                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="f-correspondenceBy-post"
+                                   name="correspondenceBy" type="checkbox" value="post">
+                            <label class="govuk-label govuk-checkboxes__label"
+                                   for="f-correspondenceBy-post">
+                                Post
+                            </label>
+                        </div>
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="f-correspondenceBy-email"
+                                   name="correspondenceBy" type="checkbox" value="email">
+                            <label class="govuk-label govuk-checkboxes__label"
+                                   for="f-correspondenceBy-email">
+                                Email
+                            </label>
+                        </div>
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="f-correspondenceBy-phone"
+                                   name="correspondenceBy" type="checkbox" value="phone">
+                            <label class="govuk-label govuk-checkboxes__label"
+                                   for="f-correspondenceBy-phone">
+                                Phone
+                            </label>
+                        </div>
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="f-correspondenceBy-welsh"
+                                   name="correspondenceBy" type="checkbox" value="welsh">
+                            <label class="govuk-label govuk-checkboxes__label"
+                                   for="f-correspondenceBy-welsh">
+                                Welsh
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="govuk-button-group govuk-!-padding-top-5">
+                <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
+            </div>
+            <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+    </div>
+{{end }}
