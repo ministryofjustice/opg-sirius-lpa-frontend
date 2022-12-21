@@ -329,7 +329,7 @@ func getSortedInsertKeys(selectedTemplateInserts []sirius.Insert) []string {
 		}
 	}
 	// insert api response infrequently includes the key all
-	// note api keys are lowercase so this check is case-sensitive
+	// note insert keys are lowercase so this check is case-sensitive
 	if !slices.Contains(documentInsertKeys, "all") {
 		documentInsertKeys = append(documentInsertKeys, "all")
 	}
