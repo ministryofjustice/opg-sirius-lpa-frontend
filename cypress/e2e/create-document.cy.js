@@ -10,7 +10,7 @@ describe("Create a document", () => {
         cy.contains("Select document inserts");
         cy.contains("DD1: DD1 - Case complete");
         cy.get("#f-DD1").click();
-        cy.contains("button", "Continue").click();
+        cy.contains("button", "Create draft document").click();
     });
 
 
