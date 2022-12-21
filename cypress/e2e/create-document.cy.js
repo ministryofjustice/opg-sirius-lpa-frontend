@@ -10,14 +10,14 @@ describe("Create a document", () => {
         cy.contains("Select document inserts");
         cy.contains("DD1: DD1 - Case complete");
         cy.get("#f-DD1").click();
-        cy.contains("button", "Create draft document").click();
+        cy.contains("button", "Continue").click();
     });
 
 
     it("creates a document on the case by selecting a recipient", () => {
         cy.contains("Select a recipient");
         cy.get("#f-189").click();
-        cy.contains("button", "Continue").click();
+        cy.contains("button", "Create draft document").click();
     });
 
     it("creates a new recipient via new recipient form", () => {
