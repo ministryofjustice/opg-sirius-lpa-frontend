@@ -69,3 +69,9 @@ $moj-page-width: 1220px;
 .app-\!-float-right {
     float: right;
 }
+
+.app-\!-td-last-child-no-border {
+    tr:last-child td {
+        border-bottom: none;
+    }
+}

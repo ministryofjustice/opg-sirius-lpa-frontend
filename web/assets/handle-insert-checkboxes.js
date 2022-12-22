@@ -11,7 +11,7 @@ const handleInsertCheckboxes = () => {
         checkboxes.forEach((el, i) => {
             el.addEventListener("change", (event) => {
                 checkboxes.forEach((otherEl) => {
-                    if (otherEl.id === el.id) {
+                    if (otherEl.value === el.value) {
                         el.checked ? otherEl.setAttribute("checked", "checked") : otherEl.removeAttribute("checked");
                     }
                 })

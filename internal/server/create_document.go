@@ -339,11 +339,11 @@ func getSortedInsertKeys(selectedTemplateInserts []sirius.Insert) []string {
 }
 
 func removeDuplicateStr(strSlice []string) []string {
-	allKeys := make(map[string]bool)
+	allKeys := make(map[string]struct{})
 	var list []string
 	for _, item := range strSlice {
 		if _, value := allKeys[item]; !value {
-			allKeys[item] = true
+			allKeys[item] = struct{}{}
 			list = append(list, item)
 		}
 	}
