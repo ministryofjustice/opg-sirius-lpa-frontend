@@ -75,7 +75,6 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 			case "preview":
 			case "delete":
 			case "publish":
-			case "cancel":
 			case "saveAndExit":
 			}
 		}
