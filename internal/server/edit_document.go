@@ -11,6 +11,7 @@ type EditDocumentClient interface {
 	Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int) ([]sirius.Document, error)
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
+	EditDocument(ctx sirius.Context, uuid string, content string) (sirius.Document, error)
 }
 
 type editDocumentData struct {
@@ -71,7 +72,37 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 
 			switch documentControls {
 			case "save":
+				content := r.FormValue("documentTextEditor")
+				documentUUID := r.FormValue("documentUUID")
 
+				document, err := client.EditDocument(ctx, documentUUID, content)
+				if err != nil {
+					return err
+				}
+
+				caseID, err := strconv.Atoi(r.FormValue("id"))
+				if err != nil {
+					return err
+				}
+
+				caseType, err := sirius.ParseCaseType(r.FormValue("case"))
+				if err != nil {
+					return err
+				}
+
+				caseItem, err := client.Case(ctx, caseID)
+				if err != nil {
+					return err
+				}
+
+				documents, err := client.Documents(ctx, caseType, caseID)
+				if err != nil {
+					return err
+				}
+
+				data.Case = caseItem
+				data.Documents = documents
+				data.Document = document
 			case "preview":
 			case "delete":
 			case "publish":

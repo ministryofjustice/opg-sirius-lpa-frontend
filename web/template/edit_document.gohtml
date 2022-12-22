@@ -37,6 +37,11 @@
                 </div>
             </form>
             <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+                <input type="hidden" name="id" value="{{ .Case.ID }}"/>
+                <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
+                <input type="hidden" name="documentUUID" value="{{ .Document.UUID }}"/>
+
                 <div class="govuk-form-group {{ if .Error.Field.documentTextEditor }}govuk-form-group--error{{ end }} govuk-!-margin-bottom-2">
                     <textarea id="documentTextEditor" name="documentTextEditor">{{ .Document.Content }}</textarea>
                 </div>
@@ -48,7 +53,7 @@
                             name="documentControls" type="submit" value="delete">Delete draft
                     </button>
                     <button class="govuk-button govuk-button--secondary" data-module="govuk-button"
-                            name="documentControls" type="submit" value="preview">Preview draftt
+                            name="documentControls" type="submit" value="preview">Preview draft
                     </button>
                 </div>
                 <div class="govuk-button-group govuk-!-margin-bottom-0">
