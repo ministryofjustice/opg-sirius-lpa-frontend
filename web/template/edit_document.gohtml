@@ -34,7 +34,7 @@
                         <option hidden {{ if not nil }}selected{{ end }} disabled></option>
                         {{ $documentID := .Document.ID }}
                         {{ range .Documents }}
-                            <option value="{{ .ID }}" {{ if eq .ID $documentID }}selected{{ end }}>{{ .ID }}: {{ .CreatedDate }}: {{ .Correspondent.Firstname }} {{ .Correspondent.Surname }}: {{ .SystemType }}</option>
+                            <option value="{{ .UUID }}" {{ if eq .ID $documentID }}selected{{ end }}>{{ .ID }}: {{ .CreatedDate }}: {{ .Correspondent.Firstname }} {{ .Correspondent.Surname }}: {{ .SystemType }}</option>
                         {{ end }}
                     </select>
                     <button class="govuk-button govuk-button--secondary govuk-grid-column-one-third app-!-float-right"

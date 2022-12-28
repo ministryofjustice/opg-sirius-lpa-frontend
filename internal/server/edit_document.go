@@ -14,7 +14,7 @@ type EditDocumentClient interface {
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 	EditDocument(ctx sirius.Context, uuid string, content string) (sirius.Document, error)
 	DeleteDocument(ctx sirius.Context, uuid string) error
-	AddDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string) error
+	AddDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string) (sirius.Document, error)
 }
 
 type editDocumentData struct {
@@ -76,7 +76,6 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 			documentControls := postFormString(r, "documentControls")
 			content := r.FormValue("documentTextEditor")
 			documentUUID := r.FormValue("documentUUID")
-
 			switch documentControls {
 			case "save":
 				document, err := client.EditDocument(ctx, documentUUID, content)
@@ -97,6 +96,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				data.Case = caseItem
 				data.Documents = documents
 				data.Document = document
+
 			case "preview":
 				_, err := client.EditDocument(ctx, documentUUID, content)
 				if err != nil {
@@ -109,7 +109,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					return err
 				}
 
-				err = client.AddDocument(ctx, caseID, document, sirius.TypePreview)
+				previewDocument, err := client.AddDocument(ctx, caseID, document, sirius.TypePreview)
 				if err != nil {
 					return err
 				}
@@ -127,7 +127,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				data.Case = caseItem
 				data.Documents = documents
 				data.Document = document
-				data.Download = fmt.Sprintf("/lpa-api/v1/documents/%s/download", document.UUID)
+				data.Download = fmt.Sprintf("/lpa-api/v1/documents/%s/download", previewDocument.UUID)
 
 			case "delete":
 				err := client.DeleteDocument(ctx, documentUUID)
@@ -155,6 +155,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					return err
 				}
 				data.Document = document
+
 			case "publish":
 				_, err := client.EditDocument(ctx, documentUUID, content)
 				if err != nil {
@@ -167,7 +168,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					return err
 				}
 
-				err = client.AddDocument(ctx, caseID, document, sirius.TypeSave)
+				_, err = client.AddDocument(ctx, caseID, document, sirius.TypeSave)
 				if err != nil {
 					return err
 				}

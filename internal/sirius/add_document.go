@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func (c *Client) AddDocument(ctx Context, caseID int, document Document, docType string) error {
+func (c *Client) AddDocument(ctx Context, caseID int, document Document, docType string) (Document, error) {
 	data, err := json.Marshal(struct {
 		CaseId          int    `json:"caseId"`
 		CorrespondentID int    `json:"correspondentId"`
@@ -24,31 +24,35 @@ func (c *Client) AddDocument(ctx Context, caseID int, document Document, docType
 		Content:         document.Content,
 	})
 	if err != nil {
-		return err
+		return Document{}, err
 	}
 
 	req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("/lpa-api/v1/lpas/%d/documents", caseID), bytes.NewReader(data))
 	if err != nil {
-		return err
+		return Document{}, err
 	}
 
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return err
+		return Document{}, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v ValidationError
 		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
-			return err
+			return Document{}, err
 		}
-		return v
+		return Document{}, v
 	}
 
 	if resp.StatusCode != http.StatusCreated {
-		return newStatusError(resp)
+		return Document{}, newStatusError(resp)
 	}
 
-	return nil
+	var d Document
+	if err := json.NewDecoder(resp.Body).Decode(&d); err != nil {
+		return Document{}, err
+	}
+	return d, nil
 }
