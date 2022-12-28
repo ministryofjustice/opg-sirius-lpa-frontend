@@ -14,6 +14,12 @@
 
             <h1 class="govuk-heading-l app-!-embedded-hide">Edit draft document</h1>
 
+            <div class="govuk-notification-banner govuk-!-display-none" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner" id="download-warning-message">
+                <div class="govuk-notification-banner__content">
+                    <p class="govuk-notification-banner__heading">Your download will open in a new window when ready</p>
+                </div>
+            </div>
+
             <form class="form" method="GET">
                 <input type="hidden" name="id" value="{{ .Case.ID }}"/>
                 <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
@@ -52,13 +58,18 @@
                     <button class="govuk-button govuk-button--secondary" data-module="govuk-button"
                             name="documentControls" type="submit" value="delete">Delete draft
                     </button>
-                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button"
-                            name="documentControls" type="submit" value="preview">Preview draft
-                    </button>
+                    {{ if .Download }}
+                        <a class="govuk-button" data-module="app-loading-button" data-loading-button-message="#download-warning-message" href="{{ sirius .Download }}">Download</a>
+                    {{ else }}
+                        <button class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                                name="documentControls" type="submit" value="preview"
+                                data-loading-button-message="#download-warning-message">Preview draft
+                        </button>
+                    {{ end }}
                 </div>
                 <div class="govuk-button-group govuk-!-margin-bottom-0">
                     <button class="govuk-button govuk-button--secondary" data-module="govuk-button"
-                            name="documentControls" type="submit" value="saveAndExit">Save and exit
+                            name="documentControls" type="submit" value="saveAndExit" id="saveAndExit">Save and exit
                     </button>
                     <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit"
                             value="publish">Publish draft

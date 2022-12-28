@@ -20,6 +20,12 @@ type Document struct {
 	CaseItems           []Case `json:"caseItems,omitempty"`
 }
 
+const (
+	TypeDraft   string = "Draft"
+	TypePreview string = "Preview"
+	TypeSave    string = "Save"
+)
+
 func (c *Client) Documents(ctx Context, caseType CaseType, caseId int) ([]Document, error) {
 	var d []Document
 

@@ -7,8 +7,22 @@ import (
 	"net/http"
 )
 
-func (c *Client) AddDocument(ctx Context, caseID int, document Document) error {
-	data, err := json.Marshal(document)
+func (c *Client) AddDocument(ctx Context, caseID int, document Document, docType string) error {
+	data, err := json.Marshal(struct {
+		CaseId          int    `json:"caseId"`
+		CorrespondentID int    `json:"correspondentId"`
+		Type            string `json:"type"`
+		FileName        string `json:"filename"`
+		SystemType      string `json:"systemType"`
+		Content         string `json:"content"`
+	}{
+		CaseId:          caseID,
+		CorrespondentID: document.Correspondent.ID,
+		Type:            docType,
+		FileName:        document.FileName,
+		SystemType:      document.SystemType,
+		Content:         document.Content,
+	})
 	if err != nil {
 		return err
 	}
