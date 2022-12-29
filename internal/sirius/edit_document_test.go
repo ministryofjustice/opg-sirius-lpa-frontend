@@ -51,7 +51,7 @@ func TestEditDocument(t *testing.T) {
 							"filename":            dsl.String("LP-A.pdf"),
 							"mimetype":            dsl.String(`application\/pdf`),
 							"correspondent": dsl.Like(map[string]interface{}{
-								"id":        dsl.Like(1),
+								"id":        dsl.Like(189),
 								"firstname": dsl.String("Consuela"),
 								"surname":   dsl.String("Aysien"),
 							}),
@@ -72,7 +72,7 @@ func TestEditDocument(t *testing.T) {
 				SystemType:          "LP-A",
 				FileName:            "LP-A.pdf",
 				Content:             "Edited test content",
-				Correspondent:       Person{ID: 1, Firstname: "Consuela", Surname: "Aysien"},
+				Correspondent:       Person{ID: 189, Firstname: "Consuela", Surname: "Aysien"},
 				ChildCount:          0,
 			},
 		},

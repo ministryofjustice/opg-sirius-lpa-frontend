@@ -38,7 +38,7 @@ func TestAddDocument(t *testing.T) {
 							"caseId":          dsl.Like(800),
 							"type":            dsl.String("Save"),
 							"filename":        dsl.String("LP-A.pdf"),
-							"correspondentId": dsl.Like(1),
+							"correspondentId": dsl.Like(189),
 							"systemType":      dsl.String("LP-A"),
 							"content":         dsl.String("Test content"),
 						}),
@@ -56,7 +56,7 @@ func TestAddDocument(t *testing.T) {
 							"filename":            dsl.String("LP-A.pdf"),
 							"mimetype":            dsl.String(`application\/pdf`),
 							"correspondent": dsl.Like(map[string]interface{}{
-								"id":        dsl.Like(1),
+								"id":        dsl.Like(189),
 								"firstname": dsl.String("Consuela"),
 								"surname":   dsl.String("Aysien"),
 							}),
@@ -77,7 +77,7 @@ func TestAddDocument(t *testing.T) {
 				SystemType:          "LP-A",
 				FileName:            "LP-A.pdf",
 				Content:             "Test content",
-				Correspondent:       Person{ID: 1, Firstname: "Consuela", Surname: "Aysien"},
+				Correspondent:       Person{ID: 189, Firstname: "Consuela", Surname: "Aysien"},
 				ChildCount:          0,
 			},
 		},
@@ -101,7 +101,7 @@ func TestAddDocument(t *testing.T) {
 					SystemType:          "LP-A",
 					FileName:            "LP-A.pdf",
 					Content:             "Test content",
-					Correspondent:       Person{ID: 1, Firstname: "Consuela", Surname: "Aysien"},
+					Correspondent:       Person{ID: 189, Firstname: "Consuela", Surname: "Aysien"},
 					ChildCount:          0,
 				}, TypeSave)
 
