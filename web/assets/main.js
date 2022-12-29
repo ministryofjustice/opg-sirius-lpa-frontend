@@ -8,6 +8,7 @@ import todaysDate from "./todays-date.js";
 import showHideFilter from "./show-hide-filter";
 import fullWidthContainer from "./full-width-container";
 import searchController from "./search-controller";
+import textEditor from "./text-editor";
 
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
@@ -26,6 +27,7 @@ loadingButton();
 searchController();
 showHideFilter();
 fullWidthContainer();
+textEditor();
 
 if (window.self !== window.parent) {
   const success = document.querySelector("[data-app-reload~=\"page\"]");
