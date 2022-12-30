@@ -65,3 +65,13 @@ $moj-page-width: 1220px;
 .app-\!-search-results-table th button {
     color: govuk-colour("blue");
 }
+
+.app-\!-float-right {
+    float: right;
+}
+
+.app-\!-td-last-child-no-border {
+    tr:last-child td {
+        border-bottom: none;
+    }
+}

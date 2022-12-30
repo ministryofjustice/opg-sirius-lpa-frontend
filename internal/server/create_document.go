@@ -3,8 +3,10 @@ package server
 import (
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
 	"net/http"
+	"sort"
 	"strconv"
 	"sync"
 )
@@ -19,19 +21,21 @@ type CreateDocumentClient interface {
 }
 
 type createDocumentData struct {
-	XSRFToken               string
-	Success                 bool
-	Error                   sirius.ValidationError
-	Case                    sirius.Case
-	Document                sirius.Document
-	DocumentTemplates       []sirius.DocumentTemplateData
-	DocumentTemplateTypes   []sirius.RefDataItem
-	DocumentTemplateRefData []sirius.RefDataItem
-	DocumentInsertTypes     []InsertDisplayData
-	TemplateSelected        sirius.DocumentTemplateData
-	HasViewedInsertPage     bool
-	SelectedInserts         []string
-	Recipients              []sirius.Person
+	XSRFToken                  string
+	Success                    bool
+	Error                      sirius.ValidationError
+	Case                       sirius.Case
+	Document                   sirius.Document
+	DocumentTemplates          []sirius.DocumentTemplateData
+	DocumentTemplateTypes      []sirius.RefDataItem
+	DocumentTemplateRefData    []sirius.RefDataItem
+	DocumentInsertTypes        []InsertDisplayData
+	TemplateSelected           sirius.DocumentTemplateData
+	HasViewedInsertPage        bool
+	SelectedInserts            []string
+	Recipients                 []sirius.Person
+	DocumentInsertKeys         []string
+	HasSelectedAddNewRecipient bool
 }
 
 type InsertDisplayData struct {
@@ -97,6 +101,8 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 			data.DocumentTemplateTypes = translateDocumentData(data.DocumentTemplates, data.DocumentTemplateRefData)
 
 			templateId := r.FormValue("templateId")
+			hasSelectedSubmitTemplate := r.FormValue("hasSelectedSubmitTemplate")
+
 			if templateId != "" {
 				for _, dt := range data.DocumentTemplates {
 					if dt.TemplateId == templateId {
@@ -104,39 +110,71 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 						break
 					}
 				}
+			} else if hasSelectedSubmitTemplate == "true" {
+				w.WriteHeader(http.StatusBadRequest)
+				data.Error = sirius.ValidationError{
+					Field: sirius.FieldErrors{
+						"templateId": {"reason": "Please select a document template to continue"},
+					},
+				}
 			}
+
 			if data.TemplateSelected.TemplateId != "" {
 				data.DocumentInsertTypes = translateInsertData(data.TemplateSelected.Inserts, data.DocumentTemplateRefData)
+				data.DocumentInsertKeys = getSortedInsertKeys(data.TemplateSelected.Inserts)
 			}
 
 			hasViewedInsertPage := r.FormValue("hasViewedInserts")
-			if hasViewedInsertPage == "true" {
+			hasNoInsertsToSelect := data.TemplateSelected.TemplateId != "" && len(data.DocumentInsertTypes) == 0
+			uniqueInserts := removeDuplicateStr(r.Form["insert"])
+			data.SelectedInserts = uniqueInserts
+
+			if hasViewedInsertPage == "true" || hasNoInsertsToSelect {
 				data.HasViewedInsertPage = true
-				data.SelectedInserts = r.Form["insert"]
 				data.Recipients, err = getRecipients(ctx, client, data.Case)
 				if err != nil {
 					return err
 				}
 			}
 
-		case http.MethodPost:
-			recipientControls := postFormString(r, "recipientControls")
+			hasSelectedAddNewRecipient := r.FormValue("hasSelectedAddNewRecipient")
+			if hasSelectedAddNewRecipient == "true" {
+				data.HasSelectedAddNewRecipient = true
+			}
 
-			switch recipientControls {
-			case "select":
+		case http.MethodPost:
+			selectedRecipientIDs, err := sliceAtoi(r.Form["selectRecipients"])
+
+			if len(selectedRecipientIDs) > 0 {
 				templateId := r.FormValue("templateId")
-				inserts := r.Form["insert"]
-				if len(inserts) == 0 {
-					inserts = []string{}
+				uniqueInserts := removeDuplicateStr(r.Form["insert"])
+
+				if len(uniqueInserts) == 0 {
+					uniqueInserts = []string{}
 				}
 
-				selectedRecipientIDs, err := sliceAtoi(r.Form["selectRecipients"])
 				if err != nil {
 					return err
 				}
+				if len(selectedRecipientIDs) == 0 {
+					w.WriteHeader(http.StatusBadRequest)
+					data.Error = sirius.ValidationError{
+						Field: sirius.FieldErrors{
+							"selectRecipient": {"reason": "Value is required and can't be empty"},
+						},
+					}
+					data.TemplateSelected.TemplateId = r.FormValue("templateId")
+					data.SelectedInserts = uniqueInserts
+					data.HasViewedInsertPage = true
+					data.Recipients, err = getRecipients(ctx, client, data.Case)
+					if err != nil {
+						return err
+					}
+					return tmpl(w, data)
+				}
 
 				for _, recipientID := range selectedRecipientIDs {
-					_, err = client.CreateDocument(ctx, caseID, recipientID, templateId, inserts)
+					_, err = client.CreateDocument(ctx, caseID, recipientID, templateId, uniqueInserts)
 					if err != nil {
 						return err
 					}
@@ -151,8 +189,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 					data.Success = true
 					// redirect
 				}
-
-			case "generate":
+			} else {
 				contact := sirius.Person{
 					Salutation:            postFormString(r, "salutation"),
 					Firstname:             postFormString(r, "firstname"),
@@ -180,7 +217,6 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 				if ve, ok := err.(sirius.ValidationError); ok {
 					w.WriteHeader(http.StatusBadRequest)
 					data.Error = ve
-					data.Recipients = append(data.Recipients, contact)
 				} else if err != nil {
 					return err
 				} else {
@@ -277,7 +313,41 @@ func translateInsertData(selectedTemplateInserts []sirius.Insert, documentTempla
 			}
 		}
 	}
+
+	sort.Slice(documentTemplateInserts, func(i, j int) bool {
+		return documentTemplateInserts[i].Handle < documentTemplateInserts[j].Handle
+	})
+
 	return documentTemplateInserts
+}
+
+func getSortedInsertKeys(selectedTemplateInserts []sirius.Insert) []string {
+	var documentInsertKeys []string
+	for _, in := range selectedTemplateInserts {
+		if !slices.Contains(documentInsertKeys, in.Key) {
+			documentInsertKeys = append(documentInsertKeys, in.Key)
+		}
+	}
+	// insert api response infrequently includes the key all
+	// note insert keys are lowercase so this check is case-sensitive
+	if !slices.Contains(documentInsertKeys, "all") {
+		documentInsertKeys = append(documentInsertKeys, "all")
+	}
+
+	sort.Strings(documentInsertKeys)
+	return documentInsertKeys
+}
+
+func removeDuplicateStr(strSlice []string) []string {
+	allKeys := make(map[string]struct{})
+	var list []string
+	for _, item := range strSlice {
+		if _, value := allKeys[item]; !value {
+			allKeys[item] = struct{}{}
+			list = append(list, item)
+		}
+	}
+	return list
 }
 
 func sliceAtoi(strSlice []string) ([]int, error) {
