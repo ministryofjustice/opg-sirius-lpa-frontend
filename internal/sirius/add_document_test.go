@@ -54,15 +54,10 @@ func TestAddDocument(t *testing.T) {
 							"createdDate":         dsl.String(`15/12/2022 13:41:04`),
 							"direction":           dsl.String("Outgoing"),
 							"filename":            dsl.String("LP-A.pdf"),
-							"mimetype":            dsl.String(`application\/pdf`),
-							"correspondent": dsl.Like(map[string]interface{}{
-								"id":        dsl.Like(189),
-								"firstname": dsl.String("Consuela"),
-								"surname":   dsl.String("Aysien"),
-							}),
-							"childCount": dsl.Like(0),
-							"systemType": dsl.String("LP-A"),
-							"content":    dsl.String("Test content"),
+							"mimeType":            dsl.String(`application\/pdf`),
+							"childCount":          dsl.Like(0),
+							"systemType":          dsl.String("LP-A"),
+							"content":             dsl.String("Test content"),
 						}),
 					})
 			},
@@ -77,7 +72,6 @@ func TestAddDocument(t *testing.T) {
 				SystemType:          "LP-A",
 				FileName:            "LP-A.pdf",
 				Content:             "Test content",
-				Correspondent:       Person{ID: 189, Firstname: "Consuela", Surname: "Aysien"},
 				ChildCount:          0,
 			},
 		},
@@ -101,7 +95,6 @@ func TestAddDocument(t *testing.T) {
 					SystemType:          "LP-A",
 					FileName:            "LP-A.pdf",
 					Content:             "Test content",
-					Correspondent:       Person{ID: 189, Firstname: "Consuela", Surname: "Aysien"},
 					ChildCount:          0,
 				}, TypeSave)
 
