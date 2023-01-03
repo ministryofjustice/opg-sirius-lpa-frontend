@@ -43,7 +43,7 @@ func TestDocument(t *testing.T) {
 							"createdDate":         dsl.String(`15/12/2022 13:41:04`),
 							"direction":           dsl.String("Outgoing"),
 							"filename":            dsl.String("LP-A.pdf"),
-							"mimetype":            dsl.String(`application\/pdf`),
+							"mimeType":            dsl.String(`application\/pdf`),
 							"correspondent": dsl.Like(map[string]interface{}{
 								"id":        dsl.Like(189),
 								"firstname": dsl.String("Consuela"),
@@ -51,7 +51,6 @@ func TestDocument(t *testing.T) {
 							}),
 							"childCount": dsl.Like(0),
 							"systemType": dsl.String("LP-A"),
-							"content":    dsl.String("Test content"),
 						}, 1),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
@@ -67,7 +66,6 @@ func TestDocument(t *testing.T) {
 					MimeType:            `application\/pdf`,
 					SystemType:          "LP-A",
 					FileName:            "LP-A.pdf",
-					Content:             "Test content",
 					Correspondent:       Person{ID: 189, Firstname: "Consuela", Surname: "Aysien"},
 					ChildCount:          0,
 				},
@@ -129,7 +127,7 @@ func TestDocumentByUuid(t *testing.T) {
 							"createdDate":         dsl.String(`15/12/2022 13:41:04`),
 							"direction":           dsl.String("Outgoing"),
 							"filename":            dsl.String("LP-A.pdf"),
-							"mimetype":            dsl.String(`application\/pdf`),
+							"mimeType":            dsl.String(`application\/pdf`),
 							"correspondent": dsl.Like(map[string]interface{}{
 								"id": dsl.Like(189),
 							}),
