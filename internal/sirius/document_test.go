@@ -129,7 +129,7 @@ func TestDocumentByUuid(t *testing.T) {
 							"createdDate":         dsl.String(`15/12/2022 13:41:04`),
 							"direction":           dsl.String("Outgoing"),
 							"filename":            dsl.String("LP-A.pdf"),
-							"mimetype":            dsl.String(`application\/pdf`),
+							"mimeType":            dsl.String(`application\/pdf`),
 							"correspondent": dsl.Like(map[string]interface{}{
 								"id": dsl.Like(189),
 							}),
