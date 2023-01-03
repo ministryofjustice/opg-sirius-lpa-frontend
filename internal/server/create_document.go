@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
@@ -15,7 +16,7 @@ type CreateDocumentClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
 	CreateContact(ctx sirius.Context, contact sirius.Person) (sirius.Person, error)
-	CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.DocumentData, error)
+	CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error)
 }
 
 type createDocumentData struct {
@@ -136,10 +137,11 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 				}
 
 				for _, recipientID := range selectedRecipientIDs {
-					_, err = client.CreateDocument(ctx, caseID, recipientID, templateId, inserts)
+					document, err := client.CreateDocument(ctx, caseID, recipientID, templateId, inserts)
 					if err != nil {
 						return err
 					}
+					data.Document = document
 				}
 
 				if ve, ok := err.(sirius.ValidationError); ok {
@@ -149,7 +151,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 					return err
 				} else {
 					data.Success = true
-					// redirect
+					http.Redirect(w, r, fmt.Sprintf("/edit-document?id=%d&case=%s", caseID, caseType), http.StatusFound)
 				}
 
 			case "generate":
