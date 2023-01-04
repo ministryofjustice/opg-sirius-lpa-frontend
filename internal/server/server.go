@@ -55,6 +55,7 @@ type Client interface {
 	DeleteRelationshipClient
 	EditComplaintClient
 	EditDatesClient
+	EditDocumentClient
 	EditDonorClient
 	EditPaymentClient
 	EventClient
@@ -85,6 +86,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/create-donor", wrap(CreateDonor(client, templates.Get("donor.gohtml"))))
 	mux.Handle("/create-investigation", wrap(CreateInvestigation(client, templates.Get("create_investigation.gohtml"))))
 	mux.Handle("/create-document", wrap(CreateDocument(client, templates.Get("create_document.gohtml"))))
+	mux.Handle("/edit-document", wrap(EditDocument(client, templates.Get("edit_document.gohtml"))))
 	mux.Handle("/investigation-hold", wrap(InvestigationHold(client, templates.Get("investigation_hold.gohtml"))))
 	mux.Handle("/edit-investigation", wrap(EditInvestigation(client, templates.Get("edit_investigation.gohtml"))))
 	mux.Handle("/edit-donor", wrap(EditDonor(client, templates.Get("donor.gohtml"))))

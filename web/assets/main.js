@@ -8,6 +8,7 @@ import todaysDate from "./todays-date.js";
 import showHideFilter from "./show-hide-filter";
 import fullWidthContainer from "./full-width-container";
 import searchController from "./search-controller";
+import textEditor from "./text-editor";
 import selectTab from "./select-tab";
 import handleInsertCheckboxes from "./handle-insert-checkboxes";
 
@@ -28,6 +29,7 @@ loadingButton();
 searchController();
 showHideFilter();
 fullWidthContainer();
+textEditor();
 selectTab();
 handleInsertCheckboxes();
 
