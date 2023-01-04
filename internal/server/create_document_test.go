@@ -495,3 +495,54 @@ func TestSliceAtoi(t *testing.T) {
 	assert.Equal(t, nil, err)
 	assert.Equal(t, []int{1, 2, 3}, result)
 }
+
+func TestRemoveDuplicateStr(t *testing.T) {
+	testSliceStr := []string{"test", "test", "testing"}
+	result := removeDuplicateStr(testSliceStr)
+
+	assert.Equal(t, []string{"test", "testing"}, result)
+}
+
+func TestGetSortedInsertKeys(t *testing.T) {
+	selectedTemplateInsertsWithAll := []sirius.Insert{
+		{
+			Key:             "all",
+			InsertId:        "DDINSERT",
+			Location:        `lpa\/DD.html.twig`,
+			OnScreenSummary: "DDINSERTONSCREENSUMMARY",
+		},
+		{
+			Key:             "imperfect",
+			InsertId:        "IM1INSERT",
+			Location:        `lpa\/IM1.html.twig`,
+			OnScreenSummary: "IM1INSERTONSCREENSUMMARY",
+		},
+		{
+			Key:             "perfect",
+			InsertId:        "P1INSERT",
+			Location:        `lpa\/P1.html.twig`,
+			OnScreenSummary: "P1INSERTONSCREENSUMMARY",
+		},
+	}
+
+	selectedTemplateInsertsWithoutAll := []sirius.Insert{
+		{
+			Key:             "imperfect",
+			InsertId:        "IM1INSERT",
+			Location:        `lpa\/IM1.html.twig`,
+			OnScreenSummary: "IM1INSERTONSCREENSUMMARY",
+		},
+		{
+			Key:             "perfect",
+			InsertId:        "P1INSERT",
+			Location:        `lpa\/P1.html.twig`,
+			OnScreenSummary: "P1INSERTONSCREENSUMMARY",
+		},
+	}
+
+	result1 := getSortedInsertKeys(selectedTemplateInsertsWithAll)
+	result2 := getSortedInsertKeys(selectedTemplateInsertsWithoutAll)
+
+	assert.Equal(t, []string{"all", "imperfect", "perfect"}, result1)
+	assert.Equal(t, []string{"all", "imperfect", "perfect"}, result2)
+}

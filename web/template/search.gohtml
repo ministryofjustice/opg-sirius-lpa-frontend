@@ -13,9 +13,9 @@
         {{ template "search-filter" . }}
 
         <div class="moj-filter-layout__content govuk-!-padding-left-2 govuk-!-padding-right-2">
-            <div class="moj-action-bar govuk">
-                <div class="moj-action-bar__filter govuk-!-margin-bottom-0"></div>
-            </div>
+            <button class="govuk-button govuk-button--secondary" aria-controls="app-filters" data-filter-toggle>
+                {{ if .Filters.Set }}Hide{{ else }}Show{{ end }} filters
+            </button>
 
             <h3 class="govuk-heading-s govuk-!-margin-bottom-6">You searched for:  {{ .SearchTerm }}</h3>
 
@@ -23,15 +23,9 @@
                 <div class="govuk-grid-row">
                     <div class="govuk-grid-column-one-half">
                         <h2 class="govuk-heading-m">No cases were found</h2>
-                        <p class="govuk-body">This could be because:</p>
-                        <ul class="govuk-list govuk-list--bullet">
-                            <li>the paper LPA hasn't been scanned yet</li>
-                            <li>the name is spelt incorrectly or differently on the paper LPA which means a match can't be found</li>
-                            <li>if your filter selections included the role 'Client' as well as an LPA case type (since Clients have Orders, not LPAs)</li>
-                        </ul>
+                        <p class="govuk-body">This could be because the paper LPA or Court Order hasn't been scanned yet</p>
 
                         <p class="govuk-body">For the best search results try searching with the case number.</p>
-
                         <p class="govuk-body">If you don't have the case number try searching by:</p>
                         <ul class="govuk-list govuk-list--bullet">
                             <li>full name and date of birth, or</li>
@@ -41,16 +35,16 @@
                 </div>
             {{ else }}
 
-                <hr class="govuk-section-break govuk-section-break--s govuk-section-break--visible govuk-!-margin-top-5">
+                <p class="moj-pagination__results govuk-!-padding-0 govuk-!-margin-bottom-6">Showing <b>{{ .Pagination.Start }}</b> to <b>{{ .Pagination.End }}</b> of <b>{{ .Pagination.TotalItems }}</b> cases</p>
 
                 {{ if eq 0 (len .DeletedCases) }}
                     <table class="govuk-table" data-module="moj-sortable-table">
                         <thead class="govuk-table__head">
-                        <tr class="govuk-table__row">
+                        <tr class="govuk-table__row app-!-search-results-table">
                             <th scope="col" class="govuk-table__header" aria-sort="none">Case number</th>
                             <th scope="col" class="govuk-table__header" aria-sort="none">Name/Role</th>
                             <th scope="col" class="govuk-table__header" aria-sort="none">Date of birth</th>
-                            <th scope="col" class="govuk-table__header govuk-!-width-one-third app-!-colour-text-blue">Address</th>
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-third">Address</th>
                             <th scope="col" class="govuk-table__header" aria-sort="none">Type</th>
                             <th scope="col" class="govuk-table__header" aria-sort="none">Status</th>
                         </tr>

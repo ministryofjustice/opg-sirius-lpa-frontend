@@ -9,6 +9,8 @@ import showHideFilter from "./show-hide-filter";
 import fullWidthContainer from "./full-width-container";
 import searchController from "./search-controller";
 import textEditor from "./text-editor";
+import selectTab from "./select-tab";
+import handleInsertCheckboxes from "./handle-insert-checkboxes";
 
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
@@ -28,6 +30,8 @@ searchController();
 showHideFilter();
 fullWidthContainer();
 textEditor();
+selectTab();
+handleInsertCheckboxes();
 
 if (window.self !== window.parent) {
   const success = document.querySelector("[data-app-reload~=\"page\"]");

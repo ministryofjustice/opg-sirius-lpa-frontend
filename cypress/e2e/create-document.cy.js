@@ -1,27 +1,30 @@
 describe("Create a document", () => {
     beforeEach(() => {
         cy.visit("/create-document?id=800&case=lpa");
-        cy.contains("Create Draft");
-        cy.get(".moj-banner").should("not.exist");
+        cy.contains("7000-0000-0000");
+        cy.contains("Select a document template");
         cy.get("#f-templateId").type("DD");
         cy.get(".autocomplete__menu").contains("DD: Donor deceased: Blank template").click();
-        cy.contains("button", "Select template").click();
-        cy.contains("Template: DD");
-        cy.get("#f-DD1").click();
-        cy.contains("button", "Select inserts").click();
+        cy.contains("button", "Continue").click();
+
+        cy.contains("Select document inserts");
+        cy.contains("DD1: DD1 - Case complete");
+        cy.get("#f-DD1-all").click();
+        cy.contains("button", "Continue").click();
     });
 
 
     it("creates a document on the case by selecting a recipient", () => {
-        cy.contains(".govuk-radios__item", "Select").find("input").check();
+        cy.contains("Select a recipient");
         cy.get("#f-189").click();
-        cy.contains("button", "Select recipient").click();
+        cy.contains("button", "Create draft document").click();
     });
 
-    it("generates a recipient", () => {
-        cy.contains("Select or generate a recipient");
-        cy.contains(".govuk-radios__item", "Generate").find("input").check();
+    it("creates a new recipient via new recipient form", () => {
+        cy.contains("Select a recipient");
+        cy.contains("button", "Add new recipient").click();
 
+        cy.contains("Add a new recipient");
         cy.get("#f-salutation").type("Prof");
         cy.get("#f-firstname").type("Melanie");
         cy.get("#f-middlenames").type("Josefina");
@@ -38,10 +41,8 @@ describe("Create a document", () => {
         cy.get("#f-correspondenceBy-email").click();
         cy.get("#f-correspondenceBy-phone").click();
 
-        cy.contains("button", "Create new recipient").click();
+        cy.contains("button", "Continue").click();
         cy.get(".moj-banner").should("exist");
-        cy.get(".moj-banner").contains(
-            "You have successfully created a recipient."
-        );
+        cy.get(".moj-banner").contains("New recipient added");
     });
 });
