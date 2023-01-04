@@ -7,12 +7,8 @@ import (
 	"net/http"
 )
 
-type DocumentData struct {
-	DocumentID int `json:"id"`
-}
-
-func (c *Client) CreateDocument(ctx Context, caseID, correspondentID int, templateID string, inserts []string) (DocumentData, error) {
-	var d DocumentData
+func (c *Client) CreateDocument(ctx Context, caseID, correspondentID int, templateID string, inserts []string) (Document, error) {
+	var d Document
 
 	data, err := json.Marshal(struct {
 		TemplateID      string   `json:"templateId"`

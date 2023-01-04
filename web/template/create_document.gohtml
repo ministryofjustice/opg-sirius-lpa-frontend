@@ -78,7 +78,7 @@
                                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-recipientControls-2">
                                     <div class="govuk-!-width-one-half govuk-form-group {{ if .Error.Field.generateRecipient }}govuk-form-group--error{{ end }}">
                                         {{ template "input" (field "salutation" "Salutation" nil .Error.Field.contactSalutation) }}
-                                        {{ template "input" (field "firstName" "First name" nil .Error.Field.contactFirstname) }}
+                                        {{ template "input" (field "firstname" "First name" nil .Error.Field.contactFirstname) }}
                                         {{ template "input" (field "middlenames" "Middle name" nil .Error.Field.contactMiddlenames) }}
                                         {{ template "input" (field "surname" "Last name" nil .Error.Field.contactSurname) }}
                                         {{ template "input" (field "companyName" "Company name" nil .Error.Field.companyName) }}

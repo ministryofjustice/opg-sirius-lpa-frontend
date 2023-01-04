@@ -39,9 +39,9 @@ func (m *mockCreateDocumentClient) CreateContact(ctx sirius.Context, contact sir
 	return args.Get(0).(sirius.Person), args.Error(1)
 }
 
-func (m *mockCreateDocumentClient) CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.DocumentData, error) {
+func (m *mockCreateDocumentClient) CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error) {
 	args := m.Called(ctx, caseID, correspondentID, templateID, inserts)
-	return args.Get(0).(sirius.DocumentData), args.Error(1)
+	return args.Get(0).(sirius.Document), args.Error(1)
 }
 
 func (m *mockCreateDocumentClient) Person(ctx sirius.Context, id int) (sirius.Person, error) {
@@ -114,7 +114,7 @@ func TestPostCreateDocument(t *testing.T) {
 				Return(caseItem, nil)
 			client.
 				On("CreateDocument", mock.Anything, 123, 1, "DD", []string{"DDINSERT"}).
-				Return(sirius.DocumentData{}, nil)
+				Return(sirius.Document{}, nil)
 
 			template := &mockTemplate{}
 			template.
@@ -141,7 +141,7 @@ func TestPostCreateDocument(t *testing.T) {
 			resp := w.Result()
 
 			assert.Nil(t, err)
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			assert.Equal(t, http.StatusFound, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
