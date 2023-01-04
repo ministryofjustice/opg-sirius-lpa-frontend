@@ -2,6 +2,8 @@ package templatefn
 
 import (
 	"fmt"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"net/url"
 	"strings"
 	"time"
@@ -53,6 +55,9 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		},
 		"ToLower": strings.ToLower,
 		"ToUpper": strings.ToUpper,
+		"capitalise": func(text string) string {
+			return cases.Title(language.English).String(text)
+		},
 		"contains": func(xs []string, needle string) bool {
 			for _, x := range xs {
 				if x == needle {
