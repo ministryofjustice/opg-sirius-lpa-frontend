@@ -3,7 +3,6 @@ package sirius
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"math"
 	"net/http"
 )
@@ -46,7 +45,14 @@ var AllPersonTypes = []string{
 func (c *Client) Search(ctx Context, term string, page int, personTypeFilters []string) (SearchResponse, *Pagination, error) {
 	var v SearchResponse
 	if len(term) < 3 {
-		return v, nil, fmt.Errorf("Search term must be at least three characters")
+		err := ValidationError{
+			Detail: "Search term must be at least three characters",
+			Field: FieldErrors{
+				"term": {"reason": "Search term must be at least three characters"},
+			},
+		}
+
+		return v, nil, err
 	}
 
 	if len(personTypeFilters) == 0 {
