@@ -15,13 +15,13 @@ type Person struct {
 	DateOfBirth           DateString `json:"dob,omitempty"`
 	PreviouslyKnownAs     string     `json:"previousNames,omitempty"`
 	AlsoKnownAs           string     `json:"otherNames,omitempty"`
-	AddressLine1          string     `json:"addressLine1"`
-	AddressLine2          string     `json:"addressLine2"`
-	AddressLine3          string     `json:"addressLine3"`
-	Town                  string     `json:"town"`
-	County                string     `json:"county"`
-	Postcode              string     `json:"postcode"`
-	Country               string     `json:"country"`
+	AddressLine1          string     `json:"addressLine1,omitempty"`
+	AddressLine2          string     `json:"addressLine2,omitempty"`
+	AddressLine3          string     `json:"addressLine3,omitempty"`
+	Town                  string     `json:"town,omitempty"`
+	County                string     `json:"county,omitempty"`
+	Postcode              string     `json:"postcode,omitempty"`
+	Country               string     `json:"country,omitempty"`
 	IsAirmailRequired     bool       `json:"isAirmailRequired"`
 	PhoneNumber           string     `json:"phoneNumber"`
 	Email                 string     `json:"email"`

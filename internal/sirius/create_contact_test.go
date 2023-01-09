@@ -64,7 +64,6 @@ func TestCreateContact(t *testing.T) {
 							"surname":               "Price",
 							"addressLine1":          "278 Nicole Lock",
 							"addressLine2":          "Toby Court",
-							"addressLine3":          "",
 							"town":                  "Russellstad",
 							"county":                "Cumbria",
 							"postcode":              "HP19 9BW",
