@@ -23,7 +23,14 @@ type User struct {
 
 func (c *Client) SearchUsers(ctx Context, term string) ([]User, error) {
 	if len(term) < 3 {
-		return nil, fmt.Errorf("Search term must be at least three characters")
+		err := ValidationError{
+			Detail: "Search term must be at least three characters",
+			Field: FieldErrors{
+				"term": {"reason": "Search term must be at least three characters"},
+			},
+		}
+
+		return nil, err
 	}
 
 	var v []apiUser

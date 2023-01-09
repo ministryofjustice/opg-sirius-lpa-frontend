@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -141,6 +142,12 @@ func (e RedirectError) To() string {
 	return string(e)
 }
 
+type ProblemError struct {
+	Title            string             `json:"title"`
+	Detail           string             `json:"detail"`
+	ValidationErrors sirius.FieldErrors `json:"validationErrors"`
+}
+
 func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL string) func(next Handler) http.Handler {
 	return func(next Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -162,6 +169,30 @@ func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL 
 
 				if statusError, ok := err.(sirius.StatusError); ok {
 					correlationId = statusError.CorrelationId
+				}
+
+				if r.Header.Get("Accept") == "application/json" {
+					rfcErr := ProblemError{
+						Title: err.Error(),
+					}
+
+					if ve, ok := err.(sirius.ValidationError); ok {
+						code = 400
+						rfcErr.Detail = ve.Detail
+						rfcErr.ValidationErrors = ve.Field
+					}
+
+					w.Header().Add("Content-Type", "application/problem+json")
+					w.WriteHeader(code)
+
+					err = json.NewEncoder(w).Encode(rfcErr)
+
+					if err != nil {
+						logger.Request(r, err)
+						http.Error(w, "Could not generate error JSON", http.StatusInternalServerError)
+					}
+
+					return
 				}
 
 				w.WriteHeader(code)

@@ -10,11 +10,11 @@ export default function select(prefix) {
     fetchPerson(prefix)
   );
   enhanceTemplateSearchElement(
-      document.querySelector('[data-select-template]')
+    document.querySelector("[data-select-template]")
   );
 }
 
-function enhanceTemplateSearchElement(element){
+function enhanceTemplateSearchElement(element) {
   if (element) {
     accessibleAutocomplete.enhanceSelectElement({
       selectElement: element,
@@ -47,7 +47,11 @@ function enhanceUserPersonSearchElement(element, source) {
 
 function fetchForAutocomplete(url, mapFunction) {
   let controller = { abort: () => {} };
-  const fetchOptions = {};
+  const fetchOptions = {
+    headers: {
+      Accept: "application/json",
+    },
+  };
 
   return (query, callback) => {
     controller.abort();

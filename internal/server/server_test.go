@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"errors"
 	"io"
 	"net/http"
@@ -101,6 +102,42 @@ func TestErrorHandlerUnauthorizedError(t *testing.T) {
 
 	assert.Equal(http.StatusFound, resp.StatusCode)
 	assert.Equal("http://sirius/auth", resp.Header.Get("Location"))
+}
+
+func TestErrorHandlerJsonError(t *testing.T) {
+	assert := assert.New(t)
+
+	expectedError := sirius.ValidationError{
+		Detail: "Not valid complaint",
+		Field: sirius.FieldErrors{
+			"title": {
+				"tooShort": "The title must be at least 5 characters",
+			},
+		},
+	}
+
+	logger := &mockLogger{}
+	logger.
+		On("Request", mock.Anything, expectedError)
+
+	handler := errorHandler(logger, nil, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
+		return expectedError
+	})
+
+	w := httptest.NewRecorder()
+	r, _ := http.NewRequest("GET", "/path", nil)
+	r.Header.Add("Accept", "application/json")
+
+	handler.ServeHTTP(w, r)
+
+	resp := w.Result()
+
+	assert.Equal(http.StatusBadRequest, resp.StatusCode)
+	assert.Equal("application/problem+json", resp.Header.Get("Content-Type"))
+
+	body := new(bytes.Buffer)
+	_, _ = body.ReadFrom(resp.Body)
+	assert.Equal(`{"title":"validation error","detail":"Not valid complaint","validationErrors":{"title":{"tooShort":"The title must be at least 5 characters"}}}`, strings.Trim(body.String(), "\n"))
 }
 
 func TestGetContext(t *testing.T) {
