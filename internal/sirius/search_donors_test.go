@@ -114,7 +114,14 @@ func TestSearchDonors(t *testing.T) {
 func TestSearchDonorsTooShort(t *testing.T) {
 	client := NewClient(http.DefaultClient, "")
 
+	expectedErr := ValidationError{
+		Detail: "Search term must be at least three characters",
+		Field: FieldErrors{
+			"term": {"reason": "Search term must be at least three characters"},
+		},
+	}
+
 	donors, err := client.SearchDonors(Context{Context: context.Background()}, "ad")
 	assert.Nil(t, donors)
-	assert.Equal(t, fmt.Errorf("Search term must be at least three characters"), err)
+	assert.Equal(t, expectedErr, err)
 }
