@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -329,10 +328,11 @@ func TestPostPreviewDocument(t *testing.T) {
 
 	template.
 		On("Func", mock.Anything, editDocumentData{
-			Case:      caseItem,
-			Documents: documents,
-			Document:  document,
-			Download:  fmt.Sprintf("/lpa-api/v1/documents/%s/download", previewDocument.UUID),
+			Case:         caseItem,
+			Documents:    documents,
+			Document:     document,
+			PreviewDraft: true,
+			DownloadUUID: "efef6714-b4fe-44c2-b26e-90dfe3663e96",
 		}).
 		Return(nil)
 
@@ -373,7 +373,9 @@ func TestPostSaveDocumentAndExit(t *testing.T) {
 
 			template := &mockTemplate{}
 			template.
-				On("Func", mock.Anything, editDocumentData{}).
+				On("Func", mock.Anything, editDocumentData{
+					SaveAndExit: true,
+				}).
 				Return(nil)
 
 			form := url.Values{

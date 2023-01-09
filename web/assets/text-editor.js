@@ -1,13 +1,5 @@
-/* Import TinyMCE */
 import tinymce from "tinymce/tinymce.min.js";
 
-/* Default icons are required for TinyMCE 5.3 or above */
-// import 'tinymce/icons/default';
-
-/* A theme is also required */
-// import 'tinymce/themes/modern/theme';
-
-/* Initialize TinyMCE */
 const textEditor = () => {
     tinymce.init({
         selector: '#documentTextEditor',
@@ -16,7 +8,9 @@ const textEditor = () => {
         toolbar: 'bold italic | bullist numlist',
         plugins: 'paste lists',
         paste_as_text: true,
+        paste_word_valid_elements: 'h1,h2,h3,strong,em,b,i',
         browser_spellcheck: true,
+        gecko_spellcheck: true,
         height: 300,
         cache_suffix: '?v=5.6.1',
     });

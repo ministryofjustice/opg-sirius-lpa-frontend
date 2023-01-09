@@ -41,18 +41,6 @@ describe("Edit a document", () => {
         cy.get("#documentTextEditor").contains("Test content");
 
         cy.contains("button", "Preview draft").click();
-
-        // Make the link open in a new tab because otherwise Cypress
-        // throws cross-domain errors
-        cy.contains("a", "Download").then(($input) => {
-            $input[0].setAttribute("target", "_blank");
-        });
-
-        cy.contains("a", "Download").click();
-        cy.contains("a", "Download")
-            .invoke("attr", "class")
-            .should("contain", "govuk-button--disabled");
-        cy.contains("Your download will open in a new window when ready");
     });
 
     it("publishes a draft document", () => {

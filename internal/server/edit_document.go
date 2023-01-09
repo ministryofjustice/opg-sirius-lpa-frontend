@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
@@ -18,13 +17,16 @@ type EditDocumentClient interface {
 }
 
 type editDocumentData struct {
-	XSRFToken string
-	Success   bool
-	Error     sirius.ValidationError
-	Case      sirius.Case
-	Documents []sirius.Document
-	Document  sirius.Document
-	Download  string
+	XSRFToken    string
+	Success      bool
+	Error        sirius.ValidationError
+	Case         sirius.Case
+	Documents    []sirius.Document
+	Document     sirius.Document
+	Download     string
+	SaveAndExit  bool
+	PreviewDraft bool
+	DownloadUUID string
 }
 
 func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
@@ -61,7 +63,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 			draftDocuments := getDraftDocuments(documents)
 			data.Documents = draftDocuments
 
-			defaultDocumentUUID := documents[0].UUID
+			defaultDocumentUUID := draftDocuments[0].UUID
 			selectedDocumentUUID := r.FormValue("document")
 			if selectedDocumentUUID != "" {
 				defaultDocumentUUID = selectedDocumentUUID
@@ -94,7 +96,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				}
 
 				data.Case = caseItem
-				data.Documents = documents
+				data.Documents = getDraftDocuments(documents)
 				data.Document = document
 
 			case "preview":
@@ -125,17 +127,16 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				}
 
 				data.Case = caseItem
-				data.Documents = documents
+				data.Documents = getDraftDocuments(documents)
 				data.Document = document
-				data.Download = fmt.Sprintf("/lpa-api/v1/documents/%s/download", previewDocument.UUID)
+				data.PreviewDraft = true
+				data.DownloadUUID = previewDocument.UUID
 
 			case "delete":
 				err := client.DeleteDocument(ctx, documentUUID)
 				if err != nil {
 					return err
 				}
-
-				SetFlash(w, FlashNotification{Title: "Document deleted"})
 
 				caseItem, err := client.Case(ctx, caseID)
 				if err != nil {
@@ -148,8 +149,9 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				}
 
 				data.Case = caseItem
-				data.Documents = documents
-				defaultDocumentUUID := documents[0].UUID
+				draftDocuments := getDraftDocuments(documents)
+				data.Documents = draftDocuments
+				defaultDocumentUUID := draftDocuments[0].UUID
 				document, err := client.DocumentByUUID(ctx, defaultDocumentUUID)
 				if err != nil {
 					return err
@@ -178,8 +180,6 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					return err
 				}
 
-				SetFlash(w, FlashNotification{Title: "Document published"})
-
 				caseItem, err := client.Case(ctx, caseID)
 				if err != nil {
 					return err
@@ -191,8 +191,9 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				}
 
 				data.Case = caseItem
-				data.Documents = documents
-				defaultDocumentUUID := documents[0].UUID
+				draftDocuments := getDraftDocuments(documents)
+				data.Documents = draftDocuments
+				defaultDocumentUUID := draftDocuments[0].UUID
 				documentToDisplay, err := client.DocumentByUUID(ctx, defaultDocumentUUID)
 				if err != nil {
 					return err
@@ -204,8 +205,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				if err != nil {
 					return err
 				}
-
-				SetFlash(w, FlashNotification{Title: "Document saved"})
+				data.SaveAndExit = true
 			}
 		}
 
