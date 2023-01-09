@@ -195,14 +195,19 @@ jobs:
 
       - name: Run cypress
         run: |
-          make cypress
+          make up
 
-      - name: Upload Screenshots
+      - name: Cypress Tests
+        uses: cypress-io/github-action@v5.0.2
+        with:
+          browser: chrome
+
+      - name: Upload Cypress screenshots
         uses: actions/upload-artifact@v3
         if: failure()
         with:
-          name: Test Screenshots
-          path: ./cypress/screenshots
+          name: cypress-screenshots
+          path: cypress/screenshots
 
   push:
     name: Push Images
