@@ -56,6 +56,7 @@ type Client interface {
 	DeleteRelationshipClient
 	EditComplaintClient
 	EditDatesClient
+	EditDocumentClient
 	EditDonorClient
 	EditPaymentClient
 	EventClient
@@ -86,6 +87,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/create-donor", wrap(CreateDonor(client, templates.Get("donor.gohtml"))))
 	mux.Handle("/create-investigation", wrap(CreateInvestigation(client, templates.Get("create_investigation.gohtml"))))
 	mux.Handle("/create-document", wrap(CreateDocument(client, templates.Get("create_document.gohtml"))))
+	mux.Handle("/edit-document", wrap(EditDocument(client, templates.Get("edit_document.gohtml"))))
 	mux.Handle("/investigation-hold", wrap(InvestigationHold(client, templates.Get("investigation_hold.gohtml"))))
 	mux.Handle("/edit-investigation", wrap(EditInvestigation(client, templates.Get("edit_investigation.gohtml"))))
 	mux.Handle("/edit-donor", wrap(EditDonor(client, templates.Get("donor.gohtml"))))
@@ -115,7 +117,9 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/javascript/", static)
 	mux.Handle("/stylesheets/", static)
 
-	return otelhttp.NewHandler(http.StripPrefix(prefix, securityheaders.Use(mux)), "lpa-frontend")
+	muxWithHeaders := securityheaders.Use(setCSPHeader(mux))
+
+	return otelhttp.NewHandler(http.StripPrefix(prefix, muxWithHeaders), "lpa-frontend")
 }
 
 type Handler func(w http.ResponseWriter, r *http.Request) error
@@ -242,4 +246,12 @@ func translateRefData(types []sirius.RefDataItem, tmplHandle string) string {
 		}
 	}
 	return tmplHandle
+}
+
+func setCSPHeader(h http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; img-src 'self' data:")
+
+		h.ServeHTTP(w, r)
+	}
 }
