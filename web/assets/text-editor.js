@@ -1,4 +1,8 @@
 import tinymce from "tinymce/tinymce.min.js";
+import "tinymce/icons/default";
+import "tinymce/themes/silver";
+import "tinymce/plugins/paste";
+import "tinymce/plugins/lists";
 
 const textEditor = () => {
     tinymce.init({
@@ -12,7 +16,8 @@ const textEditor = () => {
         browser_spellcheck: true,
         gecko_spellcheck: true,
         height: 300,
-        cache_suffix: '?v=5.6.1',
+        cache_suffix: '?v=5.10.7',
+        skin: 'oxide',
     });
 }
 

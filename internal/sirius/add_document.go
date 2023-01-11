@@ -7,15 +7,17 @@ import (
 	"net/http"
 )
 
+type addDocumentRequestData struct {
+	CaseId          int    `json:"caseId"`
+	CorrespondentID int    `json:"correspondentId"`
+	Type            string `json:"type"`
+	FileName        string `json:"filename"`
+	SystemType      string `json:"systemType"`
+	Content         string `json:"content"`
+}
+
 func (c *Client) AddDocument(ctx Context, caseID int, document Document, docType string) (Document, error) {
-	data, err := json.Marshal(struct {
-		CaseId          int    `json:"caseId"`
-		CorrespondentID int    `json:"correspondentId"`
-		Type            string `json:"type"`
-		FileName        string `json:"filename"`
-		SystemType      string `json:"systemType"`
-		Content         string `json:"content"`
-	}{
+	data, err := json.Marshal(addDocumentRequestData{
 		CaseId:          caseID,
 		CorrespondentID: document.Correspondent.ID,
 		Type:            docType,

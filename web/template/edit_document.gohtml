@@ -14,7 +14,7 @@
                 <meta data-app-reload="saveAndExit" />
                 {{ template "success-banner" "You have successfully saved the document." }}
             {{ else if .PreviewDraft }}
-                <meta data-app-reload="previewDraft" id="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .DownloadUUID) }}"/>
+                <a href="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .DownloadUUID) }}" target="_blank" data-module="app-auto-click">Download preview document</a>
             {{ end }}
 
             <h1 class="govuk-heading-l app-!-embedded-hide">Edit draft document</h1>

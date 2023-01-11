@@ -11,7 +11,7 @@ import searchController from "./search-controller";
 import textEditor from "./text-editor";
 import selectTab from "./select-tab";
 import handleInsertCheckboxes from "./handle-insert-checkboxes";
-import previewDraft from "./preview-draft";
+import autoClick from "./auto-click";
 
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
@@ -33,7 +33,7 @@ fullWidthContainer();
 textEditor();
 selectTab();
 handleInsertCheckboxes();
-previewDraft();
+autoClick();
 
 if (window.self !== window.parent) {
   const success = document.querySelector("[data-app-reload~=\"page\"]");

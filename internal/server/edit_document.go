@@ -63,40 +63,30 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 			draftDocuments := getDraftDocuments(documents)
 			data.Documents = draftDocuments
 
-			defaultDocumentUUID := draftDocuments[0].UUID
-			selectedDocumentUUID := r.FormValue("document")
-			if selectedDocumentUUID != "" {
-				defaultDocumentUUID = selectedDocumentUUID
+			if len(draftDocuments) > 0 {
+				defaultDocumentUUID := draftDocuments[0].UUID
+				selectedDocumentUUID := r.FormValue("document")
+				if selectedDocumentUUID != "" {
+					defaultDocumentUUID = selectedDocumentUUID
+				}
+				document, err := client.DocumentByUUID(ctx, defaultDocumentUUID)
+				if err != nil {
+					return err
+				}
+				data.Document = document
 			}
-			document, err := client.DocumentByUUID(ctx, defaultDocumentUUID)
-			if err != nil {
-				return err
-			}
-			data.Document = document
 
 		case http.MethodPost:
 			documentControls := postFormString(r, "documentControls")
 			content := r.FormValue("documentTextEditor")
 			documentUUID := r.FormValue("documentUUID")
+
 			switch documentControls {
 			case "save":
 				document, err := client.EditDocument(ctx, documentUUID, content)
 				if err != nil {
 					return err
 				}
-
-				caseItem, err := client.Case(ctx, caseID)
-				if err != nil {
-					return err
-				}
-
-				documents, err := client.Documents(ctx, caseType, caseID)
-				if err != nil {
-					return err
-				}
-
-				data.Case = caseItem
-				data.Documents = getDraftDocuments(documents)
 				data.Document = document
 
 			case "preview":
@@ -116,18 +106,6 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					return err
 				}
 
-				caseItem, err := client.Case(ctx, caseID)
-				if err != nil {
-					return err
-				}
-
-				documents, err := client.Documents(ctx, caseType, caseID)
-				if err != nil {
-					return err
-				}
-
-				data.Case = caseItem
-				data.Documents = getDraftDocuments(documents)
 				data.Document = document
 				data.PreviewDraft = true
 				data.DownloadUUID = previewDocument.UUID
@@ -137,26 +115,6 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				if err != nil {
 					return err
 				}
-
-				caseItem, err := client.Case(ctx, caseID)
-				if err != nil {
-					return err
-				}
-
-				documents, err := client.Documents(ctx, caseType, caseID)
-				if err != nil {
-					return err
-				}
-
-				data.Case = caseItem
-				draftDocuments := getDraftDocuments(documents)
-				data.Documents = draftDocuments
-				defaultDocumentUUID := draftDocuments[0].UUID
-				document, err := client.DocumentByUUID(ctx, defaultDocumentUUID)
-				if err != nil {
-					return err
-				}
-				data.Document = document
 
 			case "publish":
 				_, err := client.EditDocument(ctx, documentUUID, content)
@@ -179,7 +137,15 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				if err != nil {
 					return err
 				}
+			case "saveAndExit":
+				_, err := client.EditDocument(ctx, documentUUID, content)
+				if err != nil {
+					return err
+				}
+				data.SaveAndExit = true
+			}
 
+			if !data.SaveAndExit {
 				caseItem, err := client.Case(ctx, caseID)
 				if err != nil {
 					return err
@@ -191,21 +157,18 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				}
 
 				data.Case = caseItem
-				draftDocuments := getDraftDocuments(documents)
-				data.Documents = draftDocuments
-				defaultDocumentUUID := draftDocuments[0].UUID
-				documentToDisplay, err := client.DocumentByUUID(ctx, defaultDocumentUUID)
-				if err != nil {
-					return err
-				}
-				data.Document = documentToDisplay
+				data.Documents = getDraftDocuments(documents)
 
-			case "saveAndExit":
-				_, err := client.EditDocument(ctx, documentUUID, content)
-				if err != nil {
-					return err
+				if documentControls == "delete" || documentControls == "publish" {
+					if len(data.Documents) > 0 {
+						defaultDocumentUUID := data.Documents[0].UUID
+						documentToDisplay, err := client.DocumentByUUID(ctx, defaultDocumentUUID)
+						if err != nil {
+							return err
+						}
+						data.Document = documentToDisplay
+					}
 				}
-				data.SaveAndExit = true
 			}
 		}
 
