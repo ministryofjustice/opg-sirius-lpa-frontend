@@ -18,7 +18,7 @@ func TestCreateDocument(t *testing.T) {
 	testCases := []struct {
 		name           string
 		setup          func()
-		expectedResult DocumentData
+		expectedResult Document
 		expectedError  func(int) error
 	}{
 		{
@@ -48,8 +48,8 @@ func TestCreateDocument(t *testing.T) {
 						}),
 					})
 			},
-			expectedResult: DocumentData{
-				DocumentID: 1,
+			expectedResult: Document{
+				ID: 1,
 			},
 		},
 	}
@@ -61,7 +61,7 @@ func TestCreateDocument(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				result, err := client.CreateDocument(Context{Context: context.Background()}, 800, 141, "DD", []string{"DD1"})
+				result, err := client.CreateDocument(Context{Context: context.Background()}, 800, 189, "DD", []string{"DD1"})
 
 				assert.Equal(t, tc.expectedResult, result)
 				if tc.expectedError == nil {
