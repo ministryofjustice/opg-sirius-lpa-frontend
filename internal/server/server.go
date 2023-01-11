@@ -116,7 +116,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/javascript/", static)
 	mux.Handle("/stylesheets/", static)
 
-	muxWithHeaders := setCSPHeader(securityheaders.Use(mux))
+	muxWithHeaders := securityheaders.Use(setCSPHeader(mux))
 
 	return otelhttp.NewHandler(http.StripPrefix(prefix, muxWithHeaders), "lpa-frontend")
 }
