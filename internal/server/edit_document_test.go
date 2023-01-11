@@ -424,6 +424,9 @@ func TestGetEditDocumentWhenCaseErrors(t *testing.T) {
 	client.
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{}, expectedError)
+	client.
+		On("Documents", mock.Anything, sirius.CaseTypeLpa, 123).
+		Return([]sirius.Document{}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
