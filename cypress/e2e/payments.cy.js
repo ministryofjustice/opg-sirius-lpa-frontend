@@ -7,6 +7,7 @@ describe("View a payment", () => {
         });
 
         it("displays add payment and apply fee reduction buttons", () => {
+            cy.visit("/payments?id=801");
             cy.get(".govuk-button").contains("Add payment");
             cy.get(".govuk-button").contains("Apply fee reduction");
         });
