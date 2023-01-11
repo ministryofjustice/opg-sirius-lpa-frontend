@@ -189,7 +189,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 					return err
 				} else {
 					data.Success = true
-					http.Redirect(w, r, fmt.Sprintf("/edit-document?id=%d&case=%s", caseID, caseType), http.StatusFound)
+					return RedirectError(fmt.Sprintf("/edit-document?id=%d&case=%s", caseID, caseType))
 				}
 			} else {
 				contact := sirius.Person{
