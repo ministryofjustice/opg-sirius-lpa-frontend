@@ -34,8 +34,6 @@ RUN apk --update --no-cache add \
     tzdata \
     && rm -rf /var/cache/apk/*
 
-RUN apk upgrade libcrypto3 libssl3
-
 COPY --from=build-env /go/bin/opg-sirius-lpa-frontend opg-sirius-lpa-frontend
 COPY --from=asset-env /app/web/static web/static
 COPY web/template web/template
