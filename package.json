@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
-    "build": "yarn build:js && yarn build:css && yarn build:images",
+    "build": "yarn build:js && yarn build:css && yarn build:images && yarn build:tinymce",
     "build:js": "esbuild --bundle web/assets/load-classes.js web/assets/main.js --minify --outdir=web/static/javascript --sourcemap --resolve-extensions=.mjs,.js",
     "build:css": "sass --load-path . --style compressed web/assets/main.scss web/static/stylesheets/all.css",
     "build:images": "mkdir -p web/static/assets/images && cp node_modules/govuk-frontend/govuk/assets/images/* node_modules/@ministryofjustice/frontend/moj/assets/images/* web/static/assets/images",
+    "build:tinymce": "cp -r node_modules/tinymce/skins web/static/javascript",
     "clean": "rm -rf web/static",
     "cypress": "cypress open",
     "prettier": "prettier --write ."
@@ -16,7 +17,8 @@
     "accessible-autocomplete": "^2.0.4",
     "cypress": "12.3.0",
     "govuk-frontend": "^4.4.0",
-    "jquery": "^3.6.1"
+    "jquery": "^3.6.1",
+    "tinymce": "^5.10.7"
   },
   "devDependencies": {
     "esbuild": "^0.16.0",
