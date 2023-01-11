@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
 )
@@ -49,22 +50,33 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 
 		switch r.Method {
 		case http.MethodGet:
-			caseItem, err := client.Case(ctx, caseID)
-			if err != nil {
+			group, groupCtx := errgroup.WithContext(ctx.Context)
+
+			group.Go(func() error {
+				caseItem, err := client.Case(ctx.With(groupCtx), caseID)
+				if err != nil {
+					return err
+				}
+				data.Case = caseItem
+				return nil
+			})
+
+			group.Go(func() error {
+				documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID)
+				if err != nil {
+					return err
+				}
+				draftDocuments := getDraftDocuments(documents)
+				data.Documents = draftDocuments
+				return nil
+			})
+
+			if err := group.Wait(); err != nil {
 				return err
 			}
 
-			documents, err := client.Documents(ctx, caseType, caseID)
-			if err != nil {
-				return err
-			}
-
-			data.Case = caseItem
-			draftDocuments := getDraftDocuments(documents)
-			data.Documents = draftDocuments
-
-			if len(draftDocuments) > 0 {
-				defaultDocumentUUID := draftDocuments[0].UUID
+			if len(data.Documents) > 0 {
+				defaultDocumentUUID := data.Documents[0].UUID
 				selectedDocumentUUID := r.FormValue("document")
 				if selectedDocumentUUID != "" {
 					defaultDocumentUUID = selectedDocumentUUID
@@ -75,7 +87,6 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				}
 				data.Document = document
 			}
-
 		case http.MethodPost:
 			documentControls := postFormString(r, "documentControls")
 			content := r.FormValue("documentTextEditor")
@@ -146,18 +157,30 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 			}
 
 			if !data.SaveAndExit {
-				caseItem, err := client.Case(ctx, caseID)
-				if err != nil {
+				group, groupCtx := errgroup.WithContext(ctx.Context)
+
+				group.Go(func() error {
+					caseItem, err := client.Case(ctx.With(groupCtx), caseID)
+					if err != nil {
+						return err
+					}
+					data.Case = caseItem
+					return nil
+				})
+
+				group.Go(func() error {
+					documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID)
+					if err != nil {
+						return err
+					}
+
+					data.Documents = getDraftDocuments(documents)
+					return nil
+				})
+
+				if err := group.Wait(); err != nil {
 					return err
 				}
-
-				documents, err := client.Documents(ctx, caseType, caseID)
-				if err != nil {
-					return err
-				}
-
-				data.Case = caseItem
-				data.Documents = getDraftDocuments(documents)
 
 				if documentControls == "delete" || documentControls == "publish" {
 					if len(data.Documents) > 0 {
