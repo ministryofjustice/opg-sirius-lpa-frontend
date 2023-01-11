@@ -117,12 +117,6 @@ func TestPostCreateDocument(t *testing.T) {
 				Return(sirius.Document{}, nil)
 
 			template := &mockTemplate{}
-			template.
-				On("Func", mock.Anything, createDocumentData{
-					Case:    caseItem,
-					Success: true,
-				}).
-				Return(nil)
 
 			form := url.Values{
 				"id":                {"123"},
@@ -140,8 +134,8 @@ func TestPostCreateDocument(t *testing.T) {
 			err := CreateDocument(client, template.Func)(w, r)
 			resp := w.Result()
 
-			assert.Nil(t, err)
-			assert.Equal(t, http.StatusFound, resp.StatusCode)
+			assert.Equal(t, RedirectError("/edit-document?id=123&case="+caseType), err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
