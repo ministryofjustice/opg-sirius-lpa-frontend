@@ -116,7 +116,9 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/javascript/", static)
 	mux.Handle("/stylesheets/", static)
 
-	return otelhttp.NewHandler(http.StripPrefix(prefix, securityheaders.Use(mux)), "lpa-frontend")
+	muxWithHeaders := setCSPHeader(securityheaders.Use(mux))
+
+	return otelhttp.NewHandler(http.StripPrefix(prefix, muxWithHeaders), "lpa-frontend")
 }
 
 type Handler func(w http.ResponseWriter, r *http.Request) error
@@ -213,4 +215,12 @@ func translateRefData(types []sirius.RefDataItem, tmplHandle string) string {
 		}
 	}
 	return tmplHandle
+}
+
+func setCSPHeader(h http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; img-src 'self' data:")
+
+		h.ServeHTTP(w, r)
+	}
 }

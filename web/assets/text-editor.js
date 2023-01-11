@@ -17,7 +17,6 @@ const textEditor = () => {
         gecko_spellcheck: true,
         height: 300,
         cache_suffix: '?v=5.10.7',
-        skin: 'oxide',
     });
 }
 
