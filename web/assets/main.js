@@ -12,6 +12,7 @@ import textEditor from "./text-editor";
 import selectTab from "./select-tab";
 import handleInsertCheckboxes from "./handle-insert-checkboxes";
 import autoClick from "./auto-click";
+import handleCreateDocumentButton from "./handle-create-document-button";
 
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
@@ -34,6 +35,7 @@ textEditor();
 selectTab();
 handleInsertCheckboxes();
 autoClick();
+handleCreateDocumentButton();
 
 if (window.self !== window.parent) {
   const success = document.querySelector("[data-app-reload~=\"page\"]");
