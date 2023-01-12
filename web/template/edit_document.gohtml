@@ -1,0 +1,82 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Edit Document{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            {{ template "error-summary" .Error }}
+
+            {{ if .Success }}
+                <meta data-app-reload="page"/>
+                {{ template "success-banner" "You have successfully published a document." }}
+            {{ else if .SaveAndExit }}
+                <meta data-app-reload="saveAndExit"/>
+                {{ template "success-banner" "You have successfully saved the document." }}
+            {{ else if .PreviewDraft }}
+                <a href="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .DownloadUUID) }}" target="_blank"
+                   data-module="app-auto-click">Download preview document</a>
+            {{ end }}
+
+            <h1 class="govuk-heading-m">Edit draft document</h1>
+
+            {{ if not .Documents }}
+                <p class="govuk-body govuk-!-padding-top-7 govuk-!-padding-bottom-7"><strong>There is currently no document
+                        data available to display.</strong></p>
+            {{ else }}
+                <form class="form" method="GET">
+                    <input type="hidden" name="id" value="{{ .Case.ID }}"/>
+                    <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
+
+                    <div class="govuk-form-group {{ if .Error.Field.document }}govuk-form-group--error{{ end }}">
+                        <label class="govuk-label" for="f-document">
+                            Select a draft to edit
+                        </label>
+                        {{ template "errors" .Error.Field.document }}
+                        <select class="govuk-select {{ if .Error.Field.document }}govuk-select--error{{ end }} govuk-grid-column-two-thirds"
+                                id="f-document" name="document">
+                            <option hidden {{ if not nil }}selected{{ end }} disabled></option>
+                            {{ $documentID := .Document.ID }}
+                            {{ range .Documents }}
+                                <option value="{{ .UUID }}" {{ if eq .ID $documentID }}selected{{ end }}>{{ .ID }}: {{ .CreatedDate }}: {{ .Correspondent.Firstname }} {{ .Correspondent.Surname }}: {{ .SystemType }}</option>
+                            {{ end }}
+                        </select>
+                        <button class="govuk-button govuk-button--secondary govuk-grid-column-one-third app-!-float-right"
+                                data-module="govuk-button" type="submit">Select
+                        </button>
+                    </div>
+                </form>
+                <form class="form" method="POST">
+                    <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+                    <input type="hidden" name="id" value="{{ .Case.ID }}"/>
+                    <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
+                    <input type="hidden" name="documentUUID" value="{{ .Document.UUID }}"/>
+
+                    <div class="govuk-form-group {{ if .Error.Field.documentTextEditor }}govuk-form-group--error{{ end }} govuk-!-margin-bottom-2">
+                        <textarea id="documentTextEditor" name="documentTextEditor">{{ .Document.Content }}</textarea>
+                    </div>
+                    <div class="govuk-button-group govuk-!-margin-bottom-6">
+                        <button class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                                name="documentControls" type="submit" value="save">Save draft
+                        </button>
+                        <button class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                                name="documentControls" type="submit" value="delete">Delete draft
+                        </button>
+                        <button class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                                name="documentControls" type="submit" value="preview">Preview draft
+                        </button>
+                    </div>
+                    <div class="govuk-button-group govuk-!-margin-bottom-0">
+                        <button class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                                name="documentControls" type="submit" value="saveAndExit" id="saveAndExit">Save and exit
+                        </button>
+                        <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit"
+                                value="publish">Publish draft
+                        </button>
+                    </div>
+                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+                </form>
+            {{ end }}
+        </div>
+    </div>
+{{ end }}

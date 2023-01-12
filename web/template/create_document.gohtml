@@ -51,7 +51,7 @@
 {{ end }}
 
 {{ define "add-recipient" }}
-    <h1 class="govuk-heading-l app-!-embedded-hide">Add a new recipient</h1>
+    <h1 class="govuk-heading-m">Add a new recipient</h1>
     <form class="form" method="POST">
         <input type="hidden" name="id" value="{{ .Case.ID }}"/>
         <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
@@ -129,7 +129,7 @@
 
 {{ define "select-recipient" }}
     <div class="govuk-grid-row">
-        <h1 class="govuk-heading-l app-!-embedded-hide govuk-grid-column-two-thirds">Select a recipient</h1>
+        <h1 class="govuk-heading-m govuk-grid-column-two-thirds">Select a recipient</h1>
         <form class="form" method="GET">
             <input type="hidden" name="id" value="{{ .Case.ID }}"/>
             <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
@@ -192,7 +192,7 @@
 {{ end }}
 
 {{ define "select-insert" }}
-    <h1 class="govuk-heading-l app-!-embedded-hide">Select document inserts</h1>
+    <h1 class="govuk-heading-m">Select document inserts</h1>
     <form class="form" method="GET">
         <input type="hidden" name="id" value="{{ .Case.ID }}"/>
         <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
@@ -270,7 +270,7 @@
 {{ end }}
 
 {{ define "select-template" }}
-    <h1 class="govuk-heading-l app-!-embedded-hide">Select a document template</h1>
+    <h1 class="govuk-heading-m">Select a document template</h1>
 
     <form class="form" method="GET">
         <input type="hidden" name="id" value="{{ .Case.ID }}"/>
