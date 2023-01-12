@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -213,4 +214,37 @@ func TestPostFormDateString(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 
 	assert.Equal(t, sirius.DateString("2022-01-02"), postFormDateString(r, "name"))
+}
+
+func TestCancelledContext(t *testing.T) {
+	assert := assert.New(t)
+
+	expectedErr := context.Canceled
+
+	logger := &mockLogger{}
+	logger.
+		On("Request", mock.Anything, expectedErr)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, errorVars{
+			SiriusURL: "http://sirius",
+			Code:      499,
+			Error:     "context canceled",
+		}).
+		Return(nil)
+
+	handler := errorHandler(logger, template.Func, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
+		return expectedErr
+	})
+
+	w := httptest.NewRecorder()
+	r, _ := http.NewRequest("POST", "/", strings.NewReader("xsrfToken=the-real-one"))
+
+	handler.ServeHTTP(w, r)
+
+	resp := w.Result()
+
+	assert.Equal(499, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, template, logger)
 }
