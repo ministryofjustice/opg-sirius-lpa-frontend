@@ -1,7 +1,9 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -197,6 +199,10 @@ func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL 
 					}
 
 					return
+				}
+
+				if errors.Is(err, context.Canceled) {
+					code = 499
 				}
 
 				w.WriteHeader(code)
