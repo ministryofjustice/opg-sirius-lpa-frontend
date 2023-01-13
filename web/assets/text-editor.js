@@ -17,9 +17,12 @@ const textEditor = () => {
         gecko_spellcheck: true,
         height: 300,
         cache_suffix: '?v=5.10.7',
-        content_css: '../stylesheets/all.css',
+        content_css: getContentCSSPath(),
     });
 }
 
 export default textEditor;
 
+function getContentCSSPath() {
+    return window.self !== window.parent ?  '../frontend/stylesheets/all.css' : '../stylesheets/all.css';
+}
