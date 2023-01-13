@@ -30,6 +30,9 @@ func TestCreateContact(t *testing.T) {
 				Firstname:             "Pauline",
 				Middlenames:           "Suzanne",
 				Surname:               "Price",
+				DateOfBirth:           DateString("1995-07-01"),
+				PreviouslyKnownAs:     "",
+				AlsoKnownAs:           "",
 				CompanyName:           "",
 				CompanyReference:      "",
 				AddressLine1:          "278 Nicole Lock",
@@ -45,6 +48,7 @@ func TestCreateContact(t *testing.T) {
 				CorrespondenceByPost:  false,
 				CorrespondenceByEmail: true,
 				CorrespondenceByPhone: true,
+				ResearchOptOut:        false,
 			},
 			setup: func() {
 				pact.
@@ -62,8 +66,12 @@ func TestCreateContact(t *testing.T) {
 							"firstname":             "Pauline",
 							"middlenames":           "Suzanne",
 							"surname":               "Price",
+							"dob":                   "01/07/1995",
+							"previousNames":         "",
+							"otherNames":            "",
 							"addressLine1":          "278 Nicole Lock",
 							"addressLine2":          "Toby Court",
+							"addressLine3":          "",
 							"town":                  "Russellstad",
 							"county":                "Cumbria",
 							"postcode":              "HP19 9BW",
@@ -76,6 +84,9 @@ func TestCreateContact(t *testing.T) {
 							"correspondenceByEmail": true,
 							"correspondenceByPhone": true,
 							"correspondenceByWelsh": false,
+							"companyName":           "",
+							"companyReference":      "",
+							"researchOptOut":        false,
 						},
 					}).
 					WillRespondWith(dsl.Response{
