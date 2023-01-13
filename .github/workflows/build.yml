@@ -93,11 +93,11 @@ jobs:
         id: pact_tag
         run: |
           if [ $GITHUB_EVENT_NAME == "pull_request" ]; then
-              echo "::set-output name=TAG::${{github.event.pull_request.head.sha}}"
-              echo "::set-output name=BRANCH::${{github.head_ref}}"
+              echo "TAG=${{github.event.pull_request.head.sha}}" >> $GITHUB_OUTPUT
+              echo "BRANCH=${{github.head_ref}}" >> $GITHUB_OUTPUT
           else
-              echo "::set-output name=TAG::${{github.sha}}"
-              echo "::set-output name=BRANCH::main"
+              echo "TAG=${{github.sha}}" >> $GITHUB_OUTPUT
+              echo "BRANCH=main" >> $GITHUB_OUTPUT
           fi
       - name: Publish pacts
         if: github.actor != 'dependabot[bot]'
