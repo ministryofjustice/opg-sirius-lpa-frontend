@@ -263,6 +263,7 @@ func TestPostPublishDocument(t *testing.T) {
 			Case:      caseItem,
 			Documents: documents,
 			Document:  document,
+			Success:   true,
 		}).
 		Return(nil)
 
