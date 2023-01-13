@@ -1,0 +1,32 @@
+// ----------------------------------------------------------------
+// Styling for the inline WYSIWYG editor on create document
+// ----------------------------------------------------------------
+
+body#tinymce {
+    min-width: 0;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: .9em;
+    margin: 15px;
+
+    ul {
+        padding-left: 40px;
+
+        li {
+            list-style: disc;
+        }
+    }
+
+    ol li {
+        list-style: decimal;
+    }
+
+    .user-instruction {
+        color: blue;
+    }
+}
+
+.tox-tbtn {
+    min-width: 10px;
+    margin-left: 0;
+    background: none;
+}
