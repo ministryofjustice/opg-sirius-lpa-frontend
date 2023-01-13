@@ -7,6 +7,8 @@ $moj-page-width: 1220px;
 @import "node_modules/accessible-autocomplete/src/autocomplete";
 @import "./dark.scss";
 
+$moj-assets-path: "node_modules/@ministryofjustice/frontend/moj/assets";
+
 .app-\!-embedded .app-\!-embedded-hide {
   display: none;
 }
