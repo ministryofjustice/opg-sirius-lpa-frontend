@@ -63,4 +63,12 @@ if (window.self !== window.parent) {
         `${window.location.protocol}//${window.location.host}`
     );
   }
+
+  const reloadTimeline = document.querySelector("[data-app-reload~=\"reload-timeline\"]");
+  if (reloadTimeline) {
+    window.parent.postMessage(
+        "reload-timeline",
+        `${window.location.protocol}//${window.location.host}`
+    );
+  }
 }
