@@ -148,6 +148,8 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				if err != nil {
 					return err
 				}
+				data.Success = true
+
 			case "saveAndExit":
 				_, err := client.EditDocument(ctx, documentUUID, content)
 				if err != nil {
