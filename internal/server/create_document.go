@@ -144,34 +144,20 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 			}
 
 		case http.MethodPost:
-			selectedRecipientIDs, err := sliceAtoi(r.Form["selectRecipients"])
+			recipientControls := postFormString(r, "recipientControls")
 
-			if len(selectedRecipientIDs) > 0 {
+			switch recipientControls {
+			case "selectRecipients":
+				selectedRecipientIDs, err := sliceAtoi(r.Form["selectRecipients"])
+				if err != nil {
+					return err
+				}
+
 				templateId := r.FormValue("templateId")
 				uniqueInserts := removeDuplicateStr(r.Form["insert"])
 
 				if len(uniqueInserts) == 0 {
 					uniqueInserts = []string{}
-				}
-
-				if err != nil {
-					return err
-				}
-				if len(selectedRecipientIDs) == 0 {
-					w.WriteHeader(http.StatusBadRequest)
-					data.Error = sirius.ValidationError{
-						Field: sirius.FieldErrors{
-							"selectRecipient": {"reason": "Value is required and can't be empty"},
-						},
-					}
-					data.TemplateSelected.TemplateId = r.FormValue("templateId")
-					data.SelectedInserts = uniqueInserts
-					data.HasViewedInsertPage = true
-					data.Recipients, err = getRecipients(ctx, client, data.Case)
-					if err != nil {
-						return err
-					}
-					return tmpl(w, data)
 				}
 
 				for _, recipientID := range selectedRecipientIDs {
@@ -191,7 +177,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 					data.Success = true
 					return RedirectError(fmt.Sprintf("/edit-document?id=%d&case=%s", caseID, caseType))
 				}
-			} else {
+			case "addNewRecipient":
 				contact := sirius.Person{
 					Salutation:            postFormString(r, "salutation"),
 					Firstname:             postFormString(r, "firstname"),

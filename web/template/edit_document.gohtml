@@ -4,15 +4,13 @@
 
 {{ define "main" }}
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-grid-column-full">
             {{ template "error-summary" .Error }}
 
             {{ if .Success }}
-                <meta data-app-reload="page"/>
-                {{ template "success-banner" "You have successfully published a document." }}
+                <meta data-app-reload="reload-timeline"/>
             {{ else if .SaveAndExit }}
                 <meta data-app-reload="saveAndExit"/>
-                {{ template "success-banner" "You have successfully saved the document." }}
             {{ else if .PreviewDraft }}
                 <a href="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .DownloadUUID) }}" target="_blank"
                    data-module="app-auto-click">Download preview document</a>
@@ -21,6 +19,7 @@
             <h1 class="govuk-heading-m">Edit draft document</h1>
 
             {{ if not .Documents }}
+                <meta data-app-reload="saveAndExit"/>
                 <p class="govuk-body govuk-!-padding-top-7 govuk-!-padding-bottom-7"><strong>There is currently no document
                         data available to display.</strong></p>
             {{ else }}
@@ -28,7 +27,7 @@
                     <input type="hidden" name="id" value="{{ .Case.ID }}"/>
                     <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
 
-                    <div class="govuk-form-group {{ if .Error.Field.document }}govuk-form-group--error{{ end }}">
+                    <div class="govuk-form-group {{ if .Error.Field.document }}govuk-form-group--error{{ end }} govuk-!-margin-bottom-0">
                         <label class="govuk-label" for="f-document">
                             Select a draft to edit
                         </label>
@@ -53,7 +52,7 @@
                     <input type="hidden" name="documentUUID" value="{{ .Document.UUID }}"/>
 
                     <div class="govuk-form-group {{ if .Error.Field.documentTextEditor }}govuk-form-group--error{{ end }} govuk-!-margin-bottom-2">
-                        <textarea id="documentTextEditor" name="documentTextEditor">{{ .Document.Content }}</textarea>
+                        <textarea id="documentTextEditor" name="documentTextEditor">{{ filterContent .Document.Content }}</textarea>
                     </div>
                     <div class="govuk-button-group govuk-!-margin-bottom-6">
                         <button class="govuk-button govuk-button--secondary" data-module="govuk-button"

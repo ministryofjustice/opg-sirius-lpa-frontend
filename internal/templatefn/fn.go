@@ -94,6 +94,10 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return "", nil
 		},
+		"filterContent": func(content string) string {
+			//Fixes extra newline appearing in text editor due to newline present between the doctype and html tags
+			return strings.Replace(content, "<!DOCTYPE html>\n<html lang=\"en\">", "<!DOCTYPE html><html lang=\"en\">", -1)
+		},
 	}
 }
 
