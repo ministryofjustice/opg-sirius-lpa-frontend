@@ -83,6 +83,8 @@ func TestEditDonor(t *testing.T) {
 							"correspondenceByPhone": false,
 							"correspondenceByWelsh": true,
 							"researchOptOut":        true,
+							"companyName":           "",
+							"companyReference":      "",
 						},
 					}).
 					WillRespondWith(dsl.Response{
