@@ -7,6 +7,7 @@ $moj-assets-path: "/lpa/frontend/assets/";
 @import "node_modules/@ministryofjustice/frontend/moj/all";
 @import "node_modules/accessible-autocomplete/src/autocomplete";
 @import "./dark.scss";
+@import "./wysiwyg.scss";
 
 .app-\!-embedded .app-\!-embedded-hide {
   display: none;

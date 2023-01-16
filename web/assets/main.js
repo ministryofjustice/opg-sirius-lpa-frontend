@@ -12,6 +12,7 @@ import textEditor from "./text-editor";
 import selectTab from "./select-tab";
 import handleInsertCheckboxes from "./handle-insert-checkboxes";
 import autoClick from "./auto-click";
+import handleCreateDocumentButton from "./handle-create-document-button";
 
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
@@ -34,9 +35,10 @@ textEditor();
 selectTab();
 handleInsertCheckboxes();
 autoClick();
+handleCreateDocumentButton();
 
 if (window.self !== window.parent) {
-  const success = document.querySelector("[data-app-reload~=\"page\"]");
+  const success = document.querySelector('[data-app-reload~="page"]');
   if (success) {
     window.parent.postMessage(
       "form-done",
@@ -54,11 +56,23 @@ if (window.self !== window.parent) {
     });
   });
 
-  const saveAndExit = document.querySelector("[data-app-reload~=\"saveAndExit\"]");
+  const saveAndExit = document.querySelector(
+    '[data-app-reload~="saveAndExit"]'
+  );
   if (saveAndExit) {
     window.parent.postMessage(
-        "form-cancel",
-        `${window.location.protocol}//${window.location.host}`
+      "form-cancel",
+      `${window.location.protocol}//${window.location.host}`
+    );
+  }
+
+  const reloadTimeline = document.querySelector(
+    '[data-app-reload~="reload-timeline"]'
+  );
+  if (reloadTimeline) {
+    window.parent.postMessage(
+      "reload-timeline",
+      `${window.location.protocol}//${window.location.host}`
     );
   }
 }

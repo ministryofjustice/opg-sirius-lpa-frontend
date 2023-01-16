@@ -123,7 +123,7 @@ func TestPostCreateDocument(t *testing.T) {
 				"case":              {caseType},
 				"templateId":        {"DD"},
 				"selectRecipients":  {"1"},
-				"recipientControls": {"select"},
+				"recipientControls": {"selectRecipients"},
 				"insert":            {"DDINSERT"},
 			}
 
@@ -197,7 +197,7 @@ func TestPostCreateDocumentGenerateNewRecipient(t *testing.T) {
 				"id":                {"123"},
 				"case":              {caseType},
 				"templateId":        {"DD"},
-				"recipientControls": {"generate"},
+				"recipientControls": {"addNewRecipient"},
 				"insert":            {"DDINSERT"},
 				"companyName":       {"Test Company Name"},
 				"companyReference":  {"Test Company Reference"},

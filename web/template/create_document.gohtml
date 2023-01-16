@@ -4,7 +4,7 @@
 
 {{ define "main" }}
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-grid-column-full">
             {{ template "error-summary" .Error }}
 
             {{ if .Success }}
@@ -119,7 +119,7 @@
                     </fieldset>
                 </div>
                 <div class="govuk-button-group govuk-!-padding-top-5">
-                    <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
+                    <button class="govuk-button" data-module="govuk-button" type="submit" name="recipientControls" value="addNewRecipient">Continue</button>
                 </div>
                 <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
             </div>
@@ -162,11 +162,12 @@
                         <td class="govuk-table__cell">
                             <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                 <div class="govuk-checkboxes__item">
-                                    <input class="govuk-checkboxes__input" id="f-{{ .ID }}"
+                                    <input class="govuk-checkboxes__input" id="f-recipient-{{ .ID }}"
                                            name="selectRecipients" type="checkbox"
-                                           value="{{ .ID }}"/>
+                                           value="{{ .ID }}"
+                                           data-module="recipient-checkbox"/>
                                     <label class="govuk-label govuk-checkboxes__label"
-                                           for="f-{{ .ID }}">
+                                           for="f-recipient-{{ .ID }}">
                                         {{ if .CompanyName  }}
                                             <h2 class="govuk-heading-s govuk-!-margin-bottom-1">{{ .CompanyName }} ({{ .PersonType }})</h2>
                                         {{ else }}
@@ -184,7 +185,7 @@
         </div>
 
         <div class="govuk-button-group govuk-!-padding-top-5">
-            <button class="govuk-button" data-module="govuk-button" type="submit">Create draft document
+            <button class="govuk-button govuk-button--disabled" data-module="create-document-button" type="submit" name="recipientControls" value="selectRecipients">Create draft document
             </button>
         </div>
         <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
