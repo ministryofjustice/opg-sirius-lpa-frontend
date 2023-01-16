@@ -1,5 +1,5 @@
 const handleCreateDocumentButton = () => {
-    /*  After creating a non case contact recipient, if a user clicks the create document button without selecting a
+  /*  After creating a non case contact recipient, if a user clicks the create document button without selecting a
         recipient, the recipient they just created will be lost (as non case contacts are not retrieved as part of the
         call to get recipients). So JS is required to disable the button and enable it if at least one recipient has
         been selected */
@@ -9,25 +9,27 @@ const handleCreateDocumentButton = () => {
     '[data-module="create-document-button"]'
   );
 
-    /** @type NodeList|null checkboxes */
-    const checkboxes = document.querySelectorAll(
-        '[data-module="recipient-checkbox"]'
-    );
+  /** @type NodeList|null checkboxes */
+  const checkboxes = document.querySelectorAll(
+    '[data-module="recipient-checkbox"]'
+  );
 
-    if (checkboxes && checkboxes.length > 0) {
-        checkboxes.forEach((el, i) => {
-            el.addEventListener("change", (event) => {
-                let isOneRecipientSelected = Array.prototype.slice.call(checkboxes).some(x => x.checked);
-                if(isOneRecipientSelected) {
-                    createDocumentButton.ariaDisabled = "false";
-                    createDocumentButton.classList.remove("govuk-button--disabled");
-                } else {
-                    createDocumentButton.ariaDisabled = "true";
-                    createDocumentButton.classList.add("govuk-button--disabled");
-                }
-            });
-        })
-    }
+  if (checkboxes && checkboxes.length > 0) {
+    checkboxes.forEach((el, i) => {
+      el.addEventListener("change", (event) => {
+        let isOneRecipientSelected = Array.from(checkboxes).some(
+          (x) => x.checked
+        );
+        if (isOneRecipientSelected) {
+          createDocumentButton.disabled = "false";
+          createDocumentButton.classList.remove("govuk-button--disabled");
+        } else {
+          createDocumentButton.disabled = "true";
+          createDocumentButton.classList.add("govuk-button--disabled");
+        }
+      });
+    });
+  }
 };
 
 export default handleCreateDocumentButton;

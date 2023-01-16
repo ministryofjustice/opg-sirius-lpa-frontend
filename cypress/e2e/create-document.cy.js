@@ -16,7 +16,7 @@ describe("Create a document", () => {
 
     it("creates a document on the case by selecting a recipient", () => {
         cy.contains("Select a recipient");
-        cy.get("#f-189").click();
+        cy.get("#f-recipient-189").click();
         cy.contains("button", "Create draft document").click();
     });
 
@@ -25,7 +25,7 @@ describe("Create a document", () => {
         cy.contains("button", "Create draft document")
             .invoke("attr", "class")
             .should("contain", "govuk-button--disabled");
-        cy.get("#f-189").click();
+        cy.get("#f-recipient-189").click();
         cy.contains("button", "Create draft document")
             .invoke("attr", "class")
             .should("contain", "govuk-button");

@@ -38,7 +38,7 @@ autoClick();
 handleCreateDocumentButton();
 
 if (window.self !== window.parent) {
-  const success = document.querySelector("[data-app-reload~=\"page\"]");
+  const success = document.querySelector('[data-app-reload~="page"]');
   if (success) {
     window.parent.postMessage(
       "form-done",
@@ -56,19 +56,23 @@ if (window.self !== window.parent) {
     });
   });
 
-  const saveAndExit = document.querySelector("[data-app-reload~=\"saveAndExit\"]");
+  const saveAndExit = document.querySelector(
+    '[data-app-reload~="saveAndExit"]'
+  );
   if (saveAndExit) {
     window.parent.postMessage(
-        "form-cancel",
-        `${window.location.protocol}//${window.location.host}`
+      "form-cancel",
+      `${window.location.protocol}//${window.location.host}`
     );
   }
 
-  const reloadTimeline = document.querySelector("[data-app-reload~=\"reload-timeline\"]");
+  const reloadTimeline = document.querySelector(
+    '[data-app-reload~="reload-timeline"]'
+  );
   if (reloadTimeline) {
     window.parent.postMessage(
-        "reload-timeline",
-        `${window.location.protocol}//${window.location.host}`
+      "reload-timeline",
+      `${window.location.protocol}//${window.location.host}`
     );
   }
 }

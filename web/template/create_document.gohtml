@@ -162,12 +162,12 @@
                         <td class="govuk-table__cell">
                             <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                 <div class="govuk-checkboxes__item">
-                                    <input class="govuk-checkboxes__input" id="f-{{ .ID }}"
+                                    <input class="govuk-checkboxes__input" id="f-recipient-{{ .ID }}"
                                            name="selectRecipients" type="checkbox"
                                            value="{{ .ID }}"
                                            data-module="recipient-checkbox"/>
                                     <label class="govuk-label govuk-checkboxes__label"
-                                           for="f-{{ .ID }}">
+                                           for="f-recipient-{{ .ID }}">
                                         {{ if .CompanyName  }}
                                             <h2 class="govuk-heading-s govuk-!-margin-bottom-1">{{ .CompanyName }} ({{ .PersonType }})</h2>
                                         {{ else }}

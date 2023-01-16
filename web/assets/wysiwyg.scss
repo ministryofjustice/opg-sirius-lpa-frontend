@@ -3,30 +3,30 @@
 // ----------------------------------------------------------------
 
 body#tinymce {
-    min-width: 0;
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: .9em;
-    margin: 15px;
+  min-width: 0;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 0.9em;
+  margin: 15px;
 
-    ul {
-        padding-left: 40px;
+  ul {
+    padding-left: 40px;
 
-        li {
-            list-style: disc;
-        }
+    li {
+      list-style: disc;
     }
+  }
 
-    ol li {
-        list-style: decimal;
-    }
+  ol li {
+    list-style: decimal;
+  }
 
-    .user-instruction {
-        color: blue;
-    }
+  .user-instruction {
+    color: blue;
+  }
 }
 
 .tox-tbtn {
-    min-width: 10px;
-    margin-left: 0;
-    background: none;
+  min-width: 10px;
+  margin-left: 0;
+  background: none;
 }
