@@ -52,7 +52,7 @@
                     <input type="hidden" name="documentUUID" value="{{ .Document.UUID }}"/>
 
                     <div class="govuk-form-group {{ if .Error.Field.documentTextEditor }}govuk-form-group--error{{ end }} govuk-!-margin-bottom-2">
-                        <textarea id="documentTextEditor" name="documentTextEditor">{{ .Document.Content }}</textarea>
+                        <textarea id="documentTextEditor" name="documentTextEditor">{{ filterContent .Document.Content }}</textarea>
                     </div>
                     <div class="govuk-button-group govuk-!-margin-bottom-6">
                         <button class="govuk-button govuk-button--secondary" data-module="govuk-button"
