@@ -283,6 +283,10 @@ func translateDocumentData(documentTemplateData []sirius.DocumentTemplateData, d
 		}
 	}
 
+	sort.Slice(documentTemplateTypes, func(i, j int) bool {
+		return documentTemplateTypes[i].Handle < documentTemplateTypes[j].Handle
+	})
+
 	return documentTemplateTypes
 }
 
