@@ -68,7 +68,7 @@
                                         Not associated with a case
                                     {{ end }}
                                 </td>
-                                <td class="govuk-table__cell" data-sort-value="{{ .Surname }}">
+                                <td class="govuk-table__cell" data-sort-value="{{ ToLower .Surname }}">
                                     <strong>
                                         {{ if .Cases }}
                                             {{ printf "%s %s %s" .Salutation .Firstname .Surname }}<br>{{ .PersonType }}
