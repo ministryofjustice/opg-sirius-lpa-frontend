@@ -3,11 +3,10 @@
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
-    "build": "yarn build:js && yarn build:css && yarn build:images && yarn build:tinymce && yarn build:font",
+    "build": "yarn build:js && yarn build:css && yarn build:assets && yarn build:tinymce",
     "build:js": "esbuild --bundle web/assets/load-classes.js web/assets/main.js --minify --outdir=web/static/javascript --sourcemap --resolve-extensions=.mjs,.js",
     "build:css": "sass --load-path . --style compressed web/assets/main.scss web/static/stylesheets/all.css",
-    "build:images": "mkdir -p web/static/assets/images && cp node_modules/govuk-frontend/govuk/assets/images/* node_modules/@ministryofjustice/frontend/moj/assets/images/* web/static/assets/images",
-    "build:font": "mkdir -p web/static/assets/fonts && cp node_modules/govuk-frontend/govuk/assets/fonts/* web/static/assets/fonts",
+    "build:assets": "mkdir -p web/static/assets/images web/static/assets/fonts && cp node_modules/govuk-frontend/govuk/assets/images/* node_modules/@ministryofjustice/frontend/moj/assets/images/* web/static/assets/images && cp node_modules/govuk-frontend/govuk/assets/fonts/* web/static/assets/fonts",
     "build:tinymce": "cp -r node_modules/tinymce/skins web/static/javascript",
     "clean": "rm -rf web/static",
     "cypress": "cypress open",
