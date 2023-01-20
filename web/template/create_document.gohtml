@@ -42,7 +42,7 @@
                 {{ template "select-insert" . }}
 
             {{ else }}
-                {{ template "case-details" . }}
+                <p class="govuk-body govuk-!-margin-top-8"><strong>{{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "lpa" }}LPA{{ end }} {{ .Case.UID }}</strong></p>
                 {{ template "select-template" . }}
             {{ end }}
         </div>
