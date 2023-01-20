@@ -9,6 +9,7 @@
 
             {{ if .Success }}
                 <meta data-app-reload="reload-timeline"/>
+                {{ template "success-banner" "Draft document published" }}
             {{ else if .SaveAndExit }}
                 <meta data-app-reload="saveAndExit"/>
             {{ else if .PreviewDraft }}
