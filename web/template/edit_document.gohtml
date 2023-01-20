@@ -20,8 +20,6 @@
 
             {{ if not .Documents }}
                 <meta data-app-reload="saveAndExit"/>
-                <p class="govuk-body govuk-!-padding-top-7 govuk-!-padding-bottom-7"><strong>There is currently no document
-                        data available to display.</strong></p>
             {{ else }}
                 <form class="form" method="GET">
                     <input type="hidden" name="id" value="{{ .Case.ID }}"/>
