@@ -17,6 +17,8 @@
                    data-module="app-auto-click">Download preview document</a>
             {{ end }}
 
+            <a href="create-document?id={{ .Case.ID }}&case={{ .Case.CaseType }}" class="govuk-back-link">Back</a>
+            {{ template "case-details" . }}
             <h1 class="govuk-heading-m">Edit draft document</h1>
 
             {{ if not .Documents }}
