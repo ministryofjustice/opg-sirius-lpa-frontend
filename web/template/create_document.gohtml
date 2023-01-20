@@ -38,7 +38,6 @@
 
             {{ else if .TemplateSelected.TemplateId }}
                 <a href="create-document?id={{ .Case.ID }}&case={{ .Case.CaseType }}" class="govuk-back-link">Back</a>
-
                 {{ template "case-details" . }}
                 {{ template "select-insert" . }}
 
@@ -121,7 +120,11 @@
                 <div class="govuk-button-group govuk-!-padding-top-5">
                     <button class="govuk-button" data-module="govuk-button" type="submit" name="recipientControls" value="addNewRecipient">Continue</button>
                 </div>
-                <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+                {{ $url := (printf "create-document?id=%d&case=%s&templateId=%s&hasViewedInserts=true" .Case.ID .Case.CaseType .TemplateSelected.TemplateId) }}
+                {{ range .SelectedInserts }}
+                    {{ $url = (printf "%s&insert=%s" $url .)  }}
+                {{ end }}
+                <a href="{{$url}}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
             </div>
         </div>
     </form>
