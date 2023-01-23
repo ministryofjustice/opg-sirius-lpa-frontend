@@ -540,3 +540,66 @@ func TestGetSortedInsertKeys(t *testing.T) {
 	assert.Equal(t, []string{"all", "imperfect", "perfect"}, result1)
 	assert.Equal(t, []string{"all", "imperfect", "perfect"}, result2)
 }
+
+func TestGetBackUrl(t *testing.T) {
+	template := sirius.DocumentTemplateData{TemplateId: "DD"}
+	insertsAvailable := []InsertDisplayData{{
+		Handle: "DDINSERTONSCREENSUMMARY",
+		Label:  "DD Insert label",
+		Key:    "All",
+	}}
+	selectedInsert := []string{"DDINSERT"}
+	caseItem := sirius.Case{CaseType: "lpa", UID: "7000"}
+
+	/* scenario 1: selected back from select recipient page, only selected a template, no inserts available */
+	selectedTemplateOnlyNoInsertsData := createDocumentData{
+		Case:             caseItem,
+		TemplateSelected: template,
+	}
+
+	/* scenario 2: selected back from insert page, selected a template, inserts available to select */
+	selectedTemplateOnlyInsertsAvailableData := createDocumentData{
+		Case:                caseItem,
+		TemplateSelected:    template,
+		DocumentInsertTypes: insertsAvailable,
+		HasViewedInsertPage: true,
+	}
+	/* scenario 3: selected back from select recipient page, selected a template and insert, inserts available to select */
+	selectedTemplateAndInsertData := createDocumentData{
+		Case:                caseItem,
+		TemplateSelected:    template,
+		SelectedInserts:     selectedInsert,
+		DocumentInsertTypes: insertsAvailable,
+		HasViewedInsertPage: true,
+	}
+
+	/* scenario 4: selected back from add recipient page, selected a template and insert, inserts available to select */
+	selectedAddNewRecipientData := createDocumentData{
+		Case:                       caseItem,
+		TemplateSelected:           template,
+		SelectedInserts:            selectedInsert,
+		DocumentInsertTypes:        insertsAvailable,
+		HasViewedInsertPage:        true,
+		HasSelectedAddNewRecipient: true,
+	}
+
+	/* scenario 5: selected back from add recipient page, selected a template, no inserts available to select */
+	selectedAddNewRecipientNoInsertData := createDocumentData{
+		Case:                       caseItem,
+		TemplateSelected:           template,
+		HasViewedInsertPage:        true,
+		HasSelectedAddNewRecipient: true,
+	}
+
+	scenarioOneUrl := getBackUrl(selectedTemplateOnlyNoInsertsData)
+	scenarioTwoUrl := getBackUrl(selectedTemplateOnlyInsertsAvailableData)
+	scenarioThreeUrl := getBackUrl(selectedTemplateAndInsertData)
+	scenarioFourUrl := getBackUrl(selectedAddNewRecipientData)
+	scenarioFiveUrl := getBackUrl(selectedAddNewRecipientNoInsertData)
+
+	assert.Equal(t, "/create-document?id=0&case=lpa", scenarioOneUrl)
+	assert.Equal(t, "/create-document?id=0&case=lpa&templateId=DD", scenarioTwoUrl)
+	assert.Equal(t, "/create-document?id=0&case=lpa&templateId=DD&insert=DDINSERT", scenarioThreeUrl)
+	assert.Equal(t, "/create-document?id=0&case=lpa&templateId=DD&hasViewedInserts=true&insert=DDINSERT", scenarioFourUrl)
+	assert.Equal(t, "/create-document?id=0&case=lpa&templateId=DD&hasViewedInserts=true", scenarioFiveUrl)
+}

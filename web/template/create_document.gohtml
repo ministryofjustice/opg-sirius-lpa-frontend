@@ -13,36 +13,22 @@
             {{ end }}
 
             {{ if .HasSelectedAddNewRecipient }}
-                {{ $url := (printf "create-document?id=%d&case=%s&templateId=%s&hasViewedInserts=true" .Case.ID .Case.CaseType .TemplateSelected.TemplateId) }}
-                {{ range .SelectedInserts }}
-                    {{ $url = (printf "%s&insert=%s" $url .)  }}
-                {{ end }}
-                <a href="{{$url}}" class="govuk-back-link">Back</a>
-
+                <a href="{{ prefix .Back }}" class="govuk-back-link">Back</a>
                 {{ template "case-details" . }}
                 {{ template "add-recipient" . }}
 
             {{ else if .HasViewedInsertPage }}
-                {{ if eq (len .DocumentInsertTypes) 0 }}
-                    <a href="create-document?id={{ .Case.ID }}&case={{ .Case.CaseType }}" class="govuk-back-link">Back</a>
-                {{ else }}
-                    {{ $url := (printf "create-document?id=%d&case=%s&templateId=%s" .Case.ID .Case.CaseType .TemplateSelected.TemplateId) }}
-                    {{ range .SelectedInserts }}
-                        {{ $url = (printf "%s&insert=%s" $url .)  }}
-                    {{ end }}
-                    <a href="{{$url}}" class="govuk-back-link">Back</a>
-                {{ end }}
-
+                <a href="{{ prefix .Back }}" class="govuk-back-link">Back</a>
                 {{ template "case-details" . }}
                 {{ template "select-recipient" . }}
 
             {{ else if .TemplateSelected.TemplateId }}
-                <a href="create-document?id={{ .Case.ID }}&case={{ .Case.CaseType }}" class="govuk-back-link">Back</a>
+                <a href="{{ prefix .Back }}" class="govuk-back-link">Back</a>
                 {{ template "case-details" . }}
                 {{ template "select-insert" . }}
 
             {{ else }}
-                <p class="govuk-body govuk-!-margin-top-8"><strong>{{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "lpa" }}LPA{{ end }} {{ .Case.UID }}</strong></p>
+                <div class="govuk-!-margin-top-8">{{ template "case-details" . }}</div>
                 {{ template "select-template" . }}
             {{ end }}
         </div>
