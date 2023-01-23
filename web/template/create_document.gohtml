@@ -106,11 +106,7 @@
                 <div class="govuk-button-group govuk-!-padding-top-5">
                     <button class="govuk-button" data-module="govuk-button" type="submit" name="recipientControls" value="addNewRecipient">Continue</button>
                 </div>
-                {{ $url := (printf "create-document?id=%d&case=%s&templateId=%s&hasViewedInserts=true" .Case.ID .Case.CaseType .TemplateSelected.TemplateId) }}
-                {{ range .SelectedInserts }}
-                    {{ $url = (printf "%s&insert=%s" $url .)  }}
-                {{ end }}
-                <a href="{{$url}}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+                <a href="{{ prefix .Back }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
             </div>
         </div>
     </form>
