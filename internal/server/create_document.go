@@ -37,6 +37,7 @@ type createDocumentData struct {
 	Recipients                 []sirius.Person
 	DocumentInsertKeys         []string
 	HasSelectedAddNewRecipient bool
+	Back                       string
 }
 
 type InsertDisplayData struct {
@@ -142,6 +143,8 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 			if hasSelectedAddNewRecipient == "true" {
 				data.HasSelectedAddNewRecipient = true
 			}
+
+			data.Back = getBackUrl(data)
 
 		case http.MethodPost:
 			recipientControls := postFormString(r, "recipientControls")
@@ -354,4 +357,21 @@ func sliceAtoi(strSlice []string) ([]int, error) {
 	}
 
 	return intSlice, nil
+}
+
+func getBackUrl(data createDocumentData) string {
+	url := fmt.Sprintf("/create-document?id=%d&case=%s", data.Case.ID, data.Case.CaseType)
+	if data.HasSelectedAddNewRecipient {
+		url = fmt.Sprintf("%s&templateId=%s&hasViewedInserts=true", url, data.TemplateSelected.TemplateId)
+	} else if data.HasViewedInsertPage {
+		if len(data.DocumentInsertTypes) != 0 {
+			url = fmt.Sprintf("%s&templateId=%s", url, data.TemplateSelected.TemplateId)
+		}
+	}
+	if len(data.SelectedInserts) > 0 {
+		for _, i := range data.SelectedInserts {
+			url = fmt.Sprintf("%s&insert=%s", url, i)
+		}
+	}
+	return url
 }
