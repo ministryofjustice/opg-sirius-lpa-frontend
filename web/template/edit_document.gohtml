@@ -9,6 +9,7 @@
 
             {{ if .Success }}
                 <meta data-app-reload="reload-timeline"/>
+                {{ template "success-banner" "Draft document published" }}
             {{ else if .SaveAndExit }}
                 <meta data-app-reload="saveAndExit"/>
             {{ else if .PreviewDraft }}
@@ -16,12 +17,12 @@
                    data-module="app-auto-click">Download preview document</a>
             {{ end }}
 
+            <a href="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .Case.CaseType) }}" class="govuk-back-link">Back</a>
+            {{ template "case-details" . }}
             <h1 class="govuk-heading-m">Edit draft document</h1>
 
             {{ if not .Documents }}
                 <meta data-app-reload="saveAndExit"/>
-                <p class="govuk-body govuk-!-padding-top-7 govuk-!-padding-bottom-7"><strong>There is currently no document
-                        data available to display.</strong></p>
             {{ else }}
                 <form class="form" method="GET">
                     <input type="hidden" name="id" value="{{ .Case.ID }}"/>
@@ -32,17 +33,19 @@
                             Select a draft to edit
                         </label>
                         {{ template "errors" .Error.Field.document }}
-                        <select class="govuk-select {{ if .Error.Field.document }}govuk-select--error{{ end }} govuk-grid-column-two-thirds"
-                                id="f-document" name="document">
-                            <option hidden {{ if not nil }}selected{{ end }} disabled></option>
-                            {{ $documentID := .Document.ID }}
-                            {{ range .Documents }}
-                                <option value="{{ .UUID }}" {{ if eq .ID $documentID }}selected{{ end }}>{{ .ID }}: {{ .CreatedDate }}: {{ .Correspondent.Firstname }} {{ .Correspondent.Surname }}: {{ .SystemType }}</option>
-                            {{ end }}
-                        </select>
-                        <button class="govuk-button govuk-button--secondary govuk-grid-column-one-third app-!-float-right"
-                                data-module="govuk-button" type="submit">Select
-                        </button>
+                        <div class="app-!-flex">
+                            <select class="govuk-select {{ if .Error.Field.document }}govuk-select--error{{ end }} app-!-full-width govuk-!-margin-right-2"
+                                    id="f-document" name="document">
+                                <option hidden {{ if not nil }}selected{{ end }} disabled></option>
+                                {{ $documentID := .Document.ID }}
+                                {{ range .Documents }}
+                                    <option value="{{ .UUID }}" {{ if eq .ID $documentID }}selected{{ end }}>{{ .ID }}: {{ .CreatedDate }}: {{ .Correspondent.Firstname }} {{ .Correspondent.Surname }}: {{ .SystemType }}</option>
+                                {{ end }}
+                            </select>
+                            <button class="govuk-button govuk-button--secondary"
+                                    data-module="govuk-button" type="submit">Select
+                            </button>
+                        </div>
                     </div>
                 </form>
                 <form class="form" method="POST">
