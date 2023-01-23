@@ -17,7 +17,7 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   font-size: 0.875em;
 }
 
-.app-\!-unlink-table__label {
+.app-\!-full-width {
   width: 100%;
 }
 
@@ -78,6 +78,6 @@ $govuk-assets-path: "/lpa/frontend/assets/";
     }
 }
 
-.app-\!-select-draft-width {
-  width: 88%;
+.app-\!-flex {
+    display: flex;
 }

@@ -33,17 +33,19 @@
                             Select a draft to edit
                         </label>
                         {{ template "errors" .Error.Field.document }}
-                        <select class="govuk-select {{ if .Error.Field.document }}govuk-select--error{{ end }} app-!-select-draft-width govuk-!-margin-right-2"
-                                id="f-document" name="document">
-                            <option hidden {{ if not nil }}selected{{ end }} disabled></option>
-                            {{ $documentID := .Document.ID }}
-                            {{ range .Documents }}
-                                <option value="{{ .UUID }}" {{ if eq .ID $documentID }}selected{{ end }}>{{ .ID }}: {{ .CreatedDate }}: {{ .Correspondent.Firstname }} {{ .Correspondent.Surname }}: {{ .SystemType }}</option>
-                            {{ end }}
-                        </select>
-                        <button class="govuk-button govuk-button--secondary"
-                                data-module="govuk-button" type="submit">Select
-                        </button>
+                        <div class="app-!-flex">
+                            <select class="govuk-select {{ if .Error.Field.document }}govuk-select--error{{ end }} app-!-full-width govuk-!-margin-right-2"
+                                    id="f-document" name="document">
+                                <option hidden {{ if not nil }}selected{{ end }} disabled></option>
+                                {{ $documentID := .Document.ID }}
+                                {{ range .Documents }}
+                                    <option value="{{ .UUID }}" {{ if eq .ID $documentID }}selected{{ end }}>{{ .ID }}: {{ .CreatedDate }}: {{ .Correspondent.Firstname }} {{ .Correspondent.Surname }}: {{ .SystemType }}</option>
+                                {{ end }}
+                            </select>
+                            <button class="govuk-button govuk-button--secondary"
+                                    data-module="govuk-button" type="submit">Select
+                            </button>
+                        </div>
                     </div>
                 </form>
                 <form class="form" method="POST">
