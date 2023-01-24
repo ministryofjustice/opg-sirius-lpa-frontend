@@ -26,6 +26,28 @@ func (m *mockAddComplaintClient) Case(ctx sirius.Context, id int) (sirius.Case, 
 	return args.Get(0).(sirius.Case), args.Error(1)
 }
 
+func (m *mockAddComplaintClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
+	args := m.Called(ctx, category)
+	if args.Get(0) != nil {
+		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
+var demoComplainantCategories = []sirius.RefDataItem{
+	{
+		Handle: "LPA_DONOR",
+		Label:  "LPA Donor",
+	},
+}
+
+var demoComplaintOrigins = []sirius.RefDataItem{
+	{
+		Handle: "PHONE",
+		Label:  "Phone call",
+	},
+}
+
 func TestGetAddComplaint(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
@@ -33,12 +55,20 @@ func TestGetAddComplaint(t *testing.T) {
 			client.
 				On("Case", mock.Anything, 123).
 				Return(sirius.Case{CaseType: caseType, UID: "7000"}, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+				Return(demoComplainantCategories, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+				Return(demoComplaintOrigins, nil)
 
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, addComplaintData{
-					Entity:     caseType + " 7000",
-					Categories: complaintCategories,
+					Entity:                caseType + " 7000",
+					Categories:            complaintCategories,
+					ComplainantCategories: demoComplainantCategories,
+					Origins:               demoComplaintOrigins,
 				}).
 				Return(nil)
 
@@ -79,6 +109,33 @@ func TestGetAddComplaintWhenCaseErrors(t *testing.T) {
 	client.
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{}, expectedError)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
+	w := httptest.NewRecorder()
+
+	err := AddComplaint(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestGetAddComplaintWhenRefDataErrors(t *testing.T) {
+	client := &mockAddComplaintClient{}
+	client.
+		On("Case", mock.Anything, 123).
+		Return(sirius.Case{CaseType: "LPA", UID: "7000"}, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return([]sirius.RefDataItem{}, expectedError)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
@@ -94,12 +151,20 @@ func TestGetAddComplaintWhenTemplateErrors(t *testing.T) {
 	client.
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{CaseType: "LPA", UID: "7000"}, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addComplaintData{
-			Categories: complaintCategories,
-			Entity:     "LPA 7000",
+			Entity:                "LPA 7000",
+			Categories:            complaintCategories,
+			ComplainantCategories: demoComplainantCategories,
+			Origins:               demoComplaintOrigins,
 		}).
 		Return(expectedError)
 
@@ -120,6 +185,12 @@ func TestPostAddComplaint(t *testing.T) {
 				On("Case", mock.Anything, 123).
 				Return(sirius.Case{CaseType: caseType, UID: "7000"}, nil)
 			client.
+				On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+				Return(demoComplainantCategories, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+				Return(demoComplaintOrigins, nil)
+			client.
 				On("AddComplaint", mock.Anything, 123, sirius.CaseType(caseType), sirius.Complaint{
 					Category:     "01",
 					Description:  "This is a complaint",
@@ -133,9 +204,11 @@ func TestPostAddComplaint(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, addComplaintData{
-					Success:    true,
-					Entity:     caseType + " 7000",
-					Categories: complaintCategories,
+					Success:               true,
+					Entity:                caseType + " 7000",
+					Categories:            complaintCategories,
+					ComplainantCategories: demoComplainantCategories,
+					Origins:               demoComplaintOrigins,
 				}).
 				Return(nil)
 
@@ -174,17 +247,25 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{CaseType: "LPA", UID: "7000"}, nil)
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
+	client.
 		On("AddComplaint", mock.Anything, 123, sirius.CaseTypeLpa, complaint).
 		Return(expectedError)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addComplaintData{
-			Success:    false,
-			Error:      expectedError,
-			Entity:     "LPA 7000",
-			Complaint:  complaint,
-			Categories: complaintCategories,
+			Success:               false,
+			Error:                 expectedError,
+			Entity:                "LPA 7000",
+			Complaint:             complaint,
+			Categories:            complaintCategories,
+			ComplainantCategories: demoComplainantCategories,
+			Origins:               demoComplaintOrigins,
 		}).
 		Return(nil)
 
@@ -211,6 +292,12 @@ func TestPostAddComplaintWhenAddComplaintOtherError(t *testing.T) {
 	client.
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{CaseType: "LPA", UID: "7000"}, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
 	client.
 		On("AddComplaint", mock.Anything, 123, sirius.CaseTypeLpa, complaint).
 		Return(expectedError)

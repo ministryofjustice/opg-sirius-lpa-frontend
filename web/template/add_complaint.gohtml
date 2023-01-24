@@ -61,6 +61,10 @@
           </div>
         </div>
 
+        {{ template "select" (select "complainantCategory" "Complainant category" .Complaint.ComplainantCategory .Error.Field.complainantCategory (options .ComplainantCategories)) }}
+
+        {{ template "select" (select "origin" "Origin" .Complaint.Origin .Error.Field.origin (options .Origins)) }}
+
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
           <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
