@@ -10,6 +10,8 @@ const (
 	FeeReductionTypeCategory   string = "feeReductionType"
 	PaymentReferenceType       string = "paymentReferenceType"
 	DocumentTemplateIdCategory string = "documentTemplateId"
+	ComplainantCategory        string = "complainantCategory"
+	ComplaintOrigin            string = "complaintOrigin"
 )
 
 type RefDataItem struct {

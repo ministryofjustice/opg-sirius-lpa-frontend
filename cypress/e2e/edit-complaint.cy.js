@@ -18,6 +18,8 @@ describe("Edit complaint", () => {
       .get("input")
       .should("be.checked");
     cy.get("#f-subCategory-01").should("have.value", "07");
+    cy.get("#f-complainantCategory").select("LPA Donor");
+    cy.get("#f-origin").select("Phone call");
     cy.get("#f-resolutionDate").type("2022-05-06");
     cy.contains(".govuk-radios__label", "Complaint Not Upheld").click();
     cy.get("#f-resolutionInfo").type("Because...");

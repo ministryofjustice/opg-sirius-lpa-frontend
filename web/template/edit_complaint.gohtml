@@ -59,6 +59,10 @@
           </div>
         </div>
 
+        {{ template "select" (select "complainantCategory" "Complainant category" .Complaint.ComplainantCategory .Error.Field.complainantCategory (options .ComplainantCategories)) }}
+
+        {{ template "select" (select "origin" "Origin" .Complaint.Origin .Error.Field.origin (options .Origins)) }}
+
         {{ template "input-date" (field "resolutionDate" "Resolution date" .Complaint.ResolutionDate .Error.Field.resolutionDate) }}
 
         {{ template "radios" (radios "resolution" "Resolution state" .Complaint.Resolution .Error.Field.resolution

@@ -323,3 +323,125 @@ func TestRefDataByCategoryDocumentTemplateId(t *testing.T) {
 		})
 	}
 }
+
+func TestRefDataByCategoryComplainantCategory(t *testing.T) {
+	t.Parallel()
+
+	pact := newPact()
+	defer pact.Teardown()
+
+	testCases := []struct {
+		name             string
+		setup            func()
+		expectedResponse []RefDataItem
+		expectedError    func(int) error
+	}{
+		{
+			name: "OK",
+			setup: func() {
+				pact.
+					AddInteraction().
+					UponReceiving("A request for complainant category ref data").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String(fmt.Sprintf("/lpa-api/v1/reference-data/%s", ComplainantCategory)),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.EachLike(map[string]interface{}{
+							"handle": dsl.String("LPA_DONOR"),
+							"label":  dsl.String("LPA Donor"),
+						}, 1),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: []RefDataItem{
+				{
+					Handle: "LPA_DONOR",
+					Label:  "LPA Donor",
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.Verify(func() error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+
+				types, err := client.RefDataByCategory(Context{Context: context.Background()}, ComplainantCategory)
+
+				assert.Equal(t, tc.expectedResponse, types)
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}
+
+func TestRefDataByCategoryComplainantOrigin(t *testing.T) {
+	t.Parallel()
+
+	pact := newPact()
+	defer pact.Teardown()
+
+	testCases := []struct {
+		name             string
+		setup            func()
+		expectedResponse []RefDataItem
+		expectedError    func(int) error
+	}{
+		{
+			name: "OK",
+			setup: func() {
+				pact.
+					AddInteraction().
+					UponReceiving("A request for complaint origin ref data").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String(fmt.Sprintf("/lpa-api/v1/reference-data/%s", ComplaintOrigin)),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.EachLike(map[string]interface{}{
+							"handle": dsl.String("PHONE"),
+							"label":  dsl.String("Phone call"),
+						}, 1),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: []RefDataItem{
+				{
+					Handle: "PHONE",
+					Label:  "Phone call",
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.Verify(func() error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+
+				types, err := client.RefDataByCategory(Context{Context: context.Background()}, ComplaintOrigin)
+
+				assert.Equal(t, tc.expectedResponse, types)
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}
