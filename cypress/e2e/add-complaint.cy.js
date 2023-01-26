@@ -13,6 +13,8 @@ describe("Add a complaint", () => {
     cy.get("#f-receivedDate").type("2022-04-05");
     cy.contains(".govuk-radios__label", "OPG Decisions").click();
     cy.get("#f-subCategory-02").select("Fee Decision");
+    cy.get("#f-complainantCategory").select("LPA Donor");
+    cy.get("#f-origin").select("Phone call");
     cy.get("button[type=submit]").click();
     cy.get(".moj-banner").should("exist");
   });

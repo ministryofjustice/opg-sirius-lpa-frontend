@@ -9,9 +9,10 @@ import (
 )
 
 type EditComplaintClient interface {
-	EditComplaint(ctx sirius.Context, id int, complaint sirius.Complaint) error
-	Complaint(ctx sirius.Context, id int) (sirius.Complaint, error)
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
+	Complaint(ctx sirius.Context, id int) (sirius.Complaint, error)
+	EditComplaint(ctx sirius.Context, id int, complaint sirius.Complaint) error
+	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
 type editComplaintData struct {
@@ -19,8 +20,11 @@ type editComplaintData struct {
 	Success   bool
 	Error     sirius.ValidationError
 
-	Categories map[string]complaintCategory
-	Complaint  sirius.Complaint
+	Categories            map[string]complaintCategory
+	ComplainantCategories []sirius.RefDataItem
+	Origins               []sirius.RefDataItem
+
+	Complaint sirius.Complaint
 }
 
 func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
@@ -37,17 +41,29 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 			Categories: complaintCategories,
 		}
 
+		data.ComplainantCategories, err = client.RefDataByCategory(ctx, sirius.ComplainantCategory)
+		if err != nil {
+			return err
+		}
+
+		data.Origins, err = client.RefDataByCategory(ctx, sirius.ComplaintOrigin)
+		if err != nil {
+			return err
+		}
+
 		if r.Method == http.MethodPost {
 			complaint := sirius.Complaint{
-				Category:       postFormString(r, "category"),
-				Description:    postFormString(r, "description"),
-				ReceivedDate:   postFormDateString(r, "receivedDate"),
-				Severity:       postFormString(r, "severity"),
-				SubCategory:    getValidSubcategory(postFormString(r, "category"), r.PostForm["subCategory"]),
-				Summary:        postFormString(r, "summary"),
-				Resolution:     postFormString(r, "resolution"),
-				ResolutionInfo: postFormString(r, "resolutionInfo"),
-				ResolutionDate: postFormDateString(r, "resolutionDate"),
+				Category:            postFormString(r, "category"),
+				Description:         postFormString(r, "description"),
+				ReceivedDate:        postFormDateString(r, "receivedDate"),
+				Severity:            postFormString(r, "severity"),
+				SubCategory:         getValidSubcategory(postFormString(r, "category"), r.PostForm["subCategory"]),
+				ComplainantCategory: postFormString(r, "complainantCategory"),
+				Origin:              postFormString(r, "origin"),
+				Summary:             postFormString(r, "summary"),
+				Resolution:          postFormString(r, "resolution"),
+				ResolutionInfo:      postFormString(r, "resolutionInfo"),
+				ResolutionDate:      postFormDateString(r, "resolutionDate"),
 			}
 
 			err = client.EditComplaint(ctx, id, complaint)
