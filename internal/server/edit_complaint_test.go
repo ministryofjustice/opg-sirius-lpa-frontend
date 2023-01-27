@@ -153,15 +153,16 @@ func TestGetEditComplaintWhenTemplateErrors(t *testing.T) {
 
 func TestPostEditComplaint(t *testing.T) {
 	complaint := sirius.Complaint{
-		Category:       "01",
-		Description:    "This is a complaint",
-		ReceivedDate:   sirius.DateString("2022-04-05"),
-		Severity:       "Minor",
-		SubCategory:    "07",
-		Summary:        "In summary...",
-		Resolution:     "complaint upheld",
-		ResolutionInfo: "This is what we did",
-		ResolutionDate: sirius.DateString("2022-05-06"),
+		Category:             "01",
+		Description:          "This is a complaint",
+		ReceivedDate:         sirius.DateString("2022-04-05"),
+		Severity:             "Minor",
+		InvestigatingOfficer: "Test Officer",
+		SubCategory:          "07",
+		Summary:              "In summary...",
+		Resolution:           "complaint upheld",
+		ResolutionInfo:       "This is what we did",
+		ResolutionDate:       sirius.DateString("2022-05-06"),
 	}
 
 	client := &mockEditComplaintClient{}
@@ -190,15 +191,16 @@ func TestPostEditComplaint(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"category":       {"01"},
-		"description":    {"This is a complaint"},
-		"receivedDate":   {"2022-04-05"},
-		"severity":       {"Minor"},
-		"subCategory":    {"07"},
-		"summary":        {"In summary..."},
-		"resolution":     {"complaint upheld"},
-		"resolutionInfo": {"This is what we did"},
-		"resolutionDate": {"2022-05-06"},
+		"category":             {"01"},
+		"description":          {"This is a complaint"},
+		"receivedDate":         {"2022-04-05"},
+		"severity":             {"Minor"},
+		"investigatingOfficer": {"Test Officer"},
+		"subCategory":          {"07"},
+		"summary":              {"In summary..."},
+		"resolution":           {"complaint upheld"},
+		"resolutionInfo":       {"This is what we did"},
+		"resolutionDate":       {"2022-05-06"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))

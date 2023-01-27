@@ -25,6 +25,8 @@
           (item "Security Breach" "Security Breach")
         ) }}
 
+        {{ template "input" (field "investigatingOfficer" "Investigating officer" .Complaint.InvestigatingOfficer .Error.Field.investigatingOfficer) }}
+
         {{ template "input" (field "summary" "Title" .Complaint.Summary .Error.Field.summary) }}
 
         {{ template "textarea" (field "description" "Description" .Complaint.Description .Error.Field.description) }}
