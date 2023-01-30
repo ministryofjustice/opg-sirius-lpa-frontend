@@ -192,12 +192,13 @@ func TestPostAddComplaint(t *testing.T) {
 				Return(demoComplaintOrigins, nil)
 			client.
 				On("AddComplaint", mock.Anything, 123, sirius.CaseType(caseType), sirius.Complaint{
-					Category:     "01",
-					Description:  "This is a complaint",
-					ReceivedDate: sirius.DateString("2022-04-05"),
-					Severity:     "Minor",
-					SubCategory:  "07",
-					Summary:      "In summary...",
+					Category:             "01",
+					Description:          "This is a complaint",
+					ReceivedDate:         sirius.DateString("2022-04-05"),
+					Severity:             "Minor",
+					InvestigatingOfficer: "Test Officer",
+					SubCategory:          "07",
+					Summary:              "In summary...",
 				}).
 				Return(nil)
 
@@ -213,12 +214,13 @@ func TestPostAddComplaint(t *testing.T) {
 				Return(nil)
 
 			form := url.Values{
-				"category":     {"01"},
-				"description":  {"This is a complaint"},
-				"receivedDate": {"2022-04-05"},
-				"severity":     {"Minor"},
-				"subCategory":  {"07"},
-				"summary":      {"In summary..."},
+				"category":             {"01"},
+				"description":          {"This is a complaint"},
+				"receivedDate":         {"2022-04-05"},
+				"severity":             {"Minor"},
+				"investigatingOfficer": {"Test Officer"},
+				"subCategory":          {"07"},
+				"summary":              {"In summary..."},
 			}
 
 			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))

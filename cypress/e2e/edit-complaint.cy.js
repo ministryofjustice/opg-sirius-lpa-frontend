@@ -10,6 +10,7 @@ describe("Edit complaint", () => {
       .parent()
       .get("input")
       .should("be.checked");
+    cy.get("#f-investigatingOfficer").should("have.value", "Test Officer");
     cy.get("#f-summary").should("have.value", "This and that");
     cy.get("#f-description").should("have.value", "This is seriously bad");
     cy.get("#f-receivedDate").should("have.value", "2022-04-05");
