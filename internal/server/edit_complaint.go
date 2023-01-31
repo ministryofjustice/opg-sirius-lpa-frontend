@@ -75,12 +75,7 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 			}
 
 			if complaint.CompensationType != "NOT_APPLICABLE" {
-				complaint.CompensationAmount, err = postFormFloat(r, fmt.Sprintf("compensationAmount%s", complaint.CompensationType))
-				if err != nil {
-					return err
-				}
-
-				//complaint.CompensationAmount = sirius.PoundsToPence(compensation)
+				complaint.CompensationAmount = postFormString(r, fmt.Sprintf("compensationAmount%s", complaint.CompensationType))
 			}
 
 			err = client.EditComplaint(ctx, id, complaint)

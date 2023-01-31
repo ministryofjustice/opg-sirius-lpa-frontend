@@ -88,7 +88,7 @@
                     {{ template "errors" $.Error.Field.compensationAmount }}
                     <div class="govuk-input__wrapper">
                       <div class="govuk-input__prefix" aria-hidden="true">£</div>
-                      <input class="govuk-input govuk-!-width-one-third {{ if $.Error.Field.compensationAmount }}govuk-input--error{{ end }}" id="f-compensation-amount-{{ $k }}" name="compensationAmount{{ $v.Handle }}" value="{{ if $.Complaint.CompensationAmount }}{{ fee $.Complaint.CompensationAmount }}{{ end }}" type="number" step="0.01">
+                      <input class="govuk-input govuk-!-width-one-third {{ if $.Error.Field.compensationAmount }}govuk-input--error{{ end }}" id="f-compensation-amount-{{ $k }}" name="compensationAmount{{ $v.Handle }}" value="{{ if $.Complaint.CompensationAmount }}{{ $.Complaint.CompensationAmount }}{{ end }}" type="number" step="0.01">
                     </div>
                   </div>
                 </div>

@@ -48,6 +48,7 @@ func TestEditComplaint(t *testing.T) {
 							"resolutionInfo":       "We did stuff",
 							"resolutionDate":       "07/06/2022",
 							"compensationType":     "COMPENSATORY",
+							"compensationAmount":   "150.00",
 						}),
 					}).
 					WillRespondWith(dsl.Response{
@@ -79,6 +80,7 @@ func TestEditComplaint(t *testing.T) {
 					ResolutionInfo:       "We did stuff",
 					ResolutionDate:       DateString("2022-06-07"),
 					CompensationType:     "COMPENSATORY",
+					CompensationAmount:   "150.00",
 				})
 
 				if tc.expectedError == nil {

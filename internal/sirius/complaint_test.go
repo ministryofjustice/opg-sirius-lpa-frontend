@@ -43,6 +43,7 @@ func TestComplaint(t *testing.T) {
 							"investigatingOfficer": dsl.String("Test Officer"),
 							"subCategory":          dsl.String("07"),
 							"summary":              dsl.String("This and that"),
+							"compensationType":     dsl.String("NOT_APPLICABLE"),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
@@ -55,6 +56,7 @@ func TestComplaint(t *testing.T) {
 				InvestigatingOfficer: "Test Officer",
 				SubCategory:          "07",
 				Summary:              "This and that",
+				CompensationType:     "NOT_APPLICABLE",
 			},
 		},
 	}

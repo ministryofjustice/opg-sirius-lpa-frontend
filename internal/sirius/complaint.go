@@ -11,8 +11,8 @@ type Complaint struct {
 	SubCategory          string     `json:"subCategory"`
 	ComplainantCategory  string     `json:"complainantCategory"`
 	Origin               string     `json:"origin"`
-	CompensationType     string     `json:"compensationType"`
-	CompensationAmount   float64    `json:"compensationAmount"`
+	CompensationType     string     `json:"compensationType,omitempty"`
+	CompensationAmount   string     `json:"compensationAmount,omitempty"`
 	Summary              string     `json:"summary"`
 	Resolution           string     `json:"resolution,omitempty"`
 	ResolutionInfo       string     `json:"resolutionInfo,omitempty"`
