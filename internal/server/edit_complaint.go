@@ -43,12 +43,16 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 			Categories: complaintCategories,
 		}
 
-		data.ComplainantCategories, err = client.RefDataByCategory(ctx, sirius.ComplainantCategory)
 		if err != nil {
 			return err
 		}
 
-		data.Origins, err = client.RefDataByCategory(ctx, sirius.ComplaintOrigin)
+		data.CompensationTypes, err = client.RefDataByCategory(ctx, sirius.CompensationType)
+		if err != nil {
+			return err
+		}
+
+		data.Complaint, err = client.Complaint(ctx, id)
 		if err != nil {
 			return err
 		}

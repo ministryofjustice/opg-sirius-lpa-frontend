@@ -241,6 +241,10 @@ func postFormInt(r *http.Request, name string) (int, error) {
 	return strconv.Atoi(postFormString(r, name))
 }
 
+func postFormFloat(r *http.Request, name string) (float64, error) {
+	return strconv.ParseFloat(postFormString(r, name), 64)
+}
+
 func postFormDateString(r *http.Request, name string) sirius.DateString {
 	return sirius.DateString(postFormString(r, name))
 }
