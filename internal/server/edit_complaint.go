@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -23,6 +24,7 @@ type editComplaintData struct {
 	Categories            map[string]complaintCategory
 	ComplainantCategories []sirius.RefDataItem
 	Origins               []sirius.RefDataItem
+	CompensationTypes     []sirius.RefDataItem
 
 	Complaint sirius.Complaint
 }
@@ -41,12 +43,16 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 			Categories: complaintCategories,
 		}
 
-		data.ComplainantCategories, err = client.RefDataByCategory(ctx, sirius.ComplainantCategory)
 		if err != nil {
 			return err
 		}
 
-		data.Origins, err = client.RefDataByCategory(ctx, sirius.ComplaintOrigin)
+		data.CompensationTypes, err = client.RefDataByCategory(ctx, sirius.CompensationType)
+		if err != nil {
+			return err
+		}
+
+		data.Complaint, err = client.Complaint(ctx, id)
 		if err != nil {
 			return err
 		}
@@ -61,10 +67,20 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 				SubCategory:          getValidSubcategory(postFormString(r, "category"), r.PostForm["subCategory"]),
 				ComplainantCategory:  postFormString(r, "complainantCategory"),
 				Origin:               postFormString(r, "origin"),
+				CompensationType:     postFormString(r, "compensationType"),
 				Summary:              postFormString(r, "summary"),
 				Resolution:           postFormString(r, "resolution"),
 				ResolutionInfo:       postFormString(r, "resolutionInfo"),
 				ResolutionDate:       postFormDateString(r, "resolutionDate"),
+			}
+
+			if complaint.CompensationType != "NOT_APPLICABLE" {
+				complaint.CompensationAmount, err = postFormFloat(r, fmt.Sprintf("compensationAmount%s", complaint.CompensationType))
+				if err != nil {
+					return err
+				}
+
+				//complaint.CompensationAmount = sirius.PoundsToPence(compensation)
 			}
 
 			err = client.EditComplaint(ctx, id, complaint)
@@ -79,12 +95,6 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 				data.Success = true
 			}
 		}
-
-		complaint, err := client.Complaint(ctx, id)
-		if err != nil {
-			return err
-		}
-		data.Complaint = complaint
 
 		return tmpl(w, data)
 	}
