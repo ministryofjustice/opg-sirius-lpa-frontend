@@ -8,7 +8,6 @@ import (
 )
 
 func (c *Client) EditComplaint(ctx Context, id int, complaint Complaint) error {
-	fmt.Println(complaint)
 	data, err := json.Marshal(complaint)
 	if err != nil {
 		return err
