@@ -76,7 +76,7 @@
           <div class="govuk-radios" data-module="govuk-radios">
             {{ range $k, $v := .CompensationTypes }}
               <div class="govuk-radios__item">
-                <input class="govuk-radios__input" id="f-compensation-type-{{ $k }}" name="compensationType" type="radio" value="{{ $v.Handle }}" data-aria-controls="conditional-compensation-{{ $k }}" {{ if or (eq $v.Handle $.Complaint.CompensationType) (not $.Complaint.CompensationType) }}checked{{ end }}>
+                <input class="govuk-radios__input" id="f-compensation-type-{{ $k }}" name="compensationType" type="radio" value="{{ $v.Handle }}" data-aria-controls="conditional-compensation-{{ $k }}" {{ if or (eq $v.Handle $.Complaint.CompensationType) (and (not $.Complaint.CompensationType) (eq $v.Handle "NOT_APPLICABLE")) }}checked{{ end }}>
                 <label class="govuk-label govuk-radios__label" for="f-compensation-type-{{ $k }}">
                   {{ $v.Label }}
                 </label>

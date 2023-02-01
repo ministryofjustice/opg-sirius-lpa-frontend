@@ -215,18 +215,18 @@ func TestPostEditComplaint(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"category":             {"01"},
-		"description":          {"This is a complaint"},
-		"receivedDate":         {"2022-04-05"},
-		"severity":             {"Minor"},
-		"investigatingOfficer": {"Test Officer"},
-		"subCategory":          {"07"},
-		"summary":              {"In summary..."},
-		"resolution":           {"complaint upheld"},
-		"resolutionInfo":       {"This is what we did"},
-		"resolutionDate":       {"2022-05-06"},
-		"compensationType":     {"COMPENSATORY"},
-		"compensationAmount":   {"150.00"},
+		"category":                       {"01"},
+		"description":                    {"This is a complaint"},
+		"receivedDate":                   {"2022-04-05"},
+		"severity":                       {"Minor"},
+		"investigatingOfficer":           {"Test Officer"},
+		"subCategory":                    {"07"},
+		"summary":                        {"In summary..."},
+		"resolution":                     {"complaint upheld"},
+		"resolutionInfo":                 {"This is what we did"},
+		"resolutionDate":                 {"2022-05-06"},
+		"compensationType":               {"COMPENSATORY"},
+		"compensationAmountCOMPENSATORY": {"150.00"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
