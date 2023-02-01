@@ -12,6 +12,7 @@ const (
 	DocumentTemplateIdCategory string = "documentTemplateId"
 	ComplainantCategory        string = "complainantCategory"
 	ComplaintOrigin            string = "complaintOrigin"
+	CompensationType           string = "compensationType"
 )
 
 type RefDataItem struct {
