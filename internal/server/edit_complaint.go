@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -23,6 +24,7 @@ type editComplaintData struct {
 	Categories            map[string]complaintCategory
 	ComplainantCategories []sirius.RefDataItem
 	Origins               []sirius.RefDataItem
+	CompensationTypes     []sirius.RefDataItem
 
 	Complaint sirius.Complaint
 }
@@ -51,6 +53,11 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		data.CompensationTypes, err = client.RefDataByCategory(ctx, sirius.CompensationType)
+		if err != nil {
+			return err
+		}
+
 		if r.Method == http.MethodPost {
 			complaint := sirius.Complaint{
 				Category:             postFormString(r, "category"),
@@ -61,10 +68,15 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 				SubCategory:          getValidSubcategory(postFormString(r, "category"), r.PostForm["subCategory"]),
 				ComplainantCategory:  postFormString(r, "complainantCategory"),
 				Origin:               postFormString(r, "origin"),
+				CompensationType:     postFormString(r, "compensationType"),
 				Summary:              postFormString(r, "summary"),
 				Resolution:           postFormString(r, "resolution"),
 				ResolutionInfo:       postFormString(r, "resolutionInfo"),
 				ResolutionDate:       postFormDateString(r, "resolutionDate"),
+			}
+
+			if complaint.CompensationType != "NOT_APPLICABLE" {
+				complaint.CompensationAmount = postFormString(r, fmt.Sprintf("compensationAmount%s", complaint.CompensationType))
 			}
 
 			err = client.EditComplaint(ctx, id, complaint)
@@ -80,11 +92,10 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 			}
 		}
 
-		complaint, err := client.Complaint(ctx, id)
+		data.Complaint, err = client.Complaint(ctx, id)
 		if err != nil {
 			return err
 		}
-		data.Complaint = complaint
 
 		return tmpl(w, data)
 	}

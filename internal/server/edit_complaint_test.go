@@ -39,6 +39,13 @@ func (m *mockEditComplaintClient) RefDataByCategory(ctx sirius.Context, category
 	return nil, args.Error(1)
 }
 
+var demoCompensationTypes = []sirius.RefDataItem{
+	{
+		Handle: "COMPENSATORY",
+		Label:  "Compensatory",
+	},
+}
+
 func TestGetEditComplaint(t *testing.T) {
 	complaint := sirius.Complaint{
 		Category: "01",
@@ -52,6 +59,9 @@ func TestGetEditComplaint(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
 		Return(demoComplaintOrigins, nil)
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil)
+	client.
 		On("Complaint", mock.Anything, 123).
 		Return(complaint, nil)
 
@@ -62,6 +72,7 @@ func TestGetEditComplaint(t *testing.T) {
 			Categories:            complaintCategories,
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
+			CompensationTypes:     demoCompensationTypes,
 		}).
 		Return(nil)
 
@@ -109,6 +120,9 @@ func TestGetEditComplaintWhenComplaintErrors(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
 		Return(demoComplaintOrigins, nil)
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil)
+	client.
 		On("Complaint", mock.Anything, 123).
 		Return(sirius.Complaint{}, expectedError)
 
@@ -130,6 +144,9 @@ func TestGetEditComplaintWhenTemplateErrors(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
 		Return(demoComplaintOrigins, nil)
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil)
+	client.
 		On("Complaint", mock.Anything, 123).
 		Return(sirius.Complaint{}, nil)
 
@@ -139,6 +156,7 @@ func TestGetEditComplaintWhenTemplateErrors(t *testing.T) {
 			Categories:            complaintCategories,
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
+			CompensationTypes:     demoCompensationTypes,
 		}).
 		Return(expectedError)
 
@@ -163,6 +181,8 @@ func TestPostEditComplaint(t *testing.T) {
 		Resolution:           "complaint upheld",
 		ResolutionInfo:       "This is what we did",
 		ResolutionDate:       sirius.DateString("2022-05-06"),
+		CompensationType:     "COMPENSATORY",
+		CompensationAmount:   "150.00",
 	}
 
 	client := &mockEditComplaintClient{}
@@ -172,6 +192,9 @@ func TestPostEditComplaint(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
 		Return(demoComplaintOrigins, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil)
 	client.
 		On("Complaint", mock.Anything, 123).
 		Return(complaint, nil)
@@ -187,20 +210,23 @@ func TestPostEditComplaint(t *testing.T) {
 			Categories:            complaintCategories,
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
+			CompensationTypes:     demoCompensationTypes,
 		}).
 		Return(nil)
 
 	form := url.Values{
-		"category":             {"01"},
-		"description":          {"This is a complaint"},
-		"receivedDate":         {"2022-04-05"},
-		"severity":             {"Minor"},
-		"investigatingOfficer": {"Test Officer"},
-		"subCategory":          {"07"},
-		"summary":              {"In summary..."},
-		"resolution":           {"complaint upheld"},
-		"resolutionInfo":       {"This is what we did"},
-		"resolutionDate":       {"2022-05-06"},
+		"category":                       {"01"},
+		"description":                    {"This is a complaint"},
+		"receivedDate":                   {"2022-04-05"},
+		"severity":                       {"Minor"},
+		"investigatingOfficer":           {"Test Officer"},
+		"subCategory":                    {"07"},
+		"summary":                        {"In summary..."},
+		"resolution":                     {"complaint upheld"},
+		"resolutionInfo":                 {"This is what we did"},
+		"resolutionDate":                 {"2022-05-06"},
+		"compensationType":               {"COMPENSATORY"},
+		"compensationAmountCOMPENSATORY": {"150.00"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
@@ -230,6 +256,9 @@ func TestPostEditComplaintWhenEditComplaintValidationError(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
 		Return(demoComplaintOrigins, nil)
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil)
+	client.
 		On("Complaint", mock.Anything, 123).
 		Return(complaint, nil)
 	client.
@@ -245,6 +274,7 @@ func TestPostEditComplaintWhenEditComplaintValidationError(t *testing.T) {
 			Categories:            complaintCategories,
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
+			CompensationTypes:     demoCompensationTypes,
 		}).
 		Return(nil)
 
@@ -274,6 +304,9 @@ func TestPostEditComplaintWhenEditComplaintOtherError(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
 		Return(demoComplaintOrigins, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil)
 	client.
 		On("EditComplaint", mock.Anything, 123, complaint).
 		Return(expectedError)
