@@ -81,7 +81,7 @@
                   {{ $v.Label }}
                 </label>
               </div>
-              {{ if not (eq $v.Label "N/A") }}
+              {{ if not (eq $v.Handle "NOT_APPLICABLE") }}
                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-compensation-{{ $k }}">
                   <div class="govuk-!-width-one-half govuk-form-group {{ if $.Error.Field.compensationAmount }}govuk-form-group--error{{ end }}">
                     <label class="govuk-label" for="f-compensation-amount-{{ $k }}">Compensation amount</label>
