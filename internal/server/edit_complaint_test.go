@@ -308,6 +308,9 @@ func TestPostEditComplaintWhenEditComplaintOtherError(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
 		Return(demoCompensationTypes, nil)
 	client.
+		On("Complaint", mock.Anything, 123).
+		Return(complaint, nil)
+	client.
 		On("EditComplaint", mock.Anything, 123, complaint).
 		Return(expectedError)
 
