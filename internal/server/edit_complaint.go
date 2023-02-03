@@ -58,6 +58,11 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		data.Complaint, err = client.Complaint(ctx, id)
+		if err != nil {
+			return err
+		}
+
 		if r.Method == http.MethodPost {
 			complaint := sirius.Complaint{
 				Category:             postFormString(r, "category"),
@@ -90,11 +95,6 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 			}
-		}
-
-		data.Complaint, err = client.Complaint(ctx, id)
-		if err != nil {
-			return err
 		}
 
 		return tmpl(w, data)
