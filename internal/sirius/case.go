@@ -21,6 +21,7 @@ type Case struct {
 	Donor             *Person    `json:"donor,omitempty"`
 	TrustCorporations []Person   `json:"trustCorporations,omitempty"`
 	Attorneys         []Person   `json:"attorneys,omitempty"`
+	Correspondent     *Person    `json:"correspondent,omitempty"`
 }
 
 func (c Case) Summary() string {

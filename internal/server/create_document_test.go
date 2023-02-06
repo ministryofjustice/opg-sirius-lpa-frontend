@@ -484,6 +484,29 @@ func TestGetRecipients(t *testing.T) {
 	assert.Equal(t, 3, len(recipients))
 }
 
+func TestGetRecipientsWithCorrespondent(t *testing.T) {
+	donor := sirius.Person{ID: 1}
+	attorney := sirius.Person{ID: 3}
+	correspondent := sirius.Person{ID: 4}
+	caseItem := sirius.Case{Donor: &donor, Attorneys: []sirius.Person{attorney}, Correspondent: &correspondent}
+
+	r, _ := http.NewRequest("GET", "/", nil)
+	ctx := getContext(r)
+	client := &mockCreateDocumentClient{}
+	client.
+		On("Person", mock.Anything, 1).
+		Return(donor, nil)
+	client.
+		On("Person", mock.Anything, 3).
+		Return(attorney, nil)
+	client.
+		On("Person", mock.Anything, 4).
+		Return(correspondent, nil)
+
+	recipients, _ := getRecipients(ctx, client, caseItem)
+	assert.Equal(t, 3, len(recipients))
+}
+
 func TestSliceAtoi(t *testing.T) {
 	testSliceStr := []string{"1", "2", "3"}
 	result, err := sliceAtoi(testSliceStr)

@@ -2,14 +2,15 @@ package server
 
 import (
 	"fmt"
-	"github.com/ministryofjustice/opg-go-common/template"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"golang.org/x/exp/slices"
-	"golang.org/x/sync/errgroup"
 	"net/http"
 	"sort"
 	"strconv"
 	"sync"
+
+	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"golang.org/x/exp/slices"
+	"golang.org/x/sync/errgroup"
 )
 
 type CreateDocumentClient interface {
@@ -234,6 +235,10 @@ func getRecipients(ctx sirius.Context, client CreateDocumentClient, caseItem sir
 	recipientIds = append(recipientIds, donor.ID)
 	recipientIds = append(recipientIds, getPersonIds(caseItem.TrustCorporations)...)
 	recipientIds = append(recipientIds, getPersonIds(caseItem.Attorneys)...)
+
+	if caseItem.Correspondent != nil {
+		recipientIds = append(recipientIds, caseItem.Correspondent.ID)
+	}
 
 	var recipients []sirius.Person
 	group, groupCtx := errgroup.WithContext(ctx.Context)
