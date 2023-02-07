@@ -8,6 +8,7 @@ type Complaint struct {
 	ReceivedDate         DateString `json:"receivedDate"`
 	Severity             string     `json:"severity"`
 	InvestigatingOfficer string     `json:"investigatingOfficer"`
+	ComplainantName      string     `json:"complainantName"`
 	SubCategory          string     `json:"subCategory"`
 	ComplainantCategory  string     `json:"complainantCategory"`
 	Origin               string     `json:"origin"`

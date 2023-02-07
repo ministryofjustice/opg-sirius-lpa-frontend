@@ -25,6 +25,8 @@
 
         {{ template "input" (field "investigatingOfficer" "Investigating officer" .Complaint.InvestigatingOfficer .Error.Field.investigatingOfficer) }}
 
+        {{ template "input" (field "complainantName" "Complainant name" .Complaint.ComplainantName .Error.Field.complainantName) }}
+
         {{ template "input" (field "summary" "Title" .Complaint.Summary .Error.Field.summary) }}
 
         {{ template "textarea" (field "description" "Description" .Complaint.Description .Error.Field.description) }}

@@ -70,6 +70,7 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 				ReceivedDate:         postFormDateString(r, "receivedDate"),
 				Severity:             postFormString(r, "severity"),
 				InvestigatingOfficer: postFormString(r, "investigatingOfficer"),
+				ComplainantName:      postFormString(r, "complainantName"),
 				SubCategory:          getValidSubcategory(postFormString(r, "category"), r.PostForm["subCategory"]),
 				ComplainantCategory:  postFormString(r, "complainantCategory"),
 				Origin:               postFormString(r, "origin"),
