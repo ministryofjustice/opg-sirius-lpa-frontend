@@ -57,7 +57,7 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 		if err != nil {
 			return err
 		}
-		
+
 		data.Complaint, err = client.Complaint(ctx, id)
 		if err != nil {
 			return err
@@ -96,11 +96,6 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 			}
-		}
-
-		data.Complaint, err = client.Complaint(ctx, id)
-		if err != nil {
-			return err
 		}
 
 		return tmpl(w, data)
