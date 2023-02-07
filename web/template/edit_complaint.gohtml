@@ -67,6 +67,36 @@
 
         {{ template "input-date" (field "resolutionDate" "Resolution date" .Complaint.ResolutionDate .Error.Field.resolutionDate) }}
 
+        <div class="govuk-form-group {{ if .Error.Field.compensationType }}govuk-form-group--error{{ end }}">
+          <label class="govuk-label" for="f-category">
+            Compensation
+          </label>
+          {{ template "errors" .Error.Field.compensationType }}
+
+          <div class="govuk-radios" data-module="govuk-radios">
+            {{ range $k, $v := .CompensationTypes }}
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="f-compensation-type-{{ $k }}" name="compensationType" type="radio" value="{{ $v.Handle }}" data-aria-controls="conditional-compensation-{{ $k }}" {{ if or (eq $v.Handle $.Complaint.CompensationType) (and (not $.Complaint.CompensationType) (eq $v.Handle "NOT_APPLICABLE")) }}checked{{ end }}>
+                <label class="govuk-label govuk-radios__label" for="f-compensation-type-{{ $k }}">
+                  {{ $v.Label }}
+                </label>
+              </div>
+              {{ if not (eq $v.Handle "NOT_APPLICABLE") }}
+                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-compensation-{{ $k }}">
+                  <div class="govuk-!-width-one-half govuk-form-group {{ if $.Error.Field.compensationAmount }}govuk-form-group--error{{ end }}">
+                    <label class="govuk-label" for="f-compensation-amount-{{ $k }}">Compensation amount</label>
+                    {{ template "errors" $.Error.Field.compensationAmount }}
+                    <div class="govuk-input__wrapper">
+                      <div class="govuk-input__prefix" aria-hidden="true">£</div>
+                      <input class="govuk-input govuk-!-width-one-third {{ if $.Error.Field.compensationAmount }}govuk-input--error{{ end }}" id="f-compensation-amount-{{ $k }}" name="compensationAmount{{ $v.Handle }}" value="{{ if $.Complaint.CompensationAmount }}{{ $.Complaint.CompensationAmount }}{{ end }}" type="number" step="0.01">
+                    </div>
+                  </div>
+                </div>
+              {{ end }}
+            {{ end }}
+          </div>
+        </div>
+
         {{ template "radios" (radios "resolution" "Resolution state" .Complaint.Resolution .Error.Field.resolution
           (item "complaint upheld" "Complaint Upheld")
           (item "complaint partially upheld" "Complaint Partially Upheld")
