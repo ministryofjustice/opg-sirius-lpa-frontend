@@ -1,21 +1,20 @@
-{{ define "payment" }}
+{{ define "refund" }}
     <details class="govuk-details" data-module="govuk-details">
         <summary class="govuk-details__summary">
             <span class="govuk-details__summary-text" id="f-payments-tab">
-                Payments
+                Refunds
             </span>
         </summary>
         <div class="govuk-details__text">
-
-            {{ range $p := .Payments }}
+            {{ range $i, $p := .Refunds }}
                 <table class="govuk-table table__no-border">
                     <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Amount:</th>
-                        <td class="govuk-table__cell"><strong>£{{ fee .Amount }}</strong></td>
+                        <td class="govuk-table__cell"><strong>£{{ fee (abs .Amount) }}</strong></td>
                     </tr>
                     <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header">Date of payment:</th>
+                        <th scope="row" class="govuk-table__header">Date of refund:</th>
                         <td class="govuk-table__cell">{{ formatDate .PaymentDate }}</td>
                     </tr>
                     <tr class="govuk-table__row">
@@ -34,26 +33,6 @@
                                 {{ end }} reference:
                             </th>
                             <td class="govuk-table__cell">{{ .Reference }}</td>
-                        </tr>
-                    {{ end }}
-                    {{ if not .Locked }}
-                        <tr class="govuk-table__row">
-                            <th scope="row" class="govuk-table__header app-!-table-row__no-border"
-                                colspan="2">
-                                <a class="govuk-link"
-                                   href="{{ prefix (printf "/edit-payment?id=%d" .ID) }}">
-                                    Edit payment
-                                </a>
-                            </th>
-                        </tr>
-                        <tr class="govuk-table__row">
-                            <th scope="row" class="govuk-table__header app-!-table-row__no-border"
-                                colspan="2">
-                                <a class="govuk-link govuk-link--no-visited-state app-!-colour-text-red"
-                                   href="{{ prefix (printf "/delete-payment?id=%d" .ID) }}">
-                                    Delete payment
-                                </a>
-                            </th>
                         </tr>
                     {{ end }}
                     </tbody>
