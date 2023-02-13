@@ -14,11 +14,11 @@
                         <td class="govuk-table__cell"><strong>£{{ fee (abs .Amount) }}</strong></td>
                     </tr>
                     <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header">Date of refund:</th>
+                        <th scope="row" class="govuk-table__header">Date refund issued:</th>
                         <td class="govuk-table__cell">{{ formatDate .PaymentDate }}</td>
                     </tr>
                     <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header">Method:</th>
+                        <th scope="row" class="govuk-table__header">Method of refund:</th>
                         <td class="govuk-table__cell">
                             {{ range $.PaymentSources }}
                                 {{ if eq .Handle $p.Source }}{{ .Label }}{{ end }}
