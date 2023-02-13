@@ -21,11 +21,13 @@ type getPaymentsData struct {
 	Case              sirius.Case
 	Payments          []sirius.Payment
 	FeeReductions     []sirius.Payment
+	Refunds           []sirius.Payment
 	PaymentSources    []sirius.RefDataItem
 	ReferenceTypes    []sirius.RefDataItem
 	FeeReductionTypes []sirius.RefDataItem
 	IsReducedFeesUser bool
 	TotalPaid         int
+	TotalRefunds      int
 	OutstandingFee    int
 	RefundAmount      int
 	FlashMessage      FlashNotification
@@ -51,19 +53,6 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		var feeReductions []sirius.Payment
-		var nonReductionPayments []sirius.Payment
-
-		for _, p := range payments {
-			if p.Source == sirius.FeeReductionSource {
-				feeReductions = append(feeReductions, p)
-			} else {
-				nonReductionPayments = append(nonReductionPayments, p)
-			}
-		}
-		data.FeeReductions = feeReductions
-		data.Payments = nonReductionPayments
-
 		data.PaymentSources, err = client.RefDataByCategory(ctx, sirius.PaymentSourceCategory)
 		if err != nil {
 			return err
@@ -81,13 +70,21 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 
 		totalPaidAndReductions := 0
 		for _, p := range payments {
-			if p.Source != sirius.FeeReductionSource {
-				data.TotalPaid = data.TotalPaid + p.Amount
+			if p.Amount < 0 {
+				data.Refunds = append(data.Refunds, p)
+				data.TotalRefunds = data.TotalRefunds + (p.Amount * -1)
+			} else {
+				if p.Source == sirius.FeeReductionSource {
+					data.FeeReductions = append(data.FeeReductions, p) // multiple fee reductions?
+				} else {
+					data.Payments = append(data.Payments, p)
+					data.TotalPaid = data.TotalPaid + p.Amount
+				}
+				totalPaidAndReductions = totalPaidAndReductions + p.Amount
 			}
-			totalPaidAndReductions = totalPaidAndReductions + p.Amount
 		}
 
-		outstandingFeeOrRefund := 8200 - totalPaidAndReductions
+		outstandingFeeOrRefund := 8200 - totalPaidAndReductions + data.TotalRefunds
 		if outstandingFeeOrRefund < 0 {
 			data.RefundAmount = outstandingFeeOrRefund * -1 /*convert to pos num for display*/
 		} else {
