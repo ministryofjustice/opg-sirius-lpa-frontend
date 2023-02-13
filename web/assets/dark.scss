@@ -55,6 +55,7 @@ $sirius-bg-color: #29292e;
   .govuk-file-upload,
   .govuk-summary-list__key,
   .govuk-summary-list__value,
+  .govuk-back-link,
   .moj-banner__message {
     color: govuk-colour("white");
   }
@@ -99,5 +100,9 @@ $sirius-bg-color: #29292e;
   .autocomplete__option--focused,
   .autocomplete__option:hover {
     background-color: govuk-colour("blue");
+  }
+
+  .govuk-back-link:before {
+    border-color: govuk-colour("white");
   }
 }
