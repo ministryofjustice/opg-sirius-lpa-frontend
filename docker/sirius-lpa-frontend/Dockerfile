@@ -25,7 +25,7 @@ COPY internal internal
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o /go/bin/opg-sirius-lpa-frontend
 
-FROM alpine:3.17.1
+FROM alpine:3.17.2
 
 WORKDIR /go/bin
 
