@@ -11,7 +11,7 @@ RUN yarn
 COPY web/assets web/assets
 RUN yarn build
 
-FROM golang:1.20.0 as build-env
+FROM golang:1.20.1 as build-env
 
 WORKDIR /app
 
@@ -25,7 +25,7 @@ COPY internal internal
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o /go/bin/opg-sirius-lpa-frontend
 
-FROM alpine:3.17.1
+FROM alpine:3.17.2
 
 WORKDIR /go/bin
 
