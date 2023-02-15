@@ -169,18 +169,21 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			complaint := sirius.Complaint{
-				Category:             postFormString(r, "category"),
-				Description:          postFormString(r, "description"),
-				ReceivedDate:         postFormDateString(r, "receivedDate"),
-				Severity:             postFormString(r, "severity"),
-				InvestigatingOfficer: postFormString(r, "investigatingOfficer"),
-				ComplainantName:      postFormString(r, "complainantName"),
-				SubCategory:          getValidSubcategory(postFormString(r, "category"), r.PostForm["subCategory"]),
-				ComplainantCategory:  postFormString(r, "complainantCategory"),
-				Origin:               postFormString(r, "origin"),
-				Summary:              postFormString(r, "summary"),
+			category := postFormString(r, "category")
+			if category != "" {
+				if getValidSubcategory(postFormString(r, "category"), r.PostForm["subCategory"]) == "" {
+					w.WriteHeader(http.StatusBadRequest)
+					data.Error = sirius.ValidationError{
+						Field: sirius.FieldErrors{
+							"subCategory": {"reason": "Please select a subcategory"},
+						},
+					}
+					data.Complaint = populateComplaint(r)
+					return tmpl(w, data)
+				}
 			}
+
+			complaint := populateComplaint(r)
 
 			err = client.AddComplaint(ctx, caseID, caseType, complaint)
 
