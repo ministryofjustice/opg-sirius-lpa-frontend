@@ -103,19 +103,6 @@ func getValidSubcategory(category string, subCategories []string) string {
 	return ""
 }
 
-type addComplaintData struct {
-	XSRFToken string
-	Entity    string
-	Success   bool
-	Error     sirius.ValidationError
-
-	Categories            map[string]complaintCategory
-	ComplainantCategories []sirius.RefDataItem
-	Origins               []sirius.RefDataItem
-
-	Complaint sirius.Complaint
-}
-
 func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strconv.Atoi(r.FormValue("id"))
@@ -131,7 +118,7 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 		ctx := getContext(r)
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
-		data := addComplaintData{
+		data := addOrEditComplaintData{
 			XSRFToken:  ctx.XSRFToken,
 			Categories: complaintCategories,
 		}

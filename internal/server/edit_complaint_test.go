@@ -67,7 +67,7 @@ func TestGetEditComplaint(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, editComplaintData{
+		On("Func", mock.Anything, addOrEditComplaintData{
 			Complaint:             complaint,
 			Categories:            complaintCategories,
 			ComplainantCategories: demoComplainantCategories,
@@ -152,7 +152,7 @@ func TestGetEditComplaintWhenTemplateErrors(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, editComplaintData{
+		On("Func", mock.Anything, addOrEditComplaintData{
 			Categories:            complaintCategories,
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
@@ -183,6 +183,9 @@ func TestPostEditComplaint(t *testing.T) {
 		ResolutionDate:       sirius.DateString("2022-05-06"),
 		CompensationType:     "COMPENSATORY",
 		CompensationAmount:   "150.00",
+		ComplainantCategory:  "EPA Donor",
+		ComplainantName:      "Test name",
+		Origin:               "Letter",
 	}
 
 	client := &mockEditComplaintClient{}
@@ -204,7 +207,7 @@ func TestPostEditComplaint(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, editComplaintData{
+		On("Func", mock.Anything, addOrEditComplaintData{
 			Success:               true,
 			Complaint:             complaint,
 			Categories:            complaintCategories,
@@ -227,6 +230,9 @@ func TestPostEditComplaint(t *testing.T) {
 		"resolutionDate":                 {"2022-05-06"},
 		"compensationType":               {"COMPENSATORY"},
 		"compensationAmountCOMPENSATORY": {"150.00"},
+		"complainantCategory":            {"EPA Donor"},
+		"complainantName":                {"Test name"},
+		"origin":                         {"Letter"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
@@ -267,7 +273,7 @@ func TestPostEditComplaintWhenEditComplaintValidationError(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, editComplaintData{
+		On("Func", mock.Anything, addOrEditComplaintData{
 			Success:               false,
 			Error:                 expectedError,
 			Complaint:             complaint,
@@ -326,4 +332,130 @@ func TestPostEditComplaintWhenEditComplaintOtherError(t *testing.T) {
 
 	assert.Equal(t, expectedError, err)
 	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestPostEditComplaintWhenEditComplaintResolutionStateValidationError(t *testing.T) {
+	expectedError := sirius.ValidationError{Field: sirius.FieldErrors{}}
+	for _, field := range fieldsToBeValidated {
+		expectedError.Field[field] = map[string]string{
+			"reason": "Value is required and can't be empty",
+		}
+	}
+
+	complaint := sirius.Complaint{Description: "This is a complaint", Resolution: "Test resolution"}
+
+	client := &mockEditComplaintClient{}
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil)
+	client.
+		On("Complaint", mock.Anything, 123).
+		Return(complaint, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, addOrEditComplaintData{
+			Success:               false,
+			Error:                 expectedError,
+			Complaint:             complaint,
+			Categories:            complaintCategories,
+			ComplainantCategories: demoComplainantCategories,
+			Origins:               demoComplaintOrigins,
+			CompensationTypes:     demoCompensationTypes,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"description":          {"This is a complaint"},
+		"resolution":           {"Test resolution"},
+		"category":             {""},
+		"severity":             {""},
+		"investigatingOfficer": {""},
+		"complainantName":      {""},
+		"origin":               {""},
+		"compensationType":     {""},
+		"summary":              {""},
+		"resolutionDate":       {""},
+		"receivedDate":         {""},
+		"complainantCategory":  {""},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := EditComplaint(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostEditComplaintWhenSubCategoryValidationError(t *testing.T) {
+	expectedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{"subCategory": {"reason": "Please select a subcategory"}},
+	}
+
+	complaint := sirius.Complaint{Description: "This is a complaint", Category: "Test Category"}
+
+	client := &mockEditComplaintClient{}
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil)
+	client.
+		On("Complaint", mock.Anything, 123).
+		Return(complaint, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, addOrEditComplaintData{
+			Success:               false,
+			Error:                 expectedError,
+			Complaint:             complaint,
+			Categories:            complaintCategories,
+			ComplainantCategories: demoComplainantCategories,
+			Origins:               demoComplaintOrigins,
+			CompensationTypes:     demoCompensationTypes,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"description": {"This is a complaint"},
+		"category":    {"Test Category"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&case=lpa", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := EditComplaint(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestIsFieldPopulated(t *testing.T) {
+	form := url.Values{
+		"description": {"This is a complaint"},
+	}
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&case=lpa", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+
+	assert.Equal(t, true, isFieldPopulated("description", r))
+	assert.Equal(t, false, isFieldPopulated("receivedDate", r))
 }

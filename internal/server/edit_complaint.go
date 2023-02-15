@@ -16,8 +16,9 @@ type EditComplaintClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
-type editComplaintData struct {
+type addOrEditComplaintData struct {
 	XSRFToken string
+	Entity    string
 	Success   bool
 	Error     sirius.ValidationError
 
@@ -29,6 +30,8 @@ type editComplaintData struct {
 	Complaint sirius.Complaint
 }
 
+var fieldsToBeValidated = []string{"category", "severity", "investigatingOfficer", "complainantName", "origin", "compensationType", "summary", "resolutionDate", "receivedDate", "complainantCategory"}
+
 func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		id, err := strconv.Atoi(r.FormValue("id"))
@@ -38,7 +41,7 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 
 		ctx := getContext(r)
 
-		data := editComplaintData{
+		data := addOrEditComplaintData{
 			XSRFToken:  ctx.XSRFToken,
 			Categories: complaintCategories,
 		}
@@ -64,22 +67,35 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			complaint := sirius.Complaint{
-				Category:             postFormString(r, "category"),
-				Description:          postFormString(r, "description"),
-				ReceivedDate:         postFormDateString(r, "receivedDate"),
-				Severity:             postFormString(r, "severity"),
-				InvestigatingOfficer: postFormString(r, "investigatingOfficer"),
-				ComplainantName:      postFormString(r, "complainantName"),
-				SubCategory:          getValidSubcategory(postFormString(r, "category"), r.PostForm["subCategory"]),
-				ComplainantCategory:  postFormString(r, "complainantCategory"),
-				Origin:               postFormString(r, "origin"),
-				CompensationType:     postFormString(r, "compensationType"),
-				Summary:              postFormString(r, "summary"),
-				Resolution:           postFormString(r, "resolution"),
-				ResolutionInfo:       postFormString(r, "resolutionInfo"),
-				ResolutionDate:       postFormDateString(r, "resolutionDate"),
+			resolution := postFormString(r, "resolution")
+
+			if resolution != "" {
+				fieldErrors := sirius.FieldErrors{}
+
+				for _, field := range fieldsToBeValidated {
+					if !isFieldPopulated(field, r) {
+						fieldErrors[field] = map[string]string{
+							"reason": "Value is required and can't be empty",
+						}
+					}
+				}
+
+				if len(fieldErrors) > 0 {
+					w.WriteHeader(http.StatusBadRequest)
+					data.Error.Field = fieldErrors
+					data.Complaint = populateComplaint(r)
+					return tmpl(w, data)
+				}
 			}
+
+			category := postFormString(r, "category")
+			if category != "" {
+				if getValidSubcategory(postFormString(r, "category"), r.PostForm["subCategory"]) == "" {
+					return getSubcategoryValidationError(w, r, tmpl, data)
+				}
+			}
+
+			complaint := populateComplaint(r)
 
 			if complaint.CompensationType != "NOT_APPLICABLE" {
 				complaint.CompensationAmount = postFormString(r, fmt.Sprintf("compensationAmount%s", complaint.CompensationType))
@@ -100,4 +116,47 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 
 		return tmpl(w, data)
 	}
+}
+
+func populateComplaint(r *http.Request) sirius.Complaint {
+	return sirius.Complaint{
+		Category:             postFormString(r, "category"),
+		Description:          postFormString(r, "description"),
+		ReceivedDate:         postFormDateString(r, "receivedDate"),
+		Severity:             postFormString(r, "severity"),
+		InvestigatingOfficer: postFormString(r, "investigatingOfficer"),
+		ComplainantName:      postFormString(r, "complainantName"),
+		SubCategory:          getValidSubcategory(postFormString(r, "category"), r.PostForm["subCategory"]),
+		ComplainantCategory:  postFormString(r, "complainantCategory"),
+		Origin:               postFormString(r, "origin"),
+		CompensationType:     postFormString(r, "compensationType"),
+		Summary:              postFormString(r, "summary"),
+		Resolution:           postFormString(r, "resolution"),
+		ResolutionInfo:       postFormString(r, "resolutionInfo"),
+		ResolutionDate:       postFormDateString(r, "resolutionDate"),
+	}
+}
+
+func isFieldPopulated(field string, r *http.Request) bool {
+	if field == "receivedDate" || field == "resolutionDate" {
+		if postFormDateString(r, field) == "" {
+			return false
+		}
+	} else {
+		if postFormString(r, field) == "" {
+			return false
+		}
+	}
+	return true
+}
+
+func getSubcategoryValidationError(w http.ResponseWriter, r *http.Request, tmpl template.Template, data addOrEditComplaintData) error {
+	w.WriteHeader(http.StatusBadRequest)
+	data.Error = sirius.ValidationError{
+		Field: sirius.FieldErrors{
+			"subCategory": {"reason": "Please select a subcategory"},
+		},
+	}
+	data.Complaint = populateComplaint(r)
+	return tmpl(w, data)
 }
