@@ -64,7 +64,7 @@ func TestGetAddComplaint(t *testing.T) {
 
 			template := &mockTemplate{}
 			template.
-				On("Func", mock.Anything, addComplaintData{
+				On("Func", mock.Anything, addOrEditComplaintData{
 					Entity:                caseType + " 7000",
 					Categories:            complaintCategories,
 					ComplainantCategories: demoComplainantCategories,
@@ -160,7 +160,7 @@ func TestGetAddComplaintWhenTemplateErrors(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, addComplaintData{
+		On("Func", mock.Anything, addOrEditComplaintData{
 			Entity:                "LPA 7000",
 			Categories:            complaintCategories,
 			ComplainantCategories: demoComplainantCategories,
@@ -204,7 +204,7 @@ func TestPostAddComplaint(t *testing.T) {
 
 			template := &mockTemplate{}
 			template.
-				On("Func", mock.Anything, addComplaintData{
+				On("Func", mock.Anything, addOrEditComplaintData{
 					Success:               true,
 					Entity:                caseType + " 7000",
 					Categories:            complaintCategories,
@@ -260,7 +260,7 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, addComplaintData{
+		On("Func", mock.Anything, addOrEditComplaintData{
 			Success:               false,
 			Error:                 expectedError,
 			Entity:                "LPA 7000",
@@ -316,6 +316,54 @@ func TestPostAddComplaintWhenAddComplaintOtherError(t *testing.T) {
 
 	assert.Equal(t, expectedError, err)
 	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestPostAddComplaintWhenSubCategoryValidationError(t *testing.T) {
+	expectedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{"subCategory": {"reason": "Please select a subcategory"}},
+	}
+
+	complaint := sirius.Complaint{Description: "This is a complaint", Category: "Test Category"}
+
+	client := &mockAddComplaintClient{}
+	client.
+		On("Case", mock.Anything, 123).
+		Return(sirius.Case{CaseType: "LPA", UID: "7000"}, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, addOrEditComplaintData{
+			Success:               false,
+			Error:                 expectedError,
+			Entity:                "LPA 7000",
+			Complaint:             complaint,
+			Categories:            complaintCategories,
+			ComplainantCategories: demoComplainantCategories,
+			Origins:               demoComplaintOrigins,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"description": {"This is a complaint"},
+		"category":    {"Test Category"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&case=lpa", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AddComplaint(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestGetValidSubcategory(t *testing.T) {

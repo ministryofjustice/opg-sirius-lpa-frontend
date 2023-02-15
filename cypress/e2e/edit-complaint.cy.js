@@ -11,6 +11,7 @@ describe("Edit complaint", () => {
       .get("input")
       .should("be.checked");
     cy.get("#f-investigatingOfficer").should("have.value", "Test Officer");
+    cy.get("#f-complainantName").type("Test complainant");
     cy.get("#f-summary").should("have.value", "This and that");
     cy.get("#f-description").should("have.value", "This is seriously bad");
     cy.get("#f-receivedDate").should("have.value", "2022-04-05");
@@ -22,6 +23,7 @@ describe("Edit complaint", () => {
     cy.get("#f-complainantCategory").select("LPA Donor");
     cy.get("#f-origin").select("Phone call");
     cy.get("#f-resolutionDate").type("2022-05-06");
+    cy.contains(".govuk-radios__label", "Compensatory").click();
     cy.contains(".govuk-radios__label", "Complaint Not Upheld").click();
     cy.get("#f-resolutionInfo").type("Because...");
     cy.get("button[type=submit]").click();
