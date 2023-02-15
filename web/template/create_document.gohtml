@@ -26,7 +26,6 @@
                 <a href="{{ prefix .Back }}" class="govuk-back-link govuk-!-margin-top-0">Back</a>
                 {{ template "case-details" . }}
                 {{ template "select-insert" . }}
-
             {{ else }}
                 {{ template "case-details" . }}
                 {{ template "select-template" . }}
@@ -115,21 +114,23 @@
 {{ end }}
 
 {{ define "select-recipient" }}
-    <h1 class="govuk-heading-m app-!-float-left">Select a recipient</h1>
-    <form class="form" method="GET">
-        <input type="hidden" name="id" value="{{ .Case.ID }}"/>
-        <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
-        <input type="hidden" name="templateId" value="{{ .TemplateSelected.TemplateId }}"/>
-        {{ range .SelectedInserts }}
-            <input type="hidden" name="insert" value="{{ . }}"/>
-        {{ end }}
-        <input type="hidden" name="hasViewedInserts" value="true"/>
-        <input type="hidden" name="hasSelectedAddNewRecipient" value="true"/>
-        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 app-!-float-right"
-                data-module="govuk-button" type="submit">
-            Add new recipient
-        </button>
-    </form>
+    <div class="govuk-clearfix">
+        <h1 class="govuk-heading-m app-!-float-left">Select a recipient</h1>
+        <form class="form" method="GET">
+            <input type="hidden" name="id" value="{{ .Case.ID }}"/>
+            <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
+            <input type="hidden" name="templateId" value="{{ .TemplateSelected.TemplateId }}"/>
+            {{ range .SelectedInserts }}
+                <input type="hidden" name="insert" value="{{ . }}"/>
+            {{ end }}
+            <input type="hidden" name="hasViewedInserts" value="true"/>
+            <input type="hidden" name="hasSelectedAddNewRecipient" value="true"/>
+            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 app-!-float-right"
+                    data-module="govuk-button" type="submit">
+                Add new recipient
+            </button>
+        </form>
+    </div>
 
     <form class="form" method="POST">
         <input type="hidden" name="id" value="{{ .Case.ID }}"/>
@@ -180,7 +181,21 @@
 {{ end }}
 
 {{ define "select-insert" }}
-    <h1 class="govuk-heading-m">Select document inserts</h1>
+    <div class="govuk-clearfix">
+        <h1 class="govuk-heading-m app-!-float-left">Select document inserts</h1>
+        <form class="form" method="GET">
+            <input type="hidden" name="id" value="{{ .Case.ID }}"/>
+            <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
+            <input type="hidden" name="templateId" value="{{ .TemplateSelected.TemplateId }}"/>
+            <input type="hidden" name="hasViewedInserts" value="true"/>
+
+            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 app-!-float-right"
+                    data-module="govuk-button" type="submit">
+                Skip
+            </button>
+        </form>
+    </div>
+
     <form class="form" method="GET">
         <input type="hidden" name="id" value="{{ .Case.ID }}"/>
         <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
