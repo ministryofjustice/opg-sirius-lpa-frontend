@@ -31,7 +31,7 @@ func (c *Client) MiReport(ctx Context, params url.Values) (*MiReportResponse, er
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v miReportError

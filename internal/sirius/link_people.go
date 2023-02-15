@@ -35,7 +35,7 @@ func (c *Client) LinkPeople(ctx Context, parentId int, childId int) error {
 		return err
 	}
 
-	defer res.Body.Close()
+	defer res.Body.Close() //#nosec G307 false positive
 
 	if res.StatusCode == http.StatusBadRequest {
 		var v ValidationError

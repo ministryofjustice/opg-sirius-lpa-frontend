@@ -26,7 +26,7 @@ func (c *Client) PlaceInvestigationOnHold(ctx Context, investigationID int, reas
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v ValidationError

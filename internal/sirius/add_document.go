@@ -38,7 +38,7 @@ func (c *Client) AddDocument(ctx Context, caseID int, document Document, docType
 	if err != nil {
 		return Document{}, err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v ValidationError

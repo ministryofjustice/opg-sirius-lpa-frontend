@@ -15,7 +15,7 @@ func (c *Client) DeletePayment(ctx Context, paymentID int) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode != http.StatusNoContent {
 		return newStatusError(resp)

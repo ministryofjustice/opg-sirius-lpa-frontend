@@ -22,7 +22,7 @@ func (c *Client) EditInvestigation(ctx Context, investigationID int, investigati
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v struct {
