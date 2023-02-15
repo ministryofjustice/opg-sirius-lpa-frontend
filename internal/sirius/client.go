@@ -65,7 +65,7 @@ func (c *Client) get(ctx Context, path string, v interface{}) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode != http.StatusOK {
 		return newStatusError(resp)

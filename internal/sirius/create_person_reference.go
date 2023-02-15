@@ -31,7 +31,7 @@ func (c *Client) CreatePersonReference(ctx Context, personID int, referencedUID,
 		return err
 	}
 
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v ValidationError

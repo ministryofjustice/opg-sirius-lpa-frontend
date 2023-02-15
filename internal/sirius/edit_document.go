@@ -26,7 +26,7 @@ func (c *Client) EditDocument(ctx Context, uuid string, content string) (Documen
 	if err != nil {
 		return Document{}, err
 	}
-	defer res.Body.Close()
+	defer res.Body.Close() //#nosec G307 false positive
 
 	if res.StatusCode == http.StatusBadRequest {
 		var v ValidationError

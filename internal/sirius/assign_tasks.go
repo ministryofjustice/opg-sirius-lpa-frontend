@@ -23,7 +23,7 @@ func (c *Client) AssignTasks(ctx Context, assigneeID int, taskIDs []int) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v ValidationError

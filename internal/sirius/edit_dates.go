@@ -33,7 +33,7 @@ func (c *Client) EditDates(ctx Context, caseID int, caseType CaseType, dates Dat
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v ValidationError

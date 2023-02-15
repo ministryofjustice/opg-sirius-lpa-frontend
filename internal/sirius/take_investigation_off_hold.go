@@ -16,7 +16,7 @@ func (c *Client) TakeInvestigationOffHold(ctx Context, holdPeriodId int) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v ValidationError

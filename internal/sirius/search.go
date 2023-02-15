@@ -73,7 +73,7 @@ func (c *Client) Search(ctx Context, term string, page int, personTypeFilters []
 	if err != nil {
 		return v, nil, err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode != http.StatusOK {
 		return v, nil, newStatusError(resp)

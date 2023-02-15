@@ -101,7 +101,7 @@ func (c *Client) DocumentTemplates(ctx Context, caseType CaseType) ([]DocumentTe
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	var v documentTemplateApiResponse
 	if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
