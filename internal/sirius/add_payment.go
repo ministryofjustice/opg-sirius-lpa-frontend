@@ -31,7 +31,7 @@ func (c *Client) AddPayment(ctx Context, caseID int, amount int, source string, 
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v ValidationError

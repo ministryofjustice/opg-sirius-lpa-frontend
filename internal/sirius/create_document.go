@@ -33,7 +33,7 @@ func (c *Client) CreateDocument(ctx Context, caseID, correspondentID int, templa
 	if err != nil {
 		return d, err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v ValidationError

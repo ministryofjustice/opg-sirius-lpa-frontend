@@ -21,7 +21,7 @@ func (c *Client) CreateContact(ctx Context, contact Person) (Person, error) {
 	if err != nil {
 		return Person{}, err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v ValidationError

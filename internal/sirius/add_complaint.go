@@ -22,7 +22,7 @@ func (c *Client) AddComplaint(ctx Context, caseID int, caseType CaseType, compla
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v ValidationError
