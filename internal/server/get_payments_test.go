@@ -512,3 +512,135 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
+
+func TestGetPaymentsCalculations(t *testing.T) {
+	testCases := []struct {
+		allPayments    []sirius.Payment
+		payments       []sirius.Payment
+		feeReductions  []sirius.Payment
+		refunds        []sirius.Payment
+		totalPaid      int
+		totalRefunds   int
+		outstandingFee int
+		refundAmount   int
+	}{
+		{
+			[]sirius.Payment{{ID: 2, Amount: 4100}, {ID: 3, Amount: 1500}, {ID: 4, Amount: -4100}},
+			[]sirius.Payment{{ID: 2, Amount: 4100}, {ID: 3, Amount: 1500}},
+			[]sirius.Payment(nil),
+			[]sirius.Payment{{ID: 4, Amount: -4100}},
+			5600,
+			4100,
+			6700,
+			0,
+		}, // underpaid, outstanding fee due
+		{
+			[]sirius.Payment{
+				{ID: 2, Amount: 4100},
+				{ID: 7, Amount: 4100},
+				{ID: 3, Amount: -2500},
+				{ID: 4, Amount: -1600},
+				{ID: 8, Amount: 8200, Source: "FEE_REDUCTION", FeeReductionType: "EXEMPTION"},
+			},
+			[]sirius.Payment{{ID: 2, Amount: 4100}, {ID: 7, Amount: 4100}},
+			[]sirius.Payment{{ID: 8, Amount: 8200, Source: "FEE_REDUCTION", FeeReductionType: "EXEMPTION"}},
+			[]sirius.Payment{{ID: 3, Amount: -2500}, {ID: 4, Amount: -1600}},
+			8200,
+			4100,
+			0,
+			4100,
+		}, // overpaid, refund due
+		{
+			[]sirius.Payment{
+				{ID: 2, Amount: 4100},
+				{ID: 7, Amount: 4100},
+				{ID: 8, Amount: 4100, Source: "FEE_REDUCTION", FeeReductionType: "REMISSION"},
+				{ID: 3, Amount: -4100},
+			},
+			[]sirius.Payment{{ID: 2, Amount: 4100}, {ID: 7, Amount: 4100}},
+			[]sirius.Payment{{ID: 8, Amount: 4100, Source: "FEE_REDUCTION", FeeReductionType: "REMISSION"}},
+			[]sirius.Payment{{ID: 3, Amount: -4100}},
+			8200,
+			4100,
+			0,
+			0,
+		}, // paid in full
+	}
+	for _, tc := range testCases {
+		caseItem := sirius.Case{
+			UID:     "7000-0000-0021",
+			SubType: "pfa",
+		}
+
+		paymentSources := []sirius.RefDataItem{
+			{
+				Handle: "PHONE",
+				Label:  "Paid over the phone",
+			},
+		}
+
+		feeReductionTypes := []sirius.RefDataItem{
+			{
+				Handle: "REMISSION",
+				Label:  "Remission",
+			},
+		}
+
+		user := sirius.User{ID: 1, DisplayName: "Test User", Roles: []string{"OPG User", "Reduced Fees User"}}
+
+		referenceTypes := []sirius.RefDataItem{
+			{
+				Handle: "GOVUK",
+				Label:  "GOV.UK Pay",
+			},
+		}
+
+		client := &mockGetPayments{}
+		client.
+			On("Payments", mock.Anything, 4).
+			Return(tc.allPayments, nil)
+		client.
+			On("Case", mock.Anything, 4).
+			Return(caseItem, nil)
+		client.
+			On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+			Return(paymentSources, nil)
+		client.
+			On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
+			Return(referenceTypes, nil)
+		client.
+			On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+			Return(feeReductionTypes, nil)
+		client.
+			On("GetUserDetails", mock.Anything).
+			Return(user, nil)
+
+		template := &mockTemplate{}
+		template.
+			On("Func", mock.Anything, getPaymentsData{
+				PaymentSources:    paymentSources,
+				ReferenceTypes:    referenceTypes,
+				FeeReductionTypes: feeReductionTypes,
+				Payments:          tc.payments,
+				FeeReductions:     tc.feeReductions,
+				Refunds:           tc.refunds,
+				Case:              caseItem,
+				TotalPaid:         tc.totalPaid,
+				TotalRefunds:      tc.totalRefunds,
+				OutstandingFee:    tc.outstandingFee,
+				RefundAmount:      tc.refundAmount,
+				IsReducedFeesUser: true,
+			}).
+			Return(nil)
+
+		r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
+		w := httptest.NewRecorder()
+
+		err := GetPayments(client, template.Func)(w, r)
+		resp := w.Result()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		mock.AssertExpectationsForObjects(t, client, template)
+	}
+}
