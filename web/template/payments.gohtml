@@ -13,7 +13,7 @@
                 {{ template "notification-banner" .FlashMessage }}
             {{ end }}
 
-            {{ if and (not .Payments) (not .FeeReductions)}}
+            {{ if and (not .Payments) (not .FeeReductions) (not .Refunds)}}
                 <p class="govuk-body govuk-!-padding-top-7 govuk-!-padding-bottom-7"><strong>There is currently no fee
                         data available to display.</strong></p>
             {{ else }}
