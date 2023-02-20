@@ -13,22 +13,21 @@
             {{ end }}
 
             {{ if .HasSelectedAddNewRecipient }}
-                <a href="{{ prefix .Back }}" class="govuk-back-link">Back</a>
+                <a href="{{ prefix .Back }}" class="govuk-back-link govuk-!-margin-top-0">Back</a>
                 {{ template "case-details" . }}
                 {{ template "add-recipient" . }}
 
             {{ else if .HasViewedInsertPage }}
-                <a href="{{ prefix .Back }}" class="govuk-back-link">Back</a>
+                <a href="{{ prefix .Back }}" class="govuk-back-link govuk-!-margin-top-0">Back</a>
                 {{ template "case-details" . }}
                 {{ template "select-recipient" . }}
 
             {{ else if .TemplateSelected.TemplateId }}
-                <a href="{{ prefix .Back }}" class="govuk-back-link">Back</a>
+                <a href="{{ prefix .Back }}" class="govuk-back-link govuk-!-margin-top-0">Back</a>
                 {{ template "case-details" . }}
                 {{ template "select-insert" . }}
-
             {{ else }}
-                <div class="govuk-!-margin-top-8">{{ template "case-details" . }}</div>
+                {{ template "case-details" . }}
                 {{ template "select-template" . }}
             {{ end }}
         </div>
@@ -106,15 +105,17 @@
                 <div class="govuk-button-group govuk-!-padding-top-5">
                     <button class="govuk-button" data-module="govuk-button" type="submit" name="recipientControls" value="addNewRecipient">Continue</button>
                 </div>
-                <a href="{{ prefix .Back }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+                <div class="govuk-body">
+                    <a href="{{ prefix .Back }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+                </div>
             </div>
         </div>
     </form>
 {{ end }}
 
 {{ define "select-recipient" }}
-    <div class="govuk-grid-row">
-        <h1 class="govuk-heading-m govuk-grid-column-two-thirds">Select a recipient</h1>
+    <div class="govuk-clearfix">
+        <h1 class="govuk-heading-m app-!-float-left">Select a recipient</h1>
         <form class="form" method="GET">
             <input type="hidden" name="id" value="{{ .Case.ID }}"/>
             <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
@@ -124,7 +125,7 @@
             {{ end }}
             <input type="hidden" name="hasViewedInserts" value="true"/>
             <input type="hidden" name="hasSelectedAddNewRecipient" value="true"/>
-            <button class="govuk-button govuk-button--secondary app-!-float-right govuk-grid-column-one-third"
+            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 app-!-float-right"
                     data-module="govuk-button" type="submit">
                 Add new recipient
             </button>
@@ -140,45 +141,48 @@
 
         <div class="govuk-form-group {{ if .Error.Field.selectRecipient }}govuk-form-group--error{{ end }}">
             {{ template "errors" .Error.Field.selectRecipient }}
-            <table class="govuk-table my-table table__no-border">
-                <tbody class="govuk-table__body">
-                {{ range .Recipients }}
-                    <tr class="govuk-table__row">
-                        <td class="govuk-table__cell">
-                            <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                                <div class="govuk-checkboxes__item">
-                                    <input class="govuk-checkboxes__input" id="f-recipient-{{ .ID }}"
-                                           name="selectRecipients" type="checkbox"
-                                           value="{{ .ID }}"
-                                           data-module="recipient-checkbox"/>
-                                    <label class="govuk-label govuk-checkboxes__label"
-                                           for="f-recipient-{{ .ID }}">
-                                        {{ if .CompanyName  }}
-                                            <h2 class="govuk-heading-s govuk-!-margin-bottom-1">{{ .CompanyName }} ({{ .PersonType }})</h2>
-                                        {{ else }}
-                                            <h2 class="govuk-heading-s govuk-!-margin-bottom-1">{{ .Salutation }} {{ .Firstname }} {{ .Surname }} ({{ .PersonType }})</h2>
-                                        {{ end }}
-                                        <p class="govuk-body govuk-!-margin-bottom-0">{{ .AddressLine1 }}, {{ .AddressLine2 }}, {{ .AddressLine3 }}, {{ .Town }}, {{ .County }}, {{ .Postcode }}.</p>
-                                    </label>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                {{ end }}
-                </tbody>
-            </table>
+            <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                <table class="govuk-table">
+                    <tbody class="govuk-table__body">
+                    {{ range .Recipients }}
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input" id="f-recipient-{{ .ID }}"
+                                            name="selectRecipients" type="checkbox"
+                                            value="{{ .ID }}"
+                                            data-module="recipient-checkbox"/>
+                                        <label class="govuk-label govuk-checkboxes__label"
+                                            for="f-recipient-{{ .ID }}">
+                                            {{ if .CompanyName  }}
+                                                <h2 class="govuk-heading-s govuk-!-margin-bottom-1">{{ .CompanyName }} ({{ .PersonType }})</h2>
+                                            {{ else }}
+                                                <h2 class="govuk-heading-s govuk-!-margin-bottom-1">{{ .Salutation }} {{ .Firstname }} {{ .Surname }} ({{ .PersonType }})</h2>
+                                            {{ end }}
+                                            <p class="govuk-body govuk-!-margin-bottom-0">{{ .AddressLine1 }}, {{ .AddressLine2 }}, {{ .AddressLine3 }}, {{ .Town }}, {{ .County }}, {{ .Postcode }}.</p>
+                                        </label>
+                                    </div>
+                            </td>
+                        </tr>
+                    {{ end }}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="govuk-button-group govuk-!-padding-top-5">
             <button class="govuk-button govuk-button--disabled" data-module="create-document-button" type="submit" name="recipientControls" value="selectRecipients">Create draft document
             </button>
         </div>
-        <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        <div class="govuk-body">
+            <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
     </form>
 {{ end }}
 
 {{ define "select-insert" }}
     <h1 class="govuk-heading-m">Select document inserts</h1>
+
     <form class="form" method="GET">
         <input type="hidden" name="id" value="{{ .Case.ID }}"/>
         <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
@@ -187,6 +191,12 @@
 
         <div class="govuk-tabs" data-module="govuk-tabs">
             <h2 class="govuk-tabs__title">Inserts</h2>
+
+            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 app-!-float-right"
+                    data-module="govuk-button" type="submit" name="skipInserts" value="true">
+                Skip
+            </button>
+
             <ul class="govuk-tabs__list">
                 {{ range .DocumentInsertKeys }}
                     <li class="govuk-tabs__list-item" data-module="tab-link" id="{{ . }}">
@@ -198,60 +208,61 @@
             </ul>
 
             {{ range $k := .DocumentInsertKeys }}
-                <div class="govuk-tabs__panel" data-module="tab-content" id="{{ $k }}">
-                    <table class="govuk-table my-table table__no-border">
-                        <tbody class="govuk-table__body app-!-td-last-child-no-border">
-                        {{ range $t := $.DocumentInsertTypes }}
-                            {{if eq $t.Key $k }}
-                                <tr class="govuk-table__row app-!-table-row__no-border">
-                                    <td class="govuk-table__cell">
-                                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                                            <div class="govuk-checkboxes__item">
-                                                <input class="govuk-checkboxes__input"
-                                                       id="f-{{ $t.Handle }}-{{$k}}"
-                                                       name="insert"
-                                                       type="checkbox" value="{{ $t.Handle }}"
-                                                       data-module="insert-checkbox"
-                                                       {{ if contains $.SelectedInserts $t.Handle }}checked{{ end }}/>
-                                                <label class="govuk-label govuk-checkboxes__label"
-                                                       for="f-{{ $t.Handle }}-{{$k}}">
-                                                    {{ $t.Handle }}: {{ $t.Label }}
-                                                </label>
+                <div class="govuk-tabs__panel app-tabs__panel--compact" data-module="tab-content" id="{{ $k }}">
+                    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                        <table class="govuk-table app-table--compact">
+                            <tbody class="govuk-table__body app-!-td-last-child-no-border">
+                            {{ range $t := $.DocumentInsertTypes }}
+                                {{if eq $t.Key $k }}
+                                    <tr class="govuk-table__row app-!-table-row__no-border">
+                                        <td class="govuk-table__cell">
+                                                <div class="govuk-checkboxes__item">
+                                                    <input class="govuk-checkboxes__input"
+                                                        id="f-{{ $t.Handle }}-{{$k}}"
+                                                        name="insert"
+                                                        type="checkbox" value="{{ $t.Handle }}"
+                                                        data-module="insert-checkbox"
+                                                        {{ if contains $.SelectedInserts $t.Handle }}checked{{ end }}/>
+                                                    <label class="govuk-label govuk-checkboxes__label"
+                                                        for="f-{{ $t.Handle }}-{{$k}}">
+                                                        {{ $t.Handle }}: {{ $t.Label }}
+                                                    </label>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {{ else if eq $k "all" }}
-                                <tr class="govuk-table__row app-!-table-row__no-border">
-                                    <td class="govuk-table__cell">
-                                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                                            <div class="govuk-checkboxes__item">
-                                                <input class="govuk-checkboxes__input"
-                                                       id="f-{{ $t.Handle }}-{{$k}}"
-                                                       name="insert"
-                                                       type="checkbox" value="{{ $t.Handle }}"
-                                                       data-module="insert-checkbox"
-                                                       {{ if contains $.SelectedInserts $t.Handle }}checked{{ end }}/>
-                                                <label class="govuk-label govuk-checkboxes__label"
-                                                       for="f-{{ $t.Handle }}-{{$k}}">
-                                                    {{ $t.Handle }}: {{ $t.Label }}
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                    </tr>
+                                {{ else if eq $k "all" }}
+                                    <tr class="govuk-table__row app-!-table-row__no-border">
+                                        <td class="govuk-table__cell">
+                                                <div class="govuk-checkboxes__item">
+                                                    <input class="govuk-checkboxes__input"
+                                                        id="f-{{ $t.Handle }}-{{$k}}"
+                                                        name="insert"
+                                                        type="checkbox" value="{{ $t.Handle }}"
+                                                        data-module="insert-checkbox"
+                                                        {{ if contains $.SelectedInserts $t.Handle }}checked{{ end }}/>
+                                                    <label class="govuk-label govuk-checkboxes__label"
+                                                        for="f-{{ $t.Handle }}-{{$k}}">
+                                                        {{ $t.Handle }}: {{ $t.Label }}
+                                                    </label>
+                                                </div>
+                                        </td>
+                                    </tr>
+                                {{ end }}
                             {{ end }}
-                        {{ end }}
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             {{ end }}
         </div>
 
-        <div class="govuk-button-group govuk-!-padding-top-5">
+        <div class="govuk-button-group">
             <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
         </div>
-        <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        <div class="govuk-body">
+            <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
     </form>
 {{ end }}
 
@@ -278,6 +289,8 @@
         <div class="govuk-button-group govuk-!-padding-top-5">
             <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
         </div>
-        <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        <div class="govuk-body">
+            <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
     </form>
 {{ end }}
