@@ -129,8 +129,11 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 
 			hasViewedInsertPage := r.FormValue("hasViewedInserts")
 			hasNoInsertsToSelect := data.TemplateSelected.TemplateId != "" && len(data.DocumentInsertTypes) == 0
-			uniqueInserts := removeDuplicateStr(r.Form["insert"])
-			data.SelectedInserts = uniqueInserts
+
+			if r.FormValue("skipInserts") == "" {
+				uniqueInserts := removeDuplicateStr(r.Form["insert"])
+				data.SelectedInserts = uniqueInserts
+			}
 
 			if hasViewedInsertPage == "true" || hasNoInsertsToSelect {
 				data.HasViewedInsertPage = true
@@ -158,10 +161,10 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 				}
 
 				templateId := r.FormValue("templateId")
-				uniqueInserts := removeDuplicateStr(r.Form["insert"])
 
-				if len(uniqueInserts) == 0 {
-					uniqueInserts = []string{}
+				uniqueInserts := []string{}
+				if r.FormValue("skipInserts") == "" {
+					uniqueInserts = removeDuplicateStr(r.Form["insert"])
 				}
 
 				for _, recipientID := range selectedRecipientIDs {
@@ -214,13 +217,16 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 				} else {
 					data.Success = true
 					data.TemplateSelected.TemplateId = r.FormValue("templateId")
-					data.SelectedInserts = r.Form["insert"]
 					data.HasViewedInsertPage = true
 					data.Recipients, err = getRecipients(ctx, client, data.Case)
 					if err != nil {
 						return err
 					}
 					data.Recipients = append(data.Recipients, createdContact)
+
+					if r.FormValue("skipInserts") == "" {
+						data.SelectedInserts = r.Form["insert"]
+					}
 				}
 			}
 		}

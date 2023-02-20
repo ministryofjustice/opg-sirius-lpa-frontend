@@ -181,20 +181,7 @@
 {{ end }}
 
 {{ define "select-insert" }}
-    <div class="govuk-clearfix">
-        <h1 class="govuk-heading-m app-!-float-left">Select document inserts</h1>
-        <form class="form" method="GET">
-            <input type="hidden" name="id" value="{{ .Case.ID }}"/>
-            <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
-            <input type="hidden" name="templateId" value="{{ .TemplateSelected.TemplateId }}"/>
-            <input type="hidden" name="hasViewedInserts" value="true"/>
-
-            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 app-!-float-right"
-                    data-module="govuk-button" type="submit">
-                Skip
-            </button>
-        </form>
-    </div>
+    <h1 class="govuk-heading-m">Select document inserts</h1>
 
     <form class="form" method="GET">
         <input type="hidden" name="id" value="{{ .Case.ID }}"/>
@@ -204,6 +191,12 @@
 
         <div class="govuk-tabs" data-module="govuk-tabs">
             <h2 class="govuk-tabs__title">Inserts</h2>
+
+            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 app-!-float-right"
+                    data-module="govuk-button" type="submit" name="skipInserts" value="true">
+                Skip
+            </button>
+
             <ul class="govuk-tabs__list">
                 {{ range .DocumentInsertKeys }}
                     <li class="govuk-tabs__list-item" data-module="tab-link" id="{{ . }}">
