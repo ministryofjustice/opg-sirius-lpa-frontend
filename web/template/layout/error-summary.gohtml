@@ -6,7 +6,7 @@
       </h2>
       <div class="govuk-error-summary__body">
         <ul class="govuk-list govuk-error-summary__list">
-          {{ if .Detail }}
+          {{ if (and .Detail (ne .Detail "Payload failed validation") )}}
             <li>{{ .Detail }}</li>
           {{ end }}
           {{ range $k, $v := .Field }}
