@@ -14,7 +14,7 @@
 
         <div class="moj-filter-layout__content govuk-!-padding-left-2 govuk-!-padding-right-2">
             <button class="govuk-button govuk-button--secondary" aria-controls="app-filters" data-filter-toggle>
-                {{ if .Filters.Set }}Hide{{ else }}Show{{ end }} filters
+                Hide filters
             </button>
 
             <h3 class="govuk-heading-s govuk-!-margin-bottom-6">You searched for:  {{ .SearchTerm }}</h3>
@@ -35,18 +35,18 @@
                 </div>
             {{ else }}
 
-                <p class="moj-pagination__results govuk-!-padding-0 govuk-!-margin-bottom-6">Showing <b>{{ .Pagination.Start }}</b> to <b>{{ .Pagination.End }}</b> of <b>{{ .Pagination.TotalItems }}</b> cases</p>
+                <p class="moj-pagination__results govuk-!-padding-0 govuk-!-margin-bottom-6">Showing <b>{{ .Pagination.Start }}</b> to <b>{{ .Pagination.End }}</b> of <b>{{ .Pagination.TotalItems }}</b> results</p>
 
                 {{ if eq 0 (len .DeletedCases) }}
                     <table class="govuk-table" data-module="moj-sortable-table">
                         <thead class="govuk-table__head">
-                        <tr class="govuk-table__row app-!-search-results-table">
-                            <th scope="col" class="govuk-table__header" aria-sort="none">Case number</th>
-                            <th scope="col" class="govuk-table__header" aria-sort="none">Name/Role</th>
-                            <th scope="col" class="govuk-table__header" aria-sort="none">Date of birth</th>
+                        <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header">Case number</th>
+                            <th scope="col" class="govuk-table__header">Name/Role</th>
+                            <th scope="col" class="govuk-table__header">Date of birth</th>
                             <th scope="col" class="govuk-table__header govuk-!-width-one-third">Address</th>
-                            <th scope="col" class="govuk-table__header" aria-sort="none">Type</th>
-                            <th scope="col" class="govuk-table__header" aria-sort="none">Status</th>
+                            <th scope="col" class="govuk-table__header">Type</th>
+                            <th scope="col" class="govuk-table__header">Status</th>
                         </tr>
                         </thead>
                         <tbody class="govuk-table__body">
@@ -68,31 +68,31 @@
                                         Not associated with a case
                                     {{ end }}
                                 </td>
-                                <td class="govuk-table__cell" data-sort-value="{{ ToLower .Surname }}">
+                                <td class="govuk-table__cell">
                                     <strong>
-                                        {{ if .Cases }}
-                                            {{ printf "%s %s %s" .Salutation .Firstname .Surname }}<br>{{ .PersonType }}
+                                        {{ if or (eq (ToLower .PersonType) "client") (eq (ToLower .PersonType) "deputy") }}
+                                            <a class="govuk-link govuk-link--no-underline govuk-link--no-visited-state" href="{{ sirius (printf "/supervision#/clients/%d" .ID) }}">
+                                                {{ printf "%s %s %s" .Salutation .Firstname .Surname }}
+                                            </a><br>{{ .PersonType }}
+                                        {{ else if eq (ToLower .PersonType) "donor" }}
+                                            <a class="govuk-link govuk-link--no-underline govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d" .ID) }}">
+                                                {{ printf "%s %s %s" .Salutation .Firstname .Surname }}
+                                            </a><br>{{ .PersonType }}
                                         {{ else }}
-                                            {{ if or (eq (ToLower .PersonType) "client") (eq (ToLower .PersonType) "deputy") }}
-                                                <a class="govuk-link govuk-link--no-underline govuk-link--no-visited-state" href="{{ sirius (printf "/supervision#/clients/%d" .ID) }}">
-                                                    {{ printf "%s %s %s" .Salutation .Firstname .Surname }}
-                                                </a><br>{{ .PersonType }}
-                                            {{ else }}
-                                                <a class="govuk-link govuk-link--no-underline govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d" .ID) }}">
-                                                    {{ printf "%s %s %s" .Salutation .Firstname .Surname }}
-                                                </a><br>{{ .PersonType }}
-                                            {{ end }}
+                                            <a class="govuk-link govuk-link--no-underline govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d" (index .Cases 0).Donor.ID) }}">
+                                                {{ printf "%s %s %s" .Salutation .Firstname .Surname }}
+                                            </a><br>{{ .PersonType }}
                                         {{ end }}
                                     </strong>
                                 </td>
-                                <td class="govuk-table__cell" data-sort-value="{{ dateYear .DateOfBirth }}">{{ formatDate .DateOfBirth }}</td>
+                                <td class="govuk-table__cell">{{ formatDate .DateOfBirth }}</td>
                                 <td class="govuk-table__cell">{{ .AddressSummary }}</td>
                                 <td class="govuk-table__cell">
                                     {{ range $case := .Cases }}
                                         {{ $case.CaseType }} - {{ ToUpper $case.SubType }}<br>
                                     {{ end }}
                                 </td>
-                                <td class="govuk-table__cell" {{ if .Cases }}data-sort-value="{{ (ToLower (index .Cases 0).Status) }}"{{ end }}>
+                                <td class="govuk-table__cell">
                                     {{ range $case := .Cases }}
                                         {{ $status := (ToLower $case.Status) }}
                                         {{ if $status }}

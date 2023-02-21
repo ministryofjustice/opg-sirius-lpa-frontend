@@ -1,5 +1,5 @@
 {{ define "pagination-inner" }}
-    <p class="moj-pagination__results">Showing <b>{{ .Start }}</b> to <b>{{ .End }}</b> of <b>{{ .TotalItems }}</b> cases</p>
+    <p class="moj-pagination__results">Showing <b>{{ .Start }}</b> to <b>{{ .End }}</b> of <b>{{ .TotalItems }}</b> results</p>
 
     {{ if ne 1 .TotalPages }}
         <ul class="moj-pagination__list">
