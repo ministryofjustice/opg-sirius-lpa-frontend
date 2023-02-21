@@ -4,7 +4,7 @@ describe("Search", () => {
         it("finds a person with associated case", () => {
             cy.visit("/search?term=john");
             cy.contains("You searched for: john");
-            cy.contains("Showing 1 to 1 of 1 cases");
+            cy.contains("Showing 1 to 1 of 1 results");
             cy.contains("Donor (1)");
             const $row = cy.get("table > tbody > tr");
             $row.should("contain", "John Doe");
@@ -24,14 +24,13 @@ describe("Search", () => {
         });
 
         it("it shows/hides filter panel", () => {
-            cy.contains(".govuk-button", "Show filters").click();
-            cy.contains("Apply filters").should("be.visible");
             cy.contains(".govuk-button", "Hide filters").click();
             cy.contains("Apply filters").should("not.be.visible");
+            cy.contains(".govuk-button", "Show filters").click();
+            cy.contains("Apply filters").should("be.visible");
         });
 
         it("enables the person type filters on selection", () => {
-            cy.contains(".govuk-button", "Show filters").click();
             cy.contains(".govuk-checkboxes__item", "Attorney").find("input").check();
             cy.contains(".govuk-checkboxes__item", "Trust corporation").find("input").check();
             cy.get("button[type=submit]").click();
@@ -40,7 +39,6 @@ describe("Search", () => {
         });
 
         it("can clear all filters", () => {
-            cy.contains(".govuk-button", "Show filters").click();
             cy.contains(".govuk-checkboxes__item", "Donor").find("input").check();
             cy.contains(".govuk-checkboxes__item", "Attorney").find("input").check();
             cy.contains(".govuk-checkboxes__item", "Client").find("input").check();

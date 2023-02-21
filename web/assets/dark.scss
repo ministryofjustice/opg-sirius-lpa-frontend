@@ -76,9 +76,7 @@ $sirius-bg-color: #29292e;
     filter: invert(100%);
   }
 
-  .moj-pagination__link,
-  .app-\!-search-results-table th,
-  .app-\!-search-results-table th button {
+  .moj-pagination__link {
     color: govuk-colour("light-blue");
   }
 
