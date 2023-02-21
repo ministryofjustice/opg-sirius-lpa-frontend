@@ -13,7 +13,7 @@
                 {{ template "notification-banner" .FlashMessage }}
             {{ end }}
 
-            {{ if and (not .Payments) (not .FeeReductions)}}
+            {{ if and (not .Payments) (not .FeeReductions) (not .Refunds)}}
                 <p class="govuk-body govuk-!-padding-top-7 govuk-!-padding-bottom-7"><strong>There is currently no fee
                         data available to display.</strong></p>
             {{ else }}
@@ -49,17 +49,24 @@
                             {{ end }}
                         </td>
                     </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Total refunds:</th>
+                        <td class="govuk-table__cell">£{{ if .TotalRefunds }}{{ fee .TotalRefunds }}{{ else }}0.00{{ end }}</td>
+                    </tr>
                     </tbody>
                 </table>
 
                 <h2 class="govuk-heading-m govuk-!-padding-top-3 govuk-!-padding-bottom-2">Fee details</h2>
 
-                {{if .Payments}}
+                {{ if .Payments }}
                     {{ template "payment" . }}
-                {{end}}
-                {{if .FeeReductions}}
+                {{ end }}
+                {{ if .FeeReductions }}
                     {{ template "fee-reduction" . }}
-                {{end}}
+                {{ end }}
+                {{ if .Refunds }}
+                    {{ template "refund" . }}
+                {{ end }}
             {{ end }}
 
             <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}">
