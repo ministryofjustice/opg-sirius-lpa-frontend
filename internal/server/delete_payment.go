@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
 
@@ -31,6 +32,7 @@ func DeletePayment(client DeletePaymentClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
+		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		p, err := client.PaymentByID(ctx, id)
 		if err != nil {
@@ -42,13 +44,25 @@ func DeletePayment(client DeletePaymentClient, tmpl template.Template) Handler {
 			Payment:   p,
 		}
 
-		data.Case, err = client.Case(ctx, p.Case.ID)
-		if err != nil {
-			return err
-		}
+		group.Go(func() error {
+			data.Case, err = client.Case(ctx.With(groupCtx), p.Case.ID)
+			if err != nil {
+				return err
+			}
 
-		data.FeeReductionTypes, err = client.RefDataByCategory(ctx, sirius.FeeReductionTypeCategory)
-		if err != nil {
+			return nil
+		})
+
+		group.Go(func() error {
+			data.FeeReductionTypes, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.FeeReductionTypeCategory)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
 			return err
 		}
 

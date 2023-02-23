@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
 
@@ -34,6 +35,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
+		group, groupCtx := errgroup.WithContext(ctx.Context)
 		data := addPaymentData{
 			XSRFToken:   ctx.XSRFToken,
 			Amount:      postFormString(r, "amount"),
@@ -41,13 +43,25 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 			PaymentDate: postFormDateString(r, "paymentDate"),
 		}
 
-		data.Case, err = client.Case(ctx, caseID)
-		if err != nil {
-			return err
-		}
+		group.Go(func() error {
+			data.Case, err = client.Case(ctx.With(groupCtx), caseID)
+			if err != nil {
+				return err
+			}
 
-		data.PaymentSources, err = client.RefDataByCategory(ctx, sirius.PaymentSourceCategory)
-		if err != nil {
+			return nil
+		})
+
+		group.Go(func() error {
+			data.PaymentSources, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.PaymentSourceCategory)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
 			return err
 		}
 

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
 
@@ -41,62 +42,84 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
+		group, groupCtx := errgroup.WithContext(ctx.Context)
 		data := getPaymentsData{XSRFToken: ctx.XSRFToken}
 
-		data.Case, err = client.Case(ctx, caseID)
-		if err != nil {
-			return err
-		}
-
-		payments, err := client.Payments(ctx, caseID)
-		if err != nil {
-			return err
-		}
-
-		data.PaymentSources, err = client.RefDataByCategory(ctx, sirius.PaymentSourceCategory)
-		if err != nil {
-			return err
-		}
-
-		data.ReferenceTypes, err = client.RefDataByCategory(ctx, sirius.PaymentReferenceType)
-		if err != nil {
-			return err
-		}
-
-		data.FeeReductionTypes, err = client.RefDataByCategory(ctx, sirius.FeeReductionTypeCategory)
-		if err != nil {
-			return err
-		}
-
-		totalPaidAndReductions := 0
-		for _, p := range payments {
-			if p.Amount < 0 {
-				data.Refunds = append(data.Refunds, p)
-				data.TotalRefunds = data.TotalRefunds + (p.Amount * -1)
-			} else {
-				if p.Source == sirius.FeeReductionSource {
-					data.FeeReductions = append(data.FeeReductions, p)
-				} else {
-					data.Payments = append(data.Payments, p)
-					data.TotalPaid = data.TotalPaid + p.Amount
-				}
+		group.Go(func() error {
+			data.Case, err = client.Case(ctx.With(groupCtx), caseID)
+			if err != nil {
+				return err
 			}
-			totalPaidAndReductions = totalPaidAndReductions + p.Amount
-		}
+			return nil
+		})
 
-		outstandingFeeOrRefund := 8200 - totalPaidAndReductions
-		if outstandingFeeOrRefund < 0 {
-			data.RefundAmount = outstandingFeeOrRefund * -1 /*convert to pos num for display*/
-		} else {
-			data.OutstandingFee = outstandingFeeOrRefund
-		}
+		group.Go(func() error {
+			payments, err := client.Payments(ctx, caseID)
+			if err != nil {
+				return err
+			}
+			totalPaidAndReductions := 0
+			for _, p := range payments {
+				if p.Amount < 0 {
+					data.Refunds = append(data.Refunds, p)
+					data.TotalRefunds = data.TotalRefunds + (p.Amount * -1)
+				} else {
+					if p.Source == sirius.FeeReductionSource {
+						data.FeeReductions = append(data.FeeReductions, p)
+					} else {
+						data.Payments = append(data.Payments, p)
+						data.TotalPaid = data.TotalPaid + p.Amount
+					}
+				}
+				totalPaidAndReductions = totalPaidAndReductions + p.Amount
+			}
 
-		user, err := client.GetUserDetails(ctx)
-		if err != nil {
+			outstandingFeeOrRefund := 8200 - totalPaidAndReductions
+			if outstandingFeeOrRefund < 0 {
+				data.RefundAmount = outstandingFeeOrRefund * -1 /*convert to pos num for display*/
+			} else {
+				data.OutstandingFee = outstandingFeeOrRefund
+			}
+
+			return nil
+		})
+
+		group.Go(func() error {
+			data.PaymentSources, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.PaymentSourceCategory)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		group.Go(func() error {
+			data.ReferenceTypes, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.PaymentReferenceType)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		group.Go(func() error {
+			data.FeeReductionTypes, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.FeeReductionTypeCategory)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		group.Go(func() error {
+			user, err := client.GetUserDetails(ctx.With(groupCtx))
+			if err != nil {
+				return err
+			}
+			data.IsReducedFeesUser = user.HasRole("Reduced Fees User")
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
 			return err
 		}
-
-		data.IsReducedFeesUser = user.HasRole("Reduced Fees User")
 
 		data.FlashMessage, _ = GetFlash(w, r)
 

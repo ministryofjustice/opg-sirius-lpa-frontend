@@ -91,10 +91,19 @@ func TestGetEditFeeReduction(t *testing.T) {
 }
 
 func TestEditFeeReductionWhenFailureOnGetPaymentByID(t *testing.T) {
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
+		},
+	}
+
 	client := &mockEditFeeReductionClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
-		Return(sirius.Payment{}, expectedError)
+		Return(sirius.Payment{}, expectedError).
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
@@ -115,10 +124,19 @@ func TestEditFeeReductionWhenFailureOnGetCase(t *testing.T) {
 		Case:             &sirius.Case{ID: 4},
 	}
 
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
+		},
+	}
+
 	client := &mockEditFeeReductionClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
 		Return(feeReduction, nil).
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil).
 		On("Case", mock.Anything, 4).
 		Return(sirius.Case{}, expectedError)
 

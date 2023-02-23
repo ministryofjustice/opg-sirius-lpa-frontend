@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
 
@@ -37,29 +38,46 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
+		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		data := editComplaintData{
 			XSRFToken:  ctx.XSRFToken,
 			Categories: complaintCategories,
 		}
 
-		data.ComplainantCategories, err = client.RefDataByCategory(ctx, sirius.ComplainantCategory)
-		if err != nil {
-			return err
-		}
+		group.Go(func() error {
+			data.ComplainantCategories, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.ComplainantCategory)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
 
-		data.Origins, err = client.RefDataByCategory(ctx, sirius.ComplaintOrigin)
-		if err != nil {
-			return err
-		}
+		group.Go(func() error {
+			data.Origins, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.ComplaintOrigin)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
 
-		data.CompensationTypes, err = client.RefDataByCategory(ctx, sirius.CompensationType)
-		if err != nil {
-			return err
-		}
+		group.Go(func() error {
+			data.CompensationTypes, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.CompensationType)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
 
-		data.Complaint, err = client.Complaint(ctx, id)
-		if err != nil {
+		group.Go(func() error {
+			data.Complaint, err = client.Complaint(ctx.With(groupCtx), id)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
 			return err
 		}
 

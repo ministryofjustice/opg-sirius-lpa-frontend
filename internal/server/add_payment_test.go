@@ -93,10 +93,21 @@ func TestAddPaymentNoID(t *testing.T) {
 }
 
 func TestAddPaymentWhenFailureOnGetCase(t *testing.T) {
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
 	client := &mockAddPaymentClient{}
 	client.
 		On("Case", mock.Anything, 4).
 		Return(sirius.Case{}, expectedError)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
 	w := httptest.NewRecorder()

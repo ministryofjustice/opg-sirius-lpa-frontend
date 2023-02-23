@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
 
@@ -34,24 +35,35 @@ func EditFeeReduction(client EditFeeReductionClient, tmpl template.Template) Han
 		}
 
 		ctx := getContext(r)
-		feeReduction, err := client.PaymentByID(ctx, paymentID)
-		if err != nil {
-			return err
-		}
-
+		group, groupCtx := errgroup.WithContext(ctx.Context)
 		data := editFeeReductionData{
-			XSRFToken:    ctx.XSRFToken,
-			PaymentID:    paymentID,
-			FeeReduction: feeReduction,
+			XSRFToken: ctx.XSRFToken,
+			PaymentID: paymentID,
 		}
 
-		data.Case, err = client.Case(ctx, feeReduction.Case.ID)
-		if err != nil {
-			return err
-		}
+		group.Go(func() error {
+			feeReduction, err := client.PaymentByID(ctx.With(groupCtx), paymentID)
+			if err != nil {
+				return err
+			}
+			data.FeeReduction = feeReduction
 
-		data.FeeReductionTypes, err = client.RefDataByCategory(ctx, sirius.FeeReductionTypeCategory)
-		if err != nil {
+			data.Case, err = client.Case(ctx, feeReduction.Case.ID)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		group.Go(func() error {
+			data.FeeReductionTypes, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.FeeReductionTypeCategory)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
 			return err
 		}
 
@@ -68,7 +80,7 @@ func EditFeeReduction(client EditFeeReductionClient, tmpl template.Template) Han
 				return err
 			} else {
 				SetFlash(w, FlashNotification{Title: "Fee reduction edited"})
-				return RedirectError(fmt.Sprintf("/payments?id=%d", feeReduction.Case.ID))
+				return RedirectError(fmt.Sprintf("/payments?id=%d", data.FeeReduction.Case.ID))
 			}
 		}
 

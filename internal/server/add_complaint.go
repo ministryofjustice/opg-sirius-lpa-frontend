@@ -137,7 +137,7 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 		}
 
 		group.Go(func() error {
-			caseitem, err := client.Case(ctx, caseID)
+			caseitem, err := client.Case(ctx.With(groupCtx), caseID)
 			if err != nil {
 				return err
 			}

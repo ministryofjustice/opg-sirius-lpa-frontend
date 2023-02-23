@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
 
@@ -36,26 +37,38 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-		p, err := client.PaymentByID(ctx, paymentID)
-		if err != nil {
-			return err
-		}
-
+		group, groupCtx := errgroup.WithContext(ctx.Context)
 		data := editPaymentData{
-			XSRFToken:   ctx.XSRFToken,
-			PaymentID:   paymentID,
-			Amount:      fmt.Sprintf("%.2f", sirius.PenceToPounds(p.Amount)),
-			Source:      p.Source,
-			PaymentDate: p.PaymentDate,
+			XSRFToken: ctx.XSRFToken,
 		}
 
-		data.Case, err = client.Case(ctx, p.Case.ID)
-		if err != nil {
-			return err
-		}
+		group.Go(func() error {
+			p, err := client.PaymentByID(ctx, paymentID)
+			if err != nil {
+				return err
+			}
 
-		data.PaymentSources, err = client.RefDataByCategory(ctx, sirius.PaymentSourceCategory)
-		if err != nil {
+			data.PaymentID = paymentID
+			data.Amount = fmt.Sprintf("%.2f", sirius.PenceToPounds(p.Amount))
+			data.Source = p.Source
+			data.PaymentDate = p.PaymentDate
+
+			data.Case, err = client.Case(ctx.With(groupCtx), p.Case.ID)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		group.Go(func() error {
+			data.PaymentSources, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.PaymentSourceCategory)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
 			return err
 		}
 
@@ -105,7 +118,7 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 				return err
 			} else {
 				SetFlash(w, FlashNotification{Title: "Payment saved"})
-				return RedirectError(fmt.Sprintf("/payments?id=%d", p.Case.ID))
+				return RedirectError(fmt.Sprintf("/payments?id=%d", data.Case.ID))
 			}
 		}
 
