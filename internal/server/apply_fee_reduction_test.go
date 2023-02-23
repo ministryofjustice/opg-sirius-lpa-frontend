@@ -92,10 +92,19 @@ func TestApplyFeeReductionNoID(t *testing.T) {
 }
 
 func TestApplyFeeReductionWhenFailureOnGetCase(t *testing.T) {
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
+		},
+	}
 	client := &mockApplyFeeReductionClient{}
 	client.
 		On("Case", mock.Anything, 4).
 		Return(sirius.Case{}, expectedError)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
 	w := httptest.NewRecorder()
