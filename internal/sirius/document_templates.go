@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sort"
 )
 
 type documentTemplateApiResponse map[string]json.RawMessage
@@ -13,6 +14,7 @@ type insertApiResponse map[string]json.RawMessage
 type UniversalTemplateData struct {
 	Location        string `json:"location"`
 	OnScreenSummary string `json:"onScreenSummary"`
+	Order           int    `json:"order"`
 }
 
 type documentTemplateApiData struct {
@@ -26,6 +28,7 @@ type Insert struct {
 	InsertId        string
 	Location        string `json:"location"`
 	OnScreenSummary string `json:"onScreenSummary"`
+	Order           int    `json:"order"`
 }
 
 type DocumentTemplateData struct {
@@ -81,6 +84,7 @@ func (i insertApiResponse) toInsertData() ([]Insert, error) {
 				insert.InsertId = insertId
 				insert.Location = insertData.Location
 				insert.OnScreenSummary = insertData.OnScreenSummary
+				insert.Order = insertData.Order
 				inserts = append(inserts, insert)
 			}
 			continue
@@ -88,6 +92,15 @@ func (i insertApiResponse) toInsertData() ([]Insert, error) {
 
 		return nil, errors.New("could not format insert data")
 	}
+
+	sort.Slice(inserts, func(i, j int) bool {
+		if inserts[i].Key != inserts[j].Key {
+			return inserts[i].Key < inserts[j].Key
+		}
+
+		return inserts[i].Order < inserts[j].Order
+	})
+
 	return inserts, nil
 }
 
