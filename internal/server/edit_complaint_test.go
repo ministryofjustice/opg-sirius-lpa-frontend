@@ -97,10 +97,23 @@ func TestGetEditComplaintNoID(t *testing.T) {
 }
 
 func TestGetEditComplaintWhenRefDataErrors(t *testing.T) {
+	complaint := sirius.Complaint{
+		Category: "01",
+	}
+
 	client := &mockEditComplaintClient{}
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
 		Return(demoComplainantCategories, expectedError)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
+	client.
+		On("Complaint", mock.Anything, 123).
+		Return(complaint, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()

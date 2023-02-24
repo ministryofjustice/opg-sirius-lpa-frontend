@@ -95,10 +95,19 @@ func TestGetEditPayment(t *testing.T) {
 }
 
 func TestEditPaymentWhenFailureOnGetPaymentByID(t *testing.T) {
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
 	client := &mockEditPaymentClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
-		Return(sirius.Payment{}, expectedError)
+		Return(sirius.Payment{}, expectedError).
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
@@ -118,11 +127,20 @@ func TestEditPaymentWhenFailureOnGetCase(t *testing.T) {
 		Case:        &sirius.Case{ID: 4},
 	}
 
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
 	client := &mockEditPaymentClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
-		Return(payment, nil)
-	client.
+		Return(payment, nil).
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil).
 		On("Case", mock.Anything, 4).
 		Return(sirius.Case{}, expectedError)
 
@@ -295,7 +313,7 @@ func TestPostEditPaymentAmountIncorrectFormat(t *testing.T) {
 }
 
 func TestPostEditPayment(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "lpa", UID: "700700"}
+	caseItem := sirius.Case{CaseType: "lpa", UID: "700700", ID: 4}
 
 	payment := sirius.Payment{
 		ID:          123,

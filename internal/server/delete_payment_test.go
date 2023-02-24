@@ -112,6 +112,13 @@ func TestDeletePaymentWhenFailureOnGetCase(t *testing.T) {
 		Case:        &sirius.Case{ID: 4},
 	}
 
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
+		},
+	}
+
 	client := &mockDeletePaymentClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
@@ -119,6 +126,9 @@ func TestDeletePaymentWhenFailureOnGetCase(t *testing.T) {
 	client.
 		On("Case", mock.Anything, 4).
 		Return(sirius.Case{}, expectedError)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
