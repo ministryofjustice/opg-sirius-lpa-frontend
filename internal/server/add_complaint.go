@@ -2,13 +2,11 @@ package server
 
 import (
 	"fmt"
-	"net/http"
-	"strconv"
-	"strings"
-
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
+	"net/http"
+	"strconv"
 )
 
 type AddComplaintClient interface {
@@ -17,99 +15,13 @@ type AddComplaintClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
-type complaintCategory struct {
-	Label    string
-	Children map[string]string
-}
-
-var complaintCategories = map[string]complaintCategory{
-	"01": {
-		Label: "Correspondence",
-		Children: map[string]string{
-			"06": "General Query",
-			"07": "Chase up",
-			"08": "Typo / Grammar",
-			"09": "Quality of Documents",
-			"10": "Third Parties",
-			"11": "Refund Request",
-			"12": "Digital Tool",
-			"13": "Finance",
-			"14": "Customer Service",
-		},
-	},
-	"02": {
-		Label: "OPG Decisions",
-		Children: map[string]string{
-			"15": "POA Decisions",
-			"16": "Supervision Decisions",
-			"17": "Investigation Outcomes",
-			"18": "Fee Decision",
-			"19": "Safeguarding Decisions",
-			"20": "Other",
-		},
-	},
-	"03": {
-		Label: "Non OPG",
-		Children: map[string]string{
-			"21": "Banks / Utilities",
-			"22": "COP / Judicial",
-			"23": "DX / Royal Mail",
-			"24": "Health / Social Care",
-			"25": "Solicitors",
-			"26": "Deputy / Attorney",
-			"27": "Other",
-		},
-	},
-	"04": {
-		Label: "Customer Service",
-		Children: map[string]string{
-			"28": "Letter Content",
-			"29": "Delays",
-			"30": "Contact with OPG",
-			"31": "Quality",
-			"32": "Incorrect / Confusing Advice",
-			"33": "Failure to Follow Procedure",
-			"34": "Lost Documents",
-			"35": "Security Breach",
-			"36": "Other",
-		},
-	},
-	"05": {
-		Label: "Policy",
-		Children: map[string]string{
-			"37": "Mental Capacity Act",
-			"38": "Fee Policy",
-			"39": "Donor Deceased Policy",
-			"40": "Refund Policy",
-			"41": "Forms / Guidance",
-			"42": "Digital Product",
-			"43": "Safeguarding Policy",
-			"44": "Jurisdiction",
-			"45": "Other",
-		},
-	},
-}
-
-func getValidSubcategory(category string, subCategories []string) string {
-	if category, ok := complaintCategories[category]; ok {
-		for _, subCategory := range subCategories {
-			s := strings.TrimSpace(subCategory)
-			if _, ok := category.Children[s]; ok {
-				return s
-			}
-		}
-	}
-
-	return ""
-}
-
 type addComplaintData struct {
 	XSRFToken string
 	Entity    string
 	Success   bool
 	Error     sirius.ValidationError
 
-	Categories            map[string]complaintCategory
+	Categories            []sirius.RefDataItem
 	ComplainantCategories []sirius.RefDataItem
 	Origins               []sirius.RefDataItem
 
@@ -132,8 +44,7 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		data := addComplaintData{
-			XSRFToken:  ctx.XSRFToken,
-			Categories: complaintCategories,
+			XSRFToken: ctx.XSRFToken,
 		}
 
 		group.Go(func() error {
@@ -164,6 +75,15 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 			return nil
 		})
 
+		group.Go(func() error {
+			data.Categories, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.ComplaintCategory)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
 		if err := group.Wait(); err != nil {
 			return err
 		}
@@ -176,7 +96,7 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 				Severity:             postFormString(r, "severity"),
 				InvestigatingOfficer: postFormString(r, "investigatingOfficer"),
 				ComplainantName:      postFormString(r, "complainantName"),
-				SubCategory:          getValidSubcategory(postFormString(r, "category"), r.PostForm["subCategory"]),
+				SubCategory:          postFormString(r, "subCategory"),
 				ComplainantCategory:  postFormString(r, "complainantCategory"),
 				Origin:               postFormString(r, "origin"),
 				Summary:              postFormString(r, "summary"),

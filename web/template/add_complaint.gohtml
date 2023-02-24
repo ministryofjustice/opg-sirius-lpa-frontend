@@ -42,21 +42,21 @@
           {{ template "errors" .Error.Field.category }}
 
           <div class="govuk-radios" data-module="govuk-radios">
-            {{ range $k, $v := .Categories }}
+            {{ range $v := .Categories }}
               <div class="govuk-radios__item">
-                <input class="govuk-radios__input" id="f-category-{{ $k }}" name="category" type="radio" value="{{ $k }}" data-aria-controls="conditional-category-{{ $k }}" {{ if eq $k $.Complaint.Category }}checked{{ end }}>
-                <label class="govuk-label govuk-radios__label" for="f-category-{{ $k }}">
+                <input class="govuk-radios__input" id="f-category-{{ $v.Handle }}" name="category" type="radio" value="{{ $v.Handle }}" data-aria-controls="conditional-category-{{ $v.Handle }}" {{ if eq $v.Handle $.Complaint.Category }}checked{{ end }}>
+                <label class="govuk-label govuk-radios__label" for="f-category-{{ $v.Handle }}">
                   {{ $v.Label }}
                 </label>
               </div>
-              <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-category-{{ $k }}">
+              <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-category-{{ $v.Handle }}">
                 <div class="govuk-!-width-one-half govuk-form-group {{ if $.Error.Field.subCategory }}govuk-form-group--error{{ end }}">
-                  <label class="govuk-label" for="f-subCategory-{{ $k }}">Subcategory</label>
+                  <label class="govuk-label" for="f-subCategory-{{ $v.Handle }}">Subcategory</label>
                   {{ template "errors" $.Error.Field.subCategory }}
-                  <select class="govuk-select {{ if $.Error.Field.subCategory }}govuk-select--error{{ end }}" id="f-subCategory-{{ $k }}" name="subCategory">
+                  <select class="govuk-select {{ if $.Error.Field.subCategory }}govuk-select--error{{ end }}" id="f-subCategory-{{ $v.Handle }}" name="subCategory">
                     <option hidden {{ if eq "" $.Complaint.SubCategory }}selected{{ end }} disabled></option>
-                    {{ range $id, $label := $v.Children }}
-                      <option value="{{ $id }}" {{ if eq $id $.Complaint.SubCategory }}selected{{ end }} >{{ $label }}</option>
+                    {{ range $subcategory := $v.Subcategories }}
+                      <option value="{{ $subcategory.Handle }}" {{ if eq $subcategory.Handle $.Complaint.SubCategory }}selected{{ end }} >{{ $subcategory.Label }}</option>
                     {{ end }}
                   </select>
                 </div>

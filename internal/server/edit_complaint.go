@@ -22,7 +22,7 @@ type editComplaintData struct {
 	Success   bool
 	Error     sirius.ValidationError
 
-	Categories            map[string]complaintCategory
+	Categories            []sirius.RefDataItem
 	ComplainantCategories []sirius.RefDataItem
 	Origins               []sirius.RefDataItem
 	CompensationTypes     []sirius.RefDataItem
@@ -41,8 +41,7 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		data := editComplaintData{
-			XSRFToken:  ctx.XSRFToken,
-			Categories: complaintCategories,
+			XSRFToken: ctx.XSRFToken,
 		}
 
 		group.Go(func() error {
@@ -77,6 +76,15 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 			return nil
 		})
 
+		group.Go(func() error {
+			data.Categories, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.ComplaintCategory)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
 		if err := group.Wait(); err != nil {
 			return err
 		}
@@ -89,7 +97,7 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 				Severity:             postFormString(r, "severity"),
 				InvestigatingOfficer: postFormString(r, "investigatingOfficer"),
 				ComplainantName:      postFormString(r, "complainantName"),
-				SubCategory:          getValidSubcategory(postFormString(r, "category"), r.PostForm["subCategory"]),
+				SubCategory:          postFormString(r, "subCategory"),
 				ComplainantCategory:  postFormString(r, "complainantCategory"),
 				Origin:               postFormString(r, "origin"),
 				CompensationType:     postFormString(r, "compensationType"),

@@ -13,12 +13,14 @@ const (
 	ComplainantCategory        string = "complainantCategory"
 	ComplaintOrigin            string = "complaintOrigin"
 	CompensationType           string = "compensationType"
+	ComplaintCategory          string = "complaintCategory"
 )
 
 type RefDataItem struct {
-	Handle         string `json:"handle"`
-	Label          string `json:"label"`
-	UserSelectable bool   `json:"userSelectable"`
+	Handle         string        `json:"handle"`
+	Label          string        `json:"label"`
+	UserSelectable bool          `json:"userSelectable"`
+	Subcategories  []RefDataItem `json:"subcategories"`
 }
 
 func (c *Client) RefDataByCategory(ctx Context, category string) ([]RefDataItem, error) {

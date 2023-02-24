@@ -60,7 +60,9 @@ func TestGetEditComplaint(t *testing.T) {
 		Return(demoComplaintOrigins, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
-		Return(demoCompensationTypes, nil)
+		Return(demoCompensationTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
 	client.
 		On("Complaint", mock.Anything, 123).
 		Return(complaint, nil)
@@ -69,7 +71,7 @@ func TestGetEditComplaint(t *testing.T) {
 	template.
 		On("Func", mock.Anything, editComplaintData{
 			Complaint:             complaint,
-			Categories:            complaintCategories,
+			Categories:            demoComplaintCategories,
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
 			CompensationTypes:     demoCompensationTypes,
@@ -110,7 +112,9 @@ func TestGetEditComplaintWhenRefDataErrors(t *testing.T) {
 		Return(demoCompensationTypes, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
-		Return(demoComplaintOrigins, nil)
+		Return(demoComplaintOrigins, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
 	client.
 		On("Complaint", mock.Anything, 123).
 		Return(complaint, nil)
@@ -134,7 +138,9 @@ func TestGetEditComplaintWhenComplaintErrors(t *testing.T) {
 		Return(demoComplaintOrigins, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
-		Return(demoCompensationTypes, nil)
+		Return(demoCompensationTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
 	client.
 		On("Complaint", mock.Anything, 123).
 		Return(sirius.Complaint{}, expectedError)
@@ -158,7 +164,9 @@ func TestGetEditComplaintWhenTemplateErrors(t *testing.T) {
 		Return(demoComplaintOrigins, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
-		Return(demoCompensationTypes, nil)
+		Return(demoCompensationTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
 	client.
 		On("Complaint", mock.Anything, 123).
 		Return(sirius.Complaint{}, nil)
@@ -166,7 +174,7 @@ func TestGetEditComplaintWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, editComplaintData{
-			Categories:            complaintCategories,
+			Categories:            demoComplaintCategories,
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
 			CompensationTypes:     demoCompensationTypes,
@@ -207,7 +215,9 @@ func TestPostEditComplaint(t *testing.T) {
 		Return(demoComplaintOrigins, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
-		Return(demoCompensationTypes, nil)
+		Return(demoCompensationTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
 	client.
 		On("Complaint", mock.Anything, 123).
 		Return(complaint, nil)
@@ -220,7 +230,7 @@ func TestPostEditComplaint(t *testing.T) {
 		On("Func", mock.Anything, editComplaintData{
 			Success:               true,
 			Complaint:             complaint,
-			Categories:            complaintCategories,
+			Categories:            demoComplaintCategories,
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
 			CompensationTypes:     demoCompensationTypes,
@@ -270,7 +280,9 @@ func TestPostEditComplaintWhenEditComplaintValidationError(t *testing.T) {
 		Return(demoComplaintOrigins, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
-		Return(demoCompensationTypes, nil)
+		Return(demoCompensationTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
 	client.
 		On("Complaint", mock.Anything, 123).
 		Return(complaint, nil)
@@ -284,7 +296,7 @@ func TestPostEditComplaintWhenEditComplaintValidationError(t *testing.T) {
 			Success:               false,
 			Error:                 expectedError,
 			Complaint:             complaint,
-			Categories:            complaintCategories,
+			Categories:            demoComplaintCategories,
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
 			CompensationTypes:     demoCompensationTypes,
@@ -319,7 +331,9 @@ func TestPostEditComplaintWhenEditComplaintOtherError(t *testing.T) {
 		Return(demoComplaintOrigins, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
-		Return(demoCompensationTypes, nil)
+		Return(demoCompensationTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
 	client.
 		On("Complaint", mock.Anything, 123).
 		Return(complaint, nil)
