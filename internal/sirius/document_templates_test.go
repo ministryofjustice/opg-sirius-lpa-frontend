@@ -44,6 +44,7 @@ func TestDocumentTypes(t *testing.T) {
 										"DD1": dsl.Like(map[string]interface{}{
 											"onScreenSummary": dsl.Like("DD1LPAINSERTONSCREENSUMMARY"),
 											"location":        dsl.Like(`lpa\/inserts\/DD1.html.twig`),
+											"order":           dsl.Like(0),
 										}),
 									}),
 								}),
@@ -60,6 +61,7 @@ func TestDocumentTypes(t *testing.T) {
 							InsertId:        "DD1",
 							Location:        `lpa\/inserts\/DD1.html.twig`,
 							OnScreenSummary: "DD1LPAINSERTONSCREENSUMMARY",
+							Order:           0,
 						},
 					},
 					Location:        `lpa\/DD.html.twig`,

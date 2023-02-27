@@ -320,10 +320,6 @@ func translateInsertData(selectedTemplateInserts []sirius.Insert, documentTempla
 		}
 	}
 
-	sort.Slice(documentTemplateInserts, func(i, j int) bool {
-		return documentTemplateInserts[i].Handle < documentTemplateInserts[j].Handle
-	})
-
 	return documentTemplateInserts
 }
 
