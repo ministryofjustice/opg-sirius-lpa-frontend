@@ -20,14 +20,8 @@
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Method of refund:</th>
                         <td class="govuk-table__cell">
-                            {{ if eq "MAKE" $p.Source }}
-                                GOV.UK Pay (online - Make an LPA)
-                            {{ else if eq "ONLINE" $p.Source }}
-                                GOV.UK Pay (card payment)
-                            {{ else }}
-                                {{ range $.PaymentSources }}
-                                    {{ if eq .Handle $p.Source }}{{ .Label }}{{ end }}
-                                {{ end }}
+                            {{ range $.PaymentSources }}
+                                {{ if eq .Handle $p.Source }}{{ .Label }}{{ end }}
                             {{ end }}
                         </td>
                     </tr>
