@@ -48,17 +48,30 @@ var demoComplaintOrigins = []sirius.RefDataItem{
 	},
 }
 
+var demoComplaintCategories = []sirius.RefDataItem{
+	{
+		Handle: "02",
+		Label:  "OPG Decisions",
+		Subcategories: []sirius.RefDataItem{
+			{
+				Handle: "18",
+				Label:  "Fee Decision",
+			},
+		},
+	},
+}
+
 func TestGetAddComplaint(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
 			client := &mockAddComplaintClient{}
 			client.
 				On("Case", mock.Anything, 123).
-				Return(sirius.Case{CaseType: caseType, UID: "7000"}, nil)
-			client.
+				Return(sirius.Case{CaseType: caseType, UID: "7000"}, nil).
 				On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
-				Return(demoComplainantCategories, nil)
-			client.
+				Return(demoComplainantCategories, nil).
+				On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+				Return(demoComplaintCategories, nil).
 				On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
 				Return(demoComplaintOrigins, nil)
 
@@ -66,7 +79,7 @@ func TestGetAddComplaint(t *testing.T) {
 			template.
 				On("Func", mock.Anything, addComplaintData{
 					Entity:                caseType + " 7000",
-					Categories:            complaintCategories,
+					Categories:            demoComplaintCategories,
 					ComplainantCategories: demoComplainantCategories,
 					Origins:               demoComplaintOrigins,
 				}).
@@ -114,7 +127,9 @@ func TestGetAddComplaintWhenCaseErrors(t *testing.T) {
 		Return(demoComplainantCategories, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
-		Return(demoComplaintOrigins, nil)
+		Return(demoComplaintOrigins, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
@@ -135,7 +150,9 @@ func TestGetAddComplaintWhenRefDataErrors(t *testing.T) {
 		Return([]sirius.RefDataItem{}, expectedError)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
-		Return(demoComplaintOrigins, nil)
+		Return(demoComplaintOrigins, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
@@ -156,13 +173,15 @@ func TestGetAddComplaintWhenTemplateErrors(t *testing.T) {
 		Return(demoComplainantCategories, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
-		Return(demoComplaintOrigins, nil)
+		Return(demoComplaintOrigins, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addComplaintData{
 			Entity:                "LPA 7000",
-			Categories:            complaintCategories,
+			Categories:            demoComplaintCategories,
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
 		}).
@@ -189,7 +208,9 @@ func TestPostAddComplaint(t *testing.T) {
 				Return(demoComplainantCategories, nil)
 			client.
 				On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
-				Return(demoComplaintOrigins, nil)
+				Return(demoComplaintOrigins, nil).
+				On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+				Return(demoComplaintCategories, nil)
 			client.
 				On("AddComplaint", mock.Anything, 123, sirius.CaseType(caseType), sirius.Complaint{
 					Category:             "01",
@@ -207,7 +228,7 @@ func TestPostAddComplaint(t *testing.T) {
 				On("Func", mock.Anything, addComplaintData{
 					Success:               true,
 					Entity:                caseType + " 7000",
-					Categories:            complaintCategories,
+					Categories:            demoComplaintCategories,
 					ComplainantCategories: demoComplainantCategories,
 					Origins:               demoComplaintOrigins,
 				}).
@@ -253,7 +274,9 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 		Return(demoComplainantCategories, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
-		Return(demoComplaintOrigins, nil)
+		Return(demoComplaintOrigins, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
 	client.
 		On("AddComplaint", mock.Anything, 123, sirius.CaseTypeLpa, complaint).
 		Return(expectedError)
@@ -265,7 +288,7 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 			Error:                 expectedError,
 			Entity:                "LPA 7000",
 			Complaint:             complaint,
-			Categories:            complaintCategories,
+			Categories:            demoComplaintCategories,
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
 		}).
@@ -299,7 +322,9 @@ func TestPostAddComplaintWhenAddComplaintOtherError(t *testing.T) {
 		Return(demoComplainantCategories, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
-		Return(demoComplaintOrigins, nil)
+		Return(demoComplaintOrigins, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
 	client.
 		On("AddComplaint", mock.Anything, 123, sirius.CaseTypeLpa, complaint).
 		Return(expectedError)
@@ -316,24 +341,4 @@ func TestPostAddComplaintWhenAddComplaintOtherError(t *testing.T) {
 
 	assert.Equal(t, expectedError, err)
 	mock.AssertExpectationsForObjects(t, client)
-}
-
-func TestGetValidSubcategory(t *testing.T) {
-	t.Run("empty", func(t *testing.T) {
-		valid := getValidSubcategory("04", []string{})
-
-		assert.Equal(t, "", valid)
-	})
-
-	t.Run("exists", func(t *testing.T) {
-		valid := getValidSubcategory("04", []string{"06", "12", "33", "41"})
-
-		assert.Equal(t, "33", valid)
-	})
-
-	t.Run("missing", func(t *testing.T) {
-		valid := getValidSubcategory("04", []string{"06", "12", "41"})
-
-		assert.Equal(t, "", valid)
-	})
 }
