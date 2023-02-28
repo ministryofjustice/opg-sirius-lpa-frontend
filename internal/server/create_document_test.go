@@ -462,13 +462,10 @@ func TestTranslateInsertData(t *testing.T) {
 }
 
 func TestGetRecipientsFiltersInactiveActors(t *testing.T) {
-	trueBool := true
-	falseBool := false
-
-	donor := sirius.Person{ID: 1, SystemStatus: &trueBool}
-	trustCorp := sirius.Person{ID: 2, SystemStatus: &trueBool}
-	activeAttorney := sirius.Person{ID: 3, SystemStatus: &trueBool}
-	inactiveAttorney := sirius.Person{ID: 4, SystemStatus: &falseBool}
+	donor := sirius.Person{ID: 1}
+	trustCorp := sirius.Person{ID: 2, SystemStatus: true}
+	activeAttorney := sirius.Person{ID: 3, SystemStatus: true}
+	inactiveAttorney := sirius.Person{ID: 4, SystemStatus: false}
 	caseItem := sirius.Case{Donor: &donor, TrustCorporations: []sirius.Person{trustCorp}, Attorneys: []sirius.Person{activeAttorney, inactiveAttorney}}
 
 	r, _ := http.NewRequest("GET", "/", nil)
@@ -489,9 +486,8 @@ func TestGetRecipientsFiltersInactiveActors(t *testing.T) {
 }
 
 func TestGetRecipientsWithCorrespondent(t *testing.T) {
-	trueBool := true
 	donor := sirius.Person{ID: 1}
-	attorney := sirius.Person{ID: 3, SystemStatus: &trueBool}
+	attorney := sirius.Person{ID: 3, SystemStatus: true}
 	correspondent := sirius.Person{ID: 4}
 	caseItem := sirius.Case{Donor: &donor, Attorneys: []sirius.Person{attorney}, Correspondent: &correspondent}
 
