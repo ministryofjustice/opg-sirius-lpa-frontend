@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -486,7 +485,6 @@ func TestGetRecipientsFiltersInactiveActors(t *testing.T) {
 		Return(inactiveAttorney, nil)
 
 	recipients, _ := getRecipients(ctx, client, caseItem)
-
 	assert.Equal(t, 3, len(recipients))
 }
 
@@ -509,8 +507,6 @@ func TestGetRecipientsWithCorrespondent(t *testing.T) {
 		Return(correspondent, nil)
 
 	recipients, _ := getRecipients(ctx, client, caseItem)
-
-	fmt.Println(recipients)
 	assert.Equal(t, 3, len(recipients))
 }
 
