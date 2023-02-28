@@ -239,8 +239,8 @@ func getRecipients(ctx sirius.Context, client CreateDocumentClient, caseItem sir
 	var recipientIds []int
 	donor := *caseItem.Donor
 	recipientIds = append(recipientIds, donor.ID)
-	recipientIds = append(recipientIds, getPersonIds(sirius.FilterInactiveActors(caseItem.TrustCorporations))...)
-	recipientIds = append(recipientIds, getPersonIds(sirius.FilterInactiveActors(caseItem.Attorneys))...)
+	recipientIds = append(recipientIds, getPersonIds(sirius.FilterInactiveAttorneys(caseItem.TrustCorporations))...)
+	recipientIds = append(recipientIds, getPersonIds(sirius.FilterInactiveAttorneys(caseItem.Attorneys))...)
 
 	if caseItem.Correspondent != nil {
 		recipientIds = append(recipientIds, caseItem.Correspondent.ID)

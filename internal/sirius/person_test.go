@@ -101,7 +101,7 @@ func TestPersonFiltersInactiveActors(t *testing.T) {
 	inactiveActor1 := Person{ID: 3, SystemStatus: &falseBool}
 	inactiveActor2 := Person{ID: 4, SystemStatus: &falseBool}
 	persons := []Person{actor1, actor2, inactiveActor1, inactiveActor2}
-	activeActors := FilterInactiveActors(persons)
+	activeActors := FilterInactiveAttorneys(persons)
 
 	assert.Equal(t, 2, len(activeActors))
 	assert.NotContains(t, activeActors, inactiveActor1)
