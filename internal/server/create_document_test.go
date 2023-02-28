@@ -461,32 +461,37 @@ func TestTranslateInsertData(t *testing.T) {
 	assert.Equal(t, "All", translatedInsert[0].Key)
 }
 
-func TestGetRecipients(t *testing.T) {
-	donor := sirius.Person{ID: 1}
-	trustCorp := sirius.Person{ID: 2}
-	attorney := sirius.Person{ID: 3}
-	caseItem := sirius.Case{Donor: &donor, TrustCorporations: []sirius.Person{trustCorp}, Attorneys: []sirius.Person{attorney}}
+func TestGetRecipientsFiltersInactiveActors(t *testing.T) {
+	trueBool := true
+	falseBool := false
+
+	donor := sirius.Person{ID: 1, SystemStatus: &trueBool}
+	trustCorp := sirius.Person{ID: 2, SystemStatus: &trueBool}
+	activeAttorney := sirius.Person{ID: 3, SystemStatus: &trueBool}
+	inactiveAttorney := sirius.Person{ID: 4, SystemStatus: &falseBool}
+	caseItem := sirius.Case{Donor: &donor, TrustCorporations: []sirius.Person{trustCorp}, Attorneys: []sirius.Person{activeAttorney, inactiveAttorney}}
 
 	r, _ := http.NewRequest("GET", "/", nil)
 	ctx := getContext(r)
 	client := &mockCreateDocumentClient{}
 	client.
 		On("Person", mock.Anything, 1).
-		Return(donor, nil)
-	client.
+		Return(donor, nil).
 		On("Person", mock.Anything, 2).
-		Return(trustCorp, nil)
-	client.
+		Return(trustCorp, nil).
 		On("Person", mock.Anything, 3).
-		Return(attorney, nil)
+		Return(activeAttorney, nil).
+		On("Person", mock.Anything, 4).
+		Return(inactiveAttorney, nil)
 
 	recipients, _ := getRecipients(ctx, client, caseItem)
 	assert.Equal(t, 3, len(recipients))
 }
 
 func TestGetRecipientsWithCorrespondent(t *testing.T) {
+	trueBool := true
 	donor := sirius.Person{ID: 1}
-	attorney := sirius.Person{ID: 3}
+	attorney := sirius.Person{ID: 3, SystemStatus: &trueBool}
 	correspondent := sirius.Person{ID: 4}
 	caseItem := sirius.Case{Donor: &donor, Attorneys: []sirius.Person{attorney}, Correspondent: &correspondent}
 
@@ -495,11 +500,9 @@ func TestGetRecipientsWithCorrespondent(t *testing.T) {
 	client := &mockCreateDocumentClient{}
 	client.
 		On("Person", mock.Anything, 1).
-		Return(donor, nil)
-	client.
+		Return(donor, nil).
 		On("Person", mock.Anything, 3).
-		Return(attorney, nil)
-	client.
+		Return(attorney, nil).
 		On("Person", mock.Anything, 4).
 		Return(correspondent, nil)
 
