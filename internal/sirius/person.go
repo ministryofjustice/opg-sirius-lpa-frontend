@@ -36,6 +36,7 @@ type Person struct {
 	CompanyReference      string     `json:"companyReference"`
 	PersonType            string     `json:"personType,omitempty"`
 	Cases                 []*Case    `json:"cases,omitempty"`
+	SystemStatus          *bool      `json:"systemStatus,omitempty"`
 }
 
 func (p Person) Summary() string {
@@ -60,4 +61,14 @@ func (c *Client) Person(ctx Context, id int) (Person, error) {
 	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%d", id), &v)
 
 	return v, err
+}
+
+func FilterInactiveAttorneys(actors []Person) []Person {
+	var activeActors []Person
+	for _, actor := range actors {
+		if actor.SystemStatus != nil && *actor.SystemStatus {
+			activeActors = append(activeActors, actor)
+		}
+	}
+	return activeActors
 }
