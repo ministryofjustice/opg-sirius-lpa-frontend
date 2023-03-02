@@ -9,7 +9,7 @@ import (
 )
 
 type EditDocumentClient interface {
-	Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int) ([]sirius.Document, error)
+	Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, filterByDocType bool) ([]sirius.Document, error)
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 	EditDocument(ctx sirius.Context, uuid string, content string) (sirius.Document, error)
@@ -62,12 +62,11 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 			})
 
 			group.Go(func() error {
-				documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID)
+				documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID, true)
 				if err != nil {
 					return err
 				}
-				draftDocuments := getDraftDocuments(documents)
-				data.Documents = draftDocuments
+				data.Documents = documents
 				return nil
 			})
 
@@ -171,7 +170,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				})
 
 				group.Go(func() error {
-					documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID)
+					documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID, true)
 					if err != nil {
 						return err
 					}
