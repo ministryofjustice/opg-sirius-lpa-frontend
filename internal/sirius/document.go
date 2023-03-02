@@ -30,7 +30,7 @@ func (c *Client) Documents(ctx Context, caseType CaseType, caseId int, filterByD
 	var d []Document
 
 	url := fmt.Sprintf("/lpa-api/v1/%s/%d/documents", caseType+"s", caseId)
-	if filterByDocType == true {
+	if filterByDocType {
 		url += fmt.Sprintf("?type[]=%s", TypeDraft)
 	}
 
