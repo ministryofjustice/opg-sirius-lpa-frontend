@@ -2,6 +2,15 @@
 
 {{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create Document{{ end }}
 
+{{ define "create-document-back-and-case-details" }}
+    <div class="govuk-body">
+        <a href="{{ prefix .Back }}" class="govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-0">Back</a>
+        <div class="app-!-float-right">
+            {{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "hw" }}HW{{ end }} {{ .Case.UID }}
+        </div>
+    </div>
+{{ end }}
+
 {{ define "main" }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
@@ -13,21 +22,24 @@
             {{ end }}
 
             {{ if .HasSelectedAddNewRecipient }}
-                <a href="{{ prefix .Back }}" class="govuk-back-link govuk-!-margin-top-0">Back</a>
-                {{ template "case-details" . }}
+                {{ template "create-document-back-and-case-details" . }}
                 {{ template "add-recipient" . }}
 
             {{ else if .HasViewedInsertPage }}
-                <a href="{{ prefix .Back }}" class="govuk-back-link govuk-!-margin-top-0">Back</a>
-                {{ template "case-details" . }}
+                {{ template "create-document-back-and-case-details" . }}
                 {{ template "select-recipient" . }}
 
             {{ else if .TemplateSelected.TemplateId }}
-                <a href="{{ prefix .Back }}" class="govuk-back-link govuk-!-margin-top-0">Back</a>
-                {{ template "case-details" . }}
+                {{ template "create-document-back-and-case-details" . }}
                 {{ template "select-insert" . }}
             {{ else }}
-                {{ template "case-details" . }}
+                <div class="govuk-body">
+                    <a href="#" data-app-iframe-cancel class="govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-0">Back</a>
+                    <div class="app-!-float-right">
+                        {{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "hw" }}HW{{ end }} {{ .Case.UID }}
+                    </div>
+                </div>
+
                 {{ template "select-template" . }}
             {{ end }}
         </div>
@@ -192,7 +204,7 @@
         <div class="govuk-tabs" data-module="govuk-tabs">
             <h2 class="govuk-tabs__title">Inserts</h2>
 
-            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 app-!-float-right"
+            <button class="govuk-button govuk-!-margin-bottom-0 app-!-float-right"
                     data-module="govuk-button" type="submit" name="skipInserts" value="true">
                 Skip
             </button>
