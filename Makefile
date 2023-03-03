@@ -19,7 +19,7 @@ up:
 	docker-compose -f docker/docker-compose.ci.yml up -d
 
 scan:
-	trivy sirius-lpa-frontend:latest
+	trivy image sirius-lpa-frontend:latest
 
 pa11y:
 	docker-compose -f docker/docker-compose.ci.yml run --entrypoint="pa11y-ci" puppeteer
