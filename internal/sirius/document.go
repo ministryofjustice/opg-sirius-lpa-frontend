@@ -26,13 +26,10 @@ const (
 	TypeSave    string = "Save"
 )
 
-func (c *Client) Documents(ctx Context, caseType CaseType, caseId int, filterByDocType bool) ([]Document, error) {
+func (c *Client) Documents(ctx Context, caseType CaseType, caseId int, docType string) ([]Document, error) {
 	var d []Document
 
-	url := fmt.Sprintf("/lpa-api/v1/%s/%d/documents", caseType+"s", caseId)
-	if filterByDocType {
-		url += fmt.Sprintf("?type[]=%s", TypeDraft)
-	}
+	url := fmt.Sprintf("/lpa-api/v1/%s/%d/documents?type[]=%s", caseType+"s", caseId, docType)
 
 	err := c.get(ctx, url, &d)
 	if err != nil {

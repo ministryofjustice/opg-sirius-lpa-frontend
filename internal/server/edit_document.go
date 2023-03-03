@@ -9,7 +9,7 @@ import (
 )
 
 type EditDocumentClient interface {
-	Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, filterByDocType bool) ([]sirius.Document, error)
+	Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docType string) ([]sirius.Document, error)
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 	EditDocument(ctx sirius.Context, uuid string, content string) (sirius.Document, error)
@@ -62,7 +62,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 			})
 
 			group.Go(func() error {
-				documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID, true)
+				documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID, sirius.TypeDraft)
 				if err != nil {
 					return err
 				}
@@ -170,12 +170,12 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				})
 
 				group.Go(func() error {
-					documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID, true)
+					documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID, sirius.TypeDraft)
 					if err != nil {
 						return err
 					}
 
-					data.Documents = getDraftDocuments(documents)
+					data.Documents = documents
 					return nil
 				})
 
@@ -198,14 +198,4 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 
 		return tmpl(w, data)
 	}
-}
-
-func getDraftDocuments(documents []sirius.Document) []sirius.Document {
-	var draftDocuments []sirius.Document
-	for _, document := range documents {
-		if document.Type == sirius.TypeDraft {
-			draftDocuments = append(draftDocuments, document)
-		}
-	}
-	return draftDocuments
 }
