@@ -1,3 +1,3 @@
 {{ define "case-details" }}
-    <p class="govuk-body"><strong>{{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "lpa" }}LPA{{ end }} {{ .Case.UID }}</strong></p>
+    <p class="govuk-body"><strong>{{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "hw" }}HW{{ end }} {{ .Case.UID }}</strong></p>
 {{ end }}
