@@ -26,10 +26,12 @@ const (
 	TypeSave    string = "Save"
 )
 
-func (c *Client) Documents(ctx Context, caseType CaseType, caseId int) ([]Document, error) {
+func (c *Client) Documents(ctx Context, caseType CaseType, caseId int, docType string) ([]Document, error) {
 	var d []Document
 
-	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/%s/%d/documents", caseType+"s", caseId), &d)
+	url := fmt.Sprintf("/lpa-api/v1/%s/%d/documents?type[]=%s", caseType+"s", caseId, docType)
+
+	err := c.get(ctx, url, &d)
 	if err != nil {
 		return nil, err
 	}
