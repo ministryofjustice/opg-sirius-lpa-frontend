@@ -80,7 +80,7 @@ func TestDocument(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				documents, err := client.Documents(Context{Context: context.Background()}, CaseTypeLpa, 800)
+				documents, err := client.Documents(Context{Context: context.Background()}, CaseTypeLpa, 800, TypeDraft)
 
 				assert.Equal(t, tc.expectedResponse, documents)
 				if tc.expectedError == nil {
