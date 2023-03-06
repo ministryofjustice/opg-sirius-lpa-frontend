@@ -17,8 +17,13 @@
                    data-module="app-auto-click">Download preview document</a>
             {{ end }}
 
-            <a href="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .Case.CaseType) }}" class="govuk-back-link govuk-!-margin-top-0">Back</a>
-            {{ template "case-details" . }}
+            <div class="govuk-body">
+                <a href="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .Case.CaseType) }}" class="govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-0">Back</a>
+                <div class="app-!-float-right">
+                    {{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "hw" }}HW{{ end }} {{ .Case.UID }}
+                </div>
+            </div>
+
             <h1 class="govuk-heading-m">Edit draft document</h1>
 
             {{ if not .Documents }}
@@ -57,13 +62,11 @@
                     <div class="govuk-form-group {{ if .Error.Field.documentTextEditor }}govuk-form-group--error{{ end }} govuk-!-margin-bottom-2">
                         <textarea id="documentTextEditor" name="documentTextEditor">{{ filterContent .Document.Content }}</textarea>
                     </div>
-                    <div class="govuk-button-group govuk-!-margin-bottom-6">
+                    <div class="govuk-button-group">
                         <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="save">Save draft</button>
+                        <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="saveAndExit" id="saveAndExit">Save and exit</button>
                         <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="delete">Delete draft</button>
                         <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="preview">Preview draft</button>
-                    </div>
-                    <div class="govuk-button-group govuk-!-margin-bottom-0">
-                        <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="saveAndExit" id="saveAndExit">Save and exit</button>
                         <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit" value="publish">Publish draft</button>
                     </div>
                     <div class="govuk-body">
