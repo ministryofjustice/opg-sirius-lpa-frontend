@@ -1,7 +1,6 @@
 describe("Create a task", () => {
   beforeEach(() => {
     cy.visit("/create-task?id=800");
-    cy.viewport(1000, 850);
   });
 
   it("creates a task for a user", () => {

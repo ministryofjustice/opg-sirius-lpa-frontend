@@ -1,7 +1,6 @@
 describe("Edit complaint", () => {
   beforeEach(() => {
     cy.visit("/edit-complaint?id=986");
-    cy.viewport(1000, 950);
   });
 
   it("edits a complaint", () => {
@@ -11,7 +10,6 @@ describe("Edit complaint", () => {
       .parent()
       .get("input")
       .should("be.checked");
-
     cy.get("#f-investigatingOfficer").should("have.value", "Test Officer");
     cy.get("#f-complainantName").type("Someones name");
     cy.get("#f-summary").should("have.value", "This and that");

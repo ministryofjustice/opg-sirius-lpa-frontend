@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -192,7 +191,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var bodyData map[string]interface{}
 	bodyBytes, err := ioutil.ReadAll(r.Body)
 	r.Body.Close()
-	r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 	if err != nil {
 		log.Println(err)
 	}
