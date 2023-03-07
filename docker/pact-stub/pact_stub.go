@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -84,13 +86,33 @@ func (q Request) String() string {
 	return fmt.Sprintf("method=%s path=%s query=%s headers=%v body=%v", q.Method, q.Path, q.Query, q.Headers, q.Body)
 }
 
-func (q Request) Match(r *http.Request) bool {
+func (q Request) Match(r *http.Request, rBody map[string]interface{}) bool {
 	if q.Method != r.Method {
 		return false
 	}
 
 	if q.Path != r.URL.Path {
 		return false
+	}
+
+	if q.Body != nil && len(rBody) > 0 {
+		var qBody map[string]interface{}
+
+		qb, err := json.Marshal(q.Body)
+		if err != nil {
+			log.Println(err)
+			return false
+		}
+
+		if err := json.Unmarshal(qb, &qBody); err != nil {
+			log.Println(err)
+			return false
+		}
+
+		if !reflect.DeepEqual(rBody, qBody) {
+			log.Println(qBody, " did not match ", rBody)
+			return false
+		}
 	}
 
 	if q.Query != "" {
@@ -166,8 +188,21 @@ type Server struct {
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("-> method=%s path=%s query=%s headers=%v body=%v\n", r.Method, r.URL.Path, r.URL.Query().Encode(), r.Header, nil)
 
+	var bodyData map[string]interface{}
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+	if err != nil {
+		log.Println(err)
+	}
+
+	if len(bodyBytes) > 0 {
+		if err := json.Unmarshal(bodyBytes, &bodyData); err != nil {
+			log.Println(err)
+		}
+	}
+
 	for _, interaction := range s.interactions {
-		if interaction.Request.Match(r) {
+		if interaction.Request.Match(r, bodyData) {
 			interaction.Response.Send(w)
 			return
 		}

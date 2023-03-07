@@ -9,7 +9,7 @@ describe("Add a payment", () => {
         cy.get(".moj-banner").should("not.exist");
         cy.get("#f-amount").type("41.00");
         cy.get("#f-source").select("PHONE");
-        cy.get("#f-paymentDate").type("2022-03-25");
+        cy.get("#f-paymentDate").type("2022-04-25");
         cy.get("button[type=submit]").click();
         cy.get(".moj-banner").should("exist");
     });

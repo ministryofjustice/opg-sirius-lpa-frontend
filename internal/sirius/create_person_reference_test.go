@@ -35,7 +35,7 @@ func TestCreatePersonReference(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"referencedUid": dsl.Like("7000-9999-0001"),
+							"referencedUid": dsl.Like("7000-0000-0003"),
 							"reason":        dsl.Like("Mother"),
 						},
 					}).
@@ -54,7 +54,7 @@ func TestCreatePersonReference(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.CreatePersonReference(Context{Context: context.Background()}, 189, "7000-9999-0001", "Mother")
+				err := client.CreatePersonReference(Context{Context: context.Background()}, 189, "7000-0000-0003", "Mother")
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {

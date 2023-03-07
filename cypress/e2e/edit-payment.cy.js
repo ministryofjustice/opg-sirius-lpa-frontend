@@ -7,8 +7,8 @@ describe("Edit a payment", () => {
         cy.contains("Edit payment");
         cy.contains("7000-0000-0000");
         cy.get(".moj-banner").should("not.exist");
-        cy.get("#f-amount").clear().type("45.50");
-        cy.get("#f-paymentDate").type("2022-07-16");
+        cy.get("#f-amount").clear().type("25.50");
+        cy.get("#f-paymentDate").type("2022-04-27");
         cy.get("button[type=submit]").click();
         cy.get(".moj-banner").should("exist");
     });
