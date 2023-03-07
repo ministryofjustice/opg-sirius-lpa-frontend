@@ -41,6 +41,7 @@ func TestDeletedCases(t *testing.T) {
 						Body: dsl.EachLike(map[string]interface{}{
 							"uId":            dsl.String("7000-0000-5555"),
 							"type":           dsl.String("LPA"),
+							"onlineLpaId":    dsl.String("A987654321"),
 							"status":         dsl.String("Return - unpaid"),
 							"deletedAt":      dsl.String("02/12/2022"),
 							"deletionReason": dsl.String("LPA was not paid for after 12 months"),
@@ -49,11 +50,12 @@ func TestDeletedCases(t *testing.T) {
 			},
 			expectedResponse: []DeletedCase{
 				{
-					UID:       "7000-0000-5555",
-					Type:      "LPA",
-					Status:    "Return - unpaid",
-					DeletedAt: DateString("2022-12-02"),
-					Reason:    "LPA was not paid for after 12 months",
+					UID:         "7000-0000-5555",
+					Type:        "LPA",
+					OnlineLpaId: "A987654321",
+					Status:      "Return - unpaid",
+					DeletedAt:   DateString("2022-12-02"),
+					Reason:      "LPA was not paid for after 12 months",
 				},
 			},
 		},

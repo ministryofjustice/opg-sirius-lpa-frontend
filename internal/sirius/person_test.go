@@ -23,6 +23,37 @@ func TestPerson(t *testing.T) {
 		expectedError    func(int) error
 	}{
 		{
+			name: "OK without children",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A donor exists").
+					UponReceiving("A request for the person").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String("/lpa-api/v1/persons/188"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.Like(map[string]interface{}{
+							"id":        dsl.Like(188),
+							"uId":       dsl.Term("7000-0000-0007", `7\d{3}-\d{4}-\d{4}`),
+							"firstname": dsl.String("John"),
+							"surname":   dsl.String("Doe"),
+							"dob":       dsl.Term("05/05/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
+						}),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: Person{
+				ID:          188,
+				UID:         "7000-0000-0007",
+				Firstname:   "John",
+				Surname:     "Doe",
+				DateOfBirth: DateString("1970-05-05"),
+			},
+		},
+		{
 			name: "OK with children",
 			setup: func() {
 				pact.
@@ -78,7 +109,7 @@ func TestPerson(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				caseitem, err := client.Person(Context{Context: context.Background()}, 189)
+				caseitem, err := client.Person(Context{Context: context.Background()}, tc.expectedResponse.ID)
 
 				assert.Equal(t, tc.expectedResponse, caseitem)
 				if tc.expectedError == nil {
