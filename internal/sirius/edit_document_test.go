@@ -35,7 +35,7 @@ func TestEditDocument(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: dsl.Like(map[string]interface{}{
-							"content": dsl.String("Edited test content"),
+							"content": dsl.String("<p>Edited test content</p>"),
 						}),
 					}).
 					WillRespondWith(dsl.Response{
@@ -52,7 +52,7 @@ func TestEditDocument(t *testing.T) {
 							"mimeType":            dsl.String(`application\/pdf`),
 							"childCount":          dsl.Like(0),
 							"systemType":          dsl.String("LP-A"),
-							"content":             dsl.String("Edited test content"),
+							"content":             dsl.String("<p>Edited test content</p>"),
 						}),
 					})
 			},
@@ -66,7 +66,7 @@ func TestEditDocument(t *testing.T) {
 				MimeType:            `application\/pdf`,
 				SystemType:          "LP-A",
 				FileName:            "LP-A.pdf",
-				Content:             "Edited test content",
+				Content:             "<p>Edited test content</p>",
 				ChildCount:          0,
 			},
 		},
@@ -79,7 +79,7 @@ func TestEditDocument(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				document, err := client.EditDocument(Context{Context: context.Background()}, "dfef6714-b4fe-44c2-b26e-90dfe3663e95", "Edited test content")
+				document, err := client.EditDocument(Context{Context: context.Background()}, "dfef6714-b4fe-44c2-b26e-90dfe3663e95", "<p>Edited test content</p>")
 
 				assert.Equal(t, tc.expectedResponse, document)
 				if tc.expectedError == nil {

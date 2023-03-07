@@ -92,6 +92,12 @@ func TestEditFeeReduction(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: map[string]interface{}{
+							"id":     124,
+							"amount": 4100,
+							"case": map[string]interface{}{
+								"id":     802,
+								"status": "",
+							},
 							"paymentEvidence":  dsl.String("Edited test evidence"),
 							"feeReductionType": dsl.String("REMISSION"),
 							"paymentDate":      dsl.Term("28/04/2022", `^\d{1,2}/\d{1,2}/\d{4}$`),
@@ -116,9 +122,12 @@ func TestEditFeeReduction(t *testing.T) {
 				err := client.EditPayment(Context{Context: context.Background()},
 					124,
 					Payment{
+						ID:               124,
+						Amount:           4100,
+						Case:             &Case{ID: 802, Status: ""},
 						PaymentEvidence:  "Edited test evidence",
 						FeeReductionType: "REMISSION",
-						PaymentDate:      DateString("2022-04-27"),
+						PaymentDate:      DateString("2022-04-28"),
 						Source:           FeeReductionSource,
 					},
 				)
