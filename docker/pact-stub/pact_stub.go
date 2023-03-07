@@ -190,10 +190,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var bodyData map[string]interface{}
 	bodyBytes, err := ioutil.ReadAll(r.Body)
-	r.Body.Close()
 	if err != nil {
 		log.Println(err)
 	}
+
+	defer r.Body.Close() //#nosec G307 false positive
 
 	if len(bodyBytes) > 0 {
 		if err := json.Unmarshal(bodyBytes, &bodyData); err != nil {
