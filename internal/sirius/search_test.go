@@ -30,7 +30,7 @@ func TestSearch(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A donor exists").
+					Given("A donor exists to be referenced by name").
 					UponReceiving("A search request for a donor not related to a case").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,

@@ -34,10 +34,8 @@ func TestNoteTypes(t *testing.T) {
 						Path:   dsl.String("/lpa-api/v1/note-types/lpa"),
 					}).
 					WillRespondWith(dsl.Response{
-						Status: http.StatusOK,
-						Body: dsl.Like([]string{
-							"Application processing",
-						}),
+						Status:  http.StatusOK,
+						Body:    dsl.EachLike(dsl.String("Application processing"), 1),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},

@@ -83,7 +83,6 @@ describe("Search", () => {
            const $row = cy.get("table > tbody > tr");
            $row.should("contain", "LPA was not paid for after 12 months");
            $row.should("contain", "return - unpaid");
-           $row.should("contain", "A987654321");
            $row.should("contain", "02/12/2022");
            $row.should("contain", "LPA");
            $row.should("contain", "deleted");

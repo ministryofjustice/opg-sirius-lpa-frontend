@@ -21,9 +21,17 @@ func TestCreateTask(t *testing.T) {
 		setup         func()
 		expectedError func(int) error
 		file          *NoteFile
+		task          TaskRequest
 	}{
 		{
-			name: "OK",
+			name: "OK for user",
+			task: TaskRequest{
+				AssigneeID:  47,
+				Type:        "Check Application",
+				Name:        "Something",
+				Description: "More words",
+				DueDate:     "2035-03-04",
+			},
 			setup: func() {
 				pact.
 					AddInteraction().
@@ -49,47 +57,15 @@ func TestCreateTask(t *testing.T) {
 					})
 			},
 		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.setup()
-
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
-
-				err := client.CreateTask(Context{Context: context.Background()}, 800, TaskRequest{
-					AssigneeID:  47,
-					Type:        "Check Application",
-					Name:        "Something",
-					Description: "More words",
-					DueDate:     "2035-03-04",
-				})
-				if (tc.expectedError) == nil {
-					assert.Nil(t, err)
-				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
-				}
-				return nil
-			}))
-		})
-	}
-}
-
-func TestCreateTaskForTeam(t *testing.T) {
-	t.Parallel()
-
-	pact := newPact()
-	defer pact.Teardown()
-
-	testCases := []struct {
-		name          string
-		setup         func()
-		expectedError func(int) error
-		file          *NoteFile
-	}{
 		{
 			name: "OK for team",
+			task: TaskRequest{
+				AssigneeID:  123,
+				Type:        "Check Application",
+				Name:        "A title",
+				Description: "A description",
+				DueDate:     "2035-03-04",
+			},
 			setup: func() {
 				pact.
 					AddInteraction().
@@ -124,13 +100,7 @@ func TestCreateTaskForTeam(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.CreateTask(Context{Context: context.Background()}, 800, TaskRequest{
-					AssigneeID:  123,
-					Type:        "Check Application",
-					Name:        "A title",
-					Description: "A description",
-					DueDate:     "2035-03-04",
-				})
+				err := client.CreateTask(Context{Context: context.Background()}, 800, tc.task)
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {
