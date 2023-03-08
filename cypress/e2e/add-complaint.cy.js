@@ -9,6 +9,7 @@ describe("Add a complaint", () => {
     cy.get(".moj-banner").should("not.exist");
     cy.contains(".govuk-radios__label", "Major").click();
     cy.get("#f-investigatingOfficer").type("Test Officer");
+    cy.get("#f-complainantName").type("Someones name");
     cy.get("#f-summary").type("A title");
     cy.get("#f-description").type("A description");
     cy.get("#f-receivedDate").type("2022-04-05");

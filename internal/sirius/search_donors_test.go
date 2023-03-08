@@ -32,12 +32,12 @@ func TestSearchDonors(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
 						Path:   dsl.String("/lpa-api/v1/search/persons"),
-						Body: dsl.Like(map[string]interface{}{
-							"term":        "7000-9999-0001",
+						Body: map[string]interface{}{
+							"term":        "7000-0000-0003",
 							"personTypes": []string{"Donor"},
 							"size":        PageLimit,
 							"from":        0,
-						}),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status:  http.StatusOK,
@@ -98,7 +98,7 @@ func TestSearchDonors(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				donors, err := client.SearchDonors(Context{Context: context.Background()}, "7000-9999-0001")
+				donors, err := client.SearchDonors(Context{Context: context.Background()}, "7000-0000-0003")
 				assert.Equal(t, tc.expectedResponse, donors)
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
