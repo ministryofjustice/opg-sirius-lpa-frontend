@@ -122,6 +122,7 @@ jobs:
           name: pacts
           path: |
             ./pacts/sirius-lpa-frontend-sirius.json
+            ./pacts/ignored-ignored.json
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -162,6 +163,12 @@ jobs:
         run: |
           make lighthouse
 
+      - name: Retrieve pact
+        run: |
+          docker container create --name temp -v pacts_data:/root hello-world
+          docker cp ./pacts/ignored-ignored.json temp:/root/ignored-ignored.json
+          docker cp ./pacts/sirius-lpa-frontend-sirius.json temp:/root/sirius-lpa-frontend-sirius.json
+
   cypress:
     name: Cypress
     runs-on: ubuntu-latest
@@ -180,6 +187,12 @@ jobs:
         with:
           name: pacts
           path: ./pacts
+
+      - name: Retrieve pact
+        run: |
+          docker container create --name temp -v pacts_data:/root hello-world
+          docker cp ./pacts/ignored-ignored.json temp:/root/ignored-ignored.json
+          docker cp ./pacts/sirius-lpa-frontend-sirius.json temp:/root/sirius-lpa-frontend-sirius.json
 
       - name: Restore images
         run: |
