@@ -21,6 +21,17 @@ func newPact() *dsl.Pact {
 	}
 }
 
+func newIgnoredPact() *dsl.Pact {
+	return &dsl.Pact{
+		Consumer:          "ignored",
+		Provider:          "ignored",
+		Host:              "localhost",
+		PactFileWriteMode: "merge",
+		LogDir:            "../../logs",
+		PactDir:           "../../pacts",
+	}
+}
+
 func TestStatusError(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "/some/url", nil)
 
@@ -76,15 +87,4 @@ func TestToFieldErrorsThrowsError(t *testing.T) {
 
 	assert.Equal(t, err, errors.New("could not parse field validation_errors"))
 	assert.Nil(t, result)
-}
-
-func newIgnoredPact() *dsl.Pact {
-	return &dsl.Pact{
-		Consumer:          "ignored",
-		Provider:          "ignored",
-		Host:              "localhost",
-		PactFileWriteMode: "merge",
-		LogDir:            "../../logs",
-		PactDir:           "../../pacts",
-	}
 }
