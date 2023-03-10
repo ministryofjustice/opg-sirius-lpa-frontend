@@ -37,14 +37,14 @@ func TestTeams(t *testing.T) {
 						Status:  http.StatusOK,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 						Body: dsl.EachLike(map[string]interface{}{
-							"id":          dsl.Like(123),
+							"id":          dsl.Like(23),
 							"displayName": dsl.Like("Cool Team"),
 						}, 1),
 					})
 			},
 			expectedResponse: []Team{
 				{
-					ID:          123,
+					ID:          23,
 					DisplayName: "Cool Team",
 				},
 			},
