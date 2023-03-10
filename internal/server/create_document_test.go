@@ -87,7 +87,8 @@ func TestGetCreateDocument(t *testing.T) {
 					Case:                    caseItem,
 					DocumentTemplateRefData: documentTemplates,
 					DocumentTemplates:       documentTemplateData,
-					Back:                    "/create-document?id=0&case=" + caseType,
+					ComponentDocumentData: buildComponentDocumentData(documentTemplateData, documentTemplates),
+					Back:                  "/create-document?id=0&case=" + caseType,
 				}).
 				Return(nil)
 
@@ -360,6 +361,7 @@ func TestGetCreateDocumentWhenTemplateErrors(t *testing.T) {
 			Case:                    caseItem,
 			DocumentTemplateRefData: documentTemplates,
 			DocumentTemplates:       documentTemplateData,
+			ComponentDocumentData:   buildComponentDocumentData(documentTemplateData, documentTemplates),
 			Back:                    "/create-document?id=0&case=lpa",
 		}).
 		Return(expectedError)

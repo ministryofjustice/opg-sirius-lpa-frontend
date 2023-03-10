@@ -5,14 +5,11 @@ describe("Create a document", () => {
         cy.contains("Select a document template");
         cy.get("#f-templateId").type("DD");
         cy.get(".autocomplete__menu").contains("DD: Donor deceased: Blank template").click();
-        cy.contains("button", "Continue").click();
 
         cy.contains("Select document inserts");
-        cy.contains("DD1: DD1 - Case complete");
-        cy.get("#f-DD1-all").click();
+        cy.contains("DD1: DD1 - Case complete").click();
         cy.contains("button", "Continue").click();
     });
-
 
     it("creates a document on the case by selecting a recipient", () => {
         cy.contains("Select a recipient");
