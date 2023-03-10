@@ -13,12 +13,10 @@ import selectTab from "./select-tab";
 import handleInsertCheckboxes from "./handle-insert-checkboxes";
 import autoClick from "./auto-click";
 import handleCreateDocumentButton from "./handle-create-document-button";
+import insertSelector from "./insert-selector";
 
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
-
-// we aren't using the JS tabs, but they try to initialise this will stop them breaking
-GOVUKFrontend.Tabs.prototype.setup = () => {};
 
 const prefix = document.body.getAttribute("data-prefix");
 
@@ -36,6 +34,7 @@ selectTab();
 handleInsertCheckboxes();
 autoClick();
 handleCreateDocumentButton();
+insertSelector();
 
 if (window.self !== window.parent) {
   const success = document.querySelector('[data-app-reload~="page"]');
