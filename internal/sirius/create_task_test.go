@@ -60,7 +60,7 @@ func TestCreateTask(t *testing.T) {
 		{
 			name: "OK for team",
 			task: TaskRequest{
-				AssigneeID:  123,
+				AssigneeID:  23,
 				Type:        "Check Application",
 				Name:        "A title",
 				Description: "A description",
@@ -78,7 +78,7 @@ func TestCreateTask(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"assigneeId":  123,
+							"assigneeId":  23,
 							"type":        "Check Application",
 							"name":        "A title",
 							"description": "A description",
