@@ -35,16 +35,16 @@ func TestAddComplaint(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: dsl.Like(map[string]interface{}{
-							"category":             "01",
-							"description":          "This is seriously bad",
+							"category":             "02",
+							"description":          "A description",
 							"receivedDate":         "05/04/2022",
 							"severity":             "Major",
 							"investigatingOfficer": "Test Officer",
 							"complainantName":      "Someones name",
-							"subCategory":          "07",
+							"subCategory":          "18",
 							"complainantCategory":  "LPA_DONOR",
 							"origin":               "PHONE",
-							"summary":              "This and that",
+							"summary":              "A title",
 						}),
 					}).
 					WillRespondWith(dsl.Response{
@@ -64,16 +64,16 @@ func TestAddComplaint(t *testing.T) {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
 				err := client.AddComplaint(Context{Context: context.Background()}, 800, CaseTypeLpa, Complaint{
-					Category:             "01",
-					Description:          "This is seriously bad",
+					Category:             "02",
+					Description:          "A description",
 					ReceivedDate:         DateString("2022-04-05"),
 					Severity:             "Major",
 					InvestigatingOfficer: "Test Officer",
 					ComplainantName:      "Someones name",
-					SubCategory:          "07",
+					SubCategory:          "18",
 					ComplainantCategory:  "LPA_DONOR",
 					Origin:               "PHONE",
-					Summary:              "This and that",
+					Summary:              "A title",
 				})
 
 				if tc.expectedError == nil {

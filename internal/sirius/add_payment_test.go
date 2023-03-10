@@ -35,7 +35,7 @@ func TestAddPayment(t *testing.T) {
 						},
 						Body: map[string]interface{}{
 							"amount":      4100,
-							"source":      "MAKE",
+							"source":      "PHONE",
 							"paymentDate": "25/04/2022",
 						},
 					}).
@@ -54,7 +54,7 @@ func TestAddPayment(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.AddPayment(Context{Context: context.Background()}, 800, 4100, "MAKE", DateString("2022-04-25"))
+				err := client.AddPayment(Context{Context: context.Background()}, 800, 4100, "PHONE", DateString("2022-04-25"))
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
