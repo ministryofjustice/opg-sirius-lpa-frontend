@@ -1,6 +1,6 @@
 describe("Create donor", () => {
   beforeEach(() => {
-    cy.visit("/edit-donor?id=189");
+    cy.visit("/edit-donor?id=188");
   });
 
   it("edits a donor", () => {
@@ -9,12 +9,12 @@ describe("Create donor", () => {
 
     cy.get("#f-firstname").should("have.value", "John");
     cy.get("#f-surname").should("have.value", "Doe");
-    cy.get("#f-dob").should("have.value", "1970-01-01");
+    cy.get("#f-dob").should("have.value", "1970-05-05");
 
     cy.get("#f-salutation").type("Dr");
-    cy.get("#f-firstname").type("Will");
-    cy.get("#f-middlenames").type("Oswald");
-    cy.get("#f-surname").type("Niesborella");
+    cy.get("#f-firstname").clear().type("Will");
+    cy.get("#f-middlenames").clear().type("Oswald");
+    cy.get("#f-surname").clear().type("Niesborella");
     cy.get("#f-dob").type("1995-07-01");
     cy.get("#f-previousNames").type("Will Macphail");
     cy.get("#f-otherNames").type("Bill");
