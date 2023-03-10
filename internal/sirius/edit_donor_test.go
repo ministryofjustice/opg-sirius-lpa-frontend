@@ -25,6 +25,8 @@ func TestEditDonor(t *testing.T) {
 		{
 			name: "OK",
 			personData: Person{
+				ID:                    188,
+				UID:                   "7000-0000-0007",
 				Salutation:            "Dr",
 				Firstname:             "Will",
 				Middlenames:           "Oswald",
@@ -55,11 +57,13 @@ func TestEditDonor(t *testing.T) {
 					UponReceiving("A request to edit a donor").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/donors/189"),
+						Path:   dsl.String("/lpa-api/v1/donors/188"),
 						Headers: dsl.MapMatcher{
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: map[string]interface{}{
+							"id":                    188,
+							"uId":                   "7000-0000-0007",
 							"salutation":            "Dr",
 							"firstname":             "Will",
 							"middlenames":           "Oswald",
@@ -102,7 +106,7 @@ func TestEditDonor(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.EditDonor(Context{Context: context.Background()}, 189, tc.personData)
+				err := client.EditDonor(Context{Context: context.Background()}, 188, tc.personData)
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {

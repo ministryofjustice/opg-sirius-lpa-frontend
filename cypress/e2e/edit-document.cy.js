@@ -12,7 +12,6 @@ describe("Edit a document", () => {
         cy.contains("button", "Save and exit");
     });
 
-
     it("can select a draft to edit", () => {
         cy.contains("1: 15/12/2022 13:41:04: Consuela Aysien: LP-A");
         cy.get("#f-document").select("1: 15/12/2022 13:41:04: Consuela Aysien: LP-A");
@@ -23,7 +22,13 @@ describe("Edit a document", () => {
     it("saves a draft document", () => {
         cy.get("#documentTextEditor").contains("Test content");
         // can only edit the iframe
-        cy.get("#documentTextEditor_ifr").type("Edited test content");
+        const $iframe = cy
+            .get("iframe[id=documentTextEditor_ifr]")
+            .its('0.contentDocument.body')
+            .should('not.be.empty')
+            .then(cy.wrap);
+
+        $iframe.clear().type("Edited test content");
 
         cy.contains("button", "Save draft").click();
         cy.get("#documentTextEditor").contains("Edited test content");

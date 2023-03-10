@@ -33,7 +33,7 @@ func TestEditCase(t *testing.T) {
 						Method: http.MethodPut,
 						Path:   dsl.String("/lpa-api/v1/lpas/800"),
 						Body: map[string]interface{}{
-							"status": "Suspended",
+							"status": "Perfect",
 						},
 					}).
 					WillRespondWith(dsl.Response{
@@ -54,7 +54,7 @@ func TestEditCase(t *testing.T) {
 						Method: http.MethodPut,
 						Path:   dsl.String("/lpa-api/v1/epas/800"),
 						Body: map[string]interface{}{
-							"status": "Suspended",
+							"status": "Perfect",
 						},
 					}).
 					WillRespondWith(dsl.Response{
@@ -73,7 +73,7 @@ func TestEditCase(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.EditCase(Context{Context: context.Background()}, 800, tc.caseType, Case{Status: "Suspended"})
+				err := client.EditCase(Context{Context: context.Background()}, 800, tc.caseType, Case{Status: "Perfect"})
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
