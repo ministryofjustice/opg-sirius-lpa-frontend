@@ -69,7 +69,7 @@ func TestCreateTask(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("LPA team with members exists").
+					Given("An LPA and a team exists").
 					UponReceiving("A request to create a task for a team").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
