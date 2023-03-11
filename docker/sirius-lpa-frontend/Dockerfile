@@ -1,4 +1,4 @@
-FROM node:19.6.1-alpine3.17 as asset-env
+FROM node:19.7.0-alpine3.17 as asset-env
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ RUN yarn
 COPY web/assets web/assets
 RUN yarn build
 
-FROM golang:1.20.1 as build-env
+FROM golang:1.20.2 as build-env
 
 WORKDIR /app
 
