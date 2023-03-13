@@ -1,11 +1,13 @@
 package server
 
 import (
+	"net/http"
+	"sort"
+	"strconv"
+
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
-	"net/http"
-	"strconv"
 )
 
 type EditDocumentClient interface {
@@ -66,6 +68,11 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				if err != nil {
 					return err
 				}
+
+				sort.Slice(documents, func(i, j int) bool {
+					return documents[i].ID > documents[j].ID
+				})
+
 				data.Documents = documents
 				return nil
 			})
@@ -174,6 +181,10 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					if err != nil {
 						return err
 					}
+
+					sort.Slice(documents, func(i, j int) bool {
+						return documents[i].ID > documents[j].ID
+					})
 
 					data.Documents = documents
 					return nil

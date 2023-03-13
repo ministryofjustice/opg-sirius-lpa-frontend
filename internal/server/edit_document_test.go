@@ -156,20 +156,20 @@ func TestPostDeleteDocument(t *testing.T) {
 	caseItem := sirius.Case{CaseType: "lpa", UID: "700700"}
 
 	document := sirius.Document{
-		ID:      1,
+		ID:      3,
 		UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
 		Type:    sirius.TypeDraft,
 		Content: "Test content",
 	}
 
 	documents := []sirius.Document{
-		document,
 		{
 			ID:      2,
 			UUID:    "efef6714-b4fe-44c2-b26e-90dfe3663e96",
 			Type:    sirius.TypeDraft,
 			Content: "Some more content",
 		},
+		document,
 	}
 
 	client := &mockEditDocumentClient{}
@@ -495,12 +495,17 @@ func TestGetEditDocumentWhenTemplateErrors(t *testing.T) {
 	caseItem := sirius.Case{CaseType: "lpa", UID: "7000"}
 
 	document := sirius.Document{
-		ID:   1,
+		ID:   2,
 		UUID: "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
 		Type: sirius.TypeDraft,
 	}
 
 	documents := []sirius.Document{
+		sirius.Document{
+			ID:   1,
+			UUID: "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+			Type: sirius.TypeDraft,
+		},
 		document,
 	}
 

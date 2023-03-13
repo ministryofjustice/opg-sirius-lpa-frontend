@@ -1,9 +1,9 @@
-const handleInsertCheckboxes = () => {
+const handleInsertCheckboxes = (config = {}) => {
   /*Insert checkboxes may appear twice and therefore js is needed to make sure
     that a check in one tab is displayed in the other*/
 
-  /** @type NodeList|null checkboxes */
-  const checkboxes = document.querySelectorAll(
+  /** @type {NodeListOf<HTMLInputElement>|null} checkboxes */
+  const checkboxes = (config.scope || document).querySelectorAll(
     '[data-module="insert-checkbox"]'
   );
 
