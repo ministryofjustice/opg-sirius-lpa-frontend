@@ -37,6 +37,7 @@ type createDocumentData struct {
 	SelectedInserts            []string
 	Recipients                 []sirius.Person
 	DocumentInsertKeys         []string
+	ComponentDocumentData      ComponentDocumentData
 	HasSelectedAddNewRecipient bool
 	Back                       string
 }
@@ -45,6 +46,21 @@ type InsertDisplayData struct {
 	Handle string
 	Label  string
 	Key    string
+}
+
+type ComponentTemplateInsertData struct {
+	InsertId        string `json:"id"`
+	OnScreenSummary string `json:"onScreenSummary"`
+}
+
+type ComponentTemplateData struct {
+	Id      string                                   `json:"id"`
+	Inserts map[string][]ComponentTemplateInsertData `json:"inserts"`
+}
+
+type ComponentDocumentData struct {
+	Templates    []ComponentTemplateData `json:"templates"`
+	Translations map[string]string       `json:"translations"`
 }
 
 func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler {
@@ -125,6 +141,8 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 			if data.TemplateSelected.TemplateId != "" {
 				data.DocumentInsertTypes = translateInsertData(data.TemplateSelected.Inserts, data.DocumentTemplateRefData)
 				data.DocumentInsertKeys = getSortedInsertKeys(data.TemplateSelected.Inserts)
+			} else {
+				data.ComponentDocumentData = buildComponentDocumentData(data.DocumentTemplates, data.DocumentTemplateRefData)
 			}
 
 			hasViewedInsertPage := r.FormValue("hasViewedInserts")
@@ -381,4 +399,34 @@ func getBackUrl(data createDocumentData) string {
 		}
 	}
 	return url
+}
+
+func buildComponentDocumentData(templates []sirius.DocumentTemplateData, inserts []sirius.RefDataItem) ComponentDocumentData {
+	data := ComponentDocumentData{
+		Translations: map[string]string{},
+	}
+
+	for _, template := range templates {
+		formed := ComponentTemplateData{
+			Id:      template.TemplateId,
+			Inserts: map[string][]ComponentTemplateInsertData{},
+		}
+
+		for _, insert := range template.Inserts {
+			formedInsert := ComponentTemplateInsertData{
+				InsertId:        insert.InsertId,
+				OnScreenSummary: insert.OnScreenSummary,
+			}
+
+			formed.Inserts[insert.Key] = append(formed.Inserts[insert.Key], formedInsert)
+		}
+
+		data.Templates = append(data.Templates, formed)
+	}
+
+	for _, insert := range inserts {
+		data.Translations[insert.Handle] = insert.Label
+	}
+
+	return data
 }
