@@ -2,6 +2,7 @@ package sirius
 
 import (
 	"fmt"
+	"sort"
 )
 
 type Document struct {
@@ -35,6 +36,10 @@ func (c *Client) Documents(ctx Context, caseType CaseType, caseId int, docType s
 	if err != nil {
 		return nil, err
 	}
+
+	sort.Slice(d, func(i, j int) bool {
+		return d[i].ID > d[j].ID
+	})
 
 	return d, err
 }
