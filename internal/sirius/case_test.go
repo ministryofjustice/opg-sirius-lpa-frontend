@@ -187,3 +187,16 @@ func TestCaseWithFeeReduction(t *testing.T) {
 		})
 	}
 }
+
+func TestCaseFiltersInactiveActors(t *testing.T) {
+	actor1 := Person{ID: 1, SystemStatus: true}
+	actor2 := Person{ID: 2, SystemStatus: true}
+	inactiveActor1 := Person{ID: 3, SystemStatus: false}
+	inactiveActor2 := Person{ID: 4, SystemStatus: false}
+
+	caseItem := Case{ID: 1, Attorneys: []Person{actor1, inactiveActor1}, TrustCorporations: []Person{actor2, inactiveActor2}}
+	filteredCase := caseItem.FilterInactiveAttorneys()
+
+	assert.Equal(t, []Person{actor1}, filteredCase.Attorneys)
+	assert.Equal(t, []Person{actor2}, filteredCase.TrustCorporations)
+}
