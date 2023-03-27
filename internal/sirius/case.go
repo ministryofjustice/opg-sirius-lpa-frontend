@@ -34,3 +34,24 @@ func (c *Client) Case(ctx Context, id int) (Case, error) {
 
 	return v, err
 }
+
+func (c Case) FilterInactiveAttorneys() Case {
+	var activeAttorneys []Person
+	var activeTrustCorps []Person
+
+	for _, attorney := range c.Attorneys {
+		if attorney.SystemStatus {
+			activeAttorneys = append(activeAttorneys, attorney)
+		}
+	}
+
+	for _, trustCorp := range c.TrustCorporations {
+		if trustCorp.SystemStatus {
+			activeTrustCorps = append(activeTrustCorps, trustCorp)
+		}
+	}
+
+	c.Attorneys = activeAttorneys
+	c.TrustCorporations = activeTrustCorps
+	return c
+}

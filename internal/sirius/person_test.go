@@ -122,16 +122,3 @@ func TestPerson(t *testing.T) {
 		})
 	}
 }
-
-func TestPersonFiltersInactiveActors(t *testing.T) {
-	actor1 := Person{ID: 1, SystemStatus: true}
-	actor2 := Person{ID: 2, SystemStatus: true}
-	inactiveActor1 := Person{ID: 3, SystemStatus: false}
-	inactiveActor2 := Person{ID: 4, SystemStatus: false}
-	persons := []Person{actor1, actor2, inactiveActor1, inactiveActor2}
-	activeActors := FilterInactiveAttorneys(persons)
-
-	assert.Equal(t, 2, len(activeActors))
-	assert.NotContains(t, activeActors, inactiveActor1)
-	assert.NotContains(t, activeActors, inactiveActor2)
-}

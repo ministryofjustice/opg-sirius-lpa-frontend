@@ -87,8 +87,8 @@ func TestGetCreateDocument(t *testing.T) {
 					Case:                    caseItem,
 					DocumentTemplateRefData: documentTemplates,
 					DocumentTemplates:       documentTemplateData,
-					ComponentDocumentData: buildComponentDocumentData(documentTemplateData, documentTemplates),
-					Back:                  "/create-document?id=0&case=" + caseType,
+					ComponentDocumentData:   buildComponentDocumentData(documentTemplateData, documentTemplates),
+					Back:                    "/create-document?id=0&case=" + caseType,
 				}).
 				Return(nil)
 
@@ -179,9 +179,6 @@ func TestPostCreateDocumentGenerateNewRecipient(t *testing.T) {
 			client.
 				On("CreateContact", mock.Anything, contact).
 				Return(contact, nil)
-			client.
-				On("Person", mock.Anything, 1).
-				Return(donor, nil)
 
 			template := &mockTemplate{}
 			template.
@@ -375,48 +372,6 @@ func TestGetCreateDocumentWhenTemplateErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestGetCreateDocumentWhenPersonErrors(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "lpa", UID: "7000", Donor: &sirius.Person{ID: 1}}
-
-	documentTemplates := []sirius.RefDataItem{
-		{
-			Handle: "DD",
-			Label:  "Donor deceased: Blank template",
-		},
-	}
-
-	documentTemplateData := []sirius.DocumentTemplateData{
-		{
-			Inserts:         nil,
-			TemplateId:      "DD",
-			Location:        `lpa\/DD.html.twig`,
-			OnScreenSummary: "DDONSCREENSUMMARY",
-		},
-	}
-
-	client := &mockCreateDocumentClient{}
-	client.
-		On("Case", mock.Anything, 123).
-		Return(caseItem, nil)
-	client.
-		On("RefDataByCategory", mock.Anything, sirius.DocumentTemplateIdCategory).
-		Return(documentTemplates, nil)
-	client.
-		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
-		Return(documentTemplateData, nil)
-	client.
-		On("Person", mock.Anything, 1).
-		Return(sirius.Person{}, expectedError)
-
-	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa&hasViewedInserts=true", nil)
-	w := httptest.NewRecorder()
-
-	err := CreateDocument(client, nil)(w, r)
-
-	assert.Equal(t, expectedError, err)
-	mock.AssertExpectationsForObjects(t, client)
-}
-
 func TestTranslateDocumentData(t *testing.T) {
 	documentTemplateRefData := []sirius.RefDataItem{
 		{
@@ -470,21 +425,9 @@ func TestGetRecipientsFiltersInactiveActors(t *testing.T) {
 	inactiveAttorney := sirius.Person{ID: 4, SystemStatus: false}
 	caseItem := sirius.Case{Donor: &donor, TrustCorporations: []sirius.Person{trustCorp}, Attorneys: []sirius.Person{activeAttorney, inactiveAttorney}}
 
-	r, _ := http.NewRequest("GET", "/", nil)
-	ctx := getContext(r)
-	client := &mockCreateDocumentClient{}
-	client.
-		On("Person", mock.Anything, 1).
-		Return(donor, nil).
-		On("Person", mock.Anything, 2).
-		Return(trustCorp, nil).
-		On("Person", mock.Anything, 3).
-		Return(activeAttorney, nil).
-		On("Person", mock.Anything, 4).
-		Return(inactiveAttorney, nil)
-
-	recipients, _ := getRecipients(ctx, client, caseItem)
+	recipients, _ := getRecipients(caseItem)
 	assert.Equal(t, 3, len(recipients))
+	assert.NotContains(t, recipients, inactiveAttorney)
 }
 
 func TestGetRecipientsWithCorrespondent(t *testing.T) {
@@ -493,19 +436,27 @@ func TestGetRecipientsWithCorrespondent(t *testing.T) {
 	correspondent := sirius.Person{ID: 4}
 	caseItem := sirius.Case{Donor: &donor, Attorneys: []sirius.Person{attorney}, Correspondent: &correspondent}
 
-	r, _ := http.NewRequest("GET", "/", nil)
-	ctx := getContext(r)
-	client := &mockCreateDocumentClient{}
-	client.
-		On("Person", mock.Anything, 1).
-		Return(donor, nil).
-		On("Person", mock.Anything, 3).
-		Return(attorney, nil).
-		On("Person", mock.Anything, 4).
-		Return(correspondent, nil)
-
-	recipients, _ := getRecipients(ctx, client, caseItem)
+	recipients, _ := getRecipients(caseItem)
 	assert.Equal(t, 3, len(recipients))
+}
+
+func TestGetRecipientsOrder(t *testing.T) {
+	donor := sirius.Person{ID: 1}
+	attorney1 := sirius.Person{ID: 2, Firstname: "Gemma", Surname: "Taylor", SystemStatus: true}
+	attorney2 := sirius.Person{ID: 3, Firstname: "Amy", Surname: "Taylor", SystemStatus: true}
+	attorney3 := sirius.Person{ID: 4, Firstname: "Claire", Surname: "Smith", SystemStatus: true}
+	correspondent := sirius.Person{ID: 5}
+	trustCorp := sirius.Person{ID: 6, SystemStatus: true}
+	caseItem := sirius.Case{Donor: &donor, Attorneys: []sirius.Person{attorney1, attorney2, attorney3}, Correspondent: &correspondent, TrustCorporations: []sirius.Person{trustCorp}}
+
+	recipients, _ := getRecipients(caseItem)
+	assert.Equal(t, 6, len(recipients))
+	assert.Equal(t, donor, recipients[0])
+	assert.Equal(t, correspondent, recipients[1])
+	assert.Equal(t, attorney3, recipients[2])
+	assert.Equal(t, attorney2, recipients[3])
+	assert.Equal(t, attorney1, recipients[4])
+	assert.Equal(t, trustCorp, recipients[5])
 }
 
 func TestSliceAtoi(t *testing.T) {
