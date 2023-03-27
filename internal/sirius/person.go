@@ -62,13 +62,3 @@ func (c *Client) Person(ctx Context, id int) (Person, error) {
 
 	return v, err
 }
-
-func FilterInactiveAttorneys(actors []Person) []Person {
-	var activeActors []Person
-	for _, actor := range actors {
-		if actor.SystemStatus {
-			activeActors = append(activeActors, actor)
-		}
-	}
-	return activeActors
-}

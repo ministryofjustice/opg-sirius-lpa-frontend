@@ -2,15 +2,13 @@ package server
 
 import (
 	"fmt"
-	"net/http"
-	"sort"
-	"strconv"
-	"sync"
-
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
+	"net/http"
+	"sort"
+	"strconv"
 )
 
 type CreateDocumentClient interface {
@@ -155,7 +153,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 
 			if hasViewedInsertPage == "true" || hasNoInsertsToSelect {
 				data.HasViewedInsertPage = true
-				data.Recipients, err = getRecipients(ctx, client, data.Case)
+				data.Recipients, err = getRecipients(data.Case)
 				if err != nil {
 					return err
 				}
@@ -236,7 +234,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 					data.Success = true
 					data.TemplateSelected.TemplateId = r.FormValue("templateId")
 					data.HasViewedInsertPage = true
-					data.Recipients, err = getRecipients(ctx, client, data.Case)
+					data.Recipients, err = getRecipients(data.Case)
 					if err != nil {
 						return err
 					}
@@ -253,50 +251,27 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 	}
 }
 
-func getRecipients(ctx sirius.Context, client CreateDocumentClient, caseItem sirius.Case) ([]sirius.Person, error) {
-	var recipientIds []int
-	donor := *caseItem.Donor
-	recipientIds = append(recipientIds, donor.ID)
-	recipientIds = append(recipientIds, getPersonIds(sirius.FilterInactiveAttorneys(caseItem.TrustCorporations))...)
-	recipientIds = append(recipientIds, getPersonIds(sirius.FilterInactiveAttorneys(caseItem.Attorneys))...)
-
-	if caseItem.Correspondent != nil {
-		recipientIds = append(recipientIds, caseItem.Correspondent.ID)
-	}
+func getRecipients(caseItem sirius.Case) ([]sirius.Person, error) {
+	caseItem = caseItem.FilterInactiveAttorneys()
 
 	var recipients []sirius.Person
-	group, groupCtx := errgroup.WithContext(ctx.Context)
-	var personsMu sync.Mutex
+	recipients = append(recipients, *caseItem.Donor)
 
-	for _, recipientID := range recipientIds {
-		recipientID := recipientID
-
-		group.Go(func() error {
-			person, err := client.Person(ctx.With(groupCtx), recipientID)
-			if err != nil {
-				return err
-			}
-
-			personsMu.Lock()
-			recipients = append(recipients, person)
-			personsMu.Unlock()
-			return nil
-		})
+	if caseItem.Correspondent != nil {
+		recipients = append(recipients, *caseItem.Correspondent)
 	}
 
-	if err := group.Wait(); err != nil {
-		return nil, err
-	}
+	sort.Slice(caseItem.Attorneys, func(i, j int) bool {
+		if caseItem.Attorneys[i].Surname == caseItem.Attorneys[j].Surname {
+			return caseItem.Attorneys[i].Firstname < caseItem.Attorneys[j].Firstname
+		}
+		return caseItem.Attorneys[i].Surname < caseItem.Attorneys[j].Surname
+	})
+
+	recipients = append(recipients, caseItem.Attorneys...)
+	recipients = append(recipients, caseItem.TrustCorporations...)
 
 	return recipients, nil
-}
-
-func getPersonIds(persons []sirius.Person) []int {
-	var personIds []int
-	for _, person := range persons {
-		personIds = append(personIds, person.ID)
-	}
-	return personIds
 }
 
 func translateDocumentData(documentTemplateData []sirius.DocumentTemplateData, documentTemplateRefData []sirius.RefDataItem) []sirius.RefDataItem {
