@@ -226,6 +226,44 @@ func TestPostCreateDocumentGenerateNewRecipient(t *testing.T) {
 	}
 }
 
+func TestPostCreateDocumentPrioritiseInvalidInserts(t *testing.T) {
+	for _, caseType := range []string{"lpa", "epa"} {
+		t.Run(caseType, func(t *testing.T) {
+			caseItem := sirius.Case{CaseType: caseType, UID: "7000"}
+
+			client := &mockCreateDocumentClient{}
+			client.
+				On("Case", mock.Anything, 123).
+				Return(caseItem, nil)
+			client.
+				On("CreateDocument", mock.Anything, 123, 1, "DD", []string{"IN-5", "IN-8", "IM-1", "P-35", "P-17", "IM-3"}).
+				Return(sirius.Document{}, nil)
+
+			template := &mockTemplate{}
+
+			form := url.Values{
+				"id":                {"123"},
+				"case":              {caseType},
+				"templateId":        {"DD"},
+				"selectRecipients":  {"1"},
+				"recipientControls": {"selectRecipients"},
+				"insert":            {"IM-1", "P-35", "IN-5", "IN-8", "P-17", "IM-3"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := CreateDocument(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Equal(t, RedirectError("/edit-document?id=123&case="+caseType), err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
 func TestGetCreateDocumentBadQuery(t *testing.T) {
 	testCases := map[string]string{
 		"no-id":    "/?case=lpa",
