@@ -58,9 +58,7 @@
                                             <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" $r.ID $case.ID) }}">{{ $case.UID }}</a><br>
                                         {{ else if eq (ToLower $r.PersonType) "client" }}
                                             <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/supervision#/clients/%d?order=%d" $r.ID $case.ID) }}">{{ $case.UID }}</a><br>
-                                        {{ else if eq (ToLower $r.PersonType) "deputy" }}
-                                            <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/supervision#/deputy-hub/%d" $r.ID) }}">{{ $case.UID }}</a><br>
-                                        {{ else }}
+                                        {{ else if not (eq (ToLower $r.PersonType) "deputy") }}
                                             <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" $case.Donor.ID $case.ID) }}">{{ $case.UID }}</a><br>
                                         {{ end }}
                                     {{ end }}
