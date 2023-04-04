@@ -2,13 +2,15 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+	"sort"
+	"strconv"
+	"strings"
+
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
-	"net/http"
-	"sort"
-	"strconv"
 )
 
 type CreateDocumentClient interface {
@@ -182,6 +184,10 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 				if r.FormValue("skipInserts") == "" {
 					uniqueInserts = removeDuplicateStr(r.Form["insert"])
 				}
+
+				sort.SliceStable(uniqueInserts, func(i, j int) bool {
+					return strings.HasPrefix(uniqueInserts[i], "IN") && !strings.HasPrefix(uniqueInserts[j], "IN")
+				})
 
 				for _, recipientID := range selectedRecipientIDs {
 					document, err := client.CreateDocument(ctx, caseID, recipientID, templateId, uniqueInserts)
