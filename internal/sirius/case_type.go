@@ -1,6 +1,9 @@
 package sirius
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 type CaseType string
 
@@ -10,10 +13,10 @@ const (
 )
 
 func ParseCaseType(s string) (CaseType, error) {
-	switch s {
-	case "lpa", "LPA":
+	switch strings.ToLower(s) {
+	case "lpa":
 		return CaseTypeLpa, nil
-	case "epa", "EPA":
+	case "epa":
 		return CaseTypeEpa, nil
 	}
 
