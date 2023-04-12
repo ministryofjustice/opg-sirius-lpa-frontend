@@ -9,9 +9,6 @@
         "Dependencies",
         "Renovate"
     ],
-    "lockFileMaintenance": {
-        "enabled": true
-    },
     "packageRules": [
         {
             "automerge": true,
