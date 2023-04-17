@@ -18,6 +18,7 @@ type apiUserTeam struct {
 type User struct {
 	ID          int      `json:"id"`
 	DisplayName string   `json:"displayName"`
+	Surname     string   `json:"surname"`
 	Roles       []string `json:"roles"`
 }
 
