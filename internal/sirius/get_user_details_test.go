@@ -36,17 +36,19 @@ func TestGetUserDetails(t *testing.T) {
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
 						Body: dsl.Like(map[string]interface{}{
-							"id":          dsl.Like(104),
-							"displayName": dsl.String("Test User"),
-							"roles":       dsl.Like([]string{"OPG User", "Reduced Fees User"}),
+							"id":             dsl.Like(104),
+							"displayName":    dsl.String("Test User"),
+							"bad_field_1524": dsl.String("Other"),
+							"roles":          dsl.Like([]string{"OPG User", "Reduced Fees User"}),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
 			expectedResponse: User{
-				ID:          104,
-				DisplayName: "Test User",
-				Roles:       []string{"OPG User", "Reduced Fees User"},
+				ID:           104,
+				DisplayName:  "Test User",
+				BadField1524: "Other",
+				Roles:        []string{"OPG User", "Reduced Fees User"},
 			},
 		},
 	}
