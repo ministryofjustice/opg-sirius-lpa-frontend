@@ -34,4 +34,10 @@ body#tinymce {
 .app-\!-html-class--dark  {
   background: #363639;
   color: #ddd;
+
+  &#tinymce {
+    .user-instruction {
+      color: lighten(govuk-colour("light-blue"), 20%);
+    }
+  }
 }
