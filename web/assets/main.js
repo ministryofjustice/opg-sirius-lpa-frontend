@@ -14,6 +14,7 @@ import handleInsertCheckboxes from "./handle-insert-checkboxes";
 import autoClick from "./auto-click";
 import handleCreateDocumentButton from "./handle-create-document-button";
 import insertSelector from "./insert-selector";
+import addressFinder from "./address-finder";
 
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
@@ -35,6 +36,7 @@ handleInsertCheckboxes();
 autoClick();
 handleCreateDocumentButton();
 insertSelector();
+addressFinder(prefix);
 
 if (window.self !== window.parent) {
   const success = document.querySelector('[data-app-reload~="page"]');
