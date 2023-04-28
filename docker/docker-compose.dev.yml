@@ -1,0 +1,6 @@
+version: "3.6"
+
+services:
+  app:
+    volumes:
+      - "../web/static/javascript:/go/bin/web/static/javascript"

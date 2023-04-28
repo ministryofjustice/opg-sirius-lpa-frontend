@@ -18,6 +18,10 @@ build-all:
 up:
 	docker-compose -f docker/docker-compose.ci.yml up -d
 
+dev:
+	docker-compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml up -d
+	yarn && yarn watch
+
 scan:
 	trivy image sirius-lpa-frontend:latest
 
