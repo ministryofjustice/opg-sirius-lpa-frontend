@@ -49,16 +49,13 @@
           {{ template "input-date" (field "dob" "Date of birth" .Donor.DateOfBirth .Error.Field.dob) }}
           {{ template "input" (field "previousNames" "Previously known as" .Donor.PreviouslyKnownAs .Error.Field.previousNames) }}
           {{ template "input" (field "otherNames" "Also known as" .Donor.AlsoKnownAs .Error.Field.otherNames) }}
-
-          <div data-module="app-address-finder" data-app-address-finder-label="What is the donor's address?">
-            {{ template "input" (field "addressLine1" "Address 1" .Donor.AddressLine1 .Error.Field.addressLine1) }}
-            {{ template "input" (field "addressLine2" "Address 2" .Donor.AddressLine2 .Error.Field.addressLine2) }}
-            {{ template "input" (field "addressLine3" "Address 3" .Donor.AddressLine3 .Error.Field.addressLine3) }}
-            {{ template "input" (field "town" "Town" .Donor.Town .Error.Field.town) }}
-            {{ template "input" (field "county" "County" .Donor.County .Error.Field.county) }}
-            {{ template "input" (field "postcode" "Postcode" .Donor.Postcode .Error.Field.postcode) }}
-            {{ template "input" (field "country" "Country" .Donor.Country .Error.Field.country) }}
-          </div>
+          {{ template "input" (field "addressLine1" "Address 1" .Donor.AddressLine1 .Error.Field.addressLine1) }}
+          {{ template "input" (field "addressLine2" "Address 2" .Donor.AddressLine2 .Error.Field.addressLine2) }}
+          {{ template "input" (field "addressLine3" "Address 3" .Donor.AddressLine3 .Error.Field.addressLine3) }}
+          {{ template "input" (field "town" "Town" .Donor.Town .Error.Field.town) }}
+          {{ template "input" (field "county" "County" .Donor.County .Error.Field.county) }}
+          {{ template "input" (field "postcode" "Postcode" .Donor.Postcode .Error.Field.postcode) }}
+          {{ template "input" (field "country" "Country" .Donor.Country .Error.Field.country) }}
 
           <div class="govuk-form-group {{ if .Error.Field.isAirmailRequired }}govuk-form-group--error{{ end }}">
             <fieldset class="govuk-fieldset">
