@@ -101,11 +101,14 @@ func TestCaseNoPayments(t *testing.T) {
 							"uId":      dsl.String("7000-0000-0001"),
 							"caseType": dsl.String("LPA"),
 							"status":   dsl.String("Pending"),
+							"donor": dsl.Like(map[string]interface{}{
+								"id": dsl.Like(189),
+							}),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
-			expectedResponse: Case{UID: "7000-0000-0001", CaseType: "LPA", Status: "Pending"},
+			expectedResponse: Case{UID: "7000-0000-0001", CaseType: "LPA", Status: "Pending", Donor: &Person{ID: 189}},
 		},
 	}
 
@@ -151,7 +154,7 @@ func TestCaseWithFeeReduction(t *testing.T) {
 					UponReceiving("A request for the case").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/cases/802"),
+						Path:   dsl.String("/lpa-api/v1/cases/806"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
@@ -159,11 +162,14 @@ func TestCaseWithFeeReduction(t *testing.T) {
 							"uId":      dsl.String("7000-0000-0002"),
 							"caseType": dsl.String("LPA"),
 							"status":   dsl.String("Pending"),
+							"donor": dsl.Like(map[string]interface{}{
+								"id": dsl.Like(189),
+							}),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},
-			expectedResponse: Case{UID: "7000-0000-0002", CaseType: "LPA", Status: "Pending"},
+			expectedResponse: Case{UID: "7000-0000-0002", CaseType: "LPA", Status: "Pending", Donor: &Person{ID: 189}},
 		},
 	}
 
@@ -174,7 +180,82 @@ func TestCaseWithFeeReduction(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				caseitem, err := client.Case(Context{Context: context.Background()}, 802)
+				caseitem, err := client.Case(Context{Context: context.Background()}, 806)
+
+				assert.Equal(t, tc.expectedResponse, caseitem)
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}
+
+func TestCaseUsesDonorParent(t *testing.T) {
+	pact := newIgnoredPact()
+	defer pact.Teardown()
+
+	testCases := []struct {
+		name             string
+		setup            func()
+		expectedResponse Case
+		expectedError    func(int) error
+	}{
+		{
+			name: "OK",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have a case with a donor who has a linked record").
+					UponReceiving("A request for a case with a linked donor").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String("/lpa-api/v1/cases/807"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.Like(map[string]interface{}{
+							"uId":      dsl.String("7000-0000-0002"),
+							"caseType": dsl.String("LPA"),
+							"status":   dsl.String("Pending"),
+							"donor": dsl.Like(map[string]interface{}{
+								"id":        dsl.Like(112),
+								"firstname": dsl.String("Child"),
+								"surname":   dsl.String("Donor"),
+								"parent": map[string]interface{}{
+									"id":        dsl.Like(113),
+									"firstname": dsl.String("Parent"),
+									"surname":   dsl.String("Donor"),
+								},
+							}),
+						}),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: Case{
+				UID:      "7000-0000-0002",
+				CaseType: "LPA",
+				Status:   "Pending",
+				Donor: &Person{
+					ID:        113,
+					Firstname: "Parent",
+					Surname:   "Donor",
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.Verify(func() error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+
+				caseitem, err := client.Case(Context{Context: context.Background()}, 807)
 
 				assert.Equal(t, tc.expectedResponse, caseitem)
 				if tc.expectedError == nil {

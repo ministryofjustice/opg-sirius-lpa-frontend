@@ -53,4 +53,13 @@ describe("Create a document", () => {
         cy.get(".moj-banner").should("exist");
         cy.get(".moj-banner").contains("New recipient added");
     });
+
+    it("displays parent recipient details only", () => {
+        cy.visit("/create-document?id=807&case=LPA&hasSelectedSubmitTemplate=true&templateId=DD&hasViewedInserts=true&insert=DD1");
+        cy.contains("7000-0000-0002");
+
+        cy.contains("Select a recipient");
+        cy.get("#f-recipient-113").click();
+        cy.contains("Parent Donor");
+    });
 });
