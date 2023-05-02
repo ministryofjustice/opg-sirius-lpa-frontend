@@ -14,7 +14,6 @@ describe("Create donor", () => {
     cy.get("#f-dob").type("1978-04-19");
     cy.get("#f-previousNames").type("Colton Bacman");
     cy.get("#f-otherNames").type("Mel");
-    cy.contains("Enter address manually").click()
     cy.get("#f-addressLine1").type("29737 Andrew Plaza");
     cy.get("#f-addressLine2").type("Apt. 814");
     cy.get("#f-addressLine3").type("Gislasonside");
