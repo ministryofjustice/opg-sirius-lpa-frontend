@@ -154,7 +154,7 @@ func TestCaseWithFeeReduction(t *testing.T) {
 					UponReceiving("A request for the case").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/cases/806"),
+						Path:   dsl.String("/lpa-api/v1/cases/802"),
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
@@ -180,7 +180,7 @@ func TestCaseWithFeeReduction(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				caseitem, err := client.Case(Context{Context: context.Background()}, 806)
+				caseitem, err := client.Case(Context{Context: context.Background()}, 802)
 
 				assert.Equal(t, tc.expectedResponse, caseitem)
 				if tc.expectedError == nil {
@@ -209,7 +209,7 @@ func TestCaseUsesDonorParent(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a case with a donor who has a linked record").
+					Given("A linked donor exists on a case").
 					UponReceiving("A request for a case with a linked donor").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
