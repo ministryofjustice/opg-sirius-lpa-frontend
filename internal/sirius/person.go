@@ -32,6 +32,7 @@ type Person struct {
 	CorrespondenceByWelsh bool       `json:"correspondenceByWelsh"`
 	ResearchOptOut        bool       `json:"researchOptOut"`
 	Children              []Person   `json:"children,omitempty"`
+	Parent                *Person    `json:"parent,omitempty"`
 	CompanyName           string     `json:"companyName"`
 	CompanyReference      string     `json:"companyReference"`
 	PersonType            string     `json:"personType,omitempty"`
