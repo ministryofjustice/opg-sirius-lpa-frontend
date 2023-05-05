@@ -7,6 +7,7 @@ lint:
 
 go-test:
 	rm -f pacts/sirius-lpa-frontend-sirius.json
+	rm -f pacts/ignored-ignored.json
 	go test -count 1 ./...
 
 build:
