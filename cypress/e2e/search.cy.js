@@ -66,7 +66,6 @@ describe("Search", () => {
         it("can apply and remove filters", () => {
             cy.contains(".govuk-checkboxes__item", "Attorney").find("input").check();
             cy.contains(".govuk-checkboxes__item", "Trust corporation").find("input").check();
-            cy.get("button[type=submit]").click();
             cy.contains(".moj-filter__tag", "Attorney");
             cy.contains(".moj-filter__tag", "Trust Corporation");
             cy.contains(".moj-filter__selected-heading", "Clear filters").find("a").click();
