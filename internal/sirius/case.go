@@ -32,8 +32,10 @@ func (c *Client) Case(ctx Context, id int) (Case, error) {
 	var v Case
 	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/cases/%d", id), &v)
 
-	if v.Donor.Parent != nil {
-		v.Donor = v.Donor.Parent
+	if v.Donor != nil {
+		if v.Donor.Parent != nil {
+			v.Donor = v.Donor.Parent
+		}
 	}
 
 	return v, err
