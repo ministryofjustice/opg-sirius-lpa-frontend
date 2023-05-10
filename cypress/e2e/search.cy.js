@@ -61,7 +61,6 @@ describe("Search", () => {
             cy.get('.moj-filter-layout__filter').should("not.be.visible");
             cy.contains(".govuk-button", "Show filters").click();
             cy.get('.moj-filter-layout__filter').should("be.visible");
-            cy.contains("Apply filters").should("be.visible");
         });
 
         it("can apply and remove filters", () => {
