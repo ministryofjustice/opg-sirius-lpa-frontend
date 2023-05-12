@@ -30,13 +30,14 @@ func TestCreateWarning(t *testing.T) {
 					UponReceiving("A request to create a warning").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/persons/189/warnings"),
+						Path:   dsl.String("/lpa-api/v1/warnings"),
 						Headers: dsl.MapMatcher{
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: dsl.Like(map[string]interface{}{
-							"warningType": "Complaint Received",
-							"warningText": "Some warning notes",
+							"personId":    dsl.Like(189),
+							"warningType": dsl.Like("Complaint Received"),
+							"warningText": dsl.Like("Some warning notes"),
 						}),
 					}).
 					WillRespondWith(dsl.Response{

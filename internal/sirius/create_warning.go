@@ -3,15 +3,16 @@ package sirius
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
 func (c *Client) CreateWarning(ctx Context, personId int, warningType string, warningNote string) error {
 	postData, err := json.Marshal(struct {
+		PersonID    int    `json:"personId"`
 		WarningType string `json:"warningType"`
 		WarningText string `json:"warningText"`
 	}{
+		PersonID:    personId,
 		WarningType: warningType,
 		WarningText: warningNote,
 	})
@@ -21,9 +22,8 @@ func (c *Client) CreateWarning(ctx Context, personId int, warningType string, wa
 	}
 
 	req, err := c.newRequest(
-		ctx,
-		http.MethodPost,
-		fmt.Sprintf("/lpa-api/v1/persons/%d/warnings", personId),
+		ctx, http.MethodPost,
+		"/lpa-api/v1/warnings",
 		bytes.NewReader(postData),
 	)
 
