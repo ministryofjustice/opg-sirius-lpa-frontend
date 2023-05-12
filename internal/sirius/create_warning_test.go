@@ -35,9 +35,9 @@ func TestCreateWarning(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: dsl.Like(map[string]interface{}{
-							"personId":    189,
-							"warningType": "Complaint Received",
-							"warningText": "Some warning notes",
+							"personId":    dsl.Like(189),
+							"warningType": dsl.Like("Complaint Received"),
+							"warningText": dsl.Like("Some warning notes"),
 						}),
 					}).
 					WillRespondWith(dsl.Response{

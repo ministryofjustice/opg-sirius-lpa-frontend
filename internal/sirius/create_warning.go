@@ -21,7 +21,11 @@ func (c *Client) CreateWarning(ctx Context, personId int, warningType string, wa
 		return err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPost, "/lpa-api/v1/warnings", bytes.NewReader(postData))
+	req, err := c.newRequest(
+		ctx, http.MethodPost,
+		"/lpa-api/v1/warnings",
+		bytes.NewReader(postData),
+	)
 
 	if err != nil {
 		return err
