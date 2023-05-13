@@ -193,7 +193,7 @@ jobs:
           make up
 
       - name: Cypress Tests
-        uses: cypress-io/github-action@v5.7.1
+        uses: cypress-io/github-action@v5.7.2
         with:
           browser: chrome
 
