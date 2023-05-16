@@ -24,12 +24,12 @@ jobs:
       - name: Define commit SHA and branch
         id: commit_branch
         run: |
-          if [ $GITHUB_EVENT_NAME == "pull_request" ]; then
-              echo "COMMIT=${{github.event.pull_request.head.sha}}" >> $GITHUB_OUTPUT
-              echo "BRANCH=${{github.head_ref}}" >> $GITHUB_OUTPUT
-          else
+          if [ "${{ github.head_ref }}" == "" ]; then
               echo "COMMIT=${{github.sha}}" >> $GITHUB_OUTPUT
               echo "BRANCH=main" >> $GITHUB_OUTPUT
+          else
+              echo "COMMIT=${{github.event.pull_request.head.sha}}" >> $GITHUB_OUTPUT
+              echo "BRANCH=${{github.head_ref}}" >> $GITHUB_OUTPUT
           fi
       - name: Bump version
         id: bump_version
