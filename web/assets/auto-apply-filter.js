@@ -1,5 +1,9 @@
 export default function autoApplyFilter() {
-    const filters = document.querySelectorAll("input.govuk-checkboxes__input");
+    if (document.body.className.includes('js-enabled')) {
+        document.querySelector('.moj-filter form button').classList.add("govuk-!-display-none");
+    }
+
+    const filters = document.querySelectorAll('[data-module="app-auto-apply-filter"]');
     let timeout = null;
 
     filters.forEach((filter) => {
@@ -7,7 +11,7 @@ export default function autoApplyFilter() {
             if (timeout !== null) clearTimeout(timeout);
 
             timeout = setTimeout(() => {
-                document.forms["search-filters"].submit();
+                filter.closest("form").submit();
             }, 500)
         })
     })

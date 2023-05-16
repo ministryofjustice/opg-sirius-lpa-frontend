@@ -64,6 +64,8 @@ describe("Search", () => {
         });
 
         it("can apply and remove filters", () => {
+            // Checks the button is hidden because js is enabled
+            cy.contains("Apply filters").should("not.be.visible");
             cy.contains(".govuk-checkboxes__item", "Attorney").find("input").check();
             cy.contains(".govuk-checkboxes__item", "Trust corporation").find("input").check();
             cy.contains(".moj-filter__tag", "Attorney");
