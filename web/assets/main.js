@@ -15,6 +15,7 @@ import autoClick from "./auto-click";
 import handleCreateDocumentButton from "./handle-create-document-button";
 import insertSelector from "./insert-selector";
 import addressFinder from "./address-finder";
+import autoApplyFilter from "./auto-apply-filter";
 
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
@@ -37,6 +38,7 @@ autoClick();
 handleCreateDocumentButton();
 insertSelector();
 addressFinder(prefix);
+autoApplyFilter();
 
 if (window.self !== window.parent) {
   const success = document.querySelector('[data-app-reload~="page"]');
