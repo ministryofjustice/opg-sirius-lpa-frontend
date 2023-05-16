@@ -12,7 +12,7 @@ export default function autoApplyFilter() {
 
             timeout = setTimeout(() => {
                 filter.closest("form").submit();
-            }, 500)
+            }, 1000)
         })
     })
 }
