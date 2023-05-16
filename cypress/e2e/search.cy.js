@@ -58,15 +58,14 @@ describe("Search", () => {
 
         it("it shows/hides filter panel", () => {
             cy.contains(".govuk-button", "Hide filters").click();
-            cy.contains("Apply filters").should("not.be.visible");
+            cy.get('.moj-filter-layout__filter').should("not.be.visible");
             cy.contains(".govuk-button", "Show filters").click();
-            cy.contains("Apply filters").should("be.visible");
+            cy.get('.moj-filter-layout__filter').should("be.visible");
         });
 
         it("can apply and remove filters", () => {
             cy.contains(".govuk-checkboxes__item", "Attorney").find("input").check();
             cy.contains(".govuk-checkboxes__item", "Trust corporation").find("input").check();
-            cy.get("button[type=submit]").click();
             cy.contains(".moj-filter__tag", "Attorney");
             cy.contains(".moj-filter__tag", "Trust Corporation");
             cy.contains(".moj-filter__selected-heading", "Clear filters").find("a").click();
