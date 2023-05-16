@@ -14,6 +14,40 @@ defaults:
     shell: bash
 
 jobs:
+  identify:
+    name: Identify version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+      - name: Define commit SHA and branch
+        id: commit_branch
+        run: |
+          if [ "${{ github.head_ref }}" == "" ]; then
+              echo "COMMIT=${{github.sha}}" >> $GITHUB_OUTPUT
+              echo "BRANCH=main" >> $GITHUB_OUTPUT
+          else
+              echo "COMMIT=${{github.event.pull_request.head.sha}}" >> $GITHUB_OUTPUT
+              echo "BRANCH=${{github.head_ref}}" >> $GITHUB_OUTPUT
+          fi
+      - name: Bump version
+        id: bump_version
+        uses: anothrNick/github-tag-action@1.62.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INITIAL_VERSION: 1.0.0
+          DEFAULT_BRANCH: main
+          DEFAULT_BUMP: minor
+          PRERELEASE: true
+          PRERELEASE_SUFFIX: ${{ steps.commit_branch.outputs.BRANCH }}
+          RELEASE_BRANCHES: main
+          WITH_V: true
+    outputs:
+      commit: ${{ steps.commit_branch.outputs.COMMIT }}
+      branch: ${{ steps.commit_branch.outputs.BRANCH }}
+      tag: ${{ steps.bump_version.outputs.tag }}
+
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -34,6 +68,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    needs: [identify]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v4
@@ -82,21 +117,12 @@ jobs:
         run: |
           gotestsum --junitfile /tmp/test-results/unit-tests.xml -- ./... -coverprofile=/tmp/test-coverage.txt
 
-      - name: Define Pact tag
-        id: pact_tag
-        run: |
-          if [ $GITHUB_EVENT_NAME == "pull_request" ]; then
-              echo "TAG=${{github.event.pull_request.head.sha}}" >> $GITHUB_OUTPUT
-              echo "BRANCH=${{github.head_ref}}" >> $GITHUB_OUTPUT
-          else
-              echo "TAG=${{github.sha}}" >> $GITHUB_OUTPUT
-              echo "BRANCH=main" >> $GITHUB_OUTPUT
-          fi
       - name: Publish pacts
         run: |
           pact-broker publish ./pacts/sirius-lpa-frontend-sirius.json \
-            --consumer-app-version ${{ steps.pact_tag.outputs.TAG }} \
-            --tag ${{ steps.pact_tag.outputs.BRANCH }} \
+            --consumer-app-version ${{ needs.identify.outputs.commit }} \
+            --branch ${{ needs.identify.outputs.branch }} \
+            --tag ${{ needs.identify.outputs.tag }} \
             --broker-base-url https://pact-broker.api.opg.service.justice.gov.uk \
             --broker-username admin \
             --broker-password ${{ secrets.PACT_BROKER_PASSWORD }}
@@ -207,22 +233,11 @@ jobs:
   push:
     name: Push Images
     runs-on: ubuntu-latest
-    needs: ["build", "test", "lint", "acceptance-test", "cypress"]
-    outputs:
-      branch: ${{ steps.set-outputs.outputs.branch }}
-      tag: ${{ steps.bump_version.outputs.tag }}
+    needs: [identify, "build", "test", "lint", "acceptance-test", "cypress"]
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: "0"
-      - name: Extract branch name
-        run: |
-          if [ "${{ github.head_ref }}" == "" ]; then
-            echo BRANCH_NAME=main >> $GITHUB_ENV
-          else
-            echo BRANCH_NAME=${{ github.head_ref }} >> $GITHUB_ENV
-          fi
-        id: extract_branch
       - uses: unfor19/install-aws-cli-action@v1
 
       - name: Cache Images
@@ -249,19 +264,6 @@ jobs:
         with:
           sarif_file: "trivy-results.sarif"
 
-      - name: Bump version
-        id: bump_version
-        uses: anothrNick/github-tag-action@1.62.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          INITIAL_VERSION: 1.0.0
-          DEFAULT_BRANCH: main
-          DEFAULT_BUMP: minor
-          PRERELEASE: true
-          PRERELEASE_SUFFIX: ${{ env.BRANCH_NAME }}
-          RELEASE_BRANCHES: main
-          WITH_V: true
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -284,19 +286,19 @@ jobs:
           ECR_REPOSITORY: sirius/sirius-lpa-frontend
         run: |
           docker tag sirius-lpa-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          docker tag sirius-lpa-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.bump_version.outputs.tag }}
+          docker tag sirius-lpa-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.identify.outputs.tag }}
           if [ $BRANCH_NAME == "main" ]; then
             # We want all of the tags pushed
             docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           else
-            docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.bump_version.outputs.tag }}
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.identify.outputs.tag }}
           fi
 
-          echo "Container tag: ${{ steps.bump_version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "Container tag: ${{ needs.identify.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
 
   push-tags:
     runs-on: ubuntu-latest
-    needs: push
+    needs: [identify, push]
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
@@ -317,7 +319,7 @@ jobs:
 
       - name: Push Tag to Parameter Store
         run: |
-          aws ssm put-parameter --name "opg-sirius-lpa-frontend-latest-green-build" --type "String" --value "${{ needs.push.outputs.tag}}" --overwrite --region=eu-west-1
+          aws ssm put-parameter --name "opg-sirius-lpa-frontend-latest-green-build" --type "String" --value "${{ needs.identify.outputs.tag }}" --overwrite --region=eu-west-1
 
       - name: Trigger Dev Deploy
         shell: bash
