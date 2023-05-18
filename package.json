@@ -16,7 +16,7 @@
   "dependencies": {
     "@ministryofjustice/frontend": "1.6.6",
     "accessible-autocomplete": "^2.0.4",
-    "cypress": "12.11.0",
+    "cypress": "12.12.0",
     "govuk-frontend": "^4.4.0",
     "jquery": "^3.6.1",
     "tinymce": "^5.10.7"
