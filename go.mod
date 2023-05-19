@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/ministryofjustice/opg-go-common v0.0.0-20220816144329-763497f29f90
 	github.com/pact-foundation/pact-go v1.7.0
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.3
 	go.opentelemetry.io/contrib/detectors/aws/ecs v1.16.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.41.1
 	go.opentelemetry.io/contrib/propagators/aws v1.16.1
