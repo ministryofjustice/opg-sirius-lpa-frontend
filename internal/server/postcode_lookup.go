@@ -8,7 +8,7 @@ import (
 )
 
 type PostcodeLookupClient interface {
-	PostcodeLookup(ctx sirius.Context, postcode string) ([]sirius.Address, error)
+	PostcodeLookup(ctx sirius.Context, postcode string) ([]sirius.PostcodeLookupAddress, error)
 }
 
 func SearchPostcode(client PostcodeLookupClient) Handler {

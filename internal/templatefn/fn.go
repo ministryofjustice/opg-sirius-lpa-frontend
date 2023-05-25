@@ -2,11 +2,13 @@ package templatefn
 
 import (
 	"fmt"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
+	"html/template"
 	"net/url"
 	"strings"
 	"time"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
@@ -103,6 +105,9 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return -num
 			}
 			return num
+		},
+		"attr": func(s string) template.HTMLAttr {
+			return template.HTMLAttr(s)
 		},
 	}
 }
