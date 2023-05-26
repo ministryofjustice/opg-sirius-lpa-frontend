@@ -19,7 +19,7 @@ func TestPostcodeLookup(t *testing.T) {
 	testCases := []struct {
 		name             string
 		setup            func()
-		expectedResponse []Address
+		expectedResponse []PostcodeLookupAddress
 		expectedError    func(int) error
 	}{
 		{
@@ -48,14 +48,14 @@ func TestPostcodeLookup(t *testing.T) {
 						}, 1),
 					})
 			},
-			expectedResponse: []Address{
+			expectedResponse: []PostcodeLookupAddress{
 				{
-					AddressLine1: "Office of the Public Guardian",
-					AddressLine2: "1 Something Street",
-					AddressLine3: "Someborough",
-					Town:         "Someton",
-					Postcode:     "SW1A 1AA",
-					Description:  "Office of the Public Guardian, 1 Something Street, Someborough",
+					Line1:       "Office of the Public Guardian",
+					Line2:       "1 Something Street",
+					Line3:       "Someborough",
+					Town:        "Someton",
+					Postcode:    "SW1A 1AA",
+					Description: "Office of the Public Guardian, 1 Something Street, Someborough",
 				},
 			},
 		},
