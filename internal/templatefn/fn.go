@@ -107,7 +107,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			return num
 		},
 		"attr": func(s string) template.HTMLAttr {
-			return template.HTMLAttr(s)
+			return template.HTMLAttr(s) //#nosec G203 false positive
 		},
 	}
 }
