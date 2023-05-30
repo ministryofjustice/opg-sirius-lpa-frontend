@@ -1,0 +1,226 @@
+{{ template "page" . }}
+
+{{ define "title" }}Create a draft LPA{{ end }}
+
+{{ define "main" }}
+  {{ if .Success }}
+    <div class="govuk-panel govuk-panel--confirmation">
+      <h1 class="govuk-panel__title">
+        {{ if (eq (len .Uids) 2) }}
+          Draft Health and Welfare and Property and Finance LPAs for the donor
+          {{ .Draft.DonorFirstname }} {{ .Draft.DonorMiddlename }} {{ .Draft.DonorSurname }} have been saved
+        {{ else }}
+          A draft
+            {{ range $type, $uid := .Uids }}{{ if eq $type "hw" }}Health and Welfare{{ else if eq $type "pfa" }}Property and Finance{{ end }} {{ end }}
+          LPA for the donor {{ .Draft.DonorFirstname }} {{ .Draft.DonorMiddlename }} {{ .Draft.DonorSurname }} has been saved
+        {{ end }}
+      </h1>
+      <div class="govuk-panel__body app-panel__body--smaller">
+        <p>Please inform the caller of their case reference number [insert when/how]</p>
+        <p>
+          {{ range $type, $uid := .Uids }}
+            <div><strong>{{ if eq $type "hw" }}Health and Welfare{{ else if eq $type "pfa" }}Property and Finance{{ end }} case reference number is {{ $uid }}</strong></div>
+          {{ end }}
+        </p>
+        <p><a class="govuk-link govuk-link--inverse" href="#">View donor record</a></p>
+      </div>
+    </div>
+
+    <h2 class="govuk-heading-m">What happens next?</h2>
+
+    <p class="govuk-body">Insert content that provides the user with relevant guidance. Let them know it will appear on the timeline and what they can and must do following the creation of the draft.</p>
+
+    <div class="govuk-button-group">
+      <a href="{{ prefix ("/digital-lpa/create") }}" class="govuk-button govuk-button--secondary">Create another draft LPA</button>
+      <a class="govuk-link govuk-link--no-visited-state" href="/">Return to case home</a>
+    </div>
+  {{ else }}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        {{ template "error-summary" .Error }}
+
+        <h1 class="govuk-heading-l">Create a draft LPA</h1>
+
+        <form class="form" method="POST">
+          <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+          <div class="govuk-form-group {{ if .Error.Field.types }}govuk-form-group--error{{ end }}" id="f-types">
+            <fieldset class="govuk-fieldset" aria-describedby="f-type-hint">
+              <legend class="govuk-fieldset__legend">What LPA types are required?</legend>
+              <div class="govuk-hint" id="f-type-hint">Select all that apply</div>
+              {{ template "errors" .Error.Field.types }}
+              <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="f-type-hw"
+                          name="subtype" type="checkbox" value="hw" {{ if contains .Draft.SubTypes "hw" }}checked{{ end }}>
+                  <label class="govuk-label govuk-checkboxes__label"
+                          for="f-type-hw">
+                    Health and welfare
+                  </label>
+                </div>
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="f-type-pfa"
+                          name="subtype" type="checkbox" value="pfa" {{ if contains .Draft.SubTypes "pfa" }}checked{{ end }}>
+                  <label class="govuk-label govuk-checkboxes__label"
+                          for="f-type-pfa">
+                    Property and finance
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <a id="f-donorName"></a>
+          {{ template "input" (field "donorFirstname" "What is the donor's first name?" .Draft.DonorFirstname .Error.Field.donorName) }}
+
+          <div class="govuk-form-group {{ if .Error.Field.donorMiddlename }}govuk-form-group--error{{ end }}" aria-describedby="f-donorMiddlename-hint">
+            <label class="govuk-label" for="f-donorMiddlename">What is the donor's middle name?</label>
+            <div class="govuk-hint" id="f-donorMiddlename-hint">Optional</div>
+            {{ template "errors".Error.Field.donorMiddlename }}
+            <input class="govuk-input {{ if .Error.Field.donorMiddlename }}govuk-input--error{{ end }}" id="f-donorMiddlename" name="donorMiddlename" value="{{ .Draft.DonorMiddlename }}" />
+          </div>
+
+          {{ template "input" (field "donorSurname" "What is the donor's last name?" .Draft.DonorSurname .Error.Field.donorName) }}
+
+          <div class="govuk-form-group {{ if .Error.Field.donorDob }}govuk-form-group--error{{ end }}" id="f-donorDob">
+            <fieldset class="govuk-fieldset" role="group" aria-describedby="f-dob-hint">
+              <legend class="govuk-fieldset__legend">
+                <h1 class="govuk-fieldset__heading">
+                  What is the donor's date of birth?
+                </h1>
+              </legend>
+              <div id="f-dob-hint" class="govuk-hint">
+                For example, 12 01 1967
+              </div>
+              {{ template "errors" .Error.Field.donorDob }}
+              <div class="govuk-date-input" id="f-dob">
+                <div class="govuk-date-input__item">
+                  <div class="govuk-form-group">
+                    <label class="govuk-label govuk-date-input__label" for="f-dob-day">
+                      Day
+                    </label>
+                    <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="f-dob-day" name="dobDay" type="text" inputmode="numeric" {{ if not (eq .Draft.Dob.Day 0) }}value="{{ .Draft.Dob.Day }}"{{ end }}>
+                  </div>
+                </div>
+                <div class="govuk-date-input__item">
+                  <div class="govuk-form-group">
+                    <label class="govuk-label govuk-date-input__label" for="f-dob-month">
+                      Month
+                    </label>
+                    <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="f-dob-month" name="dobMonth" type="text" inputmode="numeric" {{ if not (eq .Draft.Dob.Month 0) }}value="{{ .Draft.Dob.Month }}"{{ end }}>
+                  </div>
+                </div>
+                <div class="govuk-date-input__item">
+                  <div class="govuk-form-group">
+                    <label class="govuk-label govuk-date-input__label" for="f-dob-year">
+                      Year
+                    </label>
+                    <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="f-dob-year" name="dobYear" type="text" inputmode="numeric" {{ if not (eq .Draft.Dob.Year 0) }}value="{{ .Draft.Dob.Year }}"{{ end }}>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="What is the donor's address?">
+            {{ template "input" (field "donorAddressLine1" "Address line 1" .Draft.DonorAddress.Line1 .Error.Field.donorAddressLine1 "data-app-address-finder-map" "addressLine1") }}
+            {{ template "input" (field "donorAddressLine2" "Address line 2 (optional)" .Draft.DonorAddress.Line2 .Error.Field.donorAddressLine2 "data-app-address-finder-map" "addressLine2") }}
+            {{ template "input" (field "donorAddressLine3" "Address line 3 (optional)" .Draft.DonorAddress.Line3 .Error.Field.donorAddressLine3 "data-app-address-finder-map" "addressLine3") }}
+            {{ template "input" (field "donorTown" "Town or city" .Draft.DonorAddress.Town .Error.Field.donorTown "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+            {{ template "input" (field "donorPostcode" "Postcode" .Draft.DonorAddress.Postcode .Error.Field.donorPostcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+            {{ template "input" (field "donorCountry" "Country" .Draft.DonorAddress.Country .Error.Field.donorCountry "data-app-address-finder-map" "country" "class" "govuk-!-width-two-thirds") }}
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.recipient }}govuk-form-group--error{{ end }}" id="f-recipient">
+            <fieldset class="govuk-fieldset" aria-describedby="f-recipient-hint">
+              <legend class="govuk-fieldset__legend">Who should the documents be posted to?</legend>
+              {{ template "errors" .Error.Field.recipient }}
+              <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="f-recipient-donor-same-address"
+                          name="recipient" type="radio" value="donor-same-address"
+                          {{ if eq "donor-same-address" .Draft.Recipient}}checked="checked"{{ end }}>
+                  <label class="govuk-label govuk-radios__label"
+                          for="f-recipient-donor-same-address">
+                    The donor, using the address above
+                  </label>
+                </div>
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="f-recipient-donor-other-address"
+                          name="recipient" type="radio" value="donor-other-address"
+                          data-aria-controls="f-recipient-donor-other-address-reveal"
+                          {{ if eq "donor-other-address" .Draft.Recipient}}checked="checked"{{ end }}>
+                  <label class="govuk-label govuk-radios__label"
+                          for="f-recipient-donor-other-address">
+                    The donor, using a different address
+                  </label>
+                </div>
+                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="f-recipient-donor-other-address-reveal">
+                  <div class="govuk-form-group" data-module="app-address-finder">
+                    {{ template "input" (field "alternativeAddressLine2" "Address line 2 (optional)" .Draft.AlternativeAddress.Line2 .Error.Field.alternativeAddressLine2 "data-app-address-finder-map" "addressLine2") }}
+                    {{ template "input" (field "alternativeAddressLine1" "Address line 1" .Draft.AlternativeAddress.Line1 .Error.Field.alternativeAddressLine1 "data-app-address-finder-map" "addressLine1") }}
+                    {{ template "input" (field "alternativeAddressLine3" "Address line 3 (optional)" .Draft.AlternativeAddress.Line3 .Error.Field.alternativeAddressLine3 "data-app-address-finder-map" "addressLine3") }}
+                    {{ template "input" (field "alternativeTown" "Town or city" .Draft.AlternativeAddress.Town .Error.Field.alternativeTown "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "alternativePostcode" "Postcode" .Draft.AlternativeAddress.Postcode .Error.Field.alternativePostcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "alternativeCountry" "Country" .Draft.AlternativeAddress.Country .Error.Field.alternativeCountry "data-app-address-finder-map" "country" "class" "govuk-!-width-two-thirds") }}
+                  </div>
+                </div>
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="f-recipient-other"
+                          name="recipient" type="radio" value="other"
+                          data-aria-controls="f-recipient-other-reveal"
+                          {{ if eq "other" .Draft.Recipient}}checked="checked"{{ end }}>
+                  <label class="govuk-label govuk-radios__label"
+                          for="f-recipient-other">
+                    Another person
+                  </label>
+                </div>
+                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="f-recipient-other-reveal">
+                  <a id="f-correspondentName"></a>
+                  {{ template "input" (field "correspondentFirstname" "What is their first name?" .Draft.CorrespondentFirstname .Error.Field.correspondentName) }}
+
+                  <div class="govuk-form-group {{ if .Error.Field.correspondentMiddlename }}govuk-form-group--error{{ end }}" aria-describedby="f-correspondentMiddlename-hint">
+                    <label class="govuk-label" for="f-correspondentMiddlename">What is their middle name?</label>
+                    <div class="govuk-hint" id="f-correspondentMiddlename-hint">Optional</div>
+                    {{ template "errors".Error.Field.correspondentMiddlename }}
+                    <input class="govuk-input {{ if .Error.Field.correspondentMiddlename }}govuk-input--error{{ end }}" id="f-correspondentMiddlename" name="correspondentMiddlename" value="{{ .Draft.CorrespondentMiddlename }}" />
+                  </div>
+
+                  {{ template "input" (field "correspondentSurname" "What is their last name?" .Draft.CorrespondentSurname .Error.Field.correspondentName) }}
+
+                  <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="What is their address?">
+                    {{ template "input" (field "correspondentAddressLine1" "Address line 1" .Draft.CorrespondentAddress.Line1 .Error.Field.correspondentAddressLine1 "data-app-address-finder-map" "addressLine1") }}
+                    {{ template "input" (field "correspondentAddressLine2" "Address line 2 (optional)" .Draft.CorrespondentAddress.Line2 .Error.Field.correspondentAddressLine2 "data-app-address-finder-map" "addressLine2") }}
+                    {{ template "input" (field "correspondentAddressLine3" "Address line 3 (optional)" .Draft.CorrespondentAddress.Line3 .Error.Field.correspondentAddressLine3 "data-app-address-finder-map" "addressLine3") }}
+                    {{ template "input" (field "correspondentTown" "Town or city" .Draft.CorrespondentAddress.Town .Error.Field.correspondentTown "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "correspondentPostcode" "Postcode" .Draft.CorrespondentAddress.Postcode .Error.Field.correspondentPostcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "correspondentCountry" "Country" .Draft.CorrespondentAddress.Country .Error.Field.correspondentCountry "data-app-address-finder-map" "country" "class" "govuk-!-width-two-thirds") }}
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.donorPhone }}govuk-form-group--error{{ end }}" aria-describedby="f-donorPhone-hint">
+            <label class="govuk-label" for="f-donorPhone">What is the donor's phone number?</label>
+            <div class="govuk-hint" id="f-donorPhone-hint">Optional</div>
+            {{ template "errors".Error.Field.donorPhone }}
+            <input class="govuk-input {{ if .Error.Field.donorPhone }}govuk-input--error{{ end }}" id="f-donorPhone" name="donorPhone" value="{{ .Draft.Phone }}" />
+          </div>
+
+          <div class="govuk-form-group {{ if .Error.Field.donorEmail }}govuk-form-group--error{{ end }}" aria-describedby="f-donorEmail-hint">
+            <label class="govuk-label" for="f-donorEmail">What is the donor's email address?</label>
+            <div class="govuk-hint" id="f-donorEmail-hint">Optional</div>
+            {{ template "errors".Error.Field.donorEmail }}
+            <input class="govuk-input {{ if .Error.Field.donorEmail }}govuk-input--error{{ end }}" id="f-donorEmail" name="donorEmail" value="{{ .Draft.Email }}" />
+          </div>
+
+          <div class="govuk-button-group">
+            <button class="govuk-button" data-module="govuk-button" type="submit">Save draft LPA</button>
+            <a class="govuk-link govuk-link--no-visited-state" href="/">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  {{ end }}
+{{ end }}
