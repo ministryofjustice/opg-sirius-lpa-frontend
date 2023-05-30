@@ -6,9 +6,14 @@
   {{ if .Success }}
     <div class="govuk-panel govuk-panel--confirmation">
       <h1 class="govuk-panel__title">
-        A draft
-          {{ range $type, $uid := .Uids }}{{ if eq $type "hw" }}Health and Welfare{{ else if eq $type "pfa" }}Property and Finance{{ end }} {{ end }}
-        LPA for the donor {{ .Draft.DonorFirstname }} {{ .Draft.DonorMiddlename }} {{ .Draft.DonorSurname }} has been saved
+        {{ if (eq (len .Uids) 2) }}
+          Draft Health and Welfare and Property and Finance LPAs for the donor
+          {{ .Draft.DonorFirstname }} {{ .Draft.DonorMiddlename }} {{ .Draft.DonorSurname }} have been saved
+        {{ else }}
+          A draft
+            {{ range $type, $uid := .Uids }}{{ if eq $type "hw" }}Health and Welfare{{ else if eq $type "pfa" }}Property and Finance{{ end }} {{ end }}
+          LPA for the donor {{ .Draft.DonorFirstname }} {{ .Draft.DonorMiddlename }} {{ .Draft.DonorSurname }} has been saved
+        {{ end }}
       </h1>
       <div class="govuk-panel__body app-panel__body--smaller">
         <p>Please inform the caller of their case reference number [insert when/how]</p>
@@ -152,12 +157,12 @@
                 </div>
                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="f-recipient-donor-other-address-reveal">
                   <div class="govuk-form-group" data-module="app-address-finder">
-                    {{ template "input" (field "correspondentAddressLine1" "Address line 1" .Draft.CorrespondentAddress.Line1 .Error.Field.correspondentAddressLine1 "data-app-address-finder-map" "addressLine1") }}
-                    {{ template "input" (field "correspondentAddressLine2" "Address line 2 (optional)" .Draft.CorrespondentAddress.Line2 .Error.Field.correspondentAddressLine2 "data-app-address-finder-map" "addressLine2") }}
-                    {{ template "input" (field "correspondentAddressLine3" "Address line 3 (optional)" .Draft.CorrespondentAddress.Line3 .Error.Field.correspondentAddressLine3 "data-app-address-finder-map" "addressLine3") }}
-                    {{ template "input" (field "correspondentTown" "Town or city" .Draft.CorrespondentAddress.Town .Error.Field.correspondentTown "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
-                    {{ template "input" (field "correspondentPostcode" "Postcode" .Draft.CorrespondentAddress.Postcode .Error.Field.correspondentPostcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
-                    {{ template "input" (field "correspondentCountry" "Country" .Draft.CorrespondentAddress.Country .Error.Field.correspondentCountry "data-app-address-finder-map" "country" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "alternativeAddressLine2" "Address line 2 (optional)" .Draft.AlternativeAddress.Line2 .Error.Field.alternativeAddressLine2 "data-app-address-finder-map" "addressLine2") }}
+                    {{ template "input" (field "alternativeAddressLine1" "Address line 1" .Draft.AlternativeAddress.Line1 .Error.Field.alternativeAddressLine1 "data-app-address-finder-map" "addressLine1") }}
+                    {{ template "input" (field "alternativeAddressLine3" "Address line 3 (optional)" .Draft.AlternativeAddress.Line3 .Error.Field.alternativeAddressLine3 "data-app-address-finder-map" "addressLine3") }}
+                    {{ template "input" (field "alternativeTown" "Town or city" .Draft.AlternativeAddress.Town .Error.Field.alternativeTown "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "alternativePostcode" "Postcode" .Draft.AlternativeAddress.Postcode .Error.Field.alternativePostcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "alternativeCountry" "Country" .Draft.AlternativeAddress.Country .Error.Field.alternativeCountry "data-app-address-finder-map" "country" "class" "govuk-!-width-two-thirds") }}
                   </div>
                 </div>
                 <div class="govuk-radios__item">

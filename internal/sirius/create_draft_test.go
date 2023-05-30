@@ -30,17 +30,17 @@ func TestCreateDraft(t *testing.T) {
 				Source:    "PHONE",
 				DonorName: "Coleen Morneault",
 				DonorDob:  DateString("1952-04-08"),
-				DonorAddress: &Address{
+				DonorAddress: Address{
 					Line1:    "Fluke House",
 					Town:     "South Bend",
-					Postcode: "AI1 6VW",
+					Postcode: "AI16VW",
 					Country:  "GB",
 				},
 			},
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I am a Modernise user").
+					Given("I am a Modernised LPA user").
 					UponReceiving("A request to create a draft LPA with minimal data").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
@@ -56,7 +56,7 @@ func TestCreateDraft(t *testing.T) {
 							"donorAddress": map[string]string{
 								"addressLine1": "Fluke House",
 								"town":         "South Bend",
-								"postcode":     "AI1 6VW",
+								"postcode":     "AI16VW",
 								"country":      "GB",
 							},
 						},
@@ -81,23 +81,23 @@ func TestCreateDraft(t *testing.T) {
 			draftData: Draft{
 				CaseType:  []string{"hw", "pfa"},
 				Source:    "PHONE",
-				DonorName: "Coleen Morneault",
+				DonorName: "Coleen Stephanie Morneault",
 				DonorDob:  DateString("1952-04-08"),
-				DonorAddress: &Address{
+				DonorAddress: Address{
 					Line1:    "Fluke House",
 					Line2:    "Summit",
 					Line3:    "Houston",
 					Town:     "South Bend",
-					Postcode: "AI1 6VW",
+					Postcode: "AI16VW",
 					Country:  "GB",
 				},
-				CorrespondentName: "Leon Selden",
+				CorrespondentName: "Leon Marius Selden",
 				CorrespondentAddress: &Address{
 					Line1:    "Nitzsche, Nader And Schuppe",
 					Line2:    "6064 Alessandro Plain",
 					Line3:    "Pittsfield",
 					Town:     "Concord",
-					Postcode: "JN2 7UO",
+					Postcode: "JN27UO",
 					Country:  "GB",
 				},
 				PhoneNumber: "07893932118",
@@ -106,7 +106,7 @@ func TestCreateDraft(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I am a Modernise user").
+					Given("I am a Modernised LPA user").
 					UponReceiving("A request to create a draft LPA with all possible data").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
@@ -117,23 +117,23 @@ func TestCreateDraft(t *testing.T) {
 						Body: map[string]interface{}{
 							"types":     []string{"hw", "pfa"},
 							"source":    "PHONE",
-							"donorName": "Coleen Morneault",
+							"donorName": "Coleen Stephanie Morneault",
 							"donorDob":  "08/04/1952",
 							"donorAddress": map[string]string{
 								"addressLine1": "Fluke House",
 								"addressLine2": "Summit",
 								"addressLine3": "Houston",
 								"town":         "South Bend",
-								"postcode":     "AI1 6VW",
+								"postcode":     "AI16VW",
 								"country":      "GB",
 							},
-							"correspondentName": "Leon Selden",
+							"correspondentName": "Leon Marius Selden",
 							"correspondentAddress": map[string]string{
 								"addressLine1": "Nitzsche, Nader And Schuppe",
 								"addressLine2": "6064 Alessandro Plain",
 								"addressLine3": "Pittsfield",
 								"town":         "Concord",
-								"postcode":     "JN2 7UO",
+								"postcode":     "JN27UO",
 								"country":      "GB",
 							},
 							"donorPhone": "07893932118",

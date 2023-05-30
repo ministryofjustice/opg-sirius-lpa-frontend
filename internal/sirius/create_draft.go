@@ -20,7 +20,7 @@ type Draft struct {
 	Source               string     `json:"source"`
 	DonorName            string     `json:"donorName"`
 	DonorDob             DateString `json:"donorDob"`
-	DonorAddress         *Address   `json:"donorAddress"`
+	DonorAddress         Address    `json:"donorAddress"`
 	CorrespondentName    string     `json:"correspondentName,omitempty"`
 	CorrespondentAddress *Address   `json:"correspondentAddress,omitempty"`
 	PhoneNumber          string     `json:"donorPhone,omitempty"`
