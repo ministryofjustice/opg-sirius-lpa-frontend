@@ -50,7 +50,12 @@ function AddressFinder($module, options) {
     this.$inputContainer.appendChild($input);
   });
   this.$module.appendChild(this.$inputContainer);
-  this.hideInputs();
+
+  if (
+    this.$module.querySelectorAll('input[value]:not([value=""])').length === 0
+  ) {
+    this.hideInputs();
+  }
 }
 
 AddressFinder.template = (id) => `
@@ -173,16 +178,29 @@ AddressFinder.prototype.handleSearch = function () {
     });
 };
 
+AddressFinder.prototype.underwriteValue = function (field, value) {
+  let $input = this.$module.querySelector(`[name="${field}"]`);
+
+  if (!$input) {
+    $input = this.$module.querySelector(
+      `[data-app-address-finder-map="${field}"]`
+    );
+  }
+
+  if ($input instanceof HTMLInputElement) {
+    $input.value = value;
+  }
+};
+
 AddressFinder.prototype.handleSelect = function () {
   const i = parseInt(this.$dropdown.value, 10);
   const result = this.results[i];
 
-  Object.entries(result).forEach(([field, value]) => {
-    const $input = this.$module.querySelector(`[name="${field}"]`);
-    if ($input instanceof HTMLInputElement) {
-      $input.value = value;
-    }
-  });
+  Object.entries(result).forEach(([field, value]) =>
+    this.underwriteValue(field, value)
+  );
+
+  this.underwriteValue("country", "GB");
 };
 
 export default function init(prefix, $scope) {
