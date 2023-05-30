@@ -25,6 +25,7 @@ type draft struct {
 	CorrespondentFirstname  string
 	CorrespondentMiddlename string
 	CorrespondentSurname    string
+	AlternativeAddress      sirius.Address
 	CorrespondentAddress    sirius.Address
 	Dob                     dob
 	Email                   string
@@ -92,18 +93,26 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 					Line3:    postFormString(r, "donorAddressLine3"),
 					Town:     postFormString(r, "donorTown"),
 					Postcode: postFormString(r, "donorPostcode"),
-					Country:  fallback(postFormString(r, "donorCountry"), "GB"),
+					Country:  postFormString(r, "donorCountry"),
 				},
 				CorrespondentFirstname:  postFormString(r, "correspondentFirstname"),
 				CorrespondentMiddlename: postFormString(r, "correspondentMiddlename"),
 				CorrespondentSurname:    postFormString(r, "correspondentSurname"),
+				AlternativeAddress: sirius.Address{
+					Line1:    postFormString(r, "alternativeAddressLine1"),
+					Line2:    postFormString(r, "alternativeAddressLine2"),
+					Line3:    postFormString(r, "alternativeAddressLine3"),
+					Town:     postFormString(r, "alternativeTown"),
+					Postcode: postFormString(r, "alternativePostcode"),
+					Country:  postFormString(r, "alternativeCountry"),
+				},
 				CorrespondentAddress: sirius.Address{
 					Line1:    postFormString(r, "correspondentAddressLine1"),
 					Line2:    postFormString(r, "correspondentAddressLine2"),
 					Line3:    postFormString(r, "correspondentAddressLine3"),
 					Town:     postFormString(r, "correspondentTown"),
 					Postcode: postFormString(r, "correspondentPostcode"),
-					Country:  fallback(postFormString(r, "correspondentCountry"), "GB"),
+					Country:  postFormString(r, "correspondentCountry"),
 				},
 				Recipient: postFormString(r, "recipient"),
 				Email:     postFormString(r, "donorEmail"),
@@ -111,12 +120,40 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 			}
 
 			compiledDraft := sirius.Draft{
-				CaseType:             data.Draft.SubTypes,
-				Source:               "PHONE",
-				DonorName:            buildName(data.Draft.DonorFirstname, data.Draft.DonorMiddlename, data.Draft.DonorSurname),
-				DonorAddress:         &data.Draft.DonorAddress,
-				CorrespondentName:    buildName(data.Draft.CorrespondentFirstname, data.Draft.CorrespondentMiddlename, data.Draft.CorrespondentSurname),
-				CorrespondentAddress: &data.Draft.CorrespondentAddress,
+				CaseType:  data.Draft.SubTypes,
+				Source:    "PHONE",
+				DonorName: buildName(data.Draft.DonorFirstname, data.Draft.DonorMiddlename, data.Draft.DonorSurname),
+				DonorAddress: sirius.Address{
+					Line1:    data.Draft.DonorAddress.Line1,
+					Line2:    data.Draft.DonorAddress.Line2,
+					Line3:    data.Draft.DonorAddress.Line3,
+					Town:     data.Draft.DonorAddress.Town,
+					Postcode: strings.ReplaceAll(data.Draft.DonorAddress.Postcode, " ", ""),
+					Country:  data.Draft.DonorAddress.Country,
+				},
+				Email:       data.Draft.Email,
+				PhoneNumber: data.Draft.Phone,
+			}
+
+			if data.Draft.Recipient == "donor-other-address" {
+				compiledDraft.CorrespondentAddress = &sirius.Address{
+					Line1:    data.Draft.AlternativeAddress.Line1,
+					Line2:    data.Draft.AlternativeAddress.Line2,
+					Line3:    data.Draft.AlternativeAddress.Line3,
+					Town:     data.Draft.AlternativeAddress.Town,
+					Postcode: strings.ReplaceAll(data.Draft.AlternativeAddress.Postcode, " ", ""),
+					Country:  fallback(data.Draft.AlternativeAddress.Country, "GB"),
+				}
+			} else if data.Draft.Recipient == "other" {
+				compiledDraft.CorrespondentName = buildName(data.Draft.CorrespondentFirstname, data.Draft.CorrespondentMiddlename, data.Draft.CorrespondentSurname)
+				compiledDraft.CorrespondentAddress = &sirius.Address{
+					Line1:    data.Draft.CorrespondentAddress.Line1,
+					Line2:    data.Draft.CorrespondentAddress.Line2,
+					Line3:    data.Draft.CorrespondentAddress.Line3,
+					Town:     data.Draft.CorrespondentAddress.Town,
+					Postcode: strings.ReplaceAll(data.Draft.CorrespondentAddress.Postcode, " ", ""),
+					Country:  fallback(data.Draft.CorrespondentAddress.Country, "GB"),
+				}
 			}
 
 			dob := time.Date(data.Draft.Dob.Year, time.Month(data.Draft.Dob.Month), data.Draft.Dob.Day, 0, 0, 0, 0, time.UTC)
@@ -124,9 +161,6 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 			if dob.After(date1900) {
 				compiledDraft.DonorDob = sirius.DateString(dob.Format("2006-01-02"))
 			}
-
-			compiledDraft.DonorAddress.Postcode = strings.ReplaceAll(compiledDraft.DonorAddress.Postcode, " ", "")
-
 			uids, err := client.CreateDraft(ctx, compiledDraft)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
