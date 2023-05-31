@@ -56,7 +56,7 @@ func TestPostCreateDraft(t *testing.T) {
 				Line2:    "Zipper House",
 				Line3:    "Mills Ports",
 				Town:     "Deerfield Beach",
-				Postcode: "QY99QW",
+				Postcode: "QY9 9QW",
 				Country:  "GB",
 			},
 			CorrespondentAddress: &sirius.Address{
@@ -64,7 +64,7 @@ func TestPostCreateDraft(t *testing.T) {
 				Line2:    "Lind Run",
 				Line3:    "Hendersonville",
 				Town:     "Moline",
-				Postcode: "OE62DV",
+				Postcode: "OE6 2DV",
 				Country:  "GB",
 			},
 		}).
@@ -157,6 +157,9 @@ func TestPostCreateDraftWhenAPIFails(t *testing.T) {
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			Source:    "PHONE",
 			DonorName: "Gerald Sandel",
+			DonorAddress: sirius.Address{
+				Country: "GB",
+			},
 		}).
 		Return(map[string]string{}, expectedError)
 
@@ -182,6 +185,9 @@ func TestPostCreateDraftWhenValidationError(t *testing.T) {
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			Source:    "PHONE",
 			DonorName: "Gerald",
+			DonorAddress: sirius.Address{
+				Country: "GB",
+			},
 		}).
 		Return(map[string]string{}, sirius.ValidationError{Field: sirius.FieldErrors{
 			"surname": {"required": "This field is required"},
