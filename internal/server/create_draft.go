@@ -128,8 +128,8 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 					Line2:    data.Draft.DonorAddress.Line2,
 					Line3:    data.Draft.DonorAddress.Line3,
 					Town:     data.Draft.DonorAddress.Town,
-					Postcode: strings.ReplaceAll(data.Draft.DonorAddress.Postcode, " ", ""),
-					Country:  data.Draft.DonorAddress.Country,
+					Postcode: data.Draft.DonorAddress.Postcode,
+					Country:  fallback(data.Draft.DonorAddress.Country, "GB"),
 				},
 				Email:       data.Draft.Email,
 				PhoneNumber: data.Draft.Phone,
@@ -141,7 +141,7 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 					Line2:    data.Draft.AlternativeAddress.Line2,
 					Line3:    data.Draft.AlternativeAddress.Line3,
 					Town:     data.Draft.AlternativeAddress.Town,
-					Postcode: strings.ReplaceAll(data.Draft.AlternativeAddress.Postcode, " ", ""),
+					Postcode: data.Draft.AlternativeAddress.Postcode,
 					Country:  fallback(data.Draft.AlternativeAddress.Country, "GB"),
 				}
 			} else if data.Draft.Recipient == "other" {
@@ -151,7 +151,7 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 					Line2:    data.Draft.CorrespondentAddress.Line2,
 					Line3:    data.Draft.CorrespondentAddress.Line3,
 					Town:     data.Draft.CorrespondentAddress.Town,
-					Postcode: strings.ReplaceAll(data.Draft.CorrespondentAddress.Postcode, " ", ""),
+					Postcode: data.Draft.CorrespondentAddress.Postcode,
 					Country:  fallback(data.Draft.CorrespondentAddress.Country, "GB"),
 				}
 			}
