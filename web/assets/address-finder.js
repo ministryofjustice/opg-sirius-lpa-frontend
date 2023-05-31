@@ -52,7 +52,9 @@ function AddressFinder($module, options) {
   this.$module.appendChild(this.$inputContainer);
 
   if (
-    this.$module.querySelectorAll('input[value]:not([value=""])').length === 0
+    0 ===
+      this.$module.querySelectorAll('input[value]:not([value=""])').length &&
+    0 === this.$module.querySelectorAll(".govuk-form-group--error").length
   ) {
     this.hideInputs();
   }
