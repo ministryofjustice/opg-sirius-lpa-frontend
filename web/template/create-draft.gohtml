@@ -122,13 +122,14 @@
             </fieldset>
           </div>
 
-          <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="What is the donor's address?">
-            {{ template "input" (field "donorAddressLine1" "Address line 1" .Draft.DonorAddress.Line1 .Error.Field.donorAddressLine1 "data-app-address-finder-map" "addressLine1") }}
-            {{ template "input" (field "donorAddressLine2" "Address line 2 (optional)" .Draft.DonorAddress.Line2 .Error.Field.donorAddressLine2 "data-app-address-finder-map" "addressLine2") }}
-            {{ template "input" (field "donorAddressLine3" "Address line 3 (optional)" .Draft.DonorAddress.Line3 .Error.Field.donorAddressLine3 "data-app-address-finder-map" "addressLine3") }}
-            {{ template "input" (field "donorTown" "Town or city" .Draft.DonorAddress.Town .Error.Field.donorTown "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
-            {{ template "input" (field "donorPostcode" "Postcode" .Draft.DonorAddress.Postcode .Error.Field.donorPostcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
-            {{ template "input" (field "donorCountry" "Country" .Draft.DonorAddress.Country .Error.Field.donorCountry "data-app-address-finder-map" "country" "class" "govuk-!-width-two-thirds") }}
+          <div class="govuk-form-group {{ if .Error.Field.donorAddress }}govuk-form-group--error{{ end }}" data-module="app-address-finder" data-app-address-finder-label="What is the donor's address?">
+          {{ template "errors" .Error.Field.donorAddress }}
+            {{ template "input" (field "donorAddressLine1" "Address line 1" .Draft.DonorAddress.Line1 (index .Error.Field "donorAddress/addressLine1") "data-app-address-finder-map" "addressLine1") }}
+            {{ template "input" (field "donorAddressLine2" "Address line 2 (optional)" .Draft.DonorAddress.Line2 (index .Error.Field "donorAddress/addressLine2") "data-app-address-finder-map" "addressLine2") }}
+            {{ template "input" (field "donorAddressLine3" "Address line 3 (optional)" .Draft.DonorAddress.Line3 (index .Error.Field "donorAddress/addressLine3") "data-app-address-finder-map" "addressLine3") }}
+            {{ template "input" (field "donorTown" "Town or city" .Draft.DonorAddress.Town (index .Error.Field "donorAddress/town") "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+            {{ template "input" (field "donorPostcode" "Postcode" .Draft.DonorAddress.Postcode (index .Error.Field "donorAddress/postcode") "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+            {{ template "input" (field "donorCountry" "Country" .Draft.DonorAddress.Country (index .Error.Field "donorAddress/country") "data-app-address-finder-map" "country" "class" "govuk-!-width-two-thirds") }}
           </div>
 
           <div class="govuk-form-group {{ if .Error.Field.recipient }}govuk-form-group--error{{ end }}" id="f-recipient">
@@ -157,12 +158,12 @@
                 </div>
                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="f-recipient-donor-other-address-reveal">
                   <div class="govuk-form-group" data-module="app-address-finder">
-                    {{ template "input" (field "alternativeAddressLine2" "Address line 2 (optional)" .Draft.AlternativeAddress.Line2 .Error.Field.alternativeAddressLine2 "data-app-address-finder-map" "addressLine2") }}
-                    {{ template "input" (field "alternativeAddressLine1" "Address line 1" .Draft.AlternativeAddress.Line1 .Error.Field.alternativeAddressLine1 "data-app-address-finder-map" "addressLine1") }}
-                    {{ template "input" (field "alternativeAddressLine3" "Address line 3 (optional)" .Draft.AlternativeAddress.Line3 .Error.Field.alternativeAddressLine3 "data-app-address-finder-map" "addressLine3") }}
-                    {{ template "input" (field "alternativeTown" "Town or city" .Draft.AlternativeAddress.Town .Error.Field.alternativeTown "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
-                    {{ template "input" (field "alternativePostcode" "Postcode" .Draft.AlternativeAddress.Postcode .Error.Field.alternativePostcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
-                    {{ template "input" (field "alternativeCountry" "Country" .Draft.AlternativeAddress.Country .Error.Field.alternativeCountry "data-app-address-finder-map" "country" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "alternativeAddressLine1" "Address line 1" .Draft.AlternativeAddress.Line1 (index .Error.Field "correspondentAddress/addressLine1") "data-app-address-finder-map" "addressLine1") }}
+                    {{ template "input" (field "alternativeAddressLine2" "Address line 2 (optional)" .Draft.AlternativeAddress.Line2 (index .Error.Field "correspondentAddress/addressLine2") "data-app-address-finder-map" "addressLine2") }}
+                    {{ template "input" (field "alternativeAddressLine3" "Address line 3 (optional)" .Draft.AlternativeAddress.Line3 (index .Error.Field "correspondentAddress/addressLine3") "data-app-address-finder-map" "addressLine3") }}
+                    {{ template "input" (field "alternativeTown" "Town or city" .Draft.AlternativeAddress.Town (index .Error.Field "correspondentAddress/town") "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "alternativePostcode" "Postcode" .Draft.AlternativeAddress.Postcode (index .Error.Field "correspondentAddress/postcode") "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "alternativeCountry" "Country" .Draft.AlternativeAddress.Country (index .Error.Field "correspondentAddress/country") "data-app-address-finder-map" "country" "class" "govuk-!-width-two-thirds") }}
                   </div>
                 </div>
                 <div class="govuk-radios__item">
@@ -189,12 +190,12 @@
                   {{ template "input" (field "correspondentSurname" "What is their last name?" .Draft.CorrespondentSurname .Error.Field.correspondentName) }}
 
                   <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="What is their address?">
-                    {{ template "input" (field "correspondentAddressLine1" "Address line 1" .Draft.CorrespondentAddress.Line1 .Error.Field.correspondentAddressLine1 "data-app-address-finder-map" "addressLine1") }}
-                    {{ template "input" (field "correspondentAddressLine2" "Address line 2 (optional)" .Draft.CorrespondentAddress.Line2 .Error.Field.correspondentAddressLine2 "data-app-address-finder-map" "addressLine2") }}
-                    {{ template "input" (field "correspondentAddressLine3" "Address line 3 (optional)" .Draft.CorrespondentAddress.Line3 .Error.Field.correspondentAddressLine3 "data-app-address-finder-map" "addressLine3") }}
-                    {{ template "input" (field "correspondentTown" "Town or city" .Draft.CorrespondentAddress.Town .Error.Field.correspondentTown "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
-                    {{ template "input" (field "correspondentPostcode" "Postcode" .Draft.CorrespondentAddress.Postcode .Error.Field.correspondentPostcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
-                    {{ template "input" (field "correspondentCountry" "Country" .Draft.CorrespondentAddress.Country .Error.Field.correspondentCountry "data-app-address-finder-map" "country" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "correspondentAddressLine1" "Address line 1" .Draft.CorrespondentAddress.Line1 (index .Error.Field "correspondentAddress/addressLine1") "data-app-address-finder-map" "addressLine1") }}
+                    {{ template "input" (field "correspondentAddressLine2" "Address line 2 (optional)" .Draft.CorrespondentAddress.Line2 (index .Error.Field "correspondentAddress/addressLine2") "data-app-address-finder-map" "addressLine2") }}
+                    {{ template "input" (field "correspondentAddressLine3" "Address line 3 (optional)" .Draft.CorrespondentAddress.Line3 (index .Error.Field "correspondentAddress/addressLine3") "data-app-address-finder-map" "addressLine3") }}
+                    {{ template "input" (field "correspondentTown" "Town or city" .Draft.CorrespondentAddress.Town (index .Error.Field "correspondentAddress/town") "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "correspondentPostcode" "Postcode" .Draft.CorrespondentAddress.Postcode (index .Error.Field "correspondentAddress/postcode") "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "correspondentCountry" "Country" .Draft.CorrespondentAddress.Country (index .Error.Field "correspondentAddress/country") "data-app-address-finder-map" "country" "class" "govuk-!-width-two-thirds") }}
                   </div>
                 </div>
               </div>
