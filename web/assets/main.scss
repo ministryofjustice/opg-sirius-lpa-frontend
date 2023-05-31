@@ -106,3 +106,7 @@ $govuk-assets-path: "/lpa/frontend/assets/";
 .autocomplete__wrapper {
   font-family: $govuk-font-family;
 }
+
+.app-panel__body--smaller {
+    @include govuk-font($size: 24);
+}
