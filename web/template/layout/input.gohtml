@@ -2,6 +2,6 @@
   <div class="govuk-form-group {{ if .Error }}govuk-form-group--error{{ end }}">
     <label class="govuk-label" for="f-{{ .Name }}">{{ .Label }}</label>
     {{ template "errors" .Error }}
-    <input class="govuk-input {{ if .Error }}govuk-input--error{{ end }}" id="f-{{ .Name }}" name="{{ .Name }}" value="{{ .Value }}" />
+    <input class="govuk-input {{ if .Error }}govuk-input--error{{ end }} {{ .Attrs.class }}" id="f-{{ .Name }}" name="{{ .Name }}" value="{{ .Value }}" {{ range $k, $v := .Attrs }} {{$k | attr}}={{$v}} {{ end }} />
   </div>
 {{ end }}
