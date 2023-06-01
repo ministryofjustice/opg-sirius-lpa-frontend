@@ -33,7 +33,7 @@ func TestCreateDraft(t *testing.T) {
 				DonorAddress: Address{
 					Line1:    "Fluke House",
 					Town:     "South Bend",
-					Postcode: "AI16VW",
+					Postcode: "AI1 6VW",
 					Country:  "GB",
 				},
 			},
@@ -56,7 +56,7 @@ func TestCreateDraft(t *testing.T) {
 							"donorAddress": map[string]string{
 								"addressLine1": "Fluke House",
 								"town":         "South Bend",
-								"postcode":     "AI16VW",
+								"postcode":     "AI1 6VW",
 								"country":      "GB",
 							},
 						},
@@ -88,7 +88,7 @@ func TestCreateDraft(t *testing.T) {
 					Line2:    "Summit",
 					Line3:    "Houston",
 					Town:     "South Bend",
-					Postcode: "AI16VW",
+					Postcode: "AI1 6VW",
 					Country:  "GB",
 				},
 				CorrespondentName: "Leon Marius Selden",
@@ -97,7 +97,7 @@ func TestCreateDraft(t *testing.T) {
 					Line2:    "6064 Alessandro Plain",
 					Line3:    "Pittsfield",
 					Town:     "Concord",
-					Postcode: "JN27UO",
+					Postcode: "JN2 7UO",
 					Country:  "GB",
 				},
 				PhoneNumber: "07893932118",
@@ -124,7 +124,7 @@ func TestCreateDraft(t *testing.T) {
 								"addressLine2": "Summit",
 								"addressLine3": "Houston",
 								"town":         "South Bend",
-								"postcode":     "AI16VW",
+								"postcode":     "AI1 6VW",
 								"country":      "GB",
 							},
 							"correspondentName": "Leon Marius Selden",
@@ -133,7 +133,7 @@ func TestCreateDraft(t *testing.T) {
 								"addressLine2": "6064 Alessandro Plain",
 								"addressLine3": "Pittsfield",
 								"town":         "Concord",
-								"postcode":     "JN27UO",
+								"postcode":     "JN2 7UO",
 								"country":      "GB",
 							},
 							"donorPhone": "07893932118",
@@ -170,9 +170,6 @@ func TestCreateDraft(t *testing.T) {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
 				person, err := client.CreateDraft(Context{Context: context.Background()}, tc.draftData)
-				// if err != nil {
-				// 	panic(err)
-				// }
 				if (tc.expectedError) == nil {
 					assert.Equal(t, tc.expectedResponse, person)
 					assert.Nil(t, err)
