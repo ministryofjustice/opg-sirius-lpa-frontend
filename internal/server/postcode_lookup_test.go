@@ -15,18 +15,18 @@ type mockPostcodeLookupClient struct {
 	mock.Mock
 }
 
-func (m *mockPostcodeLookupClient) PostcodeLookup(ctx sirius.Context, postcode string) ([]sirius.Address, error) {
+func (m *mockPostcodeLookupClient) PostcodeLookup(ctx sirius.Context, postcode string) ([]sirius.PostcodeLookupAddress, error) {
 	args := m.Called(ctx, postcode)
-	return args.Get(0).([]sirius.Address), args.Error(1)
+	return args.Get(0).([]sirius.PostcodeLookupAddress), args.Error(1)
 }
 
 func TestGetPostcodeLookup(t *testing.T) {
-	expectedAddresses := []sirius.Address{{
-		AddressLine1: "17 Some Road",
-		AddressLine2: "Testingsborough",
-		Town:         "Teston",
-		Postcode:     "SW1A 0AA",
-		Description:  "17 Some Road, Testingsborough, Teston",
+	expectedAddresses := []sirius.PostcodeLookupAddress{{
+		Line1:       "17 Some Road",
+		Line2:       "Testingsborough",
+		Town:        "Teston",
+		Postcode:    "SW1A 0AA",
+		Description: "17 Some Road, Testingsborough, Teston",
 	}}
 
 	client := &mockPostcodeLookupClient{}
@@ -44,7 +44,7 @@ func TestGetPostcodeLookup(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-	var addresses []sirius.Address
+	var addresses []sirius.PostcodeLookupAddress
 	_ = json.NewDecoder(resp.Body).Decode(&addresses)
 
 	assert.Equal(t, expectedAddresses, addresses)
@@ -54,7 +54,7 @@ func TestGetPostcodeLookupWhenError(t *testing.T) {
 	client := &mockPostcodeLookupClient{}
 	client.
 		On("PostcodeLookup", mock.Anything, "SW1A 0AA").
-		Return([]sirius.Address{}, expectedError)
+		Return([]sirius.PostcodeLookupAddress{}, expectedError)
 
 	req, _ := http.NewRequest(http.MethodGet, "/?postcode=SW1A 0AA", nil)
 
