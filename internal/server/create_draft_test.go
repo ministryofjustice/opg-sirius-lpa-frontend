@@ -21,8 +21,16 @@ func (m *mockCreateDraftClient) CreateDraft(ctx sirius.Context, draft sirius.Dra
 	return args.Get(0).(map[string]string), args.Error(1)
 }
 
+func (m *mockCreateDraftClient) GetUserDetails(ctx sirius.Context) (sirius.User, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(sirius.User), args.Error(1)
+}
+
 func TestGetCreateDraft(t *testing.T) {
 	client := &mockCreateDraftClient{}
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -40,8 +48,29 @@ func TestGetCreateDraft(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestGetCreateDraftForbidden(t *testing.T) {
+	client := &mockCreateDraftClient{}
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{}, nil)
+
+	template := &mockTemplate{}
+
+	r, _ := http.NewRequest(http.MethodGet, "/digital-lpas/create", nil)
+	w := httptest.NewRecorder()
+
+	err := CreateDraft(client, template.Func)(w, r)
+
+	assert.Equal(t, sirius.StatusError{Code: 403}, err)
+
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestPostCreateDraft(t *testing.T) {
 	client := &mockCreateDraftClient{}
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			CaseType:          []string{"pfa", "hw"},
@@ -154,6 +183,9 @@ func TestPostCreateDraft(t *testing.T) {
 func TestPostCreateDraftWhenAPIFails(t *testing.T) {
 	client := &mockCreateDraftClient{}
 	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
+	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			Source:    "PHONE",
 			DonorName: "Gerald Sandel",
@@ -181,6 +213,9 @@ func TestPostCreateDraftWhenAPIFails(t *testing.T) {
 
 func TestPostCreateDraftWhenValidationError(t *testing.T) {
 	client := &mockCreateDraftClient{}
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			Source:    "PHONE",
