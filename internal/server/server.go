@@ -178,6 +178,7 @@ func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL 
 				correlationId := ""
 
 				if statusError, ok := err.(sirius.StatusError); ok {
+					code = statusError.Code
 					correlationId = statusError.CorrelationId
 				}
 

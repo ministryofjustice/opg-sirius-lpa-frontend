@@ -34,6 +34,7 @@ type draft struct {
 
 type CreateDraftClient interface {
 	CreateDraft(ctx sirius.Context, draft sirius.Draft) (map[string]string, error)
+	GetUserDetails(ctx sirius.Context) (sirius.User, error)
 }
 
 type createDraftData struct {
@@ -67,6 +68,16 @@ func fallback(val string, fallback string) string {
 func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
+
+		user, err := client.GetUserDetails(ctx)
+
+		if err != nil {
+			return err
+		}
+
+		if !user.HasRole("private-mlpa") {
+			return sirius.StatusError{Code: http.StatusForbidden}
+		}
 
 		data := createDraftData{
 			XSRFToken: ctx.XSRFToken,
