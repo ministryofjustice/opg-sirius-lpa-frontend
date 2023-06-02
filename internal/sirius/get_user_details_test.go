@@ -38,7 +38,7 @@ func TestGetUserDetails(t *testing.T) {
 						Body: dsl.Like(map[string]interface{}{
 							"id":          dsl.Like(104),
 							"displayName": dsl.String("Test User"),
-							"roles":       dsl.Like([]string{"OPG User", "Reduced Fees User"}),
+							"roles":       dsl.Like([]string{"OPG User", "Reduced Fees User", "private-mlpa"}),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
@@ -46,7 +46,7 @@ func TestGetUserDetails(t *testing.T) {
 			expectedResponse: User{
 				ID:          104,
 				DisplayName: "Test User",
-				Roles:       []string{"OPG User", "Reduced Fees User"},
+				Roles:       []string{"OPG User", "Reduced Fees User", "private-mlpa"},
 			},
 		},
 	}
