@@ -94,8 +94,9 @@ func TestCreateContact(t *testing.T) {
 						Status:  http.StatusCreated,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 						Body: map[string]interface{}{
-							"id":  dsl.Like(771),
-							"uId": dsl.Like("7000-0000-2688"),
+							"id":         dsl.Like(771),
+							"uId":        dsl.Like("7000-0000-2688"),
+							"otherField": dsl.Like(true),
 						},
 					})
 			},
