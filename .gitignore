@@ -7,3 +7,6 @@ pacts/
 web/static
 .idea
 log/
+
+.structurizr
+docs/architecture/dsl/**/workspace.json
