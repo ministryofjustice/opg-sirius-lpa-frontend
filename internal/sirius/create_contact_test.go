@@ -88,6 +88,7 @@ func TestCreateContact(t *testing.T) {
 							"companyName":           "",
 							"companyReference":      "",
 							"researchOptOut":        false,
+							"otherField":            true,
 						},
 					}).
 					WillRespondWith(dsl.Response{
