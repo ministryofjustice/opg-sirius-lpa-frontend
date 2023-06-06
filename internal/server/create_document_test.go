@@ -183,12 +183,12 @@ func TestPostCreateDocumentGenerateNewRecipient(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, createDocumentData{
-					Case:                caseItem,
-					TemplateSelected:    selectedTemplate,
-					Success:             true,
-					SelectedInserts:     []string{"DDINSERT"},
-					HasViewedInsertPage: true,
-					Recipients:          []sirius.Person{donor, contact},
+					Case:                  caseItem,
+					TemplateSelected:      selectedTemplate,
+					RecipientAddedSuccess: true,
+					SelectedInserts:       []string{"DDINSERT"},
+					HasViewedInsertPage:   true,
+					Recipients:            []sirius.Person{donor, contact},
 				}).
 				Return(nil)
 

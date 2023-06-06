@@ -24,7 +24,7 @@ type CreateDocumentClient interface {
 
 type createDocumentData struct {
 	XSRFToken                  string
-	Success                    bool
+	RecipientAddedSuccess      bool
 	Error                      sirius.ValidationError
 	Case                       sirius.Case
 	Document                   sirius.Document
@@ -203,7 +203,6 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 				} else if err != nil {
 					return err
 				} else {
-					data.Success = true
 					return RedirectError(fmt.Sprintf("/edit-document?id=%d&case=%s", caseID, caseType))
 				}
 			case "addNewRecipient":
@@ -237,7 +236,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 				} else if err != nil {
 					return err
 				} else {
-					data.Success = true
+					data.RecipientAddedSuccess = true
 					data.TemplateSelected.TemplateId = r.FormValue("templateId")
 					data.HasViewedInsertPage = true
 					data.Recipients, err = getRecipients(data.Case)
