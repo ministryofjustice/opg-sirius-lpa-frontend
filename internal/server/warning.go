@@ -10,7 +10,8 @@ import (
 
 type WarningClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
-	CreateWarning(ctx sirius.Context, personId int, warningType, warningNote string) error
+	CreateWarning(ctx sirius.Context, personId int, warningType, warningNote string, caseIDs []int) error
+	Person(ctx sirius.Context, personID int) (sirius.Person, error)
 }
 
 type warningData struct {
@@ -21,6 +22,7 @@ type warningData struct {
 
 	WarningType string
 	WarningText string
+	Donor       sirius.Person
 }
 
 func Warning(client WarningClient, tmpl template.Template) Handler {
@@ -36,17 +38,37 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		donor, err := client.Person(ctx, personId)
+		if err != nil {
+			return err
+		}
+
 		data := warningData{
 			Success:      false,
 			XSRFToken:    ctx.XSRFToken,
 			WarningTypes: warningTypes,
+			Donor:        donor,
 		}
 
 		if r.Method == http.MethodPost {
 			warningType := postFormString(r, "warningType")
 			warningText := postFormString(r, "warningText")
 
-			err := client.CreateWarning(ctx, personId, warningType, warningText)
+			var caseIDs = []int{}
+
+			for _, id := range r.PostForm["case-id"] {
+				intID, err := strconv.Atoi(id)
+				if err != nil {
+					return err
+				}
+				caseIDs = append(caseIDs, intID)
+			}
+
+			//if warningType == "Donor Deceased" && !checkAllCasesSelected(caseIDs, donor.Cases) {
+			//
+			//}
+
+			err := client.CreateWarning(ctx, personId, warningType, warningText, caseIDs)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
@@ -63,3 +85,12 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 		return tmpl(w, data)
 	}
 }
+
+//func checkAllCasesSelected(caseIDsSelected []int, allCases []*sirius.Case) bool {
+//	allCasesSelected := true
+//	for _, caseItem := range allCases {
+//		allCasesSelected = slices.Contains(caseIDsSelected, caseItem.ID) // true
+//	}
+//
+//	return allCasesSelected
+//}
