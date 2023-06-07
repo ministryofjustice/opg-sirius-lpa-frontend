@@ -92,6 +92,7 @@ func TestCreateWarningOnMultipleCases(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: dsl.Like(map[string]interface{}{
+							"personId":    dsl.Like(400),
 							"caseIds":     dsl.Like([]int{405, 406}),
 							"warningType": dsl.Like("Complaint Received"),
 							"warningText": dsl.Like("Some warning notes for multiple cases"),

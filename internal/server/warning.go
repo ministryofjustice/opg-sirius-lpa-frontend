@@ -64,10 +64,6 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 				caseIDs = append(caseIDs, intID)
 			}
 
-			//if warningType == "Donor Deceased" && !checkAllCasesSelected(caseIDs, donor.Cases) {
-			//
-			//}
-
 			err := client.CreateWarning(ctx, personId, warningType, warningText, caseIDs)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
@@ -85,12 +81,3 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 		return tmpl(w, data)
 	}
 }
-
-//func checkAllCasesSelected(caseIDsSelected []int, allCases []*sirius.Case) bool {
-//	allCasesSelected := true
-//	for _, caseItem := range allCases {
-//		allCasesSelected = slices.Contains(caseIDsSelected, caseItem.ID) // true
-//	}
-//
-//	return allCasesSelected
-//}
