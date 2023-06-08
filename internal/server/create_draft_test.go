@@ -134,8 +134,8 @@ func TestPostCreateDraft(t *testing.T) {
 				},
 			},
 			Success: true,
-			Uids: map[string]string{
-				"pfa": "M-0123-4567-8901",
+			Uids: []createDraftResult{
+				{Subtype: "pfa", Uid: "M-0123-4567-8901"},
 			},
 		}).
 		Return(nil)

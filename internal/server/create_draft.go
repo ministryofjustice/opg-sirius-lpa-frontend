@@ -37,12 +37,17 @@ type CreateDraftClient interface {
 	GetUserDetails(ctx sirius.Context) (sirius.User, error)
 }
 
+type createDraftResult struct {
+	Uid     string
+	Subtype string
+}
+
 type createDraftData struct {
 	XSRFToken string
 	Draft     draft
 	Error     sirius.ValidationError
 	Success   bool
-	Uids      map[string]string
+	Uids      []createDraftResult
 }
 
 func buildName(parts ...string) string {
@@ -181,7 +186,13 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 				return err
 			} else {
 				data.Success = true
-				data.Uids = uids
+
+				for subtype, uid := range uids {
+					data.Uids = append(data.Uids, createDraftResult{
+						Subtype: subtype,
+						Uid:     uid,
+					})
+				}
 			}
 		}
 

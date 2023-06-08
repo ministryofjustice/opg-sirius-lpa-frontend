@@ -16,6 +16,14 @@ $sirius-bg-color: #29292e;
     color: govuk-colour("white");
   }
 
+  .govuk-caption-xl,
+  .govuk-caption-l,
+  .govuk-caption-m,
+  .govuk-caption-s,
+  .govuk-caption-xs {
+    color: govuk-colour("light-grey");
+  }
+
   h1,
   h2,
   h3,
@@ -110,5 +118,9 @@ $sirius-bg-color: #29292e;
 
   .govuk-back-link:before {
     border-color: govuk-colour("white");
+  }
+
+  .app-stat-block {
+    background-color: govuk-colour("dark-grey");
   }
 }
