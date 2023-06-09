@@ -14,6 +14,7 @@ const (
 	ComplaintOrigin            string = "complaintOrigin"
 	CompensationType           string = "compensationType"
 	ComplaintCategory          string = "complaintCategory"
+	CountryCategory            string = "country"
 )
 
 type RefDataItem struct {

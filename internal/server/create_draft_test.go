@@ -26,15 +26,28 @@ func (m *mockCreateDraftClient) GetUserDetails(ctx sirius.Context) (sirius.User,
 	return args.Get(0).(sirius.User), args.Error(1)
 }
 
+func (m *mockCreateDraftClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
+	args := m.Called(ctx, category)
+	if args.Get(0) != nil {
+		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
 func TestGetCreateDraft(t *testing.T) {
 	client := &mockCreateDraftClient{}
 	client.
 		On("GetUserDetails", mock.Anything).
 		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, createDraftData{}).
+		On("Func", mock.Anything, createDraftData{
+			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
+		}).
 		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/digital-lpas/create", nil)
@@ -53,6 +66,9 @@ func TestGetCreateDraftForbidden(t *testing.T) {
 	client.
 		On("GetUserDetails", mock.Anything).
 		Return(sirius.User{}, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 
 	template := &mockTemplate{}
 
@@ -71,6 +87,9 @@ func TestPostCreateDraft(t *testing.T) {
 	client.
 		On("GetUserDetails", mock.Anything).
 		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			CaseType:          []string{"pfa", "hw"},
@@ -104,6 +123,7 @@ func TestPostCreateDraft(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createDraftData{
+			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
 			Draft: draft{
 				SubTypes:        []string{"pfa", "hw"},
 				DonorFirstname:  "Gerald",
@@ -186,6 +206,9 @@ func TestPostCreateDraftWhenAPIFails(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			Source:    "PHONE",
 			DonorName: "Gerald Sandel",
@@ -217,6 +240,9 @@ func TestPostCreateDraftWhenValidationError(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			Source:    "PHONE",
 			DonorName: "Gerald",
@@ -231,6 +257,7 @@ func TestPostCreateDraftWhenValidationError(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createDraftData{
+			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
 			Draft: draft{
 				DonorFirstname: "Gerald",
 			},
