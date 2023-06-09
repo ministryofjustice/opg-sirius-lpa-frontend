@@ -189,7 +189,7 @@ AddressFinder.prototype.underwriteValue = function (field, value) {
     );
   }
 
-  if ($input instanceof HTMLInputElement) {
+  if ($input instanceof HTMLInputElement || $input instanceof HTMLSelectElement) {
     $input.value = value;
   }
 };

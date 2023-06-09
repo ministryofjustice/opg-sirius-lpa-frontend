@@ -216,11 +216,9 @@ func getIgnoredInteractionsForCypressTesting(interactions []Interaction) []Inter
 	// We need this test to produce specific data in the response so that Cypress tests will pass.
 	// Since Pact won't let us return multiple array entries from `dsl.EachLike`
 	// we modify pact stub to return the desired output.
-	var updatedInteractions []Interaction
-	for _, i := range interactions {
-		switch i.ProviderState {
-		case "Some document template ids types exist":
-			i.Response.Body = []map[string]interface{}{{
+	for index, interaction := range interactions {
+		if interaction.Request.Path == "/lpa-api/v1/reference-data/documentTemplateId" {
+			interactions[index].Response.Body = []map[string]interface{}{{
 				"handle": "DDONSCREENSUMMARY",
 				"label":  "Donor deceased: Blank template",
 			}, {
@@ -228,7 +226,7 @@ func getIgnoredInteractionsForCypressTesting(interactions []Interaction) []Inter
 				"label":  "DD1 - Case complete",
 			}}
 		}
-		updatedInteractions = append(updatedInteractions, i)
 	}
-	return updatedInteractions
+
+	return interactions
 }
