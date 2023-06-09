@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRefDataByCategoryWarningTypes(t *testing.T) {
+func TestRefDataByCategory(t *testing.T) {
 	t.Parallel()
 
 	pact := newPact()
@@ -19,16 +19,17 @@ func TestRefDataByCategoryWarningTypes(t *testing.T) {
 	testCases := []struct {
 		name             string
 		setup            func()
+		category         string
 		expectedResponse []RefDataItem
 		expectedError    func(int) error
 	}{
 		{
-			name: "OK",
+			name:     "Warning Types",
+			category: WarningTypeCategory,
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("Some warning types exist").
-					UponReceiving("A request for warning types").
+					UponReceiving("A request for warning type ref data").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String(fmt.Sprintf("/lpa-api/v1/reference-data/%s", WarningTypeCategory)),
@@ -49,48 +50,12 @@ func TestRefDataByCategoryWarningTypes(t *testing.T) {
 				},
 			},
 		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.setup()
-
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
-
-				types, err := client.RefDataByCategory(Context{Context: context.Background()}, WarningTypeCategory)
-
-				assert.Equal(t, tc.expectedResponse, types)
-				if tc.expectedError == nil {
-					assert.Nil(t, err)
-				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
-				}
-				return nil
-			}))
-		})
-	}
-
-}
-
-func TestRefDataByCategoryPaymentSources(t *testing.T) {
-	t.Parallel()
-
-	pact := newPact()
-	defer pact.Teardown()
-
-	testCases := []struct {
-		name             string
-		setup            func()
-		expectedResponse []RefDataItem
-		expectedError    func(int) error
-	}{
 		{
-			name: "OK",
+			name:     "Payment sources",
+			category: PaymentSourceCategory,
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("Some payment sources exist").
 					UponReceiving("A request for payment source ref data").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
@@ -114,49 +79,13 @@ func TestRefDataByCategoryPaymentSources(t *testing.T) {
 				},
 			},
 		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.setup()
-
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
-
-				types, err := client.RefDataByCategory(Context{Context: context.Background()}, PaymentSourceCategory)
-
-				assert.Equal(t, tc.expectedResponse, types)
-				if tc.expectedError == nil {
-					assert.Nil(t, err)
-				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
-				}
-				return nil
-			}))
-		})
-	}
-
-}
-
-func TestRefDataByCategoryFeeReductionType(t *testing.T) {
-	t.Parallel()
-
-	pact := newPact()
-	defer pact.Teardown()
-
-	testCases := []struct {
-		name             string
-		setup            func()
-		expectedResponse []RefDataItem
-		expectedError    func(int) error
-	}{
 		{
-			name: "OK",
+			name:     "Fee reduction types",
+			category: FeeReductionTypeCategory,
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("Some fee reduction types exist").
-					UponReceiving("A request for fee reduction ref data").
+					UponReceiving("A request for fee reduction type ref data").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String(fmt.Sprintf("/lpa-api/v1/reference-data/%s", FeeReductionTypeCategory)),
@@ -177,48 +106,13 @@ func TestRefDataByCategoryFeeReductionType(t *testing.T) {
 				},
 			},
 		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.setup()
-
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
-
-				types, err := client.RefDataByCategory(Context{Context: context.Background()}, FeeReductionTypeCategory)
-
-				assert.Equal(t, tc.expectedResponse, types)
-				if tc.expectedError == nil {
-					assert.Nil(t, err)
-				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
-				}
-				return nil
-			}))
-		})
-	}
-}
-
-func TestRefDataByCategoryPaymentReferenceType(t *testing.T) {
-	t.Parallel()
-
-	pact := newPact()
-	defer pact.Teardown()
-
-	testCases := []struct {
-		name             string
-		setup            func()
-		expectedResponse []RefDataItem
-		expectedError    func(int) error
-	}{
 		{
-			name: "OK",
+			name:     "Payment reference types",
+			category: PaymentReferenceType,
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("Some payment reference types exist").
-					UponReceiving("A request for payment reference ref data").
+					UponReceiving("A request for payment reference type ref data").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String(fmt.Sprintf("/lpa-api/v1/reference-data/%s", PaymentReferenceType)),
@@ -239,47 +133,12 @@ func TestRefDataByCategoryPaymentReferenceType(t *testing.T) {
 				},
 			},
 		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.setup()
-
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
-
-				types, err := client.RefDataByCategory(Context{Context: context.Background()}, PaymentReferenceType)
-
-				assert.Equal(t, tc.expectedResponse, types)
-				if tc.expectedError == nil {
-					assert.Nil(t, err)
-				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
-				}
-				return nil
-			}))
-		})
-	}
-}
-
-func TestRefDataByCategoryDocumentTemplateId(t *testing.T) {
-	t.Parallel()
-
-	pact := newPact()
-	defer pact.Teardown()
-
-	testCases := []struct {
-		name             string
-		setup            func()
-		expectedResponse []RefDataItem
-		expectedError    func(int) error
-	}{
 		{
-			name: "OK",
+			name:     "Document template IDs",
+			category: DocumentTemplateIdCategory,
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("Some document template ids types exist").
 					UponReceiving("A request for document template id ref data").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
@@ -301,43 +160,9 @@ func TestRefDataByCategoryDocumentTemplateId(t *testing.T) {
 				},
 			},
 		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.setup()
-
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
-
-				types, err := client.RefDataByCategory(Context{Context: context.Background()}, DocumentTemplateIdCategory)
-
-				assert.Equal(t, tc.expectedResponse, types)
-				if tc.expectedError == nil {
-					assert.Nil(t, err)
-				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
-				}
-				return nil
-			}))
-		})
-	}
-}
-
-func TestRefDataByCategoryComplainantCategory(t *testing.T) {
-	t.Parallel()
-
-	pact := newPact()
-	defer pact.Teardown()
-
-	testCases := []struct {
-		name             string
-		setup            func()
-		expectedResponse []RefDataItem
-		expectedError    func(int) error
-	}{
 		{
-			name: "OK",
+			name:     "Complainant category",
+			category: ComplainantCategory,
 			setup: func() {
 				pact.
 					AddInteraction().
@@ -362,43 +187,9 @@ func TestRefDataByCategoryComplainantCategory(t *testing.T) {
 				},
 			},
 		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.setup()
-
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
-
-				types, err := client.RefDataByCategory(Context{Context: context.Background()}, ComplainantCategory)
-
-				assert.Equal(t, tc.expectedResponse, types)
-				if tc.expectedError == nil {
-					assert.Nil(t, err)
-				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
-				}
-				return nil
-			}))
-		})
-	}
-}
-
-func TestRefDataByCategoryComplainantOrigin(t *testing.T) {
-	t.Parallel()
-
-	pact := newPact()
-	defer pact.Teardown()
-
-	testCases := []struct {
-		name             string
-		setup            func()
-		expectedResponse []RefDataItem
-		expectedError    func(int) error
-	}{
 		{
-			name: "OK",
+			name:     "Complaint origin",
+			category: ComplaintOrigin,
 			setup: func() {
 				pact.
 					AddInteraction().
@@ -423,43 +214,9 @@ func TestRefDataByCategoryComplainantOrigin(t *testing.T) {
 				},
 			},
 		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.setup()
-
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
-
-				types, err := client.RefDataByCategory(Context{Context: context.Background()}, ComplaintOrigin)
-
-				assert.Equal(t, tc.expectedResponse, types)
-				if tc.expectedError == nil {
-					assert.Nil(t, err)
-				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
-				}
-				return nil
-			}))
-		})
-	}
-}
-
-func TestRefDataByCategoryCompensation(t *testing.T) {
-	t.Parallel()
-
-	pact := newPact()
-	defer pact.Teardown()
-
-	testCases := []struct {
-		name             string
-		setup            func()
-		expectedResponse []RefDataItem
-		expectedError    func(int) error
-	}{
 		{
-			name: "OK",
+			name:     "Compensation type",
+			category: CompensationType,
 			setup: func() {
 				pact.
 					AddInteraction().
@@ -484,43 +241,9 @@ func TestRefDataByCategoryCompensation(t *testing.T) {
 				},
 			},
 		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.setup()
-
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
-
-				types, err := client.RefDataByCategory(Context{Context: context.Background()}, CompensationType)
-
-				assert.Equal(t, tc.expectedResponse, types)
-				if tc.expectedError == nil {
-					assert.Nil(t, err)
-				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
-				}
-				return nil
-			}))
-		})
-	}
-}
-
-func TestRefDataByCategoryComplaintCategory(t *testing.T) {
-	t.Parallel()
-
-	pact := newPact()
-	defer pact.Teardown()
-
-	testCases := []struct {
-		name             string
-		setup            func()
-		expectedResponse []RefDataItem
-		expectedError    func(int) error
-	}{
 		{
-			name: "OK",
+			name:     "Complaint category",
+			category: ComplaintCategory,
 			setup: func() {
 				pact.
 					AddInteraction().
@@ -555,6 +278,33 @@ func TestRefDataByCategoryComplaintCategory(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "Country",
+			category: CountryCategory,
+			setup: func() {
+				pact.
+					AddInteraction().
+					UponReceiving("A request for country ref data").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String(fmt.Sprintf("/lpa-api/v1/reference-data/%s", CountryCategory)),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.EachLike(map[string]interface{}{
+							"handle": dsl.String("GB"),
+							"label":  dsl.String("Great Britain"),
+						}, 1),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: []RefDataItem{
+				{
+					Handle: "GB",
+					Label:  "Great Britain",
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -564,7 +314,7 @@ func TestRefDataByCategoryComplaintCategory(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				types, err := client.RefDataByCategory(Context{Context: context.Background()}, ComplaintCategory)
+				types, err := client.RefDataByCategory(Context{Context: context.Background()}, tc.category)
 
 				assert.Equal(t, tc.expectedResponse, types)
 				if tc.expectedError == nil {
