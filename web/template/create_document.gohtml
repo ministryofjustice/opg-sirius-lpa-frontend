@@ -16,19 +16,16 @@
         <div class="govuk-grid-column-full">
             {{ template "error-summary" .Error }}
 
-            {{ if .Success }}
-                <meta data-app-reload="page"/>
+            {{ if .RecipientAddedSuccess }}
                 {{ template "success-banner" "New recipient added" }}
             {{ end }}
 
             {{ if .HasSelectedAddNewRecipient }}
                 {{ template "create-document-back-and-case-details" . }}
                 {{ template "add-recipient" . }}
-
             {{ else if .HasViewedInsertPage }}
                 {{ template "create-document-back-and-case-details" . }}
                 {{ template "select-recipient" . }}
-
             {{ else if .TemplateSelected.TemplateId }}
                 {{ template "create-document-back-and-case-details" . }}
                 {{ template "select-insert" . }}
