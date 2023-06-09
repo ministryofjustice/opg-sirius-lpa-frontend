@@ -47,6 +47,15 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return "", nil
 		},
+		"date": func(s sirius.DateString, format string) (string, error) {
+			time, err := s.Time()
+
+			if err != nil {
+				return "", err
+			}
+
+			return time.Format(format), nil
+		},
 		"translateRefData": func(types []sirius.RefDataItem, tmplHandle string) string {
 			for _, refDataType := range types {
 				if refDataType.Handle == tmplHandle {

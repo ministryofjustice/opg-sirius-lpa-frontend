@@ -65,6 +65,7 @@ type Client interface {
 	EventClient
 	GetPaymentsClient
 	LinkPersonClient
+	LpaClient
 	MiReportingClient
 	RelationshipClient
 	SearchDonorsClient
@@ -117,6 +118,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/search-postcode", wrap(SearchPostcode(client)))
 	mux.Handle("/search", wrap(Search(client, templates.Get("search.gohtml"))))
 	mux.Handle("/digital-lpa/create", wrap(CreateDraft(client, templates.Get("create-draft.gohtml"))))
+	mux.Handle("/lpa", wrap(Lpa(client, templates.Get("lpa.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))
 	mux.Handle("/assets/", static)

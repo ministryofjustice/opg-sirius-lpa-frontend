@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 )
 
 // DateString is a date in the format "YYYY-MM-DD" that will unmarshal from and
@@ -74,4 +75,8 @@ func (s DateString) GetYear() (string, error) {
 	}
 
 	return parts[0], nil
+}
+
+func (s DateString) Time() (time.Time, error) {
+	return time.Parse("2006-01-02", string(s))
 }
