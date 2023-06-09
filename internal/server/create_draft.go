@@ -7,6 +7,7 @@ import (
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"golang.org/x/sync/errgroup"
 )
 
 type dob struct {
@@ -35,10 +36,12 @@ type draft struct {
 type CreateDraftClient interface {
 	CreateDraft(ctx sirius.Context, draft sirius.Draft) (map[string]string, error)
 	GetUserDetails(ctx sirius.Context) (sirius.User, error)
+	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
 type createDraftData struct {
 	XSRFToken string
+	Countries []sirius.RefDataItem
 	Draft     draft
 	Error     sirius.ValidationError
 	Success   bool
@@ -68,19 +71,37 @@ func fallback(val string, fallback string) string {
 func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
-
-		user, err := client.GetUserDetails(ctx)
-
-		if err != nil {
-			return err
-		}
-
-		if !user.HasRole("private-mlpa") {
-			return sirius.StatusError{Code: http.StatusForbidden}
-		}
+		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		data := createDraftData{
 			XSRFToken: ctx.XSRFToken,
+		}
+
+		group.Go(func() error {
+			user, err := client.GetUserDetails(ctx)
+			if err != nil {
+				return err
+			}
+
+			if !user.HasRole("private-mlpa") {
+				return sirius.StatusError{Code: http.StatusForbidden}
+			}
+
+			return nil
+		})
+
+		group.Go(func() error {
+			var err error
+			data.Countries, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.CountryCategory)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
+			return err
 		}
 
 		if r.Method == "POST" {
