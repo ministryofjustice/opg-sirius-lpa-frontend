@@ -4,7 +4,7 @@
       {{ .Label }}
     </label>
     {{ template "errors" .Errors }}
-    <select class="govuk-select {{ if .Errors }}govuk-select--error{{ end }}" id="f-{{ .Name }}" name="{{ .Name }}" {{ if .Attrs.required }}required{{ end }}>
+    <select class="govuk-select {{ if .Errors }}govuk-select--error{{ end }}" id="f-{{ .Name }}" name="{{ .Name }}" {{ if .Attrs.required }}required{{ end }} {{ range $k, $v := .Attrs }} {{$k | attr}}={{$v}} {{ end }}>
       <option hidden {{ if not .Value }}selected{{ end }} disabled></option>
       {{ range .Options }}
         <option value="{{ .Value }}" {{ if eq .Value $.Value }}selected{{ end }} >{{ .Label }}</option>
