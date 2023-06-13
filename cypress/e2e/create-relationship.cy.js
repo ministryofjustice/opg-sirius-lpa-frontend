@@ -1,5 +1,28 @@
 describe("Create a relationship", () => {
   beforeEach(() => {
+    cy.addMock("/lpa-api/v1/search/persons", "POST", {
+      status: 200,
+      body: {
+          "aggregations": {
+            "personType": {
+              "Donor": 1
+            }
+          },
+          "results": [
+            {
+              "firstname": "John",
+              "id": 47,
+              "personType": "Donor",
+              "surname": "Doe",
+              "uId": "7000-0000-0003"
+            }
+          ],
+          "total": {
+            "count": 1
+          }
+      },
+    });
+
     cy.visit("/create-relationship?id=189");
   });
 

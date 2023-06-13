@@ -1,7 +1,40 @@
 describe("Search", () => {
     describe("Searching by name", () => {
-
         it("finds a person not associated with a case", () => {
+            cy.addMock("/lpa-api/v1/search/persons", "POST", {
+                status: 200,
+                body: {
+                    "aggregations": {
+                      "personType": {
+                        "Donor": 1
+                      }
+                    },
+                    "results": [
+                      {
+                        "addressLine1": "123 Somewhere Road",
+                        "cases": [
+                          {
+                            "caseSubtype": "pfa",
+                            "caseType": "LPA",
+                            "id": 23,
+                            "status": "Perfect",
+                            "uId": "7000-5382-4438"
+                          }
+                        ],
+                        "dob": "17/03/1990",
+                        "firstname": "Bob",
+                        "id": 36,
+                        "personType": "Donor",
+                        "surname": "Smith",
+                        "uId": "7000-8548-8461"
+                      }
+                    ],
+                    "total": {
+                      "count": 1
+                    }
+                  },
+              });
+
             cy.visit("/search?term=bob");
             cy.contains("You searched for: bob");
             cy.contains("Showing 1 to 1 of 1 results");
@@ -19,6 +52,46 @@ describe("Search", () => {
         });
 
         it("finds a person with more than one case", () => {
+            cy.addMock("/lpa-api/v1/search/persons", "POST", {
+                status: 200,
+                body: {
+                    "aggregations": {
+                      "personType": {
+                        "Donor": 1
+                      }
+                    },
+                    "results": [
+                      {
+                        "addressLine1": "123 Somewhere Road",
+                        "cases": [
+                          {
+                            "caseSubtype": "pfa",
+                            "caseType": "LPA",
+                            "id": 23,
+                            "status": "Perfect",
+                            "uId": "7000-5382-4438"
+                          },
+                          {
+                            "caseSubtype": "hw",
+                            "caseType": "LPA",
+                            "id": 24,
+                            "status": "Pending",
+                            "uId": "7000-5382-8764"
+                          }
+                        ],
+                        "firstname": "Harry",
+                        "id": 36,
+                        "personType": "Donor",
+                        "surname": "Jones",
+                        "uId": "7000-8548-8461"
+                      }
+                    ],
+                    "total": {
+                      "count": 1
+                    }
+                },
+              });
+
             cy.visit("/search?term=harry");
             cy.contains("You searched for: harry");
             cy.contains("Showing 1 to 1 of 1 results");
@@ -39,6 +112,38 @@ describe("Search", () => {
         });
 
         it("finds a deputy", () => {
+            cy.addMock("/lpa-api/v1/search/persons", "POST", {
+                status: 200,
+                body: {
+                    "aggregations": {
+                      "personType": {
+                        "Deputy": 1
+                      }
+                    },
+                    "results": [
+                      {
+                        "addressLine1": "100 Random Road",
+                        "cases": [
+                          {
+                            "caseSubtype": "hw",
+                            "caseType": "ORDER",
+                            "id": 48,
+                            "uId": "7000-5113-1871"
+                          }
+                        ],
+                        "firstname": "Fred",
+                        "id": 65,
+                        "personType": "Deputy",
+                        "surname": "Jones",
+                        "uId": "7000-6509-8813"
+                      }
+                    ],
+                    "total": {
+                      "count": 1
+                    }
+                }
+              });
+
             cy.visit("/search?term=fred");
             cy.contains("You searched for: fred");
             cy.contains("Showing 1 to 1 of 1 results");
@@ -77,6 +182,15 @@ describe("Search", () => {
 
     describe("Search deleted case", () => {
        beforeEach(() => {
+           cy.addMock("/lpa-api/v1/search/persons", "POST", {
+            status: 200,
+            body: {
+                "total": {
+                  "count": 0
+                }
+            }
+          });
+
            cy.visit("/search?term=700000005555");
        });
 

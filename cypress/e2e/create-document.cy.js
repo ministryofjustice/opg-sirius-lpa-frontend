@@ -1,5 +1,38 @@
 describe("Create a document", () => {
     beforeEach(() => {
+        cy.addMock("/lpa-api/v1/templates/lpa", "GET", {
+            status: 200,
+            body: {
+                "DD": {
+                    "onScreenSummary": "DDONSCREENSUMMARY",
+                    "location":        "lpa/DD.html.twig",
+                    "inserts": {
+                        "all": {
+                            "DD1": {
+                                "onScreenSummary": "DD1LPAINSERTONSCREENSUMMARY",
+                                "location":        "lpa\/inserts\/DD1.html.twig",
+                                "order":           0,
+                            },
+                        },
+                    },
+                },
+            }
+          });
+
+        cy.addMock("/lpa-api/v1/reference-data/documentTemplateId", "GET", {
+            status: 200,
+            body: [
+                {
+                    "handle": "DDONSCREENSUMMARY",
+                    "label":  "Donor deceased: Blank template",
+                },
+                {
+                    "handle": "DD1LPAINSERTONSCREENSUMMARY",
+                    "label":  "DD1 - Case complete",
+                },
+            ],
+          });
+
         cy.visit("/create-document?id=800&case=lpa");
         cy.contains("7000-0000-0000");
         cy.contains("Select a document template");
@@ -55,6 +88,25 @@ describe("Create a document", () => {
     });
 
     it("displays parent recipient details only", () => {
+        cy.addMock("/lpa-api/v1/cases/807", "GET", {
+            status: 200,
+            body: {
+                uId:      "7000-0000-0002",
+                caseType: "LPA",
+                status:   "Pending",
+                donor: {
+                    id:        112,
+                    firstname: "Child",
+                    surname:   "Donor",
+                    parent: {
+                        id:        113,
+                        firstname: "Parent",
+                        surname:   "Donor",
+                    },
+                }
+            }
+          });
+
         cy.visit("/create-document?id=807&case=LPA&hasSelectedSubmitTemplate=true&templateId=DD&hasViewedInserts=true&insert=DD1");
         cy.contains("7000-0000-0002");
 
