@@ -39,13 +39,18 @@ type CreateDraftClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
+type createDraftResult struct {
+	Uid     string
+	Subtype string
+}
+
 type createDraftData struct {
 	XSRFToken string
 	Countries []sirius.RefDataItem
 	Draft     draft
 	Error     sirius.ValidationError
 	Success   bool
-	Uids      map[string]string
+	Uids      []createDraftResult
 }
 
 func buildName(parts ...string) string {
@@ -202,7 +207,13 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 				return err
 			} else {
 				data.Success = true
-				data.Uids = uids
+
+				for subtype, uid := range uids {
+					data.Uids = append(data.Uids, createDraftResult{
+						Subtype: subtype,
+						Uid:     uid,
+					})
+				}
 			}
 		}
 

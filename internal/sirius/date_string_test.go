@@ -3,6 +3,7 @@ package sirius
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -86,4 +87,13 @@ func TestDateStringGetYear(t *testing.T) {
 	y, err := v.GetYear()
 	assert.Nil(t, err)
 	assert.Equal(t, "2022", y)
+}
+
+func TestDateStringToTime(t *testing.T) {
+	str := DateString("2021-05-24")
+
+	timeDate, err := str.Time()
+
+	assert.IsType(t, time.Time{}, timeDate)
+	assert.Nil(t, err)
 }
