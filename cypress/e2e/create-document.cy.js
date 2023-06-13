@@ -88,6 +88,25 @@ describe("Create a document", () => {
     });
 
     it("displays parent recipient details only", () => {
+        cy.addMock("/lpa-api/v1/cases/807", "GET", {
+            status: 200,
+            body: {
+                uId:      "7000-0000-0002",
+                caseType: "LPA",
+                status:   "Pending",
+                donor: {
+                    id:        112,
+                    firstname: "Child",
+                    surname:   "Donor",
+                    parent: {
+                        id:        113,
+                        firstname: "Parent",
+                        surname:   "Donor",
+                    },
+                }
+            }
+          });
+
         cy.visit("/create-document?id=807&case=LPA&hasSelectedSubmitTemplate=true&templateId=DD&hasViewedInserts=true&insert=DD1");
         cy.contains("7000-0000-0002");
 
