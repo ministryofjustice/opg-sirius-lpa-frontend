@@ -1,5 +1,38 @@
 describe("Create a document", () => {
     beforeEach(() => {
+        cy.addMock("/lpa-api/v1/templates/lpa", "GET", {
+            status: 200,
+            body: {
+                "DD": {
+                    "onScreenSummary": "DDONSCREENSUMMARY",
+                    "location":        "lpa/DD.html.twig",
+                    "inserts": {
+                        "all": {
+                            "DD1": {
+                                "onScreenSummary": "DD1LPAINSERTONSCREENSUMMARY",
+                                "location":        "lpa\/inserts\/DD1.html.twig",
+                                "order":           0,
+                            },
+                        },
+                    },
+                },
+            }
+          });
+
+        cy.addMock("/lpa-api/v1/reference-data/documentTemplateId", "GET", {
+            status: 200,
+            body: [
+                {
+                    "handle": "DDONSCREENSUMMARY",
+                    "label":  "Donor deceased: Blank template",
+                },
+                {
+                    "handle": "DD1LPAINSERTONSCREENSUMMARY",
+                    "label":  "DD1 - Case complete",
+                },
+            ],
+          });
+
         cy.visit("/create-document?id=800&case=lpa");
         cy.contains("7000-0000-0000");
         cy.contains("Select a document template");
