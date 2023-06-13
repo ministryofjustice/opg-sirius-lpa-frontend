@@ -7,13 +7,11 @@ services:
       dockerfile: ./docker/sirius-lpa-frontend/Dockerfile
     ports: ["8888:8080"]
     environment:
-      SIRIUS_URL: http://pact-stub:8080
+      SIRIUS_URL: http://sirius-mock:8080
       SIRIUS_PUBLIC_URL: http://localhost:8080
 
-  pact-stub:
-    build: ./pact-stub
-    environment:
-      PACT_DIR: ./pacts
-      PORT: 8080
+  sirius-mock:
+    image: wiremock/wiremock:2.35.0
+    ports: ["1234:8080"]
     volumes:
-      - "../pacts:/app/pacts"
+      - "../cypress/mocks:/home/wiremock/mappings"
