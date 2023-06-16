@@ -139,3 +139,8 @@ $govuk-assets-path: "/lpa/frontend/assets/";
 .app-\!-moj-search__button {
   box-shadow: none !important;
 }
+
+.app-\!-html-class--dark input::placeholder {
+  color: white;
+  font-style: italic;
+}
