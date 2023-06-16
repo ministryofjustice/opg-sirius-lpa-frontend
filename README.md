@@ -32,6 +32,8 @@ SIRIUS_PUBLIC_URL=http://localhost:8080 SIRIUS_URL=http://localhost:8080 PORT=88
 
 ### Testing
 
+#### Unit tests
+
 Make sure that `pact` is available before running the tests, on a Mac with Homebrew you can do:
 
 ```
@@ -45,17 +47,22 @@ Then to run the tests:
 make go-test
 ```
 
-The tests will produce a `./pacts` directory which is then used to provide a
-stub service for the Cypress tests. To start the application in a way that uses
-the stub service, and open Cypress in the current project run the following:
+#### E2E tests (Cypress)
+
+You can run the end-to-end tests locally with Cypress. This will start a copy
+of the service with a mock backend so that you don't need to start all of the
+Sirius backend and can get reliable responses.
 
 ```
-docker-compose -f docker/docker-compose.ci.yml up -d --build app
+make build up
 yarn && yarn cypress
 ```
 
 ## Development
 
-On CI we lint using [golangci-lint](https://golangci-lint.run/). It may be
+For Go we lint using [golangci-lint](https://golangci-lint.run/). It may be
 useful to install locally to check changes. This will include a check on
 formatting so it is recommended to setup your editor to use `go fmt`.
+
+JavaScript files are similarly linted with [Prettier](https://prettier.io/).
+You can run this locally with `yarn prettier`.
