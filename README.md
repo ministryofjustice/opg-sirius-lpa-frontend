@@ -50,7 +50,7 @@ stub service for the Cypress tests. To start the application in a way that uses
 the stub service, and open Cypress in the current project run the following:
 
 ```
-docker-compose -f docker/docker-compose.cypress.yml up -d --build
+docker-compose -f docker/docker-compose.ci.yml up -d --build app
 yarn && yarn cypress
 ```
 
