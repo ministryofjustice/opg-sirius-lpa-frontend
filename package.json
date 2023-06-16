@@ -10,6 +10,7 @@
     "build:tinymce": "cp -r node_modules/tinymce/skins web/static/javascript",
     "clean": "rm -rf web/static",
     "cypress": "cypress open",
+    "lint": "prettier --check .",
     "prettier": "prettier --write .",
     "watch": "yarn build:js --watch"
   },

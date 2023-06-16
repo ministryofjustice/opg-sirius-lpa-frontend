@@ -9,9 +9,9 @@ describe("Edit investigation", () => {
     cy.get("#f-title").should("have.value", "Test title");
     cy.get("#f-information").should("have.value", "Some test info");
     cy.contains(".govuk-radios__label", "Normal")
-        .parent()
-        .get("input")
-        .should("be.checked");
+      .parent()
+      .get("input")
+      .should("be.checked");
     cy.get("#f-dateReceived").should("have.value", "2022-01-23");
     cy.get("#f-approvalDate").type("2022-04-05");
     cy.get("#f-riskAssessmentDate").type("2022-04-05");
