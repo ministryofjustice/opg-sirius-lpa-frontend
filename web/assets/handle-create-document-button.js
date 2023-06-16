@@ -21,10 +21,10 @@ const handleCreateDocumentButton = () => {
           (x) => x.checked
         );
         if (isOneRecipientSelected) {
-          createDocumentButton.removeAttribute("disabled")
+          createDocumentButton.removeAttribute("disabled");
           createDocumentButton.classList.remove("govuk-button--disabled");
         } else {
-          createDocumentButton.setAttribute("disabled", "true")
+          createDocumentButton.setAttribute("disabled", "true");
           createDocumentButton.classList.add("govuk-button--disabled");
         }
       });
