@@ -21,8 +21,13 @@ function enhanceTemplateSearchElement(element) {
       showAllValues: true,
       onConfirm: function (value) {
         // Provide default behaviour, which is normally overridden by `onConfirm`
-        const requestedOption = [].filter.call(this.selectElement.options, option => (option.textContent || option.innerText) === value)[0]
-        if (requestedOption) { requestedOption.selected = true }
+        const requestedOption = [].filter.call(
+          this.selectElement.options,
+          (option) => (option.textContent || option.innerText) === value
+        )[0];
+        if (requestedOption) {
+          requestedOption.selected = true;
+        }
 
         this.selectElement.dispatchEvent(new CustomEvent("confirm"));
       },
