@@ -143,8 +143,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Run linting
+      - name: Go Lint
         uses: golangci/golangci-lint-action@v3
+      - name: Prettier
+        run: yarn lint
 
   acceptance-test:
     name: Acceptance Testing
