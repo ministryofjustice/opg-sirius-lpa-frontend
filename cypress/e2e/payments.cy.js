@@ -8,8 +8,21 @@ describe("View a payment", () => {
 
     it("displays add payment and apply fee reduction buttons", () => {
       cy.visit("/payments?id=801");
-      cy.get(".govuk-button").contains("Add payment");
-      cy.get(".govuk-button").contains("Apply fee reduction");
+      cy.contains(".govuk-button", "Add payment");
+      cy.contains(".govuk-button", "Apply fee reduction").should("not.exist");
+    });
+
+    it("displays add payment and apply fee reduction buttons", () => {
+      cy.addMock("/lpa-api/v1/users/current", "GET", {
+        status: 200,
+        body: {
+          roles: ["OPG User", "Reduced Fees User"],
+        },
+      });
+
+      cy.visit("/payments?id=801");
+      cy.contains(".govuk-button", "Add payment");
+      cy.contains(".govuk-button", "Apply fee reduction");
     });
   });
 

@@ -63,7 +63,6 @@ jobs:
           make build
           mkdir -p /tmp/images
           docker save -o /tmp/images/app.tar sirius-lpa-frontend:latest
-          docker save -o /tmp/images/pact-stub.tar docker_pact-stub:latest
 
   test:
     name: Test
@@ -96,12 +95,6 @@ jobs:
       - name: Set Pact Standalone version
         run: |
           echo "pact_version=1.88.82" >> $GITHUB_ENV
-      - name: Cache Pact
-        id: cache-pact
-        uses: actions/cache@v3
-        with:
-          path: ./pact/
-          key: ${{ runner.os }}-pact-${{ env.pact_version }}
       - name: Add Pact to Path
         if: steps.cache-pact.outputs.cache-hit == 'true'
         run: |
@@ -131,13 +124,6 @@ jobs:
         with:
           files: /tmp/test-coverage.txt
           fail_ci_if_error: true
-      - name: Persist Pacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: pacts
-          path: |
-            ./pacts/sirius-lpa-frontend-sirius.json
-            ./pacts/ignored-ignored.json
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -161,16 +147,10 @@ jobs:
         with:
           path: /tmp/images
           key: ${{ runner.os }}-images-${{ github.run_id }}-${{ github.run_number }}
-      - name: Download Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: pacts
-          path: ./pacts
 
       - name: Restore Images
         run: |
           docker load -i /tmp/images/app.tar
-          docker load -i /tmp/images/pact-stub.tar
 
       - name: Run pa11y
         run: |
@@ -179,12 +159,6 @@ jobs:
       - name: Run Lighthouse
         run: |
           make lighthouse
-
-      - name: Retrieve pact
-        run: |
-          docker container create --name temp -v pacts_data:/root hello-world
-          docker cp ./pacts/ignored-ignored.json temp:/root/ignored-ignored.json
-          docker cp ./pacts/sirius-lpa-frontend-sirius.json temp:/root/sirius-lpa-frontend-sirius.json
 
   cypress:
     name: Cypress
@@ -199,22 +173,10 @@ jobs:
         with:
           path: /tmp/images
           key: ${{ runner.os }}-images-${{ github.run_id }}-${{ github.run_number }}
-      - name: Download Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: pacts
-          path: ./pacts
-
-      - name: Retrieve pact
-        run: |
-          docker container create --name temp -v pacts_data:/root hello-world
-          docker cp ./pacts/ignored-ignored.json temp:/root/ignored-ignored.json
-          docker cp ./pacts/sirius-lpa-frontend-sirius.json temp:/root/sirius-lpa-frontend-sirius.json
 
       - name: Restore images
         run: |
           docker load -i /tmp/images/app.tar
-          docker load -i /tmp/images/pact-stub.tar
 
       - name: Run app
         run: |

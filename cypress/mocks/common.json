@@ -1,0 +1,122 @@
+{
+  "mappings": [
+    {
+      "request": { "method": "GET", "url": "/lpa-api/v1/users/current" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"displayName\":\"Test User\",\"id\":104,\"roles\":[\"OPG User\"]}"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/reference-data/warningType"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"handle\":\"Complaint Received\",\"label\":\"Complaint Received\"}]"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/reference-data/paymentSource"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"handle\":\"PHONE\",\"label\":\"Paid over the phone\",\"userSelectable\":true}]"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/reference-data/feeReductionType"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"handle\":\"REMISSION\",\"label\":\"Remission\"}]"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/reference-data/paymentReferenceType"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"handle\":\"GOVUK\",\"label\":\"GOV.UK Pay\"}]"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/reference-data/documentTemplateId"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"handle\":\"DDONSCREENSUMMARY\",\"label\":\"Donor deceased: Blank template\"}]"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/reference-data/complainantCategory"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"handle\":\"LPA_DONOR\",\"label\":\"LPA Donor\"}]"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/reference-data/complaintOrigin"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"handle\":\"PHONE\",\"label\":\"Phone call\"}]"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/reference-data/compensationType"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"handle\":\"COMPENSATORY\",\"label\":\"Compensatory\"}]"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/reference-data/complaintCategory"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"handle\":\"02\",\"label\":\"OPG Decisions\",\"subcategories\":[{\"handle\":\"18\",\"label\":\"Fee Decision\"}]}]"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/reference-data/country"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"handle\":\"GB\",\"label\":\"Great Britain\"}]"
+      }
+    }
+  ]
+}
