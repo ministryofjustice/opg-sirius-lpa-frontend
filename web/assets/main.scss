@@ -140,7 +140,10 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   box-shadow: none !important;
 }
 
+input::placeholder {
+  font-style: italic;
+}
+
 .app-\!-html-class--dark input::placeholder {
   color: white;
-  font-style: italic;
 }
