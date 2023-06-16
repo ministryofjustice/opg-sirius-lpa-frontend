@@ -1,0 +1,722 @@
+{
+  "mappings": [
+    {
+      "name": "A request for the case",
+      "request": { "method": "GET", "url": "/lpa-api/v1/cases/801" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"caseType\":\"LPA\",\"donor\":{\"id\":189},\"status\":\"Pending\",\"uId\":\"7000-0000-0001\"}"
+      }
+    },
+    {
+      "name": "A request to create a draft document on the case",
+      "request": {
+        "method": "POST",
+        "url": "/lpa-api/v1/lpas/800/documents/draft"
+      },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"id\":1}"
+      }
+    },
+    {
+      "name": "A request to edit the document",
+      "request": {
+        "method": "PUT",
+        "url": "/lpa-api/v1/documents/dfef6714-b4fe-44c2-b26e-90dfe3663e95"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"childCount\":0,\"content\":\"<p>Edited test content</p>\",\"createdDate\":\"15/12/2022 13:41:04\",\"direction\":\"Outgoing\",\"filename\":\"LP-A.pdf\",\"friendlyDescription\":\"Dr Consuela Aysien - __LPAONSCREENSUMMARY__\",\"id\":1,\"mimeType\":\"application\\\\/pdf\",\"systemType\":\"LP-A\",\"type\":\"Draft\",\"uuid\":\"dfef6714-b4fe-44c2-b26e-90dfe3663e95\"}"
+      }
+    },
+    {
+      "name": "A request to delete a payment",
+      "request": { "method": "DELETE", "url": "/lpa-api/v1/payments/123" },
+      "response": { "status": 204, "headers": {} }
+    },
+    {
+      "name": "A request to delete the person reference",
+      "request": {
+        "method": "DELETE",
+        "url": "/lpa-api/v1/person-references/768"
+      },
+      "response": { "status": 204, "headers": {} }
+    },
+    {
+      "name": "A request for the case",
+      "request": { "method": "GET", "url": "/lpa-api/v1/cases/800" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"caseType\":\"LPA\",\"donor\":{\"id\":189},\"id\":800,\"status\":\"Pending\",\"uId\":\"7000-0000-0000\"}"
+      }
+    },
+    {
+      "name": "A request for the digital LPA",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/digital-lpas/M-1234-9876-4567"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"application\":{\"correspondentAddress\":{\"addressLine1\":\"Main Line Bungalow\",\"addressLine2\":\"Himmerton Lane\",\"addressLine3\":\"Sutton\",\"country\":\"GB\",\"postcode\":\"S24 7DJ\",\"town\":\"Scarsdale\"},\"correspondentName\":\"Heath Enstad\",\"donorAddress\":{\"addressLine1\":\"Apartment 24\",\"addressLine2\":\"Navigation Building\",\"addressLine3\":\"90 London Road\",\"country\":\"GB\",\"postcode\":\"B15 4TA\",\"town\":\"Birmingham\"},\"donorDob\":\"27/05/1978\",\"donorEmail\":\"zswanberg@host.example\",\"donorName\":\"Zoraida Swanberg\",\"donorPhone\":\"073456249524\"},\"caseSubtype\":\"pfa\",\"complaintCount\":1,\"createdDate\":\"26/03/2018\",\"investigationCount\":2,\"status\":\"Draft\",\"taskCount\":3,\"uId\":\"M-1234-9876-4567\",\"warningCount\":4}"
+      }
+    },
+    {
+      "name": "A request to add a complaint to the case",
+      "request": { "method": "POST", "url": "/lpa-api/v1/lpas/800/complaints" },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"id\":42}"
+      }
+    },
+    {
+      "name": "A request to delete a fee reduction",
+      "request": { "method": "DELETE", "url": "/lpa-api/v1/payments/124" },
+      "response": { "status": 204, "headers": {} }
+    },
+    {
+      "name": "A request to create a note",
+      "request": { "method": "POST", "url": "/lpa-api/v1/lpas/800/notes" },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request to create a note with a file",
+      "request": { "method": "POST", "url": "/lpa-api/v1/lpas/800/notes" },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A search for the deleted case",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/deleted-cases?uid=700000005555"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"deletedAt\":\"02/12/2022\",\"deletionReason\":\"LPA was not paid for after 12 months\",\"status\":\"Return - unpaid\",\"type\":\"LPA\",\"uId\":\"7000-0000-5555\"}]"
+      }
+    },
+    {
+      "name": "A request to unlink those cases",
+      "request": { "method": "PATCH", "url": "/lpa-api/v1/person-links/189" },
+      "response": { "status": 204, "headers": {} }
+    },
+    {
+      "name": "A request to assign a task",
+      "request": { "method": "PUT", "url": "/lpa-api/v1/users/47/tasks/990" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request to assign multiple tasks",
+      "request": {
+        "method": "PUT",
+        "url": "/lpa-api/v1/users/47/tasks/990+991"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request for the LPA's available statuses",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/lpas/800/available-statuses"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[\"Perfect\"]"
+      }
+    },
+    {
+      "name": "A request for the EPA's available statuses",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/epas/800/available-statuses"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[\"Perfect\"]"
+      }
+    },
+    {
+      "name": "A request to create a fee reduction",
+      "request": { "method": "POST", "url": "/lpa-api/v1/cases/801/payments" },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request for a document by uuid",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/documents/dfef6714-b4fe-44c2-b26e-90dfe3663e95"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"childCount\":0,\"content\":\"Test content\",\"correspondent\":{\"id\":189},\"createdDate\":\"15/12/2022 13:41:04\",\"direction\":\"Outgoing\",\"filename\":\"LP-A.pdf\",\"friendlyDescription\":\"Dr Consuela Aysien - __LPAONSCREENSUMMARY__\",\"id\":1,\"mimeType\":\"application\\\\/pdf\",\"systemType\":\"LP-A\",\"type\":\"Draft\",\"uuid\":\"dfef6714-b4fe-44c2-b26e-90dfe3663e95\"}"
+      }
+    },
+    {
+      "name": "A request to create a payment",
+      "request": { "method": "POST", "url": "/lpa-api/v1/cases/800/payments" },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request to edit the dates",
+      "request": { "method": "PUT", "url": "/lpa-api/v1/lpas/800/edit-dates" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request to create a contact",
+      "request": { "method": "POST", "url": "/lpa-api/v1/non-case-contacts" },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"id\":771,\"uId\":\"7000-0000-2688\"}"
+      }
+    },
+    {
+      "name": "A request to change the assignee of the case",
+      "request": { "method": "PUT", "url": "/lpa-api/v1/users/47/cases/800" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request to change the assignee of multiple cases",
+      "request": {
+        "method": "PUT",
+        "url": "/lpa-api/v1/users/47/cases/800+801+802"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request to add a document to the case",
+      "request": { "method": "POST", "url": "/lpa-api/v1/lpas/800/documents" },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"childCount\":0,\"content\":\"Test content\",\"createdDate\":\"15/12/2022 13:41:04\",\"direction\":\"Outgoing\",\"filename\":\"LP-A.pdf\",\"friendlyDescription\":\"Dr Consuela Aysien - __LPAONSCREENSUMMARY__\",\"id\":1,\"mimeType\":\"application\\\\/pdf\",\"systemType\":\"LP-A\",\"type\":\"Save\",\"uuid\":\"dfef6714-b4fe-44c2-b26e-90dfe3663e95\"}"
+      }
+    },
+    {
+      "name": "A request to edit the LPA",
+      "request": { "method": "PUT", "url": "/lpa-api/v1/lpas/800" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request to edit the EPA",
+      "request": { "method": "PUT", "url": "/lpa-api/v1/epas/800" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request to edit the complaint",
+      "request": { "method": "PUT", "url": "/lpa-api/v1/complaints/986" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request for the complaint",
+      "request": { "method": "GET", "url": "/lpa-api/v1/complaints/986" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"category\":\"01\",\"description\":\"This is seriously bad\",\"investigatingOfficer\":\"Test Officer\",\"receivedDate\":\"05/04/2022\",\"severity\":\"Major\",\"subCategory\":\"07\",\"summary\":\"This and that\"}"
+      }
+    },
+    {
+      "name": "A request for the case",
+      "request": { "method": "GET", "url": "/lpa-api/v1/cases/802" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"caseType\":\"LPA\",\"donor\":{\"id\":189},\"status\":\"Pending\",\"uId\":\"7000-0000-0002\"}"
+      }
+    },
+    {
+      "name": "A request to create an investigation on the case",
+      "request": {
+        "method": "POST",
+        "url": "/lpa-api/v1/lpas/800/investigations"
+      },
+      "response": { "status": 201, "headers": {} }
+    },
+    {
+      "name": "A request for that payment by ID",
+      "request": { "method": "GET", "url": "/lpa-api/v1/payments/123" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"amount\":4100,\"case\":{\"id\":800},\"id\":123,\"paymentDate\":\"23/01/2022\",\"source\":\"PHONE\"}"
+      }
+    },
+    {
+      "name": "A request for task types",
+      "request": { "method": "GET", "url": "/lpa-api/v1/tasktypes/lpa" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"task_types\":{\"Check Application\":{}}}"
+      }
+    },
+    {
+      "name": "A request for the documents by case",
+      "request": { "method": "GET", "url": "/lpa-api/v1/lpas/800/documents" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"childCount\":0,\"correspondent\":{\"firstname\":\"Consuela\",\"id\":189,\"surname\":\"Aysien\"},\"createdDate\":\"15/12/2022 13:41:04\",\"direction\":\"Outgoing\",\"filename\":\"LP-A.pdf\",\"friendlyDescription\":\"Dr Consuela Aysien - __LPAONSCREENSUMMARY__\",\"id\":1,\"mimeType\":\"application\\\\/pdf\",\"systemType\":\"LP-A\",\"type\":\"Draft\",\"uuid\":\"dfef6714-b4fe-44c2-b26e-90dfe3663e95\"}]"
+      }
+    },
+    {
+      "name": "A request for teams",
+      "request": { "method": "GET", "url": "/lpa-api/v1/teams" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"displayName\":\"Cool Team\",\"id\":23}]"
+      }
+    },
+    {
+      "name": "A request for a task",
+      "request": { "method": "GET", "url": "/lpa-api/v1/tasks/990" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"caseItems\":[{\"caseType\":\"LPA\",\"uId\":\"7000-0000-0001\"}],\"dueDate\":\"10/01/2022\",\"id\":990,\"name\":\"Create physical case file\",\"status\":\"Not Started\"}"
+      }
+    },
+    {
+      "name": "A request to create a draft LPA with minimal data",
+      "request": { "method": "POST", "url": "/lpa-api/v1/digital-lpas" },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"caseSubtype\":\"hw\",\"uId\":\"M-GHIJ-7890-KLMN\"}]"
+      }
+    },
+    {
+      "name": "A request to create a draft LPA with all possible data",
+      "request": { "method": "POST", "url": "/lpa-api/v1/digital-lpas" },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"caseSubtype\":\"hw\",\"uId\":\"M-GHIJ-7890-KLMN\"},{\"caseSubtype\":\"pfa\",\"uId\":\"M-ABCD-1234-EF56\"}]"
+      }
+    },
+    {
+      "name": "A request to take the investigation off hold",
+      "request": { "method": "DELETE", "url": "/lpa-api/v1/hold-periods/175" },
+      "response": { "status": 204, "headers": {} }
+    },
+    {
+      "name": "A request to create a donor",
+      "request": { "method": "POST", "url": "/lpa-api/v1/donors" },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"id\":771,\"uId\":\"7000-0290-0192\"}"
+      }
+    },
+    {
+      "name": "A postcode search",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/postcode-lookup?postcode=SW1A+1AA"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"addressLine1\":\"Office of the Public Guardian\",\"addressLine2\":\"1 Something Street\",\"addressLine3\":\"Someborough\",\"description\":\"Office of the Public Guardian, 1 Something Street, Someborough\",\"postcode\":\"SW1A 1AA\",\"town\":\"Someton\"}]"
+      }
+    },
+    {
+      "name": "A request for the person",
+      "request": { "method": "GET", "url": "/lpa-api/v1/persons/188" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"dob\":\"05/05/1970\",\"firstname\":\"John\",\"id\":188,\"surname\":\"Doe\",\"uId\":\"7000-0000-0007\"}"
+      }
+    },
+    {
+      "name": "A request for the person with children",
+      "request": { "method": "GET", "url": "/lpa-api/v1/persons/189" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"children\":[{\"firstname\":\"Child\",\"id\":105,\"surname\":\"One\",\"uId\":\"7000-0000-0002\"}],\"dob\":\"01/01/1970\",\"firstname\":\"John\",\"id\":189,\"surname\":\"Doe\",\"uId\":\"7000-0000-0001\"}"
+      }
+    },
+    {
+      "name": "A request for the person by UID",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/persons/by-uid/7000-0000-0001"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"dob\":\"01/01/1970\",\"firstname\":\"John\",\"id\":103,\"surname\":\"Doe\",\"uId\":\"7000-0000-0001\"}"
+      }
+    },
+    {
+      "name": "A request for the person by UID",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/persons/by-uid/7000-0000-0001"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"children\":[{\"id\":104}],\"dob\":\"01/01/1970\",\"firstname\":\"John\",\"id\":103,\"surname\":\"Doe\",\"uId\":\"7000-0000-0001\"}"
+      }
+    },
+    {
+      "name": "A request for person references",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/persons/189/references"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"displayName\":\"John Doe\",\"id\":189,\"reason\":\"Friend\",\"referenceId\":768,\"uid\":70000000000}]"
+      }
+    },
+    {
+      "name": "A request to place the investigation on hold",
+      "request": {
+        "method": "POST",
+        "url": "/lpa-api/v1/investigations/300/hold-periods"
+      },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request for that fee reduction by ID",
+      "request": { "method": "GET", "url": "/lpa-api/v1/payments/124" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"amount\":4100,\"case\":{\"id\":802},\"feeReductionType\":\"REMISSION\",\"id\":124,\"paymentDate\":\"23/01/2022\",\"paymentEvidence\":\"Test evidence\",\"source\":\"FEE_REDUCTION\"}"
+      }
+    },
+    {
+      "name": "A search for admin users",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/search/users?query=admin"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"displayName\":\"system admin\",\"id\":47}]"
+      }
+    },
+    {
+      "name": "A search request for a donor not related to a case",
+      "request": { "method": "POST", "url": "/lpa-api/v1/search/persons" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"aggregations\":{\"personType\":{\"Donor\":1}},\"results\":[{\"addressLine1\":\"123 Somewhere Road\",\"cases\":[{\"caseSubtype\":\"pfa\",\"caseType\":\"LPA\",\"id\":23,\"status\":\"Perfect\",\"uId\":\"7000-5382-4438\"}],\"dob\":\"17/03/1990\",\"firstname\":\"Bob\",\"id\":36,\"personType\":\"Donor\",\"surname\":\"Smith\",\"uId\":\"7000-8548-8461\"}],\"total\":{\"count\":1}}"
+      }
+    },
+    {
+      "name": "A search request for the deleted case uid",
+      "request": { "method": "POST", "url": "/lpa-api/v1/search/persons" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"total\":{\"count\":0}}"
+      }
+    },
+    {
+      "name": "A request to edit a fee reduction",
+      "request": { "method": "PUT", "url": "/lpa-api/v1/payments/124" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A search for donors",
+      "request": { "method": "POST", "url": "/lpa-api/v1/search/persons" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"aggregations\":{\"personType\":{\"Donor\":1}},\"results\":[{\"addressLine1\":\"123 Somewhere Road\",\"cases\":[{\"caseSubtype\":\"pfa\",\"caseType\":\"LPA\",\"id\":23,\"status\":\"Perfect\",\"uId\":\"7000-8548-8461\"}],\"firstname\":\"John\",\"id\":47,\"personType\":\"Donor\",\"surname\":\"Doe\",\"uId\":\"7000-0000-0003\"}],\"total\":{\"count\":1}}"
+      }
+    },
+    {
+      "name": "A request for note types",
+      "request": { "method": "GET", "url": "/lpa-api/v1/note-types/lpa" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[\"Application processing\"]"
+      }
+    },
+    {
+      "name": "A request for the payments by case",
+      "request": { "method": "GET", "url": "/lpa-api/v1/cases/800/payments" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"amount\":4100,\"case\":{\"id\":800},\"id\":2,\"paymentDate\":\"23/01/2022\",\"source\":\"MAKE\"}]"
+      }
+    },
+    {
+      "name": "A request for the payments by case",
+      "request": { "method": "GET", "url": "/lpa-api/v1/cases/801/payments" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[]"
+      }
+    },
+    {
+      "name": "A request for the investigation",
+      "request": { "method": "GET", "url": "/lpa-api/v1/investigations/300" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"additionalInformation\":\"Some test info\",\"id\":300,\"investigationReceivedDate\":\"23/01/2022\",\"investigationTitle\":\"Test title\",\"type\":\"Normal\"}"
+      }
+    },
+    {
+      "name": "A request to create a warning",
+      "request": { "method": "POST", "url": "/lpa-api/v1/warnings" },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request for the fee reduction by case",
+      "request": { "method": "GET", "url": "/lpa-api/v1/cases/802/payments" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"amount\":4100,\"case\":{\"id\":802},\"feeReductionType\":\"REMISSION\",\"id\":3,\"paymentDate\":\"24/01/2022\",\"paymentEvidence\":\"Test\\nmultiple\\nline evidence\",\"source\":\"FEE_REDUCTION\"}]"
+      }
+    },
+    {
+      "name": "A request to edit the investigation",
+      "request": { "method": "PUT", "url": "/lpa-api/v1/investigations/300" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request to delete a document",
+      "request": {
+        "method": "DELETE",
+        "url": "/lpa-api/v1/documents/dfef6714-b4fe-44c2-b26e-90dfe3663e95"
+      },
+      "response": { "status": 204, "headers": {} }
+    },
+    {
+      "name": "A request to create a person reference",
+      "request": {
+        "method": "POST",
+        "url": "/lpa-api/v1/persons/189/references"
+      },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request to edit a payment",
+      "request": { "method": "PUT", "url": "/lpa-api/v1/payments/123" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request to create a task",
+      "request": { "method": "POST", "url": "/lpa-api/v1/cases/800/tasks" },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request to create a task for a team",
+      "request": { "method": "POST", "url": "/lpa-api/v1/cases/800/tasks" },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request for document templates",
+      "request": { "method": "GET", "url": "/lpa-api/v1/templates/lpa" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"DD\":{\"inserts\":{\"all\":{\"DD1\":{\"location\":\"lpa\\\\/inserts\\\\/DD1.html.twig\",\"onScreenSummary\":\"DD1LPAINSERTONSCREENSUMMARY\",\"order\":0}}},\"location\":\"lpa\\\\/DD.html.twig\",\"onScreenSummary\":\"DDONSCREENSUMMARY\"}}"
+      }
+    },
+    {
+      "name": "A request for document templates (no inserts)",
+      "request": { "method": "GET", "url": "/lpa-api/v1/templates/lpa" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"CT-bb\":{\"inserts\":[],\"location\":\"complaints/CT-bb.html.twig\",\"onScreenSummary\":\"CTBBONSCREENSUMMARY\"}}"
+      }
+    },
+    {
+      "name": "A request to link two people",
+      "request": { "method": "POST", "url": "/lpa-api/v1/person-links" },
+      "response": { "status": 204, "headers": {} }
+    },
+    {
+      "name": "A request for the investigation which is on hold",
+      "request": { "method": "GET", "url": "/lpa-api/v1/investigations/301" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"additionalInformation\":\"Some test info\",\"holdPeriods\":[{\"id\":175,\"reason\":\"Police Investigation\",\"startDate\":\"25/01/2022\"}],\"id\":301,\"investigationReceivedDate\":\"23/01/2022\",\"investigationTitle\":\"Test title\",\"isOnHold\":true,\"type\":\"Normal\"}"
+      }
+    },
+    {
+      "name": "A request to edit a donor",
+      "request": { "method": "PUT", "url": "/lpa-api/v1/donors/188" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request for the MI config",
+      "request": { "method": "GET", "url": "/api/reporting/config" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"data\":{\"items\":[{\"properties\":{\"reportType\":{\"description\":\"radio\",\"enum\":[{\"description\":\"Number of EPAs received\",\"name\":\"epasReceived\"}],\"type\":\"reportType\"}}}]}}"
+      }
+    },
+    {
+      "name": "A request for an MI report",
+      "request": {
+        "method": "GET",
+        "url": "/api/reporting/applications?reportType=epasReceived"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"data\":{\"report_description\":\"Number of EPAs received\",\"report_type\":\"epasReceived\",\"result_count\":10}}"
+      }
+    },
+    {
+      "name": "A request for a case with a linked donor",
+      "request": { "method": "GET", "url": "/lpa-api/v1/cases/807" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"caseType\":\"LPA\",\"donor\":{\"firstname\":\"Child\",\"id\":112,\"parent\":{\"firstname\":\"Parent\",\"id\":113,\"surname\":\"Donor\"},\"surname\":\"Donor\"},\"status\":\"Pending\",\"uId\":\"7000-0000-0002\"}"
+      }
+    },
+    {
+      "name": "A search request for a donor who has more than one case",
+      "request": { "method": "POST", "url": "/lpa-api/v1/search/persons" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"aggregations\":{\"personType\":{\"Donor\":1}},\"results\":[{\"addressLine1\":\"123 Somewhere Road\",\"cases\":[{\"caseSubtype\":\"pfa\",\"caseType\":\"LPA\",\"id\":23,\"status\":\"Perfect\",\"uId\":\"7000-5382-4438\"},{\"caseSubtype\":\"hw\",\"caseType\":\"LPA\",\"id\":24,\"status\":\"Pending\",\"uId\":\"7000-5382-8764\"}],\"firstname\":\"Harry\",\"id\":36,\"personType\":\"Donor\",\"surname\":\"Jones\",\"uId\":\"7000-8548-8461\"}],\"total\":{\"count\":1}}"
+      }
+    },
+    {
+      "name": "A search request for a person who doesn't exist",
+      "request": { "method": "POST", "url": "/lpa-api/v1/search/persons" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"total\":{\"count\":0}}"
+      }
+    },
+    {
+      "name": "A search request for a person who doesn't exist with filters applied",
+      "request": { "method": "POST", "url": "/lpa-api/v1/search/persons" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"total\":{\"count\":0}}"
+      }
+    },
+    {
+      "name": "A search request for a deputy",
+      "request": { "method": "POST", "url": "/lpa-api/v1/search/persons" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"aggregations\":{\"personType\":{\"Deputy\":1}},\"results\":[{\"addressLine1\":\"100 Random Road\",\"cases\":[{\"caseSubtype\":\"hw\",\"caseType\":\"ORDER\",\"id\":48,\"uId\":\"7000-5113-1871\"}],\"firstname\":\"Fred\",\"id\":65,\"personType\":\"Deputy\",\"surname\":\"Jones\",\"uId\":\"7000-6509-8813\"}],\"total\":{\"count\":1}}"
+      }
+    },
+    {
+      "name": "A request for the documents by case",
+      "request": { "method": "GET", "url": "/lpa-api/v1/lpas/894/documents" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"id\":1,\"uuid\":\"7327f57d-e3d5-4300-95a8-67b3337c7231\"},{\"id\":2,\"uuid\":\"40fa2847-27ae-4976-a93a-9f45ec0a4e98\"}]"
+      }
+    },
+    {
+      "name": "A request for the current user",
+      "request": { "method": "GET", "url": "/lpa-api/v1/users/current" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"displayName\":\"Test User\",\"id\":105,\"roles\":[\"OPG User\",\"Reduced Fees User\",\"private-mlpa\"]}"
+      }
+    }
+  ]
+}
