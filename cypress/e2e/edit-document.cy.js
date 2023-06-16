@@ -1,5 +1,28 @@
 describe("Edit a document", () => {
   beforeEach(() => {
+    cy.addMock("/lpa-api/v1/lpas/800/documents?type[]=Draft", "GET", {
+      status: 200,
+      body: [
+        {
+          childCount: 0,
+          correspondent: {
+            firstname: "Consuela",
+            id: 189,
+            surname: "Aysien",
+          },
+          createdDate: "15/12/2022 13:41:04",
+          direction: "Outgoing",
+          filename: "LP-A.pdf",
+          friendlyDescription: "Dr Consuela Aysien - __LPAONSCREENSUMMARY__",
+          id: 1,
+          mimeType: "application\\/pdf",
+          systemType: "LP-A",
+          type: "Draft",
+          uuid: "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+        },
+      ],
+    });
+
     cy.visit("/edit-document?id=800&case=lpa");
   });
 

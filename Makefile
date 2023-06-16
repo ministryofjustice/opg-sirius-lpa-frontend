@@ -11,13 +11,13 @@ go-test:
 	go test -count 1 ./...
 
 build:
-	docker-compose -f docker/docker-compose.ci.yml build --parallel app pact-stub
+	docker-compose -f docker/docker-compose.ci.yml build --parallel app
 
 build-all:
-	docker-compose -f docker/docker-compose.ci.yml build --parallel app pact-stub puppeteer cypress
+	docker-compose -f docker/docker-compose.ci.yml build --parallel app puppeteer cypress
 
 up:
-	docker-compose -f docker/docker-compose.ci.yml up -d
+	docker-compose -f docker/docker-compose.ci.yml up -d app
 
 dev:
 	docker-compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml up -d
