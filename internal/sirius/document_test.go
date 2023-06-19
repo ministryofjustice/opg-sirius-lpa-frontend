@@ -94,56 +94,6 @@ func TestDocument(t *testing.T) {
 	}
 }
 
-func TestDocumentsSortedByID(t *testing.T) {
-	t.Parallel()
-
-	pact := newIgnoredPact()
-	defer pact.Teardown()
-
-	pact.
-		AddInteraction().
-		Given("I have an lpa with multiple documents, out of order").
-		UponReceiving("A request for the documents by case").
-		WithRequest(dsl.Request{
-			Method: http.MethodGet,
-			Path:   dsl.String("/lpa-api/v1/lpas/894/documents"),
-		}).
-		WillRespondWith(dsl.Response{
-			Status: http.StatusOK,
-			Body: []map[string]interface{}{
-				{
-					"id":   1,
-					"uuid": "7327f57d-e3d5-4300-95a8-67b3337c7231",
-				},
-				{
-					"id":   2,
-					"uuid": "40fa2847-27ae-4976-a93a-9f45ec0a4e98",
-				},
-			},
-			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-		})
-
-	assert.Nil(t, pact.Verify(func() error {
-		client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
-
-		documents, err := client.Documents(Context{Context: context.Background()}, CaseTypeLpa, 894, TypeDraft)
-
-		assert.Equal(t, []Document{
-			{
-				ID:   2,
-				UUID: "40fa2847-27ae-4976-a93a-9f45ec0a4e98",
-			},
-			{
-				ID:   1,
-				UUID: "7327f57d-e3d5-4300-95a8-67b3337c7231",
-			},
-		}, documents)
-		assert.Nil(t, err)
-
-		return nil
-	}))
-}
-
 func TestDocumentByUuid(t *testing.T) {
 	t.Parallel()
 

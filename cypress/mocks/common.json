@@ -60,7 +60,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "[{\"handle\":\"DDONSCREENSUMMARY\",\"label\":\"Donor deceased: Blank template\"}]"
+        "body": "[{\"handle\":\"DDONSCREENSUMMARY\",\"label\":\"Donor deceased: Blank template\"},{\"handle\":\"DD1LPAINSERTONSCREENSUMMARY\",\"label\":\"DD1 - Case complete\"}]"
       }
     },
     {
