@@ -1,5 +1,12 @@
 describe("Create Digital LPA draft", () => {
   beforeEach(() => {
+    cy.addMock("/lpa-api/v1/users/current", "GET", {
+      status: 200,
+      body: {
+        roles: ["OPG User", "private-mlpa"],
+      },
+    });
+
     cy.visit("/digital-lpa/create");
   });
 
