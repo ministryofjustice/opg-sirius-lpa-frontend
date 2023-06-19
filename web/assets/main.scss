@@ -161,3 +161,8 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   border-width: 1px;
   border-right: none;
 }
+
+/* 19px font for menu items in header */
+.govuk-header__navigation-item a {
+  font-size: 1.1875rem !important;
+}
