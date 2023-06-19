@@ -24,10 +24,7 @@ const toMappings = (filename) => {
   }));
 };
 
-const mappings = [
-  ...toMappings("sirius-lpa-frontend-sirius"),
-  ...toMappings("ignored-ignored"),
-];
+const mappings = [...toMappings("sirius-lpa-frontend-sirius")];
 
 fs.writeFileSync(
   path.join(__dirname, "migrated-from-pact.json"),
