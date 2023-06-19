@@ -158,5 +158,6 @@ $govuk-assets-path: "/lpa/frontend/assets/";
    no right border on the input box, as per design */
 .moj-search__input {
   border-color: #b1b4b6 !important;
+  border-width: 1px;
   border-right: none;
 }
