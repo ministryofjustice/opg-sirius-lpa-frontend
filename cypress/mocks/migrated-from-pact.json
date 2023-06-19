@@ -299,15 +299,6 @@
       }
     },
     {
-      "name": "A request for the documents by case",
-      "request": { "method": "GET", "url": "/lpa-api/v1/lpas/800/documents" },
-      "response": {
-        "status": 200,
-        "headers": { "Content-Type": "application/json" },
-        "body": "[{\"childCount\":0,\"correspondent\":{\"firstname\":\"Consuela\",\"id\":189,\"surname\":\"Aysien\"},\"createdDate\":\"15/12/2022 13:41:04\",\"direction\":\"Outgoing\",\"filename\":\"LP-A.pdf\",\"friendlyDescription\":\"Dr Consuela Aysien - __LPAONSCREENSUMMARY__\",\"id\":1,\"mimeType\":\"application\\\\/pdf\",\"systemType\":\"LP-A\",\"type\":\"Draft\",\"uuid\":\"dfef6714-b4fe-44c2-b26e-90dfe3663e95\"}]"
-      }
-    },
-    {
       "name": "A request for teams",
       "request": { "method": "GET", "url": "/lpa-api/v1/teams" },
       "response": {
@@ -482,15 +473,6 @@
       }
     },
     {
-      "name": "A search for donors",
-      "request": { "method": "POST", "url": "/lpa-api/v1/search/persons" },
-      "response": {
-        "status": 200,
-        "headers": { "Content-Type": "application/json" },
-        "body": "{\"aggregations\":{\"personType\":{\"Donor\":1}},\"results\":[{\"addressLine1\":\"123 Somewhere Road\",\"cases\":[{\"caseSubtype\":\"pfa\",\"caseType\":\"LPA\",\"id\":23,\"status\":\"Perfect\",\"uId\":\"7000-8548-8461\"}],\"firstname\":\"John\",\"id\":47,\"personType\":\"Donor\",\"surname\":\"Doe\",\"uId\":\"7000-0000-0003\"}],\"total\":{\"count\":1}}"
-      }
-    },
-    {
       "name": "A request for note types",
       "request": { "method": "GET", "url": "/lpa-api/v1/note-types/lpa" },
       "response": {
@@ -653,15 +635,6 @@
         "status": 200,
         "headers": { "Content-Type": "application/json" },
         "body": "{\"data\":{\"report_description\":\"Number of EPAs received\",\"report_type\":\"epasReceived\",\"result_count\":10}}"
-      }
-    },
-    {
-      "name": "A request for a case with a linked donor",
-      "request": { "method": "GET", "url": "/lpa-api/v1/cases/807" },
-      "response": {
-        "status": 200,
-        "headers": { "Content-Type": "application/json" },
-        "body": "{\"caseType\":\"LPA\",\"donor\":{\"firstname\":\"Child\",\"id\":112,\"parent\":{\"firstname\":\"Parent\",\"id\":113,\"surname\":\"Donor\"},\"surname\":\"Donor\"},\"status\":\"Pending\",\"uId\":\"7000-0000-0002\"}"
       }
     },
     {
