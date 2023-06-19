@@ -148,7 +148,7 @@ $govuk-assets-path: "/lpa/frontend/assets/";
 }
 
 /* push header links to right on wide screen */
-@media(min-width: 1024px) {
+@media (min-width: 1024px) {
   nav.govuk-header__navigation {
     float: right;
   }
