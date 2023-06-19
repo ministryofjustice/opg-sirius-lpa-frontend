@@ -147,3 +147,9 @@ input::placeholder {
 .app-\!-html-class--dark input::placeholder {
   color: white;
 }
+
+@media(min-width: 1024px) {
+  nav.govuk-header__navigation {
+    float: right;
+  }
+}
