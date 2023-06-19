@@ -132,24 +132,31 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   background-color: govuk-colour("light-grey");
 }
 
+/* make button same height as search box */
 .moj-search form {
   align-items: stretch !important;
 }
 
+/* no box shadow on search button */
 .app-\!-moj-search__button {
   box-shadow: none !important;
 }
 
-input::placeholder {
-  font-style: italic;
-}
-
+/* white placeholder text in dark mode */
 .app-\!-html-class--dark input::placeholder {
   color: white;
 }
 
+/* push header links to right on wide screen */
 @media(min-width: 1024px) {
   nav.govuk-header__navigation {
     float: right;
   }
+}
+
+/* grey border on search box matches colour of phase banner bottom border;
+   no right border on the input box, as per design */
+.moj-search__input {
+  border-color: #b1b4b6 !important;
+  border-right: none;
 }
