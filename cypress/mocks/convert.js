@@ -26,7 +26,6 @@ const toMappings = (filename) => {
 
 const mappings = [
   ...toMappings("sirius-lpa-frontend-sirius"),
-  ...toMappings("ignored-ignored"),
 ];
 
 fs.writeFileSync(
