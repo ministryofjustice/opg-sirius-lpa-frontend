@@ -21,17 +21,6 @@ func newPact() *dsl.Pact {
 	}
 }
 
-func newIgnoredPact() *dsl.Pact {
-	return &dsl.Pact{
-		Consumer:          "ignored",
-		Provider:          "ignored",
-		Host:              "localhost",
-		PactFileWriteMode: "merge",
-		LogDir:            "../../logs",
-		PactDir:           "../../pacts",
-	}
-}
-
 func TestStatusError(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "/some/url", nil)
 
