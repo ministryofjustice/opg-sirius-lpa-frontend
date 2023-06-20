@@ -168,15 +168,12 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   }
 }
 
+/* enables search box to be positioned inside the primary navigation */
 .opg-search-container {
   position: relative;
 }
 
-.moj-primary-navigation__search {
-  margin-top: 0.5625rem;
-  margin-bottom: 0.8125rem;
-}
-
+/* reposition search box inside primary navigation on wide screens */
 @media (min-width: 1024px) {
   .moj-primary-navigation__search {
     position: absolute;
@@ -184,6 +181,13 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   }
 }
 
+/* margins for search box */
+.moj-primary-navigation__search {
+  margin-top: 0.5625rem;
+  margin-bottom: 0.8125rem;
+}
+
+/* prevent search button stretching to screen width on narrow screens */
 @media (max-width: 768px) {
   .app-\!-moj-search__button {
     width: auto;
