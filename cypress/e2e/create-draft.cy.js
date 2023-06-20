@@ -31,22 +31,22 @@ describe("Create Digital LPA draft", () => {
       .type("SW1A 1AA");
     cy.contains("Find address").click();
     cy.contains("Enter address manually").click();
-    cy.get("#f-donorAddressLine1").should(
+    cy.get("#f-donorAddress.line1").should(
       "have.value",
       "Office of the Public Guardian"
     );
-    cy.get("#f-donorAddressLine2").should("have.value", "1 Something Street");
-    cy.get("#f-donorAddressLine3").should("have.value", "Someborough");
-    cy.get("#f-donorTown").should("have.value", "Someton");
-    cy.get("#f-donorPostcode").should("have.value", "SW1A 1AA");
-    cy.get("#f-donorCountry").should("have.value", "GB");
+    cy.get("#f-donorAddress.line2").should("have.value", "1 Something Street");
+    cy.get("#f-donorAddress.line3").should("have.value", "Someborough");
+    cy.get("#f-donorAddress.town").should("have.value", "Someton");
+    cy.get("#f-donorAddress.postcode").should("have.value", "SW1A 1AA");
+    cy.get("#f-donorAddress.country").should("have.value", "GB");
 
     // Override address manually
-    cy.get("#f-donorAddressLine1").clear().type("Fluke House");
-    cy.get("#f-donorAddressLine2").clear().type("Summit");
-    cy.get("#f-donorAddressLine3").clear().type("Houston");
-    cy.get("#f-donorTown").clear().type("South Bend");
-    cy.get("#f-donorPostcode").clear().type("AI1 6VW");
+    cy.get("#f-donorAddress.line1").clear().type("Fluke House");
+    cy.get("#f-donorAddress.line2").clear().type("Summit");
+    cy.get("#f-donorAddress.line3").clear().type("Houston");
+    cy.get("#f-donorAddress.town").clear().type("South Bend");
+    cy.get("#f-donorAddress.postcode").clear().type("AI1 6VW");
 
     cy.contains("Another person").click();
     cy.get("#f-correspondentFirstname").type("Leon");
@@ -57,13 +57,13 @@ describe("Create Digital LPA draft", () => {
       .closest(".govuk-radios__conditional")
       .within(() => {
         cy.contains("Enter address manually").click();
-        cy.get("#f-correspondentAddressLine1").type(
+        cy.get("#f-correspondentAddress.line1").type(
           "Nitzsche, Nader And Schuppe"
         );
-        cy.get("#f-correspondentAddressLine2").type("6064 Alessandro Plain");
-        cy.get("#f-correspondentAddressLine3").type("Pittsfield");
-        cy.get("#f-correspondentTown").type("Concord");
-        cy.get("#f-correspondentPostcode").type("JN2 7UO");
+        cy.get("#f-correspondentAddress.line2").type("6064 Alessandro Plain");
+        cy.get("#f-correspondentAddress.line3").type("Pittsfield");
+        cy.get("#f-correspondentAddress.town").type("Concord");
+        cy.get("#f-correspondentAddress.postcode").type("JN2 7UO");
       });
 
     cy.get("#f-donorPhone").type("07893932118");
