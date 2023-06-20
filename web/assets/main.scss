@@ -147,10 +147,24 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   color: white;
 }
 
-/* push header links to right on wide screen */
-@media (min-width: 1024px) {
-  nav.govuk-header__navigation {
-    float: right;
+/* centre title in header and right-align menu */
+@media (min-width: 769px) {
+  .govuk-header__container {
+    display: grid;
+    grid-template-columns: [one] auto [two] 0.5fr [three] 0.5fr [end];
+
+    .govuk-header__logo {
+      width: auto;
+      float: none;
+    }
+
+    .govuk-header__service-name {
+      justify-self: right;
+    }
+
+    .govuk-header__navigation {
+      justify-self: right;
+    }
   }
 }
 
