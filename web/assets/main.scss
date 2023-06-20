@@ -184,6 +184,12 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   }
 }
 
+@media (max-width: 768px) {
+  .app-\!-moj-search__button {
+    width: auto;
+  }
+}
+
 /* grey border on search box matches colour of phase banner bottom border;
    no right border on the input box, as per design */
 .moj-search__input {
