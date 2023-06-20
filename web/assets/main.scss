@@ -168,9 +168,20 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   }
 }
 
+.opg-search-container {
+  position: relative;
+}
+
 .moj-primary-navigation__search {
   margin-top: 0.5625rem;
   margin-bottom: 0.8125rem;
+}
+
+@media (min-width: 1024px) {
+  .moj-primary-navigation__search {
+    position: absolute;
+    right: 0;
+  }
 }
 
 /* grey border on search box matches colour of phase banner bottom border;
