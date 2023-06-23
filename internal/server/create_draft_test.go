@@ -124,7 +124,7 @@ func TestPostCreateDraft(t *testing.T) {
 	template.
 		On("Func", mock.Anything, createDraftData{
 			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
-			Draft: draft{
+			Form: formDraft{
 				SubTypes:        []string{"pfa", "hw"},
 				DonorFirstname:  "Gerald",
 				DonorMiddlename: "Ryan",
@@ -161,31 +161,31 @@ func TestPostCreateDraft(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"subtype":                   {"pfa", "hw"},
-		"donorFirstname":            {"Gerald"},
-		"donorMiddlename":           {"Ryan"},
-		"donorSurname":              {"Sandel"},
-		"dobDay":                    {"6"},
-		"dobMonth":                  {"3"},
-		"dobYear":                   {"1943"},
-		"donorEmail":                {"gerald.sandel@somehost.example"},
-		"donorPhone":                {"01638294820"},
-		"donorAddressLine1":         {"Bradtke"},
-		"donorAddressLine2":         {"Zipper House"},
-		"donorAddressLine3":         {"Mills Ports"},
-		"donorTown":                 {"Deerfield Beach"},
-		"donorPostcode":             {"QY9 9QW"},
-		"donorCountry":              {"GB"},
-		"recipient":                 {"other"},
-		"correspondentFirstname":    {"Rosalinda"},
-		"correspondentMiddlename":   {""},
-		"correspondentSurname":      {"Langdale"},
-		"correspondentAddressLine1": {"Intensity Office"},
-		"correspondentAddressLine2": {"Lind Run"},
-		"correspondentAddressLine3": {"Hendersonville"},
-		"correspondentTown":         {"Moline"},
-		"correspondentPostcode":     {"OE6 2DV"},
-		"correspondentCountry":      {"GB"},
+		"subtype":                       {"pfa", "hw"},
+		"donorFirstname":                {"Gerald"},
+		"donorMiddlename":               {"Ryan"},
+		"donorSurname":                  {"Sandel"},
+		"dob.day":                       {"6"},
+		"dob.month":                     {"3"},
+		"dob.year":                      {"1943"},
+		"donorEmail":                    {"gerald.sandel@somehost.example"},
+		"donorPhone":                    {"01638294820"},
+		"donorAddress.Line1":            {"Bradtke"},
+		"donorAddress.Line2":            {"Zipper House"},
+		"donorAddress.Line3":            {"Mills Ports"},
+		"donorAddress.Town":             {"Deerfield Beach"},
+		"donorAddress.Postcode":         {"QY9 9QW"},
+		"donorAddress.Country":          {"GB"},
+		"recipient":                     {"other"},
+		"correspondentFirstname":        {"Rosalinda"},
+		"correspondentMiddlename":       {""},
+		"correspondentSurname":          {"Langdale"},
+		"correspondentAddress.Line1":    {"Intensity Office"},
+		"correspondentAddress.Line2":    {"Lind Run"},
+		"correspondentAddress.Line3":    {"Hendersonville"},
+		"correspondentAddress.Town":     {"Moline"},
+		"correspondentAddress.Postcode": {"OE6 2DV"},
+		"correspondentAddress.Country":  {"GB"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/digital-lpa/create", strings.NewReader(form.Encode()))
@@ -258,7 +258,7 @@ func TestPostCreateDraftWhenValidationError(t *testing.T) {
 	template.
 		On("Func", mock.Anything, createDraftData{
 			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
-			Draft: draft{
+			Form: formDraft{
 				DonorFirstname: "Gerald",
 			},
 			Error: sirius.ValidationError{
