@@ -17,13 +17,13 @@
   "dependencies": {
     "@ministryofjustice/frontend": "1.8.0",
     "accessible-autocomplete": "^2.0.4",
-    "cypress": "12.14.0",
+    "cypress": "12.15.0",
     "govuk-frontend": "^4.4.0",
     "jquery": "^3.6.1",
     "tinymce": "^5.10.7"
   },
   "devDependencies": {
-    "esbuild": "^0.17.0",
+    "esbuild": "^0.18.0",
     "prettier": "^2.5.1",
     "sass": "^1.26.11"
   },
