@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/securityheaders"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -76,6 +77,8 @@ type Client interface {
 	UnlinkPersonClient
 	WarningClient
 }
+
+var decoder *form.Decoder
 
 func New(logger Logger, client Client, templates template.Templates, prefix, siriusPublicURL, webDir string) http.Handler {
 	wrap := errorHandler(logger, templates.Get("error.gohtml"), prefix, siriusPublicURL)

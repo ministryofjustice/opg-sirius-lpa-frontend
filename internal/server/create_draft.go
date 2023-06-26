@@ -1,36 +1,56 @@
 package server
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"strings"
-	"time"
 
+	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
 )
 
 type dob struct {
-	Day   int
-	Month int
-	Year  int
+	Day   int `form:"day"`
+	Month int `form:"month"`
+	Year  int `form:"year"`
 }
 
-type draft struct {
-	SubTypes                []string
-	DonorFirstname          string
-	DonorMiddlename         string
-	DonorSurname            string
-	DonorAddress            sirius.Address
-	Recipient               string
-	CorrespondentFirstname  string
-	CorrespondentMiddlename string
-	CorrespondentSurname    string
-	AlternativeAddress      sirius.Address
-	CorrespondentAddress    sirius.Address
-	Dob                     dob
-	Email                   string
-	Phone                   string
+func (d *dob) toDateString() sirius.DateString {
+	if d.Day == 0 && d.Month == 0 && d.Year == 0 {
+		return ""
+	}
+
+	monthSpacing := ""
+	daySpacing := ""
+
+	if d.Month < 10 {
+		monthSpacing = "0"
+	}
+	if d.Day < 10 {
+		daySpacing = "0"
+	}
+
+	return sirius.DateString(fmt.Sprintf("%d-%s%d-%s%d", d.Year, monthSpacing, d.Month, daySpacing, d.Day))
+}
+
+type formDraft struct {
+	SubTypes                []string       `form:"subtype"`
+	DonorFirstname          string         `form:"donorFirstname"`
+	DonorMiddlename         string         `form:"donorMiddlename"`
+	DonorSurname            string         `form:"donorSurname"`
+	DonorAddress            sirius.Address `form:"donorAddress"`
+	Recipient               string         `form:"recipient"`
+	CorrespondentFirstname  string         `form:"correspondentFirstname"`
+	CorrespondentMiddlename string         `form:"correspondentMiddlename"`
+	CorrespondentSurname    string         `form:"correspondentSurname"`
+	AlternativeAddress      sirius.Address `form:"alternativeAddress"`
+	CorrespondentAddress    sirius.Address `form:"correspondentAddress"`
+	Dob                     dob            `form:"dob"`
+	Email                   string         `form:"donorEmail"`
+	Phone                   string         `form:"donorPhone"`
 }
 
 type CreateDraftClient interface {
@@ -47,7 +67,7 @@ type createDraftResult struct {
 type createDraftData struct {
 	XSRFToken string
 	Countries []sirius.RefDataItem
-	Draft     draft
+	Form      formDraft
 	Error     sirius.ValidationError
 	Success   bool
 	Uids      []createDraftResult
@@ -65,15 +85,28 @@ func buildName(parts ...string) string {
 	return strings.Join(nonEmptyParts, " ")
 }
 
-func fallback(val string, fallback string) string {
-	if val == "" {
-		return fallback
-	} else {
-		return val
+func addDefaultCountry(address sirius.Address) sirius.Address {
+	out := sirius.Address{
+		Line1:    address.Line1,
+		Line2:    address.Line2,
+		Line3:    address.Line3,
+		Town:     address.Town,
+		Postcode: address.Postcode,
+		Country:  address.Country,
 	}
+
+	if out.Country == "" {
+		out.Country = "GB"
+	}
+
+	return out
 }
 
 func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
+	if decoder == nil {
+		decoder = form.NewDecoder()
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 		group, groupCtx := errgroup.WithContext(ctx.Context)
@@ -110,94 +143,30 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == "POST" {
-			dobDay, _ := postFormInt(r, "dobDay")
-			dobMonth, _ := postFormInt(r, "dobMonth")
-			dobYear, _ := postFormInt(r, "dobYear")
-
-			data.Draft = draft{
-				SubTypes:        r.PostForm["subtype"],
-				DonorFirstname:  postFormString(r, "donorFirstname"),
-				DonorMiddlename: postFormString(r, "donorMiddlename"),
-				DonorSurname:    postFormString(r, "donorSurname"),
-				Dob: dob{
-					Day:   dobDay,
-					Month: dobMonth,
-					Year:  dobYear,
-				},
-				DonorAddress: sirius.Address{
-					Line1:    postFormString(r, "donorAddressLine1"),
-					Line2:    postFormString(r, "donorAddressLine2"),
-					Line3:    postFormString(r, "donorAddressLine3"),
-					Town:     postFormString(r, "donorTown"),
-					Postcode: postFormString(r, "donorPostcode"),
-					Country:  postFormString(r, "donorCountry"),
-				},
-				CorrespondentFirstname:  postFormString(r, "correspondentFirstname"),
-				CorrespondentMiddlename: postFormString(r, "correspondentMiddlename"),
-				CorrespondentSurname:    postFormString(r, "correspondentSurname"),
-				AlternativeAddress: sirius.Address{
-					Line1:    postFormString(r, "alternativeAddressLine1"),
-					Line2:    postFormString(r, "alternativeAddressLine2"),
-					Line3:    postFormString(r, "alternativeAddressLine3"),
-					Town:     postFormString(r, "alternativeTown"),
-					Postcode: postFormString(r, "alternativePostcode"),
-					Country:  postFormString(r, "alternativeCountry"),
-				},
-				CorrespondentAddress: sirius.Address{
-					Line1:    postFormString(r, "correspondentAddressLine1"),
-					Line2:    postFormString(r, "correspondentAddressLine2"),
-					Line3:    postFormString(r, "correspondentAddressLine3"),
-					Town:     postFormString(r, "correspondentTown"),
-					Postcode: postFormString(r, "correspondentPostcode"),
-					Country:  postFormString(r, "correspondentCountry"),
-				},
-				Recipient: postFormString(r, "recipient"),
-				Email:     postFormString(r, "donorEmail"),
-				Phone:     postFormString(r, "donorPhone"),
+			err := decoder.Decode(&data.Form, r.PostForm)
+			if err != nil {
+				log.Panic(err)
 			}
 
 			compiledDraft := sirius.Draft{
-				CaseType:  data.Draft.SubTypes,
-				Source:    "PHONE",
-				DonorName: buildName(data.Draft.DonorFirstname, data.Draft.DonorMiddlename, data.Draft.DonorSurname),
-				DonorAddress: sirius.Address{
-					Line1:    data.Draft.DonorAddress.Line1,
-					Line2:    data.Draft.DonorAddress.Line2,
-					Line3:    data.Draft.DonorAddress.Line3,
-					Town:     data.Draft.DonorAddress.Town,
-					Postcode: data.Draft.DonorAddress.Postcode,
-					Country:  fallback(data.Draft.DonorAddress.Country, "GB"),
-				},
-				Email:       data.Draft.Email,
-				PhoneNumber: data.Draft.Phone,
+				CaseType:     data.Form.SubTypes,
+				Source:       "PHONE",
+				DonorName:    buildName(data.Form.DonorFirstname, data.Form.DonorMiddlename, data.Form.DonorSurname),
+				DonorDob:     data.Form.Dob.toDateString(),
+				DonorAddress: addDefaultCountry(data.Form.DonorAddress),
+				Email:        data.Form.Email,
+				PhoneNumber:  data.Form.Phone,
 			}
 
-			if data.Draft.Recipient == "donor-other-address" {
-				compiledDraft.CorrespondentAddress = &sirius.Address{
-					Line1:    data.Draft.AlternativeAddress.Line1,
-					Line2:    data.Draft.AlternativeAddress.Line2,
-					Line3:    data.Draft.AlternativeAddress.Line3,
-					Town:     data.Draft.AlternativeAddress.Town,
-					Postcode: data.Draft.AlternativeAddress.Postcode,
-					Country:  fallback(data.Draft.AlternativeAddress.Country, "GB"),
-				}
-			} else if data.Draft.Recipient == "other" {
-				compiledDraft.CorrespondentName = buildName(data.Draft.CorrespondentFirstname, data.Draft.CorrespondentMiddlename, data.Draft.CorrespondentSurname)
-				compiledDraft.CorrespondentAddress = &sirius.Address{
-					Line1:    data.Draft.CorrespondentAddress.Line1,
-					Line2:    data.Draft.CorrespondentAddress.Line2,
-					Line3:    data.Draft.CorrespondentAddress.Line3,
-					Town:     data.Draft.CorrespondentAddress.Town,
-					Postcode: data.Draft.CorrespondentAddress.Postcode,
-					Country:  fallback(data.Draft.CorrespondentAddress.Country, "GB"),
-				}
+			if data.Form.Recipient == "donor-other-address" {
+				correspondentAddress := addDefaultCountry(data.Form.AlternativeAddress)
+				compiledDraft.CorrespondentAddress = &correspondentAddress
+			} else if data.Form.Recipient == "other" {
+				correspondentAddress := addDefaultCountry(data.Form.CorrespondentAddress)
+				compiledDraft.CorrespondentAddress = &correspondentAddress
+				compiledDraft.CorrespondentName = buildName(data.Form.CorrespondentFirstname, data.Form.CorrespondentMiddlename, data.Form.CorrespondentSurname)
 			}
 
-			dob := time.Date(data.Draft.Dob.Year, time.Month(data.Draft.Dob.Month), data.Draft.Dob.Day, 0, 0, 0, 0, time.UTC)
-			date1900, _ := time.Parse("2006-01-02", "1900-01-01")
-			if dob.After(date1900) {
-				compiledDraft.DonorDob = sirius.DateString(dob.Format("2006-01-02"))
-			}
 			uids, err := client.CreateDraft(ctx, compiledDraft)
 
 			if ve, ok := err.(sirius.ValidationError); ok {

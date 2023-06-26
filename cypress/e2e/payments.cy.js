@@ -6,7 +6,14 @@ describe("View a payment", () => {
       cy.contains("There is currently no fee data available to display.");
     });
 
-    it("displays add payment and apply fee reduction buttons", () => {
+    it("displays add payment but not apply fee reduction button", () => {
+      cy.addMock("/lpa-api/v1/users/current", "GET", {
+        status: 200,
+        body: {
+          roles: ["OPG User"],
+        },
+      });
+
       cy.visit("/payments?id=801");
       cy.contains(".govuk-button", "Add payment");
       cy.contains(".govuk-button", "Apply fee reduction").should("not.exist");
