@@ -7,6 +7,17 @@
   "labels": ["Dependencies", "Renovate"],
   "packageRules": [
     {
+      "description": [
+        "Ignore Dockerfile Node upgrades",
+        "Node 20.3.x doesn't work with our local versions of Docker so we must lock to 20.2.x for now"
+      ],
+      "matchFiles": ["docker/sirius-lpa-frontend/Dockerfile"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["node"],
+      "matchUpdateTypes": ["minor"],
+      "enabled": false
+    },
+    {
       "automerge": true,
       "groupName": "Patch & Minor Updates",
       "groupSlug": "all-minor-patch-updates",
