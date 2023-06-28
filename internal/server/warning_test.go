@@ -76,7 +76,7 @@ func TestGetWarning(t *testing.T) {
 	assert.Equal(t, http.StatusOK, result.StatusCode)
 }
 
-func TestPostWarning(t *testing.T) {
+func TestPostWarningWithOneCase(t *testing.T) {
 	donor := sirius.Person{
 		Firstname: "John",
 		Surname:   "Doe",
@@ -114,7 +114,7 @@ func TestPostWarning(t *testing.T) {
 		Donor: donor,
 	}).Return(nil)
 
-	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "Some random warning notes", []int{}).Return(nil)
+	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "Some random warning notes", []int{0}).Return(nil)
 
 	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
 		"warningType": {"Complaint Recieved"},
@@ -178,6 +178,54 @@ func TestPostWarningWithMultipleCases(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
 		"case-id":     {"1", "2"},
+		"warningType": {"Complaint Recieved"},
+		"warningText": {"Some random warning notes"},
+	}.Encode()))
+
+	req.Header.Add("content-type", formUrlEncoded)
+
+	w := httptest.NewRecorder()
+	err := Warning(siriusClient, template.Func)(w, req)
+	assert.Nil(t, err)
+	result := w.Result()
+	assert.Equal(t, http.StatusOK, result.StatusCode)
+}
+
+func TestPostWarningWithNoCases(t *testing.T) {
+	donor := sirius.Person{
+		Firstname: "John",
+		Surname:   "Doe",
+	}
+
+	siriusClient := &mockWarningClient{}
+	siriusClient.On("RefDataByCategory", mock.Anything, sirius.WarningTypeCategory).Return(
+		[]sirius.RefDataItem{
+			{
+				Handle: "Complaint Received",
+				Label:  "Complaint Received",
+			},
+		},
+		nil,
+	)
+
+	siriusClient.On("Person", mock.Anything, 89).Return(donor, nil)
+
+	template := &mockTemplate{}
+	template.On("Func", mock.Anything, warningData{
+		Success:   true,
+		XSRFToken: "",
+		WarningTypes: []sirius.RefDataItem{
+			{
+				Handle: "Complaint Received",
+				Label:  "Complaint Received",
+			},
+		},
+		Donor: donor,
+	}).Return(nil)
+
+	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "Some random warning notes", []int{}).Return(nil)
+
+	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
 		"warningType": {"Complaint Recieved"},
 		"warningText": {"Some random warning notes"},
 	}.Encode()))
