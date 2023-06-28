@@ -7,7 +7,7 @@ describe("Create a warning", () => {
         firstname: "John",
         id: 189,
         surname: "Doe",
-        uId: "7000-0000-0007"
+        uId: "7000-0000-0007",
       },
     });
     cy.visit("/create-warning?id=189");
@@ -19,7 +19,7 @@ describe("Create a warning", () => {
       body: {
         personId: 189,
         warningText: "Some warning notes",
-        warningType: "Complaint Received"
+        warningType: "Complaint Received",
       },
     });
     cy.contains("Create Warning");
@@ -48,15 +48,15 @@ describe("Create a warning on multiple cases", () => {
             caseType: "LPA",
             id: 405,
             status: "Perfect",
-            uId: "7000-5382-4438"
+            uId: "7000-5382-4438",
           },
           {
             caseSubtype: "hw",
             caseType: "LPA",
             id: 406,
             status: "Pending",
-            uId: "7000-5382-8764"
-          }
+            uId: "7000-5382-8764",
+          },
         ],
       },
     });
@@ -71,10 +71,7 @@ describe("Create a warning on multiple cases", () => {
         personId: 400,
         warningText: "Some warning notes for multiple cases",
         warningType: "Complaint Received",
-        caseIds: [
-          405,
-          406
-        ],
+        caseIds: [405, 406],
       },
     });
 
