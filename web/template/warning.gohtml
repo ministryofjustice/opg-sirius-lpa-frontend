@@ -17,6 +17,22 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
+        {{ if gt (len .Donor.Cases) 1 }}
+          <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend">What case is the warning for?</legend>
+              <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                {{ range $i, $c := .Donor.Cases }}
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="case-id-{{ $i }}" name="case-id" type="checkbox" value="{{ $c.ID }}">
+                    <label class="govuk-label govuk-checkboxes__label" for="case-id-{{ $i }}">{{ ToUpper $c.SubType }} {{ $c.UID }}</label>
+                  </div>
+                {{ end }}
+              </div>
+            </fieldset>
+          </div>
+        {{ end }}
+
         {{ template "select" (select "warningType" "Warning type" .WarningType .Error.Field.warningType (options .WarningTypes)) }}
 
         {{ template "textarea" (field "warningText" "Notes" .WarningText .Error.Field.warningText) }}
