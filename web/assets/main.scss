@@ -131,3 +131,106 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   padding: 1.375rem;
   background-color: govuk-colour("light-grey");
 }
+
+/* make button same height as search box */
+.moj-search form {
+  align-items: stretch !important;
+}
+
+/* no box shadow on search button */
+.app-\!-moj-search__button {
+  box-shadow: none !important;
+}
+
+/* white placeholder text in dark mode */
+.app-\!-html-class--dark input::placeholder {
+  color: white;
+}
+
+/* centre title in header and right-align menu */
+@media (min-width: 769px) {
+  .govuk-header__container {
+    display: grid;
+    grid-template-columns: [one] auto [two] 0.5fr [three] 0.5fr [end];
+
+    .govuk-header__logo {
+      width: auto;
+      float: none;
+    }
+
+    .govuk-header__service-name {
+      justify-self: right;
+    }
+
+    .govuk-header__navigation {
+      justify-self: right;
+    }
+  }
+}
+
+/* to enable positioning search box */
+.govuk-phase-banner {
+  position: relative !important;
+}
+
+/* position search box to right of feedback link */
+.opg-search-container {
+  display: flex;
+  justify-content: flex-end;
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin-right: 0;
+}
+
+/* position feedback box left-aligned with feedback link on narrow screens */
+@media (max-width: 1024px) {
+  .opg-search-container {
+    justify-content: flex-start;
+    position: relative;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+/* space above and below feedback link div when also holding search box */
+@media (min-width: 1024px) {
+  .govuk-phase-banner {
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+  }
+}
+
+/* margins for search box */
+.moj-primary-navigation__search {
+  margin-top: 0.5625rem;
+  margin-bottom: 0.8125rem;
+}
+
+/* remove search box margins when at 768px breakpoint */
+@media (max-width: 768px) {
+  .moj-primary-navigation__search {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+/* prevent search button stretching to screen width on narrow screens */
+@media (max-width: 768px) {
+  .app-\!-moj-search__button {
+    width: auto;
+  }
+}
+
+/* grey border on search box matches colour of phase banner bottom border;
+   no right border on the input box, as per design */
+.moj-search__input {
+  border-color: #b1b4b6 !important;
+  border-width: 1px;
+  border-right: none;
+}
+
+/* 19px font for menu items in header */
+.govuk-header__navigation-item a {
+  font-size: 1.1875rem !important;
+}
