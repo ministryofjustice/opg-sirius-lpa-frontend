@@ -64,6 +64,10 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 				caseIDs = append(caseIDs, intID)
 			}
 
+			if len(donor.Cases) == 1 {
+				caseIDs = []int{donor.Cases[0].ID}
+			}
+
 			err := client.CreateWarning(ctx, personId, warningType, warningText, caseIDs)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
