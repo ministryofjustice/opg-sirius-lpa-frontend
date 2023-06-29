@@ -100,6 +100,65 @@ func TestPerson(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "OK with multiple cases",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A donor exists with more than 1 case").
+					UponReceiving("A request for the person with multiple cases").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String("/lpa-api/v1/persons/400"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.Like(map[string]interface{}{
+							"id":        dsl.Like(400),
+							"uId":       dsl.Term("7000-0000-0001", `7\d{3}-\d{4}-\d{4}`),
+							"firstname": dsl.String("John"),
+							"surname":   dsl.String("Doe"),
+							"dob":       dsl.Term("01/01/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
+							"cases": []map[string]interface{}{
+								{
+									"id":          dsl.Like(405),
+									"uId":         dsl.Term("7000-5382-4438", `\d{4}-\d{4}-\d{4}`),
+									"caseSubtype": dsl.Term("pfa", "hw|pfa"),
+									"caseType":    dsl.Like("LPA"),
+								},
+								{
+									"id":          dsl.Like(406),
+									"uId":         dsl.Term("7000-5382-8764", `\d{4}-\d{4}-\d{4}`),
+									"caseSubtype": dsl.Term("hw", "hw|pfa"),
+									"caseType":    dsl.Like("LPA"),
+								},
+							},
+						}),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: Person{
+				ID:          400,
+				UID:         "7000-0000-0001",
+				Firstname:   "John",
+				Surname:     "Doe",
+				DateOfBirth: DateString("1970-01-01"),
+				Cases: []*Case{
+					{
+						ID:       405,
+						UID:      "7000-5382-4438",
+						CaseType: "LPA",
+						SubType:  "pfa",
+					},
+					{
+						ID:       406,
+						UID:      "7000-5382-8764",
+						CaseType: "LPA",
+						SubType:  "hw",
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
