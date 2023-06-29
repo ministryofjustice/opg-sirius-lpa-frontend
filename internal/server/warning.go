@@ -11,7 +11,7 @@ import (
 type WarningClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	CreateWarning(ctx sirius.Context, personId int, warningType, warningNote string, caseIDs []int) error
-	Person(ctx sirius.Context, personID int) (sirius.Person, error)
+	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
 }
 
 type warningData struct {
@@ -22,7 +22,7 @@ type warningData struct {
 
 	WarningType string
 	WarningText string
-	Donor       sirius.Person
+	Cases       []sirius.Case
 }
 
 func Warning(client WarningClient, tmpl template.Template) Handler {
@@ -38,7 +38,7 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		donor, err := client.Person(ctx, personId)
+		cases, err := client.CasesByDonor(ctx, personId)
 		if err != nil {
 			return err
 		}
@@ -47,7 +47,7 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 			Success:      false,
 			XSRFToken:    ctx.XSRFToken,
 			WarningTypes: warningTypes,
-			Donor:        donor,
+			Cases:        cases,
 		}
 
 		if r.Method == http.MethodPost {
@@ -64,8 +64,8 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 				caseIDs = append(caseIDs, intID)
 			}
 
-			if len(donor.Cases) == 1 {
-				caseIDs = []int{donor.Cases[0].ID}
+			if len(data.Cases) == 1 {
+				caseIDs = []int{data.Cases[0].ID}
 			}
 
 			err := client.CreateWarning(ctx, personId, warningType, warningText, caseIDs)
