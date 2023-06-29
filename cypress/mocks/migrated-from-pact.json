@@ -379,6 +379,15 @@
       }
     },
     {
+      "name": "A request for a person's cases",
+      "request": { "method": "GET", "url": "/lpa-api/v1/persons/189/cases" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"cases\":[{\"id\":822,\"uId\":\"7000-3039-2919\",\"caseSubtype\":\"hw\"}]}"
+      }
+    },
+    {
       "name": "A request for the person by UID",
       "request": {
         "method": "GET",

@@ -30,9 +30,9 @@ func (s *mockWarningClient) RefDataByCategory(ctx sirius.Context, category strin
 	return nil, args.Error(1)
 }
 
-func (s *mockWarningClient) Person(ctx sirius.Context, personID int) (sirius.Person, error) {
+func (s *mockWarningClient) CasesByDonor(ctx sirius.Context, personID int) ([]sirius.Case, error) {
 	args := s.Called(ctx, personID)
-	return args.Get(0).(sirius.Person), args.Error(1)
+	return args.Get(0).([]sirius.Case), args.Error(1)
 }
 
 func TestGetWarning(t *testing.T) {
@@ -43,27 +43,23 @@ func TestGetWarning(t *testing.T) {
 		},
 	}
 
-	donor := sirius.Person{
-		Firstname: "John",
-		Surname:   "Doe",
-		Cases: []*sirius.Case{
-			{
-				CaseType: "PFA",
-				UID:      "700700",
-			},
+	cases := []sirius.Case{
+		{
+			SubType: "PFA",
+			UID:     "700700",
 		},
 	}
 
 	siriusClient := &mockWarningClient{}
 	siriusClient.On("RefDataByCategory", mock.Anything, sirius.WarningTypeCategory).Return(warningTypes, nil)
-	siriusClient.On("Person", mock.Anything, 89).Return(donor, nil)
+	siriusClient.On("CasesByDonor", mock.Anything, 89).Return(cases, nil)
 
 	template := &mockTemplate{}
 	template.On("Func", mock.Anything, warningData{
 		Success:      false,
 		XSRFToken:    "",
 		WarningTypes: warningTypes,
-		Donor:        donor,
+		Cases:        cases,
 	}).Return(nil)
 
 	req, _ := http.NewRequest(http.MethodGet, "/?id=89", nil)
@@ -77,14 +73,10 @@ func TestGetWarning(t *testing.T) {
 }
 
 func TestPostWarningWithOneCase(t *testing.T) {
-	donor := sirius.Person{
-		Firstname: "John",
-		Surname:   "Doe",
-		Cases: []*sirius.Case{
-			{
-				CaseType: "PFA",
-				UID:      "7000-8888-0000",
-			},
+	cases := []sirius.Case{
+		{
+			SubType: "PFA",
+			UID:     "7000-8888-0000",
 		},
 	}
 
@@ -99,7 +91,7 @@ func TestPostWarningWithOneCase(t *testing.T) {
 		nil,
 	)
 
-	siriusClient.On("Person", mock.Anything, 89).Return(donor, nil)
+	siriusClient.On("CasesByDonor", mock.Anything, 89).Return(cases, nil)
 
 	template := &mockTemplate{}
 	template.On("Func", mock.Anything, warningData{
@@ -111,7 +103,7 @@ func TestPostWarningWithOneCase(t *testing.T) {
 				Label:  "Complaint Received",
 			},
 		},
-		Donor: donor,
+		Cases: cases,
 	}).Return(nil)
 
 	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "Some random warning notes", []int{0}).Return(nil)
@@ -131,20 +123,16 @@ func TestPostWarningWithOneCase(t *testing.T) {
 }
 
 func TestPostWarningWithMultipleCases(t *testing.T) {
-	donor := sirius.Person{
-		Firstname: "John",
-		Surname:   "Doe",
-		Cases: []*sirius.Case{
-			{
-				ID:       1,
-				CaseType: "PFA",
-				UID:      "7000-1234-0000",
-			},
-			{
-				ID:       2,
-				CaseType: "HW",
-				UID:      "7000-9876-0000",
-			},
+	cases := []sirius.Case{
+		{
+			ID:      1,
+			SubType: "PFA",
+			UID:     "7000-1234-0000",
+		},
+		{
+			ID:      2,
+			SubType: "HW",
+			UID:     "7000-9876-0000",
 		},
 	}
 
@@ -159,7 +147,7 @@ func TestPostWarningWithMultipleCases(t *testing.T) {
 		nil,
 	)
 
-	siriusClient.On("Person", mock.Anything, 89).Return(donor, nil)
+	siriusClient.On("CasesByDonor", mock.Anything, 89).Return(cases, nil)
 
 	template := &mockTemplate{}
 	template.On("Func", mock.Anything, warningData{
@@ -171,7 +159,7 @@ func TestPostWarningWithMultipleCases(t *testing.T) {
 				Label:  "Complaint Received",
 			},
 		},
-		Donor: donor,
+		Cases: cases,
 	}).Return(nil)
 
 	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "Some random warning notes", []int{1, 2}).Return(nil)
@@ -192,10 +180,7 @@ func TestPostWarningWithMultipleCases(t *testing.T) {
 }
 
 func TestPostWarningWithNoCases(t *testing.T) {
-	donor := sirius.Person{
-		Firstname: "John",
-		Surname:   "Doe",
-	}
+	cases := []sirius.Case{}
 
 	siriusClient := &mockWarningClient{}
 	siriusClient.On("RefDataByCategory", mock.Anything, sirius.WarningTypeCategory).Return(
@@ -208,7 +193,7 @@ func TestPostWarningWithNoCases(t *testing.T) {
 		nil,
 	)
 
-	siriusClient.On("Person", mock.Anything, 89).Return(donor, nil)
+	siriusClient.On("CasesByDonor", mock.Anything, 89).Return(cases, nil)
 
 	template := &mockTemplate{}
 	template.On("Func", mock.Anything, warningData{
@@ -220,7 +205,7 @@ func TestPostWarningWithNoCases(t *testing.T) {
 				Label:  "Complaint Received",
 			},
 		},
-		Donor: donor,
+		Cases: cases,
 	}).Return(nil)
 
 	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "Some random warning notes", []int{}).Return(nil)
@@ -240,10 +225,7 @@ func TestPostWarningWithNoCases(t *testing.T) {
 }
 
 func TestPostWarningValidationErrors(t *testing.T) {
-	donor := sirius.Person{
-		Firstname: "John",
-		Surname:   "Doe",
-	}
+	cases := []sirius.Case{}
 
 	siriusClient := &mockWarningClient{}
 	siriusClient.On("RefDataByCategory", mock.Anything, sirius.WarningTypeCategory).Return(
@@ -256,7 +238,7 @@ func TestPostWarningValidationErrors(t *testing.T) {
 		nil,
 	)
 
-	siriusClient.On("Person", mock.Anything, 89).Return(donor, nil)
+	siriusClient.On("CasesByDonor", mock.Anything, 89).Return(cases, nil)
 
 	ve := sirius.ValidationError{
 		Field: sirius.FieldErrors{
@@ -278,7 +260,7 @@ func TestPostWarningValidationErrors(t *testing.T) {
 		},
 		Error:       ve,
 		WarningType: "Complaint Received",
-		Donor:       donor,
+		Cases:       cases,
 	}).Return(nil)
 
 	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
@@ -306,10 +288,7 @@ func TestCreateWarningReturnsError(t *testing.T) {
 		},
 		nil,
 	)
-	siriusClient.On("Person", mock.Anything, 89).Return(sirius.Person{
-		Firstname: "John",
-		Surname:   "Doe",
-	}, nil)
+	siriusClient.On("CasesByDonor", mock.Anything, 89).Return([]sirius.Case{}, nil)
 
 	e := errors.New("Some error")
 
