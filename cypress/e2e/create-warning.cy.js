@@ -1,13 +1,9 @@
 describe("Create a warning", () => {
   beforeEach(() => {
-    cy.addMock("/lpa-api/v1/persons/189", "GET", {
+    cy.addMock("/lpa-api/v1/persons/189/cases", "GET", {
       status: 200,
       body: {
-        dob: "05/05/1970",
-        firstname: "John",
-        id: 189,
-        surname: "Doe",
-        uId: "7000-0000-0007",
+        cases: [],
       },
     });
     cy.visit("/create-warning?id=189");
@@ -34,27 +30,18 @@ describe("Create a warning", () => {
 
 describe("Create a warning on multiple cases", () => {
   beforeEach(() => {
-    cy.addMock("/lpa-api/v1/persons/400", "GET", {
+    cy.addMock("/lpa-api/v1/persons/400/cases", "GET", {
       status: 200,
       body: {
-        dob: "05/05/1970",
-        firstname: "John",
-        id: 400,
-        surname: "Doe",
-        uId: "7000-0000-0007",
         cases: [
           {
             caseSubtype: "pfa",
-            caseType: "LPA",
             id: 405,
-            status: "Perfect",
             uId: "7000-5382-4438",
           },
           {
             caseSubtype: "hw",
-            caseType: "LPA",
             id: 406,
-            status: "Pending",
             uId: "7000-5382-8764",
           },
         ],
