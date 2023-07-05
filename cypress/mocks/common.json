@@ -55,17 +55,6 @@
     {
       "request": {
         "method": "GET",
-        "url": "/lpa-api/v1/reference-data/documentTemplateId"
-      },
-      "response": {
-        "status": 200,
-        "headers": { "Content-Type": "application/json" },
-        "body": "[{\"handle\":\"DDONSCREENSUMMARY\",\"label\":\"Donor deceased: Blank template\"},{\"handle\":\"DD1LPAINSERTONSCREENSUMMARY\",\"label\":\"DD1 - Case complete\"}]"
-      }
-    },
-    {
-      "request": {
-        "method": "GET",
         "url": "/lpa-api/v1/reference-data/complainantCategory"
       },
       "response": {

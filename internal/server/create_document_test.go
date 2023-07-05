@@ -16,14 +16,6 @@ type mockCreateDocumentClient struct {
 	mock.Mock
 }
 
-func (m *mockCreateDocumentClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
-	args := m.Called(ctx, category)
-	if args.Get(0) != nil {
-		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
-	}
-	return nil, args.Error(1)
-}
-
 func (m *mockCreateDocumentClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(sirius.Case), args.Error(1)
@@ -54,19 +46,12 @@ func TestGetCreateDocument(t *testing.T) {
 		t.Run(caseType, func(t *testing.T) {
 			caseItem := sirius.Case{CaseType: caseType, UID: "7000"}
 
-			documentTemplates := []sirius.RefDataItem{
-				{
-					Handle: "DD",
-					Label:  "DD Template Label",
-				},
-			}
-
 			documentTemplateData := []sirius.DocumentTemplateData{
 				{
-					Inserts:         nil,
-					TemplateId:      "DD",
-					Location:        "DD.html.twig",
-					OnScreenSummary: "DDONSCREENSUMMARY",
+					Inserts:    nil,
+					TemplateId: "DD",
+					Location:   "DD.html.twig",
+					Label:      "DD Template Label",
 				},
 			}
 
@@ -75,20 +60,16 @@ func TestGetCreateDocument(t *testing.T) {
 				On("Case", mock.Anything, 123).
 				Return(caseItem, nil)
 			client.
-				On("RefDataByCategory", mock.Anything, sirius.DocumentTemplateIdCategory).
-				Return(documentTemplates, nil)
-			client.
 				On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
 				Return(documentTemplateData, nil)
 
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, createDocumentData{
-					Case:                    caseItem,
-					DocumentTemplateRefData: documentTemplates,
-					DocumentTemplates:       documentTemplateData,
-					ComponentDocumentData:   buildComponentDocumentData(documentTemplateData, documentTemplates),
-					Back:                    "/create-document?id=0&case=" + caseType,
+					Case:                  caseItem,
+					DocumentTemplates:     documentTemplateData,
+					ComponentDocumentData: buildComponentDocumentData(documentTemplateData),
+					Back:                  "/create-document?id=0&case=" + caseType,
 				}).
 				Return(nil)
 
@@ -298,55 +279,13 @@ func TestGetCreateDocumentWhenCaseErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestGetCreateDocumentWhenFailureOnGetDocumentRefData(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "lpa", UID: "7000"}
-
-	documentTemplateData := []sirius.DocumentTemplateData{
-		{
-			Inserts:         nil,
-			TemplateId:      "DD",
-			Location:        `lpa\/DD.html.twig`,
-			OnScreenSummary: "DDONSCREENSUMMARY",
-		},
-	}
-
-	client := &mockCreateDocumentClient{}
-	client.
-		On("Case", mock.Anything, 123).
-		Return(caseItem, nil)
-	client.
-		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
-		Return(documentTemplateData, nil)
-	client.
-		On("RefDataByCategory", mock.Anything, sirius.DocumentTemplateIdCategory).
-		Return([]sirius.RefDataItem{}, expectedError)
-
-	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
-	w := httptest.NewRecorder()
-
-	err := CreateDocument(client, nil)(w, r)
-
-	assert.Equal(t, expectedError, err)
-	mock.AssertExpectationsForObjects(t, client)
-}
-
 func TestGetCreateDocumentWhenFailureOnGetDocumentTemplates(t *testing.T) {
 	caseItem := sirius.Case{CaseType: "lpa", UID: "7000"}
 
-	documentTemplates := []sirius.RefDataItem{
-		{
-			Handle: "DD",
-			Label:  "Donor deceased: Blank template",
-		},
-	}
-
 	client := &mockCreateDocumentClient{}
 	client.
 		On("Case", mock.Anything, 123).
 		Return(caseItem, nil)
-	client.
-		On("RefDataByCategory", mock.Anything, sirius.DocumentTemplateIdCategory).
-		Return(documentTemplates, nil)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return([]sirius.DocumentTemplateData{}, expectedError)
@@ -363,19 +302,12 @@ func TestGetCreateDocumentWhenFailureOnGetDocumentTemplates(t *testing.T) {
 func TestGetCreateDocumentWhenTemplateErrors(t *testing.T) {
 	caseItem := sirius.Case{CaseType: "lpa", UID: "7000"}
 
-	documentTemplates := []sirius.RefDataItem{
-		{
-			Handle: "DD",
-			Label:  "Donor deceased: Blank template",
-		},
-	}
-
 	documentTemplateData := []sirius.DocumentTemplateData{
 		{
-			Inserts:         nil,
-			TemplateId:      "DD",
-			Location:        `lpa\/DD.html.twig`,
-			OnScreenSummary: "DDONSCREENSUMMARY",
+			Inserts:    nil,
+			TemplateId: "DD",
+			Location:   `lpa\/DD.html.twig`,
+			Label:      "Donor deceased: Blank template",
 		},
 	}
 
@@ -384,20 +316,16 @@ func TestGetCreateDocumentWhenTemplateErrors(t *testing.T) {
 		On("Case", mock.Anything, 123).
 		Return(caseItem, nil)
 	client.
-		On("RefDataByCategory", mock.Anything, sirius.DocumentTemplateIdCategory).
-		Return(documentTemplates, nil)
-	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return(documentTemplateData, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createDocumentData{
-			Case:                    caseItem,
-			DocumentTemplateRefData: documentTemplates,
-			DocumentTemplates:       documentTemplateData,
-			ComponentDocumentData:   buildComponentDocumentData(documentTemplateData, documentTemplates),
-			Back:                    "/create-document?id=0&case=lpa",
+			Case:                  caseItem,
+			DocumentTemplates:     documentTemplateData,
+			ComponentDocumentData: buildComponentDocumentData(documentTemplateData),
+			Back:                  "/create-document?id=0&case=lpa",
 		}).
 		Return(expectedError)
 
@@ -410,47 +338,36 @@ func TestGetCreateDocumentWhenTemplateErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestTranslateDocumentData(t *testing.T) {
-	documentTemplateRefData := []sirius.RefDataItem{
-		{
-			Handle: "DDONSCREENSUMMARY",
-			Label:  "DD Template Label",
-		},
-	}
-
+func TestSortDocumentData(t *testing.T) {
 	documentTemplateData := []sirius.DocumentTemplateData{
 		{
-			Inserts:         nil,
-			TemplateId:      "DD",
-			Location:        `DD.html.twig`,
-			OnScreenSummary: "DDONSCREENSUMMARY",
+			TemplateId: "DD",
+		},
+		{
+			TemplateId: "AA",
+		},
+		{
+			TemplateId: "ZZ",
 		},
 	}
 
-	documentTemplateTypes := translateDocumentData(documentTemplateData, documentTemplateRefData)
-	assert.Equal(t, "DD Template Label", documentTemplateTypes[0].Label)
-	assert.Equal(t, "DD", documentTemplateTypes[0].Handle)
-	assert.Equal(t, false, documentTemplateTypes[0].UserSelectable)
+	sortedDocumentData := sortDocumentData(documentTemplateData)
+	assert.Equal(t, "AA", sortedDocumentData[0].TemplateId)
+	assert.Equal(t, "DD", sortedDocumentData[1].TemplateId)
+	assert.Equal(t, "ZZ", sortedDocumentData[2].TemplateId)
 }
 
 func TestTranslateInsertData(t *testing.T) {
-	documentTemplateRefData := []sirius.RefDataItem{
-		{
-			Handle: "DDINSERTONSCREENSUMMARY",
-			Label:  "DD Insert label",
-		},
-	}
-
 	selectedTemplateInserts := []sirius.Insert{
 		{
-			Key:             "All",
-			InsertId:        "DDINSERT",
-			Location:        `lpa\/DD.html.twig`,
-			OnScreenSummary: "DDINSERTONSCREENSUMMARY",
+			Key:      "All",
+			InsertId: "DDINSERT",
+			Location: `lpa\/DD.html.twig`,
+			Label:    "DD Insert label",
 		},
 	}
 
-	translatedInsert := translateInsertData(selectedTemplateInserts, documentTemplateRefData)
+	translatedInsert := translateInsertData(selectedTemplateInserts)
 	assert.Equal(t, "DD Insert label", translatedInsert[0].Label)
 	assert.Equal(t, "DDINSERT", translatedInsert[0].Handle)
 	assert.Equal(t, "All", translatedInsert[0].Key)
@@ -518,19 +435,16 @@ func TestGetSortedInsertKeys(t *testing.T) {
 			Key:             "all",
 			InsertId:        "DDINSERT",
 			Location:        `lpa\/DD.html.twig`,
-			OnScreenSummary: "DDINSERTONSCREENSUMMARY",
 		},
 		{
 			Key:             "imperfect",
 			InsertId:        "IM1INSERT",
 			Location:        `lpa\/IM1.html.twig`,
-			OnScreenSummary: "IM1INSERTONSCREENSUMMARY",
 		},
 		{
 			Key:             "perfect",
 			InsertId:        "P1INSERT",
 			Location:        `lpa\/P1.html.twig`,
-			OnScreenSummary: "P1INSERTONSCREENSUMMARY",
 		},
 	}
 
@@ -539,13 +453,11 @@ func TestGetSortedInsertKeys(t *testing.T) {
 			Key:             "imperfect",
 			InsertId:        "IM1INSERT",
 			Location:        `lpa\/IM1.html.twig`,
-			OnScreenSummary: "IM1INSERTONSCREENSUMMARY",
 		},
 		{
 			Key:             "perfect",
 			InsertId:        "P1INSERT",
 			Location:        `lpa\/P1.html.twig`,
-			OnScreenSummary: "P1INSERTONSCREENSUMMARY",
 		},
 	}
 

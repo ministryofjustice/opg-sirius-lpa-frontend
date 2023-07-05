@@ -27,7 +27,6 @@ func TestDocumentTypes(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("Some document templates exist").
 					UponReceiving("A request for document templates").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
@@ -37,14 +36,14 @@ func TestDocumentTypes(t *testing.T) {
 						Status: http.StatusOK,
 						Body: dsl.Like(map[string]interface{}{
 							"DD": dsl.Like(map[string]interface{}{
-								"onScreenSummary": dsl.Like("DDONSCREENSUMMARY"),
-								"location":        dsl.Like(`lpa\/DD.html.twig`),
+								"location": dsl.Like(`lpa\/DD.html.twig`),
+								"label":    dsl.Like("Donor deceased: Blank template"),
 								"inserts": dsl.Like(map[string]interface{}{
 									"all": dsl.Like(map[string]interface{}{
 										"DD1": dsl.Like(map[string]interface{}{
-											"onScreenSummary": dsl.Like("DD1LPAINSERTONSCREENSUMMARY"),
-											"location":        dsl.Like(`lpa\/inserts\/DD1.html.twig`),
-											"order":           dsl.Like(0),
+											"location": dsl.Like(`lpa\/inserts\/DD1.html.twig`),
+											"label":    dsl.Like("DD1 - Case complete"),
+											"order":    dsl.Like(0),
 										}),
 									}),
 								}),
@@ -57,48 +56,16 @@ func TestDocumentTypes(t *testing.T) {
 				{
 					Inserts: []Insert{
 						{
-							Key:             "all",
-							InsertId:        "DD1",
-							Location:        `lpa\/inserts\/DD1.html.twig`,
-							OnScreenSummary: "DD1LPAINSERTONSCREENSUMMARY",
-							Order:           0,
+							Key:      "all",
+							InsertId: "DD1",
+							Label:    "DD1 - Case complete",
+							Location: `lpa\/inserts\/DD1.html.twig`,
+							Order:    0,
 						},
 					},
-					Location:        `lpa\/DD.html.twig`,
-					OnScreenSummary: "DDONSCREENSUMMARY",
-					TemplateId:      "DD",
-				},
-			},
-		},
-		{
-			name: "OK - template with no inserts",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("Some document templates exist").
-					UponReceiving("A request for document templates (no inserts)").
-					WithRequest(dsl.Request{
-						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/templates/lpa"),
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"CT-bb": dsl.Like(map[string]interface{}{
-								"onScreenSummary": dsl.Like("CTBBONSCREENSUMMARY"),
-								"location":        dsl.Like(`complaints/CT-bb.html.twig`),
-								"inserts":         dsl.Like([]interface{}{}),
-							}),
-						}),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-					})
-			},
-			expectedResponse: []DocumentTemplateData{
-				{
-					Inserts:         []Insert(nil),
-					Location:        `complaints/CT-bb.html.twig`,
-					OnScreenSummary: "CTBBONSCREENSUMMARY",
-					TemplateId:      "CT-bb",
+					Location:   `lpa\/DD.html.twig`,
+					TemplateId: "DD",
+					Label:      "Donor deceased: Blank template",
 				},
 			},
 		},

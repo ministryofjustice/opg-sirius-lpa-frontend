@@ -288,8 +288,8 @@
             <select class="govuk-select {{ if .Error.Field.templateId }}govuk-select--error{{ end }}"
                     id="f-templateId" name="templateId" data-select-template>
                 <option value="" selected></option>
-                {{ range .DocumentTemplateTypes }}
-                    <option value="{{ .Handle }}" {{ if eq .Handle nil }}selected{{ end }}>{{ .Handle }}: {{ .Label }}</option>
+                {{ range .DocumentTemplates }}
+                    <option value="{{ .TemplateId }}" {{ if eq .TemplateId nil }}selected{{ end }}>{{ .TemplateId }}: {{ .Label }}</option>
                 {{ end }}
             </select>
         </div>
