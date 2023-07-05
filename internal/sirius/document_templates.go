@@ -12,30 +12,26 @@ type documentTemplateApiResponse map[string]json.RawMessage
 type insertApiResponse map[string]json.RawMessage
 
 type UniversalTemplateData struct {
-	Location        string `json:"location"`
-	Label           string `json:"label"`
-	Order           int    `json:"order"`
+	Label string `json:"label"`
+	Order int    `json:"order"`
 }
 
 type documentTemplateApiData struct {
-	Inserts         insertApiResponse `json:"inserts"`
-	Location        string            `json:"location"`
-	Label           string            `json:"label"`
+	Inserts insertApiResponse `json:"inserts"`
+	Label   string            `json:"label"`
 }
 
 type Insert struct {
-	Key             string
-	InsertId        string
-	Location        string `json:"location"`
-	Label           string `json:"label"`
-	Order           int    `json:"order"`
+	Key      string
+	InsertId string
+	Label    string `json:"label"`
+	Order    int    `json:"order"`
 }
 
 type DocumentTemplateData struct {
-	Inserts         []Insert
-	TemplateId      string
-	Location        string `json:"location"`
-	Label           string `json:"label"`
+	Inserts    []Insert
+	TemplateId string
+	Label      string `json:"label"`
 }
 
 func (d documentTemplateApiResponse) toDocumentData() ([]DocumentTemplateData, error) {
@@ -51,7 +47,6 @@ func (d documentTemplateApiResponse) toDocumentData() ([]DocumentTemplateData, e
 			if err != nil {
 				return nil, err
 			}
-			asDocumentTemplateData.Location = asDocumentTemplateApiData.Location
 			asDocumentTemplateData.Label = asDocumentTemplateApiData.Label
 			asDocumentTemplateData.Inserts = inserts
 			s = append(s, asDocumentTemplateData)
@@ -60,7 +55,6 @@ func (d documentTemplateApiResponse) toDocumentData() ([]DocumentTemplateData, e
 			// handle when inserts = []
 			var universalTemplateData UniversalTemplateData
 			if err := json.Unmarshal(v, &universalTemplateData); err == nil {
-				asDocumentTemplateData.Location = universalTemplateData.Location
 				asDocumentTemplateData.Label = universalTemplateData.Label
 				s = append(s, asDocumentTemplateData)
 				continue
@@ -82,7 +76,6 @@ func (i insertApiResponse) toInsertData() ([]Insert, error) {
 		if err := json.Unmarshal(v, &asInsertKeyApiResponse); err == nil {
 			for insertId, insertData := range asInsertKeyApiResponse {
 				insert.InsertId = insertId
-				insert.Location = insertData.Location
 				insert.Label = insertData.Label
 				insert.Order = insertData.Order
 				inserts = append(inserts, insert)

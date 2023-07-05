@@ -50,7 +50,6 @@ func TestGetCreateDocument(t *testing.T) {
 				{
 					Inserts:    nil,
 					TemplateId: "DD",
-					Location:   "DD.html.twig",
 					Label:      "DD Template Label",
 				},
 			}
@@ -306,7 +305,6 @@ func TestGetCreateDocumentWhenTemplateErrors(t *testing.T) {
 		{
 			Inserts:    nil,
 			TemplateId: "DD",
-			Location:   `lpa\/DD.html.twig`,
 			Label:      "Donor deceased: Blank template",
 		},
 	}
@@ -362,7 +360,6 @@ func TestTranslateInsertData(t *testing.T) {
 		{
 			Key:      "All",
 			InsertId: "DDINSERT",
-			Location: `lpa\/DD.html.twig`,
 			Label:    "DD Insert label",
 		},
 	}
@@ -434,17 +431,14 @@ func TestGetSortedInsertKeys(t *testing.T) {
 		{
 			Key:             "all",
 			InsertId:        "DDINSERT",
-			Location:        `lpa\/DD.html.twig`,
 		},
 		{
 			Key:             "imperfect",
 			InsertId:        "IM1INSERT",
-			Location:        `lpa\/IM1.html.twig`,
 		},
 		{
 			Key:             "perfect",
 			InsertId:        "P1INSERT",
-			Location:        `lpa\/P1.html.twig`,
 		},
 	}
 
@@ -452,12 +446,10 @@ func TestGetSortedInsertKeys(t *testing.T) {
 		{
 			Key:             "imperfect",
 			InsertId:        "IM1INSERT",
-			Location:        `lpa\/IM1.html.twig`,
 		},
 		{
 			Key:             "perfect",
 			InsertId:        "P1INSERT",
-			Location:        `lpa\/P1.html.twig`,
 		},
 	}
 
@@ -471,7 +463,7 @@ func TestGetSortedInsertKeys(t *testing.T) {
 func TestGetBackUrl(t *testing.T) {
 	template := sirius.DocumentTemplateData{TemplateId: "DD"}
 	insertsAvailable := []InsertDisplayData{{
-		Handle: "DDINSERTONSCREENSUMMARY",
+		Handle: "DDINSERT1",
 		Label:  "DD Insert label",
 		Key:    "All",
 	}}
