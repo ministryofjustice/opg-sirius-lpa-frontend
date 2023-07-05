@@ -15,6 +15,7 @@ type DigitalLpa struct {
 	InvestigationCount int        `json:"investigationCount"`
 	TaskCount          int        `json:"taskCount"`
 	WarningCount       int        `json:"warningCount"`
+	ObjectionCount     int        `json:"objectionCount"`
 }
 
 func (c *Client) DigitalLpa(ctx Context, uid string) (DigitalLpa, error) {
