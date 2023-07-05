@@ -14,6 +14,7 @@ type insertApiResponse map[string]json.RawMessage
 type UniversalTemplateData struct {
 	Location        string `json:"location"`
 	OnScreenSummary string `json:"onScreenSummary"`
+	Label           string `json:"label"`
 	Order           int    `json:"order"`
 }
 
@@ -21,6 +22,7 @@ type documentTemplateApiData struct {
 	Inserts         insertApiResponse `json:"inserts"`
 	Location        string            `json:"location"`
 	OnScreenSummary string            `json:"onScreenSummary"`
+	Label           string            `json:"label"`
 }
 
 type Insert struct {
@@ -28,6 +30,7 @@ type Insert struct {
 	InsertId        string
 	Location        string `json:"location"`
 	OnScreenSummary string `json:"onScreenSummary"`
+	Label           string `json:"label"`
 	Order           int    `json:"order"`
 }
 
@@ -36,6 +39,7 @@ type DocumentTemplateData struct {
 	TemplateId      string
 	Location        string `json:"location"`
 	OnScreenSummary string `json:"onScreenSummary"`
+	Label           string `json:"label"`
 }
 
 func (d documentTemplateApiResponse) toDocumentData() ([]DocumentTemplateData, error) {
@@ -53,6 +57,7 @@ func (d documentTemplateApiResponse) toDocumentData() ([]DocumentTemplateData, e
 			}
 			asDocumentTemplateData.Location = asDocumentTemplateApiData.Location
 			asDocumentTemplateData.OnScreenSummary = asDocumentTemplateApiData.OnScreenSummary
+			asDocumentTemplateData.Label = asDocumentTemplateApiData.Label
 			asDocumentTemplateData.Inserts = inserts
 			s = append(s, asDocumentTemplateData)
 			continue
@@ -62,6 +67,7 @@ func (d documentTemplateApiResponse) toDocumentData() ([]DocumentTemplateData, e
 			if err := json.Unmarshal(v, &universalTemplateData); err == nil {
 				asDocumentTemplateData.Location = universalTemplateData.Location
 				asDocumentTemplateData.OnScreenSummary = universalTemplateData.OnScreenSummary
+				asDocumentTemplateData.Label = universalTemplateData.Label
 				s = append(s, asDocumentTemplateData)
 				continue
 			}
@@ -84,6 +90,7 @@ func (i insertApiResponse) toInsertData() ([]Insert, error) {
 				insert.InsertId = insertId
 				insert.Location = insertData.Location
 				insert.OnScreenSummary = insertData.OnScreenSummary
+				insert.Label = insertData.Label
 				insert.Order = insertData.Order
 				inserts = append(inserts, insert)
 			}

@@ -10,13 +10,11 @@ import (
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/exp/slices"
-	"golang.org/x/sync/errgroup"
 )
 
 type CreateDocumentClient interface {
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
 	Person(ctx sirius.Context, id int) (sirius.Person, error)
-	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
 	CreateContact(ctx sirius.Context, contact sirius.Person) (sirius.Person, error)
 	CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error)
@@ -29,8 +27,6 @@ type createDocumentData struct {
 	Case                       sirius.Case
 	Document                   sirius.Document
 	DocumentTemplates          []sirius.DocumentTemplateData
-	DocumentTemplateTypes      []sirius.RefDataItem
-	DocumentTemplateRefData    []sirius.RefDataItem
 	DocumentInsertTypes        []InsertDisplayData
 	TemplateSelected           sirius.DocumentTemplateData
 	HasViewedInsertPage        bool
@@ -51,6 +47,7 @@ type InsertDisplayData struct {
 type ComponentTemplateInsertData struct {
 	InsertId        string `json:"id"`
 	OnScreenSummary string `json:"onScreenSummary"`
+	Label           string `json:"label"`
 }
 
 type ComponentTemplateData struct {
@@ -92,32 +89,12 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 
 		switch r.Method {
 		case http.MethodGet:
-			group, groupCtx := errgroup.WithContext(ctx.Context)
-
-			group.Go(func() error {
-				documentTemplates, err := client.DocumentTemplates(ctx.With(groupCtx), caseType)
-				if err != nil {
-					return err
-				}
-
-				data.DocumentTemplates = documentTemplates
-				return nil
-			})
-
-			group.Go(func() error {
-				documentTemplateRefData, err := client.RefDataByCategory(ctx.With(groupCtx), sirius.DocumentTemplateIdCategory)
-				if err != nil {
-					return err
-				}
-				data.DocumentTemplateRefData = documentTemplateRefData
-				return nil
-			})
-
-			if err := group.Wait(); err != nil {
+			documentTemplates, err := client.DocumentTemplates(ctx, caseType)
+			if err != nil {
 				return err
 			}
 
-			data.DocumentTemplateTypes = translateDocumentData(data.DocumentTemplates, data.DocumentTemplateRefData)
+			data.DocumentTemplates = sortDocumentData(documentTemplates)
 
 			templateId := r.FormValue("templateId")
 			hasSelectedSubmitTemplate := r.FormValue("hasSelectedSubmitTemplate")
@@ -139,10 +116,10 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 			}
 
 			if data.TemplateSelected.TemplateId != "" {
-				data.DocumentInsertTypes = translateInsertData(data.TemplateSelected.Inserts, data.DocumentTemplateRefData)
+				data.DocumentInsertTypes = translateInsertData(data.TemplateSelected.Inserts)
 				data.DocumentInsertKeys = getSortedInsertKeys(data.TemplateSelected.Inserts)
 			} else {
-				data.ComponentDocumentData = buildComponentDocumentData(data.DocumentTemplates, data.DocumentTemplateRefData)
+				data.ComponentDocumentData = buildComponentDocumentData(data.DocumentTemplates)
 			}
 
 			hasViewedInsertPage := r.FormValue("hasViewedInserts")
@@ -279,43 +256,23 @@ func getRecipients(caseItem sirius.Case) ([]sirius.Person, error) {
 	return recipients, nil
 }
 
-func translateDocumentData(documentTemplateData []sirius.DocumentTemplateData, documentTemplateRefData []sirius.RefDataItem) []sirius.RefDataItem {
-	var documentTemplateTypes []sirius.RefDataItem
-	for _, dt := range documentTemplateData {
-		for _, refData := range documentTemplateRefData {
-			if refData.Handle == dt.OnScreenSummary {
-				translatedRefDataItem := sirius.RefDataItem{
-					Handle:         dt.TemplateId,
-					Label:          refData.Label,
-					UserSelectable: false,
-				}
-				documentTemplateTypes = append(documentTemplateTypes, translatedRefDataItem)
-				break
-			}
-		}
-	}
-
-	sort.Slice(documentTemplateTypes, func(i, j int) bool {
-		return documentTemplateTypes[i].Handle < documentTemplateTypes[j].Handle
+func sortDocumentData(documentTemplateData []sirius.DocumentTemplateData) []sirius.DocumentTemplateData {
+	sort.Slice(documentTemplateData, func(i, j int) bool {
+		return documentTemplateData[i].TemplateId < documentTemplateData[j].TemplateId
 	})
 
-	return documentTemplateTypes
+	return documentTemplateData
 }
 
-func translateInsertData(selectedTemplateInserts []sirius.Insert, documentTemplateRefData []sirius.RefDataItem) []InsertDisplayData {
+func translateInsertData(selectedTemplateInserts []sirius.Insert) []InsertDisplayData {
 	var documentTemplateInserts []InsertDisplayData
 	for _, in := range selectedTemplateInserts {
-		for _, refData := range documentTemplateRefData {
-			if refData.Handle == in.OnScreenSummary {
-				translatedRefDataItem := InsertDisplayData{
-					Handle: in.InsertId,
-					Label:  refData.Label,
-					Key:    in.Key,
-				}
-				documentTemplateInserts = append(documentTemplateInserts, translatedRefDataItem)
-				break
-			}
+		translatedRefDataItem := InsertDisplayData{
+			Handle: in.InsertId,
+			Label:  in.Label,
+			Key:    in.Key,
 		}
+		documentTemplateInserts = append(documentTemplateInserts, translatedRefDataItem)
 	}
 
 	return documentTemplateInserts
@@ -381,7 +338,7 @@ func getBackUrl(data createDocumentData) string {
 	return url
 }
 
-func buildComponentDocumentData(templates []sirius.DocumentTemplateData, inserts []sirius.RefDataItem) ComponentDocumentData {
+func buildComponentDocumentData(templates []sirius.DocumentTemplateData) ComponentDocumentData {
 	data := ComponentDocumentData{
 		Translations: map[string]string{},
 	}
@@ -396,16 +353,13 @@ func buildComponentDocumentData(templates []sirius.DocumentTemplateData, inserts
 			formedInsert := ComponentTemplateInsertData{
 				InsertId:        insert.InsertId,
 				OnScreenSummary: insert.OnScreenSummary,
+				Label:           insert.Label,
 			}
 
 			formed.Inserts[insert.Key] = append(formed.Inserts[insert.Key], formedInsert)
 		}
 
 		data.Templates = append(data.Templates, formed)
-	}
-
-	for _, insert := range inserts {
-		data.Translations[insert.Handle] = insert.Label
 	}
 
 	return data

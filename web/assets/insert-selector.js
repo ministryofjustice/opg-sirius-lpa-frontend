@@ -90,8 +90,6 @@ InsertSelector.prototype.populateSelector = function (insertLists) {
     );
 
     const $rows = inserts.map((insert) => {
-      const label = this.data.translations[insert.onScreenSummary];
-
       return el(
         "tr",
         {
@@ -114,7 +112,7 @@ InsertSelector.prototype.populateSelector = function (insertLists) {
                   class: "govuk-label govuk-checkboxes__label",
                   for: `f-${insert.id}-${key}`,
                 },
-                [`${insert.id}: ${label}`]
+                [`${insert.id}: ${insert.label}`]
               ),
             ]),
           ]),
