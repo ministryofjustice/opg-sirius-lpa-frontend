@@ -36,12 +36,10 @@ func TestDocumentTypes(t *testing.T) {
 						Status: http.StatusOK,
 						Body: dsl.Like(map[string]interface{}{
 							"DD": dsl.Like(map[string]interface{}{
-								"location": dsl.Like(`lpa\/DD.html.twig`),
 								"label":    dsl.Like("Donor deceased: Blank template"),
 								"inserts": dsl.Like(map[string]interface{}{
 									"all": dsl.Like(map[string]interface{}{
 										"DD1": dsl.Like(map[string]interface{}{
-											"location": dsl.Like(`lpa\/inserts\/DD1.html.twig`),
 											"label":    dsl.Like("DD1 - Case complete"),
 											"order":    dsl.Like(0),
 										}),
@@ -59,11 +57,9 @@ func TestDocumentTypes(t *testing.T) {
 							Key:      "all",
 							InsertId: "DD1",
 							Label:    "DD1 - Case complete",
-							Location: `lpa\/inserts\/DD1.html.twig`,
 							Order:    0,
 						},
 					},
-					Location:   `lpa\/DD.html.twig`,
 					TemplateId: "DD",
 					Label:      "Donor deceased: Blank template",
 				},
