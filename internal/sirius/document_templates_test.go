@@ -37,12 +37,10 @@ func TestDocumentTypes(t *testing.T) {
 						Status: http.StatusOK,
 						Body: dsl.Like(map[string]interface{}{
 							"DD": dsl.Like(map[string]interface{}{
-								"onScreenSummary": dsl.Like("DDONSCREENSUMMARY"),
 								"location":        dsl.Like(`lpa\/DD.html.twig`),
 								"inserts": dsl.Like(map[string]interface{}{
 									"all": dsl.Like(map[string]interface{}{
 										"DD1": dsl.Like(map[string]interface{}{
-											"onScreenSummary": dsl.Like("DD1LPAINSERTONSCREENSUMMARY"),
 											"location":        dsl.Like(`lpa\/inserts\/DD1.html.twig`),
 											"order":           dsl.Like(0),
 										}),
@@ -60,12 +58,10 @@ func TestDocumentTypes(t *testing.T) {
 							Key:             "all",
 							InsertId:        "DD1",
 							Location:        `lpa\/inserts\/DD1.html.twig`,
-							OnScreenSummary: "DD1LPAINSERTONSCREENSUMMARY",
 							Order:           0,
 						},
 					},
 					Location:        `lpa\/DD.html.twig`,
-					OnScreenSummary: "DDONSCREENSUMMARY",
 					TemplateId:      "DD",
 				},
 			},
@@ -85,7 +81,6 @@ func TestDocumentTypes(t *testing.T) {
 						Status: http.StatusOK,
 						Body: dsl.Like(map[string]interface{}{
 							"CT-bb": dsl.Like(map[string]interface{}{
-								"onScreenSummary": dsl.Like("CTBBONSCREENSUMMARY"),
 								"location":        dsl.Like(`complaints/CT-bb.html.twig`),
 								"inserts":         dsl.Like([]interface{}{}),
 							}),
@@ -97,7 +92,6 @@ func TestDocumentTypes(t *testing.T) {
 				{
 					Inserts:         []Insert(nil),
 					Location:        `complaints/CT-bb.html.twig`,
-					OnScreenSummary: "CTBBONSCREENSUMMARY",
 					TemplateId:      "CT-bb",
 				},
 			},
