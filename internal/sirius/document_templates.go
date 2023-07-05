@@ -13,21 +13,21 @@ type insertApiResponse map[string]json.RawMessage
 
 type UniversalTemplateData struct {
 	Location        string `json:"location"`
-	OnScreenSummary string `json:"onScreenSummary"`
+	Label           string `json:"label"`
 	Order           int    `json:"order"`
 }
 
 type documentTemplateApiData struct {
 	Inserts         insertApiResponse `json:"inserts"`
 	Location        string            `json:"location"`
-	OnScreenSummary string            `json:"onScreenSummary"`
+	Label           string            `json:"label"`
 }
 
 type Insert struct {
 	Key             string
 	InsertId        string
 	Location        string `json:"location"`
-	OnScreenSummary string `json:"onScreenSummary"`
+	Label           string `json:"label"`
 	Order           int    `json:"order"`
 }
 
@@ -35,7 +35,7 @@ type DocumentTemplateData struct {
 	Inserts         []Insert
 	TemplateId      string
 	Location        string `json:"location"`
-	OnScreenSummary string `json:"onScreenSummary"`
+	Label           string `json:"label"`
 }
 
 func (d documentTemplateApiResponse) toDocumentData() ([]DocumentTemplateData, error) {
@@ -52,7 +52,7 @@ func (d documentTemplateApiResponse) toDocumentData() ([]DocumentTemplateData, e
 				return nil, err
 			}
 			asDocumentTemplateData.Location = asDocumentTemplateApiData.Location
-			asDocumentTemplateData.OnScreenSummary = asDocumentTemplateApiData.OnScreenSummary
+			asDocumentTemplateData.Label = asDocumentTemplateApiData.Label
 			asDocumentTemplateData.Inserts = inserts
 			s = append(s, asDocumentTemplateData)
 			continue
@@ -61,7 +61,7 @@ func (d documentTemplateApiResponse) toDocumentData() ([]DocumentTemplateData, e
 			var universalTemplateData UniversalTemplateData
 			if err := json.Unmarshal(v, &universalTemplateData); err == nil {
 				asDocumentTemplateData.Location = universalTemplateData.Location
-				asDocumentTemplateData.OnScreenSummary = universalTemplateData.OnScreenSummary
+				asDocumentTemplateData.Label = universalTemplateData.Label
 				s = append(s, asDocumentTemplateData)
 				continue
 			}
@@ -83,7 +83,7 @@ func (i insertApiResponse) toInsertData() ([]Insert, error) {
 			for insertId, insertData := range asInsertKeyApiResponse {
 				insert.InsertId = insertId
 				insert.Location = insertData.Location
-				insert.OnScreenSummary = insertData.OnScreenSummary
+				insert.Label = insertData.Label
 				insert.Order = insertData.Order
 				inserts = append(inserts, insert)
 			}

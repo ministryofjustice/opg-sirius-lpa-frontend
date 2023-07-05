@@ -586,24 +586,6 @@
       }
     },
     {
-      "name": "A request for document templates",
-      "request": { "method": "GET", "url": "/lpa-api/v1/templates/lpa" },
-      "response": {
-        "status": 200,
-        "headers": { "Content-Type": "application/json" },
-        "body": "{\"DD\":{\"inserts\":{\"all\":{\"DD1\":{\"location\":\"lpa\\\\/inserts\\\\/DD1.html.twig\",\"onScreenSummary\":\"DD1LPAINSERTONSCREENSUMMARY\",\"order\":0}}},\"location\":\"lpa\\\\/DD.html.twig\",\"onScreenSummary\":\"DDONSCREENSUMMARY\"}}"
-      }
-    },
-    {
-      "name": "A request for document templates (no inserts)",
-      "request": { "method": "GET", "url": "/lpa-api/v1/templates/lpa" },
-      "response": {
-        "status": 200,
-        "headers": { "Content-Type": "application/json" },
-        "body": "{\"CT-bb\":{\"inserts\":[],\"location\":\"complaints/CT-bb.html.twig\",\"onScreenSummary\":\"CTBBONSCREENSUMMARY\"}}"
-      }
-    },
-    {
       "name": "A request to link two people",
       "request": { "method": "POST", "url": "/lpa-api/v1/person-links" },
       "response": { "status": 204, "headers": {} }

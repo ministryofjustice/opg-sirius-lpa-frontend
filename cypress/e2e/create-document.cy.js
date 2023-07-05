@@ -4,12 +4,12 @@ describe("Create a document", () => {
       status: 200,
       body: {
         DD: {
-          onScreenSummary: "DDONSCREENSUMMARY",
+          label: "Donor deceased: Blank template",
           location: "lpa/DD.html.twig",
           inserts: {
             all: {
               DD1: {
-                onScreenSummary: "DD1LPAINSERTONSCREENSUMMARY",
+                label: "DD1 - Case complete",
                 location: "lpa/inserts/DD1.html.twig",
                 order: 0,
               },

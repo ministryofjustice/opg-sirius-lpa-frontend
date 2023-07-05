@@ -134,33 +134,6 @@ func TestRefDataByCategory(t *testing.T) {
 			},
 		},
 		{
-			name:     "Document template IDs",
-			category: DocumentTemplateIdCategory,
-			setup: func() {
-				pact.
-					AddInteraction().
-					UponReceiving("A request for document template id ref data").
-					WithRequest(dsl.Request{
-						Method: http.MethodGet,
-						Path:   dsl.String(fmt.Sprintf("/lpa-api/v1/reference-data/%s", DocumentTemplateIdCategory)),
-					}).
-					WillRespondWith(dsl.Response{
-						Status: http.StatusOK,
-						Body: dsl.EachLike(map[string]interface{}{
-							"handle": dsl.String("DDONSCREENSUMMARY"),
-							"label":  dsl.String("Donor deceased: Blank template"),
-						}, 1),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-					})
-			},
-			expectedResponse: []RefDataItem{
-				{
-					Handle: "DDONSCREENSUMMARY",
-					Label:  "Donor deceased: Blank template",
-				},
-			},
-		},
-		{
 			name:     "Complainant category",
 			category: ComplainantCategory,
 			setup: func() {
