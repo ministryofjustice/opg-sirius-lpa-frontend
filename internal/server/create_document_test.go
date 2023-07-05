@@ -435,19 +435,16 @@ func TestGetSortedInsertKeys(t *testing.T) {
 			Key:             "all",
 			InsertId:        "DDINSERT",
 			Location:        `lpa\/DD.html.twig`,
-			OnScreenSummary: "DDINSERTONSCREENSUMMARY",
 		},
 		{
 			Key:             "imperfect",
 			InsertId:        "IM1INSERT",
 			Location:        `lpa\/IM1.html.twig`,
-			OnScreenSummary: "IM1INSERTONSCREENSUMMARY",
 		},
 		{
 			Key:             "perfect",
 			InsertId:        "P1INSERT",
 			Location:        `lpa\/P1.html.twig`,
-			OnScreenSummary: "P1INSERTONSCREENSUMMARY",
 		},
 	}
 
@@ -456,13 +453,11 @@ func TestGetSortedInsertKeys(t *testing.T) {
 			Key:             "imperfect",
 			InsertId:        "IM1INSERT",
 			Location:        `lpa\/IM1.html.twig`,
-			OnScreenSummary: "IM1INSERTONSCREENSUMMARY",
 		},
 		{
 			Key:             "perfect",
 			InsertId:        "P1INSERT",
 			Location:        `lpa\/P1.html.twig`,
-			OnScreenSummary: "P1INSERTONSCREENSUMMARY",
 		},
 	}
 
