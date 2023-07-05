@@ -5,12 +5,10 @@ describe("Create a document", () => {
       body: {
         DD: {
           label: "Donor deceased: Blank template",
-          location: "lpa/DD.html.twig",
           inserts: {
             all: {
               DD1: {
                 label: "DD1 - Case complete",
-                location: "lpa/inserts/DD1.html.twig",
                 order: 0,
               },
             },

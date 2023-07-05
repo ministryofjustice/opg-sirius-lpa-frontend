@@ -13,7 +13,8 @@ describe("Edit a document", () => {
           createdDate: "15/12/2022 13:41:04",
           direction: "Outgoing",
           filename: "LP-A.pdf",
-          friendlyDescription: "Dr Consuela Aysien - __LPAONSCREENSUMMARY__",
+          friendlyDescription:
+            "Dr Consuela Aysien - LPA perfect + reg due date: applicant",
           id: 1,
           mimeType: "application\\/pdf",
           systemType: "LP-A",
