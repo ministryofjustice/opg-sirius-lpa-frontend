@@ -3,7 +3,7 @@ module github.com/ministryofjustice/opg-sirius-lpa-frontend
 go 1.19
 
 require (
-	github.com/go-playground/form/v4 v4.2.0
+	github.com/go-playground/form/v4 v4.2.1
 	github.com/ministryofjustice/opg-go-common v0.0.0-20220816144329-763497f29f90
 	github.com/pact-foundation/pact-go v1.7.0
 	github.com/stretchr/testify v1.8.4
@@ -14,10 +14,10 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.16.0
 	go.opentelemetry.io/otel/sdk v1.16.0
 	golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df
-	golang.org/x/mod v0.11.0
+	golang.org/x/mod v0.12.0
 	golang.org/x/sync v0.3.0
-	golang.org/x/text v0.10.0
-	google.golang.org/grpc v1.56.1
+	golang.org/x/text v0.11.0
+	google.golang.org/grpc v1.56.2
 )
 
 require (
