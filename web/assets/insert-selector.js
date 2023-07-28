@@ -13,10 +13,10 @@ function InsertSelector($module) {
   this.$initiator = document.querySelector(`${selectorAttribute}-select`);
 
   this.$containerTemplate = $module.querySelector(
-    '[data-id="insert-selector-template-container"]'
+    '[data-id="insert-selector-template-container"]',
   );
   this.$panelTemplate = $module.querySelector(
-    '[data-id="insert-selector-template-panel"]'
+    '[data-id="insert-selector-template-panel"]',
   );
 
   this.templateId = "";
@@ -59,7 +59,7 @@ InsertSelector.prototype.populateSelector = function (insertLists) {
 
   this.$tabContainer = this.$container.querySelector(".govuk-tabs__list");
   this.$panelContainer = this.$container.querySelector(
-    '[data-module="govuk-tabs"]'
+    '[data-module="govuk-tabs"]',
   );
 
   if (!insertLists.all) {
@@ -85,8 +85,8 @@ InsertSelector.prototype.populateSelector = function (insertLists) {
           el("a", { class: "govuk-tabs__tab", href: `#panel-${key}` }, [
             key.charAt(0).toUpperCase() + key.slice(1),
           ]),
-        ]
-      )
+        ],
+      ),
     );
 
     const $rows = inserts.map((insert) => {
@@ -112,11 +112,11 @@ InsertSelector.prototype.populateSelector = function (insertLists) {
                   class: "govuk-label govuk-checkboxes__label",
                   for: `f-${insert.id}-${key}`,
                 },
-                [`${insert.id}: ${insert.label}`]
+                [`${insert.id}: ${insert.label}`],
               ),
             ]),
           ]),
-        ]
+        ],
       );
     });
 
@@ -124,7 +124,7 @@ InsertSelector.prototype.populateSelector = function (insertLists) {
 
     $panel.setAttribute("id", `panel-${key}`);
     $rows.forEach(($child) =>
-      $panel.querySelector("tbody").appendChild($child)
+      $panel.querySelector("tbody").appendChild($child),
     );
 
     this.$panelContainer.appendChild($panel);
@@ -138,7 +138,7 @@ InsertSelector.prototype.populateSelector = function (insertLists) {
 
 export default function init($scope) {
   const $insertSelectors = ($scope || document).querySelectorAll(
-    '[data-module="app-insert-selector"]'
+    '[data-module="app-insert-selector"]',
   );
 
   nodeListForEach($insertSelectors, ($insertSelector) => {

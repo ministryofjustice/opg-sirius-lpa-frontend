@@ -4,7 +4,7 @@ const handleInsertCheckboxes = (config = {}) => {
 
   /** @type {NodeListOf<HTMLInputElement>|null} checkboxes */
   const checkboxes = (config.scope || document).querySelectorAll(
-    '[data-module="insert-checkbox"]'
+    '[data-module="insert-checkbox"]',
   );
 
   if (checkboxes && checkboxes.length > 0) {

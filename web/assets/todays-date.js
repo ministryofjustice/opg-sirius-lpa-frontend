@@ -1,6 +1,6 @@
 const todaysDate = () => {
   const selectTodayLink = document.querySelector(
-    '[data-module="select-todays-date"]'
+    '[data-module="select-todays-date"]',
   );
   const datePicker = document.querySelector(".date-picker");
 
@@ -11,7 +11,7 @@ const todaysDate = () => {
         e.preventDefault();
         datePicker.value = new Date().toJSON().slice(0, 10);
       },
-      false
+      false,
     );
   }
 };

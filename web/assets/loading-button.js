@@ -1,7 +1,7 @@
 const loadingButton = () => {
   /** @type HTMLAnchorElement|null loadingButton */
   const loadingButton = document.querySelector(
-    '[data-module="app-loading-button"]'
+    '[data-module="app-loading-button"]',
   );
 
   if (loadingButton) {
@@ -24,7 +24,7 @@ const loadingButton = () => {
           message.classList.remove("govuk-!-display-none");
         }
       },
-      false
+      false,
     );
   }
 };

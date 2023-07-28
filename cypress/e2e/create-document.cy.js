@@ -94,7 +94,7 @@ describe("Create a document", () => {
     });
 
     cy.visit(
-      "/create-document?id=807&case=LPA&hasSelectedSubmitTemplate=true&templateId=DD&hasViewedInserts=true&insert=DD1"
+      "/create-document?id=807&case=LPA&hasSelectedSubmitTemplate=true&templateId=DD&hasViewedInserts=true&insert=DD1",
     );
     cy.contains("7000-0000-0002");
 

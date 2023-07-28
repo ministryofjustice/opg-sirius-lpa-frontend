@@ -3,14 +3,14 @@ import accessibleAutocomplete from "accessible-autocomplete";
 export default function select(prefix) {
   enhanceUserPersonSearchElement(
     document.querySelector("[data-select-user]"),
-    fetchUser(prefix)
+    fetchUser(prefix),
   );
   enhanceUserPersonSearchElement(
     document.querySelector("[data-select-person]"),
-    fetchPerson(prefix)
+    fetchPerson(prefix),
   );
   enhanceTemplateSearchElement(
-    document.querySelector("[data-select-template]")
+    document.querySelector("[data-select-template]"),
   );
 }
 
@@ -23,7 +23,7 @@ function enhanceTemplateSearchElement(element) {
         // Provide default behaviour, which is normally overridden by `onConfirm`
         const requestedOption = [].filter.call(
           this.selectElement.options,
-          (option) => (option.textContent || option.innerText) === value
+          (option) => (option.textContent || option.innerText) === value,
         )[0];
         if (requestedOption) {
           requestedOption.selected = true;
@@ -87,7 +87,7 @@ function fetchForAutocomplete(url, mapFunction) {
 function fetchUser(prefix) {
   return fetchForAutocomplete(
     (query) => `${prefix}/search-users?q=${encodeURIComponent(query)}`,
-    ({ id, displayName }) => ({ id, text: displayName })
+    ({ id, displayName }) => ({ id, text: displayName }),
   );
 }
 
@@ -97,6 +97,6 @@ function fetchPerson(prefix) {
     ({ uId, firstname, surname }) => ({
       id: uId,
       text: `${firstname} ${surname} (${uId})`,
-    })
+    }),
   );
 }

@@ -8,7 +8,7 @@ export default function autoApplyFilter() {
   }
 
   const filters = document.querySelectorAll(
-    '[data-module="app-auto-apply-filter"]'
+    '[data-module="app-auto-apply-filter"]',
   );
   let timeout = null;
 

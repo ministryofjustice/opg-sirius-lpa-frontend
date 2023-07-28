@@ -45,7 +45,7 @@ if (window.self !== window.parent) {
   if (success) {
     window.parent.postMessage(
       "form-done",
-      `${window.location.protocol}//${window.location.host}`
+      `${window.location.protocol}//${window.location.host}`,
     );
   }
 
@@ -53,29 +53,29 @@ if (window.self !== window.parent) {
     el.addEventListener("click", (event) => {
       window.parent.postMessage(
         "form-cancel",
-        `${window.location.protocol}//${window.location.host}`
+        `${window.location.protocol}//${window.location.host}`,
       );
       event.preventDefault();
     });
   });
 
   const saveAndExit = document.querySelector(
-    '[data-app-reload~="saveAndExit"]'
+    '[data-app-reload~="saveAndExit"]',
   );
   if (saveAndExit) {
     window.parent.postMessage(
       "form-cancel",
-      `${window.location.protocol}//${window.location.host}`
+      `${window.location.protocol}//${window.location.host}`,
     );
   }
 
   const reloadTimeline = document.querySelector(
-    '[data-app-reload~="reload-timeline"]'
+    '[data-app-reload~="reload-timeline"]',
   );
   if (reloadTimeline) {
     window.parent.postMessage(
       "reload-timeline",
-      `${window.location.protocol}//${window.location.host}`
+      `${window.location.protocol}//${window.location.host}`,
     );
   }
 }
