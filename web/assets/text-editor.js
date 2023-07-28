@@ -19,7 +19,7 @@ const textEditor = () => {
     cache_suffix: "?v=5.10.7",
     content_css: getContentCSSPath(),
     body_class: document.documentElement.classList.contains(
-      "app-!-html-class--dark"
+      "app-!-html-class--dark",
     )
       ? "app-!-html-class--dark"
       : "",

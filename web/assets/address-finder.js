@@ -109,7 +109,7 @@ AddressFinder.prototype.showError = function () {
   this.$input.classList.add("govuk-input--error");
   this.$input.setAttribute(
     "aria-describedby",
-    this.$input.getAttribute("aria-describedby") + " " + this.$error.id
+    this.$input.getAttribute("aria-describedby") + " " + this.$error.id,
   );
   this.$input
     .closest(".govuk-form-group")
@@ -125,7 +125,7 @@ AddressFinder.prototype.resetError = function () {
   if (describedBy) {
     this.$input.setAttribute(
       "aria-describedby",
-      describedBy.replace(this.$error.id, "").trim()
+      describedBy.replace(this.$error.id, "").trim(),
     );
   }
 
@@ -185,7 +185,7 @@ AddressFinder.prototype.underwriteValue = function (field, value) {
 
   if (!$input) {
     $input = this.$module.querySelector(
-      `[data-app-address-finder-map="${field}"]`
+      `[data-app-address-finder-map="${field}"]`,
     );
   }
 
@@ -202,7 +202,7 @@ AddressFinder.prototype.handleSelect = function () {
   const result = this.results[i];
 
   Object.entries(result).forEach(([field, value]) =>
-    this.underwriteValue(field, value)
+    this.underwriteValue(field, value),
   );
 
   this.underwriteValue("country", "GB");
@@ -210,7 +210,7 @@ AddressFinder.prototype.handleSelect = function () {
 
 export default function init(prefix, $scope) {
   const $addressFinders = ($scope || document).querySelectorAll(
-    '[data-module="app-address-finder"]'
+    '[data-module="app-address-finder"]',
   );
 
   nodeListForEach($addressFinders, ($addressFinder) => {
