@@ -6,19 +6,19 @@ const handleCreateDocumentButton = () => {
 
   /** @type HTMLButtonElement|null createDocumentButton */
   const createDocumentButton = document.querySelector(
-    '[data-module="create-document-button"]'
+    '[data-module="create-document-button"]',
   );
 
   /** @type NodeList|null checkboxes */
   const checkboxes = document.querySelectorAll(
-    '[data-module="recipient-checkbox"]'
+    '[data-module="recipient-checkbox"]',
   );
 
   if (checkboxes && checkboxes.length > 0) {
     checkboxes.forEach((el, i) => {
       el.addEventListener("change", (event) => {
         let isOneRecipientSelected = Array.from(checkboxes).some(
-          (x) => x.checked
+          (x) => x.checked,
         );
         if (isOneRecipientSelected) {
           createDocumentButton.removeAttribute("disabled");

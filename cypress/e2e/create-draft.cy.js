@@ -33,11 +33,11 @@ describe("Create Digital LPA draft", () => {
     cy.contains("Enter address manually").click();
     cy.get("#f-donorAddress\\.Line1").should(
       "have.value",
-      "Office of the Public Guardian"
+      "Office of the Public Guardian",
     );
     cy.get("#f-donorAddress\\.Line2").should(
       "have.value",
-      "1 Something Street"
+      "1 Something Street",
     );
     cy.get("#f-donorAddress\\.Line3").should("have.value", "Someborough");
     cy.get("#f-donorAddress\\.Town").should("have.value", "Someton");
@@ -61,7 +61,7 @@ describe("Create Digital LPA draft", () => {
       .within(() => {
         cy.contains("Enter address manually").click();
         cy.get("#f-correspondentAddress\\.Line1").type(
-          "Nitzsche, Nader And Schuppe"
+          "Nitzsche, Nader And Schuppe",
         );
         cy.get("#f-correspondentAddress\\.Line2").type("6064 Alessandro Plain");
         cy.get("#f-correspondentAddress\\.Line3").type("Pittsfield");
@@ -74,13 +74,13 @@ describe("Create Digital LPA draft", () => {
 
     cy.contains("Save draft LPA").click();
     cy.get(".govuk-panel").contains(
-      "Draft Health and Welfare and Property and Finance LPAs for the donor Coleen Stephanie Morneault have been saved"
+      "Draft Health and Welfare and Property and Finance LPAs for the donor Coleen Stephanie Morneault have been saved",
     );
     cy.get(".govuk-panel").contains(
-      "Health and Welfare case reference number is M-GHIJ-7890-KLMN"
+      "Health and Welfare case reference number is M-GHIJ-7890-KLMN",
     );
     cy.get(".govuk-panel").contains(
-      "Property and Finance case reference number is M-ABCD-1234-EF56"
+      "Property and Finance case reference number is M-ABCD-1234-EF56",
     );
   });
 });

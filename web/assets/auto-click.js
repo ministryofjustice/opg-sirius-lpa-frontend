@@ -1,7 +1,7 @@
 const autoClick = () => {
   /** @type HTMLAnchorElement|null autoClickLink */
   const autoClickLinks = document.querySelectorAll(
-    '[data-module~="app-auto-click"]'
+    '[data-module~="app-auto-click"]',
   );
 
   if (autoClickLinks) {

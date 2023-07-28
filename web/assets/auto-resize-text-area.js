@@ -10,7 +10,7 @@ const autoResizeTextArea = () => {
         txtareas[i].style.height = "auto";
         txtareas[i].style.height = txtareas[i].scrollHeight + 4 + "px";
       },
-      false
+      false,
     );
   }
 };

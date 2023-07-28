@@ -39,7 +39,7 @@ describe("Edit a document", () => {
   it("can select a draft to edit", () => {
     cy.contains("1: 15/12/2022 13:41:04: Consuela Aysien: LP-A");
     cy.get("#f-document").select(
-      "1: 15/12/2022 13:41:04: Consuela Aysien: LP-A"
+      "1: 15/12/2022 13:41:04: Consuela Aysien: LP-A",
     );
     cy.contains("button", "Select").click();
     cy.contains("1: 15/12/2022 13:41:04: Consuela Aysien: LP-A");
