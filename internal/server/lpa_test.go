@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -38,13 +39,17 @@ func TestGetLpa(t *testing.T) {
 		}).
 		Return(nil)
 
-	req, _ := http.NewRequest(http.MethodGet, "/lpa?uid=M-9876-9876-9876", nil)
-	w := httptest.NewRecorder()
+	var err error
+	mux := chi.NewRouter()
+	mux.HandleFunc("/lpa/{uid}", func(w http.ResponseWriter, r *http.Request) {
+		err = Lpa(client, template.Func)(w, r)
+	})
 
-	err := Lpa(client, template.Func)(w, req)
+	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9876", nil)
+	resp := httptest.NewRecorder()
+	mux.ServeHTTP(resp, req)
+
 	assert.Nil(t, err)
-
-	resp := w.Result()
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	assert.Equal(t, http.StatusOK, resp.Code)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
