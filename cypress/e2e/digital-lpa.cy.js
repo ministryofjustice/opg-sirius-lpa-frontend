@@ -1,6 +1,6 @@
 describe("Edit a payment", () => {
   beforeEach(() => {
-    cy.visit("/lpa?uid=M-1234-9876-4567");
+    cy.visit("/lpa/M-1234-9876-4567");
   });
 
   it("shows case information", () => {
