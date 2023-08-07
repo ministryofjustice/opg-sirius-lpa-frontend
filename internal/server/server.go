@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/securityheaders"
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -83,7 +84,7 @@ var decoder *form.Decoder
 func New(logger Logger, client Client, templates template.Templates, prefix, siriusPublicURL, webDir string) http.Handler {
 	wrap := errorHandler(logger, templates.Get("error.gohtml"), prefix, siriusPublicURL)
 
-	mux := http.NewServeMux()
+	mux := chi.NewRouter()
 
 	mux.Handle("/", http.NotFoundHandler())
 	mux.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {})
@@ -121,12 +122,12 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/search-postcode", wrap(SearchPostcode(client)))
 	mux.Handle("/search", wrap(Search(client, templates.Get("search.gohtml"))))
 	mux.Handle("/digital-lpa/create", wrap(CreateDraft(client, templates.Get("create-draft.gohtml"))))
-	mux.Handle("/lpa", wrap(Lpa(client, templates.Get("lpa.gohtml"))))
+	mux.Handle("/lpa/{uid}", wrap(Lpa(client, templates.Get("lpa.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))
-	mux.Handle("/assets/", static)
-	mux.Handle("/javascript/", static)
-	mux.Handle("/stylesheets/", static)
+	mux.Handle("/assets/*", static)
+	mux.Handle("/javascript/*", static)
+	mux.Handle("/stylesheets/*", static)
 
 	muxWithHeaders := securityheaders.Use(setCSPHeader(mux))
 

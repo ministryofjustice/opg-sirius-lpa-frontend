@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
@@ -18,7 +19,7 @@ type lpaData struct {
 
 func Lpa(client LpaClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		uid := r.FormValue("uid")
+		uid := chi.URLParam(r, "uid")
 		ctx := getContext(r)
 
 		lpa, err := client.DigitalLpa(ctx, uid)
