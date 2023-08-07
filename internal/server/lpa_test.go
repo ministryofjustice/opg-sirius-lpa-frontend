@@ -2,7 +2,6 @@ package server
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -38,13 +37,12 @@ func TestGetLpa(t *testing.T) {
 		}).
 		Return(nil)
 
-	req, _ := http.NewRequest(http.MethodGet, "/lpa?uid=M-9876-9876-9876", nil)
-	w := httptest.NewRecorder()
+	server := newMockServer("/lpa/{uid}", Lpa(client, template.Func))
 
-	err := Lpa(client, template.Func)(w, req)
+	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9876", nil)
+	resp, err := server.serve(req)
+
 	assert.Nil(t, err)
-
-	resp := w.Result()
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	assert.Equal(t, http.StatusOK, resp.Code)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
