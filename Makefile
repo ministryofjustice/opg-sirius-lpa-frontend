@@ -1,38 +1,56 @@
 export DOCKER_BUILDKIT=1
 
-all: lint go-test build scan pa11y lighthouse cypress down
+all: lint gosec unit-test build-all scan pa11y lighthouse cypress down
 
-lint:
-	docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint:latest golangci-lint run -v
+lint: go-lint yarn-lint
 
-go-test:
-	rm -f pacts/sirius-lpa-frontend-sirius.json
-	go test -count 1 ./...
+go-lint:
+	docker compose run --rm go-lint
+
+yarn-lint:
+	docker compose run --rm yarn
+	docker compose run --rm yarn lint
+
+gosec:
+	docker compose run --rm gosec
+
+test-results:
+	mkdir -p -m 0777 test-results .gocache pacts logs cypress/screenshots .trivy-cache
+
+setup-directories: test-results
+
+unit-test: setup-directories
+	docker compose run --rm test-runner
 
 build:
-	docker-compose -f docker/docker-compose.ci.yml build --parallel app
+	docker compose build lpa-frontend
 
 build-all:
-	docker-compose -f docker/docker-compose.ci.yml build --parallel app puppeteer cypress
+	docker compose build --parallel lpa-frontend puppeteer cypress test-runner
 
 up:
-	docker-compose -f docker/docker-compose.ci.yml up -d app
+	docker compose up -d lpa-frontend
 
 dev:
-	docker-compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml up -d
-	yarn && yarn watch
+	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up -d lpa-frontend
+	docker compose run --rm yarn
+	docker compose run --rm yarn watch
 
-scan:
-	trivy image sirius-lpa-frontend:latest
+scan: setup-directories
+	docker compose run --rm trivy image --format table --exit-code 0 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest
+	docker compose run --rm trivy image --format sarif --output /test-results/trivy.sarif --exit-code 1 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest
 
-pa11y:
-	docker-compose -f docker/docker-compose.ci.yml run --entrypoint="pa11y-ci" puppeteer
+pa11y: setup-directories
+	docker compose run --entrypoint="pa11y-ci" puppeteer
 
-lighthouse:
-	docker-compose -f docker/docker-compose.ci.yml run --entrypoint="lhci autorun" puppeteer
+lighthouse: setup-directories
+	docker compose run --entrypoint="lhci autorun" puppeteer
+
+cypress: setup-directories
+	docker compose run --rm cypress
 
 down:
-	docker-compose -f docker/docker-compose.ci.yml down
+	docker compose down
 
 run-structurizr:
 	docker pull structurizr/lite
