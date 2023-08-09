@@ -3,7 +3,7 @@ Cypress.Commands.add("addMock", async (url, method, response) => {
     response.body = JSON.stringify(response.body);
   }
 
-  await fetch("http://localhost:8563/__admin/mappings", {
+  await fetch(`${Cypress.env("MOCK_SERVER_URI")}/__admin/mappings`, {
     method: "POST",
     body: JSON.stringify({
       request: {
@@ -16,7 +16,7 @@ Cypress.Commands.add("addMock", async (url, method, response) => {
 });
 
 Cypress.Commands.add("resetMocks", async () => {
-  await fetch("http://localhost:8563/__admin/mappings/reset", {
+  await fetch(`${Cypress.env("MOCK_SERVER_URI")}/__admin/mappings/reset`, {
     method: "POST",
   });
 });

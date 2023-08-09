@@ -1,7 +1,7 @@
 module.exports = {
   ci: {
     collect: {
-      url: ["http://app:8080/create-warning?id=189"],
+      url: ["http://lpa-frontend:8080/create-warning?id=189"],
       settings: {
         extraHeaders: JSON.stringify({
           Cookie: "XSRF-TOKEN=abcde; Other=other",

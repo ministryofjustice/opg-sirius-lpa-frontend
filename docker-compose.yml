@@ -1,0 +1,81 @@
+version: "3.6"
+
+services:
+  lpa-frontend:
+    image: 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest
+    build:
+      dockerfile: docker/sirius-lpa-frontend/Dockerfile
+    depends_on:
+      - sirius-mock
+    ports: ["8888:8080"]
+    environment:
+      SIRIUS_URL: http://sirius-mock:8080
+      SIRIUS_PUBLIC_URL: http://localhost:8080
+
+  sirius-mock:
+    image: wiremock/wiremock:2.35.0
+    ports: ["8563:8080"]
+    volumes:
+      - "./cypress/mocks:/home/wiremock/mappings"
+
+  puppeteer:
+    build: docker/puppeteer
+    depends_on:
+      - lpa-frontend
+    environment:
+      - LHCI_BUILD_CONTEXT__CURRENT_HASH=$GITHUB_SHA
+      - LHCI_BUILD_CONTEXT__GITHUB_REPO_SLUG=ministryofjustice/opg-sirius-lpa-frontend
+      - LHCI_GITHUB_APP_TOKEN
+
+  go-lint:
+    image: golangci/golangci-lint:v1.53.3
+    working_dir: /go/src/app
+    volumes:
+      - ./:/go/src/app
+      - ./.cache/golangci-lint/v1.53.3:/root/.cache
+    command: golangci-lint run -v --timeout 5m
+
+  yarn:
+    image: node:lts-alpine3.18
+    working_dir: /home/node/app
+    entrypoint: yarn
+    volumes:
+      - ./:/home/node/app
+
+  gosec:
+    image: securego/gosec:latest
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: -exclude-dir=.gocache /app/...
+
+  test-runner:
+    build:
+      context: docker/test-runner/
+    command: gotestsum --junitfile test-results/unit-tests.xml -- ./... -coverprofile=test-results/test-coverage.txt
+    working_dir: /go/src/app
+    volumes:
+      - ./:/go/src/app
+      - ./.gocache:/go/pkg/mod
+
+  trivy:
+    image: aquasec/trivy:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./.trivy-cache:/root/.cache
+      - ./test-results:/test-results
+
+  cypress:
+    image: cypress/included:latest
+    command: run --browser chrome
+    entrypoint: cypress
+    depends_on:
+      - lpa-frontend
+      - sirius-mock
+    environment:
+      - CYPRESS_BASE_URL=http://lpa-frontend:8080
+      - CYPRESS_MOCK_SERVER_URI=http://sirius-mock:8080
+      - CYPRESS_VIDEO=false
+    working_dir: /e2e
+    volumes:
+      - ./:/e2e
