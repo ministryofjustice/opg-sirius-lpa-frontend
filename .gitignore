@@ -10,3 +10,7 @@ log/
 
 .structurizr
 docs/architecture/dsl/**/workspace.json
+.cache
+.gocache
+.trivy-cache
+test-results
