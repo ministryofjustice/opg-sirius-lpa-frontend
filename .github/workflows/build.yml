@@ -62,7 +62,7 @@ jobs:
         run: |
           make build
           mkdir -p /tmp/images
-          docker save -o /tmp/images/app.tar sirius-lpa-frontend:latest
+          docker save -o /tmp/images/app.tar 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest
 
   test:
     name: Test
@@ -70,69 +70,40 @@ jobs:
     needs: [identify]
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v4
-        with:
-          go-version: 1.19.2
-      - uses: unfor19/install-aws-cli-action@v1
 
       - name: Cache Dependencies
         uses: actions/cache@v3
         with:
-          path: ~/go/pkg/mod
+          path: .gocache
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-      - name: Install modules
-        run: |
-          go mod download
-
-      - name: Setup gotestsum
-        uses: autero1/action-gotestsum@v2.0.0
-        with:
-          gotestsum_version: 1.6.4
-      - run: mkdir -p /tmp/test-results
-
-      - name: Set Pact Standalone version
-        run: |
-          echo "pact_version=1.88.82" >> $GITHUB_ENV
-      - name: Add Pact to Path
-        if: steps.cache-pact.outputs.cache-hit == 'true'
-        run: |
-          echo "$PWD/pact/bin" >> $GITHUB_PATH
-      - name: Download pact tools
-        if: steps.cache-pact.outputs.cache-hit != 'true'
-        run: |
-          curl -LO https://github.com/pact-foundation/pact-ruby-standalone/releases/download/v${{ env.pact_version }}/pact-${{ env.pact_version }}-linux-x86_64.tar.gz
-          tar xzf pact-${{ env.pact_version }}-linux-x86_64.tar.gz
-          echo "$PWD/pact/bin" >> $GITHUB_PATH
 
       - name: Run Tests
-        run: |
-          gotestsum --junitfile /tmp/test-results/unit-tests.xml -- ./... -coverprofile=/tmp/test-coverage.txt
+        run: make unit-test
 
       - name: Publish pacts
         run: |
-          pact-broker publish ./pacts/sirius-lpa-frontend-sirius.json \
+          docker compose run --rm test-runner pact-broker publish ./pacts/sirius-lpa-frontend-sirius.json \
             --consumer-app-version ${{ needs.identify.outputs.commit }} \
             --branch ${{ needs.identify.outputs.branch }} \
             --tag ${{ needs.identify.outputs.tag }} \
             --broker-base-url https://pact-broker.api.opg.service.justice.gov.uk \
             --broker-username admin \
             --broker-password ${{ secrets.PACT_BROKER_PASSWORD }}
+
       - name: Upload Code Coverage
         uses: codecov/codecov-action@v3
         with:
-          files: /tmp/test-coverage.txt
+          files: test-results/test-coverage.txt
           fail_ci_if_error: true
   lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Go Lint
-        uses: golangci/golangci-lint-action@v3
-      - name: Prettier
-        run: yarn && yarn lint
+      - name: Go & Yarn Lint
+        run: make lint
 
   acceptance-test:
     name: Acceptance Testing
@@ -179,13 +150,7 @@ jobs:
           docker load -i /tmp/images/app.tar
 
       - name: Run app
-        run: |
-          make up
-
-      - name: Cypress Tests
-        uses: cypress-io/github-action@v5.8.3
-        with:
-          browser: chrome
+        run: make cypress
 
       - name: Upload Cypress screenshots
         uses: actions/upload-artifact@v3
@@ -211,22 +176,16 @@ jobs:
           key: ${{ runner.os }}-images-${{ github.run_id }}-${{ github.run_number }}
 
       - name: Restore Image
-        run: |
-          docker load -i /tmp/images/app.tar
+        run: docker load -i /tmp/images/app.tar
 
-      - name: Trivy Image Vulnerability Scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: sirius-lpa-frontend:latest
-          format: "template"
-          template: "@/contrib/sarif.tpl"
-          output: "trivy-results.sarif"
+      - name: Run Trivy
+        run: make scan
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         if: always()
         with:
-          sarif_file: "trivy-results.sarif"
+          sarif_file: "test-results/trivy.sarif"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -249,10 +208,10 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: sirius/sirius-lpa-frontend
         run: |
-          docker tag sirius-lpa-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          docker tag sirius-lpa-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.identify.outputs.tag }}
+          docker tag 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.identify.outputs.tag }}
           if [ "${{ needs.identify.outputs.branch }}" == "main" ]; then
             # We want all of the tags pushed
+            docker tag 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:main-${{ needs.identify.outputs.tag }}
             docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           else
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.identify.outputs.tag }}

@@ -17,11 +17,16 @@ Frontend forms for Sirius.
 ### Running the application
 
 ```
-docker-compose -f docker/docker-compose.yml up -d --build
+make up
 ```
 
-This will run the application at http://localhost:8888/, and assumes that Sirius
-is running at http://localhost:8080/.
+This will run the application at http://localhost:8888/, running against the mock api server.
+
+```
+make dev
+```
+
+This will run the application at http://localhost:8888/, assumes sirius is at http://localhost:8080, and will hot reload the javascript into the app.
 
 Alternatively the application can be run without the use of Docker
 
@@ -34,17 +39,8 @@ SIRIUS_PUBLIC_URL=http://localhost:8080 SIRIUS_URL=http://localhost:8080 PORT=88
 
 #### Unit tests
 
-Make sure that `pact` is available before running the tests, on a Mac with Homebrew you can do:
-
 ```
-brew tap pact-foundation/pact-ruby-standalone
-brew install pact-ruby-standalone
-```
-
-Then to run the tests:
-
-```
-make go-test
+make unit-test
 ```
 
 #### E2E tests (Cypress)
@@ -54,15 +50,22 @@ of the service with a mock backend so that you don't need to start all of the
 Sirius backend and can get reliable responses.
 
 ```
-make build up
-yarn && yarn cypress
+make cypress
 ```
 
 ## Development
 
-For Go we lint using [golangci-lint](https://golangci-lint.run/). It may be
-useful to install locally to check changes. This will include a check on
-formatting so it is recommended to setup your editor to use `go fmt`.
+For CI Like linting locally you can run
 
-JavaScript files are similarly linted with [Prettier](https://prettier.io/).
-You can run this locally with `yarn prettier`.
+```
+make go-lint
+make yarn-lint
+# or to run both linters simply
+make lint
+```
+
+To run the entire CI build locally just run
+
+```
+make
+```
