@@ -14,6 +14,10 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   display: none;
 }
 
+.app-\!-embedded sirius-header {
+  display: none;
+}
+
 // When embedded, always use mobile-size wrapper spacing
 @include govuk-media-query($from: tablet) {
   .app-\!-embedded .govuk-width-container {
