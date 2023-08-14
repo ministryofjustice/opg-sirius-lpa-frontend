@@ -6,10 +6,15 @@ $govuk-assets-path: "/lpa/frontend/assets/";
 @import "node_modules/govuk-frontend/govuk/all";
 @import "node_modules/@ministryofjustice/frontend/moj/all";
 @import "node_modules/accessible-autocomplete/src/autocomplete";
+@import "node_modules/opg-sirius-header/sass/sirius-header";
 @import "./dark.scss";
 @import "./wysiwyg.scss";
 
 .app-\!-embedded .app-\!-embedded-hide {
+  display: none;
+}
+
+.app-\!-embedded sirius-header {
   display: none;
 }
 
