@@ -133,7 +133,10 @@ $govuk-assets-path: "/lpa/frontend/assets/";
 }
 
 .app-table-no-cell-borders {
-    table, tr, td, th{
-      border: none !important;
-    }
+  table,
+  tr,
+  td,
+  th {
+    border: none !important;
+  }
 }
