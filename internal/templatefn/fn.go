@@ -31,12 +31,13 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"today": func() string {
 			return time.Now().Format("2006-01-02")
 		},
-		"field":   field,
-		"radios":  radios,
-		"item":    item,
-		"fieldID": fieldID,
-		"select":  select_,
-		"options": options,
+		"field":    field,
+		"radios":   radios,
+		"item":     item,
+		"fieldID":  fieldID,
+		"select":   select_,
+		"options":  options,
+		"caseTabs": caseTab,
 		"fee": func(amount int) string {
 			float := float64(amount)
 			return fmt.Sprintf("%.2f", float/100)
@@ -118,6 +119,18 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"attr": func(s string) template.HTMLAttr {
 			return template.HTMLAttr(s) //#nosec G203 false positive
 		},
+	}
+}
+
+type CaseTabData struct {
+	Lpa     sirius.DigitalLpa
+	TabName string
+}
+
+func caseTab(lpa sirius.DigitalLpa, tabName string) CaseTabData {
+	return CaseTabData{
+		Lpa:     lpa,
+		TabName: tabName,
 	}
 }
 

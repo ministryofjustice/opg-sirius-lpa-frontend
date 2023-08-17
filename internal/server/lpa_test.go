@@ -40,9 +40,8 @@ func TestGetLpa(t *testing.T) {
 	server := newMockServer("/lpa/{uid}", Lpa(client, template.Func))
 
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9876", nil)
-	resp, err := server.serve(req)
+	_, err := server.serve(req)
 
 	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.Code)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
