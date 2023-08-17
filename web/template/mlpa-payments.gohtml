@@ -1,0 +1,67 @@
+{{ template "page" . }}
+
+{{ define "title" }}Payments{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row" id="fees-data">
+        <div class="govuk-grid-column-two-thirds">
+
+            {{ template "mlpa-header" (caseTabs .Lpa "fees") }}
+
+            <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Fees</h1>
+
+            <h2 class="govuk-heading-m govuk-!-margin-bottom-3">Summary</h2>
+
+            <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-2">
+
+            <table class="govuk-table table__no-border app-table-no-cell-borders">
+                <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">Progress</th>
+                    {{ if gt .OutstandingFee 0 }}
+                        <td class="govuk-table__cell govuk-!-font-weight-bold">UNPAID<br>£{{ fee .OutstandingFee }} expected</td>
+                    {{ else }}
+                        <td class="govuk-table__cell govuk-!-font-weight-bold">PAID<br>No fees due</td>
+                    {{ end }}
+                </tr>
+                {{ if .RefundAmount }}
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Refund due</th>
+                        <td class="govuk-table__cell govuk-!-font-weight-bold">£{{ fee .RefundAmount }}</td>
+                    </tr>
+                {{ end }}
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">Total paid</th>
+                    <td class="govuk-table__cell">£{{ fee .TotalPaid }}</td>
+                </tr>
+
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">Fee reduction type</th>
+                    <td class="govuk-table__cell">
+                        {{ $feeReductionTypes := .FeeReductionTypes }}
+                        {{ if .FeeReductions }}
+                            {{ range .FeeReductions }}
+                                {{ translateRefData $feeReductionTypes .FeeReductionType }}
+                            {{ end }}
+                        {{ else }}
+                            None applied
+                        {{ end }}
+                    </td>
+                    <td class="govuk-table__cell">
+                        {{ if not .FeeReductions }}  {{/* should be {{ if and (.IsReducedFeesUser) (not .FeeReductions) }} but reduced fees user does not have mlpa permission */}}
+                        <a class="govuk-link" id="f-apply-fee-reduction-button"
+                           href="{{ prefix (printf "/apply-fee-reduction?id=%d" .Case.ID) }}">
+                            Record a fee reduction
+                        </a>
+                        {{ end }}
+                    </td>
+                </tr>
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">Total refunds</th>
+                    <td class="govuk-table__cell">£{{ if .TotalRefunds }}{{ fee .TotalRefunds }}{{ else }}0.00{{ end }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{{ end }}

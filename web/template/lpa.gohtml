@@ -5,11 +5,8 @@
 {{ define "main" }}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <span class="govuk-caption-l">
-      Date of birth {{ .Lpa.Application.DonorDob }} | Postcode
-      {{ .Lpa.Application.DonorAddress.Postcode }}
-    </span>
-    <h1 class="govuk-heading-xl">{{ .Lpa.Application.DonorName }}</h1>
+
+    {{ template "mlpa-header" (caseTabs .Lpa "summary") }}
 
     <h2 class="govuk-heading-m">Case summary</h2>
 
