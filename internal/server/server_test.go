@@ -102,7 +102,7 @@ func TestErrorHandlerUnauthorizedError(t *testing.T) {
 	resp := w.Result()
 
 	assert.Equal(http.StatusFound, resp.StatusCode)
-	assert.Equal("http://sirius/auth", resp.Header.Get("Location"))
+	assert.Equal("http://sirius/auth?redirect=%2Fpath", resp.Header.Get("Location"))
 }
 
 func TestErrorHandlerJsonError(t *testing.T) {
