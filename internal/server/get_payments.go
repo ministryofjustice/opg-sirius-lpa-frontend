@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/go-chi/chi/v5"
 	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
@@ -14,11 +15,13 @@ type GetPaymentsClient interface {
 	Payments(ctx sirius.Context, id int) ([]sirius.Payment, error)
 	Case(sirius.Context, int) (sirius.Case, error)
 	GetUserDetails(sirius.Context) (sirius.User, error)
+	DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error)
 }
 
 type getPaymentsData struct {
 	XSRFToken string
 
+	Lpa               sirius.DigitalLpa
 	Case              sirius.Case
 	Payments          []sirius.Payment
 	FeeReductions     []sirius.Payment
@@ -36,14 +39,26 @@ type getPaymentsData struct {
 
 func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		caseID, err := strconv.Atoi(r.FormValue("id"))
-		if err != nil {
-			return err
-		}
-
 		ctx := getContext(r)
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 		data := getPaymentsData{XSRFToken: ctx.XSRFToken}
+
+		var caseID int
+		var err error
+
+		uid := chi.URLParam(r, "uid")
+		if uid != "" {
+			data.Lpa, err = client.DigitalLpa(ctx, uid)
+			if err != nil {
+				return err
+			}
+			caseID = data.Lpa.ID
+		} else {
+			caseID, err = strconv.Atoi(chi.URLParam(r, "id"))
+			if err != nil {
+				return err
+			}
+		}
 
 		group.Go(func() error {
 			data.Case, err = client.Case(ctx.With(groupCtx), caseID)
