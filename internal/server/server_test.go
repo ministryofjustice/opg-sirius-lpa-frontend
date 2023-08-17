@@ -90,7 +90,7 @@ func TestErrorHandlerUnauthorizedError(t *testing.T) {
 
 	expectedErr := anUnauthorizedError{is: true}
 
-	handler := errorHandler(nil, nil, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
+	handler := errorHandler(nil, nil, "/prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
 		return expectedErr
 	})
 
@@ -102,7 +102,7 @@ func TestErrorHandlerUnauthorizedError(t *testing.T) {
 	resp := w.Result()
 
 	assert.Equal(http.StatusFound, resp.StatusCode)
-	assert.Equal("http://sirius/auth", resp.Header.Get("Location"))
+	assert.Equal("http://sirius/auth?redirect=%2Fprefix%2Fpath", resp.Header.Get("Location"))
 }
 
 func TestErrorHandlerJsonError(t *testing.T) {

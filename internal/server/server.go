@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -169,7 +170,7 @@ func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL 
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if err := next(w, r); err != nil {
 				if v, ok := err.(unauthorizedError); ok && v.IsUnauthorized() {
-					http.Redirect(w, r, siriusURL+"/auth", http.StatusFound)
+					http.Redirect(w, r, fmt.Sprintf("%s/auth?redirect=%s", siriusURL, url.QueryEscape(prefix + r.URL.Path)), http.StatusFound)
 					return
 				}
 
