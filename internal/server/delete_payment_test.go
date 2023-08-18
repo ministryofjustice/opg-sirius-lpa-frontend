@@ -264,7 +264,7 @@ func TestPostDeletePayment(t *testing.T) {
 	err := DeletePayment(client, template.Func)(w, r)
 	resp := w.Result()
 
-	assert.Equal(t, RedirectError("/payments?id=4"), err)
+	assert.Equal(t, RedirectError("/payments/4"), err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

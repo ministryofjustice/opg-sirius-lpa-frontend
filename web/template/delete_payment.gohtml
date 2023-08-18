@@ -18,7 +18,7 @@
                         Delete
                     </button>
 
-                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/payments?id=%d" .Case.ID) }}">
+                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/payments/%d" .Case.ID) }}">
                         Cancel
                     </a>
                 </div>

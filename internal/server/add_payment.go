@@ -103,7 +103,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 				SetFlash(w, FlashNotification{
 					Title: "Payment added",
 				})
-				return RedirectError(fmt.Sprintf("/payments?id=%d", caseID))
+				return RedirectError(fmt.Sprintf("/payments/%d", caseID))
 			}
 		}
 

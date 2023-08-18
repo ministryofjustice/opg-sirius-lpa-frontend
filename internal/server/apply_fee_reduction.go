@@ -76,7 +76,7 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) H
 				SetFlash(w, FlashNotification{
 					Title: fmt.Sprintf("%s approved", translateRefData(data.FeeReductionTypes, data.FeeReductionType)),
 				})
-				return RedirectError(fmt.Sprintf("/payments?id=%d", caseID))
+				return RedirectError(fmt.Sprintf("/payments/%d", caseID))
 			}
 		}
 
