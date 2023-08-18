@@ -80,7 +80,7 @@ func DeletePayment(client DeletePaymentClient, tmpl template.Template) Handler {
 			SetFlash(w, FlashNotification{
 				Title: fmt.Sprintf("%s deleted", item),
 			})
-			return RedirectError(fmt.Sprintf("/payments?id=%d", p.Case.ID))
+			return RedirectError(fmt.Sprintf("/payments/%d", p.Case.ID))
 		}
 
 		return tmpl(w, data)

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/go-chi/chi/v5"
 	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
@@ -36,7 +37,16 @@ type getPaymentsData struct {
 
 func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		caseID, err := strconv.Atoi(r.FormValue("id"))
+		var caseID int
+		var err error
+
+		caseIDChiURLParam := chi.URLParam(r, "id")
+		if caseIDChiURLParam != "" {
+			caseID, err = strconv.Atoi(caseIDChiURLParam)
+		} else {
+			caseID, err = strconv.Atoi(r.FormValue("id"))
+		}
+
 		if err != nil {
 			return err
 		}

@@ -212,7 +212,7 @@ func TestPostFeeReduction(t *testing.T) {
 	err := ApplyFeeReduction(client, template.Func)(w, r)
 	resp := w.Result()
 
-	assert.Equal(t, RedirectError("/payments?id=123"), err)
+	assert.Equal(t, RedirectError("/payments/123"), err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

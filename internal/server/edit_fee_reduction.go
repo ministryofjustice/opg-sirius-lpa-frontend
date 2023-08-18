@@ -80,7 +80,7 @@ func EditFeeReduction(client EditFeeReductionClient, tmpl template.Template) Han
 				return err
 			} else {
 				SetFlash(w, FlashNotification{Title: "Fee reduction edited"})
-				return RedirectError(fmt.Sprintf("/payments?id=%d", data.FeeReduction.Case.ID))
+				return RedirectError(fmt.Sprintf("/payments/%d", data.FeeReduction.Case.ID))
 			}
 		}
 
