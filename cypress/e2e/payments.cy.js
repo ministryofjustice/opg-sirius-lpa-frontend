@@ -1,7 +1,7 @@
 describe("View a payment", () => {
   describe("No payments on case", () => {
     it("displays default message when there are no payments on the case", () => {
-      cy.visit("/payments?id=801");
+      cy.visit("/payments/801");
       cy.contains("7000-0000-0001");
       cy.contains("There is currently no fee data available to display.");
     });
@@ -14,7 +14,7 @@ describe("View a payment", () => {
         },
       });
 
-      cy.visit("/payments?id=801");
+      cy.visit("/payments/801");
       cy.contains(".govuk-button", "Add payment");
       cy.contains(".govuk-button", "Apply fee reduction").should("not.exist");
     });
@@ -27,7 +27,7 @@ describe("View a payment", () => {
         },
       });
 
-      cy.visit("/payments?id=801");
+      cy.visit("/payments/801");
       cy.contains(".govuk-button", "Add payment");
       cy.contains(".govuk-button", "Apply fee reduction");
     });
@@ -35,7 +35,7 @@ describe("View a payment", () => {
 
   describe("Payments on case", () => {
     it("displays payment information if there is a payment on the case", () => {
-      cy.visit("/payments?id=800");
+      cy.visit("/payments/800");
       cy.contains("7000-0000-0000");
       cy.contains("Total paid");
       cy.contains("£41.00");
@@ -54,7 +54,7 @@ describe("View a payment", () => {
     });
 
     it("displays fee reduction information", () => {
-      cy.visit("/payments?id=802");
+      cy.visit("/payments/802");
       cy.contains("Fee reductions");
       cy.get("#f-fee-reductions-tab").click();
       cy.contains("Outstanding fee due");

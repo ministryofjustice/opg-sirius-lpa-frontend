@@ -118,7 +118,7 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 				return err
 			} else {
 				SetFlash(w, FlashNotification{Title: "Payment saved"})
-				return RedirectError(fmt.Sprintf("/payments?id=%d", data.Case.ID))
+				return RedirectError(fmt.Sprintf("/payments/%d", data.Case.ID))
 			}
 		}
 
