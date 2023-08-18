@@ -118,6 +118,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/edit-payment", wrap(EditPayment(client, templates.Get("edit_payment.gohtml"))))
 	mux.Handle("/edit-fee-reduction", wrap(EditFeeReduction(client, templates.Get("edit_fee_reduction.gohtml"))))
 	mux.Handle("/payments", wrap(GetPayments(client, templates.Get("payments.gohtml"))))
+	mux.Handle("/payments/{id}", wrap(GetPayments(client, templates.Get("payments.gohtml"))))
 	mux.Handle("/search-users", wrap(SearchUsers(client)))
 	mux.Handle("/search-persons", wrap(SearchDonors(client)))
 	mux.Handle("/search-postcode", wrap(SearchPostcode(client)))
@@ -170,7 +171,7 @@ func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL 
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if err := next(w, r); err != nil {
 				if v, ok := err.(unauthorizedError); ok && v.IsUnauthorized() {
-					http.Redirect(w, r, fmt.Sprintf("%s/auth?redirect=%s", siriusURL, url.QueryEscape(prefix + r.URL.Path)), http.StatusFound)
+					http.Redirect(w, r, fmt.Sprintf("%s/auth?redirect=%s", siriusURL, url.QueryEscape(prefix+r.URL.Path)), http.StatusFound)
 					return
 				}
 
