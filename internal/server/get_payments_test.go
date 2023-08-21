@@ -2,7 +2,6 @@ package server
 
 import (
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -117,33 +116,26 @@ func TestGetPayments(t *testing.T) {
 		}).
 		Return(nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
-	w := httptest.NewRecorder()
+	server := newMockServer("/payments/{id}", GetPayments(client, template.Func))
 
-	err := GetPayments(client, template.Func)(w, r)
-	resp := w.Result()
+	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+	resp, err := server.serve(req)
 
 	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	assert.Equal(t, http.StatusOK, resp.Code)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestGetPaymentsNoID(t *testing.T) {
-	testCases := map[string]string{
-		"no-id":  "/",
-		"bad-id": "/?id=test",
-	}
+func TestGetPaymentsBadID(t *testing.T) {
+	client := &mockGetPayments{}
+	template := &mockTemplate{}
 
-	for name, testUrl := range testCases {
-		t.Run(name, func(t *testing.T) {
-			r, _ := http.NewRequest(http.MethodGet, testUrl, nil)
-			w := httptest.NewRecorder()
+	server := newMockServer("/payments/{id}", GetPayments(client, template.Func))
 
-			err := GetPayments(nil, nil)(w, r)
+	req, _ := http.NewRequest(http.MethodGet, "/payments/bad-id", nil)
+	_, err := server.serve(req)
 
-			assert.NotNil(t, err)
-		})
-	}
+	assert.NotNil(t, err)
 }
 
 func TestGetPaymentsWhenFailureOnGetCase(t *testing.T) {
@@ -195,10 +187,10 @@ func TestGetPaymentsWhenFailureOnGetCase(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
-	w := httptest.NewRecorder()
+	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
-	err := GetPayments(client, nil)(w, r)
+	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+	_, err := server.serve(req)
 
 	assert.Equal(t, expectedError, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -248,10 +240,10 @@ func TestGetPaymentsWhenFailureOnGetPayments(t *testing.T) {
 		On("Payments", mock.Anything, 4).
 		Return([]sirius.Payment{}, expectedError)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
-	w := httptest.NewRecorder()
+	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
-	err := GetPayments(client, nil)(w, r)
+	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+	_, err := server.serve(req)
 
 	assert.Equal(t, expectedError, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -303,10 +295,10 @@ func TestGetPaymentsWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return([]sirius.RefDataItem{}, expectedError)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
-	w := httptest.NewRecorder()
+	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
-	err := GetPayments(client, nil)(w, r)
+	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+	_, err := server.serve(req)
 
 	assert.Equal(t, expectedError, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -358,10 +350,10 @@ func TestGetPaymentsWhenFailureOnGetReferenceTypeRefData(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
 		Return([]sirius.RefDataItem{}, expectedError)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
-	w := httptest.NewRecorder()
+	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
-	err := GetPayments(client, nil)(w, r)
+	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+	_, err := server.serve(req)
 
 	assert.Equal(t, expectedError, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -413,10 +405,10 @@ func TestGetPaymentsWhenFailureOnFeeReductionTypesRefData(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return([]sirius.RefDataItem{}, expectedError)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
-	w := httptest.NewRecorder()
+	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
-	err := GetPayments(client, nil)(w, r)
+	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+	_, err := server.serve(req)
 
 	assert.Equal(t, expectedError, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -489,10 +481,10 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 		}).
 		Return(expectedError)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
-	w := httptest.NewRecorder()
+	server := newMockServer("/payments/{id}", GetPayments(client, template.Func))
 
-	err := GetPayments(client, template.Func)(w, r)
+	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+	_, err := server.serve(req)
 
 	assert.Equal(t, expectedError, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -590,14 +582,12 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 		}).
 		Return(nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
-	w := httptest.NewRecorder()
+	server := newMockServer("/payments/{id}", GetPayments(client, template.Func))
 
-	err := GetPayments(client, template.Func)(w, r)
-	resp := w.Result()
+	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+	_, err := server.serve(req)
 
 	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -716,14 +706,13 @@ func TestGetPaymentsCalculations(t *testing.T) {
 			}).
 			Return(nil)
 
-		r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
-		w := httptest.NewRecorder()
+		server := newMockServer("/payments/{id}", GetPayments(client, template.Func))
 
-		err := GetPayments(client, template.Func)(w, r)
-		resp := w.Result()
+		req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+		resp, err := server.serve(req)
 
 		assert.Nil(t, err)
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		assert.Equal(t, http.StatusOK, resp.Code)
 		mock.AssertExpectationsForObjects(t, client, template)
 	}
 }

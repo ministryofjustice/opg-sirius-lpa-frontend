@@ -12,7 +12,7 @@ type MockServer struct {
 	err error
 }
 
-func newMockServer(route string, handler Handler) MockServer {
+func newMockServer(route string, handler Handler) *MockServer {
 	mux := chi.NewRouter()
 	server := MockServer{
 		mux: mux,
@@ -23,7 +23,7 @@ func newMockServer(route string, handler Handler) MockServer {
 		server.err = handler(w, r)
 	})
 
-	return server
+	return &server
 }
 
 func (s *MockServer) serve(req *http.Request) (*httptest.ResponseRecorder, error) {

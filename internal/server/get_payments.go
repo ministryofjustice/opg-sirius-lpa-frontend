@@ -37,16 +37,7 @@ type getPaymentsData struct {
 
 func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		var caseID int
-		var err error
-
-		caseIDChiURLParam := chi.URLParam(r, "id")
-		if caseIDChiURLParam != "" {
-			caseID, err = strconv.Atoi(caseIDChiURLParam)
-		} else {
-			caseID, err = strconv.Atoi(r.FormValue("id"))
-		}
-
+		caseID, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
 			return err
 		}
