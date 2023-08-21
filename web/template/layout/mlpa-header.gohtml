@@ -26,7 +26,7 @@
                 </a>
             </li>
             <li class="govuk-tabs__list-item {{ if eq .TabName "fees" }}govuk-tabs__list-item--selected{{ end }}">
-                <a class="govuk-tabs__tab" href="{{ prefix (printf "/mlpa/%s/payments" .Lpa.UID) }}">
+                <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s/payments" .Lpa.UID) }}">
                     Fees
                 </a>
             </li>
