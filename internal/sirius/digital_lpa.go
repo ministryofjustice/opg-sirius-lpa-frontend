@@ -6,6 +6,7 @@ import (
 )
 
 type DigitalLpa struct {
+	ID                 int        `json:"id"`
 	UID                string     `json:"uId"`
 	Application        Draft      `json:"application"`
 	Subtype            string     `json:"caseSubtype"`

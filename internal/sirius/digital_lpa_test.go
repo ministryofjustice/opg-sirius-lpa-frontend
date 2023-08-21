@@ -37,6 +37,7 @@ func TestDigitalLpa(t *testing.T) {
 						Status:  http.StatusOK,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 						Body: map[string]interface{}{
+							"id":                 dsl.Like(1),
 							"uId":                dsl.Like("M-1234-9876-4567"),
 							"caseSubtype":        dsl.Like("pfa"),
 							"status":             dsl.Like("Draft"),
@@ -73,6 +74,7 @@ func TestDigitalLpa(t *testing.T) {
 					})
 			},
 			expectedResponse: DigitalLpa{
+				ID:                 1,
 				UID:                "M-1234-9876-4567",
 				Subtype:            "pfa",
 				Status:             "Draft",

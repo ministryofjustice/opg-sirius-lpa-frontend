@@ -36,6 +36,11 @@ func (m *mockGetPayments) GetUserDetails(ctx sirius.Context) (sirius.User, error
 	return args.Get(0).(sirius.User), args.Error(1)
 }
 
+func (m *mockGetPayments) DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(sirius.DigitalLpa), args.Error(1)
+}
+
 func TestGetPayments(t *testing.T) {
 	allPayments := []sirius.Payment{
 		{
