@@ -68,6 +68,9 @@ $sirius-bg-color: #29292e;
   .govuk-summary-list__key,
   .govuk-summary-list__value,
   .govuk-back-link,
+  .govuk-tabs__tab:link,
+  .govuk-tabs__tab:visited,
+  .govuk-tabs__tab,
   .moj-banner__message {
     color: govuk-colour("white");
   }
@@ -80,6 +83,7 @@ $sirius-bg-color: #29292e;
   .govuk-textarea,
   .govuk-select,
   .govuk-table,
+  .govuk-tabs__list-item,
   .moj-filter,
   .moj-filter__selected,
   .autocomplete__input {
