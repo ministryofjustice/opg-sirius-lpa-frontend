@@ -131,3 +131,12 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   padding: 1.375rem;
   background-color: govuk-colour("light-grey");
 }
+
+.app-table-no-cell-borders {
+  table,
+  tr,
+  td,
+  th {
+    border: none !important;
+  }
+}
