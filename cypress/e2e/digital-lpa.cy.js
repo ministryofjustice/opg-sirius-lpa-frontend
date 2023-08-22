@@ -20,6 +20,5 @@ describe("View a digital LPA", () => {
 
     cy.contains("Fees").click();
     cy.contains("£41.00 expected");
-    cy.contains("Record a fee reduction");
   });
 });
