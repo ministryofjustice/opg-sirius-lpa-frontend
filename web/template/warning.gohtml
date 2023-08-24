@@ -25,7 +25,8 @@
                 {{ range $i, $c := .Cases }}
                   <div class="govuk-checkboxes__item">
                     <input class="govuk-checkboxes__input" id="case-id-{{ $i }}" name="case-id" type="checkbox" value="{{ $c.ID }}">
-                    <label class="govuk-label govuk-checkboxes__label" for="case-id-{{ $i }}">{{ ToUpper $c.SubType }} {{ $c.UID }}</label>
+                    <label class="govuk-label govuk-checkboxes__label" for="case-id-{{ $i }}">
+                      {{if(eq $c.CaseType "EPA")}} EPA {{else}} {{ToUpper $c.SubType }}{{end}} {{ $c.UID }}</label>
                   </div>
                 {{ end }}
               </div>
