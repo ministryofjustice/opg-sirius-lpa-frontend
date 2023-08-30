@@ -106,6 +106,17 @@
         "headers": { "Content-Type": "application/json" },
         "body": "[{\"handle\":\"GB\",\"label\":\"Great Britain\"}]"
       }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/lpas/800/documents?type[]=Save"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"id\":1,\"uuid\":\"7327f57d-e3d5-4300-95a8-67b3337c7231\",\"friendlyDescription\": \"Mr Test Person - Blank Template\",\"direction\": \"Outgoing\",\"createdDate\": \"24/08/2023 15:27:16\",\"systemType\": \"EP-BB\",\"correspondent\": {\"uId\": \"7000-0000-0013\",\"firstname\": \"Test\",\"surname\": \"Person\",\"personType\": \"Donor\"}},{\"id\":2,\"uuid\":\"40fa2847-27ae-4976-a93a-9f45ec0a4e98\",\"friendlyDescription\": \"Mr John Doe - Donor deceased: Case Withdrawn\",\"direction\": \"Outgoing\",\"createdDate\": \"15/05/2023 11:09:28\",\"systemType\": \"DD-4\",\"correspondent\": {\"uId\": \"7000-0000-0013\",\"firstname\": \"John\",\"surname\": \"Doe\",\"personType\": \"Correspondent\"}}]"
+      }
     }
   ]
 }
