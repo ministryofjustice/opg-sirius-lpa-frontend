@@ -45,10 +45,11 @@
                             {{ if eq .Direction "Incoming" }}
                                 [IN]
                             {{ else if  eq .Direction "Outgoing" }}
-                                [OUT] {{ .Correspondent.PersonType }}, {{ .Correspondent.Firstname }} {{.Correspondent.Surname }}
+                                [OUT]
                             {{ else }}
                                 [INT]
                             {{ end }}
+                            {{ .Correspondent.PersonType }}, {{ .Correspondent.Firstname }} {{.Correspondent.Surname }}
                             <br><a class="govuk-link" href="#">{{ .FriendlyDescription }}</a>
                         </td>
                         <td class="govuk-table__cell">{{ .SystemType }}</td>
