@@ -25,11 +25,16 @@ describe("View a digital LPA", () => {
   it("shows document information", () => {
     cy.contains("M-1234-9876-4567");
     cy.get("h1").contains("Zoraida Swanberg");
-
     cy.contains("Documents").click();
+
     cy.contains("Mr Test Person - Blank Template");
     cy.contains("[OUT]");
     cy.contains("24/08/2023");
-    cy.contains("LP-BB");
+    cy.contains("EP-BB");
+
+    cy.contains("John Doe - Donor deceased: Case Withdrawn");
+    cy.contains("[OUT]");
+    cy.contains("15/05/2023");
+    cy.contains("DD-4");
   });
 });
