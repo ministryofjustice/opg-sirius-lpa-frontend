@@ -1,6 +1,6 @@
 {{ define "mlpa-header" }}
     <span class="govuk-caption-l">
-      Date of birth {{ .Lpa.Application.DonorDob }} | Postcode
+      Date of birth {{ (date .Lpa.Application.DonorDob "2 January 2006") }} | Postcode
       {{ .Lpa.Application.DonorAddress.Postcode }}
     </span>
     <h1 class="govuk-heading-xl">{{ .Lpa.Application.DonorName }}</h1>
@@ -31,7 +31,7 @@
                 </a>
             </li>
             <li class="govuk-tabs__list-item {{ if eq .TabName "documents" }}govuk-tabs__list-item--selected{{ end }}">
-                <a class="govuk-tabs__tab" href="#documents">
+                <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s/documents" .Lpa.UID) }}">
                     Documents
                 </a>
             </li>
