@@ -67,6 +67,7 @@ type Client interface {
 	EditPaymentClient
 	EventClient
 	GetPaymentsClient
+	GetDocumentsClient
 	LinkPersonClient
 	LpaClient
 	MiReportingClient
@@ -119,6 +120,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/edit-fee-reduction", wrap(EditFeeReduction(client, templates.Get("edit_fee_reduction.gohtml"))))
 	mux.Handle("/payments/{id}", wrap(GetPayments(client, templates.Get("payments.gohtml"))))
 	mux.Handle("/lpa/{uid}/payments", wrap(GetPayments(client, templates.Get("mlpa-payments.gohtml"))))
+	mux.Handle("/lpa/{uid}/documents", wrap(GetDocuments(client, templates.Get("mlpa-documents.gohtml"))))
 	mux.Handle("/search-users", wrap(SearchUsers(client)))
 	mux.Handle("/search-persons", wrap(SearchDonors(client)))
 	mux.Handle("/search-postcode", wrap(SearchPostcode(client)))
