@@ -8,16 +8,21 @@
 
             {{ template "mlpa-header" (caseTabs .Lpa "documents") }}
 
-            <div class="govuk-!-display-block">
-                <h1 class="govuk-heading-l govuk-!-margin-bottom-5 govuk-!-display-inline govuk-!-padding-right-4">Documents</h1>
+            <div class="moj-button-menu__wrapper">
+                <h1 class="govuk-heading-l">Documents</h1>
                 <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Create a document</button>
             </div>
 
-            <a class="govuk-link govuk-!-padding-right-4" href="#">
-                Download
-                <span class="govuk-visually-hidden">Download selected documents</span>
-            </a>
-            <a class="govuk-link app-!-colour-text-red" href="#">Delete</a>
+            <div class="govuk-body">
+                <a class="govuk-link govuk-!-padding-right-4" href="#">
+                    Download
+                    <span class="govuk-visually-hidden">selected documents</span>
+                </a>
+                <a class="govuk-link app-!-colour-text-red" href="#">
+                    Delete
+                    <span class="govuk-visually-hidden">selected documents</span>
+                </a>
+            </div>
 
             <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-2 govuk-!-margin-top-3">
 
@@ -53,7 +58,7 @@
                             <br><a class="govuk-link" href="#">{{ .FriendlyDescription }}</a>
                         </td>
                         <td class="govuk-table__cell">{{ .SystemType }}</td>
-                        <td class="govuk-table__cell">{{ .CreatedDate }}</td>
+                        <td class="govuk-table__cell">{{ (parseDateWithTime .CreatedDate "2 January 2006") }}</td>
                     </tr>
                 {{ end }}
                 </tbody>
