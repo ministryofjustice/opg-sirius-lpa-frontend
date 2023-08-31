@@ -29,12 +29,12 @@ describe("View a digital LPA", () => {
 
     cy.contains("Mr Test Person - Blank Template");
     cy.contains("[OUT]");
-    cy.contains("24/08/2023");
+    cy.contains("24 August 2023");
     cy.contains("EP-BB");
 
     cy.contains("John Doe - Donor deceased: Case Withdrawn");
     cy.contains("[OUT]");
-    cy.contains("15/05/2023");
+    cy.contains("15 May 2023");
     cy.contains("DD-4");
   });
 });
