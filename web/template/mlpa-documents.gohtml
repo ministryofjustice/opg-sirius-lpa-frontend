@@ -40,8 +40,8 @@
                     <tr class="govuk-table__row govuk-table__row--selected">
                         <td class="govuk-table__cell">
                             <div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox">
-                                <input type="checkbox" class="govuk-checkboxes__input" id="mountain-aconcagua">
-                                <label class="govuk-label govuk-checkboxes__label" for="mountain-aconcagua">
+                                <input type="checkbox" class="govuk-checkboxes__input" id="select-{{ .UUID }}">
+                                <label class="govuk-label govuk-checkboxes__label" for="select-{{ .UUID }}">
                                     <span class="govuk-visually-hidden">Select all documents</span>
                                 </label>
                             </div>
@@ -58,7 +58,7 @@
                             <br><a class="govuk-link" href="#">{{ .FriendlyDescription }}</a>
                         </td>
                         <td class="govuk-table__cell">{{ .SystemType }}</td>
-                        <td class="govuk-table__cell">{{ (parseDateWithTime .CreatedDate "2 January 2006") }}</td>
+                        <td class="govuk-table__cell">{{ (formatDateWithTime .CreatedDate "2 January 2006") }}</td>
                     </tr>
                 {{ end }}
                 </tbody>
