@@ -140,3 +140,20 @@ $govuk-assets-path: "/lpa/frontend/assets/";
     border: none !important;
   }
 }
+
+/*
+first element left-aligned in row, second element right-aligned;
+on narrow screens, reverts to block display
+*/
+@media (min-width: 640px) {
+  .app-two-element-row {
+    display: flex !important;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+
+    * {
+      margin-bottom: 22px !important;
+    }
+  }
+}
