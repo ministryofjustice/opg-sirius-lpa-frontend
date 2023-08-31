@@ -1,0 +1,69 @@
+{{ template "page" . }}
+
+{{ define "title" }}Documents{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row" id="documents">
+        <div class="govuk-grid-column-two-thirds">
+
+            {{ template "mlpa-header" (caseTabs .Lpa "documents") }}
+
+            <div class="moj-button-menu__wrapper">
+                <h1 class="govuk-heading-l">Documents</h1>
+                <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Create a document</button>
+            </div>
+
+            <div class="govuk-body">
+                <a class="govuk-link govuk-!-padding-right-4" href="#">
+                    Download
+                    <span class="govuk-visually-hidden">selected documents</span>
+                </a>
+                <a class="govuk-link app-!-colour-text-red" href="#">
+                    Delete
+                    <span class="govuk-visually-hidden">selected documents</span>
+                </a>
+            </div>
+
+            <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-2 govuk-!-margin-top-3">
+
+            <table class="govuk-table" data-module="moj-multi-select" data-multi-select-checkbox="#select-all">
+                <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th class="govuk-table__header" scope="col" id="select-all"></th>
+                    <th class="govuk-table__header" scope="col">Document</th>
+                    <th class="govuk-table__header" scope="col">Document type</th>
+                    <th class="govuk-table__header" scope="col">Created</th>
+                </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                {{ range .Documents }}
+                    <tr class="govuk-table__row govuk-table__row--selected">
+                        <td class="govuk-table__cell">
+                            <div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox">
+                                <input type="checkbox" class="govuk-checkboxes__input" id="select-{{ .UUID }}">
+                                <label class="govuk-label govuk-checkboxes__label" for="select-{{ .UUID }}">
+                                    <span class="govuk-visually-hidden">Select all documents</span>
+                                </label>
+                            </div>
+                        </td>
+                        <td class="govuk-table__cell">
+                            {{ if eq .Direction "Incoming" }}
+                                [IN]
+                            {{ else if  eq .Direction "Outgoing" }}
+                                [OUT]
+                            {{ else }}
+                                [INT]
+                            {{ end }}
+                            {{ .Correspondent.PersonType }}, {{ .Correspondent.Firstname }} {{.Correspondent.Surname }}
+                            <br><a class="govuk-link" href="#">{{ .FriendlyDescription }}</a>
+                        </td>
+                        <td class="govuk-table__cell">{{ .SystemType }}</td>
+                        <td class="govuk-table__cell">{{ (formatDateWithTime .CreatedDate "2 January 2006") }}</td>
+                    </tr>
+                {{ end }}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+{{ end }}
