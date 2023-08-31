@@ -8,6 +8,10 @@
 
             {{ template "mlpa-header" (caseTabs .Lpa "fees") }}
 
+            {{ if .FlashMessage.Title }}
+                {{ template "notification-banner" .FlashMessage }}
+            {{ end }}
+
             <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Fees</h1>
 
             <div class="app-two-element-row">
