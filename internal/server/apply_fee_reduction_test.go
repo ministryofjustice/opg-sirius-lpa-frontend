@@ -194,7 +194,7 @@ func TestPostFeeReduction(t *testing.T) {
 		},
 		{
 			name: "Digital LPA",
-			id: 456,
+			id: 9456,
 			caseItem: sirius.Case{CaseType: "DIGITAL_LPA", UID: "M-AAA-BBB-CCC"},
 			paymentDate: "2023-09-01",
 			expectedRedirect: "/lpa/M-AAA-BBB-CCC/payments",
