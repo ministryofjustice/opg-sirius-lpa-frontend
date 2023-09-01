@@ -1,4 +1,4 @@
-describe("Apply a fee reduction", () => {
+describe("Apply a fee reduction to a non-digital LPA", () => {
   beforeEach(() => {
     cy.visit("/apply-fee-reduction?id=801");
   });
@@ -19,5 +19,21 @@ describe("Apply a fee reduction", () => {
     cy.contains("Apply a fee reduction");
     cy.get('[data-module="select-todays-date"]').click();
     cy.get("#f-paymentDate").should("have.value", "2022-02-25");
+  });
+});
+
+describe("Apply a fee reduction to a digital LPA", () => {
+  it("adds a fee reduction to the case", () => {
+    cy.visit("/apply-fee-reduction?id=9456");
+    cy.contains("Apply a fee reduction");
+    cy.contains("M-999-456-AAA");
+    cy.get(".moj-banner").should("not.exist");
+    cy.get("#f-feeReductionType").select("Remission");
+    cy.get("#f-paymentEvidence").type("Test evidence");
+    cy.get("#f-paymentDate").type("2023-09-01");
+    cy.get("button[type=submit]").click();
+    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-banner").contains("Remission approved");
+    cy.url().should("contain", "/lpa/M-999-456-AAA/payments");
   });
 });
