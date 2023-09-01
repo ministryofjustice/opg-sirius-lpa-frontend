@@ -103,6 +103,11 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 				SetFlash(w, FlashNotification{
 					Title: "Payment added",
 				})
+
+				if data.Case.CaseType == "DIGITAL_LPA" {
+					return RedirectError(fmt.Sprintf("/lpa/%s/payments", data.Case.UID))
+				}
+
 				return RedirectError(fmt.Sprintf("/payments/%d", caseID))
 			}
 		}
