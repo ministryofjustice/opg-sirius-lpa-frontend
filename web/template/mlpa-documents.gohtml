@@ -8,9 +8,20 @@
 
             {{ template "mlpa-header" (caseTabs .Lpa "documents") }}
 
-            <div class="moj-button-menu__wrapper">
-                <h1 class="govuk-heading-l">Documents</h1>
-                <button class="govuk-button govuk-button--secondary" data-module="govuk-button">Create a document</button>
+            <div class="moj-page-header-actions">
+                <div class="moj-page-header-actions__title">
+                    <h1 class="govuk-heading-l">Documents</h1>
+                </div>
+
+                <div class="moj-page-header-actions__actions">
+                    <div class="moj-button-menu">
+                        <div class="moj-button-menu__wrapper">
+                            <button class="govuk-button moj-button-menu__item govuk-button--secondary moj-page-header-actions__action" data-module="govuk-button">
+                                Create a document
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="govuk-body">
