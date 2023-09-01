@@ -69,7 +69,7 @@
                         {{ if and (.IsReducedFeesUser) (not .FeeReductions) }}
                         <a class="govuk-link" id="f-apply-fee-reduction-button"
                            href="{{ prefix (printf "/apply-fee-reduction?id=%d" .Case.ID) }}">
-                            Record a fee reduction
+                            Apply a fee reduction
                         </a>
                         {{ end }}
                     </td>
