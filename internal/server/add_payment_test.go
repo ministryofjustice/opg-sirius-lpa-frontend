@@ -280,3 +280,45 @@ func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
 		})
 	}
 }
+
+func TestPostAddPaymentToDigitalLpa(t *testing.T) {
+	caseitem := sirius.Case{CaseType: "DIGITAL_LPA", UID: "M-AAAA-BBBB-CCCC"}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
+	client := &mockAddPaymentClient{}
+	client.
+		On("AddPayment", mock.Anything, 444, 5200, "PHONE", sirius.DateString("2023-08-31")).
+		Return(nil)
+	client.
+		On("Case", mock.Anything, 444).
+		Return(caseitem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
+
+	template := &mockTemplate{}
+
+	form := url.Values{
+		"amount":      {"52.00"},
+		"source":      {"PHONE"},
+		"paymentDate": {"2023-08-31"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=444", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AddPayment(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Equal(t, RedirectError("/lpa/M-AAAA-BBBB-CCCC/payments"), err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}

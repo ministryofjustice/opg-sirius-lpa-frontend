@@ -8,9 +8,18 @@
 
             {{ template "mlpa-header" (caseTabs .Lpa "fees") }}
 
+            {{ if .FlashMessage.Title }}
+                {{ template "notification-banner" .FlashMessage }}
+            {{ end }}
+
             <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Fees</h1>
 
-            <h2 class="govuk-heading-m govuk-!-margin-bottom-3">Summary</h2>
+            <div class="app-two-element-row">
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-3">Summary</h2>
+                <a role="button" class="govuk-button govuk-button--secondary" data-module="govuk-button" href="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}">
+                    Add a payment
+                </a>
+            </div>
 
             <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-2">
 
