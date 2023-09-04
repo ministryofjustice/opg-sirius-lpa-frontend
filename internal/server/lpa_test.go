@@ -15,25 +15,36 @@ type mockLpaClient struct {
 
 func (m *mockLpaClient) DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error) {
 	args := m.Called(ctx, uid)
-
 	return args.Get(0).(sirius.DigitalLpa), args.Error(1)
+}
+
+func (m *mockLpaClient) TasksForCase(ctx sirius.Context, id int) (sirius.TaskList, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.TaskList), args.Error(1)
 }
 
 func TestGetLpa(t *testing.T) {
 	digitalLpa := sirius.DigitalLpa{
+		ID:      22,
 		UID:     "M-9876-9876-9876",
 		Subtype: "hw",
 	}
+
+	tasks := sirius.TaskList{}
 
 	client := &mockLpaClient{}
 	client.
 		On("DigitalLpa", mock.Anything, "M-9876-9876-9876").
 		Return(digitalLpa, nil)
+	client.
+		On("TasksForCase", mock.Anything, 22).
+		Return(tasks, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, lpaData{
 			Lpa: digitalLpa,
+			Tasks: tasks,
 		}).
 		Return(nil)
 
