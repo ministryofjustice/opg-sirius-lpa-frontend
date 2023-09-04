@@ -15,7 +15,7 @@ type LpaClient interface {
 
 type lpaData struct {
 	Lpa sirius.DigitalLpa
-	Tasks sirius.TaskList
+	TaskList sirius.TaskList
 }
 
 func Lpa(client LpaClient, tmpl template.Template) Handler {
@@ -37,7 +37,7 @@ func Lpa(client LpaClient, tmpl template.Template) Handler {
 
 		data := lpaData{
 			Lpa: lpa,
-			Tasks: tasks,
+			TaskList: tasks,
 		}
 
 		return tmpl(w, data)

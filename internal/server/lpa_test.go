@@ -30,7 +30,7 @@ func TestGetLpa(t *testing.T) {
 		Subtype: "hw",
 	}
 
-	tasks := sirius.TaskList{}
+	taskList := sirius.TaskList{}
 
 	client := &mockLpaClient{}
 	client.
@@ -38,13 +38,13 @@ func TestGetLpa(t *testing.T) {
 		Return(digitalLpa, nil)
 	client.
 		On("TasksForCase", mock.Anything, 22).
-		Return(tasks, nil)
+		Return(taskList, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, lpaData{
 			Lpa: digitalLpa,
-			Tasks: tasks,
+			TaskList: taskList,
 		}).
 		Return(nil)
 
