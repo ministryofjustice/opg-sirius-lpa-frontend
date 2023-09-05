@@ -1,6 +1,11 @@
 package sirius
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/url"
+)
 
 type Task struct {
 	ID          int        `json:"id"`
@@ -32,11 +37,31 @@ func (c *Client) Task(ctx Context, id int) (Task, error) {
 }
 
 func (c *Client) TasksForCase(ctx Context, caseId int) ([]Task, error) {
-	//url := fmt.Sprintf("/lpa-api/v1/cases/%d/tasks?filter=status:Not+started,active:true&limit=99", caseId)
-	url := fmt.Sprintf("/lpa-api/v1/cases/%d/tasks", caseId)
+	path := fmt.Sprintf("/lpa-api/v1/cases/%d/tasks", caseId)
+
+	querystring := url.Values{}
+	querystring.Set("filter", "status:Not started,active:true")
+	querystring.Set("limit", "99")
+
+	req, err := c.newRequestWithQuery(ctx, http.MethodGet, path, querystring, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, newStatusError(resp)
+	}
+
+	defer resp.Body.Close() //#nosec G307 false positive
 
 	var v taskList
-	err := c.get(ctx, url, &v)
+	json.NewDecoder(resp.Body).Decode(&v)
 
 	return v.Tasks, err
 }

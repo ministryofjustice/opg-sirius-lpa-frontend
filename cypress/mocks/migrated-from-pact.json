@@ -158,7 +158,7 @@
       "name": "A request to get tasks for a case",
       "request": {
         "method": "GET",
-        "url": "/lpa-api/v1/cases/800/tasks"
+        "url": "/lpa-api/v1/cases/800/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99"
       },
       "response": {
         "status": 200,
