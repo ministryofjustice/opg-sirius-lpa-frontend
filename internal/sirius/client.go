@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -55,6 +56,23 @@ func (c *Client) newRequest(ctx Context, method, path string, body io.Reader) (*
 	return req, err
 }
 
+func (c *Client) newRequestWithQuery(ctx Context, method, path string, query url.Values, body io.Reader) (*http.Request, error) {
+	req, err := c.newRequest(ctx, method, path, body)
+	if err != nil {
+		return nil, err
+	}
+
+	querystring := req.URL.Query()
+	for k, values := range query {
+		for _, v := range values {
+			querystring.Add(k, v)
+		}
+	}
+	req.URL.RawQuery = querystring.Encode()
+
+	return req, err
+}
+
 func (c *Client) get(ctx Context, path string, v interface{}) error {
 	req, err := c.newRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
@@ -65,12 +83,12 @@ func (c *Client) get(ctx Context, path string, v interface{}) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode != http.StatusOK {
 		return newStatusError(resp)
 	}
 
+	defer resp.Body.Close() //#nosec G307 false positive
 	return json.NewDecoder(resp.Body).Decode(&v)
 }
 
