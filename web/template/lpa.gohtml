@@ -69,7 +69,7 @@
     <h2>Tasks</h2>
 
     <ul>
-      {{ range .TaskList.Tasks }}
+      {{ range .TaskList }}
         <li>{{ .Description }} ({{ .Assignee.DisplayName }})</li>
       {{ end }}
     </ul>
