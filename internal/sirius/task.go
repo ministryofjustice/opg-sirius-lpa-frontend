@@ -3,11 +3,17 @@ package sirius
 import "fmt"
 
 type Task struct {
-	ID        int        `json:"id"`
-	Status    string     `json:"status"`
-	DueDate   DateString `json:"dueDate"`
-	Name      string     `json:"name"`
-	CaseItems []Case     `json:"caseItems"`
+	ID          int        `json:"id"`
+	Status      string     `json:"status"`
+	DueDate     DateString `json:"dueDate"`
+	Name        string     `json:"name"`
+	CaseItems   []Case     `json:"caseItems"`
+    Description string     `json:"description"`
+	Assignee    User       `json:"assignee"`
+}
+
+type taskList struct {
+    Tasks []Task `json:"tasks"`
 }
 
 func (t Task) Summary() string {
@@ -23,4 +29,14 @@ func (c *Client) Task(ctx Context, id int) (Task, error) {
 	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/tasks/%d", id), &v)
 
 	return v, err
+}
+
+func (c *Client) TasksForCase(ctx Context, caseId int) ([]Task, error) {
+	//url := fmt.Sprintf("/lpa-api/v1/cases/%d/tasks?filter=status:Not+started,active:true&limit=99", caseId)
+	url := fmt.Sprintf("/lpa-api/v1/cases/%d/tasks", caseId)
+
+	var v taskList
+	err := c.get(ctx, url, &v)
+
+	return v.Tasks, err
 }
