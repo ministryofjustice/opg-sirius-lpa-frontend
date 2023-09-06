@@ -60,7 +60,10 @@ func (c *Client) TasksForCase(ctx Context, caseId int) ([]Task, error) {
 	defer resp.Body.Close() //#nosec G307 false positive
 
 	var v taskList
-	json.NewDecoder(resp.Body).Decode(&v)
+	err = json.NewDecoder(resp.Body).Decode(&v)
+	if err != nil {
+		return nil, err
+	}
 
 	return v.Tasks, err
 }
