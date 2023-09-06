@@ -17,6 +17,10 @@ type Context struct {
 	XSRFToken string
 }
 
+type HttpClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 func (ctx Context) With(c context.Context) Context {
 	return Context{
 		Context:   c,
@@ -25,7 +29,7 @@ func (ctx Context) With(c context.Context) Context {
 	}
 }
 
-func NewClient(httpClient *http.Client, baseURL string) *Client {
+func NewClient(httpClient HttpClient, baseURL string) *Client {
 	return &Client{
 		http:    httpClient,
 		baseURL: baseURL,
@@ -33,7 +37,7 @@ func NewClient(httpClient *http.Client, baseURL string) *Client {
 }
 
 type Client struct {
-	http    *http.Client
+	http    HttpClient
 	baseURL string
 }
 
