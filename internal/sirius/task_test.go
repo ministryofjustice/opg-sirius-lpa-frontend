@@ -82,6 +82,80 @@ func TestTask(t *testing.T) {
 	}
 }
 
+func TestTasksForCase(t *testing.T) {
+	t.Parallel()
+
+	pact := newPact()
+	defer pact.Teardown()
+
+	testCases := []struct {
+		name             string
+		setup            func()
+		expectedResponse []Task
+		expectedError    func(int) error
+	}{
+		{
+			name: "OK",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have a case with an open task assigned").
+					UponReceiving("A request for the tasks for a case").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.Like("/lpa-api/v1/cases/10/tasks"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.Like(map[string]interface{}{
+							"tasks": dsl.EachLike(map[string]interface{}{
+								"id":       dsl.Like(12),
+								"status":   dsl.String("Not started"),
+								"dueDate":  dsl.String("05/09/2023"),
+								"name":     dsl.String("Review reduced fees request"),
+								"assignee": dsl.Like(map[string]interface{}{
+									"displayName": dsl.String("Consuela"),
+								}),
+							}, 1),
+						}),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: []Task{
+				{
+					ID:       12,
+					Status:   "Not started",
+					DueDate:  DateString("2023-09-05"),
+					Name:     "Review reduced fees request",
+					Assignee: User{
+						DisplayName: "Consuela",
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.Verify(func() error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+
+				tasks, err := client.TasksForCase(Context{Context: context.Background()}, 10)
+
+				assert.Equal(t, tc.expectedResponse, tasks)
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}
+
 func TestTaskSummary(t *testing.T) {
 	task := Task{
 		Name: "Review case details",
