@@ -70,11 +70,8 @@
             </fieldset>
           </div>
 
-          <p>{{ .Error.Field }}</p>
-          <p>{{ .Error.Field.donorFirstNames }}</p>
-
           <a id="f-donorName"></a>
-          {{ template "input" (field "donorFirstname" "What is the donor's first name?" .Form.DonorFirstname .Error.Field.donorFirstNames) }}
+          {{ template "input" (field "donorFirstname" "What is the donor's first name?" .Form.DonorFirstname .Error.Field.donorName) }}
 
           <div class="govuk-form-group {{ if .Error.Field.donorMiddlename }}govuk-form-group--error{{ end }}" aria-describedby="f-donorMiddlename-hint">
             <label class="govuk-label" for="f-donorMiddlename">What is the donor's middle name?</label>
@@ -83,7 +80,7 @@
             <input class="govuk-input {{ if .Error.Field.donorMiddlename }}govuk-input--error{{ end }}" id="f-donorMiddlename" name="donorMiddlename" value="{{ .Form.DonorMiddlename }}" />
           </div>
 
-          {{ template "input" (field "donorSurname" "What is the donor's last name?" .Form.DonorSurname .Error.Field.donorLastName) }}
+          {{ template "input" (field "donorSurname" "What is the donor's last name?" .Form.DonorSurname .Error.Field.donorName) }}
 
           <div class="govuk-form-group {{ if .Error.Field.donorDob }}govuk-form-group--error{{ end }}" id="f-donorDob">
             <fieldset class="govuk-fieldset" role="group" aria-describedby="f-dob-hint">
