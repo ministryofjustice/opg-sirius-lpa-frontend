@@ -68,7 +68,7 @@
 
     <h2>Tasks</h2>
 
-    <ul>
+    <ul data-role="tasks-list">
       {{ range .TaskList }}
         <li>{{ .Name }} ({{ .Assignee.DisplayName }})</li>
       {{ end }}
