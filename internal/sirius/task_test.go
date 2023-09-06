@@ -82,6 +82,12 @@ func TestTask(t *testing.T) {
 	}
 }
 
+func TestTasksForCaseBadContext(t *testing.T) {
+	client := NewClient(http.DefaultClient, "http://localhost")
+	_, err := client.TasksForCase(Context{Context: nil}, 21)
+	assert.Equal(t, "net/http: nil Context", err.Error())
+}
+
 func TestTasksForCase(t *testing.T) {
 	t.Parallel()
 
@@ -90,12 +96,14 @@ func TestTasksForCase(t *testing.T) {
 
 	testCases := []struct {
 		name             string
+		id               int
 		setup            func()
 		expectedResponse []Task
 		expectedError    func(int) error
 	}{
 		{
 			name: "OK",
+			id: 10,
 			setup: func() {
 				pact.
 					AddInteraction().
@@ -133,6 +141,32 @@ func TestTasksForCase(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "404",
+			id: 9012929,
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have a case with an open task assigned").
+					UponReceiving("A request for the tasks for a non-existent case").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.Like("/lpa-api/v1/cases/9012929/tasks"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusNotFound,
+					})
+			},
+			expectedResponse: nil,
+			expectedError: func(port int) error {
+				return StatusError{
+					Code: 404,
+					URL: fmt.Sprintf("http://localhost:%d/lpa-api/v1/cases/9012929/tasks?filter=status%%3ANot+started%%2Cactive%%3Atrue&limit=99", port),
+					Method: "GET",
+					CorrelationId: "",
+				}
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -142,7 +176,7 @@ func TestTasksForCase(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				tasks, err := client.TasksForCase(Context{Context: context.Background()}, 10)
+				tasks, err := client.TasksForCase(Context{Context: context.Background()}, tc.id)
 
 				assert.Equal(t, tc.expectedResponse, tasks)
 				if tc.expectedError == nil {
