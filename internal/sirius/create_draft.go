@@ -16,15 +16,19 @@ type Address struct {
 }
 
 type Draft struct {
-	CaseType             []string   `json:"types"`
-	Source               string     `json:"source"`
-	DonorName            string     `json:"donorName"`
-	DonorDob             DateString `json:"donorDob"`
-	DonorAddress         Address    `json:"donorAddress"`
-	CorrespondentName    string     `json:"correspondentName,omitempty"`
-	CorrespondentAddress *Address   `json:"correspondentAddress,omitempty"`
-	PhoneNumber          string     `json:"donorPhone,omitempty"`
-	Email                string     `json:"donorEmail,omitempty"`
+	CaseType                []string   `json:"types"`
+	Source                  string     `json:"source"`
+	DonorName               string     `json:"donorName"`
+	DonorFirstNames         string     `json:"donorFirstNames"`
+	DonorLastName           string     `json:"donorLastName"`
+	DonorDob                DateString `json:"donorDob"`
+	DonorAddress            Address    `json:"donorAddress"`
+	CorrespondentName       string     `json:"correspondentName,omitempty"`
+	CorrespondentFirstNames string     `json:"correspondentFirstNames,omitempty"`
+	CorrespondentLastName   string     `json:"correspondentLastName,omitempty"`
+	CorrespondentAddress    *Address   `json:"correspondentAddress,omitempty"`
+	PhoneNumber             string     `json:"donorPhone,omitempty"`
+	Email                   string     `json:"donorEmail,omitempty"`
 }
 
 func (c *Client) CreateDraft(ctx Context, draft Draft) (map[string]string, error) {

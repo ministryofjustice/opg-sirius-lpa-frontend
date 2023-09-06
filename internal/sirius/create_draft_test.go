@@ -26,10 +26,12 @@ func TestCreateDraft(t *testing.T) {
 		{
 			name: "Minimal",
 			draftData: Draft{
-				CaseType:  []string{"hw"},
-				Source:    "PHONE",
-				DonorName: "Coleen Morneault",
-				DonorDob:  DateString("1952-04-08"),
+				CaseType:        []string{"hw"},
+				Source:          "PHONE",
+				DonorName:       "Coleen Morneault",
+				DonorFirstNames: "Coleen",
+				DonorLastName:   "Morneault",
+				DonorDob:        DateString("1952-04-08"),
 				DonorAddress: Address{
 					Line1:    "Fluke House",
 					Town:     "South Bend",
@@ -49,10 +51,12 @@ func TestCreateDraft(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"types":     []string{"hw"},
-							"source":    "PHONE",
-							"donorName": "Coleen Morneault",
-							"donorDob":  "08/04/1952",
+							"types":           []string{"hw"},
+							"source":          "PHONE",
+							"donorName":       "Coleen Morneault",
+							"donorFirstNames": "Coleen",
+							"donorLastName":   "Morneault",
+							"donorDob":        "08/04/1952",
 							"donorAddress": map[string]string{
 								"addressLine1": "Fluke House",
 								"town":         "South Bend",
@@ -79,10 +83,12 @@ func TestCreateDraft(t *testing.T) {
 		{
 			name: "All possible details",
 			draftData: Draft{
-				CaseType:  []string{"hw", "pfa"},
-				Source:    "PHONE",
-				DonorName: "Coleen Stephanie Morneault",
-				DonorDob:  DateString("1952-04-08"),
+				CaseType:        []string{"hw", "pfa"},
+				Source:          "PHONE",
+				DonorName:       "Coleen Stephanie Morneault",
+				DonorFirstNames: "Coleen Stephanie",
+				DonorLastName:   "Morneault",
+				DonorDob:        DateString("1952-04-08"),
 				DonorAddress: Address{
 					Line1:    "Fluke House",
 					Line2:    "Summit",
@@ -91,7 +97,9 @@ func TestCreateDraft(t *testing.T) {
 					Postcode: "AI1 6VW",
 					Country:  "GB",
 				},
-				CorrespondentName: "Leon Marius Selden",
+				CorrespondentName:       "Leon Marius Selden",
+				CorrespondentFirstNames: "Leon Marius",
+				CorrespondentLastName:   "Selden",
 				CorrespondentAddress: &Address{
 					Line1:    "Nitzsche, Nader And Schuppe",
 					Line2:    "6064 Alessandro Plain",
@@ -115,10 +123,12 @@ func TestCreateDraft(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"types":     []string{"hw", "pfa"},
-							"source":    "PHONE",
-							"donorName": "Coleen Stephanie Morneault",
-							"donorDob":  "08/04/1952",
+							"types":           []string{"hw", "pfa"},
+							"source":          "PHONE",
+							"donorName":       "Coleen Stephanie Morneault",
+							"donorFirstNames": "Coleen Stephanie",
+							"donorLastName":   "Morneault",
+							"donorDob":        "08/04/1952",
 							"donorAddress": map[string]string{
 								"addressLine1": "Fluke House",
 								"addressLine2": "Summit",
@@ -127,7 +137,9 @@ func TestCreateDraft(t *testing.T) {
 								"postcode":     "AI1 6VW",
 								"country":      "GB",
 							},
-							"correspondentName": "Leon Marius Selden",
+							"correspondentName":       "Leon Marius Selden",
+							"correspondentFirstNames": "Leon Marius",
+							"correspondentLastName":   "Selden",
 							"correspondentAddress": map[string]string{
 								"addressLine1": "Nitzsche, Nader And Schuppe",
 								"addressLine2": "6064 Alessandro Plain",
