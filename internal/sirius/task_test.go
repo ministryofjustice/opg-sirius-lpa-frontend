@@ -2,13 +2,24 @@ package sirius
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
+
+type mockHttpClient struct {
+	mock.Mock
+}
+
+func (m *mockHttpClient) Do(req *http.Request) (*http.Response, error) {
+	args := m.Called(req)
+	return nil, args.Error(1)
+}
 
 func TestTask(t *testing.T) {
 	t.Parallel()
@@ -86,6 +97,18 @@ func TestTasksForCaseBadContext(t *testing.T) {
 	client := NewClient(http.DefaultClient, "http://localhost")
 	_, err := client.TasksForCase(Context{Context: nil}, 21)
 	assert.Equal(t, "net/http: nil Context", err.Error())
+}
+
+func TestTasksForCaseNetworkError(t *testing.T) {
+	mockHttpClient := &mockHttpClient{}
+
+	// NB the structure of the error returned here does not match real http errors
+	// returned by Do(), but we only care whether the error is handled
+	mockHttpClient.On("Do", mock.Anything).Return(nil, errors.New("Networking issue"))
+
+	client := NewClient(mockHttpClient, "http://localhost")
+	_, err := client.TasksForCase(Context{Context: context.Background()}, 777)
+	assert.Equal(t, "Networking issue", err.Error())
 }
 
 func TestTasksForCase(t *testing.T) {
