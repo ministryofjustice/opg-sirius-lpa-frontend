@@ -13,7 +13,6 @@ type Task struct {
 	DueDate     DateString `json:"dueDate"`
 	Name        string     `json:"name"`
 	CaseItems   []Case     `json:"caseItems"`
-    Description string     `json:"description"`
 	Assignee    User       `json:"assignee"`
 }
 
