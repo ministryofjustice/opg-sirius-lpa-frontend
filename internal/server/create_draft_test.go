@@ -92,13 +92,17 @@ func TestPostCreateDraft(t *testing.T) {
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
-			CaseType:          []string{"pfa", "hw"},
-			Source:            "PHONE",
-			DonorName:         "Gerald Ryan Sandel",
-			CorrespondentName: "Rosalinda Langdale",
-			DonorDob:          sirius.DateString("1943-03-06"),
-			Email:             "gerald.sandel@somehost.example",
-			PhoneNumber:       "01638294820",
+			CaseType:                []string{"pfa", "hw"},
+			Source:                  "PHONE",
+			DonorName:               "Gerald Ryan Sandel",
+			DonorFirstNames:         "Gerald Ryan",
+			DonorLastName:           "Sandel",
+			CorrespondentName:       "Rosalinda Langdale",
+			CorrespondentFirstNames: "Rosalinda",
+			CorrespondentLastName:   "Langdale",
+			DonorDob:                sirius.DateString("1943-03-06"),
+			Email:                   "gerald.sandel@somehost.example",
+			PhoneNumber:             "01638294820",
 			DonorAddress: sirius.Address{
 				Line1:    "Bradtke",
 				Line2:    "Zipper House",
@@ -210,8 +214,10 @@ func TestPostCreateDraftWhenAPIFails(t *testing.T) {
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
-			Source:    "PHONE",
-			DonorName: "Gerald Sandel",
+			Source:          "PHONE",
+			DonorName:       "Gerald Sandel",
+			DonorFirstNames: "Gerald",
+			DonorLastName:   "Sandel",
 			DonorAddress: sirius.Address{
 				Country: "GB",
 			},
@@ -244,8 +250,9 @@ func TestPostCreateDraftWhenValidationError(t *testing.T) {
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
-			Source:    "PHONE",
-			DonorName: "Gerald",
+			Source:          "PHONE",
+			DonorName:       "Gerald",
+			DonorFirstNames: "Gerald",
 			DonorAddress: sirius.Address{
 				Country: "GB",
 			},
