@@ -48,10 +48,12 @@ func TestDigitalLpa(t *testing.T) {
 							"warningCount":       dsl.Like(4),
 							"objectionCount":     dsl.Like(5),
 							"application": map[string]interface{}{
-								"donorName":  dsl.Like("Zoraida Swanberg"),
-								"donorDob":   dsl.Term("27/05/1978", `^\d{1,2}/\d{1,2}/\d{4}$`),
-								"donorPhone": dsl.Like("073456249524"),
-								"donorEmail": dsl.Like("zswanberg@host.example"),
+								"donorName":       dsl.Like("Zoraida Swanberg"),
+								"donorFirstNames": dsl.Like("Zoraida"),
+								"donorLastName":   dsl.Like("Swanberg"),
+								"donorDob":        dsl.Term("27/05/1978", `^\d{1,2}/\d{1,2}/\d{4}$`),
+								"donorPhone":      dsl.Like("073456249524"),
+								"donorEmail":      dsl.Like("zswanberg@host.example"),
 								"donorAddress": map[string]interface{}{
 									"addressLine1": dsl.Like("Apartment 24"),
 									"addressLine2": dsl.Like("Navigation Building"),
@@ -60,7 +62,9 @@ func TestDigitalLpa(t *testing.T) {
 									"postcode":     dsl.Like("B15 4TA"),
 									"country":      dsl.Term("GB", `^[A-Z]{2}$`),
 								},
-								"correspondentName": dsl.Like("Heath Enstad"),
+								"correspondentName":       dsl.Like("Heath Enstad"),
+								"correspondentFirstNames": dsl.Like("Heath"),
+								"correspondentLastName":   dsl.Like("Enstad"),
 								"correspondentAddress": map[string]interface{}{
 									"addressLine1": dsl.Like("Main Line Bungalow"),
 									"addressLine2": dsl.Like("Himmerton Lane"),
@@ -85,8 +89,10 @@ func TestDigitalLpa(t *testing.T) {
 				WarningCount:       4,
 				ObjectionCount:     5,
 				Application: Draft{
-					DonorName: "Zoraida Swanberg",
-					DonorDob:  DateString("1978-05-27"),
+					DonorName:       "Zoraida Swanberg",
+					DonorFirstNames: "Zoraida",
+					DonorLastName:   "Swanberg",
+					DonorDob:        DateString("1978-05-27"),
 					DonorAddress: Address{
 						Line1:    "Apartment 24",
 						Line2:    "Navigation Building",
@@ -95,7 +101,9 @@ func TestDigitalLpa(t *testing.T) {
 						Postcode: "B15 4TA",
 						Country:  "GB",
 					},
-					CorrespondentName: "Heath Enstad",
+					CorrespondentName:       "Heath Enstad",
+					CorrespondentFirstNames: "Heath",
+					CorrespondentLastName:   "Enstad",
 					CorrespondentAddress: &Address{
 						Line1:    "Main Line Bungalow",
 						Line2:    "Himmerton Lane",
