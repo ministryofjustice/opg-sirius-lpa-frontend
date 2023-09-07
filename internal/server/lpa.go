@@ -1,7 +1,6 @@
 package server
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -31,8 +30,6 @@ func Lpa(client LpaClient, tmpl template.Template) Handler {
 		data := lpaData{
 			Lpa: lpa,
 		}
-
-		log.Print(data)
 
 		return tmpl(w, data)
 	}
