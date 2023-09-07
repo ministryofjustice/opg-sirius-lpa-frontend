@@ -37,4 +37,17 @@ describe("View a digital LPA", () => {
     cy.contains("15 May 2023");
     cy.contains("DD-4");
   });
+
+  it("shows task list", () => {
+    cy.contains("M-1234-9876-4567");
+    cy.get("h2").contains("Tasks");
+    cy.get("ul[data-role=tasks-list] li").should((elts) => {
+      expect(elts).to.have.length(3);
+      expect(elts).to.contain("Review reduced fee eligibility (Super Team)");
+      expect(elts).to.contain(
+        "Review application correspondence (Marvellous Team)",
+      );
+      expect(elts).to.contain("Another task (Super Team)");
+    });
+  });
 });
