@@ -1,9 +1,11 @@
 package sirius
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"testing"
 
@@ -18,7 +20,7 @@ type mockHttpClient struct {
 
 func (m *mockHttpClient) Do(req *http.Request) (*http.Response, error) {
 	args := m.Called(req)
-	return nil, args.Error(1)
+	return args.Get(0).(*http.Response), args.Error(1)
 }
 
 func TestTask(t *testing.T) {
@@ -104,11 +106,27 @@ func TestTasksForCaseNetworkError(t *testing.T) {
 
 	// NB the structure of the error returned here does not match real http errors
 	// returned by Do(), but we only care whether the error is handled
-	mockHttpClient.On("Do", mock.Anything).Return(nil, errors.New("Networking issue"))
+	mockHttpClient.On("Do", mock.Anything).Return(&http.Response{}, errors.New("Networking issue"))
 
 	client := NewClient(mockHttpClient, "http://localhost")
 	_, err := client.TasksForCase(Context{Context: context.Background()}, 777)
 	assert.Equal(t, "Networking issue", err.Error())
+}
+
+func TestTasksForCaseBadJson(t *testing.T) {
+	mockHttpClient := &mockHttpClient{}
+
+	badJsonResponse := http.Response{
+		StatusCode: 200,
+        Body: io.NopCloser(bytes.NewBufferString("[bad json time")),
+    }
+
+	mockHttpClient.On("Do", mock.Anything).Return(&badJsonResponse, nil)
+
+	client := NewClient(mockHttpClient, "http://localhost")
+	_, err := client.TasksForCase(Context{Context: context.Background()}, 8888)
+
+	assert.Equal(t, "invalid character 'b' looking for beginning of value", err.Error())
 }
 
 func TestTasksForCase(t *testing.T) {
