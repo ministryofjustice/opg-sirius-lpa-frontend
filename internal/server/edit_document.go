@@ -1,11 +1,12 @@
 package server
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
-	"net/http"
-	"strconv"
 )
 
 type EditDocumentClient interface {
@@ -15,6 +16,7 @@ type EditDocumentClient interface {
 	EditDocument(ctx sirius.Context, uuid string, content string) (sirius.Document, error)
 	DeleteDocument(ctx sirius.Context, uuid string) error
 	AddDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string) (sirius.Document, error)
+	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
 }
 
 type editDocumentData struct {
@@ -24,6 +26,7 @@ type editDocumentData struct {
 	Case         sirius.Case
 	Documents    []sirius.Document
 	Document     sirius.Document
+	UsesNotify   bool
 	Download     string
 	SaveAndExit  bool
 	PreviewDraft bool
@@ -70,6 +73,16 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				return nil
 			})
 
+			var documentTemplates []sirius.DocumentTemplateData
+			group.Go(func() error {
+				documentTemplates, err = client.DocumentTemplates(ctx, caseType)
+				if err != nil {
+					return err
+				}
+
+				return nil
+			})
+
 			if err := group.Wait(); err != nil {
 				return err
 			}
@@ -85,6 +98,14 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					return err
 				}
 				data.Document = document
+
+				for _, dt := range documentTemplates {
+					if dt.TemplateId == document.SystemType {
+						data.UsesNotify = dt.UsesNotify
+
+						break
+					}
+				}
 			}
 		case http.MethodPost:
 			documentControls := postFormString(r, "documentControls")
