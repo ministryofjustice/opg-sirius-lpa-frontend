@@ -24,6 +24,16 @@ describe("Edit a document", () => {
       ],
     });
 
+    cy.addMock("/lpa-api/v1/templates/lpa", "GET", {
+      status: 200,
+      body: {
+        DD: {
+          label: "LPA Registered Notification",
+          inserts: {},
+        },
+      },
+    });
+
     cy.visit("/edit-document?id=800&case=lpa");
   });
 
