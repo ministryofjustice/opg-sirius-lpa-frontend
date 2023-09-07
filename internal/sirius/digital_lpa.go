@@ -2,7 +2,6 @@ package sirius
 
 import (
 	"fmt"
-	"log"
 )
 
 type DigitalLpa struct {
@@ -22,8 +21,6 @@ type DigitalLpa struct {
 func (c *Client) DigitalLpa(ctx Context, uid string) (DigitalLpa, error) {
 	var v DigitalLpa
 	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/digital-lpas/%s", uid), &v)
-
-	log.Print(v)
 
 	return v, err
 }
