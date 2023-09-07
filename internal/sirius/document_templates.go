@@ -12,13 +12,15 @@ type documentTemplateApiResponse map[string]json.RawMessage
 type insertApiResponse map[string]json.RawMessage
 
 type UniversalTemplateData struct {
-	Label string `json:"label"`
-	Order int    `json:"order"`
+	Label      string `json:"label"`
+	Order      int    `json:"order"`
+	UsesNotify bool   `json:"govukNotify"`
 }
 
 type documentTemplateApiData struct {
-	Inserts insertApiResponse `json:"inserts"`
-	Label   string            `json:"label"`
+	Inserts    insertApiResponse `json:"inserts"`
+	Label      string            `json:"label"`
+	UsesNotify bool              `json:"govukNotify"`
 }
 
 type Insert struct {
@@ -32,6 +34,7 @@ type DocumentTemplateData struct {
 	Inserts    []Insert
 	TemplateId string
 	Label      string `json:"label"`
+	UsesNotify bool
 }
 
 func (d documentTemplateApiResponse) toDocumentData() ([]DocumentTemplateData, error) {
@@ -48,6 +51,7 @@ func (d documentTemplateApiResponse) toDocumentData() ([]DocumentTemplateData, e
 				return nil, err
 			}
 			asDocumentTemplateData.Label = asDocumentTemplateApiData.Label
+			asDocumentTemplateData.UsesNotify = asDocumentTemplateApiData.UsesNotify
 			asDocumentTemplateData.Inserts = inserts
 			s = append(s, asDocumentTemplateData)
 			continue
@@ -56,6 +60,7 @@ func (d documentTemplateApiResponse) toDocumentData() ([]DocumentTemplateData, e
 			var universalTemplateData UniversalTemplateData
 			if err := json.Unmarshal(v, &universalTemplateData); err == nil {
 				asDocumentTemplateData.Label = universalTemplateData.Label
+				asDocumentTemplateData.UsesNotify = universalTemplateData.UsesNotify
 				s = append(s, asDocumentTemplateData)
 				continue
 			}

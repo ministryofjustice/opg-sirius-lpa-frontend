@@ -46,19 +46,32 @@ func (m *mockEditDocumentClient) AddDocument(ctx sirius.Context, caseID int, doc
 	return args.Get(0).(sirius.Document), args.Error(1)
 }
 
+func (m *mockEditDocumentClient) DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error) {
+	args := m.Called(ctx, caseType)
+	return args.Get(0).([]sirius.DocumentTemplateData), args.Error(1)
+}
+
 func TestGetEditDocument(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
 			caseItem := sirius.Case{CaseType: caseType, UID: "7000"}
 
 			document := sirius.Document{
-				ID:   1,
-				UUID: "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-				Type: sirius.TypeDraft,
+				ID:         1,
+				UUID:       "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+				SystemType: "LP-LETTER",
+				Type:       sirius.TypeDraft,
 			}
 
 			documents := []sirius.Document{
 				document,
+			}
+
+			documentTemplates := []sirius.DocumentTemplateData{
+				{
+					TemplateId: "LP-LETTER",
+					UsesNotify: true,
+				},
 			}
 
 			client := &mockEditDocumentClient{}
@@ -71,13 +84,17 @@ func TestGetEditDocument(t *testing.T) {
 			client.
 				On("DocumentByUUID", mock.Anything, document.UUID).
 				Return(document, nil)
+			client.
+				On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
+				Return(documentTemplates, nil)
 
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, editDocumentData{
-					Case:      caseItem,
-					Documents: documents,
-					Document:  document,
+					Case:       caseItem,
+					Documents:  documents,
+					Document:   document,
+					UsesNotify: true,
 				}).
 				Return(nil)
 
@@ -428,6 +445,9 @@ func TestGetEditDocumentWhenCaseErrors(t *testing.T) {
 	client.
 		On("Documents", mock.Anything, sirius.CaseTypeLpa, 123, sirius.TypeDraft).
 		Return([]sirius.Document{}, nil)
+	client.
+		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
+		Return([]sirius.DocumentTemplateData{}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
@@ -448,6 +468,9 @@ func TestGetCreateDocumentWhenFailureOnDocuments(t *testing.T) {
 	client.
 		On("Documents", mock.Anything, sirius.CaseTypeLpa, 123, sirius.TypeDraft).
 		Return([]sirius.Document{}, expectedError)
+	client.
+		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
+		Return([]sirius.DocumentTemplateData{}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
@@ -481,6 +504,9 @@ func TestGetCreateDocumentWhenFailureOnDocumentByUUID(t *testing.T) {
 	client.
 		On("DocumentByUUID", mock.Anything, "dfef6714-b4fe-44c2-b26e-90dfe3663e95").
 		Return(sirius.Document{}, expectedError)
+	client.
+		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
+		Return([]sirius.DocumentTemplateData{}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
@@ -514,6 +540,9 @@ func TestGetEditDocumentWhenTemplateErrors(t *testing.T) {
 	client.
 		On("DocumentByUUID", mock.Anything, "dfef6714-b4fe-44c2-b26e-90dfe3663e95").
 		Return(document, nil)
+	client.
+		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
+		Return([]sirius.DocumentTemplateData{}, nil)
 
 	template := &mockTemplate{}
 	template.
