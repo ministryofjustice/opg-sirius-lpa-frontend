@@ -2,6 +2,7 @@ package sirius
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -36,12 +37,12 @@ func TestDocumentTypes(t *testing.T) {
 						Status: http.StatusOK,
 						Body: dsl.Like(map[string]interface{}{
 							"DD": dsl.Like(map[string]interface{}{
-								"label":    dsl.Like("Donor deceased: Blank template"),
+								"label": dsl.Like("Donor deceased: Blank template"),
 								"inserts": dsl.Like(map[string]interface{}{
 									"all": dsl.Like(map[string]interface{}{
 										"DD1": dsl.Like(map[string]interface{}{
-											"label":    dsl.Like("DD1 - Case complete"),
-											"order":    dsl.Like(0),
+											"label": dsl.Like("DD1 - Case complete"),
+											"order": dsl.Like(0),
 										}),
 									}),
 								}),
@@ -86,4 +87,17 @@ func TestDocumentTypes(t *testing.T) {
 			}))
 		})
 	}
+}
+
+func TestHandlingNotifyField(t *testing.T) {
+	config := "{\"label\":\"An example letter sent with notify\",\"govukNotify\":true}"
+	response := documentTemplateApiResponse{
+		"WITH-NOTIFY": json.RawMessage([]byte(config)),
+	}
+
+	data, err := response.toDocumentData()
+
+	assert.Nil(t, err)
+	assert.Equal(t, "An example letter sent with notify", data[0].Label)
+	assert.Equal(t, true, data[0].UsesNotify)
 }
