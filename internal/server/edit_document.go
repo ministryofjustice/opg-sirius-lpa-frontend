@@ -47,6 +47,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		var documentTemplates []sirius.DocumentTemplateData
 		data := editDocumentData{
 			XSRFToken: ctx.XSRFToken,
 		}
@@ -73,7 +74,6 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				return nil
 			})
 
-			var documentTemplates []sirius.DocumentTemplateData
 			group.Go(func() error {
 				documentTemplates, err = client.DocumentTemplates(ctx, caseType)
 				if err != nil {
@@ -98,14 +98,6 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					return err
 				}
 				data.Document = document
-
-				for _, dt := range documentTemplates {
-					if dt.TemplateId == document.SystemType {
-						data.UsesNotify = dt.UsesNotify
-
-						break
-					}
-				}
 			}
 		case http.MethodPost:
 			documentControls := postFormString(r, "documentControls")
@@ -200,6 +192,15 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					return nil
 				})
 
+				group.Go(func() error {
+					documentTemplates, err = client.DocumentTemplates(ctx, caseType)
+					if err != nil {
+						return err
+					}
+
+					return nil
+				})
+
 				if err := group.Wait(); err != nil {
 					return err
 				}
@@ -213,6 +214,16 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 						}
 						data.Document = documentToDisplay
 					}
+				}
+			}
+		}
+
+		if len(documentTemplates) > 0 && data.Document.SystemType != "" {
+			for _, dt := range documentTemplates {
+				if dt.TemplateId == data.Document.SystemType {
+					data.UsesNotify = dt.UsesNotify
+
+					break
 				}
 			}
 		}

@@ -137,6 +137,9 @@ func TestPostSaveDocument(t *testing.T) {
 			client.
 				On("EditDocument", mock.Anything, document.UUID, "Edited test content").
 				Return(document, nil)
+			client.
+				On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
+				Return([]sirius.DocumentTemplateData{}, nil)
 
 			template := &mockTemplate{}
 			template.
@@ -202,6 +205,9 @@ func TestPostDeleteDocument(t *testing.T) {
 	client.
 		On("DeleteDocument", mock.Anything, document.UUID).
 		Return(nil)
+	client.
+		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
+		Return([]sirius.DocumentTemplateData{}, nil)
 
 	template := &mockTemplate{}
 
@@ -272,6 +278,9 @@ func TestPostPublishDocument(t *testing.T) {
 	client.
 		On("Documents", mock.Anything, sirius.CaseType("lpa"), 123, sirius.TypeDraft).
 		Return(documents, nil)
+	client.
+		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
+		Return([]sirius.DocumentTemplateData{}, nil)
 
 	template := &mockTemplate{}
 
@@ -341,6 +350,9 @@ func TestPostPreviewDocument(t *testing.T) {
 	client.
 		On("Documents", mock.Anything, sirius.CaseType("lpa"), 123, sirius.TypeDraft).
 		Return(documents, nil)
+	client.
+		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
+		Return([]sirius.DocumentTemplateData{}, nil)
 
 	template := &mockTemplate{}
 
