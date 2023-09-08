@@ -28,7 +28,6 @@ func TestCreateDraft(t *testing.T) {
 			draftData: Draft{
 				CaseType:        []string{"hw"},
 				Source:          "PHONE",
-				DonorName:       "Coleen Morneault",
 				DonorFirstNames: "Coleen",
 				DonorLastName:   "Morneault",
 				DonorDob:        DateString("1952-04-08"),
@@ -53,7 +52,6 @@ func TestCreateDraft(t *testing.T) {
 						Body: map[string]interface{}{
 							"types":           []string{"hw"},
 							"source":          "PHONE",
-							"donorName":       "Coleen Morneault",
 							"donorFirstNames": "Coleen",
 							"donorLastName":   "Morneault",
 							"donorDob":        "08/04/1952",
@@ -85,7 +83,6 @@ func TestCreateDraft(t *testing.T) {
 			draftData: Draft{
 				CaseType:        []string{"hw", "pfa"},
 				Source:          "PHONE",
-				DonorName:       "Coleen Stephanie Morneault",
 				DonorFirstNames: "Coleen Stephanie",
 				DonorLastName:   "Morneault",
 				DonorDob:        DateString("1952-04-08"),
@@ -97,7 +94,6 @@ func TestCreateDraft(t *testing.T) {
 					Postcode: "AI1 6VW",
 					Country:  "GB",
 				},
-				CorrespondentName:       "Leon Marius Selden",
 				CorrespondentFirstNames: "Leon Marius",
 				CorrespondentLastName:   "Selden",
 				CorrespondentAddress: &Address{
@@ -125,7 +121,6 @@ func TestCreateDraft(t *testing.T) {
 						Body: map[string]interface{}{
 							"types":           []string{"hw", "pfa"},
 							"source":          "PHONE",
-							"donorName":       "Coleen Stephanie Morneault",
 							"donorFirstNames": "Coleen Stephanie",
 							"donorLastName":   "Morneault",
 							"donorDob":        "08/04/1952",
@@ -137,7 +132,6 @@ func TestCreateDraft(t *testing.T) {
 								"postcode":     "AI1 6VW",
 								"country":      "GB",
 							},
-							"correspondentName":       "Leon Marius Selden",
 							"correspondentFirstNames": "Leon Marius",
 							"correspondentLastName":   "Selden",
 							"correspondentAddress": map[string]string{

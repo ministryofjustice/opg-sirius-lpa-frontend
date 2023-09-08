@@ -151,7 +151,6 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 			compiledDraft := sirius.Draft{
 				CaseType:        data.Form.SubTypes,
 				Source:          "PHONE",
-				DonorName:       buildName(data.Form.DonorFirstname, data.Form.DonorMiddlename, data.Form.DonorSurname),
 				DonorFirstNames: buildName(data.Form.DonorFirstname, data.Form.DonorMiddlename),
 				DonorLastName:   data.Form.DonorSurname,
 				DonorDob:        data.Form.Dob.toDateString(),
@@ -166,7 +165,6 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 			} else if data.Form.Recipient == "other" {
 				correspondentAddress := addDefaultCountry(data.Form.CorrespondentAddress)
 				compiledDraft.CorrespondentAddress = &correspondentAddress
-				compiledDraft.CorrespondentName = buildName(data.Form.CorrespondentFirstname, data.Form.CorrespondentMiddlename, data.Form.CorrespondentSurname)
 				compiledDraft.CorrespondentFirstNames = buildName(data.Form.CorrespondentFirstname, data.Form.CorrespondentMiddlename)
 				compiledDraft.CorrespondentLastName = data.Form.CorrespondentSurname
 			}
