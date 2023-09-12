@@ -10,10 +10,12 @@ import (
 
 type LpaClient interface {
 	DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error)
+	TasksForCase(ctx sirius.Context, id int) ([]sirius.Task, error)
 }
 
 type lpaData struct {
 	Lpa sirius.DigitalLpa
+	TaskList []sirius.Task
 }
 
 func Lpa(client LpaClient, tmpl template.Template) Handler {
@@ -27,8 +29,15 @@ func Lpa(client LpaClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		tasks, err := client.TasksForCase(ctx, lpa.ID)
+
+		if err != nil {
+			return err
+		}
+
 		data := lpaData{
 			Lpa: lpa,
+			TaskList: tasks,
 		}
 
 		return tmpl(w, data)
