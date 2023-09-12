@@ -53,11 +53,11 @@ func (c *Client) TasksForCase(ctx Context, caseId int) ([]Task, error) {
 		return nil, err
 	}
 
+	defer resp.Body.Close() //#nosec G307 false positive
+
 	if resp.StatusCode != http.StatusOK {
 		return nil, newStatusError(resp)
 	}
-
-	defer resp.Body.Close() //#nosec G307 false positive
 
 	var v taskList
 	err = json.NewDecoder(resp.Body).Decode(&v)

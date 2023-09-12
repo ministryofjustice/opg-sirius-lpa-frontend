@@ -88,11 +88,12 @@ func (c *Client) get(ctx Context, path string, v interface{}) error {
 		return err
 	}
 
+	defer resp.Body.Close() //#nosec G307 false positive
+
 	if resp.StatusCode != http.StatusOK {
 		return newStatusError(resp)
 	}
 
-	defer resp.Body.Close() //#nosec G307 false positive
 	return json.NewDecoder(resp.Body).Decode(&v)
 }
 
