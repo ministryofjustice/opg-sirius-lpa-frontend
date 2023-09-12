@@ -81,7 +81,7 @@
       </div>
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Name</dt>
-        <dd class="govuk-summary-list__value">{{ .Lpa.Application.DonorName }}</dd>
+        <dd class="govuk-summary-list__value">{{ .Lpa.Application.DonorFirstNames }} {{ .Lpa.Application.DonorLastName }}</dd>
       </div>
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Date of birth</dt>
@@ -135,8 +135,8 @@
           {{ if (eq .Lpa.Application.CorrespondentAddress.Line1 "") }}
             The donor
           {{ else }}
-            {{ if not (eq .Lpa.Application.CorrespondentName "") }}
-              {{ .Lpa.Application.CorrespondentName }}<br>
+            {{ if not (eq .Lpa.Application.CorrespondentFirstNames "") }}
+              {{ .Lpa.Application.CorrespondentFirstNames }} {{ .Lpa.Application.CorrespondentLastName }}<br>
             {{ end }}
               {{ .Lpa.Application.CorrespondentAddress.Line1 }}
               {{ if not (eq .Lpa.Application.CorrespondentAddress.Line2 "") }}<br>{{ .Lpa.Application.CorrespondentAddress.Line2 }}{{ end }}
