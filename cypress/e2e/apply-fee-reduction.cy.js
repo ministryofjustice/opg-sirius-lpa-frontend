@@ -26,7 +26,7 @@ describe("Apply a fee reduction to a digital LPA", () => {
   it("adds a fee reduction to the case", () => {
     cy.visit("/apply-fee-reduction?id=9456");
     cy.contains("Apply a fee reduction");
-    cy.contains("M-999-456-AAA");
+    cy.contains("M-9999-4567-AAAA");
     cy.get(".moj-banner").should("not.exist");
     cy.get("#f-feeReductionType").select("Remission");
     cy.get("#f-paymentEvidence").type("Test evidence");
@@ -34,6 +34,6 @@ describe("Apply a fee reduction to a digital LPA", () => {
     cy.get("button[type=submit]").click();
     cy.get(".moj-banner").should("exist");
     cy.get(".moj-banner").contains("Remission approved");
-    cy.url().should("contain", "/lpa/M-999-456-AAA/payments");
+    cy.url().should("contain", "/lpa/M-9999-4567-AAAA/payments");
   });
 });
