@@ -76,6 +76,11 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) H
 				SetFlash(w, FlashNotification{
 					Title: fmt.Sprintf("%s approved", translateRefData(data.FeeReductionTypes, data.FeeReductionType)),
 				})
+
+				if data.Case.CaseType == "DIGITAL_LPA" {
+					return RedirectError(fmt.Sprintf("/lpa/%s/payments", data.Case.UID))
+				}
+
 				return RedirectError(fmt.Sprintf("/payments/%d", caseID))
 			}
 		}
