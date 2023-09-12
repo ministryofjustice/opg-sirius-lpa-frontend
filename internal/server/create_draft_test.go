@@ -94,10 +94,8 @@ func TestPostCreateDraft(t *testing.T) {
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			CaseType:                []string{"pfa", "hw"},
 			Source:                  "PHONE",
-			DonorName:               "Gerald Ryan Sandel",
 			DonorFirstNames:         "Gerald Ryan",
 			DonorLastName:           "Sandel",
-			CorrespondentName:       "Rosalinda Langdale",
 			CorrespondentFirstNames: "Rosalinda",
 			CorrespondentLastName:   "Langdale",
 			DonorDob:                sirius.DateString("1943-03-06"),
@@ -215,7 +213,6 @@ func TestPostCreateDraftWhenAPIFails(t *testing.T) {
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			Source:          "PHONE",
-			DonorName:       "Gerald Sandel",
 			DonorFirstNames: "Gerald",
 			DonorLastName:   "Sandel",
 			DonorAddress: sirius.Address{
@@ -251,7 +248,6 @@ func TestPostCreateDraftWhenValidationError(t *testing.T) {
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			Source:          "PHONE",
-			DonorName:       "Gerald",
 			DonorFirstNames: "Gerald",
 			DonorAddress: sirius.Address{
 				Country: "GB",

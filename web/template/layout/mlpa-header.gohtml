@@ -3,7 +3,7 @@
       Date of birth {{ (date .Lpa.Application.DonorDob "2 January 2006") }} | Postcode
       {{ .Lpa.Application.DonorAddress.Postcode }}
     </span>
-    <h1 class="govuk-heading-xl">{{ .Lpa.Application.DonorName }}</h1>
+    <h1 class="govuk-heading-xl">{{ .Lpa.Application.DonorFirstNames }} {{ .Lpa.Application.DonorLastName }}</h1>
 
     <div class="govuk-tabs">
         <h2 class="govuk-tabs__title">

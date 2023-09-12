@@ -71,7 +71,7 @@
           </div>
 
           <a id="f-donorName"></a>
-          {{ template "input" (field "donorFirstname" "What is the donor's first name?" .Form.DonorFirstname .Error.Field.donorName) }}
+          {{ template "input" (field "donorFirstname" "What is the donor's first name?" .Form.DonorFirstname .Error.Field.donorFirstNames) }}
 
           <div class="govuk-form-group {{ if .Error.Field.donorMiddlename }}govuk-form-group--error{{ end }}" aria-describedby="f-donorMiddlename-hint">
             <label class="govuk-label" for="f-donorMiddlename">What is the donor's middle name?</label>
@@ -80,7 +80,7 @@
             <input class="govuk-input {{ if .Error.Field.donorMiddlename }}govuk-input--error{{ end }}" id="f-donorMiddlename" name="donorMiddlename" value="{{ .Form.DonorMiddlename }}" />
           </div>
 
-          {{ template "input" (field "donorSurname" "What is the donor's last name?" .Form.DonorSurname .Error.Field.donorName) }}
+          {{ template "input" (field "donorSurname" "What is the donor's last name?" .Form.DonorSurname .Error.Field.donorLastName) }}
 
           <div class="govuk-form-group {{ if .Error.Field.donorDob }}govuk-form-group--error{{ end }}" id="f-donorDob">
             <fieldset class="govuk-fieldset" role="group" aria-describedby="f-dob-hint">
@@ -178,7 +178,7 @@
                 </div>
                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="f-recipient-other-reveal">
                   <a id="f-correspondentName"></a>
-                  {{ template "input" (field "correspondentFirstname" "What is their first name?" .Form.CorrespondentFirstname .Error.Field.correspondentName) }}
+                  {{ template "input" (field "correspondentFirstname" "What is their first name?" .Form.CorrespondentFirstname .Error.Field.correspondentFirstNames) }}
 
                   <div class="govuk-form-group {{ if .Error.Field.correspondentMiddlename }}govuk-form-group--error{{ end }}" aria-describedby="f-correspondentMiddlename-hint">
                     <label class="govuk-label" for="f-correspondentMiddlename">What is their middle name?</label>
@@ -187,7 +187,7 @@
                     <input class="govuk-input {{ if .Error.Field.correspondentMiddlename }}govuk-input--error{{ end }}" id="f-correspondentMiddlename" name="correspondentMiddlename" value="{{ .Form.CorrespondentMiddlename }}" />
                   </div>
 
-                  {{ template "input" (field "correspondentSurname" "What is their last name?" .Form.CorrespondentSurname .Error.Field.correspondentName) }}
+                  {{ template "input" (field "correspondentSurname" "What is their last name?" .Form.CorrespondentSurname .Error.Field.correspondentLastName) }}
 
                   <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="What is their address?">
                     {{ template "input" (field "correspondentAddress.Line1" "Address line 1" .Form.CorrespondentAddress.Line1 (index .Error.Field "correspondentAddress/addressLine1") "data-app-address-finder-map" "addressLine1") }}
