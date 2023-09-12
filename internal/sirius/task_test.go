@@ -118,8 +118,8 @@ func TestTasksForCaseBadJson(t *testing.T) {
 
 	badJsonResponse := http.Response{
 		StatusCode: 200,
-        Body: io.NopCloser(bytes.NewBufferString("[bad json time")),
-    }
+		Body: io.NopCloser(bytes.NewBufferString("[bad json time")),
+	}
 
 	mockHttpClient.On("Do", mock.Anything).Return(&badJsonResponse, nil)
 
