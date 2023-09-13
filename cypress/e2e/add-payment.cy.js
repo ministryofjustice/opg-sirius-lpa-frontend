@@ -28,7 +28,7 @@ describe("Add a payment to a digital LPA", () => {
   it("adds a payment to the case", () => {
     cy.visit("/add-payment?id=900");
     cy.contains("Add a payment");
-    cy.contains("M-FFFF-EEEE-DDDD");
+    cy.contains("M-9999-4567-AAAA");
     cy.get(".moj-banner").should("not.exist");
     cy.get("#f-amount").type("82.00");
     cy.get("#f-source").select("PHONE");
@@ -36,6 +36,6 @@ describe("Add a payment to a digital LPA", () => {
     cy.get("button[type=submit]").click();
     cy.get(".moj-banner").should("exist");
     cy.get(".moj-banner").contains("Payment added");
-    cy.url().should("include", "/lpa/M-FFFF-EEEE-DDDD/payments");
+    cy.url().should("include", "/lpa/M-9999-4567-AAAA/payments");
   });
 });
