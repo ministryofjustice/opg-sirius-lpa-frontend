@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -177,7 +178,28 @@ func TestApplyFeeReductionWhenFailureOnGetFeeReductionTypesRefData(t *testing.T)
 }
 
 func TestPostFeeReduction(t *testing.T) {
-	caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
+	testCases := []struct {
+		name string
+		id int
+		caseItem sirius.Case
+		paymentDate string
+		expectedRedirect string
+	}{
+		{
+			name: "Non-digital LPA",
+			id: 123,
+			caseItem: sirius.Case{CaseType: "LPA", UID: "700700"},
+			paymentDate: "2022-01-23",
+			expectedRedirect: "/payments/123",
+		},
+		{
+			name: "Digital LPA",
+			id: 9456,
+			caseItem: sirius.Case{CaseType: "DIGITAL_LPA", UID: "M-AAA-BBB-CCC"},
+			paymentDate: "2023-09-01",
+			expectedRedirect: "/lpa/M-AAA-BBB-CCC/payments",
+		},
+	}
 
 	feeReductionTypes := []sirius.RefDataItem{
 		{
@@ -186,33 +208,35 @@ func TestPostFeeReduction(t *testing.T) {
 		},
 	}
 
-	client := &mockApplyFeeReductionClient{}
-	client.
-		On("ApplyFeeReduction", mock.Anything, 123, "REMISSION", "Test evidence", sirius.DateString("2022-01-23")).
-		Return(nil)
-	client.
-		On("Case", mock.Anything, 123).
-		Return(caseitem, nil)
-	client.
-		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
-		Return(feeReductionTypes, nil)
+	for _, tc := range(testCases) {
+		client := &mockApplyFeeReductionClient{}
+		client.
+			On("ApplyFeeReduction", mock.Anything, tc.id, "REMISSION", "Test evidence", sirius.DateString(tc.paymentDate)).
+			Return(nil)
+		client.
+			On("Case", mock.Anything, tc.id).
+			Return(tc.caseItem, nil)
+		client.
+			On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+			Return(feeReductionTypes, nil)
 
-	template := &mockTemplate{}
+		template := &mockTemplate{}
 
-	form := url.Values{
-		"feeReductionType": {"REMISSION"},
-		"paymentDate":      {"2022-01-23"},
-		"paymentEvidence":  {"Test evidence"},
+		form := url.Values{
+			"feeReductionType": {"REMISSION"},
+			"paymentDate":      {tc.paymentDate},
+			"paymentEvidence":  {"Test evidence"},
+		}
+
+		r, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("/?id=%d", tc.id), strings.NewReader(form.Encode()))
+		r.Header.Add("Content-Type", formUrlEncoded)
+		w := httptest.NewRecorder()
+
+		err := ApplyFeeReduction(client, template.Func)(w, r)
+		resp := w.Result()
+
+		assert.Equal(t, RedirectError(tc.expectedRedirect), err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		mock.AssertExpectationsForObjects(t, client, template)
 	}
-
-	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := ApplyFeeReduction(client, template.Func)(w, r)
-	resp := w.Result()
-
-	assert.Equal(t, RedirectError("/payments/123"), err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
