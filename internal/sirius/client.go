@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -14,6 +15,10 @@ type Context struct {
 	Context   context.Context
 	Cookies   []*http.Cookie
 	XSRFToken string
+}
+
+type HttpClient interface {
+	Do(req *http.Request) (*http.Response, error)
 }
 
 func (ctx Context) With(c context.Context) Context {
@@ -24,7 +29,7 @@ func (ctx Context) With(c context.Context) Context {
 	}
 }
 
-func NewClient(httpClient *http.Client, baseURL string) *Client {
+func NewClient(httpClient HttpClient, baseURL string) *Client {
 	return &Client{
 		http:    httpClient,
 		baseURL: baseURL,
@@ -32,7 +37,7 @@ func NewClient(httpClient *http.Client, baseURL string) *Client {
 }
 
 type Client struct {
-	http    *http.Client
+	http    HttpClient
 	baseURL string
 }
 
@@ -55,6 +60,23 @@ func (c *Client) newRequest(ctx Context, method, path string, body io.Reader) (*
 	return req, err
 }
 
+func (c *Client) newRequestWithQuery(ctx Context, method, path string, query url.Values, body io.Reader) (*http.Request, error) {
+	req, err := c.newRequest(ctx, method, path, body)
+	if err != nil {
+		return nil, err
+	}
+
+	querystring := req.URL.Query()
+	for k, values := range query {
+		for _, v := range values {
+			querystring.Add(k, v)
+		}
+	}
+	req.URL.RawQuery = querystring.Encode()
+
+	return req, err
+}
+
 func (c *Client) get(ctx Context, path string, v interface{}) error {
 	req, err := c.newRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
@@ -65,6 +87,7 @@ func (c *Client) get(ctx Context, path string, v interface{}) error {
 	if err != nil {
 		return err
 	}
+
 	defer resp.Body.Close() //#nosec G307 false positive
 
 	if resp.StatusCode != http.StatusOK {

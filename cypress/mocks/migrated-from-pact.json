@@ -155,6 +155,18 @@
       }
     },
     {
+      "name": "A request to get tasks for a case",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/cases/800/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"tasks\":[{\"id\":1,\"name\":\"Review reduced fee eligibility\",\"assignee\":{\"displayName\":\"Super Team\"}},{\"id\":2,\"name\":\"Review application correspondence\",\"assignee\":{\"displayName\":\"Marvellous Team\"}},{\"id\":3,\"name\":\"Another task\",\"assignee\":{\"displayName\":\"Super Team\"}}]}"
+      }
+    },
+    {
       "name": "A request for the LPA's available statuses",
       "request": {
         "method": "GET",
