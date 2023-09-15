@@ -1,9 +1,10 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 )
@@ -16,8 +17,9 @@ type GetDocumentsClient interface {
 type getDocumentsData struct {
 	XSRFToken string
 
-	Lpa       sirius.DigitalLpa
-	Documents []sirius.Document
+	Lpa          sirius.DigitalLpa
+	Documents    []sirius.Document
+	FlashMessage FlashNotification
 }
 
 func GetDocuments(client GetDocumentsClient, tmpl template.Template) Handler {
@@ -39,6 +41,8 @@ func GetDocuments(client GetDocumentsClient, tmpl template.Template) Handler {
 			Documents: documents,
 			Lpa:       lpa,
 		}
+
+		data.FlashMessage, _ = GetFlash(w, r)
 
 		return tmpl(w, data)
 	}

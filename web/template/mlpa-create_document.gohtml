@@ -1,0 +1,115 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create Document{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            {{ template "mlpa-header" (caseTabs .Lpa "documents") }}
+
+            {{ template "error-summary" .Error }}
+
+            <h1 class="govuk-heading-l">Create a document</h1>
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+                <div class="govuk-form-group {{ if .Error.Field.templateId }}govuk-form-group--error{{ end }}">
+                    <label class="govuk-label govuk-label--s" for="f-templateId">Select a document template</label>
+                    <div id="f-templateId-hint" class="govuk-hint">
+                        Select a template or enter the name of the template
+                    </div>
+                    {{ template "errors" .Error.Field.templateId }}
+                    <select class="govuk-select {{ if .Error.Field.templateId }}govuk-select--error{{ end }}"
+                            id="f-templateId" name="templateId" aria-describedby="f-templateId-hint" data-select-template>
+                        <option value="" selected></option>
+                        {{ range .DocumentTemplates }}
+                            <option value="{{ .TemplateId }}" {{ if eq .TemplateId $.SelectedTemplateId }}selected{{ end }}>{{ .TemplateId }}: {{ .Label }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+
+                <div data-module="app-insert-selector" data-initiator-selector="#f-templateId" data-selected="{{ join .SelectedInserts "," }}">
+                    <script type="application/json" data-id="insert-selector-data">
+                        {{ .ComponentDocumentData }}
+                    </script>
+
+                    <template data-id="insert-selector-template-container">
+                        <div>
+                            <fieldset class="govuk-fieldset" aria-describedby="f-insert-selector-hint">
+                                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                                    Select document inserts
+                                </legend>
+                                <div id="f-insert-selector-hint" class="govuk-hint">
+                                    Optional
+                                </div>
+
+                                <div class="govuk-tabs" data-module="govuk-tabs">
+                                    <ul class="govuk-tabs__list"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <template data-id="insert-selector-template-panel">
+                        <div class="govuk-tabs__panel app-tabs__panel--compact" data-module="tab-content">
+                            <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                <table class="govuk-table app-table--compact">
+                                    <tbody class="govuk-table__body app-!-td-last-child-no-border">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        Select a recipient
+                    </legend>
+                    <div class="govuk-form-group {{ if .Error.Field.selectRecipient }}govuk-form-group--error{{ end }}">
+                        {{ template "errors" .Error.Field.selectRecipient }}
+                        <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                            <table class="govuk-table">
+                                <tbody class="govuk-table__body">
+                                {{ range $recipient := .Recipients }}
+                                    <tr class="govuk-table__row">
+                                        <td class="govuk-table__cell">
+                                                <div class="govuk-checkboxes__item">
+                                                    <input class="govuk-checkboxes__input" id="f-recipient-{{ .ID }}"
+                                                        name="selectRecipients" type="checkbox"
+                                                        value="{{ .ID }}"
+                                                        data-module="recipient-checkbox"
+                                                        {{ range $selected := $.SelectedRecipients  }}
+                                                            {{ if eq $selected $recipient.ID }}checked{{ end }}
+                                                        {{ end }}
+                                                    />
+                                                    <label class="govuk-label govuk-checkboxes__label"
+                                                        for="f-recipient-{{ .ID }}">
+                                                        {{ if .CompanyName  }}
+                                                            <h2 class="govuk-heading-s govuk-!-margin-bottom-1">{{ .CompanyName }} ({{ .PersonType }})</h2>
+                                                        {{ else }}
+                                                            <h2 class="govuk-heading-s govuk-!-margin-bottom-1">{{ .Salutation }} {{ .Firstname }} {{ .Surname }} ({{ .PersonType }})</h2>
+                                                        {{ end }}
+                                                        <p class="govuk-body govuk-!-margin-bottom-0">{{ .AddressSummary }}</p>
+                                                    </label>
+                                                </div>
+                                        </td>
+                                    </tr>
+                                {{ end }}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="govuk-button-group govuk-!-padding-top-5">
+                    <button class="govuk-button" data-module="govuk-button" data-module="create-document-button" type="submit">Continue</button>
+                </div>
+                <div class="govuk-body">
+                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s/documents" .Lpa.UID) }}">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{{ end }}
