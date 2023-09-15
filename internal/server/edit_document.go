@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -12,6 +13,7 @@ import (
 type EditDocumentClient interface {
 	Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docType string) ([]sirius.Document, error)
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
+	DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error)
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 	EditDocument(ctx sirius.Context, uuid string, content string) (sirius.Document, error)
 	DeleteDocument(ctx sirius.Context, uuid string) error
@@ -24,6 +26,7 @@ type editDocumentData struct {
 	Success      bool
 	Error        sirius.ValidationError
 	Case         sirius.Case
+	Lpa          sirius.DigitalLpa
 	Documents    []sirius.Document
 	Document     sirius.Document
 	UsesNotify   bool
@@ -62,6 +65,15 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					return err
 				}
 				data.Case = caseItem
+
+				if caseType == sirius.CaseTypeDigitalLpa {
+					lpa, err := client.DigitalLpa(ctx.With(groupCtx), data.Case.UID)
+					if err != nil {
+						return err
+					}
+					data.Lpa = lpa
+				}
+
 				return nil
 			})
 
@@ -139,6 +151,19 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					return err
 				}
 
+				caseItem, err := client.Case(ctx, caseID)
+				if err != nil {
+					return err
+				}
+
+				if caseType == sirius.CaseTypeDigitalLpa {
+					SetFlash(w, FlashNotification{
+						Description: "Draft document deleted",
+					})
+
+					return RedirectError(fmt.Sprintf("/lpa/%s/documents", caseItem.UID))
+				}
+
 			case "publish":
 				_, err := client.EditDocument(ctx, documentUUID, content)
 				if err != nil {
@@ -160,6 +185,20 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				if err != nil {
 					return err
 				}
+
+				if caseType == sirius.CaseTypeDigitalLpa {
+					caseItem, err := client.Case(ctx, caseID)
+					if err != nil {
+						return err
+					}
+
+					SetFlash(w, FlashNotification{
+						Description: "Document published",
+					})
+
+					return RedirectError(fmt.Sprintf("/lpa/%s/documents", caseItem.UID))
+				}
+
 				data.Success = true
 
 			case "saveAndExit":
@@ -179,6 +218,15 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 						return err
 					}
 					data.Case = caseItem
+
+					if caseType == sirius.CaseTypeDigitalLpa {
+						lpa, err := client.DigitalLpa(ctx.With(groupCtx), data.Case.UID)
+						if err != nil {
+							return err
+						}
+						data.Lpa = lpa
+					}
+
 					return nil
 				})
 

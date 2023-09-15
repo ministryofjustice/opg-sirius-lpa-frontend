@@ -19,16 +19,18 @@ func TestDocumentTypes(t *testing.T) {
 
 	testCases := []struct {
 		name             string
+		caseType         CaseType
 		setup            func()
 		expectedResponse []DocumentTemplateData
 		expectedError    func(int) error
 	}{
 		{
-			name: "OK",
+			name:     "LPA",
+			caseType: CaseTypeLpa,
 			setup: func() {
 				pact.
 					AddInteraction().
-					UponReceiving("A request for document templates").
+					UponReceiving("A request for LPA document templates").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/templates/lpa"),
@@ -66,6 +68,34 @@ func TestDocumentTypes(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "Digital LPA",
+			caseType: CaseTypeDigitalLpa,
+			setup: func() {
+				pact.
+					AddInteraction().
+					UponReceiving("A request for Digital LPA document templates").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String("/lpa-api/v1/templates/digitallpa"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.Like(map[string]interface{}{
+							"DLPA-DONOR-FORM": dsl.Like(map[string]interface{}{
+								"label": dsl.Like("Donor application form"),
+							}),
+						}),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: []DocumentTemplateData{
+				{
+					TemplateId: "DLPA-DONOR-FORM",
+					Label:      "Donor application form",
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -75,7 +105,7 @@ func TestDocumentTypes(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				documentTemplateTypes, err := client.DocumentTemplates(Context{Context: context.Background()}, CaseTypeLpa)
+				documentTemplateTypes, err := client.DocumentTemplates(Context{Context: context.Background()}, tc.caseType)
 
 				assert.Equal(t, tc.expectedResponse, documentTemplateTypes)
 				if tc.expectedError == nil {
