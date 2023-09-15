@@ -14,7 +14,7 @@ const handleCreateDocumentButton = () => {
     '[data-module="recipient-checkbox"]',
   );
 
-  if (checkboxes && checkboxes.length > 0) {
+  if (createDocumentButton && checkboxes && checkboxes.length > 0) {
     checkboxes.forEach((el, i) => {
       el.addEventListener("change", (event) => {
         let isOneRecipientSelected = Array.from(checkboxes).some(
