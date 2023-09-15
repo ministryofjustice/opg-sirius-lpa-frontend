@@ -103,7 +103,12 @@ func (i insertApiResponse) toInsertData() ([]Insert, error) {
 }
 
 func (c *Client) DocumentTemplates(ctx Context, caseType CaseType) ([]DocumentTemplateData, error) {
-	req, err := c.newRequest(ctx, http.MethodGet, fmt.Sprintf("/lpa-api/v1/templates/%s", caseType), nil)
+	templateSet := caseType
+	if caseType == CaseTypeDigitalLpa {
+		templateSet = "digitallpa"
+	}
+
+	req, err := c.newRequest(ctx, http.MethodGet, fmt.Sprintf("/lpa-api/v1/templates/%s", templateSet), nil)
 	if err != nil {
 		return nil, err
 	}

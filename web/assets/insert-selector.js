@@ -24,6 +24,18 @@ function InsertSelector($module) {
 
 InsertSelector.prototype.init = function () {
   this.$initiator.addEventListener("confirm", this.onSelectTemplate.bind(this));
+
+  this.onSelectTemplate();
+
+  const selected = this.$module.getAttribute("data-selected");
+  if (selected.length) {
+    const inserts = selected.split(",");
+    inserts.forEach((insert) => {
+      this.$module.querySelector(
+        `input[value="${insert}"]`,
+      ).checked = true;
+    });
+  }
 };
 
 InsertSelector.prototype.onSelectTemplate = function (e) {
