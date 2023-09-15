@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -145,7 +144,7 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 		if r.Method == "POST" {
 			err := decoder.Decode(&data.Form, r.PostForm)
 			if err != nil {
-				log.Panic(err)
+				return err
 			}
 
 			compiledDraft := sirius.Draft{

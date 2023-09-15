@@ -121,6 +121,7 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	mux.Handle("/payments/{id}", wrap(GetPayments(client, templates.Get("payments.gohtml"))))
 	mux.Handle("/lpa/{uid}/payments", wrap(GetPayments(client, templates.Get("mlpa-payments.gohtml"))))
 	mux.Handle("/lpa/{uid}/documents", wrap(GetDocuments(client, templates.Get("mlpa-documents.gohtml"))))
+	mux.Handle("/lpa/{uid}/documents/new", wrap(CreateDocumentDigitalLpa(client, templates.Get("mlpa-create_document.gohtml"))))
 	mux.Handle("/search-users", wrap(SearchUsers(client)))
 	mux.Handle("/search-persons", wrap(SearchDonors(client)))
 	mux.Handle("/search-postcode", wrap(SearchPostcode(client)))

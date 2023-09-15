@@ -8,8 +8,9 @@ import (
 type CaseType string
 
 const (
-	CaseTypeLpa = CaseType("lpa")
-	CaseTypeEpa = CaseType("epa")
+	CaseTypeLpa        = CaseType("lpa")
+	CaseTypeEpa        = CaseType("epa")
+	CaseTypeDigitalLpa = CaseType("digital_lpa")
 )
 
 func ParseCaseType(s string) (CaseType, error) {
@@ -18,6 +19,8 @@ func ParseCaseType(s string) (CaseType, error) {
 		return CaseTypeLpa, nil
 	case "epa":
 		return CaseTypeEpa, nil
+	case "digital_lpa":
+		return CaseTypeDigitalLpa, nil
 	}
 
 	return CaseType(""), errors.New("could not parse case type")

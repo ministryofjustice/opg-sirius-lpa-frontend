@@ -21,6 +21,11 @@ func (m *mockEditDocumentClient) Case(ctx sirius.Context, id int) (sirius.Case, 
 	return args.Get(0).(sirius.Case), args.Error(1)
 }
 
+func (m *mockEditDocumentClient) DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error) {
+	args := m.Called(ctx, uid)
+	return args.Get(0).(sirius.DigitalLpa), args.Error(1)
+}
+
 func (m *mockEditDocumentClient) Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docType string) ([]sirius.Document, error) {
 	args := m.Called(ctx, caseType, caseId, docType)
 	return args.Get(0).([]sirius.Document), args.Error(1)
@@ -52,7 +57,7 @@ func (m *mockEditDocumentClient) DocumentTemplates(ctx sirius.Context, caseType 
 }
 
 func TestGetEditDocument(t *testing.T) {
-	for _, caseType := range []string{"lpa", "epa"} {
+	for _, caseType := range []string{"lpa", "epa", "digital_lpa"} {
 		t.Run(caseType, func(t *testing.T) {
 			caseItem := sirius.Case{CaseType: caseType, UID: "7000"}
 
@@ -89,13 +94,25 @@ func TestGetEditDocument(t *testing.T) {
 				Return(documentTemplates, nil)
 
 			template := &mockTemplate{}
+			templateData := editDocumentData{
+				Case:       caseItem,
+				Documents:  documents,
+				Document:   document,
+				UsesNotify: true,
+			}
+
+			if caseType == "digital_lpa" {
+				lpa := sirius.DigitalLpa{}
+
+				client.
+					On("DigitalLpa", mock.Anything, "7000").
+					Return(lpa, nil)
+
+				templateData.Lpa = lpa
+			}
+
 			template.
-				On("Func", mock.Anything, editDocumentData{
-					Case:       caseItem,
-					Documents:  documents,
-					Document:   document,
-					UsesNotify: true,
-				}).
+				On("Func", mock.Anything, templateData).
 				Return(nil)
 
 			r, _ := http.NewRequest(http.MethodGet, "/?id=123&case="+caseType, nil)
@@ -112,7 +129,7 @@ func TestGetEditDocument(t *testing.T) {
 }
 
 func TestPostSaveDocument(t *testing.T) {
-	for _, caseType := range []string{"lpa", "epa"} {
+	for _, caseType := range []string{"lpa", "epa", "digital_lpa"} {
 		t.Run(caseType, func(t *testing.T) {
 			caseItem := sirius.Case{CaseType: caseType, UID: "7000"}
 
@@ -142,12 +159,24 @@ func TestPostSaveDocument(t *testing.T) {
 				Return([]sirius.DocumentTemplateData{}, nil)
 
 			template := &mockTemplate{}
+			templateData := editDocumentData{
+				Case:      caseItem,
+				Documents: documents,
+				Document:  document,
+			}
+
+			if caseType == "digital_lpa" {
+				lpa := sirius.DigitalLpa{}
+
+				client.
+					On("DigitalLpa", mock.Anything, "7000").
+					Return(lpa, nil)
+
+				templateData.Lpa = lpa
+			}
+
 			template.
-				On("Func", mock.Anything, editDocumentData{
-					Case:      caseItem,
-					Documents: documents,
-					Document:  document,
-				}).
+				On("Func", mock.Anything, templateData).
 				Return(nil)
 
 			form := url.Values{
@@ -173,144 +202,166 @@ func TestPostSaveDocument(t *testing.T) {
 }
 
 func TestPostDeleteDocument(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "lpa", UID: "700700"}
+	for _, caseType := range []string{"lpa", "epa", "digital_lpa"} {
+		t.Run(caseType, func(t *testing.T) {
+			caseItem := sirius.Case{CaseType: caseType, UID: "700700"}
 
-	document := sirius.Document{
-		ID:      1,
-		UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-		Type:    sirius.TypeDraft,
-		Content: "Test content",
+			document := sirius.Document{
+				ID:      1,
+				UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+				Type:    sirius.TypeDraft,
+				Content: "Test content",
+			}
+
+			documents := []sirius.Document{
+				document,
+				{
+					ID:      2,
+					UUID:    "efef6714-b4fe-44c2-b26e-90dfe3663e96",
+					Type:    sirius.TypeDraft,
+					Content: "Some more content",
+				},
+			}
+
+			client := &mockEditDocumentClient{}
+			client.
+				On("Case", mock.Anything, 123).
+				Return(caseItem, nil)
+			client.
+				On("DeleteDocument", mock.Anything, document.UUID).
+				Return(nil)
+
+			template := &mockTemplate{}
+			expectedError = nil
+
+			if caseType == "digital_lpa" {
+				expectedError = RedirectError("/lpa/700700/documents")
+			} else {
+				client.
+					On("Documents", mock.Anything, sirius.CaseType(caseType), 123, sirius.TypeDraft).
+					Return(documents, nil)
+				client.
+					On("DocumentByUUID", mock.Anything, document.UUID).
+					Return(document, nil)
+				client.
+					On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
+					Return([]sirius.DocumentTemplateData{}, nil)
+
+				template.
+					On("Func", mock.Anything, editDocumentData{
+						Case:      caseItem,
+						Documents: documents,
+						Document:  document,
+					}).
+					Return(nil)
+			}
+
+			form := url.Values{
+				"id":                 {"123"},
+				"case":               {caseType},
+				"documentControls":   {"delete"},
+				"documentTextEditor": {"Test content"},
+				"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := EditDocument(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Equal(t, expectedError, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
 	}
-
-	documents := []sirius.Document{
-		document,
-		{
-			ID:      2,
-			UUID:    "efef6714-b4fe-44c2-b26e-90dfe3663e96",
-			Type:    sirius.TypeDraft,
-			Content: "Some more content",
-		},
-	}
-
-	client := &mockEditDocumentClient{}
-	client.
-		On("Case", mock.Anything, 123).
-		Return(caseItem, nil)
-	client.
-		On("Documents", mock.Anything, sirius.CaseType("lpa"), 123, sirius.TypeDraft).
-		Return(documents, nil)
-	client.
-		On("DocumentByUUID", mock.Anything, document.UUID).
-		Return(document, nil)
-	client.
-		On("DeleteDocument", mock.Anything, document.UUID).
-		Return(nil)
-	client.
-		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
-		Return([]sirius.DocumentTemplateData{}, nil)
-
-	template := &mockTemplate{}
-
-	template.
-		On("Func", mock.Anything, editDocumentData{
-			Case:      caseItem,
-			Documents: documents,
-			Document:  document,
-		}).
-		Return(nil)
-
-	form := url.Values{
-		"id":                 {"123"},
-		"case":               {"lpa"},
-		"documentControls":   {"delete"},
-		"documentTextEditor": {"Test content"},
-		"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
-	}
-
-	r, _ := http.NewRequest(http.MethodPost, "/?id=123&case=lpa", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := EditDocument(client, template.Func)(w, r)
-	resp := w.Result()
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestPostPublishDocument(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "lpa", UID: "700700"}
+	for _, caseType := range []string{"lpa", "epa", "digital_lpa"} {
+		t.Run(caseType, func(t *testing.T) {
+			caseItem := sirius.Case{CaseType: caseType, UID: "700700"}
 
-	document := sirius.Document{
-		ID:      1,
-		UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-		Type:    sirius.TypeDraft,
-		Content: "Test content",
+			document := sirius.Document{
+				ID:      1,
+				UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+				Type:    sirius.TypeDraft,
+				Content: "Test content",
+			}
+
+			documents := []sirius.Document{
+				document,
+			}
+
+			publishedDocument := sirius.Document{
+				ID:      1,
+				UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+				Type:    sirius.TypeSave,
+				Content: "Test content",
+			}
+			client := &mockEditDocumentClient{}
+			client.
+				On("EditDocument", mock.Anything, document.UUID, "Test content").
+				Return(document, nil)
+			client.
+				On("DocumentByUUID", mock.Anything, document.UUID).
+				Return(document, nil)
+			client.
+				On("AddDocument", mock.Anything, 123, document, sirius.TypeSave).
+				Return(publishedDocument, nil)
+			client.
+				On("DeleteDocument", mock.Anything, document.UUID).
+				Return(nil)
+			client.
+				On("Case", mock.Anything, 123).
+				Return(caseItem, nil)
+
+			template := &mockTemplate{}
+			expectedError = nil
+
+			if caseType == "digital_lpa" {
+				expectedError = RedirectError("/lpa/700700/documents")
+			} else {
+				client.
+					On("Documents", mock.Anything, sirius.CaseType(caseType), 123, sirius.TypeDraft).
+					Return(documents, nil)
+				client.
+					On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
+					Return([]sirius.DocumentTemplateData{}, nil)
+
+				template.
+					On("Func", mock.Anything, editDocumentData{
+						Case:      caseItem,
+						Documents: documents,
+						Document:  document,
+						Success:   true,
+					}).
+					Return(nil)
+
+			}
+
+			form := url.Values{
+				"id":                 {"123"},
+				"case":               {caseType},
+				"documentControls":   {"publish"},
+				"documentTextEditor": {"Test content"},
+				"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := EditDocument(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Equal(t, expectedError, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
 	}
-
-	documents := []sirius.Document{
-		document,
-	}
-
-	publishedDocument := sirius.Document{
-		ID:      1,
-		UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-		Type:    sirius.TypeSave,
-		Content: "Test content",
-	}
-	client := &mockEditDocumentClient{}
-	client.
-		On("EditDocument", mock.Anything, document.UUID, "Test content").
-		Return(document, nil)
-	client.
-		On("DocumentByUUID", mock.Anything, document.UUID).
-		Return(document, nil)
-	client.
-		On("AddDocument", mock.Anything, 123, document, sirius.TypeSave).
-		Return(publishedDocument, nil)
-	client.
-		On("DeleteDocument", mock.Anything, document.UUID).
-		Return(nil)
-	client.
-		On("Case", mock.Anything, 123).
-		Return(caseItem, nil)
-	client.
-		On("Documents", mock.Anything, sirius.CaseType("lpa"), 123, sirius.TypeDraft).
-		Return(documents, nil)
-	client.
-		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
-		Return([]sirius.DocumentTemplateData{}, nil)
-
-	template := &mockTemplate{}
-
-	template.
-		On("Func", mock.Anything, editDocumentData{
-			Case:      caseItem,
-			Documents: documents,
-			Document:  document,
-			Success:   true,
-		}).
-		Return(nil)
-
-	form := url.Values{
-		"id":                 {"123"},
-		"case":               {"lpa"},
-		"documentControls":   {"publish"},
-		"documentTextEditor": {"Test content"},
-		"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
-	}
-
-	r, _ := http.NewRequest(http.MethodPost, "/?id=123&case=lpa", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := EditDocument(client, template.Func)(w, r)
-	resp := w.Result()
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestPostPreviewDocument(t *testing.T) {
@@ -387,7 +438,7 @@ func TestPostPreviewDocument(t *testing.T) {
 }
 
 func TestPostSaveDocumentAndExit(t *testing.T) {
-	for _, caseType := range []string{"lpa", "epa"} {
+	for _, caseType := range []string{"lpa", "epa", "digital_lpa"} {
 		t.Run(caseType, func(t *testing.T) {
 			document := sirius.Document{
 				ID:      1,
