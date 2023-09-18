@@ -43,6 +43,7 @@ func TestSearch(t *testing.T) {
 							"personTypes": AllPersonTypes,
 							"size":        PageLimit,
 							"from":        0,
+							"indices":     []string{"person", "firm"},
 						},
 					}).
 					WillRespondWith(dsl.Response{
@@ -132,6 +133,7 @@ func TestSearch(t *testing.T) {
 							"personTypes": AllPersonTypes,
 							"size":        PageLimit,
 							"from":        0,
+							"indices":     []string{"person", "firm"},
 						},
 					}).
 					WillRespondWith(dsl.Response{
@@ -165,7 +167,7 @@ func TestSearch(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				results, pagination, err := client.Search(Context{Context: context.Background()}, tc.searchTerm, 1, AllPersonTypes)
+				results, pagination, err := client.Search(Context{Context: context.Background()}, tc.searchTerm, 1, AllPersonTypes, []string{"person", "firm"})
 				assert.Equal(t, tc.expectedResponse, results)
 				assert.Equal(t, tc.expectedPagination, pagination)
 				if tc.expectedError == nil {
