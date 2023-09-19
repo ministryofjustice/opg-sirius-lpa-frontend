@@ -37,6 +37,7 @@ func TestSearchDonors(t *testing.T) {
 							"personTypes": []string{"Donor"},
 							"size":        PageLimit,
 							"from":        0,
+							"indices":     []string{"person"},
 						},
 					}).
 					WillRespondWith(dsl.Response{
