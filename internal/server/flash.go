@@ -53,7 +53,7 @@ func GetFlash(w http.ResponseWriter, r *http.Request) (FlashNotification, error)
 		return FlashNotification{}, err
 	}
 
-	dc := &http.Cookie{Name: flashCookieName, MaxAge: -1, Expires: time.Unix(1, 0), Path: "/",}
+	dc := &http.Cookie{Name: flashCookieName, MaxAge: -1, Expires: time.Unix(1, 0), Path: "/"}
 
 	http.SetCookie(w, dc)
 	return v, nil

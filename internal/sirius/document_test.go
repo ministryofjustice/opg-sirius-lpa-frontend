@@ -18,17 +18,69 @@ func TestDocument(t *testing.T) {
 
 	testCases := []struct {
 		name             string
+		caseType         CaseType
 		setup            func()
 		expectedError    func(int) error
 		expectedResponse []Document
 	}{
 		{
-			name: "OK",
+			name: "LPA",
+			caseType: CaseTypeLpa,
 			setup: func() {
 				pact.
 					AddInteraction().
 					Given("I have an lpa with a draft document").
 					UponReceiving("A request for the documents by case").
+					WithRequest(dsl.Request{
+						Method: http.MethodGet,
+						Path:   dsl.String("/lpa-api/v1/lpas/800/documents"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusOK,
+						Body: dsl.EachLike(map[string]interface{}{
+							"id":                  dsl.Like(1),
+							"uuid":                dsl.String("dfef6714-b4fe-44c2-b26e-90dfe3663e95"),
+							"type":                dsl.String("Draft"),
+							"friendlyDescription": dsl.String("Dr Consuela Aysien - LPA perfect + reg due date: applicant"),
+							"createdDate":         dsl.String(`15/12/2022 13:41:04`),
+							"direction":           dsl.String("Outgoing"),
+							"filename":            dsl.String("LP-A.pdf"),
+							"mimeType":            dsl.String(`application\/pdf`),
+							"correspondent": dsl.Like(map[string]interface{}{
+								"id":        dsl.Like(189),
+								"firstname": dsl.String("Consuela"),
+								"surname":   dsl.String("Aysien"),
+							}),
+							"childCount": dsl.Like(0),
+							"systemType": dsl.String("LP-A"),
+						}, 1),
+						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					})
+			},
+			expectedResponse: []Document{
+				{
+					ID:                  1,
+					UUID:                "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+					Type:                "Draft",
+					FriendlyDescription: "Dr Consuela Aysien - LPA perfect + reg due date: applicant",
+					CreatedDate:         `15/12/2022 13:41:04`,
+					Direction:           "Outgoing",
+					MimeType:            `application\/pdf`,
+					SystemType:          "LP-A",
+					FileName:            "LP-A.pdf",
+					Correspondent:       Person{ID: 189, Firstname: "Consuela", Surname: "Aysien"},
+					ChildCount:          0,
+				},
+			},
+		},
+		{
+			name: "Digital LPA",
+			caseType: CaseTypeDigitalLpa,
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have an lpa with a draft document").
+					UponReceiving("A request for the documents for a digital LPA").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/lpas/800/documents"),
@@ -80,7 +132,7 @@ func TestDocument(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				documents, err := client.Documents(Context{Context: context.Background()}, CaseTypeLpa, 800, TypeDraft)
+				documents, err := client.Documents(Context{Context: context.Background()}, tc.caseType, 800, TypeDraft)
 
 				assert.Equal(t, tc.expectedResponse, documents)
 				if tc.expectedError == nil {
