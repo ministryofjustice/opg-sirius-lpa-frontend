@@ -34,7 +34,7 @@ func TestSearch(t *testing.T) {
 					UponReceiving("A search request for a donor not related to a case").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/search/persons"),
+						Path:   dsl.String("/lpa-api/v1/search/searchAll"),
 						Headers: dsl.MapMatcher{
 							"Content-Type": dsl.String("application/json"),
 						},
@@ -124,7 +124,7 @@ func TestSearch(t *testing.T) {
 					UponReceiving("A search request for the deleted case uid").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/search/persons"),
+						Path:   dsl.String("/lpa-api/v1/search/searchAll"),
 						Headers: dsl.MapMatcher{
 							"Content-Type": dsl.String("application/json"),
 						},

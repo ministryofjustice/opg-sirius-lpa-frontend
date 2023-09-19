@@ -31,7 +31,7 @@ func TestSearchDonors(t *testing.T) {
 					UponReceiving("A search for donors").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/search/persons"),
+						Path:   dsl.String("/lpa-api/v1/search/searchAll"),
 						Body: map[string]interface{}{
 							"term":        "7000-0000-0003",
 							"personTypes": []string{"Donor"},

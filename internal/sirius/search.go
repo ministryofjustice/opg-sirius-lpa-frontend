@@ -65,7 +65,7 @@ func (c *Client) Search(ctx Context, term string, page int, personTypeFilters []
 		return v, nil, err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPost, "/lpa-api/v1/search/persons", bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPost, "/lpa-api/v1/search/searchAll", bytes.NewReader(data))
 	if err != nil {
 		return v, nil, err
 	}
