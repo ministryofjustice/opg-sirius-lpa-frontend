@@ -110,7 +110,7 @@
     {
       "request": {
         "method": "GET",
-        "url": "/lpa-api/v1/lpas/800/documents?type[]=Save"
+        "url": "/lpa-api/v1/lpas/800/documents?type[-][]=Draft&type[-][]=Preview"
       },
       "response": {
         "status": 200,
