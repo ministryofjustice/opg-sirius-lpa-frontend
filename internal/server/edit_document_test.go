@@ -26,8 +26,8 @@ func (m *mockEditDocumentClient) DigitalLpa(ctx sirius.Context, uid string) (sir
 	return args.Get(0).(sirius.DigitalLpa), args.Error(1)
 }
 
-func (m *mockEditDocumentClient) Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docType string) ([]sirius.Document, error) {
-	args := m.Called(ctx, caseType, caseId, docType)
+func (m *mockEditDocumentClient) Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docTypes []string, notDocTypes []string) ([]sirius.Document, error) {
+	args := m.Called(ctx, caseType, caseId, docTypes, notDocTypes)
 	return args.Get(0).([]sirius.Document), args.Error(1)
 }
 
@@ -84,7 +84,7 @@ func TestGetEditDocument(t *testing.T) {
 				On("Case", mock.Anything, 123).
 				Return(caseItem, nil)
 			client.
-				On("Documents", mock.Anything, sirius.CaseType(caseType), 123, sirius.TypeDraft).
+				On("Documents", mock.Anything, sirius.CaseType(caseType), 123, []string{sirius.TypeDraft}, []string{}).
 				Return(documents, nil)
 			client.
 				On("DocumentByUUID", mock.Anything, document.UUID).
@@ -149,7 +149,7 @@ func TestPostSaveDocument(t *testing.T) {
 				On("Case", mock.Anything, 123).
 				Return(caseItem, nil)
 			client.
-				On("Documents", mock.Anything, sirius.CaseType(caseType), 123, sirius.TypeDraft).
+				On("Documents", mock.Anything, sirius.CaseType(caseType), 123, []string{sirius.TypeDraft}, []string{}).
 				Return(documents, nil)
 			client.
 				On("EditDocument", mock.Anything, document.UUID, "Edited test content").
@@ -238,7 +238,7 @@ func TestPostDeleteDocument(t *testing.T) {
 				expectedError = RedirectError("/lpa/700700/documents")
 			} else {
 				client.
-					On("Documents", mock.Anything, sirius.CaseType(caseType), 123, sirius.TypeDraft).
+					On("Documents", mock.Anything, sirius.CaseType(caseType), 123, []string{sirius.TypeDraft}, []string{}).
 					Return(documents, nil)
 				client.
 					On("DocumentByUUID", mock.Anything, document.UUID).
@@ -325,7 +325,7 @@ func TestPostPublishDocument(t *testing.T) {
 				expectedError = RedirectError("/lpa/700700/documents")
 			} else {
 				client.
-					On("Documents", mock.Anything, sirius.CaseType(caseType), 123, sirius.TypeDraft).
+					On("Documents", mock.Anything, sirius.CaseType(caseType), 123, []string{sirius.TypeDraft}, []string{}).
 					Return(documents, nil)
 				client.
 					On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
@@ -399,7 +399,7 @@ func TestPostPreviewDocument(t *testing.T) {
 		On("Case", mock.Anything, 123).
 		Return(caseItem, nil)
 	client.
-		On("Documents", mock.Anything, sirius.CaseType("lpa"), 123, sirius.TypeDraft).
+		On("Documents", mock.Anything, sirius.CaseType("lpa"), 123, []string{sirius.TypeDraft}, []string{}).
 		Return(documents, nil)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
@@ -506,7 +506,7 @@ func TestGetEditDocumentWhenCaseErrors(t *testing.T) {
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{}, expectedError)
 	client.
-		On("Documents", mock.Anything, sirius.CaseTypeLpa, 123, sirius.TypeDraft).
+		On("Documents", mock.Anything, sirius.CaseTypeLpa, 123, []string{sirius.TypeDraft}, []string{}).
 		Return([]sirius.Document{}, nil)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
@@ -529,7 +529,7 @@ func TestGetCreateDocumentWhenFailureOnDocuments(t *testing.T) {
 		On("Case", mock.Anything, 123).
 		Return(caseItem, nil)
 	client.
-		On("Documents", mock.Anything, sirius.CaseTypeLpa, 123, sirius.TypeDraft).
+		On("Documents", mock.Anything, sirius.CaseTypeLpa, 123, []string{sirius.TypeDraft}, []string{}).
 		Return([]sirius.Document{}, expectedError)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
@@ -562,7 +562,7 @@ func TestGetCreateDocumentWhenFailureOnDocumentByUUID(t *testing.T) {
 		On("Case", mock.Anything, 123).
 		Return(caseItem, nil)
 	client.
-		On("Documents", mock.Anything, sirius.CaseTypeLpa, 123, sirius.TypeDraft).
+		On("Documents", mock.Anything, sirius.CaseTypeLpa, 123, []string{sirius.TypeDraft}, []string{}).
 		Return(documents, nil)
 	client.
 		On("DocumentByUUID", mock.Anything, "dfef6714-b4fe-44c2-b26e-90dfe3663e95").
@@ -598,7 +598,7 @@ func TestGetEditDocumentWhenTemplateErrors(t *testing.T) {
 		On("Case", mock.Anything, 123).
 		Return(caseItem, nil)
 	client.
-		On("Documents", mock.Anything, sirius.CaseTypeLpa, 123, sirius.TypeDraft).
+		On("Documents", mock.Anything, sirius.CaseTypeLpa, 123, []string{sirius.TypeDraft}, []string{}).
 		Return(documents, nil)
 	client.
 		On("DocumentByUUID", mock.Anything, "dfef6714-b4fe-44c2-b26e-90dfe3663e95").
