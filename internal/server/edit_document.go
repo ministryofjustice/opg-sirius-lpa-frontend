@@ -11,7 +11,7 @@ import (
 )
 
 type EditDocumentClient interface {
-	Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docType string) ([]sirius.Document, error)
+	Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docTypes []string, notDocTypes []string) ([]sirius.Document, error)
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
 	DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error)
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
@@ -78,7 +78,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 			})
 
 			group.Go(func() error {
-				documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID, sirius.TypeDraft)
+				documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID, []string{sirius.TypeDraft}, []string{})
 				if err != nil {
 					return err
 				}
@@ -231,7 +231,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				})
 
 				group.Go(func() error {
-					documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID, sirius.TypeDraft)
+					documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID, []string{sirius.TypeDraft}, []string{})
 					if err != nil {
 						return err
 					}

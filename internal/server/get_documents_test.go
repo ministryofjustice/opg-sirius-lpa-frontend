@@ -1,19 +1,20 @@
 package server
 
 import (
+	"net/http"
+	"testing"
+
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"net/http"
-	"testing"
 )
 
 type mockGetDocuments struct {
 	mock.Mock
 }
 
-func (m *mockGetDocuments) Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docType string) ([]sirius.Document, error) {
-	args := m.Called(ctx, caseType, caseId, docType)
+func (m *mockGetDocuments) Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docTypes []string, notDocTypes []string) ([]sirius.Document, error) {
+	args := m.Called(ctx, caseType, caseId, docTypes, notDocTypes)
 	return args.Get(0).([]sirius.Document), args.Error(1)
 }
 
@@ -43,7 +44,7 @@ func TestGetDocuments(t *testing.T) {
 		On("DigitalLpa", mock.Anything, "M-9876-9876-9876").
 		Return(digitalLpa, nil)
 	client.
-		On("Documents", mock.Anything, sirius.CaseType("lpa"), 1, sirius.TypeSave).
+		On("Documents", mock.Anything, sirius.CaseType("lpa"), 1, []string{}, []string{sirius.TypeDraft, sirius.TypePreview}).
 		Return(documents, nil)
 
 	template := &mockTemplate{}
@@ -91,7 +92,7 @@ func TestGetPaymentsWhenFailureOnGetDocuments(t *testing.T) {
 		On("DigitalLpa", mock.Anything, "M-9876-9876-9876").
 		Return(digitalLpa, nil)
 	client.
-		On("Documents", mock.Anything, sirius.CaseType("lpa"), 1, sirius.TypeSave).
+		On("Documents", mock.Anything, sirius.CaseType("lpa"), 1, []string{}, []string{sirius.TypeDraft, sirius.TypePreview}).
 		Return([]sirius.Document{}, expectedError)
 
 	server := newMockServer("/lpa/{uid}/documents", GetDocuments(client, nil))

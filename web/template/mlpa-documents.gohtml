@@ -62,17 +62,28 @@
                             </div>
                         </td>
                         <td class="govuk-table__cell">
-                            {{ if eq .Direction "Incoming" }}
-                                [IN]
-                            {{ else if  eq .Direction "Outgoing" }}
-                                [OUT]
-                            {{ else }}
-                                [INT]
-                            {{ end }}
-                            {{ .Correspondent.PersonType }}, {{ .Correspondent.Firstname }} {{.Correspondent.Surname }}
-                            <br><a class="govuk-link" href="#">{{ .FriendlyDescription }}</a>
+                            <strong>
+                                {{ if eq .Direction "Incoming" }}
+                                    [IN]
+                                {{ else if eq .Direction "Outgoing" }}
+                                    [OUT] {{ .Correspondent.PersonType }}, {{ .Correspondent.Firstname }} {{.Correspondent.Surname }}
+                                {{ else }}
+                                    [INT]
+                                {{ end }}
+                            </strong>
+                            <br>
+                            <a class="govuk-link" href="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .UUID) }}" target="_blank">
+                                {{ .FriendlyDescription }}
+                            </a>
                         </td>
-                        <td class="govuk-table__cell">{{ .SystemType }}</td>
+                        <td class="govuk-table__cell">
+                            {{ if eq .Direction "Incoming" }}
+                                {{ .Type }}
+                                {{ if .SubType }}<br />&ndash; {{ .SubType }}{{ end }}
+                            {{ else if eq .Direction "Outgoing" }}
+                                {{ .SystemType }}
+                            {{ end }}
+                        </td>
                         <td class="govuk-table__cell">{{ (formatDateWithTime .CreatedDate "2 January 2006") }}</td>
                     </tr>
                 {{ end }}

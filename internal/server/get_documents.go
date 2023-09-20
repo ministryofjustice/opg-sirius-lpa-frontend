@@ -11,7 +11,7 @@ import (
 
 type GetDocumentsClient interface {
 	DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error)
-	Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docType string) ([]sirius.Document, error)
+	Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docTypes []string, notDocTypes []string) ([]sirius.Document, error)
 }
 
 type getDocumentsData struct {
@@ -31,7 +31,7 @@ func GetDocuments(client GetDocumentsClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		documents, err := client.Documents(ctx, "lpa", lpa.ID, sirius.TypeSave)
+		documents, err := client.Documents(ctx, "lpa", lpa.ID, []string{}, []string{sirius.TypeDraft, sirius.TypePreview})
 		if err != nil {
 			return err
 		}

@@ -3,6 +3,7 @@ package sirius
 import (
 	"fmt"
 	"sort"
+	"strings"
 )
 
 type Document struct {
@@ -14,6 +15,7 @@ type Document struct {
 	Direction           string `json:"direction"`
 	MimeType            string `json:"mimeType"`
 	SystemType          string `json:"systemType"`
+	SubType             string `json:"subType"`
 	FileName            string `json:"fileName,omitempty"`
 	Content             string `json:"content,omitempty"`
 	Correspondent       Person `json:"correspondent"`
@@ -27,14 +29,24 @@ const (
 	TypeSave    string = "Save"
 )
 
-func (c *Client) Documents(ctx Context, caseType CaseType, caseId int, docType string) ([]Document, error) {
+func (c *Client) Documents(ctx Context, caseType CaseType, caseId int, docTypes []string, notDocTypes []string) ([]Document, error) {
 	var d []Document
 
 	if caseType == CaseTypeDigitalLpa {
 		caseType = CaseTypeLpa
 	}
 
-	url := fmt.Sprintf("/lpa-api/v1/%s/%d/documents?type[]=%s", caseType+"s", caseId, docType)
+	query := ""
+
+	for _, docType := range docTypes {
+		query = query + "&type[]=" + docType
+	}
+
+	for _, docType := range notDocTypes {
+		query = query + "&type[-][]=" + docType
+	}
+
+	url := fmt.Sprintf("/lpa-api/v1/%s/%d/documents?%s", caseType+"s", caseId, strings.Trim(query, "&"))
 
 	err := c.get(ctx, url, &d)
 	if err != nil {

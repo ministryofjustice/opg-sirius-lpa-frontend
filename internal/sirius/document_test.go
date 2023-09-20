@@ -24,7 +24,7 @@ func TestDocument(t *testing.T) {
 		expectedResponse []Document
 	}{
 		{
-			name: "LPA",
+			name:     "LPA",
 			caseType: CaseTypeLpa,
 			setup: func() {
 				pact.
@@ -34,6 +34,10 @@ func TestDocument(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/lpas/800/documents"),
+						Query: dsl.MapMatcher{
+							"type[]":    dsl.EachLike("Draft", 1),
+							"type[-][]": dsl.EachLike("Preview", 1),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
@@ -74,7 +78,7 @@ func TestDocument(t *testing.T) {
 			},
 		},
 		{
-			name: "Digital LPA",
+			name:     "Digital LPA",
 			caseType: CaseTypeDigitalLpa,
 			setup: func() {
 				pact.
@@ -84,6 +88,10 @@ func TestDocument(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/lpas/800/documents"),
+						Query: dsl.MapMatcher{
+							"type[]":    dsl.EachLike("Draft", 1),
+							"type[-][]": dsl.EachLike("Preview", 1),
+						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
@@ -132,7 +140,7 @@ func TestDocument(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				documents, err := client.Documents(Context{Context: context.Background()}, tc.caseType, 800, TypeDraft)
+				documents, err := client.Documents(Context{Context: context.Background()}, tc.caseType, 800, []string{TypeDraft}, []string{TypePreview})
 
 				assert.Equal(t, tc.expectedResponse, documents)
 				if tc.expectedError == nil {
