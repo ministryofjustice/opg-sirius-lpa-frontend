@@ -1,6 +1,6 @@
 describe("Create a relationship", () => {
   beforeEach(() => {
-    cy.addMock("/lpa-api/v1/search/persons", "POST", {
+    cy.addMock("/lpa-api/v1/search/searchAll", "POST", {
       status: 200,
       body: {
         aggregations: {

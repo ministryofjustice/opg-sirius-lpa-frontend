@@ -1,7 +1,7 @@
 describe("Search", () => {
   describe("Searching by name", () => {
     beforeEach(() => {
-      cy.addMock("/lpa-api/v1/search/persons", "POST", {
+      cy.addMock("/lpa-api/v1/search/searchAll", "POST", {
         status: 200,
         body: {
           aggregations: {
@@ -124,6 +124,15 @@ describe("Search", () => {
 
   describe("Search features", () => {
     beforeEach(() => {
+      cy.addMock("/lpa-api/v1/search/searchAll", "POST", {
+        status: 200,
+        body: {
+          total: {
+            count: 0,
+          },
+        },
+      });
+
       cy.visit("/search?term=abcdefg");
     });
 
@@ -152,7 +161,7 @@ describe("Search", () => {
 
   describe("Search deleted case", () => {
     beforeEach(() => {
-      cy.addMock("/lpa-api/v1/search/persons", "POST", {
+      cy.addMock("/lpa-api/v1/search/searchAll", "POST", {
         status: 200,
         body: {
           total: {
