@@ -14,6 +14,7 @@ type searchRequest struct {
 	PersonTypes []string `json:"personTypes"`
 	Limit       int      `json:"size"`
 	From        int      `json:"from"`
+	Indices     []string `json:"indices"`
 }
 
 type Aggregations struct {
@@ -42,7 +43,7 @@ var AllPersonTypes = []string{
 	"Correspondent",
 }
 
-func (c *Client) Search(ctx Context, term string, page int, personTypeFilters []string) (SearchResponse, *Pagination, error) {
+func (c *Client) Search(ctx Context, term string, page int, personTypeFilters []string, indices []string) (SearchResponse, *Pagination, error) {
 	var v SearchResponse
 	if len(term) < 3 {
 		err := ValidationError{
@@ -59,12 +60,12 @@ func (c *Client) Search(ctx Context, term string, page int, personTypeFilters []
 		personTypeFilters = AllPersonTypes
 	}
 
-	data, err := json.Marshal(searchRequest{Term: term, PersonTypes: personTypeFilters, Limit: PageLimit, From: PageLimit * (page - 1)})
+	data, err := json.Marshal(searchRequest{Term: term, PersonTypes: personTypeFilters, Limit: PageLimit, From: PageLimit * (page - 1), Indices: indices})
 	if err != nil {
 		return v, nil, err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPost, "/lpa-api/v1/search/persons", bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPost, "/lpa-api/v1/search/searchAll", bytes.NewReader(data))
 	if err != nil {
 		return v, nil, err
 	}

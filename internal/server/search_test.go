@@ -13,8 +13,8 @@ type mockSearchClient struct {
 	mock.Mock
 }
 
-func (m *mockSearchClient) Search(ctx sirius.Context, term string, page int, personTypeFilters []string) (sirius.SearchResponse, *sirius.Pagination, error) {
-	args := m.Called(ctx, term, page, personTypeFilters)
+func (m *mockSearchClient) Search(ctx sirius.Context, term string, page int, personTypeFilters []string, indices []string) (sirius.SearchResponse, *sirius.Pagination, error) {
+	args := m.Called(ctx, term, page, personTypeFilters, indices)
 	if v, ok := args.Get(1).(*sirius.Pagination); ok {
 		return args.Get(0).(sirius.SearchResponse), v, args.Error(2)
 	}
@@ -50,7 +50,7 @@ func TestGetSearch(t *testing.T) {
 
 	client := &mockSearchClient{}
 	client.
-		On("Search", mock.Anything, "bob", 1, noFilters).
+		On("Search", mock.Anything, "bob", 1, noFilters, []string{"person"}).
 		Return(expectedResponse, expectedPagination, nil)
 
 	template := &mockTemplate{}
@@ -101,7 +101,7 @@ func TestGetSearchFiltered(t *testing.T) {
 
 	client := &mockSearchClient{}
 	client.
-		On("Search", mock.Anything, "bob", 1, filters).
+		On("Search", mock.Anything, "bob", 1, filters, []string{"person"}).
 		Return(expectedResponse, expectedPagination, nil)
 
 	template := &mockTemplate{}
@@ -157,7 +157,7 @@ func TestGetSearchPaginationCalculations(t *testing.T) {
 
 	client := &mockSearchClient{}
 	client.
-		On("Search", mock.Anything, "bob", 2, noFilters).
+		On("Search", mock.Anything, "bob", 2, noFilters, []string{"person"}).
 		Return(expectedResponse, expectedPagination, nil)
 
 	template := &mockTemplate{}
@@ -209,7 +209,7 @@ func TestGetSearchCallsDeletedCasesOnFallback(t *testing.T) {
 
 	client := &mockSearchClient{}
 	client.
-		On("Search", mock.Anything, "7000-0000-5678", 1, noFilters).
+		On("Search", mock.Anything, "7000-0000-5678", 1, noFilters, []string{"person"}).
 		Return(expectedResponse, expectedPagination, nil).
 		On("DeletedCases", mock.Anything, "700000005678").
 		Return(expectedDeletedCases, nil)
@@ -253,7 +253,7 @@ func TestGetSearchGetDeletedCasesFailure(t *testing.T) {
 
 	client := &mockSearchClient{}
 	client.
-		On("Search", mock.Anything, "7000-0000-5678", 1, noFilters).
+		On("Search", mock.Anything, "7000-0000-5678", 1, noFilters, []string{"person"}).
 		Return(expectedResponse, expectedPagination, nil).
 		On("DeletedCases", mock.Anything, "700000005678").
 		Return([]sirius.DeletedCase{}, expectedError)
@@ -290,7 +290,7 @@ func TestGetSearchErrors(t *testing.T) {
 
 	client := &mockSearchClient{}
 	client.
-		On("Search", mock.Anything, "bob", 1, filters).
+		On("Search", mock.Anything, "bob", 1, filters, []string{"person"}).
 		Return(sirius.SearchResponse{}, &sirius.Pagination{}, expectedError)
 
 	req, _ := http.NewRequest(http.MethodGet, "/search?term=bob", nil)
@@ -322,7 +322,7 @@ func TestGetSearchTemplateErrors(t *testing.T) {
 
 	client := &mockSearchClient{}
 	client.
-		On("Search", mock.Anything, "bob", 1, noFilters).
+		On("Search", mock.Anything, "bob", 1, noFilters, []string{"person"}).
 		Return(expectedResponse, expectedPagination, nil)
 
 	template := &mockTemplate{}

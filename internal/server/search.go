@@ -11,7 +11,7 @@ import (
 )
 
 type SearchClient interface {
-	Search(ctx sirius.Context, term string, page int, personTypeFilters []string) (sirius.SearchResponse, *sirius.Pagination, error)
+	Search(ctx sirius.Context, term string, page int, personTypeFilters []string, indices []string) (sirius.SearchResponse, *sirius.Pagination, error)
 	DeletedCases(ctx sirius.Context, uid string) ([]sirius.DeletedCase, error)
 }
 
@@ -77,7 +77,7 @@ func Search(client SearchClient, tmpl template.Template) Handler {
 			Filters:    filters,
 		}
 
-		results, pagination, err := client.Search(ctx, searchTerm, getPage(r), filters.PersonType)
+		results, pagination, err := client.Search(ctx, searchTerm, getPage(r), filters.PersonType, []string{"person"})
 		if err != nil {
 			return err
 		}
