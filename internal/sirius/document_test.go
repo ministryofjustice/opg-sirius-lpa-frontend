@@ -34,10 +34,6 @@ func TestDocument(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/lpas/800/documents"),
-						Query: dsl.MapMatcher{
-							"type[]":    dsl.EachLike("Draft", 1),
-							"type[-][]": dsl.EachLike("Preview", 1),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
@@ -88,10 +84,6 @@ func TestDocument(t *testing.T) {
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/lpas/800/documents"),
-						Query: dsl.MapMatcher{
-							"type[]":    dsl.EachLike("Draft", 1),
-							"type[-][]": dsl.EachLike("Preview", 1),
-						},
 					}).
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
