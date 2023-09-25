@@ -16,6 +16,8 @@ import (
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Logger interface {
@@ -88,6 +90,8 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 
 	mux := chi.NewRouter()
 
+	mux.Use(attachTargetMiddleware)
+
 	mux.Handle("/", http.NotFoundHandler())
 	mux.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {})
 
@@ -137,6 +141,16 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	muxWithHeaders := securityheaders.Use(setCSPHeader(mux))
 
 	return otelhttp.NewHandler(http.StripPrefix(prefix, muxWithHeaders), "lpa-frontend")
+}
+
+func attachTargetMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		trace.SpanFromContext(r.Context()).SetAttributes(
+			attribute.String("http.target", r.URL.Path),
+		)
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 type Handler func(w http.ResponseWriter, r *http.Request) error
