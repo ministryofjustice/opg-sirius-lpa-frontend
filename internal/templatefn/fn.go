@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/url"
+	"sort"
 	"strings"
 	"time"
 
@@ -97,7 +98,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "turquoise"
 			case "pending":
 				return "blue"
-			case "payment pending", "reduced fees pending":
+			case "payment pending", "reduced fees pending", "draft":
 				return "purple"
 			case "cancelled", "rejected", "revoked", "withdrawn", "return - unpaid", "deleted":
 				return "red"
@@ -134,14 +135,32 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 }
 
 type CaseTabData struct {
-	Lpa     sirius.DigitalLpa
-	TabName string
+	Lpa               sirius.DigitalLpa
+	SortedLinkedCases []linkedCase
+	TabName           string
+}
+
+type linkedCase struct {
+	UID     string
+	Subtype string
 }
 
 func caseTab(lpa sirius.DigitalLpa, tabName string) CaseTabData {
+	var linkedCases []linkedCase
+	linkedCases = append(linkedCases, linkedCase{lpa.UID, lpa.Subtype})
+
+	for _, linkedLpa := range lpa.LinkedCases {
+		linkedCases = append(linkedCases, linkedCase{linkedLpa.UID, linkedLpa.Subtype})
+	}
+
+	sort.Slice(linkedCases, func(i, j int) bool {
+		return linkedCases[i].UID < linkedCases[j].UID
+	})
+
 	return CaseTabData{
-		Lpa:     lpa,
-		TabName: tabName,
+		Lpa:               lpa,
+		SortedLinkedCases: linkedCases,
+		TabName:           tabName,
 	}
 }
 
