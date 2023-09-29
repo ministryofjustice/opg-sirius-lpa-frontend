@@ -5,41 +5,45 @@
     </span>
     <h1 class="govuk-heading-xl">{{ .Lpa.Application.DonorFirstNames }} {{ .Lpa.Application.DonorLastName }}</h1>
 
-    <div class="govuk-tabs">
-        <h2 class="govuk-tabs__title">
-            Contents
-        </h2>
-        <ul class="govuk-tabs__list">
-            <li class="govuk-tabs__list-item {{ if eq .TabName "summary" }}govuk-tabs__list-item--selected{{ end }}">
-                <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s" .Lpa.UID) }}">
-                    Summary
-                </a>
-            </li>
-            <li class="govuk-tabs__list-item {{ if eq .TabName "details" }}govuk-tabs__list-item--selected{{ end }}">
-                <a class="govuk-tabs__tab" href="#lpa-details">
-                    LPA details
-                </a>
-            </li>
-            <li class="govuk-tabs__list-item {{ if eq .TabName "issues" }}govuk-tabs__list-item--selected{{ end }}">
-                <a class="govuk-tabs__tab"  href="#issues">
-                    Issues
-                </a>
-            </li>
-            <li class="govuk-tabs__list-item {{ if eq .TabName "fees" }}govuk-tabs__list-item--selected{{ end }}">
-                <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s/payments" .Lpa.UID) }}">
-                    Fees
-                </a>
-            </li>
-            <li class="govuk-tabs__list-item {{ if eq .TabName "documents" }}govuk-tabs__list-item--selected{{ end }}">
-                <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s/documents" .Lpa.UID) }}">
-                    Documents
-                </a>
-            </li>
-            <li class="govuk-tabs__list-item {{ if eq .TabName "history" }}govuk-tabs__list-item--selected{{ end }}">
-                <a class="govuk-tabs__tab" href="#history">
-                    History
-                </a>
-            </li>
-        </ul>
+    <div class="case-management-navigation">
+        <div class="govuk-tabs">
+            <h2 class="govuk-tabs__title">
+                Contents
+            </h2>
+            <ul class="govuk-tabs__list">
+                <li class="govuk-tabs__list-item {{ if eq .TabName "summary" }}govuk-tabs__list-item--selected{{ end }}">
+                    <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s" .Lpa.UID) }}">
+                        Summary
+                    </a>
+                </li>
+                <li class="govuk-tabs__list-item {{ if eq .TabName "details" }}govuk-tabs__list-item--selected{{ end }}">
+                    <a class="govuk-tabs__tab" href="#lpa-details">
+                        LPA details
+                    </a>
+                </li>
+                <li class="govuk-tabs__list-item {{ if eq .TabName "issues" }}govuk-tabs__list-item--selected{{ end }}">
+                    <a class="govuk-tabs__tab"  href="#issues">
+                        Issues
+                    </a>
+                </li>
+                <li class="govuk-tabs__list-item {{ if eq .TabName "fees" }}govuk-tabs__list-item--selected{{ end }}">
+                    <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s/payments" .Lpa.UID) }}">
+                        Fees
+                    </a>
+                </li>
+                <li class="govuk-tabs__list-item {{ if eq .TabName "documents" }}govuk-tabs__list-item--selected{{ end }}">
+                    <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s/documents" .Lpa.UID) }}">
+                        Documents
+                    </a>
+                </li>
+
+                <div class="govuk-form-group govuk-!-text-align-right">
+                  <select class="govuk-select" id="case-actions" name="case-actions">
+                    <option value="create-warning">Create Warning</option>
+                    <option value="create-task" selected>Create Task</option>
+                  </select>
+                </div>
+            </ul>
+        </div>
     </div>
 {{ end }}
