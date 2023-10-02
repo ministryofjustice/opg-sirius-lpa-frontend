@@ -66,11 +66,11 @@
       </aside>
     </div>
 
-    <h2 class="govuk-heading-m">Tasks</h2>
+    <h2>Tasks</h2>
 
     <ul data-role="tasks-list">
       {{ range .TaskList }}
-        <li class="govuk-body">{{ .Name }} ({{ .Assignee.DisplayName }})</li>
+        <li>{{ .Name }} ({{ .Assignee.DisplayName }})</li>
       {{ end }}
     </ul>
 
