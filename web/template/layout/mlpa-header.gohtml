@@ -5,8 +5,8 @@
     </span>
     <h1 class="govuk-heading-xl">{{ .Lpa.Application.DonorFirstNames }} {{ .Lpa.Application.DonorLastName }}</h1>
 
-    <div class="case-management-navigation">
-        <div class="govuk-tabs">
+    <div class="case-management-row govuk-grid-row">
+        <div class="govuk-tabs govuk-grid-column-two-thirds">
             <h2 class="govuk-tabs__title">
                 Contents
             </h2>
@@ -36,14 +36,21 @@
                         Documents
                     </a>
                 </li>
-
-                <div class="govuk-form-group govuk-!-text-align-right">
-                  <select class="govuk-select" id="case-actions" name="case-actions">
-                    <option value="create-warning">Create Warning</option>
-                    <option value="create-task" selected>Create Task</option>
-                  </select>
-                </div>
+                <li class="govuk-tabs__list-item {{ if eq .TabName "history" }}govuk-tabs__list-item--selected{{ end }}">
+                    <a class="govuk-tabs__tab" href="#history">
+                        History
+                    </a>
+                </li>
             </ul>
+        </div>
+        <div class="govuk-grid-column-one-quarter">
+            <nav data-module="dropdown-menu" data-dropdown-open="false">
+                <button class="govuk-body" data-role="dropdown-menu-toggle">Case actions</button>
+                <ul class="govuk-list" data-role="dropdown-menu-actions">
+                    <li><a href="#">Create a warning</a></li>
+                    <li><a href="#">Create a task</a>
+                </ul>
+            </nav>
         </div>
     </div>
 {{ end }}
