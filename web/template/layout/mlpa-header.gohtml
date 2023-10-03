@@ -48,7 +48,7 @@
                 <button class="govuk-body" data-role="dropdown-menu-toggle">Case actions</button>
                 <ul class="govuk-list" data-role="dropdown-menu-actions">
                     <li><a href="#">Create a warning</a></li>
-                    <li><a href="#">Create a task</a>
+                    <li><a href="{{ sirius (printf "/lpa/fronten/create-task?id=%d" .Lpa.ID) }}">Create a task</a>
                 </ul>
             </nav>
         </div>
