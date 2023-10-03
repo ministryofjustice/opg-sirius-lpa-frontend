@@ -1,11 +1,10 @@
 package server
 
 import (
-	"net/http"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"net/http"
 )
 
 type LpaClient interface {
@@ -14,7 +13,7 @@ type LpaClient interface {
 }
 
 type lpaData struct {
-	Lpa sirius.DigitalLpa
+	Lpa      sirius.DigitalLpa
 	TaskList []sirius.Task
 }
 
@@ -36,7 +35,7 @@ func Lpa(client LpaClient, tmpl template.Template) Handler {
 		}
 
 		data := lpaData{
-			Lpa: lpa,
+			Lpa:      lpa,
 			TaskList: tasks,
 		}
 
