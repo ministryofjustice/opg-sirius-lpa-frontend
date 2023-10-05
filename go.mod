@@ -6,7 +6,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-playground/form/v4 v4.2.1
 	github.com/ministryofjustice/opg-go-common v0.0.0-20231002150139-ed6f6387fc7e
-	github.com/pact-foundation/pact-go v1.8.0
+	github.com/pact-foundation/pact-go/v2 v2.0.2
 	github.com/pact-foundation/pact-go/v2 v2.0.2
 	github.com/stretchr/testify v1.8.4
 	go.opentelemetry.io/contrib/detectors/aws/ecs v1.20.0
