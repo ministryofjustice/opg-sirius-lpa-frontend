@@ -1,6 +1,6 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add a decision about fees{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add a fee decision{{ end }}
 
 {{ define "main" }}
     <div class="govuk-grid-row">
@@ -9,7 +9,7 @@
 
             {{ template "error-summary" .Error }}
 
-            <h1 class="govuk-heading-l">Add a decision about fees</h1>
+            <h1 class="govuk-heading-l">Add a fee decision</h1>
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
@@ -20,12 +20,12 @@
 
                 <div class="govuk-form-group {{ if .Error.Field.amount }}govuk-form-group--error{{ end }}">
                     <label class="govuk-label" for="f-decision-reason">
-                        Enter decision reason
+                        Reason for decision
                     </label>
                     {{ template "errors" .Error.Field.decisionReason }}
                     <div class="govuk-input__wrapper">
                         <textarea class="govuk-textarea{{ if .Error.Field.decisionReason }} govuk-input--error{{ end }}"
-                            id="f-decision-reason" name="decisionReason" rows="4" cols="30">{{ .DecisionReason }}</textarea>
+                            id="f-decision-reason" name="decisionReason" rows="3" cols="25">{{ .DecisionReason }}</textarea>
                     </div>
                 </div>
 
