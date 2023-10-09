@@ -60,6 +60,7 @@ func TestGetAddPayment(t *testing.T) {
 		On("Func", mock.Anything, addPaymentData{
 			Case:           caseItem,
 			PaymentSources: paymentSources,
+			ReturnUrl: "/payments/4",
 		}).
 		Return(nil)
 
@@ -145,6 +146,7 @@ func TestAddPaymentWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, addPaymentData{
 			Case:           caseItem,
 			PaymentSources: paymentSources,
+			ReturnUrl: "/payments/123",
 		}).
 		Return(expectedError)
 
@@ -258,6 +260,7 @@ func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
 					PaymentDate:    sirius.DateString("2022-01-23"),
 					Error:          validationError,
 					PaymentSources: paymentSources,
+					ReturnUrl:      "/payments/123",
 				}).
 				Return(nil)
 
