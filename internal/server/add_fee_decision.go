@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
@@ -11,7 +12,7 @@ import (
 
 type AddFeeDecisionClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
-	//AddPayment(ctx sirius.Context, caseID int, amount int, source string, paymentDate sirius.DateString) error
+	AddFeeDecision(ctx sirius.Context, caseID int, decisionType string, decisionReason string, decisionDate sirius.DateString) error
 	Case(sirius.Context, int) (sirius.Case, error)
 }
 
@@ -23,6 +24,7 @@ type addFeeDecisionData struct {
 	DecisionType   string
 	DecisionReason string
 	DecisionDate   sirius.DateString
+	ReturnUrl      string
 }
 
 func AddFeeDecision(client AddFeeDecisionClient, tmpl template.Template) Handler {
@@ -63,35 +65,35 @@ func AddFeeDecision(client AddFeeDecisionClient, tmpl template.Template) Handler
 			return err
 		}
 
+		if data.Case.CaseType == "DIGITAL_LPA" {
+			data.ReturnUrl = fmt.Sprintf("/lpa/%s/payments", data.Case.UID)
+		} else {
+			data.ReturnUrl = fmt.Sprintf("/payments/%d", caseID)
+		}
+
 		if r.Method == http.MethodPost {
-			/*if !sirius.IsAmountValid(data.Amount) {
+			data.Error = sirius.ValidationError{
+				Field: sirius.FieldErrors{},
+			}
+
+			if data.DecisionType == "" {
+				data.Error.Field["decisionType"] = map[string]string{
+					"reason": "Value is required and can't be empty",
+				}
+			}
+
+			if data.DecisionDate == "" {
+				data.Error.Field["decisionDate"] = map[string]string{
+					"reason": "Value is required and can't be empty",
+				}
+			}
+
+			if len(data.Error.Field) > 0 {
 				w.WriteHeader(http.StatusBadRequest)
-				data.Error = sirius.ValidationError{
-					Field: sirius.FieldErrors{
-						"amount": {"reason": "Please enter the amount to 2 decimal places"},
-					},
-				}
-				if data.Source == "" {
-					data.Error.Field["source"] = map[string]string{
-						"reason": "Value is required and can't be empty",
-					}
-				}
-				if data.PaymentDate == "" {
-					data.Error.Field["paymentDate"] = map[string]string{
-						"reason": "Value is required and can't be empty",
-					}
-				}
 				return tmpl(w, data)
 			}
 
-			amountFloat, err := strconv.ParseFloat(data.Amount, 64)
-			if err != nil {
-				return err
-			}
-
-			amountInPence := sirius.PoundsToPence(amountFloat)
-
-			err = client.AddPayment(ctx, caseID, amountInPence, data.Source, data.PaymentDate)
+			err = client.AddFeeDecision(ctx, caseID, data.DecisionType, data.DecisionReason, data.DecisionDate)
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
@@ -99,15 +101,11 @@ func AddFeeDecision(client AddFeeDecisionClient, tmpl template.Template) Handler
 				return err
 			} else {
 				SetFlash(w, FlashNotification{
-					Title: "Payment added",
+					Title: "Fee decision added",
 				})
 
-				if data.Case.CaseType == "DIGITAL_LPA" {
-					return RedirectError(fmt.Sprintf("/lpa/%s/payments", data.Case.UID))
-				}
-
-				return RedirectError(fmt.Sprintf("/payments/%d", caseID))
-			}*/
+				return RedirectError(data.ReturnUrl)
+			}
 		}
 
 		return tmpl(w, data)
