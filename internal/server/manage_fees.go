@@ -2,7 +2,6 @@ package server
 
 import (
     "fmt"
-    "golang.org/x/sync/errgroup"
     "net/http"
     "strconv"
 
@@ -26,21 +25,10 @@ func ManageFees(client ManageFeesClient, tmpl template.Template) Handler {
             return err
         }
 
-        ctx := getContext(r)
-        group, groupCtx := errgroup.WithContext(ctx.Context)
-
         data := manageFeesData{}
 
-        group.Go(func() error {
-            data.Case, err = client.Case(ctx.With(groupCtx), caseID)
-            if err != nil {
-                return err
-            }
-
-            return nil
-        })
-
-        if err := group.Wait(); err != nil {
+        data.Case, err = client.Case(getContext(r), caseID)
+        if err != nil {
             return err
         }
 
