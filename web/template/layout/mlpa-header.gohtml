@@ -48,8 +48,8 @@
             <nav class="govuk-grid-column-one-quarter govuk-form-group" data-module="dropdown-menu">
                 <select class="govuk-select" id="case-actions" data-role="dropdown-menu-toggle">
                     <option value="case-actions" selected>Case actions</option>
-                    <option value="{{ sirius (printf "/lpa/frontend/create-task?id=%d" .Lpa.ID) }}">Create a task</option>
-                    <option value="{{ sirius (printf "/lpa/frontend/create-warning?id=%d" .Lpa.Donor.ID) }}">Create a warning</option>
+                    <option value="{{ prefix (printf "/create-task?id=%d" .Lpa.ID) }}">Create a task</option>
+                    <option value="{{ prefix (printf "/create-warning?id=%d" .Lpa.Donor.ID) }}">Create a warning</option>
                 </select>
             </nav>
         </div>
