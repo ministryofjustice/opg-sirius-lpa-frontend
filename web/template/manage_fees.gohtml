@@ -1,0 +1,31 @@
+{{ template "page" . }}
+
+{{ define "title" }}Manage fees{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-body">
+        <a href="{{ prefix .ReturnUrl }}" class="govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-0">Back</a>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            {{ template "case-details" . }}
+
+            <h1 class="govuk-heading-l">Manage fees</h1>
+
+            <p class="govuk-body">
+                <a class="govuk-link" href="{{ prefix (printf "/apply-fee-reduction?id=%d" .Case.ID) }}">
+                    Apply a fee reduction
+                </a>
+            </p>
+
+            <p class="govuk-body"><strong>or</strong></p>
+
+            <p class="govuk-body">
+                <a class="govuk-link" href="{{ prefix (printf "/add-fee-decision?id=%d" .Case.ID) }}">
+                    Record why a fee reduction will not be applied
+                </a>
+            </p>
+        </div>
+    </div>
+{{ end }}
