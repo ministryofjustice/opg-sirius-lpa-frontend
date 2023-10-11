@@ -8,9 +8,8 @@ export default function dropdownMenu() {
       return;
     }
 
-    dropdownMenuToggle.addEventListener("click", () => {
-      const dropdownOpen = e.getAttribute("data-dropdown-open") === "true";
-      e.setAttribute("data-dropdown-open", dropdownOpen ? "false" : "true");
+    dropdownMenuToggle.addEventListener("change", (e) => {
+      window.location.href = e.target.value;
     });
   });
 }
