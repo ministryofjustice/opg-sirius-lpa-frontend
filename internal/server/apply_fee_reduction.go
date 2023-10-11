@@ -25,6 +25,7 @@ type applyFeeReductionData struct {
 	FeeReductionType  string
 	PaymentDate       sirius.DateString
 	FeeReductionTypes []sirius.RefDataItem
+	ReturnUrl         string
 }
 
 func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) Handler {
@@ -65,6 +66,12 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) H
 			return err
 		}
 
+		if data.Case.CaseType == "DIGITAL_LPA" {
+            data.ReturnUrl = fmt.Sprintf("/lpa/%s/payments", data.Case.UID)
+        } else {
+            data.ReturnUrl = fmt.Sprintf("/payments/%d", caseID)
+        }
+
 		if r.Method == http.MethodPost {
 			err = client.ApplyFeeReduction(ctx, caseID, data.FeeReductionType, data.PaymentEvidence, data.PaymentDate)
 			if ve, ok := err.(sirius.ValidationError); ok {
@@ -77,11 +84,7 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) H
 					Title: fmt.Sprintf("%s approved", translateRefData(data.FeeReductionTypes, data.FeeReductionType)),
 				})
 
-				if data.Case.CaseType == "DIGITAL_LPA" {
-					return RedirectError(fmt.Sprintf("/lpa/%s/payments", data.Case.UID))
-				}
-
-				return RedirectError(fmt.Sprintf("/payments/%d", caseID))
+				return RedirectError(data.ReturnUrl)
 			}
 		}
 

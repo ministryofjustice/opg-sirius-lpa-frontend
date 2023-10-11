@@ -9,14 +9,12 @@
 
             {{ template "error-summary" .Error }}
 
-            <h1 class="govuk-heading-l">Add a fee decision</h1>
+            <h1 class="govuk-heading-l">Record why a fee reduction will not be applied</h1>
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-                {{ template "select" (select "decisionType" "Decision type" .DecisionType .Error.Field.decisionType (options .DecisionTypes "filterSelectable" false)) }}
-
-                {{ template "input-date" (field "decisionDate" "Date of decision" .DecisionDate .Error.Field.decisionDate "max" today "selectToday" true) }}
+                {{ template "select" (select "decisionType" "Type of decision" .DecisionType .Error.Field.decisionType (options .DecisionTypes "filterSelectable" false)) }}
 
                 <div class="govuk-form-group {{ if .Error.Field.amount }}govuk-form-group--error{{ end }}">
                     <label class="govuk-label" for="f-decision-reason">
@@ -25,9 +23,11 @@
                     {{ template "errors" .Error.Field.decisionReason }}
                     <div class="govuk-input__wrapper">
                         <textarea class="govuk-textarea{{ if .Error.Field.decisionReason }} govuk-input--error{{ end }}"
-                            id="f-decision-reason" name="decisionReason" rows="3" cols="25">{{ .DecisionReason }}</textarea>
+                            id="f-decisionReason" name="decisionReason" rows="3" cols="25">{{ .DecisionReason }}</textarea>
                     </div>
                 </div>
+
+                {{ template "input-date" (field "decisionDate" "Date of decision" .DecisionDate .Error.Field.decisionDate "max" today "selectToday" true) }}
 
                 <div class="govuk-button-group govuk-!-padding-top-6">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
