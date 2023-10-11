@@ -91,6 +91,85 @@ func TestAddFeeDecisionNoID(t *testing.T) {
 	}
 }
 
+func TestAddFeeDecisionInvalidPostData(t *testing.T) {
+	testCases := []struct{
+		name string
+		postData url.Values
+		expectedTemplateData addFeeDecisionData
+		expectedValidationError sirius.ValidationError
+	}{
+		{
+			name: "Invalid decision type",
+			postData: url.Values{
+				"decisionReason": {"Invalid evidence"},
+				"decisionDate":   {"2023-10-10"},
+			},
+			expectedTemplateData: addFeeDecisionData{
+				DecisionReason: "Invalid evidence",
+				DecisionType: "",
+				DecisionDate: "2023-10-10",
+			},
+			expectedValidationError: sirius.ValidationError{
+				Field: sirius.FieldErrors{
+					"decisionType": {"reason": "Value is required and can't be empty"},
+				},
+			},
+		},
+		{
+			name: "Invalid decision date",
+			postData: url.Values{
+				"decisionReason": {"Invalid evidence"},
+				"decisionType":   {"DECLINED_REMISSION"},
+			},
+			expectedTemplateData: addFeeDecisionData{
+				DecisionReason: "Invalid evidence",
+				DecisionType: "DECLINED_REMISSION",
+				DecisionDate: "",
+			},
+			expectedValidationError: sirius.ValidationError{
+				Field: sirius.FieldErrors{
+					"decisionDate": {"reason": "Value is required and can't be empty"},
+				},
+			},
+		},
+	}
+
+	caseItem := sirius.Case{CaseType: "DIGITAL_LPA", UID: "M-AAAA-BBBB-DDDD"}
+	client := &mockAddFeeDecisionClient{}
+	template := &mockTemplate{}
+
+	for _, test := range testCases {
+		t.Run(test.name, func(t *testing.T) {
+			client.
+				On("Case", mock.Anything, 22222).
+				Return(caseItem, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
+				Return(feeDecisionTypes, nil)
+
+			test.expectedTemplateData.Case = caseItem
+			test.expectedTemplateData.DecisionTypes = feeDecisionTypes
+			test.expectedTemplateData.ReturnUrl = "/lpa/M-AAAA-BBBB-DDDD/payments"
+			test.expectedTemplateData.Error = test.expectedValidationError
+
+			template.
+				On("Func", mock.Anything, test.expectedTemplateData).
+				Return(nil)
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=22222", strings.NewReader(test.postData.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := AddFeeDecision(client, template.Func)(w, r)
+
+			resp := w.Result()
+			mock.AssertExpectationsForObjects(t, client, template)
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+		})
+	}
+}
+
 func TestAddFeeDecisionWhenFailureOnGetCase(t *testing.T) {
 	client := &mockAddFeeDecisionClient{}
 	client.
