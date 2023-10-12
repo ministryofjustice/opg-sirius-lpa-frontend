@@ -16,17 +16,17 @@ Frontend forms for Sirius.
 
 ### Running the application
 
+This will run the application at http://localhost:8888/. It runs against the mock api server so does not require the sirius URI prefix `/lpa/frontend`.
+
 ```
 make up
 ```
 
-This will run the application at http://localhost:8888/, running against the mock api server.
+This will run the application at http://localhost:8888/, assumes sirius is at http://localhost:8080, and will hot reload the javascript into the app.
 
 ```
 make dev
 ```
-
-This will run the application at http://localhost:8888/, assumes sirius is at http://localhost:8080, and will hot reload the javascript into the app.
 
 Alternatively the application can be run without the use of Docker
 
