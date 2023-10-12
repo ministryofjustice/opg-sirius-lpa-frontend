@@ -9,7 +9,7 @@ export default function dropdownMenu() {
     }
 
     dropdownMenuToggle.addEventListener("change", (e) => {
-      window.location.href = e.target.value;
+      window.location.href = encodeURI(e.target.value);
     });
   });
 }
