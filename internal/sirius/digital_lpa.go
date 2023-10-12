@@ -5,18 +5,19 @@ import (
 )
 
 type DigitalLpa struct {
-	ID                 int        `json:"id"`
-	UID                string     `json:"uId"`
-	Application        Draft      `json:"application"`
-	Subtype            string     `json:"caseSubtype"`
-	CreatedDate        DateString `json:"createdDate"`
-	Status             string     `json:"status"`
-	ComplaintCount     int        `json:"complaintCount"`
-	InvestigationCount int        `json:"investigationCount"`
-	TaskCount          int        `json:"taskCount"`
-	WarningCount       int        `json:"warningCount"`
-	ObjectionCount     int        `json:"objectionCount"`
-	Donor              Donor      `json:"donor"`
+	ID                 int          `json:"id"`
+	UID                string       `json:"uId"`
+	Application        Draft        `json:"application"`
+	Subtype            string       `json:"caseSubtype"`
+	CreatedDate        DateString   `json:"createdDate"`
+	Status             string       `json:"status"`
+	ComplaintCount     int          `json:"complaintCount"`
+	InvestigationCount int          `json:"investigationCount"`
+	TaskCount          int          `json:"taskCount"`
+	WarningCount       int          `json:"warningCount"`
+	ObjectionCount     int          `json:"objectionCount"`
+	LinkedCases        []DigitalLpa `json:"linkedDigitalLpas"`
+	Donor              Donor        `json:"donor"`
 }
 
 type Donor struct {
