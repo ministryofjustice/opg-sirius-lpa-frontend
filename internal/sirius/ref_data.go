@@ -15,6 +15,7 @@ const (
 	CompensationType           string = "compensationType"
 	ComplaintCategory          string = "complaintCategory"
 	CountryCategory            string = "country"
+	FeeDecisionTypeCategory    string = "feeDecisionType"
 )
 
 type RefDataItem struct {
@@ -27,9 +28,9 @@ type RefDataItem struct {
 func (c *Client) RefDataByCategory(ctx Context, category string) ([]RefDataItem, error) {
 	var v []RefDataItem
 
-	if cached, ok := getCached(category); ok {
+	/*if cached, ok := getCached(category); ok {
 		return cached, nil
-	}
+	}*/
 
 	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/reference-data/%s", category), &v)
 
