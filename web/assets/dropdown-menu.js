@@ -13,8 +13,8 @@ export default function dropdownMenu() {
       if (url.startsWith("//") || !url.startsWith("/")) {
         return;
       }
-      
-      window.location.href = url
+
+      window.location.href = url;
     });
   });
 }
