@@ -17,6 +17,7 @@ import insertSelector from "./insert-selector";
 import addressFinder from "./address-finder";
 import autoApplyFilter from "./auto-apply-filter";
 import dropdownMenu from "./dropdown-menu";
+import modalLink from "./modal-link";
 
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
@@ -41,6 +42,7 @@ insertSelector();
 addressFinder(prefix);
 autoApplyFilter();
 dropdownMenu();
+modalLink();
 
 if (window.self !== window.parent) {
   const success = document.querySelector('[data-app-reload~="page"]');
@@ -80,4 +82,13 @@ if (window.self !== window.parent) {
       `${window.location.protocol}//${window.location.host}`,
     );
   }
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      window.parent.postMessage(
+        "form-cancel",
+        `${window.location.protocol}//${window.location.host}`,
+      );
+    }
+  });
 }
