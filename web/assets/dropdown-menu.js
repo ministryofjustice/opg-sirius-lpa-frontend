@@ -9,12 +9,8 @@ export default function dropdownMenu() {
     }
 
     dropdownMenuToggle.addEventListener("change", (e) => {
-      const url = encodeURI(e.target.value);
-      if (url.startsWith("//") || !url.startsWith("/")) {
-        return;
-      }
-
-      window.location.href = url;
+      const $a = document.getElementById(e.target.value);
+      $a?.click();
     });
   });
 }
