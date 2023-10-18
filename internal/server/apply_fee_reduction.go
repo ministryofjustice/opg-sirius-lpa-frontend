@@ -67,10 +67,10 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) H
 		}
 
 		if data.Case.CaseType == "DIGITAL_LPA" {
-            data.ReturnUrl = fmt.Sprintf("/lpa/%s/payments", data.Case.UID)
-        } else {
-            data.ReturnUrl = fmt.Sprintf("/payments/%d", caseID)
-        }
+			data.ReturnUrl = fmt.Sprintf("/lpa/%s/payments", data.Case.UID)
+		} else {
+			data.ReturnUrl = fmt.Sprintf("/payments/%d", caseID)
+		}
 
 		if r.Method == http.MethodPost {
 			err = client.ApplyFeeReduction(ctx, caseID, data.FeeReductionType, data.PaymentEvidence, data.PaymentDate)
