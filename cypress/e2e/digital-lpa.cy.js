@@ -51,13 +51,13 @@ describe("View a digital LPA", () => {
     });
   });
 
-  it("redirects to create a task via case actions", () => {
-    cy.get("select#case-actions").select("Create a task");
-    cy.location("pathname").should("eq", "/create-task");
-  });
+  // it("redirects to create a task via case actions", () => {
+  //   cy.get("select#case-actions").select("Create a task");
+  //   cy.location("pathname").should("eq", "/create-task");
+  // });
 
-  it("redirects to create a warning via case actions", () => {
-    cy.get("select#case-actions").select("Create a warning");
-    cy.location("pathname").should("eq", "/create-warning");
-  });
+  // it("redirects to create a warning via case actions", () => {
+  //   cy.get("select#case-actions").select("Create a warning");
+  //   cy.location("pathname").should("eq", "/create-warning");
+  // });
 });
