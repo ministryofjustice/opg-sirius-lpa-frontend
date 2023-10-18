@@ -72,27 +72,6 @@ func AddFeeDecision(client AddFeeDecisionClient, tmpl template.Template) Handler
 		}
 
 		if r.Method == http.MethodPost {
-			data.Error = sirius.ValidationError{
-				Field: sirius.FieldErrors{},
-			}
-
-			if data.DecisionType == "" {
-				data.Error.Field["decisionType"] = map[string]string{
-					"reason": "Value is required and can't be empty",
-				}
-			}
-
-			if data.DecisionDate == "" {
-				data.Error.Field["decisionDate"] = map[string]string{
-					"reason": "Value is required and can't be empty",
-				}
-			}
-
-			if len(data.Error.Field) > 0 {
-				w.WriteHeader(http.StatusBadRequest)
-				return tmpl(w, data)
-			}
-
 			err = client.AddFeeDecision(ctx, caseID, data.DecisionType, data.DecisionReason, data.DecisionDate)
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)

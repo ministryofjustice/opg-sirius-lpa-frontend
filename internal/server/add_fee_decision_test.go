@@ -146,6 +146,14 @@ func TestAddFeeDecisionInvalidPostData(t *testing.T) {
 			client.
 				On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
 				Return(feeDecisionTypes, nil)
+			client.
+				On("AddFeeDecision",
+					mock.Anything,
+					22222,
+					test.expectedTemplateData.DecisionType,
+					test.expectedTemplateData.DecisionReason,
+					sirius.DateString(test.expectedTemplateData.DecisionDate)).
+				Return(test.expectedValidationError)
 
 			test.expectedTemplateData.Case = caseItem
 			test.expectedTemplateData.DecisionTypes = feeDecisionTypes
