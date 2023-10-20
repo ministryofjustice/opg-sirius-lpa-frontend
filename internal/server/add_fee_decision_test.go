@@ -251,7 +251,47 @@ func TestAddFeeDecisionWhenFailureOnGetRefData(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestPostAddFeeDecisionToDigitalLpa(t *testing.T) {
+func TestAddFeeDecisionNonValidationClientError(t *testing.T) {
+	caseItem := sirius.Case{CaseType: "DIGITAL_LPA", UID: "M-AAAA-BBBB-ZZEE"}
+
+	client := &mockAddFeeDecisionClient{}
+	client.
+		On("Case", mock.Anything, 765).
+		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
+		Return(feeDecisionTypes, nil)
+
+	// client gets a 500 error back when adding the fee decision via the API
+	serverError := sirius.StatusError{
+		Code: http.StatusInternalServerError,
+		URL: "https://not.real/",
+		Method: http.MethodPost,
+		CorrelationId: "Uncorrelated",
+	}
+	client.
+		On("AddFeeDecision", mock.Anything, 765, "DECLINED_REMISSION", "Invalid evidence", sirius.DateString("2023-10-10")).
+		Return(serverError)
+
+	template := &mockTemplate{}
+
+	form := url.Values{
+		"decisionReason": {"Invalid evidence"},
+		"decisionType":   {"DECLINED_REMISSION"},
+		"decisionDate":   {"2023-10-10"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=765", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AddFeeDecision(client, template.Func)(w, r)
+
+	assert.Equal(t, serverError, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestAddFeeDecisionToDigitalLpaPostSuccess(t *testing.T) {
 	caseItem := sirius.Case{CaseType: "DIGITAL_LPA", UID: "M-AAAA-BBBB-DDDD"}
 
 	client := &mockAddFeeDecisionClient{}
