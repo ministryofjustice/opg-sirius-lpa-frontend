@@ -9,6 +9,20 @@ import (
 	"testing"
 )
 
+func TestAddFeeDecisionBadJSON(t *testing.T) {
+	client := NewClient(http.DefaultClient, "http://not/real/server")
+
+	err := client.AddFeeDecision(
+		Context{Context: context.Background()},
+		0,
+		"DECLINED_REMISSION",
+		"None",
+		"00/11/2999",
+	)
+
+	assert.ErrorContains(t, err, "failed to format non-date")
+}
+
 func TestAddFeeDecision(t *testing.T) {
 	t.Parallel()
 
