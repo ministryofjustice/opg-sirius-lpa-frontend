@@ -22,16 +22,12 @@ func (c *Client) AddFeeDecision(ctx Context, caseID int, decisionType string, de
 		return err
 	}
 
-	req, err := c.newRequest(
+	req, _ := c.newRequest(
 		ctx,
 		http.MethodPost,
 		fmt.Sprintf("/lpa-api/v1/cases/%d/fee-decisions", caseID),
 		bytes.NewReader(postData),
 	)
-
-	if err != nil {
-		return err
-	}
 
 	resp, err := c.http.Do(req)
 	if err != nil {
