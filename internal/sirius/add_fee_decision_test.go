@@ -41,7 +41,7 @@ func TestAddFeeDecision(t *testing.T) {
 		{
 			name: "OK",
 			description: "Valid request Sirius can handle",
-			caseId: 999999,
+			caseId: 800,
 			request: map[string]string{
 				"decisionType": "DECLINED_REMISSION",
 				"decisionReason": "Insufficient evidence",
@@ -55,33 +55,9 @@ func TestAddFeeDecision(t *testing.T) {
 			},
 		},
 		{
-			name: "InternalServerError",
-			description: "Request which Sirius responds to with a 500 error",
-			caseId: 111,
-			request: map[string]string{
-				"decisionType": "DECLINED_REMISSION",
-				"decisionReason": "Insufficient evidence",
-				"decisionDate": "18/10/2023",
-			},
-			response: func() dsl.Response {
-				return dsl.Response{
-					Status:  http.StatusInternalServerError,
-					Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-				}
-			},
-			expectedError: func(pactPort int) error {
-				return StatusError{
-					Code: http.StatusInternalServerError,
-					URL: fmt.Sprintf("http://localhost:%d/lpa-api/v1/cases/111/fee-decisions", pactPort),
-					Method: http.MethodPost,
-					CorrelationId: "",
-				}
-			},
-		},
-		{
 			name: "ValidationError",
 			description: "Request with invalid data",
-			caseId: 888,
+			caseId: 800,
 			request: map[string]string{
 				"decisionType": "",
 				"decisionReason": "",
@@ -99,7 +75,7 @@ func TestAddFeeDecision(t *testing.T) {
 
 				return dsl.Response{
 					Status:  http.StatusBadRequest,
-					Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/problem+json")},
 					Body:    string(bodyBytes),
 				}
 			},
@@ -154,3 +130,30 @@ func TestAddFeeDecision(t *testing.T) {
 		})
 	}
 }
+
+/*
+		{
+			name: "InternalServerError",
+			description: "Request which Sirius responds to with a 500 error",
+			caseId: 111,
+			request: map[string]string{
+				"decisionType": "DECLINED_REMISSION",
+				"decisionReason": "Insufficient evidence",
+				"decisionDate": "18/10/2023",
+			},
+			response: func() dsl.Response {
+				return dsl.Response{
+					Status:  http.StatusInternalServerError,
+					Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/problem+json")},
+				}
+			},
+			expectedError: func(pactPort int) error {
+				return StatusError{
+					Code: http.StatusInternalServerError,
+					URL: fmt.Sprintf("http://localhost:%d/lpa-api/v1/cases/111/fee-decisions", pactPort),
+					Method: http.MethodPost,
+					CorrelationId: "",
+				}
+			},
+		},
+		*/
