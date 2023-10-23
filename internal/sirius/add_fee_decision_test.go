@@ -2,6 +2,7 @@ package sirius
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/stretchr/testify/assert"
@@ -31,60 +32,42 @@ func TestAddFeeDecision(t *testing.T) {
 
 	testCases := []struct {
 		name          string
+		description   string
 		caseId        int
-		setup         func()
+		request       map[string]string
+		response      func() dsl.Response
 		expectedError func(int) error
 	}{
 		{
 			name: "OK",
+			description: "Valid request Sirius can handle",
 			caseId: 999999,
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("I have case 999999 assigned").
-					UponReceiving("A request to add a fee decision for case 999999").
-					WithRequest(dsl.Request{
-						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/cases/999999/fee-decisions"),
-						Headers: dsl.MapMatcher{
-							"Content-Type": dsl.String("application/json"),
-						},
-						Body: map[string]interface{}{
-							"decisionType": "DECLINED_REMISSION",
-							"decisionReason": "Insufficient evidence",
-							"decisionDate": "18/10/2023",
-						},
-					}).
-					WillRespondWith(dsl.Response{
-						Status:  http.StatusCreated,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-					})
+			request: map[string]string{
+				"decisionType": "DECLINED_REMISSION",
+				"decisionReason": "Insufficient evidence",
+				"decisionDate": "18/10/2023",
+			},
+			response: func() dsl.Response {
+				return dsl.Response{
+					Status:  http.StatusCreated,
+					Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+				}
 			},
 		},
 		{
 			name: "InternalServerError",
+			description: "Request which Sirius responds to with a 500 error",
 			caseId: 111,
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("I have case 111 assigned").
-					UponReceiving("A request to add a fee decision for case 111").
-					WithRequest(dsl.Request{
-						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/cases/111/fee-decisions"),
-						Headers: dsl.MapMatcher{
-							"Content-Type": dsl.String("application/json"),
-						},
-						Body: map[string]interface{}{
-							"decisionType": "DECLINED_REMISSION",
-							"decisionReason": "Insufficient evidence",
-							"decisionDate": "18/10/2023",
-						},
-					}).
-					WillRespondWith(dsl.Response{
-						Status:  http.StatusInternalServerError,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-					})
+			request: map[string]string{
+				"decisionType": "DECLINED_REMISSION",
+				"decisionReason": "Insufficient evidence",
+				"decisionDate": "18/10/2023",
+			},
+			response: func() dsl.Response {
+				return dsl.Response{
+					Status:  http.StatusInternalServerError,
+					Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+				}
 			},
 			expectedError: func(pactPort int) error {
 				return StatusError{
@@ -95,11 +78,59 @@ func TestAddFeeDecision(t *testing.T) {
 				}
 			},
 		},
+		{
+			name: "ValidationError",
+			description: "Request with invalid data",
+			caseId: 888,
+			request: map[string]string{
+				"decisionType": "",
+				"decisionReason": "",
+				"decisionDate": "18/10/2023",
+			},
+			response: func() dsl.Response {
+				validationError := ValidationError{
+					Field: FieldErrors{
+						"decisionType": map[string]string{},
+					},
+					Detail: "",
+				}
+
+				bodyBytes, _ := json.Marshal(validationError)
+
+				return dsl.Response{
+					Status:  http.StatusBadRequest,
+					Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					Body:    string(bodyBytes),
+				}
+			},
+			expectedError: func(pactPort int) error {
+				return ValidationError{
+					Field: FieldErrors{
+						"decisionType": map[string]string{},
+					},
+					Detail: "",
+				}
+			},
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.setup()
+			request := dsl.Request{
+				Method:  http.MethodPost,
+				Path:    dsl.String(fmt.Sprintf("/lpa-api/v1/cases/%d/fee-decisions", tc.caseId)),
+				Headers: dsl.MapMatcher{
+					"Content-Type": dsl.String("application/json"),
+				},
+				Body: tc.request,
+			}
+
+			pact.
+				AddInteraction().
+				Given("Request to add a fee decision via Sirius API").
+				UponReceiving(tc.description).
+				WithRequest(request).
+				WillRespondWith(tc.response())
 
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
@@ -108,8 +139,8 @@ func TestAddFeeDecision(t *testing.T) {
 				err := client.AddFeeDecision(
 					Context{Context: context.Background()},
 					tc.caseId,
-					"DECLINED_REMISSION",
-					"Insufficient evidence",
+					tc.request["decisionType"],
+					tc.request["decisionReason"],
 					DateString("2023-10-18"),
 				)
 
