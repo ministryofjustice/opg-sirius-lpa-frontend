@@ -41,7 +41,7 @@ func TestAddFeeDecision(t *testing.T) {
 		{
 			name: "OK",
 			description: "Valid request Sirius can handle",
-			caseId: 800,
+			caseId: 801,
 			request: map[string]string{
 				"decisionType": "DECLINED_REMISSION",
 				"decisionReason": "Insufficient evidence",
@@ -57,16 +57,18 @@ func TestAddFeeDecision(t *testing.T) {
 		{
 			name: "ValidationError",
 			description: "Request with invalid data",
-			caseId: 800,
+			caseId: 801,
 			request: map[string]string{
 				"decisionType": "",
-				"decisionReason": "",
+				"decisionReason": "Some reason",
 				"decisionDate": "18/10/2023",
 			},
 			response: func() dsl.Response {
 				validationError := ValidationError{
 					Field: FieldErrors{
-						"decisionType": map[string]string{},
+						"decisionType": map[string]string{
+							"isEmpty": "Value is required and can't be empty",
+						},
 					},
 					Detail: "",
 				}
@@ -82,7 +84,9 @@ func TestAddFeeDecision(t *testing.T) {
 			expectedError: func(pactPort int) error {
 				return ValidationError{
 					Field: FieldErrors{
-						"decisionType": map[string]string{},
+						"decisionType": map[string]string{
+							"isEmpty": "Value is required and can't be empty",
+						},
 					},
 					Detail: "",
 				}
