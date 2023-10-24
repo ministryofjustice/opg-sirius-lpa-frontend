@@ -40,7 +40,7 @@ func TestAddFeeDecision(t *testing.T) {
 		{
 			name: "OK",
 			description: "Valid request Sirius can handle",
-			caseId: 800,
+			caseId: 1,
 			request: map[string]string{
 				"decisionType": "DECLINED_REMISSION",
 				"decisionReason": "Insufficient evidence",
@@ -56,7 +56,7 @@ func TestAddFeeDecision(t *testing.T) {
 		{
 			name: "ValidationError",
 			description: "Request with invalid data",
-			caseId: 800,
+			caseId: 1,
 			request: map[string]string{
 				"decisionType": "",
 				"decisionReason": "Some reason",
