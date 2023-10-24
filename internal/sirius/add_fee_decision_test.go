@@ -2,7 +2,6 @@ package sirius
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/stretchr/testify/assert"
@@ -41,7 +40,7 @@ func TestAddFeeDecision(t *testing.T) {
 		{
 			name: "OK",
 			description: "Valid request Sirius can handle",
-			caseId: 801,
+			caseId: 800,
 			request: map[string]string{
 				"decisionType": "DECLINED_REMISSION",
 				"decisionReason": "Insufficient evidence",
@@ -57,28 +56,29 @@ func TestAddFeeDecision(t *testing.T) {
 		{
 			name: "ValidationError",
 			description: "Request with invalid data",
-			caseId: 801,
+			caseId: 800,
 			request: map[string]string{
 				"decisionType": "",
 				"decisionReason": "Some reason",
 				"decisionDate": "18/10/2023",
 			},
 			response: func() dsl.Response {
-				validationError := ValidationError{
-					Field: FieldErrors{
+				body := map[string]interface{}{
+					"validation_errors": map[string]interface{}{
 						"decisionType": map[string]string{
 							"isEmpty": "Value is required and can't be empty",
 						},
 					},
-					Detail: "",
+					"detail": "Payload failed validation",
+					"type": "http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html",
+					"status": 400,
+					"title": "Bad Request",
 				}
-
-				bodyBytes, _ := json.Marshal(validationError)
 
 				return dsl.Response{
 					Status:  http.StatusBadRequest,
 					Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/problem+json")},
-					Body:    string(bodyBytes),
+					Body:    body,
 				}
 			},
 			expectedError: func(pactPort int) error {
@@ -88,7 +88,7 @@ func TestAddFeeDecision(t *testing.T) {
 							"isEmpty": "Value is required and can't be empty",
 						},
 					},
-					Detail: "",
+					Detail: "Payload failed validation",
 				}
 			},
 		},
