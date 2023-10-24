@@ -216,6 +216,28 @@
       }
     },
     {
+      "name": "A request to add a fee decision",
+      "request": {
+        "method": "POST",
+        "url": "/lpa-api/v1/cases/801/fee-decisions"
+      },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
+      "name": "A request to add a fee decision to a digital LPA",
+      "request": {
+        "method": "POST",
+        "url": "/lpa-api/v1/cases/9456/fee-decisions"
+      },
+      "response": {
+        "status": 201,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
       "name": "A request for a document by uuid",
       "request": {
         "method": "GET",

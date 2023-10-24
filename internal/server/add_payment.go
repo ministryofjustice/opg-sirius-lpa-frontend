@@ -25,6 +25,7 @@ type addPaymentData struct {
 	Source         string
 	PaymentDate    sirius.DateString
 	PaymentSources []sirius.RefDataItem
+	ReturnUrl      string
 }
 
 func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
@@ -63,6 +64,12 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 
 		if err := group.Wait(); err != nil {
 			return err
+		}
+
+		if data.Case.CaseType == "DIGITAL_LPA" {
+			data.ReturnUrl = fmt.Sprintf("/lpa/%s/payments", data.Case.UID)
+		} else {
+			data.ReturnUrl = fmt.Sprintf("/payments/%d", caseID)
 		}
 
 		if r.Method == http.MethodPost {
@@ -104,11 +111,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 					Title: "Payment added",
 				})
 
-				if data.Case.CaseType == "DIGITAL_LPA" {
-					return RedirectError(fmt.Sprintf("/lpa/%s/payments", data.Case.UID))
-				}
-
-				return RedirectError(fmt.Sprintf("/payments/%d", caseID))
+				return RedirectError(data.ReturnUrl)
 			}
 		}
 

@@ -1,6 +1,6 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add payment{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add a fee decision{{ end }}
 
 {{ define "main" }}
     <div class="govuk-grid-row">
@@ -9,25 +9,25 @@
 
             {{ template "error-summary" .Error }}
 
-            <h1 class="govuk-heading-l">Add a payment</h1>
+            <h1 class="govuk-heading-l">Record why a fee reduction will not be applied</h1>
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
+                {{ template "select" (select "decisionType" "Type of decision" .DecisionType .Error.Field.decisionType (options .DecisionTypes "filterSelectable" false)) }}
+
                 <div class="govuk-form-group {{ if .Error.Field.amount }}govuk-form-group--error{{ end }}">
-                    <label class="govuk-label" for="f-amount">
-                        Enter amount paid
+                    <label class="govuk-label" for="f-decision-reason">
+                        Reason for decision
                     </label>
-                    {{ template "errors" .Error.Field.amount }}
+                    {{ template "errors" .Error.Field.decisionReason }}
                     <div class="govuk-input__wrapper">
-                        <div class="govuk-input__prefix" aria-hidden="true">£</div>
-                        <input class="govuk-input govuk-input--width-5 {{ if .Error.Field.amount }}govuk-input--error{{ end }}" id="f-amount" name="amount" type="number" step="0.01" value="{{ if ne .Amount "0" }}{{ .Amount }}{{ end }}">
+                        <textarea class="govuk-textarea{{ if .Error.Field.decisionReason }} govuk-input--error{{ end }}"
+                            id="f-decisionReason" name="decisionReason" rows="3" cols="25">{{ .DecisionReason }}</textarea>
                     </div>
                 </div>
 
-                {{ template "select" (select "source" "Payment method" .Source .Error.Field.source (options .PaymentSources "filterSelectable" true)) }}
-
-                {{ template "input-date" (field "paymentDate" "Date of payment" .PaymentDate .Error.Field.paymentDate "max" today "selectToday" true) }}
+                {{ template "input-date" (field "decisionDate" "Date of decision" .DecisionDate .Error.Field.decisionDate "max" today "selectToday" true) }}
 
                 <div class="govuk-button-group govuk-!-padding-top-6">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
