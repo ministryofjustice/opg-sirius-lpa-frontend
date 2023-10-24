@@ -130,30 +130,3 @@ func TestAddFeeDecision(t *testing.T) {
 		})
 	}
 }
-
-/*
-		{
-			name: "InternalServerError",
-			description: "Request which Sirius responds to with a 500 error",
-			caseId: 111,
-			request: map[string]string{
-				"decisionType": "DECLINED_REMISSION",
-				"decisionReason": "Insufficient evidence",
-				"decisionDate": "18/10/2023",
-			},
-			response: func() dsl.Response {
-				return dsl.Response{
-					Status:  http.StatusInternalServerError,
-					Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/problem+json")},
-				}
-			},
-			expectedError: func(pactPort int) error {
-				return StatusError{
-					Code: http.StatusInternalServerError,
-					URL: fmt.Sprintf("http://localhost:%d/lpa-api/v1/cases/111/fee-decisions", pactPort),
-					Method: http.MethodPost,
-					CorrelationId: "",
-				}
-			},
-		},
-		*/
