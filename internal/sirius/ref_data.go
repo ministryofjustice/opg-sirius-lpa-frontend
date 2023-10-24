@@ -15,6 +15,7 @@ const (
 	CompensationType           string = "compensationType"
 	ComplaintCategory          string = "complaintCategory"
 	CountryCategory            string = "country"
+	FeeDecisionTypeCategory    string = "feeDecisionType"
 )
 
 type RefDataItem struct {

@@ -60,6 +60,7 @@ func TestGetApplyFeeReduction(t *testing.T) {
 		On("Func", mock.Anything, applyFeeReductionData{
 			Case:              caseItem,
 			FeeReductionTypes: feeReductionTypes,
+			ReturnUrl:         "/payments/4",
 		}).
 		Return(nil)
 
@@ -131,7 +132,7 @@ func TestApplyFeeReductionWhenTemplateErrors(t *testing.T) {
 
 	client := &mockApplyFeeReductionClient{}
 	client.
-		On("Case", mock.Anything, 123).
+		On("Case", mock.Anything, 222).
 		Return(caseItem, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
@@ -142,10 +143,11 @@ func TestApplyFeeReductionWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, applyFeeReductionData{
 			Case:              caseItem,
 			FeeReductionTypes: feeReductionTypes,
+			ReturnUrl:         "/payments/222",
 		}).
 		Return(expectedError)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/?id=222", nil)
 	w := httptest.NewRecorder()
 
 	err := ApplyFeeReduction(client, template.Func)(w, r)
