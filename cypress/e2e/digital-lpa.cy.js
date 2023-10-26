@@ -53,11 +53,11 @@ describe("View a digital LPA", () => {
 
   it("redirects to create a task via case actions", () => {
     cy.get("select#case-actions").select("Create a task");
-    cy.location("pathname").should("eq", "/create-task");
+    cy.url().should("include", "/create-task?id=800");
   });
 
   it("redirects to create a warning via case actions", () => {
     cy.get("select#case-actions").select("Create a warning");
-    cy.location("pathname").should("eq", "/create-warning");
+    cy.url().should("include", "/create-warning?id=189");
   });
 });
