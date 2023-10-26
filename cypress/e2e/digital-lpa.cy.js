@@ -51,13 +51,34 @@ describe("View a digital LPA", () => {
     });
   });
 
-  it("redirects to create a task via case actions", () => {
+  it("creates a task via case actions", () => {
     cy.get("select#case-actions").select("Create a task");
     cy.url().should("include", "/create-task?id=800");
+    cy.contains("7000-0000-0000");
+    cy.get("#f-taskType").select("Check Application");
+    cy.get("#f-name").type("Do this task");
+    cy.get("#f-description").type("This task, do");
+    cy.contains(".govuk-radios__item", "Team").find("input").check();
+    cy.get("#f-assigneeTeam").select("Cool Team");
+    cy.get("#f-dueDate").type("2035-01-01");
+    cy.get("button[type=submit]").click();
+
+    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-banner").contains("Task created");
+    cy.get("h1").contains("Zoraida Swanberg");
+    cy.location("pathname").should("eq", "/lpa/M-1234-9876-4567");
   });
 
-  it("redirects to create a warning via case actions", () => {
+  it("creates a warning via case actions", () => {
     cy.get("select#case-actions").select("Create a warning");
     cy.url().should("include", "/create-warning?id=189");
+    cy.get("#f-warningType").select("Complaint Received");
+    cy.get("#f-warningText").type("Be warned!");
+    cy.get("button[type=submit]").click();
+
+    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-banner").contains("Warning created");
+    cy.get("h1").contains("Zoraida Swanberg");
+    cy.location("pathname").should("eq", "/lpa/M-1234-9876-4567");
   });
 });
