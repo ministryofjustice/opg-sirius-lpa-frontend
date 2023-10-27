@@ -54,7 +54,7 @@ describe("View a digital LPA", () => {
   it("creates a task via case actions", () => {
     cy.get("select#case-actions").select("Create a task");
     cy.url().should("include", "/create-task?id=800");
-    cy.contains("7000-0000-0000");
+    cy.contains("M-1234-9876-4567");
     cy.get("#f-taskType").select("Check Application");
     cy.get("#f-name").type("Do this task");
     cy.get("#f-description").type("This task, do");

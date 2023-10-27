@@ -61,7 +61,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "{\"caseType\":\"LPA\",\"donor\":{\"id\":189},\"id\":800,\"status\":\"Pending\",\"uId\":\"7000-0000-0000\"}"
+        "body": "{\"caseType\":\"DIGITAL_LPA\",\"donor\":{\"id\":189},\"id\":800,\"status\":\"Pending\",\"uId\":\"M-1234-9876-4567\"}"
       }
     },
     {
