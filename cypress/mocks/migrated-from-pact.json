@@ -702,7 +702,10 @@
     },
     {
       "name": "A request to create a warning for a digital LPA",
-      "request": { "method": "POST", "url": "/lpa-api/v1/create-warning?id=66" },
+      "request": {
+        "method": "POST",
+        "url": "/lpa-api/v1/create-warning?id=66"
+      },
       "response": {
         "status": 201,
         "headers": { "Content-Type": "application/json" }
