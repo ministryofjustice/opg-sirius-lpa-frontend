@@ -71,7 +71,7 @@ describe("View a digital LPA", () => {
 
   it("creates a warning via case actions", () => {
     cy.get("select#case-actions").select("Create a warning");
-    cy.url().should("include", "/create-warning?id=189");
+    cy.url().should("include", "/create-warning?id=666");
     cy.get("#f-warningType").select("Complaint Received");
     cy.get("#f-warningText").type("Be warned!");
     cy.get("button[type=submit]").click();
