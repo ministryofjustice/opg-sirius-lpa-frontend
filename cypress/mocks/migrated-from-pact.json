@@ -65,6 +65,15 @@
       }
     },
     {
+      "name": "A request for a person's cases",
+      "request": { "method": "GET", "url": "/lpa-api/v1/persons/666/cases" },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"cases\":[{\"id\":800,\"uId\":\"M-1234-9876-4567\",\"caseType\":\"DIGITAL_LPA\",\"caseSubtype\":\"hw\"}]}"
+      }
+    },
+    {
       "name": "A request for a digital LPA case",
       "request": { "method": "GET", "url": "/lpa-api/v1/cases/900" },
       "response": {
@@ -82,7 +91,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "{\"donor\":{\"id\":189}, \"application\":{\"correspondentAddress\":{\"addressLine1\":\"Main Line Bungalow\",\"addressLine2\":\"Himmerton Lane\",\"addressLine3\":\"Sutton\",\"country\":\"GB\",\"postcode\":\"S24 7DJ\",\"town\":\"Scarsdale\"},\"correspondentFirstNames\":\"Heath\",\"correspondentLastName\":\"Enstad\",\"donorAddress\":{\"addressLine1\":\"Apartment 24\",\"addressLine2\":\"Navigation Building\",\"addressLine3\":\"90 London Road\",\"country\":\"GB\",\"postcode\":\"B15 4TA\",\"town\":\"Birmingham\"},\"donorDob\":\"27/05/1978\",\"donorEmail\":\"zswanberg@host.example\",\"donorFirstNames\":\"Zoraida\",\"donorLastName\":\"Swanberg\",\"donorPhone\":\"073456249524\"},\"caseSubtype\":\"pfa\",\"complaintCount\":1,\"createdDate\":\"26/03/2018\",\"investigationCount\":2,\"status\":\"Draft\",\"taskCount\":3,\"uId\":\"M-1234-9876-4567\",\"id\":800,\"warningCount\":4}"
+        "body": "{\"donor\":{\"id\":666}, \"application\":{\"correspondentAddress\":{\"addressLine1\":\"Main Line Bungalow\",\"addressLine2\":\"Himmerton Lane\",\"addressLine3\":\"Sutton\",\"country\":\"GB\",\"postcode\":\"S24 7DJ\",\"town\":\"Scarsdale\"},\"correspondentFirstNames\":\"Heath\",\"correspondentLastName\":\"Enstad\",\"donorAddress\":{\"addressLine1\":\"Apartment 24\",\"addressLine2\":\"Navigation Building\",\"addressLine3\":\"90 London Road\",\"country\":\"GB\",\"postcode\":\"B15 4TA\",\"town\":\"Birmingham\"},\"donorDob\":\"27/05/1978\",\"donorEmail\":\"zswanberg@host.example\",\"donorFirstNames\":\"Zoraida\",\"donorLastName\":\"Swanberg\",\"donorPhone\":\"073456249524\"},\"caseSubtype\":\"pfa\",\"complaintCount\":1,\"createdDate\":\"26/03/2018\",\"investigationCount\":2,\"status\":\"Draft\",\"taskCount\":3,\"uId\":\"M-1234-9876-4567\",\"id\":800,\"warningCount\":4}"
       }
     },
     {
