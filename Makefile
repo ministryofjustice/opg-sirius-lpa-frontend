@@ -34,7 +34,7 @@ build-all: ## Build containers
 build-all: docker compose build --parallel lpa-frontend puppeteer cypress test-runner
 
 up: ## Start application
-up: docker compose up -d lpa-frontend
+	docker compose up -d lpa-frontend
 
 dev: ## Start application with live reload for JavaScript files
 dev:
