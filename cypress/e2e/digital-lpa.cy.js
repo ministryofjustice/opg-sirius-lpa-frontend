@@ -1,11 +1,11 @@
 describe("View a digital LPA", () => {
   beforeEach(() => {
-    cy.visit("/lpa/M-1234-9876-4567");
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
   });
 
   it("shows case information", () => {
-    cy.contains("M-1234-9876-4567");
-    cy.get("h1").contains("Zoraida Swanberg");
+    cy.contains("M-DIGI-LPA3-3333");
+    cy.get("h1").contains("Agnes Hartley");
     cy.get(".govuk-tag.app-tag--draft").contains("Draft");
 
     cy.contains("1 Complaints");
@@ -15,16 +15,16 @@ describe("View a digital LPA", () => {
   });
 
   it("shows payment information", () => {
-    cy.contains("M-1234-9876-4567");
-    cy.get("h1").contains("Zoraida Swanberg");
+    cy.contains("M-DIGI-LPA3-3333");
+    cy.get("h1").contains("Agnes Hartley");
 
     cy.contains("Fees").click();
     cy.contains("£41.00 expected");
   });
 
   it("shows document information", () => {
-    cy.contains("M-1234-9876-4567");
-    cy.get("h1").contains("Zoraida Swanberg");
+    cy.contains("M-DIGI-LPA3-3333");
+    cy.get("h1").contains("Agnes Hartley");
     cy.contains("Documents").click();
 
     cy.contains("Mr Test Person - Blank Template");
@@ -39,7 +39,7 @@ describe("View a digital LPA", () => {
   });
 
   it("shows task list", () => {
-    cy.contains("M-1234-9876-4567");
+    cy.contains("M-DIGI-LPA3-3333");
     cy.get("h2").contains("Tasks");
     cy.get("ul[data-role=tasks-list] li").should((elts) => {
       expect(elts).to.have.length(3);
@@ -53,8 +53,8 @@ describe("View a digital LPA", () => {
 
   it("creates a task via case actions", () => {
     cy.get("select#case-actions").select("Create a task");
-    cy.url().should("include", "/create-task?id=800");
-    cy.contains("M-1234-9876-4567");
+    cy.url().should("include", "/create-task?id=333");
+    cy.contains("M-DIGI-LPA3-3333");
     cy.get("#f-taskType").select("Check Application");
     cy.get("#f-name").type("Do this task");
     cy.get("#f-description").type("This task, do");
@@ -65,20 +65,20 @@ describe("View a digital LPA", () => {
 
     cy.get(".moj-banner").should("exist");
     cy.get(".moj-banner").contains("Task created");
-    cy.get("h1").contains("Zoraida Swanberg");
-    cy.location("pathname").should("eq", "/lpa/M-1234-9876-4567");
+    cy.get("h1").contains("Agnes Hartley");
+    cy.location("pathname").should("eq", "/lpa/M-DIGI-LPA3-3333");
   });
 
   it("creates a warning via case actions", () => {
     cy.get("select#case-actions").select("Create a warning");
-    cy.url().should("include", "/create-warning?id=666");
+    cy.url().should("include", "/create-warning?id=33");
     cy.get("#f-warningType").select("Complaint Received");
     cy.get("#f-warningText").type("Be warned!");
     cy.get("button[type=submit]").click();
 
     cy.get(".moj-banner").should("exist");
     cy.get(".moj-banner").contains("Warning created");
-    cy.get("h1").contains("Zoraida Swanberg");
-    cy.location("pathname").should("eq", "/lpa/M-1234-9876-4567");
+    cy.get("h1").contains("Agnes Hartley");
+    cy.location("pathname").should("eq", "/lpa/M-DIGI-LPA3-3333");
   });
 });
