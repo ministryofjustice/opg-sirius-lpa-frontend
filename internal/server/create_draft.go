@@ -36,20 +36,22 @@ func (d *dob) toDateString() sirius.DateString {
 }
 
 type formDraft struct {
-	SubTypes                []string       `form:"subtype"`
-	DonorFirstname          string         `form:"donorFirstname"`
-	DonorMiddlename         string         `form:"donorMiddlename"`
-	DonorSurname            string         `form:"donorSurname"`
-	DonorAddress            sirius.Address `form:"donorAddress"`
-	Recipient               string         `form:"recipient"`
-	CorrespondentFirstname  string         `form:"correspondentFirstname"`
-	CorrespondentMiddlename string         `form:"correspondentMiddlename"`
-	CorrespondentSurname    string         `form:"correspondentSurname"`
-	AlternativeAddress      sirius.Address `form:"alternativeAddress"`
-	CorrespondentAddress    sirius.Address `form:"correspondentAddress"`
-	Dob                     dob            `form:"dob"`
-	Email                   string         `form:"donorEmail"`
-	Phone                   string         `form:"donorPhone"`
+	SubTypes                  []string       `form:"subtype"`
+	DonorFirstname            string         `form:"donorFirstname"`
+	DonorMiddlename           string         `form:"donorMiddlename"`
+	DonorSurname              string         `form:"donorSurname"`
+	DonorAddress              sirius.Address `form:"donorAddress"`
+	Recipient                 string         `form:"recipient"`
+	CorrespondentFirstname    string         `form:"correspondentFirstname"`
+	CorrespondentMiddlename   string         `form:"correspondentMiddlename"`
+	CorrespondentSurname      string         `form:"correspondentSurname"`
+	AlternativeAddress        sirius.Address `form:"alternativeAddress"`
+	CorrespondentAddress      sirius.Address `form:"correspondentAddress"`
+	Dob                       dob            `form:"dob"`
+	Email                     string         `form:"donorEmail"`
+	Phone                     string         `form:"donorPhone"`
+	CorrespondenceByWelsh     bool           `form:"correspondenceByWelsh"`
+	CorrespondenceLargeFormat bool           `form:"correspondenceLargeFormat"`
 }
 
 type CreateDraftClient interface {
@@ -148,14 +150,16 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 			}
 
 			compiledDraft := sirius.Draft{
-				CaseType:        data.Form.SubTypes,
-				Source:          "PHONE",
-				DonorFirstNames: buildName(data.Form.DonorFirstname, data.Form.DonorMiddlename),
-				DonorLastName:   data.Form.DonorSurname,
-				DonorDob:        data.Form.Dob.toDateString(),
-				DonorAddress:    addDefaultCountry(data.Form.DonorAddress),
-				Email:           data.Form.Email,
-				PhoneNumber:     data.Form.Phone,
+				CaseType:                  data.Form.SubTypes,
+				Source:                    "PHONE",
+				DonorFirstNames:           buildName(data.Form.DonorFirstname, data.Form.DonorMiddlename),
+				DonorLastName:             data.Form.DonorSurname,
+				DonorDob:                  data.Form.Dob.toDateString(),
+				DonorAddress:              addDefaultCountry(data.Form.DonorAddress),
+				Email:                     data.Form.Email,
+				PhoneNumber:               data.Form.Phone,
+				CorrespondenceByWelsh:     data.Form.CorrespondenceByWelsh,
+				CorrespondenceLargeFormat: data.Form.CorrespondenceLargeFormat,
 			}
 
 			if data.Form.Recipient == "donor-other-address" {
