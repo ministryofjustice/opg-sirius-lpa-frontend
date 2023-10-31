@@ -104,8 +104,10 @@ func TestCreateDraft(t *testing.T) {
 					Postcode: "JN2 7UO",
 					Country:  "GB",
 				},
-				PhoneNumber: "07893932118",
-				Email:       "c.morneault@somehost.example",
+				PhoneNumber:               "07893932118",
+				Email:                     "c.morneault@somehost.example",
+				CorrespondenceByWelsh:     true,
+				CorrespondenceLargeFormat: false,
 			},
 			setup: func() {
 				pact.
@@ -142,8 +144,9 @@ func TestCreateDraft(t *testing.T) {
 								"postcode":     "JN2 7UO",
 								"country":      "GB",
 							},
-							"donorPhone": "07893932118",
-							"donorEmail": "c.morneault@somehost.example",
+							"donorPhone":            "07893932118",
+							"donorEmail":            "c.morneault@somehost.example",
+							"correspondenceByWelsh": true,
 						},
 					}).
 					WillRespondWith(dsl.Response{

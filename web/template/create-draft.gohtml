@@ -216,6 +216,33 @@
             <input class="govuk-input {{ if .Error.Field.donorEmail }}govuk-input--error{{ end }}" id="f-donorEmail" name="donorEmail" value="{{ .Form.Email }}" />
           </div>
 
+          <div class="govuk-form-group {{ if or (.Error.Field.correspondenceLargeFormat) (.Error.Field.correspondenceByWelsh) }}govuk-form-group--error{{ end }}" id="f-correspondenceOptions">
+            <fieldset class="govuk-fieldset" aria-describedby="f-correspondence-options-hint">
+              <legend class="govuk-fieldset__legend">Does the donor require correspondence in Welsh or large format?</legend>
+              <div class="govuk-hint" id="f-correspondence-options-hint">Optional, select all that apply</div>
+              {{ template "errors" .Error.Field.correspondenceByWelsh }}
+              {{ template "errors" .Error.Field.correspondenceLargeFormat }}
+              <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="f-correspondence-welsh"
+                         name="correspondenceByWelsh" type="checkbox" value="true" {{ if .Form.CorrespondenceByWelsh }}checked{{ end }}>
+                  <label class="govuk-label govuk-checkboxes__label"
+                         for="f-correspondence-welsh">
+                    Welsh
+                  </label>
+                </div>
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="f-correspondence-large"
+                         name="correspondenceLargeFormat" type="checkbox" value="true" {{ if .Form.CorrespondenceLargeFormat }}checked{{ end }}>
+                  <label class="govuk-label govuk-checkboxes__label"
+                         for="f-correspondence-large">
+                    Large format
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
           <div class="govuk-button-group">
             <button class="govuk-button" data-module="govuk-button" type="submit">Save draft LPA</button>
             <a class="govuk-link govuk-link--no-visited-state" href="/">Cancel</a>
