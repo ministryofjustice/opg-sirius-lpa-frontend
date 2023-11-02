@@ -24,7 +24,6 @@ type taskData struct {
 	Success   bool
 	Error     sirius.ValidationError
 
-	Case             sirius.Case
 	TaskTypes        []string
 	Teams            []sirius.Team
 	Task             sirius.TaskRequest
@@ -66,13 +65,13 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 			return nil
 		})
 
+		var caseitem sirius.Case
 		group.Go(func() error {
-			caseitem, err := client.Case(ctx.With(groupCtx), caseID)
+			caseitem, err = client.Case(ctx.With(groupCtx), caseID)
 			if err != nil {
 				return err
 			}
 			data.Entity = caseitem.Summary()
-			data.Case = caseitem
 			return nil
 		})
 
@@ -124,12 +123,12 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 
-				if data.Case.CaseType == "DIGITAL_LPA" {
+				if caseitem.CaseType == "DIGITAL_LPA" {
 					SetFlash(w, FlashNotification{
 						Title: "Task created",
 					})
 
-					return RedirectError(fmt.Sprintf("/lpa/%s", data.Case.UID))
+					return RedirectError(fmt.Sprintf("/lpa/%s", caseitem.UID))
 				}
 			}
 		}
