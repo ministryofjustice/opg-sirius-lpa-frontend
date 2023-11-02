@@ -1,7 +1,9 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -20,9 +22,9 @@ type warningData struct {
 	Success      bool
 	Error        sirius.ValidationError
 
-	WarningType string
-	WarningText string
-	Cases       []sirius.Case
+	WarningType  string
+	WarningText  string
+	Cases        []sirius.Case
 }
 
 func Warning(client WarningClient, tmpl template.Template) Handler {
@@ -79,6 +81,15 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 				return err
 			} else {
 				data.Success = true
+
+				for _, lpa := range data.Cases {
+					if lpa.CaseType == "DIGITAL_LPA" && slices.Contains(caseIDs, lpa.ID) {
+						SetFlash(w, FlashNotification{
+							Title: "Warning created",
+						})
+						return RedirectError(fmt.Sprintf("/lpa/%s", lpa.UID))
+					}
+				}
 			}
 		}
 
