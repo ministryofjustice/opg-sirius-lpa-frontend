@@ -37,6 +37,7 @@ func (m *mockTaskClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
 }
 
 func TestGetTask(t *testing.T) {
+	siriusCase := sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}
 	client := &mockTaskClient{}
 	client.
 		On("TaskTypes", mock.Anything).
@@ -46,7 +47,7 @@ func TestGetTask(t *testing.T) {
 		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
 	client.
 		On("Case", mock.Anything, 123).
-		Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
+		Return(siriusCase, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -54,6 +55,7 @@ func TestGetTask(t *testing.T) {
 			TaskTypes: []string{"a", "b"},
 			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entity:    "LPA 7000-0000-0000",
+			Case:      siriusCase,
 		}).
 		Return(nil)
 
@@ -171,6 +173,7 @@ func TestGetTaskWhenTemplateErrors(t *testing.T) {
 }
 
 func TestPostTask(t *testing.T) {
+	siriusCase := sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}
 	client := &mockTaskClient{}
 	client.
 		On("TaskTypes", mock.Anything).
@@ -180,7 +183,7 @@ func TestPostTask(t *testing.T) {
 		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
 	client.
 		On("Case", mock.Anything, 123).
-		Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
+		Return(siriusCase, nil)
 	client.
 		On("CreateTask", mock.Anything, 123, sirius.TaskRequest{
 			Type:        "Some task type",
@@ -199,6 +202,7 @@ func TestPostTask(t *testing.T) {
 			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			AssigneeUserName: "System user",
 			Entity:           "LPA 7000-0000-0000",
+			Case:             siriusCase,
 		}).
 		Return(nil)
 
@@ -264,6 +268,7 @@ func TestPostTaskWhenCreateTaskFails(t *testing.T) {
 }
 
 func TestPostTaskWhenAssignToNotSet(t *testing.T) {
+	siriusCase := sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}
 	client := &mockTaskClient{}
 	client.
 		On("TaskTypes", mock.Anything).
@@ -273,7 +278,7 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
 	client.
 		On("Case", mock.Anything, 123).
-		Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
+		Return(siriusCase, nil)
 	client.
 		On("CreateTask", mock.Anything, mock.Anything, mock.Anything).
 		Return(sirius.ValidationError{
@@ -288,6 +293,7 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 			TaskTypes: []string{"a", "b"},
 			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entity:    "LPA 7000-0000-0000",
+			Case:      siriusCase,
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{
 					"assignTo": {"": "Assignee not set"},
@@ -322,6 +328,7 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 }
 
 func TestPostTaskWhenValidationError(t *testing.T) {
+	siriusCase := sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}
 	testCases := map[string]struct {
 		field            string
 		value            string
@@ -349,7 +356,7 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 				Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
 			client.
 				On("Case", mock.Anything, 123).
-				Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
+				Return(siriusCase, nil)
 			client.
 				On("CreateTask", mock.Anything, mock.Anything, mock.Anything).
 				Return(sirius.ValidationError{Field: sirius.FieldErrors{
@@ -378,6 +385,7 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 						AssigneeID:  66,
 					},
 					AssigneeUserName: tc.assigneeUserName,
+					Case: siriusCase,
 				}).
 				Return(nil)
 

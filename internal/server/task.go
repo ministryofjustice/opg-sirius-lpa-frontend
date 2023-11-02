@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -23,6 +24,7 @@ type taskData struct {
 	Success   bool
 	Error     sirius.ValidationError
 
+	Case             sirius.Case
 	TaskTypes        []string
 	Teams            []sirius.Team
 	Task             sirius.TaskRequest
@@ -70,6 +72,7 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 				return err
 			}
 			data.Entity = caseitem.Summary()
+			data.Case = caseitem
 			return nil
 		})
 
@@ -120,6 +123,14 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 				return err
 			} else {
 				data.Success = true
+
+				if data.Case.CaseType == "DIGITAL_LPA" {
+					SetFlash(w, FlashNotification{
+						Title: "Task created",
+					})
+
+					return RedirectError(fmt.Sprintf("/lpa/%s", data.Case.UID))
+				}
 			}
 		}
 

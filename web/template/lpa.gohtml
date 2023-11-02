@@ -10,6 +10,10 @@
 
     <h2 class="govuk-heading-m">Case summary</h2>
 
+    {{ if .FlashMessage.Title }}
+        {{ template "notification-banner" .FlashMessage }}
+    {{ end }}
+
     <dl class="govuk-summary-list">
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Status</dt>
