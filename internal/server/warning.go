@@ -25,7 +25,6 @@ type warningData struct {
 	WarningType  string
 	WarningText  string
 	Cases        []sirius.Case
-	FlashMessage FlashNotification
 }
 
 func Warning(client WarningClient, tmpl template.Template) Handler {
@@ -83,11 +82,11 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 
-				SetFlash(w, FlashNotification{
-					Title: "Warning created",
-				})
 				for _, lpa := range data.Cases {
 					if lpa.CaseType == "DIGITAL_LPA" && slices.Contains(caseIDs, lpa.ID) {
+						SetFlash(w, FlashNotification{
+							Title: "Warning created",
+						})
 						return RedirectError(fmt.Sprintf("/lpa/%s", lpa.UID))
 					}
 				}

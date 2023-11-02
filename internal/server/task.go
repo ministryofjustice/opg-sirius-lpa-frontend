@@ -124,11 +124,11 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 
-				SetFlash(w, FlashNotification{
-					Title: "Task created",
-				})
-
 				if data.Case.CaseType == "DIGITAL_LPA" {
+					SetFlash(w, FlashNotification{
+						Title: "Task created",
+					})
+
 					return RedirectError(fmt.Sprintf("/lpa/%s", data.Case.UID))
 				}
 			}
