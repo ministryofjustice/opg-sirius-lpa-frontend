@@ -3,12 +3,12 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
 )
 
