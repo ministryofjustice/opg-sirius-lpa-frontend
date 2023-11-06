@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -64,8 +65,9 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 			return nil
 		})
 
+		var caseitem sirius.Case
 		group.Go(func() error {
-			caseitem, err := client.Case(ctx.With(groupCtx), caseID)
+			caseitem, err = client.Case(ctx.With(groupCtx), caseID)
 			if err != nil {
 				return err
 			}
@@ -120,6 +122,14 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 				return err
 			} else {
 				data.Success = true
+
+				if caseitem.CaseType == "DIGITAL_LPA" {
+					SetFlash(w, FlashNotification{
+						Title: "Task created",
+					})
+
+					return RedirectError(fmt.Sprintf("/lpa/%s", caseitem.UID))
+				}
 			}
 		}
 

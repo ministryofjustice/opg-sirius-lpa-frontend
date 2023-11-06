@@ -13,8 +13,9 @@ type LpaClient interface {
 }
 
 type lpaData struct {
-	Lpa      sirius.DigitalLpa
-	TaskList []sirius.Task
+	Lpa          sirius.DigitalLpa
+	TaskList     []sirius.Task
+	FlashMessage FlashNotification
 }
 
 func Lpa(client LpaClient, tmpl template.Template) Handler {
@@ -38,6 +39,8 @@ func Lpa(client LpaClient, tmpl template.Template) Handler {
 			Lpa:      lpa,
 			TaskList: tasks,
 		}
+
+		data.FlashMessage, _ = GetFlash(w, r)
 
 		return tmpl(w, data)
 	}
