@@ -14,3 +14,5 @@ docs/architecture/dsl/**/workspace.json
 .gocache
 .trivy-cache
 test-results
+
+moj-frontend
