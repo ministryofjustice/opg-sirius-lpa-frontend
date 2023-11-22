@@ -36,6 +36,11 @@ func (m *mockTaskClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
 	return args.Get(0).(sirius.Case), args.Error(1)
 }
 
+func (m *mockTaskClient) GetUserDetails(ctx sirius.Context) (sirius.User, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(sirius.User), args.Error(1)
+}
+
 func TestGetTask(t *testing.T) {
 	client := &mockTaskClient{}
 	client.
