@@ -247,7 +247,8 @@ func TestPostTaskWhenAssignToMe(t *testing.T) {
 			Name:        "Do this",
 			Description: "Please",
 			AssigneeID:  66,
-		})
+		}).
+		Return(nil)
 	client.
 	    On("GetUserDetails",mock.Anything).
         Return(user, nil)
