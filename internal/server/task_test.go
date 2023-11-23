@@ -227,6 +227,61 @@ func TestPostTask(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
+func TestPostTaskWhenAssignToMe(t *testing.T) {
+    user := sirius.User{ID: 66, DisplayName: "Me", Roles: []string{"OPG User", "Reduced Fees User"}}
+
+	client := &mockTaskClient{}
+	client.
+		On("TaskTypes", mock.Anything).
+		Return([]string{"a", "b"}, nil)
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Case", mock.Anything, 123).
+		Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
+	client.
+		On("CreateTask", mock.Anything, 123, sirius.TaskRequest{
+			Type:        "Some task type",
+			DueDate:     "2022-03-04",
+			Name:        "Do this",
+			Description: "Please",
+			AssigneeID:  66,
+		})
+	client.
+	    On("GetUserDetails",mock.Anything).
+        Return(user, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, taskData{
+			Success:          true,
+			TaskTypes:        []string{"a", "b"},
+			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			AssigneeUserName: "Me",
+			Entity:           "LPA 7000-0000-0000",
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"assignTo":     {"me"},
+		"taskType":     {"Some task type"},
+		"dueDate":      {"2022-03-04"},
+		"name":         {"Do this"},
+		"description":  {"Please"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := Task(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
 func TestPostTaskWhenCreateTaskFails(t *testing.T) {
 	client := &mockTaskClient{}
 	client.
