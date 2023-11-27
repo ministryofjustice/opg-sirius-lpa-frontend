@@ -283,6 +283,58 @@ func TestPostTaskWhenAssignToMe(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
+func TestGetTaskWhenGetUserDetailsErrors(t *testing.T) {
+	client := &mockTaskClient{}
+	client.
+		On("TaskTypes", mock.Anything).
+		Return([]string{}, nil)
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{}, nil)
+	client.
+		On("Case", mock.Anything, mock.Anything).
+		Return(sirius.Case{}, nil)
+	client.
+    	On("CreateTask", mock.Anything, 123, sirius.TaskRequest{
+    		Type:        "Some task type",
+    		DueDate:     "2022-03-04",
+    		Name:        "Do this",
+    		Description: "Please",
+    		AssigneeID:  66,
+    	}).
+    	Return(nil)
+	client.
+    	On("GetUserDetails", mock.Anything).
+    	Return(sirius.User{}, expectedError)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, taskData{
+			Success:          true,
+			TaskTypes:        []string{"a", "b"},
+			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			AssigneeUserName: "Me",
+			Entity:           "LPA 7000-0000-0000",
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"assignTo":     {"me"},
+		"taskType":     {"Some task type"},
+		"dueDate":      {"2022-03-04"},
+		"name":         {"Do this"},
+		"description":  {"Please"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := Task(client, template.Func)(w, r)
+
+    assert.Equal(t, expectedError, err)
+}
+
 func TestPostTaskWhenCreateTaskFails(t *testing.T) {
 	client := &mockTaskClient{}
 	client.
