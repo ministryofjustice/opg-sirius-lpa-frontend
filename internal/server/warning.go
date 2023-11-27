@@ -22,9 +22,9 @@ type warningData struct {
 	Success      bool
 	Error        sirius.ValidationError
 
-	WarningType  string
-	WarningText  string
-	Cases        []sirius.Case
+	WarningType string
+	WarningText string
+	Cases       []sirius.Case
 }
 
 func Warning(client WarningClient, tmpl template.Template) Handler {

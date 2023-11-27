@@ -60,7 +60,7 @@ func TestGetAddPayment(t *testing.T) {
 		On("Func", mock.Anything, addPaymentData{
 			Case:           caseItem,
 			PaymentSources: paymentSources,
-			ReturnUrl: "/payments/4",
+			ReturnUrl:      "/payments/4",
 		}).
 		Return(nil)
 
@@ -146,7 +146,7 @@ func TestAddPaymentWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, addPaymentData{
 			Case:           caseItem,
 			PaymentSources: paymentSources,
-			ReturnUrl: "/payments/123",
+			ReturnUrl:      "/payments/123",
 		}).
 		Return(expectedError)
 

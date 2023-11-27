@@ -118,7 +118,7 @@ func TestTasksForCaseBadJson(t *testing.T) {
 
 	badJsonResponse := http.Response{
 		StatusCode: 200,
-		Body: io.NopCloser(bytes.NewBufferString("[bad json time")),
+		Body:       io.NopCloser(bytes.NewBufferString("[bad json time")),
 	}
 
 	mockHttpClient.On("Do", mock.Anything).Return(&badJsonResponse, nil)
@@ -144,7 +144,7 @@ func TestTasksForCase(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			id: 10,
+			id:   10,
 			setup: func() {
 				pact.
 					AddInteraction().
@@ -158,10 +158,10 @@ func TestTasksForCase(t *testing.T) {
 						Status: http.StatusOK,
 						Body: dsl.Like(map[string]interface{}{
 							"tasks": dsl.EachLike(map[string]interface{}{
-								"id":       dsl.Like(12),
-								"status":   dsl.String("Not started"),
-								"dueDate":  dsl.String("05/09/2023"),
-								"name":     dsl.String("Review reduced fees request"),
+								"id":      dsl.Like(12),
+								"status":  dsl.String("Not started"),
+								"dueDate": dsl.String("05/09/2023"),
+								"name":    dsl.String("Review reduced fees request"),
 								"assignee": dsl.Like(map[string]interface{}{
 									"displayName": dsl.String("Consuela"),
 								}),
@@ -172,10 +172,10 @@ func TestTasksForCase(t *testing.T) {
 			},
 			expectedResponse: []Task{
 				{
-					ID:       12,
-					Status:   "Not started",
-					DueDate:  DateString("2023-09-05"),
-					Name:     "Review reduced fees request",
+					ID:      12,
+					Status:  "Not started",
+					DueDate: DateString("2023-09-05"),
+					Name:    "Review reduced fees request",
 					Assignee: User{
 						DisplayName: "Consuela",
 					},
@@ -184,7 +184,7 @@ func TestTasksForCase(t *testing.T) {
 		},
 		{
 			name: "404",
-			id: 9012929,
+			id:   9012929,
 			setup: func() {
 				pact.
 					AddInteraction().
@@ -201,9 +201,9 @@ func TestTasksForCase(t *testing.T) {
 			expectedResponse: nil,
 			expectedError: func(port int) error {
 				return StatusError{
-					Code: 404,
-					URL: fmt.Sprintf("http://localhost:%d/lpa-api/v1/cases/9012929/tasks?filter=status%%3ANot+started%%2Cactive%%3Atrue&limit=99", port),
-					Method: "GET",
+					Code:          404,
+					URL:           fmt.Sprintf("http://localhost:%d/lpa-api/v1/cases/9012929/tasks?filter=status%%3ANot+started%%2Cactive%%3Atrue&limit=99", port),
+					Method:        "GET",
 					CorrelationId: "",
 				}
 			},

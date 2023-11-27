@@ -54,14 +54,14 @@ func TestCasesByDonor(t *testing.T) {
 			},
 			expectedResponse: []Case{
 				{
-					ID:       405,
-					UID:      "7000-5382-4438",
-					SubType:  "pfa",
+					ID:      405,
+					UID:     "7000-5382-4438",
+					SubType: "pfa",
 				},
 				{
-					ID:       406,
-					UID:      "7000-5382-8764",
-					SubType:  "hw",
+					ID:      406,
+					UID:     "7000-5382-8764",
+					SubType: "hw",
 				},
 			},
 		},

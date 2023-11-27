@@ -429,27 +429,27 @@ func TestRemoveDuplicateStr(t *testing.T) {
 func TestGetSortedInsertKeys(t *testing.T) {
 	selectedTemplateInsertsWithAll := []sirius.Insert{
 		{
-			Key:             "all",
-			InsertId:        "DDINSERT",
+			Key:      "all",
+			InsertId: "DDINSERT",
 		},
 		{
-			Key:             "imperfect",
-			InsertId:        "IM1INSERT",
+			Key:      "imperfect",
+			InsertId: "IM1INSERT",
 		},
 		{
-			Key:             "perfect",
-			InsertId:        "P1INSERT",
+			Key:      "perfect",
+			InsertId: "P1INSERT",
 		},
 	}
 
 	selectedTemplateInsertsWithoutAll := []sirius.Insert{
 		{
-			Key:             "imperfect",
-			InsertId:        "IM1INSERT",
+			Key:      "imperfect",
+			InsertId: "IM1INSERT",
 		},
 		{
-			Key:             "perfect",
-			InsertId:        "P1INSERT",
+			Key:      "perfect",
+			InsertId: "P1INSERT",
 		},
 	}
 
