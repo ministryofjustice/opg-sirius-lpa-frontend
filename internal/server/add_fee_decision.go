@@ -37,10 +37,10 @@ func AddFeeDecision(client AddFeeDecisionClient, tmpl template.Template) Handler
 		ctx := getContext(r)
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 		data := addFeeDecisionData{
-			XSRFToken: ctx.XSRFToken,
-			DecisionType: postFormString(r, "decisionType"),
+			XSRFToken:      ctx.XSRFToken,
+			DecisionType:   postFormString(r, "decisionType"),
 			DecisionReason: postFormString(r, "decisionReason"),
-			DecisionDate: postFormDateString(r, "decisionDate"),
+			DecisionDate:   postFormDateString(r, "decisionDate"),
 		}
 
 		group.Go(func() error {

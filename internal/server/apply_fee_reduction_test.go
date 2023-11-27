@@ -181,24 +181,24 @@ func TestApplyFeeReductionWhenFailureOnGetFeeReductionTypesRefData(t *testing.T)
 
 func TestPostFeeReduction(t *testing.T) {
 	testCases := []struct {
-		name string
-		id int
-		caseItem sirius.Case
-		paymentDate string
+		name             string
+		id               int
+		caseItem         sirius.Case
+		paymentDate      string
 		expectedRedirect string
 	}{
 		{
-			name: "Non-digital LPA",
-			id: 123,
-			caseItem: sirius.Case{CaseType: "LPA", UID: "700700"},
-			paymentDate: "2022-01-23",
+			name:             "Non-digital LPA",
+			id:               123,
+			caseItem:         sirius.Case{CaseType: "LPA", UID: "700700"},
+			paymentDate:      "2022-01-23",
 			expectedRedirect: "/payments/123",
 		},
 		{
-			name: "Digital LPA",
-			id: 9456,
-			caseItem: sirius.Case{CaseType: "DIGITAL_LPA", UID: "M-AAA-BBB-CCC"},
-			paymentDate: "2023-09-01",
+			name:             "Digital LPA",
+			id:               9456,
+			caseItem:         sirius.Case{CaseType: "DIGITAL_LPA", UID: "M-AAA-BBB-CCC"},
+			paymentDate:      "2023-09-01",
 			expectedRedirect: "/lpa/M-AAA-BBB-CCC/payments",
 		},
 	}
@@ -210,7 +210,7 @@ func TestPostFeeReduction(t *testing.T) {
 		},
 	}
 
-	for _, tc := range(testCases) {
+	for _, tc := range testCases {
 		client := &mockApplyFeeReductionClient{}
 		client.
 			On("ApplyFeeReduction", mock.Anything, tc.id, "REMISSION", "Test evidence", sirius.DateString(tc.paymentDate)).

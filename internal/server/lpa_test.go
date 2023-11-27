@@ -47,12 +47,12 @@ func TestGetLpaErrorRetrievingTasksForCase(t *testing.T) {
 
 	template := &mockTemplate{}
 	/*
-	template.
-		On("Func", mock.Anything, lpaData{
-			Lpa: digitalLpa,
-			TaskList: taskList,
-		}).
-		Return(nil)
+		template.
+			On("Func", mock.Anything, lpaData{
+				Lpa: digitalLpa,
+				TaskList: taskList,
+			}).
+			Return(nil)
 	*/
 
 	server := newMockServer("/lpa/{uid}", Lpa(client, template.Func))
@@ -84,7 +84,7 @@ func TestGetLpa(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, lpaData{
-			Lpa: digitalLpa,
+			Lpa:      digitalLpa,
 			TaskList: taskList,
 		}).
 		Return(nil)

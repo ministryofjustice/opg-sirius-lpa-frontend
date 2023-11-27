@@ -8,16 +8,16 @@ import (
 )
 
 type Task struct {
-	ID          int        `json:"id"`
-	Status      string     `json:"status"`
-	DueDate     DateString `json:"dueDate"`
-	Name        string     `json:"name"`
-	CaseItems   []Case     `json:"caseItems"`
-	Assignee    User       `json:"assignee"`
+	ID        int        `json:"id"`
+	Status    string     `json:"status"`
+	DueDate   DateString `json:"dueDate"`
+	Name      string     `json:"name"`
+	CaseItems []Case     `json:"caseItems"`
+	Assignee  User       `json:"assignee"`
 }
 
 type taskList struct {
-    Tasks []Task `json:"tasks"`
+	Tasks []Task `json:"tasks"`
 }
 
 func (t Task) Summary() string {
