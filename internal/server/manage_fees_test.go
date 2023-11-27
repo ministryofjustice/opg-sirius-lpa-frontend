@@ -22,15 +22,15 @@ func (m *mockManageFeesClient) Case(ctx sirius.Context, id int) (sirius.Case, er
 
 func TestGetManageFees(t *testing.T) {
 	tests := []struct {
-		scenario string
-		caseItem sirius.Case
+		scenario          string
+		caseItem          sirius.Case
 		expectedReturnUrl string
 	}{
 		{
 			scenario: "Digital LPA",
 			caseItem: sirius.Case{
-				ID: 71,
-				UID: "M-AAAA-BBBB-DDDD",
+				ID:       71,
+				UID:      "M-AAAA-BBBB-DDDD",
 				CaseType: "DIGITAL_LPA",
 			},
 			expectedReturnUrl: "/lpa/M-AAAA-BBBB-DDDD/payments",
@@ -38,7 +38,7 @@ func TestGetManageFees(t *testing.T) {
 		{
 			scenario: "Non-digital LPA",
 			caseItem: sirius.Case{
-				ID: 81,
+				ID:  81,
 				UID: "7000-0000-0021",
 			},
 			expectedReturnUrl: "/payments/81",
@@ -54,7 +54,7 @@ func TestGetManageFees(t *testing.T) {
 		template := &mockTemplate{}
 		template.
 			On("Func", mock.Anything, manageFeesData{
-				Case: test.caseItem,
+				Case:      test.caseItem,
 				ReturnUrl: test.expectedReturnUrl,
 			}).
 			Return(nil)

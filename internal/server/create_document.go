@@ -45,8 +45,8 @@ type InsertDisplayData struct {
 }
 
 type ComponentTemplateInsertData struct {
-	InsertId        string `json:"id"`
-	Label           string `json:"label"`
+	InsertId string `json:"id"`
+	Label    string `json:"label"`
 }
 
 type ComponentTemplateData struct {
@@ -350,8 +350,8 @@ func buildComponentDocumentData(templates []sirius.DocumentTemplateData) Compone
 
 		for _, insert := range template.Inserts {
 			formedInsert := ComponentTemplateInsertData{
-				InsertId:        insert.InsertId,
-				Label:           insert.Label,
+				InsertId: insert.InsertId,
+				Label:    insert.Label,
 			}
 
 			formed.Inserts[insert.Key] = append(formed.Inserts[insert.Key], formedInsert)

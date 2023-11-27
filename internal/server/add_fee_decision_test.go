@@ -56,9 +56,9 @@ func TestGetAddFeeDecision(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addFeeDecisionData{
-			Case: caseItem,
+			Case:          caseItem,
 			DecisionTypes: feeDecisionTypes,
-			ReturnUrl: "/payments/4",
+			ReturnUrl:     "/payments/4",
 		}).
 		Return(nil)
 
@@ -92,10 +92,10 @@ func TestAddFeeDecisionNoID(t *testing.T) {
 }
 
 func TestAddFeeDecisionInvalidPostData(t *testing.T) {
-	testCases := []struct{
-		name string
-		postData url.Values
-		expectedTemplateData addFeeDecisionData
+	testCases := []struct {
+		name                    string
+		postData                url.Values
+		expectedTemplateData    addFeeDecisionData
 		expectedValidationError sirius.ValidationError
 	}{
 		{
@@ -106,8 +106,8 @@ func TestAddFeeDecisionInvalidPostData(t *testing.T) {
 			},
 			expectedTemplateData: addFeeDecisionData{
 				DecisionReason: "Invalid evidence",
-				DecisionType: "",
-				DecisionDate: "2023-10-10",
+				DecisionType:   "",
+				DecisionDate:   "2023-10-10",
 			},
 			expectedValidationError: sirius.ValidationError{
 				Field: sirius.FieldErrors{
@@ -123,8 +123,8 @@ func TestAddFeeDecisionInvalidPostData(t *testing.T) {
 			},
 			expectedTemplateData: addFeeDecisionData{
 				DecisionReason: "Invalid evidence",
-				DecisionType: "DECLINED_REMISSION",
-				DecisionDate: "",
+				DecisionType:   "DECLINED_REMISSION",
+				DecisionDate:   "",
 			},
 			expectedValidationError: sirius.ValidationError{
 				Field: sirius.FieldErrors{
@@ -213,9 +213,9 @@ func TestAddFeeDecisionWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addFeeDecisionData{
-			Case: caseItem,
+			Case:          caseItem,
 			DecisionTypes: feeDecisionTypes,
-			ReturnUrl: "/payments/111",
+			ReturnUrl:     "/payments/111",
 		}).
 		Return(expectedError)
 
@@ -264,9 +264,9 @@ func TestAddFeeDecisionNonValidationClientError(t *testing.T) {
 
 	// client gets a 500 error back when adding the fee decision via the API
 	serverError := sirius.StatusError{
-		Code: http.StatusInternalServerError,
-		URL: "https://not.real/",
-		Method: http.MethodPost,
+		Code:          http.StatusInternalServerError,
+		URL:           "https://not.real/",
+		Method:        http.MethodPost,
 		CorrelationId: "Uncorrelated",
 	}
 	client.
