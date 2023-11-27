@@ -91,13 +91,13 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 
 			switch assignTo {
 			case "me":
-			    user, err := client.GetUserDetails(ctx)
-			    if (err != nil){
-			        return err
-			    } else {
-                    task.AssigneeID = user.ID
-                    data.AssigneeUserName = user.DisplayName
-                }
+				user, err := client.GetUserDetails(ctx)
+				if (err != nil){
+					return err
+				} else {
+					task.AssigneeID = user.ID
+					data.AssigneeUserName = user.DisplayName
+				}
 			case "user":
 				parts := strings.SplitN(postFormString(r, "assigneeUser"), ":", 2)
 				if len(parts) == 2 {
