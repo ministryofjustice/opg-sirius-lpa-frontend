@@ -229,8 +229,8 @@ func TestPostAssignTaskToMe(t *testing.T) {
 		On("AssignTasks", mock.Anything, 66, []int{123}).
 		Return(nil)
 	client.
-	    On("GetUserDetails",mock.Anything).
-	    Return(user,nil)
+		On("GetUserDetails",mock.Anything).
+		Return(user,nil)
 
 	template := &mockTemplate{}
 	template.
@@ -270,8 +270,8 @@ func TestPostAssignTaskWhenUserDetailsErrors(t *testing.T) {
 		On("AssignTasks", mock.Anything, 66, []int{123}).
 		Return(nil)
 	client.
-	    On("GetUserDetails",mock.Anything).
-	    Return(sirius.User{},expectedError)
+		On("GetUserDetails",mock.Anything).
+		Return(sirius.User{},expectedError)
 
 	template := &mockTemplate{}
 	template.
@@ -293,7 +293,7 @@ func TestPostAssignTaskWhenUserDetailsErrors(t *testing.T) {
 
 	err := AssignTask(client, template.Func)(w, r)
 
-    assert.Equal(t, expectedError, err)
+	assert.Equal(t, expectedError, err)
 }
 
 func TestPostAssignTaskMultiple(t *testing.T) {
