@@ -258,6 +258,44 @@ func TestPostAssignTaskToMe(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestPostAssignTaskWhenUserDetailsErrors(t *testing.T) {
+	client := &mockAssignTaskClient{}
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Task", mock.Anything, 123).
+		Return(sirius.Task{Name: "A task", CaseItems: []sirius.Case{{UID: "7000-0000-0000", CaseType: "LPA"}}}, nil)
+	client.
+		On("AssignTasks", mock.Anything, 66, []int{123}).
+		Return(nil)
+	client.
+	    On("GetUserDetails",mock.Anything).
+	    Return(sirius.User{},expectedError)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, assignTaskData{
+			Success:          true,
+			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			AssigneeUserName: "Me",
+			Entities:         []string{"LPA 7000-0000-0000: A task"},
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"assignTo":     {"me"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AssignTask(client, template.Func)(w, r)
+
+    assert.Equal(t, expectedError, err)
+}
+
 func TestPostAssignTaskMultiple(t *testing.T) {
 	client := &mockAssignTaskClient{}
 	client.
