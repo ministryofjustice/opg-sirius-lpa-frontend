@@ -227,3 +227,18 @@ func TestDocumentByUuid(t *testing.T) {
 		})
 	}
 }
+
+// non-pact test
+func TestDocumentIsViewable(t *testing.T) {
+	d := Document{}
+	assert.True(t, d.IsViewable())
+
+	d.Direction = "Incoming"
+	assert.True(t, d.IsViewable())
+
+	d.SubType = "Reduced fee request evidence"
+	assert.False(t, d.IsViewable())
+
+	d.ReceivedDateTime = "11/12/2023"
+	assert.True(t, d.IsViewable())
+}

@@ -12,6 +12,7 @@ type Document struct {
 	Type                string `json:"type"`
 	FriendlyDescription string `json:"friendlyDescription"`
 	CreatedDate         string `json:"createdDate"`
+	ReceivedDateTime    string `json:"receivedDateTime"`
 	Direction           string `json:"direction"`
 	MimeType            string `json:"mimeType"`
 	SystemType          string `json:"systemType"`
@@ -21,6 +22,13 @@ type Document struct {
 	Correspondent       Person `json:"correspondent"`
 	ChildCount          int    `json:"childCount"`
 	CaseItems           []Case `json:"caseItems,omitempty"`
+}
+
+func (d *Document) IsViewable() bool {
+	if d.SubType == "Reduced fee request evidence" && d.Direction == "Incoming" {
+		return d.ReceivedDateTime != ""
+	}
+	return true
 }
 
 const (
