@@ -5,8 +5,7 @@
     </span>
     <h1 class="govuk-heading-xl">{{ .Lpa.Application.DonorFirstNames }} {{ .Lpa.Application.DonorLastName }}</h1>
 
-    <nav class="moj-sub-navigation" aria-label="linked cases">
-
+    <nav class="moj-sub-navigation govuk-!-margin-bottom-0" aria-label="linked cases">
         <ul class="moj-sub-navigation__list">
             {{ range .SortedLinkedCases }}
                 <li class="moj-sub-navigation__item">
@@ -16,11 +15,9 @@
                 </li>
             {{ end }}
         </ul>
-
-        <h2 class="govuk-heading-m govuk-!-margin-top-3">
-            {{ template "status-tag" (ToLower $.Lpa.Status) }} {{ if (eq .Lpa.Subtype "hw") }}Health and welfare{{ else }}Property and finance{{ end }}, {{ .Lpa.UID }}
-        </h2>
     </nav>
+
+    {{ template "mlpa-case-summary" }}
 
     <div class="case-management-row govuk-grid-row">
         <div class="govuk-tabs govuk-grid-column-two-thirds">

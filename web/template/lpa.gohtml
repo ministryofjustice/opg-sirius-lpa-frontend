@@ -3,164 +3,164 @@
 {{ define "title" }}LPA{{ end }}
 
 {{ define "main" }}
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-full">
 
-    {{ template "mlpa-header" (caseTabs .Lpa "summary") }}
+  {{ template "mlpa-header" (caseTabs .Lpa "summary") }}
 
-    <h2 class="govuk-heading-m">Case summary</h2>
+  <h2 class="govuk-heading-m">Case summary</h2>
 
-    {{ if .FlashMessage.Title }}
-        {{ template "notification-banner" .FlashMessage }}
-    {{ end }}
+  {{ if .FlashMessage.Title }}
+      {{ template "notification-banner" .FlashMessage }}
+  {{ end }}
 
-    <dl class="govuk-summary-list">
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Status</dt>
-        <dd class="govuk-summary-list__value">
-          <strong class="govuk-tag app-tag--draft">
-            {{ .Lpa.Status }}
-          </strong>
-        </dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Progress</dt>
-        <dd class="govuk-summary-list__value">Forms posted [DATE]</dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Case reference</dt>
-        <dd class="govuk-summary-list__value">{{ .Lpa.UID }}</dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Case type</dt>
-        <dd class="govuk-summary-list__value">
-          {{ if (eq .Lpa.Subtype "hw") }}
-            LPA Health and welfare
-          {{ else }}
-            LPA Property and finance
-          {{ end }}
-        </dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Date created</dt>
-        <dd class="govuk-summary-list__value">{{ (date .Lpa.CreatedDate "2 January 2006") }}</dd>
-      </div>
-    </dl>
-
-    <div class="app-stat-block__container">
-      <aside class="app-stat-block">
-        <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ .Lpa.ObjectionCount }}</h3>
-        Objections
-      </aside>
-      <aside class="app-stat-block">
-        <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ .Lpa.WarningCount }}</h3>
-        Warnings
-      </aside>
-      <aside class="app-stat-block">
-        <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ .Lpa.ComplaintCount }}</h3>
-        Complaints
-      </aside>
-      <aside class="app-stat-block">
-        <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ .Lpa.InvestigationCount }}</h3>
-        Investigations
-      </aside>
-      <aside class="app-stat-block">
-        <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ len .TaskList }}</h3>
-        Tasks
-      </aside>
-    </div>
-
-    <h2>Tasks</h2>
-
-    <ul data-role="tasks-list">
-      {{ range .TaskList }}
-        <li>{{ .Name }} ({{ .Assignee.DisplayName }})</li>
-      {{ end }}
-    </ul>
-
-    <h2 class="govuk-heading-m">Donor details</h2>
-
-    <dl class="govuk-summary-list">
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Application format</dt>
-        <dd class="govuk-summary-list__value">
-          {{if (eq .Lpa.Application.Source "APPLICANT")}}
-            Digital
-          {{else}}
-            Paper
-          {{end}}
-        </dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Name</dt>
-        <dd class="govuk-summary-list__value">{{ .Lpa.Application.DonorFirstNames }} {{ .Lpa.Application.DonorLastName }}</dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Date of birth</dt>
-        <dd class="govuk-summary-list__value">{{ (date .Lpa.Application.DonorDob "2 January 2006") }}</dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Address</dt>
-        <dd class="govuk-summary-list__value">
-          {{ .Lpa.Application.DonorAddress.Line1 }}
-          {{ if not (eq .Lpa.Application.DonorAddress.Line2 "") }}<br>{{ .Lpa.Application.DonorAddress.Line2 }}{{ end }}
-          {{ if not (eq .Lpa.Application.DonorAddress.Line3 "") }}<br>{{ .Lpa.Application.DonorAddress.Line3 }}{{ end }}
-        </dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Town or city</dt>
-        <dd class="govuk-summary-list__value">{{ .Lpa.Application.DonorAddress.Town }}</dd>
-      </div>
-      {{ if not (eq .Lpa.Application.DonorAddress.Postcode "") }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">Postcode</dt>
-          <dd class="govuk-summary-list__value">{{ .Lpa.Application.DonorAddress.Postcode }}</dd>
+          <dt class="govuk-summary-list__key">Status</dt>
+          <dd class="govuk-summary-list__value">
+            <strong class="govuk-tag app-tag--draft">
+              {{ .Lpa.Status }}
+            </strong>
+          </dd>
         </div>
-      {{ end }}
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Country</dt>
-        <dd class="govuk-summary-list__value">{{ .Lpa.Application.DonorAddress.Country }}</dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Phone number</dt>
-        <dd class="govuk-summary-list__value">
-          {{ if (eq .Lpa.Application.PhoneNumber "") }}
-            not provided
-          {{ else }}
-            {{ .Lpa.Application.PhoneNumber }}
-          {{ end }}
-        </dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Email</dt>
-        <dd class="govuk-summary-list__value">
-          {{ if (eq .Lpa.Application.Email "") }}
-            not provided
-          {{ else }}
-            {{ .Lpa.Application.Email }}
-          {{ end }}
-        </dd>
-      </div>
-      <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Post forms to</dt>
-        <dd class="govuk-summary-list__value">
-          {{ if (eq .Lpa.Application.CorrespondentAddress.Line1 "") }}
-            The donor
-          {{ else }}
-            {{ if not (eq .Lpa.Application.CorrespondentFirstNames "") }}
-              {{ .Lpa.Application.CorrespondentFirstNames }} {{ .Lpa.Application.CorrespondentLastName }}<br>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Progress</dt>
+          <dd class="govuk-summary-list__value">Forms posted [DATE]</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Case reference</dt>
+          <dd class="govuk-summary-list__value">{{ .Lpa.UID }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Case type</dt>
+          <dd class="govuk-summary-list__value">
+            {{ if (eq .Lpa.Subtype "hw") }}
+              LPA Health and welfare
+            {{ else }}
+              LPA Property and finance
             {{ end }}
-              {{ .Lpa.Application.CorrespondentAddress.Line1 }}
-              {{ if not (eq .Lpa.Application.CorrespondentAddress.Line2 "") }}<br>{{ .Lpa.Application.CorrespondentAddress.Line2 }}{{ end }}
-              {{ if not (eq .Lpa.Application.CorrespondentAddress.Line3 "") }}<br>{{ .Lpa.Application.CorrespondentAddress.Line3 }}{{ end }}
-              <br>{{ .Lpa.Application.CorrespondentAddress.Town }}
-              <br>{{ .Lpa.Application.CorrespondentAddress.Postcode }}
-              <br>{{ .Lpa.Application.CorrespondentAddress.Country }}
-              <br>
-          {{ end }}
-        </dd>
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Date created</dt>
+          <dd class="govuk-summary-list__value">{{ (date .Lpa.CreatedDate "2 January 2006") }}</dd>
+        </div>
+      </dl>
+
+      <div class="app-stat-block__container">
+        <aside class="app-stat-block">
+          <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ .Lpa.ObjectionCount }}</h3>
+          Objections
+        </aside>
+        <aside class="app-stat-block">
+          <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ .Lpa.WarningCount }}</h3>
+          Warnings
+        </aside>
+        <aside class="app-stat-block">
+          <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ .Lpa.ComplaintCount }}</h3>
+          Complaints
+        </aside>
+        <aside class="app-stat-block">
+          <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ .Lpa.InvestigationCount }}</h3>
+          Investigations
+        </aside>
+        <aside class="app-stat-block">
+          <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ len .TaskList }}</h3>
+          Tasks
+        </aside>
       </div>
-    </dl>
+
+      <h2>Tasks</h2>
+
+      <ul data-role="tasks-list">
+        {{ range .TaskList }}
+          <li>{{ .Name }} ({{ .Assignee.DisplayName }})</li>
+        {{ end }}
+      </ul>
+
+      <h2 class="govuk-heading-m">Donor details</h2>
+
+      <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Application format</dt>
+          <dd class="govuk-summary-list__value">
+            {{if (eq .Lpa.Application.Source "APPLICANT")}}
+              Digital
+            {{else}}
+              Paper
+            {{end}}
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Name</dt>
+          <dd class="govuk-summary-list__value">{{ .Lpa.Application.DonorFirstNames }} {{ .Lpa.Application.DonorLastName }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Date of birth</dt>
+          <dd class="govuk-summary-list__value">{{ (date .Lpa.Application.DonorDob "2 January 2006") }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Address</dt>
+          <dd class="govuk-summary-list__value">
+            {{ .Lpa.Application.DonorAddress.Line1 }}
+            {{ if not (eq .Lpa.Application.DonorAddress.Line2 "") }}<br>{{ .Lpa.Application.DonorAddress.Line2 }}{{ end }}
+            {{ if not (eq .Lpa.Application.DonorAddress.Line3 "") }}<br>{{ .Lpa.Application.DonorAddress.Line3 }}{{ end }}
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Town or city</dt>
+          <dd class="govuk-summary-list__value">{{ .Lpa.Application.DonorAddress.Town }}</dd>
+        </div>
+        {{ if not (eq .Lpa.Application.DonorAddress.Postcode "") }}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Postcode</dt>
+            <dd class="govuk-summary-list__value">{{ .Lpa.Application.DonorAddress.Postcode }}</dd>
+          </div>
+        {{ end }}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Country</dt>
+          <dd class="govuk-summary-list__value">{{ .Lpa.Application.DonorAddress.Country }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Phone number</dt>
+          <dd class="govuk-summary-list__value">
+            {{ if (eq .Lpa.Application.PhoneNumber "") }}
+              not provided
+            {{ else }}
+              {{ .Lpa.Application.PhoneNumber }}
+            {{ end }}
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Email</dt>
+          <dd class="govuk-summary-list__value">
+            {{ if (eq .Lpa.Application.Email "") }}
+              not provided
+            {{ else }}
+              {{ .Lpa.Application.Email }}
+            {{ end }}
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Post forms to</dt>
+          <dd class="govuk-summary-list__value">
+            {{ if (eq .Lpa.Application.CorrespondentAddress.Line1 "") }}
+              The donor
+            {{ else }}
+              {{ if not (eq .Lpa.Application.CorrespondentFirstNames "") }}
+                {{ .Lpa.Application.CorrespondentFirstNames }} {{ .Lpa.Application.CorrespondentLastName }}<br>
+              {{ end }}
+                {{ .Lpa.Application.CorrespondentAddress.Line1 }}
+                {{ if not (eq .Lpa.Application.CorrespondentAddress.Line2 "") }}<br>{{ .Lpa.Application.CorrespondentAddress.Line2 }}{{ end }}
+                {{ if not (eq .Lpa.Application.CorrespondentAddress.Line3 "") }}<br>{{ .Lpa.Application.CorrespondentAddress.Line3 }}{{ end }}
+                <br>{{ .Lpa.Application.CorrespondentAddress.Town }}
+                <br>{{ .Lpa.Application.CorrespondentAddress.Postcode }}
+                <br>{{ .Lpa.Application.CorrespondentAddress.Country }}
+                <br>
+            {{ end }}
+          </dd>
+        </div>
+      </dl>
+    </div>
   </div>
-</div>
 {{ end }}
