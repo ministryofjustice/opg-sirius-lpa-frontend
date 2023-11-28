@@ -4,7 +4,7 @@ export default function showHideCaseSummary(prefix) {
     const buttonIcon = document.querySelector(".case-summary-toggle-icon")
     const caseSummary = document.querySelector(".case-summary");
 
-    if (button && caseSummary) {
+    if (button && buttonText && buttonIcon && caseSummary ) {
         button.onclick = () => {
             if (buttonText.innerText === "Hide") {
                 buttonText.innerText = "Show";
