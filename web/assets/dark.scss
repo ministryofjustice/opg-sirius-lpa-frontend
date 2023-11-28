@@ -41,6 +41,7 @@ $sirius-bg-color: #29292e;
     color: govuk-colour("white");
   }
 
+  .govuk-accordion__show-all,
   .govuk-details__summary-text,
   .govuk-link:link {
     color: lighten(govuk-colour("light-blue"), 20%);
@@ -127,5 +128,10 @@ $sirius-bg-color: #29292e;
 
   .app-stat-block {
     background-color: govuk-colour("dark-grey");
+  }
+
+  .app-\!-caseworker-summary,
+  .app-\!-caseworker-summary table {
+    background-color: #505a5f;
   }
 }

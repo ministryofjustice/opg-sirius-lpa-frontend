@@ -38,6 +38,21 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   border-bottom: none;
 }
 
+.app-\!-caseworker-summary {
+  background-color: #f2f6fc;
+  padding: 0 govuk-spacing(4) 0 govuk-spacing(4);
+  margin-bottom: govuk-spacing(2);
+}
+
+.app-\!-svg-icon {
+  margin-right: govuk-spacing(1);
+}
+
+.app-\!-table-head__no-vertical-padding th {
+  padding-bottom: 0;
+  padding-top: 0;
+}
+
 .app-\!-moj-search__button {
   background-color: $govuk-brand-colour;
   margin: 0;
