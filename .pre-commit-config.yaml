@@ -25,3 +25,12 @@ repos:
     rev: 32.221.1
     hooks:
       - id: renovate-config-validator
+  - repo: local
+    hooks:
+      - id: lpa-prettier
+        name: lpa-prettier
+        entry: yarn prettier
+        language: system
+        pass_filenames: true
+        types: [file]
+        files: .*\.(js|scss)$
