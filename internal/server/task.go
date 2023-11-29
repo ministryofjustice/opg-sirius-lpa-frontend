@@ -13,6 +13,7 @@ import (
 
 type TaskClient interface {
 	CreateTask(ctx sirius.Context, caseID int, task sirius.TaskRequest) error
+	GetUserDetails(ctx sirius.Context) (sirius.User, error)
 	TaskTypes(ctx sirius.Context) ([]string, error)
 	Teams(ctx sirius.Context) ([]sirius.Team, error)
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
@@ -89,6 +90,14 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 			assignTo := postFormString(r, "assignTo")
 
 			switch assignTo {
+			case "me":
+				user, err := client.GetUserDetails(ctx)
+				if (err != nil){
+					return err
+				} else {
+					task.AssigneeID = user.ID
+					data.AssigneeUserName = user.DisplayName
+				}
 			case "user":
 				parts := strings.SplitN(postFormString(r, "assigneeUser"), ":", 2)
 				if len(parts) == 2 {
@@ -110,6 +119,7 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 				data.Error = ve
 
 				switch data.AssignTo {
+				case "me":
 				case "user":
 					data.Error.Field["assigneeUser"] = data.Error.Field["assigneeId"]
 				case "team":
