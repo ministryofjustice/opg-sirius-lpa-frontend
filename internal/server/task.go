@@ -119,6 +119,7 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 				data.Error = ve
 
 				switch data.AssignTo {
+				case "me":
 				case "user":
 					data.Error.Field["assigneeUser"] = data.Error.Field["assigneeId"]
 				case "team":
