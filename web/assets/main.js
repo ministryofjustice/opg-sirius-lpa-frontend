@@ -17,6 +17,7 @@ import insertSelector from "./insert-selector";
 import addressFinder from "./address-finder";
 import autoApplyFilter from "./auto-apply-filter";
 import dropdownMenu from "./dropdown-menu";
+import showHideCaseSummary from "./show-hide-case-summary";
 
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
@@ -41,6 +42,7 @@ insertSelector();
 addressFinder(prefix);
 autoApplyFilter();
 dropdownMenu();
+showHideCaseSummary();
 
 if (window.self !== window.parent) {
   const success = document.querySelector('[data-app-reload~="page"]');
