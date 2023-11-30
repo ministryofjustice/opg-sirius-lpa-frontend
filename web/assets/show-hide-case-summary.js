@@ -4,12 +4,14 @@ export default function showHideCaseSummary(prefix) {
   );
 
   if (button) {
-    const container = button.closest('[data-id="caseworker-summary-container"]');
+    const container = button.closest(
+      '[data-id="caseworker-summary-container"]',
+    );
     const buttonText = container.querySelector(
-        '[data-id="case-summary-toggle-text"]',
+      '[data-id="case-summary-toggle-text"]',
     );
     const buttonIcon = container.querySelector(
-        '[data-id="case-summary-toggle-icon"]',
+      '[data-id="case-summary-toggle-icon"]',
     );
     const caseSummary = container.querySelector('[data-id="case-summary"]');
 
@@ -18,16 +20,16 @@ export default function showHideCaseSummary(prefix) {
         if (buttonText.innerText === "Hide") {
           buttonText.innerText = "Show";
           buttonIcon.classList.replace(
-              "govuk-accordion-nav__chevron--up",
-              "govuk-accordion-nav__chevron--down",
+            "govuk-accordion-nav__chevron--up",
+            "govuk-accordion-nav__chevron--down",
           );
           caseSummary.hidden = true;
           caseSummary.ariaExpanded = "false";
         } else {
           buttonText.innerText = "Hide";
           buttonIcon.classList.replace(
-              "govuk-accordion-nav__chevron--down",
-              "govuk-accordion-nav__chevron--up",
+            "govuk-accordion-nav__chevron--down",
+            "govuk-accordion-nav__chevron--up",
           );
           caseSummary.hidden = false;
           caseSummary.ariaExpanded = "true";
@@ -35,5 +37,4 @@ export default function showHideCaseSummary(prefix) {
       };
     }
   }
-
 }
