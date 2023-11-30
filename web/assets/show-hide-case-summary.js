@@ -4,8 +4,12 @@ export default function showHideCaseSummary(prefix) {
   );
 
   const container = button.closest('[data-id="caseworker-summary-container"]');
-  const buttonText = container.querySelector('[data-id="case-summary-toggle-text"]');
-  const buttonIcon = container.querySelector('[data-id="case-summary-toggle-icon"]');
+  const buttonText = container.querySelector(
+    '[data-id="case-summary-toggle-text"]',
+  );
+  const buttonIcon = container.querySelector(
+    '[data-id="case-summary-toggle-icon"]',
+  );
   const caseSummary = container.querySelector('[data-id="case-summary"]');
 
   if (container && buttonText && buttonIcon && caseSummary) {
@@ -17,7 +21,7 @@ export default function showHideCaseSummary(prefix) {
           "govuk-accordion-nav__chevron--down",
         );
         caseSummary.hidden = true;
-        caseSummary.ariaExpanded = 'false';
+        caseSummary.ariaExpanded = "false";
       } else {
         buttonText.innerText = "Hide";
         buttonIcon.classList.replace(
@@ -25,7 +29,7 @@ export default function showHideCaseSummary(prefix) {
           "govuk-accordion-nav__chevron--up",
         );
         caseSummary.hidden = false;
-        caseSummary.ariaExpanded = 'true';
+        caseSummary.ariaExpanded = "true";
       }
     };
   }
