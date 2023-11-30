@@ -38,6 +38,22 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   border-bottom: none;
 }
 
+.app-caseworker-summary {
+  background-color: #f2f6fc;
+  padding: 2px govuk-spacing(4) 4px govuk-spacing(4); // the 2px top 4px bottom is so that on click/hover of the show/hide button, the box shadow doesnt exceed the height of the case summary when collapsed
+  margin: 0 govuk-spacing(-3) govuk-spacing(2) govuk-spacing(-3);
+}
+
+.app-svg-icon {
+  height: 1em;
+  margin-right: govuk-spacing(1);
+}
+
+.app-table-head--no-vertical-padding th {
+  padding-bottom: 0;
+  padding-top: 0;
+}
+
 .app-\!-moj-search__button {
   background-color: $govuk-brand-colour;
   margin: 0;
