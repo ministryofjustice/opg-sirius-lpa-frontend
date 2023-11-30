@@ -16,7 +16,7 @@ export default function showHideCaseSummary(prefix) {
     const caseSummary = container.querySelector('[data-id="case-summary"]');
 
     if (container && buttonText && buttonIcon && caseSummary) {
-      container.onclick = () => {
+      button.addEventListener("click", () => {
         if (buttonText.innerText === "Hide") {
           buttonText.innerText = "Show";
           buttonIcon.classList.replace(
@@ -34,7 +34,7 @@ export default function showHideCaseSummary(prefix) {
           caseSummary.hidden = false;
           caseSummary.ariaExpanded = "true";
         }
-      };
+      });
     }
   }
 }
