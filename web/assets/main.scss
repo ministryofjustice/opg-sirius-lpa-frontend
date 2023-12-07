@@ -176,13 +176,13 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   }
 }
 
-@media (min-width: 768px) { // 768px - max screen width
+@media (min-width: 768px) {
   .app-align-service-name-center {
     text-align: center;
   }
 }
 
-@media (max-width: 768px) { // 0px -> 768px
+@media (max-width: 768px) {
   .app-\!-moj-header__navigation-item {
     display: list-item;
     padding: 10px 0;
@@ -190,7 +190,7 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   }
 }
 
-@media (min-width: 1024px) { // 0px -> 1024px
+@media (min-width: 1024px) {
   .app-search-below-phase-banner {
     display: none;
   }
