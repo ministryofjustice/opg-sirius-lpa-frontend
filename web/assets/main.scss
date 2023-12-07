@@ -58,10 +58,29 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   background-color: $govuk-brand-colour;
   margin: 0;
   border: none;
+  width: auto;
+  box-shadow: none;
 }
 
 .app-\!-moj-search__button:hover {
   background-color: $govuk-link-hover-colour;
+}
+
+.app-moj-search__input {
+  border: 1px solid $govuk-border-colour;
+}
+
+.app-search-below-phase-banner {
+  display: block;
+  margin-top: govuk-spacing(2);
+}
+
+.app-search-inline-phase-banner {
+  display: none;
+}
+
+.app-\!-moj-header__navigation-item {
+  border-bottom: 1px solid govuk-colour("white");
 }
 
 .app-\!-colour-text-red {
@@ -154,5 +173,29 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   td,
   th {
     border: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .app-align-service-name-center {
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-\!-moj-header__navigation-item {
+    display: list-item;
+    padding: 10px 0;
+    border-bottom: 1px solid govuk-colour("dark-grey");
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-search-below-phase-banner {
+    display: none;
+  }
+
+  .app-search-inline-phase-banner {
+    display: block;
   }
 }
