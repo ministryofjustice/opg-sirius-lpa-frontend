@@ -1,6 +1,6 @@
 {{ define "header" }}
   <div class="app-!-embedded-hide">
-    <header class="moj-header" role="banner">
+    <header class="moj-header" role="banner" data-module="govuk-header">
       <div class="moj-header__container app-align-service-name-center">
         <div class="moj-header__logo">
           <svg role="presentation" focusable="false" class="moj-header__logotype-crest" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" height="40" width="40">
@@ -11,9 +11,9 @@
         </div>
         <a class="moj-header__link moj-header__link--service-name" href="{{ sirius "/lpa" }}">Powers of attorney - Sirius</a>
         <div class="moj-header__content">
-          <nav class="moj-header__navigation app-!-moj-header__navigation" aria-label="Account navigation" data-module="app-header-container">
-            <button type="button" class="govuk-header__menu-button app-!-govuk-header__menu-button" data-module="app-header-menu-toggle" aria-controls="navigation" aria-expanded="false" aria-label="Show or hide menu options">Options</button>
-            <ul class="moj-header__navigation-list app-!-moj-header__navigation-list" data-id="app-header-menu-item-list">
+          <nav class="moj-header__navigation app-!-moj-header__navigation" aria-label="Account navigation">
+            <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-expanded="false" aria-label="Show or hide menu options">Options</button>
+            <ul id="navigation" class="moj-header__navigation-list app-!-moj-header__navigation-list">
               <li class="moj-header__navigation-item app-!-moj-header__navigation-item">
                 <a class="moj-header__navigation-link" href="{{ sirius "/supervision" }}">Supervision</a>
               </li>
