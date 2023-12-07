@@ -67,7 +67,7 @@ $govuk-assets-path: "/lpa/frontend/assets/";
 }
 
 .app-moj-search__input {
-  border: 1px solid #b1b4b6;
+  border: 1px solid $govuk-border-colour;
 }
 
 .app-search-below-phase-banner {
@@ -80,7 +80,7 @@ $govuk-assets-path: "/lpa/frontend/assets/";
 }
 
 .app-\!-moj-header__navigation-item {
-  border-bottom: 1px solid govuk-colour("white") !important;
+  border-bottom: 1px solid govuk-colour("white");
 }
 
 .app-\!-colour-text-red {
@@ -186,7 +186,7 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   .app-\!-moj-header__navigation-item {
     display: list-item;
     padding: 10px 0;
-    border-bottom: 1px solid #2e3133;
+    border-bottom: 1px solid govuk-colour("dark-grey");
   }
 }
 
