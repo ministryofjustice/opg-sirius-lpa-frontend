@@ -44,9 +44,36 @@
                         </tr>
                     </thead>
                     <tbody class="govuk-table__body">
-                        <tr class="govuk-table__row">
-                            <td class="govuk-table__cell app-!-table-row__no-border" colspan="3">There are no live tasks.</td>
-                        </tr>
+                        {{ if not .TaskList }}
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell app-!-table-row__no-border" colspan="3">
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0">There are no live tasks</p>
+                                </td>
+                            </tr>
+                        {{ end }}
+
+                        {{ range .TaskList }}
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell govuk-!-width-one-half">
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0">{{ .Name }}</p>
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0">
+                                        {{ .Description }}
+                                    </p>
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0 app-!-colour-text-lighter">
+                                        Assigned to {{ .Assignee.DisplayName }}
+                                    </p>
+                                </td>
+                                <td class="govuk-table__cell govuk-!-width-one-quarter">
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0">
+                                    {{ (date .DueDate "2 January 2006") }}
+                                    </p>
+                                </td>
+                                <td class="govuk-table__cell govuk-!-width-one-quarter">
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0">Clear task</p>
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0">Reassign task</p>
+                                </td>
+                            </tr>
+                        {{ end }}
                     </tbody>
                 </table>
             </div>
