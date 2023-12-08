@@ -8,12 +8,13 @@ import (
 )
 
 type Task struct {
-	ID        int        `json:"id"`
-	Status    string     `json:"status"`
-	DueDate   DateString `json:"dueDate"`
-	Name      string     `json:"name"`
-	CaseItems []Case     `json:"caseItems"`
-	Assignee  User       `json:"assignee"`
+	ID          int        `json:"id"`
+	Status      string     `json:"status"`
+	DueDate     DateString `json:"dueDate"`
+	Name        string     `json:"name"`
+	Description string     `json:"description"`
+	CaseItems   []Case     `json:"caseItems"`
+	Assignee    User       `json:"assignee"`
 }
 
 type taskList struct {
@@ -41,6 +42,7 @@ func (c *Client) TasksForCase(ctx Context, caseId int) ([]Task, error) {
 	querystring := url.Values{}
 	querystring.Set("filter", "status:Not started,active:true")
 	querystring.Set("limit", "99")
+	querystring.Set("sort", "duedate:ASC")
 
 	req, err := c.newRequestWithQuery(ctx, http.MethodGet, path, querystring, nil)
 

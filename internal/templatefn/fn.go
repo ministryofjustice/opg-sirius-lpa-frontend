@@ -136,6 +136,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 
 type CaseTabData struct {
 	Lpa               sirius.DigitalLpa
+	TaskList          []sirius.Task
 	SortedLinkedCases []linkedCase
 	TabName           string
 }
@@ -146,7 +147,7 @@ type linkedCase struct {
 	CreatedDate sirius.DateString
 }
 
-func caseTab(lpa sirius.DigitalLpa, tabName string) CaseTabData {
+func caseTab(lpa sirius.DigitalLpa, taskList []sirius.Task, tabName string) CaseTabData {
 	var linkedCases []linkedCase
 	linkedCases = append(linkedCases, linkedCase{lpa.UID, lpa.Subtype, lpa.CreatedDate})
 
@@ -163,6 +164,7 @@ func caseTab(lpa sirius.DigitalLpa, tabName string) CaseTabData {
 
 	return CaseTabData{
 		Lpa:               lpa,
+		TaskList:          taskList,
 		SortedLinkedCases: linkedCases,
 		TabName:           tabName,
 	}
