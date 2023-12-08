@@ -4,7 +4,7 @@
 
 {{ define "main" }}
 
-  {{ template "mlpa-header" (caseTabs .Lpa "summary") }}
+  {{ template "mlpa-header" (caseTabs .Lpa .TaskList "summary") }}
 
   <h2 class="govuk-heading-m">Case summary</h2>
 
@@ -69,14 +69,6 @@
           Tasks
         </aside>
       </div>
-
-      <h2>Tasks</h2>
-
-      <ul data-role="tasks-list">
-        {{ range .TaskList }}
-          <li>{{ .Name }} ({{ .Assignee.DisplayName }})</li>
-        {{ end }}
-      </ul>
 
       <h2 class="govuk-heading-m">Donor details</h2>
 
