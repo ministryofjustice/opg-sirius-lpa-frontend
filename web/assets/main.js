@@ -18,7 +18,6 @@ import addressFinder from "./address-finder";
 import autoApplyFilter from "./auto-apply-filter";
 import dropdownMenu from "./dropdown-menu";
 import showHideCaseSummary from "./show-hide-case-summary";
-import toggleHeaderMenu from "./header-menu-toggle";
 
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
@@ -44,7 +43,6 @@ addressFinder(prefix);
 autoApplyFilter();
 dropdownMenu();
 showHideCaseSummary();
-toggleHeaderMenu();
 
 if (window.self !== window.parent) {
   const success = document.querySelector('[data-app-reload~="page"]');
