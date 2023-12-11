@@ -41,6 +41,11 @@ func (m *mockGetPayments) DigitalLpa(ctx sirius.Context, uid string) (sirius.Dig
 	return args.Get(0).(sirius.DigitalLpa), args.Error(1)
 }
 
+func (m *mockGetPayments) TasksForCase(ctx sirius.Context, id int) ([]sirius.Task, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]sirius.Task), args.Error(1)
+}
+
 func TestGetPayments(t *testing.T) {
 	allPayments := []sirius.Payment{
 		{
@@ -94,9 +99,11 @@ func TestGetPayments(t *testing.T) {
 
 	client := &mockGetPayments{}
 	client.
-		On("Payments", mock.Anything, 4).
+		On("Payments", mock.Anything, 901).
 		Return(allPayments, nil).
-		On("Case", mock.Anything, 4).
+		On("TasksForCase", mock.Anything, 901).
+		Return([]sirius.Task{}, nil).
+		On("Case", mock.Anything, 901).
 		Return(caseItem, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil).
@@ -118,12 +125,13 @@ func TestGetPayments(t *testing.T) {
 			TotalPaid:         5538,
 			IsReducedFeesUser: true,
 			OutstandingFee:    2662,
+			TaskList:          []sirius.Task{},
 		}).
 		Return(nil)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, template.Func))
 
-	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/payments/901", nil)
 	resp, err := server.serve(req)
 
 	assert.Nil(t, err)
@@ -179,10 +187,12 @@ func TestGetPaymentsWhenFailureOnGetCase(t *testing.T) {
 	}
 	client := &mockGetPayments{}
 	client.
-		On("Case", mock.Anything, 4).
+		On("Case", mock.Anything, 8).
 		Return(sirius.Case{}, expectedError).
-		On("Payments", mock.Anything, 4).
+		On("Payments", mock.Anything, 8).
 		Return(allPayments, nil).
+		On("TasksForCase", mock.Anything, 8).
+		Return([]sirius.Task{}, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
@@ -194,7 +204,7 @@ func TestGetPaymentsWhenFailureOnGetCase(t *testing.T) {
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
-	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/payments/8", nil)
 	_, err := server.serve(req)
 
 	assert.Equal(t, expectedError, err)
@@ -232,8 +242,10 @@ func TestGetPaymentsWhenFailureOnGetPayments(t *testing.T) {
 
 	client := &mockGetPayments{}
 	client.
-		On("Case", mock.Anything, 4).
+		On("Case", mock.Anything, 9).
 		Return(caseItem, nil).
+		On("TasksForCase", mock.Anything, 9).
+		Return([]sirius.Task{}, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
@@ -242,12 +254,12 @@ func TestGetPaymentsWhenFailureOnGetPayments(t *testing.T) {
 		Return(feeReductionTypes, nil).
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil).
-		On("Payments", mock.Anything, 4).
+		On("Payments", mock.Anything, 9).
 		Return([]sirius.Payment{}, expectedError)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
-	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/payments/9", nil)
 	_, err := server.serve(req)
 
 	assert.Equal(t, expectedError, err)
@@ -287,9 +299,11 @@ func TestGetPaymentsWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 
 	client := &mockGetPayments{}
 	client.
-		On("Case", mock.Anything, 4).
+		On("Case", mock.Anything, 111).
 		Return(caseItem, nil).
-		On("Payments", mock.Anything, 4).
+		On("TasksForCase", mock.Anything, 111).
+		Return([]sirius.Task{}, nil).
+		On("Payments", mock.Anything, 111).
 		Return(payments, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
 		Return(referenceTypes, nil).
@@ -302,7 +316,7 @@ func TestGetPaymentsWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
-	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/payments/111", nil)
 	_, err := server.serve(req)
 
 	assert.Equal(t, expectedError, err)
@@ -344,6 +358,8 @@ func TestGetPaymentsWhenFailureOnGetReferenceTypeRefData(t *testing.T) {
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil).
+		On("TasksForCase", mock.Anything, 4).
+		Return([]sirius.Task{}, nil).
 		On("Payments", mock.Anything, 4).
 		Return(payments, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
@@ -397,9 +413,11 @@ func TestGetPaymentsWhenFailureOnFeeReductionTypesRefData(t *testing.T) {
 
 	client := &mockGetPayments{}
 	client.
-		On("Case", mock.Anything, 4).
+		On("Case", mock.Anything, 876).
 		Return(caseItem, nil).
-		On("Payments", mock.Anything, 4).
+		On("TasksForCase", mock.Anything, 876).
+		Return([]sirius.Task{}, nil).
+		On("Payments", mock.Anything, 876).
 		Return(payments, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil).
@@ -412,7 +430,7 @@ func TestGetPaymentsWhenFailureOnFeeReductionTypesRefData(t *testing.T) {
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
-	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/payments/876", nil)
 	_, err := server.serve(req)
 
 	assert.Equal(t, expectedError, err)
@@ -459,10 +477,12 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 
 	client := &mockGetPayments{}
 	client.
-		On("Payments", mock.Anything, 4).
+		On("Payments", mock.Anything, 554).
 		Return(payments, nil).
-		On("Case", mock.Anything, 4).
+		On("Case", mock.Anything, 554).
 		Return(caseItem, nil).
+		On("TasksForCase", mock.Anything, 554).
+		Return([]sirius.Task{}, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
@@ -483,12 +503,13 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 			IsReducedFeesUser: false,
 			FeeReductionTypes: feeReductionTypes,
 			OutstandingFee:    4100,
+			TaskList:          []sirius.Task{},
 		}).
 		Return(expectedError)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, template.Func))
 
-	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/payments/554", nil)
 	_, err := server.serve(req)
 
 	assert.Equal(t, expectedError, err)
@@ -559,10 +580,12 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 
 	client := &mockGetPayments{}
 	client.
-		On("Payments", mock.Anything, 4).
+		On("Payments", mock.Anything, 742).
 		Return(allPayments, nil).
-		On("Case", mock.Anything, 4).
+		On("Case", mock.Anything, 742).
 		Return(caseItem, nil).
+		On("TasksForCase", mock.Anything, 742).
+		Return([]sirius.Task{}, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
@@ -584,12 +607,13 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 			TotalPaid:         5000,
 			IsReducedFeesUser: true,
 			RefundAmount:      900,
+			TaskList:          []sirius.Task{},
 		}).
 		Return(nil)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, template.Func))
 
-	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/payments/742", nil)
 	_, err := server.serve(req)
 
 	assert.Nil(t, err)
@@ -680,10 +704,12 @@ func TestGetPaymentsCalculations(t *testing.T) {
 
 		client := &mockGetPayments{}
 		client.
-			On("Payments", mock.Anything, 4).
+			On("Payments", mock.Anything, 929).
 			Return(tc.allPayments, nil).
-			On("Case", mock.Anything, 4).
+			On("Case", mock.Anything, 929).
 			Return(caseItem, nil).
+			On("TasksForCase", mock.Anything, 929).
+			Return([]sirius.Task{}, nil).
 			On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 			Return(paymentSources, nil).
 			On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
@@ -708,12 +734,13 @@ func TestGetPaymentsCalculations(t *testing.T) {
 				OutstandingFee:    tc.outstandingFee,
 				RefundAmount:      tc.refundAmount,
 				IsReducedFeesUser: true,
+				TaskList:          []sirius.Task{},
 			}).
 			Return(nil)
 
 		server := newMockServer("/payments/{id}", GetPayments(client, template.Func))
 
-		req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
+		req, _ := http.NewRequest(http.MethodGet, "/payments/929", nil)
 		resp, err := server.serve(req)
 
 		assert.Nil(t, err)
