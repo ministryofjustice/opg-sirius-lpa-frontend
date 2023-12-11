@@ -143,7 +143,7 @@
       "name": "A request to get tasks for an LPA - digital LPA #3",
       "request": {
         "method": "GET",
-        "url": "/lpa-api/v1/cases/333/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99"
+        "url": "/lpa-api/v1/cases/333/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC"
       },
       "response": {
         "status": 200,
@@ -241,7 +241,19 @@
       "name": "A request to get tasks for a case",
       "request": {
         "method": "GET",
-        "url": "/lpa-api/v1/cases/800/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99"
+        "url": "/lpa-api/v1/cases/800/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"tasks\":[{\"id\":1,\"name\":\"Review reduced fee eligibility\",\"assignee\":{\"displayName\":\"Super Team\"}},{\"id\":2,\"name\":\"Review application correspondence\",\"assignee\":{\"displayName\":\"Marvellous Team\"}},{\"id\":3,\"name\":\"Another task\",\"assignee\":{\"displayName\":\"Super Team\"}}]}"
+      }
+    },
+    {
+      "name": "A request to get tasks for a second case",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/cases/801/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC"
       },
       "response": {
         "status": 200,
