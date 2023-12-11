@@ -16,6 +16,7 @@ type GetPaymentsClient interface {
 	Case(sirius.Context, int) (sirius.Case, error)
 	GetUserDetails(sirius.Context) (sirius.User, error)
 	DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error)
+	TasksForCase(ctx sirius.Context, id int) ([]sirius.Task, error)
 }
 
 type getPaymentsData struct {
@@ -26,6 +27,7 @@ type getPaymentsData struct {
 	Payments          []sirius.Payment
 	FeeReductions     []sirius.Payment
 	Refunds           []sirius.Payment
+	TaskList          []sirius.Task
 	PaymentSources    []sirius.RefDataItem
 	ReferenceTypes    []sirius.RefDataItem
 	FeeReductionTypes []sirius.RefDataItem
@@ -59,6 +61,15 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 				return err
 			}
 		}
+
+		group.Go(func() error {
+			data.TaskList, err = client.TasksForCase(ctx, caseID)
+
+			if err != nil {
+				return err
+			}
+			return nil
+		})
 
 		group.Go(func() error {
 			data.Case, err = client.Case(ctx.With(groupCtx), caseID)
