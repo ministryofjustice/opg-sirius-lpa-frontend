@@ -6,7 +6,7 @@
     "build": "yarn build:js && yarn build:css && yarn build:assets && yarn build:tinymce",
     "build:js": "esbuild --bundle web/assets/load-classes.js web/assets/main.js --minify --outdir=web/static/javascript --sourcemap --resolve-extensions=.mjs,.js",
     "build:css": "sass --load-path . --style compressed web/assets/main.scss web/static/stylesheets/all.css",
-    "build:assets": "mkdir -p web/static/assets/images web/static/assets/fonts && cp node_modules/govuk-frontend/govuk/assets/images/* node_modules/@ministryofjustice/frontend/moj/assets/images/* web/static/assets/images && cp node_modules/govuk-frontend/govuk/assets/fonts/* web/static/assets/fonts",
+    "build:assets": "mkdir -p web/static/assets/images web/static/assets/fonts && cp node_modules/govuk-frontend/dist/govuk/assets/images/* node_modules/@ministryofjustice/frontend/moj/assets/images/* web/static/assets/images && cp node_modules/govuk-frontend/dist/govuk/assets/fonts/* web/static/assets/fonts",
     "build:tinymce": "cp -r node_modules/tinymce/skins web/static/javascript",
     "clean": "rm -rf web/static",
     "cypress": "cypress open",
@@ -15,10 +15,10 @@
     "watch": "yarn build:js --watch"
   },
   "dependencies": {
-    "@ministryofjustice/frontend": "1.8.1",
+    "@ministryofjustice/frontend": "2.0.0-beta.1",
     "accessible-autocomplete": "^2.0.4",
     "cypress": "13.6.0",
-    "govuk-frontend": "^4.4.0",
+    "govuk-frontend": "^5.0.0",
     "jquery": "^3.6.1",
     "tinymce": "^5.10.7"
   },
