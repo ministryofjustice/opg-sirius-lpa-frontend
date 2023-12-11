@@ -1,12 +1,12 @@
 {{ define "header" }}
   <div class="app-!-embedded-hide">
-    <header class="moj-header" role="banner" data-module="govuk-header">
-      <div class="moj-header__container app-align-service-name-center">
+    <header role="banner" data-module="govuk-header" class="govuk-header">
+      <div class="govuk-header__container govuk-width-container app-align-service-name-center">
         <div class="moj-header__logo">
           {{ template "moj-crest" }}
           <span class="moj-header__link moj-header__link--organisation-name">OPG</span>
         </div>
-        <a class="moj-header__link moj-header__link--service-name" href="{{ sirius "/lpa" }}">Powers of attorney - Sirius</a>
+        <a class="moj-header__link moj-header__link--service-name app-!-moj-header__link--service-name" href="{{ sirius "/lpa" }}">Powers of attorney - Sirius</a>
         <div class="moj-header__content">
           <nav class="moj-header__navigation" aria-label="Account navigation">
             <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-expanded="false" aria-label="Show or hide menu options">Options</button>
@@ -27,30 +27,31 @@
     </header>
 
     <div class="govuk-width-container">
-      <div class="govuk-grid-row govuk-phase-banner app-align-items-center">
-        <div class="govuk-grid-column-two-thirds">
-          <p class="govuk-phase-banner__content">
+      <div class="govuk-phase-banner">
+        <div class="govuk-grid-row app-align-items-center">
+          <div class="govuk-grid-column-two-thirds">
+            <p class="govuk-phase-banner__content">
             <span class="govuk-phase-banner__text">
               Your <a class="govuk-link" href="#">feedback</a> will help us to improve this service.
             </span>
-          </p>
-        </div>
-
-        <div class="govuk-grid-column-one-third app-search-inline-phase-banner">
-          <form class="form" method="get" action="{{ prefix "/search" }}" data-module="search">
-            <div class="govuk-input__wrapper">
-              <label class="govuk-label moj-search__label govuk-visually-hidden" for="search">
-                Search
-              </label>
-              <input class="govuk-input moj-search__input app-moj-search__input" name="term" type="search" placeholder="Search for a case" aria-label="Search">
-              <button class="govuk-button govuk-input__suffix app-!-moj-search__button" data-module="govuk-button">
-                <span class="govuk-visually-hidden">Search</span>
-                <svg class="app-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M20.7094 19.6769L16.8433 15.8198C18.2078 14.1953 18.8924 12.1067 18.7545 9.98976C18.6165 7.87276 17.6666 5.89076 16.1028 4.45712C14.5391 3.02348 12.4822 2.24889 10.3612 2.29491C8.24021 2.34093 6.21887 3.20399 4.71876 4.70411C3.21864 6.20423 2.35557 8.22556 2.30956 10.3465C2.26354 12.4675 3.03813 14.5244 4.47177 16.0882C5.90541 17.6519 7.88741 18.6019 10.0044 18.7398C12.1214 18.8778 14.2099 18.1932 15.8344 16.8287L19.6915 20.6948C19.8281 20.8268 20.0106 20.9006 20.2005 20.9006C20.3904 20.9006 20.5729 20.8268 20.7094 20.6948C20.8435 20.5593 20.9188 20.3764 20.9188 20.1858C20.9188 19.9952 20.8435 19.8123 20.7094 19.6769ZM3.7719 10.543C3.7719 9.20088 4.16988 7.88893 4.9155 6.77303C5.66112 5.65712 6.72091 4.78738 7.96084 4.27379C9.20076 3.76019 10.5651 3.62581 11.8814 3.88764C13.1977 4.14947 14.4068 4.79574 15.3558 5.74474C16.3048 6.69374 16.9511 7.90284 17.2129 9.21914C17.4748 10.5354 17.3404 11.8998 16.8268 13.1397C16.3132 14.3797 15.4435 15.4395 14.3276 16.1851C13.2117 16.9307 11.8997 17.3287 10.5576 17.3287C8.75866 17.3263 7.03406 16.6106 5.762 15.3386C4.48994 14.0665 3.77426 12.3419 3.7719 10.543Z" fill="white"/>
-                </svg>
-              </button>
-            </div>
-          </form>
+            </p>
+          </div>
+          <div class="govuk-grid-column-one-third app-search-inline-phase-banner">
+            <form class="form" method="get" action="{{ prefix "/search" }}" data-module="search">
+              <div class="govuk-input__wrapper">
+                <label class="govuk-label moj-search__label govuk-visually-hidden" for="search">
+                  Search
+                </label>
+                <input class="govuk-input moj-search__input app-moj-search__input" name="term" type="search" placeholder="Search for a case" aria-label="Search">
+                <button class="govuk-button govuk-input__suffix app-!-moj-search__button" data-module="govuk-button">
+                  <span class="govuk-visually-hidden">Search</span>
+                  <svg class="app-svg-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+                    <path d="M20.7094 19.6769L16.8433 15.8198C18.2078 14.1953 18.8924 12.1067 18.7545 9.98976C18.6165 7.87276 17.6666 5.89076 16.1028 4.45712C14.5391 3.02348 12.4822 2.24889 10.3612 2.29491C8.24021 2.34093 6.21887 3.20399 4.71876 4.70411C3.21864 6.20423 2.35557 8.22556 2.30956 10.3465C2.26354 12.4675 3.03813 14.5244 4.47177 16.0882C5.90541 17.6519 7.88741 18.6019 10.0044 18.7398C12.1214 18.8778 14.2099 18.1932 15.8344 16.8287L19.6915 20.6948C19.8281 20.8268 20.0106 20.9006 20.2005 20.9006C20.3904 20.9006 20.5729 20.8268 20.7094 20.6948C20.8435 20.5593 20.9188 20.3764 20.9188 20.1858C20.9188 19.9952 20.8435 19.8123 20.7094 19.6769ZM3.7719 10.543C3.7719 9.20088 4.16988 7.88893 4.9155 6.77303C5.66112 5.65712 6.72091 4.78738 7.96084 4.27379C9.20076 3.76019 10.5651 3.62581 11.8814 3.88764C13.1977 4.14947 14.4068 4.79574 15.3558 5.74474C16.3048 6.69374 16.9511 7.90284 17.2129 9.21914C17.4748 10.5354 17.3404 11.8998 16.8268 13.1397C16.3132 14.3797 15.4435 15.4395 14.3276 16.1851C13.2117 16.9307 11.8997 17.3287 10.5576 17.3287C8.75866 17.3263 7.03406 16.6106 5.762 15.3386C4.48994 14.0665 3.77426 12.3419 3.7719 10.543Z" fill="white"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
 
@@ -64,7 +65,7 @@
               <input class="govuk-input moj-search__input app-moj-search__input" name="term" type="search" placeholder="Search for a case" aria-label="Search">
               <button class="govuk-button govuk-input__suffix app-!-moj-search__button" data-module="govuk-button">
                 <span class="govuk-visually-hidden">Search</span>
-                <svg class="app-svg-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <svg class="app-svg-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
                   <path d="M20.7094 19.6769L16.8433 15.8198C18.2078 14.1953 18.8924 12.1067 18.7545 9.98976C18.6165 7.87276 17.6666 5.89076 16.1028 4.45712C14.5391 3.02348 12.4822 2.24889 10.3612 2.29491C8.24021 2.34093 6.21887 3.20399 4.71876 4.70411C3.21864 6.20423 2.35557 8.22556 2.30956 10.3465C2.26354 12.4675 3.03813 14.5244 4.47177 16.0882C5.90541 17.6519 7.88741 18.6019 10.0044 18.7398C12.1214 18.8778 14.2099 18.1932 15.8344 16.8287L19.6915 20.6948C19.8281 20.8268 20.0106 20.9006 20.2005 20.9006C20.3904 20.9006 20.5729 20.8268 20.7094 20.6948C20.8435 20.5593 20.9188 20.3764 20.9188 20.1858C20.9188 19.9952 20.8435 19.8123 20.7094 19.6769ZM3.7719 10.543C3.7719 9.20088 4.16988 7.88893 4.9155 6.77303C5.66112 5.65712 6.72091 4.78738 7.96084 4.27379C9.20076 3.76019 10.5651 3.62581 11.8814 3.88764C13.1977 4.14947 14.4068 4.79574 15.3558 5.74474C16.3048 6.69374 16.9511 7.90284 17.2129 9.21914C17.4748 10.5354 17.3404 11.8998 16.8268 13.1397C16.3132 14.3797 15.4435 15.4395 14.3276 16.1851C13.2117 16.9307 11.8997 17.3287 10.5576 17.3287C8.75866 17.3263 7.03406 16.6106 5.762 15.3386C4.48994 14.0665 3.77426 12.3419 3.7719 10.543Z" fill="white"/>
                 </svg>
               </button>

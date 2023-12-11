@@ -88,6 +88,10 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   align-items: center;
 }
 
+.app-\!-moj-header__link--service-name {
+  font-weight: 700;
+}
+
 .app-\!-moj-header__navigation-item {
   text-decoration: underline;
 }
