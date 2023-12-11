@@ -47,13 +47,13 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 			XSRFToken: ctx.XSRFToken,
 		}
 
-		group, _ := errgroup.WithContext(ctx.Context)
-
 		data.Lpa, err = client.DigitalLpa(ctx, uid)
 
 		if err != nil {
 			return err
 		}
+
+		group, _ := errgroup.WithContext(ctx.Context)
 
 		group.Go(func() error {
 			documentTemplates, err := client.DocumentTemplates(ctx, sirius.CaseTypeDigitalLpa)

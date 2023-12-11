@@ -21,6 +21,11 @@ func (m *mockCreateDocumentDigitalLpaClient) DigitalLpa(ctx sirius.Context, uid 
 	return args.Get(0).(sirius.DigitalLpa), args.Error(1)
 }
 
+func (m *mockCreateDocumentDigitalLpaClient) TasksForCase(ctx sirius.Context, id int) ([]sirius.Task, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]sirius.Task), args.Error(1)
+}
+
 func (m *mockCreateDocumentDigitalLpaClient) DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error) {
 	args := m.Called(ctx, caseType)
 	return args.Get(0).([]sirius.DocumentTemplateData), args.Error(1)
@@ -38,6 +43,7 @@ func (m *mockCreateDocumentDigitalLpaClient) CreateDocument(ctx sirius.Context, 
 
 func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 	digitalLpa := sirius.DigitalLpa{
+		ID: 15,
 		Application: sirius.Draft{
 			DonorFirstNames: "Zackary",
 			DonorLastName:   "Lemmonds",
@@ -56,6 +62,9 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 	client.
 		On("DigitalLpa", mock.Anything, "M-TWGJ-CDDJ-4NTL").
 		Return(digitalLpa, nil)
+	client.
+		On("TasksForCase", mock.Anything, 15).
+		Return([]sirius.Task{}, nil)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeDigitalLpa).
 		Return(templateData, nil)
@@ -76,6 +85,7 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 				Postcode:     "NR16 2GB",
 				Country:      "UK",
 			}},
+			TaskList:              []sirius.Task{},
 		}).
 		Return(nil)
 
@@ -90,15 +100,11 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 
 func TestGetCreateDocumentDigitalLpaError(t *testing.T) {
 	expectedError := errors.New("expected error")
-	templateData := []sirius.DocumentTemplateData{{TemplateId: "DL-EXAMPLE", Label: "Example DL Form"}}
 
 	client := &mockCreateDocumentDigitalLpaClient{}
 	client.
 		On("DigitalLpa", mock.Anything, "M-TWGJ-CDDJ-4NTL").
 		Return(sirius.DigitalLpa{}, expectedError)
-	client.
-		On("DocumentTemplates", mock.Anything, sirius.CaseTypeDigitalLpa).
-		Return(templateData, nil)
 
 	template := &mockTemplate{}
 
@@ -113,7 +119,7 @@ func TestGetCreateDocumentDigitalLpaError(t *testing.T) {
 
 func TestPostCreateDocumentDigitalLpa(t *testing.T) {
 	digitalLpa := sirius.DigitalLpa{
-		ID: 1234,
+		ID: 1344,
 		Application: sirius.Draft{
 			DonorFirstNames: "Zackary",
 			DonorLastName:   "Lemmonds",
@@ -145,6 +151,9 @@ func TestPostCreateDocumentDigitalLpa(t *testing.T) {
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeDigitalLpa).
 		Return(templateData, nil)
 	client.
+		On("TasksForCase", mock.Anything, 1344).
+		Return([]sirius.Task{}, nil)
+	client.
 		On("CreateContact", mock.Anything, sirius.Person{
 			ID:           -1,
 			Firstname:    "Zackary",
@@ -157,7 +166,7 @@ func TestPostCreateDocumentDigitalLpa(t *testing.T) {
 		}).
 		Return(sirius.Person{ID: 4829}, nil)
 	client.
-		On("CreateDocument", mock.Anything, 1234, 4829, "DL-EXAMPLE", []string{"DL_INS_01", "DL_INS_02"}).
+		On("CreateDocument", mock.Anything, 1344, 4829, "DL-EXAMPLE", []string{"DL_INS_01", "DL_INS_02"}).
 		Return(sirius.Document{}, nil)
 
 	template := &mockTemplate{}
@@ -174,13 +183,13 @@ func TestPostCreateDocumentDigitalLpa(t *testing.T) {
 	req.Header.Add("Content-Type", formUrlEncoded)
 	_, err := server.serve(req)
 
-	assert.Equal(t, RedirectError("/edit-document?id=1234&case=digital_lpa"), err)
+	assert.Equal(t, RedirectError("/edit-document?id=1344&case=digital_lpa"), err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestPostCreateDocumentDigitalLpaInvalid(t *testing.T) {
 	digitalLpa := sirius.DigitalLpa{
-		ID: 1234,
+		ID: 1666,
 		Application: sirius.Draft{
 			DonorFirstNames: "Zackary",
 			DonorLastName:   "Lemmonds",
@@ -211,6 +220,9 @@ func TestPostCreateDocumentDigitalLpaInvalid(t *testing.T) {
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeDigitalLpa).
 		Return(templateData, nil)
+	client.
+		On("TasksForCase", mock.Anything, 1666).
+		Return([]sirius.Task{}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -228,6 +240,7 @@ func TestPostCreateDocumentDigitalLpaInvalid(t *testing.T) {
 				Postcode:     "NR16 2GB",
 				Country:      "UK",
 			}},
+			TaskList:              []sirius.Task{},
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{
 					"templateId":      {"reason": "Please select a document template to continue"},
