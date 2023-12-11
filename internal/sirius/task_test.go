@@ -202,7 +202,7 @@ func TestTasksForCase(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:          404,
-					URL:           fmt.Sprintf("http://localhost:%d/lpa-api/v1/cases/9012929/tasks?filter=status%%3ANot+started%%2Cactive%%3Atrue&limit=99", port),
+					URL:           fmt.Sprintf("http://localhost:%d/lpa-api/v1/cases/9012929/tasks?filter=status%%3ANot+started%%2Cactive%%3Atrue&limit=99&sort=duedate%%3AASC", port),
 					Method:        "GET",
 					CorrelationId: "",
 				}
