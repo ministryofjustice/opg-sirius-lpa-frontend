@@ -17,6 +17,7 @@
       <link rel="apple-touch-icon" href="{{ prefix "/assets/images/govuk-apple-touch-icon.png" }}">
 
       <link href="{{ prefixAsset "/stylesheets/all.css" }}" rel="stylesheet">
+      <script src="{{ prefixAsset "/javascript/main.js" }}" type="module"></script>
     </head>
 
     <body class="govuk-template__body app-body-class" data-prefix="{{ prefix "" }}">
@@ -34,8 +35,6 @@
       </div>
 
       <footer class="govuk-footer app-!-embedded-hide" role="contentinfo"></footer>
-
-      <script src="{{ prefixAsset "/javascript/main.js" }}"></script>
     </body>
   </html>
 {{ end }}
