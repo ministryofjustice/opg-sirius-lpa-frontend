@@ -55,8 +55,9 @@ lighthouse: setup-directories
 cypress: setup-directories
 	docker compose run --rm cypress
 
-down: ## Stop application
-down: docker compose down
+down: ## Stop application
+down:
+	docker compose down
 
 run-structurizr:
 	docker pull structurizr/lite
