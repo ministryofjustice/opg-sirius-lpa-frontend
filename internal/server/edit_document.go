@@ -19,6 +19,7 @@ type EditDocumentClient interface {
 	DeleteDocument(ctx sirius.Context, uuid string) error
 	AddDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string) (sirius.Document, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
+	TasksForCase(ctx sirius.Context, id int) ([]sirius.Task, error)
 }
 
 type editDocumentData struct {
@@ -29,6 +30,7 @@ type editDocumentData struct {
 	Lpa          sirius.DigitalLpa
 	Documents    []sirius.Document
 	Document     sirius.Document
+	TaskList     []sirius.Task
 	UsesNotify   bool
 	Download     string
 	SaveAndExit  bool
@@ -88,6 +90,16 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 
 			group.Go(func() error {
 				documentTemplates, err = client.DocumentTemplates(ctx, caseType)
+				if err != nil {
+					return err
+				}
+
+				return nil
+			})
+
+			group.Go(func() error {
+				data.TaskList, err = client.TasksForCase(ctx, caseID)
+
 				if err != nil {
 					return err
 				}
@@ -242,6 +254,16 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 
 				group.Go(func() error {
 					documentTemplates, err = client.DocumentTemplates(ctx, caseType)
+					if err != nil {
+						return err
+					}
+
+					return nil
+				})
+
+				group.Go(func() error {
+					data.TaskList, err = client.TasksForCase(ctx, caseID)
+
 					if err != nil {
 						return err
 					}
