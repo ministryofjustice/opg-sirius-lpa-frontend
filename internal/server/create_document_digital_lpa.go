@@ -17,6 +17,7 @@ type CreateDocumentDigitalLpaClient interface {
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
 	CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error)
 	CreateContact(ctx sirius.Context, contact sirius.Person) (sirius.Person, error)
+	TasksForCase(ctx sirius.Context, id int) ([]sirius.Task, error)
 }
 
 type createDocumentDigitalLpaData struct {
@@ -24,6 +25,7 @@ type createDocumentDigitalLpaData struct {
 	Error                 sirius.ValidationError
 	Lpa                   sirius.DigitalLpa
 	DocumentTemplates     []sirius.DocumentTemplateData
+	TaskList              []sirius.Task
 	ComponentDocumentData ComponentDocumentData
 	Recipients            []sirius.Person
 	SelectedTemplateId    string
@@ -45,9 +47,17 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 			XSRFToken: ctx.XSRFToken,
 		}
 
-		group, groupCtx := errgroup.WithContext(ctx.Context)
+		group, _ := errgroup.WithContext(ctx.Context)
+
+		data.Lpa, err = client.DigitalLpa(ctx, uid)
+
+		if err != nil {
+			return err
+		}
+
 		group.Go(func() error {
-			data.Lpa, err = client.DigitalLpa(ctx.With(groupCtx), uid)
+			documentTemplates, err := client.DocumentTemplates(ctx, sirius.CaseTypeDigitalLpa)
+			data.DocumentTemplates = sortDocumentData(documentTemplates)
 
 			if err != nil {
 				return err
@@ -57,8 +67,7 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 		})
 
 		group.Go(func() error {
-			documentTemplates, err := client.DocumentTemplates(ctx, sirius.CaseTypeDigitalLpa)
-			data.DocumentTemplates = sortDocumentData(documentTemplates)
+			data.TaskList, err = client.TasksForCase(ctx, data.Lpa.ID)
 
 			if err != nil {
 				return err
