@@ -148,7 +148,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "{\"tasks\":[{\"id\":1,\"name\":\"Review reduced fee eligibility\",\"assignee\":{\"displayName\":\"Super Team\"}},{\"id\":2,\"name\":\"Review application correspondence\",\"assignee\":{\"displayName\":\"Marvellous Team\"}},{\"id\":3,\"name\":\"Another task\",\"assignee\":{\"displayName\":\"Super Team\"}}]}"
+        "body": "{\"tasks\":[{\"id\":1,\"name\":\"Review reduced fee eligibility\",\"duedate\":\"10/12/2023\",\"assignee\":{\"displayName\":\"Super Team\"}},{\"id\":2,\"name\":\"Review application correspondence\",\"duedate\":\"12/12/2023\",\"assignee\":{\"displayName\":\"Marvellous Team\"}},{\"id\":3,\"name\":\"Another task\",\"duedate\":\"20/12/2023\",\"assignee\":{\"displayName\":\"Super Team\"}}]}"
       }
     },
     {
@@ -238,7 +238,7 @@
       }
     },
     {
-      "name": "A request to get tasks for a case",
+      "name": "A request to get tasks for a case (ID 800)",
       "request": {
         "method": "GET",
         "url": "/lpa-api/v1/cases/800/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC"
@@ -246,11 +246,11 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "{\"tasks\":[{\"id\":1,\"name\":\"Review reduced fee eligibility\",\"assignee\":{\"displayName\":\"Super Team\"}},{\"id\":2,\"name\":\"Review application correspondence\",\"assignee\":{\"displayName\":\"Marvellous Team\"}},{\"id\":3,\"name\":\"Another task\",\"assignee\":{\"displayName\":\"Super Team\"}}]}"
+        "body": "{\"tasks\":[{\"id\":1,\"name\":\"Review reduced fee eligibility\",\"duedate\":\"10/12/2023\",\"assignee\":{\"displayName\":\"Super Team\"}},{\"id\":2,\"name\":\"Review application correspondence\",\"duedate\":\"13/12/2023\",\"assignee\":{\"displayName\":\"Marvellous Team\"}},{\"id\":3,\"name\":\"Another task\",\"duedate\":\"16/12/2023\",\"assignee\":{\"displayName\":\"Super Team\"}}]}"
       }
     },
     {
-      "name": "A request to get tasks for a second case",
+      "name": "A request to get tasks for a second case (ID 801)",
       "request": {
         "method": "GET",
         "url": "/lpa-api/v1/cases/801/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC"
@@ -258,7 +258,43 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "{\"tasks\":[{\"id\":1,\"name\":\"Review reduced fee eligibility\",\"assignee\":{\"displayName\":\"Super Team\"}},{\"id\":2,\"name\":\"Review application correspondence\",\"assignee\":{\"displayName\":\"Marvellous Team\"}},{\"id\":3,\"name\":\"Another task\",\"assignee\":{\"displayName\":\"Super Team\"}}]}"
+        "body": "{\"tasks\":[{\"id\":1,\"name\":\"Review reduced fee eligibility\",\"duedate\":\"10/12/2023\",\"assignee\":{\"displayName\":\"Super Team\"}},{\"id\":2,\"name\":\"Review application correspondence\",\"duedate\":\"13/12/2023\",\"assignee\":{\"displayName\":\"Marvellous Team\"}},{\"id\":3,\"name\":\"Another task\",\"duedate\":\"16/12/2023\",\"assignee\":{\"displayName\":\"Super Team\"}}]}"
+      }
+    },
+    {
+      "name": "A request to get tasks for a third case (ID 900)",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/cases/900/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"tasks\":[{\"id\":1,\"name\":\"Review reduced fee eligibility\",\"duedate\":\"10/12/2023\",\"assignee\":{\"displayName\":\"Super Team\"}},{\"id\":2,\"name\":\"Review application correspondence\",\"duedate\":\"13/12/2023\",\"assignee\":{\"displayName\":\"Marvellous Team\"}},{\"id\":3,\"name\":\"Another task\",\"duedate\":\"16/12/2023\",\"assignee\":{\"displayName\":\"Super Team\"}}]}"
+      }
+    },
+    {
+      "name": "A request to get tasks for a fourth case (ID 483)",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/cases/483/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"tasks\":[{\"id\":1,\"name\":\"Review reduced fee eligibility\",\"duedate\":\"10/12/2023\",\"assignee\":{\"displayName\":\"Super Team\"}},{\"id\":2,\"name\":\"Review application correspondence\",\"duedate\":\"13/12/2023\",\"assignee\":{\"displayName\":\"Marvellous Team\"}},{\"id\":3,\"name\":\"Another task\",\"duedate\":\"16/12/2023\",\"assignee\":{\"displayName\":\"Super Team\"}}]}"
+      }
+    },
+    {
+      "name": "A request to get tasks for a fifth case (ID 802)",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/cases/802/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"tasks\":[{\"id\":1,\"name\":\"Review reduced fee eligibility\",\"duedate\":\"10/12/2023\",\"assignee\":{\"displayName\":\"Super Team\"}},{\"id\":2,\"name\":\"Review application correspondence\",\"duedate\":\"13/12/2023\",\"assignee\":{\"displayName\":\"Marvellous Team\"}},{\"id\":3,\"name\":\"Another task\",\"duedate\":\"16/12/2023\",\"assignee\":{\"displayName\":\"Super Team\"}}]}"
       }
     },
     {
