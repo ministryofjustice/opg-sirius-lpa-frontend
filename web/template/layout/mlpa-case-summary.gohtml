@@ -29,8 +29,8 @@
                 <p class="govuk-body">There are none in place.</p>
             </div>
             <div class="govuk-grid-column-two-thirds">
-                <table class="govuk-table">
-                    <thead class="govuk-table__head app-table-head--no-vertical-padding">
+                <table class="govuk-table" data-role="tasks-table">
+                    <thead class="govuk-table__head app-table-head--no-vertical-padding" data-role="tasks-table-header">
                         <tr class="govuk-table__row">
                             <th scope="col" class="govuk-table__header">
                                 <svg class="app-svg-icon--inline govuk-!-display-inline" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -2 19 19" overflow="visible">
@@ -53,7 +53,7 @@
                         {{ end }}
 
                         {{ range .TaskList }}
-                            <tr class="govuk-table__row">
+                            <tr class="govuk-table__row" data-role="tasks-table-task-row">
                                 <td class="govuk-table__cell govuk-!-width-one-half">
                                     <p class="govuk-body-s govuk-!-margin-bottom-0">{{ .Name }}</p>
                                     <p class="govuk-body-s govuk-!-margin-bottom-0">
