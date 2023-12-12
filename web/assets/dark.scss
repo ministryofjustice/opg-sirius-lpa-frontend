@@ -134,4 +134,8 @@ $sirius-bg-color: #29292e;
   .app-caseworker-summary table {
     background-color: #505a5f;
   }
+
+  .govuk-header {
+    border-bottom: 10px solid govuk-colour("black");
+  }
 }
