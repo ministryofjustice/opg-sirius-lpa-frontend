@@ -211,6 +211,66 @@ func TestGetPaymentsWhenFailureOnGetCase(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
+func TestGetPaymentsWhenFailureOnGetTasks(t *testing.T) {
+	allPayments := []sirius.Payment{
+		{
+			ID:     2,
+			Amount: 4100,
+		},
+		{
+			ID:     3,
+			Amount: 1438,
+		},
+	}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle: "PHONE",
+			Label:  "Paid over the phone",
+		},
+	}
+
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
+		},
+	}
+
+	user := sirius.User{ID: 1, DisplayName: "Test User", Roles: []string{"OPG User", "Reduced Fees User"}}
+
+	referenceTypes := []sirius.RefDataItem{
+		{
+			Handle: "GOVUK",
+			Label:  "GOV.UK Pay",
+		},
+	}
+	client := &mockGetPayments{}
+	client.
+		On("Case", mock.Anything, 77).
+		Return(sirius.Case{}, nil).
+		On("Payments", mock.Anything, 77).
+		Return(allPayments, nil).
+		On("TasksForCase", mock.Anything, 77).
+		Return([]sirius.Task{}, expectedError).
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil).
+		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
+		Return(referenceTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil).
+		On("GetUserDetails", mock.Anything).
+		Return(user, nil)
+
+	server := newMockServer("/payments/{id}", GetPayments(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/payments/77", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
 func TestGetPaymentsWhenFailureOnGetPayments(t *testing.T) {
 	caseItem := sirius.Case{
 		UID:     "7000-0000-0021",

@@ -214,6 +214,69 @@ func TestPostSaveDocument(t *testing.T) {
 	}
 }
 
+func TestPostSaveDocumentErrorFetchingTasks(t *testing.T) {
+	caseItem := sirius.Case{CaseType: "lpa", UID: "7000"}
+
+	document := sirius.Document{
+		ID:      1,
+		UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e96",
+		Type:    sirius.TypeDraft,
+		Content: "Test content",
+	}
+
+	documents := []sirius.Document{
+		document,
+	}
+
+	client := &mockEditDocumentClient{}
+	client.
+		On("EditDocument", mock.Anything, document.UUID, "Edited test content").
+		Return(document, nil)
+	client.
+		On("Case", mock.Anything, 639).
+		Return(caseItem, nil)
+	client.
+		On("Documents", mock.Anything, sirius.CaseType("lpa"), 639, []string{sirius.TypeDraft}, []string{}).
+		Return(documents, nil)
+	client.
+		On("DocumentTemplates", mock.Anything, sirius.CaseType("lpa")).
+		Return([]sirius.DocumentTemplateData{}, nil)
+	client.
+		On("TasksForCase", mock.Anything, 639).
+		Return([]sirius.Task{}, expectedError)
+
+	template := &mockTemplate{}
+
+	templateData := editDocumentData{
+		Case:      caseItem,
+		Documents: documents,
+		Document:  document,
+		TaskList:  []sirius.Task{},
+	}
+
+	template.
+		On("Func", mock.Anything, templateData).
+		Return(nil)
+
+	form := url.Values{
+		"id":                 {"639"},
+		"case":               {"lpa"},
+		"documentControls":   {"save"},
+		"documentTextEditor": {"Edited test content"},
+		"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e96"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=639&case=lpa", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := EditDocument(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Equal(t, expectedError, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
 func TestPostDeleteDocument(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa", "digital_lpa"} {
 		t.Run(caseType, func(t *testing.T) {
@@ -606,6 +669,30 @@ func TestGetCreateDocumentWhenFailureOnDocumentByUUID(t *testing.T) {
 		Return([]sirius.Task{}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=843&case=lpa", nil)
+	w := httptest.NewRecorder()
+
+	err := EditDocument(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestGetEditDocumentWhenTasksErrors(t *testing.T) {
+	client := &mockEditDocumentClient{}
+	client.
+		On("Case", mock.Anything, 223).
+		Return(sirius.Case{}, nil)
+	client.
+		On("Documents", mock.Anything, sirius.CaseTypeLpa, 223, []string{sirius.TypeDraft}, []string{}).
+		Return([]sirius.Document{}, nil)
+	client.
+		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
+		Return([]sirius.DocumentTemplateData{}, nil)
+	client.
+		On("TasksForCase", mock.Anything, 223).
+		Return([]sirius.Task{}, expectedError)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=223&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := EditDocument(client, nil)(w, r)
