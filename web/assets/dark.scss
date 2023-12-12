@@ -134,4 +134,15 @@ $sirius-bg-color: #29292e;
   .app-caseworker-summary table {
     background-color: #505a5f;
   }
+
+  // Search dropdown
+  .sirius-search {
+    background-color: govuk-colour("black") !important;
+    box-shadow: 0 5px 5px govuk-colour("black") !important;
+  }
+
+  .sirius-search__item {
+    background-color: $sirius-bg-color !important;
+    color: govuk-colour("white") !important;
+  }
 }

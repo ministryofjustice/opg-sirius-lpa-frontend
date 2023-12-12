@@ -2,6 +2,8 @@ FROM node:21.1.0-alpine3.17 as asset-env
 
 WORKDIR /app
 
+RUN apk add --no-cache git
+
 RUN mkdir -p web/static
 
 COPY package.json .
