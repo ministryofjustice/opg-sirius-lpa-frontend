@@ -74,7 +74,7 @@ func TestGetDocuments(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestGetPaymentsWhenFailureOnGetDigitalLpa(t *testing.T) {
+func TestGetDocumentsWhenFailureOnGetDigitalLpa(t *testing.T) {
 	client := &mockGetDocuments{}
 	client.
 		On("DigitalLpa", mock.Anything, "M-9876-9876-9876").
@@ -89,7 +89,7 @@ func TestGetPaymentsWhenFailureOnGetDigitalLpa(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestGetPaymentsWhenFailureOnGetDocuments(t *testing.T) {
+func TestGetDocumentsWhenFailureOnGetDocuments(t *testing.T) {
 	digitalLpa := sirius.DigitalLpa{
 		ID:      1532,
 		UID:     "M-9876-9876-9876",
@@ -110,6 +110,33 @@ func TestGetPaymentsWhenFailureOnGetDocuments(t *testing.T) {
 	server := newMockServer("/lpa/{uid}/documents", GetDocuments(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9876/documents", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestGetDocumentsWhenFailureOnGetTasks(t *testing.T) {
+	digitalLpa := sirius.DigitalLpa{
+		ID:      1444,
+		UID:     "M-A876-A876-A876",
+		Subtype: "hw",
+	}
+
+	client := &mockGetDocuments{}
+	client.
+		On("DigitalLpa", mock.Anything, "M-A876-A876-A876").
+		Return(digitalLpa, nil)
+	client.
+		On("Documents", mock.Anything, sirius.CaseType("lpa"), 1444, []string{}, []string{sirius.TypeDraft, sirius.TypePreview}).
+		Return([]sirius.Document{}, nil)
+	client.
+		On("TasksForCase", mock.Anything, 1444).
+		Return([]sirius.Task{}, expectedError)
+
+	server := newMockServer("/lpa/{uid}/documents", GetDocuments(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-A876-A876-A876/documents", nil)
 	_, err := server.serve(req)
 
 	assert.Equal(t, expectedError, err)
