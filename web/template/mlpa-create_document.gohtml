@@ -5,7 +5,7 @@
 {{ define "main" }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            {{ template "mlpa-header" (caseTabs .Lpa "documents") }}
+            {{ template "mlpa-header" (caseTabs .Lpa .TaskList "documents") }}
 
             {{ template "error-summary" .Error }}
 
