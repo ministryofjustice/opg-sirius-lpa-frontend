@@ -44,7 +44,7 @@
                         </tr>
                     </thead>
                     <tbody class="govuk-table__body">
-                        {{ if not .TaskList }}
+                        {{ if not .CaseSummary.TaskList }}
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell app-!-table-row__no-border" colspan="3">
                                     <p class="govuk-body-s govuk-!-margin-bottom-0">There are no live tasks</p>
@@ -52,7 +52,7 @@
                             </tr>
                         {{ end }}
 
-                        {{ range .TaskList }}
+                        {{ range .CaseSummary.TaskList }}
                             <tr class="govuk-table__row" data-role="tasks-table-task-row">
                                 <td class="govuk-table__cell govuk-!-width-one-half">
                                     <p class="govuk-body-s govuk-!-margin-bottom-0">{{ .Name }}</p>

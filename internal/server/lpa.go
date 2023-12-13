@@ -12,6 +12,7 @@ type LpaClient interface {
 }
 
 type lpaData struct {
+	Lpa          sirius.DigitalLpa
 	CaseSummary  sirius.CaseSummary
 	FlashMessage FlashNotification
 }
@@ -28,6 +29,7 @@ func Lpa(client LpaClient, tmpl template.Template) Handler {
 		}
 
 		data := lpaData{
+			Lpa:         caseSummary.Lpa,
 			CaseSummary: caseSummary,
 		}
 

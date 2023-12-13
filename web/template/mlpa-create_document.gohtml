@@ -5,7 +5,7 @@
 {{ define "main" }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            {{ template "mlpa-header" (caseTabs .Lpa .TaskList "documents") }}
+            {{ template "mlpa-header" (caseTabs .CaseSummary "documents") }}
 
             {{ template "error-summary" .Error }}
 
@@ -107,7 +107,7 @@
                     <button class="govuk-button" data-module="govuk-button" data-module="create-document-button" type="submit">Continue</button>
                 </div>
                 <div class="govuk-body">
-                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s/documents" .Lpa.UID) }}">Cancel</a>
+                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s/documents" .CaseSummary.Lpa.UID) }}">Cancel</a>
                 </div>
             </form>
         </div>
