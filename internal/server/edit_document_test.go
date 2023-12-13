@@ -21,14 +21,9 @@ func (m *mockEditDocumentClient) Case(ctx sirius.Context, id int) (sirius.Case, 
 	return args.Get(0).(sirius.Case), args.Error(1)
 }
 
-func (m *mockEditDocumentClient) DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error) {
+func (m *mockEditDocumentClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
 	args := m.Called(ctx, uid)
-	return args.Get(0).(sirius.DigitalLpa), args.Error(1)
-}
-
-func (m *mockEditDocumentClient) TasksForCase(ctx sirius.Context, id int) ([]sirius.Task, error) {
-	args := m.Called(ctx, id)
-	return args.Get(0).([]sirius.Task), args.Error(1)
+	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
 func (m *mockEditDocumentClient) Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docTypes []string, notDocTypes []string) ([]sirius.Document, error) {
@@ -97,9 +92,6 @@ func TestGetEditDocument(t *testing.T) {
 			client.
 				On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
 				Return(documentTemplates, nil)
-			client.
-				On("TasksForCase", mock.Anything, 155).
-				Return([]sirius.Task{}, nil)
 
 			template := &mockTemplate{}
 			templateData := editDocumentData{
@@ -107,17 +99,16 @@ func TestGetEditDocument(t *testing.T) {
 				Documents:  documents,
 				Document:   document,
 				UsesNotify: true,
-				TaskList:   []sirius.Task{},
 			}
 
 			if caseType == "digital_lpa" {
-				lpa := sirius.DigitalLpa{}
+				caseSummary := sirius.CaseSummary{Lpa: sirius.DigitalLpa{}, TaskList: []sirius.Task{}}
 
 				client.
-					On("DigitalLpa", mock.Anything, "7000").
-					Return(lpa, nil)
+					On("CaseSummary", mock.Anything, "7000").
+					Return(caseSummary, nil)
 
-				templateData.Lpa = lpa
+				templateData.CaseSummary = caseSummary
 			}
 
 			template.
@@ -166,26 +157,22 @@ func TestPostSaveDocument(t *testing.T) {
 			client.
 				On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
 				Return([]sirius.DocumentTemplateData{}, nil)
-			client.
-				On("TasksForCase", mock.Anything, 144).
-				Return([]sirius.Task{}, nil)
 
 			template := &mockTemplate{}
 			templateData := editDocumentData{
 				Case:      caseItem,
 				Documents: documents,
 				Document:  document,
-				TaskList:  []sirius.Task{},
 			}
 
 			if caseType == "digital_lpa" {
-				lpa := sirius.DigitalLpa{}
+				caseSummary := sirius.CaseSummary{Lpa: sirius.DigitalLpa{}, TaskList: []sirius.Task{}}
 
 				client.
-					On("DigitalLpa", mock.Anything, "7000").
-					Return(lpa, nil)
+					On("CaseSummary", mock.Anything, "7000").
+					Return(caseSummary, nil)
 
-				templateData.Lpa = lpa
+				templateData.CaseSummary = caseSummary
 			}
 
 			template.
@@ -212,69 +199,6 @@ func TestPostSaveDocument(t *testing.T) {
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
-}
-
-func TestPostSaveDocumentErrorFetchingTasks(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "lpa", UID: "7000"}
-
-	document := sirius.Document{
-		ID:      1,
-		UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e96",
-		Type:    sirius.TypeDraft,
-		Content: "Test content",
-	}
-
-	documents := []sirius.Document{
-		document,
-	}
-
-	client := &mockEditDocumentClient{}
-	client.
-		On("EditDocument", mock.Anything, document.UUID, "Edited test content").
-		Return(document, nil)
-	client.
-		On("Case", mock.Anything, 639).
-		Return(caseItem, nil)
-	client.
-		On("Documents", mock.Anything, sirius.CaseType("lpa"), 639, []string{sirius.TypeDraft}, []string{}).
-		Return(documents, nil)
-	client.
-		On("DocumentTemplates", mock.Anything, sirius.CaseType("lpa")).
-		Return([]sirius.DocumentTemplateData{}, nil)
-	client.
-		On("TasksForCase", mock.Anything, 639).
-		Return([]sirius.Task{}, expectedError)
-
-	template := &mockTemplate{}
-
-	templateData := editDocumentData{
-		Case:      caseItem,
-		Documents: documents,
-		Document:  document,
-		TaskList:  []sirius.Task{},
-	}
-
-	template.
-		On("Func", mock.Anything, templateData).
-		Return(nil)
-
-	form := url.Values{
-		"id":                 {"639"},
-		"case":               {"lpa"},
-		"documentControls":   {"save"},
-		"documentTextEditor": {"Edited test content"},
-		"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e96"},
-	}
-
-	r, _ := http.NewRequest(http.MethodPost, "/?id=639&case=lpa", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := EditDocument(client, template.Func)(w, r)
-	resp := w.Result()
-
-	assert.Equal(t, expectedError, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostDeleteDocument(t *testing.T) {
@@ -322,16 +246,12 @@ func TestPostDeleteDocument(t *testing.T) {
 				client.
 					On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
 					Return([]sirius.DocumentTemplateData{}, nil)
-				client.
-					On("TasksForCase", mock.Anything, 288).
-					Return([]sirius.Task{}, nil)
 
 				template.
 					On("Func", mock.Anything, editDocumentData{
 						Case:      caseItem,
 						Documents: documents,
 						Document:  document,
-						TaskList:  []sirius.Task{},
 					}).
 					Return(nil)
 			}
@@ -410,9 +330,6 @@ func TestPostPublishDocument(t *testing.T) {
 				client.
 					On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
 					Return([]sirius.DocumentTemplateData{}, nil)
-				client.
-					On("TasksForCase", mock.Anything, 544).
-					Return([]sirius.Task{}, nil)
 
 				template.
 					On("Func", mock.Anything, editDocumentData{
@@ -420,7 +337,6 @@ func TestPostPublishDocument(t *testing.T) {
 						Documents: documents,
 						Document:  document,
 						Success:   true,
-						TaskList:  []sirius.Task{},
 					}).
 					Return(nil)
 
@@ -488,9 +404,6 @@ func TestPostPreviewDocument(t *testing.T) {
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return([]sirius.DocumentTemplateData{}, nil)
-	client.
-		On("TasksForCase", mock.Anything, 888).
-		Return([]sirius.Task{}, nil)
 
 	template := &mockTemplate{}
 
@@ -501,7 +414,6 @@ func TestPostPreviewDocument(t *testing.T) {
 			Document:     document,
 			PreviewDraft: true,
 			DownloadUUID: "efef6714-b4fe-44c2-b26e-90dfe3663e96",
-			TaskList:     []sirius.Task{},
 		}).
 		Return(nil)
 
@@ -599,9 +511,6 @@ func TestGetEditDocumentWhenCaseErrors(t *testing.T) {
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return([]sirius.DocumentTemplateData{}, nil)
-	client.
-		On("TasksForCase", mock.Anything, 222).
-		Return([]sirius.Task{}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=222&case=lpa", nil)
 	w := httptest.NewRecorder()
@@ -625,9 +534,6 @@ func TestGetCreateDocumentWhenFailureOnDocuments(t *testing.T) {
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return([]sirius.DocumentTemplateData{}, nil)
-	client.
-		On("TasksForCase", mock.Anything, 535).
-		Return([]sirius.Task{}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=535&case=lpa", nil)
 	w := httptest.NewRecorder()
@@ -664,35 +570,8 @@ func TestGetCreateDocumentWhenFailureOnDocumentByUUID(t *testing.T) {
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return([]sirius.DocumentTemplateData{}, nil)
-	client.
-		On("TasksForCase", mock.Anything, 843).
-		Return([]sirius.Task{}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=843&case=lpa", nil)
-	w := httptest.NewRecorder()
-
-	err := EditDocument(client, nil)(w, r)
-
-	assert.Equal(t, expectedError, err)
-	mock.AssertExpectationsForObjects(t, client)
-}
-
-func TestGetEditDocumentWhenTasksErrors(t *testing.T) {
-	client := &mockEditDocumentClient{}
-	client.
-		On("Case", mock.Anything, 223).
-		Return(sirius.Case{}, nil)
-	client.
-		On("Documents", mock.Anything, sirius.CaseTypeLpa, 223, []string{sirius.TypeDraft}, []string{}).
-		Return([]sirius.Document{}, nil)
-	client.
-		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
-		Return([]sirius.DocumentTemplateData{}, nil)
-	client.
-		On("TasksForCase", mock.Anything, 223).
-		Return([]sirius.Task{}, expectedError)
-
-	r, _ := http.NewRequest(http.MethodGet, "/?id=223&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := EditDocument(client, nil)(w, r)
@@ -727,9 +606,6 @@ func TestGetEditDocumentWhenTemplateErrors(t *testing.T) {
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return([]sirius.DocumentTemplateData{}, nil)
-	client.
-		On("TasksForCase", mock.Anything, 123).
-		Return([]sirius.Task{}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -737,7 +613,6 @@ func TestGetEditDocumentWhenTemplateErrors(t *testing.T) {
 			Case:      caseItem,
 			Document:  document,
 			Documents: documents,
-			TaskList:  []sirius.Task{},
 		}).
 		Return(expectedError)
 

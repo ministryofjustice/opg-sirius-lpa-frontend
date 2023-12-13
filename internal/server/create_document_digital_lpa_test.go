@@ -16,9 +16,9 @@ type mockCreateDocumentDigitalLpaClient struct {
 	mock.Mock
 }
 
-func (m *mockCreateDocumentDigitalLpaClient) DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error) {
+func (m *mockCreateDocumentDigitalLpaClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
 	args := m.Called(ctx, uid)
-	return args.Get(0).(sirius.DigitalLpa), args.Error(1)
+	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
 func (m *mockCreateDocumentDigitalLpaClient) TasksForCase(ctx sirius.Context, id int) ([]sirius.Task, error) {
@@ -42,29 +42,29 @@ func (m *mockCreateDocumentDigitalLpaClient) CreateDocument(ctx sirius.Context, 
 }
 
 func TestGetCreateDocumentDigitalLpa(t *testing.T) {
-	digitalLpa := sirius.DigitalLpa{
-		ID: 15,
-		Application: sirius.Draft{
-			DonorFirstNames: "Zackary",
-			DonorLastName:   "Lemmonds",
-			DonorAddress: sirius.Address{
-				Line1:    "9 Mount Pleasant Drive",
-				Town:     "East Harling",
-				Postcode: "NR16 2GB",
-				Country:  "UK",
+	caseSummary := sirius.CaseSummary{
+		Lpa: sirius.DigitalLpa{
+			ID: 15,
+			Application: sirius.Draft{
+				DonorFirstNames: "Zackary",
+				DonorLastName:   "Lemmonds",
+				DonorAddress: sirius.Address{
+					Line1:    "9 Mount Pleasant Drive",
+					Town:     "East Harling",
+					Postcode: "NR16 2GB",
+					Country:  "UK",
+				},
 			},
 		},
+		TaskList: []sirius.Task{},
 	}
 
 	templateData := []sirius.DocumentTemplateData{{TemplateId: "DL-EXAMPLE", Label: "Example DL Form"}}
 
 	client := &mockCreateDocumentDigitalLpaClient{}
 	client.
-		On("DigitalLpa", mock.Anything, "M-TWGJ-CDDJ-4NTL").
-		Return(digitalLpa, nil)
-	client.
-		On("TasksForCase", mock.Anything, 15).
-		Return([]sirius.Task{}, nil)
+		On("CaseSummary", mock.Anything, "M-TWGJ-CDDJ-4NTL").
+		Return(caseSummary, nil)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeDigitalLpa).
 		Return(templateData, nil)
@@ -72,7 +72,7 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createDocumentDigitalLpaData{
-			Lpa:                   digitalLpa,
+			CaseSummary:           caseSummary,
 			DocumentTemplates:     sortDocumentData(templateData),
 			ComponentDocumentData: buildComponentDocumentData(templateData),
 			Recipients: []sirius.Person{{
@@ -85,7 +85,6 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 				Postcode:     "NR16 2GB",
 				Country:      "UK",
 			}},
-			TaskList:              []sirius.Task{},
 		}).
 		Return(nil)
 
@@ -103,8 +102,8 @@ func TestGetCreateDocumentDigitalLpaError(t *testing.T) {
 
 	client := &mockCreateDocumentDigitalLpaClient{}
 	client.
-		On("DigitalLpa", mock.Anything, "M-TWGJ-CDDJ-4NTL").
-		Return(sirius.DigitalLpa{}, expectedError)
+		On("CaseSummary", mock.Anything, "M-TWGJ-CDDJ-4NTL").
+		Return(sirius.CaseSummary{}, expectedError)
 
 	template := &mockTemplate{}
 
@@ -118,18 +117,21 @@ func TestGetCreateDocumentDigitalLpaError(t *testing.T) {
 }
 
 func TestPostCreateDocumentDigitalLpa(t *testing.T) {
-	digitalLpa := sirius.DigitalLpa{
-		ID: 1344,
-		Application: sirius.Draft{
-			DonorFirstNames: "Zackary",
-			DonorLastName:   "Lemmonds",
-			DonorAddress: sirius.Address{
-				Line1:    "9 Mount Pleasant Drive",
-				Town:     "East Harling",
-				Postcode: "NR16 2GB",
-				Country:  "UK",
+	caseSummary := sirius.CaseSummary{
+		Lpa: sirius.DigitalLpa{
+			ID: 1344,
+			Application: sirius.Draft{
+				DonorFirstNames: "Zackary",
+				DonorLastName:   "Lemmonds",
+				DonorAddress: sirius.Address{
+					Line1:    "9 Mount Pleasant Drive",
+					Town:     "East Harling",
+					Postcode: "NR16 2GB",
+					Country:  "UK",
+				},
 			},
 		},
+		TaskList: []sirius.Task{},
 	}
 
 	templateData := []sirius.DocumentTemplateData{
@@ -145,14 +147,11 @@ func TestPostCreateDocumentDigitalLpa(t *testing.T) {
 
 	client := &mockCreateDocumentDigitalLpaClient{}
 	client.
-		On("DigitalLpa", mock.Anything, "M-TWGJ-CDDJ-4NTL").
-		Return(digitalLpa, nil)
+		On("CaseSummary", mock.Anything, "M-TWGJ-CDDJ-4NTL").
+		Return(caseSummary, nil)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeDigitalLpa).
 		Return(templateData, nil)
-	client.
-		On("TasksForCase", mock.Anything, 1344).
-		Return([]sirius.Task{}, nil)
 	client.
 		On("CreateContact", mock.Anything, sirius.Person{
 			ID:           -1,
@@ -188,18 +187,21 @@ func TestPostCreateDocumentDigitalLpa(t *testing.T) {
 }
 
 func TestPostCreateDocumentDigitalLpaInvalid(t *testing.T) {
-	digitalLpa := sirius.DigitalLpa{
-		ID: 1666,
-		Application: sirius.Draft{
-			DonorFirstNames: "Zackary",
-			DonorLastName:   "Lemmonds",
-			DonorAddress: sirius.Address{
-				Line1:    "9 Mount Pleasant Drive",
-				Town:     "East Harling",
-				Postcode: "NR16 2GB",
-				Country:  "UK",
+	caseSummary := sirius.CaseSummary{
+		Lpa: sirius.DigitalLpa{
+			ID: 1666,
+			Application: sirius.Draft{
+				DonorFirstNames: "Zackary",
+				DonorLastName:   "Lemmonds",
+				DonorAddress: sirius.Address{
+					Line1:    "9 Mount Pleasant Drive",
+					Town:     "East Harling",
+					Postcode: "NR16 2GB",
+					Country:  "UK",
+				},
 			},
 		},
+		TaskList: []sirius.Task{},
 	}
 
 	templateData := []sirius.DocumentTemplateData{
@@ -215,19 +217,16 @@ func TestPostCreateDocumentDigitalLpaInvalid(t *testing.T) {
 
 	client := &mockCreateDocumentDigitalLpaClient{}
 	client.
-		On("DigitalLpa", mock.Anything, "M-TWGJ-CDDJ-4NTL").
-		Return(digitalLpa, nil)
+		On("CaseSummary", mock.Anything, "M-TWGJ-CDDJ-4NTL").
+		Return(caseSummary, nil)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeDigitalLpa).
 		Return(templateData, nil)
-	client.
-		On("TasksForCase", mock.Anything, 1666).
-		Return([]sirius.Task{}, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createDocumentDigitalLpaData{
-			Lpa:                   digitalLpa,
+			CaseSummary:           caseSummary,
 			DocumentTemplates:     sortDocumentData(templateData),
 			ComponentDocumentData: buildComponentDocumentData(templateData),
 			Recipients: []sirius.Person{{
@@ -240,7 +239,7 @@ func TestPostCreateDocumentDigitalLpaInvalid(t *testing.T) {
 				Postcode:     "NR16 2GB",
 				Country:      "UK",
 			}},
-			TaskList:              []sirius.Task{},
+
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{
 					"templateId":      {"reason": "Please select a document template to continue"},
