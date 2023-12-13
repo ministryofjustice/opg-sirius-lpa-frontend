@@ -18,15 +18,9 @@ func (m *mockGetDocuments) Documents(ctx sirius.Context, caseType sirius.CaseTyp
 	return args.Get(0).([]sirius.Document), args.Error(1)
 }
 
-func (m *mockGetDocuments) DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error) {
+func (m *mockGetDocuments) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
 	args := m.Called(ctx, uid)
-
-	return args.Get(0).(sirius.DigitalLpa), args.Error(1)
-}
-
-func (m *mockGetDocuments) TasksForCase(ctx sirius.Context, id int) ([]sirius.Task, error) {
-	args := m.Called(ctx, id)
-	return args.Get(0).([]sirius.Task), args.Error(1)
+	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
 func TestGetDocuments(t *testing.T) {
@@ -38,29 +32,28 @@ func TestGetDocuments(t *testing.T) {
 		},
 	}
 
-	digitalLpa := sirius.DigitalLpa{
-		ID:      676,
-		UID:     "M-9876-9876-9876",
-		Subtype: "hw",
+	caseSummary := sirius.CaseSummary{
+		Lpa: sirius.DigitalLpa{
+			ID:      676,
+			UID:     "M-9876-9876-9876",
+			Subtype: "hw",
+		},
+		TaskList: []sirius.Task{},
 	}
 
 	client := &mockGetDocuments{}
 	client.
-		On("DigitalLpa", mock.Anything, "M-9876-9876-9876").
-		Return(digitalLpa, nil)
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		Return(caseSummary, nil)
 	client.
 		On("Documents", mock.Anything, sirius.CaseType("lpa"), 676, []string{}, []string{sirius.TypeDraft, sirius.TypePreview}).
 		Return(documents, nil)
-	client.
-		On("TasksForCase", mock.Anything, 676).
-		Return([]sirius.Task{}, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getDocumentsData{
-			Lpa:       digitalLpa,
-			Documents: documents,
-			TaskList:  []sirius.Task{},
+			CaseSummary: caseSummary,
+			Documents:   documents,
 		}).
 		Return(nil)
 
@@ -77,8 +70,8 @@ func TestGetDocuments(t *testing.T) {
 func TestGetDocumentsWhenFailureOnGetDigitalLpa(t *testing.T) {
 	client := &mockGetDocuments{}
 	client.
-		On("DigitalLpa", mock.Anything, "M-9876-9876-9876").
-		Return(sirius.DigitalLpa{}, expectedError)
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		Return(sirius.CaseSummary{}, expectedError)
 
 	server := newMockServer("/lpa/{uid}/documents", GetDocuments(client, nil))
 
@@ -90,22 +83,22 @@ func TestGetDocumentsWhenFailureOnGetDigitalLpa(t *testing.T) {
 }
 
 func TestGetDocumentsWhenFailureOnGetDocuments(t *testing.T) {
-	digitalLpa := sirius.DigitalLpa{
-		ID:      1532,
-		UID:     "M-9876-9876-9876",
-		Subtype: "hw",
+	caseSummary := sirius.CaseSummary{
+		Lpa: sirius.DigitalLpa{
+			ID:      1532,
+			UID:     "M-9876-9876-9876",
+			Subtype: "hw",
+		},
+		TaskList: []sirius.Task{},
 	}
 
 	client := &mockGetDocuments{}
 	client.
-		On("DigitalLpa", mock.Anything, "M-9876-9876-9876").
-		Return(digitalLpa, nil)
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		Return(caseSummary, nil)
 	client.
 		On("Documents", mock.Anything, sirius.CaseType("lpa"), 1532, []string{}, []string{sirius.TypeDraft, sirius.TypePreview}).
 		Return([]sirius.Document{}, expectedError)
-	client.
-		On("TasksForCase", mock.Anything, 1532).
-		Return([]sirius.Task{}, nil)
 
 	server := newMockServer("/lpa/{uid}/documents", GetDocuments(client, nil))
 
@@ -116,23 +109,11 @@ func TestGetDocumentsWhenFailureOnGetDocuments(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestGetDocumentsWhenFailureOnGetTasks(t *testing.T) {
-	digitalLpa := sirius.DigitalLpa{
-		ID:      1444,
-		UID:     "M-A876-A876-A876",
-		Subtype: "hw",
-	}
-
+func TestGetDocumentsWhenFailureOnGetCaseSummary(t *testing.T) {
 	client := &mockGetDocuments{}
 	client.
-		On("DigitalLpa", mock.Anything, "M-A876-A876-A876").
-		Return(digitalLpa, nil)
-	client.
-		On("Documents", mock.Anything, sirius.CaseType("lpa"), 1444, []string{}, []string{sirius.TypeDraft, sirius.TypePreview}).
-		Return([]sirius.Document{}, nil)
-	client.
-		On("TasksForCase", mock.Anything, 1444).
-		Return([]sirius.Task{}, expectedError)
+		On("CaseSummary", mock.Anything, "M-A876-A876-A876").
+		Return(sirius.CaseSummary{}, expectedError)
 
 	server := newMockServer("/lpa/{uid}/documents", GetDocuments(client, nil))
 

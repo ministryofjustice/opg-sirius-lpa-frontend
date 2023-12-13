@@ -15,19 +15,17 @@ type GetPaymentsClient interface {
 	Payments(ctx sirius.Context, id int) ([]sirius.Payment, error)
 	Case(sirius.Context, int) (sirius.Case, error)
 	GetUserDetails(sirius.Context) (sirius.User, error)
-	DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error)
-	TasksForCase(ctx sirius.Context, id int) ([]sirius.Task, error)
+	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
 }
 
 type getPaymentsData struct {
 	XSRFToken string
 
-	Lpa               sirius.DigitalLpa
+	CaseSummary       sirius.CaseSummary
 	Case              sirius.Case
 	Payments          []sirius.Payment
 	FeeReductions     []sirius.Payment
 	Refunds           []sirius.Payment
-	TaskList          []sirius.Task
 	PaymentSources    []sirius.RefDataItem
 	ReferenceTypes    []sirius.RefDataItem
 	FeeReductionTypes []sirius.RefDataItem
@@ -43,33 +41,27 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 		group, groupCtx := errgroup.WithContext(ctx.Context)
-		data := getPaymentsData{XSRFToken: ctx.XSRFToken}
+		data := getPaymentsData{
+			XSRFToken: ctx.XSRFToken,
+			CaseSummary: sirius.CaseSummary{},
+		}
 
 		var caseID int
 		var err error
 
 		uid := chi.URLParam(r, "uid")
 		if uid != "" {
-			data.Lpa, err = client.DigitalLpa(ctx, uid)
+			data.CaseSummary, err = client.CaseSummary(ctx, uid)
 			if err != nil {
 				return err
 			}
-			caseID = data.Lpa.ID
+			caseID = data.CaseSummary.Lpa.ID
 		} else {
 			caseID, err = strconv.Atoi(chi.URLParam(r, "id"))
 			if err != nil {
 				return err
 			}
 		}
-
-		group.Go(func() error {
-			data.TaskList, err = client.TasksForCase(ctx, caseID)
-
-			if err != nil {
-				return err
-			}
-			return nil
-		})
 
 		group.Go(func() error {
 			data.Case, err = client.Case(ctx.With(groupCtx), caseID)
