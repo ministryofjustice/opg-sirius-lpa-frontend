@@ -6,7 +6,7 @@
     <div class="govuk-grid-row" id="fees-data">
         <div class="govuk-grid-column-full">
 
-            {{ template "mlpa-header" (caseTabs .Lpa "fees") }}
+            {{ template "mlpa-header" (caseTabs .CaseSummary "fees") }}
 
             {{ if .FlashMessage.Title }}
                 {{ template "notification-banner" .FlashMessage }}

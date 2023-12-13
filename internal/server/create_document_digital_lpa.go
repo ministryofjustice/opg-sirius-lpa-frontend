@@ -13,7 +13,7 @@ import (
 )
 
 type CreateDocumentDigitalLpaClient interface {
-	DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error)
+	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
 	CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error)
 	CreateContact(ctx sirius.Context, contact sirius.Person) (sirius.Person, error)
@@ -22,7 +22,7 @@ type CreateDocumentDigitalLpaClient interface {
 type createDocumentDigitalLpaData struct {
 	XSRFToken             string
 	Error                 sirius.ValidationError
-	Lpa                   sirius.DigitalLpa
+	CaseSummary           sirius.CaseSummary
 	DocumentTemplates     []sirius.DocumentTemplateData
 	ComponentDocumentData ComponentDocumentData
 	Recipients            []sirius.Person
@@ -45,16 +45,13 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 			XSRFToken: ctx.XSRFToken,
 		}
 
-		group, groupCtx := errgroup.WithContext(ctx.Context)
-		group.Go(func() error {
-			data.Lpa, err = client.DigitalLpa(ctx.With(groupCtx), uid)
+		data.CaseSummary, err = client.CaseSummary(ctx, uid)
 
-			if err != nil {
-				return err
-			}
+		if err != nil {
+			return err
+		}
 
-			return nil
-		})
+		group, _ := errgroup.WithContext(ctx.Context)
 
 		group.Go(func() error {
 			documentTemplates, err := client.DocumentTemplates(ctx, sirius.CaseTypeDigitalLpa)
@@ -73,17 +70,19 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 
 		data.ComponentDocumentData = buildComponentDocumentData(data.DocumentTemplates)
 
+		lpa := data.CaseSummary.Lpa
+
 		donorPlaceholder := sirius.Person{
 			ID:           -1,
-			Firstname:    data.Lpa.Application.DonorFirstNames,
-			Surname:      data.Lpa.Application.DonorLastName,
+			Firstname:    lpa.Application.DonorFirstNames,
+			Surname:      lpa.Application.DonorLastName,
 			PersonType:   "Donor",
-			AddressLine1: data.Lpa.Application.DonorAddress.Line1,
-			AddressLine2: data.Lpa.Application.DonorAddress.Line2,
-			AddressLine3: data.Lpa.Application.DonorAddress.Line3,
-			Town:         data.Lpa.Application.DonorAddress.Town,
-			Postcode:     data.Lpa.Application.DonorAddress.Postcode,
-			Country:      data.Lpa.Application.DonorAddress.Country,
+			AddressLine1: lpa.Application.DonorAddress.Line1,
+			AddressLine2: lpa.Application.DonorAddress.Line2,
+			AddressLine3: lpa.Application.DonorAddress.Line3,
+			Town:         lpa.Application.DonorAddress.Town,
+			Postcode:     lpa.Application.DonorAddress.Postcode,
+			Country:      lpa.Application.DonorAddress.Country,
 		}
 		data.Recipients = append(data.Recipients, donorPlaceholder)
 
@@ -128,7 +127,7 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 					}
 				}
 
-				_, err = client.CreateDocument(ctx, data.Lpa.ID, recipient.ID, data.SelectedTemplateId, data.SelectedInserts)
+				_, err = client.CreateDocument(ctx, lpa.ID, recipient.ID, data.SelectedTemplateId, data.SelectedInserts)
 				if err != nil {
 					return err
 				}
@@ -139,7 +138,7 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 				} else if err != nil {
 					return err
 				} else {
-					return RedirectError(fmt.Sprintf("/edit-document?id=%d&case=%s", data.Lpa.ID, sirius.CaseTypeDigitalLpa))
+					return RedirectError(fmt.Sprintf("/edit-document?id=%d&case=%s", lpa.ID, sirius.CaseTypeDigitalLpa))
 				}
 			}
 		}
