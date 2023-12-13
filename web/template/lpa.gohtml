@@ -4,7 +4,7 @@
 
 {{ define "main" }}
 
-  {{ template "mlpa-header" (caseTabs .Lpa .TaskList "summary") }}
+  {{ template "mlpa-header" (caseTabs .CaseSummary "summary") }}
 
   <h2 class="govuk-heading-m">Case summary</h2>
 
@@ -65,7 +65,7 @@
           Investigations
         </aside>
         <aside class="app-stat-block">
-          <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ len .TaskList }}</h3>
+          <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ len .CaseSummary.TaskList }}</h3>
           Tasks
         </aside>
       </div>

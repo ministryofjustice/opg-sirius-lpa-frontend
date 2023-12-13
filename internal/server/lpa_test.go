@@ -54,6 +54,7 @@ func TestGetLpa(t *testing.T) {
 	template.
 		On("Func", mock.Anything, lpaData{
 			CaseSummary: caseSummary,
+			Lpa:         caseSummary.Lpa,
 		}).
 		Return(nil)
 
