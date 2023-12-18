@@ -1,9 +1,5 @@
 package sirius
 
-import (
-	"fmt"
-)
-
 type CaseSummary struct {
 	Lpa DigitalLpa
 	TaskList []Task
