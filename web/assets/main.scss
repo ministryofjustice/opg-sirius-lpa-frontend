@@ -68,6 +68,10 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   color: govuk-colour("red") !important;
 }
 
+.app-\!-colour-text-lighter {
+  color: govuk-colour("dark-grey") !important;
+}
+
 .app-\!-pre-wrap {
   white-space: pre-wrap;
 }

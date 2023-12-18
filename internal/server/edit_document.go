@@ -13,7 +13,7 @@ import (
 type EditDocumentClient interface {
 	Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docTypes []string, notDocTypes []string) ([]sirius.Document, error)
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
-	DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error)
+	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 	EditDocument(ctx sirius.Context, uuid string, content string) (sirius.Document, error)
 	DeleteDocument(ctx sirius.Context, uuid string) error
@@ -26,7 +26,7 @@ type editDocumentData struct {
 	Success      bool
 	Error        sirius.ValidationError
 	Case         sirius.Case
-	Lpa          sirius.DigitalLpa
+	CaseSummary  sirius.CaseSummary
 	Documents    []sirius.Document
 	Document     sirius.Document
 	UsesNotify   bool
@@ -67,11 +67,10 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				data.Case = caseItem
 
 				if caseType == sirius.CaseTypeDigitalLpa {
-					lpa, err := client.DigitalLpa(ctx.With(groupCtx), data.Case.UID)
+					data.CaseSummary, err = client.CaseSummary(ctx.With(groupCtx), data.Case.UID)
 					if err != nil {
 						return err
 					}
-					data.Lpa = lpa
 				}
 
 				return nil
@@ -220,23 +219,20 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					data.Case = caseItem
 
 					if caseType == sirius.CaseTypeDigitalLpa {
-						lpa, err := client.DigitalLpa(ctx.With(groupCtx), data.Case.UID)
+						data.CaseSummary, err = client.CaseSummary(ctx.With(groupCtx), data.Case.UID)
 						if err != nil {
 							return err
 						}
-						data.Lpa = lpa
 					}
 
 					return nil
 				})
 
 				group.Go(func() error {
-					documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID, []string{sirius.TypeDraft}, []string{})
+					data.Documents, err = client.Documents(ctx.With(groupCtx), caseType, caseID, []string{sirius.TypeDraft}, []string{})
 					if err != nil {
 						return err
 					}
-
-					data.Documents = documents
 					return nil
 				})
 
@@ -245,7 +241,6 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					if err != nil {
 						return err
 					}
-
 					return nil
 				})
 
