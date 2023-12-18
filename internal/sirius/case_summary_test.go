@@ -32,9 +32,12 @@ func TestCaseSummary(t *testing.T) {
 		return digitalLpaUrl.String() == r.URL.String()
 	})
 	var digitalLpaBody bytes.Buffer
-    json.NewEncoder(&digitalLpaBody).Encode(DigitalLpa{
+    err := json.NewEncoder(&digitalLpaBody).Encode(DigitalLpa{
     	ID: 1,
     })
+    if err != nil {
+    	t.Fail()
+    }
 	respForDigitalLpa := http.Response{
 		StatusCode: 200,
 		Body: io.NopCloser(bytes.NewReader(digitalLpaBody.Bytes())),
@@ -46,19 +49,22 @@ func TestCaseSummary(t *testing.T) {
 		return tasksForCaseUrl.String() == r.URL.String()
 	})
 	var tasksForCaseBody bytes.Buffer
-    json.NewEncoder(&tasksForCaseBody).Encode(map[string][]Task{
+    err = json.NewEncoder(&tasksForCaseBody).Encode(map[string][]Task{
     	"tasks": []Task{
     		Task{},
     		Task{},
     		Task{},
     	},
     })
+    if err != nil {
+    	t.Fail()
+    }
 	respForTasksForCase := http.Response{
 		StatusCode: 200,
 		Body: io.NopCloser(bytes.NewReader(tasksForCaseBody.Bytes())),
 	}
 	mockHttpClient.On("Do", reqForTasksForCaseMatcher).Return(&respForTasksForCase, nil)
 
-	_, err := client.CaseSummary(Context{Context: context.Background()}, "M-QWER-TY34-3434")
+	_, err = client.CaseSummary(Context{Context: context.Background()}, "M-QWER-TY34-3434")
 	assert.Nil(t, err)
 }
