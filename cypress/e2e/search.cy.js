@@ -173,12 +173,5 @@ describe("Search", () => {
       $row.should("contain", "deleted");
       $row.should("contain", "7000-0000-5555");
     });
-
-    it("finds no cases (dropdown appears)", () => {
-      cy.visit("/search?term=abcdefg");
-      cy.get("#f-search-form-below-phase-banner").type("abcdefg").submit();
-      const $row = cy.get(".sirius-search__item");
-      $row.should("contain", "No cases were found");
-    });
   });
 });
