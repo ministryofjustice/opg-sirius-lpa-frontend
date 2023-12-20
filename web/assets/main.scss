@@ -6,6 +6,7 @@ $govuk-assets-path: "/lpa/frontend/assets/";
 @import "node_modules/govuk-frontend/govuk/all";
 @import "node_modules/@ministryofjustice/frontend/moj/all";
 @import "node_modules/accessible-autocomplete/src/autocomplete";
+@import "node_modules/opg-sirius-search-ui/src/search";
 @import "./dark.scss";
 @import "./wysiwyg.scss";
 
