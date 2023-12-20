@@ -41,18 +41,16 @@ $sirius-bg-color: #29292e;
     color: govuk-colour("white");
   }
 
+  .sirius-search--colour-text-blue,
   .govuk-accordion__show-all,
   .govuk-details__summary-text,
-  .govuk-link:link {
+  .govuk-link:link,
+  .govuk-link--no-visited-state:visited {
     color: lighten(govuk-colour("light-blue"), 20%);
   }
 
   .govuk-link:visited {
     color: govuk-colour("light-pink");
-  }
-
-  .govuk-link--no-visited-state:visited {
-    color: lighten(govuk-colour("light-blue"), 20%);
   }
 
   .govuk-link:hover {
@@ -136,7 +134,7 @@ $sirius-bg-color: #29292e;
   }
 
   .govuk-header {
-  border-bottom: 10px solid govuk-colour("black");
+    border-bottom: 10px solid govuk-colour("black");
   }
 
   // Search dropdown
