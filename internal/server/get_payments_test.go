@@ -37,7 +37,7 @@ func (m *mockGetPayments) GetUserDetails(ctx sirius.Context) (sirius.User, error
 }
 
 func (m *mockGetPayments) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
-	args := m.Called(ctx)
+	args := m.Called(ctx, uid)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
@@ -195,6 +195,21 @@ func TestGetPaymentsWhenFailureOnGetCase(t *testing.T) {
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/payments/8", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestGetPaymentsWhenFailureOnGetCaseSummary(t *testing.T) {
+	client := &mockGetPayments{}
+	client.
+		On("CaseSummary", mock.Anything, "M-QQQQ-WWWW-EEEE").
+		Return(sirius.CaseSummary{}, expectedError)
+
+	server := newMockServer("/lpa/{uid}/payments", GetPayments(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-QQQQ-WWWW-EEEE/payments", nil)
 	_, err := server.serve(req)
 
 	assert.Equal(t, expectedError, err)
