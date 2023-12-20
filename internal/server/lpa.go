@@ -8,13 +8,12 @@ import (
 )
 
 type LpaClient interface {
-	DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error)
-	TasksForCase(ctx sirius.Context, id int) ([]sirius.Task, error)
+	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
 }
 
 type lpaData struct {
 	Lpa          sirius.DigitalLpa
-	TaskList     []sirius.Task
+	CaseSummary  sirius.CaseSummary
 	FlashMessage FlashNotification
 }
 
@@ -23,21 +22,15 @@ func Lpa(client LpaClient, tmpl template.Template) Handler {
 		uid := chi.URLParam(r, "uid")
 		ctx := getContext(r)
 
-		lpa, err := client.DigitalLpa(ctx, uid)
-
-		if err != nil {
-			return err
-		}
-
-		tasks, err := client.TasksForCase(ctx, lpa.ID)
+		caseSummary, err := client.CaseSummary(ctx, uid)
 
 		if err != nil {
 			return err
 		}
 
 		data := lpaData{
-			Lpa:      lpa,
-			TaskList: tasks,
+			Lpa:         caseSummary.Lpa,
+			CaseSummary: caseSummary,
 		}
 
 		data.FlashMessage, _ = GetFlash(w, r)
