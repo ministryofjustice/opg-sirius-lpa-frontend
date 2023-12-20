@@ -136,6 +136,17 @@ $sirius-bg-color: #29292e;
   }
 
   .govuk-header {
-    border-bottom: 10px solid govuk-colour("black");
+  border-bottom: 10px solid govuk-colour("black");
+  }
+
+  // Search dropdown
+  .sirius-search {
+    background-color: govuk-colour("black") !important;
+    box-shadow: 0 5px 5px govuk-colour("black") !important;
+  }
+
+  .sirius-search__item {
+    background-color: $sirius-bg-color !important;
+    color: govuk-colour("white") !important;
   }
 }
