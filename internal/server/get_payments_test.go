@@ -545,6 +545,7 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 	}
 
 	caseItem := sirius.Case{
+		ID:      742,
 		UID:     "7000-0000-0021",
 		SubType: "pfa",
 	}
@@ -572,8 +573,9 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 		},
 	}
 
-	client := &mockGetPayments{}
-	client.
+	// get by case ID
+	client1 := &mockGetPayments{}
+	client1.
 		On("Payments", mock.Anything, 742).
 		Return(allPayments, nil).
 		On("Case", mock.Anything, 742).
@@ -587,8 +589,8 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil)
 
-	template := &mockTemplate{}
-	template.
+	template1 := &mockTemplate{}
+	template1.
 		On("Func", mock.Anything, getPaymentsData{
 			PaymentSources:    paymentSources,
 			ReferenceTypes:    referenceTypes,
@@ -602,13 +604,60 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 		}).
 		Return(nil)
 
-	server := newMockServer("/payments/{id}", GetPayments(client, template.Func))
-
+	server := newMockServer("/payments/{id}", GetPayments(client1, template1.Func))
 	req, _ := http.NewRequest(http.MethodGet, "/payments/742", nil)
 	_, err := server.serve(req)
 
 	assert.Nil(t, err)
-	mock.AssertExpectationsForObjects(t, client, template)
+	mock.AssertExpectationsForObjects(t, client1, template1)
+
+	// get by digital LPA UID
+	caseSummary := sirius.CaseSummary{
+		Lpa: sirius.DigitalLpa{
+			ID: 742,
+		},
+		TaskList: []sirius.Task{},
+	}
+
+	client2 := &mockGetPayments{}
+	client2.
+		On("Payments", mock.Anything, 742).
+		Return(allPayments, nil).
+		On("Case", mock.Anything, 742).
+		Return(caseItem, nil).
+		On("CaseSummary", mock.Anything, "M-QQQQ-EEEE-YYYY").
+		Return(caseSummary, nil).
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil).
+		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
+		Return(referenceTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil).
+		On("GetUserDetails", mock.Anything).
+		Return(user, nil)
+
+	template2 := &mockTemplate{}
+	template2.
+		On("Func", mock.Anything, getPaymentsData{
+			PaymentSources:    paymentSources,
+			ReferenceTypes:    referenceTypes,
+			Payments:          nonReductionPayments,
+			FeeReductions:     feeReductions,
+			FeeReductionTypes: feeReductionTypes,
+			Case:              caseItem,
+			CaseSummary:       caseSummary,
+			TotalPaid:         5000,
+			IsReducedFeesUser: true,
+			RefundAmount:      900,
+		}).
+		Return(nil)
+
+	server = newMockServer("/lpa/{uid}/payments", GetPayments(client2, template2.Func))
+	req, _ = http.NewRequest(http.MethodGet, "/lpa/M-QQQQ-EEEE-YYYY/payments", nil)
+	_, err = server.serve(req)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client2, template2)
 }
 
 func TestGetPaymentsCalculations(t *testing.T) {
