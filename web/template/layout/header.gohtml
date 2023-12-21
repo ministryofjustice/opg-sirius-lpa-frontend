@@ -37,14 +37,14 @@
             </p>
           </div>
           <div class="govuk-grid-column-one-third app-search-inline-phase-banner">
-            <form class="form" id="f-search-form" method="get" action="{{ prefix "/search" }}" data-module="search">
+            <form class="form" method="get" action="{{ prefix "/search" }}" data-module="search">
               <div class="govuk-input__wrapper">
                 <label class="govuk-label moj-search__label govuk-visually-hidden" for="search">
                   Search
                 </label>
-                <input class="govuk-input moj-search__input app-moj-search__input"
+                <input id="f-search-preview" class="govuk-input moj-search__input app-moj-search__input"
                        data-module="sirius-search-preview"
-                       data-sirius-search-preview-attach="#f-search-form"
+                       data-sirius-search-preview-attach="#f-search-preview"
                        name="term" type="search" placeholder="Search for a case" aria-label="Search">
                 <button class="govuk-button govuk-input__suffix app-!-moj-search__button" data-module="govuk-button">
                   <span class="govuk-visually-hidden">Search</span>
@@ -60,14 +60,14 @@
 
       <div class="govuk-grid-row app-search-below-phase-banner">
         <div class="govuk-grid-column-full govuk-input--width-30">
-          <form class="form" id="f-search-form-below-phase-banner" method="get" action="{{ prefix "/search" }}" data-module="search">
+          <form class="form" method="get" action="{{ prefix "/search" }}" data-module="search">
             <div class="govuk-input__wrapper">
               <label class="govuk-label moj-search__label govuk-visually-hidden" for="search">
                 Search
               </label>
-              <input class="govuk-input moj-search__input app-moj-search__input"
+              <input id="f-search-preview-below-phase-banner" class="govuk-input moj-search__input app-moj-search__input"
                      data-module="sirius-search-preview"
-                     data-sirius-search-preview-attach="#f-search-form-below-phase-banner"
+                     data-sirius-search-preview-attach="#f-search-preview-below-phase-banner"
                      name="term" type="search" placeholder="Search for a case" aria-label="Search">
               <button class="govuk-button govuk-input__suffix app-!-moj-search__button" data-module="govuk-button">
                 <span class="govuk-visually-hidden">Search</span>
