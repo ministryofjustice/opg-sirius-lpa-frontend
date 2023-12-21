@@ -12,6 +12,7 @@ type Dates struct {
 	DispatchDate     DateString `json:"dispatchDate,omitempty"`
 	DueDate          DateString `json:"dueDate,omitempty"`
 	InvalidDate      DateString `json:"invalidDate,omitempty"`
+	PaymentDate      DateString `json:"paymentDate,omitempty"`
 	ReceiptDate      DateString `json:"receiptDate,omitempty"`
 	RegistrationDate DateString `json:"registrationDate,omitempty"`
 	RejectedDate     DateString `json:"rejectedDate,omitempty"`
