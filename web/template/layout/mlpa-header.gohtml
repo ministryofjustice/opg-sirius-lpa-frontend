@@ -25,9 +25,9 @@
                 Contents
             </h2>
             <ul class="govuk-tabs__list">
-                <li class="govuk-tabs__list-item {{ if eq .TabName "summary" }}govuk-tabs__list-item--selected{{ end }}">
+                <li class="govuk-tabs__list-item {{ if eq .TabName "application-progress" }}govuk-tabs__list-item--selected{{ end }}">
                     <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s" .Lpa.UID) }}">
-                        Summary
+                        Application progress
                     </a>
                 </li>
                 <li class="govuk-tabs__list-item {{ if eq .TabName "details" }}govuk-tabs__list-item--selected{{ end }}">
