@@ -1,6 +1,7 @@
 import MOJFrontend from "@ministryofjustice/frontend/moj/all.js";
 import * as GOVUKFrontend from "govuk-frontend";
 import $ from "jquery";
+import "opg-sirius-search-ui";
 import autoResizeTextArea from "./auto-resize-text-area.js";
 import loadingButton from "./loading-button.js";
 import select from "./select.js";
