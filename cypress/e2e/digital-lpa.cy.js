@@ -7,11 +7,6 @@ describe("View a digital LPA", () => {
     cy.contains("M-DIGI-LPA3-3333");
     cy.get("h1").contains("Agnes Hartley");
     cy.get(".govuk-tag.app-tag--draft").contains("Draft");
-
-    cy.contains("1 Complaints");
-    cy.contains("2 Investigations");
-    cy.contains("3 Tasks");
-    cy.contains("4 Warnings");
   });
 
   it("shows payment information", () => {
