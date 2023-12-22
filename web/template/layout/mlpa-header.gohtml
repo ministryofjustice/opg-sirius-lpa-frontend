@@ -57,15 +57,19 @@
                 </li>
             </ul>
         </div>
-
+        
         <div class="govuk-grid-column-one-quarter">
-            <nav data-module="dropdown-menu">
-                <select class="govuk-select" id="case-actions" data-role="dropdown-menu-toggle">
-                    <option value="case-actions" selected>Case actions</option>
-                    <option value="{{ prefix (printf "/create-task?id=%d" .Lpa.ID) }}">Create a task</option>
-                    <option value="{{ prefix (printf "/create-warning?id=%d" .Lpa.Donor.ID) }}">Create a warning</option>
-                </select>
-            </nav>
+            <div class="moj-button-menu">
+                <div class="moj-button-menu__wrapper">
+                    <a href="{{ prefix (printf "/create-task?id=%d" .Lpa.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
+                        Create a task
+                    </a>
+                    <a href="{{ prefix (printf "/create-warning?id=%d" .Lpa.Donor.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
+                        Create a warning
+                    </a>
+
+                </div>
+            </div>
         </div>
     </div>
 {{ end }}
