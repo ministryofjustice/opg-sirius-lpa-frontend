@@ -1,4 +1,5 @@
 import MOJFrontend from "@ministryofjustice/frontend/moj/all.js";
+
 export default function dropdownMenu() {
   new MOJFrontend.ButtonMenu({
     container: $(".moj-button-menu"),
