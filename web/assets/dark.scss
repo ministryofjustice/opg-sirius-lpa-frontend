@@ -134,4 +134,8 @@ $sirius-bg-color: #29292e;
   .govuk-header {
     border-bottom: 10px solid govuk-colour("black");
   }
+
+  .app-colour-text-lighter {
+    color: govuk-colour("white") !important;
+  }
 }

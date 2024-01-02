@@ -1,4 +1,5 @@
 opg-sirius-lpa-frontend
+cypress/downloads
 cypress/screenshots
 cypress/videos
 logs/

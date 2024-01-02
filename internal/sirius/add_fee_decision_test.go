@@ -39,8 +39,7 @@ func TestAddFeeDecision(t *testing.T) {
 	}{
 		{
 			name:        "OK",
-			description: "Valid request Sirius can handle",
-			caseId:      1,
+			description: "A valid fee decision request",
 			request: map[string]string{
 				"decisionType":   "DECLINED_REMISSION",
 				"decisionReason": "Insufficient evidence",
@@ -55,8 +54,7 @@ func TestAddFeeDecision(t *testing.T) {
 		},
 		{
 			name:        "ValidationError",
-			description: "Request with invalid data",
-			caseId:      1,
+			description: "A fee decision request with invalid data",
 			request: map[string]string{
 				"decisionType":   "",
 				"decisionReason": "Some reason",
@@ -98,7 +96,7 @@ func TestAddFeeDecision(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			request := dsl.Request{
 				Method: http.MethodPost,
-				Path:   dsl.String(fmt.Sprintf("/lpa-api/v1/cases/%d/fee-decisions", tc.caseId)),
+				Path:   dsl.String("/lpa-api/v1/cases/1/fee-decisions"),
 				Headers: dsl.MapMatcher{
 					"Content-Type": dsl.String("application/json"),
 				},
@@ -107,7 +105,7 @@ func TestAddFeeDecision(t *testing.T) {
 
 			pact.
 				AddInteraction().
-				Given("Request to add a fee decision via Sirius API").
+				Given("a digital LPA exists awaiting fee decision").
 				UponReceiving(tc.description).
 				WithRequest(request).
 				WillRespondWith(tc.response())
@@ -118,7 +116,7 @@ func TestAddFeeDecision(t *testing.T) {
 				// ctx Context, caseID int, decisionType string, decisionReason string, decisionDate DateString
 				err := client.AddFeeDecision(
 					Context{Context: context.Background()},
-					tc.caseId,
+					1,
 					tc.request["decisionType"],
 					tc.request["decisionReason"],
 					DateString("2023-10-18"),

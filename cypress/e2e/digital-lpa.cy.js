@@ -35,14 +35,20 @@ describe("View a digital LPA", () => {
 
   it("shows task list", () => {
     cy.contains("M-DIGI-LPA3-3333");
-    cy.get("h2").contains("Tasks");
-    cy.get("ul[data-role=tasks-list] li").should((elts) => {
+    cy.get(
+      "table[data-role=tasks-table] [data-role=tasks-table-header] tr th",
+    ).should((elts) => {
+      expect(elts).to.contain("Tasks");
+      expect(elts).to.contain("Due date");
+      expect(elts).to.contain("Actions");
+    });
+    cy.get(
+      "table[data-role=tasks-table] tr[data-role=tasks-table-task-row]",
+    ).should((elts) => {
       expect(elts).to.have.length(3);
-      expect(elts).to.contain("Review reduced fee eligibility (Super Team)");
-      expect(elts).to.contain(
-        "Review application correspondence (Marvellous Team)",
-      );
-      expect(elts).to.contain("Another task (Super Team)");
+      expect(elts).to.contain("Review reduced fee eligibility");
+      expect(elts).to.contain("Review application correspondence");
+      expect(elts).to.contain("Another task");
     });
   });
 

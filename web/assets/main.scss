@@ -135,6 +135,10 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   display: flex;
 }
 
+.app-colour-text-lighter {
+  color: govuk-colour("dark-grey") !important;
+}
+
 .app-table--compact {
   margin-bottom: 0;
 }

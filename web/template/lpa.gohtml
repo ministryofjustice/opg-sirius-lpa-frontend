@@ -4,7 +4,7 @@
 
 {{ define "main" }}
 
-  {{ template "mlpa-header" (caseTabs .Lpa "application-progress") }}
+  {{ template "mlpa-header" (caseTabs .CaseSummary "application-progress") }}
 
   {{ if .FlashMessage.Title }}
       {{ template "notification-banner" .FlashMessage }}
@@ -44,14 +44,6 @@
           <dd class="govuk-summary-list__value">{{ (date .Lpa.CreatedDate "2 January 2006") }}</dd>
         </div>
       </dl>
-
-      <h2>Tasks</h2>
-
-      <ul data-role="tasks-list">
-        {{ range .TaskList }}
-          <li>{{ .Name }} ({{ .Assignee.DisplayName }})</li>
-        {{ end }}
-      </ul>
 
       <h2 class="govuk-heading-m">Donor details</h2>
 
