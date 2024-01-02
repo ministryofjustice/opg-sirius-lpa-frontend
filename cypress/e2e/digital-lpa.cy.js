@@ -49,6 +49,7 @@ describe("View a digital LPA", () => {
       expect(elts).to.contain("Review reduced fee eligibility");
       expect(elts).to.contain("Review application correspondence");
       expect(elts).to.contain("Another task");
+      expect(elts).to.contain("Reassign task");
     });
   });
 
