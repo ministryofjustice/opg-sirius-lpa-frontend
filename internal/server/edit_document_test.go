@@ -21,9 +21,9 @@ func (m *mockEditDocumentClient) Case(ctx sirius.Context, id int) (sirius.Case, 
 	return args.Get(0).(sirius.Case), args.Error(1)
 }
 
-func (m *mockEditDocumentClient) DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error) {
+func (m *mockEditDocumentClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
 	args := m.Called(ctx, uid)
-	return args.Get(0).(sirius.DigitalLpa), args.Error(1)
+	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
 func (m *mockEditDocumentClient) Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docTypes []string, notDocTypes []string) ([]sirius.Document, error) {
@@ -81,10 +81,10 @@ func TestGetEditDocument(t *testing.T) {
 
 			client := &mockEditDocumentClient{}
 			client.
-				On("Case", mock.Anything, 123).
+				On("Case", mock.Anything, 155).
 				Return(caseItem, nil)
 			client.
-				On("Documents", mock.Anything, sirius.CaseType(caseType), 123, []string{sirius.TypeDraft}, []string{}).
+				On("Documents", mock.Anything, sirius.CaseType(caseType), 155, []string{sirius.TypeDraft}, []string{}).
 				Return(documents, nil)
 			client.
 				On("DocumentByUUID", mock.Anything, document.UUID).
@@ -102,20 +102,20 @@ func TestGetEditDocument(t *testing.T) {
 			}
 
 			if caseType == "digital_lpa" {
-				lpa := sirius.DigitalLpa{}
+				caseSummary := sirius.CaseSummary{Lpa: sirius.DigitalLpa{}, TaskList: []sirius.Task{}}
 
 				client.
-					On("DigitalLpa", mock.Anything, "7000").
-					Return(lpa, nil)
+					On("CaseSummary", mock.Anything, "7000").
+					Return(caseSummary, nil)
 
-				templateData.Lpa = lpa
+				templateData.CaseSummary = caseSummary
 			}
 
 			template.
 				On("Func", mock.Anything, templateData).
 				Return(nil)
 
-			r, _ := http.NewRequest(http.MethodGet, "/?id=123&case="+caseType, nil)
+			r, _ := http.NewRequest(http.MethodGet, "/?id=155&case="+caseType, nil)
 			w := httptest.NewRecorder()
 
 			err := EditDocument(client, template.Func)(w, r)
@@ -146,10 +146,10 @@ func TestPostSaveDocument(t *testing.T) {
 
 			client := &mockEditDocumentClient{}
 			client.
-				On("Case", mock.Anything, 123).
+				On("Case", mock.Anything, 144).
 				Return(caseItem, nil)
 			client.
-				On("Documents", mock.Anything, sirius.CaseType(caseType), 123, []string{sirius.TypeDraft}, []string{}).
+				On("Documents", mock.Anything, sirius.CaseType(caseType), 144, []string{sirius.TypeDraft}, []string{}).
 				Return(documents, nil)
 			client.
 				On("EditDocument", mock.Anything, document.UUID, "Edited test content").
@@ -166,13 +166,13 @@ func TestPostSaveDocument(t *testing.T) {
 			}
 
 			if caseType == "digital_lpa" {
-				lpa := sirius.DigitalLpa{}
+				caseSummary := sirius.CaseSummary{Lpa: sirius.DigitalLpa{}, TaskList: []sirius.Task{}}
 
 				client.
-					On("DigitalLpa", mock.Anything, "7000").
-					Return(lpa, nil)
+					On("CaseSummary", mock.Anything, "7000").
+					Return(caseSummary, nil)
 
-				templateData.Lpa = lpa
+				templateData.CaseSummary = caseSummary
 			}
 
 			template.
@@ -180,14 +180,14 @@ func TestPostSaveDocument(t *testing.T) {
 				Return(nil)
 
 			form := url.Values{
-				"id":                 {"123"},
+				"id":                 {"144"},
 				"case":               {caseType},
 				"documentControls":   {"save"},
 				"documentTextEditor": {"Edited test content"},
 				"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/?id=144&case="+caseType, strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
@@ -225,7 +225,7 @@ func TestPostDeleteDocument(t *testing.T) {
 
 			client := &mockEditDocumentClient{}
 			client.
-				On("Case", mock.Anything, 123).
+				On("Case", mock.Anything, 288).
 				Return(caseItem, nil)
 			client.
 				On("DeleteDocument", mock.Anything, document.UUID).
@@ -238,7 +238,7 @@ func TestPostDeleteDocument(t *testing.T) {
 				expectedError = RedirectError("/lpa/700700/documents")
 			} else {
 				client.
-					On("Documents", mock.Anything, sirius.CaseType(caseType), 123, []string{sirius.TypeDraft}, []string{}).
+					On("Documents", mock.Anything, sirius.CaseType(caseType), 288, []string{sirius.TypeDraft}, []string{}).
 					Return(documents, nil)
 				client.
 					On("DocumentByUUID", mock.Anything, document.UUID).
@@ -257,14 +257,14 @@ func TestPostDeleteDocument(t *testing.T) {
 			}
 
 			form := url.Values{
-				"id":                 {"123"},
+				"id":                 {"288"},
 				"case":               {caseType},
 				"documentControls":   {"delete"},
 				"documentTextEditor": {"Test content"},
 				"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/?id=288&case="+caseType, strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
@@ -309,13 +309,13 @@ func TestPostPublishDocument(t *testing.T) {
 				On("DocumentByUUID", mock.Anything, document.UUID).
 				Return(document, nil)
 			client.
-				On("AddDocument", mock.Anything, 123, document, sirius.TypeSave).
+				On("AddDocument", mock.Anything, 544, document, sirius.TypeSave).
 				Return(publishedDocument, nil)
 			client.
 				On("DeleteDocument", mock.Anything, document.UUID).
 				Return(nil)
 			client.
-				On("Case", mock.Anything, 123).
+				On("Case", mock.Anything, 544).
 				Return(caseItem, nil)
 
 			template := &mockTemplate{}
@@ -325,7 +325,7 @@ func TestPostPublishDocument(t *testing.T) {
 				expectedError = RedirectError("/lpa/700700/documents")
 			} else {
 				client.
-					On("Documents", mock.Anything, sirius.CaseType(caseType), 123, []string{sirius.TypeDraft}, []string{}).
+					On("Documents", mock.Anything, sirius.CaseType(caseType), 544, []string{sirius.TypeDraft}, []string{}).
 					Return(documents, nil)
 				client.
 					On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
@@ -343,14 +343,14 @@ func TestPostPublishDocument(t *testing.T) {
 			}
 
 			form := url.Values{
-				"id":                 {"123"},
+				"id":                 {"544"},
 				"case":               {caseType},
 				"documentControls":   {"publish"},
 				"documentTextEditor": {"Test content"},
 				"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/?id=544&case="+caseType, strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
@@ -393,13 +393,13 @@ func TestPostPreviewDocument(t *testing.T) {
 		On("DocumentByUUID", mock.Anything, document.UUID).
 		Return(document, nil)
 	client.
-		On("AddDocument", mock.Anything, 123, document, sirius.TypePreview).
+		On("AddDocument", mock.Anything, 888, document, sirius.TypePreview).
 		Return(previewDocument, nil)
 	client.
-		On("Case", mock.Anything, 123).
+		On("Case", mock.Anything, 888).
 		Return(caseItem, nil)
 	client.
-		On("Documents", mock.Anything, sirius.CaseType("lpa"), 123, []string{sirius.TypeDraft}, []string{}).
+		On("Documents", mock.Anything, sirius.CaseType("lpa"), 888, []string{sirius.TypeDraft}, []string{}).
 		Return(documents, nil)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
@@ -418,14 +418,14 @@ func TestPostPreviewDocument(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"id":                 {"123"},
+		"id":                 {"888"},
 		"case":               {"lpa"},
 		"documentControls":   {"preview"},
 		"documentTextEditor": {"Test content"},
 		"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
 	}
 
-	r, _ := http.NewRequest(http.MethodPost, "/?id=123&case=lpa", strings.NewReader(form.Encode()))
+	r, _ := http.NewRequest(http.MethodPost, "/?id=888&case=lpa", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
@@ -460,14 +460,14 @@ func TestPostSaveDocumentAndExit(t *testing.T) {
 				Return(nil)
 
 			form := url.Values{
-				"id":                 {"123"},
+				"id":                 {"987"},
 				"case":               {caseType},
 				"documentControls":   {"saveAndExit"},
 				"documentTextEditor": {"Test content"},
 				"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/?id=987&case="+caseType, strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
@@ -484,8 +484,8 @@ func TestPostSaveDocumentAndExit(t *testing.T) {
 func TestGetEditDocumentBadQuery(t *testing.T) {
 	testCases := map[string]string{
 		"no-id":    "/?case=lpa",
-		"no-case":  "/?id=123",
-		"bad-case": "/?id=123&case=person",
+		"no-case":  "/?id=1111",
+		"bad-case": "/?id=1111&case=person",
 	}
 
 	for name, url := range testCases {
@@ -503,16 +503,16 @@ func TestGetEditDocumentBadQuery(t *testing.T) {
 func TestGetEditDocumentWhenCaseErrors(t *testing.T) {
 	client := &mockEditDocumentClient{}
 	client.
-		On("Case", mock.Anything, 123).
+		On("Case", mock.Anything, 222).
 		Return(sirius.Case{}, expectedError)
 	client.
-		On("Documents", mock.Anything, sirius.CaseTypeLpa, 123, []string{sirius.TypeDraft}, []string{}).
+		On("Documents", mock.Anything, sirius.CaseTypeLpa, 222, []string{sirius.TypeDraft}, []string{}).
 		Return([]sirius.Document{}, nil)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return([]sirius.DocumentTemplateData{}, nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/?id=222&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := EditDocument(client, nil)(w, r)
@@ -526,16 +526,16 @@ func TestGetCreateDocumentWhenFailureOnDocuments(t *testing.T) {
 
 	client := &mockEditDocumentClient{}
 	client.
-		On("Case", mock.Anything, 123).
+		On("Case", mock.Anything, 535).
 		Return(caseItem, nil)
 	client.
-		On("Documents", mock.Anything, sirius.CaseTypeLpa, 123, []string{sirius.TypeDraft}, []string{}).
+		On("Documents", mock.Anything, sirius.CaseTypeLpa, 535, []string{sirius.TypeDraft}, []string{}).
 		Return([]sirius.Document{}, expectedError)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return([]sirius.DocumentTemplateData{}, nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/?id=535&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := EditDocument(client, nil)(w, r)
@@ -559,10 +559,10 @@ func TestGetCreateDocumentWhenFailureOnDocumentByUUID(t *testing.T) {
 
 	client := &mockEditDocumentClient{}
 	client.
-		On("Case", mock.Anything, 123).
+		On("Case", mock.Anything, 843).
 		Return(caseItem, nil)
 	client.
-		On("Documents", mock.Anything, sirius.CaseTypeLpa, 123, []string{sirius.TypeDraft}, []string{}).
+		On("Documents", mock.Anything, sirius.CaseTypeLpa, 843, []string{sirius.TypeDraft}, []string{}).
 		Return(documents, nil)
 	client.
 		On("DocumentByUUID", mock.Anything, "dfef6714-b4fe-44c2-b26e-90dfe3663e95").
@@ -571,7 +571,7 @@ func TestGetCreateDocumentWhenFailureOnDocumentByUUID(t *testing.T) {
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return([]sirius.DocumentTemplateData{}, nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/?id=843&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := EditDocument(client, nil)(w, r)

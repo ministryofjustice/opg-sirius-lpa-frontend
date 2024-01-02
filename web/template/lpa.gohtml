@@ -4,9 +4,7 @@
 
 {{ define "main" }}
 
-  {{ template "mlpa-header" (caseTabs .Lpa "summary") }}
-
-  <h2 class="govuk-heading-m">Case summary</h2>
+  {{ template "mlpa-header" (caseTabs .CaseSummary "application-progress") }}
 
   {{ if .FlashMessage.Title }}
       {{ template "notification-banner" .FlashMessage }}
@@ -46,37 +44,6 @@
           <dd class="govuk-summary-list__value">{{ (date .Lpa.CreatedDate "2 January 2006") }}</dd>
         </div>
       </dl>
-
-      <div class="app-stat-block__container">
-        <aside class="app-stat-block">
-          <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ .Lpa.ObjectionCount }}</h3>
-          Objections
-        </aside>
-        <aside class="app-stat-block">
-          <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ .Lpa.WarningCount }}</h3>
-          Warnings
-        </aside>
-        <aside class="app-stat-block">
-          <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ .Lpa.ComplaintCount }}</h3>
-          Complaints
-        </aside>
-        <aside class="app-stat-block">
-          <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ .Lpa.InvestigationCount }}</h3>
-          Investigations
-        </aside>
-        <aside class="app-stat-block">
-          <h3 class="govuk-heading-l govuk-!-margin-bottom-2">{{ len .TaskList }}</h3>
-          Tasks
-        </aside>
-      </div>
-
-      <h2>Tasks</h2>
-
-      <ul data-role="tasks-list">
-        {{ range .TaskList }}
-          <li>{{ .Name }} ({{ .Assignee.DisplayName }})</li>
-        {{ end }}
-      </ul>
 
       <h2 class="govuk-heading-m">Donor details</h2>
 

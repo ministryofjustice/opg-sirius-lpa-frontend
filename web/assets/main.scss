@@ -136,6 +136,10 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   display: flex;
 }
 
+.app-colour-text-lighter {
+  color: govuk-colour("dark-grey") !important;
+}
+
 .app-table--compact {
   margin-bottom: 0;
 }
@@ -170,20 +174,6 @@ $govuk-assets-path: "/lpa/frontend/assets/";
   border: 1px solid govuk-colour("black");
   color: govuk-colour("black");
   background: govuk-colour("white");
-}
-
-.app-stat-block__container {
-  display: flex;
-  grid-gap: 1.375rem;
-  margin-bottom: govuk-spacing(6);
-}
-
-.app-stat-block {
-  @include govuk-font($size: 19);
-  display: block;
-  flex: 1;
-  padding: 1.375rem;
-  background-color: govuk-colour("light-grey");
 }
 
 .app-table-no-cell-borders {

@@ -124,10 +124,6 @@ $sirius-bg-color: #29292e;
     border-color: govuk-colour("white");
   }
 
-  .app-stat-block {
-    background-color: govuk-colour("dark-grey");
-  }
-
   .app-caseworker-summary,
   .app-caseworker-summary table {
     background-color: #505a5f;
@@ -135,6 +131,10 @@ $sirius-bg-color: #29292e;
 
   .govuk-header {
     border-bottom: 10px solid govuk-colour("black");
+  }
+  
+  .app-colour-text-lighter {
+    color: govuk-colour("white") !important;
   }
 
   // Search dropdown
@@ -145,6 +145,5 @@ $sirius-bg-color: #29292e;
 
   .sirius-search__item {
     background-color: $sirius-bg-color !important;
-    color: govuk-colour("white") !important;
   }
 }
