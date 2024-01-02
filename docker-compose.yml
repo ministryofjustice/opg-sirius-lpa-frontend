@@ -36,7 +36,8 @@ services:
     command: golangci-lint run -v --timeout 5m
 
   yarn:
-    image: node:lts-alpine3.18
+    build:
+      context: docker/yarn/
     working_dir: /home/node/app
     entrypoint: yarn
     volumes:
