@@ -8,6 +8,7 @@ describe("Edit dates", () => {
     cy.contains("LPA 7000-0000-0000");
     cy.get(".moj-banner").should("not.exist");
     cy.get("#f-receiptDate").type("2022-03-04");
+    cy.get("#f-paymentDate").type("2022-03-04");
     cy.get("#f-dueDate").type("2022-03-04");
     cy.get("#f-registrationDate").type("2022-03-04");
     cy.get("#f-dispatchDate").type("2022-03-04");
