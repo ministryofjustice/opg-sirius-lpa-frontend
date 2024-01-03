@@ -20,6 +20,8 @@
     "cypress": "13.6.1",
     "govuk-frontend": "^4.4.0",
     "jquery": "^3.6.1",
+    "opg-sirius-search-ui": "https://github.com/ministryofjustice/opg-sirius-search-ui#v1.41.1",
+    "punycode": "^2.3.1",
     "tinymce": "^5.10.7"
   },
   "devDependencies": {
