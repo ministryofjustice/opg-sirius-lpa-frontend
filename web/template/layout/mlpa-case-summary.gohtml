@@ -70,7 +70,9 @@
                                 </td>
                                 <td class="govuk-table__cell govuk-!-width-one-quarter">
                                     <p class="govuk-body-s govuk-!-margin-bottom-0">Clear task</p>
-                                    <p class="govuk-body-s govuk-!-margin-bottom-0">Reassign task</p>
+                                    <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/assign-task?id=%d" .ID) }}">
+                                        Reassign task
+                                    </a>
                                 </td>
                             </tr>
                         {{ end }}
