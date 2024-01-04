@@ -63,7 +63,7 @@
                 <select class="govuk-select" id="case-actions" data-role="dropdown-menu-toggle">
                     <option value="case-actions" selected>Case actions</option>
                     <option value="{{ prefix (printf "/create-task?id=%d" .CaseSummary.DigitalLpa.SiriusData.ID) }}">Create a task</option>
-                    <option value="{{ prefix (printf "/create-warning?id=%d" .CaseSummary.DigitalLpa.SiriusData.ID) }}">Create a warning</option>
+                    <option value="{{ prefix (printf "/create-warning?id=%d" .CaseSummary.DigitalLpa.SiriusData.Donor.ID) }}">Create a warning</option>
                 </select>
             </nav>
         </div>
