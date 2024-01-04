@@ -37,10 +37,12 @@ func TestGetLpaErrorRetrievingCaseSummary(t *testing.T) {
 
 func TestGetLpa(t *testing.T) {
 	caseSummary := sirius.CaseSummary{
-		Lpa: sirius.DigitalLpa{
-			ID:      22,
-			UID:     "M-9876-9876-9876",
-			Subtype: "hw",
+		DigitalLpa: sirius.DigitalLpa{
+			UID: "M-9876-9876-9876",
+			SiriusData: sirius.SiriusData{
+				ID:      22,
+				Subtype: "hw",
+			},
 		},
 		TaskList: []sirius.Task{},
 	}
@@ -54,7 +56,7 @@ func TestGetLpa(t *testing.T) {
 	template.
 		On("Func", mock.Anything, lpaData{
 			CaseSummary: caseSummary,
-			Lpa:         caseSummary.Lpa,
+			DigitalLpa:  caseSummary.DigitalLpa,
 		}).
 		Return(nil)
 

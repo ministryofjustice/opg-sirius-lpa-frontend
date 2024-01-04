@@ -17,11 +17,11 @@
                    data-module="app-auto-click">Download preview document</a>
             {{ end }}
 
-            {{ if .CaseSummary.Lpa.ID }}
+            {{ if .CaseSummary.DigitalLpa.ID }}
                 {{ template "mlpa-header" (caseTabs .CaseSummary "documents") }}
 
                 <div class="govuk-body">
-                    <a href="{{ prefix (printf "/lpa/%s/documents" .CaseSummary.Lpa.UID) }}" class="govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+                    <a href="{{ prefix (printf "/lpa/%s/documents" .CaseSummary.DigitalLpa.UID) }}" class="govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-0">
                         Back
                     </a>
                 </div>

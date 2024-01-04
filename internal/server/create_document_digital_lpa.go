@@ -70,19 +70,19 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 
 		data.ComponentDocumentData = buildComponentDocumentData(data.DocumentTemplates)
 
-		lpa := data.CaseSummary.Lpa
+		lpa := data.CaseSummary.DigitalLpa
 
 		donorPlaceholder := sirius.Person{
 			ID:           -1,
-			Firstname:    lpa.Application.DonorFirstNames,
-			Surname:      lpa.Application.DonorLastName,
+			Firstname:    lpa.SiriusData.Application.DonorFirstNames,
+			Surname:      lpa.SiriusData.Application.DonorLastName,
 			PersonType:   "Donor",
-			AddressLine1: lpa.Application.DonorAddress.Line1,
-			AddressLine2: lpa.Application.DonorAddress.Line2,
-			AddressLine3: lpa.Application.DonorAddress.Line3,
-			Town:         lpa.Application.DonorAddress.Town,
-			Postcode:     lpa.Application.DonorAddress.Postcode,
-			Country:      lpa.Application.DonorAddress.Country,
+			AddressLine1: lpa.SiriusData.Application.DonorAddress.Line1,
+			AddressLine2: lpa.SiriusData.Application.DonorAddress.Line2,
+			AddressLine3: lpa.SiriusData.Application.DonorAddress.Line3,
+			Town:         lpa.SiriusData.Application.DonorAddress.Town,
+			Postcode:     lpa.SiriusData.Application.DonorAddress.Postcode,
+			Country:      lpa.SiriusData.Application.DonorAddress.Country,
 		}
 		data.Recipients = append(data.Recipients, donorPlaceholder)
 
@@ -127,7 +127,7 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 					}
 				}
 
-				_, err = client.CreateDocument(ctx, lpa.ID, recipient.ID, data.SelectedTemplateId, data.SelectedInserts)
+				_, err = client.CreateDocument(ctx, lpa.SiriusData.ID, recipient.ID, data.SelectedTemplateId, data.SelectedInserts)
 				if err != nil {
 					return err
 				}
@@ -138,7 +138,7 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 				} else if err != nil {
 					return err
 				} else {
-					return RedirectError(fmt.Sprintf("/edit-document?id=%d&case=%s", lpa.ID, sirius.CaseTypeDigitalLpa))
+					return RedirectError(fmt.Sprintf("/edit-document?id=%d&case=%s", lpa.SiriusData.ID, sirius.CaseTypeDigitalLpa))
 				}
 			}
 		}

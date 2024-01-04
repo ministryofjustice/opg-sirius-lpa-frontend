@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-type DigitalLpa struct {
+type SiriusData struct {
 	ID                 int          `json:"id"`
 	UID                string       `json:"uId"`
 	Application        Draft        `json:"application"`
@@ -18,6 +18,11 @@ type DigitalLpa struct {
 	ObjectionCount     int          `json:"objectionCount"`
 	LinkedCases        []DigitalLpa `json:"linkedDigitalLpas"`
 	Donor              Donor        `json:"donor"`
+}
+
+type DigitalLpa struct {
+	UID        string     `json:"uId"`
+	SiriusData SiriusData `json:"opg.poas.sirius"`
 }
 
 type Donor struct {

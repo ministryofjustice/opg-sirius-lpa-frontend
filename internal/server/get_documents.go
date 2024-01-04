@@ -5,8 +5,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
 type GetDocumentsClient interface {
@@ -42,7 +42,7 @@ func GetDocuments(client GetDocumentsClient, tmpl template.Template) Handler {
 		data.Documents, err = client.Documents(
 			ctx,
 			"lpa",
-			data.CaseSummary.Lpa.ID,
+			data.CaseSummary.DigitalLpa.SiriusData.ID,
 			[]string{}, []string{sirius.TypeDraft, sirius.TypePreview})
 
 		if err != nil {
