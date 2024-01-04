@@ -102,7 +102,7 @@ func TestGetEditDocument(t *testing.T) {
 			}
 
 			if caseType == "digital_lpa" {
-				caseSummary := sirius.CaseSummary{Lpa: sirius.DigitalLpa{}, TaskList: []sirius.Task{}}
+				caseSummary := sirius.CaseSummary{DigitalLpa: sirius.DigitalLpa{}, TaskList: []sirius.Task{}}
 
 				client.
 					On("CaseSummary", mock.Anything, "7000").
@@ -166,7 +166,7 @@ func TestPostSaveDocument(t *testing.T) {
 			}
 
 			if caseType == "digital_lpa" {
-				caseSummary := sirius.CaseSummary{Lpa: sirius.DigitalLpa{}, TaskList: []sirius.Task{}}
+				caseSummary := sirius.CaseSummary{DigitalLpa: sirius.DigitalLpa{}, TaskList: []sirius.Task{}}
 
 				client.
 					On("CaseSummary", mock.Anything, "7000").

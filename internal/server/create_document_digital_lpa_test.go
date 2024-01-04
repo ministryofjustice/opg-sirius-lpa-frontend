@@ -43,16 +43,18 @@ func (m *mockCreateDocumentDigitalLpaClient) CreateDocument(ctx sirius.Context, 
 
 func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 	caseSummary := sirius.CaseSummary{
-		Lpa: sirius.DigitalLpa{
-			ID: 15,
-			Application: sirius.Draft{
-				DonorFirstNames: "Zackary",
-				DonorLastName:   "Lemmonds",
-				DonorAddress: sirius.Address{
-					Line1:    "9 Mount Pleasant Drive",
-					Town:     "East Harling",
-					Postcode: "NR16 2GB",
-					Country:  "UK",
+		DigitalLpa: sirius.DigitalLpa{
+			SiriusData: sirius.SiriusData{
+				ID: 15,
+				Application: sirius.Draft{
+					DonorFirstNames: "Zackary",
+					DonorLastName:   "Lemmonds",
+					DonorAddress: sirius.Address{
+						Line1:    "9 Mount Pleasant Drive",
+						Town:     "East Harling",
+						Postcode: "NR16 2GB",
+						Country:  "UK",
+					},
 				},
 			},
 		},
@@ -118,16 +120,18 @@ func TestGetCreateDocumentDigitalLpaError(t *testing.T) {
 
 func TestPostCreateDocumentDigitalLpa(t *testing.T) {
 	caseSummary := sirius.CaseSummary{
-		Lpa: sirius.DigitalLpa{
-			ID: 1344,
-			Application: sirius.Draft{
-				DonorFirstNames: "Zackary",
-				DonorLastName:   "Lemmonds",
-				DonorAddress: sirius.Address{
-					Line1:    "9 Mount Pleasant Drive",
-					Town:     "East Harling",
-					Postcode: "NR16 2GB",
-					Country:  "UK",
+		DigitalLpa: sirius.DigitalLpa{
+			SiriusData: sirius.SiriusData{
+				ID: 1344,
+				Application: sirius.Draft{
+					DonorFirstNames: "Zackary",
+					DonorLastName:   "Lemmonds",
+					DonorAddress: sirius.Address{
+						Line1:    "9 Mount Pleasant Drive",
+						Town:     "East Harling",
+						Postcode: "NR16 2GB",
+						Country:  "UK",
+					},
 				},
 			},
 		},
@@ -188,16 +192,18 @@ func TestPostCreateDocumentDigitalLpa(t *testing.T) {
 
 func TestPostCreateDocumentDigitalLpaInvalid(t *testing.T) {
 	caseSummary := sirius.CaseSummary{
-		Lpa: sirius.DigitalLpa{
-			ID: 1666,
-			Application: sirius.Draft{
-				DonorFirstNames: "Zackary",
-				DonorLastName:   "Lemmonds",
-				DonorAddress: sirius.Address{
-					Line1:    "9 Mount Pleasant Drive",
-					Town:     "East Harling",
-					Postcode: "NR16 2GB",
-					Country:  "UK",
+		DigitalLpa: sirius.DigitalLpa{
+			SiriusData: sirius.SiriusData{
+				ID: 1666,
+				Application: sirius.Draft{
+					DonorFirstNames: "Zackary",
+					DonorLastName:   "Lemmonds",
+					DonorAddress: sirius.Address{
+						Line1:    "9 Mount Pleasant Drive",
+						Town:     "East Harling",
+						Postcode: "NR16 2GB",
+						Country:  "UK",
+					},
 				},
 			},
 		},

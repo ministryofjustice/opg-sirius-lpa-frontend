@@ -3,14 +3,16 @@ describe("Create a document for a digital LPA", () => {
     cy.addMock("/lpa-api/v1/digital-lpas/M-GDJ7-QK9R-4XVF", "GET", {
       status: 200,
       body: {
-        id: 483,
-        application: {
-          donorFirstNames: "Steven",
-          donorLastName: "Munnell",
-          donorDob: "17/06/1982",
-          donorAddress: {
-            addressLine1: "1 Scotland Street",
-            postcode: "EH6 18J",
+        "opg.poas.sirius": {
+          id: 483,
+          application: {
+            donorFirstNames: "Steven",
+            donorLastName: "Munnell",
+            donorDob: "17/06/1982",
+            donorAddress: {
+              addressLine1: "1 Scotland Street",
+              postcode: "EH6 18J",
+            },
           },
         },
       },
