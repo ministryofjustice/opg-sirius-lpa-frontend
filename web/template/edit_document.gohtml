@@ -17,7 +17,7 @@
                    data-module="app-auto-click">Download preview document</a>
             {{ end }}
 
-            {{ if .CaseSummary.DigitalLpa.ID }}
+            {{ if .CaseSummary.DigitalLpa.SiriusData.ID }}
                 {{ template "mlpa-header" (caseTabs .CaseSummary "documents") }}
 
                 <div class="govuk-body">
