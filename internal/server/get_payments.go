@@ -42,7 +42,7 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		ctx := getContext(r)
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 		data := getPaymentsData{
-			XSRFToken: ctx.XSRFToken,
+			XSRFToken:   ctx.XSRFToken,
 			CaseSummary: sirius.CaseSummary{},
 		}
 
@@ -55,7 +55,7 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 			if err != nil {
 				return err
 			}
-			caseID = data.CaseSummary.Lpa.ID
+			caseID = data.CaseSummary.DigitalLpa.SiriusData.ID
 		} else {
 			caseID, err = strconv.Atoi(chi.URLParam(r, "id"))
 			if err != nil {
