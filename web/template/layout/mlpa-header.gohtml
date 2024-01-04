@@ -1,16 +1,16 @@
 {{ define "mlpa-header" }}
     <span class="govuk-caption-l">
-      Date of birth {{ (date .CaseSummary.Lpa.Application.DonorDob "2 January 2006") }} | Postcode
-      {{ .CaseSummary.Lpa.Application.DonorAddress.Postcode }}
+      Date of birth {{ (date .CaseSummary.DigitalLpa.SiriusData.Application.DonorDob "2 January 2006") }} | Postcode
+      {{ .CaseSummary.DigitalLpa.SiriusData.Application.DonorAddress.Postcode }}
     </span>
-    <h1 class="govuk-heading-xl">{{ .CaseSummary.Lpa.Application.DonorFirstNames }} {{ .CaseSummary.Lpa.Application.DonorLastName }}</h1>
+    <h1 class="govuk-heading-xl">{{ .CaseSummary.DigitalLpa.SiriusData.Application.DonorFirstNames }} {{ .CaseSummary.DigitalLpa.SiriusData.Application.DonorLastName }}</h1>
 
     <nav class="moj-sub-navigation govuk-!-margin-bottom-0" aria-label="linked cases">
         <ul class="moj-sub-navigation__list">
             {{ range .SortedLinkedCases }}
                 <li class="moj-sub-navigation__item">
-                    <a class="moj-sub-navigation__link" {{ if eq $.CaseSummary.Lpa.UID .UID }}aria-current="page"{{ end }} href="{{ prefix (printf "/lpa/%s" .UID ) }}">
-                        {{ template "status-tag" (ToLower $.CaseSummary.Lpa.Status) }} {{ ToUpper .Subtype }} {{ .UID }}
+                    <a class="moj-sub-navigation__link" {{ if eq $.CaseSummary.DigitalLpa.UID .UID }}aria-current="page"{{ end }} href="{{ prefix (printf "/lpa/%s" .UID ) }}">
+                        {{ template "status-tag" (ToLower $.CaseSummary.DigitalLpa.SiriusData.Status) }} {{ ToUpper .Subtype }} {{ .UID }}
                     </a>
                 </li>
             {{ end }}
@@ -26,7 +26,7 @@
             </h2>
             <ul class="govuk-tabs__list">
                 <li class="govuk-tabs__list-item {{ if eq .TabName "application-progress" }}govuk-tabs__list-item--selected{{ end }}">
-                    <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s" .CaseSummary.Lpa.UID) }}">
+                    <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s" .CaseSummary.DigitalLpa.UID) }}">
                         Application progress
                     </a>
                 </li>
@@ -41,12 +41,12 @@
                     </a>
                 </li>
                 <li class="govuk-tabs__list-item {{ if eq .TabName "fees" }}govuk-tabs__list-item--selected{{ end }}">
-                    <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s/payments" .CaseSummary.Lpa.UID) }}">
+                    <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s/payments" .CaseSummary.DigitalLpa.UID) }}">
                         Fees
                     </a>
                 </li>
                 <li class="govuk-tabs__list-item {{ if eq .TabName "documents" }}govuk-tabs__list-item--selected{{ end }}">
-                    <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s/documents" .CaseSummary.Lpa.UID) }}">
+                    <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s/documents" .CaseSummary.DigitalLpa.UID) }}">
                         Documents
                     </a>
                 </li>
@@ -62,8 +62,8 @@
             <nav data-module="dropdown-menu">
                 <select class="govuk-select" id="case-actions" data-role="dropdown-menu-toggle">
                     <option value="case-actions" selected>Case actions</option>
-                    <option value="{{ prefix (printf "/create-task?id=%d" .CaseSummary.Lpa.ID) }}">Create a task</option>
-                    <option value="{{ prefix (printf "/create-warning?id=%d" .CaseSummary.Lpa.Donor.ID) }}">Create a warning</option>
+                    <option value="{{ prefix (printf "/create-task?id=%d" .CaseSummary.DigitalLpa.SiriusData.ID) }}">Create a task</option>
+                    <option value="{{ prefix (printf "/create-warning?id=%d" .CaseSummary.DigitalLpa.SiriusData.ID) }}">Create a warning</option>
                 </select>
             </nav>
         </div>

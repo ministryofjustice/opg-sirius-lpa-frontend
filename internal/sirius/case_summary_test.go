@@ -24,52 +24,54 @@ func (m *mockCaseSummaryHttpClient) Do(req *http.Request) (*http.Response, error
 }
 
 type testCase struct {
-	Description string
-	DigitalLpaResponse http.Response
-	DigitalLpaError error
+	Description          string
+	DigitalLpaResponse   http.Response
+	DigitalLpaError      error
 	TasksForCaseResponse http.Response
-	TasksForCaseError error
-	ExpectedError error
+	TasksForCaseError    error
+	ExpectedError        error
 }
 
 func setupTestCase(t *testing.T, description string, digitalLpaError error, tasksForCaseError error, expectedError error) testCase {
 	// digital LPA mock
 	var digitalLpaBody bytes.Buffer
-    err := json.NewEncoder(&digitalLpaBody).Encode(DigitalLpa{
-    	ID: 1,
-    })
-    if err != nil {
-    	t.Fatal("Could not compile digital LPA JSON")
-    }
+	err := json.NewEncoder(&digitalLpaBody).Encode(DigitalLpa{
+		SiriusData: SiriusData{
+			ID: 1,
+		},
+	})
+	if err != nil {
+		t.Fatal("Could not compile digital LPA JSON")
+	}
 	respForDigitalLpa := http.Response{
 		StatusCode: 200,
-		Body: io.NopCloser(bytes.NewReader(digitalLpaBody.Bytes())),
+		Body:       io.NopCloser(bytes.NewReader(digitalLpaBody.Bytes())),
 	}
 
 	// tasks for case mock
 	var tasksForCaseBody bytes.Buffer
-    err = json.NewEncoder(&tasksForCaseBody).Encode(map[string][]Task{
-    	"tasks": []Task{
-    		Task{},
-    		Task{},
-    		Task{},
-    	},
-    })
-    if err != nil {
-    	t.Fatal("Could not compile tasks for case JSON")
-    }
+	err = json.NewEncoder(&tasksForCaseBody).Encode(map[string][]Task{
+		"tasks": []Task{
+			Task{},
+			Task{},
+			Task{},
+		},
+	})
+	if err != nil {
+		t.Fatal("Could not compile tasks for case JSON")
+	}
 	respForTasksForCase := http.Response{
 		StatusCode: 200,
-		Body: io.NopCloser(bytes.NewReader(tasksForCaseBody.Bytes())),
+		Body:       io.NopCloser(bytes.NewReader(tasksForCaseBody.Bytes())),
 	}
 
 	return testCase{
-		Description: description,
-		DigitalLpaResponse: respForDigitalLpa,
-		DigitalLpaError: digitalLpaError,
+		Description:          description,
+		DigitalLpaResponse:   respForDigitalLpa,
+		DigitalLpaError:      digitalLpaError,
 		TasksForCaseResponse: respForTasksForCase,
-		TasksForCaseError: tasksForCaseError,
-		ExpectedError: expectedError,
+		TasksForCaseError:    tasksForCaseError,
+		ExpectedError:        expectedError,
 	}
 }
 
@@ -86,12 +88,12 @@ func setupTestCases(t *testing.T) []testCase {
 
 // not tested by pact as this is just an amalgam of two other pact-tested methods
 func TestCaseSummary(t *testing.T) {
-	reqForDigitalLpaMatcher := mock.MatchedBy(func (r *http.Request) bool {
+	reqForDigitalLpaMatcher := mock.MatchedBy(func(r *http.Request) bool {
 		digitalLpaUrl, _ := url.Parse("http://localhost:8888/lpa-api/v1/digital-lpas/M-QWER-TY34-3434")
 		return digitalLpaUrl.String() == r.URL.String()
 	})
 
-	reqForTasksForCaseMatcher := mock.MatchedBy(func (r *http.Request) bool {
+	reqForTasksForCaseMatcher := mock.MatchedBy(func(r *http.Request) bool {
 		tasksForCaseUrl, _ := url.Parse("http://localhost:8888/lpa-api/v1/cases/1/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC")
 		return tasksForCaseUrl.String() == r.URL.String()
 	})

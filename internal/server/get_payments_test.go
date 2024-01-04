@@ -613,8 +613,10 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 
 	// get by digital LPA UID
 	caseSummary := sirius.CaseSummary{
-		Lpa: sirius.DigitalLpa{
-			ID: 742,
+		DigitalLpa: sirius.DigitalLpa{
+			SiriusData: sirius.SiriusData{
+				ID: 742,
+			},
 		},
 		TaskList: []sirius.Task{},
 	}

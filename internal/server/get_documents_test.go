@@ -33,10 +33,12 @@ func TestGetDocuments(t *testing.T) {
 	}
 
 	caseSummary := sirius.CaseSummary{
-		Lpa: sirius.DigitalLpa{
-			ID:      676,
-			UID:     "M-9876-9876-9876",
-			Subtype: "hw",
+		DigitalLpa: sirius.DigitalLpa{
+			UID: "M-9876-9876-9876",
+			SiriusData: sirius.SiriusData{
+				ID:      676,
+				Subtype: "hw",
+			},
 		},
 		TaskList: []sirius.Task{},
 	}
@@ -84,10 +86,12 @@ func TestGetDocumentsWhenFailureOnGetDigitalLpa(t *testing.T) {
 
 func TestGetDocumentsWhenFailureOnGetDocuments(t *testing.T) {
 	caseSummary := sirius.CaseSummary{
-		Lpa: sirius.DigitalLpa{
-			ID:      1532,
-			UID:     "M-9876-9876-9876",
-			Subtype: "hw",
+		DigitalLpa: sirius.DigitalLpa{
+			UID: "M-9876-9876-9876",
+			SiriusData: sirius.SiriusData{
+				ID:      1532,
+				Subtype: "hw",
+			},
 		},
 		TaskList: []sirius.Task{},
 	}
