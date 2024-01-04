@@ -205,6 +205,20 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				if err != nil {
 					return err
 				}
+
+				if caseType == sirius.CaseTypeDigitalLpa {
+					caseItem, err := client.Case(ctx, caseID)
+					if err != nil {
+						return err
+					}
+
+					SetFlash(w, FlashNotification{
+						Description: "Document saved",
+					})
+
+					return RedirectError(fmt.Sprintf("/lpa/%s/documents", caseItem.UID))
+				}
+
 				data.SaveAndExit = true
 			}
 
