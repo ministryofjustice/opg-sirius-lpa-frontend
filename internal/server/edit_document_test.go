@@ -438,7 +438,7 @@ func TestPostPreviewDocument(t *testing.T) {
 }
 
 func TestPostSaveDocumentAndExit(t *testing.T) {
-	for _, caseType := range []string{"lpa", "epa", "digital_lpa"} {
+	for _, caseType := range []string{"lpa", "epa", "digital_lpa_1", "digital_lpa_2"} {
 		t.Run(caseType, func(t *testing.T) {
 			document := sirius.Document{
 				ID:      1,
@@ -453,11 +453,31 @@ func TestPostSaveDocumentAndExit(t *testing.T) {
 				Return(document, nil)
 
 			template := &mockTemplate{}
-			template.
-				On("Func", mock.Anything, editDocumentData{
-					SaveAndExit: true,
-				}).
-				Return(nil)
+
+			if caseType == "digital_lpa_1" {
+				caseType = "digital_lpa"
+				expectedError = nil
+
+				client.
+					On("Case", mock.Anything, 987).
+					Return(sirius.Case{CaseType: caseType, UID: "M-1234-4567-8999"}, nil)
+
+				expectedError = RedirectError("/lpa/M-1234-4567-8999/documents")
+			} else if caseType == "digital_lpa_2" {
+				caseType = "digital_lpa"
+
+				client.
+					On("Case", mock.Anything, 987).
+					Return(sirius.Case{}, expectedError)
+			} else {
+				expectedError = nil
+
+				template.
+					On("Func", mock.Anything, editDocumentData{
+						SaveAndExit: true,
+					}).
+					Return(nil)
+			}
 
 			form := url.Values{
 				"id":                 {"987"},
@@ -474,7 +494,7 @@ func TestPostSaveDocumentAndExit(t *testing.T) {
 			err := EditDocument(client, template.Func)(w, r)
 			resp := w.Result()
 
-			assert.Nil(t, err)
+			assert.Equal(t, expectedError, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
