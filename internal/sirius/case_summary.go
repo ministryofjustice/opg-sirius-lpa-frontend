@@ -1,8 +1,8 @@
 package sirius
 
 type CaseSummary struct {
-	Lpa DigitalLpa
-	TaskList []Task
+	DigitalLpa DigitalLpa
+	TaskList   []Task
 }
 
 /**
@@ -12,12 +12,12 @@ func (c *Client) CaseSummary(ctx Context, uid string) (CaseSummary, error) {
 	var cs CaseSummary
 	var err error
 
-	cs.Lpa, err = c.DigitalLpa(ctx, uid)
+	cs.DigitalLpa, err = c.DigitalLpa(ctx, uid)
 	if err != nil {
 		return cs, err
 	}
 
-	cs.TaskList, err = c.TasksForCase(ctx, cs.Lpa.ID)
+	cs.TaskList, err = c.TasksForCase(ctx, cs.DigitalLpa.SiriusData.ID)
 	if err != nil {
 		return cs, err
 	}
