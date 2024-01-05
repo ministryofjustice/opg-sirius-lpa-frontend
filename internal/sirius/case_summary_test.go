@@ -106,7 +106,7 @@ func setupTestCases(t *testing.T) []testCase {
 	}
 }
 
-// not tested by pact as this is just an amalgam of two other pact-tested methods
+// not tested by pact as this is just an amalgam of other pact-tested methods
 func TestCaseSummary(t *testing.T) {
 	reqForDigitalLpaMatcher := mock.MatchedBy(func(r *http.Request) bool {
 		digitalLpaUrl, _ := url.Parse("http://localhost:8888/lpa-api/v1/digital-lpas/M-QWER-TY34-3434")
