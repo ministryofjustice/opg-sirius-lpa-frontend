@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -18,12 +17,7 @@ type CaseSummary struct {
 func (c *Client) warningsForCase(ctx Context, caseId int) ([]Warning, error) {
 	path := fmt.Sprintf("/lpa-api/v1/cases/%d/warnings", caseId)
 
-	querystring := url.Values{}
-	//querystring.Set("limit", "99")
-	//querystring.Set("filter", "status:Not started,active:true")
-	querystring.Set("sort", "dateadded:DESC")
-
-	req, err := c.newRequestWithQuery(ctx, http.MethodGet, path, querystring, nil)
+	req, err := c.newRequest(ctx, http.MethodGet, path, nil)
 
 	if err != nil {
 		return nil, err
@@ -45,62 +39,6 @@ func (c *Client) warningsForCase(ctx Context, caseId int) ([]Warning, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	/*
-	// EXAMPLE WARNINGS API RESPONSE
-	[
-	    {
-	        "isPermanent": false,
-	        "id": 12,
-	        "warningType": "Attorney deceased",
-	        "warningText": "daadsdas",
-	        "dateAdded": "05/01/2024 10:50:35",
-	        "dateClosed": "",
-	        "systemStatus": true,
-	        "caseItems":
-	        [
-	            {
-	                "uId": "M-3J8F-86JF-9UDA",
-	                "caseSubtype": "hw",
-	                "caseType": "DIGITAL_LPA",
-	                "errorMessages":
-	                []
-	            }
-	        ],
-	        "errorMessages":
-	        []
-	    },
-	    {
-	        "isPermanent": false,
-	        "id": 13,
-	        "warningType": "Donor Deceased",
-	        "warningText": "dasadsads",
-	        "dateAdded": "05/01/2024 10:51:06",
-	        "dateClosed": "",
-	        "systemStatus": true,
-	        "caseItems":
-	        [
-	            {
-	                "uId": "M-3J8F-86JF-9UDA",
-	                "caseSubtype": "hw",
-	                "caseType": "DIGITAL_LPA",
-	                "errorMessages":
-	                []
-	            }
-	        ],
-	        "errorMessages":
-	        []
-	    }
-	]
-	*/
-
-	/*warningList := []Warning{
-		Warning{ID: 2, WarningType: "Warning type", WarningText: "Warning text sits underneath. Warning text sits underneath.", DateAdded: "12th Dec 2023",},
-		Warning{ID: 1, WarningType: "Warning type", WarningText: "Warning text sits underneath. Warning text sits underneath.", DateAdded: "11th Aug 2023",},
-		Warning{ID: 3, WarningType: "Warning type", WarningText: "Warning text sits underneath. Warning text sits underneath.", DateAdded: "8th Jan 2023",},
-		Warning{ID: 4, WarningType: "Warning type", WarningText: "Warning text sits underneath. Warning text sits underneath.", DateAdded: "17th Dec 2022",},
-		Warning{ID: 5, WarningType: "Warning type", WarningText: "Warning text sits underneath. Warning text sits underneath.", DateAdded: "1st Sept 2022",},
-	}*/
 
 	return warningList, nil
 }
