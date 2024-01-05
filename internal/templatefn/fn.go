@@ -172,12 +172,33 @@ func caseTab(caseSummary sirius.CaseSummary, tabName string) CaseTabData {
 	}
 }
 
-// sort warnings to show in case summary
+// sort warnings to show in case summary, donor deceased first, then in
+// descending date order
 func sortWarningsForCaseSummary(warnings []sirius.Warning) []sirius.Warning {
-	sortedWarnings := warnings
-	return sortedWarnings
+	sort.Slice(warnings, func(i, j int) bool {
+		if warnings[i].WarningType == "Donor Deceased" {
+			return true
+		} else if warnings[j].WarningType == "Donor Deceased" {
+			return false
+		}
+
+		iTime, err := time.Parse("02/01/2006 15:04:05", warnings[i].DateAdded)
+		if err != nil {
+			return false
+		}
+
+		jTime, err := time.Parse("02/01/2006 15:04:05", warnings[j].DateAdded)
+		if err != nil {
+			return false
+		}
+
+		return iTime.After(jTime)
+	})
+
+	return warnings
 }
 
+// construct string to use in case summary for cases a warning is applied to
 func casesWarningAppliedTo(uid string, cases []sirius.Case) string {
 	// return value:
 	// "" (only this case)
