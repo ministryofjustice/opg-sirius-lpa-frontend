@@ -140,6 +140,18 @@
       }
     },
     {
+      "name": "A request to get warnings for an LPA - digital LPA #3",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/cases/333/warnings"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"id\":44,\"warningType\":\"Court application in progress\",\"warningText\":\"Court notified\",\"dateAdded\":\"24/08/2022 13:13:13\",\"caseItems\":[{\"uId\":\"M-DIGI-LPA3-3333\"}]},{\"id\":22,\"warningType\":\"Complaint Received\",\"warningText\":\"Complaint from donor\",\"dateAdded\":\"12/12/2023 12:12:12\",\"caseItems\":[{\"uId\":\"M-DIGI-LPA3-3333\"},{\"uId\":\"M-DIGI-LPA3-5555\"}]},{\"id\":24,\"warningType\":\"Donor Deceased\",\"warningText\":\"Advised of donor death\",\"dateAdded\":\"05/01/2022 10:10:00\",\"caseItems\":[{\"uId\":\"M-DIGI-LPA3-3333\"},{\"uId\":\"M-DIGI-LPA3-5555\"},{\"uId\":\"M-DIGI-LPA3-6666\"}]}]"
+      }
+    },
+    {
       "name": "A request to create tasks for an LPA - digital LPA #3",
       "request": {
         "method": "POST",
