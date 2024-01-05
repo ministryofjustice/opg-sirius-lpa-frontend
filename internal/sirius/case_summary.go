@@ -23,5 +23,10 @@ func (c *Client) CaseSummary(ctx Context, uid string) (CaseSummary, error) {
 		return cs, err
 	}
 
+	cs.WarningList = []Warning{
+		Warning{ID: 1, WarningType: "Warning type", WarningText: "Warning text sits underneath. Warning text sits underneath.", DateAdded: "11th Aug 2023",},
+		Warning{ID: 2, WarningType: "Warning type", WarningText: "Warning text sits underneath. Warning text sits underneath.", DateAdded: "12th Dec 2023",},
+	}
+
 	return cs, nil
 }
