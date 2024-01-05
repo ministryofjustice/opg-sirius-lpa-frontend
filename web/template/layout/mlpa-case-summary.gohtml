@@ -19,7 +19,13 @@
                     <path fill="#fff" d="M8.4 4.5h2.2l-.2 7H8.6l-.2-7Z"/>
                 </svg>
                 <h3 class="govuk-heading-s govuk-!-display-inline">Warnings</h3>
-                <p class="govuk-body-s govuk-!-padding-top-2">There are none in place.</p>
+                {{ if not .CaseSummary.WarningList }}
+                    <p class="govuk-body-s govuk-!-padding-top-2">There are none in place.</p>
+                {{ else }}
+                    {{ range .CaseSummary.WarningList }}
+                        <p class="govuk-body-s">{{ .DateAdded }} {{ .WarningType }}</p>
+                    {{ end }}
+                {{ end }}
 
                 <svg class="app-svg-icon--inline" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -2 19 19" overflow="visible">
                     <circle cx="9.5" cy="9.5" r="9.5" fill="#1D70B8"/>
