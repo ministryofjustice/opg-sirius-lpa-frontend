@@ -29,10 +29,19 @@ type testCase struct {
 	DigitalLpaError      error
 	TasksForCaseResponse http.Response
 	TasksForCaseError    error
+	WarningsResponse     http.Response
+	WarningsError        error
 	ExpectedError        error
 }
 
-func setupTestCase(t *testing.T, description string, digitalLpaError error, tasksForCaseError error, expectedError error) testCase {
+func setupTestCase(
+	t *testing.T,
+	description string,
+	digitalLpaError error,
+	tasksForCaseError error,
+	warningsError error,
+	expectedError error,
+) testCase {
 	// digital LPA mock
 	var digitalLpaBody bytes.Buffer
 	err := json.NewEncoder(&digitalLpaBody).Encode(DigitalLpa{
@@ -51,11 +60,7 @@ func setupTestCase(t *testing.T, description string, digitalLpaError error, task
 	// tasks for case mock
 	var tasksForCaseBody bytes.Buffer
 	err = json.NewEncoder(&tasksForCaseBody).Encode(map[string][]Task{
-		"tasks": []Task{
-			Task{},
-			Task{},
-			Task{},
-		},
+		"tasks": []Task{},
 	})
 	if err != nil {
 		t.Fatal("Could not compile tasks for case JSON")
@@ -65,12 +70,25 @@ func setupTestCase(t *testing.T, description string, digitalLpaError error, task
 		Body:       io.NopCloser(bytes.NewReader(tasksForCaseBody.Bytes())),
 	}
 
+	// warnings mock
+	var warningsBody bytes.Buffer
+	err = json.NewEncoder(&warningsBody).Encode([]Warning{})
+	if err != nil {
+		t.Fatal("Could not compile warnings JSON")
+	}
+	respForWarnings := http.Response{
+		StatusCode: 200,
+		Body:       io.NopCloser(bytes.NewReader(warningsBody.Bytes())),
+	}
+
 	return testCase{
 		Description:          description,
 		DigitalLpaResponse:   respForDigitalLpa,
 		DigitalLpaError:      digitalLpaError,
 		TasksForCaseResponse: respForTasksForCase,
 		TasksForCaseError:    tasksForCaseError,
+		WarningsResponse:     respForWarnings,
+		WarningsError:        warningsError,
 		ExpectedError:        expectedError,
 	}
 }
@@ -78,11 +96,13 @@ func setupTestCase(t *testing.T, description string, digitalLpaError error, task
 func setupTestCases(t *testing.T) []testCase {
 	digitalLpaErr := errors.New("Unable to fetch digital LPA")
 	tasksForCaseErr := errors.New("Unable to fetch tasks for case")
+	warningsErr := errors.New("Unable to fetch warnings")
 
 	return []testCase{
-		setupTestCase(t, "Case summary: all requests successful", nil, nil, nil),
-		setupTestCase(t, "Case summary: digital LPA request failure", digitalLpaErr, nil, digitalLpaErr),
-		setupTestCase(t, "Case summary: tasks for case request failure", nil, tasksForCaseErr, tasksForCaseErr),
+		setupTestCase(t, "Case summary: all requests successful", nil, nil, nil, nil),
+		setupTestCase(t, "Case summary: digital LPA request failure", digitalLpaErr, nil, nil, digitalLpaErr),
+		setupTestCase(t, "Case summary: tasks for case request failure", nil, tasksForCaseErr, nil, tasksForCaseErr),
+		setupTestCase(t, "Case summary: warnings request failure", nil, nil, warningsErr, warningsErr),
 	}
 }
 
@@ -98,12 +118,18 @@ func TestCaseSummary(t *testing.T) {
 		return tasksForCaseUrl.String() == r.URL.String()
 	})
 
+	reqForWarningsMatcher := mock.MatchedBy(func(r *http.Request) bool {
+		warningsUrl, _ := url.Parse("http://localhost:8888/lpa-api/v1/cases/1/warnings")
+		return warningsUrl.String() == r.URL.String()
+	})
+
 	for _, testCase := range setupTestCases(t) {
 		mockHttpClient := mockCaseSummaryHttpClient{}
 		client := NewClient(&mockHttpClient, "http://localhost:8888")
 
 		mockHttpClient.On("Do", reqForDigitalLpaMatcher).Return(&testCase.DigitalLpaResponse, testCase.DigitalLpaError)
 		mockHttpClient.On("Do", reqForTasksForCaseMatcher).Return(&testCase.TasksForCaseResponse, testCase.TasksForCaseError)
+		mockHttpClient.On("Do", reqForWarningsMatcher).Return(&testCase.WarningsResponse, testCase.WarningsError)
 
 		_, err := client.CaseSummary(Context{Context: context.Background()}, "M-QWER-TY34-3434")
 		assert.Equal(t, testCase.ExpectedError, err)
