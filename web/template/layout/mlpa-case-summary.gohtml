@@ -13,19 +13,36 @@
 
         <div class="govuk-grid-row" data-id="case-summary" aria-expanded="true">
             <div class="govuk-grid-column-one-third">
-                <svg class="app-svg-icon--inline" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -2 19 19" overflow="visible">
-                    <circle cx="9.5" cy="9.5" r="9.5" fill="#1D70B8"/>
-                    <circle cx="9.5" fill="#fff" cy="13.8" r="1.3"/>
-                    <path fill="#fff" d="M8.4 4.5h2.2l-.2 7H8.6l-.2-7Z"/>
-                </svg>
-                <h3 class="govuk-heading-s govuk-!-display-inline">Warnings</h3>
-                {{ if not .CaseSummary.WarningList }}
-                    <p class="govuk-body-s govuk-!-padding-top-2">There are none in place.</p>
-                {{ else }}
-                    {{ range .CaseSummary.WarningList }}
-                        <p class="govuk-body-s">{{ .DateAdded }} {{ .WarningType }}</p>
+                <div class="govuk-!-margin-bottom-4">
+                    <div class="govuk-!-margin-bottom-2">
+                        <svg class="app-svg-icon--inline" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -2 19 19" overflow="visible">
+                            <circle cx="9.5" cy="9.5" r="9.5" fill="#1D70B8"/>
+                            <circle cx="9.5" fill="#fff" cy="13.8" r="1.3"/>
+                            <path fill="#fff" d="M8.4 4.5h2.2l-.2 7H8.6l-.2-7Z"/>
+                        </svg>
+                        <h3 class="govuk-heading-s govuk-!-display-inline">Warnings</h3>
+                    </div>
+                    {{ if not .CaseSummary.WarningList }}
+                        <p class="govuk-body-s">There are none in place.</p>
+                    {{ else }}
+                        {{ range .CaseSummary.WarningList }}
+                            <details class="govuk-details govuk-!-margin-bottom-1">
+                                <summary class="govuk-details__summary">
+                                    <span class="govuk-details__summary-text govuk-body-s">
+                                        {{ .DateAdded }} {{ .WarningType }}
+                                    </span>
+                                </summary>
+                                <div class="govuk-details__text">
+                                    <span class="govuk-body-s">
+                                        <strong>Applied to ...</strong>
+                                        <br>
+                                        {{ .WarningText }}
+                                    </span>
+                                </div>
+                            </details>
+                        {{ end }}
                     {{ end }}
-                {{ end }}
+                </div>
                 <svg class="app-svg-icon--inline" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -2 19 19" overflow="visible">
                     <circle cx="9.5" cy="9.5" r="9.5" fill="#1D70B8"/>
                     <circle cx="9.5" fill="#fff" cy="13.8" r="1.3"/>
