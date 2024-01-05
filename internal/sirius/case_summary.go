@@ -1,12 +1,13 @@
 package sirius
 
 type CaseSummary struct {
-	DigitalLpa DigitalLpa
-	TaskList   []Task
+	DigitalLpa  DigitalLpa
+	TaskList    []Task
+	WarningList []Warning
 }
 
 /**
- * Get data for the case summary area (digital LPA record and tasks for that LPA).
+ * Get data for the case summary area (digital LPA record, tasks, and warnings for that LPA)
  */
 func (c *Client) CaseSummary(ctx Context, uid string) (CaseSummary, error) {
 	var cs CaseSummary
