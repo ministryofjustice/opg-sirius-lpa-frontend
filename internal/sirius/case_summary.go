@@ -1,10 +1,6 @@
 package sirius
 
 import (
-	"encoding/json"
-	"fmt"
-	"net/http"
-
 	"golang.org/x/sync/errgroup"
 )
 
@@ -12,35 +8,6 @@ type CaseSummary struct {
 	DigitalLpa  DigitalLpa
 	TaskList    []Task
 	WarningList []Warning
-}
-
-func (c *Client) warningsForCase(ctx Context, caseId int) ([]Warning, error) {
-	path := fmt.Sprintf("/lpa-api/v1/cases/%d/warnings", caseId)
-
-	req, err := c.newRequest(ctx, http.MethodGet, path, nil)
-
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := c.http.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close() //#nosec G307 false positive
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, newStatusError(resp)
-	}
-
-	var warningList []Warning
-	err = json.NewDecoder(resp.Body).Decode(&warningList)
-	if err != nil {
-		return nil, err
-	}
-
-	return warningList, nil
 }
 
 /**
@@ -65,7 +32,7 @@ func (c *Client) CaseSummary(ctx Context, uid string) (CaseSummary, error) {
 	})
 
 	group.Go(func() error {
-		cs.WarningList, err = c.warningsForCase(ctx.With(groupCtx), cs.DigitalLpa.SiriusData.ID)
+		cs.WarningList, err = c.WarningsForCase(ctx.With(groupCtx), cs.DigitalLpa.SiriusData.ID)
 		if err != nil {
 			return err
 		}
