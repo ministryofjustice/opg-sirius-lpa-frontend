@@ -8,9 +8,9 @@ import (
 
 type Warning struct {
 	ID          int    `json:"id"`
+	DateAdded   string `json:"dateAdded"`
 	WarningType string `json:"warningType"`
 	WarningText string `json:"warningText"`
-	DateAdded   string `json:"dateAdded"`
 	CaseItems   []Case `json:"caseItems"`
 }
 
