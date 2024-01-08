@@ -188,7 +188,7 @@ func TestTasksForCase(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a case with an open task assigned").
+					Given("There is no case with tasks with the specified ID").
 					UponReceiving("A request for the tasks for a non-existent case").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
@@ -198,7 +198,6 @@ func TestTasksForCase(t *testing.T) {
 						Status: http.StatusNotFound,
 					})
 			},
-			expectedResponse: nil,
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:          404,
