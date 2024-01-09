@@ -83,8 +83,8 @@ func TestWarningsForCase(t *testing.T) {
 						Body: dsl.EachLike(map[string]interface{}{
 							"id":           dsl.Like(9901),
 							"dateAdded":    dsl.Regex("07/01/2023", `\d{2}\/\d{2}\/\d{4}`),
-							"warningType":  dsl.String("Donor Deceased"),
-							"warningText":  dsl.String("Donor died"),
+							"warningType":  dsl.String("Attorney removed"),
+							"warningText":  dsl.String("Attorney was removed"),
 							"caseItems":    dsl.EachLike(map[string]interface{}{
 								"uId":      dsl.String("M-TTTT-RRRR-EEEE"),
 								"caseType": dsl.String("DIGITAL_LPA"),
@@ -97,8 +97,8 @@ func TestWarningsForCase(t *testing.T) {
 				Warning{
 					ID: 9901,
 					DateAdded: "07/01/2023",
-					WarningType: "Donor Deceased",
-					WarningText: "Donor died",
+					WarningType: "Attorney removed",
+					WarningText: "Attorney was removed",
 					CaseItems: []Case{
 						Case{
 							UID: "M-TTTT-RRRR-EEEE",
