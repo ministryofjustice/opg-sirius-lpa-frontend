@@ -82,7 +82,7 @@ func TestWarningsForCase(t *testing.T) {
 						Status: http.StatusOK,
 						Body: dsl.EachLike(map[string]interface{}{
 							"id":           dsl.Like(9901),
-							"dateAdded":    dsl.String("07/01/2023"),
+							"dateAdded":    dsl.Regex("07/01/2023", `\d{2}\/\d{2}\/\d{4}`),
 							"warningType":  dsl.String("Donor Deceased"),
 							"warningText":  dsl.String("Donor died"),
 							"caseItems":    dsl.EachLike(map[string]interface{}{
