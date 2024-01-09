@@ -29,7 +29,9 @@ const textEditor = () => {
 export default textEditor;
 
 function getContentCSSPath() {
+  const prefix = document.body.getAttribute("data-prefix");
+
   return window.self !== window.parent
     ? "../frontend/stylesheets/all.css"
-    : "../stylesheets/all.css";
+    : prefix + "/stylesheets/all.css";
 }
