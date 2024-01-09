@@ -35,7 +35,7 @@ func TestWarningsForCaseNetworkError(t *testing.T) {
 	mockWarningHttpClient.On("Do", mock.Anything).Return(&http.Response{}, errors.New("Networking issue"))
 
 	client := NewClient(mockWarningHttpClient, "http://localhost")
-	_, err := client.TasksForCase(Context{Context: context.Background()}, 990)
+	_, err := client.WarningsForCase(Context{Context: context.Background()}, 990)
 	assert.Equal(t, "Networking issue", err.Error())
 }
 
