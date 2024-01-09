@@ -1,21 +1,16 @@
 import MOJFrontend from "@ministryofjustice/frontend/moj/all.js";
 
 export default function dropdownMenu() {
-  new MOJFrontend.ButtonMenu({
-    container: $('[data-module="app-button-menu"]'),
-    mq: "(min-width: 200em)",
-    buttonText: "Menu",
-    buttonClasses:
-      "govuk-button--secondary moj-button-menu__toggle-button--secondary",
-  });
-
-  new MOJFrontend.ButtonMenu({
-    container: $('[data-module="button-menu"]'),
-    mq: "(min-width: 200em)",
-    buttonText: "Menu",
-    buttonClasses:
-      "govuk-button--secondary moj-button-menu__toggle-button--secondary",
-  });
+  let $container = $('[data-module="app-button-menu"]');
+  if ($container.length > 0) {
+    new MOJFrontend.ButtonMenu({
+      container: $container,
+      mq: "(min-width: 200em)",
+      buttonText: "Menu",
+      buttonClasses:
+        "govuk-button--secondary moj-button-menu__toggle-button--secondary",
+    });
+  }
 
   document.querySelectorAll("[data-module='dropdown-menu']").forEach((e) => {
     let dropdownMenuToggle = e.querySelector(
