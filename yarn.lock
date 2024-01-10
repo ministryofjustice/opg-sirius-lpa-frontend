@@ -1112,9 +1112,10 @@ onetime@^5.1.0:
   dependencies:
     mimic-fn "^2.1.0"
 
-"opg-sirius-search-ui@https://github.com/ministryofjustice/opg-sirius-search-ui#v1.41.1":
+"opg-sirius-search-ui@https://github.com/ministryofjustice/opg-sirius-search-ui#v1.42.0":
   version "0.1.0"
-  resolved "https://github.com/ministryofjustice/opg-sirius-search-ui#6dd3985b372b72df05cc0638dd6c732de6fdc343"
+  uid e271be7b9aced38a1c5ef371a0aa6b9d77673556
+  resolved "https://github.com/ministryofjustice/opg-sirius-search-ui#e271be7b9aced38a1c5ef371a0aa6b9d77673556"
 
 ospath@^1.2.2:
   version "1.2.2"
