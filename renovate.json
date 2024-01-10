@@ -34,7 +34,7 @@
       "matchUpdateTypes": ["minor", "patch"],
       "prPriority": 1,
       "stabilityDays": 3,
-      "schedule": ["0 17 * * 0"]
+      "schedule": ["on sunday"]
     }
   ],
   "major": {
