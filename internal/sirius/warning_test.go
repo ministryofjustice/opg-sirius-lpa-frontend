@@ -50,7 +50,7 @@ func TestWarningsForCaseBadResponseJSON(t *testing.T) {
 	mockWarningHttpClient.On("Do", mock.Anything).Return(&badJsonResponse, nil)
 
 	client := NewClient(mockWarningHttpClient, "http://localhost")
-	_, err := client.TasksForCase(Context{Context: context.Background()}, 990)
+	_, err := client.WarningsForCase(Context{Context: context.Background()}, 990)
 
 	assert.Equal(t, "invalid character 'b' looking for beginning of value", err.Error())
 }
