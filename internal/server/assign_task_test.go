@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -480,4 +481,38 @@ func TestPostAssignTaskWhenValidationError(t *testing.T) {
 			assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 		})
 	}
+}
+
+func TestPostAssignTaskToDigitalLpaRedirects(t *testing.T) {
+	uid := "M-EEEE-RRRR-TTTT"
+
+	client := &mockAssignTaskClient{}
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Task", mock.Anything, 123).
+		Return(sirius.Task{Name: "A task", CaseItems: []sirius.Case{{UID: uid, CaseType: "DIGITAL_LPA"}}}, nil)
+	client.
+		On("AssignTasks", mock.Anything, mock.Anything, mock.Anything).
+		Return(nil)
+
+	form := url.Values{
+		"assignTo": {"user"},
+		"assigneeUser": {"66: Some user"},
+	}
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.Anything).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AssignTask(client, template.Func)(w, r)
+
+	redirectError := RedirectError(fmt.Sprintf("/lpa/%s", uid))
+	assert.Equal(t, redirectError, err)
 }
