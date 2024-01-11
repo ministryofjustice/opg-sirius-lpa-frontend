@@ -30,8 +30,8 @@
                         Application progress
                     </a>
                 </li>
-                <li class="govuk-tabs__list-item {{ if eq .TabName "details" }}govuk-tabs__list-item--selected{{ end }}">
-                    <a class="govuk-tabs__tab" href="#lpa-details">
+                <li class="govuk-tabs__list-item {{ if eq .TabName "lpa-details" }}govuk-tabs__list-item--selected{{ end }}">
+                    <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s/lpa-details" .CaseSummary.DigitalLpa.UID) }}">
                         LPA details
                     </a>
                 </li>
