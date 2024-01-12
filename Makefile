@@ -6,7 +6,8 @@ help:
 all: lint gosec unit-test build-all scan pa11y lighthouse cypress down
 
 lint: ## Lint source code
-	go-lint yarn-lint
+	go-lint
+	yarn-lint
 
 go-lint:
 	docker compose run --rm go-lint
