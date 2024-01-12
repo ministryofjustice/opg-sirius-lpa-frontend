@@ -1,7 +1,8 @@
 $govuk-page-width: 1220px;
 $moj-page-width: 1220px;
-$moj-assets-path: "/lpa/frontend/assets/";
-$govuk-assets-path: "/lpa/frontend/assets/";
+
+$moj-assets-path: "../assets/";
+$govuk-assets-path: "../assets/";
 
 @import "node_modules/govuk-frontend/govuk/all";
 @import "node_modules/@ministryofjustice/frontend/moj/all";
