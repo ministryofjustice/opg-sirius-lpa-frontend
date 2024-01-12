@@ -40,6 +40,7 @@ dev:
 	docker compose run --rm yarn
 	docker compose run --rm yarn build
 	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up -d lpa-frontend
+	docker compose run --rm yarn watch
 
 scan: setup-directories
 	docker compose run --rm trivy image --format table --exit-code 0 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest
