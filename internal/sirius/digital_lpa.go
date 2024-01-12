@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -21,8 +22,9 @@ type SiriusData struct {
 }
 
 type DigitalLpa struct {
-	UID        string     `json:"uId"`
-	SiriusData SiriusData `json:"opg.poas.sirius"`
+	UID          string          `json:"uId"`
+	SiriusData   SiriusData      `json:"opg.poas.sirius"`
+	LpaStoreData json.RawMessage `json:"opg.poas.lpastore"`
 }
 
 type Donor struct {
