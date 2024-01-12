@@ -14,8 +14,6 @@ type GetLpaDetailsClient interface {
 }
 
 type getLpaDetails struct {
-	XSRFToken string
-
 	LpaStoreData map[string]interface{}
 	CaseSummary  sirius.CaseSummary
 }
@@ -26,13 +24,15 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		ctx := getContext(r)
 
 		caseSummary, err := client.CaseSummary(ctx, uid)
-
 		if err != nil {
 			return err
 		}
 
 		var lpaStoreData map[string]interface{}
-		_ = json.Unmarshal(caseSummary.DigitalLpa.LpaStoreData, &lpaStoreData)
+		err = json.Unmarshal(caseSummary.DigitalLpa.LpaStoreData, &lpaStoreData)
+		if err != nil {
+			return err
+		}
 
 		data := getLpaDetails{
 			LpaStoreData: lpaStoreData,
