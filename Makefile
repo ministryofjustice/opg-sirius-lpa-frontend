@@ -6,8 +6,7 @@ help:
 all: lint gosec unit-test build-all scan pa11y lighthouse cypress down
 
 lint: ## Lint source code
-	go-lint
-	yarn-lint
+lint: go-lint yarn-lint
 
 go-lint:
 	docker compose run --rm go-lint
@@ -40,7 +39,7 @@ dev: ## Start application and watch JS and SASS files for changes
 	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up -d lpa-frontend
 	docker compose run --rm yarn watch
 
-up: # Start application with mock Sirius API; mostly for use with Cypress tests
+up: ## Start application with mock Sirius API; mostly for use with Cypress tests
 	docker compose up -d lpa-frontend
 
 scan: setup-directories
