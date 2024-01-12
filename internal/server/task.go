@@ -25,6 +25,7 @@ type taskData struct {
 	Success   bool
 	Error     sirius.ValidationError
 
+	CaseUID          string
 	TaskTypes        []string
 	Teams            []sirius.Team
 	Task             sirius.TaskRequest
@@ -73,6 +74,7 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 				return err
 			}
 			data.Entity = caseitem.Summary()
+			data.CaseUID = caseitem.UID
 			return nil
 		})
 
@@ -92,7 +94,7 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 			switch assignTo {
 			case "me":
 				user, err := client.GetUserDetails(ctx)
-				if (err != nil){
+				if err != nil {
 					return err
 				} else {
 					task.AssigneeID = user.ID

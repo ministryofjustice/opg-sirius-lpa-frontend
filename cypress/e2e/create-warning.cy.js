@@ -3,7 +3,13 @@ describe("Create a warning", () => {
     cy.addMock("/lpa-api/v1/persons/189/cases", "GET", {
       status: 200,
       body: {
-        cases: [],
+        cases: [
+          {
+            caseSubtype: "pfa",
+            id: 405,
+            uId: "7000-0000-1234",
+          },
+        ],
       },
     });
     cy.visit("/create-warning?id=189");
