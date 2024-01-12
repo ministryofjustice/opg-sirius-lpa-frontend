@@ -6,7 +6,7 @@ help:
 all: lint gosec unit-test build-all scan pa11y lighthouse cypress down
 
 lint: ## Lint source code
-lint: go-lint yarn-lint
+	go-lint yarn-lint
 
 go-lint:
 	docker compose run --rm go-lint
@@ -16,7 +16,7 @@ yarn-lint:
 	docker compose run --rm yarn lint
 
 gosec: ## Scan Go code for security flaws
-gosec: docker compose run --rm gosec
+	docker compose run --rm gosec
 
 test-results:
 	mkdir -p -m 0777 test-results .gocache pacts logs cypress/screenshots .trivy-cache
@@ -31,12 +31,9 @@ build:
 	docker compose build lpa-frontend
 
 build-all: ## Build containers
-build-all: docker compose build --parallel lpa-frontend puppeteer cypress test-runner
+	docker compose build --parallel lpa-frontend puppeteer cypress test-runner
 
-up: ## Start application
-	docker compose up -d lpa-frontend
-
-dev:
+dev: ## Start application and watch JS and SASS files for changes
 	docker compose run --rm yarn
 	docker compose run --rm yarn build
 	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up -d lpa-frontend
@@ -55,8 +52,7 @@ lighthouse: setup-directories
 cypress: setup-directories
 	docker compose run --rm cypress
 
-down: ## Stop application
-down:
+down: ## Stop everything
 	docker compose down
 
 run-structurizr:
