@@ -6,7 +6,7 @@ export default function dropdownMenu() {
     new MOJFrontend.ButtonMenu({
       container: $container,
       mq: "(min-width: 200em)",
-      buttonText: "Menu",
+      buttonText: "Case actions",
       buttonClasses:
         "govuk-button--secondary moj-button-menu__toggle-button--secondary",
     });
