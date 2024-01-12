@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -53,4 +54,35 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetLpaDetailsFailureOnUnmarshallingJson(t *testing.T) {
+	caseSummary := sirius.CaseSummary{
+		DigitalLpa: sirius.DigitalLpa{
+			UID: "M-9876-9876-9876",
+			SiriusData: sirius.SiriusData{
+				ID:      22,
+				Subtype: "hw",
+			},
+			LpaStoreData: json.RawMessage([]byte(`{"some": "bad json data}`)),
+		},
+		TaskList: []sirius.Task{},
+	}
+
+	client := &mockGetLpaDetailsClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		Return(caseSummary, nil)
+
+	server := newMockServer("/lpa/{uid}/lpa-details", GetLpaDetails(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9876/lpa-details", nil)
+	_, err := server.serve(req)
+
+	var tt *json.SyntaxError
+
+	if !errors.As(err, &tt) {
+		assert.FailNow(t, "Expected json syntax error")
+	}
+	mock.AssertExpectationsForObjects(t, client)
 }
