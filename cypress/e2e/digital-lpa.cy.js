@@ -54,7 +54,7 @@ describe("View a digital LPA", () => {
   });
 
   it("creates a task via case actions", () => {
-    cy.get(".govuk-button").contains("Menu").click();
+    cy.get(".govuk-button").contains("Case actions").click();
     cy.contains("Create a task").click();
     cy.url().should("include", "/create-task?id=333");
     cy.contains("M-DIGI-LPA3-3333");
@@ -73,7 +73,7 @@ describe("View a digital LPA", () => {
   });
 
   it("creates a warning via case actions", () => {
-    cy.get(".govuk-button").contains("Menu").click();
+    cy.get(".govuk-button").contains("Case actions").click();
     cy.contains("Create a warning").click();
     cy.url().should("include", "/create-warning?id=33");
     cy.get("#f-warningType").select("Complaint Received");
