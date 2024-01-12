@@ -98,18 +98,6 @@
       }
     },
     {
-      "name": "A request for the LPA - digital LPA - #3",
-      "request": {
-        "method": "GET",
-        "url": "/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333"
-      },
-      "response": {
-        "status": 200,
-        "headers": { "Content-Type": "application/json" },
-        "body": "{\"opg.poas.sirius\":{\"donor\":{\"id\":33},\"application\":{\"correspondentAddress\":{\"addressLine1\":\"Flat 3\",\"addressLine2\":\"Digital LPA Lane\",\"addressLine3\":\"Somewhere\",\"country\":\"GB\",\"postcode\":\"SW1 1AA\",\"town\":\"London\"},\"correspondentFirstNames\":\"Kendrick\",\"correspondentLastName\":\"Lamar\",\"donorAddress\":{\"addressLine1\":\"Apartment 3\",\"addressLine2\":\"Gherkin Building\",\"addressLine3\":\"33 London Road\",\"country\":\"GB\",\"postcode\":\"B15 3AA\",\"town\":\"Birmingham\"},\"donorDob\":\"27/05/1998\",\"donorEmail\":\"agnes@host.example\",\"donorFirstNames\":\"Agnes\",\"donorLastName\":\"Hartley\",\"donorPhone\":\"073656249524\"},\"caseSubtype\":\"pfa\",\"complaintCount\":1,\"createdDate\":\"31/10/2023\",\"investigationCount\":2,\"status\":\"Draft\",\"taskCount\":2,\"id\":333,\"warningCount\":4},\"uId\":\"M-DIGI-LPA3-3333\"}"
-      }
-    },
-    {
       "name": "A request for a case - digital LPA #3",
       "request": { "method": "GET", "url": "/lpa-api/v1/cases/333" },
       "response": {
