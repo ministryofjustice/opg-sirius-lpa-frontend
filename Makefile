@@ -16,7 +16,7 @@ yarn-lint:
 	docker compose run --rm yarn lint
 
 gosec: ## Scan Go code for security flaws
-gosec: docker compose run --rm gosec
+	docker compose run --rm gosec
 
 test-results:
 	mkdir -p -m 0777 test-results .gocache pacts logs cypress/screenshots .trivy-cache
@@ -31,16 +31,16 @@ build:
 	docker compose build lpa-frontend
 
 build-all: ## Build containers
-build-all: docker compose build --parallel lpa-frontend puppeteer cypress test-runner
+	docker compose build --parallel lpa-frontend puppeteer cypress test-runner
 
-up: ## Start application
-	docker compose up -d lpa-frontend
-
-dev: ## Start application with live reload for JavaScript files
-dev:
-	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up -d lpa-frontend
+dev: ## Start application and watch JS and SASS files for changes
 	docker compose run --rm yarn
+	docker compose run --rm yarn build
+	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up -d lpa-frontend
 	docker compose run --rm yarn watch
+
+up: ## Start application with mock Sirius API; mostly for use with Cypress tests
+	docker compose up -d lpa-frontend
 
 scan: setup-directories
 	docker compose run --rm trivy image --format table --exit-code 0 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest
@@ -55,8 +55,7 @@ lighthouse: setup-directories
 cypress: setup-directories
 	docker compose run --rm cypress
 
-down: ## Stop application
-down:
+down: ## Stop everything
 	docker compose down
 
 run-structurizr:
