@@ -59,6 +59,7 @@ func TestGetTask(t *testing.T) {
 			TaskTypes: []string{"a", "b"},
 			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entity:    "LPA 7000-0000-0000",
+			CaseUID:   "7000-0000-0000",
 		}).
 		Return(nil)
 
@@ -204,6 +205,7 @@ func TestPostTask(t *testing.T) {
 			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			AssigneeUserName: "System user",
 			Entity:           "LPA 7000-0000-0000",
+			CaseUID:          "7000-0000-0000",
 		}).
 		Return(nil)
 
@@ -228,7 +230,7 @@ func TestPostTask(t *testing.T) {
 }
 
 func TestPostTaskWhenAssignToMe(t *testing.T) {
-    user := sirius.User{ID: 66, DisplayName: "Me", Roles: []string{"OPG User", "Reduced Fees User"}}
+	user := sirius.User{ID: 66, DisplayName: "Me", Roles: []string{"OPG User", "Reduced Fees User"}}
 
 	client := &mockTaskClient{}
 	client.
@@ -250,8 +252,8 @@ func TestPostTaskWhenAssignToMe(t *testing.T) {
 		}).
 		Return(nil)
 	client.
-	    On("GetUserDetails",mock.Anything).
-        Return(user, nil)
+		On("GetUserDetails", mock.Anything).
+		Return(user, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -261,15 +263,16 @@ func TestPostTaskWhenAssignToMe(t *testing.T) {
 			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			AssigneeUserName: "Me",
 			Entity:           "LPA 7000-0000-0000",
+			CaseUID:          "7000-0000-0000",
 		}).
 		Return(nil)
 
 	form := url.Values{
-		"assignTo":     {"me"},
-		"taskType":     {"Some task type"},
-		"dueDate":      {"2022-03-04"},
-		"name":         {"Do this"},
-		"description":  {"Please"},
+		"assignTo":    {"me"},
+		"taskType":    {"Some task type"},
+		"dueDate":     {"2022-03-04"},
+		"name":        {"Do this"},
+		"description": {"Please"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
@@ -295,17 +298,17 @@ func TestGetTaskWhenGetUserDetailsErrors(t *testing.T) {
 		On("Case", mock.Anything, mock.Anything).
 		Return(sirius.Case{}, nil)
 	client.
-    	On("CreateTask", mock.Anything, 123, sirius.TaskRequest{
-    		Type:        "Some task type",
-    		DueDate:     "2022-03-04",
-    		Name:        "Do this",
-    		Description: "Please",
-    		AssigneeID:  66,
-    	}).
-    	Return(nil)
+		On("CreateTask", mock.Anything, 123, sirius.TaskRequest{
+			Type:        "Some task type",
+			DueDate:     "2022-03-04",
+			Name:        "Do this",
+			Description: "Please",
+			AssigneeID:  66,
+		}).
+		Return(nil)
 	client.
-    	On("GetUserDetails", mock.Anything).
-    	Return(sirius.User{}, expectedError)
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{}, expectedError)
 
 	template := &mockTemplate{}
 	template.
@@ -315,15 +318,16 @@ func TestGetTaskWhenGetUserDetailsErrors(t *testing.T) {
 			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			AssigneeUserName: "Me",
 			Entity:           "LPA 7000-0000-0000",
+			CaseUID:          "7000-0000-0000",
 		}).
 		Return(nil)
 
 	form := url.Values{
-		"assignTo":     {"me"},
-		"taskType":     {"Some task type"},
-		"dueDate":      {"2022-03-04"},
-		"name":         {"Do this"},
-		"description":  {"Please"},
+		"assignTo":    {"me"},
+		"taskType":    {"Some task type"},
+		"dueDate":     {"2022-03-04"},
+		"name":        {"Do this"},
+		"description": {"Please"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
@@ -332,7 +336,7 @@ func TestGetTaskWhenGetUserDetailsErrors(t *testing.T) {
 
 	err := Task(client, template.Func)(w, r)
 
-    assert.Equal(t, expectedError, err)
+	assert.Equal(t, expectedError, err)
 }
 
 func TestPostTaskWhenCreateTaskFails(t *testing.T) {
@@ -401,6 +405,7 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 			TaskTypes: []string{"a", "b"},
 			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entity:    "LPA 7000-0000-0000",
+			CaseUID:   "7000-0000-0000",
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{
 					"assignTo": {"": "Assignee not set"},
@@ -482,6 +487,7 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 					TaskTypes: []string{"a", "b"},
 					Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 					Entity:    "LPA 7000-0000-0000",
+					CaseUID:   "7000-0000-0000",
 					Error:     sirius.ValidationError{Field: expectedErrors},
 					Task: sirius.TaskRequest{
 						Type:        "Some task type",
