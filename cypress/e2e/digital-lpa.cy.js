@@ -1,5 +1,54 @@
 describe("View a digital LPA", () => {
   beforeEach(() => {
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333", "GET", {
+      status: 200,
+      body: {
+        uId: "M-DIGI-LPA3-3333",
+        "opg.poas.sirius": {
+          id: 333,
+          uId: "M-DIGI-LPA3-3333",
+          status: "Draft",
+          caseSubtype: "pfa",
+          createdDate: "31/10/2023",
+          investigationCount: 2,
+          complaintCount: 1,
+          taskCount: 2,
+          warningCount: 4,
+          donor: {
+            id: 33,
+          },
+          application: {
+            donorFirstNames: "Agnes",
+            donorLastName: "Hartley",
+            donorDob: "27/05/1998",
+            donorEmail: "agnes@host.example",
+            donorPhone: "073656249524",
+            donorAddress: {
+              addressLine1: "Apartment 3",
+              addressLine2: "Gherkin Building",
+              addressLine3: "33 London Road",
+              country: "GB",
+              postcode: "B15 3AA",
+              town: "Birmingham",
+            },
+            correspondentFirstNames: "Kendrick",
+            correspondentLastName: "Lamar",
+            correspondentAddress: {
+              addressLine1: "Flat 3",
+              addressLine2: "Digital LPA Lane",
+              addressLine3: "Somewhere",
+              country: "GB",
+              postcode: "SW1 1AA",
+              town: "London",
+            },
+          },
+        },
+        "opg.poas.lpastore": {
+          lpaType: "pf",
+          registrationDate: "2022-12-18",
+        },
+      },
+    });
     cy.visit("/lpa/M-DIGI-LPA3-3333");
   });
 
@@ -84,5 +133,11 @@ describe("View a digital LPA", () => {
     cy.get(".moj-banner").contains("Warning created");
     cy.get("h1").contains("Agnes Hartley");
     cy.location("pathname").should("eq", "/lpa/M-DIGI-LPA3-3333");
+  });
+
+  it("shows lpa details from lpa store", () => {
+    cy.contains("LPA details").click();
+    cy.contains("lpaType:pf");
+    cy.contains("registrationDate:2022-12-18");
   });
 });
