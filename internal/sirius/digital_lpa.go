@@ -28,7 +28,17 @@ type DigitalLpa struct {
 }
 
 type Donor struct {
-	ID int `json:"id"`
+	ID           int        `json:"id"`
+	Firstname    string     `json:"firstname"`
+	Surname      string     `json:"surname"`
+	DateOfBirth  DateString `json:"dob"`
+	AddressLine1 string     `json:"addressLine1"`
+	AddressLine2 string     `json:"addressLine2"`
+	AddressLine3 string     `json:"addressLine3"`
+	Town         string     `json:"town"`
+	Postcode     string     `json:"postcode"`
+	Country      string     `json:"country"`
+	PersonType   string     `json:"personType,omitempty"`
 }
 
 func (c *Client) DigitalLpa(ctx Context, uid string) (DigitalLpa, error) {
