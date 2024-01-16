@@ -5,6 +5,18 @@ describe("Create a document for a digital LPA", () => {
       body: {
         "opg.poas.sirius": {
           id: 483,
+          donor: {
+            firstname: "Steven",
+            surname: "Munnell",
+            dob: "17/06/1982",
+            addressLine1: "1 Scotland Street",
+            addressLine2: "Netherton",
+            addressLine3: "Glasgow",
+            town: "Edinburgh",
+            postcode: "EH6 18J",
+            country: "GB",
+            personType: "Donor",
+          },
           application: {
             donorFirstNames: "Steven",
             donorLastName: "Munnell",
@@ -51,7 +63,7 @@ describe("Create a document for a digital LPA", () => {
     cy.contains("Select document inserts");
     cy.contains("DLPA Insert 1").click();
 
-    cy.contains("1 Scotland Street, EH6 18J");
+    cy.contains("1 Scotland Street, Netherton, Glasgow, Edinburgh, EH6 18J, GB");
     cy.contains("Steven Munnell (Donor)").click();
 
     cy.contains("button", "Continue").click();
