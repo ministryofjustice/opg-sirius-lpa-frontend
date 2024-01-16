@@ -46,6 +46,19 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 		DigitalLpa: sirius.DigitalLpa{
 			SiriusData: sirius.SiriusData{
 				ID: 15,
+				Donor: sirius.Donor{
+					ID:           12,
+					Firstname:    "Zackary",
+					Surname:      "Lemmonds",
+					DateOfBirth:  "18/04/1965",
+					AddressLine1: "9 Mount Pleasant Drive",
+					AddressLine2: "",
+					AddressLine3: "",
+					Town:         "East Harling",
+					Postcode:     "NR16 2GB",
+					Country:      "UK",
+					PersonType:   "Donor",
+				},
 				Application: sirius.Draft{
 					DonorFirstNames: "Zackary",
 					DonorLastName:   "Lemmonds",
@@ -78,7 +91,7 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 			DocumentTemplates:     sortDocumentData(templateData),
 			ComponentDocumentData: buildComponentDocumentData(templateData),
 			Recipients: []sirius.Person{{
-				ID:           -1,
+				ID:           12,
 				Firstname:    "Zackary",
 				Surname:      "Lemmonds",
 				PersonType:   "Donor",
@@ -123,6 +136,19 @@ func TestPostCreateDocumentDigitalLpa(t *testing.T) {
 		DigitalLpa: sirius.DigitalLpa{
 			SiriusData: sirius.SiriusData{
 				ID: 1344,
+				Donor: sirius.Donor{
+					ID:           12,
+					Firstname:    "Zackary",
+					Surname:      "Lemmonds",
+					DateOfBirth:  "18/04/1965",
+					AddressLine1: "9 Mount Pleasant Drive",
+					AddressLine2: "",
+					AddressLine3: "",
+					Town:         "East Harling",
+					Postcode:     "NR16 2GB",
+					Country:      "UK",
+					PersonType:   "Donor",
+				},
 				Application: sirius.Draft{
 					DonorFirstNames: "Zackary",
 					DonorLastName:   "Lemmonds",
@@ -157,19 +183,7 @@ func TestPostCreateDocumentDigitalLpa(t *testing.T) {
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeDigitalLpa).
 		Return(templateData, nil)
 	client.
-		On("CreateContact", mock.Anything, sirius.Person{
-			ID:           -1,
-			Firstname:    "Zackary",
-			Surname:      "Lemmonds",
-			PersonType:   "Donor",
-			AddressLine1: "9 Mount Pleasant Drive",
-			Town:         "East Harling",
-			Postcode:     "NR16 2GB",
-			Country:      "UK",
-		}).
-		Return(sirius.Person{ID: 4829}, nil)
-	client.
-		On("CreateDocument", mock.Anything, 1344, 4829, "DL-EXAMPLE", []string{"DL_INS_01", "DL_INS_02"}).
+		On("CreateDocument", mock.Anything, 1344, 12, "DL-EXAMPLE", []string{"DL_INS_01", "DL_INS_02"}).
 		Return(sirius.Document{}, nil)
 
 	template := &mockTemplate{}
@@ -179,7 +193,7 @@ func TestPostCreateDocumentDigitalLpa(t *testing.T) {
 	form := url.Values{
 		"templateId":       {"DL-EXAMPLE"},
 		"insert":           {"DL_INS_01", "DL_INS_02"},
-		"selectRecipients": {"-1"},
+		"selectRecipients": {"12"},
 	}
 
 	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-TWGJ-CDDJ-4NTL/documents/new", strings.NewReader(form.Encode()))
@@ -195,6 +209,19 @@ func TestPostCreateDocumentDigitalLpaInvalid(t *testing.T) {
 		DigitalLpa: sirius.DigitalLpa{
 			SiriusData: sirius.SiriusData{
 				ID: 1666,
+				Donor: sirius.Donor{
+					ID:           12,
+					Firstname:    "Zackary",
+					Surname:      "Lemmonds",
+					DateOfBirth:  "18/04/1965",
+					AddressLine1: "9 Mount Pleasant Drive",
+					AddressLine2: "",
+					AddressLine3: "",
+					Town:         "East Harling",
+					Postcode:     "NR16 2GB",
+					Country:      "UK",
+					PersonType:   "Donor",
+				},
 				Application: sirius.Draft{
 					DonorFirstNames: "Zackary",
 					DonorLastName:   "Lemmonds",
@@ -236,7 +263,7 @@ func TestPostCreateDocumentDigitalLpaInvalid(t *testing.T) {
 			DocumentTemplates:     sortDocumentData(templateData),
 			ComponentDocumentData: buildComponentDocumentData(templateData),
 			Recipients: []sirius.Person{{
-				ID:           -1,
+				ID:           12,
 				Firstname:    "Zackary",
 				Surname:      "Lemmonds",
 				PersonType:   "Donor",
