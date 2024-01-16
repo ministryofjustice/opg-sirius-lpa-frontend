@@ -63,7 +63,9 @@ describe("Create a document for a digital LPA", () => {
     cy.contains("Select document inserts");
     cy.contains("DLPA Insert 1").click();
 
-    cy.contains("1 Scotland Street, Netherton, Glasgow, Edinburgh, EH6 18J, GB");
+    cy.contains(
+      "1 Scotland Street, Netherton, Glasgow, Edinburgh, EH6 18J, GB",
+    );
     cy.contains("Steven Munnell (Donor)").click();
 
     cy.contains("button", "Continue").click();
