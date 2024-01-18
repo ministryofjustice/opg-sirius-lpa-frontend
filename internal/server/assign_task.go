@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -65,6 +66,7 @@ func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 		})
 
 		var tasksMu sync.Mutex
+		var lpa *sirius.Case
 
 		for _, taskID := range taskIDs {
 			taskID := taskID
@@ -73,6 +75,10 @@ func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 				task, err := client.Task(ctx.With(groupCtx), taskID)
 				if err != nil {
 					return err
+				}
+
+				if lpa == nil && len(task.CaseItems) > 0 {
+					lpa = &task.CaseItems[0]
 				}
 
 				tasksMu.Lock()
@@ -127,6 +133,12 @@ func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 				delete(data.Error.Field, "assigneeId")
 			} else if err != nil {
 				return err
+			} else if lpa != nil && lpa.CaseType == "DIGITAL_LPA" {
+				// redirect
+				SetFlash(w, FlashNotification{
+					Title: "Task assigned",
+				})
+				return RedirectError(fmt.Sprintf("/lpa/%s", lpa.UID))
 			} else {
 				data.Success = true
 			}
