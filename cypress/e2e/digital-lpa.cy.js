@@ -139,19 +139,19 @@ describe("View a digital LPA", () => {
   });
 
   it("shows warnings list", () => {
-    cy.get("[data-role=warnings-list] [data-role=warning]").should((elts) => {
+    cy.get(".app-caseworker-summary > div:nth-child(2) li").should((elts) => {
       expect(elts).to.have.length(3);
 
       // check donor deceased is at the top, date is properly-formatted,
       // and applies to text for 3+ cases is correct
       expect(elts[0]).to.contain("Donor Deceased");
       expect(elts[0]).to.contain(
-        "this case, M-DIGI-LPA3-5555 and M-DIGI-LPA3-6666",
+        "this case, HW M-DIGI-LPA3-5555 and PW M-DIGI-LPA3-6666",
       );
 
       // check sorting has worked properly and case applies text is correct for 2 cases
       expect(elts[1]).to.contain("Complaint Received");
-      expect(elts[1]).to.contain("this case and M-DIGI-LPA3-5555");
+      expect(elts[1]).to.contain("this case and HW M-DIGI-LPA3-5555");
 
       // check case applies text is correct for 1 case
       expect(elts[2]).to.contain("Court application in progress");
