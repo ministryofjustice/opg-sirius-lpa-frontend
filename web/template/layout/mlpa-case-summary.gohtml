@@ -13,7 +13,7 @@
 
         <div class="govuk-grid-row" data-id="case-summary" aria-expanded="true">
             <div class="govuk-grid-column-one-third">
-                <div class="govuk-!-margin-bottom-4" data-role="warnings-list">
+                <div class="govuk-!-margin-bottom-4">
                     <div class="govuk-!-margin-bottom-2">
                         <svg class="app-svg-icon--inline govuk-!-display-inline" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -2 19 19" overflow="visible">
                             <circle cx="9.5" cy="9.5" r="9.5" fill="#1D70B8"/>
@@ -25,10 +25,10 @@
                     {{ if not .CaseSummary.WarningList }}
                         <p class="govuk-body-s">There are none in place.</p>
                     {{ else }}
-                        <ul class="govuk-list" data-role="warnings-list">
+                        <ul class="govuk-list">
                             {{ $uid := .CaseSummary.DigitalLpa.UID }}
                             {{ range (sortWarningsForCaseSummary .CaseSummary.WarningList) }}
-                                <li data-role="warning">
+                                <li>
                                     <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>{{ .WarningType }}</strong></p>
                                     {{ $appliedTo := (casesWarningAppliedTo $uid .CaseItems) }}
                                     {{ if not (eq $appliedTo "") }}
