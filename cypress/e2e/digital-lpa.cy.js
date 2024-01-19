@@ -58,9 +58,7 @@ describe("View a digital LPA", () => {
           warningType: "Court application in progress",
           warningText: "Court notified",
           dateAdded: "24/08/2022 13:13:13",
-          caseItems:[
-            { uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" }
-          ]
+          caseItems: [{ uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" }],
         },
         {
           id: 22,
@@ -69,8 +67,8 @@ describe("View a digital LPA", () => {
           dateAdded: "12/12/2023 12:12:12",
           caseItems: [
             { uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" },
-            { uId: "M-DIGI-LPA3-5555", caseSubtype: "hw" }
-          ]
+            { uId: "M-DIGI-LPA3-5555", caseSubtype: "hw" },
+          ],
         },
         {
           id: 24,
@@ -80,10 +78,10 @@ describe("View a digital LPA", () => {
           caseItems: [
             { uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" },
             { uId: "M-DIGI-LPA3-5555", caseSubtype: "hw" },
-            { uId: "M-DIGI-LPA3-6666", caseSubtype: "pw" }
-          ]
-        }
-      ]
+            { uId: "M-DIGI-LPA3-6666", caseSubtype: "pw" },
+          ],
+        },
+      ],
     });
 
     cy.visit("/lpa/M-DIGI-LPA3-3333");
