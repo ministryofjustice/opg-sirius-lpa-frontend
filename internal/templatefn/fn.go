@@ -205,7 +205,7 @@ func casesWarningAppliedTo(uid string, cases []sirius.Case) string {
 	// return value:
 	// "" (only this case)
 	// or " and UID" (one other case)
-	// or ", UID1, UID2, ... and UIDn" (2 to n other cases)
+	// or ", UID1, UID2, ..., UIDn-1 and UIDn" (2 to n other cases)
 	if len(cases) == 1 {
 		return ""
 	}

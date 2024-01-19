@@ -25,23 +25,20 @@
                     {{ if not .CaseSummary.WarningList }}
                         <p class="govuk-body-s">There are none in place.</p>
                     {{ else }}
-                        {{ $uid := .CaseSummary.DigitalLpa.UID }}
-                        {{ range (sortWarningsForCaseSummary .CaseSummary.WarningList) }}
-                            <details class="govuk-details govuk-!-margin-bottom-1" data-role="warning-detail">
-                                <summary class="govuk-details__summary">
-                                    <span class="govuk-details__summary-text govuk-body-s">
-                                        {{ formatDateWithTime .DateAdded "02 Jan 2006" }} {{ .WarningType }}
-                                    </span>
-                                </summary>
-                                <div class="govuk-details__text">
-                                    <span class="govuk-body-s">
-                                        <strong>Applied to this case{{ casesWarningAppliedTo $uid .CaseItems }}</strong>
-                                        <br>
-                                        {{ .WarningText }}
-                                    </span>
-                                </div>
-                            </details>
-                        {{ end }}
+                        <ul class="govuk-list" data-role="warnings-list">
+                            {{ $uid := .CaseSummary.DigitalLpa.UID }}
+                            {{ range (sortWarningsForCaseSummary .CaseSummary.WarningList) }}
+                                <li data-role="warning">
+                                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>{{ .WarningType }}</strong></p>
+                                    {{ $appliedTo := (casesWarningAppliedTo $uid .CaseItems) }}
+                                    {{ if not (eq $appliedTo "") }}
+                                        <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">Applied to this case{{ $appliedTo }}</p>
+                                    {{ end }}
+                                    <p class="govuk-body-s govuk-!-margin-bottom-1">{{ .WarningText }}</p>
+                                    <hr>
+                                </li>
+                            {{ end }}
+                        </ul>
                     {{ end }}
                 </div>
                 <svg class="app-svg-icon--inline" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -2 19 19" overflow="visible">
