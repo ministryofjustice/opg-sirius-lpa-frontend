@@ -49,6 +49,43 @@ describe("View a digital LPA", () => {
         },
       },
     });
+
+    cy.addMock("/lpa-api/v1/cases/333/warnings", "GET", {
+      status: 200,
+      body: [
+        {
+          id: 44,
+          warningType: "Court application in progress",
+          warningText: "Court notified",
+          dateAdded: "24/08/2022 13:13:13",
+          caseItems:[
+            { uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" }
+          ]
+        },
+        {
+          id: 22,
+          warningType: "Complaint Received",
+          warningText: "Complaint from donor",
+          dateAdded: "12/12/2023 12:12:12",
+          caseItems: [
+            { uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" },
+            { uId: "M-DIGI-LPA3-5555", caseSubtype: "hw" }
+          ]
+        },
+        {
+          id: 24,
+          warningType: "Donor Deceased",
+          warningText: "Advised of donor death",
+          dateAdded: "05/01/2022 10:10:00",
+          caseItems: [
+            { uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" },
+            { uId: "M-DIGI-LPA3-5555", caseSubtype: "hw" },
+            { uId: "M-DIGI-LPA3-6666", caseSubtype: "pw" }
+          ]
+        }
+      ]
+    });
+
     cy.visit("/lpa/M-DIGI-LPA3-3333");
   });
 
