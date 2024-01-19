@@ -202,8 +202,9 @@ func sortWarningsForCaseSummary(warnings []sirius.Warning) []sirius.Warning {
 func casesWarningAppliedTo(uid string, cases []sirius.Case) string {
 	// return value:
 	// "" (only this case)
-	// or " and UID" (one other case)
-	// or ", UID1, UID2, ..., UIDn-1 and UIDn" (2 to n other cases)
+	// or " and <subtype (hw|pw)> <uid>" (one other case)
+	// or ", <subtype (hw|pw)> <uid_1>, <subtype (hw|pw)> <uid_2>, ...,
+	// <subtype (hw|pw)> <uid_n-1> and <subtype (hw|pw)> <uid_n>" (2 to n other cases)
 	if len(cases) == 1 {
 		return ""
 	}
@@ -223,6 +224,8 @@ func casesWarningAppliedTo(uid string, cases []sirius.Case) string {
 		} else {
 			b.WriteString(", ")
 		}
+		b.WriteString(strings.ToUpper(caseItem.SubType))
+		b.WriteString(" ")
 		b.WriteString(caseItem.UID)
 	}
 
