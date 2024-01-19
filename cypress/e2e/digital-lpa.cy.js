@@ -102,26 +102,24 @@ describe("View a digital LPA", () => {
   });
 
   it("shows warnings list", () => {
-    cy.get("[data-role=warnings-list] [data-role=warning]").should(
-      (elts) => {
-        expect(elts).to.have.length(3);
+    cy.get("[data-role=warnings-list] [data-role=warning]").should((elts) => {
+      expect(elts).to.have.length(3);
 
-        // check donor deceased is at the top, date is properly-formatted,
-        // and applies to text for 3+ cases is correct
-        expect(elts[0]).to.contain("Donor Deceased");
-        expect(elts[0]).to.contain(
-          "this case, M-DIGI-LPA3-5555 and M-DIGI-LPA3-6666",
-        );
+      // check donor deceased is at the top, date is properly-formatted,
+      // and applies to text for 3+ cases is correct
+      expect(elts[0]).to.contain("Donor Deceased");
+      expect(elts[0]).to.contain(
+        "this case, M-DIGI-LPA3-5555 and M-DIGI-LPA3-6666",
+      );
 
-        // check sorting has worked properly and case applies text is correct for 2 cases
-        expect(elts[1]).to.contain("Complaint Received");
-        expect(elts[1]).to.contain("this case and M-DIGI-LPA3-5555");
+      // check sorting has worked properly and case applies text is correct for 2 cases
+      expect(elts[1]).to.contain("Complaint Received");
+      expect(elts[1]).to.contain("this case and M-DIGI-LPA3-5555");
 
-        // check case applies text is correct for 1 case
-        expect(elts[2]).to.contain("Court application in progress");
-        expect(elts[2]).not.to.contain("this case");
-      },
-    );
+      // check case applies text is correct for 1 case
+      expect(elts[2]).to.contain("Court application in progress");
+      expect(elts[2]).not.to.contain("this case");
+    });
   });
 
   it("creates a task via case actions", () => {
