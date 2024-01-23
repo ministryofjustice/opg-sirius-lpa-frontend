@@ -15,7 +15,7 @@
     "watch": "yarn build:js --watch=forever & yarn build:css --watch"
   },
   "dependencies": {
-    "@ministryofjustice/frontend": "1.8.1",
+    "@ministryofjustice/frontend": "2.0.0",
     "accessible-autocomplete": "^2.0.4",
     "cypress": "13.6.3",
     "govuk-frontend": "^4.4.0",
