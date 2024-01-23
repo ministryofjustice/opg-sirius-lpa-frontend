@@ -72,19 +72,19 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 
 		lpa := data.CaseSummary.DigitalLpa
 
-		donorPlaceholder := sirius.Person{
-			ID:           -1,
-			Firstname:    lpa.SiriusData.Application.DonorFirstNames,
-			Surname:      lpa.SiriusData.Application.DonorLastName,
-			PersonType:   "Donor",
-			AddressLine1: lpa.SiriusData.Application.DonorAddress.Line1,
-			AddressLine2: lpa.SiriusData.Application.DonorAddress.Line2,
-			AddressLine3: lpa.SiriusData.Application.DonorAddress.Line3,
-			Town:         lpa.SiriusData.Application.DonorAddress.Town,
-			Postcode:     lpa.SiriusData.Application.DonorAddress.Postcode,
-			Country:      lpa.SiriusData.Application.DonorAddress.Country,
+		donorRecipient := sirius.Person{
+			ID:           lpa.SiriusData.Donor.ID,
+			Firstname:    lpa.SiriusData.Donor.Firstname,
+			Surname:      lpa.SiriusData.Donor.Surname,
+			PersonType:   lpa.SiriusData.Donor.PersonType,
+			AddressLine1: lpa.SiriusData.Donor.AddressLine1,
+			AddressLine2: lpa.SiriusData.Donor.AddressLine2,
+			AddressLine3: lpa.SiriusData.Donor.AddressLine3,
+			Town:         lpa.SiriusData.Donor.Town,
+			Postcode:     lpa.SiriusData.Donor.Postcode,
+			Country:      lpa.SiriusData.Donor.Country,
 		}
-		data.Recipients = append(data.Recipients, donorPlaceholder)
+		data.Recipients = append(data.Recipients, donorRecipient)
 
 		if r.Method == "POST" {
 			// set data
@@ -118,13 +118,6 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 			for _, recipient := range data.Recipients {
 				if !slices.Contains(data.SelectedRecipients, recipient.ID) {
 					continue
-				}
-
-				if recipient.ID == donorPlaceholder.ID {
-					recipient, err = client.CreateContact(ctx, donorPlaceholder)
-					if err != nil {
-						return err
-					}
 				}
 
 				_, err = client.CreateDocument(ctx, lpa.SiriusData.ID, recipient.ID, data.SelectedTemplateId, data.SelectedInserts)
