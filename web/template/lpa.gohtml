@@ -32,10 +32,10 @@
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">Case type</dt>
           <dd class="govuk-summary-list__value">
-            {{ if (eq .DigitalLpa.SiriusData.Subtype "hw") }}
-              LPA Health and welfare
+            {{ if (eq .DigitalLpa.SiriusData.Subtype "personal-welfare") }}
+              LPA Personal welfare
             {{ else }}
-              LPA Property and finance
+              LPA Property and affairs
             {{ end }}
           </dd>
         </div>
