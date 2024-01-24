@@ -82,7 +82,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "{\"opg.poas.sirius\":{\"application\":{\"correspondentAddress\":{\"addressLine1\":\"Main Line Bungalow\",\"addressLine2\":\"Himmerton Lane\",\"addressLine3\":\"Sutton\",\"country\":\"GB\",\"postcode\":\"S24 7DJ\",\"town\":\"Scarsdale\"},\"correspondentFirstNames\":\"Heath\",\"correspondentLastName\":\"Enstad\",\"donorAddress\":{\"addressLine1\":\"Apartment 24\",\"addressLine2\":\"Navigation Building\",\"addressLine3\":\"90 London Road\",\"country\":\"GB\",\"postcode\":\"B15 4TA\",\"town\":\"Birmingham\"},\"donorDob\":\"27/05/1978\",\"donorEmail\":\"zswanberg@host.example\",\"donorFirstNames\":\"Zoraida\",\"donorLastName\":\"Swanberg\",\"donorPhone\":\"073456249524\"},\"caseSubtype\":\"pfa\",\"complaintCount\":1,\"createdDate\":\"26/03/2018\",\"investigationCount\":2,\"status\":\"Draft\",\"taskCount\":3,\"id\":800,\"warningCount\":4},\"uId\":\"M-1234-9876-4567\"}"
+        "body": "{\"opg.poas.sirius\":{\"application\":{\"correspondentAddress\":{\"addressLine1\":\"Main Line Bungalow\",\"addressLine2\":\"Himmerton Lane\",\"addressLine3\":\"Sutton\",\"country\":\"GB\",\"postcode\":\"S24 7DJ\",\"town\":\"Scarsdale\"},\"correspondentFirstNames\":\"Heath\",\"correspondentLastName\":\"Enstad\",\"donorAddress\":{\"addressLine1\":\"Apartment 24\",\"addressLine2\":\"Navigation Building\",\"addressLine3\":\"90 London Road\",\"country\":\"GB\",\"postcode\":\"B15 4TA\",\"town\":\"Birmingham\"},\"donorDob\":\"27/05/1978\",\"donorEmail\":\"zswanberg@host.example\",\"donorFirstNames\":\"Zoraida\",\"donorLastName\":\"Swanberg\",\"donorPhone\":\"073456249524\"},\"caseSubtype\":\"property-and-affairs\",\"complaintCount\":1,\"createdDate\":\"26/03/2018\",\"investigationCount\":2,\"status\":\"Draft\",\"taskCount\":3,\"id\":800,\"warningCount\":4},\"uId\":\"M-1234-9876-4567\"}"
       }
     },
     {
@@ -94,7 +94,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "{\"opg.poas.sirius\":{\"application\":{\"correspondentAddress\":{\"addressLine1\":\"Main Line Bungalow\",\"addressLine2\":\"Himmerton Lane\",\"addressLine3\":\"Sutton\",\"country\":\"GB\",\"postcode\":\"S24 7DJ\",\"town\":\"Scarsdale\"},\"correspondentFirstNames\":\"Heath\",\"correspondentLastName\":\"Enstad\",\"donorAddress\":{\"addressLine1\":\"Apartment 24\",\"addressLine2\":\"Navigation Building\",\"addressLine3\":\"90 London Road\",\"country\":\"GB\",\"postcode\":\"B15 4TA\",\"town\":\"Birmingham\"},\"donorDob\":\"27/05/1978\",\"donorEmail\":\"zswanberg@host.example\",\"donorFirstNames\":\"Zoraida\",\"donorLastName\":\"Swanberg\",\"donorPhone\":\"073456249524\"},\"caseSubtype\":\"pfa\",\"complaintCount\":1,\"createdDate\":\"31/08/2023\",\"investigationCount\":2,\"status\":\"Draft\",\"taskCount\":3,\"id\":900,\"warningCount\":4},\"uId\":\"M-9999-4567-AAAA\"}"
+        "body": "{\"opg.poas.sirius\":{\"application\":{\"correspondentAddress\":{\"addressLine1\":\"Main Line Bungalow\",\"addressLine2\":\"Himmerton Lane\",\"addressLine3\":\"Sutton\",\"country\":\"GB\",\"postcode\":\"S24 7DJ\",\"town\":\"Scarsdale\"},\"correspondentFirstNames\":\"Heath\",\"correspondentLastName\":\"Enstad\",\"donorAddress\":{\"addressLine1\":\"Apartment 24\",\"addressLine2\":\"Navigation Building\",\"addressLine3\":\"90 London Road\",\"country\":\"GB\",\"postcode\":\"B15 4TA\",\"town\":\"Birmingham\"},\"donorDob\":\"27/05/1978\",\"donorEmail\":\"zswanberg@host.example\",\"donorFirstNames\":\"Zoraida\",\"donorLastName\":\"Swanberg\",\"donorPhone\":\"073456249524\"},\"caseSubtype\":\"property-and-affairs\",\"complaintCount\":1,\"createdDate\":\"31/08/2023\",\"investigationCount\":2,\"status\":\"Draft\",\"taskCount\":3,\"id\":900,\"warningCount\":4},\"uId\":\"M-9999-4567-AAAA\"}"
       }
     },
     {
@@ -124,7 +124,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "{\"cases\":[{\"id\":333,\"uId\":\"M-DIGI-LPA3-3333\",\"caseSubtype\":\"hw\",\"caseType\":\"DIGITAL_LPA\"}]}"
+        "body": "{\"cases\":[{\"id\":333,\"uId\":\"M-DIGI-LPA3-3333\",\"caseSubtype\":\"personal-welfare\",\"caseType\":\"DIGITAL_LPA\"}]}"
       }
     },
     {
@@ -536,7 +536,7 @@
       "response": {
         "status": 201,
         "headers": { "Content-Type": "application/json" },
-        "body": "[{\"caseSubtype\":\"hw\",\"uId\":\"M-GHIJ-7890-KLMN\"}]"
+        "body": "[{\"caseSubtype\":\"personal-welfare\",\"uId\":\"M-GHIJ-7890-KLMN\"}]"
       }
     },
     {
@@ -545,7 +545,7 @@
       "response": {
         "status": 201,
         "headers": { "Content-Type": "application/json" },
-        "body": "[{\"caseSubtype\":\"hw\",\"uId\":\"M-GHIJ-7890-KLMN\"},{\"caseSubtype\":\"pfa\",\"uId\":\"M-ABCD-1234-EF56\"}]"
+        "body": "[{\"caseSubtype\":\"personal-welfare\",\"uId\":\"M-GHIJ-7890-KLMN\"},{\"caseSubtype\":\"property-and-affairs\",\"uId\":\"M-ABCD-1234-EF56\"}]"
       }
     },
     {

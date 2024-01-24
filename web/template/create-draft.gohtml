@@ -7,11 +7,11 @@
     <div class="govuk-panel govuk-panel--confirmation">
       <h1 class="govuk-panel__title">
         {{ if (eq (len .Uids) 2) }}
-          Draft Health and Welfare and Property and Finance LPAs for the donor
+          Draft Personal welfare and Property and affairs LPAs for the donor
           {{ .Form.DonorFirstname }} {{ .Form.DonorMiddlename }} {{ .Form.DonorSurname }} have been saved
         {{ else }}
           A draft
-            {{ range .Uids }}{{ if eq .Subtype "hw" }}Health and Welfare{{ else if eq .Subtype "pfa" }}Property and Finance{{ end }} {{ end }}
+            {{ range .Uids }}{{ if eq .Subtype "personal-welfare" }}Personal welfare{{ else if eq .Subtype "property-and-affairs" }}Property and affairs{{ end }} {{ end }}
           LPA for the donor {{ .Form.DonorFirstname }} {{ .Form.DonorMiddlename }} {{ .Form.DonorSurname }} has been saved
         {{ end }}
       </h1>
@@ -19,7 +19,7 @@
         <p>Please inform the caller of their case reference number [insert when/how]</p>
         <p>
           {{ range .Uids }}
-            <div><strong>{{ if eq .Subtype "hw" }}Health and Welfare{{ else if eq .Subtype "pfa" }}Property and Finance{{ end }} case reference number is {{ .Uid }}</strong></div>
+            <div><strong>{{ if eq .Subtype "personal-welfare" }}Personal welfare{{ else if eq .Subtype "property-and-affairs" }}Property and affairs{{ end }} case reference number is {{ .Uid }}</strong></div>
           {{ end }}
         </p>
         <p><a class="govuk-link govuk-link--inverse" href="{{ prefix (printf "/lpa/%s" (index .Uids 0).Uid ) }}">View donor record</a></p>
@@ -52,7 +52,7 @@
               <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                 <div class="govuk-checkboxes__item">
                   <input class="govuk-checkboxes__input" id="f-type-hw"
-                          name="subtype" type="checkbox" value="hw" {{ if contains .Form.SubTypes "hw" }}checked{{ end }}>
+                          name="subtype" type="checkbox" value="personal-welfare" {{ if contains .Form.SubTypes "personal-welfare" }}checked{{ end }}>
                   <label class="govuk-label govuk-checkboxes__label"
                           for="f-type-hw">
                     Health and welfare
@@ -60,7 +60,7 @@
                 </div>
                 <div class="govuk-checkboxes__item">
                   <input class="govuk-checkboxes__input" id="f-type-pfa"
-                          name="subtype" type="checkbox" value="pfa" {{ if contains .Form.SubTypes "pfa" }}checked{{ end }}>
+                          name="subtype" type="checkbox" value="property-and-affairs" {{ if contains .Form.SubTypes "property-and-affairs" }}checked{{ end }}>
                   <label class="govuk-label govuk-checkboxes__label"
                           for="f-type-pfa">
                     Property and finance
