@@ -51,19 +51,19 @@
               {{ template "errors" .Error.Field.types }}
               <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                 <div class="govuk-checkboxes__item">
-                  <input class="govuk-checkboxes__input" id="f-type-hw"
+                  <input class="govuk-checkboxes__input" id="f-type-personal-welfare"
                           name="subtype" type="checkbox" value="personal-welfare" {{ if contains .Form.SubTypes "personal-welfare" }}checked{{ end }}>
                   <label class="govuk-label govuk-checkboxes__label"
-                          for="f-type-hw">
-                    Health and welfare
+                          for="f-type-personal-welfare">
+                    Personal welfare
                   </label>
                 </div>
                 <div class="govuk-checkboxes__item">
-                  <input class="govuk-checkboxes__input" id="f-type-pfa"
+                  <input class="govuk-checkboxes__input" id="f-type-property-and-affairs"
                           name="subtype" type="checkbox" value="property-and-affairs" {{ if contains .Form.SubTypes "property-and-affairs" }}checked{{ end }}>
                   <label class="govuk-label govuk-checkboxes__label"
-                          for="f-type-pfa">
-                    Property and finance
+                          for="f-type-property-and-affairs">
+                    Property and affairs
                   </label>
                 </div>
               </div>

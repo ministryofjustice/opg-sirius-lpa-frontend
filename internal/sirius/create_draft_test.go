@@ -26,7 +26,7 @@ func TestCreateDraft(t *testing.T) {
 		{
 			name: "Minimal",
 			draftData: Draft{
-				CaseType:        []string{"hw"},
+				CaseType:        []string{"personal-welfare"},
 				Source:          "PHONE",
 				DonorFirstNames: "Coleen",
 				DonorLastName:   "Morneault",
@@ -50,7 +50,7 @@ func TestCreateDraft(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"types":           []string{"hw"},
+							"types":           []string{"personal-welfare"},
 							"source":          "PHONE",
 							"donorFirstNames": "Coleen",
 							"donorLastName":   "Morneault",
@@ -68,20 +68,20 @@ func TestCreateDraft(t *testing.T) {
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 						Body: []map[string]interface{}{
 							{
-								"caseSubtype": dsl.String("hw"),
+								"caseSubtype": dsl.String("personal-welfare"),
 								"uId":         dsl.Regex("M-GHIJ-7890-KLMN", `^M(-[0-9A-Z]{4}){3}$`),
 							},
 						},
 					})
 			},
 			expectedResponse: map[string]string{
-				"hw": "M-GHIJ-7890-KLMN",
+				"personal-welfare": "M-GHIJ-7890-KLMN",
 			},
 		},
 		{
 			name: "All possible details",
 			draftData: Draft{
-				CaseType:        []string{"hw", "pfa"},
+				CaseType:        []string{"personal-welfare", "property-and-affairs"},
 				Source:          "PHONE",
 				DonorFirstNames: "Coleen Stephanie",
 				DonorLastName:   "Morneault",
@@ -121,7 +121,7 @@ func TestCreateDraft(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"types":           []string{"hw", "pfa"},
+							"types":           []string{"personal-welfare", "property-and-affairs"},
 							"source":          "PHONE",
 							"donorFirstNames": "Coleen Stephanie",
 							"donorLastName":   "Morneault",
@@ -154,19 +154,19 @@ func TestCreateDraft(t *testing.T) {
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 						Body: []map[string]interface{}{
 							{
-								"caseSubtype": dsl.String("hw"),
+								"caseSubtype": dsl.String("personal-welfare"),
 								"uId":         dsl.Regex("M-GHIJ-7890-KLMN", `^M(-[0-9A-Z]{4}){3}$`),
 							},
 							{
-								"caseSubtype": dsl.String("pfa"),
+								"caseSubtype": dsl.String("property-and-affairs"),
 								"uId":         dsl.Regex("M-ABCD-1234-EF56", `^M(-[0-9A-Z]{4}){3}$`),
 							},
 						},
 					})
 			},
 			expectedResponse: map[string]string{
-				"pfa": "M-ABCD-1234-EF56",
-				"hw":  "M-GHIJ-7890-KLMN",
+				"personal-welfare":  "M-GHIJ-7890-KLMN",
+				"property-and-affairs": "M-ABCD-1234-EF56",
 			},
 		},
 	}

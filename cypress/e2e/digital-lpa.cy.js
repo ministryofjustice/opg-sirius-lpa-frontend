@@ -8,7 +8,7 @@ describe("View a digital LPA", () => {
           id: 333,
           uId: "M-DIGI-LPA3-3333",
           status: "Draft",
-          caseSubtype: "pfa",
+          caseSubtype: "property-and-affairs",
           createdDate: "31/10/2023",
           investigationCount: 2,
           complaintCount: 1,
