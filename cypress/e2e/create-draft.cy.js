@@ -13,8 +13,8 @@ describe("Create Digital LPA draft", () => {
   it("creates a digital LPA", () => {
     cy.contains("Create a draft LPA");
 
-    cy.contains("Health and welfare").click();
-    cy.contains("Property and finance").click();
+    cy.contains("Personal welfare").click();
+    cy.contains("Property and affairs").click();
 
     cy.get("#f-donorFirstname").type("Coleen");
     cy.get("#f-donorMiddlename").type("Stephanie");
@@ -74,13 +74,13 @@ describe("Create Digital LPA draft", () => {
 
     cy.contains("Save draft LPA").click();
     cy.get(".govuk-panel").contains(
-      "Draft Health and Welfare and Property and Finance LPAs for the donor Coleen Stephanie Morneault have been saved",
+      "Draft Personal welfare and Property and affairs LPAs for the donor Coleen Stephanie Morneault have been saved",
     );
     cy.get(".govuk-panel").contains(
-      "Health and Welfare case reference number is M-GHIJ-7890-KLMN",
+      "Personal welfare case reference number is M-GHIJ-7890-KLMN",
     );
     cy.get(".govuk-panel").contains(
-      "Property and Finance case reference number is M-ABCD-1234-EF56",
+      "Property and affairs case reference number is M-ABCD-1234-EF56",
     );
   });
 });
