@@ -19,7 +19,7 @@
                     <td class="govuk-table__cell">{{ .OnlineLpaId }}</td>
                     <td class="govuk-table__cell">
                         {{ if .Status }}
-                            {{ template "status-tag" (ToLower .Status) }}
+                            {{ template "status-tag" .Status }}
                         {{ end }}
                     </td>
                     <td class="govuk-table__cell">{{ .Reason }}</td>

@@ -10,7 +10,7 @@
             {{ range .SortedLinkedCases }}
                 <li class="moj-sub-navigation__item">
                     <a class="moj-sub-navigation__link" {{ if eq $.CaseSummary.DigitalLpa.UID .UID }}aria-current="page"{{ end }} href="{{ prefix (printf "/lpa/%s" .UID ) }}">
-                        {{ template "status-tag" (ToLower $.CaseSummary.DigitalLpa.SiriusData.Status) }} {{ ToUpper .Subtype }} {{ .UID }}
+                        {{ template "status-tag" $.CaseSummary.DigitalLpa.SiriusData.Status }} {{ ToUpper .Subtype }} {{ .UID }}
                     </a>
                 </li>
             {{ end }}
