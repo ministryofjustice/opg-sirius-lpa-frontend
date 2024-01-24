@@ -92,9 +92,8 @@
                                 </td>
                                 <td class="govuk-table__cell">
                                     {{ range $case := .Cases }}
-                                        {{ $status := (ToLower $case.Status) }}
-                                        {{ if $status }}
-                                            {{ template "status-tag" (ToLower $case.Status) }}<br>
+                                        {{ if $case.Status }}
+                                            {{ template "status-tag" $case.Status }}<br>
                                         {{ end }}
                                     {{ end }}
                                 </td>
