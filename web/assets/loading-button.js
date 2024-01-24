@@ -8,13 +8,13 @@ const loadingButton = () => {
     loadingButton.addEventListener(
       "click",
       (e) => {
-        if (loadingButton.classList.contains("govuk-button--disabled")) {
+        if (loadingButton.hasAttribute("disabled")) {
           e.preventDefault();
           return false;
         }
 
         loadingButton.ariaDisabled = "true";
-        loadingButton.classList.add("govuk-button--disabled");
+        loadingButton.setAttribute("disabled", "true");
 
         const messageSelector =
           loadingButton.getAttribute("data-loading-button-message") ?? "";

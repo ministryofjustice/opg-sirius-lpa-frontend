@@ -91,7 +91,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			return i - 1
 		},
 		"statusColour": func(s string) string {
-			switch s {
+			switch strings.ToLower(s) {
 			case "registered":
 				return "green"
 			case "perfect":
