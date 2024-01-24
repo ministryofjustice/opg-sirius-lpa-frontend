@@ -21,9 +21,7 @@ describe("MI Reporting", () => {
     });
 
     cy.contains("a", "Download").click();
-    cy.contains("a", "Download")
-      .invoke("attr", "class")
-      .should("contain", "govuk-button--disabled");
+    cy.contains("a", "Download").should("have.attr", "disabled");
     cy.contains("Your download will open in a new window when ready");
   });
 });

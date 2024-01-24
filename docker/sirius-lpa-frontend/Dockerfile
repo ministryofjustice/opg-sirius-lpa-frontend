@@ -11,6 +11,7 @@ COPY yarn.lock .
 RUN yarn
 
 COPY web/assets web/assets
+COPY moj-frontend node_modules/@ministryofjustice/frontend
 RUN yarn build
 
 FROM golang:1.21.6 as build-env
