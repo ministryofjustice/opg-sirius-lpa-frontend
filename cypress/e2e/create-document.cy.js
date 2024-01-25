@@ -38,9 +38,10 @@ describe("Create a document", () => {
 
   it("create document button is disabled if recipient is not selected", () => {
     cy.contains("Select a recipient");
-    cy.contains("button", "Create draft document")
-      .invoke("attr", "class")
-      .should("contain", "govuk-button--disabled");
+    cy.contains("button", "Create draft document").should(
+      "have.attr",
+      "disabled",
+    );
     cy.get("#f-recipient-189").click();
     cy.contains("button", "Create draft document")
       .invoke("attr", "class")

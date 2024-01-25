@@ -89,7 +89,7 @@ describe("Search", () => {
       $row.should("contain", "Bob Smith");
       $row.should("contain", "17/03/1990");
       $row.should("contain", "123 Somewhere Road");
-      $row.should("contain", "perfect");
+      $row.should("contain", "Perfect");
       $row.should("contain", "LPA - PFA");
       $row
         .contains("7000-5382-4438")
@@ -101,8 +101,8 @@ describe("Search", () => {
       const $row = cy.get("table > tbody > tr");
       $row.should("contain", "Bob Jones");
       $row.should("contain", "123 Somewhere Road");
-      $row.should("contain", "perfect");
-      $row.should("contain", "pending");
+      $row.should("contain", "Perfect");
+      $row.should("contain", "Pending");
       $row.should("contain", "LPA - PFA");
       $row.should("contain", "LPA - HW");
       cy.contains("7000-5382-4438")
@@ -167,7 +167,7 @@ describe("Search", () => {
     it("finds a deleted case", () => {
       const $row = cy.get("table > tbody > tr");
       $row.should("contain", "LPA was not paid for after 12 months");
-      $row.should("contain", "return - unpaid");
+      $row.should("contain", "Return - unpaid");
       $row.should("contain", "02/12/2022");
       $row.should("contain", "LPA");
       $row.should("contain", "deleted");
