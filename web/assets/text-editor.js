@@ -5,6 +5,8 @@ import "tinymce/plugins/paste";
 import "tinymce/plugins/lists";
 
 const textEditor = () => {
+  const prefix = document.body.getAttribute("data-prefix");
+
   tinymce.init({
     selector: "#documentTextEditor",
     menubar: false,
@@ -17,7 +19,8 @@ const textEditor = () => {
     gecko_spellcheck: true,
     height: 300,
     cache_suffix: "?v=5.10.7",
-    content_css: getContentCSSPath(),
+    content_css: prefix + "/stylesheets/all.css",
+    base_url: prefix + "/javascript",
     body_class: document.documentElement.classList.contains(
       "app-!-html-class--dark",
     )
@@ -27,11 +30,3 @@ const textEditor = () => {
 };
 
 export default textEditor;
-
-function getContentCSSPath() {
-  const prefix = document.body.getAttribute("data-prefix");
-
-  return window.self !== window.parent
-    ? "../frontend/stylesheets/all.css"
-    : prefix + "/stylesheets/all.css";
-}
