@@ -11,7 +11,7 @@
           {{ .Form.DonorFirstname }} {{ .Form.DonorMiddlename }} {{ .Form.DonorSurname }} have been saved
         {{ else }}
           A draft
-            {{ range .Uids }}{{ if eq .Subtype "personal-welfare" }}Personal welfare{{ else if eq .Subtype "property-and-affairs" }}Property and affairs{{ end }} {{ end }}
+            {{ range .Uids }}{{ subtypeLongFormat .Subtype }} {{ end }}
           LPA for the donor {{ .Form.DonorFirstname }} {{ .Form.DonorMiddlename }} {{ .Form.DonorSurname }} has been saved
         {{ end }}
       </h1>
@@ -19,7 +19,7 @@
         <p>Please inform the caller of their case reference number [insert when/how]</p>
         <p>
           {{ range .Uids }}
-            <div><strong>{{ if eq .Subtype "personal-welfare" }}Personal welfare{{ else if eq .Subtype "property-and-affairs" }}Property and affairs{{ end }} case reference number is {{ .Uid }}</strong></div>
+            <div><strong>{{ subtypeLongFormat .Subtype }} case reference number is {{ .Uid }}</strong></div>
           {{ end }}
         </p>
         <p><a class="govuk-link govuk-link--inverse" href="{{ prefix (printf "/lpa/%s" (index .Uids 0).Uid ) }}">View donor record</a></p>

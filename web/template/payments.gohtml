@@ -6,7 +6,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <h1 class="govuk-heading-s govuk-!-padding-bottom-2">
-                <strong>{{ if eq .Case.SubType "property-and-affairs" }}PA{{ else if eq .Case.SubType "personal-welfare" }}PW{{ else if eq .Case.SubType "hw" }}HW{{ else if eq .Case.SubType "pfa" }}PFA{{ end }} {{ .Case.UID }}</strong>
+                <strong>{{ subtypeShortFormat .Case.SubType }} {{ .Case.UID }}</strong>
             </h1>
 
             {{ if .FlashMessage.Title }}
