@@ -31,7 +31,7 @@
                 <div class="govuk-body">
                     <a href="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .Case.CaseType) }}" class="govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-0">Back</a>
                     <div class="app-!-float-right">
-                        {{ if eq .Case.SubType "pfa" }}PFA{{ else if eq .Case.SubType "hw" }}HW{{ else if eq .Case.SubType "property-and-affairs" }}PA{{ else if eq .Case.SubType "personal-welfare"}}PW{{ end }} {{ .Case.UID }}
+                        {{ subtypeShortFormat .Subtype }} {{ .Case.UID }}
                     </div>
                 </div>
 

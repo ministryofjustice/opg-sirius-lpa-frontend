@@ -87,7 +87,7 @@
                         <td class="govuk-table__cell">
                             {{ if eq .Direction "Incoming" }}
                                 {{ .Type }}
-                                {{ if .SubType }}<br />&ndash; {{ .SubType }}{{ end }}
+                                {{ if .SubType }}<br />&ndash; {{ subtypeShortFormat .SubType }}{{ end }}
                             {{ else if eq .Direction "Outgoing" }}
                                 {{ .SystemType }}
                             {{ end }}

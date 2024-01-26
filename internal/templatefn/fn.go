@@ -135,6 +135,36 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"join": func(s []string, joiner string) string {
 			return strings.Join(s, joiner)
 		},
+		// 2-3 character LPA subtype, upper-cased
+		"subtypeShortFormat": func(subtype string) string {
+			switch strings.ToLower(subtype) {
+				case "personal-welfare":
+					return "PW"
+				case "property-and-affairs":
+					return "PA"
+				case "hw":
+					return "HW"
+				case "pfa":
+					return "PFA"
+				default:
+					return ""
+			}
+		},
+		// full text for LPA subtype, e.g. "Personal welfare"
+		"subtypeLongFormat": func(subtype string) string {
+			switch strings.ToLower(subtype) {
+				case "personal-welfare":
+					return "Personal welfare"
+				case "property-and-affairs":
+					return "Property and affairs"
+				case "hw":
+					return "Health and welfare"
+				case "pfa":
+					return "Property and financial affairs"
+				default:
+					return ""
+			}
+		},
 	}
 }
 
