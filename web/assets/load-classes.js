@@ -1,6 +1,8 @@
-document.body.className = document.body.className
-  ? document.body.className + " js-enabled"
-  : "js-enabled";
+document.body.className +=
+  " js-enabled" +
+  ("noModule" in HTMLScriptElement.prototype
+    ? " govuk-frontend-supported"
+    : "");
 
 if (window.self !== window.parent) {
   document.documentElement.className += " app-!-html-class--embedded";
