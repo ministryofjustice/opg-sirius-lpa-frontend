@@ -49,6 +49,41 @@ describe("View a digital LPA", () => {
         },
       },
     });
+
+    cy.addMock("/lpa-api/v1/cases/333/warnings", "GET", {
+      status: 200,
+      body: [
+        {
+          id: 44,
+          warningType: "Court application in progress",
+          warningText: "Court notified",
+          dateAdded: "24/08/2022 13:13:13",
+          caseItems: [{ uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" }],
+        },
+        {
+          id: 22,
+          warningType: "Complaint Received",
+          warningText: "Complaint from donor",
+          dateAdded: "12/12/2023 12:12:12",
+          caseItems: [
+            { uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" },
+            { uId: "M-DIGI-LPA3-5555", caseSubtype: "hw" },
+          ],
+        },
+        {
+          id: 24,
+          warningType: "Donor Deceased",
+          warningText: "Advised of donor death",
+          dateAdded: "05/01/2022 10:10:00",
+          caseItems: [
+            { uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" },
+            { uId: "M-DIGI-LPA3-5555", caseSubtype: "hw" },
+            { uId: "M-DIGI-LPA3-6666", caseSubtype: "pw" },
+          ],
+        },
+      ],
+    });
+
     cy.visit("/lpa/M-DIGI-LPA3-3333");
   });
 
@@ -82,8 +117,7 @@ describe("View a digital LPA", () => {
     cy.contains("DD-4");
   });
 
-  it("shows task list", () => {
-    cy.contains("M-DIGI-LPA3-3333");
+  it("shows task table", () => {
     cy.get(
       "table[data-role=tasks-table] [data-role=tasks-table-header] tr th",
     ).should((elts) => {
@@ -99,6 +133,27 @@ describe("View a digital LPA", () => {
       expect(elts).to.contain("Review application correspondence");
       expect(elts).to.contain("Another task");
       expect(elts).to.contain("Reassign task");
+    });
+  });
+
+  it("shows warnings list", () => {
+    cy.get(".app-caseworker-summary > div:nth-child(2) li").should((elts) => {
+      expect(elts).to.have.length(3);
+
+      // check donor deceased is at the top, date is properly-formatted,
+      // and applies to text for 3+ cases is correct
+      expect(elts[0]).to.contain("Donor Deceased");
+      expect(elts[0]).to.contain(
+        "this case, HW M-DIGI-LPA3-5555 and PW M-DIGI-LPA3-6666",
+      );
+
+      // check sorting has worked properly and case applies text is correct for 2 cases
+      expect(elts[1]).to.contain("Complaint Received");
+      expect(elts[1]).to.contain("this case and HW M-DIGI-LPA3-5555");
+
+      // check case applies text is correct for 1 case
+      expect(elts[2]).to.contain("Court application in progress");
+      expect(elts[2]).not.to.contain("this case");
     });
   });
 
