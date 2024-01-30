@@ -39,6 +39,8 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"select":   select_,
 		"options":  options,
 		"caseTabs": caseTab,
+		"sortWarningsForCaseSummary": sortWarningsForCaseSummary,
+		"casesWarningAppliedTo": casesWarningAppliedTo,
 		"fee": func(amount int) string {
 			float := float64(amount)
 			return fmt.Sprintf("%.2f", float/100)
@@ -170,6 +172,66 @@ func caseTab(caseSummary sirius.CaseSummary, tabName string) CaseTabData {
 		SortedLinkedCases: linkedCases,
 		TabName:           tabName,
 	}
+}
+
+// sort warnings to show in case summary, donor deceased first, then in
+// descending date order
+func sortWarningsForCaseSummary(warnings []sirius.Warning) []sirius.Warning {
+	sort.Slice(warnings, func(i, j int) bool {
+		if warnings[i].WarningType == "Donor Deceased" {
+			return true
+		} else if warnings[j].WarningType == "Donor Deceased" {
+			return false
+		}
+
+		iTime, err := time.Parse("02/01/2006 15:04:05", warnings[i].DateAdded)
+		if err != nil {
+			return false
+		}
+
+		jTime, err := time.Parse("02/01/2006 15:04:05", warnings[j].DateAdded)
+		if err != nil {
+			return false
+		}
+
+		return iTime.After(jTime)
+	})
+
+	return warnings
+}
+
+// construct string to use in case summary for cases a warning is applied to
+func casesWarningAppliedTo(uid string, cases []sirius.Case) string {
+	// return value:
+	// "" (only this case)
+	// or " and <subtype (hw|pw)> <uid>" (one other case)
+	// or ", <subtype (hw|pw)> <uid_1>, <subtype (hw|pw)> <uid_2>, ...,
+	// <subtype (hw|pw)> <uid_n-1> and <subtype (hw|pw)> <uid_n>" (2 to n other cases)
+	if len(cases) == 1 {
+		return ""
+	}
+
+	var filteredCases []sirius.Case
+	for _, caseItem := range(cases) {
+		if caseItem.UID != uid {
+			filteredCases = append(filteredCases, caseItem)
+		}
+	}
+	numCases := len(filteredCases)
+
+	var b strings.Builder
+	for index, caseItem := range(filteredCases) {
+		if index == numCases - 1 {
+			b.WriteString(" and ")
+		} else {
+			b.WriteString(", ")
+		}
+		b.WriteString(strings.ToUpper(caseItem.SubType))
+		b.WriteString(" ")
+		b.WriteString(caseItem.UID)
+	}
+
+	return b.String()
 }
 
 type fieldData struct {

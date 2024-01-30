@@ -14,11 +14,11 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type mockHttpClient struct {
+type mockTaskHttpClient struct {
 	mock.Mock
 }
 
-func (m *mockHttpClient) Do(req *http.Request) (*http.Response, error) {
+func (m *mockTaskHttpClient) Do(req *http.Request) (*http.Response, error) {
 	args := m.Called(req)
 	return args.Get(0).(*http.Response), args.Error(1)
 }
@@ -102,28 +102,28 @@ func TestTasksForCaseBadContext(t *testing.T) {
 }
 
 func TestTasksForCaseNetworkError(t *testing.T) {
-	mockHttpClient := &mockHttpClient{}
+	mockTaskHttpClient := &mockTaskHttpClient{}
 
 	// NB the structure of the error returned here does not match real http errors
 	// returned by Do(), but we only care whether the error is handled
-	mockHttpClient.On("Do", mock.Anything).Return(&http.Response{}, errors.New("Networking issue"))
+	mockTaskHttpClient.On("Do", mock.Anything).Return(&http.Response{}, errors.New("Networking issue"))
 
-	client := NewClient(mockHttpClient, "http://localhost")
+	client := NewClient(mockTaskHttpClient, "http://localhost")
 	_, err := client.TasksForCase(Context{Context: context.Background()}, 777)
 	assert.Equal(t, "Networking issue", err.Error())
 }
 
 func TestTasksForCaseBadJson(t *testing.T) {
-	mockHttpClient := &mockHttpClient{}
+	mockTaskHttpClient := &mockTaskHttpClient{}
 
 	badJsonResponse := http.Response{
 		StatusCode: 200,
 		Body:       io.NopCloser(bytes.NewBufferString("[bad json time")),
 	}
 
-	mockHttpClient.On("Do", mock.Anything).Return(&badJsonResponse, nil)
+	mockTaskHttpClient.On("Do", mock.Anything).Return(&badJsonResponse, nil)
 
-	client := NewClient(mockHttpClient, "http://localhost")
+	client := NewClient(mockTaskHttpClient, "http://localhost")
 	_, err := client.TasksForCase(Context{Context: context.Background()}, 8888)
 
 	assert.Equal(t, "invalid character 'b' looking for beginning of value", err.Error())
@@ -188,7 +188,7 @@ func TestTasksForCase(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a case with an open task assigned").
+					Given("There is no case with tasks with the specified ID").
 					UponReceiving("A request for the tasks for a non-existent case").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
@@ -198,7 +198,6 @@ func TestTasksForCase(t *testing.T) {
 						Status: http.StatusNotFound,
 					})
 			},
-			expectedResponse: nil,
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:          404,
