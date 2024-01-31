@@ -157,7 +157,7 @@ func caseTab(caseSummary sirius.CaseSummary, tabName string) CaseTabData {
 	linkedCases = append(linkedCases, linkedCase{lpa.UID, lpa.Subtype, lpa.CreatedDate})
 
 	for _, linkedLpa := range lpa.LinkedCases {
-		linkedCases = append(linkedCases, linkedCase{linkedLpa.UID, linkedLpa.SiriusData.Subtype, linkedLpa.SiriusData.CreatedDate})
+		linkedCases = append(linkedCases, linkedCase{linkedLpa.UID, linkedLpa.Subtype, linkedLpa.CreatedDate})
 	}
 
 	sort.Slice(linkedCases, func(i, j int) bool {
