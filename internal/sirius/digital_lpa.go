@@ -17,7 +17,7 @@ type SiriusData struct {
 	TaskCount          int          `json:"taskCount"`
 	WarningCount       int          `json:"warningCount"`
 	ObjectionCount     int          `json:"objectionCount"`
-	LinkedCases        []DigitalLpa `json:"linkedDigitalLpas"`
+	LinkedCases        []SiriusData `json:"linkedDigitalLpas"`
 	Donor              Donor        `json:"donor"`
 }
 
