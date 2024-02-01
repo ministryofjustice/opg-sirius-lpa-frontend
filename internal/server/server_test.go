@@ -222,17 +222,7 @@ func TestCancelledContext(t *testing.T) {
 	expectedErr := context.Canceled
 
 	logger := &mockLogger{}
-	logger.
-		On("Request", mock.Anything, expectedErr)
-
 	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, errorVars{
-			SiriusURL: "http://sirius",
-			Code:      499,
-			Error:     "context canceled",
-		}).
-		Return(nil)
 
 	handler := errorHandler(logger, template.Func, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
 		return expectedErr
