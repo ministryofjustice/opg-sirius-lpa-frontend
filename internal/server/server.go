@@ -192,6 +192,11 @@ func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL 
 	return func(next Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if err := next(w, r); err != nil {
+				if errors.Is(err, context.Canceled) {
+					w.WriteHeader(499)
+					return
+				}
+
 				if v, ok := err.(unauthorizedError); ok && v.IsUnauthorized() {
 					http.Redirect(w, r, fmt.Sprintf("%s/auth?redirect=%s", siriusURL, url.QueryEscape(prefix+r.URL.Path)), http.StatusFound)
 					return
@@ -234,10 +239,6 @@ func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL 
 					}
 
 					return
-				}
-
-				if errors.Is(err, context.Canceled) {
-					code = 499
 				}
 
 				w.WriteHeader(code)
