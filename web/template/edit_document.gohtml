@@ -31,7 +31,7 @@
                 <div class="govuk-body">
                     <a href="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .Case.CaseType) }}" class="govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-0">Back</a>
                     <div class="app-!-float-right">
-                        {{ subtypeShortFormat .Subtype }} {{ .Case.UID }}
+                        {{ subtypeShortFormat .Case.SubType }} {{ .Case.UID }}
                     </div>
                 </div>
 
