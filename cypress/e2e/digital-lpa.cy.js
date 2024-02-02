@@ -50,6 +50,19 @@ describe("View a digital LPA", () => {
       },
     });
 
+    cy.addMock("/lpa-api/v1/cases/333", "GET", {
+      status: 200,
+      body: {
+        "id": 333,
+        "uId": "M-DIGI-LPA3-3333",
+        "caseType": "DIGITAL_LPA",
+        "donor": {
+          "id": 33
+        },
+        "status": "Pending"
+      }
+    });
+
     cy.addMock("/lpa-api/v1/cases/333/warnings", "GET", {
       status: 200,
       body: [
@@ -84,6 +97,42 @@ describe("View a digital LPA", () => {
       ],
     });
 
+    cy.addMock("/lpa-api/v1/lpas/333/documents?type[-][]=Draft&type[-][]=Preview", "GET", {
+      status: 200,
+      body: [
+      {
+          "id": 1,
+          "uuid": "7327f57d-e3d5-4300-95a8-67b3337c7231",
+          "friendlyDescription": "Mr Test Person - Blank Template",
+          "direction": "Outgoing",
+          "createdDate": "24/08/2023 15:27:16",
+          "systemType": "EP-BB",
+          "correspondent": {
+            "uId": "7000-0000-0013",
+            "firstname": "Test",
+            "surname": "Person",
+            "personType": "Donor"
+          }
+        },
+        {
+          "id": 2,
+          "uuid": "40fa2847-27ae-4976-a93a-9f45ec0a4e98",
+          "friendlyDescription": "Mr John Doe - Reduced fee evidence",
+          "direction": "Incoming",
+          "createdDate": "15/05/2023 11:09:28",
+          "receivedDateTime": "15/05/2023 11:09:28",
+          "type": "Application Related",
+          "subType": "Reduced fee request evidence",
+          "correspondent": {
+            "uId": "7000-0000-0013",
+            "firstname": "John",
+            "surname": "Doe",
+            "personType": "Correspondent"
+          }
+        }
+      ]
+    });
+
     cy.visit("/lpa/M-DIGI-LPA3-3333");
   });
 
@@ -111,10 +160,11 @@ describe("View a digital LPA", () => {
     cy.contains("24 August 2023");
     cy.contains("EP-BB");
 
-    cy.contains("John Doe - Donor deceased: Case Withdrawn");
-    cy.contains("[OUT]");
+    cy.contains("Mr John Doe - Reduced fee evidence");
+    cy.contains("[IN]");
     cy.contains("15 May 2023");
-    cy.contains("DD-4");
+    cy.contains("Application Related");
+    cy.contains("Reduced fee request evidence");
   });
 
   it("shows task table", () => {
