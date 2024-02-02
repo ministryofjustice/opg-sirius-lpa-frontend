@@ -98,27 +98,6 @@
       }
     },
     {
-      "name": "A request for a case - digital LPA #3",
-      "request": { "method": "GET", "url": "/lpa-api/v1/cases/333" },
-      "response": {
-        "status": 200,
-        "headers": { "Content-Type": "application/json" },
-        "body": "{\"caseType\":\"DIGITAL_LPA\",\"donor\":{\"id\":33},\"id\":333,\"status\":\"Pending\",\"uId\":\"M-DIGI-LPA3-3333\"}"
-      }
-    },
-    {
-      "name": "A request for the documents for digital LPA #3",
-      "request": {
-        "method": "GET",
-        "url": "/lpa-api/v1/lpas/333/documents?type[-][]=Draft&type[-][]=Preview"
-      },
-      "response": {
-        "status": 200,
-        "headers": { "Content-Type": "application/json" },
-        "body": "[{\"id\":1,\"uuid\":\"7327f57d-e3d5-4300-95a8-67b3337c7231\",\"friendlyDescription\": \"Mr Test Person - Blank Template\",\"direction\": \"Outgoing\",\"createdDate\": \"24/08/2023 15:27:16\",\"systemType\": \"EP-BB\",\"correspondent\": {\"uId\": \"7000-0000-0013\",\"firstname\": \"Test\",\"surname\": \"Person\",\"personType\": \"Donor\"}},{\"id\":2,\"uuid\":\"40fa2847-27ae-4976-a93a-9f45ec0a4e98\",\"friendlyDescription\": \"Mr John Doe - Donor deceased: Case Withdrawn\",\"direction\": \"Outgoing\",\"createdDate\": \"15/05/2023 11:09:28\",\"systemType\": \"DD-4\",\"correspondent\": {\"uId\": \"7000-0000-0013\",\"firstname\": \"John\",\"surname\": \"Doe\",\"personType\": \"Correspondent\"}}]"
-      }
-    },
-    {
       "name": "A request for a person's cases for digital LPA #3",
       "request": { "method": "GET", "url": "/lpa-api/v1/persons/33/cases" },
       "response": {
