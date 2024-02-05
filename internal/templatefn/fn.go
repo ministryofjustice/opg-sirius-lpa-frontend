@@ -135,36 +135,8 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"join": func(s []string, joiner string) string {
 			return strings.Join(s, joiner)
 		},
-		// 2-3 character LPA subtype, upper-cased
-		"subtypeShortFormat": func(subtype string) string {
-			switch strings.ToLower(subtype) {
-				case "personal-welfare":
-					return "PW"
-				case "property-and-affairs":
-					return "PA"
-				case "hw":
-					return "HW"
-				case "pfa":
-					return "PFA"
-				default:
-					return ""
-			}
-		},
-		// full text for LPA subtype, e.g. "Personal welfare"
-		"subtypeLongFormat": func(subtype string) string {
-			switch strings.ToLower(subtype) {
-				case "personal-welfare":
-					return "Personal welfare"
-				case "property-and-affairs":
-					return "Property and affairs"
-				case "hw":
-					return "Health and welfare"
-				case "pfa":
-					return "Property and financial affairs"
-				default:
-					return ""
-			}
-		},
+		"subtypeShortFormat": subtypeShortFormat,
+		"subtypeLongFormat": subtypeLongFormat,
 	}
 }
 
@@ -178,6 +150,38 @@ type linkedCase struct {
 	UID         string
 	Subtype     string
 	CreatedDate sirius.DateString
+}
+
+// 2-3 character LPA subtype, upper-cased
+func subtypeShortFormat(subtype string) string {
+	switch strings.ToLower(subtype) {
+		case "personal-welfare":
+			return "PW"
+		case "property-and-affairs":
+			return "PA"
+		case "hw":
+			return "HW"
+		case "pfa":
+			return "PFA"
+		default:
+			return ""
+	}
+}
+
+// full text for LPA subtype, e.g. "Personal welfare"
+func subtypeLongFormat(subtype string) string {
+	switch strings.ToLower(subtype) {
+		case "personal-welfare":
+			return "Personal welfare"
+		case "property-and-affairs":
+			return "Property and affairs"
+		case "hw":
+			return "Health and welfare"
+		case "pfa":
+			return "Property and financial affairs"
+		default:
+			return ""
+	}
 }
 
 func caseTab(caseSummary sirius.CaseSummary, tabName string) CaseTabData {
@@ -256,7 +260,7 @@ func casesWarningAppliedTo(uid string, cases []sirius.Case) string {
 		} else {
 			b.WriteString(", ")
 		}
-		b.WriteString(strings.ToUpper(caseItem.SubType))
+		b.WriteString(subtypeShortFormat(caseItem.SubType))
 		b.WriteString(" ")
 		b.WriteString(caseItem.UID)
 	}
