@@ -19,6 +19,7 @@ type deleteRelationshipData struct {
 	XSRFToken string
 	Entity    string
 	Success   bool
+	Error     sirius.ValidationError
 
 	PersonReferences []sirius.PersonReference
 }
@@ -36,15 +37,17 @@ func DeleteRelationship(client DeleteRelationshipClient, tmpl template.Template)
 		if r.Method == http.MethodPost {
 			referenceID, err := postFormInt(r, "reference-id")
 			if err != nil {
-				return err
+				w.WriteHeader(http.StatusBadRequest)
+				data.Error = sirius.ValidationError{
+					Detail: "Select a relationship to delete",
+				}
+			} else {
+				err = client.DeletePersonReference(ctx, referenceID)
+				if err != nil {
+					return err
+				}
+				data.Success = true
 			}
-
-			err = client.DeletePersonReference(ctx, referenceID)
-			if err != nil {
-				return err
-			}
-
-			data.Success = true
 		}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
