@@ -71,7 +71,9 @@ describe("View a digital LPA", () => {
           warningType: "Court application in progress",
           warningText: "Court notified",
           dateAdded: "24/08/2022 13:13:13",
-          caseItems: [{ uId: "M-DIGI-LPA3-3333", caseSubtype: "personal-welfare" }],
+          caseItems: [
+            { uId: "M-DIGI-LPA3-3333", caseSubtype: "personal-welfare" },
+          ],
         },
         {
           id: 22,
