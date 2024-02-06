@@ -71,7 +71,7 @@ describe("View a digital LPA", () => {
           warningType: "Court application in progress",
           warningText: "Court notified",
           dateAdded: "24/08/2022 13:13:13",
-          caseItems: [{ uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" }],
+          caseItems: [{ uId: "M-DIGI-LPA3-3333", caseSubtype: "personal-welfare" }],
         },
         {
           id: 22,
@@ -79,8 +79,8 @@ describe("View a digital LPA", () => {
           warningText: "Complaint from donor",
           dateAdded: "12/12/2023 12:12:12",
           caseItems: [
-            { uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" },
-            { uId: "M-DIGI-LPA3-5555", caseSubtype: "hw" },
+            { uId: "M-DIGI-LPA3-3333", caseSubtype: "personal-welfare" },
+            { uId: "M-DIGI-LPA3-5555", caseSubtype: "property-and-affairs" },
           ],
         },
         {
@@ -89,9 +89,9 @@ describe("View a digital LPA", () => {
           warningText: "Advised of donor death",
           dateAdded: "05/01/2022 10:10:00",
           caseItems: [
-            { uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" },
-            { uId: "M-DIGI-LPA3-5555", caseSubtype: "hw" },
-            { uId: "M-DIGI-LPA3-6666", caseSubtype: "pw" },
+            { uId: "M-DIGI-LPA3-3333", caseSubtype: "personal-welfare" },
+            { uId: "M-DIGI-LPA3-5555", caseSubtype: "property-and-affairs" },
+            { uId: "M-DIGI-LPA3-6666", caseSubtype: "personal-welfare" },
           ],
         },
       ],
@@ -198,12 +198,12 @@ describe("View a digital LPA", () => {
       // and applies to text for 3+ cases is correct
       expect(elts[0]).to.contain("Donor Deceased");
       expect(elts[0]).to.contain(
-        "this case, HW M-DIGI-LPA3-5555 and PW M-DIGI-LPA3-6666",
+        "this case, PA M-DIGI-LPA3-5555 and PW M-DIGI-LPA3-6666",
       );
 
       // check sorting has worked properly and case applies text is correct for 2 cases
       expect(elts[1]).to.contain("Complaint Received");
-      expect(elts[1]).to.contain("this case and HW M-DIGI-LPA3-5555");
+      expect(elts[1]).to.contain("this case and PA M-DIGI-LPA3-5555");
 
       // check case applies text is correct for 1 case
       expect(elts[2]).to.contain("Court application in progress");
