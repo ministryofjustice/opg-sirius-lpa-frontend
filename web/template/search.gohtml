@@ -87,7 +87,7 @@
                                 <td class="govuk-table__cell">{{ .AddressSummary }}</td>
                                 <td class="govuk-table__cell">
                                     {{ range $case := .Cases }}
-                                        {{ $case.CaseType }} - {{ ToUpper $case.SubType }}<br>
+                                        {{ $case.CaseType }} - {{ subtypeShortFormat $case.SubType }}<br>
                                     {{ end }}
                                 </td>
                                 <td class="govuk-table__cell">

@@ -92,7 +92,7 @@ func TestPostCreateDraft(t *testing.T) {
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
-			CaseType:                  []string{"pfa", "hw"},
+			CaseType:                  []string{"property-and-affairs", "personal-welfare"},
 			Source:                    "PHONE",
 			DonorFirstNames:           "Gerald Ryan",
 			DonorLastName:             "Sandel",
@@ -121,7 +121,7 @@ func TestPostCreateDraft(t *testing.T) {
 			},
 		}).
 		Return(map[string]string{
-			"pfa": "M-0123-4567-8901",
+			"property-and-affairs": "M-0123-4567-8901",
 		}, nil)
 
 	template := &mockTemplate{}
@@ -129,7 +129,7 @@ func TestPostCreateDraft(t *testing.T) {
 		On("Func", mock.Anything, createDraftData{
 			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
 			Form: formDraft{
-				SubTypes:                  []string{"pfa", "hw"},
+				SubTypes:                  []string{"property-and-affairs", "personal-welfare"},
 				DonorFirstname:            "Gerald",
 				DonorMiddlename:           "Ryan",
 				DonorSurname:              "Sandel",
@@ -161,13 +161,13 @@ func TestPostCreateDraft(t *testing.T) {
 			},
 			Success: true,
 			Uids: []createDraftResult{
-				{Subtype: "pfa", Uid: "M-0123-4567-8901"},
+				{Subtype: "property-and-affairs", Uid: "M-0123-4567-8901"},
 			},
 		}).
 		Return(nil)
 
 	form := url.Values{
-		"subtype":                       {"pfa", "hw"},
+		"subtype":                       {"property-and-affairs", "personal-welfare"},
 		"donorFirstname":                {"Gerald"},
 		"donorMiddlename":               {"Ryan"},
 		"donorSurname":                  {"Sandel"},
