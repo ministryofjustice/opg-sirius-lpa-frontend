@@ -185,3 +185,41 @@ func TestPostDeleteRelationshipWhenDeletePersonReferenceErrors(t *testing.T) {
 	assert.Equal(t, expectedError, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
+
+func TestPostDeleteRelationshipWhenNoRelationshipSelectedValidationError(t *testing.T) {
+	client := &mockDeleteRelationshipClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{{ReferenceID: 1}}, nil)
+
+	expectedError := sirius.ValidationError{
+		Detail: "Select a relationship to delete",
+	}
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, deleteRelationshipData{
+			Entity:           "John Doe",
+			Success:          false,
+			PersonReferences: []sirius.PersonReference{{ReferenceID: 1}},
+			Error:            expectedError,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"reference-id": {""},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	_ = DeleteRelationship(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
