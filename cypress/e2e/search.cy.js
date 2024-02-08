@@ -69,9 +69,22 @@ describe("Search", () => {
                 },
               ],
             },
+
+            // this is a pathological record which is unlikely to occur
+            // in the live system, but here to reproduce the bug
+            // found in the integrations environment (VEGA-2309)
+            {
+              id: 77,
+              uId: "7000-6509-8877",
+              personType: "Attorney",
+              firstname: "Bob",
+              surname: "Priest",
+              addressLine1: "199 Ersatz Crescent",
+              cases: [],
+            },
           ],
           total: {
-            count: 3,
+            count: 4,
           },
         },
       });
@@ -79,22 +92,17 @@ describe("Search", () => {
       cy.visit("/search?term=bob");
 
       cy.contains("You searched for: bob");
-      cy.contains("Showing 1 to 3 of 3 results");
+      cy.contains("Showing 1 to 4 of 4 results");
       cy.contains("Donor (2)");
       cy.contains("Deputy (1)");
     });
 
-    it("finds a person not associated with a case", () => {
+    it("finds a non-donor who is not associated with a case", () => {
       const $row = cy.get("table > tbody > tr");
-      $row.should("contain", "Bob Smith");
-      $row.should("contain", "17/03/1990");
-      $row.should("contain", "123 Somewhere Road");
-      $row.should("contain", "Perfect");
-      $row.should("contain", "LPA - PFA");
-      $row
-        .contains("7000-5382-4438")
-        .should("have.attr", "href")
-        .should("contain", "/person/36/23");
+      $row.should("contain", "Not associated with a case");
+      $row.should("contain", "Bob Priest");
+      $row.should("contain", "199 Ersatz Crescent");
+      $row.should("contain", "Attorney");
     });
 
     it("finds a person with more than one case", () => {
