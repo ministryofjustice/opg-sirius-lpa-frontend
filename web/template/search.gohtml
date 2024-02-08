@@ -76,10 +76,13 @@
                                             <a class="govuk-link govuk-link--no-underline govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d" .ID) }}">
                                                 {{ printf "%s %s %s" .Salutation .Firstname .Surname }}
                                             </a><br>{{ .PersonType }}
-                                        {{ else }}
+                                        {{ else if gt (len .Cases) 0 }}
                                             <a class="govuk-link govuk-link--no-underline govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d" (index .Cases 0).Donor.ID) }}">
                                                 {{ printf "%s %s %s" .Salutation .Firstname .Surname }}
                                             </a><br>{{ .PersonType }}
+                                        {{ else }}
+                                            {{ printf "%s %s %s" .Salutation .Firstname .Surname }}
+                                            <br>{{ .PersonType }}
                                         {{ end }}
                                     </strong>
                                 </td>
