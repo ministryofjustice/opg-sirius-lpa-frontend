@@ -8,7 +8,7 @@ describe("View a digital LPA", () => {
           id: 333,
           uId: "M-DIGI-LPA3-3333",
           status: "Draft",
-          caseSubtype: "pfa",
+          caseSubtype: "property-and-affairs",
           createdDate: "31/10/2023",
           investigationCount: 2,
           complaintCount: 1,
@@ -50,6 +50,19 @@ describe("View a digital LPA", () => {
       },
     });
 
+    cy.addMock("/lpa-api/v1/cases/333", "GET", {
+      status: 200,
+      body: {
+        id: 333,
+        uId: "M-DIGI-LPA3-3333",
+        caseType: "DIGITAL_LPA",
+        donor: {
+          id: 33,
+        },
+        status: "Pending",
+      },
+    });
+
     cy.addMock("/lpa-api/v1/cases/333/warnings", "GET", {
       status: 200,
       body: [
@@ -58,7 +71,9 @@ describe("View a digital LPA", () => {
           warningType: "Court application in progress",
           warningText: "Court notified",
           dateAdded: "24/08/2022 13:13:13",
-          caseItems: [{ uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" }],
+          caseItems: [
+            { uId: "M-DIGI-LPA3-3333", caseSubtype: "personal-welfare" },
+          ],
         },
         {
           id: 22,
@@ -66,8 +81,8 @@ describe("View a digital LPA", () => {
           warningText: "Complaint from donor",
           dateAdded: "12/12/2023 12:12:12",
           caseItems: [
-            { uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" },
-            { uId: "M-DIGI-LPA3-5555", caseSubtype: "hw" },
+            { uId: "M-DIGI-LPA3-3333", caseSubtype: "personal-welfare" },
+            { uId: "M-DIGI-LPA3-5555", caseSubtype: "property-and-affairs" },
           ],
         },
         {
@@ -76,13 +91,53 @@ describe("View a digital LPA", () => {
           warningText: "Advised of donor death",
           dateAdded: "05/01/2022 10:10:00",
           caseItems: [
-            { uId: "M-DIGI-LPA3-3333", caseSubtype: "pw" },
-            { uId: "M-DIGI-LPA3-5555", caseSubtype: "hw" },
-            { uId: "M-DIGI-LPA3-6666", caseSubtype: "pw" },
+            { uId: "M-DIGI-LPA3-3333", caseSubtype: "personal-welfare" },
+            { uId: "M-DIGI-LPA3-5555", caseSubtype: "property-and-affairs" },
+            { uId: "M-DIGI-LPA3-6666", caseSubtype: "personal-welfare" },
           ],
         },
       ],
     });
+
+    cy.addMock(
+      "/lpa-api/v1/lpas/333/documents?type[-][]=Draft&type[-][]=Preview",
+      "GET",
+      {
+        status: 200,
+        body: [
+          {
+            id: 1,
+            uuid: "7327f57d-e3d5-4300-95a8-67b3337c7231",
+            friendlyDescription: "Mr Test Person - Blank Template",
+            direction: "Outgoing",
+            createdDate: "24/08/2023 15:27:16",
+            systemType: "EP-BB",
+            correspondent: {
+              uId: "7000-0000-0013",
+              firstname: "Test",
+              surname: "Person",
+              personType: "Donor",
+            },
+          },
+          {
+            id: 2,
+            uuid: "40fa2847-27ae-4976-a93a-9f45ec0a4e98",
+            friendlyDescription: "Mr John Doe - Reduced fee evidence",
+            direction: "Incoming",
+            createdDate: "15/05/2023 11:09:28",
+            receivedDateTime: "15/05/2023 11:09:28",
+            type: "Application Related",
+            subType: "Reduced fee request evidence",
+            correspondent: {
+              uId: "7000-0000-0013",
+              firstname: "John",
+              surname: "Doe",
+              personType: "Correspondent",
+            },
+          },
+        ],
+      },
+    );
 
     cy.visit("/lpa/M-DIGI-LPA3-3333");
   });
@@ -111,10 +166,11 @@ describe("View a digital LPA", () => {
     cy.contains("24 August 2023");
     cy.contains("EP-BB");
 
-    cy.contains("John Doe - Donor deceased: Case Withdrawn");
-    cy.contains("[OUT]");
+    cy.contains("Mr John Doe - Reduced fee evidence");
+    cy.contains("[IN]");
     cy.contains("15 May 2023");
-    cy.contains("DD-4");
+    cy.contains("Application Related");
+    cy.contains("Reduced fee request evidence");
   });
 
   it("shows task table", () => {
@@ -144,12 +200,12 @@ describe("View a digital LPA", () => {
       // and applies to text for 3+ cases is correct
       expect(elts[0]).to.contain("Donor Deceased");
       expect(elts[0]).to.contain(
-        "this case, HW M-DIGI-LPA3-5555 and PW M-DIGI-LPA3-6666",
+        "this case, PA M-DIGI-LPA3-5555 and PW M-DIGI-LPA3-6666",
       );
 
       // check sorting has worked properly and case applies text is correct for 2 cases
       expect(elts[1]).to.contain("Complaint Received");
-      expect(elts[1]).to.contain("this case and HW M-DIGI-LPA3-5555");
+      expect(elts[1]).to.contain("this case and PA M-DIGI-LPA3-5555");
 
       // check case applies text is correct for 1 case
       expect(elts[2]).to.contain("Court application in progress");
