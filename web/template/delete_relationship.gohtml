@@ -7,6 +7,8 @@
     <div class="govuk-grid-column-two-thirds">
       <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
 
+      {{ template "error-summary" .Error }}
+
       {{ if .Success }}
         <meta data-app-reload="page" />
         {{ template "success-banner" "You have successfully deleted a relationship." }}
