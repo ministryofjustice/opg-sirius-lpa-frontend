@@ -1,9 +1,13 @@
 const disableAfterClick = () => {
   document
-    .querySelectorAll('[data-disable-after-click="true"]')
+    .querySelectorAll('button[type="submit"][data-disable-after-click="true"]')
     .forEach((button) => {
-      button.addEventListener(
-        "click",
+      if (!button.form) {
+        return false;
+      }
+
+      button.form.addEventListener(
+        "submit",
         (e) => {
           if (button.hasAttribute("disabled")) {
             e.preventDefault();
@@ -12,10 +16,6 @@ const disableAfterClick = () => {
 
           button.ariaDisabled = "true";
           button.setAttribute("disabled", "true");
-
-          if (button.type == "submit") {
-            button.form.submit();
-          }
         },
         false,
       );
