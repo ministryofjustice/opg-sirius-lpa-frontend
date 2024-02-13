@@ -12,6 +12,10 @@ const disableAfterClick = () => {
 
           button.ariaDisabled = "true";
           button.setAttribute("disabled", "true");
+
+          if (button.type == "submit") {
+            button.form.submit();
+          }
         },
         false,
       );
