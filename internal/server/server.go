@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -15,14 +16,9 @@ import (
 	"github.com/ministryofjustice/opg-go-common/securityheaders"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/telemetry"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 )
-
-type Logger interface {
-	Request(*http.Request, error)
-}
 
 type Server struct {
 	Templates map[string]*template.Template
@@ -87,12 +83,12 @@ type Client interface {
 
 var decoder *form.Decoder
 
-func New(logger Logger, client Client, templates template.Templates, prefix, siriusPublicURL, webDir string) http.Handler {
-	wrap := errorHandler(logger, templates.Get("error.gohtml"), prefix, siriusPublicURL)
+func New(logger *slog.Logger, client Client, templates template.Templates, prefix, siriusPublicURL, webDir string) http.Handler {
+	wrap := errorHandler(templates.Get("error.gohtml"), prefix, siriusPublicURL)
 
 	mux := chi.NewRouter()
 
-	mux.Use(attachTargetMiddleware)
+	mux.Use(telemetry.AttachMiddleware(logger))
 
 	mux.Handle("/", http.NotFoundHandler())
 	mux.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {})
@@ -148,16 +144,6 @@ func New(logger Logger, client Client, templates template.Templates, prefix, sir
 	return otelhttp.NewHandler(http.StripPrefix(prefix, muxWithHeaders), "lpa-frontend")
 }
 
-func attachTargetMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		trace.SpanFromContext(r.Context()).SetAttributes(
-			attribute.String("http.target", r.URL.Path),
-		)
-
-		next.ServeHTTP(w, r)
-	})
-}
-
 type Handler func(w http.ResponseWriter, r *http.Request) error
 
 type errorVars struct {
@@ -188,7 +174,7 @@ type ProblemError struct {
 	ValidationErrors sirius.FieldErrors `json:"validationErrors"`
 }
 
-func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL string) func(next Handler) http.Handler {
+func errorHandler(tmplError template.Template, prefix, siriusURL string) func(next Handler) http.Handler {
 	return func(next Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if err := next(w, r); err != nil {
@@ -207,10 +193,9 @@ func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL 
 					return
 				}
 
-				logger.Request(r, err)
-
 				code := http.StatusInternalServerError
 				correlationId := ""
+				logger := telemetry.GetLoggerFromContext(r.Context())
 
 				if statusError, ok := err.(sirius.StatusError); ok {
 					code = statusError.Code
@@ -223,9 +208,13 @@ func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL 
 					}
 
 					if ve, ok := err.(sirius.ValidationError); ok {
-						code = 400
+						code = http.StatusBadRequest
 						rfcErr.Detail = ve.Detail
 						rfcErr.ValidationErrors = ve.Field
+					}
+
+					if code == http.StatusInternalServerError {
+						logger.Error(err.Error())
 					}
 
 					w.Header().Add("Content-Type", "application/problem+json")
@@ -234,11 +223,15 @@ func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL 
 					err = json.NewEncoder(w).Encode(rfcErr)
 
 					if err != nil {
-						logger.Request(r, err)
+						logger.Error(err.Error())
 						http.Error(w, "Could not generate error JSON", http.StatusInternalServerError)
 					}
 
 					return
+				}
+
+				if code == http.StatusInternalServerError {
+					logger.Error(err.Error())
 				}
 
 				w.WriteHeader(code)
@@ -251,7 +244,7 @@ func errorHandler(logger Logger, tmplError template.Template, prefix, siriusURL 
 				})
 
 				if err != nil {
-					logger.Request(r, err)
+					logger.Error(err.Error())
 					http.Error(w, "Could not generate error template", http.StatusInternalServerError)
 				}
 			}

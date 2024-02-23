@@ -3,14 +3,17 @@ package server
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/telemetry"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -26,14 +29,6 @@ type mockTemplate struct {
 func (t *mockTemplate) Func(w io.Writer, data interface{}) error {
 	args := t.Called(w, data)
 	return args.Error(0)
-}
-
-type mockLogger struct {
-	mock.Mock
-}
-
-func (t *mockLogger) Request(r *http.Request, err error) {
-	t.Called(r, err)
 }
 
 type anUnauthorizedError struct {
@@ -55,11 +50,10 @@ func TestNew(t *testing.T) {
 func TestErrorHandlerError(t *testing.T) {
 	assert := assert.New(t)
 
-	expectedErr := anUnauthorizedError{is: false}
+	var buf bytes.Buffer
+	logHandler := slog.NewJSONHandler(&buf, nil)
 
-	logger := &mockLogger{}
-	logger.
-		On("Request", mock.Anything, expectedErr)
+	ctx := telemetry.WithLogger(context.Background(), slog.New(logHandler))
 
 	template := &mockTemplate{}
 	template.
@@ -70,19 +64,25 @@ func TestErrorHandlerError(t *testing.T) {
 		}).
 		Return(nil)
 
-	handler := errorHandler(logger, template.Func, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
-		return expectedErr
+	handler := errorHandler(template.Func, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
+		return errors.New("hey")
 	})
 
 	w := httptest.NewRecorder()
-	r, _ := http.NewRequest("GET", "/path", nil)
+	r, _ := http.NewRequestWithContext(ctx, "GET", "/path", nil)
 
 	handler.ServeHTTP(w, r)
 
 	resp := w.Result()
 
 	assert.Equal(http.StatusInternalServerError, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, template, logger)
+	mock.AssertExpectationsForObjects(t, template)
+
+	data := map[string]string{}
+	err := json.Unmarshal(buf.Bytes(), &data)
+	assert.Nil(err)
+	assert.Equal("hey", data["msg"])
+	assert.Equal("ERROR", data["level"])
 }
 
 func TestErrorHandlerUnauthorizedError(t *testing.T) {
@@ -90,7 +90,7 @@ func TestErrorHandlerUnauthorizedError(t *testing.T) {
 
 	expectedErr := anUnauthorizedError{is: true}
 
-	handler := errorHandler(nil, nil, "/prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
+	handler := errorHandler(nil, "/prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
 		return expectedErr
 	})
 
@@ -117,16 +117,17 @@ func TestErrorHandlerJsonError(t *testing.T) {
 		},
 	}
 
-	logger := &mockLogger{}
-	logger.
-		On("Request", mock.Anything, expectedError)
+	var buf bytes.Buffer
+	logHandler := slog.NewJSONHandler(&buf, nil)
 
-	handler := errorHandler(logger, nil, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
+	ctx := telemetry.WithLogger(context.Background(), slog.New(logHandler))
+
+	handler := errorHandler(nil, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
 		return expectedError
 	})
 
 	w := httptest.NewRecorder()
-	r, _ := http.NewRequest("GET", "/path", nil)
+	r, _ := http.NewRequestWithContext(ctx, "GET", "/path", nil)
 	r.Header.Add("Accept", "application/json")
 
 	handler.ServeHTTP(w, r)
@@ -139,6 +140,8 @@ func TestErrorHandlerJsonError(t *testing.T) {
 	body := new(bytes.Buffer)
 	_, _ = body.ReadFrom(resp.Body)
 	assert.Equal(`{"title":"validation error","detail":"Not valid complaint","validationErrors":{"title":{"tooShort":"The title must be at least 5 characters"}}}`, strings.Trim(body.String(), "\n"))
+
+	assert.Nil(buf.Bytes())
 }
 
 func TestGetContext(t *testing.T) {
@@ -221,10 +224,9 @@ func TestCancelledContext(t *testing.T) {
 
 	expectedErr := context.Canceled
 
-	logger := &mockLogger{}
 	template := &mockTemplate{}
 
-	handler := errorHandler(logger, template.Func, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
+	handler := errorHandler(template.Func, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
 		return expectedErr
 	})
 
@@ -236,5 +238,5 @@ func TestCancelledContext(t *testing.T) {
 	resp := w.Result()
 
 	assert.Equal(499, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, template, logger)
+	mock.AssertExpectationsForObjects(t, template)
 }
