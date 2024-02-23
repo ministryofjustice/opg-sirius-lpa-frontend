@@ -16,9 +16,8 @@ import (
 	"github.com/ministryofjustice/opg-go-common/securityheaders"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/telemetry"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 )
 
 type Server struct {
@@ -89,7 +88,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 
 	mux := chi.NewRouter()
 
-	mux.Use(attachTargetMiddleware(logger))
+	mux.Use(telemetry.AttachMiddleware(logger))
 
 	mux.Handle("/", http.NotFoundHandler())
 	mux.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {})
@@ -143,25 +142,6 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	muxWithHeaders := securityheaders.Use(setCSPHeader(mux))
 
 	return otelhttp.NewHandler(http.StripPrefix(prefix, muxWithHeaders), "lpa-frontend")
-}
-
-func attachTargetMiddleware(logger *slog.Logger) func(next http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			span := trace.SpanFromContext(r.Context())
-
-			span.SetAttributes(
-				attribute.String("http.target", r.URL.Path),
-			)
-
-			r = r.WithContext(context.WithValue(r.Context(), "logger", logger.With(
-				slog.String("trace_id", span.SpanContext().TraceID().String()),
-				slog.Any("request", r),
-			)))
-
-			next.ServeHTTP(w, r)
-		})
-	}
 }
 
 type Handler func(w http.ResponseWriter, r *http.Request) error
