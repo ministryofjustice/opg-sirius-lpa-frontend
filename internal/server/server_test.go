@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/telemetry"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -50,9 +51,9 @@ func TestErrorHandlerError(t *testing.T) {
 	assert := assert.New(t)
 
 	var buf bytes.Buffer
-	logger := slog.NewJSONHandler(&buf, nil)
+	logHandler := slog.NewJSONHandler(&buf, nil)
 
-	ctx := context.WithValue(context.Background(), "logger", slog.New(logger))
+	ctx := telemetry.WithLogger(context.Background(), slog.New(logHandler))
 
 	template := &mockTemplate{}
 	template.
@@ -116,9 +117,9 @@ func TestErrorHandlerJsonError(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	logger := slog.NewJSONHandler(&buf, nil)
+	logHandler := slog.NewJSONHandler(&buf, nil)
 
-	ctx := context.WithValue(context.Background(), "logger", slog.New(logger))
+	ctx := telemetry.WithLogger(context.Background(), slog.New(logHandler))
 
 	handler := errorHandler(nil, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
 		return expectedError
