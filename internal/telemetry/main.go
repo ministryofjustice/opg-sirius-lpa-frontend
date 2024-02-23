@@ -28,7 +28,7 @@ func NewLogger() *slog.Logger {
 					case *http.Request:
 						return slog.Group(a.Key,
 							slog.String("method", v.Method),
-							slog.String("uri", v.URL.String()))
+							slog.String("path", v.URL.String()))
 					}
 				}
 
@@ -81,6 +81,10 @@ func InitTracerProvider(ctx context.Context, logger *slog.Logger, exportTraces b
 	}
 }
 
+func WithLogger(ctx context.Context, logger *slog.Logger) context.Context {
+	return context.WithValue(ctx, contextKey("logger"), logger)
+}
+
 func AttachMiddleware(logger *slog.Logger) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -95,7 +99,7 @@ func AttachMiddleware(logger *slog.Logger) func(next http.Handler) http.Handler 
 				slog.Any("request", r),
 			)
 
-			r = r.WithContext(context.WithValue(r.Context(), contextKey("logger"), loggerWithRequest))
+			r = r.WithContext(WithLogger(r.Context(), loggerWithRequest))
 
 			next.ServeHTTP(w, r)
 		})

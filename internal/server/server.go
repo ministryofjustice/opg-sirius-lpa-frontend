@@ -195,7 +195,7 @@ func errorHandler(tmplError template.Template, prefix, siriusURL string) func(ne
 
 				code := http.StatusInternalServerError
 				correlationId := ""
-				logger := r.Context().Value("logger").(*slog.Logger)
+				logger := telemetry.GetLoggerFromContext(r.Context())
 
 				if statusError, ok := err.(sirius.StatusError); ok {
 					code = statusError.Code
