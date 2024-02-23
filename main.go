@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -20,14 +19,17 @@ import (
 	"golang.org/x/mod/sumdb/dirhash"
 )
 
-func fatal(err error, logger *slog.Logger) {
-	logger.Error(fmt.Sprintf("a fatal error occurred: %s", err.Error()))
-	os.Exit(1)
-}
-
 func main() {
+	ctx := context.Background()
 	logger := telemetry.NewLogger()
 
+	if err := run(ctx, logger); err != nil {
+		logger.Error("fatal startup error", slog.Any("err", err.Error()))
+		os.Exit(1)
+	}
+}
+
+func run(ctx context.Context, logger *slog.Logger) error {
 	port := env.Get("PORT", "8080")
 	webDir := env.Get("WEB_DIR", "web")
 	siriusURL := env.Get("SIRIUS_URL", "http://localhost:9001")
@@ -37,16 +39,19 @@ func main() {
 
 	staticHash, err := dirhash.HashDir(webDir+"/static", webDir, dirhash.DefaultHash)
 	if err != nil {
-		fatal(err, logger)
+		return err
 	}
 
 	tmpls, err := template.Parse(webDir+"/template", templatefn.All(siriusPublicURL, prefix, staticHash))
 	if err != nil {
-		fatal(err, logger)
+		return err
 	}
 
-	shutdown := telemetry.InitTracerProvider(context.Background(), logger, exportTraces)
+	shutdown, err := telemetry.InitTracerProvider(ctx, logger, exportTraces)
 	defer shutdown()
+	if err != nil {
+		return err
+	}
 
 	httpClient := http.DefaultClient
 	httpClient.Transport = otelhttp.NewTransport(httpClient.Transport)
@@ -61,7 +66,8 @@ func main() {
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
-			fatal(err, logger)
+			logger.Error("listen and server error", slog.Any("err", err.Error()))
+			os.Exit(1)
 		}
 	}()
 
@@ -73,10 +79,8 @@ func main() {
 	sig := <-c
 	logger.Info("signal received: ", sig)
 
-	tc, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	tc, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
-	if err := server.Shutdown(tc); err != nil {
-		logger.Error(err.Error())
-	}
+	return server.Shutdown(tc)
 }

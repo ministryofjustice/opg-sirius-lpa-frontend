@@ -40,11 +40,10 @@ func NewLogger() *slog.Logger {
 		}))
 }
 
-func InitTracerProvider(ctx context.Context, logger *slog.Logger, exportTraces bool) func() {
+func InitTracerProvider(ctx context.Context, logger *slog.Logger, exportTraces bool) (func(), error) {
 	resource, err := ecs.NewResourceDetector().Detect(ctx)
 	if err != nil {
-		logger.Error(err.Error())
-		os.Exit(1)
+		return nil, err
 	}
 
 	var traceExporter trace.SpanExporter
@@ -56,8 +55,7 @@ func InitTracerProvider(ctx context.Context, logger *slog.Logger, exportTraces b
 		)
 
 		if err != nil {
-			logger.Error(err.Error())
-			os.Exit(1)
+			return nil, err
 		}
 	}
 
@@ -78,7 +76,7 @@ func InitTracerProvider(ctx context.Context, logger *slog.Logger, exportTraces b
 				logger.Error(err.Error())
 			}
 		}
-	}
+	}, nil
 }
 
 func WithLogger(ctx context.Context, logger *slog.Logger) context.Context {
