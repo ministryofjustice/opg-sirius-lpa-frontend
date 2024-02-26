@@ -21,7 +21,7 @@ describe("Create donor", () => {
     cy.get("#f-county").type("Saskatchewan");
     cy.get("#f-postcode").type("S7R 9F9");
     cy.get("#f-country").type("Canada");
-    cy.get("#f-isAirmailRequired").click();
+    cy.get("label[for=f-isAirmailRequired]").click();
     cy.get("#f-phoneNumber").type("072345678");
     cy.get("#f-email").type("m.vancolkenburg@ca.test");
     cy.get("#f-correspondenceBy-email").click();
