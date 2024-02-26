@@ -221,7 +221,7 @@ describe("View a digital LPA", () => {
     cy.get("#f-taskType").select("Check Application");
     cy.get("#f-name").type("Do this task");
     cy.get("#f-description").type("This task, do");
-    cy.contains(".govuk-radios__item", "Team").find("input").check();
+    cy.contains("label", "Team").click();
     cy.get("#f-assigneeTeam").select("Cool Team");
     cy.get("#f-dueDate").type("2035-01-01");
     cy.get("button[type=submit]").click();

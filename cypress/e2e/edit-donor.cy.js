@@ -25,13 +25,13 @@ describe("Create donor", () => {
     cy.get("#f-county").type("North Carolina");
     cy.get("#f-postcode").type("40936");
     cy.get("#f-country").type("United States");
-    cy.get("#f-isAirmailRequired").click();
+    cy.get("label[for=f-isAirmailRequired]").click();
     cy.get("#f-phoneNumber").type("0841781784");
     cy.get("#f-email").type("docniesborella@mail.test");
     cy.get("#f-correspondenceBy-post").click();
     cy.get("#f-correspondenceBy-email").click();
     cy.get("#f-correspondenceBy-welsh").click();
-    cy.get("#f-researchOptOut").click();
+    cy.get("label[for=f-researchOptOut]").click();
 
     cy.get("button[type=submit]").click();
     cy.get(".moj-banner").should("exist");
