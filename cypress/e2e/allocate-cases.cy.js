@@ -6,7 +6,7 @@ describe("Allocate cases", () => {
   it("allocates a case", () => {
     cy.contains("Allocate Case");
     cy.get(".moj-banner").should("not.exist");
-    cy.contains(".govuk-radios__item", "User").find("input").check();
+    cy.contains("label", "User").click();
     cy.get("#f-assigneeUser").type("admin");
     cy.get(".autocomplete__menu").contains("system admin").click();
     cy.get("button[type=submit]").click();

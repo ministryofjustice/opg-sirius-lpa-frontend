@@ -32,7 +32,7 @@ describe("Create a document", () => {
 
   it("creates a document on the case by selecting a recipient", () => {
     cy.contains("Select a recipient");
-    cy.get("#f-recipient-189").click();
+    cy.get("label[for=f-recipient-189]").click();
     cy.contains("button", "Create draft document").click();
   });
 
@@ -42,7 +42,7 @@ describe("Create a document", () => {
       "have.attr",
       "disabled",
     );
-    cy.get("#f-recipient-189").click();
+    cy.get("label[for=f-recipient-189]").click();
     cy.contains("button", "Create draft document")
       .invoke("attr", "class")
       .should("contain", "govuk-button");
@@ -63,7 +63,7 @@ describe("Create a document", () => {
     cy.get("#f-town").type("Hirthehaven");
     cy.get("#f-county").type("Saskatchewan");
     cy.get("#f-postcode").type("S7R 9F9");
-    cy.get("#f-isAirmailRequired").click();
+    cy.get("label[for=f-isAirmailRequired").click();
     cy.get("#f-phoneNumber").type("072345678");
     cy.get("#f-email").type("m.vancolkenburg@ca.test");
     cy.get("#f-correspondenceBy-email").click();
@@ -100,7 +100,7 @@ describe("Create a document", () => {
     cy.contains("7000-0000-0002");
 
     cy.contains("Select a recipient");
-    cy.get("#f-recipient-113").click();
+    cy.get("label[for=f-recipient-113]").click();
     cy.contains("Parent Donor");
   });
 });

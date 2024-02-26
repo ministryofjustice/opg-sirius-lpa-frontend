@@ -15,12 +15,12 @@ describe("Edit complaint", () => {
     cy.get("#f-summary").should("have.value", "This and that");
     cy.get("#f-description").should("have.value", "This is seriously bad");
     cy.get("#f-receivedDate").should("have.value", "2022-04-05");
-    cy.contains(".govuk-radios__label", "OPG Decisions")
+    cy.contains("label", "OPG Decisions")
       .parent()
       .get("input")
       .should("be.checked");
     cy.contains(".govuk-radios__label", "OPG Decisions").click();
-    cy.get("#f-compensation-type-0").check();
+    cy.get("label[for=f-compensation-type-0]").click();
     cy.get("#f-compensation-amount-0").type("150.00");
     cy.get("#f-subCategory-02").should("have.value", "18");
     cy.get("#f-complainantCategory").select("LPA Donor");

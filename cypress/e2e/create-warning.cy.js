@@ -70,8 +70,8 @@ describe("Create a warning on multiple cases", () => {
 
     cy.contains("Create Warning");
     cy.get(".moj-banner").should("not.exist");
-    cy.get("#case-id-0").click();
-    cy.get("#case-id-1").click();
+    cy.get("label[for=case-id-0]").click();
+    cy.get("label[for=case-id-1]").click();
     cy.get("select").select("Complaint Received");
     cy.get("textarea").type("Some warning notes for multiple cases");
     cy.get("button[type=submit]").click();
