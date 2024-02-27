@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/ministryofjustice/opg-go-common/env"
+	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/server"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/telemetry"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/templatefn"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"golang.org/x/mod/sumdb/dirhash"
@@ -21,7 +21,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	logger := telemetry.NewLogger()
+	logger := telemetry.NewLogger("opg-sirius-lpa-frontend")
 
 	if err := run(ctx, logger); err != nil {
 		logger.Error("fatal startup error", slog.Any("err", err.Error()))
@@ -47,7 +47,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		return err
 	}
 
-	shutdown, err := telemetry.InitTracerProvider(ctx, logger, exportTraces)
+	shutdown, err := telemetry.StartTracerProvider(ctx, logger, exportTraces)
 	defer shutdown()
 	if err != nil {
 		return err

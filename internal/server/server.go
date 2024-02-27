@@ -14,9 +14,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/securityheaders"
+	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/telemetry"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
@@ -88,7 +88,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 
 	mux := chi.NewRouter()
 
-	mux.Use(telemetry.AttachMiddleware(logger))
+	mux.Use(telemetry.Middleware(logger))
 
 	mux.Handle("/", http.NotFoundHandler())
 	mux.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {})
@@ -195,7 +195,7 @@ func errorHandler(tmplError template.Template, prefix, siriusURL string) func(ne
 
 				code := http.StatusInternalServerError
 				correlationId := ""
-				logger := telemetry.GetLoggerFromContext(r.Context())
+				logger := telemetry.LoggerFromContext(r.Context())
 
 				if statusError, ok := err.(sirius.StatusError); ok {
 					code = statusError.Code
