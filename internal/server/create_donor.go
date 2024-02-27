@@ -3,7 +3,6 @@ package server
 import (
 	"net/http"
 
-	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
@@ -28,9 +27,6 @@ func CreateDonor(client CreateDonorClient, tmpl template.Template) Handler {
 			XSRFToken: ctx.XSRFToken,
 			IsNew:     true,
 		}
-
-		logger := telemetry.LoggerFromContext(r.Context())
-		logger.Warn("hi")
 
 		if r.Method == http.MethodPost {
 			donor := sirius.Person{
