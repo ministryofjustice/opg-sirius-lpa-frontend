@@ -104,6 +104,14 @@ Sirius backend and can get reliable responses.
 make cypress
 ```
 
+To run tests with the Cypress test runner, start a copy of the service with a
+mock backend and start cypress.
+
+```
+make up
+yarn cypress open
+```
+
 ## Development
 
 For CI Like linting locally you can run
