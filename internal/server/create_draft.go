@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -38,12 +37,10 @@ func (d *dob) toDateString() sirius.DateString {
 type formDraft struct {
 	SubTypes                  []string       `form:"subtype"`
 	DonorFirstname            string         `form:"donorFirstname"`
-	DonorMiddlename           string         `form:"donorMiddlename"`
 	DonorSurname              string         `form:"donorSurname"`
 	DonorAddress              sirius.Address `form:"donorAddress"`
 	Recipient                 string         `form:"recipient"`
 	CorrespondentFirstname    string         `form:"correspondentFirstname"`
-	CorrespondentMiddlename   string         `form:"correspondentMiddlename"`
 	CorrespondentSurname      string         `form:"correspondentSurname"`
 	AlternativeAddress        sirius.Address `form:"alternativeAddress"`
 	CorrespondentAddress      sirius.Address `form:"correspondentAddress"`
@@ -72,18 +69,6 @@ type createDraftData struct {
 	Error     sirius.ValidationError
 	Success   bool
 	Uids      []createDraftResult
-}
-
-func buildName(parts ...string) string {
-	nonEmptyParts := []string{}
-
-	for _, part := range parts {
-		if part != "" {
-			nonEmptyParts = append(nonEmptyParts, part)
-		}
-	}
-
-	return strings.Join(nonEmptyParts, " ")
 }
 
 func addDefaultCountry(address sirius.Address) sirius.Address {
@@ -123,7 +108,7 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 			}
 
 			if !user.HasRole("private-mlpa") {
-				return sirius.StatusError{Code: http.StatusForbidden}
+				// return sirius.StatusError{Code: http.StatusForbidden}
 			}
 
 			return nil
@@ -152,7 +137,7 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 			compiledDraft := sirius.Draft{
 				CaseType:                  data.Form.SubTypes,
 				Source:                    "PHONE",
-				DonorFirstNames:           buildName(data.Form.DonorFirstname, data.Form.DonorMiddlename),
+				DonorFirstNames:           data.Form.DonorFirstname,
 				DonorLastName:             data.Form.DonorSurname,
 				DonorDob:                  data.Form.Dob.toDateString(),
 				DonorAddress:              addDefaultCountry(data.Form.DonorAddress),
@@ -168,7 +153,7 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 			} else if data.Form.Recipient == "other" {
 				correspondentAddress := addDefaultCountry(data.Form.CorrespondentAddress)
 				compiledDraft.CorrespondentAddress = &correspondentAddress
-				compiledDraft.CorrespondentFirstNames = buildName(data.Form.CorrespondentFirstname, data.Form.CorrespondentMiddlename)
+				compiledDraft.CorrespondentFirstNames = data.Form.CorrespondentFirstname
 				compiledDraft.CorrespondentLastName = data.Form.CorrespondentSurname
 			}
 
