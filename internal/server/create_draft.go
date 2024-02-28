@@ -108,7 +108,7 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 			}
 
 			if !user.HasRole("private-mlpa") {
-				// return sirius.StatusError{Code: http.StatusForbidden}
+				return sirius.StatusError{Code: http.StatusForbidden}
 			}
 
 			return nil
