@@ -41,6 +41,10 @@
 
         <h1 class="govuk-heading-l">Create a draft LPA</h1>
 
+        <div class="govuk-inset-text">
+            Details you enter will appear in the donor section of the LPA form.
+        </div>
+
         <form class="form" method="POST">
           <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
@@ -229,8 +233,16 @@
             </fieldset>
           </div>
 
+          <div class="govuk-warning-text">
+              <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+              <strong class="govuk-warning-text__text">
+                  <span class="govuk-visually-hidden">Warning</span>
+                  You are about to create an LPA case. Check the details you’ve entered are correct before clicking the ‘confirm and create draft LPA’ button.
+              </strong>
+          </div>
+
           <div class="govuk-button-group">
-            <button class="govuk-button" data-module="govuk-button" type="submit">Save draft LPA</button>
+            <button class="govuk-button" data-module="govuk-button" type="submit">Confirm and create draft LPA</button>
             <a class="govuk-link govuk-link--no-visited-state" href="/">Cancel</a>
           </div>
         </form>
