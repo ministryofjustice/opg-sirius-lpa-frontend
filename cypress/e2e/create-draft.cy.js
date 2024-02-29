@@ -16,8 +16,7 @@ describe("Create Digital LPA draft", () => {
     cy.contains("Personal welfare").click();
     cy.contains("Property and affairs").click();
 
-    cy.get("#f-donorFirstname").type("Coleen");
-    cy.get("#f-donorMiddlename").type("Stephanie");
+    cy.get("#f-donorFirstname").type("Coleen Stephanie");
     cy.get("#f-donorSurname").type("Morneault");
 
     cy.get("#f-dob-day").type("8");
@@ -53,7 +52,6 @@ describe("Create Digital LPA draft", () => {
 
     cy.contains("Another person").click();
     cy.get("#f-correspondentFirstname").type("Leon");
-    cy.get("#f-correspondentMiddlename").type("Marius");
     cy.get("#f-correspondentSurname").type("Selden");
 
     cy.get("#f-correspondentSurname")
