@@ -130,8 +130,7 @@ func TestPostCreateDraft(t *testing.T) {
 			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
 			Form: formDraft{
 				SubTypes:                  []string{"property-and-affairs", "personal-welfare"},
-				DonorFirstname:            "Gerald",
-				DonorMiddlename:           "Ryan",
+				DonorFirstname:            "Gerald Ryan",
 				DonorSurname:              "Sandel",
 				Dob:                       dob{Day: 6, Month: 3, Year: 1943},
 				Email:                     "gerald.sandel@somehost.example",
@@ -148,7 +147,6 @@ func TestPostCreateDraft(t *testing.T) {
 				},
 				Recipient:               "other",
 				CorrespondentFirstname:  "Rosalinda",
-				CorrespondentMiddlename: "",
 				CorrespondentSurname:    "Langdale",
 				CorrespondentAddress: sirius.Address{
 					Line1:    "Intensity Office",
@@ -168,8 +166,7 @@ func TestPostCreateDraft(t *testing.T) {
 
 	form := url.Values{
 		"subtype":                       {"property-and-affairs", "personal-welfare"},
-		"donorFirstname":                {"Gerald"},
-		"donorMiddlename":               {"Ryan"},
+		"donorFirstname":                {"Gerald Ryan"},
 		"donorSurname":                  {"Sandel"},
 		"dob.day":                       {"6"},
 		"dob.month":                     {"3"},
@@ -186,7 +183,6 @@ func TestPostCreateDraft(t *testing.T) {
 		"donorAddress.Country":          {"GB"},
 		"recipient":                     {"other"},
 		"correspondentFirstname":        {"Rosalinda"},
-		"correspondentMiddlename":       {""},
 		"correspondentSurname":          {"Langdale"},
 		"correspondentAddress.Line1":    {"Intensity Office"},
 		"correspondentAddress.Line2":    {"Lind Run"},
@@ -219,7 +215,7 @@ func TestPostCreateDraftWhenAPIFails(t *testing.T) {
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			Source:          "PHONE",
-			DonorFirstNames: "Gerald",
+			DonorFirstNames: "Gerald Ryan",
 			DonorLastName:   "Sandel",
 			DonorAddress: sirius.Address{
 				Country: "GB",
@@ -230,7 +226,7 @@ func TestPostCreateDraftWhenAPIFails(t *testing.T) {
 	template := &mockTemplate{}
 
 	form := url.Values{
-		"donorFirstname": {"Gerald"},
+		"donorFirstname": {"Gerald Ryan"},
 		"donorSurname":   {"Sandel"},
 	}
 
@@ -254,7 +250,7 @@ func TestPostCreateDraftWhenValidationError(t *testing.T) {
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			Source:          "PHONE",
-			DonorFirstNames: "Gerald",
+			DonorFirstNames: "Gerald Ryan",
 			DonorAddress: sirius.Address{
 				Country: "GB",
 			},
@@ -268,7 +264,7 @@ func TestPostCreateDraftWhenValidationError(t *testing.T) {
 		On("Func", mock.Anything, createDraftData{
 			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
 			Form: formDraft{
-				DonorFirstname: "Gerald",
+				DonorFirstname: "Gerald Ryan",
 			},
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{
@@ -279,7 +275,7 @@ func TestPostCreateDraftWhenValidationError(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"donorFirstname": {"Gerald"},
+		"donorFirstname": {"Gerald Ryan"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/digital-lpa/create", strings.NewReader(form.Encode()))

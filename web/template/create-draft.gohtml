@@ -8,11 +8,11 @@
       <h1 class="govuk-panel__title">
         {{ if (eq (len .Uids) 2) }}
           Draft Personal welfare and Property and affairs LPAs for the donor
-          {{ .Form.DonorFirstname }} {{ .Form.DonorMiddlename }} {{ .Form.DonorSurname }} have been saved
+          {{ .Form.DonorFirstname }} {{ .Form.DonorSurname }} have been saved
         {{ else }}
           A draft
             {{ range .Uids }}{{ subtypeLongFormat .Subtype }} {{ end }}
-          LPA for the donor {{ .Form.DonorFirstname }} {{ .Form.DonorMiddlename }} {{ .Form.DonorSurname }} has been saved
+          LPA for the donor {{ .Form.DonorFirstname }} {{ .Form.DonorSurname }} has been saved
         {{ end }}
       </h1>
       <div class="govuk-panel__body app-panel__body--smaller">
@@ -40,6 +40,10 @@
         {{ template "error-summary" .Error }}
 
         <h1 class="govuk-heading-l">Create a draft LPA</h1>
+
+        <div class="govuk-inset-text">
+            Details you enter will appear in the donor section of the LPA form.
+        </div>
 
         <form class="form" method="POST">
           <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
@@ -71,22 +75,15 @@
           </div>
 
           <a id="f-donorName"></a>
-          {{ template "input" (field "donorFirstname" "What is the donor's first name?" .Form.DonorFirstname .Error.Field.donorFirstNames) }}
+          {{ template "input" (field "donorFirstname" "Donor’s first names, including any middle names" .Form.DonorFirstname .Error.Field.donorFirstNames) }}
 
-          <div class="govuk-form-group {{ if .Error.Field.donorMiddlename }}govuk-form-group--error{{ end }}" aria-describedby="f-donorMiddlename-hint">
-            <label class="govuk-label" for="f-donorMiddlename">What is the donor's middle name?</label>
-            <div class="govuk-hint" id="f-donorMiddlename-hint">Optional</div>
-            {{ template "errors".Error.Field.donorMiddlename }}
-            <input class="govuk-input {{ if .Error.Field.donorMiddlename }}govuk-input--error{{ end }}" id="f-donorMiddlename" name="donorMiddlename" value="{{ .Form.DonorMiddlename }}" />
-          </div>
-
-          {{ template "input" (field "donorSurname" "What is the donor's last name?" .Form.DonorSurname .Error.Field.donorLastName) }}
+          {{ template "input" (field "donorSurname" "Donor’s last name" .Form.DonorSurname .Error.Field.donorLastName) }}
 
           <div class="govuk-form-group {{ if .Error.Field.donorDob }}govuk-form-group--error{{ end }}" id="f-donorDob">
             <fieldset class="govuk-fieldset" role="group" aria-describedby="f-dob-hint">
               <legend class="govuk-fieldset__legend">
                 <h1 class="govuk-fieldset__heading">
-                  What is the donor's date of birth?
+                  Donor’s date of birth
                 </h1>
               </legend>
               <div id="f-dob-hint" class="govuk-hint">
@@ -122,7 +119,7 @@
             </fieldset>
           </div>
 
-          <div class="govuk-form-group {{ if .Error.Field.donorAddress }}govuk-form-group--error{{ end }}" data-module="app-address-finder" data-app-address-finder-label="What is the donor's address?">
+          <div class="govuk-form-group {{ if .Error.Field.donorAddress }}govuk-form-group--error{{ end }}" data-module="app-address-finder" data-app-address-finder-label="Donor’s address">
           {{ template "errors" .Error.Field.donorAddress }}
             {{ template "input" (field "donorAddress.Line1" "Address line 1" .Form.DonorAddress.Line1 (index .Error.Field "donorAddress/addressLine1") "data-app-address-finder-map" "addressLine1") }}
             {{ template "input" (field "donorAddress.Line2" "Address line 2 (optional)" .Form.DonorAddress.Line2 (index .Error.Field "donorAddress/addressLine2") "data-app-address-finder-map" "addressLine2") }}
@@ -178,18 +175,11 @@
                 </div>
                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="f-recipient-other-reveal">
                   <a id="f-correspondentName"></a>
-                  {{ template "input" (field "correspondentFirstname" "What is their first name?" .Form.CorrespondentFirstname .Error.Field.correspondentFirstNames) }}
+                  {{ template "input" (field "correspondentFirstname" "First names, including any middle names" .Form.CorrespondentFirstname .Error.Field.correspondentFirstNames) }}
 
-                  <div class="govuk-form-group {{ if .Error.Field.correspondentMiddlename }}govuk-form-group--error{{ end }}" aria-describedby="f-correspondentMiddlename-hint">
-                    <label class="govuk-label" for="f-correspondentMiddlename">What is their middle name?</label>
-                    <div class="govuk-hint" id="f-correspondentMiddlename-hint">Optional</div>
-                    {{ template "errors".Error.Field.correspondentMiddlename }}
-                    <input class="govuk-input {{ if .Error.Field.correspondentMiddlename }}govuk-input--error{{ end }}" id="f-correspondentMiddlename" name="correspondentMiddlename" value="{{ .Form.CorrespondentMiddlename }}" />
-                  </div>
+                  {{ template "input" (field "correspondentSurname" "Last name" .Form.CorrespondentSurname .Error.Field.correspondentLastName) }}
 
-                  {{ template "input" (field "correspondentSurname" "What is their last name?" .Form.CorrespondentSurname .Error.Field.correspondentLastName) }}
-
-                  <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="What is their address?">
+                  <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Postal address">
                     {{ template "input" (field "correspondentAddress.Line1" "Address line 1" .Form.CorrespondentAddress.Line1 (index .Error.Field "correspondentAddress/addressLine1") "data-app-address-finder-map" "addressLine1") }}
                     {{ template "input" (field "correspondentAddress.Line2" "Address line 2 (optional)" .Form.CorrespondentAddress.Line2 (index .Error.Field "correspondentAddress/addressLine2") "data-app-address-finder-map" "addressLine2") }}
                     {{ template "input" (field "correspondentAddress.Line3" "Address line 3 (optional)" .Form.CorrespondentAddress.Line3 (index .Error.Field "correspondentAddress/addressLine3") "data-app-address-finder-map" "addressLine3") }}
@@ -203,14 +193,14 @@
           </div>
 
           <div class="govuk-form-group {{ if .Error.Field.donorPhone }}govuk-form-group--error{{ end }}" aria-describedby="f-donorPhone-hint">
-            <label class="govuk-label" for="f-donorPhone">What is the donor's phone number?</label>
+            <label class="govuk-label" for="f-donorPhone">Donor’s phone number</label>
             <div class="govuk-hint" id="f-donorPhone-hint">Optional</div>
             {{ template "errors".Error.Field.donorPhone }}
             <input class="govuk-input {{ if .Error.Field.donorPhone }}govuk-input--error{{ end }}" id="f-donorPhone" name="donorPhone" value="{{ .Form.Phone }}" />
           </div>
 
           <div class="govuk-form-group {{ if .Error.Field.donorEmail }}govuk-form-group--error{{ end }}" aria-describedby="f-donorEmail-hint">
-            <label class="govuk-label" for="f-donorEmail">What is the donor's email address?</label>
+            <label class="govuk-label" for="f-donorEmail">Donor’s email address</label>
             <div class="govuk-hint" id="f-donorEmail-hint">Optional</div>
             {{ template "errors".Error.Field.donorEmail }}
             <input class="govuk-input {{ if .Error.Field.donorEmail }}govuk-input--error{{ end }}" id="f-donorEmail" name="donorEmail" value="{{ .Form.Email }}" />
@@ -243,8 +233,16 @@
             </fieldset>
           </div>
 
+          <div class="govuk-warning-text">
+              <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+              <strong class="govuk-warning-text__text">
+                  <span class="govuk-visually-hidden">Warning</span>
+                  You are about to create an LPA case. Check the details you’ve entered are correct before clicking the ‘confirm and create draft LPA’ button.
+              </strong>
+          </div>
+
           <div class="govuk-button-group">
-            <button class="govuk-button" data-module="govuk-button" type="submit" data-disable-after-click="true">Save draft LPA</button>
+            <button class="govuk-button" data-module="govuk-button" type="submit" data-disable-after-click="true">Confirm and create draft LPA</button>
             <a class="govuk-link govuk-link--no-visited-state" href="/">Cancel</a>
           </div>
         </form>
