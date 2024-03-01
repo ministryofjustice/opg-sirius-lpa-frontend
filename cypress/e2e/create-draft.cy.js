@@ -70,7 +70,7 @@ describe("Create Digital LPA draft", () => {
     cy.get("#f-donorPhone").type("07893932118");
     cy.get("#f-donorEmail").type("c.morneault@somehost.example");
 
-    cy.contains("Save draft LPA").click();
+    cy.contains("Confirm and create draft LPA").click();
     cy.get(".govuk-panel").contains(
       "Draft Personal welfare and Property and affairs LPAs for the donor Coleen Stephanie Morneault have been saved",
     );
