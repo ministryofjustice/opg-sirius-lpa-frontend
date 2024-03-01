@@ -9,6 +9,7 @@ require (
 	github.com/go-playground/form/v4 v4.2.1
 	github.com/ministryofjustice/opg-go-common v0.0.0-20240227144553-d506200e53d5
 	github.com/pact-foundation/pact-go v1.8.0
+	github.com/pact-foundation/pact-go/v2 v2.0.4
 	github.com/stretchr/testify v1.8.4
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.48.0
 	golang.org/x/mod v0.15.0
