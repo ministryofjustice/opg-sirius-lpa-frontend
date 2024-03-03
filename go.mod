@@ -9,8 +9,8 @@ require (
 	github.com/go-playground/form/v4 v4.2.1
 	github.com/ministryofjustice/opg-go-common v0.0.0-20240227144553-d506200e53d5
 	github.com/pact-foundation/pact-go v1.8.0
-	github.com/stretchr/testify v1.8.4
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.48.0
+	github.com/stretchr/testify v1.9.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0
 	golang.org/x/mod v0.15.0
 	golang.org/x/sync v0.6.0
 	golang.org/x/text v0.14.0
@@ -28,7 +28,7 @@ require (
 	github.com/hashicorp/go-version v1.6.0 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/objx v0.5.0 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
 	go.opentelemetry.io/contrib/detectors/aws/ecs v1.24.0 // indirect
 	go.opentelemetry.io/contrib/propagators/aws v1.24.0 // indirect
 	go.opentelemetry.io/otel v1.24.0 // indirect
