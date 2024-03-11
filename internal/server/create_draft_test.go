@@ -145,9 +145,9 @@ func TestPostCreateDraft(t *testing.T) {
 					Postcode: "QY9 9QW",
 					Country:  "GB",
 				},
-				Recipient:               "other",
-				CorrespondentFirstname:  "Rosalinda",
-				CorrespondentSurname:    "Langdale",
+				Recipient:              "other",
+				CorrespondentFirstname: "Rosalinda",
+				CorrespondentSurname:   "Langdale",
 				CorrespondentAddress: sirius.Address{
 					Line1:    "Intensity Office",
 					Line2:    "Lind Run",

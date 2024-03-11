@@ -99,7 +99,7 @@ func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 			switch assignTo {
 			case "me":
 				user, err := client.GetUserDetails(ctx)
-				if (err != nil){
+				if err != nil {
 					return err
 				} else {
 					assigneeID = user.ID

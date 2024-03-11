@@ -32,15 +32,15 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"today": func() string {
 			return time.Now().Format("2006-01-02")
 		},
-		"field":    field,
-		"radios":   radios,
-		"item":     item,
-		"fieldID":  fieldID,
-		"select":   select_,
-		"options":  options,
-		"caseTabs": caseTab,
+		"field":                      field,
+		"radios":                     radios,
+		"item":                       item,
+		"fieldID":                    fieldID,
+		"select":                     select_,
+		"options":                    options,
+		"caseTabs":                   caseTab,
 		"sortWarningsForCaseSummary": sortWarningsForCaseSummary,
-		"casesWarningAppliedTo": casesWarningAppliedTo,
+		"casesWarningAppliedTo":      casesWarningAppliedTo,
 		"fee": func(amount int) string {
 			float := float64(amount)
 			return fmt.Sprintf("%.2f", float/100)
@@ -136,7 +136,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			return strings.Join(s, joiner)
 		},
 		"subtypeShortFormat": subtypeShortFormat,
-		"subtypeLongFormat": subtypeLongFormat,
+		"subtypeLongFormat":  subtypeLongFormat,
 	}
 }
 
@@ -155,32 +155,32 @@ type linkedCase struct {
 // 2-3 character LPA subtype, upper-cased
 func subtypeShortFormat(subtype string) string {
 	switch strings.ToLower(subtype) {
-		case "personal-welfare":
-			return "PW"
-		case "property-and-affairs":
-			return "PA"
-		case "hw":
-			return "HW"
-		case "pfa":
-			return "PFA"
-		default:
-			return ""
+	case "personal-welfare":
+		return "PW"
+	case "property-and-affairs":
+		return "PA"
+	case "hw":
+		return "HW"
+	case "pfa":
+		return "PFA"
+	default:
+		return ""
 	}
 }
 
 // full text for LPA subtype, e.g. "Personal welfare"
 func subtypeLongFormat(subtype string) string {
 	switch strings.ToLower(subtype) {
-		case "personal-welfare":
-			return "Personal welfare"
-		case "property-and-affairs":
-			return "Property and affairs"
-		case "hw":
-			return "Health and welfare"
-		case "pfa":
-			return "Property and financial affairs"
-		default:
-			return ""
+	case "personal-welfare":
+		return "Personal welfare"
+	case "property-and-affairs":
+		return "Property and affairs"
+	case "hw":
+		return "Health and welfare"
+	case "pfa":
+		return "Property and financial affairs"
+	default:
+		return ""
 	}
 }
 
@@ -246,7 +246,7 @@ func casesWarningAppliedTo(uid string, cases []sirius.Case) string {
 	}
 
 	var filteredCases []sirius.Case
-	for _, caseItem := range(cases) {
+	for _, caseItem := range cases {
 		if caseItem.UID != uid {
 			filteredCases = append(filteredCases, caseItem)
 		}
@@ -254,8 +254,8 @@ func casesWarningAppliedTo(uid string, cases []sirius.Case) string {
 	numCases := len(filteredCases)
 
 	var b strings.Builder
-	for index, caseItem := range(filteredCases) {
-		if index == numCases - 1 {
+	for index, caseItem := range filteredCases {
+		if index == numCases-1 {
 			b.WriteString(" and ")
 		} else {
 			b.WriteString(", ")

@@ -81,11 +81,11 @@ func TestWarningsForCase(t *testing.T) {
 					WillRespondWith(dsl.Response{
 						Status: http.StatusOK,
 						Body: dsl.EachLike(map[string]interface{}{
-							"id":           dsl.Like(9901),
-							"dateAdded":    dsl.Regex("07/01/2023 10:10:10", `\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}`),
-							"warningType":  dsl.String("Attorney removed"),
-							"warningText":  dsl.String("Attorney was removed"),
-							"caseItems":    dsl.EachLike(map[string]interface{}{
+							"id":          dsl.Like(9901),
+							"dateAdded":   dsl.Regex("07/01/2023 10:10:10", `\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}`),
+							"warningType": dsl.String("Attorney removed"),
+							"warningText": dsl.String("Attorney was removed"),
+							"caseItems": dsl.EachLike(map[string]interface{}{
 								"uId":      dsl.String("M-TTTT-RRRR-EEEE"),
 								"caseType": dsl.String("DIGITAL_LPA"),
 							}, 1),
@@ -95,13 +95,13 @@ func TestWarningsForCase(t *testing.T) {
 			},
 			expectedResponse: []Warning{
 				Warning{
-					ID: 9901,
-					DateAdded: "07/01/2023 10:10:10",
+					ID:          9901,
+					DateAdded:   "07/01/2023 10:10:10",
 					WarningType: "Attorney removed",
 					WarningText: "Attorney was removed",
 					CaseItems: []Case{
 						Case{
-							UID: "M-TTTT-RRRR-EEEE",
+							UID:      "M-TTTT-RRRR-EEEE",
 							CaseType: "DIGITAL_LPA",
 						},
 					},
