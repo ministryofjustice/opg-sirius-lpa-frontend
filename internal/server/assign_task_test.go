@@ -217,7 +217,7 @@ func TestPostAssignTask(t *testing.T) {
 }
 
 func TestPostAssignTaskToMe(t *testing.T) {
-    user := sirius.User{ID: 66, DisplayName: "Me", Roles: []string{"OPG User", "Reduced Fees User"}}
+	user := sirius.User{ID: 66, DisplayName: "Me", Roles: []string{"OPG User", "Reduced Fees User"}}
 
 	client := &mockAssignTaskClient{}
 	client.
@@ -230,8 +230,8 @@ func TestPostAssignTaskToMe(t *testing.T) {
 		On("AssignTasks", mock.Anything, 66, []int{123}).
 		Return(nil)
 	client.
-		On("GetUserDetails",mock.Anything).
-		Return(user,nil)
+		On("GetUserDetails", mock.Anything).
+		Return(user, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -244,7 +244,7 @@ func TestPostAssignTaskToMe(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"assignTo":     {"me"},
+		"assignTo": {"me"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
@@ -271,8 +271,8 @@ func TestPostAssignTaskWhenUserDetailsErrors(t *testing.T) {
 		On("AssignTasks", mock.Anything, 66, []int{123}).
 		Return(nil)
 	client.
-		On("GetUserDetails",mock.Anything).
-		Return(sirius.User{},expectedError)
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{}, expectedError)
 
 	template := &mockTemplate{}
 	template.
@@ -285,7 +285,7 @@ func TestPostAssignTaskWhenUserDetailsErrors(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"assignTo":     {"me"},
+		"assignTo": {"me"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
@@ -498,7 +498,7 @@ func TestPostAssignTaskToDigitalLpaRedirects(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"assignTo": {"user"},
+		"assignTo":     {"user"},
 		"assigneeUser": {"66: Some user"},
 	}
 

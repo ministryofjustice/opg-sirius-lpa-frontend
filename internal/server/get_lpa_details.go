@@ -14,8 +14,9 @@ type GetLpaDetailsClient interface {
 }
 
 type getLpaDetails struct {
-	LpaStoreData map[string]interface{}
 	CaseSummary  sirius.CaseSummary
+	DigitalLpa   sirius.DigitalLpa
+	LpaStoreData map[string]interface{}
 }
 
 func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
@@ -35,8 +36,9 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		}
 
 		data := getLpaDetails{
-			LpaStoreData: lpaStoreData,
 			CaseSummary:  caseSummary,
+			DigitalLpa:   caseSummary.DigitalLpa,
+			LpaStoreData: lpaStoreData,
 		}
 
 		return tmpl(w, data)
