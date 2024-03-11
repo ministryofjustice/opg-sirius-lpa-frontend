@@ -131,7 +131,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/search-persons", wrap(SearchDonors(client)))
 	mux.Handle("/search-postcode", wrap(SearchPostcode(client)))
 	mux.Handle("/search", wrap(Search(client, templates.Get("search.gohtml"))))
-	mux.Handle("/digital-lpa/create", wrap(CreateDraft(client, templates.Get("create-draft.gohtml"))))
+	mux.Handle("/digital-lpa/create", wrap(CreateDraft(client, templates.Get("create_draft.gohtml"))))
 	mux.Handle("/lpa/{uid}", wrap(Lpa(client, templates.Get("lpa.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))
