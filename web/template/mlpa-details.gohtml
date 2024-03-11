@@ -10,9 +10,96 @@
 
             <h1 class="govuk-heading-l govuk-!-margin-bottom-5">LPA details</h1>
 
-            <p class="govuk-body-s">
-                {{ .LpaStoreData }}
-            </p>
+            <div>
+                <h2 class="govuk-heading-m">Donor</h2>
+
+                <dl class="govuk-summary-list">
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Application format</dt>
+                    <dd class="govuk-summary-list__value">
+                      {{if (eq .DigitalLpa.SiriusData.Application.Source "APPLICANT")}}
+                        Digital
+                      {{else}}
+                        Paper
+                      {{end}}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Name</dt>
+                    <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorFirstNames }} {{ .DigitalLpa.SiriusData.Application.DonorLastName }}</dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Date of birth</dt>
+                    <dd class="govuk-summary-list__value">{{ (date .DigitalLpa.SiriusData.Application.DonorDob "2 January 2006") }}</dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Address</dt>
+                    <dd class="govuk-summary-list__value">
+                      {{ .DigitalLpa.SiriusData.Application.DonorAddress.Line1 }}
+                      {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Line2 "") }}<br>{{ .DigitalLpa.SiriusData.Application.DonorAddress.Line2 }}{{ end }}
+                      {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Line3 "") }}<br>{{ .DigitalLpa.SiriusData.Application.DonorAddress.Line3 }}{{ end }}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Town or city</dt>
+                    <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorAddress.Town }}</dd>
+                  </div>
+                  {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Postcode "") }}
+                    <div class="govuk-summary-list__row">
+                      <dt class="govuk-summary-list__key">Postcode</dt>
+                      <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorAddress.Postcode }}</dd>
+                    </div>
+                  {{ end }}
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Country</dt>
+                    <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorAddress.Country }}</dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Phone number</dt>
+                    <dd class="govuk-summary-list__value">
+                      {{ if (eq .DigitalLpa.SiriusData.Application.PhoneNumber "") }}
+                        not provided
+                      {{ else }}
+                        {{ .DigitalLpa.SiriusData.Application.PhoneNumber }}
+                      {{ end }}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Email</dt>
+                    <dd class="govuk-summary-list__value">
+                      {{ if (eq .DigitalLpa.SiriusData.Application.Email "") }}
+                        not provided
+                      {{ else }}
+                        {{ .DigitalLpa.SiriusData.Application.Email }}
+                      {{ end }}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Post forms to</dt>
+                    <dd class="govuk-summary-list__value">
+                      {{ if (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line1 "") }}
+                        The donor
+                      {{ else }}
+                        {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentFirstNames "") }}
+                          {{ .DigitalLpa.SiriusData.Application.CorrespondentFirstNames }} {{ .DigitalLpa.SiriusData.Application.CorrespondentLastName }}<br>
+                        {{ end }}
+                          {{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line1 }}
+                          {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line2 "") }}<br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line2 }}{{ end }}
+                          {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line3 "") }}<br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line3 }}{{ end }}
+                          <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Town }}
+                          <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Postcode }}
+                          <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Country }}
+                          <br>
+                      {{ end }}
+                    </dd>
+                  </div>
+                </dl>
+            </div>
+            <div>
+                <p class="govuk-body-s">
+                    {{ .LpaStoreData }}
+                </p>
+            </div>
         </div>
     </div>
 {{ end }}
