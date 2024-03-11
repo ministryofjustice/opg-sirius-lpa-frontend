@@ -41,6 +41,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 	template.
 		On("Func", mock.Anything, getLpaDetails{
 			CaseSummary: caseSummary,
+			DigitalLpa:  caseSummary.DigitalLpa,
 			LpaStoreData: map[string]interface{}{
 				"some": "data",
 			},
