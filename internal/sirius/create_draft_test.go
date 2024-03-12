@@ -165,7 +165,7 @@ func TestCreateDraft(t *testing.T) {
 					})
 			},
 			expectedResponse: map[string]string{
-				"personal-welfare":  "M-GHIJ-7890-KLMN",
+				"personal-welfare":     "M-GHIJ-7890-KLMN",
 				"property-and-affairs": "M-ABCD-1234-EF56",
 			},
 		},
