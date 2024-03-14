@@ -192,18 +192,20 @@
             </fieldset>
           </div>
 
-          <div class="govuk-form-group {{ if .Error.Field.donorPhone }}govuk-form-group--error{{ end }}" aria-describedby="f-donorPhone-hint">
+          <div class="govuk-form-group {{ if .Error.Field.donorPhone }}govuk-form-group--error{{ end }}">
             <label class="govuk-label" for="f-donorPhone">Donor’s phone number</label>
             <div class="govuk-hint" id="f-donorPhone-hint">Optional</div>
             {{ template "errors".Error.Field.donorPhone }}
-            <input class="govuk-input {{ if .Error.Field.donorPhone }}govuk-input--error{{ end }}" id="f-donorPhone" name="donorPhone" value="{{ .Form.Phone }}" />
+            <input class="govuk-input {{ if .Error.Field.donorPhone }}govuk-input--error{{ end }}" id="f-donorPhone"
+                   name="donorPhone" value="{{ .Form.Phone }}" aria-describedby="f-donorPhone-hint" />
           </div>
 
-          <div class="govuk-form-group {{ if .Error.Field.donorEmail }}govuk-form-group--error{{ end }}" aria-describedby="f-donorEmail-hint">
+          <div class="govuk-form-group {{ if .Error.Field.donorEmail }}govuk-form-group--error{{ end }}">
             <label class="govuk-label" for="f-donorEmail">Donor’s email address</label>
             <div class="govuk-hint" id="f-donorEmail-hint">Optional</div>
             {{ template "errors".Error.Field.donorEmail }}
-            <input class="govuk-input {{ if .Error.Field.donorEmail }}govuk-input--error{{ end }}" id="f-donorEmail" name="donorEmail" value="{{ .Form.Email }}" />
+            <input class="govuk-input {{ if .Error.Field.donorEmail }}govuk-input--error{{ end }}" id="f-donorEmail"
+                   name="donorEmail" value="{{ .Form.Email }}" aria-describedby="f-donorEmail-hint" />
           </div>
 
           <div class="govuk-form-group {{ if or (.Error.Field.correspondenceLargeFormat) (.Error.Field.correspondenceByWelsh) }}govuk-form-group--error{{ end }}" id="f-correspondenceOptions">
