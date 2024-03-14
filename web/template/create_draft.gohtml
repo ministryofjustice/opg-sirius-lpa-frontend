@@ -49,13 +49,13 @@
           <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
           <div class="govuk-form-group {{ if .Error.Field.types }}govuk-form-group--error{{ end }}" id="f-types">
-            <fieldset class="govuk-fieldset" aria-describedby="f-type-hint">
+            <fieldset class="govuk-fieldset">
               <legend class="govuk-fieldset__legend">What LPA types are required?</legend>
               <div class="govuk-hint" id="f-type-hint">Select all that apply</div>
               {{ template "errors" .Error.Field.types }}
               <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                 <div class="govuk-checkboxes__item">
-                  <input class="govuk-checkboxes__input" id="f-type-personal-welfare"
+                  <input class="govuk-checkboxes__input" id="f-type-personal-welfare" aria-describedby="f-type-hint"
                           name="subtype" type="checkbox" value="personal-welfare" {{ if contains .Form.SubTypes "personal-welfare" }}checked{{ end }}>
                   <label class="govuk-label govuk-checkboxes__label"
                           for="f-type-personal-welfare">
@@ -63,7 +63,7 @@
                   </label>
                 </div>
                 <div class="govuk-checkboxes__item">
-                  <input class="govuk-checkboxes__input" id="f-type-property-and-affairs"
+                  <input class="govuk-checkboxes__input" id="f-type-property-and-affairs" aria-describedby="f-type-hint"
                           name="subtype" type="checkbox" value="property-and-affairs" {{ if contains .Form.SubTypes "property-and-affairs" }}checked{{ end }}>
                   <label class="govuk-label govuk-checkboxes__label"
                           for="f-type-property-and-affairs">
@@ -80,7 +80,7 @@
           {{ template "input" (field "donorSurname" "Donor’s last name" .Form.DonorSurname .Error.Field.donorLastName) }}
 
           <div class="govuk-form-group {{ if .Error.Field.donorDob }}govuk-form-group--error{{ end }}" id="f-donorDob">
-            <fieldset class="govuk-fieldset" role="group" aria-describedby="f-dob-hint">
+            <fieldset class="govuk-fieldset" role="group">
               <legend class="govuk-fieldset__legend">
                 <h1 class="govuk-fieldset__heading">
                   Donor’s date of birth
@@ -96,7 +96,8 @@
                     <label class="govuk-label govuk-date-input__label" for="f-dob-day">
                       Day
                     </label>
-                    <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="f-dob-day" name="dob.day" type="text" inputmode="numeric" {{ if not (eq .Form.Dob.Day 0) }}value="{{ .Form.Dob.Day }}"{{ end }}>
+                    <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="f-dob-day" name="dob.day"type="text"
+                           inputmode="numeric" {{ if not (eq .Form.Dob.Day 0) }}value="{{ .Form.Dob.Day }}"{{ end }} aria-describedby="f-dob-hint">
                   </div>
                 </div>
                 <div class="govuk-date-input__item">
@@ -104,7 +105,8 @@
                     <label class="govuk-label govuk-date-input__label" for="f-dob-month">
                       Month
                     </label>
-                    <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="f-dob-month" name="dob.month" type="text" inputmode="numeric" {{ if not (eq .Form.Dob.Month 0) }}value="{{ .Form.Dob.Month }}"{{ end }}>
+                    <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="f-dob-month" name="dob.month" type="text"
+                           inputmode="numeric" {{ if not (eq .Form.Dob.Month 0) }}value="{{ .Form.Dob.Month }}"{{ end }} aria-describedby="f-dob-hint">
                   </div>
                 </div>
                 <div class="govuk-date-input__item">
@@ -112,7 +114,8 @@
                     <label class="govuk-label govuk-date-input__label" for="f-dob-year">
                       Year
                     </label>
-                    <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="f-dob-year" name="dob.year" type="text" inputmode="numeric" {{ if not (eq .Form.Dob.Year 0) }}value="{{ .Form.Dob.Year }}"{{ end }}>
+                    <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="f-dob-year" name="dob.year" type="text"
+                           inputmode="numeric" {{ if not (eq .Form.Dob.Year 0) }}value="{{ .Form.Dob.Year }}"{{ end }} aria-describedby="f-dob-hint">
                   </div>
                 </div>
               </div>
@@ -130,13 +133,13 @@
           </div>
 
           <div class="govuk-form-group {{ if .Error.Field.recipient }}govuk-form-group--error{{ end }}" id="f-recipient">
-            <fieldset class="govuk-fieldset" aria-describedby="f-recipient-hint">
+            <fieldset class="govuk-fieldset">
               <legend class="govuk-fieldset__legend">Who should the documents be posted to?</legend>
               {{ template "errors" .Error.Field.recipient }}
               <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
                 <div class="govuk-radios__item">
                   <input class="govuk-radios__input" id="f-recipient-donor-same-address"
-                          name="recipient" type="radio" value="donor-same-address"
+                          name="recipient" type="radio" value="donor-same-address" aria-describedby="f-recipient-hint"
                           {{ if eq "donor-same-address" .Form.Recipient}}checked="checked"{{ end }}>
                   <label class="govuk-label govuk-radios__label"
                           for="f-recipient-donor-same-address">
@@ -146,7 +149,7 @@
                 <div class="govuk-radios__item">
                   <input class="govuk-radios__input" id="f-recipient-donor-other-address"
                           name="recipient" type="radio" value="donor-other-address"
-                          data-aria-controls="f-recipient-donor-other-address-reveal"
+                          data-aria-controls="f-recipient-donor-other-address-reveal" aria-describedby="f-recipient-hint"
                           {{ if eq "donor-other-address" .Form.Recipient}}checked="checked"{{ end }}>
                   <label class="govuk-label govuk-radios__label"
                           for="f-recipient-donor-other-address">
@@ -166,7 +169,7 @@
                 <div class="govuk-radios__item">
                   <input class="govuk-radios__input" id="f-recipient-other"
                           name="recipient" type="radio" value="other"
-                          data-aria-controls="f-recipient-other-reveal"
+                          data-aria-controls="f-recipient-other-reveal" aria-describedby="f-recipient-hint"
                           {{ if eq "other" .Form.Recipient}}checked="checked"{{ end }}>
                   <label class="govuk-label govuk-radios__label"
                           for="f-recipient-other">
@@ -192,29 +195,31 @@
             </fieldset>
           </div>
 
-          <div class="govuk-form-group {{ if .Error.Field.donorPhone }}govuk-form-group--error{{ end }}" aria-describedby="f-donorPhone-hint">
+          <div class="govuk-form-group {{ if .Error.Field.donorPhone }}govuk-form-group--error{{ end }}">
             <label class="govuk-label" for="f-donorPhone">Donor’s phone number</label>
             <div class="govuk-hint" id="f-donorPhone-hint">Optional</div>
             {{ template "errors".Error.Field.donorPhone }}
-            <input class="govuk-input {{ if .Error.Field.donorPhone }}govuk-input--error{{ end }}" id="f-donorPhone" name="donorPhone" value="{{ .Form.Phone }}" />
+            <input class="govuk-input {{ if .Error.Field.donorPhone }}govuk-input--error{{ end }}" id="f-donorPhone"
+                   name="donorPhone" value="{{ .Form.Phone }}" aria-describedby="f-donorPhone-hint" />
           </div>
 
-          <div class="govuk-form-group {{ if .Error.Field.donorEmail }}govuk-form-group--error{{ end }}" aria-describedby="f-donorEmail-hint">
+          <div class="govuk-form-group {{ if .Error.Field.donorEmail }}govuk-form-group--error{{ end }}">
             <label class="govuk-label" for="f-donorEmail">Donor’s email address</label>
             <div class="govuk-hint" id="f-donorEmail-hint">Optional</div>
             {{ template "errors".Error.Field.donorEmail }}
-            <input class="govuk-input {{ if .Error.Field.donorEmail }}govuk-input--error{{ end }}" id="f-donorEmail" name="donorEmail" value="{{ .Form.Email }}" />
+            <input class="govuk-input {{ if .Error.Field.donorEmail }}govuk-input--error{{ end }}" id="f-donorEmail"
+                   name="donorEmail" value="{{ .Form.Email }}" aria-describedby="f-donorEmail-hint" />
           </div>
 
           <div class="govuk-form-group {{ if or (.Error.Field.correspondenceLargeFormat) (.Error.Field.correspondenceByWelsh) }}govuk-form-group--error{{ end }}" id="f-correspondenceOptions">
-            <fieldset class="govuk-fieldset" aria-describedby="f-correspondence-options-hint">
+            <fieldset class="govuk-fieldset">
               <legend class="govuk-fieldset__legend">Does the donor require correspondence in Welsh or large format?</legend>
               <div class="govuk-hint" id="f-correspondence-options-hint">Optional, select all that apply</div>
               {{ template "errors" .Error.Field.correspondenceByWelsh }}
               {{ template "errors" .Error.Field.correspondenceLargeFormat }}
               <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                 <div class="govuk-checkboxes__item">
-                  <input class="govuk-checkboxes__input" id="f-correspondence-welsh"
+                  <input class="govuk-checkboxes__input" id="f-correspondence-welsh" aria-describedby="f-correspondence-options-hint"
                          name="correspondenceByWelsh" type="checkbox" value="true" {{ if .Form.CorrespondenceByWelsh }}checked{{ end }}>
                   <label class="govuk-label govuk-checkboxes__label"
                          for="f-correspondence-welsh">
@@ -222,7 +227,7 @@
                   </label>
                 </div>
                 <div class="govuk-checkboxes__item">
-                  <input class="govuk-checkboxes__input" id="f-correspondence-large"
+                  <input class="govuk-checkboxes__input" id="f-correspondence-large" aria-describedby="f-correspondence-options-hint"
                          name="correspondenceLargeFormat" type="checkbox" value="true" {{ if .Form.CorrespondenceLargeFormat }}checked{{ end }}>
                   <label class="govuk-label govuk-checkboxes__label"
                          for="f-correspondence-large">
