@@ -44,8 +44,26 @@ describe("View a digital LPA", () => {
           },
         },
         "opg.poas.lpastore": {
+          attorneys: [
+            {
+              firstNames: "Esther",
+              lastName: "Greenwood",
+              status: "active",
+            },
+            {
+              firstNames: "Susanna",
+              lastName: "Kaysen",
+              status: "removed",
+            },
+            {
+              firstNames: "Philomena",
+              lastName: "Guinea",
+              status: "replacement",
+            },
+          ],
           lpaType: "pf",
           registrationDate: "2022-12-18",
+          peopleToNotify: [],
         },
       },
     });
@@ -250,5 +268,13 @@ describe("View a digital LPA", () => {
     cy.contains("LPA details").click();
     cy.contains("lpaType:pf");
     cy.contains("registrationDate:2022-12-18");
+  });
+
+  it.only("shows lpa details in accordions with correct counts of actors", () => {
+    cy.contains("LPA details").click();
+    cy.contains("Attorneys (2)");
+    cy.contains("Replacement attorneys (1)");
+    cy.contains("Notified people (0)");
+    cy.contains("Correspondent (0)");
   });
 });
