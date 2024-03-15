@@ -122,7 +122,7 @@
         <div class="govuk-accordion__section-header">
           <h2 class="govuk-accordion__section-heading">
             <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
-              Attorneys ({{ (len (index .LpaStoreData "attorneys")) }})
+              Attorneys ({{ count "attorneys" .LpaStoreData }})
             </span>
           </h2>
         </div>
@@ -146,7 +146,7 @@
         <div class="govuk-accordion__section-header">
           <h2 class="govuk-accordion__section-heading">
             <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
-              Replacement attorneys ({{ (len (index .LpaStoreData "attorneys")) }})
+              Replacement attorneys ({{ count "attorneys" .LpaStoreData )) }})
             </span>
           </h2>
         </div>
