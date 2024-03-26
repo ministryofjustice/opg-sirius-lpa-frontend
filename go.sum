@@ -91,6 +91,8 @@ github.com/leodido/go-urn v1.2.0/go.mod h1:+8+nEpDfqqsY+g338gtMEUOtuK+4dEMhiQEgx
 github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=
 github.com/ministryofjustice/opg-go-common v0.0.0-20240227144553-d506200e53d5 h1:o3Cyak8pXiOQTLdniFSiyCbhNiQ5To/+cLHyVKKBd/o=
 github.com/ministryofjustice/opg-go-common v0.0.0-20240227144553-d506200e53d5/go.mod h1:zwxromuoYZxDwvvBy6NDhdyw3AZnAeq3dXZ647fNVf4=
+github.com/ministryofjustice/opg-go-common v0.0.0-20240326094508-d16a21564abf h1:tlHgih+++/6OaeZSXZ8WQctnqQ7G2z2Lv1f8Zg7s7oE=
+github.com/ministryofjustice/opg-go-common v0.0.0-20240326094508-d16a21564abf/go.mod h1:LdytY8+QWEgpgrr4uGAFn4q4RqODCaRA3tQ9tx8WM5o=
 github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
