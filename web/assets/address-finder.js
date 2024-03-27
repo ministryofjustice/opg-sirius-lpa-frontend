@@ -64,7 +64,7 @@ AddressFinder.template = (id) => `
   <div class="govuk-form-group">
     <label class="govuk-label" for="f-${id}-input"></label>
     <div class="govuk-hint" id="f-${id}-hint">
-      Enter a UK postcode, or enter the address manually
+      Enter a UK postcode, or enter the address manually.
     </div>
     <p id="f-${id}-error" class="govuk-error-message govuk-!-display-none">
       <span class="govuk-visually-hidden">Error:</span>
