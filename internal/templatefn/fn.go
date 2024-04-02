@@ -137,6 +137,30 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		},
 		"subtypeShortFormat": subtypeShortFormat,
 		"subtypeLongFormat":  subtypeLongFormat,
+		"howReplacementAttorneysMakeDecisionsLongForm": func(s string) string {
+			switch s {
+			case "jointly":
+				return "Jointly"
+           	case "jointly-and-severally":
+           		return "Jointly & severally"
+            case "jointly-for-some-severally-for-others":
+            	return "Jointly for some, severally for others"
+            default:
+            	return ""
+            }
+		},
+		"howReplacementAttorneysStepInLongForm": func(s string) string {
+			switch s {
+			case "all-can-no-longer-act":
+				return "When all can no longer act"
+            case "one-can-no-longer-act":
+            	return "When one can no longer act"
+            case "another-way":
+            	return "Another way"
+			default:
+            	return ""
+			}
+		},
 	}
 }
 

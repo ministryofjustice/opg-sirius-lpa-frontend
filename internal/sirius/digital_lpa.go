@@ -41,9 +41,12 @@ type Donor struct {
 }
 
 type LpaStoreData struct {
-	Donor     LpaStoreDonor      `json:"donor"`
-	Attorneys []LpaStoreAttorney `json:"attorneys"`
-	SignedAt  string             `json:"signedAt"`
+	Donor                                       LpaStoreDonor      `json:"donor"`
+	Attorneys                                   []LpaStoreAttorney `json:"attorneys"`
+	HowReplacementAttorneysMakeDecisions        string             `json:"howReplacementAttorneysMakeDecisions"`
+	HowReplacementAttorneysStepIn               string             `json:"howReplacementAttorneysStepIn"`
+	HowReplacementAttorneysMakeDecisionsDetails string             `json:"howReplacementAttorneysMakeDecisionsDetails"`
+	SignedAt                                    string             `json:"signedAt"`
 }
 
 type LpaStoreDonor struct {
