@@ -137,7 +137,6 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		},
 		"subtypeShortFormat": subtypeShortFormat,
 		"subtypeLongFormat":  subtypeLongFormat,
-		"count":              count,
 	}
 }
 
@@ -151,14 +150,6 @@ type linkedCase struct {
 	UID         string
 	Subtype     string
 	CreatedDate sirius.DateString
-}
-
-func count(item string, data map[string]interface{}) int {
-	if data[item] == nil {
-		return 0
-	}
-
-	return len(data[item].([]interface{}))
 }
 
 // 2-3 character LPA subtype, upper-cased
