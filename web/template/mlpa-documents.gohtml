@@ -93,7 +93,7 @@
                             {{ end }}
                         </td>
                         <td class="govuk-table__cell">
-                            {{ (formatDateWithTime .CreatedDate "2 January 2006") }}
+                            {{ (parseAndFormatDate .CreatedDate "02/01/2006 15:04:05" "2 January 2006") }}
                         </td>
                     </tr>
                 {{ end }}

@@ -60,12 +60,12 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 
 			return time.Format(format), nil
 		},
-		"formatDateWithTime": func(s string, format string) (string, error) {
-			t, err := time.Parse("02/01/2006 15:04:05", s)
+		// s is a date string; layout specifies its structure
+		"parseAndFormatDate": func (s string, layout string, format string) (string, error) {
+			t, err := time.Parse(layout, s)
 			if err != nil {
 				return "", err
 			}
-
 			return t.Format(format), nil
 		},
 		"translateRefData": func(types []sirius.RefDataItem, tmplHandle string) string {
