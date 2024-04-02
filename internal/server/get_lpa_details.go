@@ -13,12 +13,6 @@ type GetLpaDetailsClient interface {
 	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
 }
 
-type getLpaDetails struct {
-	CaseSummary        sirius.CaseSummary
-	DigitalLpa         sirius.DigitalLpa
-	LpaStoreDataLegacy map[string]interface{}
-}
-
 // TODO move to digital_lpa.go
 type LpaStoreData struct {
 	Donor LpaStoreDonor `json:"donor"`
@@ -27,6 +21,13 @@ type LpaStoreData struct {
 type LpaStoreDonor struct {
 	FirstNames string `json:"firstNames"`
 	LastName   string `json:"lastName"`
+}
+
+type getLpaDetails struct {
+	CaseSummary        sirius.CaseSummary
+	DigitalLpa         sirius.DigitalLpa
+	LpaStoreDataLegacy map[string]interface{}
+	LpaStoreData       LpaStoreData
 }
 
 func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
@@ -45,10 +46,22 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		out, err := json.Marshal(caseSummary.DigitalLpa.LpaStoreData)
+		if err != nil {
+			return err
+		}
+
+		var lpaStoreData LpaStoreData
+		err = json.Unmarshal(out, &lpaStoreData)
+		if err != nil {
+			return err
+		}
+
 		data := getLpaDetails{
 			CaseSummary:        caseSummary,
 			DigitalLpa:         caseSummary.DigitalLpa,
 			LpaStoreDataLegacy: lpaStoreDataLegacy,
+			LpaStoreData:       lpaStoreData,
 		}
 
 		return tmpl(w, data)
