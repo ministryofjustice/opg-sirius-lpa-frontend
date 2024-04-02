@@ -50,22 +50,7 @@
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key">Address</dt>
               <dd class="govuk-summary-list__value">
-                {{ .DigitalLpa.LpaStoreData.Donor.Address.Line1 }}
-                {{ if not (eq .DigitalLpa.LpaStoreData.Donor.Address.Line2 "") }}
-                  <br>{{ .DigitalLpa.LpaStoreData.Donor.Address.Line2 }}
-                {{ end }}
-                {{ if not (eq .DigitalLpa.LpaStoreData.Donor.Address.Line3 "") }}
-                  <br>{{ .DigitalLpa.LpaStoreData.Donor.Address.Line3 }}
-                {{ end }}
-                {{ if not (eq .DigitalLpa.LpaStoreData.Donor.Address.Town "") }}
-                  <br>{{ .DigitalLpa.LpaStoreData.Donor.Address.Town }}
-                {{ end }}
-                {{ if not (eq .DigitalLpa.LpaStoreData.Donor.Address.Postcode "") }}
-                  <br>{{ .DigitalLpa.LpaStoreData.Donor.Address.Postcode }}
-                {{ end }}
-                {{ if not (eq .DigitalLpa.LpaStoreData.Donor.Address.Country "") }}
-                  <br>{{ .DigitalLpa.LpaStoreData.Donor.Address.Country }}
-                {{ end }}
+                {{ template "mlpa-address" .DigitalLpa.LpaStoreData.Donor.Address }}
               </dd>
             </div>
             <div class="govuk-summary-list__row">
