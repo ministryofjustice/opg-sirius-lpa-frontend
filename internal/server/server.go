@@ -69,7 +69,6 @@ type Client interface {
 	GetPaymentsClient
 	GetDocumentsClient
 	LinkPersonClient
-	LpaClient
 	ManageFeesClient
 	MiReportingClient
 	RelationshipClient
@@ -126,6 +125,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/edit-fee-reduction", wrap(EditFeeReduction(client, templates.Get("edit_fee_reduction.gohtml"))))
 	mux.Handle("/payments/{id}", wrap(GetPayments(client, templates.Get("payments.gohtml"))))
 	mux.Handle("/lpa/{uid}/lpa-details", wrap(GetLpaDetails(client, templates.Get("mlpa-details.gohtml"))))
+	mux.Handle("/lpa/{uid}", wrap(GetLpaDetails(client, templates.Get("lpa.gohtml"))))
 	mux.Handle("/lpa/{uid}/payments", wrap(GetPayments(client, templates.Get("mlpa-payments.gohtml"))))
 	mux.Handle("/lpa/{uid}/documents", wrap(GetDocuments(client, templates.Get("mlpa-documents.gohtml"))))
 	mux.Handle("/lpa/{uid}/documents/new", wrap(CreateDocumentDigitalLpa(client, templates.Get("mlpa-create_document.gohtml"))))
@@ -134,7 +134,6 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/search-postcode", wrap(SearchPostcode(client)))
 	mux.Handle("/search", wrap(Search(client, templates.Get("search.gohtml"))))
 	mux.Handle("/digital-lpa/create", wrap(CreateDraft(client, templates.Get("create_draft.gohtml"))))
-	mux.Handle("/lpa/{uid}", wrap(Lpa(client, templates.Get("lpa.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))
 	mux.Handle("/assets/*", static)
