@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
@@ -13,21 +12,10 @@ type GetLpaDetailsClient interface {
 	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
 }
 
-// TODO move to digital_lpa.go
-type LpaStoreData struct {
-	Donor LpaStoreDonor `json:"donor"`
-}
-
-type LpaStoreDonor struct {
-	FirstNames string `json:"firstNames"`
-	LastName   string `json:"lastName"`
-}
-
 type getLpaDetails struct {
 	CaseSummary        sirius.CaseSummary
 	DigitalLpa         sirius.DigitalLpa
-	LpaStoreDataLegacy map[string]interface{}
-	LpaStoreData       LpaStoreData
+	LpaStoreData       sirius.LpaStoreData
 }
 
 func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
@@ -40,28 +28,9 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		var lpaStoreDataLegacy map[string]interface{}
-		err = json.Unmarshal(caseSummary.DigitalLpa.LpaStoreData, &lpaStoreDataLegacy)
-		if err != nil {
-			return err
-		}
-
-		out, err := json.Marshal(caseSummary.DigitalLpa.LpaStoreData)
-		if err != nil {
-			return err
-		}
-
-		var lpaStoreData LpaStoreData
-		err = json.Unmarshal(out, &lpaStoreData)
-		if err != nil {
-			return err
-		}
-
 		data := getLpaDetails{
-			CaseSummary:        caseSummary,
-			DigitalLpa:         caseSummary.DigitalLpa,
-			LpaStoreDataLegacy: lpaStoreDataLegacy,
-			LpaStoreData:       lpaStoreData,
+			CaseSummary: caseSummary,
+			DigitalLpa:  caseSummary.DigitalLpa,
 		}
 
 		return tmpl(w, data)
