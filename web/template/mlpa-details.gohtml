@@ -181,6 +181,28 @@
         </div>
         <div id="accordion-default-content-4" class="govuk-accordion__section-content">
           {{ if (gt (len .ReplacementAttorneys) 0) }}
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">When replacement attorneys can step in</dt>
+                <dd class="govuk-summary-list__value">
+                  <p class="govuk-body">
+                    {{ howReplacementAttorneysStepInLongForm .DigitalLpa.LpaStoreData.HowReplacementAttorneysStepIn }}
+                  </p>
+                  {{ if (eq .DigitalLpa.LpaStoreData.HowReplacementAttorneysStepIn "another-way") }}
+                    <div class="govuk-body">
+                      {{ howReplacementAttorneysStepInLongForm .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisionsDetails}}
+                    </div>
+                  {{ end }}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                <dt class="govuk-summary-list__key">How replacement attorneys must make decisions</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ howReplacementAttorneysMakeDecisionsLongForm .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions }}
+                </dd>
+              </div>
+            </dl>
+
             {{ range $num, $attorney := .ReplacementAttorneys }}
               <h2 class="govuk-heading-m">
                 Replacement attorney {{ plusN $num 1 }}
