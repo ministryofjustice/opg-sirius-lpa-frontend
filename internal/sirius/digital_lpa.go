@@ -1,7 +1,6 @@
 package sirius
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -21,10 +20,19 @@ type SiriusData struct {
 	Donor              Donor        `json:"donor"`
 }
 
+type LpaStoreData struct {
+	Donor LpaStoreDonor `json:"donor"`
+}
+
+type LpaStoreDonor struct {
+	FirstNames string `json:"firstNames"`
+	LastName   string `json:"lastName"`
+}
+
 type DigitalLpa struct {
-	UID          string          `json:"uId"`
-	SiriusData   SiriusData      `json:"opg.poas.sirius"`
-	LpaStoreData json.RawMessage `json:"opg.poas.lpastore"`
+	UID                string          `json:"uId"`
+	SiriusData         SiriusData      `json:"opg.poas.sirius"`
+	LpaStoreData       LpaStoreData    `json:"opg.poas.lpastore"`
 }
 
 type Donor struct {
@@ -44,6 +52,5 @@ type Donor struct {
 func (c *Client) DigitalLpa(ctx Context, uid string) (DigitalLpa, error) {
 	var v DigitalLpa
 	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/digital-lpas/%s", uid), &v)
-
 	return v, err
 }
