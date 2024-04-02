@@ -13,9 +13,11 @@ type GetLpaDetailsClient interface {
 }
 
 type getLpaDetails struct {
-	CaseSummary  sirius.CaseSummary
-	DigitalLpa   sirius.DigitalLpa
-	FlashMessage FlashNotification
+	CaseSummary             sirius.CaseSummary
+	DigitalLpa              sirius.DigitalLpa
+	ReplacementAttorneys    []sirius.LpaStoreAttorney
+	NonReplacementAttorneys []sirius.LpaStoreAttorney
+	FlashMessage            FlashNotification
 }
 
 func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
@@ -34,6 +36,20 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		}
 
 		data.FlashMessage, _ = GetFlash(w, r)
+
+		var replacementAttorneys []sirius.LpaStoreAttorney
+		var nonReplacementAttorneys []sirius.LpaStoreAttorney
+		for _, attorney := range(caseSummary.DigitalLpa.LpaStoreData.Attorneys) {
+			switch status := attorney.Status; status {
+			case "replacement":
+				replacementAttorneys = append(replacementAttorneys, attorney)
+			case "active":
+				nonReplacementAttorneys = append(nonReplacementAttorneys, attorney)
+			}
+		}
+
+		data.ReplacementAttorneys = replacementAttorneys
+		data.NonReplacementAttorneys = nonReplacementAttorneys
 
 		return tmpl(w, data)
 	}
