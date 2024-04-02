@@ -89,8 +89,8 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return false
 		},
-		"minus1": func(i int) int {
-			return i - 1
+		"plusN": func(i int, n int) int {
+			return i + n
 		},
 		"statusColour": func(s string) string {
 			switch strings.ToLower(s) {
