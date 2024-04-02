@@ -13,9 +13,9 @@ type GetLpaDetailsClient interface {
 }
 
 type getLpaDetails struct {
-	CaseSummary        sirius.CaseSummary
-	DigitalLpa         sirius.DigitalLpa
-	LpaStoreData       sirius.LpaStoreData
+	CaseSummary  sirius.CaseSummary
+	DigitalLpa   sirius.DigitalLpa
+	FlashMessage FlashNotification
 }
 
 func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
@@ -32,6 +32,8 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 			CaseSummary: caseSummary,
 			DigitalLpa:  caseSummary.DigitalLpa,
 		}
+
+		data.FlashMessage, _ = GetFlash(w, r)
 
 		return tmpl(w, data)
 	}
