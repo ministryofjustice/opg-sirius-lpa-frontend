@@ -4,6 +4,12 @@ import (
 	"fmt"
 )
 
+type DigitalLpa struct {
+	UID                string          `json:"uId"`
+	SiriusData         SiriusData      `json:"opg.poas.sirius"`
+	LpaStoreData       LpaStoreData    `json:"opg.poas.lpastore"`
+}
+
 type SiriusData struct {
 	ID                 int          `json:"id"`
 	UID                string       `json:"uId"`
@@ -20,21 +26,6 @@ type SiriusData struct {
 	Donor              Donor        `json:"donor"`
 }
 
-type LpaStoreData struct {
-	Donor LpaStoreDonor `json:"donor"`
-}
-
-type LpaStoreDonor struct {
-	FirstNames string `json:"firstNames"`
-	LastName   string `json:"lastName"`
-}
-
-type DigitalLpa struct {
-	UID                string          `json:"uId"`
-	SiriusData         SiriusData      `json:"opg.poas.sirius"`
-	LpaStoreData       LpaStoreData    `json:"opg.poas.lpastore"`
-}
-
 type Donor struct {
 	ID           int        `json:"id"`
 	Firstname    string     `json:"firstname"`
@@ -47,6 +38,34 @@ type Donor struct {
 	Postcode     string     `json:"postcode"`
 	Country      string     `json:"country"`
 	PersonType   string     `json:"personType,omitempty"`
+}
+
+type LpaStoreData struct {
+	Donor     LpaStoreDonor      `json:"donor"`
+	Attorneys []LpaStoreAttorney `json:"attorneys"`
+	SignedAt  string             `json:"signedAt"`
+}
+
+type LpaStoreDonor struct {
+	FirstNames        string          `json:"firstNames"`
+	LastName          string          `json:"lastName"`
+	OtherNamesKnownBy string          `json:"otherNamesKnownBy"`
+	DateOfBirth       string          `json:"dateOfBirth"`
+	Email             string          `json:"email"`
+	Address           LpaStoreAddress `json:"address"`
+}
+
+type LpaStoreAddress struct {
+	Line1    string `json:"line1"`
+	Line2    string `json:"line2"`
+	Line3    string `json:"line3"`
+	Town     string `json:"town"`
+	Postcode string `json:"postcode"`
+	Country  string `json:"country"`
+}
+
+type LpaStoreAttorney struct {
+	Status string `json:"status"`
 }
 
 func (c *Client) DigitalLpa(ctx Context, uid string) (DigitalLpa, error) {

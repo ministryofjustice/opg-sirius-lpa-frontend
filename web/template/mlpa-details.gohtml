@@ -111,7 +111,7 @@
         <div class="govuk-accordion__section-header">
           <h2 class="govuk-accordion__section-heading">
             <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
-              Attorneys (0 TODO)
+              Attorneys ({{ len .NonReplacementAttorneys }})
             </span>
           </h2>
         </div>
@@ -135,7 +135,7 @@
         <div class="govuk-accordion__section-header">
           <h2 class="govuk-accordion__section-heading">
             <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
-              Replacement attorneys (0 TODO)
+              Replacement attorneys ({{ len .ReplacementAttorneys }})
             </span>
           </h2>
         </div>
