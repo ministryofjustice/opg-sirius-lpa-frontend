@@ -9,12 +9,6 @@
             {{ template "mlpa-header" (caseTabs .CaseSummary "lpa-details") }}
 
             <h1 class="govuk-heading-l govuk-!-margin-bottom-5">LPA details</h1>
-
-            <div>
-                <p class="govuk-body-s">
-                    {{ .LpaStoreDataLegacy }}
-                </p>
-            </div>
         </div>
     </div>
 
@@ -30,8 +24,16 @@
         <div id="accordion-default-content-1" class="govuk-accordion__section-content">
           <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row">
-              <dt class="govuk-summary-list__key">Name</dt>
-              <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorFirstNames }} {{ .DigitalLpa.SiriusData.Application.DonorLastName }}</dd>
+              <dt class="govuk-summary-list__key">First names</dt>
+              <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.Donor.FirstNames }}</dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Last name</dt>
+              <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.Donor.LastName }}</dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Otherwise known as</dt>
+              <dd class="govuk-summary-list__value">TODO</dd>
             </div>
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key">Date of birth</dt>
@@ -41,31 +43,20 @@
               <dt class="govuk-summary-list__key">Address</dt>
               <dd class="govuk-summary-list__value">
                 {{ .DigitalLpa.SiriusData.Application.DonorAddress.Line1 }}
-                {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Line2 "") }}<br>{{ .DigitalLpa.SiriusData.Application.DonorAddress.Line2 }}{{ end }}
-                {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Line3 "") }}<br>{{ .DigitalLpa.SiriusData.Application.DonorAddress.Line3 }}{{ end }}
-              </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-              <dt class="govuk-summary-list__key">Town or city</dt>
-              <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorAddress.Town }}</dd>
-            </div>
-            {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Postcode "") }}
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Postcode</dt>
-                <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorAddress.Postcode }}</dd>
-              </div>
-            {{ end }}
-            <div class="govuk-summary-list__row">
-              <dt class="govuk-summary-list__key">Country</dt>
-              <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorAddress.Country }}</dd>
-            </div>
-            <div class="govuk-summary-list__row">
-              <dt class="govuk-summary-list__key">Phone number</dt>
-              <dd class="govuk-summary-list__value">
-                {{ if (eq .DigitalLpa.SiriusData.Application.PhoneNumber "") }}
-                  not provided
-                {{ else }}
-                  {{ .DigitalLpa.SiriusData.Application.PhoneNumber }}
+                {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Line2 "") }}
+                  <br>{{ .DigitalLpa.SiriusData.Application.DonorAddress.Line2 }}
+                {{ end }}
+                {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Line3 "") }}
+                  <br>{{ .DigitalLpa.SiriusData.Application.DonorAddress.Line3 }}
+                {{ end }}
+                {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Town "") }}
+                  <br>{{ .DigitalLpa.SiriusData.Application.DonorAddress.Town }}
+                {{ end }}
+                {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Postcode "") }}
+                  <br>{{ .DigitalLpa.SiriusData.Application.DonorAddress.Postcode }}
+                {{ end }}
+                {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Country "") }}
+                  <br>{{ .DigitalLpa.SiriusData.Application.DonorAddress.Country }}
                 {{ end }}
               </dd>
             </div>
@@ -80,32 +71,29 @@
               </dd>
             </div>
             <div class="govuk-summary-list__row">
-              <dt class="govuk-summary-list__key">Post forms to</dt>
+              <dt class="govuk-summary-list__key">Phone</dt>
               <dd class="govuk-summary-list__value">
-                {{ if (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line1 "") }}
-                  The donor
+                {{ if (eq .DigitalLpa.SiriusData.Application.PhoneNumber "") }}
+                  not provided
                 {{ else }}
-                  {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentFirstNames "") }}
-                    {{ .DigitalLpa.SiriusData.Application.CorrespondentFirstNames }} {{ .DigitalLpa.SiriusData.Application.CorrespondentLastName }}<br>
-                  {{ end }}
-                    {{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line1 }}
-                    {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line2 "") }}<br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line2 }}{{ end }}
-                    {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line3 "") }}<br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line3 }}{{ end }}
-                    <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Town }}
-                    <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Postcode }}
-                    <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Country }}
-                    <br>
+                  {{ .DigitalLpa.SiriusData.Application.PhoneNumber }}
                 {{ end }}
               </dd>
             </div>
             <div class="govuk-summary-list__row">
-              <dt class="govuk-summary-list__key">Application format</dt>
+              <dt class="govuk-summary-list__key">Format</dt>
               <dd class="govuk-summary-list__value">
                 {{if (eq .DigitalLpa.SiriusData.Application.Source "APPLICANT")}}
                   Digital
                 {{else}}
                   Paper
                 {{end}}
+              </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">Signed on</dt>
+              <dd class="govuk-summary-list__value">
+                TODO
               </dd>
             </div>
           </dl>
@@ -115,7 +103,7 @@
         <div class="govuk-accordion__section-header">
           <h2 class="govuk-accordion__section-heading">
             <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
-              Attorneys ({{ count "attorneys" .LpaStoreDataLegacy }})
+              Attorneys (0 TODO)
             </span>
           </h2>
         </div>
@@ -139,7 +127,7 @@
         <div class="govuk-accordion__section-header">
           <h2 class="govuk-accordion__section-heading">
             <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
-              Replacement attorneys ({{ count "attorneys" .LpaStoreDataLegacy }})
+              Replacement attorneys (0 TODO)
             </span>
           </h2>
         </div>
@@ -175,7 +163,7 @@
         <div class="govuk-accordion__section-header">
           <h2 class="govuk-accordion__section-heading">
             <span class="govuk-accordion__section-button" id="accordion-default-heading-7">
-              Notified people ({{ count "peopleToNotify" .LpaStoreDataLegacy }})
+              Notified people (0 TODO)
             </span>
           </h2>
         </div>
@@ -187,7 +175,7 @@
         <div class="govuk-accordion__section-header">
           <h2 class="govuk-accordion__section-heading">
             <span class="govuk-accordion__section-button" id="accordion-default-heading-8">
-              Correspondent ({{ count "correspondent" .LpaStoreDataLegacy }})
+              Correspondent (0 TODO)
             </span>
           </h2>
         </div>
