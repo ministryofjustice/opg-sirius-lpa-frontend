@@ -66,7 +66,7 @@
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key">Phone</dt>
               <dd class="govuk-summary-list__value">
-                TODO - NOT CURRENTLY IN LPA STORE
+                <strong>TODO - Donor/Phone - NOT IN LPA STORE</strong>
               </dd>
             </div>
             <div class="govuk-summary-list__row">
@@ -76,10 +76,11 @@
                   Digital
                 {{ else }}
                   Paper
-                {{ end }}
+                {{ end }} <strong>TODO - POSSIBLY INCORRECT</strong>
+                <br><strong>TODO - Donor/Format[language] - NOT IN LPA STORE</strong>
               </dd>
             </div>
-            <div class="govuk-summary-list__row">
+            <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
               <dt class="govuk-summary-list__key">Signed on</dt>
               <dd class="govuk-summary-list__value">
                 {{ if (eq .DigitalLpa.LpaStoreData.SignedAt "") }}
@@ -101,7 +102,61 @@
           </h2>
         </div>
         <div id="accordion-default-content-2" class="govuk-accordion__section-content">
-          <p class="govuk-body"></p>
+          {{ if (gt (len .NonReplacementAttorneys) 0) }}
+            {{ range $num, $attorney := .NonReplacementAttorneys }}
+              <h2 class="govuk-heading-m">
+                Attorney {{ plusN $num 1 }}
+              </h2>
+
+              <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">First names</dt>
+                  <dd class="govuk-summary-list__value">{{ $attorney.FirstNames }}</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Last name</dt>
+                  <dd class="govuk-summary-list__value">{{ $attorney.LastName }}</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Date of birth</dt>
+                  <dd class="govuk-summary-list__value">
+                    {{ parseAndFormatDate $attorney.DateOfBirth "2006-01-02" "2 January 2006" }}
+                  </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Address</dt>
+                  <dd class="govuk-summary-list__value">
+                    {{ template "mlpa-address" $attorney.Address }}
+                  </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Email</dt>
+                  <dd class="govuk-summary-list__value">
+                    {{ if (eq $attorney.Email "") }}
+                      Not provided
+                    {{ else }}
+                      {{ $attorney.Email }}
+                    {{ end }}
+                  </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Phone</dt>
+                  <dd class="govuk-summary-list__value">
+                    <strong>TODO - Attorney/Phone - NOT IN LPA STORE</strong>
+                  </dd>
+                </div>
+                <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                  <dt class="govuk-summary-list__key">Format</dt>
+                  <dd class="govuk-summary-list__value">
+                    <strong>TODO - Attorney/Format[channel] - NOT IN LPA STORE</strong>
+                    <br><strong>TODO - Attorney/Format[language] - NOT IN LPA STORE</strong>
+                  </dd>
+                </div>
+              </dl>
+            {{ end }}
+          {{ else }}
+            <p class="govuk-body">The donor did not provide details for this section</p>
+          {{ end }}
         </div>
       </div>
       <div class="govuk-accordion__section">
@@ -125,7 +180,61 @@
           </h2>
         </div>
         <div id="accordion-default-content-4" class="govuk-accordion__section-content">
-          <p class="govuk-body"></p>
+          {{ if (gt (len .ReplacementAttorneys) 0) }}
+            {{ range $num, $attorney := .ReplacementAttorneys }}
+              <h2 class="govuk-heading-m">
+                Replacement attorney {{ plusN $num 1 }}
+              </h2>
+
+              <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">First names</dt>
+                  <dd class="govuk-summary-list__value">{{ $attorney.FirstNames }}</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Last name</dt>
+                  <dd class="govuk-summary-list__value">{{ $attorney.LastName }}</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Date of birth</dt>
+                  <dd class="govuk-summary-list__value">
+                    {{ parseAndFormatDate $attorney.DateOfBirth "2006-01-02" "2 January 2006" }}
+                  </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Address</dt>
+                  <dd class="govuk-summary-list__value">
+                    {{ template "mlpa-address" $attorney.Address }}
+                  </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Email</dt>
+                  <dd class="govuk-summary-list__value">
+                    {{ if (eq $attorney.Email "") }}
+                      Not provided
+                    {{ else }}
+                      {{ $attorney.Email }}
+                    {{ end }}
+                  </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Phone</dt>
+                  <dd class="govuk-summary-list__value">
+                    <strong>TODO - Attorney/Phone - NOT IN LPA STORE</strong>
+                  </dd>
+                </div>
+                <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                  <dt class="govuk-summary-list__key">Format</dt>
+                  <dd class="govuk-summary-list__value">
+                    <strong>TODO - Attorney/Format[channel] - NOT IN LPA STORE</strong>
+                    <br><strong>TODO - Attorney/Format[language] - NOT IN LPA STORE</strong>
+                  </dd>
+                </div>
+              </dl>
+            {{ end }}
+          {{ else }}
+            <p class="govuk-body">The donor did not provide details for this section</p>
+          {{ end }}
         </div>
       </div>
       <div class="govuk-accordion__section">

@@ -47,12 +47,21 @@ type LpaStoreData struct {
 }
 
 type LpaStoreDonor struct {
-	FirstNames        string          `json:"firstNames"`
-	LastName          string          `json:"lastName"`
-	OtherNamesKnownBy string          `json:"otherNamesKnownBy"`
-	DateOfBirth       string          `json:"dateOfBirth"`
-	Email             string          `json:"email"`
-	Address           LpaStoreAddress `json:"address"`
+	LpaStorePerson
+	OtherNamesKnownBy string `json:"otherNamesKnownBy"`
+}
+
+type LpaStoreAttorney struct {
+	LpaStorePerson
+	Status string `json:"status"`
+}
+
+type LpaStorePerson struct {
+	FirstNames  string          `json:"firstNames"`
+	LastName    string          `json:"lastName"`
+	Address     LpaStoreAddress `json:"address"`
+	DateOfBirth string          `json:"dateOfBirth"`
+	Email       string          `json:"email"`
 }
 
 type LpaStoreAddress struct {
@@ -62,10 +71,6 @@ type LpaStoreAddress struct {
 	Town     string `json:"town"`
 	Postcode string `json:"postcode"`
 	Country  string `json:"country"`
-}
-
-type LpaStoreAttorney struct {
-	Status string `json:"status"`
 }
 
 func (c *Client) DigitalLpa(ctx Context, uid string) (DigitalLpa, error) {
