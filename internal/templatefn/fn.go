@@ -137,7 +137,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		},
 		"subtypeShortFormat": subtypeShortFormat,
 		"subtypeLongFormat":  subtypeLongFormat,
-		"howReplacementAttorneysMakeDecisionsLongForm": func(s string) string {
+		"howAttorneysMakeDecisionsLongForm": func(s string) string {
 			switch s {
 			case "jointly":
 				return "Jointly"
@@ -146,7 +146,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
             case "jointly-for-some-severally-for-others":
             	return "Jointly for some, severally for others"
             default:
-            	return ""
+            	return "CODE NOT RECOGNISED: " + s
             }
 		},
 		"howReplacementAttorneysStepInLongForm": func(s string) string {
@@ -158,7 +158,17 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
             case "another-way":
             	return "Another way"
 			default:
-            	return ""
+            	return "CODE NOT RECOGNISED: " + s
+			}
+		},
+		"whenTheLpaCanBeUsedLongForm": func(s string) string {
+			switch s {
+			case "when-has-capacity":
+				return "As soon as it's registered"
+            case "when-capacity-lost":
+            	return "When capacity is lost"
+			default:
+            	return "CODE NOT RECOGNISED: " + s
 			}
 		},
 	}
