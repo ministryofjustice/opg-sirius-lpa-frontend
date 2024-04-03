@@ -5,9 +5,9 @@ import (
 )
 
 type DigitalLpa struct {
-	UID                string          `json:"uId"`
-	SiriusData         SiriusData      `json:"opg.poas.sirius"`
-	LpaStoreData       LpaStoreData    `json:"opg.poas.lpastore"`
+	UID          string       `json:"uId"`
+	SiriusData   SiriusData   `json:"opg.poas.sirius"`
+	LpaStoreData LpaStoreData `json:"opg.poas.lpastore"`
 }
 
 type SiriusData struct {
@@ -43,9 +43,13 @@ type Donor struct {
 type LpaStoreData struct {
 	Donor                                       LpaStoreDonor      `json:"donor"`
 	Attorneys                                   []LpaStoreAttorney `json:"attorneys"`
+	HowAttorneysMakeDecisions                   string             `json:"howAttorneysMakeDecisions"`
+	HowAttorneysMakeDecisionsDetails            string             `json:"howAttorneysMakeDecisionsDetails"`
+	WhenTheLpaCanBeUsed                         string             `json:"whenTheLpaCanBeUsed"`
 	HowReplacementAttorneysMakeDecisions        string             `json:"howReplacementAttorneysMakeDecisions"`
-	HowReplacementAttorneysStepIn               string             `json:"howReplacementAttorneysStepIn"`
 	HowReplacementAttorneysMakeDecisionsDetails string             `json:"howReplacementAttorneysMakeDecisionsDetails"`
+	HowReplacementAttorneysStepIn               string             `json:"howReplacementAttorneysStepIn"`
+	HowReplacementAttorneysStepInDetails        string             `json:"howReplacementAttorneysStepInDetails"`
 	SignedAt                                    string             `json:"signedAt"`
 }
 
