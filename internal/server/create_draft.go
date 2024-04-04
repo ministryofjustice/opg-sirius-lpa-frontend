@@ -72,7 +72,7 @@ type createDraftData struct {
 }
 
 func addDefaultCountry(address sirius.Address) sirius.Address {
-	out := sirius.Address{
+	return sirius.Address{
 		Line1:    address.Line1,
 		Line2:    address.Line2,
 		Line3:    address.Line3,
@@ -80,12 +80,6 @@ func addDefaultCountry(address sirius.Address) sirius.Address {
 		Postcode: address.Postcode,
 		Country:  address.Country,
 	}
-
-	if out.Country == "" {
-		out.Country = "GB"
-	}
-
-	return out
 }
 
 func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
