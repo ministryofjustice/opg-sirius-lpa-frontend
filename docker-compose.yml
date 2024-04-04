@@ -13,7 +13,7 @@ services:
       SIRIUS_PUBLIC_URL: http://localhost:8080
 
   sirius-mock:
-    image: wiremock/wiremock:3.4.2
+    image: wiremock/wiremock:3.5.2
     ports: ["8563:8080"]
     volumes:
       - "./cypress/mocks:/home/wiremock/mappings"
@@ -28,7 +28,7 @@ services:
       - LHCI_GITHUB_APP_TOKEN
 
   go-lint:
-    image: golangci/golangci-lint:v1.57.1
+    image: golangci/golangci-lint:v1.57.2
     working_dir: /go/src/app
     volumes:
       - ./:/go/src/app
