@@ -211,15 +211,12 @@ func TestPostCreateDraftWhenAPIFails(t *testing.T) {
 		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
-		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+		Return([]sirius.RefDataItem{}, nil)
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			Source:          "PHONE",
 			DonorFirstNames: "Gerald Ryan",
 			DonorLastName:   "Sandel",
-			DonorAddress: sirius.Address{
-				Country: "GB",
-			},
 		}).
 		Return(map[string]string{}, expectedError)
 
@@ -246,14 +243,11 @@ func TestPostCreateDraftWhenValidationError(t *testing.T) {
 		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
-		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+		Return([]sirius.RefDataItem{}, nil)
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			Source:          "PHONE",
 			DonorFirstNames: "Gerald Ryan",
-			DonorAddress: sirius.Address{
-				Country: "GB",
-			},
 		}).
 		Return(map[string]string{}, sirius.ValidationError{Field: sirius.FieldErrors{
 			"surname": {"required": "This field is required"},
@@ -262,7 +256,7 @@ func TestPostCreateDraftWhenValidationError(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createDraftData{
-			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
+			Countries: []sirius.RefDataItem{},
 			Form: formDraft{
 				DonorFirstname: "Gerald Ryan",
 			},
