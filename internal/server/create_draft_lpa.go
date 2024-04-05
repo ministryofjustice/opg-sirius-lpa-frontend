@@ -117,8 +117,8 @@ func CreateDraftLpa(client CreateDraftLpaClient, tmpl template.Template) Handler
 
 				for subtype, uid := range uids {
 					data.Uids = append(data.Uids, createDraftLpaResult{
-						Uid:     uid,
 						Subtype: subtype,
+						Uid:     uid,
 					})
 				}
 			}

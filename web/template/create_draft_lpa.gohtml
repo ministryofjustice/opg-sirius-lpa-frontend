@@ -4,11 +4,39 @@
 
 {{ define "main" }}
 	{{ if .Success }}
-		<div class="govuk-panel govuk-panel--confirmation">
-			<h1 class="govuk-panel__title">
-				Success
-			</h1>
+
+		<div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+			<div class="govuk-notification-banner__header">
+				<h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+					Success
+				</h2>
+			</div>
+			<div class="govuk-notification-banner__content">
+				<h3 class="govuk-notification-banner__heading">
+					{{ if eq 2 (len .Uids) }}
+						2 draft LPAs for {{ .Donor.Firstname }} {{ .Donor.Surname }} have been created.
+					{{ else }}
+						A draft LPA for {{ .Donor.Firstname }} {{ .Donor.Surname }} has been created.
+					{{ end }}
+				</h3>
+				<p class="govuk-body">
+					{{ if eq 2 (len .Uids) }}
+						Case reference numbers
+					{{ else }}
+						Case reference number
+					{{ end }}
+					{{ range .Uids }}
+					<br><a class="govuk-notification-banner__link" href="{{ prefix (printf "/lpa/%s" .Uid) }}">{{ .Uid }}</a> {{ subtypeLongFormat .Subtype }}
+					{{ end }}
+				</p>
+			</div>
 		</div>
+
+		<div class="govuk-button-group">
+			<a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/lpa/%s" (index .Uids 0).Uid ) }}">View donor record</a>
+			<a class="govuk-button govuk-button--secondary" href="{{ prefix ("/create-draft-lpa") }}">Create another draft LPA</a>
+		</div>
+
 	{{ else }}
 		<div class="govuk-grid-row">
 			<div class="govuk-grid-column-two-thirds">
@@ -30,14 +58,6 @@
 							{{ template "errors" .Error.Field.types }}
 							<div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
 								<div class="govuk-checkboxes__item">
-									<input class="govuk-checkboxes__input" id="f-type-personal-welfare"
-										   name="subtype" type="checkbox" value="personal-welfare" {{ if contains .Form.SubTypes "personal-welfare" }}checked{{ end }}>
-									<label class="govuk-label govuk-checkboxes__label"
-										   for="f-type-personal-welfare">
-										Personal welfare
-									</label>
-								</div>
-								<div class="govuk-checkboxes__item">
 									<input class="govuk-checkboxes__input" id="f-type-property-and-affairs"
 										   name="subtype" type="checkbox" value="property-and-affairs" {{ if contains .Form.SubTypes "property-and-affairs" }}checked{{ end }}>
 									<label class="govuk-label govuk-checkboxes__label"
@@ -45,19 +65,29 @@
 										Property and affairs
 									</label>
 								</div>
+								<div class="govuk-checkboxes__item">
+									<input class="govuk-checkboxes__input" id="f-type-personal-welfare"
+										   name="subtype" type="checkbox" value="personal-welfare" {{ if contains .Form.SubTypes "personal-welfare" }}checked{{ end }}>
+									<label class="govuk-label govuk-checkboxes__label"
+										   for="f-type-personal-welfare">
+										Personal welfare
+									</label>
+								</div>
 							</div>
 						</fieldset>
 					</div>
 
 					<div>
-						<p class="bold">Donor address</p>
-						{{ .Donor.AddressLine1 }}
-						{{ if not (eq .Donor.AddressLine2 "") }}<br>{{ .Donor.AddressLine2 }}{{ end }}
-						{{ if not (eq .Donor.AddressLine3 "") }}<br>{{ .Donor.AddressLine3 }}{{ end }}
-						<br>{{ .Donor.Town }}
-						<br>{{ .Donor.Postcode }}
-						<br>{{ .Donor.Country }}
-						<br>
+						<p>
+							<strong>Donor address</strong>
+							<br>{{ .Donor.AddressLine1 }}
+							{{ if not (eq .Donor.AddressLine2 "") }}<br>{{ .Donor.AddressLine2 }}{{ end }}
+							{{ if not (eq .Donor.AddressLine3 "") }}<br>{{ .Donor.AddressLine3 }}{{ end }}
+							<br>{{ .Donor.Town }}
+							<br>{{ .Donor.Postcode }}
+							<br>{{ .Donor.Country }}
+							<br>
+						</p>
 					</div>
 
 					<div class="govuk-form-group {{ if .Error.Field.recipient }}govuk-form-group--error{{ end }}" id="f-recipient">
