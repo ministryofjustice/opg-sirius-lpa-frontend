@@ -11,8 +11,8 @@ require (
 	github.com/pact-foundation/pact-go v1.8.0
 	github.com/stretchr/testify v1.9.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0
-	golang.org/x/mod v0.16.0
-	golang.org/x/sync v0.6.0
+	golang.org/x/mod v0.17.0
+	golang.org/x/sync v0.7.0
 	golang.org/x/text v0.14.0
 )
 
