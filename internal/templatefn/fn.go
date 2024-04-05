@@ -61,7 +61,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			return time.Format(format), nil
 		},
 		// s is a date string; layout specifies its structure
-		"parseAndFormatDate": func (s string, layout string, format string) (string, error) {
+		"parseAndFormatDate": func(s string, layout string, format string) (string, error) {
 			t, err := time.Parse(layout, s)
 			if err != nil {
 				return "", err
@@ -141,34 +141,44 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			switch s {
 			case "jointly":
 				return "Jointly"
-           	case "jointly-and-severally":
-           		return "Jointly & severally"
-            case "jointly-for-some-severally-for-others":
-            	return "Jointly for some, severally for others"
-            default:
-            	return "CODE NOT RECOGNISED: " + s
-            }
+			case "jointly-and-severally":
+				return "Jointly & severally"
+			case "jointly-for-some-severally-for-others":
+				return "Jointly for some, severally for others"
+			default:
+				return "CODE NOT RECOGNISED: " + s
+			}
 		},
 		"howReplacementAttorneysStepInLongForm": func(s string) string {
 			switch s {
 			case "all-can-no-longer-act":
 				return "When all can no longer act"
-            case "one-can-no-longer-act":
-            	return "When one can no longer act"
-            case "another-way":
-            	return "Another way"
+			case "one-can-no-longer-act":
+				return "When one can no longer act"
+			case "another-way":
+				return "Another way"
 			default:
-            	return "CODE NOT RECOGNISED: " + s
+				return "CODE NOT RECOGNISED: " + s
 			}
 		},
 		"whenTheLpaCanBeUsedLongForm": func(s string) string {
 			switch s {
 			case "when-has-capacity":
 				return "As soon as it's registered"
-            case "when-capacity-lost":
-            	return "When capacity is lost"
+			case "when-capacity-lost":
+				return "When capacity is lost"
 			default:
-            	return "CODE NOT RECOGNISED: " + s
+				return "CODE NOT RECOGNISED: " + s
+			}
+		},
+		"channelForFormat": func(s string) string {
+			switch s {
+			case "paper":
+				return "Paper"
+			case "online":
+				return "Online"
+			default:
+				return "CODE NOT RECOGNISED: " + s
 			}
 		},
 	}
