@@ -1,6 +1,7 @@
 package templatefn
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"net/url"
@@ -62,6 +63,10 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		},
 		// s is a date string; layout specifies its structure
 		"parseAndFormatDate": func(s string, layout string, format string) (string, error) {
+			if s == "" {
+				return "", errors.New("Not a date")
+			}
+
 			t, err := time.Parse(layout, s)
 			if err != nil {
 				return "", err
