@@ -7,7 +7,7 @@ toolchain go1.22.0
 require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-playground/form/v4 v4.2.1
-	github.com/ministryofjustice/opg-go-common v0.0.0-20240227144553-d506200e53d5
+	github.com/ministryofjustice/opg-go-common v0.0.0-20240327113448-b9fa41e2a2f9
 	github.com/pact-foundation/pact-go v1.8.0
 	github.com/stretchr/testify v1.9.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0
@@ -42,7 +42,7 @@ require (
 	golang.org/x/sys v0.17.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240123012728-ef4313101c80 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240123012728-ef4313101c80 // indirect
-	google.golang.org/grpc v1.62.0 // indirect
+	google.golang.org/grpc v1.62.1 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
