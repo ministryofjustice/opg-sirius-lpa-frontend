@@ -1,0 +1,200 @@
+{{ template "page" . }}
+
+{{ define "title" }}Create a draft LPA{{ end }}
+
+{{ define "main" }}
+	{{ if .Success }}
+
+		<div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+			<div class="govuk-notification-banner__header">
+				<h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+					Success
+				</h2>
+			</div>
+			<div class="govuk-notification-banner__content">
+				<h3 class="govuk-notification-banner__heading">
+					{{ if eq 2 (len .Uids) }}
+						2 draft LPAs for {{ .Donor.Firstname }} {{ .Donor.Surname }} have been created.
+					{{ else }}
+						A draft LPA for {{ .Donor.Firstname }} {{ .Donor.Surname }} has been created.
+					{{ end }}
+				</h3>
+				<p class="govuk-body">
+					{{ if eq 2 (len .Uids) }}
+						Case reference numbers
+					{{ else }}
+						Case reference number
+					{{ end }}
+					{{ range .Uids }}
+					<br><a class="govuk-notification-banner__link" href="{{ prefix (printf "/lpa/%s" .Uid) }}">{{ .Uid }}</a> {{ subtypeLongFormat .Subtype }}
+					{{ end }}
+				</p>
+			</div>
+		</div>
+
+		<div class="govuk-button-group">
+			<a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/lpa/%s" (index .Uids 0).Uid ) }}">View donor record</a>
+			<a class="govuk-button govuk-button--secondary" href="{{ prefix ("/create-draft-lpa") }}">Create another draft LPA</a>
+		</div>
+
+	{{ else }}
+		<div class="govuk-grid-row">
+			<div class="govuk-grid-column-two-thirds">
+				{{ template "error-summary" .Error }}
+
+				<h1 class="govuk-heading-l">Create a draft LPA for {{ .Donor.Firstname }} {{ .Donor.Surname }}</h1>
+
+				<div class="govuk-inset-text">
+					Details you enter will appear in the donor section of the LPA form.
+				</div>
+
+				<form class="form" method="POST">
+					<input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+					<div class="govuk-form-group {{ if .Error.Field.types }}govuk-form-group--error{{ end }}" id="f-types">
+						<fieldset class="govuk-fieldset" aria-describedby="f-type-hint">
+							<legend class="govuk-fieldset__legend">What LPA types are required?</legend>
+							<div class="govuk-hint" id="f-type-hint">Select all that applies</div>
+							{{ template "errors" .Error.Field.types }}
+							<div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+								<div class="govuk-checkboxes__item">
+									<input class="govuk-checkboxes__input" id="f-type-property-and-affairs"
+										   name="subtype" type="checkbox" value="property-and-affairs" {{ if contains .Form.SubTypes "property-and-affairs" }}checked{{ end }}>
+									<label class="govuk-label govuk-checkboxes__label"
+										   for="f-type-property-and-affairs">
+										Property and affairs
+									</label>
+								</div>
+								<div class="govuk-checkboxes__item">
+									<input class="govuk-checkboxes__input" id="f-type-personal-welfare"
+										   name="subtype" type="checkbox" value="personal-welfare" {{ if contains .Form.SubTypes "personal-welfare" }}checked{{ end }}>
+									<label class="govuk-label govuk-checkboxes__label"
+										   for="f-type-personal-welfare">
+										Personal welfare
+									</label>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+
+					<div>
+						<p>
+							<strong>Donor address</strong>
+							<br>{{ .Donor.AddressLine1 }}
+							{{ if not (eq .Donor.AddressLine2 "") }}<br>{{ .Donor.AddressLine2 }}{{ end }}
+							{{ if not (eq .Donor.AddressLine3 "") }}<br>{{ .Donor.AddressLine3 }}{{ end }}
+							<br>{{ .Donor.Town }}
+							<br>{{ .Donor.Postcode }}
+							<br>{{ .Donor.Country }}
+							<br>
+						</p>
+					</div>
+
+					<div class="govuk-form-group {{ if .Error.Field.recipient }}govuk-form-group--error{{ end }}" id="f-recipient">
+						<fieldset class="govuk-fieldset" aria-describedby="f-recipient-hint">
+							<legend class="govuk-fieldset__legend">Who should the documents be posted to?</legend>
+							{{ template "errors" .Error.Field.recipient }}
+							<div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+								<div class="govuk-radios__item">
+									<input class="govuk-radios__input" id="f-recipient-donor-same-address"
+										   name="recipient" type="radio" value="donor-same-address"
+										   {{ if eq "donor-same-address" .Form.Recipient}}checked="checked"{{ end }}>
+									<label class="govuk-label govuk-radios__label"
+										   for="f-recipient-donor-same-address">
+										The donor, using the address above
+									</label>
+								</div>
+								<div class="govuk-radios__item">
+									<input class="govuk-radios__input" id="f-recipient-donor-other-address"
+										   name="recipient" type="radio" value="donor-other-address"
+										   data-aria-controls="f-recipient-donor-other-address-reveal"
+										   {{ if eq "donor-other-address" .Form.Recipient}}checked="checked"{{ end }}>
+									<label class="govuk-label govuk-radios__label"
+										   for="f-recipient-donor-other-address">
+										The donor, using a different address
+									</label>
+								</div>
+								<div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="f-recipient-donor-other-address-reveal">
+									<div class="govuk-form-group" data-module="app-address-finder">
+										{{ template "input" (field "alternativeAddress.Line1" "Address line 1" .Form.AlternativeAddress.Line1 (index .Error.Field "correspondentAddress/addressLine1") "data-app-address-finder-map" "addressLine1") }}
+										{{ template "input" (field "alternativeAddress.Line2" "Address line 2 (optional)" .Form.AlternativeAddress.Line2 (index .Error.Field "correspondentAddress/addressLine2") "data-app-address-finder-map" "addressLine2") }}
+										{{ template "input" (field "alternativeAddress.Line3" "Address line 3 (optional)" .Form.AlternativeAddress.Line3 (index .Error.Field "correspondentAddress/addressLine3") "data-app-address-finder-map" "addressLine3") }}
+										{{ template "input" (field "alternativeAddress.Town" "Town or city" .Form.AlternativeAddress.Town (index .Error.Field "correspondentAddress/town") "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+										{{ template "input" (field "alternativeAddress.Postcode" "Postcode" .Form.AlternativeAddress.Postcode (index .Error.Field "correspondentAddress/postcode") "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+										{{ template "select" (select "alternativeCountry.Country" "Country" .Form.AlternativeAddress.Country (index .Error.Field "correspondentAddress/country") (options .Countries) "data-app-address-finder-map" "country") }}
+									</div>
+								</div>
+								<div class="govuk-radios__item">
+									<input class="govuk-radios__input" id="f-recipient-other"
+										   name="recipient" type="radio" value="other"
+										   data-aria-controls="f-recipient-other-reveal"
+										   {{ if eq "other" .Form.Recipient}}checked="checked"{{ end }}>
+									<label class="govuk-label govuk-radios__label"
+										   for="f-recipient-other">
+										Another person
+									</label>
+								</div>
+								<div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="f-recipient-other-reveal">
+									<a id="f-correspondentName"></a>
+									{{ template "input" (field "correspondentFirstname" "First name" .Form.CorrespondentFirstname .Error.Field.correspondentFirstNames) }}
+
+									{{ template "input" (field "correspondentSurname" "Last name" .Form.CorrespondentSurname .Error.Field.correspondentLastName) }}
+
+									<div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Postal address">
+										{{ template "input" (field "correspondentAddress.Line1" "Address line 1" .Form.CorrespondentAddress.Line1 (index .Error.Field "correspondentAddress/addressLine1") "data-app-address-finder-map" "addressLine1") }}
+										{{ template "input" (field "correspondentAddress.Line2" "Address line 2 (optional)" .Form.CorrespondentAddress.Line2 (index .Error.Field "correspondentAddress/addressLine2") "data-app-address-finder-map" "addressLine2") }}
+										{{ template "input" (field "correspondentAddress.Line3" "Address line 3 (optional)" .Form.CorrespondentAddress.Line3 (index .Error.Field "correspondentAddress/addressLine3") "data-app-address-finder-map" "addressLine3") }}
+										{{ template "input" (field "correspondentAddress.Town" "Town or city" .Form.CorrespondentAddress.Town (index .Error.Field "correspondentAddress/town") "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+										{{ template "input" (field "correspondentAddress.Postcode" "Postcode" .Form.CorrespondentAddress.Postcode (index .Error.Field "correspondentAddress/postcode") "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+										{{ template "select" (select "correspondentAddress.Country" "Country" .Form.CorrespondentAddress.Country (index .Error.Field "correspondentAddress/country") (options .Countries) "data-app-address-finder-map" "country") }}
+									</div>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+
+					<div class="govuk-form-group {{ if or (.Error.Field.correspondenceLargeFormat) (.Error.Field.correspondenceByWelsh) }}govuk-form-group--error{{ end }}" id="f-correspondenceOptions">
+						<fieldset class="govuk-fieldset" aria-describedby="f-correspondence-options-hint">
+							<legend class="govuk-fieldset__legend">Does the donor require correspondence in Welsh or large format?</legend>
+							<div class="govuk-hint" id="f-correspondence-options-hint">Optional, select all that apply</div>
+							{{ template "errors" .Error.Field.correspondenceByWelsh }}
+							{{ template "errors" .Error.Field.correspondenceLargeFormat }}
+							<div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+								<div class="govuk-checkboxes__item">
+									<input class="govuk-checkboxes__input" id="f-correspondence-welsh"
+										   name="correspondenceByWelsh" type="checkbox" value="true" {{ if .Form.CorrespondenceByWelsh }}checked{{ end }}>
+									<label class="govuk-label govuk-checkboxes__label"
+										   for="f-correspondence-welsh">
+										Welsh
+									</label>
+								</div>
+								<div class="govuk-checkboxes__item">
+									<input class="govuk-checkboxes__input" id="f-correspondence-large"
+										   name="correspondenceLargeFormat" type="checkbox" value="true" {{ if .Form.CorrespondenceLargeFormat }}checked{{ end }}>
+									<label class="govuk-label govuk-checkboxes__label"
+										   for="f-correspondence-large">
+										Large format
+									</label>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+
+					<div class="govuk-warning-text">
+						<span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+						<strong class="govuk-warning-text__text">
+							<span class="govuk-visually-hidden">Warning</span>
+							You are about to create an LPA case. Check the details you’ve entered are correct before clicking the ‘confirm and create draft LPA’ button.
+						</strong>
+					</div>
+
+					<div class="govuk-button-group">
+						<button class="govuk-button" data-module="govuk-button" type="submit" data-disable-after-click="true">Confirm and create draft LPA</button>
+						<a class="govuk-link govuk-link--no-visited-state" href="/">Cancel</a>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	{{ end }}
+{{ end }}
