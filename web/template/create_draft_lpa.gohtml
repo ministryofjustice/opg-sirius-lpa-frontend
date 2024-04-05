@@ -14,7 +14,7 @@
 			<div class="govuk-grid-column-two-thirds">
 				{{ template "error-summary" .Error }}
 
-				<h1 class="govuk-heading-l">Create a draft LPA for</h1>
+				<h1 class="govuk-heading-l">Create a draft LPA for {{ .Donor.Firstname }} {{ .Donor.Surname }}</h1>
 
 				<div class="govuk-inset-text">
 					Details you enter will appear in the donor section of the LPA form.
@@ -26,7 +26,7 @@
 					<div class="govuk-form-group {{ if .Error.Field.types }}govuk-form-group--error{{ end }}" id="f-types">
 						<fieldset class="govuk-fieldset" aria-describedby="f-type-hint">
 							<legend class="govuk-fieldset__legend">What LPA types are required?</legend>
-							<div class="govuk-hint" id="f-type-hint">Select all that apply</div>
+							<div class="govuk-hint" id="f-type-hint">Select all that applies</div>
 							{{ template "errors" .Error.Field.types }}
 							<div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
 								<div class="govuk-checkboxes__item">
@@ -49,7 +49,16 @@
 						</fieldset>
 					</div>
 
-
+					<div>
+						<p class="bold">Donor address</p>
+						{{ .Donor.AddressLine1 }}
+						{{ if not (eq .Donor.AddressLine2 "") }}<br>{{ .Donor.AddressLine2 }}{{ end }}
+						{{ if not (eq .Donor.AddressLine3 "") }}<br>{{ .Donor.AddressLine3 }}{{ end }}
+						<br>{{ .Donor.Town }}
+						<br>{{ .Donor.Postcode }}
+						<br>{{ .Donor.Country }}
+						<br>
+					</div>
 
 					<div class="govuk-form-group {{ if .Error.Field.recipient }}govuk-form-group--error{{ end }}" id="f-recipient">
 						<fieldset class="govuk-fieldset" aria-describedby="f-recipient-hint">
@@ -62,7 +71,7 @@
 										   {{ if eq "donor-same-address" .Form.Recipient}}checked="checked"{{ end }}>
 									<label class="govuk-label govuk-radios__label"
 										   for="f-recipient-donor-same-address">
-										The donor
+										The donor, using the address above
 									</label>
 								</div>
 								<div class="govuk-radios__item">

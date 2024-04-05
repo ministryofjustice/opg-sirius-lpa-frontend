@@ -16,9 +16,7 @@ type DraftLpa struct {
 	CorrespondenceLargeFormat bool     `json:"correspondenceLargeFormat,omitempty"`
 }
 
-func (c *Client) CreateDraftLpa(ctx Context, lpa DraftLpa) (map[string]string, error) {
-	//func (c *Client) CreateDraftLpa(ctx Context, donorID int, lpa DraftLpa) error {
-
+func (c *Client) CreateDraftLpa(ctx Context, donorID int, lpa DraftLpa) (map[string]string, error) {
 	data, err := json.Marshal(lpa)
 	out := map[string]string{}
 
@@ -26,8 +24,7 @@ func (c *Client) CreateDraftLpa(ctx Context, lpa DraftLpa) (map[string]string, e
 		return out, err
 	}
 
-	//req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("/lpa-api/v1/donor/%d/digital-lpas", donorID), bytes.NewReader(data))
-	req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("/lpa-api/v1/donor/42/digital-lpas"), bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("/lpa-api/v1/donor/%d/digital-lpas", donorID), bytes.NewReader(data))
 	if err != nil {
 		return out, err
 	}
