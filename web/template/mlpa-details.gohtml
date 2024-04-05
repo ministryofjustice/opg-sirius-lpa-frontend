@@ -162,11 +162,7 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Format</dt>
                 <dd class="govuk-summary-list__value">
-                  {{ if (eq .DigitalLpa.SiriusData.Application.Source "APPLICANT") }}
-                    Digital
-                  {{ else }}
-                    Paper
-                  {{ end }} <strong>TODO - POSSIBLY INCORRECT</strong>
+                  <strong>TODO - Donor/Format[channel] - NOT IN LPA STORE</strong>
                   <br><strong>TODO - Donor/Format[language] - NOT IN LPA STORE</strong>
                 </dd>
               </div>
@@ -381,7 +377,9 @@
             </h2>
           </div>
           <div id="accordion-default-content-5" class="govuk-accordion__section-content">
-            <p class="govuk-body">TODO</p>
+            <div class="govuk-body">
+              {{ .DigitalLpa.LpaStoreData.RestrictionsAndConditions }}
+            </div>
           </div>
         </div>
         <div class="govuk-accordion__section">
@@ -393,31 +391,101 @@
             </h2>
           </div>
           <div id="accordion-default-content-6" class="govuk-accordion__section-content">
-            <p class="govuk-body">TODO</p>
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">First names</dt>
+                <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.CertificateProvider.FirstNames }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Last name</dt>
+                <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.CertificateProvider.LastName }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Address</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ template "mlpa-address" .DigitalLpa.LpaStoreData.CertificateProvider.Address }}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Email</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ if (eq .DigitalLpa.LpaStoreData.CertificateProvider.Email "") }}
+                    Not provided
+                  {{ else }}
+                    {{ .DigitalLpa.LpaStoreData.CertificateProvider.Email }}
+                  {{ end }}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Phone</dt>
+                <dd class="govuk-summary-list__value">
+                  <strong>TODO - CertificateProvider/Phone - NOT IN LPA STORE</strong>
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                <dt class="govuk-summary-list__key">Format</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ channelForFormat .DigitalLpa.LpaStoreData.CertificateProvider.Channel }}
+                  <br><strong>TODO - CertificateProvider/Format[language] - NOT IN LPA STORE</strong>
+                </dd>
+              </div>
+            </dl>
           </div>
         </div>
         <div class="govuk-accordion__section">
           <div class="govuk-accordion__section-header">
             <h2 class="govuk-accordion__section-heading">
               <span class="govuk-accordion__section-button" id="accordion-default-heading-7">
-                Notified people (0 TODO)
+                Notified people ({{ len .DigitalLpa.LpaStoreData.PeopleToNotify }})
               </span>
             </h2>
           </div>
           <div id="accordion-default-content-7" class="govuk-accordion__section-content">
-            <p class="govuk-body">TODO</p>
+            {{ if (gt (len .DigitalLpa.LpaStoreData.PeopleToNotify) 0) }}
+              {{ range $num, $personToNotify := .DigitalLpa.LpaStoreData.PeopleToNotify }}
+                <h2 class="govuk-heading-m">
+                  Notified person {{ plusN $num 1 }}
+                </h2>
+
+                <dl class="govuk-summary-list">
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">First names</dt>
+                    <dd class="govuk-summary-list__value">{{ $personToNotify.FirstNames }}</dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Last name</dt>
+                    <dd class="govuk-summary-list__value">{{ $personToNotify.LastName }}</dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Address</dt>
+                    <dd class="govuk-summary-list__value">
+                      {{ template "mlpa-address" $personToNotify.Address }}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                    <dt class="govuk-summary-list__key">Format</dt>
+                    <dd class="govuk-summary-list__value">
+                      <strong>TODO - NotifiedPerson/Format[channel] - NOT IN LPA STORE</strong>
+                      <br><strong>TODO - NotifiedPerson/Format[language] - NOT IN LPA STORE</strong>
+                    </dd>
+                  </div>
+                </dl>
+              {{ end }}
+            {{ else }}
+              <p class="govuk-body">The donor did not provide details for this section</p>
+            {{ end }}
           </div>
         </div>
         <div class="govuk-accordion__section">
           <div class="govuk-accordion__section-header">
             <h2 class="govuk-accordion__section-heading">
               <span class="govuk-accordion__section-button" id="accordion-default-heading-8">
-                Correspondent (0 TODO)
+                Correspondent
               </span>
             </h2>
           </div>
           <div id="accordion-default-content-8" class="govuk-accordion__section-content">
-            <p class="govuk-body">TODO</p>
+            <p class="govuk-body">TODO - correspondent is not in the LPA store</p>
           </div>
         </div>
       </div>
