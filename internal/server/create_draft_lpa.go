@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -21,8 +22,9 @@ type formDraftLpa struct {
 }
 
 type CreateDraftLpaClient interface {
-	CreateDraftLpa(ctx sirius.Context, draft sirius.DraftLpa) (map[string]string, error)
+	CreateDraftLpa(ctx sirius.Context, donorID int, draft sirius.DraftLpa) (map[string]string, error)
 	GetUserDetails(ctx sirius.Context) (sirius.User, error)
+	Person(ctx sirius.Context, personID int) (sirius.Person, error)
 }
 
 type createDraftLpaResult struct {
@@ -33,6 +35,7 @@ type createDraftLpaResult struct {
 type createDraftLpaData struct {
 	XSRFToken string
 	Countries []sirius.RefDataItem
+	Donor     sirius.Person
 	Form      formDraftLpa
 	Error     sirius.ValidationError
 	Success   bool
@@ -45,11 +48,22 @@ func CreateDraftLpa(client CreateDraftLpaClient, tmpl template.Template) Handler
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
+		id, err := strconv.Atoi(r.FormValue("id"))
+		if err != nil {
+			return err
+		}
+
 		ctx := getContext(r)
+		donor, err := client.Person(ctx, id)
+		if err != nil {
+			return err
+		}
+
 		group, _ := errgroup.WithContext(ctx.Context)
 
 		data := createDraftLpaData{
 			XSRFToken: ctx.XSRFToken,
+			Donor:     donor,
 		}
 
 		group.Go(func() error {
@@ -91,7 +105,7 @@ func CreateDraftLpa(client CreateDraftLpaClient, tmpl template.Template) Handler
 				compiledDraft.CorrespondentLastName = data.Form.CorrespondentSurname
 			}
 
-			uids, err := client.CreateDraftLpa(ctx, compiledDraft)
+			uids, err := client.CreateDraftLpa(ctx, id, compiledDraft)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
