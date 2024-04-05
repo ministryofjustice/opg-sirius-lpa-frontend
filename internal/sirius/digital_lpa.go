@@ -41,33 +41,46 @@ type Donor struct {
 }
 
 type LpaStoreData struct {
-	Donor                                       LpaStoreDonor      `json:"donor"`
-	Attorneys                                   []LpaStoreAttorney `json:"attorneys"`
-	HowAttorneysMakeDecisions                   string             `json:"howAttorneysMakeDecisions"`
-	HowAttorneysMakeDecisionsDetails            string             `json:"howAttorneysMakeDecisionsDetails"`
-	WhenTheLpaCanBeUsed                         string             `json:"whenTheLpaCanBeUsed"`
-	HowReplacementAttorneysMakeDecisions        string             `json:"howReplacementAttorneysMakeDecisions"`
-	HowReplacementAttorneysMakeDecisionsDetails string             `json:"howReplacementAttorneysMakeDecisionsDetails"`
-	HowReplacementAttorneysStepIn               string             `json:"howReplacementAttorneysStepIn"`
-	HowReplacementAttorneysStepInDetails        string             `json:"howReplacementAttorneysStepInDetails"`
-	SignedAt                                    string             `json:"signedAt"`
+	Donor                                       LpaStoreDonor               `json:"donor"`
+	Attorneys                                   []LpaStoreAttorney          `json:"attorneys"`
+	CertificateProvider                         LpaStoreCertificateProvider `json:"certificateProvider"`
+	PeopleToNotify                              []LpaStorePersonToNotify    `json:"peopleToNotify"`
+	HowAttorneysMakeDecisions                   string                      `json:"howAttorneysMakeDecisions"`
+	HowAttorneysMakeDecisionsDetails            string                      `json:"howAttorneysMakeDecisionsDetails"`
+	WhenTheLpaCanBeUsed                         string                      `json:"whenTheLpaCanBeUsed"`
+	HowReplacementAttorneysMakeDecisions        string                      `json:"howReplacementAttorneysMakeDecisions"`
+	HowReplacementAttorneysMakeDecisionsDetails string                      `json:"howReplacementAttorneysMakeDecisionsDetails"`
+	HowReplacementAttorneysStepIn               string                      `json:"howReplacementAttorneysStepIn"`
+	HowReplacementAttorneysStepInDetails        string                      `json:"howReplacementAttorneysStepInDetails"`
+	RestrictionsAndConditions                   string                      `json:"restrictionsAndConditions"`
+	SignedAt                                    string                      `json:"signedAt"`
 }
 
 type LpaStoreDonor struct {
 	LpaStorePerson
+	DateOfBirth string          `json:"dateOfBirth"`
 	OtherNamesKnownBy string `json:"otherNamesKnownBy"`
 }
 
 type LpaStoreAttorney struct {
 	LpaStorePerson
+	DateOfBirth string          `json:"dateOfBirth"`
 	Status string `json:"status"`
+}
+
+type LpaStoreCertificateProvider struct {
+	LpaStorePerson
+	Channel string `json:"channel"`
+}
+
+type LpaStorePersonToNotify struct {
+	LpaStorePerson
 }
 
 type LpaStorePerson struct {
 	FirstNames  string          `json:"firstNames"`
 	LastName    string          `json:"lastName"`
 	Address     LpaStoreAddress `json:"address"`
-	DateOfBirth string          `json:"dateOfBirth"`
 	Email       string          `json:"email"`
 }
 
