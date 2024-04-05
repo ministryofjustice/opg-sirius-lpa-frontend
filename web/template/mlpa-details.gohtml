@@ -134,7 +134,9 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Date of birth</dt>
                 <dd class="govuk-summary-list__value">
-                  {{ parseAndFormatDate .DigitalLpa.LpaStoreData.Donor.DateOfBirth "2006-01-02" "2 January 2006" }}
+                  {{ if not (eq .DigitalLpa.LpaStoreData.Donor.DateOfBirth "") }}
+                    {{ parseAndFormatDate .DigitalLpa.LpaStoreData.Donor.DateOfBirth "2006-01-02" "2 January 2006" }}
+                  {{ end }}
                 </dd>
               </div>
               <div class="govuk-summary-list__row">
@@ -206,7 +208,9 @@
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Date of birth</dt>
                     <dd class="govuk-summary-list__value">
-                      {{ parseAndFormatDate $attorney.DateOfBirth "2006-01-02" "2 January 2006" }}
+                      {{ if not (eq $attorney.DateOfBirth "") }}
+                        {{ parseAndFormatDate $attorney.DateOfBirth "2006-01-02" "2 January 2006" }}
+                      {{ end }}
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row">
@@ -329,7 +333,9 @@
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Date of birth</dt>
                     <dd class="govuk-summary-list__value">
-                      {{ parseAndFormatDate $attorney.DateOfBirth "2006-01-02" "2 January 2006" }}
+                      {{ if not (eq $attorney.DateOfBirth "") }}
+                        {{ parseAndFormatDate $attorney.DateOfBirth "2006-01-02" "2 January 2006" }}
+                      {{ end }}
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row">
