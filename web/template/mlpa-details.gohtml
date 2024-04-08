@@ -492,7 +492,7 @@
                     <dt class="govuk-summary-list__key">Last name</dt>
                     <dd class="govuk-summary-list__value">{{ $personToNotify.LastName }}</dd>
                   </div>
-                  <div class="govuk-summary-list__row">
+                  <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
                     <dt class="govuk-summary-list__key">Address</dt>
                     <dd class="govuk-summary-list__value">
                       {{ template "mlpa-address" $personToNotify.Address }}
@@ -514,22 +514,22 @@
             </h2>
           </div>
           <div id="accordion-default-content-8" class="govuk-accordion__section-content">
-            <div class="govuk-body">
-              {{ if (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line1 "") }}
-                The donor
-              {{ else }}
-                {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentFirstNames "") }}
-                  {{ .DigitalLpa.SiriusData.Application.CorrespondentFirstNames }} {{ .DigitalLpa.SiriusData.Application.CorrespondentLastName }}<br>
-                {{ end }}
-                  {{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line1 }}
-                  {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line2 "") }}<br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line2 }}{{ end }}
-                  {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line3 "") }}<br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line3 }}{{ end }}
-                  <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Town }}
-                  <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Postcode }}
-                  <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Country }}
-                  <br>
-              {{ end }}
-            </div>
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">First names</dt>
+                <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.CorrespondentFirstNames }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Last name</dt>
+                <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.CorrespondentLastName }}</dd>
+              </div>
+              <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                <dt class="govuk-summary-list__key">Address</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ template "mlpa-address" .DigitalLpa.SiriusData.Application.CorrespondentAddress }}
+                </dd>
+              </div>
+            </dl>
           </div>
         </div>
       </div>
