@@ -39,7 +39,7 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 
 		var replacementAttorneys []sirius.LpaStoreAttorney
 		var nonReplacementAttorneys []sirius.LpaStoreAttorney
-		for _, attorney := range(caseSummary.DigitalLpa.LpaStoreData.Attorneys) {
+		for _, attorney := range caseSummary.DigitalLpa.LpaStoreData.Attorneys {
 			switch attorney.Status {
 			case "replacement":
 				replacementAttorneys = append(replacementAttorneys, attorney)
