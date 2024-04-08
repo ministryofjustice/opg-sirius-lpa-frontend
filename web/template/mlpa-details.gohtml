@@ -510,7 +510,22 @@
             </h2>
           </div>
           <div id="accordion-default-content-8" class="govuk-accordion__section-content">
-            <p class="govuk-body">TODO - correspondent is not in the LPA store</p>
+            <div class="govuk-body">
+              {{ if (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line1 "") }}
+                The donor
+              {{ else }}
+                {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentFirstNames "") }}
+                  {{ .DigitalLpa.SiriusData.Application.CorrespondentFirstNames }} {{ .DigitalLpa.SiriusData.Application.CorrespondentLastName }}<br>
+                {{ end }}
+                  {{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line1 }}
+                  {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line2 "") }}<br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line2 }}{{ end }}
+                  {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line3 "") }}<br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line3 }}{{ end }}
+                  <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Town }}
+                  <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Postcode }}
+                  <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Country }}
+                  <br>
+              {{ end }}
+            </div>
           </div>
         </div>
       </div>
