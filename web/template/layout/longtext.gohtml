@@ -1,0 +1,9 @@
+{{ define "longtext" }}
+  {{ $lines := splitByLinebreak . }}
+  {{ range $num, $line := $lines }}
+    {{ $line }}
+    {{ if lt $num (plusN (len $lines) -1) }}
+      <br>
+    {{ end }}
+  {{ end }}
+{{ end }}
