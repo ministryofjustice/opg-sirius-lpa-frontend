@@ -449,7 +449,11 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Phone</dt>
                 <dd class="govuk-summary-list__value">
-                  <strong>TODO - CertificateProvider/Phone - NOT IN LPA STORE</strong>
+                  {{ if (eq .DigitalLpa.LpaStoreData.CertificateProvider.Phone "") }}
+                    Not provided
+                  {{ else }}
+                    {{ .DigitalLpa.LpaStoreData.CertificateProvider.Phone }}
+                  {{ end }}
                 </dd>
               </div>
               <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
