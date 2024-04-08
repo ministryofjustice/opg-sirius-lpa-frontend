@@ -62,7 +62,7 @@
           <dt class="govuk-summary-list__key">Phone number</dt>
           <dd class="govuk-summary-list__value">
             {{ if (eq .DigitalLpa.SiriusData.Application.PhoneNumber "") }}
-              not provided
+              Not provided
             {{ else }}
               {{ .DigitalLpa.SiriusData.Application.PhoneNumber }}
             {{ end }}
@@ -72,7 +72,7 @@
           <dt class="govuk-summary-list__key">Email</dt>
           <dd class="govuk-summary-list__value">
             {{ if (eq .DigitalLpa.SiriusData.Application.Email "") }}
-              not provided
+              Not provided
             {{ else }}
               {{ .DigitalLpa.SiriusData.Application.Email }}
             {{ end }}
@@ -158,7 +158,11 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Phone</dt>
                 <dd class="govuk-summary-list__value">
-                  <strong>TODO - Donor/Phone - NOT IN LPA STORE</strong>
+                  {{ if (eq .DigitalLpa.SiriusData.Application.PhoneNumber "") }}
+                    Not provided
+                  {{ else }}
+                    {{ .DigitalLpa.SiriusData.Application.PhoneNumber }}
+                  {{ end }}
                 </dd>
               </div>
               <div class="govuk-summary-list__row">
@@ -232,14 +236,24 @@
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Phone</dt>
                     <dd class="govuk-summary-list__value">
-                      <strong>TODO - Attorney/Phone - NOT IN LPA STORE</strong>
+                      {{ if (eq $attorney.Mobile "") }}
+                        Not provided
+                      {{ else }}
+                        {{ $attorney.Mobile }}
+                      {{ end }}
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
                     <dt class="govuk-summary-list__key">Format</dt>
                     <dd class="govuk-summary-list__value">
-                      <strong>TODO - Attorney/Format[channel] - NOT IN LPA STORE</strong>
-                      <br><strong>TODO - Attorney/Format[language] - NOT IN LPA STORE</strong>
+                      {{ if (eq $attorney.Email "") }}
+                        Paper
+                      {{ else }}
+                        Online
+                      {{ end }}
+                      {{ if not (eq $attorney.ContactLanguagePreference "") }}
+                        <br>{{ $attorney.ContactLanguagePreference }}
+                      {{ end }}
                     </dd>
                   </div>
                 </dl>
@@ -357,14 +371,24 @@
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Phone</dt>
                     <dd class="govuk-summary-list__value">
-                      <strong>TODO - Attorney/Phone - NOT IN LPA STORE</strong>
+                      {{ if (eq $attorney.Mobile "") }}
+                        Not provided
+                      {{ else }}
+                        {{ $attorney.Mobile }}
+                      {{ end }}
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
                     <dt class="govuk-summary-list__key">Format</dt>
                     <dd class="govuk-summary-list__value">
-                      <strong>TODO - Attorney/Format[channel] - NOT IN LPA STORE</strong>
-                      <br><strong>TODO - Attorney/Format[language] - NOT IN LPA STORE</strong>
+                      {{ if (eq $attorney.Email "") }}
+                        Paper
+                      {{ else }}
+                        Online
+                      {{ end }}
+                      {{ if not (eq $attorney.ContactLanguagePreference "") }}
+                        <br>{{ $attorney.ContactLanguagePreference }}
+                      {{ end }}
                     </dd>
                   </div>
                 </dl>
@@ -432,7 +456,9 @@
                 <dt class="govuk-summary-list__key">Format</dt>
                 <dd class="govuk-summary-list__value">
                   {{ channelForFormat .DigitalLpa.LpaStoreData.CertificateProvider.Channel }}
-                  <br><strong>TODO - CertificateProvider/Format[language] - NOT IN LPA STORE</strong>
+                  {{ if not (eq .DigitalLpa.LpaStoreData.CertificateProvider.ContactLanguagePreference "") }}
+                    <br>{{ .DigitalLpa.LpaStoreData.CertificateProvider.ContactLanguagePreference }}
+                  {{ end }}
                 </dd>
               </div>
             </dl>
@@ -466,13 +492,6 @@
                     <dt class="govuk-summary-list__key">Address</dt>
                     <dd class="govuk-summary-list__value">
                       {{ template "mlpa-address" $personToNotify.Address }}
-                    </dd>
-                  </div>
-                  <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
-                    <dt class="govuk-summary-list__key">Format</dt>
-                    <dd class="govuk-summary-list__value">
-                      <strong>TODO - NotifiedPerson/Format[channel] - NOT IN LPA STORE</strong>
-                      <br><strong>TODO - NotifiedPerson/Format[language] - NOT IN LPA STORE</strong>
                     </dd>
                   </div>
                 </dl>
