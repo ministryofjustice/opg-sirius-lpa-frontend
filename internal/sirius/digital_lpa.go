@@ -64,13 +64,15 @@ type LpaStoreDonor struct {
 
 type LpaStoreAttorney struct {
 	LpaStorePerson
-	DateOfBirth string `json:"dateOfBirth"`
-	Status      string `json:"status"`
-	Mobile      string `json:"mobile"`
+	DateOfBirth               string `json:"dateOfBirth"`
+	Status                    string `json:"status"`
+	Mobile                    string `json:"mobile"`
+	ContactLanguagePreference string `json:"contactLanguagePreference"`
 }
 
 type LpaStoreCertificateProvider struct {
 	LpaStorePerson
+	Phone                     string `json:"phone"`
 	Channel                   string `json:"channel"`
 	ContactLanguagePreference string `json:"contactLanguagePreference"`
 }
