@@ -58,19 +58,21 @@ type LpaStoreData struct {
 
 type LpaStoreDonor struct {
 	LpaStorePerson
-	DateOfBirth string          `json:"dateOfBirth"`
+	DateOfBirth       string `json:"dateOfBirth"`
 	OtherNamesKnownBy string `json:"otherNamesKnownBy"`
 }
 
 type LpaStoreAttorney struct {
 	LpaStorePerson
-	DateOfBirth string          `json:"dateOfBirth"`
-	Status string `json:"status"`
+	DateOfBirth string `json:"dateOfBirth"`
+	Status      string `json:"status"`
+	Mobile      string `json:"mobile"`
 }
 
 type LpaStoreCertificateProvider struct {
 	LpaStorePerson
-	Channel string `json:"channel"`
+	Channel                   string `json:"channel"`
+	ContactLanguagePreference string `json:"contactLanguagePreference"`
 }
 
 type LpaStorePersonToNotify struct {
@@ -78,10 +80,10 @@ type LpaStorePersonToNotify struct {
 }
 
 type LpaStorePerson struct {
-	FirstNames  string          `json:"firstNames"`
-	LastName    string          `json:"lastName"`
-	Address     LpaStoreAddress `json:"address"`
-	Email       string          `json:"email"`
+	FirstNames string          `json:"firstNames"`
+	LastName   string          `json:"lastName"`
+	Address    LpaStoreAddress `json:"address"`
+	Email      string          `json:"email"`
 }
 
 type LpaStoreAddress struct {
