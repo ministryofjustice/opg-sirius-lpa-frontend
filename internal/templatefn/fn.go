@@ -186,6 +186,9 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "CODE NOT RECOGNISED: " + s
 			}
 		},
+		"convertLinebreaks": func(s string) template.HTML {
+			return template.HTML(strings.Replace(s, "\n", "<br>", -1))
+		},
 	}
 }
 
