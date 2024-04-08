@@ -10,7 +10,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type formDraftLpa struct {
+type formAdditionalDraft struct {
 	SubTypes                  []string       `form:"subtype"`
 	Recipient                 string         `form:"recipient"`
 	CorrespondentFirstname    string         `form:"correspondentFirstname"`
@@ -21,28 +21,28 @@ type formDraftLpa struct {
 	CorrespondenceLargeFormat bool           `form:"correspondenceLargeFormat"`
 }
 
-type CreateDraftLpaClient interface {
-	CreateDraftLpa(ctx sirius.Context, donorID int, draft sirius.DraftLpa) (map[string]string, error)
+type CreateAdditionalDraftClient interface {
+	CreateAdditionalDraftLpa(ctx sirius.Context, donorID int, draft sirius.AdditionalDraft) (map[string]string, error)
 	GetUserDetails(ctx sirius.Context) (sirius.User, error)
 	Person(ctx sirius.Context, personID int) (sirius.Person, error)
 }
 
-type createDraftLpaResult struct {
+type createAdditionalDraftResult struct {
 	Uid     string
 	Subtype string
 }
 
-type createDraftLpaData struct {
+type createAdditionalDraftData struct {
 	XSRFToken string
 	Countries []sirius.RefDataItem
 	Donor     sirius.Person
-	Form      formDraftLpa
+	Form      formAdditionalDraft
 	Error     sirius.ValidationError
 	Success   bool
-	Uids      []createDraftLpaResult
+	Uids      []createAdditionalDraftResult
 }
 
-func CreateDraftLpa(client CreateDraftLpaClient, tmpl template.Template) Handler {
+func CreateAdditionalDraft(client CreateAdditionalDraftClient, tmpl template.Template) Handler {
 	if decoder == nil {
 		decoder = form.NewDecoder()
 	}
@@ -61,7 +61,7 @@ func CreateDraftLpa(client CreateDraftLpaClient, tmpl template.Template) Handler
 
 		group, _ := errgroup.WithContext(ctx.Context)
 
-		data := createDraftLpaData{
+		data := createAdditionalDraftData{
 			XSRFToken: ctx.XSRFToken,
 			Donor:     donor,
 		}
@@ -89,7 +89,7 @@ func CreateDraftLpa(client CreateDraftLpaClient, tmpl template.Template) Handler
 				return err
 			}
 
-			compiledDraft := sirius.DraftLpa{
+			compiledDraft := sirius.AdditionalDraft{
 				CaseType:                  data.Form.SubTypes,
 				CorrespondenceByWelsh:     data.Form.CorrespondenceByWelsh,
 				CorrespondenceLargeFormat: data.Form.CorrespondenceLargeFormat,
@@ -105,7 +105,7 @@ func CreateDraftLpa(client CreateDraftLpaClient, tmpl template.Template) Handler
 				compiledDraft.CorrespondentLastName = data.Form.CorrespondentSurname
 			}
 
-			uids, err := client.CreateDraftLpa(ctx, id, compiledDraft)
+			uids, err := client.CreateAdditionalDraftLpa(ctx, id, compiledDraft)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
@@ -116,7 +116,7 @@ func CreateDraftLpa(client CreateDraftLpaClient, tmpl template.Template) Handler
 				data.Success = true
 
 				for subtype, uid := range uids {
-					data.Uids = append(data.Uids, createDraftLpaResult{
+					data.Uids = append(data.Uids, createAdditionalDraftResult{
 						Subtype: subtype,
 						Uid:     uid,
 					})

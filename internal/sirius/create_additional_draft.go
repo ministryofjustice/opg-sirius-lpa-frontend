@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-type DraftLpa struct {
+type AdditionalDraft struct {
 	CaseType                  []string `json:"types"`
 	CorrespondentFirstNames   string   `json:"correspondentFirstNames,omitempty"`
 	CorrespondentLastName     string   `json:"correspondentLastName,omitempty"`
@@ -16,7 +16,7 @@ type DraftLpa struct {
 	CorrespondenceLargeFormat bool     `json:"correspondenceLargeFormat,omitempty"`
 }
 
-func (c *Client) CreateDraftLpa(ctx Context, donorID int, lpa DraftLpa) (map[string]string, error) {
+func (c *Client) CreateAdditionalDraft(ctx Context, donorID int, lpa AdditionalDraft) (map[string]string, error) {
 	data, err := json.Marshal(lpa)
 	out := map[string]string{}
 
