@@ -34,7 +34,7 @@
 
 		<div class="govuk-button-group">
 			<a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/lpa/%s" (index .Uids 0).Uid ) }}">View donor record</a>
-			<a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/create-draft-lpa?id=%d" .Donor.ID ) }}">Create another draft LPA</a>
+			<a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/create-additional-draft-lpa?id=%d" .Donor.ID ) }}">Create another draft LPA</a>
 		</div>
 
 	{{ else }}
