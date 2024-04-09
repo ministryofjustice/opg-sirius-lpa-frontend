@@ -31,7 +31,7 @@ func TestCreateAdditionalDraft(t *testing.T) {
 				pact.
 					AddInteraction().
 					Given("I am a Modernised LPA user").
-					UponReceiving("A request to create a draft LPA with minimal data").
+					UponReceiving("A request to create an additional draft LPA with minimal data").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
 						Path:   dsl.String("/lpa-api/donors/188/digital-lpas"),
@@ -39,18 +39,7 @@ func TestCreateAdditionalDraft(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"id":              188,
-							"types":           []string{"personal-welfare"},
-							"source":          "PHONE",
-							"donorFirstNames": "Coleen",
-							"donorLastName":   "Morneault",
-							"donorDob":        "08/04/1952",
-							"donorAddress": map[string]string{
-								"addressLine1": "Fluke House",
-								"town":         "South Bend",
-								"postcode":     "AI1 6VW",
-								"country":      "GB",
-							},
+							"types": []string{"personal-welfare"},
 						},
 					}).
 					WillRespondWith(dsl.Response{
