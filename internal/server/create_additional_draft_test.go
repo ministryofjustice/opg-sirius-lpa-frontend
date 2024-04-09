@@ -6,6 +6,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"strings"
 	"testing"
 )
 
@@ -35,27 +37,20 @@ func TestGetCreateAdditionalDraft(t *testing.T) {
 		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
 	client.
 		On("Person", mock.Anything, 123).
-		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
+		Return(sirius.Person{ID: 123, Firstname: "John", Surname: "Doe"}, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createAdditionalDraftData{
-
 			Donor: sirius.Person{
-				ID:           123,
-				Firstname:    "John",
-				Surname:      "Doe",
-				DateOfBirth:  "18/04/1965",
-				AddressLine1: "9 Mount Pleasant Drive",
-				Town:         "East Harling",
-				Postcode:     "NR16 2GB",
-				Country:      "UK",
-				PersonType:   "Donor",
+				ID:        123,
+				Firstname: "John",
+				Surname:   "Doe",
 			},
 		}).
 		Return(nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/create-additional-draft-lpa", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/create-additional-draft-lpa/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := CreateAdditionalDraft(client, template.Func)(w, r)
@@ -73,16 +68,145 @@ func TestGetCreateAdditionalDraftForbidden(t *testing.T) {
 		Return(sirius.User{}, nil)
 	client.
 		On("Person", mock.Anything, 123).
-		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
+		Return(sirius.Person{ID: 123, Firstname: "John", Surname: "Doe"}, nil)
 
 	template := &mockTemplate{}
 
-	r, _ := http.NewRequest(http.MethodGet, "/create-additional-draft-lpa", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/create-additional-draft-lpa/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := CreateAdditionalDraft(client, template.Func)(w, r)
 
 	assert.Equal(t, sirius.StatusError{Code: 403}, err)
 
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateAdditionalDraft(t *testing.T) {
+	client := &mockCreateAdditionalDraftClient{}
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{ID: 123, Firstname: "John", Surname: "Doe"}, nil)
+	client.
+		On("CreateAdditionalDraft", mock.Anything, 123, sirius.AdditionalDraft{
+			CaseType:                  []string{"property-and-affairs", "personal-welfare"},
+			CorrespondenceByWelsh:     true,
+			CorrespondenceLargeFormat: false,
+		}).
+		Return(map[string]string{
+			"property-and-affairs": "M-0123-4567-8901",
+		}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createAdditionalDraftData{
+			Form: formAdditionalDraft{
+				SubTypes:                  []string{"property-and-affairs", "personal-welfare"},
+				CorrespondenceByWelsh:     true,
+				CorrespondenceLargeFormat: false,
+			},
+			Success: true,
+			Uids: []createAdditionalDraftResult{
+				{Subtype: "property-and-affairs", Uid: "M-0123-4567-8901"},
+			},
+			Donor: sirius.Person{
+				ID:        123,
+				Firstname: "John",
+				Surname:   "Doe",
+			},
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"subtype":                   {"property-and-affairs", "personal-welfare"},
+		"correspondenceByWelsh":     {"true"},
+		"correspondenceLargeFormat": {"false"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/create-additional-draft-lpa/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateAdditionalDraft(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateAdditionalDraftWhenAPIFails(t *testing.T) {
+	client := &mockCreateAdditionalDraftClient{}
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{ID: 123, Firstname: "John", Surname: "Doe"}, nil)
+	client.
+		On("CreateAdditionalDraft", mock.Anything, 123, sirius.AdditionalDraft{
+			CaseType: []string{"property-and-affairs", "personal-welfare"},
+		}).
+		Return(map[string]string{}, expectedError)
+
+	template := &mockTemplate{}
+
+	form := url.Values{
+		"subtype": {"property-and-affairs", "personal-welfare"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/create-additional-draft-lpa/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateAdditionalDraft(client, template.Func)(w, r)
+	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateAdditionalDraftWhenValidationError(t *testing.T) {
+	client := &mockCreateAdditionalDraftClient{}
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{ID: 123, Firstname: "John", Surname: "Doe"}, nil)
+	client.
+		On("CreateAdditionalDraft", mock.Anything, 123, sirius.AdditionalDraft{
+			CorrespondenceByWelsh: false,
+		}).
+		Return(map[string]string{}, sirius.ValidationError{Field: sirius.FieldErrors{
+			"subtype": {"required": "Value required and can't be empty"},
+		}})
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createAdditionalDraftData{
+			Form: formAdditionalDraft{},
+			Error: sirius.ValidationError{
+				Field: sirius.FieldErrors{
+					"subtype": {"required": "Value required and can't be empty"},
+				},
+			},
+			Donor: sirius.Person{
+				ID:        123,
+				Firstname: "John",
+				Surname:   "Doe",
+			},
+		}).
+		Return(nil)
+
+	form := url.Values{}
+
+	r, _ := http.NewRequest(http.MethodPost, "/create-additional-draft-lpa/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateAdditionalDraft(client, template.Func)(w, r)
+	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
