@@ -39,18 +39,7 @@ func TestCreateAdditionalDraft(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"id":              188,
-							"types":           []string{"personal-welfare"},
-							"source":          "PHONE",
-							"donorFirstNames": "Coleen",
-							"donorLastName":   "Morneault",
-							"donorDob":        "08/04/1952",
-							"donorAddress": map[string]string{
-								"addressLine1": "Fluke House",
-								"town":         "South Bend",
-								"postcode":     "AI1 6VW",
-								"country":      "GB",
-							},
+							"types": []string{"personal-welfare"},
 						},
 					}).
 					WillRespondWith(dsl.Response{
