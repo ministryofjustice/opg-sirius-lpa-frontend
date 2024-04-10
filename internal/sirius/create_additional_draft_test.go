@@ -34,7 +34,7 @@ func TestCreateAdditionalDraft(t *testing.T) {
 					UponReceiving("A request to create an additional draft LPA with minimal data").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/donors/188/digital-lpas"),
+						Path:   dsl.String("/lpa-api/v1/donors/188/digital-lpas"),
 						Headers: dsl.MapMatcher{
 							"Content-Type": dsl.String("application/json"),
 						},
@@ -54,7 +54,7 @@ func TestCreateAdditionalDraft(t *testing.T) {
 					})
 			},
 			expectedResponse: map[string]string{
-				"personal-welfare": "M-GHIJ-7890-KLMN",
+				"caseSubtype": "M-GHIJ-7890-KLMN",
 			},
 		},
 	}
