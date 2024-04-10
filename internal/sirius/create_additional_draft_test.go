@@ -54,7 +54,8 @@ func TestCreateAdditionalDraft(t *testing.T) {
 					})
 			},
 			expectedResponse: map[string]string{
-				"personal-welfare": "M-GHIJ-7890-KLMN",
+				"caseSubtype": "personal-welfare",
+				"uId":         "M-GHIJ-7890-KLMN",
 			},
 		},
 	}
