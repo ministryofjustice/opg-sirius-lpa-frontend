@@ -30,7 +30,7 @@ func TestCreateAdditionalDraft(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I am a Modernised LPA user").
+					Given("A donor exists").
 					UponReceiving("A request to create an additional draft LPA with minimal data").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
@@ -48,13 +48,13 @@ func TestCreateAdditionalDraft(t *testing.T) {
 						Body: []map[string]interface{}{
 							{
 								"caseSubtype": dsl.String("personal-welfare"),
-								"uId":         dsl.Regex("M-GHIJ-7890-KLMN", `^M(-[0-9A-Z]{4}){3}$`),
+								"uId":         dsl.Regex("M-GHIJ-7890-ABCD", `^M(-[0-9A-Z]{4}){3}$`),
 							},
 						},
 					})
 			},
 			expectedResponse: map[string]string{
-				"personal-welfare": "M-GHIJ-7890-KLMN",
+				"personal-welfare": "M-GHIJ-7890-ABCD",
 			},
 		},
 	}
