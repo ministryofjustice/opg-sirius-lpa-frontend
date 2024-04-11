@@ -30,7 +30,7 @@ func TestCreateAdditionalDraft(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I am a Modernised LPA user").
+					Given("A donor exists").
 					UponReceiving("A request to create an additional draft LPA with minimal data").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
