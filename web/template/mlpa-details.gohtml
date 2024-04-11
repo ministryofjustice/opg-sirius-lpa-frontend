@@ -176,7 +176,7 @@
                 <dt class="govuk-summary-list__key">Signed on</dt>
                 <dd class="govuk-summary-list__value">
                   {{ if (eq .DigitalLpa.LpaStoreData.SignedAt "") }}
-                    Not signed
+                    Not provided
                   {{ else }}
                     {{ parseAndFormatDate .DigitalLpa.LpaStoreData.SignedAt "2006-01-02T15:04:05.0Z" "2 January 2006" }}
                   {{ end }}
@@ -312,7 +312,7 @@
                     <div class="govuk-body">
                       {{ howReplacementAttorneysStepInLongForm .DigitalLpa.LpaStoreData.HowReplacementAttorneysStepIn }}
                       {{ if (eq .DigitalLpa.LpaStoreData.HowReplacementAttorneysStepIn "another-way") }}
-                        <br>{{ howReplacementAttorneysStepInLongForm .DigitalLpa.LpaStoreData.HowReplacementAttorneysStepInDetails}}
+                        <br>{{ howReplacementAttorneysStepInLongForm .DigitalLpa.LpaStoreData.HowReplacementAttorneysStepInDetails }}
                       {{ end }}
                     </div>
                   </dd>
