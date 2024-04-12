@@ -31,11 +31,11 @@ func TestCreateAdditionalDraft(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A donor exists").
+					Given("A donor with a digital LPA exists").
 					UponReceiving("A request to create an additional draft LPA with minimal data").
 					WithRequest(dsl.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/donors/188/digital-lpas"),
+						Path:   dsl.String("/lpa-api/v1/donors/234/digital-lpas"),
 						Headers: dsl.MapMatcher{
 							"Content-Type": dsl.String("application/json"),
 						},
@@ -68,7 +68,7 @@ func TestCreateAdditionalDraft(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				person, err := client.CreateAdditionalDraft(Context{Context: context.Background()}, 188, tc.additionalDraftData)
+				person, err := client.CreateAdditionalDraft(Context{Context: context.Background()}, 234, tc.additionalDraftData)
 				if (tc.expectedError) == nil {
 					assert.Equal(t, tc.expectedResponse, person)
 					assert.Nil(t, err)
