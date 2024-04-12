@@ -93,6 +93,7 @@ func CreateAdditionalDraft(client CreateAdditionalDraftClient, tmpl template.Tem
 				CaseType:                  data.Form.SubTypes,
 				CorrespondenceByWelsh:     data.Form.CorrespondenceByWelsh,
 				CorrespondenceLargeFormat: data.Form.CorrespondenceLargeFormat,
+				Source:                    "PHONE",
 			}
 
 			if data.Form.Recipient == "donor-other-address" {

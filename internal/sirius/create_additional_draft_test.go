@@ -39,7 +39,8 @@ func TestCreateAdditionalDraft(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"types": []string{"personal-welfare"},
+							"types":  []string{"personal-welfare"},
+							"source": "PHONE",
 						},
 					}).
 					WillRespondWith(dsl.Response{
