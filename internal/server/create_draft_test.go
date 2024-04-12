@@ -243,7 +243,7 @@ func TestPostCreateDraftWhenValidationError(t *testing.T) {
 		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
-		Return([]sirius.RefDataItem{}, nil)
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			Source:          "PHONE",
@@ -256,7 +256,7 @@ func TestPostCreateDraftWhenValidationError(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createDraftData{
-			Countries: []sirius.RefDataItem{},
+			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
 			Form: formDraft{
 				DonorFirstname: "Gerald Ryan",
 			},
