@@ -528,18 +528,6 @@
       }
     },
     {
-      "name": "A request to create an additional draft LPA with minimal data",
-      "request": {
-        "method": "POST",
-        "url": "/lpa-api/donors/188/digital-lpas"
-      },
-      "response": {
-        "status": 201,
-        "headers": { "Content-Type": "application/json" },
-        "body": "[{\"caseSubtype\":\"personal-welfare\",\"uId\":\"M-GHIJ-7890-KLMN\"}]"
-      }
-    },
-    {
       "name": "A request to take the investigation off hold",
       "request": { "method": "DELETE", "url": "/lpa-api/v1/hold-periods/175" },
       "response": { "status": 204, "headers": {} }

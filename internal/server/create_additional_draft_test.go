@@ -95,6 +95,7 @@ func TestPostCreateAdditionalDraft(t *testing.T) {
 			CaseType:                  []string{"property-and-affairs", "personal-welfare"},
 			CorrespondenceByWelsh:     true,
 			CorrespondenceLargeFormat: false,
+			Source:                    "PHONE",
 		}).
 		Return(map[string]string{
 			"property-and-affairs": "M-0123-4567-8901",
@@ -149,6 +150,7 @@ func TestPostCreateAdditionalDraftWhenAPIFails(t *testing.T) {
 	client.
 		On("CreateAdditionalDraft", mock.Anything, 123, sirius.AdditionalDraft{
 			CaseType: []string{"property-and-affairs", "personal-welfare"},
+			Source:   "PHONE",
 		}).
 		Return(map[string]string{}, expectedError)
 
@@ -178,6 +180,7 @@ func TestPostCreateAdditionalDraftWhenValidationError(t *testing.T) {
 	client.
 		On("CreateAdditionalDraft", mock.Anything, 123, sirius.AdditionalDraft{
 			CorrespondenceByWelsh: false,
+			Source:                "PHONE",
 		}).
 		Return(map[string]string{}, sirius.ValidationError{Field: sirius.FieldErrors{
 			"subtype": {"required": "Value required and can't be empty"},

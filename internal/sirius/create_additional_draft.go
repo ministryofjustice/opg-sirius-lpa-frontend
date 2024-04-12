@@ -14,6 +14,7 @@ type AdditionalDraft struct {
 	CorrespondentAddress      *Address `json:"correspondentAddress,omitempty"`
 	CorrespondenceByWelsh     bool     `json:"correspondenceByWelsh,omitempty"`
 	CorrespondenceLargeFormat bool     `json:"correspondenceLargeFormat,omitempty"`
+	Source                    string   `json:"source"`
 }
 
 func (c *Client) CreateAdditionalDraft(ctx Context, donorID int, lpa AdditionalDraft) (map[string]string, error) {
