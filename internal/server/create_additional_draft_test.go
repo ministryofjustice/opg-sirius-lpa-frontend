@@ -92,7 +92,17 @@ func TestPostCreateAdditionalDraft(t *testing.T) {
 		Return(sirius.Person{ID: 123, Firstname: "John", Surname: "Doe"}, nil)
 	client.
 		On("CreateAdditionalDraft", mock.Anything, 123, sirius.AdditionalDraft{
-			CaseType:                  []string{"property-and-affairs", "personal-welfare"},
+			CaseType:                []string{"property-and-affairs", "personal-welfare"},
+			CorrespondentFirstNames: "Rosalinda",
+			CorrespondentLastName:   "Langdale",
+			CorrespondentAddress: &sirius.Address{
+				Line1:    "Intensity Office",
+				Line2:    "Lind Run",
+				Line3:    "Hendersonville",
+				Town:     "Moline",
+				Postcode: "OE6 2DV",
+				Country:  "GB",
+			},
 			CorrespondenceByWelsh:     true,
 			CorrespondenceLargeFormat: false,
 			Source:                    "PHONE",
@@ -105,7 +115,18 @@ func TestPostCreateAdditionalDraft(t *testing.T) {
 	template.
 		On("Func", mock.Anything, createAdditionalDraftData{
 			Form: formAdditionalDraft{
-				SubTypes:                  []string{"property-and-affairs", "personal-welfare"},
+				SubTypes:               []string{"property-and-affairs", "personal-welfare"},
+				Recipient:              "other",
+				CorrespondentFirstname: "Rosalinda",
+				CorrespondentSurname:   "Langdale",
+				CorrespondentAddress: sirius.Address{
+					Line1:    "Intensity Office",
+					Line2:    "Lind Run",
+					Line3:    "Hendersonville",
+					Town:     "Moline",
+					Postcode: "OE6 2DV",
+					Country:  "GB",
+				},
 				CorrespondenceByWelsh:     true,
 				CorrespondenceLargeFormat: false,
 			},
@@ -122,12 +143,94 @@ func TestPostCreateAdditionalDraft(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"subtype":                   {"property-and-affairs", "personal-welfare"},
-		"correspondenceByWelsh":     {"true"},
-		"correspondenceLargeFormat": {"false"},
+		"subtype":                       {"property-and-affairs", "personal-welfare"},
+		"recipient":                     {"other"},
+		"correspondentFirstname":        {"Rosalinda"},
+		"correspondentSurname":          {"Langdale"},
+		"correspondentAddress.Line1":    {"Intensity Office"},
+		"correspondentAddress.Line2":    {"Lind Run"},
+		"correspondentAddress.Line3":    {"Hendersonville"},
+		"correspondentAddress.Town":     {"Moline"},
+		"correspondentAddress.Postcode": {"OE6 2DV"},
+		"correspondentAddress.Country":  {"GB"},
+		"correspondenceByWelsh":         {"true"},
+		"correspondenceLargeFormat":     {"false"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/create-additional-draft-lpa/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateAdditionalDraft(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateAdditionalDraftDonorOtherAddress(t *testing.T) {
+	client := &mockCreateAdditionalDraftClient{}
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
+	client.
+		On("Person", mock.Anything, 234).
+		Return(sirius.Person{ID: 234, Firstname: "Amy", Surname: "Shoe"}, nil)
+	client.
+		On("CreateAdditionalDraft", mock.Anything, 234, sirius.AdditionalDraft{
+			CaseType: []string{"property-and-affairs", "personal-welfare"},
+			CorrespondentAddress: &sirius.Address{
+				Line1:    "Other Address",
+				Town:     "New City",
+				Postcode: "AB1 2CD",
+				Country:  "GB",
+			},
+			Source: "PHONE",
+		}).
+		Return(map[string]string{
+			"personal-welfare": "M-1234-45678-9101",
+		}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createAdditionalDraftData{
+			Form: formAdditionalDraft{
+				SubTypes:  []string{"property-and-affairs", "personal-welfare"},
+				Recipient: "donor-other-address",
+				CorrespondentAddress: sirius.Address{
+					Line1:    "Other Address",
+					Town:     "New City",
+					Postcode: "AB1 2CD",
+					Country:  "GB",
+				},
+				CorrespondenceByWelsh:     false,
+				CorrespondenceLargeFormat: false,
+			},
+			Success: true,
+			Uids: []createAdditionalDraftResult{
+				{Subtype: "personal-welfare", Uid: "M-1234-45678-9101"},
+			},
+			Donor: sirius.Person{
+				ID:        234,
+				Firstname: "Amy",
+				Surname:   "Shoe",
+			},
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"subtype":                       {"property-and-affairs", "personal-welfare"},
+		"recipient":                     {"donor-other-address"},
+		"correspondentAddress.Line1":    {"Other Address"},
+		"correspondentAddress.Town":     {"New City"},
+		"correspondentAddress.Postcode": {"AB1 2CD"},
+		"correspondentAddress.Country":  {"GB"},
+		"correspondenceByWelsh":         {"false"},
+		"correspondenceLargeFormat":     {"false"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/create-additional-draft-lpa/?id=234", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
