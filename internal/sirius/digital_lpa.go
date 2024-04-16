@@ -58,8 +58,9 @@ type LpaStoreData struct {
 
 type LpaStoreDonor struct {
 	LpaStorePerson
-	DateOfBirth       string `json:"dateOfBirth"`
-	OtherNamesKnownBy string `json:"otherNamesKnownBy"`
+	DateOfBirth               string `json:"dateOfBirth"`
+	OtherNamesKnownBy         string `json:"otherNamesKnownBy"`
+	ContactLanguagePreference string `json:"contactLanguagePreference"`
 }
 
 type LpaStoreAttorney struct {
