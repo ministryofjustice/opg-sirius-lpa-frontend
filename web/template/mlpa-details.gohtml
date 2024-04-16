@@ -9,198 +9,539 @@
             {{ template "mlpa-header" (caseTabs .CaseSummary "lpa-details") }}
 
             <h1 class="govuk-heading-l govuk-!-margin-bottom-5">LPA details</h1>
+        </div>
+    </div>
 
-            <div>
-                <h2 class="govuk-heading-m">Donor</h2>
+    {{ if (eq .DigitalLpa.LpaStoreData nil) }}
+
+      <!-- draft application -->
+      <h2 class="govuk-heading-m">Donor</h2>
+
+      <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Application format</dt>
+          <dd class="govuk-summary-list__value">
+            {{if (eq .DigitalLpa.SiriusData.Application.Source "APPLICANT")}}
+              Digital
+            {{else}}
+              Paper
+            {{end}}
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Name</dt>
+          <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorFirstNames }} {{ .DigitalLpa.SiriusData.Application.DonorLastName }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Date of birth</dt>
+          <dd class="govuk-summary-list__value">{{ (date .DigitalLpa.SiriusData.Application.DonorDob "2 January 2006") }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Address</dt>
+          <dd class="govuk-summary-list__value">
+            {{ .DigitalLpa.SiriusData.Application.DonorAddress.Line1 }}
+            {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Line2 "") }}<br>{{ .DigitalLpa.SiriusData.Application.DonorAddress.Line2 }}{{ end }}
+            {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Line3 "") }}<br>{{ .DigitalLpa.SiriusData.Application.DonorAddress.Line3 }}{{ end }}
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Town or city</dt>
+          <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorAddress.Town }}</dd>
+        </div>
+        {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Postcode "") }}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Postcode</dt>
+            <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorAddress.Postcode }}</dd>
+          </div>
+        {{ end }}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Country</dt>
+          <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorAddress.Country }}</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Phone number</dt>
+          <dd class="govuk-summary-list__value">
+            {{ if (eq .DigitalLpa.SiriusData.Application.PhoneNumber "") }}
+              Not provided
+            {{ else }}
+              {{ .DigitalLpa.SiriusData.Application.PhoneNumber }}
+            {{ end }}
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Email</dt>
+          <dd class="govuk-summary-list__value">
+            {{ if (eq .DigitalLpa.SiriusData.Application.Email "") }}
+              Not provided
+            {{ else }}
+              {{ .DigitalLpa.SiriusData.Application.Email }}
+            {{ end }}
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Post forms to</dt>
+          <dd class="govuk-summary-list__value">
+            {{ if (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line1 "") }}
+              The donor
+            {{ else }}
+              {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentFirstNames "") }}
+                {{ .DigitalLpa.SiriusData.Application.CorrespondentFirstNames }} {{ .DigitalLpa.SiriusData.Application.CorrespondentLastName }}<br>
+              {{ end }}
+                {{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line1 }}
+                {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line2 "") }}<br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line2 }}{{ end }}
+                {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line3 "") }}<br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line3 }}{{ end }}
+                <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Town }}
+                <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Postcode }}
+                <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Country }}
+                <br>
+            {{ end }}
+          </dd>
+        </div>
+      </dl>
+
+    {{ else }}
+
+      <!-- not a draft application -->
+      <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+        <div class="govuk-accordion__section">
+          <div class="govuk-accordion__section-header">
+            <h2 class="govuk-accordion__section-heading">
+              <span class="govuk-accordion__section-button" id="accordion-default-heading-1">
+                Donor
+              </span>
+            </h2>
+          </div>
+          <div id="accordion-default-content-1" class="govuk-accordion__section-content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">First names</dt>
+                <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.Donor.FirstNames }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Last name</dt>
+                <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.Donor.LastName }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Otherwise known as</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ if (eq .DigitalLpa.LpaStoreData.Donor.OtherNamesKnownBy "") }}
+                    No other name specified
+                  {{ else }}
+                    {{ .DigitalLpa.LpaStoreData.Donor.OtherNamesKnownBy }}
+                  {{ end }}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Date of birth</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ if not (eq .DigitalLpa.LpaStoreData.Donor.DateOfBirth "") }}
+                    {{ parseAndFormatDate .DigitalLpa.LpaStoreData.Donor.DateOfBirth "2006-01-02" "2 January 2006" }}
+                  {{ end }}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Address</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ template "mlpa-address" .DigitalLpa.LpaStoreData.Donor.Address }}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Email</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ if (eq .DigitalLpa.LpaStoreData.Donor.Email "") }}
+                    Not provided
+                  {{ else }}
+                    {{ .DigitalLpa.LpaStoreData.Donor.Email }}
+                  {{ end }}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Phone</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ if (eq .DigitalLpa.SiriusData.Application.PhoneNumber "") }}
+                    Not provided
+                  {{ else }}
+                    {{ .DigitalLpa.SiriusData.Application.PhoneNumber }}
+                  {{ end }}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Format</dt>
+                <dd class="govuk-summary-list__value">
+                  <strong>TODO - Donor/Format[channel] - NOT IN LPA STORE</strong>
+                  {{ if not (eq .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference "") }}
+                    <br><strong>{{ languageForFormat .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference }}</strong>
+                  {{ end }}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                <dt class="govuk-summary-list__key">Signed on</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ if (eq .DigitalLpa.LpaStoreData.SignedAt "") }}
+                    Not provided
+                  {{ else }}
+                    {{ parseAndFormatDate .DigitalLpa.LpaStoreData.SignedAt "2006-01-02T15:04:05.0Z" "2 January 2006" }}
+                  {{ end }}
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+        <div class="govuk-accordion__section">
+          <div class="govuk-accordion__section-header">
+            <h2 class="govuk-accordion__section-heading">
+              <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
+                Attorneys ({{ len .NonReplacementAttorneys }})
+              </span>
+            </h2>
+          </div>
+          <div id="accordion-default-content-2" class="govuk-accordion__section-content">
+            {{ if (gt (len .NonReplacementAttorneys) 0) }}
+              {{ range $num, $attorney := .NonReplacementAttorneys }}
+                <h2 class="govuk-heading-m">
+                  Attorney {{ plusN $num 1 }}
+                </h2>
 
                 <dl class="govuk-summary-list">
                   <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Application format</dt>
-                    <dd class="govuk-summary-list__value">
-                      {{if (eq .DigitalLpa.SiriusData.Application.Source "APPLICANT")}}
-                        Digital
-                      {{else}}
-                        Paper
-                      {{end}}
-                    </dd>
+                    <dt class="govuk-summary-list__key">First names</dt>
+                    <dd class="govuk-summary-list__value">{{ $attorney.FirstNames }}</dd>
                   </div>
                   <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Name</dt>
-                    <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorFirstNames }} {{ .DigitalLpa.SiriusData.Application.DonorLastName }}</dd>
+                    <dt class="govuk-summary-list__key">Last name</dt>
+                    <dd class="govuk-summary-list__value">{{ $attorney.LastName }}</dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Date of birth</dt>
-                    <dd class="govuk-summary-list__value">{{ (date .DigitalLpa.SiriusData.Application.DonorDob "2 January 2006") }}</dd>
+                    <dd class="govuk-summary-list__value">
+                      {{ if not (eq $attorney.DateOfBirth "") }}
+                        {{ parseAndFormatDate $attorney.DateOfBirth "2006-01-02" "2 January 2006" }}
+                      {{ end }}
+                    </dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Address</dt>
                     <dd class="govuk-summary-list__value">
-                      {{ .DigitalLpa.SiriusData.Application.DonorAddress.Line1 }}
-                      {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Line2 "") }}<br>{{ .DigitalLpa.SiriusData.Application.DonorAddress.Line2 }}{{ end }}
-                      {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Line3 "") }}<br>{{ .DigitalLpa.SiriusData.Application.DonorAddress.Line3 }}{{ end }}
-                    </dd>
-                  </div>
-                  <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Town or city</dt>
-                    <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorAddress.Town }}</dd>
-                  </div>
-                  {{ if not (eq .DigitalLpa.SiriusData.Application.DonorAddress.Postcode "") }}
-                    <div class="govuk-summary-list__row">
-                      <dt class="govuk-summary-list__key">Postcode</dt>
-                      <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorAddress.Postcode }}</dd>
-                    </div>
-                  {{ end }}
-                  <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Country</dt>
-                    <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.DonorAddress.Country }}</dd>
-                  </div>
-                  <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Phone number</dt>
-                    <dd class="govuk-summary-list__value">
-                      {{ if (eq .DigitalLpa.SiriusData.Application.PhoneNumber "") }}
-                        not provided
-                      {{ else }}
-                        {{ .DigitalLpa.SiriusData.Application.PhoneNumber }}
-                      {{ end }}
+                      {{ template "mlpa-address" $attorney.Address }}
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Email</dt>
                     <dd class="govuk-summary-list__value">
-                      {{ if (eq .DigitalLpa.SiriusData.Application.Email "") }}
-                        not provided
+                      {{ if (eq $attorney.Email "") }}
+                        Not provided
                       {{ else }}
-                        {{ .DigitalLpa.SiriusData.Application.Email }}
+                        {{ $attorney.Email }}
                       {{ end }}
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Post forms to</dt>
+                    <dt class="govuk-summary-list__key">Phone</dt>
                     <dd class="govuk-summary-list__value">
-                      {{ if (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line1 "") }}
-                        The donor
+                      {{ if (eq $attorney.Mobile "") }}
+                        Not provided
                       {{ else }}
-                        {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentFirstNames "") }}
-                          {{ .DigitalLpa.SiriusData.Application.CorrespondentFirstNames }} {{ .DigitalLpa.SiriusData.Application.CorrespondentLastName }}<br>
-                        {{ end }}
-                          {{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line1 }}
-                          {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line2 "") }}<br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line2 }}{{ end }}
-                          {{ if not (eq .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line3 "") }}<br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Line3 }}{{ end }}
-                          <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Town }}
-                          <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Postcode }}
-                          <br>{{ .DigitalLpa.SiriusData.Application.CorrespondentAddress.Country }}
-                          <br>
+                        {{ $attorney.Mobile }}
+                      {{ end }}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                    <dt class="govuk-summary-list__key">Format</dt>
+                    <dd class="govuk-summary-list__value">
+                      {{ if (eq $attorney.Email "") }}
+                        Paper
+                      {{ else }}
+                        Online
+                      {{ end }}
+                      {{ if not (eq $attorney.ContactLanguagePreference "") }}
+                        <br>{{ languageForFormat $attorney.ContactLanguagePreference }}
                       {{ end }}
                     </dd>
                   </div>
                 </dl>
+              {{ end }}
+            {{ else }}
+              <p class="govuk-body">The donor did not provide details for this section</p>
+            {{ end }}
+          </div>
+        </div>
+        <div class="govuk-accordion__section">
+          <div class="govuk-accordion__section-header">
+            <h2 class="govuk-accordion__section-heading">
+              <span class="govuk-accordion__section-button" id="accordion-default-heading-3">
+                Decisions
+              </span>
+            </h2>
+          </div>
+          <div id="accordion-default-content-3" class="govuk-accordion__section-content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">When attorneys can use the LPA</dt>
+                <dd class="govuk-summary-list__value">
+                  <p class="govuk-body">
+                    {{ whenTheLpaCanBeUsedLongForm .DigitalLpa.LpaStoreData.WhenTheLpaCanBeUsed }}
+                  </p>
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                <dt class="govuk-summary-list__key">How attorneys must make decisions</dt>
+                <dd class="govuk-summary-list__value">
+                  <div class="govuk-body">
+                    {{ howAttorneysMakeDecisionsLongForm .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions }}
+                    {{ if (gt (len .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisionsDetails) 0) }}
+                      <br>
+                      <span class="app-newlines-as-br">
+                        {{ .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisionsDetails }}
+                      </span>
+                    {{ end }}
+                  </div>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+        <div class="govuk-accordion__section">
+          <div class="govuk-accordion__section-header">
+            <h2 class="govuk-accordion__section-heading">
+              <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
+                Replacement attorneys ({{ len .ReplacementAttorneys }})
+              </span>
+            </h2>
+          </div>
+          <div id="accordion-default-content-4" class="govuk-accordion__section-content">
+            {{ if (gt (len .ReplacementAttorneys) 0) }}
+              <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">When replacement attorneys can step in</dt>
+                  <dd class="govuk-summary-list__value">
+                    <div class="govuk-body">
+                      {{ howReplacementAttorneysStepInLongForm .DigitalLpa.LpaStoreData.HowReplacementAttorneysStepIn }}
+                      {{ if (eq .DigitalLpa.LpaStoreData.HowReplacementAttorneysStepIn "another-way") }}
+                        <br>{{ howReplacementAttorneysStepInLongForm .DigitalLpa.LpaStoreData.HowReplacementAttorneysStepInDetails }}
+                      {{ end }}
+                    </div>
+                  </dd>
+                </div>
+                <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                  <dt class="govuk-summary-list__key">How replacement attorneys must make decisions</dt>
+                  <dd class="govuk-summary-list__value">
+                    <div class="govuk-body">
+                      {{ howAttorneysMakeDecisionsLongForm .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions }}
+                      {{ if (gt (len .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisionsDetails) 0) }}
+                        <br>
+                        <span class="app-newlines-as-br">
+                          {{ .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisionsDetails }}
+                        </span>
+                      {{ end }}
+                    </div>
+                  </dd>
+                </div>
+              </dl>
+
+              {{ range $num, $attorney := .ReplacementAttorneys }}
+                <h2 class="govuk-heading-m">
+                  Replacement attorney {{ plusN $num 1 }}
+                </h2>
+
+                <dl class="govuk-summary-list">
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">First names</dt>
+                    <dd class="govuk-summary-list__value">{{ $attorney.FirstNames }}</dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Last name</dt>
+                    <dd class="govuk-summary-list__value">{{ $attorney.LastName }}</dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Date of birth</dt>
+                    <dd class="govuk-summary-list__value">
+                      {{ if not (eq $attorney.DateOfBirth "") }}
+                        {{ parseAndFormatDate $attorney.DateOfBirth "2006-01-02" "2 January 2006" }}
+                      {{ end }}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Address</dt>
+                    <dd class="govuk-summary-list__value">
+                      {{ template "mlpa-address" $attorney.Address }}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Email</dt>
+                    <dd class="govuk-summary-list__value">
+                      {{ if (eq $attorney.Email "") }}
+                        Not provided
+                      {{ else }}
+                        {{ $attorney.Email }}
+                      {{ end }}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Phone</dt>
+                    <dd class="govuk-summary-list__value">
+                      {{ if (eq $attorney.Mobile "") }}
+                        Not provided
+                      {{ else }}
+                        {{ $attorney.Mobile }}
+                      {{ end }}
+                    </dd>
+                  </div>
+                  <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                    <dt class="govuk-summary-list__key">Format</dt>
+                    <dd class="govuk-summary-list__value">
+                      {{ if (eq $attorney.Email "") }}
+                        Paper
+                      {{ else }}
+                        Online
+                      {{ end }}
+                      {{ if not (eq $attorney.ContactLanguagePreference "") }}
+                        <br>{{ languageForFormat $attorney.ContactLanguagePreference }}
+                      {{ end }}
+                    </dd>
+                  </div>
+                </dl>
+              {{ end }}
+            {{ else }}
+              <p class="govuk-body">The donor did not provide details for this section</p>
+            {{ end }}
+          </div>
+        </div>
+        <div class="govuk-accordion__section">
+          <div class="govuk-accordion__section-header">
+            <h2 class="govuk-accordion__section-heading">
+              <span class="govuk-accordion__section-button" id="accordion-default-heading-5">
+                Restrictions and conditions
+              </span>
+            </h2>
+          </div>
+          <div id="accordion-default-content-5" class="govuk-accordion__section-content">
+            <div class="govuk-body">
+              <span class="app-newlines-as-br">
+                {{ .DigitalLpa.LpaStoreData.RestrictionsAndConditions }}
+              </span>
             </div>
-            <div>
-                <p class="govuk-body-s">
-                    {{ .LpaStoreData }}
-                </p>
-            </div>
+          </div>
         </div>
-    </div>
+        <div class="govuk-accordion__section">
+          <div class="govuk-accordion__section-header">
+            <h2 class="govuk-accordion__section-heading">
+              <span class="govuk-accordion__section-button" id="accordion-default-heading-6">
+                Certificate provider
+              </span>
+            </h2>
+          </div>
+          <div id="accordion-default-content-6" class="govuk-accordion__section-content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">First names</dt>
+                <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.CertificateProvider.FirstNames }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Last name</dt>
+                <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.CertificateProvider.LastName }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Address</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ template "mlpa-address" .DigitalLpa.LpaStoreData.CertificateProvider.Address }}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Email</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ if (eq .DigitalLpa.LpaStoreData.CertificateProvider.Email "") }}
+                    Not provided
+                  {{ else }}
+                    {{ .DigitalLpa.LpaStoreData.CertificateProvider.Email }}
+                  {{ end }}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Phone</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ if (eq .DigitalLpa.LpaStoreData.CertificateProvider.Phone "") }}
+                    Not provided
+                  {{ else }}
+                    {{ .DigitalLpa.LpaStoreData.CertificateProvider.Phone }}
+                  {{ end }}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                <dt class="govuk-summary-list__key">Format</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ channelForFormat .DigitalLpa.LpaStoreData.CertificateProvider.Channel }}
+                  {{ if not (eq .DigitalLpa.LpaStoreData.CertificateProvider.ContactLanguagePreference "") }}
+                    <br>{{ languageForFormat .DigitalLpa.LpaStoreData.CertificateProvider.ContactLanguagePreference }}
+                  {{ end }}
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+        <div class="govuk-accordion__section">
+          <div class="govuk-accordion__section-header">
+            <h2 class="govuk-accordion__section-heading">
+              <span class="govuk-accordion__section-button" id="accordion-default-heading-7">
+                Notified people ({{ len .DigitalLpa.LpaStoreData.PeopleToNotify }})
+              </span>
+            </h2>
+          </div>
+          <div id="accordion-default-content-7" class="govuk-accordion__section-content">
+            {{ if (gt (len .DigitalLpa.LpaStoreData.PeopleToNotify) 0) }}
+              {{ range $num, $personToNotify := .DigitalLpa.LpaStoreData.PeopleToNotify }}
+                <h2 class="govuk-heading-m">
+                  Notified person {{ plusN $num 1 }}
+                </h2>
 
-
-
-    <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-      <div class="govuk-accordion__section">
-        <div class="govuk-accordion__section-header">
-          <h2 class="govuk-accordion__section-heading">
-            <span class="govuk-accordion__section-button" id="accordion-default-heading-1">
-              Donor
-            </span>
-          </h2>
+                <dl class="govuk-summary-list">
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">First names</dt>
+                    <dd class="govuk-summary-list__value">{{ $personToNotify.FirstNames }}</dd>
+                  </div>
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Last name</dt>
+                    <dd class="govuk-summary-list__value">{{ $personToNotify.LastName }}</dd>
+                  </div>
+                  <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                    <dt class="govuk-summary-list__key">Address</dt>
+                    <dd class="govuk-summary-list__value">
+                      {{ template "mlpa-address" $personToNotify.Address }}
+                    </dd>
+                  </div>
+                </dl>
+              {{ end }}
+            {{ else }}
+              <p class="govuk-body">The donor did not provide details for this section</p>
+            {{ end }}
+          </div>
         </div>
-        <div id="accordion-default-content-1" class="govuk-accordion__section-content">
-          <p class="govuk-body"></p>
-        </div>
-      </div>
-      <div class="govuk-accordion__section">
-        <div class="govuk-accordion__section-header">
-          <h2 class="govuk-accordion__section-heading">
-            <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
-              Attorneys ({{ count "attorneys" .LpaStoreData }})
-            </span>
-          </h2>
-        </div>
-        <div id="accordion-default-content-2" class="govuk-accordion__section-content">
-          <p class="govuk-body"></p>
-        </div>
-      </div>
-      <div class="govuk-accordion__section">
-        <div class="govuk-accordion__section-header">
-          <h2 class="govuk-accordion__section-heading">
-            <span class="govuk-accordion__section-button" id="accordion-default-heading-3">
-              Decisions
-            </span>
-          </h2>
-        </div>
-        <div id="accordion-default-content-3" class="govuk-accordion__section-content">
-          <p class="govuk-body"></p>
-        </div>
-      </div>
-      <div class="govuk-accordion__section">
-        <div class="govuk-accordion__section-header">
-          <h2 class="govuk-accordion__section-heading">
-            <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
-              Replacement attorneys ({{ count "attorneys" .LpaStoreData }})
-            </span>
-          </h2>
-        </div>
-        <div id="accordion-default-content-4" class="govuk-accordion__section-content">
-          <p class="govuk-body"></p>
-        </div>
-      </div>
-      <div class="govuk-accordion__section">
-        <div class="govuk-accordion__section-header">
-          <h2 class="govuk-accordion__section-heading">
-            <span class="govuk-accordion__section-button" id="accordion-default-heading-5">
-              Restrictions and conditions
-            </span>
-          </h2>
-        </div>
-        <div id="accordion-default-content-5" class="govuk-accordion__section-content">
-          <p class="govuk-body"></p>
+        <div class="govuk-accordion__section">
+          <div class="govuk-accordion__section-header">
+            <h2 class="govuk-accordion__section-heading">
+              <span class="govuk-accordion__section-button" id="accordion-default-heading-8">
+                Correspondent
+              </span>
+            </h2>
+          </div>
+          <div id="accordion-default-content-8" class="govuk-accordion__section-content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">First names</dt>
+                <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.CorrespondentFirstNames }}</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Last name</dt>
+                <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.CorrespondentLastName }}</dd>
+              </div>
+              <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                <dt class="govuk-summary-list__key">Address</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ template "mlpa-address" .DigitalLpa.SiriusData.Application.CorrespondentAddress }}
+                </dd>
+              </div>
+            </dl>
+          </div>
         </div>
       </div>
-      <div class="govuk-accordion__section">
-        <div class="govuk-accordion__section-header">
-          <h2 class="govuk-accordion__section-heading">
-            <span class="govuk-accordion__section-button" id="accordion-default-heading-6">
-              Certificate provider
-            </span>
-          </h2>
-        </div>
-        <div id="accordion-default-content-6" class="govuk-accordion__section-content">
-          <p class="govuk-body"></p>
-        </div>
-      </div>
-      <div class="govuk-accordion__section">
-        <div class="govuk-accordion__section-header">
-          <h2 class="govuk-accordion__section-heading">
-            <span class="govuk-accordion__section-button" id="accordion-default-heading-7">
-              Notified people ({{ count "peopleToNotify" .LpaStoreData }})
-            </span>
-          </h2>
-        </div>
-        <div id="accordion-default-content-7" class="govuk-accordion__section-content">
-          <p class="govuk-body"></p>
-        </div>
-      </div>
-      <div class="govuk-accordion__section">
-        <div class="govuk-accordion__section-header">
-          <h2 class="govuk-accordion__section-heading">
-            <span class="govuk-accordion__section-button" id="accordion-default-heading-8">
-              Correspondent ({{ count "correspondent" .LpaStoreData }})
-            </span>
-          </h2>
-        </div>
-        <div id="accordion-default-content-8" class="govuk-accordion__section-content">
-          <p class="govuk-body"></p>
-        </div>
-      </div>
-    </div>
+    {{ end }}
 {{ end }}

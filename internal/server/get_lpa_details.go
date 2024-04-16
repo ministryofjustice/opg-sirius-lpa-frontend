@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
@@ -14,9 +13,11 @@ type GetLpaDetailsClient interface {
 }
 
 type getLpaDetails struct {
-	CaseSummary  sirius.CaseSummary
-	DigitalLpa   sirius.DigitalLpa
-	LpaStoreData map[string]interface{}
+	CaseSummary             sirius.CaseSummary
+	DigitalLpa              sirius.DigitalLpa
+	ReplacementAttorneys    []sirius.LpaStoreAttorney
+	NonReplacementAttorneys []sirius.LpaStoreAttorney
+	FlashMessage            FlashNotification
 }
 
 func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
@@ -29,17 +30,26 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		var lpaStoreData map[string]interface{}
-		err = json.Unmarshal(caseSummary.DigitalLpa.LpaStoreData, &lpaStoreData)
-		if err != nil {
-			return err
+		data := getLpaDetails{
+			CaseSummary: caseSummary,
+			DigitalLpa:  caseSummary.DigitalLpa,
 		}
 
-		data := getLpaDetails{
-			CaseSummary:  caseSummary,
-			DigitalLpa:   caseSummary.DigitalLpa,
-			LpaStoreData: lpaStoreData,
+		data.FlashMessage, _ = GetFlash(w, r)
+
+		var replacementAttorneys []sirius.LpaStoreAttorney
+		var nonReplacementAttorneys []sirius.LpaStoreAttorney
+		for _, attorney := range caseSummary.DigitalLpa.LpaStoreData.Attorneys {
+			switch attorney.Status {
+			case "replacement":
+				replacementAttorneys = append(replacementAttorneys, attorney)
+			case "active":
+				nonReplacementAttorneys = append(nonReplacementAttorneys, attorney)
+			}
 		}
+
+		data.ReplacementAttorneys = replacementAttorneys
+		data.NonReplacementAttorneys = nonReplacementAttorneys
 
 		return tmpl(w, data)
 	}

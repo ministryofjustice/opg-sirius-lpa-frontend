@@ -209,3 +209,8 @@ $govuk-assets-path: "../assets/";
     display: block;
   }
 }
+
+/* where newlines should display as <br>, add this class */
+.app-newlines-as-br {
+  white-space: pre-wrap;
+}
