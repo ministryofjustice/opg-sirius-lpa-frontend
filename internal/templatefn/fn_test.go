@@ -9,7 +9,6 @@ import (
 
 func TestParseAndFormatDate(t *testing.T) {
 	fns := All("", "", "")
-
 	fn := fns["parseAndFormatDate"].(func(string, string, string)(string, error))
 
 	var val string
@@ -26,4 +25,12 @@ func TestParseAndFormatDate(t *testing.T) {
 	val, err = fn("16 April 2024", "2 January 2006", "2006-01-02")
 	assert.Equal(t, "2024-04-16", val)
 	assert.Equal(t, nil, err)
+}
+
+func TestPlusN(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["plusN"].(func(int, int)int)
+
+	val := fn(1, 1)
+	assert.Equal(t, 2, val)
 }
