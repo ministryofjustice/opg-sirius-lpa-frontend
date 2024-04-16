@@ -287,7 +287,10 @@
                   <div class="govuk-body">
                     {{ howAttorneysMakeDecisionsLongForm .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions }}
                     {{ if (gt (len .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisionsDetails) 0) }}
-                      <br>{{ .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisionsDetails }}
+                      <br>
+                      <span class="app-newlines-as-br">
+                        {{ .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisionsDetails }}
+                      </span>
                     {{ end }}
                   </div>
                 </dd>
@@ -323,7 +326,10 @@
                     <div class="govuk-body">
                       {{ howAttorneysMakeDecisionsLongForm .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions }}
                       {{ if (gt (len .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisionsDetails) 0) }}
-                        <br>{{ .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisionsDetails }}
+                        <br>
+                        <span class="app-newlines-as-br">
+                          {{ .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisionsDetails }}
+                        </span>
                       {{ end }}
                     </div>
                   </dd>
@@ -408,7 +414,9 @@
           </div>
           <div id="accordion-default-content-5" class="govuk-accordion__section-content">
             <div class="govuk-body">
-              {{ .DigitalLpa.LpaStoreData.RestrictionsAndConditions }}
+              <span class="app-newlines-as-br">
+                {{ .DigitalLpa.LpaStoreData.RestrictionsAndConditions }}
+              </span>
             </div>
           </div>
         </div>
