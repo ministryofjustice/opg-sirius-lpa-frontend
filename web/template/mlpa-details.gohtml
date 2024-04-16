@@ -169,7 +169,9 @@
                 <dt class="govuk-summary-list__key">Format</dt>
                 <dd class="govuk-summary-list__value">
                   <strong>TODO - Donor/Format[channel] - NOT IN LPA STORE</strong>
-                  <br><strong>TODO - Donor/Format[language] - NOT IN LPA STORE</strong>
+                  {{ if not (eq .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference "") }}
+                    <br><strong>{{ languageForFormat .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference }}</strong>
+                  {{ end }}
                 </dd>
               </div>
               <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
@@ -252,7 +254,7 @@
                         Online
                       {{ end }}
                       {{ if not (eq $attorney.ContactLanguagePreference "") }}
-                        <br>{{ $attorney.ContactLanguagePreference }}
+                        <br>{{ languageForFormat $attorney.ContactLanguagePreference }}
                       {{ end }}
                     </dd>
                   </div>
@@ -393,7 +395,7 @@
                         Online
                       {{ end }}
                       {{ if not (eq $attorney.ContactLanguagePreference "") }}
-                        <br>{{ $attorney.ContactLanguagePreference }}
+                        <br>{{ languageForFormat $attorney.ContactLanguagePreference }}
                       {{ end }}
                     </dd>
                   </div>
@@ -469,7 +471,7 @@
                 <dd class="govuk-summary-list__value">
                   {{ channelForFormat .DigitalLpa.LpaStoreData.CertificateProvider.Channel }}
                   {{ if not (eq .DigitalLpa.LpaStoreData.CertificateProvider.ContactLanguagePreference "") }}
-                    <br>{{ .DigitalLpa.LpaStoreData.CertificateProvider.ContactLanguagePreference }}
+                    <br>{{ languageForFormat .DigitalLpa.LpaStoreData.CertificateProvider.ContactLanguagePreference }}
                   {{ end }}
                 </dd>
               </div>

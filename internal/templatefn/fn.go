@@ -150,8 +150,10 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "Jointly & severally"
 			case "jointly-for-some-severally-for-others":
 				return "Jointly for some, severally for others"
+			case "":
+				return "Not specified"
 			default:
-				return "CODE NOT RECOGNISED: " + s
+				return "howAttorneysMakeDecisions NOT RECOGNISED: " + s
 			}
 		},
 		"howReplacementAttorneysStepInLongForm": func(s string) string {
@@ -162,8 +164,10 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "When one can no longer act"
 			case "another-way":
 				return "Another way"
+			case "":
+				return "Not specified"
 			default:
-				return "CODE NOT RECOGNISED: " + s
+				return "howReplacementAttorneysStepIn NOT RECOGNISED: " + s
 			}
 		},
 		"whenTheLpaCanBeUsedLongForm": func(s string) string {
@@ -172,18 +176,36 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "As soon as it's registered"
 			case "when-capacity-lost":
 				return "When capacity is lost"
+			case "":
+				return "Not specified"
 			default:
-				return "CODE NOT RECOGNISED: " + s
+				return "whenTheLpaCanBeUsed NOT RECOGNISED: " + s
 			}
 		},
+		// translate channel code to long version for Format fields in display
 		"channelForFormat": func(s string) string {
 			switch s {
 			case "paper":
 				return "Paper"
 			case "online":
 				return "Online"
+			case "":
+				return "Not specified"
 			default:
-				return "CODE NOT RECOGNISED: " + s
+				return "channel NOT RECOGNISED: " + s
+			}
+		},
+		// translate language code to long version for Format fields in display
+		"languageForFormat": func(s string) string {
+			switch s {
+			case "cy":
+				return "Welsh"
+			case "en":
+				return "English"
+			case "":
+				return "Not specified"
+			default:
+				return "language NOT RECOGNISED: " + s
 			}
 		},
 	}
