@@ -25,7 +25,40 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 				ID:      22,
 				Subtype: "hw",
 			},
-			LpaStoreData: sirius.LpaStoreData{},
+			LpaStoreData: sirius.LpaStoreData{
+				Attorneys: []sirius.LpaStoreAttorney{
+					sirius.LpaStoreAttorney{
+						Status: "replacement",
+						LpaStorePerson: sirius.LpaStorePerson{
+							Email: "first@does.not.exist",
+						},
+					},
+					sirius.LpaStoreAttorney{
+						Status: "replacement",
+						LpaStorePerson: sirius.LpaStorePerson{
+							Email: "second@does.not.exist",
+						},
+					},
+					sirius.LpaStoreAttorney{
+						Status: "active",
+						LpaStorePerson: sirius.LpaStorePerson{
+							Email: "third@does.not.exist",
+						},
+					},
+					sirius.LpaStoreAttorney{
+						Status: "active",
+						LpaStorePerson: sirius.LpaStorePerson{
+							Email: "fourth@does.not.exist",
+						},
+					},
+					sirius.LpaStoreAttorney{
+						Status: "removed",
+						LpaStorePerson: sirius.LpaStorePerson{
+							Email: "fifth@does.not.exist",
+						},
+					},
+				},
+			},
 		},
 		TaskList: []sirius.Task{},
 	}
@@ -40,6 +73,34 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 		On("Func", mock.Anything, getLpaDetails{
 			CaseSummary: caseSummary,
 			DigitalLpa:  caseSummary.DigitalLpa,
+			ReplacementAttorneys: []sirius.LpaStoreAttorney{
+				sirius.LpaStoreAttorney{
+					Status: "replacement",
+					LpaStorePerson: sirius.LpaStorePerson{
+						Email: "first@does.not.exist",
+					},
+				},
+				sirius.LpaStoreAttorney{
+					Status: "replacement",
+					LpaStorePerson: sirius.LpaStorePerson{
+						Email: "second@does.not.exist",
+					},
+				},
+			},
+			NonReplacementAttorneys: []sirius.LpaStoreAttorney{
+				sirius.LpaStoreAttorney{
+					Status: "active",
+					LpaStorePerson: sirius.LpaStorePerson{
+						Email: "third@does.not.exist",
+					},
+				},
+				sirius.LpaStoreAttorney{
+					Status: "active",
+					LpaStorePerson: sirius.LpaStorePerson{
+						Email: "fourth@does.not.exist",
+					},
+				},
+			},
 		}).
 		Return(nil)
 
