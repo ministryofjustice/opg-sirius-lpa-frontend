@@ -34,3 +34,69 @@ func TestPlusN(t *testing.T) {
 	val := fn(1, 1)
 	assert.Equal(t, 2, val)
 }
+
+func testStringMapper(t *testing.T, fnName string, expectations map[string]string) {
+	fns := All("", "", "")
+	fn := fns[fnName].(func(string)string)
+
+	for input, expected := range expectations {
+		assert.Equal(t, expected, fn(input))
+	}
+}
+
+func TestHowAttorneysMakeDecisionsLongForm(t *testing.T) {
+	expectations := map[string]string{
+		"jointly": "Jointly",
+		"jointly-and-severally": "Jointly & severally",
+		"jointly-for-some-severally-for-others": "Jointly for some, severally for others",
+		"": "Not specified",
+		"foo": "howAttorneysMakeDecisions NOT RECOGNISED: foo",
+	}
+
+	testStringMapper(t, "howAttorneysMakeDecisionsLongForm", expectations)
+}
+
+func TestHowReplacementAttorneysStepInLongForm(t *testing.T) {
+	expectations := map[string]string{
+		"all-can-no-longer-act": "When all can no longer act",
+		"one-can-no-longer-act": "When one can no longer act",
+		"another-way": "Another way",
+		"": "Not specified",
+		"foo": "howReplacementAttorneysStepIn NOT RECOGNISED: foo",
+	}
+
+	testStringMapper(t, "howReplacementAttorneysStepInLongForm", expectations)
+}
+
+func TestWhenTheLpaCanBeUsedLongForm(t *testing.T) {
+	expectations := map[string]string{
+		"when-has-capacity": "As soon as it's registered",
+		"when-capacity-lost": "When capacity is lost",
+		"": "Not specified",
+		"foo": "whenTheLpaCanBeUsed NOT RECOGNISED: foo",
+	}
+
+	testStringMapper(t, "whenTheLpaCanBeUsedLongForm", expectations)
+}
+
+func TestChannelForFormat(t *testing.T) {
+	expectations := map[string]string{
+		"paper": "Paper",
+		"online": "Online",
+		"": "Not specified",
+		"foo": "channel NOT RECOGNISED: foo",
+	}
+
+	testStringMapper(t, "channelForFormat", expectations)
+}
+
+func TestLanguageForFormat(t *testing.T) {
+	expectations := map[string]string{
+		"cy": "Welsh",
+		"en": "English",
+		"": "Not specified",
+		"foo": "language NOT RECOGNISED: foo",
+	}
+
+	testStringMapper(t, "languageForFormat", expectations)
+}
