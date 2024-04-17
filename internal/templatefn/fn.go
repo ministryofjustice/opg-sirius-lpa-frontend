@@ -150,6 +150,7 @@ type CaseTabData struct {
 type linkedCase struct {
 	UID         string
 	Subtype     string
+	CaseStatus  string
 	CreatedDate sirius.DateString
 }
 
@@ -197,10 +198,10 @@ func caseTab(caseSummary sirius.CaseSummary, tabName string) CaseTabData {
 	lpa := caseSummary.DigitalLpa.SiriusData
 
 	var linkedCases []linkedCase
-	linkedCases = append(linkedCases, linkedCase{lpa.UID, lpa.Subtype, lpa.CreatedDate})
+	linkedCases = append(linkedCases, linkedCase{lpa.UID, lpa.Subtype, lpa.Status, lpa.CreatedDate})
 
 	for _, linkedLpa := range lpa.LinkedCases {
-		linkedCases = append(linkedCases, linkedCase{linkedLpa.UID, linkedLpa.Subtype, linkedLpa.CreatedDate})
+		linkedCases = append(linkedCases, linkedCase{linkedLpa.UID, linkedLpa.Subtype, linkedLpa.Status, linkedLpa.CreatedDate})
 	}
 
 	sort.Slice(linkedCases, func(i, j int) bool {
