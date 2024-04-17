@@ -313,3 +313,21 @@ func TestPostCreateAdditionalDraftWhenValidationError(t *testing.T) {
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
+
+func TestCreateAdditionalDraftNoID(t *testing.T) {
+	testCases := map[string]string{
+		"no-id":  "/",
+		"bad-id": "/?id=test",
+	}
+
+	for name, testUrl := range testCases {
+		t.Run(name, func(t *testing.T) {
+			r, _ := http.NewRequest(http.MethodGet, testUrl, nil)
+			w := httptest.NewRecorder()
+
+			err := CreateAdditionalDraft(nil, nil)(w, r)
+
+			assert.NotNil(t, err)
+		})
+	}
+}
