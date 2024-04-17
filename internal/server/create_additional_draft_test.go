@@ -331,3 +331,61 @@ func TestCreateAdditionalDraftNoID(t *testing.T) {
 		})
 	}
 }
+
+func TestPostCreateAdditionalDraftWhenUserDetailsErrors(t *testing.T) {
+	client := &mockCreateAdditionalDraftClient{}
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{}, expectedError)
+	client.
+		On("Person", mock.Anything, 234).
+		Return(sirius.Person{ID: 234, Firstname: "Amy", Surname: "Shoe"}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createAdditionalDraftData{
+			Donor: sirius.Person{
+				ID:        234,
+				Firstname: "Amy",
+				Surname:   "Shoe",
+			},
+		}).
+		Return(nil)
+	form := url.Values{}
+
+	r, _ := http.NewRequest(http.MethodPost, "/create-additional-draft-lpa/?id=234", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateAdditionalDraft(client, template.Func)(w, r)
+	assert.Equal(t, expectedError, err)
+}
+
+func TestPostCreateAdditionalDraftWhenPersonErrors(t *testing.T) {
+	client := &mockCreateAdditionalDraftClient{}
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
+	client.
+		On("Person", mock.Anything, 234).
+		Return(sirius.Person{ID: 234, Firstname: "Amy", Surname: "Shoe"}, expectedError)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createAdditionalDraftData{
+			Donor: sirius.Person{
+				ID:        234,
+				Firstname: "Amy",
+				Surname:   "Shoe",
+			},
+		}).
+		Return(nil)
+	form := url.Values{}
+
+	r, _ := http.NewRequest(http.MethodPost, "/create-additional-draft-lpa/?id=234", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateAdditionalDraft(client, template.Func)(w, r)
+	assert.Equal(t, expectedError, err)
+}
