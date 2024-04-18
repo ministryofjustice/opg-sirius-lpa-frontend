@@ -42,6 +42,20 @@ describe("View a digital LPA", () => {
               town: "London",
             },
           },
+          linkedDigitalLpas: [
+            {
+              uId: "M-DIGI-LPA3-3334",
+              caseSubtype: "personal-welfare",
+              caseStatus: "Processing",
+              createdDate: "01/11/2023"
+            },
+            {
+              uId: "M-DIGI-LPA3-3335",
+              caseSubtype: "personal-welfare",
+              caseStatus: "Registered",
+              createdDate: "02/11/2023"
+            }
+          ]
         },
         "opg.poas.lpastore": {
           attorneys: [
