@@ -1,8 +1,19 @@
 {{ define "mlpa-header" }}
-    <span class="govuk-caption-l">
-      Date of birth {{ (date .CaseSummary.DigitalLpa.SiriusData.Application.DonorDob "2 January 2006") }} | Postcode
-      {{ .CaseSummary.DigitalLpa.SiriusData.Application.DonorAddress.Postcode }}
-    </span>
+    <div class="govuk-grid-row">
+        <span class="govuk-caption-l govuk-grid-column-three-quarters">
+          Date of birth {{ (date .CaseSummary.DigitalLpa.SiriusData.Application.DonorDob "2 January 2006") }} | Postcode
+          {{ .CaseSummary.DigitalLpa.SiriusData.Application.DonorAddress.Postcode }}
+        </span>
+        <div class="govuk-grid-column-one-quarter">
+            <div class="moj-button-menu" data-module="donor-actions-button-menu">
+                <div class="moj-button-menu__wrapper">
+                    <a href="{{ prefix (printf "/create-additional-draft-lpa?id=%d" .CaseSummary.DigitalLpa.SiriusData.Donor.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
+                        Create a draft LPA
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
     <h1 class="govuk-heading-xl">{{ .CaseSummary.DigitalLpa.SiriusData.Application.DonorFirstNames }} {{ .CaseSummary.DigitalLpa.SiriusData.Application.DonorLastName }}</h1>
 
     <nav class="moj-sub-navigation govuk-!-margin-bottom-0" aria-label="linked cases">
@@ -16,7 +27,6 @@
             {{ end }}
         </ul>
     </nav>
-
     {{ template "mlpa-case-summary" $ }}
 
     <div class="case-management-row govuk-grid-row">
@@ -58,7 +68,7 @@
             </ul>
         </div>
 
-        <div class="govuk-grid-column-one-quarter">
+        <div class="govuk-grid-column-one-third">
             <div class="moj-button-menu" data-module="app-button-menu">
                 <div class="moj-button-menu__wrapper">
                     <a href="{{ prefix (printf "/create-task?id=%d" .CaseSummary.DigitalLpa.SiriusData.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
@@ -67,7 +77,6 @@
                     <a href="{{ prefix (printf "/create-warning?id=%d" .CaseSummary.DigitalLpa.SiriusData.Donor.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
                         Create a warning
                     </a>
-
                 </div>
             </div>
         </div>
