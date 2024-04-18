@@ -46,13 +46,13 @@ describe("View a digital LPA", () => {
             {
               uId: "M-DIGI-LPA3-3334",
               caseSubtype: "personal-welfare",
-              Status: "Processing",
+              status: "Processing",
               createdDate: "01/11/2023",
             },
             {
               uId: "M-DIGI-LPA3-3335",
               caseSubtype: "personal-welfare",
-              Status: "Registered",
+              status: "Registered",
               createdDate: "02/11/2023",
             },
           ],
