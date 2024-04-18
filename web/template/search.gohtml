@@ -88,7 +88,7 @@
                                 </td>
                                 <td class="govuk-table__cell">{{ formatDate .DateOfBirth }}</td>
                                 <td class="govuk-table__cell">{{ .AddressSummary }}</td>
-                                <td class="govuk-table__cell">
+                                <td class="govuk-table__cell table-cell-nowrap">
                                     {{ range $case := .Cases }}
                                         {{ $case.CaseType }} - {{ subtypeShortFormat $case.SubType }}<br>
                                     {{ end }}

@@ -186,6 +186,10 @@ $govuk-assets-path: "../assets/";
   }
 }
 
+.table-cell-nowrap {
+  white-space: nowrap;
+}
+
 @media (min-width: 768px) {
   .app-align-service-name-center {
     text-align: center;
