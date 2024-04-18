@@ -1,7 +1,7 @@
 import MOJFrontend from "@ministryofjustice/frontend/moj/all.js";
 
-export default function rightAlignedDropDownMenu() {
-  let $container = $('[data-module="right-aligned-app-button-menu"]');
+export default function donorDropDownMenu() {
+  let $container = $('[data-module="donor-actions-button-menu"]');
   if ($container.length > 0) {
     new MOJFrontend.ButtonMenu({
       container: $container,
@@ -13,17 +13,17 @@ export default function rightAlignedDropDownMenu() {
   }
 
   document
-    .querySelectorAll("[data-module='right-dropdown-menu']")
+    .querySelectorAll("[data-module='donor-dropdown-menu']")
     .forEach((e) => {
-      let rightDropDownMenuToggle = e.querySelector(
-        "[data-role='right-dropdown-menu-toggle']",
+      let donorDropDownMenuToggle = e.querySelector(
+        "[data-role='donor-dropdown-menu-toggle']",
       );
 
-      if (rightDropDownMenuToggle === null) {
+      if (donorDropDownMenuToggle === null) {
         return;
       }
 
-      rightDropDownMenuToggle.addEventListener("change", (e) => {
+      donorDropDownMenuToggle.addEventListener("change", (e) => {
         const url = encodeURI(e.target.value);
         if (url.startsWith("//") || !url.startsWith("/")) {
           return;

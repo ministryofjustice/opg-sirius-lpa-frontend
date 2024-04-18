@@ -1,11 +1,11 @@
 {{ define "mlpa-header" }}
-    <div class="case-management-row govuk-grid-row">
+    <div class="govuk-grid-row">
         <span class="govuk-caption-l govuk-grid-column-three-quarters">
           Date of birth {{ (date .CaseSummary.DigitalLpa.SiriusData.Application.DonorDob "2 January 2006") }} | Postcode
           {{ .CaseSummary.DigitalLpa.SiriusData.Application.DonorAddress.Postcode }}
         </span>
         <div class="govuk-grid-column-one-quarter">
-            <div class="moj-button-menu" data-module="right-aligned-app-button-menu">
+            <div class="moj-button-menu" data-module="donor-actions-button-menu">
                 <div class="moj-button-menu__wrapper">
                     <a href="{{ prefix (printf "/create-additional-draft-lpa?id=%d" .CaseSummary.DigitalLpa.SiriusData.Donor.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
                         Create a draft LPA

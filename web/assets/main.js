@@ -20,7 +20,7 @@ import autoApplyFilter from "./auto-apply-filter";
 import dropdownMenu from "./dropdown-menu";
 import showHideCaseSummary from "./show-hide-case-summary";
 import disableAfterClick from "./disable-after-click";
-import rightAlignedDropDownMenu from "./donor-record-dropdown-menu";
+import donorDropDownMenu from "./donor-actions-dropdown-menu";
 
 // Expose jQuery on window so MOJFrontend can use it
 window.$ = $;
@@ -47,7 +47,7 @@ autoApplyFilter();
 dropdownMenu();
 showHideCaseSummary();
 disableAfterClick();
-rightAlignedDropDownMenu();
+donorDropDownMenu();
 
 if (window.self !== window.parent) {
   const success = document.querySelector('[data-app-reload~="page"]');
