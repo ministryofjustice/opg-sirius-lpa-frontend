@@ -65,6 +65,11 @@ describe("View a digital LPA", () => {
               status: "active",
             },
             {
+              firstNames: "Volo",
+              lastName: "McSpolo",
+              status: "active",
+            },
+            {
               firstNames: "Susanna",
               lastName: "Kaysen",
               status: "removed",
@@ -292,10 +297,9 @@ describe("View a digital LPA", () => {
 
   it.only("shows lpa details in accordions with correct counts of actors", () => {
     cy.contains("LPA details").click();
-    // TODO: vega-2377 will address the fact it should display as 2 attorneys and 1 replacement attorney
-    cy.contains("Attorneys (3)");
-    cy.contains("Replacement attorneys (3)");
+    cy.contains("Attorneys (2)");
+    cy.contains("Replacement attorneys (1)");
     cy.contains("Notified people (0)");
-    cy.contains("Correspondent (0)");
+    cy.contains("Correspondent");
   });
 });

@@ -1,6 +1,7 @@
 package templatefn
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"net/url"
@@ -60,12 +61,16 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 
 			return time.Format(format), nil
 		},
-		"formatDateWithTime": func(s string, format string) (string, error) {
-			t, err := time.Parse("02/01/2006 15:04:05", s)
+		// s is a date string; layout specifies its structure
+		"parseAndFormatDate": func(s string, layout string, format string) (string, error) {
+			if s == "" {
+				return "", errors.New("Not a date")
+			}
+
+			t, err := time.Parse(layout, s)
 			if err != nil {
 				return "", err
 			}
-
 			return t.Format(format), nil
 		},
 		"translateRefData": func(types []sirius.RefDataItem, tmplHandle string) string {
@@ -89,8 +94,8 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return false
 		},
-		"minus1": func(i int) int {
-			return i - 1
+		"plusN": func(i int, n int) int {
+			return i + n
 		},
 		"statusColour": func(s string) string {
 			switch strings.ToLower(s) {
@@ -137,7 +142,72 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		},
 		"subtypeShortFormat": subtypeShortFormat,
 		"subtypeLongFormat":  subtypeLongFormat,
-		"count":              count,
+		"howAttorneysMakeDecisionsLongForm": func(s string) string {
+			switch s {
+			case "jointly":
+				return "Jointly"
+			case "jointly-and-severally":
+				return "Jointly & severally"
+			case "jointly-for-some-severally-for-others":
+				return "Jointly for some, severally for others"
+			case "":
+				return "Not specified"
+			default:
+				return "howAttorneysMakeDecisions NOT RECOGNISED: " + s
+			}
+		},
+		"howReplacementAttorneysStepInLongForm": func(s string) string {
+			switch s {
+			case "all-can-no-longer-act":
+				return "When all can no longer act"
+			case "one-can-no-longer-act":
+				return "When one can no longer act"
+			case "another-way":
+				return "Another way"
+			case "":
+				return "Not specified"
+			default:
+				return "howReplacementAttorneysStepIn NOT RECOGNISED: " + s
+			}
+		},
+		"whenTheLpaCanBeUsedLongForm": func(s string) string {
+			switch s {
+			case "when-has-capacity":
+				return "As soon as it's registered"
+			case "when-capacity-lost":
+				return "When capacity is lost"
+			case "":
+				return "Not specified"
+			default:
+				return "whenTheLpaCanBeUsed NOT RECOGNISED: " + s
+			}
+		},
+		// translate channel code to long version for Format fields in display
+		"channelForFormat": func(s string) string {
+			switch s {
+			case "paper":
+				return "Paper"
+			case "online":
+				return "Online"
+			case "":
+				return "Not specified"
+			default:
+				return "channel NOT RECOGNISED: " + s
+			}
+		},
+		// translate language code to long version for Format fields in display
+		"languageForFormat": func(s string) string {
+			switch s {
+			case "cy":
+				return "Welsh"
+			case "en":
+				return "English"
+			case "":
+				return "Not specified"
+			default:
+				return "language NOT RECOGNISED: " + s
+			}
+		},
 	}
 }
 
@@ -152,14 +222,6 @@ type linkedCase struct {
 	Subtype     string
 	Status      string
 	CreatedDate sirius.DateString
-}
-
-func count(item string, data map[string]interface{}) int {
-	if data[item] == nil {
-		return 0
-	}
-
-	return len(data[item].([]interface{}))
 }
 
 // 2-3 character LPA subtype, upper-cased
