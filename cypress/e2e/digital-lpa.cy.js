@@ -46,16 +46,16 @@ describe("View a digital LPA", () => {
             {
               uId: "M-DIGI-LPA3-3334",
               caseSubtype: "personal-welfare",
-              caseStatus: "Processing",
-              createdDate: "01/11/2023"
+              Status: "Processing",
+              createdDate: "01/11/2023",
             },
             {
               uId: "M-DIGI-LPA3-3335",
               caseSubtype: "personal-welfare",
-              caseStatus: "Registered",
-              createdDate: "02/11/2023"
-            }
-          ]
+              Status: "Registered",
+              createdDate: "02/11/2023",
+            },
+          ],
         },
         "opg.poas.lpastore": {
           attorneys: [
@@ -178,6 +178,12 @@ describe("View a digital LPA", () => {
     cy.contains("M-DIGI-LPA3-3333");
     cy.get("h1").contains("Agnes Hartley");
     cy.get(".govuk-tag.app-tag--draft").contains("Draft");
+
+    cy.contains("PW M-DIGI-LPA3-3334");
+    cy.get(".govuk-tag.app-tag--processing").contains("Processing");
+
+    cy.contains("PW M-DIGI-LPA3-3335");
+    cy.get(".govuk-tag.app-tag--registered").contains("Registered");
   });
 
   it("shows payment information", () => {

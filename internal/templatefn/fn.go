@@ -150,7 +150,7 @@ type CaseTabData struct {
 type linkedCase struct {
 	UID         string
 	Subtype     string
-	CaseStatus  string
+	Status      string
 	CreatedDate sirius.DateString
 }
 
