@@ -12,7 +12,7 @@
         </div>
     </div>
 
-    {{ if (eq .DigitalLpa.LpaStoreData nil) }}
+    {{ if or (eq .DigitalLpa.LpaStoreData nil) (eq .DigitalLpa.SiriusData.Status "Draft") }}
 
       <!-- draft application -->
       <h2 class="govuk-heading-m">Donor</h2>
