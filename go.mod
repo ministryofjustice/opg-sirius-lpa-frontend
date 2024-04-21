@@ -2,7 +2,7 @@ module github.com/ministryofjustice/opg-sirius-lpa-frontend
 
 go 1.22
 
-toolchain go1.22.0
+toolchain go1.22.2
 
 require (
 	github.com/go-chi/chi/v5 v5.0.12
