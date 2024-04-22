@@ -1,0 +1,18 @@
+{{ define "mlpa-address" }}
+  {{ .Line1 }}
+  {{ if not (eq .Line2 "") }}
+    <br>{{ .Line2 }}
+  {{ end }}
+  {{ if not (eq .Line3 "") }}
+    <br>{{ .Line3 }}
+  {{ end }}
+  {{ if not (eq .Town "") }}
+    <br>{{ .Town }}
+  {{ end }}
+  {{ if not (eq .Postcode "") }}
+    <br>{{ .Postcode }}
+  {{ end }}
+  {{ if not (eq .Country "") }}
+    <br>{{ .Country }}
+  {{ end }}
+{{ end }}

@@ -7,7 +7,7 @@ describe("View a digital LPA", () => {
         "opg.poas.sirius": {
           id: 333,
           uId: "M-DIGI-LPA3-3333",
-          status: "Draft",
+          status: "Processing",
           caseSubtype: "property-and-affairs",
           createdDate: "31/10/2023",
           investigationCount: 2,
@@ -46,7 +46,7 @@ describe("View a digital LPA", () => {
             {
               uId: "M-DIGI-LPA3-3334",
               caseSubtype: "personal-welfare",
-              status: "Processing",
+              status: "Draft",
               createdDate: "01/11/2023",
             },
             {
@@ -62,6 +62,11 @@ describe("View a digital LPA", () => {
             {
               firstNames: "Esther",
               lastName: "Greenwood",
+              status: "active",
+            },
+            {
+              firstNames: "Volo",
+              lastName: "McSpolo",
               status: "active",
             },
             {
@@ -91,7 +96,7 @@ describe("View a digital LPA", () => {
         donor: {
           id: 33,
         },
-        status: "Pending",
+        status: "Processing",
       },
     });
 
@@ -171,22 +176,115 @@ describe("View a digital LPA", () => {
       },
     );
 
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3334", "GET", {
+      status: 200,
+      body: {
+        uId: "M-DIGI-LPA3-3334",
+        "opg.poas.sirius": {
+          id: 334,
+          uId: "M-DIGI-LPA3-3334",
+          status: "Draft",
+          caseSubtype: "property-and-affairs",
+          createdDate: "31/10/2023",
+          investigationCount: 2,
+          complaintCount: 1,
+          taskCount: 2,
+          warningCount: 4,
+          donor: {
+            id: 33,
+          },
+          application: {
+            donorFirstNames: "Agnes",
+            donorLastName: "Hartley",
+            donorDob: "27/05/1998",
+            donorEmail: "agnes@host.example",
+            donorPhone: "073656249524",
+            donorAddress: {
+              addressLine1: "Apartment 3",
+              addressLine2: "Gherkin Building",
+              addressLine3: "33 London Road",
+              country: "GB",
+              postcode: "B15 3AA",
+              town: "Birmingham",
+            },
+            correspondentFirstNames: "Kendrick",
+            correspondentLastName: "Lamar",
+            correspondentAddress: {
+              addressLine1: "Flat 3",
+              addressLine2: "Digital LPA Lane",
+              addressLine3: "Somewhere",
+              country: "GB",
+              postcode: "SW1 1AA",
+              town: "London",
+            },
+          },
+          linkedDigitalLpas: [
+            {
+              uId: "M-DIGI-LPA3-3333",
+              caseSubtype: "property-and-affairs",
+              status: "Processing",
+              createdDate: "01/11/2023",
+            },
+            {
+              uId: "M-DIGI-LPA3-3335",
+              caseSubtype: "personal-welfare",
+              status: "Registered",
+              createdDate: "02/11/2023",
+            },
+          ],
+        },
+        "opg.poas.lpastore": null,
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/cases/334", "GET", {
+      status: 200,
+      body: {
+        id: 334,
+        uId: "M-DIGI-LPA3-3334",
+        caseType: "DIGITAL_LPA",
+        donor: {
+          id: 33,
+        },
+        status: "Draft",
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/cases/334/warnings", "GET", {
+      status: 200,
+      body: [],
+    });
+
+    cy.addMock(
+      "/lpa-api/v1/cases/334/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
+      "GET",
+      {
+        status: 200,
+        body: {
+          tasks: [],
+        },
+      },
+    );
   });
 
   it("shows case information", () => {
-    cy.contains("M-DIGI-LPA3-3333");
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+
     cy.get("h1").contains("Agnes Hartley");
-    cy.get(".govuk-tag.app-tag--draft").contains("Draft");
+
+    cy.contains("M-DIGI-LPA3-3333");
+    cy.get("a[href='/lpa/M-DIGI-LPA3-3333'] .govuk-tag").contains("Processing");
 
     cy.contains("PW M-DIGI-LPA3-3334");
-    cy.get(".govuk-tag.app-tag--processing").contains("Processing");
+    cy.get("a[href='/lpa/M-DIGI-LPA3-3334'] .govuk-tag").contains("Draft");
 
     cy.contains("PW M-DIGI-LPA3-3335");
-    cy.get(".govuk-tag.app-tag--registered").contains("Registered");
+    cy.get("a[href='/lpa/M-DIGI-LPA3-3335'] .govuk-tag").contains("Registered");
   });
 
   it("shows payment information", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+
     cy.contains("M-DIGI-LPA3-3333");
     cy.get("h1").contains("Agnes Hartley");
 
@@ -195,6 +293,8 @@ describe("View a digital LPA", () => {
   });
 
   it("shows document information", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+
     cy.contains("M-DIGI-LPA3-3333");
     cy.get("h1").contains("Agnes Hartley");
     cy.contains("Documents").click();
@@ -212,6 +312,8 @@ describe("View a digital LPA", () => {
   });
 
   it("shows task table", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+
     cy.get(
       "table[data-role=tasks-table] [data-role=tasks-table-header] tr th",
     ).should((elts) => {
@@ -231,6 +333,8 @@ describe("View a digital LPA", () => {
   });
 
   it("shows warnings list", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+
     cy.get(".app-caseworker-summary > div:nth-child(2) li").should((elts) => {
       expect(elts).to.have.length(3);
 
@@ -252,6 +356,8 @@ describe("View a digital LPA", () => {
   });
 
   it("creates a task via case actions", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+
     cy.get(".govuk-button").contains("Case actions").click();
     cy.contains("Create a task").click();
     cy.url().should("include", "/create-task?id=333");
@@ -271,6 +377,8 @@ describe("View a digital LPA", () => {
   });
 
   it("creates a warning via case actions", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+
     cy.get(".govuk-button").contains("Case actions").click();
     cy.contains("Create a warning").click();
     cy.url().should("include", "/create-warning?id=33");
@@ -284,18 +392,21 @@ describe("View a digital LPA", () => {
     cy.location("pathname").should("eq", "/lpa/M-DIGI-LPA3-3333");
   });
 
-  it("shows lpa details from lpa store", () => {
+  it("shows lpa details from store when status is Processing", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+
     cy.contains("LPA details").click();
-    cy.contains("lpaType:pf");
-    cy.contains("registrationDate:2022-12-18");
+    cy.contains("Attorneys (2)");
+    cy.contains("Replacement attorneys (1)");
+    cy.contains("Notified people (0)");
+    cy.contains("Correspondent");
   });
 
-  it.only("shows lpa details in accordions with correct counts of actors", () => {
+  it("shows application details when status is Draft", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3334");
+
     cy.contains("LPA details").click();
-    // TODO: vega-2377 will address the fact it should display as 2 attorneys and 1 replacement attorney
-    cy.contains("Attorneys (3)");
-    cy.contains("Replacement attorneys (3)");
-    cy.contains("Notified people (0)");
-    cy.contains("Correspondent (0)");
+    cy.contains("Application format");
+    cy.contains("Paper");
   });
 });
