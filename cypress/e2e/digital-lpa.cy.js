@@ -7,7 +7,7 @@ describe("View a digital LPA", () => {
         "opg.poas.sirius": {
           id: 333,
           uId: "M-DIGI-LPA3-3333",
-          status: "Draft",
+          status: "Processing",
           caseSubtype: "property-and-affairs",
           createdDate: "31/10/2023",
           investigationCount: 2,
@@ -46,7 +46,7 @@ describe("View a digital LPA", () => {
             {
               uId: "M-DIGI-LPA3-3334",
               caseSubtype: "personal-welfare",
-              status: "Processing",
+              status: "Draft",
               createdDate: "01/11/2023",
             },
             {
@@ -96,7 +96,7 @@ describe("View a digital LPA", () => {
         donor: {
           id: 33,
         },
-        status: "Pending",
+        status: "Processing",
       },
     });
 
@@ -180,15 +180,16 @@ describe("View a digital LPA", () => {
   });
 
   it("shows case information", () => {
-    cy.contains("M-DIGI-LPA3-3333");
     cy.get("h1").contains("Agnes Hartley");
-    cy.get(".govuk-tag.app-tag--draft").contains("Draft");
+
+    cy.contains("M-DIGI-LPA3-3333");
+    cy.get("a[href='/lpa/M-DIGI-LPA3-3333'] .govuk-tag").contains("Processing");
 
     cy.contains("PW M-DIGI-LPA3-3334");
-    cy.get(".govuk-tag.app-tag--processing").contains("Processing");
+    cy.get("a[href='/lpa/M-DIGI-LPA3-3334'] .govuk-tag").contains("Draft");
 
     cy.contains("PW M-DIGI-LPA3-3335");
-    cy.get(".govuk-tag.app-tag--registered").contains("Registered");
+    cy.get("a[href='/lpa/M-DIGI-LPA3-3335'] .govuk-tag").contains("Registered");
   });
 
   it("shows payment information", () => {
@@ -289,13 +290,7 @@ describe("View a digital LPA", () => {
     cy.location("pathname").should("eq", "/lpa/M-DIGI-LPA3-3333");
   });
 
-  it("shows lpa details from lpa store", () => {
-    cy.contains("LPA details").click();
-    cy.contains("lpaType:pf");
-    cy.contains("registrationDate:2022-12-18");
-  });
-
-  it.only("shows lpa details in accordions with correct counts of actors", () => {
+  it("shows lpa details in accordions with correct counts of actors", () => {
     cy.contains("LPA details").click();
     cy.contains("Attorneys (2)");
     cy.contains("Replacement attorneys (1)");
