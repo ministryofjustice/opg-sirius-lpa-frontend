@@ -180,7 +180,7 @@
                   {{ if (eq .DigitalLpa.LpaStoreData.SignedAt "") }}
                     Not provided
                   {{ else }}
-                    {{ parseAndFormatDate .DigitalLpa.LpaStoreData.SignedAt "2006-01-02T15:04:05.0Z" "2 January 2006" }}
+                    {{ parseAndFormatDate .DigitalLpa.LpaStoreData.SignedAt "2006-01-02T15:04:05Z" "2 January 2006" }}
                   {{ end }}
                 </dd>
               </div>

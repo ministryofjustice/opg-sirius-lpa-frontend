@@ -1,7 +1,6 @@
 package templatefn
 
 import (
-	"errors"
 	"fmt"
 	"html/template"
 	"net/url"
@@ -61,17 +60,19 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 
 			return time.Format(format), nil
 		},
-		// s is a date string; layout specifies its structure
-		"parseAndFormatDate": func(s string, layout string, format string) (string, error) {
+		// s is a date string; layout specifies its structure;
+		// if the date is invalid, this returns "invalid date"
+		// instead of an error to prevent breaking the page render
+		"parseAndFormatDate": func(s string, layout string, format string) string {
 			if s == "" {
-				return "", errors.New("Not a date")
+				return "invalid date"
 			}
 
 			t, err := time.Parse(layout, s)
 			if err != nil {
-				return "", err
+				return "invalid date"
 			}
-			return t.Format(format), nil
+			return t.Format(format)
 		},
 		"translateRefData": func(types []sirius.RefDataItem, tmplHandle string) string {
 			for _, refDataType := range types {
