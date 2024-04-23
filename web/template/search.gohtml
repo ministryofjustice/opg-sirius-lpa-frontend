@@ -52,7 +52,7 @@
                         <tbody class="govuk-table__body">
                         {{ range $r := (slice .Results 0 (len .Results)) }}
                             <tr class="govuk-table__row">
-                                <td class="govuk-table__cell govuk-link--no-visited-state">
+                                <td class="govuk-table__cell govuk-link--no-visited-state table-cell-nowrap">
                                     {{ range $case := .Cases }}
                                         {{ if eq (ToLower $r.PersonType) "donor" }}
                                             <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" $r.ID $case.ID) }}">{{ $case.UID }}</a><br>
