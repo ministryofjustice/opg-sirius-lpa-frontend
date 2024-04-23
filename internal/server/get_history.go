@@ -11,7 +11,7 @@ import (
 )
 
 type GetHistoryClient interface {
-	GetEvents(ctx sirius.Context, id int, caseId string) (any, error)
+	GetEvents(ctx sirius.Context, id int, caseId int) (any, error)
 	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
 }
 
@@ -32,13 +32,15 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		caseId := caseSummary.DigitalLpa.SiriusData.ID
+
 		var lpaStoreData map[string]interface{}
 		err = json.Unmarshal(caseSummary.DigitalLpa.LpaStoreData, &lpaStoreData)
 		if err != nil {
 			return err
 		}
 
-		eventDetails, err := client.GetEvents(ctx, caseSummary.DigitalLpa.SiriusData.Donor.ID, uid)
+		eventDetails, err := client.GetEvents(ctx, caseSummary.DigitalLpa.SiriusData.Donor.ID, caseId)
 
 		var eventDump map[string]interface{}
 		//err = json.Unmarshal(eventDetails, &eventDump)
@@ -53,7 +55,6 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 			EventData:    &eventDetails,
 		}
 
-		log.Print("MISH")
 		log.Print(eventDump)
 
 		return tmpl(w, data)
