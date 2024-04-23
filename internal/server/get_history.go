@@ -1,10 +1,8 @@
 package server
 
 import (
-	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"log"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -16,10 +14,9 @@ type GetHistoryClient interface {
 }
 
 type getHistory struct {
-	CaseSummary  sirius.CaseSummary
-	DigitalLpa   sirius.DigitalLpa
-	LpaStoreData map[string]interface{}
-	EventData    any
+	CaseSummary sirius.CaseSummary
+	DigitalLpa  sirius.DigitalLpa
+	EventData   any
 }
 
 func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
@@ -34,28 +31,16 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 
 		caseId := caseSummary.DigitalLpa.SiriusData.ID
 
-		var lpaStoreData map[string]interface{}
-		err = json.Unmarshal(caseSummary.DigitalLpa.LpaStoreData, &lpaStoreData)
-		if err != nil {
-			return err
-		}
-
 		eventDetails, err := client.GetEvents(ctx, caseSummary.DigitalLpa.SiriusData.Donor.ID, caseId)
-
-		var eventDump map[string]interface{}
-		//err = json.Unmarshal(eventDetails, &eventDump)
 		if err != nil {
 			return err
 		}
 
 		data := getHistory{
-			CaseSummary:  caseSummary,
-			DigitalLpa:   caseSummary.DigitalLpa,
-			LpaStoreData: lpaStoreData,
-			EventData:    &eventDetails,
+			CaseSummary: caseSummary,
+			DigitalLpa:  caseSummary.DigitalLpa,
+			EventData:   &eventDetails,
 		}
-
-		log.Print(eventDump)
 
 		return tmpl(w, data)
 	}
