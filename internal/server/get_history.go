@@ -15,7 +15,6 @@ type GetHistoryClient interface {
 
 type getHistory struct {
 	CaseSummary sirius.CaseSummary
-	DigitalLpa  sirius.DigitalLpa
 	EventData   any
 }
 
@@ -38,7 +37,6 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 
 		data := getHistory{
 			CaseSummary: caseSummary,
-			DigitalLpa:  caseSummary.DigitalLpa,
 			EventData:   &eventDetails,
 		}
 
