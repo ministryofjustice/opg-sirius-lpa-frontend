@@ -9,7 +9,7 @@ import (
 )
 
 type GetHistoryClient interface {
-	GetEvents(ctx sirius.Context, id int, caseId int) (any, error)
+	GetEvents(ctx sirius.Context, donorId int, caseId int) (any, error)
 	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
 }
 
@@ -37,7 +37,7 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 
 		data := getHistory{
 			CaseSummary: caseSummary,
-			EventData:   &eventDetails,
+			EventData:   eventDetails,
 		}
 
 		return tmpl(w, data)
