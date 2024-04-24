@@ -97,10 +97,10 @@ func CreateAdditionalDraft(client CreateAdditionalDraftClient, tmpl template.Tem
 			}
 
 			if data.Form.Recipient == "donor-other-address" {
-				correspondentAddress := addDefaultCountry(data.Form.AlternativeAddress)
+				correspondentAddress := data.Form.AlternativeAddress
 				compiledDraft.CorrespondentAddress = &correspondentAddress
 			} else if data.Form.Recipient == "other" {
-				correspondentAddress := addDefaultCountry(data.Form.CorrespondentAddress)
+				correspondentAddress := data.Form.CorrespondentAddress
 				compiledDraft.CorrespondentAddress = &correspondentAddress
 				compiledDraft.CorrespondentFirstNames = data.Form.CorrespondentFirstname
 				compiledDraft.CorrespondentLastName = data.Form.CorrespondentSurname
