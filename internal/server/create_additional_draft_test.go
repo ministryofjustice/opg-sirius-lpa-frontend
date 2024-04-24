@@ -179,11 +179,9 @@ func TestPostCreateAdditionalDraftDonorOtherAddress(t *testing.T) {
 		Return(sirius.Person{ID: 234, Firstname: "Amy", Surname: "Shoe"}, nil)
 	client.
 		On("CreateAdditionalDraft", mock.Anything, 234, sirius.AdditionalDraft{
-			CaseType: []string{"property-and-affairs", "personal-welfare"},
-			CorrespondentAddress: &sirius.Address{
-				Country: "GB",
-			},
-			Source: "PHONE",
+			CaseType:             []string{"property-and-affairs", "personal-welfare"},
+			CorrespondentAddress: &sirius.Address{},
+			Source:               "PHONE",
 		}).
 		Return(map[string]string{
 			"personal-welfare": "M-1234-45678-9101",
