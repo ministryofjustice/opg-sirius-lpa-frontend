@@ -1,0 +1,17 @@
+{{ template "page" . }}
+
+{{ define "title" }}History{{ end }}
+
+{{ define "main" }}
+
+{{ template "mlpa-header" (caseTabs .CaseSummary "history") }}
+
+<div class="moj-page-header-actions">
+    <div class="moj-page-header-actions__title">
+        <h1 class="govuk-heading-l">History</h1>
+    </div>
+</div>
+    {{ range $v := .EventData }}
+        <p>{{ $v }}</p>
+    {{ end }}
+{{ end }}
