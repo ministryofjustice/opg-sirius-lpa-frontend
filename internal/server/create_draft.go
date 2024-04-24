@@ -71,23 +71,6 @@ type createDraftData struct {
 	Uids      []createDraftResult
 }
 
-func addDefaultCountry(address sirius.Address) sirius.Address {
-	out := sirius.Address{
-		Line1:    address.Line1,
-		Line2:    address.Line2,
-		Line3:    address.Line3,
-		Town:     address.Town,
-		Postcode: address.Postcode,
-		Country:  address.Country,
-	}
-
-	if out.Country == "" {
-		out.Country = "GB"
-	}
-
-	return out
-}
-
 func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 	if decoder == nil {
 		decoder = form.NewDecoder()
@@ -140,7 +123,7 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 				DonorFirstNames:           data.Form.DonorFirstname,
 				DonorLastName:             data.Form.DonorSurname,
 				DonorDob:                  data.Form.Dob.toDateString(),
-				DonorAddress:              addDefaultCountry(data.Form.DonorAddress),
+				DonorAddress:              data.Form.DonorAddress,
 				Email:                     data.Form.Email,
 				PhoneNumber:               data.Form.Phone,
 				CorrespondenceByWelsh:     data.Form.CorrespondenceByWelsh,
@@ -148,10 +131,10 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 			}
 
 			if data.Form.Recipient == "donor-other-address" {
-				correspondentAddress := addDefaultCountry(data.Form.AlternativeAddress)
+				correspondentAddress := data.Form.AlternativeAddress
 				compiledDraft.CorrespondentAddress = &correspondentAddress
 			} else if data.Form.Recipient == "other" {
-				correspondentAddress := addDefaultCountry(data.Form.CorrespondentAddress)
+				correspondentAddress := data.Form.CorrespondentAddress
 				compiledDraft.CorrespondentAddress = &correspondentAddress
 				compiledDraft.CorrespondentFirstNames = data.Form.CorrespondentFirstname
 				compiledDraft.CorrespondentLastName = data.Form.CorrespondentSurname
