@@ -61,7 +61,7 @@
                     </a>
                 </li>
                 <li class="govuk-tabs__list-item {{ if eq .TabName "history" }}govuk-tabs__list-item--selected{{ end }}">
-                    <a class="govuk-tabs__tab" href="#history">
+                    <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s/history" .CaseSummary.DigitalLpa.UID) }}">
                         History
                     </a>
                 </li>
