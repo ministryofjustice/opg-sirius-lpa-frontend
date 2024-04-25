@@ -218,3 +218,25 @@ $govuk-assets-path: "../assets/";
 .app-newlines-as-br {
   white-space: pre-wrap;
 }
+
+.app-progress-indicator-summary {
+  display: flex;
+  align-items: center;
+  height: 2em;
+  margin-bottom: 2px;
+}
+
+.app-progress-indicator-icon {
+  display: block;
+  margin-right: govuk-spacing(2);
+  height: 98%;
+
+  ellipse[data-svg-elt=background] {
+    stroke: $govuk-body-background-colour;
+    fill: $govuk-body-background-colour;
+  }
+
+  path[data-svg-elt=border], path[data-svg-elt=tick] {
+    fill: govuk-colour("green");
+  }
+}

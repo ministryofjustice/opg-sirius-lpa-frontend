@@ -146,4 +146,15 @@ $sirius-bg-color: #29292e;
   .sirius-search__item {
     background-color: $sirius-bg-color !important;
   }
+
+  .app-progress-indicator-icon {
+    ellipse[data-svg-elt=background] {
+      stroke: $sirius-bg-color;
+      fill: $sirius-bg-color;
+    }
+
+    path[data-svg-elt=border], path[data-svg-elt=tick] {
+      fill: govuk-colour("white");
+    }
+  }
 }
