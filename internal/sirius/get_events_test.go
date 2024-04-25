@@ -37,11 +37,11 @@ func TestGetEvents(t *testing.T) {
 						Status:  http.StatusOK,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 						Body: dsl.Like(map[string][]interface{}{
-							"events": []interface{}{"event details"},
+							"events": []interface{}{},
 						}),
 					})
 			},
-			expectedResponse: []interface{}{"event details"},
+			expectedResponse: []interface{}{},
 		},
 	}
 
