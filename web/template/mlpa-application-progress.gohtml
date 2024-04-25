@@ -1,0 +1,17 @@
+{{ template "page" . }}
+
+{{ define "title" }}LPA{{ end }}
+
+{{ define "main" }}
+
+  {{ template "mlpa-header" (caseTabs .CaseSummary "application-progress") }}
+
+  {{ if .FlashMessage.Title }}
+      {{ template "notification-banner" .FlashMessage }}
+  {{ end }}
+
+  {{ range .ProgressIndicators }}
+    {{ template "mlpa-progress-indicator" . }}
+  {{ end }}
+
+{{ end }}

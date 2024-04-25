@@ -70,7 +70,9 @@ describe("View the application progress for a digital LPA", () => {
       body: {
         digitalLpaUid: uid,
         progressIndicators: [
-          { "indicator": "FEES", "status": "Complete" },
+          { "indicator": "FEES", "status": "NOT_STARTED" },
+          { "indicator": "FEES", "status": "COMPLETE" },
+          { "indicator": "FEES", "status": "IN_PROGRESS" },
         ],
       },
     });

@@ -209,6 +209,17 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "language NOT RECOGNISED: " + s
 			}
 		},
+		// translate progress indicator context to long version for application progress page
+		"progressIndicatorContext": func(s string) string {
+			switch s {
+			case "FEES":
+				return "Fees"
+			case "":
+				return "Not specified"
+			default:
+				return "indicator NOT RECOGNISED: " + s
+			}
+		},
 	}
 }
 
