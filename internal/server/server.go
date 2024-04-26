@@ -66,6 +66,7 @@ type Client interface {
 	EditDonorClient
 	EditPaymentClient
 	EventClient
+	GetHistoryClient
 	GetPaymentsClient
 	GetDocumentsClient
 	LinkPersonClient
@@ -128,6 +129,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/lpa/{uid}", wrap(GetLpaDetails(client, templates.Get("lpa.gohtml"))))
 	mux.Handle("/lpa/{uid}/payments", wrap(GetPayments(client, templates.Get("mlpa-payments.gohtml"))))
 	mux.Handle("/lpa/{uid}/documents", wrap(GetDocuments(client, templates.Get("mlpa-documents.gohtml"))))
+	mux.Handle("/lpa/{uid}/history", wrap(GetHistory(client, templates.Get("mlpa-history.gohtml"))))
 	mux.Handle("/lpa/{uid}/documents/new", wrap(CreateDocumentDigitalLpa(client, templates.Get("mlpa-create_document.gohtml"))))
 	mux.Handle("/search-users", wrap(SearchUsers(client)))
 	mux.Handle("/search-persons", wrap(SearchDonors(client)))
