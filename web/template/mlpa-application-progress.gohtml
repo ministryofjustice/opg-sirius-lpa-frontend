@@ -10,8 +10,12 @@
       {{ template "notification-banner" .FlashMessage }}
   {{ end }}
 
-  {{ range .ProgressIndicators }}
-    {{ template "mlpa-progress-indicator" . }}
+  {{ if gt (len .ProgressIndicators) 0 }}
+    {{ range .ProgressIndicators }}
+      {{ template "mlpa-progress-indicator" . }}
+    {{ end }}
+  {{ else }}
+    <p class="govuk-body">No progress indicators for this digital LPA</p>
   {{ end }}
 
 {{ end }}
