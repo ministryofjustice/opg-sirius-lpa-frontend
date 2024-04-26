@@ -230,13 +230,37 @@ $govuk-assets-path: "../assets/";
   display: block;
   margin-right: govuk-spacing(2);
   height: 98%;
+}
 
-  ellipse[data-svg-elt=background] {
+.app-progress-indicator-icon[data-progress-indicator=not-started] {
+  [data-svg-elt=background] {
+    stroke: govuk-colour("mid-grey");
+    fill: govuk-colour("mid-grey");
+  }
+  [data-svg-elt=tick], [data-svg-elt=border] {
+    display: none;
+  }
+}
+
+.app-progress-indicator-icon[data-progress-indicator=in-progress] {
+  [data-svg-elt=background] {
     stroke: $govuk-body-background-colour;
     fill: $govuk-body-background-colour;
   }
+  [data-svg-elt=border] {
+    fill: govuk-colour("green");
+  }
+  [data-svg-elt=tick] {
+    display: none;
+  }
+}
 
-  path[data-svg-elt=border], path[data-svg-elt=tick] {
+.app-progress-indicator-icon[data-progress-indicator=complete] {
+  [data-svg-elt=background] {
+    stroke: $govuk-body-background-colour;
+    fill: $govuk-body-background-colour;
+  }
+  [data-svg-elt=border], [data-svg-elt=tick] {
     fill: govuk-colour("green");
   }
 }
