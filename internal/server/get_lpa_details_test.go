@@ -17,6 +17,11 @@ func (m *mockGetLpaDetailsClient) CaseSummary(ctx sirius.Context, uid string) (s
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
+func (m *mockGetLpaDetailsClient) ProgressIndicatorsForDigitalLpa(ctx sirius.Context, uid string) ([]sirius.ProgressIndicator, error) {
+	args := m.Called(ctx, uid)
+	return args.Get(0).([]sirius.ProgressIndicator), args.Error(1)
+}
+
 func TestGetLpaDetailsSuccess(t *testing.T) {
 	caseSummary := sirius.CaseSummary{
 		DigitalLpa: sirius.DigitalLpa{
@@ -63,10 +68,20 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 		TaskList: []sirius.Task{},
 	}
 
+	progressIndicators := []sirius.ProgressIndicator{
+		sirius.ProgressIndicator{
+			Status: "COMPLETE",
+			Indicator: "FEES",
+		},
+	}
+
 	client := &mockGetLpaDetailsClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
 		Return(caseSummary, nil)
+	client.
+		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-9876-9876-9876").
+		Return(progressIndicators, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -101,6 +116,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 					},
 				},
 			},
+			ProgressIndicators: progressIndicators,
 		}).
 		Return(nil)
 
