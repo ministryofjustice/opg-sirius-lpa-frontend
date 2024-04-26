@@ -67,6 +67,7 @@ type Client interface {
 	EditPaymentClient
 	EventClient
 	GetHistoryClient
+	GetLpaDetailsClient
 	GetPaymentsClient
 	GetDocumentsClient
 	LinkPersonClient

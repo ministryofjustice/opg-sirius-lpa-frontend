@@ -10,7 +10,8 @@ import (
 )
 
 type GetLpaDetailsClient interface {
-	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
+	CaseSummary(siriusCtx sirius.Context, uid string) (sirius.CaseSummary, error)
+	ProgressIndicatorsForDigitalLpa(siriusCtx sirius.Context, uid string) ([]sirius.ProgressIndicator, error)
 }
 
 type getLpaDetails struct {
@@ -32,11 +33,20 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		group.Go(func() error {
-			cs, err := client.CaseSummary(sirius.Context{Context: groupCtx}, uid)
+			cs, err := client.CaseSummary(ctx.With(groupCtx), uid)
 			if err != nil {
 				return err
 			}
 			data.CaseSummary = cs
+			return nil
+		})
+
+		group.Go(func() error {
+			inds, err := client.ProgressIndicatorsForDigitalLpa(ctx.With(groupCtx), uid)
+			if err != nil {
+				return err
+			}
+			data.ProgressIndicators = inds
 			return nil
 		})
 
@@ -46,22 +56,6 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 
 		// to prevent lots of changes to template structure
 		data.DigitalLpa = data.CaseSummary.DigitalLpa
-
-		// TODO - use real data
-		data.ProgressIndicators = []sirius.ProgressIndicator{
-			sirius.ProgressIndicator{
-				Indicator: "FEES",
-				Status: "NOT_STARTED",
-			},
-			sirius.ProgressIndicator{
-				Indicator: "FEES",
-				Status: "IN_PROGRESS",
-			},
-			sirius.ProgressIndicator{
-				Indicator: "FEES",
-				Status: "COMPLETE",
-			},
-		}
 
 		data.FlashMessage, _ = GetFlash(w, r)
 
