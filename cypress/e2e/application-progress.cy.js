@@ -82,9 +82,17 @@ describe("View the application progress for a digital LPA", () => {
     cy.visit(`/lpa/${uid}`);
 
     cy.get(".app-progress-indicator-summary").then((elts) => {
-      expect(Cypress.$(elts[0]).find("svg[data-progress-indicator=not-started]").length).to.equal(1);
-      expect(Cypress.$(elts[1]).find("svg[data-progress-indicator=complete]").length).to.equal(1);
-      expect(Cypress.$(elts[2]).find("svg[data-progress-indicator=in-progress]").length).to.equal(1);
-    })
+      expect(
+        Cypress.$(elts[0]).find("svg[data-progress-indicator=not-started]")
+          .length,
+      ).to.equal(1);
+      expect(
+        Cypress.$(elts[1]).find("svg[data-progress-indicator=complete]").length,
+      ).to.equal(1);
+      expect(
+        Cypress.$(elts[2]).find("svg[data-progress-indicator=in-progress]")
+          .length,
+      ).to.equal(1);
+    });
   });
 });
