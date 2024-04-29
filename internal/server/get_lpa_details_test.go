@@ -70,7 +70,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 
 	progressIndicators := []sirius.ProgressIndicator{
 		sirius.ProgressIndicator{
-			Status: "COMPLETE",
+			Status:    "COMPLETE",
 			Indicator: "FEES",
 		},
 	}
