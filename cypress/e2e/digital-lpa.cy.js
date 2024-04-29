@@ -434,7 +434,7 @@ describe("View a digital LPA", () => {
     cy.contains("Correspondent");
   });
 
-    it("shows application details when status is Draft", () => {
+  it("shows application details when status is Draft", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3334");
 
     cy.contains("LPA details").click();

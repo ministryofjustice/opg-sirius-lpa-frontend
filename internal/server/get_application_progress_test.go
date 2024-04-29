@@ -86,7 +86,7 @@ func TestGetApplicationProgressSuccess(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getApplicationProgressDetails{
-			CaseSummary: caseSummary,
+			CaseSummary:        caseSummary,
 			ProgressIndicators: progressIndicators,
 		}).
 		Return(nil)
