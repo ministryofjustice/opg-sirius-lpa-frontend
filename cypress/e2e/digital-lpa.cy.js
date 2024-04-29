@@ -281,22 +281,6 @@ describe("View a digital LPA", () => {
         },
       },
     );
-
-    cy.addMock(
-      `/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3334/progress-indicators`,
-      "GET",
-      {
-        status: 200,
-        body: {
-          digitalLpaUid: "M-DIGI-LPA3-3334",
-          progressIndicators: [
-            { indicator: "FEES", status: "NOT_STARTED" },
-            { indicator: "FEES", status: "COMPLETE" },
-            { indicator: "FEES", status: "IN_PROGRESS" },
-          ],
-        },
-      },
-    );
   });
 
   it("shows case information", () => {
