@@ -24,7 +24,7 @@ func TestProgressIndicatorsForDigitalLpa(t *testing.T) {
 
 	pact.
 		AddInteraction().
-		Given("A digital LPA with progress indicators exists").
+		Given("A digital with UID LPA M-QEQE-EEEE-WERT and a fees progress indicator with status 'In progress' exists").
 		UponReceiving("A request for the progress indicators for a digital LPA").
 		WithRequest(dsl.Request{
 			Method: http.MethodGet,
