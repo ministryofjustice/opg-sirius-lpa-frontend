@@ -17,6 +17,7 @@ type GetApplicationProgressClient interface {
 type getApplicationProgressDetails struct {
 	CaseSummary             sirius.CaseSummary
 	ProgressIndicators      []sirius.ProgressIndicator
+	FlashMessage            FlashNotification
 }
 
 func GetApplicationProgressDetails(client GetApplicationProgressClient, tmpl template.Template) Handler {
@@ -49,6 +50,8 @@ func GetApplicationProgressDetails(client GetApplicationProgressClient, tmpl tem
 		if err := group.Wait(); err != nil {
 			return err
 		}
+
+		data.FlashMessage, _ = GetFlash(w, r)
 
 		return tmpl(w, data)
 	}
