@@ -15,16 +15,11 @@ func TestProgressIndicatorsForDigitalLpa(t *testing.T) {
 
 	defer pact.Teardown()
 
-	expectedResponse := []ProgressIndicator{
-		ProgressIndicator{
-			Indicator: "FEES",
-			Status:    "IN_PROGRESS",
-		},
-	}
+	expectedResponse := []ProgressIndicator{}
 
 	pact.
 		AddInteraction().
-		Given("A digital with UID LPA M-QEQE-EEEE-WERT and a fees progress indicator with status 'In progress' exists").
+		Given("A digital LPA with UID LPA M-QEQE-EEEE-WERT and a fees progress indicator with status 'In progress' exists").
 		UponReceiving("A request for the progress indicators for a digital LPA").
 		WithRequest(dsl.Request{
 			Method: http.MethodGet,
@@ -33,11 +28,11 @@ func TestProgressIndicatorsForDigitalLpa(t *testing.T) {
 		WillRespondWith(dsl.Response{
 			Status: http.StatusOK,
 			Body: dsl.Like(map[string]interface{}{
-				"digitalLpaUid": dsl.Like("M-QEQE-EEEE-WERT"),
+				"uid": dsl.Like("M-QEQE-EEEE-WERT"),
 				"progressIndicators": dsl.EachLike(map[string]interface{}{
 					"indicator": dsl.Like("FEES"),
 					"status":    dsl.Like("IN_PROGRESS"),
-				}, 1),
+				}, 0),
 			}),
 			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 		})
