@@ -8,7 +8,7 @@ import (
 
 func TestParseAndFormatDate(t *testing.T) {
 	fns := All("", "", "")
-	fn := fns["parseAndFormatDate"].(func(string, string, string)string)
+	fn := fns["parseAndFormatDate"].(func(string, string, string) string)
 
 	var val string
 
@@ -27,7 +27,7 @@ func TestParseAndFormatDate(t *testing.T) {
 
 func TestPlusN(t *testing.T) {
 	fns := All("", "", "")
-	fn := fns["plusN"].(func(int, int)int)
+	fn := fns["plusN"].(func(int, int) int)
 
 	val := fn(1, 1)
 	assert.Equal(t, 2, val)
@@ -35,7 +35,7 @@ func TestPlusN(t *testing.T) {
 
 func testStringMapper(t *testing.T, fnName string, expectations map[string]string) {
 	fns := All("", "", "")
-	fn := fns[fnName].(func(string)string)
+	fn := fns[fnName].(func(string) string)
 
 	for input, expected := range expectations {
 		assert.Equal(t, expected, fn(input))
@@ -44,11 +44,11 @@ func testStringMapper(t *testing.T, fnName string, expectations map[string]strin
 
 func TestHowAttorneysMakeDecisionsLongForm(t *testing.T) {
 	expectations := map[string]string{
-		"jointly": "Jointly",
-		"jointly-and-severally": "Jointly & severally",
+		"jointly":                               "Jointly",
+		"jointly-and-severally":                 "Jointly & severally",
 		"jointly-for-some-severally-for-others": "Jointly for some, severally for others",
-		"": "Not specified",
-		"foo": "howAttorneysMakeDecisions NOT RECOGNISED: foo",
+		"":                                      "Not specified",
+		"foo":                                   "howAttorneysMakeDecisions NOT RECOGNISED: foo",
 	}
 
 	testStringMapper(t, "howAttorneysMakeDecisionsLongForm", expectations)
@@ -58,9 +58,9 @@ func TestHowReplacementAttorneysStepInLongForm(t *testing.T) {
 	expectations := map[string]string{
 		"all-can-no-longer-act": "When all can no longer act",
 		"one-can-no-longer-act": "When one can no longer act",
-		"another-way": "Another way",
-		"": "Not specified",
-		"foo": "howReplacementAttorneysStepIn NOT RECOGNISED: foo",
+		"another-way":           "Another way",
+		"":                      "Not specified",
+		"foo":                   "howReplacementAttorneysStepIn NOT RECOGNISED: foo",
 	}
 
 	testStringMapper(t, "howReplacementAttorneysStepInLongForm", expectations)
@@ -68,10 +68,10 @@ func TestHowReplacementAttorneysStepInLongForm(t *testing.T) {
 
 func TestWhenTheLpaCanBeUsedLongForm(t *testing.T) {
 	expectations := map[string]string{
-		"when-has-capacity": "As soon as it's registered",
+		"when-has-capacity":  "As soon as it's registered",
 		"when-capacity-lost": "When capacity is lost",
-		"": "Not specified",
-		"foo": "whenTheLpaCanBeUsed NOT RECOGNISED: foo",
+		"":                   "Not specified",
+		"foo":                "whenTheLpaCanBeUsed NOT RECOGNISED: foo",
 	}
 
 	testStringMapper(t, "whenTheLpaCanBeUsedLongForm", expectations)
@@ -79,10 +79,10 @@ func TestWhenTheLpaCanBeUsedLongForm(t *testing.T) {
 
 func TestChannelForFormat(t *testing.T) {
 	expectations := map[string]string{
-		"paper": "Paper",
+		"paper":  "Paper",
 		"online": "Online",
-		"": "Not specified",
-		"foo": "channel NOT RECOGNISED: foo",
+		"":       "Not specified",
+		"foo":    "channel NOT RECOGNISED: foo",
 	}
 
 	testStringMapper(t, "channelForFormat", expectations)
@@ -90,11 +90,33 @@ func TestChannelForFormat(t *testing.T) {
 
 func TestLanguageForFormat(t *testing.T) {
 	expectations := map[string]string{
-		"cy": "Welsh",
-		"en": "English",
-		"": "Not specified",
+		"cy":  "Welsh",
+		"en":  "English",
+		"":    "Not specified",
 		"foo": "language NOT RECOGNISED: foo",
 	}
 
 	testStringMapper(t, "languageForFormat", expectations)
+}
+
+func TestProgressIndicatorContext(t *testing.T) {
+	expectations := map[string]string{
+		"FEES": "Fees",
+		"":     "Not specified",
+		"foo":  "indicator NOT RECOGNISED: foo",
+	}
+
+	testStringMapper(t, "progressIndicatorContext", expectations)
+}
+
+func TestProgressIndicatorStatus(t *testing.T) {
+	expectations := map[string]string{
+		"IN_PROGRESS": "In progress",
+		"NOT_STARTED": "Not started",
+		"COMPLETE": "Complete",
+		"":     "Not specified",
+		"foo":  "status NOT RECOGNISED: foo",
+	}
+
+	testStringMapper(t, "progressIndicatorStatus", expectations)
 }
