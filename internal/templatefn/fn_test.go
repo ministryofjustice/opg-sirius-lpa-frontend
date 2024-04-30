@@ -98,3 +98,13 @@ func TestLanguageForFormat(t *testing.T) {
 
 	testStringMapper(t, "languageForFormat", expectations)
 }
+
+func TestProgressIndicatorContext(t *testing.T) {
+	expectations := map[string]string{
+		"FEES": "Fees",
+		"":     "Not specified",
+		"foo":  "indicator NOT RECOGNISED: foo",
+	}
+
+	testStringMapper(t, "progressIndicatorContext", expectations)
+}
