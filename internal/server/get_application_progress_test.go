@@ -1,6 +1,8 @@
 package server
 
 import (
+	"errors"
+
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -98,4 +100,52 @@ func TestGetApplicationProgressSuccess(t *testing.T) {
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetApplicationProgressCaseSummaryFail(t *testing.T) {
+	var cs sirius.CaseSummary
+	expectedError := errors.New("Case could not be retrieved")
+
+	client := &mockApplicationProgressClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		Return(cs, expectedError)
+	client.
+		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-9876-9876-9876").
+		Return([]sirius.ProgressIndicator{}, nil)
+
+	template := &mockTemplate{}
+	template.On("Func", mock.Anything, mock.Anything).Return(nil)
+
+	server := newMockServer("/lpa/{uid}", GetApplicationProgressDetails(client, template.Func))
+
+	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9876", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, expectedError, err)
+}
+
+func TestGetApplicationProgressProgressIndicatorsFail(t *testing.T) {
+	var cs sirius.CaseSummary
+	var inds []sirius.ProgressIndicator
+
+	expectedError := errors.New("Progress indicators could not be retrieved")
+
+	client := &mockApplicationProgressClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		Return(cs, nil)
+	client.
+		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-9876-9876-9876").
+		Return(inds, expectedError)
+
+	template := &mockTemplate{}
+	template.On("Func", mock.Anything, mock.Anything).Return(nil)
+
+	server := newMockServer("/lpa/{uid}", GetApplicationProgressDetails(client, template.Func))
+
+	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9876", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, expectedError, err)
 }
