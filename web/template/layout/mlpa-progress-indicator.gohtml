@@ -17,7 +17,10 @@
         </svg>
 
         <div>
-          <h3 class="govuk-!-display-inline">{{ progressIndicatorContext .Indicator }}</h3>
+          <h3 class="govuk-!-display-inline">
+            {{ progressIndicatorContext .Indicator }}
+            <span class="govuk-visually-hidden"> ({{ progressIndicatorStatus .Status }})</span>
+          </h3>
         </div>
       </div>
     </summary>

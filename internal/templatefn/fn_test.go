@@ -108,3 +108,15 @@ func TestProgressIndicatorContext(t *testing.T) {
 
 	testStringMapper(t, "progressIndicatorContext", expectations)
 }
+
+func TestProgressIndicatorStatus(t *testing.T) {
+	expectations := map[string]string{
+		"IN_PROGRESS": "In progress",
+		"NOT_STARTED": "Not started",
+		"COMPLETE": "Complete",
+		"":     "Not specified",
+		"foo":  "status NOT RECOGNISED: foo",
+	}
+
+	testStringMapper(t, "progressIndicatorStatus", expectations)
+}

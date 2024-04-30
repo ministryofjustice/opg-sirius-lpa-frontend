@@ -220,6 +220,21 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "indicator NOT RECOGNISED: " + s
 			}
 		},
+		// translate progress indicator status for application progress page
+		"progressIndicatorStatus": func(s string) string {
+			switch s {
+			case "IN_PROGRESS":
+				return "In progress"
+			case "COMPLETE":
+				return "Complete"
+			case "NOT_STARTED":
+				return "Not started"
+			case "":
+				return "Not specified"
+			default:
+				return "status NOT RECOGNISED: " + s
+			}
+		},
 	}
 }
 
