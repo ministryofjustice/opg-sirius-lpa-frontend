@@ -2,15 +2,26 @@ package sirius
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
-func TestProgressIndicatorsForDigitalLpa(t *testing.T) {
+type mockProgressIndicatorsHttpClient struct {
+	mock.Mock
+}
+
+func (m *mockProgressIndicatorsHttpClient) Do(req *http.Request) (*http.Response, error) {
+	args := m.Called(req)
+	return args.Get(0).(*http.Response), args.Error(1)
+}
+
+func TestProgressIndicatorsForDigitalLpaSuccess(t *testing.T) {
 	pact := newPact()
 
 	defer pact.Teardown()
@@ -47,4 +58,14 @@ func TestProgressIndicatorsForDigitalLpa(t *testing.T) {
 
 		return nil
 	}))
+}
+
+func TestGetApplicationProgressProgressIndicatorsFail(t *testing.T) {
+	mockClient := &mockProgressIndicatorsHttpClient{}
+	mockClient.On("Do", mock.Anything).Return(&http.Response{}, errors.New("Networking issue"))
+
+	client := NewClient(mockClient, "http://localhost")
+	_, err := client.ProgressIndicatorsForDigitalLpa(Context{Context: context.Background()}, "M-QEQE-EEEE-QQQE")
+
+	assert.Equal(t, "Networking issue", err.Error())
 }
