@@ -146,4 +146,32 @@ $sirius-bg-color: #29292e;
   .sirius-search__item {
     background-color: $sirius-bg-color !important;
   }
+
+  .app-progress-indicator-icon[data-progress-indicator="not-started"] {
+    [data-svg-elt="background"] {
+      stroke: govuk-colour("white");
+      fill: govuk-colour("white");
+    }
+  }
+
+  .app-progress-indicator-icon[data-progress-indicator="in-progress"] {
+    [data-svg-elt="background"] {
+      stroke: $sirius-bg-color;
+      fill: $sirius-bg-color;
+    }
+    [data-svg-elt="border"] {
+      fill: govuk-colour("white");
+    }
+  }
+
+  .app-progress-indicator-icon[data-progress-indicator="complete"] {
+    [data-svg-elt="background"] {
+      stroke: $sirius-bg-color;
+      fill: $sirius-bg-color;
+    }
+    [data-svg-elt="border"],
+    [data-svg-elt="tick"] {
+      fill: govuk-colour("white");
+    }
+  }
 }

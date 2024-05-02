@@ -1,0 +1,21 @@
+{{ template "page" . }}
+
+{{ define "title" }}LPA{{ end }}
+
+{{ define "main" }}
+
+  {{ template "mlpa-header" (caseTabs .CaseSummary "application-progress") }}
+
+  {{ if .FlashMessage.Title }}
+      {{ template "notification-banner" .FlashMessage }}
+  {{ end }}
+
+  {{ if gt (len .ProgressIndicators) 0 }}
+    {{ range .ProgressIndicators }}
+      {{ template "mlpa-progress-indicator" . }}
+    {{ end }}
+  {{ else }}
+    <p class="govuk-body">No progress indicators for this digital LPA</p>
+  {{ end }}
+
+{{ end }}
