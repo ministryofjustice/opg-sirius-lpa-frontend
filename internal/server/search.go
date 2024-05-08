@@ -63,12 +63,12 @@ func newSearchFilters(form url.Values) searchFilters {
 func Search(client SearchClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
-		searchTerm := r.FormValue("term")
+		searchTerm := r.FormValue("search")
 		if searchTerm == "" {
 			return errors.New("search term required")
 		}
 		search := url.Values{}
-		search.Add("term", r.FormValue("term"))
+		search.Add("search", r.FormValue("search"))
 
 		filters := newSearchFilters(r.Form)
 
