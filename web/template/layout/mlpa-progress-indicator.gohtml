@@ -6,7 +6,7 @@
         {{ $indicatorProgress := "complete" }}
         {{ if eq .Status "IN_PROGRESS" }}
           {{ $indicatorProgress = "in-progress" }}
-        {{ else if eq .Status "NOT_STARTED" }}
+        {{ else if eq .Status "CANNOT_START" }}
           {{ $indicatorProgress = "not-started" }}
         {{ end }}
 
