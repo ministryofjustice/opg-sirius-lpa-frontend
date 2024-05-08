@@ -80,7 +80,7 @@ func TestSearchUsersTooShort(t *testing.T) {
 	expectedErr := ValidationError{
 		Detail: "Search term must be at least three characters",
 		Field: FieldErrors{
-			"term": {"reason": "Search term must be at least three characters"},
+			"search": {"reason": "Search term must be at least three characters"},
 		},
 	}
 

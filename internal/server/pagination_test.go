@@ -95,9 +95,9 @@ func TestPagination(t *testing.T) {
 				CurrentPage: tc.CurrentPage,
 				TotalPages:  tc.TotalPages,
 				PageSize:    tc.PageSize,
-			}, "term=bob", "")
+			}, "search=bob", "")
 
-			assert.Equal("?term=bob", pagination.SearchTerm)
+			assert.Equal("?search=bob", pagination.SearchTerm)
 			assert.Equal(tc.Start, pagination.Start())
 			assert.Equal(tc.End, pagination.End())
 			assert.Equal(tc.HasPrevious, pagination.HasPrevious())
@@ -134,7 +134,7 @@ func TestPaginationPagesWhenOverflow(t *testing.T) {
 				CurrentPage: current,
 				TotalPages:  10,
 				PageSize:    25,
-			}, "term=bob", "")
+			}, "search=bob", "")
 
 			assert.Equal(t, pages, pagination.Pages())
 		})
@@ -144,8 +144,8 @@ func TestPaginationPagesWhenOverflow(t *testing.T) {
 func TestPaginationWithFilters(t *testing.T) {
 	assert := assert.New(t)
 
-	pagination := newPagination(&sirius.Pagination{}, "term=bob", "person-type=Donor&person-type=Trust+Corporation")
+	pagination := newPagination(&sirius.Pagination{}, "search=bob", "person-type=Donor&person-type=Trust+Corporation")
 
-	assert.Equal("?term=bob", pagination.SearchTerm)
+	assert.Equal("?search=bob", pagination.SearchTerm)
 	assert.Equal("&person-type=Donor&person-type=Trust+Corporation", pagination.Filters)
 }
