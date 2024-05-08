@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"sync"
 	"time"
 )
 
@@ -9,17 +10,26 @@ type cacheItem struct {
 	value []RefDataItem
 }
 
+var mutex = &sync.RWMutex{}
+
 var cache map[string]cacheItem
 
 func getCached(category string) ([]RefDataItem, bool) {
 	var v []RefDataItem
+	found := false
+
 	oneHourAgo := time.Now().Add(-1 * time.Hour)
 
+	mutex.RLock()
+
 	if cache[category].time.After(oneHourAgo) && len(cache[category].value) > 0 {
-		return cache[category].value, true
+		v = cache[category].value
+		found = true
 	}
 
-	return v, false
+	mutex.RUnlock()
+
+	return v, found
 }
 
 func setCached(category string, value []RefDataItem) {
@@ -27,8 +37,12 @@ func setCached(category string, value []RefDataItem) {
 		cache = map[string]cacheItem{}
 	}
 
+	mutex.Lock()
+
 	cache[category] = cacheItem{
 		time:  time.Now(),
 		value: value,
 	}
+
+	mutex.Unlock()
 }
