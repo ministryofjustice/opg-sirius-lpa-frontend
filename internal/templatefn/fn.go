@@ -214,6 +214,8 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			switch s {
 			case "FEES":
 				return "Fees"
+			case "DONOR_ID":
+				return "Donor identity confirmation"
 			case "":
 				return "Not specified"
 			default:
@@ -227,7 +229,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "In progress"
 			case "COMPLETE":
 				return "Complete"
-			case "NOT_STARTED":
+			case "CANNOT_START":
 				return "Not started"
 			case "":
 				return "Not specified"
