@@ -274,9 +274,8 @@ describe("View a digital LPA", () => {
         body: {
           digitalLpaUid: "M-DIGI-LPA3-3333",
           progressIndicators: [
-            { indicator: "FEES", status: "CANNOT_START" },
-            { indicator: "FEES", status: "COMPLETE" },
             { indicator: "FEES", status: "IN_PROGRESS" },
+            { indicator: "DONOR_ID", status: "CANNOT_START" },
           ],
         },
       },
@@ -290,11 +289,7 @@ describe("View a digital LPA", () => {
         body: {
           digitalLpaUid: "M-DIGI-LPA3-3334",
           progressIndicators: [
-            { indicator: "FEES", status: "CANNOT_START" },
             { indicator: "FEES", status: "COMPLETE" },
-            { indicator: "FEES", status: "IN_PROGRESS" },
-            { indicator: "DONOR_ID", status: "CANNOT_START" },
-            { indicator: "DONOR_ID", status: "COMPLETE" },
             { indicator: "DONOR_ID", status: "IN_PROGRESS" },
           ],
         },
