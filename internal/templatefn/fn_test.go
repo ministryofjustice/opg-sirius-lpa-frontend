@@ -101,9 +101,10 @@ func TestLanguageForFormat(t *testing.T) {
 
 func TestProgressIndicatorContext(t *testing.T) {
 	expectations := map[string]string{
-		"FEES": "Fees",
-		"":     "Not specified",
-		"foo":  "indicator NOT RECOGNISED: foo",
+		"FEES":     "Fees",
+		"DONOR_ID": "Donor identity confirmation",
+		"":         "Not specified",
+		"foo":      "indicator NOT RECOGNISED: foo",
 	}
 
 	testStringMapper(t, "progressIndicatorContext", expectations)
@@ -111,11 +112,11 @@ func TestProgressIndicatorContext(t *testing.T) {
 
 func TestProgressIndicatorStatus(t *testing.T) {
 	expectations := map[string]string{
-		"IN_PROGRESS": "In progress",
-		"NOT_STARTED": "Not started",
-		"COMPLETE": "Complete",
-		"":     "Not specified",
-		"foo":  "status NOT RECOGNISED: foo",
+		"IN_PROGRESS":  "In progress",
+		"CANNOT_START": "Not started",
+		"COMPLETE":     "Complete",
+		"":             "Not specified",
+		"foo":          "status NOT RECOGNISED: foo",
 	}
 
 	testStringMapper(t, "progressIndicatorStatus", expectations)
