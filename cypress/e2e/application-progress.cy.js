@@ -70,9 +70,12 @@ describe("View the application progress for a digital LPA", () => {
       body: {
         digitalLpaUid: uid,
         progressIndicators: [
-          { indicator: "FEES", status: "NOT_STARTED" },
+          { indicator: "FEES", status: "CANNOT_START" },
           { indicator: "FEES", status: "COMPLETE" },
           { indicator: "FEES", status: "IN_PROGRESS" },
+          { indicator: "DONOR_ID", status: "CANNOT_START" },
+          { indicator: "DONOR_ID", status: "COMPLETE" },
+          { indicator: "DONOR_ID", status: "IN_PROGRESS" },
         ],
       },
     });
@@ -93,6 +96,18 @@ describe("View the application progress for a digital LPA", () => {
         Cypress.$(elts[2]).find("svg[data-progress-indicator=in-progress]")
           .length,
       ).to.equal(1);
+      cy.get(".app-progress-indicator-summary").then((elts) => {
+        expect(
+            Cypress.$(elts[3]).find("svg[data-progress-indicator=not-started]")
+                .length,
+        ).to.equal(1);
+        expect(
+            Cypress.$(elts[4]).find("svg[data-progress-indicator=complete]").length,
+        ).to.equal(1);
+        expect(
+            Cypress.$(elts[5]).find("svg[data-progress-indicator=in-progress]")
+                .length,
+        ).to.equal(1);
     });
   });
 });
