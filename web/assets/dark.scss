@@ -91,6 +91,12 @@ $sirius-bg-color: #29292e;
     color: govuk-colour("white");
   }
 
+  .govuk-input,
+  .govuk-textarea,
+  .govuk-select {
+    border-color: govuk-colour("white");
+  }
+
   .moj-pagination__link::before,
   .moj-pagination__link::after {
     filter: invert(100%);
