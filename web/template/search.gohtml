@@ -54,7 +54,9 @@
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell govuk-link--no-visited-state table-cell-nowrap">
                                     {{ range $case := .Cases }}
-                                        {{ if eq (ToLower $r.PersonType) "donor" }}
+                                        {{ if eq $case.CaseType "DIGITAL_LPA" }}
+                                            <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/lpa/%d" $case.UID) }}">{{ $case.UID }}</a><br>
+                                        {{ else if eq (ToLower $r.PersonType) "donor" }}
                                             <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" $r.ID $case.ID) }}">{{ $case.UID }}</a><br>
                                         {{ else if eq (ToLower $r.PersonType) "client" }}
                                             <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/supervision#/clients/%d?order=%d" $r.ID $case.ID) }}">{{ $case.UID }}</a><br>
