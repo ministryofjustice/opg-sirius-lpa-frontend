@@ -54,7 +54,9 @@
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell govuk-link--no-visited-state table-cell-nowrap">
                                     {{ range $case := .Cases }}
-                                        {{ if eq (ToLower $r.PersonType) "donor" }}
+                                        {{ if eq $case.CaseType "DIGITAL_LPA" }}
+                                            <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/frontend/lpa/%s" $case.UID) }}">{{ $case.UID }}</a><br>
+                                        {{ else if eq (ToLower $r.PersonType) "donor" }}
                                             <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" $r.ID $case.ID) }}">{{ $case.UID }}</a><br>
                                         {{ else if eq (ToLower $r.PersonType) "client" }}
                                             <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/supervision#/clients/%d?order=%d" $r.ID $case.ID) }}">{{ $case.UID }}</a><br>
@@ -68,7 +70,11 @@
                                 </td>
                                 <td class="govuk-table__cell">
                                     <strong>
-                                        {{ if or (eq (ToLower .PersonType) "client") (eq (ToLower .PersonType) "deputy") }}
+                                        {{ if and (gt (len .Cases) 0) (eq (index .Cases 0).CaseType "DIGITAL_LPA") }}
+                                            <a class="govuk-link govuk-link--no-underline govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/frontend/lpa/%s" (index .Cases 0).UID) }}">
+                                                {{ printf "%s %s %s" .Salutation .Firstname .Surname }}
+                                            </a><br>{{ .PersonType }}
+                                        {{ else if or (eq (ToLower .PersonType) "client") (eq (ToLower .PersonType) "deputy") }}
                                             <a class="govuk-link govuk-link--no-underline govuk-link--no-visited-state" href="{{ sirius (printf "/supervision#/clients/%d" .ID) }}">
                                                 {{ printf "%s %s %s" .Salutation .Firstname .Surname }}
                                             </a><br>{{ .PersonType }}
