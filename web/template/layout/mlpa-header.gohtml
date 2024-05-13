@@ -45,11 +45,6 @@
                         LPA details
                     </a>
                 </li>
-                <li class="govuk-tabs__list-item {{ if eq .TabName "issues" }}govuk-tabs__list-item--selected{{ end }}">
-                    <a class="govuk-tabs__tab"  href="#issues">
-                        Issues
-                    </a>
-                </li>
                 <li class="govuk-tabs__list-item {{ if eq .TabName "fees" }}govuk-tabs__list-item--selected{{ end }}">
                     <a class="govuk-tabs__tab" href="{{ prefix (printf "/lpa/%s/payments" .CaseSummary.DigitalLpa.UID) }}">
                         Fees
