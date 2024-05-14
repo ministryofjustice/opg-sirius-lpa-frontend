@@ -54,6 +54,24 @@ describe("Search", () => {
               ],
             },
             {
+              id: 46,
+              uId: "7000-0000-7777",
+              personType: "Donor",
+              firstname: "Bob",
+              surname: "McGee",
+              dob: "25/08/1980",
+              addressLine1: "42 Place Road",
+              cases: [
+                {
+                  id: 32,
+                  uId: "M-ABCD-0000-1234",
+                  caseType: "DIGITAL_LPA",
+                  caseSubtype: "personal-welfare",
+                  status: "Draft",
+                },
+              ],
+            },
+            {
               id: 65,
               uId: "7000-6509-8813",
               personType: "Deputy",
@@ -119,6 +137,9 @@ describe("Search", () => {
       cy.contains("7000-5382-8764")
         .should("have.attr", "href")
         .should("contain", "/person/36/24");
+      cy.contains("M-ABCD-0000-1234")
+        .should("have.attr", "href")
+        .should("contain", "/lpa/frontend/lpa/M-ABCD-0000-1234");
     });
 
     it("finds a deputy", () => {
