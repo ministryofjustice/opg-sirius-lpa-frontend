@@ -182,9 +182,7 @@ $sirius-bg-color: #29292e;
   }
 
   .govuk-inset-text,
-  .govuk-inset-text *,
-  .govuk-warning-text,
-  .govuk-warning-text * {
+  .govuk-warning-text .govuk-warning-text__text {
     color: govuk-colour("white") !important;
   }
 }
