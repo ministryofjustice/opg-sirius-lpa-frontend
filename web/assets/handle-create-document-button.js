@@ -14,6 +14,10 @@ const handleCreateDocumentButton = () => {
     '[data-module="recipient-checkbox"]',
   );
 
+  if (createDocumentButton !== null) {
+    createDocumentButton.setAttribute("disabled", "");
+  }
+
   if (createDocumentButton && checkboxes && checkboxes.length > 0) {
     checkboxes.forEach((el, i) => {
       el.addEventListener("change", (event) => {
@@ -23,7 +27,7 @@ const handleCreateDocumentButton = () => {
         if (isOneRecipientSelected) {
           createDocumentButton.removeAttribute("disabled");
         } else {
-          createDocumentButton.setAttribute("disabled", "true");
+          createDocumentButton.setAttribute("disabled", "");
         }
       });
     });
