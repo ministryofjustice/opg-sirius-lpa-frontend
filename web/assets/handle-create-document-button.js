@@ -14,7 +14,9 @@ const handleCreateDocumentButton = () => {
     '[data-module="recipient-checkbox"]',
   );
 
-  createDocumentButton.setAttribute("disabled", "");
+  if (createDocumentButton !== null) {
+    createDocumentButton.setAttribute("disabled", "");
+  }
 
   if (createDocumentButton && checkboxes && checkboxes.length > 0) {
     checkboxes.forEach((el, i) => {
