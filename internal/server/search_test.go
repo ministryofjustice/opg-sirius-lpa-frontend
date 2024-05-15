@@ -61,11 +61,11 @@ func TestGetSearch(t *testing.T) {
 			Aggregations: expectedResponse.Aggregations,
 			Filters:      searchFilters{},
 			SearchTerm:   "bob",
-			Pagination:   newPagination(expectedPagination, "term=bob", ""),
+			Pagination:   newPagination(expectedPagination, "search=bob", ""),
 		}).
 		Return(nil)
 
-	req, _ := http.NewRequest(http.MethodGet, "/search?term=bob", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/search?search=bob", nil)
 	w := httptest.NewRecorder()
 
 	err := Search(client, template.Func)(w, req)
@@ -114,13 +114,13 @@ func TestGetSearchFiltered(t *testing.T) {
 			SearchTerm:   "bob",
 			Pagination: newPagination(
 				expectedPagination,
-				"term=bob",
+				"search=bob",
 				"person-type=Donor&person-type=Attorney",
 			),
 		}).
 		Return(nil)
 
-	req, _ := http.NewRequest(http.MethodGet, "/search?term=bob&person-type=Donor&person-type=Attorney", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/search?search=bob&person-type=Donor&person-type=Attorney", nil)
 	w := httptest.NewRecorder()
 
 	err := Search(client, template.Func)(w, req)
@@ -168,11 +168,11 @@ func TestGetSearchPaginationCalculations(t *testing.T) {
 			Aggregations: expectedResponse.Aggregations,
 			Filters:      searchFilters{},
 			SearchTerm:   "bob",
-			Pagination:   newPagination(expectedPagination, "term=bob", ""),
+			Pagination:   newPagination(expectedPagination, "search=bob", ""),
 		}).
 		Return(nil)
 
-	req, _ := http.NewRequest(http.MethodGet, "/search?term=bob&page=2", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/search?search=bob&page=2", nil)
 	w := httptest.NewRecorder()
 
 	err := Search(client, template.Func)(w, req)
@@ -222,12 +222,12 @@ func TestGetSearchCallsDeletedCasesOnFallback(t *testing.T) {
 			Aggregations: expectedResponse.Aggregations,
 			Filters:      searchFilters{},
 			SearchTerm:   "7000-0000-5678",
-			Pagination:   newPagination(expectedPagination, "term=7000-0000-5678", ""),
+			Pagination:   newPagination(expectedPagination, "search=7000-0000-5678", ""),
 			DeletedCases: expectedDeletedCases,
 		}).
 		Return(nil)
 
-	req, _ := http.NewRequest(http.MethodGet, "/search?term=7000-0000-5678", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/search?search=7000-0000-5678", nil)
 	w := httptest.NewRecorder()
 
 	err := Search(client, template.Func)(w, req)
@@ -258,7 +258,7 @@ func TestGetSearchGetDeletedCasesFailure(t *testing.T) {
 		On("DeletedCases", mock.Anything, "700000005678").
 		Return([]sirius.DeletedCase{}, expectedError)
 
-	req, _ := http.NewRequest(http.MethodGet, "/search?term=7000-0000-5678", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/search?search=7000-0000-5678", nil)
 	w := httptest.NewRecorder()
 
 	err := Search(client, nil)(w, req)
@@ -269,7 +269,7 @@ func TestGetSearchGetDeletedCasesFailure(t *testing.T) {
 
 func TestGetSearchBadQuery(t *testing.T) {
 	testCases := map[string]string{
-		"no-search-term": "/search?term=",
+		"no-search-term": "/search?search=",
 		"bad-query":      "/search?abc=hello",
 	}
 
@@ -293,7 +293,7 @@ func TestGetSearchErrors(t *testing.T) {
 		On("Search", mock.Anything, "bob", 1, filters).
 		Return(sirius.SearchResponse{}, &sirius.Pagination{}, expectedError)
 
-	req, _ := http.NewRequest(http.MethodGet, "/search?term=bob", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/search?search=bob", nil)
 	w := httptest.NewRecorder()
 
 	err := Search(client, nil)(w, req)
@@ -333,11 +333,11 @@ func TestGetSearchTemplateErrors(t *testing.T) {
 			Aggregations: expectedResponse.Aggregations,
 			Filters:      searchFilters{},
 			SearchTerm:   "bob",
-			Pagination:   newPagination(expectedPagination, "term=bob", ""),
+			Pagination:   newPagination(expectedPagination, "search=bob", ""),
 		}).
 		Return(expectedError)
 
-	req, _ := http.NewRequest(http.MethodGet, "/search?term=bob", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/search?search=bob", nil)
 	w := httptest.NewRecorder()
 
 	err := Search(client, template.Func)(w, req)
