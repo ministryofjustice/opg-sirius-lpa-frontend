@@ -6,7 +6,7 @@ export default function donorDropDownMenu() {
     new MOJFrontend.ButtonMenu({
       container: $container,
       mq: "(min-width: 200em)",
-      buttonText: "Donor record actions",
+      buttonText: "Update donor's record",
       buttonClasses:
         "govuk-button--secondary moj-button-menu__toggle-button--secondary",
     });
