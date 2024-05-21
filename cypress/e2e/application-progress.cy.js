@@ -77,7 +77,10 @@ describe("View the application progress for a digital LPA", () => {
           { indicator: "DONOR_ID", status: "COMPLETE" },
           { indicator: "DONOR_ID", status: "IN_PROGRESS" },
           { indicator: "CERTIFICATE_PROVIDER_ID", status: "CANNOT_START" },
-          { indicator: "CERTIFICATE_PROVIDER_SIGNATURE", status: "CANNOT_START" },
+          {
+            indicator: "CERTIFICATE_PROVIDER_SIGNATURE",
+            status: "CANNOT_START",
+          },
           { indicator: "ATTORNEY_SIGNATURES", status: "CANNOT_START" },
           { indicator: "PREREGISTRATION_NOTICES", status: "CANNOT_START" },
           { indicator: "REGISTRATION_NOTICES", status: "CANNOT_START" },
@@ -113,24 +116,24 @@ describe("View the application progress for a digital LPA", () => {
           .length,
       ).to.equal(1);
       expect(
-          Cypress.$(elts[6]).find("svg[data-progress-indicator=not-started]")
-              .length,
+        Cypress.$(elts[6]).find("svg[data-progress-indicator=not-started]")
+          .length,
       ).to.equal(1);
       expect(
-          Cypress.$(elts[7]).find("svg[data-progress-indicator=not-started]")
-              .length,
+        Cypress.$(elts[7]).find("svg[data-progress-indicator=not-started]")
+          .length,
       ).to.equal(1);
       expect(
-          Cypress.$(elts[8]).find("svg[data-progress-indicator=not-started]")
-              .length,
+        Cypress.$(elts[8]).find("svg[data-progress-indicator=not-started]")
+          .length,
       ).to.equal(1);
       expect(
-          Cypress.$(elts[9]).find("svg[data-progress-indicator=not-started]")
-              .length,
+        Cypress.$(elts[9]).find("svg[data-progress-indicator=not-started]")
+          .length,
       ).to.equal(1);
       expect(
-          Cypress.$(elts[10]).find("svg[data-progress-indicator=not-started]")
-              .length,
+        Cypress.$(elts[10]).find("svg[data-progress-indicator=not-started]")
+          .length,
       ).to.equal(1);
     });
   });
