@@ -276,6 +276,14 @@ describe("View a digital LPA", () => {
           progressIndicators: [
             { indicator: "FEES", status: "IN_PROGRESS" },
             { indicator: "DONOR_ID", status: "CANNOT_START" },
+            { indicator: "CERTIFICATE_PROVIDER_ID", status: "CANNOT_START" },
+            {
+              indicator: "CERTIFICATE_PROVIDER_SIGNATURE",
+              status: "CANNOT_START",
+            },
+            { indicator: "ATTORNEY_SIGNATURES", status: "CANNOT_START" },
+            { indicator: "PREREGISTRATION_NOTICES", status: "CANNOT_START" },
+            { indicator: "REGISTRATION_NOTICES", status: "CANNOT_START" },
           ],
         },
       },
@@ -291,6 +299,14 @@ describe("View a digital LPA", () => {
           progressIndicators: [
             { indicator: "FEES", status: "COMPLETE" },
             { indicator: "DONOR_ID", status: "IN_PROGRESS" },
+            { indicator: "CERTIFICATE_PROVIDER_ID", status: "CANNOT_START" },
+            {
+              indicator: "CERTIFICATE_PROVIDER_SIGNATURE",
+              status: "CANNOT_START",
+            },
+            { indicator: "ATTORNEY_SIGNATURES", status: "CANNOT_START" },
+            { indicator: "PREREGISTRATION_NOTICES", status: "CANNOT_START" },
+            { indicator: "REGISTRATION_NOTICES", status: "CANNOT_START" },
           ],
         },
       },
