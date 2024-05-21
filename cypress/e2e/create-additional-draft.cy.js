@@ -133,4 +133,12 @@ describe("Create Additional Digital LPA draft", () => {
     );
     cy.contains("M-0202-WXYZ-0202");
   });
+
+  it("returns to donor's first LPA when cancelled", () => {
+    cy.get("button:contains('Confirm and create draft LPA') + a").should(
+      (elts) => {
+        expect(elts[0].getAttribute("href")).to.equal("/lpa/M-ABCD-0000-1234");
+      },
+    );
+  });
 });
