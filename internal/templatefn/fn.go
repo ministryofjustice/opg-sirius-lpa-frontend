@@ -216,6 +216,16 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "Fees"
 			case "DONOR_ID":
 				return "Donor identity confirmation"
+			case "CERTIFICATE_PROVIDER_ID":
+				return "Certificate provider identity confirmation"
+			case "CERTIFICATE_PROVIDER_SIGNATURE":
+				return "Certificate provider certificate"
+			case "ATTORNEY_SIGNATURES":
+				return "Attorney signatures"
+			case "PREREGISTRATION_NOTICES":
+				return "Pre-registration notices"
+			case "REGISTRATION_NOTICES":
+				return "Registration notices"
 			case "":
 				return "Not specified"
 			default:
