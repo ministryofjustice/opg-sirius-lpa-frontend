@@ -66,7 +66,7 @@
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Assign Task</button>
-          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+          <a href="{{ prefix (printf "/lpa/%s" .Uid )}}" data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
         </div>
       </form>
     </div>

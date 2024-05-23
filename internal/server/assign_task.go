@@ -23,6 +23,7 @@ type AssignTaskClient interface {
 type assignTaskData struct {
 	XSRFToken string
 	Entities  []string
+	Uid       string
 	Success   bool
 	Error     sirius.ValidationError
 
@@ -80,6 +81,8 @@ func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 				if lpa == nil && len(task.CaseItems) > 0 {
 					lpa = &task.CaseItems[0]
 				}
+
+				data.Uid = lpa.UID
 
 				tasksMu.Lock()
 				data.Entities = append(data.Entities, task.Summary())

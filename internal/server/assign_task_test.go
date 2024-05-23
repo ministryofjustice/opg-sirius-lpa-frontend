@@ -52,6 +52,7 @@ func TestGetAssignTask(t *testing.T) {
 		On("Func", mock.Anything, assignTaskData{
 			Teams:    []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entities: []string{"LPA 7000-0000-0000: A task"},
+			Uid:      "7000-0000-0000",
 		}).
 		Return(nil)
 
@@ -196,6 +197,7 @@ func TestPostAssignTask(t *testing.T) {
 			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			AssigneeUserName: "System user",
 			Entities:         []string{"LPA 7000-0000-0000: A task"},
+			Uid:              "7000-0000-0000",
 		}).
 		Return(nil)
 
@@ -240,6 +242,7 @@ func TestPostAssignTaskToMe(t *testing.T) {
 			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			AssigneeUserName: "Me",
 			Entities:         []string{"LPA 7000-0000-0000: A task"},
+			Uid:              "7000-0000-0000",
 		}).
 		Return(nil)
 
@@ -281,6 +284,7 @@ func TestPostAssignTaskWhenUserDetailsErrors(t *testing.T) {
 			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			AssigneeUserName: "Me",
 			Entities:         []string{"LPA 7000-0000-0000: A task"},
+			Uid:              "7000-0000-0000",
 		}).
 		Return(nil)
 
@@ -393,6 +397,7 @@ func TestPostAssignTaskWhenAssignToNotSet(t *testing.T) {
 		On("Func", mock.Anything, assignTaskData{
 			Teams:    []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entities: []string{"LPA 7000-0000-0000: A task"},
+			Uid:      "7000-0000-0000",
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{
 					"assignTo": {"": "Assignee not set"},
@@ -461,6 +466,7 @@ func TestPostAssignTaskWhenValidationError(t *testing.T) {
 					Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 					Entities:         []string{"LPA 7000-0000-0000: A task"},
 					Error:            sirius.ValidationError{Field: expectedErrors},
+					Uid:              "7000-0000-0000",
 					AssigneeUserName: tc.assigneeUserName,
 				}).
 				Return(nil)
