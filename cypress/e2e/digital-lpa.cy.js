@@ -289,6 +289,22 @@ describe("View a digital LPA", () => {
       },
     );
 
+    cy.addMock("/lpa-api/v1/tasks/1", "GET", {
+      status: 200,
+      body: {
+        caseItems: [
+          {
+            caseType: "DIGITAL_LPA",
+            uId: "M-DIGI-LPA3-3333",
+          },
+        ],
+        dueDate: "10/01/2022",
+        id: 1,
+        name: "Create physical case file",
+        status: "Not Started",
+      },
+    });
+
     cy.addMock(
       `/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3334/progress-indicators`,
       "GET",
@@ -454,5 +470,17 @@ describe("View a digital LPA", () => {
     cy.contains("LPA details").click();
     cy.contains("Application format");
     cy.contains("Paper");
+  });
+
+  it("can cancel reassign task", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+
+    cy.contains("Reassign task").click();
+    cy.url().should("include", "/assign-task?id=1");
+    cy.contains("Assign Task");
+
+    cy.contains("Cancel").click();
+    cy.url().should("include", "/lpa/M-DIGI-LPA3-3333");
+    cy.contains("Case summary");
   });
 });
