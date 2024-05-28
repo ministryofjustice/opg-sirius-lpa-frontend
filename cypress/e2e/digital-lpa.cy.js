@@ -465,10 +465,10 @@ describe("View a digital LPA", () => {
     cy.contains("Correspondent");
   });
 
-  it.only("shows channel for donor", () => {
+  it("shows channel for donor", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details").then(() => {
       Cypress.$("span:contains('Donor')").closest("button")[0].click();
-      cy.contains("online");
+      cy.contains("Online");
     });
   });
 
