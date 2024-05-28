@@ -168,9 +168,9 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Format</dt>
                 <dd class="govuk-summary-list__value">
-                  <strong>TODO - Donor/Format[channel] - NOT IN LPA STORE</strong>
+                  {{ channelForFormat .DigitalLpa.LpaStoreData.Channel }}
                   {{ if not (eq .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference "") }}
-                    <br><strong>{{ languageForFormat .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference }}</strong>
+                    <br>{{ languageForFormat .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference }}
                   {{ end }}
                 </dd>
               </div>

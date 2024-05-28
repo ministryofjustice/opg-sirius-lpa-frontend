@@ -81,6 +81,7 @@ describe("View a digital LPA", () => {
             },
           ],
           lpaType: "pf",
+          channel: "online",
           registrationDate: "2022-12-18",
           peopleToNotify: [],
         },
@@ -462,6 +463,13 @@ describe("View a digital LPA", () => {
     cy.contains("Replacement attorneys (1)");
     cy.contains("Notified people (0)");
     cy.contains("Correspondent");
+  });
+
+  it.only("shows channel for donor", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details").then(() => {
+      Cypress.$("span:contains('Donor')").closest("button")[0].click();
+      cy.contains("online");
+    });
   });
 
   it("shows application details when status is Draft", () => {
