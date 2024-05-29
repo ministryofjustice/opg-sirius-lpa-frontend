@@ -491,4 +491,31 @@ describe("View a digital LPA", () => {
     cy.url().should("include", "/lpa/M-DIGI-LPA3-3333");
     cy.contains("Case summary");
   });
+
+  it("can cancel creating a warning", () => {
+    cy.addMock("/lpa-api/v1/persons/33/cases", "GET", {
+      status: 200,
+      body: {
+        cases: [
+          {
+            caseSubtype: "property-and-affairs",
+            id: 333,
+            uId: "M-DIGI-LPA3-3333",
+            status: "Processing",
+          }
+        ],
+      },
+    });
+
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+    cy.contains("Case actions").click();
+    cy.contains("Create a warning").click();
+
+    cy.url().should("include", "/create-warning?id=33");
+    cy.contains("Create Warning");
+    cy.contains("Cancel").click();
+
+    cy.url().should("include", "/lpa/M-DIGI-LPA3-3333");
+    cy.contains("Case summary");
+  });
 });
