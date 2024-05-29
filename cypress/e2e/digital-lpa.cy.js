@@ -494,7 +494,7 @@ describe("View a digital LPA", () => {
             id: 333,
             uId: "M-DIGI-LPA3-3333",
             status: "Processing",
-          }
+          },
         ],
       },
     });
