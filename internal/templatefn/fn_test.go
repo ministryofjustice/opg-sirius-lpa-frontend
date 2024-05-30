@@ -102,6 +102,7 @@ func TestLanguageForFormat(t *testing.T) {
 func TestProgressIndicatorContext(t *testing.T) {
 	expectations := map[string]string{
 		"FEES":                           "Fees",
+		"DONOR":                          "Donor section",
 		"DONOR_ID":                       "Donor identity confirmation",
 		"CERTIFICATE_PROVIDER_ID":        "Certificate provider identity confirmation",
 		"CERTIFICATE_PROVIDER_SIGNATURE": "Certificate provider certificate",
