@@ -214,6 +214,8 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			switch s {
 			case "FEES":
 				return "Fees"
+			case "DONOR":
+				return "Donor section"
 			case "DONOR_ID":
 				return "Donor identity confirmation"
 			case "CERTIFICATE_PROVIDER_ID":
