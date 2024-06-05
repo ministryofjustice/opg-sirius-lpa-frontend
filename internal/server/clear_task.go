@@ -30,7 +30,9 @@ func ClearTask(client ClearTaskClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		var lpa *sirius.Case
 		var taskIDs []int
+
 		for _, id := range r.Form["id"] {
 			taskID, err := strconv.Atoi(id)
 			if err != nil {
@@ -38,63 +40,49 @@ func ClearTask(client ClearTaskClient, tmpl template.Template) Handler {
 			}
 			taskIDs = append(taskIDs, taskID)
 		}
-
 		if len(taskIDs) == 0 {
 			return errors.New("no tasks selected")
 		}
 
 		ctx := getContext(r)
-		data := clearTaskData{XSRFToken: ctx.XSRFToken}
-
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
-		var lpa *sirius.Case
+		data := clearTaskData{XSRFToken: ctx.XSRFToken}
+		taskID, err := strconv.Atoi(r.FormValue("id"))
 
-		for _, taskID := range taskIDs {
-			taskID := taskID
+		group.Go(func() error {
+			task, err := client.Task(ctx.With(groupCtx), taskID)
+			if err != nil {
+				return err
+			}
 
-			group.Go(func() error {
-				task, err := client.Task(ctx.With(groupCtx), taskID)
-				if err != nil {
-					return err
-				}
+			if lpa == nil && len(task.CaseItems) > 0 {
+				lpa = &task.CaseItems[0]
+			}
 
-				if lpa == nil && len(task.CaseItems) > 0 {
-					lpa = &task.CaseItems[0]
-				}
+			data.Uid = lpa.UID
+			data.Task = task
 
-				data.Uid = lpa.UID
-				data.Task = task
-
-				return nil
-			})
-		}
+			return nil
+		})
 
 		if err := group.Wait(); err != nil {
 			return err
 		}
 
 		if r.Method == http.MethodPost {
-
-			taskID, err := strconv.Atoi(r.FormValue("id"))
-
 			err = client.ClearTask(ctx, taskID)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
-
 			} else if err != nil {
 				return err
-			} else if lpa != nil && lpa.CaseType == "DIGITAL_LPA" {
-				// redirect
-				SetFlash(w, FlashNotification{
-					Title: "Task completed",
-				})
-				return RedirectError(fmt.Sprintf("/lpa/%s", lpa.UID))
-			} else {
-				data.Success = true
 			}
+
+			data.Success = true
+			SetFlash(w, FlashNotification{Title: "Task completed"})
+			return RedirectError(fmt.Sprintf("/lpa/%s", lpa.UID))
 		}
 
 		return tmpl(w, data)

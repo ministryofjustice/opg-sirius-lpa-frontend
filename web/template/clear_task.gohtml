@@ -4,7 +4,7 @@
 
 {{ define "main" }}
     <div class="govuk-grid-row">
-        <p class="govuk-grid-column-two-thirds">
+        <div class="govuk-grid-column-two-thirds">
             <p class="govuk-body">
                 {{ range .Entities }}
                     <strong>{{ . }}</strong>
@@ -19,12 +19,12 @@
                 {{ template "success-banner" "You have successfully cleared a task." }}
             {{ end }}
 
-            <h1 class="govuk-heading-l app-!-embedded-hide">Clear Task</h1>
+            <h1 class="govuk-heading-l">Clear Task</h1>
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-                <div>
+                <div class="govuk-body">
                     <strong>Task:</strong> {{ .Task.Name }}
                 </div>
 
