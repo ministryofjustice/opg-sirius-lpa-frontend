@@ -5,12 +5,6 @@
 {{ define "main" }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <p class="govuk-body">
-                {{ range .Entities }}
-                    <strong>{{ . }}</strong>
-                    <br />
-                {{ end }}
-            </p>
 
             {{ template "error-summary" .Error }}
 
@@ -27,7 +21,6 @@
                 <div class="govuk-body">
                     <strong>Task:</strong> {{ .Task.Name }}
                 </div>
-
 
                 <div class="govuk-button-group">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Save and clear task</button>

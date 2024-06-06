@@ -49,6 +49,9 @@ func ClearTask(client ClearTaskClient, tmpl template.Template) Handler {
 
 		data := clearTaskData{XSRFToken: ctx.XSRFToken}
 		taskID, err := strconv.Atoi(r.FormValue("id"))
+		if err != nil {
+			return err
+		}
 
 		group.Go(func() error {
 			task, err := client.Task(ctx.With(groupCtx), taskID)
