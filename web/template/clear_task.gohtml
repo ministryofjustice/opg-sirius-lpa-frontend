@@ -1,0 +1,39 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Clear Task{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <p class="govuk-body">
+                {{ range .Entities }}
+                    <strong>{{ . }}</strong>
+                    <br />
+                {{ end }}
+            </p>
+
+            {{ template "error-summary" .Error }}
+
+            {{ if .Success }}
+                <meta data-app-reload="page" />
+                {{ template "success-banner" "You have successfully cleared a task." }}
+            {{ end }}
+
+            <h1 class="govuk-heading-l">Clear Task</h1>
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+                <div class="govuk-body">
+                    <strong>Task:</strong> {{ .Task.Name }}
+                </div>
+
+
+                <div class="govuk-button-group">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Save and clear task</button>
+                    <a href="{{ prefix (printf "/lpa/%s" .Uid )}}" data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{{ end }}
