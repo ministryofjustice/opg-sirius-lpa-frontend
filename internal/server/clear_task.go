@@ -49,6 +49,9 @@ func ClearTask(client ClearTaskClient, tmpl template.Template) Handler {
 
 		data := clearTaskData{XSRFToken: ctx.XSRFToken}
 		taskID, err := strconv.Atoi(r.FormValue("id"))
+		if err != nil {
+			return err
+		}
 
 		group.Go(func() error {
 			task, err := client.Task(ctx.With(groupCtx), taskID)
@@ -78,11 +81,12 @@ func ClearTask(client ClearTaskClient, tmpl template.Template) Handler {
 				data.Error = ve
 			} else if err != nil {
 				return err
+			} else if lpa != nil && lpa.CaseType == "DIGITAL_LPA" {
+				SetFlash(w, FlashNotification{Title: "Task completed"})
+				return RedirectError(fmt.Sprintf("/lpa/%s", lpa.UID))
+			} else {
+				data.Success = true
 			}
-
-			data.Success = true
-			SetFlash(w, FlashNotification{Title: "Task completed"})
-			return RedirectError(fmt.Sprintf("/lpa/%s", lpa.UID))
 		}
 
 		return tmpl(w, data)
