@@ -36,6 +36,30 @@ func TestClearTask(t *testing.T) {
 					})
 			},
 		},
+		{
+			name: "404",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("There is no tasks with the specified ID").
+					UponReceiving("A request to clear a non-existent task").
+					WithRequest(dsl.Request{
+						Method: http.MethodPut,
+						Path:   dsl.Like("/lpa-api/v1/tasks/990/mark-as-completed"),
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusNotFound,
+					})
+			},
+			expectedError: func(port int) error {
+				return StatusError{
+					Code:          404,
+					URL:           fmt.Sprintf("http://localhost:%d/lpa-api/v1/tasks/990/mark-as-completed", port),
+					Method:        "PUT",
+					CorrelationId: "",
+				}
+			},
+		},
 	}
 
 	for _, tc := range testCases {
