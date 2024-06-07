@@ -51,6 +51,7 @@ type Client interface {
 	AssignTaskClient
 	ApplyFeeReductionClient
 	ChangeStatusClient
+	ClearTaskClient
 	CreateDonorClient
 	CreateDocumentClient
 	CreateDraftClient
@@ -117,6 +118,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change_status.gohtml"))))
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate_cases.gohtml"))))
 	mux.Handle("/assign-task", wrap(AssignTask(client, templates.Get("assign_task.gohtml"))))
+	mux.Handle("/clear-task", wrap(ClearTask(client, templates.Get("clear_task.gohtml"))))
 	mux.Handle("/mi-reporting", wrap(MiReporting(client, templates.Get("mi_reporting.gohtml"))))
 	mux.Handle("/add-payment", wrap(AddPayment(client, templates.Get("add_payment.gohtml"))))
 	mux.Handle("/delete-payment", wrap(DeletePayment(client, templates.Get("delete_payment.gohtml"))))
