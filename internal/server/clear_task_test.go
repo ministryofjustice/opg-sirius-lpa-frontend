@@ -128,3 +128,64 @@ func TestClearTaskWhenTemplateErrors(t *testing.T) {
 	assert.Equal(t, expectedError, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
+
+func TestPostClearTaskWhenValidationErrors(t *testing.T) {
+	expectedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{"field": {"": "problem"}},
+	}
+
+	client := &mockClearTaskClient{}
+	client.
+		On("Task", mock.Anything, 33).
+		Return(sirius.Task{ID: 33, Name: "A task", CaseItems: []sirius.Case{{UID: "M-DIGI-0001-0001", CaseType: "DIGITAL_LPA"}}}, nil)
+	client.
+		On("ClearTask", mock.Anything, 33).
+		Return(expectedError)
+
+	template := &mockTemplate{}
+
+	template.On("Func", mock.Anything, clearTaskData{
+		Success: false,
+		Error:   expectedError,
+		Task:    sirius.Task{ID: 33, Name: "A task", CaseItems: []sirius.Case{{UID: "M-DIGI-0001-0001", CaseType: "DIGITAL_LPA"}}},
+		Uid:     "M-DIGI-0001-0001",
+	}).Return(nil)
+
+	form := url.Values{
+		"id": {"33"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/clear-task?id=33", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := ClearTask(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostClearTaskWhenOtherError(t *testing.T) {
+	client := &mockClearTaskClient{}
+	client.
+		On("Task", mock.Anything, 33).
+		Return(sirius.Task{ID: 33, Name: "A task", CaseItems: []sirius.Case{{UID: "M-DIGI-0001-0001", CaseType: "DIGITAL_LPA"}}}, nil)
+	client.
+		On("ClearTask", mock.Anything, 33).
+		Return(expectedError)
+
+	form := url.Values{
+		"id": {"33"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/clear-task?id=33", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := ClearTask(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
