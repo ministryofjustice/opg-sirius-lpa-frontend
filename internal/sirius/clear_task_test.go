@@ -25,7 +25,7 @@ func TestClearTask(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A donor with a task").
+					Given("I have a case with an open task assigned").
 					UponReceiving("A request to clear the task").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
