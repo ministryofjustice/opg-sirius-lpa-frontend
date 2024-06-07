@@ -1,7 +1,6 @@
 package sirius
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -20,14 +19,6 @@ func (c *Client) ClearTask(ctx Context, taskID int) error {
 		return err
 	}
 	defer resp.Body.Close() //#nosec G307 false positive
-
-	if resp.StatusCode == http.StatusBadRequest {
-		var v ValidationError
-		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
-			return err
-		}
-		return v
-	}
 
 	if resp.StatusCode != http.StatusOK {
 		return newStatusError(resp)
