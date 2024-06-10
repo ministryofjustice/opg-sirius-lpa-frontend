@@ -492,6 +492,18 @@ describe("View a digital LPA", () => {
     cy.contains("Case summary");
   });
 
+  it("can cancel clear task", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+
+    cy.contains("Clear task").click();
+    cy.url().should("include", "/clear-task?id=1");
+    cy.contains("Save and clear task");
+
+    cy.contains("Cancel").click();
+    cy.url().should("include", "/lpa/M-DIGI-LPA3-3333");
+    cy.contains("Case summary");
+  });
+
   it("can cancel creating a warning", () => {
     cy.addMock("/lpa-api/v1/persons/33/cases", "GET", {
       status: 200,
@@ -516,6 +528,24 @@ describe("View a digital LPA", () => {
     cy.contains("Cancel").click();
 
     cy.url().should("include", "/lpa/M-DIGI-LPA3-3333");
+    cy.contains("Case summary");
+  });
+
+  it("can clear a task", () => {
+    cy.addMock("/lpa-api/v1/tasks/1/mark-as-completed", "PUT", {
+      status: 200,
+    });
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+
+    cy.contains("Clear task").click();
+    cy.url().should("include", "/clear-task?id=1");
+    // cy.contains("Save and clear task").click();
+    cy.get("button[type=submit]").click();
+
+    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-banner").contains("Task completed");
+
+    cy.url().should("contain", "/lpa/M-DIGI-LPA3-3333");
     cy.contains("Case summary");
   });
 });
