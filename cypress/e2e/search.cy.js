@@ -107,7 +107,7 @@ describe("Search", () => {
         },
       });
 
-      cy.visit("/search?term=bob");
+      cy.visit("/search?search=bob");
 
       cy.contains("You searched for: bob");
       cy.contains("Showing 1 to 4 of 4 results");
@@ -153,7 +153,7 @@ describe("Search", () => {
 
   describe("Search features", () => {
     beforeEach(() => {
-      cy.visit("/search?term=abcdefg");
+      cy.visit("/search?search=abcdefg");
     });
 
     it("it shows/hides filter panel", () => {
@@ -188,7 +188,7 @@ describe("Search", () => {
         },
       });
 
-      cy.visit("/search?term=700000005555");
+      cy.visit("/search?search=700000005555");
     });
 
     it("finds a deleted case", () => {

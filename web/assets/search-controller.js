@@ -4,7 +4,7 @@ const searchController = () => {
   window.addEventListener("load", (event) => {
     if (window.location.pathname.includes("/search")) {
       let params = new URLSearchParams(window.location.search);
-      searchInput.value = params.get("term");
+      searchInput.value = params.get("search");
     }
   });
 };
