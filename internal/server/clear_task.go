@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
 )
@@ -45,7 +44,6 @@ func ClearTask(client ClearTaskClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		data := clearTaskData{XSRFToken: ctx.XSRFToken}
 		taskID, err := strconv.Atoi(r.FormValue("id"))
@@ -53,25 +51,17 @@ func ClearTask(client ClearTaskClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		group.Go(func() error {
-			task, err := client.Task(ctx.With(groupCtx), taskID)
-			if err != nil {
-				return err
-			}
-
-			if lpa == nil && len(task.CaseItems) > 0 {
-				lpa = &task.CaseItems[0]
-			}
-
-			data.Uid = lpa.UID
-			data.Task = task
-
-			return nil
-		})
-
-		if err := group.Wait(); err != nil {
+		task, err := client.Task(ctx, taskID)
+		if err != nil {
 			return err
 		}
+
+		if len(task.CaseItems) > 0 {
+			lpa = &task.CaseItems[0]
+		}
+
+		data.Uid = lpa.UID
+		data.Task = task
 
 		if r.Method == http.MethodPost {
 			err = client.ClearTask(ctx, taskID)
