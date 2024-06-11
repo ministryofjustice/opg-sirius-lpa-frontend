@@ -91,7 +91,10 @@
                                     </p>
                                 </td>
                                 <td class="govuk-table__cell govuk-!-width-one-quarter">
-                                    <p class="govuk-body-s govuk-!-margin-bottom-0">Clear task</p>
+                                    <a class="govuk-body-s govuk-!-margin-bottom-0 govuk-link" href="{{ prefix (printf "/clear-task?id=%d" .ID) }}">
+                                        Clear task
+                                    </a>
+                                    <br/>
                                     <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/assign-task?id=%d" .ID) }}">
                                         Reassign task
                                     </a>
