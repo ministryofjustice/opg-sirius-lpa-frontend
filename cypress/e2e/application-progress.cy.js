@@ -64,18 +64,16 @@ describe("View the application progress for a digital LPA", () => {
         },
       },
     );
+  });
 
+  it("shows application progress not started", () => {
     cy.addMock(`/lpa-api/v1/digital-lpas/${uid}/progress-indicators`, "GET", {
       status: 200,
       body: {
         digitalLpaUid: uid,
         progressIndicators: [
           { indicator: "FEES", status: "CANNOT_START" },
-          { indicator: "FEES", status: "COMPLETE" },
-          { indicator: "FEES", status: "IN_PROGRESS" },
           { indicator: "DONOR_ID", status: "CANNOT_START" },
-          { indicator: "DONOR_ID", status: "COMPLETE" },
-          { indicator: "DONOR_ID", status: "IN_PROGRESS" },
           { indicator: "CERTIFICATE_PROVIDER_ID", status: "CANNOT_START" },
           {
             indicator: "CERTIFICATE_PROVIDER_SIGNATURE",
@@ -87,9 +85,7 @@ describe("View the application progress for a digital LPA", () => {
         ],
       },
     });
-  });
 
-  it("shows application progress", () => {
     cy.visit(`/lpa/${uid}`);
 
     cy.get(".app-progress-indicator-summary").then((elts) => {
@@ -98,10 +94,11 @@ describe("View the application progress for a digital LPA", () => {
           .length,
       ).to.equal(1);
       expect(
-        Cypress.$(elts[1]).find("svg[data-progress-indicator=complete]").length,
+        Cypress.$(elts[1]).find("svg[data-progress-indicator=not-started]")
+          .length,
       ).to.equal(1);
       expect(
-        Cypress.$(elts[2]).find("svg[data-progress-indicator=in-progress]")
+        Cypress.$(elts[2]).find("svg[data-progress-indicator=not-started]")
           .length,
       ).to.equal(1);
       expect(
@@ -109,32 +106,132 @@ describe("View the application progress for a digital LPA", () => {
           .length,
       ).to.equal(1);
       expect(
-        Cypress.$(elts[4]).find("svg[data-progress-indicator=complete]").length,
+        Cypress.$(elts[4]).find("svg[data-progress-indicator=not-started]")
+          .length,
       ).to.equal(1);
       expect(
-        Cypress.$(elts[5]).find("svg[data-progress-indicator=in-progress]")
+        Cypress.$(elts[5]).find("svg[data-progress-indicator=not-started]")
           .length,
       ).to.equal(1);
       expect(
         Cypress.$(elts[6]).find("svg[data-progress-indicator=not-started]")
           .length,
       ).to.equal(1);
+    });
+
+    cy.contains("Donor identity confirmation").click();
+    cy.contains("Not started");
+    cy.contains("Start donor identity check").should("not.exist");
+  });
+
+  it("shows application progress in progress", () => {
+    cy.addMock(`/lpa-api/v1/digital-lpas/${uid}/progress-indicators`, "GET", {
+      status: 200,
+      body: {
+        digitalLpaUid: uid,
+        progressIndicators: [
+          { indicator: "FEES", status: "IN_PROGRESS" },
+          { indicator: "DONOR_ID", status: "IN_PROGRESS" },
+          { indicator: "CERTIFICATE_PROVIDER_ID", status: "IN_PROGRESS" },
+          {
+            indicator: "CERTIFICATE_PROVIDER_SIGNATURE",
+            status: "IN_PROGRESS",
+          },
+          { indicator: "ATTORNEY_SIGNATURES", status: "IN_PROGRESS" },
+          { indicator: "PREREGISTRATION_NOTICES", status: "IN_PROGRESS" },
+          { indicator: "REGISTRATION_NOTICES", status: "IN_PROGRESS" },
+        ],
+      },
+    });
+
+    cy.visit(`/lpa/${uid}`);
+
+    cy.get(".app-progress-indicator-summary").then((elts) => {
       expect(
-        Cypress.$(elts[7]).find("svg[data-progress-indicator=not-started]")
+        Cypress.$(elts[0]).find("svg[data-progress-indicator=in-progress]")
           .length,
       ).to.equal(1);
       expect(
-        Cypress.$(elts[8]).find("svg[data-progress-indicator=not-started]")
+        Cypress.$(elts[1]).find("svg[data-progress-indicator=in-progress]")
           .length,
       ).to.equal(1);
       expect(
-        Cypress.$(elts[9]).find("svg[data-progress-indicator=not-started]")
+        Cypress.$(elts[2]).find("svg[data-progress-indicator=in-progress]")
           .length,
       ).to.equal(1);
       expect(
-        Cypress.$(elts[10]).find("svg[data-progress-indicator=not-started]")
+        Cypress.$(elts[3]).find("svg[data-progress-indicator=in-progress]")
+          .length,
+      ).to.equal(1);
+      expect(
+        Cypress.$(elts[4]).find("svg[data-progress-indicator=in-progress]")
+          .length,
+      ).to.equal(1);
+      expect(
+        Cypress.$(elts[5]).find("svg[data-progress-indicator=in-progress]")
+          .length,
+      ).to.equal(1);
+      expect(
+        Cypress.$(elts[6]).find("svg[data-progress-indicator=in-progress]")
           .length,
       ).to.equal(1);
     });
+
+    cy.contains("Donor identity confirmation").click();
+    cy.contains("In progress");
+    cy.contains("Start donor identity check").should("exist");
+  });
+
+  it("shows application progress completed", () => {
+    const uid = "M-QEQE-EEEE-WERT";
+
+    cy.addMock(`/lpa-api/v1/digital-lpas/${uid}/progress-indicators`, "GET", {
+      status: 200,
+      body: {
+        digitalLpaUid: uid,
+        progressIndicators: [
+          { indicator: "FEES", status: "COMPLETE" },
+          { indicator: "DONOR_ID", status: "COMPLETE" },
+          { indicator: "CERTIFICATE_PROVIDER_ID", status: "COMPLETE" },
+          {
+            indicator: "CERTIFICATE_PROVIDER_SIGNATURE",
+            status: "COMPLETE",
+          },
+          { indicator: "ATTORNEY_SIGNATURES", status: "COMPLETE" },
+          { indicator: "PREREGISTRATION_NOTICES", status: "COMPLETE" },
+          { indicator: "REGISTRATION_NOTICES", status: "COMPLETE" },
+        ],
+      },
+    });
+
+    cy.visit(`/lpa/${uid}`);
+
+    cy.get(".app-progress-indicator-summary").then((elts) => {
+      expect(
+        Cypress.$(elts[0]).find("svg[data-progress-indicator=complete]").length,
+      ).to.equal(1);
+      expect(
+        Cypress.$(elts[1]).find("svg[data-progress-indicator=complete]").length,
+      ).to.equal(1);
+      expect(
+        Cypress.$(elts[2]).find("svg[data-progress-indicator=complete]").length,
+      ).to.equal(1);
+      expect(
+        Cypress.$(elts[3]).find("svg[data-progress-indicator=complete]").length,
+      ).to.equal(1);
+      expect(
+        Cypress.$(elts[4]).find("svg[data-progress-indicator=complete]").length,
+      ).to.equal(1);
+      expect(
+        Cypress.$(elts[5]).find("svg[data-progress-indicator=complete]").length,
+      ).to.equal(1);
+      expect(
+        Cypress.$(elts[6]).find("svg[data-progress-indicator=complete]").length,
+      ).to.equal(1);
+    });
+
+    cy.contains("Donor identity confirmation").click();
+    cy.contains("Complete");
+    cy.contains("Start donor identity check").should("not.exist");
   });
 });
