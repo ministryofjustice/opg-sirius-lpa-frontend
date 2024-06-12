@@ -14,9 +14,14 @@ type GetApplicationProgressClient interface {
 	ProgressIndicatorsForDigitalLpa(siriusCtx sirius.Context, uid string) ([]sirius.ProgressIndicator, error)
 }
 
+type IndicatorView struct {
+	UID string
+	sirius.ProgressIndicator
+}
+
 type getApplicationProgressDetails struct {
 	CaseSummary        sirius.CaseSummary
-	ProgressIndicators []sirius.ProgressIndicator
+	ProgressIndicators []IndicatorView
 	FlashMessage       FlashNotification
 }
 
@@ -43,7 +48,12 @@ func GetApplicationProgressDetails(client GetApplicationProgressClient, tmpl tem
 			if err != nil {
 				return err
 			}
-			data.ProgressIndicators = inds
+			for _, v := range inds {
+				data.ProgressIndicators = append(data.ProgressIndicators, IndicatorView{
+					UID:               uid,
+					ProgressIndicator: v,
+				})
+			}
 			return nil
 		})
 
