@@ -25,7 +25,26 @@
       </div>
     </summary>
     <div class="govuk-details__text">
-      -
+      {{ if eq (progressIndicatorContext .Indicator) "Donor identity confirmation" }}
+      <table class="govuk-table table__no-border app-table-no-cell-borders">
+        <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+          <th scope="row" class="govuk-table__header">Progress</th>
+          <td class="govuk-table__cell">{{ progressIndicatorStatus .Status }}</td>
+          <td class="govuk-table__cell">
+            {{if eq .Status "IN_PROGRESS"}}
+            <a class="govuk-link govuk-link--no-visited-state"
+               href={{printf "/lpa/identity-check/start?personType=donor&lpas[]={%s}" .UID}}>
+              Start donor identity check
+            </a>
+            {{end}}
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      {{ else }}
+        -
+      {{ end }}
     </div>
   </details>
 {{ end }}
