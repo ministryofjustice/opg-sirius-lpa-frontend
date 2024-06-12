@@ -77,6 +77,13 @@ func TestGetApplicationProgressSuccess(t *testing.T) {
 		},
 	}
 
+	indicatorView := []IndicatorView{
+		{
+			UID:               "M-9876-9876-9876",
+			ProgressIndicator: progressIndicators[0],
+		},
+	}
+
 	client := &mockApplicationProgressClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
@@ -89,7 +96,7 @@ func TestGetApplicationProgressSuccess(t *testing.T) {
 	template.
 		On("Func", mock.Anything, getApplicationProgressDetails{
 			CaseSummary:        caseSummary,
-			ProgressIndicators: progressIndicators,
+			ProgressIndicators: indicatorView,
 		}).
 		Return(nil)
 
