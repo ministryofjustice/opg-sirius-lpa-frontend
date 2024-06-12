@@ -34,7 +34,7 @@
           <td class="govuk-table__cell">
             {{if eq .Status "IN_PROGRESS"}}
             <a class="govuk-link govuk-link--no-visited-state"
-               href={{printf "/lpa/identity-check/start?personType=donor&lpas[]={%s}" .UID}}>
+               href="{{printf "/lpa/identity-check/start?personType=donor&lpas[]={%s}" .UID}}">
               Start donor identity check
             </a>
             {{end}}
