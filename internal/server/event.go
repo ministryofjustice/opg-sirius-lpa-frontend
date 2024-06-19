@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"encoding/base64"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -23,11 +24,13 @@ type EventClient interface {
 }
 
 type eventData struct {
-	XSRFToken string
-	NoteTypes []string
-	Entity    string
-	Success   bool
-	Error     sirius.ValidationError
+	XSRFToken    string
+	NoteTypes    []string
+	Entity       string
+	IsDigitalLpa bool
+	CaseUID      string
+	Success      bool
+	Error        sirius.ValidationError
 
 	Type        string
 	Name        string
@@ -61,6 +64,9 @@ func Event(client EventClient, tmpl template.Template) Handler {
 			return nil
 		})
 
+		data.CaseUID = ""
+		data.IsDigitalLpa = false
+
 		group.Go(func() error {
 			switch entityType {
 			case sirius.EntityTypePerson:
@@ -75,6 +81,8 @@ func Event(client EventClient, tmpl template.Template) Handler {
 					return err
 				}
 				data.Entity = caseitem.Summary()
+				data.IsDigitalLpa = caseitem.CaseType == "DIGITAL_LPA"
+				data.CaseUID = caseitem.UID
 			}
 
 			return nil
@@ -111,6 +119,14 @@ func Event(client EventClient, tmpl template.Template) Handler {
 				return err
 			} else {
 				data.Success = true
+
+				if data.IsDigitalLpa && data.CaseUID != "" {
+					SetFlash(w, FlashNotification{
+						Title: "Event created",
+					})
+
+					return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
+				}
 			}
 		}
 
