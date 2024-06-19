@@ -38,9 +38,10 @@ func (m *mockEventClient) Case(ctx sirius.Context, id int) (sirius.Case, error) 
 
 func TestGetEvent(t *testing.T) {
 	testCases := map[string]struct {
-		url            string
-		clientSetup    func(*mockEventClient)
-		expectedEntity string
+		url             string
+		clientSetup     func(*mockEventClient)
+		expectedEntity  string
+		expectedCaseUID string
 	}{
 		"person": {
 			url: "/?id=123&entity=person",
@@ -58,7 +59,8 @@ func TestGetEvent(t *testing.T) {
 					On("Case", mock.Anything, 123).
 					Return(sirius.Case{UID: "7000-0000-0001", CaseType: "LPA"}, nil)
 			},
-			expectedEntity: "LPA 7000-0000-0001",
+			expectedEntity:  "LPA 7000-0000-0001",
+			expectedCaseUID: "7000-0000-0001",
 		},
 		"epa": {
 			url: "/?id=123&entity=epa",
@@ -67,7 +69,8 @@ func TestGetEvent(t *testing.T) {
 					On("Case", mock.Anything, 123).
 					Return(sirius.Case{UID: "7000-0000-0001", CaseType: "EPA"}, nil)
 			},
-			expectedEntity: "EPA 7000-0000-0001",
+			expectedEntity:  "EPA 7000-0000-0001",
+			expectedCaseUID: "7000-0000-0001",
 		},
 	}
 
@@ -84,6 +87,7 @@ func TestGetEvent(t *testing.T) {
 				On("Func", mock.Anything, eventData{
 					NoteTypes: []string{"a", "b"},
 					Entity:    tc.expectedEntity,
+					CaseUID:   tc.expectedCaseUID,
 				}).
 				Return(nil)
 
