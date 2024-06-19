@@ -1,0 +1,13 @@
+{{ define "pi-certificate-provider-id" }}
+    <tr class="govuk-table__row">
+        <th scope="row" class="govuk-table__header">Certificate provider: {{ .CertificateProviderName }} </th>
+        <td class="govuk-table__cell">
+            {{if and (eq .Status "IN_PROGRESS") (eq .CertificateProviderChannel "paper")}}
+                <a class="govuk-link govuk-link--no-visited-state"
+                   href="{{printf "/lpa/identity-check/start?personType=certificate-provider&lpas[]=%s" .UID}}">
+                    Start certificate provider identity check
+                </a>
+            {{end}}
+        </td>
+    </tr>
+{{ end }}

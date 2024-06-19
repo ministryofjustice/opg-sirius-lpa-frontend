@@ -33,6 +33,7 @@ func TestGetApplicationProgressSuccess(t *testing.T) {
 				Subtype: "hw",
 			},
 			LpaStoreData: sirius.LpaStoreData{
+				Channel: "Digital",
 				Attorneys: []sirius.LpaStoreAttorney{
 					sirius.LpaStoreAttorney{
 						Status: "replacement",
@@ -65,6 +66,13 @@ func TestGetApplicationProgressSuccess(t *testing.T) {
 						},
 					},
 				},
+				CertificateProvider: sirius.LpaStoreCertificateProvider{
+					LpaStorePerson: sirius.LpaStorePerson{
+						FirstNames: "Fake",
+						LastName:   "Provider",
+					},
+					Channel: "Paper",
+				},
 			},
 		},
 		TaskList: []sirius.Task{},
@@ -79,8 +87,11 @@ func TestGetApplicationProgressSuccess(t *testing.T) {
 
 	indicatorView := []IndicatorView{
 		{
-			UID:               "M-9876-9876-9876",
-			ProgressIndicator: progressIndicators[0],
+			UID:                        "M-9876-9876-9876",
+			ProgressIndicator:          progressIndicators[0],
+			CertificateProviderChannel: "Paper",
+			CertificateProviderName:    "Fake Provider",
+			DonorChannel:               "Digital",
 		},
 	}
 
