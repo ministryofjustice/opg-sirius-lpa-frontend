@@ -28,7 +28,7 @@ type eventData struct {
 	NoteTypes    []string
 	Entity       string
 	IsDigitalLpa bool
-	CaseUid      string
+	CaseUID      string
 	Success      bool
 	Error        sirius.ValidationError
 
@@ -64,7 +64,7 @@ func Event(client EventClient, tmpl template.Template) Handler {
 			return nil
 		})
 
-		data.CaseUid = ""
+		data.CaseUID = ""
 		data.IsDigitalLpa = false
 
 		group.Go(func() error {
@@ -82,7 +82,7 @@ func Event(client EventClient, tmpl template.Template) Handler {
 				}
 				data.Entity = caseitem.Summary()
 				data.IsDigitalLpa = caseitem.CaseType == "DIGITAL_LPA"
-				data.CaseUid = caseitem.UID
+				data.CaseUID = caseitem.UID
 			}
 
 			return nil
@@ -120,12 +120,12 @@ func Event(client EventClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 
-				if data.IsDigitalLpa && data.CaseUid != "" {
+				if data.IsDigitalLpa && data.CaseUID != "" {
 					SetFlash(w, FlashNotification{
 						Title: "Event created",
 					})
 
-					return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUid))
+					return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
 				}
 			}
 		}
