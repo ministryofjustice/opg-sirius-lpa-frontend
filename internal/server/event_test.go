@@ -359,3 +359,43 @@ func TestPostEventWhenValidationError(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 }
+
+func TestPostEventDigitalLpaRedirect(t *testing.T) {
+	client := &mockEventClient{}
+	client.
+		On("NoteTypes", mock.Anything).
+		Return([]string{"a", "b"}, nil)
+	client.
+		On("Case", mock.Anything, 123).
+		Return(sirius.Case{
+			UID:      "M-EEEE-AAAA-TTTT",
+			CaseType: "DIGITAL_LPA",
+		}, nil)
+	client.
+		On("CreateNote", mock.Anything, 123, sirius.EntityTypeLpa, "Application processing", "Something", "More words", (*sirius.NoteFile)(nil)).
+		Return(nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, eventData{
+			Success:   true,
+			NoteTypes: []string{"a", "b"},
+			Entity:    "DIGITAL_LPA M-EEEE-AAAA-TTTT",
+		}).
+		Return(nil)
+
+	var buf bytes.Buffer
+	form := multipart.NewWriter(&buf)
+	_ = form.WriteField("type", "Application processing")
+	_ = form.WriteField("name", "Something")
+	_ = form.WriteField("description", "More words")
+	_ = form.Close()
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&entity=lpa", &buf)
+	r.Header.Add("Content-Type", form.FormDataContentType())
+	w := httptest.NewRecorder()
+
+	err := Event(client, template.Func)(w, r)
+
+	assert.Equal(t, RedirectError("/lpa/M-EEEE-AAAA-TTTT"), err)
+}
