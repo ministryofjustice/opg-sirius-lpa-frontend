@@ -4,12 +4,21 @@ import (
 	"fmt"
 )
 
+type anomalyStatus string
+
+const (
+	AnomalyAccepted anomalyStatus = "accepted"
+	AnomalyDetected anomalyStatus = "detected"
+	AnomalyFatal    anomalyStatus = "fatal"
+	AnomalyResolved anomalyStatus = "resolved"
+)
+
 type Anomaly struct {
-	Id            int    `json:"id"`
-	Status        string `json:"status"`
-	FieldName     string `json:"fieldName"`
-	RuleType      string `json:"ruleType"`
-	FieldOwnerUid string `json:"fieldOwnerUid"`
+	Id            int           `json:"id"`
+	Status        anomalyStatus `json:"status"`
+	FieldName     string        `json:"fieldName"`
+	RuleType      string        `json:"ruleType"`
+	FieldOwnerUid string        `json:"fieldOwnerUid"`
 }
 
 type Anomalies struct {
