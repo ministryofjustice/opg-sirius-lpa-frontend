@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"golang.org/x/sync/errgroup"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -25,21 +26,29 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		uid := chi.URLParam(r, "uid")
 		ctx := getContext(r)
 
-		caseSummary, err := client.CaseSummary(ctx, uid)
-		if err != nil {
+		var err error
+		var data getLpaDetails
+
+		group, groupCtx := errgroup.WithContext(ctx.Context)
+
+		group.Go(func() error {
+			data.CaseSummary, err = client.CaseSummary(ctx.With(groupCtx), uid)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
 			return err
 		}
 
-		data := getLpaDetails{
-			CaseSummary: caseSummary,
-			DigitalLpa:  caseSummary.DigitalLpa,
-		}
-
+		data.DigitalLpa = data.CaseSummary.DigitalLpa
 		data.FlashMessage, _ = GetFlash(w, r)
 
 		var replacementAttorneys []sirius.LpaStoreAttorney
 		var nonReplacementAttorneys []sirius.LpaStoreAttorney
-		for _, attorney := range caseSummary.DigitalLpa.LpaStoreData.Attorneys {
+		for _, attorney := range data.DigitalLpa.LpaStoreData.Attorneys {
 			switch attorney.Status {
 			case "replacement":
 				replacementAttorneys = append(replacementAttorneys, attorney)
