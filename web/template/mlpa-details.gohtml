@@ -3,16 +3,15 @@
 {{ define "title" }}LPA details{{ end }}
 
 {{ define "main" }}
-    <div class="govuk-grid-row" id="lpa-details-data">
+    {{ if or (eq .DigitalLpa.LpaStoreData nil) (eq .DigitalLpa.SiriusData.Status "Draft") }}
+      <div class="govuk-grid-row" id="lpa-details-data">
         <div class="govuk-grid-column-full">
 
-            {{ template "mlpa-header" (caseTabs .CaseSummary "lpa-details") }}
+          {{ template "mlpa-header" (caseTabs .CaseSummary "lpa-details") }}
 
-            <h1 class="govuk-heading-l govuk-!-margin-bottom-5">LPA details</h1>
+          <h1 class="govuk-heading-l govuk-!-margin-bottom-5">LPA details</h1>
         </div>
-    </div>
-
-    {{ if or (eq .DigitalLpa.LpaStoreData nil) (eq .DigitalLpa.SiriusData.Status "Draft") }}
+      </div>
 
       <!-- draft application -->
       <h2 class="govuk-heading-m">Donor</h2>
@@ -102,6 +101,25 @@
     {{ else }}
 
       <!-- not a draft application -->
+      <div class="govuk-grid-row" id="lpa-details-data">
+        <div class="govuk-grid-column-full">
+
+          {{ template "mlpa-header" (caseTabs .CaseSummary "lpa-details") }}
+
+          <h1 class="govuk-heading-l govuk-!-margin-bottom-5">LPA details</h1>
+
+          {{ if .AnomalyDisplay.HasAnomalies }}
+            <div class="govuk-error-summary" data-module="govuk-error-summary">
+              <div role="alert">
+                <div class="govuk-error-summary__body">
+                  Some LPA details have been identified for review
+                </div>
+              </div>
+            </div>
+          {{ end }}
+        </div>
+      </div>
+
       <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
         <div class="govuk-accordion__section">
           <div class="govuk-accordion__section-header">
