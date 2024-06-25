@@ -17,6 +17,11 @@ func (m *mockGetLpaDetailsClient) CaseSummary(ctx sirius.Context, uid string) (s
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
+func (m *mockGetLpaDetailsClient) AnomaliesForDigitalLpa(ctx sirius.Context, uid string) ([]sirius.Anomaly, error) {
+	args := m.Called(ctx, uid)
+	return args.Get(0).([]sirius.Anomaly), args.Error(1)
+}
+
 func TestGetLpaDetailsSuccess(t *testing.T) {
 	caseSummary := sirius.CaseSummary{
 		DigitalLpa: sirius.DigitalLpa{
@@ -27,31 +32,31 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 			},
 			LpaStoreData: sirius.LpaStoreData{
 				Attorneys: []sirius.LpaStoreAttorney{
-					sirius.LpaStoreAttorney{
+					{
 						Status: "replacement",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "first@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
+					{
 						Status: "replacement",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "second@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
+					{
 						Status: "active",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "third@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
+					{
 						Status: "active",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "fourth@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
+					{
 						Status: "removed",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "fifth@does.not.exist",
@@ -74,13 +79,13 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 			CaseSummary: caseSummary,
 			DigitalLpa:  caseSummary.DigitalLpa,
 			ReplacementAttorneys: []sirius.LpaStoreAttorney{
-				sirius.LpaStoreAttorney{
+				{
 					Status: "replacement",
 					LpaStorePerson: sirius.LpaStorePerson{
 						Email: "first@does.not.exist",
 					},
 				},
-				sirius.LpaStoreAttorney{
+				{
 					Status: "replacement",
 					LpaStorePerson: sirius.LpaStorePerson{
 						Email: "second@does.not.exist",
@@ -88,13 +93,13 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 				},
 			},
 			NonReplacementAttorneys: []sirius.LpaStoreAttorney{
-				sirius.LpaStoreAttorney{
+				{
 					Status: "active",
 					LpaStorePerson: sirius.LpaStorePerson{
 						Email: "third@does.not.exist",
 					},
 				},
-				sirius.LpaStoreAttorney{
+				{
 					Status: "active",
 					LpaStorePerson: sirius.LpaStorePerson{
 						Email: "fourth@does.not.exist",
