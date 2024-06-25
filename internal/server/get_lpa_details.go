@@ -17,7 +17,7 @@ type GetLpaDetailsClient interface {
 type getLpaDetails struct {
 	CaseSummary             sirius.CaseSummary
 	DigitalLpa              sirius.DigitalLpa
-	AnomalyDisplay          sirius.AnomalyDisplay
+	AnomalyDisplay          *sirius.AnomalyDisplay
 	ReplacementAttorneys    []sirius.LpaStoreAttorney
 	NonReplacementAttorneys []sirius.LpaStoreAttorney
 	FlashMessage            FlashNotification
@@ -54,7 +54,7 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data.AnomalyDisplay = sirius.AnomalyDisplay{}
+		data.AnomalyDisplay = &sirius.AnomalyDisplay{}
 		if anomalies != nil {
 			data.AnomalyDisplay.Group(&data.CaseSummary.DigitalLpa.LpaStoreData, anomalies)
 		}
