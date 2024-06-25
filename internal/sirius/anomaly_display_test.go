@@ -34,7 +34,7 @@ func TestAnomaliesForSection(t *testing.T) {
 
 	expected := AnomaliesForObject{
 		Uid: "1",
-		Anomalies: map[string][]Anomaly{
+		Anomalies: map[ObjectFieldName][]Anomaly{
 			"firstNames": {anomaly},
 		},
 	}
@@ -52,20 +52,20 @@ func TestAnomalyDisplay(t *testing.T) {
 		FieldOwnerUid: "1",
 	}
 
-	ad.AddAnomalyToSection(donor, anomaly)
+	ad.AddAnomalyToSection(DonorSection, anomaly)
 
 	expected := AnomaliesForSection{
-		Section: donor,
-		Objects: map[string]AnomaliesForObject{
+		Section: DonorSection,
+		Objects: map[ObjectUid]AnomaliesForObject{
 			"1": {
 				Uid: "1",
-				Anomalies: map[string][]Anomaly{
+				Anomalies: map[ObjectFieldName][]Anomaly{
 					"firstNames": {anomaly},
 				},
 			},
 		},
 	}
-	assert.Equal(t, expected, ad.GetAnomaliesForSection(donor))
+	assert.Equal(t, expected, ad.GetAnomaliesForSection(DonorSection))
 }
 
 func TestGroupAnomalies(t *testing.T) {
@@ -96,11 +96,11 @@ func TestGroupAnomalies(t *testing.T) {
 	ad.Group(&lpa, anomalies)
 
 	expectedDonorAnomalies := AnomaliesForSection{
-		Section: donor,
-		Objects: map[string]AnomaliesForObject{
+		Section: DonorSection,
+		Objects: map[ObjectUid]AnomaliesForObject{
 			"1": {
 				Uid: "1",
-				Anomalies: map[string][]Anomaly{
+				Anomalies: map[ObjectFieldName][]Anomaly{
 					"firstNames": {
 						{
 							Status:        AnomalyDetected,
@@ -118,5 +118,5 @@ func TestGroupAnomalies(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, expectedDonorAnomalies, ad.GetAnomaliesForSection(donor))
+	assert.Equal(t, expectedDonorAnomalies, ad.GetAnomaliesForSection(DonorSection))
 }
