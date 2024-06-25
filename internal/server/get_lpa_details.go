@@ -44,8 +44,9 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 
 		group.Go(func() error {
 			// ignore errors: there may be no LPA in the store yet for a given UID (e.g. if it's still a draft)
-			// TODO is there a better way to be selective about ignored errors?
+			// TODO is there a better way to be selective about ignored client errors?
 			anomalies, _ = client.AnomaliesForDigitalLpa(ctx.With(groupCtx), uid)
+
 			return nil
 		})
 
