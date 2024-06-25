@@ -9,7 +9,7 @@ func TestAnomaliesForObject(t *testing.T) {
 	afo := AnomaliesForObject{}
 
 	anomaly := Anomaly{
-		Status:        anomalyStatus("detected"),
+		Status:        AnomalyDetected,
 		FieldName:     "firstNames",
 		FieldOwnerUid: "1",
 	}
@@ -23,7 +23,7 @@ func TestAnomaliesForSection(t *testing.T) {
 	afs := AnomaliesForSection{}
 
 	anomaly := Anomaly{
-		Status:        anomalyStatus("detected"),
+		Status:        AnomalyDetected,
 		FieldName:     "firstNames",
 		FieldOwnerUid: "1",
 	}
@@ -47,7 +47,7 @@ func TestAnomalyDisplay(t *testing.T) {
 	ad := AnomalyDisplay{}
 
 	anomaly := Anomaly{
-		Status:        anomalyStatus("detected"),
+		Status:        AnomalyDetected,
 		FieldName:     "firstNames",
 		FieldOwnerUid: "1",
 	}
@@ -82,12 +82,12 @@ func TestGroupAnomalies(t *testing.T) {
 	anomalies := []Anomaly{
 		// donor (2 anomalies on one field)
 		{
-			Status:        anomalyStatus("detected"),
+			Status:        AnomalyDetected,
 			FieldName:     "firstNames",
 			FieldOwnerUid: "1",
 		},
 		{
-			Status:        anomalyStatus("detected"),
+			Status:        AnomalyDetected,
 			FieldName:     "firstNames",
 			FieldOwnerUid: "1",
 		},
@@ -103,12 +103,12 @@ func TestGroupAnomalies(t *testing.T) {
 				Anomalies: map[string][]Anomaly{
 					"firstNames": {
 						{
-							Status:        anomalyStatus("detected"),
+							Status:        AnomalyDetected,
 							FieldName:     "firstNames",
 							FieldOwnerUid: "1",
 						},
 						{
-							Status:        anomalyStatus("detected"),
+							Status:        AnomalyDetected,
 							FieldName:     "firstNames",
 							FieldOwnerUid: "1",
 						},
