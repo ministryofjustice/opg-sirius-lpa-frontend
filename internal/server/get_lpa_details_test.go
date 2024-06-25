@@ -35,6 +35,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 					{
 						Status: "replacement",
 						LpaStorePerson: sirius.LpaStorePerson{
+							Uid:   "1",
 							Email: "first@does.not.exist",
 						},
 					},
@@ -68,21 +69,58 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 		TaskList: []sirius.Task{},
 	}
 
+	anomalies := []sirius.Anomaly{
+		{
+			Id:            999,
+			Status:        sirius.AnomalyFatal,
+			FieldName:     "date-of-birth",
+			FieldOwnerUid: "1",
+		},
+	}
+
+	expectedAnomalyDisplay := sirius.AnomalyDisplay{
+		AnomaliesBySection: map[sirius.AnomalyDisplaySection]sirius.AnomaliesForSection{
+			sirius.AttorneysSection: {
+				Section: sirius.AttorneysSection,
+				Objects: map[sirius.ObjectUid]sirius.AnomaliesForObject{
+					"1": {
+						Uid: "1",
+						Anomalies: map[sirius.ObjectFieldName][]sirius.Anomaly{
+							"date-of-birth": {
+								{
+									Id:            999,
+									Status:        sirius.AnomalyFatal,
+									FieldName:     "date-of-birth",
+									FieldOwnerUid: "1",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
 	client := &mockGetLpaDetailsClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
 		Return(caseSummary, nil)
+	client.
+		On("AnomaliesForDigitalLpa", mock.Anything, "M-9876-9876-9876").
+		Return(anomalies, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getLpaDetails{
-			CaseSummary: caseSummary,
-			DigitalLpa:  caseSummary.DigitalLpa,
+			CaseSummary:    caseSummary,
+			DigitalLpa:     caseSummary.DigitalLpa,
+			AnomalyDisplay: expectedAnomalyDisplay,
 			ReplacementAttorneys: []sirius.LpaStoreAttorney{
 				{
 					Status: "replacement",
 					LpaStorePerson: sirius.LpaStorePerson{
 						Email: "first@does.not.exist",
+						Uid:   "1",
 					},
 				},
 				{

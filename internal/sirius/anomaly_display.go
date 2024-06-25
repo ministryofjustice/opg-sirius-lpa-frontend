@@ -3,11 +3,11 @@ package sirius
 type AnomalyDisplaySection string
 
 const (
-	root                AnomalyDisplaySection = "root"
-	donor               AnomalyDisplaySection = "donor"
-	certificateProvider AnomalyDisplaySection = "certificate-provider"
-	attorneys           AnomalyDisplaySection = "attorneys"
-	peopleToNotify      AnomalyDisplaySection = "people-to-notify"
+	RootSection                AnomalyDisplaySection = "root"
+	DonorSection               AnomalyDisplaySection = "donor"
+	CertificateProviderSection AnomalyDisplaySection = "certificateProvider"
+	AttorneysSection           AnomalyDisplaySection = "attorneys"
+	PeopleToNotifySection      AnomalyDisplaySection = "peopleToNotify"
 )
 
 // AnomalyDisplay - Anomalies for the whole LPA details page
@@ -46,20 +46,20 @@ type AnomaliesForSection struct {
 	// key is the UID of the object (fieldOwnerUid) which has the anomalies;
 	// if an object has no anomalies, it will have no key in this map;
 	// if no object has anomalies, the map will be empty
-	Objects map[string]AnomaliesForObject
+	Objects map[ObjectUid]AnomaliesForObject
 }
 
 func (afs *AnomaliesForSection) AddAnomalyToObject(a Anomaly) {
 	anomaliesForObject, ok := afs.Objects[a.FieldOwnerUid]
 	if !ok {
-		afs.Objects = map[string]AnomaliesForObject{}
+		afs.Objects = map[ObjectUid]AnomaliesForObject{}
 		anomaliesForObject = AnomaliesForObject{Uid: a.FieldOwnerUid}
 	}
 	anomaliesForObject.AddAnomaly(a)
 	afs.Objects[a.FieldOwnerUid] = anomaliesForObject
 }
 
-func (afs *AnomaliesForSection) GetAnomaliesForObject(uid string) AnomaliesForObject {
+func (afs *AnomaliesForSection) GetAnomaliesForObject(uid ObjectUid) AnomaliesForObject {
 	anomaliesForObject, ok := afs.Objects[uid]
 	if !ok {
 		return AnomaliesForObject{}
@@ -74,22 +74,22 @@ func (afs *AnomaliesForSection) HasAnomalies() bool {
 // AnomaliesForObject - Anomalies for an individual object (donor, attorney etc.) within a section
 type AnomaliesForObject struct {
 	// fieldOwnerUid for the object which has the anomalies
-	Uid string
+	Uid ObjectUid
 
 	// map from field names to the anomalies for that field
-	Anomalies map[string][]Anomaly
+	Anomalies map[ObjectFieldName][]Anomaly
 }
 
 func (afo *AnomaliesForObject) AddAnomaly(a Anomaly) {
 	anomalies, ok := afo.Anomalies[a.FieldName]
 	if !ok {
-		afo.Anomalies = map[string][]Anomaly{}
+		afo.Anomalies = map[ObjectFieldName][]Anomaly{}
 		anomalies = []Anomaly{}
 	}
 	afo.Anomalies[a.FieldName] = append(anomalies, a)
 }
 
-func (afo *AnomaliesForObject) GetAnomaliesForField(fieldName string) []Anomaly {
+func (afo *AnomaliesForObject) GetAnomaliesForField(fieldName ObjectFieldName) []Anomaly {
 	anomalies, ok := afo.Anomalies[fieldName]
 	if !ok {
 		return []Anomaly{}
@@ -98,25 +98,25 @@ func (afo *AnomaliesForObject) GetAnomaliesForField(fieldName string) []Anomaly 
 }
 
 // getSectionForUid - Map a UID to an object inside an LPA and return which section it's in
-func getSectionForUid(lpa *LpaStoreData, uid string) AnomalyDisplaySection {
-	if lpa.Donor.Uid == uid {
-		return donor
-	} else if lpa.CertificateProvider.Uid == uid {
-		return certificateProvider
+func getSectionForUid(lpa *LpaStoreData, uid ObjectUid) AnomalyDisplaySection {
+	if ObjectUid(lpa.Donor.Uid) == uid {
+		return DonorSection
+	} else if ObjectUid(lpa.CertificateProvider.Uid) == uid {
+		return CertificateProviderSection
 	} else {
 		for _, attorney := range lpa.Attorneys {
-			if attorney.Uid == uid {
-				return attorneys
+			if ObjectUid(attorney.Uid) == uid {
+				return AttorneysSection
 			}
 		}
 
 		for _, person := range lpa.PeopleToNotify {
-			if person.Uid == uid {
-				return peopleToNotify
+			if ObjectUid(person.Uid) == uid {
+				return PeopleToNotifySection
 			}
 		}
 	}
 
 	// UID is not matched, so assume it applies to the top-level fields of the LPA
-	return root
+	return RootSection
 }
