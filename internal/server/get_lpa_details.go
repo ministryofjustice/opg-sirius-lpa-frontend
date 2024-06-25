@@ -43,10 +43,9 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		})
 
 		group.Go(func() error {
-			anomalies, err = client.AnomaliesForDigitalLpa(ctx.With(groupCtx), uid)
-			if err != nil {
-				return err
-			}
+			// ignore errors: there may be no LPA in the store yet for a given UID (e.g. if it's still a draft)
+			// TODO is there a better way to be selective about ignored errors?
+			anomalies, _ = client.AnomaliesForDigitalLpa(ctx.With(groupCtx), uid)
 			return nil
 		})
 
@@ -55,7 +54,9 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		}
 
 		data.AnomalyDisplay = sirius.AnomalyDisplay{}
-		data.AnomalyDisplay.Group(&data.CaseSummary.DigitalLpa.LpaStoreData, anomalies)
+		if anomalies != nil {
+			data.AnomalyDisplay.Group(&data.CaseSummary.DigitalLpa.LpaStoreData, anomalies)
+		}
 
 		data.DigitalLpa = data.CaseSummary.DigitalLpa
 		data.FlashMessage, _ = GetFlash(w, r)
