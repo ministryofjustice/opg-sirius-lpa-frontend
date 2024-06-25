@@ -3,11 +3,12 @@ package sirius
 type AnomalyDisplaySection string
 
 const (
-	RootSection                AnomalyDisplaySection = "root"
-	DonorSection               AnomalyDisplaySection = "donor"
-	CertificateProviderSection AnomalyDisplaySection = "certificateProvider"
-	AttorneysSection           AnomalyDisplaySection = "attorneys"
-	PeopleToNotifySection      AnomalyDisplaySection = "peopleToNotify"
+	RootSection                 AnomalyDisplaySection = "root"
+	DonorSection                AnomalyDisplaySection = "donor"
+	CertificateProviderSection  AnomalyDisplaySection = "certificateProvider"
+	AttorneysSection            AnomalyDisplaySection = "attorneys"
+	ReplacementAttorneysSection AnomalyDisplaySection = "replacementAttorneys"
+	PeopleToNotifySection       AnomalyDisplaySection = "peopleToNotify"
 )
 
 // AnomalyDisplay - Anomalies for the whole LPA details page
@@ -25,8 +26,9 @@ func (ad *AnomalyDisplay) AddAnomalyToSection(s AnomalyDisplaySection, a Anomaly
 	ad.AnomaliesBySection[s] = anomaliesForSection
 }
 
-func (ad *AnomalyDisplay) GetAnomaliesForSection(s AnomalyDisplaySection) AnomaliesForSection {
-	return ad.AnomaliesBySection[s]
+func (ad *AnomalyDisplay) GetAnomaliesForSection(s string) *AnomaliesForSection {
+	anomalies := ad.AnomaliesBySection[AnomalyDisplaySection(s)]
+	return &anomalies
 }
 
 // Group - Split raw anomalies across the sections of the LPA details page
@@ -41,6 +43,11 @@ func (ad *AnomalyDisplay) Group(lpa *LpaStoreData, anomalies []Anomaly) *Anomaly
 
 func (ad *AnomalyDisplay) HasAnomalies() bool {
 	return len(ad.AnomaliesBySection) > 0
+}
+
+func (ad *AnomalyDisplay) SectionHasAnomalies(s string) bool {
+	section := ad.GetAnomaliesForSection(s)
+	return section.HasAnomalies()
 }
 
 // AnomaliesForSection - Anomalies for a section of the LPA details page
@@ -63,12 +70,12 @@ func (afs *AnomaliesForSection) AddAnomalyToObject(a Anomaly) {
 	afs.Objects[a.FieldOwnerUid] = anomaliesForObject
 }
 
-func (afs *AnomaliesForSection) GetAnomaliesForObject(uid ObjectUid) AnomaliesForObject {
-	anomaliesForObject, ok := afs.Objects[uid]
+func (afs *AnomaliesForSection) GetAnomaliesForObject(uid string) *AnomaliesForObject {
+	anomaliesForObject, ok := afs.Objects[ObjectUid(uid)]
 	if !ok {
-		return AnomaliesForObject{}
+		return &AnomaliesForObject{}
 	}
-	return anomaliesForObject
+	return &anomaliesForObject
 }
 
 func (afs *AnomaliesForSection) HasAnomalies() bool {
@@ -93,8 +100,8 @@ func (afo *AnomaliesForObject) AddAnomaly(a Anomaly) {
 	afo.Anomalies[a.FieldName] = append(anomalies, a)
 }
 
-func (afo *AnomaliesForObject) GetAnomaliesForField(fieldName ObjectFieldName) []Anomaly {
-	anomalies, ok := afo.Anomalies[fieldName]
+func (afo *AnomaliesForObject) GetAnomaliesForField(fieldName string) []Anomaly {
+	anomalies, ok := afo.Anomalies[ObjectFieldName(fieldName)]
 	if !ok {
 		return []Anomaly{}
 	}
@@ -110,7 +117,12 @@ func getSectionForUid(lpa *LpaStoreData, uid ObjectUid) AnomalyDisplaySection {
 	} else {
 		for _, attorney := range lpa.Attorneys {
 			if ObjectUid(attorney.Uid) == uid {
-				return AttorneysSection
+				switch attorney.Status {
+				case "replacement":
+					return ReplacementAttorneysSection
+				case "active":
+					return AttorneysSection
+				}
 			}
 		}
 
