@@ -39,7 +39,7 @@ func TestAnomaliesForSection(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, expected, afs.GetAnomaliesForObject("1"))
+	assert.Equal(t, expected, *afs.GetAnomaliesForObject("1"))
 	assert.True(t, afs.HasAnomalies())
 }
 
@@ -67,7 +67,7 @@ func TestAnomalyDisplay(t *testing.T) {
 			},
 		},
 	}
-	assert.Equal(t, expected, ad.GetAnomaliesForSection(DonorSection))
+	assert.Equal(t, expected, *ad.GetAnomaliesForSection("donor"))
 }
 
 func TestGroupAnomalies(t *testing.T) {
@@ -120,5 +120,5 @@ func TestGroupAnomalies(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, expectedDonorAnomalies, ad.GetAnomaliesForSection(DonorSection))
+	assert.Equal(t, expectedDonorAnomalies, *ad.GetAnomaliesForSection("donor"))
 }
