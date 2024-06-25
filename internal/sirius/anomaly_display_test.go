@@ -52,7 +52,9 @@ func TestAnomalyDisplay(t *testing.T) {
 		FieldOwnerUid: "1",
 	}
 
+	assert.False(t, ad.HasAnomalies())
 	ad.AddAnomalyToSection(DonorSection, anomaly)
+	assert.True(t, ad.HasAnomalies())
 
 	expected := AnomaliesForSection{
 		Section: DonorSection,

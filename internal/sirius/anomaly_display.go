@@ -39,6 +39,10 @@ func (ad *AnomalyDisplay) Group(lpa *LpaStoreData, anomalies []Anomaly) *Anomaly
 	return ad
 }
 
+func (ad *AnomalyDisplay) HasAnomalies() bool {
+	return len(ad.AnomaliesBySection) > 0
+}
+
 // AnomaliesForSection - Anomalies for a section of the LPA details page
 type AnomaliesForSection struct {
 	Section AnomalyDisplaySection
