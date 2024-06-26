@@ -10,10 +10,10 @@ type ObjectFieldName string
 type AnomalyStatus string
 
 const (
-	AnomalyAccepted AnomalyStatus = "accepted"
-	AnomalyDetected AnomalyStatus = "detected"
-	AnomalyFatal    AnomalyStatus = "fatal"
-	AnomalyResolved AnomalyStatus = "resolved"
+	AnomalyAccepted = AnomalyStatus("accepted")
+	AnomalyDetected = AnomalyStatus("detected")
+	AnomalyFatal    = AnomalyStatus("fatal")
+	AnomalyResolved = AnomalyStatus("resolved")
 )
 
 type Anomaly struct {
