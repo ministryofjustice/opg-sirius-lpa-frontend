@@ -73,25 +73,25 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 		{
 			Id:            999,
 			Status:        sirius.AnomalyFatal,
-			FieldName:     "date-of-birth",
-			FieldOwnerUid: "1",
+			FieldName:     sirius.ObjectFieldName("lastName"),
+			FieldOwnerUid: sirius.ObjectUid("1"),
 		},
 	}
 
 	expectedAnomalyDisplay := sirius.AnomalyDisplay{
 		AnomaliesBySection: map[sirius.AnomalyDisplaySection]sirius.AnomaliesForSection{
-			sirius.AttorneysSection: {
-				Section: sirius.AttorneysSection,
+			sirius.ReplacementAttorneysSection: {
+				Section: sirius.ReplacementAttorneysSection,
 				Objects: map[sirius.ObjectUid]sirius.AnomaliesForObject{
-					"1": {
-						Uid: "1",
+					sirius.ObjectUid("1"): {
+						Uid: sirius.ObjectUid("1"),
 						Anomalies: map[sirius.ObjectFieldName][]sirius.Anomaly{
-							"date-of-birth": {
+							sirius.ObjectFieldName("lastName"): {
 								{
 									Id:            999,
 									Status:        sirius.AnomalyFatal,
-									FieldName:     "date-of-birth",
-									FieldOwnerUid: "1",
+									FieldName:     sirius.ObjectFieldName("lastName"),
+									FieldOwnerUid: sirius.ObjectUid("1"),
 								},
 							},
 						},
