@@ -17,11 +17,15 @@ type AnomalyDisplay struct {
 }
 
 func (ad *AnomalyDisplay) AddAnomalyToSection(s AnomalyDisplaySection, a Anomaly) {
+	if ad.AnomaliesBySection == nil {
+		ad.AnomaliesBySection = map[AnomalyDisplaySection]AnomaliesForSection{}
+	}
+
 	anomaliesForSection, ok := ad.AnomaliesBySection[s]
 	if !ok {
-		ad.AnomaliesBySection = map[AnomalyDisplaySection]AnomaliesForSection{}
 		anomaliesForSection = AnomaliesForSection{Section: s}
 	}
+
 	anomaliesForSection.AddAnomalyToObject(a)
 	ad.AnomaliesBySection[s] = anomaliesForSection
 }
@@ -61,11 +65,15 @@ type AnomaliesForSection struct {
 }
 
 func (afs *AnomaliesForSection) AddAnomalyToObject(a Anomaly) {
+	if afs.Objects == nil {
+		afs.Objects = map[ObjectUid]AnomaliesForObject{}
+	}
+
 	anomaliesForObject, ok := afs.Objects[a.FieldOwnerUid]
 	if !ok {
-		afs.Objects = map[ObjectUid]AnomaliesForObject{}
 		anomaliesForObject = AnomaliesForObject{Uid: a.FieldOwnerUid}
 	}
+
 	anomaliesForObject.AddAnomaly(a)
 	afs.Objects[a.FieldOwnerUid] = anomaliesForObject
 }
@@ -92,11 +100,15 @@ type AnomaliesForObject struct {
 }
 
 func (afo *AnomaliesForObject) AddAnomaly(a Anomaly) {
-	anomalies, ok := afo.Anomalies[a.FieldName]
-	if !ok {
+	if afo.Anomalies == nil {
 		afo.Anomalies = map[ObjectFieldName][]Anomaly{}
+	}
+	anomalies, ok := afo.Anomalies[a.FieldName]
+
+	if !ok {
 		anomalies = []Anomaly{}
 	}
+
 	afo.Anomalies[a.FieldName] = append(anomalies, a)
 }
 
@@ -110,13 +122,13 @@ func (afo *AnomaliesForObject) GetAnomaliesForField(fieldName string) []Anomaly 
 
 // getSectionForUid - Map a UID to an object inside an LPA and return which section it's in
 func getSectionForUid(lpa *LpaStoreData, uid ObjectUid) AnomalyDisplaySection {
-	if ObjectUid(lpa.Donor.Uid) == uid {
+	if ObjectUid(lpa.Donor.LpaStorePerson.Uid) == uid {
 		return DonorSection
-	} else if ObjectUid(lpa.CertificateProvider.Uid) == uid {
+	} else if ObjectUid(lpa.CertificateProvider.LpaStorePerson.Uid) == uid {
 		return CertificateProviderSection
 	} else {
 		for _, attorney := range lpa.Attorneys {
-			if ObjectUid(attorney.Uid) == uid {
+			if ObjectUid(attorney.LpaStorePerson.Uid) == uid {
 				switch attorney.Status {
 				case "replacement":
 					return ReplacementAttorneysSection
@@ -127,7 +139,7 @@ func getSectionForUid(lpa *LpaStoreData, uid ObjectUid) AnomalyDisplaySection {
 		}
 
 		for _, person := range lpa.PeopleToNotify {
-			if ObjectUid(person.Uid) == uid {
+			if ObjectUid(person.LpaStorePerson.Uid) == uid {
 				return PeopleToNotifySection
 			}
 		}
