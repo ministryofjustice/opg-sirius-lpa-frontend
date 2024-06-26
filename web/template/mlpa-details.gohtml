@@ -227,7 +227,7 @@
                 <dl class="govuk-summary-list">
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">First names</dt>
-                    {{ $attorneyFieldAnomalies := $attorneyAnomalies.GetAnomaliesForField "firstNames" }}
+                    {{ $attorneyFieldAnomalies := $attorneyAnomalies.GetAnomaliesForFieldWithStatus "firstNames" "detected" }}
                     <dd class="govuk-summary-list__value{{ if gt (len $attorneyFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
                       {{ $attorney.FirstNames }}
                       {{ if gt (len $attorneyFieldAnomalies) 0 }}
@@ -237,7 +237,7 @@
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Last name</dt>
-                    {{ $attorneyFieldAnomalies = $attorneyAnomalies.GetAnomaliesForField "lastName" }}
+                    {{ $attorneyFieldAnomalies = $attorneyAnomalies.GetAnomaliesForFieldWithStatus "lastName" "detected" }}
                     <dd class="govuk-summary-list__value{{ if gt (len $attorneyFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
                       {{ $attorney.LastName }}
                       {{ if gt (len $attorneyFieldAnomalies) 0 }}
@@ -384,7 +384,7 @@
                 <dl class="govuk-summary-list">
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">First names</dt>
-                    {{ $attorneyFieldAnomalies := $attorneyAnomalies.GetAnomaliesForField "firstNames" }}
+                    {{ $attorneyFieldAnomalies := $attorneyAnomalies.GetAnomaliesForFieldWithStatus "firstNames" "detected" }}
                     <dd class="govuk-summary-list__value{{ if gt (len $attorneyFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
                       {{ $attorney.FirstNames }}
                       {{ if gt (len $attorneyFieldAnomalies) 0 }}
@@ -394,7 +394,7 @@
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Last name</dt>
-                    {{ $attorneyFieldAnomalies = $attorneyAnomalies.GetAnomaliesForField "lastName" }}
+                    {{ $attorneyFieldAnomalies = $attorneyAnomalies.GetAnomaliesForFieldWithStatus "lastName" "detected" }}
                     <dd class="govuk-summary-list__value{{ if gt (len $attorneyFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
                       {{ $attorney.LastName }}
                       {{ if gt (len $attorneyFieldAnomalies) 0 }}

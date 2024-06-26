@@ -112,12 +112,22 @@ func (afo *AnomaliesForObject) AddAnomaly(a Anomaly) {
 	afo.Anomalies[a.FieldName] = append(anomalies, a)
 }
 
-func (afo *AnomaliesForObject) GetAnomaliesForField(fieldName string) []Anomaly {
+func (afo *AnomaliesForObject) GetAnomaliesForFieldWithStatus(fieldName string, status string) []Anomaly {
+	var anomaliesWithStatus []Anomaly
+
 	anomalies, ok := afo.Anomalies[ObjectFieldName(fieldName)]
 	if !ok {
-		return []Anomaly{}
+		return anomaliesWithStatus
 	}
-	return anomalies
+
+	wantedStatus := AnomalyStatus(status)
+	for _, anomaly := range anomalies {
+		if anomaly.Status == wantedStatus {
+			anomaliesWithStatus = append(anomaliesWithStatus, anomaly)
+		}
+	}
+
+	return anomaliesWithStatus
 }
 
 // getSectionForUid - Map a UID to an object inside an LPA and return which section it's in

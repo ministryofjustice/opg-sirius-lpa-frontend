@@ -16,7 +16,7 @@ func TestAnomaliesForObject(t *testing.T) {
 
 	afo.AddAnomaly(anomaly)
 
-	assert.Equal(t, []Anomaly{anomaly}, afo.GetAnomaliesForField("firstNames"))
+	assert.Equal(t, []Anomaly{anomaly}, afo.GetAnomaliesForFieldWithStatus("firstNames", "detected"))
 }
 
 func TestAnomaliesForSection(t *testing.T) {
