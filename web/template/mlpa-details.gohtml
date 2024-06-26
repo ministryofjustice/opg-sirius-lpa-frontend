@@ -120,8 +120,7 @@
         </div>
       </div>
 
-      {{ $section := "donor" }}
-      {{ $anomaliesForSection := .AnomalyDisplay.GetAnomaliesForSection $section }}
+      <!-- donor -->
       <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
         <div class="govuk-accordion__section">
           <div class="govuk-accordion__section-header">
@@ -208,18 +207,16 @@
           </div>
         </div>
 
-        {{ $section = "attorneys" }}
-        {{ $anomaliesForSection = .AnomalyDisplay.GetAnomaliesForSection $section }}
+        <!-- attorneys -->
+        {{ $anomaliesForSection := .AnomalyDisplay.GetAnomaliesForSection "attorneys" }}
         <div class="govuk-accordion__section">
-          <div class="govuk-accordion__section-header">
+          <div class="govuk-accordion__section-header{{ if $anomaliesForSection.HasAnomalies }} govuk-form-group--error{{ end }}">
             <h2 class="govuk-accordion__section-heading">
               <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
                 Attorneys ({{ len .NonReplacementAttorneys }})
-                {{ if .AnomalyDisplay.SectionHasAnomalies $section }}WE GOT TROUBLE{{ end }}
               </span>
             </h2>
           </div>
-
           <div id="accordion-default-content-2" class="govuk-accordion__section-content">
             {{ if (gt (len .NonReplacementAttorneys) 0) }}
               {{ range $num, $attorney := .NonReplacementAttorneys }}
@@ -232,13 +229,15 @@
                     <dt class="govuk-summary-list__key">First names</dt>
                     <dd class="govuk-summary-list__value">
                       {{ $attorney.FirstNames }}
+                      {{ $attorneyFieldAnomalies := $attorneyAnomalies.GetAnomaliesForField "firstNames" }}
+                      {{ if gt (len $attorneyFieldAnomalies) 0 }}OH DEAR{{ end }}
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Last name</dt>
                     <dd class="govuk-summary-list__value">
                       {{ $attorney.LastName }}
-                      {{ $attorneyFieldAnomalies := $attorneyAnomalies.GetAnomaliesForField "lastName" }}
+                      {{ $attorneyFieldAnomalies = $attorneyAnomalies.GetAnomaliesForField "lastName" }}
                       {{ if gt (len $attorneyFieldAnomalies) 0 }}OH DEAR{{ end }}
                     </dd>
                   </div>
@@ -332,8 +331,10 @@
           </div>
         </div>
 
+        <!-- replacement attorneys -->
+        {{ $anomaliesForSection = .AnomalyDisplay.GetAnomaliesForSection "replacementAttorneys" }}
         <div class="govuk-accordion__section">
-          <div class="govuk-accordion__section-header">
+          <div class="govuk-accordion__section-header{{ if $anomaliesForSection.HasAnomalies }} govuk-form-group--error{{ end }}">
             <h2 class="govuk-accordion__section-heading">
               <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
                 Replacement attorneys ({{ len .ReplacementAttorneys }})
@@ -371,6 +372,7 @@
               </dl>
 
               {{ range $num, $attorney := .ReplacementAttorneys }}
+                {{ $attorneyAnomalies := $anomaliesForSection.GetAnomaliesForObject $attorney.Uid }}
                 <h2 class="govuk-heading-m">
                   Replacement attorney {{ plusN $num 1 }}
                 </h2>
@@ -378,11 +380,19 @@
                 <dl class="govuk-summary-list">
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">First names</dt>
-                    <dd class="govuk-summary-list__value">{{ $attorney.FirstNames }}</dd>
+                    <dd class="govuk-summary-list__value">
+                      {{ $attorney.FirstNames }}
+                      {{ $attorneyFieldAnomalies := $attorneyAnomalies.GetAnomaliesForField "firstNames" }}
+                      {{ if gt (len $attorneyFieldAnomalies) 0 }}OH DEAR{{ end }}
+                    </dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Last name</dt>
-                    <dd class="govuk-summary-list__value">{{ $attorney.LastName }}</dd>
+                    <dd class="govuk-summary-list__value">
+                      {{ $attorney.LastName }}
+                      {{ $attorneyFieldAnomalies = $attorneyAnomalies.GetAnomaliesForField "lastName" }}
+                      {{ if gt (len $attorneyFieldAnomalies) 0 }}OH DEAR{{ end }}
+                    </dd>
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Date of birth</dt>
