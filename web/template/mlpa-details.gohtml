@@ -214,6 +214,7 @@
             <h2 class="govuk-accordion__section-heading">
               <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
                 Attorneys ({{ len .NonReplacementAttorneys }})
+                {{ if $anomaliesForSection.HasAnomalies }}<span class="govuk-error-message">For review</span>{{ end }}
               </span>
             </h2>
           </div>
@@ -342,6 +343,7 @@
             <h2 class="govuk-accordion__section-heading">
               <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
                 Replacement attorneys ({{ len .ReplacementAttorneys }})
+                {{ if $anomaliesForSection.HasAnomalies }}<span class="govuk-error-message">For review</span>{{ end }}
               </span>
             </h2>
           </div>
