@@ -114,7 +114,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 		On("Func", mock.Anything, getLpaDetails{
 			CaseSummary:    caseSummary,
 			DigitalLpa:     caseSummary.DigitalLpa,
-			AnomalyDisplay: expectedAnomalyDisplay,
+			AnomalyDisplay: &expectedAnomalyDisplay,
 			ReplacementAttorneys: []sirius.LpaStoreAttorney{
 				{
 					Status: "replacement",
