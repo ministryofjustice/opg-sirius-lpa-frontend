@@ -79,19 +79,33 @@ func TestGroupAnomalies(t *testing.T) {
 				Uid: "1",
 			},
 		},
+		Attorneys: []LpaStoreAttorney{
+			{
+				LpaStorePerson: LpaStorePerson{
+					Uid: "2",
+				},
+				Status: "active",
+			},
+		},
 	}
 
 	anomalies := []Anomaly{
 		// donor (2 anomalies on one field)
 		{
 			Status:        AnomalyDetected,
-			FieldName:     "firstNames",
-			FieldOwnerUid: "1",
+			FieldName:     ObjectFieldName("firstNames"),
+			FieldOwnerUid: ObjectUid("1"),
 		},
 		{
 			Status:        AnomalyDetected,
-			FieldName:     "firstNames",
-			FieldOwnerUid: "1",
+			FieldName:     ObjectFieldName("firstNames"),
+			FieldOwnerUid: ObjectUid("1"),
+		},
+		// attorneys
+		{
+			Status:        AnomalyDetected,
+			FieldName:     ObjectFieldName("lastName"),
+			FieldOwnerUid: ObjectUid("2"),
 		},
 	}
 
@@ -100,19 +114,37 @@ func TestGroupAnomalies(t *testing.T) {
 	expectedDonorAnomalies := AnomaliesForSection{
 		Section: DonorSection,
 		Objects: map[ObjectUid]AnomaliesForObject{
-			"1": {
-				Uid: "1",
+			ObjectUid("1"): {
+				Uid: ObjectUid("1"),
 				Anomalies: map[ObjectFieldName][]Anomaly{
-					"firstNames": {
+					ObjectFieldName("firstNames"): {
 						{
 							Status:        AnomalyDetected,
-							FieldName:     "firstNames",
-							FieldOwnerUid: "1",
+							FieldName:     ObjectFieldName("firstNames"),
+							FieldOwnerUid: ObjectUid("1"),
 						},
 						{
 							Status:        AnomalyDetected,
-							FieldName:     "firstNames",
-							FieldOwnerUid: "1",
+							FieldName:     ObjectFieldName("firstNames"),
+							FieldOwnerUid: ObjectUid("1"),
+						},
+					},
+				},
+			},
+		},
+	}
+
+	expectedAttorneyAnomalies := AnomaliesForSection{
+		Section: AttorneysSection,
+		Objects: map[ObjectUid]AnomaliesForObject{
+			ObjectUid("2"): {
+				Uid: ObjectUid("2"),
+				Anomalies: map[ObjectFieldName][]Anomaly{
+					ObjectFieldName("lastName"): {
+						{
+							Status:        AnomalyDetected,
+							FieldName:     ObjectFieldName("lastName"),
+							FieldOwnerUid: ObjectUid("2"),
 						},
 					},
 				},
@@ -121,4 +153,5 @@ func TestGroupAnomalies(t *testing.T) {
 	}
 
 	assert.Equal(t, expectedDonorAnomalies, *ad.GetAnomaliesForSection("donor"))
+	assert.Equal(t, expectedAttorneyAnomalies, *ad.GetAnomaliesForSection("attorneys"))
 }
