@@ -76,6 +76,12 @@ describe("View and edit anomalies for a digital LPA", () => {
 
     it("shows anomalies", () => {
         cy.visit("/lpa/M-DIGI-QQQQ-1111/lpa-details");
+        cy.contains("Some LPA details have been identified for review.");
+        cy.contains("For review");
+        cy.contains("Review attorney's first names");
+        cy.contains("Review attorney's last name");
+        cy.contains("Review replacement attorney's first names");
+        cy.contains("Review replacement attorney's last name");
     });
 });
 
