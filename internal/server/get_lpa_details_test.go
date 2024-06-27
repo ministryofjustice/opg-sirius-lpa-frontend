@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -20,6 +21,28 @@ func (m *mockGetLpaDetailsClient) CaseSummary(ctx sirius.Context, uid string) (s
 func (m *mockGetLpaDetailsClient) AnomaliesForDigitalLpa(ctx sirius.Context, uid string) ([]sirius.Anomaly, error) {
 	args := m.Called(ctx, uid)
 	return args.Get(0).([]sirius.Anomaly), args.Error(1)
+}
+
+func TestGetLpaDetailsCaseSummaryFail(t *testing.T) {
+	expectedError := errors.New("network error")
+
+	client := &mockGetLpaDetailsClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-EEEE-9876-9876").
+		Return(sirius.CaseSummary{}, expectedError)
+	client.
+		On("AnomaliesForDigitalLpa", mock.Anything, "M-EEEE-9876-9876").
+		Return([]sirius.Anomaly{}, nil)
+
+	template := &mockTemplate{}
+
+	server := newMockServer("/lpa/{uid}/lpa-details", GetLpaDetails(client, template.Func))
+
+	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-EEEE-9876-9876/lpa-details", nil)
+	_, err := server.serve(req)
+
+	assert.Error(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
 }
 
 func TestGetLpaDetailsSuccess(t *testing.T) {

@@ -56,13 +56,13 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "", nil
 			}
 
-			time, err := s.Time()
+			t, err := s.Time()
 
 			if err != nil {
 				return "", err
 			}
 
-			return time.Format(format), nil
+			return t.Format(format), nil
 		},
 		// s is a date string; layout specifies its structure;
 		// if the date is invalid, this returns "invalid date"
