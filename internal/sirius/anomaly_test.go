@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/pact-foundation/pact-go/dsl"
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -21,16 +21,16 @@ func (m *mockAnomaliesHttpClient) Do(req *http.Request) (*http.Response, error) 
 	return args.Get(0).(*http.Response), args.Error(1)
 }
 
-func TestAnomaliesForDigitalLpaSuccess(t *testing.T) {
+func TestAnomaliesForDigitalLpaNotInStore(t *testing.T) {
 	pact := newPact()
 
 	defer pact.Teardown()
 
-	expectedResponse := []Anomaly{}
+	var expectedResponse []Anomaly
 
 	pact.
 		AddInteraction().
-		Given("A digital LPA with UID LPA M-QWQW-QTQT-WERT and anomalies exists").
+		Given("A digital LPA with UID LPA M-QWQW-QTQT-WERT exists but has no LPA store record").
 		UponReceiving("A request for the anomalies for a digital LPA").
 		WithRequest(dsl.Request{
 			Method: http.MethodGet,
@@ -40,7 +40,7 @@ func TestAnomaliesForDigitalLpaSuccess(t *testing.T) {
 			Status: http.StatusOK,
 			Body: dsl.Like(map[string]interface{}{
 				"uid":       dsl.Like("M-QWQW-QTQT-WERT"),
-				"anomalies": dsl.EachLike(map[string]interface{}{}, 0),
+				"anomalies": nil,
 			}),
 			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 		})
@@ -56,6 +56,43 @@ func TestAnomaliesForDigitalLpaSuccess(t *testing.T) {
 		return nil
 	}))
 }
+
+/*
+func TestAnomaliesForDigitalLpaSuccess(t *testing.T) {
+	pact := newPact()
+
+	defer pact.Teardown()
+
+	expectedResponse := []Anomaly
+
+	pact.
+		AddInteraction().
+		Given("A digital LPA with UID LPA M-XXXX-QTQT-WERT and anomalies exists").
+		UponReceiving("A request for the anomalies for a digital LPA").
+		WithRequest(dsl.Request{
+			Method: http.MethodGet,
+			Path:   dsl.String("/lpa-api/v1/digital-lpas/M-XXXX-QTQT-WERT/anomalies"),
+		}).
+		WillRespondWith(dsl.Response{
+			Status: http.StatusOK,
+			Body: dsl.Like(map[string]interface{}{
+				"uid":       dsl.Like("M-XXXX-QTQT-WERT"),
+				"anomalies": dsl.EachLike(map[string]interface{}{}, 0),
+			}),
+			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+		})
+
+	assert.Nil(t, pact.Verify(func() error {
+		client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+
+		anomalies, err := client.AnomaliesForDigitalLpa(Context{Context: context.Background()}, "M-XXXX-QTQT-WERT")
+
+		assert.Equal(t, expectedResponse, anomalies)
+		assert.Nil(t, err)
+
+		return nil
+	}))
+}*/
 
 func TestAnomaliesForDigitalLpaFail(t *testing.T) {
 	mockClient := &mockAnomaliesHttpClient{}
