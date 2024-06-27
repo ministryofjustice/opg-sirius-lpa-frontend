@@ -62,7 +62,8 @@ func TestAnomaliesForDigitalLpaFail(t *testing.T) {
 	mockClient.On("Do", mock.Anything).Return(&http.Response{}, errors.New("Networking issue"))
 
 	client := NewClient(mockClient, "http://localhost")
-	_, err := client.ProgressIndicatorsForDigitalLpa(Context{Context: context.Background()}, "M-QEQE-EEEE-QQQE")
+	_, err := client.AnomaliesForDigitalLpa(Context{Context: context.Background()}, "M-QEQE-EEEE-QQQE")
 
+	assert.NotNil(t, err)
 	assert.Equal(t, "Networking issue", err.Error())
 }
