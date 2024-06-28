@@ -1,10 +1,28 @@
 package templatefn
 
 import (
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestDate(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["date"].(func(sirius.DateString, string) (string, error))
+
+	val, err := fn("", "")
+	assert.Nil(t, err)
+	assert.Equal(t, "", val)
+
+	val, err = fn("aaaa", "2006-01-02")
+	assert.NotNil(t, err)
+	assert.Equal(t, "", val)
+
+	val, err = fn("2024-06-27", "02 Jan 2006")
+	assert.Nil(t, err)
+	assert.Equal(t, "27 Jun 2024", val)
+}
 
 func TestParseAndFormatDate(t *testing.T) {
 	fns := All("", "", "")

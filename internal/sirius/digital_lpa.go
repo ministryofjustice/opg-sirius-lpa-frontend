@@ -84,6 +84,7 @@ type LpaStorePersonToNotify struct {
 }
 
 type LpaStorePerson struct {
+	Uid        string          `json:"uid"`
 	FirstNames string          `json:"firstNames"`
 	LastName   string          `json:"lastName"`
 	Address    LpaStoreAddress `json:"address"`
