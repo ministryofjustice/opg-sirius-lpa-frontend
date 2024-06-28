@@ -70,7 +70,48 @@ func TestAnomalyDisplay(t *testing.T) {
 	assert.Equal(t, expected, *ad.GetAnomaliesForSection("donor"))
 }
 
-func TestGroupAnomalies(t *testing.T) {
+func TestAnomalyDisplay_SectionHasAnomalies(t *testing.T) {
+	ad := AnomalyDisplay{
+		AnomaliesBySection: map[AnomalyDisplaySection]AnomaliesForSection{
+			DonorSection: {
+				Section: DonorSection,
+				Objects: map[ObjectUid]AnomaliesForObject{
+					ObjectUid("1"): {},
+				},
+			},
+		},
+	}
+
+	assert.True(t, ad.SectionHasAnomalies("donor"))
+}
+
+func TestAnomaliesForSection_GetAnomaliesForObject(t *testing.T) {
+	afs := AnomaliesForSection{
+		Section: AnomalyDisplaySection("donor"),
+		Objects: nil,
+	}
+
+	assert.Equal(t, &AnomaliesForObject{}, afs.GetAnomaliesForObject("donor"))
+}
+
+func TestAnomaliesForObject_GetAnomaliesForFieldWithStatus(t *testing.T) {
+	anomaly := Anomaly{
+		Id:     1,
+		Status: AnomalyDetected,
+	}
+
+	afo := AnomaliesForObject{
+		Uid: ObjectUid("1"),
+		Anomalies: map[ObjectFieldName][]Anomaly{
+			"firstNames": {anomaly},
+		},
+	}
+
+	assert.Equal(t, []Anomaly{anomaly}, afo.GetAnomaliesForFieldWithStatus("firstNames", "detected"))
+	assert.Equal(t, []Anomaly(nil), afo.GetAnomaliesForFieldWithStatus("lastName", "detected"))
+}
+
+func TestAnomalyDisplay_Group(t *testing.T) {
 	ad := AnomalyDisplay{}
 
 	lpa := LpaStoreData{
@@ -85,6 +126,12 @@ func TestGroupAnomalies(t *testing.T) {
 					Uid: "2",
 				},
 				Status: "active",
+			},
+		},
+		// to test that no anomalies are returned for this section
+		CertificateProvider: LpaStoreCertificateProvider{
+			LpaStorePerson: LpaStorePerson{
+				Uid: "4",
 			},
 		},
 	}
@@ -154,4 +201,48 @@ func TestGroupAnomalies(t *testing.T) {
 
 	assert.Equal(t, expectedDonorAnomalies, *ad.GetAnomaliesForSection("donor"))
 	assert.Equal(t, expectedAttorneyAnomalies, *ad.GetAnomaliesForSection("attorneys"))
+	assert.Equal(t, AnomaliesForSection{}, *ad.GetAnomaliesForSection("certificateProvider"))
+}
+
+func TestGetSectionForUid(t *testing.T) {
+	lpa := LpaStoreData{
+		Donor: LpaStoreDonor{
+			LpaStorePerson: LpaStorePerson{
+				Uid: "1",
+			},
+		},
+		Attorneys: []LpaStoreAttorney{
+			{
+				LpaStorePerson: LpaStorePerson{
+					Uid: "2",
+				},
+				Status: "active",
+			},
+			{
+				LpaStorePerson: LpaStorePerson{
+					Uid: "3",
+				},
+				Status: "replacement",
+			},
+		},
+		CertificateProvider: LpaStoreCertificateProvider{
+			LpaStorePerson: LpaStorePerson{
+				Uid: "4",
+			},
+		},
+		PeopleToNotify: []LpaStorePersonToNotify{
+			{
+				LpaStorePerson{
+					Uid: "5",
+				},
+			},
+		},
+	}
+
+	assert.Equal(t, DonorSection, getSectionForUid(&lpa, "1"))
+	assert.Equal(t, AttorneysSection, getSectionForUid(&lpa, "2"))
+	assert.Equal(t, ReplacementAttorneysSection, getSectionForUid(&lpa, "3"))
+	assert.Equal(t, CertificateProviderSection, getSectionForUid(&lpa, "4"))
+	assert.Equal(t, PeopleToNotifySection, getSectionForUid(&lpa, "5"))
+	assert.Equal(t, RootSection, getSectionForUid(&lpa, ""))
 }
