@@ -26,11 +26,9 @@ func TestAnomaliesForDigitalLpaNotInStore(t *testing.T) {
 
 	defer pact.Teardown()
 
-	var expectedResponse []Anomaly
-
 	pact.
 		AddInteraction().
-		Given("A digital LPA with UID LPA M-QWQW-QTQT-WERT exists but has no LPA store record").
+		Given("A digital LPA with UID LPA M-QWQW-QTQT-WERT exists with LPA store record and no anomalies").
 		UponReceiving("A request for the anomalies for a digital LPA").
 		WithRequest(dsl.Request{
 			Method: http.MethodGet,
@@ -40,7 +38,7 @@ func TestAnomaliesForDigitalLpaNotInStore(t *testing.T) {
 			Status: http.StatusOK,
 			Body: dsl.Like(map[string]interface{}{
 				"uid":       dsl.Like("M-QWQW-QTQT-WERT"),
-				"anomalies": nil,
+				"anomalies": []interface{}{},
 			}),
 			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 		})
@@ -50,7 +48,7 @@ func TestAnomaliesForDigitalLpaNotInStore(t *testing.T) {
 
 		anomalies, err := client.AnomaliesForDigitalLpa(Context{Context: context.Background()}, "M-QWQW-QTQT-WERT")
 
-		assert.Equal(t, expectedResponse, anomalies)
+		assert.Equal(t, []Anomaly{}, anomalies)
 		assert.Nil(t, err)
 
 		return nil
