@@ -117,6 +117,9 @@ github.com/pact-foundation/pact-go v1.8.0 h1:On9JjJZrzwqmT2UICedWqLpcAtqVyd/ktt0
 github.com/pact-foundation/pact-go v1.8.0/go.mod h1:YLt/uSQGo9x5ZUjynLzNy3IiORlA4BtbR9p2yxgD2as=
 github.com/pact-foundation/pact-go v1.9.0 h1:8nUZ8Xvq3nQ+36TeS4GpkeE0zjr2LO86/ZW1HT/BaFI=
 github.com/pact-foundation/pact-go v1.9.0/go.mod h1:YLt/uSQGo9x5ZUjynLzNy3IiORlA4BtbR9p2yxgD2as=
+github.com/pact-foundation/pact-go v1.10.0 h1:LE954RwmeV0rSm21umyPGGCvzHkEhglowkNGyuMwNGM=
+github.com/pact-foundation/pact-go v1.10.0/go.mod h1:YLt/uSQGo9x5ZUjynLzNy3IiORlA4BtbR9p2yxgD2as=
+github.com/pact-foundation/pact-go/v2 v2.0.5/go.mod h1:OO003128Co8mczCV7UrD6kmeCdyxFOAv4dt3BFvqy5E=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
