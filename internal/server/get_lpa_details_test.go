@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -17,6 +18,33 @@ func (m *mockGetLpaDetailsClient) CaseSummary(ctx sirius.Context, uid string) (s
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
+func (m *mockGetLpaDetailsClient) AnomaliesForDigitalLpa(ctx sirius.Context, uid string) ([]sirius.Anomaly, error) {
+	args := m.Called(ctx, uid)
+	return args.Get(0).([]sirius.Anomaly), args.Error(1)
+}
+
+func TestGetLpaDetailsCaseSummaryFail(t *testing.T) {
+	expectedError := errors.New("network error")
+
+	client := &mockGetLpaDetailsClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-EEEE-9876-9876").
+		Return(sirius.CaseSummary{}, expectedError)
+	client.
+		On("AnomaliesForDigitalLpa", mock.Anything, "M-EEEE-9876-9876").
+		Return([]sirius.Anomaly{}, nil)
+
+	template := &mockTemplate{}
+
+	server := newMockServer("/lpa/{uid}/lpa-details", GetLpaDetails(client, template.Func))
+
+	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-EEEE-9876-9876/lpa-details", nil)
+	_, err := server.serve(req)
+
+	assert.Error(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
 func TestGetLpaDetailsSuccess(t *testing.T) {
 	caseSummary := sirius.CaseSummary{
 		DigitalLpa: sirius.DigitalLpa{
@@ -27,31 +55,32 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 			},
 			LpaStoreData: sirius.LpaStoreData{
 				Attorneys: []sirius.LpaStoreAttorney{
-					sirius.LpaStoreAttorney{
+					{
 						Status: "replacement",
 						LpaStorePerson: sirius.LpaStorePerson{
+							Uid:   "1",
 							Email: "first@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
+					{
 						Status: "replacement",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "second@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
+					{
 						Status: "active",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "third@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
+					{
 						Status: "active",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "fourth@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
+					{
 						Status: "removed",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "fifth@does.not.exist",
@@ -63,24 +92,61 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 		TaskList: []sirius.Task{},
 	}
 
+	anomalies := []sirius.Anomaly{
+		{
+			Id:            999,
+			Status:        sirius.AnomalyFatal,
+			FieldName:     sirius.ObjectFieldName("lastName"),
+			FieldOwnerUid: sirius.ObjectUid("1"),
+		},
+	}
+
+	expectedAnomalyDisplay := sirius.AnomalyDisplay{
+		AnomaliesBySection: map[sirius.AnomalyDisplaySection]sirius.AnomaliesForSection{
+			sirius.ReplacementAttorneysSection: {
+				Section: sirius.ReplacementAttorneysSection,
+				Objects: map[sirius.ObjectUid]sirius.AnomaliesForObject{
+					sirius.ObjectUid("1"): {
+						Uid: sirius.ObjectUid("1"),
+						Anomalies: map[sirius.ObjectFieldName][]sirius.Anomaly{
+							sirius.ObjectFieldName("lastName"): {
+								{
+									Id:            999,
+									Status:        sirius.AnomalyFatal,
+									FieldName:     sirius.ObjectFieldName("lastName"),
+									FieldOwnerUid: sirius.ObjectUid("1"),
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
 	client := &mockGetLpaDetailsClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
 		Return(caseSummary, nil)
+	client.
+		On("AnomaliesForDigitalLpa", mock.Anything, "M-9876-9876-9876").
+		Return(anomalies, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getLpaDetails{
-			CaseSummary: caseSummary,
-			DigitalLpa:  caseSummary.DigitalLpa,
+			CaseSummary:    caseSummary,
+			DigitalLpa:     caseSummary.DigitalLpa,
+			AnomalyDisplay: &expectedAnomalyDisplay,
 			ReplacementAttorneys: []sirius.LpaStoreAttorney{
-				sirius.LpaStoreAttorney{
+				{
 					Status: "replacement",
 					LpaStorePerson: sirius.LpaStorePerson{
 						Email: "first@does.not.exist",
+						Uid:   "1",
 					},
 				},
-				sirius.LpaStoreAttorney{
+				{
 					Status: "replacement",
 					LpaStorePerson: sirius.LpaStorePerson{
 						Email: "second@does.not.exist",
@@ -88,13 +154,13 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 				},
 			},
 			NonReplacementAttorneys: []sirius.LpaStoreAttorney{
-				sirius.LpaStoreAttorney{
+				{
 					Status: "active",
 					LpaStorePerson: sirius.LpaStorePerson{
 						Email: "third@does.not.exist",
 					},
 				},
-				sirius.LpaStoreAttorney{
+				{
 					Status: "active",
 					LpaStorePerson: sirius.LpaStorePerson{
 						Email: "fourth@does.not.exist",

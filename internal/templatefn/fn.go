@@ -52,6 +52,10 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			return "", nil
 		},
 		"date": func(s sirius.DateString, format string) (string, error) {
+			if s == "" {
+				return "", nil
+			}
+
 			t, err := s.Time()
 
 			if err != nil {
