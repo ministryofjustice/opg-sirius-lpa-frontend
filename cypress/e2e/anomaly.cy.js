@@ -44,6 +44,7 @@ describe("View and edit anomalies for a digital LPA", () => {
     cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-QQQQ-1111/anomalies", "GET", {
       status: 200,
       body: {
+        uid: "M-DIGI-QQQQ-1111",
         anomalies: [
           {
             id: 123,
