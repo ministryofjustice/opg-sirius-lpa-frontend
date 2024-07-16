@@ -472,7 +472,7 @@ describe("View a digital LPA", () => {
     });
   });
 
-  it("shows application details when status is Draft", () => {
+  it("shows application details when store is empty", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3334");
 
     cy.contains("LPA details").click();
