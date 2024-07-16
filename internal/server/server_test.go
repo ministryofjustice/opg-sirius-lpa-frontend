@@ -139,7 +139,7 @@ func TestErrorHandlerJsonError(t *testing.T) {
 
 	body := new(bytes.Buffer)
 	_, _ = body.ReadFrom(resp.Body)
-	assert.Equal(`{"title":"validation error","detail":"Not valid complaint","validationErrors":{"title":{"tooShort":"The title must be at least 5 characters"}}}`, strings.Trim(body.String(), "\n"))
+	assert.Equal(`{"title":"Not valid complaint","detail":"Not valid complaint","validationErrors":{"title":{"tooShort":"The title must be at least 5 characters"}}}`, strings.Trim(body.String(), "\n"))
 
 	assert.Nil(buf.Bytes())
 }
