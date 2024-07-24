@@ -77,3 +77,15 @@ func TestToFieldErrorsThrowsError(t *testing.T) {
 	assert.Equal(t, err, errors.New("could not parse field validation_errors"))
 	assert.Nil(t, result)
 }
+
+func TestValidationErrorSummary(t *testing.T) {
+	emptyValidationError := ValidationError{}
+
+	assert.Equal(t, "validation error", emptyValidationError.Error())
+
+	descriptiveValidationError := ValidationError{
+		Detail: "This case is in a Registered status and cannot be deleted",
+	}
+
+	assert.Equal(t, "This case is in a Registered status and cannot be deleted", descriptiveValidationError.Error())
+}

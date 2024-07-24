@@ -162,6 +162,10 @@ func (e ValidationError) Any() bool {
 	return len(e.Detail) > 0 || len(e.Field) > 0
 }
 
-func (ValidationError) Error() string {
+func (e ValidationError) Error() string {
+	if len(e.Detail) > 0 {
+		return e.Detail
+	}
+
 	return "validation error"
 }
