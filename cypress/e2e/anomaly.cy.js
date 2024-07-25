@@ -11,6 +11,7 @@ describe("View and edit anomalies for a digital LPA", () => {
           caseSubtype: "property-and-affairs",
         },
         "opg.poas.lpastore": {
+          channel: "online",
           attorneys: [
             {
               uid: "attorney-1-uid",
