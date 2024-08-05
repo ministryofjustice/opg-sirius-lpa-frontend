@@ -3,18 +3,18 @@
 {{ define "title" }}LPA details{{ end }}
 
 {{ define "main" }}
-    <div class="govuk-grid-row" id="lpa-details-data">
-      <div class="govuk-grid-column-full">
-
-        {{ template "mlpa-header" (caseTabs .CaseSummary "lpa-details") }}
-
-        <h1 class="govuk-heading-l govuk-!-margin-bottom-5">LPA details</h1>
-      </div>
-    </div>
-
-    {{ if eq .DigitalLpa.LpaStoreData.Channel "" }}
-
+  {{ if eq .DigitalLpa.LpaStoreData.Channel "" }}
       <!-- draft application -->
+
+      <div class="govuk-grid-row" id="lpa-details-data">
+        <div class="govuk-grid-column-full">
+
+          {{ template "mlpa-header" (caseTabs .CaseSummary "lpa-details") }}
+
+          <h1 class="govuk-heading-l govuk-!-margin-bottom-5">LPA details</h1>
+        </div>
+      </div>
+
       <h2 class="govuk-heading-m">Donor</h2>
 
       <dl class="govuk-summary-list">
