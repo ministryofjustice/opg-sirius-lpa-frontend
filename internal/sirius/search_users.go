@@ -26,7 +26,7 @@ func (c *Client) SearchUsers(ctx Context, term string) ([]User, error) {
 		err := ValidationError{
 			Detail: "Search term must be at least three characters",
 			Field: FieldErrors{
-				"term": {"reason": "Search term must be at least three characters"},
+				"search": {"reason": "Search term must be at least three characters"},
 			},
 		}
 
