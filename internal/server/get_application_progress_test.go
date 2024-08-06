@@ -3,11 +3,12 @@ package server
 import (
 	"errors"
 
+	"net/http"
+	"testing"
+
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"net/http"
-	"testing"
 )
 
 type mockApplicationProgressClient struct {
@@ -31,6 +32,9 @@ func TestGetApplicationProgressSuccess(t *testing.T) {
 			SiriusData: sirius.SiriusData{
 				ID:      22,
 				Subtype: "hw",
+				Application: sirius.Draft{
+					Source: "APPLICANT",
+				},
 			},
 			LpaStoreData: sirius.LpaStoreData{
 				Channel: "Digital",
@@ -91,7 +95,7 @@ func TestGetApplicationProgressSuccess(t *testing.T) {
 			ProgressIndicator:          progressIndicators[0],
 			CertificateProviderChannel: "Paper",
 			CertificateProviderName:    "Fake Provider",
-			DonorChannel:               "Digital",
+			ApplicationSource:          "APPLICANT",
 		},
 	}
 
