@@ -21,6 +21,7 @@ describe("View the application progress for a digital LPA", () => {
             id: 33,
           },
           application: {
+            source: "PHONE",
             donorFirstNames: "Peter",
             donorLastName: "Maaaabbbb",
             donorDob: "27/05/1968",
@@ -292,6 +293,7 @@ describe("View the application progress for a digital LPA", () => {
             id: 33,
           },
           application: {
+            source: "APPLICANT",
             donorFirstNames: "Peter",
             donorLastName: "Maaaabbbb",
             donorDob: "27/05/1968",
