@@ -3,7 +3,7 @@
         <th scope="row" class="govuk-table__header">Progress</th>
         <td class="govuk-table__cell">{{ progressIndicatorStatus .Status }}</td>
         <td class="govuk-table__cell">
-            {{if and (eq .Status "IN_PROGRESS") (eq .DonorChannel "paper")}}
+            {{if eq .Status "IN_PROGRESS"}}
                 <a class="govuk-link govuk-link--no-visited-state"
                    href="{{printf "/lpa/identity-check/start?personType=donor&lpas[]=%s" .UID}}">
                     Start donor identity check
