@@ -1,9 +1,10 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 )
@@ -17,7 +18,7 @@ type IndicatorView struct {
 	UID                        string
 	CertificateProviderName    string
 	CertificateProviderChannel string
-	DonorChannel               string
+	ApplicationSource          string
 	sirius.ProgressIndicator
 }
 
@@ -54,7 +55,7 @@ func GetApplicationProgressDetails(client GetApplicationProgressClient, tmpl tem
 				CertificateProviderName:    cpName,
 				ProgressIndicator:          v,
 				CertificateProviderChannel: cs.DigitalLpa.LpaStoreData.CertificateProvider.Channel,
-				DonorChannel:               cs.DigitalLpa.LpaStoreData.Channel,
+				ApplicationSource:          cs.DigitalLpa.SiriusData.Application.Source,
 			})
 		}
 
