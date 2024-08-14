@@ -14,6 +14,7 @@ describe("View a digital LPA", () => {
           complaintCount: 1,
           taskCount: 2,
           warningCount: 4,
+          dueDate: '01/12/2023',
           donor: {
             id: 33,
           },
@@ -469,6 +470,12 @@ describe("View a digital LPA", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details").then(() => {
       Cypress.$("span:contains('Donor')").closest("button")[0].click();
       cy.contains("Online");
+    });
+  });
+
+  it("shows due date", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details").then(() => {
+      cy.contains("Registration due: 1 December 2023");
     });
   });
 
