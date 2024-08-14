@@ -14,7 +14,7 @@ describe("View a digital LPA", () => {
           complaintCount: 1,
           taskCount: 2,
           warningCount: 4,
-          dueDate: '01/12/2023',
+          dueDate: "01/12/2023",
           donor: {
             id: 33,
           },
