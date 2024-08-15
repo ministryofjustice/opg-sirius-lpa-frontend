@@ -3,18 +3,24 @@
 {{ define "title" }}LPA details{{ end }}
 
 {{ define "main" }}
-    <div class="govuk-grid-row" id="lpa-details-data">
-      <div class="govuk-grid-column-full">
-
-        {{ template "mlpa-header" (caseTabs .CaseSummary "lpa-details") }}
-
-        <h1 class="govuk-heading-l govuk-!-margin-bottom-5">LPA details</h1>
-      </div>
-    </div>
-
-    {{ if eq .DigitalLpa.LpaStoreData.Channel "" }}
-
+  {{ if eq .DigitalLpa.LpaStoreData.Channel "" }}
       <!-- draft application -->
+
+      <div class="govuk-grid-row" id="lpa-details-data">
+        <div class="govuk-grid-column-full">
+
+          {{ template "mlpa-header" (caseTabs .CaseSummary "lpa-details") }}
+
+          <div class="govuk-!-margin-bottom-5">
+            <h1 class="govuk-heading-l govuk-!-margin-bottom-1">LPA details</h1>
+
+            {{ if ne .DigitalLpa.SiriusData.DueDate "" }}
+              <div class="govuk-body-l">Registration due: {{ date .DigitalLpa.SiriusData.DueDate "2 January 2006" }}</div>
+            {{ end }}
+          </div>
+        </div>
+      </div>
+
       <h2 class="govuk-heading-m">Donor</h2>
 
       <dl class="govuk-summary-list">
@@ -107,7 +113,13 @@
 
           {{ template "mlpa-header" (caseTabs .CaseSummary "lpa-details") }}
 
-          <h1 class="govuk-heading-l govuk-!-margin-bottom-5">LPA details</h1>
+          <div class="govuk-!-margin-bottom-5">
+            <h1 class="govuk-heading-l govuk-!-margin-bottom-1">LPA details</h1>
+
+            {{ if ne .DigitalLpa.SiriusData.DueDate "" }}
+              <div class="govuk-body-l">Registration due: {{ date .DigitalLpa.SiriusData.DueDate "2 January 2006" }}</div>
+            {{ end }}
+          </div>
 
           {{ if .AnomalyDisplay.HasAnomalies }}
             <div class="govuk-error-summary" data-module="govuk-error-summary">
