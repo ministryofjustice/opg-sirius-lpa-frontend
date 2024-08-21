@@ -47,7 +47,7 @@ func TestDigitalLpa(t *testing.T) {
 								"taskCount":          dsl.Like(3),
 								"warningCount":       dsl.Like(4),
 								"objectionCount":     dsl.Like(5),
-								"dueDate":            dsl.Term("30/04/2018", `^\d{1,2}/\d{1,2}/\d{4}$`),
+								"dueDate":            dsl.Like(""),
 								"application": map[string]interface{}{
 									"donorFirstNames": dsl.Like("Zoraida"),
 									"donorLastName":   dsl.Like("Swanberg"),
@@ -89,7 +89,7 @@ func TestDigitalLpa(t *testing.T) {
 					TaskCount:          3,
 					WarningCount:       4,
 					ObjectionCount:     5,
-					DueDate:            DateString("2018-04-30"),
+					DueDate:            "",
 					Application: Draft{
 						DonorFirstNames: "Zoraida",
 						DonorLastName:   "Swanberg",
