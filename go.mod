@@ -2,7 +2,7 @@ module github.com/ministryofjustice/opg-sirius-lpa-frontend
 
 go 1.22
 
-toolchain go1.22.5
+toolchain go1.23.0
 
 require (
 	github.com/go-chi/chi/v5 v5.1.0
@@ -13,7 +13,7 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0
 	golang.org/x/mod v0.20.0
 	golang.org/x/sync v0.8.0
-	golang.org/x/text v0.16.0
+	golang.org/x/text v0.17.0
 )
 
 require (
