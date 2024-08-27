@@ -24,6 +24,7 @@ type SiriusData struct {
 	ObjectionCount     int          `json:"objectionCount"`
 	LinkedCases        []SiriusData `json:"linkedDigitalLpas"`
 	Donor              Donor        `json:"donor"`
+	DueDate            DateString   `json:"dueDate"`
 }
 
 type Donor struct {
