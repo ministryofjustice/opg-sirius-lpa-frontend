@@ -758,9 +758,9 @@ global-dirs@^3.0.0:
     ini "2.0.0"
 
 govuk-frontend@^5.0.0:
-  version "5.5.0"
-  resolved "https://registry.yarnpkg.com/govuk-frontend/-/govuk-frontend-5.5.0.tgz#dfb2426788dbf570ef7d2742983bc54e68f17f34"
-  integrity sha512-lNSHCOzgk6LfgelcdtJxTLK1BX/cpjCUyEB3LnzliD9o9YQckNMsbj5+jSOs2RFy6XBJ/DJqxj2TKfjBCuzpyA==
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/govuk-frontend/-/govuk-frontend-5.6.0.tgz#8c0975f0d825ec7192bcfe64e3e97ef3dfa7dea1"
+  integrity sha512-yNA4bL7i7mNrg36wPNZ3RctHo9mjl82Phs8MWs1lwovxJuQ4ogEo/XWn2uB1HxkXNqgMlW4wnd0iiKgRMfxYfw==
 
 graceful-fs@^4.1.6, graceful-fs@^4.2.0:
   version "4.2.11"
@@ -809,9 +809,9 @@ ieee754@^1.1.13:
   integrity sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==
 
 immutable@^4.0.0:
-  version "4.3.6"
-  resolved "https://registry.yarnpkg.com/immutable/-/immutable-4.3.6.tgz#6a05f7858213238e587fb83586ffa3b4b27f0447"
-  integrity sha512-Ju0+lEMyzMVZarkTn/gqRpdqd5dOPaz1mCZ0SH3JV6iFw81PldE/PEB1hWVEA288HPt4WXW8O7AWxB10M+03QQ==
+  version "4.3.7"
+  resolved "https://registry.yarnpkg.com/immutable/-/immutable-4.3.7.tgz#c70145fc90d89fb02021e65c84eb0226e4e5a381"
+  integrity sha512-1hqclzwYwjRDFLjcFxOM5AYkkG0rpFPpr1RLPMEuGczoS7YA8gLhy8SWXYRAA/XwfEHpfo3cw5JGioS32fnMRw==
 
 indent-string@^4.0.0:
   version "4.0.0"
@@ -1215,9 +1215,9 @@ safer-buffer@^2.0.2, safer-buffer@^2.1.0, safer-buffer@~2.1.0:
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
 sass@^1.26.11:
-  version "1.77.8"
-  resolved "https://registry.yarnpkg.com/sass/-/sass-1.77.8.tgz#9f18b449ea401759ef7ec1752a16373e296b52bd"
-  integrity sha512-4UHg6prsrycW20fqLGPShtEvo/WyHRVRHwOP4DzkUrObWoWI05QBSfzU71TVB7PFaL104TwNaHpjlWXAZbQiNQ==
+  version "1.78.0"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.78.0.tgz#cef369b2f9dc21ea1d2cf22c979f52365da60841"
+  integrity sha512-AaIqGSrjo5lA2Yg7RvFZrlXDBCp3nV4XP73GrLGvdRWWwk+8H3l0SDvq/5bA4eF+0RFPLuWUk3E+P1U/YqnpsQ==
   dependencies:
     chokidar ">=3.0.0 <4.0.0"
     immutable "^4.0.0"
