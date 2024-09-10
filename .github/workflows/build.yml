@@ -214,6 +214,7 @@ jobs:
           if [ "${{ needs.identify.outputs.branch }}" == "main" ]; then
             # We want all of the tags pushed
             docker tag 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:main-${{ needs.identify.outputs.tag }}
+            docker tag 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:main-${{ needs.identify.outputs.tag }}-$(date +"%Y%m%d%H%M%S")
             docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           else
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.identify.outputs.tag }}
