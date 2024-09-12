@@ -27,6 +27,25 @@ describe("Create a document for a digital LPA", () => {
             },
           },
         },
+        "opg.poas.lpastore": {
+          donor: {
+            uid: "572fe550-e465-40b3-a643-ca9564fabab8",
+            firstNames: "Steven",
+            lastName: "Munnell",
+            email: "Steven.Munnell@example.com",
+            dateOfBirth: "17/06/1982",
+            otherNamesKnownBy: "",
+            contactLanguagePreference: "",
+            address: {
+              line1: "1 Scotland Street",
+              line2: "Netherton",
+              line3: "Glasgow",
+              town: "Edinburgh",
+              postcode: "EH6 18J",
+              country: "GB",
+            },
+          },
+        },
       },
     });
 
