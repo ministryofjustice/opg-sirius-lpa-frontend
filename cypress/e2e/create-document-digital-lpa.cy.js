@@ -44,7 +44,7 @@ describe("Create a document for a digital LPA", () => {
               postcode: "EH6 18J",
               country: "GB",
             },
-          }
+          },
         },
       },
     });
