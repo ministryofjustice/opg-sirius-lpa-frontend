@@ -79,6 +79,7 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 			UID:          lpa.LpaStoreData.Donor.Uid,
 			Firstname:    lpa.LpaStoreData.Donor.FirstNames,
 			Surname:      lpa.LpaStoreData.Donor.LastName,
+			DateOfBirth:  sirius.DateString(lpa.LpaStoreData.Donor.DateOfBirth),
 			PersonType:   "Donor",
 			AddressLine1: lpa.LpaStoreData.Donor.Address.Line1,
 			AddressLine2: lpa.LpaStoreData.Donor.Address.Line2,
@@ -86,25 +87,33 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 			Town:         lpa.LpaStoreData.Donor.Address.Town,
 			Postcode:     lpa.LpaStoreData.Donor.Address.Postcode,
 			Country:      lpa.LpaStoreData.Donor.Address.Country,
+			Email:        lpa.LpaStoreData.Donor.Email,
+			AlsoKnownAs:  lpa.LpaStoreData.Donor.OtherNamesKnownBy,
 		}
 
-		placeholderRecipientId--
+		data.Recipients = append(data.Recipients, donorRecipient)
 
-		certificateProviderRecipient := sirius.Person{
-			ID:           placeholderRecipientId,
-			UID:          lpa.LpaStoreData.CertificateProvider.Uid,
-			Firstname:    lpa.LpaStoreData.CertificateProvider.FirstNames,
-			Surname:      lpa.LpaStoreData.CertificateProvider.LastName,
-			PersonType:   "Certificate Provider",
-			AddressLine1: lpa.LpaStoreData.CertificateProvider.Address.Line1,
-			AddressLine2: lpa.LpaStoreData.CertificateProvider.Address.Line2,
-			AddressLine3: lpa.LpaStoreData.CertificateProvider.Address.Line3,
-			Town:         lpa.LpaStoreData.CertificateProvider.Address.Town,
-			Postcode:     lpa.LpaStoreData.CertificateProvider.Address.Postcode,
-			Country:      lpa.LpaStoreData.CertificateProvider.Address.Country,
+		if lpa.LpaStoreData.CertificateProvider.Uid != "" {
+			placeholderRecipientId--
+
+			certificateProviderRecipient := sirius.Person{
+				ID:           placeholderRecipientId,
+				UID:          lpa.LpaStoreData.CertificateProvider.Uid,
+				Firstname:    lpa.LpaStoreData.CertificateProvider.FirstNames,
+				Surname:      lpa.LpaStoreData.CertificateProvider.LastName,
+				PersonType:   "Certificate Provider",
+				AddressLine1: lpa.LpaStoreData.CertificateProvider.Address.Line1,
+				AddressLine2: lpa.LpaStoreData.CertificateProvider.Address.Line2,
+				AddressLine3: lpa.LpaStoreData.CertificateProvider.Address.Line3,
+				Town:         lpa.LpaStoreData.CertificateProvider.Address.Town,
+				Postcode:     lpa.LpaStoreData.CertificateProvider.Address.Postcode,
+				Country:      lpa.LpaStoreData.CertificateProvider.Address.Country,
+				Email:        lpa.LpaStoreData.CertificateProvider.Email,
+				PhoneNumber:  lpa.LpaStoreData.CertificateProvider.Phone,
+			}
+
+			data.Recipients = append(data.Recipients, certificateProviderRecipient)
 		}
-
-		data.Recipients = append(data.Recipients, donorRecipient, certificateProviderRecipient)
 
 		for _, attorney := range lpa.LpaStoreData.Attorneys {
 			if attorney.Status == "removed" {
@@ -124,6 +133,7 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 				UID:          attorney.Uid,
 				Firstname:    attorney.FirstNames,
 				Surname:      attorney.LastName,
+				DateOfBirth:  sirius.DateString(attorney.DateOfBirth),
 				PersonType:   personType,
 				AddressLine1: attorney.Address.Line1,
 				AddressLine2: attorney.Address.Line2,
@@ -131,6 +141,8 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 				Town:         attorney.Address.Town,
 				Postcode:     attorney.Address.Postcode,
 				Country:      attorney.Address.Country,
+				Email:        attorney.Email,
+				PhoneNumber:  attorney.Mobile,
 			}
 
 			data.Recipients = append(data.Recipients, recipient)
