@@ -182,10 +182,13 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 					continue
 				}
 
-				// Create contact for each recipient as we currently have no way to link a document to LPA store actors
-				recipient, err = client.CreateContact(ctx, recipient)
-				if err != nil {
-					return err
+				if recipient.ID < 0 {
+					// Create a placeholder contact for each recipient as we currently have no way to link a document to
+					// LPA store actors
+					recipient, err = client.CreateContact(ctx, recipient)
+					if err != nil {
+						return err
+					}
 				}
 
 				_, err = client.CreateDocument(ctx, lpa.SiriusData.ID, recipient.ID, data.SelectedTemplateId, data.SelectedInserts)
