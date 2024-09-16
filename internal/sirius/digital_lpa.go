@@ -71,6 +71,7 @@ type LpaStoreAttorney struct {
 	Status                    string `json:"status"`
 	Mobile                    string `json:"mobile"`
 	ContactLanguagePreference string `json:"contactLanguagePreference"`
+	SignedAt                  string `json:"signedAt"`
 }
 
 type LpaStoreCertificateProvider struct {
@@ -78,6 +79,7 @@ type LpaStoreCertificateProvider struct {
 	Phone                     string `json:"phone"`
 	Channel                   string `json:"channel"`
 	ContactLanguagePreference string `json:"contactLanguagePreference"`
+	SignedAt                  string `json:"signedAt"`
 }
 
 type LpaStorePersonToNotify struct {
