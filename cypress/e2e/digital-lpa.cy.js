@@ -497,7 +497,7 @@ describe("View a digital LPA", () => {
 
     cy.contains("Attorneys (2)")
       .click()
-      .parents('.govuk-accordion__section')
+      .parents(".govuk-accordion__section")
       .within(() => {
         cy.contains("Greenwood")
           .parents(".govuk-summary-list")
@@ -505,7 +505,7 @@ describe("View a digital LPA", () => {
           .should("not.exist");
         cy.contains("McSpolo")
           .parents(".govuk-summary-list")
-          .should("contain","Signed on")
+          .should("contain", "Signed on")
           .and("contain", "20 December 2022");
       });
   });
@@ -515,7 +515,7 @@ describe("View a digital LPA", () => {
 
     cy.contains("Replacement attorneys (2)")
       .click()
-      .parents('.govuk-accordion__section')
+      .parents(".govuk-accordion__section")
       .within(() => {
         cy.contains("Guinea")
           .parents(".govuk-summary-list")
@@ -533,7 +533,7 @@ describe("View a digital LPA", () => {
 
     cy.contains("Certificate provider")
       .click()
-      .parents('.govuk-accordion__section')
+      .parents(".govuk-accordion__section")
       .should("contain", "Signed on")
       .and("contain", "18 December 2022");
   });
