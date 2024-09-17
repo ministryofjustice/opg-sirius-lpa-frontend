@@ -69,6 +69,7 @@ describe("View a digital LPA", () => {
               firstNames: "Volo",
               lastName: "McSpolo",
               status: "active",
+              signedAt: "2022-12-20T12:02:43Z",
             },
             {
               firstNames: "Susanna",
@@ -80,7 +81,19 @@ describe("View a digital LPA", () => {
               lastName: "Guinea",
               status: "replacement",
             },
+            {
+              firstNames: "Rico",
+              lastName: "Welch",
+              status: "replacement",
+              signedAt: "2022-12-19T09:12:59Z",
+            },
           ],
+          certificateProvider: {
+            uid: "e4d5e24e-2a8d-434e-b815-9898620acc71",
+            firstNames: "Timothy",
+            lastNames: "Turner",
+            signedAt: "2022-12-18T11:46:24Z",
+          },
           lpaType: "pf",
           channel: "online",
           registrationDate: "2022-12-18",
@@ -461,7 +474,7 @@ describe("View a digital LPA", () => {
 
     cy.contains("LPA details").click();
     cy.contains("Attorneys (2)");
-    cy.contains("Replacement attorneys (1)");
+    cy.contains("Replacement attorneys (2)");
     cy.contains("Notified people (0)");
     cy.contains("Correspondent");
   });
@@ -477,6 +490,52 @@ describe("View a digital LPA", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details").then(() => {
       cy.contains("Registration due: 1 December 2023");
     });
+  });
+
+  it("shows attorney signed on date and label if set", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
+
+    cy.contains("Attorneys (2)")
+      .click()
+      .parents(".govuk-accordion__section")
+      .within(() => {
+        cy.contains("Greenwood")
+          .parents(".govuk-summary-list")
+          .contains("Signed on")
+          .should("not.exist");
+        cy.contains("McSpolo")
+          .parents(".govuk-summary-list")
+          .should("contain", "Signed on")
+          .and("contain", "20 December 2022");
+      });
+  });
+
+  it("shows replacement attorney signed on date and label if set", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
+
+    cy.contains("Replacement attorneys (2)")
+      .click()
+      .parents(".govuk-accordion__section")
+      .within(() => {
+        cy.contains("Guinea")
+          .parents(".govuk-summary-list")
+          .contains("Signed on")
+          .should("not.exist");
+        cy.contains("Welch")
+          .parents(".govuk-summary-list")
+          .should("contain", "Signed on")
+          .and("contain", "19 December 2022");
+      });
+  });
+
+  it("shows certificate provider signed on date and label", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
+
+    cy.contains("Certificate provider")
+      .click()
+      .parents(".govuk-accordion__section")
+      .should("contain", "Signed on")
+      .and("contain", "18 December 2022");
   });
 
   it("shows application details when store is empty", () => {
