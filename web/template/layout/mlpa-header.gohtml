@@ -75,6 +75,9 @@
                     <a href="{{ prefix (printf "/create-event?entity=lpa&id=%d" .CaseSummary.DigitalLpa.SiriusData.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
                         Create an event
                     </a>
+                    <a href="{{ prefix (printf "/change-case-status?id=%d" .CaseSummary.DigitalLpa.SiriusData.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
+                        Change case status
+                    </a>
                 </div>
             </div>
         </div>

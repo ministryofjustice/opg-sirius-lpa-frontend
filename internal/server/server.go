@@ -11,8 +11,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/securityheaders"
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -51,6 +49,7 @@ type Client interface {
 	AssignTaskClient
 	ApplyFeeReductionClient
 	ChangeStatusClient
+	ChangeCaseStatusClient
 	ClearTaskClient
 	CreateDonorClient
 	CreateDocumentClient
@@ -116,6 +115,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/edit-complaint", wrap(EditComplaint(client, templates.Get("edit_complaint.gohtml"))))
 	mux.Handle("/unlink-person", wrap(UnlinkPerson(client, templates.Get("unlink_person.gohtml"))))
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change_status.gohtml"))))
+	mux.Handle("/change-case-status", wrap(ChangeCaseStatus(client, templates.Get("change_case_status.gohtml"))))
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate_cases.gohtml"))))
 	mux.Handle("/assign-task", wrap(AssignTask(client, templates.Get("assign_task.gohtml"))))
 	mux.Handle("/clear-task", wrap(ClearTask(client, templates.Get("clear_task.gohtml"))))

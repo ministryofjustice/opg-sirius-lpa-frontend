@@ -1,0 +1,31 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Change case status{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body"><strong>Change the status of {{ .Entity }} to</strong></p>
+
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        <meta data-app-reload="page" />
+        {{ template "success-banner" (printf "Status changed to %s" .NewStatus) }}
+      {{ end }}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">Change case status</h1>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Submit</button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
