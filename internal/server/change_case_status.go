@@ -2,16 +2,14 @@ package server
 
 import (
 	"fmt"
-	"net/http"
-	"strconv"
-
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"net/http"
 )
 
 type ChangeCaseStatusClient interface {
-	Case(sirius.Context, int) (sirius.Case, error)
-	EditCase(sirius.Context, int, sirius.CaseType, sirius.Case) error
+	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
+	EditDigitalLPA(sirius.Context, string, sirius.CaseStatusData) error
 }
 
 type changeCaseStatusData struct {
@@ -20,35 +18,34 @@ type changeCaseStatusData struct {
 	Success   bool
 	Error     sirius.ValidationError
 
+	OldStatus string
 	NewStatus string
 }
 
 func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		caseID, err := strconv.Atoi(r.FormValue("id"))
-		if err != nil {
-			return err
-		}
+		caseUID := r.FormValue("uid")
 
 		ctx := getContext(r)
 
-		caseitem, err := client.Case(ctx, caseID)
+		cs, err := client.CaseSummary(ctx, caseUID)
 		if err != nil {
 			return err
 		}
 
 		data := changeCaseStatusData{
 			XSRFToken: ctx.XSRFToken,
-			Entity:    fmt.Sprintf("%s %s", caseitem.CaseType, caseitem.UID),
+			Entity:    fmt.Sprintf("%s %s", cs.DigitalLpa.SiriusData.Subtype, caseUID),
+			OldStatus: cs.DigitalLpa.SiriusData.Status,
 			NewStatus: postFormString(r, "status"),
 		}
 
 		if r.Method == http.MethodPost {
-			caseDetails := sirius.Case{
+			caseDetails := sirius.CaseStatusData{
 				Status: data.NewStatus,
 			}
 
-			err = client.EditCase(ctx, caseID, sirius.CaseType(caseitem.CaseType), caseDetails)
+			err = client.EditDigitalLPA(ctx, caseUID, caseDetails)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)

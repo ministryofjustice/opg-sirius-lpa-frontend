@@ -5,8 +5,6 @@
 {{ define "main" }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <p class="govuk-body"><strong>Change the status of {{ .Entity }} to</strong></p>
-
       {{ template "error-summary" .Error }}
 
       {{ if .Success }}
@@ -19,7 +17,19 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-
+        <p class="govuk-body">Change the status of <strong>{{ .Entity }}</strong> to</p>
+        {{ template "radios" (radios "status" "" .OldStatus .Error.Field.status
+        (item "Draft" "Draft" "statusTag" true)
+        (item "In progress" "In progress" "statusTag" true)
+        (item "Statutory waiting period" "Statutory waiting period" "statusTag" true)
+        (item "Registered" "Registered" "statusTag" true)
+        (item "Suspended" "Suspended" "statusTag" true)
+        (item "Do not register" "Do not register" "statusTag" true)
+        (item "Expired" "Expired" "statusTag" true)
+        (item "Cannot register" "Cannot register" "statusTag" true)
+        (item "Cancelled" "Cancelled" "statusTag" true)
+        (item "De-registered" "De-registered" "statusTag" true)
+        ) }}
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Submit</button>
