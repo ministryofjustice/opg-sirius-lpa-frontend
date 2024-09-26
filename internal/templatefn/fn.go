@@ -106,7 +106,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			switch strings.ToLower(s) {
 			case "registered":
 				return "green"
-			case "perfect":
+			case "perfect", "statutory waiting period":
 				return "turquoise"
 			case "pending":
 				return "yellow"
