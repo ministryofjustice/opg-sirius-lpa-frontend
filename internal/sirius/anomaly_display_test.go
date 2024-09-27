@@ -154,6 +154,12 @@ func TestAnomalyDisplay_Group(t *testing.T) {
 			FieldName:     ObjectFieldName("lastName"),
 			FieldOwnerUid: ObjectUid("2"),
 		},
+		// root
+		{
+			Status:        AnomalyDetected,
+			FieldName:     ObjectFieldName("whenTheLpaCanBeUsed"),
+			FieldOwnerUid: ObjectUid(""),
+		},
 	}
 
 	ad.Group(&lpa, anomalies)
@@ -199,8 +205,27 @@ func TestAnomalyDisplay_Group(t *testing.T) {
 		},
 	}
 
+	expectedRootAnomalies := AnomaliesForSection{
+		Section: RootSection,
+		Objects: map[ObjectUid]AnomaliesForObject{
+			ObjectUid(""): {
+				Uid: ObjectUid(""),
+				Anomalies: map[ObjectFieldName][]Anomaly{
+					ObjectFieldName("whenTheLpaCanBeUsed"): {
+						{
+							Status:        AnomalyDetected,
+							FieldName:     ObjectFieldName("whenTheLpaCanBeUsed"),
+							FieldOwnerUid: ObjectUid(""),
+						},
+					},
+				},
+			},
+		},
+	}
+
 	assert.Equal(t, expectedDonorAnomalies, *ad.GetAnomaliesForSection("donor"))
 	assert.Equal(t, expectedAttorneyAnomalies, *ad.GetAnomaliesForSection("attorneys"))
+	assert.Equal(t, expectedRootAnomalies, *ad.GetAnomaliesForSection("root"))
 	assert.Equal(t, AnomaliesForSection{}, *ad.GetAnomaliesForSection("certificateProvider"))
 }
 
