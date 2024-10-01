@@ -132,7 +132,9 @@ func (afo *AnomaliesForObject) GetAnomaliesForFieldWithStatus(fieldName string, 
 
 // getSectionForUid - Map a UID to an object inside an LPA and return which section it's in
 func getSectionForUid(lpa *LpaStoreData, uid ObjectUid) AnomalyDisplaySection {
-	if ObjectUid(lpa.Donor.LpaStorePerson.Uid) == uid {
+	if uid == "" {
+		return RootSection
+	} else if ObjectUid(lpa.Donor.LpaStorePerson.Uid) == uid {
 		return DonorSection
 	} else if ObjectUid(lpa.CertificateProvider.LpaStorePerson.Uid) == uid {
 		return CertificateProviderSection
