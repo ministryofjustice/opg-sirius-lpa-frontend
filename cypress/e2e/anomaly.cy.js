@@ -82,6 +82,13 @@ describe("View and edit anomalies for a digital LPA", () => {
             ruleType: "empty",
             fieldOwnerUid: "",
           },
+          {
+            id: 128,
+            status: "detected",
+            fieldName: "whenTheLpaCanBeUsed",
+            ruleType: "empty",
+            fieldOwnerUid: "",
+          },
         ],
       },
     });
@@ -96,5 +103,6 @@ describe("View and edit anomalies for a digital LPA", () => {
     cy.contains("Review replacement attorney's first names");
     cy.contains("Review replacement attorney's last name");
     cy.contains("Review how attorney's can make decisions");
+    cy.contains("Review when the LPA can be used");
   });
 });
