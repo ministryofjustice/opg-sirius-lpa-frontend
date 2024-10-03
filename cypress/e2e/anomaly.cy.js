@@ -92,9 +92,63 @@ describe("View and edit anomalies for a digital LPA", () => {
         ],
       },
     });
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-SSSS-3333", "GET", {
+      status: 200,
+      body: {
+        uId: "M-DIGI-SSSS-3333",
+        "opg.poas.sirius": {
+          id: 222,
+          uId: "M-DIGI-SSSS-3333",
+          status: "Processing",
+          caseSubtype: "personal-affairs",
+        },
+        "opg.poas.lpastore": {
+          channel: "online",
+          attorneys: [
+            {
+              uid: "attorney-1-uid",
+              status: "active",
+            },
+          ],
+        },
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/cases/222/warnings", "GET", {
+      status: 200,
+      body: [],
+    });
+
+    cy.addMock(
+      "/lpa-api/v1/cases/222/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
+      "GET",
+      {
+        status: 200,
+        body: {
+          tasks: [],
+        },
+      },
+    );
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-SSSS-3333/anomalies", "GET", {
+      status: 200,
+      body: {
+        uid: "M-DIGI-SSSS-3333",
+        anomalies: [
+          {
+            id: 220,
+            status: "detected",
+            fieldName: "lifeSustainingTreatmentOption",
+            ruleType: "empty",
+            fieldOwnerUid: "",
+          },
+        ],
+      },
+    });
   });
 
-  it("shows anomalies", () => {
+  it("shows anomalies for pfa LPA", () => {
     cy.visit("/lpa/M-DIGI-QQQQ-1111/lpa-details");
     cy.contains("Some LPA details have been identified for review.");
     cy.contains("For review");
@@ -104,5 +158,12 @@ describe("View and edit anomalies for a digital LPA", () => {
     cy.contains("Review replacement attorney's last name");
     cy.contains("Review how attorney's can make decisions");
     cy.contains("Review when the LPA can be used");
+  });
+
+  it("shows anomalies for pa LPA", () => {
+    cy.visit("/lpa/M-DIGI-SSSS-3333/lpa-details");
+    cy.contains("Some LPA details have been identified for review.");
+    cy.contains("For review");
+    cy.contains("Review life sustaining treatment");
   });
 });
