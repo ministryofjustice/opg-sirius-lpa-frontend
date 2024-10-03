@@ -336,18 +336,33 @@
             {{ $rootAnomalies := $anomaliesForSection.GetAnomaliesForObject "" }}
           <div id="accordion-default-content-3" class="govuk-accordion__section-content">
             <dl class="govuk-summary-list">
-              {{ $howToUseLpaFieldAnomalies := $rootAnomalies.GetAnomaliesForFieldWithStatus "whenTheLpaCanBeUsed" "detected" }}
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">When attorneys can use the LPA</dt>
-                <dd class="govuk-summary-list__value{{ if gt (len $howToUseLpaFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
-                  <p class="govuk-body">
-                    {{ whenTheLpaCanBeUsedLongForm .DigitalLpa.LpaStoreData.WhenTheLpaCanBeUsed }}
-                    {{ if gt (len $howToUseLpaFieldAnomalies) 0 }}
-                    <br><span class="govuk-error-message">Review when the LPA can be used</span>
-                    {{ end }}
-                  </p>
-                </dd>
-              </div>
+              {{ if (eq .DigitalLpa.SiriusData.Subtype "personal-welfare")}}
+                {{ $lifeSustainingTreatmentAnomalies := $rootAnomalies.GetAnomaliesForFieldWithStatus "lifeSustainingTreatmentOption" "detected" }}
+                <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Life sustaining treatment</dt>
+                  <dd class="govuk-summary-list__value{{ if gt (len $lifeSustainingTreatmentAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                    <p class="govuk-body">
+                      {{ lifeSustainingTreatmentOptionLongForm .DigitalLpa.LpaStoreData.LifeSustainingTreatmentOption }}
+                      {{ if gt (len $lifeSustainingTreatmentAnomalies) 0 }}
+                        <br><span class="govuk-error-message">Review life sustaining treatment</span>
+                      {{ end }}
+                    </p>
+                  </dd>
+                </div>
+              {{ else }}
+                {{ $howToUseLpaFieldAnomalies := $rootAnomalies.GetAnomaliesForFieldWithStatus "whenTheLpaCanBeUsed" "detected" }}
+                 <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">When attorneys can use the LPA</dt>
+                  <dd class="govuk-summary-list__value{{ if gt (len $howToUseLpaFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                    <p class="govuk-body">
+                      {{ whenTheLpaCanBeUsedLongForm .DigitalLpa.LpaStoreData.WhenTheLpaCanBeUsed }}
+                      {{ if gt (len $howToUseLpaFieldAnomalies) 0 }}
+                      <br><span class="govuk-error-message">Review when the LPA can be used</span>
+                      {{ end }}
+                    </p>
+                  </dd>
+                </div>
+                {{ end}}
               {{ $decisionFieldAnomalies := $rootAnomalies.GetAnomaliesForFieldWithStatus "howAttorneysMakeDecisions" "detected" }}
               <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
                 <dt class="govuk-summary-list__key">How attorneys must make decisions</dt>
