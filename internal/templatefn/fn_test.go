@@ -84,6 +84,17 @@ func TestHowReplacementAttorneysStepInLongForm(t *testing.T) {
 	testStringMapper(t, "howReplacementAttorneysStepInLongForm", expectations)
 }
 
+func TestLifeSustainingTreatmentOptionLongForm(t *testing.T) {
+	expectations := map[string]string{
+		"option-a": "Option A",
+		"option-b": "Option B",
+		"":         "Not specified",
+		"foo":      "lifeSustainingTreatmentOption NOT RECOGNISED: foo",
+	}
+
+	testStringMapper(t, "lifeSustainingTreatmentOptionLongForm", expectations)
+}
+
 func TestWhenTheLpaCanBeUsedLongForm(t *testing.T) {
 	expectations := map[string]string{
 		"when-has-capacity":  "As soon as it's registered",

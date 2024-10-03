@@ -165,6 +165,11 @@ func TestAnomalyDisplay_Group(t *testing.T) {
 			FieldName:     ObjectFieldName("whenTheLpaCanBeUsed"),
 			FieldOwnerUid: ObjectUid(""),
 		},
+		{
+			Status:        AnomalyDetected,
+			FieldName:     ObjectFieldName("lifeSustainingTreatmentOption"),
+			FieldOwnerUid: ObjectUid(""),
+		},
 	}
 
 	ad.Group(&lpa, anomalies)
@@ -226,6 +231,13 @@ func TestAnomalyDisplay_Group(t *testing.T) {
 						{
 							Status:        AnomalyDetected,
 							FieldName:     ObjectFieldName("whenTheLpaCanBeUsed"),
+							FieldOwnerUid: ObjectUid(""),
+						},
+					},
+					ObjectFieldName("lifeSustainingTreatmentOption"): {
+						{
+							Status:        AnomalyDetected,
+							FieldName:     ObjectFieldName("lifeSustainingTreatmentOption"),
 							FieldOwnerUid: ObjectUid(""),
 						},
 					},
