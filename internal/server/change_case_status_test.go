@@ -47,6 +47,7 @@ func TestGetChangeCaseStatus(t *testing.T) {
 	template.
 		On("Func", mock.Anything, changeCaseStatusData{
 			Entity:    "personal-welfare M-9876-9876-9876",
+			CaseUID:   "M-9876-9876-9876",
 			OldStatus: "Draft",
 		}).
 		Return(nil)
@@ -90,6 +91,7 @@ func TestPostChangeCaseStatus(t *testing.T) {
 		On("Func", mock.Anything, changeCaseStatusData{
 			Success:   true,
 			Entity:    "personal-welfare M-9876-9876-9876",
+			CaseUID:   "M-9876-9876-9876",
 			OldStatus: "Draft",
 			NewStatus: "Cancelled",
 		}).
