@@ -8,13 +8,14 @@ import (
 )
 
 type ChangeCaseStatusClient interface {
-	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
+	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
 	EditDigitalLPAStatus(sirius.Context, string, sirius.CaseStatusData) error
 }
 
 type changeCaseStatusData struct {
 	XSRFToken string
 	Entity    string
+	CaseUID   string
 	Success   bool
 	Error     sirius.ValidationError
 
@@ -36,16 +37,17 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 		data := changeCaseStatusData{
 			XSRFToken: ctx.XSRFToken,
 			Entity:    fmt.Sprintf("%s %s", cs.DigitalLpa.SiriusData.Subtype, caseUID),
+			CaseUID:   caseUID,
 			OldStatus: cs.DigitalLpa.SiriusData.Status,
 			NewStatus: postFormString(r, "status"),
 		}
 
 		if r.Method == http.MethodPost {
-			caseDetails := sirius.CaseStatusData{
+			caseStatusData := sirius.CaseStatusData{
 				Status: data.NewStatus,
 			}
 
-			err = client.EditDigitalLPAStatus(ctx, caseUID, caseDetails)
+			err = client.EditDigitalLPAStatus(ctx, caseUID, caseStatusData)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)

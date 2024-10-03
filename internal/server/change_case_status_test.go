@@ -3,6 +3,8 @@ package server
 import (
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -50,6 +52,55 @@ func TestGetChangeCaseStatus(t *testing.T) {
 		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/change-case-status?uid=M-9876-9876-9876", nil)
+	w := httptest.NewRecorder()
+
+	err := ChangeCaseStatus(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostChangeCaseStatus(t *testing.T) {
+	caseSummary := sirius.CaseSummary{
+		DigitalLpa: sirius.DigitalLpa{
+			UID: "M-9876-9876-9876",
+			SiriusData: sirius.SiriusData{
+				ID:      676,
+				Subtype: "personal-welfare",
+				Status:  "Draft",
+			},
+		},
+	}
+
+	client := &mockChangeCaseStatusClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		Return(caseSummary, nil)
+
+	client.
+		On("EditDigitalLPAStatus", mock.Anything, "M-9876-9876-9876", sirius.CaseStatusData{
+			Status: "Cancelled",
+		}).
+		Return(nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, changeCaseStatusData{
+			Success:   true,
+			Entity:    "personal-welfare M-9876-9876-9876",
+			OldStatus: "Draft",
+			NewStatus: "Cancelled",
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"status": {"Cancelled"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/change-case-status?uid=M-9876-9876-9876", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
 	err := ChangeCaseStatus(client, template.Func)(w, r)
