@@ -9,7 +9,7 @@ import (
 
 type ChangeCaseStatusClient interface {
 	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
-	EditDigitalLPA(sirius.Context, string, sirius.CaseStatusData) error
+	EditDigitalLPAStatus(sirius.Context, string, sirius.CaseStatusData) error
 }
 
 type changeCaseStatusData struct {
@@ -45,7 +45,7 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 				Status: data.NewStatus,
 			}
 
-			err = client.EditDigitalLPA(ctx, caseUID, caseDetails)
+			err = client.EditDigitalLPAStatus(ctx, caseUID, caseDetails)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)

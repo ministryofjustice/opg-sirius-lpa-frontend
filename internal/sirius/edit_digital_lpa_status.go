@@ -11,7 +11,7 @@ type CaseStatusData struct {
 	Status string
 }
 
-func (c *Client) EditDigitalLPA(ctx Context, caseUID string, caseStatusData CaseStatusData) error {
+func (c *Client) EditDigitalLPAStatus(ctx Context, caseUID string, caseStatusData CaseStatusData) error {
 	data, err := json.Marshal(caseStatusData)
 	if err != nil {
 		return err
