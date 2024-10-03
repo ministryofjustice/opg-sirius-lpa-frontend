@@ -187,6 +187,18 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "whenTheLpaCanBeUsed NOT RECOGNISED: " + s
 			}
 		},
+		"lifeSustainingTreatmentOptionLongForm": func(s string) string {
+			switch s {
+			case "option-a":
+				return "Option A"
+			case "option-b":
+				return "Option B"
+			case "":
+				return "Not specified"
+			default:
+				return "lifeSustainingTreatmentOption NOT RECOGNISED: " + s
+			}
+		},
 		// translate channel code to long version for Format fields in display
 		"channelForFormat": func(s string) string {
 			switch s {

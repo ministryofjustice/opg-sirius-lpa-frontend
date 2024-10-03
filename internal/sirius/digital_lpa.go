@@ -54,6 +54,7 @@ type LpaStoreData struct {
 	HowReplacementAttorneysMakeDecisionsDetails string                      `json:"howReplacementAttorneysMakeDecisionsDetails"`
 	HowReplacementAttorneysStepIn               string                      `json:"howReplacementAttorneysStepIn"`
 	HowReplacementAttorneysStepInDetails        string                      `json:"howReplacementAttorneysStepInDetails"`
+	LifeSustainingTreatmentOption               string                      `json:"lifeSustainingTreatmentOption"`
 	RestrictionsAndConditions                   string                      `json:"restrictionsAndConditions"`
 	SignedAt                                    string                      `json:"signedAt"`
 }
