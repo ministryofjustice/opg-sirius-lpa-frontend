@@ -8,7 +8,7 @@ import (
 )
 
 type CaseStatusData struct {
-	Status string
+	Status string `json:"status"`
 }
 
 func (c *Client) EditDigitalLPAStatus(ctx Context, caseUID string, caseStatusData CaseStatusData) error {
