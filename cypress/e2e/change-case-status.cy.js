@@ -1,4 +1,4 @@
-describe("Change status", () => {
+describe("Change case status", () => {
   beforeEach(() => {
     cy.visit("/change-case-status?uid=M-1234-9876-4567");
   });
