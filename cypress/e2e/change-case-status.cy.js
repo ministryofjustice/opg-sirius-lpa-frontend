@@ -1,6 +1,6 @@
 describe("Change status", () => {
   beforeEach(() => {
-    cy.visit("/change-case-tatus?uid=M-1234-9876-4567");
+    cy.visit("/change-case-status?uid=M-1234-9876-4567");
   });
 
   it("changes the digital lpa case status", () => {
