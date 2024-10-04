@@ -8,7 +8,11 @@
           <div class="govuk-radios__item">
             <input class="govuk-radios__input" id="f-{{ fieldID $.Name $i }}" name="{{ $.Name }}" type="radio" value="{{ $e.Value }}" {{ if eq $.Value $e.Value }}checked{{ end }} {{ if $e.Attrs.hint }}aria-describedby="{{ fieldID $.Name $i }}-item-hint"{{ end }}>
             <label class="govuk-label govuk-radios__label" for="f-{{ fieldID $.Name $i }}">
-              {{ $e.Label }}
+              {{ if $e.Attrs.statusTag }}
+                {{ template "status-tag" $e.Label }}
+              {{ else }}
+                {{ $e.Label }}
+              {{ end }}
             </label>
             {{ if $e.Attrs.hint }}
               <div id="{{ fieldID $.Name $i }}-item-hint" class="govuk-hint govuk-radios__hint">
