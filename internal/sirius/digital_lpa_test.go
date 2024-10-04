@@ -117,12 +117,12 @@ func TestDigitalLpa(t *testing.T) {
 			},
 		},
 		{
-			name: "OK",
+			name: "OK2",
 			setup: func() {
 				pact.
 					AddInteraction().
 					Given("A digital LPA in statutory waiting period").
-					UponReceiving("A request for the digital LPA").
+					UponReceiving("A request for the digital LPA in statutory waiting period").
 					WithRequest(dsl.Request{
 						Method: http.MethodGet,
 						Path:   dsl.String("/lpa-api/v1/digital-lpas/M-1111-2222-3333"),
@@ -147,8 +147,8 @@ func TestDigitalLpa(t *testing.T) {
 									"donorFirstNames": dsl.Like("Lonnie"),
 									"donorLastName":   dsl.Like("Jakubowski"),
 									"donorDob":        dsl.Term("22/03/1949", `^\d{1,2}/\d{1,2}/\d{4}$`),
-									"donorPhone":      dsl.Like("073456249524"),
-									"donorEmail":      dsl.Like("zswanberg@host.example"),
+									"donorPhone":      dsl.Like("07123456789"),
+									"donorEmail":      dsl.Like("Lonnie.Jakubowski@example.com"),
 									"donorAddress": map[string]interface{}{
 										"addressLine1": dsl.Like("528 Fourth Avenue"),
 										"addressLine2": dsl.Like("Lower Kozey Cross"),
@@ -169,6 +169,7 @@ func TestDigitalLpa(t *testing.T) {
 					Subtype:            "property-and-affairs",
 					Status:             "Draft",
 					CreatedDate:        DateString("2018-03-26"),
+					DueDate:            DateString("2018-04-09"),
 					ComplaintCount:     0,
 					InvestigationCount: 0,
 					TaskCount:          0,
@@ -186,8 +187,8 @@ func TestDigitalLpa(t *testing.T) {
 							Postcode: "YL06 6GF",
 							Country:  "GB",
 						},
-						PhoneNumber: "073456249524",
-						Email:       "zswanberg@host.example",
+						PhoneNumber: "07123456789",
+						Email:       "Lonnie.Jakubowski@example.com",
 					},
 				},
 			},
