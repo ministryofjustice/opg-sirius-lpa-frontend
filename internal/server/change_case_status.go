@@ -56,6 +56,7 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 				return err
 			} else {
 				data.Success = true
+				data.OldStatus = data.NewStatus
 			}
 		}
 
