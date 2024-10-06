@@ -92,7 +92,7 @@ func TestPostChangeCaseStatus(t *testing.T) {
 			Success:   true,
 			Entity:    "personal-welfare M-9876-9876-9876",
 			CaseUID:   "M-9876-9876-9876",
-			OldStatus: "Draft",
+			OldStatus: "Cancelled",
 			NewStatus: "Cancelled",
 		}).
 		Return(nil)

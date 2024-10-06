@@ -93,10 +93,14 @@ describe("Change case status", () => {
       body: [],
     });
 
-    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333/update-case-status", "PUT", {
-      status: 200,
-      body: [],
-    });
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333/update-case-status",
+      "PUT",
+      {
+        status: 200,
+        body: [],
+      },
+    );
   });
 
   it("changes the digital lpa case status", () => {
@@ -105,9 +109,9 @@ describe("Change case status", () => {
     cy.contains("M-DIGI-LPA3-3333");
     cy.get(".moj-banner").should("not.exist");
     cy.contains(".govuk-radios__label", "Draft")
-        .parent()
-        .get("input")
-        .should("be.checked");
+      .parent()
+      .get("input")
+      .should("be.checked");
     cy.contains(".govuk-radios__label", "Cannot register").click();
     cy.get("button[type=submit]").click();
     cy.get(".moj-banner").should("exist");
