@@ -104,17 +104,17 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		},
 		"statusColour": func(s string) string {
 			switch strings.ToLower(s) {
-			case "registered":
+			case "registered", "statutory waiting period":
 				return "green"
 			case "perfect":
 				return "turquoise"
-			case "pending":
+			case "pending", "in progress":
 				return "yellow"
 			case "payment pending", "reduced fees pending":
 				return "blue"
 			case "draft":
 				return "purple"
-			case "cancelled", "rejected", "revoked", "withdrawn", "return - unpaid", "deleted":
+			case "cancelled", "rejected", "revoked", "withdrawn", "return - unpaid", "deleted", "do not register", "expired", "cannot register", "de-registered":
 				return "red"
 			default:
 				return "grey"
