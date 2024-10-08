@@ -171,6 +171,22 @@ jobs:
           fetch-depth: "0"
       - uses: unfor19/install-aws-cli-action@v1
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_ACTIONS }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ACTIONS }}
+          aws-region: eu-west-1
+          role-to-assume: arn:aws:iam::311462405659:role/sirius-ci
+          role-duration-seconds: 3600
+          role-session-name: GitHubActions
+
+      - name: ECR Login
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registries: 311462405659
+
       - name: Cache Images
         uses: actions/cache@v4
         with:
@@ -181,6 +197,8 @@ jobs:
         run: docker load -i /tmp/images/app.tar
 
       - name: Run Trivy
+        env:
+          TRIVY_DB_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/trivy-db-public-ecr/aquasecurity/trivy-db:2
         run: make scan
 
       - name: Upload Trivy scan results to GitHub Security tab
@@ -188,22 +206,6 @@ jobs:
         if: always()
         with:
           sarif_file: "test-results/trivy.sarif"
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_ACTIONS }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ACTIONS }}
-          aws-region: eu-west-1
-          role-to-assume: arn:aws:iam::311462405659:role/sirius-actions-ci
-          role-duration-seconds: 3600
-          role-session-name: GitHubActions
-
-      - name: ECR Login
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          registries: 311462405659
 
       - name: Push Container
         env:
