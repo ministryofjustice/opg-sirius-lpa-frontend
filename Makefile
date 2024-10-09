@@ -43,6 +43,7 @@ up: ## Start application with mock Sirius API; mostly for use with Cypress tests
 	docker compose up -d lpa-frontend
 
 scan: setup-directories
+	docker login --username $(DOCKER_USERNAME) --password-stdin $(DOCKER_PASSWORD)
 	docker compose run --rm trivy image --format table --exit-code 0 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest
 	docker compose run --rm trivy image --format sarif --output /test-results/trivy.sarif --exit-code 1 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest
 
