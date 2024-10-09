@@ -180,15 +180,6 @@ jobs:
       - name: Restore Image
         run: docker load -i /tmp/images/app.tar
 
-      - name: Run Trivy
-        run: make scan
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: "test-results/trivy.sarif"
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -201,9 +192,27 @@ jobs:
 
       - name: ECR Login
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+        uses: aws-actions/amazon-ecr-login@v2.0.1
         with:
+          mask-password: true
           registries: 311462405659
+
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@0.24.0
+        env:
+          TRIVY_DB_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/trivy-db-public-ecr/aquasecurity/trivy-db:2
+          TRIVY_JAVA_DB_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/trivy-db-public-ecr/aquasecurity/trivy-java-db:1
+        with:
+          image-ref: 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest
+          severity: 'HIGH,CRITICAL'
+          format: 'sarif'
+          output: '/test-results/trivy.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "test-results/trivy.sarif"
 
       - name: Push Container
         env:
