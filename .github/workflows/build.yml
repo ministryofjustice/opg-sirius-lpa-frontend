@@ -201,6 +201,8 @@ jobs:
         env:
           TRIVY_DB_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/trivy-db-public-ecr/aquasecurity/trivy-db:2
           TRIVY_JAVA_DB_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/trivy-db-public-ecr/aquasecurity/trivy-java-db:1
+          DOCKER_USERNAME: ${{ steps.login-ecr.outputs.docker_username }}
+          DOCKER_PASSWORD: ${{ steps.login-ecr.outputs.docker_password }}
         run: make scan
 
       - name: Upload Trivy scan results to GitHub Security tab

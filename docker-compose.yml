@@ -68,6 +68,8 @@ services:
     environment:
       - TRIVY_DB_REPOSITORY=${TRIVY_DB_REPOSITORY}
       - TRIVY_JAVA_DB_REPOSITORY=${TRIVY_JAVA_DB_REPOSITORY}
+      - DOCKER_USERNAME=${DOCKER_USERNAME}
+      - DOCKER_PASSWORD=${DOCKER_PASSWORD}
 
   cypress:
     image: cypress/included:latest
