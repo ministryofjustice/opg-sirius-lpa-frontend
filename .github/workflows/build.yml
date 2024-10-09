@@ -161,10 +161,58 @@ jobs:
           name: cypress-screenshots
           path: cypress/screenshots
 
+  trivy:
+    name: Trivy
+    runs-on: ubuntu-latest
+    needs:
+      - build
+      - test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Images
+        uses: actions/cache@v4
+        with:
+          path: /tmp/images
+          key: ${{ runner.os }}-images-${{ github.run_id }}-${{ github.run_number }}
+
+      - name: Restore images
+        run: |
+          docker load -i /tmp/images/app.tar
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_ACTIONS }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ACTIONS }}
+          aws-region: eu-west-1
+          role-to-assume: arn:aws:iam::311462405659:role/sirius-actions-ci
+          role-duration-seconds: 600
+          role-session-name: LPAFrontendTrivyAction
+
+      - name: ECR Login
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2.0.1
+        with:
+          mask-password: true
+          registries: 311462405659
+
+      - name: Run Trivy
+        env:
+          TRIVY_DB_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/trivy-db-public-ecr/aquasecurity/trivy-db:2
+          TRIVY_JAVA_DB_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/trivy-db-public-ecr/aquasecurity/trivy-java-db:1
+        run: make scan
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "test-results/trivy.sarif"
+
   push:
     name: Push Images
     runs-on: ubuntu-latest
-    needs: [identify, "build", "test", "lint", "acceptance-test", "cypress"]
+    needs: [identify, "build", "test", "lint", "acceptance-test", "cypress", "trivy"]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -196,18 +244,6 @@ jobs:
         with:
           mask-password: true
           registries: 311462405659
-
-      - name: Run Trivy
-        env:
-          TRIVY_DB_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/trivy-db-public-ecr/aquasecurity/trivy-db:2
-          TRIVY_JAVA_DB_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/trivy-db-public-ecr/aquasecurity/trivy-java-db:1
-        run: make scan
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: "test-results/trivy.sarif"
 
       - name: Push Container
         env:
