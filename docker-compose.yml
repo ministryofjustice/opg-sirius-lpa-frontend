@@ -65,6 +65,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./.trivy-cache:/root/.cache
       - ./test-results:/test-results
+      - $HOME/.aws/credentials:/home/app/.aws/credentials:ro
+    environment:
+      - TRIVY_DB_REPOSITORY=${TRIVY_DB_REPOSITORY}
+      - TRIVY_JAVA_DB_REPOSITORY=${TRIVY_JAVA_DB_REPOSITORY}
 
   cypress:
     image: cypress/included:latest
