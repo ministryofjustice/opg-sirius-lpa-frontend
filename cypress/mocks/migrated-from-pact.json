@@ -163,6 +163,17 @@
       }
     },
     {
+      "name": "A request for changing the status of the digital LPA",
+      "request": {
+        "method": "PUT",
+        "url": "/lpa-api/v1/digital-lpas/M-1234-9876-4567/update-case-status"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" }
+      }
+    },
+    {
       "name": "A request to add a complaint to the case",
       "request": { "method": "POST", "url": "/lpa-api/v1/lpas/800/complaints" },
       "response": {

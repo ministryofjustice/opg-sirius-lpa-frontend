@@ -597,6 +597,19 @@ describe("View a digital LPA", () => {
     cy.contains("Case summary");
   });
 
+  it("can cancel changing the status", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+    cy.contains("Case actions").click();
+    cy.contains("Change case status").click();
+
+    cy.url().should("include", "/change-case-status?uid=M-DIGI-LPA3-3333");
+    cy.contains("Change case status");
+    cy.get(".govuk-button-group").contains("Cancel").click();
+
+    cy.url().should("include", "/lpa/M-DIGI-LPA3-3333");
+    cy.contains("Case summary");
+  });
+
   it("can clear a task", () => {
     cy.addMock("/lpa-api/v1/tasks/1/mark-as-completed", "PUT", {
       status: 200,
