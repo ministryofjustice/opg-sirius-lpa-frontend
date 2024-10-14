@@ -36,6 +36,37 @@ type editDocumentData struct {
 	DownloadUUID string
 }
 
+func publishDraftDocument(
+	client EditDocumentClient,
+	ctx sirius.Context,
+	caseID int,
+	documentUUID string,
+	content string,
+) error {
+	_, err := client.EditDocument(ctx, documentUUID, content)
+	if err != nil {
+		return err
+	}
+
+	// need to retrieve for correspondent information
+	document, err := client.DocumentByUUID(ctx, documentUUID)
+	if err != nil {
+		return err
+	}
+
+	_, err = client.AddDocument(ctx, caseID, document, sirius.TypeSave)
+	if err != nil {
+		return err
+	}
+
+	err = client.DeleteDocument(ctx, documentUUID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
@@ -164,41 +195,28 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				}
 
 			case "publish":
-				_, err := client.EditDocument(ctx, documentUUID, content)
-				if err != nil {
+				err = publishDraftDocument(client, ctx, caseID, documentUUID, content)
+				if ve, ok := err.(sirius.ValidationError); ok {
+					w.WriteHeader(http.StatusBadRequest)
+					data.Error = ve
+				} else if err != nil {
 					return err
-				}
+				} else {
+					if caseType == sirius.CaseTypeDigitalLpa {
+						caseItem, err := client.Case(ctx, caseID)
+						if err != nil {
+							return err
+						}
 
-				// need to retrieve for correspondent information
-				document, err := client.DocumentByUUID(ctx, documentUUID)
-				if err != nil {
-					return err
-				}
+						SetFlash(w, FlashNotification{
+							Description: "Document published",
+						})
 
-				_, err = client.AddDocument(ctx, caseID, document, sirius.TypeSave)
-				if err != nil {
-					return err
-				}
-
-				err = client.DeleteDocument(ctx, documentUUID)
-				if err != nil {
-					return err
-				}
-
-				if caseType == sirius.CaseTypeDigitalLpa {
-					caseItem, err := client.Case(ctx, caseID)
-					if err != nil {
-						return err
+						return RedirectError(fmt.Sprintf("/lpa/%s/documents", caseItem.UID))
 					}
 
-					SetFlash(w, FlashNotification{
-						Description: "Document published",
-					})
-
-					return RedirectError(fmt.Sprintf("/lpa/%s/documents", caseItem.UID))
+					data.Success = true
 				}
-
-				data.Success = true
 
 			case "saveAndExit":
 				_, err := client.EditDocument(ctx, documentUUID, content)
