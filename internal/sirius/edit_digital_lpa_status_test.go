@@ -52,7 +52,7 @@ func TestEditDigitalLPAStatus(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.EditDigitalLPAStatus(Context{Context: context.Background()}, "M-1234-9876-4567", CaseStatusData{Status: "In progress"})
+				err := client.EditDigitalLPAStatus(Context{Context: context.Background()}, "M-1234-9876-4567", CaseStatusData{Status: "in-progress"})
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
