@@ -34,11 +34,11 @@ func TestEditDigitalLPAStatus(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"status": "In progress",
+							"status": "in-progress",
 						},
 					}).
 					WillRespondWith(dsl.Response{
-						Status:  http.StatusOK,
+						Status:  http.StatusNoContent,
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
 					})
 			},

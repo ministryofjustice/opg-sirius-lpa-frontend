@@ -65,6 +65,7 @@ describe("Change case status", () => {
           ],
           lpaType: "pf",
           channel: "online",
+          status: "draft",
           peopleToNotify: [],
         },
       },
