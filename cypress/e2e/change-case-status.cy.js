@@ -98,7 +98,7 @@ describe("Change case status", () => {
       "/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333/update-case-status",
       "PUT",
       {
-        status: 200,
+        status: 204,
         body: [],
       },
     );
