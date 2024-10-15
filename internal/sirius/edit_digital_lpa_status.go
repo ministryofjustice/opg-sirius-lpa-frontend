@@ -36,7 +36,7 @@ func (c *Client) EditDigitalLPAStatus(ctx Context, caseUID string, caseStatusDat
 		return v
 	}
 
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusNoContent {
 		return newStatusError(resp)
 	}
 
