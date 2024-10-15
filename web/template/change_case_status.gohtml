@@ -19,16 +19,16 @@
 
         <p class="govuk-body">Change the status of <strong>{{ .Entity }}</strong> to</p>
         {{ template "radios" (radios "status" "" .OldStatus .Error.Field.status
-        (item "Draft" "Draft" "statusTag" true)
-        (item "In progress" "In progress" "statusTag" true)
-        (item "Statutory waiting period" "Statutory waiting period" "statusTag" true)
-        (item "Registered" "Registered" "statusTag" true)
-        (item "Suspended" "Suspended" "statusTag" true)
-        (item "Do not register" "Do not register" "statusTag" true)
-        (item "Expired" "Expired" "statusTag" true)
-        (item "Cannot register" "Cannot register" "statusTag" true)
-        (item "Cancelled" "Cancelled" "statusTag" true)
-        (item "De-registered" "De-registered" "statusTag" true)
+        (item "draft" "Draft" "statusTag" true)
+        (item "in-progress" "In progress" "statusTag" true)
+        (item "statutory-waiting-period" "Statutory waiting period" "statusTag" true)
+        (item "registered" "Registered" "statusTag" true)
+        (item "suspended" "Suspended" "statusTag" true)
+        (item "do-not-register" "Do not register" "statusTag" true)
+        (item "expired" "Expired" "statusTag" true)
+        (item "cannot-register" "Cannot register" "statusTag" true)
+        (item "cancelled" "Cancelled" "statusTag" true)
+        (item "de-registered" "De-registered" "statusTag" true)
         ) }}
 
         <div class="govuk-button-group">

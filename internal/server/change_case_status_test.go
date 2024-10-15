@@ -35,6 +35,9 @@ func TestGetChangeCaseStatus(t *testing.T) {
 				Subtype: "personal-welfare",
 				Status:  "Draft",
 			},
+			LpaStoreData: sirius.LpaStoreData{
+				Status: "draft",
+			},
 		},
 	}
 
@@ -48,7 +51,7 @@ func TestGetChangeCaseStatus(t *testing.T) {
 		On("Func", mock.Anything, changeCaseStatusData{
 			Entity:    "personal-welfare M-9876-9876-9876",
 			CaseUID:   "M-9876-9876-9876",
-			OldStatus: "Draft",
+			OldStatus: "draft",
 		}).
 		Return(nil)
 
@@ -72,6 +75,9 @@ func TestPostChangeCaseStatus(t *testing.T) {
 				Subtype: "personal-welfare",
 				Status:  "Draft",
 			},
+			LpaStoreData: sirius.LpaStoreData{
+				Status: "draft",
+			},
 		},
 	}
 
@@ -82,7 +88,7 @@ func TestPostChangeCaseStatus(t *testing.T) {
 
 	client.
 		On("EditDigitalLPAStatus", mock.Anything, "M-9876-9876-9876", sirius.CaseStatusData{
-			Status: "Cancelled",
+			Status: "cancelled",
 		}).
 		Return(nil)
 
@@ -92,13 +98,13 @@ func TestPostChangeCaseStatus(t *testing.T) {
 			Success:   true,
 			Entity:    "personal-welfare M-9876-9876-9876",
 			CaseUID:   "M-9876-9876-9876",
-			OldStatus: "Cancelled",
-			NewStatus: "Cancelled",
+			OldStatus: "cancelled",
+			NewStatus: "cancelled",
 		}).
 		Return(nil)
 
 	form := url.Values{
-		"status": {"Cancelled"},
+		"status": {"cancelled"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/change-case-status?uid=M-9876-9876-9876", strings.NewReader(form.Encode()))

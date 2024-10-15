@@ -28,7 +28,6 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 		caseUID := r.FormValue("uid")
 
 		ctx := getContext(r)
-
 		cs, err := client.CaseSummary(ctx, caseUID)
 		if err != nil {
 			return err
@@ -38,7 +37,7 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 			XSRFToken: ctx.XSRFToken,
 			Entity:    fmt.Sprintf("%s %s", cs.DigitalLpa.SiriusData.Subtype, caseUID),
 			CaseUID:   caseUID,
-			OldStatus: cs.DigitalLpa.SiriusData.Status,
+			OldStatus: cs.DigitalLpa.LpaStoreData.Status,
 			NewStatus: postFormString(r, "status"),
 		}
 
