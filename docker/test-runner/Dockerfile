@@ -4,5 +4,11 @@ RUN go install gotest.tools/gotestsum@latest
 
 WORKDIR /opt
 ENV PACT_CLI_VERSION=v2.4.2
-RUN curl -fsSL https://raw.githubusercontent.com/pact-foundation/pact-ruby-standalone/master/install.sh > ./install.sh && bash ./install.sh 
+ADD https://raw.githubusercontent.com/pact-foundation/pact-ruby-standalone/master/install.sh ./install.sh
+RUN bash ./install.sh
 ENV PATH="$PATH:/opt/pact/bin"
+
+RUN addgroup -S app && \
+    adduser -S -g app app
+
+USER app
