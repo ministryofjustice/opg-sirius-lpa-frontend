@@ -1,19 +1,18 @@
-FROM node:21.1.0-alpine3.17 as asset-env
+FROM node:21.1.0-alpine3.17 AS asset-env
 
 WORKDIR /app
 
-RUN apk add --no-cache git
-
-RUN mkdir -p web/static
+RUN apk add --no-cache git \
+    && mkdir -p web/static
 
 COPY package.json .
 COPY yarn.lock .
-RUN yarn
+RUN yarn --ignore-scripts
 
 COPY web/assets web/assets
 RUN yarn build
 
-FROM golang:1.23 as build-env
+FROM golang:1.23 AS build-env
 
 WORKDIR /app
 
@@ -31,12 +30,9 @@ FROM alpine:3
 
 WORKDIR /go/bin
 
-RUN apk --update --no-cache add \
-    ca-certificates \
-    tzdata
-
-# Patch vulnerabilities
-RUN apk update && apk upgrade --no-cache busybox libcrypto3 libssl3
+RUN apk update \
+    && apk add --no-cache ca-certificates tzdata \
+    && apk upgrade --no-cache busybox libcrypto3 libssl3
 
 COPY --from=build-env /go/bin/opg-sirius-lpa-frontend opg-sirius-lpa-frontend
 COPY --from=asset-env /app/web/static web/static

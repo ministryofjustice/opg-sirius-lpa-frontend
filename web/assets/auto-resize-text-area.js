@@ -1,14 +1,16 @@
 const autoResizeTextArea = () => {
-  const txtareas = document.querySelectorAll('[data-module="app-auto-resize"]');
-  for (let i = 0; i < txtareas.length; i++) {
-    txtareas[i].style.height = "auto";
-    txtareas[i].style.height = txtareas[i].scrollHeight + 4 + "px";
+  const textareas = document.querySelectorAll(
+    '[data-module="app-auto-resize"]',
+  );
+  for (let textarea of textareas) {
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + 4 + "px";
 
-    txtareas[i].addEventListener(
+    textarea.addEventListener(
       "input",
       function () {
-        txtareas[i].style.height = "auto";
-        txtareas[i].style.height = txtareas[i].scrollHeight + 4 + "px";
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + 4 + "px";
       },
       false,
     );
