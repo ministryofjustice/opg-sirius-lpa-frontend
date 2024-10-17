@@ -38,10 +38,10 @@ services:
   yarn:
     build:
       context: docker/yarn/
-    working_dir: /home/node/app
+    working_dir: /home/node
     entrypoint: yarn
     volumes:
-      - ./:/home/node/app
+      - ./:/home/node
 
   gosec:
     image: securego/gosec:latest
