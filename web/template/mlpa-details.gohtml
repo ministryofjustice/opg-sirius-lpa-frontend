@@ -133,92 +133,9 @@
         </div>
       </div>
 
-      <!-- donor -->
       <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-        <div class="govuk-accordion__section">
-          <div class="govuk-accordion__section-header">
-            <h2 class="govuk-accordion__section-heading">
-              <span class="govuk-accordion__section-button" id="accordion-default-heading-1">
-                Donor
-              </span>
-            </h2>
-          </div>
-          <div id="accordion-default-content-1" class="govuk-accordion__section-content">
-            <dl class="govuk-summary-list">
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">First names</dt>
-                <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.Donor.FirstNames }}</dd>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Last name</dt>
-                <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.Donor.LastName }}</dd>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Otherwise known as</dt>
-                <dd class="govuk-summary-list__value">
-                  {{ if (eq .DigitalLpa.LpaStoreData.Donor.OtherNamesKnownBy "") }}
-                    No other name specified
-                  {{ else }}
-                    {{ .DigitalLpa.LpaStoreData.Donor.OtherNamesKnownBy }}
-                  {{ end }}
-                </dd>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Date of birth</dt>
-                <dd class="govuk-summary-list__value">
-                  {{ if not (eq .DigitalLpa.LpaStoreData.Donor.DateOfBirth "") }}
-                    {{ parseAndFormatDate .DigitalLpa.LpaStoreData.Donor.DateOfBirth "2006-01-02" "2 January 2006" }}
-                  {{ end }}
-                </dd>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Address</dt>
-                <dd class="govuk-summary-list__value">
-                  {{ template "mlpa-address" .DigitalLpa.LpaStoreData.Donor.Address }}
-                </dd>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Email</dt>
-                <dd class="govuk-summary-list__value">
-                  {{ if (eq .DigitalLpa.LpaStoreData.Donor.Email "") }}
-                    Not provided
-                  {{ else }}
-                    {{ .DigitalLpa.LpaStoreData.Donor.Email }}
-                  {{ end }}
-                </dd>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Phone</dt>
-                <dd class="govuk-summary-list__value">
-                  {{ if (eq .DigitalLpa.SiriusData.Application.PhoneNumber "") }}
-                    Not provided
-                  {{ else }}
-                    {{ .DigitalLpa.SiriusData.Application.PhoneNumber }}
-                  {{ end }}
-                </dd>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Format</dt>
-                <dd class="govuk-summary-list__value">
-                  {{ channelForFormat .DigitalLpa.LpaStoreData.Channel }}
-                  {{ if not (eq .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference "") }}
-                    <br>{{ languageForFormat .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference }}
-                  {{ end }}
-                </dd>
-              </div>
-              <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
-                <dt class="govuk-summary-list__key">Signed on</dt>
-                <dd class="govuk-summary-list__value">
-                  {{ if (eq .DigitalLpa.LpaStoreData.SignedAt "") }}
-                    Not provided
-                  {{ else }}
-                    {{ parseAndFormatDate .DigitalLpa.LpaStoreData.SignedAt "2006-01-02T15:04:05Z" "2 January 2006" }}
-                  {{ end }}
-                </dd>
-              </div>
-            </dl>
-          </div>
-        </div>
+        {{ . }}
+        {{ template "donor-details" . }}
 
         <!-- attorneys -->
         {{ $anomaliesForSection := .AnomalyDisplay.GetAnomaliesForSection "attorneys" }}
