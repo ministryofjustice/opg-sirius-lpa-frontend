@@ -33,11 +33,17 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 			return err
 		}
 
+		status := "draft"
+
+		if cs.DigitalLpa.LpaStoreData.Status != "" {
+			status = cs.DigitalLpa.LpaStoreData.Status
+		}
+
 		data := changeCaseStatusData{
 			XSRFToken: ctx.XSRFToken,
 			Entity:    fmt.Sprintf("%s %s", cs.DigitalLpa.SiriusData.Subtype, caseUID),
 			CaseUID:   caseUID,
-			OldStatus: cs.DigitalLpa.LpaStoreData.Status,
+			OldStatus: status,
 			NewStatus: postFormString(r, "status"),
 		}
 
