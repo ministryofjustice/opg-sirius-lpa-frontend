@@ -108,18 +108,21 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "green"
 			case "perfect":
 				return "turquoise"
-			case "pending":
+			case "statutory waiting period":
 				return "yellow"
-			case "payment pending", "reduced fees pending":
+			case "in progress":
+				return "light-blue"
+			case "pending", "payment pending", "reduced fees pending":
 				return "blue"
 			case "draft":
 				return "purple"
-			case "cancelled", "rejected", "revoked", "withdrawn", "return - unpaid", "deleted":
+			case "cancelled", "rejected", "revoked", "withdrawn", "return - unpaid", "deleted", "do not register", "expired", "cannot register", "de-registered":
 				return "red"
 			default:
 				return "grey"
 			}
 		},
+		"statusLabel": statusLabelFormat,
 		"replace": func(s, find, replace string) string {
 			return strings.ReplaceAll(s, find, replace)
 		},
@@ -313,11 +316,45 @@ func subtypeLongFormat(subtype string) string {
 	}
 }
 
+func statusLabelFormat(status string) string {
+	switch strings.ToLower(status) {
+	case "draft":
+		return "Draft"
+	case "in-progress":
+		return "In progress"
+	case "statutory-waiting-period":
+		return "Statutory waiting period"
+	case "registered":
+		return "Registered"
+	case "suspended":
+		return "Suspended"
+	case "do-not-register":
+		return "Do not register"
+	case "expired":
+		return "Expired"
+	case "cannot-register":
+		return "Cannot register"
+	case "cancelled":
+		return "Cancelled"
+	case "de-registered":
+		return "De-registered"
+	default:
+		return "draft"
+	}
+
+}
+
 func caseTab(caseSummary sirius.CaseSummary, tabName string) CaseTabData {
 	lpa := caseSummary.DigitalLpa.SiriusData
+	lpaStore := caseSummary.DigitalLpa.LpaStoreData
+	status := "draft"
+
+	if lpaStore.Status != "" {
+		status = lpaStore.Status
+	}
 
 	var linkedCases []linkedCase
-	linkedCases = append(linkedCases, linkedCase{lpa.UID, lpa.Subtype, lpa.Status, lpa.CreatedDate})
+	linkedCases = append(linkedCases, linkedCase{lpa.UID, lpa.Subtype, statusLabelFormat(status), lpa.CreatedDate})
 
 	for _, linkedLpa := range lpa.LinkedCases {
 		linkedCases = append(linkedCases, linkedCase{linkedLpa.UID, linkedLpa.Subtype, linkedLpa.Status, linkedLpa.CreatedDate})

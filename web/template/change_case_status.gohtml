@@ -1,0 +1,42 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Change case status{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        <meta data-app-reload="page" />
+        {{ $updatedStatus := statusLabel .NewStatus }}
+        {{ template "success-banner" (printf "Status changed to %s" $updatedStatus) }}
+      {{ end }}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">Change case status</h1>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+        <p class="govuk-body">Change the status of <strong>{{ .Entity }}</strong> to</p>
+        {{ template "radios" (radios "status" "" .OldStatus .Error.Field.status
+        (item "draft" "Draft" "statusTag" true)
+        (item "in-progress" "In progress" "statusTag" true)
+        (item "statutory-waiting-period" "Statutory waiting period" "statusTag" true)
+        (item "registered" "Registered" "statusTag" true)
+        (item "suspended" "Suspended" "statusTag" true)
+        (item "do-not-register" "Do not register" "statusTag" true)
+        (item "expired" "Expired" "statusTag" true)
+        (item "cannot-register" "Cannot register" "statusTag" true)
+        (item "cancelled" "Cancelled" "statusTag" true)
+        (item "de-registered" "De-registered" "statusTag" true)
+        ) }}
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Submit</button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s" .CaseUID )}}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}

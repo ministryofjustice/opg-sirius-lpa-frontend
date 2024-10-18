@@ -7,7 +7,7 @@ describe("View a digital LPA", () => {
         "opg.poas.sirius": {
           id: 333,
           uId: "M-DIGI-LPA3-3333",
-          status: "Processing",
+          status: "Draft",
           caseSubtype: "property-and-affairs",
           createdDate: "31/10/2023",
           investigationCount: 2,
@@ -96,6 +96,7 @@ describe("View a digital LPA", () => {
           },
           lpaType: "pf",
           channel: "online",
+          status: "draft",
           registrationDate: "2022-12-18",
           peopleToNotify: [],
         },
@@ -237,7 +238,7 @@ describe("View a digital LPA", () => {
             {
               uId: "M-DIGI-LPA3-3333",
               caseSubtype: "property-and-affairs",
-              status: "Processing",
+              status: "Draft",
               createdDate: "01/11/2023",
             },
             {
@@ -350,7 +351,7 @@ describe("View a digital LPA", () => {
     cy.get("h1").contains("Agnes Hartley");
 
     cy.contains("M-DIGI-LPA3-3333");
-    cy.get("a[href='/lpa/M-DIGI-LPA3-3333'] .govuk-tag").contains("Processing");
+    cy.get("a[href='/lpa/M-DIGI-LPA3-3333'] .govuk-tag").contains("Draft");
 
     cy.contains("PW M-DIGI-LPA3-3334");
     cy.get("a[href='/lpa/M-DIGI-LPA3-3334'] .govuk-tag").contains("Draft");
@@ -592,6 +593,19 @@ describe("View a digital LPA", () => {
     cy.url().should("include", "/create-warning?id=33");
     cy.contains("Create Warning");
     cy.contains("Cancel").click();
+
+    cy.url().should("include", "/lpa/M-DIGI-LPA3-3333");
+    cy.contains("Case summary");
+  });
+
+  it("can cancel changing the status", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+    cy.contains("Case actions").click();
+    cy.contains("Change case status").click();
+
+    cy.url().should("include", "/change-case-status?uid=M-DIGI-LPA3-3333");
+    cy.contains("Change case status");
+    cy.get(".govuk-button-group").contains("Cancel").click();
 
     cy.url().should("include", "/lpa/M-DIGI-LPA3-3333");
     cy.contains("Case summary");
