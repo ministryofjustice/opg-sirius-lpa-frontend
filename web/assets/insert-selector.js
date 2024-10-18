@@ -28,7 +28,7 @@ InsertSelector.prototype.init = function () {
   this.onSelectTemplate();
 
   const selected = this.$module.getAttribute("data-selected");
-  if (selected && selected.length) {
+  if (selected?.length) {
     const inserts = selected.split(",");
     inserts.forEach((insert) => {
       this.$module.querySelector(`input[value="${insert}"]`).checked = true;
