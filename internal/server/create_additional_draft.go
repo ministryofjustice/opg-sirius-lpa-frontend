@@ -25,6 +25,7 @@ type CreateAdditionalDraftClient interface {
 	CreateAdditionalDraft(ctx sirius.Context, donorID int, draft sirius.AdditionalDraft) (map[string]string, error)
 	GetUserDetails(ctx sirius.Context) (sirius.User, error)
 	Person(ctx sirius.Context, personID int) (sirius.Person, error)
+	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
 type createAdditionalDraftResult struct {
@@ -59,7 +60,7 @@ func CreateAdditionalDraft(client CreateAdditionalDraftClient, tmpl template.Tem
 			return err
 		}
 
-		group, _ := errgroup.WithContext(ctx.Context)
+		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		data := createAdditionalDraftData{
 			XSRFToken: ctx.XSRFToken,
@@ -74,6 +75,16 @@ func CreateAdditionalDraft(client CreateAdditionalDraftClient, tmpl template.Tem
 
 			if !user.HasRole("private-mlpa") {
 				return sirius.StatusError{Code: http.StatusForbidden}
+			}
+
+			return nil
+		})
+
+		group.Go(func() error {
+			var err error
+			data.Countries, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.CountryCategory)
+			if err != nil {
+				return err
 			}
 
 			return nil
