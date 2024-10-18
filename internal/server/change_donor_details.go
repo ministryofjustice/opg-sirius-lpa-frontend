@@ -101,6 +101,10 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 			} else {
 				data.Success = true
 
+				SetFlash(w, FlashNotification{
+					Title: "Changes confirmed",
+				})
+
 				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
 			}
 		}

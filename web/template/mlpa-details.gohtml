@@ -114,6 +114,11 @@
           {{ template "mlpa-header" (caseTabs .CaseSummary "lpa-details") }}
 
           <div class="govuk-!-margin-bottom-5">
+
+            {{ if .FlashMessage.Title }}
+              {{ template "notification-banner" .FlashMessage }}
+            {{ end }}
+
             <h1 class="govuk-heading-l govuk-!-margin-bottom-1">LPA details</h1>
 
             {{ if ne .DigitalLpa.SiriusData.DueDate "" }}
@@ -134,7 +139,6 @@
       </div>
 
       <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
-        {{ . }}
         {{ template "donor-details" . }}
 
         <!-- attorneys -->
