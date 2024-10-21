@@ -44,6 +44,7 @@ type Donor struct {
 type LpaStoreData struct {
 	Donor                                       LpaStoreDonor               `json:"donor"`
 	Channel                                     string                      `json:"channel"`
+	Status                                      string                      `json:"status"`
 	Attorneys                                   []LpaStoreAttorney          `json:"attorneys"`
 	CertificateProvider                         LpaStoreCertificateProvider `json:"certificateProvider"`
 	PeopleToNotify                              []LpaStorePersonToNotify    `json:"peopleToNotify"`
