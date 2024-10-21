@@ -38,8 +38,7 @@ func TestEditDigitalLPAStatus(t *testing.T) {
 						},
 					}).
 					WillRespondWith(dsl.Response{
-						Status:  http.StatusNoContent,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Status: http.StatusNoContent,
 					})
 			},
 		},
