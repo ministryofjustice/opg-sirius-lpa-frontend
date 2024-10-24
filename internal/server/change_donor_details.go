@@ -7,6 +7,7 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
 	"net/http"
+	"time"
 )
 
 type ChangeDonorDetailsClient interface {
@@ -37,6 +38,32 @@ type formDonorDetails struct {
 	LpaSignedOn       dob            `form:"lpaSignedOn"`
 }
 
+func parseDate(dateString string) (dob, error) {
+	parsedTime, err := time.Parse("2006-01-02", dateString) // Parses date in "YYYY-MM-DD" format
+	if err != nil {
+		return dob{}, err
+	}
+
+	return dob{
+		Day:   parsedTime.Day(),
+		Month: int(parsedTime.Month()),
+		Year:  parsedTime.Year(),
+	}, nil
+}
+
+func parseDateTime(dateTimeString string) (dob, error) {
+	parsedTime, err := time.Parse(time.RFC3339, dateTimeString) // Parse ISO 8601 date-time
+	if err != nil {
+		return dob{}, err
+	}
+
+	return dob{
+		Day:   parsedTime.Day(),
+		Month: int(parsedTime.Month()),
+		Year:  parsedTime.Year(),
+	}, nil
+}
+
 func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template) Handler {
 	if decoder == nil {
 		decoder = form.NewDecoder()
@@ -52,13 +79,41 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 			return err
 		}
 
-		group, groupCtx := errgroup.WithContext(ctx.Context)
+		lpaStore := cs.DigitalLpa.LpaStoreData
+		donorDob, err := parseDate(lpaStore.Donor.DateOfBirth)
+		if err != nil {
+			return err
+		}
+
+		signedAt, err := parseDateTime(lpaStore.SignedAt)
+		if err != nil {
+			return err
+		}
 
 		data := ChangeDonorDetailsData{
 			XSRFToken: ctx.XSRFToken,
 			Entity:    fmt.Sprintf("%s %s", cs.DigitalLpa.SiriusData.Subtype, caseUID),
 			CaseUID:   caseUID,
+			Form: formDonorDetails{
+				FirstNames:        lpaStore.Donor.FirstNames,
+				LastName:          lpaStore.Donor.LastName,
+				OtherNamesKnownBy: lpaStore.Donor.OtherNamesKnownBy,
+				DateOfBirth:       donorDob,
+				Address: sirius.Address{
+					Line1:    lpaStore.Donor.Address.Line1,
+					Line2:    lpaStore.Donor.Address.Line2,
+					Line3:    lpaStore.Donor.Address.Line3,
+					Town:     lpaStore.Donor.Address.Town,
+					Postcode: lpaStore.Donor.Address.Postcode,
+					Country:  lpaStore.Donor.Address.Country,
+				},
+				Email:       lpaStore.Donor.Email,
+				PhoneNumber: cs.DigitalLpa.SiriusData.Application.PhoneNumber,
+				LpaSignedOn: signedAt,
+			},
 		}
+
+		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		group.Go(func() error {
 			var err error
