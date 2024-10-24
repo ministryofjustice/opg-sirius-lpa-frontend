@@ -115,6 +115,6 @@ describe("Change case status", () => {
       .should("be.checked");
     cy.contains(".govuk-radios__label", "Cannot register").click();
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
+    cy.url().should("contain", "/lpa/M-DIGI-LPA3-3333");
   });
 });
