@@ -28,7 +28,7 @@
 
                 {{ template "input" (field "firstNames" "Donor’s first names" .Form.FirstNames .Error.Field.FirstNames) }}
                 {{ template "input" (field "lastName" "Donor’s last name" .Form.LastName .Error.Field.LastName) }}
-                {{ template "input" (field "otherNamesKnownBy" "Otherwise known as" .Form.OtherNamesKnownBy .Error.Field.OtherNamesKnownBy) }}
+                {{ template "input" (field "otherNamesKnownBy" "Otherwise known as (optional)" .Form.OtherNamesKnownBy .Error.Field.OtherNamesKnownBy) }}
                 {{ template "date" (field "dob" "Date of birth" .Form.DateOfBirth .Error.Field.DateOfBirth) }}
 
                 <div class="govuk-form-group {{ if .Error.Field.Address }}govuk-form-group--error{{ end }}" data-app-address-finder-label="Donor's address">
