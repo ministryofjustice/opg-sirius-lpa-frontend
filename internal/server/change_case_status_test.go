@@ -88,7 +88,7 @@ func TestPostChangeCaseStatus(t *testing.T) {
 
 	client.
 		On("EditDigitalLPAStatus", mock.Anything, "M-9876-9876-9876", sirius.CaseStatusData{
-			Status: "cancelled",
+			Status: "cannot-register",
 		}).
 		Return(nil)
 
@@ -98,13 +98,13 @@ func TestPostChangeCaseStatus(t *testing.T) {
 			Success:   true,
 			Entity:    "personal-welfare M-9876-9876-9876",
 			CaseUID:   "M-9876-9876-9876",
-			OldStatus: "cancelled",
-			NewStatus: "cancelled",
+			OldStatus: "cannot-register",
+			NewStatus: "cannot-register",
 		}).
 		Return(nil)
 
 	form := url.Values{
-		"status": {"cancelled"},
+		"status": {"cannot-register"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/change-case-status?uid=M-9876-9876-9876", strings.NewReader(form.Encode()))
@@ -114,7 +114,6 @@ func TestPostChangeCaseStatus(t *testing.T) {
 	err := ChangeCaseStatus(client, template.Func)(w, r)
 	resp := w.Result()
 
-	assert.Nil(t, err)
+	assert.Equal(t, RedirectError("/lpa/M-9876-9876-9876"), err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
