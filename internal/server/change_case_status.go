@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/templatefn"
 	"net/http"
 )
 
@@ -62,6 +63,11 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 			} else {
 				data.Success = true
 				data.OldStatus = data.NewStatus
+
+				SetFlash(w, FlashNotification{
+					Title: fmt.Sprintf("Status changed to %s", templatefn.StatusLabelFormat(data.NewStatus)),
+				})
+				return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
 			}
 		}
 

@@ -122,7 +122,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "grey"
 			}
 		},
-		"statusLabel": statusLabelFormat,
+		"statusLabel": StatusLabelFormat,
 		"replace": func(s, find, replace string) string {
 			return strings.ReplaceAll(s, find, replace)
 		},
@@ -316,7 +316,7 @@ func subtypeLongFormat(subtype string) string {
 	}
 }
 
-func statusLabelFormat(status string) string {
+func StatusLabelFormat(status string) string {
 	switch strings.ToLower(status) {
 	case "draft":
 		return "Draft"
@@ -354,7 +354,7 @@ func caseTab(caseSummary sirius.CaseSummary, tabName string) CaseTabData {
 	}
 
 	var linkedCases []linkedCase
-	linkedCases = append(linkedCases, linkedCase{lpa.UID, lpa.Subtype, statusLabelFormat(status), lpa.CreatedDate})
+	linkedCases = append(linkedCases, linkedCase{lpa.UID, lpa.Subtype, StatusLabelFormat(status), lpa.CreatedDate})
 
 	for _, linkedLpa := range lpa.LinkedCases {
 		linkedCases = append(linkedCases, linkedCase{linkedLpa.UID, linkedLpa.Subtype, linkedLpa.Status, linkedLpa.CreatedDate})
