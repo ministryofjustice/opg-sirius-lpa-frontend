@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-type ChangeDonorDetailsData struct {
+type ChangeDonorDetails struct {
 	FirstNames        string     `json:"firstNames"`
 	LastName          string     `json:"lastName"`
 	OtherNamesKnownBy string     `json:"otherNamesKnownBy"`
@@ -18,7 +18,7 @@ type ChangeDonorDetailsData struct {
 	LpaSignedOn       DateString `json:"lpaSignedOn"`
 }
 
-func (c *Client) ChangeDonorDetails(ctx Context, caseUID string, donorDetails ChangeDonorDetailsData) error {
+func (c *Client) ChangeDonorDetails(ctx Context, caseUID string, donorDetails ChangeDonorDetails) error {
 	data, err := json.Marshal(donorDetails)
 	if err != nil {
 		return err
