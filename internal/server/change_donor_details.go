@@ -12,15 +12,13 @@ import (
 
 type ChangeDonorDetailsClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
-	ChangeDonorDetails(sirius.Context, string, sirius.ChangeDonorDetailsData) error
-	GetUserDetails(ctx sirius.Context) (sirius.User, error)
+	ChangeDonorDetails(sirius.Context, string, sirius.ChangeDonorDetails) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
-type ChangeDonorDetailsData struct {
+type changeDonorDetailsData struct {
 	XSRFToken string
 	Countries []sirius.RefDataItem
-	Entity    string
 	Success   bool
 	Error     sirius.ValidationError
 	CaseUID   string
@@ -38,30 +36,30 @@ type formDonorDetails struct {
 	LpaSignedOn       dob            `form:"lpaSignedOn"`
 }
 
-func parseDate(dateString string) (dob, error) {
+func parseDate(dateString string) dob {
 	parsedTime, err := time.Parse("2006-01-02", dateString) // Parses date in "YYYY-MM-DD" format
 	if err != nil {
-		return dob{}, err
+		return dob{}
 	}
 
 	return dob{
 		Day:   parsedTime.Day(),
 		Month: int(parsedTime.Month()),
 		Year:  parsedTime.Year(),
-	}, nil
+	}
 }
 
-func parseDateTime(dateTimeString string) (dob, error) {
+func parseDateTime(dateTimeString string) dob {
 	parsedTime, err := time.Parse(time.RFC3339, dateTimeString) // Parse ISO 8601 date-time
 	if err != nil {
-		return dob{}, err
+		return dob{}
 	}
 
 	return dob{
 		Day:   parsedTime.Day(),
 		Month: int(parsedTime.Month()),
 		Year:  parsedTime.Year(),
-	}, nil
+	}
 }
 
 func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template) Handler {
@@ -80,19 +78,12 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 		}
 
 		lpaStore := cs.DigitalLpa.LpaStoreData
-		donorDob, err := parseDate(lpaStore.Donor.DateOfBirth)
-		if err != nil {
-			return err
-		}
+		donorDob := parseDate(lpaStore.Donor.DateOfBirth)
 
-		signedAt, err := parseDateTime(lpaStore.SignedAt)
-		if err != nil {
-			return err
-		}
+		signedAt := parseDateTime(lpaStore.SignedAt)
 
-		data := ChangeDonorDetailsData{
+		data := changeDonorDetailsData{
 			XSRFToken: ctx.XSRFToken,
-			Entity:    fmt.Sprintf("%s %s", cs.DigitalLpa.SiriusData.Subtype, caseUID),
 			CaseUID:   caseUID,
 			Form: formDonorDetails{
 				FirstNames:        lpaStore.Donor.FirstNames,
@@ -135,7 +126,7 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 				return err
 			}
 
-			donorDetailsData := sirius.ChangeDonorDetailsData{
+			donorDetailsData := sirius.ChangeDonorDetails{
 				FirstNames:        data.Form.FirstNames,
 				LastName:          data.Form.LastName,
 				OtherNamesKnownBy: data.Form.OtherNamesKnownBy,
