@@ -65,6 +65,7 @@ var testCaseSummary = sirius.CaseSummary{
 				},
 				DateOfBirth: "1965-04-18",
 			},
+			SignedAt: "2024-02-11T15:04:05Z",
 		},
 	},
 }
@@ -96,7 +97,7 @@ func TestGetChangeDonorDetails(t *testing.T) {
 						Country:  "UK",
 					},
 					PhoneNumber: "1234567890",
-					LpaSignedOn: dob{},
+					LpaSignedOn: dob{11, 2, 2024},
 				},
 			}).
 		Return(nil)
@@ -171,7 +172,7 @@ func TestGetChangeDonorDetailsWhenTemplateErrors(t *testing.T) {
 						Country:  "UK",
 					},
 					PhoneNumber: "1234567890",
-					LpaSignedOn: dob{},
+					LpaSignedOn: dob{11, 2, 2024},
 				},
 			}).
 		Return(expectedError)
@@ -209,7 +210,7 @@ func TestPostChangeDonorDetails(t *testing.T) {
 			},
 			Phone:       "",
 			Email:       "test@test.com",
-			LpaSignedOn: "",
+			LpaSignedOn: "2024-10-09",
 		}).
 		Return(nil)
 
@@ -230,7 +231,9 @@ func TestPostChangeDonorDetails(t *testing.T) {
 		"address.Country":   {"GB"},
 		"phoneNumber":       {""},
 		"email":             {"test@test.com"},
-		"lpaSignedOn":       {""},
+		"lpaSignedOn.day":   {"9"},
+		"lpaSignedOn.month": {"10"},
+		"lpaSignedOn.year":  {"2024"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/change-donor-details/?uid=M-AAAA-1111-BBBB", strings.NewReader(form.Encode()))
@@ -269,7 +272,7 @@ func TestPostChangeDonorDetailsWhenAPIFails(t *testing.T) {
 			},
 			Phone:       "",
 			Email:       "test@test.com",
-			LpaSignedOn: "",
+			LpaSignedOn: "2024-10-09",
 		}).
 		Return(expectedError)
 
@@ -290,7 +293,9 @@ func TestPostChangeDonorDetailsWhenAPIFails(t *testing.T) {
 		"address.Country":   {"GB"},
 		"phoneNumber":       {""},
 		"email":             {"test@test.com"},
-		"lpaSignedOn":       {""},
+		"lpaSignedOn.day":   {"9"},
+		"lpaSignedOn.month": {"10"},
+		"lpaSignedOn.year":  {"2024"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/change-donor-details/?uid=M-AAAA-1111-BBBB", strings.NewReader(form.Encode()))
