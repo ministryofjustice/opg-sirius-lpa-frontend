@@ -49,17 +49,17 @@ func parseDate(dateString string) dob {
 	}
 }
 
-func parseDateTime(dateTimeString string) dob {
+func parseDateTime(dateTimeString string) (dob, error) {
 	parsedTime, err := time.Parse(time.RFC3339, dateTimeString) // Parse ISO 8601 date-time
 	if err != nil {
-		return dob{}
+		return dob{}, err
 	}
 
 	return dob{
 		Day:   parsedTime.Day(),
 		Month: int(parsedTime.Month()),
 		Year:  parsedTime.Year(),
-	}
+	}, nil
 }
 
 func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template) Handler {
@@ -80,7 +80,10 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 		lpaStore := cs.DigitalLpa.LpaStoreData
 		donorDob := parseDate(lpaStore.Donor.DateOfBirth)
 
-		signedAt := parseDateTime(lpaStore.SignedAt)
+		signedAt, err := parseDateTime(lpaStore.SignedAt)
+		if err != nil {
+			return err
+		}
 
 		data := changeDonorDetailsData{
 			XSRFToken: ctx.XSRFToken,
