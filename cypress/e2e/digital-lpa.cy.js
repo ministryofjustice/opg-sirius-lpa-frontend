@@ -59,6 +59,21 @@ describe("View a digital LPA", () => {
           ],
         },
         "opg.poas.lpastore": {
+          donor: {
+            uid: "5ff557dd-1e27-4426-9681-ed6e90c2c08d",
+            firstNames: "James",
+            lastName: "Rubin",
+            otherNamesKnownBy: "Somebody",
+            dateOfBirth: "1990-02-22",
+            address: {
+              postcode: "B29 6BL",
+              country: "GB",
+              town: "Birmingham",
+              line1: "29 Grange Road"
+            },
+            contactLanguagePreference: "en",
+            email: "jrubin@mail.example"
+          },
           attorneys: [
             {
               firstNames: "Esther",
@@ -99,6 +114,7 @@ describe("View a digital LPA", () => {
           status: "draft",
           registrationDate: "2022-12-18",
           peopleToNotify: [],
+          signedAt: "2022-12-18T11:46:24Z",
         },
       },
     });
@@ -484,6 +500,46 @@ describe("View a digital LPA", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details").then(() => {
       Cypress.$("span:contains('Donor')").closest("button")[0].click();
       cy.contains("Online");
+    });
+  });
+
+  it("can go to change link for donor", () => {
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333/change-donor-details", "PUT", {
+      status: 204,
+    });
+
+    cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details").then(() => {
+      Cypress.$("span:contains('Donor')").closest("button")[0].click();
+      cy.contains("Online");
+      cy.contains("Change").click();
+
+      cy.get("#f-firstNames").clear()
+      cy.get("#f-firstNames").type("Coleen Stephanie");
+
+      cy.get("#f-lastName").clear();
+      cy.get("#f-lastName").type("Morneault");
+
+      cy.get("#f-dob-day").clear();
+      cy.get("#f-dob-month").clear();
+      cy.get("#f-dob-year").clear();
+
+      cy.get("#f-dob-day").type("8");
+      cy.get("#f-dob-month").type("4");
+      cy.get("#f-dob-year").type("1952");
+
+      cy.get("button[type=submit]").click();
+      cy.get(".moj-banner").should("exist");
+    });
+  });
+
+  it("can go to change link for donor and go back", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details").then(() => {
+      Cypress.$("span:contains('Donor')").closest("button")[0].click();
+      cy.contains("Online");
+      cy.contains("Change").click();
+      cy.contains("Back to LPA details").click();
+      cy.url().should("contain", "/lpa/M-DIGI-LPA3-3333/lpa-details");
     });
   });
 
