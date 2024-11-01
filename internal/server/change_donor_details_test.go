@@ -306,3 +306,59 @@ func TestPostChangeDonorDetailsWhenAPIFails(t *testing.T) {
 	assert.Equal(t, expectedError, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
+
+func TestPostChangeDonorDetailsWhenValidationError(t *testing.T) {
+	client := &mockChangeDonorDetailsClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
+		Return(testCaseSummary, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+	client.
+		On("ChangeDonorDetails", mock.Anything, "M-AAAA-1111-BBBB", sirius.ChangeDonorDetails{
+			LastName:    "Smith",
+			DateOfBirth: "1965-04-18",
+			Address: sirius.Address{
+				Line1:    "9 Mount",
+				Town:     "East Harling",
+				Postcode: "NR16 2GB",
+				Country:  "GB",
+			},
+			Phone:       "1234567890",
+			LpaSignedOn: "2024-10-09",
+		}).
+		Return(sirius.ValidationError{Field: sirius.FieldErrors{
+			"firstName": {"required": "Value required and can't be empty"},
+		}})
+
+	template := &mockTemplate{}
+
+	template.
+		On("Func", mock.Anything,
+			mock.MatchedBy(func(data changeDonorDetailsData) bool {
+				return data.Error.Field["firstName"]["required"] == "Value required and can't be empty"
+			}),
+		).
+		Return(nil)
+
+	form := url.Values{
+		"firstNames":        {""},
+		"lastName":          {"Smith"},
+		"address.Line1":     {"9 Mount"},
+		"address.Town":      {"East Harling"},
+		"address.Postcode":  {"NR16 2GB"},
+		"address.Country":   {"GB"},
+		"lpaSignedOn.day":   {"9"},
+		"lpaSignedOn.month": {"10"},
+		"lpaSignedOn.year":  {"2024"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/change-donor-details/?uid=M-AAAA-1111-BBBB", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := ChangeDonorDetails(client, template.Func)(w, r)
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
