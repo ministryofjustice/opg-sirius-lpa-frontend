@@ -111,8 +111,8 @@ describe("Change donor details form", () => {
 
   it("can be visited from the LPA details Change link", () => {
     cy.visit("/lpa/M-0000-0000-0001/lpa-details").then(() => {
-      cy.contains("Donor").click();
-      cy.contains("Change").click();
+      cy.get(".govuk-accordion__section-button").contains("Donor").click();
+      cy.get("#f-change-donor-details").click();
       cy.contains("Details that apply to all LPAs for this donor");
     });
   });
