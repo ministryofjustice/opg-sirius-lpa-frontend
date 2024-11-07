@@ -52,6 +52,8 @@
 				<form class="form" method="POST">
 					<input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
+
+
 					<div class="govuk-form-group {{ if .Error.Field.types }}govuk-form-group--error{{ end }}" id="f-types">
 						<fieldset class="govuk-fieldset" aria-describedby="f-type-hint">
 							<legend class="govuk-fieldset__legend">What LPA types are required?</legend>
@@ -122,7 +124,7 @@
 										{{ template "input" (field "alternativeAddress.Line3" "Address line 3 (optional)" .Form.AlternativeAddress.Line3 (index .Error.Field "correspondentAddress/addressLine3") "data-app-address-finder-map" "addressLine3") }}
 										{{ template "input" (field "alternativeAddress.Town" "Town or city" .Form.AlternativeAddress.Town (index .Error.Field "correspondentAddress/town") "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
 										{{ template "input" (field "alternativeAddress.Postcode" "Postcode" .Form.AlternativeAddress.Postcode (index .Error.Field "correspondentAddress/postcode") "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
-										{{ template "select" (select "alternativeCountry.Country" "Country" .Form.AlternativeAddress.Country (index .Error.Field "correspondentAddress/country") (options .Countries) "data-app-address-finder-map" "country") }}
+										{{ template "select" (select "alternativeAddress.Country" "Country" .Form.AlternativeAddress.Country (index .Error.Field "correspondentAddress/country") (options .Countries) "data-app-address-finder-map" "country") }}
 									</div>
 								</div>
 								<div class="govuk-radios__item">
