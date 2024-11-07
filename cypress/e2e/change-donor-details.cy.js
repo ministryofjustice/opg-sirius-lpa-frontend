@@ -111,7 +111,7 @@ describe("Change donor details form", () => {
 
   it("can be visited from the LPA details Change link", () => {
     cy.visit("/lpa/M-0000-0000-0001/lpa-details").then(() => {
-      Cypress.$("span:contains('Donor')").closest("button")[0].click();
+      cy.contains("Donor").click();
       cy.contains("Change").click();
       cy.contains("Details that apply to all LPAs for this donor");
     });
