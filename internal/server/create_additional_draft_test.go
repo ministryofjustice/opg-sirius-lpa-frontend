@@ -30,11 +30,22 @@ func (m *mockCreateAdditionalDraftClient) Person(ctx sirius.Context, personID in
 	return args.Get(0).(sirius.Person), args.Error(1)
 }
 
+func (m *mockCreateAdditionalDraftClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
+	args := m.Called(ctx, category)
+	if args.Get(0) != nil {
+		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
 func TestGetCreateAdditionalDraft(t *testing.T) {
 	client := &mockCreateAdditionalDraftClient{}
 	client.
 		On("GetUserDetails", mock.Anything).
 		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{ID: 123, Firstname: "John", Surname: "Doe"}, nil)
@@ -42,6 +53,7 @@ func TestGetCreateAdditionalDraft(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createAdditionalDraftData{
+			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
 			Donor: sirius.Person{
 				ID:        123,
 				Firstname: "John",
@@ -67,6 +79,9 @@ func TestGetCreateAdditionalDraftForbidden(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(sirius.User{}, nil)
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{ID: 123, Firstname: "John", Surname: "Doe"}, nil)
 
@@ -87,6 +102,9 @@ func TestPostCreateAdditionalDraft(t *testing.T) {
 	client.
 		On("GetUserDetails", mock.Anything).
 		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{ID: 123, Firstname: "John", Surname: "Doe"}, nil)
@@ -114,6 +132,7 @@ func TestPostCreateAdditionalDraft(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createAdditionalDraftData{
+			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
 			Form: formAdditionalDraft{
 				SubTypes:               []string{"property-and-affairs", "personal-welfare"},
 				Recipient:              "other",
@@ -175,6 +194,9 @@ func TestPostCreateAdditionalDraftDonorOtherAddress(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+	client.
 		On("Person", mock.Anything, 234).
 		Return(sirius.Person{ID: 234, Firstname: "Amy", Surname: "Shoe"}, nil)
 	client.
@@ -190,6 +212,7 @@ func TestPostCreateAdditionalDraftDonorOtherAddress(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createAdditionalDraftData{
+			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
 			Form: formAdditionalDraft{
 				SubTypes:  []string{"property-and-affairs", "personal-welfare"},
 				Recipient: "donor-other-address",
@@ -243,6 +266,9 @@ func TestPostCreateAdditionalDraftWhenAPIFails(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{}, nil)
+	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{ID: 123, Firstname: "John", Surname: "Doe"}, nil)
 	client.
@@ -273,6 +299,9 @@ func TestPostCreateAdditionalDraftWhenValidationError(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{ID: 123, Firstname: "John", Surname: "Doe"}, nil)
 	client.
@@ -287,7 +316,8 @@ func TestPostCreateAdditionalDraftWhenValidationError(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createAdditionalDraftData{
-			Form: formAdditionalDraft{},
+			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
+			Form:      formAdditionalDraft{},
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{
 					"subtype": {"required": "Value required and can't be empty"},
@@ -336,12 +366,16 @@ func TestPostCreateAdditionalDraftWhenUserDetailsErrors(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(sirius.User{}, expectedError)
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+	client.
 		On("Person", mock.Anything, 234).
 		Return(sirius.Person{ID: 234, Firstname: "Amy", Surname: "Shoe"}, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createAdditionalDraftData{
+			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
 			Donor: sirius.Person{
 				ID:        234,
 				Firstname: "Amy",
@@ -365,12 +399,16 @@ func TestPostCreateAdditionalDraftWhenPersonErrors(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(sirius.User{Roles: []string{"private-mlpa"}}, nil)
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+	client.
 		On("Person", mock.Anything, 234).
 		Return(sirius.Person{ID: 234, Firstname: "Amy", Surname: "Shoe"}, expectedError)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createAdditionalDraftData{
+			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
 			Donor: sirius.Person{
 				ID:        234,
 				Firstname: "Amy",

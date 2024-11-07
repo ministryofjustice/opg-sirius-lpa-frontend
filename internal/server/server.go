@@ -50,6 +50,7 @@ type Client interface {
 	AllocateCasesClient
 	AssignTaskClient
 	ApplyFeeReductionClient
+	ChangeDonorDetailsClient
 	ChangeStatusClient
 	ChangeCaseStatusClient
 	ClearTaskClient
@@ -98,6 +99,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/", http.NotFoundHandler())
 	mux.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {})
 
+	mux.Handle("/change-donor-details", wrap(ChangeDonorDetails(client, templates.Get("change-donor-details.gohtml"))))
 	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning.gohtml"))))
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"))))
 	mux.Handle("/create-task", wrap(Task(client, templates.Get("task.gohtml"))))
