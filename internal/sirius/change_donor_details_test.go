@@ -29,7 +29,9 @@ func TestChangeDonorDetails(t *testing.T) {
 				OtherNamesKnownBy: "Jack",
 				DateOfBirth:       "2000-11-12",
 				Address: Address{
-					Line1:    "Fluke House",
+					Line1:    "Flat Number",
+					Line2:    "Building",
+					Line3:    "Road Name",
 					Town:     "South Bend",
 					Postcode: "AI1 6VW",
 					Country:  "GB",
@@ -41,7 +43,7 @@ func TestChangeDonorDetails(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A donor with a digital LPA exists").
+					Given("A digital LPA exists").
 					UponReceiving("A request for changing donor details").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
@@ -55,7 +57,9 @@ func TestChangeDonorDetails(t *testing.T) {
 							"otherNamesKnownBy": "Jack",
 							"dateOfBirth":       "12/11/2000",
 							"address": map[string]string{
-								"addressLine1": "Fluke House",
+								"addressLine1": "Flat Number",
+								"addressLine2": "Building",
+								"addressLine3": "Road Name",
 								"town":         "South Bend",
 								"postcode":     "AI1 6VW",
 								"country":      "GB",
@@ -66,8 +70,7 @@ func TestChangeDonorDetails(t *testing.T) {
 						},
 					}).
 					WillRespondWith(dsl.Response{
-						Status:  http.StatusNoContent,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Status: http.StatusNoContent,
 					})
 			},
 		},
