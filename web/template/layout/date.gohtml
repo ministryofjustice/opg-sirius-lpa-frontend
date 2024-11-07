@@ -1,0 +1,38 @@
+{{ define "date" }}
+    <div class="govuk-form-group {{ if .Error }}govuk-form-group--error{{ end }}" id="f-{{ .Name }}">
+        <fieldset class="govuk-fieldset" role="group" aria-describedby="f-{{ .Name }}-hint">
+            <legend class="govuk-fieldset__legend">
+                <h1 class="govuk-fieldset__heading">
+                    {{ .Label }}
+                </h1>
+            </legend>
+            {{ template "errors" .Error }}
+            <div class="govuk-date-input" id="f-{{ .Name }}">
+                <div class="govuk-date-input__item">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-date-input__label" for="f-{{ .Name }}-day">
+                            Day
+                        </label>
+                        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="f-{{ .Name }}-day" name="{{ .Name }}.day" type="text" inputmode="numeric" {{ if not (eq .Value.Day 0) }}value="{{ .Value.Day }}"{{ end }}>
+                    </div>
+                </div>
+                <div class="govuk-date-input__item">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-date-input__label" for="f-{{ .Name }}-month">
+                            Month
+                        </label>
+                        <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="f-{{ .Name }}-month" name="{{ .Name }}.month" type="text" inputmode="numeric" {{ if not (eq .Value.Month 0) }}value="{{ .Value.Month }}"{{ end }}>
+                    </div>
+                </div>
+                <div class="govuk-date-input__item">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-date-input__label" for="f-{{ .Name }}-year">
+                            Year
+                        </label>
+                        <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="f-{{ .Name }}-year" name="{{ .Name }}.year" type="text" inputmode="numeric" {{ if not (eq .Value.Year 0) }}value="{{ .Value.Year }}"{{ end }}>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+{{ end }}
