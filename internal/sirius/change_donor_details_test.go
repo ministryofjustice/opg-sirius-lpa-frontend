@@ -41,7 +41,7 @@ func TestChangeDonorDetails(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A donor with a digital LPA exists").
+					Given("A digital LPA exists").
 					UponReceiving("A request for changing donor details").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
@@ -66,8 +66,7 @@ func TestChangeDonorDetails(t *testing.T) {
 						},
 					}).
 					WillRespondWith(dsl.Response{
-						Status:  http.StatusNoContent,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Status: http.StatusNoContent,
 					})
 			},
 		},
