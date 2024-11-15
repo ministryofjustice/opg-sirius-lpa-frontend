@@ -36,17 +36,17 @@ type formDonorDetails struct {
 	LpaSignedOn       dob            `form:"lpaSignedOn"`
 }
 
-func parseDate(dateString string) dob {
+func parseDate(dateString string) (dob, error) {
 	parsedTime, err := time.Parse("2006-01-02", dateString) // Parses date in "YYYY-MM-DD" format
 	if err != nil {
-		return dob{}
+		return dob{}, err
 	}
 
 	return dob{
 		Day:   parsedTime.Day(),
 		Month: int(parsedTime.Month()),
 		Year:  parsedTime.Year(),
-	}
+	}, nil
 }
 
 func parseDateTime(dateTimeString string) (dob, error) {
@@ -78,7 +78,10 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 		}
 
 		lpaStore := cs.DigitalLpa.LpaStoreData
-		donorDob := parseDate(lpaStore.Donor.DateOfBirth)
+		donorDob, err := parseDate(lpaStore.Donor.DateOfBirth)
+		if err != nil {
+			return err
+		}
 
 		signedAt, err := parseDateTime(lpaStore.SignedAt)
 		if err != nil {
