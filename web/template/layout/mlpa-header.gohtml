@@ -5,12 +5,10 @@
           {{ .CaseSummary.DigitalLpa.SiriusData.Application.DonorAddress.Postcode }}
         </span>
         <div class="govuk-grid-column-one-quarter">
-            <div class="moj-button-menu" data-module="donor-actions-button-menu">
-                <div class="moj-button-menu__wrapper">
-                    <a href="{{ prefix (printf "/create-additional-draft-lpa?id=%d" .CaseSummary.DigitalLpa.SiriusData.Donor.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
-                        Create a draft LPA
-                    </a>
-                </div>
+            <div class="moj-button-menu" data-module="moj-button-menu" data-button-text="Update donor's record" data-button-classes="govuk-button--secondary" data-align-menu="right">
+                <a href="{{ prefix (printf "/create-additional-draft-lpa?id=%d" .CaseSummary.DigitalLpa.SiriusData.Donor.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
+                    Create a draft LPA
+                </a>
             </div>
         </div>
     </div>
@@ -64,21 +62,19 @@
         </div>
 
         <div class="govuk-grid-column-one-third">
-            <div class="moj-button-menu" data-module="app-button-menu">
-                <div class="moj-button-menu__wrapper">
-                    <a href="{{ prefix (printf "/create-task?id=%d" .CaseSummary.DigitalLpa.SiriusData.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
-                        Create a task
-                    </a>
-                    <a href="{{ prefix (printf "/create-warning?id=%d" .CaseSummary.DigitalLpa.SiriusData.Donor.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
-                        Create a warning
-                    </a>
-                    <a href="{{ prefix (printf "/create-event?entity=lpa&id=%d" .CaseSummary.DigitalLpa.SiriusData.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
-                        Create an event
-                    </a>
-                    <a href="{{ prefix (printf "/change-case-status?uid=%s" .CaseSummary.DigitalLpa.UID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
-                        Change case status
-                    </a>
-                </div>
+            <div class="moj-button-menu" data-module="moj-button-menu" data-button-text="Case actions" data-button-classes="govuk-button--secondary" data-align-menu="right">
+                <a href="{{ prefix (printf "/create-task?id=%d" .CaseSummary.DigitalLpa.SiriusData.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
+                    Create a task
+                </a>
+                <a href="{{ prefix (printf "/create-warning?id=%d" .CaseSummary.DigitalLpa.SiriusData.Donor.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
+                    Create a warning
+                </a>
+                <a href="{{ prefix (printf "/create-event?entity=lpa&id=%d" .CaseSummary.DigitalLpa.SiriusData.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
+                    Create an event
+                </a>
+                <a href="{{ prefix (printf "/change-case-status?uid=%s" .CaseSummary.DigitalLpa.UID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
+                    Change case status
+                </a>
             </div>
         </div>
     </div>
