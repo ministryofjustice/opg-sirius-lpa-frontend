@@ -86,6 +86,7 @@ func ChangeAttorneyDetails(client ChangeAttorneyDetailsClient, tmpl template.Tem
 			signedAt, err := parseDateTime(attorney.SignedAt)
 			data.Form.SignedAt = signedAt
 			if err != nil {
+				return err
 			}
 		}
 
@@ -97,7 +98,6 @@ func ChangeAttorneyDetails(client ChangeAttorneyDetailsClient, tmpl template.Tem
 			if err != nil {
 				return err
 			}
-
 			return nil
 		})
 
