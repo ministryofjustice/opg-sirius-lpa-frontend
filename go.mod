@@ -7,9 +7,9 @@ toolchain go1.23.3
 require (
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-playground/form/v4 v4.2.1
-	github.com/ministryofjustice/opg-go-common v1.34.0
+	github.com/ministryofjustice/opg-go-common v1.38.0
 	github.com/pact-foundation/pact-go v1.10.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.57.0
 	golang.org/x/mod v0.22.0
 	golang.org/x/sync v0.9.0
