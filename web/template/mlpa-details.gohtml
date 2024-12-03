@@ -277,8 +277,12 @@
                   </div>
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Address</dt>
-                    <dd class="govuk-summary-list__value">
+                    {{ $attorneyFieldAnomalies = $attorneyAnomalies.GetAnomaliesForFieldWithStatus "address" "detected" }}
+                    <dd class="govuk-summary-list__value{{ if gt (len $attorneyFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
                       {{ template "mlpa-address" $attorney.Address }}
+                      {{ if gt (len $attorneyFieldAnomalies) 0 }}
+                        <br><span class="govuk-error-message">Review replacement attorney's address</span>
+                      {{ end }}
                     </dd>
                   </div>
                   <div class="govuk-summary-list__row">
