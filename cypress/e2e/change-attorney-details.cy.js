@@ -57,7 +57,7 @@ describe("Change attorney details form", () => {
               lastName: "Welch",
               status: "replacement",
               signedAt: "2022-12-19T09:12:59Z",
-              dateOfBirth: "27/05/1998",
+              dateOfBirth: "1998-05-27",
             },
           ],
           status: "in-progress",

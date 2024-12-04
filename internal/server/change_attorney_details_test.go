@@ -72,85 +72,109 @@ var testChangeAttorneyDetailsCaseSummary = sirius.CaseSummary{
 }
 
 func TestGetChangeAttorneyDetails(t *testing.T) {
-	client := &mockChangeAttorneyDetailsClient{}
-	client.
-		On("CaseSummary", mock.Anything, "M-DDDD-DDDD-DDDD").
-		Return(testChangeAttorneyDetailsCaseSummary, nil)
-	client.
-		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
-		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything,
-			changeAttorneyDetailsData{
-				Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
-				CaseUID:   "M-DDDD-DDDD-DDDD",
-				Form: formAttorneyDetails{
-					FirstNames:  "Jack",
-					LastName:    "Black",
-					DateOfBirth: dob{Day: 22, Month: 2, Year: 1990},
-					Address: sirius.Address{
-						Line1:    "9 Mount Pleasant Drive",
-						Town:     "East Harling",
-						Postcode: "NR16 2GB",
-						Country:  "UK",
-					},
-					Email:       "a@example.com",
-					PhoneNumber: "077577575757",
-					SignedAt:    dob{12, 1, 2024},
+	tests := []struct {
+		name          string
+		caseUID       string
+		attorneyUID   string
+		form          formAttorneyDetails
+		errorReturned error
+	}{
+		{
+			name:        "Change Regular Attorney Details",
+			caseUID:     "M-DDDD-DDDD-DDDD",
+			attorneyUID: "302b05c7-896c-4290-904e-2005e4f1e81e",
+			form: formAttorneyDetails{
+				FirstNames:  "Jack",
+				LastName:    "Black",
+				DateOfBirth: dob{Day: 22, Month: 2, Year: 1990},
+				Address: sirius.Address{
+					Line1:    "9 Mount Pleasant Drive",
+					Town:     "East Harling",
+					Postcode: "NR16 2GB",
+					Country:  "UK",
 				},
-			}).
-		Return(nil)
-
-	server := newMockServer("/lpa/{uid}/attorney/{attorneyUID}/change-details", ChangeAttorneyDetails(client, template.Func))
-
-	r, _ := http.NewRequest(http.MethodGet, "/lpa/M-DDDD-DDDD-DDDD/attorney/302b05c7-896c-4290-904e-2005e4f1e81e/change-details", nil)
-	_, err := server.serve(r)
-
-	assert.Nil(t, err)
-	mock.AssertExpectationsForObjects(t, client, template)
-}
-
-func TestGetChangeReplacementAttorneyDetails(t *testing.T) {
-	client := &mockChangeAttorneyDetailsClient{}
-	client.
-		On("CaseSummary", mock.Anything, "M-DDDD-DDDD-DDDD").
-		Return(testChangeAttorneyDetailsCaseSummary, nil)
-	client.
-		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
-		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything,
-			changeAttorneyDetailsData{
-				Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
-				CaseUID:   "M-DDDD-DDDD-DDDD",
-				Form: formAttorneyDetails{
-					FirstNames:  "Jack",
-					LastName:    "White",
-					DateOfBirth: dob{Day: 22, Month: 2, Year: 1990},
-					Address: sirius.Address{
-						Line1:    "29 Grange Road",
-						Town:     "Birmingham",
-						Postcode: "B29 6BL",
-						Country:  "UK",
-					},
-					Email:       "b@example.com",
-					PhoneNumber: "07122121212",
-					SignedAt:    dob{28, 11, 2024},
+				Email:       "a@example.com",
+				PhoneNumber: "077577575757",
+				SignedAt:    dob{Day: 12, Month: 1, Year: 2024},
+			},
+			errorReturned: nil,
+		},
+		{
+			name:        "Change Replacement Attorney Details",
+			caseUID:     "M-DDDD-DDDD-DDDD",
+			attorneyUID: "123a01b1-456d-5391-813d-2010d3e2d72d",
+			form: formAttorneyDetails{
+				FirstNames:  "Jack",
+				LastName:    "White",
+				DateOfBirth: dob{Day: 22, Month: 2, Year: 1990},
+				Address: sirius.Address{
+					Line1:    "29 Grange Road",
+					Town:     "Birmingham",
+					Postcode: "B29 6BL",
+					Country:  "UK",
 				},
-			}).
-		Return(nil)
+				Email:       "b@example.com",
+				PhoneNumber: "07122121212",
+				SignedAt:    dob{Day: 28, Month: 11, Year: 2024},
+			},
+			errorReturned: nil,
+		},
+		{
+			name:        "Template Error Returned",
+			caseUID:     "M-DDDD-DDDD-DDDD",
+			attorneyUID: "302b05c7-896c-4290-904e-2005e4f1e81e",
+			form: formAttorneyDetails{
+				FirstNames:  "Jack",
+				LastName:    "Black",
+				DateOfBirth: dob{Day: 22, Month: 2, Year: 1990},
+				Address: sirius.Address{
+					Line1:    "9 Mount Pleasant Drive",
+					Town:     "East Harling",
+					Postcode: "NR16 2GB",
+					Country:  "UK",
+				},
+				Email:       "a@example.com",
+				PhoneNumber: "077577575757",
+				SignedAt:    dob{Day: 12, Month: 1, Year: 2024},
+			},
+			errorReturned: expectedError,
+		},
+	}
 
-	server := newMockServer("/lpa/{uid}/attorney/{attorneyUID}/change-details", ChangeAttorneyDetails(client, template.Func))
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &mockChangeAttorneyDetailsClient{}
+			client.
+				On("CaseSummary", mock.Anything, tc.caseUID).
+				Return(testChangeAttorneyDetailsCaseSummary, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+				Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/lpa/M-DDDD-DDDD-DDDD/attorney/123a01b1-456d-5391-813d-2010d3e2d72d/change-details", nil)
-	_, err := server.serve(r)
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything,
+					changeAttorneyDetailsData{
+						Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
+						CaseUID:   tc.caseUID,
+						Form:      tc.form,
+					}).
+				Return(tc.errorReturned)
 
-	assert.Nil(t, err)
-	mock.AssertExpectationsForObjects(t, client, template)
+			server := newMockServer("/lpa/{uid}/attorney/{attorneyUID}/change-details", ChangeAttorneyDetails(client, template.Func))
+
+			r, _ := http.NewRequest(http.MethodGet, "/lpa/"+tc.caseUID+"/attorney/"+tc.attorneyUID+"/change-details", nil)
+			_, err := server.serve(r)
+
+			if tc.errorReturned != nil {
+				assert.Equal(t, tc.errorReturned, err)
+			} else {
+				assert.Nil(t, err)
+			}
+
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
 }
 
 func TestGetChangeAttorneyDetailsWhenCaseSummaryErrors(t *testing.T) {
@@ -183,44 +207,4 @@ func assertChangeAttorneyDetailsErrors(t *testing.T, client *mockChangeAttorneyD
 
 	assert.Equal(t, expectedError, err)
 	mock.AssertExpectationsForObjects(t, client)
-}
-
-func TestGetChangeAttorneyDetailsWhenTemplateErrors(t *testing.T) {
-	client := &mockChangeAttorneyDetailsClient{}
-	client.
-		On("CaseSummary", mock.Anything, "M-DDDD-DDDD-DDDD").
-		Return(testChangeAttorneyDetailsCaseSummary, nil)
-	client.
-		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
-		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, changeAttorneyDetailsData{
-			Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
-			CaseUID:   "M-DDDD-DDDD-DDDD",
-			Form: formAttorneyDetails{
-				FirstNames:  "Jack",
-				LastName:    "Black",
-				DateOfBirth: dob{Day: 22, Month: 2, Year: 1990},
-				Address: sirius.Address{
-					Line1:    "9 Mount Pleasant Drive",
-					Town:     "East Harling",
-					Postcode: "NR16 2GB",
-					Country:  "UK",
-				},
-				Email:       "a@example.com",
-				PhoneNumber: "077577575757",
-				SignedAt:    dob{12, 1, 2024},
-			},
-		}).
-		Return(expectedError)
-
-	server := newMockServer("/lpa/{uid}/attorney/{attorneyUID}/change-details", ChangeAttorneyDetails(client, template.Func))
-
-	r, _ := http.NewRequest(http.MethodGet, "/lpa/M-DDDD-DDDD-DDDD/attorney/302b05c7-896c-4290-904e-2005e4f1e81e/change-details", nil)
-	_, err := server.serve(r)
-
-	assert.Equal(t, expectedError, err)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
