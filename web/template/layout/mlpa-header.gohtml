@@ -75,6 +75,9 @@
                 <a href="{{ prefix (printf "/change-case-status?uid=%s" .CaseSummary.DigitalLpa.UID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
                     Change case status
                 </a>
+                <a href="{{ prefix (printf "/lpa/%s/manage-attorneys" .CaseSummary.DigitalLpa.UID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary" data-module="dropdown-menu">
+                    Manage attorneys
+                </a>
             </div>
         </div>
     </div>
