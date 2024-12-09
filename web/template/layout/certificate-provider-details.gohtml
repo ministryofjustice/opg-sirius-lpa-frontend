@@ -1,0 +1,82 @@
+{{ define "certificate-provider-details" }}
+
+{{ $cpAnomalies := .AnomalyDisplay.GetAnomaliesForSection "certificateProvider" }}
+<div class="govuk-accordion__section">
+    <div class="govuk-accordion__section-header">
+        <h2 class="govuk-accordion__section-heading">
+              <span class="govuk-accordion__section-button" id="accordion-default-heading-6">
+                Certificate provider
+                {{ if $cpAnomalies.HasAnomalies }}<span class="govuk-error-message">For review</span>{{ end }}
+              </span>
+        </h2>
+    </div>
+
+    <div id="accordion-default-content-6" class="govuk-accordion__section-content">
+        <dl class="govuk-summary-list">
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">First names</dt>
+                <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.CertificateProvider.FirstNames }}</dd>
+            </div>
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Last name</dt>
+                <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.CertificateProvider.LastName }}</dd>
+            </div>
+
+            {{ $addressFieldAnomalies := $cpAnomalies.GetAnomaliesForFieldWithStatus "address" "detected" }}
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Address</dt>
+                <dd class="govuk-summary-list__value{{ if gt (len $addressFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                    {{ template "mlpa-address" .DigitalLpa.LpaStoreData.CertificateProvider.Address }}
+                    {{ if gt (len $addressFieldAnomalies) 0 }}
+                        <br><span class="govuk-error-message">Review certificate provider address</span>
+                    {{ end }}
+                </dd>
+            </div>
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Email</dt>
+                <dd class="govuk-summary-list__value">
+                    {{ if (eq .DigitalLpa.LpaStoreData.CertificateProvider.Email "") }}
+                        Not provided
+                    {{ else }}
+                        {{ .DigitalLpa.LpaStoreData.CertificateProvider.Email }}
+                    {{ end }}
+                </dd>
+            </div>
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Phone</dt>
+                <dd class="govuk-summary-list__value">
+                    {{ if (eq .DigitalLpa.LpaStoreData.CertificateProvider.Phone "") }}
+                        Not provided
+                    {{ else }}
+                        {{ .DigitalLpa.LpaStoreData.CertificateProvider.Phone }}
+                    {{ end }}
+                </dd>
+            </div>
+
+            <div class="govuk-summary-list__row{{ if eq .DigitalLpa.LpaStoreData.CertificateProvider.SignedAt "" }} govuk-summary-list__row--no-border{{ end }}">
+                <dt class="govuk-summary-list__key">Format</dt>
+                <dd class="govuk-summary-list__value">
+                    {{ channelForFormat .DigitalLpa.LpaStoreData.CertificateProvider.Channel }}
+                    {{ if not (eq .DigitalLpa.LpaStoreData.CertificateProvider.ContactLanguagePreference "") }}
+                        <br>{{ languageForFormat .DigitalLpa.LpaStoreData.CertificateProvider.ContactLanguagePreference }}
+                    {{ end }}
+                </dd>
+            </div>
+
+            {{ if ne .DigitalLpa.LpaStoreData.CertificateProvider.SignedAt "" }}
+                <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                    <dt class="govuk-summary-list__key">Signed on</dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ parseAndFormatDate .DigitalLpa.LpaStoreData.CertificateProvider.SignedAt "2006-01-02T15:04:05Z" "2 January 2006" }}
+                    </dd>
+                </div>
+            {{ end }}
+
+        </dl>
+    </div>
+</div>
+{{ end }}

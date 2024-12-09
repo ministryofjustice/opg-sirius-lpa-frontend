@@ -89,6 +89,13 @@ describe("View and edit anomalies for a digital LPA", () => {
             ruleType: "empty",
             fieldOwnerUid: "",
           },
+          {
+            id: 128,
+            status: "detected",
+            fieldName: "whenTheLpaCanBeUsed",
+            ruleType: "empty",
+            fieldOwnerUid: "certificate-provider",
+          },
         ],
       },
     });
@@ -111,6 +118,11 @@ describe("View and edit anomalies for a digital LPA", () => {
               status: "active",
             },
           ],
+          certificateProvider: [
+            {
+              uid: "certificate-provider"
+            }
+          ]
         },
       },
     });
@@ -158,6 +170,7 @@ describe("View and edit anomalies for a digital LPA", () => {
     cy.contains("Review replacement attorney's last name");
     cy.contains("Review how attorney's can make decisions");
     cy.contains("Review when the LPA can be used");
+    cy.contains("Review certificate provider address")
   });
 
   it("shows anomalies for pa LPA", () => {
