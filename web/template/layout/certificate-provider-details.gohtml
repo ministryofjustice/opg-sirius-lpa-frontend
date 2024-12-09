@@ -1,12 +1,15 @@
 {{ define "certificate-provider-details" }}
 
-{{ $cpAnomalies := .AnomalyDisplay.GetAnomaliesForSection "certificateProvider" }}
+{{ $anomaliesForSection := .AnomalyDisplay.GetAnomaliesForSection "certificateProvider" }}
+{{ $cpUID := .CaseSummary.DigitalLpa.LpaStoreData.CertificateProvider.Uid  }}
+{{ $cpAnomalies := $anomaliesForSection.GetAnomaliesForObject $cpUID }}
+
 <div class="govuk-accordion__section">
-    <div class="govuk-accordion__section-header">
+    <div class="govuk-accordion__section-header{{ if $anomaliesForSection.HasAnomalies }} govuk-form-group--error{{ end }}">
         <h2 class="govuk-accordion__section-heading">
               <span class="govuk-accordion__section-button" id="accordion-default-heading-6">
                 Certificate provider
-                {{ if $cpAnomalies.HasAnomalies }}<span class="govuk-error-message">For review</span>{{ end }}
+                {{ if $anomaliesForSection.HasAnomalies }}<span class="govuk-error-message">For review</span>{{ end }}
               </span>
         </h2>
     </div>
