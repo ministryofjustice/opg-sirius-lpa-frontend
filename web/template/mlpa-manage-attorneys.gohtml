@@ -1,0 +1,44 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Manage attorneys{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">Manage attorneys</h1>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
+
+        <div class="govuk-form-group{{ if .Error.Field.recipient }} govuk-form-group--error{{ end }}" id="f-attorneyAction">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend"><strong>Select an option:</strong></legend>
+            {{ template "errors" .Error.Field.attorneyAction }}
+
+            <div class="govuk-radios" data-module="govuk-radios">
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="f-attorneyActionRemove" name="attorneyAction" type="radio" value="remove-an-attorney" {{ if eq "remove-an-attorney" .AttorneyAction }}checked{{ end }}>
+                <label class="govuk-label govuk-radios__label" for="f-attorneyActionRemove">
+                  Remove an attorney
+                </label>
+              </div>
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="f-attorneyActionEnableReplacement" name="attorneyAction" type="radio" value="enable-replacement-attorney" {{ if eq "enable-replacement-attorney" .AttorneyAction }}checked{{ end }}>
+                <label class="govuk-label govuk-radios__label" for="f-attorneyActionEnableReplacement">
+                  Enable replacement attorney
+                </label>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s" .CaseSummary.DigitalLpa.UID )}}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
