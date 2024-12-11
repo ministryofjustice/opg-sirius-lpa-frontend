@@ -36,22 +36,27 @@ func ManageAttorneys(client ManageAttorneysClient, tmpl template.Template) Handl
 			AttorneyAction: postFormString(r, "attorneyAction"),
 			CaseSummary:    caseSummary,
 			XSRFToken:      ctx.XSRFToken,
+			Error:          sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}
 
 		if r.Method == http.MethodPost {
+			var redirectUrl string
+
 			switch data.AttorneyAction {
 			case "remove-an-attorney":
-				return RedirectError(fmt.Sprintf("/lpa/%s/remove-an-attorny", caseSummary.DigitalLpa.UID))
+				redirectUrl = fmt.Sprintf("/lpa/%s/remove-an-attorny", caseSummary.DigitalLpa.UID)
 
 			case "enable-replacement-attorney":
-				return RedirectError(fmt.Sprintf("/lpa/%s/enable-replacement-attorny", caseSummary.DigitalLpa.UID))
+				redirectUrl = fmt.Sprintf("/lpa/%s/enable-replacement-attorny", caseSummary.DigitalLpa.UID)
 
 			default:
-				data.Error = sirius.ValidationError{
-					Field: sirius.FieldErrors{
-						"attorneyAction": {"reason": "Please select an option to manage attorneys."},
-					},
+				data.Error.Field["attorneyAction"] = map[string]string{
+					"reason": "Please select an option to manage attorneys.",
 				}
+			}
+
+			if !data.Error.Any() && redirectUrl != "" {
+				return RedirectError(redirectUrl)
 			}
 		}
 
