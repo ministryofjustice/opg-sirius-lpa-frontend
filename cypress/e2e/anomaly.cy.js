@@ -99,6 +99,20 @@ describe("View and edit anomalies for a digital LPA", () => {
             ruleType: "empty",
             fieldOwnerUid: "certificate-provider",
           },
+          {
+            id: 130,
+            status: "detected",
+            fieldName: "address",
+            ruleType: "address-not-usable",
+            fieldOwnerUid: "attorney-1-uid",
+          },
+          {
+            id: 131,
+            status: "detected",
+            fieldName: "address",
+            ruleType: "address-not-usable",
+            fieldOwnerUid: "replacement-attorney-1-uid",
+          },
         ],
       },
     });
@@ -164,8 +178,10 @@ describe("View and edit anomalies for a digital LPA", () => {
     cy.contains("For review");
     cy.contains("Review attorney's first names");
     cy.contains("Review attorney's last name");
+    cy.contains("Review attorney's address");
     cy.contains("Review replacement attorney's first names");
     cy.contains("Review replacement attorney's last name");
+    cy.contains("Review replacement attorney's address");
     cy.contains("Review how attorney's can make decisions");
     cy.contains("Review when the LPA can be used");
     cy.contains("Review certificate provider address");
