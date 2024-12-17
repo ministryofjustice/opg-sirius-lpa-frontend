@@ -44,10 +44,10 @@ func ManageAttorneys(client ManageAttorneysClient, tmpl template.Template) Handl
 
 			switch data.AttorneyAction {
 			case "remove-an-attorney":
-				redirectUrl = fmt.Sprintf("/lpa/%s/remove-an-attorny", caseSummary.DigitalLpa.UID)
+				redirectUrl = fmt.Sprintf("/lpa/%s/remove-an-attorney", caseSummary.DigitalLpa.UID)
 
 			case "enable-replacement-attorney":
-				redirectUrl = fmt.Sprintf("/lpa/%s/enable-replacement-attorny", caseSummary.DigitalLpa.UID)
+				redirectUrl = fmt.Sprintf("/lpa/%s/enable-replacement-attorney", caseSummary.DigitalLpa.UID)
 
 			default:
 				data.Error.Field["attorneyAction"] = map[string]string{
