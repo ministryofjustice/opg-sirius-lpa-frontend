@@ -47,7 +47,7 @@ func TestManageAttorneys(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestManageAttorneyGetCaseSummaryFails(t *testing.T) {
+func TestGetManageAttorneysGetCaseSummaryFails(t *testing.T) {
 	caseSummary := sirius.CaseSummary{}
 
 	client := &mockManageAttorneysClient{}
@@ -68,7 +68,7 @@ func TestManageAttorneyGetCaseSummaryFails(t *testing.T) {
 	assert.Equal(t, expectedError, err)
 }
 
-func TestManageAttorneyTemplateErrors(t *testing.T) {
+func TestGetManageAttorneysTemplateErrors(t *testing.T) {
 	caseSummary := sirius.CaseSummary{
 		DigitalLpa: sirius.DigitalLpa{
 			UID: "M-1111-2222-3333",
