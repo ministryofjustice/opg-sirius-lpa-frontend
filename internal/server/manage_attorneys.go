@@ -50,6 +50,8 @@ func ManageAttorneys(client ManageAttorneysClient, tmpl template.Template) Handl
 				redirectUrl = fmt.Sprintf("/lpa/%s/enable-replacement-attorney", caseSummary.DigitalLpa.UID)
 
 			default:
+				w.WriteHeader(http.StatusBadRequest)
+
 				data.Error.Field["attorneyAction"] = map[string]string{
 					"reason": "Please select an option to manage attorneys.",
 				}
