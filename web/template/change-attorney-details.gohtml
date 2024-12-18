@@ -17,6 +17,11 @@
 
             {{ template "error-summary" .Error }}
 
+            {{ if .Success }}
+                <meta data-app-reload="page" />
+                {{ template "success-banner" "You have changed attorney details." }}
+            {{ end }}
+
             <h1 class="govuk-heading-l app-!-embedded-hide">
                 {{- if eq .AttorneyStatus "replacement" -}}
                     Change replacement attorney details
