@@ -100,21 +100,28 @@ describe("Manage Attorneys", () => {
       },
     );
 
-    cy.addMock("/lpa-api/v1/digital-lpas/M-1111-1111-1111/progress-indicators", "GET", {
-      status: 200,
-      body: {
-        digitalLpaUid: "M-1111-1111-1111",
-        progressIndicators: [
-          { indicator: "FEES", status: "IN_PROGRESS" },
-          { indicator: "DONOR_ID", status: "CANNOT_START" },
-          { indicator: "CERTIFICATE_PROVIDER_ID", status: "CANNOT_START" },
-          { indicator: "CERTIFICATE_PROVIDER_SIGNATURE", status: "CANNOT_START" },
-          { indicator: "ATTORNEY_SIGNATURES", status: "CANNOT_START" },
-          { indicator: "PREREGISTRATION_NOTICES", status: "CANNOT_START" },
-          { indicator: "REGISTRATION_NOTICES", status: "CANNOT_START" },
-        ],
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-1111-1111-1111/progress-indicators",
+      "GET",
+      {
+        status: 200,
+        body: {
+          digitalLpaUid: "M-1111-1111-1111",
+          progressIndicators: [
+            { indicator: "FEES", status: "IN_PROGRESS" },
+            { indicator: "DONOR_ID", status: "CANNOT_START" },
+            { indicator: "CERTIFICATE_PROVIDER_ID", status: "CANNOT_START" },
+            {
+              indicator: "CERTIFICATE_PROVIDER_SIGNATURE",
+              status: "CANNOT_START",
+            },
+            { indicator: "ATTORNEY_SIGNATURES", status: "CANNOT_START" },
+            { indicator: "PREREGISTRATION_NOTICES", status: "CANNOT_START" },
+            { indicator: "REGISTRATION_NOTICES", status: "CANNOT_START" },
+          ],
+        },
       },
-    });
+    );
 
     cy.addMock("/lpa-api/v1/digital-lpas/M-2222-2222-2222", "GET", {
       status: 200,
@@ -196,29 +203,38 @@ describe("Manage Attorneys", () => {
       body: [],
     });
 
-    cy.addMock("/lpa-api/v1/digital-lpas/M-2222-2222-2222/progress-indicators", "GET", {
-      status: 200,
-      body: {
-        digitalLpaUid: "M-2222-2222-2222",
-        progressIndicators: [
-          { indicator: "FEES", status: "IN_PROGRESS" },
-          { indicator: "DONOR_ID", status: "CANNOT_START" },
-          { indicator: "CERTIFICATE_PROVIDER_ID", status: "CANNOT_START" },
-          { indicator: "CERTIFICATE_PROVIDER_SIGNATURE", status: "CANNOT_START" },
-          { indicator: "ATTORNEY_SIGNATURES", status: "CANNOT_START" },
-          { indicator: "PREREGISTRATION_NOTICES", status: "CANNOT_START" },
-          { indicator: "REGISTRATION_NOTICES", status: "CANNOT_START" },
-        ],
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-2222-2222-2222/progress-indicators",
+      "GET",
+      {
+        status: 200,
+        body: {
+          digitalLpaUid: "M-2222-2222-2222",
+          progressIndicators: [
+            { indicator: "FEES", status: "IN_PROGRESS" },
+            { indicator: "DONOR_ID", status: "CANNOT_START" },
+            { indicator: "CERTIFICATE_PROVIDER_ID", status: "CANNOT_START" },
+            {
+              indicator: "CERTIFICATE_PROVIDER_SIGNATURE",
+              status: "CANNOT_START",
+            },
+            { indicator: "ATTORNEY_SIGNATURES", status: "CANNOT_START" },
+            { indicator: "PREREGISTRATION_NOTICES", status: "CANNOT_START" },
+            { indicator: "REGISTRATION_NOTICES", status: "CANNOT_START" },
+          ],
+        },
       },
-    });
+    );
 
     cy.visit("/lpa/M-1111-1111-1111/manage-attorneys");
   });
 
   it("shows the Manage Attorneys page and clicking Cancel returns to the Application progress page", () => {
     cy.contains("Manage attorneys");
-    cy.get('a').contains("Cancel").click();
-    cy.url().should("include", "/lpa/M-1111-1111-1111").should("not.include", "manage-attorneys");
+    cy.get("a").contains("Cancel").click();
+    cy.url()
+      .should("include", "/lpa/M-1111-1111-1111")
+      .should("not.include", "manage-attorneys");
   });
 
   it("shows an error when submitting a blank form", () => {
