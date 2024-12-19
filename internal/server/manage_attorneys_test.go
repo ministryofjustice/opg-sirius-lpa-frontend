@@ -19,7 +19,7 @@ func (m *mockManageAttorneysClient) CaseSummary(ctx sirius.Context, uid string) 
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
-func TestManageAttorneys(t *testing.T) {
+func TestGetManageAttorneys(t *testing.T) {
 	caseSummary := sirius.CaseSummary{
 		DigitalLpa: sirius.DigitalLpa{
 			UID: "M-1111-2222-3333",
