@@ -50,6 +50,7 @@ type Client interface {
 	AllocateCasesClient
 	AssignTaskClient
 	ApplyFeeReductionClient
+	ChangeAttorneyDetailsClient
 	ChangeDonorDetailsClient
 	ChangeStatusClient
 	ChangeCaseStatusClient
