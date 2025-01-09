@@ -135,7 +135,7 @@ func TestDigitalLpa(t *testing.T) {
 							"opg.poas.sirius": map[string]interface{}{
 								"id":                 dsl.Like(111),
 								"caseSubtype":        dsl.Like("property-and-affairs"),
-								"status":             dsl.Like("Draft"),
+								"status":             dsl.Like("Statutory waiting period"),
 								"createdDate":        dsl.Term("26/03/2018", `^\d{1,2}/\d{1,2}/\d{4}$`),
 								"dueDate":            dsl.Term("09/04/2018", `^\d{1,2}/\d{1,2}/\d{4}$`),
 								"complaintCount":     dsl.Like(0),
@@ -167,7 +167,7 @@ func TestDigitalLpa(t *testing.T) {
 				SiriusData: SiriusData{
 					ID:                 111,
 					Subtype:            "property-and-affairs",
-					Status:             "Draft",
+					Status:             "Statutory waiting period",
 					CreatedDate:        DateString("2018-03-26"),
 					DueDate:            DateString("2018-04-09"),
 					ComplaintCount:     0,
