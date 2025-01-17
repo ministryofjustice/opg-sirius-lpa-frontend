@@ -92,7 +92,7 @@ func ChangeCertificateProviderDetails(client ChangeCertificateProviderDetailsCli
 
 		if r.Method == http.MethodPost {
 			SetFlash(w, FlashNotification{
-				Title: fmt.Sprintf("Changes confirmed"),
+				Title: "Changes confirmed",
 			})
 
 			return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details#certificate-provider", caseUid))
