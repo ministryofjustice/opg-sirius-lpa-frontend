@@ -139,11 +139,13 @@ describe("Change certificate provider details form", () => {
         },
       },
     );
-  })
+  });
 
   it("can be visited from the LPA details certificate provider Change link", () => {
     cy.visit("/lpa/M-1111-1111-1111/lpa-details").then(() => {
-      cy.get(".govuk-accordion__section-button").contains("Certificate provider").click();
+      cy.get(".govuk-accordion__section-button")
+        .contains("Certificate provider")
+        .click();
       cy.get("#f-change-certificate-provider-details").click();
       cy.contains("Change certificate provider details");
       cy.url().should(
@@ -184,4 +186,4 @@ describe("Change certificate provider details form", () => {
     cy.contains("Cancel").click();
     cy.url().should("contain", "/lpa/M-1111-1111-1111/lpa-details");
   });
-})
+});

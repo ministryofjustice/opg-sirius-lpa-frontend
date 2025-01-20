@@ -538,7 +538,7 @@ describe("View a digital LPA", () => {
       .should("contain", "Signed on")
       .and("contain", "18 December 2022")
       .find("#f-change-certificate-provider-details")
-        .should("contain", "Change");
+      .should("contain", "Change");
   });
 
   it("shows application details when store is empty", () => {
