@@ -28,23 +28,6 @@ describe("Change certificate provider details form", () => {
             country: "GB",
             personType: "Donor",
           },
-          certificateProvider: {
-            uid: "c362e307-71b9-4070-bdde-c19b4cdf5c1a",
-            channel: "online",
-            firstNames: "Rhea",
-            lastNames: "Vandervort",
-            address: {
-              line1: "290 Vivien Road",
-              line2: "Lower Court",
-              line3: "Tillman",
-              town: "Oxfordshire",
-              postcode: "JJ80 7QL",
-              country: "GB",
-            },
-            email: "Rhea.Vandervort@example.com",
-            phone: "0151 087 7256",
-            signedAt: "2025-01-19T09:12:59Z",
-          },
           application: {
             donorFirstNames: "Steven",
             donorLastName: "Munnell",
@@ -97,6 +80,23 @@ describe("Change certificate provider details form", () => {
               email: "K.Collins@example.com",
             },
           ],
+          certificateProvider: {
+            uid: "c362e307-71b9-4070-bdde-c19b4cdf5c1a",
+            channel: "online",
+            firstNames: "Rhea",
+            lastName: "Vandervort",
+            address: {
+              line1: "290 Vivien Road",
+              line2: "Lower Court",
+              line3: "Tillman",
+              town: "Oxfordshire",
+              postcode: "JJ80 7QL",
+              country: "GB",
+            },
+            email: "Rhea.Vandervort@example.com",
+            phone: "0151 087 7256",
+            signedAt: "2025-01-19T09:12:59Z",
+          },
         },
       },
     });
@@ -139,6 +139,8 @@ describe("Change certificate provider details form", () => {
         },
       },
     );
+
+    cy.visit("/lpa/M-1111-1111-1111/certificate-provider/change-details");
   });
 
   it("can be visited from the LPA details certificate provider Change link", () => {
@@ -157,9 +159,9 @@ describe("Change certificate provider details form", () => {
 
   it("can submit the change details form", () => {
     cy.get("#f-firstNames").should("have.value", "Rhea");
-    cy.get("#f-lastName").should("have.value", "Rutherford");
+    cy.get("#f-lastName").should("have.value", "Vandervort");
 
-    cy.get("#f-address\\.Line1").should("have.value", "15 Cameron Approach");
+    cy.get("#f-address\\.Line1").should("have.value", "290 Vivien Road");
     cy.get("#f-address\\.Line2").should("have.value", "Lower Court");
     cy.get("#f-address\\.Line3").should("have.value", "Tillman");
     cy.get("#f-address\\.Town").should("have.value", "Oxfordshire");
@@ -170,10 +172,10 @@ describe("Change certificate provider details form", () => {
     cy.get("#f-email").should("have.value", "Rhea.Vandervort@example.com");
 
     cy.get("#f-signedAt-day").should("have.value", "19");
-    cy.get("#f-signedAt-month").should("have.value", "01");
+    cy.get("#f-signedAt-month").should("have.value", "1");
     cy.get("#f-signedAt-year").should("have.value", "2025");
 
-    cy.contains("Submit").click();
+    cy.contains("Save and continue").click();
     cy.url().should("contain", "/lpa/M-1111-1111-1111/lpa-details");
   });
 
