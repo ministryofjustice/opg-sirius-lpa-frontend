@@ -3,8 +3,9 @@
 {{ $anomaliesForSection := .AnomalyDisplay.GetAnomaliesForSection "certificateProvider" }}
 {{ $cpUID := .CaseSummary.DigitalLpa.LpaStoreData.CertificateProvider.Uid  }}
 {{ $cpAnomalies := $anomaliesForSection.GetAnomaliesForObject $cpUID }}
+{{ $caseUID := .CaseSummary.DigitalLpa.UID}}
 
-<div class="govuk-accordion__section">
+<div class="govuk-accordion__section" id="certificate-provider">
     <div class="govuk-accordion__section-header{{ if $anomaliesForSection.HasAnomalies }} govuk-form-group--error{{ end }}">
         <h2 class="govuk-accordion__section-heading">
               <span class="govuk-accordion__section-button" id="accordion-default-heading-6">
@@ -16,6 +17,14 @@
 
     <div id="accordion-default-content-6" class="govuk-accordion__section-content">
         <dl class="govuk-summary-list">
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key"></dt>
+                <dd class="govuk-summary-list__value"></dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" id="f-change-certificate-provider-details" href="{{ prefix (printf "/lpa/%s/certificate-provider/change-details" $caseUID) }}">Change</a>
+                </dd>
+            </div>
 
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">First names</dt>
