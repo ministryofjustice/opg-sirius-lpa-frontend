@@ -1,3 +1,5 @@
+import * as warnings from "../mocks/warnings";
+
 describe("Change certificate provider details form", () => {
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/digital-lpas/M-1111-1111-1111", "GET", {
@@ -101,10 +103,7 @@ describe("Change certificate provider details form", () => {
       },
     });
 
-    cy.addMock("/lpa-api/v1/cases/1111/warnings", "GET", {
-      status: 200,
-      body: [],
-    });
+    warnings.empty("1111");
 
     cy.addMock(
       "/lpa-api/v1/cases/1111/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
