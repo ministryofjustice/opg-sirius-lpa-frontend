@@ -1,9 +1,9 @@
-function addMock(url, method, response) {
+async function addMock(url, method, response) {
   if (typeof response.body !== "string") {
     response.body = JSON.stringify(response.body);
   }
 
-  fetch(`${Cypress.env("MOCK_SERVER_URI")}/__admin/mappings`, {
+  await fetch(`${Cypress.env("MOCK_SERVER_URI")}/__admin/mappings`, {
     method: "POST",
     body: JSON.stringify({
       request: {
@@ -15,8 +15,8 @@ function addMock(url, method, response) {
   });
 }
 
-function reset() {
-  fetch(`${Cypress.env("MOCK_SERVER_URI")}/__admin/mappings/reset`, {
+async function reset() {
+  await fetch(`${Cypress.env("MOCK_SERVER_URI")}/__admin/mappings/reset`, {
     method: "POST",
   });
 }
