@@ -65,10 +65,14 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		var replacementAttorneys []sirius.LpaStoreAttorney
 		var nonReplacementAttorneys []sirius.LpaStoreAttorney
 		for _, attorney := range data.DigitalLpa.LpaStoreData.Attorneys {
-			switch attorney.Status {
+			if attorney.Status == "removed" {
+				continue
+			}
+
+			switch attorney.AppointmentType {
 			case "replacement":
 				replacementAttorneys = append(replacementAttorneys, attorney)
-			case "active":
+			case "original":
 				nonReplacementAttorneys = append(nonReplacementAttorneys, attorney)
 			}
 		}
