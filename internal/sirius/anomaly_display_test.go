@@ -125,7 +125,8 @@ func TestAnomalyDisplay_Group(t *testing.T) {
 				LpaStorePerson: LpaStorePerson{
 					Uid: "2",
 				},
-				Status: "active",
+				Status:          "active",
+				AppointmentType: "original",
 			},
 		},
 		// to test that no anomalies are returned for this section
@@ -264,13 +265,15 @@ func TestGetSectionForUid(t *testing.T) {
 				LpaStorePerson: LpaStorePerson{
 					Uid: "2",
 				},
-				Status: "active",
+				Status:          "active",
+				AppointmentType: "original",
 			},
 			{
 				LpaStorePerson: LpaStorePerson{
 					Uid: "3",
 				},
-				Status: "replacement",
+				Status:          "inactive",
+				AppointmentType: "replacement",
 			},
 		},
 		CertificateProvider: LpaStoreCertificateProvider{

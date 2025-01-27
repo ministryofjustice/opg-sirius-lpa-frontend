@@ -141,10 +141,10 @@ func getSectionForUid(lpa *LpaStoreData, uid ObjectUid) AnomalyDisplaySection {
 	} else {
 		for _, attorney := range lpa.Attorneys {
 			if ObjectUid(attorney.LpaStorePerson.Uid) == uid {
-				switch attorney.Status {
+				switch attorney.AppointmentType {
 				case "replacement":
 					return ReplacementAttorneysSection
-				case "active":
+				case "original":
 					return AttorneysSection
 				}
 			}

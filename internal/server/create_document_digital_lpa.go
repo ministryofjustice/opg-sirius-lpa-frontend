@@ -122,7 +122,7 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 
 			personType := "Attorney"
 
-			if attorney.Status == "replacement" {
+			if attorney.AppointmentType == "replacement" {
 				personType = "Replacement Attorney"
 			}
 
