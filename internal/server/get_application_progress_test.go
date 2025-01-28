@@ -39,32 +39,37 @@ func TestGetApplicationProgressSuccess(t *testing.T) {
 			LpaStoreData: sirius.LpaStoreData{
 				Channel: "Digital",
 				Attorneys: []sirius.LpaStoreAttorney{
-					sirius.LpaStoreAttorney{
-						Status: "replacement",
+					{
+						Status:          "inactive",
+						AppointmentType: "replacement",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "first@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
-						Status: "replacement",
+					{
+						Status:          "inactive",
+						AppointmentType: "replacement",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "second@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
-						Status: "active",
+					{
+						Status:          "active",
+						AppointmentType: "original",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "third@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
-						Status: "active",
+					{
+						Status:          "active",
+						AppointmentType: "original",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "fourth@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
-						Status: "removed",
+					{
+						Status:          "removed",
+						AppointmentType: "original",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "fifth@does.not.exist",
 						},
