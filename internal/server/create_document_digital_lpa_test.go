@@ -99,7 +99,8 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 								Country:  "UK",
 							},
 						},
-						Status: "active",
+						Status:          "active",
+						AppointmentType: "original",
 					},
 					{
 						LpaStorePerson: sirius.LpaStorePerson{
@@ -115,7 +116,8 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 								Country:  "UK",
 							},
 						},
-						Status: "removed",
+						Status:          "removed",
+						AppointmentType: "original",
 					},
 					{
 						LpaStorePerson: sirius.LpaStorePerson{
@@ -131,7 +133,8 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 								Country:  "UK",
 							},
 						},
-						Status: "replacement",
+						Status:          "inactive",
+						AppointmentType: "replacement",
 					},
 				},
 			},
