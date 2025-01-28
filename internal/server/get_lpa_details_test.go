@@ -56,32 +56,37 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 			LpaStoreData: sirius.LpaStoreData{
 				Attorneys: []sirius.LpaStoreAttorney{
 					{
-						Status: "replacement",
+						Status:          "inactive",
+						AppointmentType: "replacement",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Uid:   "1",
 							Email: "first@does.not.exist",
 						},
 					},
 					{
-						Status: "replacement",
+						Status:          "inactive",
+						AppointmentType: "replacement",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "second@does.not.exist",
 						},
 					},
 					{
-						Status: "active",
+						Status:          "active",
+						AppointmentType: "original",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "third@does.not.exist",
 						},
 					},
 					{
-						Status: "active",
+						Status:          "active",
+						AppointmentType: "original",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "fourth@does.not.exist",
 						},
 					},
 					{
-						Status: "removed",
+						Status:          "removed",
+						AppointmentType: "original",
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "fifth@does.not.exist",
 						},
@@ -140,14 +145,16 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 			AnomalyDisplay: &expectedAnomalyDisplay,
 			ReplacementAttorneys: []sirius.LpaStoreAttorney{
 				{
-					Status: "replacement",
+					Status:          "inactive",
+					AppointmentType: "replacement",
 					LpaStorePerson: sirius.LpaStorePerson{
 						Email: "first@does.not.exist",
 						Uid:   "1",
 					},
 				},
 				{
-					Status: "replacement",
+					Status:          "inactive",
+					AppointmentType: "replacement",
 					LpaStorePerson: sirius.LpaStorePerson{
 						Email: "second@does.not.exist",
 					},
@@ -155,13 +162,15 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 			},
 			NonReplacementAttorneys: []sirius.LpaStoreAttorney{
 				{
-					Status: "active",
+					Status:          "active",
+					AppointmentType: "original",
 					LpaStorePerson: sirius.LpaStorePerson{
 						Email: "third@does.not.exist",
 					},
 				},
 				{
-					Status: "active",
+					Status:          "active",
+					AppointmentType: "original",
 					LpaStorePerson: sirius.LpaStorePerson{
 						Email: "fourth@does.not.exist",
 					},
