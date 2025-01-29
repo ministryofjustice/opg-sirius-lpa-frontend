@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -99,8 +100,8 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 								Country:  "UK",
 							},
 						},
-						Status:          "active",
-						AppointmentType: "original",
+						Status:          shared.ActiveAttorneyStatus.String(),
+						AppointmentType: shared.OriginalAppointmentType.String(),
 					},
 					{
 						LpaStorePerson: sirius.LpaStorePerson{
@@ -116,8 +117,8 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 								Country:  "UK",
 							},
 						},
-						Status:          "removed",
-						AppointmentType: "original",
+						Status:          shared.RemovedAttorneyStatus.String(),
+						AppointmentType: shared.OriginalAppointmentType.String(),
 					},
 					{
 						LpaStorePerson: sirius.LpaStorePerson{
@@ -133,8 +134,8 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 								Country:  "UK",
 							},
 						},
-						Status:          "inactive",
-						AppointmentType: "replacement",
+						Status:          shared.InactiveAttorneyStatus.String(),
+						AppointmentType: shared.ReplacementAppointmentType.String(),
 					},
 				},
 			},
