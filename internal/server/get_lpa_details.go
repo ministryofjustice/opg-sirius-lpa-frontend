@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
 )
@@ -65,14 +66,14 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		var replacementAttorneys []sirius.LpaStoreAttorney
 		var nonReplacementAttorneys []sirius.LpaStoreAttorney
 		for _, attorney := range data.DigitalLpa.LpaStoreData.Attorneys {
-			if attorney.Status == "removed" {
+			if attorney.Status == shared.RemovedAttorneyStatus.String() {
 				continue
 			}
 
 			switch attorney.AppointmentType {
-			case "replacement":
+			case shared.ReplacementAppointmentType.String():
 				replacementAttorneys = append(replacementAttorneys, attorney)
-			case "original":
+			case shared.OriginalAppointmentType.String():
 				nonReplacementAttorneys = append(nonReplacementAttorneys, attorney)
 			}
 		}
