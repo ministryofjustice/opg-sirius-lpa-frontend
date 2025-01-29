@@ -15,11 +15,13 @@ describe("View and edit anomalies for a digital LPA", () => {
           attorneys: [
             {
               uid: "attorney-1-uid",
+              appointmentType: "original",
               status: "active",
             },
             {
               uid: "replacement-attorney-1-uid",
-              status: "replacement",
+              appointmentType: "replacement",
+              status: "inactive",
             },
           ],
           certificateProvider: {
