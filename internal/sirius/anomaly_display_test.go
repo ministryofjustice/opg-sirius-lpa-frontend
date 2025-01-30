@@ -273,7 +273,7 @@ func TestGetSectionForUid(t *testing.T) {
 				LpaStorePerson: LpaStorePerson{
 					Uid: "3",
 				},
-				Status:          "inactive",
+				Status:          shared.InactiveAttorneyStatus.String(),
 				AppointmentType: shared.ReplacementAppointmentType.String(),
 			},
 		},
