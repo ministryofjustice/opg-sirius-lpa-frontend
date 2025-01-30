@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -125,7 +126,8 @@ func TestAnomalyDisplay_Group(t *testing.T) {
 				LpaStorePerson: LpaStorePerson{
 					Uid: "2",
 				},
-				Status: "active",
+				Status:          shared.ActiveAttorneyStatus.String(),
+				AppointmentType: shared.OriginalAppointmentType.String(),
 			},
 		},
 		// to test that no anomalies are returned for this section
@@ -264,13 +266,15 @@ func TestGetSectionForUid(t *testing.T) {
 				LpaStorePerson: LpaStorePerson{
 					Uid: "2",
 				},
-				Status: "active",
+				Status:          shared.ActiveAttorneyStatus.String(),
+				AppointmentType: shared.OriginalAppointmentType.String(),
 			},
 			{
 				LpaStorePerson: LpaStorePerson{
 					Uid: "3",
 				},
-				Status: "replacement",
+				Status:          shared.InactiveAttorneyStatus.String(),
+				AppointmentType: shared.ReplacementAppointmentType.String(),
 			},
 		},
 		CertificateProvider: LpaStoreCertificateProvider{
