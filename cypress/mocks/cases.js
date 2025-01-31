@@ -7,6 +7,6 @@ const warnings = {
       body: [],
     });
   },
-}
+};
 
 export { warnings };
