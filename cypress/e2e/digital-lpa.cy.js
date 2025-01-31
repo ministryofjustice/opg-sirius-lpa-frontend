@@ -529,14 +529,16 @@ describe("View a digital LPA", () => {
       });
   });
 
-  it("shows certificate provider signed on date and label", () => {
+  it("shows certificate provider signed on date, label and change link", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
 
     cy.contains("Certificate provider")
       .click()
       .parents(".govuk-accordion__section")
       .should("contain", "Signed on")
-      .and("contain", "18 December 2022");
+      .and("contain", "18 December 2022")
+      .find("#f-change-certificate-provider-details")
+      .should("contain", "Change");
   });
 
   it("shows application details when store is empty", () => {
