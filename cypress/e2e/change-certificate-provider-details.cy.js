@@ -1,4 +1,4 @@
-import * as warnings from "../mocks/warnings";
+import * as cases from "../mocks/cases";
 
 describe("Change certificate provider details form", () => {
   beforeEach(() => {
@@ -103,7 +103,7 @@ describe("Change certificate provider details form", () => {
       },
     });
 
-    warnings.empty("1111");
+    cases.warnings.empty("1111");
 
     cy.addMock(
       "/lpa-api/v1/cases/1111/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
