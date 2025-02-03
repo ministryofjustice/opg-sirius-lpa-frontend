@@ -1,3 +1,5 @@
+import * as cases from "../mocks/cases";
+
 describe("Change donor details form", () => {
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/digital-lpas/M-0000-0000-0001", "GET", {
@@ -90,10 +92,7 @@ describe("Change donor details form", () => {
       },
     });
 
-    cy.addMock("/lpa-api/v1/cases/666/warnings", "GET", {
-      status: 200,
-      body: [],
-    });
+    cases.warnings.empty("666");
 
     cy.addMock(
       "/lpa-api/v1/cases/666/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",

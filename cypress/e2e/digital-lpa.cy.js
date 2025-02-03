@@ -1,3 +1,5 @@
+import * as cases from "../mocks/cases";
+
 describe("View a digital LPA", () => {
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333", "GET", {
@@ -266,10 +268,7 @@ describe("View a digital LPA", () => {
       },
     });
 
-    cy.addMock("/lpa-api/v1/cases/334/warnings", "GET", {
-      status: 200,
-      body: [],
-    });
+    cases.warnings.empty("334");
 
     cy.addMock(
       "/lpa-api/v1/cases/334/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
@@ -529,14 +528,16 @@ describe("View a digital LPA", () => {
       });
   });
 
-  it("shows certificate provider signed on date and label", () => {
+  it("shows certificate provider signed on date, label and change link", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
 
     cy.contains("Certificate provider")
       .click()
       .parents(".govuk-accordion__section")
       .should("contain", "Signed on")
-      .and("contain", "18 December 2022");
+      .and("contain", "18 December 2022")
+      .find("#f-change-certificate-provider-details")
+      .should("contain", "Change");
   });
 
   it("shows application details when store is empty", () => {
