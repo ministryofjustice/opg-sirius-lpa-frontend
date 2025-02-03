@@ -1,3 +1,5 @@
+import * as cases from "../mocks/cases";
+
 describe("Change attorney details form", () => {
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/digital-lpas/M-1111-1111-1110", "GET", {
@@ -82,10 +84,7 @@ describe("Change attorney details form", () => {
       },
     });
 
-    cy.addMock("/lpa-api/v1/cases/555/warnings", "GET", {
-      status: 200,
-      body: [],
-    });
+    cases.warnings.empty("555");
 
     cy.addMock(
       "/lpa-api/v1/cases/555/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",

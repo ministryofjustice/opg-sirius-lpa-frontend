@@ -1,3 +1,5 @@
+import * as cases from "../mocks/cases";
+
 describe("Change case status", () => {
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333", "GET", {
@@ -89,10 +91,7 @@ describe("Change case status", () => {
       body: [],
     });
 
-    cy.addMock("/lpa-api/v1/cases/333/warnings", "GET", {
-      status: 200,
-      body: [],
-    });
+    cases.warnings.empty("333");
 
     cy.addMock(
       "/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333/update-case-status",

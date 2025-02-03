@@ -1,3 +1,5 @@
+import * as cases from "../mocks/cases";
+
 describe("View and edit anomalies for a digital LPA", () => {
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-QQQQ-1111", "GET", {
@@ -29,10 +31,7 @@ describe("View and edit anomalies for a digital LPA", () => {
       },
     });
 
-    cy.addMock("/lpa-api/v1/cases/111/warnings", "GET", {
-      status: 200,
-      body: [],
-    });
+    cases.warnings.empty("111");
 
     cy.addMock(
       "/lpa-api/v1/cases/111/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
@@ -139,10 +138,7 @@ describe("View and edit anomalies for a digital LPA", () => {
       },
     });
 
-    cy.addMock("/lpa-api/v1/cases/222/warnings", "GET", {
-      status: 200,
-      body: [],
-    });
+    cases.warnings.empty("222");
 
     cy.addMock(
       "/lpa-api/v1/cases/222/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
