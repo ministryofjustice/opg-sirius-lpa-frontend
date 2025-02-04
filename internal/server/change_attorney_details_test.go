@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -42,11 +43,12 @@ var testChangeAttorneyDetailsCaseSummary = sirius.CaseSummary{
 							Country:  "UK",
 						},
 					},
-					DateOfBirth: "1990-02-22",
-					Status:      "active",
-					Email:       "a@example.com",
-					Mobile:      "077577575757",
-					SignedAt:    "2024-01-12T10:09:09Z",
+					DateOfBirth:     "1990-02-22",
+					Status:          shared.ActiveAttorneyStatus.String(),
+					AppointmentType: shared.OriginalAppointmentType.String(),
+					Email:           "a@example.com",
+					Mobile:          "077577575757",
+					SignedAt:        "2024-01-12T10:09:09Z",
 				},
 				{
 					LpaStorePerson: sirius.LpaStorePerson{
@@ -60,11 +62,12 @@ var testChangeAttorneyDetailsCaseSummary = sirius.CaseSummary{
 							Country:  "UK",
 						},
 					},
-					DateOfBirth: "1990-02-22",
-					Status:      "replacement",
-					Email:       "b@example.com",
-					Mobile:      "07122121212",
-					SignedAt:    "2024-11-28T19:22:11Z",
+					DateOfBirth:     "1990-02-22",
+					Status:          shared.InactiveAttorneyStatus.String(),
+					AppointmentType: shared.ReplacementAppointmentType.String(),
+					Email:           "b@example.com",
+					Mobile:          "07122121212",
+					SignedAt:        "2024-11-28T19:22:11Z",
 				},
 			},
 		},
