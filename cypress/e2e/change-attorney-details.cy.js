@@ -173,7 +173,7 @@ describe("Change attorney details form", () => {
 
   it("can edit all attorney details and redirect to lpa details", () => {
     cy.addMock(
-      "/lpa-api/v1/digital-lpas/M-1111-1111-1110/attorneys/active-attorney-1/change-details",
+      "/lpa-api/v1/digital-lpas/M-1111-1111-1110/attorney/active-attorney-1/change-details",
       "PUT",
       {
         status: 204,

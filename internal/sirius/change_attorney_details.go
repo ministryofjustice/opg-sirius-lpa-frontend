@@ -23,7 +23,7 @@ func (c *Client) ChangeAttorneyDetails(ctx Context, caseUID string, attorneyUID 
 		return err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/attorneys/%s/change-details", caseUID, attorneyUID), bytes.NewReader(data))
+	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/attorney/%s/change-details", caseUID, attorneyUID), bytes.NewReader(data))
 	if err != nil {
 		return err
 	}
