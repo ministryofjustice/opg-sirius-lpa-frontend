@@ -46,7 +46,7 @@ func TestChangeAttorneyDetails(t *testing.T) {
 					UponReceiving("A request for changing attorney details").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567/attorneys/attorney-uid/change-details"),
+						Path:   dsl.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567/attorney/attorney-uid/change-details"),
 						Headers: dsl.MapMatcher{
 							"Content-Type": dsl.String("application/json"),
 						},
