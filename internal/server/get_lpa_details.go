@@ -70,11 +70,11 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 				continue
 			}
 
-			switch attorney.AppointmentType {
-			case shared.ReplacementAppointmentType.String():
-				replacementAttorneys = append(replacementAttorneys, attorney)
-			case shared.OriginalAppointmentType.String():
+			if attorney.Status == shared.ActiveAttorneyStatus.String() {
 				nonReplacementAttorneys = append(nonReplacementAttorneys, attorney)
+			} else if attorney.Status == shared.InactiveAttorneyStatus.String() &&
+				attorney.AppointmentType == shared.ReplacementAppointmentType.String() {
+				replacementAttorneys = append(replacementAttorneys, attorney)
 			}
 		}
 

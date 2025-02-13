@@ -92,6 +92,13 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 							Email: "fifth@does.not.exist",
 						},
 					},
+					{
+						Status:          shared.ActiveAttorneyStatus.String(),
+						AppointmentType: shared.ReplacementAppointmentType.String(),
+						LpaStorePerson: sirius.LpaStorePerson{
+							Email: "sixth@does.not.exist",
+						},
+					},
 				},
 			},
 		},
@@ -174,6 +181,13 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 					AppointmentType: shared.OriginalAppointmentType.String(),
 					LpaStorePerson: sirius.LpaStorePerson{
 						Email: "fourth@does.not.exist",
+					},
+				},
+				{
+					Status:          shared.ActiveAttorneyStatus.String(),
+					AppointmentType: shared.ReplacementAppointmentType.String(),
+					LpaStorePerson: sirius.LpaStorePerson{
+						Email: "sixth@does.not.exist",
 					},
 				},
 			},
