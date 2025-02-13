@@ -123,7 +123,8 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 
 			personType := "Attorney"
 
-			if attorney.AppointmentType == shared.ReplacementAppointmentType.String() {
+			if attorney.AppointmentType == shared.ReplacementAppointmentType.String() &&
+				attorney.Status == shared.InactiveAttorneyStatus.String() {
 				personType = "Replacement Attorney"
 			}
 
