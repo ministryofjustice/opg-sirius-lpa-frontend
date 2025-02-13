@@ -71,6 +71,7 @@ type LpaStoreAttorney struct {
 	LpaStorePerson
 	DateOfBirth               string `json:"dateOfBirth"`
 	Status                    string `json:"status"`
+	AppointmentType           string `json:"appointmentType"`
 	Mobile                    string `json:"mobile"`
 	ContactLanguagePreference string `json:"contactLanguagePreference"`
 	SignedAt                  string `json:"signedAt"`

@@ -1,5 +1,7 @@
 package sirius
 
+import "github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
+
 type AnomalyDisplaySection string
 
 const (
@@ -141,11 +143,13 @@ func getSectionForUid(lpa *LpaStoreData, uid ObjectUid) AnomalyDisplaySection {
 	} else {
 		for _, attorney := range lpa.Attorneys {
 			if ObjectUid(attorney.LpaStorePerson.Uid) == uid {
-				switch attorney.Status {
-				case "replacement":
-					return ReplacementAttorneysSection
-				case "active":
+				if attorney.Status == shared.ActiveAttorneyStatus.String() {
 					return AttorneysSection
+				}
+
+				if attorney.Status == shared.InactiveAttorneyStatus.String() &&
+					attorney.AppointmentType == shared.ReplacementAppointmentType.String() {
+					return ReplacementAttorneysSection
 				}
 			}
 		}
