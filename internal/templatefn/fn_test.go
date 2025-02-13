@@ -86,8 +86,8 @@ func TestHowReplacementAttorneysStepInLongForm(t *testing.T) {
 
 func TestLifeSustainingTreatmentOptionLongForm(t *testing.T) {
 	expectations := map[string]string{
-		"option-a": "Option A",
-		"option-b": "Option B",
+		"option-a": "Attorneys can give or refuse consent to LST",
+		"option-b": "Attorneys cannot give or refuse consent to LST",
 		"":         "Not specified",
 		"foo":      "lifeSustainingTreatmentOption NOT RECOGNISED: foo",
 	}
