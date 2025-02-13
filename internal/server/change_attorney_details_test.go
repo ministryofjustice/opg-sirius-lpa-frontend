@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -42,11 +43,12 @@ var testChangeAttorneyDetailsCaseSummary = sirius.CaseSummary{
 							Country:  "UK",
 						},
 					},
-					DateOfBirth: "1990-02-22",
-					Status:      "active",
-					Email:       "a@example.com",
-					Mobile:      "077577575757",
-					SignedAt:    "2024-01-12T10:09:09Z",
+					DateOfBirth:     "1990-02-22",
+					Status:          shared.ActiveAttorneyStatus.String(),
+					AppointmentType: shared.OriginalAppointmentType.String(),
+					Email:           "a@example.com",
+					Mobile:          "077577575757",
+					SignedAt:        "2024-01-12T10:09:09Z",
 				},
 				{
 					LpaStorePerson: sirius.LpaStorePerson{
@@ -60,11 +62,31 @@ var testChangeAttorneyDetailsCaseSummary = sirius.CaseSummary{
 							Country:  "UK",
 						},
 					},
-					DateOfBirth: "1990-02-22",
-					Status:      "replacement",
-					Email:       "b@example.com",
-					Mobile:      "07122121212",
-					SignedAt:    "2024-11-28T19:22:11Z",
+					DateOfBirth:     "1990-02-22",
+					Status:          shared.InactiveAttorneyStatus.String(),
+					AppointmentType: shared.ReplacementAppointmentType.String(),
+					Email:           "b@example.com",
+					Mobile:          "07122121212",
+					SignedAt:        "2024-11-28T19:22:11Z",
+				},
+				{
+					LpaStorePerson: sirius.LpaStorePerson{
+						Uid:        "638f049f-c01f-4ab2-973a-2ea763b3cf7a",
+						FirstNames: "Consuelo",
+						LastName:   "Swaniawski",
+						Address: sirius.LpaStoreAddress{
+							Line1:    "14 Meadow Close",
+							Town:     "Kutch Court",
+							Postcode: "AT28 7WM",
+							Country:  "UK",
+						},
+					},
+					DateOfBirth:     "1990-04-15",
+					Status:          shared.ActiveAttorneyStatus.String(),
+					AppointmentType: shared.ReplacementAppointmentType.String(),
+					Email:           "Consuelo.Swaniawski@example.com",
+					Mobile:          "07004369909",
+					SignedAt:        "2024-10-21T13:42:16Z",
 				},
 			},
 		},
@@ -116,6 +138,26 @@ func TestGetChangeAttorneyDetails(t *testing.T) {
 				Email:       "b@example.com",
 				PhoneNumber: "07122121212",
 				SignedAt:    dob{Day: 28, Month: 11, Year: 2024},
+			},
+			errorReturned: nil,
+		},
+		{
+			name:        "Change Active Replacement Attorney Details",
+			caseUID:     "M-DDDD-DDDD-DDDD",
+			attorneyUID: "638f049f-c01f-4ab2-973a-2ea763b3cf7a",
+			form: formAttorneyDetails{
+				FirstNames:  "Consuelo",
+				LastName:    "Swaniawski",
+				DateOfBirth: dob{Day: 15, Month: 4, Year: 1990},
+				Address: sirius.Address{
+					Line1:    "14 Meadow Close",
+					Town:     "Kutch Court",
+					Postcode: "AT28 7WM",
+					Country:  "UK",
+				},
+				Email:       "Consuelo.Swaniawski@example.com",
+				PhoneNumber: "07004369909",
+				SignedAt:    dob{Day: 21, Month: 10, Year: 2024},
 			},
 			errorReturned: nil,
 		},

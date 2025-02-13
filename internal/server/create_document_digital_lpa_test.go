@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -99,7 +100,8 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 								Country:  "UK",
 							},
 						},
-						Status: "active",
+						Status:          shared.ActiveAttorneyStatus.String(),
+						AppointmentType: shared.OriginalAppointmentType.String(),
 					},
 					{
 						LpaStorePerson: sirius.LpaStorePerson{
@@ -115,7 +117,8 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 								Country:  "UK",
 							},
 						},
-						Status: "removed",
+						Status:          shared.RemovedAttorneyStatus.String(),
+						AppointmentType: shared.OriginalAppointmentType.String(),
 					},
 					{
 						LpaStorePerson: sirius.LpaStorePerson{
@@ -131,7 +134,23 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 								Country:  "UK",
 							},
 						},
-						Status: "replacement",
+						Status:          shared.InactiveAttorneyStatus.String(),
+						AppointmentType: shared.ReplacementAppointmentType.String(),
+					},
+					{
+						LpaStorePerson: sirius.LpaStorePerson{
+							Uid:        "9e2bb165-ec39-4958-815e-f9cc7277c876",
+							FirstNames: "Carole",
+							LastName:   "Prohaska",
+							Address: sirius.LpaStoreAddress{
+								Line1:    "59 Champlin Avenue",
+								Town:     "Torpbury",
+								Postcode: "ZS01 7GT",
+								Country:  "UK",
+							},
+						},
+						Status:          shared.ActiveAttorneyStatus.String(),
+						AppointmentType: shared.ReplacementAppointmentType.String(),
 					},
 				},
 			},
@@ -203,6 +222,17 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 					Postcode:     "YW08 0UQ",
 					Country:      "UK",
 					PersonType:   "Replacement Attorney",
+				},
+				{
+					ID:           -5,
+					UID:          "9e2bb165-ec39-4958-815e-f9cc7277c876",
+					Firstname:    "Carole",
+					Surname:      "Prohaska",
+					AddressLine1: "59 Champlin Avenue",
+					Town:         "Torpbury",
+					Postcode:     "ZS01 7GT",
+					Country:      "UK",
+					PersonType:   "Attorney",
 				},
 			},
 		}).
