@@ -193,9 +193,9 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"lifeSustainingTreatmentOptionLongForm": func(s string) string {
 			switch s {
 			case "option-a":
-				return "Option A"
+				return "Attorneys can give or refuse consent to LST"
 			case "option-b":
-				return "Option B"
+				return "Attorneys cannot give or refuse consent to LST"
 			case "":
 				return "Not specified"
 			default:
