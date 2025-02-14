@@ -73,16 +73,18 @@ var testChangeAttorneyDetailsCaseSummary = sirius.CaseSummary{
 
 func TestGetChangeAttorneyDetails(t *testing.T) {
 	tests := []struct {
-		name          string
-		caseUID       string
-		attorneyUID   string
-		form          formAttorneyDetails
-		errorReturned error
+		name           string
+		caseUID        string
+		attorneyUID    string
+		attorneyStatus string
+		form           formAttorneyDetails
+		errorReturned  error
 	}{
 		{
-			name:        "Change Regular Attorney Details",
-			caseUID:     "M-DDDD-DDDD-DDDD",
-			attorneyUID: "302b05c7-896c-4290-904e-2005e4f1e81e",
+			name:           "Change Regular Attorney Details",
+			caseUID:        "M-DDDD-DDDD-DDDD",
+			attorneyUID:    "302b05c7-896c-4290-904e-2005e4f1e81e",
+			attorneyStatus: "active",
 			form: formAttorneyDetails{
 				FirstNames:  "Jack",
 				LastName:    "Black",
@@ -100,9 +102,10 @@ func TestGetChangeAttorneyDetails(t *testing.T) {
 			errorReturned: nil,
 		},
 		{
-			name:        "Change Replacement Attorney Details",
-			caseUID:     "M-DDDD-DDDD-DDDD",
-			attorneyUID: "123a01b1-456d-5391-813d-2010d3e2d72d",
+			name:           "Change Replacement Attorney Details",
+			caseUID:        "M-DDDD-DDDD-DDDD",
+			attorneyUID:    "123a01b1-456d-5391-813d-2010d3e2d72d",
+			attorneyStatus: "replacement",
 			form: formAttorneyDetails{
 				FirstNames:  "Jack",
 				LastName:    "White",
@@ -120,9 +123,10 @@ func TestGetChangeAttorneyDetails(t *testing.T) {
 			errorReturned: nil,
 		},
 		{
-			name:        "Template Error Returned",
-			caseUID:     "M-DDDD-DDDD-DDDD",
-			attorneyUID: "302b05c7-896c-4290-904e-2005e4f1e81e",
+			name:           "Template Error Returned",
+			caseUID:        "M-DDDD-DDDD-DDDD",
+			attorneyUID:    "302b05c7-896c-4290-904e-2005e4f1e81e",
+			attorneyStatus: "active",
 			form: formAttorneyDetails{
 				FirstNames:  "Jack",
 				LastName:    "Black",
@@ -155,9 +159,10 @@ func TestGetChangeAttorneyDetails(t *testing.T) {
 			template.
 				On("Func", mock.Anything,
 					changeAttorneyDetailsData{
-						Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
-						CaseUID:   tc.caseUID,
-						Form:      tc.form,
+						Countries:      []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
+						CaseUID:        tc.caseUID,
+						Form:           tc.form,
+						AttorneyStatus: tc.attorneyStatus,
 					}).
 				Return(tc.errorReturned)
 
