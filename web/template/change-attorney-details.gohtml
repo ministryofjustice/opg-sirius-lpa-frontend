@@ -34,9 +34,9 @@
 
                 <div class="govuk-form-group {{ if .Error.Field.Address }}govuk-form-group--error{{ end }}" data-app-address-finder-label="Attorney address">
                     <legend class="govuk-fieldset__legend">
-                        <h1 class="govuk-fieldset__heading">
+                        <h2 class="govuk-fieldset__heading">
                             {{(print $attorneyLabel " address")}}
-                        </h1>
+                        </h2>
                     </legend>
                     {{ template "input" (field "address.Line1" "Address line 1" .Form.Address.Line1 (index .Error.Field "address/addressLine1") "data-app-address-finder-map" "addressLine1") }}
                     {{ template "input" (field "address.Line2" "Address line 2 (optional)" .Form.Address.Line2 (index .Error.Field "address/addressLine2") "data-app-address-finder-map" "addressLine2") }}
