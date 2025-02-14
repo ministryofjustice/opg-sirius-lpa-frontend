@@ -109,6 +109,12 @@ describe("Change attorney details form", () => {
         "contain",
         "/lpa/M-1111-1111-1110/attorney/active-attorney-1/change-details",
       );
+      cy.contains("Attorney's first names");
+      cy.contains("Attorney's last name");
+      cy.contains("Attorney's date of birth");
+      cy.contains("Attorney address");
+      cy.contains("Attorney's phone number (optional)");
+      cy.contains("Attorney's email address (optional)");
     });
   });
 
@@ -118,11 +124,17 @@ describe("Change attorney details form", () => {
         .contains("Replacement attorneys")
         .click();
       cy.get("#f-change-replacement-attorney-details").click();
-      cy.contains("Change attorney details");
+      cy.contains("Change replacement attorney details");
       cy.url().should(
         "contain",
         "/lpa/M-1111-1111-1110/attorney/replacement-attorney-2/change-details",
       );
+      cy.contains("Replacement attorney's first names");
+      cy.contains("Replacement attorney's last name");
+      cy.contains("Replacement attorney's date of birth");
+      cy.contains("Replacement attorney address");
+      cy.contains("Replacement attorney's phone number (optional)");
+      cy.contains("Replacement attorney's email address (optional)");
     });
   });
 
