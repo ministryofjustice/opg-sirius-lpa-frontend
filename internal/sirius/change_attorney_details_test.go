@@ -15,6 +15,8 @@ func TestChangeAttorneyDetails(t *testing.T) {
 	pact := newPact()
 	defer pact.Teardown()
 
+	attorneyUid := "302b05c7-896c-4290-904e-2005e4f1e81e"
+
 	testCases := []struct {
 		name          string
 		changeData    ChangeAttorneyDetails
@@ -46,7 +48,7 @@ func TestChangeAttorneyDetails(t *testing.T) {
 					UponReceiving("A request for changing attorney details").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567/attorney/attorney-uid/change-details"),
+						Path:   dsl.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567/attorney/" + attorneyUid + "/change-details"),
 						Headers: dsl.MapMatcher{
 							"Content-Type": dsl.String("application/json"),
 						},
@@ -81,7 +83,7 @@ func TestChangeAttorneyDetails(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.ChangeAttorneyDetails(Context{Context: context.Background()}, "M-1234-9876-4567", "attorney-uid", tc.changeData)
+				err := client.ChangeAttorneyDetails(Context{Context: context.Background()}, "M-1234-9876-4567", attorneyUid, tc.changeData)
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
