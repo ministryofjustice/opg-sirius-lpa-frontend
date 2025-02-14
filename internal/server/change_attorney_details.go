@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -11,12 +12,14 @@ import (
 
 type ChangeAttorneyDetailsClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
+	ChangeAttorneyDetails(sirius.Context, string, string, sirius.ChangeAttorneyDetails) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
 type changeAttorneyDetailsData struct {
 	XSRFToken string
 	Countries []sirius.RefDataItem
+	Success   bool
 	Error     sirius.ValidationError
 	CaseUID   string
 	Form      formAttorneyDetails
@@ -103,6 +106,40 @@ func ChangeAttorneyDetails(client ChangeAttorneyDetailsClient, tmpl template.Tem
 
 		if err := group.Wait(); err != nil {
 			return err
+		}
+
+		if r.Method == http.MethodPost {
+			err := decoder.Decode(&data.Form, r.PostForm)
+			if err != nil {
+				return err
+			}
+
+			attorneyDetailsData := sirius.ChangeAttorneyDetails{
+				FirstNames:  data.Form.FirstNames,
+				LastName:    data.Form.LastName,
+				DateOfBirth: data.Form.DateOfBirth.toDateString(),
+				Address:     data.Form.Address,
+				Phone:       data.Form.PhoneNumber,
+				Email:       data.Form.Email,
+				SignedAt:    data.Form.SignedAt.toDateString(),
+			}
+
+			err = client.ChangeAttorneyDetails(ctx, caseUID, attorneyUID, attorneyDetailsData)
+
+			if ve, ok := err.(sirius.ValidationError); ok {
+				w.WriteHeader(http.StatusBadRequest)
+				data.Error = ve
+			} else if err != nil {
+				return err
+			} else {
+				data.Success = true
+
+				SetFlash(w, FlashNotification{
+					Title: "Changes confirmed",
+				})
+
+				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
+			}
 		}
 
 		return tmpl(w, data)

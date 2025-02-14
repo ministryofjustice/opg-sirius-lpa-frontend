@@ -158,4 +158,39 @@ describe("Change attorney details form", () => {
     cy.contains("Cancel").click();
     cy.url().should("contain", "/lpa/M-1111-1111-1110/lpa-details");
   });
+
+  it("can edit all attorney details and redirect to lpa details", () => {
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-1111-1111-1110/attorney/active-attorney-1/change-details",
+      "PUT",
+      {
+        status: 204,
+      },
+    );
+
+    cy.get("#f-firstNames").clear().type("Jonathan");
+    cy.get("#f-lastName").clear().type("Ruby");
+
+    cy.get("#f-dob-day").clear().type("31");
+    cy.get("#f-dob-month").clear().type("1");
+    cy.get("#f-dob-year").clear().type("2000");
+
+    cy.get("#f-address\\.Line1").clear().type("4");
+    cy.get("#f-address\\.Line2").clear().type("Gherkin Building");
+    cy.get("#f-address\\.Line3").clear().type("33 London Road");
+    cy.get("#f-address\\.Town").clear().type("London");
+    cy.get("#f-address\\.Postcode").clear().type("B29 6BL");
+
+    cy.get("#f-phoneNumber").clear().type("07777777777");
+    cy.get("#f-email").clear().type("jimR@mail.example");
+
+    cy.get("#f-signedAt-day").clear().type("11");
+    cy.get("#f-signedAt-month").clear().type("11");
+    cy.get("#f-signedAt-year").clear().type("2023");
+
+    cy.get("button[type=submit]").click();
+    cy.get(".moj-banner").should("exist");
+
+    cy.url().should("contain", "/lpa/M-1111-1111-1110/lpa-details");
+  });
 });
