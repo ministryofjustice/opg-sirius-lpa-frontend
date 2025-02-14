@@ -114,7 +114,8 @@ describe("Change attorney details form", () => {
       cy.contains("Attorney's date of birth");
       cy.contains("Attorney address");
       cy.contains("Attorney's phone number (optional)");
-      cy.contains("Attorney's email address (optional)");    });
+      cy.contains("Attorney's email address (optional)");
+    });
   });
 
   it("can be visited from the LPA details replacement attorney Change link", () => {
