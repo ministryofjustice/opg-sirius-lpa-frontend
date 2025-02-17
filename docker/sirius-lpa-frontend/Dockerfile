@@ -12,7 +12,7 @@ RUN yarn --ignore-scripts
 COPY web/assets web/assets
 RUN yarn build
 
-FROM golang:1.23 AS build-env
+FROM golang:1.24 AS build-env
 
 WORKDIR /app
 
