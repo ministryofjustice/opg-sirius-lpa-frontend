@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base"],
+  "extends": ["config:recommended"],
   "branchNameStrict": true,
   "branchPrefix": "renovate-",
   "commitMessageAction": "Renovate Update",
@@ -11,7 +11,7 @@
         "Ignore Dockerfile Node upgrades",
         "Node 20.3.x doesn't work with our local versions of Docker so we must lock to 20.2.x for now"
       ],
-      "matchFiles": ["docker/sirius-lpa-frontend/Dockerfile"],
+      "matchFileNames": ["docker/sirius-lpa-frontend/Dockerfile"],
       "matchDatasources": ["docker"],
       "matchPackageNames": ["node"],
       "matchUpdateTypes": ["minor"],
@@ -22,19 +22,19 @@
         "Ignore tinymce upgrades to version 6",
         "Tinymce version 6 doesn't support pasting in from Word documents so we must lock to version 5 for now"
       ],
-      "matchPackagePatterns": ["tinymce"],
       "matchUpdateTypes": ["major"],
-      "enabled": false
+      "enabled": false,
+      "matchPackageNames": ["/tinymce/"]
     },
     {
       "automerge": true,
       "groupName": "Patch & Minor Updates",
       "groupSlug": "all-minor-patch-updates",
-      "matchPackagePatterns": ["*"],
       "matchUpdateTypes": ["minor", "patch"],
       "prPriority": 1,
-      "stabilityDays": 3,
-      "schedule": "* 0-6 1 * *"
+      "minimumReleaseAge": "3 days",
+      "schedule": "* 0-6 1 * *",
+      "matchPackageNames": ["*"]
     }
   ],
   "major": {
@@ -43,7 +43,7 @@
   "vulnerabilityAlerts": {
     "groupName": "Vulnerability Patches",
     "dependencyDashboardApproval": false,
-    "stabilityDays": 0,
+    "minimumReleaseAge": null,
     "rangeStrategy": "update-lockfile",
     "commitMessagePrefix": "[SECURITY]",
     "branchTopic": "{{{datasource}}}-{{{depName}}}-vulnerability",
