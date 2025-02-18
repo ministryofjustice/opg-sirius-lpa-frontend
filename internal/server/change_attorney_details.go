@@ -15,11 +15,12 @@ type ChangeAttorneyDetailsClient interface {
 }
 
 type changeAttorneyDetailsData struct {
-	XSRFToken string
-	Countries []sirius.RefDataItem
-	Error     sirius.ValidationError
-	CaseUID   string
-	Form      formAttorneyDetails
+	XSRFToken      string
+	Countries      []sirius.RefDataItem
+	Error          sirius.ValidationError
+	CaseUID        string
+	Form           formAttorneyDetails
+	AttorneyStatus string
 }
 
 type formAttorneyDetails struct {
@@ -80,6 +81,7 @@ func ChangeAttorneyDetails(client ChangeAttorneyDetailsClient, tmpl template.Tem
 				PhoneNumber: attorney.Mobile,
 				Email:       attorney.Email,
 			},
+			AttorneyStatus: attorney.Status,
 		}
 
 		if attorney.SignedAt != "" {
