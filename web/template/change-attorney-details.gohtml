@@ -3,6 +3,13 @@
 {{ define "title" }}Change attorney details{{ end }}
 
 {{ define "main" }}
+    {{- $attorneyLabel := "" -}}
+    {{- if eq .AttorneyStatus "replacement" -}}
+        {{- $attorneyLabel = "Replacement attorney" -}}
+    {{- else if eq .AttorneyStatus "active" -}}
+        {{- $attorneyLabel = "Attorney" -}}
+    {{- end -}}
+
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
 
@@ -11,17 +18,26 @@
             {{ template "error-summary" .Error }}
 
             <h1 class="govuk-heading-l app-!-embedded-hide">
-                Change attorney details
+                {{- if eq .AttorneyStatus "replacement" -}}
+                    Change replacement attorney details
+                {{- else if eq .AttorneyStatus "active" -}}
+                    Change attorney details
+                {{- end -}}
             </h1>
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-                {{ template "input" (field "firstNames" "Attorney’s first names" .Form.FirstNames .Error.Field.FirstNames) }}
-                {{ template "input" (field "lastName" "Attorney’s last name" .Form.LastName .Error.Field.LastName) }}
-                {{ template "date" (field "dob" "Attorney's date of birth" .Form.DateOfBirth .Error.Field.DateOfBirth) }}
+                {{ template "input" (field "firstNames" (print $attorneyLabel "'s first names") .Form.FirstNames .Error.Field.FirstNames) }}
+                {{ template "input" (field "lastName" (print $attorneyLabel "'s last name") .Form.LastName .Error.Field.LastName) }}
+                {{ template "date" (field "dob" (print $attorneyLabel "'s date of birth") .Form.DateOfBirth .Error.Field.DateOfBirth) }}
 
                 <div class="govuk-form-group {{ if .Error.Field.Address }}govuk-form-group--error{{ end }}" data-app-address-finder-label="Attorney address">
+                    <legend class="govuk-fieldset__legend">
+                        <h2 class="govuk-fieldset__heading">
+                            {{(print $attorneyLabel " address")}}
+                        </h2>
+                    </legend>
                     {{ template "input" (field "address.Line1" "Address line 1" .Form.Address.Line1 (index .Error.Field "address/addressLine1") "data-app-address-finder-map" "addressLine1") }}
                     {{ template "input" (field "address.Line2" "Address line 2 (optional)" .Form.Address.Line2 (index .Error.Field "address/addressLine2") "data-app-address-finder-map" "addressLine2") }}
                     {{ template "input" (field "address.Line3" "Address line 3 (optional)" .Form.Address.Line3 (index .Error.Field "address/addressLine3") "data-app-address-finder-map" "addressLine3") }}
@@ -30,8 +46,8 @@
                     {{ template "select" (select "address.Country" "Country" .Form.Address.Country (index .Error.Field "address/country") (options .Countries) "data-app-address-finder-map" "country") }}
                 </div>
 
-                {{ template "input" (field "phoneNumber" "Attorney’s phone number (optional)" .Form.PhoneNumber .Error.Field.PhoneNumber) }}
-                {{ template "input" (field "email" "Attorney’s email address (optional)" .Form.Email .Error.Field.Email) }}
+                {{ template "input" (field "phoneNumber" (print $attorneyLabel "'s phone number (optional)") .Form.PhoneNumber .Error.Field.PhoneNumber) }}
+                {{ template "input" (field "email" (print $attorneyLabel "'s email address (optional)") .Form.Email .Error.Field.Email) }}
                 {{ template "date" (field "signedAt" "LPA signed on" .Form.SignedAt .Error.Field.SignedAt) }}
 
                 <div class="govuk-warning-text">
