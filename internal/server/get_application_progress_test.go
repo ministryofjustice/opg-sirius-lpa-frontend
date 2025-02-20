@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -39,32 +40,37 @@ func TestGetApplicationProgressSuccess(t *testing.T) {
 			LpaStoreData: sirius.LpaStoreData{
 				Channel: "Digital",
 				Attorneys: []sirius.LpaStoreAttorney{
-					sirius.LpaStoreAttorney{
-						Status: "replacement",
+					{
+						Status:          shared.InactiveAttorneyStatus.String(),
+						AppointmentType: shared.ReplacementAppointmentType.String(),
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "first@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
-						Status: "replacement",
+					{
+						Status:          shared.InactiveAttorneyStatus.String(),
+						AppointmentType: shared.ReplacementAppointmentType.String(),
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "second@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
-						Status: "active",
+					{
+						Status:          shared.ActiveAttorneyStatus.String(),
+						AppointmentType: shared.OriginalAppointmentType.String(),
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "third@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
-						Status: "active",
+					{
+						Status:          shared.ActiveAttorneyStatus.String(),
+						AppointmentType: shared.OriginalAppointmentType.String(),
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "fourth@does.not.exist",
 						},
 					},
-					sirius.LpaStoreAttorney{
-						Status: "removed",
+					{
+						Status:          shared.RemovedAttorneyStatus.String(),
+						AppointmentType: shared.OriginalAppointmentType.String(),
 						LpaStorePerson: sirius.LpaStorePerson{
 							Email: "fifth@does.not.exist",
 						},
