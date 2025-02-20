@@ -88,8 +88,8 @@ var testChangeAttorneyDetailsCaseSummary = sirius.CaseSummary{
 						},
 					},
 					DateOfBirth:     "1990-04-15",
-					Status:          shared.ActiveAttorneyStatus.String(),
-					AppointmentType: shared.ReplacementAppointmentType.String(),
+					Status:          shared.RemovedAttorneyStatus.String(),
+					AppointmentType: shared.OriginalAppointmentType.String(),
 					Email:           "Consuelo.Swaniawski@example.com",
 					Mobile:          "07004369909",
 					SignedAt:        "2024-10-21T13:42:16Z",
@@ -109,10 +109,10 @@ func TestGetChangeAttorneyDetails(t *testing.T) {
 		errorReturned  error
 	}{
 		{
-			name:           "Change Regular Attorney Details",
+			name:           "Change Active Attorney Details",
 			caseUID:        "M-DDDD-DDDD-DDDD",
 			attorneyUID:    "302b05c7-896c-4290-904e-2005e4f1e81e",
-			attorneyStatus: "active",
+			attorneyStatus: shared.ActiveAttorneyStatus.String(),
 			form: formAttorneyDetails{
 				FirstNames:  "Jack",
 				LastName:    "Black",
@@ -130,10 +130,10 @@ func TestGetChangeAttorneyDetails(t *testing.T) {
 			errorReturned: nil,
 		},
 		{
-			name:           "Change Replacement Attorney Details",
+			name:           "Change Inactive Attorney Details",
 			caseUID:        "M-DDDD-DDDD-DDDD",
 			attorneyUID:    "123a01b1-456d-5391-813d-2010d3e2d72d",
-			attorneyStatus: "replacement",
+			attorneyStatus: shared.InactiveAttorneyStatus.String(),
 			form: formAttorneyDetails{
 				FirstNames:  "Jack",
 				LastName:    "White",
@@ -151,10 +151,10 @@ func TestGetChangeAttorneyDetails(t *testing.T) {
 			errorReturned: nil,
 		},
 		{
-			name:           "Change Active Replacement Attorney Details",
+			name:           "Change Removed Attorney Details",
 			caseUID:        "M-DDDD-DDDD-DDDD",
 			attorneyUID:    "638f049f-c01f-4ab2-973a-2ea763b3cf7a",
-			attorneyStatus: "replacement",
+			attorneyStatus: shared.RemovedAttorneyStatus.String(),
 			form: formAttorneyDetails{
 				FirstNames:  "Consuelo",
 				LastName:    "Swaniawski",
@@ -172,9 +172,10 @@ func TestGetChangeAttorneyDetails(t *testing.T) {
 			errorReturned: nil,
 		},
 		{
-			name:        "Template Error Returned",
-			caseUID:     "M-DDDD-DDDD-DDDD",
-			attorneyUID: "302b05c7-896c-4290-904e-2005e4f1e81e",
+			name:           "Template Error Returned",
+			caseUID:        "M-DDDD-DDDD-DDDD",
+			attorneyUID:    "302b05c7-896c-4290-904e-2005e4f1e81e",
+			attorneyStatus: shared.ActiveAttorneyStatus.String(),
 			form: formAttorneyDetails{
 				FirstNames:  "Jack",
 				LastName:    "Black",
