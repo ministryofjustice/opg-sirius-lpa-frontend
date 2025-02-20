@@ -4,7 +4,7 @@
 
 {{ define "main" }}
     {{- $attorneyLabel := "" -}}
-    {{- if eq .AttorneyStatus "replacement" -}}
+    {{- if eq (eq .AttorneyStatus "inactive") (eq .AttorneyAppointmentType "replacement") -}}
         {{- $attorneyLabel = "Replacement attorney" -}}
     {{- else if eq .AttorneyStatus "active" -}}
         {{- $attorneyLabel = "Attorney" -}}
@@ -23,7 +23,7 @@
             {{ end }}
 
             <h1 class="govuk-heading-l app-!-embedded-hide">
-                {{- if eq .AttorneyStatus "replacement" -}}
+                {{- if and (eq .AttorneyStatus "inactive") (eq .AttorneyAppointmentType "replacement") -}}
                     Change replacement attorney details
                 {{- else if eq .AttorneyStatus "active" -}}
                     Change attorney details

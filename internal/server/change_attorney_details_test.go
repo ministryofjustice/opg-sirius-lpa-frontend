@@ -101,18 +101,20 @@ var testChangeAttorneyDetailsCaseSummary = sirius.CaseSummary{
 
 func TestGetChangeAttorneyDetails(t *testing.T) {
 	tests := []struct {
-		name           string
-		caseUID        string
-		attorneyUID    string
-		attorneyStatus string
-		form           formAttorneyDetails
-		errorReturned  error
+		name                    string
+		caseUID                 string
+		attorneyUID             string
+		attorneyStatus          string
+		attorneyAppointmentType string
+		form                    formAttorneyDetails
+		errorReturned           error
 	}{
 		{
-			name:           "Change Active Attorney Details",
-			caseUID:        "M-DDDD-DDDD-DDDD",
-			attorneyUID:    "302b05c7-896c-4290-904e-2005e4f1e81e",
-			attorneyStatus: shared.ActiveAttorneyStatus.String(),
+			name:                    "Change Active Original Attorney Details",
+			caseUID:                 "M-DDDD-DDDD-DDDD",
+			attorneyUID:             "302b05c7-896c-4290-904e-2005e4f1e81e",
+			attorneyStatus:          shared.ActiveAttorneyStatus.String(),
+			attorneyAppointmentType: shared.OriginalAppointmentType.String(),
 			form: formAttorneyDetails{
 				FirstNames:  "Jack",
 				LastName:    "Black",
@@ -130,10 +132,11 @@ func TestGetChangeAttorneyDetails(t *testing.T) {
 			errorReturned: nil,
 		},
 		{
-			name:           "Change Inactive Attorney Details",
-			caseUID:        "M-DDDD-DDDD-DDDD",
-			attorneyUID:    "123a01b1-456d-5391-813d-2010d3e2d72d",
-			attorneyStatus: shared.InactiveAttorneyStatus.String(),
+			name:                    "Change Inactive Replacement Attorney Details",
+			caseUID:                 "M-DDDD-DDDD-DDDD",
+			attorneyUID:             "123a01b1-456d-5391-813d-2010d3e2d72d",
+			attorneyStatus:          shared.InactiveAttorneyStatus.String(),
+			attorneyAppointmentType: shared.ReplacementAppointmentType.String(),
 			form: formAttorneyDetails{
 				FirstNames:  "Jack",
 				LastName:    "White",
@@ -151,10 +154,11 @@ func TestGetChangeAttorneyDetails(t *testing.T) {
 			errorReturned: nil,
 		},
 		{
-			name:           "Change Removed Attorney Details",
-			caseUID:        "M-DDDD-DDDD-DDDD",
-			attorneyUID:    "638f049f-c01f-4ab2-973a-2ea763b3cf7a",
-			attorneyStatus: shared.RemovedAttorneyStatus.String(),
+			name:                    "Change Removed Original Attorney Details",
+			caseUID:                 "M-DDDD-DDDD-DDDD",
+			attorneyUID:             "638f049f-c01f-4ab2-973a-2ea763b3cf7a",
+			attorneyStatus:          shared.RemovedAttorneyStatus.String(),
+			attorneyAppointmentType: shared.OriginalAppointmentType.String(),
 			form: formAttorneyDetails{
 				FirstNames:  "Consuelo",
 				LastName:    "Swaniawski",
@@ -172,10 +176,11 @@ func TestGetChangeAttorneyDetails(t *testing.T) {
 			errorReturned: nil,
 		},
 		{
-			name:           "Template Error Returned",
-			caseUID:        "M-DDDD-DDDD-DDDD",
-			attorneyUID:    "302b05c7-896c-4290-904e-2005e4f1e81e",
-			attorneyStatus: shared.ActiveAttorneyStatus.String(),
+			name:                    "Template Error Returned",
+			caseUID:                 "M-DDDD-DDDD-DDDD",
+			attorneyUID:             "302b05c7-896c-4290-904e-2005e4f1e81e",
+			attorneyStatus:          shared.ActiveAttorneyStatus.String(),
+			attorneyAppointmentType: shared.OriginalAppointmentType.String(),
 			form: formAttorneyDetails{
 				FirstNames:  "Jack",
 				LastName:    "Black",
@@ -208,10 +213,11 @@ func TestGetChangeAttorneyDetails(t *testing.T) {
 			template.
 				On("Func", mock.Anything,
 					changeAttorneyDetailsData{
-						Countries:      []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
-						CaseUID:        tc.caseUID,
-						Form:           tc.form,
-						AttorneyStatus: tc.attorneyStatus,
+						Countries:               []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
+						CaseUID:                 tc.caseUID,
+						Form:                    tc.form,
+						AttorneyStatus:          tc.attorneyStatus,
+						AttorneyAppointmentType: tc.attorneyAppointmentType,
 					}).
 				Return(tc.errorReturned)
 
