@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -125,7 +126,8 @@ func TestAnomalyDisplay_Group(t *testing.T) {
 				LpaStorePerson: LpaStorePerson{
 					Uid: "2",
 				},
-				Status: "active",
+				Status:          shared.ActiveAttorneyStatus.String(),
+				AppointmentType: shared.OriginalAppointmentType.String(),
 			},
 		},
 		// to test that no anomalies are returned for this section
@@ -264,24 +266,33 @@ func TestGetSectionForUid(t *testing.T) {
 				LpaStorePerson: LpaStorePerson{
 					Uid: "2",
 				},
-				Status: "active",
+				Status:          shared.ActiveAttorneyStatus.String(),
+				AppointmentType: shared.OriginalAppointmentType.String(),
 			},
 			{
 				LpaStorePerson: LpaStorePerson{
 					Uid: "3",
 				},
-				Status: "replacement",
+				Status:          shared.InactiveAttorneyStatus.String(),
+				AppointmentType: shared.ReplacementAppointmentType.String(),
+			},
+			{
+				LpaStorePerson: LpaStorePerson{
+					Uid: "4",
+				},
+				Status:          shared.ActiveAttorneyStatus.String(),
+				AppointmentType: shared.ReplacementAppointmentType.String(),
 			},
 		},
 		CertificateProvider: LpaStoreCertificateProvider{
 			LpaStorePerson: LpaStorePerson{
-				Uid: "4",
+				Uid: "5",
 			},
 		},
 		PeopleToNotify: []LpaStorePersonToNotify{
 			{
 				LpaStorePerson{
-					Uid: "5",
+					Uid: "6",
 				},
 			},
 		},
@@ -290,7 +301,8 @@ func TestGetSectionForUid(t *testing.T) {
 	assert.Equal(t, DonorSection, getSectionForUid(&lpa, "1"))
 	assert.Equal(t, AttorneysSection, getSectionForUid(&lpa, "2"))
 	assert.Equal(t, ReplacementAttorneysSection, getSectionForUid(&lpa, "3"))
-	assert.Equal(t, CertificateProviderSection, getSectionForUid(&lpa, "4"))
-	assert.Equal(t, PeopleToNotifySection, getSectionForUid(&lpa, "5"))
+	assert.Equal(t, AttorneysSection, getSectionForUid(&lpa, "4"))
+	assert.Equal(t, CertificateProviderSection, getSectionForUid(&lpa, "5"))
+	assert.Equal(t, PeopleToNotifySection, getSectionForUid(&lpa, "6"))
 	assert.Equal(t, RootSection, getSectionForUid(&lpa, ""))
 }
