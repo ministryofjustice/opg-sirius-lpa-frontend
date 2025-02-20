@@ -4,7 +4,7 @@
 
 {{ define "main" }}
     {{- $attorneyLabel := "" -}}
-    {{- if eq (eq .AttorneyStatus "inactive") (eq .AttorneyAppointmentType "replacement") -}}
+    {{- if and (eq .AttorneyStatus "inactive") (eq .AttorneyAppointmentType "replacement") -}}
         {{- $attorneyLabel = "Replacement attorney" -}}
     {{- else if eq .AttorneyStatus "active" -}}
         {{- $attorneyLabel = "Attorney" -}}
