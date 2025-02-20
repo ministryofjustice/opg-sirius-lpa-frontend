@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
 )
@@ -116,13 +117,14 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 		}
 
 		for _, attorney := range lpa.LpaStoreData.Attorneys {
-			if attorney.Status == "removed" {
+			if attorney.Status == shared.RemovedAttorneyStatus.String() {
 				continue
 			}
 
 			personType := "Attorney"
 
-			if attorney.Status == "replacement" {
+			if attorney.AppointmentType == shared.ReplacementAppointmentType.String() &&
+				attorney.Status == shared.InactiveAttorneyStatus.String() {
 				personType = "Replacement Attorney"
 			}
 
