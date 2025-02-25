@@ -26,14 +26,14 @@ type changeDonorDetailsData struct {
 }
 
 type formDonorDetails struct {
-	FirstNames        string         `form:"firstNames"`
-	LastName          string         `form:"lastName"`
-	OtherNamesKnownBy string         `form:"otherNamesKnownBy"`
-	DateOfBirth       dob            `form:"dob"`
-	Address           sirius.Address `form:"address"`
-	PhoneNumber       string         `form:"phoneNumber"`
-	Email             string         `form:"email"`
-	LpaSignedOn       dob            `form:"lpaSignedOn"`
+	FirstNames        string `form:"firstNames"`
+	LastName          string `form:"lastName"`
+	OtherNamesKnownBy string `form:"otherNamesKnownBy"`
+	//DateOfBirth       dob            `form:"dob"`
+	Address     sirius.Address `form:"address"`
+	PhoneNumber string         `form:"phoneNumber"`
+	Email       string         `form:"email"`
+	LpaSignedOn dob            `form:"lpaSignedOn"`
 }
 
 func parseDate(dateString string) (dob, error) {
@@ -78,10 +78,10 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 		}
 
 		lpaStore := cs.DigitalLpa.LpaStoreData
-		donorDob, err := parseDate(lpaStore.Donor.DateOfBirth)
-		if err != nil {
-			return err
-		}
+		//donorDob, err := parseDate(lpaStore.Donor.DateOfBirth)
+		//if err != nil {
+		//	return err
+		//}
 
 		signedAt, err := parseDateTime(lpaStore.SignedAt)
 		if err != nil {
@@ -95,7 +95,7 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 				FirstNames:        lpaStore.Donor.FirstNames,
 				LastName:          lpaStore.Donor.LastName,
 				OtherNamesKnownBy: lpaStore.Donor.OtherNamesKnownBy,
-				DateOfBirth:       donorDob,
+				//DateOfBirth:       donorDob,
 				Address: sirius.Address{
 					Line1:    lpaStore.Donor.Address.Line1,
 					Line2:    lpaStore.Donor.Address.Line2,
@@ -136,11 +136,11 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 				FirstNames:        data.Form.FirstNames,
 				LastName:          data.Form.LastName,
 				OtherNamesKnownBy: data.Form.OtherNamesKnownBy,
-				DateOfBirth:       data.Form.DateOfBirth.toDateString(),
-				Address:           data.Form.Address,
-				Phone:             data.Form.PhoneNumber,
-				Email:             data.Form.Email,
-				LpaSignedOn:       data.Form.LpaSignedOn.toDateString(),
+				//DateOfBirth:       data.Form.DateOfBirth.toDateString(),
+				Address:     data.Form.Address,
+				Phone:       data.Form.PhoneNumber,
+				Email:       data.Form.Email,
+				LpaSignedOn: data.Form.LpaSignedOn.toDateString(),
 			}
 
 			err = client.ChangeDonorDetails(ctx, caseUID, donorDetailsData)
