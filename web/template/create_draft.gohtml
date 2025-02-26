@@ -26,10 +26,9 @@
         </p>
       </div>
     </div>
-    <div class="govuk-button-group">
-      <a href="{{ prefix (printf "/lpa/%s" (index .Uids 0).Uid ) }}" class="govuk-button govuk-button--secondary">View donor record</a>
-      <a href="{{ prefix "/digital-lpa/create" }}" class="govuk-button govuk-button--secondary">Create another draft LPA</a>
-    </div>
+    <a href="{{ prefix (printf "/lpa/%s" (index .Uids 0).Uid ) }}" class="govuk-button govuk-button--secondary">View donor record</a>
+    <p class="govuk-body"><a href="{{ prefix (printf "/create-additional-draft-lpa?id=%d" .DonorId ) }} " class="govuk-link">Create another draft LPA for this donor</a></p>
+    <p class="govuk-body"><a href="{{ prefix ("/digital-lpa/create") }}" class="govuk-link">Create a draft LPA for a new donor</a></p>
   {{ else }}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
