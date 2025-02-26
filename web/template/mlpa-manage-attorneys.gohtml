@@ -5,6 +5,10 @@
 {{ define "main" }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
+      <a href="{{ prefix (printf "/lpa/%s" .CaseSummary.DigitalLpa.UID )}}" class="govuk-back-link">Back</a>
+
+      {{ template "mlpa-case-details" . }}
+
       {{ template "error-summary" .Error }}
 
       <h1 class="govuk-heading-l app-!-embedded-hide">Manage attorneys</h1>
