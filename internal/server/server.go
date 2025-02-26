@@ -144,8 +144,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/lpa/{uid}/history", wrap(GetHistory(client, templates.Get("mlpa-history.gohtml"))))
 	mux.Handle("/lpa/{uid}/documents/new", wrap(CreateDocumentDigitalLpa(client, templates.Get("mlpa-create_document.gohtml"))))
 	mux.Handle("/lpa/{uid}/manage-attorneys", wrap(ManageAttorneys(client, templates.Get("mlpa-manage-attorneys.gohtml"))))
-	mux.Handle("/lpa/{uid}/remove-an-attorney", wrap(RemoveAnAttorney(client, templates.Get("mlpa-remove-attorney.gohtml"))))
-	mux.Handle("/lpa/{uid}/confirm-attorney-removal/{attorneyUID}", wrap(ConfirmAttorneyRemoval(client, templates.Get("mlpa-confirm-attorney-removal.gohtml"))))
+	mux.Handle("/lpa/{uid}/remove-an-attorney", wrap(RemoveAnAttorney(client, templates.Get("mlpa-remove-attorney.gohtml"), templates.Get("mlpa-confirm-attorney-removal.gohtml"))))
 	mux.Handle("/lpa/{uid}/certificate-provider/change-details", wrap(ChangeCertificateProviderDetails(client, templates.Get("change-certificate-provider-details.gohtml"))))
 	mux.Handle("/search-users", wrap(SearchUsers(client)))
 	mux.Handle("/search-persons", wrap(SearchDonors(client)))
@@ -269,6 +268,13 @@ func errorHandler(tmplError template.Template, prefix, siriusURL string) func(ne
 			}
 		})
 	}
+}
+
+func postFormKeySet(r *http.Request, name string) bool {
+	if _, val := r.PostForm[name]; val {
+		return true
+	}
+	return false
 }
 
 func postFormString(r *http.Request, name string) string {

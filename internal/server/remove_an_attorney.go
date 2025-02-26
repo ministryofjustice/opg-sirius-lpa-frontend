@@ -3,11 +3,10 @@ package server
 import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
-	"net/http"
-
 	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"net/http"
 )
 
 type RemoveAnAttorneyClient interface {
@@ -17,13 +16,15 @@ type RemoveAnAttorneyClient interface {
 type removeAnAttorneyData struct {
 	CaseSummary sirius.CaseSummary
 
-	ActiveAttorneys  []sirius.LpaStoreAttorney
-	SelectedAttorney string
-	Error            sirius.ValidationError
-	XSRFToken        string
+	ActiveAttorneys      []sirius.LpaStoreAttorney
+	SelectedAttorneyUid  string
+	SelectedAttorneyName string
+	SelectedAttorneyDob  string
+	Error                sirius.ValidationError
+	XSRFToken            string
 }
 
-func RemoveAnAttorney(client RemoveAnAttorneyClient, tmpl template.Template) Handler {
+func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Template, confirmTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		uid := chi.URLParam(r, "uid")
 		ctx := getContext(r)
@@ -35,10 +36,10 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, tmpl template.Template) Han
 		}
 
 		data := removeAnAttorneyData{
-			SelectedAttorney: postFormString(r, "selectedAttorney"),
-			CaseSummary:      caseSummary,
-			XSRFToken:        ctx.XSRFToken,
-			Error:            sirius.ValidationError{Field: sirius.FieldErrors{}},
+			SelectedAttorneyUid: postFormString(r, "selectedAttorney"),
+			CaseSummary:         caseSummary,
+			XSRFToken:           ctx.XSRFToken,
+			Error:               sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}
 
 		lpa := data.CaseSummary.DigitalLpa
@@ -54,7 +55,7 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, tmpl template.Template) Han
 		}
 
 		if r.Method == http.MethodPost {
-			if data.SelectedAttorney == "" {
+			if data.SelectedAttorneyUid == "" {
 				w.WriteHeader(http.StatusBadRequest)
 
 				data.Error.Field["selectAttorney"] = map[string]string{
@@ -63,10 +64,21 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, tmpl template.Template) Han
 			}
 
 			if !data.Error.Any() {
-				return RedirectError(fmt.Sprintf("/lpa/%s/confirm-attorney-removal/%s", caseSummary.DigitalLpa.UID, data.SelectedAttorney))
+				if !postFormKeySet(r, "confirmRemoval") {
+					for _, att := range data.ActiveAttorneys {
+						if att.Uid == data.SelectedAttorneyUid {
+							data.SelectedAttorneyName = att.FirstNames + " " + att.LastName
+							data.SelectedAttorneyDob = att.DateOfBirth
+						}
+					}
+
+					return confirmTmpl(w, data)
+				} else {
+					return RedirectError(fmt.Sprintf("/lpa/%s", caseSummary.DigitalLpa.UID))
+				}
 			}
 		}
 
-		return tmpl(w, data)
+		return removeTmpl(w, data)
 	}
 }

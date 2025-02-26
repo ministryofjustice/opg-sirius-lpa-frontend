@@ -153,8 +153,8 @@ func TestGetRemoveAnAttorney(t *testing.T) {
 		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
 		Return(removeAnAttorneyCaseSummary, nil)
 
-	template := &mockTemplate{}
-	template.
+	removeTemplate := &mockTemplate{}
+	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
 			CaseSummary:     removeAnAttorneyCaseSummary,
 			ActiveAttorneys: activeAttorneys,
@@ -162,14 +162,16 @@ func TestGetRemoveAnAttorney(t *testing.T) {
 		}).
 		Return(nil)
 
-	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, template.Func))
+	confirmTemplate := &mockTemplate{}
+
+	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func))
 
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-1111-2222-3333/remove-an-attorney", nil)
 	resp, err := server.serve(req)
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.Code)
-	mock.AssertExpectationsForObjects(t, client, template)
+	mock.AssertExpectationsForObjects(t, client, removeTemplate)
 }
 
 func TestGetRemoveAnAttorneyGetCaseSummaryFails(t *testing.T) {
@@ -180,12 +182,14 @@ func TestGetRemoveAnAttorneyGetCaseSummaryFails(t *testing.T) {
 		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
 		Return(caseSummary, expectedError)
 
-	template := &mockTemplate{}
-	template.
+	removeTemplate := &mockTemplate{}
+	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{}).
 		Return(nil)
 
-	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, template.Func))
+	confirmTemplate := &mockTemplate{}
+
+	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func))
 
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-1111-2222-3333/remove-an-attorney", nil)
 	_, err := server.serve(req)
@@ -199,8 +203,8 @@ func TestGetRemoveAnAttorneyTemplateErrors(t *testing.T) {
 		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
 		Return(removeAnAttorneyCaseSummary, nil)
 
-	template := &mockTemplate{}
-	template.
+	removeTemplate := &mockTemplate{}
+	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
 			CaseSummary:     removeAnAttorneyCaseSummary,
 			ActiveAttorneys: activeAttorneys,
@@ -208,7 +212,9 @@ func TestGetRemoveAnAttorneyTemplateErrors(t *testing.T) {
 		}).
 		Return(expectedError)
 
-	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, template.Func))
+	confirmTemplate := &mockTemplate{}
+
+	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func))
 
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-1111-2222-3333/remove-an-attorney", nil)
 	_, err := server.serve(req)
@@ -222,19 +228,21 @@ func TestPostRemoveAnAttorneyInvalidData(t *testing.T) {
 		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
 		Return(removeAnAttorneyCaseSummary, nil)
 
-	template := &mockTemplate{}
-	template.
+	removeTemplate := &mockTemplate{}
+	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
-			SelectedAttorney: "",
-			CaseSummary:      removeAnAttorneyCaseSummary,
-			ActiveAttorneys:  activeAttorneys,
+			SelectedAttorneyUid: "",
+			CaseSummary:         removeAnAttorneyCaseSummary,
+			ActiveAttorneys:     activeAttorneys,
 			Error: sirius.ValidationError{Field: sirius.FieldErrors{
 				"selectAttorney": {"reason": "Please select an attorney for removal."},
 			}},
 		}).
 		Return(nil)
 
-	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, template.Func))
+	confirmTemplate := &mockTemplate{}
+
+	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func))
 
 	form := url.Values{}
 
@@ -244,24 +252,29 @@ func TestPostRemoveAnAttorneyInvalidData(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
-	mock.AssertExpectationsForObjects(t, client, template)
+	mock.AssertExpectationsForObjects(t, client, removeTemplate)
 }
 
 func TestPostRemoveAnAttorneyValidData(t *testing.T) {
-	caseSummary := sirius.CaseSummary{
-		DigitalLpa: sirius.DigitalLpa{
-			UID: "M-1111-2222-3333",
-		},
-	}
-
 	client := &mockRemoveAnAttorneyClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
-		Return(caseSummary, nil)
+		Return(removeAnAttorneyCaseSummary, nil)
 
-	template := &mockTemplate{}
+	removeTemplate := &mockTemplate{}
+	confirmTemplate := &mockTemplate{}
+	confirmTemplate.
+		On("Func", mock.Anything, removeAnAttorneyData{
+			CaseSummary:          removeAnAttorneyCaseSummary,
+			ActiveAttorneys:      activeAttorneys,
+			SelectedAttorneyUid:  "302b05c7-896c-4290-904e-2005e4f1e81e",
+			SelectedAttorneyName: "Jack Black",
+			SelectedAttorneyDob:  "1990-02-22",
+			Error:                sirius.ValidationError{Field: sirius.FieldErrors{}},
+		}).
+		Return(nil)
 
-	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, template.Func))
+	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func))
 
 	form := url.Values{
 		"selectedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
@@ -269,8 +282,33 @@ func TestPostRemoveAnAttorneyValidData(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/remove-an-attorney", strings.NewReader(form.Encode()))
 	req.Header.Add("Content-Type", formUrlEncoded)
+	resp, err := server.serve(req)
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.Code)
+	mock.AssertExpectationsForObjects(t, client, confirmTemplate)
+}
+
+func TestPostConfirmAttorneyRemovalValidData(t *testing.T) {
+	client := &mockRemoveAnAttorneyClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+		Return(removeAnAttorneyCaseSummary, nil)
+
+	removeTemplate := &mockTemplate{}
+	confirmTemplate := &mockTemplate{}
+
+	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func))
+
+	form := url.Values{
+		"selectedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
+		"confirmRemoval":   {""},
+	}
+
+	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/remove-an-attorney", strings.NewReader(form.Encode()))
+	req.Header.Add("Content-Type", formUrlEncoded)
 	_, err := server.serve(req)
 
-	assert.Equal(t, RedirectError("/lpa/M-1111-2222-3333/confirm-attorney-removal/302b05c7-896c-4290-904e-2005e4f1e81e"), err)
-	mock.AssertExpectationsForObjects(t, client, template)
+	assert.Equal(t, RedirectError("/lpa/M-1111-2222-3333"), err)
+	mock.AssertExpectationsForObjects(t, client, removeTemplate)
 }

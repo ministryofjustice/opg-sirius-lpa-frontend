@@ -24,7 +24,7 @@
             <div class="govuk-radios" data-module="govuk-radios">
               {{ range $num, $attorney := .ActiveAttorneys }}
                 <div class="govuk-radios__item">
-                  <input class="govuk-radios__input" id="f-attorney-{{ plusN $num 1 }}" name="selectedAttorney" type="radio" value="{{ $attorney.Uid }}" {{ if eq $attorney.Uid $.SelectedAttorney }}checked{{ end }}>
+                  <input class="govuk-radios__input" id="f-attorney-{{ plusN $num 1 }}" name="selectedAttorney" type="radio" value="{{ $attorney.Uid }}" {{ if eq $attorney.Uid $.SelectedAttorneyUid }}checked{{ end }}>
                   <label class="govuk-label govuk-radios__label" for="f-attorney-{{ plusN $num 1 }}">
                     {{ $attorney.FirstNames }} {{ $attorney.LastName }}
                     <br>
