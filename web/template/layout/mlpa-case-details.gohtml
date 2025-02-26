@@ -1,0 +1,8 @@
+{{ define "mlpa-case-details" }}
+    <p class="govuk-body">
+        <strong class="app-!-colour-text-{{ subtypeColour .CaseSummary.DigitalLpa.SiriusData.Subtype }}">
+            {{ subtypeShortFormat .CaseSummary.DigitalLpa.SiriusData.Subtype }}
+        </strong>
+        {{ .CaseSummary.DigitalLpa.UID }}
+    </p>
+{{ end }}

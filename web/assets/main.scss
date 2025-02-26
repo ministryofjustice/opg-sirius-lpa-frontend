@@ -112,6 +112,14 @@ $govuk-assets-path: "../assets/";
   color: govuk-colour("red") !important;
 }
 
+.app-\!-colour-text-light-green {
+  color: govuk-colour("light-green") !important;
+}
+
+.app-\!-colour-text-turquoise {
+  color: govuk-colour("turquoise") !important;
+}
+
 .app-\!-pre-wrap {
   white-space: pre-wrap;
 }

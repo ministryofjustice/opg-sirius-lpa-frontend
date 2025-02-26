@@ -150,6 +150,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		},
 		"subtypeShortFormat": subtypeShortFormat,
 		"subtypeLongFormat":  subtypeLongFormat,
+		"subtypeColour":      subtypeColour,
 		"howAttorneysMakeDecisionsLongForm": func(s string) string {
 			switch s {
 			case "jointly":
@@ -342,6 +343,17 @@ func StatusLabelFormat(status string) string {
 		return "draft"
 	}
 
+}
+
+func subtypeColour(subtype string) string {
+	switch strings.ToLower(subtype) {
+	case "personal-welfare":
+		return "light-green"
+	case "property-and-affairs":
+		return "turquoise"
+	default:
+		return ""
+	}
 }
 
 func caseTab(caseSummary sirius.CaseSummary, tabName string) CaseTabData {
