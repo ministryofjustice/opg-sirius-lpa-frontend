@@ -3,29 +3,29 @@ package server
 import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-type RemoveAnAttorneyClient interface {
+type ConfirmAttorneyRemovalClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
 }
 
-type removeAnAttorneyData struct {
+type confirmAttorneyRemovalData struct {
 	CaseSummary sirius.CaseSummary
 
-	ActiveAttorneys  []sirius.LpaStoreAttorney
+	Attorney         sirius.LpaStoreAttorney
 	SelectedAttorney string
 	Error            sirius.ValidationError
 	XSRFToken        string
 }
 
-func RemoveAnAttorney(client RemoveAnAttorneyClient, tmpl template.Template) Handler {
+func ConfirmAttorneyRemoval(client ConfirmAttorneyRemovalClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		uid := chi.URLParam(r, "uid")
+		attorneyUID := chi.URLParam(r, "attorneyUID")
 		ctx := getContext(r)
 
 		caseSummary, err := client.CaseSummary(ctx, uid)
@@ -34,23 +34,19 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, tmpl template.Template) Han
 			return err
 		}
 
-		data := removeAnAttorneyData{
+		data := confirmAttorneyRemovalData{
 			SelectedAttorney: postFormString(r, "selectedAttorney"),
 			CaseSummary:      caseSummary,
 			XSRFToken:        ctx.XSRFToken,
 			Error:            sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}
 
-		lpa := data.CaseSummary.DigitalLpa
+		attorneys := caseSummary.DigitalLpa.LpaStoreData.Attorneys
 
-		for _, attorney := range lpa.LpaStoreData.Attorneys {
-			if (attorney.Status == shared.RemovedAttorneyStatus.String()) ||
-				(attorney.AppointmentType == shared.ReplacementAppointmentType.String() &&
-					attorney.Status == shared.InactiveAttorneyStatus.String()) {
-				continue
+		for i, att := range attorneys {
+			if att.Uid == attorneyUID {
+				data.Attorney = attorneys[i]
 			}
-
-			data.ActiveAttorneys = append(data.ActiveAttorneys, attorney)
 		}
 
 		if r.Method == http.MethodPost {
