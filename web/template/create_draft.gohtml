@@ -21,14 +21,14 @@
         <p class="govuk-body">
           Case reference number{{ if (eq (len .Uids) 2) }}s{{ end }}
           {{ range .Uids }}
-            <br><a href="{{ prefix (printf "/lpa/%s" .Uid) }}">{{ .Uid }}</a> {{ ToLower (subtypeLongFormat .Subtype) }}
+            <br><a class="govuk-notification-banner__link" href="{{ prefix (printf "/lpa/%s" .Uid) }}">{{ .Uid }}</a> {{ ToLower (subtypeLongFormat .Subtype) }}
           {{ end }}
         </p>
       </div>
     </div>
     <a href="{{ prefix (printf "/lpa/%s" (index .Uids 0).Uid ) }}" class="govuk-button govuk-button--secondary">View donor record</a>
-    <p class="govuk-body"><a href="{{ prefix (printf "/create-additional-draft-lpa?id=%d" .DonorId ) }} " class="govuk-link">Create another draft LPA for this donor</a></p>
-    <p class="govuk-body"><a href="{{ prefix ("/digital-lpa/create") }}" class="govuk-link">Create a draft LPA for a new donor</a></p>
+    <p class="govuk-body"><a class="govuk-link" href="{{ prefix (printf "/create-additional-draft-lpa?id=%d" .DonorId ) }}">Create another draft LPA for this donor</a></p>
+    <p class="govuk-body"><a class="govuk-link" href="{{ prefix ("/digital-lpa/create") }}">Create a draft LPA for a new donor</a></p>
   {{ else }}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">

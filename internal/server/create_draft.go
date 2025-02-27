@@ -158,12 +158,11 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 						Uid:     uid,
 					})
 				}
-				digitalLpa, err := client.DigitalLpa(ctx, data.Uids[0].Uid)
 
+				digitalLpa, err := client.DigitalLpa(ctx, data.Uids[0].Uid)
 				if err != nil {
 					return err
 				}
-
 				data.DonorId = digitalLpa.SiriusData.Donor.ID
 			}
 		}

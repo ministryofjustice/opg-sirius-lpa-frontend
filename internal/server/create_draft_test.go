@@ -34,6 +34,11 @@ func (m *mockCreateDraftClient) RefDataByCategory(ctx sirius.Context, category s
 	return nil, args.Error(1)
 }
 
+func (m *mockCreateDraftClient) DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error) {
+	args := m.Called(ctx, uid)
+	return args.Get(0).(sirius.DigitalLpa), args.Error(1)
+}
+
 func TestGetCreateDraft(t *testing.T) {
 	client := &mockCreateDraftClient{}
 	client.
@@ -90,6 +95,9 @@ func TestPostCreateDraft(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+	client.
+		On("DigitalLpa", mock.Anything, "M-0123-4567-8901").
+		Return(sirius.DigitalLpa{UID: "M-0123-4567-8901", SiriusData: sirius.SiriusData{Donor: sirius.Donor{ID: 111}}}, nil)
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			CaseType:                  []string{"property-and-affairs", "personal-welfare"},
@@ -161,6 +169,7 @@ func TestPostCreateDraft(t *testing.T) {
 			Uids: []createDraftResult{
 				{Subtype: "property-and-affairs", Uid: "M-0123-4567-8901"},
 			},
+			DonorId: 111,
 		}).
 		Return(nil)
 

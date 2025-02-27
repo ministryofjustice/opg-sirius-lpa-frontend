@@ -6,6 +6,16 @@ describe("Create Digital LPA draft", () => {
         roles: ["OPG User", "private-mlpa"],
       },
     });
+    cy.addMock(`/lpa-api/v1/digital-lpas/M-GHIJ-7890-KLMN`, "GET", {
+      status: 200,
+      body: {
+        "opg.poas.sirius": {
+          donor: {
+            id: 33,
+          },
+        },
+      },
+    });
 
     cy.visit("/digital-lpa/create");
   });
@@ -71,14 +81,14 @@ describe("Create Digital LPA draft", () => {
     cy.get("#f-donorEmail").type("c.morneault@somehost.example");
 
     cy.contains("Confirm and create draft LPA").click();
-    cy.get(".govuk-panel").contains(
-      "Draft Personal welfare and Property and affairs LPAs for the donor Coleen Stephanie Morneault have been saved",
+    cy.get(".govuk-notification-banner").contains(
+      "2 draft LPAs for Coleen Stephanie Morneault have been created.",
     );
-    cy.get(".govuk-panel").contains(
-      "Personal welfare case reference number is M-GHIJ-7890-KLMN",
+    cy.get(".govuk-notification-banner").contains(
+      "M-GHIJ-7890-KLMN personal welfare",
     );
-    cy.get(".govuk-panel").contains(
-      "Property and affairs case reference number is M-ABCD-1234-EF56",
+    cy.get(".govuk-notification-banner").contains(
+      "M-ABCD-1234-EF56 property and affairs",
     );
   });
 });
