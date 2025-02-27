@@ -25,12 +25,12 @@ type changeDraftData struct {
 }
 
 type formDraftDetails struct {
-	FirstNames  string            `form:"firstNames"`
-	LastName    string            `form:"lastName"`
-	DateOfBirth sirius.DateString `form:"dob"`
-	Address     sirius.Address    `form:"address"`
-	PhoneNumber string            `form:"phoneNumber"`
-	Email       string            `form:"email"`
+	FirstNames  string         `form:"firstNames"`
+	LastName    string         `form:"lastName"`
+	DateOfBirth dob            `form:"dob"`
+	Address     sirius.Address `form:"address"`
+	PhoneNumber string         `form:"phoneNumber"`
+	Email       string         `form:"email"`
 }
 
 func ChangeDraft(client ChangeDraftClient, tmpl template.Template) Handler {
@@ -50,13 +50,18 @@ func ChangeDraft(client ChangeDraftClient, tmpl template.Template) Handler {
 
 		donor := cs.DigitalLpa.SiriusData.Donor
 
+		dob, err := parseDate(string(donor.DateOfBirth))
+		if err != nil {
+			return err
+		}
+
 		data := changeDraftData{
 			XSRFToken: ctx.XSRFToken,
 			CaseUID:   caseUID,
 			Form: formDraftDetails{
 				FirstNames:  donor.Firstname,
 				LastName:    donor.Surname,
-				DateOfBirth: donor.DateOfBirth,
+				DateOfBirth: dob,
 				Address: sirius.Address{
 					Line1:    donor.AddressLine1,
 					Line2:    donor.AddressLine2,
@@ -92,12 +97,12 @@ func ChangeDraft(client ChangeDraftClient, tmpl template.Template) Handler {
 			}
 
 			draftData := sirius.ChangeDraft{
-				FirstNames: data.Form.FirstNames,
-				LastName:   data.Form.LastName,
-				//DateOfBirth: data.Form.DateOfBirth.toDateString(),
-				Address: data.Form.Address,
-				Phone:   data.Form.PhoneNumber,
-				Email:   data.Form.Email,
+				FirstNames:  data.Form.FirstNames,
+				LastName:    data.Form.LastName,
+				DateOfBirth: data.Form.DateOfBirth.toDateString(),
+				Address:     data.Form.Address,
+				Phone:       data.Form.PhoneNumber,
+				Email:       data.Form.Email,
 			}
 
 			err = client.ChangeDraft(ctx, caseUID, draftData)

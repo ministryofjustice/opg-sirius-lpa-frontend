@@ -8,12 +8,12 @@ import (
 )
 
 type ChangeDraft struct {
-	FirstNames string `json:"firstNames"`
-	LastName   string `json:"lastName"`
-	//DateOfBirth       DateString `json:"dateOfBirth"`
-	Address Address `json:"address"`
-	Phone   string  `json:"phoneNumber"`
-	Email   string  `json:"email"`
+	FirstNames  string     `json:"firstNames"`
+	LastName    string     `json:"lastName"`
+	DateOfBirth DateString `json:"dateOfBirth"`
+	Address     Address    `json:"address"`
+	Phone       string     `json:"phoneNumber"`
+	Email       string     `json:"email"`
 }
 
 func (c *Client) ChangeDraft(ctx Context, caseUID string, draftDetails ChangeDraft) error {
