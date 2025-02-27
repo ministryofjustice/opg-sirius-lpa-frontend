@@ -53,6 +53,7 @@ type formDraft struct {
 
 type CreateDraftClient interface {
 	CreateDraft(ctx sirius.Context, draft sirius.Draft) (map[string]string, error)
+	DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error)
 	GetUserDetails(ctx sirius.Context) (sirius.User, error)
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
@@ -69,6 +70,7 @@ type createDraftData struct {
 	Error     sirius.ValidationError
 	Success   bool
 	Uids      []createDraftResult
+	DonorId   int
 }
 
 func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
@@ -156,6 +158,12 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 						Uid:     uid,
 					})
 				}
+
+				digitalLpa, err := client.DigitalLpa(ctx, data.Uids[0].Uid)
+				if err != nil {
+					return err
+				}
+				data.DonorId = digitalLpa.SiriusData.Donor.ID
 			}
 		}
 

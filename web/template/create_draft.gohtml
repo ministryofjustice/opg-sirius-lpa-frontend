@@ -4,36 +4,31 @@
 
 {{ define "main" }}
   {{ if .Success }}
-    <div class="govuk-panel govuk-panel--confirmation">
-      <h1 class="govuk-panel__title">
-        {{ if (eq (len .Uids) 2) }}
-          Draft Personal welfare and Property and affairs LPAs for the donor
-          {{ .Form.DonorFirstname }} {{ .Form.DonorSurname }} have been saved
-        {{ else }}
-          A draft
-            {{ range .Uids }}{{ subtypeLongFormat .Subtype }} {{ end }}
-          LPA for the donor {{ .Form.DonorFirstname }} {{ .Form.DonorSurname }} has been saved
-        {{ end }}
-      </h1>
-      <div class="govuk-panel__body app-panel__body--smaller">
-        <p>Please inform the caller of their case reference number [insert when/how]</p>
-        <p>
+    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+      <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+          Success
+        </h2>
+      </div>
+      <div class="govuk-notification-banner__content">
+        <h3 class="govuk-notification-banner__heading">
+          {{ if (eq (len .Uids) 2) }}
+            2 draft LPAs for {{ .Form.DonorFirstname }} {{ .Form.DonorSurname }} have been created.
+          {{ else }}
+            A draft LPA for {{ .Form.DonorFirstname }} {{ .Form.DonorSurname }} has been created.
+          {{ end }}
+        </h3>
+        <p class="govuk-body">
+          Case reference number{{ if (eq (len .Uids) 2) }}s{{ end }}
           {{ range .Uids }}
-            <div><strong>{{ subtypeLongFormat .Subtype }} case reference number is {{ .Uid }}</strong></div>
+            <br><a class="govuk-notification-banner__link" href="{{ prefix (printf "/lpa/%s" .Uid) }}">{{ .Uid }}</a> {{ ToLower (subtypeLongFormat .Subtype) }}
           {{ end }}
         </p>
-        <p><a class="govuk-link govuk-link--inverse" href="{{ prefix (printf "/lpa/%s" (index .Uids 0).Uid ) }}">View donor record</a></p>
       </div>
     </div>
-
-    <h2 class="govuk-heading-m">What happens next?</h2>
-
-    <p class="govuk-body">Insert content that provides the user with relevant guidance. Let them know it will appear on the timeline and what they can and must do following the creation of the draft.</p>
-
-    <div class="govuk-button-group">
-      <a href="{{ prefix ("/digital-lpa/create") }}" class="govuk-button govuk-button--secondary">Create another draft LPA</button>
-      <a class="govuk-link govuk-link--no-visited-state" href="/">Return to case home</a>
-    </div>
+    <a href="{{ prefix (printf "/lpa/%s" (index .Uids 0).Uid ) }}" class="govuk-button govuk-button--secondary">View donor record</a>
+    <p class="govuk-body"><a class="govuk-link" href="{{ prefix (printf "/create-additional-draft-lpa?id=%d" .DonorId ) }}">Create another draft LPA for this donor</a></p>
+    <p class="govuk-body"><a class="govuk-link" href="{{ prefix ("/digital-lpa/create") }}">Create a draft LPA for a new donor</a></p>
   {{ else }}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
