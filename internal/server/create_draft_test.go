@@ -97,7 +97,7 @@ func TestPostCreateDraft(t *testing.T) {
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 	client.
 		On("DigitalLpa", mock.Anything, "M-0123-4567-8901").
-		Return(sirius.DigitalLpa{UID: "M-0123-4567-8901", SiriusData: sirius.SiriusData{Donor: sirius.Donor{ID: 111}}}, nil)
+		Return(sirius.DigitalLpa{UID: "M-0123-4567-8901", SiriusData: sirius.SiriusData{Donor: sirius.Donor{ID: 111, Firstname: "Gerald Ryan", Surname: "Sandel"}}}, nil)
 	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			CaseType:                  []string{"property-and-affairs", "personal-welfare"},
@@ -169,7 +169,7 @@ func TestPostCreateDraft(t *testing.T) {
 			Uids: []createDraftResult{
 				{Subtype: "property-and-affairs", Uid: "M-0123-4567-8901"},
 			},
-			DonorId: 111,
+			Donor: sirius.Donor{ID: 111, Firstname: "Gerald Ryan", Surname: "Sandel"},
 		}).
 		Return(nil)
 

@@ -12,6 +12,8 @@ describe("Create Digital LPA draft", () => {
         "opg.poas.sirius": {
           donor: {
             id: 33,
+            firstname: "Coleen Stephanie",
+            surname: "Morneault",
           },
         },
       },
@@ -85,10 +87,10 @@ describe("Create Digital LPA draft", () => {
       "2 draft LPAs for Coleen Stephanie Morneault have been created.",
     );
     cy.get(".govuk-notification-banner").contains(
-      "M-GHIJ-7890-KLMN personal welfare",
+      "M-GHIJ-7890-KLMN Personal welfare",
     );
     cy.get(".govuk-notification-banner").contains(
-      "M-ABCD-1234-EF56 property and affairs",
+      "M-ABCD-1234-EF56 Property and affairs",
     );
   });
 });

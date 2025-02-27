@@ -70,7 +70,7 @@ type createDraftData struct {
 	Error     sirius.ValidationError
 	Success   bool
 	Uids      []createDraftResult
-	DonorId   int
+	Donor     sirius.Donor
 }
 
 func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
@@ -163,7 +163,7 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 				if err != nil {
 					return err
 				}
-				data.DonorId = digitalLpa.SiriusData.Donor.ID
+				data.Donor = digitalLpa.SiriusData.Donor
 			}
 		}
 
