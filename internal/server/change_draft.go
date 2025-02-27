@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -39,8 +40,7 @@ func ChangeDraft(client ChangeDraftClient, tmpl template.Template) Handler {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
-		caseUID := r.FormValue("uid")
-
+		caseUID := chi.URLParam(r, "uid")
 		ctx := getContext(r)
 
 		cs, err := client.CaseSummary(ctx, caseUID)

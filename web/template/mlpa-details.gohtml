@@ -29,7 +29,7 @@
           <dt class="govuk-summary-list__key"></dt>
           <dd class="govuk-summary-list__value"></dd>
           <dd class="govuk-summary-list__actions">
-            <a class="govuk-link" id="f-change-draft" href="{{ prefix (printf "/change-draft?uid=%s" .CaseSummary.DigitalLpa.UID) }}">Change</a>
+            <a class="govuk-link" id="f-change-draft" href="{{ prefix (printf "/lpa/%s/change-draft" .CaseSummary.DigitalLpa.UID) }}">Change</a>
           </dd>
         </div>
 
