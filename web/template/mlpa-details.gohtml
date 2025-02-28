@@ -12,6 +12,9 @@
           {{ template "mlpa-header" (caseTabs .CaseSummary "lpa-details") }}
 
           <div class="govuk-!-margin-bottom-5">
+            {{ if .FlashMessage.Title }}
+              {{ template "notification-banner" .FlashMessage }}
+            {{ end }}
             <h1 class="govuk-heading-l govuk-!-margin-bottom-1">LPA details</h1>
 
             {{ if ne .DigitalLpa.SiriusData.DueDate "" }}
@@ -24,6 +27,15 @@
       <h2 class="govuk-heading-m">Donor</h2>
 
       <dl class="govuk-summary-list">
+
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key"></dt>
+          <dd class="govuk-summary-list__value"></dd>
+          <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" id="f-change-draft" href="{{ prefix (printf "/lpa/%s/change-draft" .CaseSummary.DigitalLpa.UID) }}">Change</a>
+          </dd>
+        </div>
+
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">Application format</dt>
           <dd class="govuk-summary-list__value">
