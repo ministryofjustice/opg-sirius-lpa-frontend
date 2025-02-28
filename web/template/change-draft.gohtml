@@ -1,0 +1,57 @@
+{{ template "page" . }}
+
+{{ define "title" }}Change donor details{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            <a href="{{ prefix (printf "/lpa/%s/lpa-details" .CaseUID )}}" class="govuk-back-link">Back to LPA details</a>
+
+            {{ template "error-summary" .Error }}
+
+            {{ if .Success }}
+                <meta data-app-reload="page" />
+                {{ template "success-banner" "You have changed attorney details." }}
+            {{ end }}
+
+            <h1 class="govuk-heading-l app-!-embedded-hide">
+                Change donor details
+            </h1>
+
+            <p class="govuk-body govuk-!-font-weight-bold">
+                Details that apply to all LPAs for this donor
+            </p>
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+                {{ template "input" (field "firstNames" "Donor’s first names" .Form.FirstNames .Error.Field.FirstNames) }}
+                {{ template "input" (field "lastName" "Donor’s last name" .Form.LastName .Error.Field.LastName) }}
+                {{ template "date" (field "dob" "Date of birth" .Form.DateOfBirth .Error.Field.DateOfBirth) }}
+                <div class="govuk-form-group {{ if .Error.Field.Address }}govuk-form-group--error{{ end }}" data-app-address-finder-label="Donor's address">
+                    <legend class="govuk-fieldset__legend">
+                        <h2 class="govuk-fieldset__heading">
+                            {{"Donor's address"}}
+                        </h2>
+                    </legend>
+                    {{ template "input" (field "address.Line1" "Address line 1" .Form.Address.Line1 (index .Error.Field "address/addressLine1") "data-app-address-finder-map" "addressLine1") }}
+                    {{ template "input" (field "address.Line2" "Address line 2 (optional)" .Form.Address.Line2 (index .Error.Field "address/addressLine2") "data-app-address-finder-map" "addressLine2") }}
+                    {{ template "input" (field "address.Line3" "Address line 3 (optional)" .Form.Address.Line3 (index .Error.Field "address/addressLine3") "data-app-address-finder-map" "addressLine3") }}
+                    {{ template "input" (field "address.Town" "Town or city" .Form.Address.Town (index .Error.Field "address/town") "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "address.Postcode" "Postcode" .Form.Address.Postcode (index .Error.Field "address/postcode") "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "select" (select "address.Country" "Country" .Form.Address.Country (index .Error.Field "address/country") (options .Countries) "data-app-address-finder-map" "country") }}
+                </div>
+
+                {{ template "input" (field "phoneNumber" "Donor’s phone number (optional)" .Form.PhoneNumber .Error.Field.PhoneNumber) }}
+                {{ template "input" (field "email" "Donor’s email address (optional)" .Form.Email .Error.Field.Email) }}
+
+                <div class="govuk-button-group">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Save and continue</button><br/>
+                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s/lpa-details" .CaseUID )}}">Cancel</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+{{ end }}
