@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
 	"net/http"
 	"strings"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -23,6 +24,16 @@ func newPact() *dsl.Pact {
 		LogDir:            "../../logs",
 		PactDir:           "../../pacts",
 	}
+}
+
+func newPact2() (*consumer.V2HTTPMockProvider, error) {
+	return consumer.NewV2Pact(consumer.MockHTTPProviderConfig{
+		Consumer: "sirius-lpa-frontend",
+		Provider: "sirius",
+		Host:     "localhost",
+		LogDir:   "../../logs",
+		PactDir:  "../../pacts",
+	})
 }
 
 func TestStatusError(t *testing.T) {
