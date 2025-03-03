@@ -1,4 +1,4 @@
-import { nodeListForEach } from "@ministryofjustice/frontend";
+import { nodeListForEach } from "./lib/nodeListForEach";
 
 /**
  * @typedef {Object} Options
