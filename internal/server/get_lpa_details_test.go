@@ -102,7 +102,13 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 				},
 			},
 		},
-		TaskList: []sirius.Task{},
+		TaskList: []sirius.Task{
+			{
+				ID:     1,
+				Name:   "Review restrictions and conditions",
+				Status: "OPEN",
+			},
+		},
 	}
 
 	anomalies := []sirius.Anomaly{
@@ -148,9 +154,10 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getLpaDetails{
-			CaseSummary:    caseSummary,
-			DigitalLpa:     caseSummary.DigitalLpa,
-			AnomalyDisplay: &expectedAnomalyDisplay,
+			CaseSummary:        caseSummary,
+			DigitalLpa:         caseSummary.DigitalLpa,
+			AnomalyDisplay:     &expectedAnomalyDisplay,
+			ReviewRestrictions: true,
 			ReplacementAttorneys: []sirius.LpaStoreAttorney{
 				{
 					Status:          shared.InactiveAttorneyStatus.String(),
