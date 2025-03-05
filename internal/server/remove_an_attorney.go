@@ -2,15 +2,16 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"net/http"
 )
 
 type RemoveAnAttorneyClient interface {
-	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
+	CaseSummary(sirius.Context, string, bool) (sirius.CaseSummary, error)
 }
 
 type removeAnAttorneyData struct {
@@ -29,7 +30,7 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 		uid := chi.URLParam(r, "uid")
 		ctx := getContext(r)
 
-		caseSummary, err := client.CaseSummary(ctx, uid)
+		caseSummary, err := client.CaseSummary(ctx, uid, false)
 
 		if err != nil {
 			return err
