@@ -2,19 +2,20 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+	"testing"
+
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"net/http"
-	"testing"
 )
 
 type mockChangeCertificateDetailsClient struct {
 	mock.Mock
 }
 
-func (m *mockChangeCertificateDetailsClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
-	args := m.Called(ctx, uid)
+func (m *mockChangeCertificateDetailsClient) CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error) {
+	args := m.Called(ctx, uid, presignImages)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
@@ -58,7 +59,7 @@ func TestGetChangeCertificateProviderDetails(t *testing.T) {
 
 	client := &mockChangeCertificateDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, caseUid).
+		On("CaseSummary", mock.Anything, caseUid, false).
 		Return(caseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
@@ -114,7 +115,7 @@ func TestGetChangeCertificateProviderDetailsCaseSummaryError(t *testing.T) {
 
 	client := &mockChangeCertificateDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, caseUid).
+		On("CaseSummary", mock.Anything, caseUid, false).
 		Return(caseSummary, expectedError)
 
 	template := &mockTemplate{}
@@ -144,7 +145,7 @@ func TestGetChangeCertificateProviderDetailsRefDataByCategoryError(t *testing.T)
 
 	client := &mockChangeCertificateDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, caseUid).
+		On("CaseSummary", mock.Anything, caseUid, false).
 		Return(caseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
@@ -177,7 +178,7 @@ func TestPostChangeCertificateProviderDetailsRedirectReturned(t *testing.T) {
 
 	client := &mockChangeCertificateDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, caseUid).
+		On("CaseSummary", mock.Anything, caseUid, false).
 		Return(caseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).

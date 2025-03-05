@@ -53,7 +53,7 @@ type formDraft struct {
 
 type CreateDraftClient interface {
 	CreateDraft(ctx sirius.Context, draft sirius.Draft) (map[string]string, error)
-	DigitalLpa(ctx sirius.Context, uid string) (sirius.DigitalLpa, error)
+	DigitalLpa(ctx sirius.Context, uid string, presignImages bool) (sirius.DigitalLpa, error)
 	GetUserDetails(ctx sirius.Context) (sirius.User, error)
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
@@ -159,7 +159,7 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 					})
 				}
 
-				digitalLpa, err := client.DigitalLpa(ctx, data.Uids[0].Uid)
+				digitalLpa, err := client.DigitalLpa(ctx, data.Uids[0].Uid, false)
 				if err != nil {
 					return err
 				}

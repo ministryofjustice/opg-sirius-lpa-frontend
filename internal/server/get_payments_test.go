@@ -36,8 +36,8 @@ func (m *mockGetPayments) GetUserDetails(ctx sirius.Context) (sirius.User, error
 	return args.Get(0).(sirius.User), args.Error(1)
 }
 
-func (m *mockGetPayments) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
-	args := m.Called(ctx, uid)
+func (m *mockGetPayments) CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error) {
+	args := m.Called(ctx, uid, presignImages)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
@@ -204,7 +204,7 @@ func TestGetPaymentsWhenFailureOnGetCase(t *testing.T) {
 func TestGetPaymentsWhenFailureOnGetCaseSummary(t *testing.T) {
 	client := &mockGetPayments{}
 	client.
-		On("CaseSummary", mock.Anything, "M-QQQQ-WWWW-EEEE").
+		On("CaseSummary", mock.Anything, "M-QQQQ-WWWW-EEEE", false).
 		Return(sirius.CaseSummary{}, expectedError)
 
 	server := newMockServer("/lpa/{uid}/payments", GetPayments(client, nil))
@@ -627,7 +627,7 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 		Return(allPayments, nil).
 		On("Case", mock.Anything, 742).
 		Return(caseItem, nil).
-		On("CaseSummary", mock.Anything, "M-QQQQ-EEEE-YYYY").
+		On("CaseSummary", mock.Anything, "M-QQQQ-EEEE-YYYY", false).
 		Return(caseSummary, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil).
