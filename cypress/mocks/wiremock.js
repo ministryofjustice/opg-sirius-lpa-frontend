@@ -1,4 +1,4 @@
-async function addMock(url, method, response) {
+async function addMock(url, method, response, priority) {
   if (typeof response.body !== "string") {
     response.body = JSON.stringify(response.body);
   }
@@ -11,6 +11,7 @@ async function addMock(url, method, response) {
         method,
       },
       response,
+      priority,
     }),
   });
 }
