@@ -41,7 +41,7 @@ func TestChangeDraft(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A request to create a draft LPA with minimal data").
+					Given("A digital LPA exists").
 					UponReceiving("A request for changing draft").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,

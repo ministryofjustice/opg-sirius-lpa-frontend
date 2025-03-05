@@ -43,8 +43,35 @@ func ChangeDraft(client ChangeDraftClient, tmpl template.Template) Handler {
 		caseUID := chi.URLParam(r, "uid")
 		ctx := getContext(r)
 
+		var countries []sirius.RefDataItem
+		var cs sirius.CaseSummary
+		var data changeDraftData
+
 		cs, err := client.CaseSummary(ctx, caseUID)
 		if err != nil {
+			return err
+		}
+
+		group, groupCtx := errgroup.WithContext(ctx.Context)
+
+		group.Go(func() error {
+			cs, err = client.CaseSummary(ctx.With(groupCtx), caseUID)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		group.Go(func() error {
+			var err error
+			countries, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.CountryCategory)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
 			return err
 		}
 
@@ -55,7 +82,7 @@ func ChangeDraft(client ChangeDraftClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data := changeDraftData{
+		data = changeDraftData{
 			XSRFToken: ctx.XSRFToken,
 			CaseUID:   caseUID,
 			Form: formDraftDetails{
@@ -73,21 +100,7 @@ func ChangeDraft(client ChangeDraftClient, tmpl template.Template) Handler {
 				PhoneNumber: donor.Phone,
 				Email:       donor.Email,
 			},
-		}
-
-		group, groupCtx := errgroup.WithContext(ctx.Context)
-
-		group.Go(func() error {
-			var err error
-			data.Countries, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.CountryCategory)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-
-		if err := group.Wait(); err != nil {
-			return err
+			Countries: countries,
 		}
 
 		if r.Method == http.MethodPost {
