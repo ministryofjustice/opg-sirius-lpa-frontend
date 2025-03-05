@@ -1,10 +1,11 @@
 package server
 
 import (
-	"github.com/go-chi/chi/v5"
-	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
+
+	"github.com/go-chi/chi/v5"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
