@@ -4,39 +4,7 @@
 
 {{ define "main" }}
 	{{ if .Success }}
-
-		<div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
-			<div class="govuk-notification-banner__header">
-				<h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
-					Success
-				</h2>
-			</div>
-			<div class="govuk-notification-banner__content">
-				<h3 class="govuk-notification-banner__heading">
-					{{ if eq 2 (len .Uids) }}
-						2 draft LPAs for {{ .Donor.Firstname }} {{ .Donor.Surname }} have been created.
-					{{ else }}
-						A draft LPA for {{ .Donor.Firstname }} {{ .Donor.Surname }} has been created.
-					{{ end }}
-				</h3>
-				<p class="govuk-body">
-					{{ if eq 2 (len .Uids) }}
-						Case reference numbers
-					{{ else }}
-						Case reference number
-					{{ end }}
-					{{ range .Uids }}
-					<br><a class="govuk-notification-banner__link" href="{{ prefix (printf "/lpa/%s" .Uid) }}">{{ .Uid }}</a> {{ subtypeLongFormat .Subtype }}
-					{{ end }}
-				</p>
-			</div>
-		</div>
-
-		<div class="govuk-button-group">
-			<a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/lpa/%s" (index .Uids 0).Uid ) }}">View donor record</a>
-			<a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/create-additional-draft-lpa?id=%d" .Donor.ID ) }}">Create another draft LPA</a>
-		</div>
-
+    {{ template "create_lpa_success_banner" . }}
 	{{ else }}
 		<a href="{{ prefix (printf "/lpa/%s" (index .Donor.Cases 0).UID )}}" class="govuk-back-link">Back</a>
 		<div class="govuk-grid-row">
