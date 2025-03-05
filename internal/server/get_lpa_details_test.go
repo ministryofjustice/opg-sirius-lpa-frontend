@@ -2,20 +2,21 @@ package server
 
 import (
 	"errors"
+	"net/http"
+	"testing"
+
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"net/http"
-	"testing"
 )
 
 type mockGetLpaDetailsClient struct {
 	mock.Mock
 }
 
-func (m *mockGetLpaDetailsClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
-	args := m.Called(ctx, uid)
+func (m *mockGetLpaDetailsClient) CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error) {
+	args := m.Called(ctx, uid, presignImages)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
@@ -29,7 +30,7 @@ func TestGetLpaDetailsCaseSummaryFail(t *testing.T) {
 
 	client := &mockGetLpaDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-EEEE-9876-9876").
+		On("CaseSummary", mock.Anything, "M-EEEE-9876-9876", true).
 		Return(sirius.CaseSummary{}, expectedError)
 	client.
 		On("AnomaliesForDigitalLpa", mock.Anything, "M-EEEE-9876-9876").
@@ -139,7 +140,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 
 	client := &mockGetLpaDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876", true).
 		Return(caseSummary, nil)
 	client.
 		On("AnomaliesForDigitalLpa", mock.Anything, "M-9876-9876-9876").

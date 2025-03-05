@@ -2,7 +2,7 @@ import * as cases from "../mocks/cases";
 
 describe("Change attorney details form", () => {
   beforeEach(() => {
-    cy.addMock("/lpa-api/v1/digital-lpas/M-1111-1111-1110", "GET", {
+    const lpaResponse = {
       status: 200,
       body: {
         uId: "M-1111-1111-1110",
@@ -72,7 +72,10 @@ describe("Change attorney details form", () => {
           peopleToNotify: [],
         },
       },
-    });
+    };
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-1111-1111-1110", "GET", lpaResponse);
+    cy.addMock("/lpa-api/v1/digital-lpas/M-1111-1111-1110?presignImages", "GET", lpaResponse);
 
     cy.addMock("/lpa-api/v1/cases/555", "GET", {
       status: 200,

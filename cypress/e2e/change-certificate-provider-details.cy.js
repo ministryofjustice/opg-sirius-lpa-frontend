@@ -2,7 +2,7 @@ import * as cases from "../mocks/cases";
 
 describe("Change certificate provider details form", () => {
   beforeEach(() => {
-    cy.addMock("/lpa-api/v1/digital-lpas/M-1111-1111-1111", "GET", {
+    const lpaResponse = {
       status: 200,
       body: {
         uId: "M-1111-1111-1111",
@@ -101,7 +101,10 @@ describe("Change certificate provider details form", () => {
           },
         },
       },
-    });
+    };
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-1111-1111-1111", "GET", lpaResponse);
+    cy.addMock("/lpa-api/v1/digital-lpas/M-1111-1111-1111?presignImages", "GET", lpaResponse);
 
     cases.warnings.empty("1111");
 
