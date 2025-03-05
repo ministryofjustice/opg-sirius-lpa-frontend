@@ -2,16 +2,17 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
-	"net/http"
 )
 
 type ChangeAttorneyDetailsClient interface {
-	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
+	CaseSummary(sirius.Context, string, bool) (sirius.CaseSummary, error)
 	ChangeAttorneyDetails(sirius.Context, string, string, sirius.ChangeAttorneyDetails) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
@@ -48,7 +49,7 @@ func ChangeAttorneyDetails(client ChangeAttorneyDetailsClient, tmpl template.Tem
 
 		ctx := getContext(r)
 
-		cs, err := client.CaseSummary(ctx, caseUID)
+		cs, err := client.CaseSummary(ctx, caseUID, false)
 		if err != nil {
 			return err
 		}

@@ -13,12 +13,12 @@ type CaseSummary struct {
 /**
  * Get data for the case summary area (digital LPA record, tasks, and warnings for that LPA)
  */
-func (c *Client) CaseSummary(ctx Context, uid string) (CaseSummary, error) {
+func (c *Client) CaseSummary(ctx Context, uid string, presignImages bool) (CaseSummary, error) {
 	var cs CaseSummary
 	var err error
 	group, groupCtx := errgroup.WithContext(ctx.Context)
 
-	cs.DigitalLpa, err = c.DigitalLpa(ctx, uid)
+	cs.DigitalLpa, err = c.DigitalLpa(ctx, uid, presignImages)
 	if err != nil {
 		return cs, err
 	}

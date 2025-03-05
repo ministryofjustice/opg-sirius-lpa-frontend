@@ -2,7 +2,7 @@ import * as cases from "../mocks/cases";
 
 describe("Change donor details form", () => {
   beforeEach(() => {
-    cy.addMock("/lpa-api/v1/digital-lpas/M-0000-0000-0001", "GET", {
+    const lpaResponse = {
       status: 200,
       body: {
         uId: "M-0000-0000-0001",
@@ -77,7 +77,14 @@ describe("Change donor details form", () => {
           peopleToNotify: [],
         },
       },
-    });
+    };
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-0000-0000-0001", "GET", lpaResponse);
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-0000-0000-0001?presignImages",
+      "GET",
+      lpaResponse,
+    );
 
     cy.addMock("/lpa-api/v1/cases/666", "GET", {
       status: 200,
