@@ -2,7 +2,7 @@ import * as cases from "../mocks/cases";
 
 describe("View and edit anomalies for a digital LPA", () => {
   beforeEach(() => {
-    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-QQQQ-1111", "GET", {
+    const lpaResponse = {
       status: 200,
       body: {
         uId: "M-DIGI-QQQQ-1111",
@@ -31,7 +31,14 @@ describe("View and edit anomalies for a digital LPA", () => {
           },
         },
       },
-    });
+    };
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-QQQQ-1111", "GET", lpaResponse);
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-DIGI-QQQQ-1111?presignImages",
+      "GET",
+      lpaResponse,
+    );
 
     cases.warnings.empty("111");
 
@@ -118,7 +125,7 @@ describe("View and edit anomalies for a digital LPA", () => {
       },
     });
 
-    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-SSSS-3333", "GET", {
+    const otherLpaResponse = {
       status: 200,
       body: {
         uId: "M-DIGI-SSSS-3333",
@@ -138,7 +145,18 @@ describe("View and edit anomalies for a digital LPA", () => {
           ],
         },
       },
-    });
+    };
+
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-DIGI-SSSS-3333",
+      "GET",
+      otherLpaResponse,
+    );
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-DIGI-SSSS-3333?presignImages",
+      "GET",
+      otherLpaResponse,
+    );
 
     cases.warnings.empty("222");
 
