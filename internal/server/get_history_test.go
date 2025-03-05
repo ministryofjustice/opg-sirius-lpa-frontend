@@ -1,19 +1,20 @@
 package server
 
 import (
+	"net/http"
+	"testing"
+
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"net/http"
-	"testing"
 )
 
 type mockGetHistoryClient struct {
 	mock.Mock
 }
 
-func (m *mockGetHistoryClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
-	args := m.Called(ctx, uid)
+func (m *mockGetHistoryClient) CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error) {
+	args := m.Called(ctx, uid, presignImages)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
@@ -38,7 +39,7 @@ func TestGetHistorySuccess(t *testing.T) {
 
 	client := &mockGetHistoryClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-9876-9876-9999").
+		On("CaseSummary", mock.Anything, "M-9876-9876-9999", false).
 		Return(caseSummary, nil)
 	client.
 		On("GetEvents", mock.Anything, 8, 12).
@@ -77,7 +78,7 @@ func TestGetHistoryWhenFailureOnGetEvents(t *testing.T) {
 
 	client := &mockGetHistoryClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-9876-9876-9999").
+		On("CaseSummary", mock.Anything, "M-9876-9876-9999", false).
 		Return(caseSummary, nil)
 	client.
 		On("GetEvents", mock.Anything, 8, 12).
@@ -95,7 +96,7 @@ func TestGetHistoryWhenFailureOnGetEvents(t *testing.T) {
 func TestGetHistoryWhenFailureOnGetCaseSummary(t *testing.T) {
 	client := &mockGetHistoryClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-9876-9876-9999").
+		On("CaseSummary", mock.Anything, "M-9876-9876-9999", false).
 		Return(sirius.CaseSummary{}, expectedError)
 
 	template := &mockTemplate{}
