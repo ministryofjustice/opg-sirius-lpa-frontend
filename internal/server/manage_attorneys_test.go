@@ -1,21 +1,22 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockManageAttorneysClient struct {
 	mock.Mock
 }
 
-func (m *mockManageAttorneysClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
-	args := m.Called(ctx, uid)
+func (m *mockManageAttorneysClient) CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error) {
+	args := m.Called(ctx, uid, presignImages)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
@@ -28,7 +29,7 @@ func TestGetManageAttorneys(t *testing.T) {
 
 	client := &mockManageAttorneysClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+		On("CaseSummary", mock.Anything, "M-1111-2222-3333", false).
 		Return(caseSummary, nil)
 
 	template := &mockTemplate{}
@@ -54,7 +55,7 @@ func TestGetManageAttorneysGetCaseSummaryFails(t *testing.T) {
 
 	client := &mockManageAttorneysClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+		On("CaseSummary", mock.Anything, "M-1111-2222-3333", false).
 		Return(caseSummary, expectedError)
 
 	template := &mockTemplate{}
@@ -79,7 +80,7 @@ func TestGetManageAttorneysTemplateErrors(t *testing.T) {
 
 	client := &mockManageAttorneysClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+		On("CaseSummary", mock.Anything, "M-1111-2222-3333", false).
 		Return(caseSummary, nil)
 
 	template := &mockTemplate{}
@@ -107,7 +108,7 @@ func TestPostManageAttorneysInvalidData(t *testing.T) {
 
 	client := &mockManageAttorneysClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+		On("CaseSummary", mock.Anything, "M-1111-2222-3333", false).
 		Return(caseSummary, nil)
 
 	template := &mockTemplate{}
@@ -163,7 +164,7 @@ func TestPostManageAttorneysValidData(t *testing.T) {
 
 			client := &mockManageAttorneysClient{}
 			client.
-				On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+				On("CaseSummary", mock.Anything, "M-1111-2222-3333", false).
 				Return(caseSummary, nil)
 
 			template := &mockTemplate{}

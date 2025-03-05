@@ -222,6 +222,9 @@
           <div id="accordion-default-content-5" class="govuk-accordion__section-content">
             <div class="govuk-body">
               <p class="app-newlines-as-br">{{ .DigitalLpa.LpaStoreData.RestrictionsAndConditions }}</p>
+              {{ range .DigitalLpa.LpaStoreData.RestrictionsAndConditionsImages }}
+                <img class="app-!-max-full-width" src="{{ .Path }}" alt="A scanned copy of the donor’s restrictions and/or conditions - the text cannot be digitised at present">
+              {{ end }}
             </div>
           </div>
         </div>
