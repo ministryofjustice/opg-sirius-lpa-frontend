@@ -1,16 +1,17 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 )
 
 type GetHistoryClient interface {
 	GetEvents(ctx sirius.Context, donorId int, caseId int) (any, error)
-	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
+	CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error)
 }
 
 type getHistory struct {
@@ -23,7 +24,7 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 		uid := chi.URLParam(r, "uid")
 		ctx := getContext(r)
 
-		caseSummary, err := client.CaseSummary(ctx, uid)
+		caseSummary, err := client.CaseSummary(ctx, uid, false)
 		if err != nil {
 			return err
 		}
