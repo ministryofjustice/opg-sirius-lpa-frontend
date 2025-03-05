@@ -10,7 +10,7 @@ import (
 )
 
 type GetDocumentsClient interface {
-	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
+	CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error)
 	Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docTypes []string, notDocTypes []string) ([]sirius.Document, error)
 }
 
@@ -33,7 +33,7 @@ func GetDocuments(client GetDocumentsClient, tmpl template.Template) Handler {
 			XSRFToken: ctx.XSRFToken,
 		}
 
-		data.CaseSummary, err = client.CaseSummary(ctx, uid)
+		data.CaseSummary, err = client.CaseSummary(ctx, uid, false)
 
 		if err != nil {
 			return err
