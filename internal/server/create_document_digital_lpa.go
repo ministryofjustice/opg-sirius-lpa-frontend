@@ -14,7 +14,7 @@ import (
 )
 
 type CreateDocumentDigitalLpaClient interface {
-	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
+	CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
 	CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error)
 	CreateContact(ctx sirius.Context, contact sirius.Person) (sirius.Person, error)
@@ -46,7 +46,7 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 			XSRFToken: ctx.XSRFToken,
 		}
 
-		data.CaseSummary, err = client.CaseSummary(ctx, uid)
+		data.CaseSummary, err = client.CaseSummary(ctx, uid, false)
 
 		if err != nil {
 			return err

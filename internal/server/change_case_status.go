@@ -2,14 +2,15 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/templatefn"
-	"net/http"
 )
 
 type ChangeCaseStatusClient interface {
-	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
+	CaseSummary(sirius.Context, string, bool) (sirius.CaseSummary, error)
 	EditDigitalLPAStatus(sirius.Context, string, sirius.CaseStatusData) error
 }
 
@@ -29,7 +30,7 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 		caseUID := r.FormValue("uid")
 
 		ctx := getContext(r)
-		cs, err := client.CaseSummary(ctx, caseUID)
+		cs, err := client.CaseSummary(ctx, caseUID, false)
 		if err != nil {
 			return err
 		}
