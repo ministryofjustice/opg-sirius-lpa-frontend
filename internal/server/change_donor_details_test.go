@@ -1,22 +1,23 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockChangeDonorDetailsClient struct {
 	mock.Mock
 }
 
-func (m *mockChangeDonorDetailsClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
-	args := m.Called(ctx, uid)
+func (m *mockChangeDonorDetailsClient) CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error) {
+	args := m.Called(ctx, uid, presignImages)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
@@ -73,7 +74,7 @@ var testCaseSummary = sirius.CaseSummary{
 func TestGetChangeDonorDetails(t *testing.T) {
 	client := &mockChangeDonorDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
+		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB", false).
 		Return(testCaseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
@@ -117,7 +118,7 @@ func TestGetChangeDonorDetailsWhenCaseSummaryErrors(t *testing.T) {
 
 	client := &mockChangeDonorDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-EEEE-EEEE-EEEE").
+		On("CaseSummary", mock.Anything, "M-EEEE-EEEE-EEEE", false).
 		Return(sirius.CaseSummary{}, expectedError)
 
 	assertChangeDonorDetailsErrors(t, client, "M-EEEE-EEEE-EEEE", expectedError)
@@ -126,7 +127,7 @@ func TestGetChangeDonorDetailsWhenCaseSummaryErrors(t *testing.T) {
 func TestGetChangeDonorDetailsWhenRefDataByCategoryErrors(t *testing.T) {
 	client := &mockChangeDonorDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
+		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB", false).
 		Return(testCaseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
@@ -148,7 +149,7 @@ func assertChangeDonorDetailsErrors(t *testing.T, client *mockChangeDonorDetails
 func TestGetChangeDonorDetailsWhenTemplateErrors(t *testing.T) {
 	client := &mockChangeDonorDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
+		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB", false).
 		Return(testCaseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
@@ -189,7 +190,7 @@ func TestGetChangeDonorDetailsWhenTemplateErrors(t *testing.T) {
 func TestPostChangeDonorDetails(t *testing.T) {
 	client := &mockChangeDonorDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
+		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB", false).
 		Return(testCaseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
@@ -251,7 +252,7 @@ func TestPostChangeDonorDetails(t *testing.T) {
 func TestPostChangeDonorDetailsWhenAPIFails(t *testing.T) {
 	client := &mockChangeDonorDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
+		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB", false).
 		Return(testCaseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
@@ -310,7 +311,7 @@ func TestPostChangeDonorDetailsWhenAPIFails(t *testing.T) {
 func TestPostChangeDonorDetailsWhenValidationError(t *testing.T) {
 	client := &mockChangeDonorDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
+		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB", false).
 		Return(testCaseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).

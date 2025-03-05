@@ -2,15 +2,16 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
-	"net/http"
 )
 
 type ChangeCertificateProviderDetailsClient interface {
-	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
+	CaseSummary(sirius.Context, string, bool) (sirius.CaseSummary, error)
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
@@ -36,7 +37,7 @@ func ChangeCertificateProviderDetails(client ChangeCertificateProviderDetailsCli
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseUid := chi.URLParam(r, "uid")
 		ctx := getContext(r)
-		caseSummary, err := client.CaseSummary(ctx, caseUid)
+		caseSummary, err := client.CaseSummary(ctx, caseUid, false)
 
 		if err != nil {
 			return err

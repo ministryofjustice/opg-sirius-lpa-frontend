@@ -17,8 +17,8 @@ type mockCreateDocumentDigitalLpaClient struct {
 	mock.Mock
 }
 
-func (m *mockCreateDocumentDigitalLpaClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
-	args := m.Called(ctx, uid)
+func (m *mockCreateDocumentDigitalLpaClient) CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error) {
+	args := m.Called(ctx, uid, presignImages)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
@@ -162,7 +162,7 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 
 	client := &mockCreateDocumentDigitalLpaClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-TWGJ-CDDJ-4NTL").
+		On("CaseSummary", mock.Anything, "M-TWGJ-CDDJ-4NTL", false).
 		Return(caseSummary, nil)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeDigitalLpa).
@@ -252,7 +252,7 @@ func TestGetCreateDocumentDigitalLpaError(t *testing.T) {
 
 	client := &mockCreateDocumentDigitalLpaClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-TWGJ-CDDJ-4NTL").
+		On("CaseSummary", mock.Anything, "M-TWGJ-CDDJ-4NTL", false).
 		Return(sirius.CaseSummary{}, expectedError)
 
 	template := &mockTemplate{}
@@ -340,7 +340,7 @@ func TestPostCreateDocumentDigitalLpa(t *testing.T) {
 
 	client := &mockCreateDocumentDigitalLpaClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-TWGJ-CDDJ-4NTL").
+		On("CaseSummary", mock.Anything, "M-TWGJ-CDDJ-4NTL", false).
 		Return(caseSummary, nil)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeDigitalLpa).
@@ -419,7 +419,7 @@ func TestPostCreateDocumentDigitalLpaInvalid(t *testing.T) {
 
 	client := &mockCreateDocumentDigitalLpaClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-TWGJ-CDDJ-4NTL").
+		On("CaseSummary", mock.Anything, "M-TWGJ-CDDJ-4NTL", false).
 		Return(caseSummary, nil)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeDigitalLpa).

@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -108,30 +109,37 @@ func setupTestCases(t *testing.T) []testCase {
 
 // not tested by pact as this is just an amalgam of other pact-tested methods
 func TestCaseSummary(t *testing.T) {
-	reqForDigitalLpaMatcher := mock.MatchedBy(func(r *http.Request) bool {
-		digitalLpaUrl, _ := url.Parse("http://localhost:8888/lpa-api/v1/digital-lpas/M-QWER-TY34-3434")
-		return digitalLpaUrl.String() == r.URL.String()
-	})
+	for presignImages, query := range map[bool]string{
+		true:  "?presignImages",
+		false: "",
+	} {
+		t.Run(fmt.Sprintf("presignImages=%v", presignImages), func(t *testing.T) {
+			reqForDigitalLpaMatcher := mock.MatchedBy(func(r *http.Request) bool {
+				digitalLpaUrl, _ := url.Parse("http://localhost:8888/lpa-api/v1/digital-lpas/M-QWER-TY34-3434" + query)
+				return digitalLpaUrl.String() == r.URL.String()
+			})
 
-	reqForTasksForCaseMatcher := mock.MatchedBy(func(r *http.Request) bool {
-		tasksForCaseUrl, _ := url.Parse("http://localhost:8888/lpa-api/v1/cases/1/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC")
-		return tasksForCaseUrl.String() == r.URL.String()
-	})
+			reqForTasksForCaseMatcher := mock.MatchedBy(func(r *http.Request) bool {
+				tasksForCaseUrl, _ := url.Parse("http://localhost:8888/lpa-api/v1/cases/1/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC")
+				return tasksForCaseUrl.String() == r.URL.String()
+			})
 
-	reqForWarningsMatcher := mock.MatchedBy(func(r *http.Request) bool {
-		warningsUrl, _ := url.Parse("http://localhost:8888/lpa-api/v1/cases/1/warnings")
-		return warningsUrl.String() == r.URL.String()
-	})
+			reqForWarningsMatcher := mock.MatchedBy(func(r *http.Request) bool {
+				warningsUrl, _ := url.Parse("http://localhost:8888/lpa-api/v1/cases/1/warnings")
+				return warningsUrl.String() == r.URL.String()
+			})
 
-	for _, testCase := range setupTestCases(t) {
-		mockHttpClient := mockCaseSummaryHttpClient{}
-		client := NewClient(&mockHttpClient, "http://localhost:8888")
+			for _, testCase := range setupTestCases(t) {
+				mockHttpClient := mockCaseSummaryHttpClient{}
+				client := NewClient(&mockHttpClient, "http://localhost:8888")
 
-		mockHttpClient.On("Do", reqForDigitalLpaMatcher).Return(&testCase.DigitalLpaResponse, testCase.DigitalLpaError)
-		mockHttpClient.On("Do", reqForTasksForCaseMatcher).Return(&testCase.TasksForCaseResponse, testCase.TasksForCaseError)
-		mockHttpClient.On("Do", reqForWarningsMatcher).Return(&testCase.WarningsResponse, testCase.WarningsError)
+				mockHttpClient.On("Do", reqForDigitalLpaMatcher).Return(&testCase.DigitalLpaResponse, testCase.DigitalLpaError)
+				mockHttpClient.On("Do", reqForTasksForCaseMatcher).Return(&testCase.TasksForCaseResponse, testCase.TasksForCaseError)
+				mockHttpClient.On("Do", reqForWarningsMatcher).Return(&testCase.WarningsResponse, testCase.WarningsError)
 
-		_, err := client.CaseSummary(Context{Context: context.Background()}, "M-QWER-TY34-3434")
-		assert.Equal(t, testCase.ExpectedError, err)
+				_, err := client.CaseSummary(Context{Context: context.Background()}, "M-QWER-TY34-3434", presignImages)
+				assert.Equal(t, testCase.ExpectedError, err)
+			}
+		})
 	}
 }
