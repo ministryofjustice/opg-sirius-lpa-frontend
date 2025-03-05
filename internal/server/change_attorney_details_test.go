@@ -1,22 +1,23 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockChangeAttorneyDetailsClient struct {
 	mock.Mock
 }
 
-func (m *mockChangeAttorneyDetailsClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
-	args := m.Called(ctx, uid)
+func (m *mockChangeAttorneyDetailsClient) CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error) {
+	args := m.Called(ctx, uid, presignImages)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
@@ -203,7 +204,7 @@ func TestGetChangeAttorneyDetails(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := &mockChangeAttorneyDetailsClient{}
 			client.
-				On("CaseSummary", mock.Anything, tc.caseUID).
+				On("CaseSummary", mock.Anything, tc.caseUID, false).
 				Return(testChangeAttorneyDetailsCaseSummary, nil)
 			client.
 				On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
@@ -241,7 +242,7 @@ func TestGetChangeAttorneyDetailsWhenCaseSummaryErrors(t *testing.T) {
 
 	client := &mockChangeAttorneyDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-EEEE-EEEE-EEEE").
+		On("CaseSummary", mock.Anything, "M-EEEE-EEEE-EEEE", false).
 		Return(sirius.CaseSummary{}, expectedError)
 
 	assertChangeAttorneyDetailsErrors(t, client, "M-EEEE-EEEE-EEEE", expectedError)
@@ -250,7 +251,7 @@ func TestGetChangeAttorneyDetailsWhenCaseSummaryErrors(t *testing.T) {
 func TestGetChangeAttorneyDetailsWhenRefDataByCategoryErrors(t *testing.T) {
 	client := &mockChangeAttorneyDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-DDDD-DDDD-DDDD").
+		On("CaseSummary", mock.Anything, "M-DDDD-DDDD-DDDD", false).
 		Return(testChangeAttorneyDetailsCaseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
@@ -290,7 +291,7 @@ func TestPostChangeAttorneyDetails(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := &mockChangeAttorneyDetailsClient{}
 			client.
-				On("CaseSummary", mock.Anything, "M-DDDD-DDDD-DDDD").
+				On("CaseSummary", mock.Anything, "M-DDDD-DDDD-DDDD", false).
 				Return(testChangeAttorneyDetailsCaseSummary, nil)
 			client.
 				On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
@@ -350,7 +351,7 @@ func TestPostChangeAttorneyDetails(t *testing.T) {
 func TestPostChangeAttorneyDetailsWhenValidationError(t *testing.T) {
 	client := &mockChangeAttorneyDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-DDDD-DDDD-DDDD").
+		On("CaseSummary", mock.Anything, "M-DDDD-DDDD-DDDD", false).
 		Return(testChangeAttorneyDetailsCaseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).

@@ -16,8 +16,8 @@ type mockApplicationProgressClient struct {
 	mock.Mock
 }
 
-func (m *mockApplicationProgressClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
-	args := m.Called(ctx, uid)
+func (m *mockApplicationProgressClient) CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error) {
+	args := m.Called(ctx, uid, presignImages)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
@@ -107,7 +107,7 @@ func TestGetApplicationProgressSuccess(t *testing.T) {
 
 	client := &mockApplicationProgressClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876", false).
 		Return(caseSummary, nil)
 	client.
 		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-9876-9876-9876").
@@ -136,7 +136,7 @@ func TestGetApplicationProgressCaseSummaryFail(t *testing.T) {
 
 	client := &mockApplicationProgressClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876", false).
 		Return(cs, expectedError)
 	client.
 		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-9876-9876-9876").
@@ -161,7 +161,7 @@ func TestGetApplicationProgressProgressIndicatorsFail(t *testing.T) {
 
 	client := &mockApplicationProgressClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876", false).
 		Return(cs, nil)
 	client.
 		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-9876-9876-9876").
