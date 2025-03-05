@@ -2,113 +2,118 @@ import * as cases from "../mocks/cases";
 
 describe("View a digital LPA", () => {
   beforeEach(() => {
-    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333", "GET", {
-      status: 200,
-      body: {
-        uId: "M-DIGI-LPA3-3333",
-        "opg.poas.sirius": {
-          id: 333,
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333?presignImages",
+      "GET",
+      {
+        status: 200,
+        body: {
           uId: "M-DIGI-LPA3-3333",
-          status: "Draft",
-          caseSubtype: "property-and-affairs",
-          createdDate: "31/10/2023",
-          investigationCount: 2,
-          complaintCount: 1,
-          taskCount: 2,
-          warningCount: 4,
-          dueDate: "01/12/2023",
-          donor: {
-            id: 33,
+          "opg.poas.sirius": {
+            id: 333,
+            uId: "M-DIGI-LPA3-3333",
+            status: "Draft",
+            caseSubtype: "property-and-affairs",
+            createdDate: "31/10/2023",
+            investigationCount: 2,
+            complaintCount: 1,
+            taskCount: 2,
+            warningCount: 4,
+            dueDate: "01/12/2023",
+            donor: {
+              id: 33,
+            },
+            application: {
+              donorFirstNames: "Agnes",
+              donorLastName: "Hartley",
+              donorDob: "27/05/1998",
+              donorEmail: "agnes@host.example",
+              donorPhone: "073656249524",
+              donorAddress: {
+                addressLine1: "Apartment 3",
+                addressLine2: "Gherkin Building",
+                addressLine3: "33 London Road",
+                country: "GB",
+                postcode: "B15 3AA",
+                town: "Birmingham",
+              },
+              correspondentFirstNames: "Kendrick",
+              correspondentLastName: "Lamar",
+              correspondentAddress: {
+                addressLine1: "Flat 3",
+                addressLine2: "Digital LPA Lane",
+                addressLine3: "Somewhere",
+                country: "GB",
+                postcode: "SW1 1AA",
+                town: "London",
+              },
+            },
+            linkedDigitalLpas: [
+              {
+                uId: "M-DIGI-LPA3-3334",
+                caseSubtype: "personal-welfare",
+                status: "Draft",
+                createdDate: "01/11/2023",
+              },
+              {
+                uId: "M-DIGI-LPA3-3335",
+                caseSubtype: "personal-welfare",
+                status: "Registered",
+                createdDate: "02/11/2023",
+              },
+            ],
           },
-          application: {
-            donorFirstNames: "Agnes",
-            donorLastName: "Hartley",
-            donorDob: "27/05/1998",
-            donorEmail: "agnes@host.example",
-            donorPhone: "073656249524",
-            donorAddress: {
-              addressLine1: "Apartment 3",
-              addressLine2: "Gherkin Building",
-              addressLine3: "33 London Road",
-              country: "GB",
-              postcode: "B15 3AA",
-              town: "Birmingham",
+          "opg.poas.lpastore": {
+            attorneys: [
+              {
+                firstNames: "Esther",
+                lastName: "Greenwood",
+                status: "active",
+                appointmentType: "original",
+              },
+              {
+                firstNames: "Volo",
+                lastName: "McSpolo",
+                status: "active",
+                appointmentType: "original",
+                signedAt: "2022-12-20T12:02:43Z",
+              },
+              {
+                firstNames: "Susanna",
+                lastName: "Kaysen",
+                status: "removed",
+                appointmentType: "original",
+              },
+              {
+                firstNames: "Philomena",
+                lastName: "Guinea",
+                status: "inactive",
+                appointmentType: "replacement",
+              },
+              {
+                firstNames: "Rico",
+                lastName: "Welch",
+                status: "inactive",
+                appointmentType: "replacement",
+                signedAt: "2022-12-19T09:12:59Z",
+              },
+            ],
+            certificateProvider: {
+              uid: "e4d5e24e-2a8d-434e-b815-9898620acc71",
+              firstNames: "Timothy",
+              lastNames: "Turner",
+              signedAt: "2022-12-18T11:46:24Z",
             },
-            correspondentFirstNames: "Kendrick",
-            correspondentLastName: "Lamar",
-            correspondentAddress: {
-              addressLine1: "Flat 3",
-              addressLine2: "Digital LPA Lane",
-              addressLine3: "Somewhere",
-              country: "GB",
-              postcode: "SW1 1AA",
-              town: "London",
-            },
+            lpaType: "pf",
+            channel: "online",
+            status: "draft",
+            registrationDate: "2022-12-18",
+            peopleToNotify: [],
+            restrictionsAndConditions: "Do not do this",
           },
-          linkedDigitalLpas: [
-            {
-              uId: "M-DIGI-LPA3-3334",
-              caseSubtype: "personal-welfare",
-              status: "Draft",
-              createdDate: "01/11/2023",
-            },
-            {
-              uId: "M-DIGI-LPA3-3335",
-              caseSubtype: "personal-welfare",
-              status: "Registered",
-              createdDate: "02/11/2023",
-            },
-          ],
-        },
-        "opg.poas.lpastore": {
-          attorneys: [
-            {
-              firstNames: "Esther",
-              lastName: "Greenwood",
-              status: "active",
-              appointmentType: "original",
-            },
-            {
-              firstNames: "Volo",
-              lastName: "McSpolo",
-              status: "active",
-              appointmentType: "original",
-              signedAt: "2022-12-20T12:02:43Z",
-            },
-            {
-              firstNames: "Susanna",
-              lastName: "Kaysen",
-              status: "removed",
-              appointmentType: "original",
-            },
-            {
-              firstNames: "Philomena",
-              lastName: "Guinea",
-              status: "inactive",
-              appointmentType: "replacement",
-            },
-            {
-              firstNames: "Rico",
-              lastName: "Welch",
-              status: "inactive",
-              appointmentType: "replacement",
-              signedAt: "2022-12-19T09:12:59Z",
-            },
-          ],
-          certificateProvider: {
-            uid: "e4d5e24e-2a8d-434e-b815-9898620acc71",
-            firstNames: "Timothy",
-            lastNames: "Turner",
-            signedAt: "2022-12-18T11:46:24Z",
-          },
-          lpaType: "pf",
-          channel: "online",
-          status: "draft",
-          registrationDate: "2022-12-18",
-          peopleToNotify: [],
         },
       },
-    });
+    );
 
     cy.addMock("/lpa-api/v1/cases/333", "GET", {
       status: 200,
@@ -256,9 +261,31 @@ describe("View a digital LPA", () => {
             },
           ],
         },
-        "opg.poas.lpastore": null,
+        "opg.poas.lpastore": {},
       },
     });
+
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3334?presignImages",
+      "GET",
+      {
+        status: 200,
+        body: {
+          uId: "M-DIGI-LPA3-3334",
+          "opg.poas.sirius": {
+            id: 334,
+          },
+          "opg.poas.lpastore": {
+            channel: "paper",
+            restrictionsAndConditionsImages: [
+              {
+                path: "some-presigned-url.jpg",
+              },
+            ],
+          },
+        },
+      },
+    );
 
     cy.addMock("/lpa-api/v1/cases/334", "GET", {
       status: 200,
@@ -633,5 +660,25 @@ describe("View a digital LPA", () => {
 
     cy.url().should("contain", "/lpa/M-DIGI-LPA3-3333");
     cy.contains("Case summary");
+  });
+
+  it("shows restrictions and conditions", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+
+    cy.contains("a", "LPA details").click();
+    cy.contains("button", "Restrictions and conditions").click();
+    cy.contains(".govuk-accordion__section--expanded", "Do not do this");
+  });
+
+  it.only("shows restrictions and conditions as images", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3334");
+
+    cy.contains("a", "LPA details").click();
+    cy.contains("button", "Restrictions and conditions").click();
+    cy.get(".govuk-accordion__section--expanded img").should(
+      "have.attr",
+      "src",
+      "some-presigned-url.jpg",
+    );
   });
 });
