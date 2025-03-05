@@ -41,11 +41,11 @@ func TestChangeDraft(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A donor with a digital LPA exists").
+					Given("A digital LPA exists").
 					UponReceiving("A request for changing draft").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/digital-lpas/M-1234-3333-4567/change-draft"),
+						Path:   dsl.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567/change-draft"),
 						Headers: dsl.MapMatcher{
 							"Content-Type": dsl.String("application/json"),
 						},
@@ -79,7 +79,7 @@ func TestChangeDraft(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.ChangeDraft(Context{Context: context.Background()}, "M-1234-3333-4567", tc.changeData)
+				err := client.ChangeDraft(Context{Context: context.Background()}, "M-1234-9876-4567", tc.changeData)
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
