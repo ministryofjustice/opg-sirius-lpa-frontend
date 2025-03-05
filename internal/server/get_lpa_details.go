@@ -59,7 +59,7 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		taskList := data.CaseSummary.TaskList
 		data.ReviewRestrictions = false
 		for _, task := range taskList {
-			if task.Name == "Review restrictions and conditions" && task.Status != "COMPLETE" {
+			if task.Name == "Review restrictions and conditions" && task.Status != "Completed" {
 				data.ReviewRestrictions = true
 			}
 		}

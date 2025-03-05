@@ -483,7 +483,9 @@ describe("View a digital LPA", () => {
     cy.contains("Notified people (0)");
     cy.contains("Correspondent");
 
-    cy.contains('Review and confirm if severance is required').should("not.exist");
+    cy.contains("Review and confirm if severance is required").should(
+      "not.exist",
+    );
   });
 
   it("shows channel for donor", () => {
@@ -638,19 +640,25 @@ describe("View a digital LPA", () => {
 
   it("review severance messages appears when review restrictions tasks is open", () => {
     cy.addMock(
-        "/lpa-api/v1/cases/333/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-        "GET",
-        {
-          status: 200,
-          body: {
-            tasks: [
-              { id: 2, name: "Review restrictions and conditions", duedate:"10/12/2023", status: "OPEN", "assignee":{displayName:"Super Team"} },
-            ],
-          },
+      "/lpa-api/v1/cases/333/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
+      "GET",
+      {
+        status: 200,
+        body: {
+          tasks: [
+            {
+              id: 2,
+              name: "Review restrictions and conditions",
+              duedate: "10/12/2023",
+              status: "OPEN",
+              assignee: { displayName: "Super Team" },
+            },
+          ],
         },
+      },
     );
 
     cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
-    cy.contains('Review and confirm if severance is required');
+    cy.contains("Review and confirm if severance is required");
   });
 });
