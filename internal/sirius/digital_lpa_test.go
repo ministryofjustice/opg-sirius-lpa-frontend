@@ -3,10 +3,11 @@ package sirius
 import (
 	"context"
 	"fmt"
-	"github.com/pact-foundation/pact-go/dsl"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+
+	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestDigitalLpa(t *testing.T) {
@@ -202,7 +203,7 @@ func TestDigitalLpa(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				digitalLpa, err := client.DigitalLpa(Context{Context: context.Background()}, tc.expectedResponse.UID)
+				digitalLpa, err := client.DigitalLpa(Context{Context: context.Background()}, tc.expectedResponse.UID, false)
 
 				assert.Equal(t, tc.expectedResponse, digitalLpa)
 				if tc.expectedError == nil {

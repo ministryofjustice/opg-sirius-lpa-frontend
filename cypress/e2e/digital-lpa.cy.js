@@ -2,7 +2,7 @@ import * as cases from "../mocks/cases";
 
 describe("View a digital LPA", () => {
   beforeEach(() => {
-    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333", "GET", {
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333?presignImages", "GET", {
       status: 200,
       body: {
         uId: "M-DIGI-LPA3-3333",
@@ -106,6 +106,7 @@ describe("View a digital LPA", () => {
           status: "draft",
           registrationDate: "2022-12-18",
           peopleToNotify: [],
+          restrictionsAndConditions: "Do not do this",
         },
       },
     });
@@ -256,7 +257,23 @@ describe("View a digital LPA", () => {
             },
           ],
         },
-        "opg.poas.lpastore": null,
+        "opg.poas.lpastore": {},
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3334?presignImages", "GET", {
+      status: 200,
+      body: {
+        uId: "M-DIGI-LPA3-3334",
+        "opg.poas.sirius": {
+          id: 334,
+        },
+        "opg.poas.lpastore": {
+          "channel": "paper",
+          restrictionsAndConditionsImages: [{
+            path: "some-presigned-url.jpg",
+          }],
+        },
       },
     });
 
@@ -633,5 +650,21 @@ describe("View a digital LPA", () => {
 
     cy.url().should("contain", "/lpa/M-DIGI-LPA3-3333");
     cy.contains("Case summary");
+  });
+
+  it("shows restrictions and conditions", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+
+    cy.contains("a", "LPA details").click();
+    cy.contains("button", "Restrictions and conditions").click();
+    cy.contains(".govuk-accordion__section--expanded", "Do not do this");
+  });
+
+  it.only("shows restrictions and conditions as images", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3334");
+
+    cy.contains("a", "LPA details").click();
+    cy.contains("button", "Restrictions and conditions").click();
+    cy.get(".govuk-accordion__section--expanded img").should('have.attr', 'src', 'some-presigned-url.jpg');
   });
 });

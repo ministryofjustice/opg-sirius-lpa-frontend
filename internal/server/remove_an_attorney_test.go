@@ -1,22 +1,23 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockRemoveAnAttorneyClient struct {
 	mock.Mock
 }
 
-func (m *mockRemoveAnAttorneyClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
-	args := m.Called(ctx, uid)
+func (m *mockRemoveAnAttorneyClient) CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error) {
+	args := m.Called(ctx, uid, presignImages)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
@@ -150,7 +151,7 @@ var activeAttorneys = []sirius.LpaStoreAttorney{
 func TestGetRemoveAnAttorney(t *testing.T) {
 	client := &mockRemoveAnAttorneyClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+		On("CaseSummary", mock.Anything, "M-1111-2222-3333", false).
 		Return(removeAnAttorneyCaseSummary, nil)
 
 	removeTemplate := &mockTemplate{}
@@ -179,7 +180,7 @@ func TestGetRemoveAnAttorneyGetCaseSummaryFails(t *testing.T) {
 
 	client := &mockRemoveAnAttorneyClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+		On("CaseSummary", mock.Anything, "M-1111-2222-3333", false).
 		Return(caseSummary, expectedError)
 
 	removeTemplate := &mockTemplate{}
@@ -200,7 +201,7 @@ func TestGetRemoveAnAttorneyGetCaseSummaryFails(t *testing.T) {
 func TestGetRemoveAnAttorneyTemplateErrors(t *testing.T) {
 	client := &mockRemoveAnAttorneyClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+		On("CaseSummary", mock.Anything, "M-1111-2222-3333", false).
 		Return(removeAnAttorneyCaseSummary, nil)
 
 	removeTemplate := &mockTemplate{}
@@ -225,7 +226,7 @@ func TestGetRemoveAnAttorneyTemplateErrors(t *testing.T) {
 func TestPostRemoveAnAttorneyInvalidData(t *testing.T) {
 	client := &mockRemoveAnAttorneyClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+		On("CaseSummary", mock.Anything, "M-1111-2222-3333", false).
 		Return(removeAnAttorneyCaseSummary, nil)
 
 	removeTemplate := &mockTemplate{}
@@ -258,7 +259,7 @@ func TestPostRemoveAnAttorneyInvalidData(t *testing.T) {
 func TestPostRemoveAnAttorneyValidData(t *testing.T) {
 	client := &mockRemoveAnAttorneyClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+		On("CaseSummary", mock.Anything, "M-1111-2222-3333", false).
 		Return(removeAnAttorneyCaseSummary, nil)
 
 	removeTemplate := &mockTemplate{}
@@ -292,7 +293,7 @@ func TestPostRemoveAnAttorneyValidData(t *testing.T) {
 func TestPostConfirmAttorneyRemovalValidData(t *testing.T) {
 	client := &mockRemoveAnAttorneyClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+		On("CaseSummary", mock.Anything, "M-1111-2222-3333", false).
 		Return(removeAnAttorneyCaseSummary, nil)
 
 	removeTemplate := &mockTemplate{}

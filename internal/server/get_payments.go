@@ -1,10 +1,11 @@
 package server
 
 import (
-	"github.com/go-chi/chi/v5"
-	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
+
+	"github.com/go-chi/chi/v5"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -15,7 +16,7 @@ type GetPaymentsClient interface {
 	Payments(ctx sirius.Context, id int) ([]sirius.Payment, error)
 	Case(sirius.Context, int) (sirius.Case, error)
 	GetUserDetails(sirius.Context) (sirius.User, error)
-	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
+	CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error)
 }
 
 type getPaymentsData struct {
@@ -51,7 +52,7 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 
 		uid := chi.URLParam(r, "uid")
 		if uid != "" {
-			data.CaseSummary, err = client.CaseSummary(ctx, uid)
+			data.CaseSummary, err = client.CaseSummary(ctx, uid, false)
 			if err != nil {
 				return err
 			}
