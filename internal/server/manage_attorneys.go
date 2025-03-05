@@ -2,15 +2,16 @@ package server
 
 import (
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
 type ManageAttorneysClient interface {
-	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
+	CaseSummary(sirius.Context, string, bool) (sirius.CaseSummary, error)
 }
 
 type manageAttorneysData struct {
@@ -26,7 +27,7 @@ func ManageAttorneys(client ManageAttorneysClient, tmpl template.Template) Handl
 		uid := chi.URLParam(r, "uid")
 		ctx := getContext(r)
 
-		caseSummary, err := client.CaseSummary(ctx, uid)
+		caseSummary, err := client.CaseSummary(ctx, uid, false)
 
 		if err != nil {
 			return err

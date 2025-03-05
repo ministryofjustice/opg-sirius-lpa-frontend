@@ -18,8 +18,8 @@ func (m *mockGetDocuments) Documents(ctx sirius.Context, caseType sirius.CaseTyp
 	return args.Get(0).([]sirius.Document), args.Error(1)
 }
 
-func (m *mockGetDocuments) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
-	args := m.Called(ctx, uid)
+func (m *mockGetDocuments) CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error) {
+	args := m.Called(ctx, uid, presignImages)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
@@ -45,7 +45,7 @@ func TestGetDocuments(t *testing.T) {
 
 	client := &mockGetDocuments{}
 	client.
-		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876", false).
 		Return(caseSummary, nil)
 	client.
 		On("Documents", mock.Anything, sirius.CaseType("lpa"), 676, []string{}, []string{sirius.TypeDraft, sirius.TypePreview}).
@@ -72,7 +72,7 @@ func TestGetDocuments(t *testing.T) {
 func TestGetDocumentsWhenFailureOnGetDigitalLpa(t *testing.T) {
 	client := &mockGetDocuments{}
 	client.
-		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876", false).
 		Return(sirius.CaseSummary{}, expectedError)
 
 	server := newMockServer("/lpa/{uid}/documents", GetDocuments(client, nil))
@@ -98,7 +98,7 @@ func TestGetDocumentsWhenFailureOnGetDocuments(t *testing.T) {
 
 	client := &mockGetDocuments{}
 	client.
-		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876", false).
 		Return(caseSummary, nil)
 	client.
 		On("Documents", mock.Anything, sirius.CaseType("lpa"), 1532, []string{}, []string{sirius.TypeDraft, sirius.TypePreview}).
@@ -116,7 +116,7 @@ func TestGetDocumentsWhenFailureOnGetDocuments(t *testing.T) {
 func TestGetDocumentsWhenFailureOnGetCaseSummary(t *testing.T) {
 	client := &mockGetDocuments{}
 	client.
-		On("CaseSummary", mock.Anything, "M-A876-A876-A876").
+		On("CaseSummary", mock.Anything, "M-A876-A876-A876", false).
 		Return(sirius.CaseSummary{}, expectedError)
 
 	server := newMockServer("/lpa/{uid}/documents", GetDocuments(client, nil))
