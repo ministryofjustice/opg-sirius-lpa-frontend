@@ -19,6 +19,7 @@ type getLpaDetails struct {
 	CaseSummary             sirius.CaseSummary
 	DigitalLpa              sirius.DigitalLpa
 	AnomalyDisplay          *sirius.AnomalyDisplay
+	ReviewRestrictions      bool
 	ReplacementAttorneys    []sirius.LpaStoreAttorney
 	NonReplacementAttorneys []sirius.LpaStoreAttorney
 	FlashMessage            FlashNotification
@@ -53,6 +54,14 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 
 		if err := group.Wait(); err != nil {
 			return err
+		}
+
+		taskList := data.CaseSummary.TaskList
+		data.ReviewRestrictions = false
+		for _, task := range taskList {
+			if task.Name == "Review restrictions and conditions" && task.Status != "Completed" {
+				data.ReviewRestrictions = true
+			}
 		}
 
 		data.AnomalyDisplay = &sirius.AnomalyDisplay{}
