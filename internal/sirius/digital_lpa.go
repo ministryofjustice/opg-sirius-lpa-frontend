@@ -39,6 +39,8 @@ type Donor struct {
 	Postcode     string     `json:"postcode"`
 	Country      string     `json:"country"`
 	PersonType   string     `json:"personType,omitempty"`
+	Phone        string     `json:"phone,omitempty"`
+	Email        string     `json:"email,omitempty"`
 }
 
 type LpaStoreData struct {
