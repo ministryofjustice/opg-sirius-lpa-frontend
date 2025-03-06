@@ -57,6 +57,7 @@ type LpaStoreData struct {
 	HowReplacementAttorneysStepInDetails        string                      `json:"howReplacementAttorneysStepInDetails"`
 	LifeSustainingTreatmentOption               string                      `json:"lifeSustainingTreatmentOption"`
 	RestrictionsAndConditions                   string                      `json:"restrictionsAndConditions"`
+	RestrictionsAndConditionsImages             []LpaStoreImage             `json:"restrictionsAndConditionsImages"`
 	SignedAt                                    string                      `json:"signedAt"`
 }
 
@@ -107,8 +108,16 @@ type LpaStoreAddress struct {
 	Country  string `json:"country"`
 }
 
-func (c *Client) DigitalLpa(ctx Context, uid string) (DigitalLpa, error) {
+type LpaStoreImage struct {
+	Path string `json:"path"`
+}
+
+func (c *Client) DigitalLpa(ctx Context, uid string, presignImages bool) (DigitalLpa, error) {
 	var v DigitalLpa
-	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/digital-lpas/%s", uid), &v)
+	url := fmt.Sprintf("/lpa-api/v1/digital-lpas/%s", uid)
+	if presignImages {
+		url += "?presignImages"
+	}
+	err := c.get(ctx, url, &v)
 	return v, err
 }

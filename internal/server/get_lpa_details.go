@@ -11,7 +11,7 @@ import (
 )
 
 type GetLpaDetailsClient interface {
-	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
+	CaseSummaryWithImages(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
 	AnomaliesForDigitalLpa(ctx sirius.Context, uid string) ([]sirius.Anomaly, error)
 }
 
@@ -37,7 +37,7 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		group.Go(func() error {
-			data.CaseSummary, err = client.CaseSummary(ctx.With(groupCtx), uid)
+			data.CaseSummary, err = client.CaseSummaryWithImages(ctx.With(groupCtx), uid)
 			if err != nil {
 				return err
 			}

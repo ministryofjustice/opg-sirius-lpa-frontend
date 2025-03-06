@@ -2,10 +2,11 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/templatefn"
-	"net/http"
 )
 
 type ChangeCaseStatusClient interface {
