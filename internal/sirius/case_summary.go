@@ -14,11 +14,23 @@ type CaseSummary struct {
  * Get data for the case summary area (digital LPA record, tasks, and warnings for that LPA)
  */
 func (c *Client) CaseSummary(ctx Context, uid string) (CaseSummary, error) {
+	return c.getCaseSummary(ctx, uid, false)
+}
+
+/**
+ * Get data for the case summary area (digital LPA record, tasks, and warnings
+ * for that LPA) including presigned URLs for images
+ */
+func (c *Client) CaseSummaryWithImages(ctx Context, uid string) (CaseSummary, error) {
+	return c.getCaseSummary(ctx, uid, true)
+}
+
+func (c *Client) getCaseSummary(ctx Context, uid string, presignImages bool) (CaseSummary, error) {
 	var cs CaseSummary
 	var err error
 	group, groupCtx := errgroup.WithContext(ctx.Context)
 
-	cs.DigitalLpa, err = c.DigitalLpa(ctx, uid)
+	cs.DigitalLpa, err = c.DigitalLpa(ctx, uid, presignImages)
 	if err != nil {
 		return cs, err
 	}
