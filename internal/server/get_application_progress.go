@@ -10,7 +10,7 @@ import (
 )
 
 type GetApplicationProgressClient interface {
-	CaseSummary(siriusCtx sirius.Context, uid string) (sirius.CaseSummary, error)
+	CaseSummary(siriusCtx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error)
 	ProgressIndicatorsForDigitalLpa(siriusCtx sirius.Context, uid string) ([]sirius.ProgressIndicator, error)
 }
 
@@ -37,7 +37,7 @@ func GetApplicationProgressDetails(client GetApplicationProgressClient, tmpl tem
 
 		var cpName string
 
-		cs, err := client.CaseSummary(ctx, uid)
+		cs, err := client.CaseSummary(ctx, uid, false)
 		if err != nil {
 			return err
 		}

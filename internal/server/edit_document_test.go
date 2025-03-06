@@ -21,8 +21,8 @@ func (m *mockEditDocumentClient) Case(ctx sirius.Context, id int) (sirius.Case, 
 	return args.Get(0).(sirius.Case), args.Error(1)
 }
 
-func (m *mockEditDocumentClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
-	args := m.Called(ctx, uid)
+func (m *mockEditDocumentClient) CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error) {
+	args := m.Called(ctx, uid, presignImages)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
@@ -105,7 +105,7 @@ func TestGetEditDocument(t *testing.T) {
 				caseSummary := sirius.CaseSummary{DigitalLpa: sirius.DigitalLpa{}, TaskList: []sirius.Task{}}
 
 				client.
-					On("CaseSummary", mock.Anything, "7000").
+					On("CaseSummary", mock.Anything, "7000", false).
 					Return(caseSummary, nil)
 
 				templateData.CaseSummary = caseSummary
@@ -169,7 +169,7 @@ func TestPostSaveDocument(t *testing.T) {
 				caseSummary := sirius.CaseSummary{DigitalLpa: sirius.DigitalLpa{}, TaskList: []sirius.Task{}}
 
 				client.
-					On("CaseSummary", mock.Anything, "7000").
+					On("CaseSummary", mock.Anything, "7000", false).
 					Return(caseSummary, nil)
 
 				templateData.CaseSummary = caseSummary

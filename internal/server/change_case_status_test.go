@@ -16,8 +16,8 @@ type mockChangeCaseStatusClient struct {
 	mock.Mock
 }
 
-func (m *mockChangeCaseStatusClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
-	args := m.Called(ctx, uid)
+func (m *mockChangeCaseStatusClient) CaseSummary(ctx sirius.Context, uid string, presignImages bool) (sirius.CaseSummary, error) {
+	args := m.Called(ctx, uid, presignImages)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
@@ -43,7 +43,7 @@ func TestGetChangeCaseStatus(t *testing.T) {
 
 	client := &mockChangeCaseStatusClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876", false).
 		Return(caseSummary, nil)
 
 	template := &mockTemplate{}
@@ -83,7 +83,7 @@ func TestPostChangeCaseStatus(t *testing.T) {
 
 	client := &mockChangeCaseStatusClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876", false).
 		Return(caseSummary, nil)
 
 	client.
