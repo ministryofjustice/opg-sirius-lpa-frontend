@@ -35,7 +35,7 @@ func TestChangeAttorneyStatus(t *testing.T) {
 						},
 						Body: map[string]interface{}{
 							"attorneyStatuses": []map[string]interface{}{{
-								"uid":    "302b05c7-896c-4290-904e-2005e4f1e81e",
+								"uid":    "cf128305-37c8-4ceb-bedf-89ed5f4ae661",
 								"status": "removed",
 							}},
 						},
