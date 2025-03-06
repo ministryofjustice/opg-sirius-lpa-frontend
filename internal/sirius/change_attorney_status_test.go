@@ -35,7 +35,7 @@ func TestChangeAttorneyStatus(t *testing.T) {
 						},
 						Body: map[string]interface{}{
 							"attorneyStatuses": []map[string]interface{}{{
-								"uid":    "302b05c7-896c-4290-904e-2005e4f1e81e",
+								"uid":    "cf128305-37c8-4ceb-bedf-89ed5f4ae661",
 								"status": "removed",
 							}},
 						},
@@ -54,7 +54,7 @@ func TestChangeAttorneyStatus(t *testing.T) {
 			assert.Nil(t, pact.Verify(func() error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
 
-				err := client.ChangeAttorneyStatus(Context{Context: context.Background()}, "M-1234-9876-4567", []AttorneyUpdatedStatus{{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", Status: "removed"}})
+				err := client.ChangeAttorneyStatus(Context{Context: context.Background()}, "M-1234-9876-4567", []AttorneyUpdatedStatus{{UID: "cf128305-37c8-4ceb-bedf-89ed5f4ae661", Status: "removed"}})
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
