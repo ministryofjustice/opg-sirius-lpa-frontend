@@ -81,6 +81,7 @@ type Client interface {
 	ManageAttorneysClient
 	ManageFeesClient
 	MiReportingClient
+	RemoveAnAttorneyClient
 	RelationshipClient
 	SearchDonorsClient
 	SearchClient
