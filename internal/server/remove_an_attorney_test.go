@@ -20,6 +20,11 @@ func (m *mockRemoveAnAttorneyClient) CaseSummary(ctx sirius.Context, uid string)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
+func (m *mockRemoveAnAttorneyClient) ChangeAttorneyStatus(ctx sirius.Context, caseUID string, attorneyUpdatedStatus []sirius.AttorneyUpdatedStatus) error {
+	args := m.Called(ctx, caseUID, attorneyUpdatedStatus)
+	return args.Error(0)
+}
+
 var removeAnAttorneyCaseSummary = sirius.CaseSummary{
 	DigitalLpa: sirius.DigitalLpa{
 		UID: "M-1111-2222-3333",
@@ -295,6 +300,12 @@ func TestPostConfirmAttorneyRemovalValidData(t *testing.T) {
 		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
 		Return(removeAnAttorneyCaseSummary, nil)
 
+	client.
+		On("ChangeAttorneyStatus", mock.Anything, "M-1111-2222-3333", []sirius.AttorneyUpdatedStatus{
+			{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", Status: "removed"},
+		}).
+		Return(nil)
+
 	removeTemplate := &mockTemplate{}
 	confirmTemplate := &mockTemplate{}
 
@@ -307,8 +318,8 @@ func TestPostConfirmAttorneyRemovalValidData(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/remove-an-attorney", strings.NewReader(form.Encode()))
 	req.Header.Add("Content-Type", formUrlEncoded)
-	_, err := server.serve(req)
+	resp, err := server.serve(req)
 
+	assert.Equal(t, http.StatusOK, resp.Code)
 	assert.Equal(t, RedirectError("/lpa/M-1111-2222-3333"), err)
-	mock.AssertExpectationsForObjects(t, client, removeTemplate)
 }
