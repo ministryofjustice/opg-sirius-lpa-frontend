@@ -154,6 +154,9 @@ func TestGetChangeDraftWhenCaseSummaryErrors(t *testing.T) {
 	client.
 		On("CaseSummary", mock.Anything, "M-FFFF-FFFF-FFFF").
 		Return(sirius.CaseSummary{}, expectedError)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 
 	assertChangeDraftErrors(t, client, "M-FFFF-FFFF-FFFF", expectedError)
 }
