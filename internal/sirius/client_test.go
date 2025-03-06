@@ -15,7 +15,7 @@ func newPact() *dsl.Pact {
 	return &dsl.Pact{
 		Consumer:          "sirius-lpa-frontend",
 		Provider:          "sirius",
-		Host:              "localhost",
+		Host:              "127.0.0.1",
 		PactFileWriteMode: "merge",
 		LogDir:            "../../logs",
 		PactDir:           "../../pacts",
@@ -26,7 +26,7 @@ func newPact2() (*consumer.V2HTTPMockProvider, error) {
 	return consumer.NewV2Pact(consumer.MockHTTPProviderConfig{
 		Consumer: "sirius-lpa-frontend",
 		Provider: "sirius",
-		Host:     "localhost",
+		Host:     "127.0.0.1",
 		LogDir:   "../../logs",
 		PactDir:  "../../pacts",
 	})
