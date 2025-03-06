@@ -46,11 +46,7 @@ func ChangeDraft(client ChangeDraftClient, tmpl template.Template) Handler {
 		var countries []sirius.RefDataItem
 		var cs sirius.CaseSummary
 		var data changeDraftData
-
-		cs, err := client.CaseSummary(ctx, caseUID)
-		if err != nil {
-			return err
-		}
+		var err error
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
@@ -63,7 +59,6 @@ func ChangeDraft(client ChangeDraftClient, tmpl template.Template) Handler {
 		})
 
 		group.Go(func() error {
-			var err error
 			countries, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.CountryCategory)
 			if err != nil {
 				return err
