@@ -2,11 +2,12 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"net/http"
 )
 
 type RemoveAnAttorneyClient interface {
@@ -97,7 +98,7 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 					} else {
 						data.Success = true
 
-						SetFlash(w, FlashNotification{Title: "Attorney statuses updated"})
+						SetFlash(w, FlashNotification{Title: "Update saved"})
 						return RedirectError(fmt.Sprintf("/lpa/%s", uid))
 					}
 				}
