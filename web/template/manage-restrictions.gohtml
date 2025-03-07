@@ -1,34 +1,36 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Manage attorneys{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Manage restrictions and conditions{{ end }}
 
 {{ define "main" }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <a href="{{ prefix (printf "/lpa/%s" .CaseSummary.DigitalLpa.UID )}}" class="govuk-back-link">Back</a>
 
-{{/*            {{ template "mlpa-case-details" . }}*/}}
+            {{ template "mlpa-case-details" . }}
 
-{{/*            {{ template "error-summary" .Error }}*/}}
+            {{ template "error-summary" .Error }}
 
             <h1 class="govuk-heading-l app-!-embedded-hide">Manage restrictions and conditions</h1>
 
             <form class="form" method="POST">
-{{/*                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">*/}}
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
 
-                <div class="govuk-form-group" id="f-attorneyAction">
+                <div class="govuk-form-group{{ if .Error.Field.recipient }} govuk-form-group--error{{ end }}" id="f-severanceAction">
+
                     <fieldset class="govuk-fieldset">
                         <legend class="govuk-fieldset__legend"><strong>Select an option:</strong></legend>
+                        {{ template "errors" .Error.Field.severanceAction }}
 
                         <div class="govuk-radios" data-module="govuk-radios">
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="f-severanceActionRequired" name="severanceAction" type="radio" value="severance-action-not-required">
+                                <input class="govuk-radios__input" id="f-severanceActionRequired" name="severanceAction" type="radio" value="severance-application-not-required" {{ if eq "severance-application-not-required" .SeveranceAction }}checked{{ end }}>
                                 <label class="govuk-label govuk-radios__label" for="f-severanceActionRequired">
                                     Severance application is not required
                                 </label>
                             </div>
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="f-severanceActionNotRequired" name="severanceAction" type="radio" value="severance-action-required">
+                                <input class="govuk-radios__input" id="f-severanceActionNotRequired" name="severanceAction" type="radio" value="severance-application-required" {{ if eq "severance-application-required" .SeveranceAction }}checked{{ end }}>
                                 <label class="govuk-label govuk-radios__label" for="f-severanceActionNotRequired">
                                     Severance application is required
                                 </label>
