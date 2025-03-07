@@ -167,7 +167,7 @@ describe("Change certificate provider details form", () => {
     cy.get("#f-address\\.Postcode").should("have.value", "JJ80 7QL");
     cy.get("#f-address\\.Country").should("have.value", "GB");
 
-    cy.get("#f-phoneNumber").should("have.value", "0151 087 7256");
+    cy.get("#f-phone").should("have.value", "0151 087 7256");
     cy.get("#f-email").should("have.value", "Rhea.Vandervort@example.com");
 
     cy.get("#f-signedAt-day").should("have.value", "19");
