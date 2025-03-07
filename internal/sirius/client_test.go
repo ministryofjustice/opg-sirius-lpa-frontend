@@ -12,12 +12,13 @@ import (
 
 func newPact() *dsl.Pact {
 	return &dsl.Pact{
-		Consumer:          "sirius-lpa-frontend",
-		Provider:          "sirius",
-		Host:              "localhost",
-		PactFileWriteMode: "merge",
-		LogDir:            "../../logs",
-		PactDir:           "../../pacts",
+		Consumer:             "sirius-lpa-frontend",
+		Provider:             "sirius",
+		Host:                 "localhost",
+		PactFileWriteMode:    "merge",
+		LogDir:               "../../logs",
+		PactDir:              "../../pacts",
+		SpecificationVersion: 4,
 	}
 }
 
