@@ -3,18 +3,18 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
-
-	"github.com/pact-foundation/pact-go/dsl"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestAddComplaint(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact2()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name          string
@@ -28,13 +28,13 @@ func TestAddComplaint(t *testing.T) {
 					AddInteraction().
 					Given("I have a pending case assigned").
 					UponReceiving("A request to add a complaint to the case").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/lpas/800/complaints"),
-						Headers: dsl.MapMatcher{
-							"Content-Type": dsl.String("application/json"),
+						Path:   matchers.String("/lpa-api/v1/lpas/800/complaints"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
 						},
-						Body: dsl.Like(map[string]interface{}{
+						Body: matchers.Like(map[string]interface{}{
 							"category":             "02",
 							"description":          "A description",
 							"receivedDate":         "05/04/2022",
@@ -47,10 +47,10 @@ func TestAddComplaint(t *testing.T) {
 							"summary":              "A title",
 						}),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusCreated,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-						Body:    dsl.Like(map[string]interface{}{"id": dsl.Integer()}),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+						Body:    matchers.Like(map[string]interface{}{"id": matchers.Integer(1)}),
 					})
 			},
 		},
@@ -60,8 +60,8 @@ func TestAddComplaint(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				err := client.AddComplaint(Context{Context: context.Background()}, 800, CaseTypeLpa, Complaint{
 					Category:             "02",
@@ -79,7 +79,7 @@ func TestAddComplaint(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
