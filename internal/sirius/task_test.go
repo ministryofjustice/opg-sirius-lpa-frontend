@@ -9,7 +9,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -26,8 +27,8 @@ func (m *mockTaskHttpClient) Do(req *http.Request) (*http.Response, error) {
 func TestTask(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact2()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -42,23 +43,23 @@ func TestTask(t *testing.T) {
 					AddInteraction().
 					Given("I have a case with an open task assigned").
 					UponReceiving("A request for a task").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/tasks/990"),
+						Path:   matchers.String("/lpa-api/v1/tasks/990"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"id":      dsl.Like(990),
-							"status":  dsl.String("Not Started"),
-							"dueDate": dsl.String("10/01/2022"),
-							"name":    dsl.String("Create physical case file"),
-							"caseItems": dsl.EachLike(map[string]interface{}{
-								"uId":      dsl.String("7000-0000-0001"),
-								"caseType": dsl.String("LPA"),
+						Body: matchers.Like(map[string]interface{}{
+							"id":      matchers.Like(990),
+							"status":  matchers.String("Not Started"),
+							"dueDate": matchers.String("10/01/2022"),
+							"name":    matchers.String("Create physical case file"),
+							"caseItems": matchers.EachLike(map[string]interface{}{
+								"uId":      matchers.String("7000-0000-0001"),
+								"caseType": matchers.String("LPA"),
 							}, 1),
 						}),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: Task{
@@ -78,8 +79,8 @@ func TestTask(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				task, err := client.Task(Context{Context: context.Background()}, 990)
 
@@ -87,7 +88,7 @@ func TestTask(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
@@ -132,8 +133,8 @@ func TestTasksForCaseBadJson(t *testing.T) {
 func TestTasksForCase(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact2()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -150,24 +151,24 @@ func TestTasksForCase(t *testing.T) {
 					AddInteraction().
 					Given("I have a case with an open task assigned").
 					UponReceiving("A request for the tasks for a case").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.Like("/lpa-api/v1/cases/10/tasks"),
+						Path:   matchers.Like("/lpa-api/v1/cases/10/tasks"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"tasks": dsl.EachLike(map[string]interface{}{
-								"id":      dsl.Like(12),
-								"status":  dsl.String("Not started"),
-								"dueDate": dsl.String("05/09/2023"),
-								"name":    dsl.String("Review reduced fees request"),
-								"assignee": dsl.Like(map[string]interface{}{
-									"displayName": dsl.String("Consuela"),
+						Body: matchers.Like(map[string]interface{}{
+							"tasks": matchers.EachLike(map[string]interface{}{
+								"id":      matchers.Like(12),
+								"status":  matchers.String("Not started"),
+								"dueDate": matchers.String("05/09/2023"),
+								"name":    matchers.String("Review reduced fees request"),
+								"assignee": matchers.Like(map[string]interface{}{
+									"displayName": matchers.String("Consuela"),
 								}),
 							}, 1),
 						}),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: []Task{
@@ -190,18 +191,18 @@ func TestTasksForCase(t *testing.T) {
 					AddInteraction().
 					Given("There is no case with tasks with the specified ID").
 					UponReceiving("A request for the tasks for a non-existent case").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.Like("/lpa-api/v1/cases/9012929/tasks"),
+						Path:   matchers.Like("/lpa-api/v1/cases/9012929/tasks"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusNotFound,
 					})
 			},
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:          404,
-					URL:           fmt.Sprintf("http://localhost:%d/lpa-api/v1/cases/9012929/tasks?filter=status%%3ANot+started%%2Cactive%%3Atrue&limit=99&sort=duedate%%3AASC", port),
+					URL:           fmt.Sprintf("http://127.0.0.1:%d/lpa-api/v1/cases/9012929/tasks?filter=status%%3ANot+started%%2Cactive%%3Atrue&limit=99&sort=duedate%%3AASC", port),
 					Method:        "GET",
 					CorrelationId: "",
 				}
@@ -213,8 +214,8 @@ func TestTasksForCase(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				tasks, err := client.TasksForCase(Context{Context: context.Background()}, tc.id)
 
@@ -222,7 +223,7 @@ func TestTasksForCase(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))

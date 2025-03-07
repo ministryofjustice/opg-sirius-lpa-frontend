@@ -6,15 +6,16 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetUserDetails(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact2()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -29,18 +30,18 @@ func TestGetUserDetails(t *testing.T) {
 					AddInteraction().
 					Given("I am a reduced fees user").
 					UponReceiving("A request for the current user").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/users/current"),
+						Path:   matchers.String("/lpa-api/v1/users/current"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"id":          dsl.Like(104),
-							"displayName": dsl.String("Test User"),
-							"roles":       dsl.Like([]string{"OPG User", "Reduced Fees User"}),
+						Body: matchers.Like(map[string]interface{}{
+							"id":          matchers.Like(104),
+							"displayName": matchers.String("Test User"),
+							"roles":       matchers.Like([]string{"OPG User", "Reduced Fees User"}),
 						}),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: User{
@@ -55,8 +56,8 @@ func TestGetUserDetails(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				currentUser, err := client.GetUserDetails(Context{Context: context.Background()})
 
@@ -64,7 +65,7 @@ func TestGetUserDetails(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
