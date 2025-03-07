@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -95,6 +96,116 @@ func (c *Client) get(ctx Context, path string, v interface{}) error {
 	}
 
 	return json.NewDecoder(resp.Body).Decode(&v)
+}
+
+func (c *Client) post(ctx Context, path string, body interface{}, response interface{}) error {
+	data := []byte{}
+
+	if body != nil {
+		var err error
+		data, err = json.Marshal(body)
+		if err != nil {
+			return err
+		}
+	}
+
+	req, err := c.newRequest(ctx, http.MethodPost, path, bytes.NewReader(data))
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close() //#nosec G307 false positive
+
+	if resp.StatusCode == http.StatusBadRequest {
+		var v ValidationError
+		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
+			return err
+		}
+		return v
+	}
+
+	if resp.StatusCode != http.StatusCreated {
+		return newStatusError(resp)
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) put(ctx Context, path string, body interface{}, response interface{}) error {
+	data := []byte{}
+
+	if body != nil {
+		var err error
+		data, err = json.Marshal(body)
+		if err != nil {
+			return err
+		}
+	}
+
+	req, err := c.newRequest(ctx, http.MethodPut, path, bytes.NewReader(data))
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close() //#nosec G307 false positive
+
+	if resp.StatusCode == http.StatusBadRequest {
+		var v ValidationError
+		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
+			return err
+		}
+		return v
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return newStatusError(resp)
+	}
+
+	var buf []byte
+	if buf, err = io.ReadAll(resp.Body); err != nil {
+		return err
+	}
+
+	if len(buf) == 0 {
+		return nil
+	}
+
+	if err := json.Unmarshal(buf, &response); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) delete(ctx Context, path string) error {
+	req, err := c.newRequest(ctx, http.MethodDelete, path, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close() //#nosec G307 false positive
+
+	if resp.StatusCode != http.StatusNoContent {
+		return newStatusError(resp)
+	}
+
+	return nil
 }
 
 type StatusError struct {
