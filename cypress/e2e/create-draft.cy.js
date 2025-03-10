@@ -80,7 +80,7 @@ describe("Create Digital LPA draft", () => {
       });
 
     cy.get("#f-donorPhone").type("07893932118");
-    cy.get("#f-donorEmail").type("c.morneault@somehost.example");
+    cy.get("#f-donorEmail").type("c.morneault@example.com");
 
     cy.contains("Confirm and create draft LPA").click();
     cy.get(".govuk-notification-banner").contains(
