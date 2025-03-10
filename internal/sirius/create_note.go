@@ -1,10 +1,7 @@
 package sirius
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
 type NoteFile struct {
@@ -21,38 +18,12 @@ type noteRequest struct {
 }
 
 func (c *Client) CreateNote(ctx Context, entityID int, entityType EntityType, noteType, name, description string, file *NoteFile) error {
-	data, err := json.Marshal(noteRequest{
+	data := noteRequest{
 		Name:        name,
 		Description: description,
 		Type:        noteType,
 		File:        file,
-	})
-	if err != nil {
-		return err
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("/lpa-api/v1/%ss/%d/notes", entityType, entityID), bytes.NewReader(data))
-	if err != nil {
-		return err
-	}
-
-	res, err := c.http.Do(req)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close() //#nosec G307 false positive
-
-	if res.StatusCode == http.StatusBadRequest {
-		var v ValidationError
-		if err := json.NewDecoder(res.Body).Decode(&v); err != nil {
-			return err
-		}
-		return v
-	}
-
-	if res.StatusCode != http.StatusCreated {
-		return newStatusError(res)
-	}
-
-	return nil
+	return c.post(ctx, fmt.Sprintf("/lpa-api/v1/%ss/%d/notes", entityType, entityID), data, nil)
 }
