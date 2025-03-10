@@ -1,16 +1,13 @@
 package sirius
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
 func (c *Client) CreateDocument(ctx Context, caseID, correspondentID int, templateID string, inserts []string) (Document, error) {
 	var d Document
 
-	data, err := json.Marshal(struct {
+	data := struct {
 		TemplateID      string   `json:"templateId"`
 		Inserts         []string `json:"inserts"`
 		CorrespondentID int      `json:"correspondentId"`
@@ -18,37 +15,11 @@ func (c *Client) CreateDocument(ctx Context, caseID, correspondentID int, templa
 		TemplateID:      templateID,
 		Inserts:         inserts,
 		CorrespondentID: correspondentID,
-	})
+	}
 
+	err := c.post(ctx, fmt.Sprintf("/lpa-api/v1/lpas/%d/documents/draft", caseID), data, &d)
 	if err != nil {
-		return d, err
-	}
-
-	req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("/lpa-api/v1/lpas/%d/documents/draft", caseID), bytes.NewReader(data))
-	if err != nil {
-		return d, err
-	}
-
-	resp, err := c.http.Do(req)
-	if err != nil {
-		return d, err
-	}
-	defer resp.Body.Close() //#nosec G307 false positive
-
-	if resp.StatusCode == http.StatusBadRequest {
-		var v ValidationError
-		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
-			return d, err
-		}
-		return d, v
-	}
-
-	if resp.StatusCode != http.StatusCreated {
-		return d, newStatusError(resp)
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&d); err != nil {
-		return d, err
+		return Document{}, nil
 	}
 
 	return d, nil
