@@ -1,9 +1,7 @@
 package sirius
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
 type Warning struct {
@@ -15,27 +13,10 @@ type Warning struct {
 }
 
 func (c *Client) WarningsForCase(ctx Context, caseId int) ([]Warning, error) {
+	var warningList []Warning
 	path := fmt.Sprintf("/lpa-api/v1/cases/%d/warnings", caseId)
 
-	req, err := c.newRequest(ctx, http.MethodGet, path, nil)
-
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := c.http.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close() //#nosec G307 false positive
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, newStatusError(resp)
-	}
-
-	var warningList []Warning
-	err = json.NewDecoder(resp.Body).Decode(&warningList)
+	err := c.get(ctx, path, &warningList)
 	if err != nil {
 		return nil, err
 	}
