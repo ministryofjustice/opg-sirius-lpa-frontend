@@ -104,17 +104,7 @@ describe("Change certificate provider details form", () => {
     });
 
     cases.warnings.empty("1111");
-
-    cy.addMock(
-      "/lpa-api/v1/cases/1111/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-      "GET",
-      {
-        status: 200,
-        body: {
-          tasks: [],
-        },
-      },
-    );
+    cases.tasks.empty("1111");
 
     cy.addMock(
       "/lpa-api/v1/digital-lpas/M-1111-1111-1111/progress-indicators",
