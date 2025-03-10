@@ -157,6 +157,14 @@ describe("Change certificate provider details form", () => {
   });
 
   it("can submit the change details form", () => {
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-1111-1111-1111/change-certificate-provider-details",
+      "PUT",
+      {
+        status: 204,
+      },
+    );
+
     cy.get("#f-firstNames").should("have.value", "Rhea");
     cy.get("#f-lastName").should("have.value", "Vandervort");
 
