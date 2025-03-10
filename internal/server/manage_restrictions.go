@@ -3,13 +3,16 @@ package server
 import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"golang.org/x/sync/errgroup"
 	"net/http"
 )
 
 type ManageRestrictionsClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
+	ClearTask(sirius.Context, int) error
 }
 
 type manageRestrictionsData struct {
@@ -18,38 +21,34 @@ type manageRestrictionsData struct {
 	CaseUID         string
 	CaseSummary     sirius.CaseSummary
 	SeveranceAction string
+	Success         bool
 }
 
 func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template) Handler {
-	//if decoder == nil {
-	//	decoder = form.NewDecoder()
-	//}
+	if decoder == nil {
+		decoder = form.NewDecoder()
+	}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseUID := chi.URLParam(r, "uid")
 		ctx := getContext(r)
 
-		cs, err := client.CaseSummary(ctx, caseUID)
-		if err != nil {
+		var cs sirius.CaseSummary
+		var err error
+
+		group, groupCtx := errgroup.WithContext(ctx.Context)
+
+		group.Go(func() error {
+			cs, err = client.CaseSummary(ctx.With(groupCtx), caseUID)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
 			return err
 		}
-
-		//var cs sirius.CaseSummary
-		//var err error
-		//
-		//group, groupCtx := errgroup.WithContext(ctx.Context)
-		//
-		//group.Go(func() error {
-		//	cs, err = client.CaseSummary(ctx.With(groupCtx), caseUID)
-		//	if err != nil {
-		//		return err
-		//	}
-		//	return nil
-		//})
-		//
-		//if err := group.Wait(); err != nil {
-		//	return err
-		//}
 
 		data := manageRestrictionsData{
 			CaseSummary:     cs,
@@ -62,12 +61,42 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 		if r.Method == http.MethodPost {
 			var redirectUrl string
 
+			taskList := data.CaseSummary.TaskList
+			reviewRestrictionsTask := false
+			var taskID int
+			for _, task := range taskList {
+				if task.Name == "Review restrictions and conditions" && task.Status != "Completed" {
+					reviewRestrictionsTask = true
+					taskID = task.ID
+				}
+			}
+
 			switch data.SeveranceAction {
 			case "severance-application-not-required":
-				redirectUrl = fmt.Sprintf("/lpa/%s/remove-an-attorney", caseUID)
+
+				err := client.ClearTask(ctx, taskID)
+
+				if ve, ok := err.(sirius.ValidationError); ok {
+					w.WriteHeader(http.StatusBadRequest)
+					data.Error = ve
+				} else if err != nil {
+					return err
+				} else {
+					data.Success = true
+
+					SetFlash(w, FlashNotification{
+						Title: "Changes confirmed",
+					})
+
+					return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
+				}
 
 			case "severance-application-required":
-				redirectUrl = fmt.Sprintf("/lpa/%s/enable-replacement-attorney", caseUID)
+				if reviewRestrictionsTask {
+					data.Error.Field["severanceAction"] = map[string]string{
+						"reason": "Not implemented yet",
+					}
+				}
 
 			default:
 				w.WriteHeader(http.StatusBadRequest)
