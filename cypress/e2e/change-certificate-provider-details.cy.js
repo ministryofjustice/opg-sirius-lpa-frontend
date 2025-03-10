@@ -73,6 +73,22 @@ describe("Change certificate provider details form", () => {
     cy.get("#f-signedAt-month").should("have.value", "1");
     cy.get("#f-signedAt-year").should("have.value", "2025");
 
+    cy.get("#f-firstNames").clear().type("Wilfredo");
+    cy.get("#f-lastName").clear().type("Morissette");
+
+    cy.get("#f-address\\.Line1").clear().type("8 Christine Ridge");
+    cy.get("#f-address\\.Line2").clear().type("Schiller Gardens");
+    cy.get("#f-address\\.Line3").clear().type("Stoltenberg");
+    cy.get("#f-address\\.Town").clear().type("Dyfed");
+    cy.get("#f-address\\.Postcode").clear().type("YH7 4SO");
+
+    cy.get("#f-phone").clear().type("0953 339 6087");
+    cy.get("#f-email").clear().type("Wilfredo.Morissette@example.com");
+
+    cy.get("#f-signedAt-day").clear().type("25");
+    cy.get("#f-signedAt-month").clear().type("6");
+    cy.get("#f-signedAt-year").clear().type("2025");
+
     cy.contains("Save and continue").click();
     cy.url().should("contain", "/lpa/M-1111-1111-1111/lpa-details");
   });
