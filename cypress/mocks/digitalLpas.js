@@ -1,7 +1,7 @@
 import { addMock } from "./wiremock";
 
-async function get(uid, body) {
-  var defaultBody = {
+function extendDefaultDigitalLpa(uid, body) {
+  let defaultBody = {
     uId: uid,
     "opg.poas.sirius": {
       id: 1111,
@@ -99,26 +99,29 @@ async function get(uid, body) {
     },
   };
 
-  var opgPoasSirius = defaultBody["opg.poas.sirius"];
-  var opgPoasSiriusDonor = defaultBody["opg.poas.sirius"].donor;
-  var opgPoasSiriusApplication = defaultBody["opg.poas.sirius"].application;
-  var opgPoasLpastore = defaultBody["opg.poas.lpastore"];
-  var opgPoasLpastoreDonor = defaultBody["opg.poas.lpastore"].donor;
-  var opgPoasLpastoreAttorneys = defaultBody["opg.poas.lpastore"].attorneys;
-  var opgPoasLpastoreCertificateProvider =
+  let opgPoasSirius = defaultBody["opg.poas.sirius"];
+  let opgPoasSiriusDonor = defaultBody["opg.poas.sirius"].donor;
+  let opgPoasSiriusApplication = defaultBody["opg.poas.sirius"].application;
+  let opgPoasLpastore = defaultBody["opg.poas.lpastore"];
+  let opgPoasLpastoreDonor = defaultBody["opg.poas.lpastore"].donor;
+  let opgPoasLpastoreAttorneys = defaultBody["opg.poas.lpastore"].attorneys;
+  let opgPoasLpastoreCertificateProvider =
     defaultBody["opg.poas.lpastore"].certificateProvider;
 
   if (body !== undefined) {
     if (body.hasOwnProperty("opg.poas.sirius")) {
       opgPoasSirius = Object.assign(
+        {},
         defaultBody["opg.poas.sirius"],
         body["opg.poas.sirius"],
       );
       opgPoasSiriusDonor = Object.assign(
+        {},
         defaultBody["opg.poas.sirius"].donor,
         body["opg.poas.sirius"].donor ?? null,
       );
       opgPoasSiriusApplication = Object.assign(
+        {},
         defaultBody["opg.poas.sirius"].application,
         body["opg.poas.sirius"].application ?? null,
       );
@@ -126,25 +129,25 @@ async function get(uid, body) {
 
     if (body.hasOwnProperty("opg.poas.lpastore")) {
       opgPoasLpastore = Object.assign(
+        {},
         defaultBody["opg.poas.lpastore"],
         body["opg.poas.lpastore"],
       );
       opgPoasLpastoreDonor = Object.assign(
+        {},
         defaultBody["opg.poas.lpastore"].donor,
         body["opg.poas.lpastore"].donor ?? null,
       );
-      opgPoasLpastoreAttorneys = Object.assign(
-        defaultBody["opg.poas.lpastore"].attorneys,
-        body["opg.poas.lpastore"].attorneys ?? null,
-      );
+      opgPoasLpastoreAttorneys = body["opg.poas.lpastore"].attorneys ?? [];
       opgPoasLpastoreCertificateProvider = Object.assign(
+        {},
         defaultBody["opg.poas.lpastore"].certificateProvider,
         body["opg.poas.lpastore"].certificateProvider ?? null,
       );
     }
   }
 
-  var updatedBody = {
+  let updatedBody = {
     uid: uid,
     "opg.poas.sirius": opgPoasSirius,
     "opg.poas.lpastore": opgPoasLpastore,
@@ -156,6 +159,12 @@ async function get(uid, body) {
   updatedBody["opg.poas.lpastore"].attorneys = opgPoasLpastoreAttorneys;
   updatedBody["opg.poas.lpastore"].certificateProvider =
     opgPoasLpastoreCertificateProvider;
+
+  return updatedBody;
+}
+
+async function get(uid, body) {
+  const updatedBody = extendDefaultDigitalLpa(uid, body);
 
   await addMock(`/lpa-api/v1/digital-lpas/${uid}`, "GET", {
     status: 200,
