@@ -3,27 +3,7 @@ import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("Change certificate provider details form", () => {
   beforeEach(() => {
-    digitalLpas.get("M-1111-1111-1111", {
-      "opg.poas.lpastore": {
-        certificateProvider: {
-          uid: "c362e307-71b9-4070-bdde-c19b4cdf5c1a",
-          channel: "online",
-          firstNames: "Rhea",
-          lastName: "Vandervort",
-          address: {
-            line1: "290 Vivien Road",
-            line2: "Lower Court",
-            line3: "Tillman",
-            town: "Oxfordshire",
-            postcode: "JJ80 7QL",
-            country: "GB",
-          },
-          email: "Rhea.Vandervort@example.com",
-          phone: "0151 087 7256",
-          signedAt: "2025-01-19T09:12:59Z",
-        },
-      },
-    });
+    digitalLpas.get("M-1111-1111-1111");
 
     cases.warnings.empty("1111");
     cases.tasks.empty("1111");
