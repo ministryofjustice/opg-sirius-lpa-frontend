@@ -22,7 +22,7 @@ describe("Change certificate provider details form", () => {
           phone: "0151 087 7256",
           signedAt: "2025-01-19T09:12:59Z",
         },
-      }
+      },
     });
 
     cases.warnings.empty("1111");

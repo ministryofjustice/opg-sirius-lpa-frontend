@@ -105,20 +105,42 @@ async function get(uid, body) {
   var opgPoasLpastore = defaultBody["opg.poas.lpastore"];
   var opgPoasLpastoreDonor = defaultBody["opg.poas.lpastore"].donor;
   var opgPoasLpastoreAttorneys = defaultBody["opg.poas.lpastore"].attorneys;
-  var opgPoasLpastoreCertificateProvider = defaultBody["opg.poas.lpastore"].certificateProvider;
+  var opgPoasLpastoreCertificateProvider =
+    defaultBody["opg.poas.lpastore"].certificateProvider;
 
   if (body !== undefined) {
     if (body.hasOwnProperty("opg.poas.sirius")) {
-      opgPoasSirius = Object.assign(defaultBody["opg.poas.sirius"], body["opg.poas.sirius"]);
-      opgPoasSiriusDonor = Object.assign(defaultBody["opg.poas.sirius"].donor, body["opg.poas.sirius"].donor ?? null);
-      opgPoasSiriusApplication = Object.assign(defaultBody["opg.poas.sirius"].application, body["opg.poas.sirius"].application ?? null);
+      opgPoasSirius = Object.assign(
+        defaultBody["opg.poas.sirius"],
+        body["opg.poas.sirius"],
+      );
+      opgPoasSiriusDonor = Object.assign(
+        defaultBody["opg.poas.sirius"].donor,
+        body["opg.poas.sirius"].donor ?? null,
+      );
+      opgPoasSiriusApplication = Object.assign(
+        defaultBody["opg.poas.sirius"].application,
+        body["opg.poas.sirius"].application ?? null,
+      );
     }
 
     if (body.hasOwnProperty("opg.poas.lpastore")) {
-      opgPoasLpastore = Object.assign(defaultBody["opg.poas.lpastore"], body["opg.poas.lpastore"]);
-      opgPoasLpastoreDonor = Object.assign(defaultBody["opg.poas.lpastore"].donor, body["opg.poas.lpastore"].donor ?? null);
-      opgPoasLpastoreAttorneys = Object.assign(defaultBody["opg.poas.lpastore"].attorneys, body["opg.poas.lpastore"].attorneys ?? null);
-      opgPoasLpastoreCertificateProvider = Object.assign(defaultBody["opg.poas.lpastore"].certificateProvider, body["opg.poas.lpastore"].certificateProvider ?? null);
+      opgPoasLpastore = Object.assign(
+        defaultBody["opg.poas.lpastore"],
+        body["opg.poas.lpastore"],
+      );
+      opgPoasLpastoreDonor = Object.assign(
+        defaultBody["opg.poas.lpastore"].donor,
+        body["opg.poas.lpastore"].donor ?? null,
+      );
+      opgPoasLpastoreAttorneys = Object.assign(
+        defaultBody["opg.poas.lpastore"].attorneys,
+        body["opg.poas.lpastore"].attorneys ?? null,
+      );
+      opgPoasLpastoreCertificateProvider = Object.assign(
+        defaultBody["opg.poas.lpastore"].certificateProvider,
+        body["opg.poas.lpastore"].certificateProvider ?? null,
+      );
     }
   }
 
@@ -132,16 +154,13 @@ async function get(uid, body) {
   updatedBody["opg.poas.sirius"].application = opgPoasSiriusApplication;
   updatedBody["opg.poas.lpastore"].donor = opgPoasLpastoreDonor;
   updatedBody["opg.poas.lpastore"].attorneys = opgPoasLpastoreAttorneys;
-  updatedBody["opg.poas.lpastore"].certificateProvider = opgPoasLpastoreCertificateProvider;
+  updatedBody["opg.poas.lpastore"].certificateProvider =
+    opgPoasLpastoreCertificateProvider;
 
-  await addMock(
-    `/lpa-api/v1/digital-lpas/${uid}`,
-    "GET",
-    {
-      status: 200,
-      body: updatedBody,
-    }
-  );
+  await addMock(`/lpa-api/v1/digital-lpas/${uid}`, "GET", {
+    status: 200,
+    body: updatedBody,
+  });
 }
 
 const progressIndicators = {
@@ -157,7 +176,10 @@ const progressIndicators = {
             { indicator: "FEES", status: "IN_PROGRESS" },
             { indicator: "DONOR_ID", status: "CANNOT_START" },
             { indicator: "CERTIFICATE_PROVIDER_ID", status: "CANNOT_START" },
-            { indicator: "CERTIFICATE_PROVIDER_SIGNATURE", status: "CANNOT_START" },
+            {
+              indicator: "CERTIFICATE_PROVIDER_SIGNATURE",
+              status: "CANNOT_START",
+            },
             { indicator: "ATTORNEY_SIGNATURES", status: "CANNOT_START" },
             { indicator: "PREREGISTRATION_NOTICES", status: "CANNOT_START" },
             { indicator: "REGISTRATION_NOTICES", status: "CANNOT_START" },
@@ -165,7 +187,7 @@ const progressIndicators = {
         },
       },
     );
-  }
+  },
 };
 
 export { get, progressIndicators };
