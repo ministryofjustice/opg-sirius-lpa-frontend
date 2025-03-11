@@ -73,6 +73,7 @@ function extendDefaultDigitalLpa(uid, body) {
             country: "GB",
           },
           status: "active",
+          appointmentType: "original",
           signedAt: "2022-12-19T09:12:59Z",
           dateOfBirth: "1971-11-27",
           mobile: "0500133447",
