@@ -61,8 +61,8 @@ func TestChangeCertificateProviderDetails(t *testing.T) {
 								"country":      "GB",
 							},
 							"phoneNumber": "056 8656 8956",
-							"email":       "Janelle.Oreilly@example.comm",
-							"SignedAt":    "21/02/2025",
+							"email":       "Janelle.Oreilly@example.com",
+							"signedAt":    "21/02/2025",
 						},
 					}).
 					WillRespondWith(dsl.Response{
