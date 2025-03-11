@@ -59,8 +59,6 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 		}
 
 		if r.Method == http.MethodPost {
-			var redirectUrl string
-
 			taskList := data.CaseSummary.TaskList
 			reviewRestrictionsTask := false
 			var taskID int
@@ -73,7 +71,6 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 
 			switch data.SeveranceAction {
 			case "severance-application-not-required":
-
 				err := client.ClearTask(ctx, taskID)
 
 				if ve, ok := err.(sirius.ValidationError); ok {
@@ -93,6 +90,7 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 
 			case "severance-application-required":
 				if reviewRestrictionsTask {
+					w.WriteHeader(http.StatusBadRequest)
 					data.Error.Field["severanceAction"] = map[string]string{
 						"reason": "Not implemented yet",
 					}
@@ -100,17 +98,11 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 
 			default:
 				w.WriteHeader(http.StatusBadRequest)
-
 				data.Error.Field["severanceAction"] = map[string]string{
 					"reason": "Please select an option",
 				}
 			}
-
-			if !data.Error.Any() && redirectUrl != "" {
-				return RedirectError(redirectUrl)
-			}
 		}
-
 		return tmpl(w, data)
 	}
 }
