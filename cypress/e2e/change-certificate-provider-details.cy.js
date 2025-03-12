@@ -8,6 +8,7 @@ describe("Change certificate provider details form", () => {
     cases.warnings.empty("1111");
     cases.tasks.empty("1111");
 
+    digitalLpas.anomalies.empty("M-1111-1111-1111");
     digitalLpas.progressIndicators.feesInProgress("M-1111-1111-1111");
 
     cy.visit("/lpa/M-1111-1111-1111/certificate-provider/change-details");
