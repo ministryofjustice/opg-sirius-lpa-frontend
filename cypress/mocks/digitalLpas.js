@@ -211,8 +211,8 @@ const anomalies = {
           tasks: [],
         },
       },
-    )
-  }
+    );
+  },
 };
 
 export { get, progressIndicators, anomalies };
