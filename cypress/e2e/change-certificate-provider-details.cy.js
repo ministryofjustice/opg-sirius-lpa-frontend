@@ -1,143 +1,15 @@
 import * as cases from "../mocks/cases";
+import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("Change certificate provider details form", () => {
   beforeEach(() => {
-    cy.addMock("/lpa-api/v1/digital-lpas/M-1111-1111-1111", "GET", {
-      status: 200,
-      body: {
-        uId: "M-1111-1111-1111",
-        "opg.poas.sirius": {
-          id: 1111,
-          uId: "M-1111-1111-1111",
-          status: "Draft",
-          caseSubtype: "property-and-affairs",
-          createdDate: "31/10/2023",
-          investigationCount: 0,
-          complaintCount: 0,
-          taskCount: 0,
-          warningCount: 0,
-          dueDate: "01/12/2023",
-          donor: {
-            id: 1111,
-            firstname: "Steven",
-            surname: "Munnell",
-            dob: "17/06/1982",
-            addressLine1: "1 Scotland Street",
-            addressLine2: "Netherton",
-            addressLine3: "Glasgow",
-            town: "Edinburgh",
-            postcode: "EH6 18J",
-            country: "GB",
-            personType: "Donor",
-          },
-          application: {
-            donorFirstNames: "Steven",
-            donorLastName: "Munnell",
-            donorDob: "17/06/1982",
-            donorAddress: {
-              addressLine1: "1 Scotland Street",
-              postcode: "EH6 18J",
-            },
-          },
-        },
-        "opg.poas.lpastore": {
-          lpaType: "pf",
-          channel: "online",
-          status: "draft",
-          registrationDate: "2022-12-18",
-          peopleToNotify: [],
-          donor: {
-            uid: "572fe550-e465-40b3-a643-ca9564fabab8",
-            firstNames: "Steven",
-            lastName: "Munnell",
-            email: "Steven.Munnell@example.com",
-            dateOfBirth: "17/06/1982",
-            otherNamesKnownBy: "",
-            contactLanguagePreference: "",
-            address: {
-              line1: "1 Scotland Street",
-              line2: "Netherton",
-              line3: "Glasgow",
-              town: "Edinburgh",
-              postcode: "EH6 18J",
-              country: "GB",
-            },
-          },
-          attorneys: [
-            {
-              uid: "active-attorney-1",
-              firstNames: "Katheryn",
-              lastName: "Collins",
-              address: {
-                line1: "9 O'Reilly Rise",
-                line2: "Upton",
-                town: "Williamsonborough",
-                postcode: "ZZ24 4JM",
-                country: "GB",
-              },
-              status: "active",
-              signedAt: "2022-12-19T09:12:59Z",
-              dateOfBirth: "1971-11-27",
-              mobile: "0500133447",
-              email: "K.Collins@example.com",
-            },
-          ],
-          certificateProvider: {
-            uid: "c362e307-71b9-4070-bdde-c19b4cdf5c1a",
-            channel: "online",
-            firstNames: "Rhea",
-            lastName: "Vandervort",
-            address: {
-              line1: "290 Vivien Road",
-              line2: "Lower Court",
-              line3: "Tillman",
-              town: "Oxfordshire",
-              postcode: "JJ80 7QL",
-              country: "GB",
-            },
-            email: "Rhea.Vandervort@example.com",
-            phone: "0151 087 7256",
-            signedAt: "2025-01-19T09:12:59Z",
-          },
-        },
-      },
-    });
+    digitalLpas.get("M-1111-1111-1111");
 
     cases.warnings.empty("1111");
+    cases.tasks.empty("1111");
 
-    cy.addMock(
-      "/lpa-api/v1/cases/1111/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-      "GET",
-      {
-        status: 200,
-        body: {
-          tasks: [],
-        },
-      },
-    );
-
-    cy.addMock(
-      "/lpa-api/v1/digital-lpas/M-1111-1111-1111/progress-indicators",
-      "GET",
-      {
-        status: 200,
-        body: {
-          digitalLpaUid: "M-1111-1111-1111",
-          progressIndicators: [
-            { indicator: "FEES", status: "IN_PROGRESS" },
-            { indicator: "DONOR_ID", status: "CANNOT_START" },
-            { indicator: "CERTIFICATE_PROVIDER_ID", status: "CANNOT_START" },
-            {
-              indicator: "CERTIFICATE_PROVIDER_SIGNATURE",
-              status: "CANNOT_START",
-            },
-            { indicator: "ATTORNEY_SIGNATURES", status: "CANNOT_START" },
-            { indicator: "PREREGISTRATION_NOTICES", status: "CANNOT_START" },
-            { indicator: "REGISTRATION_NOTICES", status: "CANNOT_START" },
-          ],
-        },
-      },
-    );
+    digitalLpas.anomalies.empty("M-1111-1111-1111");
+    digitalLpas.progressIndicators.feesInProgress("M-1111-1111-1111");
 
     cy.visit("/lpa/M-1111-1111-1111/certificate-provider/change-details");
   });
@@ -157,6 +29,14 @@ describe("Change certificate provider details form", () => {
   });
 
   it("can submit the change details form", () => {
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-1111-1111-1111/change-certificate-provider-details",
+      "PUT",
+      {
+        status: 204,
+      },
+    );
+
     cy.get("#f-firstNames").should("have.value", "Rhea");
     cy.get("#f-lastName").should("have.value", "Vandervort");
 
@@ -167,12 +47,28 @@ describe("Change certificate provider details form", () => {
     cy.get("#f-address\\.Postcode").should("have.value", "JJ80 7QL");
     cy.get("#f-address\\.Country").should("have.value", "GB");
 
-    cy.get("#f-phoneNumber").should("have.value", "0151 087 7256");
+    cy.get("#f-phone").should("have.value", "0151 087 7256");
     cy.get("#f-email").should("have.value", "Rhea.Vandervort@example.com");
 
     cy.get("#f-signedAt-day").should("have.value", "19");
     cy.get("#f-signedAt-month").should("have.value", "1");
     cy.get("#f-signedAt-year").should("have.value", "2025");
+
+    cy.get("#f-firstNames").clear().type("Wilfredo");
+    cy.get("#f-lastName").clear().type("Morissette");
+
+    cy.get("#f-address\\.Line1").clear().type("8 Christine Ridge");
+    cy.get("#f-address\\.Line2").clear().type("Schiller Gardens");
+    cy.get("#f-address\\.Line3").clear().type("Stoltenberg");
+    cy.get("#f-address\\.Town").clear().type("Dyfed");
+    cy.get("#f-address\\.Postcode").clear().type("YH7 4SO");
+
+    cy.get("#f-phone").clear().type("0953 339 6087");
+    cy.get("#f-email").clear().type("Wilfredo.Morissette@example.com");
+
+    cy.get("#f-signedAt-day").clear().type("25");
+    cy.get("#f-signedAt-month").clear().type("6");
+    cy.get("#f-signedAt-year").clear().type("2025");
 
     cy.contains("Save and continue").click();
     cy.url().should("contain", "/lpa/M-1111-1111-1111/lpa-details");
