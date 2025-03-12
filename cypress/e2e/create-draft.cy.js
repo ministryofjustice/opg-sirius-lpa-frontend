@@ -83,14 +83,10 @@ describe("Create Digital LPA draft", () => {
     cy.get("#f-donorEmail").type("c.morneault@somehost.example");
 
     cy.contains("Confirm and create draft LPA").click();
-    cy.get(".govuk-notification-banner").contains(
-      "2 draft LPAs for Coleen Stephanie Morneault have been created.",
-    );
-    cy.get(".govuk-notification-banner").contains(
-      "M-GHIJ-7890-KLMN Personal welfare",
-    );
-    cy.get(".govuk-notification-banner").contains(
-      "M-ABCD-1234-EF56 Property and affairs",
-    );
+    cy.get(".govuk-notification-banner").should("be.visible").within(() => {
+      cy.contains("2 draft LPAs for Coleen Stephanie Morneault have been created.");
+      cy.contains("M-GHIJ-7890-KLMN Personal welfare");
+      cy.contains("M-ABCD-1234-EF56 Property and affairs");
+    });
   });
 });
