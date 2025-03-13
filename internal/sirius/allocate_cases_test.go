@@ -3,18 +3,19 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAllocateCases(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact2()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name          string
@@ -30,11 +31,11 @@ func TestAllocateCases(t *testing.T) {
 					AddInteraction().
 					Given("I have a pending case assigned").
 					UponReceiving("A request to change the assignee of the case").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/users/47/cases/800"),
-						Headers: dsl.MapMatcher{
-							"Content-Type": dsl.String("application/json"),
+						Path:   matchers.String("/lpa-api/v1/users/47/cases/800"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
 						},
 						Body: map[string]interface{}{
 							"data": []map[string]interface{}{{
@@ -43,9 +44,9 @@ func TestAllocateCases(t *testing.T) {
 							}},
 						},
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			allocations: []CaseAllocation{{ID: 800, CaseType: "LPA"}},
@@ -57,11 +58,11 @@ func TestAllocateCases(t *testing.T) {
 					AddInteraction().
 					Given("Multiple cases exist").
 					UponReceiving("A request to change the assignee of multiple cases").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/users/47/cases/800+801+802"),
-						Headers: dsl.MapMatcher{
-							"Content-Type": dsl.String("application/json"),
+						Path:   matchers.String("/lpa-api/v1/users/47/cases/800+801+802"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
 						},
 						Body: map[string]interface{}{
 							"data": []map[string]interface{}{{
@@ -76,9 +77,9 @@ func TestAllocateCases(t *testing.T) {
 							}},
 						},
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			allocations: []CaseAllocation{{ID: 800, CaseType: "LPA"}, {ID: 801, CaseType: "LPA"}, {ID: 802, CaseType: "EPA"}},
@@ -89,14 +90,14 @@ func TestAllocateCases(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				err := client.AllocateCases(Context{Context: context.Background()}, 47, tc.allocations)
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))

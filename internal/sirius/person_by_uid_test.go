@@ -6,15 +6,16 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestPersonByUid(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact2()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -29,20 +30,20 @@ func TestPersonByUid(t *testing.T) {
 					AddInteraction().
 					Given("A donor exists").
 					UponReceiving("A request for the person by UID").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/persons/by-uid/7000-0000-0001"),
+						Path:   matchers.String("/lpa-api/v1/persons/by-uid/7000-0000-0001"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"id":        dsl.Like(103),
-							"uId":       dsl.Term("7000-0000-0001", `7\d{3}-\d{4}-\d{4}`),
-							"firstname": dsl.String("John"),
-							"surname":   dsl.String("Doe"),
-							"dob":       dsl.Term("01/01/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
+						Body: matchers.Like(map[string]interface{}{
+							"id":        matchers.Like(103),
+							"uId":       matchers.Term("7000-0000-0001", `7\d{3}-\d{4}-\d{4}`),
+							"firstname": matchers.String("John"),
+							"surname":   matchers.String("Doe"),
+							"dob":       matchers.Term("01/01/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
 						}),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: Person{
@@ -60,23 +61,23 @@ func TestPersonByUid(t *testing.T) {
 					AddInteraction().
 					Given("A donor exists with children").
 					UponReceiving("A request for the person by UID").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/persons/by-uid/7000-0000-0001"),
+						Path:   matchers.String("/lpa-api/v1/persons/by-uid/7000-0000-0001"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"id":        dsl.Like(103),
-							"uId":       dsl.Term("7000-0000-0001", `7\d{3}-\d{4}-\d{4}`),
-							"firstname": dsl.String("John"),
-							"surname":   dsl.String("Doe"),
-							"dob":       dsl.Term("01/01/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
-							"children": dsl.EachLike(map[string]interface{}{
-								"id": dsl.Like(104),
+						Body: matchers.Like(map[string]interface{}{
+							"id":        matchers.Like(103),
+							"uId":       matchers.Term("7000-0000-0001", `7\d{3}-\d{4}-\d{4}`),
+							"firstname": matchers.String("John"),
+							"surname":   matchers.String("Doe"),
+							"dob":       matchers.Term("01/01/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
+							"children": matchers.EachLike(map[string]interface{}{
+								"id": matchers.Like(104),
 							}, 1),
 						}),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: Person{
@@ -98,8 +99,8 @@ func TestPersonByUid(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				caseitem, err := client.PersonByUid(Context{Context: context.Background()}, "7000-0000-0001")
 
@@ -107,7 +108,7 @@ func TestPersonByUid(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
