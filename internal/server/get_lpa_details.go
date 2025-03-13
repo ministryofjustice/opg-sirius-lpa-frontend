@@ -11,7 +11,7 @@ import (
 )
 
 type GetLpaDetailsClient interface {
-	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
+	CaseSummaryWithImages(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
 	AnomaliesForDigitalLpa(ctx sirius.Context, uid string) ([]sirius.Anomaly, error)
 }
 
@@ -19,6 +19,7 @@ type getLpaDetails struct {
 	CaseSummary             sirius.CaseSummary
 	DigitalLpa              sirius.DigitalLpa
 	AnomalyDisplay          *sirius.AnomalyDisplay
+	ReviewRestrictions      bool
 	ReplacementAttorneys    []sirius.LpaStoreAttorney
 	NonReplacementAttorneys []sirius.LpaStoreAttorney
 	FlashMessage            FlashNotification
@@ -36,7 +37,7 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		group.Go(func() error {
-			data.CaseSummary, err = client.CaseSummary(ctx.With(groupCtx), uid)
+			data.CaseSummary, err = client.CaseSummaryWithImages(ctx.With(groupCtx), uid)
 			if err != nil {
 				return err
 			}
@@ -53,6 +54,14 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 
 		if err := group.Wait(); err != nil {
 			return err
+		}
+
+		taskList := data.CaseSummary.TaskList
+		data.ReviewRestrictions = false
+		for _, task := range taskList {
+			if task.Name == "Review restrictions and conditions" && task.Status != "Completed" {
+				data.ReviewRestrictions = true
+			}
 		}
 
 		data.AnomalyDisplay = &sirius.AnomalyDisplay{}
