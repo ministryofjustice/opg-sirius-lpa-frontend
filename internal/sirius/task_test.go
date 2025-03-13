@@ -27,7 +27,7 @@ func (m *mockTaskHttpClient) Do(req *http.Request) (*http.Response, error) {
 func TestTask(t *testing.T) {
 	t.Parallel()
 
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	testCases := []struct {
@@ -133,7 +133,7 @@ func TestTasksForCaseBadJson(t *testing.T) {
 func TestTasksForCase(t *testing.T) {
 	t.Parallel()
 
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	testCases := []struct {

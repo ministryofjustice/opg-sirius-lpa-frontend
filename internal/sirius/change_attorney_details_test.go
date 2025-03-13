@@ -13,7 +13,7 @@ import (
 func TestChangeAttorneyDetails(t *testing.T) {
 	t.Parallel()
 
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	attorneyUid := "302b05c7-896c-4290-904e-2005e4f1e81e"

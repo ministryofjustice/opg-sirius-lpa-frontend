@@ -14,7 +14,7 @@ import (
 func TestCreateWarning(t *testing.T) {
 	t.Parallel()
 
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	testCases := []struct {
@@ -71,7 +71,7 @@ func TestCreateWarning(t *testing.T) {
 func TestCreateWarningOnMultipleCases(t *testing.T) {
 	t.Parallel()
 
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	testCases := []struct {
