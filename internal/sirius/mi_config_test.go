@@ -3,18 +3,19 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMiConfig(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name           string
@@ -29,23 +30,23 @@ func TestMiConfig(t *testing.T) {
 					AddInteraction().
 					Given("I have a pending case assigned").
 					UponReceiving("A request for the MI config").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/reporting/config"),
+						Path:   matchers.String("/api/reporting/config"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-						Body: dsl.Like(map[string]interface{}{
-							"data": dsl.Like(map[string]interface{}{
-								"items": dsl.EachLike(map[string]interface{}{
-									"properties": dsl.Like(map[string]interface{}{
-										"reportType": dsl.Like(map[string]interface{}{
-											"description": dsl.String("radio"),
-											"type":        dsl.String("reportType"),
-											"enum": dsl.EachLike(map[string]interface{}{
-												"name":        dsl.String("epasReceived"),
-												"description": dsl.String("Number of EPAs received"),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+						Body: matchers.Like(map[string]interface{}{
+							"data": matchers.Like(map[string]interface{}{
+								"items": matchers.EachLike(map[string]interface{}{
+									"properties": matchers.Like(map[string]interface{}{
+										"reportType": matchers.Like(map[string]interface{}{
+											"description": matchers.String("radio"),
+											"type":        matchers.String("reportType"),
+											"enum": matchers.EachLike(map[string]interface{}{
+												"name":        matchers.String("epasReceived"),
+												"description": matchers.String("Number of EPAs received"),
 											}, 1),
 										}),
 									}),
@@ -70,16 +71,16 @@ func TestMiConfig(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				config, err := client.MiConfig(Context{Context: context.Background()})
+				miConfig, err := client.MiConfig(Context{Context: context.Background()})
 
-				assert.Equal(t, tc.expectedResult, config)
+				assert.Equal(t, tc.expectedResult, miConfig)
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))

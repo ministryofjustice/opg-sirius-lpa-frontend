@@ -3,7 +3,8 @@ package sirius
 import (
 	"context"
 	"fmt"
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -12,8 +13,8 @@ import (
 func TestEditPayment(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name          string
@@ -27,21 +28,21 @@ func TestEditPayment(t *testing.T) {
 					AddInteraction().
 					Given("I have an lpa which has been paid for").
 					UponReceiving("A request to edit a payment").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/payments/123"),
-						Headers: dsl.MapMatcher{
-							"Content-Type": dsl.String("application/json"),
+						Path:   matchers.String("/lpa-api/v1/payments/123"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"amount":      dsl.Like(2550),
-							"source":      dsl.String("PHONE"),
-							"paymentDate": dsl.Term("27/04/2022", `^\d{1,2}/\d{1,2}/\d{4}$`),
+							"amount":      matchers.Like(2550),
+							"source":      matchers.String("PHONE"),
+							"paymentDate": matchers.Term("27/04/2022", `^\d{1,2}/\d{1,2}/\d{4}$`),
 						},
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 		},
@@ -51,15 +52,15 @@ func TestEditPayment(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				err := client.EditPayment(Context{Context: context.Background()}, 123, Payment{Amount: 2550, Source: "PHONE", PaymentDate: DateString("2022-04-27")})
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
@@ -70,8 +71,8 @@ func TestEditPayment(t *testing.T) {
 func TestEditFeeReduction(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name          string
@@ -85,11 +86,11 @@ func TestEditFeeReduction(t *testing.T) {
 					AddInteraction().
 					Given("I have an lpa which has a fee reduction").
 					UponReceiving("A request to edit a fee reduction").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/payments/124"),
-						Headers: dsl.MapMatcher{
-							"Content-Type": dsl.String("application/json"),
+						Path:   matchers.String("/lpa-api/v1/payments/124"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
 						},
 						Body: map[string]interface{}{
 							"id":     124,
@@ -98,15 +99,15 @@ func TestEditFeeReduction(t *testing.T) {
 								"id":     802,
 								"status": "",
 							},
-							"paymentEvidence":  dsl.String("Edited test evidence"),
-							"feeReductionType": dsl.String("REMISSION"),
-							"paymentDate":      dsl.Term("28/04/2022", `^\d{1,2}/\d{1,2}/\d{4}$`),
-							"source":           dsl.String(FeeReductionSource),
+							"paymentEvidence":  matchers.String("Edited test evidence"),
+							"feeReductionType": matchers.String("REMISSION"),
+							"paymentDate":      matchers.Term("28/04/2022", `^\d{1,2}/\d{1,2}/\d{4}$`),
+							"source":           matchers.String(FeeReductionSource),
 						},
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 		},
@@ -116,8 +117,8 @@ func TestEditFeeReduction(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				err := client.EditPayment(Context{Context: context.Background()},
 					124,
@@ -135,7 +136,7 @@ func TestEditFeeReduction(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
