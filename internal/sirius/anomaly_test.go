@@ -4,7 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"net/http"
 	"testing"
 
@@ -22,29 +23,28 @@ func (m *mockAnomaliesHttpClient) Do(req *http.Request) (*http.Response, error) 
 }
 
 func TestAnomaliesForDigitalLpaNotInStore(t *testing.T) {
-	pact := newPact()
-
-	defer pact.Teardown()
+	pact, err := newPact2()
+	assert.NoError(t, err)
 
 	pact.
 		AddInteraction().
 		Given("A digital LPA with UID LPA M-QWQW-QTQT-WERT exists with LPA store record and no anomalies").
 		UponReceiving("A request for the anomalies for a digital LPA").
-		WithRequest(dsl.Request{
+		WithCompleteRequest(consumer.Request{
 			Method: http.MethodGet,
-			Path:   dsl.String("/lpa-api/v1/digital-lpas/M-QWQW-QTQT-WERT/anomalies"),
+			Path:   matchers.String("/lpa-api/v1/digital-lpas/M-QWQW-QTQT-WERT/anomalies"),
 		}).
-		WillRespondWith(dsl.Response{
+		WithCompleteResponse(consumer.Response{
 			Status: http.StatusOK,
-			Body: dsl.Like(map[string]interface{}{
-				"uid":       dsl.Like("M-QWQW-QTQT-WERT"),
+			Body: matchers.Like(map[string]interface{}{
+				"uid":       matchers.Like("M-QWQW-QTQT-WERT"),
 				"anomalies": []interface{}{},
 			}),
-			Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+			Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 		})
 
-	assert.Nil(t, pact.Verify(func() error {
-		client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+	assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+		client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 		anomalies, err := client.AnomaliesForDigitalLpa(Context{Context: context.Background()}, "M-QWQW-QTQT-WERT")
 
@@ -59,7 +59,7 @@ func TestAnomaliesForDigitalLpaFail(t *testing.T) {
 	mockClient := &mockAnomaliesHttpClient{}
 	mockClient.On("Do", mock.Anything).Return(&http.Response{}, errors.New("Networking issue"))
 
-	client := NewClient(mockClient, "http://localhost")
+	client := NewClient(mockClient, "http://127.0.0.1")
 	_, err := client.AnomaliesForDigitalLpa(Context{Context: context.Background()}, "M-QEQE-EEEE-QQQE")
 
 	assert.NotNil(t, err)

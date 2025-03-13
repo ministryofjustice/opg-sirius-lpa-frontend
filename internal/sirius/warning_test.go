@@ -5,11 +5,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"io"
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -58,8 +59,8 @@ func TestWarningsForCaseBadResponseJSON(t *testing.T) {
 func TestWarningsForCase(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact2()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -74,23 +75,23 @@ func TestWarningsForCase(t *testing.T) {
 					AddInteraction().
 					Given("I have a case with a warning").
 					UponReceiving("A request for the warnings for a case").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/cases/990/warnings"),
+						Path:   matchers.String("/lpa-api/v1/cases/990/warnings"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.EachLike(map[string]interface{}{
-							"id":          dsl.Like(9901),
-							"dateAdded":   dsl.Regex("07/01/2023 10:10:10", `\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}`),
-							"warningType": dsl.String("Attorney removed"),
-							"warningText": dsl.String("Attorney was removed"),
-							"caseItems": dsl.EachLike(map[string]interface{}{
-								"uId":      dsl.String("M-TTTT-RRRR-EEEE"),
-								"caseType": dsl.String("DIGITAL_LPA"),
+						Body: matchers.EachLike(map[string]interface{}{
+							"id":          matchers.Like(9901),
+							"dateAdded":   matchers.Regex("07/01/2023 10:10:10", `\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}`),
+							"warningType": matchers.String("Attorney removed"),
+							"warningText": matchers.String("Attorney was removed"),
+							"caseItems": matchers.EachLike(map[string]interface{}{
+								"uId":      matchers.String("M-TTTT-RRRR-EEEE"),
+								"caseType": matchers.String("DIGITAL_LPA"),
 							}, 1),
 						}, 1),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: []Warning{
@@ -115,18 +116,18 @@ func TestWarningsForCase(t *testing.T) {
 					AddInteraction().
 					Given("There is no case with warnings with the specified ID").
 					UponReceiving("A request for the warnings for a non-existent case").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/cases/990/warnings"),
+						Path:   matchers.String("/lpa-api/v1/cases/990/warnings"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusNotFound,
 					})
 			},
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:          404,
-					URL:           fmt.Sprintf("http://localhost:%d/lpa-api/v1/cases/990/warnings", port),
+					URL:           fmt.Sprintf("http://127.0.0.1:%d/lpa-api/v1/cases/990/warnings", port),
 					Method:        "GET",
 					CorrelationId: "",
 				}
@@ -138,8 +139,8 @@ func TestWarningsForCase(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				warnings, err := client.WarningsForCase(Context{Context: context.Background()}, 990)
 
@@ -147,7 +148,7 @@ func TestWarningsForCase(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 
 				return nil

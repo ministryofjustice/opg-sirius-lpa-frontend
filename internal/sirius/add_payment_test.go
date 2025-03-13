@@ -3,7 +3,8 @@ package sirius
 import (
 	"context"
 	"fmt"
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -12,8 +13,8 @@ import (
 func TestAddPayment(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact2()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name          string
@@ -27,11 +28,11 @@ func TestAddPayment(t *testing.T) {
 					AddInteraction().
 					Given("I have a pending case assigned").
 					UponReceiving("A request to create a payment").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/cases/800/payments"),
-						Headers: dsl.MapMatcher{
-							"Content-Type": dsl.String("application/json"),
+						Path:   matchers.String("/lpa-api/v1/cases/800/payments"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
 						},
 						Body: map[string]interface{}{
 							"amount":      4100,
@@ -39,9 +40,9 @@ func TestAddPayment(t *testing.T) {
 							"paymentDate": "25/04/2022",
 						},
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusCreated,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 		},
@@ -51,15 +52,15 @@ func TestAddPayment(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				err := client.AddPayment(Context{Context: context.Background()}, 800, 4100, "PHONE", DateString("2022-04-25"))
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
