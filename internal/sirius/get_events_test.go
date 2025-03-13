@@ -33,6 +33,10 @@ func TestGetEvents(t *testing.T) {
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
 						Path:   matchers.Like("/lpa-api/v1/persons/33/events?filter=case%3A66&sort=id%3Adesc"),
+						Query: matchers.MapMatcher{
+							"filter": matchers.Like("case:66"),
+							"sort":   matchers.Like("id:desc"),
+						},
 					}).
 					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
@@ -42,7 +46,7 @@ func TestGetEvents(t *testing.T) {
 						}),
 					})
 			},
-			expectedResponse: []interface{}{},
+			expectedResponse: []interface{}{map[string]interface{}{}},
 		},
 	}
 
