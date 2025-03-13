@@ -154,6 +154,11 @@ func TestTasksForCase(t *testing.T) {
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
 						Path:   matchers.Like("/lpa-api/v1/cases/10/tasks"),
+						Query: matchers.MapMatcher{
+							"filter": matchers.Like("status:Not started,active:true"),
+							"limit":  matchers.Like(99),
+							"sort":   matchers.Like("duedate:asc"),
+						},
 					}).
 					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
@@ -194,6 +199,11 @@ func TestTasksForCase(t *testing.T) {
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
 						Path:   matchers.Like("/lpa-api/v1/cases/9012929/tasks"),
+						Query: matchers.MapMatcher{
+							"filter": matchers.Like("status:Not started,active:true"),
+							"limit":  matchers.Like(99),
+							"sort":   matchers.Like("duedate:asc"),
+						},
 					}).
 					WithCompleteResponse(consumer.Response{
 						Status: http.StatusNotFound,
