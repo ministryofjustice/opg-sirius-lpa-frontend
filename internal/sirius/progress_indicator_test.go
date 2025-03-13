@@ -23,7 +23,7 @@ func (m *mockProgressIndicatorsHttpClient) Do(req *http.Request) (*http.Response
 }
 
 func TestProgressIndicatorsForDigitalLpaSuccess(t *testing.T) {
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	expectedResponse := []ProgressIndicator{

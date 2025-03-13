@@ -13,7 +13,7 @@ import (
 func TestDeletePayment(t *testing.T) {
 	t.Parallel()
 
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	testCases := []struct {
@@ -62,7 +62,7 @@ func TestDeletePayment(t *testing.T) {
 func TestDeleteFeeReduction(t *testing.T) {
 	t.Parallel()
 
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	testCases := []struct {
