@@ -1,10 +1,7 @@
 package sirius
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
 type TaskRequest struct {
@@ -16,32 +13,5 @@ type TaskRequest struct {
 }
 
 func (c *Client) CreateTask(ctx Context, caseID int, task TaskRequest) error {
-	data, err := json.Marshal(task)
-	if err != nil {
-		return err
-	}
-
-	req, err := c.newRequest(ctx, http.MethodPost, fmt.Sprintf("/lpa-api/v1/cases/%d/tasks", caseID), bytes.NewReader(data))
-	if err != nil {
-		return err
-	}
-
-	resp, err := c.http.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close() //#nosec G307 false positive
-
-	if resp.StatusCode == http.StatusBadRequest {
-		var v ValidationError
-		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
-			return err
-		}
-		return v
-	}
-
-	if resp.StatusCode != http.StatusCreated {
-		return newStatusError(resp)
-	}
-	return nil
+	return c.post(ctx, fmt.Sprintf("/lpa-api/v1/cases/%d/tasks", caseID), task, nil)
 }
