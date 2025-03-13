@@ -1,11 +1,8 @@
 package sirius
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/http"
 	"strconv"
-	"strings"
 )
 
 func (c *Client) AssignTasks(ctx Context, assigneeID int, taskIDs []int) error {
@@ -14,28 +11,5 @@ func (c *Client) AssignTasks(ctx Context, assigneeID int, taskIDs []int) error {
 		urlIDs += "+" + strconv.Itoa(taskID)
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/lpa-api/v1/users/%d/tasks/%s", assigneeID, urlIDs), strings.NewReader(""))
-	if err != nil {
-		return err
-	}
-
-	resp, err := c.http.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close() //#nosec G307 false positive
-
-	if resp.StatusCode == http.StatusBadRequest {
-		var v ValidationError
-		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
-			return err
-		}
-		return v
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return newStatusError(resp)
-	}
-
-	return nil
+	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/users/%d/tasks/%s", assigneeID, urlIDs), nil, nil)
 }

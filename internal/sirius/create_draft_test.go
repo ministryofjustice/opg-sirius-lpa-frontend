@@ -106,7 +106,7 @@ func TestCreateDraft(t *testing.T) {
 					Country:  "GB",
 				},
 				PhoneNumber:               "07893932118",
-				Email:                     "c.morneault@somehost.example",
+				Email:                     "c.morneault@example.com",
 				CorrespondenceByWelsh:     true,
 				CorrespondenceLargeFormat: false,
 			},
@@ -146,7 +146,7 @@ func TestCreateDraft(t *testing.T) {
 								"country":      "GB",
 							},
 							"donorPhone":            "07893932118",
-							"donorEmail":            "c.morneault@somehost.example",
+							"donorEmail":            "c.morneault@example.com",
 							"correspondenceByWelsh": true,
 						},
 					}).
