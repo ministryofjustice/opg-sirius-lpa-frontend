@@ -3,7 +3,8 @@ package sirius
 import (
 	"context"
 	"fmt"
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -12,8 +13,8 @@ import (
 func TestDeletePayment(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name          string
@@ -27,11 +28,11 @@ func TestDeletePayment(t *testing.T) {
 					AddInteraction().
 					Given("I have an lpa which has been paid for").
 					UponReceiving("A request to delete a payment").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodDelete,
-						Path:   dsl.String("/lpa-api/v1/payments/123"),
+						Path:   matchers.String("/lpa-api/v1/payments/123"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusNoContent,
 					})
 			},
@@ -42,15 +43,15 @@ func TestDeletePayment(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				err := client.DeletePayment(Context{Context: context.Background()}, 123)
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
@@ -61,8 +62,8 @@ func TestDeletePayment(t *testing.T) {
 func TestDeleteFeeReduction(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name          string
@@ -76,11 +77,11 @@ func TestDeleteFeeReduction(t *testing.T) {
 					AddInteraction().
 					Given("I have an lpa which has a fee reduction").
 					UponReceiving("A request to delete a fee reduction").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodDelete,
-						Path:   dsl.String("/lpa-api/v1/payments/124"),
+						Path:   matchers.String("/lpa-api/v1/payments/124"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusNoContent,
 					})
 			},
@@ -91,15 +92,15 @@ func TestDeleteFeeReduction(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				err := client.DeletePayment(Context{Context: context.Background()}, 124)
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
