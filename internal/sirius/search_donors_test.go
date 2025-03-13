@@ -3,18 +3,19 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSearchDonors(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact2()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -29,9 +30,9 @@ func TestSearchDonors(t *testing.T) {
 					AddInteraction().
 					Given("A donor exists to be referenced").
 					UponReceiving("A search for donors").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/search/persons"),
+						Path:   matchers.String("/lpa-api/v1/search/persons"),
 						Body: map[string]interface{}{
 							"term":        "7000-0000-0003",
 							"personTypes": []string{"Donor"},
@@ -39,32 +40,32 @@ func TestSearchDonors(t *testing.T) {
 							"from":        0,
 						},
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-						Body: dsl.Like(map[string]interface{}{
-							"results": dsl.EachLike(map[string]interface{}{
-								"id":           dsl.Like(47),
-								"uId":          dsl.Like("7000-0000-0003"),
-								"firstname":    dsl.Like("John"),
-								"surname":      dsl.Like("Doe"),
-								"addressLine1": dsl.Like("123 Somewhere Road"),
-								"personType":   dsl.Like("Donor"),
-								"cases": dsl.EachLike(map[string]interface{}{
-									"id":          dsl.Like(23),
-									"uId":         dsl.Term("7000-8548-8461", `\d{4}-\d{4}-\d{4}`),
-									"caseSubtype": dsl.Term("pfa", "hw|pfa"),
-									"status":      dsl.Like("Perfect"),
-									"caseType":    dsl.Like("LPA"),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+						Body: matchers.Like(map[string]interface{}{
+							"results": matchers.EachLike(map[string]interface{}{
+								"id":           matchers.Like(47),
+								"uId":          matchers.Like("7000-0000-0003"),
+								"firstname":    matchers.Like("John"),
+								"surname":      matchers.Like("Doe"),
+								"addressLine1": matchers.Like("123 Somewhere Road"),
+								"personType":   matchers.Like("Donor"),
+								"cases": matchers.EachLike(map[string]interface{}{
+									"id":          matchers.Like(23),
+									"uId":         matchers.Term("7000-8548-8461", `\d{4}-\d{4}-\d{4}`),
+									"caseSubtype": matchers.Term("pfa", "hw|pfa"),
+									"status":      matchers.Like("Perfect"),
+									"caseType":    matchers.Like("LPA"),
 								}, 1),
 							}, 1),
-							"aggregations": dsl.Like(map[string]interface{}{
+							"aggregations": matchers.Like(map[string]interface{}{
 								"personType": map[string]int{
 									"Donor": 1,
 								},
 							}),
-							"total": dsl.Like(map[string]interface{}{
-								"count": dsl.Like(1),
+							"total": matchers.Like(map[string]interface{}{
+								"count": matchers.Like(1),
 							}),
 						}),
 					})
@@ -95,15 +96,15 @@ func TestSearchDonors(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				donors, err := client.SearchDonors(Context{Context: context.Background()}, "7000-0000-0003")
 				assert.Equal(t, tc.expectedResponse, donors)
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))

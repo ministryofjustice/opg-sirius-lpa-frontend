@@ -3,7 +3,8 @@ package sirius
 import (
 	"context"
 	"fmt"
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -26,15 +27,15 @@ func TestAddFeeDecisionBadJSON(t *testing.T) {
 func TestAddFeeDecision(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact2()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name          string
 		description   string
 		caseId        int
 		request       map[string]string
-		response      func() dsl.Response
+		response      func() consumer.Response
 		expectedError func(int) error
 	}{
 		{
@@ -45,10 +46,10 @@ func TestAddFeeDecision(t *testing.T) {
 				"decisionReason": "Insufficient evidence",
 				"decisionDate":   "18/10/2023",
 			},
-			response: func() dsl.Response {
-				return dsl.Response{
+			response: func() consumer.Response {
+				return consumer.Response{
 					Status:  http.StatusCreated,
-					Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+					Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 				}
 			},
 		},
@@ -60,7 +61,7 @@ func TestAddFeeDecision(t *testing.T) {
 				"decisionReason": "Some reason",
 				"decisionDate":   "18/10/2023",
 			},
-			response: func() dsl.Response {
+			response: func() consumer.Response {
 				body := map[string]interface{}{
 					"validation_errors": map[string]interface{}{
 						"decisionType": map[string]string{
@@ -73,9 +74,9 @@ func TestAddFeeDecision(t *testing.T) {
 					"title":  "Bad Request",
 				}
 
-				return dsl.Response{
+				return consumer.Response{
 					Status:  http.StatusBadRequest,
-					Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/problem+json")},
+					Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/problem+json")},
 					Body:    body,
 				}
 			},
@@ -94,11 +95,11 @@ func TestAddFeeDecision(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			request := dsl.Request{
+			request := consumer.Request{
 				Method: http.MethodPost,
-				Path:   dsl.String("/lpa-api/v1/cases/1/fee-decisions"),
-				Headers: dsl.MapMatcher{
-					"Content-Type": dsl.String("application/json"),
+				Path:   matchers.String("/lpa-api/v1/cases/1/fee-decisions"),
+				Headers: matchers.MapMatcher{
+					"Content-Type": matchers.String("application/json"),
 				},
 				Body: tc.request,
 			}
@@ -107,11 +108,11 @@ func TestAddFeeDecision(t *testing.T) {
 				AddInteraction().
 				Given("a digital LPA exists awaiting fee decision").
 				UponReceiving(tc.description).
-				WithRequest(request).
-				WillRespondWith(tc.response())
+				WithCompleteRequest(request).
+				WithCompleteResponse(tc.response())
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				// ctx Context, caseID int, decisionType string, decisionReason string, decisionDate DateString
 				err := client.AddFeeDecision(
@@ -125,7 +126,7 @@ func TestAddFeeDecision(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
