@@ -6,15 +6,16 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestPersonReferences(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact2()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -29,20 +30,20 @@ func TestPersonReferences(t *testing.T) {
 					AddInteraction().
 					Given("A donor with a reference").
 					UponReceiving("A request for person references").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/persons/189/references"),
+						Path:   matchers.String("/lpa-api/v1/persons/189/references"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.EachLike(map[string]interface{}{
-							"referenceId": dsl.Like(768),
-							"id":          dsl.Like(189),
-							"uid":         dsl.Like(70000000000),
-							"displayName": dsl.String("John Doe"),
-							"reason":      dsl.String("Friend"),
+						Body: matchers.EachLike(map[string]interface{}{
+							"referenceId": matchers.Like(768),
+							"id":          matchers.Like(189),
+							"uid":         matchers.Like(70000000000),
+							"displayName": matchers.String("John Doe"),
+							"reason":      matchers.String("Friend"),
 						}, 1),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: []PersonReference{{
@@ -59,8 +60,8 @@ func TestPersonReferences(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				caseitem, err := client.PersonReferences(Context{Context: context.Background()}, 189)
 
@@ -68,7 +69,7 @@ func TestPersonReferences(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
