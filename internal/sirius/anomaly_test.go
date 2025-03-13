@@ -23,7 +23,7 @@ func (m *mockAnomaliesHttpClient) Do(req *http.Request) (*http.Response, error) 
 }
 
 func TestAnomaliesForDigitalLpaNotInStore(t *testing.T) {
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	pact.

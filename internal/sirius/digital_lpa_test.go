@@ -8,15 +8,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
-
-	"github.com/pact-foundation/pact-go/dsl"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestDigitalLpa(t *testing.T) {
 	t.Parallel()
 
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	testCases := []struct {
