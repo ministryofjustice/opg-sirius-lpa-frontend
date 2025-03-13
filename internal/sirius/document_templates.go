@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"sort"
 )
 
@@ -108,19 +107,10 @@ func (c *Client) DocumentTemplates(ctx Context, caseType CaseType) ([]DocumentTe
 		templateSet = "digitallpa"
 	}
 
-	req, err := c.newRequest(ctx, http.MethodGet, fmt.Sprintf("/lpa-api/v1/templates/%s", templateSet), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := c.http.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close() //#nosec G307 false positive
-
 	var v documentTemplateApiResponse
-	if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
+
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/templates/%s", templateSet), &v)
+	if err != nil {
 		return nil, err
 	}
 

@@ -8,6 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+
+	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestDigitalLpa(t *testing.T) {
@@ -203,7 +206,7 @@ func TestDigitalLpa(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				digitalLpa, err := client.DigitalLpa(Context{Context: context.Background()}, tc.expectedResponse.UID)
+				digitalLpa, err := client.DigitalLpa(Context{Context: context.Background()}, tc.expectedResponse.UID, false)
 
 				assert.Equal(t, tc.expectedResponse, digitalLpa)
 				if tc.expectedError == nil {

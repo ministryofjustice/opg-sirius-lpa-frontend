@@ -1,10 +1,7 @@
 package sirius
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"net/http"
 	"strconv"
 )
 
@@ -18,38 +15,12 @@ type allocateCasesRequest struct {
 }
 
 func (c *Client) AllocateCases(ctx Context, assigneeID int, allocations []CaseAllocation) error {
-	data, err := json.Marshal(allocateCasesRequest{Data: allocations})
-	if err != nil {
-		return err
-	}
+	data := allocateCasesRequest{Data: allocations}
 
 	caseIDs := strconv.Itoa(allocations[0].ID)
 	for _, allocation := range allocations[1:] {
 		caseIDs += "+" + strconv.Itoa(allocation.ID)
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPut, fmt.Sprintf("/lpa-api/v1/users/%d/cases/%s", assigneeID, caseIDs), bytes.NewReader(data))
-	if err != nil {
-		return err
-	}
-
-	resp, err := c.http.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close() //#nosec G307 false positive
-
-	if resp.StatusCode == http.StatusBadRequest {
-		var v ValidationError
-		if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
-			return err
-		}
-		return v
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return newStatusError(resp)
-	}
-
-	return nil
+	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/users/%d/cases/%s", assigneeID, caseIDs), data, nil)
 }

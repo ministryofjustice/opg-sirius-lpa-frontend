@@ -34,6 +34,11 @@ func (m *mockCreateDraftClient) RefDataByCategory(ctx sirius.Context, category s
 	return nil, args.Error(1)
 }
 
+func (m *mockCreateDraftClient) DigitalLpa(ctx sirius.Context, uid string, presignImages bool) (sirius.DigitalLpa, error) {
+	args := m.Called(ctx, uid, presignImages)
+	return args.Get(0).(sirius.DigitalLpa), args.Error(1)
+}
+
 func TestGetCreateDraft(t *testing.T) {
 	client := &mockCreateDraftClient{}
 	client.
@@ -91,6 +96,9 @@ func TestPostCreateDraft(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 	client.
+		On("DigitalLpa", mock.Anything, "M-0123-4567-8901", false).
+		Return(sirius.DigitalLpa{UID: "M-0123-4567-8901", SiriusData: sirius.SiriusData{Donor: sirius.Donor{ID: 111, Firstname: "Gerald Ryan", Surname: "Sandel"}}}, nil)
+	client.
 		On("CreateDraft", mock.Anything, sirius.Draft{
 			CaseType:                  []string{"property-and-affairs", "personal-welfare"},
 			Source:                    "PHONE",
@@ -99,7 +107,7 @@ func TestPostCreateDraft(t *testing.T) {
 			CorrespondentFirstNames:   "Rosalinda",
 			CorrespondentLastName:     "Langdale",
 			DonorDob:                  sirius.DateString("1943-03-06"),
-			Email:                     "gerald.sandel@somehost.example",
+			Email:                     "gerald.sandel@example.com",
 			PhoneNumber:               "01638294820",
 			CorrespondenceByWelsh:     true,
 			CorrespondenceLargeFormat: false,
@@ -133,7 +141,7 @@ func TestPostCreateDraft(t *testing.T) {
 				DonorFirstname:            "Gerald Ryan",
 				DonorSurname:              "Sandel",
 				Dob:                       dob{Day: 6, Month: 3, Year: 1943},
-				Email:                     "gerald.sandel@somehost.example",
+				Email:                     "gerald.sandel@example.com",
 				Phone:                     "01638294820",
 				CorrespondenceByWelsh:     true,
 				CorrespondenceLargeFormat: false,
@@ -161,6 +169,7 @@ func TestPostCreateDraft(t *testing.T) {
 			Uids: []createDraftResult{
 				{Subtype: "property-and-affairs", Uid: "M-0123-4567-8901"},
 			},
+			Donor: sirius.Donor{ID: 111, Firstname: "Gerald Ryan", Surname: "Sandel"},
 		}).
 		Return(nil)
 
@@ -171,7 +180,7 @@ func TestPostCreateDraft(t *testing.T) {
 		"dob.day":                       {"6"},
 		"dob.month":                     {"3"},
 		"dob.year":                      {"1943"},
-		"donorEmail":                    {"gerald.sandel@somehost.example"},
+		"donorEmail":                    {"gerald.sandel@example.com"},
 		"donorPhone":                    {"01638294820"},
 		"correspondenceByWelsh":         {"true"},
 		"correspondenceLargeFormat":     {"false"},

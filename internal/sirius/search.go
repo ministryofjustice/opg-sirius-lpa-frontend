@@ -1,10 +1,7 @@
 package sirius
 
 import (
-	"bytes"
-	"encoding/json"
 	"math"
-	"net/http"
 )
 
 const PageLimit = 25
@@ -59,27 +56,10 @@ func (c *Client) Search(ctx Context, term string, page int, personTypeFilters []
 		personTypeFilters = AllPersonTypes
 	}
 
-	data, err := json.Marshal(searchRequest{Term: term, PersonTypes: personTypeFilters, Limit: PageLimit, From: PageLimit * (page - 1)})
+	data := searchRequest{Term: term, PersonTypes: personTypeFilters, Limit: PageLimit, From: PageLimit * (page - 1)}
+
+	err := c.post(ctx, "/lpa-api/v1/search/persons", data, &v)
 	if err != nil {
-		return v, nil, err
-	}
-
-	req, err := c.newRequest(ctx, http.MethodPost, "/lpa-api/v1/search/persons", bytes.NewReader(data))
-	if err != nil {
-		return v, nil, err
-	}
-
-	resp, err := c.http.Do(req)
-	if err != nil {
-		return v, nil, err
-	}
-	defer resp.Body.Close() //#nosec G307 false positive
-
-	if resp.StatusCode != http.StatusOK {
-		return v, nil, newStatusError(resp)
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
 		return v, nil, err
 	}
 
