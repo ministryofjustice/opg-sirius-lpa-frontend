@@ -211,7 +211,7 @@ describe("View the application progress for a digital LPA", () => {
     cy.contains("Certificate provider: Fake Provider");
     cy.contains("Start certificate provider identity check").should("exist");
     cy.get(
-      "a[href='/lpa/identity-check/start?personType=certificate-provider&lpas[]=M-QEQE-EEEE-WERT']",
+      "a[href='/lpa/identity-check/start?personType=certificateProvider&lpas[]=M-QEQE-EEEE-WERT']",
     ).contains("Start certificate provider identity check");
   });
 

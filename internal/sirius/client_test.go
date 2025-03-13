@@ -1,14 +1,18 @@
 package sirius
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/pact-foundation/pact-go/v2/consumer"
+	"io"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func newPact() *dsl.Pact {
@@ -99,4 +103,189 @@ func TestValidationErrorSummary(t *testing.T) {
 	}
 
 	assert.Equal(t, "This case is in a Registered status and cannot be deleted", descriptiveValidationError.Error())
+}
+
+type mockHTTPClient struct {
+	mock.Mock
+}
+
+func (m *mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
+	args := m.Called(req)
+	return args.Get(0).(*http.Response), args.Error(1)
+}
+
+func TestRequestInternalError(t *testing.T) {
+	testCases := map[string]struct {
+		fn func(client *Client) error
+	}{
+		"get": {
+			fn: func(client *Client) error {
+				return client.get(Context{Context: context.Background()}, "/resource/14", nil)
+			},
+		},
+		"post": {
+			fn: func(client *Client) error {
+				return client.post(Context{Context: context.Background()}, "/resource/14", nil, nil)
+			},
+		},
+		"put": {
+			fn: func(client *Client) error {
+				return client.put(Context{Context: context.Background()}, "/resource/14", nil, nil)
+			},
+		},
+		"delete": {
+			fn: func(client *Client) error {
+				return client.delete(Context{Context: context.Background()}, "/resource/14")
+			},
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			expectedErr := errors.New("something went wrong")
+
+			mockHttpClient := &mockHTTPClient{}
+			mockHttpClient.
+				On("Do", mock.Anything).
+				Return(&http.Response{}, expectedErr)
+
+			client := NewClient(mockHttpClient, "https://host.example")
+
+			err := tc.fn(client)
+
+			assert.Equal(t, expectedErr, err)
+		})
+	}
+}
+
+func TestRequestStatusError(t *testing.T) {
+	testCases := map[string]struct {
+		fn func(client *Client) error
+	}{
+		"get": {
+			fn: func(client *Client) error {
+				return client.get(Context{Context: context.Background()}, "/resource/14", nil)
+			},
+		},
+		"post": {
+			fn: func(client *Client) error {
+				return client.post(Context{Context: context.Background()}, "/resource/14", nil, nil)
+			},
+		},
+		"put": {
+			fn: func(client *Client) error {
+				return client.put(Context{Context: context.Background()}, "/resource/14", nil, nil)
+			},
+		},
+		"delete": {
+			fn: func(client *Client) error {
+				return client.delete(Context{Context: context.Background()}, "/resource/14")
+			},
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			mockHttpClient := &mockHTTPClient{}
+			mockCall := mockHttpClient.On("Do", mock.Anything)
+
+			mockCall.RunFn = func(args mock.Arguments) {
+				mockCall.ReturnArguments = mock.Arguments{&http.Response{
+					Request:    args.Get(0).(*http.Request),
+					StatusCode: http.StatusServiceUnavailable,
+					Body:       io.NopCloser(strings.NewReader(`{"id":492, "name":"policy_4"}`)),
+				}, nil}
+			}
+
+			client := NewClient(mockHttpClient, "https://host.example")
+
+			err := tc.fn(client)
+
+			statusError, ok := err.(StatusError)
+			if !ok {
+				t.Error("expected error to be StatusError")
+			}
+
+			assert.Equal(t, http.StatusServiceUnavailable, statusError.Code)
+		})
+	}
+}
+
+func TestRequestMarshalBodyError(t *testing.T) {
+	testCases := map[string]struct {
+		fn func(client *Client) error
+	}{
+		"post": {
+			fn: func(client *Client) error {
+				return client.post(Context{Context: context.Background()}, "/resource/14", complex(1, 16), nil)
+			},
+		},
+		"put": {
+			fn: func(client *Client) error {
+				return client.put(Context{Context: context.Background()}, "/resource/14", complex(1, 16), nil)
+			},
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			mockHttpClient := &mockHTTPClient{}
+
+			client := NewClient(mockHttpClient, "https://host.example")
+
+			err := tc.fn(client)
+
+			assert.Equal(t, "json: unsupported type: complex128", err.Error())
+		})
+	}
+}
+
+func TestRequestUnmarshalError(t *testing.T) {
+	testCases := map[string]struct {
+		status int
+		fn     func(client *Client) error
+	}{
+		"get": {
+			fn: func(client *Client) error {
+				resp := ""
+				return client.get(Context{Context: context.Background()}, "/resource/14", &resp)
+			},
+			status: http.StatusOK,
+		},
+		"post": {
+			fn: func(client *Client) error {
+				resp := ""
+				return client.post(Context{Context: context.Background()}, "/resource/14", nil, &resp)
+			},
+			status: http.StatusCreated,
+		},
+		"put": {
+			fn: func(client *Client) error {
+				resp := ""
+				return client.put(Context{Context: context.Background()}, "/resource/14", nil, &resp)
+			},
+			status: http.StatusNoContent,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			mockHttpClient := &mockHTTPClient{}
+			mockCall := mockHttpClient.On("Do", mock.Anything)
+
+			mockCall.RunFn = func(args mock.Arguments) {
+				mockCall.ReturnArguments = mock.Arguments{&http.Response{
+					Request:    args.Get(0).(*http.Request),
+					StatusCode: tc.status,
+					Body:       io.NopCloser(strings.NewReader(`{"id":492, "name":"policy_4"}`)),
+				}, nil}
+			}
+
+			client := NewClient(mockHttpClient, "https://host.example")
+
+			err := tc.fn(client)
+
+			assert.Equal(t, "json: cannot unmarshal object into Go value of type string", err.Error())
+		})
+	}
 }

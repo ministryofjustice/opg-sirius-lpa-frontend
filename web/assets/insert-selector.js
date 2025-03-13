@@ -1,4 +1,4 @@
-import { nodeListForEach } from "@ministryofjustice/frontend";
+import { nodeListForEach } from "./lib/nodeListForEach";
 import { createElement as el } from "./lib/createElement";
 import { initAll as initGOVUKFrontend } from "govuk-frontend";
 import handleInsertCheckboxes from "./handle-insert-checkboxes";
@@ -86,25 +86,17 @@ InsertSelector.prototype.populateSelector = function (insertLists) {
 
   Object.entries(insertLists).forEach(([key, inserts]) => {
     this.$tabContainer.appendChild(
-      el(
-        "li",
-        {
-          class: "govuk-tabs__list-item",
-        },
-        [
-          el("a", { class: "govuk-tabs__tab", href: `#panel-${key}` }, [
-            key.charAt(0).toUpperCase() + key.slice(1),
-          ]),
-        ],
-      ),
+      el("li", { class: "govuk-tabs__list-item" }, [
+        el("a", { class: "govuk-tabs__tab", href: `#panel-${key}` }, [
+          key.charAt(0).toUpperCase() + key.slice(1),
+        ]),
+      ]),
     );
 
     const $rows = inserts.map((insert) => {
       return el(
         "tr",
-        {
-          class: "govuk-table__row app-!-table-row__no-border",
-        },
+        { class: "govuk-table__row app-!-table-row__no-border" },
         [
           el("td", { class: "govuk-table__cell" }, [
             el("div", { class: "govuk-checkboxes__item" }, [
