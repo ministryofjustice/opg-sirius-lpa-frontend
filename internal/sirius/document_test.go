@@ -85,6 +85,13 @@ func TestDocument(t *testing.T) {
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
 						Path:   matchers.String("/lpa-api/v1/lpas/800/documents"),
+						Query: matchers.MapMatcher{
+
+							"type": matchers.Like(map[string]interface{}{
+								"0": matchers.Like([]string{TypeDraft}),
+								"-": matchers.Like([]string{TypePreview}),
+							}),
+						},
 					}).
 					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
