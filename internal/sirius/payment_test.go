@@ -13,7 +13,7 @@ import (
 func TestPayment(t *testing.T) {
 	t.Parallel()
 
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	testCases := []struct {
@@ -83,7 +83,7 @@ func TestPayment(t *testing.T) {
 func TestFeeReductionOnCase(t *testing.T) {
 	t.Parallel()
 
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	testCases := []struct {
@@ -157,7 +157,7 @@ func TestFeeReductionOnCase(t *testing.T) {
 func TestNoPaymentOnCase(t *testing.T) {
 	t.Parallel()
 
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	testCases := []struct {
@@ -211,7 +211,7 @@ func TestNoPaymentOnCase(t *testing.T) {
 func TestPaymentByID(t *testing.T) {
 	t.Parallel()
 
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	testCases := []struct {
@@ -280,7 +280,7 @@ func TestPaymentByID(t *testing.T) {
 func TestFeeReductionByID(t *testing.T) {
 	t.Parallel()
 
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	testCases := []struct {

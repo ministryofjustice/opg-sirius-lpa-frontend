@@ -15,19 +15,8 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func newPact() *dsl.Pact {
-	return &dsl.Pact{
-		Consumer:          "sirius-lpa-frontend",
-		Provider:          "sirius",
-		Host:              "127.0.0.1",
-		PactFileWriteMode: "merge",
-		LogDir:            "../../logs",
-		PactDir:           "../../pacts",
-	}
-}
-
-func newPact2() (*consumer.V2HTTPMockProvider, error) {
-	return consumer.NewV2Pact(consumer.MockHTTPProviderConfig{
+func newPact() (*consumer.V4HTTPMockProvider, error) {
+	return consumer.NewV4Pact(consumer.MockHTTPProviderConfig{
 		Consumer: "sirius-lpa-frontend",
 		Provider: "sirius",
 		Host:     "127.0.0.1",

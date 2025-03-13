@@ -13,7 +13,7 @@ import (
 func TestInvestigationOffHold(t *testing.T) {
 	t.Parallel()
 
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	testCases := []struct {
@@ -79,7 +79,7 @@ func TestInvestigationOffHold(t *testing.T) {
 func TestInvestigationOnHold(t *testing.T) {
 	t.Parallel()
 
-	pact, err := newPact2()
+	pact, err := newPact()
 	assert.NoError(t, err)
 
 	testCases := []struct {
