@@ -6,15 +6,16 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSearchUsers(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -29,19 +30,19 @@ func TestSearchUsers(t *testing.T) {
 					AddInteraction().
 					Given("User exists").
 					UponReceiving("A search for admin users").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/search/users"),
-						Query: dsl.MapMatcher{
-							"query": dsl.String("admin"),
+						Path:   matchers.String("/lpa-api/v1/search/users"),
+						Query: matchers.MapMatcher{
+							"query": matchers.String("admin"),
 						},
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-						Body: dsl.EachLike(map[string]interface{}{
-							"id":          dsl.Like(47),
-							"displayName": dsl.String("system admin"),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+						Body: matchers.EachLike(map[string]interface{}{
+							"id":          matchers.Like(47),
+							"displayName": matchers.String("system admin"),
 						}, 1),
 					})
 			},
@@ -58,15 +59,15 @@ func TestSearchUsers(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				users, err := client.SearchUsers(Context{Context: context.Background()}, "admin")
 				assert.Equal(t, tc.expectedResponse, users)
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
