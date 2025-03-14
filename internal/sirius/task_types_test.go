@@ -37,7 +37,9 @@ func TestTaskTypes(t *testing.T) {
 						Status: http.StatusOK,
 						Body: dsl.Like(map[string]interface{}{
 							"task_types": dsl.Like(map[string]interface{}{
-								"Check Application": dsl.Like(map[string]interface{}{}),
+								"Check Application": dsl.Like(map[string]interface{}{
+									"handle": dsl.Like("Check Application"),
+								}),
 							}),
 						}),
 						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
