@@ -39,6 +39,8 @@ func TestTaskTypes(t *testing.T) {
 						Body: matchers.Like(map[string]interface{}{
 							"task_types": matchers.Like(map[string]interface{}{
 								"Check Application": matchers.Like(map[string]interface{}{}),
+									"handle": matchers.Like("Check Application"),
+								}),
 							}),
 						}),
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
