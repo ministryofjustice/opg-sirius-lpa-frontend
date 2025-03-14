@@ -6,15 +6,16 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestPerson(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -29,20 +30,20 @@ func TestPerson(t *testing.T) {
 					AddInteraction().
 					Given("A donor exists").
 					UponReceiving("A request for the person").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/persons/188"),
+						Path:   matchers.String("/lpa-api/v1/persons/188"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"id":        dsl.Like(188),
-							"uId":       dsl.Term("7000-0000-0007", `7\d{3}-\d{4}-\d{4}`),
-							"firstname": dsl.String("John"),
-							"surname":   dsl.String("Doe"),
-							"dob":       dsl.Term("05/05/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
+						Body: matchers.Like(map[string]interface{}{
+							"id":        matchers.Like(188),
+							"uId":       matchers.Term("7000-0000-0007", `7\d{3}-\d{4}-\d{4}`),
+							"firstname": matchers.String("John"),
+							"surname":   matchers.String("Doe"),
+							"dob":       matchers.Term("05/05/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
 						}),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: Person{
@@ -60,28 +61,28 @@ func TestPerson(t *testing.T) {
 					AddInteraction().
 					Given("A donor exists with children").
 					UponReceiving("A request for the person with children").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/persons/189"),
+						Path:   matchers.String("/lpa-api/v1/persons/189"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"id":        dsl.Like(189),
-							"uId":       dsl.Term("7000-0000-0001", `7\d{3}-\d{4}-\d{4}`),
-							"firstname": dsl.String("John"),
-							"surname":   dsl.String("Doe"),
-							"dob":       dsl.Term("01/01/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
-							"children": dsl.Like([]map[string]interface{}{
+						Body: matchers.Like(map[string]interface{}{
+							"id":        matchers.Like(189),
+							"uId":       matchers.Term("7000-0000-0001", `7\d{3}-\d{4}-\d{4}`),
+							"firstname": matchers.String("John"),
+							"surname":   matchers.String("Doe"),
+							"dob":       matchers.Term("01/01/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
+							"children": matchers.Like([]map[string]interface{}{
 								{
-									"id":        dsl.Like(105),
-									"uId":       dsl.Term("7000-0000-0002", `7\d{3}-\d{4}-\d{4}`),
-									"firstname": dsl.String("Child"),
-									"surname":   dsl.String("One"),
+									"id":        matchers.Like(105),
+									"uId":       matchers.Term("7000-0000-0002", `7\d{3}-\d{4}-\d{4}`),
+									"firstname": matchers.String("Child"),
+									"surname":   matchers.String("One"),
 								},
 							}),
 						}),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: Person{
@@ -107,34 +108,34 @@ func TestPerson(t *testing.T) {
 					AddInteraction().
 					Given("A donor exists with more than 1 case").
 					UponReceiving("A request for the person with multiple cases").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/persons/400"),
+						Path:   matchers.String("/lpa-api/v1/persons/400"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"id":        dsl.Like(400),
-							"uId":       dsl.Term("7000-0000-0001", `7\d{3}-\d{4}-\d{4}`),
-							"firstname": dsl.String("John"),
-							"surname":   dsl.String("Doe"),
-							"dob":       dsl.Term("01/01/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
+						Body: matchers.Like(map[string]interface{}{
+							"id":        matchers.Like(400),
+							"uId":       matchers.Term("7000-0000-0001", `7\d{3}-\d{4}-\d{4}`),
+							"firstname": matchers.String("John"),
+							"surname":   matchers.String("Doe"),
+							"dob":       matchers.Term("01/01/1970", `^\d{1,2}/\d{1,2}/\d{4}$`),
 							"cases": []map[string]interface{}{
 								{
-									"id":          dsl.Like(405),
-									"uId":         dsl.Term("7000-5382-4438", `\d{4}-\d{4}-\d{4}`),
-									"caseSubtype": dsl.Term("pfa", "hw|pfa"),
-									"caseType":    dsl.Like("LPA"),
+									"id":          matchers.Like(405),
+									"uId":         matchers.Term("7000-5382-4438", `\d{4}-\d{4}-\d{4}`),
+									"caseSubtype": matchers.Term("pfa", "hw|pfa"),
+									"caseType":    matchers.Like("LPA"),
 								},
 								{
-									"id":          dsl.Like(406),
-									"uId":         dsl.Term("7000-5382-8764", `\d{4}-\d{4}-\d{4}`),
-									"caseSubtype": dsl.Term("hw", "hw|pfa"),
-									"caseType":    dsl.Like("LPA"),
+									"id":          matchers.Like(406),
+									"uId":         matchers.Term("7000-5382-8764", `\d{4}-\d{4}-\d{4}`),
+									"caseSubtype": matchers.Term("hw", "hw|pfa"),
+									"caseType":    matchers.Like("LPA"),
 								},
 							},
 						}),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: Person{
@@ -165,8 +166,8 @@ func TestPerson(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				caseitem, err := client.Person(Context{Context: context.Background()}, tc.expectedResponse.ID)
 
@@ -174,7 +175,7 @@ func TestPerson(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))

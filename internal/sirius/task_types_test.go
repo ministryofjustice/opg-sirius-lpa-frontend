@@ -6,15 +6,16 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestTaskTypes(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -29,20 +30,19 @@ func TestTaskTypes(t *testing.T) {
 					AddInteraction().
 					Given("Some task types exist").
 					UponReceiving("A request for task types").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/tasktypes/lpa"),
+						Path:   matchers.String("/lpa-api/v1/tasktypes/lpa"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"task_types": dsl.Like(map[string]interface{}{
-								"Check Application": dsl.Like(map[string]interface{}{
-									"handle": dsl.Like("Check Application"),
-								}),
+						Body: matchers.Like(map[string]interface{}{
+							"task_types": matchers.Like(map[string]interface{}{
+								"Check Application": matchers.Like(map[string]interface{}{}),
+								"handle":            matchers.Like("Check Application"),
 							}),
 						}),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: []string{"Check Application"},
@@ -53,8 +53,8 @@ func TestTaskTypes(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				types, err := client.TaskTypes(Context{Context: context.Background()})
 
@@ -62,7 +62,7 @@ func TestTaskTypes(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))

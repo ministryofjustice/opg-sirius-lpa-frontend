@@ -3,18 +3,18 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
-
-	"github.com/pact-foundation/pact-go/dsl"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestDigitalLpa(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -29,48 +29,48 @@ func TestDigitalLpa(t *testing.T) {
 					AddInteraction().
 					Given("A digital LPA exists").
 					UponReceiving("A request for the digital LPA").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567"),
+						Path:   matchers.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 						Body: map[string]interface{}{
-							"uId": dsl.Like("M-1234-9876-4567"),
+							"uId": matchers.Like("M-1234-9876-4567"),
 							"opg.poas.sirius": map[string]interface{}{
-								"id":                 dsl.Like(789),
-								"caseSubtype":        dsl.Like("property-and-affairs"),
-								"status":             dsl.Like("Draft"),
-								"createdDate":        dsl.Term("26/03/2018", `^\d{1,2}/\d{1,2}/\d{4}$`),
-								"complaintCount":     dsl.Like(1),
-								"investigationCount": dsl.Like(2),
-								"taskCount":          dsl.Like(3),
-								"warningCount":       dsl.Like(4),
-								"objectionCount":     dsl.Like(5),
+								"id":                 matchers.Like(789),
+								"caseSubtype":        matchers.Like("property-and-affairs"),
+								"status":             matchers.Like("Draft"),
+								"createdDate":        matchers.Term("26/03/2018", `^\d{1,2}/\d{1,2}/\d{4}$`),
+								"complaintCount":     matchers.Like(1),
+								"investigationCount": matchers.Like(2),
+								"taskCount":          matchers.Like(3),
+								"warningCount":       matchers.Like(4),
+								"objectionCount":     matchers.Like(5),
 								"application": map[string]interface{}{
-									"donorFirstNames": dsl.Like("Zoraida"),
-									"donorLastName":   dsl.Like("Swanberg"),
-									"donorDob":        dsl.Term("27/05/1978", `^\d{1,2}/\d{1,2}/\d{4}$`),
-									"donorPhone":      dsl.Like("073456249524"),
-									"donorEmail":      dsl.Like("zswanberg@host.example"),
+									"donorFirstNames": matchers.Like("Zoraida"),
+									"donorLastName":   matchers.Like("Swanberg"),
+									"donorDob":        matchers.Term("27/05/1978", `^\d{1,2}/\d{1,2}/\d{4}$`),
+									"donorPhone":      matchers.Like("073456249524"),
+									"donorEmail":      matchers.Like("zswanberg@host.example"),
 									"donorAddress": map[string]interface{}{
-										"addressLine1": dsl.Like("Apartment 24"),
-										"addressLine2": dsl.Like("Navigation Building"),
-										"addressLine3": dsl.Like("90 London Road"),
-										"town":         dsl.Like("Birmingham"),
-										"postcode":     dsl.Like("B15 4TA"),
-										"country":      dsl.Term("GB", `^[A-Z]{2}$`),
+										"addressLine1": matchers.Like("Apartment 24"),
+										"addressLine2": matchers.Like("Navigation Building"),
+										"addressLine3": matchers.Like("90 London Road"),
+										"town":         matchers.Like("Birmingham"),
+										"postcode":     matchers.Like("B15 4TA"),
+										"country":      matchers.Term("GB", `^[A-Z]{2}$`),
 									},
-									"correspondentFirstNames": dsl.Like("Heath"),
-									"correspondentLastName":   dsl.Like("Enstad"),
+									"correspondentFirstNames": matchers.Like("Heath"),
+									"correspondentLastName":   matchers.Like("Enstad"),
 									"correspondentAddress": map[string]interface{}{
-										"addressLine1": dsl.Like("Main Line Bungalow"),
-										"addressLine2": dsl.Like("Himmerton Lane"),
-										"addressLine3": dsl.Like("Sutton"),
-										"town":         dsl.Like("Scarsdale"),
-										"postcode":     dsl.Like("S24 7DJ"),
-										"country":      dsl.Term("GB", `^[A-Z]{2}$`),
+										"addressLine1": matchers.Like("Main Line Bungalow"),
+										"addressLine2": matchers.Like("Himmerton Lane"),
+										"addressLine3": matchers.Like("Sutton"),
+										"town":         matchers.Like("Scarsdale"),
+										"postcode":     matchers.Like("S24 7DJ"),
+										"country":      matchers.Term("GB", `^[A-Z]{2}$`),
 									},
 								},
 							},
@@ -124,39 +124,39 @@ func TestDigitalLpa(t *testing.T) {
 					AddInteraction().
 					Given("A digital LPA in statutory waiting period").
 					UponReceiving("A request for the digital LPA in statutory waiting period").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/digital-lpas/M-1111-2222-3333"),
+						Path:   matchers.String("/lpa-api/v1/digital-lpas/M-1111-2222-3333"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 						Body: map[string]interface{}{
-							"uId": dsl.Like("M-1111-2222-3333"),
+							"uId": matchers.Like("M-1111-2222-3333"),
 							"opg.poas.sirius": map[string]interface{}{
-								"id":                 dsl.Like(111),
-								"caseSubtype":        dsl.Like("property-and-affairs"),
-								"status":             dsl.Like("Statutory waiting period"),
-								"createdDate":        dsl.Term("26/03/2018", `^\d{1,2}/\d{1,2}/\d{4}$`),
-								"dueDate":            dsl.Term("09/04/2018", `^\d{1,2}/\d{1,2}/\d{4}$`),
-								"complaintCount":     dsl.Like(0),
-								"investigationCount": dsl.Like(0),
-								"taskCount":          dsl.Like(0),
-								"warningCount":       dsl.Like(0),
-								"objectionCount":     dsl.Like(0),
+								"id":                 matchers.Like(111),
+								"caseSubtype":        matchers.Like("property-and-affairs"),
+								"status":             matchers.Like("Statutory waiting period"),
+								"createdDate":        matchers.Term("26/03/2018", `^\d{1,2}/\d{1,2}/\d{4}$`),
+								"dueDate":            matchers.Term("09/04/2018", `^\d{1,2}/\d{1,2}/\d{4}$`),
+								"complaintCount":     matchers.Like(0),
+								"investigationCount": matchers.Like(0),
+								"taskCount":          matchers.Like(0),
+								"warningCount":       matchers.Like(0),
+								"objectionCount":     matchers.Like(0),
 								"application": map[string]interface{}{
-									"donorFirstNames": dsl.Like("Lonnie"),
-									"donorLastName":   dsl.Like("Jakubowski"),
-									"donorDob":        dsl.Term("22/03/1949", `^\d{1,2}/\d{1,2}/\d{4}$`),
-									"donorPhone":      dsl.Like("07123456789"),
-									"donorEmail":      dsl.Like("Lonnie.Jakubowski@example.com"),
+									"donorFirstNames": matchers.Like("Lonnie"),
+									"donorLastName":   matchers.Like("Jakubowski"),
+									"donorDob":        matchers.Term("22/03/1949", `^\d{1,2}/\d{1,2}/\d{4}$`),
+									"donorPhone":      matchers.Like("07123456789"),
+									"donorEmail":      matchers.Like("Lonnie.Jakubowski@example.com"),
 									"donorAddress": map[string]interface{}{
-										"addressLine1": dsl.Like("528 Fourth Avenue"),
-										"addressLine2": dsl.Like("Lower Kozey Cross"),
-										"addressLine3": dsl.Like("East Thiel"),
-										"town":         dsl.Like("Ahlen"),
-										"postcode":     dsl.Like("YL06 6GF"),
-										"country":      dsl.Term("GB", `^[A-Z]{2}$`),
+										"addressLine1": matchers.Like("528 Fourth Avenue"),
+										"addressLine2": matchers.Like("Lower Kozey Cross"),
+										"addressLine3": matchers.Like("East Thiel"),
+										"town":         matchers.Like("Ahlen"),
+										"postcode":     matchers.Like("YL06 6GF"),
+										"country":      matchers.Term("GB", `^[A-Z]{2}$`),
 									},
 								},
 							},
@@ -200,8 +200,8 @@ func TestDigitalLpa(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				digitalLpa, err := client.DigitalLpa(Context{Context: context.Background()}, tc.expectedResponse.UID, false)
 
@@ -209,7 +209,7 @@ func TestDigitalLpa(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))

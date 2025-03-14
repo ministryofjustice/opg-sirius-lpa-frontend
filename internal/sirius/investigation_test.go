@@ -3,7 +3,8 @@ package sirius
 import (
 	"context"
 	"fmt"
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -12,8 +13,8 @@ import (
 func TestInvestigationOffHold(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -28,20 +29,20 @@ func TestInvestigationOffHold(t *testing.T) {
 					AddInteraction().
 					Given("I have a case assigned which has an investigation open").
 					UponReceiving("A request for the investigation").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/investigations/300"),
+						Path:   matchers.String("/lpa-api/v1/investigations/300"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"id":                        dsl.Like(300),
-							"investigationTitle":        dsl.String("Test title"),
-							"additionalInformation":     dsl.String("Some test info"),
-							"type":                      dsl.String("Normal"),
-							"investigationReceivedDate": dsl.String("23/01/2022"),
+						Body: matchers.Like(map[string]interface{}{
+							"id":                        matchers.Like(300),
+							"investigationTitle":        matchers.String("Test title"),
+							"additionalInformation":     matchers.String("Some test info"),
+							"type":                      matchers.String("Normal"),
+							"investigationReceivedDate": matchers.String("23/01/2022"),
 						}),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: Investigation{
@@ -58,8 +59,8 @@ func TestInvestigationOffHold(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				investigation, err := client.Investigation(Context{Context: context.Background()}, 300)
 
@@ -67,7 +68,7 @@ func TestInvestigationOffHold(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
@@ -78,8 +79,8 @@ func TestInvestigationOffHold(t *testing.T) {
 func TestInvestigationOnHold(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -94,28 +95,28 @@ func TestInvestigationOnHold(t *testing.T) {
 					AddInteraction().
 					Given("I have a case assigned which has an investigation on hold").
 					UponReceiving("A request for the investigation which is on hold").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/investigations/301"),
+						Path:   matchers.String("/lpa-api/v1/investigations/301"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"id":                        dsl.Like(301),
-							"investigationTitle":        dsl.String("Test title"),
-							"additionalInformation":     dsl.String("Some test info"),
-							"type":                      dsl.String("Normal"),
-							"investigationReceivedDate": dsl.String("23/01/2022"),
+						Body: matchers.Like(map[string]interface{}{
+							"id":                        matchers.Like(301),
+							"investigationTitle":        matchers.String("Test title"),
+							"additionalInformation":     matchers.String("Some test info"),
+							"type":                      matchers.String("Normal"),
+							"investigationReceivedDate": matchers.String("23/01/2022"),
 							"isOnHold":                  true,
-							"holdPeriods": dsl.Like([]map[string]interface{}{
+							"holdPeriods": matchers.Like([]map[string]interface{}{
 								{
-									"id":        dsl.Like(175),
-									"reason":    dsl.String("Police Investigation"),
-									"startDate": dsl.String("25/01/2022"),
+									"id":        matchers.Like(175),
+									"reason":    matchers.String("Police Investigation"),
+									"startDate": matchers.String("25/01/2022"),
 								},
 							}),
 						}),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: Investigation{
@@ -140,8 +141,8 @@ func TestInvestigationOnHold(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				investigation, err := client.Investigation(Context{Context: context.Background()}, 301)
 
@@ -149,7 +150,7 @@ func TestInvestigationOnHold(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
