@@ -164,10 +164,10 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.25.1.tgz#7d79922cb2d88f9048f06393dbf62d2e4accb584"
   integrity sha512-Y1EQdcfwMSeQN/ujR5VayLOJ1BHaK+ssyk0AEzPjC+t1lITgsnccPqFjb6V+LsTp/9Iov4ysfjxLaGJ9RPtkVg==
 
-"@ministryofjustice/frontend@^3.0.0":
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/@ministryofjustice/frontend/-/frontend-3.7.0.tgz#fd694f79d06f1c5a2ba581c1f5c89506810aa4a6"
-  integrity sha512-o84Sqy+1jqc1vaxIZfyG4VwJzdpDUK88O9COJFVLcFmW+Np80onlFlGAVjDUxNHYvtBdJx40w1dayq53wmtxgQ==
+"@ministryofjustice/frontend@^4.0.0":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@ministryofjustice/frontend/-/frontend-4.0.1.tgz#5e9ed308e208982179e26e7884173bce553eec87"
+  integrity sha512-LljgnzLtTIw9z8mw/pK1xLIyR3TtHrFa9Z/i7X+6odzN5MlQ0dYLDXunoAhniXeOlXz5sNbdsmGuf/iNxv0keA==
 
 "@parcel/watcher-android-arm64@2.5.1":
   version "2.5.1"
@@ -280,12 +280,10 @@
   dependencies:
     "@types/node" "*"
 
-accessible-autocomplete@^2.0.4:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/accessible-autocomplete/-/accessible-autocomplete-2.0.4.tgz#e295256c8d268b97c5ab456a1cb084b553ed3eb0"
-  integrity sha512-2p0txrSpvs5wXFUeQJHMheDPTZVSEmiUHWlEPb7vJnv2Dd1xPfoLnBQQMfNbTSit2pL/9sSQYESuD2Yyohd4Yw==
-  dependencies:
-    preact "^8.3.1"
+accessible-autocomplete@^3.0.0:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/accessible-autocomplete/-/accessible-autocomplete-3.0.1.tgz#8ddf4934d0b4ba6acb28de486dd505e062cdc86e"
+  integrity sha512-xMshgc2LT5addvvfCTGzIkRrvhbOFeylFSnSMfS/PdjvvvElZkakCwxO3/yJYBWyi1hi3tZloqOJQ5kqqJtH4g==
 
 aggregate-error@^3.0.0:
   version "3.1.0"
@@ -1197,11 +1195,6 @@ pify@^2.2.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/pify/-/pify-2.3.0.tgz#ed141a6ac043a849ea588498e7dca8b15330e90c"
   integrity sha512-udgsAY+fTnvv7kI7aaxbqwWNb0AHiB0qBO89PZKPkoTmGOgdbrHDKD+0B2X4uTfJ/FT1R09r9gTsjUjNJotuog==
-
-preact@^8.3.1:
-  version "8.5.3"
-  resolved "https://registry.yarnpkg.com/preact/-/preact-8.5.3.tgz#78c2a5562fcecb1fed1d0055fa4ac1e27bde17c1"
-  integrity sha512-O3kKP+1YdgqHOFsZF2a9JVdtqD+RPzCQc3rP+Ualf7V6rmRDchZ9MJbiGTT7LuyqFKZqlHSOyO/oMFmI2lVTsw==
 
 prettier@^3.0.0:
   version "3.5.3"
