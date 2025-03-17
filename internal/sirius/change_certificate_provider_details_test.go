@@ -45,7 +45,7 @@ func TestChangeCertificateProviderDetails(t *testing.T) {
 					UponReceiving("A request for changing certificate provider details").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/digital-lpas/M-1111-1111-1111/change-certificate-provider-details"),
+						Path:   dsl.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567/change-certificate-provider-details"),
 						Headers: dsl.MapMatcher{
 							"Content-Type": dsl.String("application/json"),
 						},
@@ -81,7 +81,7 @@ func TestChangeCertificateProviderDetails(t *testing.T) {
 
 				err := client.ChangeCertificateProviderDetails(
 					Context{Context: context.Background()},
-					"M-1111-1111-1111",
+					"M-1234-9876-4567",
 					tc.changeData,
 				)
 
