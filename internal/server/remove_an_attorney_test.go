@@ -83,9 +83,28 @@ var removeAnAttorneyCaseSummary = sirius.CaseSummary{
 					DateOfBirth:     "1990-02-22",
 					Status:          shared.InactiveAttorneyStatus.String(),
 					AppointmentType: shared.ReplacementAppointmentType.String(),
-					Email:           "b@example.com",
+					Email:           "c@example.com",
 					Mobile:          "07122121212",
 					SignedAt:        "2024-11-28T19:22:11Z",
+				},
+				{
+					LpaStorePerson: sirius.LpaStorePerson{
+						Uid:        "123a01b1-456d-5391-813d-2010d3e256f",
+						FirstNames: "Jack",
+						LastName:   "Green",
+						Address: sirius.LpaStoreAddress{
+							Line1:    "39 Grange Road",
+							Town:     "Birmingham",
+							Postcode: "B29 6BL",
+							Country:  "UK",
+						},
+					},
+					DateOfBirth:     "1990-02-26",
+					Status:          shared.InactiveAttorneyStatus.String(),
+					AppointmentType: shared.ReplacementAppointmentType.String(),
+					Email:           "d@example.com",
+					Mobile:          "07122121232",
+					SignedAt:        "2024-11-30T19:22:11Z",
 				},
 				{
 					LpaStorePerson: sirius.LpaStorePerson{
@@ -152,6 +171,47 @@ var activeAttorneys = []sirius.LpaStoreAttorney{
 	},
 }
 
+var inactiveAttorneys = []sirius.LpaStoreAttorney{
+	{
+		LpaStorePerson: sirius.LpaStorePerson{
+			Uid:        "123a01b1-456d-5391-813d-2010d3e2d72d",
+			FirstNames: "Jack",
+			LastName:   "White",
+			Address: sirius.LpaStoreAddress{
+				Line1:    "29 Grange Road",
+				Town:     "Birmingham",
+				Postcode: "B29 6BL",
+				Country:  "UK",
+			},
+		},
+		DateOfBirth:     "1990-02-22",
+		Status:          shared.InactiveAttorneyStatus.String(),
+		AppointmentType: shared.ReplacementAppointmentType.String(),
+		Email:           "c@example.com",
+		Mobile:          "07122121212",
+		SignedAt:        "2024-11-28T19:22:11Z",
+	},
+	{
+		LpaStorePerson: sirius.LpaStorePerson{
+			Uid:        "123a01b1-456d-5391-813d-2010d3e256f",
+			FirstNames: "Jack",
+			LastName:   "Green",
+			Address: sirius.LpaStoreAddress{
+				Line1:    "39 Grange Road",
+				Town:     "Birmingham",
+				Postcode: "B29 6BL",
+				Country:  "UK",
+			},
+		},
+		DateOfBirth:     "1990-02-26",
+		Status:          shared.InactiveAttorneyStatus.String(),
+		AppointmentType: shared.ReplacementAppointmentType.String(),
+		Email:           "d@example.com",
+		Mobile:          "07122121232",
+		SignedAt:        "2024-11-30T19:22:11Z",
+	},
+}
+
 func TestGetRemoveAnAttorney(t *testing.T) {
 	client := &mockRemoveAnAttorneyClient{}
 	client.
@@ -161,9 +221,10 @@ func TestGetRemoveAnAttorney(t *testing.T) {
 	removeTemplate := &mockTemplate{}
 	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
-			CaseSummary:     removeAnAttorneyCaseSummary,
-			ActiveAttorneys: activeAttorneys,
-			Error:           sirius.ValidationError{Field: sirius.FieldErrors{}},
+			CaseSummary:       removeAnAttorneyCaseSummary,
+			ActiveAttorneys:   activeAttorneys,
+			InactiveAttorneys: inactiveAttorneys,
+			Error:             sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
 		Return(nil)
 
@@ -211,9 +272,10 @@ func TestGetRemoveAnAttorneyTemplateErrors(t *testing.T) {
 	removeTemplate := &mockTemplate{}
 	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
-			CaseSummary:     removeAnAttorneyCaseSummary,
-			ActiveAttorneys: activeAttorneys,
-			Error:           sirius.ValidationError{Field: sirius.FieldErrors{}},
+			CaseSummary:       removeAnAttorneyCaseSummary,
+			ActiveAttorneys:   activeAttorneys,
+			InactiveAttorneys: inactiveAttorneys,
+			Error:             sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
 		Return(expectedError)
 
@@ -236,11 +298,17 @@ func TestPostRemoveAnAttorneyInvalidData(t *testing.T) {
 	removeTemplate := &mockTemplate{}
 	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
-			SelectedAttorneyUid: "",
-			CaseSummary:         removeAnAttorneyCaseSummary,
-			ActiveAttorneys:     activeAttorneys,
+			CaseSummary:       removeAnAttorneyCaseSummary,
+			ActiveAttorneys:   activeAttorneys,
+			InactiveAttorneys: inactiveAttorneys,
+			Form: formRemoveAttorney{
+				RemovedAttorneyUid:  "",
+				EnabledAttorneyUids: nil,
+				SkipEnableAttorney:  "",
+			},
 			Error: sirius.ValidationError{Field: sirius.FieldErrors{
-				"selectAttorney": {"reason": "Please select an attorney for removal."},
+				"removeAttorney": {"reason": "Please select an attorney for removal"},
+				"enableAttorney": {"reason": "Please select either the attorneys that can be enabled or skip the replacement of the attorneys"},
 			}},
 		}).
 		Return(nil)
@@ -256,7 +324,7 @@ func TestPostRemoveAnAttorneyInvalidData(t *testing.T) {
 	resp, err := server.serve(req)
 
 	assert.Nil(t, err)
-	assert.Equal(t, http.StatusBadRequest, resp.Code)
+	assert.Equal(t, http.StatusOK, resp.Code)
 	mock.AssertExpectationsForObjects(t, client, removeTemplate)
 }
 
@@ -270,19 +338,33 @@ func TestPostRemoveAnAttorneyValidData(t *testing.T) {
 	confirmTemplate := &mockTemplate{}
 	confirmTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
-			CaseSummary:          removeAnAttorneyCaseSummary,
-			ActiveAttorneys:      activeAttorneys,
-			SelectedAttorneyUid:  "302b05c7-896c-4290-904e-2005e4f1e81e",
-			SelectedAttorneyName: "Jack Black",
-			SelectedAttorneyDob:  "1990-02-22",
-			Error:                sirius.ValidationError{Field: sirius.FieldErrors{}},
+			CaseSummary:       removeAnAttorneyCaseSummary,
+			ActiveAttorneys:   activeAttorneys,
+			InactiveAttorneys: inactiveAttorneys,
+			Form: formRemoveAttorney{
+				RemovedAttorneyUid:  "302b05c7-896c-4290-904e-2005e4f1e81e",
+				EnabledAttorneyUids: []string{"123a01b1-456d-5391-813d-2010d3e256f"},
+				SkipEnableAttorney:  "",
+			},
+			RemovedAttorneysDetails: SelectedAttorneyDetails{
+				SelectedAttorneyName: "Jack Black",
+				SelectedAttorneyDob:  "1990-02-22",
+			},
+			EnabledAttorneysDetails: []SelectedAttorneyDetails{
+				{
+					SelectedAttorneyName: "Jack Green",
+					SelectedAttorneyDob:  "1990-02-26",
+				},
+			},
+			Error: sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
 		Return(nil)
 
 	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func))
 
 	form := url.Values{
-		"selectedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
+		"removedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
+		"enabledAttorney": {"123a01b1-456d-5391-813d-2010d3e256f"},
 	}
 
 	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/remove-an-attorney", strings.NewReader(form.Encode()))
@@ -303,6 +385,7 @@ func TestPostConfirmAttorneyRemovalValidData(t *testing.T) {
 	client.
 		On("ChangeAttorneyStatus", mock.Anything, "M-1111-2222-3333", []sirius.AttorneyUpdatedStatus{
 			{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", Status: "removed"},
+			{UID: "123a01b1-456d-5391-813d-2010d3e256f", Status: "active"},
 		}).
 		Return(nil)
 
@@ -312,8 +395,9 @@ func TestPostConfirmAttorneyRemovalValidData(t *testing.T) {
 	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func))
 
 	form := url.Values{
-		"selectedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
-		"confirmRemoval":   {""},
+		"removedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
+		"enabledAttorney": {"123a01b1-456d-5391-813d-2010d3e256f"},
+		"confirmRemoval":  {""},
 	}
 
 	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/remove-an-attorney", strings.NewReader(form.Encode()))

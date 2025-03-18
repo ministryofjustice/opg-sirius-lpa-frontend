@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"github.com/go-playground/form/v4"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -15,19 +16,34 @@ type RemoveAnAttorneyClient interface {
 	ChangeAttorneyStatus(sirius.Context, string, []sirius.AttorneyUpdatedStatus) error
 }
 
-type removeAnAttorneyData struct {
-	CaseSummary sirius.CaseSummary
+type formRemoveAttorney struct {
+	RemovedAttorneyUid  string   `form:"removedAttorney"`
+	EnabledAttorneyUids []string `form:"enabledAttorney"`
+	SkipEnableAttorney  string   `form:"skipEnableAttorney"`
+}
 
-	ActiveAttorneys      []sirius.LpaStoreAttorney
-	SelectedAttorneyUid  string
+type SelectedAttorneyDetails struct {
 	SelectedAttorneyName string
 	SelectedAttorneyDob  string
-	Success              bool
-	Error                sirius.ValidationError
-	XSRFToken            string
+}
+
+type removeAnAttorneyData struct {
+	CaseSummary             sirius.CaseSummary
+	ActiveAttorneys         []sirius.LpaStoreAttorney
+	InactiveAttorneys       []sirius.LpaStoreAttorney
+	Form                    formRemoveAttorney
+	RemovedAttorneysDetails SelectedAttorneyDetails
+	EnabledAttorneysDetails []SelectedAttorneyDetails
+	Success                 bool
+	Error                   sirius.ValidationError
+	XSRFToken               string
 }
 
 func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Template, confirmTmpl template.Template) Handler {
+	if decoder == nil {
+		decoder = form.NewDecoder()
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) error {
 		uid := chi.URLParam(r, "uid")
 		ctx := getContext(r)
@@ -39,10 +55,9 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 		}
 
 		data := removeAnAttorneyData{
-			SelectedAttorneyUid: postFormString(r, "selectedAttorney"),
-			CaseSummary:         caseSummary,
-			XSRFToken:           ctx.XSRFToken,
-			Error:               sirius.ValidationError{Field: sirius.FieldErrors{}},
+			CaseSummary: caseSummary,
+			XSRFToken:   ctx.XSRFToken,
+			Error:       sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}
 
 		lpa := data.CaseSummary.DigitalLpa
@@ -57,21 +72,61 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 			data.ActiveAttorneys = append(data.ActiveAttorneys, attorney)
 		}
 
-		if r.Method == http.MethodPost {
-			if data.SelectedAttorneyUid == "" {
-				w.WriteHeader(http.StatusBadRequest)
+		for _, attorney := range lpa.LpaStoreData.Attorneys {
+			if attorney.Status == shared.RemovedAttorneyStatus.String() || attorney.Status == shared.ActiveAttorneyStatus.String() {
+				continue
+			}
 
-				data.Error.Field["selectAttorney"] = map[string]string{
-					"reason": "Please select an attorney for removal.",
+			data.InactiveAttorneys = append(data.InactiveAttorneys, attorney)
+		}
+
+		if r.Method == http.MethodPost {
+
+			err = decoder.Decode(&data.Form, r.PostForm)
+			if err != nil {
+				return err
+			}
+
+			if data.Form.RemovedAttorneyUid == "" {
+				data.Error.Field["removeAttorney"] = map[string]string{
+					"reason": "Please select an attorney for removal",
+				}
+			}
+
+			if len(data.Form.EnabledAttorneyUids) > 0 && postFormCheckboxChecked(r, "skipEnableAttorney", "yes") {
+				data.Error.Field["enableAttorney"] = map[string]string{
+					"reason": "Please do not select both the options",
+				}
+			}
+
+			if len(data.Form.EnabledAttorneyUids) == 0 && !postFormCheckboxChecked(r, "skipEnableAttorney", "yes") {
+				data.Error.Field["enableAttorney"] = map[string]string{
+					"reason": "Please select either the attorneys that can be enabled or skip the replacement of the attorneys",
 				}
 			}
 
 			if !data.Error.Any() {
 				if !postFormKeySet(r, "confirmRemoval") {
 					for _, att := range data.ActiveAttorneys {
-						if att.Uid == data.SelectedAttorneyUid {
-							data.SelectedAttorneyName = att.FirstNames + " " + att.LastName
-							data.SelectedAttorneyDob = att.DateOfBirth
+						if att.Uid == data.Form.RemovedAttorneyUid {
+							data.RemovedAttorneysDetails = SelectedAttorneyDetails{
+								SelectedAttorneyName: att.FirstNames + " " + att.LastName,
+								SelectedAttorneyDob:  att.DateOfBirth,
+							}
+						}
+					}
+
+					if len(data.Form.EnabledAttorneyUids) > 0 {
+						for _, att := range data.InactiveAttorneys {
+							for _, enabledAttUid := range data.Form.EnabledAttorneyUids {
+								if att.Uid == enabledAttUid {
+									data.EnabledAttorneysDetails = append(data.EnabledAttorneysDetails, SelectedAttorneyDetails{
+										SelectedAttorneyName: att.FirstNames + " " + att.LastName,
+										SelectedAttorneyDob:  att.DateOfBirth,
+									})
+									break
+								}
+							}
 						}
 					}
 
@@ -80,11 +135,24 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 					var attorneyUpdatedStatus []sirius.AttorneyUpdatedStatus
 
 					for _, att := range data.ActiveAttorneys {
-						if att.Uid == data.SelectedAttorneyUid {
+						if att.Uid == data.Form.RemovedAttorneyUid {
 							attorneyUpdatedStatus = append(attorneyUpdatedStatus, sirius.AttorneyUpdatedStatus{
 								UID:    att.Uid,
 								Status: shared.RemovedAttorneyStatus.String(),
 							})
+						}
+					}
+
+					if len(data.Form.EnabledAttorneyUids) > 0 {
+						for _, att := range data.InactiveAttorneys {
+							for _, enabledAttUid := range data.Form.EnabledAttorneyUids {
+								if att.Uid == enabledAttUid {
+									attorneyUpdatedStatus = append(attorneyUpdatedStatus, sirius.AttorneyUpdatedStatus{
+										UID:    att.Uid,
+										Status: shared.ActiveAttorneyStatus.String(),
+									})
+								}
+							}
 						}
 					}
 
