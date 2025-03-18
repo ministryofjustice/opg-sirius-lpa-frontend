@@ -124,6 +124,45 @@ describe("View a digital LPA", () => {
       },
     });
 
+    cy.addMock("/lpa-api/v1/persons/33/events?filter=case:333&sort=id:desc", "GET", {
+      status: 200,
+      body: {
+        "events": [
+          {
+            "id": 111111,
+            "user": {
+              "id": 11,
+              "phoneNumber": "12345678",
+              "teams": [],
+              "displayName": "system admin",
+              "deleted": false,
+              "email": "system.admin@opgtest.com",
+            },
+            "sourceType": "Donor",
+            "sourcePerson": {
+              "id": 111111,
+              "uId": "7000-1111-1111",
+              "firstname": "John",
+              "surname": "Smith",
+            },
+            "type": "INS",
+            "changeSet": [],
+            "entity": {
+              "_class": "Opg\\Core\\Model\\Entity\\CaseActor\\Donor",
+              "email": "",
+              "firstname": "John",
+              "id": 111111,
+              "salutation": "",
+              "surname": "Smith",
+              "uId": 700011111111,
+            },
+            "createdOn": "2024-01-02T12:13:14+00:00",
+            "hash": "5555",
+          }
+        ],
+      },
+    });
+
     cy.addMock("/lpa-api/v1/cases/333/warnings", "GET", {
       status: 200,
       body: [
@@ -825,5 +864,19 @@ describe("View a digital LPA", () => {
       "src",
       "some-presigned-url.jpg",
     );
+  });
+
+  it('shows history', () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+
+    cy.contains("a", "History").click();
+
+    cy.contains("Created Donor by system admin");
+    cy.contains("2 January 2024 at 12:13");
+    cy.contains("More details").click();
+
+    cy.contains("Firstname John");
+    cy.contains("Surname Smith");
+    cy.contains("UID 700011111111");
   });
 });

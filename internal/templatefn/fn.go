@@ -7,6 +7,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode"
+	"unicode/utf8"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -90,6 +92,36 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"ToUpper": strings.ToUpper,
 		"capitalise": func(text string) string {
 			return cases.Title(language.English).String(text)
+		},
+		"camelcaseToSentence": func(text string) string {
+			if text == "" {
+				return ""
+			}
+
+			if text == "uId" {
+				return "UID"
+			}
+
+			r, n := utf8.DecodeRuneInString(text)
+			text = text[n:]
+
+			s := string(unicode.ToUpper(r))
+			for len(text) > 0 {
+				r, n := utf8.DecodeRuneInString(text)
+				text = text[n:]
+
+				if r >= 'A' && r < 'Z' {
+					s += " "
+					s += string(unicode.ToLower(r))
+				} else if r >= '0' && r < '9' {
+					s += " "
+					s += string(r)
+				} else {
+					s += string(r)
+				}
+			}
+
+			return s
 		},
 		"contains": func(xs []string, needle string) bool {
 			for _, x := range xs {
