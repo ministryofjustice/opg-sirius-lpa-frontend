@@ -1,9 +1,10 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 )
