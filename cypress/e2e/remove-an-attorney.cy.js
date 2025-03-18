@@ -278,12 +278,14 @@ describe("Remove an attorney", () => {
       .should("not.include", "remove-an-attorney");
   });
 
-  it("shows the Remove an attorney page with active attorneys", () => {
+  it("shows the Remove an attorney page with active attorneys and inactive attorneys", () => {
     cy.contains("Remove an attorney");
     cy.get('input[name="confirmRemoval"]').should("not.exist");
+    cy.contains("Select an attorney to remove");
     cy.get(".govuk-label").contains("Katheryn Collins");
     cy.get(".govuk-label").contains("Rachel Jones");
-    cy.get(".govuk-label").contains("Barry Smith").should("not.exist");
+    cy.contains("Select replacement attorneys to step in");
+    cy.get(".govuk-label").contains("Barry Smith");
   });
 
   it("shows an error when submitting a blank Remove an attorney form", () => {
@@ -291,13 +293,15 @@ describe("Remove an attorney", () => {
     cy.contains("There is a problem");
   });
 
-  it("shows the Confirm removal of attorney page when submitting the Remove an attorney form with an active attorney selected", () => {
+  it("shows the Confirm removal of attorney page when submitting the Remove an attorney form with an active attorney and an inactive attorney selected", () => {
     cy.contains("Remove an attorney");
     cy.get('input[name="confirmRemoval"]').should("not.exist");
-    cy.get("#f-attorney-1").click();
+    cy.get("#f-activeAttorney-1").click();
+    cy.get("#f-inactiveAttorney-1").click();
     cy.get("button").contains("Continue").click();
     cy.url().should("include", "/lpa/M-1111-1111-1111/remove-an-attorney");
     cy.contains("Confirm removal of attorney");
     cy.get(".govuk-summary-list__value").contains("Katheryn Collins");
+    cy.get(".govuk-summary-list__value").contains("Barry Smith");
   });
 });
