@@ -15,33 +15,77 @@
 
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
-        <input type="hidden" name="selectedAttorney" value="{{ .SelectedAttorneyUid }}"/>
+        <input type="hidden" name="removedAttorney" value="{{ .Form.RemovedAttorneyUid }}"/>
+        {{ range $idx, $enabledAttUid := .Form.EnabledAttorneyUids }}
+          <input type="hidden" name="enabledAttorney" value="{{ $enabledAttUid }}"/>
+        {{ end }}
+        <input type="hidden" name="skipEnableAttorney" value="{{ .Form.SkipEnableAttorney }}"/>
         <input type="hidden" name="confirmRemoval"/>
 
-        <div class="govuk-form-group{{ if .Error.Field.selectAttorney }} govuk-form-group--error{{ end }}">
+        <div class="govuk-form-group{{ if .Error.Field.removeAttorney }} govuk-form-group--error{{ end }}">
           <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend"><strong>Attorney to be removed</strong></legend>
-            {{ template "errors" .Error.Field.selectAttorney }}
+            {{ template "errors" .Error.Field.removeAttorney }}
 
             <dl class="govuk-summary-list">
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Name</dt>
                 <dd class="govuk-summary-list__value govuk-!-font-weight-bold">
-                  {{ .SelectedAttorneyName }}
+                  {{ .RemovedAttorneysDetails.SelectedAttorneyName }}
                 </dd>
               </div>
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Date of birth</dt>
                 <dd class="govuk-summary-list__value">
-                  {{ if not (eq .SelectedAttorneyDob "") }}
-                    {{ parseAndFormatDate .SelectedAttorneyDob "2006-01-02" "2 January 2006" }}
+                  {{ if not (eq .RemovedAttorneysDetails.SelectedAttorneyDob "") }}
+                    {{ parseAndFormatDate .RemovedAttorneysDetails.SelectedAttorneyDob "2006-01-02" "2 January 2006" }}
                   {{ end }}
                 </dd>
               </div>
             </dl>
           </fieldset>
         </div>
+
+        {{ if gt (len .Form.EnabledAttorneyUids) 0 }}
+          <div class="govuk-form-group{{ if .Error.Field.enableAttorney }} govuk-form-group--error{{ end }}">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend"><strong>Replacement Attorneys stepping in</strong></legend>
+              {{ template "errors" .Error.Field.enableAttorney }}
+
+              {{ range $idx, $enabledAttorney := .EnabledAttorneysDetails }}
+                <dl class="govuk-summary-list">
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Name</dt>
+                    <dd class="govuk-summary-list__value govuk-!-font-weight-bold">
+                      {{ $enabledAttorney.SelectedAttorneyName }}
+                    </dd>
+                  </div>
+
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Date of birth</dt>
+                    <dd class="govuk-summary-list__value">
+                      {{ if not (eq $enabledAttorney.SelectedAttorneyDob "") }}
+                        {{ parseAndFormatDate $enabledAttorney.SelectedAttorneyDob "2006-01-02" "2 January 2006" }}
+                      {{ end }}
+                    </dd>
+                  </div>
+                </dl>
+              {{ end }}
+            </fieldset>
+          </div>
+        {{ else }}
+          <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset">
+              <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                  <p>No replacement attorneys to step in</p>
+                </div>
+              </dl>
+            </fieldset>
+          </div>
+        {{ end }}
+
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Confirm removal</button>
           <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s/remove-an-attorney" .CaseSummary.DigitalLpa.UID )}}">Return to previous screen</a>
