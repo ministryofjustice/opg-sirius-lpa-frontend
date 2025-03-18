@@ -1,8 +1,9 @@
 package templatefn
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -155,4 +156,18 @@ func TestProgressIndicatorStatus(t *testing.T) {
 	}
 
 	testStringMapper(t, "progressIndicatorStatus", expectations)
+}
+
+func TestCamelcaseToSentence(t *testing.T) {
+	expectations := map[string]string{
+		"uId":   "UID",
+		"abc":   "Abc",
+		"aBc":   "A bc",
+		"aBCd":  "A b cd",
+		"aBcDe": "A bc de",
+		"a2B1":  "A 2 b 1",
+		"":      "",
+	}
+
+	testStringMapper(t, "camelcaseToSentence", expectations)
 }
