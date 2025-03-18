@@ -16,24 +16,62 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
 
-        <div class="govuk-form-group{{ if .Error.Field.selectAttorney }} govuk-form-group--error{{ end }}">
+        <div class="govuk-form-group{{ if .Error.Field.removeAttorney }} govuk-form-group--error{{ end }}">
           <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend"><strong>Select an attorney to remove</strong></legend>
-            {{ template "errors" .Error.Field.selectAttorney }}
+            {{ template "errors" .Error.Field.removeAttorney }}
 
             <div class="govuk-radios" data-module="govuk-radios">
-              {{ range $num, $attorney := .ActiveAttorneys }}
+              {{ range $num, $activeAttorney := .ActiveAttorneys }}
                 <div class="govuk-radios__item">
-                  <input class="govuk-radios__input" id="f-attorney-{{ plusN $num 1 }}" name="selectedAttorney" type="radio" value="{{ $attorney.Uid }}" {{ if eq $attorney.Uid $.SelectedAttorneyUid }}checked{{ end }}>
-                  <label class="govuk-label govuk-radios__label" for="f-attorney-{{ plusN $num 1 }}">
-                    {{ $attorney.FirstNames }} {{ $attorney.LastName }}
+                  <input class="govuk-radios__input" id="f-activeAttorney-{{ plusN $num 1 }}" name="removedAttorney" type="radio" value="{{ $activeAttorney.Uid }}"
+                         {{ if eq $activeAttorney.Uid $.Form.RemovedAttorneyUid }}checked{{ end }}>
+                  <label class="govuk-label govuk-radios__label" for="f-activeAttorney-{{ plusN $num 1 }}">
+                    {{ $activeAttorney.FirstNames }} {{ $activeAttorney.LastName }}
                     <br>
-                    {{ if not (eq $attorney.DateOfBirth "") }}
-                      {{ parseAndFormatDate $attorney.DateOfBirth "2006-01-02" "2 January 2006" }}
+                    {{ if not (eq $activeAttorney.DateOfBirth "") }}
+                      {{ parseAndFormatDate $activeAttorney.DateOfBirth "2006-01-02" "2 January 2006" }}
                     {{ end }}
                   </label>
                 </div>
               {{ end }}
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="govuk-form-group{{ if .Error.Field.enableAttorney }} govuk-form-group--error{{ end }}">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend"><strong>Select replacement attorneys to step in</strong></legend>
+            {{ template "errors" .Error.Field.enableAttorney }}
+
+            {{ if gt (len .InactiveAttorneys) 0 }}
+              <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                {{ range $idx, $inactiveAttorney := .InactiveAttorneys }}
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="f-inactiveAttorney-{{ plusN $idx 1 }}" name="enabledAttorney" type="checkbox" value="{{ $inactiveAttorney.Uid }}"
+                           {{ if contains $.Form.EnabledAttorneyUids $inactiveAttorney.Uid }}checked{{ end }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="f-inactiveAttorney-{{ plusN $idx 1 }}">
+                      {{ $inactiveAttorney.FirstNames }} {{ $inactiveAttorney.LastName }}
+                      <br>
+                      {{ if not (eq $inactiveAttorney.DateOfBirth "") }}
+                        {{ parseAndFormatDate $inactiveAttorney.DateOfBirth "2006-01-02" "2 January 2006" }}
+                      {{ end }}
+                    </label>
+                  </div>
+                {{ end }}
+              </div>
+              <p class="govuk-body">or</p>
+            {{ end }}
+          </fieldset>
+          <fieldset class="govuk-fieldset">
+            <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="f-skipEnableAttorney" name="skipEnableAttorney" type="checkbox" value="yes"
+                         {{ if eq "yes" $.Form.SkipEnableAttorney }}checked{{ end }}>
+                  <label class="govuk-label govuk-checkboxes__label" for="f-skipEnableAttorney">
+                    No replacement attorneys to step in
+                  </label>
+                </div>
             </div>
           </fieldset>
         </div>
