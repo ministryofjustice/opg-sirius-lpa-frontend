@@ -16,7 +16,7 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
         <input type="hidden" name="removedAttorney" value="{{ .Form.RemovedAttorneyUid }}"/>
-        {{ range $idx, $enabledAttUid := .Form.EnabledAttorneyUids }}
+        {{ range $enabledAttUid := .Form.EnabledAttorneyUids }}
           <input type="hidden" name="enabledAttorney" value="{{ $enabledAttUid }}"/>
         {{ end }}
         <input type="hidden" name="skipEnableAttorney" value="{{ .Form.SkipEnableAttorney }}"/>
@@ -53,7 +53,7 @@
               <legend class="govuk-fieldset__legend"><strong>Replacement Attorneys stepping in</strong></legend>
               {{ template "errors" .Error.Field.enableAttorney }}
 
-              {{ range $idx, $enabledAttorney := .EnabledAttorneysDetails }}
+              {{ range $enabledAttorney := .EnabledAttorneysDetails }}
                 <dl class="govuk-summary-list">
                   <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Name</dt>

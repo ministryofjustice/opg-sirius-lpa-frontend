@@ -95,7 +95,7 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 
 			if len(data.Form.EnabledAttorneyUids) > 0 && postFormCheckboxChecked(r, "skipEnableAttorney", "yes") {
 				data.Error.Field["enableAttorney"] = map[string]string{
-					"reason": "Please do not select both the options",
+					"reason": "Please do not select both a replacement attorney and the option to skip",
 				}
 			}
 
