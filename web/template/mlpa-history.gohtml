@@ -3,15 +3,83 @@
 {{ define "title" }}History{{ end }}
 
 {{ define "main" }}
+  {{ template "mlpa-header" (caseTabs .CaseSummary "history") }}
 
-{{ template "mlpa-header" (caseTabs .CaseSummary "history") }}
-
-<div class="moj-page-header-actions">
+  <div class="moj-page-header-actions">
     <div class="moj-page-header-actions__title">
-        <h1 class="govuk-heading-l">History</h1>
+      <h1 class="govuk-heading-l">History</h1>
     </div>
-</div>
-    {{ range $v := .EventData }}
-        <p>{{ $v }}</p>
+  </div>
+  <div class="moj-timeline">
+    {{ range .EventData }}
+      <div class="moj-timeline__item">
+        <div class="moj-timeline__header">
+          <h2 class="moj-timeline__title">
+            {{ if eq .type "INS" }}
+              <strong class="govuk-tag govuk-tag--green">Created</strong>
+            {{ else if eq .type "UPD" }}
+              <strong class="govuk-tag govuk-tag--grey">Updated</strong>
+            {{ else if eq .type "DEL" }}
+              <strong class="govuk-tag govuk-tag--red">Deleted</strong>
+            {{ end }}
+
+            {{ .sourceType }}
+          </h2>
+
+          <p class="moj-timeline__byline">by {{ .user.displayName }}</p>
+        </div>
+
+        <p class="moj-timeline__date">
+          <time datetime="{{ .createdOn }}">{{ parseAndFormatDate .createdOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
+        </p>
+
+        <div class="moj-timeline__description">
+          <details class="govuk-details">
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">
+                More details
+              </span>
+            </summary>
+            <div class="govuk-details__text">
+              <dl class="govuk-summary-list">
+                {{ range $k, $v := .entity }}
+                  {{ if eq $k "_class" "id" }}
+                    {{ continue }}
+                  {{ end }}
+
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                      {{ camelcaseToSentence $k }}
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                      {{ if eq $k "assignee" }}
+                        {{ $v.displayName }}
+                      {{ else if eq $k "uId" }}
+                        {{ printf "%.f" $v }}
+                      {{ else if eq $k "document" }}
+                        <a class="govuk-link" href="/lpa/document/{{ .uuid }}">{{ .friendlyDescription }}</a>
+                        ({{ .subType }})
+                      {{ else }}
+                        {{ $v }}
+                      {{ end }}
+                    </dd>
+                  </div>
+                {{ end }}
+              </dl>
+            </div>
+          </details>
+          <details class="govuk-details">
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">
+                Event data
+              </span>
+            </summary>
+            <div class="govuk-details__text">
+              {{ . }}
+            </div>
+          </details>
+        </div>
+      </div>
     {{ end }}
+  </div>
 {{ end }}
