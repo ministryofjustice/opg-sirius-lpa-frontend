@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
@@ -11,6 +12,7 @@ import (
 
 type ChangeCertificateProviderDetailsClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
+	ChangeCertificateProviderDetails(sirius.Context, string, sirius.ChangeCertificateProviderDetails) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
@@ -33,6 +35,10 @@ type formCertificateProviderDetails struct {
 }
 
 func ChangeCertificateProviderDetails(client ChangeCertificateProviderDetailsClient, tmpl template.Template) Handler {
+	if decoder == nil {
+		decoder = form.NewDecoder()
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseUid := chi.URLParam(r, "uid")
 		ctx := getContext(r)
@@ -91,11 +97,34 @@ func ChangeCertificateProviderDetails(client ChangeCertificateProviderDetailsCli
 		}
 
 		if r.Method == http.MethodPost {
-			SetFlash(w, FlashNotification{
-				Title: "Changes confirmed",
-			})
+			err := decoder.Decode(&data.Form, r.PostForm)
+			if err != nil {
+				return err
+			}
 
-			return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details#certificate-provider", caseUid))
+			certificateProviderDetailsData := sirius.ChangeCertificateProviderDetails{
+				FirstNames: data.Form.FirstNames,
+				LastName:   data.Form.LastName,
+				Address:    data.Form.Address,
+				Phone:      data.Form.Phone,
+				Email:      data.Form.Email,
+				SignedAt:   data.Form.SignedAt.toDateString(),
+			}
+
+			err = client.ChangeCertificateProviderDetails(ctx, caseUid, certificateProviderDetailsData)
+
+			if ve, ok := err.(sirius.ValidationError); ok {
+				w.WriteHeader(http.StatusBadRequest)
+				data.Error = ve
+			} else if err != nil {
+				return err
+			} else {
+				SetFlash(w, FlashNotification{
+					Title: "Changes confirmed",
+				})
+
+				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details#certificate-provider", caseUid))
+			}
 		}
 
 		return tmpl(w, data)

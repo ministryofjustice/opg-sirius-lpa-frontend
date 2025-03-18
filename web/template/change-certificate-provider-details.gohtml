@@ -31,7 +31,7 @@
                 {{ template "select" (select "address.Country" "Country" .Form.Address.Country (index .Error.Field "address/country") (options .Countries) "data-app-address-finder-map" "country") }}
             </div>
 
-            {{ template "input" (field "phoneNumber" "Certificate provider's phone number (optional)" .Form.Phone .Error.Field.Phone) }}
+            {{ template "input" (field "phone" "Certificate provider's phone number (optional)" .Form.Phone .Error.Field.Phone) }}
             {{ template "input" (field "email" "Certificate provider's email address (optional)" .Form.Email .Error.Field.Email) }}
             {{ template "date" (field "signedAt" "LPA signed on" .Form.SignedAt .Error.Field.SignedAt) }}
 
