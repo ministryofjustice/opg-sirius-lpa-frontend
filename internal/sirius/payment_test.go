@@ -3,7 +3,8 @@ package sirius
 import (
 	"context"
 	"fmt"
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -12,8 +13,8 @@ import (
 func TestPayment(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -28,22 +29,22 @@ func TestPayment(t *testing.T) {
 					AddInteraction().
 					Given("I have an lpa which has been paid for").
 					UponReceiving("A request for the payments by case").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/cases/800/payments"),
+						Path:   matchers.String("/lpa-api/v1/cases/800/payments"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.EachLike(map[string]interface{}{
-							"id":          dsl.Like(2),
-							"source":      dsl.Like("MAKE"),
-							"amount":      dsl.Like(4100),
-							"paymentDate": dsl.String("23/01/2022"),
-							"case": dsl.Like(map[string]interface{}{
-								"id": dsl.Like(800),
+						Body: matchers.EachLike(map[string]interface{}{
+							"id":          matchers.Like(2),
+							"source":      matchers.Like("MAKE"),
+							"amount":      matchers.Like(4100),
+							"paymentDate": matchers.String("23/01/2022"),
+							"case": matchers.Like(map[string]interface{}{
+								"id": matchers.Like(800),
 							}),
 						}, 1),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: []Payment{
@@ -62,8 +63,8 @@ func TestPayment(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				payments, err := client.Payments(Context{Context: context.Background()}, 800)
 
@@ -71,7 +72,7 @@ func TestPayment(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
@@ -82,8 +83,8 @@ func TestPayment(t *testing.T) {
 func TestFeeReductionOnCase(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -98,24 +99,24 @@ func TestFeeReductionOnCase(t *testing.T) {
 					AddInteraction().
 					Given("I have an lpa which has a fee reduction").
 					UponReceiving("A request for the fee reduction by case").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/cases/802/payments"),
+						Path:   matchers.String("/lpa-api/v1/cases/802/payments"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.EachLike(map[string]interface{}{
-							"id":               dsl.Like(3),
-							"source":           dsl.Like(FeeReductionSource),
-							"feeReductionType": dsl.Like("REMISSION"),
-							"paymentEvidence":  dsl.Like("Test\nmultiple\nline evidence"),
-							"paymentDate":      dsl.String("24/01/2022"),
-							"case": dsl.Like(map[string]interface{}{
-								"id": dsl.Like(802),
+						Body: matchers.EachLike(map[string]interface{}{
+							"id":               matchers.Like(3),
+							"source":           matchers.Like(FeeReductionSource),
+							"feeReductionType": matchers.Like("REMISSION"),
+							"paymentEvidence":  matchers.Like("Test\nmultiple\nline evidence"),
+							"paymentDate":      matchers.String("24/01/2022"),
+							"case": matchers.Like(map[string]interface{}{
+								"id": matchers.Like(802),
 							}),
-							"amount": dsl.Like(4100),
+							"amount": matchers.Like(4100),
 						}, 1),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: []Payment{
@@ -136,8 +137,8 @@ func TestFeeReductionOnCase(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				payments, err := client.Payments(Context{Context: context.Background()}, 802)
 
@@ -145,7 +146,7 @@ func TestFeeReductionOnCase(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
@@ -156,8 +157,8 @@ func TestFeeReductionOnCase(t *testing.T) {
 func TestNoPaymentOnCase(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -172,17 +173,17 @@ func TestNoPaymentOnCase(t *testing.T) {
 					AddInteraction().
 					Given("I have a pending case with no payment assigned").
 					UponReceiving("A request for the payments by case").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/cases/801/payments"),
+						Path:   matchers.String("/lpa-api/v1/cases/801/payments"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Body:    dsl.EachLike(map[string]interface{}{}, 0),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Body:    matchers.EachLike(map[string]interface{}{}, 0),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
-			expectedResponse: []Payment{},
+			expectedResponse: []Payment{{}},
 		},
 	}
 
@@ -190,8 +191,8 @@ func TestNoPaymentOnCase(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				payments, err := client.Payments(Context{Context: context.Background()}, 801)
 
@@ -199,7 +200,7 @@ func TestNoPaymentOnCase(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
@@ -210,8 +211,8 @@ func TestNoPaymentOnCase(t *testing.T) {
 func TestPaymentByID(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -227,22 +228,22 @@ func TestPaymentByID(t *testing.T) {
 					AddInteraction().
 					Given("I have an lpa which has been paid for").
 					UponReceiving("A request for that payment by ID").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/payments/123"),
+						Path:   matchers.String("/lpa-api/v1/payments/123"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"id":          dsl.Like(123),
-							"source":      dsl.Like("PHONE"),
-							"amount":      dsl.Like(4100),
-							"paymentDate": dsl.String("23/01/2022"),
-							"case": dsl.Like(map[string]interface{}{
-								"id": dsl.Like(800),
+						Body: matchers.Like(map[string]interface{}{
+							"id":          matchers.Like(123),
+							"source":      matchers.Like("PHONE"),
+							"amount":      matchers.Like(4100),
+							"paymentDate": matchers.String("23/01/2022"),
+							"case": matchers.Like(map[string]interface{}{
+								"id": matchers.Like(800),
 							}),
 						}),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: Payment{
@@ -259,8 +260,8 @@ func TestPaymentByID(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				payment, err := client.PaymentByID(Context{Context: context.Background()}, 123)
 
@@ -268,7 +269,7 @@ func TestPaymentByID(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
@@ -279,8 +280,8 @@ func TestPaymentByID(t *testing.T) {
 func TestFeeReductionByID(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -296,24 +297,24 @@ func TestFeeReductionByID(t *testing.T) {
 					AddInteraction().
 					Given("I have an lpa which has a fee reduction").
 					UponReceiving("A request for that fee reduction by ID").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/payments/124"),
+						Path:   matchers.String("/lpa-api/v1/payments/124"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
-							"id":               dsl.Like(124),
-							"source":           dsl.Like("FEE_REDUCTION"),
-							"paymentEvidence":  dsl.String("Test evidence"),
-							"feeReductionType": dsl.String("REMISSION"),
-							"paymentDate":      dsl.String("23/01/2022"),
-							"case": dsl.Like(map[string]interface{}{
-								"id": dsl.Like(802),
+						Body: matchers.Like(map[string]interface{}{
+							"id":               matchers.Like(124),
+							"source":           matchers.Like("FEE_REDUCTION"),
+							"paymentEvidence":  matchers.String("Test evidence"),
+							"feeReductionType": matchers.String("REMISSION"),
+							"paymentDate":      matchers.String("23/01/2022"),
+							"case": matchers.Like(map[string]interface{}{
+								"id": matchers.Like(802),
 							}),
-							"amount": dsl.Like(4100),
+							"amount": matchers.Like(4100),
 						}),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: Payment{
@@ -332,8 +333,8 @@ func TestFeeReductionByID(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				payment, err := client.PaymentByID(Context{Context: context.Background()}, 124)
 
@@ -341,7 +342,7 @@ func TestFeeReductionByID(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
