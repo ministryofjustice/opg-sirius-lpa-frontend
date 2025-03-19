@@ -132,10 +132,17 @@ describe("Manage restrictions form", () => {
     cy.contains("Please select an option");
   });
 
-  it("errors when severance is required when reviewing restriction task is open", () => {
+  it("redirects when severance application is required", () => {
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-6666-6666-6666/severance-status",
+      "PUT",
+      {
+        status: 204,
+      },
+    );
     cy.contains("Severance application is required").click();
     cy.contains("Confirm").click();
-    cy.contains("Not implemented yet");
+    cy.url().should("contain", "/lpa/M-6666-6666-6666/lpa-details");
   });
 
   it("redirects when severance application is not required", () => {
