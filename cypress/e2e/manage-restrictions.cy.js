@@ -23,6 +23,7 @@ describe("Manage restrictions form", () => {
             donorFirstNames: "James",
             donorLastName: "Rubin",
             donorDob: "22/02/1990",
+            severanceStatus: "REQUIRED",
           },
         },
         "opg.poas.lpastore": {
@@ -152,5 +153,10 @@ describe("Manage restrictions form", () => {
     cy.contains("Severance application is not required").click();
     cy.contains("Confirm").click();
     cy.url().should("contain", "/lpa/M-6666-6666-6666/lpa-details");
+  });
+
+  it("Ongoing severance application message appears when severance status is required", () => {
+    cy.visit("/lpa/M-6666-6666-6666/lpa-details");
+    cy.contains("Review and confirm if severance is required");
   });
 });
