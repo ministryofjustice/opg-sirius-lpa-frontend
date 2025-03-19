@@ -8,9 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
-
-	"github.com/pact-foundation/pact-go/dsl"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestDigitalLpa(t *testing.T) {
