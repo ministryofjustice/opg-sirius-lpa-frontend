@@ -23,6 +23,7 @@ type Draft struct {
 	Email                     string     `json:"donorEmail,omitempty"`
 	CorrespondenceByWelsh     bool       `json:"correspondenceByWelsh,omitempty"`
 	CorrespondenceLargeFormat bool       `json:"correspondenceLargeFormat,omitempty"`
+	SeveranceStatus           string     `json:"severanceStatus,omitempty"`
 }
 
 func (c *Client) CreateDraft(ctx Context, draft Draft) (map[string]string, error) {
