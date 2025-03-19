@@ -284,6 +284,7 @@ describe("View a digital LPA", () => {
               postcode: "SW1 1AA",
               town: "London",
             },
+            severanceStatus: "REQUIRED",
           },
           linkedDigitalLpas: [
             {
@@ -847,6 +848,11 @@ describe("View a digital LPA", () => {
     );
 
     cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
+    cy.contains("Review and confirm if severance is required");
+  });
+
+  it("Ongoing severance application message appears when severance status is required", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3334/lpa-details");
     cy.contains("Review and confirm if severance is required");
   });
 
