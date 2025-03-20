@@ -167,7 +167,7 @@ func TestPostManageRestrictionsRedirects(t *testing.T) {
 		{
 			name:            "Severance application required",
 			severanceAction: "severance-application-required",
-			severanceStatus: &sirius.SeveranceStatusData{Status: "REQUIRED"},
+			severanceStatus: &sirius.SeveranceStatusData{SeveranceStatus: "REQUIRED"},
 		},
 	}
 

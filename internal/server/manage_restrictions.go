@@ -89,7 +89,7 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 
 			case "severance-application-required":
 				err := client.UpdateSeveranceStatus(ctx, caseUID, sirius.SeveranceStatusData{
-					Status: "REQUIRED",
+					SeveranceStatus: "REQUIRED",
 				})
 
 				if ve, ok := err.(sirius.ValidationError); ok {
