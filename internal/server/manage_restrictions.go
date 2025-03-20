@@ -13,6 +13,7 @@ import (
 type ManageRestrictionsClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
 	ClearTask(sirius.Context, int) error
+	UpdateSeveranceStatus(sirius.Context, string, sirius.SeveranceStatusData) error
 }
 
 type manageRestrictionsData struct {
@@ -60,11 +61,9 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 
 		if r.Method == http.MethodPost {
 			taskList := data.CaseSummary.TaskList
-			reviewRestrictionsTask := false
 			var taskID int
 			for _, task := range taskList {
 				if task.Name == "Review restrictions and conditions" && task.Status != "Completed" {
-					reviewRestrictionsTask = true
 					taskID = task.ID
 				}
 			}
@@ -89,11 +88,23 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 				}
 
 			case "severance-application-required":
-				if reviewRestrictionsTask {
+				err := client.UpdateSeveranceStatus(ctx, caseUID, sirius.SeveranceStatusData{
+					SeveranceStatus: "REQUIRED",
+				})
+
+				if ve, ok := err.(sirius.ValidationError); ok {
 					w.WriteHeader(http.StatusBadRequest)
-					data.Error.Field["severanceAction"] = map[string]string{
-						"reason": "Not implemented yet",
-					}
+					data.Error = ve
+				} else if err != nil {
+					return err
+				} else {
+					data.Success = true
+
+					SetFlash(w, FlashNotification{
+						Title: "Changes confirmed",
+					})
+
+					return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
 				}
 
 			default:
