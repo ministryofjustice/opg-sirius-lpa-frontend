@@ -23,6 +23,7 @@ describe("Manage restrictions form", () => {
             donorFirstNames: "James",
             donorLastName: "Rubin",
             donorDob: "22/02/1990",
+            severanceStatus: "REQUIRED",
           },
         },
         "opg.poas.lpastore": {
@@ -132,12 +133,6 @@ describe("Manage restrictions form", () => {
     cy.contains("Please select an option");
   });
 
-  it("errors when severance is required when reviewing restriction task is open", () => {
-    cy.contains("Severance application is required").click();
-    cy.contains("Confirm").click();
-    cy.contains("Not implemented yet");
-  });
-
   it("redirects when severance application is not required", () => {
     cy.addMock("/lpa-api/v1/tasks/6/mark-as-completed", "PUT", {
       status: 200,
@@ -145,5 +140,23 @@ describe("Manage restrictions form", () => {
     cy.contains("Severance application is not required").click();
     cy.contains("Confirm").click();
     cy.url().should("contain", "/lpa/M-6666-6666-6666/lpa-details");
+  });
+
+  it("redirects when severance application is required", () => {
+    cy.addMock(
+        "/lpa-api/v1/digital-lpas/M-6666-6666-6666/severance-status",
+        "PUT",
+        {
+          status: 204,
+        },
+    );
+    cy.contains("Severance application is required").click();
+    cy.contains("Confirm").click();
+    cy.url().should("contain", "/lpa/M-6666-6666-6666/lpa-details");
+  });
+
+  it("Ongoing severance application message appears when severance status is required", () => {
+    cy.visit("/lpa/M-6666-6666-6666/lpa-details");
+    cy.contains("Ongoing severance application");
   });
 });
