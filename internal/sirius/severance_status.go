@@ -5,7 +5,7 @@ import (
 )
 
 type SeveranceStatusData struct {
-	Status string `json:"status"`
+	SeveranceStatus string `json:"severanceStatus"`
 }
 
 func (c *Client) UpdateSeveranceStatus(ctx Context, caseUID string, severanceStatusData SeveranceStatusData) error {

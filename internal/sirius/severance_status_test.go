@@ -24,7 +24,7 @@ func TestUpdateSeveranceStatus(t *testing.T) {
 		{
 			name: "OK",
 			severanceStatusData: SeveranceStatusData{
-				Status: "REQUIRED",
+				SeveranceStatus: "REQUIRED",
 			},
 			setup: func() {
 				pact.
@@ -38,7 +38,7 @@ func TestUpdateSeveranceStatus(t *testing.T) {
 							"Content-Type": dsl.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"status": "REQUIRED",
+							"severanceStatus": "REQUIRED",
 						},
 					}).
 					WillRespondWith(dsl.Response{

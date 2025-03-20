@@ -144,11 +144,11 @@ describe("Manage restrictions form", () => {
 
   it("redirects when severance application is required", () => {
     cy.addMock(
-        "/lpa-api/v1/digital-lpas/M-6666-6666-6666/severance-status",
-        "PUT",
-        {
-          status: 204,
-        },
+      "/lpa-api/v1/digital-lpas/M-6666-6666-6666/severance-status",
+      "PUT",
+      {
+        status: 204,
+      },
     );
     cy.contains("Severance application is required").click();
     cy.contains("Confirm").click();
