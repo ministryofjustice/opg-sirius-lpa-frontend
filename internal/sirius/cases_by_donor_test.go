@@ -3,18 +3,19 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCasesByDonor(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -29,27 +30,27 @@ func TestCasesByDonor(t *testing.T) {
 					AddInteraction().
 					Given("A donor exists with more than 1 case").
 					UponReceiving("A request for the donor's cases").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/persons/400/cases"),
+						Path:   matchers.String("/lpa-api/v1/persons/400/cases"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: dsl.Like(map[string]interface{}{
+						Body: matchers.Like(map[string]interface{}{
 							"cases": []map[string]interface{}{
 								{
-									"id":          dsl.Like(405),
-									"uId":         dsl.Term("7000-5382-4438", `\d{4}-\d{4}-\d{4}`),
-									"caseSubtype": dsl.Term("pfa", "hw|pfa"),
+									"id":          matchers.Like(405),
+									"uId":         matchers.Term("7000-5382-4438", `\d{4}-\d{4}-\d{4}`),
+									"caseSubtype": matchers.Term("pfa", "hw|pfa"),
 								},
 								{
-									"id":          dsl.Like(406),
-									"uId":         dsl.Term("7000-5382-8764", `\d{4}-\d{4}-\d{4}`),
-									"caseSubtype": dsl.Term("hw", "hw|pfa"),
+									"id":          matchers.Like(406),
+									"uId":         matchers.Term("7000-5382-8764", `\d{4}-\d{4}-\d{4}`),
+									"caseSubtype": matchers.Term("hw", "hw|pfa"),
 								},
 							},
 						}),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			expectedResponse: []Case{
@@ -71,8 +72,8 @@ func TestCasesByDonor(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				caseitem, err := client.CasesByDonor(Context{Context: context.Background()}, 400)
 
@@ -80,7 +81,7 @@ func TestCasesByDonor(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
