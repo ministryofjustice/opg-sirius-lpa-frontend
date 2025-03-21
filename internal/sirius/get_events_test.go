@@ -3,18 +3,19 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetEvents(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -29,19 +30,23 @@ func TestGetEvents(t *testing.T) {
 					AddInteraction().
 					Given("A donor with a digital LPA with events exists").
 					UponReceiving("A request for the donor's event history").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.Like("/lpa-api/v1/persons/33/events?filter=case%3A66&sort=id%3Adesc"),
+						Path:   matchers.Like("/lpa-api/v1/persons/33/events?filter=case%3A66&sort=id%3Adesc"),
+						Query: matchers.MapMatcher{
+							"filter": matchers.Like("case:66"),
+							"sort":   matchers.Like("id:desc"),
+						},
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-						Body: dsl.Like(map[string]interface{}{
-							"events": dsl.EachLike(struct{}{}, 0),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+						Body: matchers.Like(map[string]interface{}{
+							"events": matchers.EachLike(struct{}{}, 0),
 						}),
 					})
 			},
-			expectedResponse: []interface{}{},
+			expectedResponse: []interface{}{map[string]interface{}{}},
 		},
 	}
 
@@ -49,8 +54,8 @@ func TestGetEvents(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				events, err := client.GetEvents(Context{Context: context.Background()}, 33, 66)
 
@@ -58,7 +63,7 @@ func TestGetEvents(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
