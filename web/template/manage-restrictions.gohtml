@@ -18,6 +18,29 @@
 
                 <div class="govuk-form-group{{ if .Error.Field.recipient }} govuk-form-group--error{{ end }}" id="f-severanceAction">
 
+                    {{ if .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceStatus }}
+                        <p class="govuk-body">
+                            <strong>Severance application required:</strong>
+                            {{ severanceRequiredLabel .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceStatus }}
+                        </p>
+                    {{ end }}
+
+                    {{ if eq .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceStatus "NOT_REQUIRED" }}
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend"><strong>Select an option:</strong></legend>
+                        {{ template "errors" .Error.Field.severanceAction }}
+
+                        <div class="govuk-radios" data-module="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="f-severanceActionNotRequired" name="severanceAction" type="radio" value="severance-application-required" {{ if eq "severance-application-required" .SeveranceAction }}checked{{ end }}>
+                                <label class="govuk-label govuk-radios__label" for="f-severanceActionNotRequired">
+                                    Severance application is required
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    {{ else }}
                     <fieldset class="govuk-fieldset">
                         <legend class="govuk-fieldset__legend"><strong>Select an option:</strong></legend>
                         {{ template "errors" .Error.Field.severanceAction }}
@@ -37,6 +60,7 @@
                             </div>
                         </div>
                     </fieldset>
+                    {{ end }}
                 </div>
 
                 <div class="govuk-button-group">

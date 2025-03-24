@@ -72,6 +72,10 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 			case "severance-application-not-required":
 				err := client.ClearTask(ctx, taskID)
 
+				err = client.UpdateSeveranceStatus(ctx, caseUID, sirius.SeveranceStatusData{
+					SeveranceStatus: "NOT_REQUIRED",
+				})
+
 				if ve, ok := err.(sirius.ValidationError); ok {
 					w.WriteHeader(http.StatusBadRequest)
 					data.Error = ve
