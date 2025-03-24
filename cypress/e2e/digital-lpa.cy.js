@@ -107,6 +107,8 @@ describe("View a digital LPA", () => {
           registrationDate: "2022-12-18",
           peopleToNotify: [],
           restrictionsAndConditions: "Do not do this",
+          lifeSustainingTreatmentOption: "option-a",
+          howAttorneysMakeDecisions: "jointly",
         },
       },
     });
@@ -674,6 +676,22 @@ describe("View a digital LPA", () => {
     cy.contains("Review and confirm if severance is required").should(
       "not.exist",
     );
+  });
+
+  it("allows changing lpa decisions", () => {
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333/decisions", "PUT", {
+      status: 200,
+    });
+
+    cy.visit("/lpa/M-DIGI-LPA3-3333");
+
+    cy.contains("LPA details").click();
+    cy.contains("Decisions").click();
+    cy.get("#f-update-decisions").click();
+    cy.contains("Jointly for some").click();
+    cy.get("#f-howAttorneysMakeDecisionsDetails").type("This way");
+    cy.contains("Continue").click();
+    cy.contains("Changes confirmed");
   });
 
   it("shows channel for donor", () => {

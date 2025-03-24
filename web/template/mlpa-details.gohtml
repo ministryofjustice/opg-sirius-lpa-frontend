@@ -169,6 +169,13 @@
             {{ $rootAnomalies := $anomaliesForSection.GetAnomaliesForObject "" }}
           <div id="accordion-default-content-3" class="govuk-accordion__section-content">
             <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key"></dt>
+                <dd class="govuk-summary-list__value"></dd>
+                <dd class="govuk-summary-list__actions">
+                  <a class="govuk-link" id="f-update-decisions" href="{{ prefix (printf "/lpa/%s/update-decisions" .CaseSummary.DigitalLpa.UID) }}">Change</a>
+                </dd>
+              </div>
               {{ if (eq .DigitalLpa.SiriusData.Subtype "personal-welfare")}}
                 {{ $lifeSustainingTreatmentAnomalies := $rootAnomalies.GetAnomaliesForFieldWithStatus "lifeSustainingTreatmentOption" "detected" }}
                 <div class="govuk-summary-list__row">
