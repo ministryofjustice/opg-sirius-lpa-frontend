@@ -3,7 +3,8 @@ package sirius
 import (
 	"context"
 	"fmt"
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -12,8 +13,8 @@ import (
 func TestPlaceInvestigationOnHold(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name          string
@@ -27,16 +28,16 @@ func TestPlaceInvestigationOnHold(t *testing.T) {
 					AddInteraction().
 					Given("I have a case assigned which has an investigation open").
 					UponReceiving("A request to place the investigation on hold").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/investigations/300/hold-periods"),
-						Body: dsl.Like(map[string]interface{}{
-							"reason": dsl.String("Police Investigation"),
+						Path:   matchers.String("/lpa-api/v1/investigations/300/hold-periods"),
+						Body: matchers.Like(map[string]interface{}{
+							"reason": matchers.String("Police Investigation"),
 						}),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusCreated,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 		},
@@ -46,15 +47,15 @@ func TestPlaceInvestigationOnHold(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				err := client.PlaceInvestigationOnHold(Context{Context: context.Background()}, 300, "Police Investigation")
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
