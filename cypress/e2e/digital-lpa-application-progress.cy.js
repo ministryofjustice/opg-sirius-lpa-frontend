@@ -15,10 +15,12 @@ describe("View the application progress for a digital LPA", () => {
       }),
       cases.warnings.empty("2222"),
       cases.tasks.empty("2222"),
-      digitalLpas.progressIndicators.defaultCannotStart("M-2222-2222-2222", [{
-        indicator: "RESTRICTIONS_AND_CONDITIONS",
-        status: "COMPLETE",
-      }]),
+      digitalLpas.progressIndicators.defaultCannotStart("M-2222-2222-2222", [
+        {
+          indicator: "RESTRICTIONS_AND_CONDITIONS",
+          status: "COMPLETE",
+        },
+      ]),
     ]);
 
     cy.wrap(mocks);

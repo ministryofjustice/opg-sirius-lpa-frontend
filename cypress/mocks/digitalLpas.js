@@ -193,7 +193,10 @@ const progressIndicators = {
             { indicator: "ATTORNEY_SIGNATURES", status: "CANNOT_START" },
             { indicator: "PREREGISTRATION_NOTICES", status: "CANNOT_START" },
             { indicator: "REGISTRATION_NOTICES", status: "CANNOT_START" },
-            { indicator: "RESTRICTIONS_AND_CONDITIONS", status: "CANNOT_START" },
+            {
+              indicator: "RESTRICTIONS_AND_CONDITIONS",
+              status: "CANNOT_START",
+            },
           ],
         },
       },
@@ -213,11 +216,17 @@ const progressIndicators = {
 
     let allProgressIndicators = progressIndicators;
 
-    progressIndicatorTypes.forEach(progressIndicatorType => {
-      const exists = allProgressIndicators.find(progressIndicator => progressIndicator.indicator === progressIndicatorType);
+    progressIndicatorTypes.forEach((progressIndicatorType) => {
+      const exists = allProgressIndicators.find(
+        (progressIndicator) =>
+          progressIndicator.indicator === progressIndicatorType,
+      );
 
-      if (! exists) {
-        allProgressIndicators.push({ indicator: progressIndicatorType, status: "CANNOT_START" });
+      if (!exists) {
+        allProgressIndicators.push({
+          indicator: progressIndicatorType,
+          status: "CANNOT_START",
+        });
       }
     });
 
