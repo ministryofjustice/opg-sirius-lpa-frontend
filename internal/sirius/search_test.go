@@ -6,15 +6,16 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSearch(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name               string
@@ -32,11 +33,11 @@ func TestSearch(t *testing.T) {
 					AddInteraction().
 					Given("A donor exists to be referenced by name").
 					UponReceiving("A search request for a donor not related to a case").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/search/persons"),
-						Headers: dsl.MapMatcher{
-							"Content-Type": dsl.String("application/json"),
+						Path:   matchers.String("/lpa-api/v1/search/persons"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
 						},
 						Body: map[string]interface{}{
 							"term":        "bob",
@@ -45,32 +46,32 @@ func TestSearch(t *testing.T) {
 							"from":        0,
 						},
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-						Body: dsl.Like(map[string]interface{}{
-							"aggregations": dsl.Like(map[string]interface{}{
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+						Body: matchers.Like(map[string]interface{}{
+							"aggregations": matchers.Like(map[string]interface{}{
 								"personType": map[string]int{
 									"Donor": 1,
 								},
 							}),
-							"total": dsl.Like(map[string]interface{}{
-								"count": dsl.Like(1),
+							"total": matchers.Like(map[string]interface{}{
+								"count": matchers.Like(1),
 							}),
-							"results": dsl.EachLike(map[string]interface{}{
-								"id":           dsl.Like(36),
-								"uId":          dsl.Term("7000-8548-8461", `\d{4}-\d{4}-\d{4}`),
-								"firstname":    dsl.Like("Bob"),
-								"surname":      dsl.Like("Smith"),
-								"dob":          dsl.Like("17/03/1990"),
-								"addressLine1": dsl.Like("123 Somewhere Road"),
-								"personType":   dsl.Like("Donor"),
-								"cases": dsl.EachLike(map[string]interface{}{
-									"id":          dsl.Like(23),
-									"uId":         dsl.Term("7000-5382-4438", `\d{4}-\d{4}-\d{4}`),
-									"caseSubtype": dsl.Term("pfa", "hw|pfa"),
-									"status":      dsl.Like("Perfect"),
-									"caseType":    dsl.Like("LPA"),
+							"results": matchers.EachLike(map[string]interface{}{
+								"id":           matchers.Like(36),
+								"uId":          matchers.Term("7000-8548-8461", `\d{4}-\d{4}-\d{4}`),
+								"firstname":    matchers.Like("Bob"),
+								"surname":      matchers.Like("Smith"),
+								"dob":          matchers.Like("17/03/1990"),
+								"addressLine1": matchers.Like("123 Somewhere Road"),
+								"personType":   matchers.Like("Donor"),
+								"cases": matchers.EachLike(map[string]interface{}{
+									"id":          matchers.Like(23),
+									"uId":         matchers.Term("7000-5382-4438", `\d{4}-\d{4}-\d{4}`),
+									"caseSubtype": matchers.Term("pfa", "hw|pfa"),
+									"status":      matchers.Like("Perfect"),
+									"caseType":    matchers.Like("LPA"),
 								}, 1),
 							}, 1),
 						}),
@@ -121,11 +122,11 @@ func TestSearch(t *testing.T) {
 					AddInteraction().
 					Given("I have deleted a case").
 					UponReceiving("A search request for the deleted case uid").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/search/persons"),
-						Headers: dsl.MapMatcher{
-							"Content-Type": dsl.String("application/json"),
+						Path:   matchers.String("/lpa-api/v1/search/persons"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
 						},
 						Body: map[string]interface{}{
 							"term":        "700000005555",
@@ -134,12 +135,12 @@ func TestSearch(t *testing.T) {
 							"from":        0,
 						},
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-						Body: dsl.Like(map[string]interface{}{
-							"total": dsl.Like(map[string]interface{}{
-								"count": dsl.Like(0),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+						Body: matchers.Like(map[string]interface{}{
+							"total": matchers.Like(map[string]interface{}{
+								"count": matchers.Like(0),
 							}),
 						}),
 					})
@@ -162,8 +163,8 @@ func TestSearch(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				results, pagination, err := client.Search(Context{Context: context.Background()}, tc.searchTerm, 1, AllPersonTypes)
 				assert.Equal(t, tc.expectedResponse, results)
@@ -171,7 +172,7 @@ func TestSearch(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))

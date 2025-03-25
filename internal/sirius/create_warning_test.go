@@ -6,15 +6,16 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateWarning(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name          string
@@ -28,21 +29,21 @@ func TestCreateWarning(t *testing.T) {
 					AddInteraction().
 					Given("A donor exists").
 					UponReceiving("A request to create a warning").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/warnings"),
-						Headers: dsl.MapMatcher{
-							"Content-Type": dsl.String("application/json"),
+						Path:   matchers.String("/lpa-api/v1/warnings"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
 						},
-						Body: dsl.Like(map[string]interface{}{
-							"personId":    dsl.Like(189),
-							"warningType": dsl.Like("Complaint Received"),
-							"warningText": dsl.Like("Some warning notes"),
+						Body: matchers.Like(map[string]interface{}{
+							"personId":    matchers.Like(189),
+							"warningType": matchers.Like("Complaint Received"),
+							"warningText": matchers.Like("Some warning notes"),
 						}),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusCreated,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 		},
@@ -52,14 +53,14 @@ func TestCreateWarning(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				err := client.CreateWarning(Context{Context: context.Background()}, 189, "Complaint Received", "Some warning notes", []int{})
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
@@ -70,8 +71,8 @@ func TestCreateWarning(t *testing.T) {
 func TestCreateWarningOnMultipleCases(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name          string
@@ -85,22 +86,22 @@ func TestCreateWarningOnMultipleCases(t *testing.T) {
 					AddInteraction().
 					Given("A donor exists with more than 1 case").
 					UponReceiving("A request to create a warning on multiple cases").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPost,
-						Path:   dsl.String("/lpa-api/v1/warnings"),
-						Headers: dsl.MapMatcher{
-							"Content-Type": dsl.String("application/json"),
+						Path:   matchers.String("/lpa-api/v1/warnings"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
 						},
-						Body: dsl.Like(map[string]interface{}{
-							"personId":    dsl.Like(400),
-							"caseIds":     dsl.Like([]int{405, 406}),
-							"warningType": dsl.Like("Complaint Received"),
-							"warningText": dsl.Like("Some warning notes for multiple cases"),
+						Body: matchers.Like(map[string]interface{}{
+							"personId":    matchers.Like(400),
+							"caseIds":     matchers.Like([]int{405, 406}),
+							"warningType": matchers.Like("Complaint Received"),
+							"warningText": matchers.Like("Some warning notes for multiple cases"),
 						}),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusCreated,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 		},
@@ -110,14 +111,14 @@ func TestCreateWarningOnMultipleCases(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				err := client.CreateWarning(Context{Context: context.Background()}, 400, "Complaint Received", "Some warning notes for multiple cases", []int{405, 406})
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))

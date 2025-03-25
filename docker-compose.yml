@@ -57,6 +57,12 @@ services:
       - ./:/go/src/app
       - ./.gocache:/go/pkg/mod
 
+  pact:
+    image: pactfoundation/pact-cli:1
+    working_dir: /go/src/app
+    volumes:
+      - ./pacts:/go/src/app/pacts
+
   trivy:
     image: aquasec/trivy:latest
     volumes:

@@ -7,15 +7,16 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMiReport(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name           string
@@ -30,21 +31,21 @@ func TestMiReport(t *testing.T) {
 					AddInteraction().
 					Given("I have a pending case assigned").
 					UponReceiving("A request for an MI report").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/api/reporting/applications"),
-						Query: dsl.MapMatcher{
-							"reportType": dsl.String("epasReceived"),
+						Path:   matchers.String("/api/reporting/applications"),
+						Query: matchers.MapMatcher{
+							"reportType": matchers.String("epasReceived"),
 						},
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-						Body: dsl.Like(map[string]interface{}{
-							"data": dsl.Like(map[string]interface{}{
-								"result_count":       dsl.Like(10),
-								"report_type":        dsl.String("epasReceived"),
-								"report_description": dsl.String("Number of EPAs received"),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+						Body: matchers.Like(map[string]interface{}{
+							"data": matchers.Like(map[string]interface{}{
+								"result_count":       matchers.Like(10),
+								"report_type":        matchers.String("epasReceived"),
+								"report_description": matchers.String("Number of EPAs received"),
 							}),
 						}),
 					})
@@ -61,8 +62,8 @@ func TestMiReport(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				form := url.Values{
 					"reportType": {"epasReceived"},
@@ -73,7 +74,7 @@ func TestMiReport(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
