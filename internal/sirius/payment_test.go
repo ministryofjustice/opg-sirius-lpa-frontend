@@ -183,7 +183,7 @@ func TestNoPaymentOnCase(t *testing.T) {
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
-			expectedResponse: []Payment{{}},
+			expectedResponse: []Payment{},
 		},
 	}
 
