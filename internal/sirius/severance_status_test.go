@@ -23,7 +23,7 @@ func TestUpdateSeveranceStatus(t *testing.T) {
 		expectedError       func(int) error
 	}{
 		{
-			name: "OK",
+			name: "Severance status - required",
 			severanceStatusData: SeveranceStatusData{
 				SeveranceStatus: "REQUIRED",
 			},
@@ -31,7 +31,7 @@ func TestUpdateSeveranceStatus(t *testing.T) {
 				pact.
 					AddInteraction().
 					Given("A digital LPA exists").
-					UponReceiving("A request for updating severance status").
+					UponReceiving("A request for updating severance status to required").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
 						Path:   matchers.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567/severance-status"),
@@ -40,6 +40,31 @@ func TestUpdateSeveranceStatus(t *testing.T) {
 						},
 						Body: map[string]interface{}{
 							"severanceStatus": "REQUIRED",
+						},
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status: http.StatusNoContent,
+					})
+			},
+		},
+		{
+			name: "Severance Status - not required",
+			severanceStatusData: SeveranceStatusData{
+				SeveranceStatus: "NOT_REQUIRED",
+			},
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A digital LPA exists").
+					UponReceiving("A request for updating severance status to not required").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodPut,
+						Path:   matchers.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567/severance-status"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
+						},
+						Body: map[string]interface{}{
+							"severanceStatus": "NOT_REQUIRED",
 						},
 					}).
 					WithCompleteResponse(consumer.Response{
