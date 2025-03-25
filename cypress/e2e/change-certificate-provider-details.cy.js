@@ -3,12 +3,14 @@ import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("Change certificate provider details form", () => {
   beforeEach(() => {
-    digitalLpas.get("M-1111-1111-1111");
+    const mocks = Promise.allSettled([
+      digitalLpas.get("M-1111-1111-1111"),
+      cases.warnings.empty("1111"),
+      cases.tasks.empty("1111"),
+      digitalLpas.progressIndicators.feesInProgress("M-1111-1111-1111"),
+    ]);
 
-    cases.warnings.empty("1111");
-    cases.tasks.empty("1111");
-
-    digitalLpas.progressIndicators.feesInProgress("M-1111-1111-1111");
+    cy.wrap(mocks);
 
     cy.visit("/lpa/M-1111-1111-1111/certificate-provider/change-details");
   });
