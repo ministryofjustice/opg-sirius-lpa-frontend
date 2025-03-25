@@ -23,6 +23,7 @@ describe("Manage restrictions form", () => {
             donorFirstNames: "James",
             donorLastName: "Rubin",
             donorDob: "22/02/1990",
+            severanceStatus: "REQUIRED",
           },
         },
         "opg.poas.lpastore": {
@@ -132,18 +133,97 @@ describe("Manage restrictions form", () => {
     cy.contains("Please select an option");
   });
 
-  it("errors when severance is required when reviewing restriction task is open", () => {
-    cy.contains("Severance application is required").click();
-    cy.contains("Confirm").click();
-    cy.contains("Not implemented yet");
-  });
-
   it("redirects when severance application is not required", () => {
     cy.addMock("/lpa-api/v1/tasks/6/mark-as-completed", "PUT", {
       status: 200,
     });
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-6666-6666-6666/severance-status",
+      "PUT",
+      {
+        status: 204,
+      },
+    );
     cy.contains("Severance application is not required").click();
     cy.contains("Confirm").click();
     cy.url().should("contain", "/lpa/M-6666-6666-6666/lpa-details");
+  });
+
+  it("redirects when severance application is required", () => {
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-6666-6666-6666/severance-status",
+      "PUT",
+      {
+        status: 204,
+      },
+    );
+    cy.contains("Severance application is required").click();
+    cy.contains("Confirm").click();
+    cy.url().should("contain", "/lpa/M-6666-6666-6666/lpa-details");
+  });
+
+  it("Ongoing severance application message appears when severance status is required", () => {
+    cy.visit("/lpa/M-6666-6666-6666/lpa-details");
+    cy.contains("Ongoing severance application");
+  });
+
+  it("Previous not required selection shown in form", () => {
+    cy.addMock("/lpa-api/v1/digital-lpas/M-6666-6666-6668", "GET", {
+      status: 200,
+      body: {
+        uId: "M-6666-6666-66688",
+        "opg.poas.sirius": {
+          id: 888,
+          uId: "M-6666-6666-6668",
+          status: "in-progress",
+          caseSubtype: "personal-welfare",
+          createdDate: "31/10/2023",
+          investigationCount: 0,
+          complaintCount: 0,
+          taskCount: 0,
+          warningCount: 0,
+          donor: {
+            id: 88,
+          },
+          application: {
+            donorFirstNames: "James",
+            donorLastName: "Rubin",
+            donorDob: "22/02/1990",
+            severanceStatus: "NOT_REQUIRED",
+          },
+        },
+      },
+    });
+
+    cases.warnings.empty("888");
+
+    cy.addMock("/lpa-api/v1/cases/888", "GET", {
+      status: 200,
+      body: {
+        id: 888,
+        uId: "M-6666-6666-6668",
+        caseType: "DIGITAL_LPA",
+        donor: {
+          id: 6,
+        },
+      },
+    });
+
+    cy.addMock(
+      "/lpa-api/v1/cases/888/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
+      "GET",
+      {
+        status: 200,
+        body: {
+          tasks: [],
+        },
+      },
+    );
+    cy.visit("/lpa/M-6666-6666-6668/manage-restrictions").then(() => {
+      cy.contains("Severance application required:");
+      cy.contains("No");
+
+      cy.contains("Severance application is required");
+    });
   });
 });

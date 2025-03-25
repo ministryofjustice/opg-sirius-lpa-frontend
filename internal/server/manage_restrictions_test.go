@@ -24,6 +24,11 @@ func (m *mockManageRestrictionsClient) ClearTask(ctx sirius.Context, taskID int)
 	return args.Error(0)
 }
 
+func (m *mockManageRestrictionsClient) UpdateSeveranceStatus(ctx sirius.Context, caseUID string, severanceStatusData sirius.SeveranceStatusData) error {
+	args := m.Called(ctx, caseUID, severanceStatusData)
+	return args.Error(0)
+}
+
 var restrictionsCaseSummary = sirius.CaseSummary{
 	DigitalLpa: sirius.DigitalLpa{
 		UID: "M-1111-2222-3333",
@@ -114,16 +119,6 @@ func TestPostManageRestrictions(t *testing.T) {
 				"severanceAction": {"reason": "Please select an option"},
 			}},
 		},
-		{
-			name: "Severance application action selected",
-			form: url.Values{
-				"severanceAction": {"severance-application-required"},
-			},
-			severanceAction: "severance-application-required",
-			error: sirius.ValidationError{Field: sirius.FieldErrors{
-				"severanceAction": {"reason": "Not implemented yet"},
-			}},
-		},
 	}
 
 	for _, tc := range tests {
@@ -158,25 +153,52 @@ func TestPostManageRestrictions(t *testing.T) {
 	}
 }
 
-func TestPostManageRestrictionsRedirect(t *testing.T) {
-	client := &mockManageRestrictionsClient{}
-	client.
-		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
-		Return(restrictionsCaseSummary, nil)
-	client.On("ClearTask", mock.Anything, 1).Return(nil)
-
-	template := &mockTemplate{}
-
-	server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func))
-
-	form := url.Values{
-		"severanceAction": {"severance-application-not-required"},
+func TestPostManageRestrictionsRedirects(t *testing.T) {
+	tests := []struct {
+		name            string
+		severanceAction string
+		severanceStatus *sirius.SeveranceStatusData
+	}{
+		{
+			name:            "Severance application not required",
+			severanceAction: "severance-application-not-required",
+			severanceStatus: &sirius.SeveranceStatusData{SeveranceStatus: "NOT_REQUIRED"},
+		},
+		{
+			name:            "Severance application required",
+			severanceAction: "severance-application-required",
+			severanceStatus: &sirius.SeveranceStatusData{SeveranceStatus: "REQUIRED"},
+		},
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/manage-restrictions", strings.NewReader(form.Encode()))
-	req.Header.Add("Content-Type", formUrlEncoded)
-	_, err := server.serve(req)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &mockManageRestrictionsClient{}
+			client.
+				On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+				Return(restrictionsCaseSummary, nil)
 
-	assert.Equal(t, RedirectError("/lpa/M-1111-2222-3333/lpa-details"), err)
-	mock.AssertExpectationsForObjects(t, client, template)
+			if tc.severanceAction == "severance-application-not-required" {
+				client.On("ClearTask", mock.Anything, 1).Return(nil)
+			}
+
+			client.
+				On("UpdateSeveranceStatus", mock.Anything, "M-1111-2222-3333", *tc.severanceStatus).
+				Return(nil)
+
+			template := &mockTemplate{}
+			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func))
+
+			form := url.Values{
+				"severanceAction": {tc.severanceAction},
+			}
+
+			req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/manage-restrictions", strings.NewReader(form.Encode()))
+			req.Header.Add("Content-Type", formUrlEncoded)
+			_, err := server.serve(req)
+
+			assert.Equal(t, RedirectError("/lpa/M-1111-2222-3333/lpa-details"), err)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
 }
