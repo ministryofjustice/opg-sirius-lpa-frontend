@@ -179,7 +179,7 @@ func TestNoPaymentOnCase(t *testing.T) {
 					}).
 					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Body:    matchers.EachLike(map[string]interface{}{}, 0),
+						Body:    matchers.Like([]Payment{}),
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
