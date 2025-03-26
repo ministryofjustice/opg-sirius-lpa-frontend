@@ -8,7 +8,6 @@ require (
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-playground/form/v4 v4.2.1
 	github.com/ministryofjustice/opg-go-common v1.77.0
-	github.com/pact-foundation/pact-go v1.10.0
 	github.com/pact-foundation/pact-go/v2 v2.3.0
 	github.com/stretchr/testify v1.10.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.60.0
