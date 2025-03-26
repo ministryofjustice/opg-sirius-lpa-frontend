@@ -71,45 +71,37 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 			switch data.SeveranceAction {
 			case "severance-application-not-required":
 				err := client.ClearTask(ctx, taskID)
+				if handleError(w, &data, err) {
+					return err
+				}
 
 				err = client.UpdateSeveranceStatus(ctx, caseUID, sirius.SeveranceStatusData{
 					SeveranceStatus: "NOT_REQUIRED",
 				})
-
-				if ve, ok := err.(sirius.ValidationError); ok {
-					w.WriteHeader(http.StatusBadRequest)
-					data.Error = ve
-				} else if err != nil {
+				if handleError(w, &data, err) {
 					return err
-				} else {
-					data.Success = true
-
-					SetFlash(w, FlashNotification{
-						Title: "Changes confirmed",
-					})
-
-					return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
 				}
+
+				data.Success = true
+				SetFlash(w, FlashNotification{
+					Title: "Changes confirmed",
+				})
+				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
 
 			case "severance-application-required":
 				err := client.UpdateSeveranceStatus(ctx, caseUID, sirius.SeveranceStatusData{
 					SeveranceStatus: "REQUIRED",
 				})
 
-				if ve, ok := err.(sirius.ValidationError); ok {
-					w.WriteHeader(http.StatusBadRequest)
-					data.Error = ve
-				} else if err != nil {
+				if handleError(w, &data, err) {
 					return err
-				} else {
-					data.Success = true
-
-					SetFlash(w, FlashNotification{
-						Title: "Changes confirmed",
-					})
-
-					return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
 				}
+
+				data.Success = true
+				SetFlash(w, FlashNotification{
+					Title: "Changes confirmed",
+				})
+				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
 
 			default:
 				w.WriteHeader(http.StatusBadRequest)
@@ -120,4 +112,16 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 		}
 		return tmpl(w, data)
 	}
+}
+
+func handleError(w http.ResponseWriter, data *manageRestrictionsData, err error) bool {
+	if err == nil {
+		return false
+	}
+	if ve, ok := err.(sirius.ValidationError); ok {
+		w.WriteHeader(http.StatusBadRequest)
+		data.Error = ve
+		return true
+	}
+	return true
 }
