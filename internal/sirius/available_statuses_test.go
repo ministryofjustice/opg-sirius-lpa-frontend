@@ -3,18 +3,19 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestAvailableStatuses(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -30,14 +31,14 @@ func TestAvailableStatuses(t *testing.T) {
 					AddInteraction().
 					Given("I have a pending case assigned").
 					UponReceiving("A request for the LPA's available statuses").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/lpas/800/available-statuses"),
+						Path:   matchers.String("/lpa-api/v1/lpas/800/available-statuses"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Body:    dsl.EachLike(dsl.String("Perfect"), 1),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Body:    matchers.EachLike(matchers.String("Perfect"), 1),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			caseType:         CaseTypeLpa,
@@ -50,14 +51,14 @@ func TestAvailableStatuses(t *testing.T) {
 					AddInteraction().
 					Given("I have a pending EPA assigned").
 					UponReceiving("A request for the EPA's available statuses").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/epas/800/available-statuses"),
+						Path:   matchers.String("/lpa-api/v1/epas/800/available-statuses"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Body:    dsl.EachLike(dsl.String("Perfect"), 1),
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
+						Body:    matchers.EachLike(matchers.String("Perfect"), 1),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
 			caseType:         CaseTypeEpa,
@@ -69,8 +70,8 @@ func TestAvailableStatuses(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				caseitem, err := client.AvailableStatuses(Context{Context: context.Background()}, 800, tc.caseType)
 
@@ -78,7 +79,7 @@ func TestAvailableStatuses(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))

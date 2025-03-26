@@ -3,7 +3,8 @@ package sirius
 import (
 	"context"
 	"fmt"
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -12,8 +13,8 @@ import (
 func TestDeletedCases(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -28,22 +29,22 @@ func TestDeletedCases(t *testing.T) {
 					AddInteraction().
 					Given("I have deleted a case").
 					UponReceiving("A search for the deleted case").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/deleted-cases"),
-						Query: dsl.MapMatcher{
-							"uid": dsl.String("700000005555"),
+						Path:   matchers.String("/lpa-api/v1/deleted-cases"),
+						Query: matchers.MapMatcher{
+							"uid": matchers.String("700000005555"),
 						},
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-						Body: dsl.EachLike(map[string]interface{}{
-							"uId":            dsl.String("7000-0000-5555"),
-							"type":           dsl.String("LPA"),
-							"status":         dsl.String("Return - unpaid"),
-							"deletedAt":      dsl.String("02/12/2022"),
-							"deletionReason": dsl.String("LPA was not paid for after 12 months"),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+						Body: matchers.EachLike(map[string]interface{}{
+							"uId":            matchers.String("7000-0000-5555"),
+							"type":           matchers.String("LPA"),
+							"status":         matchers.String("Return - unpaid"),
+							"deletedAt":      matchers.String("02/12/2022"),
+							"deletionReason": matchers.String("LPA was not paid for after 12 months"),
 						}, 1),
 					})
 			},
@@ -63,8 +64,8 @@ func TestDeletedCases(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				deletedCases, err := client.DeletedCases(Context{Context: context.Background()}, "700000005555")
 
@@ -72,7 +73,7 @@ func TestDeletedCases(t *testing.T) {
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
