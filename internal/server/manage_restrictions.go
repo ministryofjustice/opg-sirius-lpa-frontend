@@ -70,14 +70,14 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 
 			switch data.SeveranceAction {
 			case "severance-application-not-required":
-				err := client.ClearTask(ctx, taskID)
+				err = client.UpdateSeveranceStatus(ctx, caseUID, sirius.SeveranceStatusData{
+					SeveranceStatus: "NOT_REQUIRED",
+				})
 				if handleError(w, &data, err) {
 					return err
 				}
 
-				err = client.UpdateSeveranceStatus(ctx, caseUID, sirius.SeveranceStatusData{
-					SeveranceStatus: "NOT_REQUIRED",
-				})
+				err := client.ClearTask(ctx, taskID)
 				if handleError(w, &data, err) {
 					return err
 				}

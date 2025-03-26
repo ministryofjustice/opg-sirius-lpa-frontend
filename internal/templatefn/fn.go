@@ -390,10 +390,10 @@ func subtypeColour(subtype string) string {
 }
 
 func severanceRequiredLabel(severanceStatus string) string {
-	switch strings.ToLower(severanceStatus) {
-	case "required":
+	switch severanceStatus {
+	case "REQUIRED":
 		return "Yes"
-	case "not_required":
+	case "NOT_REQUIRED":
 		return "No"
 	default:
 		return ""
