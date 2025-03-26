@@ -6,15 +6,16 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestPostcodeLookup(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name             string
@@ -28,23 +29,23 @@ func TestPostcodeLookup(t *testing.T) {
 				pact.
 					AddInteraction().
 					UponReceiving("A postcode search").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   dsl.String("/lpa-api/v1/postcode-lookup"),
-						Query: dsl.MapMatcher{
-							"postcode": dsl.String("SW1A 1AA"),
+						Path:   matchers.String("/lpa-api/v1/postcode-lookup"),
+						Query: matchers.MapMatcher{
+							"postcode": matchers.String("SW1A 1AA"),
 						},
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
-						Headers: dsl.MapMatcher{"Content-Type": dsl.String("application/json")},
-						Body: dsl.EachLike(map[string]interface{}{
-							"addressLine1": dsl.Like("Office of the Public Guardian"),
-							"addressLine2": dsl.Like("1 Something Street"),
-							"addressLine3": dsl.Like("Someborough"),
-							"town":         dsl.Like("Someton"),
-							"postcode":     dsl.Like("SW1A 1AA"),
-							"description":  dsl.Like("Office of the Public Guardian, 1 Something Street, Someborough"),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+						Body: matchers.EachLike(map[string]interface{}{
+							"addressLine1": matchers.Like("Office of the Public Guardian"),
+							"addressLine2": matchers.Like("1 Something Street"),
+							"addressLine3": matchers.Like("Someborough"),
+							"town":         matchers.Like("Someton"),
+							"postcode":     matchers.Like("SW1A 1AA"),
+							"description":  matchers.Like("Office of the Public Guardian, 1 Something Street, Someborough"),
 						}, 1),
 					})
 			},
@@ -65,15 +66,15 @@ func TestPostcodeLookup(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				addresses, err := client.PostcodeLookup(Context{Context: context.Background()}, "SW1A 1AA")
 				assert.Equal(t, tc.expectedResponse, addresses)
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))

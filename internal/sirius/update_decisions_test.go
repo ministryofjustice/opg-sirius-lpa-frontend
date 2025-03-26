@@ -3,18 +3,18 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
-
-	"github.com/pact-foundation/pact-go/dsl"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestUpdateDecisions(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name            string
@@ -32,17 +32,17 @@ func TestUpdateDecisions(t *testing.T) {
 					AddInteraction().
 					Given("A digital LPA exists").
 					UponReceiving("A request to update the decisions made").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567/decisions"),
-						Headers: dsl.MapMatcher{
-							"Content-Type": dsl.String("application/json"),
+						Path:   matchers.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567/decisions"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
 						},
-						Body: dsl.Like(map[string]any{
-							"howAttorneysMakeDecisions": dsl.Like("jointly"),
+						Body: matchers.Like(map[string]any{
+							"howAttorneysMakeDecisions": matchers.Like("jointly"),
 						}),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusNoContent,
 					})
 			},
@@ -53,15 +53,15 @@ func TestUpdateDecisions(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				err := client.UpdateDecisions(Context{Context: context.Background()}, "M-1234-9876-4567", tc.updateDecisions)
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
