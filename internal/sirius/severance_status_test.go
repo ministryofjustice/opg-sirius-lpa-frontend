@@ -22,7 +22,7 @@ func TestUpdateSeveranceStatus(t *testing.T) {
 		expectedError       func(int) error
 	}{
 		{
-			name: "OK",
+			name: "Severance status - required",
 			severanceStatusData: SeveranceStatusData{
 				SeveranceStatus: "REQUIRED",
 			},
@@ -30,7 +30,7 @@ func TestUpdateSeveranceStatus(t *testing.T) {
 				pact.
 					AddInteraction().
 					Given("A digital LPA exists").
-					UponReceiving("A request for updating severance status").
+					UponReceiving("A request for updating severance status to required").
 					WithRequest(dsl.Request{
 						Method: http.MethodPut,
 						Path:   dsl.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567/severance-status"),
@@ -39,6 +39,31 @@ func TestUpdateSeveranceStatus(t *testing.T) {
 						},
 						Body: map[string]interface{}{
 							"severanceStatus": "REQUIRED",
+						},
+					}).
+					WillRespondWith(dsl.Response{
+						Status: http.StatusNoContent,
+					})
+			},
+		},
+		{
+			name: "Severance Status - not required",
+			severanceStatusData: SeveranceStatusData{
+				SeveranceStatus: "NOT_REQUIRED",
+			},
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A digital LPA exists").
+					UponReceiving("A request for updating severance status to not required").
+					WithRequest(dsl.Request{
+						Method: http.MethodPut,
+						Path:   dsl.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567/severance-status"),
+						Headers: dsl.MapMatcher{
+							"Content-Type": dsl.String("application/json"),
+						},
+						Body: map[string]interface{}{
+							"severanceStatus": "NOT_REQUIRED",
 						},
 					}).
 					WillRespondWith(dsl.Response{
