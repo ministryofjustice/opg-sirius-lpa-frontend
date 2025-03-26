@@ -48,45 +48,46 @@ type Client interface {
 	AddFeeDecisionClient
 	AddPaymentClient
 	AllocateCasesClient
-	AssignTaskClient
 	ApplyFeeReductionClient
+	AssignTaskClient
 	ChangeAttorneyDetailsClient
-	ChangeDonorDetailsClient
-	ChangeDraftClient
 	ChangeCaseStatusClient
 	ChangeCertificateProviderDetailsClient
+	UpdateDecisionsClient
+	ChangeDonorDetailsClient
+	ChangeDraftClient
 	ChangeStatusClient
 	ClearTaskClient
-	CreateDonorClient
-	CreateDocumentClient
-	CreateDraftClient
 	CreateAdditionalDraftClient
+	CreateDocumentClient
+	CreateDonorClient
+	CreateDraftClient
 	CreateInvestigationClient
-	EditInvestigationClient
-	InvestigationHoldClient
 	DeletePaymentClient
 	DeleteRelationshipClient
 	EditComplaintClient
 	EditDatesClient
 	EditDocumentClient
 	EditDonorClient
+	EditInvestigationClient
 	EditPaymentClient
 	EventClient
 	GetApplicationProgressClient
+	GetDocumentsClient
 	GetHistoryClient
 	GetLpaDetailsClient
 	GetPaymentsClient
-	GetDocumentsClient
+	InvestigationHoldClient
 	LinkPersonClient
 	ManageAttorneysClient
 	ManageFeesClient
 	ManageRestrictionsClient
 	MiReportingClient
-	RemoveAnAttorneyClient
-	RelationshipClient
-	SearchDonorsClient
-	SearchClient
 	PostcodeLookupClient
+	RelationshipClient
+	RemoveAnAttorneyClient
+	SearchClient
+	SearchDonorsClient
 	SearchUsersClient
 	TaskClient
 	UnlinkPersonClient
@@ -151,6 +152,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/lpa/{uid}/manage-attorneys", wrap(ManageAttorneys(client, templates.Get("mlpa-manage-attorneys.gohtml"))))
 	mux.Handle("/lpa/{uid}/remove-an-attorney", wrap(RemoveAnAttorney(client, templates.Get("mlpa-remove-attorney.gohtml"), templates.Get("mlpa-confirm-attorney-removal.gohtml"))))
 	mux.Handle("/lpa/{uid}/certificate-provider/change-details", wrap(ChangeCertificateProviderDetails(client, templates.Get("change-certificate-provider-details.gohtml"))))
+	mux.Handle("/lpa/{uid}/update-decisions", wrap(UpdateDecisions(client, templates.Get("mlpa-update-decisions.gohtml"))))
 	mux.Handle("/search-users", wrap(SearchUsers(client)))
 	mux.Handle("/search-persons", wrap(SearchDonors(client)))
 	mux.Handle("/search-postcode", wrap(SearchPostcode(client)))
