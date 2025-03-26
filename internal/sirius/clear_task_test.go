@@ -4,7 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/pact-foundation/pact-go/dsl"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"net/http"
@@ -39,8 +40,8 @@ func TestClearTaskForCaseNetworkError(t *testing.T) {
 func TestClearTask(t *testing.T) {
 	t.Parallel()
 
-	pact := newPact()
-	defer pact.Teardown()
+	pact, err := newPact()
+	assert.NoError(t, err)
 
 	testCases := []struct {
 		name          string
@@ -54,11 +55,11 @@ func TestClearTask(t *testing.T) {
 					AddInteraction().
 					Given("I have a case with an open task assigned").
 					UponReceiving("A request to clear the task").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
-						Path:   dsl.String("/lpa-api/v1/tasks/990/mark-as-completed"),
+						Path:   matchers.String("/lpa-api/v1/tasks/990/mark-as-completed"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
 					})
 			},
@@ -70,18 +71,18 @@ func TestClearTask(t *testing.T) {
 					AddInteraction().
 					Given("There is no tasks with the specified ID").
 					UponReceiving("A request to clear a non-existent task").
-					WithRequest(dsl.Request{
+					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
-						Path:   dsl.Like("/lpa-api/v1/tasks/990/mark-as-completed"),
+						Path:   matchers.Like("/lpa-api/v1/tasks/990/mark-as-completed"),
 					}).
-					WillRespondWith(dsl.Response{
+					WithCompleteResponse(consumer.Response{
 						Status: http.StatusNotFound,
 					})
 			},
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:          404,
-					URL:           fmt.Sprintf("http://localhost:%d/lpa-api/v1/tasks/990/mark-as-completed", port),
+					URL:           fmt.Sprintf("http://127.0.0.1:%d/lpa-api/v1/tasks/990/mark-as-completed", port),
 					Method:        "PUT",
 					CorrelationId: "",
 				}
@@ -93,15 +94,15 @@ func TestClearTask(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setup()
 
-			assert.Nil(t, pact.Verify(func() error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", pact.Server.Port))
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				err := client.ClearTask(Context{Context: context.Background()}, 990)
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
-					assert.Equal(t, tc.expectedError(pact.Server.Port), err)
+					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 				return nil
 			}))
