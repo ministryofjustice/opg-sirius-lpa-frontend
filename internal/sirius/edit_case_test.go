@@ -34,7 +34,7 @@ func TestEditCase(t *testing.T) {
 						Method: http.MethodPut,
 						Path:   matchers.String("/lpa-api/v1/lpas/800"),
 						Body: map[string]interface{}{
-							"status": "Perfect",
+							"status": "Cancelled",
 						},
 					}).
 					WithCompleteResponse(consumer.Response{
@@ -55,7 +55,7 @@ func TestEditCase(t *testing.T) {
 						Method: http.MethodPut,
 						Path:   matchers.String("/lpa-api/v1/epas/800"),
 						Body: map[string]interface{}{
-							"status": "Perfect",
+							"status": "Cancelled",
 						},
 					}).
 					WithCompleteResponse(consumer.Response{
@@ -74,7 +74,7 @@ func TestEditCase(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				err := client.EditCase(Context{Context: context.Background()}, 800, tc.caseType, Case{Status: "Perfect"})
+				err := client.EditCase(Context{Context: context.Background()}, 800, tc.caseType, Case{Status: "Cancelled"})
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
