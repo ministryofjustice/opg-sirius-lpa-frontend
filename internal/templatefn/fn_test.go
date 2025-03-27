@@ -171,3 +171,13 @@ func TestCamelcaseToSentence(t *testing.T) {
 
 	testStringMapper(t, "camelcaseToSentence", expectations)
 }
+
+func TestSeveranceRequiredLabel(t *testing.T) {
+	expectations := map[string]string{
+		"REQUIRED":     "Yes",
+		"NOT_REQUIRED": "No",
+		"":             "",
+	}
+
+	testStringMapper(t, "severanceRequiredLabel", expectations)
+}

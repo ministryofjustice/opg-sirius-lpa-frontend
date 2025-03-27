@@ -162,7 +162,7 @@ func TestPostManageRestrictionsRedirects(t *testing.T) {
 		{
 			name:            "Severance application not required",
 			severanceAction: "severance-application-not-required",
-			severanceStatus: nil,
+			severanceStatus: &sirius.SeveranceStatusData{SeveranceStatus: "NOT_REQUIRED"},
 		},
 		{
 			name:            "Severance application required",
@@ -178,13 +178,13 @@ func TestPostManageRestrictionsRedirects(t *testing.T) {
 				On("CaseSummary", mock.Anything, "M-1111-2222-3333").
 				Return(restrictionsCaseSummary, nil)
 
-			if tc.severanceStatus == nil {
+			if tc.severanceAction == "severance-application-not-required" {
 				client.On("ClearTask", mock.Anything, 1).Return(nil)
-			} else {
-				client.
-					On("UpdateSeveranceStatus", mock.Anything, "M-1111-2222-3333", *tc.severanceStatus).
-					Return(nil)
 			}
+
+			client.
+				On("UpdateSeveranceStatus", mock.Anything, "M-1111-2222-3333", *tc.severanceStatus).
+				Return(nil)
 
 			template := &mockTemplate{}
 			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func))
