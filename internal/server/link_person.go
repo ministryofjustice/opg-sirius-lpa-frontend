@@ -46,7 +46,7 @@ func LinkPerson(client LinkPersonClient, tmpl template.Template) Handler {
 				data.Error = sirius.ValidationError{
 					Field: sirius.FieldErrors{
 						"uid": map[string]string{
-							"notFound": "A record matching the supplied uId cannot be found.",
+							"notFound": "A record matching thffe supplied uId cannot be found.",
 						},
 					},
 				}
