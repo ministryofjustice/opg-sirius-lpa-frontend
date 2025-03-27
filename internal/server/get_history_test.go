@@ -1,11 +1,12 @@
 package server
 
 import (
+	"net/http"
+	"testing"
+
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"net/http"
-	"testing"
 )
 
 type mockGetHistoryClient struct {
@@ -81,14 +82,14 @@ func TestGetHistoryWhenFailureOnGetEvents(t *testing.T) {
 		Return(caseSummary, nil)
 	client.
 		On("GetEvents", mock.Anything, 8, 12).
-		Return(nil, expectedError)
+		Return(nil, errExample)
 
 	server := newMockServer("/lpa/{uid}/history", GetHistory(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9999/history", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -96,7 +97,7 @@ func TestGetHistoryWhenFailureOnGetCaseSummary(t *testing.T) {
 	client := &mockGetHistoryClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-9876-9876-9999").
-		Return(sirius.CaseSummary{}, expectedError)
+		Return(sirius.CaseSummary{}, errExample)
 
 	template := &mockTemplate{}
 
@@ -105,6 +106,6 @@ func TestGetHistoryWhenFailureOnGetCaseSummary(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9999/history", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }

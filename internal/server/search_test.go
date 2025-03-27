@@ -1,12 +1,13 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockSearchClient struct {
@@ -256,14 +257,14 @@ func TestGetSearchGetDeletedCasesFailure(t *testing.T) {
 		On("Search", mock.Anything, "7000-0000-5678", 1, noFilters).
 		Return(expectedResponse, expectedPagination, nil).
 		On("DeletedCases", mock.Anything, "700000005678").
-		Return([]sirius.DeletedCase{}, expectedError)
+		Return([]sirius.DeletedCase{}, errExample)
 
 	req, _ := http.NewRequest(http.MethodGet, "/search?term=7000-0000-5678", nil)
 	w := httptest.NewRecorder()
 
 	err := Search(client, nil)(w, req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -291,14 +292,14 @@ func TestGetSearchErrors(t *testing.T) {
 	client := &mockSearchClient{}
 	client.
 		On("Search", mock.Anything, "bob", 1, filters).
-		Return(sirius.SearchResponse{}, &sirius.Pagination{}, expectedError)
+		Return(sirius.SearchResponse{}, &sirius.Pagination{}, errExample)
 
 	req, _ := http.NewRequest(http.MethodGet, "/search?term=bob", nil)
 	w := httptest.NewRecorder()
 
 	err := Search(client, nil)(w, req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -335,13 +336,13 @@ func TestGetSearchTemplateErrors(t *testing.T) {
 			SearchTerm:   "bob",
 			Pagination:   newPagination(expectedPagination, "term=bob", ""),
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	req, _ := http.NewRequest(http.MethodGet, "/search?term=bob", nil)
 	w := httptest.NewRecorder()
 
 	err := Search(client, template.Func)(w, req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

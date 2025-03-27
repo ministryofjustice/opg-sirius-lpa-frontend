@@ -125,7 +125,7 @@ func TestPostCreateDonorWhenAPIFails(t *testing.T) {
 			Firstname: "Rudolph",
 			Surname:   "Stotesbury",
 		}).
-		Return(sirius.Person{}, expectedError)
+		Return(sirius.Person{}, errExample)
 
 	template := &mockTemplate{}
 
@@ -139,7 +139,7 @@ func TestPostCreateDonorWhenAPIFails(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	err := CreateDonor(client, template.Func)(w, r)
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 

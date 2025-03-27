@@ -144,7 +144,7 @@ func findNoteFile(form *multipart.Form, key string) (*sirius.NoteFile, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck // no need to check error when closing body
 
 	var buf bytes.Buffer
 	enc := base64.NewEncoder(base64.StdEncoding, &buf)

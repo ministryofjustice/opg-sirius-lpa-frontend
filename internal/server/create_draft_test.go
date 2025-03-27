@@ -227,7 +227,7 @@ func TestPostCreateDraftWhenAPIFails(t *testing.T) {
 			DonorFirstNames: "Gerald Ryan",
 			DonorLastName:   "Sandel",
 		}).
-		Return(map[string]string{}, expectedError)
+		Return(map[string]string{}, errExample)
 
 	template := &mockTemplate{}
 
@@ -241,7 +241,7 @@ func TestPostCreateDraftWhenAPIFails(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	err := CreateDraft(client, template.Func)(w, r)
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 

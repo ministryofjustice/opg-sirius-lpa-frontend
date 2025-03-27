@@ -232,10 +232,10 @@ func TestPostDeleteDocument(t *testing.T) {
 				Return(nil)
 
 			template := &mockTemplate{}
-			expectedError = nil
+			errExample = nil
 
 			if caseType == "digital_lpa" {
-				expectedError = RedirectError("/lpa/700700/documents")
+				errExample = RedirectError("/lpa/700700/documents")
 			} else {
 				client.
 					On("Documents", mock.Anything, sirius.CaseType(caseType), 288, []string{sirius.TypeDraft}, []string{}).
@@ -271,7 +271,7 @@ func TestPostDeleteDocument(t *testing.T) {
 			err := EditDocument(client, template.Func)(w, r)
 			resp := w.Result()
 
-			assert.Equal(t, expectedError, err)
+			assert.Equal(t, errExample, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 			mock.AssertExpectationsForObjects(t, client, template)
@@ -319,10 +319,10 @@ func TestPostPublishDocument(t *testing.T) {
 				Return(caseItem, nil)
 
 			template := &mockTemplate{}
-			expectedError = nil
+			errExample = nil
 
 			if caseType == "digital_lpa" {
-				expectedError = RedirectError("/lpa/700700/documents")
+				errExample = RedirectError("/lpa/700700/documents")
 			} else {
 				client.
 					On("Documents", mock.Anything, sirius.CaseType(caseType), 544, []string{sirius.TypeDraft}, []string{}).
@@ -357,7 +357,7 @@ func TestPostPublishDocument(t *testing.T) {
 			err := EditDocument(client, template.Func)(w, r)
 			resp := w.Result()
 
-			assert.Equal(t, expectedError, err)
+			assert.Equal(t, errExample, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
@@ -454,23 +454,24 @@ func TestPostSaveDocumentAndExit(t *testing.T) {
 
 			template := &mockTemplate{}
 
-			if caseType == "digital_lpa_1" {
+			switch caseType {
+			case "digital_lpa_1":
 				caseType = "digital_lpa"
-				expectedError = nil
+				errExample = nil
 
 				client.
 					On("Case", mock.Anything, 987).
 					Return(sirius.Case{CaseType: caseType, UID: "M-1234-4567-8999"}, nil)
 
-				expectedError = RedirectError("/lpa/M-1234-4567-8999/documents")
-			} else if caseType == "digital_lpa_2" {
+				errExample = RedirectError("/lpa/M-1234-4567-8999/documents")
+			case "digital_lpa_2":
 				caseType = "digital_lpa"
 
 				client.
 					On("Case", mock.Anything, 987).
-					Return(sirius.Case{}, expectedError)
-			} else {
-				expectedError = nil
+					Return(sirius.Case{}, errExample)
+			default:
+				errExample = nil
 
 				template.
 					On("Func", mock.Anything, editDocumentData{
@@ -494,7 +495,7 @@ func TestPostSaveDocumentAndExit(t *testing.T) {
 			err := EditDocument(client, template.Func)(w, r)
 			resp := w.Result()
 
-			assert.Equal(t, expectedError, err)
+			assert.Equal(t, errExample, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
@@ -524,7 +525,7 @@ func TestGetEditDocumentWhenCaseErrors(t *testing.T) {
 	client := &mockEditDocumentClient{}
 	client.
 		On("Case", mock.Anything, 222).
-		Return(sirius.Case{}, expectedError)
+		Return(sirius.Case{}, errExample)
 	client.
 		On("Documents", mock.Anything, sirius.CaseTypeLpa, 222, []string{sirius.TypeDraft}, []string{}).
 		Return([]sirius.Document{}, nil)
@@ -537,7 +538,7 @@ func TestGetEditDocumentWhenCaseErrors(t *testing.T) {
 
 	err := EditDocument(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -550,7 +551,7 @@ func TestGetCreateDocumentWhenFailureOnDocuments(t *testing.T) {
 		Return(caseItem, nil)
 	client.
 		On("Documents", mock.Anything, sirius.CaseTypeLpa, 535, []string{sirius.TypeDraft}, []string{}).
-		Return([]sirius.Document{}, expectedError)
+		Return([]sirius.Document{}, errExample)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return([]sirius.DocumentTemplateData{}, nil)
@@ -560,7 +561,7 @@ func TestGetCreateDocumentWhenFailureOnDocuments(t *testing.T) {
 
 	err := EditDocument(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -586,7 +587,7 @@ func TestGetCreateDocumentWhenFailureOnDocumentByUUID(t *testing.T) {
 		Return(documents, nil)
 	client.
 		On("DocumentByUUID", mock.Anything, "dfef6714-b4fe-44c2-b26e-90dfe3663e95").
-		Return(sirius.Document{}, expectedError)
+		Return(sirius.Document{}, errExample)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
 		Return([]sirius.DocumentTemplateData{}, nil)
@@ -596,7 +597,7 @@ func TestGetCreateDocumentWhenFailureOnDocumentByUUID(t *testing.T) {
 
 	err := EditDocument(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -634,13 +635,13 @@ func TestGetEditDocumentWhenTemplateErrors(t *testing.T) {
 			Document:  document,
 			Documents: documents,
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := EditDocument(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

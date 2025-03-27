@@ -180,7 +180,7 @@ func TestGetPaymentsWhenFailureOnGetCase(t *testing.T) {
 	client := &mockGetPayments{}
 	client.
 		On("Case", mock.Anything, 8).
-		Return(sirius.Case{}, expectedError).
+		Return(sirius.Case{}, errExample).
 		On("Payments", mock.Anything, 8).
 		Return(allPayments, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
@@ -197,7 +197,7 @@ func TestGetPaymentsWhenFailureOnGetCase(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/payments/8", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -205,14 +205,14 @@ func TestGetPaymentsWhenFailureOnGetCaseSummary(t *testing.T) {
 	client := &mockGetPayments{}
 	client.
 		On("CaseSummary", mock.Anything, "M-QQQQ-WWWW-EEEE").
-		Return(sirius.CaseSummary{}, expectedError)
+		Return(sirius.CaseSummary{}, errExample)
 
 	server := newMockServer("/lpa/{uid}/payments", GetPayments(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-QQQQ-WWWW-EEEE/payments", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -258,14 +258,14 @@ func TestGetPaymentsWhenFailureOnGetPayments(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil).
 		On("Payments", mock.Anything, 9).
-		Return([]sirius.Payment{}, expectedError)
+		Return([]sirius.Payment{}, errExample)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/payments/9", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -313,14 +313,14 @@ func TestGetPaymentsWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return(feeReductionTypes, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
-		Return([]sirius.RefDataItem{}, expectedError)
+		Return([]sirius.RefDataItem{}, errExample)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/payments/111", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -368,14 +368,14 @@ func TestGetPaymentsWhenFailureOnGetReferenceTypeRefData(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
-		Return([]sirius.RefDataItem{}, expectedError)
+		Return([]sirius.RefDataItem{}, errExample)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/payments/4", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -423,14 +423,14 @@ func TestGetPaymentsWhenFailureOnFeeReductionTypesRefData(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil).
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
-		Return([]sirius.RefDataItem{}, expectedError)
+		Return([]sirius.RefDataItem{}, errExample)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/payments/876", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -499,14 +499,14 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 			FeeReductionTypes: feeReductionTypes,
 			OutstandingFee:    4100,
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, template.Func))
 
 	req, _ := http.NewRequest(http.MethodGet, "/payments/554", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 

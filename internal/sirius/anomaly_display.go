@@ -136,13 +136,13 @@ func (afo *AnomaliesForObject) GetAnomaliesForFieldWithStatus(fieldName string, 
 func getSectionForUid(lpa *LpaStoreData, uid ObjectUid) AnomalyDisplaySection {
 	if uid == "" {
 		return RootSection
-	} else if ObjectUid(lpa.Donor.LpaStorePerson.Uid) == uid {
+	} else if ObjectUid(lpa.Donor.Uid) == uid {
 		return DonorSection
-	} else if ObjectUid(lpa.CertificateProvider.LpaStorePerson.Uid) == uid {
+	} else if ObjectUid(lpa.CertificateProvider.Uid) == uid {
 		return CertificateProviderSection
 	} else {
 		for _, attorney := range lpa.Attorneys {
-			if ObjectUid(attorney.LpaStorePerson.Uid) == uid {
+			if ObjectUid(attorney.Uid) == uid {
 				if attorney.Status == shared.ActiveAttorneyStatus.String() {
 					return AttorneysSection
 				}
@@ -155,7 +155,7 @@ func getSectionForUid(lpa *LpaStoreData, uid ObjectUid) AnomalyDisplaySection {
 		}
 
 		for _, person := range lpa.PeopleToNotify {
-			if ObjectUid(person.LpaStorePerson.Uid) == uid {
+			if ObjectUid(person.Uid) == uid {
 				return PeopleToNotifySection
 			}
 		}

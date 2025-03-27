@@ -73,14 +73,14 @@ func TestGetDocumentsWhenFailureOnGetDigitalLpa(t *testing.T) {
 	client := &mockGetDocuments{}
 	client.
 		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
-		Return(sirius.CaseSummary{}, expectedError)
+		Return(sirius.CaseSummary{}, errExample)
 
 	server := newMockServer("/lpa/{uid}/documents", GetDocuments(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9876/documents", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -102,14 +102,14 @@ func TestGetDocumentsWhenFailureOnGetDocuments(t *testing.T) {
 		Return(caseSummary, nil)
 	client.
 		On("Documents", mock.Anything, sirius.CaseType("lpa"), 1532, []string{}, []string{sirius.TypeDraft, sirius.TypePreview}).
-		Return([]sirius.Document{}, expectedError)
+		Return([]sirius.Document{}, errExample)
 
 	server := newMockServer("/lpa/{uid}/documents", GetDocuments(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9876/documents", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -117,13 +117,13 @@ func TestGetDocumentsWhenFailureOnGetCaseSummary(t *testing.T) {
 	client := &mockGetDocuments{}
 	client.
 		On("CaseSummary", mock.Anything, "M-A876-A876-A876").
-		Return(sirius.CaseSummary{}, expectedError)
+		Return(sirius.CaseSummary{}, errExample)
 
 	server := newMockServer("/lpa/{uid}/documents", GetDocuments(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-A876-A876-A876/documents", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }

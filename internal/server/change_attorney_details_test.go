@@ -1,14 +1,15 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockChangeAttorneyDetailsClient struct {
@@ -195,7 +196,7 @@ func TestGetChangeAttorneyDetails(t *testing.T) {
 				PhoneNumber: "077577575757",
 				SignedAt:    dob{Day: 12, Month: 1, Year: 2024},
 			},
-			errorReturned: expectedError,
+			errorReturned: errExample,
 		},
 	}
 
@@ -242,9 +243,9 @@ func TestGetChangeAttorneyDetailsWhenCaseSummaryErrors(t *testing.T) {
 	client := &mockChangeAttorneyDetailsClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-EEEE-EEEE-EEEE").
-		Return(sirius.CaseSummary{}, expectedError)
+		Return(sirius.CaseSummary{}, errExample)
 
-	assertChangeAttorneyDetailsErrors(t, client, "M-EEEE-EEEE-EEEE", expectedError)
+	assertChangeAttorneyDetailsErrors(t, client, "M-EEEE-EEEE-EEEE", errExample)
 }
 
 func TestGetChangeAttorneyDetailsWhenRefDataByCategoryErrors(t *testing.T) {
@@ -254,9 +255,9 @@ func TestGetChangeAttorneyDetailsWhenRefDataByCategoryErrors(t *testing.T) {
 		Return(testChangeAttorneyDetailsCaseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
-		Return([]sirius.RefDataItem{}, expectedError)
+		Return([]sirius.RefDataItem{}, errExample)
 
-	assertChangeAttorneyDetailsErrors(t, client, "M-DDDD-DDDD-DDDD", expectedError)
+	assertChangeAttorneyDetailsErrors(t, client, "M-DDDD-DDDD-DDDD", errExample)
 }
 
 func assertChangeAttorneyDetailsErrors(t *testing.T, client *mockChangeAttorneyDetailsClient, uid string, expectedError error) {
@@ -282,8 +283,8 @@ func TestPostChangeAttorneyDetails(t *testing.T) {
 		},
 		{
 			name:          "Post form returns an API failure",
-			apiError:      expectedError,
-			expectedError: expectedError,
+			apiError:      errExample,
+			expectedError: errExample,
 		},
 	}
 	for _, tc := range tests {

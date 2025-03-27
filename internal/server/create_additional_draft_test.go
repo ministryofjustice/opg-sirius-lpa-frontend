@@ -1,14 +1,15 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockCreateAdditionalDraftClient struct {
@@ -276,7 +277,7 @@ func TestPostCreateAdditionalDraftWhenAPIFails(t *testing.T) {
 			CaseType: []string{"property-and-affairs", "personal-welfare"},
 			Source:   "PHONE",
 		}).
-		Return(map[string]string{}, expectedError)
+		Return(map[string]string{}, errExample)
 
 	template := &mockTemplate{}
 
@@ -289,7 +290,7 @@ func TestPostCreateAdditionalDraftWhenAPIFails(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	err := CreateAdditionalDraft(client, template.Func)(w, r)
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -364,7 +365,7 @@ func TestPostCreateAdditionalDraftWhenUserDetailsErrors(t *testing.T) {
 	client := &mockCreateAdditionalDraftClient{}
 	client.
 		On("GetUserDetails", mock.Anything).
-		Return(sirius.User{}, expectedError)
+		Return(sirius.User{}, errExample)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
@@ -390,7 +391,7 @@ func TestPostCreateAdditionalDraftWhenUserDetailsErrors(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	err := CreateAdditionalDraft(client, template.Func)(w, r)
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestPostCreateAdditionalDraftWhenPersonErrors(t *testing.T) {
@@ -403,7 +404,7 @@ func TestPostCreateAdditionalDraftWhenPersonErrors(t *testing.T) {
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 	client.
 		On("Person", mock.Anything, 234).
-		Return(sirius.Person{ID: 234, Firstname: "Amy", Surname: "Shoe"}, expectedError)
+		Return(sirius.Person{ID: 234, Firstname: "Amy", Surname: "Shoe"}, errExample)
 
 	template := &mockTemplate{}
 	template.
@@ -423,5 +424,5 @@ func TestPostCreateAdditionalDraftWhenPersonErrors(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	err := CreateAdditionalDraft(client, template.Func)(w, r)
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }

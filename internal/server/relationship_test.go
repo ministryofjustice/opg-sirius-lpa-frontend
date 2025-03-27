@@ -74,7 +74,7 @@ func TestGetRelationshipWhenPersonErrors(t *testing.T) {
 	client := &mockRelationshipClient{}
 	client.
 		On("Person", mock.Anything, 123).
-		Return(sirius.Person{}, expectedError)
+		Return(sirius.Person{}, errExample)
 
 	template := &mockTemplate{}
 	template.
@@ -88,7 +88,7 @@ func TestGetRelationshipWhenPersonErrors(t *testing.T) {
 
 	err := Relationship(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestGetRelationshipWhenTemplateErrors(t *testing.T) {
@@ -102,14 +102,14 @@ func TestGetRelationshipWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, relationshipData{
 			Entity: "John Doe",
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := Relationship(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestPostRelationship(t *testing.T) {
@@ -193,7 +193,7 @@ func TestPostRelationshipWhenCreatePersonReferenceOtherError(t *testing.T) {
 		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
 	client.
 		On("CreatePersonReference", mock.Anything, 123, "7000-1000-1111", "Father").
-		Return(expectedError)
+		Return(errExample)
 
 	form := url.Values{
 		"search": {"7000-1000-1111:Some Person (7000-1000-1111)"},
@@ -206,5 +206,5 @@ func TestPostRelationshipWhenCreatePersonReferenceOtherError(t *testing.T) {
 
 	err := Relationship(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }

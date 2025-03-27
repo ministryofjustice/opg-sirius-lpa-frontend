@@ -74,11 +74,12 @@ func LinkPerson(client LinkPersonClient, tmpl template.Template) Handler {
 					}
 				}
 
-				if data.PrimaryId == data.Entity.ID {
+				switch data.PrimaryId {
+				case data.Entity.ID:
 					err = client.LinkPeople(ctx, data.Entity.ID, data.OtherPerson.ID)
-				} else if data.PrimaryId == data.OtherPerson.ID {
+				case data.OtherPerson.ID:
 					err = client.LinkPeople(ctx, data.OtherPerson.ID, data.Entity.ID)
-				} else {
+				default:
 					return tmpl(w, data)
 				}
 

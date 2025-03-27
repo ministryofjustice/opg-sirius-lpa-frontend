@@ -78,14 +78,14 @@ func TestGetCreateInvestigationWhenCaseErrors(t *testing.T) {
 	client := &mockCreateInvestigationClient{}
 	client.
 		On("Case", mock.Anything, 123).
-		Return(sirius.Case{}, expectedError)
+		Return(sirius.Case{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := CreateInvestigation(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -102,14 +102,14 @@ func TestGetCreateInvestigationWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, createInvestigationData{
 			Case: caseItem,
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := CreateInvestigation(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -215,7 +215,7 @@ func TestPostCreateInvestigationWhenOtherError(t *testing.T) {
 		Return(caseItem, nil)
 	client.
 		On("CreateInvestigation", mock.Anything, 123, sirius.CaseTypeLpa, investigation).
-		Return(expectedError)
+		Return(errExample)
 
 	form := url.Values{
 		"type": {"Priority"},
@@ -227,6 +227,6 @@ func TestPostCreateInvestigationWhenOtherError(t *testing.T) {
 
 	err := CreateInvestigation(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }

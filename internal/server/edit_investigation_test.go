@@ -68,14 +68,14 @@ func TestGetEditInvestigationWhenInvestigationErrors(t *testing.T) {
 	client := &mockEditInvestigationClient{}
 	client.
 		On("Investigation", mock.Anything, 123).
-		Return(sirius.Investigation{}, expectedError)
+		Return(sirius.Investigation{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := EditInvestigation(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -90,14 +90,14 @@ func TestGetEditInvestigationWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, editInvestigationData{
 			ApprovalOutcomeTypes: approvalOutcomeTypes,
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := EditInvestigation(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -200,7 +200,7 @@ func TestPostEditInvestigationWhenEditInvestigationOtherError(t *testing.T) {
 	client := &mockEditInvestigationClient{}
 	client.
 		On("EditInvestigation", mock.Anything, 123, investigation).
-		Return(expectedError)
+		Return(errExample)
 
 	form := url.Values{
 		"title": {"Test Investigation"},
@@ -212,6 +212,6 @@ func TestPostEditInvestigationWhenEditInvestigationOtherError(t *testing.T) {
 
 	err := EditInvestigation(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
