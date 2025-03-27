@@ -13,7 +13,7 @@
     </div>
     <div id="accordion-default-content-4" class="govuk-accordion__section-content">
         {{ if (gt (len .RemovedAttorneys) 0) }}
-            {{ range $num, $attorney := .ReplacementAttorneys }}
+            {{ range $num, $attorney := .RemovedAttorneys }}
                 <h2 class="govuk-heading-m">
                     Removed attorney {{ plusN $num 1 }}
                 </h2>
