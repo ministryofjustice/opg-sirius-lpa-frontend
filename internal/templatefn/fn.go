@@ -180,9 +180,10 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"join": func(s []string, joiner string) string {
 			return strings.Join(s, joiner)
 		},
-		"subtypeShortFormat": subtypeShortFormat,
-		"subtypeLongFormat":  subtypeLongFormat,
-		"subtypeColour":      subtypeColour,
+		"subtypeShortFormat":     subtypeShortFormat,
+		"subtypeLongFormat":      subtypeLongFormat,
+		"subtypeColour":          subtypeColour,
+		"severanceRequiredLabel": severanceRequiredLabel,
 		"howAttorneysMakeDecisionsLongForm": func(s string) string {
 			switch s {
 			case "jointly":
@@ -383,6 +384,17 @@ func subtypeColour(subtype string) string {
 		return "light-green"
 	case "property-and-affairs":
 		return "turquoise"
+	default:
+		return ""
+	}
+}
+
+func severanceRequiredLabel(severanceStatus string) string {
+	switch severanceStatus {
+	case "REQUIRED":
+		return "Yes"
+	case "NOT_REQUIRED":
+		return "No"
 	default:
 		return ""
 	}
