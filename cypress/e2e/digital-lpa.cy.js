@@ -670,6 +670,7 @@ describe("View a digital LPA", () => {
     cy.contains("LPA details").click();
     cy.contains("Attorneys (2)");
     cy.contains("Replacement attorneys (2)");
+    cy.contains("Removed attorneys (1)");
     cy.contains("Notified people (0)");
     cy.contains("Correspondent");
 

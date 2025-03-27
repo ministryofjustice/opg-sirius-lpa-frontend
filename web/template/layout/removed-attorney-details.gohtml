@@ -1,0 +1,101 @@
+{{ define "removed-attorney-details" }}
+
+{{ $caseUID :=  .CaseSummary.DigitalLpa.UID}}
+
+<!-- removed attorneys -->
+<div class="govuk-accordion__section">
+    <div class="govuk-accordion__section-header">
+        <h2 class="govuk-accordion__section-heading">
+              <span class="govuk-accordion__section-button" id="accordion-default-heading-9">
+                Removed attorneys ({{ len .RemovedAttorneys }})
+              </span>
+        </h2>
+    </div>
+    <div id="accordion-default-content-4" class="govuk-accordion__section-content">
+        {{ if (gt (len .RemovedAttorneys) 0) }}
+            {{ range $num, $attorney := .RemovedAttorneys }}
+                <h2 class="govuk-heading-m">
+                    Removed attorney {{ plusN $num 1 }}
+                </h2>
+
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">First names</dt>
+                        <dd class="govuk-summary-list__value">{{ $attorney.FirstNames }}</dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Last name</dt>
+                        <dd class="govuk-summary-list__value">{{ $attorney.LastName }}</dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Date of birth</dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ if not (eq $attorney.DateOfBirth "") }}
+                                {{ parseAndFormatDate $attorney.DateOfBirth "2006-01-02" "2 January 2006" }}
+                            {{ end }}
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Address</dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ template "mlpa-address" $attorney.Address }}
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Email</dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ if (eq $attorney.Email "") }}
+                                Not provided
+                            {{ else }}
+                                {{ $attorney.Email }}
+                            {{ end }}
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Phone</dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ if (eq $attorney.Mobile "") }}
+                                Not provided
+                            {{ else }}
+                                {{ $attorney.Mobile }}
+                            {{ end }}
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row{{ if eq $attorney.SignedAt "" }} govuk-summary-list__row--no-border{{ end }}">
+                        <dt class="govuk-summary-list__key">Format</dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ if (eq $attorney.Email "") }}
+                                Paper
+                            {{ else }}
+                                Online
+                            {{ end }}
+                            {{ if not (eq $attorney.ContactLanguagePreference "") }}
+                                <br>{{ languageForFormat $attorney.ContactLanguagePreference }}
+                            {{ end }}
+                        </dd>
+                    </div>
+
+                    {{ if ne $attorney.SignedAt "" }}
+                        <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                            <dt class="govuk-summary-list__key">Signed on</dt>
+                            <dd class="govuk-summary-list__value">
+                                {{ parseAndFormatDate $attorney.SignedAt "2006-01-02T15:04:05Z" "2 January 2006" }}
+                            </dd>
+                        </div>
+                    {{ end }}
+
+                </dl>
+            {{ end }}
+
+        {{ else }}
+            <p class="govuk-body">No attorneys have been removed from this LPA</p>
+        {{ end }}
+    </div>
+</div>
+{{ end }}

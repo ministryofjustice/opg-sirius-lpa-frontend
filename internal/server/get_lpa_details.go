@@ -22,6 +22,7 @@ type getLpaDetails struct {
 	ReviewRestrictions      bool
 	ReplacementAttorneys    []sirius.LpaStoreAttorney
 	NonReplacementAttorneys []sirius.LpaStoreAttorney
+	RemovedAttorneys        []sirius.LpaStoreAttorney
 	FlashMessage            FlashNotification
 }
 
@@ -74,21 +75,21 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 
 		var replacementAttorneys []sirius.LpaStoreAttorney
 		var nonReplacementAttorneys []sirius.LpaStoreAttorney
+		var removedAttorneys []sirius.LpaStoreAttorney
 		for _, attorney := range data.DigitalLpa.LpaStoreData.Attorneys {
-			if attorney.Status == shared.RemovedAttorneyStatus.String() {
-				continue
-			}
-
 			if attorney.Status == shared.ActiveAttorneyStatus.String() {
 				nonReplacementAttorneys = append(nonReplacementAttorneys, attorney)
 			} else if attorney.Status == shared.InactiveAttorneyStatus.String() &&
 				attorney.AppointmentType == shared.ReplacementAppointmentType.String() {
 				replacementAttorneys = append(replacementAttorneys, attorney)
+			} else if attorney.Status == shared.RemovedAttorneyStatus.String() {
+				removedAttorneys = append(removedAttorneys, attorney)
 			}
 		}
 
 		data.ReplacementAttorneys = replacementAttorneys
 		data.NonReplacementAttorneys = nonReplacementAttorneys
+		data.RemovedAttorneys = removedAttorneys
 
 		return tmpl(w, data)
 	}
