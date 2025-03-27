@@ -230,6 +230,15 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 							},
 						},
 					},
+					RemovedAttorneys: []sirius.LpaStoreAttorney{
+						{
+							Status:          shared.RemovedAttorneyStatus.String(),
+							AppointmentType: shared.OriginalAppointmentType.String(),
+							LpaStorePerson: sirius.LpaStorePerson{
+								Email: "fifth@does.not.exist",
+							},
+						},
+					},
 				}).
 				Return(nil)
 
