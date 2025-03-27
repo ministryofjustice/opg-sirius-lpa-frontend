@@ -281,6 +281,8 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "Pre-registration notices"
 			case "REGISTRATION_NOTICES":
 				return "Registration notices"
+			case "RESTRICTIONS_AND_CONDITIONS":
+				return "Restrictions and conditions"
 			case "":
 				return "Not specified"
 			default:

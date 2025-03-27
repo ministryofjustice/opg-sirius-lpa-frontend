@@ -193,7 +193,51 @@ const progressIndicators = {
             { indicator: "ATTORNEY_SIGNATURES", status: "CANNOT_START" },
             { indicator: "PREREGISTRATION_NOTICES", status: "CANNOT_START" },
             { indicator: "REGISTRATION_NOTICES", status: "CANNOT_START" },
+            {
+              indicator: "RESTRICTIONS_AND_CONDITIONS",
+              status: "CANNOT_START",
+            },
           ],
+        },
+      },
+    );
+  },
+  async defaultCannotStart(digitalLpaUid, progressIndicators) {
+    const progressIndicatorTypes = [
+      "FEES",
+      "DONOR_ID",
+      "CERTIFICATE_PROVIDER_ID",
+      "CERTIFICATE_PROVIDER_SIGNATURE",
+      "ATTORNEY_SIGNATURES",
+      "PREREGISTRATION_NOTICES",
+      "REGISTRATION_NOTICES",
+      "RESTRICTIONS_AND_CONDITIONS",
+    ];
+
+    let allProgressIndicators = progressIndicators;
+
+    progressIndicatorTypes.forEach((progressIndicatorType) => {
+      const exists = allProgressIndicators.find(
+        (progressIndicator) =>
+          progressIndicator.indicator === progressIndicatorType,
+      );
+
+      if (!exists) {
+        allProgressIndicators.push({
+          indicator: progressIndicatorType,
+          status: "CANNOT_START",
+        });
+      }
+    });
+
+    await addMock(
+      `/lpa-api/v1/digital-lpas/${digitalLpaUid}/progress-indicators`,
+      "GET",
+      {
+        status: 200,
+        body: {
+          digitalLpaUid: digitalLpaUid,
+          progressIndicators: allProgressIndicators,
         },
       },
     );
