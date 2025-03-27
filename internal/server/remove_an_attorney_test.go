@@ -1,14 +1,15 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockRemoveAnAttorneyClient struct {
@@ -246,7 +247,7 @@ func TestGetRemoveAnAttorneyGetCaseSummaryFails(t *testing.T) {
 	client := &mockRemoveAnAttorneyClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
-		Return(caseSummary, expectedError)
+		Return(caseSummary, errExample)
 
 	removeTemplate := &mockTemplate{}
 	removeTemplate.
@@ -260,7 +261,7 @@ func TestGetRemoveAnAttorneyGetCaseSummaryFails(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-1111-2222-3333/remove-an-attorney", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestGetRemoveAnAttorneyTemplateErrors(t *testing.T) {
@@ -277,7 +278,7 @@ func TestGetRemoveAnAttorneyTemplateErrors(t *testing.T) {
 			InactiveAttorneys: inactiveAttorneys,
 			Error:             sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	confirmTemplate := &mockTemplate{}
 
@@ -286,7 +287,7 @@ func TestGetRemoveAnAttorneyTemplateErrors(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-1111-2222-3333/remove-an-attorney", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestPostRemoveAnAttorneyInvalidData(t *testing.T) {

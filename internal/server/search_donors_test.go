@@ -48,12 +48,12 @@ func TestGetSearchDonorsWhenError(t *testing.T) {
 	client := &mockSearchDonorsClient{}
 	client.
 		On("SearchDonors", mock.Anything, "something").
-		Return([]sirius.Person{}, expectedError)
+		Return([]sirius.Person{}, errExample)
 
 	req, _ := http.NewRequest(http.MethodGet, "/?q=something", nil)
 
 	w := httptest.NewRecorder()
 	err := SearchDonors(client)(w, req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }

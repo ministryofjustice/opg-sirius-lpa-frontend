@@ -1,13 +1,14 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockChangeDraftClient struct {
@@ -109,7 +110,7 @@ func TestGetChangeDraft(t *testing.T) {
 				Email:       "a@example.com",
 				PhoneNumber: "077577575757",
 			},
-			errorReturned: expectedError,
+			errorReturned: errExample,
 		},
 	}
 
@@ -153,12 +154,12 @@ func TestGetChangeDraftWhenCaseSummaryErrors(t *testing.T) {
 	client := &mockChangeDraftClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-FFFF-FFFF-FFFF").
-		Return(sirius.CaseSummary{}, expectedError)
+		Return(sirius.CaseSummary{}, errExample)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 
-	assertChangeDraftErrors(t, client, "M-FFFF-FFFF-FFFF", expectedError)
+	assertChangeDraftErrors(t, client, "M-FFFF-FFFF-FFFF", errExample)
 }
 
 func TestGetChangeDraftWhenRefDataByCategoryErrors(t *testing.T) {
@@ -168,9 +169,9 @@ func TestGetChangeDraftWhenRefDataByCategoryErrors(t *testing.T) {
 		Return(testChangeDraftCaseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
-		Return([]sirius.RefDataItem{}, expectedError)
+		Return([]sirius.RefDataItem{}, errExample)
 
-	assertChangeDraftErrors(t, client, "M-FFFF-FFFF-FFFF", expectedError)
+	assertChangeDraftErrors(t, client, "M-FFFF-FFFF-FFFF", errExample)
 }
 
 func assertChangeDraftErrors(t *testing.T, client *mockChangeDraftClient, uid string, expectedError error) {
@@ -196,8 +197,8 @@ func TestPostChangeDraft(t *testing.T) {
 		},
 		{
 			name:          "Post form returns an API failure",
-			apiError:      expectedError,
-			expectedError: expectedError,
+			apiError:      errExample,
+			expectedError: errExample,
 		},
 	}
 	for _, tc := range tests {

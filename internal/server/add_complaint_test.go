@@ -121,7 +121,7 @@ func TestGetAddComplaintWhenCaseErrors(t *testing.T) {
 	client := &mockAddComplaintClient{}
 	client.
 		On("Case", mock.Anything, 123).
-		Return(sirius.Case{}, expectedError)
+		Return(sirius.Case{}, errExample)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
 		Return(demoComplainantCategories, nil)
@@ -136,7 +136,7 @@ func TestGetAddComplaintWhenCaseErrors(t *testing.T) {
 
 	err := AddComplaint(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -147,7 +147,7 @@ func TestGetAddComplaintWhenRefDataErrors(t *testing.T) {
 		Return(sirius.Case{CaseType: "LPA", UID: "7000"}, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
-		Return([]sirius.RefDataItem{}, expectedError)
+		Return([]sirius.RefDataItem{}, errExample)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
 		Return(demoComplaintOrigins, nil).
@@ -159,7 +159,7 @@ func TestGetAddComplaintWhenRefDataErrors(t *testing.T) {
 
 	err := AddComplaint(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -185,14 +185,14 @@ func TestGetAddComplaintWhenTemplateErrors(t *testing.T) {
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := AddComplaint(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -327,7 +327,7 @@ func TestPostAddComplaintWhenAddComplaintOtherError(t *testing.T) {
 		Return(demoComplaintCategories, nil)
 	client.
 		On("AddComplaint", mock.Anything, 123, sirius.CaseTypeLpa, complaint).
-		Return(expectedError)
+		Return(errExample)
 
 	form := url.Values{
 		"description": {"This is a complaint"},
@@ -339,6 +339,6 @@ func TestPostAddComplaintWhenAddComplaintOtherError(t *testing.T) {
 
 	err := AddComplaint(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }

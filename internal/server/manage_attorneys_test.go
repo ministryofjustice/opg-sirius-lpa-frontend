@@ -1,13 +1,14 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockManageAttorneysClient struct {
@@ -55,7 +56,7 @@ func TestGetManageAttorneysGetCaseSummaryFails(t *testing.T) {
 	client := &mockManageAttorneysClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
-		Return(caseSummary, expectedError)
+		Return(caseSummary, errExample)
 
 	template := &mockTemplate{}
 	template.
@@ -67,7 +68,7 @@ func TestGetManageAttorneysGetCaseSummaryFails(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-1111-2222-3333/manage-attorneys", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestGetManageAttorneysTemplateErrors(t *testing.T) {
@@ -88,14 +89,14 @@ func TestGetManageAttorneysTemplateErrors(t *testing.T) {
 			CaseSummary: caseSummary,
 			Error:       sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	server := newMockServer("/lpa/{uid}/manage-attorneys", ManageAttorneys(client, template.Func))
 
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-1111-2222-3333/manage-attorneys", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestPostManageAttorneysInvalidData(t *testing.T) {

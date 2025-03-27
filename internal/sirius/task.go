@@ -55,7 +55,7 @@ func (c *Client) TasksForCase(ctx Context, caseId int) ([]Task, error) {
 		return nil, err
 	}
 
-	defer resp.Body.Close() //#nosec G307 false positive
+	defer resp.Body.Close() //nolint:errcheck // no need to check error when closing body
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, newStatusError(resp)

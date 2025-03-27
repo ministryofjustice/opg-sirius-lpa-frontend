@@ -81,14 +81,14 @@ func TestGetEditDatesWhenCaseErrors(t *testing.T) {
 	client := &mockEditDatesClient{}
 	client.
 		On("Case", mock.Anything, 123).
-		Return(caseitem, expectedError)
+		Return(caseitem, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := EditDates(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -105,14 +105,14 @@ func TestGetEditDatesWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, editDatesData{
 			Entity: "PFA 700700",
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := EditDates(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -178,7 +178,7 @@ func TestPostEditDatesWhenEditDatesErrors(t *testing.T) {
 		On("EditDates", mock.Anything, 123, sirius.CaseTypeLpa, sirius.Dates{
 			RegistrationDate: sirius.DateString("2022-01-03"),
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	form := url.Values{
 		"registrationDate": {"2022-01-03"},
@@ -190,7 +190,7 @@ func TestPostEditDatesWhenEditDatesErrors(t *testing.T) {
 
 	err := EditDates(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 

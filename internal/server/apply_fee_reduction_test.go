@@ -103,7 +103,7 @@ func TestApplyFeeReductionWhenFailureOnGetCase(t *testing.T) {
 	client := &mockApplyFeeReductionClient{}
 	client.
 		On("Case", mock.Anything, 4).
-		Return(sirius.Case{}, expectedError)
+		Return(sirius.Case{}, errExample)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return(feeReductionTypes, nil)
@@ -113,7 +113,7 @@ func TestApplyFeeReductionWhenFailureOnGetCase(t *testing.T) {
 
 	err := ApplyFeeReduction(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -145,14 +145,14 @@ func TestApplyFeeReductionWhenTemplateErrors(t *testing.T) {
 			FeeReductionTypes: feeReductionTypes,
 			ReturnUrl:         "/payments/222",
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=222", nil)
 	w := httptest.NewRecorder()
 
 	err := ApplyFeeReduction(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -168,14 +168,14 @@ func TestApplyFeeReductionWhenFailureOnGetFeeReductionTypesRefData(t *testing.T)
 		Return(caseItem, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
-		Return([]sirius.RefDataItem{}, expectedError)
+		Return([]sirius.RefDataItem{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := ApplyFeeReduction(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 

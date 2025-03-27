@@ -71,7 +71,7 @@ func TestGetDeleteRelationshipWhenPersonErrors(t *testing.T) {
 	client := &mockDeleteRelationshipClient{}
 	client.
 		On("Person", mock.Anything, 123).
-		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, expectedError)
+		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, errExample)
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ReferenceID: 1}}, nil)
@@ -81,7 +81,7 @@ func TestGetDeleteRelationshipWhenPersonErrors(t *testing.T) {
 
 	err := DeleteRelationship(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -92,14 +92,14 @@ func TestGetDeleteRelationshipWhenPersonReferencesErrors(t *testing.T) {
 		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 123).
-		Return([]sirius.PersonReference{{ReferenceID: 1}}, expectedError)
+		Return([]sirius.PersonReference{{ReferenceID: 1}}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := DeleteRelationship(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -118,14 +118,14 @@ func TestGetDeleteRelationshipWhenTemplateErrors(t *testing.T) {
 			Entity:           "John Doe",
 			PersonReferences: []sirius.PersonReference{{ReferenceID: 1}},
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := DeleteRelationship(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -170,7 +170,7 @@ func TestPostDeleteRelationshipWhenDeletePersonReferenceErrors(t *testing.T) {
 	client := &mockDeleteRelationshipClient{}
 	client.
 		On("DeletePersonReference", mock.Anything, 1).
-		Return(expectedError)
+		Return(errExample)
 
 	form := url.Values{
 		"reference-id": {"1"},
@@ -182,7 +182,7 @@ func TestPostDeleteRelationshipWhenDeletePersonReferenceErrors(t *testing.T) {
 
 	err := DeleteRelationship(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 

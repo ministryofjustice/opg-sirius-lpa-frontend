@@ -95,7 +95,7 @@ func TestGetTaskWhenTaskTypeErrors(t *testing.T) {
 	client := &mockTaskClient{}
 	client.
 		On("TaskTypes", mock.Anything).
-		Return([]string{}, expectedError)
+		Return([]string{}, errExample)
 	client.
 		On("Teams", mock.Anything).
 		Return([]sirius.Team{}, nil)
@@ -108,7 +108,7 @@ func TestGetTaskWhenTaskTypeErrors(t *testing.T) {
 
 	err := Task(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestGetTaskWhenTeamsErrors(t *testing.T) {
@@ -118,7 +118,7 @@ func TestGetTaskWhenTeamsErrors(t *testing.T) {
 		Return([]string{}, nil)
 	client.
 		On("Teams", mock.Anything).
-		Return([]sirius.Team{}, expectedError)
+		Return([]sirius.Team{}, errExample)
 	client.
 		On("Case", mock.Anything, mock.Anything).
 		Return(sirius.Case{}, nil)
@@ -128,7 +128,7 @@ func TestGetTaskWhenTeamsErrors(t *testing.T) {
 
 	err := Task(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestGetTaskWhenCaseErrors(t *testing.T) {
@@ -141,14 +141,14 @@ func TestGetTaskWhenCaseErrors(t *testing.T) {
 		Return([]sirius.Team{}, nil)
 	client.
 		On("Case", mock.Anything, mock.Anything).
-		Return(sirius.Case{}, expectedError)
+		Return(sirius.Case{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := Task(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestGetTaskWhenTemplateErrors(t *testing.T) {
@@ -166,14 +166,14 @@ func TestGetTaskWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, mock.Anything).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := Task(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestPostTask(t *testing.T) {
@@ -308,7 +308,7 @@ func TestGetTaskWhenGetUserDetailsErrors(t *testing.T) {
 		Return(nil)
 	client.
 		On("GetUserDetails", mock.Anything).
-		Return(sirius.User{}, expectedError)
+		Return(sirius.User{}, errExample)
 
 	template := &mockTemplate{}
 	template.
@@ -336,7 +336,7 @@ func TestGetTaskWhenGetUserDetailsErrors(t *testing.T) {
 
 	err := Task(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestPostTaskWhenCreateTaskFails(t *testing.T) {
@@ -352,7 +352,7 @@ func TestPostTaskWhenCreateTaskFails(t *testing.T) {
 		Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
 	client.
 		On("CreateTask", mock.Anything, mock.Anything, mock.Anything).
-		Return(expectedError)
+		Return(errExample)
 
 	template := &mockTemplate{}
 	template.
@@ -377,7 +377,7 @@ func TestPostTaskWhenCreateTaskFails(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	err := Task(client, template.Func)(w, r)
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestPostTaskWhenAssignToNotSet(t *testing.T) {

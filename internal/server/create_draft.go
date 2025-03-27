@@ -132,10 +132,11 @@ func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 				CorrespondenceLargeFormat: data.Form.CorrespondenceLargeFormat,
 			}
 
-			if data.Form.Recipient == "donor-other-address" {
+			switch data.Form.Recipient {
+			case "donor-other-address":
 				correspondentAddress := data.Form.AlternativeAddress
 				compiledDraft.CorrespondentAddress = &correspondentAddress
-			} else if data.Form.Recipient == "other" {
+			case "other":
 				correspondentAddress := data.Form.CorrespondentAddress
 				compiledDraft.CorrespondentAddress = &correspondentAddress
 				compiledDraft.CorrespondentFirstNames = data.Form.CorrespondentFirstname
