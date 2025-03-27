@@ -117,7 +117,7 @@ func TestGetAllocateCasesWhenTeamsErrors(t *testing.T) {
 	client := &mockAllocateCasesClient{}
 	client.
 		On("Teams", mock.Anything).
-		Return([]sirius.Team{}, expectedError)
+		Return([]sirius.Team{}, errExample)
 	client.
 		On("Case", mock.Anything, mock.Anything).
 		Return(sirius.Case{}, nil)
@@ -127,7 +127,7 @@ func TestGetAllocateCasesWhenTeamsErrors(t *testing.T) {
 
 	err := AllocateCases(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -138,14 +138,14 @@ func TestGetAllocateCasesWhenCaseErrors(t *testing.T) {
 		Return([]sirius.Team{}, nil)
 	client.
 		On("Case", mock.Anything, mock.Anything).
-		Return(sirius.Case{}, expectedError)
+		Return(sirius.Case{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := AllocateCases(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -161,14 +161,14 @@ func TestGetAllocateCasesWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, mock.Anything).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := AllocateCases(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -271,7 +271,7 @@ func TestPostAllocateCasesWhenAllocateCasesFails(t *testing.T) {
 		Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
 	client.
 		On("AllocateCases", mock.Anything, 66, []sirius.CaseAllocation{{ID: 123, CaseType: "LPA"}}).
-		Return(expectedError)
+		Return(errExample)
 
 	form := url.Values{
 		"assignTo":     {"user"},
@@ -284,7 +284,7 @@ func TestPostAllocateCasesWhenAllocateCasesFails(t *testing.T) {
 
 	err := AllocateCases(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 

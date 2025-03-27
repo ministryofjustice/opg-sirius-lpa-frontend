@@ -1,13 +1,14 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockManageRestrictionsClient struct {
@@ -59,12 +60,12 @@ func TestGetManageRestrictionsCases(t *testing.T) {
 			name:          "Get case summary errors",
 			caseSummary:   sirius.CaseSummary{},
 			templateError: nil,
-			expectedError: expectedError,
+			expectedError: errExample,
 		},
 		{
 			name:          "Template errors",
 			caseSummary:   restrictionsCaseSummary,
-			templateError: expectedError,
+			templateError: errExample,
 			expectedError: nil,
 		},
 	}

@@ -20,7 +20,7 @@ import (
 
 const formUrlEncoded = "application/x-www-form-urlencoded"
 
-var expectedError = errors.New("error")
+var errExample = errors.New("error")
 
 type mockTemplate struct {
 	mock.Mock

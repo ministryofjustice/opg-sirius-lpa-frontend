@@ -90,14 +90,14 @@ func TestGetChangeStatusWhenCaseErrors(t *testing.T) {
 	client := &mockChangeStatusClient{}
 	client.
 		On("Case", mock.Anything, 123).
-		Return(caseitem, expectedError)
+		Return(caseitem, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := ChangeStatus(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -111,14 +111,14 @@ func TestGetChangeStatusWhenAvailableStatusesErrors(t *testing.T) {
 
 	client.
 		On("AvailableStatuses", mock.Anything, 123, sirius.CaseTypeLpa).
-		Return([]string{}, expectedError)
+		Return([]string{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := ChangeStatus(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -140,14 +140,14 @@ func TestGetChangeStatusWhenTemplateErrors(t *testing.T) {
 			Entity:            "PFA 700700",
 			AvailableStatuses: []string{"Cancelled", "Withdrawn"},
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := ChangeStatus(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -207,7 +207,7 @@ func TestPostChangeStatusWhenChangeStatusErrors(t *testing.T) {
 		On("EditCase", mock.Anything, 123, sirius.CaseTypeLpa, sirius.Case{
 			Status: "Withdrawn",
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	client.
 		On("Case", mock.Anything, 123).
@@ -227,6 +227,6 @@ func TestPostChangeStatusWhenChangeStatusErrors(t *testing.T) {
 
 	err := ChangeStatus(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }

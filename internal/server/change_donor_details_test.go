@@ -1,14 +1,15 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockChangeDonorDetailsClient struct {
@@ -118,9 +119,9 @@ func TestGetChangeDonorDetailsWhenCaseSummaryErrors(t *testing.T) {
 	client := &mockChangeDonorDetailsClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-EEEE-EEEE-EEEE").
-		Return(sirius.CaseSummary{}, expectedError)
+		Return(sirius.CaseSummary{}, errExample)
 
-	assertChangeDonorDetailsErrors(t, client, "M-EEEE-EEEE-EEEE", expectedError)
+	assertChangeDonorDetailsErrors(t, client, "M-EEEE-EEEE-EEEE", errExample)
 }
 
 func TestGetChangeDonorDetailsWhenRefDataByCategoryErrors(t *testing.T) {
@@ -130,9 +131,9 @@ func TestGetChangeDonorDetailsWhenRefDataByCategoryErrors(t *testing.T) {
 		Return(testCaseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
-		Return([]sirius.RefDataItem{}, expectedError)
+		Return([]sirius.RefDataItem{}, errExample)
 
-	assertChangeDonorDetailsErrors(t, client, "M-AAAA-1111-BBBB", expectedError)
+	assertChangeDonorDetailsErrors(t, client, "M-AAAA-1111-BBBB", errExample)
 }
 
 func assertChangeDonorDetailsErrors(t *testing.T, client *mockChangeDonorDetailsClient, uid string, expectedError error) {
@@ -175,14 +176,14 @@ func TestGetChangeDonorDetailsWhenTemplateErrors(t *testing.T) {
 					LpaSignedOn: dob{11, 2, 2024},
 				},
 			}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/change-donor-details/?uid=M-AAAA-1111-BBBB", nil)
 	w := httptest.NewRecorder()
 
 	err := ChangeDonorDetails(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -274,7 +275,7 @@ func TestPostChangeDonorDetailsWhenAPIFails(t *testing.T) {
 			Email:       "test@test.com",
 			LpaSignedOn: "2024-10-09",
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	template := &mockTemplate{}
 
@@ -303,7 +304,7 @@ func TestPostChangeDonorDetailsWhenAPIFails(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	err := ChangeDonorDetails(client, template.Func)(w, r)
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 

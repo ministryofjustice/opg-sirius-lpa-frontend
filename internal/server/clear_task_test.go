@@ -1,14 +1,15 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockClearTaskClient struct {
@@ -118,14 +119,14 @@ func TestClearTaskBadQueryString(t *testing.T) {
 }
 
 func TestClearTaskWhenTaskErrors(t *testing.T) {
-	client := setupMockClearTaskClient(123, "7000-0000-0000", "LPA", expectedError)
+	client := setupMockClearTaskClient(123, "7000-0000-0000", "LPA", errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := ClearTask(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -135,14 +136,14 @@ func TestClearTaskWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, mock.Anything).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := ClearTask(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -178,7 +179,7 @@ func TestPostClearTaskWhenValidationErrors(t *testing.T) {
 
 func TestPostClearTaskWhenOtherError(t *testing.T) {
 	client := setupMockClearTaskClient(33, "M-DIGI-0001-0001", "DIGITAL_LPA", nil)
-	client.On("ClearTask", mock.Anything, 33).Return(expectedError)
+	client.On("ClearTask", mock.Anything, 33).Return(errExample)
 
 	form := url.Values{"id": {"33"}}
 
@@ -188,6 +189,6 @@ func TestPostClearTaskWhenOtherError(t *testing.T) {
 
 	err := ClearTask(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }

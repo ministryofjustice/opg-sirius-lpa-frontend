@@ -83,7 +83,7 @@ func TestLinkPersonGetFails(t *testing.T) {
 	client := &mockLinkPersonClient{}
 	client.
 		On("Person", mock.Anything, 123).
-		Return(sirius.Person{}, expectedError)
+		Return(sirius.Person{}, errExample)
 
 	template := &mockTemplate{}
 	template.
@@ -95,7 +95,7 @@ func TestLinkPersonGetFails(t *testing.T) {
 
 	err := LinkPerson(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestLinkPersonTemplateErrors(t *testing.T) {
@@ -111,14 +111,14 @@ func TestLinkPersonTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, linkPersonData{
 			Entity: person,
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := LinkPerson(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestLinkPersonSearch(t *testing.T) {

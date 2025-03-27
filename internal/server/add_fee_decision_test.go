@@ -182,7 +182,7 @@ func TestAddFeeDecisionWhenFailureOnGetCase(t *testing.T) {
 	client := &mockAddFeeDecisionClient{}
 	client.
 		On("Case", mock.Anything, 75757).
-		Return(sirius.Case{}, expectedError)
+		Return(sirius.Case{}, errExample)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
 		Return(feeDecisionTypes, nil)
@@ -192,7 +192,7 @@ func TestAddFeeDecisionWhenFailureOnGetCase(t *testing.T) {
 
 	err := AddFeeDecision(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -217,14 +217,14 @@ func TestAddFeeDecisionWhenTemplateErrors(t *testing.T) {
 			DecisionTypes: feeDecisionTypes,
 			ReturnUrl:     "/payments/111",
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=111", nil)
 	w := httptest.NewRecorder()
 
 	err := AddFeeDecision(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -240,14 +240,14 @@ func TestAddFeeDecisionWhenFailureOnGetRefData(t *testing.T) {
 		Return(caseItem, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
-		Return([]sirius.RefDataItem{}, expectedError)
+		Return([]sirius.RefDataItem{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=232", nil)
 	w := httptest.NewRecorder()
 
 	err := AddFeeDecision(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 

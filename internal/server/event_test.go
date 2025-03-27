@@ -138,7 +138,7 @@ func TestGetEventWhenNoteTypeErrors(t *testing.T) {
 	client := &mockEventClient{}
 	client.
 		On("NoteTypes", mock.Anything).
-		Return([]string{}, expectedError)
+		Return([]string{}, errExample)
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
@@ -148,7 +148,7 @@ func TestGetEventWhenNoteTypeErrors(t *testing.T) {
 
 	err := Event(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestGetEventWhenTemplateErrors(t *testing.T) {
@@ -163,14 +163,14 @@ func TestGetEventWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, mock.Anything).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=person", nil)
 	w := httptest.NewRecorder()
 
 	err := Event(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestPostEvent(t *testing.T) {
@@ -288,7 +288,7 @@ func TestPostEventWhenCreateNoteFails(t *testing.T) {
 		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
 	client.
 		On("CreateNote", mock.Anything, 123, sirius.EntityTypePerson, "Application processing", "Something", "More words", (*sirius.NoteFile)(nil)).
-		Return(expectedError)
+		Return(errExample)
 
 	template := &mockTemplate{}
 	template.
@@ -312,7 +312,7 @@ func TestPostEventWhenCreateNoteFails(t *testing.T) {
 
 	err := Event(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestPostEventWhenValidationError(t *testing.T) {

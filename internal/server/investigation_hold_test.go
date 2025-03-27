@@ -83,14 +83,14 @@ func TestInvestigationOnHoldWhenGetInvestigationErrors(t *testing.T) {
 	client := &mockInvestigationHoldClient{}
 	client.
 		On("Investigation", mock.Anything, 123).
-		Return(sirius.Investigation{}, expectedError)
+		Return(sirius.Investigation{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := InvestigationHold(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -110,14 +110,14 @@ func TestGetPlaceInvestigationOnHoldWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, investigationHoldData{
 			Investigation: investigation,
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := InvestigationHold(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -213,7 +213,7 @@ func TestPostPlaceInvestigationOnHoldWhenOtherError(t *testing.T) {
 		On("Investigation", mock.Anything, 123).
 		Return(investigation, nil).
 		On("PlaceInvestigationOnHold", mock.Anything, 123, "Police Investigation").
-		Return(expectedError)
+		Return(errExample)
 
 	form := url.Values{
 		"reason": {"Police Investigation"},
@@ -225,7 +225,7 @@ func TestPostPlaceInvestigationOnHoldWhenOtherError(t *testing.T) {
 
 	err := InvestigationHold(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -448,7 +448,7 @@ func TestPostTakeInvestigationOffHoldWhenOtherError(t *testing.T) {
 		On("Investigation", mock.Anything, 123).
 		Return(investigation, nil).
 		On("TakeInvestigationOffHold", mock.Anything, 1).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", nil)
 	r.Header.Add("Content-Type", formUrlEncoded)
@@ -456,6 +456,6 @@ func TestPostTakeInvestigationOffHoldWhenOtherError(t *testing.T) {
 
 	err := InvestigationHold(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }

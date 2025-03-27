@@ -144,7 +144,7 @@ func TestPostEditDonorWhenAPIFails(t *testing.T) {
 			Firstname: "Rudolph",
 			Surname:   "Stotesbury",
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	template := &mockTemplate{}
 
@@ -158,7 +158,7 @@ func TestPostEditDonorWhenAPIFails(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	err := EditDonor(client, template.Func)(w, r)
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 

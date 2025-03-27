@@ -37,28 +37,28 @@ func TestGetUpdateDecisionsGet(t *testing.T) {
 			updateDecisionsData{
 				Form: formDecisionsDetails{},
 			}).
-		Return(expectedError)
+		Return(errExample)
 
 	server := newMockServer("/lpa/{uid}/update-decisions", UpdateDecisions(client, template.Func))
 
 	r, _ := http.NewRequest(http.MethodGet, "/lpa/M-1111-2222-3333/update-decisions", nil)
 	_, err := server.serve(r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestGetUpdateDecisionsGetWhenCaseSummaryErrors(t *testing.T) {
 	client := &mockUpdateDecisionsClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
-		Return(sirius.CaseSummary{}, expectedError)
+		Return(sirius.CaseSummary{}, errExample)
 
 	server := newMockServer("/lpa/{uid}/update-decisions", UpdateDecisions(client, nil))
 
 	r, _ := http.NewRequest(http.MethodGet, "/lpa/M-1111-2222-3333/update-decisions", nil)
 	_, err := server.serve(r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestPostUpdateDecisions(t *testing.T) {
@@ -70,8 +70,8 @@ func TestPostUpdateDecisions(t *testing.T) {
 			expectedError: RedirectError("/lpa/M-1111-2222-3333/lpa-details"),
 		},
 		"failure": {
-			updateError:   expectedError,
-			expectedError: expectedError,
+			updateError:   errExample,
+			expectedError: errExample,
 		},
 	}
 

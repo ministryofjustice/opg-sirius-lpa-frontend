@@ -91,14 +91,14 @@ func TestUnlinkPersonsWhenFailure(t *testing.T) {
 	client := &mockUnlinkPerson{}
 	client.
 		On("Person", mock.Anything, 189).
-		Return(sirius.Person{}, expectedError)
+		Return(sirius.Person{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=189", nil)
 	w := httptest.NewRecorder()
 
 	err := UnlinkPerson(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -115,14 +115,14 @@ func TestUnlinkPersonWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, unlinkPersonData{
 			Person: person,
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=189", nil)
 	w := httptest.NewRecorder()
 
 	err := UnlinkPerson(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 

@@ -54,12 +54,12 @@ func TestGetPostcodeLookupWhenError(t *testing.T) {
 	client := &mockPostcodeLookupClient{}
 	client.
 		On("PostcodeLookup", mock.Anything, "SW1A 0AA").
-		Return([]sirius.PostcodeLookupAddress{}, expectedError)
+		Return([]sirius.PostcodeLookupAddress{}, errExample)
 
 	req, _ := http.NewRequest(http.MethodGet, "/?postcode=SW1A 0AA", nil)
 
 	w := httptest.NewRecorder()
 	err := SearchPostcode(client)(w, req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }

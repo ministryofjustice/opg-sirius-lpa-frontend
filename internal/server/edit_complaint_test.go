@@ -106,7 +106,7 @@ func TestGetEditComplaintWhenRefDataErrors(t *testing.T) {
 	client := &mockEditComplaintClient{}
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
-		Return(demoComplainantCategories, expectedError)
+		Return(demoComplainantCategories, errExample)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
 		Return(demoCompensationTypes, nil)
@@ -124,7 +124,7 @@ func TestGetEditComplaintWhenRefDataErrors(t *testing.T) {
 
 	err := EditComplaint(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -143,14 +143,14 @@ func TestGetEditComplaintWhenComplaintErrors(t *testing.T) {
 		Return(demoComplaintCategories, nil)
 	client.
 		On("Complaint", mock.Anything, 123).
-		Return(sirius.Complaint{}, expectedError)
+		Return(sirius.Complaint{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := EditComplaint(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -179,14 +179,14 @@ func TestGetEditComplaintWhenTemplateErrors(t *testing.T) {
 			Origins:               demoComplaintOrigins,
 			CompensationTypes:     demoCompensationTypes,
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := EditComplaint(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -339,7 +339,7 @@ func TestPostEditComplaintWhenEditComplaintOtherError(t *testing.T) {
 		Return(complaint, nil)
 	client.
 		On("EditComplaint", mock.Anything, 123, complaint).
-		Return(expectedError)
+		Return(errExample)
 
 	form := url.Values{
 		"description": {"This is a complaint"},
@@ -351,6 +351,6 @@ func TestPostEditComplaintWhenEditComplaintOtherError(t *testing.T) {
 
 	err := EditComplaint(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }

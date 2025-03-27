@@ -105,7 +105,7 @@ func TestEditPaymentWhenFailureOnGetPaymentByID(t *testing.T) {
 	client := &mockEditPaymentClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
-		Return(sirius.Payment{}, expectedError).
+		Return(sirius.Payment{}, errExample).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil)
 
@@ -114,7 +114,7 @@ func TestEditPaymentWhenFailureOnGetPaymentByID(t *testing.T) {
 
 	err := EditPayment(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -142,14 +142,14 @@ func TestEditPaymentWhenFailureOnGetCase(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil).
 		On("Case", mock.Anything, 4).
-		Return(sirius.Case{}, expectedError)
+		Return(sirius.Case{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := EditPayment(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -176,14 +176,14 @@ func TestEditPaymentWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 		Return(payment, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
-		Return([]sirius.RefDataItem{}, expectedError)
+		Return([]sirius.RefDataItem{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := EditPayment(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -230,14 +230,14 @@ func TestEditPaymentWhenTemplateErrors(t *testing.T) {
 			PaymentDate:    sirius.DateString("2022-07-23"),
 			PaymentSources: paymentSources,
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := EditPayment(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 

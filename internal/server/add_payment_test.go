@@ -105,7 +105,7 @@ func TestAddPaymentWhenFailureOnGetCase(t *testing.T) {
 	client := &mockAddPaymentClient{}
 	client.
 		On("Case", mock.Anything, 4).
-		Return(sirius.Case{}, expectedError)
+		Return(sirius.Case{}, errExample)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil)
@@ -115,7 +115,7 @@ func TestAddPaymentWhenFailureOnGetCase(t *testing.T) {
 
 	err := AddPayment(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -148,14 +148,14 @@ func TestAddPaymentWhenTemplateErrors(t *testing.T) {
 			PaymentSources: paymentSources,
 			ReturnUrl:      "/payments/123",
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := AddPayment(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -171,14 +171,14 @@ func TestAddPaymentWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 		Return(caseItem, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
-		Return([]sirius.RefDataItem{}, expectedError)
+		Return([]sirius.RefDataItem{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := AddPayment(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 

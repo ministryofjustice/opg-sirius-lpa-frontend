@@ -89,7 +89,7 @@ func (c *Client) get(ctx Context, path string, v interface{}) error {
 		return err
 	}
 
-	defer resp.Body.Close() //#nosec G307 false positive
+	defer resp.Body.Close() //nolint:errcheck // no need to check error when closing body
 
 	if resp.StatusCode != http.StatusOK {
 		return newStatusError(resp)
@@ -117,7 +117,7 @@ func (c *Client) post(ctx Context, path string, body interface{}, response inter
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close() //#nosec G307 false positive
+	defer resp.Body.Close() //nolint:errcheck // no need to check error when closing body
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v ValidationError
@@ -168,7 +168,7 @@ func (c *Client) put(ctx Context, path string, body interface{}, response interf
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close() //#nosec G307 false positive
+	defer resp.Body.Close() //nolint:errcheck // no need to check error when closing body
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v ValidationError
@@ -208,7 +208,7 @@ func (c *Client) delete(ctx Context, path string) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close() //#nosec G307 false positive
+	defer resp.Body.Close() //nolint:errcheck // no need to check error when closing body
 
 	if resp.StatusCode != http.StatusNoContent {
 		return newStatusError(resp)

@@ -123,7 +123,7 @@ func TestGetAssignTaskWhenTeamsErrors(t *testing.T) {
 	client := &mockAssignTaskClient{}
 	client.
 		On("Teams", mock.Anything).
-		Return([]sirius.Team{}, expectedError)
+		Return([]sirius.Team{}, errExample)
 	client.
 		On("Task", mock.Anything, mock.Anything).
 		Return(sirius.Task{Name: "A task", CaseItems: []sirius.Case{{UID: "7000-0000-0000", CaseType: "LPA"}}}, nil)
@@ -133,7 +133,7 @@ func TestGetAssignTaskWhenTeamsErrors(t *testing.T) {
 
 	err := AssignTask(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -144,14 +144,14 @@ func TestGetAssignTaskWhenTaskErrors(t *testing.T) {
 		Return([]sirius.Team{}, nil)
 	client.
 		On("Task", mock.Anything, mock.Anything).
-		Return(sirius.Task{Name: "A task", CaseItems: []sirius.Case{{UID: "7000-0000-0000", CaseType: "LPA"}}}, expectedError)
+		Return(sirius.Task{Name: "A task", CaseItems: []sirius.Case{{UID: "7000-0000-0000", CaseType: "LPA"}}}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := AssignTask(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -167,14 +167,14 @@ func TestGetAssignTaskWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, mock.Anything).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := AssignTask(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -275,7 +275,7 @@ func TestPostAssignTaskWhenUserDetailsErrors(t *testing.T) {
 		Return(nil)
 	client.
 		On("GetUserDetails", mock.Anything).
-		Return(sirius.User{}, expectedError)
+		Return(sirius.User{}, errExample)
 
 	template := &mockTemplate{}
 	template.
@@ -298,7 +298,7 @@ func TestPostAssignTaskWhenUserDetailsErrors(t *testing.T) {
 
 	err := AssignTask(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestPostAssignTaskMultiple(t *testing.T) {
@@ -359,7 +359,7 @@ func TestPostAssignTaskWhenAssignTaskFails(t *testing.T) {
 		Return(sirius.Task{Name: "A task", CaseItems: []sirius.Case{{UID: "7000-0000-0000", CaseType: "LPA"}}}, nil)
 	client.
 		On("AssignTasks", mock.Anything, 66, []int{123}).
-		Return(expectedError)
+		Return(errExample)
 
 	form := url.Values{
 		"assignTo":     {"user"},
@@ -372,7 +372,7 @@ func TestPostAssignTaskWhenAssignTaskFails(t *testing.T) {
 
 	err := AssignTask(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 

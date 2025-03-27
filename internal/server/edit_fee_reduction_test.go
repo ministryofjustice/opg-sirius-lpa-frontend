@@ -101,7 +101,7 @@ func TestEditFeeReductionWhenFailureOnGetPaymentByID(t *testing.T) {
 	client := &mockEditFeeReductionClient{}
 	client.
 		On("PaymentByID", mock.Anything, 123).
-		Return(sirius.Payment{}, expectedError).
+		Return(sirius.Payment{}, errExample).
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return(feeReductionTypes, nil)
 
@@ -110,7 +110,7 @@ func TestEditFeeReductionWhenFailureOnGetPaymentByID(t *testing.T) {
 
 	err := EditFeeReduction(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -138,14 +138,14 @@ func TestEditFeeReductionWhenFailureOnGetCase(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return(feeReductionTypes, nil).
 		On("Case", mock.Anything, 4).
-		Return(sirius.Case{}, expectedError)
+		Return(sirius.Case{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := EditFeeReduction(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -171,14 +171,14 @@ func TestEditFeeReductionWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil).
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
-		Return([]sirius.RefDataItem{}, expectedError)
+		Return([]sirius.RefDataItem{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := EditFeeReduction(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -221,14 +221,14 @@ func TestEditFeeReductionWhenTemplateErrors(t *testing.T) {
 			FeeReduction:      feeReduction,
 			FeeReductionTypes: feeReductionTypes,
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
 	err := EditFeeReduction(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 

@@ -267,14 +267,14 @@ func TestGetCreateDocumentWhenCaseErrors(t *testing.T) {
 	client := &mockCreateDocumentClient{}
 	client.
 		On("Case", mock.Anything, 123).
-		Return(sirius.Case{}, expectedError)
+		Return(sirius.Case{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := CreateDocument(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -287,14 +287,14 @@ func TestGetCreateDocumentWhenFailureOnGetDocumentTemplates(t *testing.T) {
 		Return(caseItem, nil)
 	client.
 		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
-		Return([]sirius.DocumentTemplateData{}, expectedError)
+		Return([]sirius.DocumentTemplateData{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := CreateDocument(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -325,14 +325,14 @@ func TestGetCreateDocumentWhenTemplateErrors(t *testing.T) {
 			ComponentDocumentData: buildComponentDocumentData(documentTemplateData),
 			Back:                  "/create-document?id=0&case=lpa",
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := CreateDocument(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 

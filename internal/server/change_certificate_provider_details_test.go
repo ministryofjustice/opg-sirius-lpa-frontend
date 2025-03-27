@@ -2,13 +2,14 @@ package server
 
 import (
 	"fmt"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 type mockChangeCertificateProviderDetailsClient struct {
@@ -121,7 +122,7 @@ func TestGetChangeCertificateProviderDetailsCaseSummaryError(t *testing.T) {
 	client := &mockChangeCertificateProviderDetailsClient{}
 	client.
 		On("CaseSummary", mock.Anything, caseUid).
-		Return(caseSummary, expectedError)
+		Return(caseSummary, errExample)
 
 	template := &mockTemplate{}
 	template.
@@ -140,7 +141,7 @@ func TestGetChangeCertificateProviderDetailsCaseSummaryError(t *testing.T) {
 	)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestGetChangeCertificateProviderDetailsRefDataByCategoryError(t *testing.T) {
@@ -154,7 +155,7 @@ func TestGetChangeCertificateProviderDetailsRefDataByCategoryError(t *testing.T)
 		Return(caseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
-		Return([]sirius.RefDataItem{}, expectedError)
+		Return([]sirius.RefDataItem{}, errExample)
 
 	template := &mockTemplate{}
 	template.
@@ -173,7 +174,7 @@ func TestGetChangeCertificateProviderDetailsRefDataByCategoryError(t *testing.T)
 	)
 	_, err := server.serve(req)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 }
 
 func TestPostChangeCertificateProviderDetailsValidationError(t *testing.T) {

@@ -129,14 +129,14 @@ func TestGetMiReportingWhenConfigErrors(t *testing.T) {
 	client := &mockMiReportingClient{}
 	client.
 		On("MiConfig", mock.Anything).
-		Return(nil, expectedError)
+		Return(nil, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
 	err := MiReporting(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -160,14 +160,14 @@ func TestGetMiReportingWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, miReportingData{
 			ReportTypes: reportTypes,
 		}).
-		Return(expectedError)
+		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
 	err := MiReporting(client, template.Func)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -217,7 +217,7 @@ func TestPostMiReportingWhenError(t *testing.T) {
 	client := &mockMiReportingClient{}
 	client.
 		On("MiReport", mock.Anything, url.Values{}).
-		Return(nil, expectedError)
+		Return(nil, errExample)
 
 	r, _ := http.NewRequest(http.MethodPost, "/", strings.NewReader(""))
 	r.Header.Add("Content-Type", formUrlEncoded)
@@ -225,6 +225,6 @@ func TestPostMiReportingWhenError(t *testing.T) {
 
 	err := MiReporting(client, nil)(w, r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }

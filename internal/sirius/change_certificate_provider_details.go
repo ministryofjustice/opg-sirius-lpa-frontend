@@ -36,7 +36,7 @@ func (c *Client) ChangeCertificateProviderDetails(ctx Context, caseUID string, c
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck // no need to check error when closing body
 
 	if resp.StatusCode == http.StatusBadRequest {
 		var v ValidationError
