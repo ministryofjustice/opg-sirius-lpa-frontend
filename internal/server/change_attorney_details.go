@@ -139,7 +139,7 @@ func ChangeAttorneyDetails(client ChangeAttorneyDetailsClient, tmpl template.Tem
 				data.Success = true
 
 				SetFlash(w, FlashNotification{
-					Title: "Changes confirmed",
+					Title: "Update saved",
 				})
 
 				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))

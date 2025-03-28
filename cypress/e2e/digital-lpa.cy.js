@@ -692,7 +692,7 @@ describe("View a digital LPA", () => {
     cy.contains("Jointly for some").click();
     cy.get("#f-howAttorneysMakeDecisionsDetails").type("This way");
     cy.contains("Continue").click();
-    cy.contains("Changes confirmed");
+    cy.contains("Update saved");
   });
 
   it("shows channel for donor", () => {
@@ -753,7 +753,7 @@ describe("View a digital LPA", () => {
       .should("contain", "Signed on")
       .and("contain", "18 December 2022")
       .find("#f-change-certificate-provider-details")
-      .should("contain", "Change");
+      .should("contain", "Update");
   });
 
   it("shows application details when store is empty", () => {

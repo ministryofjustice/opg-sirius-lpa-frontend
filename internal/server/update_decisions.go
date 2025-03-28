@@ -90,7 +90,7 @@ func UpdateDecisions(client UpdateDecisionsClient, tmpl template.Template) Handl
 				data.Success = true
 
 				SetFlash(w, FlashNotification{
-					Title: "Changes confirmed",
+					Title: "Update saved",
 				})
 
 				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
