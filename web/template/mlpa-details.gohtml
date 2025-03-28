@@ -32,7 +32,7 @@
           <dt class="govuk-summary-list__key"></dt>
           <dd class="govuk-summary-list__value"></dd>
           <dd class="govuk-summary-list__actions">
-            <a class="govuk-link" id="f-change-draft" href="{{ prefix (printf "/lpa/%s/change-draft" .CaseSummary.DigitalLpa.UID) }}">Change</a>
+            <a class="govuk-link" id="f-change-draft" href="{{ prefix (printf "/lpa/%s/change-draft" .CaseSummary.DigitalLpa.UID) }}">Update</a>
           </dd>
         </div>
 
@@ -173,7 +173,7 @@
                 <dt class="govuk-summary-list__key"></dt>
                 <dd class="govuk-summary-list__value"></dd>
                 <dd class="govuk-summary-list__actions">
-                  <a class="govuk-link" id="f-update-decisions" href="{{ prefix (printf "/lpa/%s/update-decisions" .CaseSummary.DigitalLpa.UID) }}">Change</a>
+                  <a class="govuk-link" id="f-update-decisions" href="{{ prefix (printf "/lpa/%s/update-decisions" .CaseSummary.DigitalLpa.UID) }}">Update</a>
                 </dd>
               </div>
               {{ if (eq .DigitalLpa.SiriusData.Subtype "personal-welfare")}}
