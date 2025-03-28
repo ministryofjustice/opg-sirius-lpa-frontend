@@ -692,7 +692,7 @@ describe("View a digital LPA", () => {
     cy.contains("Jointly for some").click();
     cy.get("#f-howAttorneysMakeDecisionsDetails").type("This way");
     cy.contains("Continue").click();
-    cy.contains("Changes confirmed");
+    cy.contains("Update saved");
   });
 
   it("shows channel for donor", () => {

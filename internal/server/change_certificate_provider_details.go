@@ -120,7 +120,7 @@ func ChangeCertificateProviderDetails(client ChangeCertificateProviderDetailsCli
 				return err
 			} else {
 				SetFlash(w, FlashNotification{
-					Title: "Changes confirmed",
+					Title: "Update saved",
 				})
 
 				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details#certificate-provider", caseUid))
