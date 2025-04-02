@@ -5,6 +5,8 @@
   "branchPrefix": "renovate-",
   "commitMessageAction": "Renovate Update",
   "labels": ["Dependencies", "Renovate"],
+  "configMigration": true,
+  "postUpdateOptions": ["gomodTidy"],
   "packageRules": [
     {
       "description": [
