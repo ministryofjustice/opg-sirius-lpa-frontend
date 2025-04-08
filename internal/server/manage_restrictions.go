@@ -14,6 +14,7 @@ type ManageRestrictionsClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
 	ClearTask(sirius.Context, int) error
 	UpdateSeveranceStatus(sirius.Context, string, sirius.SeveranceStatusData) error
+	EditSeveranceApplication(sirius.Context, string, sirius.SeveranceApplicationDetails) error
 }
 
 type manageRestrictionsData struct {
@@ -22,6 +23,7 @@ type manageRestrictionsData struct {
 	CaseUID         string
 	CaseSummary     sirius.CaseSummary
 	SeveranceAction string
+	FormAction      string
 	Success         bool
 }
 
@@ -59,6 +61,8 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 			CaseUID:         caseUID,
 		}
 
+		data.FormAction = r.FormValue("action")
+
 		if r.Method == http.MethodPost {
 			taskList := data.CaseSummary.TaskList
 			var taskID int
@@ -69,15 +73,15 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 			}
 
 			switch data.SeveranceAction {
-			case "severance-application-not-required":
-				err = client.UpdateSeveranceStatus(ctx, caseUID, sirius.SeveranceStatusData{
-					SeveranceStatus: "NOT_REQUIRED",
-				})
-				if handleError(w, &data, err) {
-					return err
+			case "donor-consent-given", "donor-consent-not-given":
+				hasDonorConsented := true
+				if data.SeveranceAction == "donor-consent-not-given" {
+					hasDonorConsented = false
 				}
 
-				err := client.ClearTask(ctx, taskID)
+				err := client.EditSeveranceApplication(ctx, caseUID, sirius.SeveranceApplicationDetails{
+					HasDonorConsented: hasDonorConsented,
+				})
 				if handleError(w, &data, err) {
 					return err
 				}
@@ -88,13 +92,23 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 				})
 				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
 
-			case "severance-application-required":
-				err := client.UpdateSeveranceStatus(ctx, caseUID, sirius.SeveranceStatusData{
-					SeveranceStatus: "REQUIRED",
+			case "severance-application-required", "severance-application-not-required":
+				severanceStatus := "REQUIRED"
+				if data.SeveranceAction == "severance-application-not-required" {
+					severanceStatus = "NOT_REQUIRED"
+				}
+				err = client.UpdateSeveranceStatus(ctx, caseUID, sirius.SeveranceStatusData{
+					SeveranceStatus: severanceStatus,
 				})
-
 				if handleError(w, &data, err) {
 					return err
+				}
+
+				if data.SeveranceAction == "severance-application-not-required" {
+					err := client.ClearTask(ctx, taskID)
+					if handleError(w, &data, err) {
+						return err
+					}
 				}
 
 				data.Success = true
