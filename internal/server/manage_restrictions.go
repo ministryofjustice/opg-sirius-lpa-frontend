@@ -14,15 +14,18 @@ type ManageRestrictionsClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
 	ClearTask(sirius.Context, int) error
 	UpdateSeveranceStatus(sirius.Context, string, sirius.SeveranceStatusData) error
+	EditSeveranceApplication(sirius.Context, string, sirius.SeveranceApplicationDetails) error
 }
 
 type manageRestrictionsData struct {
-	XSRFToken       string
-	Error           sirius.ValidationError
-	CaseUID         string
-	CaseSummary     sirius.CaseSummary
-	SeveranceAction string
-	Success         bool
+	XSRFToken         string
+	Error             sirius.ValidationError
+	CaseUID           string
+	CaseSummary       sirius.CaseSummary
+	SeveranceAction   string
+	DonorConsentGiven string
+	FormAction        string
+	Success           bool
 }
 
 func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template) Handler {
@@ -52,11 +55,17 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 		}
 
 		data := manageRestrictionsData{
-			CaseSummary:     cs,
-			SeveranceAction: postFormString(r, "severanceAction"),
-			XSRFToken:       ctx.XSRFToken,
-			Error:           sirius.ValidationError{Field: sirius.FieldErrors{}},
-			CaseUID:         caseUID,
+			CaseSummary:       cs,
+			SeveranceAction:   postFormString(r, "severanceAction"),
+			DonorConsentGiven: postFormString(r, "donorConsentGiven"),
+			XSRFToken:         ctx.XSRFToken,
+			Error:             sirius.ValidationError{Field: sirius.FieldErrors{}},
+			CaseUID:           caseUID,
+		}
+
+		data.FormAction = r.FormValue("action")
+		if data.FormAction == "" && data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceStatus == "REQUIRED" {
+			data.FormAction = "donor-consent"
 		}
 
 		if r.Method == http.MethodPost {
@@ -68,45 +77,59 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 				}
 			}
 
-			switch data.SeveranceAction {
-			case "severance-application-not-required":
-				err = client.UpdateSeveranceStatus(ctx, caseUID, sirius.SeveranceStatusData{
-					SeveranceStatus: "NOT_REQUIRED",
-				})
-				if handleError(w, &data, err) {
-					return err
+			if data.FormAction == "" || data.FormAction == "change-severance-required" {
+				switch data.SeveranceAction {
+				case "severance-application-required", "severance-application-not-required":
+					severanceStatus := "REQUIRED"
+					if data.SeveranceAction == "severance-application-not-required" {
+						severanceStatus = "NOT_REQUIRED"
+					}
+					err = client.UpdateSeveranceStatus(ctx, caseUID, sirius.SeveranceStatusData{
+						SeveranceStatus: severanceStatus,
+					})
+					if handleError(w, &data, err) {
+						return err
+					}
+
+					if data.SeveranceAction == "severance-application-not-required" {
+						err := client.ClearTask(ctx, taskID)
+						if handleError(w, &data, err) {
+							return err
+						}
+					}
+
+					return handleSuccess(w, &data, caseUID)
+
+				default:
+					w.WriteHeader(http.StatusBadRequest)
+					data.Error.Field["severanceAction"] = map[string]string{
+						"reason": "Please select an option",
+					}
 				}
+			}
 
-				err := client.ClearTask(ctx, taskID)
-				if handleError(w, &data, err) {
-					return err
-				}
+			if data.FormAction == "donor-consent" {
+				switch data.DonorConsentGiven {
+				case "donor-consent-given", "donor-consent-not-given":
+					hasDonorConsented := true
+					if data.DonorConsentGiven == "donor-consent-not-given" {
+						hasDonorConsented = false
+					}
 
-				data.Success = true
-				SetFlash(w, FlashNotification{
-					Title: "Update saved",
-				})
-				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
+					err := client.EditSeveranceApplication(ctx, caseUID, sirius.SeveranceApplicationDetails{
+						HasDonorConsented: hasDonorConsented,
+					})
+					if handleError(w, &data, err) {
+						return err
+					}
 
-			case "severance-application-required":
-				err := client.UpdateSeveranceStatus(ctx, caseUID, sirius.SeveranceStatusData{
-					SeveranceStatus: "REQUIRED",
-				})
+					return handleSuccess(w, &data, caseUID)
 
-				if handleError(w, &data, err) {
-					return err
-				}
-
-				data.Success = true
-				SetFlash(w, FlashNotification{
-					Title: "Update saved",
-				})
-				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
-
-			default:
-				w.WriteHeader(http.StatusBadRequest)
-				data.Error.Field["severanceAction"] = map[string]string{
-					"reason": "Please select an option",
+				default:
+					w.WriteHeader(http.StatusBadRequest)
+					data.Error.Field["donorConsentAction"] = map[string]string{
+						"reason": "Please select an option",
+					}
 				}
 			}
 		}
@@ -124,4 +147,12 @@ func handleError(w http.ResponseWriter, data *manageRestrictionsData, err error)
 		return true
 	}
 	return true
+}
+
+func handleSuccess(w http.ResponseWriter, data *manageRestrictionsData, caseUID string) RedirectError {
+	data.Success = true
+	SetFlash(w, FlashNotification{
+		Title: "Update saved",
+	})
+	return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
 }
