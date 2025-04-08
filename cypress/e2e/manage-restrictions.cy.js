@@ -120,9 +120,7 @@ describe("Manage restrictions form", () => {
 
   it("can go back to changing the severance required option", () => {
     cy.contains("Change").click();
-    cy.url().should("contain", "/lpa/M-6666-6666-6666/lpa-details");
-    cy.contains("Manage restrictions and conditions");
-    cy.url().should("contain", "/lpa/M-6666-6666-6666/manage-restrictions");
+    cy.url().should("contain", "/lpa/M-6666-6666-6666/manage-restrictions?action=change-severance-required");
     cy.contains("Manage restrictions and conditions");
     cy.contains("Select an option");
     cy.contains("Severance application is not required");

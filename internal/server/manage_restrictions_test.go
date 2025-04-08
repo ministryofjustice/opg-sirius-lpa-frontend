@@ -70,30 +70,35 @@ func TestGetManageRestrictionsCases(t *testing.T) {
 	tests := []struct {
 		name          string
 		caseSummary   sirius.CaseSummary
+		action        string
 		templateError error
 		expectedError error
 	}{
 		{
 			name:          "Get manage restrictions request succeeds",
 			caseSummary:   restrictionsCaseSummary,
+			action:        "",
 			templateError: nil,
 			expectedError: nil,
 		},
 		{
 			name:          "Get manage restrictions with severance required request succeeds",
 			caseSummary:   restrictionsCaseSummaryWithSeveranceRequired,
+			action:        "donor-consent",
 			templateError: nil,
 			expectedError: nil,
 		},
 		{
 			name:          "Get case summary errors",
 			caseSummary:   sirius.CaseSummary{},
+			action:        "",
 			templateError: nil,
 			expectedError: errExample,
 		},
 		{
 			name:          "Template errors",
 			caseSummary:   restrictionsCaseSummary,
+			action:        "",
 			templateError: errExample,
 			expectedError: nil,
 		},
@@ -111,6 +116,7 @@ func TestGetManageRestrictionsCases(t *testing.T) {
 				On("Func", mock.Anything, manageRestrictionsData{
 					CaseSummary: tc.caseSummary,
 					CaseUID:     "M-1111-2222-3333",
+					FormAction:  tc.action,
 					Error:       sirius.ValidationError{Field: sirius.FieldErrors{}},
 				}).
 				Return(tc.templateError)
@@ -162,6 +168,7 @@ func TestPostManageRestrictions(t *testing.T) {
 				SeveranceAction: tc.severanceAction,
 				CaseSummary:     restrictionsCaseSummary,
 				CaseUID:         "M-1111-2222-3333",
+				FormAction:      "",
 				Error:           tc.error,
 			}
 
@@ -235,19 +242,19 @@ func TestPostManageRestrictionsRedirects(t *testing.T) {
 
 func TestPostManageRestrictionsWithSeveranceRequiredRedirects(t *testing.T) {
 	tests := []struct {
-		name             string
-		severanceAction  string
-		severanceDetails *sirius.SeveranceApplicationDetails
+		name               string
+		donorConsentAction string
+		severanceDetails   *sirius.SeveranceApplicationDetails
 	}{
 		{
-			name:             "Donor consent given",
-			severanceAction:  "donor-consent-given",
-			severanceDetails: &sirius.SeveranceApplicationDetails{HasDonorConsented: true},
+			name:               "Donor consent given",
+			donorConsentAction: "donor-consent-given",
+			severanceDetails:   &sirius.SeveranceApplicationDetails{HasDonorConsented: true},
 		},
 		{
-			name:             "Donor refused severance",
-			severanceAction:  "donor-consent-not-given",
-			severanceDetails: &sirius.SeveranceApplicationDetails{HasDonorConsented: false},
+			name:               "Donor refused severance",
+			donorConsentAction: "donor-consent-not-given",
+			severanceDetails:   &sirius.SeveranceApplicationDetails{HasDonorConsented: false},
 		},
 	}
 
@@ -256,11 +263,7 @@ func TestPostManageRestrictionsWithSeveranceRequiredRedirects(t *testing.T) {
 			client := &mockManageRestrictionsClient{}
 			client.
 				On("CaseSummary", mock.Anything, "M-1111-2222-3333").
-				Return(restrictionsCaseSummary, nil)
-
-			if tc.severanceAction == "severance-application-not-required" {
-				client.On("ClearTask", mock.Anything, 1).Return(nil)
-			}
+				Return(restrictionsCaseSummaryWithSeveranceRequired, nil)
 
 			client.
 				On("EditSeveranceApplication", mock.Anything, "M-1111-2222-3333", *tc.severanceDetails).
@@ -270,7 +273,7 @@ func TestPostManageRestrictionsWithSeveranceRequiredRedirects(t *testing.T) {
 			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func))
 
 			form := url.Values{
-				"severanceAction": {tc.severanceAction},
+				"donorConsentGiven": {tc.donorConsentAction},
 			}
 
 			req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/manage-restrictions", strings.NewReader(form.Encode()))
