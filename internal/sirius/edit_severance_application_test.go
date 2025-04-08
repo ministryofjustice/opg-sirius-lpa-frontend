@@ -40,7 +40,7 @@ func TestEditSeveranceApplication(t *testing.T) {
 						},
 						Body: map[string]interface{}{
 							"hasDonorConsented":      true,
-							"severanceOrdered":       nil,
+							"severanceOrdered":       false,
 							"courtOrderDecisionMade": nil,
 							"courtOrderReceived":     nil,
 						},
