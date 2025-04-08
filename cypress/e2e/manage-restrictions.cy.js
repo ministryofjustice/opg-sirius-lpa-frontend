@@ -113,9 +113,19 @@ describe("Manage restrictions form", () => {
       cy.url().should("contain", "/lpa/M-6666-6666-6666/manage-restrictions");
       cy.contains("Manage restrictions and conditions");
       cy.contains("Select an option");
-      cy.contains("Severance application is not required");
-      cy.contains("Severance application is required");
+      cy.contains("Donor has provided consent to a severance application");
+      cy.contains("Donor has refused severance of restriction and conditions");
     });
+  });
+
+  it("can go back to changing the severance required option", () => {
+    cy.contains("Change").click();
+    cy.url().should("contain", "/lpa/M-6666-6666-6666/manage-restrictions");
+    cy.url().should("contain", "action=change-severance-required");
+    cy.contains("Manage restrictions and conditions");
+    cy.contains("Select an option");
+    cy.contains("Severance application is not required");
+    cy.contains("Severance application is required");
   });
 
   it("can go Back to LPA details", () => {
@@ -129,7 +139,7 @@ describe("Manage restrictions form", () => {
   });
 
   it("errors when submitting without selecting an option", () => {
-    cy.contains("Confirm").click();
+    cy.contains("Save and exit").click();
     cy.contains("Please select an option");
   });
 
@@ -144,6 +154,7 @@ describe("Manage restrictions form", () => {
         status: 204,
       },
     );
+    cy.contains("Change").click();
     cy.contains("Severance application is not required").click();
     cy.contains("Confirm").click();
     cy.url().should("contain", "/lpa/M-6666-6666-6666/lpa-details");
@@ -157,6 +168,7 @@ describe("Manage restrictions form", () => {
         status: 204,
       },
     );
+    cy.contains("Change").click();
     cy.contains("Severance application is required").click();
     cy.contains("Confirm").click();
     cy.url().should("contain", "/lpa/M-6666-6666-6666/lpa-details");
