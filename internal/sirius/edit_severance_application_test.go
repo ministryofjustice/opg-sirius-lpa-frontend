@@ -40,9 +40,9 @@ func TestEditSeveranceApplication(t *testing.T) {
 						},
 						Body: map[string]interface{}{
 							"hasDonorConsented":      true,
-							"severanceOrdered":       "",
-							"courtOrderDecisionMade": "",
-							"courtOrderReceived":     "",
+							"severanceOrdered":       nil,
+							"courtOrderDecisionMade": nil,
+							"courtOrderReceived":     nil,
 						},
 					}).
 					WithCompleteResponse(consumer.Response{
