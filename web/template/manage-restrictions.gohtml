@@ -23,48 +23,76 @@
                             <strong>Severance application required:</strong>
                             {{ severanceRequiredLabel .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceStatus }}
                         </p>
+                        <p class="govuk-body">
+                            <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s/manage-restrictions?action=change-severance-required" .CaseUID )}}">Change</a>
+                        </p>
                     {{ end }}
 
                     {{ if eq .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceStatus "NOT_REQUIRED" }}
-                    <fieldset class="govuk-fieldset">
-                        <legend class="govuk-fieldset__legend"><strong>Select an option:</strong></legend>
-                        {{ template "errors" .Error.Field.severanceAction }}
+                        <fieldset class="govuk-fieldset">
+                            <legend class="govuk-fieldset__legend"><strong>Select an option:</strong></legend>
+                            {{ template "errors" .Error.Field.severanceAction }}
 
-                        <div class="govuk-radios" data-module="govuk-radios">
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="f-severanceActionNotRequired" name="severanceAction" type="radio" value="severance-application-required" {{ if eq "severance-application-required" .SeveranceAction }}checked{{ end }}>
-                                <label class="govuk-label govuk-radios__label" for="f-severanceActionNotRequired">
-                                    Severance application is required
-                                </label>
+                            <div class="govuk-radios" data-module="govuk-radios">
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="f-severanceActionNotRequired" name="severanceAction" type="radio" value="severance-application-required" {{ if eq "severance-application-required" .SeveranceAction }}checked{{ end }}>
+                                    <label class="govuk-label govuk-radios__label" for="f-severanceActionNotRequired">
+                                        Severance application is required
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-                    </fieldset>
+                        </fieldset>
+
+                    {{ else if eq .FormAction "donor-consent" }}
+                        <fieldset class="govuk-fieldset">
+                            <legend class="govuk-fieldset__legend"><strong>Select an option:</strong></legend>
+                            {{ template "errors" .Error.Field.donorConsentAction }}
+
+                            <div class="govuk-radios" data-module="govuk-radios">
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="f-donorConsentGiven" name="donorConsentGiven" type="radio" value="donor-consent-given" {{ if eq "donor-consent-given" .DonorConsentGiven }}checked{{ end }}>
+                                    <label class="govuk-label govuk-radios__label" for="f-severanceActionRequired">
+                                        Donor has provided consent to a severance application
+                                    </label>
+                                </div>
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="f-donorConsentNotGiven" name="donorConsentGiven" type="radio" value="donor-consent-not-given" {{ if eq "donor-consent-not-given" .DonorConsentGiven }}checked{{ end }}>
+                                    <label class="govuk-label govuk-radios__label" for="f-severanceActionNotRequired">
+                                        Donor has refused severance of restriction and conditions
+                                    </label>
+                                </div>
+                            </div>
+                        </fieldset>
 
                     {{ else }}
-                    <fieldset class="govuk-fieldset">
-                        <legend class="govuk-fieldset__legend"><strong>Select an option:</strong></legend>
-                        {{ template "errors" .Error.Field.severanceAction }}
+                        <fieldset class="govuk-fieldset">
+                            <legend class="govuk-fieldset__legend"><strong>Select an option:</strong></legend>
+                            {{ template "errors" .Error.Field.severanceAction }}
 
-                        <div class="govuk-radios" data-module="govuk-radios">
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="f-severanceActionRequired" name="severanceAction" type="radio" value="severance-application-not-required" {{ if eq "severance-application-not-required" .SeveranceAction }}checked{{ end }}>
-                                <label class="govuk-label govuk-radios__label" for="f-severanceActionRequired">
-                                    Severance application is not required
-                                </label>
+                            <div class="govuk-radios" data-module="govuk-radios">
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="f-severanceActionRequired" name="severanceAction" type="radio" value="severance-application-not-required" {{ if eq "severance-application-not-required" .SeveranceAction }}checked{{ end }}>
+                                    <label class="govuk-label govuk-radios__label" for="f-severanceActionRequired">
+                                        Severance application is not required
+                                    </label>
+                                </div>
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="f-severanceActionNotRequired" name="severanceAction" type="radio" value="severance-application-required" {{ if eq "severance-application-required" .SeveranceAction }}checked{{ end }}>
+                                    <label class="govuk-label govuk-radios__label" for="f-severanceActionNotRequired">
+                                        Severance application is required
+                                    </label>
+                                </div>
                             </div>
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="f-severanceActionNotRequired" name="severanceAction" type="radio" value="severance-application-required" {{ if eq "severance-application-required" .SeveranceAction }}checked{{ end }}>
-                                <label class="govuk-label govuk-radios__label" for="f-severanceActionNotRequired">
-                                    Severance application is required
-                                </label>
-                            </div>
-                        </div>
-                    </fieldset>
+                        </fieldset>
                     {{ end }}
                 </div>
 
                 <div class="govuk-button-group">
-                    <button class="govuk-button" data-module="govuk-button" type="submit">Confirm</button>
+                    {{ if eq .FormAction "donor-consent" }}
+                        <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+                    {{ else }}
+                        <button class="govuk-button" data-module="govuk-button" type="submit">Confirm</button>
+                    {{ end }}
                     <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s/lpa-details" .CaseUID )}}">Cancel</a>
                 </div>
             </form>

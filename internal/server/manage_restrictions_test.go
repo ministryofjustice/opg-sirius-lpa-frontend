@@ -30,9 +30,32 @@ func (m *mockManageRestrictionsClient) UpdateSeveranceStatus(ctx sirius.Context,
 	return args.Error(0)
 }
 
+func (m *mockManageRestrictionsClient) EditSeveranceApplication(ctx sirius.Context, caseUID string, severanceApplicationDetails sirius.SeveranceApplicationDetails) error {
+	args := m.Called(ctx, caseUID, severanceApplicationDetails)
+	return args.Error(0)
+}
+
 var restrictionsCaseSummary = sirius.CaseSummary{
 	DigitalLpa: sirius.DigitalLpa{
 		UID: "M-1111-2222-3333",
+	},
+	TaskList: []sirius.Task{
+		{
+			ID:     1,
+			Name:   "Review restrictions and conditions",
+			Status: "Not started",
+		},
+	},
+}
+
+var restrictionsCaseSummaryWithSeveranceRequired = sirius.CaseSummary{
+	DigitalLpa: sirius.DigitalLpa{
+		UID: "M-1111-2222-3333",
+		SiriusData: sirius.SiriusData{
+			Application: sirius.Draft{
+				SeveranceStatus: "REQUIRED",
+			},
+		},
 	},
 	TaskList: []sirius.Task{
 		{
@@ -47,24 +70,35 @@ func TestGetManageRestrictionsCases(t *testing.T) {
 	tests := []struct {
 		name          string
 		caseSummary   sirius.CaseSummary
+		action        string
 		templateError error
 		expectedError error
 	}{
 		{
 			name:          "Get manage restrictions request succeeds",
 			caseSummary:   restrictionsCaseSummary,
+			action:        "",
+			templateError: nil,
+			expectedError: nil,
+		},
+		{
+			name:          "Get manage restrictions with severance required request succeeds",
+			caseSummary:   restrictionsCaseSummaryWithSeveranceRequired,
+			action:        "donor-consent",
 			templateError: nil,
 			expectedError: nil,
 		},
 		{
 			name:          "Get case summary errors",
 			caseSummary:   sirius.CaseSummary{},
+			action:        "",
 			templateError: nil,
 			expectedError: errExample,
 		},
 		{
 			name:          "Template errors",
 			caseSummary:   restrictionsCaseSummary,
+			action:        "",
 			templateError: errExample,
 			expectedError: nil,
 		},
@@ -82,6 +116,7 @@ func TestGetManageRestrictionsCases(t *testing.T) {
 				On("Func", mock.Anything, manageRestrictionsData{
 					CaseSummary: tc.caseSummary,
 					CaseUID:     "M-1111-2222-3333",
+					FormAction:  tc.action,
 					Error:       sirius.ValidationError{Field: sirius.FieldErrors{}},
 				}).
 				Return(tc.templateError)
@@ -133,6 +168,7 @@ func TestPostManageRestrictions(t *testing.T) {
 				SeveranceAction: tc.severanceAction,
 				CaseSummary:     restrictionsCaseSummary,
 				CaseUID:         "M-1111-2222-3333",
+				FormAction:      "",
 				Error:           tc.error,
 			}
 
@@ -192,6 +228,52 @@ func TestPostManageRestrictionsRedirects(t *testing.T) {
 
 			form := url.Values{
 				"severanceAction": {tc.severanceAction},
+			}
+
+			req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/manage-restrictions", strings.NewReader(form.Encode()))
+			req.Header.Add("Content-Type", formUrlEncoded)
+			_, err := server.serve(req)
+
+			assert.Equal(t, RedirectError("/lpa/M-1111-2222-3333/lpa-details"), err)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
+func TestPostManageRestrictionsWithSeveranceRequiredRedirects(t *testing.T) {
+	tests := []struct {
+		name               string
+		donorConsentAction string
+		severanceDetails   *sirius.SeveranceApplicationDetails
+	}{
+		{
+			name:               "Donor consent given",
+			donorConsentAction: "donor-consent-given",
+			severanceDetails:   &sirius.SeveranceApplicationDetails{HasDonorConsented: true},
+		},
+		{
+			name:               "Donor refused severance",
+			donorConsentAction: "donor-consent-not-given",
+			severanceDetails:   &sirius.SeveranceApplicationDetails{HasDonorConsented: false},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &mockManageRestrictionsClient{}
+			client.
+				On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+				Return(restrictionsCaseSummaryWithSeveranceRequired, nil)
+
+			client.
+				On("EditSeveranceApplication", mock.Anything, "M-1111-2222-3333", *tc.severanceDetails).
+				Return(nil)
+
+			template := &mockTemplate{}
+			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func))
+
+			form := url.Values{
+				"donorConsentGiven": {tc.donorConsentAction},
 			}
 
 			req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/manage-restrictions", strings.NewReader(form.Encode()))
