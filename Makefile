@@ -15,6 +15,10 @@ yarn-lint:
 	docker compose run --rm yarn
 	docker compose run --rm yarn lint
 
+yarn-prettier:
+	docker compose run --rm yarn
+	docker compose run --rm yarn prettier . --write
+
 gosec: ## Scan Go code for security flaws
 	docker compose run --rm gosec
 
