@@ -257,19 +257,19 @@ func TestPostChangeCertificateProviderDetailsRedirectReturned(t *testing.T) {
 		Return(testChangeCertificateProviderCaseSummary, nil)
 	client.
 		On("ChangeCertificateProviderDetails", mock.Anything, caseUid, sirius.ChangeCertificateProviderDetails{
-			FirstNames: "Josefa",
-			LastName:   "Kihn",
+			FirstNames: "Johathan",
+			LastName:   "Hammes",
 			Address: sirius.Address{
-				Line1:    "37 Davonte Grange",
-				Line2:    "Nether Raynor",
-				Line3:    "New Fahey",
-				Town:     "Surrey",
-				Postcode: "KV94 9CD",
+				Line1:    "4 Edyth Place",
+				Line2:    "Leannonthorpe",
+				Line3:    "Gwent",
+				Town:     "Heidenreichwick",
+				Postcode: "HR6 9YN",
 				Country:  "GB",
 			},
-			Phone:    "01452 927995",
-			Email:    "Kyra.Schowalter@example.com",
-			SignedAt: "2024-01-12",
+			Phone:    "01697 722252",
+			Email:    "Johathan.Hammes@example.com",
+			SignedAt: "2025-01-19",
 		}).
 		Return(nil)
 	client.

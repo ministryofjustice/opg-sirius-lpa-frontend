@@ -25,13 +25,13 @@ type changeCertificateProviderDetailsData struct {
 }
 
 type formCertificateProviderDetails struct {
-	FirstNames string         `json:"firstNames"`
-	LastName   string         `json:"lastName"`
-	Address    sirius.Address `json:"address"`
-	Channel    string         `json:"channel"`
-	Email      string         `json:"email"`
-	Phone      string         `json:"phone"`
-	SignedAt   dob            `json:"signedAt"`
+	FirstNames string         `form:"firstNames"`
+	LastName   string         `form:"lastName"`
+	Address    sirius.Address `form:"address"`
+	Channel    string         `form:"channel"`
+	Email      string         `form:"email"`
+	Phone      string         `form:"phone"`
+	SignedAt   dob            `form:"signedAt"`
 }
 
 func ChangeCertificateProviderDetails(client ChangeCertificateProviderDetailsClient, tmpl template.Template) Handler {
