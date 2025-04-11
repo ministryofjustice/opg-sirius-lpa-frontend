@@ -8,8 +8,8 @@
 
             {{ template "mlpa-header" (caseTabs .CaseSummary "documents") }}
 
-            {{ if (or .FlashMessage.Title .FlashMessage.Description) }}
-                {{ template "notification-banner" .FlashMessage }}
+            {{ if .FlashMessage.Title }}
+                {{ template "success-banner" .FlashMessage.Title }}
             {{ end }}
 
             <div class="moj-page-header-actions">
