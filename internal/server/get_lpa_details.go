@@ -3,7 +3,6 @@ package server
 import (
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -28,7 +27,7 @@ type getLpaDetails struct {
 
 func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		uid := chi.URLParam(r, "uid")
+		uid := r.PathValue("uid")
 		ctx := getContext(r)
 
 		var err error

@@ -2,12 +2,12 @@ package server
 
 import (
 	"fmt"
-	"github.com/go-chi/chi/v5"
+	"net/http"
+
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
-	"net/http"
 )
 
 type ManageRestrictionsClient interface {
@@ -34,7 +34,7 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
-		caseUID := chi.URLParam(r, "uid")
+		caseUID := r.PathValue("uid")
 		ctx := getContext(r)
 
 		var cs sirius.CaseSummary

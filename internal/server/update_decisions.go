@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -40,7 +39,7 @@ func UpdateDecisions(client UpdateDecisionsClient, tmpl template.Template) Handl
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
-		caseUID := chi.URLParam(r, "uid")
+		caseUID := r.PathValue("uid")
 		ctx := getContext(r)
 
 		cs, err := client.CaseSummary(ctx, caseUID)

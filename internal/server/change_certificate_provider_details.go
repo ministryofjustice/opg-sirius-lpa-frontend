@@ -2,12 +2,12 @@ package server
 
 import (
 	"fmt"
-	"github.com/go-chi/chi/v5"
+	"net/http"
+
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
-	"net/http"
 )
 
 type ChangeCertificateProviderDetailsClient interface {
@@ -40,7 +40,7 @@ func ChangeCertificateProviderDetails(client ChangeCertificateProviderDetailsCli
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
-		caseUid := chi.URLParam(r, "uid")
+		caseUid := r.PathValue("uid")
 		ctx := getContext(r)
 		caseSummary, err := client.CaseSummary(ctx, caseUid)
 
