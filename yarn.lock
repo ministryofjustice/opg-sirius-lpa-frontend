@@ -994,11 +994,6 @@ isstream@~0.1.2:
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
   integrity sha512-Yljz7ffyPbrLpLngrMtZ7NduUgVvi6wG9RJ9IUcyCd59YQ911PBJphODUcbOVbqYfxe1wuYf/LJ8PauMRwsM/g==
 
-jquery@^3.6.1:
-  version "3.7.1"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.7.1.tgz#083ef98927c9a6a74d05a6af02806566d16274de"
-  integrity sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==
-
 jsbn@~0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
@@ -1163,7 +1158,6 @@ onetime@^5.1.0:
 
 "opg-sirius-search-ui@https://github.com/ministryofjustice/opg-sirius-search-ui#v1.72.0":
   version "0.1.0"
-  uid "05d5159af195e3a4377ccf680ef1c77c91c46ba7"
   resolved "https://github.com/ministryofjustice/opg-sirius-search-ui#05d5159af195e3a4377ccf680ef1c77c91c46ba7"
 
 ospath@^1.2.2:

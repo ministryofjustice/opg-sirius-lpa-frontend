@@ -1,6 +1,5 @@
-import MOJFrontend from "@ministryofjustice/frontend/moj/all.js";
+import * as MOJFrontend from "@ministryofjustice/frontend";
 import * as GOVUKFrontend from "govuk-frontend";
-import $ from "jquery";
 import "opg-sirius-search-ui";
 import autoResizeTextArea from "./auto-resize-text-area.js";
 import loadingButton from "./loading-button.js";
@@ -19,9 +18,6 @@ import addressFinder from "./address-finder";
 import autoApplyFilter from "./auto-apply-filter";
 import showHideCaseSummary from "./show-hide-case-summary";
 import disableAfterClick from "./disable-after-click";
-
-// Expose jQuery on window so MOJFrontend can use it
-window.$ = $;
 
 const prefix = document.body.getAttribute("data-prefix");
 
