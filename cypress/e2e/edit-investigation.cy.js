@@ -5,7 +5,7 @@ describe("Edit investigation", () => {
 
   it("edits a investigation", () => {
     cy.contains("Edit Investigation");
-    cy.get(".moj-banner").should("not.exist");
+    cy.get(".moj-alert").should("not.exist");
     cy.get("#f-title").should("have.value", "Test title");
     cy.get("#f-information").should("have.value", "Some test info");
     cy.contains(".govuk-radios__label", "Normal")
@@ -18,6 +18,6 @@ describe("Edit investigation", () => {
     cy.get("#f-approvalOutcome").select("Court Application");
     cy.get("#f-investigationClosureDate").type("2022-04-05");
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-alert").should("exist");
   });
 });

@@ -6,9 +6,9 @@ describe("Delete a relationship", () => {
   it("deletes a relationship", () => {
     cy.contains("Delete Relationship");
     cy.contains("John Doe");
-    cy.get(".moj-banner").should("not.exist");
+    cy.get(".moj-alert").should("not.exist");
     cy.contains("label", "John Doe").click();
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-alert").should("exist");
   });
 });

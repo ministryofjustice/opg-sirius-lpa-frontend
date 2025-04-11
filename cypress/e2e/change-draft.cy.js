@@ -151,7 +151,7 @@ describe("Change draft form", () => {
     cy.get("#f-email").clear().type("jimR@mail.example");
 
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-alert").should("exist");
 
     cy.url().should("contain", "/lpa/M-1111-2222-1111/lpa-details");
   });

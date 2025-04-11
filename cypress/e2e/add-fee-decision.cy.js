@@ -6,13 +6,13 @@ describe("Add a fee decision to a non-digital LPA", () => {
   it("adds a fee decision to the case", () => {
     cy.contains("Record why a fee reduction will not be applied");
     cy.contains("7000-0000-0001");
-    cy.get(".moj-banner").should("not.exist");
+    cy.get(".moj-alert").should("not.exist");
     cy.get("#f-decisionType").select("Declined exemption");
     cy.get("#f-decisionReason").type("Invalid evidence");
     cy.get("#f-decisionDate").type("2023-10-09");
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
-    cy.get(".moj-banner").contains("Fee decision added");
+    cy.get(".moj-alert").should("exist");
+    cy.get(".moj-alert").contains("Fee decision added");
   });
 
   it("sets the applied date to today", () => {
