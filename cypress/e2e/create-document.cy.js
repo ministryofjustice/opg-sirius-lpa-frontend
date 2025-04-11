@@ -70,8 +70,8 @@ describe("Create a document", () => {
     cy.get("#f-correspondenceBy-phone").click();
 
     cy.contains("button", "Continue").click();
-    cy.get(".moj-banner").should("exist");
-    cy.get(".moj-banner").contains("New recipient added");
+    cy.get(".moj-alert").should("exist");
+    cy.get(".moj-alert").contains("New recipient added");
   });
 
   it("displays parent recipient details only", () => {

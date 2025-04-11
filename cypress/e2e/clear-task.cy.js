@@ -9,9 +9,9 @@ describe("Clear task on a digital LPA", () => {
 
   it("marks a task as completed", () => {
     cy.contains("Clear Task");
-    cy.get(".moj-banner").should("not.exist");
+    cy.get(".moj-alert").should("not.exist");
     cy.contains("Task:");
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-alert").should("exist");
   });
 });

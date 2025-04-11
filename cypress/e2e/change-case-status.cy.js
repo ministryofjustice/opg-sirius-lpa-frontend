@@ -111,7 +111,7 @@ describe("Change case status", () => {
     cy.visit("/change-case-status?uid=M-DIGI-LPA3-3333");
     cy.contains("Change case status");
     cy.contains("M-DIGI-LPA3-3333");
-    cy.get(".moj-banner").should("not.exist");
+    cy.get(".moj-alert").should("not.exist");
     cy.contains(".govuk-radios__label", "Draft")
       .parent()
       .get("input")

@@ -6,12 +6,12 @@ describe("Apply a fee reduction to a non-digital LPA", () => {
   it("adds a fee reduction to the case", () => {
     cy.contains("Apply a fee reduction");
     cy.contains("7000-0000-0001");
-    cy.get(".moj-banner").should("not.exist");
+    cy.get(".moj-alert").should("not.exist");
     cy.get("#f-feeReductionType").select("Remission");
     cy.get("#f-paymentEvidence").type("Test evidence");
     cy.get("#f-paymentDate").type("2022-04-25");
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-alert").should("exist");
   });
 
   it("sets the applied date to today", () => {
@@ -27,13 +27,13 @@ describe("Apply a fee reduction to a digital LPA", () => {
     cy.visit("/apply-fee-reduction?id=9456");
     cy.contains("Apply a fee reduction");
     cy.contains("M-9999-4567-AAAA");
-    cy.get(".moj-banner").should("not.exist");
+    cy.get(".moj-alert").should("not.exist");
     cy.get("#f-feeReductionType").select("Remission");
     cy.get("#f-paymentEvidence").type("Test evidence");
     cy.get("#f-paymentDate").type("2023-09-01");
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
-    cy.get(".moj-banner").contains("Remission approved");
+    cy.get(".moj-alert").should("exist");
+    cy.get(".moj-alert").contains("Remission approved");
     cy.url().should("contain", "/lpa/M-9999-4567-AAAA/payments");
   });
 });

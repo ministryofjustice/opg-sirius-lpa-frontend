@@ -203,7 +203,7 @@ describe("Change attorney details form", () => {
     cy.get("#f-signedAt-year").clear().type("2023");
 
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-alert").should("exist");
 
     cy.url().should("contain", "/lpa/M-1111-1111-1110/lpa-details");
   });

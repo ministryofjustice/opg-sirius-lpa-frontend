@@ -6,8 +6,8 @@ describe("Delete a payment", () => {
   it("deletes a payment on a case", () => {
     cy.contains("Delete payment");
     cy.contains("7000-0000-0000");
-    cy.get(".moj-banner").should("not.exist");
+    cy.get(".moj-alert").should("not.exist");
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-alert").should("exist");
   });
 });

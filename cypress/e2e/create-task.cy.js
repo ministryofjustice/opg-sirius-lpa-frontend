@@ -5,7 +5,7 @@ describe("Create a task", () => {
 
   it("creates a task for a user", () => {
     cy.contains("Create Task");
-    cy.get(".moj-banner").should("not.exist");
+    cy.get(".moj-alert").should("not.exist");
     cy.get("#f-taskType").select("Check Application");
     cy.get("#f-name").type("Something");
     cy.get("#f-description").type("More words");
@@ -14,12 +14,12 @@ describe("Create a task", () => {
     cy.get(".autocomplete__menu").contains("system admin").click();
     cy.get("#f-dueDate").type("2035-03-04");
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-alert").should("exist");
   });
 
   it("creates a task for a team", () => {
     cy.contains("Create Task");
-    cy.get(".moj-banner").should("not.exist");
+    cy.get(".moj-alert").should("not.exist");
     cy.get("#f-taskType").select("Check Application");
     cy.get("#f-name").type("A title");
     cy.get("#f-description").type("A description");
@@ -27,6 +27,6 @@ describe("Create a task", () => {
     cy.get("#f-assigneeTeam").select("Cool Team");
     cy.get("#f-dueDate").type("2035-03-04");
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-alert").should("exist");
   });
 });

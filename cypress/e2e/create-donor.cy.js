@@ -5,7 +5,7 @@ describe("Create donor", () => {
 
   it("creates a donor", () => {
     cy.contains("Create Donor");
-    cy.get(".moj-banner").should("not.exist");
+    cy.get(".moj-alert").should("not.exist");
 
     cy.get("#f-salutation").type("Prof");
     cy.get("#f-firstname").type("Melanie");

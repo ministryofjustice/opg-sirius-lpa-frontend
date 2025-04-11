@@ -202,7 +202,7 @@ describe("Change donor details form", () => {
     cy.get("#f-lpaSignedOn-year").type("2023");
 
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-alert").should("exist");
 
     cy.url().should("contain", "/lpa/M-0000-0000-0001/lpa-details");
 
