@@ -188,7 +188,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 
 				if caseType == sirius.CaseTypeDigitalLpa {
 					SetFlash(w, FlashNotification{
-						Description: "Draft document deleted",
+						Title: "Draft document deleted",
 					})
 
 					return RedirectError(fmt.Sprintf("/lpa/%s/documents", caseItem.UID))
@@ -209,7 +209,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 						}
 
 						SetFlash(w, FlashNotification{
-							Description: "Document published",
+							Title: "Document published",
 						})
 
 						return RedirectError(fmt.Sprintf("/lpa/%s/documents", caseItem.UID))
@@ -231,7 +231,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					}
 
 					SetFlash(w, FlashNotification{
-						Description: "Document saved",
+						Title: "Document saved",
 					})
 
 					return RedirectError(fmt.Sprintf("/lpa/%s/documents", caseItem.UID))

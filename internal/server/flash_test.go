@@ -33,11 +33,10 @@ func TestSetFlashAddsHeader(t *testing.T) {
 		Return(header)
 
 	SetFlash(w, FlashNotification{
-		Title:       "title",
-		Description: "description",
+		Title: "title",
 	})
 
-	assert.Equal(t, "flash-lpa-frontend=eyJuYW1lIjoidGl0bGUiLCJkZXNjcmlwdGlvbiI6ImRlc2NyaXB0aW9uIn0=; Path=/; HttpOnly", header.Get("Set-Cookie"))
+	assert.Equal(t, "flash-lpa-frontend=eyJuYW1lIjoidGl0bGUifQ==; Path=/; HttpOnly", header.Get("Set-Cookie"))
 }
 
 func TestGetFlashGetsHeader(t *testing.T) {
@@ -50,14 +49,13 @@ func TestGetFlashGetsHeader(t *testing.T) {
 	r, _ := http.NewRequest("GET", "/some-url", nil)
 	r.AddCookie(&http.Cookie{
 		Name:  "flash-lpa-frontend",
-		Value: "eyJuYW1lIjoidGl0bGUiLCJkZXNjcmlwdGlvbiI6ImRlc2NyaXB0aW9uIn0=",
+		Value: "eyJuYW1lIjoidGl0bGUifQ==",
 	})
 
 	notification, err := GetFlash(w, r)
 
 	assert.Nil(t, err)
 	assert.Equal(t, "title", notification.Title)
-	assert.Equal(t, "description", notification.Description)
 	assert.Contains(t, header.Get("Set-Cookie"), "flash-lpa-frontend=;")
 }
 
