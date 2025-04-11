@@ -5,7 +5,7 @@ describe("Create donor", () => {
 
   it("edits a donor", () => {
     cy.contains("Edit Donor");
-    cy.get(".moj-banner").should("not.exist");
+    cy.get(".moj-alert").should("not.exist");
 
     cy.get("#f-firstname").should("have.value", "John");
     cy.get("#f-surname").should("have.value", "Doe");
@@ -34,7 +34,7 @@ describe("Create donor", () => {
     cy.get("label[for=f-researchOptOut]").click();
 
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
-    cy.get(".moj-banner").contains("Donor was edited");
+    cy.get(".moj-alert").should("exist");
+    cy.get(".moj-alert").contains("Donor was edited");
   });
 });

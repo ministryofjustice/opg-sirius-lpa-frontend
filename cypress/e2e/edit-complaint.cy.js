@@ -5,7 +5,7 @@ describe("Edit complaint", () => {
 
   it("edits a complaint", () => {
     cy.contains("Edit Complaint");
-    cy.get(".moj-banner").should("not.exist");
+    cy.get(".moj-alert").should("not.exist");
     cy.contains(".govuk-radios__label", "Major")
       .parent()
       .get("input")
@@ -29,6 +29,6 @@ describe("Edit complaint", () => {
     cy.contains(".govuk-radios__label", "Complaint Upheld").click();
     cy.get("#f-resolutionInfo").type("Because...");
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-alert").should("exist");
   });
 });

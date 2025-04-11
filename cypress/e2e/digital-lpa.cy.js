@@ -642,8 +642,8 @@ describe("View a digital LPA", () => {
     cy.get("#f-dueDate").type("2035-01-01");
     cy.get("button[type=submit]").click();
 
-    cy.get(".moj-banner").should("exist");
-    cy.get(".moj-banner").contains("Task created");
+    cy.get(".moj-alert").should("exist");
+    cy.get(".moj-alert").contains("Task created");
     cy.get("h1").contains("Agnes Hartley");
     cy.location("pathname").should("eq", "/lpa/M-DIGI-LPA3-3333");
   });
@@ -658,8 +658,8 @@ describe("View a digital LPA", () => {
     cy.get("#f-warningText").type("Be warned!");
     cy.get("button[type=submit]").click();
 
-    cy.get(".moj-banner").should("exist");
-    cy.get(".moj-banner").contains("Warning created");
+    cy.get(".moj-alert").should("exist");
+    cy.get(".moj-alert").contains("Warning created");
     cy.get("h1").contains("Agnes Hartley");
     cy.location("pathname").should("eq", "/lpa/M-DIGI-LPA3-3333");
   });
@@ -838,8 +838,8 @@ describe("View a digital LPA", () => {
     cy.url().should("include", "/clear-task?id=1");
     cy.get("button[type=submit]").click();
 
-    cy.get(".moj-banner").should("exist");
-    cy.get(".moj-banner").contains("Task completed");
+    cy.get(".moj-alert").should("exist");
+    cy.get(".moj-alert").contains("Task completed");
 
     cy.url().should("contain", "/lpa/M-DIGI-LPA3-3333");
     cy.contains("Case summary");

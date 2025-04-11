@@ -71,7 +71,7 @@ $sirius-bg-color: #29292e;
   .govuk-tabs__tab:link,
   .govuk-tabs__tab:visited,
   .govuk-tabs__tab,
-  .moj-banner__message,
+  .moj-alert__content,
   .moj-sub-navigation__link {
     color: govuk-colour("white");
   }
@@ -106,6 +106,10 @@ $sirius-bg-color: #29292e;
 
   .moj-pagination__link {
     color: govuk-colour("light-blue");
+  }
+
+  .moj-alert {
+    background-color: $sirius-bg-color;
   }
 
   .govuk-notification-banner__content {

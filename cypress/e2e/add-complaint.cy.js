@@ -6,7 +6,7 @@ describe("Add a complaint", () => {
   it("adds a complaint to the case", () => {
     cy.contains("Add Complaint");
     cy.contains("LPA 7000-0000-0000");
-    cy.get(".moj-banner").should("not.exist");
+    cy.get(".moj-alert").should("not.exist");
     cy.contains(".govuk-radios__label", "Major").click();
     cy.get("#f-investigatingOfficer").type("Test Officer");
     cy.get("#f-complainantName").type("Someones name");
@@ -18,6 +18,6 @@ describe("Add a complaint", () => {
     cy.get("#f-complainantCategory").select("LPA Donor");
     cy.get("#f-origin").select("Phone call");
     cy.get("button[type=submit]").click();
-    cy.get(".moj-banner").should("exist");
+    cy.get(".moj-alert").should("exist");
   });
 });
