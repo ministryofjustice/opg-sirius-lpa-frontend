@@ -13,7 +13,7 @@
 
           <div class="govuk-!-margin-bottom-5">
             {{ if .FlashMessage.Title }}
-              {{ template "notification-banner" .FlashMessage }}
+              {{ template "success-banner" .FlashMessage.Title }}
             {{ end }}
             <h1 class="govuk-heading-l govuk-!-margin-bottom-1">LPA details</h1>
 
@@ -128,7 +128,7 @@
           <div class="govuk-!-margin-bottom-5">
 
             {{ if .FlashMessage.Title }}
-              {{ template "notification-banner" .FlashMessage }}
+              {{ template "success-banner" .FlashMessage.Description }}
             {{ end }}
 
             <h1 class="govuk-heading-l govuk-!-margin-bottom-1">LPA details</h1>

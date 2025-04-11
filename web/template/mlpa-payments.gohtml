@@ -9,7 +9,7 @@
             {{ template "mlpa-header" (caseTabs .CaseSummary "fees") }}
 
             {{ if .FlashMessage.Title }}
-                {{ template "notification-banner" .FlashMessage }}
+                {{ template "success-banner" .FlashMessage.Title }}
             {{ end }}
 
             <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Fees</h1>

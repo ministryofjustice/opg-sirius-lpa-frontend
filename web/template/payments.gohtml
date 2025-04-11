@@ -10,7 +10,7 @@
             </h1>
 
             {{ if .FlashMessage.Title }}
-                {{ template "notification-banner" .FlashMessage }}
+                {{ template "success-banner" .FlashMessage.Title }}
             {{ end }}
 
             {{ if and (not .Payments) (not .FeeReductions) (not .Refunds)}}
