@@ -6,7 +6,6 @@ import (
 	"slices"
 	"strconv"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -40,7 +39,7 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 		}
 		ctx := getContext(r)
 
-		uid := chi.URLParam(r, "uid")
+		uid := r.PathValue("uid")
 
 		data := createDocumentDigitalLpaData{
 			XSRFToken: ctx.XSRFToken,

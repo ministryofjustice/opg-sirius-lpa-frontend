@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -23,7 +22,7 @@ type manageAttorneysData struct {
 
 func ManageAttorneys(client ManageAttorneysClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		uid := chi.URLParam(r, "uid")
+		uid := r.PathValue("uid")
 		ctx := getContext(r)
 
 		caseSummary, err := client.CaseSummary(ctx, uid)

@@ -3,7 +3,6 @@ package server
 import (
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -32,7 +31,7 @@ func GetApplicationProgressDetails(client GetApplicationProgressClient, tmpl tem
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var data getApplicationProgressDetails
 
-		uid := chi.URLParam(r, "uid")
+		uid := r.PathValue("uid")
 		ctx := getContext(r)
 
 		var cpName string
