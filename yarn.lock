@@ -1158,6 +1158,7 @@ onetime@^5.1.0:
 
 "opg-sirius-search-ui@https://github.com/ministryofjustice/opg-sirius-search-ui#v1.72.0":
   version "0.1.0"
+  uid "05d5159af195e3a4377ccf680ef1c77c91c46ba7"
   resolved "https://github.com/ministryofjustice/opg-sirius-search-ui#05d5159af195e3a4377ccf680ef1c77c91c46ba7"
 
 ospath@^1.2.2:
