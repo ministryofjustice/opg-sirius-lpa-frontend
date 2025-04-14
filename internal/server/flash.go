@@ -11,7 +11,6 @@ const flashCookieName string = "flash-lpa-frontend"
 
 type FlashNotification struct {
 	Title       string `json:"name"`
-	Description string `json:"description"`
 }
 
 func SetFlash(w http.ResponseWriter, notification FlashNotification) {
