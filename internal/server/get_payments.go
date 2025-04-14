@@ -1,10 +1,10 @@
 package server
 
 import (
-	"github.com/go-chi/chi/v5"
-	"golang.org/x/sync/errgroup"
 	"net/http"
 	"strconv"
+
+	"golang.org/x/sync/errgroup"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -49,7 +49,7 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		var caseID int
 		var err error
 
-		uid := chi.URLParam(r, "uid")
+		uid := r.PathValue("uid")
 		if uid != "" {
 			data.CaseSummary, err = client.CaseSummary(ctx, uid)
 			if err != nil {
@@ -57,7 +57,7 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 			}
 			caseID = data.CaseSummary.DigitalLpa.SiriusData.ID
 		} else {
-			caseID, err = strconv.Atoi(chi.URLParam(r, "id"))
+			caseID, err = strconv.Atoi(r.PathValue("id"))
 			if err != nil {
 				return err
 			}

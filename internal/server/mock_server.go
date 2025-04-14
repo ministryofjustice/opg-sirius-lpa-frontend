@@ -3,17 +3,15 @@ package server
 import (
 	"net/http"
 	"net/http/httptest"
-
-	"github.com/go-chi/chi/v5"
 )
 
 type MockServer struct {
-	mux *chi.Mux
+	mux *http.ServeMux
 	err error
 }
 
 func newMockServer(route string, handler Handler) *MockServer {
-	mux := chi.NewRouter()
+	mux := http.NewServeMux()
 	server := MockServer{
 		mux: mux,
 		err: nil,

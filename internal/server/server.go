@@ -11,7 +11,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/securityheaders"
 	"github.com/ministryofjustice/opg-go-common/telemetry"
@@ -99,9 +98,7 @@ var decoder *form.Decoder
 func New(logger *slog.Logger, client Client, templates template.Templates, prefix, siriusPublicURL, webDir string) http.Handler {
 	wrap := errorHandler(templates.Get("error.gohtml"), prefix, siriusPublicURL)
 
-	mux := chi.NewRouter()
-
-	mux.Use(telemetry.Middleware(logger))
+	mux := http.NewServeMux()
 
 	mux.Handle("/", http.NotFoundHandler())
 	mux.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {})
@@ -160,13 +157,15 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/digital-lpa/create", wrap(CreateDraft(client, templates.Get("create_draft.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))
-	mux.Handle("/assets/*", static)
-	mux.Handle("/javascript/*", static)
-	mux.Handle("/stylesheets/*", static)
+	mux.Handle("/assets/{path...}", static)
+	mux.Handle("/javascript/{path...}", static)
+	mux.Handle("/stylesheets/{path...}", static)
 
 	muxWithHeaders := securityheaders.Use(setCSPHeader(mux))
 
-	return otelhttp.NewHandler(http.StripPrefix(prefix, muxWithHeaders), "lpa-frontend")
+	middleware := telemetry.Middleware(logger)
+
+	return otelhttp.NewHandler(http.StripPrefix(prefix, middleware(muxWithHeaders)), "lpa-frontend")
 }
 
 type Handler func(w http.ResponseWriter, r *http.Request) error

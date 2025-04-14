@@ -2,12 +2,12 @@ package server
 
 import (
 	"fmt"
-	"github.com/go-chi/chi/v5"
+	"net/http"
+
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
-	"net/http"
 )
 
 type ChangeAttorneyDetailsClient interface {
@@ -43,8 +43,8 @@ func ChangeAttorneyDetails(client ChangeAttorneyDetailsClient, tmpl template.Tem
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
-		caseUID := chi.URLParam(r, "uid")
-		attorneyUID := chi.URLParam(r, "attorneyUID")
+		caseUID := r.PathValue("uid")
+		attorneyUID := r.PathValue("attorneyUID")
 
 		ctx := getContext(r)
 
