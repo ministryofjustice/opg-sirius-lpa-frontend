@@ -46,6 +46,7 @@ func getContext(r *http.Request) sirius.Context {
 type Client interface {
 	AddComplaintClient
 	AddFeeDecisionClient
+	AddObjectionClient
 	AddPaymentClient
 	AllocateCasesClient
 	ApplyFeeReductionClient
@@ -109,6 +110,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/lpa/{uid}/attorney/{attorneyUID}/change-details", wrap(ChangeAttorneyDetails(client, templates.Get("change-attorney-details.gohtml"))))
 	mux.Handle("/lpa/{uid}/change-draft", wrap(ChangeDraft(client, templates.Get("change-draft.gohtml"))))
 	mux.Handle("/lpa/{uid}/manage-restrictions", wrap(ManageRestrictions(client, templates.Get("manage-restrictions.gohtml"))))
+	mux.Handle("/add-objection", wrap(AddObjection(client, templates.Get("add-objection.gohtml"))))
 	mux.Handle("/change-donor-details", wrap(ChangeDonorDetails(client, templates.Get("change-donor-details.gohtml"))))
 	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning.gohtml"))))
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"))))
