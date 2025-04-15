@@ -5,6 +5,7 @@ import (
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"golang.org/x/sync/errgroup"
 	"net/http"
 )
 
@@ -36,11 +37,22 @@ func AddObjection(client AddObjectionClient, tmpl template.Template) Handler {
 
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseUID := r.FormValue("uid")
-
 		ctx := getContext(r)
 
-		cs, err := client.CaseSummary(ctx, caseUID)
-		if err != nil {
+		var cs sirius.CaseSummary
+		var err error
+
+		group, groupCtx := errgroup.WithContext(ctx.Context)
+
+		group.Go(func() error {
+			cs, err = client.CaseSummary(ctx.With(groupCtx), caseUID)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
 			return err
 		}
 
