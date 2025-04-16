@@ -43,7 +43,7 @@
             <div class="govuk-details__text">
               <dl class="govuk-summary-list">
                 {{ range $k, $v := .entity }}
-                  {{ if eq $k "_class" "id" }}
+                  {{ if eq $k "_class" "id" "document" }}
                     {{ continue }}
                   {{ end }}
 
@@ -56,12 +56,21 @@
                         {{ $v.displayName }}
                       {{ else if eq $k "uId" }}
                         {{ printf "%.f" $v }}
-                      {{ else if eq $k "document" }}
-                        <a class="govuk-link" href="/lpa/document/{{ .uuid }}">{{ .friendlyDescription }}</a>
-                        ({{ .subType }})
                       {{ else }}
                         {{ $v }}
                       {{ end }}
+                    </dd>
+                  </div>
+                {{ end }}
+
+                {{ if and (eq .sourceType "Note") (ne (len .entity.document) 0) }}
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                      Document
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                      <a class="govuk-link" href="/lpa/document/{{ .entity.document.uuid }}">{{ .entity.document.friendlyDescription }}</a>
+                      ({{ .entity.document.subType }})
                     </dd>
                   </div>
                 {{ end }}
