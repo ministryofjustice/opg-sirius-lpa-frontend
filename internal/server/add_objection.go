@@ -85,11 +85,7 @@ func AddObjection(client AddObjectionClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 
-				SetFlash(w, FlashNotification{
-					Title: "Update saved",
-				})
-
-				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
+				return RedirectError(fmt.Sprintf("/lpa/%s", caseUID))
 			}
 		}
 
