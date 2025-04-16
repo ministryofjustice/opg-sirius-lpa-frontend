@@ -121,7 +121,7 @@ func TestPostAddObjection(t *testing.T) {
 		{
 			name:          "Add objection post form success",
 			apiError:      nil,
-			expectedError: RedirectError("/lpa/M-9898-9898-9898/lpa-details"),
+			expectedError: RedirectError("/lpa/M-9898-9898-9898"),
 		},
 		{
 			name:          "Add objection returns an API failure",
