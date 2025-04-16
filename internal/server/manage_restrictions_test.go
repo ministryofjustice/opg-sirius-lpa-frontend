@@ -30,7 +30,7 @@ func (m *mockManageRestrictionsClient) UpdateSeveranceStatus(ctx sirius.Context,
 	return args.Error(0)
 }
 
-func (m *mockManageRestrictionsClient) EditSeveranceApplication(ctx sirius.Context, caseUID string, severanceApplicationDetails sirius.SeveranceApplicationDetails) error {
+func (m *mockManageRestrictionsClient) EditSeveranceApplication(ctx sirius.Context, caseUID string, severanceApplicationDetails sirius.SeveranceApplication) error {
 	args := m.Called(ctx, caseUID, severanceApplicationDetails)
 	return args.Error(0)
 }
@@ -244,17 +244,17 @@ func TestPostManageRestrictionsWithSeveranceRequiredRedirects(t *testing.T) {
 	tests := []struct {
 		name               string
 		donorConsentAction string
-		severanceDetails   *sirius.SeveranceApplicationDetails
+		severanceDetails   *sirius.SeveranceApplication
 	}{
 		{
 			name:               "Donor consent given",
 			donorConsentAction: "donor-consent-given",
-			severanceDetails:   &sirius.SeveranceApplicationDetails{HasDonorConsented: true},
+			severanceDetails:   &sirius.SeveranceApplication{HasDonorConsented: true},
 		},
 		{
 			name:               "Donor refused severance",
 			donorConsentAction: "donor-consent-not-given",
-			severanceDetails:   &sirius.SeveranceApplicationDetails{HasDonorConsented: false},
+			severanceDetails:   &sirius.SeveranceApplication{HasDonorConsented: false},
 		},
 	}
 
