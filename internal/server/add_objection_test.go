@@ -49,7 +49,7 @@ var testAddObjectionsCaseSummary = sirius.CaseSummary{
 	},
 }
 
-func TestGetAddObjectionsTemplateMultipls(t *testing.T) {
+func TestGetAddObjectionsTemplate(t *testing.T) {
 	tests := []struct {
 		name           string
 		errorReturned  error
