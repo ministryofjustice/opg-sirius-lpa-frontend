@@ -1,4 +1,5 @@
 import * as cases from "../mocks/cases";
+import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("Change attorney details form", () => {
   beforeEach(() => {
@@ -86,18 +87,13 @@ describe("Change attorney details form", () => {
       },
     });
 
-    cases.warnings.empty("555");
+    const mocks = Promise.allSettled([
+      cases.warnings.empty("555"),
+      cases.tasks.empty("555"),
+      digitalLpas.objections.empty("M-1111-1111-1110"),
+    ]);
 
-    cy.addMock(
-      "/lpa-api/v1/cases/555/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-      "GET",
-      {
-        status: 200,
-        body: {
-          tasks: [],
-        },
-      },
-    );
+    cy.wrap(mocks);
 
     cy.visit("/lpa/M-1111-1111-1110/attorney/active-attorney-1/change-details");
   });
