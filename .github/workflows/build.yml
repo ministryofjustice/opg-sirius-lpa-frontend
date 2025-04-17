@@ -239,15 +239,7 @@ jobs:
     name: End of PR Workflow
     runs-on: ubuntu-latest
     if: always()
-    needs: [
-      identify,
-      build,
-      test,
-      lint,
-      acceptance-test,
-      cypress,
-      push
-    ]
+    needs: [identify, build, test, lint, acceptance-test, cypress, push]
     steps:
       - name: End of PR Workflow
         run: |
