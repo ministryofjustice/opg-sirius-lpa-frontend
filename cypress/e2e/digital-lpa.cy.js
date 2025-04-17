@@ -1,4 +1,5 @@
 import * as cases from "../mocks/cases";
+import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("View a digital LPA", () => {
   beforeEach(() => {
@@ -205,6 +206,37 @@ describe("View a digital LPA", () => {
       ],
     });
 
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333/objections", "GET", {
+      status: 200,
+      body: {
+        uid: "M-DIGI-LPA3-3333",
+        objections: [
+          {
+            id: 12,
+            notes: "",
+            objectionType: "factual",
+            receivedDate: "2025-01-01",
+          },
+        ],
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3334/objections", "GET", {
+      status: 200,
+      body: {
+        uid: "M-DIGI-LPA3-3334",
+        objections: [],
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3336/objections", "GET", {
+      status: 200,
+      body: {
+        uid: "M-DIGI-LPA3-3334",
+        objections: [],
+      },
+    });
+
     cy.addMock(
       "/lpa-api/v1/lpas/333/documents?type[-][]=Draft&type[-][]=Preview",
       "GET",
@@ -319,18 +351,17 @@ describe("View a digital LPA", () => {
       },
     });
 
-    cases.warnings.empty("334");
+    const mocks = Promise.allSettled([
+      cases.warnings.empty("333"),
+      cases.warnings.empty("334"),
+      cases.warnings.empty("336"),
+      cases.tasks.empty("334"),
+      cases.tasks.empty("336"),
+      digitalLpas.objections.empty("M-DIGI-LPA3-3333"),
+      digitalLpas.objections.empty("M-DIGI-LPA3-3333"),
+    ]);
 
-    cy.addMock(
-      "/lpa-api/v1/cases/334/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-      "GET",
-      {
-        status: 200,
-        body: {
-          tasks: [],
-        },
-      },
-    );
+    cy.wrap(mocks);
 
     cy.addMock(
       `/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333/progress-indicators`,
@@ -502,19 +533,6 @@ describe("View a digital LPA", () => {
       },
     });
 
-    cases.warnings.empty("336");
-
-    cy.addMock(
-      "/lpa-api/v1/cases/336/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-      "GET",
-      {
-        status: 200,
-        body: {
-          tasks: [],
-        },
-      },
-    );
-
     cy.addMock(
       `/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3336/progress-indicators`,
       "GET",
@@ -608,7 +626,7 @@ describe("View a digital LPA", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3333");
 
     cy.get(".app-caseworker-summary > div:nth-child(2) li").should((elts) => {
-      expect(elts).to.have.length(3);
+      expect(elts).to.have.length(4);
 
       // check donor deceased is at the top, date is properly-formatted,
       // and applies to text for 3+ cases is correct
