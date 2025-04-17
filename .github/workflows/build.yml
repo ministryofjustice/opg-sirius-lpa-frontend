@@ -245,7 +245,7 @@ jobs:
       test,
       lint,
       acceptance-test,
-      cypres"
+      cypress,
       push
     ]
     steps:
