@@ -75,7 +75,6 @@ describe("Create a document for a digital LPA", () => {
 
     digitalLpas.objections.empty("M-GDJ7-QK9R-4XVF");
 
-
     cy.visit("/lpa/M-GDJ7-QK9R-4XVF/documents/new");
   });
 
