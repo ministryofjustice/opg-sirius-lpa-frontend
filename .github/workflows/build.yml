@@ -49,20 +49,11 @@ jobs:
       tag: ${{ steps.bump_version.outputs.tag }}
 
   build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - name: Cache Images
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
-        with:
-          path: /tmp/images
-          key: ${{ runner.os }}-images-${{ github.run_id }}-${{ github.run_number }}
-      - name: Build Images
-        run: |
-          make build
-          mkdir -p /tmp/images
-          docker save -o /tmp/images/app.tar 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest
+    name: Build LPA Frontend
+    uses: ministryofjustice/opg-github-workflows/.github/workflows/build-multi-architecture-image.yml@6bc0246b5cca2f4c85d06986c82a9a42643f6851 # v3.13.0
+    with:
+      image_name: 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend
+      build_options: --file docker/sirius-lpa-frontend/Dockerfile
 
   test:
     name: Test
@@ -120,15 +111,19 @@ jobs:
       - test
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - name: Cache Images
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+
+      - name: Set up Docker
+        run: |
+          echo '{"experimental": true, "features": { "containerd-snapshotter": true }}' | sudo tee -a /etc/docker/daemon.json
+          sudo systemctl restart docker
+          docker run --privileged --rm tonistiigi/binfmt --install all
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           path: /tmp/images
-          key: ${{ runner.os }}-images-${{ github.run_id }}-${{ github.run_number }}
-
-      - name: Restore Images
+          name: multi-arch-image
+      - name: Load Images
         run: |
-          docker load -i /tmp/images/app.tar
+          docker load -i /tmp/images/multi-arch-image.tar
 
       - name: Run pa11y
         run: |
@@ -146,15 +141,19 @@ jobs:
       - test
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - name: Cache Images
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+
+      - name: Set up Docker
+        run: |
+          echo '{"experimental": true, "features": { "containerd-snapshotter": true }}' | sudo tee -a /etc/docker/daemon.json
+          sudo systemctl restart docker
+          docker run --privileged --rm tonistiigi/binfmt --install all
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           path: /tmp/images
-          key: ${{ runner.os }}-images-${{ github.run_id }}-${{ github.run_number }}
-
-      - name: Restore images
+          name: multi-arch-image
+      - name: Load Images
         run: |
-          docker load -i /tmp/images/app.tar
+          docker load -i /tmp/images/multi-arch-image.tar
 
       - name: Run app
         run: make cypress
@@ -176,14 +175,18 @@ jobs:
           fetch-depth: "0"
       - uses: unfor19/install-aws-cli-action@e8b481e524a99f37fbd39fdc1dcb3341ab091367 # v1.0.7
 
-      - name: Cache Images
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      - name: Set up Docker
+        run: |
+          echo '{"experimental": true, "features": { "containerd-snapshotter": true }}' | sudo tee -a /etc/docker/daemon.json
+          sudo systemctl restart docker
+          docker run --privileged --rm tonistiigi/binfmt --install all
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           path: /tmp/images
-          key: ${{ runner.os }}-images-${{ github.run_id }}-${{ github.run_number }}
-
-      - name: Restore Image
-        run: docker load -i /tmp/images/app.tar
+          name: multi-arch-image
+      - name: Load Images
+        run: |
+          docker load -i /tmp/images/multi-arch-image.tar
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722 # v4.1.0
@@ -232,9 +235,34 @@ jobs:
 
           echo "Container tag: ${{ needs.identify.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
 
+  end_of_pr_workflow:
+    name: End of PR Workflow
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [
+      identify,
+      build,
+      test,
+      lint,
+      acceptance-test,
+      cypress,
+      push
+    ]
+    steps:
+      - name: End of PR Workflow
+        run: |
+          if ${{ contains(needs.*.result,'failure') }}
+          then
+            echo "Not all checks succedeed, check the previous jobs."
+            exit 1
+          else
+            echo "All checks succedeed!"
+            exit 0
+          fi
+
   push-tags:
     runs-on: ubuntu-latest
-    needs: [identify, push]
+    needs: [identify, end_of_pr_workflow]
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
