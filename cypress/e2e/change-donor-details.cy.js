@@ -1,4 +1,5 @@
 import * as cases from "../mocks/cases";
+import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("Change donor details form", () => {
   beforeEach(() => {
@@ -92,18 +93,13 @@ describe("Change donor details form", () => {
       },
     });
 
-    cases.warnings.empty("666");
+    const mocks = Promise.allSettled([
+      cases.warnings.empty("666"),
+      cases.tasks.empty("666"),
+      digitalLpas.objections.empty("M-0000-0000-0001"),
+    ]);
 
-    cy.addMock(
-      "/lpa-api/v1/cases/666/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-      "GET",
-      {
-        status: 200,
-        body: {
-          tasks: [],
-        },
-      },
-    );
+    cy.wrap(mocks);
 
     cy.visit("/change-donor-details?uid=M-0000-0000-0001");
   });

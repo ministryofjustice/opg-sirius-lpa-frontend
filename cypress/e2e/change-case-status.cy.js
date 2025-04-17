@@ -1,4 +1,5 @@
 import * as cases from "../mocks/cases";
+import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("Change case status", () => {
   beforeEach(() => {
@@ -90,12 +91,13 @@ describe("Change case status", () => {
       },
     });
 
-    cy.addMock("/lpa-api/v1/cases/333/tasks", "GET", {
-      status: 200,
-      body: [],
-    });
+    const mocks = Promise.allSettled([
+      cases.warnings.empty("333"),
+      cases.tasks.empty("333"),
+      digitalLpas.objections.empty("M-DIGI-LPA3-3333"),
+    ]);
 
-    cases.warnings.empty("333");
+    cy.wrap(mocks);
 
     cy.addMock(
       "/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333/update-case-status",
