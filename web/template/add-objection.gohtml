@@ -1,0 +1,89 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add Objection{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <a href="{{ prefix (printf "/lpa/%s" .CaseUID )}}" class="govuk-back-link">Back</a>
+
+            {{ template "error-summary" .Error }}
+
+            {{ if .Success }}
+                <meta data-app-reload="page" />
+                {{ template "success-banner" "You have successfully added a complaint." }}
+            {{ end }}
+
+            <h1 class="govuk-heading-l app-!-embedded-hide">Add Objection</h1>
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
+
+                <div class="govuk-form-group {{ if .Error.Field.lpaUids }}govuk-form-group--error{{ end }}" id="f-lpaUids">
+                    <fieldset class="govuk-fieldset" aria-describedby="f-lpaUids-hint">
+                        <legend class="govuk-fieldset__legend">Add the objection to</legend>
+                        <div class="govuk-hint" id="f-lpaUids-hint"></div>
+                        {{ template "errors" .Error.Field.lpaUids }}
+                        <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                            {{ range .LinkedLpas }}
+                                <div class="govuk-checkboxes__item">
+                                    <input class="govuk-checkboxes__input" id="f-lpaUids-{{ .UID }}"
+                                           name="lpaUids" type="checkbox" value="{{ .UID }}" {{ if contains $.Form.LpaUids .UID }}checked{{ end }}>
+                                    <label class="govuk-label govuk-checkboxes__label"
+                                           for="f-lpaUids-{{ .UID }}">
+                                        {{ subtypeShortFormat .Subtype }} {{ .UID }}
+                                    </label>
+                                </div>
+                            {{ end }}
+                        </div>
+                    </fieldset>
+                </div>
+
+                {{ template "date" (field "receivedDate" "Date received" .Form.ReceivedDate .Error.Field.receivedDate) }}
+
+                <div class="govuk-form-group{{ if .Error.Field.objectionType }} govuk-form-group--error{{ end }}" id="f-objectionType">
+                    <fieldset class="govuk-fieldset">
+                            <legend class="govuk-fieldset__legend">Objection type</legend>
+                            {{ template "errors" .Error.Field.objectionType }}
+                            <div class="govuk-radios" data-module="govuk-radios">
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="f-objectionType-factual" name="objectionType" type="radio" value="factual" {{ if eq "factual" .Form.ObjectionType }}checked{{ end }}>
+                                    <label class="govuk-label govuk-radios__label" for="f-objectionType-factual">
+                                        Factual
+                                    </label>
+                                </div>
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="f-objectionType-prescribed" name="objectionType" type="radio" value="prescribed" {{ if eq "precribed" .Form.ObjectionType }}checked{{ end }}>
+                                    <label class="govuk-label govuk-radios__label" for="f-objectionType-prescribed">
+                                        Prescribed
+                                    </label>
+                                </div>
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="f-objectionType-thirdParty" name="objectionType" type="radio" value="thirdParty" {{ if eq "thirdParty" .Form.ObjectionType }}checked{{ end }}>
+                                    <label class="govuk-label govuk-radios__label" for="f-objectionType-thirdParty">
+                                        Third Party
+                                    </label>
+                                </div>
+                            </div>
+                    </fieldset>
+                </div>
+
+
+                <div class="govuk-form-group {{ if .Error.Field.notes }}govuk-form-group--error{{ end }}">
+                    <label class="govuk-label" for="f-notes">
+                        Notes (optional)
+                    </label>
+                    {{ template "errors" .Error.Field.notes }}
+                    <div class="govuk-input__wrapper">
+                        <textarea class="govuk-textarea" id="f-notes" name="notes" rows="3" cols="25">{{ .Form.Notes }}</textarea>
+                    </div>
+                </div>
+
+                <div class="govuk-button-group">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s" .CaseUID )}}">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{{ end }}
