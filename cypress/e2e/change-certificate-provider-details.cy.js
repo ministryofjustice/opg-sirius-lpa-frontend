@@ -8,6 +8,7 @@ describe("Change certificate provider details form", () => {
       cases.warnings.empty("1111"),
       cases.tasks.empty("1111"),
       digitalLpas.progressIndicators.feesInProgress("M-1111-1111-1111"),
+      digitalLpas.objections.empty("M-1111-1111-1111"),
     ]);
 
     cy.wrap(mocks);

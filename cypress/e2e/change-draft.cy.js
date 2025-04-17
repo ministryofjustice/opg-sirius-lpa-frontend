@@ -1,4 +1,5 @@
 import * as cases from "../mocks/cases";
+import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("Change draft form", () => {
   beforeEach(() => {
@@ -72,18 +73,13 @@ describe("Change draft form", () => {
       },
     });
 
-    cases.warnings.empty("565");
+    const mocks = Promise.allSettled([
+      cases.warnings.empty("565"),
+      cases.tasks.empty("565"),
+      digitalLpas.objections.empty("M-1111-2222-1111"),
+    ]);
 
-    cy.addMock(
-      "/lpa-api/v1/cases/565/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-      "GET",
-      {
-        status: 200,
-        body: {
-          tasks: [],
-        },
-      },
-    );
+    cy.wrap(mocks);
 
     cy.visit("/lpa/M-1111-2222-1111/change-draft");
   });

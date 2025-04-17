@@ -31,6 +31,8 @@ type testCase struct {
 	TasksForCaseError    error
 	WarningsResponse     http.Response
 	WarningsError        error
+	ObjectionsResponse   http.Response
+	ObjectionsError      error
 	ExpectedError        error
 }
 
@@ -40,6 +42,7 @@ func setupTestCase(
 	digitalLpaError error,
 	tasksForCaseError error,
 	warningsError error,
+	objectionsError error,
 	expectedError error,
 ) testCase {
 	// digital LPA mock
@@ -81,6 +84,17 @@ func setupTestCase(
 		Body:       io.NopCloser(bytes.NewReader(warningsBody.Bytes())),
 	}
 
+	// objections mock
+	var objectionsBody bytes.Buffer
+	err = json.NewEncoder(&objectionsBody).Encode(ObjectionsForCase{})
+	if err != nil {
+		t.Fatal("Could not compile objections JSON")
+	}
+	respForObjections := http.Response{
+		StatusCode: 200,
+		Body:       io.NopCloser(bytes.NewReader(objectionsBody.Bytes())),
+	}
+
 	return testCase{
 		Description:          description,
 		DigitalLpaResponse:   respForDigitalLpa,
@@ -89,6 +103,8 @@ func setupTestCase(
 		TasksForCaseError:    tasksForCaseError,
 		WarningsResponse:     respForWarnings,
 		WarningsError:        warningsError,
+		ObjectionsResponse:   respForObjections,
+		ObjectionsError:      objectionsError,
 		ExpectedError:        expectedError,
 	}
 }
@@ -97,12 +113,14 @@ func setupTestCases(t *testing.T) []testCase {
 	digitalLpaErr := errors.New("Unable to fetch digital LPA")
 	tasksForCaseErr := errors.New("Unable to fetch tasks for case")
 	warningsErr := errors.New("Unable to fetch warnings")
+	objectionsErr := errors.New("Unable to fetch objections")
 
 	return []testCase{
-		setupTestCase(t, "Case summary: all requests successful", nil, nil, nil, nil),
-		setupTestCase(t, "Case summary: digital LPA request failure", digitalLpaErr, nil, nil, digitalLpaErr),
-		setupTestCase(t, "Case summary: tasks for case request failure", nil, tasksForCaseErr, nil, tasksForCaseErr),
-		setupTestCase(t, "Case summary: warnings request failure", nil, nil, warningsErr, warningsErr),
+		setupTestCase(t, "Case summary: all requests successful", nil, nil, nil, nil, nil),
+		setupTestCase(t, "Case summary: digital LPA request failure", digitalLpaErr, nil, nil, nil, digitalLpaErr),
+		setupTestCase(t, "Case summary: tasks for case request failure", nil, tasksForCaseErr, nil, nil, tasksForCaseErr),
+		setupTestCase(t, "Case summary: warnings request failure", nil, nil, warningsErr, nil, warningsErr),
+		setupTestCase(t, "Case summary: objections request failure", nil, nil, nil, objectionsErr, objectionsErr),
 	}
 }
 
@@ -123,6 +141,11 @@ func TestCaseSummary(t *testing.T) {
 		return warningsUrl.String() == r.URL.String()
 	})
 
+	reqForObjectionsMatcher := mock.MatchedBy(func(r *http.Request) bool {
+		objectionsUrl, _ := url.Parse("http://localhost:8888/lpa-api/v1/digital-lpas/M-QWER-TY34-3434/objections")
+		return objectionsUrl.String() == r.URL.String()
+	})
+
 	for _, testCase := range setupTestCases(t) {
 		mockHttpClient := mockCaseSummaryHttpClient{}
 		client := NewClient(&mockHttpClient, "http://localhost:8888")
@@ -130,6 +153,7 @@ func TestCaseSummary(t *testing.T) {
 		mockHttpClient.On("Do", reqForDigitalLpaMatcher).Return(&testCase.DigitalLpaResponse, testCase.DigitalLpaError)
 		mockHttpClient.On("Do", reqForTasksForCaseMatcher).Return(&testCase.TasksForCaseResponse, testCase.TasksForCaseError)
 		mockHttpClient.On("Do", reqForWarningsMatcher).Return(&testCase.WarningsResponse, testCase.WarningsError)
+		mockHttpClient.On("Do", reqForObjectionsMatcher).Return(&testCase.ObjectionsResponse, testCase.ObjectionsError)
 
 		_, err := client.CaseSummary(Context{Context: context.Background()}, "M-QWER-TY34-3434")
 		assert.Equal(t, testCase.ExpectedError, err)
@@ -152,6 +176,11 @@ func TestCaseSummaryWithImages(t *testing.T) {
 		return warningsUrl.String() == r.URL.String()
 	})
 
+	reqForObjectionsMatcher := mock.MatchedBy(func(r *http.Request) bool {
+		objectionsUrl, _ := url.Parse("http://localhost:8888/lpa-api/v1/digital-lpas/M-QWER-TY34-3434/objections")
+		return objectionsUrl.String() == r.URL.String()
+	})
+
 	for _, testCase := range setupTestCases(t) {
 		mockHttpClient := mockCaseSummaryHttpClient{}
 		client := NewClient(&mockHttpClient, "http://localhost:8888")
@@ -159,6 +188,7 @@ func TestCaseSummaryWithImages(t *testing.T) {
 		mockHttpClient.On("Do", reqForDigitalLpaMatcher).Return(&testCase.DigitalLpaResponse, testCase.DigitalLpaError)
 		mockHttpClient.On("Do", reqForTasksForCaseMatcher).Return(&testCase.TasksForCaseResponse, testCase.TasksForCaseError)
 		mockHttpClient.On("Do", reqForWarningsMatcher).Return(&testCase.WarningsResponse, testCase.WarningsError)
+		mockHttpClient.On("Do", reqForObjectionsMatcher).Return(&testCase.ObjectionsResponse, testCase.ObjectionsError)
 
 		_, err := client.CaseSummaryWithImages(Context{Context: context.Background()}, "M-QWER-TY34-3434")
 		assert.Equal(t, testCase.ExpectedError, err)
