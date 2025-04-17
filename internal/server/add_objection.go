@@ -18,7 +18,7 @@ type addObjectionData struct {
 	XSRFToken  string
 	Success    bool
 	Error      sirius.ValidationError
-	Case       sirius.CaseSummary
+	CaseUID    string
 	LinkedLpas []sirius.SiriusData
 	Form       formAddObjections
 }
@@ -28,6 +28,10 @@ type formAddObjections struct {
 	ReceivedDate  dob      `form:"receivedDate"`
 	ObjectionType string   `form:"objectionType"`
 	Notes         string   `form:"notes"`
+}
+
+func isValidStatusForObjection(status string) bool {
+	return status == "In progress" || status == "Draft" || status == "Statutory waiting period"
 }
 
 func AddObjection(client AddObjectionClient, tmpl template.Template) Handler {
@@ -56,10 +60,22 @@ func AddObjection(client AddObjectionClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		var linkedCasesForObjections []sirius.SiriusData
+
+		if isValidStatusForObjection(cs.DigitalLpa.SiriusData.Status) {
+			linkedCasesForObjections = append(linkedCasesForObjections, cs.DigitalLpa.SiriusData)
+		}
+
+		for _, c := range cs.DigitalLpa.SiriusData.LinkedCases {
+			if isValidStatusForObjection(c.Status) {
+				linkedCasesForObjections = append(linkedCasesForObjections, c)
+			}
+		}
+
 		data := addObjectionData{
 			XSRFToken:  ctx.XSRFToken,
-			Case:       cs,
-			LinkedLpas: cs.DigitalLpa.SiriusData.LinkedCases,
+			CaseUID:    caseUID,
+			LinkedLpas: linkedCasesForObjections,
 		}
 
 		if r.Method == http.MethodPost {
