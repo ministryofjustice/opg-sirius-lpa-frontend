@@ -1,4 +1,5 @@
 import * as cases from "../mocks/cases";
+import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("View and edit anomalies for a digital LPA", () => {
   beforeEach(() => {
@@ -32,19 +33,6 @@ describe("View and edit anomalies for a digital LPA", () => {
         },
       },
     });
-
-    cases.warnings.empty("111");
-
-    cy.addMock(
-      "/lpa-api/v1/cases/111/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-      "GET",
-      {
-        status: 200,
-        body: {
-          tasks: [],
-        },
-      },
-    );
 
     cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-QQQQ-1111/anomalies", "GET", {
       status: 200,
@@ -140,18 +128,16 @@ describe("View and edit anomalies for a digital LPA", () => {
       },
     });
 
-    cases.warnings.empty("222");
+    const mocks = Promise.allSettled([
+      cases.warnings.empty("111"),
+      cases.warnings.empty("222"),
+      cases.tasks.empty("111"),
+      cases.tasks.empty("222"),
+      digitalLpas.objections.empty("M-DIGI-QQQQ-1111"),
+      digitalLpas.objections.empty("M-DIGI-SSSS-3333"),
+    ]);
 
-    cy.addMock(
-      "/lpa-api/v1/cases/222/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-      "GET",
-      {
-        status: 200,
-        body: {
-          tasks: [],
-        },
-      },
-    );
+    cy.wrap(mocks);
 
     cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-SSSS-3333/anomalies", "GET", {
       status: 200,

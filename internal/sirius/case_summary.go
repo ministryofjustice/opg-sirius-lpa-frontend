@@ -8,6 +8,7 @@ type CaseSummary struct {
 	DigitalLpa  DigitalLpa
 	TaskList    []Task
 	WarningList []Warning
+	Objections  []Objection
 }
 
 /**
@@ -45,6 +46,14 @@ func (c *Client) getCaseSummary(ctx Context, uid string, presignImages bool) (Ca
 
 	group.Go(func() error {
 		cs.WarningList, err = c.WarningsForCase(ctx.With(groupCtx), cs.DigitalLpa.SiriusData.ID)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	group.Go(func() error {
+		cs.Objections, err = c.ObjectionsForCase(ctx.With(groupCtx), uid)
 		if err != nil {
 			return err
 		}

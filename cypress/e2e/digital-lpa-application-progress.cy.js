@@ -7,6 +7,8 @@ describe("View the application progress for a digital LPA", () => {
       digitalLpas.get("M-1111-1111-1111"),
       cases.warnings.empty("1111"),
       cases.tasks.empty("1111"),
+      digitalLpas.objections.empty("M-1111-1111-1111"),
+      digitalLpas.objections.empty("M-2222-2222-2222"),
       digitalLpas.progressIndicators.feesInProgress("M-1111-1111-1111"),
       digitalLpas.get("M-2222-2222-2222", {
         "opg.poas.sirius": {
