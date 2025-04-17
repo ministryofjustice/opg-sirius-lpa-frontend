@@ -259,4 +259,20 @@ const anomalies = {
   },
 };
 
-export { get, progressIndicators, anomalies };
+const objections = {
+  async empty(digitalLpaUid) {
+    await addMock(
+      `/lpa-api/v1/digital-lpas/${digitalLpaUid}/objections`,
+      "GET",
+      {
+        status: 200,
+        body: {
+          uid: `${digitalLpaUid}`,
+          objections: [],
+        },
+      },
+    );
+  },
+};
+
+export { get, progressIndicators, anomalies, objections };

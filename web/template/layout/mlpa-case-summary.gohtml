@@ -11,6 +11,8 @@
             </div>
         </div>
 
+        {{ $uid := .CaseSummary.DigitalLpa.UID }}
+
         <div class="govuk-grid-row" data-id="case-summary" aria-expanded="true">
             <div class="govuk-grid-column-one-third">
                 <div class="govuk-!-margin-bottom-4">
@@ -26,7 +28,6 @@
                         <p class="govuk-body-s">There are none in place.</p>
                     {{ else }}
                         <ul class="govuk-list">
-                            {{ $uid := .CaseSummary.DigitalLpa.UID }}
                             {{ range (sortWarningsForCaseSummary .CaseSummary.WarningList) }}
                                 <li>
                                     <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>{{ .WarningType }}</strong></p>
@@ -47,7 +48,23 @@
                     <path fill="#fff" d="M8.4 4.5h2.2l-.2 7H8.6l-.2-7Z"/>
                 </svg>
                 <h3 class="govuk-heading-s govuk-!-display-inline">Complaints, objections & investigations</h3>
-                <p class="govuk-body-s">There are none in place.</p>
+                {{ if not .CaseSummary.Objections }}
+                    <p class="govuk-body-s">There are none in place.</p>
+                {{ else }}
+                    <a class="govuk-body-s govuk-link" href="">
+                        <strong>Objection received</strong>
+                    </a>
+                    <ul class="govuk-list">
+                        {{ range .CaseSummary.Objections }}
+                            <li>
+                                <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">Received on {{ parseAndFormatDate .ReceivedDate "2006-01-02" "2 January 2006" }}</p>
+                                <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">Added to {{ $uid }}</p>
+                                <a class="govuk-body-s govuk-link" href="">Record objection outcome</a>
+                            </li>
+                        {{ end }}
+                    </ul>
+
+                {{ end }}
             </div>
 
             <div class="govuk-grid-column-two-thirds">
