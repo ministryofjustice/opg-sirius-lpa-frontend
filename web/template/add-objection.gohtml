@@ -5,7 +5,7 @@
 {{ define "main" }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <a href="{{ prefix (printf "/lpa/%s/lpa-details" .Case.DigitalLpa.UID )}}" class="govuk-back-link">Back</a>
+            <a href="{{ prefix (printf "/lpa/%s" .CaseUID )}}" class="govuk-back-link">Back</a>
 
             {{ template "error-summary" .Error }}
 
@@ -25,15 +25,6 @@
                         <div class="govuk-hint" id="f-lpaUids-hint"></div>
                         {{ template "errors" .Error.Field.lpaUids }}
                         <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-                            <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="f-lpaUids-{{ .Case.DigitalLpa.UID }}"
-                                       name="lpaUids" type="checkbox" value="{{ .Case.DigitalLpa.UID }}" {{ if contains .Form.LpaUids .Case.DigitalLpa.UID }}checked{{ end }}>
-                                <label class="govuk-label govuk-checkboxes__label"
-                                       for="f-lpaUids-{{ .Case.DigitalLpa.UID }}">
-                                    {{ subtypeShortFormat .Case.DigitalLpa.SiriusData.Subtype }} {{ .Case.DigitalLpa.UID }}
-                                </label>
-                            </div>
-
                             {{ range .LinkedLpas }}
                                 <div class="govuk-checkboxes__item">
                                     <input class="govuk-checkboxes__input" id="f-lpaUids-{{ .UID }}"
@@ -44,7 +35,6 @@
                                     </label>
                                 </div>
                             {{ end }}
-
                         </div>
                     </fieldset>
                 </div>
@@ -91,7 +81,7 @@
 
                 <div class="govuk-button-group">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
-                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s/lpa-details" .Case.DigitalLpa.UID )}}">Cancel</a>
+                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s" .CaseUID )}}">Cancel</a>
                 </div>
             </form>
         </div>

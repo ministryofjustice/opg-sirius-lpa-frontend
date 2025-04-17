@@ -30,13 +30,14 @@ var testAddObjectionsCaseSummary = sirius.CaseSummary{
 		UID: "M-9898-9898-9898",
 		SiriusData: sirius.SiriusData{
 			ID:      676,
+			UID:     "M-9898-9898-9898",
 			Subtype: "personal-welfare",
 			Status:  "Draft",
 			LinkedCases: []sirius.SiriusData{
 				{
 					UID:     "M-9999-9999-9999",
 					Subtype: "personal-welfare",
-					Status:  "Draft",
+					Status:  "In progress",
 				},
 				{
 					UID:     "M-8888-8888-8888",
@@ -74,8 +75,32 @@ func TestGetAddObjectionsTemplateMultipls(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, addObjectionData{
-					Case:       testAddObjectionsCaseSummary,
-					LinkedLpas: testAddObjectionsCaseSummary.DigitalLpa.SiriusData.LinkedCases,
+					CaseUID: "M-9898-9898-9898",
+					LinkedLpas: []sirius.SiriusData{
+						{
+							UID:     "M-9898-9898-9898",
+							ID:      676,
+							Subtype: "personal-welfare",
+							Status:  "Draft",
+							LinkedCases: []sirius.SiriusData{
+								{
+									UID:     "M-9999-9999-9999",
+									Subtype: "personal-welfare",
+									Status:  "In progress",
+								},
+								{
+									UID:     "M-8888-8888-8888",
+									Subtype: "personal-welfare",
+									Status:  "Registered",
+								},
+							},
+						},
+						{
+							UID:     "M-9999-9999-9999",
+							Subtype: "personal-welfare",
+							Status:  "In progress",
+						},
+					},
 				}).
 				Return(tc.errorReturned)
 
