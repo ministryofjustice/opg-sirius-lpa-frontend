@@ -1,3 +1,6 @@
+import * as cases from "../mocks/cases";
+import * as digitalLpas from "../mocks/digitalLpas";
+
 describe("View the application progress for a digital LPA", () => {
   const uid = "M-QEQE-EEEE-WERT";
   const id = 113222;
@@ -67,21 +70,13 @@ describe("View the application progress for a digital LPA", () => {
       },
     });
 
-    cy.addMock(`/lpa-api/v1/cases/${id}/warnings`, "GET", {
-      status: 200,
-      body: [],
-    });
+    const mocks = Promise.allSettled([
+      cases.warnings.empty("113222"),
+      cases.tasks.empty("113222"),
+      digitalLpas.objections.empty("M-QEQE-EEEE-WERT"),
+    ]);
 
-    cy.addMock(
-      `/lpa-api/v1/cases/${id}/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC`,
-      "GET",
-      {
-        status: 200,
-        body: {
-          tasks: [],
-        },
-      },
-    );
+    cy.wrap(mocks);
   });
 
   it("shows application progress not started", () => {
