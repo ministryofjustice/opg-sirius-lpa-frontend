@@ -73,7 +73,7 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 		if data.FormAction == "" && data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceStatus == "REQUIRED" {
 			data.FormAction = "donor-consent"
 
-			if data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication != nil && *data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.HasDonorConsented == true {
+			if data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication != nil && *data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.HasDonorConsented {
 				data.FormAction = "court-order"
 			}
 		}
