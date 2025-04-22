@@ -1,14 +1,13 @@
 package server
 
 import (
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
-
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 type mockManageRestrictionsClient struct {
@@ -30,9 +29,13 @@ func (m *mockManageRestrictionsClient) UpdateSeveranceStatus(ctx sirius.Context,
 	return args.Error(0)
 }
 
-func (m *mockManageRestrictionsClient) EditSeveranceApplication(ctx sirius.Context, caseUID string, severanceApplicationDetails sirius.SeveranceApplicationDetails) error {
+func (m *mockManageRestrictionsClient) EditSeveranceApplication(ctx sirius.Context, caseUID string, severanceApplicationDetails sirius.SeveranceApplication) error {
 	args := m.Called(ctx, caseUID, severanceApplicationDetails)
 	return args.Error(0)
+}
+
+func convertToBool(b bool) *bool {
+	return &b
 }
 
 var restrictionsCaseSummary = sirius.CaseSummary{
@@ -66,6 +69,27 @@ var restrictionsCaseSummaryWithSeveranceRequired = sirius.CaseSummary{
 	},
 }
 
+var restrictionsCaseSummaryWithDonorConsentGiven = sirius.CaseSummary{
+	DigitalLpa: sirius.DigitalLpa{
+		UID: "M-1111-2222-3333",
+		SiriusData: sirius.SiriusData{
+			Application: sirius.Draft{
+				SeveranceStatus: "REQUIRED",
+				SeveranceApplication: &sirius.SeveranceApplication{
+					HasDonorConsented: convertToBool(true),
+				},
+			},
+		},
+	},
+	TaskList: []sirius.Task{
+		{
+			ID:     1,
+			Name:   "Review restrictions and conditions",
+			Status: "Not started",
+		},
+	},
+}
+
 func TestGetManageRestrictionsCases(t *testing.T) {
 	tests := []struct {
 		name          string
@@ -85,6 +109,13 @@ func TestGetManageRestrictionsCases(t *testing.T) {
 			name:          "Get manage restrictions with severance required request succeeds",
 			caseSummary:   restrictionsCaseSummaryWithSeveranceRequired,
 			action:        "donor-consent",
+			templateError: nil,
+			expectedError: nil,
+		},
+		{
+			name:          "Get manage restrictions with donor consent given succeeds",
+			caseSummary:   restrictionsCaseSummaryWithDonorConsentGiven,
+			action:        "court-order",
 			templateError: nil,
 			expectedError: nil,
 		},
@@ -244,17 +275,17 @@ func TestPostManageRestrictionsWithSeveranceRequiredRedirects(t *testing.T) {
 	tests := []struct {
 		name               string
 		donorConsentAction string
-		severanceDetails   *sirius.SeveranceApplicationDetails
+		severanceDetails   *sirius.SeveranceApplication
 	}{
 		{
 			name:               "Donor consent given",
 			donorConsentAction: "donor-consent-given",
-			severanceDetails:   &sirius.SeveranceApplicationDetails{HasDonorConsented: true},
+			severanceDetails:   &sirius.SeveranceApplication{HasDonorConsented: convertToBool(true)},
 		},
 		{
 			name:               "Donor refused severance",
 			donorConsentAction: "donor-consent-not-given",
-			severanceDetails:   &sirius.SeveranceApplicationDetails{HasDonorConsented: false},
+			severanceDetails:   &sirius.SeveranceApplication{HasDonorConsented: convertToBool(false)},
 		},
 	}
 
@@ -274,6 +305,68 @@ func TestPostManageRestrictionsWithSeveranceRequiredRedirects(t *testing.T) {
 
 			form := url.Values{
 				"donorConsentGiven": {tc.donorConsentAction},
+				"action":            {"donor-consent"},
+			}
+
+			req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/manage-restrictions", strings.NewReader(form.Encode()))
+			req.Header.Add("Content-Type", formUrlEncoded)
+			_, err := server.serve(req)
+
+			assert.Equal(t, RedirectError("/lpa/M-1111-2222-3333/lpa-details"), err)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
+func TestPostManageRestrictionsWithDonorConsentGivenRedirects(t *testing.T) {
+	tests := []struct {
+		name                   string
+		courtOrderDecisionMade string
+		courtOrderReceived     string
+		severanceOrderedAction string
+		severanceDetails       *sirius.SeveranceApplication
+	}{
+		{
+			name:                   "Court order decision made date given",
+			courtOrderDecisionMade: "2025-04-05",
+			courtOrderReceived:     "",
+			severanceOrderedAction: "",
+			severanceDetails: &sirius.SeveranceApplication{
+				CourtOrderDecisionMade: "2025-04-05",
+			},
+		},
+		{
+			name:                   "Court order received date and severance ordered given",
+			courtOrderDecisionMade: "2025-04-05",
+			courtOrderReceived:     "2025-04-10",
+			severanceOrderedAction: "severance-ordered",
+			severanceDetails: &sirius.SeveranceApplication{
+				CourtOrderDecisionMade: "2025-04-05",
+				CourtOrderReceived:     "2025-04-10",
+				SeveranceOrdered:       convertToBool(true),
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &mockManageRestrictionsClient{}
+			client.
+				On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+				Return(restrictionsCaseSummaryWithDonorConsentGiven, nil)
+
+			client.
+				On("EditSeveranceApplication", mock.Anything, "M-1111-2222-3333", *tc.severanceDetails).
+				Return(nil)
+
+			template := &mockTemplate{}
+			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func))
+
+			form := url.Values{
+				"courtOrderDecisionMade": {tc.courtOrderDecisionMade},
+				"courtOrderReceived":     {tc.courtOrderReceived},
+				"severanceOrdered":       {tc.severanceOrderedAction},
+				"action":                 {"court-order"},
 			}
 
 			req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/manage-restrictions", strings.NewReader(form.Encode()))

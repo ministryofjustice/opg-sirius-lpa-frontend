@@ -10,6 +10,10 @@ import (
 	"testing"
 )
 
+func convertToBool(b bool) *bool {
+	return &b
+}
+
 func TestEditSeveranceApplication(t *testing.T) {
 	t.Parallel()
 
@@ -17,15 +21,15 @@ func TestEditSeveranceApplication(t *testing.T) {
 	assert.NoError(t, err)
 
 	testCases := []struct {
-		name                        string
-		severanceApplicationDetails SeveranceApplicationDetails
-		setup                       func()
-		expectedError               func(int) error
+		name                 string
+		severanceApplication SeveranceApplication
+		setup                func()
+		expectedError        func(int) error
 	}{
 		{
 			name: "Donor consent given",
-			severanceApplicationDetails: SeveranceApplicationDetails{
-				HasDonorConsented: true,
+			severanceApplication: SeveranceApplication{
+				HasDonorConsented: convertToBool(true),
 			},
 			setup: func() {
 				pact.
@@ -40,7 +44,7 @@ func TestEditSeveranceApplication(t *testing.T) {
 						},
 						Body: map[string]interface{}{
 							"hasDonorConsented":      true,
-							"severanceOrdered":       false,
+							"severanceOrdered":       nil,
 							"courtOrderDecisionMade": nil,
 							"courtOrderReceived":     nil,
 						},
@@ -59,7 +63,7 @@ func TestEditSeveranceApplication(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				err := client.EditSeveranceApplication(Context{Context: context.Background()}, "M-1234-9876-4567", tc.severanceApplicationDetails)
+				err := client.EditSeveranceApplication(Context{Context: context.Background()}, "M-1234-9876-4567", tc.severanceApplication)
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
