@@ -14,18 +14,21 @@ type ManageRestrictionsClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
 	ClearTask(sirius.Context, int) error
 	UpdateSeveranceStatus(sirius.Context, string, sirius.SeveranceStatusData) error
-	EditSeveranceApplication(sirius.Context, string, sirius.SeveranceApplicationDetails) error
+	EditSeveranceApplication(sirius.Context, string, sirius.SeveranceApplication) error
 }
 
 type manageRestrictionsData struct {
-	XSRFToken         string
-	Error             sirius.ValidationError
-	CaseUID           string
-	CaseSummary       sirius.CaseSummary
-	SeveranceAction   string
-	DonorConsentGiven string
-	FormAction        string
-	Success           bool
+	XSRFToken               string
+	Error                   sirius.ValidationError
+	CaseUID                 string
+	CaseSummary             sirius.CaseSummary
+	SeveranceAction         string
+	DonorConsentGiven       string
+	SeveranceOrderedByCourt string
+	CourtOrderDecisionDate  sirius.DateString
+	CourtOrderReceivedDate  sirius.DateString
+	FormAction              string
+	Success                 bool
 }
 
 func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template) Handler {
@@ -55,17 +58,24 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 		}
 
 		data := manageRestrictionsData{
-			CaseSummary:       cs,
-			SeveranceAction:   postFormString(r, "severanceAction"),
-			DonorConsentGiven: postFormString(r, "donorConsentGiven"),
-			XSRFToken:         ctx.XSRFToken,
-			Error:             sirius.ValidationError{Field: sirius.FieldErrors{}},
-			CaseUID:           caseUID,
+			CaseSummary:             cs,
+			SeveranceAction:         postFormString(r, "severanceAction"),
+			DonorConsentGiven:       postFormString(r, "donorConsentGiven"),
+			SeveranceOrderedByCourt: postFormString(r, "severanceOrdered"),
+			CourtOrderDecisionDate:  postFormDateString(r, "courtOrderDecisionMade"),
+			CourtOrderReceivedDate:  postFormDateString(r, "courtOrderReceived"),
+			XSRFToken:               ctx.XSRFToken,
+			Error:                   sirius.ValidationError{Field: sirius.FieldErrors{}},
+			CaseUID:                 caseUID,
 		}
 
 		data.FormAction = r.FormValue("action")
 		if data.FormAction == "" && data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceStatus == "REQUIRED" {
 			data.FormAction = "donor-consent"
+
+			if data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication != nil && *data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.HasDonorConsented == true {
+				data.FormAction = "court-order"
+			}
 		}
 
 		if r.Method == http.MethodPost {
@@ -116,8 +126,8 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 						hasDonorConsented = false
 					}
 
-					err := client.EditSeveranceApplication(ctx, caseUID, sirius.SeveranceApplicationDetails{
-						HasDonorConsented: hasDonorConsented,
+					err := client.EditSeveranceApplication(ctx, caseUID, sirius.SeveranceApplication{
+						HasDonorConsented: &hasDonorConsented,
 					})
 					if handleError(w, &data, err) {
 						return err
@@ -131,6 +141,35 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 						"reason": "Please select an option",
 					}
 				}
+			}
+
+			if data.FormAction == "court-order" {
+				severanceApplication := sirius.SeveranceApplication{}
+
+				if data.CourtOrderDecisionDate != "" {
+					severanceApplication.CourtOrderDecisionMade = data.CourtOrderDecisionDate
+				}
+
+				if data.CourtOrderReceivedDate != "" {
+					severanceApplication.CourtOrderReceived = data.CourtOrderReceivedDate
+				}
+
+				switch data.SeveranceOrderedByCourt {
+				case "severance-ordered", "severance-not-ordered":
+					isSeveranceOrdered := true
+					if data.SeveranceOrderedByCourt == "severance-not-ordered" {
+						isSeveranceOrdered = false
+					}
+
+					severanceApplication.SeveranceOrdered = &isSeveranceOrdered
+				}
+
+				err := client.EditSeveranceApplication(ctx, caseUID, severanceApplication)
+				if handleError(w, &data, err) {
+					return err
+				}
+
+				return handleSuccess(w, &data, caseUID)
 			}
 		}
 		return tmpl(w, data)
