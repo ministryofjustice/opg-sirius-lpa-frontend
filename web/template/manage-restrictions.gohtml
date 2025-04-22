@@ -65,13 +65,13 @@
                                 <legend class="govuk-fieldset__legend"><strong>Has severance of the restrictions and conditions been ordered?</strong></legend>
                                 <div class="govuk-radios" data-module="govuk-radios">
                                     <div class="govuk-radios__item">
-                                        <input class="govuk-radios__input" id="f-severanceNotOrdered" name="severanceOrdered" type="radio" value="severance-not-ordered" {{ if eq "severance-ordered" .CourtOrderedSeverance }}checked{{ end }}>
+                                        <input class="govuk-radios__input" id="f-severanceNotOrdered" name="severanceOrdered" type="radio" value="severance-not-ordered" {{ if eq "severance-not-ordered" .SeveranceOrderedByCourt }}checked{{ end }}>
                                         <label class="govuk-label govuk-radios__label" for="f-severanceNotOrdered">
                                             No
                                         </label>
                                     </div>
                                     <div class="govuk-radios__item">
-                                        <input class="govuk-radios__input" id="f-severanceOrdered" name="severanceOrdered" type="radio" value="severance-ordered" {{ if eq "severance-not-ordered" .CourtOrderedSeverance }}checked{{ end }}>
+                                        <input class="govuk-radios__input" id="f-severanceOrdered" name="severanceOrdered" type="radio" value="severance-ordered" {{ if eq "severance-ordered" .SeveranceOrderedByCourt }}checked{{ end }}>
                                         <label class="govuk-label govuk-radios__label" for="f-severanceOrdered">
                                             Yes
                                         </label>
@@ -125,11 +125,15 @@
                 </div>
 
                 <div class="govuk-button-group">
-                    {{ if eq .FormAction "donor-consent" }}
-                        <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
-                    {{ else }}
-                        <button class="govuk-button" data-module="govuk-button" type="submit">Confirm</button>
-                    {{ end }}
+                    <button class="govuk-button" data-module="govuk-button" type="submit">
+                        {{ if eq .FormAction "court-order" }}
+                            Save and continue
+                        {{ else if eq .FormAction "donor-consent" }}
+                            Save and exit
+                        {{ else }}
+                            Confirm
+                        {{ end }}
+                    </button>
                     <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s/lpa-details" .CaseUID )}}">Cancel</a>
                 </div>
             </form>

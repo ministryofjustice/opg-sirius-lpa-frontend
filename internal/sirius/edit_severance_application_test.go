@@ -10,6 +10,10 @@ import (
 	"testing"
 )
 
+func convertToBool(b bool) *bool {
+	return &b
+}
+
 func TestEditSeveranceApplication(t *testing.T) {
 	t.Parallel()
 
@@ -25,7 +29,7 @@ func TestEditSeveranceApplication(t *testing.T) {
 		{
 			name: "Donor consent given",
 			severanceApplication: SeveranceApplication{
-				HasDonorConsented: true,
+				HasDonorConsented: convertToBool(true),
 			},
 			setup: func() {
 				pact.
@@ -40,7 +44,7 @@ func TestEditSeveranceApplication(t *testing.T) {
 						},
 						Body: map[string]interface{}{
 							"hasDonorConsented":      true,
-							"severanceOrdered":       false,
+							"severanceOrdered":       nil,
 							"courtOrderDecisionMade": nil,
 							"courtOrderReceived":     nil,
 						},
