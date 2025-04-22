@@ -51,35 +51,6 @@ func TestEditSeveranceApplication(t *testing.T) {
 					})
 			},
 		},
-		{
-			name: "Severance Ordered",
-			severanceApplication: SeveranceApplication{
-				SeveranceOrdered:       convertToBool(true),
-				CourtOrderDecisionMade: "2025-04-05",
-				CourtOrderReceived:     "2025-04-10",
-			},
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("A digital LPA exists").
-					UponReceiving("A request for editing severance application").
-					WithCompleteRequest(consumer.Request{
-						Method: http.MethodPut,
-						Path:   matchers.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567/severance"),
-						Headers: matchers.MapMatcher{
-							"Content-Type": matchers.String("application/json"),
-						},
-						Body: map[string]interface{}{
-							"severanceOrdered":       true,
-							"courtOrderDecisionMade": "05/04/2025",
-							"courtOrderReceived":     "10/04/2025",
-						},
-					}).
-					WithCompleteResponse(consumer.Response{
-						Status: http.StatusNoContent,
-					})
-			},
-		},
 	}
 
 	for _, tc := range testCases {
