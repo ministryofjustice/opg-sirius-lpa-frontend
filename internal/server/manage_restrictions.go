@@ -18,17 +18,17 @@ type ManageRestrictionsClient interface {
 }
 
 type manageRestrictionsData struct {
-	XSRFToken              string
-	Error                  sirius.ValidationError
-	CaseUID                string
-	CaseSummary            sirius.CaseSummary
-	SeveranceAction        string
-	DonorConsentGiven      string
-	CourtOrderedSeverance  string
-	CourtOrderDecisionDate sirius.DateString
-	CourtOrderReceivedDate sirius.DateString
-	FormAction             string
-	Success                bool
+	XSRFToken               string
+	Error                   sirius.ValidationError
+	CaseUID                 string
+	CaseSummary             sirius.CaseSummary
+	SeveranceAction         string
+	DonorConsentGiven       string
+	SeveranceOrderedByCourt string
+	CourtOrderDecisionDate  sirius.DateString
+	CourtOrderReceivedDate  sirius.DateString
+	FormAction              string
+	Success                 bool
 }
 
 func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template) Handler {
@@ -57,18 +57,16 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 			return err
 		}
 
-		fmt.Println(fmt.Sprintf("%#v", cs))
-
 		data := manageRestrictionsData{
-			CaseSummary:            cs,
-			SeveranceAction:        postFormString(r, "severanceAction"),
-			DonorConsentGiven:      postFormString(r, "donorConsentGiven"),
-			CourtOrderedSeverance:  postFormString(r, "severanceOrdered"),
-			CourtOrderDecisionDate: postFormDateString(r, "courtOrderDecisionMade"),
-			CourtOrderReceivedDate: postFormDateString(r, "courtOrderReceived"),
-			XSRFToken:              ctx.XSRFToken,
-			Error:                  sirius.ValidationError{Field: sirius.FieldErrors{}},
-			CaseUID:                caseUID,
+			CaseSummary:             cs,
+			SeveranceAction:         postFormString(r, "severanceAction"),
+			DonorConsentGiven:       postFormString(r, "donorConsentGiven"),
+			SeveranceOrderedByCourt: postFormString(r, "severanceOrdered"),
+			CourtOrderDecisionDate:  postFormDateString(r, "courtOrderDecisionMade"),
+			CourtOrderReceivedDate:  postFormDateString(r, "courtOrderReceived"),
+			XSRFToken:               ctx.XSRFToken,
+			Error:                   sirius.ValidationError{Field: sirius.FieldErrors{}},
+			CaseUID:                 caseUID,
 		}
 
 		data.FormAction = r.FormValue("action")
@@ -156,10 +154,10 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 					severanceApplication.CourtOrderReceived = data.CourtOrderReceivedDate
 				}
 
-				switch data.CourtOrderedSeverance {
+				switch data.SeveranceOrderedByCourt {
 				case "severance-ordered", "severance-not-ordered":
 					isSeveranceOrdered := true
-					if data.CourtOrderedSeverance == "severance-not-ordered" {
+					if data.SeveranceOrderedByCourt == "severance-not-ordered" {
 						isSeveranceOrdered = false
 					}
 
