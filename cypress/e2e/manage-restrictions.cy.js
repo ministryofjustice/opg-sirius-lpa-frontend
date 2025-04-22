@@ -264,7 +264,7 @@ describe("Manage restrictions form", () => {
             severanceStatus: "REQUIRED",
             severanceApplication: {
               hasDonorConsented: true,
-            }
+            },
           },
         },
       },
@@ -285,14 +285,14 @@ describe("Manage restrictions form", () => {
     });
 
     cy.addMock(
-        "/lpa-api/v1/cases/888/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-        "GET",
-        {
-          status: 200,
-          body: {
-            tasks: [],
-          },
+      "/lpa-api/v1/cases/888/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
+      "GET",
+      {
+        status: 200,
+        body: {
+          tasks: [],
         },
+      },
     );
     cy.visit("/lpa/M-6666-6666-6669/manage-restrictions").then(() => {
       cy.contains("Manage restrictions and conditions");
@@ -300,7 +300,9 @@ describe("Manage restrictions form", () => {
       cy.contains("Manage restrictions and conditions");
       cy.contains("Date court order made");
       cy.contains("Date court order issued");
-      cy.contains("Has severance of the restrictions and conditions been ordered?");
+      cy.contains(
+        "Has severance of the restrictions and conditions been ordered?",
+      );
     });
   });
 });
