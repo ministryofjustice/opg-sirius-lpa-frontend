@@ -183,7 +183,7 @@ describe("Manage restrictions form", () => {
     cy.addMock("/lpa-api/v1/digital-lpas/M-6666-6666-6668", "GET", {
       status: 200,
       body: {
-        uId: "M-6666-6666-66688",
+        uId: "M-6666-6666-6668",
         "opg.poas.sirius": {
           id: 888,
           uId: "M-6666-6666-6668",
@@ -236,6 +236,73 @@ describe("Manage restrictions form", () => {
       cy.contains("No");
 
       cy.contains("Severance application is required");
+    });
+  });
+
+  it("can be visited from the LPA details manage restrictions link when donor has given consent", () => {
+    cy.addMock("/lpa-api/v1/digital-lpas/M-6666-6666-6669", "GET", {
+      status: 200,
+      body: {
+        uId: "M-6666-6666-6669",
+        "opg.poas.sirius": {
+          id: 888,
+          uId: "M-6666-6666-6669",
+          status: "in-progress",
+          caseSubtype: "personal-welfare",
+          createdDate: "31/10/2023",
+          investigationCount: 0,
+          complaintCount: 0,
+          taskCount: 0,
+          warningCount: 0,
+          donor: {
+            id: 88,
+          },
+          application: {
+            donorFirstNames: "James",
+            donorLastName: "Rubin",
+            donorDob: "22/02/1990",
+            severanceStatus: "REQUIRED",
+            severanceApplication: {
+              hasDonorConsented: true,
+            },
+          },
+        },
+      },
+    });
+
+    cases.warnings.empty("888");
+
+    cy.addMock("/lpa-api/v1/cases/888", "GET", {
+      status: 200,
+      body: {
+        id: 888,
+        uId: "M-6666-6666-6669",
+        caseType: "DIGITAL_LPA",
+        donor: {
+          id: 6,
+        },
+      },
+    });
+
+    cy.addMock(
+      "/lpa-api/v1/cases/888/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
+      "GET",
+      {
+        status: 200,
+        body: {
+          tasks: [],
+        },
+      },
+    );
+    cy.visit("/lpa/M-6666-6666-6669/manage-restrictions").then(() => {
+      cy.contains("Manage restrictions and conditions");
+      cy.url().should("contain", "/lpa/M-6666-6666-6669/manage-restrictions");
+      cy.contains("Manage restrictions and conditions");
+      cy.contains("Date court order made");
+      cy.contains("Date court order issued");
+      cy.contains(
+        "Has severance of the restrictions and conditions been ordered?",
+      );
     });
   });
 });
