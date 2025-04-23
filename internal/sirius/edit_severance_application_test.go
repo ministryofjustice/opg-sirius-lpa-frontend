@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func convertToBool(b bool) *bool {
+func boolPointer(b bool) *bool {
 	return &b
 }
 
@@ -29,7 +29,7 @@ func TestEditSeveranceApplication(t *testing.T) {
 		{
 			name: "Donor consent given",
 			severanceApplication: SeveranceApplication{
-				HasDonorConsented: convertToBool(true),
+				HasDonorConsented: boolPointer(true),
 			},
 			setup: func() {
 				pact.

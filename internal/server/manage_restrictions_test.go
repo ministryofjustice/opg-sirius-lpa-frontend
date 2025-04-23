@@ -34,7 +34,7 @@ func (m *mockManageRestrictionsClient) EditSeveranceApplication(ctx sirius.Conte
 	return args.Error(0)
 }
 
-func convertToBool(b bool) *bool {
+func boolPointer(b bool) *bool {
 	return &b
 }
 
@@ -76,7 +76,7 @@ var restrictionsCaseSummaryWithDonorConsentGiven = sirius.CaseSummary{
 			Application: sirius.Draft{
 				SeveranceStatus: "REQUIRED",
 				SeveranceApplication: &sirius.SeveranceApplication{
-					HasDonorConsented: convertToBool(true),
+					HasDonorConsented: boolPointer(true),
 				},
 			},
 		},
@@ -280,12 +280,12 @@ func TestPostManageRestrictionsWithSeveranceRequiredRedirects(t *testing.T) {
 		{
 			name:               "Donor consent given",
 			donorConsentAction: "donor-consent-given",
-			severanceDetails:   &sirius.SeveranceApplication{HasDonorConsented: convertToBool(true)},
+			severanceDetails:   &sirius.SeveranceApplication{HasDonorConsented: boolPointer(true)},
 		},
 		{
 			name:               "Donor refused severance",
 			donorConsentAction: "donor-consent-not-given",
-			severanceDetails:   &sirius.SeveranceApplication{HasDonorConsented: convertToBool(false)},
+			severanceDetails:   &sirius.SeveranceApplication{HasDonorConsented: boolPointer(false)},
 		},
 	}
 
@@ -343,7 +343,7 @@ func TestPostManageRestrictionsWithDonorConsentGivenRedirects(t *testing.T) {
 			severanceDetails: &sirius.SeveranceApplication{
 				CourtOrderDecisionMade: "2025-04-05",
 				CourtOrderReceived:     "2025-04-10",
-				SeveranceOrdered:       convertToBool(true),
+				SeveranceOrdered:       boolPointer(true),
 			},
 		},
 	}
