@@ -5,13 +5,12 @@ import (
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"golang.org/x/sync/errgroup"
 	"net/http"
 )
 
 type AddObjectionClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
-	AddObjections(sirius.Context, sirius.AddObjections) error
+	AddObjection(sirius.Context, sirius.AddObjection) error
 }
 
 type addObjectionData struct {
@@ -20,10 +19,10 @@ type addObjectionData struct {
 	Error      sirius.ValidationError
 	CaseUID    string
 	LinkedLpas []sirius.SiriusData
-	Form       formAddObjections
+	Form       formAddObjection
 }
 
-type formAddObjections struct {
+type formAddObjection struct {
 	LpaUids       []string `form:"lpaUids"`
 	ReceivedDate  dob      `form:"receivedDate"`
 	ObjectionType string   `form:"objectionType"`
@@ -43,20 +42,8 @@ func AddObjection(client AddObjectionClient, tmpl template.Template) Handler {
 		caseUID := r.FormValue("uid")
 		ctx := getContext(r)
 
-		var cs sirius.CaseSummary
-		var err error
-
-		group, groupCtx := errgroup.WithContext(ctx.Context)
-
-		group.Go(func() error {
-			cs, err = client.CaseSummary(ctx.With(groupCtx), caseUID)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-
-		if err := group.Wait(); err != nil {
+		cs, err := client.CaseSummary(ctx, caseUID)
+		if err != nil {
 			return err
 		}
 
@@ -84,14 +71,14 @@ func AddObjection(client AddObjectionClient, tmpl template.Template) Handler {
 				return err
 			}
 
-			objection := sirius.AddObjections{
+			objection := sirius.AddObjection{
 				LpaUids:       data.Form.LpaUids,
 				ReceivedDate:  data.Form.ReceivedDate.toDateString(),
 				ObjectionType: data.Form.ObjectionType,
 				Notes:         data.Form.Notes,
 			}
 
-			err = client.AddObjections(ctx, objection)
+			err = client.AddObjection(ctx, objection)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)

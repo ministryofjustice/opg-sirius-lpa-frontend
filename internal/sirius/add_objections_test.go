@@ -19,13 +19,13 @@ func TestAddObjection(t *testing.T) {
 
 	testCases := []struct {
 		name           string
-		objectionsData AddObjections
+		objectionsData AddObjection
 		setup          func()
 		expectedError  func(int) error
 	}{
 		{
 			name: "OK",
-			objectionsData: AddObjections{
+			objectionsData: AddObjection{
 				LpaUids:       []string{"M-1234-9876-4567"},
 				ReceivedDate:  "2025-01-02",
 				ObjectionType: "factual",
@@ -64,7 +64,7 @@ func TestAddObjection(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				err := client.AddObjections(Context{Context: context.Background()}, tc.objectionsData)
+				err := client.AddObjection(Context{Context: context.Background()}, tc.objectionsData)
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {
