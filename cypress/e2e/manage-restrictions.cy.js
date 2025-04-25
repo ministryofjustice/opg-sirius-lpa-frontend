@@ -1,4 +1,5 @@
 import * as cases from "../mocks/cases";
+import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("Manage restrictions form", () => {
   beforeEach(() => {
@@ -79,7 +80,16 @@ describe("Manage restrictions form", () => {
       },
     });
 
-    cases.warnings.empty("666");
+    const mocks = Promise.allSettled([
+      cases.warnings.empty("666"),
+      cases.warnings.empty("888"),
+      cases.tasks.empty("888"),
+      digitalLpas.objections.empty("M-6666-6666-6666"),
+      digitalLpas.objections.empty("M-6666-6666-6668"),
+      digitalLpas.objections.empty("M-6666-6666-6669"),
+    ]);
+
+    cy.wrap(mocks);
 
     cy.addMock(
       "/lpa-api/v1/cases/666/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
@@ -207,8 +217,6 @@ describe("Manage restrictions form", () => {
       },
     });
 
-    cases.warnings.empty("888");
-
     cy.addMock("/lpa-api/v1/cases/888", "GET", {
       status: 200,
       body: {
@@ -221,16 +229,6 @@ describe("Manage restrictions form", () => {
       },
     });
 
-    cy.addMock(
-      "/lpa-api/v1/cases/888/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-      "GET",
-      {
-        status: 200,
-        body: {
-          tasks: [],
-        },
-      },
-    );
     cy.visit("/lpa/M-6666-6666-6668/manage-restrictions").then(() => {
       cy.contains("Severance application required:");
       cy.contains("No");
@@ -269,8 +267,6 @@ describe("Manage restrictions form", () => {
         },
       },
     });
-
-    cases.warnings.empty("888");
 
     cy.addMock("/lpa-api/v1/cases/888", "GET", {
       status: 200,
