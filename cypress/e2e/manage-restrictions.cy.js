@@ -86,6 +86,7 @@ describe("Manage restrictions form", () => {
       cases.tasks.empty("888"),
       digitalLpas.objections.empty("M-6666-6666-6666"),
       digitalLpas.objections.empty("M-6666-6666-6668"),
+      digitalLpas.objections.empty("M-6666-6666-6669"),
     ]);
 
     cy.wrap(mocks);
@@ -266,8 +267,6 @@ describe("Manage restrictions form", () => {
         },
       },
     });
-
-    cases.warnings.empty("888");
 
     cy.addMock("/lpa-api/v1/cases/888", "GET", {
       status: 200,
