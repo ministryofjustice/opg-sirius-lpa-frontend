@@ -1,4 +1,5 @@
 import * as cases from "../mocks/cases";
+import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("Manage Attorneys", () => {
   beforeEach(() => {
@@ -86,18 +87,16 @@ describe("Manage Attorneys", () => {
       },
     });
 
-    cases.warnings.empty("1111");
+    const mocks = Promise.allSettled([
+      cases.warnings.empty("1111"),
+      cases.warnings.empty("2222"),
+      cases.tasks.empty("1111"),
+      cases.tasks.empty("2222"),
+      digitalLpas.objections.empty("M-1111-1111-1111"),
+      digitalLpas.objections.empty("M-2222-2222-2222"),
+    ]);
 
-    cy.addMock(
-      "/lpa-api/v1/cases/1111/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-      "GET",
-      {
-        status: 200,
-        body: {
-          tasks: [],
-        },
-      },
-    );
+    cy.wrap(mocks);
 
     cy.addMock(
       "/lpa-api/v1/digital-lpas/M-1111-1111-1111/progress-indicators",
@@ -185,19 +184,6 @@ describe("Manage Attorneys", () => {
         status: "Processing",
       },
     });
-
-    cy.addMock(
-      "/lpa-api/v1/cases/2222/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-      "GET",
-      {
-        status: 200,
-        body: {
-          tasks: [],
-        },
-      },
-    );
-
-    cases.warnings.empty("2222");
 
     cy.addMock(
       "/lpa-api/v1/digital-lpas/M-2222-2222-2222/progress-indicators",
