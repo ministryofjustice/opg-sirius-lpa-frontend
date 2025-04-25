@@ -9,6 +9,9 @@
                 <a href="{{ prefix (printf "/create-additional-draft-lpa?id=%d" .CaseSummary.DigitalLpa.SiriusData.Donor.ID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
                     Create a draft LPA
                 </a>
+                <a href="{{ prefix (printf "/add-objection?uid=%s" .CaseSummary.DigitalLpa.UID) }}" role="button" draggable="false" class="govuk-button moj-button-menu__item govuk-button--secondary " data-module="dropdown-menu">
+                    Add an objection
+                </a>
             </div>
         </div>
     </div>
