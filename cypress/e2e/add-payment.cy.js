@@ -28,7 +28,7 @@ describe("Add a payment to a non-digital LPA", () => {
 
 describe("Add a payment to a digital LPA", () => {
   it("adds a payment to the case", () => {
-    digitalLpas.objections.empty("M-9999-4567-AAAA");
+    cy.wrap(digitalLpas.objections.empty("M-9999-4567-AAAA"));
     cy.visit("/add-payment?id=900");
     cy.contains("Add a payment");
     cy.contains("M-9999-4567-AAAA");
