@@ -53,7 +53,6 @@ type Client interface {
 	ChangeAttorneyDetailsClient
 	ChangeCaseStatusClient
 	ChangeCertificateProviderDetailsClient
-	UpdateDecisionsClient
 	ChangeDonorDetailsClient
 	ChangeDraftClient
 	ChangeStatusClient
@@ -91,6 +90,8 @@ type Client interface {
 	SearchUsersClient
 	TaskClient
 	UnlinkPersonClient
+	UpdateDecisionsClient
+	UpdateObjectionClient
 	WarningClient
 }
 
@@ -105,6 +106,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {})
 
 	mux.Handle("/lpa/{uid}/attorney/{attorneyUID}/change-details", wrap(ChangeAttorneyDetails(client, templates.Get("change-attorney-details.gohtml"))))
+	mux.Handle("/lpa/{uid}/objection/{id}", wrap(UpdateObjection(client, templates.Get("add-objection.gohtml"))))
 	mux.Handle("/lpa/{uid}/change-draft", wrap(ChangeDraft(client, templates.Get("change-draft.gohtml"))))
 	mux.Handle("/lpa/{uid}/manage-restrictions", wrap(ManageRestrictions(client, templates.Get("manage-restrictions.gohtml"))))
 	mux.Handle("/add-objection", wrap(AddObjection(client, templates.Get("add-objection.gohtml"))))
