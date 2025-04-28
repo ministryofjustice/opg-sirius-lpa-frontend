@@ -4,11 +4,13 @@ import (
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"golang.org/x/sync/errgroup"
 	"net/http"
 )
 
 type UpdateObjectionClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
+	GetObjection(sirius.Context, string) (sirius.Objection, error)
 	//UpdateObjection(sirius.Context, string, sirius.ChangeDonorDetails) error
 }
 
@@ -35,10 +37,37 @@ func UpdateObjection(client UpdateObjectionClient, tmpl template.Template) Handl
 
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseUID := r.PathValue("uid")
+		objectionID := r.PathValue("id")
 
 		ctx := getContext(r)
 
-		cs, err := client.CaseSummary(ctx, caseUID)
+		var cs sirius.CaseSummary
+		var obj sirius.Objection
+		var err error
+
+		group, groupCtx := errgroup.WithContext(ctx.Context)
+
+		group.Go(func() error {
+			cs, err = client.CaseSummary(ctx.With(groupCtx), caseUID)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		group.Go(func() error {
+			obj, err = client.GetObjection(ctx.With(groupCtx), objectionID)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
+			return err
+		}
+
+		receivedDate, err := parseDate(obj.ReceivedDate)
 		if err != nil {
 			return err
 		}
@@ -59,6 +88,12 @@ func UpdateObjection(client UpdateObjectionClient, tmpl template.Template) Handl
 			XSRFToken:  ctx.XSRFToken,
 			CaseUID:    caseUID,
 			LinkedLpas: linkedCasesForObjections,
+			Form: formUpdateObjection{
+				LpaUids:       obj.LpaUids,
+				ReceivedDate:  receivedDate,
+				ObjectionType: obj.ObjectionType,
+				Notes:         obj.Notes,
+			},
 		}
 
 		return tmpl(w, data)
