@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -11,7 +12,7 @@ import (
 type UpdateObjectionClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
 	GetObjection(sirius.Context, string) (sirius.Objection, error)
-	//UpdateObjection(sirius.Context, string, sirius.ChangeDonorDetails) error
+	UpdateObjection(sirius.Context, string, sirius.AddObjection) error
 }
 
 type updateObjectionData struct {
@@ -94,6 +95,39 @@ func UpdateObjection(client UpdateObjectionClient, tmpl template.Template) Handl
 				ObjectionType: obj.ObjectionType,
 				Notes:         obj.Notes,
 			},
+		}
+
+		if r.Method == http.MethodPost {
+			if err := r.ParseForm(); err != nil {
+				return err
+			}
+
+			data.Form = formUpdateObjection{}
+
+			err := decoder.Decode(&data.Form, r.PostForm)
+			if err != nil {
+				return err
+			}
+
+			objection := sirius.AddObjection{
+				LpaUids:       data.Form.LpaUids,
+				ReceivedDate:  data.Form.ReceivedDate.toDateString(),
+				ObjectionType: data.Form.ObjectionType,
+				Notes:         data.Form.Notes,
+			}
+
+			err = client.UpdateObjection(ctx, objectionID, objection)
+
+			if ve, ok := err.(sirius.ValidationError); ok {
+				w.WriteHeader(http.StatusBadRequest)
+				data.Error = ve
+			} else if err != nil {
+				return err
+			} else {
+				data.Success = true
+
+				return RedirectError(fmt.Sprintf("/lpa/%s", caseUID))
+			}
 		}
 
 		return tmpl(w, data)
