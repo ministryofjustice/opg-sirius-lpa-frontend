@@ -1,0 +1,82 @@
+{{ template "page" . }}
+
+{{ define "title" }}Confirm screen{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <a href="{{ prefix (printf "/lpa/%s/objection/%s" .CaseUID .ObjectionID )}}" class="govuk-back-link">Back</a>
+
+            <h1 class="govuk-heading-l app-!-embedded-hide">Confirm screen</h1>
+
+                    <main class="govuk-main-wrapper " id="main-content" role="main">
+                        <div class="govuk-grid-row">
+
+                            <div class="govuk-grid-column-two-thirds-from-desktop">
+                                <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+                                    <div class="govuk-summary-list__row">
+                                        <dt class="govuk-summary-list__key">
+                                            Objection added to
+                                        </dt>
+                                        <dd class="govuk-summary-list__value">
+                                            {{ range .Form.LpaUids }}
+                                                <p class="govuk-body">{{ . }}</p>
+                                            {{ end }}
+                                        </dd>
+                                        <dd class="govuk-summary-list__actions">
+                                            <a class="govuk-link" href="#">Change<span class="govuk-visually-hidden"> lpaUids</span></a>
+                                        </dd>
+                                    </div>
+                                    <div class="govuk-summary-list__row">
+                                        <dt class="govuk-summary-list__key">
+                                            Date received
+                                        </dt>
+                                        <dd class="govuk-summary-list__value">
+                                            {{ date .ReceivedDate "2 January 2006" }}
+                                        </dd>
+                                        <dd class="govuk-summary-list__actions">
+                                            <a class="govuk-link" href="#">Change<span class="govuk-visually-hidden"> receivedDate</span></a>
+                                        </dd>
+                                    </div>
+                                    <div class="govuk-summary-list__row">
+                                        <dt class="govuk-summary-list__key">
+                                            Objection Type
+                                        </dt>
+                                        <dd class="govuk-summary-list__value">
+                                            {{ objectionType .Form.ObjectionType }}
+                                        </dd>
+                                        <dd class="govuk-summary-list__actions">
+                                            <a class="govuk-link" href="#">Change<span class="govuk-visually-hidden"> objectionType</span></a>
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+                    </main>
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
+                <input type="hidden" name="step" value="confirm">
+
+                <!-- Hidden fields populating the form's original input -->
+                {{ range .Form.LpaUids }}
+                    <input type="hidden" name="lpaUids" value="{{ . }}">
+                {{ end }}
+                <input type="hidden" name="receivedDate.day" value="{{ .Form.ReceivedDate.Day }}">
+                <input type="hidden" name="receivedDate.month" value="{{ .Form.ReceivedDate.Month }}">
+                <input type="hidden" name="receivedDate.year" value="{{ .Form.ReceivedDate.Year }}">
+                <input type="hidden" name="objectionType" value="{{ .Form.ObjectionType }}">
+                <input type="hidden" name="notes" value="{{ .Form.Notes }}">
+
+                <div class="govuk-button-group">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Confirm and exit</button>
+                </div>
+            </form>
+
+            <div class="govuk-button-group">
+                <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s" .CaseUID )}}">Cancel</a>
+            </div>
+
+        </div>
+    </div>
+{{ end }}
