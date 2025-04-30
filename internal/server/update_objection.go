@@ -17,6 +17,7 @@ type UpdateObjectionClient interface {
 
 type updateObjectionData struct {
 	XSRFToken  string
+	Title      string
 	Success    bool
 	Error      sirius.ValidationError
 	CaseUID    string
@@ -31,7 +32,7 @@ type formUpdateObjection struct {
 	Notes         string   `form:"notes"`
 }
 
-func UpdateObjection(client UpdateObjectionClient, tmpl template.Template) Handler {
+func UpdateObjection(client UpdateObjectionClient, formTmpl template.Template, confirmTmpl template.Template) Handler {
 	if decoder == nil {
 		decoder = form.NewDecoder()
 	}
@@ -86,6 +87,7 @@ func UpdateObjection(client UpdateObjectionClient, tmpl template.Template) Handl
 		}
 
 		data := updateObjectionData{
+			Title:      "Update Objection",
 			XSRFToken:  ctx.XSRFToken,
 			CaseUID:    caseUID,
 			LinkedLpas: linkedCasesForObjections,
@@ -109,6 +111,23 @@ func UpdateObjection(client UpdateObjectionClient, tmpl template.Template) Handl
 				return err
 			}
 
+			submissionStep := r.PostFormValue("step")
+			if submissionStep != "confirm" {
+				return confirmTmpl(w, struct {
+					XSRFToken    string
+					CaseUID      string
+					ObjectionID  string
+					ReceivedDate sirius.DateString
+					Form         formUpdateObjection
+				}{
+					XSRFToken:    ctx.XSRFToken,
+					CaseUID:      caseUID,
+					ObjectionID:  objectionID,
+					Form:         data.Form,
+					ReceivedDate: data.Form.ReceivedDate.toDateString(),
+				})
+			}
+
 			objection := sirius.AddObjection{
 				LpaUids:       data.Form.LpaUids,
 				ReceivedDate:  data.Form.ReceivedDate.toDateString(),
@@ -130,6 +149,6 @@ func UpdateObjection(client UpdateObjectionClient, tmpl template.Template) Handl
 			}
 		}
 
-		return tmpl(w, data)
+		return formTmpl(w, data)
 	}
 }

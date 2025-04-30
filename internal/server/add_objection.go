@@ -15,6 +15,7 @@ type AddObjectionClient interface {
 
 type addObjectionData struct {
 	XSRFToken  string
+	Title      string
 	Success    bool
 	Error      sirius.ValidationError
 	CaseUID    string
@@ -61,6 +62,7 @@ func AddObjection(client AddObjectionClient, tmpl template.Template) Handler {
 
 		data := addObjectionData{
 			XSRFToken:  ctx.XSRFToken,
+			Title:      "Add Objection",
 			CaseUID:    caseUID,
 			LinkedLpas: linkedCasesForObjections,
 		}

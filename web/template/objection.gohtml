@@ -1,6 +1,6 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add Objection{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ .Title }}{{ end }}
 
 {{ define "main" }}
     <div class="govuk-grid-row">
@@ -14,10 +14,11 @@
                 {{ template "success-banner" "You have successfully added a complaint." }}
             {{ end }}
 
-            <h1 class="govuk-heading-l app-!-embedded-hide">Add Objection</h1>
+            <h1 class="govuk-heading-l app-!-embedded-hide">{{ .Title }}</h1>
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
+                <input type="hidden" name="step" value="edit">
 
                 <div class="govuk-form-group {{ if .Error.Field.lpaUids }}govuk-form-group--error{{ end }}" id="f-lpaUids">
                     <fieldset class="govuk-fieldset" aria-describedby="f-lpaUids-hint">
