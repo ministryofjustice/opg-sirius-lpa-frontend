@@ -10,7 +10,7 @@ import (
 
 type AddObjectionClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
-	AddObjection(sirius.Context, sirius.AddObjection) error
+	AddObjection(sirius.Context, sirius.ObjectionRequest) error
 }
 
 type addObjectionData struct {
@@ -20,10 +20,10 @@ type addObjectionData struct {
 	Error      sirius.ValidationError
 	CaseUID    string
 	LinkedLpas []sirius.SiriusData
-	Form       formAddObjection
+	Form       formObjection
 }
 
-type formAddObjection struct {
+type formObjection struct {
 	LpaUids       []string `form:"lpaUids"`
 	ReceivedDate  dob      `form:"receivedDate"`
 	ObjectionType string   `form:"objectionType"`
@@ -73,7 +73,7 @@ func AddObjection(client AddObjectionClient, tmpl template.Template) Handler {
 				return err
 			}
 
-			objection := sirius.AddObjection{
+			objection := sirius.ObjectionRequest{
 				LpaUids:       data.Form.LpaUids,
 				ReceivedDate:  data.Form.ReceivedDate.toDateString(),
 				ObjectionType: data.Form.ObjectionType,

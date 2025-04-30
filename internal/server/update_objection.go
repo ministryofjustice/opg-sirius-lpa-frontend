@@ -12,7 +12,7 @@ import (
 type UpdateObjectionClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
 	GetObjection(sirius.Context, string) (sirius.Objection, error)
-	UpdateObjection(sirius.Context, string, sirius.AddObjection) error
+	UpdateObjection(sirius.Context, string, sirius.ObjectionRequest) error
 }
 
 type updateObjectionData struct {
@@ -22,14 +22,7 @@ type updateObjectionData struct {
 	Error      sirius.ValidationError
 	CaseUID    string
 	LinkedLpas []sirius.SiriusData
-	Form       formUpdateObjection
-}
-
-type formUpdateObjection struct {
-	LpaUids       []string `form:"lpaUids"`
-	ReceivedDate  dob      `form:"receivedDate"`
-	ObjectionType string   `form:"objectionType"`
-	Notes         string   `form:"notes"`
+	Form       formObjection
 }
 
 func UpdateObjection(client UpdateObjectionClient, formTmpl template.Template, confirmTmpl template.Template) Handler {
@@ -91,7 +84,7 @@ func UpdateObjection(client UpdateObjectionClient, formTmpl template.Template, c
 			XSRFToken:  ctx.XSRFToken,
 			CaseUID:    caseUID,
 			LinkedLpas: linkedCasesForObjections,
-			Form: formUpdateObjection{
+			Form: formObjection{
 				LpaUids:       obj.LpaUids,
 				ReceivedDate:  receivedDate,
 				ObjectionType: obj.ObjectionType,
@@ -104,7 +97,7 @@ func UpdateObjection(client UpdateObjectionClient, formTmpl template.Template, c
 				return err
 			}
 
-			data.Form = formUpdateObjection{}
+			data.Form = formObjection{}
 
 			err := decoder.Decode(&data.Form, r.PostForm)
 			if err != nil {
@@ -118,7 +111,7 @@ func UpdateObjection(client UpdateObjectionClient, formTmpl template.Template, c
 					CaseUID      string
 					ObjectionID  string
 					ReceivedDate sirius.DateString
-					Form         formUpdateObjection
+					Form         formObjection
 				}{
 					XSRFToken:    ctx.XSRFToken,
 					CaseUID:      caseUID,
@@ -128,7 +121,7 @@ func UpdateObjection(client UpdateObjectionClient, formTmpl template.Template, c
 				})
 			}
 
-			objection := sirius.AddObjection{
+			objection := sirius.ObjectionRequest{
 				LpaUids:       data.Form.LpaUids,
 				ReceivedDate:  data.Form.ReceivedDate.toDateString(),
 				ObjectionType: data.Form.ObjectionType,

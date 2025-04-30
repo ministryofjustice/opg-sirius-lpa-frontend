@@ -17,6 +17,21 @@ type Objection struct {
 	LpaUids       []string `json:"lpaUids"`
 }
 
+type ObjectionRequest struct {
+	LpaUids       []string   `json:"lpaUids"`
+	ReceivedDate  DateString `json:"receivedDate"`
+	ObjectionType string     `json:"objectionType"`
+	Notes         string     `json:"notes"`
+}
+
+func (c *Client) AddObjection(ctx Context, objectionDetails ObjectionRequest) error {
+	return c.post(ctx, "/lpa-api/v1/objections", objectionDetails, nil)
+}
+
+func (c *Client) UpdateObjection(ctx Context, objectionId string, objectionDetails ObjectionRequest) error {
+	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/objections/%s", objectionId), objectionDetails, nil)
+}
+
 func (c *Client) ObjectionsForCase(ctx Context, caseUID string) ([]Objection, error) {
 	var caseObjections ObjectionsForCase
 	path := fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/objections", caseUID)
