@@ -101,7 +101,7 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 						return err
 					}
 
-					if data.SeveranceAction == "severance-application-not-required" {
+					if data.SeveranceAction == "severance-application-not-required" && taskID != 0 {
 						err := client.ClearTask(ctx, taskID)
 						if handleError(w, &data, err) {
 							return err
