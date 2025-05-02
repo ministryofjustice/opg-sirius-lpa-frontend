@@ -232,9 +232,9 @@ func TestUpdateObjection(t *testing.T) {
 		{
 			name: "OK",
 			objectionsData: ObjectionRequest{
-				LpaUids:       []string{"M-1234-9876-4567"},
+				LpaUids:       []string{"M-9999-9999-9999"},
 				ReceivedDate:  "2025-01-02",
-				ObjectionType: "factual",
+				ObjectionType: "prescribed",
 				Notes:         "test",
 			},
 			setup: func() {
@@ -249,9 +249,9 @@ func TestUpdateObjection(t *testing.T) {
 							"Content-Type": matchers.String("application/json"),
 						},
 						Body: matchers.Like(map[string]interface{}{
-							"lpaUids":       []string{"M-1234-9876-4567"},
+							"lpaUids":       matchers.EachLike(matchers.String("M-9999-9999-9999"), 1),
 							"receivedDate":  matchers.Like("02/01/2025"),
-							"objectionType": matchers.Like("factual"),
+							"objectionType": matchers.Like("prescribed"),
 							"notes":         matchers.Like("test"),
 						}),
 					}).
