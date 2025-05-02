@@ -151,3 +151,223 @@ func TestObjectionsForCase(t *testing.T) {
 		})
 	}
 }
+
+func TestAddObjection(t *testing.T) {
+	t.Parallel()
+
+	pact, err := newPact()
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		name           string
+		objectionsData ObjectionRequest
+		setup          func()
+		expectedError  func(int) error
+	}{
+		{
+			name: "OK",
+			objectionsData: ObjectionRequest{
+				LpaUids:       []string{"M-1234-9876-4567"},
+				ReceivedDate:  "2025-01-02",
+				ObjectionType: "factual",
+				Notes:         "test",
+			},
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A digital LPA exists").
+					UponReceiving("A request to add an objection").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodPost,
+						Path:   matchers.String("/lpa-api/v1/objections"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
+						},
+						Body: matchers.Like(map[string]interface{}{
+							"lpaUids":       []string{"M-1234-9876-4567"},
+							"receivedDate":  matchers.Like("02/01/2025"),
+							"objectionType": matchers.Like("factual"),
+							"notes":         matchers.Like("test"),
+						}),
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status:  http.StatusCreated,
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+					})
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
+
+				err := client.AddObjection(Context{Context: context.Background()}, tc.objectionsData)
+				if (tc.expectedError) == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(config.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}
+
+func TestUpdateObjection(t *testing.T) {
+	t.Parallel()
+
+	pact, err := newPact()
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		name           string
+		objectionsData ObjectionRequest
+		setup          func()
+		expectedError  func(int) error
+	}{
+		{
+			name: "OK",
+			objectionsData: ObjectionRequest{
+				LpaUids:       []string{"M-9999-9999-9999"},
+				ReceivedDate:  "2025-01-02",
+				ObjectionType: "prescribed",
+				Notes:         "test",
+			},
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have a digital LPA with an objection").
+					UponReceiving("A request to update an objection").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodPut,
+						Path:   matchers.String("/lpa-api/v1/objections/3"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
+						},
+						Body: matchers.Like(map[string]interface{}{
+							"lpaUids":       []string{"M-9999-9999-9999"},
+							"receivedDate":  matchers.Like("02/01/2025"),
+							"objectionType": matchers.Like("prescribed"),
+							"notes":         matchers.Like("test"),
+						}),
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status: http.StatusNoContent,
+					})
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
+
+				err := client.UpdateObjection(Context{Context: context.Background()}, "3", tc.objectionsData)
+				if (tc.expectedError) == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(config.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}
+
+func TestGetObjection(t *testing.T) {
+	t.Parallel()
+
+	pact, err := newPact()
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		name             string
+		setup            func()
+		expectedResponse Objection
+		expectedError    func(int) error
+	}{
+		{
+			name: "OK",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have a digital LPA with an objection").
+					UponReceiving("A request for the objection").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodGet,
+						Path:   matchers.String("/lpa-api/v1/objections/3"),
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status: http.StatusOK,
+						Body: matchers.Like(map[string]interface{}{
+							"id":            matchers.Like(3),
+							"notes":         matchers.String("Test"),
+							"objectionType": matchers.String("factual"),
+							"receivedDate":  matchers.String("05/09/2024"),
+							"lpaUids":       []string{"M-1234-9876-4567"},
+						}),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+					})
+			},
+			expectedResponse: Objection{
+				ID:            3,
+				Notes:         "Test",
+				ObjectionType: "factual",
+				ReceivedDate:  "05/09/2024",
+				LpaUids:       []string{"M-1234-9876-4567"},
+			},
+		},
+		{
+			name: "404",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("There is no objection with the specified ID").
+					UponReceiving("A request for a non-existent objection").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodGet,
+						Path:   matchers.String("/lpa-api/v1/objections/3"),
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status: http.StatusNotFound,
+					})
+			},
+			expectedError: func(port int) error {
+				return StatusError{
+					Code:          404,
+					URL:           fmt.Sprintf("http://127.0.0.1:%d/lpa-api/v1/objections/3", port),
+					Method:        "GET",
+					CorrelationId: "",
+				}
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
+
+				objection, err := client.GetObjection(Context{Context: context.Background()}, "3")
+
+				assert.Equal(t, tc.expectedResponse, objection)
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(config.Port), err)
+				}
+
+				return nil
+			}))
+		})
+	}
+}
