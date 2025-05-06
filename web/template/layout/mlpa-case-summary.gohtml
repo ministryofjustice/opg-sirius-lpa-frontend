@@ -55,10 +55,27 @@
                         <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/lpa/%s/objection/%d" $uid .ID) }}">
                             <strong>Objection received</strong>
                         </a>
+
+                        {{- $last := 0 }}
+                        {{- range $i, $_ := .LpaUids }}
+                            {{- $last = $i }}
+                        {{- end }}
+
                         <ul class="govuk-list">
                                 <li>
                                     <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">Received on {{ parseAndFormatDate .ReceivedDate "2006-01-02" "2 January 2006" }}</p>
-                                    <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">Added to {{ $uid }}</p>
+                                    <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">
+                                        {{ "Added to " }}
+                                        {{- range $i, $uid := .LpaUids -}}
+                                            {{- if eq $i 0 -}}
+                                                {{ $uid }}
+                                            {{- else if eq $i $last -}}
+                                                {{ " and "}}{{ $uid }}
+                                            {{- else -}}
+                                                , {{ $uid }}
+                                            {{- end -}}
+                                        {{- end -}}
+                                    </p>
                                     <a class="govuk-body-s govuk-link" href="">Record objection outcome</a>
                                 </li>
                         </ul>
