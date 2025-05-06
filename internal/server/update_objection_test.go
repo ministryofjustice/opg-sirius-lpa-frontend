@@ -181,7 +181,7 @@ func TestGetUpdateObjectionWhenGetObjectionErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestPostUpdateObjection(t *testing.T) {
+func TestPostUpdateObjectionToAPI(t *testing.T) {
 	tests := []struct {
 		name          string
 		apiError      error
@@ -284,4 +284,58 @@ func TestPostUpdateObjectionWhenValidationError(t *testing.T) {
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostUpdateObjectionToConfirmScreen(t *testing.T) {
+	client := &mockUpdateObjectionClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-7777-8888-9999").
+		Return(testUpdateObjectionsCaseSummary, nil)
+	client.
+		On("GetObjection", mock.Anything, "3").
+		Return(testObjection, nil)
+
+	confirmTemplate := &mockTemplate{}
+	confirmTemplate.
+		On("Func", mock.Anything, struct {
+			XSRFToken    string
+			CaseUID      string
+			ObjectionID  string
+			ReceivedDate sirius.DateString
+			Form         formObjection
+		}{
+			XSRFToken:    "",
+			CaseUID:      "M-7777-8888-9999",
+			ObjectionID:  "3",
+			ReceivedDate: "2025-01-01",
+			Form: formObjection{
+				LpaUids:       []string{"M-7777-8888-9999", "M-9999-9999-9999"},
+				ReceivedDate:  dob{1, 1, 2025},
+				ObjectionType: "prescribed",
+				Notes:         "Test",
+			},
+		}).
+		Return(nil).Once()
+
+	formTemplate := &mockTemplate{}
+
+	form := url.Values{
+		"lpaUids":            {"M-7777-8888-9999", "M-9999-9999-9999"},
+		"receivedDate.day":   {"1"},
+		"receivedDate.month": {"1"},
+		"receivedDate.year":  {"2025"},
+		"objectionType":      {"prescribed"},
+		"notes":              {"Test"},
+		"step":               {"review"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/lpa/M-7777-8888-9999/objection/3", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+
+	server := newMockServer("/lpa/{uid}/objection/{id}", UpdateObjection(client, formTemplate.Func, confirmTemplate.Func))
+
+	_, err := server.serve(r)
+	assert.NoError(t, err)
+
+	mock.AssertExpectationsForObjects(t, client, confirmTemplate)
 }

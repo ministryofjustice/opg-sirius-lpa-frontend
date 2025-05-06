@@ -204,6 +204,7 @@ describe("Add objections form", () => {
             notes: "test",
             objectionType: "factual",
             receivedDate: "2025-01-01",
+            lpaUids: ["M-0000-0000-0008"],
           },
         ],
       },
