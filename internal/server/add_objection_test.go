@@ -15,7 +15,7 @@ type mockAddObjectionClient struct {
 	mock.Mock
 }
 
-func (m *mockAddObjectionClient) AddObjection(ctx sirius.Context, objection sirius.AddObjection) error {
+func (m *mockAddObjectionClient) AddObjection(ctx sirius.Context, objection sirius.ObjectionRequest) error {
 	args := m.Called(ctx, objection)
 	return args.Error(0)
 }
@@ -75,6 +75,7 @@ func TestGetAddObjectionsTemplate(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, addObjectionData{
+					Title:   "Add Objection",
 					CaseUID: "M-9898-9898-9898",
 					LinkedLpas: []sirius.SiriusData{
 						{
@@ -161,7 +162,7 @@ func TestPostAddObjection(t *testing.T) {
 				On("CaseSummary", mock.Anything, "M-9898-9898-9898").
 				Return(testAddObjectionsCaseSummary, nil)
 			client.
-				On("AddObjection", mock.Anything, sirius.AddObjection{
+				On("AddObjection", mock.Anything, sirius.ObjectionRequest{
 					LpaUids:       []string{"M-9898-9898-9898", "M-9999-9999-9999"},
 					ReceivedDate:  "2025-01-01",
 					ObjectionType: "factual",
@@ -197,7 +198,7 @@ func TestPostAddObjectionWhenValidationError(t *testing.T) {
 		On("CaseSummary", mock.Anything, "M-9898-9898-9898").
 		Return(testAddObjectionsCaseSummary, nil)
 	client.
-		On("AddObjection", mock.Anything, sirius.AddObjection{
+		On("AddObjection", mock.Anything, sirius.ObjectionRequest{
 			LpaUids:      []string{"M-9898-9898-9898"},
 			ReceivedDate: "2025-01-01",
 			Notes:        "Test",

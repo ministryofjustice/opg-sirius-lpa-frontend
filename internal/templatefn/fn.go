@@ -304,6 +304,21 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "status NOT RECOGNISED: " + s
 			}
 		},
+		// translate objection type for confirm objection page
+		"objectionType": func(s string) string {
+			switch s {
+			case "factual":
+				return "Factual"
+			case "prescribed":
+				return "Prescribed"
+			case "thirdParty":
+				return "Third Party"
+			case "":
+				return "Not specified"
+			default:
+				return "objection type NOT RECOGNISED: " + s
+			}
+		},
 	}
 }
 
