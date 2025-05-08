@@ -266,10 +266,7 @@ const objections = {
       "GET",
       {
         status: 200,
-        body: {
-          uid: `${digitalLpaUid}`,
-          objections: [],
-        },
+        body: [],
       },
     );
   },
