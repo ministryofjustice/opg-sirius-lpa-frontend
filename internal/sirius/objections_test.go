@@ -81,17 +81,13 @@ func TestObjectionsForCase(t *testing.T) {
 					}).
 					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: matchers.Like(map[string]interface{}{
-							"uid": matchers.Regex("M-9999-9999-9999", `^M(-[0-9A-Z]{4}){3}$`),
-							"objections": matchers.Like([]map[string]interface{}{
-								{
-									"id":            matchers.Like(105),
-									"notes":         matchers.String("Test"),
-									"objectionType": matchers.String("factual"),
-									"receivedDate":  matchers.String("05/09/2024"),
-								},
-							}),
-						}),
+						Body: matchers.EachLike(map[string]interface{}{
+							"id":            matchers.Like(105),
+							"notes":         matchers.String("Test"),
+							"objectionType": matchers.String("factual"),
+							"receivedDate":  matchers.String("05/09/2024"),
+							"lpaUids":       []string{"M-9999-9999-9999"},
+						}, 1),
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
@@ -101,6 +97,7 @@ func TestObjectionsForCase(t *testing.T) {
 					Notes:         "Test",
 					ObjectionType: "factual",
 					ReceivedDate:  "05/09/2024",
+					LpaUids:       []string{"M-9999-9999-9999"},
 				},
 			},
 		},

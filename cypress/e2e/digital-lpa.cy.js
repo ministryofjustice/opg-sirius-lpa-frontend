@@ -208,33 +208,14 @@ describe("View a digital LPA", () => {
 
     cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333/objections", "GET", {
       status: 200,
-      body: {
-        uid: "M-DIGI-LPA3-3333",
-        objections: [
-          {
-            id: 12,
-            notes: "",
-            objectionType: "factual",
-            receivedDate: "2025-01-01",
-          },
-        ],
-      },
-    });
-
-    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3334/objections", "GET", {
-      status: 200,
-      body: {
-        uid: "M-DIGI-LPA3-3334",
-        objections: [],
-      },
-    });
-
-    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3336/objections", "GET", {
-      status: 200,
-      body: {
-        uid: "M-DIGI-LPA3-3334",
-        objections: [],
-      },
+      body: [
+        {
+          id: 12,
+          notes: "",
+          objectionType: "factual",
+          receivedDate: "2025-01-01",
+        },
+      ],
     });
 
     cy.addMock(
@@ -357,8 +338,8 @@ describe("View a digital LPA", () => {
       cases.warnings.empty("336"),
       cases.tasks.empty("334"),
       cases.tasks.empty("336"),
-      digitalLpas.objections.empty("M-DIGI-LPA3-3333"),
-      digitalLpas.objections.empty("M-DIGI-LPA3-3333"),
+      digitalLpas.objections.empty("M-DIGI-LPA3-3334"),
+      digitalLpas.objections.empty("M-DIGI-LPA3-3336"),
     ]);
 
     cy.wrap(mocks);
