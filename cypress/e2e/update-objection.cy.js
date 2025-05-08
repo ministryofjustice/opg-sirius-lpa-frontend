@@ -12,33 +12,15 @@ describe("Update objection form", () => {
           uId: "M-0000-0000-0008",
           status: "Draft",
           caseSubtype: "personal-welfare",
-          createdDate: "31/10/2023",
-          investigationCount: 0,
-          complaintCount: 0,
-          taskCount: 0,
-          warningCount: 0,
-          donor: {
-            id: 8,
-          },
           application: {
             donorFirstNames: "James",
             donorLastName: "Rubin",
             donorDob: "22/02/1990",
-            donorEmail: "jrubin@mail.example",
-            donorPhone: "073656249524",
             donorAddress: {
               addressLine1: "Apartment 3",
               country: "GB",
               postcode: "B15 3AA",
               town: "Birmingham",
-            },
-            correspondentFirstNames: "Kendrick",
-            correspondentLastName: "Lamar",
-            correspondentAddress: {
-              addressLine1: "Flat 3",
-              country: "GB",
-              postcode: "SW1 1AA",
-              town: "London",
             },
           },
           linkedDigitalLpas: [
@@ -56,57 +38,20 @@ describe("Update objection form", () => {
             },
           ],
         },
-        "opg.poas.lpastore": {
-          donor: {
-            uid: "5ff557dd-1e27-4426-9681-ed6e90c2c08d",
-            firstNames: "James",
-            lastName: "Rubin",
-            otherNamesKnownBy: "Somebody",
-            dateOfBirth: "1990-02-22",
-            address: {
-              line1: "Apartment 3",
-              town: "Birmingham",
-              country: "GB",
-              postcode: "B15 3AA",
-            },
-            contactLanguagePreference: "en",
-            email: "jrubin@mail.example",
-          },
-          attorneys: [
-            {
-              firstNames: "Esther",
-              lastName: "Greenwood",
-              status: "active",
-            },
-          ],
-          certificateProvider: {
-            uid: "e4d5e24e-2a8d-434e-b815-9898620acc71",
-            firstNames: "Timothy",
-            lastNames: "Turner",
-            signedAt: "2022-12-18T11:46:24Z",
-          },
-          signedAt: "2024-10-18T11:46:24Z",
-          lpaType: "pw",
-          channel: "online",
-          registrationDate: "2024-11-11",
-          peopleToNotify: [],
-        },
       },
     });
 
     cy.addMock("/lpa-api/v1/digital-lpas/M-0000-0000-0008/objections", "GET", {
       status: 200,
-      body: {
-        uid: "M-0000-0000-0008",
-        objections: [
-          {
-            id: 18,
-            notes: "test",
-            objectionType: "factual",
-            receivedDate: "2025-01-01",
-          },
-        ],
-      },
+      body: [
+        {
+          id: 18,
+          notes: "test",
+          objectionType: "factual",
+          receivedDate: "2025-01-01",
+          lpaUids: ["M-0000-0000-0008"],
+        },
+      ],
     });
 
     cy.addMock("/lpa-api/v1/objections/18", "GET", {
