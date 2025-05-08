@@ -196,23 +196,19 @@ describe("Add objections form", () => {
   it("objection shows in case summary", () => {
     cy.addMock("/lpa-api/v1/digital-lpas/M-0000-0000-0008/objections", "GET", {
       status: 200,
-      body: {
-        uid: "M-0000-0000-0008",
-        objections: [
-          {
-            id: 18,
-            notes: "test",
-            objectionType: "factual",
-            receivedDate: "2025-01-01",
-          },
-        ],
-      },
+      body: [
+        {
+          id: 18,
+          notes: "test",
+          objectionType: "factual",
+          receivedDate: "2025-01-01",
+        },
+      ],
     });
 
     cy.visit("/lpa/M-0000-0000-0008/lpa-details").then(() => {
       cy.contains("Objection received");
       cy.contains("Received on 1 January 2025");
-      cy.contains("Added to M-0000-0000-0008");
       cy.contains("Record objection outcome");
     });
   });

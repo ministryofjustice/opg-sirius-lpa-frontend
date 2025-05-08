@@ -86,7 +86,7 @@ func setupTestCase(
 
 	// objections mock
 	var objectionsBody bytes.Buffer
-	err = json.NewEncoder(&objectionsBody).Encode(ObjectionsForCase{})
+	err = json.NewEncoder(&objectionsBody).Encode([]Objection{})
 	if err != nil {
 		t.Fatal("Could not compile objections JSON")
 	}
