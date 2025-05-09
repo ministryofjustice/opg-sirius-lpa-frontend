@@ -158,6 +158,18 @@ func TestProgressIndicatorStatus(t *testing.T) {
 	testStringMapper(t, "progressIndicatorStatus", expectations)
 }
 
+func TestObjectionType(t *testing.T) {
+	expectations := map[string]string{
+		"factual":    "Factual",
+		"prescribed": "Prescribed",
+		"thirdParty": "Third Party",
+		"":           "Not specified",
+		"foo":        "objection type NOT RECOGNISED: foo",
+	}
+
+	testStringMapper(t, "objectionType", expectations)
+}
+
 func TestCamelcaseToSentence(t *testing.T) {
 	expectations := map[string]string{
 		"uId":   "UID",
