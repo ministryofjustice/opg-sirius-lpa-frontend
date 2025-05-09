@@ -1,6 +1,6 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add Objection{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ .Title }}{{ end }}
 
 {{ define "main" }}
     <div class="govuk-grid-row">
@@ -14,10 +14,11 @@
                 {{ template "success-banner" "You have successfully added a complaint." }}
             {{ end }}
 
-            <h1 class="govuk-heading-l app-!-embedded-hide">Add Objection</h1>
+            <h1 class="govuk-heading-l app-!-embedded-hide">{{ .Title }}</h1>
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
+                <input type="hidden" name="step" value="edit">
 
                 <div class="govuk-form-group {{ if .Error.Field.lpaUids }}govuk-form-group--error{{ end }}" id="f-lpaUids">
                     <fieldset class="govuk-fieldset" aria-describedby="f-lpaUids-hint">
@@ -53,7 +54,7 @@
                                     </label>
                                 </div>
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="f-objectionType-prescribed" name="objectionType" type="radio" value="prescribed" {{ if eq "precribed" .Form.ObjectionType }}checked{{ end }}>
+                                    <input class="govuk-radios__input" id="f-objectionType-prescribed" name="objectionType" type="radio" value="prescribed" {{ if eq "prescribed" .Form.ObjectionType }}checked{{ end }}>
                                     <label class="govuk-label govuk-radios__label" for="f-objectionType-prescribed">
                                         Prescribed
                                     </label>
@@ -68,15 +69,18 @@
                     </fieldset>
                 </div>
 
-
                 <div class="govuk-form-group {{ if .Error.Field.notes }}govuk-form-group--error{{ end }}">
                     <label class="govuk-label" for="f-notes">
                         Notes (optional)
                     </label>
-                    {{ template "errors" .Error.Field.notes }}
-                    <div class="govuk-input__wrapper">
-                        <textarea class="govuk-textarea" id="f-notes" name="notes" rows="3" cols="25">{{ .Form.Notes }}</textarea>
-                    </div>
+                    {{ if eq .Title "Add Objection" }}
+                        {{ template "errors" .Error.Field.notes }}
+                        <div class="govuk-input__wrapper">
+                            <textarea class="govuk-textarea" id="f-notes" name="notes" rows="3" cols="25">{{ .Form.Notes }}</textarea>
+                        </div>
+                    {{ else }}
+                        <p class="govuk-body app-newlines-as-br">{{ .Form.Notes }}</p>
+                    {{ end }}
                 </div>
 
                 <div class="govuk-button-group">
