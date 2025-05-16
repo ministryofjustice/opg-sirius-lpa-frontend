@@ -12,6 +12,21 @@ type Objection struct {
 	LpaUids       []string `json:"lpaUids"`
 }
 
+type Objection2 struct {
+	ID            int                   `json:"id"`
+	Notes         string                `json:"notes"`
+	ObjectionType string                `json:"objectionType"`
+	ReceivedDate  string                `json:"receivedDate"`
+	LpaUids       []string              `json:"lpaUids"`
+	Resolutions   []ObjectionResolution `json:"resolutions"`
+}
+
+type ObjectionResolution struct {
+	Resolution      string     `json:"resolution"`
+	ResolutionNotes string     `json:"resolutionNotes"`
+	ResolutionDate  DateString `json:"resolutionDate"`
+}
+
 type ObjectionRequest struct {
 	LpaUids       []string   `json:"lpaUids"`
 	ReceivedDate  DateString `json:"receivedDate"`
@@ -36,8 +51,8 @@ func (c *Client) ObjectionsForCase(ctx Context, caseUID string) ([]Objection, er
 	return objectionList, err
 }
 
-func (c *Client) GetObjection(ctx Context, Id string) (Objection, error) {
-	var objection Objection
+func (c *Client) GetObjection(ctx Context, Id string) (Objection2, error) {
+	var objection Objection2
 	path := fmt.Sprintf("/lpa-api/v1/objections/%s", Id)
 
 	err := c.get(ctx, path, &objection)

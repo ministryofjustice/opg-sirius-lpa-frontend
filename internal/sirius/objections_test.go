@@ -92,7 +92,7 @@ func TestObjectionsForCase(t *testing.T) {
 					})
 			},
 			expectedResponse: []Objection{
-				Objection{
+				{
 					ID:            105,
 					Notes:         "Test",
 					ObjectionType: "factual",
@@ -287,7 +287,7 @@ func TestGetObjection(t *testing.T) {
 	testCases := []struct {
 		name             string
 		setup            func()
-		expectedResponse Objection
+		expectedResponse Objection2
 		expectedError    func(int) error
 	}{
 		{
@@ -309,16 +309,30 @@ func TestGetObjection(t *testing.T) {
 							"objectionType": matchers.String("factual"),
 							"receivedDate":  matchers.String("05/09/2024"),
 							"lpaUids":       []string{"M-1234-9876-4567"},
+							"resolutions": []map[string]interface{}{
+								{
+									"resolution":      matchers.Like("not upheld"),
+									"resolutionNotes": matchers.Like("Everything is fine"),
+									"resolutionDate":  matchers.Like("01/01/2025"),
+								},
+							},
 						}),
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
-			expectedResponse: Objection{
+			expectedResponse: Objection2{
 				ID:            3,
 				Notes:         "Test",
 				ObjectionType: "factual",
 				ReceivedDate:  "05/09/2024",
 				LpaUids:       []string{"M-1234-9876-4567"},
+				Resolutions: []ObjectionResolution{
+					{
+						Resolution:      "not upheld",
+						ResolutionNotes: "Everything is fine",
+						ResolutionDate:  "2025-01-01",
+					},
+				},
 			},
 		},
 		{
