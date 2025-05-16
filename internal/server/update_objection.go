@@ -11,7 +11,7 @@ import (
 
 type UpdateObjectionClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
-	GetObjection(sirius.Context, string) (sirius.Objection, error)
+	GetObjection(sirius.Context, string) (sirius.Objection2, error)
 	UpdateObjection(sirius.Context, string, sirius.ObjectionRequest) error
 }
 
@@ -37,7 +37,7 @@ func UpdateObjection(client UpdateObjectionClient, formTmpl template.Template, c
 		ctx := getContext(r)
 
 		var cs sirius.CaseSummary
-		var obj sirius.Objection
+		var obj sirius.Objection2
 		var err error
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
