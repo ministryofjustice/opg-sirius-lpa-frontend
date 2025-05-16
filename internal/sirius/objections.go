@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-type Objection struct {
+type ObjectionForCase struct {
 	ID            int      `json:"id"`
 	Notes         string   `json:"notes"`
 	ObjectionType string   `json:"objectionType"`
@@ -12,7 +12,7 @@ type Objection struct {
 	LpaUids       []string `json:"lpaUids"`
 }
 
-type Objection2 struct {
+type Objection struct {
 	ID            int                   `json:"id"`
 	Notes         string                `json:"notes"`
 	ObjectionType string                `json:"objectionType"`
@@ -42,8 +42,8 @@ func (c *Client) UpdateObjection(ctx Context, objectionId string, objectionDetai
 	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/objections/%s", objectionId), objectionDetails, nil)
 }
 
-func (c *Client) ObjectionsForCase(ctx Context, caseUID string) ([]Objection, error) {
-	var objectionList []Objection
+func (c *Client) ObjectionsForCase(ctx Context, caseUID string) ([]ObjectionForCase, error) {
+	var objectionList []ObjectionForCase
 	path := fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/objections", caseUID)
 
 	err := c.get(ctx, path, &objectionList)
@@ -51,8 +51,8 @@ func (c *Client) ObjectionsForCase(ctx Context, caseUID string) ([]Objection, er
 	return objectionList, err
 }
 
-func (c *Client) GetObjection(ctx Context, Id string) (Objection2, error) {
-	var objection Objection2
+func (c *Client) GetObjection(ctx Context, Id string) (Objection, error) {
+	var objection Objection
 	path := fmt.Sprintf("/lpa-api/v1/objections/%s", Id)
 
 	err := c.get(ctx, path, &objection)

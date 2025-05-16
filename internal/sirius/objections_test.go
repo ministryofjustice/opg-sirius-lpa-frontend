@@ -65,7 +65,7 @@ func TestObjectionsForCase(t *testing.T) {
 	testCases := []struct {
 		name             string
 		setup            func()
-		expectedResponse []Objection
+		expectedResponse []ObjectionForCase
 		expectedError    func(int) error
 	}{
 		{
@@ -91,7 +91,7 @@ func TestObjectionsForCase(t *testing.T) {
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
-			expectedResponse: []Objection{
+			expectedResponse: []ObjectionForCase{
 				{
 					ID:            105,
 					Notes:         "Test",
@@ -287,7 +287,7 @@ func TestGetObjection(t *testing.T) {
 	testCases := []struct {
 		name             string
 		setup            func()
-		expectedResponse Objection2
+		expectedResponse Objection
 		expectedError    func(int) error
 	}{
 		{
@@ -320,7 +320,7 @@ func TestGetObjection(t *testing.T) {
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
-			expectedResponse: Objection2{
+			expectedResponse: Objection{
 				ID:            3,
 				Notes:         "Test",
 				ObjectionType: "factual",
