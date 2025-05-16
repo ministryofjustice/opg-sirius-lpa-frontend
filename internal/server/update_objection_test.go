@@ -24,9 +24,9 @@ func (m *mockUpdateObjectionClient) CaseSummary(ctx sirius.Context, uid string) 
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
-func (m *mockUpdateObjectionClient) GetObjection(ctx sirius.Context, objectionId string) (sirius.Objection2, error) {
+func (m *mockUpdateObjectionClient) GetObjection(ctx sirius.Context, objectionId string) (sirius.Objection, error) {
 	args := m.Called(ctx, objectionId)
-	return args.Get(0).(sirius.Objection2), args.Error(1)
+	return args.Get(0).(sirius.Objection), args.Error(1)
 }
 
 var testUpdateObjectionsCaseSummary = sirius.CaseSummary{
@@ -51,12 +51,12 @@ var testUpdateObjectionsCaseSummary = sirius.CaseSummary{
 			},
 		},
 	},
-	Objections: []sirius.Objection{
+	Objections: []sirius.ObjectionForCase{
 		testObjection,
 	},
 }
 
-var testObjection = sirius.Objection{
+var testObjection = sirius.ObjectionForCase{
 	ID:            3,
 	Notes:         "Test",
 	ObjectionType: "factual",
@@ -64,7 +64,7 @@ var testObjection = sirius.Objection{
 	LpaUids:       []string{"M-7777-8888-9999"},
 }
 
-var testObjection2 = sirius.Objection2{
+var testObjection2 = sirius.Objection{
 	ID:            3,
 	Notes:         "Test",
 	ObjectionType: "factual",
@@ -185,7 +185,7 @@ func TestGetUpdateObjectionWhenGetObjectionErrors(t *testing.T) {
 		Return(testUpdateObjectionsCaseSummary, nil)
 	client.
 		On("GetObjection", mock.Anything, "3").
-		Return(sirius.Objection2{}, errExample)
+		Return(sirius.Objection{}, errExample)
 
 	server := newMockServer("/lpa/{uid}/objection/{id}", UpdateObjection(client, nil, nil))
 
