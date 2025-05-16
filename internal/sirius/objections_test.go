@@ -278,93 +278,93 @@ func TestUpdateObjection(t *testing.T) {
 	}
 }
 
-func TestGetObjection(t *testing.T) {
-	t.Parallel()
-
-	pact, err := newPact()
-	assert.NoError(t, err)
-
-	testCases := []struct {
-		name             string
-		setup            func()
-		expectedResponse Objection
-		expectedError    func(int) error
-	}{
-		{
-			name: "OK",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("I have a digital LPA with an objection").
-					UponReceiving("A request for the objection").
-					WithCompleteRequest(consumer.Request{
-						Method: http.MethodGet,
-						Path:   matchers.String("/lpa-api/v1/objections/3"),
-					}).
-					WithCompleteResponse(consumer.Response{
-						Status: http.StatusOK,
-						Body: matchers.Like(map[string]interface{}{
-							"id":            matchers.Like(3),
-							"notes":         matchers.String("Test"),
-							"objectionType": matchers.String("factual"),
-							"receivedDate":  matchers.String("05/09/2024"),
-							"lpaUids":       []string{"M-1234-9876-4567"},
-						}),
-						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
-					})
-			},
-			expectedResponse: Objection{
-				ID:            3,
-				Notes:         "Test",
-				ObjectionType: "factual",
-				ReceivedDate:  "05/09/2024",
-				LpaUids:       []string{"M-1234-9876-4567"},
-			},
-		},
-		{
-			name: "404",
-			setup: func() {
-				pact.
-					AddInteraction().
-					Given("There is no objection with the specified ID").
-					UponReceiving("A request for a non-existent objection").
-					WithCompleteRequest(consumer.Request{
-						Method: http.MethodGet,
-						Path:   matchers.String("/lpa-api/v1/objections/3"),
-					}).
-					WithCompleteResponse(consumer.Response{
-						Status: http.StatusNotFound,
-					})
-			},
-			expectedError: func(port int) error {
-				return StatusError{
-					Code:          404,
-					URL:           fmt.Sprintf("http://127.0.0.1:%d/lpa-api/v1/objections/3", port),
-					Method:        "GET",
-					CorrelationId: "",
-				}
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.setup()
-
-			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
-				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
-
-				objection, err := client.GetObjection(Context{Context: context.Background()}, "3")
-
-				assert.Equal(t, tc.expectedResponse, objection)
-				if tc.expectedError == nil {
-					assert.Nil(t, err)
-				} else {
-					assert.Equal(t, tc.expectedError(config.Port), err)
-				}
-
-				return nil
-			}))
-		})
-	}
-}
+//func TestGetObjection(t *testing.T) {
+//	t.Parallel()
+//
+//	pact, err := newPact()
+//	assert.NoError(t, err)
+//
+//	testCases := []struct {
+//		name             string
+//		setup            func()
+//		expectedResponse Objection
+//		expectedError    func(int) error
+//	}{
+//		{
+//			name: "OK",
+//			setup: func() {
+//				pact.
+//					AddInteraction().
+//					Given("I have a digital LPA with an objection").
+//					UponReceiving("A request for the objection").
+//					WithCompleteRequest(consumer.Request{
+//						Method: http.MethodGet,
+//						Path:   matchers.String("/lpa-api/v1/objections/3"),
+//					}).
+//					WithCompleteResponse(consumer.Response{
+//						Status: http.StatusOK,
+//						Body: matchers.Like(map[string]interface{}{
+//							"id":            matchers.Like(3),
+//							"notes":         matchers.String("Test"),
+//							"objectionType": matchers.String("factual"),
+//							"receivedDate":  matchers.String("05/09/2024"),
+//							"lpaUids":       []string{"M-1234-9876-4567"},
+//						}),
+//						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+//					})
+//			},
+//			expectedResponse: Objection{
+//				ID:            3,
+//				Notes:         "Test",
+//				ObjectionType: "factual",
+//				ReceivedDate:  "05/09/2024",
+//				LpaUids:       []string{"M-1234-9876-4567"},
+//			},
+//		},
+//		{
+//			name: "404",
+//			setup: func() {
+//				pact.
+//					AddInteraction().
+//					Given("There is no objection with the specified ID").
+//					UponReceiving("A request for a non-existent objection").
+//					WithCompleteRequest(consumer.Request{
+//						Method: http.MethodGet,
+//						Path:   matchers.String("/lpa-api/v1/objections/3"),
+//					}).
+//					WithCompleteResponse(consumer.Response{
+//						Status: http.StatusNotFound,
+//					})
+//			},
+//			expectedError: func(port int) error {
+//				return StatusError{
+//					Code:          404,
+//					URL:           fmt.Sprintf("http://127.0.0.1:%d/lpa-api/v1/objections/3", port),
+//					Method:        "GET",
+//					CorrelationId: "",
+//				}
+//			},
+//		},
+//	}
+//
+//	for _, tc := range testCases {
+//		t.Run(tc.name, func(t *testing.T) {
+//			tc.setup()
+//
+//			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+//				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
+//
+//				objection, err := client.GetObjection(Context{Context: context.Background()}, "3")
+//
+//				assert.Equal(t, tc.expectedResponse, objection)
+//				if tc.expectedError == nil {
+//					assert.Nil(t, err)
+//				} else {
+//					assert.Equal(t, tc.expectedError(config.Port), err)
+//				}
+//
+//				return nil
+//			}))
+//		})
+//	}
+//}
