@@ -24,9 +24,9 @@ func (m *mockUpdateObjectionClient) CaseSummary(ctx sirius.Context, uid string) 
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
-func (m *mockUpdateObjectionClient) GetObjection(ctx sirius.Context, objectionId string) (sirius.Objection, error) {
+func (m *mockUpdateObjectionClient) GetObjection(ctx sirius.Context, objectionId string) (sirius.Objection2, error) {
 	args := m.Called(ctx, objectionId)
-	return args.Get(0).(sirius.Objection), args.Error(1)
+	return args.Get(0).(sirius.Objection2), args.Error(1)
 }
 
 var testUpdateObjectionsCaseSummary = sirius.CaseSummary{
@@ -64,6 +64,21 @@ var testObjection = sirius.Objection{
 	LpaUids:       []string{"M-7777-8888-9999"},
 }
 
+var testObjection2 = sirius.Objection2{
+	ID:            3,
+	Notes:         "Test",
+	ObjectionType: "factual",
+	ReceivedDate:  "2025-03-12",
+	LpaUids:       []string{"M-7777-8888-9999"},
+	Resolutions: []sirius.ObjectionResolution{
+		{
+			Resolution:      "not upheld",
+			ResolutionNotes: "Everything is fine",
+			ResolutionDate:  "2025-01-01",
+		},
+	},
+}
+
 func TestGetUpdateObjectionsTemplate(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -88,7 +103,7 @@ func TestGetUpdateObjectionsTemplate(t *testing.T) {
 				Return(testUpdateObjectionsCaseSummary, nil)
 			client.
 				On("GetObjection", mock.Anything, "3").
-				Return(testObjection, nil)
+				Return(testObjection2, nil)
 
 			template := &mockTemplate{}
 			template.
@@ -152,7 +167,7 @@ func TestGetUpdateObjectionWhenCaseSummaryErrors(t *testing.T) {
 		Return(sirius.CaseSummary{}, errExample)
 	client.
 		On("GetObjection", mock.Anything, "3").
-		Return(testObjection, nil)
+		Return(testObjection2, nil)
 
 	server := newMockServer("/lpa/{uid}/objection/{id}", UpdateObjection(client, nil, nil))
 
@@ -170,7 +185,7 @@ func TestGetUpdateObjectionWhenGetObjectionErrors(t *testing.T) {
 		Return(testUpdateObjectionsCaseSummary, nil)
 	client.
 		On("GetObjection", mock.Anything, "3").
-		Return(sirius.Objection{}, errExample)
+		Return(sirius.Objection2{}, errExample)
 
 	server := newMockServer("/lpa/{uid}/objection/{id}", UpdateObjection(client, nil, nil))
 
@@ -206,7 +221,7 @@ func TestPostUpdateObjectionToAPI(t *testing.T) {
 				Return(testUpdateObjectionsCaseSummary, nil)
 			client.
 				On("GetObjection", mock.Anything, "3").
-				Return(testObjection, nil)
+				Return(testObjection2, nil)
 			client.
 				On("UpdateObjection", mock.Anything, "3", sirius.ObjectionRequest{
 					LpaUids:       []string{"M-7777-8888-9999", "M-9999-9999-9999"},
@@ -247,7 +262,7 @@ func TestPostUpdateObjectionWhenValidationError(t *testing.T) {
 		Return(testUpdateObjectionsCaseSummary, nil)
 	client.
 		On("GetObjection", mock.Anything, "3").
-		Return(testObjection, nil)
+		Return(testObjection2, nil)
 	client.
 		On("UpdateObjection", mock.Anything, "3", sirius.ObjectionRequest{
 			LpaUids:      []string{"M-7777-8888-9999"},
@@ -293,7 +308,7 @@ func TestPostUpdateObjectionToConfirmScreen(t *testing.T) {
 		Return(testUpdateObjectionsCaseSummary, nil)
 	client.
 		On("GetObjection", mock.Anything, "3").
-		Return(testObjection, nil)
+		Return(testObjection2, nil)
 
 	confirmTemplate := &mockTemplate{}
 	confirmTemplate.
