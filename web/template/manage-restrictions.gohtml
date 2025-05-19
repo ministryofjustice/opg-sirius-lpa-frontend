@@ -106,6 +106,7 @@
                                 <label class="govuk-label" for="f-courtOrderDecisionMade">
                                     <strong>Date court order made</strong>
                                 </label>
+                                {{ template "errors" .Error.Field.courtOrderDecisionDate }}
                                 <input class="govuk-input govuk-!-width-one-third " type="date" id="f-courtOrderDecisionMade" name="courtOrderDecisionMade">
                             </div>
 
@@ -113,11 +114,13 @@
                                 <label class="govuk-label" for="f-courtOrderReceived">
                                     <strong>Date court order issued</strong>
                                 </label>
+                                {{ template "errors" .Error.Field.courtOrderReceivedDate }}
                                 <input class="govuk-input govuk-!-width-one-third " type="date" id="f-courtOrderReceived" name="courtOrderReceived">
                             </div>
 
                             <div class="govuk-form-group">
                                 <legend class="govuk-fieldset__legend"><strong>Has severance of the restrictions and conditions been ordered?</strong></legend>
+                                {{ template "errors" .Error.Field.severanceOrderedAction }}
                                 <div class="govuk-radios" data-module="govuk-radios">
                                     <div class="govuk-radios__item">
                                         <input class="govuk-radios__input" id="f-severanceNotOrdered" name="severanceOrdered" type="radio" value="severance-not-ordered" {{ if eq "severance-not-ordered" .SeveranceOrderedByCourt }}checked{{ end }}>
@@ -159,13 +162,13 @@
 
                             <div class="govuk-radios" data-module="govuk-radios">
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="f-donorConsentGiven" name="donorConsentGiven" type="radio" value="donor-consent-given" {{ if eq "donor-consent-given" .DonorConsentGiven }}checked{{ end }}>
+                                    <input class="govuk-radios__input" id="f-donorConsentGiven" name="donorConsentGiven" type="radio" value="donor-consent-given" {{ if and (ne .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication nil) (compareBoolPointers .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.HasDonorConsented true) }}checked{{ end }}>
                                     <label class="govuk-label govuk-radios__label" for="f-donorConsentGiven">
                                         Donor has provided consent to a severance application
                                     </label>
                                 </div>
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="f-donorConsentNotGiven" name="donorConsentGiven" type="radio" value="donor-consent-not-given" {{ if eq "donor-consent-not-given" .DonorConsentGiven }}checked{{ end }}>
+                                    <input class="govuk-radios__input" id="f-donorConsentNotGiven" name="donorConsentGiven" type="radio" value="donor-consent-not-given" {{ if and (ne .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication nil) (compareBoolPointers .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.HasDonorConsented false) }}checked{{ end }}>
                                     <label class="govuk-label govuk-radios__label" for="f-donorConsentNotGiven">
                                         Donor has refused severance of restriction and conditions
                                     </label>
@@ -180,13 +183,13 @@
 
                             <div class="govuk-radios" data-module="govuk-radios">
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="f-severanceActionNotRequired" name="severanceAction" type="radio" value="severance-application-not-required" {{ if eq "severance-application-not-required" .SeveranceAction }}checked{{ end }}>
+                                    <input class="govuk-radios__input" id="f-severanceActionNotRequired" name="severanceAction" type="radio" value="severance-application-not-required" {{ if eq .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceStatus "NOT_REQUIRED" }}checked{{ end }}>
                                     <label class="govuk-label govuk-radios__label" for="f-severanceActionNotRequired">
                                         Severance application is not required
                                     </label>
                                 </div>
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="f-severanceActionRequired" name="severanceAction" type="radio" value="severance-application-required" {{ if eq "severance-application-required" .SeveranceAction }}checked{{ end }}>
+                                    <input class="govuk-radios__input" id="f-severanceActionRequired" name="severanceAction" type="radio" value="severance-application-required" {{ if eq .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceStatus "REQUIRED" }}checked{{ end }}>
                                     <label class="govuk-label govuk-radios__label" for="f-severanceActionRequired">
                                         Severance application is required
                                     </label>
