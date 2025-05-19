@@ -17,21 +17,36 @@ type ManageRestrictionsClient interface {
 	EditSeveranceApplication(sirius.Context, string, sirius.SeveranceApplication) error
 }
 
-type manageRestrictionsData struct {
-	XSRFToken               string
-	Error                   sirius.ValidationError
-	CaseUID                 string
-	CaseSummary             sirius.CaseSummary
-	SeveranceAction         string
-	DonorConsentGiven       string
-	SeveranceOrderedByCourt string
-	CourtOrderDecisionDate  sirius.DateString
-	CourtOrderReceivedDate  sirius.DateString
-	FormAction              string
-	Success                 bool
+type CourtOrderRestrictionDetails struct {
+	SelectedCourtOrderDecisionDate sirius.DateString
+	SelectedCourtOrderReceivedDate sirius.DateString
+	SelectedSeveranceAction        string
+	SelectedSeveranceType          string
+	SelectedSeveranceActionDetail  string
+	RemovedWords                   string
+	ChangedRestrictions            string
+	SelectedFormAction             string
 }
 
-func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template) Handler {
+type manageRestrictionsData struct {
+	XSRFToken                 string
+	Error                     sirius.ValidationError
+	CaseUID                   string
+	CaseSummary               sirius.CaseSummary
+	SeveranceAction           string
+	DonorConsentGiven         string
+	SeveranceOrderedByCourt   string
+	CourtOrderDecisionDate    sirius.DateString
+	CourtOrderReceivedDate    sirius.DateString
+	SeveranceType             string
+	WordsToBeRemoved          string
+	AmendedRestrictions       string
+	FormAction                string
+	ConfirmRestrictionDetails CourtOrderRestrictionDetails
+	Success                   bool
+}
+
+func ManageRestrictions(client ManageRestrictionsClient, manageTmpl template.Template, confirmTmpl template.Template) Handler {
 	if decoder == nil {
 		decoder = form.NewDecoder()
 	}
@@ -57,6 +72,10 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 			return err
 		}
 
+		fmt.Print("Hi ", postFormString(r, "removedWords"))
+		fmt.Println("Hi1 ", postFormString(r, "removedWords"))
+		fmt.Printf("Hi2 %s", postFormString(r, "removedWords"))
+
 		data := manageRestrictionsData{
 			CaseSummary:             cs,
 			SeveranceAction:         postFormString(r, "severanceAction"),
@@ -64,6 +83,9 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 			SeveranceOrderedByCourt: postFormString(r, "severanceOrdered"),
 			CourtOrderDecisionDate:  postFormDateString(r, "courtOrderDecisionMade"),
 			CourtOrderReceivedDate:  postFormDateString(r, "courtOrderReceived"),
+			SeveranceType:           postFormString(r, "severanceType"),
+			WordsToBeRemoved:        postFormString(r, "removedWords"),
+			AmendedRestrictions:     postFormString(r, "updatedRestrictions"),
 			XSRFToken:               ctx.XSRFToken,
 			Error:                   sirius.ValidationError{Field: sirius.FieldErrors{}},
 			CaseUID:                 caseUID,
@@ -143,36 +165,68 @@ func ManageRestrictions(client ManageRestrictionsClient, tmpl template.Template)
 				}
 			}
 
-			if data.FormAction == "court-order" {
-				severanceApplication := sirius.SeveranceApplication{}
-
-				if data.CourtOrderDecisionDate != "" {
-					severanceApplication.CourtOrderDecisionMade = data.CourtOrderDecisionDate
+			if data.FormAction == "court-order" || data.FormAction == "edit-restrictions" {
+				data.ConfirmRestrictionDetails = CourtOrderRestrictionDetails{
+					SelectedCourtOrderDecisionDate: data.CourtOrderDecisionDate,
+					SelectedCourtOrderReceivedDate: data.CourtOrderReceivedDate,
 				}
 
-				if data.CourtOrderReceivedDate != "" {
-					severanceApplication.CourtOrderReceived = data.CourtOrderReceivedDate
+				if data.SeveranceOrderedByCourt == "severance-not-ordered" {
+					data.ConfirmRestrictionDetails.SelectedSeveranceActionDetail = "No words are to be removed"
+				} else if data.SeveranceOrderedByCourt == "severance-ordered" {
+					if data.SeveranceType == "severance-partial" {
+						data.ConfirmRestrictionDetails.SelectedSeveranceActionDetail = "Some words are to be removed"
+						data.ConfirmRestrictionDetails.RemovedWords = data.WordsToBeRemoved
+						data.ConfirmRestrictionDetails.ChangedRestrictions = data.AmendedRestrictions
+					} else if data.SeveranceType == "severance-not-partial" {
+						data.ConfirmRestrictionDetails.SelectedSeveranceActionDetail = "All restrictions and conditions are to be removed"
+					}
 				}
 
-				switch data.SeveranceOrderedByCourt {
-				case "severance-ordered", "severance-not-ordered":
-					isSeveranceOrdered := true
-					if data.SeveranceOrderedByCourt == "severance-not-ordered" {
-						isSeveranceOrdered = false
+				data.ConfirmRestrictionDetails.SelectedSeveranceAction = data.SeveranceOrderedByCourt
+				data.ConfirmRestrictionDetails.SelectedSeveranceType = data.SeveranceType
+				data.ConfirmRestrictionDetails.SelectedFormAction = data.FormAction
+
+				if data.FormAction != "edit-restrictions" && data.SeveranceOrderedByCourt == "severance-ordered" && data.SeveranceType == "severance-partial" {
+					data.FormAction = "edit-restrictions"
+					return manageTmpl(w, data)
+				} else if !postFormKeySet(r, "confirmRestrictions") {
+					return confirmTmpl(w, data)
+				} else {
+					severanceApplication := sirius.SeveranceApplication{}
+
+					if data.CourtOrderDecisionDate != "" {
+						severanceApplication.CourtOrderDecisionMade = data.CourtOrderDecisionDate
 					}
 
-					severanceApplication.SeveranceOrdered = &isSeveranceOrdered
-				}
+					if data.CourtOrderReceivedDate != "" {
+						severanceApplication.CourtOrderReceived = data.CourtOrderReceivedDate
+					}
 
-				err := client.EditSeveranceApplication(ctx, caseUID, severanceApplication)
-				if handleError(w, &data, err) {
-					return err
-				}
+					if data.AmendedRestrictions != "" {
+						severanceApplication.UpdatedRestrictions = data.AmendedRestrictions
+					}
 
-				return handleSuccess(w, &data, caseUID)
+					switch data.SeveranceOrderedByCourt {
+					case "severance-ordered", "severance-not-ordered":
+						isSeveranceOrdered := true
+						if data.SeveranceOrderedByCourt == "severance-not-ordered" {
+							isSeveranceOrdered = false
+						}
+
+						severanceApplication.SeveranceOrdered = &isSeveranceOrdered
+					}
+
+					err := client.EditSeveranceApplication(ctx, caseUID, severanceApplication)
+					if handleError(w, &data, err) {
+						return err
+					}
+
+					return handleSuccess(w, &data, caseUID)
+				}
 			}
 		}
-		return tmpl(w, data)
+		return manageTmpl(w, data)
 	}
 }
 
