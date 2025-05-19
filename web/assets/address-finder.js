@@ -39,7 +39,7 @@ function AddressFinder($module, options) {
   this.$dropdown.addEventListener("change", this.handleSelect.bind(this));
 
   const $label = $container.querySelector(`[for="f-${id}-input"]`);
-  $label.innerHTML = this.$module.getAttribute("data-app-address-finder-label");
+  $label.innerText = this.$module.getAttribute("data-app-address-finder-label");
 
   const $link = $container.querySelector(".govuk-link");
   $link?.addEventListener("click", this.toggleInputs.bind(this));
