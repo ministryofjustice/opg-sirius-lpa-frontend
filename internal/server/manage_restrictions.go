@@ -228,7 +228,9 @@ func ManageRestrictions(client ManageRestrictionsClient, manageTmpl template.Tem
 							}
 						}
 
-						return confirmTmpl(w, data)
+						if !data.Error.Any() {
+							return confirmTmpl(w, data)
+						}
 					} else {
 						severanceApplication := sirius.SeveranceApplication{}
 
