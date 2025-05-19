@@ -319,6 +319,9 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "objection type NOT RECOGNISED: " + s
 			}
 		},
+		"compareBoolPointers": func(i *bool, j bool) bool {
+			return *i == j
+		},
 	}
 }
 
