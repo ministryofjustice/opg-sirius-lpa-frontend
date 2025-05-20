@@ -6,7 +6,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             {{ if eq .FormAction "edit-restrictions" }}
-                <a href="{{ prefix (printf "/lpa/%s/manage-restrictions" .CaseSummary.DigitalLpa.UID ) }}" class="govuk-back-link">Back to Manage restriction and conditions</a>
+                <a href="{{ prefix (printf "/lpa/%s/manage-restrictions" .CaseUID ) }}" class="govuk-back-link">Back to Manage restriction and conditions</a>
             {{ else }}
                 <a href="{{ prefix (printf "/lpa/%s/lpa-details" .CaseUID )}}" class="govuk-back-link">Back to case record</a>
             {{ end }}
@@ -158,13 +158,13 @@
 
                                 <div class="govuk-radios" data-module="govuk-radios">
                                     <div class="govuk-radios__item">
-                                        <input class="govuk-radios__input" id="f-donorConsentGiven" name="donorConsentGiven" type="radio" value="donor-consent-given" {{ if and (ne .ExistingSeverance nil) (compareBoolPointers .ExistingSeverance.HasDonorConsented true) }}checked{{ end }}>
+                                        <input class="govuk-radios__input" id="f-donorConsentGiven" name="donorConsentGiven" type="radio" value="donor-consent-given" {{ if and (ne .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication nil) (compareBoolPointers .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.HasDonorConsented true) }}checked{{ end }}>
                                         <label class="govuk-label govuk-radios__label" for="f-donorConsentGiven">
                                             Donor has provided consent to a severance application
                                         </label>
                                     </div>
                                     <div class="govuk-radios__item">
-                                        <input class="govuk-radios__input" id="f-donorConsentNotGiven" name="donorConsentGiven" type="radio" value="donor-consent-not-given" {{ if and (ne .ExistingSeverance nil) (compareBoolPointers .ExistingSeverance.HasDonorConsented false) }}checked{{ end }}>
+                                        <input class="govuk-radios__input" id="f-donorConsentNotGiven" name="donorConsentGiven" type="radio" value="donor-consent-not-given" {{ if and (ne .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication nil) (compareBoolPointers .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.HasDonorConsented false) }}checked{{ end }}>
                                         <label class="govuk-label govuk-radios__label" for="f-donorConsentNotGiven">
                                             Donor has refused severance of restriction and conditions
                                         </label>
