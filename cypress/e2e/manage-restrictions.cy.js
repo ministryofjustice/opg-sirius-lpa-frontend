@@ -305,14 +305,18 @@ describe("Manage restrictions form", () => {
       cy.get("#f-severancePartial").click();
       cy.get("button").contains("Save and continue").click();
       cy.contains("Update restrictions and conditions");
-      cy.contains("Enter the words to be removed, exactly as they appear in the court order");
+      cy.contains(
+        "Enter the words to be removed, exactly as they appear in the court order",
+      );
       cy.get("#f-removedWords").type("always want to");
       cy.get("#f-updatedRestrictions").type("I live in Edinburgh");
       cy.get("button").contains("Confirm").click();
       cy.contains("Confirm updates to restrictions and conditions");
       cy.get(".govuk-summary-list__value").contains("14 May 2025");
       cy.get(".govuk-summary-list__value").contains("19 May 2025");
-      cy.get(".govuk-summary-list__value").contains("Some words are to be removed");
+      cy.get(".govuk-summary-list__value").contains(
+        "Some words are to be removed",
+      );
     });
   });
 });
