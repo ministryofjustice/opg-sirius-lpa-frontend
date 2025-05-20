@@ -43,6 +43,7 @@ type manageRestrictionsData struct {
 	AmendedRestrictions       string
 	FormAction                string
 	ConfirmRestrictionDetails CourtOrderRestrictionDetails
+	ExistingSeverance         *sirius.SeveranceApplication
 	Success                   bool
 }
 
@@ -87,11 +88,15 @@ func ManageRestrictions(client ManageRestrictionsClient, manageTmpl template.Tem
 			CaseUID:                 caseUID,
 		}
 
+		if cs.DigitalLpa.SiriusData.Application.SeveranceApplication != nil {
+			data.ExistingSeverance = cs.DigitalLpa.SiriusData.Application.SeveranceApplication
+		}
+
 		data.FormAction = r.FormValue("action")
 		if data.FormAction == "" && data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceStatus == "REQUIRED" {
 			data.FormAction = "donor-consent"
 
-			if data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication != nil && *data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.HasDonorConsented {
+			if data.ExistingSeverance != nil && *data.ExistingSeverance.HasDonorConsented {
 				data.FormAction = "court-order"
 			}
 		}
@@ -156,7 +161,7 @@ func ManageRestrictions(client ManageRestrictionsClient, manageTmpl template.Tem
 				default:
 					w.WriteHeader(http.StatusBadRequest)
 					data.Error.Field["donorConsentAction"] = map[string]string{
-						"reason": "Please select an option",
+						"reason": "Please select an option for donor consent",
 					}
 				}
 			}
@@ -185,15 +190,7 @@ func ManageRestrictions(client ManageRestrictionsClient, manageTmpl template.Tem
 				case "severance-not-ordered":
 					data.ConfirmRestrictionDetails.SelectedSeveranceActionDetail = "No words are to be removed"
 				case "severance-ordered":
-					switch data.SeveranceType {
-					case "severance-partial":
-						data.ConfirmRestrictionDetails.SelectedSeveranceActionDetail = "Some words are to be removed"
-						data.ConfirmRestrictionDetails.RemovedWords = data.WordsToBeRemoved
-						data.ConfirmRestrictionDetails.ChangedRestrictions = data.AmendedRestrictions
-					case "severance-not-partial":
-						data.ConfirmRestrictionDetails.SelectedSeveranceActionDetail = "All restrictions and conditions are to be removed"
-
-					}
+					handleSeveranceType(w, &data)
 
 				default:
 					w.WriteHeader(http.StatusBadRequest)
@@ -206,67 +203,86 @@ func ManageRestrictions(client ManageRestrictionsClient, manageTmpl template.Tem
 				data.ConfirmRestrictionDetails.SelectedSeveranceType = data.SeveranceType
 				data.ConfirmRestrictionDetails.SelectedFormAction = data.FormAction
 
-				if !data.Error.Any() {
-					if data.FormAction != "edit-restrictions" && data.SeveranceOrderedByCourt == "severance-ordered" && data.SeveranceType == "severance-partial" {
-						data.FormAction = "edit-restrictions"
-						return manageTmpl(w, data)
-					} else if !postFormKeySet(r, "confirmRestrictions") {
+				if data.Error.Any() {
+					return manageTmpl(w, data)
+				}
 
-						if data.SeveranceOrderedByCourt == "severance-ordered" && data.SeveranceType == "severance-partial" {
-							if data.WordsToBeRemoved == "" {
-								w.WriteHeader(http.StatusBadRequest)
-								data.Error.Field["wordsToBeRemoved"] = map[string]string{
-									"reason": "Enter words to be removed",
-								}
-							}
+				if data.FormAction != "edit-restrictions" && data.SeveranceOrderedByCourt == "severance-ordered" && data.SeveranceType == "severance-partial" {
+					data.FormAction = "edit-restrictions"
+					return manageTmpl(w, data)
+				} else if !postFormKeySet(r, "confirmRestrictions") {
 
-							if data.AmendedRestrictions == "" {
-								w.WriteHeader(http.StatusBadRequest)
-								data.Error.Field["amendedRestrictions"] = map[string]string{
-									"reason": "Enter the updated restrictions and conditions",
-								}
+					if data.SeveranceOrderedByCourt == "severance-ordered" && data.SeveranceType == "severance-partial" {
+						if data.WordsToBeRemoved == "" {
+							w.WriteHeader(http.StatusBadRequest)
+							data.Error.Field["wordsToBeRemoved"] = map[string]string{
+								"reason": "Enter words to be removed",
 							}
 						}
 
-						if !data.Error.Any() {
-							return confirmTmpl(w, data)
-						}
-					} else {
-						severanceApplication := sirius.SeveranceApplication{}
-
-						if data.CourtOrderDecisionDate != "" {
-							severanceApplication.CourtOrderDecisionMade = data.CourtOrderDecisionDate
-						}
-
-						if data.CourtOrderReceivedDate != "" {
-							severanceApplication.CourtOrderReceived = data.CourtOrderReceivedDate
-						}
-
-						if data.AmendedRestrictions != "" {
-							severanceApplication.UpdatedRestrictions = data.AmendedRestrictions
-						}
-
-						switch data.SeveranceOrderedByCourt {
-						case "severance-ordered", "severance-not-ordered":
-							isSeveranceOrdered := true
-							if data.SeveranceOrderedByCourt == "severance-not-ordered" {
-								isSeveranceOrdered = false
+						if data.AmendedRestrictions == "" {
+							w.WriteHeader(http.StatusBadRequest)
+							data.Error.Field["amendedRestrictions"] = map[string]string{
+								"reason": "Enter the updated restrictions and conditions",
 							}
-
-							severanceApplication.SeveranceOrdered = &isSeveranceOrdered
 						}
-
-						err := client.EditSeveranceApplication(ctx, caseUID, severanceApplication)
-						if handleError(w, &data, err) {
-							return err
-						}
-
-						return handleSuccess(w, &data, caseUID)
 					}
+
+					if !data.Error.Any() {
+						return confirmTmpl(w, data)
+					}
+				} else {
+					severanceApplication := sirius.SeveranceApplication{}
+
+					if data.CourtOrderDecisionDate != "" {
+						severanceApplication.CourtOrderDecisionMade = data.CourtOrderDecisionDate
+					}
+
+					if data.CourtOrderReceivedDate != "" {
+						severanceApplication.CourtOrderReceived = data.CourtOrderReceivedDate
+					}
+
+					if data.AmendedRestrictions != "" {
+						severanceApplication.UpdatedRestrictions = data.AmendedRestrictions
+					}
+
+					switch data.SeveranceOrderedByCourt {
+					case "severance-ordered", "severance-not-ordered":
+						isSeveranceOrdered := true
+						if data.SeveranceOrderedByCourt == "severance-not-ordered" {
+							isSeveranceOrdered = false
+						}
+
+						severanceApplication.SeveranceOrdered = &isSeveranceOrdered
+					}
+
+					err := client.EditSeveranceApplication(ctx, caseUID, severanceApplication)
+					if handleError(w, &data, err) {
+						return err
+					}
+
+					return handleSuccess(w, &data, caseUID)
 				}
 			}
 		}
 		return manageTmpl(w, data)
+	}
+}
+
+func handleSeveranceType(w http.ResponseWriter, data *manageRestrictionsData) {
+	switch data.SeveranceType {
+	case "severance-partial":
+		data.ConfirmRestrictionDetails.SelectedSeveranceActionDetail = "Some words are to be removed"
+		data.ConfirmRestrictionDetails.RemovedWords = data.WordsToBeRemoved
+		data.ConfirmRestrictionDetails.ChangedRestrictions = data.AmendedRestrictions
+	case "severance-not-partial":
+		data.ConfirmRestrictionDetails.SelectedSeveranceActionDetail = "All restrictions and conditions are to be removed"
+
+	default:
+		w.WriteHeader(http.StatusBadRequest)
+		data.Error.Field["severanceType"] = map[string]string{
+			"reason": "Select if all restrictions and conditions are to be removed",
+		}
 	}
 }
 
