@@ -9,6 +9,7 @@ type SeveranceApplication struct {
 	SeveranceOrdered       *bool      `json:"severanceOrdered,omitempty"`
 	CourtOrderDecisionMade DateString `json:"courtOrderDecisionMade,omitempty"`
 	CourtOrderReceived     DateString `json:"courtOrderReceived,omitempty"`
+	UpdatedRestrictions    string     `json:"updatedRestrictions,omitempty"`
 }
 
 func (c *Client) EditSeveranceApplication(ctx Context, caseUID string, severanceApplication SeveranceApplication) error {

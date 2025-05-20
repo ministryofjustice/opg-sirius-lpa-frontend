@@ -1,0 +1,101 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Confirm removal of attorney{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <a href="{{ prefix (printf "/lpa/%s/manage-restrictions" .CaseSummary.DigitalLpa.UID )}}" class="govuk-back-link">Back to Manage restriction and conditions</a>
+
+      {{ template "mlpa-case-details" . }}
+
+      {{ template "error-summary" .Error }}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">Confirm updates to restrictions and conditions</h1>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
+        <input type="hidden" name="courtOrderDecisionMade" value="{{ .ConfirmRestrictionDetails.SelectedCourtOrderDecisionDate }}"/>
+        <input type="hidden" name="courtOrderReceived" value="{{ .ConfirmRestrictionDetails.SelectedCourtOrderReceivedDate }}"/>
+        <input type="hidden" name="severanceOrdered" value="{{ .ConfirmRestrictionDetails.SelectedSeveranceAction }}"/>
+        <input type="hidden" name="severanceType" value="{{ .ConfirmRestrictionDetails.SelectedSeveranceType }}"/>
+        <input type="hidden" name="removedWords" value="{{ .ConfirmRestrictionDetails.RemovedWords }}"/>
+        <input type="hidden" name="updatedRestrictions" value="{{ .ConfirmRestrictionDetails.ChangedRestrictions }}"/>
+        <input type="hidden" name="action" value="{{ .ConfirmRestrictionDetails.SelectedFormAction }}"/>
+        <input type="hidden" name="confirmRestrictions"/>
+
+        <div class="govuk-form-group">
+          <fieldset class="govuk-fieldset">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Date court order made</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ date .ConfirmRestrictionDetails.SelectedCourtOrderDecisionDate "2 January 2006" }}
+                </dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Date court order issued</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ date .ConfirmRestrictionDetails.SelectedCourtOrderReceivedDate "2 January 2006" }}
+                </dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Court order instructions</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ .ConfirmRestrictionDetails.SelectedSeveranceActionDetail }}
+                </dd>
+              </div>
+
+              {{ if eq .FormAction "edit-restrictions" }}
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Words to be removed</dt>
+                  <dd class="govuk-summary-list__value">
+                    {{ .ConfirmRestrictionDetails.RemovedWords }}
+                  </dd>
+                </div>
+              {{ end }}
+            </dl>
+            {{ if eq .FormAction "edit-restrictions" }}
+              <div class="govuk-grid-row">
+                <div class="govuk-grid-column-one-half">
+                  <label class="govuk-label">
+                    <strong>Updated restrictions and conditions</strong>
+                  </label>
+                  <div class="govuk-input__wrapper">
+                    {{ .ConfirmRestrictionDetails.ChangedRestrictions }}
+                  </div>
+                </div>
+                <div class="govuk-grid-column-one-half">
+                  <label class="govuk-label">
+                    <strong>Original restrictions and conditions</strong>
+                  </label>
+                  <div class="govuk-input__wrapper">
+                    {{ if .CaseSummary.DigitalLpa.LpaStoreData.RestrictionsAndConditions }}
+                      <p class="app-newlines-as-br">{{ .CaseSummary.DigitalLpa.LpaStoreData.RestrictionsAndConditions }}</p>
+                    {{ else }}
+                      {{ range .CaseSummary.DigitalLpa.LpaStoreData.RestrictionsAndConditionsImages }}
+                        <img class="app-!-max-full-width" src="{{ .Path }}" alt="A scanned copy of the donor’s restrictions and/or conditions - the text cannot be digitised at present">
+                      {{ end }}
+                    {{ end }}
+                  </div>
+                </div>
+              </div>
+            {{ end }}
+          </fieldset>
+        </div>
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Confirm</button>
+        </div>
+        <div class="govuk-button-group">
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s/manage-restrictions" .CaseSummary.DigitalLpa.UID )}}">Back to Update restrictions and conditions</a>
+        </div>
+        <div class="govuk-button-group">
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s" .CaseSummary.DigitalLpa.UID )}}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
