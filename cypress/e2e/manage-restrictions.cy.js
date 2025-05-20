@@ -299,6 +299,20 @@ describe("Manage restrictions form", () => {
       cy.contains(
         "Has severance of the restrictions and conditions been ordered?",
       );
+      cy.get("#f-courtOrderDecisionMade").type("2025-05-14");
+      cy.get("#f-courtOrderReceived").type("2025-05-19");
+      cy.get("#f-severanceOrdered").click();
+      cy.get("#f-severancePartial").click();
+      cy.get("button").contains("Save and continue").click();
+      cy.contains("Update restrictions and conditions");
+      cy.contains("Enter the words to be removed, exactly as they appear in the court order");
+      cy.get("#f-removedWords").type("always want to");
+      cy.get("#f-updatedRestrictions").type("I live in Edinburgh");
+      cy.get("button").contains("Confirm").click();
+      cy.contains("Confirm updates to restrictions and conditions");
+      cy.get(".govuk-summary-list__value").contains("14 May 2025");
+      cy.get(".govuk-summary-list__value").contains("19 May 2025");
+      cy.get(".govuk-summary-list__value").contains("Some words are to be removed");
     });
   });
 });

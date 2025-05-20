@@ -152,7 +152,9 @@ func TestGetManageRestrictionsCases(t *testing.T) {
 				}).
 				Return(tc.templateError)
 
-			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func))
+			confirmTemplate := &mockTemplate{}
+
+			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func, confirmTemplate.Func))
 
 			req, _ := http.NewRequest(http.MethodGet, "/lpa/M-1111-2222-3333/manage-restrictions", nil)
 			resp, err := server.serve(req)
@@ -208,7 +210,9 @@ func TestPostManageRestrictions(t *testing.T) {
 				On("Func", mock.Anything, restrictionsData).
 				Return(nil)
 
-			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func))
+			confirmTemplate := &mockTemplate{}
+
+			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func, confirmTemplate.Func))
 
 			req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/manage-restrictions", strings.NewReader(tc.form.Encode()))
 			req.Header.Add("Content-Type", formUrlEncoded)
@@ -255,7 +259,8 @@ func TestPostManageRestrictionsRedirects(t *testing.T) {
 				Return(nil)
 
 			template := &mockTemplate{}
-			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func))
+			confirmTemplate := &mockTemplate{}
+			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func, confirmTemplate.Func))
 
 			form := url.Values{
 				"severanceAction": {tc.severanceAction},
@@ -301,7 +306,8 @@ func TestPostManageRestrictionsWithSeveranceRequiredRedirects(t *testing.T) {
 				Return(nil)
 
 			template := &mockTemplate{}
-			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func))
+			confirmTemplate := &mockTemplate{}
+			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func, confirmTemplate.Func))
 
 			form := url.Values{
 				"donorConsentGiven": {tc.donorConsentAction},
@@ -324,26 +330,189 @@ func TestPostManageRestrictionsWithDonorConsentGivenRedirects(t *testing.T) {
 		courtOrderDecisionMade string
 		courtOrderReceived     string
 		severanceOrderedAction string
-		severanceDetails       *sirius.SeveranceApplication
+		severanceType          string
+		templateError          error
+		expectedError          error
 	}{
-		{
-			name:                   "Court order decision made date given",
-			courtOrderDecisionMade: "2025-04-05",
-			courtOrderReceived:     "",
-			severanceOrderedAction: "",
-			severanceDetails: &sirius.SeveranceApplication{
-				CourtOrderDecisionMade: "2025-04-05",
-			},
-		},
 		{
 			name:                   "Court order received date and severance ordered given",
 			courtOrderDecisionMade: "2025-04-05",
 			courtOrderReceived:     "2025-04-10",
 			severanceOrderedAction: "severance-ordered",
+			severanceType:          "severance-partial",
+			templateError:          nil,
+			expectedError:          nil,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &mockManageRestrictionsClient{}
+			client.
+				On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+				Return(restrictionsCaseSummaryWithDonorConsentGiven, nil)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, manageRestrictionsData{
+					CaseSummary:             restrictionsCaseSummaryWithDonorConsentGiven,
+					CaseUID:                 "M-1111-2222-3333",
+					FormAction:              "edit-restrictions",
+					SeveranceOrderedByCourt: "severance-ordered",
+					CourtOrderDecisionDate:  "2025-04-05",
+					CourtOrderReceivedDate:  "2025-04-10",
+					SeveranceType:           "severance-partial",
+					ConfirmRestrictionDetails: CourtOrderRestrictionDetails{
+						SelectedCourtOrderDecisionDate: "2025-04-05",
+						SelectedCourtOrderReceivedDate: "2025-04-10",
+						SelectedSeveranceAction:        "severance-ordered",
+						SelectedSeveranceType:          "severance-partial",
+						SelectedSeveranceActionDetail:  "Some words are to be removed",
+						SelectedFormAction:             "court-order",
+					},
+					Error: sirius.ValidationError{Field: sirius.FieldErrors{}},
+				}).
+				Return(tc.templateError)
+
+			confirmTemplate := &mockTemplate{}
+
+			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func, confirmTemplate.Func))
+
+			form := url.Values{
+				"courtOrderDecisionMade": {tc.courtOrderDecisionMade},
+				"courtOrderReceived":     {tc.courtOrderReceived},
+				"severanceOrdered":       {tc.severanceOrderedAction},
+				"severanceType":          {tc.severanceType},
+				"action":                 {"court-order"},
+			}
+
+			req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/manage-restrictions", strings.NewReader(form.Encode()))
+			req.Header.Add("Content-Type", formUrlEncoded)
+			resp, err := server.serve(req)
+
+			if tc.expectedError != nil {
+				assert.Equal(t, tc.expectedError, err)
+			} else if tc.templateError != nil {
+				assert.Equal(t, tc.templateError, err)
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, http.StatusOK, resp.Code)
+				mock.AssertExpectationsForObjects(t, client, template)
+			}
+		})
+	}
+}
+
+func TestPostManageRestrictionsWithRestrictionsUpdated(t *testing.T) {
+	tests := []struct {
+		name                   string
+		courtOrderDecisionMade string
+		courtOrderReceived     string
+		severanceOrderedAction string
+		severanceType          string
+		removedWords           string
+		updatedRestrictions    string
+		templateError          error
+		expectedError          error
+	}{
+		{
+			name:                   "Restrictions severed",
+			courtOrderDecisionMade: "2025-04-05",
+			courtOrderReceived:     "2025-04-10",
+			severanceOrderedAction: "severance-ordered",
+			severanceType:          "severance-partial",
+			removedWords:           "always want to",
+			updatedRestrictions:    "I live in Edinburgh",
+			templateError:          nil,
+			expectedError:          nil,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &mockManageRestrictionsClient{}
+			client.
+				On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+				Return(restrictionsCaseSummaryWithDonorConsentGiven, nil)
+
+			template := &mockTemplate{}
+			confirmTemplate := &mockTemplate{}
+			confirmTemplate.
+				On("Func", mock.Anything, manageRestrictionsData{
+					CaseSummary:             restrictionsCaseSummaryWithDonorConsentGiven,
+					CaseUID:                 "M-1111-2222-3333",
+					FormAction:              "edit-restrictions",
+					SeveranceOrderedByCourt: "severance-ordered",
+					CourtOrderDecisionDate:  "2025-04-05",
+					CourtOrderReceivedDate:  "2025-04-10",
+					SeveranceType:           "severance-partial",
+					WordsToBeRemoved:        "always want to",
+					AmendedRestrictions:     "I live in Edinburgh",
+					ConfirmRestrictionDetails: CourtOrderRestrictionDetails{
+						SelectedCourtOrderDecisionDate: "2025-04-05",
+						SelectedCourtOrderReceivedDate: "2025-04-10",
+						SelectedSeveranceAction:        "severance-ordered",
+						SelectedSeveranceType:          "severance-partial",
+						SelectedSeveranceActionDetail:  "Some words are to be removed",
+						RemovedWords:                   "always want to",
+						ChangedRestrictions:            "I live in Edinburgh",
+						SelectedFormAction:             "edit-restrictions",
+					},
+					Error: sirius.ValidationError{Field: sirius.FieldErrors{}},
+				}).
+				Return(tc.templateError)
+
+			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func, confirmTemplate.Func))
+
+			form := url.Values{
+				"courtOrderDecisionMade": {tc.courtOrderDecisionMade},
+				"courtOrderReceived":     {tc.courtOrderReceived},
+				"severanceOrdered":       {tc.severanceOrderedAction},
+				"severanceType":          {tc.severanceType},
+				"removedWords":           {tc.removedWords},
+				"updatedRestrictions":    {tc.updatedRestrictions},
+				"action":                 {"edit-restrictions"},
+			}
+
+			req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/manage-restrictions", strings.NewReader(form.Encode()))
+			req.Header.Add("Content-Type", formUrlEncoded)
+			resp, err := server.serve(req)
+
+			if tc.expectedError != nil {
+				assert.Equal(t, tc.expectedError, err)
+			} else if tc.templateError != nil {
+				assert.Equal(t, tc.templateError, err)
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, http.StatusOK, resp.Code)
+				mock.AssertExpectationsForObjects(t, client, template)
+			}
+		})
+	}
+}
+
+func TestPostManageRestrictionsWithCourtOrderInstructions(t *testing.T) {
+	tests := []struct {
+		name                   string
+		courtOrderDecisionMade string
+		courtOrderReceived     string
+		severanceOrderedAction string
+		severanceType          string
+		updatedRestrictions    string
+		severanceDetails       *sirius.SeveranceApplication
+	}{
+		{
+			name:                   "Severance order given and restrictions have been updated",
+			courtOrderDecisionMade: "2025-04-05",
+			courtOrderReceived:     "2025-04-10",
+			severanceOrderedAction: "severance-ordered",
+			severanceType:          "severance-partial",
+			updatedRestrictions:    "This is an updated restriction",
 			severanceDetails: &sirius.SeveranceApplication{
 				CourtOrderDecisionMade: "2025-04-05",
 				CourtOrderReceived:     "2025-04-10",
 				SeveranceOrdered:       boolPointer(true),
+				UpdatedRestrictions:    "This is an updated restriction",
 			},
 		},
 	}
@@ -360,13 +529,17 @@ func TestPostManageRestrictionsWithDonorConsentGivenRedirects(t *testing.T) {
 				Return(nil)
 
 			template := &mockTemplate{}
-			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func))
+			confirmTemplate := &mockTemplate{}
+			server := newMockServer("/lpa/{uid}/manage-restrictions", ManageRestrictions(client, template.Func, confirmTemplate.Func))
 
 			form := url.Values{
 				"courtOrderDecisionMade": {tc.courtOrderDecisionMade},
 				"courtOrderReceived":     {tc.courtOrderReceived},
 				"severanceOrdered":       {tc.severanceOrderedAction},
-				"action":                 {"court-order"},
+				"severanceType":          {tc.severanceType},
+				"updatedRestrictions":    {tc.updatedRestrictions},
+				"confirmRestrictions":    {""},
+				"action":                 {"edit-restrictions"},
 			}
 
 			req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/manage-restrictions", strings.NewReader(form.Encode()))
