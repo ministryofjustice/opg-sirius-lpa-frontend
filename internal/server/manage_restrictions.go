@@ -43,7 +43,6 @@ type manageRestrictionsData struct {
 	AmendedRestrictions       string
 	FormAction                string
 	ConfirmRestrictionDetails CourtOrderRestrictionDetails
-	ExistingSeverance         *sirius.SeveranceApplication
 	Success                   bool
 }
 
@@ -88,15 +87,11 @@ func ManageRestrictions(client ManageRestrictionsClient, manageTmpl template.Tem
 			CaseUID:                 caseUID,
 		}
 
-		if cs.DigitalLpa.SiriusData.Application.SeveranceApplication != nil {
-			data.ExistingSeverance = cs.DigitalLpa.SiriusData.Application.SeveranceApplication
-		}
-
 		data.FormAction = r.FormValue("action")
 		if data.FormAction == "" && data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceStatus == "REQUIRED" {
 			data.FormAction = "donor-consent"
 
-			if data.ExistingSeverance != nil && *data.ExistingSeverance.HasDonorConsented {
+			if data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication != nil && *data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.HasDonorConsented {
 				data.FormAction = "court-order"
 			}
 		}
