@@ -4,7 +4,7 @@
 
 {{ define "main" }}
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
+        <div {{ if ne .FormAction "edit-restrictions" }}class="govuk-grid-column-two-thirds"{{ end }}>
             {{ if eq .FormAction "edit-restrictions" }}
                 <a href="{{ prefix (printf "/lpa/%s/manage-restrictions" .CaseUID ) }}" class="govuk-back-link">Back to Manage restriction and conditions</a>
             {{ else }}

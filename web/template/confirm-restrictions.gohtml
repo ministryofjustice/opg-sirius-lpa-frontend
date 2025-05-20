@@ -4,7 +4,7 @@
 
 {{ define "main" }}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
+    <div {{ if ne .ConfirmRestrictionDetails.SelectedFormAction "edit-restrictions" }}class="govuk-grid-column-two-thirds"{{ end }}>
       <a href="{{ prefix (printf "/lpa/%s/manage-restrictions" .CaseSummary.DigitalLpa.UID )}}" class="govuk-back-link">Back to Manage restriction and conditions</a>
 
       {{ template "mlpa-case-details" . }}
