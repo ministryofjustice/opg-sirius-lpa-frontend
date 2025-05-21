@@ -71,9 +71,9 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		if data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication != nil && data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.SeveranceOrdered != nil {
 			data.CheckedForSeverance = true
 
-			if *data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.SeveranceOrdered && data.DigitalLpa.LpaStoreData.RestrictionsAndConditions == "" {
+			if *data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.SeveranceOrdered && data.CaseSummary.DigitalLpa.LpaStoreData.RestrictionsAndConditions == "" {
 				data.SeveranceType = "All restrictions and conditions have been removed"
-			} else if *data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.SeveranceOrdered && data.DigitalLpa.LpaStoreData.RestrictionsAndConditions != "" {
+			} else if *data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.SeveranceOrdered && data.CaseSummary.DigitalLpa.LpaStoreData.RestrictionsAndConditions != "" {
 				data.SeveranceType = "Some words have been removed"
 			} else if !*data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.SeveranceOrdered {
 				data.SeveranceType = "No words have been removed"

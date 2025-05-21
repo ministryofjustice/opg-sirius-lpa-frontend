@@ -19,11 +19,11 @@
         <div class="govuk-body">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-one-half">
-                    {{ if .CheckedForSeverance }}
-                        <p class="govuk-!-text-align-left">
+                    <p class="govuk-!-text-align-left">
+                        {{ if .CheckedForSeverance }}
                             <strong>Checked for severance - {{ .SeveranceType }}</strong>
-                        </p>
-                    {{ end }}
+                        {{ end }}
+                    </p>
                 </div>
                 <div class="govuk-grid-column-one-half">
                     <p class="govuk-!-text-align-right">
