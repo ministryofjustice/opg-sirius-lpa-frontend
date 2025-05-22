@@ -193,3 +193,24 @@ func TestSeveranceRequiredLabel(t *testing.T) {
 
 	testStringMapper(t, "severanceRequiredLabel", expectations)
 }
+
+// Helper function to easily get a pointer to a bool
+func boolPtr(b bool) *bool {
+	return &b
+}
+
+func TestCompareBoolPointer(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["compareBoolPointers"].(func(*bool, bool) bool)
+
+	var val bool
+
+	val = fn(boolPtr(true), true)
+	assert.Equal(t, true, val)
+
+	val = fn(boolPtr(true), false)
+	assert.Equal(t, false, val)
+
+	val = fn(boolPtr(false), false)
+	assert.Equal(t, true, val)
+}
