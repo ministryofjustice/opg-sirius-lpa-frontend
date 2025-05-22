@@ -7,9 +7,9 @@
         <h2 class="govuk-accordion__section-heading">
               <span class="govuk-accordion__section-button" id="accordion-default-heading-5">
                 Restrictions and conditions
-                {{ if eq .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceStatus "REQUIRED" }}
+                {{ if and (eq .CheckedForSeverance false) (eq .CaseSummary.DigitalLpa.SiriusData.Application.SeveranceStatus "REQUIRED") }}
                     {{ template "information-alert" "Ongoing severance application" }}
-                {{ else if .ReviewRestrictions }}
+                {{ else if and (eq .CheckedForSeverance false) (.ReviewRestrictions) }}
                     {{ template "information-alert" "Review and confirm if severance is required" }}
                 {{ end }}
               </span>
@@ -17,9 +17,24 @@
     </div>
     <div id="accordion-default-content-5" class="govuk-accordion__section-content">
         <div class="govuk-body">
-            <p class="govuk-!-text-align-right">
-                <a class="govuk-link" id="f-manage-restrictions-conditions" href="{{ prefix (printf "/lpa/%s/manage-restrictions" $caseUID) }}">Manage restrictions and conditions</a>
-            </p>
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-one-half">
+                    <p class="govuk-!-text-align-left">
+                        {{ if .CheckedForSeverance }}
+                            <strong>Checked for severance - {{ .SeveranceType }}</strong>
+                        {{ end }}
+                    </p>
+                </div>
+                <div class="govuk-grid-column-one-half">
+                    <p class="govuk-!-text-align-right">
+                        {{ if .CheckedForSeverance }}
+                            <a class="govuk-link" id="f-manage-restrictions-conditions" href="#">Update</a>
+                        {{ else }}
+                            <a class="govuk-link" id="f-manage-restrictions-conditions" href="{{ prefix (printf "/lpa/%s/manage-restrictions" $caseUID) }}">Manage restrictions and conditions</a>
+                        {{ end }}
+                    </p>
+                </div>
+            </div>
 
             {{ if .DigitalLpa.LpaStoreData.RestrictionsAndConditions }}
                 <p class="app-newlines-as-br">{{ .DigitalLpa.LpaStoreData.RestrictionsAndConditions }}</p>

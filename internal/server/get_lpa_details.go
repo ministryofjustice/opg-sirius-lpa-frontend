@@ -19,6 +19,8 @@ type getLpaDetails struct {
 	DigitalLpa              sirius.DigitalLpa
 	AnomalyDisplay          *sirius.AnomalyDisplay
 	ReviewRestrictions      bool
+	CheckedForSeverance     bool
+	SeveranceType           string
 	ReplacementAttorneys    []sirius.LpaStoreAttorney
 	NonReplacementAttorneys []sirius.LpaStoreAttorney
 	RemovedAttorneys        []sirius.LpaStoreAttorney
@@ -61,6 +63,20 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		for _, task := range taskList {
 			if task.Name == "Review restrictions and conditions" && task.Status != "Completed" {
 				data.ReviewRestrictions = true
+			}
+		}
+
+		data.CheckedForSeverance = false
+		data.SeveranceType = ""
+		if data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication != nil && data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.SeveranceOrdered != nil {
+			data.CheckedForSeverance = true
+
+			if *data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.SeveranceOrdered && data.CaseSummary.DigitalLpa.LpaStoreData.RestrictionsAndConditions == "" {
+				data.SeveranceType = "All restrictions and conditions have been removed"
+			} else if *data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.SeveranceOrdered && data.CaseSummary.DigitalLpa.LpaStoreData.RestrictionsAndConditions != "" {
+				data.SeveranceType = "Some words have been removed"
+			} else if !*data.CaseSummary.DigitalLpa.SiriusData.Application.SeveranceApplication.SeveranceOrdered {
+				data.SeveranceType = "No words have been removed"
 			}
 		}
 
