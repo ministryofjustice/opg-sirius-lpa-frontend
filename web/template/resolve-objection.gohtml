@@ -19,39 +19,36 @@
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
 
-                <div class="govuk-form-group {{ if .Error.Field.resolution }}govuk-form-group--error{{ end }}">
+                {{ range $index, $uid := .LpaUids }}
+                    <input type="hidden" name="caseUid" value="{{ $uid }}">
 
-                    <fieldset class="govuk-fieldset">
-                        <legend class="govuk-fieldset__legend"><strong>What is the outcome for {{ .CaseUID }}</strong></legend>
-                        {{ template "errors" .Error.Field.resolution }}
-                        <div class="govuk-radios" data-module="govuk-radios">
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="f-resolution-Upheld" name="resolution" type="radio" value="upheld" {{ if eq "upheld" .Resolution }}checked{{ end }}>
-                                <label class="govuk-label govuk-radios__label" for="f-resolution-Upheld">
-                                    Objection upheld
-                                </label>
+                    <div class="govuk-form-group">
+                        <fieldset class="govuk-fieldset">
+                            <legend class="govuk-fieldset__legend">
+                                <strong>What is the outcome for {{ $uid }}</strong>
+                            </legend>
+
+                            <div class="govuk-radios" data-module="govuk-radios">
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="res-upheld-{{ $index }}" name="resolution_{{ $index }}" type="radio" value="upheld">
+                                    <label class="govuk-label govuk-radios__label" for="res-upheld-{{ $index }}">Objection upheld</label>
+                                </div>
+
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="res-notUpheld-{{ $index }}" name="resolution_{{ $index }}" type="radio" value="notUpheld">
+                                    <label class="govuk-label govuk-radios__label" for="res-notUpheld-{{ $index }}">Objection not upheld</label>
+                                </div>
                             </div>
-                            <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="f-resolution-notUpheld" name="resolution" type="radio" value="notUpheld" {{ if eq "notUpheld" .Resolution }}checked{{ end }}>
-                                <label class="govuk-label govuk-radios__label" for="f-resolution-notUpheld">
-                                    Objection not upheld
-                                </label>
-                            </div>
-                        </div>
-                    </fieldset>
-                </div>
+                        </fieldset>
+                    </div>
 
-
-
-                <div class="govuk-form-group {{ if .Error.Field.notes }}govuk-form-group--error{{ end }}">
-                    <label class="govuk-label" for="f-notes">
-                        Notes for {{ .CaseUID }} (optional)
-                    </label>
-                        {{ template "errors" .Error.Field.notes }}
-                        <div class="govuk-input__wrapper">
-                            <textarea class="govuk-textarea" id="f-notes" name="notes" rows="3" cols="25">{{ .Form.Notes }}</textarea>
-                        </div>
-                </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="notes-{{ $index }}">
+                            Notes for {{ $uid }} (optional)
+                        </label>
+                        <textarea class="govuk-textarea" id="notes-{{ $index }}" name="notes_{{ $index }}" rows="3" cols="25"></textarea>
+                    </div>
+                {{ end }}
 
                 <div class="govuk-button-group">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Confirm</button>
