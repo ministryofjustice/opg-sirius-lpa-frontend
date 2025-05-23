@@ -321,11 +321,13 @@ func TestGetObjection(t *testing.T) {
 					})
 			},
 			expectedResponse: Objection{
-				ID:            3,
-				Notes:         "Test",
-				ObjectionType: "factual",
-				ReceivedDate:  "05/09/2024",
-				LpaUids:       []string{"M-1234-9876-4567"},
+				ObjectionForCase: ObjectionForCase{
+					ID:            3,
+					Notes:         "Test",
+					ObjectionType: "factual",
+					ReceivedDate:  "05/09/2024",
+					LpaUids:       []string{"M-1234-9876-4567"},
+				},
 				Resolutions: []ObjectionResolution{
 					{
 						Resolution:      "not upheld",
@@ -382,4 +384,3 @@ func TestGetObjection(t *testing.T) {
 		})
 	}
 }
-

@@ -13,12 +13,8 @@ type ObjectionForCase struct {
 }
 
 type Objection struct {
-	ID            int                   `json:"id"`
-	Notes         string                `json:"notes"`
-	ObjectionType string                `json:"objectionType"`
-	ReceivedDate  string                `json:"receivedDate"`
-	LpaUids       []string              `json:"lpaUids"`
-	Resolutions   []ObjectionResolution `json:"resolutions"`
+	ObjectionForCase
+	Resolutions []ObjectionResolution `json:"resolutions"`
 }
 
 type ObjectionResolution struct {
