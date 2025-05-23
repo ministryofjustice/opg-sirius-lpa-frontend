@@ -76,7 +76,7 @@
                                             {{- end -}}
                                         {{- end -}}
                                     </p>
-                                    <a class="govuk-body-s govuk-link" href="">Record objection outcome</a>
+                                    <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/lpa/%s/objection/%d/resolve" $uid .ID) }}">Record objection outcome</a>
                                 </li>
                         </ul>
                     {{ end }}
