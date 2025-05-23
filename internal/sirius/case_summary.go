@@ -8,7 +8,7 @@ type CaseSummary struct {
 	DigitalLpa  DigitalLpa
 	TaskList    []Task
 	WarningList []Warning
-	Objections  []Objection
+	Objections  []ObjectionForCase
 }
 
 /**
