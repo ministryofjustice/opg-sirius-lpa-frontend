@@ -85,6 +85,7 @@ type Client interface {
 	PostcodeLookupClient
 	RelationshipClient
 	RemoveAnAttorneyClient
+	ResolveObjectionClient
 	SearchClient
 	SearchDonorsClient
 	SearchUsersClient
@@ -107,6 +108,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 
 	mux.Handle("/lpa/{uid}/attorney/{attorneyUID}/change-details", wrap(ChangeAttorneyDetails(client, templates.Get("change-attorney-details.gohtml"))))
 	mux.Handle("/lpa/{uid}/objection/{id}", wrap(UpdateObjection(client, templates.Get("objection.gohtml"), templates.Get("confirm-objection.gohtml"))))
+	mux.Handle("/lpa/{uid}/objection/{id}/resolve", wrap(ResolveObjection(client, templates.Get("resolve-objection.gohtml"))))
 	mux.Handle("/lpa/{uid}/change-draft", wrap(ChangeDraft(client, templates.Get("change-draft.gohtml"))))
 	mux.Handle("/lpa/{uid}/manage-restrictions", wrap(ManageRestrictions(client, templates.Get("manage-restrictions.gohtml"), templates.Get("confirm-restrictions.gohtml"))))
 	mux.Handle("/add-objection", wrap(AddObjection(client, templates.Get("objection.gohtml"))))
