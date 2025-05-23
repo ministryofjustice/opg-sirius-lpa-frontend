@@ -22,6 +22,7 @@ type Objection struct {
 }
 
 type ObjectionResolution struct {
+	Uid             string     `json:"uid"`
 	Resolution      string     `json:"resolution"`
 	ResolutionNotes string     `json:"resolutionNotes"`
 	ResolutionDate  DateString `json:"resolutionDate"`
