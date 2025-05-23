@@ -62,7 +62,7 @@ func UpdateObjection(client UpdateObjectionClient, formTmpl template.Template, c
 			return err
 		}
 
-		receivedDate, err := parseDate(obj.ReceivedDate)
+		receivedDate, err := parseDate(obj.ObjectionForCase.ReceivedDate)
 		if err != nil {
 			return err
 		}
@@ -85,10 +85,10 @@ func UpdateObjection(client UpdateObjectionClient, formTmpl template.Template, c
 			CaseUID:    caseUID,
 			LinkedLpas: linkedCasesForObjections,
 			Form: formObjection{
-				LpaUids:       obj.LpaUids,
+				LpaUids:       obj.ObjectionForCase.LpaUids,
 				ReceivedDate:  receivedDate,
-				ObjectionType: obj.ObjectionType,
-				Notes:         obj.Notes,
+				ObjectionType: obj.ObjectionForCase.ObjectionType,
+				Notes:         obj.ObjectionForCase.Notes,
 			},
 		}
 
