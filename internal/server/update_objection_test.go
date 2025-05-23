@@ -65,11 +65,13 @@ var testObjection = sirius.ObjectionForCase{
 }
 
 var testObjection2 = sirius.Objection{
-	ID:            3,
-	Notes:         "Test",
-	ObjectionType: "factual",
-	ReceivedDate:  "2025-03-12",
-	LpaUids:       []string{"M-7777-8888-9999"},
+	ObjectionForCase: sirius.ObjectionForCase{
+		ID:            3,
+		Notes:         "Test",
+		ObjectionType: "factual",
+		ReceivedDate:  "2025-03-12",
+		LpaUids:       []string{"M-7777-8888-9999"},
+	},
 	Resolutions: []sirius.ObjectionResolution{
 		{
 			Resolution:      "not upheld",
