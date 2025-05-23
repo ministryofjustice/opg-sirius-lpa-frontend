@@ -311,6 +311,7 @@ func TestGetObjection(t *testing.T) {
 							"lpaUids":       []string{"M-1234-9876-4567"},
 							"resolutions": []map[string]interface{}{
 								{
+									"uid":             matchers.Like("M-1234-9876-4567"),
 									"resolution":      matchers.Like("not upheld"),
 									"resolutionNotes": matchers.Like("Everything is fine"),
 									"resolutionDate":  matchers.Like("01/01/2025"),
@@ -330,6 +331,7 @@ func TestGetObjection(t *testing.T) {
 				},
 				Resolutions: []ObjectionResolution{
 					{
+						Uid:             "M-1234-9876-4567",
 						Resolution:      "not upheld",
 						ResolutionNotes: "Everything is fine",
 						ResolutionDate:  "2025-01-01",
