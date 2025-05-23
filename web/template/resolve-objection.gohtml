@@ -19,21 +19,21 @@
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
 
-                <div class="govuk-form-group {{ if .Error.Field.outcome }}govuk-form-group--error{{ end }}">
+                <div class="govuk-form-group {{ if .Error.Field.resolution }}govuk-form-group--error{{ end }}">
 
                     <fieldset class="govuk-fieldset">
                         <legend class="govuk-fieldset__legend"><strong>What is the outcome for {{ .CaseUID }}</strong></legend>
-                        {{ template "errors" .Error.Field.outcome }}
+                        {{ template "errors" .Error.Field.resolution }}
                         <div class="govuk-radios" data-module="govuk-radios">
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="f-outcomeUpheld" name="outcome" type="radio" value="upheld" {{ if eq "upheld" .Outcome }}checked{{ end }}>
-                                <label class="govuk-label govuk-radios__label" for="f-outcomeUpheld">
+                                <input class="govuk-radios__input" id="f-resolution-Upheld" name="resolution" type="radio" value="upheld" {{ if eq "upheld" .Resolution }}checked{{ end }}>
+                                <label class="govuk-label govuk-radios__label" for="f-resolution-Upheld">
                                     Objection upheld
                                 </label>
                             </div>
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="f-outcomeNotUpheld" name="outcome" type="radio" value="not-upheld" {{ if eq "not-upheld" .Outcome }}checked{{ end }}>
-                                <label class="govuk-label govuk-radios__label" for="f-outcomeNotUpheld">
+                                <input class="govuk-radios__input" id="f-resolution-notUpheld" name="resolution" type="radio" value="notUpheld" {{ if eq "notUpheld" .Resolution }}checked{{ end }}>
+                                <label class="govuk-label govuk-radios__label" for="f-resolution-notUpheld">
                                     Objection not upheld
                                 </label>
                             </div>

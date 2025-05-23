@@ -31,6 +31,11 @@ type ObjectionRequest struct {
 	Notes         string     `json:"notes"`
 }
 
+type ResolutionRequest struct {
+	Resolution string `json:"resolution"`
+	Notes      string `json:"resolutionNotes"`
+}
+
 func (c *Client) AddObjection(ctx Context, objectionDetails ObjectionRequest) error {
 	return c.post(ctx, "/lpa-api/v1/objections", objectionDetails, nil)
 }
@@ -55,4 +60,8 @@ func (c *Client) GetObjection(ctx Context, Id string) (Objection, error) {
 	err := c.get(ctx, path, &objection)
 
 	return objection, err
+}
+
+func (c *Client) ResolveObjection(ctx Context, objectionId string, lpaUid string, resolutionDetails ResolutionRequest) error {
+	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/objections/%s/resolution/%s", objectionId, lpaUid), resolutionDetails, nil)
 }
