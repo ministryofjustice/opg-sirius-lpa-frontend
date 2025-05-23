@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -11,6 +12,7 @@ import (
 type ResolveObjectionClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
 	GetObjection(sirius.Context, string) (sirius.Objection, error)
+	ResolveObjection(sirius.Context, string, string, sirius.ResolutionRequest) error
 }
 
 type resolveObjectionData struct {
@@ -19,9 +21,15 @@ type resolveObjectionData struct {
 	Error       sirius.ValidationError
 	CaseUID     string
 	ObjectionId string
-	Outcome     string
+	Resolution  string
 	Objection   sirius.Objection
 	LpaUids     []string
+	Form        formResolveObjection
+}
+
+type formResolveObjection struct {
+	Resolution string `form:"resolution"`
+	Notes      string `form:"notes"`
 }
 
 func ResolveObjection(client ResolveObjectionClient, formTmpl template.Template) Handler {
@@ -58,6 +66,31 @@ func ResolveObjection(client ResolveObjectionClient, formTmpl template.Template)
 			ObjectionId: objectionID,
 			Objection:   obj,
 			LpaUids:     obj.LpaUids,
+		}
+
+		if r.Method == http.MethodPost {
+			err := decoder.Decode(&data.Form, r.PostForm)
+			if err != nil {
+				return err
+			}
+
+			resolution := sirius.ResolutionRequest{
+				Resolution: data.Form.Resolution,
+				Notes:      data.Form.Notes,
+			}
+
+			err = client.ResolveObjection(ctx, objectionID, caseUID, resolution)
+
+			if ve, ok := err.(sirius.ValidationError); ok {
+				w.WriteHeader(http.StatusBadRequest)
+				data.Error = ve
+			} else if err != nil {
+				return err
+			} else {
+				data.Success = true
+
+				return RedirectError(fmt.Sprintf("/lpa/%s", caseUID))
+			}
 		}
 
 		return formTmpl(w, data)
