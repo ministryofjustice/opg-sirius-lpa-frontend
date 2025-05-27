@@ -40,12 +40,12 @@
             <form class="form" method="get" action="{{ prefix "/search" }}" data-module="search">
               <div class="govuk-input__wrapper">
                 <label class="govuk-label moj-search__label govuk-visually-hidden" for="f-search-input">
-                  Search
+                  Search for a case
                 </label>
                 <input id="f-search-input" class="govuk-input moj-search__input app-moj-search__input"
                        data-module="sirius-search-preview"
                        data-sirius-search-preview-attach="#f-search-preview"
-                       name="term" type="search" placeholder="Search for a case" aria-label="Search">
+                       name="term" type="search" placeholder="Search for a case" required>
                 <button class="govuk-button govuk-input__suffix app-!-moj-search__button" data-module="govuk-button">
                   <span class="govuk-visually-hidden">Search</span>
                   <svg class="app-svg-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
