@@ -50,6 +50,15 @@
                 <h3 class="govuk-heading-s govuk-!-display-inline">Complaints, objections & investigations</h3>
                 {{ if not .CaseSummary.Objections }}
                     <p class="govuk-body-s">There are none in place.</p>
+{{/*                {{ else if .ObjectionResolution }}*/}}
+{{/*                    <a class="govuk-body-s govuk-link" href="">*/}}
+{{/*                        <strong>Objection {{ .ObjectionResolution.Resolution }}</strong>*/}}
+{{/*                        <ul class="govuk-list">*/}}
+{{/*                            <li>*/}}
+{{/*                                <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">Received on {{ parseAndFormatDate .ResolutionDate "2006-01-02" "2 January 2006" }}</p>*/}}
+{{/*                            </li>*/}}
+{{/*                        </ul>*/}}
+{{/*                    </a>*/}}
                 {{ else }}
                     {{ range .CaseSummary.Objections }}
                         <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/lpa/%s/objection/%d" $uid .ID) }}">

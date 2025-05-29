@@ -22,7 +22,8 @@
                 {{ range $index, $uid := .LpaUids }}
                     <input type="hidden" name="caseUid" value="{{ $uid }}">
 
-                    <div class="govuk-form-group">
+                    <div class="govuk-form-group {{ if $.Error.Field.resolution }}govuk-form-group--error{{ end }}" id="f-resolution">
+
                         <fieldset class="govuk-fieldset">
                             <legend class="govuk-fieldset__legend">
                                 <strong>What is the outcome for {{ $uid }}</strong>
@@ -30,24 +31,22 @@
 
                             <div class="govuk-radios" data-module="govuk-radios">
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="res-upheld-{{ $index }}" name="resolution_{{ $index }}" type="radio" value="upheld">
-                                    <label class="govuk-label govuk-radios__label" for="res-upheld-{{ $index }}">Objection upheld</label>
+                                    <input class="govuk-radios__input" id="f-resolution-upheld-{{ $index }}" name="resolution_{{ $index }}" type="radio" value="upheld">
+                                    <label class="govuk-label govuk-radios__label" for="f-resolution-upheld-{{ $index }}">Objection upheld</label>
                                 </div>
 
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="res-notUpheld-{{ $index }}" name="resolution_{{ $index }}" type="radio" value="notUpheld">
-                                    <label class="govuk-label govuk-radios__label" for="res-notUpheld-{{ $index }}">Objection not upheld</label>
+                                    <input class="govuk-radios__input" id="f-resolution-notUpheld-{{ $index }}" name="resolution_{{ $index }}" type="radio" value="notUpheld">
+                                    <label class="govuk-label govuk-radios__label" for="f-resolution-notUpheld-{{ $index }}}">Objection not upheld</label>
                                 </div>
                             </div>
                         </fieldset>
                     </div>
 
-                    <div class="govuk-form-group">
-                        <label class="govuk-label" for="notes-{{ $index }}">
-                            Notes for {{ $uid }} (optional)
-                        </label>
-                        <textarea class="govuk-textarea" id="notes-{{ $index }}" name="notes_{{ $index }}" rows="3" cols="25"></textarea>
-                    </div>
+                    {{ $name := printf "resolutionNotes_%d" $index }}
+                    {{ $label := printf "Notes for %s (optional)" $uid }}
+                    {{ template "textarea" (field $name $label $.Form.ResolutionNotes $.Error.Field.resolutionNotes) }}
+
                 {{ end }}
 
                 <div class="govuk-button-group">

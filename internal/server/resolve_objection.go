@@ -28,8 +28,8 @@ type resolveObjectionData struct {
 }
 
 type formResolveObjection struct {
-	Resolution string `form:"resolution"`
-	Notes      string `form:"notes"`
+	Resolution      string `form:"resolution"`
+	ResolutionNotes string `form:"resolutionNotes"`
 }
 
 func ResolveObjection(client ResolveObjectionClient, formTmpl template.Template) Handler {
@@ -73,71 +73,44 @@ func ResolveObjection(client ResolveObjectionClient, formTmpl template.Template)
 				return err
 			}
 
-			//resolutions := r.PostForm["resolution[]"]
-			//notes := r.PostForm["notes[]"]
 			uids := r.PostForm["caseUid"]
 
 			results := make([]sirius.ResolutionRequest, len(data.LpaUids))
 
 			var validationErrors sirius.ValidationError
+			var hasValidationError bool
 
 			for i := range uids {
 
 				resolution := r.PostForm.Get(fmt.Sprintf("resolution_%d", i))
-				notes := r.PostForm.Get(fmt.Sprintf("notes_%d", i))
+				notes := r.PostForm.Get(fmt.Sprintf("resolutionNotes_%d", i))
 
 				results[i] = sirius.ResolutionRequest{
 					Resolution: resolution,
 					Notes:      notes,
 				}
-				//
-				//resReq := sirius.ResolutionRequest{
-				//	Resolution: resolutions[i],
-				//	Notes:      notes[i],
-				//}
 
 				err := client.ResolveObjection(ctx, objectionID, uids[i], results[i])
 
 				if ve, ok := err.(sirius.ValidationError); ok {
-					w.WriteHeader(http.StatusBadRequest)
-					data.Error = ve
+					hasValidationError = true
+					if validationErrors.Field == nil {
+						validationErrors = ve
+					}
 				} else if err != nil {
 					return err
 				}
 			}
 
-			if validationErrors.Field != nil {
+			if hasValidationError {
+				w.WriteHeader(http.StatusBadRequest)
 				data.Error = validationErrors
-			} else {
-				data.Success = true
-				return RedirectError(fmt.Sprintf("/lpa/%s", caseUID))
+				return formTmpl(w, data)
 			}
-		}
 
-		//if r.Method == http.MethodPost {
-		//	err := decoder.Decode(&data.Form, r.PostForm)
-		//	if err != nil {
-		//		return err
-		//	}
-		//
-		//	resolution := sirius.ResolutionRequest{
-		//		Resolution: data.Form.Resolution,
-		//		Notes:      data.Form.Notes,
-		//	}
-		//
-		//	err = client.ResolveObjection(ctx, objectionID, caseUID, resolution)
-		//
-		//	if ve, ok := err.(sirius.ValidationError); ok {
-		//		w.WriteHeader(http.StatusBadRequest)
-		//		data.Error = ve
-		//	} else if err != nil {
-		//		return err
-		//	} else {
-		//		data.Success = true
-		//
-		//		return RedirectError(fmt.Sprintf("/lpa/%s", caseUID))
-		//	}
-		//}
+			data.Success = true
+			return RedirectError(fmt.Sprintf("/lpa/%s", caseUID))
+		}
 
 		return formTmpl(w, data)
 	}
