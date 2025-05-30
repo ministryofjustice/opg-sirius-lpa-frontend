@@ -5,11 +5,12 @@ import (
 )
 
 type ObjectionForCase struct {
-	ID            int      `json:"id"`
-	Notes         string   `json:"notes"`
-	ObjectionType string   `json:"objectionType"`
-	ReceivedDate  string   `json:"receivedDate"`
-	LpaUids       []string `json:"lpaUids"`
+	ID            int                   `json:"id"`
+	Notes         string                `json:"notes"`
+	ObjectionType string                `json:"objectionType"`
+	ReceivedDate  string                `json:"receivedDate"`
+	LpaUids       []string              `json:"lpaUids"`
+	Resolutions   []ObjectionResolution `json:"objectionLpas"`
 }
 
 type Objection struct {
@@ -18,10 +19,10 @@ type Objection struct {
 }
 
 type ObjectionResolution struct {
-	Uid             string     `json:"uid"`
-	Resolution      string     `json:"resolution"`
-	ResolutionNotes string     `json:"resolutionNotes"`
-	ResolutionDate  DateString `json:"resolutionDate"`
+	Uid             string `json:"uid"`
+	Resolution      string `json:"resolution"`
+	ResolutionNotes string `json:"resolutionNotes"`
+	ResolutionDate  string `json:"resolutionDate,omitempty"`
 }
 
 type ObjectionRequest struct {

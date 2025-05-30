@@ -50,27 +50,37 @@
                 <h3 class="govuk-heading-s govuk-!-display-inline">Complaints, objections & investigations</h3>
                 {{ if not .CaseSummary.Objections }}
                     <p class="govuk-body-s">There are none in place.</p>
-{{/*                {{ else if .ObjectionResolution }}*/}}
-{{/*                    <a class="govuk-body-s govuk-link" href="">*/}}
-{{/*                        <strong>Objection {{ .ObjectionResolution.Resolution }}</strong>*/}}
-{{/*                        <ul class="govuk-list">*/}}
-{{/*                            <li>*/}}
-{{/*                                <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">Received on {{ parseAndFormatDate .ResolutionDate "2006-01-02" "2 January 2006" }}</p>*/}}
-{{/*                            </li>*/}}
-{{/*                        </ul>*/}}
-{{/*                    </a>*/}}
                 {{ else }}
                     {{ range .CaseSummary.Objections }}
-                        <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/lpa/%s/objection/%d" $uid .ID) }}">
-                            <strong>Objection received</strong>
-                        </a>
+                        {{ $matchedResolution := false }}
 
-                        {{- $last := 0 }}
-                        {{- range $i, $_ := .LpaUids }}
-                            {{- $last = $i }}
-                        {{- end }}
+                        {{ range .Resolutions }}
+                            {{ if and (eq .Uid $uid) .Resolution }}
+                                {{ $matchedResolution = true }}
+                                <a class="govuk-body-s govuk-link" href="">
+                                    <strong>Objection {{ resolutionOutcome .Resolution }}</strong>
+                                </a>
+                                <ul class="govuk-list">
+                                    <li>
+                                        <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">
+                                            Outcome received on {{ parseAndFormatDate .ResolutionDate "2006-01-02" "2 January 2006" }}
+                                        </p>
+                                    </li>
+                                </ul>
+                            {{ end }}
+                        {{ end }}
 
-                        <ul class="govuk-list">
+                        {{ if not $matchedResolution }}
+                            <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/lpa/%s/objection/%d" $uid .ID) }}">
+                                <strong>Objection received</strong>
+                            </a>
+
+                            {{- $last := 0 }}
+                            {{- range $i, $_ := .LpaUids }}
+                                {{- $last = $i }}
+                            {{- end }}
+
+                            <ul class="govuk-list">
                                 <li>
                                     <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">Received on {{ parseAndFormatDate .ReceivedDate "2006-01-02" "2 January 2006" }}</p>
                                     <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">
@@ -87,9 +97,9 @@
                                     </p>
                                     <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/lpa/%s/objection/%d/resolve" $uid .ID) }}">Record objection outcome</a>
                                 </li>
-                        </ul>
+                            </ul>
+                        {{ end }}
                     {{ end }}
-
                 {{ end }}
             </div>
 

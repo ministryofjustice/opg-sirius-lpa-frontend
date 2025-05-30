@@ -9,6 +9,7 @@ type CaseSummary struct {
 	TaskList    []Task
 	WarningList []Warning
 	Objections  []ObjectionForCase
+	Resolution  ObjectionResolution
 }
 
 /**
