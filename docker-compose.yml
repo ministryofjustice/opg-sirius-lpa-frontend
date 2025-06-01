@@ -26,7 +26,7 @@ services:
       - LHCI_GITHUB_APP_TOKEN
 
   go-lint:
-    image: golangci/golangci-lint:v2.1.5
+    image: golangci/golangci-lint:v2.1.6
     working_dir: /go/src/app
     volumes:
       - ./:/go/src/app
