@@ -5,7 +5,8 @@ import (
 )
 
 type CaseStatusData struct {
-	Status string `json:"status"`
+	Status           string `json:"status"`
+	CaseChangeReason string `json:"caseChangeReason,omitempty"`
 }
 
 func (c *Client) EditDigitalLPAStatus(ctx Context, caseUID string, caseStatusData CaseStatusData) error {
