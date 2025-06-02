@@ -119,6 +119,7 @@ describe("Change case status", () => {
       .get("input")
       .should("be.checked");
     cy.contains(".govuk-radios__label", "Cannot register").click();
+    cy.contains(".govuk-radios__label", "The LPA does not work and cannot be changed").click();
     cy.get("button[type=submit]").click();
     cy.url().should("contain", "/lpa/M-DIGI-LPA3-3333");
   });
