@@ -4,18 +4,13 @@ import (
 	"fmt"
 )
 
-type ObjectionForCase struct {
+type Objection struct {
 	ID            int                   `json:"id"`
 	Notes         string                `json:"notes"`
 	ObjectionType string                `json:"objectionType"`
 	ReceivedDate  string                `json:"receivedDate"`
 	LpaUids       []string              `json:"lpaUids"`
 	Resolutions   []ObjectionResolution `json:"objectionLpas"`
-}
-
-type Objection struct {
-	ObjectionForCase
-	Resolutions []ObjectionResolution `json:"resolutions"`
 }
 
 type ObjectionResolution struct {
@@ -45,8 +40,8 @@ func (c *Client) UpdateObjection(ctx Context, objectionId string, objectionDetai
 	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/objections/%s", objectionId), objectionDetails, nil)
 }
 
-func (c *Client) ObjectionsForCase(ctx Context, caseUID string) ([]ObjectionForCase, error) {
-	var objectionList []ObjectionForCase
+func (c *Client) ObjectionsForCase(ctx Context, caseUID string) ([]Objection, error) {
+	var objectionList []Objection
 	path := fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/objections", caseUID)
 
 	err := c.get(ctx, path, &objectionList)
