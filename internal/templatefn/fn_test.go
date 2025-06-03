@@ -214,3 +214,16 @@ func TestCompareBoolPointer(t *testing.T) {
 	val = fn(boolPtr(false), false)
 	assert.Equal(t, true, val)
 }
+
+func TestInStringArray(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["inStringArray"].(func(string, []string) bool)
+
+	var val bool
+
+	val = fn("in-progress", []string{"draft", "in-progress"})
+	assert.Equal(t, true, val)
+
+	val = fn("cancelled", []string{"draft", "in-progress"})
+	assert.Equal(t, false, val)
+}
