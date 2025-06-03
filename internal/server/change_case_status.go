@@ -54,6 +54,7 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 
 		data := changeCaseStatusData{
 			XSRFToken:          ctx.XSRFToken,
+			Error:              sirius.ValidationError{Field: sirius.FieldErrors{}},
 			Entity:             fmt.Sprintf("%s %s", cs.DigitalLpa.SiriusData.Subtype, caseUID),
 			CaseUID:            caseUID,
 			OldStatus:          status,
@@ -88,26 +89,36 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 		}
 
 		if r.Method == http.MethodPost {
-			caseStatusData := sirius.CaseStatusData{
-				Status:           data.NewStatus,
-				CaseChangeReason: data.StatusChangeReason,
+			if (data.NewStatus == "cannot-register" || data.NewStatus == "cancelled") && data.StatusChangeReason == "" {
+				data.OldStatus = data.NewStatus
+				w.WriteHeader(http.StatusBadRequest)
+				data.Error.Field["changeReason"] = map[string]string{
+					"reason": "Please select a reason",
+				}
 			}
 
-			err = client.EditDigitalLPAStatus(ctx, caseUID, caseStatusData)
+			if !data.Error.Any() {
+				caseStatusData := sirius.CaseStatusData{
+					Status:           data.NewStatus,
+					CaseChangeReason: data.StatusChangeReason,
+				}
 
-			if ve, ok := err.(sirius.ValidationError); ok {
-				w.WriteHeader(http.StatusBadRequest)
-				data.Error = ve
-			} else if err != nil {
-				return err
-			} else {
-				data.Success = true
-				data.OldStatus = data.NewStatus
+				err = client.EditDigitalLPAStatus(ctx, caseUID, caseStatusData)
 
-				SetFlash(w, FlashNotification{
-					Title: fmt.Sprintf("Status changed to %s", templatefn.StatusLabelFormat(data.NewStatus)),
-				})
-				return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
+				if ve, ok := err.(sirius.ValidationError); ok {
+					w.WriteHeader(http.StatusBadRequest)
+					data.Error = ve
+				} else if err != nil {
+					return err
+				} else {
+					data.Success = true
+					data.OldStatus = data.NewStatus
+
+					SetFlash(w, FlashNotification{
+						Title: fmt.Sprintf("Status changed to %s", templatefn.StatusLabelFormat(data.NewStatus)),
+					})
+					return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
+				}
 			}
 		}
 

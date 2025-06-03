@@ -33,6 +33,7 @@
                 {{ if $e.ConditionalItem }}
                   <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="f-{{ fieldID "status" $i }}-reveal">
                     <div class="govuk-form-group">
+                      {{ template "errors" $.Error.Field.changeReason }}
                       {{ range $j, $f := $.CaseStatusChangeReasons }}
                         {{ if inStringArray $e.Value $f.ParentSources }}
                           <div class="govuk-radios__item">
