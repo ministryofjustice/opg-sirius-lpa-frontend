@@ -82,8 +82,8 @@ func ResolveObjection(client ResolveObjectionClient, formTmpl template.Template)
 
 			for i := range uids {
 
-				resolution := r.PostForm.Get(fmt.Sprintf("resolution_%d", i))
-				notes := r.PostForm.Get(fmt.Sprintf("resolutionNotes_%d", i))
+				resolution := r.PostForm.Get(fmt.Sprintf("resolution-%d", i))
+				notes := r.PostForm.Get(fmt.Sprintf("resolutionNotes-%d", i))
 
 				results[i] = sirius.ResolutionRequest{
 					Resolution: resolution,

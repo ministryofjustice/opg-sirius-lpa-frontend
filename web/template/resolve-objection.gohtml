@@ -31,19 +31,19 @@
 
                             <div class="govuk-radios" data-module="govuk-radios">
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="f-resolution-upheld-{{ $index }}" name="resolution_{{ $index }}" type="radio" value="upheld">
+                                    <input class="govuk-radios__input" id="f-resolution-upheld-{{ $index }}" name="resolution-{{ $index }}" type="radio" value="upheld">
                                     <label class="govuk-label govuk-radios__label" for="f-resolution-upheld-{{ $index }}">Objection upheld</label>
                                 </div>
 
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="f-resolution-notUpheld-{{ $index }}" name="resolution_{{ $index }}" type="radio" value="notUpheld">
+                                    <input class="govuk-radios__input" id="f-resolution-notUpheld-{{ $index }}" name="resolution-{{ $index }}" type="radio" value="notUpheld">
                                     <label class="govuk-label govuk-radios__label" for="f-resolution-notUpheld-{{ $index }}}">Objection not upheld</label>
                                 </div>
                             </div>
                         </fieldset>
                     </div>
 
-                    {{ $name := printf "resolutionNotes_%d" $index }}
+                    {{ $name := printf "resolutionNotes-%d" $index }}
                     {{ $label := printf "Notes for %s (optional)" $uid }}
                     {{ template "textarea" (field $name $label $.Form.ResolutionNotes $.Error.Field.resolutionNotes) }}
 
