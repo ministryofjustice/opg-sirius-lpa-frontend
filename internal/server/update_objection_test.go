@@ -51,12 +51,12 @@ var testUpdateObjectionsCaseSummary = sirius.CaseSummary{
 			},
 		},
 	},
-	Objections: []sirius.ObjectionForCase{
+	Objections: []sirius.Objection{
 		testObjection,
 	},
 }
 
-var testObjection = sirius.ObjectionForCase{
+var testObjection = sirius.Objection{
 	ID:            3,
 	Notes:         "Test",
 	ObjectionType: "factual",
@@ -65,13 +65,11 @@ var testObjection = sirius.ObjectionForCase{
 }
 
 var testObjection2 = sirius.Objection{
-	ObjectionForCase: sirius.ObjectionForCase{
-		ID:            3,
-		Notes:         "Test",
-		ObjectionType: "factual",
-		ReceivedDate:  "2025-03-12",
-		LpaUids:       []string{"M-7777-8888-9999"},
-	},
+	ID:            3,
+	Notes:         "Test",
+	ObjectionType: "factual",
+	ReceivedDate:  "2025-03-12",
+	LpaUids:       []string{"M-7777-8888-9999"},
 	Resolutions: []sirius.ObjectionResolution{
 		{
 			Resolution:      "not upheld",
