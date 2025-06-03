@@ -86,6 +86,7 @@ func TestGetChangeCaseStatus(t *testing.T) {
 			OldStatus:               "draft",
 			StatusItems:             statusItems,
 			CaseStatusChangeReasons: statusChangeReasons,
+			Error:                   sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
 		Return(nil)
 
@@ -152,6 +153,7 @@ func TestPostChangeCaseStatus(t *testing.T) {
 			NewStatus:               "expired",
 			StatusItems:             statusItems,
 			CaseStatusChangeReasons: statusChangeReasons,
+			Error:                   sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
 		Return(nil)
 
@@ -224,6 +226,7 @@ func TestPostChangeCaseStatusWithReason(t *testing.T) {
 			StatusItems:             statusItems,
 			CaseStatusChangeReasons: statusChangeReasons,
 			StatusChangeReason:      "LPA_DOES_NOT_WORK",
+			Error:                   sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
 		Return(nil)
 
