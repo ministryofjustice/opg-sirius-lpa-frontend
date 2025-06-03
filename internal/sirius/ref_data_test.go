@@ -293,11 +293,9 @@ func TestRefDataByCategory(t *testing.T) {
 					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
 						Body: matchers.EachLike(map[string]interface{}{
-							"handle": matchers.String("LPA_DOES_NOT_WORK"),
-							"label":  matchers.String("The LPA does not work and cannot be changed"),
-							"parentSources": matchers.EachLike([]string{
-								"cannot-register",
-							}, 1),
+							"handle":        matchers.String("LPA_DOES_NOT_WORK"),
+							"label":         matchers.String("The LPA does not work and cannot be changed"),
+							"parentSources": matchers.EachLike("cannot-register", 1),
 						}, 1),
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
