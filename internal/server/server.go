@@ -320,7 +320,7 @@ func translateRefData(types []sirius.RefDataItem, tmplHandle string) string {
 
 func setCSPHeader(h http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Security-Policy", "default-src 'self'; img-src 'self' data:")
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; img-src 'self' data: s3.eu-west-1.amazonaws.com")
 
 		h.ServeHTTP(w, r)
 	}
