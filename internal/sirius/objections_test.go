@@ -65,7 +65,7 @@ func TestObjectionsForCase(t *testing.T) {
 	testCases := []struct {
 		name             string
 		setup            func()
-		expectedResponse []ObjectionForCase
+		expectedResponse []Objection
 		expectedError    func(int) error
 	}{
 		{
@@ -91,7 +91,7 @@ func TestObjectionsForCase(t *testing.T) {
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
-			expectedResponse: []ObjectionForCase{
+			expectedResponse: []Objection{
 				{
 					ID:            105,
 					Notes:         "Test",
@@ -309,7 +309,7 @@ func TestGetObjection(t *testing.T) {
 							"objectionType": matchers.String("factual"),
 							"receivedDate":  matchers.String("05/09/2024"),
 							"lpaUids":       []string{"M-1234-9876-4567"},
-							"resolutions": []map[string]interface{}{
+							"objectionLpas": []map[string]interface{}{
 								{
 									"uid":             matchers.Like("M-1234-9876-4567"),
 									"resolution":      matchers.Like("not upheld"),
@@ -322,19 +322,17 @@ func TestGetObjection(t *testing.T) {
 					})
 			},
 			expectedResponse: Objection{
-				ObjectionForCase: ObjectionForCase{
-					ID:            3,
-					Notes:         "Test",
-					ObjectionType: "factual",
-					ReceivedDate:  "05/09/2024",
-					LpaUids:       []string{"M-1234-9876-4567"},
-				},
+				ID:            3,
+				Notes:         "Test",
+				ObjectionType: "factual",
+				ReceivedDate:  "05/09/2024",
+				LpaUids:       []string{"M-1234-9876-4567"},
 				Resolutions: []ObjectionResolution{
 					{
 						Uid:             "M-1234-9876-4567",
 						Resolution:      "not upheld",
 						ResolutionNotes: "Everything is fine",
-						ResolutionDate:  "2025-01-01",
+						ResolutionDate:  "01/01/2025",
 					},
 				},
 			},
