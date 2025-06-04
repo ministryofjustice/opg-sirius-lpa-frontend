@@ -384,3 +384,63 @@ func TestGetObjection(t *testing.T) {
 		})
 	}
 }
+
+func TestResolveObjection(t *testing.T) {
+	t.Parallel()
+
+	pact, err := newPact()
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		name            string
+		resolutionsData ResolutionRequest
+		setup           func()
+		expectedError   func(int) error
+	}{
+		{
+			name: "OK",
+			resolutionsData: ResolutionRequest{
+				Resolution: "upheld",
+				Notes:      "test",
+			},
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A digital LPA exists with an objection").
+					UponReceiving("A request to resolve an objection").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodPut,
+						Path:   matchers.String("/lpa-api/v1/objections/3/resolution/M-9999-9999-9999"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
+						},
+						Body: matchers.Like(map[string]interface{}{
+							"resolution":      matchers.Like("upheld"),
+							"resolutionNotes": matchers.Like("test"),
+						}),
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status: http.StatusNoContent,
+					})
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
+
+				err := client.ResolveObjection(Context{Context: context.Background()}, "3", "M-9999-9999-9999", tc.resolutionsData)
+				if (tc.expectedError) == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(config.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}
