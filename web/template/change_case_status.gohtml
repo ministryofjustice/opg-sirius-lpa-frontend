@@ -19,19 +19,38 @@
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
         <p class="govuk-body">Change the status of <strong>{{ .Entity }}</strong> to</p>
-        {{ template "radios" (radios "status" "" .OldStatus .Error.Field.status
-        (item "draft" "Draft" "statusTag" true)
-        (item "in-progress" "In progress" "statusTag" true)
-        (item "statutory-waiting-period" "Statutory waiting period" "statusTag" true)
-        (item "registered" "Registered" "statusTag" true)
-        (item "suspended" "Suspended" "statusTag" true)
-        (item "do-not-register" "Do not register" "statusTag" true)
-        (item "expired" "Expired" "statusTag" true)
-        (item "cannot-register" "Cannot register" "statusTag" true)
-        (item "cancelled" "Cancelled" "statusTag" true)
-        (item "de-registered" "De-registered" "statusTag" true)
-        ) }}
-
+        <div class="govuk-form-group {{ if .Error.Field.status }}govuk-form-group--error{{ end }}">
+          <fieldset class="govuk-fieldset">
+            {{ template "errors" .Error.Field.status }}
+            <div class="govuk-radios {{ if .Error.Field.status }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+              {{ range $i, $e := .StatusItems }}
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="f-{{ fieldID "status" $i }}" name="status" type="radio" value="{{ $e.Value }}" {{ if eq $.OldStatus $e.Value }}checked{{ end }} {{ if $e.ConditionalItem }}data-aria-controls="f-{{ fieldID "status" $i }}-reveal"{{ end }}>
+                  <label class="govuk-label govuk-radios__label" for="f-{{ fieldID "status" $i }}">
+                    {{ template "status-tag" $e.Label }}
+                  </label>
+                </div>
+                {{ if $e.ConditionalItem }}
+                  <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="f-{{ fieldID "status" $i }}-reveal">
+                    <div class="govuk-form-group">
+                      {{ template "errors" $.Error.Field.changeReason }}
+                      {{ range $j, $f := $.CaseStatusChangeReasons }}
+                        {{ if inStringArray $e.Value $f.ParentSources }}
+                          <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="f-{{ fieldID "statusReason" $j }}" name="statusReason" type="radio" value="{{ $f.Handle }}" {{ if eq $.StatusChangeReason $f.Handle }}checked{{ end }}>
+                            <label class="govuk-label govuk-radios__label" for="f-{{ fieldID "statusReason" $j }}">
+                              {{ $f.Label }}
+                            </label>
+                          </div>
+                        {{ end }}
+                      {{ end }}
+                    </div>
+                  </div>
+                {{ end }}
+              {{ end }}
+            </div>
+          </fieldset>
+        </div>
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Submit</button>
           <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s" .CaseUID )}}">Cancel</a>
