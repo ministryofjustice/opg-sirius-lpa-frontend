@@ -5,12 +5,10 @@ import (
 	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"golang.org/x/sync/errgroup"
 	"net/http"
 )
 
 type ResolveObjectionClient interface {
-	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
 	GetObjection(sirius.Context, string) (sirius.Objection, error)
 	ResolveObjection(sirius.Context, string, string, sirius.ResolutionRequest) error
 }
@@ -21,7 +19,6 @@ type resolveObjectionData struct {
 	Error       sirius.ValidationError
 	CaseUID     string
 	ObjectionId string
-	Resolution  string
 	Objection   sirius.Objection
 	LpaUids     []string
 	Form        formResolveObjection
@@ -43,20 +40,8 @@ func ResolveObjection(client ResolveObjectionClient, formTmpl template.Template)
 
 		ctx := getContext(r)
 
-		var obj sirius.Objection
-		var err error
-
-		group, groupCtx := errgroup.WithContext(ctx.Context)
-
-		group.Go(func() error {
-			obj, err = client.GetObjection(ctx.With(groupCtx), objectionID)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-
-		if err := group.Wait(); err != nil {
+		obj, err := client.GetObjection(ctx, objectionID)
+		if err != nil {
 			return err
 		}
 

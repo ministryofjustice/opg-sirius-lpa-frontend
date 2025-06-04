@@ -81,9 +81,8 @@ var testObjection2 = sirius.Objection{
 
 func TestGetUpdateObjectionsTemplate(t *testing.T) {
 	tests := []struct {
-		name           string
-		errorReturned  error
-		expectedStatus int
+		name          string
+		errorReturned error
 	}{
 		{
 			name:          "update objections template successfully loads",
