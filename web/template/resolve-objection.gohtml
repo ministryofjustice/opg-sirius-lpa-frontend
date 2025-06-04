@@ -31,13 +31,15 @@
 
                             <div class="govuk-radios" data-module="govuk-radios">
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="f-resolution-upheld-{{ $index }}" name="resolution-{{ $index }}" type="radio" value="upheld">
+                                    <input class="govuk-radios__input" id="f-resolution-upheld-{{ $index }}" name="resolution-{{ $index }}" type="radio" value="upheld"
+                                           {{ if eq (index $.Form.Resolution $index) "upheld" }}checked{{ end }}>
                                     <label class="govuk-label govuk-radios__label" for="f-resolution-upheld-{{ $index }}">Objection upheld</label>
                                 </div>
 
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="f-resolution-notUpheld-{{ $index }}" name="resolution-{{ $index }}" type="radio" value="notUpheld">
-                                    <label class="govuk-label govuk-radios__label" for="f-resolution-notUpheld-{{ $index }}}">Objection not upheld</label>
+                                    <input class="govuk-radios__input" id="f-resolution-notUpheld-{{ $index }}" name="resolution-{{ $index }}" type="radio" value="notUpheld"
+                                           {{ if eq (index $.Form.Resolution $index) "notUpheld" }}checked{{ end }}>
+                                    <label class="govuk-label govuk-radios__label" for="f-resolution-notUpheld-{{ $index }}">Objection not upheld</label>
                                 </div>
                             </div>
                         </fieldset>
@@ -45,7 +47,7 @@
 
                     {{ $name := printf "resolutionNotes-%d" $index }}
                     {{ $label := printf "Notes for %s (optional)" $uid }}
-                    {{ template "textarea" (field $name $label $.Form.ResolutionNotes $.Error.Field.resolutionNotes) }}
+                    {{ template "textarea" (field $name $label (index $.Form.ResolutionNotes $index) $.Error.Field.resolutionNotes) }}
 
                 {{ end }}
 
