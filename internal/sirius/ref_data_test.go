@@ -279,6 +279,35 @@ func TestRefDataByCategory(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "Case status change reason category",
+			category: CaseStatusChangeReason,
+			setup: func() {
+				pact.
+					AddInteraction().
+					UponReceiving("A request for case status change reason category ref data").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodGet,
+						Path:   matchers.String(fmt.Sprintf("/lpa-api/v1/reference-data/%s", CaseStatusChangeReason)),
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status: http.StatusOK,
+						Body: matchers.EachLike(map[string]interface{}{
+							"handle":        matchers.String("LPA_DOES_NOT_WORK"),
+							"label":         matchers.String("The LPA does not work and cannot be changed"),
+							"parentSources": matchers.EachLike("cannot-register", 1),
+						}, 1),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+					})
+			},
+			expectedResponse: []RefDataItem{
+				{
+					Handle:        "LPA_DOES_NOT_WORK",
+					Label:         "The LPA does not work and cannot be changed",
+					ParentSources: []string{"cannot-register"},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
