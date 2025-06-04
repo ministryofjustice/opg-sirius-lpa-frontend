@@ -61,6 +61,10 @@ func TestGetResolveObjectionsTemplate(t *testing.T) {
 					ObjectionId: "6",
 					Objection:   testObjection1,
 					LpaUids:     testObjection1.LpaUids,
+					Form: formResolveObjection{
+						Resolution:      []string{""},
+						ResolutionNotes: []string{""},
+					},
 				}).
 				Return(tc.errorReturned)
 
