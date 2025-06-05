@@ -19,35 +19,34 @@
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
 
-                {{ range $index, $uid := .LpaUids }}
-                    <input type="hidden" name="caseUid" value="{{ $uid }}">
+                {{ range .Form }}
 
                     <div class="govuk-form-group {{ if $.Error.Field.resolution }}govuk-form-group--error{{ end }}" id="f-resolution">
 
                         <fieldset class="govuk-fieldset">
                             <legend class="govuk-fieldset__legend">
-                                <strong>What is the outcome for {{ $uid }}</strong>
+                                <strong>What is the outcome for {{ .UID }}</strong>
                             </legend>
 
                             <div class="govuk-radios" data-module="govuk-radios">
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="f-resolution-upheld-{{ $index }}" name="resolution-{{ $index }}" type="radio" value="upheld"
-                                           {{ if eq (index $.Form.Resolution $index) "upheld" }}checked{{ end }}>
-                                    <label class="govuk-label govuk-radios__label" for="f-resolution-upheld-{{ $index }}">Objection upheld</label>
+                                    <input class="govuk-radios__input" id="f-resolution-upheld-{{ .UID }}" name="resolution-{{ .UID }}" type="radio" value="upheld"
+                                           {{ if eq .Resolution "upheld" }}checked{{ end }}>
+                                    <label class="govuk-label govuk-radios__label" for="f-resolution-upheld-{{ .UID }}">Objection upheld</label>
                                 </div>
 
                                 <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="f-resolution-notUpheld-{{ $index }}" name="resolution-{{ $index }}" type="radio" value="notUpheld"
-                                           {{ if eq (index $.Form.Resolution $index) "notUpheld" }}checked{{ end }}>
-                                    <label class="govuk-label govuk-radios__label" for="f-resolution-notUpheld-{{ $index }}">Objection not upheld</label>
+                                    <input class="govuk-radios__input" id="f-resolution-notUpheld-{{ .UID }}" name="resolution-{{ .UID }}" type="radio" value="notUpheld"
+                                           {{ if eq .Resolution "notUpheld" }}checked{{ end }}>
+                                    <label class="govuk-label govuk-radios__label" for="f-resolution-notUpheld-{{ .UID }}">Objection not upheld</label>
                                 </div>
                             </div>
                         </fieldset>
                     </div>
 
-                    {{ $name := printf "resolutionNotes-%d" $index }}
-                    {{ $label := printf "Notes for %s (optional)" $uid }}
-                    {{ template "textarea" (field $name $label (index $.Form.ResolutionNotes $index) $.Error.Field.resolutionNotes) }}
+                    {{ $name := printf "resolutionNotes-%s" .UID }}
+                    {{ $label := printf "Notes for %s (optional)" .UID }}
+                    {{ template "textarea" (field $name $label .ResolutionNotes $.Error.Field.resolutionNotes) }}
 
                 {{ end }}
 

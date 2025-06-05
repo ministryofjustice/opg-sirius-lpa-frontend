@@ -126,10 +126,10 @@ describe("Update objection form", () => {
     });
 
     cy.contains("What is the outcome for M-0000-0000-0005");
-    cy.get("#f-resolution-upheld-0").click();
-    cy.get("#f-resolutionNotes-0").type("Test");
-    cy.get("#f-resolution-notUpheld-1").click();
-    cy.get("#f-resolutionNotes-1").type("Test");
+    cy.get("#f-resolution-upheld-M-0000-0000-0005").click();
+    cy.get("#f-resolutionNotes-M-0000-0000-0005").type("Test");
+    cy.get("#f-resolution-notUpheld-M-0000-0000-0004").click();
+    cy.get("#f-resolutionNotes-M-0000-0000-0004").type("Test");
 
     cy.get("button[type=submit]").click();
 

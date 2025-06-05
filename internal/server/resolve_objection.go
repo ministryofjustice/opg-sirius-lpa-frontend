@@ -19,13 +19,13 @@ type resolveObjectionData struct {
 	CaseUID     string
 	ObjectionId string
 	Objection   sirius.Objection
-	LpaUids     []string
-	Form        formResolveObjection
+	Form        []formResolveObjection
 }
 
 type formResolveObjection struct {
-	Resolution      []string `form:"resolution"`
-	ResolutionNotes []string `form:"resolutionNotes"`
+	UID             string `form:"uid"`
+	Resolution      string `form:"resolution"`
+	ResolutionNotes string `form:"resolutionNotes"`
 }
 
 func ResolveObjection(client ResolveObjectionClient, formTmpl template.Template) Handler {
@@ -41,18 +41,16 @@ func ResolveObjection(client ResolveObjectionClient, formTmpl template.Template)
 			return err
 		}
 
-		uids := obj.LpaUids
-
 		data := resolveObjectionData{
 			XSRFToken:   ctx.XSRFToken,
 			CaseUID:     caseUID,
 			ObjectionId: objectionID,
 			Objection:   obj,
-			LpaUids:     uids,
-			Form: formResolveObjection{
-				Resolution:      make([]string, len(uids)),
-				ResolutionNotes: make([]string, len(uids)),
-			},
+			Form:        make([]formResolveObjection, len(obj.LpaUids)),
+		}
+
+		for i, uid := range obj.LpaUids {
+			data.Form[i].UID = uid
 		}
 
 		if r.Method == http.MethodPost {
@@ -60,24 +58,22 @@ func ResolveObjection(client ResolveObjectionClient, formTmpl template.Template)
 				return err
 			}
 
-			results := make([]sirius.ResolutionRequest, len(uids))
-
 			var validationErrors sirius.ValidationError
 			var hasValidationError bool
 
-			for i := range uids {
-				resolution := r.PostForm.Get(fmt.Sprintf("resolution-%d", i))
-				notes := r.PostForm.Get(fmt.Sprintf("resolutionNotes-%d", i))
+			for i, uid := range obj.LpaUids {
+				resolution := r.PostForm.Get(fmt.Sprintf("resolution-%s", uid))
+				notes := r.PostForm.Get(fmt.Sprintf("resolutionNotes-%s", uid))
 
-				data.Form.Resolution[i] = resolution
-				data.Form.ResolutionNotes[i] = notes
+				data.Form[i].Resolution = resolution
+				data.Form[i].ResolutionNotes = notes
 
-				results[i] = sirius.ResolutionRequest{
+				req := sirius.ResolutionRequest{
 					Resolution: resolution,
 					Notes:      notes,
 				}
 
-				err := client.ResolveObjection(ctx, objectionID, uids[i], results[i])
+				err := client.ResolveObjection(ctx, objectionID, uid, req)
 
 				if ve, ok := err.(sirius.ValidationError); ok {
 					hasValidationError = true
