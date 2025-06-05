@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
@@ -35,9 +34,6 @@ type formCertificateProviderDetails struct {
 }
 
 func ChangeCertificateProviderDetails(client ChangeCertificateProviderDetailsClient, tmpl template.Template) Handler {
-	if decoder == nil {
-		decoder = form.NewDecoder()
-	}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseUid := r.PathValue("uid")

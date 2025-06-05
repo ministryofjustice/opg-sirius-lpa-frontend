@@ -319,6 +319,19 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "objection type NOT RECOGNISED: " + s
 			}
 		},
+		// translate resolution outcome for case summary page
+		"resolutionOutcome": func(s string) string {
+			switch s {
+			case "upheld":
+				return "upheld"
+			case "notUpheld":
+				return "not upheld"
+			case "":
+				return "Not specified"
+			default:
+				return "resolution outcome NOT RECOGNISED: " + s
+			}
+		},
 		"compareBoolPointers": func(i *bool, j bool) bool {
 			return *i == j
 		},
