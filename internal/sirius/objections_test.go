@@ -65,7 +65,7 @@ func TestObjectionsForCase(t *testing.T) {
 	testCases := []struct {
 		name             string
 		setup            func()
-		expectedResponse []ObjectionForCase
+		expectedResponse []Objection
 		expectedError    func(int) error
 	}{
 		{
@@ -91,7 +91,7 @@ func TestObjectionsForCase(t *testing.T) {
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
-			expectedResponse: []ObjectionForCase{
+			expectedResponse: []Objection{
 				{
 					ID:            105,
 					Notes:         "Test",
@@ -309,7 +309,7 @@ func TestGetObjection(t *testing.T) {
 							"objectionType": matchers.String("factual"),
 							"receivedDate":  matchers.String("05/09/2024"),
 							"lpaUids":       []string{"M-1234-9876-4567"},
-							"resolutions": []map[string]interface{}{
+							"objectionLpas": []map[string]interface{}{
 								{
 									"uid":             matchers.Like("M-1234-9876-4567"),
 									"resolution":      matchers.Like("not upheld"),
@@ -322,19 +322,17 @@ func TestGetObjection(t *testing.T) {
 					})
 			},
 			expectedResponse: Objection{
-				ObjectionForCase: ObjectionForCase{
-					ID:            3,
-					Notes:         "Test",
-					ObjectionType: "factual",
-					ReceivedDate:  "05/09/2024",
-					LpaUids:       []string{"M-1234-9876-4567"},
-				},
+				ID:            3,
+				Notes:         "Test",
+				ObjectionType: "factual",
+				ReceivedDate:  "05/09/2024",
+				LpaUids:       []string{"M-1234-9876-4567"},
 				Resolutions: []ObjectionResolution{
 					{
 						Uid:             "M-1234-9876-4567",
 						Resolution:      "not upheld",
 						ResolutionNotes: "Everything is fine",
-						ResolutionDate:  "2025-01-01",
+						ResolutionDate:  "01/01/2025",
 					},
 				},
 			},
@@ -381,6 +379,66 @@ func TestGetObjection(t *testing.T) {
 					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
 
+				return nil
+			}))
+		})
+	}
+}
+
+func TestResolveObjection(t *testing.T) {
+	t.Parallel()
+
+	pact, err := newPact()
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		name            string
+		resolutionsData ResolutionRequest
+		setup           func()
+		expectedError   func(int) error
+	}{
+		{
+			name: "OK",
+			resolutionsData: ResolutionRequest{
+				Resolution: "upheld",
+				Notes:      "test",
+			},
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A digital LPA exists with an objection").
+					UponReceiving("A request to resolve an objection").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodPut,
+						Path:   matchers.String("/lpa-api/v1/objections/3/resolution/M-9999-9999-9999"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
+						},
+						Body: matchers.Like(map[string]interface{}{
+							"resolution":      matchers.Like("upheld"),
+							"resolutionNotes": matchers.Like("test"),
+						}),
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status: http.StatusNoContent,
+					})
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
+
+				err := client.ResolveObjection(Context{Context: context.Background()}, "3", "M-9999-9999-9999", tc.resolutionsData)
+				if (tc.expectedError) == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(config.Port), err)
+				}
 				return nil
 			}))
 		})
