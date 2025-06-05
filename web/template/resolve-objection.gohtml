@@ -21,7 +21,7 @@
 
                 {{ range .Form }}
 
-                    <div class="govuk-form-group {{ if $.Error.Field.resolution }}govuk-form-group--error{{ end }}" id="f-resolution">
+                    <div class="govuk-form-group {{ if $.Error.Field.resolution }}govuk-form-group--error{{ end }}" id="f-resolution-{{ .UID }}">
 
                         <fieldset class="govuk-fieldset">
                             <legend class="govuk-fieldset__legend">
