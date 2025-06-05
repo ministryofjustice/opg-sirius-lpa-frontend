@@ -96,11 +96,10 @@ type Client interface {
 	WarningClient
 }
 
-var decoder *form.Decoder
+var decoder = form.NewDecoder()
 
 func New(logger *slog.Logger, client Client, templates template.Templates, prefix, siriusPublicURL, webDir string) http.Handler {
 	wrap := errorHandler(templates.Get("error.gohtml"), prefix, siriusPublicURL)
-
 	mux := http.NewServeMux()
 
 	mux.Handle("/", http.NotFoundHandler())
