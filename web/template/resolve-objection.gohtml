@@ -1,0 +1,60 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Record objection outcome{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <a href="{{ prefix (printf "/lpa/%s" .CaseUID )}}" class="govuk-back-link">Back</a>
+
+            {{ template "error-summary" .Error }}
+
+            {{ if .Success }}
+                <meta data-app-reload="page" />
+                {{ template "success-banner" "You have successfully resolved an objection." }}
+            {{ end }}
+
+            <h1 class="govuk-heading-l app-!-embedded-hide">Record objection outcome</h1>
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
+
+                {{ range .Form }}
+
+                    <div class="govuk-form-group {{ if $.Error.Field.resolution }}govuk-form-group--error{{ end }}" id="f-resolution">
+
+                        <fieldset class="govuk-fieldset">
+                            <legend class="govuk-fieldset__legend">
+                                <strong>What is the outcome for {{ .UID }}</strong>
+                            </legend>
+
+                            <div class="govuk-radios" data-module="govuk-radios">
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="f-resolution-upheld-{{ .UID }}" name="resolution-{{ .UID }}" type="radio" value="upheld"
+                                           {{ if eq .Resolution "upheld" }}checked{{ end }}>
+                                    <label class="govuk-label govuk-radios__label" for="f-resolution-upheld-{{ .UID }}">Objection upheld</label>
+                                </div>
+
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="f-resolution-notUpheld-{{ .UID }}" name="resolution-{{ .UID }}" type="radio" value="notUpheld"
+                                           {{ if eq .Resolution "notUpheld" }}checked{{ end }}>
+                                    <label class="govuk-label govuk-radios__label" for="f-resolution-notUpheld-{{ .UID }}">Objection not upheld</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    {{ $name := printf "resolutionNotes-%s" .UID }}
+                    {{ $label := printf "Notes for %s (optional)" .UID }}
+                    {{ template "textarea" (field $name $label .ResolutionNotes $.Error.Field.resolutionNotes) }}
+
+                {{ end }}
+
+                <div class="govuk-button-group">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Confirm</button>
+                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s" .CaseUID )}}">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{{ end }}
