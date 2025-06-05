@@ -60,10 +60,12 @@ func TestGetResolveObjectionsTemplate(t *testing.T) {
 					CaseUID:     "M-4444-4444-4444",
 					ObjectionId: "6",
 					Objection:   testObjection1,
-					LpaUids:     testObjection1.LpaUids,
 					Form: formResolveObjection{
-						Resolution:      []string{""},
-						ResolutionNotes: []string{""},
+						Resolutions: []formResolveObjectionItem{
+							{
+								UID: "M-4444-4444-4444",
+							},
+						},
 					},
 				}).
 				Return(tc.errorReturned)
@@ -132,9 +134,9 @@ func TestPostResolveObjection(t *testing.T) {
 			template := &mockTemplate{}
 
 			form := url.Values{
-				"caseUid":           {"M-4444-4444-4444"},
-				"resolution-0":      {"upheld"},
-				"resolutionNotes-0": {"Test"},
+				"resolutions[0].uid":             {"M-4444-4444-4444"},
+				"resolutions[0].resolution":      {"upheld"},
+				"resolutions[0].resolutionNotes": {"Test"},
 			}
 
 			server := newMockServer("/lpa/{uid}/objection/{id}/resolve", ResolveObjection(client, template.Func))
@@ -172,9 +174,9 @@ func TestPostResolveObjectionWhenValidationError(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"caseUid":           {"M-4444-4444-4444"},
-		"resolution-0":      {""},
-		"resolutionNotes-0": {"Test"},
+		"resolutions[0].uid":             {"M-4444-4444-4444"},
+		"resolutions[0].resolution":      {""},
+		"resolutions[0].resolutionNotes": {"Test"},
 	}
 
 	server := newMockServer("/lpa/{uid}/objection/{id}/resolve", ResolveObjection(client, template.Func))
