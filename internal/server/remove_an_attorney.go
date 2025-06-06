@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-playground/form/v4"
-
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -40,9 +38,6 @@ type removeAnAttorneyData struct {
 }
 
 func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Template, confirmTmpl template.Template) Handler {
-	if decoder == nil {
-		decoder = form.NewDecoder()
-	}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
 		uid := r.PathValue("uid")
