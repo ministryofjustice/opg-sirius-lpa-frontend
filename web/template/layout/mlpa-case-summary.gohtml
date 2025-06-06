@@ -51,56 +51,66 @@
                 {{ if not .CaseSummary.Objections }}
                     <p class="govuk-body-s">There are none in place.</p>
                 {{ else }}
-                    {{ range .CaseSummary.Objections }}
-                        {{ $matchedResolution := false }}
-                        {{ $objectionID := .ID }}
+                    <details class="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                              Objections ({{ len .CaseSummary.Objections }})
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
 
-                        {{ range .Resolutions }}
-                            {{ if and (eq .Uid $uid) .Resolution }}
-                                {{ $matchedResolution = true }}
-                                <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/lpa/%s/objection/%d/view" $uid $objectionID) }}">
-                                    <strong>Objection {{ resolutionOutcome .Resolution }}</strong>
+                        {{ range .CaseSummary.Objections }}
+                            {{ $matchedResolution := false }}
+                            {{ $objectionID := .ID }}
+
+                            {{ range .Resolutions }}
+                                {{ if and (eq .Uid $uid) .Resolution }}
+                                    {{ $matchedResolution = true }}
+                                    <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/lpa/%s/objection/%d/view" $uid $objectionID) }}">
+                                        <strong>Objection {{ resolutionOutcome .Resolution }}</strong>
+                                    </a>
+                                    <ul class="govuk-list">
+                                        <li>
+                                            <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">
+                                                Outcome recorded on {{ parseAndFormatDate .ResolutionDate "2006-01-02" "2 January 2006" }}
+                                            </p>
+                                        </li>
+                                    </ul>
+                                {{ end }}
+                            {{ end }}
+
+                            {{ if not $matchedResolution }}
+                                <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/lpa/%s/objection/%d" $uid .ID) }}">
+                                    <strong>Objection received</strong>
                                 </a>
+
+                                {{- $last := 0 }}
+                                {{- range $i, $_ := .LpaUids }}
+                                    {{- $last = $i }}
+                                {{- end }}
+
                                 <ul class="govuk-list">
                                     <li>
+                                        <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">Received on {{ parseAndFormatDate .ReceivedDate "2006-01-02" "2 January 2006" }}</p>
                                         <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">
-                                            Outcome recorded on {{ parseAndFormatDate .ResolutionDate "2006-01-02" "2 January 2006" }}
+                                            {{ "Added to " }}
+                                            {{- range $i, $uid := .LpaUids -}}
+                                                {{- if eq $i 0 -}}
+                                                    {{ $uid }}
+                                                {{- else if eq $i $last -}}
+                                                    {{ " and "}}{{ $uid }}
+                                                {{- else -}}
+                                                    , {{ $uid }}
+                                                {{- end -}}
+                                            {{- end -}}
                                         </p>
+                                        <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/lpa/%s/objection/%d/resolve" $uid .ID) }}">Record objection outcome</a>
                                     </li>
                                 </ul>
                             {{ end }}
                         {{ end }}
-
-                        {{ if not $matchedResolution }}
-                            <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/lpa/%s/objection/%d" $uid .ID) }}">
-                                <strong>Objection received</strong>
-                            </a>
-
-                            {{- $last := 0 }}
-                            {{- range $i, $_ := .LpaUids }}
-                                {{- $last = $i }}
-                            {{- end }}
-
-                            <ul class="govuk-list">
-                                <li>
-                                    <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">Received on {{ parseAndFormatDate .ReceivedDate "2006-01-02" "2 January 2006" }}</p>
-                                    <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">
-                                        {{ "Added to " }}
-                                        {{- range $i, $uid := .LpaUids -}}
-                                            {{- if eq $i 0 -}}
-                                                {{ $uid }}
-                                            {{- else if eq $i $last -}}
-                                                {{ " and "}}{{ $uid }}
-                                            {{- else -}}
-                                                , {{ $uid }}
-                                            {{- end -}}
-                                        {{- end -}}
-                                    </p>
-                                    <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/lpa/%s/objection/%d/resolve" $uid .ID) }}">Record objection outcome</a>
-                                </li>
-                            </ul>
-                        {{ end }}
-                    {{ end }}
+                        </div>
+                    </details>
                 {{ end }}
             </div>
 
