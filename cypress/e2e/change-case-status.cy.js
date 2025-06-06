@@ -91,6 +91,15 @@ describe("Change case status", () => {
       },
     });
 
+    cy.addMock("/lpa-api/v1/reference-data/caseChangeReason", "GET", {
+      status: 200,
+      body: {
+        handle: "LPA_DOES_NOT_WORK",
+        label: "The lpa does not work...",
+        parentSources: ["cannot-register"],
+      },
+    });
+
     const mocks = Promise.allSettled([
       cases.warnings.empty("333"),
       cases.tasks.empty("333"),
@@ -119,6 +128,10 @@ describe("Change case status", () => {
       .get("input")
       .should("be.checked");
     cy.contains(".govuk-radios__label", "Cannot register").click();
+    cy.contains(
+      ".govuk-radios__label",
+      "The LPA does not work and cannot be changed",
+    ).click();
     cy.get("button[type=submit]").click();
     cy.url().should("contain", "/lpa/M-DIGI-LPA3-3333");
   });
