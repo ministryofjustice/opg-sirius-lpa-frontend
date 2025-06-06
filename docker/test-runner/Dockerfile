@@ -1,4 +1,4 @@
-FROM golang:1.24-bookworm
+FROM golang:1.24.3-bookworm
 
 RUN go install gotest.tools/gotestsum@latest
 

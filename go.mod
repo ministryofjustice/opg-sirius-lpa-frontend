@@ -1,6 +1,6 @@
 module github.com/ministryofjustice/opg-sirius-lpa-frontend
 
-go 1.24.1
+go 1.24.3
 
 require (
 	github.com/go-playground/form/v4 v4.2.1
@@ -8,9 +8,9 @@ require (
 	github.com/pact-foundation/pact-go/v2 v2.4.1
 	github.com/stretchr/testify v1.10.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.60.0
-	golang.org/x/mod v0.24.0
-	golang.org/x/sync v0.13.0
-	golang.org/x/text v0.24.0
+	golang.org/x/mod v0.25.0
+	golang.org/x/sync v0.15.0
+	golang.org/x/text v0.25.0
 )
 
 require (
