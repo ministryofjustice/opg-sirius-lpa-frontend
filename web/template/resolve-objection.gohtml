@@ -21,7 +21,7 @@
 
                 {{ range .Form }}
 
-                    <div class="govuk-form-group {{ if $.Error.Field.resolution }}govuk-form-group--error{{ end }}" id="f-resolution-{{ .UID }}">
+                    <div class="govuk-form-group {{ if (index $.Errors .UID).Field.resolution }}govuk-form-group--error{{ end }}" id="f-resolution-{{ .UID }}">
 
                         <fieldset class="govuk-fieldset">
                             <legend class="govuk-fieldset__legend">
@@ -46,7 +46,7 @@
 
                     {{ $name := printf "resolutionNotes-%s" .UID }}
                     {{ $label := printf "Notes for %s (optional)" .UID }}
-                    {{ template "textarea" (field $name $label .ResolutionNotes $.Error.Field.resolutionNotes) }}
+                    {{ template "textarea" (field $name $label .ResolutionNotes (index $.Errors .UID).Field.resolutionNotes) }}
 
                 {{ end }}
 

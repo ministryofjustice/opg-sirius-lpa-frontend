@@ -16,6 +16,7 @@ type resolveObjectionData struct {
 	XSRFToken   string
 	Success     bool
 	Error       sirius.ValidationError
+	Errors      map[string]sirius.ValidationError
 	CaseUID     string
 	ObjectionId string
 	Objection   sirius.Objection
@@ -53,13 +54,14 @@ func ResolveObjection(client ResolveObjectionClient, formTmpl template.Template)
 			data.Form[i].UID = uid
 		}
 
+		Errors := make(map[string]sirius.ValidationError)
+
 		if r.Method == http.MethodPost {
 			if err := r.ParseForm(); err != nil {
 				return err
 			}
 
 			var validationErrors sirius.ValidationError
-			var hasValidationError bool
 
 			for i, uid := range obj.LpaUids {
 				resolution := r.PostForm.Get(fmt.Sprintf("resolution-%s", uid))
@@ -68,26 +70,23 @@ func ResolveObjection(client ResolveObjectionClient, formTmpl template.Template)
 				data.Form[i].Resolution = resolution
 				data.Form[i].ResolutionNotes = notes
 
-				req := sirius.ResolutionRequest{
+				err := client.ResolveObjection(ctx, objectionID, uid, sirius.ResolutionRequest{
 					Resolution: resolution,
 					Notes:      notes,
-				}
-
-				err := client.ResolveObjection(ctx, objectionID, uid, req)
+				})
 
 				if ve, ok := err.(sirius.ValidationError); ok {
-					hasValidationError = true
-					if validationErrors.Field == nil {
-						validationErrors = ve
-					}
+					Errors[uid] = ve
+					validationErrors = ve
 				} else if err != nil {
 					return err
 				}
 			}
 
-			if hasValidationError {
+			if len(Errors) > 0 {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = validationErrors
+				data.Errors = Errors
 				return formTmpl(w, data)
 			}
 
