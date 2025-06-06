@@ -32,21 +32,16 @@ jobs:
               echo "BRANCH=${{github.head_ref}}" >> $GITHUB_OUTPUT
           fi
       - name: Bump version
-        id: bump_version
-        uses: anothrNick/github-tag-action@f278d49d30cdd8775cc3e7dd00b5ee11686ee297 # 1.71.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          INITIAL_VERSION: 1.0.0
-          DEFAULT_BRANCH: main
-          DEFAULT_BUMP: minor
-          PRERELEASE: true
-          PRERELEASE_SUFFIX: ${{ steps.commit_branch.outputs.BRANCH }}
-          RELEASE_BRANCHES: main
-          WITH_V: true
+        id: semver_tag
+        uses: ministryofjustice/opg-github-actions/.github/actions/semver-tag@v3.1.4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: minor
+          releases_enabled: false
     outputs:
       commit: ${{ steps.commit_branch.outputs.COMMIT }}
       branch: ${{ steps.commit_branch.outputs.BRANCH }}
-      tag: ${{ steps.bump_version.outputs.tag }}
+      tag: ${{ steps.semver_tag.outputs.created_tag }}
 
   build:
     name: Build LPA Frontend
