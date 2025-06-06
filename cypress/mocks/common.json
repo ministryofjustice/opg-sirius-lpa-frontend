@@ -110,17 +110,6 @@
     {
       "request": {
         "method": "GET",
-        "url": "/lpa-api/v1/reference-data/caseChangeReason"
-      },
-      "response": {
-        "status": 200,
-        "headers": { "Content-Type": "application/json" },
-        "body": "[{\"handle\":\"LPA_DOES_NOT_WORK\",\"label\":\"The LPA does not work and cannot be changed\",\"parentSources\":[\"cannot-register\"]}]"
-      }
-    },
-    {
-      "request": {
-        "method": "GET",
         "url": "/lpa-api/v1/lpas/800/documents?type[-][]=Draft&type[-][]=Preview"
       },
       "response": {

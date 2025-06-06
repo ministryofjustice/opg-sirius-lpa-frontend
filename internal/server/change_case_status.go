@@ -40,9 +40,31 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 		caseUID := r.FormValue("uid")
 
 		ctx := getContext(r)
+
+		var cs sirius.CaseSummary
+		var caseStatusChangeReasons []sirius.RefDataItem
+		var err error
+
 		group, groupCtx := errgroup.WithContext(ctx.Context)
-		cs, err := client.CaseSummary(ctx, caseUID)
-		if err != nil {
+
+		group.Go(func() error {
+			cs, err = client.CaseSummary(ctx.With(groupCtx), caseUID)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		group.Go(func() error {
+			caseStatusChangeReasons, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.CaseStatusChangeReason)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
 			return err
 		}
 
@@ -53,13 +75,14 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 		}
 
 		data := changeCaseStatusData{
-			XSRFToken:          ctx.XSRFToken,
-			Error:              sirius.ValidationError{Field: sirius.FieldErrors{}},
-			Entity:             fmt.Sprintf("%s %s", cs.DigitalLpa.SiriusData.Subtype, caseUID),
-			CaseUID:            caseUID,
-			OldStatus:          status,
-			NewStatus:          postFormString(r, "status"),
-			StatusChangeReason: postFormString(r, "statusReason"),
+			XSRFToken:               ctx.XSRFToken,
+			Error:                   sirius.ValidationError{Field: sirius.FieldErrors{}},
+			Entity:                  fmt.Sprintf("%s %s", cs.DigitalLpa.SiriusData.Subtype, caseUID),
+			CaseUID:                 caseUID,
+			OldStatus:               status,
+			NewStatus:               postFormString(r, "status"),
+			StatusChangeReason:      postFormString(r, "statusReason"),
+			CaseStatusChangeReasons: caseStatusChangeReasons,
 		}
 
 		data.StatusItems = []statusItem{
@@ -73,19 +96,6 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 			{Value: "cannot-register", Label: "Cannot register", ConditionalItem: true},
 			{Value: "cancelled", Label: "Cancelled", ConditionalItem: true},
 			{Value: "de-registered", Label: "De-registered", ConditionalItem: false},
-		}
-
-		group.Go(func() error {
-			data.CaseStatusChangeReasons, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.CaseStatusChangeReason)
-			if err != nil {
-				return err
-			}
-
-			return nil
-		})
-
-		if err := group.Wait(); err != nil {
-			return err
 		}
 
 		if r.Method == http.MethodPost {
