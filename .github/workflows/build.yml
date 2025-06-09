@@ -33,7 +33,7 @@ jobs:
           fi
       - name: Bump version
         id: semver_tag
-        uses: ministryofjustice/opg-github-actions/.github/actions/semver-tag@v3.1.4
+        uses: ministryofjustice/opg-github-actions/.github/actions/semver-tag@c9c5dfb290b8f614df0884928c521165ba83d630 # v3.1.4
         with:
           default_bump: minor
           releases_enabled: false
