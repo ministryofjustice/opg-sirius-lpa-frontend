@@ -93,11 +93,11 @@ describe("Change case status", () => {
 
     cy.addMock("/lpa-api/v1/reference-data/caseChangeReason", "GET", {
       status: 200,
-      body: {
+      body: [{
         handle: "LPA_DOES_NOT_WORK",
-        label: "The lpa does not work...",
+        label: "The LPA does not work and cannot be changed",
         parentSources: ["cannot-register"],
-      },
+      }],
     });
 
     const mocks = Promise.allSettled([
