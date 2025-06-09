@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
@@ -44,9 +43,6 @@ type createAdditionalDraftData struct {
 }
 
 func CreateAdditionalDraft(client CreateAdditionalDraftClient, tmpl template.Template) Handler {
-	if decoder == nil {
-		decoder = form.NewDecoder()
-	}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
 		id, err := strconv.Atoi(r.FormValue("id"))

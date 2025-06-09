@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
@@ -35,9 +34,6 @@ func isValidStatusForObjection(status string) bool {
 }
 
 func AddObjection(client AddObjectionClient, tmpl template.Template) Handler {
-	if decoder == nil {
-		decoder = form.NewDecoder()
-	}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseUID := r.FormValue("uid")
