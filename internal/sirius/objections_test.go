@@ -415,8 +415,8 @@ func TestResolveObjection(t *testing.T) {
 							"Content-Type": matchers.String("application/json"),
 						},
 						Body: matchers.Like(map[string]interface{}{
-							"resolution":      matchers.Like("upheld"),
-							"resolutionNotes": matchers.Like("test"),
+							"resolution":      "upheld",
+							"resolutionNotes": "test",
 						}),
 					}).
 					WithCompleteResponse(consumer.Response{
