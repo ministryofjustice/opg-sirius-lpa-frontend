@@ -241,7 +241,7 @@ func TestUpdateObjection(t *testing.T) {
 					UponReceiving("A request to update an objection").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
-						Path:   matchers.String("/lpa-api/v1/objections/3"),
+						Path:   matchers.String("/lpa-api/v1/objections/1337"),
 						Headers: matchers.MapMatcher{
 							"Content-Type": matchers.String("application/json"),
 						},
@@ -266,7 +266,7 @@ func TestUpdateObjection(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				err := client.UpdateObjection(Context{Context: context.Background()}, "3", tc.objectionsData)
+				err := client.UpdateObjection(Context{Context: context.Background()}, "1337", tc.objectionsData)
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {
@@ -299,12 +299,12 @@ func TestGetObjection(t *testing.T) {
 					UponReceiving("A request for the objection").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   matchers.String("/lpa-api/v1/objections/3"),
+						Path:   matchers.String("/lpa-api/v1/objections/1337"),
 					}).
 					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
 						Body: matchers.Like(map[string]interface{}{
-							"id":            matchers.Like(3),
+							"id":            matchers.Like(1337),
 							"notes":         matchers.String("Test"),
 							"objectionType": matchers.String("factual"),
 							"receivedDate":  matchers.String("05/09/2024"),
@@ -322,7 +322,7 @@ func TestGetObjection(t *testing.T) {
 					})
 			},
 			expectedResponse: Objection{
-				ID:            3,
+				ID:            1337,
 				Notes:         "Test",
 				ObjectionType: "factual",
 				ReceivedDate:  "05/09/2024",
@@ -346,7 +346,7 @@ func TestGetObjection(t *testing.T) {
 					UponReceiving("A request for a non-existent objection").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   matchers.String("/lpa-api/v1/objections/3"),
+						Path:   matchers.String("/lpa-api/v1/objections/1337"),
 					}).
 					WithCompleteResponse(consumer.Response{
 						Status: http.StatusNotFound,
@@ -355,7 +355,7 @@ func TestGetObjection(t *testing.T) {
 			expectedError: func(port int) error {
 				return StatusError{
 					Code:          404,
-					URL:           fmt.Sprintf("http://127.0.0.1:%d/lpa-api/v1/objections/3", port),
+					URL:           fmt.Sprintf("http://127.0.0.1:%d/lpa-api/v1/objections/1337", port),
 					Method:        "GET",
 					CorrelationId: "",
 				}
@@ -370,7 +370,7 @@ func TestGetObjection(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				objection, err := client.GetObjection(Context{Context: context.Background()}, "3")
+				objection, err := client.GetObjection(Context{Context: context.Background()}, "1337")
 
 				assert.Equal(t, tc.expectedResponse, objection)
 				if tc.expectedError == nil {
@@ -410,13 +410,13 @@ func TestResolveObjection(t *testing.T) {
 					UponReceiving("A request to resolve an objection").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
-						Path:   matchers.String("/lpa-api/v1/objections/3/resolution/M-9999-9999-9999"),
+						Path:   matchers.String("/lpa-api/v1/objections/1337/resolution/M-9999-9999-9999"),
 						Headers: matchers.MapMatcher{
 							"Content-Type": matchers.String("application/json"),
 						},
 						Body: matchers.Like(map[string]interface{}{
-							"resolution":      matchers.Like("upheld"),
-							"resolutionNotes": matchers.Like("test"),
+							"resolution":      "upheld",
+							"resolutionNotes": "test",
 						}),
 					}).
 					WithCompleteResponse(consumer.Response{
@@ -433,7 +433,7 @@ func TestResolveObjection(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				err := client.ResolveObjection(Context{Context: context.Background()}, "3", "M-9999-9999-9999", tc.resolutionsData)
+				err := client.ResolveObjection(Context{Context: context.Background()}, "1337", "M-9999-9999-9999", tc.resolutionsData)
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {
