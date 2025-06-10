@@ -406,7 +406,7 @@ func TestResolveObjection(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A digital LPA exists with an objection").
+					Given("I have a digital LPA with an objection").
 					UponReceiving("A request to resolve an objection").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
@@ -415,8 +415,8 @@ func TestResolveObjection(t *testing.T) {
 							"Content-Type": matchers.String("application/json"),
 						},
 						Body: matchers.Like(map[string]interface{}{
-							"resolution":      matchers.Like("upheld"),
-							"resolutionNotes": matchers.Like("test"),
+							"resolution":      "upheld",
+							"resolutionNotes": "test",
 						}),
 					}).
 					WithCompleteResponse(consumer.Response{
