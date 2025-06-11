@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
@@ -34,9 +33,6 @@ type formDecisionsDetails struct {
 }
 
 func UpdateDecisions(client UpdateDecisionsClient, tmpl template.Template) Handler {
-	if decoder == nil {
-		decoder = form.NewDecoder()
-	}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseUID := r.PathValue("uid")

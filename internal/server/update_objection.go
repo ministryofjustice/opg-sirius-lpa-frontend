@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"github.com/go-playground/form/v4"
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
@@ -26,9 +25,6 @@ type updateObjectionData struct {
 }
 
 func UpdateObjection(client UpdateObjectionClient, formTmpl template.Template, confirmTmpl template.Template) Handler {
-	if decoder == nil {
-		decoder = form.NewDecoder()
-	}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseUID := r.PathValue("uid")

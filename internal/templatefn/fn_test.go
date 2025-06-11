@@ -170,6 +170,17 @@ func TestObjectionType(t *testing.T) {
 	testStringMapper(t, "objectionType", expectations)
 }
 
+func TestResolutionOutcome(t *testing.T) {
+	expectations := map[string]string{
+		"upheld":    "upheld",
+		"notUpheld": "not upheld",
+		"":          "Not specified",
+		"foo":       "resolution outcome NOT RECOGNISED: foo",
+	}
+
+	testStringMapper(t, "resolutionOutcome", expectations)
+}
+
 func TestCamelcaseToSentence(t *testing.T) {
 	expectations := map[string]string{
 		"uId":   "UID",
