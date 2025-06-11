@@ -335,6 +335,14 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"compareBoolPointers": func(i *bool, j bool) bool {
 			return *i == j
 		},
+		"inStringArray": func(value string, array []string) bool {
+			for _, v := range array {
+				if v == value {
+					return true
+				}
+			}
+			return false
+		},
 	}
 }
 
