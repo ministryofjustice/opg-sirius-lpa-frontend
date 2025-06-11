@@ -247,6 +247,78 @@ func TestGetCreateDocumentDigitalLpa(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestGetCreateDocumentDigitalLpaDraftApplication(t *testing.T) {
+	caseSummary := sirius.CaseSummary{
+		DigitalLpa: sirius.DigitalLpa{
+			SiriusData: sirius.SiriusData{
+				ID:     15,
+				Status: "Draft",
+				Application: sirius.Draft{
+					DonorFirstNames: "Zackary",
+					DonorLastName:   "Lemmonds",
+					DonorAddress: sirius.Address{
+						Line1:    "9 Mount Pleasant Drive",
+						Town:     "East Harling",
+						Postcode: "NR16 2GB",
+						Country:  "UK",
+					},
+				},
+				Donor: sirius.Donor{
+					ID:           1,
+					Firstname:    "Zackary",
+					Surname:      "Lemmonds",
+					DateOfBirth:  "18/04/1965",
+					AddressLine1: "9 Mount Pleasant Drive",
+					Town:         "East Harling",
+					Postcode:     "NR16 2GB",
+					Country:      "UK",
+				},
+			},
+		},
+		TaskList: []sirius.Task{},
+	}
+
+	templateData := []sirius.DocumentTemplateData{{TemplateId: "DL-EXAMPLE", Label: "Example DL Form"}}
+
+	client := &mockCreateDocumentDigitalLpaClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-TWGJ-CDDJ-4NTL").
+		Return(caseSummary, nil)
+	client.
+		On("DocumentTemplates", mock.Anything, sirius.CaseTypeDigitalLpa).
+		Return(templateData, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createDocumentDigitalLpaData{
+			CaseSummary:           caseSummary,
+			DocumentTemplates:     sortDocumentData(templateData),
+			ComponentDocumentData: buildComponentDocumentData(templateData),
+			Recipients: []sirius.Person{
+				{
+					ID:           -1,
+					Firstname:    "Zackary",
+					Surname:      "Lemmonds",
+					DateOfBirth:  "18/04/1965",
+					AddressLine1: "9 Mount Pleasant Drive",
+					Town:         "East Harling",
+					Postcode:     "NR16 2GB",
+					Country:      "UK",
+					PersonType:   "Donor",
+				},
+			},
+		}).
+		Return(nil)
+
+	server := newMockServer("/lpa/{uid}/documents/new", CreateDocumentDigitalLpa(client, template.Func))
+
+	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-TWGJ-CDDJ-4NTL/documents/new", nil)
+	_, err := server.serve(req)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestGetCreateDocumentDigitalLpaError(t *testing.T) {
 	expectedError := errors.New("expected error")
 
