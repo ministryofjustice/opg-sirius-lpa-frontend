@@ -213,6 +213,7 @@ func xsrfHandler() func(next http.Handler) http.Handler {
 
 				if cookieToken != postToken {
 					http.Error(w, "Post request was not valid. Please refresh the page and try again.", http.StatusForbidden)
+					return
 				}
 			}
 
