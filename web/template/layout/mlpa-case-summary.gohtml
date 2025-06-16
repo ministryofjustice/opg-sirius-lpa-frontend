@@ -51,13 +51,22 @@
                 {{ if not .CaseSummary.Objections }}
                     <p class="govuk-body-s">There are none in place.</p>
                 {{ else }}
+                <details class="govuk-details">
+                    <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                              Objections ({{ len .CaseSummary.Objections }})
+                            </span>
+                    </summary>
+                    <div class="govuk-details__text">
                     {{ range .CaseSummary.Objections }}
                         {{ $matchedResolution := false }}
+                        {{ $objectionID := .ID }}
 
                         {{ range .Resolutions }}
                             {{ if and (eq .Uid $uid) .Resolution }}
                                 {{ $matchedResolution = true }}
-                                <a class="govuk-body-s govuk-link" href="">
+
+                                <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/lpa/%s/objection/%d/view" $uid $objectionID) }}">
                                     <strong>Objection {{ resolutionOutcome .Resolution }}</strong>
                                 </a>
                                 <ul class="govuk-list">
@@ -100,6 +109,8 @@
                             </ul>
                         {{ end }}
                     {{ end }}
+                    </div>
+                </details>
                 {{ end }}
             </div>
 
