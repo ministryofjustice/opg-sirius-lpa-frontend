@@ -74,21 +74,40 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 
 		placeholderRecipientId := -1
 
-		donorRecipient := sirius.Person{
-			ID:           placeholderRecipientId,
-			UID:          lpa.LpaStoreData.Donor.Uid,
-			Firstname:    lpa.LpaStoreData.Donor.FirstNames,
-			Surname:      lpa.LpaStoreData.Donor.LastName,
-			DateOfBirth:  sirius.DateString(lpa.LpaStoreData.Donor.DateOfBirth),
-			PersonType:   "Donor",
-			AddressLine1: lpa.LpaStoreData.Donor.Address.Line1,
-			AddressLine2: lpa.LpaStoreData.Donor.Address.Line2,
-			AddressLine3: lpa.LpaStoreData.Donor.Address.Line3,
-			Town:         lpa.LpaStoreData.Donor.Address.Town,
-			Postcode:     lpa.LpaStoreData.Donor.Address.Postcode,
-			Country:      lpa.LpaStoreData.Donor.Address.Country,
-			Email:        lpa.LpaStoreData.Donor.Email,
-			AlsoKnownAs:  lpa.LpaStoreData.Donor.OtherNamesKnownBy,
+		var donorRecipient sirius.Person
+
+		if lpa.SiriusData.Status == "Draft" {
+			donorRecipient = sirius.Person{
+				ID:           placeholderRecipientId,
+				Firstname:    lpa.SiriusData.Donor.Firstname,
+				Surname:      lpa.SiriusData.Donor.Surname,
+				DateOfBirth:  lpa.SiriusData.Donor.DateOfBirth,
+				PersonType:   "Donor",
+				AddressLine1: lpa.SiriusData.Donor.AddressLine1,
+				AddressLine2: lpa.SiriusData.Donor.AddressLine2,
+				AddressLine3: lpa.SiriusData.Donor.AddressLine3,
+				Town:         lpa.SiriusData.Donor.Town,
+				Postcode:     lpa.SiriusData.Donor.Postcode,
+				Country:      lpa.SiriusData.Donor.Country,
+				Email:        lpa.SiriusData.Donor.Email,
+			}
+		} else {
+			donorRecipient = sirius.Person{
+				ID:           placeholderRecipientId,
+				UID:          lpa.LpaStoreData.Donor.Uid,
+				Firstname:    lpa.LpaStoreData.Donor.FirstNames,
+				Surname:      lpa.LpaStoreData.Donor.LastName,
+				DateOfBirth:  sirius.DateString(lpa.LpaStoreData.Donor.DateOfBirth),
+				PersonType:   "Donor",
+				AddressLine1: lpa.LpaStoreData.Donor.Address.Line1,
+				AddressLine2: lpa.LpaStoreData.Donor.Address.Line2,
+				AddressLine3: lpa.LpaStoreData.Donor.Address.Line3,
+				Town:         lpa.LpaStoreData.Donor.Address.Town,
+				Postcode:     lpa.LpaStoreData.Donor.Address.Postcode,
+				Country:      lpa.LpaStoreData.Donor.Address.Country,
+				Email:        lpa.LpaStoreData.Donor.Email,
+				AlsoKnownAs:  lpa.LpaStoreData.Donor.OtherNamesKnownBy,
+			}
 		}
 
 		data.Recipients = append(data.Recipients, donorRecipient)
