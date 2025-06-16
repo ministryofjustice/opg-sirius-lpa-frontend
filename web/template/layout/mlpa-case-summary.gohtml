@@ -66,7 +66,7 @@
                             {{ if and (eq .Uid $uid) .Resolution }}
                                 {{ $matchedResolution = true }}
 
-                                <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/lpa/%s/objection/%d/view" $uid $objectionID) }}">
+                                <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/lpa/%s/objection/%d/outcome" $uid $objectionID) }}">
                                     <strong>Objection {{ resolutionOutcome .Resolution }}</strong>
                                 </a>
                                 <ul class="govuk-list">
