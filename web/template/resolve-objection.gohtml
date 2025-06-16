@@ -10,7 +10,6 @@
             {{ template "error-summary" .Error }}
 
             {{ if .Success }}
-                <meta data-app-reload="page" />
                 {{ template "success-banner" "You have successfully resolved an objection." }}
             {{ end }}
 
@@ -21,7 +20,7 @@
 
                 {{ range .Form }}
 
-                    <div class="govuk-form-group {{ if (index $.Errors .UID).Field.resolution }}govuk-form-group--error{{ end }}" id="f-resolution-{{ .UID }}">
+                    <div class="govuk-form-group {{ if (index $.ErrorsByCase .UID).Field.resolution }}govuk-form-group--error{{ end }}" id="f-resolution-{{ .UID }}">
 
                         <fieldset class="govuk-fieldset">
                             <legend class="govuk-fieldset__legend">
@@ -46,7 +45,7 @@
 
                     {{ $name := printf "resolutionNotes-%s" .UID }}
                     {{ $label := printf "Notes for %s (optional)" .UID }}
-                    {{ template "textarea" (field $name $label .ResolutionNotes (index $.Errors .UID).Field.resolutionNotes) }}
+                    {{ template "textarea" (field $name $label .ResolutionNotes (index $.ErrorsByCase .UID).Field.resolutionNotes) }}
 
                 {{ end }}
 

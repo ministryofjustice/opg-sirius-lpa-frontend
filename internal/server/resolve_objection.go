@@ -15,9 +15,9 @@ type ResolveObjectionClient interface {
 type resolveObjectionData struct {
 	XSRFToken   string
 	Success     bool
-	Error       sirius.ValidationError
-	Errors      map[string]sirius.ValidationError
-	CaseUID     string
+	Error        sirius.ValidationError
+	ErrorsByCase map[string]sirius.ValidationError
+	CaseUID      string
 	ObjectionId string
 	Objection   sirius.Objection
 	Form        []formResolveObjection
@@ -86,7 +86,7 @@ func ResolveObjection(client ResolveObjectionClient, formTmpl template.Template)
 			if len(Errors) > 0 {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = validationErrors
-				data.Errors = Errors
+				data.ErrorsByCase = Errors
 				return formTmpl(w, data)
 			}
 
