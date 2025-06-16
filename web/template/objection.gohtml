@@ -10,7 +10,6 @@
             {{ template "error-summary" .Error }}
 
             {{ if .Success }}
-                <meta data-app-reload="page" />
                 {{ template "success-banner" "You have successfully added a complaint." }}
             {{ end }}
 

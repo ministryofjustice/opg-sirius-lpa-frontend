@@ -8,7 +8,6 @@
       {{ template "error-summary" .Error }}
 
       {{ if .Success }}
-        <meta data-app-reload="page" />
         {{ $updatedStatus := statusLabel .NewStatus }}
         {{ template "success-banner" (printf "Status changed to %s" $updatedStatus) }}
       {{ end }}
