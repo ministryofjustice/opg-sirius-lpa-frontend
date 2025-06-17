@@ -203,6 +203,7 @@ func TestPostCreateDraft(t *testing.T) {
 
 	r, _ := http.NewRequest(http.MethodPost, "/digital-lpa/create", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
+	_ = r.ParseMultipartForm(32 << 20)
 	w := httptest.NewRecorder()
 
 	err := CreateDraft(client, template.Func)(w, r)
@@ -238,6 +239,7 @@ func TestPostCreateDraftWhenAPIFails(t *testing.T) {
 
 	r, _ := http.NewRequest(http.MethodPost, "/digital-lpa/create", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
+	_ = r.ParseMultipartForm(32 << 20)
 	w := httptest.NewRecorder()
 
 	err := CreateDraft(client, template.Func)(w, r)
@@ -283,6 +285,7 @@ func TestPostCreateDraftWhenValidationError(t *testing.T) {
 
 	r, _ := http.NewRequest(http.MethodPost, "/digital-lpa/create", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
+	_ = r.ParseMultipartForm(32 << 20)
 	w := httptest.NewRecorder()
 
 	err := CreateDraft(client, template.Func)(w, r)
