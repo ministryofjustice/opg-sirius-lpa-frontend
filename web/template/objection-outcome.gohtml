@@ -1,0 +1,74 @@
+{{ template "page" . }}
+
+{{ define "title" }}Objection - {{ resolutionOutcome .Resolution.Resolution }}{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <a href="{{ prefix (printf "/lpa/%s" .Resolution.Uid )}}" class="govuk-back-link">Back</a>
+
+            <h1 class="govuk-heading-l">Objection - {{ resolutionOutcome .Resolution.Resolution }}</h1>
+
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Added to
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ .Resolution.Uid }}
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Received on
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ parseAndFormatDate .Objection.ReceivedDate "2006-01-02" "2 January 2006" }}
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Objection type
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ objectionType .Objection.ObjectionType }}
+                    </dd>
+                </div>
+
+                {{ if eq .Resolution.Resolution "upheld" }}
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Will this stop the LPA from being registered?
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Will an attorney need to be removed?
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                        </dd>
+                    </div>
+                {{ end }}
+
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Notes
+                    </dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ if (eq .Resolution.ResolutionNotes "") }}
+                            No notes provided
+                        {{ else }}
+                            {{ .Resolution.ResolutionNotes }}
+                        {{ end}}
+                    </dd>
+                </div>
+            </dl>
+
+            <div class="govuk-button-group">
+                <a data-app-iframe-cancel class="govuk-button govuk-button--secondary" role="button" href="{{ prefix (printf "/lpa/%s" .Resolution.Uid )}}">Exit</a>
+            </div>
+        </div>
+    </div>
+{{ end }}

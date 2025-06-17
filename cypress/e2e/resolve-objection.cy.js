@@ -91,6 +91,7 @@ describe("Update objection form", () => {
 
   it("can be visited from the case summary dashboard", () => {
     cy.visit("/lpa/M-0000-0000-0005/lpa-details").then(() => {
+      cy.contains("Objections (1)").click();
       cy.contains("Record objection outcome").click();
 
       cy.url().should("include", "/lpa/M-0000-0000-0005/objection/15");
