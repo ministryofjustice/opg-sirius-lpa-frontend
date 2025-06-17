@@ -182,6 +182,38 @@ func TestGetContextMissingXSRFToken(t *testing.T) {
 	assert.Equal("", ctx.XSRFToken)
 }
 
+func TestXsrfHandlerIncorrectXSRFToken(t *testing.T) {
+	xsrfMiddleware := xsrfHandler()
+
+	httpHandler := xsrfMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+
+	req, _ := http.NewRequest(http.MethodPost, "/", strings.NewReader("xsrfToken=xZKapp6sHWgRoXHJr5W3cy=="))
+	req.Header.Add("Content-Type", formUrlEncoded)
+	req.AddCookie(&http.Cookie{Name: "XSRF-TOKEN", Value: "cGoJkHDPgQyzRM8TPByxKT=="})
+
+	respRecorder := httptest.NewRecorder()
+	httpHandler.ServeHTTP(respRecorder, req)
+	res := respRecorder.Result()
+
+	assert.Equal(t, http.StatusForbidden, res.StatusCode)
+}
+
+func TestXsrfHandlerMatchesXSRFToken(t *testing.T) {
+	xsrfMiddleware := xsrfHandler()
+
+	httpHandler := xsrfMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+
+	req, _ := http.NewRequest(http.MethodPost, "/", strings.NewReader("xsrfToken=HEXyWv4XQyee6TMu7LRsn9=="))
+	req.Header.Add("Content-Type", formUrlEncoded)
+	req.AddCookie(&http.Cookie{Name: "XSRF-TOKEN", Value: "HEXyWv4XQyee6TMu7LRsn9=="})
+
+	respRecorder := httptest.NewRecorder()
+	httpHandler.ServeHTTP(respRecorder, req)
+	res := respRecorder.Result()
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
 func TestPostFormString(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodPost, "/?name=ignored", strings.NewReader("name=%20%20%09%0Ahello%0A%0A%20%20%09%09"))
 	r.Header.Add("Content-Type", formUrlEncoded)
