@@ -115,6 +115,8 @@ func MiReporting(client MiReportingClient, tmpl template.Template) Handler {
 				}
 			}
 
+			form.Del("xsrfToken")
+
 			result, err := client.MiReport(ctx, form)
 			if err != nil {
 				return err
