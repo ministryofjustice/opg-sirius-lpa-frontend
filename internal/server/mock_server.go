@@ -25,6 +25,8 @@ func newMockServer(route string, handler Handler) *MockServer {
 }
 
 func (s *MockServer) serve(req *http.Request) (*httptest.ResponseRecorder, error) {
+	_ = req.ParseMultipartForm(32 << 20)
+
 	resp := httptest.NewRecorder()
 	s.mux.ServeHTTP(resp, req)
 
