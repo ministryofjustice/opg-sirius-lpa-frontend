@@ -252,6 +252,13 @@ func ManageRestrictions(client ManageRestrictionsClient, manageTmpl template.Tem
 						return err
 					}
 
+					if taskID != 0 {
+						err := client.ClearTask(ctx, taskID)
+						if handleError(w, &data, err) {
+							return err
+						}
+					}
+
 					return handleSuccess(w, &data, caseUID)
 				}
 			}
