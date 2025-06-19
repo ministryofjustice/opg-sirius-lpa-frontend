@@ -203,6 +203,7 @@ func TestPostMiReporting(t *testing.T) {
 
 	r, _ := http.NewRequest(http.MethodPost, "/", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
+	_ = r.ParseMultipartForm(32 << 20)
 	w := httptest.NewRecorder()
 
 	err := MiReporting(client, template.Func)(w, r)
@@ -220,6 +221,7 @@ func TestPostMiReportingWhenError(t *testing.T) {
 		Return(nil, errExample)
 
 	r, _ := http.NewRequest(http.MethodPost, "/", strings.NewReader(""))
+	_ = r.ParseMultipartForm(32 << 20)
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 

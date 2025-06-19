@@ -21,6 +21,7 @@ type miReportingData struct {
 	Controls    []namedControl
 	ResultCount int
 	Download    string
+	XSRFToken   string
 }
 
 type namedControl struct {
@@ -46,7 +47,9 @@ var miLabels = map[string]string{
 func MiReporting(client MiReportingClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
-		data := miReportingData{}
+		data := miReportingData{
+			XSRFToken: ctx.XSRFToken,
+		}
 
 		switch r.Method {
 		case http.MethodGet:
@@ -111,6 +114,8 @@ func MiReporting(client MiReportingClient, tmpl template.Template) Handler {
 					form.Del(key)
 				}
 			}
+
+			form.Del("xsrfToken")
 
 			result, err := client.MiReport(ctx, form)
 			if err != nil {
