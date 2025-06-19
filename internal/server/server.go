@@ -167,7 +167,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	muxWithHeaders := securityheaders.Use(setCSPHeader(mux))
 
 	loggerMiddleware := telemetry.Middleware(logger)
-	xsrfMiddleware := xsrfHandler()
+	xsrfMiddleware := xsrfHandler(logger, templates.Get("error.gohtml"), siriusPublicURL)
 
 	return otelhttp.NewHandler(http.StripPrefix(prefix, xsrfMiddleware(loggerMiddleware(muxWithHeaders))), "lpa-frontend")
 }
@@ -202,7 +202,7 @@ type ProblemError struct {
 	ValidationErrors sirius.FieldErrors `json:"validationErrors"`
 }
 
-func xsrfHandler() func(next http.Handler) http.Handler {
+func xsrfHandler(logger *slog.Logger, tmplError template.Template, siriusURL string) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.Method == http.MethodPost {
@@ -215,7 +215,17 @@ func xsrfHandler() func(next http.Handler) http.Handler {
 				postToken := postFormString(r, "xsrfToken")
 
 				if cookieToken != postToken {
-					http.Error(w, "Post request was not valid. Please refresh the page and try again.", http.StatusForbidden)
+					errorMessage := "Post request was not valid. Please refresh the page and try again."
+
+					w.WriteHeader(http.StatusForbidden)
+					_ = tmplError(w, errorVars{
+						SiriusURL: siriusURL,
+						Path:      r.URL.Path,
+						Code:      http.StatusForbidden,
+						Error:     errorMessage,
+					})
+					logger.Error(errorMessage)
+
 					return
 				}
 			}

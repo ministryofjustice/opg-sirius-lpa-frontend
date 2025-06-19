@@ -183,7 +183,21 @@ func TestGetContextMissingXSRFToken(t *testing.T) {
 }
 
 func TestXsrfHandlerIncorrectXSRFToken(t *testing.T) {
-	xsrfMiddleware := xsrfHandler()
+	var buf bytes.Buffer
+	logHandler := slog.NewJSONHandler(&buf, nil)
+	logger := slog.New(logHandler)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, errorVars{
+			SiriusURL: "http://sirius",
+			Path:      "/",
+			Code:      http.StatusForbidden,
+			Error:     "Post request was not valid. Please refresh the page and try again.",
+		}).
+		Return(nil)
+
+	xsrfMiddleware := xsrfHandler(logger, template.Func, "http://sirius")
 
 	httpHandler := xsrfMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
 
@@ -199,7 +213,13 @@ func TestXsrfHandlerIncorrectXSRFToken(t *testing.T) {
 }
 
 func TestXsrfHandlerMatchesXSRFToken(t *testing.T) {
-	xsrfMiddleware := xsrfHandler()
+	var buf bytes.Buffer
+	logHandler := slog.NewJSONHandler(&buf, nil)
+	logger := slog.New(logHandler)
+
+	template := &mockTemplate{}
+
+	xsrfMiddleware := xsrfHandler(logger, template.Func, "http://sirius")
 
 	httpHandler := xsrfMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
 
