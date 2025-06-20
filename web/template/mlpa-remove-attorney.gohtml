@@ -39,6 +39,25 @@
           </fieldset>
         </div>
 
+        <div class="govuk-form-group{{ if .Error.Field.removedReason }} govuk-form-group--error{{ end }}">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend"><strong>Select the reason for removing</strong></legend>
+            {{ template "errors" .Error.Field.removedReason }}
+
+            <div class="govuk-radios" data-module="govuk-radios">
+              {{ range $num, $removedReason := .RemovedReasons }}
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="f-removedReason-{{ plusN $num 1 }}" name="removedReason" type="radio" value="{{ $removedReason.Handle }}"
+                        {{ if eq $removedReason.Handle $.Form.RemovedReason }}checked{{ end }}>
+                  <label class="govuk-label govuk-radios__label" for="f-removedReason-{{ plusN $num 1 }}">
+                    {{ $removedReason.Label }}
+                  </label>
+                </div>
+              {{ end }}
+            </div>
+          </fieldset>
+        </div>
+
         <div class="govuk-form-group{{ if .Error.Field.enableAttorney }} govuk-form-group--error{{ end }}">
           <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend"><strong>Select replacement attorneys to step in</strong></legend>
