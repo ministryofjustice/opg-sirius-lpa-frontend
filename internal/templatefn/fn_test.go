@@ -65,7 +65,7 @@ func TestHowAttorneysMakeDecisionsLongForm(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["howAttorneysMakeDecisionsLongForm"].(func(bool, string) string)
 
-	expectations := map[int]map[string]interface{}{
+	tests := map[int]map[string]interface{}{
 		0: {"soleAttorney": false, "value": "jointly", "result": "Jointly"},
 		1: {"soleAttorney": false, "value": "jointly-and-severally", "result": "Jointly & severally"},
 		2: {"soleAttorney": false, "value": "jointly-for-some-severally-for-others", "result": "Jointly for some, severally for others"},
@@ -74,8 +74,8 @@ func TestHowAttorneysMakeDecisionsLongForm(t *testing.T) {
 		5: {"soleAttorney": true, "value": "jointly-for-some-severally-for-others", "result": "There is only one attorney appointed"},
 	}
 
-	for _, expectation := range expectations {
-		assert.Equal(t, expectation["result"], fn(expectation["soleAttorney"].(bool), expectation["value"].(string)))
+	for _, test := range tests {
+		assert.Equal(t, test["result"], fn(test["soleAttorney"].(bool), test["value"].(string)))
 	}
 }
 
