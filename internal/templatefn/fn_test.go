@@ -62,15 +62,21 @@ func testStringMapper(t *testing.T, fnName string, expectations map[string]strin
 }
 
 func TestHowAttorneysMakeDecisionsLongForm(t *testing.T) {
-	expectations := map[string]string{
-		"jointly":                               "Jointly",
-		"jointly-and-severally":                 "Jointly & severally",
-		"jointly-for-some-severally-for-others": "Jointly for some, severally for others",
-		"":                                      "Not specified",
-		"foo":                                   "howAttorneysMakeDecisions NOT RECOGNISED: foo",
+	fns := All("", "", "")
+	fn := fns["howAttorneysMakeDecisionsLongForm"].(func(bool, string) string)
+
+	expectations := map[int]map[string]interface{}{
+		0: {"soleAttorney": false, "value": "jointly", "result": "Jointly"},
+		1: {"soleAttorney": false, "value": "jointly-and-severally", "result": "Jointly & severally"},
+		2: {"soleAttorney": false, "value": "jointly-for-some-severally-for-others", "result": "Jointly for some, severally for others"},
+		3: {"soleAttorney": false, "value": "", "result": "Not specified"},
+		4: {"soleAttorney": false, "value": "foo", "result": "howAttorneysMakeDecisions NOT RECOGNISED: foo"},
+		5: {"soleAttorney": true, "value": "jointly-for-some-severally-for-others", "result": "There is only one attorney appointed"},
 	}
 
-	testStringMapper(t, "howAttorneysMakeDecisionsLongForm", expectations)
+	for _, expectation := range expectations {
+		assert.Equal(t, expectation["result"], fn(expectation["soleAttorney"].(bool), expectation["value"].(string)))
+	}
 }
 
 func TestHowReplacementAttorneysStepInLongForm(t *testing.T) {
