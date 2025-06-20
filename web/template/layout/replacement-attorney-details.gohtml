@@ -34,7 +34,7 @@
                     <dt class="govuk-summary-list__key">How replacement attorneys must make decisions</dt>
                     <dd class="govuk-summary-list__value">
                         <div class="govuk-body">
-                            {{ howAttorneysMakeDecisionsLongForm .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions }}
+                            {{ howAttorneysMakeDecisionsLongForm false .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions }}
                             {{ if (gt (len .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisionsDetails) 0) }}
                                 <p class="app-newlines-as-br">{{ .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisionsDetails }}</p>
                             {{ end }}
