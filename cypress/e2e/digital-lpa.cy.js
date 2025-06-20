@@ -916,10 +916,10 @@ describe("View a digital LPA", () => {
     cy.visit("/lpa/M-1111-1111-1111/lpa-details");
 
     cy.contains("Decisions")
-    .click()
-    .parents(".govuk-accordion__section")
-    .within(() => {
-      cy.contains("There is only one attorney appointed")
-    });
+      .click()
+      .parents(".govuk-accordion__section")
+      .within(() => {
+        cy.contains("There is only one attorney appointed");
+      });
   });
 });
