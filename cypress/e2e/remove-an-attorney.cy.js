@@ -244,6 +244,31 @@ describe("Remove an attorney", () => {
       },
     );
 
+    cy.addMock(
+      "/lpa-api/v1/reference-data/attorneyRemovedReason",
+      "GET",
+      {
+        status: 200,
+        body: [
+          {
+            "handle": "BANKRUPT",
+            "label": "Bankrupt",
+            "validSubTypes": [
+              "property-and-affairs"
+            ]
+          },
+          {
+            "handle": "DECEASED",
+            "label": "Deceased",
+            "validSubTypes": [
+                "property-and-affairs",
+                "personal-welfare"
+            ]
+          },
+        ],
+      },
+    );
+
     cy.visit("/lpa/M-1111-1111-1111/remove-an-attorney");
   });
 
@@ -282,11 +307,13 @@ describe("Remove an attorney", () => {
     cy.contains("Remove an attorney");
     cy.get('input[name="confirmRemoval"]').should("not.exist");
     cy.get("#f-activeAttorney-1").click();
+    cy.get("#f-removedReason-1").click();
     cy.get("#f-inactiveAttorney-1").click();
     cy.get("button").contains("Continue").click();
     cy.url().should("include", "/lpa/M-1111-1111-1111/remove-an-attorney");
     cy.contains("Confirm removal of attorney");
     cy.get(".govuk-summary-list__value").contains("Katheryn Collins");
+    cy.get(".govuk-summary-list__value").contains("Bankrupt");
     cy.get(".govuk-summary-list__value").contains("Barry Smith");
   });
 });
