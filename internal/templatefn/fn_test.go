@@ -65,17 +65,17 @@ func TestHowAttorneysMakeDecisionsLongForm(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["howAttorneysMakeDecisionsLongForm"].(func(bool, string) string)
 
-	tests := map[int]map[string]interface{}{
-		0: {"soleAttorney": false, "value": "jointly", "result": "Jointly"},
-		1: {"soleAttorney": false, "value": "jointly-and-severally", "result": "Jointly & severally"},
-		2: {"soleAttorney": false, "value": "jointly-for-some-severally-for-others", "result": "Jointly for some, severally for others"},
-		3: {"soleAttorney": false, "value": "", "result": "Not specified"},
-		4: {"soleAttorney": false, "value": "foo", "result": "howAttorneysMakeDecisions NOT RECOGNISED: foo"},
-		5: {"soleAttorney": true, "value": "jointly-for-some-severally-for-others", "result": "There is only one attorney appointed"},
+	tests := map[string]map[string]interface{}{
+		"Jointly":                          {"isSoleAttorney": false, "value": "jointly", "result": "Jointly"},
+		"JointlyAndSeverally":              {"isSoleAttorney": false, "value": "jointly-and-severally", "result": "Jointly & severally"},
+		"JointlyForSomeSeverallyForOthers": {"isSoleAttorney": false, "value": "jointly-for-some-severally-for-others", "result": "Jointly for some, severally for others"},
+		"Empty":                            {"isSoleAttorney": false, "value": "", "result": "Not specified"},
+		"NotValid":                         {"isSoleAttorney": false, "value": "foo", "result": "howAttorneysMakeDecisions NOT RECOGNISED: foo"},
+		"IsSoleAttorney":                   {"isSoleAttorney": true, "value": "jointly-for-some-severally-for-others", "result": "There is only one attorney appointed"},
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test["result"], fn(test["soleAttorney"].(bool), test["value"].(string)))
+		assert.Equal(t, test["result"], fn(test["isSoleAttorney"].(bool), test["value"].(string)))
 	}
 }
 
