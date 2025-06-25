@@ -9,6 +9,12 @@ type Address struct {
 	Country  string `json:"country"`
 }
 
+type DonorIdentityCheck struct {
+	State     string `json:"state,omitempty"`
+	CheckedAt string `json:"checkedAt,omitempty"`
+	Reference string `json:"reference,omitempty"`
+}
+
 type Draft struct {
 	CaseType                  []string              `json:"types"`
 	Source                    string                `json:"source"`
@@ -25,6 +31,7 @@ type Draft struct {
 	CorrespondenceLargeFormat bool                  `json:"correspondenceLargeFormat,omitempty"`
 	SeveranceStatus           string                `json:"severanceStatus,omitempty"`
 	SeveranceApplication      *SeveranceApplication `json:"severanceApplication,omitempty"`
+	DonorIdentityCheck        *DonorIdentityCheck   `json:"donorIdentityCheck,omitempty"`
 }
 
 func (c *Client) CreateDraft(ctx Context, draft Draft) (map[string]string, error) {
