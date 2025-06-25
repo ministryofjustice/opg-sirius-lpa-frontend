@@ -1,14 +1,24 @@
 {{ define "pi-donor-id" }}
     <tr class="govuk-table__row">
-        <th scope="row" class="govuk-table__header">Progress</th>
-        <td class="govuk-table__cell">{{ progressIndicatorStatus .Status }}</td>
-        <td class="govuk-table__cell">
-            {{if and (eq .Status "IN_PROGRESS") (eq .ApplicationSource "PHONE")}}
-                <a class="govuk-link govuk-link--no-visited-state"
-                   href="{{printf "/lpa/identity-check/start?personType=donor&lpas[]=%s" .UID}}">
-                    Start donor identity check
-                </a>
-            {{end}}
-        </td>
+        {{ if (eq .DonorIdentityCheckState "COUNTER_SERVICE_STARTED") }}
+            <td>
+                {{ if not (eq .ApplicationSource "PHONE") }}
+                    Donor unable to attempt online ID check on {{ parseAndFormatDate .DonorIdentityCheckCheckedAt "2006-01-02T15:04:05Z" "2 January 2006" }} - Post Office to check identity
+                {{ else }}
+                    Donor unable to attempt phone ID check on {{ parseAndFormatDate .DonorIdentityCheckCheckedAt "2006-01-02T15:04:05Z" "2 January 2006" }} - Post Office to check identity
+                {{ end }}
+            </td>
+        {{ else }}
+            <th scope="row" class="govuk-table__header">Progress</th>
+            <td class="govuk-table__cell">{{ progressIndicatorStatus .Status }}</td>
+            <td class="govuk-table__cell">
+                {{if and (eq .Status "IN_PROGRESS") (eq .ApplicationSource "PHONE")}}
+                    <a class="govuk-link govuk-link--no-visited-state"
+                       href="{{printf "/lpa/identity-check/start?personType=donor&lpas[]=%s" .UID}}">
+                        Start donor identity check
+                    </a>
+                {{end}}
+            </td>
+        {{ end }}
     </tr>
 {{ end }}
