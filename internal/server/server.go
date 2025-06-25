@@ -27,12 +27,8 @@ type Server struct {
 func getContext(r *http.Request) sirius.Context {
 	token := ""
 
-	if r.Method == http.MethodGet {
-		if cookie, err := r.Cookie("XSRF-TOKEN"); err == nil {
-			token, _ = url.QueryUnescape(cookie.Value)
-		}
-	} else {
-		token = r.FormValue("xsrfToken")
+	if cookie, err := r.Cookie("XSRF-TOKEN"); err == nil {
+		token, _ = url.QueryUnescape(cookie.Value)
 	}
 
 	return sirius.Context{
@@ -170,9 +166,10 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 
 	muxWithHeaders := securityheaders.Use(setCSPHeader(mux))
 
-	middleware := telemetry.Middleware(logger)
+	loggerMiddleware := telemetry.Middleware(logger)
+	xsrfMiddleware := xsrfHandler(logger, templates.Get("error.gohtml"), siriusPublicURL)
 
-	return otelhttp.NewHandler(http.StripPrefix(prefix, middleware(muxWithHeaders)), "lpa-frontend")
+	return otelhttp.NewHandler(http.StripPrefix(prefix, xsrfMiddleware(loggerMiddleware(muxWithHeaders))), "lpa-frontend")
 }
 
 type Handler func(w http.ResponseWriter, r *http.Request) error
@@ -203,6 +200,39 @@ type ProblemError struct {
 	Title            string             `json:"title"`
 	Detail           string             `json:"detail"`
 	ValidationErrors sirius.FieldErrors `json:"validationErrors"`
+}
+
+func xsrfHandler(logger *slog.Logger, tmplError template.Template, siriusURL string) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.Method == http.MethodPost {
+				cookieToken := ""
+
+				if cookie, err := r.Cookie("XSRF-TOKEN"); err == nil {
+					cookieToken, _ = url.QueryUnescape(cookie.Value)
+				}
+
+				postToken := postFormString(r, "xsrfToken")
+
+				if cookieToken != postToken {
+					errorMessage := "Post request was not valid. Please refresh the page and try again."
+
+					w.WriteHeader(http.StatusForbidden)
+					_ = tmplError(w, errorVars{
+						SiriusURL: siriusURL,
+						Path:      r.URL.Path,
+						Code:      http.StatusForbidden,
+						Error:     errorMessage,
+					})
+					logger.Error(errorMessage)
+
+					return
+				}
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
 }
 
 func errorHandler(tmplError template.Template, prefix, siriusURL string) func(next Handler) http.Handler {
