@@ -184,7 +184,11 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"subtypeLongFormat":      subtypeLongFormat,
 		"subtypeColour":          subtypeColour,
 		"severanceRequiredLabel": severanceRequiredLabel,
-		"howAttorneysMakeDecisionsLongForm": func(s string) string {
+		"howAttorneysMakeDecisionsLongForm": func(isSoleAttorney bool, s string) string {
+			if isSoleAttorney {
+				return "There is only one attorney appointed"
+			}
+
 			switch s {
 			case "jointly":
 				return "Jointly"
