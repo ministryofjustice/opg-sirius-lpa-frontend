@@ -10,6 +10,7 @@ import (
 type GetApplicationProgressClient interface {
 	CaseSummary(siriusCtx sirius.Context, uid string) (sirius.CaseSummary, error)
 	ProgressIndicatorsForDigitalLpa(siriusCtx sirius.Context, uid string) ([]sirius.ProgressIndicator, error)
+	OutgoingDocumentBySystemType(ctx sirius.Context, caseType sirius.CaseType, caseId int, systemType string) ([]sirius.Document, error)
 }
 
 type IndicatorView struct {
@@ -19,6 +20,7 @@ type IndicatorView struct {
 	ApplicationSource           string
 	DonorIdentityCheckState     string
 	DonorIdentityCheckCheckedAt string
+	VouchLetterSentAt           string
 	sirius.ProgressIndicator
 }
 
@@ -45,6 +47,21 @@ func GetApplicationProgressDetails(client GetApplicationProgressClient, tmpl tem
 
 		cpName = cs.DigitalLpa.LpaStoreData.CertificateProvider.FirstNames + " " + cs.DigitalLpa.LpaStoreData.CertificateProvider.LastName
 
+		vouchingLetters, err := client.OutgoingDocumentBySystemType(
+			ctx,
+			sirius.CaseType("lpa"),
+			cs.DigitalLpa.SiriusData.ID,
+			"DLP-VOUCH-INVITE",
+		)
+		if err != nil {
+			return err
+		}
+
+		var voucherLetterSentAt string
+		if len(vouchingLetters) > 0 {
+			voucherLetterSentAt = vouchingLetters[0].CreatedDate
+		}
+
 		inds, err := client.ProgressIndicatorsForDigitalLpa(ctx, uid)
 		if err != nil {
 			return err
@@ -68,6 +85,7 @@ func GetApplicationProgressDetails(client GetApplicationProgressClient, tmpl tem
 				ApplicationSource:           cs.DigitalLpa.SiriusData.Application.Source,
 				DonorIdentityCheckState:     donorIdentityCheckState,
 				DonorIdentityCheckCheckedAt: donorIdentityCheckCheckedAt,
+				VouchLetterSentAt:           voucherLetterSentAt,
 			})
 		}
 
