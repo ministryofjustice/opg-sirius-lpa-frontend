@@ -8,8 +8,8 @@ describe("View the application progress for a digital LPA", () => {
       cases.warnings.empty("1111"),
       cases.tasks.empty("1111"),
       digitalLpas.objections.empty("M-1111-1111-1111"),
-      digitalLpas.objections.empty("M-2222-2222-2222"),
       digitalLpas.progressIndicators.feesInProgress("M-1111-1111-1111"),
+
       digitalLpas.get("M-2222-2222-2222", {
         "opg.poas.sirius": {
           id: 2222,
@@ -17,12 +17,34 @@ describe("View the application progress for a digital LPA", () => {
       }),
       cases.warnings.empty("2222"),
       cases.tasks.empty("2222"),
+      digitalLpas.objections.empty("M-2222-2222-2222"),
       digitalLpas.progressIndicators.defaultCannotStart("M-2222-2222-2222", [
         {
           indicator: "RESTRICTIONS_AND_CONDITIONS",
           status: "COMPLETE",
         },
       ]),
+
+      digitalLpas.get("M-3333-3333-3333", {
+        "opg.poas.sirius": {
+          id: 3333,
+          application: {
+            source: "paper",
+            donorIdentityCheck: {
+              state: 'COUNTER_SERVICE_STARTED',
+              checkedAt: '2024-07-01T16:06:08Z',
+              reference: '712254d5-4cf4-463c-96c1-67744b70043e'
+            },
+          }
+        },
+        "opg.poas.lpastore": {
+          channel: "paper",
+        }
+      }),
+      cases.warnings.empty("3333"),
+      cases.tasks.empty("3333"),
+      digitalLpas.objections.empty("M-3333-3333-3333"),
+      digitalLpas.progressIndicators.feesInProgress("M-3333-3333-3333"),
     ]);
 
     cy.wrap(mocks);
@@ -39,4 +61,38 @@ describe("View the application progress for a digital LPA", () => {
 
     cy.contains("Restrictions and conditions (Complete)");
   });
+
+  it("shows unable to attempt online ID check PI content", () => {
+    cy.visit("/lpa/M-3333-3333-3333");
+
+    cy.contains("Donor identity confirmation").click()
+
+    cy.contains("Donor unable to attempt online ID check on 1 July 2024 - Post Office to check identity")
+  })
+
+  it("shows unable to attempt paper ID check PI content", () => {
+    const mocks = Promise.allSettled([
+      digitalLpas.get("M-3333-3333-3333", {
+        "opg.poas.sirius": {
+          id: 3333,
+          application: {
+            source: "PHONE",
+            donorIdentityCheck: {
+              state: 'COUNTER_SERVICE_STARTED',
+              checkedAt: '2024-07-01T16:06:08Z',
+              reference: '712254d5-4cf4-463c-96c1-67744b70043e'
+            },
+          }
+        },
+      }),
+    ]);
+
+    cy.wrap(mocks);
+
+    cy.visit("/lpa/M-3333-3333-3333");
+
+    cy.contains("Donor identity confirmation").click()
+
+    cy.contains("Donor unable to attempt phone ID check on 1 July 2024 - Post Office to check identity")
+  })
 });
