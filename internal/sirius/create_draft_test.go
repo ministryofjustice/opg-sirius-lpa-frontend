@@ -109,6 +109,11 @@ func TestCreateDraft(t *testing.T) {
 				Email:                     "c.morneault@example.com",
 				CorrespondenceByWelsh:     true,
 				CorrespondenceLargeFormat: false,
+				DonorIdentityCheck: &DonorIdentityCheck{
+					State:     "SUCCESS",
+					CheckedAt: "2024-07-01T16:06:08Z",
+					Reference: "712254d5-4cf4-463c-96c1-67744b70043e",
+				},
 			},
 			setup: func() {
 				pact.
@@ -148,6 +153,11 @@ func TestCreateDraft(t *testing.T) {
 							"donorPhone":            "07893932118",
 							"donorEmail":            "c.morneault@example.com",
 							"correspondenceByWelsh": true,
+							"donorIdentityCheck": map[string]string{
+								"state":     "SUCCESS",
+								"checkedAt": "2024-07-01T16:06:08Z",
+								"reference": "712254d5-4cf4-463c-96c1-67744b70043e",
+							},
 						},
 					}).
 					WithCompleteResponse(consumer.Response{
