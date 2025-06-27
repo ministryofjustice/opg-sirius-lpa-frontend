@@ -31,15 +31,15 @@ describe("View the application progress for a digital LPA", () => {
           application: {
             source: "paper",
             donorIdentityCheck: {
-              state: 'COUNTER_SERVICE_STARTED',
-              checkedAt: '2024-07-01T16:06:08Z',
-              reference: '712254d5-4cf4-463c-96c1-67744b70043e'
+              state: "COUNTER_SERVICE_STARTED",
+              checkedAt: "2024-07-01T16:06:08Z",
+              reference: "712254d5-4cf4-463c-96c1-67744b70043e",
             },
-          }
+          },
         },
         "opg.poas.lpastore": {
           channel: "paper",
-        }
+        },
       }),
       cases.warnings.empty("3333"),
       cases.tasks.empty("3333"),
@@ -65,10 +65,12 @@ describe("View the application progress for a digital LPA", () => {
   it("shows unable to attempt online ID check PI content", () => {
     cy.visit("/lpa/M-3333-3333-3333");
 
-    cy.contains("Donor identity confirmation").click()
+    cy.contains("Donor identity confirmation").click();
 
-    cy.contains("Donor unable to attempt online ID check on 1 July 2024 - Post Office to check identity")
-  })
+    cy.contains(
+      "Donor unable to attempt online ID check on 1 July 2024 - Post Office to check identity",
+    );
+  });
 
   it("shows unable to attempt paper ID check PI content", () => {
     const mocks = Promise.allSettled([
@@ -78,11 +80,11 @@ describe("View the application progress for a digital LPA", () => {
           application: {
             source: "PHONE",
             donorIdentityCheck: {
-              state: 'COUNTER_SERVICE_STARTED',
-              checkedAt: '2024-07-01T16:06:08Z',
-              reference: '712254d5-4cf4-463c-96c1-67744b70043e'
+              state: "COUNTER_SERVICE_STARTED",
+              checkedAt: "2024-07-01T16:06:08Z",
+              reference: "712254d5-4cf4-463c-96c1-67744b70043e",
             },
-          }
+          },
         },
       }),
     ]);
@@ -91,8 +93,10 @@ describe("View the application progress for a digital LPA", () => {
 
     cy.visit("/lpa/M-3333-3333-3333");
 
-    cy.contains("Donor identity confirmation").click()
+    cy.contains("Donor identity confirmation").click();
 
-    cy.contains("Donor unable to attempt phone ID check on 1 July 2024 - Post Office to check identity")
-  })
+    cy.contains(
+      "Donor unable to attempt phone ID check on 1 July 2024 - Post Office to check identity",
+    );
+  });
 });
