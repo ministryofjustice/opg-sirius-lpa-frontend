@@ -84,7 +84,68 @@ describe("View the application progress for a digital LPA", () => {
           status: "COMPLETE",
         },
       ]),
+
+      digitalLpas.get("M-5555-5555-5555", {
+        "opg.poas.sirius": {
+          id: 5555,
+          application: {
+            source: "APPLICANT",
+            donorIdentityCheck: {
+              state: "VOUCH_STARTED",
+              checkedAt: "2024-07-01T16:06:08Z",
+              reference: "712254d5-4cf4-463c-96c1-67744b70043e",
+            },
+          },
+        },
+        "opg.poas.lpastore": {
+          channel: "paper",
+        },
+      }),
+      cases.warnings.empty("5555"),
+      cases.tasks.empty("5555"),
+      digitalLpas.objections.empty("M-5555-5555-5555"),
+      digitalLpas.progressIndicators.feesInProgress("M-5555-5555-5555"),
+      digitalLpas.progressIndicators.defaultCannotStart("M-5555-5555-5555", [
+        {
+          indicator: "DONOR_ID",
+          status: "IN_PROGRESS",
+        },
+      ]),
+
+      digitalLpas.get("M-6666-6666-6666", {
+        "opg.poas.sirius": {
+          id: 6666,
+          application: {
+            source: "APPLICANT",
+            donorIdentityCheck: {
+              state: "VOUCH_STARTED",
+              checkedAt: "2024-07-01T16:06:08Z",
+              reference: "712254d5-4cf4-463c-96c1-67744b70043e",
+            },
+          },
+        },
+        "opg.poas.lpastore": {
+          channel: "paper",
+        },
+      }),
+      cases.warnings.empty("6666"),
+      cases.tasks.empty("6666"),
+      digitalLpas.objections.empty("M-6666-6666-6666"),
+      digitalLpas.progressIndicators.feesInProgress("M-6666-6666-6666"),
+      digitalLpas.progressIndicators.defaultCannotStart("M-6666-6666-6666", [
+        {
+          indicator: "DONOR_ID",
+          status: "IN_PROGRESS",
+        },
+      ])
     ]);
+
+    cy.addMock("/lpa-api/v1/lpas/1111/documents?systemType[]=DLP-VOUCH-INVITE&direction=1", "GET", {status: 200, body: []});
+    cy.addMock("/lpa-api/v1/lpas/2222/documents?systemType[]=DLP-VOUCH-INVITE&direction=1", "GET", {status: 200, body: []});
+    cy.addMock("/lpa-api/v1/lpas/3333/documents?systemType[]=DLP-VOUCH-INVITE&direction=1", "GET", {status: 200, body: []});
+    cy.addMock("/lpa-api/v1/lpas/4444/documents?systemType[]=DLP-VOUCH-INVITE&direction=1", "GET", {status: 200, body: []});
+    cy.addMock("/lpa-api/v1/lpas/5555/documents?systemType[]=DLP-VOUCH-INVITE&direction=1", "GET", {status: 200, body: []});
+    cy.addMock("/lpa-api/v1/lpas/6666/documents?systemType[]=DLP-VOUCH-INVITE&direction=1", "GET", {status: 200, body: [{"CreatedDate": "03/07/2025 16:05:40"}]});
 
     cy.wrap(mocks);
 
@@ -146,4 +207,22 @@ describe("View the application progress for a digital LPA", () => {
 
     cy.contains("Passed phone identity check on 29 June 2025");
   });
+
+  it("shows vouching started content, waiting to send letter", () => {
+    cy.visit("/lpa/M-5555-5555-5555");
+
+    cy.contains("Donor identity confirmation").click();
+
+    cy.contains("Donor unable to attempt online ID check on 1 July 2024 - vouching request on hold until the is LPA received by OPG");
+  });
+
+  it("shows vouching started content, sent letter", () => {
+    cy.visit("/lpa/M-6666-6666-6666");
+
+    cy.contains("Donor identity confirmation").click();
+
+    cy.contains("Donor unable to attempt online ID check on 1 July 2024 - vouching request posted on");
+  });
+
+
 });
