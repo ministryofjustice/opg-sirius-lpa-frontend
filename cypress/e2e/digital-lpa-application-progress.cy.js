@@ -54,25 +54,25 @@ describe("View the application progress for a digital LPA", () => {
             },
         },
         "opg.poas.lpastore": {
-            channel: "paper",
-            donor: {
-                lastName: "Rubix",
-                uid: "5ff557dd-1e27-4426-9681-ed6e90c2c08d",
-                address: {
-                    postcode: "W8A 0IK",
-                    country: "GB",
-                    town: "Edinburgh",
-                    line1: "1 Scotland Street",
-                },
-                dateOfBirth: "1938-03-18",
-                firstNames: "Jack",
-                contactLanguagePreference: "en",
-                identityCheck: {
-                    type: "opg-paper-id",
-                    checkedAt: "2025-06-29T15:06:29Z",
-                },
-                email: "jrubix@mail.example",
+          channel: "paper",
+          donor: {
+            lastName: "Rubix",
+            uid: "5ff557dd-1e27-4426-9681-ed6e90c2c08d",
+            address: {
+              postcode: "W8A 0IK",
+              country: "GB",
+              town: "Edinburgh",
+              line1: "1 Scotland Street",
             },
+            dateOfBirth: "1938-03-18",
+            firstNames: "Jack",
+            contactLanguagePreference: "en",
+            identityCheck: {
+              type: "opg-paper-id",
+              checkedAt: "2025-06-29T15:06:29Z",
+            },
+            email: "jrubix@mail.example",
+          },
         },
       }),
       cases.warnings.empty("4444"),
