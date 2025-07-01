@@ -11,7 +11,7 @@ services:
       SIRIUS_PUBLIC_URL: http://localhost:8080
 
   sirius-mock:
-    image: wiremock/wiremock:3.13.0
+    image: wiremock/wiremock:3.13.1
     ports: ["8563:8080"]
     volumes:
       - "./cypress/mocks:/home/wiremock/mappings"
@@ -76,7 +76,7 @@ services:
       - TRIVY_PASSWORD=${DOCKER_PASSWORD}
 
   cypress:
-    image: cypress/included:14.4.1
+    image: cypress/included:14.5.0
     command: run --browser chrome
     entrypoint: cypress
     depends_on:
