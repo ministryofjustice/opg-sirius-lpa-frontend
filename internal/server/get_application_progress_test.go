@@ -35,6 +35,11 @@ func TestGetApplicationProgressSuccess(t *testing.T) {
 				Subtype: "hw",
 				Application: sirius.Draft{
 					Source: "APPLICANT",
+					DonorIdentityCheck: &sirius.DonorIdentityCheck{
+						State:     "SUCCESS",
+						CheckedAt: "2025-06-28T16:06:08Z",
+						Reference: "712254d5-4cf4-463c-96c1-67744b70043e",
+					},
 				},
 			},
 			LpaStoreData: sirius.LpaStoreData{
@@ -97,11 +102,13 @@ func TestGetApplicationProgressSuccess(t *testing.T) {
 
 	indicatorView := []IndicatorView{
 		{
-			UID:                        "M-9876-9876-9876",
-			ProgressIndicator:          progressIndicators[0],
-			CertificateProviderChannel: "Paper",
-			CertificateProviderName:    "Fake Provider",
-			ApplicationSource:          "APPLICANT",
+			UID:                         "M-9876-9876-9876",
+			ProgressIndicator:           progressIndicators[0],
+			CertificateProviderChannel:  "Paper",
+			CertificateProviderName:     "Fake Provider",
+			ApplicationSource:           "APPLICANT",
+			DonorIdentityCheckState:     "SUCCESS",
+			DonorIdentityCheckCheckedAt: "2025-06-28T16:06:08Z",
 		},
 	}
 
