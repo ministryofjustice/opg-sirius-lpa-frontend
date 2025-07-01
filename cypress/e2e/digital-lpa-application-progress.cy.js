@@ -36,19 +36,19 @@ describe("View the application progress for a digital LPA", () => {
             lastName: "Rubix",
             uid: "5ff557dd-1e27-4426-9681-ed6e90c2c08d",
             address: {
-              "postcode": "W8A 0IK",
-              "country": "GB",
-              "town": "Edinburgh",
-              "line1": "1 Scotland Street"
+              postcode: "W8A 0IK",
+              country: "GB",
+              town: "Edinburgh",
+              line1: "1 Scotland Street",
             },
             dateOfBirth: "1938-03-18",
             firstNames: "Jack",
             contactLanguagePreference: "en",
             identityCheck: {
               type: "opg-paper-id",
-              checkedAt: "2025-06-29T15:06:29Z"
+              checkedAt: "2025-06-29T15:06:29Z",
             },
-            email: "jrubix@mail.example"
+            email: "jrubix@mail.example",
           },
         },
       }),
@@ -83,8 +83,6 @@ describe("View the application progress for a digital LPA", () => {
 
     cy.contains("Donor identity confirmation").click();
 
-    cy.contains(
-        "Passed phone identity check on 29 June 2025",
-    );
+    cy.contains("Passed phone identity check on 29 June 2025");
   });
 });
