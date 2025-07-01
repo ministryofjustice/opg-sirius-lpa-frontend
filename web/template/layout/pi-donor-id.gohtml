@@ -2,10 +2,10 @@
     <tr class="govuk-table__row">
         {{ if (eq .DonorIdentityCheckState "COUNTER_SERVICE_STARTED") }}
             <td>
-                {{ if not (eq .ApplicationSource "PHONE") }}
-                    Donor unable to attempt online ID check on {{ parseAndFormatDate .DonorIdentityCheckCheckedAt "2006-01-02T15:04:05Z" "2 January 2006" }} - Post Office to check identity
-                {{ else }}
+                {{ if eq .ApplicationSource "PHONE" }}
                     Donor unable to attempt phone ID check on {{ parseAndFormatDate .DonorIdentityCheckCheckedAt "2006-01-02T15:04:05Z" "2 January 2006" }} - Post Office to check identity
+                {{ else }}
+                    Donor unable to attempt online ID check on {{ parseAndFormatDate .DonorIdentityCheckCheckedAt "2006-01-02T15:04:05Z" "2 January 2006" }} - Post Office to check identity
                 {{ end }}
             </td>
         {{ else }}
