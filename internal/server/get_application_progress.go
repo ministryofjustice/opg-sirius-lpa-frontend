@@ -53,7 +53,9 @@ func GetApplicationProgressDetails(client GetApplicationProgressClient, tmpl tem
 			var donorIdentityCheckState string
 			var donorIdentityCheckCheckedAt string
 
-			if cs.DigitalLpa.SiriusData.Application.DonorIdentityCheck != nil {
+			if cs.DigitalLpa.LpaStoreData.Donor.IdentityCheck != nil {
+				donorIdentityCheckCheckedAt = cs.DigitalLpa.LpaStoreData.Donor.IdentityCheck.CheckedAt
+			} else if cs.DigitalLpa.SiriusData.Application.DonorIdentityCheck != nil {
 				donorIdentityCheckState = cs.DigitalLpa.SiriusData.Application.DonorIdentityCheck.State
 				donorIdentityCheckCheckedAt = cs.DigitalLpa.SiriusData.Application.DonorIdentityCheck.CheckedAt
 			}

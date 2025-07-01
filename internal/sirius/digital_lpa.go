@@ -63,11 +63,17 @@ type LpaStoreData struct {
 	SignedAt                                    string                      `json:"signedAt"`
 }
 
+type ActorIdentityCheck struct {
+	CheckedAt string `json:"checkedAt"`
+	Type      string `json:"type"`
+}
+
 type LpaStoreDonor struct {
 	LpaStorePerson
-	DateOfBirth               string `json:"dateOfBirth"`
-	OtherNamesKnownBy         string `json:"otherNamesKnownBy"`
-	ContactLanguagePreference string `json:"contactLanguagePreference"`
+	DateOfBirth               string              `json:"dateOfBirth"`
+	OtherNamesKnownBy         string              `json:"otherNamesKnownBy"`
+	ContactLanguagePreference string              `json:"contactLanguagePreference"`
+	IdentityCheck             *ActorIdentityCheck `json:"identityCheck"`
 }
 
 type LpaStoreAttorney struct {

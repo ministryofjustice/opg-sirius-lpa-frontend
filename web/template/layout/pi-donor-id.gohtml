@@ -8,6 +8,10 @@
                     Donor unable to attempt online ID check on {{ parseAndFormatDate .DonorIdentityCheckCheckedAt "2006-01-02T15:04:05Z" "2 January 2006" }} - Post Office to check identity
                 {{ end }}
             </td>
+        {{ else if (eq .Status "COMPLETE") }}
+            <td>
+                Passed phone identity check on {{ parseAndFormatDate .DonorIdentityCheckCheckedAt "2006-01-02T15:04:05Z" "2 January 2006" }}
+            </td>
         {{ else }}
             <th scope="row" class="govuk-table__header">Progress</th>
             <td class="govuk-table__cell">{{ progressIndicatorStatus .Status }}</td>
