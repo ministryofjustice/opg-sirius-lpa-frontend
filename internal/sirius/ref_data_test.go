@@ -308,6 +308,35 @@ func TestRefDataByCategory(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "Attorney removed reason category",
+			category: AttorneyRemovedReasonCategory,
+			setup: func() {
+				pact.
+					AddInteraction().
+					UponReceiving("A request for attorney removed reason category ref data").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodGet,
+						Path:   matchers.String(fmt.Sprintf("/lpa-api/v1/reference-data/%s", AttorneyRemovedReasonCategory)),
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status: http.StatusOK,
+						Body: matchers.EachLike(map[string]interface{}{
+							"handle":        matchers.String("BANKRUPT"),
+							"label":         matchers.String("Bankrupt"),
+							"ValidSubTypes": matchers.EachLike("property-and-affairs", 1),
+						}, 1),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+					})
+			},
+			expectedResponse: []RefDataItem{
+				{
+					Handle:        "BANKRUPT",
+					Label:         "Bankrupt",
+					ValidSubTypes: []string{"property-and-affairs"},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {

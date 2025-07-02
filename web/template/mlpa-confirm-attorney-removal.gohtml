@@ -20,6 +20,7 @@
           <input type="hidden" name="enabledAttorney" value="{{ $enabledAttUid }}"/>
         {{ end }}
         <input type="hidden" name="skipEnableAttorney" value="{{ .Form.SkipEnableAttorney }}"/>
+        <input type="hidden" name="removedReason" value="{{ .RemovedReason.Handle }}">
         <input type="hidden" name="confirmRemoval"/>
 
         <div class="govuk-form-group{{ if .Error.Field.removeAttorney }} govuk-form-group--error{{ end }}">
@@ -41,6 +42,13 @@
                   {{ if not (eq .RemovedAttorneysDetails.SelectedAttorneyDob "") }}
                     {{ parseAndFormatDate .RemovedAttorneysDetails.SelectedAttorneyDob "2006-01-02" "2 January 2006" }}
                   {{ end }}
+                </dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Reason</dt>
+                <dd class="govuk-summary-list__value">
+                  {{ .RemovedReason.Label }}
                 </dd>
               </div>
             </dl>

@@ -5,8 +5,9 @@ import (
 )
 
 type AttorneyUpdatedStatus struct {
-	UID    string `json:"uid"`
-	Status string `json:"status"`
+	UID           string `json:"uid"`
+	Status        string `json:"status"`
+	RemovedReason string `json:"removedReason"`
 }
 
 type attorneyStatusRequest struct {
