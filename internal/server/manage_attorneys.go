@@ -48,6 +48,9 @@ func ManageAttorneys(client ManageAttorneysClient, tmpl template.Template) Handl
 			case "enable-replacement-attorney":
 				redirectUrl = fmt.Sprintf("/lpa/%s/enable-replacement-attorney", caseSummary.DigitalLpa.UID)
 
+			case "manage-decisions":
+				redirectUrl = fmt.Sprintf("/lpa/%s/manage-attorney-decisions", caseSummary.DigitalLpa.UID)
+
 			default:
 				w.WriteHeader(http.StatusBadRequest)
 

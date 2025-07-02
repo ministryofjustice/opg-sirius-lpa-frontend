@@ -79,6 +79,7 @@ type LpaStoreAttorney struct {
 	ContactLanguagePreference string `json:"contactLanguagePreference"`
 	SignedAt                  string `json:"signedAt"`
 	Email                     string `json:"email"`
+	Decisions                 bool   `json:"cannotMakeJointDecisions,omitempty"`
 }
 
 type LpaStoreCertificateProvider struct {
