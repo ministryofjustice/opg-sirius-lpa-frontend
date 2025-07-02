@@ -13,6 +13,34 @@
 
             <h1 class="govuk-heading-l app-!-embedded-hide">Manage decisions - attorneys who cannot act jointly</h1>
 
+
+            <div class="govuk-body">
+                <label class="govuk-label">
+                    <strong>Attorneys appointment type</strong>
+                </label>
+                <div class="govuk-input__wrapper">
+                    <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm .CaseSummary.DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions }}</p>
+                </div>
+
+                <label class="govuk-label">
+                    <strong>Replacement attorney appointment type</strong>
+                </label>
+                <div class="govuk-input__wrapper">
+                    <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm .CaseSummary.DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions }}</p>
+                </div>
+
+                <label class="govuk-label">
+                    <strong>Restrictions and conditions</strong>
+                </label>
+                <div class="govuk-input__wrapper">
+                    {{ if .CaseSummary.DigitalLpa.LpaStoreData.RestrictionsAndConditions }}
+                        <p class="app-newlines-as-br">{{ .CaseSummary.DigitalLpa.LpaStoreData.RestrictionsAndConditions }}</p>
+                    {{ end }}
+                </div>
+            </div>
+
+
+
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
 
