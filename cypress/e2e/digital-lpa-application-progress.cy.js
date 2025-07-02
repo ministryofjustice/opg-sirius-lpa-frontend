@@ -27,18 +27,18 @@ describe("View the application progress for a digital LPA", () => {
 
       digitalLpas.get("M-3333-3333-3333", {
         "opg.poas.sirius": {
-            id: 3333,
-            application: {
-                source: "paper",
-                donorIdentityCheck: {
-                    state: "COUNTER_SERVICE_STARTED",
-                    checkedAt: "2024-07-01T16:06:08Z",
-                    reference: "712254d5-4cf4-463c-96c1-67744b70043e",
-                },
+          id: 3333,
+          application: {
+            source: "APPLICANT",
+            donorIdentityCheck: {
+              state: "COUNTER_SERVICE_STARTED",
+              checkedAt: "2024-07-01T16:06:08Z",
+              reference: "712254d5-4cf4-463c-96c1-67744b70043e",
             },
+          },
         },
         "opg.poas.lpastore": {
-            channel: "paper",
+          channel: "paper",
         },
       }),
       cases.warnings.empty("3333"),
@@ -48,10 +48,10 @@ describe("View the application progress for a digital LPA", () => {
 
       digitalLpas.get("M-4444-4444-4444", {
         "opg.poas.sirius": {
-            id: 4444,
-            application: {
-                source: "paper",
-            },
+          id: 4444,
+          application: {
+            source: "PHONE",
+          },
         },
         "opg.poas.lpastore": {
           channel: "paper",
@@ -80,8 +80,8 @@ describe("View the application progress for a digital LPA", () => {
       digitalLpas.objections.empty("M-4444-4444-4444"),
       digitalLpas.progressIndicators.defaultCannotStart("M-4444-4444-4444", [
         {
-            indicator: "DONOR_ID",
-            status: "COMPLETE",
+          indicator: "DONOR_ID",
+          status: "COMPLETE",
         },
       ]),
     ]);
@@ -107,25 +107,25 @@ describe("View the application progress for a digital LPA", () => {
     cy.contains("Donor identity confirmation").click();
 
     cy.contains(
-        "Donor unable to attempt online ID check on 1 July 2024 - Post Office to check identity",
+      "Donor unable to attempt online ID check on 1 July 2024 - Post Office to check identity",
     );
   });
 
   it("shows unable to attempt paper ID check PI content", () => {
     const mocks = Promise.allSettled([
-        digitalLpas.get("M-3333-3333-3333", {
-            "opg.poas.sirius": {
-                id: 3333,
-                application: {
-                    source: "PHONE",
-                    donorIdentityCheck: {
-                        state: "COUNTER_SERVICE_STARTED",
-                        checkedAt: "2024-07-01T16:06:08Z",
-                        reference: "712254d5-4cf4-463c-96c1-67744b70043e",
-                    },
-                },
+      digitalLpas.get("M-3333-3333-3333", {
+        "opg.poas.sirius": {
+          id: 3333,
+          application: {
+            source: "PHONE",
+            donorIdentityCheck: {
+              state: "COUNTER_SERVICE_STARTED",
+              checkedAt: "2024-07-01T16:06:08Z",
+              reference: "712254d5-4cf4-463c-96c1-67744b70043e",
             },
-        }),
+          },
+        },
+      }),
     ]);
 
     cy.wrap(mocks);
@@ -135,7 +135,7 @@ describe("View the application progress for a digital LPA", () => {
     cy.contains("Donor identity confirmation").click();
 
     cy.contains(
-        "Donor unable to attempt phone ID check on 1 July 2024 - Post Office to check identity",
+      "Donor unable to attempt phone ID check on 1 July 2024 - Post Office to check identity",
     );
   });
 
