@@ -29,7 +29,7 @@ describe("View the application progress for a digital LPA", () => {
         "opg.poas.sirius": {
           id: 3333,
           application: {
-            source: "paper",
+            source: "APPLICANT",
             donorIdentityCheck: {
               state: "COUNTER_SERVICE_STARTED",
               checkedAt: "2024-07-01T16:06:08Z",
@@ -45,6 +45,45 @@ describe("View the application progress for a digital LPA", () => {
       cases.tasks.empty("3333"),
       digitalLpas.objections.empty("M-3333-3333-3333"),
       digitalLpas.progressIndicators.feesInProgress("M-3333-3333-3333"),
+
+      digitalLpas.get("M-4444-4444-4444", {
+        "opg.poas.sirius": {
+          id: 4444,
+          application: {
+            source: "PHONE",
+          },
+        },
+        "opg.poas.lpastore": {
+          channel: "paper",
+          donor: {
+            lastName: "Rubix",
+            uid: "5ff557dd-1e27-4426-9681-ed6e90c2c08d",
+            address: {
+              postcode: "W8A 0IK",
+              country: "GB",
+              town: "Edinburgh",
+              line1: "1 Scotland Street",
+            },
+            dateOfBirth: "1938-03-18",
+            firstNames: "Jack",
+            contactLanguagePreference: "en",
+            identityCheck: {
+              type: "opg-paper-id",
+              checkedAt: "2025-06-29T15:06:29Z",
+            },
+            email: "jrubix@mail.example",
+          },
+        },
+      }),
+      cases.warnings.empty("4444"),
+      cases.tasks.empty("4444"),
+      digitalLpas.objections.empty("M-4444-4444-4444"),
+      digitalLpas.progressIndicators.defaultCannotStart("M-4444-4444-4444", [
+        {
+          indicator: "DONOR_ID",
+          status: "COMPLETE",
+        },
+      ]),
     ]);
 
     cy.wrap(mocks);
@@ -98,5 +137,13 @@ describe("View the application progress for a digital LPA", () => {
     cy.contains(
       "Donor unable to attempt phone ID check on 1 July 2024 - Post Office to check identity",
     );
+  });
+
+  it("shows complete Donor identity confirmation progress indicator", () => {
+    cy.visit("/lpa/M-4444-4444-4444");
+
+    cy.contains("Donor identity confirmation").click();
+
+    cy.contains("Passed phone identity check on 29 June 2025");
   });
 });
