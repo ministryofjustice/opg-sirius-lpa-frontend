@@ -14,6 +14,12 @@ type AttorneyDecisionsClient interface {
 	ManageAttorneyDecisions(sirius.Context, string, []sirius.AttorneyDecisions) error
 }
 
+type AttorneyDetails struct {
+	AttorneyName    string
+	AttorneyDob     string
+	AppointmentType string
+}
+
 type formManageAttorneyDecisions struct {
 	DecisionAttorneysUids                 []string `form:"decisionAttorney"`
 	JointDecisionsCanBeMadeByAllAttorneys string   `form:"allAttorneysCanMakeDecisions"`
@@ -24,13 +30,13 @@ type manageAttorneyDecisionsData struct {
 	CaseSummary              sirius.CaseSummary
 	ActiveAttorneys          []sirius.LpaStoreAttorney
 	Form                     formManageAttorneyDecisions
-	DecisionAttorneysDetails []SelectedAttorneyDetails
+	DecisionAttorneysDetails []AttorneyDetails
 	Success                  bool
 	Error                    sirius.ValidationError
 	XSRFToken                string
 }
 
-func AttorneyDecisions(client AttorneyDecisionsClient, removeTmpl template.Template) Handler {
+func AttorneyDecisions(client AttorneyDecisionsClient, decisionTmpl template.Template, confirmTmpl template.Template) Handler {
 
 	return func(w http.ResponseWriter, r *http.Request) error {
 		uid := r.PathValue("uid")
@@ -63,37 +69,81 @@ func AttorneyDecisions(client AttorneyDecisionsClient, removeTmpl template.Templ
 				return err
 			}
 
-			var attorneyDecisions []sirius.AttorneyDecisions
+			err = decoder.Decode(&data.Form, r.PostForm)
+			if err != nil {
+				return err
+			}
 
-			if len(data.Form.DecisionAttorneysUids) > 0 {
-				for _, att := range data.ActiveAttorneys {
-					for _, enabledAttUid := range data.Form.DecisionAttorneysUids {
-						if att.Uid == enabledAttUid {
+			if (len(data.Form.DecisionAttorneysUids) == 0 && !postFormCheckboxChecked(r, "skipDecisionAttorney", "yes")) ||
+				(len(data.Form.DecisionAttorneysUids) > 0 && postFormCheckboxChecked(r, "skipDecisionAttorney", "yes")) {
+				data.Error.Field["decisionAttorney"] = map[string]string{
+					"reason": "Select who cannot make joint decisions, or select 'Joint decisions can be made by all attorneys'",
+				}
+			}
+
+			if !data.Error.Any() {
+				if !postFormKeySet(r, "confirmDecisions") {
+
+					if len(data.Form.DecisionAttorneysUids) > 0 {
+						for _, att := range data.ActiveAttorneys {
+							for _, enabledAttUid := range data.Form.DecisionAttorneysUids {
+								if att.Uid == enabledAttUid {
+									data.DecisionAttorneysDetails = append(data.DecisionAttorneysDetails, AttorneyDetails{
+										AttorneyName:    att.FirstNames + " " + att.LastName,
+										AttorneyDob:     att.DateOfBirth,
+										AppointmentType: att.AppointmentType,
+									})
+									break
+								}
+							}
+						}
+					}
+
+					return confirmTmpl(w, data)
+				} else {
+					var attorneyDecisions []sirius.AttorneyDecisions
+
+					if data.Form.SkipDecisionAttorney == "yes" {
+						for _, att := range data.ActiveAttorneys {
 							attorneyDecisions = append(attorneyDecisions, sirius.AttorneyDecisions{
 								UID:                      att.Uid,
-								CannotMakeJointDecisions: true,
+								CannotMakeJointDecisions: false,
 							})
 						}
+					} else {
+						for _, att := range data.ActiveAttorneys {
+							isChecked := false
+							for _, selectedUid := range data.Form.DecisionAttorneysUids {
+								if selectedUid == att.Uid {
+									isChecked = true
+									break
+								}
+							}
+							attorneyDecisions = append(attorneyDecisions, sirius.AttorneyDecisions{
+								UID:                      att.Uid,
+								CannotMakeJointDecisions: isChecked,
+							})
+						}
+					}
+
+					err = client.ManageAttorneyDecisions(ctx, uid, attorneyDecisions)
+
+					if ve, ok := err.(sirius.ValidationError); ok {
+						w.WriteHeader(http.StatusBadRequest)
+						data.Error = ve
+					} else if err != nil {
+						return err
+					} else {
+						data.Success = true
+
+						SetFlash(w, FlashNotification{Title: "Update saved"})
+						return RedirectError(fmt.Sprintf("/lpa/%s", uid))
 					}
 				}
 			}
 
-			err = client.ManageAttorneyDecisions(ctx, uid, attorneyDecisions)
-
-			if ve, ok := err.(sirius.ValidationError); ok {
-				w.WriteHeader(http.StatusBadRequest)
-				data.Error = ve
-			} else if err != nil {
-				return err
-			} else {
-				data.Success = true
-
-				SetFlash(w, FlashNotification{Title: "Update saved"})
-				return RedirectError(fmt.Sprintf("/lpa/%s", uid))
-			}
-
 		}
 
-		return removeTmpl(w, data)
+		return decisionTmpl(w, data)
 	}
 }

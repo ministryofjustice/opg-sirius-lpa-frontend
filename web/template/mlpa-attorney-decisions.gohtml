@@ -58,6 +58,9 @@
                                                {{ if contains $.Form.DecisionAttorneysUids $activeAttorney.Uid }}checked{{ end }}>
                                         <label class="govuk-label govuk-checkboxes__label" for="f-activeAttorney-{{ plusN $idx 1 }}">
                                             {{ $activeAttorney.FirstNames }} {{ $activeAttorney.LastName }}
+                                            {{ if eq $activeAttorney.AppointmentType "original" }} (attorney)
+                                            {{ else }} (previously replacement attorney)
+                                            {{ end }}
                                             <br>
                                             {{ if not (eq $activeAttorney.DateOfBirth "") }}
                                                 {{ parseAndFormatDate $activeAttorney.DateOfBirth "2006-01-02" "2 January 2006" }}
