@@ -74,3 +74,24 @@ func (c *Client) DocumentByUUID(ctx Context, uuid string) (Document, error) {
 
 	return d, err
 }
+
+func (c *Client) OutgoingDocumentBySystemType(ctx Context, caseType CaseType, caseId int, systemType string) ([]Document, error) {
+	var d []Document
+
+	if caseType == CaseTypeDigitalLpa {
+		caseType = CaseTypeLpa
+	}
+
+	url := fmt.Sprintf("/lpa-api/v1/%s/%d/documents?systemType[]=%s&direction=1", caseType+"s", caseId, systemType)
+
+	err := c.get(ctx, url, &d)
+	if err != nil {
+		return nil, err
+	}
+
+	sort.Slice(d, func(i, j int) bool {
+		return d[i].ID > d[j].ID
+	})
+
+	return d, err
+}
