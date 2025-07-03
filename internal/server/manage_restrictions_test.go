@@ -14,7 +14,7 @@ type mockManageRestrictionsClient struct {
 	mock.Mock
 }
 
-func (m *mockManageRestrictionsClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
+func (m *mockManageRestrictionsClient) CaseSummaryWithImages(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
 	args := m.Called(ctx, uid)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
@@ -139,7 +139,7 @@ func TestGetManageRestrictionsCases(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := &mockManageRestrictionsClient{}
 			client.
-				On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+				On("CaseSummaryWithImages", mock.Anything, "M-1111-2222-3333").
 				Return(tc.caseSummary, tc.expectedError)
 
 			template := &mockTemplate{}
@@ -194,7 +194,7 @@ func TestPostManageRestrictions(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := &mockManageRestrictionsClient{}
 			client.
-				On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+				On("CaseSummaryWithImages", mock.Anything, "M-1111-2222-3333").
 				Return(restrictionsCaseSummary, nil)
 
 			restrictionsData := manageRestrictionsData{
@@ -247,7 +247,7 @@ func TestPostManageRestrictionsRedirects(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := &mockManageRestrictionsClient{}
 			client.
-				On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+				On("CaseSummaryWithImages", mock.Anything, "M-1111-2222-3333").
 				Return(restrictionsCaseSummary, nil)
 
 			if tc.severanceAction == "severance-application-not-required" {
@@ -298,7 +298,7 @@ func TestPostManageRestrictionsWithSeveranceRequiredRedirects(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := &mockManageRestrictionsClient{}
 			client.
-				On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+				On("CaseSummaryWithImages", mock.Anything, "M-1111-2222-3333").
 				Return(restrictionsCaseSummaryWithSeveranceRequired, nil)
 
 			client.
@@ -349,7 +349,7 @@ func TestPostManageRestrictionsWithDonorConsentGivenRedirects(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := &mockManageRestrictionsClient{}
 			client.
-				On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+				On("CaseSummaryWithImages", mock.Anything, "M-1111-2222-3333").
 				Return(restrictionsCaseSummaryWithDonorConsentGiven, nil)
 
 			template := &mockTemplate{}
@@ -432,7 +432,7 @@ func TestPostManageRestrictionsWithRestrictionsUpdated(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := &mockManageRestrictionsClient{}
 			client.
-				On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+				On("CaseSummaryWithImages", mock.Anything, "M-1111-2222-3333").
 				Return(restrictionsCaseSummaryWithDonorConsentGiven, nil)
 
 			template := &mockTemplate{}
@@ -521,7 +521,7 @@ func TestPostManageRestrictionsWithCourtOrderInstructions(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := &mockManageRestrictionsClient{}
 			client.
-				On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+				On("CaseSummaryWithImages", mock.Anything, "M-1111-2222-3333").
 				Return(restrictionsCaseSummaryWithDonorConsentGiven, nil)
 
 			client.
