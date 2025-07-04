@@ -34,6 +34,12 @@
                   Enable replacement attorney
                 </label>
               </div>
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="f-attorneyActionManageDecisions" name="attorneyAction" type="radio" value="manage-decisions" {{ if eq "manage-decisions" .AttorneyAction }}checked{{ end }}>
+                <label class="govuk-label govuk-radios__label" for="f-manageDecisions">
+                  Manage decisions - attorneys who cannot act jointly
+                </label>
+              </div>
             </div>
           </fieldset>
         </div>

@@ -152,6 +152,10 @@ func TestPostManageAttorneysValidData(t *testing.T) {
 			attorneyAction:      "enable-replacement-attorney",
 			expectedRedirectUrl: "/lpa/M-1111-2222-3333/enable-replacement-attorney",
 		},
+		"Manage attorney decisions": {
+			attorneyAction:      "manage-decisions",
+			expectedRedirectUrl: "/lpa/M-1111-2222-3333/manage-attorney-decisions",
+		},
 	}
 
 	for name, tc := range testCases {
