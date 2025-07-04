@@ -2,6 +2,8 @@ package server
 
 import (
 	"net/http"
+	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
@@ -202,4 +204,141 @@ func TestGetManageAttorneyDecisionsTemplateErrors(t *testing.T) {
 	_, err := server.serve(req)
 
 	assert.Equal(t, errExample, err)
+}
+
+func TestPostManageAttorneyDecisionsInvalidData(t *testing.T) {
+	client := &mockManageAttorneyDecisionsClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-6666-6666-6666").
+		Return(manageAttorneyDecisionsSummary, nil)
+
+	formTemplate := &mockTemplate{}
+	formTemplate.
+		On("Func", mock.Anything, manageAttorneyDecisionsData{
+			CaseSummary:     manageAttorneyDecisionsSummary,
+			ActiveAttorneys: activeAttorneys,
+			Form: formManageAttorneyDecisions{
+				DecisionAttorneysUids: nil,
+				SkipDecisionAttorney:  "",
+			},
+			Error: sirius.ValidationError{Field: sirius.FieldErrors{
+				"decisionAttorney": {"reason": "Select who cannot make joint decisions, or select 'Joint decisions can be made by all attorneys'"},
+			}},
+		}).
+		Return(nil)
+
+	confirmTemplate := &mockTemplate{}
+
+	server := newMockServer("/lpa/{uid}/manage-attorney-decisions", AttorneyDecisions(client, formTemplate.Func, confirmTemplate.Func))
+
+	form := url.Values{}
+
+	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-6666-6666-6666/manage-attorney-decisions", strings.NewReader(form.Encode()))
+	req.Header.Add("Content-Type", formUrlEncoded)
+	resp, err := server.serve(req)
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.Code)
+	mock.AssertExpectationsForObjects(t, client, formTemplate)
+}
+
+func TestPostManageAttorneyDecisionsInvalidData2(t *testing.T) {
+	client := &mockManageAttorneyDecisionsClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-6666-6666-6666").
+		Return(manageAttorneyDecisionsSummary, nil)
+
+	formTemplate := &mockTemplate{}
+	formTemplate.
+		On("Func", mock.Anything, manageAttorneyDecisionsData{
+			CaseSummary:     manageAttorneyDecisionsSummary,
+			ActiveAttorneys: activeAttorneys,
+			Form: formManageAttorneyDecisions{
+				DecisionAttorneysUids: []string{"302b05c7-896c-4290-904e-2005e4f1e81e"},
+				SkipDecisionAttorney:  "yes",
+			},
+			Error: sirius.ValidationError{Field: sirius.FieldErrors{
+				"decisionAttorney": {"reason": "Select who cannot make joint decisions, or select 'Joint decisions can be made by all attorneys'"},
+			}},
+		}).
+		Return(nil)
+
+	confirmTemplate := &mockTemplate{}
+
+	server := newMockServer("/lpa/{uid}/manage-attorney-decisions", AttorneyDecisions(client, formTemplate.Func, confirmTemplate.Func))
+
+	form := url.Values{
+		"decisionAttorney":     {"302b05c7-896c-4290-904e-2005e4f1e81e"},
+		"skipDecisionAttorney": {"yes"},
+	}
+
+	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-6666-6666-6666/manage-attorney-decisions", strings.NewReader(form.Encode()))
+	req.Header.Add("Content-Type", formUrlEncoded)
+	resp, err := server.serve(req)
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.Code)
+	mock.AssertExpectationsForObjects(t, client, formTemplate)
+}
+
+func TestPostConfirmManageAttorneyDecisionsValidData(t *testing.T) {
+	client := &mockManageAttorneyDecisionsClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-6666-6666-6666").
+		Return(manageAttorneyDecisionsSummary, nil)
+
+	client.
+		On("ManageAttorneyDecisions", mock.Anything, "M-6666-6666-6666", []sirius.AttorneyDecisions{
+			{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", CannotMakeJointDecisions: true},
+			{UID: "987a01b1-456d-4567-813d-2010d3e2d72d", CannotMakeJointDecisions: false},
+		}).
+		Return(nil)
+
+	formTemplate := &mockTemplate{}
+	confirmTemplate := &mockTemplate{}
+
+	server := newMockServer("/lpa/{uid}/manage-attorney-decisions", AttorneyDecisions(client, formTemplate.Func, confirmTemplate.Func))
+
+	form := url.Values{
+		"decisionAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
+		"confirmDecisions": {""},
+	}
+
+	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-6666-6666-6666/manage-attorney-decisions", strings.NewReader(form.Encode()))
+	req.Header.Add("Content-Type", formUrlEncoded)
+	resp, err := server.serve(req)
+
+	assert.Equal(t, http.StatusOK, resp.Code)
+	assert.Equal(t, RedirectError("/lpa/M-6666-6666-6666"), err)
+}
+
+func TestPostConfirmManageAttorneyDecisionsValidDataSelectAllAttorneys(t *testing.T) {
+	client := &mockManageAttorneyDecisionsClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-6666-6666-6666").
+		Return(manageAttorneyDecisionsSummary, nil)
+
+	client.
+		On("ManageAttorneyDecisions", mock.Anything, "M-6666-6666-6666", []sirius.AttorneyDecisions{
+			{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", CannotMakeJointDecisions: false},
+			{UID: "987a01b1-456d-4567-813d-2010d3e2d72d", CannotMakeJointDecisions: false},
+		}).
+		Return(nil)
+
+	formTemplate := &mockTemplate{}
+	confirmTemplate := &mockTemplate{}
+
+	server := newMockServer("/lpa/{uid}/manage-attorney-decisions", AttorneyDecisions(client, formTemplate.Func, confirmTemplate.Func))
+
+	form := url.Values{
+		"skipDecisionAttorney": {"yes"},
+		"confirmDecisions":     {""},
+	}
+
+	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-6666-6666-6666/manage-attorney-decisions", strings.NewReader(form.Encode()))
+	req.Header.Add("Content-Type", formUrlEncoded)
+	resp, err := server.serve(req)
+
+	assert.Equal(t, http.StatusOK, resp.Code)
+	assert.Equal(t, RedirectError("/lpa/M-6666-6666-6666"), err)
 }

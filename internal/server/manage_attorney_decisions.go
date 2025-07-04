@@ -21,9 +21,8 @@ type AttorneyDetails struct {
 }
 
 type formManageAttorneyDecisions struct {
-	DecisionAttorneysUids                 []string `form:"decisionAttorney"`
-	JointDecisionsCanBeMadeByAllAttorneys string   `form:"allAttorneysCanMakeDecisions"`
-	SkipDecisionAttorney                  string   `form:"skipDecisionAttorney"`
+	DecisionAttorneysUids []string `form:"decisionAttorney"`
+	SkipDecisionAttorney  string   `form:"skipDecisionAttorney"`
 }
 
 type manageAttorneyDecisionsData struct {
@@ -63,11 +62,6 @@ func AttorneyDecisions(client AttorneyDecisionsClient, decisionTmpl template.Tem
 		}
 
 		if r.Method == http.MethodPost {
-
-			err = decoder.Decode(&data.Form, r.PostForm)
-			if err != nil {
-				return err
-			}
 
 			err = decoder.Decode(&data.Form, r.PostForm)
 			if err != nil {
