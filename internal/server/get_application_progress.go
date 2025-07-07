@@ -3,9 +3,8 @@ package server
 import (
 	"net/http"
 
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-
 	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
 type GetApplicationProgressClient interface {
@@ -14,10 +13,12 @@ type GetApplicationProgressClient interface {
 }
 
 type IndicatorView struct {
-	UID                        string
-	CertificateProviderName    string
-	CertificateProviderChannel string
-	ApplicationSource          string
+	UID                         string
+	CertificateProviderName     string
+	CertificateProviderChannel  string
+	ApplicationSource           string
+	DonorIdentityCheckState     string
+	DonorIdentityCheckCheckedAt string
 	sirius.ProgressIndicator
 }
 
@@ -49,12 +50,24 @@ func GetApplicationProgressDetails(client GetApplicationProgressClient, tmpl tem
 			return err
 		}
 		for _, v := range inds {
+			var donorIdentityCheckState string
+			var donorIdentityCheckCheckedAt string
+
+			if cs.DigitalLpa.LpaStoreData.Donor.IdentityCheck != nil {
+				donorIdentityCheckCheckedAt = cs.DigitalLpa.LpaStoreData.Donor.IdentityCheck.CheckedAt
+			} else if cs.DigitalLpa.SiriusData.Application.DonorIdentityCheck != nil {
+				donorIdentityCheckState = cs.DigitalLpa.SiriusData.Application.DonorIdentityCheck.State
+				donorIdentityCheckCheckedAt = cs.DigitalLpa.SiriusData.Application.DonorIdentityCheck.CheckedAt
+			}
+
 			data.ProgressIndicators = append(data.ProgressIndicators, IndicatorView{
-				UID:                        uid,
-				CertificateProviderName:    cpName,
-				ProgressIndicator:          v,
-				CertificateProviderChannel: cs.DigitalLpa.LpaStoreData.CertificateProvider.Channel,
-				ApplicationSource:          cs.DigitalLpa.SiriusData.Application.Source,
+				UID:                         uid,
+				CertificateProviderName:     cpName,
+				ProgressIndicator:           v,
+				CertificateProviderChannel:  cs.DigitalLpa.LpaStoreData.CertificateProvider.Channel,
+				ApplicationSource:           cs.DigitalLpa.SiriusData.Application.Source,
+				DonorIdentityCheckState:     donorIdentityCheckState,
+				DonorIdentityCheckCheckedAt: donorIdentityCheckCheckedAt,
 			})
 		}
 

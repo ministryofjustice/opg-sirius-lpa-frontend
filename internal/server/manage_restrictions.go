@@ -10,7 +10,7 @@ import (
 )
 
 type ManageRestrictionsClient interface {
-	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
+	CaseSummaryWithImages(sirius.Context, string) (sirius.CaseSummary, error)
 	ClearTask(sirius.Context, int) error
 	UpdateSeveranceStatus(sirius.Context, string, sirius.SeveranceStatusData) error
 	EditSeveranceApplication(sirius.Context, string, sirius.SeveranceApplication) error
@@ -57,7 +57,7 @@ func ManageRestrictions(client ManageRestrictionsClient, manageTmpl template.Tem
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		group.Go(func() error {
-			cs, err = client.CaseSummary(ctx.With(groupCtx), caseUID)
+			cs, err = client.CaseSummaryWithImages(ctx.With(groupCtx), caseUID)
 			if err != nil {
 				return err
 			}
