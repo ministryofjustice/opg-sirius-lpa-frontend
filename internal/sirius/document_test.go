@@ -249,7 +249,7 @@ func TestOutgoingDocumentBySystemType(t *testing.T) {
 		caseType         CaseType
 		setup            func()
 		expectedError    func(int) error
-		expectedResponse Document
+		expectedResponse []Document
 	}{
 		{
 			name:     "OK",
@@ -261,15 +261,15 @@ func TestOutgoingDocumentBySystemType(t *testing.T) {
 					UponReceiving("A request for outgoing documents for a digital LPA by case systemType").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   matchers.String("/lpa-api/v1/lpas/800/documents/"),
+						Path:   matchers.String("/lpa-api/v1/lpas/800/documents"),
 						Query: matchers.MapMatcher{
-							"systemType[]": matchers.Like("SYSTEM_TYPE"),
+							"systemType[]": matchers.Like("LP-A"),
 							"direction":    matchers.Like("1"),
 						},
 					}).
 					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body: matchers.Like(map[string]interface{}{
+						Body: matchers.EachLike(map[string]interface{}{
 							"id":                  matchers.Like(1),
 							"uuid":                matchers.String("dfef6714-b4fe-44c2-b26e-90dfe3663e95"),
 							"type":                matchers.String("Draft"),
@@ -284,23 +284,25 @@ func TestOutgoingDocumentBySystemType(t *testing.T) {
 							"childCount": matchers.Like(0),
 							"systemType": matchers.String("LP-A"),
 							"content":    matchers.String("Test content"),
-						}),
+						}, 1),
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
-			expectedResponse: Document{
-				ID:                  1,
-				UUID:                "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-				Type:                "Draft",
-				FriendlyDescription: "Dr Consuela Aysien - LPA perfect + reg due date: applicant",
-				CreatedDate:         "15/12/2022 13:41:04",
-				Direction:           "Outgoing",
-				MimeType:            `application\/pdf`,
-				SystemType:          "LP-A",
-				FileName:            "LP-A.pdf",
-				Content:             "Test content",
-				Correspondent:       Person{ID: 189},
-				ChildCount:          0,
+			expectedResponse: []Document{
+				{
+					ID:                  1,
+					UUID:                "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+					Type:                "Draft",
+					FriendlyDescription: "Dr Consuela Aysien - LPA perfect + reg due date: applicant",
+					CreatedDate:         "15/12/2022 13:41:04",
+					Direction:           "Outgoing",
+					MimeType:            `application\/pdf`,
+					SystemType:          "LP-A",
+					FileName:            "LP-A.pdf",
+					Content:             "Test content",
+					Correspondent:       Person{ID: 189},
+					ChildCount:          0,
+				},
 			},
 		},
 	}
