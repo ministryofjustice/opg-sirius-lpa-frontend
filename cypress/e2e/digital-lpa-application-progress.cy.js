@@ -218,7 +218,7 @@ describe("View the application progress for a digital LPA", () => {
     cy.contains("Donor identity confirmation").click();
 
     cy.contains(
-      "Donor unable to attempt online ID check on 1 July 2024 - vouching request on hold until the is LPA received by OPG",
+      "Donor unable to attempt online ID check on 1 July 2024 - vouching request on hold until the LPA is received by OPG",
     );
   });
 
