@@ -218,12 +218,18 @@
               </div>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Last name</dt>
-                <dd class="govuk-summary-list__value">{{ .DigitalLpa.SiriusData.Application.CorrespondentLastName }}</dd>
+                <dd class="govuk-summary-list__value">
+                  {{ if (ne .DigitalLpa.SiriusData.Application.CorrespondentFirstNames "")}}
+                    {{ .DigitalLpa.SiriusData.Application.CorrespondentLastName }}
+                  {{ end }}
+                </dd>
               </div>
               <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
                 <dt class="govuk-summary-list__key">Address</dt>
                 <dd class="govuk-summary-list__value">
-                  {{ template "mlpa-address" .DigitalLpa.SiriusData.Application.CorrespondentAddress }}
+                  {{ if (ne .DigitalLpa.SiriusData.Application.CorrespondentFirstNames "")}}
+                    {{ template "mlpa-address" .DigitalLpa.SiriusData.Application.CorrespondentAddress }}
+                  {{ end }}
                 </dd>
               </div>
             </dl>

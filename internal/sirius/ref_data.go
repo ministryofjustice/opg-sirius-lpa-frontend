@@ -5,18 +5,19 @@ import (
 )
 
 const (
-	PaymentSourceCategory      string = "paymentSource"
-	WarningTypeCategory        string = "warningType"
-	FeeReductionTypeCategory   string = "feeReductionType"
-	PaymentReferenceType       string = "paymentReferenceType"
-	DocumentTemplateIdCategory string = "documentTemplateId"
-	ComplainantCategory        string = "complainantCategory"
-	ComplaintOrigin            string = "complaintOrigin"
-	CompensationType           string = "compensationType"
-	ComplaintCategory          string = "complaintCategory"
-	CountryCategory            string = "country"
-	FeeDecisionTypeCategory    string = "feeDecisionType"
-	CaseStatusChangeReason     string = "caseChangeReason"
+	PaymentSourceCategory         string = "paymentSource"
+	WarningTypeCategory           string = "warningType"
+	FeeReductionTypeCategory      string = "feeReductionType"
+	PaymentReferenceType          string = "paymentReferenceType"
+	DocumentTemplateIdCategory    string = "documentTemplateId"
+	ComplainantCategory           string = "complainantCategory"
+	ComplaintOrigin               string = "complaintOrigin"
+	CompensationType              string = "compensationType"
+	ComplaintCategory             string = "complaintCategory"
+	CountryCategory               string = "country"
+	FeeDecisionTypeCategory       string = "feeDecisionType"
+	CaseStatusChangeReason        string = "caseChangeReason"
+	AttorneyRemovedReasonCategory string = "attorneyRemovedReason"
 )
 
 type RefDataItem struct {
@@ -25,6 +26,7 @@ type RefDataItem struct {
 	UserSelectable bool          `json:"userSelectable"`
 	Subcategories  []RefDataItem `json:"subcategories"`
 	ParentSources  []string      `json:"parentSources"`
+	ValidSubTypes  []string      `json:"validSubTypes"`
 }
 
 func (c *Client) RefDataByCategory(ctx Context, category string) ([]RefDataItem, error) {
