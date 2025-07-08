@@ -47,21 +47,6 @@ func GetApplicationProgressDetails(client GetApplicationProgressClient, tmpl tem
 
 		cpName = cs.DigitalLpa.LpaStoreData.CertificateProvider.FirstNames + " " + cs.DigitalLpa.LpaStoreData.CertificateProvider.LastName
 
-		vouchingLetters, err := client.OutgoingDocumentBySystemType(
-			ctx,
-			sirius.CaseType("lpa"),
-			cs.DigitalLpa.SiriusData.ID,
-			"DLP-VOUCH-INVITE",
-		)
-		if err != nil {
-			return err
-		}
-
-		var voucherLetterSentAt string
-		if len(vouchingLetters) > 0 {
-			voucherLetterSentAt = vouchingLetters[0].CreatedDate
-		}
-
 		inds, err := client.ProgressIndicatorsForDigitalLpa(ctx, uid)
 		if err != nil {
 			return err
@@ -69,12 +54,29 @@ func GetApplicationProgressDetails(client GetApplicationProgressClient, tmpl tem
 		for _, v := range inds {
 			var donorIdentityCheckState string
 			var donorIdentityCheckCheckedAt string
+			var voucherLetterSentAt string
 
 			if cs.DigitalLpa.LpaStoreData.Donor.IdentityCheck != nil {
 				donorIdentityCheckCheckedAt = cs.DigitalLpa.LpaStoreData.Donor.IdentityCheck.CheckedAt
 			} else if cs.DigitalLpa.SiriusData.Application.DonorIdentityCheck != nil {
 				donorIdentityCheckState = cs.DigitalLpa.SiriusData.Application.DonorIdentityCheck.State
 				donorIdentityCheckCheckedAt = cs.DigitalLpa.SiriusData.Application.DonorIdentityCheck.CheckedAt
+			}
+
+			if donorIdentityCheckState == "VOUCH_STARTED" {
+				vouchingLetters, err := client.OutgoingDocumentBySystemType(
+					ctx,
+					sirius.CaseType("lpa"),
+					cs.DigitalLpa.SiriusData.ID,
+					"DLP-VOUCH-INVITE",
+				)
+				if err != nil {
+					return err
+				}
+
+				if len(vouchingLetters) > 0 {
+					voucherLetterSentAt = vouchingLetters[0].CreatedDate
+				}
 			}
 
 			data.ProgressIndicators = append(data.ProgressIndicators, IndicatorView{

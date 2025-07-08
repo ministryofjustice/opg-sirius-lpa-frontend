@@ -114,6 +114,80 @@ func TestGetApplicationProgressSuccess(t *testing.T) {
 			ApplicationSource:           "APPLICANT",
 			DonorIdentityCheckState:     "SUCCESS",
 			DonorIdentityCheckCheckedAt: "2024-07-01T16:06:08Z",
+		},
+	}
+
+	client := &mockApplicationProgressClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		Return(caseSummary, nil)
+	client.
+		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-9876-9876-9876").
+		Return(progressIndicators, nil)
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, getApplicationProgressDetails{
+			CaseSummary:        caseSummary,
+			ProgressIndicators: indicatorView,
+		}).
+		Return(nil)
+
+	server := newMockServer("/lpa/{uid}", GetApplicationProgressDetails(client, template.Func))
+
+	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9876", nil)
+	_, err := server.serve(req)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetApplicationProgressVouchStarted(t *testing.T) {
+	caseSummary := sirius.CaseSummary{
+		DigitalLpa: sirius.DigitalLpa{
+			UID: "M-9876-9876-9876",
+			SiriusData: sirius.SiriusData{
+				ID:      22,
+				Subtype: "hw",
+				Application: sirius.Draft{
+					Source: "APPLICANT",
+					DonorIdentityCheck: &sirius.DonorIdentityCheck{
+						State:     "VOUCH_STARTED",
+						CheckedAt: "2024-07-01T16:06:08Z",
+						Reference: "712254d5-4cf4-463c-96c1-67744b70043e",
+					},
+				},
+			},
+			LpaStoreData: sirius.LpaStoreData{
+				Channel:   "Digital",
+				Attorneys: []sirius.LpaStoreAttorney{},
+				CertificateProvider: sirius.LpaStoreCertificateProvider{
+					LpaStorePerson: sirius.LpaStorePerson{
+						FirstNames: "Fake",
+						LastName:   "Provider",
+					},
+					Channel: "Paper",
+				},
+			},
+		},
+		TaskList: []sirius.Task{},
+	}
+
+	progressIndicators := []sirius.ProgressIndicator{
+		sirius.ProgressIndicator{
+			Status:    "COMPLETE",
+			Indicator: "FEES",
+		},
+	}
+
+	indicatorView := []IndicatorView{
+		{
+			UID:                         "M-9876-9876-9876",
+			ProgressIndicator:           progressIndicators[0],
+			CertificateProviderChannel:  "Paper",
+			CertificateProviderName:     "Fake Provider",
+			ApplicationSource:           "APPLICANT",
+			DonorIdentityCheckState:     "VOUCH_STARTED",
+			DonorIdentityCheckCheckedAt: "2024-07-01T16:06:08Z",
 			VouchLetterSentAt:           "02/07/2025 15:04:05",
 		},
 	}
@@ -165,9 +239,6 @@ func TestGetApplicationProgressCaseSummaryFail(t *testing.T) {
 	client.
 		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-9876-9876-9876").
 		Return([]sirius.ProgressIndicator{}, nil)
-	client.
-		On("OutgoingDocumentBySystemType", mock.Anything, sirius.CaseType("lpa"), 0, "DLP-VOUCH-INVITE").
-		Return([]sirius.Document{}, nil)
 
 	template := &mockTemplate{}
 	template.On("Func", mock.Anything, mock.Anything).Return(nil)
@@ -193,9 +264,6 @@ func TestGetApplicationProgressProgressIndicatorsFail(t *testing.T) {
 	client.
 		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-9876-9876-9876").
 		Return(inds, expectedError)
-	client.
-		On("OutgoingDocumentBySystemType", mock.Anything, sirius.CaseType("lpa"), 0, "DLP-VOUCH-INVITE").
-		Return([]sirius.Document{}, nil)
 
 	template := &mockTemplate{}
 	template.On("Func", mock.Anything, mock.Anything).Return(nil)
@@ -209,20 +277,34 @@ func TestGetApplicationProgressProgressIndicatorsFail(t *testing.T) {
 }
 
 func TestGetApplicationProgressDocBySystemTypeFail(t *testing.T) {
-	var cs sirius.CaseSummary
-	var inds []sirius.ProgressIndicator
+	caseSummary := sirius.CaseSummary{
+		DigitalLpa: sirius.DigitalLpa{
+			SiriusData: sirius.SiriusData{
+				ID: 22,
+				Application: sirius.Draft{
+					DonorIdentityCheck: &sirius.DonorIdentityCheck{
+						State: "VOUCH_STARTED",
+					},
+				},
+			},
+		},
+	}
+
+	inds := []sirius.ProgressIndicator{
+		sirius.ProgressIndicator{},
+	}
 
 	expectedError := errors.New("Documents could not be retrieved")
 
 	client := &mockApplicationProgressClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
-		Return(cs, nil)
+		Return(caseSummary, nil)
 	client.
 		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-9876-9876-9876").
 		Return(inds, nil)
 	client.
-		On("OutgoingDocumentBySystemType", mock.Anything, sirius.CaseType("lpa"), 0, "DLP-VOUCH-INVITE").
+		On("OutgoingDocumentBySystemType", mock.Anything, sirius.CaseType("lpa"), 22, "DLP-VOUCH-INVITE").
 		Return([]sirius.Document{}, expectedError)
 
 	template := &mockTemplate{}
