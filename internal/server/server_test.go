@@ -182,18 +182,56 @@ func TestGetContextMissingXSRFToken(t *testing.T) {
 	assert.Equal("", ctx.XSRFToken)
 }
 
-func TestGetContextForPostRequest(t *testing.T) {
-	assert := assert.New(t)
+func TestXsrfHandlerIncorrectXSRFToken(t *testing.T) {
+	var buf bytes.Buffer
+	logHandler := slog.NewJSONHandler(&buf, nil)
+	logger := slog.New(logHandler)
 
-	r, _ := http.NewRequest("POST", "/", strings.NewReader("xsrfToken=the-real-one"))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	r.AddCookie(&http.Cookie{Name: "XSRF-TOKEN", Value: "z3tVRZ00yx4dHz3KWYv3boLWHZ4/RsCsVAKbvo2SBNc%3D"})
-	r.AddCookie(&http.Cookie{Name: "another", Value: "one"})
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, errorVars{
+			SiriusURL: "http://sirius",
+			Path:      "/",
+			Code:      http.StatusForbidden,
+			Error:     "Post request was not valid. Please refresh the page and try again.",
+		}).
+		Return(nil)
 
-	ctx := getContext(r)
-	assert.Equal(r.Context(), ctx.Context)
-	assert.Equal(r.Cookies(), ctx.Cookies)
-	assert.Equal("the-real-one", ctx.XSRFToken)
+	xsrfMiddleware := xsrfHandler(logger, template.Func, "http://sirius")
+
+	httpHandler := xsrfMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+
+	req, _ := http.NewRequest(http.MethodPost, "/", strings.NewReader("xsrfToken=xZKapp6sHWgRoXHJr5W3cy=="))
+	req.Header.Add("Content-Type", formUrlEncoded)
+	req.AddCookie(&http.Cookie{Name: "XSRF-TOKEN", Value: "cGoJkHDPgQyzRM8TPByxKT=="})
+
+	respRecorder := httptest.NewRecorder()
+	httpHandler.ServeHTTP(respRecorder, req)
+	res := respRecorder.Result()
+
+	assert.Equal(t, http.StatusForbidden, res.StatusCode)
+}
+
+func TestXsrfHandlerMatchesXSRFToken(t *testing.T) {
+	var buf bytes.Buffer
+	logHandler := slog.NewJSONHandler(&buf, nil)
+	logger := slog.New(logHandler)
+
+	template := &mockTemplate{}
+
+	xsrfMiddleware := xsrfHandler(logger, template.Func, "http://sirius")
+
+	httpHandler := xsrfMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+
+	req, _ := http.NewRequest(http.MethodPost, "/", strings.NewReader("xsrfToken=HEXyWv4XQyee6TMu7LRsn9=="))
+	req.Header.Add("Content-Type", formUrlEncoded)
+	req.AddCookie(&http.Cookie{Name: "XSRF-TOKEN", Value: "HEXyWv4XQyee6TMu7LRsn9=="})
+
+	respRecorder := httptest.NewRecorder()
+	httpHandler.ServeHTTP(respRecorder, req)
+	res := respRecorder.Result()
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
 
 func TestPostFormString(t *testing.T) {

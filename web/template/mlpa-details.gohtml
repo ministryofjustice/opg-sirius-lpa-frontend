@@ -207,13 +207,15 @@
               <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
                 <dt class="govuk-summary-list__key">How attorneys must make decisions</dt>
                 <dd class="govuk-summary-list__value{{ if gt (len $decisionFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
-                    {{ howAttorneysMakeDecisionsLongForm .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions }}
-                    {{ if gt (len $decisionFieldAnomalies) 0 }}
-                      <br><span class="govuk-error-message">Review how attorney's can make decisions</span>
-                    {{ end }}
-                    {{ if (gt (len .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisionsDetails) 0) }}
-                      <p class="app-newlines-as-br">{{ .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisionsDetails }}</p>
-                    {{ end }}
+                  {{ howAttorneysMakeDecisionsLongForm (eq (len .NonReplacementAttorneys) 1) .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions }}
+
+                  {{ if gt (len $decisionFieldAnomalies) 0 }}
+                    <br><span class="govuk-error-message">Review how attorney's can make decisions</span>
+                  {{ end }}
+
+                  {{ if (gt (len .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisionsDetails) 0) }}
+                    <p class="app-newlines-as-br">{{ .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisionsDetails }}</p>
+                  {{ end }}
                 </dd>
               </div>
             </dl>
