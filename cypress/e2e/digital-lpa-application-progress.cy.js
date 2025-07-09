@@ -140,16 +140,16 @@ describe("View the application progress for a digital LPA", () => {
       ]),
     ]);
 
-    cy.addMock(
-      "/lpa-api/v1/lpas/5555/documents?systemType[]=DLP-VOUCH-INVITE&direction=1",
-      "GET",
-      { status: 200, body: [] },
-    );
-    cy.addMock(
-      "/lpa-api/v1/lpas/6666/documents?systemType[]=DLP-VOUCH-INVITE&direction=1",
-      "GET",
-      { status: 200, body: [{ CreatedDate: "03/07/2025 16:05:40" }] },
-    );
+    cy.addMock("/lpa-api/v1/lpas/5555/documents", "GET", {
+      status: 200,
+      body: [],
+    });
+    cy.addMock("/lpa-api/v1/lpas/6666/documents", "GET", {
+      status: 200,
+      body: [
+        { CreatedDate: "03/07/2025 16:05:40", SystemType: "DLP-VOUCH-INVITE" },
+      ],
+    });
 
     cy.wrap(mocks);
 

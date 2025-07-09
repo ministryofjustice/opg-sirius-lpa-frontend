@@ -10,7 +10,7 @@ import (
 type GetApplicationProgressClient interface {
 	CaseSummary(siriusCtx sirius.Context, uid string) (sirius.CaseSummary, error)
 	ProgressIndicatorsForDigitalLpa(siriusCtx sirius.Context, uid string) ([]sirius.ProgressIndicator, error)
-	OutgoingDocumentBySystemType(ctx sirius.Context, caseType sirius.CaseType, caseId int, systemType string) ([]sirius.Document, error)
+	Documents(ctx sirius.Context, caseType sirius.CaseType, caseId int, docTypes []string, notDocTypes []string) ([]sirius.Document, error)
 }
 
 type IndicatorView struct {
@@ -64,18 +64,22 @@ func GetApplicationProgressDetails(client GetApplicationProgressClient, tmpl tem
 			}
 
 			if donorIdentityCheckState == "VOUCH_STARTED" {
-				vouchingLetters, err := client.OutgoingDocumentBySystemType(
+				documents, err := client.Documents(
 					ctx,
 					sirius.CaseType("lpa"),
 					cs.DigitalLpa.SiriusData.ID,
-					"DLP-VOUCH-INVITE",
+					[]string{},
+					[]string{},
 				)
 				if err != nil {
 					return err
 				}
 
-				if len(vouchingLetters) > 0 {
-					voucherLetterSentAt = vouchingLetters[0].CreatedDate
+				for _, letter := range documents {
+					if letter.SystemType == "DLP-VOUCH-INVITE" {
+						voucherLetterSentAt = letter.CreatedDate
+						break
+					}
 				}
 			}
 
