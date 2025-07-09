@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"slices"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
@@ -12,10 +13,12 @@ import (
 type RemoveAnAttorneyClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
 	ChangeAttorneyStatus(sirius.Context, string, []sirius.AttorneyUpdatedStatus) error
+	RefDataByCategory(sirius.Context, string) ([]sirius.RefDataItem, error)
 }
 
 type formRemoveAttorney struct {
 	RemovedAttorneyUid  string   `form:"removedAttorney"`
+	RemovedReason       string   `form:"removedReason"`
 	EnabledAttorneyUids []string `form:"enabledAttorney"`
 	SkipEnableAttorney  string   `form:"skipEnableAttorney"`
 }
@@ -29,8 +32,10 @@ type removeAnAttorneyData struct {
 	CaseSummary             sirius.CaseSummary
 	ActiveAttorneys         []sirius.LpaStoreAttorney
 	InactiveAttorneys       []sirius.LpaStoreAttorney
+	RemovedReasons          []sirius.RefDataItem
 	Form                    formRemoveAttorney
 	RemovedAttorneysDetails SelectedAttorneyDetails
+	RemovedReason           sirius.RefDataItem
 	EnabledAttorneysDetails []SelectedAttorneyDetails
 	Success                 bool
 	Error                   sirius.ValidationError
@@ -75,6 +80,16 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 			data.InactiveAttorneys = append(data.InactiveAttorneys, attorney)
 		}
 
+		allRemovedReasons, err := client.RefDataByCategory(ctx, sirius.AttorneyRemovedReasonCategory)
+		if err != nil {
+			return err
+		}
+		for _, removedReason := range allRemovedReasons {
+			if slices.Contains(removedReason.ValidSubTypes, lpa.SiriusData.Subtype) {
+				data.RemovedReasons = append(data.RemovedReasons, removedReason)
+			}
+		}
+
 		if r.Method == http.MethodPost {
 
 			err = decoder.Decode(&data.Form, r.PostForm)
@@ -85,6 +100,12 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 			if data.Form.RemovedAttorneyUid == "" {
 				data.Error.Field["removeAttorney"] = map[string]string{
 					"reason": "Please select an attorney for removal",
+				}
+			}
+
+			if data.Form.RemovedReason == "" {
+				data.Error.Field["removedReason"] = map[string]string{
+					"reason": "Please select a reason for removal",
 				}
 			}
 
@@ -125,6 +146,12 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 						}
 					}
 
+					for _, removedReason := range allRemovedReasons {
+						if removedReason.Handle == data.Form.RemovedReason {
+							data.RemovedReason = removedReason
+						}
+					}
+
 					return confirmTmpl(w, data)
 				} else {
 					var attorneyUpdatedStatus []sirius.AttorneyUpdatedStatus
@@ -132,8 +159,9 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 					for _, att := range data.ActiveAttorneys {
 						if att.Uid == data.Form.RemovedAttorneyUid {
 							attorneyUpdatedStatus = append(attorneyUpdatedStatus, sirius.AttorneyUpdatedStatus{
-								UID:    att.Uid,
-								Status: shared.RemovedAttorneyStatus.String(),
+								UID:           att.Uid,
+								Status:        shared.RemovedAttorneyStatus.String(),
+								RemovedReason: data.Form.RemovedReason,
 							})
 						}
 					}

@@ -3,11 +3,12 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"testing"
+
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
 )
 
 func TestChangeAttorneyStatus(t *testing.T) {
@@ -36,8 +37,9 @@ func TestChangeAttorneyStatus(t *testing.T) {
 						},
 						Body: map[string]interface{}{
 							"attorneyStatuses": []map[string]interface{}{{
-								"uid":    "cf128305-37c8-4ceb-bedf-89ed5f4ae661",
-								"status": "removed",
+								"uid":           "cf128305-37c8-4ceb-bedf-89ed5f4ae661",
+								"status":        "removed",
+								"removedReason": "BANKRUPT",
 							}},
 						},
 					}).
@@ -55,7 +57,7 @@ func TestChangeAttorneyStatus(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://localhost:%d", config.Port))
 
-				err := client.ChangeAttorneyStatus(Context{Context: context.Background()}, "M-1234-9876-4567", []AttorneyUpdatedStatus{{UID: "cf128305-37c8-4ceb-bedf-89ed5f4ae661", Status: "removed"}})
+				err := client.ChangeAttorneyStatus(Context{Context: context.Background()}, "M-1234-9876-4567", []AttorneyUpdatedStatus{{UID: "cf128305-37c8-4ceb-bedf-89ed5f4ae661", Status: "removed", RemovedReason: "BANKRUPT"}})
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
