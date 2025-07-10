@@ -1,0 +1,95 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Manage decisions - attorneys who cannot act jointly{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <a href="{{ prefix (printf "/lpa/%s/manage-attorneys" .CaseSummary.DigitalLpa.UID )}}" class="govuk-back-link">Back</a>
+
+            {{ template "mlpa-case-details" . }}
+
+            {{ template "error-summary" .Error }}
+
+            <h1 class="govuk-heading-l app-!-embedded-hide">Manage decisions - attorneys who cannot act jointly</h1>
+
+
+            <div class="govuk-body">
+                <label class="govuk-label">
+                    <strong>Attorneys appointment type</strong>
+                </label>
+                <div class="govuk-input__wrapper">
+                    <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm (eq (len .ActiveAttorneys) 1) .CaseSummary.DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions }}</p>
+                </div>
+
+                <label class="govuk-label">
+                    <strong>Replacement attorney appointment type</strong>
+                </label>
+                <div class="govuk-input__wrapper">
+                    <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm (eq (len .ActiveAttorneys) 1) .CaseSummary.DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions }}</p>
+                </div>
+
+                <label class="govuk-label">
+                    <strong>Restrictions and conditions</strong>
+                </label>
+                <div class="govuk-input__wrapper">
+                    {{ if .CaseSummary.DigitalLpa.LpaStoreData.RestrictionsAndConditions }}
+                        <p class="app-newlines-as-br">{{ .CaseSummary.DigitalLpa.LpaStoreData.RestrictionsAndConditions }}</p>
+                    {{ end }}
+                </div>
+            </div>
+
+
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
+
+
+                <div class="govuk-form-group{{ if .Error.Field.decisionAttorney }} govuk-form-group--error{{ end }}">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend"><strong>Select who cannot make joint decisions</strong></legend>
+                        {{ template "errors" .Error.Field.decisionAttorney }}
+
+                        {{ if gt (len .ActiveAttorneys) 0 }}
+                            <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                                {{ range $idx, $activeAttorney := .ActiveAttorneys }}
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input" id="f-activeAttorney-{{ plusN $idx 1 }}" name="decisionAttorney" type="checkbox" value="{{ $activeAttorney.Uid }}"
+                                               {{ if contains $.Form.DecisionAttorneysUids $activeAttorney.Uid }}checked{{ end }}>
+                                        <label class="govuk-label govuk-checkboxes__label" for="f-activeAttorney-{{ plusN $idx 1 }}">
+                                            {{ $activeAttorney.FirstNames }} {{ $activeAttorney.LastName }}
+                                            {{ if eq $activeAttorney.AppointmentType "original" }} (attorney)
+                                            {{ else }} (previously replacement attorney)
+                                            {{ end }}
+                                            <br>
+                                            {{ if not (eq $activeAttorney.DateOfBirth "") }}
+                                                {{ parseAndFormatDate $activeAttorney.DateOfBirth "2006-01-02" "2 January 2006" }}
+                                            {{ end }}
+                                        </label>
+                                    </div>
+                                {{ end }}
+                            </div>
+                            <p class="govuk-body">or</p>
+                        {{ end }}
+                    </fieldset>
+                    <fieldset class="govuk-fieldset">
+                        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="f-skipDecisionAttorney" name="skipDecisionAttorney" type="checkbox" value="yes"
+                                       {{ if eq "yes" $.Form.SkipDecisionAttorney }}checked{{ end }}>
+                                <label class="govuk-label govuk-checkboxes__label" for="f-skipDecisionAttorney">
+                                    Joint decisions can be made by all attorneys
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div class="govuk-button-group">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
+                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s" .CaseSummary.DigitalLpa.UID )}}">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{{ end }}
