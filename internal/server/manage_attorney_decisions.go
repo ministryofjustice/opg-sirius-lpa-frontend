@@ -33,6 +33,7 @@ type manageAttorneyDecisionsData struct {
 	Success                  bool
 	Error                    sirius.ValidationError
 	XSRFToken                string
+	FormName                 string
 }
 
 func AttorneyDecisions(client AttorneyDecisionsClient, decisionTmpl template.Template, confirmTmpl template.Template) Handler {
@@ -51,6 +52,7 @@ func AttorneyDecisions(client AttorneyDecisionsClient, decisionTmpl template.Tem
 			CaseSummary: caseSummary,
 			XSRFToken:   ctx.XSRFToken,
 			Error:       sirius.ValidationError{Field: sirius.FieldErrors{}},
+			FormName:    "decisions",
 		}
 
 		lpa := data.CaseSummary.DigitalLpa
