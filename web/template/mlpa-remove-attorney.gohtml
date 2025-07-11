@@ -15,6 +15,7 @@
 
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
+        <input type="hidden" name="step" value="remove">
 
         <div class="govuk-form-group{{ if .Error.Field.removeAttorney }} govuk-form-group--error{{ end }}">
           <fieldset class="govuk-fieldset">

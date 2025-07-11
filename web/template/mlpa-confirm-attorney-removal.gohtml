@@ -13,15 +13,6 @@
 
       <h1 class="govuk-heading-l app-!-embedded-hide">Confirm removal of attorney</h1>
 
-      <form class="form" method="POST">
-        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
-        <input type="hidden" name="removedAttorney" value="{{ .Form.RemovedAttorneyUid }}"/>
-        {{ range $enabledAttUid := .Form.EnabledAttorneyUids }}
-          <input type="hidden" name="enabledAttorney" value="{{ $enabledAttUid }}"/>
-        {{ end }}
-        <input type="hidden" name="skipEnableAttorney" value="{{ .Form.SkipEnableAttorney }}"/>
-        <input type="hidden" name="removedReason" value="{{ .RemovedReason.Handle }}">
-        <input type="hidden" name="confirmRemoval"/>
 
         <div class="govuk-form-group{{ if .Error.Field.removeAttorney }} govuk-form-group--error{{ end }}">
           <fieldset class="govuk-fieldset">
@@ -55,12 +46,14 @@
           </fieldset>
         </div>
 
-        {{ if gt (len .Form.EnabledAttorneyUids) 0 }}
-          <div class="govuk-form-group{{ if .Error.Field.enableAttorney }} govuk-form-group--error{{ end }}">
-            <fieldset class="govuk-fieldset">
-              <legend class="govuk-fieldset__legend"><strong>Replacement Attorneys stepping in</strong></legend>
-              {{ template "errors" .Error.Field.enableAttorney }}
+        <div class="govuk-form-group{{ if .Error.Field.enableAttorney }} govuk-form-group--error{{ end }}">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend">
+              <strong>Replacement Attorneys stepping in</strong>
+            </legend>
+            {{ template "errors" .Error.Field.enableAttorney }}
 
+            {{ if gt (len .Form.EnabledAttorneyUids) 0 }}
               {{ range $enabledAttorney := .EnabledAttorneysDetails }}
                 <dl class="govuk-summary-list">
                   <div class="govuk-summary-list__row">
@@ -80,19 +73,93 @@
                   </div>
                 </dl>
               {{ end }}
-            </fieldset>
-          </div>
-        {{ else }}
-          <div class="govuk-form-group">
-            <fieldset class="govuk-fieldset">
+            {{ else }}
               <dl class="govuk-summary-list">
                 <div class="govuk-summary-list__row">
                   <p>No replacement attorneys to step in</p>
                 </div>
               </dl>
-            </fieldset>
-          </div>
+            {{ end }}
+          </fieldset>
+        </div>
+
+
+      {{ if eq .Decisions "jointly-for-some-severally-for-others" }}
+        <div class="govuk-form-group{{ if .Error.Field.decisionAttorney }} govuk-form-group--error{{ end }}">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend">
+              <strong>Attorneys who cannot make joint decisions</strong>
+            </legend>
+            {{ template "errors" .Error.Field.decisionAttorney }}
+
+            {{ if gt (len .Form.DecisionAttorneysUids) 0 }}
+              {{ range $decisionAttorney := .DecisionAttorneysDetails }}
+                <dl class="govuk-summary-list">
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Name</dt>
+                    <dd class="govuk-summary-list__value govuk-!-font-weight-bold">
+                      {{ $decisionAttorney.AttorneyName }} ({{ $decisionAttorney.AppointmentType }})
+                    </dd>
+                  </div>
+
+                  <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Date of birth</dt>
+                    <dd class="govuk-summary-list__value">
+                      {{ if not (eq $decisionAttorney.AttorneyDob "") }}
+                        {{ parseAndFormatDate $decisionAttorney.AttorneyDob "2006-01-02" "2 January 2006" }}
+                      {{ end }}
+                    </dd>
+                  </div>
+                </dl>
+              {{ end }}
+            {{ else }}
+              <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                  <p>Joint decisions can be made by all attorneys</p>
+                </div>
+              </dl>
+            {{ end }}
+          </fieldset>
+        </div>
+      {{ end }}
+
+      <div class="govuk-body">
+        <label class="govuk-label">
+          <strong>Attorney appointment type</strong>
+        </label>
+        <div class="govuk-input__wrapper">
+          <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm (eq (len .ActiveAttorneys) 1) .CaseSummary.DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions }}</p>
+        </div>
+      </div>
+
+
+      <div class="govuk-body">
+        <label class="govuk-label">
+          <strong>Replacement attorney appointment type</strong>
+        </label>
+        <div class="govuk-input__wrapper">
+          <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm (eq (len .ActiveAttorneys) 1) .CaseSummary.DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions }}</p>
+        </div>
+      </div>
+
+
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
+        <input type="hidden" name="removedAttorney" value="{{ .Form.RemovedAttorneyUid }}"/>
+        {{ range $enabledAttUid := .Form.EnabledAttorneyUids }}
+          <input type="hidden" name="enabledAttorney" value="{{ $enabledAttUid }}"/>
         {{ end }}
+        <input type="hidden" name="skipEnableAttorney" value="{{ .Form.SkipEnableAttorney }}"/>
+        <input type="hidden" name="removedReason" value="{{ .RemovedReason.Handle }}">
+
+        {{ if eq .Decisions "jointly-for-some-severally-for-others" }}
+          {{ range $attUid := .Form.DecisionAttorneysUids }}
+            <input type="hidden" name="decisionAttorney" value="{{ $attUid }}"/>
+          {{ end }}
+          <input type="hidden" name="skipDecisionAttorney" value="{{ .Form.SkipDecisionAttorney }}"/>
+        {{ end }}
+        <input type="hidden" name="step" value="confirm">
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Confirm removal</button>
