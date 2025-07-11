@@ -110,9 +110,13 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 			if !data.Error.Any() {
 				submissionStep := r.PostFormValue("step")
 
-				if submissionStep == "confirm" {
+				switch submissionStep {
+				case "confirm":
 					return confirmStep(ctx, client, &data, w)
-				} else if submissionStep == "remove" {
+				case "decision":
+					buildAttorneyDetails(&data, allRemovedReasons, true)
+					return confirmTmpl(w, data)
+				case "remove":
 					buildAttorneyDetails(&data, allRemovedReasons, false)
 					if lpa.LpaStoreData.HowAttorneysMakeDecisions == "jointly-for-some-severally-for-others" {
 						data.ActiveAttorneys = decisionAttorneysListAfterRemoval(lpa.LpaStoreData.Attorneys, data.Form)
@@ -120,9 +124,8 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 					} else {
 						return confirmTmpl(w, data)
 					}
-				} else {
-					buildAttorneyDetails(&data, allRemovedReasons, true)
-					return confirmTmpl(w, data)
+				default:
+					return removeTmpl(w, data)
 				}
 
 			}
@@ -275,6 +278,13 @@ func confirmStep(ctx sirius.Context, client RemoveAnAttorneyClient, data *remove
 	uid := data.CaseSummary.DigitalLpa.UID
 
 	err := client.ChangeAttorneyStatus(ctx, uid, attorneyUpdatedStatus)
+	if ve, ok := err.(sirius.ValidationError); ok {
+		w.WriteHeader(http.StatusBadRequest)
+		data.Error = ve
+	} else if err != nil {
+		return err
+	}
+
 	err = client.ManageAttorneyDecisions(ctx, uid, attorneyDecisions)
 
 	if ve, ok := err.(sirius.ValidationError); ok {
