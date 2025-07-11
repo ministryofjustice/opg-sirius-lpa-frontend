@@ -155,72 +155,7 @@
 
         {{ template "attorney-details" . }}
 
-        <!-- decisions -->
-        {{ $anomaliesForSection := .AnomalyDisplay.GetAnomaliesForSection "root" }}
-        <div class="govuk-accordion__section">
-          <div class="govuk-accordion__section-header{{ if $anomaliesForSection.HasAnomalies }} govuk-form-group--error{{ end }}">
-            <h2 class="govuk-accordion__section-heading">
-              <span class="govuk-accordion__section-button" id="accordion-default-heading-3">
-                Decisions
-                {{ if $anomaliesForSection.HasAnomalies }}<span class="govuk-error-message">For review</span>{{ end }}
-              </span>
-            </h2>
-          </div>
-            {{ $rootAnomalies := $anomaliesForSection.GetAnomaliesForObject "" }}
-          <div id="accordion-default-content-3" class="govuk-accordion__section-content">
-            <dl class="govuk-summary-list">
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key"></dt>
-                <dd class="govuk-summary-list__value"></dd>
-                <dd class="govuk-summary-list__actions">
-                  <a class="govuk-link" id="f-update-decisions" href="{{ prefix (printf "/lpa/%s/update-decisions" .CaseSummary.DigitalLpa.UID) }}">Update</a>
-                </dd>
-              </div>
-              {{ if (eq .DigitalLpa.SiriusData.Subtype "personal-welfare")}}
-                {{ $lifeSustainingTreatmentAnomalies := $rootAnomalies.GetAnomaliesForFieldWithStatus "lifeSustainingTreatmentOption" "detected" }}
-                <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Life sustaining treatment</dt>
-                  <dd class="govuk-summary-list__value{{ if gt (len $lifeSustainingTreatmentAnomalies) 0 }} govuk-form-group--error{{ end }}">
-                    <p class="govuk-body">
-                      {{ lifeSustainingTreatmentOptionLongForm .DigitalLpa.LpaStoreData.LifeSustainingTreatmentOption }}
-                      {{ if gt (len $lifeSustainingTreatmentAnomalies) 0 }}
-                        <br><span class="govuk-error-message">Review life sustaining treatment</span>
-                      {{ end }}
-                    </p>
-                  </dd>
-                </div>
-              {{ else }}
-                {{ $howToUseLpaFieldAnomalies := $rootAnomalies.GetAnomaliesForFieldWithStatus "whenTheLpaCanBeUsed" "detected" }}
-                 <div class="govuk-summary-list__row">
-                  <dt class="govuk-summary-list__key">When attorneys can use the LPA</dt>
-                  <dd class="govuk-summary-list__value{{ if gt (len $howToUseLpaFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
-                    <p class="govuk-body">
-                      {{ whenTheLpaCanBeUsedLongForm .DigitalLpa.LpaStoreData.WhenTheLpaCanBeUsed }}
-                      {{ if gt (len $howToUseLpaFieldAnomalies) 0 }}
-                      <br><span class="govuk-error-message">Review when the LPA can be used</span>
-                      {{ end }}
-                    </p>
-                  </dd>
-                </div>
-                {{ end}}
-              {{ $decisionFieldAnomalies := $rootAnomalies.GetAnomaliesForFieldWithStatus "howAttorneysMakeDecisions" "detected" }}
-              <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
-                <dt class="govuk-summary-list__key">How attorneys must make decisions</dt>
-                <dd class="govuk-summary-list__value{{ if gt (len $decisionFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
-                  {{ howAttorneysMakeDecisionsLongForm (eq (len .NonReplacementAttorneys) 1) .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions }}
-
-                  {{ if gt (len $decisionFieldAnomalies) 0 }}
-                    <br><span class="govuk-error-message">Review how attorney's can make decisions</span>
-                  {{ end }}
-
-                  {{ if (gt (len .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisionsDetails) 0) }}
-                    <p class="app-newlines-as-br">{{ .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisionsDetails }}</p>
-                  {{ end }}
-                </dd>
-              </div>
-            </dl>
-          </div>
-        </div>
+        {{ template "decision-details" . }}
 
         {{ template "replacement-attorney-details" . }}
 

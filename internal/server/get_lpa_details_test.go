@@ -95,6 +95,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 					LpaStoreData: sirius.LpaStoreData{
 						Attorneys: []sirius.LpaStoreAttorney{
 							{
+								Decisions:       false,
 								Status:          shared.InactiveAttorneyStatus.String(),
 								AppointmentType: shared.ReplacementAppointmentType.String(),
 								LpaStorePerson: sirius.LpaStorePerson{
@@ -103,6 +104,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 								},
 							},
 							{
+								Decisions:       false,
 								Status:          shared.InactiveAttorneyStatus.String(),
 								AppointmentType: shared.ReplacementAppointmentType.String(),
 								LpaStorePerson: sirius.LpaStorePerson{
@@ -110,6 +112,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 								},
 							},
 							{
+								Decisions:       true,
 								Status:          shared.ActiveAttorneyStatus.String(),
 								AppointmentType: shared.OriginalAppointmentType.String(),
 								LpaStorePerson: sirius.LpaStorePerson{
@@ -117,6 +120,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 								},
 							},
 							{
+								Decisions:       false,
 								Status:          shared.ActiveAttorneyStatus.String(),
 								AppointmentType: shared.OriginalAppointmentType.String(),
 								LpaStorePerson: sirius.LpaStorePerson{
@@ -124,6 +128,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 								},
 							},
 							{
+								Decisions:       false,
 								Status:          shared.RemovedAttorneyStatus.String(),
 								AppointmentType: shared.OriginalAppointmentType.String(),
 								LpaStorePerson: sirius.LpaStorePerson{
@@ -131,6 +136,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 								},
 							},
 							{
+								Decisions:       true,
 								Status:          shared.ActiveAttorneyStatus.String(),
 								AppointmentType: shared.ReplacementAppointmentType.String(),
 								LpaStorePerson: sirius.LpaStorePerson{
@@ -192,6 +198,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 					ReviewRestrictions: tc.reviewRestrictions,
 					ReplacementAttorneys: []sirius.LpaStoreAttorney{
 						{
+							Decisions:       false,
 							Status:          shared.InactiveAttorneyStatus.String(),
 							AppointmentType: shared.ReplacementAppointmentType.String(),
 							LpaStorePerson: sirius.LpaStorePerson{
@@ -200,6 +207,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 							},
 						},
 						{
+							Decisions:       false,
 							Status:          shared.InactiveAttorneyStatus.String(),
 							AppointmentType: shared.ReplacementAppointmentType.String(),
 							LpaStorePerson: sirius.LpaStorePerson{
@@ -209,6 +217,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 					},
 					NonReplacementAttorneys: []sirius.LpaStoreAttorney{
 						{
+							Decisions:       true,
 							Status:          shared.ActiveAttorneyStatus.String(),
 							AppointmentType: shared.OriginalAppointmentType.String(),
 							LpaStorePerson: sirius.LpaStorePerson{
@@ -216,6 +225,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 							},
 						},
 						{
+							Decisions:       false,
 							Status:          shared.ActiveAttorneyStatus.String(),
 							AppointmentType: shared.OriginalAppointmentType.String(),
 							LpaStorePerson: sirius.LpaStorePerson{
@@ -223,6 +233,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 							},
 						},
 						{
+							Decisions:       true,
 							Status:          shared.ActiveAttorneyStatus.String(),
 							AppointmentType: shared.ReplacementAppointmentType.String(),
 							LpaStorePerson: sirius.LpaStorePerson{
@@ -232,10 +243,29 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 					},
 					RemovedAttorneys: []sirius.LpaStoreAttorney{
 						{
+							Decisions:       false,
 							Status:          shared.RemovedAttorneyStatus.String(),
 							AppointmentType: shared.OriginalAppointmentType.String(),
 							LpaStorePerson: sirius.LpaStorePerson{
 								Email: "fifth@does.not.exist",
+							},
+						},
+					},
+					DecisionAttorneys: []sirius.LpaStoreAttorney{
+						{
+							Decisions:       true,
+							Status:          shared.ActiveAttorneyStatus.String(),
+							AppointmentType: shared.OriginalAppointmentType.String(),
+							LpaStorePerson: sirius.LpaStorePerson{
+								Email: "third@does.not.exist",
+							},
+						},
+						{
+							Decisions:       true,
+							Status:          shared.ActiveAttorneyStatus.String(),
+							AppointmentType: shared.ReplacementAppointmentType.String(),
+							LpaStorePerson: sirius.LpaStorePerson{
+								Email: "sixth@does.not.exist",
 							},
 						},
 					},
