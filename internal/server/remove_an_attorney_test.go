@@ -31,6 +31,11 @@ func (m *mockRemoveAnAttorneyClient) RefDataByCategory(ctx sirius.Context, categ
 	return args.Get(0).([]sirius.RefDataItem), args.Error(1)
 }
 
+func (m *mockRemoveAnAttorneyClient) ManageAttorneyDecisions(ctx sirius.Context, caseUID string, attorneyDecisions []sirius.AttorneyDecisions) error {
+	args := m.Called(ctx, caseUID, attorneyDecisions)
+	return args.Error(0)
+}
+
 var removeAnAttorneyCaseSummary = sirius.CaseSummary{
 	DigitalLpa: sirius.DigitalLpa{
 		UID: "M-1111-2222-3333",
@@ -257,7 +262,9 @@ func TestGetRemoveAnAttorney(t *testing.T) {
 
 	confirmTemplate := &mockTemplate{}
 
-	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func))
+	decisionsTemplate := &mockTemplate{}
+
+	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
 
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-1111-2222-3333/remove-an-attorney", nil)
 	resp, err := server.serve(req)
@@ -282,7 +289,9 @@ func TestGetRemoveAnAttorneyGetCaseSummaryFails(t *testing.T) {
 
 	confirmTemplate := &mockTemplate{}
 
-	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func))
+	decisionsTemplate := &mockTemplate{}
+
+	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
 
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-1111-2222-3333/remove-an-attorney", nil)
 	_, err := server.serve(req)
@@ -312,8 +321,9 @@ func TestGetRemoveAnAttorneyTemplateErrors(t *testing.T) {
 		Return(errExample)
 
 	confirmTemplate := &mockTemplate{}
+	decisionsTemplate := &mockTemplate{}
 
-	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func))
+	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
 
 	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-1111-2222-3333/remove-an-attorney", nil)
 	_, err := server.serve(req)
@@ -353,8 +363,9 @@ func TestPostRemoveAnAttorneyInvalidData(t *testing.T) {
 		Return(nil)
 
 	confirmTemplate := &mockTemplate{}
+	decisionsTemplate := &mockTemplate{}
 
-	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func))
+	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
 
 	form := url.Values{}
 
@@ -405,8 +416,9 @@ func TestPostRemoveAnAttorneyValidData(t *testing.T) {
 			Error:         sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
 		Return(nil)
+	decisionsTemplate := &mockTemplate{}
 
-	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func))
+	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
 
 	form := url.Values{
 		"removedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
@@ -442,8 +454,9 @@ func TestPostConfirmAttorneyRemovalValidData(t *testing.T) {
 
 	removeTemplate := &mockTemplate{}
 	confirmTemplate := &mockTemplate{}
+	decisionsTemplate := &mockTemplate{}
 
-	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func))
+	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
 
 	form := url.Values{
 		"removedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
