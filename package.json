@@ -19,7 +19,7 @@
     "accessible-autocomplete": "^3.0.0",
     "cypress": "14.5.1",
     "govuk-frontend": "^5.0.0",
-    "opg-sirius-search-ui": "https://github.com/ministryofjustice/opg-sirius-search-ui#v1.74.0",
+    "opg-sirius-search-ui": "https://github.com/ministryofjustice/opg-sirius-search-ui#v1.75.0",
     "punycode": "^2.3.1",
     "tinymce": "^5.10.7"
   },
