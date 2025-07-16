@@ -26,9 +26,17 @@ func (m *mockRemoveAnAttorneyClient) ChangeAttorneyStatus(ctx sirius.Context, ca
 	return args.Error(0)
 }
 
+func (m *mockRemoveAnAttorneyClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
+	args := m.Called(ctx, category)
+	return args.Get(0).([]sirius.RefDataItem), args.Error(1)
+}
+
 var removeAnAttorneyCaseSummary = sirius.CaseSummary{
 	DigitalLpa: sirius.DigitalLpa{
 		UID: "M-1111-2222-3333",
+		SiriusData: sirius.SiriusData{
+			Subtype: "personal-welfare",
+		},
 		LpaStoreData: sirius.LpaStoreData{
 			Attorneys: []sirius.LpaStoreAttorney{
 				{
@@ -213,11 +221,28 @@ var inactiveAttorneys = []sirius.LpaStoreAttorney{
 	},
 }
 
+var removeAttorneyReasons = []sirius.RefDataItem{
+	{
+		Handle:        "BANKRUPT",
+		Label:         "Bankrupt",
+		ValidSubTypes: []string{"property-and-affairs"},
+	},
+	{
+		Handle:        "DECEASED",
+		Label:         "Deceased",
+		ValidSubTypes: []string{"property-and-affairs", "personal-welfare"},
+	},
+}
+
 func TestGetRemoveAnAttorney(t *testing.T) {
 	client := &mockRemoveAnAttorneyClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
 		Return(removeAnAttorneyCaseSummary, nil)
+
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.AttorneyRemovedReasonCategory).
+		Return(removeAttorneyReasons, nil)
 
 	removeTemplate := &mockTemplate{}
 	removeTemplate.
@@ -225,6 +250,7 @@ func TestGetRemoveAnAttorney(t *testing.T) {
 			CaseSummary:       removeAnAttorneyCaseSummary,
 			ActiveAttorneys:   activeAttorneys,
 			InactiveAttorneys: inactiveAttorneys,
+			RemovedReasons:    removeAttorneyReasons[1:2], // only second reason is valid for "personal-welfare"
 			Error:             sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
 		Return(nil)
@@ -270,12 +296,17 @@ func TestGetRemoveAnAttorneyTemplateErrors(t *testing.T) {
 		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
 		Return(removeAnAttorneyCaseSummary, nil)
 
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.AttorneyRemovedReasonCategory).
+		Return(removeAttorneyReasons, nil)
+
 	removeTemplate := &mockTemplate{}
 	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
 			CaseSummary:       removeAnAttorneyCaseSummary,
 			ActiveAttorneys:   activeAttorneys,
 			InactiveAttorneys: inactiveAttorneys,
+			RemovedReasons:    removeAttorneyReasons[1:2], // only second reason is valid for "personal-welfare"
 			Error:             sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
 		Return(errExample)
@@ -296,20 +327,27 @@ func TestPostRemoveAnAttorneyInvalidData(t *testing.T) {
 		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
 		Return(removeAnAttorneyCaseSummary, nil)
 
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.AttorneyRemovedReasonCategory).
+		Return(removeAttorneyReasons, nil)
+
 	removeTemplate := &mockTemplate{}
 	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
 			CaseSummary:       removeAnAttorneyCaseSummary,
 			ActiveAttorneys:   activeAttorneys,
 			InactiveAttorneys: inactiveAttorneys,
+			RemovedReasons:    removeAttorneyReasons[1:2], // only second reason is valid for "personal-welfare"
 			Form: formRemoveAttorney{
 				RemovedAttorneyUid:  "",
 				EnabledAttorneyUids: nil,
 				SkipEnableAttorney:  "",
+				RemovedReason:       "",
 			},
 			Error: sirius.ValidationError{Field: sirius.FieldErrors{
 				"removeAttorney": {"reason": "Please select an attorney for removal"},
 				"enableAttorney": {"reason": "Please select either the attorneys that can be enabled or skip the replacement of the attorneys"},
+				"removedReason":  {"reason": "Please select a reason for removal"},
 			}},
 		}).
 		Return(nil)
@@ -335,6 +373,10 @@ func TestPostRemoveAnAttorneyValidData(t *testing.T) {
 		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
 		Return(removeAnAttorneyCaseSummary, nil)
 
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.AttorneyRemovedReasonCategory).
+		Return(removeAttorneyReasons, nil)
+
 	removeTemplate := &mockTemplate{}
 	confirmTemplate := &mockTemplate{}
 	confirmTemplate.
@@ -342,10 +384,12 @@ func TestPostRemoveAnAttorneyValidData(t *testing.T) {
 			CaseSummary:       removeAnAttorneyCaseSummary,
 			ActiveAttorneys:   activeAttorneys,
 			InactiveAttorneys: inactiveAttorneys,
+			RemovedReasons:    removeAttorneyReasons[1:2], // only second reason is valid for "personal-welfare"
 			Form: formRemoveAttorney{
 				RemovedAttorneyUid:  "302b05c7-896c-4290-904e-2005e4f1e81e",
 				EnabledAttorneyUids: []string{"123a01b1-456d-5391-813d-2010d3e256f"},
 				SkipEnableAttorney:  "",
+				RemovedReason:       "DECEASED",
 			},
 			RemovedAttorneysDetails: SelectedAttorneyDetails{
 				SelectedAttorneyName: "Jack Black",
@@ -357,7 +401,8 @@ func TestPostRemoveAnAttorneyValidData(t *testing.T) {
 					SelectedAttorneyDob:  "1990-02-26",
 				},
 			},
-			Error: sirius.ValidationError{Field: sirius.FieldErrors{}},
+			RemovedReason: removeAttorneyReasons[1],
+			Error:         sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
 		Return(nil)
 
@@ -366,6 +411,7 @@ func TestPostRemoveAnAttorneyValidData(t *testing.T) {
 	form := url.Values{
 		"removedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
 		"enabledAttorney": {"123a01b1-456d-5391-813d-2010d3e256f"},
+		"removedReason":   {"DECEASED"},
 	}
 
 	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/remove-an-attorney", strings.NewReader(form.Encode()))
@@ -384,8 +430,12 @@ func TestPostConfirmAttorneyRemovalValidData(t *testing.T) {
 		Return(removeAnAttorneyCaseSummary, nil)
 
 	client.
+		On("RefDataByCategory", mock.Anything, sirius.AttorneyRemovedReasonCategory).
+		Return(removeAttorneyReasons, nil)
+
+	client.
 		On("ChangeAttorneyStatus", mock.Anything, "M-1111-2222-3333", []sirius.AttorneyUpdatedStatus{
-			{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", Status: "removed"},
+			{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", Status: "removed", RemovedReason: "DECEASED"},
 			{UID: "123a01b1-456d-5391-813d-2010d3e256f", Status: "active"},
 		}).
 		Return(nil)
@@ -398,6 +448,7 @@ func TestPostConfirmAttorneyRemovalValidData(t *testing.T) {
 	form := url.Values{
 		"removedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
 		"enabledAttorney": {"123a01b1-456d-5391-813d-2010d3e256f"},
+		"removedReason":   {"DECEASED"},
 		"confirmRemoval":  {""},
 	}
 

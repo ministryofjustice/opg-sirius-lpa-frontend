@@ -68,6 +68,7 @@ describe("View a digital LPA", () => {
               lastName: "Greenwood",
               status: "active",
               appointmentType: "original",
+              cannotMakeJointDecisions: true,
             },
             {
               firstNames: "Volo",
@@ -95,6 +96,14 @@ describe("View a digital LPA", () => {
               appointmentType: "replacement",
               signedAt: "2022-12-19T09:12:59Z",
             },
+            {
+              firstNames: "Anne",
+              lastName: "Rice",
+              status: "active",
+              appointmentType: "replacement",
+              signedAt: "2022-12-19T07:18:59Z",
+              cannotMakeJointDecisions: true,
+            },
           ],
           certificateProvider: {
             uid: "e4d5e24e-2a8d-434e-b815-9898620acc71",
@@ -109,7 +118,11 @@ describe("View a digital LPA", () => {
           peopleToNotify: [],
           restrictionsAndConditions: "Do not do this",
           lifeSustainingTreatmentOption: "option-a",
-          howAttorneysMakeDecisions: "jointly",
+          howAttorneysMakeDecisions: "jointly-for-some-severally-for-others",
+          howAttorneysMakeDecisionsDetails:
+            "My attorneys must act jointly to decide whether...",
+          howReplacementAttorneysMakeDecisions:
+            "jointly-for-some-severally-for-others",
         },
       },
     });
@@ -536,6 +549,16 @@ describe("View a digital LPA", () => {
         },
       },
     );
+
+    const defaultDigitalLpaMocks = Promise.allSettled([
+      digitalLpas.get("M-1111-1111-1111"),
+      cases.warnings.empty("1111"),
+      cases.tasks.empty("1111"),
+      digitalLpas.progressIndicators.feesInProgress("M-1111-1111-1111"),
+      digitalLpas.objections.empty("M-1111-1111-1111"),
+    ]);
+
+    cy.wrap(defaultDigitalLpaMocks);
   });
 
   it("shows case information", () => {
@@ -667,7 +690,7 @@ describe("View a digital LPA", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3333");
 
     cy.contains("LPA details").click();
-    cy.contains("Attorneys (2)");
+    cy.contains("Attorneys (3)");
     cy.contains("Replacement attorneys (2)");
     cy.contains("Removed attorneys (1)");
     cy.contains("Notified people (0)");
@@ -710,7 +733,7 @@ describe("View a digital LPA", () => {
   it("shows attorney signed on date and label if set", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
 
-    cy.contains("Attorneys (2)")
+    cy.contains("Attorneys (3)")
       .click()
       .parents(".govuk-accordion__section")
       .within(() => {
@@ -900,5 +923,32 @@ describe("View a digital LPA", () => {
     cy.contains("Firstname John");
     cy.contains("Surname Smith");
     cy.contains("UID 700011111111");
+  });
+
+  it("shows correct message for sole attorney", () => {
+    cy.visit("/lpa/M-1111-1111-1111/lpa-details");
+
+    cy.contains("Decisions")
+      .click()
+      .parents(".govuk-accordion__section")
+      .within(() => {
+        cy.contains("There is only one attorney appointed");
+      });
+  });
+
+  it("shows decisions", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
+
+    cy.contains("Decisions")
+      .click()
+      .parents(".govuk-accordion__section")
+      .within(() => {
+        cy.contains("Jointly for some, severally for others");
+        cy.contains("Attorneys who cannot make joint decisions");
+        cy.contains("Esther Greenwood");
+        cy.contains("Anne Rice (previously a replacement attorney)");
+        cy.contains("Decisions attorneys must make jointly");
+        cy.contains("My attorneys must act jointly to decide whether");
+      });
   });
 });
