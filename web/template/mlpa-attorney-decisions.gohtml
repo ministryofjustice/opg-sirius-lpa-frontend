@@ -41,7 +41,6 @@
 
             {{ $removeAttorneyJourney := eq .FormName "remove"}}
 
-
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
                 <input type="hidden" name="step" value="decision">
@@ -69,7 +68,10 @@
                                         <label class="govuk-label govuk-checkboxes__label" for="f-activeAttorney-{{ plusN $idx 1 }}">
                                             {{ $activeAttorney.FirstNames }} {{ $activeAttorney.LastName }}
                                             {{ if eq $activeAttorney.AppointmentType "original" }} (attorney)
+<<<<<<< HEAD
                                             {{ else if $removeAttorneyJourney }} (replacement attorney stepping in)
+=======
+>>>>>>> 61588064 (Vega 2819 record attorney joint decisions (#692))
                                             {{ else }} (previously replacement attorney)
                                             {{ end }}
                                             <br>
