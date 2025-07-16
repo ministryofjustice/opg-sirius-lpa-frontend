@@ -105,11 +105,19 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 				return err
 			}
 
+			submissionStep := r.PostFormValue("step")
+
 			validateRemoveAttorneyPage(r, &data)
 
-			if !data.Error.Any() {
-				submissionStep := r.PostFormValue("step")
+			if submissionStep == "decision" && data.Decisions == "jointly-for-some-severally-for-others" {
+				validateManageAttorneysPage(r, &data)
+				if _, ok := data.Error.Field["decisionAttorney"]; ok {
+					data.ActiveAttorneys = decisionAttorneysListAfterRemoval(lpa.LpaStoreData.Attorneys, data.Form)
+					return decisionsTmpl(w, data)
+				}
+			}
 
+			if !data.Error.Any() {
 				switch submissionStep {
 				case "confirm":
 					return confirmStep(ctx, client, &data, w)
@@ -161,6 +169,15 @@ func validateRemoveAttorneyPage(r *http.Request, data *removeAnAttorneyData) {
 	}
 }
 
+func validateManageAttorneysPage(r *http.Request, data *removeAnAttorneyData) {
+	if (len(data.Form.DecisionAttorneysUids) == 0 && !postFormCheckboxChecked(r, "skipDecisionAttorney", "yes")) ||
+		(len(data.Form.DecisionAttorneysUids) > 0 && postFormCheckboxChecked(r, "skipDecisionAttorney", "yes")) {
+		data.Error.Field["decisionAttorney"] = map[string]string{
+			"reason": "Select who cannot make joint decisions, or select 'Joint decisions can be made by all attorneys'",
+		}
+	}
+}
+
 func buildAttorneyDetails(data *removeAnAttorneyData, removedReasons []sirius.RefDataItem, decisionAttorneys bool) {
 
 	for _, att := range data.ActiveAttorneys {
@@ -172,12 +189,17 @@ func buildAttorneyDetails(data *removeAnAttorneyData, removedReasons []sirius.Re
 		}
 	}
 
-	for _, att := range data.InactiveAttorneys {
-		if slices.Contains(data.Form.EnabledAttorneyUids, att.Uid) {
-			data.EnabledAttorneysDetails = append(data.EnabledAttorneysDetails, SelectedAttorneyDetails{
-				SelectedAttorneyName: att.FirstNames + " " + att.LastName,
-				SelectedAttorneyDob:  att.DateOfBirth,
-			})
+	if len(data.Form.EnabledAttorneyUids) > 0 {
+		for _, att := range data.InactiveAttorneys {
+			for _, enabledAttUid := range data.Form.EnabledAttorneyUids {
+				if att.Uid == enabledAttUid {
+					data.EnabledAttorneysDetails = append(data.EnabledAttorneysDetails, SelectedAttorneyDetails{
+						SelectedAttorneyName: att.FirstNames + " " + att.LastName,
+						SelectedAttorneyDob:  att.DateOfBirth,
+					})
+					break
+				}
+			}
 		}
 	}
 
@@ -188,7 +210,7 @@ func buildAttorneyDetails(data *removeAnAttorneyData, removedReasons []sirius.Re
 	}
 
 	if decisionAttorneys {
-		for _, att := range data.ActiveAttorneys {
+		for _, att := range data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys {
 			if slices.Contains(data.Form.DecisionAttorneysUids, att.Uid) {
 				data.DecisionAttorneysDetails = append(data.DecisionAttorneysDetails, AttorneyDetails{
 					AttorneyName:    att.FirstNames + " " + att.LastName,
@@ -197,13 +219,14 @@ func buildAttorneyDetails(data *removeAnAttorneyData, removedReasons []sirius.Re
 				})
 			}
 		}
+
 	}
 }
 
 func decisionAttorneysListAfterRemoval(attorneys []sirius.LpaStoreAttorney, form formRemoveAttorney) []sirius.LpaStoreAttorney {
-	enabled := map[string]bool{}
-	for _, uid := range form.EnabledAttorneyUids {
-		enabled[uid] = true
+	var enabledAttorneyUid string
+	if len(form.EnabledAttorneyUids) > 0 {
+		enabledAttorneyUid = form.EnabledAttorneyUids[0]
 	}
 
 	//TODO: Test for when no attorneys enabled
@@ -215,7 +238,7 @@ func decisionAttorneysListAfterRemoval(attorneys []sirius.LpaStoreAttorney, form
 				attorneysForDecisions = append(attorneysForDecisions, att)
 			}
 		case shared.InactiveAttorneyStatus.String():
-			if enabled[att.Uid] {
+			if att.Uid == enabledAttorneyUid {
 				attorneysForDecisions = append(attorneysForDecisions, att)
 			}
 		}
@@ -260,7 +283,8 @@ func confirmStep(ctx sirius.Context, client RemoveAnAttorneyClient, data *remove
 			})
 		}
 	} else {
-		for _, att := range data.ActiveAttorneys {
+		decisionsAttorneys := decisionAttorneysListAfterRemoval(data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys, data.Form)
+		for _, att := range decisionsAttorneys {
 			isChecked := false
 			for _, selectedUid := range data.Form.DecisionAttorneysUids {
 				if selectedUid == att.Uid {

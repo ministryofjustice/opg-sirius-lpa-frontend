@@ -51,7 +51,7 @@
                         <input type="hidden" name="enabledAttorney" value="{{ $enabledAttUid }}"/>
                     {{ end }}
                     <input type="hidden" name="skipEnableAttorney" value="{{ .Form.SkipEnableAttorney }}"/>
-                    <input type="hidden" name="removedReason" value="{{ .RemovedReason.Handle }}">
+                    <input type="hidden" name="removedReason" value="{{ .Form.RemovedReason }}">
                 {{ end}}
 
                 <div class="govuk-form-group{{ if .Error.Field.decisionAttorney }} govuk-form-group--error{{ end }}">
@@ -68,10 +68,7 @@
                                         <label class="govuk-label govuk-checkboxes__label" for="f-activeAttorney-{{ plusN $idx 1 }}">
                                             {{ $activeAttorney.FirstNames }} {{ $activeAttorney.LastName }}
                                             {{ if eq $activeAttorney.AppointmentType "original" }} (attorney)
-<<<<<<< HEAD
-                                            {{ else if $removeAttorneyJourney }} (replacement attorney stepping in)
-=======
->>>>>>> 61588064 (Vega 2819 record attorney joint decisions (#692))
+                                            {{ else if and ($removeAttorneyJourney) (eq $activeAttorney.Status "inactive") }} (replacement attorney stepping in)
                                             {{ else }} (previously replacement attorney)
                                             {{ end }}
                                             <br>
