@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -35,17 +34,23 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		errNotFound := sirius.StatusError{Code: http.StatusNotFound}
+
 		var caseIDs []int
 		for _, id := range r.Form["id"] {
+			if id == "" {
+				return errNotFound
+			}
+
 			caseID, err := strconv.Atoi(id)
 			if err != nil {
-				return err
+				return errNotFound
 			}
 			caseIDs = append(caseIDs, caseID)
 		}
 
 		if len(caseIDs) == 0 {
-			return errors.New("no cases selected")
+			return errNotFound
 		}
 
 		ctx := getContext(r)
