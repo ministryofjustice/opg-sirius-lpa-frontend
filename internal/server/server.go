@@ -151,7 +151,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/lpa/{uid}/history", wrap(GetHistory(client, templates.Get("mlpa-history.gohtml"))))
 	mux.Handle("/lpa/{uid}/documents/new", wrap(CreateDocumentDigitalLpa(client, templates.Get("mlpa-create_document.gohtml"))))
 	mux.Handle("/lpa/{uid}/manage-attorneys", wrap(ManageAttorneys(client, templates.Get("mlpa-manage-attorneys.gohtml"))))
-	mux.Handle("/lpa/{uid}/remove-an-attorney", wrap(RemoveAnAttorney(client, templates.Get("mlpa-remove-attorney.gohtml"), templates.Get("mlpa-confirm-attorney-removal.gohtml"))))
+	mux.Handle("/lpa/{uid}/remove-an-attorney", wrap(RemoveAnAttorney(client, templates.Get("mlpa-remove-attorney.gohtml"), templates.Get("mlpa-confirm-attorney-removal.gohtml"), templates.Get("mlpa-attorney-decisions.gohtml"))))
 	mux.Handle("/lpa/{uid}/manage-attorney-decisions", wrap(AttorneyDecisions(client, templates.Get("mlpa-attorney-decisions.gohtml"), templates.Get("mlpa-confirm-attorney-decisions.gohtml"))))
 	mux.Handle("/lpa/{uid}/certificate-provider/change-details", wrap(ChangeCertificateProviderDetails(client, templates.Get("change-certificate-provider-details.gohtml"))))
 	mux.Handle("/lpa/{uid}/update-decisions", wrap(UpdateDecisions(client, templates.Get("mlpa-update-decisions.gohtml"))))
