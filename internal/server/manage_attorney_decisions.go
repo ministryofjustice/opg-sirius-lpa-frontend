@@ -28,6 +28,7 @@ type formManageAttorneyDecisions struct {
 type manageAttorneyDecisionsData struct {
 	CaseSummary              sirius.CaseSummary
 	ActiveAttorneys          []sirius.LpaStoreAttorney
+	DecisionAttorneys        []sirius.LpaStoreAttorney
 	Form                     formManageAttorneyDecisions
 	DecisionAttorneysDetails []AttorneyDetails
 	Success                  bool
@@ -59,7 +60,7 @@ func AttorneyDecisions(client AttorneyDecisionsClient, decisionTmpl template.Tem
 
 		for _, attorney := range lpa.LpaStoreData.Attorneys {
 			if attorney.Status == shared.ActiveAttorneyStatus.String() {
-				data.ActiveAttorneys = append(data.ActiveAttorneys, attorney)
+				data.DecisionAttorneys = append(data.DecisionAttorneys, attorney)
 			}
 		}
 
@@ -81,7 +82,7 @@ func AttorneyDecisions(client AttorneyDecisionsClient, decisionTmpl template.Tem
 				if !postFormKeySet(r, "confirmDecisions") {
 
 					if len(data.Form.DecisionAttorneysUids) > 0 {
-						for _, att := range data.ActiveAttorneys {
+						for _, att := range data.DecisionAttorneys {
 							for _, enabledAttUid := range data.Form.DecisionAttorneysUids {
 								if att.Uid == enabledAttUid {
 									data.DecisionAttorneysDetails = append(data.DecisionAttorneysDetails, AttorneyDetails{
@@ -100,14 +101,14 @@ func AttorneyDecisions(client AttorneyDecisionsClient, decisionTmpl template.Tem
 					var attorneyDecisions []sirius.AttorneyDecisions
 
 					if data.Form.SkipDecisionAttorney == "yes" {
-						for _, att := range data.ActiveAttorneys {
+						for _, att := range data.DecisionAttorneys {
 							attorneyDecisions = append(attorneyDecisions, sirius.AttorneyDecisions{
 								UID:                      att.Uid,
 								CannotMakeJointDecisions: false,
 							})
 						}
 					} else {
-						for _, att := range data.ActiveAttorneys {
+						for _, att := range data.DecisionAttorneys {
 							isChecked := false
 							for _, selectedUid := range data.Form.DecisionAttorneysUids {
 								if selectedUid == att.Uid {

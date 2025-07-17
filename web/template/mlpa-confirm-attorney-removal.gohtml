@@ -128,7 +128,7 @@
           <strong>Attorney appointment type</strong>
         </label>
         <div class="govuk-input__wrapper">
-          <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm (eq (len .ActiveAttorneys) 1) .CaseSummary.DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions }}</p>
+          <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm false .CaseSummary.DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions }}</p>
         </div>
       </div>
 
@@ -138,7 +138,7 @@
           <strong>Replacement attorney appointment type</strong>
         </label>
         <div class="govuk-input__wrapper">
-          <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm (eq (len .ActiveAttorneys) 1) .CaseSummary.DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions }}</p>
+          <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm false .CaseSummary.DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions }}</p>
         </div>
       </div>
 
