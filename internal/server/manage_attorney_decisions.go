@@ -27,7 +27,6 @@ type formManageAttorneyDecisions struct {
 
 type manageAttorneyDecisionsData struct {
 	CaseSummary              sirius.CaseSummary
-	ActiveAttorneys          []sirius.LpaStoreAttorney
 	DecisionAttorneys        []sirius.LpaStoreAttorney
 	Form                     formManageAttorneyDecisions
 	DecisionAttorneysDetails []AttorneyDetails

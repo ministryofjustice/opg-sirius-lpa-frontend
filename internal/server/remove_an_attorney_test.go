@@ -43,6 +43,8 @@ var removeAnAttorneyCaseSummary = sirius.CaseSummary{
 			Subtype: "personal-welfare",
 		},
 		LpaStoreData: sirius.LpaStoreData{
+			HowAttorneysMakeDecisions:            "jointly",
+			HowReplacementAttorneysMakeDecisions: "jointly",
 			Attorneys: []sirius.LpaStoreAttorney{
 				{
 					LpaStorePerson: sirius.LpaStorePerson{
@@ -226,6 +228,47 @@ var inactiveAttorneys = []sirius.LpaStoreAttorney{
 	},
 }
 
+var decisionAttorneys = []sirius.LpaStoreAttorney{
+	{
+		LpaStorePerson: sirius.LpaStorePerson{
+			Uid:        "987a01b1-456d-4567-813d-2010d3e2d72d",
+			FirstNames: "Shelley",
+			LastName:   "Jones",
+			Address: sirius.LpaStoreAddress{
+				Line1:    "29 Broad Road",
+				Town:     "Birmingham",
+				Postcode: "B29 6BT",
+				Country:  "UK",
+			},
+		},
+		DateOfBirth:     "1990-02-27",
+		Status:          shared.ActiveAttorneyStatus.String(),
+		AppointmentType: shared.ReplacementAppointmentType.String(),
+		Email:           "b@example.com",
+		Mobile:          "07122121242",
+		SignedAt:        "2024-11-28T20:22:11Z",
+	},
+	{
+		LpaStorePerson: sirius.LpaStorePerson{
+			Uid:        "123a01b1-456d-5391-813d-2010d3e256f",
+			FirstNames: "Jack",
+			LastName:   "Green",
+			Address: sirius.LpaStoreAddress{
+				Line1:    "39 Grange Road",
+				Town:     "Birmingham",
+				Postcode: "B29 6BL",
+				Country:  "UK",
+			},
+		},
+		DateOfBirth:     "1990-02-26",
+		Status:          shared.InactiveAttorneyStatus.String(),
+		AppointmentType: shared.ReplacementAppointmentType.String(),
+		Email:           "d@example.com",
+		Mobile:          "07122121232",
+		SignedAt:        "2024-11-30T19:22:11Z",
+	},
+}
+
 var removeAttorneyReasons = []sirius.RefDataItem{
 	{
 		Handle:        "BANKRUPT",
@@ -252,6 +295,8 @@ func TestGetRemoveAnAttorney(t *testing.T) {
 	removeTemplate := &mockTemplate{}
 	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
+			FormName:          "remove",
+			Decisions:         "jointly",
 			CaseSummary:       removeAnAttorneyCaseSummary,
 			ActiveAttorneys:   activeAttorneys,
 			InactiveAttorneys: inactiveAttorneys,
@@ -261,7 +306,6 @@ func TestGetRemoveAnAttorney(t *testing.T) {
 		Return(nil)
 
 	confirmTemplate := &mockTemplate{}
-
 	decisionsTemplate := &mockTemplate{}
 
 	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
@@ -312,6 +356,8 @@ func TestGetRemoveAnAttorneyTemplateErrors(t *testing.T) {
 	removeTemplate := &mockTemplate{}
 	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
+			FormName:          "remove",
+			Decisions:         "jointly",
 			CaseSummary:       removeAnAttorneyCaseSummary,
 			ActiveAttorneys:   activeAttorneys,
 			InactiveAttorneys: inactiveAttorneys,
@@ -344,6 +390,8 @@ func TestPostRemoveAnAttorneyInvalidData(t *testing.T) {
 	removeTemplate := &mockTemplate{}
 	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
+			FormName:          "remove",
+			Decisions:         "jointly",
 			CaseSummary:       removeAnAttorneyCaseSummary,
 			ActiveAttorneys:   activeAttorneys,
 			InactiveAttorneys: inactiveAttorneys,
@@ -392,6 +440,8 @@ func TestPostRemoveAnAttorneyValidData(t *testing.T) {
 	confirmTemplate := &mockTemplate{}
 	confirmTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
+			FormName:          "remove",
+			Decisions:         "jointly",
 			CaseSummary:       removeAnAttorneyCaseSummary,
 			ActiveAttorneys:   activeAttorneys,
 			InactiveAttorneys: inactiveAttorneys,
@@ -424,6 +474,7 @@ func TestPostRemoveAnAttorneyValidData(t *testing.T) {
 		"removedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
 		"enabledAttorney": {"123a01b1-456d-5391-813d-2010d3e256f"},
 		"removedReason":   {"DECEASED"},
+		"step":            {"remove"},
 	}
 
 	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/remove-an-attorney", strings.NewReader(form.Encode()))
@@ -462,7 +513,7 @@ func TestPostConfirmAttorneyRemovalValidData(t *testing.T) {
 		"removedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
 		"enabledAttorney": {"123a01b1-456d-5391-813d-2010d3e256f"},
 		"removedReason":   {"DECEASED"},
-		"confirmRemoval":  {""},
+		"step":            {"confirm"},
 	}
 
 	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-1111-2222-3333/remove-an-attorney", strings.NewReader(form.Encode()))
@@ -471,4 +522,64 @@ func TestPostConfirmAttorneyRemovalValidData(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, resp.Code)
 	assert.Equal(t, RedirectError("/lpa/M-1111-2222-3333"), err)
+}
+
+func TestPostRemoveAnAttorneyWithDecisionsValidData(t *testing.T) {
+	client := &mockRemoveAnAttorneyClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-6666-6666-6666").
+		Return(manageAttorneyDecisionsSummary, nil)
+
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.AttorneyRemovedReasonCategory).
+		Return(removeAttorneyReasons, nil)
+
+	removeTemplate := &mockTemplate{}
+	confirmTemplate := &mockTemplate{}
+	decisionsTemplate := &mockTemplate{}
+	decisionsTemplate.
+		On("Func", mock.Anything, removeAnAttorneyData{
+			FormName:          "remove",
+			Decisions:         "jointly-for-some-severally-for-others",
+			CaseSummary:       manageAttorneyDecisionsSummary,
+			ActiveAttorneys:   activeAttorneys,
+			InactiveAttorneys: inactiveAttorneys,
+			DecisionAttorneys: decisionAttorneys,
+			Form: formRemoveAttorney{
+				RemovedAttorneyUid:  "302b05c7-896c-4290-904e-2005e4f1e81e",
+				EnabledAttorneyUids: []string{"123a01b1-456d-5391-813d-2010d3e256f"},
+				SkipEnableAttorney:  "",
+				RemovedReason:       "DECEASED",
+			},
+			RemovedAttorneysDetails: SelectedAttorneyDetails{
+				SelectedAttorneyName: "Jack Black",
+				SelectedAttorneyDob:  "1990-02-22",
+			},
+			EnabledAttorneysDetails: []SelectedAttorneyDetails{
+				{
+					SelectedAttorneyName: "Jack Green",
+					SelectedAttorneyDob:  "1990-02-26",
+				},
+			},
+			RemovedReason: removeAttorneyReasons[1],
+			Error:         sirius.ValidationError{Field: sirius.FieldErrors{}},
+		}).
+		Return(nil)
+
+	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
+
+	form := url.Values{
+		"removedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
+		"enabledAttorney": {"123a01b1-456d-5391-813d-2010d3e256f"},
+		"removedReason":   {"DECEASED"},
+		"step":            {"remove"},
+	}
+
+	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-6666-6666-6666/remove-an-attorney", strings.NewReader(form.Encode()))
+	req.Header.Add("Content-Type", formUrlEncoded)
+	resp, err := server.serve(req)
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.Code)
+	mock.AssertExpectationsForObjects(t, client, decisionsTemplate)
 }
