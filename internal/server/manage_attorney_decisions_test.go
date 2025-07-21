@@ -26,6 +26,8 @@ func (m *mockManageAttorneyDecisionsClient) ManageAttorneyDecisions(ctx sirius.C
 	return args.Error(0)
 }
 
+var InactiveReplacementAttorneyUID = "123a01b1-456d-5391-813d-2010d3e256f"
+
 var manageAttorneyDecisionsSummary = sirius.CaseSummary{
 	DigitalLpa: sirius.DigitalLpa{
 		UID: "M-6666-6666-6666",

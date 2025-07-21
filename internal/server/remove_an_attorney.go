@@ -125,18 +125,14 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 				case "decision":
 					buildAttorneyDetails(&data, allRemovedReasons)
 					return confirmTmpl(w, data)
-				case "remove":
+				default: //"remove"
 					buildAttorneyDetails(&data, allRemovedReasons)
-					if data.Decisions == "jointly-for-some-severally-for-others" {
-						data.DecisionAttorneys = decisionAttorneysListAfterRemoval(lpa.LpaStoreData.Attorneys, data.Form)
-						return decisionsTmpl(w, data)
-					} else {
+					if data.Decisions != "jointly-for-some-severally-for-others" {
 						return confirmTmpl(w, data)
 					}
-				default:
-					return removeTmpl(w, data)
+					data.DecisionAttorneys = decisionAttorneysListAfterRemoval(lpa.LpaStoreData.Attorneys, data.Form)
+					return decisionsTmpl(w, data)
 				}
-
 			}
 		}
 
@@ -242,6 +238,7 @@ func decisionAttorneysListAfterRemoval(attorneys []sirius.LpaStoreAttorney, form
 				attorneysForDecisions = append(attorneysForDecisions, att)
 			}
 		}
+		// No default: other statuses are intentionally ignored
 	}
 
 	return attorneysForDecisions

@@ -36,6 +36,10 @@ func (m *mockRemoveAnAttorneyClient) ManageAttorneyDecisions(ctx sirius.Context,
 	return args.Error(0)
 }
 
+var ActiveOriginalAttorneyUid = "302b05c7-896c-4290-904e-2005e4f1e81e"
+
+var ActiveReplacementAttorneyUid = "987a01b1-456d-4567-813d-2010d3e2d72d"
+
 var removeAnAttorneyCaseSummary = sirius.CaseSummary{
 	DigitalLpa: sirius.DigitalLpa{
 		UID: "M-1111-2222-3333",
@@ -149,7 +153,7 @@ var removeAnAttorneyCaseSummary = sirius.CaseSummary{
 var activeAttorneys = []sirius.LpaStoreAttorney{
 	{
 		LpaStorePerson: sirius.LpaStorePerson{
-			Uid:        "302b05c7-896c-4290-904e-2005e4f1e81e",
+			Uid:        ActiveOriginalAttorneyUid,
 			FirstNames: "Jack",
 			LastName:   "Black",
 			Address: sirius.LpaStoreAddress{
@@ -168,7 +172,7 @@ var activeAttorneys = []sirius.LpaStoreAttorney{
 	},
 	{
 		LpaStorePerson: sirius.LpaStorePerson{
-			Uid:        "987a01b1-456d-4567-813d-2010d3e2d72d",
+			Uid:        ActiveReplacementAttorneyUid,
 			FirstNames: "Shelley",
 			LastName:   "Jones",
 			Address: sirius.LpaStoreAddress{
@@ -209,7 +213,7 @@ var inactiveAttorneys = []sirius.LpaStoreAttorney{
 	},
 	{
 		LpaStorePerson: sirius.LpaStorePerson{
-			Uid:        "123a01b1-456d-5391-813d-2010d3e256f",
+			Uid:        InactiveReplacementAttorneyUID,
 			FirstNames: "Jack",
 			LastName:   "Green",
 			Address: sirius.LpaStoreAddress{
@@ -231,7 +235,7 @@ var inactiveAttorneys = []sirius.LpaStoreAttorney{
 var decisionAttorneys = []sirius.LpaStoreAttorney{
 	{
 		LpaStorePerson: sirius.LpaStorePerson{
-			Uid:        "987a01b1-456d-4567-813d-2010d3e2d72d",
+			Uid:        ActiveReplacementAttorneyUid,
 			FirstNames: "Shelley",
 			LastName:   "Jones",
 			Address: sirius.LpaStoreAddress{
@@ -250,7 +254,7 @@ var decisionAttorneys = []sirius.LpaStoreAttorney{
 	},
 	{
 		LpaStorePerson: sirius.LpaStorePerson{
-			Uid:        "123a01b1-456d-5391-813d-2010d3e256f",
+			Uid:        InactiveReplacementAttorneyUID,
 			FirstNames: "Jack",
 			LastName:   "Green",
 			Address: sirius.LpaStoreAddress{
@@ -446,8 +450,8 @@ func TestPostSkipEnableAttorneyValidationErrors(t *testing.T) {
 			InactiveAttorneys: inactiveAttorneys,
 			RemovedReasons:    removeAttorneyReasons[1:2], // only second reason is valid for "personal-welfare"
 			Form: formRemoveAttorney{
-				RemovedAttorneyUid:  "302b05c7-896c-4290-904e-2005e4f1e81e",
-				EnabledAttorneyUids: []string{"123a01b1-456d-5391-813d-2010d3e256f"},
+				RemovedAttorneyUid:  ActiveOriginalAttorneyUid,
+				EnabledAttorneyUids: []string{InactiveReplacementAttorneyUID},
 				SkipEnableAttorney:  "yes",
 				RemovedReason:       "DECEASED",
 			},
@@ -463,8 +467,8 @@ func TestPostSkipEnableAttorneyValidationErrors(t *testing.T) {
 	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
 
 	form := url.Values{
-		"removedAttorney":    {"302b05c7-896c-4290-904e-2005e4f1e81e"},
-		"enabledAttorney":    {"123a01b1-456d-5391-813d-2010d3e256f"},
+		"removedAttorney":    {ActiveOriginalAttorneyUid},
+		"enabledAttorney":    {InactiveReplacementAttorneyUID},
 		"removedReason":      {"DECEASED"},
 		"skipEnableAttorney": {"yes"},
 	}
@@ -499,10 +503,10 @@ func TestPostDecisionAttorneyValidationError(t *testing.T) {
 			InactiveAttorneys: inactiveAttorneys,
 			DecisionAttorneys: decisionAttorneys,
 			Form: formRemoveAttorney{
-				RemovedAttorneyUid:    "302b05c7-896c-4290-904e-2005e4f1e81e",
-				EnabledAttorneyUids:   []string{"123a01b1-456d-5391-813d-2010d3e256f"},
+				RemovedAttorneyUid:    ActiveOriginalAttorneyUid,
+				EnabledAttorneyUids:   []string{InactiveReplacementAttorneyUID},
 				RemovedReason:         "DECEASED",
-				DecisionAttorneysUids: []string{"987a01b1-456d-4567-813d-2010d3e2d72d"},
+				DecisionAttorneysUids: []string{ActiveReplacementAttorneyUid},
 				SkipDecisionAttorney:  "yes",
 			},
 			Error: sirius.ValidationError{Field: sirius.FieldErrors{
@@ -516,9 +520,9 @@ func TestPostDecisionAttorneyValidationError(t *testing.T) {
 	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
 
 	form := url.Values{
-		"removedAttorney":      {"302b05c7-896c-4290-904e-2005e4f1e81e"},
-		"enabledAttorney":      {"123a01b1-456d-5391-813d-2010d3e256f"},
-		"decisionAttorney":     {"987a01b1-456d-4567-813d-2010d3e2d72d"},
+		"removedAttorney":      {ActiveOriginalAttorneyUid},
+		"enabledAttorney":      {InactiveReplacementAttorneyUID},
+		"decisionAttorney":     {ActiveReplacementAttorneyUid},
 		"removedReason":        {"DECEASED"},
 		"skipDecisionAttorney": {"yes"},
 		"step":                 {"decision"},
@@ -554,8 +558,8 @@ func TestPostRemoveAnAttorneyValidData(t *testing.T) {
 			InactiveAttorneys: inactiveAttorneys,
 			RemovedReasons:    removeAttorneyReasons[1:2], // only second reason is valid for "personal-welfare"
 			Form: formRemoveAttorney{
-				RemovedAttorneyUid:  "302b05c7-896c-4290-904e-2005e4f1e81e",
-				EnabledAttorneyUids: []string{"123a01b1-456d-5391-813d-2010d3e256f"},
+				RemovedAttorneyUid:  ActiveOriginalAttorneyUid,
+				EnabledAttorneyUids: []string{InactiveReplacementAttorneyUID},
 				SkipEnableAttorney:  "",
 				RemovedReason:       "DECEASED",
 			},
@@ -578,8 +582,8 @@ func TestPostRemoveAnAttorneyValidData(t *testing.T) {
 	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
 
 	form := url.Values{
-		"removedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
-		"enabledAttorney": {"123a01b1-456d-5391-813d-2010d3e256f"},
+		"removedAttorney": {ActiveOriginalAttorneyUid},
+		"enabledAttorney": {InactiveReplacementAttorneyUID},
 		"removedReason":   {"DECEASED"},
 		"step":            {"remove"},
 	}
@@ -605,8 +609,8 @@ func TestPostConfirmAttorneyRemovalValidData(t *testing.T) {
 
 	client.
 		On("ChangeAttorneyStatus", mock.Anything, "M-1111-2222-3333", []sirius.AttorneyUpdatedStatus{
-			{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", Status: "removed", RemovedReason: "DECEASED"},
-			{UID: "123a01b1-456d-5391-813d-2010d3e256f", Status: "active"},
+			{UID: ActiveOriginalAttorneyUid, Status: "removed", RemovedReason: "DECEASED"},
+			{UID: InactiveReplacementAttorneyUID, Status: "active"},
 		}).
 		Return(nil)
 
@@ -617,8 +621,8 @@ func TestPostConfirmAttorneyRemovalValidData(t *testing.T) {
 	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
 
 	form := url.Values{
-		"removedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
-		"enabledAttorney": {"123a01b1-456d-5391-813d-2010d3e256f"},
+		"removedAttorney": {ActiveOriginalAttorneyUid},
+		"enabledAttorney": {InactiveReplacementAttorneyUID},
 		"removedReason":   {"DECEASED"},
 		"step":            {"confirm"},
 	}
@@ -653,8 +657,8 @@ func TestPostRemoveAnAttorneyWithDecisionsValidData(t *testing.T) {
 			InactiveAttorneys: inactiveAttorneys,
 			DecisionAttorneys: decisionAttorneys,
 			Form: formRemoveAttorney{
-				RemovedAttorneyUid:  "302b05c7-896c-4290-904e-2005e4f1e81e",
-				EnabledAttorneyUids: []string{"123a01b1-456d-5391-813d-2010d3e256f"},
+				RemovedAttorneyUid:  ActiveOriginalAttorneyUid,
+				EnabledAttorneyUids: []string{InactiveReplacementAttorneyUID},
 				SkipEnableAttorney:  "",
 				RemovedReason:       "DECEASED",
 			},
@@ -676,8 +680,8 @@ func TestPostRemoveAnAttorneyWithDecisionsValidData(t *testing.T) {
 	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
 
 	form := url.Values{
-		"removedAttorney": {"302b05c7-896c-4290-904e-2005e4f1e81e"},
-		"enabledAttorney": {"123a01b1-456d-5391-813d-2010d3e256f"},
+		"removedAttorney": {ActiveOriginalAttorneyUid},
+		"enabledAttorney": {InactiveReplacementAttorneyUID},
 		"removedReason":   {"DECEASED"},
 		"step":            {"remove"},
 	}
@@ -712,10 +716,10 @@ func TestPostRemoveAnAttorneyDecisionsValidData(t *testing.T) {
 			ActiveAttorneys:   activeAttorneys,
 			InactiveAttorneys: inactiveAttorneys,
 			Form: formRemoveAttorney{
-				RemovedAttorneyUid:    "302b05c7-896c-4290-904e-2005e4f1e81e",
-				EnabledAttorneyUids:   []string{"123a01b1-456d-5391-813d-2010d3e256f"},
+				RemovedAttorneyUid:    ActiveOriginalAttorneyUid,
+				EnabledAttorneyUids:   []string{InactiveReplacementAttorneyUID},
 				RemovedReason:         "DECEASED",
-				DecisionAttorneysUids: []string{"987a01b1-456d-4567-813d-2010d3e2d72d"},
+				DecisionAttorneysUids: []string{ActiveReplacementAttorneyUid},
 			},
 			RemovedAttorneysDetails: SelectedAttorneyDetails{
 				SelectedAttorneyName: "Jack Black",
@@ -742,9 +746,9 @@ func TestPostRemoveAnAttorneyDecisionsValidData(t *testing.T) {
 	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
 
 	form := url.Values{
-		"removedAttorney":  {"302b05c7-896c-4290-904e-2005e4f1e81e"},
-		"enabledAttorney":  {"123a01b1-456d-5391-813d-2010d3e256f"},
-		"decisionAttorney": {"987a01b1-456d-4567-813d-2010d3e2d72d"},
+		"removedAttorney":  {ActiveOriginalAttorneyUid},
+		"enabledAttorney":  {InactiveReplacementAttorneyUID},
+		"decisionAttorney": {ActiveReplacementAttorneyUid},
 		"removedReason":    {"DECEASED"},
 		"step":             {"decision"},
 	}
@@ -770,16 +774,16 @@ func TestPostConfirmAttorneyRemoveAndDecisionsValidData(t *testing.T) {
 
 	client.
 		On("ChangeAttorneyStatus", mock.Anything, "M-6666-6666-6666", []sirius.AttorneyUpdatedStatus{
-			{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", Status: "removed", RemovedReason: "DECEASED"},
-			{UID: "123a01b1-456d-5391-813d-2010d3e256f", Status: "active"},
+			{UID: ActiveOriginalAttorneyUid, Status: "removed", RemovedReason: "DECEASED"},
+			{UID: InactiveReplacementAttorneyUID, Status: "active"},
 		}).
 		Return(nil)
 
 	client.
 		On("ManageAttorneyDecisions", mock.Anything, "M-6666-6666-6666", []sirius.AttorneyDecisions{
-			{UID: "987a01b1-456d-4567-813d-2010d3e2d72d", CannotMakeJointDecisions: true},
-			{UID: "123a01b1-456d-5391-813d-2010d3e256f", CannotMakeJointDecisions: false},
-			{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", CannotMakeJointDecisions: false},
+			{UID: ActiveReplacementAttorneyUid, CannotMakeJointDecisions: true},
+			{UID: InactiveReplacementAttorneyUID, CannotMakeJointDecisions: false},
+			{UID: ActiveOriginalAttorneyUid, CannotMakeJointDecisions: false},
 		}).
 		Return(nil)
 
@@ -790,10 +794,10 @@ func TestPostConfirmAttorneyRemoveAndDecisionsValidData(t *testing.T) {
 	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
 
 	form := url.Values{
-		"removedAttorney":  {"302b05c7-896c-4290-904e-2005e4f1e81e"},
-		"enabledAttorney":  {"123a01b1-456d-5391-813d-2010d3e256f"},
+		"removedAttorney":  {ActiveOriginalAttorneyUid},
+		"enabledAttorney":  {InactiveReplacementAttorneyUID},
 		"removedReason":    {"DECEASED"},
-		"decisionAttorney": {"987a01b1-456d-4567-813d-2010d3e2d72d"},
+		"decisionAttorney": {ActiveReplacementAttorneyUid},
 		"step":             {"confirm"},
 	}
 
@@ -817,15 +821,15 @@ func TestPostConfirmAttorneyRemoveAndSkipDecisionsValidData(t *testing.T) {
 
 	client.
 		On("ChangeAttorneyStatus", mock.Anything, "M-6666-6666-6666", []sirius.AttorneyUpdatedStatus{
-			{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", Status: "removed", RemovedReason: "DECEASED"},
-			{UID: "123a01b1-456d-5391-813d-2010d3e256f", Status: "active"},
+			{UID: ActiveOriginalAttorneyUid, Status: "removed", RemovedReason: "DECEASED"},
+			{UID: InactiveReplacementAttorneyUID, Status: "active"},
 		}).
 		Return(nil)
 
 	client.
 		On("ManageAttorneyDecisions", mock.Anything, "M-6666-6666-6666", []sirius.AttorneyDecisions{
-			{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", CannotMakeJointDecisions: false},
-			{UID: "987a01b1-456d-4567-813d-2010d3e2d72d", CannotMakeJointDecisions: false},
+			{UID: ActiveOriginalAttorneyUid, CannotMakeJointDecisions: false},
+			{UID: ActiveReplacementAttorneyUid, CannotMakeJointDecisions: false},
 		}).
 		Return(nil)
 
@@ -836,8 +840,8 @@ func TestPostConfirmAttorneyRemoveAndSkipDecisionsValidData(t *testing.T) {
 	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
 
 	form := url.Values{
-		"removedAttorney":      {"302b05c7-896c-4290-904e-2005e4f1e81e"},
-		"enabledAttorney":      {"123a01b1-456d-5391-813d-2010d3e256f"},
+		"removedAttorney":      {ActiveOriginalAttorneyUid},
+		"enabledAttorney":      {InactiveReplacementAttorneyUID},
 		"removedReason":        {"DECEASED"},
 		"skipDecisionAttorney": {"yes"},
 		"step":                 {"confirm"},
