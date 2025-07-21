@@ -757,3 +757,96 @@ func TestPostRemoveAnAttorneyDecisionsValidData(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.Code)
 	mock.AssertExpectationsForObjects(t, client, confirmTemplate)
 }
+
+func TestPostConfirmAttorneyRemoveAndDecisionsValidData(t *testing.T) {
+	client := &mockRemoveAnAttorneyClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-6666-6666-6666").
+		Return(manageAttorneyDecisionsSummary, nil)
+
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.AttorneyRemovedReasonCategory).
+		Return(removeAttorneyReasons, nil)
+
+	client.
+		On("ChangeAttorneyStatus", mock.Anything, "M-6666-6666-6666", []sirius.AttorneyUpdatedStatus{
+			{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", Status: "removed", RemovedReason: "DECEASED"},
+			{UID: "123a01b1-456d-5391-813d-2010d3e256f", Status: "active"},
+		}).
+		Return(nil)
+
+	client.
+		On("ManageAttorneyDecisions", mock.Anything, "M-6666-6666-6666", []sirius.AttorneyDecisions{
+			{UID: "987a01b1-456d-4567-813d-2010d3e2d72d", CannotMakeJointDecisions: true},
+			{UID: "123a01b1-456d-5391-813d-2010d3e256f", CannotMakeJointDecisions: false},
+			{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", CannotMakeJointDecisions: false},
+		}).
+		Return(nil)
+
+	removeTemplate := &mockTemplate{}
+	confirmTemplate := &mockTemplate{}
+	decisionsTemplate := &mockTemplate{}
+
+	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
+
+	form := url.Values{
+		"removedAttorney":  {"302b05c7-896c-4290-904e-2005e4f1e81e"},
+		"enabledAttorney":  {"123a01b1-456d-5391-813d-2010d3e256f"},
+		"removedReason":    {"DECEASED"},
+		"decisionAttorney": {"987a01b1-456d-4567-813d-2010d3e2d72d"},
+		"step":             {"confirm"},
+	}
+
+	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-6666-6666-6666/remove-an-attorney", strings.NewReader(form.Encode()))
+	req.Header.Add("Content-Type", formUrlEncoded)
+	resp, err := server.serve(req)
+
+	assert.Equal(t, http.StatusOK, resp.Code)
+	assert.Equal(t, RedirectError("/lpa/M-6666-6666-6666"), err)
+}
+
+func TestPostConfirmAttorneyRemoveAndSkipDecisionsValidData(t *testing.T) {
+	client := &mockRemoveAnAttorneyClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-6666-6666-6666").
+		Return(manageAttorneyDecisionsSummary, nil)
+
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.AttorneyRemovedReasonCategory).
+		Return(removeAttorneyReasons, nil)
+
+	client.
+		On("ChangeAttorneyStatus", mock.Anything, "M-6666-6666-6666", []sirius.AttorneyUpdatedStatus{
+			{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", Status: "removed", RemovedReason: "DECEASED"},
+			{UID: "123a01b1-456d-5391-813d-2010d3e256f", Status: "active"},
+		}).
+		Return(nil)
+
+	client.
+		On("ManageAttorneyDecisions", mock.Anything, "M-6666-6666-6666", []sirius.AttorneyDecisions{
+			{UID: "302b05c7-896c-4290-904e-2005e4f1e81e", CannotMakeJointDecisions: false},
+			{UID: "987a01b1-456d-4567-813d-2010d3e2d72d", CannotMakeJointDecisions: false},
+		}).
+		Return(nil)
+
+	removeTemplate := &mockTemplate{}
+	confirmTemplate := &mockTemplate{}
+	decisionsTemplate := &mockTemplate{}
+
+	server := newMockServer("/lpa/{uid}/remove-an-attorney", RemoveAnAttorney(client, removeTemplate.Func, confirmTemplate.Func, decisionsTemplate.Func))
+
+	form := url.Values{
+		"removedAttorney":      {"302b05c7-896c-4290-904e-2005e4f1e81e"},
+		"enabledAttorney":      {"123a01b1-456d-5391-813d-2010d3e256f"},
+		"removedReason":        {"DECEASED"},
+		"skipDecisionAttorney": {"yes"},
+		"step":                 {"confirm"},
+	}
+
+	req, _ := http.NewRequest(http.MethodPost, "/lpa/M-6666-6666-6666/remove-an-attorney", strings.NewReader(form.Encode()))
+	req.Header.Add("Content-Type", formUrlEncoded)
+	resp, err := server.serve(req)
+
+	assert.Equal(t, http.StatusOK, resp.Code)
+	assert.Equal(t, RedirectError("/lpa/M-6666-6666-6666"), err)
+}
