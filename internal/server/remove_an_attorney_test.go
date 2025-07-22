@@ -328,6 +328,9 @@ func TestGetRemoveAnAttorneyGetCaseSummaryFails(t *testing.T) {
 	client.
 		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
 		Return(caseSummary, errExample)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.AttorneyRemovedReasonCategory).
+		Return(removeAttorneyReasons, nil)
 
 	removeTemplate := &mockTemplate{}
 	removeTemplate.

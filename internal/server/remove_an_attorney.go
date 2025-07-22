@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"golang.org/x/sync/errgroup"
 	"net/http"
 	"slices"
 
@@ -55,9 +56,30 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 		uid := r.PathValue("uid")
 		ctx := getContext(r)
 
-		caseSummary, err := client.CaseSummary(ctx, uid)
+		var caseSummary sirius.CaseSummary
+		var allRemovedReasons []sirius.RefDataItem
+		var err error
 
-		if err != nil {
+		group, groupCtx := errgroup.WithContext(ctx.Context)
+
+		group.Go(func() error {
+			caseSummary, err = client.CaseSummary(ctx.With(groupCtx), uid)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		group.Go(func() error {
+			allRemovedReasons, err = client.RefDataByCategory(ctx, sirius.AttorneyRemovedReasonCategory)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
 			return err
 		}
 
@@ -89,10 +111,6 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 			data.InactiveAttorneys = append(data.InactiveAttorneys, attorney)
 		}
 
-		allRemovedReasons, err := client.RefDataByCategory(ctx, sirius.AttorneyRemovedReasonCategory)
-		if err != nil {
-			return err
-		}
 		for _, removedReason := range allRemovedReasons {
 			if slices.Contains(removedReason.ValidSubTypes, lpa.SiriusData.Subtype) {
 				data.RemovedReasons = append(data.RemovedReasons, removedReason)
@@ -221,9 +239,9 @@ func buildAttorneyDetails(data *removeAnAttorneyData, removedReasons []sirius.Re
 }
 
 func decisionAttorneysListAfterRemoval(attorneys []sirius.LpaStoreAttorney, form formRemoveAttorney) []sirius.LpaStoreAttorney {
-	var enabledAttorneyUid string
-	if len(form.EnabledAttorneyUids) > 0 {
-		enabledAttorneyUid = form.EnabledAttorneyUids[0]
+	enabledAttorneyUids := make(map[string]bool)
+	for _, uid := range form.EnabledAttorneyUids {
+		enabledAttorneyUids[uid] = true
 	}
 
 	var attorneysForDecisions []sirius.LpaStoreAttorney
@@ -234,11 +252,10 @@ func decisionAttorneysListAfterRemoval(attorneys []sirius.LpaStoreAttorney, form
 				attorneysForDecisions = append(attorneysForDecisions, att)
 			}
 		case shared.InactiveAttorneyStatus.String():
-			if att.Uid == enabledAttorneyUid {
+			if enabledAttorneyUids[att.Uid] {
 				attorneysForDecisions = append(attorneysForDecisions, att)
 			}
 		}
-		// No default: other statuses are intentionally ignored
 	}
 
 	return attorneysForDecisions
