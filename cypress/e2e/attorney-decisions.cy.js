@@ -228,16 +228,13 @@ describe("Manage attorney decisions form", () => {
             { uid: "active-attorney-1", cannotMakeJointDecisions: true },
             { uid: "active-attorney-2", cannotMakeJointDecisions: true },
           ],
-          receivedDate: "13/12/2024",
-          objectionType: "prescribed",
-          notes: "Test",
         },
       },
     );
 
     cy.contains("Manage decisions - attorneys who cannot act jointly");
-    cy.get("#f-activeAttorney-1").click();
-    cy.get("#f-activeAttorney-2").click();
+    cy.get("#f-decisionAttorney-1").click();
+    cy.get("#f-decisionAttorney-2").click();
     cy.get("button").contains("Continue").click();
     cy.url().should(
       "include",

@@ -130,32 +130,12 @@ describe("Remove an attorney", () => {
       cases.tasks.empty("1111"),
       cases.tasks.empty("2222"),
       digitalLpas.objections.empty("M-1111-1111-1111"),
+      digitalLpas.objections.empty("M-2222-2222-2222"),
+      digitalLpas.progressIndicators.feesInProgress("M-1111-1111-1111"),
+      digitalLpas.progressIndicators.feesInProgress("M-2222-2222-2222"),
     ]);
 
     cy.wrap(mocks);
-
-    cy.addMock(
-      "/lpa-api/v1/digital-lpas/M-1111-1111-1111/progress-indicators",
-      "GET",
-      {
-        status: 200,
-        body: {
-          digitalLpaUid: "M-1111-1111-1111",
-          progressIndicators: [
-            { indicator: "FEES", status: "IN_PROGRESS" },
-            { indicator: "DONOR_ID", status: "CANNOT_START" },
-            { indicator: "CERTIFICATE_PROVIDER_ID", status: "CANNOT_START" },
-            {
-              indicator: "CERTIFICATE_PROVIDER_SIGNATURE",
-              status: "CANNOT_START",
-            },
-            { indicator: "ATTORNEY_SIGNATURES", status: "CANNOT_START" },
-            { indicator: "PREREGISTRATION_NOTICES", status: "CANNOT_START" },
-            { indicator: "REGISTRATION_NOTICES", status: "CANNOT_START" },
-          ],
-        },
-      },
-    );
 
     cy.addMock("/lpa-api/v1/digital-lpas/M-2222-2222-2222", "GET", {
       status: 200,
@@ -164,6 +144,7 @@ describe("Remove an attorney", () => {
         "opg.poas.sirius": {
           id: 2222,
           uId: "M-2222-2222-2222",
+          caseSubtype: "property-and-affairs",
           donor: {
             firstname: "Steven",
             surname: "Munnell",
@@ -187,6 +168,13 @@ describe("Remove an attorney", () => {
           },
         },
         "opg.poas.lpastore": {
+          lpaType: "pf",
+          channel: "online",
+          status: "draft",
+          registrationDate: "2022-12-18",
+          howAttorneysMakeDecisions: "jointly-for-some-severally-for-others",
+          howReplacementAttorneysMakeDecisions:
+            "jointly-for-some-severally-for-others",
           donor: {
             uid: "572fe550-e465-40b3-a643-ca9564fabab8",
             firstNames: "Steven",
@@ -204,6 +192,62 @@ describe("Remove an attorney", () => {
               country: "GB",
             },
           },
+          attorneys: [
+            {
+              uid: "active-attorney-1",
+              firstNames: "Katheryn",
+              lastName: "Collins",
+              address: {
+                line1: "9 O'Reilly Rise",
+                line2: "Upton",
+                town: "Williamsonborough",
+                postcode: "ZZ24 4JM",
+                country: "GB",
+              },
+              status: "active",
+              appointmentType: "original",
+              signedAt: "2022-12-19T09:12:59Z",
+              dateOfBirth: "1971-11-27",
+              mobile: "0500133447",
+              email: "K.Collins@example.com",
+            },
+            {
+              uid: "active-attorney-2",
+              firstNames: "Rachel",
+              lastName: "Jones",
+              address: {
+                line1: "10 O'Reilly Rise",
+                line2: "Upton",
+                town: "Williamsonborough",
+                postcode: "ZZ24 4JM",
+                country: "GB",
+              },
+              status: "active",
+              appointmentType: "replacement",
+              signedAt: "2022-12-20T09:12:59Z",
+              dateOfBirth: "1971-11-29",
+              mobile: "0500133447",
+              email: "K.Collins@example.com",
+            },
+            {
+              uid: "inactive-attorney-1",
+              firstNames: "Barry",
+              lastName: "Smith",
+              address: {
+                line1: "11 O'Reilly Rise",
+                line2: "Upton",
+                town: "Williamsonborough",
+                postcode: "ZZ24 4JM",
+                country: "GB",
+              },
+              status: "inactive",
+              appointmentType: "replacement",
+              signedAt: "2022-12-22T09:12:59Z",
+              dateOfBirth: "1971-11-30",
+              mobile: "0500133447",
+              email: "K.Collins@example.com",
+            },
+          ],
         },
       },
     });
@@ -220,29 +264,6 @@ describe("Remove an attorney", () => {
         status: "Processing",
       },
     });
-
-    cy.addMock(
-      "/lpa-api/v1/digital-lpas/M-2222-2222-2222/progress-indicators",
-      "GET",
-      {
-        status: 200,
-        body: {
-          digitalLpaUid: "M-2222-2222-2222",
-          progressIndicators: [
-            { indicator: "FEES", status: "IN_PROGRESS" },
-            { indicator: "DONOR_ID", status: "CANNOT_START" },
-            { indicator: "CERTIFICATE_PROVIDER_ID", status: "CANNOT_START" },
-            {
-              indicator: "CERTIFICATE_PROVIDER_SIGNATURE",
-              status: "CANNOT_START",
-            },
-            { indicator: "ATTORNEY_SIGNATURES", status: "CANNOT_START" },
-            { indicator: "PREREGISTRATION_NOTICES", status: "CANNOT_START" },
-            { indicator: "REGISTRATION_NOTICES", status: "CANNOT_START" },
-          ],
-        },
-      },
-    );
 
     cy.addMock("/lpa-api/v1/reference-data/attorneyRemovedReason", "GET", {
       status: 200,
@@ -306,5 +327,59 @@ describe("Remove an attorney", () => {
     cy.get(".govuk-summary-list__value").contains("Katheryn Collins");
     cy.get(".govuk-summary-list__value").contains("Bankrupt");
     cy.get(".govuk-summary-list__value").contains("Barry Smith");
+  });
+
+  it("shows the decisions form on a jointly and severally case", () => {
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-2222-2222-2222/attorney-status",
+      "PUT",
+      {
+        status: 204,
+        body: {
+          attorneyStatuses: [
+            {
+              uid: "active-attorney-2",
+              status: "removed",
+              removedReason: "BANKRUPT",
+            },
+            { uid: "inactive-attorney-1", status: "active" },
+          ],
+        },
+      },
+    );
+
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-2222-2222-2222/attorney-decisions",
+      "PUT",
+      {
+        status: 204,
+        body: {
+          attorneyDecisions: [
+            { uid: "active-attorney-1", cannotMakeJointDecisions: true },
+            { uid: "inactive-attorney-1", cannotMakeJointDecisions: false },
+          ],
+        },
+      },
+    );
+
+    cy.visit("/lpa/M-2222-2222-2222/remove-an-attorney");
+    cy.get("#f-activeAttorney-2").click();
+    cy.get("#f-removedReason-1").click();
+    cy.get("#f-inactiveAttorney-1").click();
+    cy.get("button").contains("Continue").click();
+
+    cy.contains("Manage decisions - attorneys who cannot act jointly");
+    cy.contains("Select who cannot make joint decisions");
+    cy.contains("Katheryn Collins (attorney)");
+    cy.contains("Barry Smith (replacement attorney stepping in)");
+    cy.get("#f-decisionAttorney-1").click();
+    cy.get("button").contains("Continue").click();
+
+    cy.contains("Confirm removal of attorney");
+    cy.get("button").contains("Confirm removal").click();
+    cy.url()
+      .should("include", "/lpa/M-2222-2222-2222")
+      .should("not.include", "manage-attorney-decisions");
+    cy.contains("Update saved");
   });
 });
