@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -14,11 +15,12 @@ type UpdateDecisionsClient interface {
 }
 
 type updateDecisionsData struct {
-	XSRFToken   string
-	Success     bool
-	Error       sirius.ValidationError
-	Form        formDecisionsDetails
-	CaseSummary sirius.CaseSummary
+	XSRFToken       string
+	Success         bool
+	Error           sirius.ValidationError
+	Form            formDecisionsDetails
+	CaseSummary     sirius.CaseSummary
+	ActiveAttorneys []sirius.LpaStoreAttorney
 }
 
 type formDecisionsDetails struct {
@@ -59,6 +61,15 @@ func UpdateDecisions(client UpdateDecisionsClient, tmpl template.Template) Handl
 				HowReplacementAttorneysMakeDecisionsDetails: lpaStoreData.HowReplacementAttorneysMakeDecisionsDetails,
 			},
 		}
+
+		var activeAttorneys []sirius.LpaStoreAttorney
+		for _, attorney := range lpaStoreData.Attorneys {
+			if attorney.Status == shared.ActiveAttorneyStatus.String() {
+				activeAttorneys = append(activeAttorneys, attorney)
+			}
+		}
+
+		data.ActiveAttorneys = activeAttorneys
 
 		if r.Method == http.MethodPost {
 			if err := decoder.Decode(&data.Form, r.PostForm); err != nil {
