@@ -97,6 +97,7 @@ func TestGetAllocateCasesMultiple(t *testing.T) {
 func TestGetAllocateCasesBadQueryString(t *testing.T) {
 	testCases := map[string]string{
 		"no-id":      "/",
+		"empty-id":   "/?id=",
 		"bad-id":     "/?id=what",
 		"one-bad-id": "/?id=1&id=bad&id=2",
 	}
@@ -108,7 +109,7 @@ func TestGetAllocateCasesBadQueryString(t *testing.T) {
 
 			err := AllocateCases(nil, nil)(w, r)
 
-			assert.NotNil(t, err)
+			assert.Equal(t, err, sirius.StatusError{Code: 404})
 		})
 	}
 }
