@@ -128,9 +128,11 @@ func TestPostEditDates(t *testing.T) {
 					DispatchDate:     sirius.DateString("2022-02-03"),
 					DueDate:          sirius.DateString("2022-03-05"),
 					InvalidDate:      sirius.DateString("2022-04-03"),
+					PaymentDate:      sirius.DateString("2022-05-03"),
 					ReceiptDate:      sirius.DateString("2021-11-23"),
 					RegistrationDate: sirius.DateString("2022-05-03"),
 					RejectedDate:     sirius.DateString("2022-06-03"),
+					RevokedDate:      sirius.DateString("2022-12-03"),
 					WithdrawnDate:    sirius.DateString("2022-07-03"),
 				}).
 				Return(nil)
@@ -152,9 +154,11 @@ func TestPostEditDates(t *testing.T) {
 				"dispatchDate":     {"2022-02-03"},
 				"dueDate":          {"2022-03-05"},
 				"invalidDate":      {"2022-04-03"},
+				"paymentDate":      {"2022-05-03"},
 				"receiptDate":      {"2021-11-23"},
 				"registrationDate": {"2022-05-03"},
 				"rejectedDate":     {"2022-06-03"},
+				"revokedDate":      {"2022-12-03"},
 				"withdrawnDate":    {"2022-07-03"},
 			}
 

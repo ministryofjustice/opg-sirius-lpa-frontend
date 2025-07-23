@@ -41,8 +41,10 @@ func TestEditDates(t *testing.T) {
 							"dispatchDate":     "04/03/2022",
 							"dueDate":          "04/03/2022",
 							"invalidDate":      "04/03/2022",
+							"paymentDate":      "04/03/2022",
 							"receiptDate":      "04/03/2022",
 							"registrationDate": "04/03/2022",
+							"revokedDate":      "04/03/2022",
 							"withdrawnDate":    "04/03/2022",
 						},
 					}).
@@ -67,8 +69,10 @@ func TestEditDates(t *testing.T) {
 					DispatchDate:     DateString("2022-03-04"),
 					DueDate:          DateString("2022-03-04"),
 					InvalidDate:      DateString("2022-03-04"),
+					PaymentDate:      DateString("2022-03-04"),
 					ReceiptDate:      DateString("2022-03-04"),
 					RegistrationDate: DateString("2022-03-04"),
+					RevokedDate:      DateString("2022-03-04"),
 					WithdrawnDate:    DateString("2022-03-04"),
 				})
 
