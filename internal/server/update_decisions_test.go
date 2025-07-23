@@ -74,28 +74,6 @@ var updateDecisionsCaseSummary = sirius.CaseSummary{
 	},
 }
 
-var updateDecisionsActiveAttorneys = []sirius.LpaStoreAttorney{
-	{
-		LpaStorePerson: sirius.LpaStorePerson{
-			Uid:        "302b05c7-896c-4290-904e-2005e4f1e81e",
-			FirstNames: "Jack",
-			LastName:   "Black",
-			Address: sirius.LpaStoreAddress{
-				Line1:    "9 Mount Pleasant Drive",
-				Town:     "East Harling",
-				Postcode: "NR16 2GB",
-				Country:  "UK",
-			},
-		},
-		DateOfBirth:     "1990-02-22",
-		Status:          shared.ActiveAttorneyStatus.String(),
-		AppointmentType: shared.OriginalAppointmentType.String(),
-		Email:           "a@example.com",
-		Mobile:          "077577575757",
-		SignedAt:        "2024-01-12T10:09:09Z",
-	},
-}
-
 func TestGetUpdateDecisionsGet(t *testing.T) {
 	client := &mockUpdateDecisionsClient{}
 	client.
@@ -106,9 +84,9 @@ func TestGetUpdateDecisionsGet(t *testing.T) {
 	template.
 		On("Func", mock.Anything,
 			updateDecisionsData{
-				CaseSummary:     updateDecisionsCaseSummary,
-				Form:            formDecisionsDetails{},
-				ActiveAttorneys: updateDecisionsActiveAttorneys,
+				CaseSummary:         updateDecisionsCaseSummary,
+				Form:                formDecisionsDetails{},
+				ActiveAttorneyCount: 1,
 			}).
 		Return(errExample)
 

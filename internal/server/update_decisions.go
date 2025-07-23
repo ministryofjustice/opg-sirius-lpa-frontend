@@ -15,12 +15,12 @@ type UpdateDecisionsClient interface {
 }
 
 type updateDecisionsData struct {
-	XSRFToken       string
-	Success         bool
-	Error           sirius.ValidationError
-	Form            formDecisionsDetails
-	CaseSummary     sirius.CaseSummary
-	ActiveAttorneys []sirius.LpaStoreAttorney
+	XSRFToken           string
+	Success             bool
+	Error               sirius.ValidationError
+	Form                formDecisionsDetails
+	CaseSummary         sirius.CaseSummary
+	ActiveAttorneyCount int
 }
 
 type formDecisionsDetails struct {
@@ -62,14 +62,11 @@ func UpdateDecisions(client UpdateDecisionsClient, tmpl template.Template) Handl
 			},
 		}
 
-		var activeAttorneys []sirius.LpaStoreAttorney
 		for _, attorney := range lpaStoreData.Attorneys {
 			if attorney.Status == shared.ActiveAttorneyStatus.String() {
-				activeAttorneys = append(activeAttorneys, attorney)
+				data.ActiveAttorneyCount++
 			}
 		}
-
-		data.ActiveAttorneys = activeAttorneys
 
 		if r.Method == http.MethodPost {
 			if err := decoder.Decode(&data.Form, r.PostForm); err != nil {

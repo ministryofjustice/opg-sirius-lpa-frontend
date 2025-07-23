@@ -24,7 +24,7 @@
           <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend">How must attorneys make decisions?</legend>
             {{ template "errors" .Error.Field.howAttorneysMakeDecisions }}
-            {{ if eq (len .ActiveAttorneys) 1 }}
+            {{ if eq .ActiveAttorneyCount 1 }}
               <div class="govuk-inset-text">
                 {{ howAttorneysMakeDecisionsLongForm true .Form.HowAttorneysMakeDecisions }}
               </div>
