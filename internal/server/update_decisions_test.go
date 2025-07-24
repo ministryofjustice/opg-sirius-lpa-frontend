@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"net/http"
 	"net/url"
 	"strings"
@@ -25,17 +26,67 @@ func (m *mockUpdateDecisionsClient) UpdateDecisions(ctx sirius.Context, uid stri
 	return args.Error(0)
 }
 
+var updateDecisionsCaseSummary = sirius.CaseSummary{
+	DigitalLpa: sirius.DigitalLpa{
+		UID: "M-1111-2222-3333",
+		LpaStoreData: sirius.LpaStoreData{
+			Attorneys: []sirius.LpaStoreAttorney{
+				{
+					LpaStorePerson: sirius.LpaStorePerson{
+						Uid:        "302b05c7-896c-4290-904e-2005e4f1e81e",
+						FirstNames: "Jack",
+						LastName:   "Black",
+						Address: sirius.LpaStoreAddress{
+							Line1:    "9 Mount Pleasant Drive",
+							Town:     "East Harling",
+							Postcode: "NR16 2GB",
+							Country:  "UK",
+						},
+					},
+					DateOfBirth:     "1990-02-22",
+					Status:          shared.ActiveAttorneyStatus.String(),
+					AppointmentType: shared.OriginalAppointmentType.String(),
+					Email:           "a@example.com",
+					Mobile:          "077577575757",
+					SignedAt:        "2024-01-12T10:09:09Z",
+				},
+				{
+					LpaStorePerson: sirius.LpaStorePerson{
+						Uid:        "123a01b1-456d-5391-813d-2010d3e2d72d",
+						FirstNames: "Jack",
+						LastName:   "White",
+						Address: sirius.LpaStoreAddress{
+							Line1:    "29 Grange Road",
+							Town:     "Birmingham",
+							Postcode: "B29 6BL",
+							Country:  "UK",
+						},
+					},
+					DateOfBirth:     "1990-02-22",
+					Status:          shared.InactiveAttorneyStatus.String(),
+					AppointmentType: shared.ReplacementAppointmentType.String(),
+					Email:           "c@example.com",
+					Mobile:          "07122121212",
+					SignedAt:        "2024-11-28T19:22:11Z",
+				},
+			},
+		},
+	},
+}
+
 func TestGetUpdateDecisionsGet(t *testing.T) {
 	client := &mockUpdateDecisionsClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
-		Return(sirius.CaseSummary{}, nil)
+		Return(updateDecisionsCaseSummary, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything,
 			updateDecisionsData{
-				Form: formDecisionsDetails{},
+				CaseSummary:         updateDecisionsCaseSummary,
+				Form:                formDecisionsDetails{},
+				ActiveAttorneyCount: 1,
 			}).
 		Return(errExample)
 

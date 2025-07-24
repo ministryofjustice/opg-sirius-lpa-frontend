@@ -20,11 +20,15 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
 
-        {{ if .Form.HowAttorneysMakeDecisions }}
-          <div class="govuk-form-group {{ if .Error.Field.howAttorneysMakeDecisions }}govuk-form-group--error{{ end }}">
-            <fieldset class="govuk-fieldset">
-              <legend class="govuk-fieldset__legend">How must attorneys make decisions?</legend>
-              {{ template "errors" .Error.Field.howAttorneysMakeDecisions }}
+        <div class="govuk-form-group {{ if .Error.Field.howAttorneysMakeDecisions }}govuk-form-group--error{{ end }}">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend">How must attorneys make decisions?</legend>
+            {{ template "errors" .Error.Field.howAttorneysMakeDecisions }}
+            {{ if eq .ActiveAttorneyCount 1 }}
+              <div class="govuk-inset-text">
+                {{ howAttorneysMakeDecisionsLongForm true .Form.HowAttorneysMakeDecisions }}
+              </div>
+            {{ else }}
               <div class="govuk-radios" data-module="govuk-radios">
                 <div class="govuk-radios__item">
                   <input class="govuk-radios__input" id="f-howAttorneysMakeDecisions" name="howAttorneysMakeDecisions" type="radio" value="jointly" {{ if eq .Form.HowAttorneysMakeDecisions "jointly" }}checked{{ end }}>
@@ -48,9 +52,9 @@
                   </div>
                 </div>
               </div>
-            </fieldset>
-          </div>
-        {{ end }}
+            {{ end}}
+          </fieldset>
+        </div>
 
         {{ with .Form.LifeSustainingTreatmentOption }}
           {{ template "radios" (radios "lifeSustainingTreatmentOption" "Can attorneys make decisions about life sustaining treatment?" . $.Error.Field.lifeSustainingTreatmentOption
