@@ -26,6 +26,7 @@
         {{ template "input-date" (field "rejectedDate" "Date rejected" .Dates.RejectedDate .Error.Field.rejectedDate) }}
         {{ template "input-date" (field "invalidDate" "Date invalidated" .Dates.InvalidDate .Error.Field.invalidDate) }}
         {{ template "input-date" (field "withdrawnDate" "Date withdrawn" .Dates.WithdrawnDate .Error.Field.withdrawnDate) }}
+        {{ template "input-date" (field "revokedDate" "Date revoked" .Dates.RevokedDate .Error.Field.revokedDate) }}
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>

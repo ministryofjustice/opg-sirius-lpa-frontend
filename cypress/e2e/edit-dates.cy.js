@@ -16,6 +16,7 @@ describe("Edit dates", () => {
     cy.get("#f-rejectedDate").type("2022-03-04");
     cy.get("#f-invalidDate").type("2022-03-04");
     cy.get("#f-withdrawnDate").type("2022-03-04");
+    cy.get("#f-revokedDate").type("2022-03-04");
     cy.get("button[type=submit]").click();
     cy.get(".moj-alert").should("exist");
   });

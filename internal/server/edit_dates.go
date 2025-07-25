@@ -47,6 +47,7 @@ func EditDates(client EditDatesClient, tmpl template.Template) Handler {
 				ReceiptDate:      postFormDateString(r, "receiptDate"),
 				RegistrationDate: postFormDateString(r, "registrationDate"),
 				RejectedDate:     postFormDateString(r, "rejectedDate"),
+				RevokedDate:      postFormDateString(r, "revokedDate"),
 				WithdrawnDate:    postFormDateString(r, "withdrawnDate"),
 			}
 
@@ -77,6 +78,7 @@ func EditDates(client EditDatesClient, tmpl template.Template) Handler {
 				ReceiptDate:      caseitem.ReceiptDate,
 				RegistrationDate: caseitem.RegistrationDate,
 				RejectedDate:     caseitem.RejectedDate,
+				RevokedDate:      caseitem.RevokedDate,
 				WithdrawnDate:    caseitem.WithdrawnDate,
 			}
 		}
