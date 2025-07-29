@@ -19,14 +19,14 @@
                     <strong>Attorneys appointment type</strong>
                 </label>
                 <div class="govuk-input__wrapper">
-                    <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm (eq (len .ActiveAttorneys) 1) .CaseSummary.DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions }}</p>
+                    <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm false .CaseSummary.DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions }}</p>
                 </div>
 
                 <label class="govuk-label">
                     <strong>Replacement attorney appointment type</strong>
                 </label>
                 <div class="govuk-input__wrapper">
-                    <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm (eq (len .ActiveAttorneys) 1) .CaseSummary.DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions }}</p>
+                    <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm false .CaseSummary.DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions }}</p>
                 </div>
 
                 <label class="govuk-label">
@@ -39,31 +39,41 @@
                 </div>
             </div>
 
-
+            {{ $removeAttorneyJourney := eq .FormName "remove"}}
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}">
+                <input type="hidden" name="step" value="decision">
 
+                {{ if $removeAttorneyJourney }}
+                    <input type="hidden" name="removedAttorney" value="{{ .Form.RemovedAttorneyUid }}"/>
+                    {{ range $enabledAttUid := .Form.EnabledAttorneyUids }}
+                        <input type="hidden" name="enabledAttorney" value="{{ $enabledAttUid }}"/>
+                    {{ end }}
+                    <input type="hidden" name="skipEnableAttorney" value="{{ .Form.SkipEnableAttorney }}"/>
+                    <input type="hidden" name="removedReason" value="{{ .Form.RemovedReason }}">
+                {{ end}}
 
                 <div class="govuk-form-group{{ if .Error.Field.decisionAttorney }} govuk-form-group--error{{ end }}">
                     <fieldset class="govuk-fieldset">
                         <legend class="govuk-fieldset__legend"><strong>Select who cannot make joint decisions</strong></legend>
                         {{ template "errors" .Error.Field.decisionAttorney }}
 
-                        {{ if gt (len .ActiveAttorneys) 0 }}
+                        {{ if gt (len .DecisionAttorneys) 0 }}
                             <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                                {{ range $idx, $activeAttorney := .ActiveAttorneys }}
+                                {{ range $idx, $attorney := .DecisionAttorneys }}
                                     <div class="govuk-checkboxes__item">
-                                        <input class="govuk-checkboxes__input" id="f-activeAttorney-{{ plusN $idx 1 }}" name="decisionAttorney" type="checkbox" value="{{ $activeAttorney.Uid }}"
-                                               {{ if contains $.Form.DecisionAttorneysUids $activeAttorney.Uid }}checked{{ end }}>
-                                        <label class="govuk-label govuk-checkboxes__label" for="f-activeAttorney-{{ plusN $idx 1 }}">
-                                            {{ $activeAttorney.FirstNames }} {{ $activeAttorney.LastName }}
-                                            {{ if eq $activeAttorney.AppointmentType "original" }} (attorney)
+                                        <input class="govuk-checkboxes__input" id="f-decisionAttorney-{{ plusN $idx 1 }}" name="decisionAttorney" type="checkbox" value="{{ $attorney.Uid }}"
+                                               {{ if contains $.Form.DecisionAttorneysUids $attorney.Uid }}checked{{ end }}>
+                                        <label class="govuk-label govuk-checkboxes__label" for="f-decisionAttorney-{{ plusN $idx 1 }}">
+                                            {{ $attorney.FirstNames }} {{ $attorney.LastName }}
+                                            {{ if eq $attorney.AppointmentType "original" }} (attorney)
+                                            {{ else if and ($removeAttorneyJourney) (eq $attorney.Status "inactive") }} (replacement attorney stepping in)
                                             {{ else }} (previously replacement attorney)
                                             {{ end }}
                                             <br>
-                                            {{ if not (eq $activeAttorney.DateOfBirth "") }}
-                                                {{ parseAndFormatDate $activeAttorney.DateOfBirth "2006-01-02" "2 January 2006" }}
+                                            {{ if not (eq $attorney.DateOfBirth "") }}
+                                                {{ parseAndFormatDate $attorney.DateOfBirth "2006-01-02" "2 January 2006" }}
                                             {{ end }}
                                         </label>
                                     </div>
