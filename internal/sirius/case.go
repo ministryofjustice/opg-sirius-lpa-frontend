@@ -18,6 +18,7 @@ type Case struct {
 	ReceiptDate       DateString `json:"receiptDate,omitempty"`
 	RegistrationDate  DateString `json:"registrationDate,omitempty"`
 	RejectedDate      DateString `json:"rejectedDate,omitempty"`
+	RevokedDate       DateString `json:"revokedDate,omitempty"`
 	WithdrawnDate     DateString `json:"withdrawnDate,omitempty"`
 	Donor             *Person    `json:"donor,omitempty"`
 	TrustCorporations []Person   `json:"trustCorporations,omitempty"`
