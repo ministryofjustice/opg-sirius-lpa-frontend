@@ -69,10 +69,7 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 			if err != nil {
 				return err
 			}
-			return nil
-		})
 
-		group.Go(func() error {
 			payments, err := client.Payments(ctx, caseID)
 			if err != nil {
 				return err
@@ -93,7 +90,7 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 				totalPaidAndReductions = totalPaidAndReductions + p.Amount
 			}
 
-			outstandingFeeOrRefund := 8200 - totalPaidAndReductions
+			outstandingFeeOrRefund := data.Case.ExpectedPaymentTotal - totalPaidAndReductions
 			if outstandingFeeOrRefund < 0 {
 				data.RefundAmount = outstandingFeeOrRefund * -1 /*convert to pos num for display*/
 			} else {
