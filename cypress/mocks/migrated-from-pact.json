@@ -6,7 +6,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "{\"caseType\":\"LPA\",\"donor\":{\"id\":189},\"status\":\"Pending\",\"uId\":\"7000-0000-0001\"}"
+        "body": "{\"caseType\":\"LPA\",\"donor\":{\"id\":189},\"status\":\"Pending\",\"uId\":\"7000-0000-0001\",\"expectedPaymentTotal\":8200}"
       }
     },
     {
@@ -15,7 +15,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "{\"caseType\":\"DIGITAL_LPA\",\"donor\":{\"id\":189},\"status\":\"Pending\",\"uId\":\"M-9999-4567-AAAA\"}"
+        "body": "{\"caseType\":\"DIGITAL_LPA\",\"donor\":{\"id\":189},\"status\":\"Pending\",\"uId\":\"M-9999-4567-AAAA\",\"expectedPaymentTotal\":8200}"
       }
     },
     {
@@ -61,7 +61,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "{\"caseType\":\"LPA\",\"donor\":{\"id\":189},\"id\":800,\"status\":\"Pending\",\"uId\":\"7000-0000-0000\"}"
+        "body": "{\"caseType\":\"LPA\",\"donor\":{\"id\":189},\"id\":800,\"status\":\"Pending\",\"uId\":\"7000-0000-0000\",\"expectedPaymentTotal\":8200}"
       }
     },
     {
@@ -70,7 +70,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "{\"caseType\":\"DIGITAL_LPA\",\"donor\":{\"id\":189},\"id\":900,\"status\":\"Pending\",\"uId\":\"M-9999-4567-AAAA\"}"
+        "body": "{\"caseType\":\"DIGITAL_LPA\",\"donor\":{\"id\":189},\"id\":900,\"status\":\"Pending\",\"uId\":\"M-9999-4567-AAAA\",\"expectedPaymentTotal\":8200}"
       }
     },
     {
@@ -473,7 +473,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "{\"caseType\":\"LPA\",\"donor\":{\"id\":189},\"status\":\"Pending\",\"uId\":\"7000-0000-0002\"}"
+        "body": "{\"caseType\":\"LPA\",\"donor\":{\"id\":189},\"status\":\"Pending\",\"uId\":\"7000-0000-0002\",\"expectedPaymentTotal\":8200}"
       }
     },
     {
