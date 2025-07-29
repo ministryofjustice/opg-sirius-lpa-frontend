@@ -137,6 +137,7 @@ describe("View a digital LPA", () => {
           id: 33,
         },
         status: "Processing",
+        expectedPaymentTotal: 8200,
       },
     });
 
@@ -342,6 +343,7 @@ describe("View a digital LPA", () => {
           id: 33,
         },
         status: "Draft",
+        expectedPaymentTotal: 8200,
       },
     });
 
@@ -524,6 +526,7 @@ describe("View a digital LPA", () => {
           id: 33,
         },
         status: "Draft",
+        expectedPaymentTotal: 8200,
       },
     });
 
