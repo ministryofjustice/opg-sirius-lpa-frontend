@@ -49,6 +49,7 @@ type LpaStoreData struct {
 	Status                                      string                      `json:"status"`
 	Attorneys                                   []LpaStoreAttorney          `json:"attorneys"`
 	CertificateProvider                         LpaStoreCertificateProvider `json:"certificateProvider"`
+	CertificateProviderNotRelatedConfirmedAt    string                      `json:"certificateProviderNotRelatedConfirmedAt"`
 	PeopleToNotify                              []LpaStorePersonToNotify    `json:"peopleToNotify"`
 	HowAttorneysMakeDecisions                   string                      `json:"howAttorneysMakeDecisions"`
 	HowAttorneysMakeDecisionsDetails            string                      `json:"howAttorneysMakeDecisionsDetails"`
@@ -129,4 +130,22 @@ func (c *Client) DigitalLpa(ctx Context, uid string, presignImages bool) (Digita
 	}
 	err := c.get(ctx, url, &v)
 	return v, err
+}
+
+func (cp LpaStoreData) IsEligibilityConfirmed() bool {
+	return cp.CertificateProviderNotRelatedConfirmedAt != ""
+}
+
+func (cp LpaStoreCertificateProvider) HasMatchingDetailsWithDonorOrAttorneys(donor LpaStoreDonor, attorneys []LpaStoreAttorney) bool {
+	if cp.LastName == donor.LastName {
+		return true
+	}
+
+	for _, attorney := range attorneys {
+		if cp.LastName == attorney.LastName {
+			return true
+		}
+	}
+
+	return false
 }
