@@ -216,3 +216,246 @@ func TestDigitalLpa(t *testing.T) {
 		})
 	}
 }
+
+func TestLpaStoreData_IsEligibilityConfirmed(t *testing.T) {
+	tests := []struct {
+		name     string
+		data     LpaStoreData
+		expected bool
+	}{
+		{
+			name: "eligibility confirmed with valid timestamp",
+			data: LpaStoreData{
+				CertificateProviderNotRelatedConfirmedAt: "2024-01-15T10:30:00Z",
+			},
+			expected: true,
+		},
+		{
+			name: "eligibility not confirmed - empty string",
+			data: LpaStoreData{
+				CertificateProviderNotRelatedConfirmedAt: "",
+			},
+			expected: false,
+		},
+		{
+			name: "eligibility confirmed with different timestamp format",
+			data: LpaStoreData{
+				CertificateProviderNotRelatedConfirmedAt: "2025-07-30T14:22:33Z",
+			},
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.data.IsEligibilityConfirmed()
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestLpaStoreCertificateProvider_HasMatchingDetailsWithDonorOrAttorneys(t *testing.T) {
+	tests := []struct {
+		name      string
+		cp        LpaStoreCertificateProvider
+		donor     LpaStoreDonor
+		attorneys []LpaStoreAttorney
+		expected  bool
+	}{
+		{
+			name: "matches donor last name",
+			cp: LpaStoreCertificateProvider{
+				LpaStorePerson: LpaStorePerson{LastName: "Smith"},
+			},
+			donor: LpaStoreDonor{
+				LpaStorePerson: LpaStorePerson{LastName: "Smith"},
+			},
+			attorneys: []LpaStoreAttorney{},
+			expected:  true,
+		},
+		{
+			name: "matches first attorney last name",
+			cp: LpaStoreCertificateProvider{
+				LpaStorePerson: LpaStorePerson{LastName: "Jones"},
+			},
+			donor: LpaStoreDonor{
+				LpaStorePerson: LpaStorePerson{LastName: "Smith"},
+			},
+			attorneys: []LpaStoreAttorney{
+				{LpaStorePerson: LpaStorePerson{LastName: "Jones"}},
+				{LpaStorePerson: LpaStorePerson{LastName: "Brown"}},
+			},
+			expected: true,
+		},
+		{
+			name: "matches second attorney last name",
+			cp: LpaStoreCertificateProvider{
+				LpaStorePerson: LpaStorePerson{LastName: "Brown"},
+			},
+			donor: LpaStoreDonor{
+				LpaStorePerson: LpaStorePerson{LastName: "Smith"},
+			},
+			attorneys: []LpaStoreAttorney{
+				{LpaStorePerson: LpaStorePerson{LastName: "Jones"}},
+				{LpaStorePerson: LpaStorePerson{LastName: "Brown"}},
+			},
+			expected: true,
+		},
+		{
+			name: "no matches with donor or attorneys",
+			cp: LpaStoreCertificateProvider{
+				LpaStorePerson: LpaStorePerson{LastName: "Wilson"},
+			},
+			donor: LpaStoreDonor{
+				LpaStorePerson: LpaStorePerson{LastName: "Smith"},
+			},
+			attorneys: []LpaStoreAttorney{
+				{LpaStorePerson: LpaStorePerson{LastName: "Jones"}},
+				{LpaStorePerson: LpaStorePerson{LastName: "Brown"}},
+			},
+			expected: false,
+		},
+		{
+			name: "no attorneys and no donor match",
+			cp: LpaStoreCertificateProvider{
+				LpaStorePerson: LpaStorePerson{LastName: "Wilson"},
+			},
+			donor: LpaStoreDonor{
+				LpaStorePerson: LpaStorePerson{LastName: "Smith"},
+			},
+			attorneys: []LpaStoreAttorney{},
+			expected:  false,
+		},
+		{
+			name: "empty certificate provider last name",
+			cp: LpaStoreCertificateProvider{
+				LpaStorePerson: LpaStorePerson{LastName: ""},
+			},
+			donor: LpaStoreDonor{
+				LpaStorePerson: LpaStorePerson{LastName: "Smith"},
+			},
+			attorneys: []LpaStoreAttorney{
+				{LpaStorePerson: LpaStorePerson{LastName: "Jones"}},
+			},
+			expected: false,
+		},
+		{
+			name: "empty donor last name but matches attorney",
+			cp: LpaStoreCertificateProvider{
+				LpaStorePerson: LpaStorePerson{LastName: "Jones"},
+			},
+			donor: LpaStoreDonor{
+				LpaStorePerson: LpaStorePerson{LastName: ""},
+			},
+			attorneys: []LpaStoreAttorney{
+				{LpaStorePerson: LpaStorePerson{LastName: "Jones"}},
+			},
+			expected: true,
+		},
+		{
+			name: "case sensitive matching - should match exactly",
+			cp: LpaStoreCertificateProvider{
+				LpaStorePerson: LpaStorePerson{LastName: "smith"},
+			},
+			donor: LpaStoreDonor{
+				LpaStorePerson: LpaStorePerson{LastName: "Smith"},
+			},
+			attorneys: []LpaStoreAttorney{},
+			expected:  false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.cp.HasMatchingDetailsWithDonorOrAttorneys(tt.donor, tt.attorneys)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestDigitalLpaEligibilityScenarios(t *testing.T) {
+	tests := []struct {
+		name                         string
+		lpaStoreData                 LpaStoreData
+		expectedEligibilityConfirmed bool
+		expectedHasMatchingDetails   bool
+	}{
+		{
+			name: "eligibility confirmed with matching donor name",
+			lpaStoreData: LpaStoreData{
+				CertificateProviderNotRelatedConfirmedAt: "2024-01-15T10:30:00Z",
+				CertificateProvider: LpaStoreCertificateProvider{
+					LpaStorePerson: LpaStorePerson{LastName: "Smith"},
+				},
+				Donor: LpaStoreDonor{
+					LpaStorePerson: LpaStorePerson{LastName: "Smith"},
+				},
+				Attorneys: []LpaStoreAttorney{},
+			},
+			expectedEligibilityConfirmed: true,
+			expectedHasMatchingDetails:   true,
+		},
+		{
+			name: "eligibility confirmed with matching attorney name",
+			lpaStoreData: LpaStoreData{
+				CertificateProviderNotRelatedConfirmedAt: "2024-01-15T10:30:00Z",
+				CertificateProvider: LpaStoreCertificateProvider{
+					LpaStorePerson: LpaStorePerson{LastName: "Jones"},
+				},
+				Donor: LpaStoreDonor{
+					LpaStorePerson: LpaStorePerson{LastName: "Smith"},
+				},
+				Attorneys: []LpaStoreAttorney{
+					{LpaStorePerson: LpaStorePerson{LastName: "Jones"}},
+				},
+			},
+			expectedEligibilityConfirmed: true,
+			expectedHasMatchingDetails:   true,
+		},
+		{
+			name: "eligibility confirmed but no matching names",
+			lpaStoreData: LpaStoreData{
+				CertificateProviderNotRelatedConfirmedAt: "2024-01-15T10:30:00Z",
+				CertificateProvider: LpaStoreCertificateProvider{
+					LpaStorePerson: LpaStorePerson{LastName: "Wilson"},
+				},
+				Donor: LpaStoreDonor{
+					LpaStorePerson: LpaStorePerson{LastName: "Smith"},
+				},
+				Attorneys: []LpaStoreAttorney{
+					{LpaStorePerson: LpaStorePerson{LastName: "Jones"}},
+				},
+			},
+			expectedEligibilityConfirmed: true,
+			expectedHasMatchingDetails:   false,
+		},
+		{
+			name: "eligibility not confirmed with matching names",
+			lpaStoreData: LpaStoreData{
+				CertificateProviderNotRelatedConfirmedAt: "",
+				CertificateProvider: LpaStoreCertificateProvider{
+					LpaStorePerson: LpaStorePerson{LastName: "Smith"},
+				},
+				Donor: LpaStoreDonor{
+					LpaStorePerson: LpaStorePerson{LastName: "Smith"},
+				},
+				Attorneys: []LpaStoreAttorney{},
+			},
+			expectedEligibilityConfirmed: false,
+			expectedHasMatchingDetails:   true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			eligibilityResult := tt.lpaStoreData.IsEligibilityConfirmed()
+			assert.Equal(t, tt.expectedEligibilityConfirmed, eligibilityResult)
+
+			matchingResult := tt.lpaStoreData.CertificateProvider.HasMatchingDetailsWithDonorOrAttorneys(
+				tt.lpaStoreData.Donor,
+				tt.lpaStoreData.Attorneys,
+			)
+			assert.Equal(t, tt.expectedHasMatchingDetails, matchingResult)
+		})
+	}
+}
