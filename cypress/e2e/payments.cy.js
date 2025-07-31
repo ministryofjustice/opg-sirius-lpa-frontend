@@ -1,6 +1,3 @@
-import * as cases from "../mocks/cases";
-import * as digitalLpas from "../mocks/digitalLpas";
-
 describe("View a payment", () => {
   describe("No payments on case", () => {
     it("displays default message when there are no payments on the case", () => {
@@ -97,7 +94,6 @@ describe("View a payment", () => {
       cy.visit("/payments/800");
     });
 
-
     it("can be deleted by system admin users", () => {
       cy.addMock("/lpa-api/v1/users/current", "GET", {
         status: 200,
@@ -138,5 +134,4 @@ describe("View a payment", () => {
       cy.contains("Delete payment").should("not.exist");
     });
   });
-
 });
