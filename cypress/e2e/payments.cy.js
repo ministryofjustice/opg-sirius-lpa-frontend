@@ -1,3 +1,6 @@
+import * as cases from "../mocks/cases";
+import * as digitalLpas from "../mocks/digitalLpas";
+
 describe("View a payment", () => {
   describe("No payments on case", () => {
     it("displays default message when there are no payments on the case", () => {
@@ -72,4 +75,68 @@ describe("View a payment", () => {
       cy.get("f-apply-fee-reduction-button").should("not.exist");
     });
   });
+
+  describe("Online payments", () => {
+    beforeEach(() => {
+      cy.addMock("/lpa-api/v1/cases/800/payments", "GET", {
+        status: 200,
+        body: [
+          {
+            amount: 8200,
+            case: {
+              id: 800,
+            },
+            id: 234,
+            paymentDate: "12/02/2025",
+            source: "ONLINE",
+            locked: true,
+          },
+        ],
+      });
+
+      cy.visit("/payments/800");
+    });
+
+
+    it("can be deleted by system admin users", () => {
+      cy.addMock("/lpa-api/v1/users/current", "GET", {
+        status: 200,
+        body: {
+          roles: ["OPG User", "System Admin"],
+        },
+      });
+      cy.visit("/payments/800");
+
+      cy.contains("7000-0000-0000");
+      cy.get("#f-payments-tab").click();
+      cy.contains("Amount");
+      cy.contains("£82.00");
+      cy.contains("Date of payment:");
+      cy.contains("12/02/2025");
+      cy.contains("Method");
+      cy.contains("Edit payment").should("not.exist");
+      cy.get(".govuk-link").contains("Delete payment");
+    });
+
+    it("can not be deleted by other users", () => {
+      cy.addMock("/lpa-api/v1/users/current", "GET", {
+        status: 200,
+        body: {
+          roles: ["OPG User", "Reduced Fees User"],
+        },
+      });
+
+      cy.visit("/payments/800");
+      cy.contains("7000-0000-0000");
+      cy.get("#f-payments-tab").click();
+      cy.contains("Amount");
+      cy.contains("£82.00");
+      cy.contains("Date of payment:");
+      cy.contains("12/02/2025");
+      cy.contains("Method");
+      cy.contains("Edit payment").should("not.exist");
+      cy.contains("Delete payment").should("not.exist");
+    });
+  });
+
 });
