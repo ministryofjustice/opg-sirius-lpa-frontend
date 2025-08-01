@@ -15,17 +15,18 @@ type GetLpaDetailsClient interface {
 }
 
 type getLpaDetails struct {
-	CaseSummary             sirius.CaseSummary
-	DigitalLpa              sirius.DigitalLpa
-	AnomalyDisplay          *sirius.AnomalyDisplay
-	ReviewRestrictions      bool
-	CheckedForSeverance     bool
-	SeveranceType           string
-	ReplacementAttorneys    []sirius.LpaStoreAttorney
-	NonReplacementAttorneys []sirius.LpaStoreAttorney
-	RemovedAttorneys        []sirius.LpaStoreAttorney
-	DecisionAttorneys       []sirius.LpaStoreAttorney
-	FlashMessage            FlashNotification
+	CaseSummary                   sirius.CaseSummary
+	DigitalLpa                    sirius.DigitalLpa
+	AnomalyDisplay                *sirius.AnomalyDisplay
+	ReviewRestrictions            bool
+	CheckedForSeverance           bool
+	SeveranceType                 string
+	ReplacementAttorneys          []sirius.LpaStoreAttorney
+	NonReplacementAttorneys       []sirius.LpaStoreAttorney
+	RemovedAttorneys              []sirius.LpaStoreAttorney
+	DecisionAttorneys             []sirius.LpaStoreAttorney
+	FlashMessage                  FlashNotification
+	ReplacementAttorneysDecisions string
 }
 
 func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
@@ -111,6 +112,11 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		data.NonReplacementAttorneys = nonReplacementAttorneys
 		data.RemovedAttorneys = removedAttorneys
 		data.DecisionAttorneys = decisionAttorneys
+		data.ReplacementAttorneysDecisions = data.CaseSummary.DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions
+
+		if len(data.NonReplacementAttorneys) > 1 && len(data.ReplacementAttorneys) > 1 && data.ReplacementAttorneysDecisions == "" {
+			data.ReplacementAttorneysDecisions = data.CaseSummary.DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions
+		}
 
 		return tmpl(w, data)
 	}
