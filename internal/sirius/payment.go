@@ -22,6 +22,28 @@ type Payment struct {
 	References       []PaymentReference `json:"references,omitempty"`
 }
 
+func (c *Client) AddPayment(ctx Context, caseID int, amount int, source string, paymentDate DateString) error {
+	data := struct {
+		Amount      int        `json:"amount"`
+		Source      string     `json:"source"`
+		PaymentDate DateString `json:"paymentDate"`
+	}{
+		Amount:      amount,
+		Source:      source,
+		PaymentDate: paymentDate,
+	}
+
+	return c.post(ctx, fmt.Sprintf("/lpa-api/v1/cases/%d/payments", caseID), data, nil)
+}
+
+func (c *Client) EditPayment(ctx Context, paymentID int, payment Payment) error {
+	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/payments/%d", paymentID), payment, nil)
+}
+
+func (c *Client) DeletePayment(ctx Context, paymentID int) error {
+	return c.delete(ctx, fmt.Sprintf("/lpa-api/v1/payments/%d", paymentID))
+}
+
 func (c *Client) Payments(ctx Context, id int) ([]Payment, error) {
 	var p []Payment
 

@@ -7,6 +7,7 @@
         </summary>
         <div class="govuk-details__text">
 
+            {{ $sysAdminUser := .IsSysAdminUser}}
             {{ range $p := .Payments }}
                 <table class="govuk-table table__no-border">
                     <tbody class="govuk-table__body">
@@ -46,6 +47,8 @@
                                 </a>
                             </th>
                         </tr>
+                    {{ end }}
+                    {{ if or (not .Locked) $sysAdminUser }}
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header app-!-table-row__no-border"
                                 colspan="2">
