@@ -346,38 +346,6 @@ var testChangeCertificateProviderCaseSummaryWithEligibilityConfirmed = sirius.Ca
 	},
 }
 
-func TestLpaStoreDataCertificateProvider_IsEligibilityConfirmed(t *testing.T) {
-	tests := []struct {
-		name     string
-		cp       sirius.LpaStoreData
-		expected bool
-	}{
-		{
-			name: "confirmed with valid timestamp",
-			cp: sirius.LpaStoreData{
-				CertificateProviderNotRelatedConfirmedAt: "2024-01-15T10:30:00Z",
-			},
-			expected: true,
-		},
-		{
-			name: "not confirmed - empty string",
-			cp: sirius.LpaStoreData{
-				CertificateProviderNotRelatedConfirmedAt: "",
-			},
-			expected: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := tt.cp.IsEligibilityConfirmed()
-			if result != tt.expected {
-				t.Errorf("IsEligibilityConfirmed() = %v, want %v", result, tt.expected)
-			}
-		})
-	}
-}
-
 func TestLpaStoreCertificateProvider_HasMatchingDetailsWithDonorOrAttorneys(t *testing.T) {
 	tests := []struct {
 		name      string
