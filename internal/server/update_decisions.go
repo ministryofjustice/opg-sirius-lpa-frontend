@@ -15,12 +15,13 @@ type UpdateDecisionsClient interface {
 }
 
 type updateDecisionsData struct {
-	XSRFToken           string
-	Success             bool
-	Error               sirius.ValidationError
-	Form                formDecisionsDetails
-	CaseSummary         sirius.CaseSummary
-	ActiveAttorneyCount int
+	XSRFToken                string
+	Success                  bool
+	Error                    sirius.ValidationError
+	Form                     formDecisionsDetails
+	CaseSummary              sirius.CaseSummary
+	ActiveAttorneyCount      int
+	ReplacementAttorneyCount int
 }
 
 type formDecisionsDetails struct {
@@ -66,6 +67,15 @@ func UpdateDecisions(client UpdateDecisionsClient, tmpl template.Template) Handl
 			if attorney.Status == shared.ActiveAttorneyStatus.String() {
 				data.ActiveAttorneyCount++
 			}
+
+			if attorney.AppointmentType == shared.ReplacementAppointmentType.String() &&
+				attorney.Status == shared.InactiveAttorneyStatus.String() {
+				data.ReplacementAttorneyCount++
+			}
+		}
+
+		if data.ActiveAttorneyCount > 1 && data.ReplacementAttorneyCount > 1 && data.Form.HowReplacementAttorneysMakeDecisions == "" {
+			data.Form.HowReplacementAttorneysMakeDecisions = data.Form.HowAttorneysMakeDecisions
 		}
 
 		if r.Method == http.MethodPost {

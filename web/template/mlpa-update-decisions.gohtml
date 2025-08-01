@@ -70,11 +70,15 @@
           ) }}
         {{ end }}
 
-        {{ if .Form.HowReplacementAttorneysMakeDecisions }}
-          <div class="govuk-form-group {{ if .Error.Field.howReplacementAttorneysMakeDecisions }}govuk-form-group--error{{ end }}">
-            <fieldset class="govuk-fieldset">
-              <legend class="govuk-fieldset__legend">How must replacement attorneys make decisions?</legend>
-              {{ template "errors" .Error.Field.howReplacementAttorneysMakeDecisions }}
+        <div class="govuk-form-group {{ if .Error.Field.howReplacementAttorneysMakeDecisions }}govuk-form-group--error{{ end }}">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend">How must replacement attorneys make decisions?</legend>
+            {{ template "errors" .Error.Field.howReplacementAttorneysMakeDecisions }}
+            {{ if eq .ReplacementAttorneyCount 1 }}
+              <div class="govuk-inset-text">
+                {{ howAttorneysMakeDecisionsLongForm true .Form.HowReplacementAttorneysMakeDecisions }}
+              </div>
+            {{ else }}
               <div class="govuk-radios" data-module="govuk-radios">
                 <div class="govuk-radios__item">
                   <input class="govuk-radios__input" id="f-howReplacementAttorneysMakeDecisions" name="howReplacementAttorneysMakeDecisions" type="radio" value="jointly" {{ if eq .Form.HowReplacementAttorneysMakeDecisions "jointly" }}checked{{ end }}>
@@ -98,9 +102,9 @@
                   </div>
                 </div>
               </div>
-            </fieldset>
-          </div>
-        {{ end }}
+            {{ end}}
+          </fieldset>
+        </div>
 
         {{ if .Form.HowReplacementAttorneysStepIn }}
           <div class="govuk-form-group {{ if .Error.Field.howReplacementAttorneysStepIn }}govuk-form-group--error{{ end }}">
