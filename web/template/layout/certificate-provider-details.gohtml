@@ -16,6 +16,13 @@
     </div>
 
     <div id="accordion-default-content-6" class="govuk-accordion__section-content">
+
+        {{ if ne .DigitalLpa.LpaStoreData.CertificateProviderNotRelatedConfirmedAt "" }}
+            <p class="govuk-body govuk-!-font-weight-bold" role="status" aria-live="polite">
+                Matching details checked — the certificate provider is eligible for this LPA
+            </p>
+        {{ end }}
+
         <dl class="govuk-summary-list">
 
             <div class="govuk-summary-list__row">
