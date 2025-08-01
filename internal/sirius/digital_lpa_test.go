@@ -7,6 +7,7 @@ import (
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 	"net/http"
+	"strings"
 	"testing"
 )
 
@@ -215,4 +216,110 @@ func TestDigitalLpa(t *testing.T) {
 			}))
 		})
 	}
+}
+
+func TestWasSignedOnBehalfOfDonor(t *testing.T) {
+	tests := []struct {
+		name     string
+		lpa      DigitalLpa
+		expected bool
+	}{
+		{
+			name: "returns true when authorised signatory exists",
+			lpa: DigitalLpa{
+				LpaStoreData: LpaStoreData{
+					AuthorisedSignatory: &LpaStoreAuthorisedSignatory{
+						FirstNames: "John",
+						LastName:   "Smith",
+					},
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "returns false when no authorised signatory",
+			lpa: DigitalLpa{
+				LpaStoreData: LpaStoreData{
+					AuthorisedSignatory: nil,
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "returns false when empty authorised signatory",
+			lpa: DigitalLpa{
+				LpaStoreData: LpaStoreData{
+					AuthorisedSignatory: &LpaStoreAuthorisedSignatory{
+						FirstNames: "",
+						LastName:   "",
+					},
+				},
+			},
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.lpa.WasSignedOnBehalfOfDonor()
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestGetAuthorisedSignatoryFullName(t *testing.T) {
+	tests := []struct {
+		name     string
+		lpa      DigitalLpa
+		expected string
+	}{
+		{
+			name: "returns full name when both names present",
+			lpa: DigitalLpa{
+				LpaStoreData: LpaStoreData{
+					AuthorisedSignatory: &LpaStoreAuthorisedSignatory{
+						FirstNames: "John",
+						LastName:   "Smith",
+					},
+				},
+			},
+			expected: "John Smith",
+		},
+		{
+			name: "returns empty when no signatory",
+			lpa: DigitalLpa{
+				LpaStoreData: LpaStoreData{
+					AuthorisedSignatory: nil,
+				},
+			},
+			expected: "",
+		},
+		{
+			name: "handles whitespace correctly",
+			lpa: DigitalLpa{
+				LpaStoreData: LpaStoreData{
+					AuthorisedSignatory: &LpaStoreAuthorisedSignatory{
+						FirstNames: "  John  ",
+						LastName:   "  Smith  ",
+					},
+				},
+			},
+			expected: "John     Smith",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.lpa.GetAuthorisedSignatoryFullName()
+			assert.Equal(t, tt.expected, strings.TrimSpace(result))
+		})
+	}
+}
+
+// Additional tests for witness functions WIP
+func TestWitnessHelperFunctions(t *testing.T) {
+	// Test WasWitnessedByCertificateProvider
+	// Test WasWitnessedByIndependentWitness
+	// Test GetIndependentWitnessFullName
+	// Test GetIndependentWitnessAddress
 }
