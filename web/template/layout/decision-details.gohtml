@@ -12,6 +12,7 @@
     </div>
     {{ $rootAnomalies := $anomaliesForSection.GetAnomaliesForObject "" }}
     {{ $decisionFieldAnomalies := $rootAnomalies.GetAnomaliesForFieldWithStatus "howAttorneysMakeDecisions" "detected" }}
+    {{ $raDecisionFieldAnomalies := $rootAnomalies.GetAnomaliesForFieldWithStatus "howReplacementAttorneysMakeDecisions" "detected" }}
 
     <div id="accordion-default-content-3" class="govuk-accordion__section-content">
         <dl class="govuk-summary-list">
@@ -25,7 +26,7 @@
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Attorney appointment type</dt>
                 <dd class="govuk-summary-list__value{{ if gt (len $decisionFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
-                    {{ howAttorneysMakeDecisionsLongForm (eq (len .NonReplacementAttorneys) 1) .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions }}
+                    {{ howAttorneysMakeDecisionsLongForm (eq (len .NonReplacementAttorneys) 1) .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions }}
 
                     {{ if gt (len $decisionFieldAnomalies) 0 }}
                         <br><span class="govuk-error-message">Review how attorneys can make decisions</span>
@@ -78,8 +79,12 @@
             {{ end}}
             <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
                 <dt class="govuk-summary-list__key">Replacement attorneys appointment type</dt>
-                <dd class="govuk-summary-list__value">
-                    {{ howAttorneysMakeDecisionsLongForm (eq (len .NonReplacementAttorneys) 1) .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions }}
+                <dd class="govuk-summary-list__value{{ if gt (len $raDecisionFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                    {{ howAttorneysMakeDecisionsLongForm (eq (len .ReplacementAttorneys) 1) .ReplacementAttorneysDecisions }}
+
+                    {{ if gt (len $raDecisionFieldAnomalies) 0 }}
+                        <br><span class="govuk-error-message">Review how replacement attorney's can make decisions</span>
+                    {{ end }}
                 </dd>
             </div>
         </dl>
