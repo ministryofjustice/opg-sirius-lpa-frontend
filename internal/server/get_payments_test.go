@@ -64,9 +64,12 @@ func TestGetPayments(t *testing.T) {
 		},
 	}
 
+	expectedPaymentTotal := 8000
+
 	caseItem := sirius.Case{
-		UID:     "7000-0000-0021",
-		SubType: "pfa",
+		UID:                  "7000-0000-0021",
+		SubType:              "pfa",
+		ExpectedPaymentTotal: expectedPaymentTotal,
 	}
 
 	paymentSources := []sirius.RefDataItem{
@@ -117,7 +120,7 @@ func TestGetPayments(t *testing.T) {
 			Case:              caseItem,
 			TotalPaid:         5538,
 			IsReducedFeesUser: true,
-			OutstandingFee:    2662,
+			OutstandingFee:    expectedPaymentTotal - 5538,
 		}).
 		Return(nil)
 
@@ -144,17 +147,6 @@ func TestGetPaymentsBadID(t *testing.T) {
 }
 
 func TestGetPaymentsWhenFailureOnGetCase(t *testing.T) {
-	allPayments := []sirius.Payment{
-		{
-			ID:     2,
-			Amount: 4100,
-		},
-		{
-			ID:     3,
-			Amount: 1438,
-		},
-	}
-
 	paymentSources := []sirius.RefDataItem{
 		{
 			Handle: "PHONE",
@@ -181,8 +173,6 @@ func TestGetPaymentsWhenFailureOnGetCase(t *testing.T) {
 	client.
 		On("Case", mock.Anything, 8).
 		Return(sirius.Case{}, errExample).
-		On("Payments", mock.Anything, 8).
-		Return(allPayments, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
 		Return(paymentSources, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
@@ -191,6 +181,8 @@ func TestGetPaymentsWhenFailureOnGetCase(t *testing.T) {
 		Return(feeReductionTypes, nil).
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil)
+
+	client.AssertNotCalled(t, "Payments")
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
@@ -444,9 +436,12 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 		},
 	}
 
+	expectedPaymentTotal := 8000
+
 	caseItem := sirius.Case{
-		UID:     "7000-0000-0021",
-		SubType: "pfa",
+		UID:                  "7000-0000-0021",
+		SubType:              "pfa",
+		ExpectedPaymentTotal: expectedPaymentTotal,
 	}
 
 	paymentSources := []sirius.RefDataItem{
@@ -497,7 +492,7 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 			TotalPaid:         4100,
 			IsReducedFeesUser: false,
 			FeeReductionTypes: feeReductionTypes,
-			OutstandingFee:    4100,
+			OutstandingFee:    expectedPaymentTotal - 4100,
 		}).
 		Return(errExample)
 
@@ -544,10 +539,13 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 		},
 	}
 
+	expectedPaymentTotal := 8000
+
 	caseItem := sirius.Case{
-		ID:      742,
-		UID:     "7000-0000-0021",
-		SubType: "pfa",
+		ID:                   742,
+		UID:                  "7000-0000-0021",
+		SubType:              "pfa",
+		ExpectedPaymentTotal: expectedPaymentTotal,
 	}
 
 	paymentSources := []sirius.RefDataItem{
@@ -600,7 +598,7 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 			Case:              caseItem,
 			TotalPaid:         5000,
 			IsReducedFeesUser: true,
-			RefundAmount:      900,
+			RefundAmount:      (expectedPaymentTotal - 4100 - 5000) * -1,
 		}).
 		Return(nil)
 
@@ -650,7 +648,7 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 			CaseSummary:       caseSummary,
 			TotalPaid:         5000,
 			IsReducedFeesUser: true,
-			RefundAmount:      900,
+			RefundAmount:      (expectedPaymentTotal - 4100 - 5000) * -1,
 		}).
 		Return(nil)
 
@@ -717,8 +715,9 @@ func TestGetPaymentsCalculations(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		caseItem := sirius.Case{
-			UID:     "7000-0000-0021",
-			SubType: "pfa",
+			UID:                  "7000-0000-0021",
+			SubType:              "pfa",
+			ExpectedPaymentTotal: 8200,
 		}
 
 		paymentSources := []sirius.RefDataItem{
