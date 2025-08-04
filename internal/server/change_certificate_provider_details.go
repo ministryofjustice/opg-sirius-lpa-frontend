@@ -2,11 +2,11 @@ package server
 
 import (
 	"fmt"
-	"net/http"
-
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
+	"net/http"
+	"time"
 )
 
 type ChangeCertificateProviderDetailsClient interface {
@@ -116,9 +116,10 @@ func ChangeCertificateProviderDetails(client ChangeCertificateProviderDetailsCli
 				return err
 			} else {
 				SetFlash(w, FlashNotification{
-					Title: "Update saved",
+					Title: "Update saved aaaa",
 				})
 
+				time.Sleep(15 * time.Second)
 				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details#certificate-provider", caseUid))
 			}
 		}
