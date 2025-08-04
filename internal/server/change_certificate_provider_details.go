@@ -118,8 +118,11 @@ func ChangeCertificateProviderDetails(client ChangeCertificateProviderDetailsCli
 				SetFlash(w, FlashNotification{
 					Title: "Update saved aaaa",
 				})
+				
+				// This sleep is to give LpaStore time to fire off an lpa-updated event to Sirius after it receives the
+				// update, which recalculates anomaly before reloading the page
+				time.Sleep(3 * time.Second)
 
-				time.Sleep(15 * time.Second)
 				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details#certificate-provider", caseUid))
 			}
 		}
