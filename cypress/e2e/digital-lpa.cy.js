@@ -105,6 +105,20 @@ describe("View a digital LPA", () => {
               cannotMakeJointDecisions: true,
             },
           ],
+          trustCorporations: [
+            {
+              Name: "Trust Me Ltd.",
+              CompanyNumber: "123456789",
+              status: "active",
+              appointmentType: "original",
+            },
+            {
+              Name: "Trust Me Again Ltd.",
+              CompanyNumber: "987654321",
+              status: "inactive",
+              appointmentType: "replacement",
+            }
+          ],
           certificateProvider: {
             uid: "e4d5e24e-2a8d-434e-b815-9898620acc71",
             firstNames: "Timothy",
@@ -690,8 +704,8 @@ describe("View a digital LPA", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3333");
 
     cy.contains("LPA details").click();
-    cy.contains("Attorneys (3)");
-    cy.contains("Replacement attorneys (2)");
+    cy.contains("Attorneys (4)");
+    cy.contains("Replacement attorneys (3)");
     cy.contains("Removed attorneys (1)");
     cy.contains("Notified people (0)");
     cy.contains("Correspondent");
@@ -733,7 +747,7 @@ describe("View a digital LPA", () => {
   it("shows attorney signed on date and label if set", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
 
-    cy.contains("Attorneys (3)")
+    cy.contains("Attorneys (4)")
       .click()
       .parents(".govuk-accordion__section")
       .within(() => {
@@ -751,7 +765,7 @@ describe("View a digital LPA", () => {
   it("shows replacement attorney signed on date and label if set", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
 
-    cy.contains("Replacement attorneys (2)")
+    cy.contains("Replacement attorneys (3)")
       .click()
       .parents(".govuk-accordion__section")
       .within(() => {
