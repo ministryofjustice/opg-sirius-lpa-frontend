@@ -116,7 +116,7 @@ func ChangeCertificateProviderDetails(client ChangeCertificateProviderDetailsCli
 				return err
 			} else {
 				SetFlash(w, FlashNotification{
-					Title: "Update saved aaaa",
+					Title: "Update saved",
 				})
 
 				// This sleep is to give LpaStore time to fire off an lpa-updated event to Sirius after it receives the
