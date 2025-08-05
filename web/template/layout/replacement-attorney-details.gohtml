@@ -4,18 +4,20 @@
 
 <!-- replacement attorneys -->
 {{ $anomaliesForSection := .AnomalyDisplay.GetAnomaliesForSection "replacementAttorneys" }}
+{{ $totalReplacmentAttorneys := plusN (len .ReplacementAttorneys) (len .ReplacementTrustCorporations ) }}
 <div class="govuk-accordion__section">
     <div class="govuk-accordion__section-header{{ if $anomaliesForSection.HasAnomalies }} govuk-form-group--error{{ end }}">
         <h2 class="govuk-accordion__section-heading">
-              <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
-                Replacement attorneys ({{ len .ReplacementAttorneys }})
+            <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
+                Replacement attorneys ({{ $totalReplacmentAttorneys }})
                 {{ if $anomaliesForSection.HasAnomalies }}<span class="govuk-error-message">For review</span>{{ end }}
-              </span>
+            </span>
         </h2>
     </div>
 
     <div id="accordion-default-content-4" class="govuk-accordion__section-content">
-        {{ if (gt (len .ReplacementAttorneys) 0) }}
+        {{ if (gt $totalReplacmentAttorneys 0) }}
+            {{ $count := 0 }}
             <dl class="govuk-summary-list">
 
                 <div class="govuk-summary-list__row">
@@ -47,7 +49,8 @@
             {{ range $num, $attorney := .ReplacementAttorneys }}
                 {{ $attorneyAnomalies := $anomaliesForSection.GetAnomaliesForObject $attorney.Uid }}
                 <h2 class="govuk-heading-m">
-                    Replacement attorney {{ plusN $num 1 }}
+                    {{ $count = plusN $count 1 }}
+                    Replacement attorney {{ $count }}
                 </h2>
 
                 <dl class="govuk-summary-list">
@@ -147,6 +150,108 @@
                         </div>
                     {{ end }}
 
+                </dl>
+            {{ end }}
+            {{ range $num, $trustCorporation := .ReplacementTrustCorporations }}
+                <h2 class="govuk-heading-m">
+                    {{ $count = plusN $count 1 }}
+                    Attorney {{ $count }}
+                </h2>
+
+                <dl class="govuk-summary-list">
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key"></dt>
+                        <dd class="govuk-summary-list__value"></dd>
+                        <dd class="govuk-summary-list__actions">
+                            <!--do we have a trust-corp update link?-->
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Trust corporation name</dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ $trustCorporation.Name }}
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Company address</dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ template "mlpa-address" $trustCorporation.Address }}
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Company phone number</dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ if (eq $trustCorporation.Mobile "") }}
+                                No details provided
+                            {{ else }}
+                                {{ $trustCorporation.Mobile }}
+                            {{ end }}
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Company email</dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ if (eq $trustCorporation.Email "") }}
+                                No details provided
+                            {{ else }}
+                                {{ $trustCorporation.Email }}
+                            {{ end }}
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Company registration number</dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ if (eq $trustCorporation.CompanyNumber "") }}
+                                No details provided
+                            {{ else }}
+                                {{ $trustCorporation.CompanyNumber }}
+                            {{ end }}
+                        </dd>
+                    </div>
+
+                    {{ range $num, $signatory := $trustCorporation.Signatories }}
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">{{ if (eq $num 0) }}First{{ else }}Second{{ end }} authorised person</dt>
+                            <dd class="govuk-summary-list__value">
+                                {{ $signatory.FirstNames }} {{ $signatory.LastName }}
+                            </dd>
+                        </div>
+                    {{ end }}
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Attorney format</dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ if (eq $trustCorporation.Email "") }}
+                                    Paper
+                                {{ else }}
+                                    Online
+                                {{ end }}
+                        </dd>
+                    </div>
+
+                    {{ if not (eq $trustCorporation.ContactLanguagePreference "") }}
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">Correspondence</dt>
+                            <dd class="govuk-summary-list__value">
+                                {{ languageForFormat $trustCorporation.ContactLanguagePreference }}
+                            </dd>
+                        </div>
+                    {{ end }}
+
+                    {{ range $num, $signatory := $trustCorporation.Signatories }}
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">LPA signed by {{ if (eq $num 0) }}first{{ else }}second{{ end }} authorised person on</dt>
+                            <dd class="govuk-summary-list__value">
+                                {{ parseAndFormatDate $signatory.SignedAt "2006-01-02T15:04:05Z" "2 January 2006" }}
+                            </dd>
+                        </div>
+                    {{ end }}
                 </dl>
             {{ end }}
 
