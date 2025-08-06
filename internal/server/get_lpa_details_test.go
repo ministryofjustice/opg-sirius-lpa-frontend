@@ -179,6 +179,18 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 									},
 								},
 							},
+							{
+								Name:          "Dont Trust Me",
+								CompanyNumber: "987654321",
+								LpaStoreAttorney: sirius.LpaStoreAttorney{
+									Decisions:       false,
+									Status:          shared.RemovedAttorneyStatus.String(),
+									AppointmentType: shared.OriginalAppointmentType.String(),
+									LpaStorePerson: sirius.LpaStorePerson{
+										Email: "dont.trust.me@does.not.exist",
+									},
+								},
+							},
 						},
 					},
 				},
@@ -339,6 +351,20 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 								AppointmentType: shared.OriginalAppointmentType.String(),
 								LpaStorePerson: sirius.LpaStorePerson{
 									Email: "trust.me.once@does.not.exist",
+								},
+							},
+						},
+					},
+					RemovedTrustCorporations: []sirius.LpaStoreTrustCorporation{
+						{
+							Name:          "Dont Trust Me",
+							CompanyNumber: "987654321",
+							LpaStoreAttorney: sirius.LpaStoreAttorney{
+								Decisions:       false,
+								Status:          shared.RemovedAttorneyStatus.String(),
+								AppointmentType: shared.OriginalAppointmentType.String(),
+								LpaStorePerson: sirius.LpaStorePerson{
+									Email: "dont.trust.me@does.not.exist",
 								},
 							},
 						},
