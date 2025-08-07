@@ -1,0 +1,99 @@
+{{ define "trust-corporation-summary" }}
+
+<dl class="govuk-summary-list">
+
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key"></dt>
+        <dd class="govuk-summary-list__value"></dd>
+        <dd class="govuk-summary-list__actions">
+            <!--do we have a trust-corp update link?-->
+        </dd>
+    </div>
+
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Trust corporation name</dt>
+        <dd class="govuk-summary-list__value">
+            {{ .Name }}
+        </dd>
+    </div>
+
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Company address</dt>
+        <dd class="govuk-summary-list__value">
+            {{ template "mlpa-address" .Address }}
+        </dd>
+    </div>
+
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Company phone number</dt>
+        <dd class="govuk-summary-list__value">
+            {{ if (eq .Mobile "") }}
+                No details provided
+            {{ else }}
+                {{ .Mobile }}
+            {{ end }}
+        </dd>
+    </div>
+
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Company email</dt>
+        <dd class="govuk-summary-list__value">
+            {{ if (eq .Email "") }}
+                No details provided
+            {{ else }}
+                {{ .Email }}
+            {{ end }}
+        </dd>
+    </div>
+
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Company registration number</dt>
+        <dd class="govuk-summary-list__value">
+            {{ if (eq .CompanyNumber "") }}
+                No details provided
+            {{ else }}
+                {{ .CompanyNumber }}
+            {{ end }}
+        </dd>
+    </div>
+
+    {{ range $num, $signatory := .Signatories }}
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">{{ if (eq $num 0) }}First{{ else }}Second{{ end }} authorised person</dt>
+            <dd class="govuk-summary-list__value">
+                {{ $signatory.FirstNames }} {{ $signatory.LastName }}
+            </dd>
+        </div>
+    {{ end }}
+
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Attorney format</dt>
+        <dd class="govuk-summary-list__value">
+            {{ if (eq .Email "") }}
+                    Paper
+                {{ else }}
+                    Online
+                {{ end }}
+        </dd>
+    </div>
+
+    {{ if not (eq .ContactLanguagePreference "") }}
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Correspondence</dt>
+            <dd class="govuk-summary-list__value">
+                {{ languageForFormat .ContactLanguagePreference }}
+            </dd>
+        </div>
+    {{ end }}
+
+    {{ range $num, $signatory := .Signatories }}
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">LPA signed by {{ if (eq $num 0) }}first{{ else }}second{{ end }} authorised person on</dt>
+            <dd class="govuk-summary-list__value">
+                {{ parseAndFormatDate $signatory.SignedAt "2006-01-02T15:04:05Z" "2 January 2006" }}
+            </dd>
+        </div>
+    {{ end }}
+</dl>
+
+{{ end }}
