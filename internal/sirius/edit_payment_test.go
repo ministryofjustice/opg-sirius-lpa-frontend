@@ -96,8 +96,9 @@ func TestEditFeeReduction(t *testing.T) {
 							"id":     124,
 							"amount": 4100,
 							"case": map[string]interface{}{
-								"id":     802,
-								"status": "",
+								"id":                   802,
+								"status":               "",
+								"expectedPaymentTotal": 8000,
 							},
 							"paymentEvidence":  matchers.String("Edited test evidence"),
 							"feeReductionType": matchers.String("REMISSION"),
@@ -125,7 +126,7 @@ func TestEditFeeReduction(t *testing.T) {
 					Payment{
 						ID:               124,
 						Amount:           4100,
-						Case:             &Case{ID: 802, Status: ""},
+						Case:             &Case{ID: 802, Status: "", ExpectedPaymentTotal: 8000},
 						PaymentEvidence:  "Edited test evidence",
 						FeeReductionType: "REMISSION",
 						PaymentDate:      DateString("2022-04-28"),
