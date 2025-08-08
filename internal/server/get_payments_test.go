@@ -117,6 +117,7 @@ func TestGetPayments(t *testing.T) {
 			Case:              caseItem,
 			TotalPaid:         5538,
 			IsReducedFeesUser: true,
+			IsSysAdminUser:    false,
 			OutstandingFee:    2662,
 		}).
 		Return(nil)
@@ -463,7 +464,7 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 		},
 	}
 
-	user := sirius.User{ID: 1, DisplayName: "Test User", Roles: []string{"OPG User", "Case Manager"}}
+	user := sirius.User{ID: 1, DisplayName: "Test User", Roles: []string{"OPG User", "System Admin"}}
 
 	referenceTypes := []sirius.RefDataItem{
 		{
@@ -496,6 +497,7 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 			Case:              caseItem,
 			TotalPaid:         4100,
 			IsReducedFeesUser: false,
+			IsSysAdminUser:    true,
 			FeeReductionTypes: feeReductionTypes,
 			OutstandingFee:    4100,
 		}).
@@ -600,6 +602,7 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 			Case:              caseItem,
 			TotalPaid:         5000,
 			IsReducedFeesUser: true,
+			IsSysAdminUser:    false,
 			RefundAmount:      900,
 		}).
 		Return(nil)
@@ -650,6 +653,7 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 			CaseSummary:       caseSummary,
 			TotalPaid:         5000,
 			IsReducedFeesUser: true,
+			IsSysAdminUser:    false,
 			RefundAmount:      900,
 		}).
 		Return(nil)
@@ -774,6 +778,7 @@ func TestGetPaymentsCalculations(t *testing.T) {
 				OutstandingFee:    tc.outstandingFee,
 				RefundAmount:      tc.refundAmount,
 				IsReducedFeesUser: true,
+				IsSysAdminUser:    false,
 			}).
 			Return(nil)
 
