@@ -166,7 +166,7 @@ describe("View and edit anomalies for a digital LPA", () => {
     cy.contains("Review replacement attorney's first names");
     cy.contains("Review replacement attorney's last name");
     cy.contains("Review replacement attorney's address");
-    cy.contains("Review how attorney's can make decisions");
+    cy.contains("Review how attorneys can make decisions");
     cy.contains("Review when the LPA can be used");
     cy.contains("Review certificate provider address");
   });
