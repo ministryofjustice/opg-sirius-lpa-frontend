@@ -324,7 +324,7 @@ func TestRefDataByCategory(t *testing.T) {
 						Body: matchers.EachLike(map[string]interface{}{
 							"handle":        matchers.String("BANKRUPT"),
 							"label":         matchers.String("Bankrupt"),
-							"ValidSubTypes": matchers.EachLike("property-and-affairs", 1),
+							"validSubTypes": matchers.EachLike("property-and-affairs", 1),
 						}, 1),
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
