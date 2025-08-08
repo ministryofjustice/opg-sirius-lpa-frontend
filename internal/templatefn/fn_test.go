@@ -631,13 +631,13 @@ func TestTranslateRefDataForTheTmplHandle(t *testing.T) {
 
 	types := []sirius.RefDataItem{
 		{
-			Handle: "REFTYPE",
-			Label:  "refType",
+			Handle: "REFTYPEDIFFERENT",
+			Label:  "refTypeDifferent",
 		},
 	}
 
 	val := fn(types, "REFTYPE")
-	assert.Equal(t, "refType", val)
+	assert.Equal(t, "REFTYPE", val)
 }
 
 func TestCapitalise(t *testing.T) {
@@ -715,11 +715,11 @@ func TestDateYear(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "", val)
 
-	val, err = fn("2006-01-02")
+	val, _ = fn("2006-01-02")
 	assert.Equal(t, "2006", val)
 
 	expected := "failed to format non-date"
-	val, err = fn("202402/03")
+	_, err = fn("202402/03")
 	assert.Equal(t, expected, err.Error())
 }
 
