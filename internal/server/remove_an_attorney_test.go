@@ -298,13 +298,16 @@ func TestGetRemoveAnAttorney(t *testing.T) {
 	removeTemplate := &mockTemplate{}
 	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
-			FormName:          "remove",
-			Decisions:         "jointly",
-			CaseSummary:       removeAnAttorneyCaseSummary,
-			ActiveAttorneys:   activeAttorneys,
-			InactiveAttorneys: inactiveAttorneys,
-			RemovedReasons:    removeAttorneyReasons[1:2], // only second reason is valid for "personal-welfare"
-			Error:             sirius.ValidationError{Field: sirius.FieldErrors{}},
+			FormName:                     "remove",
+			Decisions:                    "jointly",
+			ReplacementAttorneyDecisions: "jointly",
+			ActiveAttorneyCount:          2,
+			ReplacementAttorneyCount:     2,
+			CaseSummary:                  removeAnAttorneyCaseSummary,
+			ActiveAttorneys:              activeAttorneys,
+			InactiveAttorneys:            inactiveAttorneys,
+			RemovedReasons:               removeAttorneyReasons[1:2], // only second reason is valid for "personal-welfare"
+			Error:                        sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
 		Return(nil)
 
@@ -362,13 +365,16 @@ func TestGetRemoveAnAttorneyTemplateErrors(t *testing.T) {
 	removeTemplate := &mockTemplate{}
 	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
-			FormName:          "remove",
-			Decisions:         "jointly",
-			CaseSummary:       removeAnAttorneyCaseSummary,
-			ActiveAttorneys:   activeAttorneys,
-			InactiveAttorneys: inactiveAttorneys,
-			RemovedReasons:    removeAttorneyReasons[1:2], // only second reason is valid for "personal-welfare"
-			Error:             sirius.ValidationError{Field: sirius.FieldErrors{}},
+			FormName:                     "remove",
+			Decisions:                    "jointly",
+			ReplacementAttorneyDecisions: "jointly",
+			ActiveAttorneyCount:          2,
+			ReplacementAttorneyCount:     2,
+			CaseSummary:                  removeAnAttorneyCaseSummary,
+			ActiveAttorneys:              activeAttorneys,
+			InactiveAttorneys:            inactiveAttorneys,
+			RemovedReasons:               removeAttorneyReasons[1:2], // only second reason is valid for "personal-welfare"
+			Error:                        sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
 		Return(errExample)
 
@@ -431,14 +437,17 @@ func TestPostRemoveAnAttorneyValidationErrorsRemoveTemplate(t *testing.T) {
 			removeTemplate := &mockTemplate{}
 			removeTemplate.
 				On("Func", mock.Anything, removeAnAttorneyData{
-					FormName:          "remove",
-					Decisions:         "jointly",
-					CaseSummary:       removeAnAttorneyCaseSummary,
-					ActiveAttorneys:   activeAttorneys,
-					InactiveAttorneys: inactiveAttorneys,
-					RemovedReasons:    removeAttorneyReasons[1:2], // only second reason is valid for "personal-welfare"
-					Form:              tc.expectedForm,
-					Error:             tc.expectedErr,
+					FormName:                     "remove",
+					Decisions:                    "jointly",
+					ReplacementAttorneyDecisions: "jointly",
+					ActiveAttorneyCount:          2,
+					ReplacementAttorneyCount:     2,
+					CaseSummary:                  removeAnAttorneyCaseSummary,
+					ActiveAttorneys:              activeAttorneys,
+					InactiveAttorneys:            inactiveAttorneys,
+					RemovedReasons:               removeAttorneyReasons[1:2], // only second reason is valid for "personal-welfare"
+					Form:                         tc.expectedForm,
+					Error:                        tc.expectedErr,
 				}).
 				Return(nil)
 
@@ -473,12 +482,15 @@ func TestPostDecisionAttorneyValidationError(t *testing.T) {
 	decisionsTemplate := &mockTemplate{}
 	decisionsTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
-			FormName:          "remove",
-			Decisions:         "jointly-for-some-severally-for-others",
-			CaseSummary:       manageAttorneyDecisionsSummary,
-			ActiveAttorneys:   activeAttorneys,
-			InactiveAttorneys: inactiveAttorneys,
-			DecisionAttorneys: decisionAttorneys,
+			FormName:                     "remove",
+			Decisions:                    "jointly-for-some-severally-for-others",
+			ReplacementAttorneyDecisions: "jointly-for-some-severally-for-others",
+			ActiveAttorneyCount:          2,
+			ReplacementAttorneyCount:     2,
+			CaseSummary:                  manageAttorneyDecisionsSummary,
+			ActiveAttorneys:              activeAttorneys,
+			InactiveAttorneys:            inactiveAttorneys,
+			DecisionAttorneys:            decisionAttorneys,
 			Form: formRemoveAttorney{
 				RemovedAttorneyUid:    ActiveOriginalAttorneyUid,
 				EnabledAttorneyUids:   []string{InactiveReplacementAttorneyUID},
@@ -528,12 +540,15 @@ func TestPostRemoveAnAttorneyWithoutDecisionsConfirmTemplate(t *testing.T) {
 	confirmTemplate := &mockTemplate{}
 	confirmTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
-			FormName:          "remove",
-			Decisions:         "jointly",
-			CaseSummary:       removeAnAttorneyCaseSummary,
-			ActiveAttorneys:   activeAttorneys,
-			InactiveAttorneys: inactiveAttorneys,
-			RemovedReasons:    removeAttorneyReasons[1:2], // only second reason is valid for "personal-welfare"
+			FormName:                     "remove",
+			Decisions:                    "jointly",
+			ReplacementAttorneyDecisions: "jointly",
+			ActiveAttorneyCount:          2,
+			ReplacementAttorneyCount:     2,
+			CaseSummary:                  removeAnAttorneyCaseSummary,
+			ActiveAttorneys:              activeAttorneys,
+			InactiveAttorneys:            inactiveAttorneys,
+			RemovedReasons:               removeAttorneyReasons[1:2], // only second reason is valid for "personal-welfare"
 			Form: formRemoveAttorney{
 				RemovedAttorneyUid:  ActiveOriginalAttorneyUid,
 				EnabledAttorneyUids: []string{InactiveReplacementAttorneyUID},
@@ -626,12 +641,15 @@ func TestPostRemoveAttorneyWithDecisionsOnDecisionsTemplate(t *testing.T) {
 	decisionsTemplate := &mockTemplate{}
 	decisionsTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
-			FormName:          "remove",
-			Decisions:         "jointly-for-some-severally-for-others",
-			CaseSummary:       manageAttorneyDecisionsSummary,
-			ActiveAttorneys:   activeAttorneys,
-			InactiveAttorneys: inactiveAttorneys,
-			DecisionAttorneys: decisionAttorneys,
+			FormName:                     "remove",
+			Decisions:                    "jointly-for-some-severally-for-others",
+			ReplacementAttorneyDecisions: "jointly-for-some-severally-for-others",
+			ActiveAttorneyCount:          2,
+			ReplacementAttorneyCount:     2,
+			CaseSummary:                  manageAttorneyDecisionsSummary,
+			ActiveAttorneys:              activeAttorneys,
+			InactiveAttorneys:            inactiveAttorneys,
+			DecisionAttorneys:            decisionAttorneys,
 			Form: formRemoveAttorney{
 				RemovedAttorneyUid:  ActiveOriginalAttorneyUid,
 				EnabledAttorneyUids: []string{InactiveReplacementAttorneyUID},
@@ -687,11 +705,14 @@ func TestPostRemoveAttorneyWithDecisionsOnConfirmTemplate(t *testing.T) {
 	confirmTemplate := &mockTemplate{}
 	confirmTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
-			FormName:          "remove",
-			Decisions:         "jointly-for-some-severally-for-others",
-			CaseSummary:       manageAttorneyDecisionsSummary,
-			ActiveAttorneys:   activeAttorneys,
-			InactiveAttorneys: inactiveAttorneys,
+			FormName:                     "remove",
+			Decisions:                    "jointly-for-some-severally-for-others",
+			ReplacementAttorneyDecisions: "jointly-for-some-severally-for-others",
+			ActiveAttorneyCount:          2,
+			ReplacementAttorneyCount:     2,
+			CaseSummary:                  manageAttorneyDecisionsSummary,
+			ActiveAttorneys:              activeAttorneys,
+			InactiveAttorneys:            inactiveAttorneys,
 			Form: formRemoveAttorney{
 				RemovedAttorneyUid:    ActiveOriginalAttorneyUid,
 				EnabledAttorneyUids:   []string{InactiveReplacementAttorneyUID},
