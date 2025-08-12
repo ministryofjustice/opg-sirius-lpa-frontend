@@ -33,21 +33,24 @@ type SelectedAttorneyDetails struct {
 }
 
 type removeAnAttorneyData struct {
-	CaseSummary              sirius.CaseSummary
-	ActiveAttorneys          []sirius.LpaStoreAttorney
-	InactiveAttorneys        []sirius.LpaStoreAttorney
-	DecisionAttorneys        []sirius.LpaStoreAttorney
-	RemovedReasons           []sirius.RefDataItem
-	Form                     formRemoveAttorney
-	RemovedAttorneysDetails  SelectedAttorneyDetails
-	RemovedReason            sirius.RefDataItem
-	EnabledAttorneysDetails  []SelectedAttorneyDetails
-	DecisionAttorneysDetails []AttorneyDetails
-	Success                  bool
-	Error                    sirius.ValidationError
-	XSRFToken                string
-	FormName                 string
-	Decisions                string
+	CaseSummary                  sirius.CaseSummary
+	ActiveAttorneys              []sirius.LpaStoreAttorney
+	InactiveAttorneys            []sirius.LpaStoreAttorney
+	DecisionAttorneys            []sirius.LpaStoreAttorney
+	RemovedReasons               []sirius.RefDataItem
+	Form                         formRemoveAttorney
+	RemovedAttorneysDetails      SelectedAttorneyDetails
+	RemovedReason                sirius.RefDataItem
+	EnabledAttorneysDetails      []SelectedAttorneyDetails
+	DecisionAttorneysDetails     []AttorneyDetails
+	ActiveAttorneyCount          int
+	ReplacementAttorneyCount     int
+	Success                      bool
+	Error                        sirius.ValidationError
+	XSRFToken                    string
+	FormName                     string
+	Decisions                    string
+	ReplacementAttorneyDecisions string
 }
 
 func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Template, confirmTmpl template.Template, decisionsTmpl template.Template) Handler {
@@ -84,11 +87,12 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 		}
 
 		data := removeAnAttorneyData{
-			CaseSummary: caseSummary,
-			XSRFToken:   ctx.XSRFToken,
-			Error:       sirius.ValidationError{Field: sirius.FieldErrors{}},
-			FormName:    "remove",
-			Decisions:   caseSummary.DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions,
+			CaseSummary:                  caseSummary,
+			XSRFToken:                    ctx.XSRFToken,
+			Error:                        sirius.ValidationError{Field: sirius.FieldErrors{}},
+			FormName:                     "remove",
+			Decisions:                    caseSummary.DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions,
+			ReplacementAttorneyDecisions: caseSummary.DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions,
 		}
 
 		lpa := data.CaseSummary.DigitalLpa
@@ -101,6 +105,7 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 			}
 
 			data.ActiveAttorneys = append(data.ActiveAttorneys, attorney)
+			data.ActiveAttorneyCount++
 		}
 
 		for _, attorney := range lpa.LpaStoreData.Attorneys {
@@ -109,6 +114,11 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 			}
 
 			data.InactiveAttorneys = append(data.InactiveAttorneys, attorney)
+			data.ReplacementAttorneyCount++
+		}
+
+		if data.ActiveAttorneyCount > 1 && data.ReplacementAttorneyCount > 1 && data.ReplacementAttorneyDecisions == "" {
+			data.ReplacementAttorneyDecisions = data.Decisions
 		}
 
 		for _, removedReason := range allRemovedReasons {

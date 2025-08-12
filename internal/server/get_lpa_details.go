@@ -30,6 +30,7 @@ type getLpaDetails struct {
 	RemovedTrustCorporations        []sirius.LpaStoreTrustCorporation
 	DecisionTrustCorporations       []sirius.LpaStoreTrustCorporation
 	FlashMessage                    FlashNotification
+	ReplacementAttorneysDecisions   string
 }
 
 func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
@@ -115,6 +116,11 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		data.NonReplacementAttorneys = nonReplacementAttorneys
 		data.RemovedAttorneys = removedAttorneys
 		data.DecisionAttorneys = decisionAttorneys
+		data.ReplacementAttorneysDecisions = data.CaseSummary.DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions
+
+		if len(data.NonReplacementAttorneys) > 1 && len(data.ReplacementAttorneys) > 1 && data.ReplacementAttorneysDecisions == "" {
+			data.ReplacementAttorneysDecisions = data.CaseSummary.DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions
+		}
 
 		var replacementTrustCorporations []sirius.LpaStoreTrustCorporation
 		var nonReplacementTrustCorporations []sirius.LpaStoreTrustCorporation
