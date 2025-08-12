@@ -262,20 +262,20 @@ func TestPrefix(t *testing.T) {
 	assert.Equal(t, "URL", val)
 }
 
-func TestPrefixAssetIsElevenOrOver(t *testing.T) {
-	fns := All("", "PREFIX", "/stylesheets/all.css")
+func TestPrefixAssetGivenValidCache(t *testing.T) {
+	fns := All("", "PREFIX", "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1")
 	fn := fns["prefixAsset"].(func(string) string)
 
-	val := fn("test")
-	assert.Equal(t, "PREFIXtest?ylesheet", val)
+	val := fn("")
+	assert.Equal(t, "PREFIX?d6a61d20", val)
 }
 
-func TestPrefixAssetUnderEleven(t *testing.T) {
-	fns := All("", "PREFIX", "stylesheet")
+func TestPrefixAssetIgnoresInvalidCache(t *testing.T) {
+	fns := All("", "PREFIX", "48d6a61d2")
 	fn := fns["prefixAsset"].(func(string) string)
 
-	val := fn("test")
-	assert.Equal(t, "PREFIXtest", val)
+	val := fn("48d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1")
+	assert.Equal(t, "PREFIX48d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1", val)
 }
 
 func TestToday(t *testing.T) {
