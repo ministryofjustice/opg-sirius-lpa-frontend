@@ -26,14 +26,18 @@ type formManageAttorneyDecisions struct {
 }
 
 type manageAttorneyDecisionsData struct {
-	CaseSummary              sirius.CaseSummary
-	DecisionAttorneys        []sirius.LpaStoreAttorney
-	Form                     formManageAttorneyDecisions
-	DecisionAttorneysDetails []AttorneyDetails
-	Success                  bool
-	Error                    sirius.ValidationError
-	XSRFToken                string
-	FormName                 string
+	CaseSummary                  sirius.CaseSummary
+	DecisionAttorneys            []sirius.LpaStoreAttorney
+	Form                         formManageAttorneyDecisions
+	DecisionAttorneysDetails     []AttorneyDetails
+	ActiveAttorneyCount          int
+	ReplacementAttorneyCount     int
+	Decisions                    string
+	ReplacementAttorneyDecisions string
+	Success                      bool
+	Error                        sirius.ValidationError
+	XSRFToken                    string
+	FormName                     string
 }
 
 func AttorneyDecisions(client AttorneyDecisionsClient, decisionTmpl template.Template, confirmTmpl template.Template) Handler {
@@ -49,10 +53,12 @@ func AttorneyDecisions(client AttorneyDecisionsClient, decisionTmpl template.Tem
 		}
 
 		data := manageAttorneyDecisionsData{
-			CaseSummary: caseSummary,
-			XSRFToken:   ctx.XSRFToken,
-			Error:       sirius.ValidationError{Field: sirius.FieldErrors{}},
-			FormName:    "decisions",
+			CaseSummary:                  caseSummary,
+			XSRFToken:                    ctx.XSRFToken,
+			Error:                        sirius.ValidationError{Field: sirius.FieldErrors{}},
+			FormName:                     "decisions",
+			Decisions:                    caseSummary.DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions,
+			ReplacementAttorneyDecisions: caseSummary.DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions,
 		}
 
 		lpa := data.CaseSummary.DigitalLpa
@@ -60,7 +66,17 @@ func AttorneyDecisions(client AttorneyDecisionsClient, decisionTmpl template.Tem
 		for _, attorney := range lpa.LpaStoreData.Attorneys {
 			if attorney.Status == shared.ActiveAttorneyStatus.String() {
 				data.DecisionAttorneys = append(data.DecisionAttorneys, attorney)
+				data.ActiveAttorneyCount++
 			}
+
+			if attorney.AppointmentType == shared.ReplacementAppointmentType.String() &&
+				attorney.Status == shared.InactiveAttorneyStatus.String() {
+				data.ReplacementAttorneyCount++
+			}
+		}
+
+		if data.ActiveAttorneyCount > 1 && data.ReplacementAttorneyCount > 1 && data.ReplacementAttorneyDecisions == "" {
+			data.ReplacementAttorneyDecisions = data.Decisions
 		}
 
 		if r.Method == http.MethodPost {
