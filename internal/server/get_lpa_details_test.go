@@ -144,6 +144,54 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 								},
 							},
 						},
+						TrustCorporations: []sirius.LpaStoreTrustCorporation{
+							{
+								Name:          "Trust Me Once",
+								CompanyNumber: "123456789",
+								Signatories: []sirius.Signatory{
+									{
+										FirstNames: "First",
+									},
+								},
+								LpaStoreAttorney: sirius.LpaStoreAttorney{
+									Decisions:       true,
+									Status:          shared.ActiveAttorneyStatus.String(),
+									AppointmentType: shared.OriginalAppointmentType.String(),
+									LpaStorePerson: sirius.LpaStorePerson{
+										Email: "trust.me.once@does.not.exist",
+									},
+								},
+							},
+							{
+								Name:          "Trust Me Twice",
+								CompanyNumber: "987654321",
+								Signatories: []sirius.Signatory{
+									{
+										FirstNames: "Second",
+									},
+								},
+								LpaStoreAttorney: sirius.LpaStoreAttorney{
+									Decisions:       false,
+									Status:          shared.InactiveAttorneyStatus.String(),
+									AppointmentType: shared.ReplacementAppointmentType.String(),
+									LpaStorePerson: sirius.LpaStorePerson{
+										Email: "trust.me.twice@does.not.exist",
+									},
+								},
+							},
+							{
+								Name:          "Dont Trust Me",
+								CompanyNumber: "987654321",
+								LpaStoreAttorney: sirius.LpaStoreAttorney{
+									Decisions:       false,
+									Status:          shared.RemovedAttorneyStatus.String(),
+									AppointmentType: shared.OriginalAppointmentType.String(),
+									LpaStorePerson: sirius.LpaStorePerson{
+										Email: "dont.trust.me@does.not.exist",
+									},
+								},
+							},
+						},
 					},
 				},
 				TaskList: tc.taskList,
@@ -266,6 +314,77 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 							AppointmentType: shared.ReplacementAppointmentType.String(),
 							LpaStorePerson: sirius.LpaStorePerson{
 								Email: "sixth@does.not.exist",
+							},
+						},
+					},
+					ReplacementTrustCorporations: []sirius.LpaStoreTrustCorporation{
+						{
+							Name:          "Trust Me Twice",
+							CompanyNumber: "987654321",
+							Signatories: []sirius.Signatory{
+								{
+									FirstNames: "Second",
+								},
+							},
+							LpaStoreAttorney: sirius.LpaStoreAttorney{
+								Decisions:       false,
+								Status:          shared.InactiveAttorneyStatus.String(),
+								AppointmentType: shared.ReplacementAppointmentType.String(),
+								LpaStorePerson: sirius.LpaStorePerson{
+									Email: "trust.me.twice@does.not.exist",
+								},
+							},
+						},
+					},
+					NonReplacementTrustCorporations: []sirius.LpaStoreTrustCorporation{
+						{
+							Name:          "Trust Me Once",
+							CompanyNumber: "123456789",
+							Signatories: []sirius.Signatory{
+								{
+									FirstNames: "First",
+								},
+							},
+							LpaStoreAttorney: sirius.LpaStoreAttorney{
+								Decisions:       true,
+								Status:          shared.ActiveAttorneyStatus.String(),
+								AppointmentType: shared.OriginalAppointmentType.String(),
+								LpaStorePerson: sirius.LpaStorePerson{
+									Email: "trust.me.once@does.not.exist",
+								},
+							},
+						},
+					},
+					RemovedTrustCorporations: []sirius.LpaStoreTrustCorporation{
+						{
+							Name:          "Dont Trust Me",
+							CompanyNumber: "987654321",
+							LpaStoreAttorney: sirius.LpaStoreAttorney{
+								Decisions:       false,
+								Status:          shared.RemovedAttorneyStatus.String(),
+								AppointmentType: shared.OriginalAppointmentType.String(),
+								LpaStorePerson: sirius.LpaStorePerson{
+									Email: "dont.trust.me@does.not.exist",
+								},
+							},
+						},
+					},
+					DecisionTrustCorporations: []sirius.LpaStoreTrustCorporation{
+						{
+							Name:          "Trust Me Once",
+							CompanyNumber: "123456789",
+							Signatories: []sirius.Signatory{
+								{
+									FirstNames: "First",
+								},
+							},
+							LpaStoreAttorney: sirius.LpaStoreAttorney{
+								Decisions:       true,
+								Status:          shared.ActiveAttorneyStatus.String(),
+								AppointmentType: shared.OriginalAppointmentType.String(),
+								LpaStorePerson: sirius.LpaStorePerson{
+									Email: "trust.me.once@does.not.exist",
+								},
 							},
 						},
 					},
