@@ -115,7 +115,21 @@ describe("View and edit anomalies for a digital LPA", () => {
             fieldName: "lastName",
             ruleType: "empty",
             fieldOwnerUid: "certificate-provider",
-            },
+          },
+          {
+            id: 134,
+            status: "detected",
+            fieldName: "lastName",
+            ruleType: "last-name-matches-donor",
+            fieldOwnerUid: "certificate-provider",
+          },
+          {
+            id: 135,
+            status: "detected",
+            fieldName: "lastName",
+            ruleType: "last-name-matches-attorney",
+            fieldOwnerUid: "certificate-provider",
+          },
         ],
       },
     });
