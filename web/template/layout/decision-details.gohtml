@@ -87,6 +87,17 @@
                     {{ end }}
                 </dd>
             </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">When replacement attorneys can step in</dt>
+                <dd class="govuk-summary-list__value">
+                    <div class="govuk-body">
+                        {{ howReplacementAttorneysStepInLongForm .DigitalLpa.LpaStoreData.HowReplacementAttorneysStepIn }}
+                        {{ if (eq .DigitalLpa.LpaStoreData.HowReplacementAttorneysStepIn "another-way") }}
+                            <br>{{ howReplacementAttorneysStepInLongForm .DigitalLpa.LpaStoreData.HowReplacementAttorneysStepInDetails }}
+                        {{ end }}
+                    </div>
+                </dd>
+            </div>
         </dl>
     </div>
 </div>
