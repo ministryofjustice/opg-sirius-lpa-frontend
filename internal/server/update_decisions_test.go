@@ -74,6 +74,94 @@ var updateDecisionsCaseSummary = sirius.CaseSummary{
 	},
 }
 
+var caseSummaryWithMultipleAttorneys = sirius.CaseSummary{
+	DigitalLpa: sirius.DigitalLpa{
+		UID: "M-1111-2222-3333",
+		LpaStoreData: sirius.LpaStoreData{
+			Attorneys: []sirius.LpaStoreAttorney{
+				{
+					LpaStorePerson: sirius.LpaStorePerson{
+						Uid:        "302b05c7-896c-4290-904e-2005e4f1e81e",
+						FirstNames: "Jack",
+						LastName:   "Black",
+						Address: sirius.LpaStoreAddress{
+							Line1:    "9 Mount Pleasant Drive",
+							Town:     "East Harling",
+							Postcode: "NR16 2GB",
+							Country:  "UK",
+						},
+					},
+					DateOfBirth:     "1990-02-22",
+					Status:          shared.ActiveAttorneyStatus.String(),
+					AppointmentType: shared.OriginalAppointmentType.String(),
+					Email:           "a@example.com",
+					Mobile:          "077577575757",
+					SignedAt:        "2024-01-12T10:09:09Z",
+				},
+				{
+					LpaStorePerson: sirius.LpaStorePerson{
+						Uid:        "302b05c7-896c-4290-405r-2005e4f1b79c",
+						FirstNames: "Jack",
+						LastName:   "Green",
+						Address: sirius.LpaStoreAddress{
+							Line1:    "19 Mount Pleasant Drive",
+							Town:     "East Harling",
+							Postcode: "NR17 2GB",
+							Country:  "UK",
+						},
+					},
+					DateOfBirth:     "1990-02-12",
+					Status:          shared.ActiveAttorneyStatus.String(),
+					AppointmentType: shared.OriginalAppointmentType.String(),
+					Email:           "b@example.com",
+					Mobile:          "077577575888",
+					SignedAt:        "2024-01-14T10:09:09Z",
+				},
+				{
+					LpaStorePerson: sirius.LpaStorePerson{
+						Uid:        "123a01b1-456d-5391-813d-2010d3e2d72d",
+						FirstNames: "Jack",
+						LastName:   "White",
+						Address: sirius.LpaStoreAddress{
+							Line1:    "29 Grange Road",
+							Town:     "Birmingham",
+							Postcode: "B29 6BL",
+							Country:  "UK",
+						},
+					},
+					DateOfBirth:     "1990-02-22",
+					Status:          shared.InactiveAttorneyStatus.String(),
+					AppointmentType: shared.ReplacementAppointmentType.String(),
+					Email:           "c@example.com",
+					Mobile:          "07122121212",
+					SignedAt:        "2024-11-28T19:22:11Z",
+				},
+				{
+					LpaStorePerson: sirius.LpaStorePerson{
+						Uid:        "767a01c1-789e-5391-456a-2010d3e3g78e",
+						FirstNames: "Jack",
+						LastName:   "Yellow",
+						Address: sirius.LpaStoreAddress{
+							Line1:    "39 Grange Road",
+							Town:     "Birmingham",
+							Postcode: "B29 6UL",
+							Country:  "UK",
+						},
+					},
+					DateOfBirth:     "1990-02-26",
+					Status:          shared.InactiveAttorneyStatus.String(),
+					AppointmentType: shared.ReplacementAppointmentType.String(),
+					Email:           "d@example.com",
+					Mobile:          "07122124567",
+					SignedAt:        "2024-11-18T19:22:11Z",
+				},
+			},
+			HowAttorneysMakeDecisions:            "jointly",
+			HowReplacementAttorneysMakeDecisions: "",
+		},
+	},
+}
+
 func TestGetUpdateDecisionsGet(t *testing.T) {
 	client := &mockUpdateDecisionsClient{}
 	client.
@@ -84,9 +172,38 @@ func TestGetUpdateDecisionsGet(t *testing.T) {
 	template.
 		On("Func", mock.Anything,
 			updateDecisionsData{
-				CaseSummary:         updateDecisionsCaseSummary,
-				Form:                formDecisionsDetails{},
-				ActiveAttorneyCount: 1,
+				CaseSummary:              updateDecisionsCaseSummary,
+				Form:                     formDecisionsDetails{},
+				ActiveAttorneyCount:      1,
+				ReplacementAttorneyCount: 1,
+			}).
+		Return(errExample)
+
+	server := newMockServer("/lpa/{uid}/update-decisions", UpdateDecisions(client, template.Func))
+
+	r, _ := http.NewRequest(http.MethodGet, "/lpa/M-1111-2222-3333/update-decisions", nil)
+	_, err := server.serve(r)
+
+	assert.Equal(t, errExample, err)
+}
+
+func TestGetUpdateDecisionsMultipleAttorneys(t *testing.T) {
+	client := &mockUpdateDecisionsClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-1111-2222-3333").
+		Return(caseSummaryWithMultipleAttorneys, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything,
+			updateDecisionsData{
+				CaseSummary: caseSummaryWithMultipleAttorneys,
+				Form: formDecisionsDetails{
+					HowAttorneysMakeDecisions:            "jointly",
+					HowReplacementAttorneysMakeDecisions: "jointly",
+				},
+				ActiveAttorneyCount:      2,
+				ReplacementAttorneyCount: 2,
 			}).
 		Return(errExample)
 
