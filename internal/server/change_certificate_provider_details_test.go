@@ -346,63 +346,6 @@ var testChangeCertificateProviderCaseSummaryWithEligibilityConfirmed = sirius.Ca
 	},
 }
 
-func TestLpaStoreCertificateProvider_HasMatchingDetailsWithDonorOrAttorneys(t *testing.T) {
-	tests := []struct {
-		name      string
-		cp        sirius.LpaStoreCertificateProvider
-		donor     sirius.LpaStoreDonor
-		attorneys []sirius.LpaStoreAttorney
-		expected  bool
-	}{
-		{
-			name: "matches donor last name",
-			cp: sirius.LpaStoreCertificateProvider{
-				LpaStorePerson: sirius.LpaStorePerson{LastName: "Smith"},
-			},
-			donor: sirius.LpaStoreDonor{
-				LpaStorePerson: sirius.LpaStorePerson{LastName: "Smith"},
-			},
-			attorneys: []sirius.LpaStoreAttorney{},
-			expected:  true,
-		},
-		{
-			name: "matches attorney last name",
-			cp: sirius.LpaStoreCertificateProvider{
-				LpaStorePerson: sirius.LpaStorePerson{LastName: "Jones"},
-			},
-			donor: sirius.LpaStoreDonor{
-				LpaStorePerson: sirius.LpaStorePerson{LastName: "Smith"},
-			},
-			attorneys: []sirius.LpaStoreAttorney{
-				{LpaStorePerson: sirius.LpaStorePerson{LastName: "Jones"}},
-			},
-			expected: true,
-		},
-		{
-			name: "no matches",
-			cp: sirius.LpaStoreCertificateProvider{
-				LpaStorePerson: sirius.LpaStorePerson{LastName: "Brown"},
-			},
-			donor: sirius.LpaStoreDonor{
-				LpaStorePerson: sirius.LpaStorePerson{LastName: "Smith"},
-			},
-			attorneys: []sirius.LpaStoreAttorney{
-				{LpaStorePerson: sirius.LpaStorePerson{LastName: "Jones"}},
-			},
-			expected: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := tt.cp.HasMatchingDetailsWithDonorOrAttorneys(tt.donor, tt.attorneys)
-			if result != tt.expected {
-				t.Errorf("HasMatchingDetailsWithDonorOrAttorneys() = %v, want %v", result, tt.expected)
-			}
-		})
-	}
-}
-
 func TestGetChangeCertificateProviderDetailsWithEligibilityConfirmed(t *testing.T) {
 	caseUid := "M-1111-1111-1111"
 

@@ -131,17 +131,3 @@ func (c *Client) DigitalLpa(ctx Context, uid string, presignImages bool) (Digita
 	err := c.get(ctx, url, &v)
 	return v, err
 }
-
-func (cp LpaStoreCertificateProvider) HasMatchingDetailsWithDonorOrAttorneys(donor LpaStoreDonor, attorneys []LpaStoreAttorney) bool {
-	if cp.LastName == donor.LastName {
-		return true
-	}
-
-	for _, attorney := range attorneys {
-		if cp.LastName == attorney.LastName {
-			return true
-		}
-	}
-
-	return false
-}
