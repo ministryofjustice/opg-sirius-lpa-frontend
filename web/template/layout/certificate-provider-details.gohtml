@@ -43,15 +43,7 @@
                 <dd class="govuk-summary-list__value{{ if gt (len $cpFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
                     {{ .DigitalLpa.LpaStoreData.CertificateProvider.LastName }}
                     {{ if gt (len $cpFieldAnomalies) 0 }}
-                        {{ range $num, $cpAnomaly := $cpFieldAnomalies }}
-                            {{ if (eq $cpAnomaly.RuleType "empty") }}
-                                <br><span class="govuk-error-message">Review certificate provider's last name</span>
-                            {{ else if (eq $cpAnomaly.RuleType "last-name-matches-donor") }}
-                                <br><span class="govuk-error-message">Review last name - this matches the donor's. Check certificate provider's eligibility</span>
-                            {{ else if (eq $cpAnomaly.RuleType "last-name-matches-attorney") }}
-                                <br><span class="govuk-error-message">Review last name - this matches at least one of the attorney's. Check certificate provider's eligibility</span>
-                            {{ end }}
-                        {{ end }}
+                        <br><span class="govuk-error-message">{{ $cpFieldAnomalies.GetHintTextForAnomalyField }}</span>
                     {{ end }}
                 </dd>
             </div>
@@ -62,7 +54,7 @@
                 <dd class="govuk-summary-list__value{{ if gt (len $addressFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
                     {{ template "mlpa-address" .DigitalLpa.LpaStoreData.CertificateProvider.Address }}
                     {{ if gt (len $addressFieldAnomalies) 0 }}
-                        <br><span class="govuk-error-message">Review certificate provider address</span>
+                        <br><span class="govuk-error-message">Review certificate provider's address</span>
                     {{ end }}
                 </dd>
             </div>
