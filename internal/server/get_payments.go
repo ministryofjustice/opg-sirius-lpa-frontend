@@ -30,6 +30,7 @@ type getPaymentsData struct {
 	ReferenceTypes    []sirius.RefDataItem
 	FeeReductionTypes []sirius.RefDataItem
 	IsReducedFeesUser bool
+	IsSysAdminUser    bool
 	TotalPaid         int
 	TotalRefunds      int
 	OutstandingFee    int
@@ -132,6 +133,7 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 				return err
 			}
 			data.IsReducedFeesUser = user.HasRole("Reduced Fees User")
+			data.IsSysAdminUser = user.HasRole("System Admin")
 			return nil
 		})
 

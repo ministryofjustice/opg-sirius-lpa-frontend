@@ -4,50 +4,25 @@
 
 <!-- replacement attorneys -->
 {{ $anomaliesForSection := .AnomalyDisplay.GetAnomaliesForSection "replacementAttorneys" }}
+{{ $totalReplacmentAttorneys := plusN (len .ReplacementAttorneys) (len .ReplacementTrustCorporations ) }}
 <div class="govuk-accordion__section">
     <div class="govuk-accordion__section-header{{ if $anomaliesForSection.HasAnomalies }} govuk-form-group--error{{ end }}">
         <h2 class="govuk-accordion__section-heading">
-              <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
-                Replacement attorneys ({{ len .ReplacementAttorneys }})
+            <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
+                Replacement attorneys ({{ $totalReplacmentAttorneys }})
                 {{ if $anomaliesForSection.HasAnomalies }}<span class="govuk-error-message">For review</span>{{ end }}
-              </span>
+            </span>
         </h2>
     </div>
 
     <div id="accordion-default-content-4" class="govuk-accordion__section-content">
-        {{ if (gt (len .ReplacementAttorneys) 0) }}
-            <dl class="govuk-summary-list">
-
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">When replacement attorneys can step in</dt>
-                    <dd class="govuk-summary-list__value">
-                        <div class="govuk-body">
-                            {{ howReplacementAttorneysStepInLongForm .DigitalLpa.LpaStoreData.HowReplacementAttorneysStepIn }}
-                            {{ if (eq .DigitalLpa.LpaStoreData.HowReplacementAttorneysStepIn "another-way") }}
-                                <br>{{ howReplacementAttorneysStepInLongForm .DigitalLpa.LpaStoreData.HowReplacementAttorneysStepInDetails }}
-                            {{ end }}
-                        </div>
-                    </dd>
-                </div>
-
-                <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
-                    <dt class="govuk-summary-list__key">How replacement attorneys must make decisions</dt>
-                    <dd class="govuk-summary-list__value">
-                        <div class="govuk-body">
-                            {{ howAttorneysMakeDecisionsLongForm false .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions }}
-                            {{ if (gt (len .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisionsDetails) 0) }}
-                                <p class="app-newlines-as-br">{{ .DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisionsDetails }}</p>
-                            {{ end }}
-                        </div>
-                    </dd>
-                </div>
-
-            </dl>
-
+        {{ if (gt $totalReplacmentAttorneys 0) }}
+            {{ $count := 0 }}
             {{ range $num, $attorney := .ReplacementAttorneys }}
                 {{ $attorneyAnomalies := $anomaliesForSection.GetAnomaliesForObject $attorney.Uid }}
                 <h2 class="govuk-heading-m">
-                    Replacement attorney {{ plusN $num 1 }}
+                    {{ $count = plusN $count 1 }}
+                    Replacement attorney {{ $count }}
                 </h2>
 
                 <dl class="govuk-summary-list">
@@ -148,6 +123,14 @@
                     {{ end }}
 
                 </dl>
+            {{ end }}
+            {{ range $num, $trustCorporation := .ReplacementTrustCorporations }}
+                <h2 class="govuk-heading-m">
+                    {{ $count = plusN $count 1 }}
+                    Replacement attorney {{ $count }}
+                </h2>
+
+                {{ template "trust-corporation-summary" $trustCorporation}}
             {{ end }}
 
         {{ else }}

@@ -48,6 +48,7 @@ type LpaStoreData struct {
 	Channel                                     string                      `json:"channel"`
 	Status                                      string                      `json:"status"`
 	Attorneys                                   []LpaStoreAttorney          `json:"attorneys"`
+	TrustCorporations                           []LpaStoreTrustCorporation  `json:"trustCorporations"`
 	CertificateProvider                         LpaStoreCertificateProvider `json:"certificateProvider"`
 	CertificateProviderNotRelatedConfirmedAt    string                      `json:"certificateProviderNotRelatedConfirmedAt"`
 	PeopleToNotify                              []LpaStorePersonToNotify    `json:"peopleToNotify"`
@@ -87,6 +88,20 @@ type LpaStoreAttorney struct {
 	SignedAt                  string `json:"signedAt"`
 	Email                     string `json:"email"`
 	Decisions                 bool   `json:"cannotMakeJointDecisions,omitempty"`
+}
+
+type LpaStoreTrustCorporation struct {
+	LpaStoreAttorney
+	Name          string      `json:"name"`
+	CompanyNumber string      `json:"companyNumber"`
+	Signatories   []Signatory `json:"signatories,omitempty"`
+}
+
+type Signatory struct {
+	FirstNames        string `json:"firstNames"`
+	LastName          string `json:"lastName"`
+	ProfessionalTitle string `json:"professionalTitle"`
+	SignedAt          string `json:"signedAt"`
 }
 
 type LpaStoreCertificateProvider struct {

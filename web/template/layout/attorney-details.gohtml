@@ -3,24 +3,27 @@
 {{ $caseUID :=  .CaseSummary.DigitalLpa.UID}}
 
 {{ $anomaliesForSection := .AnomalyDisplay.GetAnomaliesForSection "attorneys" }}
+{{ $totalAttorneys := plusN (len .NonReplacementAttorneys) (len .NonReplacementTrustCorporations ) }}
 <div class="govuk-accordion__section">
 
     <div class="govuk-accordion__section-header{{ if $anomaliesForSection.HasAnomalies }} govuk-form-group--error{{ end }}">
         <h2 class="govuk-accordion__section-heading">
-              <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
-                Attorneys ({{ len .NonReplacementAttorneys }})
+            <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
+                Attorneys ({{ $totalAttorneys }})
                 {{ if $anomaliesForSection.HasAnomalies }}<span class="govuk-error-message">For review</span>{{ end }}
-              </span>
+            </span>
         </h2>
     </div>
 
     <div id="accordion-default-content-2" class="govuk-accordion__section-content">
-        {{ if (gt (len .NonReplacementAttorneys) 0) }}
+        {{ if (gt $totalAttorneys 0) }}
+            {{ $count := 0 }}
             {{ range $num, $attorney := .NonReplacementAttorneys }}
                 {{ $attorneyAnomalies := $anomaliesForSection.GetAnomaliesForObject $attorney.Uid }}
 
                 <h2 class="govuk-heading-m">
-                    Attorney {{ plusN $num 1 }}
+                    {{ $count = plusN $count 1 }}
+                    Attorney {{ $count }}
                 </h2>
 
                 <dl class="govuk-summary-list">
@@ -70,7 +73,7 @@
                         <dd class="govuk-summary-list__value{{ if gt (len $attorneyFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
                             {{ template "mlpa-address" $attorney.Address }}
                             {{ if gt (len $attorneyFieldAnomalies) 0 }}
-                              <br><span class="govuk-error-message">Review attorney's address</span>
+                                <br><span class="govuk-error-message">Review attorney's address</span>
                             {{ end }}
                         </dd>
                     </div>
@@ -121,6 +124,14 @@
                     {{ end }}
 
                 </dl>
+            {{ end }}
+            {{ range $num, $trustCorporation := .NonReplacementTrustCorporations }}
+                <h2 class="govuk-heading-m">
+                    {{ $count = plusN $count 1 }}
+                    Attorney {{ $count }}
+                </h2>
+
+                {{ template "trust-corporation-summary" $trustCorporation}}
             {{ end }}
         {{ else }}
             <p class="govuk-body">The donor did not provide details for this section</p>
