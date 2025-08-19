@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -33,6 +34,9 @@ func (c *Client) getCaseSummary(ctx Context, uid string, presignImages bool) (Ca
 	group, groupCtx := errgroup.WithContext(ctx.Context)
 
 	cs.DigitalLpa, err = c.DigitalLpa(ctx, uid, presignImages)
+	for _, caseStatus := range cs.DigitalLpa.SiriusData.LinkedCases {
+		caseStatus.Status = shared.CaseStatusParseStatus(caseStatus.Status)
+	}
 	if err != nil {
 		return cs, err
 	}

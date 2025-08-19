@@ -16,7 +16,7 @@ type SiriusData struct {
 	Application        Draft        `json:"application"`
 	Subtype            string       `json:"caseSubtype"`
 	CreatedDate        DateString   `json:"createdDate"`
-	Status             string       `json:"status"`
+	Status             string       `json:"status"` //change type something like caseStatus
 	ComplaintCount     int          `json:"complaintCount"`
 	InvestigationCount int          `json:"investigationCount"`
 	TaskCount          int          `json:"taskCount"`
@@ -25,6 +25,7 @@ type SiriusData struct {
 	LinkedCases        []SiriusData `json:"linkedDigitalLpas"`
 	Donor              Donor        `json:"donor"`
 	DueDate            DateString   `json:"dueDate"`
+	StatusColour       string
 }
 
 type Donor struct {
