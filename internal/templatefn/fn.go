@@ -10,6 +10,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
@@ -134,26 +135,26 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"plusN": func(i int, n int) int {
 			return i + n
 		},
-		"statusColour": func(s string) string {
-			switch strings.ToLower(s) {
-			case "registered":
-				return "green"
-			case "perfect":
-				return "turquoise"
-			case "statutory waiting period":
-				return "yellow"
-			case "in progress":
-				return "light-blue"
-			case "pending", "payment pending", "reduced fees pending":
-				return "blue"
-			case "draft":
-				return "purple"
-			case "cancelled", "rejected", "revoked", "withdrawn", "return - unpaid", "deleted", "do not register", "expired", "cannot register", "de-registered":
-				return "red"
-			default:
-				return "grey"
-			}
-		},
+		//"statusColour": func(s string) string {
+		//	switch strings.ToLower(s) {
+		//	case "registered":
+		//		return "green"
+		//	case "perfect":
+		//		return "turquoise"
+		//	case "statutory waiting period":
+		//		return "yellow"
+		//	case "in progress":
+		//		return "light-blue"
+		//	case "pending", "payment pending", "reduced fees pending":
+		//		return "blue"
+		//	case "draft":
+		//		return "purple"
+		//	case "cancelled", "rejected", "revoked", "withdrawn", "return - unpaid", "deleted", "do not register", "expired", "cannot register", "de-registered":
+		//		return "red"
+		//	default:
+		//		return "grey"
+		//	}
+		//},
 		"statusLabel": StatusLabelFormat,
 		"replace": func(s, find, replace string) string {
 			return strings.ReplaceAll(s, find, replace)
@@ -357,10 +358,11 @@ type CaseTabData struct {
 }
 
 type linkedCase struct {
-	UID         string
-	Subtype     string
-	Status      string
-	CreatedDate sirius.DateString
+	UID          string
+	Subtype      string
+	Status       string
+	StatusColour string
+	CreatedDate  sirius.DateString
 }
 
 // 2-3 character LPA subtype, upper-cased
@@ -455,10 +457,11 @@ func caseTab(caseSummary sirius.CaseSummary, tabName string) CaseTabData {
 	}
 
 	var linkedCases []linkedCase
-	linkedCases = append(linkedCases, linkedCase{lpa.UID, lpa.Subtype, StatusLabelFormat(status), lpa.CreatedDate})
+
+	linkedCases = append(linkedCases, linkedCase{lpa.UID, lpa.Subtype, shared.CaseStatusParseStatus(status).String(), shared.CaseStatusParseStatus(status).CaseStatusColour(), lpa.CreatedDate})
 
 	for _, linkedLpa := range lpa.LinkedCases {
-		linkedCases = append(linkedCases, linkedCase{linkedLpa.UID, linkedLpa.Subtype, linkedLpa.Status, linkedLpa.CreatedDate})
+		linkedCases = append(linkedCases, linkedCase{linkedLpa.UID, linkedLpa.Subtype, shared.CaseStatusParseStatus(linkedLpa.Status).String(), shared.CaseStatusParseStatus(linkedLpa.Status).CaseStatusColour(), linkedLpa.CreatedDate})
 	}
 
 	sort.Slice(linkedCases, func(i, j int) bool {
