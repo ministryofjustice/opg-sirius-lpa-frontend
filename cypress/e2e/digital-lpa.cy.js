@@ -951,4 +951,258 @@ describe("View a digital LPA", () => {
         cy.contains("My attorneys must act jointly to decide whether");
       });
   });
+
+  it("shows signed on behalf information when present", () => {
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3337", "GET", {
+      status: 200,
+      body: {
+        uId: "M-DIGI-LPA3-3337",
+        "opg.poas.sirius": {
+          id: 337,
+          uId: "M-DIGI-LPA3-3337",
+          status: "Processing",
+          caseSubtype: "property-and-affairs",
+          createdDate: "31/10/2023",
+          donor: { id: 34 },
+        },
+        "opg.poas.lpastore": {
+          authorisedSignatory: {
+            firstNames: "John",
+            lastName: "Smith",
+            signedAt: "2024-01-15T10:30:00Z",
+          },
+          witnessedByCertificateProviderAt: "2024-01-15T10:31:00Z",
+          witnessedByIndependentWitnessAt: "2024-01-15T10:32:00Z",
+          independentWitness: {
+            firstNames: "Jane",
+            lastName: "Doe",
+            address: {
+              line1: "123 Test Street",
+              line2: "Test Area",
+              town: "Test Town",
+              postcode: "T3ST 1NG",
+              country: "GB",
+            },
+            email: "jane.doe@example.com",
+          },
+          donor: {
+            firstNames: "Original",
+            lastName: "Donor",
+          },
+          signedAt: "2024-01-15T10:30:00Z",
+          attorneys: [],
+          certificateProvider: {
+            uid: "cert-provider-uid",
+            firstNames: "Certificate",
+            lastNames: "Provider",
+          },
+        },
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/cases/337", "GET", {
+      status: 200,
+      body: {
+        id: 337,
+        uId: "M-DIGI-LPA3-3337",
+        caseType: "DIGITAL_LPA",
+        donor: { id: 34 },
+        status: "Processing",
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3337/anomalies", "GET", {
+      status: 200,
+      body: [],
+    });
+
+    cy.visit("/lpa/M-DIGI-LPA3-3337/lpa-details");
+
+    cy.contains("Donor").click();
+
+    cy.contains("LPA signed on behalf of the donor by");
+    cy.contains("John Smith");
+
+    cy.contains("View witness details").click();
+
+    cy.contains("Signed by witness 1 (certificate provider)");
+    cy.contains("Yes");
+
+    cy.contains("Signed by witness 2");
+    cy.contains("Witness 2 name");
+    cy.contains("Jane Doe");
+    cy.contains("Witness 2 address");
+    cy.contains("123 Test Street");
+    cy.contains("Test Area");
+    cy.contains("Test Town");
+    cy.contains("T3ST 1NG");
+  });
+
+  it("shows partial signed on behalf information when some witness data missing", () => {
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3338", "GET", {
+      status: 200,
+      body: {
+        uId: "M-DIGI-LPA3-3338",
+        "opg.poas.sirius": {
+          id: 338,
+          uId: "M-DIGI-LPA3-3338",
+          status: "Processing",
+          caseSubtype: "property-and-affairs",
+          createdDate: "31/10/2023",
+          donor: { id: 35 },
+        },
+        "opg.poas.lpastore": {
+          authorisedSignatory: {
+            firstNames: "Helper",
+            lastName: "Person",
+            signedAt: "2024-01-15T10:30:00Z",
+          },
+          witnessedByCertificateProviderAt: "2024-01-15T10:31:00Z",
+
+          donor: {
+            firstNames: "Original",
+            lastName: "Donor",
+          },
+          signedAt: "2024-01-15T10:30:00Z",
+          attorneys: [],
+          certificateProvider: {
+            uid: "cert-provider-uid-2",
+            firstNames: "Certificate",
+            lastNames: "Provider",
+          },
+        },
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/cases/338", "GET", {
+      status: 200,
+      body: {
+        id: 338,
+        uId: "M-DIGI-LPA3-3338",
+        caseType: "DIGITAL_LPA",
+        donor: { id: 35 },
+        status: "Processing",
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3338/anomalies", "GET", {
+      status: 200,
+      body: [],
+    });
+
+    cy.visit("/lpa/M-DIGI-LPA3-3338/lpa-details");
+
+    cy.contains("Donor").click();
+
+    cy.contains("LPA signed on behalf of the donor by");
+    cy.contains("Helper Person");
+
+    cy.contains("View witness details").click();
+
+    cy.contains("Signed by witness 1 (certificate provider)");
+    cy.contains("Yes");
+
+    cy.contains("Signed by witness 2").should("not.exist");
+    cy.contains("Witness 2 name").should("not.exist");
+    cy.contains("Witness 2 address").should("not.exist");
+  });
+
+  it("does not show signed on behalf when donor signed directly", () => {
+    cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
+
+    cy.contains("Donor").click();
+
+    cy.contains("LPA signed on behalf of the donor by").should("not.exist");
+    cy.contains("View witness details").should("not.exist");
+
+    cy.contains("First names");
+    cy.contains("Last name");
+    cy.contains("Signed on");
+  });
+
+  it("handles witness details in correct GOV.UK details component format", () => {
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3339", "GET", {
+      status: 200,
+      body: {
+        uId: "M-DIGI-LPA3-3339",
+        "opg.poas.sirius": {
+          id: 339,
+          uId: "M-DIGI-LPA3-3339",
+          status: "Processing",
+          caseSubtype: "property-and-affairs",
+          createdDate: "31/10/2023",
+          donor: { id: 36 },
+        },
+        "opg.poas.lpastore": {
+          authorisedSignatory: {
+            firstNames: "Test",
+            lastName: "Signatory",
+            signedAt: "2024-01-15T10:30:00Z",
+          },
+          witnessedByCertificateProviderAt: "2024-01-15T10:31:00Z",
+          witnessedByIndependentWitnessAt: "2024-01-15T10:32:00Z",
+          independentWitness: {
+            firstNames: "Witness",
+            lastName: "Two",
+            address: {
+              line1: "456 Another Street",
+              town: "Another Town",
+              postcode: "AN0 7H3R",
+            },
+          },
+          donor: {
+            firstNames: "Test",
+            lastName: "Donor",
+          },
+          attorneys: [],
+          certificateProvider: {
+            uid: "cert-provider-uid-3",
+            firstNames: "Certificate",
+            lastNames: "Provider",
+          },
+        },
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/cases/339", "GET", {
+      status: 200,
+      body: {
+        id: 339,
+        uId: "M-DIGI-LPA3-3339",
+        caseType: "DIGITAL_LPA",
+        donor: { id: 36 },
+        status: "Processing",
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3339/anomalies", "GET", {
+      status: 200,
+      body: [],
+    });
+
+    cy.visit("/lpa/M-DIGI-LPA3-3339/lpa-details");
+
+    cy.contains("Donor").click();
+
+    cy.get('details[class*="govuk-details"]').should("exist");
+    cy.get('summary[class*="govuk-details__summary"]').should(
+      "contain",
+      "View witness details",
+    );
+
+    cy.get('details[class*="govuk-details"]').should("not.have.attr", "open");
+
+    cy.contains("View witness details").click();
+
+    cy.get('details[class*="govuk-details"]').should("have.attr", "open");
+
+    cy.get("details .govuk-details__text .govuk-summary-list").should("exist");
+    cy.get(".govuk-summary-list__key").should(
+      "contain",
+      "Signed by witness 1 (certificate provider)",
+    );
+    cy.get(".govuk-summary-list__key").should("contain", "Signed by witness 2");
+    cy.get(".govuk-summary-list__key").should("contain", "Witness 2 name");
+    cy.get(".govuk-summary-list__key").should("contain", "Witness 2 address");
+  });
 });

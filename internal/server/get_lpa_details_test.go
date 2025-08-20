@@ -282,3 +282,134 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 		})
 	}
 }
+
+func TestLpaDetailsSignedOnBehalf(t *testing.T) {
+	caseSummary := sirius.CaseSummary{
+		DigitalLpa: sirius.DigitalLpa{
+			UID: "M-1234-5678-ABCD",
+			SiriusData: sirius.SiriusData{
+				ID:      123,
+				Subtype: "hw",
+			},
+			LpaStoreData: sirius.LpaStoreData{
+				AuthorisedSignatory: &sirius.LpaStoreAuthorisedSignatory{
+					FirstNames: "John",
+					LastName:   "Smith",
+					SignedAt:   "2024-01-15T10:30:00Z",
+				},
+				WitnessedByCertificateProviderAt: "2024-01-15T10:31:00Z",
+				WitnessedByIndependentWitnessAt:  "2024-01-15T10:32:00Z",
+				IndependentWitness: &sirius.LpaStoreIndependentWitness{
+					FirstNames: "Jane",
+					LastName:   "Doe",
+					Address: sirius.LpaStoreAddress{
+						Line1:    "123 Test Street",
+						Town:     "Test Town",
+						Postcode: "T3ST 1NG",
+						Country:  "GB",
+					},
+				},
+				Attorneys: []sirius.LpaStoreAttorney{},
+			},
+		},
+		TaskList: []sirius.Task{},
+	}
+
+	var anomalies []sirius.Anomaly
+
+	client := &mockGetLpaDetailsClient{}
+	client.
+		On("CaseSummaryWithImages", mock.Anything, "M-1234-5678-ABCD").
+		Return(caseSummary, nil)
+	client.
+		On("AnomaliesForDigitalLpa", mock.Anything, "M-1234-5678-ABCD").
+		Return(anomalies, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.MatchedBy(func(data getLpaDetails) bool {
+			lpa := data.CaseSummary.DigitalLpa
+
+			signatoryCheck := lpa.WasSignedOnBehalfOfDonor() == true
+			signatoryNameCheck := lpa.GetAuthorisedSignatoryFullName() == "John Smith"
+			witness1Check := lpa.WasWitnessedByCertificateProvider() == true
+			witness2Check := lpa.WasWitnessedByIndependentWitness() == true
+			witness2NameCheck := lpa.GetIndependentWitnessFullName() == "Jane Doe"
+
+			address := lpa.GetIndependentWitnessAddress()
+			addressCheck := address.Line1 == "123 Test Street" && address.Town == "Test Town"
+
+			dataStructureCheck := data.CaseSummary.DigitalLpa.UID == "M-1234-5678-ABCD" &&
+				data.AnomalyDisplay != nil &&
+				data.ReviewRestrictions == false
+
+			return signatoryCheck && signatoryNameCheck && witness1Check &&
+				witness2Check && witness2NameCheck && addressCheck && dataStructureCheck
+		})).
+		Return(nil)
+
+	server := newMockServer("/lpa/{uid}/lpa-details", GetLpaDetails(client, template.Func))
+
+	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-1234-5678-ABCD/lpa-details", nil)
+	_, err := server.serve(req)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestLpaDetailsSignedDirectly(t *testing.T) {
+	caseSummary := sirius.CaseSummary{
+		DigitalLpa: sirius.DigitalLpa{
+			UID: "M-5678-1234-DCBA",
+			SiriusData: sirius.SiriusData{
+				ID:      456,
+				Subtype: "hw",
+			},
+			LpaStoreData: sirius.LpaStoreData{
+				// No AuthorisedSignatory - donor signed directly
+				SignedAt:                         "2024-01-15T10:30:00Z",
+				WitnessedByCertificateProviderAt: "2024-01-15T10:31:00Z",
+				// No IndependentWitness or WitnessedByIndependentWitnessAt
+				Attorneys: []sirius.LpaStoreAttorney{},
+			},
+		},
+		TaskList: []sirius.Task{},
+	}
+
+	var anomalies []sirius.Anomaly
+
+	client := &mockGetLpaDetailsClient{}
+	client.
+		On("CaseSummaryWithImages", mock.Anything, "M-5678-1234-DCBA").
+		Return(caseSummary, nil)
+	client.
+		On("AnomaliesForDigitalLpa", mock.Anything, "M-5678-1234-DCBA").
+		Return(anomalies, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.MatchedBy(func(data getLpaDetails) bool {
+			lpa := data.CaseSummary.DigitalLpa
+
+			signatoryCheck := lpa.WasSignedOnBehalfOfDonor() == false
+			signatoryNameCheck := lpa.GetAuthorisedSignatoryFullName() == ""
+			witness1Check := lpa.WasWitnessedByCertificateProvider() == true
+			witness2Check := lpa.WasWitnessedByIndependentWitness() == false
+			witness2NameCheck := lpa.GetIndependentWitnessFullName() == ""
+
+			address := lpa.GetIndependentWitnessAddress()
+			addressCheck := address.Line1 == "" && address.Town == ""
+
+			return signatoryCheck && signatoryNameCheck && witness1Check &&
+				witness2Check && witness2NameCheck && addressCheck
+		})).
+		Return(nil)
+
+	server := newMockServer("/lpa/{uid}/lpa-details", GetLpaDetails(client, template.Func))
+
+	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-5678-1234-DCBA/lpa-details", nil)
+	_, err := server.serve(req)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
