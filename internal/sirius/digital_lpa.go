@@ -50,6 +50,7 @@ type LpaStoreData struct {
 	Attorneys                                   []LpaStoreAttorney          `json:"attorneys"`
 	TrustCorporations                           []LpaStoreTrustCorporation  `json:"trustCorporations"`
 	CertificateProvider                         LpaStoreCertificateProvider `json:"certificateProvider"`
+	CertificateProviderNotRelatedConfirmedAt    string                      `json:"certificateProviderNotRelatedConfirmedAt"`
 	PeopleToNotify                              []LpaStorePersonToNotify    `json:"peopleToNotify"`
 	HowAttorneysMakeDecisions                   string                      `json:"howAttorneysMakeDecisions"`
 	HowAttorneysMakeDecisionsDetails            string                      `json:"howAttorneysMakeDecisionsDetails"`
