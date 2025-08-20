@@ -56,25 +56,29 @@
           </fieldset>
         </div>
 
-        {{ with .Form.LifeSustainingTreatmentOption }}
-          {{ template "radios" (radios "lifeSustainingTreatmentOption" "Can attorneys make decisions about life sustaining treatment?" . $.Error.Field.lifeSustainingTreatmentOption
+        {{ if (eq .CaseSummary.DigitalLpa.SiriusData.Subtype "personal-welfare")}}
+          {{ template "radios" (radios "lifeSustainingTreatmentOption" "Can attorneys make decisions about life sustaining treatment?" .Form.LifeSustainingTreatmentOption $.Error.Field.lifeSustainingTreatmentOption
             (item "option-a" "Attorneys can make decisions about life sustaining treatment")
             (item "option-b" "Attorneys cannot make decisions about life sustaining treatment")
           ) }}
         {{ end }}
 
-        {{ with .Form.WhenTheLpaCanBeUsed }}
-          {{ template "radios" (radios "whenTheLpaCanBeUsed" "When can attorneys used the LPA?" . $.Error.Field.whenTheLpaCanBeUsed
+        {{ if (eq .CaseSummary.DigitalLpa.SiriusData.Subtype "property-and-affairs")}}
+          {{ template "radios" (radios "whenTheLpaCanBeUsed" "When can attorneys use the LPA?" .Form.WhenTheLpaCanBeUsed $.Error.Field.whenTheLpaCanBeUsed
             (item "when-has-capacity" "When it is registered")
             (item "when-capacity-lost" "When the donor has lost capacity")
           ) }}
         {{ end }}
 
-        {{ if .Form.HowReplacementAttorneysMakeDecisions }}
-          <div class="govuk-form-group {{ if .Error.Field.howReplacementAttorneysMakeDecisions }}govuk-form-group--error{{ end }}">
-            <fieldset class="govuk-fieldset">
-              <legend class="govuk-fieldset__legend">How must replacement attorneys make decisions?</legend>
-              {{ template "errors" .Error.Field.howReplacementAttorneysMakeDecisions }}
+        <div class="govuk-form-group {{ if .Error.Field.howReplacementAttorneysMakeDecisions }}govuk-form-group--error{{ end }}">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend">How must replacement attorneys make decisions?</legend>
+            {{ template "errors" .Error.Field.howReplacementAttorneysMakeDecisions }}
+            {{ if eq .ReplacementAttorneyCount 1 }}
+              <div class="govuk-inset-text">
+                {{ howAttorneysMakeDecisionsLongForm true .Form.HowReplacementAttorneysMakeDecisions }}
+              </div>
+            {{ else }}
               <div class="govuk-radios" data-module="govuk-radios">
                 <div class="govuk-radios__item">
                   <input class="govuk-radios__input" id="f-howReplacementAttorneysMakeDecisions" name="howReplacementAttorneysMakeDecisions" type="radio" value="jointly" {{ if eq .Form.HowReplacementAttorneysMakeDecisions "jointly" }}checked{{ end }}>
@@ -98,14 +102,14 @@
                   </div>
                 </div>
               </div>
-            </fieldset>
-          </div>
-        {{ end }}
+            {{ end}}
+          </fieldset>
+        </div>
 
         {{ if .Form.HowReplacementAttorneysStepIn }}
           <div class="govuk-form-group {{ if .Error.Field.howReplacementAttorneysStepIn }}govuk-form-group--error{{ end }}">
             <fieldset class="govuk-fieldset">
-              <legend class="govuk-fieldset__legend">How must replacement attorneys make decisions?</legend>
+              <legend class="govuk-fieldset__legend">How must replacement attorneys step in?</legend>
               {{ template "errors" .Error.Field.howReplacementAttorneysStepIn }}
               <div class="govuk-radios" data-module="govuk-radios">
                 <div class="govuk-radios__item">

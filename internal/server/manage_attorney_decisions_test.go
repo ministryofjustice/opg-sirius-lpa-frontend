@@ -144,10 +144,14 @@ func TestGetManageAttorneyDecisions(t *testing.T) {
 	formTemplate := &mockTemplate{}
 	formTemplate.
 		On("Func", mock.Anything, manageAttorneyDecisionsData{
-			FormName:          "decisions",
-			CaseSummary:       manageAttorneyDecisionsSummary,
-			DecisionAttorneys: activeAttorneys,
-			Error:             sirius.ValidationError{Field: sirius.FieldErrors{}},
+			FormName:                     "decisions",
+			CaseSummary:                  manageAttorneyDecisionsSummary,
+			DecisionAttorneys:            activeAttorneys,
+			Decisions:                    "jointly-for-some-severally-for-others",
+			ReplacementAttorneyDecisions: "jointly-for-some-severally-for-others",
+			ActiveAttorneyCount:          2,
+			ReplacementAttorneyCount:     2,
+			Error:                        sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
 		Return(nil)
 
@@ -193,10 +197,14 @@ func TestGetManageAttorneyDecisionsTemplateErrors(t *testing.T) {
 	formTemplate := &mockTemplate{}
 	formTemplate.
 		On("Func", mock.Anything, manageAttorneyDecisionsData{
-			FormName:          "decisions",
-			CaseSummary:       manageAttorneyDecisionsSummary,
-			DecisionAttorneys: activeAttorneys,
-			Error:             sirius.ValidationError{Field: sirius.FieldErrors{}},
+			FormName:                     "decisions",
+			CaseSummary:                  manageAttorneyDecisionsSummary,
+			DecisionAttorneys:            activeAttorneys,
+			Decisions:                    "jointly-for-some-severally-for-others",
+			ReplacementAttorneyDecisions: "jointly-for-some-severally-for-others",
+			ActiveAttorneyCount:          2,
+			ReplacementAttorneyCount:     2,
+			Error:                        sirius.ValidationError{Field: sirius.FieldErrors{}},
 		}).
 		Return(errExample)
 
@@ -247,10 +255,14 @@ func TestPostManageAttorneyDecisionsInvalidData(t *testing.T) {
 			formTemplate := &mockTemplate{}
 			formTemplate.
 				On("Func", mock.Anything, manageAttorneyDecisionsData{
-					FormName:          "decisions",
-					CaseSummary:       manageAttorneyDecisionsSummary,
-					DecisionAttorneys: activeAttorneys,
-					Form:              tc.formData,
+					FormName:                     "decisions",
+					CaseSummary:                  manageAttorneyDecisionsSummary,
+					DecisionAttorneys:            activeAttorneys,
+					Decisions:                    "jointly-for-some-severally-for-others",
+					ReplacementAttorneyDecisions: "jointly-for-some-severally-for-others",
+					ActiveAttorneyCount:          2,
+					ReplacementAttorneyCount:     2,
+					Form:                         tc.formData,
 					Error: sirius.ValidationError{Field: sirius.FieldErrors{
 						"decisionAttorney": {"reason": "Select who cannot make joint decisions, or select 'Joint decisions can be made by all attorneys'"},
 					}},
@@ -291,9 +303,13 @@ func TestPostManageAttorneyDecisionsValidData(t *testing.T) {
 	confirmTemplate := &mockTemplate{}
 	confirmTemplate.
 		On("Func", mock.Anything, manageAttorneyDecisionsData{
-			FormName:          "decisions",
-			CaseSummary:       manageAttorneyDecisionsSummary,
-			DecisionAttorneys: activeAttorneys,
+			FormName:                     "decisions",
+			CaseSummary:                  manageAttorneyDecisionsSummary,
+			DecisionAttorneys:            activeAttorneys,
+			Decisions:                    "jointly-for-some-severally-for-others",
+			ReplacementAttorneyDecisions: "jointly-for-some-severally-for-others",
+			ActiveAttorneyCount:          2,
+			ReplacementAttorneyCount:     2,
 			Form: formManageAttorneyDecisions{
 				DecisionAttorneysUids: []string{"302b05c7-896c-4290-904e-2005e4f1e81e"},
 			},

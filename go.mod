@@ -4,13 +4,13 @@ go 1.24.3
 
 require (
 	github.com/go-playground/form/v4 v4.2.1
-	github.com/ministryofjustice/opg-go-common v1.116.0
+	github.com/ministryofjustice/opg-go-common v1.119.0
 	github.com/pact-foundation/pact-go/v2 v2.4.1
 	github.com/stretchr/testify v1.10.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.62.0
-	golang.org/x/mod v0.25.0
+	golang.org/x/mod v0.27.0
 	golang.org/x/sync v0.16.0
-	golang.org/x/text v0.26.0
+	golang.org/x/text v0.28.0
 )
 
 require (
@@ -44,7 +44,7 @@ require (
 	golang.org/x/sys v0.33.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250603155806-513f23925822 // indirect
-	google.golang.org/grpc v1.73.0 // indirect
+	google.golang.org/grpc v1.74.2 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

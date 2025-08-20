@@ -15,17 +15,22 @@ type GetLpaDetailsClient interface {
 }
 
 type getLpaDetails struct {
-	CaseSummary             sirius.CaseSummary
-	DigitalLpa              sirius.DigitalLpa
-	AnomalyDisplay          *sirius.AnomalyDisplay
-	ReviewRestrictions      bool
-	CheckedForSeverance     bool
-	SeveranceType           string
-	ReplacementAttorneys    []sirius.LpaStoreAttorney
-	NonReplacementAttorneys []sirius.LpaStoreAttorney
-	RemovedAttorneys        []sirius.LpaStoreAttorney
-	DecisionAttorneys       []sirius.LpaStoreAttorney
-	FlashMessage            FlashNotification
+	CaseSummary                     sirius.CaseSummary
+	DigitalLpa                      sirius.DigitalLpa
+	AnomalyDisplay                  *sirius.AnomalyDisplay
+	ReviewRestrictions              bool
+	CheckedForSeverance             bool
+	SeveranceType                   string
+	ReplacementAttorneys            []sirius.LpaStoreAttorney
+	NonReplacementAttorneys         []sirius.LpaStoreAttorney
+	RemovedAttorneys                []sirius.LpaStoreAttorney
+	DecisionAttorneys               []sirius.LpaStoreAttorney
+	ReplacementTrustCorporations    []sirius.LpaStoreTrustCorporation
+	NonReplacementTrustCorporations []sirius.LpaStoreTrustCorporation
+	RemovedTrustCorporations        []sirius.LpaStoreTrustCorporation
+	DecisionTrustCorporations       []sirius.LpaStoreTrustCorporation
+	FlashMessage                    FlashNotification
+	ReplacementAttorneysDecisions   string
 }
 
 func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
@@ -111,6 +116,34 @@ func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
 		data.NonReplacementAttorneys = nonReplacementAttorneys
 		data.RemovedAttorneys = removedAttorneys
 		data.DecisionAttorneys = decisionAttorneys
+		data.ReplacementAttorneysDecisions = data.CaseSummary.DigitalLpa.LpaStoreData.HowReplacementAttorneysMakeDecisions
+
+		if len(data.NonReplacementAttorneys) > 1 && len(data.ReplacementAttorneys) > 1 && data.ReplacementAttorneysDecisions == "" {
+			data.ReplacementAttorneysDecisions = data.CaseSummary.DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions
+		}
+
+		var replacementTrustCorporations []sirius.LpaStoreTrustCorporation
+		var nonReplacementTrustCorporations []sirius.LpaStoreTrustCorporation
+		var removedTrustCorporations []sirius.LpaStoreTrustCorporation
+		var decisionTrustCorporations []sirius.LpaStoreTrustCorporation
+		for _, trustCorporation := range data.DigitalLpa.LpaStoreData.TrustCorporations {
+			if trustCorporation.Status == shared.ActiveAttorneyStatus.String() {
+				nonReplacementTrustCorporations = append(nonReplacementTrustCorporations, trustCorporation)
+			} else if trustCorporation.Status == shared.InactiveAttorneyStatus.String() &&
+				trustCorporation.AppointmentType == shared.ReplacementAppointmentType.String() {
+				replacementTrustCorporations = append(replacementTrustCorporations, trustCorporation)
+			} else if trustCorporation.Status == shared.RemovedAttorneyStatus.String() {
+				removedTrustCorporations = append(removedTrustCorporations, trustCorporation)
+			}
+			if trustCorporation.Decisions {
+				decisionTrustCorporations = append(decisionTrustCorporations, trustCorporation)
+			}
+		}
+
+		data.ReplacementTrustCorporations = replacementTrustCorporations
+		data.NonReplacementTrustCorporations = nonReplacementTrustCorporations
+		data.RemovedTrustCorporations = removedTrustCorporations
+		data.DecisionTrustCorporations = decisionTrustCorporations
 
 		return tmpl(w, data)
 	}
