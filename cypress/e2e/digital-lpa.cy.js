@@ -573,6 +573,81 @@ describe("View a digital LPA", () => {
     ]);
 
     cy.wrap(defaultDigitalLpaMocks);
+
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3337/progress-indicators",
+      "GET",
+      {
+        status: 200,
+        body: {
+          digitalLpaUid: "M-DIGI-LPA3-3337",
+          progressIndicators: [
+            { indicator: "FEES", status: "COMPLETE" },
+            { indicator: "DONOR_ID", status: "COMPLETE" },
+          ],
+        },
+      },
+    );
+
+    cy.addMock("/lpa-api/v1/cases/337/tasks", "GET", {
+      status: 200,
+      body: { tasks: [] },
+    });
+
+    cy.addMock("/lpa-api/v1/cases/337/warnings", "GET", {
+      status: 200,
+      body: [],
+    });
+
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3338/progress-indicators",
+      "GET",
+      {
+        status: 200,
+        body: {
+          digitalLpaUid: "M-DIGI-LPA3-3338",
+          progressIndicators: [
+            { indicator: "FEES", status: "COMPLETE" },
+            { indicator: "DONOR_ID", status: "COMPLETE" },
+          ],
+        },
+      },
+    );
+
+    cy.addMock("/lpa-api/v1/cases/338/tasks", "GET", {
+      status: 200,
+      body: { tasks: [] },
+    });
+
+    cy.addMock("/lpa-api/v1/cases/338/warnings", "GET", {
+      status: 200,
+      body: [],
+    });
+
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3339/progress-indicators",
+      "GET",
+      {
+        status: 200,
+        body: {
+          digitalLpaUid: "M-DIGI-LPA3-3339",
+          progressIndicators: [
+            { indicator: "FEES", status: "COMPLETE" },
+            { indicator: "DONOR_ID", status: "COMPLETE" },
+          ],
+        },
+      },
+    );
+
+    cy.addMock("/lpa-api/v1/cases/339/tasks", "GET", {
+      status: 200,
+      body: { tasks: [] },
+    });
+
+    cy.addMock("/lpa-api/v1/cases/339/warnings", "GET", {
+      status: 200,
+      body: [],
+    });
   });
 
   it("shows case information", () => {
