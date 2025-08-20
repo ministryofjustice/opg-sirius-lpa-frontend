@@ -149,7 +149,7 @@ func (c *Client) DigitalLpa(ctx Context, uid string, presignImages bool) (Digita
 	return v, err
 }
 
-// Helper functions 3111 - WIP
+// Helper functions
 func (lpa *DigitalLpa) WasSignedOnBehalfOfDonor() bool {
 	return lpa.LpaStoreData.AuthorisedSignatory != nil &&
 		(lpa.LpaStoreData.AuthorisedSignatory.FirstNames != "" ||
