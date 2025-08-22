@@ -56,15 +56,15 @@
           </fieldset>
         </div>
 
-        {{ with .Form.LifeSustainingTreatmentOption }}
-          {{ template "radios" (radios "lifeSustainingTreatmentOption" "Can attorneys make decisions about life sustaining treatment?" . $.Error.Field.lifeSustainingTreatmentOption
+        {{ if (eq .CaseSummary.DigitalLpa.SiriusData.Subtype "personal-welfare")}}
+          {{ template "radios" (radios "lifeSustainingTreatmentOption" "Can attorneys make decisions about life sustaining treatment?" .Form.LifeSustainingTreatmentOption $.Error.Field.lifeSustainingTreatmentOption
             (item "option-a" "Attorneys can make decisions about life sustaining treatment")
             (item "option-b" "Attorneys cannot make decisions about life sustaining treatment")
           ) }}
         {{ end }}
 
-        {{ with .Form.WhenTheLpaCanBeUsed }}
-          {{ template "radios" (radios "whenTheLpaCanBeUsed" "When can attorneys used the LPA?" . $.Error.Field.whenTheLpaCanBeUsed
+        {{ if (eq .CaseSummary.DigitalLpa.SiriusData.Subtype "property-and-affairs")}}
+          {{ template "radios" (radios "whenTheLpaCanBeUsed" "When can attorneys use the LPA?" .Form.WhenTheLpaCanBeUsed $.Error.Field.whenTheLpaCanBeUsed
             (item "when-has-capacity" "When it is registered")
             (item "when-capacity-lost" "When the donor has lost capacity")
           ) }}
