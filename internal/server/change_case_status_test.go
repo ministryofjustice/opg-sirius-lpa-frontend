@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -54,10 +55,10 @@ func TestGetChangeCaseStatus(t *testing.T) {
 			SiriusData: sirius.SiriusData{
 				ID:      676,
 				Subtype: "personal-welfare",
-				Status:  "Draft",
+				Status:  shared.CaseStatusTypeDraft,
 			},
 			LpaStoreData: sirius.LpaStoreData{
-				Status: "draft",
+				Status: shared.CaseStatusTypeDraft,
 			},
 		},
 	}
@@ -108,10 +109,10 @@ func TestPostChangeCaseStatus(t *testing.T) {
 			SiriusData: sirius.SiriusData{
 				ID:      676,
 				Subtype: "personal-welfare",
-				Status:  "Draft",
+				Status:  shared.CaseStatusTypeDraft,
 			},
 			LpaStoreData: sirius.LpaStoreData{
-				Status: "draft",
+				Status: shared.CaseStatusTypeDraft,
 			},
 		},
 	}
@@ -179,10 +180,10 @@ func TestPostChangeCaseStatusWithReason(t *testing.T) {
 			SiriusData: sirius.SiriusData{
 				ID:      676,
 				Subtype: "personal-welfare",
-				Status:  "Draft",
+				Status:  shared.CaseStatusTypeDraft,
 			},
 			LpaStoreData: sirius.LpaStoreData{
-				Status: "draft",
+				Status: shared.CaseStatusTypeDraft,
 			},
 		},
 	}

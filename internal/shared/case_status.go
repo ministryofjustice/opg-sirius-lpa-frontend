@@ -1,120 +1,164 @@
 package shared
 
-import "strings"
+import (
+	"encoding/json"
+)
 
 type CaseStatus int
 
 const (
-	Unknown CaseStatus = iota
-	Registered
-	Perfect
-	StatutoryWaitingPeriod
-	InProgress
-	Pending
-	PaymentPending
-	ReducedFeesPending
-	Draft
-	Cancelled
-	Rejected
-	Revoked
-	Withdrawn
-	ReturnUnpaid
-	Deleted
-	DoNotRegister
-	Expired
-	CannotRegister
-	DeRegistered
-	Suspended
+	CaseStatusTypeUnknown CaseStatus = iota
+	CaseStatusTypeRegistered
+	CaseStatusTypePerfect
+	CaseStatusTypeStatutoryWaitingPeriod
+	CaseStatusTypeInProgress
+	CaseStatusTypePending
+	CaseStatusTypePaymentPending
+	CaseStatusTypeReducedFeesPending
+	CaseStatusTypeDraft
+	CaseStatusTypeCancelled
+	CaseStatusTypeRejected
+	CaseStatusTypeRevoked
+	CaseStatusTypeWithdrawn
+	CaseStatusTypeReturnUnpaid
+	CaseStatusTypeDeleted
+	CaseStatusTypeDoNotRegister
+	CaseStatusTypeExpired
+	CaseStatusTypeCannotRegister
+	CaseStatusTypeDeRegistered
+	CaseStatusTypeSuspended
 )
 
-func CaseStatusParseStatus(s string) CaseStatus {
-	switch strings.ToLower(s) {
-	case "registered":
-		return Registered
-	case "perfect":
-		return Perfect
-	case "statutory waiting period":
-		return StatutoryWaitingPeriod
-	case "in progress":
-		return InProgress
-	case "pending":
-		return Pending
-	case "payment pending":
-		return PaymentPending
-	case "reduced fees pending":
-		return ReducedFeesPending
-	case "draft":
-		return Draft
-	case "cancelled":
-		return Cancelled
-	case "rejected":
-		return Rejected
-	case "revoked":
-		return Revoked
-	case "withdrawn":
-		return Withdrawn
-	case "return - unpaid":
-		return ReturnUnpaid
-	case "deleted":
-		return Deleted
-	case "do not register":
-		return DoNotRegister
-	case "expired":
-		return Expired
-	case "cannot register":
-		return CannotRegister
-	case "de-registered":
-		return DeRegistered
+var caseStatusTypeMap = map[string]CaseStatus{
+	"draft":                    CaseStatusTypeDraft,
+	"Draft":                    CaseStatusTypeDraft,
+	"In progress":              CaseStatusTypeInProgress,
+	"in-progress":              CaseStatusTypeInProgress,
+	"Statutory waiting period": CaseStatusTypeStatutoryWaitingPeriod,
+	"statutory-waiting-period": CaseStatusTypeStatutoryWaitingPeriod,
+	"Do not register":          CaseStatusTypeDoNotRegister,
+	"do-not-register":          CaseStatusTypeDoNotRegister,
+	"Expired":                  CaseStatusTypeExpired,
+	"expired":                  CaseStatusTypeExpired,
+	"Registered":               CaseStatusTypeRegistered,
+	"registered":               CaseStatusTypeRegistered,
+	"Cannot register":          CaseStatusTypeCannotRegister,
+	"cannot-register":          CaseStatusTypeCannotRegister,
+	"Cancelled":                CaseStatusTypeCancelled,
+	"cancelled":                CaseStatusTypeCancelled,
+	"De-registered":            CaseStatusTypeDeRegistered,
+	"de-registered":            CaseStatusTypeDeRegistered,
+	"Suspended":                CaseStatusTypeSuspended,
+	"suspended":                CaseStatusTypeSuspended,
+	"Perfect":                  CaseStatusTypePerfect,
+	"Pending":                  CaseStatusTypePending,
+	"Payment Pending":          CaseStatusTypePaymentPending,
+	"Reduced Fees Pending":     CaseStatusTypeReducedFeesPending,
+	"Rejected":                 CaseStatusTypeRejected,
+	"Withdrawn":                CaseStatusTypeWithdrawn,
+	"Return - unpaid":          CaseStatusTypeReturnUnpaid,
+	"Deleted":                  CaseStatusTypeDeleted,
+	"Revoked":                  CaseStatusTypeRevoked,
+}
+
+func (cs CaseStatus) String() string {
+	switch cs {
+	case CaseStatusTypeDraft:
+		return "Draft"
+	case CaseStatusTypeInProgress:
+		return "In progress"
+	case CaseStatusTypeStatutoryWaitingPeriod:
+		return "Statutory waiting period"
+	case CaseStatusTypeDoNotRegister:
+		return "Do not register"
+	case CaseStatusTypeExpired:
+		return "Expired"
+	case CaseStatusTypeRegistered:
+		return "Registered"
+	case CaseStatusTypeCannotRegister:
+		return "Cannot register"
+	case CaseStatusTypeCancelled:
+		return "Cancelled"
+	case CaseStatusTypeDeRegistered:
+		return "De-registered"
+	case CaseStatusTypeSuspended:
+		return "Suspended"
+	case CaseStatusTypePerfect:
+		return "Perfect"
+	case CaseStatusTypePending:
+		return "Pending"
+	case CaseStatusTypePaymentPending:
+		return "Payment Pending"
+	case CaseStatusTypeReducedFeesPending:
+		return "Reduced Fees Pending"
+	case CaseStatusTypeRejected:
+		return "Rejected"
+	case CaseStatusTypeWithdrawn:
+		return "Withdrawn"
+	case CaseStatusTypeReturnUnpaid:
+		return "Return - unpaid"
+	case CaseStatusTypeDeleted:
+		return "Deleted"
+	case CaseStatusTypeRevoked:
+		return "Revoked"
 	default:
-		return Unknown
+		return ""
 	}
 }
 
 func (cs CaseStatus) CaseStatusColour() string {
 	switch cs {
-	case Registered:
+	case CaseStatusTypeRegistered:
 		return "green"
-	case Perfect:
+	case CaseStatusTypePerfect:
 		return "turquoise"
-	case StatutoryWaitingPeriod:
+	case CaseStatusTypeStatutoryWaitingPeriod:
 		return "yellow"
-	case InProgress:
+	case CaseStatusTypeInProgress:
 		return "light-blue"
-	case Pending, PaymentPending, ReducedFeesPending:
+	case CaseStatusTypePending, CaseStatusTypePaymentPending, CaseStatusTypeReducedFeesPending:
 		return "blue"
-	case Draft:
+	case CaseStatusTypeDraft:
 		return "purple"
-	case Cancelled, Rejected, Revoked, Withdrawn, ReturnUnpaid,
-		Deleted, DoNotRegister, Expired, CannotRegister, DeRegistered:
+	case CaseStatusTypeCancelled, CaseStatusTypeRejected, CaseStatusTypeRevoked, CaseStatusTypeWithdrawn, CaseStatusTypeReturnUnpaid,
+		CaseStatusTypeDeleted, CaseStatusTypeDoNotRegister, CaseStatusTypeExpired, CaseStatusTypeCannotRegister, CaseStatusTypeDeRegistered:
 		return "red"
 	default:
 		return "grey"
 	}
 }
 
-func (cs CaseStatus) String() string {
+func (cs CaseStatus) IsValidStatusForObjection() bool {
 	switch cs {
-	case Draft:
-		return "Draft"
-	case InProgress:
-		return "In progress"
-	case StatutoryWaitingPeriod:
-		return "Statutory waiting period"
-	case Registered:
-		return "Registered"
-	case Suspended:
-		return "Suspended"
-	case DoNotRegister:
-		return "Do not register"
-	case Expired:
-		return "Expired"
-	case CannotRegister:
-		return "Cannot register"
-	case Cancelled:
-		return "Cancelled"
-	case DeRegistered:
-		return "De-registered"
+	case CaseStatusTypeInProgress, CaseStatusTypeDraft, CaseStatusTypeStatutoryWaitingPeriod:
+		return true
 	default:
-		return "draft"
+		return false
 	}
+}
+
+func (cs CaseStatus) IsDraft() bool {
+	switch cs {
+	case CaseStatusTypeDraft:
+		return true
+	default:
+		return false
+	}
+}
+
+func ParseCaseStatusType(s string) CaseStatus {
+	value, ok := caseStatusTypeMap[s]
+	if !ok {
+		return CaseStatus(0)
+	}
+	return value
+}
+
+func (cs *CaseStatus) UnmarshalJSON(data []byte) (err error) {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	*cs = ParseCaseStatusType(s)
+	return nil
 }
