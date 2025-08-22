@@ -858,7 +858,7 @@ describe("View a digital LPA", () => {
 
     cy.url().should("include", "/change-case-status?uid=M-DIGI-LPA3-3333");
     cy.contains("Change case status");
-    cy.get(".govuk-button-group").contains("Cancelled").click();
+    cy.get(".govuk-button-group").contains("Cancel").click();
 
     cy.url().should("include", "/lpa/M-DIGI-LPA3-3333");
     cy.contains("Case summary");
