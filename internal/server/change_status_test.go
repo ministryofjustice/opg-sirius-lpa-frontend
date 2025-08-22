@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -159,7 +160,7 @@ func TestPostChangeStatus(t *testing.T) {
 			client := &mockChangeStatusClient{}
 			client.
 				On("EditCase", mock.Anything, 123, sirius.CaseType(caseType), sirius.Case{
-					Status: "Withdrawn",
+					Status: shared.CaseStatusTypeWithdrawn,
 				}).
 				Return(nil)
 
@@ -205,7 +206,7 @@ func TestPostChangeStatusWhenChangeStatusErrors(t *testing.T) {
 	client := &mockChangeStatusClient{}
 	client.
 		On("EditCase", mock.Anything, 123, sirius.CaseTypeLpa, sirius.Case{
-			Status: "Withdrawn",
+			Status: shared.CaseStatusTypeWithdrawn,
 		}).
 		Return(errExample)
 

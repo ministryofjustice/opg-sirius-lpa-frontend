@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
@@ -58,7 +59,7 @@ func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
 
 		if r.Method == http.MethodPost {
 			caseDetails := sirius.Case{
-				Status: data.NewStatus,
+				Status: shared.ParseCaseStatusType(data.NewStatus),
 			}
 
 			err = client.EditCase(ctx, caseID, sirius.CaseType(caseitem.CaseType), caseDetails)
