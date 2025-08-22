@@ -2,11 +2,12 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/templatefn"
 	"golang.org/x/sync/errgroup"
-	"net/http"
 )
 
 type ChangeCaseStatusClient interface {
@@ -70,8 +71,8 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 
 		status := "draft"
 
-		if cs.DigitalLpa.LpaStoreData.Status != "" {
-			status = cs.DigitalLpa.LpaStoreData.Status
+		if cs.DigitalLpa.LpaStoreData.Status.String() != "" {
+			status = cs.DigitalLpa.LpaStoreData.Status.String()
 		}
 
 		data := changeCaseStatusData{
