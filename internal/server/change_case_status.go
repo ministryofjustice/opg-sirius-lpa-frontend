@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
@@ -81,7 +82,7 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 			Error:                   sirius.ValidationError{Field: sirius.FieldErrors{}},
 			Entity:                  fmt.Sprintf("%s %s", cs.DigitalLpa.SiriusData.Subtype, caseUID),
 			CaseUID:                 caseUID,
-			OldStatus:               status,
+			OldStatus:               strings.ToLower(status),
 			NewStatus:               postFormString(r, "status"),
 			StatusChangeReason:      postFormString(r, "statusReason"),
 			CaseStatusChangeReasons: caseStatusChangeReasons,

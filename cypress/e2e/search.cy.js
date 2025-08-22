@@ -197,7 +197,7 @@ describe("Search", () => {
       $row.should("contain", "Return - unpaid");
       $row.should("contain", "02/12/2022");
       $row.should("contain", "LPA");
-      $row.should("contain", "deleted");
+      $row.should("contain", "Deleted");
       $row.should("contain", "7000-0000-5555");
     });
   });

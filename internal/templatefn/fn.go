@@ -429,7 +429,7 @@ func severanceRequiredLabel(severanceStatus string) string {
 func caseTab(caseSummary sirius.CaseSummary, tabName string) CaseTabData {
 	lpa := caseSummary.DigitalLpa.SiriusData
 	lpaStore := caseSummary.DigitalLpa.LpaStoreData
-	status := shared.ParseCaseStatusType(shared.CaseStatusTypeDraft.String())
+	status := shared.CaseStatusTypeDraft
 
 	if lpaStore.Status.String() != "" {
 		status = lpaStore.Status
