@@ -154,6 +154,10 @@ func ParseCaseStatusType(s string) CaseStatus {
 	return value
 }
 
+func (cs CaseStatus) MarshalJSON() ([]byte, error) {
+	return json.Marshal(cs.String())
+}
+
 func (cs *CaseStatus) UnmarshalJSON(data []byte) (err error) {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {

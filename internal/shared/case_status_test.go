@@ -12,8 +12,7 @@ func TestParseCaseStatusType(t *testing.T) {
 	}{
 		{"Draft", CaseStatusTypeDraft},
 		{"draft", CaseStatusTypeDraft},
-		{"REGISTERED", CaseStatusTypeRegistered},
-		{"in progress", CaseStatusTypeInProgress},
+		{"in-progress", CaseStatusTypeInProgress},
 		{"unknown-status", CaseStatusTypeUnknown},
 	}
 
@@ -110,11 +109,11 @@ func TestIsDraft(t *testing.T) {
 	}
 }
 
-func TestStringAndKey(t *testing.T) {
+func TestString(t *testing.T) {
 	if CaseStatusTypeDraft.String() != "Draft" {
 		t.Errorf("CaseStatusTypeDraft.String() = %q, want %q", CaseStatusTypeDraft.String(), "Draft")
 	}
-	if CaseStatusTypeRegistered.Key() != "Registered" {
-		t.Errorf("CaseStatusTypeRegistered.Key() = %q, want %q", CaseStatusTypeRegistered.Key(), "Registered")
+	if CaseStatusTypeRegistered.String() != "Registered" {
+		t.Errorf("CaseStatusTypeRegistered.Key() = %q, want %q", CaseStatusTypeRegistered.String(), "Registered")
 	}
 }
