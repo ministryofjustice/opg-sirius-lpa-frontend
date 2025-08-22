@@ -84,7 +84,7 @@ func TestGetChangeCaseStatus(t *testing.T) {
 		On("Func", mock.Anything, changeCaseStatusData{
 			Entity:                  "personal-welfare M-9876-9876-9876",
 			CaseUID:                 "M-9876-9876-9876",
-			OldStatus:               "draft",
+			OldStatus:               "Draft",
 			StatusItems:             statusItems,
 			CaseStatusChangeReasons: statusChangeReasons,
 			Error:                   sirius.ValidationError{Field: sirius.FieldErrors{}},
