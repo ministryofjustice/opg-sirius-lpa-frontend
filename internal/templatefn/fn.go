@@ -428,16 +428,10 @@ func severanceRequiredLabel(severanceStatus string) string {
 
 func caseTab(caseSummary sirius.CaseSummary, tabName string) CaseTabData {
 	lpa := caseSummary.DigitalLpa.SiriusData
-	lpaStore := caseSummary.DigitalLpa.LpaStoreData
-	status := shared.ParseCaseStatusType(shared.CaseStatusTypeDraft.String())
-
-	if lpaStore.Status.String() != "" {
-		status = lpaStore.Status
-	}
 
 	var linkedCases []linkedCase
 
-	linkedCases = append(linkedCases, linkedCase{lpa.UID, lpa.Subtype, status, lpa.CreatedDate})
+	linkedCases = append(linkedCases, linkedCase{lpa.UID, lpa.Subtype, lpa.Status, lpa.CreatedDate})
 
 	for _, linkedLpa := range lpa.LinkedCases {
 		linkedCases = append(linkedCases, linkedCase{linkedLpa.UID, linkedLpa.Subtype, linkedLpa.Status, linkedLpa.CreatedDate})
