@@ -36,14 +36,15 @@ func TestEditDates(t *testing.T) {
 							"Content-Type": matchers.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"rejectedDate":     "04/03/2022",
 							"cancellationDate": "04/03/2022",
 							"dispatchDate":     "04/03/2022",
 							"dueDate":          "04/03/2022",
+							"filingDate":       "01/05/2023",
 							"invalidDate":      "04/03/2022",
 							"paymentDate":      "08/02/2022",
 							"receiptDate":      "04/03/2022",
 							"registrationDate": "04/03/2022",
+							"rejectedDate":     "04/03/2022",
 							"revokedDate":      "01/01/2023",
 							"withdrawnDate":    "04/03/2022",
 						},
@@ -64,16 +65,17 @@ func TestEditDates(t *testing.T) {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				err := client.EditDates(Context{Context: context.Background()}, 800, "lpa", Dates{
-					RejectedDate:     DateString("2022-03-04"),
-					CancellationDate: DateString("2022-03-04"),
-					DispatchDate:     DateString("2022-03-04"),
-					DueDate:          DateString("2022-03-04"),
-					InvalidDate:      DateString("2022-03-04"),
-					PaymentDate:      DateString("2022-02-08"),
-					ReceiptDate:      DateString("2022-03-04"),
-					RegistrationDate: DateString("2022-03-04"),
-					RevokedDate:      DateString("2023-01-01"),
-					WithdrawnDate:    DateString("2022-03-04"),
+					CancellationDate: "2022-03-04",
+					DispatchDate:     "2022-03-04",
+					DueDate:          "2022-03-04",
+					FilingDate:       "2023-05-01",
+					InvalidDate:      "2022-03-04",
+					PaymentDate:      "2022-02-08",
+					ReceiptDate:      "2022-03-04",
+					RegistrationDate: "2022-03-04",
+					RejectedDate:     "2022-03-04",
+					RevokedDate:      "2023-01-01",
+					WithdrawnDate:    "2022-03-04",
 				})
 
 				if tc.expectedError == nil {
