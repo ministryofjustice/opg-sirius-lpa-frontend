@@ -73,15 +73,13 @@
         {{ end }}
 
         <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">
             {{ if .OtherPerson.ID }}
-              <button class="govuk-button" data-module="app-loading-button" type="submit">
-                Link records
-              </button>
+              Link records
             {{ else }}
-              <button class="govuk-button" data-module="govuk-button" type="submit">
-                Search
-              </button>
+              Search
             {{ end }}
+          </button>
           <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
         </div>
       </form>
