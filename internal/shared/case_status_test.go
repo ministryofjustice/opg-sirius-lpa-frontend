@@ -47,7 +47,7 @@ func TestUnmarshalJSON(t *testing.T) {
 	}
 }
 
-func TestCaseStatusColour(t *testing.T) {
+func TestColour(t *testing.T) {
 	tests := []struct {
 		status   CaseStatus
 		expected string
@@ -62,9 +62,9 @@ func TestCaseStatusColour(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		got := tt.status.CaseStatusColour()
+		got := tt.status.Colour()
 		if got != tt.expected {
-			t.Errorf("CaseStatusColour(%v) = %s, want %s", tt.status, got, tt.expected)
+			t.Errorf("Colour(%v) = %s, want %s", tt.status, got, tt.expected)
 		}
 	}
 }
