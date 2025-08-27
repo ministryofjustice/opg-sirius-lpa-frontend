@@ -106,7 +106,7 @@ func (cs CaseStatus) String() string {
 	}
 }
 
-func (cs CaseStatus) CaseStatusColour() string {
+func (cs CaseStatus) Colour() string {
 	switch cs {
 	case CaseStatusTypeRegistered:
 		return "green"
