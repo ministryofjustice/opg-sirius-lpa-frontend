@@ -76,7 +76,7 @@ services:
       - TRIVY_PASSWORD=${DOCKER_PASSWORD}
 
   cypress:
-    image: cypress/included:14.5.4
+    image: cypress/included:15.0.0
     command: run --browser chrome
     entrypoint: cypress
     depends_on:
