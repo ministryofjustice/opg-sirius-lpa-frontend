@@ -120,36 +120,36 @@ describe("View and edit anomalies for a digital LPA", () => {
       },
     });
 
-      cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-TTTT-3333", "GET", {
-          status: 200,
-          body: {
-              uId: "M-DIGI-TTTT-3333",
-              "opg.poas.sirius": {
-                  id: 111,
-                  uId: "M-DIGI-TTTT-3333",
-                  status: "Processing",
-                  caseSubtype: "property-and-affairs",
-              },
-              "opg.poas.lpastore": {
-                  channel: "online",
-                  attorneys: [
-                      {
-                          uid: "attorney-1-uid",
-                          appointmentType: "original",
-                          status: "active",
-                      },
-                      {
-                          uid: "replacement-attorney-1-uid",
-                          appointmentType: "replacement",
-                          status: "inactive",
-                      },
-                  ],
-                  certificateProvider: {
-                      uid: "certificate-provider",
-                  },
-              },
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-TTTT-3333", "GET", {
+      status: 200,
+      body: {
+        uId: "M-DIGI-TTTT-3333",
+        "opg.poas.sirius": {
+          id: 111,
+          uId: "M-DIGI-TTTT-3333",
+          status: "Processing",
+          caseSubtype: "property-and-affairs",
+        },
+        "opg.poas.lpastore": {
+          channel: "online",
+          attorneys: [
+            {
+              uid: "attorney-1-uid",
+              appointmentType: "original",
+              status: "active",
+            },
+            {
+              uid: "replacement-attorney-1-uid",
+              appointmentType: "replacement",
+              status: "inactive",
+            },
+          ],
+          certificateProvider: {
+            uid: "certificate-provider",
           },
-      });
+        },
+      },
+    });
 
     cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-TTTT-3333/anomalies", "GET", {
       status: 200,
@@ -251,6 +251,8 @@ describe("View and edit anomalies for a digital LPA", () => {
 
   it("shows anomalie for last name matching both donor and at least one attorney", () => {
     cy.visit("/lpa/M-DIGI-TTTT-3333/lpa-details");
-      cy.contains("Review last name - this matches the donor and at least one of the attorneys. Check certificate provider's eligibility");
+    cy.contains(
+      "Review last name - this matches the donor and at least one of the attorneys. Check certificate provider's eligibility",
+    );
   });
 });
