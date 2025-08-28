@@ -43,7 +43,7 @@
                 <dd class="govuk-summary-list__value{{ if gt (len $cpFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
                     {{ .DigitalLpa.LpaStoreData.CertificateProvider.LastName }}
                     {{ if gt (len $cpFieldAnomalies) 0 }}
-                        <br><span class="govuk-error-message">{{ $cpFieldAnomalies.GetHintTextForAnomalyField }}</span>
+                            <br><span class="govuk-error-message">{{ $cpAnomalies.GetHintTextForAnomalyField $cpFieldAnomalies }}</span>
                     {{ end }}
                 </dd>
             </div>

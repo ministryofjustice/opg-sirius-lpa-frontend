@@ -138,17 +138,10 @@ const (
 	Empty                   AnomalyRuleType = "empty"
 	LastNameMatchesAttorney AnomalyRuleType = "last-name-matches-attorney"
 	LastNameMatchesDonor    AnomalyRuleType = "last-name-matches-donor"
-	NotADate                AnomalyRuleType = "not a date"
-	AttorneyUnder18         AnomalyRuleType = "attorney under 18"
-	DateOfBirthInTheFuture  AnomalyRuleType = "date of birth in the future"
-	DateOfBirthTooLongAgo   AnomalyRuleType = "date of birth more than 150 years ago"
-	InvalidAddress          AnomalyRuleType = "Invalid address"
 )
 
 // For CP lastName
-func (afo *AnomaliesForObject) GetHintTextForAnomalyField(fieldName string, status string) string {
-	anomalies := afo.GetAnomaliesForFieldWithStatus(fieldName, status)
-
+func (afo *AnomaliesForObject) GetHintTextForAnomalyField(anomalies []Anomaly) string {
 	if containsAnomalyType(anomalies, LastNameMatchesDonor) && containsAnomalyType(anomalies, LastNameMatchesAttorney) {
 		return "Review last name - this matches the donor and at least one of the attorneys. Check certificate provider's eligibility"
 	}
