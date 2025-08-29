@@ -20,7 +20,7 @@ type Anomaly struct {
 	Id            int             `json:"id"`
 	Status        AnomalyStatus   `json:"status"`
 	FieldName     ObjectFieldName `json:"fieldName"`
-	RuleType      string          `json:"ruleType"`
+	RuleType      AnomalyRuleType `json:"ruleType"`
 	FieldOwnerUid ObjectUid       `json:"fieldOwnerUid"`
 }
 

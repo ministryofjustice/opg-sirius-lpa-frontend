@@ -401,7 +401,6 @@ func StatusLabelFormat(status string) string {
 	default:
 		return "draft"
 	}
-
 }
 
 func subtypeColour(subtype string) string {

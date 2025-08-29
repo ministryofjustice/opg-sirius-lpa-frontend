@@ -28,21 +28,33 @@
 
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">First names</dt>
-                <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.CertificateProvider.FirstNames }}</dd>
+                {{ $cpFieldAnomalies := $cpAnomalies.GetAnomaliesForFieldWithStatus "firstNames" "detected" }}
+                <dd class="govuk-summary-list__value{{ if gt (len $cpFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                    {{ .DigitalLpa.LpaStoreData.CertificateProvider.FirstNames }}
+                    {{ if gt (len $cpFieldAnomalies) 0 }}
+                      <br><span class="govuk-error-message">Review certificate provider's first names</span>
+                    {{ end }}
+                </dd>
             </div>
 
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Last name</dt>
-                <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.CertificateProvider.LastName }}</dd>
+                {{ $cpFieldAnomalies = $cpAnomalies.GetAnomaliesForFieldWithStatus "lastName" "detected" }}
+                <dd class="govuk-summary-list__value{{ if gt (len $cpFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                    {{ .DigitalLpa.LpaStoreData.CertificateProvider.LastName }}
+                    {{ if gt (len $cpFieldAnomalies) 0 }}
+                            <br><span class="govuk-error-message">{{ $cpAnomalies.GetHintTextForAnomalyField $cpFieldAnomalies }}</span>
+                    {{ end }}
+                </dd>
             </div>
 
-            {{ $addressFieldAnomalies := $cpAnomalies.GetAnomaliesForFieldWithStatus "address" "detected" }}
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Address</dt>
+                {{ $addressFieldAnomalies := $cpAnomalies.GetAnomaliesForFieldWithStatus "address" "detected" }}
                 <dd class="govuk-summary-list__value{{ if gt (len $addressFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
                     {{ template "mlpa-address" .DigitalLpa.LpaStoreData.CertificateProvider.Address }}
                     {{ if gt (len $addressFieldAnomalies) 0 }}
-                        <br><span class="govuk-error-message">Review certificate provider address</span>
+                        <br><span class="govuk-error-message">Review certificate provider's address</span>
                     {{ end }}
                 </dd>
             </div>

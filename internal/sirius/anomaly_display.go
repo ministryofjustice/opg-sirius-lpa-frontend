@@ -132,6 +132,43 @@ func (afo *AnomaliesForObject) GetAnomaliesForFieldWithStatus(fieldName string, 
 	return anomaliesWithStatus
 }
 
+type AnomalyRuleType string
+
+const (
+	Empty                   AnomalyRuleType = "empty"
+	LastNameMatchesAttorney AnomalyRuleType = "last-name-matches-attorney"
+	LastNameMatchesDonor    AnomalyRuleType = "last-name-matches-donor"
+)
+
+// For CP lastName
+func (afo *AnomaliesForObject) GetHintTextForAnomalyField(anomalies []Anomaly) string {
+	if containsAnomalyType(anomalies, LastNameMatchesDonor) && containsAnomalyType(anomalies, LastNameMatchesAttorney) {
+		return "Review last name - this matches the donor and at least one of the attorneys. Check certificate provider's eligibility"
+	}
+
+	for _, anomaly := range anomalies {
+		switch anomaly.RuleType {
+		case Empty:
+			return "Review certificate provider's last name"
+		case LastNameMatchesAttorney:
+			return "Review last name - this matches at least one of the attorney's. Check certificate provider's eligibility"
+		case LastNameMatchesDonor:
+			return "Review last name - this matches the donor's. Check certificate provider's eligibility"
+		}
+	}
+
+	return "Review certificate provider's last name"
+}
+
+func containsAnomalyType(anomalies []Anomaly, anomalyType AnomalyRuleType) bool {
+	for _, anomaly := range anomalies {
+		if anomaly.RuleType == anomalyType {
+			return true
+		}
+	}
+	return false
+}
+
 // getSectionForUid - Map a UID to an object inside an LPA and return which section it's in
 func getSectionForUid(lpa *LpaStoreData, uid ObjectUid) AnomalyDisplaySection {
 	if uid == "" {
