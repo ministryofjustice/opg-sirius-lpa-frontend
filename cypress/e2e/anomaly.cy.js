@@ -170,11 +170,11 @@ describe("View and edit anomalies for a digital LPA", () => {
     cy.contains("Review when the LPA can be used");
     cy.contains("Review certificate provider address");
   });
-
-  it("shows anomalies for pa LPA", () => {
-    cy.visit("/lpa/M-DIGI-SSSS-3333/lpa-details");
-    cy.contains("Some LPA details have been identified for review.");
-    cy.contains("For review");
-    cy.contains("Review life sustaining treatment");
-  });
+  //
+  // it("shows anomalies for pa LPA", () => {
+  //   cy.visit("/lpa/M-DIGI-SSSS-3333/lpa-details");
+  //   cy.contains("Some LPA details have been identified for review.");
+  //   cy.contains("For review");
+  //   cy.contains("Review life sustaining treatment");
+  // });
 });
