@@ -45,27 +45,28 @@ type Donor struct {
 }
 
 type LpaStoreData struct {
-	Donor                                       LpaStoreDonor                `json:"donor"`
-	Channel                                     string                       `json:"channel"`
-	Status                                      string                       `json:"status"`
-	Attorneys                                   []LpaStoreAttorney           `json:"attorneys"`
-  TrustCorporations                           []LpaStoreTrustCorporation  `json:"trustCorporations"`
-	CertificateProvider                         LpaStoreCertificateProvider  `json:"certificateProvider"`
-	PeopleToNotify                              []LpaStorePersonToNotify     `json:"peopleToNotify"`
-	HowAttorneysMakeDecisions                   string                       `json:"howAttorneysMakeDecisions"`
-	HowAttorneysMakeDecisionsDetails            string                       `json:"howAttorneysMakeDecisionsDetails"`
-	WhenTheLpaCanBeUsed                         string                       `json:"whenTheLpaCanBeUsed"`
-	HowReplacementAttorneysMakeDecisions        string                       `json:"howReplacementAttorneysMakeDecisions"`
-	HowReplacementAttorneysMakeDecisionsDetails string                       `json:"howReplacementAttorneysMakeDecisionsDetails"`
-	HowReplacementAttorneysStepIn               string                       `json:"howReplacementAttorneysStepIn"`
-	HowReplacementAttorneysStepInDetails        string                       `json:"howReplacementAttorneysStepInDetails"`
-	LifeSustainingTreatmentOption               string                       `json:"lifeSustainingTreatmentOption"`
-	RestrictionsAndConditions                   string                       `json:"restrictionsAndConditions"`
-	RestrictionsAndConditionsImages             []LpaStoreImage              `json:"restrictionsAndConditionsImages"`
-	SignedAt                                    string                       `json:"signedAt"`
+	Donor                                       LpaStoreDonor               `json:"donor"`
+	Channel                                     string                      `json:"channel"`
+	Status                                      string                      `json:"status"`
+	Attorneys                                   []LpaStoreAttorney          `json:"attorneys"`
+	TrustCorporations                           []LpaStoreTrustCorporation  `json:"trustCorporations"`
+	CertificateProvider                         LpaStoreCertificateProvider `json:"certificateProvider"`
+	CertificateProviderNotRelatedConfirmedAt    string                      `json:"certificateProviderNotRelatedConfirmedAt"`
+	PeopleToNotify                              []LpaStorePersonToNotify    `json:"peopleToNotify"`
+	HowAttorneysMakeDecisions                   string                      `json:"howAttorneysMakeDecisions"`
+	HowAttorneysMakeDecisionsDetails            string                      `json:"howAttorneysMakeDecisionsDetails"`
+	WhenTheLpaCanBeUsed                         string                      `json:"whenTheLpaCanBeUsed"`
+	HowReplacementAttorneysMakeDecisions        string                      `json:"howReplacementAttorneysMakeDecisions"`
+	HowReplacementAttorneysMakeDecisionsDetails string                      `json:"howReplacementAttorneysMakeDecisionsDetails"`
+	HowReplacementAttorneysStepIn               string                      `json:"howReplacementAttorneysStepIn"`
+	HowReplacementAttorneysStepInDetails        string                      `json:"howReplacementAttorneysStepInDetails"`
+	LifeSustainingTreatmentOption               string                      `json:"lifeSustainingTreatmentOption"`
+	RestrictionsAndConditions                   string                      `json:"restrictionsAndConditions"`
+	RestrictionsAndConditionsImages             []LpaStoreImage             `json:"restrictionsAndConditionsImages"`
+	SignedAt                                    string                      `json:"signedAt"`
 	AuthorisedSignatory                         *LpaStoreAuthorisedSignatory `json:"authorisedSignatory,omitempty"`
-	WitnessedByCertificateProviderAt            string                       `json:"witnessedByCertificateProviderAt"`
-	WitnessedByIndependentWitnessAt             string                       `json:"witnessedByIndependentWitnessAt"`
+	WitnessedByCertificateProviderAt            string                      `json:"witnessedByCertificateProviderAt"`
+	WitnessedByIndependentWitnessAt             string                      `json:"witnessedByIndependentWitnessAt"`
 	IndependentWitness                          *LpaStoreIndependentWitness  `json:"independentWitness,omitempty"`
 }
 
