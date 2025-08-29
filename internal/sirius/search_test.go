@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
@@ -93,7 +94,7 @@ func TestSearch(t *testing.T) {
 								UID:      "7000-5382-4438",
 								CaseType: "LPA",
 								SubType:  "pfa",
-								Status:   "Perfect",
+								Status:   shared.CaseStatusTypePerfect,
 							},
 						},
 					},

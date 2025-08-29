@@ -2,15 +2,18 @@ package sirius
 
 import (
 	"fmt"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 )
 
 type DeletedCase struct {
-	UID         string     `json:"uId"`
-	OnlineLpaId string     `json:"onlineLpaId"`
-	Type        string     `json:"type"`
-	Status      string     `json:"status"`
-	DeletedAt   DateString `json:"deletedAt"`
-	Reason      string     `json:"deletionReason"`
+	UID           string            `json:"uId"`
+	OnlineLpaId   string            `json:"onlineLpaId"`
+	Type          string            `json:"type"`
+	Status        shared.CaseStatus `json:"status"`
+	DeletedAt     DateString        `json:"deletedAt"`
+	Reason        string            `json:"deletionReason"`
+	DeletedStatus shared.CaseStatus
 }
 
 func (c *Client) DeletedCases(ctx Context, uid string) ([]DeletedCase, error) {

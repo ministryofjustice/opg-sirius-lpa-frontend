@@ -3,11 +3,13 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
 )
 
 func TestDigitalLpa(t *testing.T) {
@@ -82,7 +84,7 @@ func TestDigitalLpa(t *testing.T) {
 				SiriusData: SiriusData{
 					ID:                 789,
 					Subtype:            "property-and-affairs",
-					Status:             "Draft",
+					Status:             shared.CaseStatusTypeDraft,
 					CreatedDate:        DateString("2018-03-26"),
 					ComplaintCount:     1,
 					InvestigationCount: 2,
@@ -168,7 +170,7 @@ func TestDigitalLpa(t *testing.T) {
 				SiriusData: SiriusData{
 					ID:                 111,
 					Subtype:            "property-and-affairs",
-					Status:             "Statutory waiting period",
+					Status:             shared.CaseStatusTypeStatutoryWaitingPeriod,
 					CreatedDate:        DateString("2018-03-26"),
 					DueDate:            DateString("2018-04-09"),
 					ComplaintCount:     0,

@@ -3,10 +3,12 @@ package sirius
 import (
 	"context"
 	"fmt"
-	"github.com/pact-foundation/pact-go/v2/consumer"
-	"github.com/pact-foundation/pact-go/v2/matchers"
 	"net/http"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -84,7 +86,7 @@ func TestSearchDonors(t *testing.T) {
 							UID:      "7000-8548-8461",
 							CaseType: "LPA",
 							SubType:  "pfa",
-							Status:   "Perfect",
+							Status:   shared.CaseStatusTypePerfect,
 						},
 					},
 				},
