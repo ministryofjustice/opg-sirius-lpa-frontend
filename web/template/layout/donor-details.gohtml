@@ -90,7 +90,7 @@
                     </dd>
                 </div>
 
-                <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                <div class="govuk-summary-list__row{{ if not .DigitalLpa.WasSignedOnBehalfOfDonor }} govuk-summary-list__row--no-border{{ end }}">
                     <dt class="govuk-summary-list__key">Signed on</dt>
                     <dd class="govuk-summary-list__value">
                         {{ if (eq .DigitalLpa.LpaStoreData.SignedAt "") }}
@@ -100,6 +100,63 @@
                         {{ end }}
                     </dd>
                 </div>
+
+                {{ if .DigitalLpa.WasSignedOnBehalfOfDonor }}
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">LPA signed on behalf of the donor by</dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ .DigitalLpa.GetAuthorisedSignatoryFullName }}
+                        </dd>
+                    </div>
+
+                    <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                        <dt class="govuk-summary-list__key"></dt>
+                        <dd class="govuk-summary-list__value">
+                            <details class="govuk-details" data-module="govuk-details">
+                                <summary class="govuk-details__summary">
+                                <span class="govuk-details__summary-text">
+                                    View witness details
+                                </span>
+                                </summary>
+                                <div class="govuk-details__text">
+                                    <dl class="govuk-summary-list govuk-summary-list--no-border">
+                                        {{ if .DigitalLpa.WasWitnessedByCertificateProvider }}
+                                            <div class="govuk-summary-list__row">
+                                                <dt class="govuk-summary-list__key">Signed by witness 1 (certificate provider)</dt>
+                                                <dd class="govuk-summary-list__value">Yes</dd>
+                                            </div>
+                                        {{ end }}
+
+                                        {{ if .DigitalLpa.WasWitnessedByIndependentWitness }}
+                                            <div class="govuk-summary-list__row">
+                                                <dt class="govuk-summary-list__key">Signed by witness 2</dt>
+                                                <dd class="govuk-summary-list__value">Yes</dd>
+                                            </div>
+
+                                            {{ $witnessName := .DigitalLpa.GetIndependentWitnessFullName }}
+                                            {{ if ne $witnessName "" }}
+                                                <div class="govuk-summary-list__row">
+                                                    <dt class="govuk-summary-list__key">Witness 2 name</dt>
+                                                    <dd class="govuk-summary-list__value">{{ $witnessName }}</dd>
+                                                </div>
+                                            {{ end }}
+
+                                            {{ $witnessAddress := .DigitalLpa.GetIndependentWitnessAddress }}
+                                            {{ if ne $witnessAddress.Line1 "" }}
+                                                <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
+                                                    <dt class="govuk-summary-list__key">Witness 2 address</dt>
+                                                    <dd class="govuk-summary-list__value">
+                                                        {{ template "mlpa-address" $witnessAddress }}
+                                                    </dd>
+                                                </div>
+                                            {{ end }}
+                                        {{ end }}
+                                    </dl>
+                                </div>
+                            </details>
+                        </dd>
+                    </div>
+                {{ end }}
 
             </dl>
 
