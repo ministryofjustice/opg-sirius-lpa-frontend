@@ -102,6 +102,74 @@ describe("View and edit anomalies for a digital LPA", () => {
             ruleType: "Invalid address",
             fieldOwnerUid: "replacement-attorney-1-uid",
           },
+          {
+            id: 132,
+            status: "detected",
+            fieldName: "firstNames",
+            ruleType: "empty",
+            fieldOwnerUid: "certificate-provider",
+          },
+          {
+            id: 133,
+            status: "detected",
+            fieldName: "lastName",
+            ruleType: "empty",
+            fieldOwnerUid: "certificate-provider",
+          },
+        ],
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-TTTT-3333", "GET", {
+      status: 200,
+      body: {
+        uId: "M-DIGI-TTTT-3333",
+        "opg.poas.sirius": {
+          id: 111,
+          uId: "M-DIGI-TTTT-3333",
+          status: "Processing",
+          caseSubtype: "property-and-affairs",
+        },
+        "opg.poas.lpastore": {
+          channel: "online",
+          attorneys: [
+            {
+              uid: "attorney-1-uid",
+              appointmentType: "original",
+              status: "active",
+            },
+            {
+              uid: "replacement-attorney-1-uid",
+              appointmentType: "replacement",
+              status: "inactive",
+            },
+          ],
+          certificateProvider: {
+            uid: "certificate-provider",
+          },
+        },
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-TTTT-3333/anomalies", "GET", {
+      status: 200,
+      body: {
+        uid: "M-DIGI-TTTT-3333",
+        anomalies: [
+          {
+            id: 136,
+            status: "detected",
+            fieldName: "lastName",
+            ruleType: "last-name-matches-donor",
+            fieldOwnerUid: "certificate-provider",
+          },
+          {
+            id: 137,
+            status: "detected",
+            fieldName: "lastName",
+            ruleType: "last-name-matches-attorney",
+            fieldOwnerUid: "certificate-provider",
+          },
         ],
       },
     });
@@ -135,6 +203,7 @@ describe("View and edit anomalies for a digital LPA", () => {
       cases.tasks.empty("222"),
       digitalLpas.objections.empty("M-DIGI-QQQQ-1111"),
       digitalLpas.objections.empty("M-DIGI-SSSS-3333"),
+      digitalLpas.objections.empty("M-DIGI-TTTT-3333"),
     ]);
 
     cy.wrap(mocks);
@@ -168,7 +237,9 @@ describe("View and edit anomalies for a digital LPA", () => {
     cy.contains("Review replacement attorney's address");
     cy.contains("Review how attorneys can make decisions");
     cy.contains("Review when the LPA can be used");
-    cy.contains("Review certificate provider address");
+    cy.contains("Review certificate provider's first names");
+    cy.contains("Review certificate provider's last name");
+    cy.contains("Review certificate provider's address");
   });
 
   it("shows anomalies for pa LPA", () => {
@@ -176,5 +247,12 @@ describe("View and edit anomalies for a digital LPA", () => {
     cy.contains("Some LPA details have been identified for review.");
     cy.contains("For review");
     cy.contains("Review life sustaining treatment");
+  });
+
+  it("shows anomalie for last name matching both donor and at least one attorney", () => {
+    cy.visit("/lpa/M-DIGI-TTTT-3333/lpa-details");
+    cy.contains(
+      "Review last name - this matches the donor and at least one of the attorneys. Check certificate provider's eligibility",
+    );
   });
 });
