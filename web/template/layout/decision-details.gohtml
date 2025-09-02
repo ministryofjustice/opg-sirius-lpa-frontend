@@ -2,11 +2,13 @@
 <!-- decisions -->
 {{ $anomaliesForSection := .AnomalyDisplay.GetAnomaliesForSection "root" }}
 <div class="govuk-accordion__section">
-    <div class="govuk-accordion__section-header{{ if $anomaliesForSection.HasAnomalies }} govuk-form-group--error{{ end }}">
+    <div class="govuk-accordion__section-header">
         <h2 class="govuk-accordion__section-heading">
               <span class="govuk-accordion__section-button" id="accordion-default-heading-3">
                 Decisions
-                {{ if $anomaliesForSection.HasAnomalies }}<span class="govuk-error-message">For review</span>{{ end }}
+                {{ if $anomaliesForSection.HasAnomalies }}
+                    <span class="information-warning-header">{{ template "information-warning" "For review" }}</span>
+                {{ end }}
               </span>
         </h2>
     </div>
@@ -25,11 +27,11 @@
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Attorney appointment type</dt>
-                <dd class="govuk-summary-list__value{{ if gt (len $decisionFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                <dd class="govuk-summary-list__value">
                     {{ howAttorneysMakeDecisionsLongForm (eq (len .NonReplacementAttorneys) 1) .DigitalLpa.LpaStoreData.HowAttorneysMakeDecisions }}
 
                     {{ if gt (len $decisionFieldAnomalies) 0 }}
-                        <br><span class="govuk-error-message">Review how attorneys can make decisions</span>
+                        {{ template "information-warning" "Review how attorneys can make decisions" }}
                     {{ end }}
                 </dd>
             </div>
@@ -54,11 +56,11 @@
                 {{ $lifeSustainingTreatmentAnomalies := $rootAnomalies.GetAnomaliesForFieldWithStatus "lifeSustainingTreatmentOption" "detected" }}
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Life sustaining treatment</dt>
-                    <dd class="govuk-summary-list__value{{ if gt (len $lifeSustainingTreatmentAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                    <dd class="govuk-summary-list__value">
                         <p class="govuk-body">
                             {{ lifeSustainingTreatmentOptionLongForm .DigitalLpa.LpaStoreData.LifeSustainingTreatmentOption }}
                             {{ if gt (len $lifeSustainingTreatmentAnomalies) 0 }}
-                                <br><span class="govuk-error-message">Review life sustaining treatment</span>
+                                {{ template "information-warning" "Review life sustaining treatment" }}
                             {{ end }}
                         </p>
                     </dd>
@@ -67,11 +69,11 @@
                 {{ $howToUseLpaFieldAnomalies := $rootAnomalies.GetAnomaliesForFieldWithStatus "whenTheLpaCanBeUsed" "detected" }}
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">When attorneys can use the LPA</dt>
-                    <dd class="govuk-summary-list__value{{ if gt (len $howToUseLpaFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                    <dd class="govuk-summary-list__value">
                         <p class="govuk-body">
                             {{ whenTheLpaCanBeUsedLongForm .DigitalLpa.LpaStoreData.WhenTheLpaCanBeUsed }}
                             {{ if gt (len $howToUseLpaFieldAnomalies) 0 }}
-                                <br><span class="govuk-error-message">Review when the LPA can be used</span>
+                                {{ template "information-warning" "Review when the LPA can be used" }}
                             {{ end }}
                         </p>
                     </dd>
@@ -79,11 +81,11 @@
             {{ end}}
             <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
                 <dt class="govuk-summary-list__key">Replacement attorneys appointment type</dt>
-                <dd class="govuk-summary-list__value{{ if gt (len $raDecisionFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                <dd class="govuk-summary-list__value">
                     {{ howAttorneysMakeDecisionsLongForm (eq (len .ReplacementAttorneys) 1) .ReplacementAttorneysDecisions }}
 
                     {{ if gt (len $raDecisionFieldAnomalies) 0 }}
-                        <br><span class="govuk-error-message">Review how replacement attorney's can make decisions</span>
+                        {{ template "information-warning" "Review how replacement attorney's can make decisions" }}
                     {{ end }}
                 </dd>
             </div>
