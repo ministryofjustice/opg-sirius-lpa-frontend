@@ -48,7 +48,7 @@ function extendDefaultDigitalLpa(uid, body) {
         firstNames: "Steven",
         lastName: "Munnell",
         email: "Steven.Munnell@example.com",
-        dateOfBirth: "17/06/1982",
+        dateOfBirth: "1982-06-17",
         otherNamesKnownBy: "",
         contactLanguagePreference: "",
         address: {
