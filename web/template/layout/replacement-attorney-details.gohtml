@@ -6,11 +6,13 @@
 {{ $anomaliesForSection := .AnomalyDisplay.GetAnomaliesForSection "replacementAttorneys" }}
 {{ $totalReplacmentAttorneys := plusN (len .ReplacementAttorneys) (len .ReplacementTrustCorporations ) }}
 <div class="govuk-accordion__section">
-    <div class="govuk-accordion__section-header{{ if $anomaliesForSection.HasAnomalies }} govuk-form-group--error{{ end }}">
+    <div class="govuk-accordion__section-header">
         <h2 class="govuk-accordion__section-heading">
             <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
                 Replacement attorneys ({{ $totalReplacmentAttorneys }})
-                {{ if $anomaliesForSection.HasAnomalies }}<span class="govuk-error-message">For review</span>{{ end }}
+                {{ if $anomaliesForSection.HasAnomalies }}
+                    {{ template "information-warning" "For review" }}
+                {{ end }}
             </span>
         </h2>
     </div>
@@ -38,10 +40,10 @@
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">First names</dt>
                         {{ $attorneyFieldAnomalies := $attorneyAnomalies.GetAnomaliesForFieldWithStatus "firstNames" "detected" }}
-                        <dd class="govuk-summary-list__value{{ if gt (len $attorneyFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                        <dd class="govuk-summary-list__value">
                             {{ $attorney.FirstNames }}
                             {{ if gt (len $attorneyFieldAnomalies) 0 }}
-                                <br><span class="govuk-error-message">Review replacement attorney's first names</span>
+                                {{ template "information-warning" "Review replacement attorney's first names" }}
                             {{ end }}
                         </dd>
                     </div>
@@ -49,10 +51,10 @@
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">Last name</dt>
                         {{ $attorneyFieldAnomalies = $attorneyAnomalies.GetAnomaliesForFieldWithStatus "lastName" "detected" }}
-                        <dd class="govuk-summary-list__value{{ if gt (len $attorneyFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                        <dd class="govuk-summary-list__value">
                             {{ $attorney.LastName }}
                             {{ if gt (len $attorneyFieldAnomalies) 0 }}
-                                <br><span class="govuk-error-message">Review replacement attorney's last name</span>
+                                {{ template "information-warning" "Review replacement attorney's last name" }}
                             {{ end }}
                         </dd>
                     </div>
@@ -69,10 +71,10 @@
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">Address</dt>
                         {{ $attorneyFieldAnomalies = $attorneyAnomalies.GetAnomaliesForFieldWithStatus "address" "detected" }}
-                        <dd class="govuk-summary-list__value{{ if gt (len $attorneyFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                        <dd class="govuk-summary-list__value">
                             {{ template "mlpa-address" $attorney.Address }}
                             {{ if gt (len $attorneyFieldAnomalies) 0 }}
-                                <br><span class="govuk-error-message">Review replacement attorney's address</span>
+                                {{ template "information-warning" "Review replacement attorney's address" }}
                             {{ end }}
                         </dd>
                     </div>
