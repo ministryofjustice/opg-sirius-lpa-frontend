@@ -43,6 +43,7 @@ function extendDefaultDigitalLpa(uid, body) {
       status: "draft",
       registrationDate: "2022-12-18",
       peopleToNotify: [],
+      signedAt: "2022-12-19T09:12:59Z",
       donor: {
         uid: "572fe550-e465-40b3-a643-ca9564fabab8",
         firstNames: "Steven",
