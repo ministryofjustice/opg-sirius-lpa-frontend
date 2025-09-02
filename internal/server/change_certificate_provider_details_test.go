@@ -310,3 +310,72 @@ func TestPostChangeCertificateProviderDetailsRedirectReturned(t *testing.T) {
 	assert.Equal(t, RedirectError(fmt.Sprintf("/lpa/%s/lpa-details#certificate-provider", caseUid)), err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
+
+var testChangeCertificateProviderCaseSummaryWithEligibilityConfirmed = sirius.CaseSummary{
+	DigitalLpa: sirius.DigitalLpa{
+		LpaStoreData: sirius.LpaStoreData{
+			CertificateProvider: sirius.LpaStoreCertificateProvider{
+				LpaStorePerson: sirius.LpaStorePerson{
+					Uid:        "f9982b9a-c40c-4aee-85df-06f95c92bd12",
+					FirstNames: "Josefa",
+					LastName:   "Smith",
+					Address: sirius.LpaStoreAddress{
+						Line1:    "37 Davonte Grange",
+						Line2:    "Nether Raynor",
+						Line3:    "New Fahey",
+						Town:     "Surrey",
+						Postcode: "KV94 9CD",
+						Country:  "GB",
+					},
+					Email: "Kyra.Schowalter@example.com",
+				},
+				Phone:                     "01452 927995",
+				Channel:                   "online",
+				ContactLanguagePreference: "email",
+				SignedAt:                  "2024-01-12T10:09:09Z",
+			},
+			Donor: sirius.LpaStoreDonor{
+				LpaStorePerson: sirius.LpaStorePerson{
+					Uid:        "donor-uid",
+					FirstNames: "John",
+					LastName:   "Smith",
+				},
+			},
+			CertificateProviderNotRelatedConfirmedAt: "2024-01-15T10:30:00Z",
+		},
+	},
+}
+
+func TestGetChangeCertificateProviderDetailsWithEligibilityConfirmed(t *testing.T) {
+	caseUid := "M-1111-1111-1111"
+
+	client := &mockChangeCertificateProviderDetailsClient{}
+	client.
+		On("CaseSummary", mock.Anything, caseUid).
+		Return(testChangeCertificateProviderCaseSummaryWithEligibilityConfirmed, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.MatchedBy(func(data changeCertificateProviderDetailsData) bool {
+			return data.CaseUid == caseUid
+		})).
+		Return(nil)
+
+	server := newMockServer(
+		"/lpa/{uid}/certificate-provider/change-details",
+		ChangeCertificateProviderDetails(client, template.Func),
+	)
+
+	req, _ := http.NewRequest(
+		http.MethodGet,
+		fmt.Sprintf("/lpa/%s/certificate-provider/change-details", caseUid),
+		nil,
+	)
+	_, err := server.serve(req)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
