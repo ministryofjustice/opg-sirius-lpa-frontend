@@ -1,9 +1,10 @@
 package sirius
 
 import (
+	"testing"
+
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestAnomaliesForObject(t *testing.T) {
@@ -305,4 +306,110 @@ func TestGetSectionForUid(t *testing.T) {
 	assert.Equal(t, CertificateProviderSection, getSectionForUid(&lpa, "5"))
 	assert.Equal(t, PeopleToNotifySection, getSectionForUid(&lpa, "6"))
 	assert.Equal(t, RootSection, getSectionForUid(&lpa, ""))
+}
+
+func TestGetHintTextForAnomalyField(t *testing.T) {
+	tests := []struct {
+		name      string
+		anomalies []Anomaly
+		want      string
+	}{
+		{
+			name: "LastNameMatchesDonor and LastNameMatchesAttorney",
+			anomalies: []Anomaly{
+				{RuleType: LastNameMatchesDonor},
+				{RuleType: LastNameMatchesAttorney},
+			},
+			want: "Review last name - this matches the donor and at least one of the attorneys. Check certificate provider's eligibility",
+		},
+		{
+			name: "Empty anomaly",
+			anomalies: []Anomaly{
+				{RuleType: Empty},
+			},
+			want: "Review certificate provider's last name",
+		},
+		{
+			name: "LastNameMatchesAttorney only",
+			anomalies: []Anomaly{
+				{RuleType: LastNameMatchesAttorney},
+			},
+			want: "Review last name - this matches at least one of the attorney's. Check certificate provider's eligibility",
+		},
+		{
+			name: "LastNameMatchesDonor only",
+			anomalies: []Anomaly{
+				{RuleType: LastNameMatchesDonor},
+			},
+			want: "Review last name - this matches the donor's. Check certificate provider's eligibility",
+		},
+		{
+			name:      "No anomalies",
+			anomalies: []Anomaly{},
+			want:      "Review certificate provider's last name",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			afo := &AnomaliesForObject{}
+			got := afo.GetHintTextForAnomalyField(tt.anomalies)
+			if got != tt.want {
+				t.Errorf("GetHintTextForAnomalyField() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestContainsAnomalyType(t *testing.T) {
+	tests := []struct {
+		name       string
+		anomalies  []Anomaly
+		queryType  AnomalyRuleType
+		wantResult bool
+	}{
+		{
+			name:       "empty anomalies list",
+			anomalies:  []Anomaly{},
+			queryType:  "TypeA",
+			wantResult: false,
+		},
+		{
+			name: "anomaly type exists",
+			anomalies: []Anomaly{
+				{RuleType: "TypeA"},
+				{RuleType: "TypeB"},
+			},
+			queryType:  "TypeA",
+			wantResult: true,
+		},
+		{
+			name: "anomaly type does not exist",
+			anomalies: []Anomaly{
+				{RuleType: "TypeB"},
+				{RuleType: "TypeC"},
+			},
+			queryType:  "TypeA",
+			wantResult: false,
+		},
+		{
+			name: "multiple anomalies, match later",
+			anomalies: []Anomaly{
+				{RuleType: "TypeB"},
+				{RuleType: "TypeC"},
+				{RuleType: "TypeA"},
+			},
+			queryType:  "TypeA",
+			wantResult: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := containsAnomalyType(tt.anomalies, tt.queryType)
+			if got != tt.wantResult {
+				t.Errorf("containsAnomalyType() = %v, want %v", got, tt.wantResult)
+			}
+		})
+	}
 }
