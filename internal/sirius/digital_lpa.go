@@ -45,28 +45,28 @@ type Donor struct {
 }
 
 type LpaStoreData struct {
-	Donor                                       LpaStoreDonor               `json:"donor"`
-	Channel                                     string                      `json:"channel"`
-	Status                                      string                      `json:"status"`
-	Attorneys                                   []LpaStoreAttorney          `json:"attorneys"`
-	TrustCorporations                           []LpaStoreTrustCorporation  `json:"trustCorporations"`
-	CertificateProvider                         LpaStoreCertificateProvider `json:"certificateProvider"`
-	CertificateProviderNotRelatedConfirmedAt    string                      `json:"certificateProviderNotRelatedConfirmedAt"`
-	PeopleToNotify                              []LpaStorePersonToNotify    `json:"peopleToNotify"`
-	HowAttorneysMakeDecisions                   string                      `json:"howAttorneysMakeDecisions"`
-	HowAttorneysMakeDecisionsDetails            string                      `json:"howAttorneysMakeDecisionsDetails"`
-	WhenTheLpaCanBeUsed                         string                      `json:"whenTheLpaCanBeUsed"`
-	HowReplacementAttorneysMakeDecisions        string                      `json:"howReplacementAttorneysMakeDecisions"`
-	HowReplacementAttorneysMakeDecisionsDetails string                      `json:"howReplacementAttorneysMakeDecisionsDetails"`
-	HowReplacementAttorneysStepIn               string                      `json:"howReplacementAttorneysStepIn"`
-	HowReplacementAttorneysStepInDetails        string                      `json:"howReplacementAttorneysStepInDetails"`
-	LifeSustainingTreatmentOption               string                      `json:"lifeSustainingTreatmentOption"`
-	RestrictionsAndConditions                   string                      `json:"restrictionsAndConditions"`
-	RestrictionsAndConditionsImages             []LpaStoreImage             `json:"restrictionsAndConditionsImages"`
-	SignedAt                                    string                      `json:"signedAt"`
+	Donor                                       LpaStoreDonor                `json:"donor"`
+	Channel                                     string                       `json:"channel"`
+	Status                                      string                       `json:"status"`
+	Attorneys                                   []LpaStoreAttorney           `json:"attorneys"`
+	TrustCorporations                           []LpaStoreTrustCorporation   `json:"trustCorporations"`
+	CertificateProvider                         LpaStoreCertificateProvider  `json:"certificateProvider"`
+	CertificateProviderNotRelatedConfirmedAt    string                       `json:"certificateProviderNotRelatedConfirmedAt"`
+	PeopleToNotify                              []LpaStorePersonToNotify     `json:"peopleToNotify"`
+	HowAttorneysMakeDecisions                   string                       `json:"howAttorneysMakeDecisions"`
+	HowAttorneysMakeDecisionsDetails            string                       `json:"howAttorneysMakeDecisionsDetails"`
+	WhenTheLpaCanBeUsed                         string                       `json:"whenTheLpaCanBeUsed"`
+	HowReplacementAttorneysMakeDecisions        string                       `json:"howReplacementAttorneysMakeDecisions"`
+	HowReplacementAttorneysMakeDecisionsDetails string                       `json:"howReplacementAttorneysMakeDecisionsDetails"`
+	HowReplacementAttorneysStepIn               string                       `json:"howReplacementAttorneysStepIn"`
+	HowReplacementAttorneysStepInDetails        string                       `json:"howReplacementAttorneysStepInDetails"`
+	LifeSustainingTreatmentOption               string                       `json:"lifeSustainingTreatmentOption"`
+	RestrictionsAndConditions                   string                       `json:"restrictionsAndConditions"`
+	RestrictionsAndConditionsImages             []LpaStoreImage              `json:"restrictionsAndConditionsImages"`
+	SignedAt                                    string                       `json:"signedAt"`
 	AuthorisedSignatory                         *LpaStoreAuthorisedSignatory `json:"authorisedSignatory,omitempty"`
-	WitnessedByCertificateProviderAt            string                      `json:"witnessedByCertificateProviderAt"`
-	WitnessedByIndependentWitnessAt             string                      `json:"witnessedByIndependentWitnessAt"`
+	WitnessedByCertificateProviderAt            string                       `json:"witnessedByCertificateProviderAt"`
+	WitnessedByIndependentWitnessAt             string                       `json:"witnessedByIndependentWitnessAt"`
 	IndependentWitness                          *LpaStoreIndependentWitness  `json:"independentWitness,omitempty"`
 }
 
@@ -165,13 +165,15 @@ func (c *Client) DigitalLpa(ctx Context, uid string, presignImages bool) (Digita
 	return v, err
 }
 
-func (lpa *DigitalLpa) WasSignedOnBehalfOfDonor() bool {
-	return lpa.LpaStoreData.AuthorisedSignatory != nil &&
-		(lpa.LpaStoreData.AuthorisedSignatory.FirstNames != "" ||
-			lpa.LpaStoreData.AuthorisedSignatory.LastName != "")
+func (lpa DigitalLpa) WasSignedOnBehalfOfDonor() bool {
+	if lpa.LpaStoreData.AuthorisedSignatory == nil {
+		return false
+	}
+	return lpa.LpaStoreData.AuthorisedSignatory.FirstNames != "" ||
+		lpa.LpaStoreData.AuthorisedSignatory.LastName != ""
 }
 
-func (lpa *DigitalLpa) GetAuthorisedSignatoryFullName() string {
+func (lpa DigitalLpa) GetAuthorisedSignatoryFullName() string {
 	if lpa.LpaStoreData.AuthorisedSignatory == nil {
 		return ""
 	}
@@ -179,15 +181,15 @@ func (lpa *DigitalLpa) GetAuthorisedSignatoryFullName() string {
 		lpa.LpaStoreData.AuthorisedSignatory.LastName)
 }
 
-func (lpa *DigitalLpa) WasWitnessedByCertificateProvider() bool {
+func (lpa DigitalLpa) WasWitnessedByCertificateProvider() bool {
 	return lpa.LpaStoreData.WitnessedByCertificateProviderAt != ""
 }
 
-func (lpa *DigitalLpa) WasWitnessedByIndependentWitness() bool {
+func (lpa DigitalLpa) WasWitnessedByIndependentWitness() bool {
 	return lpa.LpaStoreData.WitnessedByIndependentWitnessAt != ""
 }
 
-func (lpa *DigitalLpa) GetIndependentWitnessFullName() string {
+func (lpa DigitalLpa) GetIndependentWitnessFullName() string {
 	if lpa.LpaStoreData.IndependentWitness == nil {
 		return ""
 	}
@@ -195,7 +197,7 @@ func (lpa *DigitalLpa) GetIndependentWitnessFullName() string {
 		lpa.LpaStoreData.IndependentWitness.LastName)
 }
 
-func (lpa *DigitalLpa) GetIndependentWitnessAddress() LpaStoreAddress {
+func (lpa DigitalLpa) GetIndependentWitnessAddress() LpaStoreAddress {
 	if lpa.LpaStoreData.IndependentWitness == nil {
 		return LpaStoreAddress{}
 	}
