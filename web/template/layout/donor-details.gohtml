@@ -1,11 +1,15 @@
 {{ define "donor-details" }}
+    {{ $anomaliesForSection := .AnomalyDisplay.GetAnomaliesForSection "donor" }}
+    {{ $donorUID := .CaseSummary.DigitalLpa.LpaStoreData.Donor.Uid  }}
+    {{ $donorAnomalies := $anomaliesForSection.GetAnomaliesForObject $donorUID }}
     <!-- donor -->
     <div class="govuk-accordion__section">
 
-        <div class="govuk-accordion__section-header">
+        <div class="govuk-accordion__section-header {{ if $anomaliesForSection.HasAnomalies }} govuk-form-group--error{{ end }}">
             <h2 class="govuk-accordion__section-heading">
               <span class="govuk-accordion__section-button" id="accordion-default-heading-1">
                 Donor
+                {{ if $anomaliesForSection.HasAnomalies }}<span class="govuk-error-message">For review</span>{{ end }}
               </span>
             </h2>
         </div>
@@ -52,12 +56,16 @@
                         </dd>
                     </div>
 
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Address</dt>
-                        <dd class="govuk-summary-list__value">
-                            {{ template "mlpa-address" .DigitalLpa.LpaStoreData.Donor.Address }}
-                        </dd>
-                    </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Address</dt>
+                    {{ $addressFieldAnomalies := $donorAnomalies.GetAnomaliesForFieldWithStatus "address" "detected" }}
+                    <dd class="govuk-summary-list__value{{ if gt (len $addressFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                        {{ template "mlpa-address" .DigitalLpa.LpaStoreData.Donor.Address }}
+                        {{ if gt (len $addressFieldAnomalies) 0 }}
+                            <br><span class="govuk-error-message">{{ $donorAnomalies.GetHintTextForAnomalyField $addressFieldAnomalies }}</span>
+                        {{ end }}
+                    </dd>
+                </div>
 
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">Email</dt>
