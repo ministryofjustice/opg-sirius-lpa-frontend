@@ -215,7 +215,11 @@ const progressIndicators = {
       "RESTRICTIONS_AND_CONDITIONS",
     ];
 
-    let allProgressIndicators = progressIndicators;
+    let allProgressIndicators = [];
+
+    if (progressIndicators !== undefined && Array.isArray(progressIndicators)) {
+      allProgressIndicators = progressIndicators;
+    }
 
     progressIndicatorTypes.forEach((progressIndicatorType) => {
       const exists = allProgressIndicators.find(
