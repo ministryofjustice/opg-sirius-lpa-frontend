@@ -21,15 +21,16 @@
                     </dd>
                 </div>
 
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">First names</dt>
-                    <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.Donor.FirstNames }}</dd>
-                </div>
+                {{ if .DigitalLpa.LpaStoreData.Donor }}
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">First names</dt>
+                        <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.Donor.FirstNames }}</dd>
+                    </div>
 
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Last name</dt>
-                    <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.Donor.LastName }}</dd>
-                </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Last name</dt>
+                        <dd class="govuk-summary-list__value">{{ .DigitalLpa.LpaStoreData.Donor.LastName }}</dd>
+                    </div>
 
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Otherwise known as</dt>
@@ -42,32 +43,33 @@
                     </dd>
                 </div>
 
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Date of birth</dt>
-                    <dd class="govuk-summary-list__value">
-                        {{ if not (eq .DigitalLpa.LpaStoreData.Donor.DateOfBirth "") }}
-                            {{ parseAndFormatDate .DigitalLpa.LpaStoreData.Donor.DateOfBirth "2006-01-02" "2 January 2006" }}
-                        {{ end }}
-                    </dd>
-                </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Date of birth</dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ if not (eq .DigitalLpa.LpaStoreData.Donor.DateOfBirth "") }}
+                                {{ parseAndFormatDate .DigitalLpa.LpaStoreData.Donor.DateOfBirth "2006-01-02" "2 January 2006" }}
+                            {{ end }}
+                        </dd>
+                    </div>
 
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Address</dt>
-                    <dd class="govuk-summary-list__value">
-                        {{ template "mlpa-address" .DigitalLpa.LpaStoreData.Donor.Address }}
-                    </dd>
-                </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Address</dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ template "mlpa-address" .DigitalLpa.LpaStoreData.Donor.Address }}
+                        </dd>
+                    </div>
 
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">Email</dt>
-                    <dd class="govuk-summary-list__value">
-                        {{ if (eq .DigitalLpa.LpaStoreData.Donor.Email "") }}
-                            Not provided
-                        {{ else }}
-                            {{ .DigitalLpa.LpaStoreData.Donor.Email }}
-                        {{ end }}
-                    </dd>
-                </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Email</dt>
+                        <dd class="govuk-summary-list__value">
+                            {{ if (eq .DigitalLpa.LpaStoreData.Donor.Email "") }}
+                                Not provided
+                            {{ else }}
+                                {{ .DigitalLpa.LpaStoreData.Donor.Email }}
+                            {{ end }}
+                        </dd>
+                    </div>
+                {{ end }}
 
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Phone</dt>
@@ -84,14 +86,14 @@
                     <dt class="govuk-summary-list__key">Format</dt>
                     <dd class="govuk-summary-list__value">
                         {{ channelForFormat .DigitalLpa.LpaStoreData.Channel }}
-                        {{ if not (eq .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference "") }}
+                        {{ if and .DigitalLpa.LpaStoreData.Donor (not (eq .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference "")) }}
                             <br>{{ languageForFormat .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference }}
                         {{ end }}
                     </dd>
                 </div>
 
-                <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
-                    <dt class="govuk-summary-list__key">Signed on</dt>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">LPA signed on</dt>
                     <dd class="govuk-summary-list__value">
                         {{ if (eq .DigitalLpa.LpaStoreData.SignedAt "") }}
                             Not provided
@@ -102,7 +104,7 @@
                 </div>
 
                 {{ if and .DigitalLpa.LpaStoreData.AuthorisedSignatory .DigitalLpa.WasSignedOnBehalfOfDonor }}
-                    <div class="govuk-summary-list__row">
+                    <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
                         <dt class="govuk-summary-list__key">LPA signed on behalf of the donor by</dt>
                         <dd class="govuk-summary-list__value">
                             {{ .DigitalLpa.GetAuthorisedSignatoryFullName }}
@@ -126,22 +128,20 @@
                                                     <dt class="govuk-summary-list__key">Signed by witness 2</dt>
                                                     <dd class="govuk-summary-list__value">Yes</dd>
                                                 </div>
-                                                {{ if .DigitalLpa.IndependentWitness }}
-                                                    {{ if not (eq .DigitalLpa.GetIndependentWitnessFullName "") }}
-                                                        <div class="govuk-summary-list__row">
-                                                            <dt class="govuk-summary-list__key">Witness 2 name</dt>
-                                                            <dd class="govuk-summary-list__value">{{ .DigitalLpa.GetIndependentWitnessFullName }}</dd>
-                                                        </div>
-                                                    {{ end }}
-                                                    {{ $witnessAddress := .DigitalLpa.GetIndependentWitnessAddress }}
-                                                    {{ if or (not (eq $witnessAddress.Line1 "")) (not (eq $witnessAddress.Town "")) }}
-                                                        <div class="govuk-summary-list__row">
-                                                            <dt class="govuk-summary-list__key">Witness 2 address</dt>
-                                                            <dd class="govuk-summary-list__value">
-                                                                {{ template "mlpa-address" $witnessAddress }}
-                                                            </dd>
-                                                        </div>
-                                                    {{ end }}
+                                                {{ if not (eq .DigitalLpa.GetIndependentWitnessFullName "") }}
+                                                    <div class="govuk-summary-list__row">
+                                                        <dt class="govuk-summary-list__key">Witness 2 name</dt>
+                                                        <dd class="govuk-summary-list__value">{{ .DigitalLpa.GetIndependentWitnessFullName }}</dd>
+                                                    </div>
+                                                {{ end }}
+                                                {{ $witnessAddress := .DigitalLpa.GetIndependentWitnessAddress }}
+                                                {{ if or (not (eq $witnessAddress.Line1 "")) (not (eq $witnessAddress.Town "")) }}
+                                                    <div class="govuk-summary-list__row">
+                                                        <dt class="govuk-summary-list__key">Witness 2 address</dt>
+                                                        <dd class="govuk-summary-list__value">
+                                                            {{ template "mlpa-address" $witnessAddress }}
+                                                        </dd>
+                                                    </div>
                                                 {{ end }}
                                             {{ end }}
                                         </dl>
