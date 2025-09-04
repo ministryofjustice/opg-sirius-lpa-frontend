@@ -13,15 +13,18 @@ type ChangeDonorDetailsClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
 	ChangeDonorDetails(sirius.Context, string, sirius.ChangeDonorDetails) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
+	ProgressIndicatorsForDigitalLpa(siriusCtx sirius.Context, uid string) ([]sirius.ProgressIndicator, error)
 }
 
 type changeDonorDetailsData struct {
-	XSRFToken string
-	Countries []sirius.RefDataItem
-	Success   bool
-	Error     sirius.ValidationError
-	CaseUID   string
-	Form      formDonorDetails
+	XSRFToken                  string
+	Countries                  []sirius.RefDataItem
+	Success                    bool
+	Error                      sirius.ValidationError
+	CaseUID                    string
+	Form                       formDonorDetails
+	DonorIdentityCheckComplete bool
+	DonorDobString             string
 }
 
 type formDonorDetails struct {
@@ -62,7 +65,6 @@ func parseDateTime(dateTimeString string) (dob, error) {
 }
 
 func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template) Handler {
-
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseUID := r.FormValue("uid")
 
@@ -82,6 +84,20 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 		signedAt, err := parseDateTime(lpaStore.SignedAt)
 		if err != nil {
 			return err
+		}
+
+		donorIdentityCheckComplete := false
+		donorDobString := lpaStore.Donor.DateOfBirth
+
+		pis, err := client.ProgressIndicatorsForDigitalLpa(ctx, caseUID)
+		if err != nil {
+			return err
+		}
+
+		for _, pi := range pis {
+			if pi.Indicator == "DONOR_ID" && pi.Status == "COMPLETE" {
+				donorIdentityCheckComplete = true
+			}
 		}
 
 		data := changeDonorDetailsData{
@@ -104,6 +120,8 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 				PhoneNumber: cs.DigitalLpa.SiriusData.Application.PhoneNumber,
 				LpaSignedOn: signedAt,
 			},
+			DonorIdentityCheckComplete: donorIdentityCheckComplete,
+			DonorDobString:             donorDobString,
 		}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
@@ -132,11 +150,14 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 				FirstNames:        data.Form.FirstNames,
 				LastName:          data.Form.LastName,
 				OtherNamesKnownBy: data.Form.OtherNamesKnownBy,
-				DateOfBirth:       data.Form.DateOfBirth.toDateString(),
 				Address:           data.Form.Address,
 				Phone:             data.Form.PhoneNumber,
 				Email:             data.Form.Email,
 				LpaSignedOn:       data.Form.LpaSignedOn.toDateString(),
+			}
+
+			if !donorIdentityCheckComplete {
+				donorDetailsData.DateOfBirth = data.Form.DateOfBirth.toDateString()
 			}
 
 			err = client.ChangeDonorDetails(ctx, caseUID, donorDetailsData)
