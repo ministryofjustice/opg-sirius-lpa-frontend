@@ -107,10 +107,12 @@ describe("Change donor details form", () => {
       cases.warnings.empty("2222"),
       cases.tasks.empty("2222"),
       digitalLpas.objections.empty("M-0000-0000-0002"),
-      digitalLpas.progressIndicators.defaultCannotStart("M-0000-0000-0002", [{
-        "indicator": "DONOR_ID",
-        "status": "COMPLETE"
-      }]),
+      digitalLpas.progressIndicators.defaultCannotStart("M-0000-0000-0002", [
+        {
+          indicator: "DONOR_ID",
+          status: "COMPLETE",
+        },
+      ]),
     ]);
 
     cy.wrap(mocks);
@@ -223,6 +225,8 @@ describe("Change donor details form", () => {
   it("will show message for case with donor ID check", () => {
     cy.visit("/change-donor-details?uid=M-0000-0000-0002");
 
-    cy.contains("Because this date of birth was used for the donor's ID check, it cannot be updated.");
+    cy.contains(
+      "Because this date of birth was used for the donor's ID check, it cannot be updated.",
+    );
   });
 });
