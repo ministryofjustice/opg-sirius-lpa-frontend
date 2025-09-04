@@ -76,7 +76,7 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 
 		var donorRecipient sirius.Person
 
-		if lpa.SiriusData.Status == "Draft" {
+		if lpa.SiriusData.Status.IsDraft() {
 			donorRecipient = sirius.Person{
 				ID:           placeholderRecipientId,
 				Firstname:    lpa.SiriusData.Donor.Firstname,
