@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -34,12 +33,12 @@ func (m *mockChangeStatusClient) AvailableStatuses(ctx sirius.Context, caseID in
 func TestGetChangeStatus(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseItem := sirius.Case{CaseType: caseType, UID: "700700"}
+			caseitem := sirius.Case{CaseType: caseType, UID: "700700"}
 
 			client := &mockChangeStatusClient{}
 			client.
 				On("Case", mock.Anything, 123).
-				Return(caseItem, nil)
+				Return(caseitem, nil)
 
 			client.
 				On("AvailableStatuses", mock.Anything, 123, sirius.CaseType(caseType)).
@@ -86,12 +85,12 @@ func TestGetChangeStatusNoID(t *testing.T) {
 }
 
 func TestGetChangeStatusWhenCaseErrors(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "PFA", UID: "700700"}
+	caseitem := sirius.Case{CaseType: "PFA", UID: "700700"}
 
 	client := &mockChangeStatusClient{}
 	client.
 		On("Case", mock.Anything, 123).
-		Return(caseItem, errExample)
+		Return(caseitem, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
@@ -103,12 +102,12 @@ func TestGetChangeStatusWhenCaseErrors(t *testing.T) {
 }
 
 func TestGetChangeStatusWhenAvailableStatusesErrors(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "PFA", UID: "700700"}
+	caseitem := sirius.Case{CaseType: "PFA", UID: "700700"}
 
 	client := &mockChangeStatusClient{}
 	client.
 		On("Case", mock.Anything, 123).
-		Return(caseItem, nil)
+		Return(caseitem, nil)
 
 	client.
 		On("AvailableStatuses", mock.Anything, 123, sirius.CaseTypeLpa).
@@ -124,12 +123,12 @@ func TestGetChangeStatusWhenAvailableStatusesErrors(t *testing.T) {
 }
 
 func TestGetChangeStatusWhenTemplateErrors(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "PFA", UID: "700700"}
+	caseitem := sirius.Case{CaseType: "PFA", UID: "700700"}
 
 	client := &mockChangeStatusClient{}
 	client.
 		On("Case", mock.Anything, 123).
-		Return(caseItem, nil)
+		Return(caseitem, nil)
 
 	client.
 		On("AvailableStatuses", mock.Anything, 123, sirius.CaseTypeLpa).
@@ -155,18 +154,18 @@ func TestGetChangeStatusWhenTemplateErrors(t *testing.T) {
 func TestPostChangeStatus(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseItem := sirius.Case{CaseType: caseType, UID: "700700"}
+			caseitem := sirius.Case{CaseType: caseType, UID: "700700"}
 
 			client := &mockChangeStatusClient{}
 			client.
 				On("EditCase", mock.Anything, 123, sirius.CaseType(caseType), sirius.Case{
-					Status: shared.CaseStatusTypeWithdrawn,
+					Status: "Withdrawn",
 				}).
 				Return(nil)
 
 			client.
 				On("Case", mock.Anything, 123).
-				Return(caseItem, nil)
+				Return(caseitem, nil)
 
 			client.
 				On("AvailableStatuses", mock.Anything, 123, sirius.CaseType(caseType)).
@@ -201,18 +200,18 @@ func TestPostChangeStatus(t *testing.T) {
 }
 
 func TestPostChangeStatusWhenChangeStatusErrors(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "lpa", UID: "700700"}
+	caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
 
 	client := &mockChangeStatusClient{}
 	client.
 		On("EditCase", mock.Anything, 123, sirius.CaseTypeLpa, sirius.Case{
-			Status: shared.CaseStatusTypeWithdrawn,
+			Status: "Withdrawn",
 		}).
 		Return(errExample)
 
 	client.
 		On("Case", mock.Anything, 123).
-		Return(caseItem, nil)
+		Return(caseitem, nil)
 
 	client.
 		On("AvailableStatuses", mock.Anything, 123, sirius.CaseTypeLpa).

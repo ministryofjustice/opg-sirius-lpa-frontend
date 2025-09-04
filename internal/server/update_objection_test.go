@@ -1,15 +1,13 @@
 package server
 
 import (
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
-
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 type mockUpdateObjectionClient struct {
@@ -38,17 +36,17 @@ var testUpdateObjectionsCaseSummary = sirius.CaseSummary{
 			ID:      676,
 			UID:     "M-7777-8888-9999",
 			Subtype: "personal-welfare",
-			Status:  shared.CaseStatusTypeDraft,
+			Status:  "Draft",
 			LinkedCases: []sirius.SiriusData{
 				{
 					UID:     "M-9999-9999-9999",
 					Subtype: "personal-welfare",
-					Status:  shared.CaseStatusTypeInProgress,
+					Status:  "In progress",
 				},
 				{
 					UID:     "M-8888-8888-8888",
 					Subtype: "personal-welfare",
-					Status:  shared.CaseStatusTypeRegistered,
+					Status:  "Registered",
 				},
 			},
 		},
@@ -122,24 +120,24 @@ func TestGetUpdateObjectionsTemplate(t *testing.T) {
 							UID:     "M-7777-8888-9999",
 							ID:      676,
 							Subtype: "personal-welfare",
-							Status:  shared.CaseStatusTypeDraft,
+							Status:  "Draft",
 							LinkedCases: []sirius.SiriusData{
 								{
 									UID:     "M-9999-9999-9999",
 									Subtype: "personal-welfare",
-									Status:  shared.CaseStatusTypeInProgress,
+									Status:  "In progress",
 								},
 								{
 									UID:     "M-8888-8888-8888",
 									Subtype: "personal-welfare",
-									Status:  shared.CaseStatusTypeRegistered,
+									Status:  "Registered",
 								},
 							},
 						},
 						{
 							UID:     "M-9999-9999-9999",
 							Subtype: "personal-welfare",
-							Status:  shared.CaseStatusTypeInProgress,
+							Status:  "In progress",
 						},
 					},
 				}).
