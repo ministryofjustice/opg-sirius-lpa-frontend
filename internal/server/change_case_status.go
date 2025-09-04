@@ -2,11 +2,14 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/templatefn"
 	"golang.org/x/sync/errgroup"
-	"net/http"
 )
 
 type ChangeCaseStatusClient interface {
@@ -17,7 +20,7 @@ type ChangeCaseStatusClient interface {
 
 type statusItem struct {
 	Value           string
-	Label           string
+	Label           shared.CaseStatus
 	ConditionalItem bool
 }
 
@@ -70,8 +73,8 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 
 		status := "draft"
 
-		if cs.DigitalLpa.LpaStoreData.Status != "" {
-			status = cs.DigitalLpa.LpaStoreData.Status
+		if cs.DigitalLpa.LpaStoreData.Status.String() != "" {
+			status = cs.DigitalLpa.LpaStoreData.Status.String()
 		}
 
 		data := changeCaseStatusData{
@@ -79,23 +82,23 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 			Error:                   sirius.ValidationError{Field: sirius.FieldErrors{}},
 			Entity:                  fmt.Sprintf("%s %s", cs.DigitalLpa.SiriusData.Subtype, caseUID),
 			CaseUID:                 caseUID,
-			OldStatus:               status,
+			OldStatus:               strings.ToLower(status),
 			NewStatus:               postFormString(r, "status"),
 			StatusChangeReason:      postFormString(r, "statusReason"),
 			CaseStatusChangeReasons: caseStatusChangeReasons,
 		}
 
 		data.StatusItems = []statusItem{
-			{Value: "draft", Label: "Draft", ConditionalItem: false},
-			{Value: "in-progress", Label: "In progress", ConditionalItem: false},
-			{Value: "statutory-waiting-period", Label: "Statutory waiting period", ConditionalItem: false},
-			{Value: "registered", Label: "Registered", ConditionalItem: false},
-			{Value: "suspended", Label: "Suspended", ConditionalItem: false},
-			{Value: "do-not-register", Label: "Do not register", ConditionalItem: false},
-			{Value: "expired", Label: "Expired", ConditionalItem: false},
-			{Value: "cannot-register", Label: "Cannot register", ConditionalItem: true},
-			{Value: "cancelled", Label: "Cancelled", ConditionalItem: true},
-			{Value: "de-registered", Label: "De-registered", ConditionalItem: false},
+			{Value: "draft", Label: shared.CaseStatusTypeDraft, ConditionalItem: false},
+			{Value: "in-progress", Label: shared.CaseStatusTypeInProgress, ConditionalItem: false},
+			{Value: "statutory-waiting-period", Label: shared.CaseStatusTypeStatutoryWaitingPeriod, ConditionalItem: false},
+			{Value: "registered", Label: shared.CaseStatusTypeRegistered, ConditionalItem: false},
+			{Value: "suspended", Label: shared.CaseStatusTypeSuspended, ConditionalItem: false},
+			{Value: "do-not-register", Label: shared.CaseStatusTypeDoNotRegister, ConditionalItem: false},
+			{Value: "expired", Label: shared.CaseStatusTypeExpired, ConditionalItem: false},
+			{Value: "cannot-register", Label: shared.CaseStatusTypeCannotRegister, ConditionalItem: true},
+			{Value: "cancelled", Label: shared.CaseStatusTypeCancelled, ConditionalItem: true},
+			{Value: "de-registered", Label: shared.CaseStatusTypeDeRegistered, ConditionalItem: false},
 		}
 
 		if r.Method == http.MethodPost {
