@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
@@ -75,7 +74,7 @@ func TestEditCase(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				err := client.EditCase(Context{Context: context.Background()}, 800, tc.caseType, Case{Status: shared.CaseStatusTypeCancelled})
+				err := client.EditCase(Context{Context: context.Background()}, 800, tc.caseType, Case{Status: "Cancelled"})
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)

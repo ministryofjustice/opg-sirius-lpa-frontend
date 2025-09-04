@@ -2,14 +2,12 @@ package server
 
 import (
 	"errors"
+	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strconv"
-
-	"github.com/ministryofjustice/opg-go-common/template"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
 type SearchClient interface {
@@ -94,9 +92,6 @@ func Search(client SearchClient, tmpl template.Template) Handler {
 
 			if isUid {
 				data.DeletedCases, err = client.DeletedCases(ctx, input)
-				for i := range data.DeletedCases {
-					data.DeletedCases[i].DeletedStatus = shared.CaseStatusTypeDeleted
-				}
 				if err != nil {
 					return err
 				}

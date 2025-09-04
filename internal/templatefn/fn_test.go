@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 )
@@ -447,7 +446,7 @@ func TestCaseTab(t *testing.T) {
 				Subtype:     "subType",
 			},
 			LpaStoreData: sirius.LpaStoreData{
-				Status: shared.CaseStatusTypeDraft,
+				Status: "draft",
 			},
 		},
 	}
@@ -458,7 +457,7 @@ func TestCaseTab(t *testing.T) {
 			{
 				UID:         "454654",
 				Subtype:     "subType",
-				Status:      shared.CaseStatusTypeDraft,
+				Status:      "Draft",
 				CreatedDate: "2010-01-01",
 			},
 		},
@@ -666,6 +665,25 @@ func TestContains(t *testing.T) {
 
 	val = fn([]string{"a", "b", "c"}, "d")
 	assert.Equal(t, false, val)
+}
+
+func TestStatusColour(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["statusColour"].(func(string) string)
+
+	var val string
+
+	val = fn("RegIStered")
+	assert.Equal(t, "green", val)
+
+	val = fn("IN PROGRESS")
+	assert.Equal(t, "light-blue", val)
+
+	val = fn("return - unpaid")
+	assert.Equal(t, "red", val)
+
+	val = fn("not in list")
+	assert.Equal(t, "grey", val)
 }
 
 func TestStatusLabel(t *testing.T) {
