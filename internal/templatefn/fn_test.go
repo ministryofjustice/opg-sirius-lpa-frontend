@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 )
@@ -446,7 +447,7 @@ func TestCaseTab(t *testing.T) {
 				Subtype:     "subType",
 			},
 			LpaStoreData: sirius.LpaStoreData{
-				Status: "draft",
+				Status: shared.CaseStatusTypeDraft,
 			},
 		},
 	}
@@ -457,7 +458,7 @@ func TestCaseTab(t *testing.T) {
 			{
 				UID:         "454654",
 				Subtype:     "subType",
-				Status:      "Draft",
+				Status:      shared.CaseStatusTypeDraft,
 				CreatedDate: "2010-01-01",
 			},
 		},
