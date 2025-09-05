@@ -2,28 +2,30 @@ package sirius
 
 import (
 	"fmt"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 )
 
 type Case struct {
-	ID                int        `json:"id,omitempty"`
-	UID               string     `json:"uId,omitempty"`
-	Status            string     `json:"status"`
-	CaseType          string     `json:"caseType,omitempty"`
-	SubType           string     `json:"caseSubtype,omitempty"`
-	CancellationDate  DateString `json:"cancellationDate,omitempty"`
-	DispatchDate      DateString `json:"dispatchDate,omitempty"`
-	DueDate           DateString `json:"dueDate,omitempty"`
-	InvalidDate       DateString `json:"invalidDate,omitempty"`
-	PaymentDate       DateString `json:"paymentDate,omitempty"`
-	ReceiptDate       DateString `json:"receiptDate,omitempty"`
-	RegistrationDate  DateString `json:"registrationDate,omitempty"`
-	RejectedDate      DateString `json:"rejectedDate,omitempty"`
-	RevokedDate       DateString `json:"revokedDate,omitempty"`
-	WithdrawnDate     DateString `json:"withdrawnDate,omitempty"`
-	Donor             *Person    `json:"donor,omitempty"`
-	TrustCorporations []Person   `json:"trustCorporations,omitempty"`
-	Attorneys         []Person   `json:"attorneys,omitempty"`
-	Correspondent     *Person    `json:"correspondent,omitempty"`
+	ID                int               `json:"id,omitempty"`
+	UID               string            `json:"uId,omitempty"`
+	Status            shared.CaseStatus `json:"status"`
+	CaseType          string            `json:"caseType,omitempty"`
+	SubType           string            `json:"caseSubtype,omitempty"`
+	CancellationDate  DateString        `json:"cancellationDate,omitempty"`
+	DispatchDate      DateString        `json:"dispatchDate,omitempty"`
+	DueDate           DateString        `json:"dueDate,omitempty"`
+	InvalidDate       DateString        `json:"invalidDate,omitempty"`
+	PaymentDate       DateString        `json:"paymentDate,omitempty"`
+	ReceiptDate       DateString        `json:"receiptDate,omitempty"`
+	RegistrationDate  DateString        `json:"registrationDate,omitempty"`
+	RejectedDate      DateString        `json:"rejectedDate,omitempty"`
+	RevokedDate       DateString        `json:"revokedDate,omitempty"`
+	WithdrawnDate     DateString        `json:"withdrawnDate,omitempty"`
+	Donor             *Person           `json:"donor,omitempty"`
+	TrustCorporations []Person          `json:"trustCorporations,omitempty"`
+	Attorneys         []Person          `json:"attorneys,omitempty"`
+	Correspondent     *Person           `json:"correspondent,omitempty"`
 }
 
 func (c Case) Summary() string {
