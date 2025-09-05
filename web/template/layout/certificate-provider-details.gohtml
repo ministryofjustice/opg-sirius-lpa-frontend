@@ -52,7 +52,7 @@
                 <dd class="govuk-summary-list__value">
                     {{ .DigitalLpa.LpaStoreData.CertificateProvider.LastName }}
                     {{ if gt (len $cpFieldAnomalies) 0 }}
-                        {{ $lastNameAnomalies := $cpAnomalies.GetHintTextForAnomalyField $cpFieldAnomalies }}
+                        {{ $lastNameAnomalies := $cpAnomalies.GetHintTextForAnomalyField $cpFieldAnomalies ""}}
                         {{ template "information-warning" $lastNameAnomalies }}
                     {{ end }}
                 </dd>
@@ -64,7 +64,9 @@
                 <dd class="govuk-summary-list__value">
                     {{ template "mlpa-address" .DigitalLpa.LpaStoreData.CertificateProvider.Address }}
                     {{ if gt (len $addressFieldAnomalies) 0 }}
-                        {{ template "information-warning" "Review certificate provider's address" }}
+                        {{ $addressAnomalie := $cpAnomalies.GetHintTextForAnomalyField $addressFieldAnomalies "certificate provider's"}}
+                        {{ template "information-warning" $addressAnomalie }}
+{{/*                        {{ template "information-warning" "Review certificate provider's address" }}*/}}
                     {{ end }}
                 </dd>
             </div>

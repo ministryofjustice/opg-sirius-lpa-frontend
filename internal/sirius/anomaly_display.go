@@ -139,10 +139,11 @@ const (
 	LastNameMatchesAttorney AnomalyRuleType = "last-name-matches-attorney"
 	LastNameMatchesDonor    AnomalyRuleType = "last-name-matches-donor"
 	NoCountry               AnomalyRuleType = "no-country"
+	InvalidAddress          AnomalyRuleType = "Invalid address"
 )
 
 // For CP lastName
-func (afo *AnomaliesForObject) GetHintTextForAnomalyField(anomalies []Anomaly) string {
+func (afo *AnomaliesForObject) GetHintTextForAnomalyField(anomalies []Anomaly, whoHasTheAnomaly string) string {
 	if containsAnomalyType(anomalies, LastNameMatchesDonor) && containsAnomalyType(anomalies, LastNameMatchesAttorney) {
 		return "Review last name - this matches the donor and at least one of the attorneys. Check certificate provider's eligibility"
 	}
@@ -157,6 +158,8 @@ func (afo *AnomaliesForObject) GetHintTextForAnomalyField(anomalies []Anomaly) s
 			return "Review last name - this matches the donor's. Check certificate provider's eligibility"
 		case NoCountry:
 			return "Review address as there is no country"
+		case InvalidAddress:
+			return "Review " + whoHasTheAnomaly + " address"
 		}
 	}
 

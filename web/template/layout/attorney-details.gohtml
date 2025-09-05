@@ -74,7 +74,8 @@
                         {{ $attorneyFieldAnomalies = $attorneyAnomalies.GetAnomaliesForFieldWithStatus "address" "detected" }}
                         <dd class="govuk-summary-list__value">
                             {{ if gt (len $attorneyFieldAnomalies) 0 }}
-                                {{ template "information-warning" "Review attorney's address" }}
+                                {{ $addressAnomalie := $attorneyAnomalies.GetHintTextForAnomalyField $attorneyFieldAnomalies "attorney's"}}
+                                {{ template "information-warning" $addressAnomalie }}
                             {{ end }}
                             {{ template "mlpa-address" $attorney.Address }}
                         </dd>
