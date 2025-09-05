@@ -1,144 +1,193 @@
 import * as cases from "../mocks/cases";
 import * as digitalLpas from "../mocks/digitalLpas";
 
+// helper function to create mock data for digital LPA - allows overriding of sirius and lpaStore data
+// to allow testing of different scenarios without having to create a new mock file for each one
+function createDigitalLpaM3333MockData(
+  lpaStoreOverrides = {},
+  siriusOverrides = {},
+) {
+  return {
+    uId: "M-DIGI-LPA3-3333",
+    "opg.poas.sirius": {
+      id: 333,
+      uId: "M-DIGI-LPA3-3333",
+      status: "Draft",
+      caseSubtype: "property-and-affairs",
+      createdDate: "31/10/2023",
+      investigationCount: 2,
+      complaintCount: 1,
+      taskCount: 2,
+      warningCount: 4,
+      dueDate: "01/12/2023",
+      donor: {
+        id: 33,
+      },
+      application: {
+        donorFirstNames: "Agnes",
+        donorLastName: "Hartley",
+        donorDob: "27/05/1998",
+        donorEmail: "agnes@host.example",
+        donorPhone: "073656249524",
+        donorAddress: {
+          addressLine1: "Apartment 3",
+          addressLine2: "Gherkin Building",
+          addressLine3: "33 London Road",
+          country: "GB",
+          postcode: "B15 3AA",
+          town: "Birmingham",
+        },
+        correspondentFirstNames: "Kendrick",
+        correspondentLastName: "Lamar",
+        correspondentAddress: {
+          addressLine1: "Flat 3",
+          addressLine2: "Digital LPA Lane",
+          addressLine3: "Somewhere",
+          country: "GB",
+          postcode: "SW1 1AA",
+          town: "London",
+        },
+      },
+      linkedDigitalLpas: [
+        {
+          uId: "M-DIGI-LPA3-3334",
+          caseSubtype: "personal-welfare",
+          status: "Draft",
+          createdDate: "01/11/2023",
+        },
+        {
+          uId: "M-DIGI-LPA3-3335",
+          caseSubtype: "personal-welfare",
+          status: "Registered",
+          createdDate: "02/11/2023",
+        },
+      ],
+      ...siriusOverrides,
+    },
+    "opg.poas.lpastore": {
+      donor: {
+        uid: "donor-uid-333",
+        firstNames: "Agnes",
+        lastName: "Hartley",
+        dateOfBirth: "1998-05-27",
+        otherNamesKnownBy: "",
+        address: {
+          line1: "Apartment 3",
+          line2: "Gherkin Building",
+          line3: "33 London Road",
+          town: "Birmingham",
+          postcode: "B15 3AA",
+          country: "GB",
+        },
+        email: "agnes@host.example",
+        contactLanguagePreference: "en",
+      },
+      attorneys: [
+        {
+          firstNames: "Esther",
+          lastName: "Greenwood",
+          status: "active",
+          appointmentType: "original",
+          cannotMakeJointDecisions: true,
+        },
+        {
+          firstNames: "Volo",
+          lastName: "McSpolo",
+          status: "active",
+          appointmentType: "original",
+          signedAt: "2022-12-20T12:02:43Z",
+        },
+        {
+          firstNames: "Susanna",
+          lastName: "Kaysen",
+          status: "removed",
+          appointmentType: "original",
+        },
+        {
+          firstNames: "Philomena",
+          lastName: "Guinea",
+          status: "inactive",
+          appointmentType: "replacement",
+        },
+        {
+          firstNames: "Rico",
+          lastName: "Welch",
+          status: "inactive",
+          appointmentType: "replacement",
+          signedAt: "2022-12-19T09:12:59Z",
+        },
+        {
+          firstNames: "Anne",
+          lastName: "Rice",
+          status: "active",
+          appointmentType: "replacement",
+          signedAt: "2022-12-19T07:18:59Z",
+          cannotMakeJointDecisions: true,
+        },
+      ],
+      trustCorporations: [
+        {
+          Name: "Trust Me Ltd.",
+          CompanyNumber: "123456789",
+          status: "active",
+          appointmentType: "original",
+        },
+        {
+          Name: "Trust Me Again Ltd.",
+          CompanyNumber: "987654321",
+          status: "inactive",
+          appointmentType: "replacement",
+        },
+      ],
+      certificateProvider: {
+        uid: "e4d5e24e-2a8d-434e-b815-9898620acc71",
+        firstNames: "Timothy",
+        lastName: "Turner",
+        signedAt: "2022-12-18T11:46:24Z",
+      },
+      lpaType: "pf",
+      channel: "online",
+      status: "draft",
+      registrationDate: "2022-12-18",
+      peopleToNotify: [],
+      restrictionsAndConditions: "Do not do this",
+      lifeSustainingTreatmentOption: "option-a",
+      howAttorneysMakeDecisions: "jointly-for-some-severally-for-others",
+      howAttorneysMakeDecisionsDetails:
+        "My attorneys must act jointly to decide whether...",
+      howReplacementAttorneysMakeDecisions:
+        "jointly-for-some-severally-for-others",
+      signedAt: "2022-12-15T09:00:00Z",
+      authorisedSignatory: {
+        firstNames: "John",
+        lastName: "Signatory",
+        signedAt: "2022-12-15T10:30:00Z",
+      },
+      witnessedByCertificateProviderAt: "2022-12-15T11:00:00Z",
+      witnessedByIndependentWitnessAt: "2022-12-15T11:30:00Z",
+      independentWitness: {
+        firstNames: "Jane",
+        lastName: "Witness",
+        address: {
+          line1: "123 Witness Street",
+          line2: "",
+          line3: "",
+          town: "London",
+          postcode: "SW1A 1AA",
+          country: "GB",
+        },
+        email: "jane.witness@example.com",
+      },
+      ...lpaStoreOverrides,
+    },
+  };
+}
+
 describe("View a digital LPA", () => {
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333", "GET", {
       status: 200,
-      body: {
-        uId: "M-DIGI-LPA3-3333",
-        "opg.poas.sirius": {
-          id: 333,
-          uId: "M-DIGI-LPA3-3333",
-          status: "Draft",
-          caseSubtype: "property-and-affairs",
-          createdDate: "31/10/2023",
-          investigationCount: 2,
-          complaintCount: 1,
-          taskCount: 2,
-          warningCount: 4,
-          dueDate: "01/12/2023",
-          donor: {
-            id: 33,
-          },
-          application: {
-            donorFirstNames: "Agnes",
-            donorLastName: "Hartley",
-            donorDob: "27/05/1998",
-            donorEmail: "agnes@host.example",
-            donorPhone: "073656249524",
-            donorAddress: {
-              addressLine1: "Apartment 3",
-              addressLine2: "Gherkin Building",
-              addressLine3: "33 London Road",
-              country: "GB",
-              postcode: "B15 3AA",
-              town: "Birmingham",
-            },
-            correspondentFirstNames: "Kendrick",
-            correspondentLastName: "Lamar",
-            correspondentAddress: {
-              addressLine1: "Flat 3",
-              addressLine2: "Digital LPA Lane",
-              addressLine3: "Somewhere",
-              country: "GB",
-              postcode: "SW1 1AA",
-              town: "London",
-            },
-          },
-          linkedDigitalLpas: [
-            {
-              uId: "M-DIGI-LPA3-3334",
-              caseSubtype: "personal-welfare",
-              status: "Draft",
-              createdDate: "01/11/2023",
-            },
-            {
-              uId: "M-DIGI-LPA3-3335",
-              caseSubtype: "personal-welfare",
-              status: "Registered",
-              createdDate: "02/11/2023",
-            },
-          ],
-        },
-        "opg.poas.lpastore": {
-          attorneys: [
-            {
-              firstNames: "Esther",
-              lastName: "Greenwood",
-              status: "active",
-              appointmentType: "original",
-              cannotMakeJointDecisions: true,
-            },
-            {
-              firstNames: "Volo",
-              lastName: "McSpolo",
-              status: "active",
-              appointmentType: "original",
-              signedAt: "2022-12-20T12:02:43Z",
-            },
-            {
-              firstNames: "Susanna",
-              lastName: "Kaysen",
-              status: "removed",
-              appointmentType: "original",
-            },
-            {
-              firstNames: "Philomena",
-              lastName: "Guinea",
-              status: "inactive",
-              appointmentType: "replacement",
-            },
-            {
-              firstNames: "Rico",
-              lastName: "Welch",
-              status: "inactive",
-              appointmentType: "replacement",
-              signedAt: "2022-12-19T09:12:59Z",
-            },
-            {
-              firstNames: "Anne",
-              lastName: "Rice",
-              status: "active",
-              appointmentType: "replacement",
-              signedAt: "2022-12-19T07:18:59Z",
-              cannotMakeJointDecisions: true,
-            },
-          ],
-          trustCorporations: [
-            {
-              Name: "Trust Me Ltd.",
-              CompanyNumber: "123456789",
-              status: "active",
-              appointmentType: "original",
-            },
-            {
-              Name: "Trust Me Again Ltd.",
-              CompanyNumber: "987654321",
-              status: "inactive",
-              appointmentType: "replacement",
-            },
-          ],
-          certificateProvider: {
-            uid: "e4d5e24e-2a8d-434e-b815-9898620acc71",
-            firstNames: "Timothy",
-            lastNames: "Turner",
-            signedAt: "2022-12-18T11:46:24Z",
-          },
-          lpaType: "pf",
-          channel: "online",
-          status: "draft",
-          registrationDate: "2022-12-18",
-          peopleToNotify: [],
-          restrictionsAndConditions: "Do not do this",
-          lifeSustainingTreatmentOption: "option-a",
-          howAttorneysMakeDecisions: "jointly-for-some-severally-for-others",
-          howAttorneysMakeDecisionsDetails:
-            "My attorneys must act jointly to decide whether...",
-          howReplacementAttorneysMakeDecisions:
-            "jointly-for-some-severally-for-others",
-        },
-      },
+      body: createDigitalLpaM3333MockData(),
     });
 
     cy.addMock("/lpa-api/v1/cases/333", "GET", {
@@ -243,6 +292,11 @@ describe("View a digital LPA", () => {
           receivedDate: "2025-01-01",
         },
       ],
+    });
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333/anomalies", "GET", {
+      status: 200,
+      body: [],
     });
 
     cy.addMock(
@@ -508,6 +562,7 @@ describe("View a digital LPA", () => {
         },
       },
     });
+
     cy.addMock(
       "/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3336?presignImages",
       "GET",
@@ -573,6 +628,198 @@ describe("View a digital LPA", () => {
     ]);
 
     cy.wrap(defaultDigitalLpaMocks);
+
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3337/progress-indicators",
+      "GET",
+      {
+        status: 200,
+        body: {
+          digitalLpaUid: "M-DIGI-LPA3-3337",
+          progressIndicators: [
+            { indicator: "FEES", status: "COMPLETE" },
+            { indicator: "DONOR_ID", status: "COMPLETE" },
+          ],
+        },
+      },
+    );
+
+    cy.addMock("/lpa-api/v1/cases/337/tasks", "GET", {
+      status: 200,
+      body: { tasks: [] },
+    });
+
+    cy.addMock("/lpa-api/v1/cases/337/warnings", "GET", {
+      status: 200,
+      body: [],
+    });
+
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3338/progress-indicators",
+      "GET",
+      {
+        status: 200,
+        body: {
+          digitalLpaUid: "M-DIGI-LPA3-3338",
+          progressIndicators: [
+            { indicator: "FEES", status: "COMPLETE" },
+            { indicator: "DONOR_ID", status: "COMPLETE" },
+          ],
+        },
+      },
+    );
+
+    cy.addMock("/lpa-api/v1/cases/338/tasks", "GET", {
+      status: 200,
+      body: { tasks: [] },
+    });
+
+    cy.addMock("/lpa-api/v1/cases/338/warnings", "GET", {
+      status: 200,
+      body: [],
+    });
+
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3339/progress-indicators",
+      "GET",
+      {
+        status: 200,
+        body: {
+          digitalLpaUid: "M-DIGI-LPA3-3339",
+          progressIndicators: [
+            { indicator: "FEES", status: "COMPLETE" },
+            { indicator: "DONOR_ID", status: "COMPLETE" },
+          ],
+        },
+      },
+    );
+
+    cy.addMock("/lpa-api/v1/cases/339/tasks", "GET", {
+      status: 200,
+      body: { tasks: [] },
+    });
+
+    cy.addMock("/lpa-api/v1/cases/339/warnings", "GET", {
+      status: 200,
+      body: [],
+    });
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-CERT-ONLY-1111", "GET", {
+      status: 200,
+      body: {
+        uId: "M-CERT-ONLY-1111",
+        "opg.poas.sirius": {
+          id: 1111,
+          uId: "M-CERT-ONLY-1111",
+          status: "Draft",
+          caseSubtype: "property-and-affairs",
+          createdDate: "31/10/2023",
+          investigationCount: 0,
+          complaintCount: 0,
+          taskCount: 0,
+          warningCount: 0,
+          donor: { id: 111 },
+          application: {
+            donorFirstNames: "Test",
+            donorLastName: "Donor",
+            donorDob: "01/01/1980",
+            donorEmail: "test@example.com",
+            donorPhone: "07123456789",
+            donorAddress: {
+              addressLine1: "1 Test Street",
+              addressLine2: "",
+              addressLine3: "",
+              country: "GB",
+              postcode: "T1 1ST",
+              town: "Testtown",
+            },
+          },
+        },
+        "opg.poas.lpastore": {
+          donor: {
+            uid: "donor-uid-111",
+            firstNames: "Test",
+            lastName: "Donor",
+            dateOfBirth: "1980-01-01",
+            address: {
+              line1: "1 Test Street",
+              town: "Testtown",
+              postcode: "T1 1ST",
+              country: "GB",
+            },
+            email: "test@example.com",
+            contactLanguagePreference: "en",
+          },
+          attorneys: [],
+          trustCorporations: [],
+          certificateProvider: {
+            uid: "cert-111",
+            firstNames: "Certificate",
+            lastName: "Provider",
+          },
+          peopleToNotify: [],
+          channel: "online",
+          status: "draft",
+          lpaType: "pf",
+          restrictionsAndConditions: "",
+          signedAt: "2024-01-15T10:30:00Z",
+          authorisedSignatory: {
+            firstNames: "Helper",
+            lastName: "Person",
+            signedAt: "2024-01-15T10:30:00Z",
+          },
+          witnessedByCertificateProviderAt: "2024-01-15T10:31:00Z",
+          witnessedByIndependentWitnessAt: "",
+          independentWitness: null,
+        },
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/cases/1111", "GET", {
+      status: 200,
+      body: {
+        id: 1111,
+        uId: "M-CERT-ONLY-1111",
+        caseType: "DIGITAL_LPA",
+        donor: { id: 111 },
+        status: "Processing",
+      },
+    });
+
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-CERT-ONLY-1111/progress-indicators",
+      "GET",
+      {
+        status: 200,
+        body: {
+          digitalLpaUid: "M-CERT-ONLY-1111",
+          progressIndicators: [
+            { indicator: "FEES", status: "COMPLETE" },
+            { indicator: "DONOR_ID", status: "COMPLETE" },
+          ],
+        },
+      },
+    );
+
+    cy.addMock("/lpa-api/v1/cases/1111/tasks", "GET", {
+      status: 200,
+      body: { tasks: [] },
+    });
+
+    cy.addMock("/lpa-api/v1/cases/1111/warnings", "GET", {
+      status: 200,
+      body: [],
+    });
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-CERT-ONLY-1111/objections", "GET", {
+      status: 200,
+      body: [],
+    });
+
+    cy.addMock("/lpa-api/v1/digital-lpas/M-CERT-ONLY-1111/anomalies", "GET", {
+      status: 200,
+      body: [],
+    });
   });
 
   it("shows case information", () => {
@@ -646,18 +893,14 @@ describe("View a digital LPA", () => {
     cy.get(".app-caseworker-summary > div:nth-child(2) li").should((elts) => {
       expect(elts).to.have.length(4);
 
-      // check donor deceased is at the top, date is properly-formatted,
-      // and applies to text for 3+ cases is correct
       expect(elts[0]).to.contain("Donor Deceased");
       expect(elts[0]).to.contain(
         "this case, PA M-DIGI-LPA3-5555 and PW M-DIGI-LPA3-6666",
       );
 
-      // check sorting has worked properly and case applies text is correct for 2 cases
       expect(elts[1]).to.contain("Complaint Received");
       expect(elts[1]).to.contain("this case and PA M-DIGI-LPA3-5555");
 
-      // check case applies text is correct for 1 case
       expect(elts[2]).to.contain("Court application in progress");
       expect(elts[2]).not.to.contain("this case");
     });
@@ -910,59 +1153,69 @@ describe("View a digital LPA", () => {
 
     cy.contains("a", "LPA details").click();
     cy.contains("button", "Restrictions and conditions").click();
-    cy.contains(".govuk-accordion__section--expanded", "Do not do this");
+
+    cy.contains("Do not do this");
   });
 
-  it("shows restrictions and conditions as images", () => {
-    cy.visit("/lpa/M-DIGI-LPA3-3336");
+  it("shows certificate provider witness only (1 witness)", () => {
+    cy.visit("/lpa/M-CERT-ONLY-1111/lpa-details");
 
-    cy.contains("a", "LPA details").click();
-    cy.contains("button", "Restrictions and conditions").click();
-    cy.get(".govuk-accordion__section--expanded img").should(
-      "have.attr",
-      "src",
-      "some-presigned-url.jpg",
-    );
-  });
-
-  it("shows history", () => {
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
-
-    cy.contains("a", "History").click();
-
-    cy.contains("Created Donor by system admin");
-    cy.contains("2 January 2024 at 12:13");
-    cy.contains("More details").click();
-
-    cy.contains("Firstname John");
-    cy.contains("Surname Smith");
-    cy.contains("UID 700011111111");
-  });
-
-  it("shows correct message for sole attorney", () => {
-    cy.visit("/lpa/M-1111-1111-1111/lpa-details");
-
-    cy.contains("Decisions")
+    cy.get(".govuk-accordion__section")
+      .contains("Donor")
       .click()
       .parents(".govuk-accordion__section")
       .within(() => {
-        cy.contains("There is only one attorney appointed");
+        cy.contains("LPA signed on behalf of the donor by").should("exist");
+        cy.contains("Helper Person").should("exist");
       });
   });
 
-  it("shows decisions", () => {
+  it("shows both witnesses when both are present (2 witnesses)", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
 
-    cy.contains("Decisions")
+    cy.get(".govuk-accordion__section")
+      .contains("Donor")
       .click()
       .parents(".govuk-accordion__section")
       .within(() => {
-        cy.contains("Jointly for some, severally for others");
-        cy.contains("Attorneys who cannot make joint decisions");
-        cy.contains("Esther Greenwood");
-        cy.contains("Anne Rice (previously a replacement attorney)");
-        cy.contains("Decisions attorneys must make jointly");
-        cy.contains("My attorneys must act jointly to decide whether");
+        cy.contains("LPA signed on behalf of the donor by").should("exist");
+        cy.contains("John Signatory").should("exist");
+
+        cy.contains(".govuk-details__summary", "View witness details").click();
+
+        cy.get(".govuk-details__text").within(() => {
+          cy.contains("Signed by witness 1 (certificate provider)").should(
+            "exist",
+          );
+          cy.contains("Signed by witness 2").should("exist");
+          cy.contains("Jane Witness").should("exist");
+          cy.contains("123 Witness Street").should("exist");
+        });
+      });
+  });
+
+  it("shows donor signed directly (no signed on behalf)", () => {
+    cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333", "GET", {
+      status: 200,
+      body: createDigitalLpaM3333MockData({
+        authorisedSignatory: null,
+        witnessedByIndependentWitnessAt: "",
+        independentWitness: null,
+      }),
+    });
+
+    cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
+
+    cy.get(".govuk-accordion__section")
+      .contains("Donor")
+      .click()
+      .parents(".govuk-accordion__section")
+      .within(() => {
+        cy.contains("LPA signed on");
+        cy.contains("15 December 2022");
+
+        cy.contains("LPA signed on behalf of the donor by").should("not.exist");
+        cy.contains("View witness details").should("not.exist");
       });
   });
 });
