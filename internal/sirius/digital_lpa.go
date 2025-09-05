@@ -3,6 +3,8 @@ package sirius
 import (
 	"fmt"
 	"strings"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 )
 
 type DigitalLpa struct {
@@ -12,20 +14,21 @@ type DigitalLpa struct {
 }
 
 type SiriusData struct {
-	ID                 int          `json:"id"`
-	UID                string       `json:"uId"`
-	Application        Draft        `json:"application"`
-	Subtype            string       `json:"caseSubtype"`
-	CreatedDate        DateString   `json:"createdDate"`
-	Status             string       `json:"status"`
-	ComplaintCount     int          `json:"complaintCount"`
-	InvestigationCount int          `json:"investigationCount"`
-	TaskCount          int          `json:"taskCount"`
-	WarningCount       int          `json:"warningCount"`
-	ObjectionCount     int          `json:"objectionCount"`
-	LinkedCases        []SiriusData `json:"linkedDigitalLpas"`
-	Donor              Donor        `json:"donor"`
-	DueDate            DateString   `json:"dueDate"`
+	ID                 int               `json:"id"`
+	UID                string            `json:"uId"`
+	Application        Draft             `json:"application"`
+	Subtype            string            `json:"caseSubtype"`
+	CreatedDate        DateString        `json:"createdDate"`
+	Status             shared.CaseStatus `json:"status"`
+	ComplaintCount     int               `json:"complaintCount"`
+	InvestigationCount int               `json:"investigationCount"`
+	TaskCount          int               `json:"taskCount"`
+	WarningCount       int               `json:"warningCount"`
+	ObjectionCount     int               `json:"objectionCount"`
+	LinkedCases        []SiriusData      `json:"linkedDigitalLpas"`
+	Donor              Donor             `json:"donor"`
+	DueDate            DateString        `json:"dueDate"`
+	StatusColour       string
 }
 
 type Donor struct {
@@ -47,7 +50,7 @@ type Donor struct {
 type LpaStoreData struct {
 	Donor                                       LpaStoreDonor                `json:"donor"`
 	Channel                                     string                       `json:"channel"`
-	Status                                      string                       `json:"status"`
+	Status                                      shared.CaseStatus            `json:"status"`
 	Attorneys                                   []LpaStoreAttorney           `json:"attorneys"`
 	TrustCorporations                           []LpaStoreTrustCorporation   `json:"trustCorporations"`
 	CertificateProvider                         LpaStoreCertificateProvider  `json:"certificateProvider"`
