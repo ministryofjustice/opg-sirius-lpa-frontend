@@ -3,11 +3,13 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"strings"
+	"testing"
+
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
 )
 
 func TestDigitalLpa(t *testing.T) {
@@ -215,4 +217,346 @@ func TestDigitalLpa(t *testing.T) {
 			}))
 		})
 	}
+}
+
+func TestWasSignedOnBehalfOfDonor(t *testing.T) {
+	tests := []struct {
+		name     string
+		lpa      DigitalLpa
+		expected bool
+	}{
+		{
+			name: "returns true when authorised signatory exists",
+			lpa: DigitalLpa{
+				LpaStoreData: LpaStoreData{
+					AuthorisedSignatory: &LpaStoreAuthorisedSignatory{
+						FirstNames: "John",
+						LastName:   "Smith",
+					},
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "returns false when no authorised signatory",
+			lpa: DigitalLpa{
+				LpaStoreData: LpaStoreData{
+					AuthorisedSignatory: nil,
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "returns false when empty authorised signatory",
+			lpa: DigitalLpa{
+				LpaStoreData: LpaStoreData{
+					AuthorisedSignatory: &LpaStoreAuthorisedSignatory{
+						FirstNames: "",
+						LastName:   "",
+					},
+				},
+			},
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.lpa.WasSignedOnBehalfOfDonor()
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestGetAuthorisedSignatoryFullName(t *testing.T) {
+	tests := []struct {
+		name     string
+		lpa      DigitalLpa
+		expected string
+	}{
+		{
+			name: "returns full name when both names present",
+			lpa: DigitalLpa{
+				LpaStoreData: LpaStoreData{
+					AuthorisedSignatory: &LpaStoreAuthorisedSignatory{
+						FirstNames: "John",
+						LastName:   "Smith",
+					},
+				},
+			},
+			expected: "John Smith",
+		},
+		{
+			name: "returns empty when no signatory",
+			lpa: DigitalLpa{
+				LpaStoreData: LpaStoreData{
+					AuthorisedSignatory: nil,
+				},
+			},
+			expected: "",
+		},
+		{
+			name: "handles whitespace correctly",
+			lpa: DigitalLpa{
+				LpaStoreData: LpaStoreData{
+					AuthorisedSignatory: &LpaStoreAuthorisedSignatory{
+						FirstNames: "  John  ",
+						LastName:   "  Smith  ",
+					},
+				},
+			},
+			expected: "John     Smith",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.lpa.GetAuthorisedSignatoryFullName()
+			assert.Equal(t, tt.expected, strings.TrimSpace(result))
+		})
+	}
+}
+
+func TestWitnessHelperFunctions(t *testing.T) {
+	t.Run("WasWitnessedByCertificateProvider", func(t *testing.T) {
+		tests := []struct {
+			name     string
+			lpa      DigitalLpa
+			expected bool
+		}{
+			{
+				name: "returns true when timestamp exists",
+				lpa: DigitalLpa{
+					LpaStoreData: LpaStoreData{
+						WitnessedByCertificateProviderAt: "2024-01-15T10:31:00Z",
+					},
+				},
+				expected: true,
+			},
+			{
+				name: "returns false when timestamp is empty",
+				lpa: DigitalLpa{
+					LpaStoreData: LpaStoreData{
+						WitnessedByCertificateProviderAt: "",
+					},
+				},
+				expected: false,
+			},
+			{
+				name: "returns false when timestamp is not set",
+				lpa: DigitalLpa{
+					LpaStoreData: LpaStoreData{},
+				},
+				expected: false,
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				result := tt.lpa.WasWitnessedByCertificateProvider()
+				assert.Equal(t, tt.expected, result)
+			})
+		}
+	})
+
+	t.Run("WasWitnessedByIndependentWitness", func(t *testing.T) {
+		tests := []struct {
+			name     string
+			lpa      DigitalLpa
+			expected bool
+		}{
+			{
+				name: "returns true when timestamp exists",
+				lpa: DigitalLpa{
+					LpaStoreData: LpaStoreData{
+						WitnessedByIndependentWitnessAt: "2024-01-15T10:32:00Z",
+					},
+				},
+				expected: true,
+			},
+			{
+				name: "returns false when timestamp is empty",
+				lpa: DigitalLpa{
+					LpaStoreData: LpaStoreData{
+						WitnessedByIndependentWitnessAt: "",
+					},
+				},
+				expected: false,
+			},
+			{
+				name: "returns false when timestamp is not set",
+				lpa: DigitalLpa{
+					LpaStoreData: LpaStoreData{},
+				},
+				expected: false,
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				result := tt.lpa.WasWitnessedByIndependentWitness()
+				assert.Equal(t, tt.expected, result)
+			})
+		}
+	})
+
+	t.Run("GetIndependentWitnessFullName", func(t *testing.T) {
+		tests := []struct {
+			name     string
+			lpa      DigitalLpa
+			expected string
+		}{
+			{
+				name: "returns full name when both names present",
+				lpa: DigitalLpa{
+					LpaStoreData: LpaStoreData{
+						IndependentWitness: &LpaStoreIndependentWitness{
+							FirstNames: "Jane",
+							LastName:   "Doe",
+						},
+					},
+				},
+				expected: "Jane Doe",
+			},
+			{
+				name: "returns first name only when last name empty",
+				lpa: DigitalLpa{
+					LpaStoreData: LpaStoreData{
+						IndependentWitness: &LpaStoreIndependentWitness{
+							FirstNames: "Jane",
+							LastName:   "",
+						},
+					},
+				},
+				expected: "Jane",
+			},
+			{
+				name: "returns last name only when first name empty",
+				lpa: DigitalLpa{
+					LpaStoreData: LpaStoreData{
+						IndependentWitness: &LpaStoreIndependentWitness{
+							FirstNames: "",
+							LastName:   "Doe",
+						},
+					},
+				},
+				expected: "Doe",
+			},
+			{
+				name: "returns empty when both names empty",
+				lpa: DigitalLpa{
+					LpaStoreData: LpaStoreData{
+						IndependentWitness: &LpaStoreIndependentWitness{
+							FirstNames: "",
+							LastName:   "",
+						},
+					},
+				},
+				expected: "",
+			},
+			{
+				name: "returns empty when witness is nil",
+				lpa: DigitalLpa{
+					LpaStoreData: LpaStoreData{
+						IndependentWitness: nil,
+					},
+				},
+				expected: "",
+			},
+			{
+				name: "handles whitespace correctly",
+				lpa: DigitalLpa{
+					LpaStoreData: LpaStoreData{
+						IndependentWitness: &LpaStoreIndependentWitness{
+							FirstNames: "  Jane  ",
+							LastName:   "  Doe  ",
+						},
+					},
+				},
+				expected: "Jane     Doe",
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				result := tt.lpa.GetIndependentWitnessFullName()
+				assert.Equal(t, tt.expected, strings.TrimSpace(result))
+			})
+		}
+	})
+
+	t.Run("GetIndependentWitnessAddress", func(t *testing.T) {
+		tests := []struct {
+			name     string
+			lpa      DigitalLpa
+			expected LpaStoreAddress
+		}{
+			{
+				name: "returns address when witness exists",
+				lpa: DigitalLpa{
+					LpaStoreData: LpaStoreData{
+						IndependentWitness: &LpaStoreIndependentWitness{
+							FirstNames: "Jane",
+							LastName:   "Doe",
+							Address: LpaStoreAddress{
+								Line1:    "123 Test Street",
+								Line2:    "Test Area",
+								Town:     "Test Town",
+								Postcode: "T3ST 1NG",
+								Country:  "GB",
+							},
+						},
+					},
+				},
+				expected: LpaStoreAddress{
+					Line1:    "123 Test Street",
+					Line2:    "Test Area",
+					Town:     "Test Town",
+					Postcode: "T3ST 1NG",
+					Country:  "GB",
+				},
+			},
+			{
+				name: "returns empty address when witness is nil",
+				lpa: DigitalLpa{
+					LpaStoreData: LpaStoreData{
+						IndependentWitness: nil,
+					},
+				},
+				expected: LpaStoreAddress{},
+			},
+			{
+				name: "returns partial address when some fields missing",
+				lpa: DigitalLpa{
+					LpaStoreData: LpaStoreData{
+						IndependentWitness: &LpaStoreIndependentWitness{
+							FirstNames: "Jane",
+							LastName:   "Doe",
+							Address: LpaStoreAddress{
+								Line1:    "123 Test Street",
+								Town:     "Test Town",
+								Postcode: "T3ST 1NG",
+								// Line2, Line3, Country are empty
+							},
+						},
+					},
+				},
+				expected: LpaStoreAddress{
+					Line1:    "123 Test Street",
+					Town:     "Test Town",
+					Postcode: "T3ST 1NG",
+					Line2:    "",
+					Line3:    "",
+					Country:  "",
+				},
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				result := tt.lpa.GetIndependentWitnessAddress()
+				assert.Equal(t, tt.expected, result)
+			})
+		}
+	})
 }
