@@ -97,6 +97,22 @@ describe("Change donor details form", () => {
       cases.warnings.empty("666"),
       cases.tasks.empty("666"),
       digitalLpas.objections.empty("M-0000-0000-0001"),
+      digitalLpas.progressIndicators.defaultCannotStart("M-0000-0000-0001"),
+
+      digitalLpas.get("M-0000-0000-0002", {
+        "opg.poas.sirius": {
+          id: 2222,
+        },
+      }),
+      cases.warnings.empty("2222"),
+      cases.tasks.empty("2222"),
+      digitalLpas.objections.empty("M-0000-0000-0002"),
+      digitalLpas.progressIndicators.defaultCannotStart("M-0000-0000-0002", [
+        {
+          indicator: "DONOR_ID",
+          status: "COMPLETE",
+        },
+      ]),
     ]);
 
     cy.wrap(mocks);
@@ -146,7 +162,7 @@ describe("Change donor details form", () => {
     cy.url().should("contain", "/lpa/M-0000-0000-0001/lpa-details");
   });
 
-  it("Can edit all donor details", () => {
+  it("can edit all donor details", () => {
     cy.addMock(
       "/lpa-api/v1/digital-lpas/M-0000-0000-0001/change-donor-details",
       "PUT",
@@ -204,5 +220,13 @@ describe("Change donor details form", () => {
 
     cy.contains("Donor").click();
     //todo: Add check for new details after lpa-store changes added
+  });
+
+  it("will show message for case with donor ID check", () => {
+    cy.visit("/change-donor-details?uid=M-0000-0000-0002");
+
+    cy.contains(
+      "Because this date of birth was used for the donor's ID check, it cannot be updated.",
+    );
   });
 });

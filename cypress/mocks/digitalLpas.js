@@ -43,12 +43,13 @@ function extendDefaultDigitalLpa(uid, body) {
       status: "draft",
       registrationDate: "2022-12-18",
       peopleToNotify: [],
+      signedAt: "2022-12-19T09:12:59Z",
       donor: {
         uid: "572fe550-e465-40b3-a643-ca9564fabab8",
         firstNames: "Steven",
         lastName: "Munnell",
         email: "Steven.Munnell@example.com",
-        dateOfBirth: "17/06/1982",
+        dateOfBirth: "1982-06-17",
         otherNamesKnownBy: "",
         contactLanguagePreference: "",
         address: {
@@ -214,7 +215,11 @@ const progressIndicators = {
       "RESTRICTIONS_AND_CONDITIONS",
     ];
 
-    let allProgressIndicators = progressIndicators;
+    let allProgressIndicators = [];
+
+    if (progressIndicators !== undefined && Array.isArray(progressIndicators)) {
+      allProgressIndicators = progressIndicators;
+    }
 
     progressIndicatorTypes.forEach((progressIndicatorType) => {
       const exists = allProgressIndicators.find(
