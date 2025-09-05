@@ -1,4 +1,7 @@
 {{ define "donor-details" }}
+    {{ $anomaliesForSection := .AnomalyDisplay.GetAnomaliesForSection "donor" }}
+    {{ $donorUID := .CaseSummary.DigitalLpa.LpaStoreData.Donor.Uid  }}
+    {{ $donorAnomalies := $anomaliesForSection.GetAnomaliesForObject $donorUID }}
     <!-- donor -->
     <div class="govuk-accordion__section">
 
@@ -6,6 +9,9 @@
             <h2 class="govuk-accordion__section-heading">
               <span class="govuk-accordion__section-button" id="accordion-default-heading-1">
                 Donor
+                  {{ if $anomaliesForSection.HasAnomalies }}
+                      <span class="information-warning-header">{{ template "information-warning" "For review" }}</span>
+                  {{ end }}
               </span>
             </h2>
         </div>
@@ -52,12 +58,17 @@
                         </dd>
                     </div>
 
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Address</dt>
-                        <dd class="govuk-summary-list__value">
-                            {{ template "mlpa-address" .DigitalLpa.LpaStoreData.Donor.Address }}
-                        </dd>
-                    </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Address</dt>
+                    {{ $addressFieldAnomalies := $donorAnomalies.GetAnomaliesForFieldWithStatus "address" "detected" }}
+                    <dd class="govuk-summary-list__value">
+                        {{ template "mlpa-address" .DigitalLpa.LpaStoreData.Donor.Address }}
+                        {{ if gt (len $addressFieldAnomalies) 0 }}
+                            {{ $addressAnomalie := $donorAnomalies.GetHintTextForAnomalyField $addressFieldAnomalies "" }}
+                            {{ template "information-warning" $addressAnomalie }}
+                        {{ end }}
+                    </dd>
+                </div>
 
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">Email</dt>

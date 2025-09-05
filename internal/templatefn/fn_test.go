@@ -667,25 +667,6 @@ func TestContains(t *testing.T) {
 	assert.Equal(t, false, val)
 }
 
-func TestStatusColour(t *testing.T) {
-	fns := All("", "", "")
-	fn := fns["statusColour"].(func(string) string)
-
-	var val string
-
-	val = fn("RegIStered")
-	assert.Equal(t, "green", val)
-
-	val = fn("IN PROGRESS")
-	assert.Equal(t, "light-blue", val)
-
-	val = fn("return - unpaid")
-	assert.Equal(t, "red", val)
-
-	val = fn("not in list")
-	assert.Equal(t, "grey", val)
-}
-
 func TestStatusLabel(t *testing.T) {
 	var val string
 

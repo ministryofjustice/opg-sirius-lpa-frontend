@@ -30,6 +30,9 @@ describe("View and edit anomalies for a digital LPA", () => {
           certificateProvider: {
             uid: "certificate-provider",
           },
+          donor: {
+            uid: "donor",
+          },
         },
       },
     });
@@ -115,6 +118,13 @@ describe("View and edit anomalies for a digital LPA", () => {
             fieldName: "lastName",
             ruleType: "empty",
             fieldOwnerUid: "certificate-provider",
+          },
+          {
+            id: 138,
+            status: "detected",
+            fieldName: "address",
+            ruleType: "no-country",
+            fieldOwnerUid: "donor",
           },
         ],
       },
