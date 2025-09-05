@@ -95,8 +95,12 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 		}
 
 		for _, pi := range pis {
-			if pi.Indicator == "DONOR_ID" && pi.Status == "COMPLETE" {
-				donorIdentityCheckComplete = true
+			if pi.Indicator == "DONOR_ID" {
+				if pi.Status == "COMPLETE" {
+					donorIdentityCheckComplete = true
+				}
+
+				break
 			}
 		}
 
