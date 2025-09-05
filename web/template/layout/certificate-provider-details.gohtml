@@ -6,11 +6,13 @@
 {{ $caseUID := .CaseSummary.DigitalLpa.UID}}
 
 <div class="govuk-accordion__section" id="certificate-provider">
-    <div class="govuk-accordion__section-header{{ if $anomaliesForSection.HasAnomalies }} govuk-form-group--error{{ end }}">
+    <div class="govuk-accordion__section-header">
         <h2 class="govuk-accordion__section-heading">
               <span class="govuk-accordion__section-button" id="accordion-default-heading-6">
                 Certificate provider
-                {{ if $anomaliesForSection.HasAnomalies }}<span class="govuk-error-message">For review</span>{{ end }}
+                {{ if $anomaliesForSection.HasAnomalies }}
+                    <span class="information-warning-header">{{ template "information-warning" "For review" }}</span>
+                {{ end }}
               </span>
         </h2>
     </div>
@@ -36,10 +38,10 @@
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">First names</dt>
                 {{ $cpFieldAnomalies := $cpAnomalies.GetAnomaliesForFieldWithStatus "firstNames" "detected" }}
-                <dd class="govuk-summary-list__value{{ if gt (len $cpFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                <dd class="govuk-summary-list__value">
                     {{ .DigitalLpa.LpaStoreData.CertificateProvider.FirstNames }}
                     {{ if gt (len $cpFieldAnomalies) 0 }}
-                      <br><span class="govuk-error-message">Review certificate provider's first names</span>
+                        {{ template "information-warning" "Review certificate provider's first names" }}
                     {{ end }}
                 </dd>
             </div>
@@ -47,10 +49,11 @@
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Last name</dt>
                 {{ $cpFieldAnomalies = $cpAnomalies.GetAnomaliesForFieldWithStatus "lastName" "detected" }}
-                <dd class="govuk-summary-list__value{{ if gt (len $cpFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                <dd class="govuk-summary-list__value">
                     {{ .DigitalLpa.LpaStoreData.CertificateProvider.LastName }}
                     {{ if gt (len $cpFieldAnomalies) 0 }}
-                            <br><span class="govuk-error-message">{{ $cpAnomalies.GetHintTextForAnomalyField $cpFieldAnomalies }}</span>
+                        {{ $lastNameAnomalies := $cpAnomalies.GetHintTextForAnomalyField $cpFieldAnomalies }}
+                        {{ template "information-warning" $lastNameAnomalies }}
                     {{ end }}
                 </dd>
             </div>
@@ -58,10 +61,10 @@
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Address</dt>
                 {{ $addressFieldAnomalies := $cpAnomalies.GetAnomaliesForFieldWithStatus "address" "detected" }}
-                <dd class="govuk-summary-list__value{{ if gt (len $addressFieldAnomalies) 0 }} govuk-form-group--error{{ end }}">
+                <dd class="govuk-summary-list__value">
                     {{ template "mlpa-address" .DigitalLpa.LpaStoreData.CertificateProvider.Address }}
                     {{ if gt (len $addressFieldAnomalies) 0 }}
-                        <br><span class="govuk-error-message">Review certificate provider's address</span>
+                        {{ template "information-warning" "Review certificate provider's address" }}
                     {{ end }}
                 </dd>
             </div>
