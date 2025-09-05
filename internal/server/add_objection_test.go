@@ -1,16 +1,14 @@
 package server
 
 import (
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
-
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 type mockAddObjectionClient struct {
@@ -34,17 +32,17 @@ var testAddObjectionsCaseSummary = sirius.CaseSummary{
 			ID:      676,
 			UID:     "M-9898-9898-9898",
 			Subtype: "personal-welfare",
-			Status:  shared.CaseStatusTypeDraft,
+			Status:  "Draft",
 			LinkedCases: []sirius.SiriusData{
 				{
 					UID:     "M-9999-9999-9999",
 					Subtype: "personal-welfare",
-					Status:  shared.CaseStatusTypeInProgress,
+					Status:  "In progress",
 				},
 				{
 					UID:     "M-8888-8888-8888",
 					Subtype: "personal-welfare",
-					Status:  shared.CaseStatusTypeRegistered,
+					Status:  "Registered",
 				},
 			},
 		},
@@ -84,24 +82,24 @@ func TestGetAddObjectionsTemplate(t *testing.T) {
 							UID:     "M-9898-9898-9898",
 							ID:      676,
 							Subtype: "personal-welfare",
-							Status:  shared.CaseStatusTypeDraft,
+							Status:  "Draft",
 							LinkedCases: []sirius.SiriusData{
 								{
 									UID:     "M-9999-9999-9999",
 									Subtype: "personal-welfare",
-									Status:  shared.CaseStatusTypeInProgress,
+									Status:  "In progress",
 								},
 								{
 									UID:     "M-8888-8888-8888",
 									Subtype: "personal-welfare",
-									Status:  shared.CaseStatusTypeRegistered,
+									Status:  "Registered",
 								},
 							},
 						},
 						{
 							UID:     "M-9999-9999-9999",
 							Subtype: "personal-welfare",
-							Status:  shared.CaseStatusTypeInProgress,
+							Status:  "In progress",
 						},
 					},
 				}).

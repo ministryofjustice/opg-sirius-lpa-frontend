@@ -2,11 +2,10 @@ package server
 
 import (
 	"fmt"
-	"net/http"
-
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
+	"net/http"
 )
 
 type UpdateObjectionClient interface {
@@ -66,12 +65,12 @@ func UpdateObjection(client UpdateObjectionClient, formTmpl template.Template, c
 
 		var linkedCasesForObjections []sirius.SiriusData
 
-		if cs.DigitalLpa.SiriusData.Status.IsValidStatusForObjection() {
+		if isValidStatusForObjection(cs.DigitalLpa.SiriusData.Status) {
 			linkedCasesForObjections = append(linkedCasesForObjections, cs.DigitalLpa.SiriusData)
 		}
 
 		for _, c := range cs.DigitalLpa.SiriusData.LinkedCases {
-			if c.Status.IsValidStatusForObjection() {
+			if isValidStatusForObjection(c.Status) {
 				linkedCasesForObjections = append(linkedCasesForObjections, c)
 			}
 		}

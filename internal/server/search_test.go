@@ -5,7 +5,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -203,7 +202,7 @@ func TestGetSearchCallsDeletedCasesOnFallback(t *testing.T) {
 			UID:         "7000-0000-5678",
 			OnlineLpaId: "A12345678901",
 			Type:        "LPA",
-			Status:      shared.CaseStatusTypeReturnUnpaid,
+			Status:      "Return - unpaid",
 			DeletedAt:   sirius.DateString("2022-02-12"),
 			Reason:      "LPA was not paid for after 12 months",
 		},
