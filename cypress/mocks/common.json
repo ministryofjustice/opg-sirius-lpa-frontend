@@ -128,6 +128,19 @@
         "headers": { "Content-Type": "application/json" },
         "body": "[{\"handle\":\"DECLINED_REMISSION\",\"label\":\"Declined remission\"},{\"handle\":\"DECLINED_EXEMPTION\",\"label\":\"Declined exemption\"}]"
       }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/reference-data/caseChangeReason"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "[{\"handle\":\"LPA_DOES_NOT_WORK\",\"label\":\"The LPA does not work and cannot be changed\", \"parentSources\":[\"cannot-register\"]}]"
+      }
     }
   ]
 }

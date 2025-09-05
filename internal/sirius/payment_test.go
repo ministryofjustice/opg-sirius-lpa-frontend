@@ -3,11 +3,13 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
 )
 
 func TestPayment(t *testing.T) {
@@ -495,7 +497,7 @@ func TestEditFeeReduction(t *testing.T) {
 							"amount": 4100,
 							"case": map[string]interface{}{
 								"id":     802,
-								"status": "",
+								"status": "Draft",
 							},
 							"paymentEvidence":  matchers.String("Edited test evidence"),
 							"feeReductionType": matchers.String("REMISSION"),
@@ -523,10 +525,10 @@ func TestEditFeeReduction(t *testing.T) {
 					Payment{
 						ID:               124,
 						Amount:           4100,
-						Case:             &Case{ID: 802, Status: ""},
+						Case:             &Case{ID: 802, Status: shared.CaseStatusTypeDraft},
 						PaymentEvidence:  "Edited test evidence",
 						FeeReductionType: "REMISSION",
-						PaymentDate:      DateString("2022-04-28"),
+						PaymentDate:      "2022-04-28",
 						Source:           FeeReductionSource,
 					},
 				)

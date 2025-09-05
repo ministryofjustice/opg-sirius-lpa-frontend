@@ -2,9 +2,10 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"net/http"
 )
 
 type AddObjectionClient interface {
@@ -29,10 +30,6 @@ type formObjection struct {
 	Notes         string   `form:"notes"`
 }
 
-func isValidStatusForObjection(status string) bool {
-	return status == "In progress" || status == "Draft" || status == "Statutory waiting period"
-}
-
 func AddObjection(client AddObjectionClient, tmpl template.Template) Handler {
 
 	return func(w http.ResponseWriter, r *http.Request) error {
@@ -46,12 +43,12 @@ func AddObjection(client AddObjectionClient, tmpl template.Template) Handler {
 
 		var linkedCasesForObjections []sirius.SiriusData
 
-		if isValidStatusForObjection(cs.DigitalLpa.SiriusData.Status) {
+		cs.DigitalLpa.SiriusData.Status.IsValidStatusForObjection() {
 			linkedCasesForObjections = append(linkedCasesForObjections, cs.DigitalLpa.SiriusData)
 		}
 
 		for _, c := range cs.DigitalLpa.SiriusData.LinkedCases {
-			if isValidStatusForObjection(c.Status) {
+			if c.Status.IsValidStatusForObjection() {
 				linkedCasesForObjections = append(linkedCasesForObjections, c)
 			}
 		}
