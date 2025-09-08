@@ -3,11 +3,12 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"testing"
+
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
 )
 
 func TestDeletedCases(t *testing.T) {

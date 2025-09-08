@@ -30,6 +30,9 @@ describe("View and edit anomalies for a digital LPA", () => {
           certificateProvider: {
             uid: "certificate-provider",
           },
+          donor: {
+            uid: "donor",
+          },
         },
       },
     });
@@ -115,6 +118,13 @@ describe("View and edit anomalies for a digital LPA", () => {
             fieldName: "lastName",
             ruleType: "empty",
             fieldOwnerUid: "certificate-provider",
+          },
+          {
+            id: 138,
+            status: "detected",
+            fieldName: "address",
+            ruleType: "no-country",
+            fieldOwnerUid: "donor",
           },
         ],
       },
@@ -249,7 +259,7 @@ describe("View and edit anomalies for a digital LPA", () => {
     cy.contains("Review life sustaining treatment");
   });
 
-  it("shows anomalie for last name matching both donor and at least one attorney", () => {
+  it("shows anomalies for last name matching both donor and at least one attorney", () => {
     cy.visit("/lpa/M-DIGI-TTTT-3333/lpa-details");
     cy.contains(
       "Review last name - this matches the donor and at least one of the attorneys. Check certificate provider's eligibility",

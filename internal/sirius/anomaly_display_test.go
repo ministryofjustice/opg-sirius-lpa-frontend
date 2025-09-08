@@ -310,9 +310,10 @@ func TestGetSectionForUid(t *testing.T) {
 
 func TestGetHintTextForAnomalyField(t *testing.T) {
 	tests := []struct {
-		name      string
-		anomalies []Anomaly
-		want      string
+		name             string
+		anomalies        []Anomaly
+		want             string
+		whoHasTheAnomaly string
 	}{
 		{
 			name: "LastNameMatchesDonor and LastNameMatchesAttorney",
@@ -348,12 +349,27 @@ func TestGetHintTextForAnomalyField(t *testing.T) {
 			anomalies: []Anomaly{},
 			want:      "Review certificate provider's last name",
 		},
+		{
+			name: "NoCountry for CP",
+			anomalies: []Anomaly{
+				{RuleType: NoCountry},
+			},
+			want: "Review address as there is no country",
+		},
+		{
+			name: "Bad address for CP",
+			anomalies: []Anomaly{
+				{RuleType: InvalidAddress},
+			},
+			whoHasTheAnomaly: "certificate provider's",
+			want:             "Review certificate provider's address",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			afo := &AnomaliesForObject{}
-			got := afo.GetHintTextForAnomalyField(tt.anomalies)
+			got := afo.GetHintTextForAnomalyField(tt.anomalies, tt.whoHasTheAnomaly)
 			if got != tt.want {
 				t.Errorf("GetHintTextForAnomalyField() = %q, want %q", got, tt.want)
 			}
