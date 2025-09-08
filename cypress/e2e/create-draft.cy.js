@@ -23,6 +23,20 @@ describe("Create Digital LPA draft", () => {
   });
 
   it("creates a digital LPA", () => {
+    cy.addMock("/lpa-api/v1/donors/130/digital-lpas", "POST", {
+      status: 201,
+      body: [
+        {
+          caseSubtype: "personal-welfare",
+          uId: "M-GHIJ-7890-KLMN",
+        },
+        {
+          caseSubtype: "property-and-affairs",
+          uId: "M-ABCD-1234-EF56",
+        },
+      ],
+    });
+
     cy.contains("Create a draft LPA");
 
     cy.contains("Personal welfare").click();
