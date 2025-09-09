@@ -134,7 +134,6 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"plusN": func(i int, n int) int {
 			return i + n
 		},
-		"statusLabel": StatusLabelFormat,
 		"replace": func(s, find, replace string) string {
 			return strings.ReplaceAll(s, find, replace)
 		},
@@ -372,33 +371,6 @@ func subtypeLongFormat(subtype string) string {
 		return "Property and financial affairs"
 	default:
 		return ""
-	}
-}
-
-func StatusLabelFormat(status string) string {
-	switch strings.ToLower(status) {
-	case "draft":
-		return "Draft"
-	case "in-progress":
-		return "In progress"
-	case "statutory-waiting-period":
-		return "Statutory waiting period"
-	case "registered":
-		return "Registered"
-	case "suspended":
-		return "Suspended"
-	case "do-not-register":
-		return "Do not register"
-	case "expired":
-		return "Expired"
-	case "cannot-register":
-		return "Cannot register"
-	case "cancelled":
-		return "Cancelled"
-	case "de-registered":
-		return "De-registered"
-	default:
-		return "draft"
 	}
 }
 

@@ -8,7 +8,6 @@ import (
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/templatefn"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -34,7 +33,7 @@ type changeCaseStatusData struct {
 	StatusItems             []statusItem
 	CaseStatusChangeReasons []sirius.RefDataItem
 	OldStatus               string
-	NewStatus               string
+	NewStatus               shared.CaseStatus
 	StatusChangeReason      string
 }
 
@@ -83,7 +82,7 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 			Entity:                  fmt.Sprintf("%s %s", cs.DigitalLpa.SiriusData.Subtype, caseUID),
 			CaseUID:                 caseUID,
 			OldStatus:               strings.ToLower(status),
-			NewStatus:               postFormString(r, "status"),
+			NewStatus:               shared.ParseCaseStatusType(postFormString(r, "status")),
 			StatusChangeReason:      postFormString(r, "statusReason"),
 			CaseStatusChangeReasons: caseStatusChangeReasons,
 		}
@@ -102,8 +101,8 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 		}
 
 		if r.Method == http.MethodPost {
-			if (data.NewStatus == "cannot-register" || data.NewStatus == "cancelled") && data.StatusChangeReason == "" {
-				data.OldStatus = data.NewStatus
+			if (data.NewStatus.String() == "cannot-register" || data.NewStatus.String() == "cancelled") && data.StatusChangeReason == "" {
+				data.OldStatus = data.NewStatus.String()
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error.Field["changeReason"] = map[string]string{
 					"reason": "Please select a reason",
@@ -112,7 +111,7 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 
 			if !data.Error.Any() {
 				caseStatusData := sirius.CaseStatusData{
-					Status:           data.NewStatus,
+					Status:           data.NewStatus.String(),
 					CaseChangeReason: data.StatusChangeReason,
 				}
 
@@ -125,10 +124,10 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 					return err
 				} else {
 					data.Success = true
-					data.OldStatus = data.NewStatus
+					data.OldStatus = data.NewStatus.String()
 
 					SetFlash(w, FlashNotification{
-						Title: fmt.Sprintf("Status changed to %s", templatefn.StatusLabelFormat(data.NewStatus)),
+						Title: fmt.Sprintf("Status changed to %s", data.NewStatus.String()),
 					})
 					return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
 				}
