@@ -140,7 +140,7 @@ func TestPostChangeCaseStatus(t *testing.T) {
 
 	client.
 		On("EditDigitalLPAStatus", mock.Anything, "M-9876-9876-9876", sirius.CaseStatusData{
-			Status: "expired",
+			Status: "Expired",
 		}).
 		Return(nil)
 
@@ -151,7 +151,7 @@ func TestPostChangeCaseStatus(t *testing.T) {
 			Entity:                  "personal-welfare M-9876-9876-9876",
 			CaseUID:                 "M-9876-9876-9876",
 			OldStatus:               "in-progress",
-			NewStatus:               "expired",
+			NewStatus:               shared.ParseCaseStatusType("expired"),
 			StatusItems:             statusItems,
 			CaseStatusChangeReasons: statusChangeReasons,
 			Error:                   sirius.ValidationError{Field: sirius.FieldErrors{}},
@@ -211,7 +211,7 @@ func TestPostChangeCaseStatusWithReason(t *testing.T) {
 
 	client.
 		On("EditDigitalLPAStatus", mock.Anything, "M-9876-9876-9876", sirius.CaseStatusData{
-			Status:           "cannot-register",
+			Status:           "Cannot register",
 			CaseChangeReason: "LPA_DOES_NOT_WORK",
 		}).
 		Return(nil)
@@ -223,7 +223,7 @@ func TestPostChangeCaseStatusWithReason(t *testing.T) {
 			Entity:                  "personal-welfare M-9876-9876-9876",
 			CaseUID:                 "M-9876-9876-9876",
 			OldStatus:               "in-progress",
-			NewStatus:               "cannot-register",
+			NewStatus:               shared.ParseCaseStatusType("cannot-register"),
 			StatusItems:             statusItems,
 			CaseStatusChangeReasons: statusChangeReasons,
 			StatusChangeReason:      "LPA_DOES_NOT_WORK",
