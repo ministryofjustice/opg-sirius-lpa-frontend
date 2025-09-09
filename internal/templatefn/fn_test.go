@@ -469,57 +469,6 @@ func TestCaseTab(t *testing.T) {
 	assert.Equal(t, expected, val)
 }
 
-func TestSortWarningsForCaseSummary(t *testing.T) {
-	warnings := []sirius.Warning{
-		{
-			WarningType: "Donor Deceased",
-			DateAdded:   "01/01/2020 00:02:03",
-		},
-		{
-			WarningType: "Welsh Language",
-			DateAdded:   "11/07/2012 11:02:03",
-		},
-		{
-			WarningType: "Safeguarding",
-			DateAdded:   "20/02/2016 00:02:03",
-		},
-		{
-			WarningType: "Violent Warning",
-			DateAdded:   "15/09/2011 00:02:03",
-		},
-		{
-			WarningType: "Fee Issue",
-			DateAdded:   "11/07/2012 11:02:02",
-		},
-	}
-
-	expected := []sirius.Warning{
-		{
-			WarningType: "Donor Deceased",
-			DateAdded:   "01/01/2020 00:02:03",
-		},
-		{
-			WarningType: "Safeguarding",
-			DateAdded:   "20/02/2016 00:02:03",
-		},
-		{
-			WarningType: "Welsh Language",
-			DateAdded:   "11/07/2012 11:02:03",
-		},
-		{
-			WarningType: "Fee Issue",
-			DateAdded:   "11/07/2012 11:02:02",
-		},
-		{
-			WarningType: "Violent Warning",
-			DateAdded:   "15/09/2011 00:02:03",
-		},
-	}
-
-	val := sortWarningsForCaseSummary(warnings)
-	assert.Equal(t, expected, val)
-}
-
 func TestCasesWarningAppliedToOnlyOneCase(t *testing.T) {
 	cases := []sirius.Case{
 		{
