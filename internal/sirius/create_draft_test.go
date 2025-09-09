@@ -114,6 +114,7 @@ func TestCreateDraft(t *testing.T) {
 					CheckedAt: "2024-07-01T16:06:08Z",
 					Reference: "712254d5-4cf4-463c-96c1-67744b70043e",
 				},
+				DonorIdentityCheckWhenDraft: true,
 			},
 			setup: func() {
 				pact.
@@ -158,6 +159,7 @@ func TestCreateDraft(t *testing.T) {
 								"checkedAt": "2024-07-01T16:06:08Z",
 								"reference": "712254d5-4cf4-463c-96c1-67744b70043e",
 							},
+							"donorIdentityCheckWhenDraft": true,
 						},
 					}).
 					WithCompleteResponse(consumer.Response{
