@@ -431,7 +431,7 @@ func caseTab(caseSummary sirius.CaseSummary, tabName string) CaseTabData {
 	lpaStore := caseSummary.DigitalLpa.LpaStoreData
 	status := shared.CaseStatusTypeDraft
 
-	if lpaStore.Status.String() != "" {
+	if lpaStore.Status.ReadableString() != "" {
 		status = lpaStore.Status
 	}
 
