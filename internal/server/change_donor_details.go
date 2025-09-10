@@ -160,7 +160,9 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 				LpaSignedOn:       data.Form.LpaSignedOn.toDateString(),
 			}
 
-			if !donorIdentityCheckComplete {
+			if donorIdentityCheckComplete {
+				donorDetailsData.DateOfBirth = donorDob.toDateString()
+			} else {
 				donorDetailsData.DateOfBirth = data.Form.DateOfBirth.toDateString()
 			}
 
