@@ -140,7 +140,7 @@ func TestPostChangeCaseStatus(t *testing.T) {
 
 	client.
 		On("EditDigitalLPAStatus", mock.Anything, "M-9876-9876-9876", sirius.CaseStatusData{
-			Status: "Expired",
+			Status: "expired",
 		}).
 		Return(nil)
 
@@ -211,7 +211,7 @@ func TestPostChangeCaseStatusWithReason(t *testing.T) {
 
 	client.
 		On("EditDigitalLPAStatus", mock.Anything, "M-9876-9876-9876", sirius.CaseStatusData{
-			Status:           "Cannot register",
+			Status:           "cannot-register",
 			CaseChangeReason: "LPA_DOES_NOT_WORK",
 		}).
 		Return(nil)

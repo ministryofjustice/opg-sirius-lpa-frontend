@@ -110,10 +110,10 @@ func TestIsDraft(t *testing.T) {
 }
 
 func TestString(t *testing.T) {
-	if CaseStatusTypeDraft.String() != "Draft" {
-		t.Errorf("CaseStatusTypeDraft.String() = %q, want %q", CaseStatusTypeDraft.String(), "Draft")
+	if CaseStatusTypeDraft.ReadableString() != "Draft" {
+		t.Errorf("CaseStatusTypeDraft.ReadableString()() = %q, want %q", CaseStatusTypeDraft.ReadableString(), "Draft")
 	}
-	if CaseStatusTypeRegistered.String() != "Registered" {
-		t.Errorf("CaseStatusTypeRegistered.Key() = %q, want %q", CaseStatusTypeRegistered.String(), "Registered")
+	if CaseStatusTypeRegistered.ReadableString() != "Registered" {
+		t.Errorf("CaseStatusTypeRegistered.Key() = %q, want %q", CaseStatusTypeRegistered.ReadableString(), "Registered")
 	}
 }
