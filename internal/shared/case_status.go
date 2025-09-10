@@ -67,7 +67,7 @@ var caseStatusTypeMap = map[string]CaseStatus{
 	"invalid":                  CaseStatusTypeInvalid,
 }
 
-func (cs CaseStatus) String() string {
+func (cs CaseStatus) ReadableString() string {
 	switch cs {
 	case CaseStatusTypeDraft:
 		return "Draft"
@@ -111,6 +111,33 @@ func (cs CaseStatus) String() string {
 		return "Imperfect"
 	case CaseStatusTypeInvalid:
 		return "Invalid"
+	default:
+		return ""
+	}
+}
+
+func (cs CaseStatus) StringForApi() string {
+	switch cs {
+	case CaseStatusTypeDraft:
+		return "draft"
+	case CaseStatusTypeInProgress:
+		return "in-progress"
+	case CaseStatusTypeStatutoryWaitingPeriod:
+		return "statutory-waiting-period"
+	case CaseStatusTypeDoNotRegister:
+		return "do-not-register"
+	case CaseStatusTypeExpired:
+		return "expired"
+	case CaseStatusTypeRegistered:
+		return "registered"
+	case CaseStatusTypeCannotRegister:
+		return "cannot-register"
+	case CaseStatusTypeCancelled:
+		return "cancelled"
+	case CaseStatusTypeDeRegistered:
+		return "de-registered"
+	case CaseStatusTypeSuspended:
+		return "suspended"
 	default:
 		return ""
 	}
@@ -165,7 +192,7 @@ func ParseCaseStatusType(s string) CaseStatus {
 }
 
 func (cs CaseStatus) MarshalJSON() ([]byte, error) {
-	return json.Marshal(cs.String())
+	return json.Marshal(cs.ReadableString())
 }
 
 func (cs *CaseStatus) UnmarshalJSON(data []byte) (err error) {

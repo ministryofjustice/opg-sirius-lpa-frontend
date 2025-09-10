@@ -72,8 +72,8 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 
 		status := "draft"
 
-		if cs.DigitalLpa.LpaStoreData.Status.String() != "" {
-			status = cs.DigitalLpa.LpaStoreData.Status.String()
+		if cs.DigitalLpa.LpaStoreData.Status.ReadableString() != "" {
+			status = cs.DigitalLpa.LpaStoreData.Status.ReadableString()
 		}
 
 		data := changeCaseStatusData{
@@ -101,8 +101,8 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 		}
 
 		if r.Method == http.MethodPost {
-			if (data.NewStatus.String() == "cannot-register" || data.NewStatus.String() == "cancelled") && data.StatusChangeReason == "" {
-				data.OldStatus = data.NewStatus.String()
+			if (data.NewStatus.StringForApi() == "cannot-register" || data.NewStatus.StringForApi() == "cancelled") && data.StatusChangeReason == "" {
+				data.OldStatus = data.NewStatus.ReadableString()
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error.Field["changeReason"] = map[string]string{
 					"reason": "Please select a reason",
@@ -111,7 +111,7 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 
 			if !data.Error.Any() {
 				caseStatusData := sirius.CaseStatusData{
-					Status:           data.NewStatus.String(),
+					Status:           data.NewStatus.StringForApi(),
 					CaseChangeReason: data.StatusChangeReason,
 				}
 
@@ -124,10 +124,10 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 					return err
 				} else {
 					data.Success = true
-					data.OldStatus = data.NewStatus.String()
+					data.OldStatus = data.NewStatus.StringForApi()
 
 					SetFlash(w, FlashNotification{
-						Title: fmt.Sprintf("Status changed to %s", strings.ToLower(data.NewStatus.String())),
+						Title: fmt.Sprintf("Status changed to %s", strings.ToLower(data.NewStatus.ReadableString())),
 					})
 					return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
 				}
