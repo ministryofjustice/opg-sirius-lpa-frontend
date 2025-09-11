@@ -403,6 +403,8 @@ func caseTab(caseSummary sirius.CaseSummary, tabName string) CaseTabData {
 
 	if lpaStore.Status.ReadableString() != "" {
 		status = lpaStore.Status
+	} else if lpa.Status.ReadableString() != "" {
+		status = lpa.Status
 	}
 
 	var linkedCases []linkedCase

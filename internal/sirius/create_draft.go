@@ -16,22 +16,23 @@ type DonorIdentityCheck struct {
 }
 
 type Draft struct {
-	CaseType                  []string              `json:"types"`
-	Source                    string                `json:"source"`
-	DonorFirstNames           string                `json:"donorFirstNames"`
-	DonorLastName             string                `json:"donorLastName"`
-	DonorDob                  DateString            `json:"donorDob"`
-	DonorAddress              Address               `json:"donorAddress"`
-	CorrespondentFirstNames   string                `json:"correspondentFirstNames,omitempty"`
-	CorrespondentLastName     string                `json:"correspondentLastName,omitempty"`
-	CorrespondentAddress      *Address              `json:"correspondentAddress,omitempty"`
-	PhoneNumber               string                `json:"donorPhone,omitempty"`
-	Email                     string                `json:"donorEmail,omitempty"`
-	CorrespondenceByWelsh     bool                  `json:"correspondenceByWelsh,omitempty"`
-	CorrespondenceLargeFormat bool                  `json:"correspondenceLargeFormat,omitempty"`
-	SeveranceStatus           string                `json:"severanceStatus,omitempty"`
-	SeveranceApplication      *SeveranceApplication `json:"severanceApplication,omitempty"`
-	DonorIdentityCheck        *DonorIdentityCheck   `json:"donorIdentityCheck,omitempty"`
+	CaseType                    []string              `json:"types"`
+	Source                      string                `json:"source"`
+	DonorFirstNames             string                `json:"donorFirstNames"`
+	DonorLastName               string                `json:"donorLastName"`
+	DonorDob                    DateString            `json:"donorDob"`
+	DonorAddress                Address               `json:"donorAddress"`
+	CorrespondentFirstNames     string                `json:"correspondentFirstNames,omitempty"`
+	CorrespondentLastName       string                `json:"correspondentLastName,omitempty"`
+	CorrespondentAddress        *Address              `json:"correspondentAddress,omitempty"`
+	PhoneNumber                 string                `json:"donorPhone,omitempty"`
+	Email                       string                `json:"donorEmail,omitempty"`
+	CorrespondenceByWelsh       bool                  `json:"correspondenceByWelsh,omitempty"`
+	CorrespondenceLargeFormat   bool                  `json:"correspondenceLargeFormat,omitempty"`
+	SeveranceStatus             string                `json:"severanceStatus,omitempty"`
+	SeveranceApplication        *SeveranceApplication `json:"severanceApplication,omitempty"`
+	DonorIdentityCheck          *DonorIdentityCheck   `json:"donorIdentityCheck,omitempty"`
+	DonorIdentityCheckWhenDraft bool                  `json:"donorIdentityCheckWhenDraft,omitempty"`
 }
 
 func (c *Client) CreateDraft(ctx Context, draft Draft) (map[string]string, error) {

@@ -469,6 +469,38 @@ func TestCaseTab(t *testing.T) {
 	assert.Equal(t, expected, val)
 }
 
+func TestCaseTabForDraftLpaNotInStore(t *testing.T) {
+	caseSummary := sirius.CaseSummary{
+		DigitalLpa: sirius.DigitalLpa{
+			UID: "123",
+			SiriusData: sirius.SiriusData{
+				ID:          222,
+				UID:         "454654",
+				CreatedDate: "2010-01-01",
+				Subtype:     "subType",
+				Status:      shared.CaseStatusTypePending,
+			},
+			LpaStoreData: sirius.LpaStoreData{},
+		},
+	}
+
+	expected := CaseTabData{
+		CaseSummary: caseSummary,
+		SortedLinkedCases: []linkedCase{
+			{
+				UID:         "454654",
+				Subtype:     "subType",
+				Status:      shared.CaseStatusTypePending,
+				CreatedDate: "2010-01-01",
+			},
+		},
+		TabName: "TabName",
+	}
+
+	val := caseTab(caseSummary, "TabName")
+	assert.Equal(t, expected, val)
+}
+
 func TestFee(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["fee"].(func(int) string)
