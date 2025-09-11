@@ -25,7 +25,7 @@
                 <div class="govuk-radios__item">
                   <input class="govuk-radios__input" id="f-{{ fieldID "status" $i }}" name="status" type="radio" value="{{ $e.Value }}" {{ if eq $.OldStatus $e.Value }}checked{{ end }} {{ if $e.ConditionalItem }}data-aria-controls="f-{{ fieldID "status" $i }}-reveal"{{ end }}>
                   <label class="govuk-label govuk-radios__label" for="f-{{ fieldID "status" $i }}">
-                    {{ template "status-tag" $e.Label }}
+                    {{ template "status-tag" $e.Label }} {{$.OldStatus}} {{$e.Value}}
                   </label>
                 </div>
                 {{ if $e.ConditionalItem }}
