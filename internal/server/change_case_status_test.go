@@ -246,3 +246,54 @@ func TestPostChangeCaseStatusWithReason(t *testing.T) {
 	assert.Equal(t, RedirectError("/lpa/M-9876-9876-9876"), err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }
+
+func TestPostChangeCaseStatusError(t *testing.T) {
+	caseSummary := sirius.CaseSummary{
+		DigitalLpa: sirius.DigitalLpa{
+			UID: "M-9876-9876-9876",
+			SiriusData: sirius.SiriusData{
+				ID:      676,
+				Subtype: "personal-welfare",
+				Status:  shared.CaseStatusTypeDraft,
+			},
+			LpaStoreData: sirius.LpaStoreData{
+				Status: shared.CaseStatusTypeDraft,
+			},
+		},
+	}
+
+	var statusChangeReasons []sirius.RefDataItem
+
+	client := &mockChangeCaseStatusClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		Return(caseSummary, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CaseStatusChangeReason).
+		Return(statusChangeReasons, nil)
+
+	template := &mockTemplate{}
+	var capturedData changeCaseStatusData
+	template.
+		On("Func", mock.Anything, mock.MatchedBy(func(data changeCaseStatusData) bool {
+			capturedData = data
+			return true
+		})).
+		Return(nil)
+
+	form := url.Values{
+		"status":       {"cannot-register"},
+		"statusReason": {""},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/change-case-status?uid=M-9876-9876-9876", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := ChangeCaseStatus(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	assert.Equal(t, "Please select a reason", capturedData.Error.Field["changeReason"]["reason"])
+}

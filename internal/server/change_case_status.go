@@ -72,8 +72,8 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 
 		status := "draft"
 
-		if cs.DigitalLpa.LpaStoreData.Status.ReadableString() != "" {
-			status = cs.DigitalLpa.LpaStoreData.Status.ReadableString()
+		if cs.DigitalLpa.LpaStoreData.Status.StringForApi() != "" {
+			status = cs.DigitalLpa.LpaStoreData.Status.StringForApi()
 		}
 
 		data := changeCaseStatusData{
