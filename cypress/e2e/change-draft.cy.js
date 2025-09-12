@@ -77,6 +77,25 @@ describe("Change draft form", () => {
       cases.warnings.empty("565"),
       cases.tasks.empty("565"),
       digitalLpas.objections.empty("M-1111-2222-1111"),
+      digitalLpas.anomalies.empty("M-1111-2222-1111"),
+      digitalLpas.progressIndicators.defaultCannotStart("M-1111-2222-1111"),
+
+      digitalLpas.get("M-0000-0000-0002", {
+        "opg.poas.sirius": {
+          id: 2222,
+        },
+        "opg.poas.lpastore": null,
+      }),
+      cases.warnings.empty("2222"),
+      cases.tasks.empty("2222"),
+      digitalLpas.objections.empty("M-0000-0000-0002"),
+      digitalLpas.anomalies.empty("M-0000-0000-0002"),
+      digitalLpas.progressIndicators.defaultCannotStart("M-0000-0000-0002", [
+        {
+          indicator: "DONOR_ID",
+          status: "COMPLETE",
+        },
+      ]),
     ]);
 
     cy.wrap(mocks);
@@ -150,5 +169,13 @@ describe("Change draft form", () => {
     cy.get(".moj-alert").should("exist");
 
     cy.url().should("contain", "/lpa/M-1111-2222-1111/lpa-details");
+  });
+
+  it("will show message for case with donor ID check", () => {
+    cy.visit("/lpa/M-0000-0000-0002/change-draft");
+
+    cy.contains(
+      "Because this date of birth was used for the donor's ID check, it cannot be updated.",
+    );
   });
 });

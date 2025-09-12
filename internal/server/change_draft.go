@@ -13,15 +13,18 @@ type ChangeDraftClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
 	ChangeDraft(sirius.Context, string, sirius.ChangeDraft) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
+	ProgressIndicatorsForDigitalLpa(siriusCtx sirius.Context, uid string) ([]sirius.ProgressIndicator, error)
 }
 
 type changeDraftData struct {
-	XSRFToken string
-	Countries []sirius.RefDataItem
-	Success   bool
-	Error     sirius.ValidationError
-	CaseUID   string
-	Form      formDraftDetails
+	XSRFToken                  string
+	Countries                  []sirius.RefDataItem
+	Success                    bool
+	Error                      sirius.ValidationError
+	CaseUID                    string
+	Form                       formDraftDetails
+	DonorIdentityCheckComplete bool
+	DonorDobString             string
 }
 
 type formDraftDetails struct {
@@ -34,7 +37,6 @@ type formDraftDetails struct {
 }
 
 func ChangeDraft(client ChangeDraftClient, tmpl template.Template) Handler {
-
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseUID := r.PathValue("uid")
 		ctx := getContext(r)
@@ -73,6 +75,24 @@ func ChangeDraft(client ChangeDraftClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		donorIdentityCheckComplete := false
+		donorDobString := string(donor.DateOfBirth)
+
+		pis, err := client.ProgressIndicatorsForDigitalLpa(ctx, caseUID)
+		if err != nil {
+			return err
+		}
+
+		for _, pi := range pis {
+			if pi.Indicator == "DONOR_ID" {
+				if pi.Status == "COMPLETE" {
+					donorIdentityCheckComplete = true
+				}
+
+				break
+			}
+		}
+
 		data = changeDraftData{
 			XSRFToken: ctx.XSRFToken,
 			CaseUID:   caseUID,
@@ -91,7 +111,9 @@ func ChangeDraft(client ChangeDraftClient, tmpl template.Template) Handler {
 				PhoneNumber: donor.Phone,
 				Email:       donor.Email,
 			},
-			Countries: countries,
+			Countries:                  countries,
+			DonorIdentityCheckComplete: donorIdentityCheckComplete,
+			DonorDobString:             donorDobString,
 		}
 
 		if r.Method == http.MethodPost {
