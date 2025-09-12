@@ -129,7 +129,10 @@ function extendDefaultDigitalLpa(uid, body) {
       );
     }
 
-    if (body.hasOwnProperty("opg.poas.lpastore")) {
+    if (
+      body.hasOwnProperty("opg.poas.lpastore") &&
+      body["opg.poas.lpastore"] !== null
+    ) {
       opgPoasLpastore = Object.assign(
         {},
         defaultBody["opg.poas.lpastore"],
@@ -157,10 +160,13 @@ function extendDefaultDigitalLpa(uid, body) {
 
   updatedBody["opg.poas.sirius"].donor = opgPoasSiriusDonor;
   updatedBody["opg.poas.sirius"].application = opgPoasSiriusApplication;
-  updatedBody["opg.poas.lpastore"].donor = opgPoasLpastoreDonor;
-  updatedBody["opg.poas.lpastore"].attorneys = opgPoasLpastoreAttorneys;
-  updatedBody["opg.poas.lpastore"].certificateProvider =
-    opgPoasLpastoreCertificateProvider;
+
+  if (updatedBody["opg.poas.lpastore"] !== null) {
+    updatedBody["opg.poas.lpastore"].donor = opgPoasLpastoreDonor;
+    updatedBody["opg.poas.lpastore"].attorneys = opgPoasLpastoreAttorneys;
+    updatedBody["opg.poas.lpastore"].certificateProvider =
+      opgPoasLpastoreCertificateProvider;
+  }
 
   return updatedBody;
 }
