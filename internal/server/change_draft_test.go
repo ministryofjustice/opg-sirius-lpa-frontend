@@ -28,6 +28,11 @@ func (m *mockChangeDraftClient) RefDataByCategory(ctx sirius.Context, category s
 	return nil, args.Error(1)
 }
 
+func (m *mockChangeDraftClient) ProgressIndicatorsForDigitalLpa(ctx sirius.Context, uid string) ([]sirius.ProgressIndicator, error) {
+	args := m.Called(ctx, uid)
+	return args.Get(0).([]sirius.ProgressIndicator), args.Error(1)
+}
+
 func (m *mockChangeDraftClient) ChangeDraft(ctx sirius.Context, caseUID string, draftData sirius.ChangeDraft) error {
 	return m.Called(ctx, caseUID, draftData).Error(0)
 }
@@ -123,14 +128,22 @@ func TestGetChangeDraft(t *testing.T) {
 			client.
 				On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 				Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+			client.
+				On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-EEEE-EEEE-EEEE").
+				Return([]sirius.ProgressIndicator{{
+					Indicator: "DONOR_ID",
+					Status:    "IN_PROGRESS",
+				}}, nil)
 
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything,
 					changeDraftData{
-						Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
-						CaseUID:   tc.caseUID,
-						Form:      tc.form,
+						Countries:                  []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
+						CaseUID:                    tc.caseUID,
+						Form:                       tc.form,
+						DonorIdentityCheckComplete: false,
+						DonorDobString:             "1990-02-22",
 					}).
 				Return(tc.errorReturned)
 
@@ -148,6 +161,54 @@ func TestGetChangeDraft(t *testing.T) {
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
+}
+
+func TestGetChangeDraftWithDonorIdentityCheck(t *testing.T) {
+	client := &mockChangeDraftClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
+		Return(testChangeDraftCaseSummary, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+	client.
+		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-AAAA-1111-BBBB").
+		Return([]sirius.ProgressIndicator{{
+			Indicator: "DONOR_ID",
+			Status:    "COMPLETE",
+		}}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything,
+			changeDraftData{
+				Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
+				CaseUID:   "M-AAAA-1111-BBBB",
+				Form: formDraftDetails{
+					FirstNames:  "Jack",
+					LastName:    "Black",
+					DateOfBirth: dob{Day: 22, Month: 2, Year: 1990},
+					Address: sirius.Address{
+						Line1:    "9 Mount Pleasant Drive",
+						Town:     "East Harling",
+						Postcode: "NR16 2GB",
+						Country:  "UK",
+					},
+					Email:       "a@example.com",
+					PhoneNumber: "077577575757",
+				},
+				DonorIdentityCheckComplete: true,
+				DonorDobString:             "1990-02-22",
+			}).
+		Return(nil)
+
+	server := newMockServer("/lpa/{uid}/change-draft", ChangeDraft(client, template.Func))
+
+	r, _ := http.NewRequest(http.MethodGet, "/lpa/M-AAAA-1111-BBBB/change-draft", nil)
+	_, err := server.serve(r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestGetChangeDraftWhenCaseSummaryErrors(t *testing.T) {
@@ -170,6 +231,21 @@ func TestGetChangeDraftWhenRefDataByCategoryErrors(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 		Return([]sirius.RefDataItem{}, errExample)
+
+	assertChangeDraftErrors(t, client, "M-FFFF-FFFF-FFFF", errExample)
+}
+
+func TestGetChangeDraftWhenProgressIndicatorsForDigitalLpaErrors(t *testing.T) {
+	client := &mockChangeDraftClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-FFFF-FFFF-FFFF").
+		Return(testChangeDraftCaseSummary, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+	client.
+		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-FFFF-FFFF-FFFF").
+		Return([]sirius.ProgressIndicator{}, errExample)
 
 	assertChangeDraftErrors(t, client, "M-FFFF-FFFF-FFFF", errExample)
 }
@@ -210,6 +286,12 @@ func TestPostChangeDraft(t *testing.T) {
 			client.
 				On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 				Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+			client.
+				On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-EEEE-EEEE-EEEE").
+				Return([]sirius.ProgressIndicator{{
+					Indicator: "DONOR_ID",
+					Status:    "IN_PROGRESS",
+				}}, nil)
 			client.
 				On("ChangeDraft", mock.Anything, "M-EEEE-EEEE-EEEE", sirius.ChangeDraft{
 					FirstNames:  "Samuel",
@@ -266,6 +348,12 @@ func TestPostChangeDraftWhenValidationError(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+	client.
+		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-EEEE-EEEE-EEEE").
+		Return([]sirius.ProgressIndicator{{
+			Indicator: "DONOR_ID",
+			Status:    "IN_PROGRESS",
+		}}, nil)
 	client.
 		On("ChangeDraft", mock.Anything, "M-EEEE-EEEE-EEEE", sirius.ChangeDraft{
 			LastName:    "Black",

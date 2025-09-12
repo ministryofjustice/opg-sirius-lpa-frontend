@@ -43,12 +43,13 @@ function extendDefaultDigitalLpa(uid, body) {
       status: "draft",
       registrationDate: "2022-12-18",
       peopleToNotify: [],
+      signedAt: "2022-12-19T09:12:59Z",
       donor: {
         uid: "572fe550-e465-40b3-a643-ca9564fabab8",
         firstNames: "Steven",
         lastName: "Munnell",
         email: "Steven.Munnell@example.com",
-        dateOfBirth: "17/06/1982",
+        dateOfBirth: "1982-06-17",
         otherNamesKnownBy: "",
         contactLanguagePreference: "",
         address: {
@@ -128,7 +129,10 @@ function extendDefaultDigitalLpa(uid, body) {
       );
     }
 
-    if (body.hasOwnProperty("opg.poas.lpastore")) {
+    if (
+      body.hasOwnProperty("opg.poas.lpastore") &&
+      body["opg.poas.lpastore"] !== null
+    ) {
       opgPoasLpastore = Object.assign(
         {},
         defaultBody["opg.poas.lpastore"],
@@ -156,10 +160,13 @@ function extendDefaultDigitalLpa(uid, body) {
 
   updatedBody["opg.poas.sirius"].donor = opgPoasSiriusDonor;
   updatedBody["opg.poas.sirius"].application = opgPoasSiriusApplication;
-  updatedBody["opg.poas.lpastore"].donor = opgPoasLpastoreDonor;
-  updatedBody["opg.poas.lpastore"].attorneys = opgPoasLpastoreAttorneys;
-  updatedBody["opg.poas.lpastore"].certificateProvider =
-    opgPoasLpastoreCertificateProvider;
+
+  if (updatedBody["opg.poas.lpastore"] !== null) {
+    updatedBody["opg.poas.lpastore"].donor = opgPoasLpastoreDonor;
+    updatedBody["opg.poas.lpastore"].attorneys = opgPoasLpastoreAttorneys;
+    updatedBody["opg.poas.lpastore"].certificateProvider =
+      opgPoasLpastoreCertificateProvider;
+  }
 
   return updatedBody;
 }
@@ -214,7 +221,11 @@ const progressIndicators = {
       "RESTRICTIONS_AND_CONDITIONS",
     ];
 
-    let allProgressIndicators = progressIndicators;
+    let allProgressIndicators = [];
+
+    if (progressIndicators !== undefined && Array.isArray(progressIndicators)) {
+      allProgressIndicators = progressIndicators;
+    }
 
     progressIndicatorTypes.forEach((progressIndicatorType) => {
       const exists = allProgressIndicators.find(

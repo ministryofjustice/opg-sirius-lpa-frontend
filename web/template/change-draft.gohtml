@@ -27,7 +27,17 @@
 
                 {{ template "input" (field "firstNames" "Donor’s first names" .Form.FirstNames .Error.Field.FirstNames) }}
                 {{ template "input" (field "lastName" "Donor’s last name" .Form.LastName .Error.Field.LastName) }}
-                {{ template "date" (field "dob" "Date of birth" .Form.DateOfBirth .Error.Field.DateOfBirth) }}
+
+                {{ if .DonorIdentityCheckComplete }}
+                    <div class="govuk-form-group">
+                        <div class="govuk-body govuk-!-margin-bottom-1">Date of birth</div>
+                        <div class="govuk-body govuk-!-margin-bottom-1">{{ parseAndFormatDate .DonorDobString "2006-01-02" "2 January 2006" }}</div>
+                        <div class="govuk-inset-text govuk-!-margin-top-1">Because this date of birth was used for the donor's ID check, it cannot be updated.</div>
+                    </div>
+                {{ else }}
+                    {{ template "date" (field "dob" "Date of birth" .Form.DateOfBirth .Error.Field.DateOfBirth) }}
+                {{ end }}
+
                 <div class="govuk-form-group {{ if .Error.Field.Address }}govuk-form-group--error{{ end }}" data-app-address-finder-label="Donor's address">
                     <legend class="govuk-fieldset__legend">
                         <h2 class="govuk-fieldset__heading">Donor's address</h2>

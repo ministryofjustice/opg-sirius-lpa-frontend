@@ -26,6 +26,11 @@ func (m *mockChangeDonorDetailsClient) ChangeDonorDetails(ctx sirius.Context, ca
 
 }
 
+func (m *mockChangeDonorDetailsClient) ProgressIndicatorsForDigitalLpa(ctx sirius.Context, uid string) ([]sirius.ProgressIndicator, error) {
+	args := m.Called(ctx, uid)
+	return args.Get(0).([]sirius.ProgressIndicator), args.Error(1)
+}
+
 func (m *mockChangeDonorDetailsClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
 	args := m.Called(ctx, category)
 	if args.Get(0) != nil {
@@ -77,6 +82,12 @@ func TestGetChangeDonorDetails(t *testing.T) {
 		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
 		Return(testCaseSummary, nil)
 	client.
+		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-AAAA-1111-BBBB").
+		Return([]sirius.ProgressIndicator{{
+			Indicator: "DONOR_ID",
+			Status:    "IN_PROGRESS",
+		}}, nil)
+	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 
@@ -100,6 +111,8 @@ func TestGetChangeDonorDetails(t *testing.T) {
 					PhoneNumber: "1234567890",
 					LpaSignedOn: dob{11, 2, 2024},
 				},
+				DonorIdentityCheckComplete: false,
+				DonorDobString:             "1965-04-18",
 			}).
 		Return(nil)
 
@@ -115,7 +128,6 @@ func TestGetChangeDonorDetails(t *testing.T) {
 }
 
 func TestGetChangeDonorDetailsWhenCaseSummaryErrors(t *testing.T) {
-
 	client := &mockChangeDonorDetailsClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-EEEE-EEEE-EEEE").
@@ -124,11 +136,29 @@ func TestGetChangeDonorDetailsWhenCaseSummaryErrors(t *testing.T) {
 	assertChangeDonorDetailsErrors(t, client, "M-EEEE-EEEE-EEEE", errExample)
 }
 
+func TestGetChangeDonorDetailsWhenProgressIndicatorsForDigitalLpaErrors(t *testing.T) {
+	client := &mockChangeDonorDetailsClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
+		Return(testCaseSummary, nil)
+	client.
+		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-AAAA-1111-BBBB").
+		Return([]sirius.ProgressIndicator{}, errExample)
+
+	assertChangeDonorDetailsErrors(t, client, "M-AAAA-1111-BBBB", errExample)
+}
+
 func TestGetChangeDonorDetailsWhenRefDataByCategoryErrors(t *testing.T) {
 	client := &mockChangeDonorDetailsClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
 		Return(testCaseSummary, nil)
+	client.
+		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-AAAA-1111-BBBB").
+		Return([]sirius.ProgressIndicator{{
+			Indicator: "DONOR_ID",
+			Status:    "IN_PROGRESS",
+		}}, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 		Return([]sirius.RefDataItem{}, errExample)
@@ -146,11 +176,17 @@ func assertChangeDonorDetailsErrors(t *testing.T, client *mockChangeDonorDetails
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestGetChangeDonorDetailsWhenTemplateErrors(t *testing.T) {
+func TestGetChangeDonorDetailsWithDonorIdentityCheck(t *testing.T) {
 	client := &mockChangeDonorDetailsClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
 		Return(testCaseSummary, nil)
+	client.
+		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-AAAA-1111-BBBB").
+		Return([]sirius.ProgressIndicator{{
+			Indicator: "DONOR_ID",
+			Status:    "COMPLETE",
+		}}, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
@@ -175,6 +211,59 @@ func TestGetChangeDonorDetailsWhenTemplateErrors(t *testing.T) {
 					PhoneNumber: "1234567890",
 					LpaSignedOn: dob{11, 2, 2024},
 				},
+				DonorIdentityCheckComplete: true,
+				DonorDobString:             "1965-04-18",
+			}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/change-donor-details/?uid=M-AAAA-1111-BBBB", nil)
+	w := httptest.NewRecorder()
+
+	err := ChangeDonorDetails(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetChangeDonorDetailsWhenTemplateErrors(t *testing.T) {
+	client := &mockChangeDonorDetailsClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
+		Return(testCaseSummary, nil)
+	client.
+		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-AAAA-1111-BBBB").
+		Return([]sirius.ProgressIndicator{{
+			Indicator: "DONOR_ID",
+			Status:    "IN_PROGRESS",
+		}}, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything,
+			changeDonorDetailsData{
+				Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
+				CaseUID:   "M-AAAA-1111-BBBB",
+				Form: formDonorDetails{
+					FirstNames:        "Zackary",
+					LastName:          "Lemmonds",
+					OtherNamesKnownBy: "",
+					DateOfBirth:       dob{Day: 18, Month: 4, Year: 1965},
+					Address: sirius.Address{
+						Line1:    "9 Mount Pleasant Drive",
+						Town:     "East Harling",
+						Postcode: "NR16 2GB",
+						Country:  "UK",
+					},
+					PhoneNumber: "1234567890",
+					LpaSignedOn: dob{11, 2, 2024},
+				},
+				DonorIdentityCheckComplete: false,
+				DonorDobString:             "1965-04-18",
 			}).
 		Return(errExample)
 
@@ -192,6 +281,12 @@ func TestPostChangeDonorDetails(t *testing.T) {
 	client.
 		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
 		Return(testCaseSummary, nil)
+	client.
+		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-AAAA-1111-BBBB").
+		Return([]sirius.ProgressIndicator{{
+			Indicator: "DONOR_ID",
+			Status:    "IN_PROGRESS",
+		}}, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
@@ -255,6 +350,12 @@ func TestPostChangeDonorDetailsWhenAPIFails(t *testing.T) {
 		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
 		Return(testCaseSummary, nil)
 	client.
+		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-AAAA-1111-BBBB").
+		Return([]sirius.ProgressIndicator{{
+			Indicator: "DONOR_ID",
+			Status:    "IN_PROGRESS",
+		}}, nil)
+	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 	client.
@@ -313,6 +414,12 @@ func TestPostChangeDonorDetailsWhenValidationError(t *testing.T) {
 	client.
 		On("CaseSummary", mock.Anything, "M-AAAA-1111-BBBB").
 		Return(testCaseSummary, nil)
+	client.
+		On("ProgressIndicatorsForDigitalLpa", mock.Anything, "M-AAAA-1111-BBBB").
+		Return([]sirius.ProgressIndicator{{
+			Indicator: "DONOR_ID",
+			Status:    "IN_PROGRESS",
+		}}, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
