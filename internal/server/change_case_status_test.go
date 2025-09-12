@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -35,16 +36,16 @@ func (m *mockChangeCaseStatusClient) RefDataByCategory(ctx sirius.Context, categ
 }
 
 var statusItems = []statusItem{
-	{Value: "draft", Label: "Draft", ConditionalItem: false},
-	{Value: "in-progress", Label: "In progress", ConditionalItem: false},
-	{Value: "statutory-waiting-period", Label: "Statutory waiting period", ConditionalItem: false},
-	{Value: "registered", Label: "Registered", ConditionalItem: false},
-	{Value: "suspended", Label: "Suspended", ConditionalItem: false},
-	{Value: "do-not-register", Label: "Do not register", ConditionalItem: false},
-	{Value: "expired", Label: "Expired", ConditionalItem: false},
-	{Value: "cannot-register", Label: "Cannot register", ConditionalItem: true},
-	{Value: "cancelled", Label: "Cancelled", ConditionalItem: true},
-	{Value: "de-registered", Label: "De-registered", ConditionalItem: false},
+	{Value: "draft", Label: shared.CaseStatusTypeDraft, ConditionalItem: false},
+	{Value: "in-progress", Label: shared.CaseStatusTypeInProgress, ConditionalItem: false},
+	{Value: "statutory-waiting-period", Label: shared.CaseStatusTypeStatutoryWaitingPeriod, ConditionalItem: false},
+	{Value: "registered", Label: shared.CaseStatusTypeRegistered, ConditionalItem: false},
+	{Value: "suspended", Label: shared.CaseStatusTypeSuspended, ConditionalItem: false},
+	{Value: "do-not-register", Label: shared.CaseStatusTypeDoNotRegister, ConditionalItem: false},
+	{Value: "expired", Label: shared.CaseStatusTypeExpired, ConditionalItem: false},
+	{Value: "cannot-register", Label: shared.CaseStatusTypeCannotRegister, ConditionalItem: true},
+	{Value: "cancelled", Label: shared.CaseStatusTypeCancelled, ConditionalItem: true},
+	{Value: "de-registered", Label: shared.CaseStatusTypeDeRegistered, ConditionalItem: false},
 }
 
 func TestGetChangeCaseStatus(t *testing.T) {
@@ -54,10 +55,10 @@ func TestGetChangeCaseStatus(t *testing.T) {
 			SiriusData: sirius.SiriusData{
 				ID:      676,
 				Subtype: "personal-welfare",
-				Status:  "Draft",
+				Status:  shared.CaseStatusTypeDraft,
 			},
 			LpaStoreData: sirius.LpaStoreData{
-				Status: "draft",
+				Status: shared.CaseStatusTypeDraft,
 			},
 		},
 	}
@@ -108,10 +109,10 @@ func TestPostChangeCaseStatus(t *testing.T) {
 			SiriusData: sirius.SiriusData{
 				ID:      676,
 				Subtype: "personal-welfare",
-				Status:  "Draft",
+				Status:  shared.CaseStatusTypeDraft,
 			},
 			LpaStoreData: sirius.LpaStoreData{
-				Status: "draft",
+				Status: shared.CaseStatusTypeDraft,
 			},
 		},
 	}
@@ -150,7 +151,7 @@ func TestPostChangeCaseStatus(t *testing.T) {
 			Entity:                  "personal-welfare M-9876-9876-9876",
 			CaseUID:                 "M-9876-9876-9876",
 			OldStatus:               "in-progress",
-			NewStatus:               "expired",
+			NewStatus:               shared.ParseCaseStatusType("expired"),
 			StatusItems:             statusItems,
 			CaseStatusChangeReasons: statusChangeReasons,
 			Error:                   sirius.ValidationError{Field: sirius.FieldErrors{}},
@@ -179,10 +180,10 @@ func TestPostChangeCaseStatusWithReason(t *testing.T) {
 			SiriusData: sirius.SiriusData{
 				ID:      676,
 				Subtype: "personal-welfare",
-				Status:  "Draft",
+				Status:  shared.CaseStatusTypeDraft,
 			},
 			LpaStoreData: sirius.LpaStoreData{
-				Status: "draft",
+				Status: shared.CaseStatusTypeDraft,
 			},
 		},
 	}
@@ -222,7 +223,7 @@ func TestPostChangeCaseStatusWithReason(t *testing.T) {
 			Entity:                  "personal-welfare M-9876-9876-9876",
 			CaseUID:                 "M-9876-9876-9876",
 			OldStatus:               "in-progress",
-			NewStatus:               "cannot-register",
+			NewStatus:               shared.ParseCaseStatusType("cannot-register"),
 			StatusItems:             statusItems,
 			CaseStatusChangeReasons: statusChangeReasons,
 			StatusChangeReason:      "LPA_DOES_NOT_WORK",
@@ -244,4 +245,55 @@ func TestPostChangeCaseStatusWithReason(t *testing.T) {
 
 	assert.Equal(t, RedirectError("/lpa/M-9876-9876-9876"), err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestPostChangeCaseStatusError(t *testing.T) {
+	caseSummary := sirius.CaseSummary{
+		DigitalLpa: sirius.DigitalLpa{
+			UID: "M-9876-9876-9876",
+			SiriusData: sirius.SiriusData{
+				ID:      676,
+				Subtype: "personal-welfare",
+				Status:  shared.CaseStatusTypeDraft,
+			},
+			LpaStoreData: sirius.LpaStoreData{
+				Status: shared.CaseStatusTypeDraft,
+			},
+		},
+	}
+
+	var statusChangeReasons []sirius.RefDataItem
+
+	client := &mockChangeCaseStatusClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-9876-9876-9876").
+		Return(caseSummary, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CaseStatusChangeReason).
+		Return(statusChangeReasons, nil)
+
+	template := &mockTemplate{}
+	var capturedData changeCaseStatusData
+	template.
+		On("Func", mock.Anything, mock.MatchedBy(func(data changeCaseStatusData) bool {
+			capturedData = data
+			return true
+		})).
+		Return(nil)
+
+	form := url.Values{
+		"status":       {"cannot-register"},
+		"statusReason": {""},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/change-case-status?uid=M-9876-9876-9876", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := ChangeCaseStatus(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	assert.Equal(t, "Please select a reason", capturedData.Error.Field["changeReason"]["reason"])
 }

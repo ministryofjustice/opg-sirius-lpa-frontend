@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 )
@@ -446,7 +447,7 @@ func TestCaseTab(t *testing.T) {
 				Subtype:     "subType",
 			},
 			LpaStoreData: sirius.LpaStoreData{
-				Status: "draft",
+				Status: shared.CaseStatusTypeDraft,
 			},
 		},
 	}
@@ -457,7 +458,7 @@ func TestCaseTab(t *testing.T) {
 			{
 				UID:         "454654",
 				Subtype:     "subType",
-				Status:      "Draft",
+				Status:      shared.CaseStatusTypeDraft,
 				CreatedDate: "2010-01-01",
 			},
 		},
@@ -468,108 +469,35 @@ func TestCaseTab(t *testing.T) {
 	assert.Equal(t, expected, val)
 }
 
-func TestSortWarningsForCaseSummary(t *testing.T) {
-	warnings := []sirius.Warning{
-		{
-			WarningType: "Donor Deceased",
-			DateAdded:   "01/01/2020 00:02:03",
-		},
-		{
-			WarningType: "Welsh Language",
-			DateAdded:   "11/07/2012 11:02:03",
-		},
-		{
-			WarningType: "Safeguarding",
-			DateAdded:   "20/02/2016 00:02:03",
-		},
-		{
-			WarningType: "Violent Warning",
-			DateAdded:   "15/09/2011 00:02:03",
-		},
-		{
-			WarningType: "Fee Issue",
-			DateAdded:   "11/07/2012 11:02:02",
+func TestCaseTabForDraftLpaNotInStore(t *testing.T) {
+	caseSummary := sirius.CaseSummary{
+		DigitalLpa: sirius.DigitalLpa{
+			UID: "123",
+			SiriusData: sirius.SiriusData{
+				ID:          222,
+				UID:         "454654",
+				CreatedDate: "2010-01-01",
+				Subtype:     "subType",
+				Status:      shared.CaseStatusTypePending,
+			},
+			LpaStoreData: sirius.LpaStoreData{},
 		},
 	}
 
-	expected := []sirius.Warning{
-		{
-			WarningType: "Donor Deceased",
-			DateAdded:   "01/01/2020 00:02:03",
+	expected := CaseTabData{
+		CaseSummary: caseSummary,
+		SortedLinkedCases: []linkedCase{
+			{
+				UID:         "454654",
+				Subtype:     "subType",
+				Status:      shared.CaseStatusTypePending,
+				CreatedDate: "2010-01-01",
+			},
 		},
-		{
-			WarningType: "Safeguarding",
-			DateAdded:   "20/02/2016 00:02:03",
-		},
-		{
-			WarningType: "Welsh Language",
-			DateAdded:   "11/07/2012 11:02:03",
-		},
-		{
-			WarningType: "Fee Issue",
-			DateAdded:   "11/07/2012 11:02:02",
-		},
-		{
-			WarningType: "Violent Warning",
-			DateAdded:   "15/09/2011 00:02:03",
-		},
+		TabName: "TabName",
 	}
 
-	val := sortWarningsForCaseSummary(warnings)
-	assert.Equal(t, expected, val)
-}
-
-func TestCasesWarningAppliedToOnlyOneCase(t *testing.T) {
-	cases := []sirius.Case{
-		{
-			UID:     "UID123String",
-			SubType: "pfa",
-		},
-	}
-
-	expected := ""
-
-	val := casesWarningAppliedTo("UID123String", cases)
-	assert.Equal(t, expected, val)
-}
-
-func TestCasesWarningAppliedToCasesWithSameUID(t *testing.T) {
-	cases := []sirius.Case{
-		{
-			UID:     "UID123String",
-			SubType: "pfa",
-		},
-		{
-			UID:     "UID123String",
-			SubType: "hw",
-		},
-	}
-
-	expected := ""
-
-	val := casesWarningAppliedTo("UID123String", cases)
-	assert.Equal(t, expected, val)
-}
-
-func TestCasesWarningAppliedToManyDifferentCases(t *testing.T) {
-	cases := []sirius.Case{
-		{
-			UID:     "UID123String",
-			SubType: "pfa",
-		},
-		{
-			UID:     "UID123StringPFANotMatching",
-			SubType: "pfa",
-		},
-		{
-			UID:     "UID123StringNtMatching",
-			SubType: "hw",
-		},
-	}
-
-	expected := ", PFA UID123StringPFANotMatching and HW UID123StringNtMatching"
-
-	val := casesWarningAppliedTo("UID123String", cases)
+	val := caseTab(caseSummary, "TabName")
 	assert.Equal(t, expected, val)
 }
 
@@ -665,19 +593,6 @@ func TestContains(t *testing.T) {
 
 	val = fn([]string{"a", "b", "c"}, "d")
 	assert.Equal(t, false, val)
-}
-
-func TestStatusLabel(t *testing.T) {
-	var val string
-
-	val = StatusLabelFormat("DRAFT")
-	assert.Equal(t, "Draft", val)
-
-	val = StatusLabelFormat("in-progress")
-	assert.Equal(t, "In progress", val)
-
-	val = StatusLabelFormat("not in list")
-	assert.Equal(t, "draft", val)
 }
 
 func TestReplace(t *testing.T) {

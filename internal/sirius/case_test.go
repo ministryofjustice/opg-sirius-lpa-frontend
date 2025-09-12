@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
@@ -48,7 +49,7 @@ func TestCase(t *testing.T) {
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
-			expectedResponse: Case{ID: 800, UID: "7000-0000-0000", CaseType: "LPA", Status: "Pending", Donor: &Person{ID: 189}},
+			expectedResponse: Case{ID: 800, UID: "7000-0000-0000", CaseType: "LPA", Status: shared.CaseStatusTypePending, Donor: &Person{ID: 189}},
 		},
 	}
 
@@ -109,7 +110,7 @@ func TestCaseNoPayments(t *testing.T) {
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
-			expectedResponse: Case{UID: "7000-0000-0001", CaseType: "LPA", Status: "Pending", Donor: &Person{ID: 189}},
+			expectedResponse: Case{UID: "7000-0000-0001", CaseType: "LPA", Status: shared.CaseStatusTypePending, Donor: &Person{ID: 189}},
 		},
 	}
 
@@ -170,7 +171,7 @@ func TestCaseWithFeeReduction(t *testing.T) {
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
-			expectedResponse: Case{UID: "7000-0000-0002", CaseType: "LPA", Status: "Pending", Donor: &Person{ID: 189}},
+			expectedResponse: Case{UID: "7000-0000-0002", CaseType: "LPA", Status: shared.CaseStatusTypePending, Donor: &Person{ID: 189}},
 		},
 	}
 
