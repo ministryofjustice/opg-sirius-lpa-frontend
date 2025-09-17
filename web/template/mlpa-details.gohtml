@@ -236,6 +236,6 @@
           </div>
         </div>
       </div>
-      <a class="govuk-link" id="download-static-lpa" href="{{ sirius (printf "/api/v1/lpas/%s/static" .CaseSummary.DigitalLpa.UID) }}" download>Download static LPA</a>
+      <a class="govuk-link" id="download-static-lpa" href="{{ sirius (printf "/api/v1/lpas/%s/static" .CaseSummary.DigitalLpa.UID) }}" aria-label="Download static LPA" download>Download static LPA</a>
     {{ end }}
 {{ end }}
