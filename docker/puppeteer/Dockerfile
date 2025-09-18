@@ -15,7 +15,7 @@ RUN apk add --no-cache \
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-RUN npm i --ignore-scripts -g pa11y-ci@2.4 @lhci/cli@0.4.x
+RUN npm ci --ignore-scripts -g pa11y-ci@2.4 @lhci/cli@0.4.x
 
 COPY pa11yci.json .pa11yci
 COPY lighthouserc.js .
