@@ -8,7 +8,6 @@ import (
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/templatefn"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -34,7 +33,7 @@ type changeCaseStatusData struct {
 	StatusItems             []statusItem
 	CaseStatusChangeReasons []sirius.RefDataItem
 	OldStatus               string
-	NewStatus               string
+	NewStatus               shared.CaseStatus
 	StatusChangeReason      string
 }
 
@@ -83,7 +82,7 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 			Entity:                  fmt.Sprintf("%s %s", cs.DigitalLpa.SiriusData.Subtype, caseUID),
 			CaseUID:                 caseUID,
 			OldStatus:               strings.ToLower(status),
-			NewStatus:               postFormString(r, "status"),
+			NewStatus:               shared.ParseCaseStatusType(postFormString(r, "status")),
 			StatusChangeReason:      postFormString(r, "statusReason"),
 			CaseStatusChangeReasons: caseStatusChangeReasons,
 		}
