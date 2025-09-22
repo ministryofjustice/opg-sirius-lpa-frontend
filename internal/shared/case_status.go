@@ -29,6 +29,8 @@ const (
 	CaseStatusTypeSuspended
 	CaseStatusTypeImperfect
 	CaseStatusTypeInvalid
+	CaseStatusTypeWithCop
+	CaseStatusTypeCancel
 )
 
 var caseStatusTypeMap = map[string]CaseStatus{
@@ -65,6 +67,7 @@ var caseStatusTypeMap = map[string]CaseStatus{
 	"imperfect":                CaseStatusTypeImperfect,
 	"Invalid":                  CaseStatusTypeInvalid,
 	"invalid":                  CaseStatusTypeInvalid,
+	"With Cop":                 CaseStatusTypeWithCop,
 }
 
 func (cs CaseStatus) ReadableString() string {
