@@ -8,8 +8,7 @@
       {{ template "error-summary" .Error }}
 
       {{ if .Success }}
-        {{ $updatedStatus := statusLabel .NewStatus }}
-        {{ template "success-banner" (printf "Status changed to %s" $updatedStatus) }}
+        {{ template "success-banner" (printf "Status changed to %s" .NewStatus.ReadableString) }}
       {{ end }}
 
       <h1 class="govuk-heading-l app-!-embedded-hide">Change case status</h1>
