@@ -30,8 +30,38 @@ const (
 	CaseStatusTypeImperfect
 	CaseStatusTypeInvalid
 	CaseStatusTypeWithCop
-	CaseStatusTypeCancel
 )
+
+type caseStatusMeta struct {
+	Readable string
+	API      string
+	Colour   string
+}
+
+var caseStatusMetadata = map[CaseStatus]caseStatusMeta{
+	CaseStatusTypeDraft:                  {"Draft", "draft", "purple"},
+	CaseStatusTypeInProgress:             {"In progress", "in-progress", "light-blue"},
+	CaseStatusTypeStatutoryWaitingPeriod: {"Statutory waiting period", "statutory-waiting-period", "yellow"},
+	CaseStatusTypeDoNotRegister:          {"Do not register", "do-not-register", "red"},
+	CaseStatusTypeExpired:                {"Expired", "expired", "red"},
+	CaseStatusTypeRegistered:             {"Registered", "registered", "green"},
+	CaseStatusTypeCannotRegister:         {"Cannot register", "cannot-register", "red"},
+	CaseStatusTypeCancelled:              {"Cancelled", "cancelled", "red"},
+	CaseStatusTypeDeRegistered:           {"De-registered", "de-registered", "red"},
+	CaseStatusTypeSuspended:              {"Suspended", "suspended", "red"},
+	CaseStatusTypePerfect:                {"Perfect", "", "turquoise"},
+	CaseStatusTypePending:                {"Pending", "", "blue"},
+	CaseStatusTypePaymentPending:         {"Payment Pending", "", "blue"},
+	CaseStatusTypeReducedFeesPending:     {"Reduced Fees Pending", "", "blue"},
+	CaseStatusTypeRejected:               {"Rejected", "", "red"},
+	CaseStatusTypeWithdrawn:              {"Withdrawn", "", "red"},
+	CaseStatusTypeReturnUnpaid:           {"Return - unpaid", "", "red"},
+	CaseStatusTypeDeleted:                {"Deleted", "", "red"},
+	CaseStatusTypeRevoked:                {"Revoked", "", "red"},
+	CaseStatusTypeImperfect:              {"Imperfect", "", "grey"},
+	CaseStatusTypeInvalid:                {"Invalid", "", "grey"},
+	CaseStatusTypeWithCop:                {"With Cop", "", "grey"},
+}
 
 var caseStatusTypeMap = map[string]CaseStatus{
 	"draft":                    CaseStatusTypeDraft,
@@ -71,101 +101,24 @@ var caseStatusTypeMap = map[string]CaseStatus{
 }
 
 func (cs CaseStatus) ReadableString() string {
-	switch cs {
-	case CaseStatusTypeDraft:
-		return "Draft"
-	case CaseStatusTypeInProgress:
-		return "In progress"
-	case CaseStatusTypeStatutoryWaitingPeriod:
-		return "Statutory waiting period"
-	case CaseStatusTypeDoNotRegister:
-		return "Do not register"
-	case CaseStatusTypeExpired:
-		return "Expired"
-	case CaseStatusTypeRegistered:
-		return "Registered"
-	case CaseStatusTypeCannotRegister:
-		return "Cannot register"
-	case CaseStatusTypeCancelled:
-		return "Cancelled"
-	case CaseStatusTypeDeRegistered:
-		return "De-registered"
-	case CaseStatusTypeSuspended:
-		return "Suspended"
-	case CaseStatusTypePerfect:
-		return "Perfect"
-	case CaseStatusTypePending:
-		return "Pending"
-	case CaseStatusTypePaymentPending:
-		return "Payment Pending"
-	case CaseStatusTypeReducedFeesPending:
-		return "Reduced Fees Pending"
-	case CaseStatusTypeRejected:
-		return "Rejected"
-	case CaseStatusTypeWithdrawn:
-		return "Withdrawn"
-	case CaseStatusTypeReturnUnpaid:
-		return "Return - unpaid"
-	case CaseStatusTypeDeleted:
-		return "Deleted"
-	case CaseStatusTypeRevoked:
-		return "Revoked"
-	case CaseStatusTypeImperfect:
-		return "Imperfect"
-	case CaseStatusTypeInvalid:
-		return "Invalid"
-	default:
-		return ""
+	if meta, ok := caseStatusMetadata[cs]; ok {
+		return meta.Readable
 	}
+	return ""
 }
 
 func (cs CaseStatus) StringForApi() string {
-	switch cs {
-	case CaseStatusTypeDraft:
-		return "draft"
-	case CaseStatusTypeInProgress:
-		return "in-progress"
-	case CaseStatusTypeStatutoryWaitingPeriod:
-		return "statutory-waiting-period"
-	case CaseStatusTypeDoNotRegister:
-		return "do-not-register"
-	case CaseStatusTypeExpired:
-		return "expired"
-	case CaseStatusTypeRegistered:
-		return "registered"
-	case CaseStatusTypeCannotRegister:
-		return "cannot-register"
-	case CaseStatusTypeCancelled:
-		return "cancelled"
-	case CaseStatusTypeDeRegistered:
-		return "de-registered"
-	case CaseStatusTypeSuspended:
-		return "suspended"
-	default:
-		return ""
+	if meta, ok := caseStatusMetadata[cs]; ok {
+		return meta.API
 	}
+	return ""
 }
 
 func (cs CaseStatus) Colour() string {
-	switch cs {
-	case CaseStatusTypeRegistered:
-		return "green"
-	case CaseStatusTypePerfect:
-		return "turquoise"
-	case CaseStatusTypeStatutoryWaitingPeriod:
-		return "yellow"
-	case CaseStatusTypeInProgress:
-		return "light-blue"
-	case CaseStatusTypePending, CaseStatusTypePaymentPending, CaseStatusTypeReducedFeesPending:
-		return "blue"
-	case CaseStatusTypeDraft:
-		return "purple"
-	case CaseStatusTypeCancelled, CaseStatusTypeRejected, CaseStatusTypeRevoked, CaseStatusTypeWithdrawn, CaseStatusTypeReturnUnpaid,
-		CaseStatusTypeDeleted, CaseStatusTypeDoNotRegister, CaseStatusTypeExpired, CaseStatusTypeCannotRegister, CaseStatusTypeDeRegistered:
-		return "red"
-	default:
-		return "grey"
+	if meta, ok := caseStatusMetadata[cs]; ok && meta.Colour != "" {
+		return meta.Colour
 	}
+	return "grey"
 }
 
 func (cs CaseStatus) IsValidStatusForObjection() bool {
@@ -178,12 +131,7 @@ func (cs CaseStatus) IsValidStatusForObjection() bool {
 }
 
 func (cs CaseStatus) IsDraft() bool {
-	switch cs {
-	case CaseStatusTypeDraft:
-		return true
-	default:
-		return false
-	}
+	return cs == CaseStatusTypeDraft
 }
 
 func ParseCaseStatusType(s string) CaseStatus {
@@ -198,7 +146,7 @@ func (cs CaseStatus) MarshalJSON() ([]byte, error) {
 	return json.Marshal(cs.ReadableString())
 }
 
-func (cs *CaseStatus) UnmarshalJSON(data []byte) (err error) {
+func (cs *CaseStatus) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
 		return err
