@@ -17,7 +17,7 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        {{ template "input-date" (field "receiptDate" "Receipt date" .Dates.ReceiptDate .Error.Field.receiptDate) }}
+        {{ template "input-date" (field "receiptDate" "Receipt date" .Dates.ReceiptDate .Error.Field.receiptDate "max" today) }}
         {{ template "input-date" (field "paymentDate" "Payment date" .Dates.PaymentDate .Error.Field.paymentDate) }}
         {{ template "input-date" (field "filingDate" "Filing date" .Dates.FilingDate .Error.Field.filingDate) }}
         {{ template "input-date" (field "dueDate" "Registration due date" .Dates.DueDate .Error.Field.dueDate) }}

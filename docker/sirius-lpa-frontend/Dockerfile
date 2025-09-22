@@ -7,7 +7,7 @@ RUN apk add --no-cache git \
 
 COPY package.json .
 COPY yarn.lock .
-RUN yarn --ignore-scripts
+RUN yarn install --frozen-lockfile --ignore-scripts
 
 COPY web/assets web/assets
 RUN yarn build
