@@ -28,12 +28,12 @@ func (m *mockEditDatesClient) EditDates(ctx sirius.Context, caseID int, caseType
 func TestGetEditDates(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseitem := sirius.Case{CaseType: caseType, UID: "700700", CancellationDate: sirius.DateString("2021-01-01")}
+			caseItem := sirius.Case{CaseType: caseType, UID: "700700", CancellationDate: sirius.DateString("2021-01-01")}
 
 			client := &mockEditDatesClient{}
 			client.
 				On("Case", mock.Anything, 123).
-				Return(caseitem, nil)
+				Return(caseItem, nil)
 
 			template := &mockTemplate{}
 			template.
@@ -76,12 +76,12 @@ func TestGetEditDatesNoID(t *testing.T) {
 }
 
 func TestGetEditDatesWhenCaseErrors(t *testing.T) {
-	caseitem := sirius.Case{CaseType: "PFA", UID: "700700"}
+	caseItem := sirius.Case{CaseType: "PFA", UID: "700700"}
 
 	client := &mockEditDatesClient{}
 	client.
 		On("Case", mock.Anything, 123).
-		Return(caseitem, errExample)
+		Return(caseItem, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
@@ -93,12 +93,12 @@ func TestGetEditDatesWhenCaseErrors(t *testing.T) {
 }
 
 func TestGetEditDatesWhenTemplateErrors(t *testing.T) {
-	caseitem := sirius.Case{CaseType: "PFA", UID: "700700"}
+	caseItem := sirius.Case{CaseType: "PFA", UID: "700700"}
 
 	client := &mockEditDatesClient{}
 	client.
 		On("Case", mock.Anything, 123).
-		Return(caseitem, nil)
+		Return(caseItem, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -119,7 +119,7 @@ func TestGetEditDatesWhenTemplateErrors(t *testing.T) {
 func TestPostEditDates(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseitem := sirius.Case{CaseType: caseType, UID: "700700", CancellationDate: sirius.DateString("2021-01-01")}
+			caseItem := sirius.Case{CaseType: caseType, UID: "700700", CancellationDate: sirius.DateString("2021-01-01")}
 
 			client := &mockEditDatesClient{}
 			client.
@@ -129,6 +129,7 @@ func TestPostEditDates(t *testing.T) {
 					DueDate:          sirius.DateString("2022-03-05"),
 					InvalidDate:      sirius.DateString("2022-04-03"),
 					PaymentDate:      sirius.DateString("2022-05-03"),
+					FilingDate:       sirius.DateString("2022-05-01"),
 					ReceiptDate:      sirius.DateString("2021-11-23"),
 					RegistrationDate: sirius.DateString("2022-05-03"),
 					RejectedDate:     sirius.DateString("2022-06-03"),
@@ -138,7 +139,7 @@ func TestPostEditDates(t *testing.T) {
 				Return(nil)
 			client.
 				On("Case", mock.Anything, 123).
-				Return(caseitem, nil)
+				Return(caseItem, nil)
 
 			template := &mockTemplate{}
 			template.
@@ -155,6 +156,7 @@ func TestPostEditDates(t *testing.T) {
 				"dueDate":          {"2022-03-05"},
 				"invalidDate":      {"2022-04-03"},
 				"paymentDate":      {"2022-05-03"},
+				"filingDate":       {"2022-05-01"},
 				"receiptDate":      {"2021-11-23"},
 				"registrationDate": {"2022-05-03"},
 				"rejectedDate":     {"2022-06-03"},
@@ -180,7 +182,7 @@ func TestPostEditDatesWhenEditDatesErrors(t *testing.T) {
 	client := &mockEditDatesClient{}
 	client.
 		On("EditDates", mock.Anything, 123, sirius.CaseTypeLpa, sirius.Dates{
-			RegistrationDate: sirius.DateString("2022-01-03"),
+			RegistrationDate: "2022-01-03",
 		}).
 		Return(errExample)
 
@@ -199,7 +201,7 @@ func TestPostEditDatesWhenEditDatesErrors(t *testing.T) {
 }
 
 func TestPostEditDatesWhenValidationError(t *testing.T) {
-	caseitem := sirius.Case{CaseType: "LPA", UID: "700700", CancellationDate: sirius.DateString("2021-01-01")}
+	caseItem := sirius.Case{CaseType: "LPA", UID: "700700", CancellationDate: sirius.DateString("2021-01-01")}
 
 	expectedError := sirius.ValidationError{
 		Field: sirius.FieldErrors{
@@ -215,13 +217,13 @@ func TestPostEditDatesWhenValidationError(t *testing.T) {
 		Return(expectedError)
 	client.
 		On("Case", mock.Anything, 123).
-		Return(caseitem, nil)
+		Return(caseItem, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, editDatesData{
 			Entity: "LPA 700700",
-			Dates:  sirius.Dates{RegistrationDate: sirius.DateString("2022-01-03")},
+			Dates:  sirius.Dates{RegistrationDate: "2022-01-03"},
 			Error:  expectedError,
 		}).
 		Return(nil)
