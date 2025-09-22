@@ -134,7 +134,6 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"plusN": func(i int, n int) int {
 			return i + n
 		},
-		"statusLabel": StatusLabelFormat,
 		"replace": func(s, find, replace string) string {
 			return strings.ReplaceAll(s, find, replace)
 		},
@@ -160,7 +159,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"join": func(s []string, joiner string) string {
 			return strings.Join(s, joiner)
 		},
-		"subtypeShortFormat":     subtypeShortFormat,
+		"subtypeShortFormat":     sirius.SubtypeShortFormat,
 		"subtypeLongFormat":      subtypeLongFormat,
 		"subtypeColour":          subtypeColour,
 		"severanceRequiredLabel": severanceRequiredLabel,
@@ -345,22 +344,6 @@ type linkedCase struct {
 	CreatedDate sirius.DateString
 }
 
-// 2-3 character LPA subtype, upper-cased
-func subtypeShortFormat(subtype string) string {
-	switch strings.ToLower(subtype) {
-	case "personal-welfare":
-		return "PW"
-	case "property-and-affairs":
-		return "PA"
-	case "hw":
-		return "HW"
-	case "pfa":
-		return "PFA"
-	default:
-		return ""
-	}
-}
-
 // full text for LPA subtype, e.g. "Personal welfare"
 func subtypeLongFormat(subtype string) string {
 	switch strings.ToLower(subtype) {
@@ -374,33 +357,6 @@ func subtypeLongFormat(subtype string) string {
 		return "Property and financial affairs"
 	default:
 		return ""
-	}
-}
-
-func StatusLabelFormat(status string) string {
-	switch strings.ToLower(status) {
-	case "draft":
-		return "Draft"
-	case "in-progress":
-		return "In progress"
-	case "statutory-waiting-period":
-		return "Statutory waiting period"
-	case "registered":
-		return "Registered"
-	case "suspended":
-		return "Suspended"
-	case "do-not-register":
-		return "Do not register"
-	case "expired":
-		return "Expired"
-	case "cannot-register":
-		return "Cannot register"
-	case "cancelled":
-		return "Cancelled"
-	case "de-registered":
-		return "De-registered"
-	default:
-		return "draft"
 	}
 }
 

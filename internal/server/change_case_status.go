@@ -24,15 +24,14 @@ type statusItem struct {
 }
 
 type changeCaseStatusData struct {
-	XSRFToken string
-	Entity    string
-	CaseUID   string
-	Success   bool
-	Error     sirius.ValidationError
-
+	XSRFToken               string
+	Entity                  string
+	CaseUID                 string
+	Success                 bool
+	Error                   sirius.ValidationError
 	StatusItems             []statusItem
 	CaseStatusChangeReasons []sirius.RefDataItem
-	OldStatus               string
+	OldStatus               shared.CaseStatus
 	NewStatus               shared.CaseStatus
 	StatusChangeReason      string
 }
@@ -70,10 +69,10 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 			return err
 		}
 
-		status := "draft"
+		status := shared.ParseCaseStatusType("draft")
 
 		if cs.DigitalLpa.LpaStoreData.Status.ReadableString() != "" {
-			status = cs.DigitalLpa.LpaStoreData.Status.ReadableString()
+			status = cs.DigitalLpa.LpaStoreData.Status
 		}
 
 		data := changeCaseStatusData{
@@ -81,7 +80,7 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 			Error:                   sirius.ValidationError{Field: sirius.FieldErrors{}},
 			Entity:                  fmt.Sprintf("%s %s", cs.DigitalLpa.SiriusData.Subtype, caseUID),
 			CaseUID:                 caseUID,
-			OldStatus:               strings.ToLower(status),
+			OldStatus:               shared.ParseCaseStatusType(status.StringForApi()),
 			NewStatus:               shared.ParseCaseStatusType(postFormString(r, "status")),
 			StatusChangeReason:      postFormString(r, "statusReason"),
 			CaseStatusChangeReasons: caseStatusChangeReasons,
@@ -102,7 +101,7 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 
 		if r.Method == http.MethodPost {
 			if (data.NewStatus.StringForApi() == "cannot-register" || data.NewStatus.StringForApi() == "cancelled") && data.StatusChangeReason == "" {
-				data.OldStatus = data.NewStatus.ReadableString()
+				data.OldStatus = shared.ParseCaseStatusType(data.NewStatus.ReadableString())
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error.Field["changeReason"] = map[string]string{
 					"reason": "Please select a reason",
@@ -124,7 +123,7 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 					return err
 				} else {
 					data.Success = true
-					data.OldStatus = data.NewStatus.StringForApi()
+					data.OldStatus = shared.ParseCaseStatusType(data.NewStatus.StringForApi())
 
 					SetFlash(w, FlashNotification{
 						Title: fmt.Sprintf("Status changed to %s", strings.ToLower(data.NewStatus.ReadableString())),

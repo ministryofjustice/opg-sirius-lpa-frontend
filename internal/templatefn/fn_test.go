@@ -563,19 +563,6 @@ func TestContains(t *testing.T) {
 	assert.Equal(t, false, val)
 }
 
-func TestStatusLabel(t *testing.T) {
-	var val string
-
-	val = StatusLabelFormat("DRAFT")
-	assert.Equal(t, "Draft", val)
-
-	val = StatusLabelFormat("in-progress")
-	assert.Equal(t, "In progress", val)
-
-	val = StatusLabelFormat("not in list")
-	assert.Equal(t, "draft", val)
-}
-
 func TestReplace(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["replace"].(func(string, string, string) string)
@@ -629,15 +616,6 @@ func TestJoin(t *testing.T) {
 
 	val := fn([]string{"a", "b", "c"}, "-")
 	assert.Equal(t, "a-b-c", val)
-}
-
-func TestSubtypeShortFormat(t *testing.T) {
-	var val string
-	val = subtypeShortFormat("hw")
-	assert.Equal(t, "HW", val)
-
-	val = subtypeShortFormat("not-in-list")
-	assert.Equal(t, "", val)
 }
 
 func TestSubtypeLongFormat(t *testing.T) {

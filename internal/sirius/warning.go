@@ -77,7 +77,7 @@ func CasesWarningAppliedTo(uid string, cases []Case) string {
 		} else {
 			b.WriteString(", ")
 		}
-		b.WriteString(subtypeShortFormat(caseItem.SubType))
+		b.WriteString(SubtypeShortFormat(caseItem.SubType))
 		b.WriteString(" ")
 		b.WriteString(caseItem.UID)
 	}
@@ -85,7 +85,7 @@ func CasesWarningAppliedTo(uid string, cases []Case) string {
 	return b.String()
 }
 
-func subtypeShortFormat(subtype string) string {
+func SubtypeShortFormat(subtype string) string {
 	switch strings.ToLower(subtype) {
 	case "personal-welfare":
 		return "PW"

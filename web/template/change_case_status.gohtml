@@ -8,8 +8,7 @@
       {{ template "error-summary" .Error }}
 
       {{ if .Success }}
-        {{ $updatedStatus := statusLabel .NewStatus }}
-        {{ template "success-banner" (printf "Status changed to %s" $updatedStatus) }}
+        {{ template "success-banner" (printf "Status changed to %s" .NewStatus.ReadableString) }}
       {{ end }}
 
       <h1 class="govuk-heading-l app-!-embedded-hide">Change case status</h1>
@@ -24,7 +23,7 @@
             <div class="govuk-radios {{ if .Error.Field.status }}govuk-radios--error{{ end }}" data-module="govuk-radios">
               {{ range $i, $e := .StatusItems }}
                 <div class="govuk-radios__item">
-                  <input class="govuk-radios__input" id="f-{{ fieldID "status" $i }}" name="status" type="radio" value="{{ $e.Value }}" {{ if eq $.OldStatus $e.Value }}checked{{ end }} {{ if $e.ConditionalItem }}data-aria-controls="f-{{ fieldID "status" $i }}-reveal"{{ end }}>
+                  <input class="govuk-radios__input" id="f-{{ fieldID "status" $i }}" name="status" type="radio" value="{{ $e.Value }}" {{ if eq $.OldStatus.StringForApi $e.Value }}checked{{ end }} {{ if $e.ConditionalItem }}data-aria-controls="f-{{ fieldID "status" $i }}-reveal"{{ end }}>
                   <label class="govuk-label govuk-radios__label" for="f-{{ fieldID "status" $i }}">
                     {{ template "status-tag" $e.Label }}
                   </label>

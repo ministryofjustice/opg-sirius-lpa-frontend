@@ -28,7 +28,6 @@ type SiriusData struct {
 	LinkedCases        []SiriusData      `json:"linkedDigitalLpas"`
 	Donor              Donor             `json:"donor"`
 	DueDate            DateString        `json:"dueDate"`
-	StatusColour       string
 }
 
 type Donor struct {
