@@ -172,10 +172,10 @@ function extendDefaultDigitalLpa(uid, body) {
   return updatedBody;
 }
 
-async function get(uid, body, presignImages = false) {
+async function get(uid, body) {
   const updatedBody = extendDefaultDigitalLpa(uid, body);
 
-  await addMock(`/lpa-api/v1/digital-lpas/${uid}${presignImages ? '?presignImages' : ''}`, "GET", {
+  await addMock(`/lpa-api/v1/digital-lpas/${uid}`, "GET", {
     status: 200,
     body: updatedBody,
   });

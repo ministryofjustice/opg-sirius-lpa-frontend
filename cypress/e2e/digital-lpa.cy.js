@@ -3,7 +3,6 @@ import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("View a digital LPA", () => {
   beforeEach(() => {
-
     cy.addMock("/lpa-api/v1/cases/333", "GET", {
       status: 200,
       body: {
@@ -58,121 +57,115 @@ describe("View a digital LPA", () => {
     });
 
     const mocks = Promise.allSettled([
-      digitalLpas.get(
-        "M-DIGI-LPA3-3333",
-        {
-          "opg.poas.sirius": {
-            id: 333,
-            donor: {
-              id: 33,
-            },
-            linkedDigitalLpas: [
-              {
-                uId: "M-DIGI-LPA3-3334",
-                caseSubtype: "personal-welfare",
-                status: "Draft",
-                createdDate: "01/11/2023",
-              },
-              {
-                uId: "M-DIGI-LPA3-3335",
-                caseSubtype: "personal-welfare",
-                status: "Registered",
-                createdDate: "02/11/2023",
-              },
-            ],
+      digitalLpas.get("M-DIGI-LPA3-3333", {
+        "opg.poas.sirius": {
+          id: 333,
+          donor: {
+            id: 33,
           },
-          "opg.poas.lpastore": {
-            attorneys: [
-              {
-                firstNames: "Esther",
-                lastName: "Greenwood",
-                status: "active",
-                appointmentType: "original",
-                cannotMakeJointDecisions: true,
-              },
-              {
-                firstNames: "Volo",
-                lastName: "McSpolo",
-                status: "active",
-                appointmentType: "original",
-                signedAt: "2022-12-20T12:02:43Z",
-              },
-              {
-                firstNames: "Susanna",
-                lastName: "Kaysen",
-                status: "removed",
-                appointmentType: "original",
-              },
-              {
-                firstNames: "Philomena",
-                lastName: "Guinea",
-                status: "inactive",
-                appointmentType: "replacement",
-              },
-              {
-                firstNames: "Rico",
-                lastName: "Welch",
-                status: "inactive",
-                appointmentType: "replacement",
-                signedAt: "2022-12-19T09:12:59Z",
-              },
-              {
-                firstNames: "Anne",
-                lastName: "Rice",
-                status: "active",
-                appointmentType: "replacement",
-                signedAt: "2022-12-19T07:18:59Z",
-                cannotMakeJointDecisions: true,
-              },
-            ],
-            trustCorporations: [
-              {
-                Name: "Trust Me Ltd.",
-                CompanyNumber: "123456789",
-                status: "active",
-                appointmentType: "original",
-              },
-              {
-                Name: "Trust Me Again Ltd.",
-                CompanyNumber: "987654321",
-                status: "inactive",
-                appointmentType: "replacement",
-              },
-            ],
-            certificateProvider: {
-              uid: "e4d5e24e-2a8d-434e-b815-9898620acc71",
-              firstNames: "Timothy",
-              lastName: "Turner",
-              signedAt: "2022-12-18T11:46:24Z",
+          linkedDigitalLpas: [
+            {
+              uId: "M-DIGI-LPA3-3334",
+              caseSubtype: "personal-welfare",
+              status: "Draft",
+              createdDate: "01/11/2023",
             },
-            restrictionsAndConditions: "Do not do this",
-            authorisedSignatory: {
-              firstNames: "John",
-              lastName: "Signatory",
-              signedAt: "2022-12-15T10:30:00Z",
+            {
+              uId: "M-DIGI-LPA3-3335",
+              caseSubtype: "personal-welfare",
+              status: "Registered",
+              createdDate: "02/11/2023",
             },
-            witnessedByCertificateProviderAt: "2022-12-15T11:00:00Z",
-            witnessedByIndependentWitnessAt: "2022-12-15T11:30:00Z",
-            independentWitness: {
-              firstNames: "Jane",
-              lastName: "Witness",
-              address: {
-                line1: "123 Witness Street",
-                line2: "",
-                line3: "",
-                town: "London",
-                postcode: "SW1A 1AA",
-                country: "GB",
-              },
-              email: "jane.witness@example.com",
+          ],
+        },
+        "opg.poas.lpastore": {
+          attorneys: [
+            {
+              firstNames: "Esther",
+              lastName: "Greenwood",
+              status: "active",
+              appointmentType: "original",
+              cannotMakeJointDecisions: true,
             },
+            {
+              firstNames: "Volo",
+              lastName: "McSpolo",
+              status: "active",
+              appointmentType: "original",
+              signedAt: "2022-12-20T12:02:43Z",
+            },
+            {
+              firstNames: "Susanna",
+              lastName: "Kaysen",
+              status: "removed",
+              appointmentType: "original",
+            },
+            {
+              firstNames: "Philomena",
+              lastName: "Guinea",
+              status: "inactive",
+              appointmentType: "replacement",
+            },
+            {
+              firstNames: "Rico",
+              lastName: "Welch",
+              status: "inactive",
+              appointmentType: "replacement",
+              signedAt: "2022-12-19T09:12:59Z",
+            },
+            {
+              firstNames: "Anne",
+              lastName: "Rice",
+              status: "active",
+              appointmentType: "replacement",
+              signedAt: "2022-12-19T07:18:59Z",
+              cannotMakeJointDecisions: true,
+            },
+          ],
+          trustCorporations: [
+            {
+              Name: "Trust Me Ltd.",
+              CompanyNumber: "123456789",
+              status: "active",
+              appointmentType: "original",
+            },
+            {
+              Name: "Trust Me Again Ltd.",
+              CompanyNumber: "987654321",
+              status: "inactive",
+              appointmentType: "replacement",
+            },
+          ],
+          certificateProvider: {
+            uid: "e4d5e24e-2a8d-434e-b815-9898620acc71",
+            firstNames: "Timothy",
+            lastName: "Turner",
+            signedAt: "2022-12-18T11:46:24Z",
           },
-        }
-      ),
-      digitalLpas.get(
-        "M-DIGI-LPA3-3334",
-        {"opg.poas.lpastore": null},
-      ),
+          restrictionsAndConditions: "Do not do this",
+          authorisedSignatory: {
+            firstNames: "John",
+            lastName: "Signatory",
+            signedAt: "2022-12-15T10:30:00Z",
+          },
+          witnessedByCertificateProviderAt: "2022-12-15T11:00:00Z",
+          witnessedByIndependentWitnessAt: "2022-12-15T11:30:00Z",
+          independentWitness: {
+            firstNames: "Jane",
+            lastName: "Witness",
+            address: {
+              line1: "123 Witness Street",
+              line2: "",
+              line3: "",
+              town: "London",
+              postcode: "SW1A 1AA",
+              country: "GB",
+            },
+            email: "jane.witness@example.com",
+          },
+        },
+      }),
+      digitalLpas.get("M-DIGI-LPA3-3334", { "opg.poas.lpastore": null }),
       digitalLpas.objections.empty("M-DIGI-LPA3-3334"),
       cases.warnings.empty("333"),
       cases.warnings.empty("1111"),
@@ -183,7 +176,6 @@ describe("View a digital LPA", () => {
     ]);
 
     cy.wrap(mocks);
-
   });
 
   it("shows case information", () => {
@@ -644,7 +636,6 @@ describe("View a digital LPA", () => {
   });
 
   it("shows donor signed directly (no signed on behalf)", () => {
-
     cy.visit("/lpa/M-DIGI-LPA3-3335/lpa-details");
 
     cy.get(".govuk-accordion__section")
