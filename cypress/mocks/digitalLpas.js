@@ -129,26 +129,27 @@ function extendDefaultDigitalLpa(uid, body) {
       );
     }
 
-    if (
-      body.hasOwnProperty("opg.poas.lpastore") &&
-      body["opg.poas.lpastore"] !== null
-    ) {
-      opgPoasLpastore = Object.assign(
-        {},
-        defaultBody["opg.poas.lpastore"],
-        body["opg.poas.lpastore"],
-      );
-      opgPoasLpastoreDonor = Object.assign(
-        {},
-        defaultBody["opg.poas.lpastore"].donor,
-        body["opg.poas.lpastore"].donor ?? null,
-      );
-      opgPoasLpastoreAttorneys = body["opg.poas.lpastore"].attorneys ?? [];
-      opgPoasLpastoreCertificateProvider = Object.assign(
-        {},
-        defaultBody["opg.poas.lpastore"].certificateProvider,
-        body["opg.poas.lpastore"].certificateProvider ?? null,
-      );
+    if (body.hasOwnProperty("opg.poas.lpastore")) {
+      if (body["opg.poas.lpastore"] !== null) {
+        opgPoasLpastore = Object.assign(
+          {},
+          defaultBody["opg.poas.lpastore"],
+          body["opg.poas.lpastore"],
+        );
+        opgPoasLpastoreDonor = Object.assign(
+          {},
+          defaultBody["opg.poas.lpastore"].donor,
+          body["opg.poas.lpastore"].donor ?? null,
+        );
+        opgPoasLpastoreAttorneys = body["opg.poas.lpastore"].attorneys ?? [];
+        opgPoasLpastoreCertificateProvider = Object.assign(
+          {},
+          defaultBody["opg.poas.lpastore"].certificateProvider,
+          body["opg.poas.lpastore"].certificateProvider ?? null,
+        );
+      } else {
+        opgPoasLpastore = null;
+      }
     }
   }
 
@@ -171,10 +172,10 @@ function extendDefaultDigitalLpa(uid, body) {
   return updatedBody;
 }
 
-async function get(uid, body) {
+async function get(uid, body, presignImages = false) {
   const updatedBody = extendDefaultDigitalLpa(uid, body);
 
-  await addMock(`/lpa-api/v1/digital-lpas/${uid}`, "GET", {
+  await addMock(`/lpa-api/v1/digital-lpas/${uid}${presignImages ? '?presignImages' : ''}`, "GET", {
     status: 200,
     body: updatedBody,
   });
