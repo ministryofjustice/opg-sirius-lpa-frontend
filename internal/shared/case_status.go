@@ -60,7 +60,7 @@ var caseStatusMetadata = map[CaseStatus]caseStatusMeta{
 	CaseStatusTypeRevoked:                {"Revoked", "", "red"},
 	CaseStatusTypeImperfect:              {"Imperfect", "", "grey"},
 	CaseStatusTypeInvalid:                {"Invalid", "", "grey"},
-	CaseStatusTypeWithCop:                {"With Cop", "", "grey"},
+	CaseStatusTypeWithCop:                {"With COP", "", "grey"},
 }
 
 var caseStatusTypeMap = map[string]CaseStatus{
@@ -97,7 +97,7 @@ var caseStatusTypeMap = map[string]CaseStatus{
 	"imperfect":                CaseStatusTypeImperfect,
 	"Invalid":                  CaseStatusTypeInvalid,
 	"invalid":                  CaseStatusTypeInvalid,
-	"With Cop":                 CaseStatusTypeWithCop,
+	"With COP":                 CaseStatusTypeWithCop,
 }
 
 func (cs CaseStatus) ReadableString() string {
