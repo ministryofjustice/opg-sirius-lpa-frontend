@@ -171,8 +171,6 @@ describe("View a digital LPA", () => {
       cases.warnings.empty("1111"),
       cases.tasks.empty("1111"),
       digitalLpas.objections.empty("M-DIGI-LPA3-3333"),
-      digitalLpas.get("M-DIGI-LPA3-3335"),
-      digitalLpas.objections.empty("M-DIGI-LPA3-3335"),
     ]);
 
     cy.wrap(mocks);
@@ -611,7 +609,47 @@ describe("View a digital LPA", () => {
     cy.contains("Do not do this");
   });
 
-  it("shows both witnesses when both are present (2 witnesses)", () => {
+  it("shows certificate provider witness only (1 witness) - authorised signatory", () => {
+    const lpaMocks = Promise.allSettled([
+      digitalLpas.get(
+        "M-DIGI-LPA3-3335",
+        {
+          "opg.poas.lpastore": {
+            witnessedByCertificateProviderAt: "2022-12-15T11:00:00Z",
+            authorisedSignatory: {
+              firstNames: "John",
+              lastName: "Signatory",
+              signedAt: "2022-12-15T10:30:00Z",
+          },
+          }
+        }
+      ),
+      digitalLpas.objections.empty("M-DIGI-LPA3-3335"),
+    ]);
+    cy.wrap(lpaMocks);
+
+    cy.visit("/lpa/M-DIGI-LPA3-3335/lpa-details");
+
+    cy.get(".govuk-accordion__section")
+      .contains("Donor")
+      .click()
+      .parents(".govuk-accordion__section")
+      .within(() => {
+        cy.contains("LPA signed on behalf of the donor by").should("exist");
+        cy.contains("John Signatory").should("exist");
+
+        cy.contains(".govuk-details__summary", "View witness details").click();
+
+        cy.get(".govuk-details__text").within(() => {
+          cy.contains("Signed by witness 1 (certificate provider)").should(
+            "exist",
+          );
+          cy.contains("Signed by witness 2").should("not.exist");
+        });
+      });
+  });
+
+  it("shows both witnesses when both are present (2 witnesses) - authorised signatory", () => {
     cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
 
     cy.get(".govuk-accordion__section")
@@ -636,6 +674,12 @@ describe("View a digital LPA", () => {
   });
 
   it("shows donor signed directly (no signed on behalf)", () => {
+    const lpaMocks = Promise.allSettled([
+      digitalLpas.get("M-DIGI-LPA3-3335"),
+      digitalLpas.objections.empty("M-DIGI-LPA3-3335"),
+    ]);
+    cy.wrap(lpaMocks);
+
     cy.visit("/lpa/M-DIGI-LPA3-3335/lpa-details");
 
     cy.get(".govuk-accordion__section")
