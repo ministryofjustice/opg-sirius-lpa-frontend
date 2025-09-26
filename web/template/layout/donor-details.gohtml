@@ -113,6 +113,11 @@
                         {{ else }}
                             {{ parseAndFormatDate .DigitalLpa.LpaStoreData.SignedAt "2006-01-02T15:04:05Z" "2 January 2006" }}
                         {{ end }}
+                        {{ $signedOnAnomalies := $donorAnomalies.GetAnomaliesForFieldWithStatus "signedAt" "detected" }}
+                        {{ if gt (len $signedOnAnomalies) 0 }}
+                            {{ $signedOnAnomaly := $donorAnomalies.GetHintTextForAnomalyField $signedOnAnomalies "" }}
+                            {{ template "information-warning" $signedOnAnomaly }}
+                        {{ end }}
                     </dd>
                 </div>
 
