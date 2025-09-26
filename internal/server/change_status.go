@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
@@ -39,7 +40,7 @@ func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
 
 		ctx := getContext(r)
 
-		caseitem, err := client.Case(ctx, caseID)
+		caseItem, err := client.Case(ctx, caseID)
 		if err != nil {
 			return err
 		}
@@ -51,17 +52,17 @@ func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
 
 		data := changeStatusData{
 			XSRFToken:         ctx.XSRFToken,
-			Entity:            fmt.Sprintf("%s %s", caseitem.CaseType, caseitem.UID),
+			Entity:            fmt.Sprintf("%s %s", caseItem.CaseType, caseItem.UID),
 			AvailableStatuses: availableStatuses,
 			NewStatus:         postFormString(r, "status"),
 		}
 
 		if r.Method == http.MethodPost {
 			caseDetails := sirius.Case{
-				Status: data.NewStatus,
+				Status: shared.ParseCaseStatusType(data.NewStatus),
 			}
 
-			err = client.EditCase(ctx, caseID, sirius.CaseType(caseitem.CaseType), caseDetails)
+			err = client.EditCase(ctx, caseID, sirius.CaseType(caseItem.CaseType), caseDetails)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
