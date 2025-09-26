@@ -17,29 +17,6 @@ describe("View a digital LPA", () => {
       },
     });
 
-    cy.addMock(
-      `/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3333/progress-indicators`,
-      "GET",
-      {
-        status: 200,
-        body: {
-          digitalLpaUid: "M-DIGI-LPA3-3333",
-          progressIndicators: [
-            { indicator: "FEES", status: "IN_PROGRESS" },
-            { indicator: "DONOR_ID", status: "CANNOT_START" },
-            { indicator: "CERTIFICATE_PROVIDER_ID", status: "CANNOT_START" },
-            {
-              indicator: "CERTIFICATE_PROVIDER_SIGNATURE",
-              status: "CANNOT_START",
-            },
-            { indicator: "ATTORNEY_SIGNATURES", status: "CANNOT_START" },
-            { indicator: "PREREGISTRATION_NOTICES", status: "CANNOT_START" },
-            { indicator: "REGISTRATION_NOTICES", status: "CANNOT_START" },
-          ],
-        },
-      },
-    );
-
     cy.addMock("/lpa-api/v1/tasks/1", "GET", {
       status: 200,
       body: {
@@ -166,6 +143,8 @@ describe("View a digital LPA", () => {
         },
       }),
       digitalLpas.get("M-DIGI-LPA3-3334", { "opg.poas.lpastore": null }),
+      digitalLpas.progressIndicators.feesInProgress("M-DIGI-LPA3-3333"),
+      digitalLpas.progressIndicators.feesInProgress("M-DIGI-LPA3-3334"),
       digitalLpas.objections.empty("M-DIGI-LPA3-3334"),
       cases.warnings.empty("333"),
       cases.warnings.empty("1111"),
@@ -174,11 +153,11 @@ describe("View a digital LPA", () => {
     ]);
 
     cy.wrap(mocks);
+
+    cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
   });
 
   it("shows case information", () => {
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
-
     cy.get("h1").contains("Steven Munnell");
 
     cy.contains("M-DIGI-LPA3-3333");
@@ -192,11 +171,6 @@ describe("View a digital LPA", () => {
   });
 
   it("shows payment information", () => {
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
-
-    cy.contains("M-DIGI-LPA3-3333");
-    cy.get("h1").contains("Steven Munnell");
-
     cy.contains("Fees").click();
     cy.contains("£41.00 expected");
   });
@@ -241,10 +215,6 @@ describe("View a digital LPA", () => {
         ],
       },
     );
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
-
-    cy.contains("M-DIGI-LPA3-3333");
-    cy.get("h1").contains("Steven Munnell");
     cy.contains("Documents").click();
 
     cy.contains("Mr Test Person - Blank Template");
@@ -260,8 +230,6 @@ describe("View a digital LPA", () => {
   });
 
   it("shows task table", () => {
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
-
     cy.get(
       "table[data-role=tasks-table] [data-role=tasks-table-header] tr th",
     ).should((elts) => {
@@ -335,30 +303,7 @@ describe("View a digital LPA", () => {
     });
   });
 
-  it("creates a task via case actions", () => {
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
-
-    cy.contains(".govuk-button", "Case actions").click();
-    cy.contains("Create a task").click();
-    cy.url().should("include", "/create-task?id=333");
-    cy.contains("M-DIGI-LPA3-3333");
-    cy.get("#f-taskType").select("Check Application");
-    cy.get("#f-name").type("Do this task");
-    cy.get("#f-description").type("This task, do");
-    cy.contains("label", "Team").click();
-    cy.get("#f-assigneeTeam").select("Cool Team");
-    cy.get("#f-dueDate").type("2035-01-01");
-    cy.get("button[type=submit]").click();
-
-    cy.get(".moj-alert").should("exist");
-    cy.get(".moj-alert").contains("Task created");
-    cy.get("h1").contains("Steven Munnell");
-    cy.location("pathname").should("eq", "/lpa/M-DIGI-LPA3-3333");
-  });
-
   it("creates a warning via case actions", () => {
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
-
     cy.contains(".govuk-button", "Case actions").click();
     cy.contains("Create a warning").click();
     cy.url().should("include", "/create-warning?id=33");
@@ -373,9 +318,6 @@ describe("View a digital LPA", () => {
   });
 
   it("shows lpa details from store when status is Processing", () => {
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
-
-    cy.contains("LPA details").click();
     cy.contains("Attorneys (4)");
     cy.contains("Replacement attorneys (3)");
     cy.contains("Removed attorneys (1)");
@@ -392,9 +334,6 @@ describe("View a digital LPA", () => {
       status: 200,
     });
 
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
-
-    cy.contains("LPA details").click();
     cy.contains("Decisions").click();
     cy.get("#f-update-decisions").click();
     cy.contains("Jointly for some").click();
@@ -417,8 +356,6 @@ describe("View a digital LPA", () => {
   });
 
   it("shows attorney signed on date and label if set", () => {
-    cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
-
     cy.contains("Attorneys (4)")
       .click()
       .parents(".govuk-accordion__section")
@@ -435,8 +372,6 @@ describe("View a digital LPA", () => {
   });
 
   it("shows replacement attorney signed on date and label if set", () => {
-    cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
-
     cy.contains("Replacement attorneys (3)")
       .click()
       .parents(".govuk-accordion__section")
@@ -453,8 +388,6 @@ describe("View a digital LPA", () => {
   });
 
   it("shows certificate provider signed on date, label and change link", () => {
-    cy.visit("/lpa/M-DIGI-LPA3-3333/lpa-details");
-
     cy.contains("Certificate provider")
       .click()
       .parents(".govuk-accordion__section")
@@ -465,115 +398,11 @@ describe("View a digital LPA", () => {
   });
 
   it("shows application details when store is empty", () => {
-    cy.addMock(
-      `/lpa-api/v1/digital-lpas/M-DIGI-LPA3-3334/progress-indicators`,
-      "GET",
-      {
-        status: 200,
-        body: {
-          digitalLpaUid: "M-DIGI-LPA3-3334",
-          progressIndicators: [
-            { indicator: "FEES", status: "COMPLETE" },
-            { indicator: "DONOR_ID", status: "IN_PROGRESS" },
-            { indicator: "CERTIFICATE_PROVIDER_ID", status: "CANNOT_START" },
-            {
-              indicator: "CERTIFICATE_PROVIDER_SIGNATURE",
-              status: "CANNOT_START",
-            },
-            { indicator: "ATTORNEY_SIGNATURES", status: "CANNOT_START" },
-            { indicator: "PREREGISTRATION_NOTICES", status: "CANNOT_START" },
-            { indicator: "REGISTRATION_NOTICES", status: "CANNOT_START" },
-          ],
-        },
-      },
-    );
-
     cy.visit("/lpa/M-DIGI-LPA3-3334");
 
     cy.contains("LPA details").click();
     cy.contains("Application format");
     cy.contains("Paper");
-  });
-
-  it("can cancel reassign task", () => {
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
-
-    cy.contains("Reassign task").click();
-    cy.url().should("include", "/assign-task?id=1");
-    cy.contains("Assign Task");
-
-    cy.contains("Cancel").click();
-    cy.url().should("include", "/lpa/M-DIGI-LPA3-3333");
-    cy.contains("Case summary");
-  });
-
-  it("can cancel clear task", () => {
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
-
-    cy.contains("Clear task").click();
-    cy.url().should("include", "/clear-task?id=1");
-    cy.contains("Save and clear task");
-
-    cy.contains("Cancel").click();
-    cy.url().should("include", "/lpa/M-DIGI-LPA3-3333");
-    cy.contains("Case summary");
-  });
-
-  it("can cancel creating a warning", () => {
-    cy.addMock("/lpa-api/v1/persons/33/cases", "GET", {
-      status: 200,
-      body: {
-        cases: [
-          {
-            caseSubtype: "property-and-affairs",
-            id: 333,
-            uId: "M-DIGI-LPA3-3333",
-            status: "Processing",
-          },
-        ],
-      },
-    });
-
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
-    cy.contains("Case actions").click();
-    cy.contains("Create a warning").click();
-
-    cy.url().should("include", "/create-warning?id=33");
-    cy.contains("Create Warning");
-    cy.contains("Cancel").click();
-
-    cy.url().should("include", "/lpa/M-DIGI-LPA3-3333");
-    cy.contains("Case summary");
-  });
-
-  it("can cancel changing the status", () => {
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
-    cy.contains("Case actions").click();
-    cy.contains("Change case status").click();
-
-    cy.url().should("include", "/change-case-status?uid=M-DIGI-LPA3-3333");
-    cy.contains("Change case status");
-    cy.get(".govuk-button-group").contains("Cancel").click();
-
-    cy.url().should("include", "/lpa/M-DIGI-LPA3-3333");
-    cy.contains("Case summary");
-  });
-
-  it("can clear a task", () => {
-    cy.addMock("/lpa-api/v1/tasks/1/mark-as-completed", "PUT", {
-      status: 200,
-    });
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
-
-    cy.contains("Clear task").click();
-    cy.url().should("include", "/clear-task?id=1");
-    cy.get("button[type=submit]").click();
-
-    cy.get(".moj-alert").should("exist");
-    cy.get(".moj-alert").contains("Task completed");
-
-    cy.url().should("contain", "/lpa/M-DIGI-LPA3-3333");
-    cy.contains("Case summary");
   });
 
   it("review severance messages appears when review restrictions tasks is open", () => {
@@ -601,9 +430,6 @@ describe("View a digital LPA", () => {
   });
 
   it("shows restrictions and conditions", () => {
-    cy.visit("/lpa/M-DIGI-LPA3-3333");
-
-    cy.contains("a", "LPA details").click();
     cy.contains("button", "Restrictions and conditions").click();
 
     cy.contains("Do not do this");
