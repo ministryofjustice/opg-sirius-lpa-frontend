@@ -126,6 +126,14 @@ describe("View and edit anomalies for a digital LPA", () => {
             ruleType: "no-country",
             fieldOwnerUid: "donor",
           },
+          {
+            id: 139,
+            status: "detected",
+            fieldName: "signedAt",
+            ruleType:
+              "date of ID and date of signature more than 6-months apart",
+            fieldOwnerUid: "donor",
+          },
         ],
       },
     });
@@ -239,6 +247,10 @@ describe("View and edit anomalies for a digital LPA", () => {
     cy.visit("/lpa/M-DIGI-QQQQ-1111/lpa-details");
     cy.contains("Some LPA details have been identified for review.");
     cy.contains("For review");
+    cy.contains("Review address as there is no country");
+    cy.contains(
+      "Review signature date - check this is within 6 months either side of the donor’s ID check",
+    );
     cy.contains("Review attorney's first names");
     cy.contains("Review attorney's last name");
     cy.contains("Review attorney's address");
