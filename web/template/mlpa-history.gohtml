@@ -3,92 +3,146 @@
 {{ define "title" }}History{{ end }}
 
 {{ define "main" }}
-  {{ template "mlpa-header" (caseTabs .CaseSummary "history") }}
+    {{ template "mlpa-header" (caseTabs .CaseSummary "history") }}
 
-  <div class="moj-page-header-actions">
-    <div class="moj-page-header-actions__title">
-      <h1 class="govuk-heading-l">History</h1>
-    </div>
-  </div>
-  <div class="moj-timeline">
-    {{ range .EventData }}
-      <div class="moj-timeline__item">
-        <div class="moj-timeline__header">
-          <h2 class="moj-timeline__title">
-            {{ if eq .type "INS" }}
-              <strong class="govuk-tag govuk-tag--green">Created</strong>
-            {{ else if eq .type "UPD" }}
-              <strong class="govuk-tag govuk-tag--grey">Updated</strong>
-            {{ else if eq .type "DEL" }}
-              <strong class="govuk-tag govuk-tag--red">Deleted</strong>
-            {{ end }}
-
-            {{ .sourceType }}
-          </h2>
-
-          <p class="moj-timeline__byline">by {{ .user.displayName }}</p>
+    <div class="moj-page-header-actions">
+        <div class="moj-page-header-actions__title">
+            <h1 class="govuk-heading-l">History</h1>
         </div>
+    </div>
+    <div class="moj-timeline">
+        {{ range .EventData }}
+            <div class="moj-timeline__item">
+                <div class="moj-timeline__header">
+                    <h2 class="moj-timeline__title">
+                        {{ if eq .source "lpa_store" }}
+                            <!-- LPA Store event styling -->
+                            {{ if eq .type "CORRECTION" }}
+                                <strong class="govuk-tag govuk-tag--blue">Correction</strong>
+                            {{ else if eq .type "CHANGE_ATTORNEYS" }}
+                                <strong class="govuk-tag govuk-tag--yellow">Attorney Change</strong>
+                            {{ else if eq .type "DONOR_CONFIRM_IDENTITY" }}
+                                <strong class="govuk-tag govuk-tag--green">Identity Confirmed</strong>
+                            {{ else if eq .type "OPG_STATUS_CHANGE" }}
+                                <strong class="govuk-tag govuk-tag--purple">Status Change</strong>
+                            {{ else }}
+                                <strong class="govuk-tag govuk-tag--grey">{{ .type }}</strong>
+                            {{ end }}
+                            LPA Store Event
+                        {{ else }}
+                            <!-- Sirius event styling (existing logic) -->
+                            {{ if eq .type "INS" }}
+                                <strong class="govuk-tag govuk-tag--green">Created</strong>
+                            {{ else if eq .type "UPD" }}
+                                <strong class="govuk-tag govuk-tag--grey">Updated</strong>
+                            {{ else if eq .type "DEL" }}
+                                <strong class="govuk-tag govuk-tag--red">Deleted</strong>
+                            {{ end }}
+                            {{ .sourceType }}
+                        {{ end }}
+                    </h2>
 
-        <p class="moj-timeline__date">
-          <time datetime="{{ .createdOn }}">{{ parseAndFormatDate .createdOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
-        </p>
+                    <p class="moj-timeline__byline">
+                        {{ if eq .source "lpa_store" }}
+                            by LPA Store System
+                        {{ else }}
+                            by {{ .user.displayName }}
+                        {{ end }}
+                    </p>
+                </div>
 
-        <div class="moj-timeline__description">
-          <details class="govuk-details">
-            <summary class="govuk-details__summary">
-              <span class="govuk-details__summary-text">
-                More details
-              </span>
-            </summary>
-            <div class="govuk-details__text">
-              <dl class="govuk-summary-list">
-                {{ range $k, $v := .entity }}
-                  {{ if eq $k "_class" "id" "document" }}
-                    {{ continue }}
-                  {{ end }}
+                <p class="moj-timeline__date">
+                    {{ if eq .source "lpa_store" }}
+                        <time datetime="{{ .applied }}">{{ parseAndFormatDate .applied "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
+                    {{ else }}
+                        <time datetime="{{ .createdOn }}">{{ parseAndFormatDate .createdOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
+                    {{ end }}
+                </p>
 
-                  <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
-                      {{ camelcaseToSentence $k }}
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                      {{ if eq $k "assignee" }}
-                        {{ $v.displayName }}
-                      {{ else if eq $k "uId" }}
-                        {{ printf "%.f" $v }}
-                      {{ else }}
-                        {{ $v }}
-                      {{ end }}
-                    </dd>
-                  </div>
-                {{ end }}
+                <div class="moj-timeline__description">
+                    {{ if eq .source "lpa_store" }}
+                        <!-- LPA Store event details -->
+                        <details class="govuk-details">
+                            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                  Changes made
+                </span>
+                            </summary>
+                            <div class="govuk-details__text">
+                                <dl class="govuk-summary-list">
+                                    {{ range .change }}
+                                        <div class="govuk-summary-list__row">
+                                            <dt class="govuk-summary-list__key">
+                                                {{ .key }}
+                                            </dt>
+                                            <dd class="govuk-summary-list__value">
+                                                <strong>From:</strong> {{ if .old }}{{ .old }}{{ else }}<em>empty</em>{{ end }}<br>
+                                                <strong>To:</strong> {{ if .new }}{{ .new }}{{ else }}<em>empty</em>{{ end }}
+                                            </dd>
+                                        </div>
+                                    {{ end }}
+                                </dl>
+                            </div>
+                        </details>
+                    {{ else }}
+                        <!-- Sirius event details (existing logic) -->
+                        <details class="govuk-details">
+                            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                  More details
+                </span>
+                            </summary>
+                            <div class="govuk-details__text">
+                                <dl class="govuk-summary-list">
+                                    {{ range $k, $v := .entity }}
+                                        {{ if eq $k "_class" "id" "document" }}
+                                            {{ continue }}
+                                        {{ end }}
 
-                {{ if and (eq .sourceType "Note") (ne (len .entity.document) 0) }}
-                  <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
-                      Document
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                      <a class="govuk-link" href="/lpa/document/{{ .entity.document.uuid }}">{{ .entity.document.friendlyDescription }}</a>
-                      ({{ .entity.document.subType }})
-                    </dd>
-                  </div>
-                {{ end }}
-              </dl>
-            </div>
-          </details>
-          <details class="govuk-details">
-            <summary class="govuk-details__summary">
+                                        <div class="govuk-summary-list__row">
+                                            <dt class="govuk-summary-list__key">
+                                                {{ camelcaseToSentence $k }}
+                                            </dt>
+                                            <dd class="govuk-summary-list__value">
+                                                {{ if eq $k "assignee" }}
+                                                    {{ $v.displayName }}
+                                                {{ else if eq $k "uId" }}
+                                                    {{ printf "%.f" $v }}
+                                                {{ else }}
+                                                    {{ $v }}
+                                                {{ end }}
+                                            </dd>
+                                        </div>
+                                    {{ end }}
+
+                                    {{ if and (eq .sourceType "Note") (ne (len .entity.document) 0) }}
+                                        <div class="govuk-summary-list__row">
+                                            <dt class="govuk-summary-list__key">
+                                                Document
+                                            </dt>
+                                            <dd class="govuk-summary-list__value">
+                                                <a class="govuk-link" href="/lpa/document/{{ .entity.document.uuid }}">{{ .entity.document.friendlyDescription }}</a>
+                                                ({{ .entity.document.subType }})
+                                            </dd>
+                                        </div>
+                                    {{ end }}
+                                </dl>
+                            </div>
+                        </details>
+                    {{ end }}
+
+                    <details class="govuk-details">
+                        <summary class="govuk-details__summary">
               <span class="govuk-details__summary-text">
                 Event data
               </span>
-            </summary>
-            <div class="govuk-details__text">
-              {{ . }}
+                        </summary>
+                        <div class="govuk-details__text">
+                            {{ . }}
+                        </div>
+                    </details>
+                </div>
             </div>
-          </details>
-        </div>
-      </div>
-    {{ end }}
-  </div>
+        {{ end }}
+    </div>
 {{ end }}
