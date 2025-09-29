@@ -131,8 +131,16 @@ describe("View and edit anomalies for a digital LPA", () => {
             status: "detected",
             fieldName: "signedAt",
             ruleType:
-              "date of ID and date of signature more than 6-months apart",
+              "Donor: date of ID and date of signature more than 6-months apart",
             fieldOwnerUid: "donor",
+          },
+          {
+            id: 140,
+            status: "detected",
+            fieldName: "signedAt",
+            ruleType:
+              "Certificate-provider: date of ID and date of signature more than 6-months apart",
+            fieldOwnerUid: "certificate-provider",
           },
         ],
       },

@@ -135,12 +135,13 @@ func (afo *AnomaliesForObject) GetAnomaliesForFieldWithStatus(fieldName string, 
 type AnomalyRuleType string
 
 const (
-	Empty                   AnomalyRuleType = "empty"
-	LastNameMatchesAttorney AnomalyRuleType = "last-name-matches-attorney"
-	LastNameMatchesDonor    AnomalyRuleType = "last-name-matches-donor"
-	NoCountry               AnomalyRuleType = "no-country"
-	InvalidAddress          AnomalyRuleType = "Invalid address"
-	IdAndSignedDateFarApart AnomalyRuleType = "date of ID and date of signature more than 6-months apart"
+	Empty                        AnomalyRuleType = "empty"
+	LastNameMatchesAttorney      AnomalyRuleType = "last-name-matches-attorney"
+	LastNameMatchesDonor         AnomalyRuleType = "last-name-matches-donor"
+	NoCountry                    AnomalyRuleType = "no-country"
+	InvalidAddress               AnomalyRuleType = "Invalid address"
+	DonorIdAndSignedDateFarApart AnomalyRuleType = "Donor: date of ID and date of signature more than 6-months apart"
+	CpIdAndSignedDateFarApart    AnomalyRuleType = "Certificate-provider: date of ID and date of signature more than 6-months apart"
 )
 
 // For CP lastName
@@ -161,8 +162,10 @@ func (afo *AnomaliesForObject) GetHintTextForAnomalyField(anomalies []Anomaly, w
 			return "Review address as there is no country"
 		case InvalidAddress:
 			return "Review " + whoHasTheAnomaly + " address"
-		case IdAndSignedDateFarApart:
+		case DonorIdAndSignedDateFarApart:
 			return "Review signature date - check this is within 6 months either side of the donor’s ID check"
+		case CpIdAndSignedDateFarApart:
+			return "Review signature date - check this is within 6 months either side of the certificate provider’s ID check"
 		}
 	}
 
