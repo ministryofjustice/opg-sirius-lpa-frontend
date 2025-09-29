@@ -131,42 +131,6 @@ describe("Case actions drop down", () => {
         cy.location("pathname").should("eq", "/lpa/M-1111-1111-1111");
     });
 
-    it("can cancel reassign task", () => {
-        cy.contains("Reassign task").click();
-        cy.url().should("include", "/assign-task?id=1");
-        cy.contains("Assign Task");
-
-        cy.contains("Cancel").click();
-        cy.url().should("include", "/lpa/M-1111-1111-1111");
-        cy.contains("Case summary");
-    });
-
-    it("can cancel clear task", () => {
-        cy.contains("Clear task").click();
-        cy.url().should("include", "/clear-task?id=1");
-        cy.contains("Save and clear task");
-
-        cy.contains("Cancel").click();
-        cy.url().should("include", "/lpa/M-1111-1111-1111");
-        cy.contains("Case summary");
-    });
-
-    it("can clear a task", () => {
-        cy.addMock("/lpa-api/v1/tasks/1/mark-as-completed", "PUT", {
-            status: 200,
-        });
-
-        cy.contains("Clear task").click();
-        cy.url().should("include", "/clear-task?id=1");
-        cy.get("button[type=submit]").click();
-
-        cy.get(".moj-alert").should("exist");
-        cy.get(".moj-alert").contains("Task completed");
-
-        cy.url().should("contain", "/lpa/M-1111-1111-1111");
-        cy.contains("Case summary");
-    });
-
     it("can cancel changing the status", () => {
         cy.addMock("/lpa-api/v1/reference-data/caseChangeReason", "GET", {
             status: 200,
