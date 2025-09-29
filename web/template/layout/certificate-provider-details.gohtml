@@ -108,6 +108,11 @@
                     <dt class="govuk-summary-list__key">Signed on</dt>
                     <dd class="govuk-summary-list__value">
                         {{ parseAndFormatDate .DigitalLpa.LpaStoreData.CertificateProvider.SignedAt "2006-01-02T15:04:05Z" "2 January 2006" }}
+                        {{ $signedOnAnomalies := $cpAnomalies.GetAnomaliesForFieldWithStatus "signedAt" "detected" }}
+                        {{ if gt (len $signedOnAnomalies) 0 }}
+                            {{ $signedOnAnomaly := $cpAnomalies.GetHintTextForAnomalyField $signedOnAnomalies "" }}
+                            {{ template "information-warning" $signedOnAnomaly }}
+                        {{ end }}
                     </dd>
                 </div>
             {{ end }}
