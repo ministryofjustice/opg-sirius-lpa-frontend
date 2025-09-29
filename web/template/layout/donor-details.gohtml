@@ -108,15 +108,15 @@
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">LPA signed on</dt>
                     <dd class="govuk-summary-list__value">
-                        {{ if (eq .DigitalLpa.LpaStoreData.SignedAt "") }}
-                            Not provided
-                        {{ else }}
-                            {{ parseAndFormatDate .DigitalLpa.LpaStoreData.SignedAt "2006-01-02T15:04:05Z" "2 January 2006" }}
-                        {{ end }}
                         {{ $signedAtAnomalies := $donorAnomalies.GetAnomaliesForFieldWithStatus "signedAt" "detected" }}
                         {{ if gt (len $signedAtAnomalies) 0 }}
                             {{ $signedAtAnomaly := $donorAnomalies.GetHintTextForAnomalyField $signedAtAnomalies "" }}
                             {{ template "information-warning" $signedAtAnomaly }}
+                        {{ end }}
+                        {{ if (eq .DigitalLpa.LpaStoreData.SignedAt "") }}
+                            Not provided
+                        {{ else }}
+                            {{ parseAndFormatDate .DigitalLpa.LpaStoreData.SignedAt "2006-01-02T15:04:05Z" "2 January 2006" }}
                         {{ end }}
                     </dd>
                 </div>
