@@ -93,11 +93,7 @@ func TestGetCombinedEvents(t *testing.T) {
 					UponReceiving("A request for the combined event history").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   matchers.Like("/lpa-api/v1/digital-lpas/M-1234-5678-9012/events?donorId=33&caseId=66"),
-						Query: matchers.MapMatcher{
-							"donorId": matchers.Like("33"),
-							"caseId":  matchers.Like("66"),
-						},
+						Path:   matchers.Like("/lpa-api/v1/digital-lpas/M-1234-5678-9012/events"),
 					}).
 					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
@@ -128,7 +124,7 @@ func TestGetCombinedEvents(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				events, err := client.GetCombinedEvents(Context{Context: context.Background()}, "M-1234-5678-9012", 33, 66)
+				events, err := client.GetCombinedEvents(Context{Context: context.Background()}, "M-1234-5678-9012")
 
 				assert.Equal(t, tc.expectedResponse, events)
 				if tc.expectedError == nil {

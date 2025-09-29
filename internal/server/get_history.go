@@ -10,7 +10,7 @@ import (
 
 type GetHistoryClient interface {
 	GetEvents(ctx sirius.Context, donorId int, caseId int) (any, error)
-	GetCombinedEvents(ctx sirius.Context, uid string, donorId int, caseId int) (any, error)
+	GetCombinedEvents(ctx sirius.Context, uid string) (any, error)
 	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
 }
 
@@ -29,17 +29,15 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		donorId := caseSummary.DigitalLpa.SiriusData.Donor.ID
-		caseId := caseSummary.DigitalLpa.SiriusData.ID
-
 		var eventDetails any
 
-		// Determine if this is a digital LPA (has LpaStoreData)
 		if caseSummary.DigitalLpa.LpaStoreData.Status != "" {
-			// Digital LPA - use combined events from both Sirius and LPA Store
-			eventDetails, err = client.GetCombinedEvents(ctx, uid, donorId, caseId)
+			// Digital LPA - use combined events
+			eventDetails, err = client.GetCombinedEvents(ctx, uid)
 		} else {
 			// Traditional LPA - use Sirius events only
+			donorId := caseSummary.DigitalLpa.SiriusData.Donor.ID
+			caseId := caseSummary.DigitalLpa.SiriusData.ID
 			eventDetails, err = client.GetEvents(ctx, donorId, caseId)
 		}
 

@@ -10,27 +10,30 @@
             <h1 class="govuk-heading-l">History</h1>
         </div>
     </div>
+
     <div class="moj-timeline">
         {{ range .EventData }}
             <div class="moj-timeline__item">
                 <div class="moj-timeline__header">
                     <h2 class="moj-timeline__title">
                         {{ if eq .source "lpa_store" }}
-                            <!-- LPA Store event styling -->
                             {{ if eq .type "CORRECTION" }}
                                 <strong class="govuk-tag govuk-tag--blue">Correction</strong>
                             {{ else if eq .type "CHANGE_ATTORNEYS" }}
                                 <strong class="govuk-tag govuk-tag--yellow">Attorney Change</strong>
+                            {{ else if eq .type "CERTIFICATE_PROVIDER_SIGN" }}
+                                <strong class="govuk-tag govuk-tag--green">CP Signed</strong>
                             {{ else if eq .type "DONOR_CONFIRM_IDENTITY" }}
                                 <strong class="govuk-tag govuk-tag--green">Identity Confirmed</strong>
                             {{ else if eq .type "OPG_STATUS_CHANGE" }}
                                 <strong class="govuk-tag govuk-tag--purple">Status Change</strong>
+                            {{ else if eq .type "STATUTORY_WAITING_PERIOD" }}
+                                <strong class="govuk-tag govuk-tag--orange">Waiting Period</strong>
                             {{ else }}
                                 <strong class="govuk-tag govuk-tag--grey">{{ .type }}</strong>
                             {{ end }}
                             LPA Store Event
                         {{ else }}
-                            <!-- Sirius event styling (existing logic) -->
                             {{ if eq .type "INS" }}
                                 <strong class="govuk-tag govuk-tag--green">Created</strong>
                             {{ else if eq .type "UPD" }}
@@ -43,54 +46,52 @@
                     </h2>
 
                     <p class="moj-timeline__byline">
-                        {{ if eq .source "lpa_store" }}
-                            by LPA Store System
-                        {{ else }}
+                        {{ if .user }}
                             by {{ .user.displayName }}
+                        {{ else }}
+                            by Unknown User
                         {{ end }}
                     </p>
                 </div>
 
                 <p class="moj-timeline__date">
-                    {{ if eq .source "lpa_store" }}
+                    {{ if .applied }}
                         <time datetime="{{ .applied }}">{{ parseAndFormatDate .applied "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
-                    {{ else }}
+                    {{ else if .createdOn }}
                         <time datetime="{{ .createdOn }}">{{ parseAndFormatDate .createdOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
+                    {{ else if .datetime }}
+                        <time datetime="{{ .datetime }}">{{ parseAndFormatDate .datetime "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
                     {{ end }}
                 </p>
 
                 <div class="moj-timeline__description">
                     {{ if eq .source "lpa_store" }}
-                        <!-- LPA Store event details -->
-                        <details class="govuk-details">
-                            <summary class="govuk-details__summary">
-                <span class="govuk-details__summary-text">
-                  Changes made
-                </span>
-                            </summary>
-                            <div class="govuk-details__text">
-                                <dl class="govuk-summary-list">
-                                    {{ range .change }}
-                                        <div class="govuk-summary-list__row">
-                                            <dt class="govuk-summary-list__key">
-                                                {{ .key }}
-                                            </dt>
-                                            <dd class="govuk-summary-list__value">
-                                                <strong>From:</strong> {{ if .old }}{{ .old }}{{ else }}<em>empty</em>{{ end }}<br>
-                                                <strong>To:</strong> {{ if .new }}{{ .new }}{{ else }}<em>empty</em>{{ end }}
-                                            </dd>
-                                        </div>
-                                    {{ end }}
-                                </dl>
-                            </div>
-                        </details>
+                        {{ if .changes }}
+                            <details class="govuk-details">
+                                <summary class="govuk-details__summary">
+                                    <span class="govuk-details__summary-text">Changes made</span>
+                                </summary>
+                                <div class="govuk-details__text">
+                                    <dl class="govuk-summary-list govuk-summary-list--no-border">
+                                        {{ range .changes }}
+                                            <div class="govuk-summary-list__row">
+                                                <dt class="govuk-summary-list__key">
+                                                    {{ .key }}
+                                                </dt>
+                                                <dd class="govuk-summary-list__value">
+                                                    <strong>From:</strong> {{ if .old }}{{ .old }}{{ else }}<em>(empty)</em>{{ end }}<br>
+                                                    <strong>To:</strong> {{ if .new }}{{ .new }}{{ else }}<em>(empty)</em>{{ end }}
+                                                </dd>
+                                            </div>
+                                        {{ end }}
+                                    </dl>
+                                </div>
+                            </details>
+                        {{ end }}
                     {{ else }}
-                        <!-- Sirius event details (existing logic) -->
                         <details class="govuk-details">
                             <summary class="govuk-details__summary">
-                <span class="govuk-details__summary-text">
-                  More details
-                </span>
+                                <span class="govuk-details__summary-text">More details</span>
                             </summary>
                             <div class="govuk-details__text">
                                 <dl class="govuk-summary-list">
@@ -130,19 +131,18 @@
                             </div>
                         </details>
                     {{ end }}
-
-                    <details class="govuk-details">
-                        <summary class="govuk-details__summary">
-              <span class="govuk-details__summary-text">
-                Event data
-              </span>
-                        </summary>
-                        <div class="govuk-details__text">
-                            {{ . }}
-                        </div>
-                    </details>
                 </div>
             </div>
         {{ end }}
     </div>
+    <details class="govuk-details" style="margin-top: 20px;">
+        <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+            DEBUG: Full Data Object
+        </span>
+        </summary>
+        <div class="govuk-details__text">
+            <pre style="white-space: pre-wrap; word-wrap: break-word;">{{ printf "%#v" . }}</pre>
+        </div>
+    </details>
 {{ end }}

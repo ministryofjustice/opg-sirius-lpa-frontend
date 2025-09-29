@@ -23,8 +23,8 @@ func (m *mockGetHistoryClient) GetEvents(ctx sirius.Context, donorId int, caseId
 	return args.Get(0), args.Error(1)
 }
 
-func (m *mockGetHistoryClient) GetCombinedEvents(ctx sirius.Context, uid string, donorId int, caseId int) (any, error) {
-	args := m.Called(ctx, uid, donorId, caseId)
+func (m *mockGetHistoryClient) GetCombinedEvents(ctx sirius.Context, uid string) (any, error) {
+	args := m.Called(ctx, uid)
 	return args.Get(0), args.Error(1)
 }
 
@@ -50,7 +50,7 @@ func TestGetHistorySuccessForDigitalLpa(t *testing.T) {
 		On("CaseSummary", mock.Anything, "M-9876-9876-9999").
 		Return(caseSummary, nil)
 	client.
-		On("GetCombinedEvents", mock.Anything, "M-9876-9876-9999", 8, 12).
+		On("GetCombinedEvents", mock.Anything, "M-9876-9876-9999").
 		Return(map[string]string{"event": "combined event details"}, nil)
 
 	template := &mockTemplate{}
@@ -134,7 +134,7 @@ func TestGetHistoryWhenFailureOnGetCombinedEventsForDigitalLpa(t *testing.T) {
 		On("CaseSummary", mock.Anything, "M-9876-9876-9999").
 		Return(caseSummary, nil)
 	client.
-		On("GetCombinedEvents", mock.Anything, "M-9876-9876-9999", 8, 12).
+		On("GetCombinedEvents", mock.Anything, "M-9876-9876-9999").
 		Return(nil, errExample)
 
 	server := newMockServer("/lpa/{uid}/history", GetHistory(client, nil))
