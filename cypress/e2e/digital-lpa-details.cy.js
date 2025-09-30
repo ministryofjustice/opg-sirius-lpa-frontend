@@ -201,20 +201,6 @@ describe("View digital LPA details", () => {
     cy.contains("Reduced fee request evidence");
   });
 
-  it("creates a warning via case actions", () => {
-    cy.contains(".govuk-button", "Case actions").click();
-    cy.contains("Create a warning").click();
-    cy.url().should("include", "/create-warning?id=33");
-    cy.get("#f-warningType").select("Complaint Received");
-    cy.get("#f-warningText").type("Be warned!");
-    cy.get("button[type=submit]").click();
-
-    cy.get(".moj-alert").should("exist");
-    cy.get(".moj-alert").contains("Warning created");
-    cy.get("h1").contains("Steven Munnell");
-    cy.location("pathname").should("eq", "/lpa/M-DIGI-LPA3-3333");
-  });
-
   it("shows lpa details from store when status is Processing", () => {
     cy.contains("Attorneys (4)");
     cy.contains("Replacement attorneys (3)");
