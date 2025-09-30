@@ -17,22 +17,6 @@ describe("View a digital LPA", () => {
       },
     });
 
-    cy.addMock("/lpa-api/v1/tasks/1", "GET", {
-      status: 200,
-      body: {
-        caseItems: [
-          {
-            caseType: "DIGITAL_LPA",
-            uId: "M-DIGI-LPA3-3333",
-          },
-        ],
-        dueDate: "10/01/2022",
-        id: 1,
-        name: "Create physical case file",
-        status: "Not Started",
-      },
-    });
-
     const mocks = Promise.allSettled([
       digitalLpas.get("M-DIGI-LPA3-3333", {
         "opg.poas.sirius": {
