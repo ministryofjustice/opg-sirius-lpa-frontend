@@ -410,9 +410,7 @@ describe("View a digital LPA", () => {
   });
 
   it("shows donor signed directly (no signed on behalf)", () => {
-    const lpaMocks = Promise.allSettled([
-      digitalLpas.get("M-DIGI-LPA3-3335"),
-    ]);
+    const lpaMocks = Promise.allSettled([digitalLpas.get("M-DIGI-LPA3-3335")]);
     cy.wrap(lpaMocks);
 
     cy.visit("/lpa/M-DIGI-LPA3-3335/lpa-details");
