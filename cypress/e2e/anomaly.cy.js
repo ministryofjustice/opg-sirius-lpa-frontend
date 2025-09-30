@@ -29,6 +29,8 @@ describe("View and edit anomalies for a digital LPA", () => {
           ],
           certificateProvider: {
             uid: "certificate-provider",
+            signedAt: "2025-09-30T10:25:47.881438922Z",
+
           },
           donor: {
             uid: "donor",
@@ -270,6 +272,9 @@ describe("View and edit anomalies for a digital LPA", () => {
     cy.contains("Review certificate provider's first names");
     cy.contains("Review certificate provider's last name");
     cy.contains("Review certificate provider's address");
+    cy.contains(
+      "Review signature date - check this is within 6 months either side of the certificate provider’s ID check",
+    );
   });
 
   it("shows anomalies for pa LPA", () => {
