@@ -1,33 +1,17 @@
 import * as digitalLpas from "../mocks/digitalLpas";
+import * as cases from "../mocks/cases";
 
 describe("Case actions drop down", () => {
   beforeEach(() => {
     const mocks = Promise.allSettled([
+      cases.tasks.empty("1111"),
+      cases.warnings.empty("1111"),
       digitalLpas.get("M-1111-1111-1111"),
       digitalLpas.objections.empty("M-1111-1111-1111"),
       digitalLpas.progressIndicators.feesInProgress("M-1111-1111-1111"),
     ]);
 
     cy.wrap(mocks);
-
-    cy.addMock(
-      "/lpa-api/v1/cases/1111/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-      "GET",
-      {
-        status: 200,
-        body: {
-          tasks: [
-            {
-              id: 1,
-              name: "Review restrictions and conditions",
-              duedate: "10/12/2023",
-              status: "OPEN",
-              assignee: { displayName: "Super Team" },
-            },
-          ],
-        },
-      },
-    );
 
     cy.addMock("/lpa-api/v1/persons/1111/cases", "GET", {
       status: 200,
@@ -38,30 +22,10 @@ describe("Case actions drop down", () => {
             id: 1111,
             uId: "M-1111-1111-1111",
             status: "Draft",
-          },
-        ],
-      },
-    });
-
-    cy.addMock("/lpa-api/v1/tasks/1", "GET", {
-      status: 200,
-      body: {
-        caseItems: [
-          {
             caseType: "DIGITAL_LPA",
-            uId: "M-1111-1111-1111",
           },
         ],
-        dueDate: "10/01/2022",
-        id: 1,
-        name: "Create physical case file",
-        status: "Not Started",
       },
-    });
-
-    cy.addMock("/lpa-api/v1/cases/1111/tasks", "POST", {
-      status: 201,
-      body: { tasks: [] },
     });
 
     cy.addMock("/lpa-api/v1/cases/1111", "GET", {
@@ -73,44 +37,17 @@ describe("Case actions drop down", () => {
         donor: {
           id: 1111,
         },
-        status: "Processing",
-        expectedPaymentTotal: 8200,
       },
-    });
-
-    cy.addMock("/lpa-api/v1/cases/1111/warnings", "GET", {
-      status: 200,
-      body: [
-        {
-          id: 44,
-          warningType: "Court application in progress",
-          warningText: "Court notified",
-          dateAdded: "24/08/2022 13:13:13",
-          caseItems: [
-            { uId: "M-1111-1111-1111", caseSubtype: "property-and-affairs" },
-          ],
-        },
-      ],
-    });
-
-    cy.addMock("/lpa-api/v1/warnings", "POST", {
-      status: 201,
-      body: {
-        personId: 1111,
-        warningText: "Be warned!",
-        warningType: "Complaint Received",
-        caseIds: [1111],
-      },
-    });
-
-    cy.addMock("/lpa-api/v1/warnings", "POST", {
-      status: 201,
     });
 
     cy.visit("/lpa/M-1111-1111-1111");
   });
 
   it("can create a task", () => {
+    cy.addMock("/lpa-api/v1/cases/1111/tasks", "POST", {
+      status: 201,
+      body: { tasks: [] },
+    });
     cy.contains(".govuk-button", "Case actions").click();
     cy.contains("Create a task").click();
     cy.url().should("include", "/create-task?id=1111");

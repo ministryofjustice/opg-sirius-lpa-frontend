@@ -1,7 +1,7 @@
 import * as cases from "../mocks/cases";
 import * as digitalLpas from "../mocks/digitalLpas";
 
-describe("View a digital LPA", () => {
+describe("View digital LPA details", () => {
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/cases/333", "GET", {
       status: 200,
@@ -14,22 +14,6 @@ describe("View a digital LPA", () => {
         },
         status: "Processing",
         expectedPaymentTotal: 8200,
-      },
-    });
-
-    cy.addMock("/lpa-api/v1/tasks/1", "GET", {
-      status: 200,
-      body: {
-        caseItems: [
-          {
-            caseType: "DIGITAL_LPA",
-            uId: "M-DIGI-LPA3-3333",
-          },
-        ],
-        dueDate: "10/01/2022",
-        id: 1,
-        name: "Create physical case file",
-        status: "Not Started",
       },
     });
 
