@@ -1,0 +1,43 @@
+{{ template "page" . }}
+
+{{ define "title" }}Change trust corporation details{{ end }}
+
+{{ define "main" }}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            <a href="{{ prefix (printf "/lpa/%s/lpa-details" .CaseUID )}}" class="govuk-back-link">Back to LPA details</a>
+
+            {{ template "error-summary" .Error }}
+
+            {{ if .Success }}
+                {{ template "success-banner" "You have changed trust corporation details." }}
+            {{ end }}
+
+            <h1 class="govuk-heading-l app-!-embedded-hide">Change trust attorney corporation details</h1>
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+
+                
+
+
+                <div class="govuk-warning-text">
+                    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                    <strong class="govuk-warning-text__text">
+                        <span class="govuk-visually-hidden">Warning</span>
+                        Any changes made will appear only on this LPA
+                    </strong>
+                </div>
+
+                <div class="govuk-button-group">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Save and continue</button><br/>
+                    <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/lpa/%s/lpa-details" .CaseUID )}}">Cancel</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+{{ end }}
