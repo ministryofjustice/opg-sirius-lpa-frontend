@@ -20,9 +20,25 @@
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
+                {{ template "input" (field "name" "Trust corporation name" .Form.Name .Error.Field.Name) }}
 
-                
+                <div class="govuk-form-group {{ if .Error.Field.Address }}govuk-form-group--error{{ end }}" data-app-address-finder-label="Company address">
+                    <legend class="govuk-fieldset__legend">
+                        <h2 class="govuk-fieldset__heading">
+                            {{(print "Company address")}}
+                        </h2>
+                    </legend>
+                    {{ template "input" (field "address.Line1" "Address line 1" .Form.Address.Line1 (index .Error.Field "address/addressLine1") "data-app-address-finder-map" "addressLine1") }}
+                    {{ template "input" (field "address.Line2" "Address line 2 (optional)" .Form.Address.Line2 (index .Error.Field "address/addressLine2") "data-app-address-finder-map" "addressLine2") }}
+                    {{ template "input" (field "address.Line3" "Address line 3 (optional)" .Form.Address.Line3 (index .Error.Field "address/addressLine3") "data-app-address-finder-map" "addressLine3") }}
+                    {{ template "input" (field "address.Town" "Town or city" .Form.Address.Town (index .Error.Field "address/town") "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "address.Postcode" "Postcode" .Form.Address.Postcode (index .Error.Field "address/postcode") "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "select" (select "address.Country" "Country" .Form.Address.Country (index .Error.Field "address/country") (options .Countries) "data-app-address-finder-map" "country") }}
+                </div>
 
+                {{ template "input" (field "email" "Company email address (optional)" .Form.Email .Error.Field.Email) }}
+                {{ template "input" (field "phoneNumber" "Company phone number (optional)" .Form.PhoneNumber .Error.Field.PhoneNumber) }}
+                {{ template "input" (field "registrationNumber" "Company registration number" .Form.RegistrationNumber .Error.Field.RegistrationNumber) }}
 
                 <div class="govuk-warning-text">
                     <span class="govuk-warning-text__icon" aria-hidden="true">!</span>

@@ -5,6 +5,7 @@ import (
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"golang.org/x/sync/errgroup"
 )
 
 type ChangeTrustCorporationDetailsClient interface {
@@ -14,10 +15,20 @@ type ChangeTrustCorporationDetailsClient interface {
 
 type changeTrustCorporationDetailsData struct {
 	XSRFToken string
+	Countries []sirius.RefDataItem
 	Success   bool
 	Error     sirius.ValidationError
 	CaseUID   string
+	Form      formTrustCorporationDetails
 	TrustCorp sirius.LpaStoreTrustCorporation
+}
+
+type formTrustCorporationDetails struct {
+	Name               string         `form:"name"`
+	Address            sirius.Address `form:"address"`
+	Email              string         `form:"email"`
+	PhoneNumber        string         `form:"phoneNumber"`
+	RegistrationNumber string         `form:"registrationNumber"`
 }
 
 func ChangeTrustCorporationDetails(client ChangeTrustCorporationDetailsClient, tmpl template.Template) Handler {
@@ -46,6 +57,36 @@ func ChangeTrustCorporationDetails(client ChangeTrustCorporationDetailsClient, t
 			XSRFToken: ctx.XSRFToken,
 			CaseUID:   caseUID,
 			TrustCorp: trustCorporation,
+			Form: formTrustCorporationDetails{
+				Name: trustCorporation.Name,
+				Address: sirius.Address{
+					Line1:    trustCorporation.Address.Line1,
+					Line2:    trustCorporation.Address.Line2,
+					Line3:    trustCorporation.Address.Line3,
+					Town:     trustCorporation.Address.Town,
+					Postcode: trustCorporation.Address.Postcode,
+					Country:  trustCorporation.Address.Country,
+				},
+				Email:              trustCorporation.Email,
+				PhoneNumber:        trustCorporation.Mobile,
+				RegistrationNumber: trustCorporation.CompanyNumber,
+			},
+		}
+
+		group, groupCtx := errgroup.WithContext(ctx.Context)
+
+		group.Go(func() error {
+			var err error
+			data.Countries, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.CountryCategory)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
+			return err
 		}
 
 		return tmpl(w, data)
