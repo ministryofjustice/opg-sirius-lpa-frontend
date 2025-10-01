@@ -17,21 +17,7 @@
                 <div class="moj-timeline__header">
                     <h2 class="moj-timeline__title">
                         {{ if eq .source "lpa_store" }}
-                            {{ if eq .type "CORRECTION" }}
-                                <strong class="govuk-tag govuk-tag--blue">Correction</strong>
-                            {{ else if eq .type "CHANGE_ATTORNEYS" }}
-                                <strong class="govuk-tag govuk-tag--yellow">Attorney Change</strong>
-                            {{ else if eq .type "CERTIFICATE_PROVIDER_SIGN" }}
-                                <strong class="govuk-tag govuk-tag--green">CP Signed</strong>
-                            {{ else if eq .type "DONOR_CONFIRM_IDENTITY" }}
-                                <strong class="govuk-tag govuk-tag--green">Identity Confirmed</strong>
-                            {{ else if eq .type "OPG_STATUS_CHANGE" }}
-                                <strong class="govuk-tag govuk-tag--purple">Status Change</strong>
-                            {{ else if eq .type "STATUTORY_WAITING_PERIOD" }}
-                                <strong class="govuk-tag govuk-tag--orange">Waiting Period</strong>
-                            {{ else }}
-                                <strong class="govuk-tag govuk-tag--grey">{{ .type }}</strong>
-                            {{ end }}
+                            <strong class="govuk-tag govuk-tag--{{ eventTypeColor .type }}">{{ formatEventType .type }}</strong>
                             LPA Store Event
                         {{ else }}
                             {{ if eq .type "INS" }}
@@ -135,4 +121,14 @@
             </div>
         {{ end }}
     </div>
+    <details class="govuk-details" style="margin-top: 20px;">
+        <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+            DEBUG: Full Data Object
+        </span>
+        </summary>
+        <div class="govuk-details__text">
+            <pre style="white-space: pre-wrap; word-wrap: break-word;">{{ printf "%#v" . }}</pre>
+        </div>
+    </details>
 {{ end }}
