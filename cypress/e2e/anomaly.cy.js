@@ -29,6 +29,7 @@ describe("View and edit anomalies for a digital LPA", () => {
           ],
           certificateProvider: {
             uid: "certificate-provider",
+            signedAt: "2025-09-30T10:25:47.881438922Z",
           },
           donor: {
             uid: "donor",
@@ -125,6 +126,22 @@ describe("View and edit anomalies for a digital LPA", () => {
             fieldName: "address",
             ruleType: "no-country",
             fieldOwnerUid: "donor",
+          },
+          {
+            id: 139,
+            status: "detected",
+            fieldName: "signedAt",
+            ruleType:
+              "Donor: date of ID and date of signature more than 6-months apart",
+            fieldOwnerUid: "donor",
+          },
+          {
+            id: 140,
+            status: "detected",
+            fieldName: "signedAt",
+            ruleType:
+              "Certificate-provider: date of ID and date of signature more than 6-months apart",
+            fieldOwnerUid: "certificate-provider",
           },
         ],
       },
@@ -239,6 +256,10 @@ describe("View and edit anomalies for a digital LPA", () => {
     cy.visit("/lpa/M-DIGI-QQQQ-1111/lpa-details");
     cy.contains("Some LPA details have been identified for review.");
     cy.contains("For review");
+    cy.contains("Review address as there is no country");
+    cy.contains(
+      "Review signature date - check this is within 6 months either side of the donor’s ID check",
+    );
     cy.contains("Review attorney's first names");
     cy.contains("Review attorney's last name");
     cy.contains("Review attorney's address");
@@ -250,6 +271,9 @@ describe("View and edit anomalies for a digital LPA", () => {
     cy.contains("Review certificate provider's first names");
     cy.contains("Review certificate provider's last name");
     cy.contains("Review certificate provider's address");
+    cy.contains(
+      "Review signature date - check this is within 6 months either side of the certificate provider’s ID check",
+    );
   });
 
   it("shows anomalies for pa LPA", () => {

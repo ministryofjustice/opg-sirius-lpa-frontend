@@ -129,26 +129,27 @@ function extendDefaultDigitalLpa(uid, body) {
       );
     }
 
-    if (
-      body.hasOwnProperty("opg.poas.lpastore") &&
-      body["opg.poas.lpastore"] !== null
-    ) {
-      opgPoasLpastore = Object.assign(
-        {},
-        defaultBody["opg.poas.lpastore"],
-        body["opg.poas.lpastore"],
-      );
-      opgPoasLpastoreDonor = Object.assign(
-        {},
-        defaultBody["opg.poas.lpastore"].donor,
-        body["opg.poas.lpastore"].donor ?? null,
-      );
-      opgPoasLpastoreAttorneys = body["opg.poas.lpastore"].attorneys ?? [];
-      opgPoasLpastoreCertificateProvider = Object.assign(
-        {},
-        defaultBody["opg.poas.lpastore"].certificateProvider,
-        body["opg.poas.lpastore"].certificateProvider ?? null,
-      );
+    if (body.hasOwnProperty("opg.poas.lpastore")) {
+      if (body["opg.poas.lpastore"] !== null) {
+        opgPoasLpastore = Object.assign(
+          {},
+          defaultBody["opg.poas.lpastore"],
+          body["opg.poas.lpastore"],
+        );
+        opgPoasLpastoreDonor = Object.assign(
+          {},
+          defaultBody["opg.poas.lpastore"].donor,
+          body["opg.poas.lpastore"].donor ?? null,
+        );
+        opgPoasLpastoreAttorneys = body["opg.poas.lpastore"].attorneys ?? [];
+        opgPoasLpastoreCertificateProvider = Object.assign(
+          {},
+          defaultBody["opg.poas.lpastore"].certificateProvider,
+          body["opg.poas.lpastore"].certificateProvider ?? null,
+        );
+      } else {
+        opgPoasLpastore = null;
+      }
     }
   }
 
