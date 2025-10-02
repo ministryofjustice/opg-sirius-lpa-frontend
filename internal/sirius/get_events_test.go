@@ -98,13 +98,11 @@ func TestGetCombinedEvents(t *testing.T) {
 					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
-						Body: matchers.Like(map[string]interface{}{
-							"events": matchers.EachLike(map[string]interface{}{
-								"source":   matchers.Like("sirius"),
-								"type":     matchers.Like("case_created"),
-								"datetime": matchers.Like("2024-01-01T10:00:00Z"),
-							}, 1),
-						}),
+						Body: matchers.EachLike(map[string]interface{}{
+							"source":   matchers.Like("sirius"),
+							"type":     matchers.Like("case_created"),
+							"datetime": matchers.Like("2024-01-01T10:00:00Z"),
+						}, 1),
 					})
 			},
 			expectedResponse: []interface{}{
