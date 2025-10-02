@@ -16,9 +16,7 @@ func (c *Client) GetEvents(ctx Context, donorId int, caseId int) (any, error) {
 
 // GetCombinedEvents Gets combined events from both Sirius and LPA Store for digital LPAs
 func (c *Client) GetCombinedEvents(ctx Context, uid string) (any, error) {
-	var v struct {
-		Events any `json:"events"`
-	}
+	var v any
 	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/events", uid), &v)
-	return v.Events, err
+	return v, err
 }
