@@ -23,7 +23,12 @@ func (m *mockGetHistoryClient) GetEvents(ctx sirius.Context, donorId int, caseId
 	return args.Get(0), args.Error(1)
 }
 
-func TestGetHistorySuccess(t *testing.T) {
+func (m *mockGetHistoryClient) GetCombinedEvents(ctx sirius.Context, uid string) (any, error) {
+	args := m.Called(ctx, uid)
+	return args.Get(0), args.Error(1)
+}
+
+func TestGetHistorySuccessForDigitalLpa(t *testing.T) {
 	caseSummary := sirius.CaseSummary{
 		DigitalLpa: sirius.DigitalLpa{
 			UID: "M-9876-9876-9999",
@@ -34,6 +39,9 @@ func TestGetHistorySuccess(t *testing.T) {
 					ID: 8,
 				},
 			},
+			LpaStoreData: sirius.LpaStoreData{
+				Status: "processing", // Non-empty status indicates digital LPA
+			},
 		},
 	}
 
@@ -42,14 +50,14 @@ func TestGetHistorySuccess(t *testing.T) {
 		On("CaseSummary", mock.Anything, "M-9876-9876-9999").
 		Return(caseSummary, nil)
 	client.
-		On("GetEvents", mock.Anything, 8, 12).
-		Return(map[string]string{"event": "event1 details"}, nil)
+		On("GetCombinedEvents", mock.Anything, "M-9876-9876-9999").
+		Return(map[string]string{"event": "combined event details"}, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getHistory{
 			CaseSummary: caseSummary,
-			EventData:   map[string]string{"event": "event1 details"},
+			EventData:   map[string]string{"event": "combined event details"},
 		}).
 		Return(nil)
 
@@ -62,7 +70,7 @@ func TestGetHistorySuccess(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestGetHistoryWhenFailureOnGetEvents(t *testing.T) {
+func TestGetHistorySuccessForTraditionalLpa(t *testing.T) {
 	caseSummary := sirius.CaseSummary{
 		DigitalLpa: sirius.DigitalLpa{
 			UID: "M-9876-9876-9999",
@@ -72,6 +80,85 @@ func TestGetHistoryWhenFailureOnGetEvents(t *testing.T) {
 				Donor: sirius.Donor{
 					ID: 8,
 				},
+			},
+			LpaStoreData: sirius.LpaStoreData{
+				Status: "", // Empty status indicates traditional LPA
+			},
+		},
+	}
+
+	client := &mockGetHistoryClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-9876-9876-9999").
+		Return(caseSummary, nil)
+	client.
+		On("GetEvents", mock.Anything, 8, 12).
+		Return(map[string]string{"event": "sirius only event details"}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, getHistory{
+			CaseSummary: caseSummary,
+			EventData:   map[string]string{"event": "sirius only event details"},
+		}).
+		Return(nil)
+
+	server := newMockServer("/lpa/{uid}/history", GetHistory(client, template.Func))
+
+	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9999/history", nil)
+	_, err := server.serve(req)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetHistoryWhenFailureOnGetCombinedEventsForDigitalLpa(t *testing.T) {
+	caseSummary := sirius.CaseSummary{
+		DigitalLpa: sirius.DigitalLpa{
+			UID: "M-9876-9876-9999",
+			SiriusData: sirius.SiriusData{
+				ID:      12,
+				Subtype: "hw",
+				Donor: sirius.Donor{
+					ID: 8,
+				},
+			},
+			LpaStoreData: sirius.LpaStoreData{
+				Status: "processing",
+			},
+		},
+	}
+
+	client := &mockGetHistoryClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-9876-9876-9999").
+		Return(caseSummary, nil)
+	client.
+		On("GetCombinedEvents", mock.Anything, "M-9876-9876-9999").
+		Return(nil, errExample)
+
+	server := newMockServer("/lpa/{uid}/history", GetHistory(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9999/history", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestGetHistoryWhenFailureOnGetEventsForTraditionalLpa(t *testing.T) {
+	caseSummary := sirius.CaseSummary{
+		DigitalLpa: sirius.DigitalLpa{
+			UID: "M-9876-9876-9999",
+			SiriusData: sirius.SiriusData{
+				ID:      12,
+				Subtype: "hw",
+				Donor: sirius.Donor{
+					ID: 8,
+				},
+			},
+			LpaStoreData: sirius.LpaStoreData{
+				Status: "",
 			},
 		},
 	}

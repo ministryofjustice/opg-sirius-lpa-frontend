@@ -347,6 +347,8 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return false
 		},
+		"formatEventType": formatEventType,
+		"eventTypeColor":  eventTypeColor,
 	}
 }
 
@@ -669,4 +671,27 @@ func collectAttrs(attrs []interface{}) map[string]interface{} {
 	}
 
 	return attributes
+}
+
+var eventTypeColors = map[string]string{
+	"CORRECTION":                "blue",
+	"CHANGE_ATTORNEYS":          "yellow",
+	"CERTIFICATE_PROVIDER_SIGN": "green",
+	"DONOR_CONFIRM_IDENTITY":    "green",
+	"OPG_STATUS_CHANGE":         "purple",
+	"STATUTORY_WAITING_PERIOD":  "orange",
+}
+
+func eventTypeColor(eventType string) string {
+	if color, ok := eventTypeColors[eventType]; ok {
+		return color
+	}
+	return "grey"
+}
+
+func formatEventType(eventType string) string {
+	// Replace underscores with spaces
+	formatted := strings.ReplaceAll(eventType, "_", " ")
+	// Title case each word
+	return cases.Title(language.English).String(strings.ToLower(formatted))
 }

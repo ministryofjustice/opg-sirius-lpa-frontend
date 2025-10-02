@@ -761,3 +761,38 @@ func TestSubtypeColour(t *testing.T) {
 	val = subtypeColour("not-in-list")
 	assert.Equal(t, "", val)
 }
+
+func TestFormatEventType(t *testing.T) {
+	tests := map[string]string{
+		"CORRECTION":                "Correction",
+		"CHANGE_ATTORNEYS":          "Change Attorneys",
+		"CERTIFICATE_PROVIDER_SIGN": "Certificate Provider Sign",
+		"DONOR_CONFIRM_IDENTITY":    "Donor Confirm Identity",
+		"OPG_STATUS_CHANGE":         "Opg Status Change",
+		"STATUTORY_WAITING_PERIOD":  "Statutory Waiting Period",
+		"":                          "",
+	}
+
+	for input, expected := range tests {
+		result := formatEventType(input)
+		assert.Equal(t, expected, result, "formatEventType(%q) should return %q", input, expected)
+	}
+}
+
+func TestEventTypeColor(t *testing.T) {
+	tests := map[string]string{
+		"CORRECTION":                "blue",
+		"CHANGE_ATTORNEYS":          "yellow",
+		"CERTIFICATE_PROVIDER_SIGN": "green",
+		"DONOR_CONFIRM_IDENTITY":    "green",
+		"OPG_STATUS_CHANGE":         "purple",
+		"STATUTORY_WAITING_PERIOD":  "orange",
+		"UNKNOWN_TYPE":              "grey",
+		"":                          "grey",
+	}
+
+	for input, expected := range tests {
+		result := eventTypeColor(input)
+		assert.Equal(t, expected, result, "eventTypeColor(%q) should return %q", input, expected)
+	}
+}
