@@ -121,6 +121,11 @@
                         <div class="govuk-summary-list__row govuk-summary-list__row--no-border">
                             <dt class="govuk-summary-list__key">Signed on</dt>
                             <dd class="govuk-summary-list__value">
+                                {{ $signedAtAnomalies := $attorneyAnomalies.GetAnomaliesForFieldWithStatus "signedAt" "detected" }}
+                                {{ if gt (len $signedAtAnomalies) 0 }}
+                                    {{ $signedAtAnomaly := $attorneyAnomalies.GetHintTextForAnomalyField $signedAtAnomalies "" }}
+                                    {{ template "information-warning" $signedAtAnomaly }}
+                                {{ end }}
                                 {{ parseAndFormatDate $attorney.SignedAt "2006-01-02T15:04:05Z" "2 January 2006" }}
                             </dd>
                         </div>

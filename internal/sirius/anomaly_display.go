@@ -1,6 +1,8 @@
 package sirius
 
-import "github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
+import (
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
+)
 
 type AnomalyDisplaySection string
 
@@ -142,12 +144,17 @@ const (
 	InvalidAddress               AnomalyRuleType = "Invalid address"
 	DonorIdAndSignedDateFarApart AnomalyRuleType = "Donor: date of ID and date of signature more than 6-months apart"
 	CpIdAndSignedDateFarApart    AnomalyRuleType = "Certificate-provider: date of ID and date of signature more than 6-months apart"
+	CpSignedTooLate              AnomalyRuleType = "certificate-provider signature more than 2-years after donor"
+	AttorneySignedTooLate        AnomalyRuleType = "attorney signature more than 2-years after donor"
 )
 
-// For CP lastName
 func (afo *AnomaliesForObject) GetHintTextForAnomalyField(anomalies []Anomaly, whoHasTheAnomaly string) string {
 	if containsAnomalyType(anomalies, LastNameMatchesDonor) && containsAnomalyType(anomalies, LastNameMatchesAttorney) {
 		return "Review last name - this matches the donor and at least one of the attorneys. Check certificate provider's eligibility"
+	}
+
+	if containsAnomalyType(anomalies, CpIdAndSignedDateFarApart) && containsAnomalyType(anomalies, CpSignedTooLate) {
+		return "Review signature date - check this is within 6 months either side of the certificate provider’s ID check and within 2 years of the donor signing the LPA"
 	}
 
 	for _, anomaly := range anomalies {
@@ -166,10 +173,13 @@ func (afo *AnomaliesForObject) GetHintTextForAnomalyField(anomalies []Anomaly, w
 			return "Review signature date - check this is within 6 months either side of the donor’s ID check"
 		case CpIdAndSignedDateFarApart:
 			return "Review signature date - check this is within 6 months either side of the certificate provider’s ID check"
+		case CpSignedTooLate:
+			return "Review signature date - check this is within 2 years of the donor signing the LPA"
+		case AttorneySignedTooLate:
+			return "Review signature date - check this is within 2 years of the donor signing the LPA"
 		}
 	}
-
-	return "Review certificate provider's last name"
+	return ""
 }
 
 func containsAnomalyType(anomalies []Anomaly, anomalyType AnomalyRuleType) bool {
