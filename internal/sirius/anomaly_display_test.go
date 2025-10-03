@@ -347,7 +347,7 @@ func TestGetHintTextForAnomalyField(t *testing.T) {
 		{
 			name:      "No anomalies",
 			anomalies: []Anomaly{},
-			want:      "Review certificate provider's last name",
+			want:      "",
 		},
 		{
 			name: "NoCountry for CP",
