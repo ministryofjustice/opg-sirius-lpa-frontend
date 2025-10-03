@@ -216,8 +216,8 @@ func updateAttorneyDecision(data *removeAnAttorneyData) []sirius.AttorneyDecisio
 		attorneyDecisions = attorneyCannotMakeJointDecisionsUpdate(data, attorneyDecisions)
 	} else {
 		data.DecisionAttorneys = decisionAttorneysListAfterRemoval(data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys, data.Form)
-		attorneyDecisions = updateSelectedAttorneysThatCannotMakeJointDecisions(data, attorneyDecisions)
-		attorneyDecisions = updateRemovedAttorneyToCannotMakeJointDecisions(data, attorneyDecisions)
+		attorneyDecisions = updateSelectedAttorneysThatCannotMakeJointDecisions(data.DecisionAttorneys, data.Form.DecisionAttorneysUids, attorneyDecisions)
+		attorneyDecisions = updateRemovedAttorneyToCannotMakeJointDecisions(data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys, data.Form.RemovedAttorneyUid, attorneyDecisions)
 	}
 
 	return attorneyDecisions
@@ -263,10 +263,10 @@ func decisionAttorneysListAfterRemoval(attorneys []sirius.LpaStoreAttorney, form
 	return attorneysForDecisions
 }
 
-func updateSelectedAttorneysThatCannotMakeJointDecisions(data *removeAnAttorneyData, attorneyDecisions []sirius.AttorneyDecisions) []sirius.AttorneyDecisions {
-	for _, att := range data.DecisionAttorneys {
+func updateSelectedAttorneysThatCannotMakeJointDecisions(decisionAttorneys []sirius.LpaStoreAttorney, decisionAttorneysUids []string, attorneyDecisions []sirius.AttorneyDecisions) []sirius.AttorneyDecisions {
+	for _, att := range decisionAttorneys {
 		isChecked := false
-		for _, selectedUid := range data.Form.DecisionAttorneysUids {
+		for _, selectedUid := range decisionAttorneysUids {
 			if selectedUid == att.Uid {
 				isChecked = true
 				break
@@ -280,9 +280,9 @@ func updateSelectedAttorneysThatCannotMakeJointDecisions(data *removeAnAttorneyD
 	return attorneyDecisions
 }
 
-func updateRemovedAttorneyToCannotMakeJointDecisions(data *removeAnAttorneyData, attorneyDecisions []sirius.AttorneyDecisions) []sirius.AttorneyDecisions {
-	for _, att := range data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys {
-		if att.Uid == data.Form.RemovedAttorneyUid {
+func updateRemovedAttorneyToCannotMakeJointDecisions(lpaStoreDecisionAttorneys []sirius.LpaStoreAttorney, removedAttorneyUid string, attorneyDecisions []sirius.AttorneyDecisions) []sirius.AttorneyDecisions {
+	for _, att := range lpaStoreDecisionAttorneys {
+		if att.Uid == removedAttorneyUid {
 			attorneyDecisions = append(attorneyDecisions, sirius.AttorneyDecisions{
 				UID:                      att.Uid,
 				CannotMakeJointDecisions: false,
@@ -327,8 +327,8 @@ func confirmStep(
 }
 
 func buildAttorneyDetails(data *removeAnAttorneyData, removedReasons []sirius.RefDataItem) {
-	updateRemovedAttorneysDetails(data)
-	updateEnabledAttorneysDetails(data)
+	data.RemovedAttorneysDetails = updateRemovedAttorneysDetails(data.ActiveAttorneys, data.Form.RemovedAttorneyUid)
+	data.EnabledAttorneysDetails = updateEnabledAttorneysDetails(data.Form.EnabledAttorneyUids, data.InactiveAttorneys)
 
 	for _, r := range removedReasons {
 		if r.Handle == data.Form.RemovedReason {
@@ -337,27 +337,30 @@ func buildAttorneyDetails(data *removeAnAttorneyData, removedReasons []sirius.Re
 	}
 
 	if len(data.Form.DecisionAttorneysUids) > 0 {
-		updateDecisionAttorneyDetails(data)
+		data.DecisionAttorneysDetails = updateDecisionAttorneyDetails(data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys, data.Form.DecisionAttorneysUids)
 	}
 }
 
-func updateRemovedAttorneysDetails(data *removeAnAttorneyData) {
-	for _, att := range data.ActiveAttorneys {
-		if att.Uid == data.Form.RemovedAttorneyUid {
-			data.RemovedAttorneysDetails = SelectedAttorneyDetails{
+func updateRemovedAttorneysDetails(activeAttorneys []sirius.LpaStoreAttorney, removedAttorneyUid string) SelectedAttorneyDetails {
+	var removedAttorneyDetails SelectedAttorneyDetails
+	for _, att := range activeAttorneys {
+		if att.Uid == removedAttorneyUid {
+			removedAttorneyDetails = SelectedAttorneyDetails{
 				SelectedAttorneyName: att.FirstNames + " " + att.LastName,
 				SelectedAttorneyDob:  att.DateOfBirth,
 			}
 		}
 	}
+	return removedAttorneyDetails
 }
 
-func updateEnabledAttorneysDetails(data *removeAnAttorneyData) {
-	if len(data.Form.EnabledAttorneyUids) > 0 {
-		for _, att := range data.InactiveAttorneys {
-			for _, enabledAttUid := range data.Form.EnabledAttorneyUids {
+func updateEnabledAttorneysDetails(enabledAttorneyUids []string, inactiveAttorneys []sirius.LpaStoreAttorney) []SelectedAttorneyDetails {
+	var updatedEnabledAttorneysDetails []SelectedAttorneyDetails
+	if len(enabledAttorneyUids) > 0 {
+		for _, att := range inactiveAttorneys {
+			for _, enabledAttUid := range enabledAttorneyUids {
 				if att.Uid == enabledAttUid {
-					data.EnabledAttorneysDetails = append(data.EnabledAttorneysDetails, SelectedAttorneyDetails{
+					updatedEnabledAttorneysDetails = append(updatedEnabledAttorneysDetails, SelectedAttorneyDetails{
 						SelectedAttorneyName: att.FirstNames + " " + att.LastName,
 						SelectedAttorneyDob:  att.DateOfBirth,
 					})
@@ -366,18 +369,21 @@ func updateEnabledAttorneysDetails(data *removeAnAttorneyData) {
 			}
 		}
 	}
+	return updatedEnabledAttorneysDetails
 }
 
-func updateDecisionAttorneyDetails(data *removeAnAttorneyData) {
-	for _, att := range data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys {
-		if slices.Contains(data.Form.DecisionAttorneysUids, att.Uid) {
-			data.DecisionAttorneysDetails = append(data.DecisionAttorneysDetails, AttorneyDetails{
+func updateDecisionAttorneyDetails(digitalAttorneys []sirius.LpaStoreAttorney, decisionAttorneyUids []string) []AttorneyDetails {
+	var updatedDecisionAttorneysDetails []AttorneyDetails
+	for _, att := range digitalAttorneys {
+		if slices.Contains(decisionAttorneyUids, att.Uid) {
+			updatedDecisionAttorneysDetails = append(updatedDecisionAttorneysDetails, AttorneyDetails{
 				AttorneyName:    att.FirstNames + " " + att.LastName,
 				AttorneyDob:     att.DateOfBirth,
 				AppointmentType: att.AppointmentType,
 			})
 		}
 	}
+	return updatedDecisionAttorneysDetails
 }
 
 func validateRemoveAttorneyPage(r *http.Request, data *removeAnAttorneyData) {
