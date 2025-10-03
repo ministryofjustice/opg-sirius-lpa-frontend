@@ -136,12 +136,15 @@ describe("Change trust corporation details form", () => {
   it("populates trust corporation details", () => {
     cy.get("#f-name").should("have.value", "Trust Me Ltd.");
 
-    cy.get("#f-address\\.Line1").should("have.value", "9 Mount");
-    cy.get("#f-address\\.Line2").should("have.value", "Pleasant Drive");
-    cy.get("#f-address\\.Line3").should("have.value", "");
-    cy.get("#f-address\\.Town").should("have.value", "East Harling");
-    cy.get("#f-address\\.Postcode").should("have.value", "NR16 2GB");
-    cy.get("#f-address\\.Country").should("have.value", "GB");
+    cy.get(String.raw`#f-address\.Line1`).should("have.value", "9 Mount");
+    cy.get(String.raw`#f-address\.Line2`).should(
+      "have.value",
+      "Pleasant Drive",
+    );
+    cy.get(String.raw`#f-address\.Line3`).should("have.value", "");
+    cy.get(String.raw`#f-address\.Town`).should("have.value", "East Harling");
+    cy.get(String.raw`#f-address\.Postcode`).should("have.value", "NR16 2GB");
+    cy.get(String.raw`#f-address\.Country`).should("have.value", "GB");
 
     cy.get("#f-phoneNumber").should("have.value", "077577575757");
     cy.get("#f-email").should("have.value", "trust.me.once@does.not.exist");
