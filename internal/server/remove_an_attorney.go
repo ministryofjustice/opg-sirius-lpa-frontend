@@ -137,12 +137,12 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 
 			submissionStep := r.PostFormValue("step")
 
-			validateRemoveAttorneyPage(r, &data)
+			validateRemoveAttorneyPage(r, data.Form.RemovedAttorneyUid, data.Form.RemovedReason, data.Form.EnabledAttorneyUids, data.Error.Field)
 
 			if submissionStep == "decision" && data.Decisions == "jointly-for-some-severally-for-others" {
-				validateManageAttorneysPage(r, &data)
+				validateManageAttorneysPage(r, data.Form.DecisionAttorneysUids, data.Error.Field)
 				if _, ok := data.Error.Field["decisionAttorney"]; ok {
-					data.DecisionAttorneys = decisionAttorneysListAfterRemoval(lpa.LpaStoreData.Attorneys, data.Form)
+					data.DecisionAttorneys = decisionAttorneysListAfterRemoval(lpa.LpaStoreData.Attorneys, data.Form.EnabledAttorneyUids, data.Form.RemovedAttorneyUid)
 					return decisionsTmpl(w, data)
 				}
 			}
@@ -150,18 +150,18 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 			if !data.Error.Any() {
 				switch submissionStep {
 				case "confirm":
-					attorneyUpdatedStatus := updateAttorneyStatus(&data)
-					attorneyDecisions := updateAttorneyDecision(&data)
-					return confirmStep(ctx, client, &data, w, attorneyUpdatedStatus, attorneyDecisions)
+					attorneyUpdatedStatus := updateAttorneyStatus(data.ActiveAttorneys, data.Form.RemovedAttorneyUid, data.Form.RemovedReason, data.InactiveAttorneys, data.Form.EnabledAttorneyUids)
+					attorneyDecisions := updateAttorneyDecision(data.Form.SkipDecisionAttorney, data.ActiveAttorneys, data.DecisionAttorneys, data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys, data.Form.EnabledAttorneyUids, data.Form.RemovedAttorneyUid, data.Form.DecisionAttorneysUids)
+					return confirmStep(ctx, client, data.CaseSummary.DigitalLpa.UID, data.Error, data.Decisions, w, attorneyUpdatedStatus, attorneyDecisions)
 				case "decision":
-					buildAttorneyDetails(&data, allRemovedReasons)
+					buildAttorneyDetails(data.RemovedAttorneysDetails, data.ActiveAttorneys, data.Form.RemovedAttorneyUid, data.EnabledAttorneysDetails, data.Form.EnabledAttorneyUids, data.InactiveAttorneys, allRemovedReasons, data.Form.RemovedReason, data.RemovedReason, data.Form.DecisionAttorneysUids, data.DecisionAttorneysDetails, data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys)
 					return confirmTmpl(w, data)
 				default: //"remove"
-					buildAttorneyDetails(&data, allRemovedReasons)
+					buildAttorneyDetails(data.RemovedAttorneysDetails, data.ActiveAttorneys, data.Form.RemovedAttorneyUid, data.EnabledAttorneysDetails, data.Form.EnabledAttorneyUids, data.InactiveAttorneys, allRemovedReasons, data.Form.RemovedReason, data.RemovedReason, data.Form.DecisionAttorneysUids, data.DecisionAttorneysDetails, data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys)
 					if data.Decisions != "jointly-for-some-severally-for-others" {
 						return confirmTmpl(w, data)
 					}
-					data.DecisionAttorneys = decisionAttorneysListAfterRemoval(lpa.LpaStoreData.Attorneys, data.Form)
+					data.DecisionAttorneys = decisionAttorneysListAfterRemoval(lpa.LpaStoreData.Attorneys, data.Form.EnabledAttorneyUids, data.Form.RemovedAttorneyUid)
 					return decisionsTmpl(w, data)
 				}
 			}
@@ -171,20 +171,39 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 	}
 }
 
-func updateAttorneyStatus(data *removeAnAttorneyData) []sirius.AttorneyUpdatedStatus {
+func updateAttorneyStatus(
+	activeAttorneys []sirius.LpaStoreAttorney,
+	removedAttorneyUid string,
+	removedReason string,
+	inactiveAttorneys []sirius.LpaStoreAttorney,
+	enabledAttorneyUids []string,
+) []sirius.AttorneyUpdatedStatus {
 	var attorneyUpdatedStatus []sirius.AttorneyUpdatedStatus
-	attorneyUpdatedStatus = removeAttorneyUpdateStatus(data, attorneyUpdatedStatus)
+	attorneyUpdatedStatus = removeAttorneyUpdateStatus(activeAttorneys, removedAttorneyUid, removedReason, attorneyUpdatedStatus)
 
-	if len(data.Form.EnabledAttorneyUids) > 0 {
-		attorneyUpdatedStatus = endableAttorneyUpdateStatus(data, attorneyUpdatedStatus)
+	if len(enabledAttorneyUids) > 0 {
+		attorneyUpdatedStatus = endableAttorneyUpdateStatus(inactiveAttorneys, enabledAttorneyUids, attorneyUpdatedStatus)
 	}
 
 	return attorneyUpdatedStatus
 }
 
-func endableAttorneyUpdateStatus(data *removeAnAttorneyData, attorneyUpdatedStatus []sirius.AttorneyUpdatedStatus) []sirius.AttorneyUpdatedStatus {
-	for _, att := range data.InactiveAttorneys {
-		for _, enabledAttUid := range data.Form.EnabledAttorneyUids {
+func removeAttorneyUpdateStatus(activeAttorneys []sirius.LpaStoreAttorney, removedAttorneyUid string, removedReason string, attorneyUpdatedStatus []sirius.AttorneyUpdatedStatus) []sirius.AttorneyUpdatedStatus {
+	for _, att := range activeAttorneys {
+		if att.Uid == removedAttorneyUid {
+			attorneyUpdatedStatus = append(attorneyUpdatedStatus, sirius.AttorneyUpdatedStatus{
+				UID:           att.Uid,
+				Status:        shared.RemovedAttorneyStatus.String(),
+				RemovedReason: removedReason,
+			})
+		}
+	}
+	return attorneyUpdatedStatus
+}
+
+func endableAttorneyUpdateStatus(inactiveAttorneys []sirius.LpaStoreAttorney, enabledAttorneyUids []string, attorneyUpdatedStatus []sirius.AttorneyUpdatedStatus) []sirius.AttorneyUpdatedStatus {
+	for _, att := range inactiveAttorneys {
+		for _, enabledAttUid := range enabledAttorneyUids {
 			if att.Uid == enabledAttUid {
 				attorneyUpdatedStatus = append(attorneyUpdatedStatus, sirius.AttorneyUpdatedStatus{
 					UID:    att.Uid,
@@ -196,37 +215,32 @@ func endableAttorneyUpdateStatus(data *removeAnAttorneyData, attorneyUpdatedStat
 	return attorneyUpdatedStatus
 }
 
-func removeAttorneyUpdateStatus(data *removeAnAttorneyData, attorneyUpdatedStatus []sirius.AttorneyUpdatedStatus) []sirius.AttorneyUpdatedStatus {
-	for _, att := range data.ActiveAttorneys {
-		if att.Uid == data.Form.RemovedAttorneyUid {
-			attorneyUpdatedStatus = append(attorneyUpdatedStatus, sirius.AttorneyUpdatedStatus{
-				UID:           att.Uid,
-				Status:        shared.RemovedAttorneyStatus.String(),
-				RemovedReason: data.Form.RemovedReason,
-			})
-		}
-	}
-	return attorneyUpdatedStatus
-}
-
-func updateAttorneyDecision(data *removeAnAttorneyData) []sirius.AttorneyDecisions {
+func updateAttorneyDecision(
+	skipDecisionAttorney string,
+	activeAttorneys []sirius.LpaStoreAttorney,
+	decisionAttorneys []sirius.LpaStoreAttorney,
+	lpaStoreAttorneys []sirius.LpaStoreAttorney,
+	enabledAttorneyUids []string,
+	removedAttorneyUid string,
+	decisionAttorneysUids []string,
+) []sirius.AttorneyDecisions {
 	var attorneyDecisions []sirius.AttorneyDecisions
 
-	if data.Form.SkipDecisionAttorney == "yes" {
-		attorneyDecisions = attorneyCannotMakeJointDecisionsUpdate(data, attorneyDecisions)
+	if skipDecisionAttorney == "yes" {
+		attorneyDecisions = attorneyCannotMakeJointDecisionsUpdate(activeAttorneys, decisionAttorneys, attorneyDecisions)
 	} else {
-		data.DecisionAttorneys = decisionAttorneysListAfterRemoval(data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys, data.Form)
-		attorneyDecisions = updateSelectedAttorneysThatCannotMakeJointDecisions(data, attorneyDecisions)
-		attorneyDecisions = updateRemovedAttorneyToCannotMakeJointDecisions(data, attorneyDecisions)
+		decisionAttorneys = decisionAttorneysListAfterRemoval(lpaStoreAttorneys, enabledAttorneyUids, removedAttorneyUid)
+		attorneyDecisions = updateSelectedAttorneysThatCannotMakeJointDecisions(decisionAttorneys, decisionAttorneysUids, attorneyDecisions)
+		attorneyDecisions = updateRemovedAttorneyToCannotMakeJointDecisions(lpaStoreAttorneys, removedAttorneyUid, attorneyDecisions)
 	}
 
 	return attorneyDecisions
 }
 
-func attorneyCannotMakeJointDecisionsUpdate(data *removeAnAttorneyData, attorneyDecisions []sirius.AttorneyDecisions) []sirius.AttorneyDecisions {
+func attorneyCannotMakeJointDecisionsUpdate(activeAttorneys []sirius.LpaStoreAttorney, decisionAttorney []sirius.LpaStoreAttorney, attorneyDecisions []sirius.AttorneyDecisions) []sirius.AttorneyDecisions {
 	processedAttorneys := make(map[string]bool)
 
-	for _, att := range append(data.ActiveAttorneys, data.DecisionAttorneys...) {
+	for _, att := range append(activeAttorneys, decisionAttorney...) {
 		if processedAttorneys[att.Uid] {
 			continue
 		}
@@ -240,9 +254,9 @@ func attorneyCannotMakeJointDecisionsUpdate(data *removeAnAttorneyData, attorney
 	return attorneyDecisions
 }
 
-func decisionAttorneysListAfterRemoval(attorneys []sirius.LpaStoreAttorney, form formRemoveAttorney) []sirius.LpaStoreAttorney {
+func decisionAttorneysListAfterRemoval(attorneys []sirius.LpaStoreAttorney, enabledAttorneyUidsFromForm []string, removedAttorneyUid string) []sirius.LpaStoreAttorney {
 	enabledAttorneyUids := make(map[string]bool)
-	for _, uid := range form.EnabledAttorneyUids {
+	for _, uid := range enabledAttorneyUidsFromForm {
 		enabledAttorneyUids[uid] = true
 	}
 
@@ -250,7 +264,7 @@ func decisionAttorneysListAfterRemoval(attorneys []sirius.LpaStoreAttorney, form
 	for _, att := range attorneys {
 		switch att.Status {
 		case shared.ActiveAttorneyStatus.String():
-			if att.Uid != form.RemovedAttorneyUid {
+			if att.Uid != removedAttorneyUid {
 				attorneysForDecisions = append(attorneysForDecisions, att)
 			}
 		case shared.InactiveAttorneyStatus.String():
@@ -263,10 +277,10 @@ func decisionAttorneysListAfterRemoval(attorneys []sirius.LpaStoreAttorney, form
 	return attorneysForDecisions
 }
 
-func updateSelectedAttorneysThatCannotMakeJointDecisions(data *removeAnAttorneyData, attorneyDecisions []sirius.AttorneyDecisions) []sirius.AttorneyDecisions {
-	for _, att := range data.DecisionAttorneys {
+func updateSelectedAttorneysThatCannotMakeJointDecisions(decisionAttorneys []sirius.LpaStoreAttorney, decisionAttorneysUids []string, attorneyDecisions []sirius.AttorneyDecisions) []sirius.AttorneyDecisions {
+	for _, att := range decisionAttorneys {
 		isChecked := false
-		for _, selectedUid := range data.Form.DecisionAttorneysUids {
+		for _, selectedUid := range decisionAttorneysUids {
 			if selectedUid == att.Uid {
 				isChecked = true
 				break
@@ -280,9 +294,9 @@ func updateSelectedAttorneysThatCannotMakeJointDecisions(data *removeAnAttorneyD
 	return attorneyDecisions
 }
 
-func updateRemovedAttorneyToCannotMakeJointDecisions(data *removeAnAttorneyData, attorneyDecisions []sirius.AttorneyDecisions) []sirius.AttorneyDecisions {
-	for _, att := range data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys {
-		if att.Uid == data.Form.RemovedAttorneyUid {
+func updateRemovedAttorneyToCannotMakeJointDecisions(lpaStoreDecisionAttorneys []sirius.LpaStoreAttorney, removedAttorneyUid string, attorneyDecisions []sirius.AttorneyDecisions) []sirius.AttorneyDecisions {
+	for _, att := range lpaStoreDecisionAttorneys {
+		if att.Uid == removedAttorneyUid {
 			attorneyDecisions = append(attorneyDecisions, sirius.AttorneyDecisions{
 				UID:                      att.Uid,
 				CannotMakeJointDecisions: false,
@@ -296,68 +310,83 @@ func updateRemovedAttorneyToCannotMakeJointDecisions(data *removeAnAttorneyData,
 func confirmStep(
 	ctx sirius.Context,
 	client RemoveAnAttorneyClient,
-	data *removeAnAttorneyData,
+	digitalLpaUid string,
+	error error,
+	decisions string,
 	w http.ResponseWriter,
 	attorneyUpdatedStatus []sirius.AttorneyUpdatedStatus,
 	attorneyDecisions []sirius.AttorneyDecisions,
 ) error {
-	uid := data.CaseSummary.DigitalLpa.UID
-
-	err := client.ChangeAttorneyStatus(ctx, uid, attorneyUpdatedStatus)
+	err := client.ChangeAttorneyStatus(ctx, digitalLpaUid, attorneyUpdatedStatus)
 	if ve, ok := err.(sirius.ValidationError); ok {
 		w.WriteHeader(http.StatusBadRequest)
-		data.Error = ve
+		error = ve
 	} else if err != nil {
 		return err
 	}
 
-	if data.Decisions == "jointly-for-some-severally-for-others" {
-		err = client.ManageAttorneyDecisions(ctx, uid, attorneyDecisions)
+	if decisions == "jointly-for-some-severally-for-others" {
+		err = client.ManageAttorneyDecisions(ctx, digitalLpaUid, attorneyDecisions)
 
 		if ve, ok := err.(sirius.ValidationError); ok {
 			w.WriteHeader(http.StatusBadRequest)
-			data.Error = ve
+			error = ve
 		} else if err != nil {
 			return err
 		}
 	}
 
 	SetFlash(w, FlashNotification{Title: "Update saved"})
-	return RedirectError(fmt.Sprintf("/lpa/%s", uid))
+	return RedirectError(fmt.Sprintf("/lpa/%s", digitalLpaUid))
 }
 
-func buildAttorneyDetails(data *removeAnAttorneyData, removedReasons []sirius.RefDataItem) {
-	updateRemovedAttorneysDetails(data)
-	updateEnabledAttorneysDetails(data)
+func buildAttorneyDetails(removedAttorneysDetails SelectedAttorneyDetails,
+	activeAttorneys []sirius.LpaStoreAttorney,
+	removedAttorneyUid string,
+	enabledAttorneysDetails []SelectedAttorneyDetails,
+	enabledAttorneyUids []string,
+	inactiveAttorneys []sirius.LpaStoreAttorney,
+	removedReasons []sirius.RefDataItem,
+	formRemovedReason string,
+	removedReason sirius.RefDataItem,
+	decisionAttorneysUids []string,
+	decisionAttorneysDetails []AttorneyDetails,
+	lpaDigitalAttorneys []sirius.LpaStoreAttorney,
+) {
+	removedAttorneysDetails = updateRemovedAttorneysDetails(activeAttorneys, removedAttorneyUid)
+	enabledAttorneysDetails = updateEnabledAttorneysDetails(enabledAttorneyUids, inactiveAttorneys)
 
 	for _, r := range removedReasons {
-		if r.Handle == data.Form.RemovedReason {
-			data.RemovedReason = r
+		if r.Handle == formRemovedReason {
+			removedReason = r
 		}
 	}
 
-	if len(data.Form.DecisionAttorneysUids) > 0 {
-		updateDecisionAttorneyDetails(data)
+	if len(decisionAttorneysUids) > 0 {
+		decisionAttorneysDetails = updateDecisionAttorneyDetails(lpaDigitalAttorneys, decisionAttorneysUids)
 	}
 }
 
-func updateRemovedAttorneysDetails(data *removeAnAttorneyData) {
-	for _, att := range data.ActiveAttorneys {
-		if att.Uid == data.Form.RemovedAttorneyUid {
-			data.RemovedAttorneysDetails = SelectedAttorneyDetails{
+func updateRemovedAttorneysDetails(activeAttorneys []sirius.LpaStoreAttorney, removedAttorneyUid string) SelectedAttorneyDetails {
+	var removedAttorneyDetails SelectedAttorneyDetails
+	for _, att := range activeAttorneys {
+		if att.Uid == removedAttorneyUid {
+			removedAttorneyDetails = SelectedAttorneyDetails{
 				SelectedAttorneyName: att.FirstNames + " " + att.LastName,
 				SelectedAttorneyDob:  att.DateOfBirth,
 			}
 		}
 	}
+	return removedAttorneyDetails
 }
 
-func updateEnabledAttorneysDetails(data *removeAnAttorneyData) {
-	if len(data.Form.EnabledAttorneyUids) > 0 {
-		for _, att := range data.InactiveAttorneys {
-			for _, enabledAttUid := range data.Form.EnabledAttorneyUids {
+func updateEnabledAttorneysDetails(enabledAttorneyUids []string, inactiveAttorneys []sirius.LpaStoreAttorney) []SelectedAttorneyDetails {
+	var updatedEnabledAttorneysDetails []SelectedAttorneyDetails
+	if len(enabledAttorneyUids) > 0 {
+		for _, att := range inactiveAttorneys {
+			for _, enabledAttUid := range enabledAttorneyUids {
 				if att.Uid == enabledAttUid {
-					data.EnabledAttorneysDetails = append(data.EnabledAttorneysDetails, SelectedAttorneyDetails{
+					updatedEnabledAttorneysDetails = append(updatedEnabledAttorneysDetails, SelectedAttorneyDetails{
 						SelectedAttorneyName: att.FirstNames + " " + att.LastName,
 						SelectedAttorneyDob:  att.DateOfBirth,
 					})
@@ -366,50 +395,53 @@ func updateEnabledAttorneysDetails(data *removeAnAttorneyData) {
 			}
 		}
 	}
+	return updatedEnabledAttorneysDetails
 }
 
-func updateDecisionAttorneyDetails(data *removeAnAttorneyData) {
-	for _, att := range data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys {
-		if slices.Contains(data.Form.DecisionAttorneysUids, att.Uid) {
-			data.DecisionAttorneysDetails = append(data.DecisionAttorneysDetails, AttorneyDetails{
+func updateDecisionAttorneyDetails(digitalAttorneys []sirius.LpaStoreAttorney, decisionAttorneyUids []string) []AttorneyDetails {
+	var updatedDecisionAttorneysDetails []AttorneyDetails
+	for _, att := range digitalAttorneys {
+		if slices.Contains(decisionAttorneyUids, att.Uid) {
+			updatedDecisionAttorneysDetails = append(updatedDecisionAttorneysDetails, AttorneyDetails{
 				AttorneyName:    att.FirstNames + " " + att.LastName,
 				AttorneyDob:     att.DateOfBirth,
 				AppointmentType: att.AppointmentType,
 			})
 		}
 	}
+	return updatedDecisionAttorneysDetails
 }
 
-func validateRemoveAttorneyPage(r *http.Request, data *removeAnAttorneyData) {
-	if data.Form.RemovedAttorneyUid == "" {
-		data.Error.Field["removeAttorney"] = map[string]string{
+func validateRemoveAttorneyPage(r *http.Request, removeAnAttorneyUid string, removedReason string, enabledAttorneyUids []string, errorField sirius.FieldErrors) {
+	if removeAnAttorneyUid == "" {
+		errorField["removeAttorney"] = map[string]string{
 			"reason": "Please select an attorney for removal",
 		}
 	}
 
-	if data.Form.RemovedReason == "" {
-		data.Error.Field["removedReason"] = map[string]string{
+	if removedReason == "" {
+		errorField["removedReason"] = map[string]string{
 			"reason": "Please select a reason for removal",
 		}
 	}
 
-	if len(data.Form.EnabledAttorneyUids) > 0 && postFormCheckboxChecked(r, "skipEnableAttorney", "yes") {
-		data.Error.Field["enableAttorney"] = map[string]string{
+	if len(enabledAttorneyUids) > 0 && postFormCheckboxChecked(r, "skipEnableAttorney", "yes") {
+		errorField["enableAttorney"] = map[string]string{
 			"reason": "Please do not select both a replacement attorney and the option to skip",
 		}
 	}
 
-	if len(data.Form.EnabledAttorneyUids) == 0 && !postFormCheckboxChecked(r, "skipEnableAttorney", "yes") {
-		data.Error.Field["enableAttorney"] = map[string]string{
+	if len(enabledAttorneyUids) == 0 && !postFormCheckboxChecked(r, "skipEnableAttorney", "yes") {
+		errorField["enableAttorney"] = map[string]string{
 			"reason": "Please select either the attorneys that can be enabled or skip the replacement of the attorneys",
 		}
 	}
 }
 
-func validateManageAttorneysPage(r *http.Request, data *removeAnAttorneyData) {
-	if (len(data.Form.DecisionAttorneysUids) == 0 && !postFormCheckboxChecked(r, "skipDecisionAttorney", "yes")) ||
-		(len(data.Form.DecisionAttorneysUids) > 0 && postFormCheckboxChecked(r, "skipDecisionAttorney", "yes")) {
-		data.Error.Field["decisionAttorney"] = map[string]string{
+func validateManageAttorneysPage(r *http.Request, decisionAttorneysUids []string, errorField sirius.FieldErrors) {
+	if (len(decisionAttorneysUids) == 0 && !postFormCheckboxChecked(r, "skipDecisionAttorney", "yes")) ||
+		(len(decisionAttorneysUids) > 0 && postFormCheckboxChecked(r, "skipDecisionAttorney", "yes")) {
+		errorField["decisionAttorney"] = map[string]string{
 			"reason": "Select who cannot make joint decisions, or select 'Joint decisions can be made by all attorneys'",
 		}
 	}
