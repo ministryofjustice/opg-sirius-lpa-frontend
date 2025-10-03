@@ -1,6 +1,6 @@
 {{ template "page" . }}
 
-{{ define "title" }}Change trust corporation details{{ end }}
+{{ define "title" }}Change attorney details{{ end }}
 
 {{ define "main" }}
 
@@ -15,7 +15,13 @@
                 {{ template "success-banner" "You have changed trust corporation details." }}
             {{ end }}
 
-            <h1 class="govuk-heading-l app-!-embedded-hide">Change trust attorney corporation details</h1>
+            <h1 class="govuk-heading-l app-!-embedded-hide">
+                {{- if and (eq .Status "inactive") (eq .AppointmentType "replacement") -}}
+                    Change replacement attorney details
+                {{- else if eq .Status "active" -}}
+                    Change attorney details
+                {{- end -}}
+            </h1>
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
