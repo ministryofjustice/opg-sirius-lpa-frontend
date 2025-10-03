@@ -20,15 +20,14 @@ type changeTrustCorporationDetailsData struct {
 	Error     sirius.ValidationError
 	CaseUID   string
 	Form      formTrustCorporationDetails
-	TrustCorp sirius.LpaStoreTrustCorporation
 }
 
 type formTrustCorporationDetails struct {
-	Name               string         `form:"name"`
-	Address            sirius.Address `form:"address"`
-	Email              string         `form:"email"`
-	PhoneNumber        string         `form:"phoneNumber"`
-	RegistrationNumber string         `form:"registrationNumber"`
+	Name          string         `form:"name"`
+	Address       sirius.Address `form:"address"`
+	Email         string         `form:"email"`
+	PhoneNumber   string         `form:"phoneNumber"`
+	CompanyNumber string         `form:"companyNumber"`
 }
 
 func ChangeTrustCorporationDetails(client ChangeTrustCorporationDetailsClient, tmpl template.Template) Handler {
@@ -56,7 +55,6 @@ func ChangeTrustCorporationDetails(client ChangeTrustCorporationDetailsClient, t
 		data := changeTrustCorporationDetailsData{
 			XSRFToken: ctx.XSRFToken,
 			CaseUID:   caseUID,
-			TrustCorp: trustCorporation,
 			Form: formTrustCorporationDetails{
 				Name: trustCorporation.Name,
 				Address: sirius.Address{
@@ -67,9 +65,9 @@ func ChangeTrustCorporationDetails(client ChangeTrustCorporationDetailsClient, t
 					Postcode: trustCorporation.Address.Postcode,
 					Country:  trustCorporation.Address.Country,
 				},
-				Email:              trustCorporation.Email,
-				PhoneNumber:        trustCorporation.Mobile,
-				RegistrationNumber: trustCorporation.CompanyNumber,
+				Email:         trustCorporation.Email,
+				PhoneNumber:   trustCorporation.Mobile,
+				CompanyNumber: trustCorporation.CompanyNumber,
 			},
 		}
 
