@@ -5,11 +5,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/pact-foundation/pact-go/v2/consumer"
-	"github.com/pact-foundation/pact-go/v2/matchers"
 	"io"
 	"net/http"
 	"testing"
+
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -155,4 +156,55 @@ func TestWarningsForCase(t *testing.T) {
 			}))
 		})
 	}
+}
+
+func TestSortWarningsForCaseSummary(t *testing.T) {
+	warnings := []Warning{
+		{
+			WarningType: "Donor Deceased",
+			DateAdded:   "01/01/2020 00:02:03",
+		},
+		{
+			WarningType: "Welsh Language",
+			DateAdded:   "11/07/2012 11:02:03",
+		},
+		{
+			WarningType: "Safeguarding",
+			DateAdded:   "20/02/2016 00:02:03",
+		},
+		{
+			WarningType: "Violent Warning",
+			DateAdded:   "15/09/2011 00:02:03",
+		},
+		{
+			WarningType: "Fee Issue",
+			DateAdded:   "11/07/2012 11:02:02",
+		},
+	}
+
+	expected := []Warning{
+		{
+			WarningType: "Donor Deceased",
+			DateAdded:   "01/01/2020 00:02:03",
+		},
+		{
+			WarningType: "Safeguarding",
+			DateAdded:   "20/02/2016 00:02:03",
+		},
+		{
+			WarningType: "Welsh Language",
+			DateAdded:   "11/07/2012 11:02:03",
+		},
+		{
+			WarningType: "Fee Issue",
+			DateAdded:   "11/07/2012 11:02:02",
+		},
+		{
+			WarningType: "Violent Warning",
+			DateAdded:   "15/09/2011 00:02:03",
+		},
+	}
+
+	val := sortWarningsForCaseSummary(warnings)
+	assert.Equal(t, expected, val)
 }

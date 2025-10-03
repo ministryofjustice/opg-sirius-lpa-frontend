@@ -2,11 +2,13 @@ package server
 
 import (
 	"fmt"
-	"github.com/ministryofjustice/opg-go-common/template"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/templatefn"
-	"golang.org/x/sync/errgroup"
 	"net/http"
+	"strings"
+
+	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"golang.org/x/sync/errgroup"
 )
 
 type ChangeCaseStatusClient interface {
@@ -17,21 +19,20 @@ type ChangeCaseStatusClient interface {
 
 type statusItem struct {
 	Value           string
-	Label           string
+	Label           shared.CaseStatus
 	ConditionalItem bool
 }
 
 type changeCaseStatusData struct {
-	XSRFToken string
-	Entity    string
-	CaseUID   string
-	Success   bool
-	Error     sirius.ValidationError
-
+	XSRFToken               string
+	Entity                  string
+	CaseUID                 string
+	Success                 bool
+	Error                   sirius.ValidationError
 	StatusItems             []statusItem
 	CaseStatusChangeReasons []sirius.RefDataItem
-	OldStatus               string
-	NewStatus               string
+	OldStatus               shared.CaseStatus
+	NewStatus               shared.CaseStatus
 	StatusChangeReason      string
 }
 
@@ -68,9 +69,9 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 			return err
 		}
 
-		status := "draft"
+		status := shared.ParseCaseStatusType("draft")
 
-		if cs.DigitalLpa.LpaStoreData.Status != "" {
+		if cs.DigitalLpa.LpaStoreData.Status.ReadableString() != "" {
 			status = cs.DigitalLpa.LpaStoreData.Status
 		}
 
@@ -79,28 +80,28 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 			Error:                   sirius.ValidationError{Field: sirius.FieldErrors{}},
 			Entity:                  fmt.Sprintf("%s %s", cs.DigitalLpa.SiriusData.Subtype, caseUID),
 			CaseUID:                 caseUID,
-			OldStatus:               status,
-			NewStatus:               postFormString(r, "status"),
+			OldStatus:               shared.ParseCaseStatusType(status.StringForApi()),
+			NewStatus:               shared.ParseCaseStatusType(postFormString(r, "status")),
 			StatusChangeReason:      postFormString(r, "statusReason"),
 			CaseStatusChangeReasons: caseStatusChangeReasons,
 		}
 
 		data.StatusItems = []statusItem{
-			{Value: "draft", Label: "Draft", ConditionalItem: false},
-			{Value: "in-progress", Label: "In progress", ConditionalItem: false},
-			{Value: "statutory-waiting-period", Label: "Statutory waiting period", ConditionalItem: false},
-			{Value: "registered", Label: "Registered", ConditionalItem: false},
-			{Value: "suspended", Label: "Suspended", ConditionalItem: false},
-			{Value: "do-not-register", Label: "Do not register", ConditionalItem: false},
-			{Value: "expired", Label: "Expired", ConditionalItem: false},
-			{Value: "cannot-register", Label: "Cannot register", ConditionalItem: true},
-			{Value: "cancelled", Label: "Cancelled", ConditionalItem: true},
-			{Value: "de-registered", Label: "De-registered", ConditionalItem: false},
+			{Value: "draft", Label: shared.CaseStatusTypeDraft, ConditionalItem: false},
+			{Value: "in-progress", Label: shared.CaseStatusTypeInProgress, ConditionalItem: false},
+			{Value: "statutory-waiting-period", Label: shared.CaseStatusTypeStatutoryWaitingPeriod, ConditionalItem: false},
+			{Value: "registered", Label: shared.CaseStatusTypeRegistered, ConditionalItem: false},
+			{Value: "suspended", Label: shared.CaseStatusTypeSuspended, ConditionalItem: false},
+			{Value: "do-not-register", Label: shared.CaseStatusTypeDoNotRegister, ConditionalItem: false},
+			{Value: "expired", Label: shared.CaseStatusTypeExpired, ConditionalItem: false},
+			{Value: "cannot-register", Label: shared.CaseStatusTypeCannotRegister, ConditionalItem: true},
+			{Value: "cancelled", Label: shared.CaseStatusTypeCancelled, ConditionalItem: true},
+			{Value: "de-registered", Label: shared.CaseStatusTypeDeRegistered, ConditionalItem: false},
 		}
 
 		if r.Method == http.MethodPost {
-			if (data.NewStatus == "cannot-register" || data.NewStatus == "cancelled") && data.StatusChangeReason == "" {
-				data.OldStatus = data.NewStatus
+			if (data.NewStatus.StringForApi() == "cannot-register" || data.NewStatus.StringForApi() == "cancelled") && data.StatusChangeReason == "" {
+				data.OldStatus = shared.ParseCaseStatusType(data.NewStatus.ReadableString())
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error.Field["changeReason"] = map[string]string{
 					"reason": "Please select a reason",
@@ -109,7 +110,7 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 
 			if !data.Error.Any() {
 				caseStatusData := sirius.CaseStatusData{
-					Status:           data.NewStatus,
+					Status:           data.NewStatus.StringForApi(),
 					CaseChangeReason: data.StatusChangeReason,
 				}
 
@@ -122,10 +123,10 @@ func ChangeCaseStatus(client ChangeCaseStatusClient, tmpl template.Template) Han
 					return err
 				} else {
 					data.Success = true
-					data.OldStatus = data.NewStatus
+					data.OldStatus = shared.ParseCaseStatusType(data.NewStatus.StringForApi())
 
 					SetFlash(w, FlashNotification{
-						Title: fmt.Sprintf("Status changed to %s", templatefn.StatusLabelFormat(data.NewStatus)),
+						Title: fmt.Sprintf("Status changed to %s", strings.ToLower(data.NewStatus.ReadableString())),
 					})
 					return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
 				}

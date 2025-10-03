@@ -28,7 +28,7 @@
                         <p class="govuk-body-s">There are none in place.</p>
                     {{ else }}
                         <ul class="govuk-list">
-                            {{ range (sortWarningsForCaseSummary .CaseSummary.WarningList) }}
+                            {{ range .CaseSummary.WarningList }}
                                 <li>
                                     <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>{{ .WarningType }}</strong></p>
                                     {{ $appliedTo := (casesWarningAppliedTo $uid .CaseItems) }}
