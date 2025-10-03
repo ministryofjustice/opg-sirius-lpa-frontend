@@ -347,7 +347,7 @@ func TestGetHintTextForAnomalyField(t *testing.T) {
 		{
 			name:      "No anomalies",
 			anomalies: []Anomaly{},
-			want:      "Review certificate provider's last name",
+			want:      "",
 		},
 		{
 			name: "NoCountry for CP",
@@ -363,6 +363,20 @@ func TestGetHintTextForAnomalyField(t *testing.T) {
 			},
 			whoHasTheAnomaly: "certificate provider's",
 			want:             "Review certificate provider's address",
+		},
+		{
+			name: "Donor SignedAt and IdCheck dates too dates too far apart",
+			anomalies: []Anomaly{
+				{RuleType: DonorIdAndSignedDateFarApart},
+			},
+			want: "Review signature date - check this is within 6 months either side of the donor’s ID check",
+		},
+		{
+			name: "CP SignedAt and IdCheck dates too dates too far apart",
+			anomalies: []Anomaly{
+				{RuleType: CpIdAndSignedDateFarApart},
+			},
+			want: "Review signature date - check this is within 6 months either side of the certificate provider’s ID check",
 		},
 	}
 
