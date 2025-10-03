@@ -14,12 +14,14 @@ type ChangeTrustCorporationDetailsClient interface {
 }
 
 type changeTrustCorporationDetailsData struct {
-	XSRFToken string
-	Countries []sirius.RefDataItem
-	Success   bool
-	Error     sirius.ValidationError
-	CaseUID   string
-	Form      formTrustCorporationDetails
+	XSRFToken       string
+	Countries       []sirius.RefDataItem
+	Success         bool
+	Error           sirius.ValidationError
+	CaseUID         string
+	Status          string
+	AppointmentType string
+	Form            formTrustCorporationDetails
 }
 
 type formTrustCorporationDetails struct {
@@ -53,8 +55,10 @@ func ChangeTrustCorporationDetails(client ChangeTrustCorporationDetailsClient, t
 		}
 
 		data := changeTrustCorporationDetailsData{
-			XSRFToken: ctx.XSRFToken,
-			CaseUID:   caseUID,
+			XSRFToken:       ctx.XSRFToken,
+			CaseUID:         caseUID,
+			Status:          trustCorporation.Status,
+			AppointmentType: trustCorporation.AppointmentType,
 			Form: formTrustCorporationDetails{
 				Name: trustCorporation.Name,
 				Address: sirius.Address{

@@ -102,16 +102,20 @@ var testChangeTrustCorpDetailsCaseSummary = sirius.CaseSummary{
 
 func TestGetChangeTrustCorpDetails(t *testing.T) {
 	tests := []struct {
-		name          string
-		caseUID       string
-		trustCorpUID  string
-		form          formTrustCorporationDetails
-		errorReturned error
+		name            string
+		caseUID         string
+		trustCorpUID    string
+		status          string
+		appointmentType string
+		form            formTrustCorporationDetails
+		errorReturned   error
 	}{
 		{
-			name:         "Change Active Original Trust Corporation Details",
-			caseUID:      "M-TCTC-TCTC-TCTC",
-			trustCorpUID: "302b05c7-896c-4290-904e-2005e4f1e81e",
+			name:            "Change Active Original Trust Corporation Details",
+			caseUID:         "M-TCTC-TCTC-TCTC",
+			trustCorpUID:    "302b05c7-896c-4290-904e-2005e4f1e81e",
+			status:          shared.ActiveAttorneyStatus.String(),
+			appointmentType: shared.OriginalAppointmentType.String(),
 			form: formTrustCorporationDetails{
 				Name: "Trust Me Once Ltd.",
 				Address: sirius.Address{
@@ -127,9 +131,11 @@ func TestGetChangeTrustCorpDetails(t *testing.T) {
 			errorReturned: nil,
 		},
 		{
-			name:         "Change Inactive Replacement Trust Corporation Details",
-			caseUID:      "M-TCTC-TCTC-TCTC",
-			trustCorpUID: "123a01b1-456d-5391-813d-2010d3e2d72d",
+			name:            "Change Inactive Replacement Trust Corporation Details",
+			caseUID:         "M-TCTC-TCTC-TCTC",
+			trustCorpUID:    "123a01b1-456d-5391-813d-2010d3e2d72d",
+			status:          shared.InactiveAttorneyStatus.String(),
+			appointmentType: shared.ReplacementAppointmentType.String(),
 			form: formTrustCorporationDetails{
 				Name: "Trust Me Twice",
 				Address: sirius.Address{
@@ -145,9 +151,11 @@ func TestGetChangeTrustCorpDetails(t *testing.T) {
 			errorReturned: nil,
 		},
 		{
-			name:         "Template Error Returned",
-			caseUID:      "M-TCTC-TCTC-TCTC",
-			trustCorpUID: "302b05c7-896c-4290-904e-2005e4f1e81e",
+			name:            "Template Error Returned",
+			caseUID:         "M-TCTC-TCTC-TCTC",
+			trustCorpUID:    "302b05c7-896c-4290-904e-2005e4f1e81e",
+			status:          shared.ActiveAttorneyStatus.String(),
+			appointmentType: shared.OriginalAppointmentType.String(),
 			form: formTrustCorporationDetails{
 				Name: "Trust Me Once Ltd.",
 				Address: sirius.Address{
@@ -178,9 +186,11 @@ func TestGetChangeTrustCorpDetails(t *testing.T) {
 			template.
 				On("Func", mock.Anything,
 					changeTrustCorporationDetailsData{
-						Countries: []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
-						CaseUID:   tc.caseUID,
-						Form:      tc.form,
+						Countries:       []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
+						CaseUID:         tc.caseUID,
+						Status:          tc.status,
+						AppointmentType: tc.appointmentType,
+						Form:            tc.form,
 					}).
 				Return(tc.errorReturned)
 
