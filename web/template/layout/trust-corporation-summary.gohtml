@@ -1,15 +1,4 @@
 {{ define "trust-corporation-summary" }}
-
-<dl class="govuk-summary-list">
-
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key"></dt>
-        <dd class="govuk-summary-list__value"></dd>
-        <dd class="govuk-summary-list__actions">
-            <!--do we have a trust-corp update link?-->
-        </dd>
-    </div>
-
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Trust corporation name</dt>
         <dd class="govuk-summary-list__value">
@@ -87,13 +76,11 @@
     {{ end }}
 
     {{ range $num, $signatory := .Signatories }}
-        <div class="govuk-summary-list__row">
+        <div class="govuk-summary-list__row{{ if ne $num 0 }} govuk-summary-list__row--no-border{{ end }}">
             <dt class="govuk-summary-list__key">LPA signed by {{ if (eq $num 0) }}first{{ else }}second{{ end }} authorised person on</dt>
             <dd class="govuk-summary-list__value">
                 {{ parseAndFormatDate $signatory.SignedAt "2006-01-02T15:04:05Z" "2 January 2006" }}
             </dd>
         </div>
     {{ end }}
-</dl>
-
 {{ end }}
