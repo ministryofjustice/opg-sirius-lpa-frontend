@@ -154,10 +154,34 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 					attorneyDecisions := updateAttorneyDecision(data.Form.SkipDecisionAttorney, data.ActiveAttorneys, data.DecisionAttorneys, data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys, data.Form.EnabledAttorneyUids, data.Form.RemovedAttorneyUid, data.Form.DecisionAttorneysUids)
 					return confirmStep(ctx, client, data.CaseSummary.DigitalLpa.UID, data.Error, data.Decisions, w, attorneyUpdatedStatus, attorneyDecisions)
 				case "decision":
-					buildAttorneyDetails(data.RemovedAttorneysDetails, data.ActiveAttorneys, data.Form.RemovedAttorneyUid, data.EnabledAttorneysDetails, data.Form.EnabledAttorneyUids, data.InactiveAttorneys, allRemovedReasons, data.Form.RemovedReason, data.RemovedReason, data.Form.DecisionAttorneysUids, data.DecisionAttorneysDetails, data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys)
+					data.RemovedAttorneysDetails = updateRemovedAttorneysDetails(data.ActiveAttorneys, data.Form.RemovedAttorneyUid)
+					data.EnabledAttorneysDetails = updateEnabledAttorneysDetails(data.Form.EnabledAttorneyUids, data.InactiveAttorneys)
+
+					for _, r := range allRemovedReasons {
+						if r.Handle == data.Form.RemovedReason {
+							data.RemovedReason = r
+						}
+					}
+
+					if len(data.Form.DecisionAttorneysUids) > 0 {
+						data.DecisionAttorneysDetails = updateDecisionAttorneyDetails(data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys, data.Form.DecisionAttorneysUids)
+					}
+
 					return confirmTmpl(w, data)
 				default: //"remove"
-					buildAttorneyDetails(data.RemovedAttorneysDetails, data.ActiveAttorneys, data.Form.RemovedAttorneyUid, data.EnabledAttorneysDetails, data.Form.EnabledAttorneyUids, data.InactiveAttorneys, allRemovedReasons, data.Form.RemovedReason, data.RemovedReason, data.Form.DecisionAttorneysUids, data.DecisionAttorneysDetails, data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys)
+					data.RemovedAttorneysDetails = updateRemovedAttorneysDetails(data.ActiveAttorneys, data.Form.RemovedAttorneyUid)
+					data.EnabledAttorneysDetails = updateEnabledAttorneysDetails(data.Form.EnabledAttorneyUids, data.InactiveAttorneys)
+
+					for _, r := range allRemovedReasons {
+						if r.Handle == data.Form.RemovedReason {
+							data.RemovedReason = r
+						}
+					}
+
+					if len(data.Form.DecisionAttorneysUids) > 0 {
+						data.DecisionAttorneysDetails = updateDecisionAttorneyDetails(data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys, data.Form.DecisionAttorneysUids)
+					}
+
 					if data.Decisions != "jointly-for-some-severally-for-others" {
 						return confirmTmpl(w, data)
 					}
@@ -311,7 +335,7 @@ func confirmStep(
 	ctx sirius.Context,
 	client RemoveAnAttorneyClient,
 	digitalLpaUid string,
-	error error,
+	validationError sirius.ValidationError,
 	decisions string,
 	w http.ResponseWriter,
 	attorneyUpdatedStatus []sirius.AttorneyUpdatedStatus,
@@ -320,7 +344,7 @@ func confirmStep(
 	err := client.ChangeAttorneyStatus(ctx, digitalLpaUid, attorneyUpdatedStatus)
 	if ve, ok := err.(sirius.ValidationError); ok {
 		w.WriteHeader(http.StatusBadRequest)
-		error = ve
+		validationError = ve
 	} else if err != nil {
 		return err
 	}
@@ -330,7 +354,7 @@ func confirmStep(
 
 		if ve, ok := err.(sirius.ValidationError); ok {
 			w.WriteHeader(http.StatusBadRequest)
-			error = ve
+			validationError = ve
 		} else if err != nil {
 			return err
 		}
@@ -338,33 +362,6 @@ func confirmStep(
 
 	SetFlash(w, FlashNotification{Title: "Update saved"})
 	return RedirectError(fmt.Sprintf("/lpa/%s", digitalLpaUid))
-}
-
-func buildAttorneyDetails(removedAttorneysDetails SelectedAttorneyDetails,
-	activeAttorneys []sirius.LpaStoreAttorney,
-	removedAttorneyUid string,
-	enabledAttorneysDetails []SelectedAttorneyDetails,
-	enabledAttorneyUids []string,
-	inactiveAttorneys []sirius.LpaStoreAttorney,
-	removedReasons []sirius.RefDataItem,
-	formRemovedReason string,
-	removedReason sirius.RefDataItem,
-	decisionAttorneysUids []string,
-	decisionAttorneysDetails []AttorneyDetails,
-	lpaDigitalAttorneys []sirius.LpaStoreAttorney,
-) {
-	removedAttorneysDetails = updateRemovedAttorneysDetails(activeAttorneys, removedAttorneyUid)
-	enabledAttorneysDetails = updateEnabledAttorneysDetails(enabledAttorneyUids, inactiveAttorneys)
-
-	for _, r := range removedReasons {
-		if r.Handle == formRemovedReason {
-			removedReason = r
-		}
-	}
-
-	if len(decisionAttorneysUids) > 0 {
-		decisionAttorneysDetails = updateDecisionAttorneyDetails(lpaDigitalAttorneys, decisionAttorneysUids)
-	}
 }
 
 func updateRemovedAttorneysDetails(activeAttorneys []sirius.LpaStoreAttorney, removedAttorneyUid string) SelectedAttorneyDetails {
