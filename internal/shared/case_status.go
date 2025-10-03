@@ -30,6 +30,7 @@ const (
 	CaseStatusTypeImperfect
 	CaseStatusTypeInvalid
 	CaseStatusTypeWithCop
+	CaseStatusTypeProcessing
 )
 
 type caseStatusMeta struct {
@@ -61,6 +62,7 @@ var caseStatusMetadata = map[CaseStatus]caseStatusMeta{
 	CaseStatusTypeImperfect:              {"Imperfect", "", "grey"},
 	CaseStatusTypeInvalid:                {"Invalid", "", "grey"},
 	CaseStatusTypeWithCop:                {"With Cop", "", "grey"},
+	CaseStatusTypeProcessing:             {"Processing", "processing", "grey"},
 }
 
 var caseStatusTypeMap = map[string]CaseStatus{
@@ -98,6 +100,7 @@ var caseStatusTypeMap = map[string]CaseStatus{
 	"Invalid":                  CaseStatusTypeInvalid,
 	"invalid":                  CaseStatusTypeInvalid,
 	"With Cop":                 CaseStatusTypeWithCop,
+	"processing":               CaseStatusTypeProcessing,
 }
 
 func (cs CaseStatus) ReadableString() string {
