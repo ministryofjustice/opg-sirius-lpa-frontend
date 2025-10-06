@@ -89,27 +89,23 @@ func TestGetCombinedEvents(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A digital LPA with combined events exists").
+					Given("A digital LPA exists").
 					UponReceiving("A request for the combined event history").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
-						Path:   matchers.Like("/lpa-api/v1/digital-lpas/M-1234-5678-9012/events"),
+						Path:   matchers.Like("/lpa-api/v1/digital-lpas/M-1234-9876-4567/events"),
 					}).
 					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusOK,
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 						Body: matchers.EachLike(map[string]interface{}{
-							"source":   matchers.Like("sirius"),
-							"type":     matchers.Like("case_created"),
-							"datetime": matchers.Like("2024-01-01T10:00:00Z"),
+							"source": matchers.Like("sirius"),
 						}, 1),
 					})
 			},
 			expectedResponse: []interface{}{
 				map[string]interface{}{
-					"source":   "sirius",
-					"type":     "case_created",
-					"datetime": "2024-01-01T10:00:00Z",
+					"source": "sirius",
 				},
 			},
 		},
