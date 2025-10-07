@@ -60,47 +60,9 @@ var caseStatusMetadata = map[CaseStatus]caseStatusMeta{
 	CaseStatusTypeDeleted:                {"Deleted", "", "red"},
 	CaseStatusTypeRevoked:                {"Revoked", "", "red"},
 	CaseStatusTypeImperfect:              {"Imperfect", "", "grey"},
-	CaseStatusTypeInvalid:                {"Invalid", "", "grey"},
+	CaseStatusTypeInvalid:                {"Invalid", "invalid", "grey"},
 	CaseStatusTypeWithCop:                {"With Cop", "", "grey"},
 	CaseStatusTypeProcessing:             {"Processing", "processing", "grey"},
-}
-
-var caseStatusTypeMap = map[string]CaseStatus{
-	"draft":                    CaseStatusTypeDraft,
-	"Draft":                    CaseStatusTypeDraft,
-	"In progress":              CaseStatusTypeInProgress,
-	"in-progress":              CaseStatusTypeInProgress,
-	"Statutory waiting period": CaseStatusTypeStatutoryWaitingPeriod,
-	"statutory-waiting-period": CaseStatusTypeStatutoryWaitingPeriod,
-	"Do not register":          CaseStatusTypeDoNotRegister,
-	"do-not-register":          CaseStatusTypeDoNotRegister,
-	"Expired":                  CaseStatusTypeExpired,
-	"expired":                  CaseStatusTypeExpired,
-	"Registered":               CaseStatusTypeRegistered,
-	"registered":               CaseStatusTypeRegistered,
-	"Cannot register":          CaseStatusTypeCannotRegister,
-	"cannot-register":          CaseStatusTypeCannotRegister,
-	"Cancelled":                CaseStatusTypeCancelled,
-	"cancelled":                CaseStatusTypeCancelled,
-	"De-registered":            CaseStatusTypeDeRegistered,
-	"de-registered":            CaseStatusTypeDeRegistered,
-	"Suspended":                CaseStatusTypeSuspended,
-	"suspended":                CaseStatusTypeSuspended,
-	"Perfect":                  CaseStatusTypePerfect,
-	"Pending":                  CaseStatusTypePending,
-	"Payment Pending":          CaseStatusTypePaymentPending,
-	"Reduced Fees Pending":     CaseStatusTypeReducedFeesPending,
-	"Rejected":                 CaseStatusTypeRejected,
-	"Withdrawn":                CaseStatusTypeWithdrawn,
-	"Return - unpaid":          CaseStatusTypeReturnUnpaid,
-	"Deleted":                  CaseStatusTypeDeleted,
-	"Revoked":                  CaseStatusTypeRevoked,
-	"Imperfect":                CaseStatusTypeImperfect,
-	"imperfect":                CaseStatusTypeImperfect,
-	"Invalid":                  CaseStatusTypeInvalid,
-	"invalid":                  CaseStatusTypeInvalid,
-	"With Cop":                 CaseStatusTypeWithCop,
-	"processing":               CaseStatusTypeProcessing,
 }
 
 func (cs CaseStatus) ReadableString() string {
@@ -138,11 +100,13 @@ func (cs CaseStatus) IsDraft() bool {
 }
 
 func ParseCaseStatusType(s string) CaseStatus {
-	value, ok := caseStatusTypeMap[s]
-	if !ok {
-		return CaseStatus(0)
+	for cs, meta := range caseStatusMetadata {
+		if (meta.Readable != "" && meta.Readable == s) ||
+			(meta.API != "" && meta.API == s) {
+			return cs
+		}
 	}
-	return value
+	return CaseStatusTypeUnknown
 }
 
 func (cs CaseStatus) MarshalJSON() ([]byte, error) {
