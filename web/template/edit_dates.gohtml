@@ -7,6 +7,8 @@
     <div class="govuk-grid-column-two-thirds">
       <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
 
+      {{ template "error-summary" .Error }}
+
       {{ if .Success }}
         <meta data-app-reload="page" />
         {{ template "success-banner" "You have successfully edited the dates." }}
@@ -17,7 +19,7 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        {{ template "input-date" (field "receiptDate" "Receipt date" .Dates.ReceiptDate .Error.Field.receiptDate "max" today) }}
+        {{ template "input-date" (field "receiptDate" "Receipt date testing" .Dates.ReceiptDate .Error.Field.receiptDate "max" today) }}
         {{ template "input-date" (field "paymentDate" "Payment date" .Dates.PaymentDate .Error.Field.paymentDate) }}
         {{ template "input-date" (field "filingDate" "Filing date" .Dates.FilingDate .Error.Field.filingDate) }}
         {{ template "input-date" (field "dueDate" "Registration due date" .Dates.DueDate .Error.Field.dueDate) }}

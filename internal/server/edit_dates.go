@@ -57,6 +57,7 @@ func EditDates(client EditDatesClient, tmpl template.Template) Handler {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
 				data.Dates = dates
+				data.Error.Field["receiptDate"] = map[string]string{"": "Select the date of receipt"}
 			} else if err != nil {
 				return err
 			} else {
