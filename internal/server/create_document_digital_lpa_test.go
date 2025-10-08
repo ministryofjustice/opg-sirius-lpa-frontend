@@ -252,7 +252,7 @@ func TestGetCreateDocumentDigitalLpaDraftApplication(t *testing.T) {
 		DigitalLpa: sirius.DigitalLpa{
 			SiriusData: sirius.SiriusData{
 				ID:     15,
-				Status: "Draft",
+				Status: shared.CaseStatusTypeDraft,
 				Application: sirius.Draft{
 					DonorFirstNames: "Zackary",
 					DonorLastName:   "Lemmonds",

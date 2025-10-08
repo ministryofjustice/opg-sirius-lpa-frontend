@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -40,7 +41,7 @@ func TestGetHistorySuccessForDigitalLpa(t *testing.T) {
 				},
 			},
 			LpaStoreData: sirius.LpaStoreData{
-				Status: "processing", // Non-empty status indicates digital LPA
+				Status: shared.ParseCaseStatusType("processing"), // Non-empty status indicates digital LPA
 			},
 		},
 	}
@@ -82,7 +83,7 @@ func TestGetHistorySuccessForTraditionalLpa(t *testing.T) {
 				},
 			},
 			LpaStoreData: sirius.LpaStoreData{
-				Status: "", // Empty status indicates traditional LPA
+				Status: shared.ParseCaseStatusType(""), // Empty status indicates traditional LPA
 			},
 		},
 	}
@@ -124,7 +125,7 @@ func TestGetHistoryWhenFailureOnGetCombinedEventsForDigitalLpa(t *testing.T) {
 				},
 			},
 			LpaStoreData: sirius.LpaStoreData{
-				Status: "processing",
+				Status: shared.ParseCaseStatusType("processing"),
 			},
 		},
 	}
@@ -158,7 +159,7 @@ func TestGetHistoryWhenFailureOnGetEventsForTraditionalLpa(t *testing.T) {
 				},
 			},
 			LpaStoreData: sirius.LpaStoreData{
-				Status: "",
+				Status: shared.ParseCaseStatusType(""),
 			},
 		},
 	}
