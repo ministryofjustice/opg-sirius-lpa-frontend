@@ -152,7 +152,7 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 				case "confirm":
 					attorneyUpdatedStatus := updateAttorneyStatus(data.ActiveAttorneys, data.Form.RemovedAttorneyUid, data.Form.RemovedReason, data.InactiveAttorneys, data.Form.EnabledAttorneyUids)
 					attorneyDecisions := updateAttorneyDecision(data.Form.SkipDecisionAttorney, data.ActiveAttorneys, data.DecisionAttorneys, data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys, data.Form.EnabledAttorneyUids, data.Form.RemovedAttorneyUid, data.Form.DecisionAttorneysUids)
-					return confirmStep(ctx, client, data.CaseSummary.DigitalLpa.UID, data.Error, data.Decisions, w, attorneyUpdatedStatus, attorneyDecisions)
+					return confirmStep(ctx, client, data.CaseSummary.DigitalLpa.UID, &data.Error, data.Decisions, w, attorneyUpdatedStatus, attorneyDecisions)
 				case "decision":
 					data.RemovedAttorneysDetails = updateRemovedAttorneysDetails(data.ActiveAttorneys, data.Form.RemovedAttorneyUid)
 					data.EnabledAttorneysDetails = updateEnabledAttorneysDetails(data.Form.EnabledAttorneyUids, data.InactiveAttorneys)
@@ -335,7 +335,7 @@ func confirmStep(
 	ctx sirius.Context,
 	client RemoveAnAttorneyClient,
 	digitalLpaUid string,
-	validationError sirius.ValidationError,
+	validationError *sirius.ValidationError,
 	decisions string,
 	w http.ResponseWriter,
 	attorneyUpdatedStatus []sirius.AttorneyUpdatedStatus,
@@ -344,7 +344,7 @@ func confirmStep(
 	err := client.ChangeAttorneyStatus(ctx, digitalLpaUid, attorneyUpdatedStatus)
 	if ve, ok := err.(sirius.ValidationError); ok {
 		w.WriteHeader(http.StatusBadRequest)
-		validationError = ve
+		*validationError = ve
 	} else if err != nil {
 		return err
 	}
@@ -354,7 +354,7 @@ func confirmStep(
 
 		if ve, ok := err.(sirius.ValidationError); ok {
 			w.WriteHeader(http.StatusBadRequest)
-			validationError = ve
+			*validationError = ve
 		} else if err != nil {
 			return err
 		}
