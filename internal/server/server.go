@@ -53,6 +53,7 @@ type Client interface {
 	ChangeDonorDetailsClient
 	ChangeDraftClient
 	ChangeStatusClient
+	ChangeTrustCorporationDetailsClient
 	ClearTaskClient
 	CreateAdditionalDraftClient
 	CreateDocumentClient
@@ -104,6 +105,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {})
 
 	mux.Handle("/lpa/{uid}/attorney/{attorneyUID}/change-details", wrap(ChangeAttorneyDetails(client, templates.Get("change-attorney-details.gohtml"))))
+	mux.Handle("/lpa/{uid}/trust-corporation/{trustCorporationUID}/change-details", wrap(ChangeTrustCorporationDetails(client, templates.Get("change-trust-corporation-details.gohtml"))))
 	mux.Handle("/lpa/{uid}/objection/{id}", wrap(UpdateObjection(client, templates.Get("objection.gohtml"), templates.Get("confirm-objection.gohtml"))))
 	mux.Handle("/lpa/{uid}/objection/{id}/resolve", wrap(ResolveObjection(client, templates.Get("resolve-objection.gohtml"))))
 	mux.Handle("/lpa/{uid}/objection/{id}/outcome", wrap(ObjectionOutcome(client, templates.Get("objection-outcome.gohtml"))))
