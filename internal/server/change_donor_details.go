@@ -25,17 +25,23 @@ type changeDonorDetailsData struct {
 	Form                       formDonorDetails
 	DonorIdentityCheckComplete bool
 	DonorDobString             string
+	SignedByWitnessTwoLabel    string
 }
 
 type formDonorDetails struct {
-	FirstNames        string         `form:"firstNames"`
-	LastName          string         `form:"lastName"`
-	OtherNamesKnownBy string         `form:"otherNamesKnownBy"`
-	DateOfBirth       dob            `form:"dob"`
-	Address           sirius.Address `form:"address"`
-	PhoneNumber       string         `form:"phoneNumber"`
-	Email             string         `form:"email"`
-	LpaSignedOn       dob            `form:"lpaSignedOn"`
+	FirstNames                string         `form:"firstNames"`
+	LastName                  string         `form:"lastName"`
+	OtherNamesKnownBy         string         `form:"otherNamesKnownBy"`
+	DateOfBirth               dob            `form:"dob"`
+	Address                   sirius.Address `form:"address"`
+	PhoneNumber               string         `form:"phoneNumber"`
+	Email                     string         `form:"email"`
+	LpaSignedOn               dob            `form:"lpaSignedOn"`
+	AuthorisedSignatory       string         `form:"authorisedSignatory"`
+	SignedByWitnessOne        string         `form:"signedByWitnessOne"`
+	SignedByWitnessTwo        string         `form:"signedByWitnessTwo"`
+	IndependentWitnessName    string         `form:"independentWitnessName"`
+	IndependentWitnessAddress sirius.Address `form:"independentWitnessAddress"`
 }
 
 func parseDate(dateString string) (dob, error) {
@@ -104,6 +110,23 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 			}
 		}
 
+		signedByWitnessOne := "no"
+		signedByWitnessTwo := "no"
+
+		if lpaStore.WitnessedByCertificateProviderAt != "" {
+			signedByWitnessOne = "yes"
+		}
+
+		if lpaStore.WitnessedByIndependentWitnessAt != "" {
+			signedByWitnessTwo = "yes"
+		}
+
+		signedByWitnessTwoLabel := "Signed by witness 2"
+
+		if lpaStore.IndependentWitness.FirstNames != "" || lpaStore.IndependentWitness.LastName != "" {
+			signedByWitnessTwoLabel += " - " + lpaStore.IndependentWitness.FirstNames + " " + lpaStore.IndependentWitness.LastName
+		}
+
 		data := changeDonorDetailsData{
 			XSRFToken: ctx.XSRFToken,
 			CaseUID:   caseUID,
@@ -120,12 +143,25 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 					Postcode: lpaStore.Donor.Address.Postcode,
 					Country:  lpaStore.Donor.Address.Country,
 				},
-				Email:       lpaStore.Donor.Email,
-				PhoneNumber: cs.DigitalLpa.SiriusData.Application.PhoneNumber,
-				LpaSignedOn: signedAt,
+				Email:                  lpaStore.Donor.Email,
+				PhoneNumber:            cs.DigitalLpa.SiriusData.Application.PhoneNumber,
+				LpaSignedOn:            signedAt,
+				AuthorisedSignatory:    lpaStore.AuthorisedSignatory.FirstNames + " " + lpaStore.AuthorisedSignatory.LastName,
+				SignedByWitnessOne:     signedByWitnessOne,
+				SignedByWitnessTwo:     signedByWitnessTwo,
+				IndependentWitnessName: lpaStore.IndependentWitness.FirstNames + " " + lpaStore.IndependentWitness.LastName,
+				IndependentWitnessAddress: sirius.Address{
+					Line1:    lpaStore.IndependentWitness.Address.Line1,
+					Line2:    lpaStore.IndependentWitness.Address.Line2,
+					Line3:    lpaStore.IndependentWitness.Address.Line3,
+					Town:     lpaStore.IndependentWitness.Address.Town,
+					Postcode: lpaStore.IndependentWitness.Address.Postcode,
+					Country:  lpaStore.IndependentWitness.Address.Country,
+				},
 			},
 			DonorIdentityCheckComplete: donorIdentityCheckComplete,
 			DonorDobString:             donorDobString,
+			SignedByWitnessTwoLabel:    signedByWitnessTwoLabel,
 		}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
@@ -150,14 +186,54 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 				return err
 			}
 
+			witnessedByCertificateProviderAt := time.Time{}
+			var witnessedByIndependentWitnessAt *time.Time
+			lpaStoreWitnessedByCertificateProviderAt := time.Time{}
+
+			if lpaStore.WitnessedByCertificateProviderAt != "" {
+				lpaStoreWitnessedByCertificateProviderAt, err = time.Parse(time.RFC3339, lpaStore.WitnessedByCertificateProviderAt)
+
+				if err != nil {
+					return err
+				}
+			}
+
+			if data.Form.SignedByWitnessOne == "yes" {
+				if lpaStoreWitnessedByCertificateProviderAt.IsZero() {
+					witnessedByCertificateProviderAt = time.Now()
+				} else {
+					witnessedByCertificateProviderAt = lpaStoreWitnessedByCertificateProviderAt
+				}
+			}
+
+			if data.Form.SignedByWitnessTwo == "yes" {
+				if lpaStore.WitnessedByIndependentWitnessAt == "" {
+					now := time.Now()
+					witnessedByIndependentWitnessAt = &now
+				} else {
+					lpaStoreWitnessedByIndependentWitnessAt, err := time.Parse(time.RFC3339, lpaStore.WitnessedByIndependentWitnessAt)
+
+					if err != nil {
+						return err
+					}
+
+					witnessedByIndependentWitnessAt = &lpaStoreWitnessedByIndependentWitnessAt
+				}
+			}
+
 			donorDetailsData := sirius.ChangeDonorDetails{
-				FirstNames:        data.Form.FirstNames,
-				LastName:          data.Form.LastName,
-				OtherNamesKnownBy: data.Form.OtherNamesKnownBy,
-				Address:           data.Form.Address,
-				Phone:             data.Form.PhoneNumber,
-				Email:             data.Form.Email,
-				LpaSignedOn:       data.Form.LpaSignedOn.toDateString(),
+				FirstNames:                       data.Form.FirstNames,
+				LastName:                         data.Form.LastName,
+				OtherNamesKnownBy:                data.Form.OtherNamesKnownBy,
+				Address:                          data.Form.Address,
+				Phone:                            data.Form.PhoneNumber,
+				Email:                            data.Form.Email,
+				LpaSignedOn:                      data.Form.LpaSignedOn.toDateString(),
+				AuthorisedSignatory:              data.Form.AuthorisedSignatory,
+				WitnessedByCertificateProviderAt: witnessedByCertificateProviderAt,
+				WitnessedByIndependentWitnessAt:  witnessedByIndependentWitnessAt,
+				IndependentWitnessName:           data.Form.IndependentWitnessName,
+				IndependentWitnessAddress:        data.Form.IndependentWitnessAddress,
 			}
 
 			if donorIdentityCheckComplete {

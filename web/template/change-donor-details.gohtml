@@ -50,6 +50,27 @@
                 {{ template "input" (field "phoneNumber" "Donor’s phone number (optional)" .Form.PhoneNumber .Error.Field.PhoneNumber) }}
                 {{ template "input" (field "email" "Donor’s email address (optional)" .Form.Email .Error.Field.Email) }}
                 {{ template "date" (field "lpaSignedOn" "LPA signed on" .Form.LpaSignedOn .Error.Field.LpaSignedOn) }}
+                {{ template "input" (field "authorisedSignatory" "Name of the person who signed on behalf of the donor" .Form.AuthorisedSignatory .Error.Field.AuthorisedSignatory) }}
+                {{ template "radios" (radios "signedByWitnessOne" "Signed by witness 1 (certificate provider)" .Form.SignedByWitnessOne .Error.Field.SignedByWitnessOne
+                (item "Yes" "Yes")
+                (item "No" "No")
+                ) }}
+                {{ template "radios" (radios "signedByWitnessTwo" .SignedByWitnessTwoLabel .Form.SignedByWitnessTwo .Error.Field.SignedByWitnessTwo
+                (item "Yes" "Yes")
+                (item "No" "No")
+                ) }}
+                {{ template "input" (field "independentWitnessName" "Witness 2 name" .Form.IndependentWitnessName .Error.Field.IndependentWitnessName) }}
+
+                <div>Witness 2 address</div>
+
+                <div class="govuk-form-group {{ if .Error.Field.IndependentWitnessAddress }}govuk-form-group--error{{ end }}" data-app-address-finder-label="Independent Witness address">
+                    {{ template "input" (field "independentWitnessAddress.Line1" "Address line 1" .Form.IndependentWitnessAddress.Line1 (index .Error.Field "independentWitnessAddress/addressLine1") "data-app-address-finder-map" "independentWitnessAddressLine1") }}
+                    {{ template "input" (field "independentWitnessAddress.Line2" "Address line 2 (optional)" .Form.IndependentWitnessAddress.Line2 (index .Error.Field "independentWitnessAddress/addressLine2") "data-app-address-finder-map" "independentWitnessAddressLine2") }}
+                    {{ template "input" (field "independentWitnessAddress.Line3" "Address line 3 (optional)" .Form.IndependentWitnessAddress.Line3 (index .Error.Field "independentWitnessAddress/addressLine3") "data-app-address-finder-map" "independentWitnessAddressLine3") }}
+                    {{ template "input" (field "independentWitnessAddress.Town" "Town or city" .Form.IndependentWitnessAddress.Town (index .Error.Field "independentWitnessAddress/town") "data-app-address-finder-map" "independentWitnessAddressTown" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "input" (field "independentWitnessAddress.Postcode" "Postcode" .Form.IndependentWitnessAddress.Postcode (index .Error.Field "independentWitnessAddress/postcode") "data-app-address-finder-map" "independentWitnessAddressPostcode" "class" "govuk-!-width-two-thirds") }}
+                    {{ template "select" (select "independentWitnessAddress.Country" "Country" .Form.IndependentWitnessAddress.Country (index .Error.Field "independentWitnessAddress/country") (options .Countries) "data-app-address-finder-map" "independentWitnessAddressCountry") }}
+                </div>
 
                 <div class="govuk-button-group">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Save and continue</button><br/>
