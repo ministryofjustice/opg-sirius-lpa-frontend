@@ -3,14 +3,14 @@ module github.com/ministryofjustice/opg-sirius-lpa-frontend
 go 1.24.3
 
 require (
-	github.com/go-playground/form/v4 v4.2.1
-	github.com/ministryofjustice/opg-go-common v1.128.0
+	github.com/go-playground/form/v4 v4.2.3
+	github.com/ministryofjustice/opg-go-common v1.133.0
 	github.com/pact-foundation/pact-go/v2 v2.4.1
 	github.com/stretchr/testify v1.11.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0
-	golang.org/x/mod v0.28.0
+	golang.org/x/mod v0.29.0
 	golang.org/x/sync v0.17.0
-	golang.org/x/text v0.29.0
+	golang.org/x/text v0.30.0
 )
 
 require (
@@ -44,7 +44,7 @@ require (
 	golang.org/x/sys v0.35.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250825161204-c5933d9347a5 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250825161204-c5933d9347a5 // indirect
-	google.golang.org/grpc v1.75.1 // indirect
+	google.golang.org/grpc v1.76.0 // indirect
 	google.golang.org/protobuf v1.36.8 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
