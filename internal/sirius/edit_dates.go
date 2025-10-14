@@ -8,6 +8,7 @@ type Dates struct {
 	CancellationDate DateString `json:"cancellationDate,omitempty"`
 	DispatchDate     DateString `json:"dispatchDate,omitempty"`
 	DueDate          DateString `json:"dueDate,omitempty"`
+	FilingDate       DateString `json:"filingDate,omitempty"`
 	InvalidDate      DateString `json:"invalidDate,omitempty"`
 	PaymentDate      DateString `json:"paymentDate,omitempty"`
 	ReceiptDate      DateString `json:"receiptDate,omitempty"`
