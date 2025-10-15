@@ -3,28 +3,12 @@ import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("Change trust corporation details form", () => {
   beforeEach(() => {
-    cy.addMock("/lpa-api/v1/digital-lpas/M-1111-1111-1110", "GET", {
-      status: 200,
-      body: {
-        uId: "M-1111-1111-1110",
+    const mocks = Promise.allSettled([
+      digitalLpas.get("M-1111-1111-1110", {
         "opg.poas.sirius": {
           id: 555,
-          uId: "M-1111-1111-1111",
+          uId: "M-1111-1111-1110",
           status: "in-progress",
-          caseSubtype: "personal-welfare",
-          createdDate: "31/10/2023",
-          investigationCount: 0,
-          complaintCount: 0,
-          taskCount: 0,
-          warningCount: 0,
-          donor: {
-            id: 33,
-          },
-          application: {
-            donorFirstNames: "James",
-            donorLastName: "Rubin",
-            donorDob: "22/02/1990",
-          },
         },
         "opg.poas.lpastore": {
           donor: {
@@ -68,8 +52,13 @@ describe("Change trust corporation details form", () => {
           registrationDate: "2024-11-11",
           peopleToNotify: [],
         },
-      },
-    });
+      }),
+      cases.warnings.empty("555"),
+      cases.tasks.empty("555"),
+      digitalLpas.objections.empty("M-1111-1111-1110"),
+    ]);
+
+    cy.wrap(mocks);
 
     cy.addMock("/lpa-api/v1/cases/555", "GET", {
       status: 200,
@@ -83,54 +72,44 @@ describe("Change trust corporation details form", () => {
       },
     });
 
-    const mocks = Promise.allSettled([
-      cases.warnings.empty("555"),
-      cases.tasks.empty("555"),
-      digitalLpas.objections.empty("M-1111-1111-1110"),
-    ]);
-
-    cy.wrap(mocks);
-
     cy.visit(
       "/lpa/M-1111-1111-1110/trust-corporation/active-trust-corp-1/change-details",
     );
   });
 
   it("can be visited from the LPA details attorney update link", () => {
-    cy.visit("/lpa/M-1111-1111-1110/lpa-details").then(() => {
-      cy.get(".govuk-accordion__section-button").contains("Attorneys").click();
-      cy.get("#f-change-trust-corporation-details").click();
-      cy.contains("Change attorney details");
-      cy.url().should(
-        "contain",
-        "/lpa/M-1111-1111-1110/trust-corporation/active-trust-corp-1/change-details",
-      );
-      cy.contains("Trust corporation name");
-      cy.contains("Company address");
-      cy.contains("Company email address (optional)");
-      cy.contains("Company phone number (optional)");
-      cy.contains("Company registration number");
-    });
+    cy.visit("/lpa/M-1111-1111-1110/lpa-details");
+    cy.get(".govuk-accordion__section-button").contains("Attorneys").click();
+    cy.get("#f-change-trust-corporation-details").click();
+    cy.contains("Change attorney details");
+    cy.url().should(
+      "contain",
+      "/lpa/M-1111-1111-1110/trust-corporation/active-trust-corp-1/change-details",
+    );
+    cy.contains("Trust corporation name");
+    cy.contains("Company address");
+    cy.contains("Company email address (optional)");
+    cy.contains("Company phone number (optional)");
+    cy.contains("Company registration number");
   });
 
   it("can be visited from the LPA details replacement attorney update link", () => {
-    cy.visit("/lpa/M-1111-1111-1110/lpa-details").then(() => {
-      cy.get(".govuk-accordion__section-button")
-        .contains("Replacement attorneys")
-        .click();
-      cy.get("#f-change-replacement-trust-corporation-details").click();
-      cy.contains("Change replacement attorney details");
-      cy.contains("Company registration number");
-      cy.url().should(
-        "contain",
-        "/lpa/M-1111-1111-1110/trust-corporation/replacement-trust-corp-2/change-details",
-      );
-      cy.contains("Trust corporation name");
-      cy.contains("Company address");
-      cy.contains("Company email address (optional)");
-      cy.contains("Company phone number (optional)");
-      cy.contains("Company registration number");
-    });
+    cy.visit("/lpa/M-1111-1111-1110/lpa-details");
+    cy.get(".govuk-accordion__section-button")
+      .contains("Replacement attorneys")
+      .click();
+    cy.get("#f-change-replacement-trust-corporation-details").click();
+    cy.contains("Change replacement attorney details");
+    cy.contains("Company registration number");
+    cy.url().should(
+      "contain",
+      "/lpa/M-1111-1111-1110/trust-corporation/replacement-trust-corp-2/change-details",
+    );
+    cy.contains("Trust corporation name");
+    cy.contains("Company address");
+    cy.contains("Company email address (optional)");
+    cy.contains("Company phone number (optional)");
+    cy.contains("Company registration number");
   });
 
   it("populates trust corporation details", () => {
