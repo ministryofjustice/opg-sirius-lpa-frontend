@@ -50,6 +50,7 @@
                 {{ template "input" (field "phoneNumber" "Donor’s phone number (optional)" .Form.PhoneNumber .Error.Field.PhoneNumber) }}
                 {{ template "input" (field "email" "Donor’s email address (optional)" .Form.Email .Error.Field.Email) }}
                 {{ template "date" (field "lpaSignedOn" "LPA signed on" .Form.LpaSignedOn .Error.Field.LpaSignedOn) }}
+
                 {{ template "input" (field "authorisedSignatory" "Name of the person who signed on behalf of the donor" .Form.AuthorisedSignatory .Error.Field.AuthorisedSignatory) }}
                 {{ template "radios" (radios "signedByWitnessOne" "Signed by witness 1 (certificate provider)" .Form.SignedByWitnessOne .Error.Field.SignedByWitnessOne
                 (item "Yes" "Yes")
@@ -61,7 +62,7 @@
                 ) }}
                 {{ template "input" (field "independentWitnessName" "Witness 2 name" .Form.IndependentWitnessName .Error.Field.IndependentWitnessName) }}
 
-                <div>Witness 2 address</div>
+                <div class="govuk-body">Witness 2 address</div>
 
                 <div class="govuk-form-group {{ if .Error.Field.IndependentWitnessAddress }}govuk-form-group--error{{ end }}" data-app-address-finder-label="Independent Witness address">
                     {{ template "input" (field "independentWitnessAddress.Line1" "Address line 1" .Form.IndependentWitnessAddress.Line1 (index .Error.Field "independentWitnessAddress/addressLine1") "data-app-address-finder-map" "independentWitnessAddressLine1") }}
