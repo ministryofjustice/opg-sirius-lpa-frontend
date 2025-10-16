@@ -10,6 +10,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
@@ -34,15 +35,14 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"today": func() string {
 			return time.Now().Format("2006-01-02")
 		},
-		"field":                      field,
-		"radios":                     radios,
-		"item":                       item,
-		"fieldID":                    fieldID,
-		"select":                     select_,
-		"options":                    options,
-		"caseTabs":                   caseTab,
-		"sortWarningsForCaseSummary": sortWarningsForCaseSummary,
-		"casesWarningAppliedTo":      casesWarningAppliedTo,
+		"field":                 field,
+		"radios":                radios,
+		"item":                  item,
+		"fieldID":               fieldID,
+		"select":                select_,
+		"options":               options,
+		"caseTabs":              caseTab,
+		"casesWarningAppliedTo": sirius.CasesWarningAppliedTo,
 		"fee": func(amount int) string {
 			float := float64(amount)
 			return fmt.Sprintf("%.2f", float/100)
@@ -134,27 +134,6 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"plusN": func(i int, n int) int {
 			return i + n
 		},
-		"statusColour": func(s string) string {
-			switch strings.ToLower(s) {
-			case "registered":
-				return "green"
-			case "perfect":
-				return "turquoise"
-			case "statutory waiting period":
-				return "yellow"
-			case "in progress":
-				return "light-blue"
-			case "pending", "payment pending", "reduced fees pending":
-				return "blue"
-			case "draft":
-				return "purple"
-			case "cancelled", "rejected", "revoked", "withdrawn", "return - unpaid", "deleted", "do not register", "expired", "cannot register", "de-registered":
-				return "red"
-			default:
-				return "grey"
-			}
-		},
-		"statusLabel": StatusLabelFormat,
 		"replace": func(s, find, replace string) string {
 			return strings.ReplaceAll(s, find, replace)
 		},
@@ -180,7 +159,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"join": func(s []string, joiner string) string {
 			return strings.Join(s, joiner)
 		},
-		"subtypeShortFormat":     subtypeShortFormat,
+		"subtypeShortFormat":     sirius.SubtypeShortFormat,
 		"subtypeLongFormat":      subtypeLongFormat,
 		"subtypeColour":          subtypeColour,
 		"severanceRequiredLabel": severanceRequiredLabel,
@@ -361,24 +340,8 @@ type CaseTabData struct {
 type linkedCase struct {
 	UID         string
 	Subtype     string
-	Status      string
+	Status      shared.CaseStatus
 	CreatedDate sirius.DateString
-}
-
-// 2-3 character LPA subtype, upper-cased
-func subtypeShortFormat(subtype string) string {
-	switch strings.ToLower(subtype) {
-	case "personal-welfare":
-		return "PW"
-	case "property-and-affairs":
-		return "PA"
-	case "hw":
-		return "HW"
-	case "pfa":
-		return "PFA"
-	default:
-		return ""
-	}
 }
 
 // full text for LPA subtype, e.g. "Personal welfare"
@@ -394,33 +357,6 @@ func subtypeLongFormat(subtype string) string {
 		return "Property and financial affairs"
 	default:
 		return ""
-	}
-}
-
-func StatusLabelFormat(status string) string {
-	switch strings.ToLower(status) {
-	case "draft":
-		return "Draft"
-	case "in-progress":
-		return "In progress"
-	case "statutory-waiting-period":
-		return "Statutory waiting period"
-	case "registered":
-		return "Registered"
-	case "suspended":
-		return "Suspended"
-	case "do-not-register":
-		return "Do not register"
-	case "expired":
-		return "Expired"
-	case "cannot-register":
-		return "Cannot register"
-	case "cancelled":
-		return "Cancelled"
-	case "de-registered":
-		return "De-registered"
-	default:
-		return "draft"
 	}
 }
 
@@ -449,14 +385,15 @@ func severanceRequiredLabel(severanceStatus string) string {
 func caseTab(caseSummary sirius.CaseSummary, tabName string) CaseTabData {
 	lpa := caseSummary.DigitalLpa.SiriusData
 	lpaStore := caseSummary.DigitalLpa.LpaStoreData
-	status := "draft"
+	status := shared.CaseStatusTypeDraft
 
-	if lpaStore.Status != "" {
+	if lpaStore.Status.ReadableString() != "" {
 		status = lpaStore.Status
 	}
 
 	var linkedCases []linkedCase
-	linkedCases = append(linkedCases, linkedCase{lpa.UID, lpa.Subtype, StatusLabelFormat(status), lpa.CreatedDate})
+
+	linkedCases = append(linkedCases, linkedCase{lpa.UID, lpa.Subtype, status, lpa.CreatedDate})
 
 	for _, linkedLpa := range lpa.LinkedCases {
 		linkedCases = append(linkedCases, linkedCase{linkedLpa.UID, linkedLpa.Subtype, linkedLpa.Status, linkedLpa.CreatedDate})
@@ -474,66 +411,6 @@ func caseTab(caseSummary sirius.CaseSummary, tabName string) CaseTabData {
 		SortedLinkedCases: linkedCases,
 		TabName:           tabName,
 	}
-}
-
-// sort warnings to show in case summary, donor deceased first, then in
-// descending date order
-func sortWarningsForCaseSummary(warnings []sirius.Warning) []sirius.Warning {
-	sort.Slice(warnings, func(i, j int) bool {
-		if warnings[i].WarningType == "Donor Deceased" {
-			return true
-		} else if warnings[j].WarningType == "Donor Deceased" {
-			return false
-		}
-
-		iTime, err := time.Parse("02/01/2006 15:04:05", warnings[i].DateAdded)
-		if err != nil {
-			return false
-		}
-
-		jTime, err := time.Parse("02/01/2006 15:04:05", warnings[j].DateAdded)
-		if err != nil {
-			return false
-		}
-
-		return iTime.After(jTime)
-	})
-
-	return warnings
-}
-
-// construct string to use in case summary for cases a warning is applied to
-func casesWarningAppliedTo(uid string, cases []sirius.Case) string {
-	// return value:
-	// "" (only this case)
-	// or " and <subtype (hw|pw)> <uid>" (one other case)
-	// or ", <subtype (hw|pw)> <uid_1>, <subtype (hw|pw)> <uid_2>, ...,
-	// <subtype (hw|pw)> <uid_n-1> and <subtype (hw|pw)> <uid_n>" (2 to n other cases)
-	if len(cases) == 1 {
-		return ""
-	}
-
-	var filteredCases []sirius.Case
-	for _, caseItem := range cases {
-		if caseItem.UID != uid {
-			filteredCases = append(filteredCases, caseItem)
-		}
-	}
-	numCases := len(filteredCases)
-
-	var b strings.Builder
-	for index, caseItem := range filteredCases {
-		if index == numCases-1 {
-			b.WriteString(" and ")
-		} else {
-			b.WriteString(", ")
-		}
-		b.WriteString(subtypeShortFormat(caseItem.SubType))
-		b.WriteString(" ")
-		b.WriteString(caseItem.UID)
-	}
-
-	return b.String()
 }
 
 type fieldData struct {

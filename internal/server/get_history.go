@@ -31,7 +31,7 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 
 		var eventDetails any
 
-		if caseSummary.DigitalLpa.LpaStoreData.Status != "" {
+		if caseSummary.DigitalLpa.LpaStoreData.Status.ReadableString() != "" {
 			// Digital LPA - use combined events
 			eventDetails, err = client.GetCombinedEvents(ctx, uid)
 		} else {
