@@ -17,16 +17,15 @@ type ChangeDonorDetailsClient interface {
 }
 
 type changeDonorDetailsData struct {
-	XSRFToken                       string
-	Countries                       []sirius.RefDataItem
-	Success                         bool
-	Error                           sirius.ValidationError
-	CaseUID                         string
-	Form                            formDonorDetails
-	DonorIdentityCheckComplete      bool
-	DonorDobString                  string
-	SignedByWitnessTwoLabel         string
-	HasAnySignedOnBehalfOfDonorData bool
+	XSRFToken                  string
+	Countries                  []sirius.RefDataItem
+	Success                    bool
+	Error                      sirius.ValidationError
+	CaseUID                    string
+	Form                       formDonorDetails
+	DonorIdentityCheckComplete bool
+	DonorDobString             string
+	SignedByWitnessTwoLabel    string
 }
 
 type formDonorDetails struct {
