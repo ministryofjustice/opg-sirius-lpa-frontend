@@ -14,11 +14,11 @@ type ChangeDonorDetails struct {
 	Phone                            string     `json:"phoneNumber"`
 	Email                            string     `json:"email"`
 	LpaSignedOn                      DateString `json:"lpaSignedOn"`
-	AuthorisedSignatory              string     `form:"authorisedSignatory"`
-	WitnessedByCertificateProviderAt time.Time  `form:"witnessedByCertificateProviderAt"`
-	WitnessedByIndependentWitnessAt  *time.Time `form:"witnessedByIndependentWitnessAt"`
-	IndependentWitnessName           string     `form:"independentWitnessName"`
-	IndependentWitnessAddress        Address    `form:"independentWitnessAddress"`
+	AuthorisedSignatory              string     `json:"authorisedSignatory"`
+	WitnessedByCertificateProviderAt time.Time  `json:"witnessedByCertificateProviderAt"`
+	WitnessedByIndependentWitnessAt  *time.Time `json:"witnessedByIndependentWitnessAt"`
+	IndependentWitnessName           string     `json:"independentWitnessName"`
+	IndependentWitnessAddress        Address    `json:"independentWitnessAddress"`
 }
 
 func (c *Client) ChangeDonorDetails(ctx Context, caseUID string, donorDetails ChangeDonorDetails) error {
