@@ -7,26 +7,27 @@ import (
 )
 
 type Case struct {
-	ID                   int               `json:"id,omitempty"`
-	UID                  string            `json:"uId,omitempty"`
-	Status               shared.CaseStatus `json:"status"`
-	CaseType             string            `json:"caseType,omitempty"`
-	SubType              string            `json:"caseSubtype,omitempty"`
+	Attorneys            []Person          `json:"attorneys,omitempty"`
 	CancellationDate     DateString        `json:"cancellationDate,omitempty"`
+	CaseType             string            `json:"caseType,omitempty"`
+	Correspondent        *Person           `json:"correspondent,omitempty"`
 	DispatchDate         DateString        `json:"dispatchDate,omitempty"`
+	Donor                *Person           `json:"donor,omitempty"`
 	DueDate              DateString        `json:"dueDate,omitempty"`
+	ExpectedPaymentTotal int               `json:"expectedPaymentTotal"`
+	FilingDate           DateString        `json:"filingDate,omitempty"`
+	ID                   int               `json:"id,omitempty"`
 	InvalidDate          DateString        `json:"invalidDate,omitempty"`
 	PaymentDate          DateString        `json:"paymentDate,omitempty"`
 	ReceiptDate          DateString        `json:"receiptDate,omitempty"`
 	RegistrationDate     DateString        `json:"registrationDate,omitempty"`
 	RejectedDate         DateString        `json:"rejectedDate,omitempty"`
 	RevokedDate          DateString        `json:"revokedDate,omitempty"`
-	WithdrawnDate        DateString        `json:"withdrawnDate,omitempty"`
-	Donor                *Person           `json:"donor,omitempty"`
+	Status               shared.CaseStatus `json:"status"`
+	SubType              string            `json:"caseSubtype,omitempty"`
 	TrustCorporations    []Person          `json:"trustCorporations,omitempty"`
-	Attorneys            []Person          `json:"attorneys,omitempty"`
-	Correspondent        *Person           `json:"correspondent,omitempty"`
-	ExpectedPaymentTotal int               `json:"expectedPaymentTotal"`
+	UID                  string            `json:"uId,omitempty"`
+	WithdrawnDate        DateString        `json:"withdrawnDate,omitempty"`
 }
 
 func (c Case) Summary() string {
