@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
@@ -53,7 +54,7 @@ func TestDeletedCases(t *testing.T) {
 				{
 					UID:       "7000-0000-5555",
 					Type:      "LPA",
-					Status:    "Return - unpaid",
+					Status:    shared.CaseStatusTypeReturnUnpaid,
 					DeletedAt: DateString("2022-12-02"),
 					Reason:    "LPA was not paid for after 12 months",
 				},
