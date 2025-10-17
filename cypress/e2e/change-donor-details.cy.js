@@ -169,11 +169,20 @@ describe("Change donor details form", () => {
     cy.get("#f-signedByWitnessOne").should("be.checked");
     cy.get("#f-signedByWitnessTwo").should("be.checked");
     cy.get("#f-independentWitnessName").should("have.value", "Turner Feil");
-    cy.get("#f-independentWitnessAddress\\.Line1").should("have.value", "139 Stoney Lane");
+    cy.get("#f-independentWitnessAddress\\.Line1").should(
+      "have.value",
+      "139 Stoney Lane",
+    );
     cy.get("#f-independentWitnessAddress\\.Line2").should("have.value", "");
     cy.get("#f-independentWitnessAddress\\.Line3").should("have.value", "");
-    cy.get("#f-independentWitnessAddress\\.Town").should("have.value", "McCullough");
-    cy.get("#f-independentWitnessAddress\\.Postcode").should("have.value", "XR41 4UW");
+    cy.get("#f-independentWitnessAddress\\.Town").should(
+      "have.value",
+      "McCullough",
+    );
+    cy.get("#f-independentWitnessAddress\\.Postcode").should(
+      "have.value",
+      "XR41 4UW",
+    );
     cy.get("#f-independentWitnessAddress\\.Country").should("have.value", "GB");
   });
 

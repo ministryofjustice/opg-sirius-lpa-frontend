@@ -18,7 +18,7 @@ const countries = {
       "GET",
       {
         status: 200,
-        body: [{ handle: "GB", label : "Great Britain" }],
+        body: [{ handle: "GB", label: "Great Britain" }],
       },
       priority,
     );
