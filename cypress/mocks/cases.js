@@ -1,5 +1,17 @@
 import { addMock } from "./wiremock";
 
+async function get(id, body, priority = 1) {
+  await addMock(
+    `/lpa-api/v1/cases/${id}`,
+    "GET",
+    {
+      status: 200,
+      body: body,
+    },
+    priority,
+  );
+}
+
 const warnings = {
   async empty(caseId) {
     await addMock(
@@ -29,4 +41,4 @@ const tasks = {
   },
 };
 
-export { warnings, tasks };
+export { get, warnings, tasks };
