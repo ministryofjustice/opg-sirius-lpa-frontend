@@ -60,9 +60,8 @@ describe("Change draft form", () => {
       },
     });
 
-    cy.addMock("/lpa-api/v1/cases/565", "GET", {
-      status: 200,
-      body: {
+    const mocks = Promise.allSettled([
+      cases.get(565, {
         id: 565,
         uId: "M-1111-2222-1111",
         caseType: "DIGITAL_LPA",
@@ -70,10 +69,7 @@ describe("Change draft form", () => {
           id: 44,
         },
         status: "Draft",
-      },
-    });
-
-    const mocks = Promise.allSettled([
+      }),
       cases.warnings.empty("565"),
       cases.tasks.empty("565"),
       digitalLpas.objections.empty("M-1111-2222-1111"),

@@ -65,9 +65,8 @@ describe("Update objection form", () => {
       },
     });
 
-    cy.addMock("/lpa-api/v1/cases/5", "GET", {
-      status: 200,
-      body: {
+    const mocks = Promise.allSettled([
+      cases.get(5, {
         id: 5,
         uId: "M-0000-0000-0005",
         caseType: "DIGITAL_LPA",
@@ -75,10 +74,7 @@ describe("Update objection form", () => {
           id: 5,
         },
         status: "Draft",
-      },
-    });
-
-    const mocks = Promise.allSettled([
+      }),
       cases.warnings.empty("5"),
       cases.tasks.empty("5"),
       digitalLpas.progressIndicators.feesInProgress("M-0000-0000-0005"),
