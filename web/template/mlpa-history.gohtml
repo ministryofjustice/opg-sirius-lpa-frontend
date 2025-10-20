@@ -62,7 +62,6 @@
                                                 {{ if eq $k "_class" "id" "document" }}
                                                     {{ continue }}
                                                 {{ end }}
-
                                                 <li>
                                                     {{ camelcaseToSentence $k }}:
                                                     {{ if eq $k "assignee" }}

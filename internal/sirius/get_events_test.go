@@ -103,9 +103,20 @@ func TestGetCombinedEvents(t *testing.T) {
 						}, 1),
 					})
 			},
-			expectedResponse: []interface{}{
-				map[string]interface{}{
-					"source": "sirius",
+			expectedResponse: APIEvent{
+				Event{
+					ChangeSet:     []interface{}(nil),
+					CreatedOn:     "",
+					Entity:        interface{}(nil),
+					ID:            0,
+					Source:        "sirius",
+					SourceType:    "",
+					Type:          "",
+					User:          EventUser{DisplayName: ""},
+					UUID:          "",
+					FormattedUUID: "",
+					Applied:       "",
+					DateTime:      "",
 				},
 			},
 		},

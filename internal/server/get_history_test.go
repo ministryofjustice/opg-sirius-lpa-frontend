@@ -24,9 +24,9 @@ func (m *mockGetHistoryClient) GetEvents(ctx sirius.Context, donorId int, caseId
 	return args.Get(0), args.Error(1)
 }
 
-func (m *mockGetHistoryClient) GetCombinedEvents(ctx sirius.Context, uid string) (any, error) {
+func (m *mockGetHistoryClient) GetCombinedEvents(ctx sirius.Context, uid string) (sirius.APIEvent, error) {
 	args := m.Called(ctx, uid)
-	return args.Get(0), args.Error(1)
+	return args.Get(0).(sirius.APIEvent), args.Error(1)
 }
 
 func TestGetHistorySuccessForDigitalLpa(t *testing.T) {
@@ -52,13 +52,41 @@ func TestGetHistorySuccessForDigitalLpa(t *testing.T) {
 		Return(caseSummary, nil)
 	client.
 		On("GetCombinedEvents", mock.Anything, "M-9876-9876-9999").
-		Return(map[string]string{"event": "combined event details"}, nil)
+		Return(sirius.APIEvent{{
+			ChangeSet:     nil,
+			CreatedOn:     "08/08/1999",
+			Entity:        nil,
+			ID:            2,
+			Source:        "mustard",
+			SourceType:    "french",
+			Type:          "LPA",
+			User:          sirius.EventUser{DisplayName: "Bear Ghost"},
+			UUID:          "654de60e-446d-4b2f-b2a7-321bf03b37df",
+			FormattedUUID: "",
+			Applied:       "08/08/1999",
+			DateTime:      "08/08/1999",
+		}}, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getHistory{
 			CaseSummary: caseSummary,
-			EventData:   map[string]string{"event": "combined event details"},
+			EventData: sirius.APIEvent{
+				sirius.Event{
+					ChangeSet:     nil,
+					CreatedOn:     "08/08/1999",
+					Entity:        nil,
+					ID:            2,
+					Source:        "mustard",
+					SourceType:    "french",
+					Type:          "LPA",
+					User:          sirius.EventUser{DisplayName: "Bear Ghost"},
+					UUID:          "654de60e-446d-4b2f-b2a7-321bf03b37df",
+					FormattedUUID: "MVG6MDSE",
+					Applied:       "08/08/1999",
+					DateTime:      "08/08/1999",
+				},
+			},
 		}).
 		Return(nil)
 
@@ -136,7 +164,7 @@ func TestGetHistoryWhenFailureOnGetCombinedEventsForDigitalLpa(t *testing.T) {
 		Return(caseSummary, nil)
 	client.
 		On("GetCombinedEvents", mock.Anything, "M-9876-9876-9999").
-		Return(nil, errExample)
+		Return(sirius.APIEvent{}, errExample)
 
 	server := newMockServer("/lpa/{uid}/history", GetHistory(client, nil))
 
@@ -196,4 +224,55 @@ func TestGetHistoryWhenFailureOnGetCaseSummary(t *testing.T) {
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestLPAEventIDFromUUIDReturnFormattedUUID(t *testing.T) {
+	result, _ := LPAEventIDFromUUID("654de60e-446d-4b2f-b2a7-321bf03b37df")
+	assert.Equal(t, "MVG6MDSE", result)
+}
+
+func TestLPAEventIDFromUUIDReturnError(t *testing.T) {
+	tests := []struct {
+		name        string
+		uuidStr     string
+		expectErr   bool
+		expectedLen int
+	}{
+		{
+			name:      "Invalid hex characters",
+			uuidStr:   "550e8400-e29b-41d4-a716-44665544ZZZZ",
+			expectErr: true,
+		},
+		{
+			name:      "Too short UUID decode fails",
+			uuidStr:   "1234",
+			expectErr: true,
+		},
+		{
+			name:      "Empty string",
+			uuidStr:   "",
+			expectErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := LPAEventIDFromUUID(tt.uuidStr)
+
+			if tt.expectErr {
+				if err == nil {
+					t.Errorf("expected error, got nil (output: %v)", got)
+				}
+				return
+			}
+
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+
+			if len(got) != tt.expectedLen {
+				t.Errorf("expected Base32 length %d, got %d (%s)", tt.expectedLen, len(got), got)
+			}
+		})
+	}
 }
