@@ -123,10 +123,13 @@ describe("Change donor details form", () => {
         },
       ]),
 
-      refData.countries.get([
-        { handle: "GB", label: "Great Britain" },
-        { handle: "US", label: "United States" },
-      ], 2),
+      refData.countries.get(
+        [
+          { handle: "GB", label: "Great Britain" },
+          { handle: "US", label: "United States" },
+        ],
+        2,
+      ),
     ]);
 
     cy.wrap(mocks);
