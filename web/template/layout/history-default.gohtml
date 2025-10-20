@@ -1,0 +1,89 @@
+{{ define "history-default" }}
+
+<div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">
+        {{ if eq .source "lpa_store" }}
+            LPA Store Event
+        {{ else }}
+            {{ if eq .type "INS" }}
+                Created:
+            {{ else if eq .type "UPD" }}
+                Updated:
+            {{ else if eq .type "DEL" }}
+                Deleted:
+            {{ end }}
+            {{ .sourceType }}
+        {{ end }}
+    </h2>
+</div>
+<div class="govuk-summary-card__content">
+    <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+            <p class="govuk-body">
+                {{ if .applied }}
+                    <time datetime="{{ .applied }}">{{ parseAndFormatDate .applied "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
+                {{ else if .createdOn }}
+                    <time datetime="{{ .createdOn }}">{{ parseAndFormatDate .createdOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
+                {{ else if .datetime }}
+                    <time datetime="{{ .datetime }}">{{ parseAndFormatDate .datetime "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
+                {{ end }}
+                - #{{ .hash }}
+            </p>
+            <p class="govuk-body">
+                {{ if eq .source "lpa_store" }}
+                    <ul class="govuk-list govuk-list--bullet">
+                    {{ range .changes }}
+                        <li>{{ .key }}
+                            <ul class="govuk-list govuk-list--bullet">
+                                <li><strong>From:</strong> {{ if .old }}{{ .old }}{{ else }}<em>(empty)</em>{{ end }}</li>
+                                <li> <strong>To:</strong> {{ if .new }}{{ .new }}{{ else }}<em>(empty)</em>{{ end }}</li>
+                            </ul>
+                        </li>
+                    {{ end }}
+                    </ul>
+                {{ else }}
+                    <dl class="govuk-summary-list">
+                        <ul class="govuk-list govuk-list--bullet">
+                        {{ range $k, $v := .entity }}
+                            {{ if eq $k "_class" "id" "document" }}
+                                {{ continue }}
+                            {{ end }}
+
+                            <li>
+                                {{ camelcaseToSentence $k }}:
+                                {{ if eq $k "assignee" }}
+                                    {{ $v.displayName }}
+                                {{ else if eq $k "uId" }}
+                                    {{ printf "%.f" $v }}
+                                {{ else }}
+                                    {{ $v }}
+                                {{ end }}
+                            </li>
+                        {{ end }}
+                        </ul>
+
+                        {{ if and (eq .sourceType "Note") (ne (len .entity.document) 0) }}
+                            <ul class="govuk-list govuk-list--bullet">
+                                <li>
+                                    Document: <a class="govuk-link" href="/lpa/document/{{ .entity.document.uuid }}">{{ .entity.document.friendlyDescription }}</a>
+                                    ({{ .entity.document.subType }})
+                                </li>
+                            </ul>
+                        {{ end }}
+                    </dl>
+                {{ end }}
+            </p>
+        </div>
+        <div class="govuk-summary-list__row">
+            <p class="govuk-hint  govuk-!-margin-bottom-0">
+                {{ if .user }}
+                    Created by {{ .user.displayName }}
+                {{ else }}
+                    Created by Unknown User
+                {{ end }}
+            </p>
+        </div>
+    </dl>
+</div>
+
+{{ end }}
