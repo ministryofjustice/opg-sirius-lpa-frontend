@@ -175,10 +175,15 @@ function extendDefaultDigitalLpa(uid, body) {
 async function get(uid, body, priority = 1) {
   const updatedBody = extendDefaultDigitalLpa(uid, body);
 
-  await addMock(`/lpa-api/v1/digital-lpas/${uid}`, "GET", {
-    status: 200,
-    body: updatedBody,
-  }, priority);
+  await addMock(
+    `/lpa-api/v1/digital-lpas/${uid}`,
+    "GET",
+    {
+      status: 200,
+      body: updatedBody,
+    },
+    priority,
+  );
 }
 
 const progressIndicators = {
