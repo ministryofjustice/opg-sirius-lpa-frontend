@@ -16,50 +16,52 @@
             <div class="moj-timeline__item">
                 <div class="moj-timeline__header">
                     <h2 class="moj-timeline__title">
-                        {{ if eq .source "lpa_store" }}
-                            <strong class="govuk-tag govuk-tag--{{ eventTypeColor .type }}">{{ formatEventType .type }}</strong>
+                        {{ if eq .Source "lpa_store" }}
+                            <strong class="govuk-tag govuk-tag--{{ eventTypeColor .Type }}">{{ formatEventType .Type }}</strong>
                             LPA Store Event
                         {{ else }}
-                            {{ if eq .type "INS" }}
+                            {{ if eq .Type "INS" }}
                                 <strong class="govuk-tag govuk-tag--green">Created</strong>
-                            {{ else if eq .type "UPD" }}
+                            {{ else if eq .Type "UPD" }}
                                 <strong class="govuk-tag govuk-tag--grey">Updated</strong>
-                            {{ else if eq .type "DEL" }}
+                            {{ else if eq .Type "DEL" }}
                                 <strong class="govuk-tag govuk-tag--red">Deleted</strong>
                             {{ end }}
-                            {{ .sourceType }}
+                            {{ .SourceType }}
                         {{ end }}
                     </h2>
 
                     <p class="moj-timeline__byline">
-                        {{ if .user }}
-                            by {{ .user.displayName }}
+                        {{ if .User }}
+                            by {{ .User.DisplayName }}
                         {{ else }}
                             by Unknown User
                         {{ end }}
                     </p>
+                    <div hidden>{{.UUID}}</div>
+                    <p class="moj-timeline__byline">{{.FormattedUUID}}</p>
                 </div>
 
                 <p class="moj-timeline__date">
-                    {{ if .applied }}
-                        <time datetime="{{ .applied }}">{{ parseAndFormatDate .applied "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
-                    {{ else if .createdOn }}
-                        <time datetime="{{ .createdOn }}">{{ parseAndFormatDate .createdOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
-                    {{ else if .datetime }}
-                        <time datetime="{{ .datetime }}">{{ parseAndFormatDate .datetime "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
+                    {{ if .Applied }}
+                        <time datetime="{{ .Applied }}">{{ parseAndFormatDate .Applied "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
+                    {{ else if .CreatedOn }}
+                        <time datetime="{{ .CreatedOn }}">{{ parseAndFormatDate .CreatedOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
+                    {{ else if .Datetime }}
+                        <time datetime="{{ .Datetime }}">{{ parseAndFormatDate .Datetime "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
                     {{ end }}
                 </p>
 
                 <div class="moj-timeline__description">
-                    {{ if eq .source "lpa_store" }}
-                        {{ if .changes }}
+                    {{ if eq .Source "lpa_store" }}
+                        {{ if .ChangeSet }}
                             <details class="govuk-details">
                                 <summary class="govuk-details__summary">
                                     <span class="govuk-details__summary-text">Changes made</span>
                                 </summary>
                                 <div class="govuk-details__text">
                                     <dl class="govuk-summary-list govuk-summary-list--no-border">
-                                        {{ range .changes }}
+                                        {{ range .ChangeSet }}
                                             <div class="govuk-summary-list__row">
                                                 <dt class="govuk-summary-list__key">
                                                     {{ .key }}
@@ -81,7 +83,7 @@
                             </summary>
                             <div class="govuk-details__text">
                                 <dl class="govuk-summary-list">
-                                    {{ range $k, $v := .entity }}
+                                    {{ range $k, $v := .Entity }}
                                         {{ if eq $k "_class" "id" "document" }}
                                             {{ continue }}
                                         {{ end }}
@@ -102,14 +104,14 @@
                                         </div>
                                     {{ end }}
 
-                                    {{ if and (eq .sourceType "Note") (ne (len .entity.document) 0) }}
+                                    {{ if and (eq .SourceType "Note") (ne (len .Entity.document) 0) }}
                                         <div class="govuk-summary-list__row">
                                             <dt class="govuk-summary-list__key">
                                                 Document
                                             </dt>
                                             <dd class="govuk-summary-list__value">
-                                                <a class="govuk-link" href="/lpa/document/{{ .entity.document.uuid }}">{{ .entity.document.friendlyDescription }}</a>
-                                                ({{ .entity.document.subType }})
+                                                <a class="govuk-link" href="/lpa/document/{{ .Entity.document.uuid }}">{{ .Entity.document.friendlyDescription }}</a>
+                                                ({{ .Entity.document.subType }})
                                             </dd>
                                         </div>
                                     {{ end }}
