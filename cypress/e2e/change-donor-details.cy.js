@@ -128,7 +128,6 @@ describe("Change donor details form", () => {
           { handle: "GB", label: "Great Britain" },
           { handle: "US", label: "United States" },
         ],
-        2,
       ),
     ]);
 
