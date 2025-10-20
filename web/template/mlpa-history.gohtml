@@ -5,118 +5,100 @@
 {{ define "main" }}
     {{ template "mlpa-header" (caseTabs .CaseSummary "history") }}
 
-    <div class="moj-page-header-actions">
-        <div class="moj-page-header-actions__title">
-            <h1 class="govuk-heading-l">History</h1>
-        </div>
+    <div>
+        {{ template "mlpa-case-details" . }}
+        <h1 class="govuk-heading-l govuk-!-padding-top-0">History</h1>
     </div>
 
     <div class="moj-timeline">
         {{ range .EventData }}
             <div class="moj-timeline__item">
-                <div class="moj-timeline__header">
-                    <h2 class="moj-timeline__title">
-                        {{ if eq .source "lpa_store" }}
-                            <strong class="govuk-tag govuk-tag--{{ eventTypeColor .type }}">{{ formatEventType .type }}</strong>
-                            LPA Store Event
-                        {{ else }}
-                            {{ if eq .type "INS" }}
-                                <strong class="govuk-tag govuk-tag--green">Created</strong>
-                            {{ else if eq .type "UPD" }}
-                                <strong class="govuk-tag govuk-tag--grey">Updated</strong>
-                            {{ else if eq .type "DEL" }}
-                                <strong class="govuk-tag govuk-tag--red">Deleted</strong>
+                <div class="govuk-summary-card govuk-!-margin-bottom-0">
+                    <div class="govuk-summary-card__title-wrapper govuk-!-padding-bottom-1 govuk-!-padding-top-1">
+                        <h1 class="govuk-summary-card__title">
+                            {{ if eq .source "lpa_store" }}
+                                LPA Store Event
+                            {{ else }}
+                                {{ if eq .type "INS" }}
+                                    Created:
+                                {{ else if eq .type "UPD" }}
+                                    Updated:
+                                {{ else if eq .type "DEL" }}
+                                    Deleted:
+                                {{ end }}
+                                {{ .sourceType }}
                             {{ end }}
-                            {{ .sourceType }}
-                        {{ end }}
-                    </h2>
-
-                    <p class="moj-timeline__byline">
-                        {{ if .user }}
-                            by {{ .user.displayName }}
-                        {{ else }}
-                            by Unknown User
-                        {{ end }}
-                    </p>
-                </div>
-
-                <p class="moj-timeline__date">
-                    {{ if .applied }}
-                        <time datetime="{{ .applied }}">{{ parseAndFormatDate .applied "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
-                    {{ else if .createdOn }}
-                        <time datetime="{{ .createdOn }}">{{ parseAndFormatDate .createdOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
-                    {{ else if .datetime }}
-                        <time datetime="{{ .datetime }}">{{ parseAndFormatDate .datetime "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
-                    {{ end }}
-                </p>
-
-                <div class="moj-timeline__description">
-                    {{ if eq .source "lpa_store" }}
-                        {{ if .changes }}
-                            <details class="govuk-details">
-                                <summary class="govuk-details__summary">
-                                    <span class="govuk-details__summary-text">Changes made</span>
-                                </summary>
-                                <div class="govuk-details__text">
-                                    <dl class="govuk-summary-list govuk-summary-list--no-border">
+                        </h1>
+                    </div>
+                    <div class="govuk-summary-card__content govuk-!-padding-top-1 govuk-!-padding-bottom-0">
+                        <dl class="govuk-summary-list">
+                            <div class="govuk-summary-list__row">
+                                <p class="govuk-body">
+                                    {{ if .applied }}
+                                        <time datetime="{{ .applied }}">{{ parseAndFormatDate .applied "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
+                                    {{ else if .createdOn }}
+                                        <time datetime="{{ .createdOn }}">{{ parseAndFormatDate .createdOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
+                                    {{ else if .datetime }}
+                                        <time datetime="{{ .datetime }}">{{ parseAndFormatDate .datetime "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
+                                    {{ end }}
+                                    - #{{ .hash }}
+                                </p>
+                                <p class="govuk-body">
+                                    {{ if eq .source "lpa_store" }}
+                                        <ul class="govuk-list govuk-list--bullet">
                                         {{ range .changes }}
-                                            <div class="govuk-summary-list__row">
-                                                <dt class="govuk-summary-list__key">
-                                                    {{ .key }}
-                                                </dt>
-                                                <dd class="govuk-summary-list__value">
-                                                    <strong>From:</strong> {{ if .old }}{{ .old }}{{ else }}<em>(empty)</em>{{ end }}<br>
-                                                    <strong>To:</strong> {{ if .new }}{{ .new }}{{ else }}<em>(empty)</em>{{ end }}
-                                                </dd>
-                                            </div>
+                                            <li>{{ .key }}
+                                                <ul class="govuk-list govuk-list--bullet">
+                                                    <li><strong>From:</strong> {{ if .old }}{{ .old }}{{ else }}<em>(empty)</em>{{ end }}</li>
+                                                    <li> <strong>To:</strong> {{ if .new }}{{ .new }}{{ else }}<em>(empty)</em>{{ end }}</li>
+                                                </ul>
+                                            </li>
                                         {{ end }}
-                                    </dl>
-                                </div>
-                            </details>
-                        {{ end }}
-                    {{ else }}
-                        <details class="govuk-details">
-                            <summary class="govuk-details__summary">
-                                <span class="govuk-details__summary-text">More details</span>
-                            </summary>
-                            <div class="govuk-details__text">
-                                <dl class="govuk-summary-list">
-                                    {{ range $k, $v := .entity }}
-                                        {{ if eq $k "_class" "id" "document" }}
-                                            {{ continue }}
-                                        {{ end }}
-
-                                        <div class="govuk-summary-list__row">
-                                            <dt class="govuk-summary-list__key">
-                                                {{ camelcaseToSentence $k }}
-                                            </dt>
-                                            <dd class="govuk-summary-list__value">
-                                                {{ if eq $k "assignee" }}
-                                                    {{ $v.displayName }}
-                                                {{ else if eq $k "uId" }}
-                                                    {{ printf "%.f" $v }}
-                                                {{ else }}
-                                                    {{ $v }}
+                                        </ul>
+                                    {{ else }}
+                                        <dl class="govuk-summary-list">
+                                            <ul class="govuk-list govuk-list--bullet">
+                                            {{ range $k, $v := .entity }}
+                                                {{ if eq $k "_class" "id" "document" }}
+                                                    {{ continue }}
                                                 {{ end }}
-                                            </dd>
-                                        </div>
-                                    {{ end }}
 
-                                    {{ if and (eq .sourceType "Note") (ne (len .entity.document) 0) }}
-                                        <div class="govuk-summary-list__row">
-                                            <dt class="govuk-summary-list__key">
-                                                Document
-                                            </dt>
-                                            <dd class="govuk-summary-list__value">
-                                                <a class="govuk-link" href="/lpa/document/{{ .entity.document.uuid }}">{{ .entity.document.friendlyDescription }}</a>
-                                                ({{ .entity.document.subType }})
-                                            </dd>
-                                        </div>
+                                                <li>
+                                                    {{ camelcaseToSentence $k }}:
+                                                    {{ if eq $k "assignee" }}
+                                                        {{ $v.displayName }}
+                                                    {{ else if eq $k "uId" }}
+                                                        {{ printf "%.f" $v }}
+                                                    {{ else }}
+                                                        {{ $v }}
+                                                    {{ end }}
+                                                </li>
+                                            {{ end }}
+                                            </ul>
+
+                                            {{ if and (eq .sourceType "Note") (ne (len .entity.document) 0) }}
+                                                <ul class="govuk-list govuk-list--bullet">
+                                                    <li>
+                                                        Document: <a class="govuk-link" href="/lpa/document/{{ .entity.document.uuid }}">{{ .entity.document.friendlyDescription }}</a>
+                                                        ({{ .entity.document.subType }})
+                                                    </li>
+                                                </ul>
+                                            {{ end }}
+                                        </dl>
                                     {{ end }}
-                                </dl>
+                                </p>
                             </div>
-                        </details>
-                    {{ end }}
+                            <div class="govuk-summary-list__row">
+                                <p class="govuk-hint govuk-!-margin-bottom-1 govuk-!-margin-top-1">
+                                    {{ if .user }}
+                                        Created by <a class="govuk-link" href="mailto:{{ .user.email}}">{{ .user.displayName }}</a>
+                                    {{ else }}
+                                        Created by Unknown User
+                                    {{ end }}
+                                </p>
+                            </div>
+                        </dl>
+                    </div>
                 </div>
             </div>
         {{ end }}
