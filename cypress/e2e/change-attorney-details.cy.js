@@ -75,19 +75,15 @@ describe("Change attorney details form", () => {
       },
     });
 
-    cy.addMock("/lpa-api/v1/cases/555", "GET", {
-      status: 200,
-      body: {
+    const mocks = Promise.allSettled([
+      cases.get(555, {
         id: 555,
         uId: "M-1111-1111-1110",
         caseType: "DIGITAL_LPA",
         donor: {
           id: 33,
         },
-      },
-    });
-
-    const mocks = Promise.allSettled([
+      }),
       cases.warnings.empty("555"),
       cases.tasks.empty("555"),
       digitalLpas.objections.empty("M-1111-1111-1110"),

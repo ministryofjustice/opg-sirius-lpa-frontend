@@ -68,19 +68,15 @@ describe("Manage restrictions form", () => {
       },
     });
 
-    cy.addMock("/lpa-api/v1/cases/666", "GET", {
-      status: 200,
-      body: {
+    const mocks = Promise.allSettled([
+      cases.get(666, {
         id: 666,
         uId: "M-6666-6666-6666",
         caseType: "DIGITAL_LPA",
         donor: {
           id: 6,
         },
-      },
-    });
-
-    const mocks = Promise.allSettled([
+      }),
       cases.warnings.empty("666"),
       cases.warnings.empty("888"),
       cases.tasks.empty("888"),
