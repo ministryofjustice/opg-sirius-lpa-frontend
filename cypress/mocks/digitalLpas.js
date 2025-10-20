@@ -172,17 +172,17 @@ function extendDefaultDigitalLpa(uid, body) {
   return updatedBody;
 }
 
-async function get(uid, body) {
+async function get(uid, body, priority = 1) {
   const updatedBody = extendDefaultDigitalLpa(uid, body);
 
   await addMock(`/lpa-api/v1/digital-lpas/${uid}`, "GET", {
     status: 200,
     body: updatedBody,
-  });
+  }, priority);
 }
 
 const progressIndicators = {
-  async feesInProgress(digitalLpaUid) {
+  async feesInProgress(digitalLpaUid, priority = 1) {
     await addMock(
       `/lpa-api/v1/digital-lpas/${digitalLpaUid}/progress-indicators`,
       "GET",
@@ -208,9 +208,10 @@ const progressIndicators = {
           ],
         },
       },
+      priority,
     );
   },
-  async defaultCannotStart(digitalLpaUid, progressIndicators) {
+  async defaultCannotStart(digitalLpaUid, progressIndicators, priority = 1) {
     const progressIndicatorTypes = [
       "FEES",
       "DONOR_ID",
@@ -252,12 +253,13 @@ const progressIndicators = {
           progressIndicators: allProgressIndicators,
         },
       },
+      priority,
     );
   },
 };
 
 const anomalies = {
-  async empty(digitalLpaUid) {
+  async empty(digitalLpaUid, priority = 1) {
     await addMock(
       `/lpa-api/v1/digital-lpas/${digitalLpaUid}/anomalies`,
       "GET",
@@ -267,12 +269,13 @@ const anomalies = {
           tasks: [],
         },
       },
+      priority,
     );
   },
 };
 
 const objections = {
-  async empty(digitalLpaUid) {
+  async empty(digitalLpaUid, priority = 1) {
     await addMock(
       `/lpa-api/v1/digital-lpas/${digitalLpaUid}/objections`,
       "GET",
@@ -280,6 +283,7 @@ const objections = {
         status: 200,
         body: [],
       },
+      priority,
     );
   },
 };
