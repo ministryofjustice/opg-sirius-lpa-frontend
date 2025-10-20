@@ -139,7 +139,18 @@
                     Attorney {{ $count }}
                 </h2>
 
-                {{ template "trust-corporation-summary" $trustCorporation}}
+                <dl class="govuk-summary-list">
+
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key"></dt>
+                        <dd class="govuk-summary-list__value"></dd>
+                        <dd class="govuk-summary-list__actions">
+                            <a class="govuk-link" id="f-change-trust-corporation-details" href="{{ prefix (printf "/lpa/%s/trust-corporation/%s/change-details" $caseUID $trustCorporation.Uid) }}">Update</a>
+                        </dd>
+                    </div>
+
+                    {{ template "trust-corporation-summary" $trustCorporation }}
+                </dl>
             {{ end }}
         {{ else }}
             <p class="govuk-body">The donor did not provide details for this section</p>
