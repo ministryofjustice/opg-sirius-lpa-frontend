@@ -131,8 +131,18 @@
                     {{ $count = plusN $count 1 }}
                     Replacement attorney {{ $count }}
                 </h2>
+                <dl class="govuk-summary-list">
 
-                {{ template "trust-corporation-summary" $trustCorporation}}
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key"></dt>
+                        <dd class="govuk-summary-list__value"></dd>
+                        <dd class="govuk-summary-list__actions">
+                            <a class="govuk-link" id="f-change-replacement-trust-corporation-details" href="{{ prefix (printf "/lpa/%s/trust-corporation/%s/change-details" $caseUID $trustCorporation.Uid) }}">Update</a>
+                        </dd>
+                    </div>
+
+                    {{ template "trust-corporation-summary" $trustCorporation}}
+                </dl>
             {{ end }}
 
         {{ else }}
