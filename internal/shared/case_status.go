@@ -61,7 +61,7 @@ var caseStatusMetadata = map[CaseStatus]caseStatusMeta{
 	CaseStatusTypeRevoked:                {"Revoked", "", "red"},
 	CaseStatusTypeImperfect:              {"Imperfect", "", "grey"},
 	CaseStatusTypeInvalid:                {"Invalid", "invalid", "grey"},
-	CaseStatusTypeWithCop:                {"With Cop", "", "grey"},
+	CaseStatusTypeWithCop:                {"With COP", "", "grey"},
 	CaseStatusTypeProcessing:             {"Processing", "processing", "grey"},
 }
 
