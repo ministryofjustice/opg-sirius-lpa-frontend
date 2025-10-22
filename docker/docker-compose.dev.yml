@@ -1,8 +1,14 @@
 services:
   lpa-frontend:
     ports: ["8888:8080"]
+    build:
+      target: dev
     volumes:
+      - "./.air.toml:/app/.air.toml"
+      - "./main.go:/app/main.go"
+      - "./internal:/app/internal"
       - "./web/static:/go/bin/web/static"
+      - "./web/template:/app/web/template"
     environment:
       SIRIUS_URL: http://docker.for.mac.localhost:8080
       SIRIUS_PUBLIC_URL: http://localhost:8080
