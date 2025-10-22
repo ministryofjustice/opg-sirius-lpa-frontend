@@ -12,6 +12,25 @@ RUN yarn install --frozen-lockfile --ignore-scripts
 COPY web/assets web/assets
 RUN yarn build
 
+FROM golang:1.25.2-alpine AS dev
+
+WORKDIR /app
+
+COPY go.mod .
+COPY go.sum .
+
+RUN go mod download
+
+RUN apk update \
+    && apk add --no-cache ca-certificates tzdata \
+    && apk upgrade --no-cache busybox libcrypto3 libssl3
+
+COPY --from=asset-env /app/web/static web/static
+
+RUN go install github.com/cosmtrek/air@v1.52.1 && go install github.com/go-delve/delve/cmd/dlv@latest
+
+ENTRYPOINT ["air"]
+
 FROM golang:1.25.2 AS build-env
 
 ARG TARGETARCH
