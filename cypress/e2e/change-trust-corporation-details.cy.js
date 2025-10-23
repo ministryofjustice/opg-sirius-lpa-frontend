@@ -135,4 +135,31 @@ describe("Change trust corporation details form", () => {
     cy.contains("Cancel").click();
     cy.url().should("contain", "/lpa/M-1111-1111-1110/lpa-details");
   });
+
+  it("can edit all attorney details and redirect to lpa details", () => {
+    cy.addMock(
+      "/lpa-api/v1/digital-lpas/M-1111-1111-1110/trust-corporation/active-trust-corp-1/change-details",
+      "PUT",
+      {
+        status: 204,
+      },
+    );
+
+    cy.get("#f-name").clear().type("Trust Ltd");
+
+    cy.get("#f-address\\.Line1").clear().type("12");
+    cy.get("#f-address\\.Line2").clear().type("Building");
+    cy.get("#f-address\\.Line3").clear().type("Road");
+    cy.get("#f-address\\.Town").clear().type("London");
+    cy.get("#f-address\\.Postcode").clear().type("E14 2SH");
+
+    cy.get("#f-phoneNumber").clear().type("07777777777");
+    cy.get("#f-email").clear().type("test@test.com");
+    cy.get("#f-companyNumber").clear().type("112233");
+
+    cy.get("button[type=submit]").click();
+    cy.get(".moj-alert").should("exist");
+
+    cy.url().should("contain", "/lpa/M-1111-1111-1110/lpa-details");
+  });
 });
