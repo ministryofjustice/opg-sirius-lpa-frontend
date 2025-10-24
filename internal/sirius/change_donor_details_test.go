@@ -3,11 +3,13 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"testing"
+	"time"
+
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
 )
 
 func TestChangeDonorDetails(t *testing.T) {
@@ -15,6 +17,9 @@ func TestChangeDonorDetails(t *testing.T) {
 
 	pact, err := newPact()
 	assert.NoError(t, err)
+
+	lpaSignedOn := "2000-11-12"
+	lpaSignedOnTime, _ := time.Parse(time.DateOnly, lpaSignedOn)
 
 	testCases := []struct {
 		name          string
@@ -28,7 +33,7 @@ func TestChangeDonorDetails(t *testing.T) {
 				FirstNames:        "Jake",
 				LastName:          "Sullivan",
 				OtherNamesKnownBy: "Jack",
-				DateOfBirth:       "2000-11-12",
+				DateOfBirth:       DateString(lpaSignedOn),
 				Address: Address{
 					Line1:    "Flat Number",
 					Line2:    "Building",
@@ -37,9 +42,21 @@ func TestChangeDonorDetails(t *testing.T) {
 					Postcode: "AI1 6VW",
 					Country:  "GB",
 				},
-				Phone:       "12345678",
-				Email:       "test@test.com",
-				LpaSignedOn: "2024-10-01",
+				Phone:                            "12345678",
+				Email:                            "test@test.com",
+				LpaSignedOn:                      "2024-10-01",
+				AuthorisedSignatory:              "Moriah Leslie",
+				WitnessedByCertificateProviderAt: lpaSignedOnTime,
+				WitnessedByIndependentWitnessAt:  &lpaSignedOnTime,
+				IndependentWitnessName:           "Lowell Green",
+				IndependentWitnessAddress: Address{
+					Line1:    "3 Jannie Field",
+					Line2:    "Stroman",
+					Line3:    "Crist Green",
+					Town:     "West Midlands",
+					Postcode: "AY7 6QN",
+					Country:  "GB",
+				},
 			},
 			setup: func() {
 				pact.
@@ -65,9 +82,21 @@ func TestChangeDonorDetails(t *testing.T) {
 								"postcode":     "AI1 6VW",
 								"country":      "GB",
 							},
-							"phoneNumber": "12345678",
-							"email":       "test@test.com",
-							"lpaSignedOn": "01/10/2024",
+							"phoneNumber":                      "12345678",
+							"email":                            "test@test.com",
+							"lpaSignedOn":                      "01/10/2024",
+							"authorisedSignatory":              "Moriah Leslie",
+							"witnessedByCertificateProviderAt": lpaSignedOnTime.Format(time.RFC3339),
+							"witnessedByIndependentWitnessAt":  lpaSignedOnTime.Format(time.RFC3339),
+							"independentWitnessName":           "Lowell Green",
+							"independentWitnessAddress": map[string]string{
+								"addressLine1": "3 Jannie Field",
+								"addressLine2": "Stroman",
+								"addressLine3": "Crist Green",
+								"town":         "West Midlands",
+								"postcode":     "AY7 6QN",
+								"country":      "GB",
+							},
 						},
 					}).
 					WithCompleteResponse(consumer.Response{
