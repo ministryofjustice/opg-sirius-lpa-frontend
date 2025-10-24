@@ -9,6 +9,14 @@ describe("Case actions drop down", () => {
       digitalLpas.get("M-1111-1111-1111"),
       digitalLpas.objections.empty("M-1111-1111-1111"),
       digitalLpas.progressIndicators.feesInProgress("M-1111-1111-1111"),
+      cases.get(1111, {
+        id: 1111,
+        uId: "M-1111-1111-1111",
+        caseType: "DIGITAL_LPA",
+        donor: {
+          id: 1111,
+        },
+      }),
     ]);
 
     cy.wrap(mocks);
@@ -25,18 +33,6 @@ describe("Case actions drop down", () => {
             caseType: "DIGITAL_LPA",
           },
         ],
-      },
-    });
-
-    cy.addMock("/lpa-api/v1/cases/1111", "GET", {
-      status: 200,
-      body: {
-        id: 1111,
-        uId: "M-1111-1111-1111",
-        caseType: "DIGITAL_LPA",
-        donor: {
-          id: 1111,
-        },
       },
     });
 

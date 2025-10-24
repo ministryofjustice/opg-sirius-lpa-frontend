@@ -1,11 +1,11 @@
 import * as cases from "../mocks/cases";
 import * as digitalLpas from "../mocks/digitalLpas";
+import * as refData from "../mocks/refData";
 
 describe("Change donor details form", () => {
   beforeEach(() => {
-    cy.addMock("/lpa-api/v1/digital-lpas/M-0000-0000-0001", "GET", {
-      status: 200,
-      body: {
+    const mocks = Promise.allSettled([
+      digitalLpas.get("M-0000-0000-0001", {
         uId: "M-0000-0000-0001",
         "opg.poas.sirius": {
           id: 666,
@@ -76,13 +76,25 @@ describe("Change donor details form", () => {
           channel: "online",
           registrationDate: "2024-11-11",
           peopleToNotify: [],
+          authorisedSignatory: {
+            firstNames: "Sam",
+            lastName: "King",
+          },
+          independentWitness: {
+            firstNames: "Turner",
+            lastName: "Feil",
+            address: {
+              line1: "139 Stoney Lane",
+              town: "McCullough",
+              postcode: "XR41 4UW",
+              country: "GB",
+            },
+          },
+          witnessedByIndependentWitnessAt: "2025-10-15T10:30:00Z",
+          witnessedByCertificateProviderAt: "2025-10-15T11:46:24Z",
         },
-      },
-    });
-
-    cy.addMock("/lpa-api/v1/cases/666", "GET", {
-      status: 200,
-      body: {
+      }),
+      cases.get(666, {
         id: 666,
         uId: "M-0000-0000-0001",
         caseType: "DIGITAL_LPA",
@@ -90,10 +102,7 @@ describe("Change donor details form", () => {
           id: 666,
         },
         status: "Draft",
-      },
-    });
-
-    const mocks = Promise.allSettled([
+      }),
       cases.warnings.empty("666"),
       cases.tasks.empty("666"),
       digitalLpas.objections.empty("M-0000-0000-0001"),
@@ -112,6 +121,11 @@ describe("Change donor details form", () => {
           indicator: "DONOR_ID",
           status: "COMPLETE",
         },
+      ]),
+
+      refData.countries.get([
+        { handle: "GB", label: "Great Britain" },
+        { handle: "US", label: "United States" },
       ]),
     ]);
 
@@ -150,6 +164,26 @@ describe("Change donor details form", () => {
     cy.get("#f-lpaSignedOn-day").should("have.value", "18");
     cy.get("#f-lpaSignedOn-month").should("have.value", "10");
     cy.get("#f-lpaSignedOn-year").should("have.value", "2024");
+
+    cy.get("#f-authorisedSignatory").should("have.value", "Sam King");
+    cy.get("#f-signedByWitnessOne").should("be.checked");
+    cy.get("#f-signedByWitnessTwo").should("be.checked");
+    cy.get("#f-independentWitnessName").should("have.value", "Turner Feil");
+    cy.get("#f-independentWitnessAddress\\.Line1").should(
+      "have.value",
+      "139 Stoney Lane",
+    );
+    cy.get("#f-independentWitnessAddress\\.Line2").should("have.value", "");
+    cy.get("#f-independentWitnessAddress\\.Line3").should("have.value", "");
+    cy.get("#f-independentWitnessAddress\\.Town").should(
+      "have.value",
+      "McCullough",
+    );
+    cy.get("#f-independentWitnessAddress\\.Postcode").should(
+      "have.value",
+      "XR41 4UW",
+    );
+    cy.get("#f-independentWitnessAddress\\.Country").should("have.value", "GB");
   });
 
   it("can go Back to LPA details", () => {
@@ -212,6 +246,33 @@ describe("Change donor details form", () => {
     cy.get("#f-lpaSignedOn-day").type("11");
     cy.get("#f-lpaSignedOn-month").type("11");
     cy.get("#f-lpaSignedOn-year").type("2023");
+
+    cy.get("#f-authorisedSignatory").clear();
+    cy.get("#f-authorisedSignatory").type("Antonetta Ernser");
+
+    cy.get("#f-signedByWitnessOne-2").check();
+    cy.get("#f-signedByWitnessTwo-2").check();
+
+    cy.get("#f-independentWitnessName").clear();
+    cy.get("#f-independentWitnessName").type("Theresa North");
+
+    cy.get("#f-independentWitnessAddress\\.Line1").clear();
+    cy.get("#f-independentWitnessAddress\\.Line1").type("79 Kara Side");
+
+    cy.get("#f-independentWitnessAddress\\.Line2").clear();
+    cy.get("#f-independentWitnessAddress\\.Line2").type("Heidenreich");
+
+    cy.get("#f-independentWitnessAddress\\.Line3").clear();
+    cy.get("#f-independentWitnessAddress\\.Line3").type("Kilback");
+
+    cy.get("#f-independentWitnessAddress\\.Town").clear();
+    cy.get("#f-independentWitnessAddress\\.Town").type("Berkshire");
+
+    cy.get("#f-independentWitnessAddress\\.Postcode").clear();
+    cy.get("#f-independentWitnessAddress\\.Postcode").type("AX94 6YD");
+
+    // This test fails to select by United States
+    // cy.get("#f-independentWitnessAddress\\.Country").select("United States");
 
     cy.get("button[type=submit]").click();
     cy.get(".moj-alert").should("exist");
