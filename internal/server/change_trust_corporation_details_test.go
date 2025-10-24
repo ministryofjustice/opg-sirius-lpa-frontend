@@ -33,9 +33,11 @@ func (m *mockChangeTrustCorporationDetailsClient) ChangeTrustCorporationDetails(
 	return m.Called(ctx, caseUID, trustCorpUID, trustCorpDetailsData).Error(0)
 }
 
+const caseUID = "M-TCTC-TCTC-TCTC"
+
 var testChangeTrustCorpDetailsCaseSummary = sirius.CaseSummary{
 	DigitalLpa: sirius.DigitalLpa{
-		UID: "M-TCTC-TCTC-TCTC",
+		UID: caseUID,
 		LpaStoreData: sirius.LpaStoreData{
 			TrustCorporations: []sirius.LpaStoreTrustCorporation{
 				{
@@ -109,7 +111,6 @@ var testChangeTrustCorpDetailsCaseSummary = sirius.CaseSummary{
 func TestGetChangeTrustCorpDetails(t *testing.T) {
 	tests := []struct {
 		name            string
-		caseUID         string
 		trustCorpUID    string
 		status          string
 		appointmentType string
@@ -118,7 +119,6 @@ func TestGetChangeTrustCorpDetails(t *testing.T) {
 	}{
 		{
 			name:            "Change Active Original Trust Corporation Details",
-			caseUID:         "M-TCTC-TCTC-TCTC",
 			trustCorpUID:    "302b05c7-896c-4290-904e-2005e4f1e81e",
 			status:          shared.ActiveAttorneyStatus.String(),
 			appointmentType: shared.OriginalAppointmentType.String(),
@@ -138,7 +138,6 @@ func TestGetChangeTrustCorpDetails(t *testing.T) {
 		},
 		{
 			name:            "Change Inactive Replacement Trust Corporation Details",
-			caseUID:         "M-TCTC-TCTC-TCTC",
 			trustCorpUID:    "123a01b1-456d-5391-813d-2010d3e2d72d",
 			status:          shared.InactiveAttorneyStatus.String(),
 			appointmentType: shared.ReplacementAppointmentType.String(),
@@ -158,7 +157,6 @@ func TestGetChangeTrustCorpDetails(t *testing.T) {
 		},
 		{
 			name:            "Template Error Returned",
-			caseUID:         "M-TCTC-TCTC-TCTC",
 			trustCorpUID:    "302b05c7-896c-4290-904e-2005e4f1e81e",
 			status:          shared.ActiveAttorneyStatus.String(),
 			appointmentType: shared.OriginalAppointmentType.String(),
@@ -182,7 +180,7 @@ func TestGetChangeTrustCorpDetails(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := &mockChangeTrustCorporationDetailsClient{}
 			client.
-				On("CaseSummary", mock.Anything, tc.caseUID).
+				On("CaseSummary", mock.Anything, caseUID).
 				Return(testChangeTrustCorpDetailsCaseSummary, nil)
 			client.
 				On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
@@ -193,7 +191,7 @@ func TestGetChangeTrustCorpDetails(t *testing.T) {
 				On("Func", mock.Anything,
 					changeTrustCorporationDetailsData{
 						Countries:       []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
-						CaseUID:         tc.caseUID,
+						CaseUID:         caseUID,
 						Status:          tc.status,
 						AppointmentType: tc.appointmentType,
 						Form:            tc.form,
@@ -202,7 +200,7 @@ func TestGetChangeTrustCorpDetails(t *testing.T) {
 
 			server := newMockServer("/lpa/{uid}/trust-corporation/{trustCorporationUID}/change-details", ChangeTrustCorporationDetails(client, template.Func))
 
-			r, _ := http.NewRequest(http.MethodGet, "/lpa/"+tc.caseUID+"/trust-corporation/"+tc.trustCorpUID+"/change-details", nil)
+			r, _ := http.NewRequest(http.MethodGet, "/lpa/"+caseUID+"/trust-corporation/"+tc.trustCorpUID+"/change-details", nil)
 			_, err := server.serve(r)
 
 			if tc.errorReturned != nil {
@@ -220,22 +218,22 @@ func TestGetChangeTrustCorpDetailsWhenCaseSummaryErrors(t *testing.T) {
 
 	client := &mockChangeTrustCorporationDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-TCTC-TCTC-TCTC").
+		On("CaseSummary", mock.Anything, caseUID).
 		Return(sirius.CaseSummary{}, errExample)
 
-	assertChangeTrustCorporationDetailsErrors(t, client, "M-TCTC-TCTC-TCTC", errExample)
+	assertChangeTrustCorporationDetailsErrors(t, client, caseUID, errExample)
 }
 
 func TestGetChangeTrustCorporationDetailsWhenRefDataByCategoryErrors(t *testing.T) {
 	client := &mockChangeTrustCorporationDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-TCTC-TCTC-TCTC").
+		On("CaseSummary", mock.Anything, caseUID).
 		Return(testChangeTrustCorpDetailsCaseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 		Return([]sirius.RefDataItem{}, errExample)
 
-	assertChangeTrustCorporationDetailsErrors(t, client, "M-TCTC-TCTC-TCTC", errExample)
+	assertChangeTrustCorporationDetailsErrors(t, client, caseUID, errExample)
 }
 
 func assertChangeTrustCorporationDetailsErrors(t *testing.T, client *mockChangeTrustCorporationDetailsClient, uid string, expectedError error) {
@@ -269,13 +267,13 @@ func TestPostChangeTrustCorporationDetails(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := &mockChangeTrustCorporationDetailsClient{}
 			client.
-				On("CaseSummary", mock.Anything, "M-TCTC-TCTC-TCTC").
+				On("CaseSummary", mock.Anything, caseUID).
 				Return(testChangeTrustCorpDetailsCaseSummary, nil)
 			client.
 				On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 				Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 			client.
-				On("ChangeTrustCorporationDetails", mock.Anything, "M-TCTC-TCTC-TCTC", "302b05c7-896c-4290-904e-2005e4f1e81e", sirius.ChangeTrustCorporationDetails{
+				On("ChangeTrustCorporationDetails", mock.Anything, caseUID, "302b05c7-896c-4290-904e-2005e4f1e81e", sirius.ChangeTrustCorporationDetails{
 					Name: "Trust Ltd.",
 					Address: sirius.Address{
 						Line1:    "9 Mount",
@@ -321,13 +319,13 @@ func TestPostChangeTrustCorporationDetails(t *testing.T) {
 func TestPostChangeTrustCorporationDetailsWhenValidationError(t *testing.T) {
 	client := &mockChangeTrustCorporationDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-TCTC-TCTC-TCTC").
+		On("CaseSummary", mock.Anything, caseUID).
 		Return(testChangeTrustCorpDetailsCaseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 	client.
-		On("ChangeTrustCorporationDetails", mock.Anything, "M-TCTC-TCTC-TCTC", "302b05c7-896c-4290-904e-2005e4f1e81e", sirius.ChangeTrustCorporationDetails{
+		On("ChangeTrustCorporationDetails", mock.Anything, caseUID, "302b05c7-896c-4290-904e-2005e4f1e81e", sirius.ChangeTrustCorporationDetails{
 			Address: sirius.Address{
 				Line1:    "9 Mount Pleasant Drive",
 				Town:     "East Harling",
