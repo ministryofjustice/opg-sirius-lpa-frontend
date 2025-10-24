@@ -99,48 +99,6 @@ func TestGetHistorySuccessForDigitalLpa(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestGetHistorySuccessForTraditionalLpa(t *testing.T) {
-	caseSummary := sirius.CaseSummary{
-		DigitalLpa: sirius.DigitalLpa{
-			UID: "M-9876-9876-9999",
-			SiriusData: sirius.SiriusData{
-				ID:      12,
-				Subtype: "hw",
-				Donor: sirius.Donor{
-					ID: 8,
-				},
-			},
-			LpaStoreData: sirius.LpaStoreData{
-				Status: shared.ParseCaseStatusType(""), // Empty status indicates traditional LPA
-			},
-		},
-	}
-
-	client := &mockGetHistoryClient{}
-	client.
-		On("CaseSummary", mock.Anything, "M-9876-9876-9999").
-		Return(caseSummary, nil)
-	client.
-		On("GetEvents", mock.Anything, 8, 12).
-		Return(map[string]string{"event": "sirius only event details"}, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, getHistory{
-			CaseSummary: caseSummary,
-			EventData:   map[string]string{"event": "sirius only event details"},
-		}).
-		Return(nil)
-
-	server := newMockServer("/lpa/{uid}/history", GetHistory(client, template.Func))
-
-	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9999/history", nil)
-	_, err := server.serve(req)
-
-	assert.Nil(t, err)
-	mock.AssertExpectationsForObjects(t, client, template)
-}
-
 func TestGetHistoryWhenFailureOnGetCombinedEventsForDigitalLpa(t *testing.T) {
 	caseSummary := sirius.CaseSummary{
 		DigitalLpa: sirius.DigitalLpa{
@@ -165,40 +123,6 @@ func TestGetHistoryWhenFailureOnGetCombinedEventsForDigitalLpa(t *testing.T) {
 	client.
 		On("GetCombinedEvents", mock.Anything, "M-9876-9876-9999").
 		Return(sirius.APIEvent{}, errExample)
-
-	server := newMockServer("/lpa/{uid}/history", GetHistory(client, nil))
-
-	req, _ := http.NewRequest(http.MethodGet, "/lpa/M-9876-9876-9999/history", nil)
-	_, err := server.serve(req)
-
-	assert.Equal(t, errExample, err)
-	mock.AssertExpectationsForObjects(t, client)
-}
-
-func TestGetHistoryWhenFailureOnGetEventsForTraditionalLpa(t *testing.T) {
-	caseSummary := sirius.CaseSummary{
-		DigitalLpa: sirius.DigitalLpa{
-			UID: "M-9876-9876-9999",
-			SiriusData: sirius.SiriusData{
-				ID:      12,
-				Subtype: "hw",
-				Donor: sirius.Donor{
-					ID: 8,
-				},
-			},
-			LpaStoreData: sirius.LpaStoreData{
-				Status: shared.ParseCaseStatusType(""),
-			},
-		},
-	}
-
-	client := &mockGetHistoryClient{}
-	client.
-		On("CaseSummary", mock.Anything, "M-9876-9876-9999").
-		Return(caseSummary, nil)
-	client.
-		On("GetEvents", mock.Anything, 8, 12).
-		Return(nil, errExample)
 
 	server := newMockServer("/lpa/{uid}/history", GetHistory(client, nil))
 

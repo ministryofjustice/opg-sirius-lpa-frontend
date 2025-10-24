@@ -14,7 +14,6 @@ import (
 )
 
 type GetHistoryClient interface {
-	GetEvents(ctx sirius.Context, donorId int, caseId int) (any, error)
 	GetCombinedEvents(ctx sirius.Context, uid string) (sirius.APIEvent, error)
 	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
 }
@@ -34,25 +33,14 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		var eventDetails sirius.APIEvent
-		var traditionalEventDetails any
-
-		if caseSummary.DigitalLpa.LpaStoreData.Status.ReadableString() != "" {
-			// Digital LPA - use combined events
-			eventDetails, err = client.GetCombinedEvents(ctx, uid)
-			for i := range eventDetails {
-				formattedUUID, err := LPAEventIDFromUUID(eventDetails[i].UUID)
-				if err != nil {
-					log.Println("Error generating formattedUUID:", err)
-					continue
-				}
-				eventDetails[i].FormattedUUID = formattedUUID
+		eventDetails, err := client.GetCombinedEvents(ctx, uid)
+		for i := range eventDetails {
+			formattedUUID, err := LPAEventIDFromUUID(eventDetails[i].UUID)
+			if err != nil {
+				log.Println("Error generating formattedUUID:", err)
+				continue
 			}
-		} else {
-			// Traditional LPA - use Sirius events only
-			donorId := caseSummary.DigitalLpa.SiriusData.Donor.ID
-			caseId := caseSummary.DigitalLpa.SiriusData.ID
-			traditionalEventDetails, err = client.GetEvents(ctx, donorId, caseId)
+			eventDetails[i].FormattedUUID = formattedUUID
 		}
 
 		if err != nil {
@@ -61,11 +49,7 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 
 		data := getHistory{
 			CaseSummary: caseSummary,
-		}
-		if eventDetails != nil {
-			data.EventData = eventDetails
-		} else if traditionalEventDetails != nil {
-			data.EventData = traditionalEventDetails
+			EventData:   eventDetails,
 		}
 
 		return tmpl(w, data)

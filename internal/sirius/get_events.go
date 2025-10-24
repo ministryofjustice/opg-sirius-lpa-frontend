@@ -10,6 +10,7 @@ type Event struct {
 	ChangeSet     []interface{} `json:"changeSet"`
 	CreatedOn     string        `json:"createdOn"`
 	Entity        any           `json:"entity"`
+	Hash          string        `json:"hash"`
 	ID            int           `json:"id"`
 	Source        string        `json:"source"`
 	SourceType    string        `json:"sourceType"`
@@ -23,16 +24,6 @@ type Event struct {
 
 type EventUser struct {
 	DisplayName string `json:"displayName"`
-}
-
-func (c *Client) GetEvents(ctx Context, donorId int, caseId int) (any, error) {
-	var v struct {
-		Events any `json:"events"`
-	}
-
-	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%d/events?filter=case:%d&sort=id:desc", donorId, caseId), &v)
-
-	return v.Events, err
 }
 
 // GetCombinedEvents Gets combined events from both Sirius and LPA Store for digital LPAs
