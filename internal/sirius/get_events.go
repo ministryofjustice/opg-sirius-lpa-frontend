@@ -24,6 +24,7 @@ type Event struct {
 
 type EventUser struct {
 	DisplayName string `json:"displayName"`
+	Email       string `json:"email"`
 }
 
 // GetCombinedEvents Gets combined events from both Sirius and LPA Store for digital LPAs
