@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
@@ -76,6 +77,8 @@ var testCaseSummary = sirius.CaseSummary{
 	},
 }
 
+var testSignedAtTime, _ = time.Parse(time.RFC3339, testCaseSummary.DigitalLpa.LpaStoreData.SignedAt)
+
 func TestGetChangeDonorDetails(t *testing.T) {
 	client := &mockChangeDonorDetailsClient{}
 	client.
@@ -108,11 +111,17 @@ func TestGetChangeDonorDetails(t *testing.T) {
 						Postcode: "NR16 2GB",
 						Country:  "UK",
 					},
-					PhoneNumber: "1234567890",
-					LpaSignedOn: dob{11, 2, 2024},
+					PhoneNumber:               "1234567890",
+					LpaSignedOn:               dob{11, 2, 2024},
+					AuthorisedSignatory:       "",
+					SignedByWitnessOne:        "No",
+					SignedByWitnessTwo:        "No",
+					IndependentWitnessName:    "",
+					IndependentWitnessAddress: sirius.Address{},
 				},
 				DonorIdentityCheckComplete: false,
 				DonorDobString:             "1965-04-18",
+				SignedByWitnessTwoLabel:    "Signed by witness 2",
 			}).
 		Return(nil)
 
@@ -208,11 +217,17 @@ func TestGetChangeDonorDetailsWithDonorIdentityCheck(t *testing.T) {
 						Postcode: "NR16 2GB",
 						Country:  "UK",
 					},
-					PhoneNumber: "1234567890",
-					LpaSignedOn: dob{11, 2, 2024},
+					PhoneNumber:               "1234567890",
+					LpaSignedOn:               dob{11, 2, 2024},
+					AuthorisedSignatory:       "",
+					SignedByWitnessOne:        "No",
+					SignedByWitnessTwo:        "No",
+					IndependentWitnessName:    "",
+					IndependentWitnessAddress: sirius.Address{},
 				},
 				DonorIdentityCheckComplete: true,
 				DonorDobString:             "1965-04-18",
+				SignedByWitnessTwoLabel:    "Signed by witness 2",
 			}).
 		Return(nil)
 
@@ -259,11 +274,17 @@ func TestGetChangeDonorDetailsWhenTemplateErrors(t *testing.T) {
 						Postcode: "NR16 2GB",
 						Country:  "UK",
 					},
-					PhoneNumber: "1234567890",
-					LpaSignedOn: dob{11, 2, 2024},
+					PhoneNumber:               "1234567890",
+					LpaSignedOn:               dob{11, 2, 2024},
+					AuthorisedSignatory:       "",
+					SignedByWitnessOne:        "No",
+					SignedByWitnessTwo:        "No",
+					IndependentWitnessName:    "",
+					IndependentWitnessAddress: sirius.Address{},
 				},
 				DonorIdentityCheckComplete: false,
 				DonorDobString:             "1965-04-18",
+				SignedByWitnessTwoLabel:    "Signed by witness 2",
 			}).
 		Return(errExample)
 
@@ -304,32 +325,54 @@ func TestPostChangeDonorDetails(t *testing.T) {
 				Postcode: "NR16 2GB",
 				Country:  "GB",
 			},
-			Phone:       "",
-			Email:       "test@test.com",
-			LpaSignedOn: "2024-10-09",
+			Phone:                            "",
+			Email:                            "test@test.com",
+			LpaSignedOn:                      "2024-10-09",
+			AuthorisedSignatory:              "Lucy Mueller",
+			WitnessedByCertificateProviderAt: testSignedAtTime,
+			WitnessedByIndependentWitnessAt:  &testSignedAtTime,
+			IndependentWitnessName:           "Ora Reagan",
+			IndependentWitnessAddress: sirius.Address{
+				Line1:    "6 Poplar Close",
+				Line2:    "Swift",
+				Line3:    "Schneider",
+				Town:     "Durham",
+				Postcode: "CC9 1GF",
+				Country:  "GB",
+			},
 		}).
 		Return(nil)
 
 	template := &mockTemplate{}
 
 	form := url.Values{
-		"firstNames":        {"Samuel"},
-		"lastName":          {"Smith"},
-		"otherNamesKnownBy": {"Sam"},
-		"dob.day":           {"1"},
-		"dob.month":         {"1"},
-		"dob.year":          {"1991"},
-		"address.Line1":     {"9 Mount"},
-		"address.Line2":     {"Pleasant Drive"},
-		"address.Line3":     {"Norwich"},
-		"address.Town":      {"East Harling"},
-		"address.Postcode":  {"NR16 2GB"},
-		"address.Country":   {"GB"},
-		"phoneNumber":       {""},
-		"email":             {"test@test.com"},
-		"lpaSignedOn.day":   {"9"},
-		"lpaSignedOn.month": {"10"},
-		"lpaSignedOn.year":  {"2024"},
+		"firstNames":                         {"Samuel"},
+		"lastName":                           {"Smith"},
+		"otherNamesKnownBy":                  {"Sam"},
+		"dob.day":                            {"1"},
+		"dob.month":                          {"1"},
+		"dob.year":                           {"1991"},
+		"address.Line1":                      {"9 Mount"},
+		"address.Line2":                      {"Pleasant Drive"},
+		"address.Line3":                      {"Norwich"},
+		"address.Town":                       {"East Harling"},
+		"address.Postcode":                   {"NR16 2GB"},
+		"address.Country":                    {"GB"},
+		"phoneNumber":                        {""},
+		"email":                              {"test@test.com"},
+		"lpaSignedOn.day":                    {"9"},
+		"lpaSignedOn.month":                  {"10"},
+		"lpaSignedOn.year":                   {"2024"},
+		"authorisedSignatory":                {"Lucy Mueller"},
+		"signedByWitnessOne":                 {"Yes"},
+		"signedByWitnessTwo":                 {"Yes"},
+		"independentWitnessAddress.Line1":    {"6 Poplar Close"},
+		"independentWitnessAddress.Line2":    {"Swift"},
+		"independentWitnessAddress.Line3":    {"Schneider"},
+		"independentWitnessAddress.Town":     {"Durham"},
+		"independentWitnessAddress.Postcode": {"CC9 1GF"},
+		"independentWitnessAddress.Country":  {"GB"},
+		"independentWitnessName":             {"Ora Reagan"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/change-donor-details/?uid=M-AAAA-1111-BBBB", strings.NewReader(form.Encode()))
@@ -372,32 +415,54 @@ func TestPostChangeDonorDetailsWhenAPIFails(t *testing.T) {
 				Postcode: "NR16 2GB",
 				Country:  "GB",
 			},
-			Phone:       "",
-			Email:       "test@test.com",
-			LpaSignedOn: "2024-10-09",
+			Phone:                            "",
+			Email:                            "test@test.com",
+			LpaSignedOn:                      "2024-10-09",
+			AuthorisedSignatory:              "Lucy Mueller",
+			WitnessedByCertificateProviderAt: testSignedAtTime,
+			WitnessedByIndependentWitnessAt:  &testSignedAtTime,
+			IndependentWitnessName:           "Ora Reagan",
+			IndependentWitnessAddress: sirius.Address{
+				Line1:    "6 Poplar Close",
+				Line2:    "Swift",
+				Line3:    "Schneider",
+				Town:     "Durham",
+				Postcode: "CC9 1GF",
+				Country:  "GB",
+			},
 		}).
 		Return(errExample)
 
 	template := &mockTemplate{}
 
 	form := url.Values{
-		"firstNames":        {"Samuel"},
-		"lastName":          {"Smith"},
-		"otherNamesKnownBy": {"Sam"},
-		"dob.day":           {"1"},
-		"dob.month":         {"1"},
-		"dob.year":          {"1991"},
-		"address.Line1":     {"9 Mount"},
-		"address.Line2":     {"Pleasant Drive"},
-		"address.Line3":     {"Norwich"},
-		"address.Town":      {"East Harling"},
-		"address.Postcode":  {"NR16 2GB"},
-		"address.Country":   {"GB"},
-		"phoneNumber":       {""},
-		"email":             {"test@test.com"},
-		"lpaSignedOn.day":   {"9"},
-		"lpaSignedOn.month": {"10"},
-		"lpaSignedOn.year":  {"2024"},
+		"firstNames":                         {"Samuel"},
+		"lastName":                           {"Smith"},
+		"otherNamesKnownBy":                  {"Sam"},
+		"dob.day":                            {"1"},
+		"dob.month":                          {"1"},
+		"dob.year":                           {"1991"},
+		"address.Line1":                      {"9 Mount"},
+		"address.Line2":                      {"Pleasant Drive"},
+		"address.Line3":                      {"Norwich"},
+		"address.Town":                       {"East Harling"},
+		"address.Postcode":                   {"NR16 2GB"},
+		"address.Country":                    {"GB"},
+		"phoneNumber":                        {""},
+		"email":                              {"test@test.com"},
+		"lpaSignedOn.day":                    {"9"},
+		"lpaSignedOn.month":                  {"10"},
+		"lpaSignedOn.year":                   {"2024"},
+		"authorisedSignatory":                {"Lucy Mueller"},
+		"signedByWitnessOne":                 {"Yes"},
+		"signedByWitnessTwo":                 {"Yes"},
+		"independentWitnessAddress.Line1":    {"6 Poplar Close"},
+		"independentWitnessAddress.Line2":    {"Swift"},
+		"independentWitnessAddress.Line3":    {"Schneider"},
+		"independentWitnessAddress.Town":     {"Durham"},
+		"independentWitnessAddress.Postcode": {"CC9 1GF"},
+		"independentWitnessAddress.Country":  {"GB"},
+		"independentWitnessName":             {"Ora Reagan"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/change-donor-details/?uid=M-AAAA-1111-BBBB", strings.NewReader(form.Encode()))

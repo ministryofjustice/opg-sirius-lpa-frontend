@@ -53,24 +53,20 @@ describe("Change trust corporation details form", () => {
           peopleToNotify: [],
         },
       }),
-      cases.warnings.empty("555"),
-      cases.tasks.empty("555"),
-      digitalLpas.objections.empty("M-1111-1111-1110"),
-    ]);
-
-    cy.wrap(mocks);
-
-    cy.addMock("/lpa-api/v1/cases/555", "GET", {
-      status: 200,
-      body: {
+      cases.get(555, {
         id: 555,
         uId: "M-1111-1111-1110",
         caseType: "DIGITAL_LPA",
         donor: {
           id: 33,
         },
-      },
-    });
+      }),
+      cases.warnings.empty("555"),
+      cases.tasks.empty("555"),
+      digitalLpas.objections.empty("M-1111-1111-1110"),
+    ]);
+
+    cy.wrap(mocks);
 
     cy.visit(
       "/lpa/M-1111-1111-1110/trust-corporation/active-trust-corp-1/change-details",

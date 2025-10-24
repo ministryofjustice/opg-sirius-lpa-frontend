@@ -3,9 +3,8 @@ import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("View digital LPA details", () => {
   beforeEach(() => {
-    cy.addMock("/lpa-api/v1/cases/333", "GET", {
-      status: 200,
-      body: {
+    const mocks = Promise.allSettled([
+      cases.get(333, {
         id: 333,
         uId: "M-DIGI-LPA3-3333",
         caseType: "DIGITAL_LPA",
@@ -14,10 +13,7 @@ describe("View digital LPA details", () => {
         },
         status: "Processing",
         expectedPaymentTotal: 8200,
-      },
-    });
-
-    const mocks = Promise.allSettled([
+      }),
       digitalLpas.get("M-DIGI-LPA3-3333", {
         "opg.poas.sirius": {
           id: 333,
