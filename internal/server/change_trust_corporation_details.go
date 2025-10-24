@@ -42,8 +42,31 @@ func ChangeTrustCorporationDetails(client ChangeTrustCorporationDetailsClient, t
 
 		ctx := getContext(r)
 
-		cs, err := client.CaseSummary(ctx, caseUID)
-		if err != nil {
+		var cs sirius.CaseSummary
+		var Countries []sirius.RefDataItem
+		var err error
+
+		group, groupCtx := errgroup.WithContext(ctx.Context)
+
+		group.Go(func() error {
+			cs, err = client.CaseSummary(ctx.With(groupCtx), caseUID)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		group.Go(func() error {
+			var err error
+			Countries, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.CountryCategory)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
 			return err
 		}
 
@@ -58,6 +81,7 @@ func ChangeTrustCorporationDetails(client ChangeTrustCorporationDetailsClient, t
 
 		data := changeTrustCorporationDetailsData{
 			XSRFToken:       ctx.XSRFToken,
+			Countries:       Countries,
 			CaseUID:         caseUID,
 			Status:          trustCorporation.Status,
 			AppointmentType: trustCorporation.AppointmentType,
@@ -75,22 +99,6 @@ func ChangeTrustCorporationDetails(client ChangeTrustCorporationDetailsClient, t
 				PhoneNumber:   trustCorporation.Mobile,
 				CompanyNumber: trustCorporation.CompanyNumber,
 			},
-		}
-
-		group, groupCtx := errgroup.WithContext(ctx.Context)
-
-		group.Go(func() error {
-			var err error
-			data.Countries, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.CountryCategory)
-			if err != nil {
-				return err
-			}
-
-			return nil
-		})
-
-		if err := group.Wait(); err != nil {
-			return err
 		}
 
 		if r.Method == http.MethodPost {
