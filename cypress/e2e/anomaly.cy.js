@@ -41,126 +41,123 @@ describe("View and edit anomalies for a digital LPA", () => {
 
     cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-QQQQ-1111/anomalies", "GET", {
       status: 200,
-      body: {
-        uid: "M-DIGI-QQQQ-1111",
-        anomalies: [
-          {
-            id: 123,
-            status: "detected",
-            fieldName: "firstNames",
-            ruleType: "empty",
-            fieldOwnerUid: "attorney-1-uid",
-          },
-          {
-            id: 124,
-            status: "detected",
-            fieldName: "lastName",
-            ruleType: "empty",
-            fieldOwnerUid: "attorney-1-uid",
-          },
-          {
-            id: 125,
-            status: "detected",
-            fieldName: "firstNames",
-            ruleType: "empty",
-            fieldOwnerUid: "replacement-attorney-1-uid",
-          },
-          {
-            id: 126,
-            status: "detected",
-            fieldName: "lastName",
-            ruleType: "empty",
-            fieldOwnerUid: "replacement-attorney-1-uid",
-          },
-          {
-            id: 127,
-            status: "detected",
-            fieldName: "howAttorneysMakeDecisions",
-            ruleType: "empty",
-            fieldOwnerUid: "",
-          },
-          {
-            id: 128,
-            status: "detected",
-            fieldName: "whenTheLpaCanBeUsed",
-            ruleType: "empty",
-            fieldOwnerUid: "",
-          },
-          {
-            id: 129,
-            status: "detected",
-            fieldName: "address",
-            ruleType: "Invalid address",
-            fieldOwnerUid: "certificate-provider",
-          },
-          {
-            id: 130,
-            status: "detected",
-            fieldName: "address",
-            ruleType: "Invalid address",
-            fieldOwnerUid: "attorney-1-uid",
-          },
-          {
-            id: 131,
-            status: "detected",
-            fieldName: "address",
-            ruleType: "Invalid address",
-            fieldOwnerUid: "replacement-attorney-1-uid",
-          },
-          {
-            id: 132,
-            status: "detected",
-            fieldName: "firstNames",
-            ruleType: "empty",
-            fieldOwnerUid: "certificate-provider",
-          },
-          {
-            id: 133,
-            status: "detected",
-            fieldName: "lastName",
-            ruleType: "empty",
-            fieldOwnerUid: "certificate-provider",
-          },
-          {
-            id: 138,
-            status: "detected",
-            fieldName: "address",
-            ruleType: "no-country",
-            fieldOwnerUid: "donor",
-          },
-          {
-            id: 139,
-            status: "detected",
-            fieldName: "signedAt",
-            ruleType:
-              "Donor: date of ID and date of signature more than 6-months apart",
-            fieldOwnerUid: "donor",
-          },
-          {
-            id: 140,
-            status: "detected",
-            fieldName: "signedAt",
-            ruleType:
-              "Certificate-provider: date of ID and date of signature more than 6-months apart",
-            fieldOwnerUid: "certificate-provider",
-          },
-          {
-            id: 141,
-            status: "detected",
-            fieldName: "signedAt",
-            ruleType:
-              "certificate-provider signature more than 2-years after donor",
-            fieldOwnerUid: "certificate-provider",
-          },
-          {
-            id: 142,
-            status: "detected",
-            fieldName: "signedAt",
-            ruleType: "attorney signature more than 2-years after donor",
-            fieldOwnerUid: "attorney-1-uid",
-          },
-        ],
-      },
+      body: [
+        {
+          id: 123,
+          status: "detected",
+          fieldName: "firstNames",
+          ruleType: "empty",
+          fieldOwnerUid: "attorney-1-uid",
+        },
+        {
+          id: 124,
+          status: "detected",
+          fieldName: "lastName",
+          ruleType: "empty",
+          fieldOwnerUid: "attorney-1-uid",
+        },
+        {
+          id: 125,
+          status: "detected",
+          fieldName: "firstNames",
+          ruleType: "empty",
+          fieldOwnerUid: "replacement-attorney-1-uid",
+        },
+        {
+          id: 126,
+          status: "detected",
+          fieldName: "lastName",
+          ruleType: "empty",
+          fieldOwnerUid: "replacement-attorney-1-uid",
+        },
+        {
+          id: 127,
+          status: "detected",
+          fieldName: "howAttorneysMakeDecisions",
+          ruleType: "empty",
+          fieldOwnerUid: "",
+        },
+        {
+          id: 128,
+          status: "detected",
+          fieldName: "whenTheLpaCanBeUsed",
+          ruleType: "empty",
+          fieldOwnerUid: "",
+        },
+        {
+          id: 129,
+          status: "detected",
+          fieldName: "address",
+          ruleType: "Invalid address",
+          fieldOwnerUid: "certificate-provider",
+        },
+        {
+          id: 130,
+          status: "detected",
+          fieldName: "address",
+          ruleType: "Invalid address",
+          fieldOwnerUid: "attorney-1-uid",
+        },
+        {
+          id: 131,
+          status: "detected",
+          fieldName: "address",
+          ruleType: "Invalid address",
+          fieldOwnerUid: "replacement-attorney-1-uid",
+        },
+        {
+          id: 132,
+          status: "detected",
+          fieldName: "firstNames",
+          ruleType: "empty",
+          fieldOwnerUid: "certificate-provider",
+        },
+        {
+          id: 133,
+          status: "detected",
+          fieldName: "lastName",
+          ruleType: "empty",
+          fieldOwnerUid: "certificate-provider",
+        },
+        {
+          id: 138,
+          status: "detected",
+          fieldName: "address",
+          ruleType: "no-country",
+          fieldOwnerUid: "donor",
+        },
+        {
+          id: 139,
+          status: "detected",
+          fieldName: "signedAt",
+          ruleType:
+            "Donor: date of ID and date of signature more than 6-months apart",
+          fieldOwnerUid: "donor",
+        },
+        {
+          id: 140,
+          status: "detected",
+          fieldName: "signedAt",
+          ruleType:
+            "Certificate-provider: date of ID and date of signature more than 6-months apart",
+          fieldOwnerUid: "certificate-provider",
+        },
+        {
+          id: 141,
+          status: "detected",
+          fieldName: "signedAt",
+          ruleType:
+            "certificate-provider signature more than 2-years after donor",
+          fieldOwnerUid: "certificate-provider",
+        },
+        {
+          id: 142,
+          status: "detected",
+          fieldName: "signedAt",
+          ruleType: "attorney signature more than 2-years after donor",
+          fieldOwnerUid: "attorney-1-uid",
+        },
+      ],
     });
 
     cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-TTTT-3333", "GET", {
@@ -196,25 +193,22 @@ describe("View and edit anomalies for a digital LPA", () => {
 
     cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-TTTT-3333/anomalies", "GET", {
       status: 200,
-      body: {
-        uid: "M-DIGI-TTTT-3333",
-        anomalies: [
-          {
-            id: 136,
-            status: "detected",
-            fieldName: "lastName",
-            ruleType: "last-name-matches-donor",
-            fieldOwnerUid: "certificate-provider",
-          },
-          {
-            id: 137,
-            status: "detected",
-            fieldName: "lastName",
-            ruleType: "last-name-matches-attorney",
-            fieldOwnerUid: "certificate-provider",
-          },
-        ],
-      },
+      body: [
+        {
+          id: 136,
+          status: "detected",
+          fieldName: "lastName",
+          ruleType: "last-name-matches-donor",
+          fieldOwnerUid: "certificate-provider",
+        },
+        {
+          id: 137,
+          status: "detected",
+          fieldName: "lastName",
+          ruleType: "last-name-matches-attorney",
+          fieldOwnerUid: "certificate-provider",
+        },
+      ],
     });
 
     cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-SSSS-3333", "GET", {
@@ -253,18 +247,15 @@ describe("View and edit anomalies for a digital LPA", () => {
 
     cy.addMock("/lpa-api/v1/digital-lpas/M-DIGI-SSSS-3333/anomalies", "GET", {
       status: 200,
-      body: {
-        uid: "M-DIGI-SSSS-3333",
-        anomalies: [
-          {
-            id: 220,
-            status: "detected",
-            fieldName: "lifeSustainingTreatmentOption",
-            ruleType: "empty",
-            fieldOwnerUid: "",
-          },
-        ],
-      },
+      body: [
+        {
+          id: 220,
+          status: "detected",
+          fieldName: "lifeSustainingTreatmentOption",
+          ruleType: "empty",
+          fieldOwnerUid: "",
+        },
+      ],
     });
   });
 

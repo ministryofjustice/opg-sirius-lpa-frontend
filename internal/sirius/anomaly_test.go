@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/pact-foundation/pact-go/v2/consumer"
-	"github.com/pact-foundation/pact-go/v2/matchers"
 	"net/http"
 	"testing"
+
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -35,11 +36,8 @@ func TestAnomaliesForDigitalLpaNotInStore(t *testing.T) {
 			Path:   matchers.String("/lpa-api/v1/digital-lpas/M-QWQW-QTQT-WERT/anomalies"),
 		}).
 		WithCompleteResponse(consumer.Response{
-			Status: http.StatusOK,
-			Body: matchers.Like(map[string]interface{}{
-				"uid":       matchers.Like("M-QWQW-QTQT-WERT"),
-				"anomalies": []interface{}{},
-			}),
+			Status:  http.StatusOK,
+			Body:    matchers.Like([]interface{}{}),
 			Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 		})
 
