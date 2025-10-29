@@ -1,24 +1,23 @@
-import tinymce from "tinymce/tinymce.min.js";
-import "tinymce/icons/default";
-import "tinymce/themes/silver";
-import "tinymce/plugins/paste";
-import "tinymce/plugins/lists";
+import hugerte from "hugerte/hugerte.min.js";
+import "hugerte/icons/default";
+import "hugerte/themes/silver";
+import "hugerte/plugins/lists";
+import 'hugerte/models/dom';
 
 const textEditor = () => {
   const prefix = document.body.getAttribute("data-prefix");
 
-  tinymce.init({
+  hugerte.init({
     selector: "#documentTextEditor",
     menubar: false,
     statusbar: false,
     toolbar: "bold italic | bullist numlist",
-    plugins: "paste lists",
+    plugins: "lists",
     paste_as_text: true,
     paste_word_valid_elements: "h1,h2,h3,strong,em,b,i",
     browser_spellcheck: true,
     gecko_spellcheck: true,
     height: 300,
-    cache_suffix: "?v=5.10.7",
     content_css: prefix + "/stylesheets/all.css",
     base_url: prefix + "/javascript",
     body_class: document.documentElement.classList.contains(

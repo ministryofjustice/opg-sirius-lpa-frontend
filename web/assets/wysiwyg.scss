@@ -2,7 +2,7 @@
 // Styling for the inline WYSIWYG editor on create document
 // ----------------------------------------------------------------
 
-body#tinymce {
+body#hugerte{
   min-width: 0;
   font-family: Verdana, Arial, Helvetica, sans-serif;
   font-size: 0.9em;
@@ -35,7 +35,7 @@ body#tinymce {
   background: #363639;
   color: #ddd;
 
-  &#tinymce {
+  &#hugerte {
     .user-instruction {
       color: lighten(govuk-colour("light-blue"), 20%);
     }
