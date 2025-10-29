@@ -37,7 +37,7 @@ build:
 build-all: ## Build containers
 	docker compose build --parallel lpa-frontend puppeteer cypress test-runner
 
-build-dev:
+build-dev: ## Build frontend container for the dev environment
 	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml build lpa-frontend
 
 dev: ## Start application and watch JS and SASS files for changes
