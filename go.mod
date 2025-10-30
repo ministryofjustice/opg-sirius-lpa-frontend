@@ -1,6 +1,6 @@
 module github.com/ministryofjustice/opg-sirius-lpa-frontend
 
-go 1.24.3
+go 1.25.3
 
 require (
 	github.com/go-playground/form/v4 v4.3.0

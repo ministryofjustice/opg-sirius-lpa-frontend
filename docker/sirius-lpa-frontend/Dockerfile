@@ -12,7 +12,7 @@ RUN yarn install --frozen-lockfile --ignore-scripts
 COPY web/assets web/assets
 RUN yarn build
 
-FROM golang:1.25.2-alpine AS dev
+FROM golang:1.25.3-alpine AS dev
 
 WORKDIR /app
 
@@ -31,7 +31,7 @@ RUN go install github.com/cosmtrek/air@v1.52.1 && go install github.com/go-delve
 
 ENTRYPOINT ["air"]
 
-FROM golang:1.25.2 AS build-env
+FROM golang:1.25.3 AS build-env
 
 ARG TARGETARCH
 WORKDIR /app
