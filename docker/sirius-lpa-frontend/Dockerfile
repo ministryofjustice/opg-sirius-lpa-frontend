@@ -12,7 +12,7 @@ RUN yarn install --frozen-lockfile --ignore-scripts
 COPY web/assets web/assets
 RUN yarn build
 
-FROM golang:1.25.2 AS build-env
+FROM golang:1.25.3 AS build-env
 
 ARG TARGETARCH
 WORKDIR /app
