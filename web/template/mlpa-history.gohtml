@@ -13,7 +13,8 @@
     <div class="moj-timeline">
         {{ range .EventData }}
             <div class="moj-timeline__item">
-                <div hidden>{{.UUID}}</div>
+                <div hidden>Sirius {{.UUID}}</div>
+                <div hidden>Lpa Store {{.ID}}</div>
                 <div class="govuk-summary-card govuk-!-margin-bottom-0">
                     <div class="govuk-summary-card__title-wrapper govuk-!-padding-bottom-1 govuk-!-padding-top-1">
                         <h1 class="govuk-summary-card__title">
@@ -45,7 +46,7 @@
                                     {{ if .Hash }}
                                         - #{{ .Hash }}
                                     {{ else }}
-                                        - #{{.FormattedUUID}}
+                                        - #{{.FormattedLpaStoreId}}
                                     {{ end }}
                                 </p>
                                 <p class="govuk-body">

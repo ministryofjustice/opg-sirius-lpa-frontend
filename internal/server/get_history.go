@@ -34,13 +34,14 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 		}
 
 		eventDetails, err := client.GetCombinedEvents(ctx, uid)
+
 		for i := range eventDetails {
-			formattedUUID, err := LPAEventIDFromUUID(eventDetails[i].UUID)
+			formattedUUID, err := LPAEventIDFromUUID(eventDetails[i].ID)
 			if err != nil {
-				log.Println("Error generating formattedUUID:", err)
+				log.Println("Error generating formattedUID:", err)
 				continue
 			}
-			eventDetails[i].FormattedUUID = formattedUUID
+			eventDetails[i].FormattedLpaStoreId = formattedUUID
 		}
 
 		if err != nil {
@@ -56,8 +57,8 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 	}
 }
 
-func LPAEventIDFromUUID(uuidStr string) (string, error) {
-	clean := strings.ReplaceAll(uuidStr, "-", "")
+func LPAEventIDFromUUID(id string) (string, error) {
+	clean := strings.ReplaceAll(id, "-", "")
 
 	idBytes, err := hex.DecodeString(clean)
 	if err != nil {
@@ -68,7 +69,7 @@ func LPAEventIDFromUUID(uuidStr string) (string, error) {
 	base32Str := encoder.EncodeToString(idBytes)
 
 	if len(base32Str) < 8 {
-		return "", fmt.Errorf("unexpected Base32 length for UUID")
+		return "", fmt.Errorf("unexpected Base32 length for UID")
 	}
 	return base32Str[:8], nil
 }

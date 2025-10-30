@@ -7,19 +7,26 @@ import (
 type APIEvent []Event
 
 type Event struct {
-	ChangeSet     []interface{} `json:"changeSet"`
-	CreatedOn     string        `json:"createdOn"`
-	Entity        any           `json:"entity"`
-	Hash          string        `json:"hash"`
-	ID            int           `json:"id"`
-	Source        string        `json:"source"`
-	SourceType    string        `json:"sourceType"`
-	Type          string        `json:"type"`
-	User          EventUser     `json:"user"`
-	UUID          string        `json:"uuid"`
-	FormattedUUID string        `json:"showUuid,omitempty"`
-	Applied       string        `json:"applied,omitempty"`
-	DateTime      string        `json:"dateTime,omitempty"`
+	ChangeSet           []interface{}   `json:"changeSet"`
+	Changes             []LpaStoreEvent `json:"changes"`
+	CreatedOn           string          `json:"createdOn"`
+	Entity              any             `json:"entity"`
+	Hash                string          `json:"hash"`
+	ID                  string          `json:"id"`
+	Source              string          `json:"source"`
+	SourceType          string          `json:"sourceType"`
+	Type                string          `json:"type"`
+	User                EventUser       `json:"user"`
+	UUID                string          `json:"uuid"`
+	Applied             string          `json:"applied,omitempty"`
+	DateTime            string          `json:"dateTime,omitempty"`
+	FormattedLpaStoreId string
+}
+
+type LpaStoreEvent struct {
+	Key string `json:"key"`
+	New any    `json:"new"`
+	Old any    `json:"old"`
 }
 
 type EventUser struct {
