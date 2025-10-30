@@ -24,19 +24,15 @@ type Anomaly struct {
 	FieldOwnerUid ObjectUid       `json:"fieldOwnerUid"`
 }
 
-type Anomalies struct {
-	Anomalies []Anomaly `json:"anomalies"`
-}
-
 func (c *Client) AnomaliesForDigitalLpa(ctx Context, uid string) ([]Anomaly, error) {
 	path := fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/anomalies", uid)
 
-	var receiver Anomalies
+	var receiver []Anomaly
 	err := c.get(ctx, path, &receiver)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return receiver.Anomalies, nil
+	return receiver, nil
 }
