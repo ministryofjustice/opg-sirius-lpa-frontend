@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
@@ -831,6 +832,545 @@ func TestPostConfirmAttorneyRemovalWithDecisionAttorneys(t *testing.T) {
 
 			assert.Equal(t, http.StatusOK, resp.Code)
 			assert.Equal(t, RedirectError("/lpa/M-6666-6666-6666"), err)
+		})
+	}
+}
+
+func TestAttorneyCannotMakeJointDecisionsUpdate(t *testing.T) {
+	activeAttorneys := []sirius.LpaStoreAttorney{
+		{
+			LpaStorePerson: sirius.LpaStorePerson{
+				Uid:        "1",
+				FirstNames: "Adam",
+				LastName:   "Moran",
+				Address:    sirius.LpaStoreAddress{},
+				Email:      "",
+			},
+			DateOfBirth:               "01/01/2021",
+			Status:                    "active",
+			AppointmentType:           "appointment",
+			Mobile:                    "12456789",
+			ContactLanguagePreference: "GB",
+			SignedAt:                  "02/08/2021",
+			Email:                     "theEmail@com",
+			Decisions:                 true,
+		},
+		{
+			LpaStorePerson: sirius.LpaStorePerson{
+				Uid:        "2",
+				FirstNames: "Bob",
+				LastName:   "Shout",
+				Address:    sirius.LpaStoreAddress{},
+				Email:      "",
+			},
+			DateOfBirth:               "09/08/2002",
+			Status:                    "active",
+			AppointmentType:           "appointment",
+			Mobile:                    "12456789",
+			ContactLanguagePreference: "GB",
+			SignedAt:                  "02/08/2021",
+			Email:                     "theEmail@com",
+			Decisions:                 true,
+		},
+	}
+
+	decisionAttorney := []sirius.LpaStoreAttorney{
+		{
+			LpaStorePerson: sirius.LpaStorePerson{
+				Uid:        "1",
+				FirstNames: "Adam",
+				LastName:   "Moran",
+				Address:    sirius.LpaStoreAddress{},
+				Email:      "",
+			},
+			DateOfBirth:               "01/01/2021",
+			Status:                    "active",
+			AppointmentType:           "appointment",
+			Mobile:                    "12456789",
+			ContactLanguagePreference: "GB",
+			SignedAt:                  "02/08/2021",
+			Email:                     "theEmail@com",
+			Decisions:                 true,
+		},
+		{
+			LpaStorePerson: sirius.LpaStorePerson{
+				Uid:        "2",
+				FirstNames: "Bob",
+				LastName:   "Shout",
+				Address:    sirius.LpaStoreAddress{},
+				Email:      "",
+			},
+			DateOfBirth:               "09/08/2002",
+			Status:                    "active",
+			AppointmentType:           "appointment",
+			Mobile:                    "12456789",
+			ContactLanguagePreference: "GB",
+			SignedAt:                  "02/08/2021",
+			Email:                     "theEmail@com",
+			Decisions:                 true,
+		},
+	}
+
+	attorneyDecisions := []sirius.AttorneyDecisions{{
+		UID:                      "3",
+		CannotMakeJointDecisions: true,
+	}}
+
+	expectedResult := []sirius.AttorneyDecisions{
+		{
+			UID:                      "3",
+			CannotMakeJointDecisions: true,
+		},
+		{
+			UID:                      "1",
+			CannotMakeJointDecisions: false,
+		},
+		{
+			UID:                      "2",
+			CannotMakeJointDecisions: false,
+		},
+	}
+	result := attorneyCannotMakeJointDecisionsUpdate(activeAttorneys, decisionAttorney, attorneyDecisions)
+
+	assert.Equal(t, expectedResult, result)
+}
+
+func TestDecisionAttorneysListAfterRemoval(t *testing.T) {
+	attorneys := []sirius.LpaStoreAttorney{
+		{
+			LpaStorePerson: sirius.LpaStorePerson{
+				Uid:        "1",
+				FirstNames: "Adam",
+				LastName:   "Moran",
+				Address:    sirius.LpaStoreAddress{},
+				Email:      "",
+			},
+			DateOfBirth:               "01/01/2021",
+			Status:                    "active",
+			AppointmentType:           "appointment",
+			Mobile:                    "12456789",
+			ContactLanguagePreference: "GB",
+			SignedAt:                  "02/08/2021",
+			Email:                     "theEmail@com",
+			Decisions:                 true,
+		},
+		{
+			LpaStorePerson: sirius.LpaStorePerson{
+				Uid:        "2",
+				FirstNames: "Bob",
+				LastName:   "Shout",
+				Address:    sirius.LpaStoreAddress{},
+				Email:      "",
+			},
+			DateOfBirth:               "09/08/2002",
+			Status:                    "active",
+			AppointmentType:           "appointment",
+			Mobile:                    "12456789",
+			ContactLanguagePreference: "GB",
+			SignedAt:                  "02/08/2021",
+			Email:                     "theEmail@com",
+			Decisions:                 true,
+		},
+	}
+
+	enabledAttorneyUidsFromForm := []string{"1"}
+	removedAttorneyUid := "1"
+	expectedResult := []sirius.LpaStoreAttorney{
+		{
+			LpaStorePerson: sirius.LpaStorePerson{
+				Uid:        "2",
+				FirstNames: "Bob",
+				LastName:   "Shout",
+				Address:    sirius.LpaStoreAddress{},
+				Email:      "",
+			},
+			DateOfBirth:               "09/08/2002",
+			Status:                    "active",
+			AppointmentType:           "appointment",
+			Mobile:                    "12456789",
+			ContactLanguagePreference: "GB",
+			SignedAt:                  "02/08/2021",
+			Email:                     "theEmail@com",
+			Decisions:                 true,
+		},
+	}
+	result := decisionAttorneysListAfterRemoval(attorneys, enabledAttorneyUidsFromForm, removedAttorneyUid)
+
+	assert.Equal(t, expectedResult, result)
+}
+
+func TestDecisionAttorneysListAfterRemovalReturnsAnEmptyList(t *testing.T) {
+	attorneys := []sirius.LpaStoreAttorney{
+		{
+			LpaStorePerson: sirius.LpaStorePerson{
+				Uid:        "1",
+				FirstNames: "Adam",
+				LastName:   "Moran",
+				Address:    sirius.LpaStoreAddress{},
+				Email:      "",
+			},
+			DateOfBirth:               "01/01/2021",
+			Status:                    "active",
+			AppointmentType:           "appointment",
+			Mobile:                    "12456789",
+			ContactLanguagePreference: "GB",
+			SignedAt:                  "02/08/2021",
+			Email:                     "theEmail@com",
+			Decisions:                 true,
+		},
+	}
+
+	enabledAttorneyUidsFromForm := []string{"1"}
+	removedAttorneyUid := "1"
+
+	result := decisionAttorneysListAfterRemoval(attorneys, enabledAttorneyUidsFromForm, removedAttorneyUid)
+	assert.Nil(t, result)
+}
+
+func TestUpdateSelectedAttorneysThatCannotMakeJointDecisions(t *testing.T) {
+	decisionAttorneys := []sirius.LpaStoreAttorney{
+		{
+			LpaStorePerson: sirius.LpaStorePerson{
+				Uid:        "1",
+				FirstNames: "Adam",
+				LastName:   "Moran",
+				Address:    sirius.LpaStoreAddress{},
+				Email:      "",
+			},
+			DateOfBirth:               "01/01/2021",
+			Status:                    "active",
+			AppointmentType:           "appointment",
+			Mobile:                    "12456789",
+			ContactLanguagePreference: "GB",
+			SignedAt:                  "02/08/2021",
+			Email:                     "theEmail@com",
+			Decisions:                 true,
+		},
+	}
+
+	decisionAttorneysUids := []string{"1"}
+	attorneyDecisions := []sirius.AttorneyDecisions{{
+		UID:                      "2",
+		CannotMakeJointDecisions: false,
+	}}
+
+	expectedResult := []sirius.AttorneyDecisions{
+		{
+			UID:                      "2",
+			CannotMakeJointDecisions: false,
+		},
+		{
+			UID:                      "1",
+			CannotMakeJointDecisions: true,
+		},
+	}
+
+	result := updateSelectedAttorneysThatCannotMakeJointDecisions(decisionAttorneys, decisionAttorneysUids, attorneyDecisions)
+	assert.Equal(t, expectedResult, result)
+}
+
+func TestUpdateRemovedAttorneyToCannotMakeJointDecisions(t *testing.T) {
+	lpaStoreDecisionAttorneys := []sirius.LpaStoreAttorney{
+		{
+			LpaStorePerson: sirius.LpaStorePerson{
+				Uid:        "1",
+				FirstNames: "Adam",
+				LastName:   "Moran",
+				Address:    sirius.LpaStoreAddress{},
+				Email:      "",
+			},
+			DateOfBirth:               "01/01/2021",
+			Status:                    "active",
+			AppointmentType:           "appointment",
+			Mobile:                    "12456789",
+			ContactLanguagePreference: "GB",
+			SignedAt:                  "02/08/2021",
+			Email:                     "theEmail@com",
+			Decisions:                 true,
+		},
+	}
+
+	removedAttorneyUid := "1"
+	attorneyDecisions := []sirius.AttorneyDecisions{{
+		UID:                      "2",
+		CannotMakeJointDecisions: false,
+	}}
+
+	expectedResult := []sirius.AttorneyDecisions{
+		{
+			UID:                      "2",
+			CannotMakeJointDecisions: false,
+		},
+		{
+			UID:                      "1",
+			CannotMakeJointDecisions: false,
+		},
+	}
+
+	result := updateRemovedAttorneyToCannotMakeJointDecisions(lpaStoreDecisionAttorneys, removedAttorneyUid, attorneyDecisions)
+	assert.Equal(t, expectedResult, result)
+}
+
+func TestUpdateRemovedAttorneysDetailsNoneSelected(t *testing.T) {
+	activeAttorneys := []sirius.LpaStoreAttorney{
+		{
+			LpaStorePerson: sirius.LpaStorePerson{
+				Uid:        "1",
+				FirstNames: "Adam",
+				LastName:   "Moran",
+				Address:    sirius.LpaStoreAddress{},
+				Email:      "",
+			},
+			DateOfBirth:               "01/01/2021",
+			Status:                    "active",
+			AppointmentType:           "appointment",
+			Mobile:                    "12456789",
+			ContactLanguagePreference: "GB",
+			SignedAt:                  "02/08/2021",
+			Email:                     "theEmail@com",
+			Decisions:                 true,
+		},
+	}
+
+	removedAttorneyUid := ""
+	expectedResult := SelectedAttorneyDetails{
+		SelectedAttorneyName: "",
+		SelectedAttorneyDob:  "",
+	}
+
+	result := updateRemovedAttorneysDetails(activeAttorneys, removedAttorneyUid)
+
+	assert.Equal(t, expectedResult, result)
+}
+
+func TestUpdateRemovedAttorneysDetailsSelected(t *testing.T) {
+	activeAttorneys := []sirius.LpaStoreAttorney{
+		{
+			LpaStorePerson: sirius.LpaStorePerson{
+				Uid:        "1",
+				FirstNames: "Adam",
+				LastName:   "Moran",
+				Address:    sirius.LpaStoreAddress{},
+				Email:      "",
+			},
+			DateOfBirth:               "01/01/2021",
+			Status:                    "active",
+			AppointmentType:           "appointment",
+			Mobile:                    "12456789",
+			ContactLanguagePreference: "GB",
+			SignedAt:                  "02/08/2021",
+			Email:                     "theEmail@com",
+			Decisions:                 true,
+		},
+	}
+
+	removedAttorneyUid := "1"
+	expectedResult := SelectedAttorneyDetails{
+		SelectedAttorneyName: "Adam Moran",
+		SelectedAttorneyDob:  "01/01/2021",
+	}
+
+	result := updateRemovedAttorneysDetails(activeAttorneys, removedAttorneyUid)
+
+	assert.Equal(t, expectedResult, result)
+}
+
+func TestUpdateDecisionAttorneyDetailsNoneSelected(t *testing.T) {
+	digitalAttorneys := []sirius.LpaStoreAttorney{
+		{
+			LpaStorePerson: sirius.LpaStorePerson{
+				Uid:        "1",
+				FirstNames: "Adam",
+				LastName:   "Moran",
+				Address:    sirius.LpaStoreAddress{},
+				Email:      "",
+			},
+			DateOfBirth:               "01/01/2021",
+			Status:                    "active",
+			AppointmentType:           "appointment",
+			Mobile:                    "12456789",
+			ContactLanguagePreference: "GB",
+			SignedAt:                  "02/08/2021",
+			Email:                     "theEmail@com",
+			Decisions:                 true,
+		},
+	}
+
+	digitalAttorneyUids := []string{}
+	result := updateDecisionAttorneyDetails(digitalAttorneys, digitalAttorneyUids)
+
+	assert.Nil(t, result)
+}
+
+func TestUpdateDecisionAttorneyDetailsThatAreSelected(t *testing.T) {
+	digitalAttorneys := []sirius.LpaStoreAttorney{
+		{
+			LpaStorePerson: sirius.LpaStorePerson{
+				Uid:        "1",
+				FirstNames: "Adam",
+				LastName:   "Moran",
+				Address:    sirius.LpaStoreAddress{},
+				Email:      "",
+			},
+			DateOfBirth:               "01/01/2021",
+			Status:                    "active",
+			AppointmentType:           "appointment",
+			Mobile:                    "12456789",
+			ContactLanguagePreference: "GB",
+			SignedAt:                  "02/08/2021",
+			Email:                     "theEmail@com",
+			Decisions:                 true,
+		},
+		{
+			LpaStorePerson: sirius.LpaStorePerson{
+				Uid:        "2",
+				FirstNames: "Bob",
+				LastName:   "Shout",
+				Address:    sirius.LpaStoreAddress{},
+				Email:      "",
+			},
+			DateOfBirth:               "09/08/2002",
+			Status:                    "active",
+			AppointmentType:           "appointment",
+			Mobile:                    "12456789",
+			ContactLanguagePreference: "GB",
+			SignedAt:                  "02/08/2021",
+			Email:                     "theEmail@com",
+			Decisions:                 true,
+		},
+	}
+
+	digitalAttorneyUids := []string{"1"}
+	expectedResult := []AttorneyDetails{
+		{
+			AttorneyName:    "Adam Moran",
+			AttorneyDob:     "01/01/2021",
+			AppointmentType: "appointment",
+		},
+	}
+
+	result := updateDecisionAttorneyDetails(digitalAttorneys, digitalAttorneyUids)
+
+	assert.Equal(t, expectedResult, result)
+}
+
+func TestValidateRemoveAttorneyPage(t *testing.T) {
+	tests := []struct {
+		name                 string
+		formValues           url.Values
+		removeAttorneysUid   string
+		removeReason         string
+		enabledAttorneysUids []string
+		expectedError        bool
+		expectedErrorMessage string
+		expectedErrorField   string
+	}{
+		{
+			name:                 "No remove an attorney Uid has an error",
+			formValues:           nil,
+			removeAttorneysUid:   "",
+			removeReason:         "1",
+			enabledAttorneysUids: []string{"uid1", "uid2"},
+			expectedError:        true,
+			expectedErrorMessage: "Please select an attorney for removal",
+			expectedErrorField:   "removeAttorney",
+		},
+		{
+			name:                 "No remove reason has an error",
+			formValues:           nil,
+			removeAttorneysUid:   "1",
+			removeReason:         "",
+			enabledAttorneysUids: []string{"uid1", "uid2"},
+			expectedError:        true,
+			expectedErrorMessage: "Please select a reason for removal",
+			expectedErrorField:   "removedReason",
+		},
+		{
+			name:                 "Have enabled attorney Uid and they are to be skipped has an error",
+			formValues:           url.Values{"skipEnableAttorney": {"yes"}},
+			removeAttorneysUid:   "1",
+			removeReason:         "2",
+			enabledAttorneysUids: []string{"uid1", "uid2"},
+			expectedError:        true,
+			expectedErrorMessage: "Please do not select both a replacement attorney and the option to skip",
+			expectedErrorField:   "enableAttorney",
+		},
+		{
+			name:                 "Have zero enabled attorney Uid and they are to be skipped has an error",
+			formValues:           url.Values{"skipEnableAttorney": {""}},
+			removeAttorneysUid:   "1",
+			removeReason:         "2",
+			enabledAttorneysUids: []string{},
+			expectedError:        true,
+			expectedErrorMessage: "Please select either the attorneys that can be enabled or skip the replacement of the attorneys",
+			expectedErrorField:   "enableAttorney",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodPost, "/", nil)
+			req.PostForm = tt.formValues
+
+			errors := sirius.FieldErrors{}
+			validateRemoveAttorneyPage(req, tt.removeAttorneysUid, tt.removeReason, tt.enabledAttorneysUids, errors)
+
+			if tt.expectedError {
+				assert.Contains(t, errors, tt.expectedErrorField)
+				assert.Contains(t, tt.expectedErrorMessage, errors[tt.expectedErrorField]["reason"])
+			} else {
+				assert.NotContains(t, errors, tt.expectedErrorField)
+			}
+		})
+	}
+}
+
+func TestValidateManageAttorneysPage(t *testing.T) {
+	tests := []struct {
+		name                  string
+		formValues            url.Values
+		decisionAttorneysUids []string
+		expectedError         bool
+	}{
+		{
+			name:                  "No attorneys and checkbox not checked has an error",
+			formValues:            url.Values{"skipDecisionAttorney": {""}},
+			decisionAttorneysUids: []string{},
+			expectedError:         true,
+		},
+		{
+			name:                  "No attorneys and checkbox checked has no error",
+			formValues:            url.Values{"skipDecisionAttorney": {"yes"}},
+			decisionAttorneysUids: []string{},
+			expectedError:         false,
+		},
+		{
+			name:                  "Attorneys and checkbox checked has an error",
+			formValues:            url.Values{"skipDecisionAttorney": {"yes"}},
+			decisionAttorneysUids: []string{"uid1", "uid2"},
+			expectedError:         true,
+		},
+		{
+			name:                  "Attorneys and checkbox not checked has no error",
+			formValues:            url.Values{"skipDecisionAttorney": {""}},
+			decisionAttorneysUids: []string{"uid1"},
+			expectedError:         false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodPost, "/", nil)
+			req.PostForm = tt.formValues
+
+			errors := sirius.FieldErrors{}
+
+			validateManageAttorneysPage(req, tt.decisionAttorneysUids, errors)
+
+			gotError := errors["decisionAttorney"] != nil
+			if gotError != tt.expectedError {
+				t.Errorf("unexpected error result: got %v, want %v", gotError, tt.expectedError)
+			}
 		})
 	}
 }

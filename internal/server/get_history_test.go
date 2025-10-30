@@ -53,18 +53,18 @@ func TestGetHistorySuccessForDigitalLpa(t *testing.T) {
 	client.
 		On("GetCombinedEvents", mock.Anything, "M-9876-9876-9999").
 		Return(sirius.APIEvent{{
-			ChangeSet:     nil,
-			CreatedOn:     "08/08/1999",
-			Entity:        nil,
-			ID:            2,
-			Source:        "mustard",
-			SourceType:    "french",
-			Type:          "LPA",
-			User:          sirius.EventUser{DisplayName: "Bear Ghost"},
-			UUID:          "654de60e-446d-4b2f-b2a7-321bf03b37df",
-			FormattedUUID: "",
-			Applied:       "08/08/1999",
-			DateTime:      "08/08/1999",
+			ChangeSet:           nil,
+			CreatedOn:           "08/08/1999",
+			Entity:              nil,
+			ID:                  "2",
+			Source:              "mustard",
+			SourceType:          "french",
+			Type:                "LPA",
+			User:                sirius.EventUser{DisplayName: "Bear Ghost"},
+			UUID:                "654de60e-446d-4b2f-b2a7-321bf03b37df",
+			FormattedLpaStoreId: "",
+			Applied:             "08/08/1999",
+			DateTime:            "08/08/1999",
 		}}, nil)
 
 	template := &mockTemplate{}
@@ -73,18 +73,18 @@ func TestGetHistorySuccessForDigitalLpa(t *testing.T) {
 			CaseSummary: caseSummary,
 			EventData: sirius.APIEvent{
 				sirius.Event{
-					ChangeSet:     nil,
-					CreatedOn:     "08/08/1999",
-					Entity:        nil,
-					ID:            2,
-					Source:        "mustard",
-					SourceType:    "french",
-					Type:          "LPA",
-					User:          sirius.EventUser{DisplayName: "Bear Ghost"},
-					UUID:          "654de60e-446d-4b2f-b2a7-321bf03b37df",
-					FormattedUUID: "MVG6MDSE",
-					Applied:       "08/08/1999",
-					DateTime:      "08/08/1999",
+					ChangeSet:           nil,
+					CreatedOn:           "08/08/1999",
+					Entity:              nil,
+					ID:                  "2",
+					Source:              "mustard",
+					SourceType:          "french",
+					Type:                "LPA",
+					User:                sirius.EventUser{DisplayName: "Bear Ghost"},
+					UUID:                "654de60e-446d-4b2f-b2a7-321bf03b37df",
+					FormattedLpaStoreId: "MVG6MDSE",
+					Applied:             "08/08/1999",
+					DateTime:            "08/08/1999",
 				},
 			},
 		}).
@@ -150,7 +150,7 @@ func TestGetHistoryWhenFailureOnGetCaseSummary(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestLPAEventIDFromUUIDReturnFormattedUUID(t *testing.T) {
+func TestLPAEventIDFromUUIDReturnFormattedLpaStoreId(t *testing.T) {
 	result, _ := LPAEventIDFromUUID("654de60e-446d-4b2f-b2a7-321bf03b37df")
 	assert.Equal(t, "MVG6MDSE", result)
 }
