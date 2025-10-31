@@ -24,15 +24,6 @@
       "enabled": false
     },
     {
-      "description": [
-        "Ignore tinymce upgrades to version 6",
-        "Tinymce version 6 doesn't support pasting in from Word documents so we must lock to version 5 for now"
-      ],
-      "matchUpdateTypes": ["major"],
-      "enabled": false,
-      "matchPackageNames": ["/tinymce/"]
-    },
-    {
       "automerge": true,
       "groupName": "Patch & Minor Updates",
       "groupSlug": "all-minor-patch-updates",
