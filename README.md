@@ -36,14 +36,16 @@ The application should be running at http://localhost:8888/ and using the runnin
 at http://localhost:8080 for authentication and API requests. It can be stopped with Ctrl-C.
 
 This command continually watches for changes inside the directories under `web/assets`
-(see below).
+(see below). Any changes you make to JavaScript or SASS files will be reflected in the
+running application (after a page refresh). It also runs [Air](https://github.com/air-verse/air)
+to rebuild the Go binary whenever the Go source and templates are changed.
 
-Any changes you make to JavaScript or SASS files will be reflected in the
-running application (after a page refresh). For this reason, this mode is most useful when
-working on UI elements, especially related to JavaScript and CSS.
+The dev environment build step is different from the production build, so if you need to
+rebuild the dev env, you can run the following:
 
-Note that changes to Go code (including gohtml templates) will not be reflected in the
-running application, unless you stop and rebuild the service with `make build`.
+```
+make build-dev
+```
 
 #### 2. Developer mode with locally-compiled binary
 
