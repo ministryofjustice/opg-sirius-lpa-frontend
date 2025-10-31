@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -10,6 +11,7 @@ import (
 
 type ChangeTrustCorporationDetailsClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
+	ChangeTrustCorporationDetails(sirius.Context, string, string, sirius.ChangeTrustCorporationDetails) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
@@ -40,8 +42,31 @@ func ChangeTrustCorporationDetails(client ChangeTrustCorporationDetailsClient, t
 
 		ctx := getContext(r)
 
-		cs, err := client.CaseSummary(ctx, caseUID)
-		if err != nil {
+		var cs sirius.CaseSummary
+		var Countries []sirius.RefDataItem
+		var err error
+
+		group, groupCtx := errgroup.WithContext(ctx.Context)
+
+		group.Go(func() error {
+			cs, err = client.CaseSummary(ctx.With(groupCtx), caseUID)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		group.Go(func() error {
+			var err error
+			Countries, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.CountryCategory)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
 			return err
 		}
 
@@ -56,6 +81,7 @@ func ChangeTrustCorporationDetails(client ChangeTrustCorporationDetailsClient, t
 
 		data := changeTrustCorporationDetailsData{
 			XSRFToken:       ctx.XSRFToken,
+			Countries:       Countries,
 			CaseUID:         caseUID,
 			Status:          trustCorporation.Status,
 			AppointmentType: trustCorporation.AppointmentType,
@@ -75,20 +101,36 @@ func ChangeTrustCorporationDetails(client ChangeTrustCorporationDetailsClient, t
 			},
 		}
 
-		group, groupCtx := errgroup.WithContext(ctx.Context)
-
-		group.Go(func() error {
-			var err error
-			data.Countries, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.CountryCategory)
+		if r.Method == http.MethodPost {
+			err := decoder.Decode(&data.Form, r.PostForm)
 			if err != nil {
 				return err
 			}
 
-			return nil
-		})
+			trustCorpData := sirius.ChangeTrustCorporationDetails{
+				Name:          data.Form.Name,
+				Address:       data.Form.Address,
+				Phone:         data.Form.PhoneNumber,
+				Email:         data.Form.Email,
+				CompanyNumber: data.Form.CompanyNumber,
+			}
 
-		if err := group.Wait(); err != nil {
-			return err
+			err = client.ChangeTrustCorporationDetails(ctx, caseUID, trustCorpUID, trustCorpData)
+
+			if ve, ok := err.(sirius.ValidationError); ok {
+				w.WriteHeader(http.StatusBadRequest)
+				data.Error = ve
+			} else if err != nil {
+				return err
+			} else {
+				data.Success = true
+
+				SetFlash(w, FlashNotification{
+					Title: "Update saved",
+				})
+
+				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
+			}
 		}
 
 		return tmpl(w, data)

@@ -2,6 +2,8 @@ package server
 
 import (
 	"net/http"
+	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
@@ -27,9 +29,15 @@ func (m *mockChangeTrustCorporationDetailsClient) RefDataByCategory(ctx sirius.C
 	return nil, args.Error(1)
 }
 
+func (m *mockChangeTrustCorporationDetailsClient) ChangeTrustCorporationDetails(ctx sirius.Context, caseUID string, trustCorpUID string, trustCorpDetailsData sirius.ChangeTrustCorporationDetails) error {
+	return m.Called(ctx, caseUID, trustCorpUID, trustCorpDetailsData).Error(0)
+}
+
+const caseUID = "M-TCTC-TCTC-TCTC"
+
 var testChangeTrustCorpDetailsCaseSummary = sirius.CaseSummary{
 	DigitalLpa: sirius.DigitalLpa{
-		UID: "M-TCTC-TCTC-TCTC",
+		UID: caseUID,
 		LpaStoreData: sirius.LpaStoreData{
 			TrustCorporations: []sirius.LpaStoreTrustCorporation{
 				{
@@ -103,7 +111,6 @@ var testChangeTrustCorpDetailsCaseSummary = sirius.CaseSummary{
 func TestGetChangeTrustCorpDetails(t *testing.T) {
 	tests := []struct {
 		name            string
-		caseUID         string
 		trustCorpUID    string
 		status          string
 		appointmentType string
@@ -112,7 +119,6 @@ func TestGetChangeTrustCorpDetails(t *testing.T) {
 	}{
 		{
 			name:            "Change Active Original Trust Corporation Details",
-			caseUID:         "M-TCTC-TCTC-TCTC",
 			trustCorpUID:    "302b05c7-896c-4290-904e-2005e4f1e81e",
 			status:          shared.ActiveAttorneyStatus.String(),
 			appointmentType: shared.OriginalAppointmentType.String(),
@@ -132,7 +138,6 @@ func TestGetChangeTrustCorpDetails(t *testing.T) {
 		},
 		{
 			name:            "Change Inactive Replacement Trust Corporation Details",
-			caseUID:         "M-TCTC-TCTC-TCTC",
 			trustCorpUID:    "123a01b1-456d-5391-813d-2010d3e2d72d",
 			status:          shared.InactiveAttorneyStatus.String(),
 			appointmentType: shared.ReplacementAppointmentType.String(),
@@ -152,7 +157,6 @@ func TestGetChangeTrustCorpDetails(t *testing.T) {
 		},
 		{
 			name:            "Template Error Returned",
-			caseUID:         "M-TCTC-TCTC-TCTC",
 			trustCorpUID:    "302b05c7-896c-4290-904e-2005e4f1e81e",
 			status:          shared.ActiveAttorneyStatus.String(),
 			appointmentType: shared.OriginalAppointmentType.String(),
@@ -176,7 +180,7 @@ func TestGetChangeTrustCorpDetails(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := &mockChangeTrustCorporationDetailsClient{}
 			client.
-				On("CaseSummary", mock.Anything, tc.caseUID).
+				On("CaseSummary", mock.Anything, caseUID).
 				Return(testChangeTrustCorpDetailsCaseSummary, nil)
 			client.
 				On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
@@ -187,7 +191,7 @@ func TestGetChangeTrustCorpDetails(t *testing.T) {
 				On("Func", mock.Anything,
 					changeTrustCorporationDetailsData{
 						Countries:       []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
-						CaseUID:         tc.caseUID,
+						CaseUID:         caseUID,
 						Status:          tc.status,
 						AppointmentType: tc.appointmentType,
 						Form:            tc.form,
@@ -196,7 +200,7 @@ func TestGetChangeTrustCorpDetails(t *testing.T) {
 
 			server := newMockServer("/lpa/{uid}/trust-corporation/{trustCorporationUID}/change-details", ChangeTrustCorporationDetails(client, template.Func))
 
-			r, _ := http.NewRequest(http.MethodGet, "/lpa/"+tc.caseUID+"/trust-corporation/"+tc.trustCorpUID+"/change-details", nil)
+			r, _ := http.NewRequest(http.MethodGet, "/lpa/"+caseUID+"/trust-corporation/"+tc.trustCorpUID+"/change-details", nil)
 			_, err := server.serve(r)
 
 			if tc.errorReturned != nil {
@@ -214,30 +218,151 @@ func TestGetChangeTrustCorpDetailsWhenCaseSummaryErrors(t *testing.T) {
 
 	client := &mockChangeTrustCorporationDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-TCTC-TCTC-TCTC").
+		On("CaseSummary", mock.Anything, caseUID).
 		Return(sirius.CaseSummary{}, errExample)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
 
-	assertChangeTrustCorporationDetailsErrors(t, client, "M-TCTC-TCTC-TCTC", errExample)
+	assertChangeTrustCorporationDetailsErrors(t, client)
 }
 
 func TestGetChangeTrustCorporationDetailsWhenRefDataByCategoryErrors(t *testing.T) {
 	client := &mockChangeTrustCorporationDetailsClient{}
 	client.
-		On("CaseSummary", mock.Anything, "M-TCTC-TCTC-TCTC").
+		On("CaseSummary", mock.Anything, caseUID).
 		Return(testChangeTrustCorpDetailsCaseSummary, nil)
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
 		Return([]sirius.RefDataItem{}, errExample)
 
-	assertChangeTrustCorporationDetailsErrors(t, client, "M-TCTC-TCTC-TCTC", errExample)
+	assertChangeTrustCorporationDetailsErrors(t, client)
 }
 
-func assertChangeTrustCorporationDetailsErrors(t *testing.T, client *mockChangeTrustCorporationDetailsClient, uid string, expectedError error) {
+func assertChangeTrustCorporationDetailsErrors(t *testing.T, client *mockChangeTrustCorporationDetailsClient) {
 	server := newMockServer("/lpa/{uid}/trust-corporation/{trustCorporationUID}/change-details", ChangeTrustCorporationDetails(client, nil))
 
-	r, _ := http.NewRequest(http.MethodGet, "/lpa/"+uid+"/trust-corporation/123a01b1-456d-5391-813d-2010d3e2d72d/change-details", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/lpa/"+caseUID+"/trust-corporation/123a01b1-456d-5391-813d-2010d3e2d72d/change-details", nil)
 	_, err := server.serve(r)
 
-	assert.Equal(t, expectedError, err)
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestPostChangeTrustCorporationDetails(t *testing.T) {
+	tests := []struct {
+		name          string
+		apiError      error
+		expectedError error
+	}{
+		{
+			name:          "Post form successfully submits",
+			apiError:      nil,
+			expectedError: RedirectError("/lpa/M-TCTC-TCTC-TCTC/lpa-details"),
+		},
+		{
+			name:          "Post form returns an API failure",
+			apiError:      errExample,
+			expectedError: errExample,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &mockChangeTrustCorporationDetailsClient{}
+			client.
+				On("CaseSummary", mock.Anything, caseUID).
+				Return(testChangeTrustCorpDetailsCaseSummary, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+				Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+			client.
+				On("ChangeTrustCorporationDetails", mock.Anything, caseUID, "302b05c7-896c-4290-904e-2005e4f1e81e", sirius.ChangeTrustCorporationDetails{
+					Name: "Trust Ltd.",
+					Address: sirius.Address{
+						Line1:    "9 Mount",
+						Line2:    "Pleasant Drive",
+						Line3:    "Norwich",
+						Town:     "East Harling",
+						Postcode: "NR16 2GB",
+						Country:  "GB",
+					},
+					Phone:         "123456789",
+					Email:         "test@test.com",
+					CompanyNumber: "20241009",
+				}).
+				Return(tc.apiError)
+
+			template := &mockTemplate{}
+
+			server := newMockServer("/lpa/{uid}/trust-corporation/{trustCorporationUID}/change-details", ChangeTrustCorporationDetails(client, template.Func))
+
+			form := url.Values{
+				"name":             {"Trust Ltd."},
+				"address.Line1":    {"9 Mount"},
+				"address.Line2":    {"Pleasant Drive"},
+				"address.Line3":    {"Norwich"},
+				"address.Town":     {"East Harling"},
+				"address.Postcode": {"NR16 2GB"},
+				"address.Country":  {"GB"},
+				"phoneNumber":      {"123456789"},
+				"email":            {"test@test.com"},
+				"companyNumber":    {"20241009"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/lpa/M-TCTC-TCTC-TCTC/trust-corporation/302b05c7-896c-4290-904e-2005e4f1e81e/change-details", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			_, err := server.serve(r)
+
+			assert.Equal(t, tc.expectedError, err)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
+func TestPostChangeTrustCorporationDetailsWhenValidationError(t *testing.T) {
+	client := &mockChangeTrustCorporationDetailsClient{}
+	client.
+		On("CaseSummary", mock.Anything, caseUID).
+		Return(testChangeTrustCorpDetailsCaseSummary, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+	client.
+		On("ChangeTrustCorporationDetails", mock.Anything, caseUID, "302b05c7-896c-4290-904e-2005e4f1e81e", sirius.ChangeTrustCorporationDetails{
+			Address: sirius.Address{
+				Line1:    "9 Mount Pleasant Drive",
+				Town:     "East Harling",
+				Postcode: "NR16 2GB",
+				Country:  "UK",
+			},
+			Phone:         "077577575757",
+			Email:         "trust.me.once@does.not.exist",
+			CompanyNumber: "123456789",
+		}).
+		Return(sirius.ValidationError{Field: sirius.FieldErrors{
+			"name": {"required": "Value required and can't be empty"},
+		}})
+
+	template := &mockTemplate{}
+
+	template.
+		On("Func", mock.Anything,
+			mock.MatchedBy(func(data changeTrustCorporationDetailsData) bool {
+				return data.Error.Field["name"]["required"] == "Value required and can't be empty"
+			}),
+		).
+		Return(nil)
+
+	server := newMockServer("/lpa/{uid}/trust-corporation/{trustCorporationUID}/change-details", ChangeTrustCorporationDetails(client, template.Func))
+
+	form := url.Values{
+		"name": {""},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/lpa/M-TCTC-TCTC-TCTC/trust-corporation/302b05c7-896c-4290-904e-2005e4f1e81e/change-details", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	_, err := server.serve(r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
