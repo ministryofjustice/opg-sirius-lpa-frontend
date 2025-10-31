@@ -4,19 +4,39 @@ import (
 	"fmt"
 )
 
-func (c *Client) GetEvents(ctx Context, donorId int, caseId int) (any, error) {
-	var v struct {
-		Events any `json:"events"`
-	}
+type APIEvent []Event
 
-	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%d/events?filter=case:%d&sort=id:desc", donorId, caseId), &v)
+type Event struct {
+	ChangeSet           []interface{}   `json:"changeSet"`
+	Changes             []LpaStoreEvent `json:"changes"`
+	CreatedOn           string          `json:"createdOn"`
+	Entity              any             `json:"entity"`
+	Hash                string          `json:"hash"`
+	ID                  string          `json:"id"`
+	Source              string          `json:"source"`
+	SourceType          string          `json:"sourceType"`
+	Type                string          `json:"type"`
+	User                EventUser       `json:"user"`
+	UUID                string          `json:"uuid"`
+	Applied             string          `json:"applied,omitempty"`
+	DateTime            string          `json:"dateTime,omitempty"`
+	FormattedLpaStoreId string
+}
 
-	return v.Events, err
+type LpaStoreEvent struct {
+	Key string `json:"key"`
+	New any    `json:"new"`
+	Old any    `json:"old"`
+}
+
+type EventUser struct {
+	DisplayName string `json:"displayName"`
+	Email       string `json:"email"`
 }
 
 // GetCombinedEvents Gets combined events from both Sirius and LPA Store for digital LPAs
-func (c *Client) GetCombinedEvents(ctx Context, uid string) (any, error) {
-	var v any
-	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/events", uid), &v)
-	return v, err
+func (c *Client) GetCombinedEvents(ctx Context, uid string) (APIEvent, error) {
+	var events APIEvent
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/events", uid), &events)
+	return events, err
 }
