@@ -4,7 +4,6 @@ import (
 	"encoding/base32"
 	"encoding/hex"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -36,12 +35,10 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 		eventDetails, err := client.GetCombinedEvents(ctx, uid)
 
 		for i := range eventDetails {
-			formattedUUID, err := LPAEventIDFromUUID(eventDetails[i].ID)
-			if err != nil {
-				log.Println("Error generating formattedUID:", err)
-				continue
+			if eventDetails[i].Source == "lpa_store" {
+				formattedUUID, _ := LPAEventIDFromUUID(eventDetails[i].ID)
+				eventDetails[i].FormattedLpaStoreId = formattedUUID
 			}
-			eventDetails[i].FormattedLpaStoreId = formattedUUID
 		}
 
 		if err != nil {
