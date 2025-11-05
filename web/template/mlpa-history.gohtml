@@ -13,20 +13,22 @@
     <div class="moj-timeline">
         {{ range .EventData }}
             <div class="moj-timeline__item">
+                <div hidden>Sirius {{.UUID}}</div>
+                <div hidden>Lpa Store {{.ID}}</div>
                 <div class="govuk-summary-card govuk-!-margin-bottom-0">
                     <div class="govuk-summary-card__title-wrapper govuk-!-padding-bottom-1 govuk-!-padding-top-1">
                         <h1 class="govuk-summary-card__title">
-                            {{ if eq .source "lpa_store" }}
+                            {{ if eq .Source "lpa_store" }}
                                 LPA Store Event
                             {{ else }}
-                                {{ if eq .type "INS" }}
+                                {{ if eq .Type "INS" }}
                                     Created:
-                                {{ else if eq .type "UPD" }}
+                                {{ else if eq .Type "UPD" }}
                                     Updated:
-                                {{ else if eq .type "DEL" }}
+                                {{ else if eq .Type "DEL" }}
                                     Deleted:
                                 {{ end }}
-                                {{ .sourceType }}
+                                {{ .SourceType }}
                             {{ end }}
                         </h1>
                     </div>
@@ -34,23 +36,27 @@
                         <dl class="govuk-summary-list">
                             <div class="govuk-summary-list__row">
                                 <p class="govuk-body">
-                                    {{ if .applied }}
-                                        <time datetime="{{ .applied }}">{{ parseAndFormatDate .applied "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
-                                    {{ else if .createdOn }}
-                                        <time datetime="{{ .createdOn }}">{{ parseAndFormatDate .createdOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
-                                    {{ else if .datetime }}
-                                        <time datetime="{{ .datetime }}">{{ parseAndFormatDate .datetime "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
+                                    {{ if .Applied }}
+                                        <time datetime="{{ .Applied }}">{{ parseAndFormatDate .Applied "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
+                                    {{ else if .CreatedOn }}
+                                        <time datetime="{{ .CreatedOn }}">{{ parseAndFormatDate .CreatedOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
+                                    {{ else if .Datetime }}
+                                        <time datetime="{{ .Datetime }}">{{ parseAndFormatDate .Datetime "2006-01-02T15:04:05Z07:00" "2 January 2006 at 15:04" }}</time>
                                     {{ end }}
-                                    - #{{ .hash }}
+                                    {{ if .Hash }}
+                                        - #{{ .Hash }}
+                                    {{ else }}
+                                        - #{{.FormattedLpaStoreId}}
+                                    {{ end }}
                                 </p>
                                 <p class="govuk-body">
-                                    {{ if eq .source "lpa_store" }}
+                                    {{ if eq .Source "lpa_store" }}
                                         <ul class="govuk-list govuk-list--bullet">
-                                        {{ range .changes }}
-                                            <li>{{ .key }}
+                                        {{ range .Changes }}
+                                            <li>{{ .Key }}
                                                 <ul class="govuk-list govuk-list--bullet">
-                                                    <li><strong>From:</strong> {{ if .old }}{{ .old }}{{ else }}<em>(empty)</em>{{ end }}</li>
-                                                    <li> <strong>To:</strong> {{ if .new }}{{ .new }}{{ else }}<em>(empty)</em>{{ end }}</li>
+                                                    <li><strong>From:</strong> {{ if .Old }}{{ .Old }}{{ else }}<em>(empty)</em>{{ end }}</li>
+                                                    <li> <strong>To:</strong> {{ if .New }}{{ .New }}{{ else }}<em>(empty)</em>{{ end }}</li>
                                                 </ul>
                                             </li>
                                         {{ end }}
@@ -58,15 +64,14 @@
                                     {{ else }}
                                         <dl class="govuk-summary-list">
                                             <ul class="govuk-list govuk-list--bullet">
-                                            {{ range $k, $v := .entity }}
+                                            {{ range $k, $v := .Entity }}
                                                 {{ if eq $k "_class" "id" "document" }}
                                                     {{ continue }}
                                                 {{ end }}
-
                                                 <li>
                                                     {{ camelcaseToSentence $k }}:
                                                     {{ if eq $k "assignee" }}
-                                                        {{ $v.displayName }}
+                                                        {{ $v.DisplayName }}
                                                     {{ else if eq $k "uId" }}
                                                         {{ printf "%.f" $v }}
                                                     {{ else }}
@@ -76,11 +81,11 @@
                                             {{ end }}
                                             </ul>
 
-                                            {{ if and (eq .sourceType "Note") (ne (len .entity.document) 0) }}
+                                            {{ if and (eq .SourceType "Note") (ne (len .Entity.document) 0) }}
                                                 <ul class="govuk-list govuk-list--bullet">
                                                     <li>
-                                                        Document: <a class="govuk-link" href="/lpa/document/{{ .entity.document.uuid }}">{{ .entity.document.friendlyDescription }}</a>
-                                                        ({{ .entity.document.subType }})
+                                                        Document: <a class="govuk-link" href="/lpa/document/{{ .Entity.document.uuid }}">{{ .Entity.document.friendlyDescription }}</a>
+                                                        ({{ .Entity.document.subType }})
                                                     </li>
                                                 </ul>
                                             {{ end }}
@@ -90,8 +95,8 @@
                             </div>
                             <div class="govuk-summary-list__row">
                                 <p class="govuk-hint govuk-!-margin-bottom-1 govuk-!-margin-top-1">
-                                    {{ if .user }}
-                                        Created by <a class="govuk-link" href="mailto:{{ .user.email}}">{{ .user.displayName }}</a>
+                                    {{ if .User }}
+                                        Created by <a class="govuk-link" href="mailto:{{ .User.Email}}">{{ .User.DisplayName }}</a>
                                     {{ else }}
                                         Created by Unknown User
                                     {{ end }}

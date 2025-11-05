@@ -1,7 +1,11 @@
 package server
 
 import (
+	"encoding/base32"
+	"encoding/hex"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 
@@ -9,8 +13,7 @@ import (
 )
 
 type GetHistoryClient interface {
-	GetEvents(ctx sirius.Context, donorId int, caseId int) (any, error)
-	GetCombinedEvents(ctx sirius.Context, uid string) (any, error)
+	GetCombinedEvents(ctx sirius.Context, uid string) (sirius.APIEvent, error)
 	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
 }
 
@@ -29,16 +32,13 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		var eventDetails any
+		eventDetails, err := client.GetCombinedEvents(ctx, uid)
 
-		if caseSummary.DigitalLpa.LpaStoreData.Status.ReadableString() != "" {
-			// Digital LPA - use combined events
-			eventDetails, err = client.GetCombinedEvents(ctx, uid)
-		} else {
-			// Traditional LPA - use Sirius events only
-			donorId := caseSummary.DigitalLpa.SiriusData.Donor.ID
-			caseId := caseSummary.DigitalLpa.SiriusData.ID
-			eventDetails, err = client.GetEvents(ctx, donorId, caseId)
+		for i := range eventDetails {
+			if eventDetails[i].Source == "lpa_store" {
+				formattedUUID, _ := LPAEventIDFromUUID(eventDetails[i].ID)
+				eventDetails[i].FormattedLpaStoreId = formattedUUID
+			}
 		}
 
 		if err != nil {
@@ -52,4 +52,21 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 
 		return tmpl(w, data)
 	}
+}
+
+func LPAEventIDFromUUID(id string) (string, error) {
+	clean := strings.ReplaceAll(id, "-", "")
+
+	idBytes, err := hex.DecodeString(clean)
+	if err != nil {
+		return "", err
+	}
+
+	encoder := base32.StdEncoding.WithPadding(base32.NoPadding)
+	base32Str := encoder.EncodeToString(idBytes)
+
+	if len(base32Str) < 8 {
+		return "", fmt.Errorf("unexpected Base32 length for UID")
+	}
+	return base32Str[:8], nil
 }
