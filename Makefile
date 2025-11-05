@@ -37,11 +37,13 @@ build:
 build-all: ## Build containers
 	docker compose build --parallel lpa-frontend puppeteer cypress test-runner
 
+build-dev: ## Build frontend container for the dev environment
+	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml build lpa-frontend
+
 dev: ## Start application and watch JS and SASS files for changes
 	docker compose run --rm yarn
 	docker compose run --rm yarn build
-	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up -d lpa-frontend
-	docker compose run --rm yarn watch
+	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up lpa-frontend yarn
 
 up: ## Start application with mock Sirius API; mostly for use with Cypress tests
 	docker compose up -d lpa-frontend
