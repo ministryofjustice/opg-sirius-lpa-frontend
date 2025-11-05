@@ -37,6 +37,9 @@ func (c *Client) AddPayment(ctx Context, caseID int, amount int, source string, 
 }
 
 func (c *Client) EditPayment(ctx Context, paymentID int, payment Payment) error {
+	if payment.Source == "FEE_REDUCTION" {
+		return c.put(ctx, fmt.Sprintf("/lpa-api/v1/payments/%d/reduction", paymentID), payment, nil)
+	}
 	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/payments/%d", paymentID), payment, nil)
 }
 

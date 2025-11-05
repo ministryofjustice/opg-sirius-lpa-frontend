@@ -488,7 +488,7 @@ func TestEditFeeReduction(t *testing.T) {
 					UponReceiving("A request to edit a fee reduction").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
-						Path:   matchers.String("/lpa-api/v1/payments/124"),
+						Path:   matchers.String("/lpa-api/v1/payments/124/reduction"),
 						Headers: matchers.MapMatcher{
 							"Content-Type": matchers.String("application/json"),
 						},

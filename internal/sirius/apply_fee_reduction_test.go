@@ -3,11 +3,12 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"testing"
+
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
 )
 
 func TestApplyFeeReduction(t *testing.T) {
@@ -30,7 +31,7 @@ func TestApplyFeeReduction(t *testing.T) {
 					UponReceiving("A request to create a fee reduction").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPost,
-						Path:   matchers.String("/lpa-api/v1/cases/801/payments"),
+						Path:   matchers.String("/lpa-api/v1/cases/801/payments/reduction"),
 						Headers: matchers.MapMatcher{
 							"Content-Type": matchers.String("application/json"),
 						},
