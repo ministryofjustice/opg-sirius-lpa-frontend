@@ -17,7 +17,7 @@
   "dependencies": {
     "@ministryofjustice/frontend": "^6.0.0",
     "accessible-autocomplete": "^3.0.0",
-    "cypress": "15.5.0",
+    "cypress": "15.6.0",
     "govuk-frontend": "^5.0.0",
     "opg-sirius-search-ui": "https://github.com/ministryofjustice/opg-sirius-search-ui#v1.77.8",
     "punycode": "^2.3.1",
