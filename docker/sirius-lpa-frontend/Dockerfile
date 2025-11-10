@@ -21,6 +21,13 @@ COPY go.sum .
 
 RUN go mod download
 
+# We need to copy the source files and config for Air to work when the container is run standalone for Sirius
+COPY main.go main.go
+COPY internal internal
+COPY web/template web/template
+
+COPY .air.toml .air.toml
+
 RUN apk update \
     && apk add --no-cache ca-certificates tzdata \
     && apk upgrade --no-cache busybox libcrypto3 libssl3
