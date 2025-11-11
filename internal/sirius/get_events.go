@@ -4,10 +4,9 @@ import (
 	"fmt"
 )
 
-type APIEvent []Event
+type APIEvents []Event
 
 type Event struct {
-	ChangeSet           []interface{}   `json:"changeSet"`
 	Changes             []LpaStoreEvent `json:"changes"`
 	CreatedOn           string          `json:"createdOn"`
 	Entity              any             `json:"entity"`
@@ -35,8 +34,8 @@ type EventUser struct {
 }
 
 // GetCombinedEvents Gets combined events from both Sirius and LPA Store for digital LPAs
-func (c *Client) GetCombinedEvents(ctx Context, uid string) (APIEvent, error) {
-	var events APIEvent
+func (c *Client) GetCombinedEvents(ctx Context, uid string) (APIEvents, error) {
+	var events APIEvents
 	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/events", uid), &events)
 	return events, err
 }
