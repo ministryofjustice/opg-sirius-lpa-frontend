@@ -46,7 +46,7 @@ func TestChangeDonorDetails(t *testing.T) {
 				Email:                            "test@test.com",
 				LpaSignedOn:                      "2024-10-01",
 				AuthorisedSignatory:              "Moriah Leslie",
-				WitnessedByCertificateProviderAt: lpaSignedOnTime,
+				WitnessedByCertificateProviderAt: &lpaSignedOnTime,
 				WitnessedByIndependentWitnessAt:  &lpaSignedOnTime,
 				IndependentWitnessName:           "Lowell Green",
 				IndependentWitnessAddress: Address{
