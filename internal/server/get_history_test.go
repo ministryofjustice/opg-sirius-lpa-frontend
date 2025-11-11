@@ -24,9 +24,9 @@ func (m *mockGetHistoryClient) GetEvents(ctx sirius.Context, donorId int, caseId
 	return args.Get(0), args.Error(1)
 }
 
-func (m *mockGetHistoryClient) GetCombinedEvents(ctx sirius.Context, uid string) (sirius.APIEvent, error) {
+func (m *mockGetHistoryClient) GetCombinedEvents(ctx sirius.Context, uid string) (sirius.APIEvents, error) {
 	args := m.Called(ctx, uid)
-	return args.Get(0).(sirius.APIEvent), args.Error(1)
+	return args.Get(0).(sirius.APIEvents), args.Error(1)
 }
 
 func TestGetHistorySuccessForDigitalLpa(t *testing.T) {
@@ -52,8 +52,7 @@ func TestGetHistorySuccessForDigitalLpa(t *testing.T) {
 		Return(caseSummary, nil)
 	client.
 		On("GetCombinedEvents", mock.Anything, "M-9876-9876-9999").
-		Return(sirius.APIEvent{{
-			ChangeSet:           nil,
+		Return(sirius.APIEvents{{
 			CreatedOn:           "08/08/1999",
 			Entity:              nil,
 			ID:                  "654dq42f-446d-4b2f-b2a7-355bf03b37tg",
@@ -71,9 +70,8 @@ func TestGetHistorySuccessForDigitalLpa(t *testing.T) {
 	template.
 		On("Func", mock.Anything, getHistory{
 			CaseSummary: caseSummary,
-			EventData: sirius.APIEvent{
+			EventData: sirius.APIEvents{
 				sirius.Event{
-					ChangeSet:           nil,
 					CreatedOn:           "08/08/1999",
 					Entity:              nil,
 					ID:                  "654dq42f-446d-4b2f-b2a7-355bf03b37tg",
@@ -122,7 +120,7 @@ func TestGetHistoryWhenFailureOnGetCombinedEventsForDigitalLpa(t *testing.T) {
 		Return(caseSummary, nil)
 	client.
 		On("GetCombinedEvents", mock.Anything, "M-9876-9876-9999").
-		Return(sirius.APIEvent{}, errExample)
+		Return(sirius.APIEvents{}, errExample)
 
 	server := newMockServer("/lpa/{uid}/history", GetHistory(client, nil))
 

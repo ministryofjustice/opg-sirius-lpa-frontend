@@ -43,9 +43,8 @@ func TestGetCombinedEvents(t *testing.T) {
 						}, 1),
 					})
 			},
-			expectedResponse: APIEvent{
+			expectedResponse: APIEvents{
 				Event{
-					ChangeSet:  []interface{}(nil),
 					CreatedOn:  "",
 					Entity:     interface{}(nil),
 					Source:     "sirius",
