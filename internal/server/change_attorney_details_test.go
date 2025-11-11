@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -396,4 +397,65 @@ func TestPostChangeAttorneyDetailsWhenValidationError(t *testing.T) {
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestDOBToDateString(t *testing.T) {
+	tests := []struct {
+		name     string
+		dob      dob
+		expected sirius.DateString
+	}{
+		{
+			name:     "all zero returns empty string",
+			dob:      dob{},
+			expected: "",
+		},
+		{
+			name:     "single digit month and day are zero padded",
+			dob:      dob{Year: 2025, Month: 1, Day: 2},
+			expected: "2025-01-02",
+		},
+		{
+			name:     "double digit month and day unchanged",
+			dob:      dob{Year: 2025, Month: 11, Day: 12},
+			expected: "2025-11-12",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			r := (&tc.dob).toDateString()
+			assert.Equal(t, tc.expected, r)
+		})
+	}
+}
+
+func TestDOBToTime(t *testing.T) {
+	tests := []struct {
+		name     string
+		dob      dob
+		expected time.Time
+	}{
+		{
+			name:     "all zero returns zero time",
+			dob:      dob{},
+			expected: time.Time{},
+		},
+		{
+			name:     "valid date returns midnight UTC",
+			dob:      dob{Year: 2025, Month: 1, Day: 2},
+			expected: time.Date(2025, time.January, 2, 0, 0, 0, 0, time.UTC),
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			r := tc.dob.toTime()
+			if tc.expected.IsZero() {
+				assert.True(t, r.IsZero())
+			} else {
+				assert.Equal(t, tc.expected, r)
+			}
+		})
+	}
 }
