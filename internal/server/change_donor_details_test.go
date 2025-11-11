@@ -329,7 +329,7 @@ func TestPostChangeDonorDetails(t *testing.T) {
 			Email:                            "test@test.com",
 			LpaSignedOn:                      "2024-10-09",
 			AuthorisedSignatory:              "Lucy Mueller",
-			WitnessedByCertificateProviderAt: testSignedAtTime,
+			WitnessedByCertificateProviderAt: &testSignedAtTime,
 			WitnessedByIndependentWitnessAt:  &testSignedAtTime,
 			IndependentWitnessName:           "Ora Reagan",
 			IndependentWitnessAddress: sirius.Address{
@@ -419,7 +419,7 @@ func TestPostChangeDonorDetailsWhenAPIFails(t *testing.T) {
 			Email:                            "test@test.com",
 			LpaSignedOn:                      "2024-10-09",
 			AuthorisedSignatory:              "Lucy Mueller",
-			WitnessedByCertificateProviderAt: testSignedAtTime,
+			WitnessedByCertificateProviderAt: &testSignedAtTime,
 			WitnessedByIndependentWitnessAt:  &testSignedAtTime,
 			IndependentWitnessName:           "Ora Reagan",
 			IndependentWitnessAddress: sirius.Address{

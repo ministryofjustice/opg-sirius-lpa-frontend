@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -31,6 +32,13 @@ func (d *dob) toDateString() sirius.DateString {
 	}
 
 	return sirius.DateString(fmt.Sprintf("%d-%s%d-%s%d", d.Year, monthSpacing, d.Month, daySpacing, d.Day))
+}
+
+func (d dob) toTime() time.Time {
+	if d.Day == 0 && d.Month == 0 && d.Year == 0 {
+		return time.Time{}
+	}
+	return time.Date(d.Year, time.Month(d.Month), d.Day, 0, 0, 0, 0, time.UTC)
 }
 
 type formDraft struct {

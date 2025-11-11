@@ -2,11 +2,12 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
-	"net/http"
-	"time"
 )
 
 type ChangeDonorDetailsClient interface {
@@ -58,16 +59,27 @@ func parseDate(dateString string) (dob, error) {
 }
 
 func parseDateTime(dateTimeString string) (dob, error) {
+	if dateTimeString == "" {
+		return dob{}, nil
+	}
+
 	parsedTime, err := time.Parse(time.RFC3339, dateTimeString) // Parse ISO 8601 date-time
 	if err != nil {
 		return dob{}, err
 	}
 
-	return dob{
+	parsedDate := dob{
 		Day:   parsedTime.Day(),
 		Month: int(parsedTime.Month()),
 		Year:  parsedTime.Year(),
-	}, nil
+	}
+
+	// null date coming from the lpa store is represented as 0001-01-01
+	if parsedDate == (dob{1, 1, 1}) {
+		return dob{}, nil
+	}
+
+	return parsedDate, nil
 }
 
 func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template) Handler {
@@ -220,23 +232,23 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 				LpaSignedOn:       data.Form.LpaSignedOn.toDateString(),
 			}
 
-			witnessedByCertificateProviderAt := time.Time{}
+			var witnessedByCertificateProviderAt *time.Time
 			var witnessedByIndependentWitnessAt *time.Time
-			signedAtTime, err := time.Parse(time.RFC3339, lpaStore.SignedAt)
+			signedAtTime := data.Form.LpaSignedOn.toTime()
 
 			if err != nil {
 				return err
 			}
 
-			if data.Form.SignedByWitnessOne == "Yes" {
+			if data.Form.SignedByWitnessOne == "Yes" && !signedAtTime.IsZero() {
 				if lpaStoreWitnessedByCertificateProviderAt.IsZero() {
-					witnessedByCertificateProviderAt = signedAtTime
+					witnessedByCertificateProviderAt = &signedAtTime
 				} else {
-					witnessedByCertificateProviderAt = lpaStoreWitnessedByCertificateProviderAt
+					witnessedByCertificateProviderAt = &lpaStoreWitnessedByCertificateProviderAt
 				}
 			}
 
-			if data.Form.SignedByWitnessTwo == "Yes" {
+			if data.Form.SignedByWitnessTwo == "Yes" && !signedAtTime.IsZero() {
 				if lpaStore.WitnessedByIndependentWitnessAt == "" {
 					witnessedByIndependentWitnessAt = &signedAtTime
 				} else {
