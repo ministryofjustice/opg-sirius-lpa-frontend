@@ -15,7 +15,7 @@ type ChangeDonorDetails struct {
 	Email                            string     `json:"email"`
 	LpaSignedOn                      DateString `json:"lpaSignedOn"`
 	AuthorisedSignatory              string     `json:"authorisedSignatory"`
-	WitnessedByCertificateProviderAt time.Time  `json:"witnessedByCertificateProviderAt"`
+	WitnessedByCertificateProviderAt *time.Time `json:"witnessedByCertificateProviderAt"`
 	WitnessedByIndependentWitnessAt  *time.Time `json:"witnessedByIndependentWitnessAt"`
 	IndependentWitnessName           string     `json:"independentWitnessName"`
 	IndependentWitnessAddress        Address    `json:"independentWitnessAddress"`
