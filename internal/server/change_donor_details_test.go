@@ -6,7 +6,6 @@ import (
 	"net/url"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
@@ -77,7 +76,8 @@ var testCaseSummary = sirius.CaseSummary{
 	},
 }
 
-var testSignedAtTime, _ = time.Parse(time.RFC3339, testCaseSummary.DigitalLpa.LpaStoreData.SignedAt)
+var newSignedOn = dob{9, 10, 2024}
+var newSignedOnTime = newSignedOn.toTime()
 
 func TestGetChangeDonorDetails(t *testing.T) {
 	client := &mockChangeDonorDetailsClient{}
@@ -327,10 +327,10 @@ func TestPostChangeDonorDetails(t *testing.T) {
 			},
 			Phone:                            "",
 			Email:                            "test@test.com",
-			LpaSignedOn:                      "2024-10-09",
+			LpaSignedOn:                      newSignedOn.toDateString(),
 			AuthorisedSignatory:              "Lucy Mueller",
-			WitnessedByCertificateProviderAt: &testSignedAtTime,
-			WitnessedByIndependentWitnessAt:  &testSignedAtTime,
+			WitnessedByCertificateProviderAt: &newSignedOnTime,
+			WitnessedByIndependentWitnessAt:  &newSignedOnTime,
 			IndependentWitnessName:           "Ora Reagan",
 			IndependentWitnessAddress: sirius.Address{
 				Line1:    "6 Poplar Close",
@@ -417,10 +417,10 @@ func TestPostChangeDonorDetailsWhenAPIFails(t *testing.T) {
 			},
 			Phone:                            "",
 			Email:                            "test@test.com",
-			LpaSignedOn:                      "2024-10-09",
+			LpaSignedOn:                      newSignedOn.toDateString(),
 			AuthorisedSignatory:              "Lucy Mueller",
-			WitnessedByCertificateProviderAt: &testSignedAtTime,
-			WitnessedByIndependentWitnessAt:  &testSignedAtTime,
+			WitnessedByCertificateProviderAt: &newSignedOnTime,
+			WitnessedByIndependentWitnessAt:  &newSignedOnTime,
 			IndependentWitnessName:           "Ora Reagan",
 			IndependentWitnessAddress: sirius.Address{
 				Line1:    "6 Poplar Close",
