@@ -66,14 +66,11 @@ func ChangeCertificateProviderDetails(client ChangeCertificateProviderDetailsCli
 			},
 		}
 
-		if certificateProvider.SignedAt != "" {
-			signedAt, err := parseDateTime(certificateProvider.SignedAt)
-			data.Form.SignedAt = signedAt
-
-			if err != nil {
-				return err
-			}
+		signedAt, err := parseDateTime(certificateProvider.SignedAt)
+		if err != nil {
+			return err
 		}
+		data.Form.SignedAt = signedAt
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 

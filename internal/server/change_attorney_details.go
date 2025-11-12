@@ -85,13 +85,11 @@ func ChangeAttorneyDetails(client ChangeAttorneyDetailsClient, tmpl template.Tem
 			AttorneyAppointmentType: attorney.AppointmentType,
 		}
 
-		if attorney.SignedAt != "" {
-			signedAt, err := parseDateTime(attorney.SignedAt)
-			data.Form.SignedAt = signedAt
-			if err != nil {
-				return err
-			}
+		signedAt, err := parseDateTime(attorney.SignedAt)
+		if err != nil {
+			return err
 		}
+		data.Form.SignedAt = signedAt
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
