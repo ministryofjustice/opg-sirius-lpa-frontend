@@ -4,6 +4,11 @@ describe("Edit a fee reduction", () => {
   });
 
   it("edits an existing fee reduction", () => {
+    cy.addMock("/lpa-api/v1/payments/124/reduction", "PUT", {
+      status: 200,
+      body: {},
+    });
+
     cy.contains("Edit fee reduction");
     cy.contains("7000-0000-0002");
     cy.get(".moj-alert").should("not.exist");

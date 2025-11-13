@@ -19,5 +19,5 @@ func (c *Client) ApplyFeeReduction(ctx Context, caseID int, feeReductionType str
 		PaymentDate:      paymentDate,
 	}
 
-	return c.post(ctx, fmt.Sprintf("/lpa-api/v1/cases/%d/payments", caseID), data, nil)
+	return c.post(ctx, fmt.Sprintf("/lpa-api/v1/cases/%d/payments/reduction", caseID), data, nil)
 }
