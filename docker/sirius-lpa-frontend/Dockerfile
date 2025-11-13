@@ -12,7 +12,7 @@ RUN yarn install --frozen-lockfile --ignore-scripts
 COPY web/assets web/assets
 RUN yarn build
 
-FROM golang:1.25.3-alpine AS dev
+FROM golang:1.25.4-alpine AS dev
 
 WORKDIR /app
 

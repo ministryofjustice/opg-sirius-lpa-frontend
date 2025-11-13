@@ -13,7 +13,7 @@ import (
 )
 
 type GetHistoryClient interface {
-	GetCombinedEvents(ctx sirius.Context, uid string) (sirius.APIEvent, error)
+	GetCombinedEvents(ctx sirius.Context, uid string) (sirius.APIEvents, error)
 	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
 }
 
