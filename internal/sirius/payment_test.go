@@ -297,7 +297,7 @@ func TestFeeReductionByID(t *testing.T) {
 				pact.
 					AddInteraction().
 					Given("I have an lpa which has a fee reduction").
-					UponReceiving("A request for that fee reduction by ID"). //possibly needs a reduction thing....but this is a get...so why?
+					UponReceiving("A request for that fee reduction by ID").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
 						Path:   matchers.String("/lpa-api/v1/payments/124"),
