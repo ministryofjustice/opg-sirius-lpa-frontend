@@ -24,7 +24,7 @@
     "hugerte": "https://github.com/ministryofjustice/opg-hugerte-dist#semver:v1.0.9"
   },
   "devDependencies": {
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.27.0",
     "prettier": "^3.0.0",
     "sass": "^1.26.11"
   },
