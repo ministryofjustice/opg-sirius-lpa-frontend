@@ -81,6 +81,15 @@ describe("Edit a document", () => {
     cy.contains("1: 15/12/2022 13:41:04: Consuela Aysien: LP-A");
     cy.get("#documentTextEditor").contains("Test content");
 
+    cy.intercept(
+      "GET",
+      "http://sirius-mock:8080/lpa-api/v1/documents/dfef6714-b4fe-44c2-b26e-90dfe3663e95/download",
+      {
+        statusCode: 200,
+        body: "pdf content",
+      },
+    );
+
     cy.contains("button", "Preview draft").click();
   });
 
