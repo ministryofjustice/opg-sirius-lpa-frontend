@@ -535,3 +535,32 @@ func TestPostChangeDonorDetailsWhenValidationError(t *testing.T) {
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
+
+func TestParseDateTime(t *testing.T) {
+	cases := []struct {
+		name     string
+		input    string
+		expected dob
+		wantErr  bool
+	}{
+		{"valid RFC3339", "2024-04-18T09:10:11Z", dob{Day: 18, Month: 4, Year: 2024}, false},
+		{"empty string", "", dob{}, false},
+		{"null date", "0001-01-01T00:00:00Z", dob{}, false},
+		{"invalid format", "18/04/2024", dob{}, true},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			actual, err := parseDateTime(tc.input)
+
+			if tc.wantErr {
+				assert.Error(t, err)
+				assert.Equal(t, tc.expected, actual)
+				return
+			}
+
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expected, actual)
+		})
+	}
+}

@@ -236,10 +236,6 @@ func ChangeDonorDetails(client ChangeDonorDetailsClient, tmpl template.Template)
 			var witnessedByIndependentWitnessAt *time.Time
 			signedAtTime := data.Form.LpaSignedOn.toTime()
 
-			if err != nil {
-				return err
-			}
-
 			if data.Form.SignedByWitnessOne == "Yes" && !signedAtTime.IsZero() {
 				if lpaStoreWitnessedByCertificateProviderAt.IsZero() {
 					witnessedByCertificateProviderAt = &signedAtTime
