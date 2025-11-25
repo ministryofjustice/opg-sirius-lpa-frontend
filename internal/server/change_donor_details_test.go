@@ -6,7 +6,6 @@ import (
 	"net/url"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
@@ -77,7 +76,8 @@ var testCaseSummary = sirius.CaseSummary{
 	},
 }
 
-var testSignedAtTime, _ = time.Parse(time.RFC3339, testCaseSummary.DigitalLpa.LpaStoreData.SignedAt)
+var newSignedOn = dob{9, 10, 2024}
+var newSignedOnTime = newSignedOn.toTime()
 
 func TestGetChangeDonorDetails(t *testing.T) {
 	client := &mockChangeDonorDetailsClient{}
@@ -327,10 +327,10 @@ func TestPostChangeDonorDetails(t *testing.T) {
 			},
 			Phone:                            "",
 			Email:                            "test@test.com",
-			LpaSignedOn:                      "2024-10-09",
+			LpaSignedOn:                      newSignedOn.toDateString(),
 			AuthorisedSignatory:              "Lucy Mueller",
-			WitnessedByCertificateProviderAt: testSignedAtTime,
-			WitnessedByIndependentWitnessAt:  &testSignedAtTime,
+			WitnessedByCertificateProviderAt: &newSignedOnTime,
+			WitnessedByIndependentWitnessAt:  &newSignedOnTime,
 			IndependentWitnessName:           "Ora Reagan",
 			IndependentWitnessAddress: sirius.Address{
 				Line1:    "6 Poplar Close",
@@ -417,10 +417,10 @@ func TestPostChangeDonorDetailsWhenAPIFails(t *testing.T) {
 			},
 			Phone:                            "",
 			Email:                            "test@test.com",
-			LpaSignedOn:                      "2024-10-09",
+			LpaSignedOn:                      newSignedOn.toDateString(),
 			AuthorisedSignatory:              "Lucy Mueller",
-			WitnessedByCertificateProviderAt: testSignedAtTime,
-			WitnessedByIndependentWitnessAt:  &testSignedAtTime,
+			WitnessedByCertificateProviderAt: &newSignedOnTime,
+			WitnessedByIndependentWitnessAt:  &newSignedOnTime,
 			IndependentWitnessName:           "Ora Reagan",
 			IndependentWitnessAddress: sirius.Address{
 				Line1:    "6 Poplar Close",
@@ -534,4 +534,33 @@ func TestPostChangeDonorDetailsWhenValidationError(t *testing.T) {
 	err := ChangeDonorDetails(client, template.Func)(w, r)
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestParseDateTime(t *testing.T) {
+	cases := []struct {
+		name     string
+		input    string
+		expected dob
+		wantErr  bool
+	}{
+		{"valid RFC3339", "2024-04-18T09:10:11Z", dob{Day: 18, Month: 4, Year: 2024}, false},
+		{"empty string", "", dob{}, false},
+		{"null date", "0001-01-01T00:00:00Z", dob{}, false},
+		{"invalid format", "18/04/2024", dob{}, true},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			actual, err := parseDateTime(tc.input)
+
+			if tc.wantErr {
+				assert.Error(t, err)
+				assert.Equal(t, tc.expected, actual)
+				return
+			}
+
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expected, actual)
+		})
+	}
 }

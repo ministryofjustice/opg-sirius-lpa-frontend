@@ -8,9 +8,9 @@ require (
 	github.com/pact-foundation/pact-go/v2 v2.4.2
 	github.com/stretchr/testify v1.11.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.63.0
-	golang.org/x/mod v0.29.0
+	golang.org/x/mod v0.30.0
 	golang.org/x/sync v0.18.0
-	golang.org/x/text v0.30.0
+	golang.org/x/text v0.31.0
 )
 
 require (
