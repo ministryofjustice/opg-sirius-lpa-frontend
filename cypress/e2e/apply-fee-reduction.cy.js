@@ -6,6 +6,11 @@ describe("Apply a fee reduction to a non-digital LPA", () => {
   });
 
   it("adds a fee reduction to the case", () => {
+    cy.addMock("/lpa-api/v1/cases/801/payments/reduction", "POST", {
+      status: 201,
+      body: {},
+    });
+
     cy.contains("Apply a fee reduction");
     cy.contains("7000-0000-0001");
     cy.get(".moj-alert").should("not.exist");
@@ -26,6 +31,11 @@ describe("Apply a fee reduction to a non-digital LPA", () => {
 
 describe("Apply a fee reduction to a digital LPA", () => {
   it("adds a fee reduction to the case", () => {
+    cy.addMock("/lpa-api/v1/cases/9456/payments/reduction", "POST", {
+      status: 201,
+      body: {},
+    });
+
     cy.wrap(digitalLpas.objections.empty("M-9999-4567-AAAA"));
     cy.visit("/apply-fee-reduction?id=9456");
     cy.contains("Apply a fee reduction");
