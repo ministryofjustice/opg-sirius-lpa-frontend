@@ -79,22 +79,22 @@ type ActorIdentityCheck struct {
 
 type LpaStoreDonor struct {
 	LpaStorePerson
-	DateOfBirth               string              `json:"dateOfBirth"`
-	OtherNamesKnownBy         string              `json:"otherNamesKnownBy"`
-	ContactLanguagePreference string              `json:"contactLanguagePreference"`
-	IdentityCheck             *ActorIdentityCheck `json:"identityCheck"`
+	DateOfBirth               string                `json:"dateOfBirth"`
+	OtherNamesKnownBy         string                `json:"otherNamesKnownBy"`
+	ContactLanguagePreference shared.LanguageFormat `json:"contactLanguagePreference"`
+	IdentityCheck             *ActorIdentityCheck   `json:"identityCheck"`
 }
 
 type LpaStoreAttorney struct {
 	LpaStorePerson
-	DateOfBirth               string `json:"dateOfBirth"`
-	Status                    string `json:"status"`
-	AppointmentType           string `json:"appointmentType"`
-	Mobile                    string `json:"mobile"`
-	ContactLanguagePreference string `json:"contactLanguagePreference"`
-	SignedAt                  string `json:"signedAt"`
-	Email                     string `json:"email"`
-	Decisions                 bool   `json:"cannotMakeJointDecisions,omitempty"`
+	DateOfBirth               string                `json:"dateOfBirth"`
+	Status                    string                `json:"status"`
+	AppointmentType           string                `json:"appointmentType"`
+	Mobile                    string                `json:"mobile"`
+	ContactLanguagePreference shared.LanguageFormat `json:"contactLanguagePreference"`
+	SignedAt                  string                `json:"signedAt"`
+	Email                     string                `json:"email"`
+	Decisions                 bool                  `json:"cannotMakeJointDecisions,omitempty"`
 }
 
 type LpaStoreTrustCorporation struct {
@@ -113,10 +113,10 @@ type Signatory struct {
 
 type LpaStoreCertificateProvider struct {
 	LpaStorePerson
-	Phone                     string `json:"phone"`
-	Channel                   string `json:"channel"`
-	ContactLanguagePreference string `json:"contactLanguagePreference"`
-	SignedAt                  string `json:"signedAt"`
+	Phone                     string                `json:"phone"`
+	Channel                   string                `json:"channel"`
+	ContactLanguagePreference shared.LanguageFormat `json:"contactLanguagePreference"`
+	SignedAt                  string                `json:"signedAt"`
 }
 
 type LpaStorePersonToNotify struct {
