@@ -126,17 +126,6 @@ func TestChannelForFormat(t *testing.T) {
 	testStringMapper(t, "channelForFormat", expectations)
 }
 
-func TestLanguageForFormat(t *testing.T) {
-	expectations := map[string]string{
-		"cy":  "Welsh",
-		"en":  "English",
-		"":    "Not specified",
-		"foo": "language NOT RECOGNISED: foo",
-	}
-
-	testStringMapper(t, "languageForFormat", expectations)
-}
-
 func TestProgressIndicatorContext(t *testing.T) {
 	expectations := map[string]string{
 		"FEES":                           "Fees",

@@ -99,8 +99,8 @@
                     <dt class="govuk-summary-list__key">Format</dt>
                     <dd class="govuk-summary-list__value">
                         {{ channelForFormat .DigitalLpa.LpaStoreData.Channel }}
-                        {{ if and .DigitalLpa.LpaStoreData.Donor (not (eq .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference "")) }}
-                            <br>{{ languageForFormat .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference }}
+                        {{ if and .DigitalLpa.LpaStoreData.Donor (not (eq .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference.String "")) }}
+                            <br>{{ .DigitalLpa.LpaStoreData.Donor.ContactLanguagePreference.Translation }}
                         {{ end }}
                     </dd>
                 </div>

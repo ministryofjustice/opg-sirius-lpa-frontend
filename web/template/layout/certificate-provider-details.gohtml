@@ -97,8 +97,8 @@
                 <dt class="govuk-summary-list__key">Format</dt>
                 <dd class="govuk-summary-list__value">
                     {{ channelForFormat .DigitalLpa.LpaStoreData.CertificateProvider.Channel }}
-                    {{ if not (eq .DigitalLpa.LpaStoreData.CertificateProvider.ContactLanguagePreference "") }}
-                        <br>{{ languageForFormat .DigitalLpa.LpaStoreData.CertificateProvider.ContactLanguagePreference }}
+                    {{ if not (eq .DigitalLpa.LpaStoreData.CertificateProvider.ContactLanguagePreference.String "") }}
+                        <br>{{ .DigitalLpa.LpaStoreData.CertificateProvider.ContactLanguagePreference.Translation }}
                     {{ end }}
                 </dd>
             </div>

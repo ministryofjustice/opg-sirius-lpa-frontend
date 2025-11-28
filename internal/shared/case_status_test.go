@@ -24,7 +24,7 @@ func TestParseCaseStatusType(t *testing.T) {
 	}
 }
 
-func TestUnmarshalJSON(t *testing.T) {
+func TestCaseStatusUnmarshalJSON(t *testing.T) {
 	tests := []struct {
 		jsonInput string
 		expected  CaseStatus

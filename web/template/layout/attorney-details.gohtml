@@ -107,12 +107,12 @@
                         <dt class="govuk-summary-list__key">Format</dt>
                         <dd class="govuk-summary-list__value">
                             {{ if (eq $attorney.Email "") }}
-                                Paper
+                                Paper akldjaklsdjaklsdj
                             {{ else }}
                                 Online
                             {{ end }}
-                            {{ if not (eq $attorney.ContactLanguagePreference "") }}
-                                <br>{{ languageForFormat $attorney.ContactLanguagePreference }}
+                            {{ if not (eq $attorney.ContactLanguagePreference.String "") }}
+                                <br>{{ $attorney.ContactLanguagePreference.Translation }}
                             {{ end }}
                         </dd>
                     </div>
