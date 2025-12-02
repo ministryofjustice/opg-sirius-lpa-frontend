@@ -24,7 +24,7 @@ func TestParseLanguageFormat(t *testing.T) {
 	}
 }
 
-func TestLanguageFormat_Translation(t *testing.T) {
+func TestLanguageFormatTranslation(t *testing.T) {
 	tests := []struct {
 		name  string
 		input LanguageFormat
