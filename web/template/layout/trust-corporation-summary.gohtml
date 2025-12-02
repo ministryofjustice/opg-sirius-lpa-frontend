@@ -66,11 +66,11 @@
         </dd>
     </div>
 
-    {{ if not (eq .ContactLanguagePreference "") }}
+    {{ if not (eq .ContactLanguagePreference.String "") }}
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Correspondence</dt>
             <dd class="govuk-summary-list__value">
-                {{ languageForFormat .ContactLanguagePreference }}
+                {{ .ContactLanguagePreference.Translation }}
             </dd>
         </div>
     {{ end }}

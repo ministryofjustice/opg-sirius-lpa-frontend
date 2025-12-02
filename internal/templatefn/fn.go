@@ -232,19 +232,6 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "channel NOT RECOGNISED: " + s
 			}
 		},
-		// translate language code to long version for Format fields in display
-		"languageForFormat": func(s string) string {
-			switch s {
-			case "cy":
-				return "Welsh"
-			case "en":
-				return "English"
-			case "":
-				return "Not specified"
-			default:
-				return "language NOT RECOGNISED: " + s
-			}
-		},
 		// translate progress indicator context to long version for application progress page
 		"progressIndicatorContext": func(s string) string {
 			switch s {
