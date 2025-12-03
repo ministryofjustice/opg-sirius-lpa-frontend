@@ -1,0 +1,27 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Document List{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            {{ template "error-summary" .Error }}
+
+            <h1 class="govuk-heading-l app-!-embedded-hide">Documents</h1>
+
+            <p class="govuk-body">
+                Viewing {{ len .SelectedCases }} Poa{{ if gt (len .SelectedCases ) 1 }}s{{ end }}
+                {{ range .SelectedCases }}
+                    {{if eq .Type "EPA "}}
+                        {{ .Type }} {{ .UID }}
+                    {{ else }}
+                        {{ .Subtype }} {{ .UID }}
+                    {{ end }}
+                {{ end }}
+            </p>
+
+            <p>{{ .Cases }}</p>
+        </div>
+    </div>
+{{ end }}

@@ -62,6 +62,7 @@ type Client interface {
 	CreateInvestigationClient
 	DeletePaymentClient
 	DeleteRelationshipClient
+	DocumentsListClient
 	EditComplaintClient
 	EditDatesClient
 	EditDocumentClient
@@ -129,6 +130,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/edit-dates", wrap(EditDates(client, templates.Get("edit_dates.gohtml"))))
 	mux.Handle("/link-person", wrap(LinkPerson(client, templates.Get("link_person.gohtml"))))
 	mux.Handle("/add-complaint", wrap(AddComplaint(client, templates.Get("add_complaint.gohtml"))))
+	mux.Handle("/donor/{id}/documents", wrap(DocumentsList(client, templates.Get("documents.gohtml"))))
 	mux.Handle("/edit-complaint", wrap(EditComplaint(client, templates.Get("edit_complaint.gohtml"))))
 	mux.Handle("/unlink-person", wrap(UnlinkPerson(client, templates.Get("unlink_person.gohtml"))))
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change_status.gohtml"))))
