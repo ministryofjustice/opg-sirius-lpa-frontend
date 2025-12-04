@@ -8,10 +8,10 @@
 
             {{ template "error-summary" .Error }}
 
-            <h1 class="govuk-heading-l app-!-embedded-hide">Documents</h1>
+            <h1 class="govuk-heading-l app-!-embedded-hide">Documents ({{ .Documents.Total }})</h1>
 
             <p class="govuk-body">
-                Viewing {{ len .SelectedCases }} Poa{{ if gt (len .SelectedCases ) 1 }}s{{ end }}
+                Viewing {{ if eq (len .SelectedCases) 0}}{{len .Cases}}{{else}}{{ len .SelectedCases }}{{end}} Poa{{ if gt (len .SelectedCases ) 1 }}s{{ end }}
                 {{ range .SelectedCases }}
                     {{if eq .Type "EPA "}}
                         {{ .Type }} {{ .UID }}
@@ -22,6 +22,9 @@
             </p>
 
             <p>{{ .Cases }}</p>
+
+            <p class="govuk-body">{{ .Documents }}</p>
+
         </div>
     </div>
 {{ end }}

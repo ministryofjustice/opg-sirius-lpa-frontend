@@ -11,7 +11,7 @@ import (
 type DocumentsListClient interface {
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
 	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
-	GetPersonDocuments(ctx sirius.Context, personID string, caseIDs []string) ([]sirius.Document, error)
+	GetPersonDocuments(ctx sirius.Context, personID string, caseIDs []string) (sirius.DocumentList, error)
 }
 
 type documentListData struct {
@@ -22,7 +22,7 @@ type documentListData struct {
 	DonorId       string
 	CaseUIDs      []string
 	Complaint     sirius.Complaint
-	Documents     []sirius.Document
+	Documents     sirius.DocumentList
 	Cases         []sirius.Case
 	SelectedCases []SelectedCaseForDocuments
 }
@@ -55,13 +55,13 @@ func DocumentsList(client DocumentsListClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		//make a map to avoid looping many times
 		casesByUID := make(map[string]sirius.Case, len(cases))
 		for _, c := range cases {
 			casesByUID[c.UID] = c
 		}
 
 		var selected []SelectedCaseForDocuments
+		var caseIDs []string
 		for _, uid := range caseUIDs {
 			if c, ok := casesByUID[uid]; ok {
 				selected = append(selected, SelectedCaseForDocuments{
@@ -70,7 +70,13 @@ func DocumentsList(client DocumentsListClient, tmpl template.Template) Handler {
 					Type:    c.CaseType,
 					Subtype: c.SubType,
 				})
+				caseIDs = append(caseIDs, strconv.Itoa(c.ID))
 			}
+		}
+
+		docs, err := client.GetPersonDocuments(ctx, donorID, caseIDs)
+		if err != nil {
+			return err
 		}
 
 		data := documentListData{
@@ -78,6 +84,7 @@ func DocumentsList(client DocumentsListClient, tmpl template.Template) Handler {
 			DonorId:       donorID,
 			Cases:         cases,
 			SelectedCases: selected,
+			Documents:     docs,
 		}
 
 		return tmpl(w, data)

@@ -24,6 +24,14 @@ type Document struct {
 	CaseItems           []Case `json:"caseItems,omitempty"`
 }
 
+type DocumentList struct {
+	Limit     int        `json:"limit,omitempty"`
+	MetaData  any        `json:"metadata,omitempty"`
+	Pages     any        `json:"pages,omitempty"`
+	Total     int        `json:"total,omitempty"`
+	Documents []Document `json:"documents,omitempty"`
+}
+
 func (d *Document) IsViewable() bool {
 	if d.SubType == "Reduced fee request evidence" && d.Direction == "Incoming" {
 		return d.ReceivedDateTime != ""
@@ -71,6 +79,24 @@ func (c *Client) Documents(ctx Context, caseType CaseType, caseId int, docTypes 
 func (c *Client) DocumentByUUID(ctx Context, uuid string) (Document, error) {
 	var d Document
 	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/documents/%s", uuid), &d)
+
+	return d, err
+}
+
+func (c *Client) GetPersonDocuments(ctx Context, personID string, caseIDs []string) (DocumentList, error) {
+	var d DocumentList
+
+	query := "?filter=draft:0,preview:0"
+
+	for _, caseID := range caseIDs {
+		query = query + ",case:" + caseID
+	}
+
+	query = query + "&limit=999"
+
+	url := fmt.Sprintf("/lpa-api/v1/persons/%s/documents%s", personID, query)
+
+	err := c.get(ctx, url, &d)
 
 	return d, err
 }
