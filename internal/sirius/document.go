@@ -84,7 +84,7 @@ func (c *Client) DocumentByUUID(ctx Context, uuid string) (Document, error) {
 	return d, err
 }
 
-func (c *Client) GetPersonDocuments(ctx Context, personID string, caseIDs []string) (DocumentList, error) {
+func (c *Client) GetPersonDocuments(ctx Context, personID int, caseIDs []string) (DocumentList, error) {
 	var d DocumentList
 
 	query := "?filter=draft:0,preview:0"
@@ -95,7 +95,7 @@ func (c *Client) GetPersonDocuments(ctx Context, personID string, caseIDs []stri
 
 	query = query + "&limit=999"
 
-	url := fmt.Sprintf("/lpa-api/v1/persons/%s/documents%s", personID, query)
+	url := fmt.Sprintf("/lpa-api/v1/persons/%d/documents%s", personID, query)
 
 	err := c.get(ctx, url, &d)
 

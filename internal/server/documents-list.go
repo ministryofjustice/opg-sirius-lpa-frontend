@@ -10,29 +10,24 @@ import (
 )
 
 type DocumentsListClient interface {
-	Case(ctx sirius.Context, id int) (sirius.Case, error)
 	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
-	GetPersonDocuments(ctx sirius.Context, personID string, caseIDs []string) (sirius.DocumentList, error)
+	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
 }
 
 type documentListData struct {
-	XSRFToken     string
-	Entity        string
-	Success       bool
-	Error         sirius.ValidationError
-	DonorId       string
-	CaseUIDs      []string
-	Complaint     sirius.Complaint
-	Documents     sirius.DocumentList
-	Cases         []sirius.Case
-	SelectedCases []SelectedCaseForDocuments
+	XSRFToken             string
+	Entity                string
+	Success               bool
+	Error                 sirius.ValidationError
+	DocumentList          sirius.DocumentList
+	SelectedCases         []SelectedCaseForDocuments
+	MultipleCasesSelected bool
 }
 
 type SelectedCaseForDocuments struct {
-	UID     string
-	ID      string
-	Subtype string
-	Type    string
+	UID      string
+	SubType  string
+	CaseType string
 }
 
 func ToUpper(s string) string {
@@ -41,41 +36,56 @@ func ToUpper(s string) string {
 
 func DocumentsList(client DocumentsListClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		if err := r.ParseForm(); err != nil {
+		donorID, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
 			return err
 		}
 
-		donorID := r.PathValue("id")
 		caseUIDs := r.Form["uid[]"]
+		multipleCasesForSelection := false
 
 		ctx := getContext(r)
 
-		donorInt, err := strconv.Atoi(donorID)
+		casesOnDonor, err := client.CasesByDonor(ctx, donorID)
 		if err != nil {
 			return err
-		}
-
-		cases, err := client.CasesByDonor(ctx, donorInt)
-		if err != nil {
-			return err
-		}
-
-		casesByUID := make(map[string]sirius.Case, len(cases))
-		for _, c := range cases {
-			casesByUID[c.UID] = c
 		}
 
 		var selected []SelectedCaseForDocuments
 		var caseIDs []string
-		for _, uid := range caseUIDs {
-			if c, ok := casesByUID[uid]; ok {
+
+		if len(caseUIDs) > 0 {
+			if len(caseUIDs) > 1 {
+				multipleCasesForSelection = true
+			}
+
+			casesByUID := make(map[string]sirius.Case, len(casesOnDonor))
+			for _, c := range casesOnDonor {
+				casesByUID[c.UID] = c
+			}
+
+			for _, uid := range caseUIDs {
+				if c, ok := casesByUID[uid]; ok {
+					selected = append(selected, SelectedCaseForDocuments{
+						UID:      c.UID,
+						CaseType: c.CaseType,
+						SubType:  c.SubType,
+					})
+					caseIDs = append(caseIDs, strconv.Itoa(c.ID))
+				}
+			}
+
+		} else {
+			if len(casesOnDonor) > 1 {
+				multipleCasesForSelection = true
+			}
+
+			for _, c := range casesOnDonor {
 				selected = append(selected, SelectedCaseForDocuments{
-					UID:     c.UID,
-					ID:      strconv.Itoa(c.ID),
-					Type:    c.CaseType,
-					Subtype: c.SubType,
+					UID:      c.UID,
+					CaseType: c.CaseType,
+					SubType:  c.SubType,
 				})
-				caseIDs = append(caseIDs, strconv.Itoa(c.ID))
 			}
 		}
 
@@ -85,11 +95,10 @@ func DocumentsList(client DocumentsListClient, tmpl template.Template) Handler {
 		}
 
 		data := documentListData{
-			XSRFToken:     ctx.XSRFToken,
-			DonorId:       donorID,
-			Cases:         cases,
-			SelectedCases: selected,
-			Documents:     docs,
+			XSRFToken:             ctx.XSRFToken,
+			SelectedCases:         selected,
+			DocumentList:          docs,
+			MultipleCasesSelected: multipleCasesForSelection,
 		}
 
 		return tmpl(w, data)
