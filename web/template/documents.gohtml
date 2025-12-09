@@ -4,26 +4,96 @@
 
 {{ define "main" }}
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-grid-column-full">
 
             {{ template "error-summary" .Error }}
 
-            <h1 class="govuk-heading-l app-!-embedded-hide">Documents ({{ .Documents.Total }})</h1>
+            {{ $multiCaseSelected := false }}
+            {{ if eq (len .SelectedCases) 0 }}
+                {{if (gt (len .Cases) 1)}}
+                    {{ $multiCaseSelected = true }}
+                {{end}}
+            {{ else if (gt (len .SelectedCases ) 1)}}
+                {{ $multiCaseSelected = true }}
+            {{ end }}
 
-            <p class="govuk-body">
-                Viewing {{ if eq (len .SelectedCases) 0}}{{len .Cases}}{{else}}{{ len .SelectedCases }}{{end}} Poa{{ if gt (len .SelectedCases ) 1 }}s{{ end }}
-                {{ range .SelectedCases }}
-                    {{if eq .Type "EPA "}}
-                        {{ .Type }} {{ .UID }}
-                    {{ else }}
-                        {{ .Subtype }} {{ .UID }}
-                    {{ end }}
+
+            <table class="govuk-table" data-module="moj-sortable-table">
+                <caption class="govuk-table__caption">
+                    Documents ({{ .Documents.Total }})
+                    <span class="govuk-body">
+                        Viewing {{ if eq (len .SelectedCases) 0}}{{len .Cases}}{{else}}{{ len .SelectedCases }}{{end}} POA{{ if $multiCaseSelected }}s{{ end }}:
+                        {{ if eq (len .SelectedCases) 0 }}
+                            {{ range .Cases }}
+                                {{if eq .CaseType "EPA"}}
+                                    <strong class="app-govuk-tag colour-govuk-brown">{{ ToUpper .CaseType }}</strong> {{ .UID }}
+                                {{ else }}
+                                    <strong class="app-govuk-tag {{ caseLabel .SubType }}">{{ ToUpper .SubType }}</strong> {{ .UID }}
+                                {{ end }}
+                            {{ end}}
+                        {{ else }}
+                            {{ range .SelectedCases }}
+                                {{if eq .Type "EPA"}}
+                                    <strong class="app-govuk-tag colour-govuk-brown">{{ ToUpper .Type }}</strong> {{ .UID }}
+                                {{ else }}
+                                    <strong class="app-govuk-tag {{ caseLabel .Subtype }}">{{ ToUpper .Subtype }}</strong> {{ .UID }}
+                                {{ end }}
+                            {{ end }}
+                        {{ end }}
+                    </span>
+                </caption>
+
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-half" aria-sort="none">Name</th>
+                        {{ if $multiCaseSelected }}
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter" aria-sort="none">Case number</th>
+                        {{ end }}
+                        <th scope="col" class="govuk-table__header" aria-sort="none">Date created</th>
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter" aria-sort="none">Document Type</th>
+                    </tr>
+                </thead>
+
+
+                <tbody class="govuk-table__body">
+                {{ range .Documents.Documents }}
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">[{{ documentDirection .Direction }}{{ if .NotifyStatus}} - {{ .NotifyStatus }}{{end}}]
+                            <br>
+                            <a class="govuk-link" href="/lpa/document/{{ .UUID }}">{{ .FriendlyDescription }}</a>
+                        </td>
+                        {{ if $multiCaseSelected }}
+                            <td class="govuk-table__cell">
+                                {{ if gt (len .CaseItems) 0 -}}
+                                    {{ $case := index .CaseItems 0 -}}
+                                    {{ if eq $case.CaseType "EPA" -}}
+                                        <strong class="app-govuk-tag colour-govuk-brown">
+                                            {{ ToUpper $case.CaseType }}
+                                        </strong>
+                                    {{ else }}
+                                        <strong class="app-govuk-tag {{ caseLabel $case.SubType}} bold">
+                                            {{ ToUpper $case.SubType }}
+                                        </strong>
+                                    {{ end }}
+                                    {{ $case.UID }}
+                                {{ end -}}
+                            </td>
+                        {{ end }}
+                        <td class="govuk-table__cell">{{ .CreatedDate }}</td>
+                        <td class="govuk-table__cell">
+                            {{ if eq .Direction "Outgoing" }}
+                                {{ .SystemType }}
+                            {{ else if eq .Direction "Incoming" }}
+                                {{ .Type }} - {{ .SubType }}
+                            {{ else if eq .Type "Correspondence" }}
+                                {{ .SubType }}
+                            {{ end}}
+                        </td>
+                    </tr>
                 {{ end }}
-            </p>
+                </tbody>
+            </table>
 
-            <p>{{ .Cases }}</p>
-
-            <p class="govuk-body">{{ .Documents }}</p>
 
         </div>
     </div>

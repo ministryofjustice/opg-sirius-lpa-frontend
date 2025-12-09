@@ -22,6 +22,7 @@ type Document struct {
 	Correspondent       Person `json:"correspondent"`
 	ChildCount          int    `json:"childCount"`
 	CaseItems           []Case `json:"caseItems,omitempty"`
+	NotifyStatus        string `json:"notifyStatus,omitempty"`
 }
 
 type DocumentList struct {

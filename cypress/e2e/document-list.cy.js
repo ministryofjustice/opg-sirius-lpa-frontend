@@ -105,7 +105,7 @@ describe("View documents", () => {
             current: 1,
             total: 1,
           },
-          total: 3,
+          total: 4,
           documents: [
             {
               id: 332,
@@ -168,64 +168,30 @@ describe("View documents", () => {
               childCount: 0,
               systemType: "LP-NA-3A",
             },
+            {
+                id: 640,
+                uuid: "42e6f4c2-5f8b-47c3-bc98-64b47c938e52",
+                type: "Save",
+                friendlyDescription: "Letter",
+                createdDate: "26/08/2022 08:11:27",
+                direction: "Outgoing",
+                notifyStatus: "posted",
+                filename: "LP-WHAT.pdf",
+                mimeType: "application/pdf",
+                caseItems: [
+                    {
+                        uId: "7000-5678-5678",
+                        caseSubtype: "hw",
+                        caseType: "LPA",
+                    },
+                ],
+                persons: [],
+                childCount: 0,
+                systemType: "LP-WHAT",
+            },
           ],
         },
       });
-
-      cy.addMock(
-          "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0,case:990&limit=999",
-          "GET",
-          {
-              status: 200,
-              body: {
-                  limit: 999,
-                  metadata: {
-                      doctype: {
-                          correspondence: 1,
-                          order: 0,
-                          report: 0,
-                          visit: 0,
-                          finance: 0,
-                          other: 0,
-                      },
-                      direction: {
-                          Incoming: 1,
-                          Outgoing: 0,
-                          Internal: 0,
-                      },
-                  },
-                  pages: {
-                      current: 1,
-                      total: 1,
-                  },
-                  total: 1,
-                  documents: [
-                      {
-                          id: 928,
-                          uuid: "d9e12f73-3ab2-4d24-9a63-6b0b3e49b1c5",
-                          type: "Application Related",
-                          friendlyDescription: "EPA.pdf",
-                          title: "Correspondence",
-                          createdDate: "08/01/2025 10:36:41",
-                          direction: "Incoming",
-                          filename: "EPA.pdf",
-                          mimeType: "application/pdf",
-                          note: {
-                              description: "Manual Upload"
-                          },
-                          caseItems: [
-                              {
-                                  uId: "7001-0000-5678",
-                                  caseSubtype: "pfa",
-                                  caseType: "EPA"
-                              }
-                          ],
-                          persons: [],
-                          childCount: 0
-                      },
-                  ],
-              },
-          });
 
       cy.addMock(
           "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0&limit=999",
@@ -245,7 +211,7 @@ describe("View documents", () => {
                       },
                       direction: {
                           Incoming: 4,
-                          Outgoing: 1,
+                          Outgoing: 2,
                           Internal: 0,
                       },
                   },
@@ -253,7 +219,7 @@ describe("View documents", () => {
                       current: 1,
                       total: 1,
                   },
-                  total: 5,
+                  total: 6,
                   documents: [
                       {
                           id: 332,
@@ -317,6 +283,27 @@ describe("View documents", () => {
                           systemType: "LP-NA-3A",
                       },
                       {
+                          id: 640,
+                          uuid: "42e6f4c2-5f8b-47c3-bc98-64b47c938e52",
+                          type: "Save",
+                          friendlyDescription: "Letter",
+                          createdDate: "26/08/2022 08:11:27",
+                          direction: "Outgoing",
+                          notifyStatus: "posted",
+                          filename: "LP-WHAT.pdf",
+                          mimeType: "application/pdf",
+                          caseItems: [
+                              {
+                                  uId: "7000-5678-5678",
+                                  caseSubtype: "hw",
+                                  caseType: "LPA",
+                              },
+                          ],
+                          persons: [],
+                          childCount: 0,
+                          systemType: "LP-WHAT",
+                      },
+                      {
                           id: 928,
                           uuid: "d9e12f73-3ab2-4d24-9a63-6b0b3e49b1c5",
                           type: "Application Related",
@@ -337,7 +324,8 @@ describe("View documents", () => {
                               }
                           ],
                           persons: [],
-                          childCount: 0
+                          childCount: 0,
+                          subtype: "pfa",
                       },
                       {
                           id: 11,
@@ -366,24 +354,80 @@ describe("View documents", () => {
 
   });
 
-  it("has title", () => {
+  it(" on a person", () => {
       cy.visit("/donor/1/documents");
       cy.contains("Documents");
   });
 
-  it("looks at documents with a single uid", () => {
+  it("on a single case", () => {
     cy.visit("/donor/1/documents?uid[]=7000-1234-1234");
 
     cy.contains("Documents");
   });
 
-  it("looks at documents with multiple uid", () => {
+  it("on multiple cases", () => {
     cy.visit("/donor/1/documents?uid[]=7000-1234-1234&uid[]=7000-5678-5678");
 
     cy.contains("Documents");
   });
 
   it("looks at EPA documents", () => {
+      cy.addMock(
+          "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0,case:990&limit=999",
+          "GET",
+          {
+              status: 200,
+              body: {
+                  limit: 999,
+                  metadata: {
+                      doctype: {
+                          correspondence: 1,
+                          order: 0,
+                          report: 0,
+                          visit: 0,
+                          finance: 0,
+                          other: 0,
+                      },
+                      direction: {
+                          Incoming: 1,
+                          Outgoing: 0,
+                          Internal: 0,
+                      },
+                  },
+                  pages: {
+                      current: 1,
+                      total: 1,
+                  },
+                  total: 1,
+                  documents: [
+                      {
+                          id: 928,
+                          uuid: "d9e12f73-3ab2-4d24-9a63-6b0b3e49b1c5",
+                          type: "Application Related",
+                          friendlyDescription: "EPA.pdf",
+                          title: "Correspondence",
+                          createdDate: "08/01/2025 10:36:41",
+                          direction: "Incoming",
+                          filename: "EPA.pdf",
+                          mimeType: "application/pdf",
+                          note: {
+                              description: "Manual Upload"
+                          },
+                          caseItems: [
+                              {
+                                  uId: "7001-0000-5678",
+                                  caseSubtype: "pfa",
+                                  caseType: "EPA"
+                              }
+                          ],
+                          persons: [],
+                          subtype: "pfa",
+                          childCount: 0
+                      },
+                  ],
+              },
+          });
+
     cy.visit("/donor/1/documents?uid[]=7001-0000-5678");
 
     cy.contains("Documents");

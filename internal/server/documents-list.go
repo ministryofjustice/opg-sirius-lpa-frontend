@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -32,6 +33,10 @@ type SelectedCaseForDocuments struct {
 	ID      string
 	Subtype string
 	Type    string
+}
+
+func ToUpper(s string) string {
+	return strings.ToUpper(s)
 }
 
 func DocumentsList(client DocumentsListClient, tmpl template.Template) Handler {
