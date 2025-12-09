@@ -20,14 +20,8 @@ type documentListData struct {
 	Success               bool
 	Error                 sirius.ValidationError
 	DocumentList          sirius.DocumentList
-	SelectedCases         []SelectedCaseForDocuments
+	SelectedCases         []sirius.Case
 	MultipleCasesSelected bool
-}
-
-type SelectedCaseForDocuments struct {
-	UID      string
-	SubType  string
-	CaseType string
 }
 
 func ToUpper(s string) string {
@@ -42,7 +36,6 @@ func DocumentsList(client DocumentsListClient, tmpl template.Template) Handler {
 		}
 
 		caseUIDs := r.Form["uid[]"]
-		multipleCasesForSelection := false
 
 		ctx := getContext(r)
 
@@ -51,14 +44,10 @@ func DocumentsList(client DocumentsListClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		var selected []SelectedCaseForDocuments
+		var selected []sirius.Case
 		var caseIDs []string
 
 		if len(caseUIDs) > 0 {
-			if len(caseUIDs) > 1 {
-				multipleCasesForSelection = true
-			}
-
 			casesByUID := make(map[string]sirius.Case, len(casesOnDonor))
 			for _, c := range casesOnDonor {
 				casesByUID[c.UID] = c
@@ -66,27 +55,12 @@ func DocumentsList(client DocumentsListClient, tmpl template.Template) Handler {
 
 			for _, uid := range caseUIDs {
 				if c, ok := casesByUID[uid]; ok {
-					selected = append(selected, SelectedCaseForDocuments{
-						UID:      c.UID,
-						CaseType: c.CaseType,
-						SubType:  c.SubType,
-					})
+					selected = append(selected, c)
 					caseIDs = append(caseIDs, strconv.Itoa(c.ID))
 				}
 			}
-
 		} else {
-			if len(casesOnDonor) > 1 {
-				multipleCasesForSelection = true
-			}
-
-			for _, c := range casesOnDonor {
-				selected = append(selected, SelectedCaseForDocuments{
-					UID:      c.UID,
-					CaseType: c.CaseType,
-					SubType:  c.SubType,
-				})
-			}
+			selected = casesOnDonor
 		}
 
 		docs, err := client.GetPersonDocuments(ctx, donorID, caseIDs)
@@ -98,7 +72,7 @@ func DocumentsList(client DocumentsListClient, tmpl template.Template) Handler {
 			XSRFToken:             ctx.XSRFToken,
 			SelectedCases:         selected,
 			DocumentList:          docs,
-			MultipleCasesSelected: multipleCasesForSelection,
+			MultipleCasesSelected: len(caseUIDs) > 1 || (len(caseUIDs) == 0 && len(casesOnDonor) > 1),
 		}
 
 		return tmpl(w, data)
