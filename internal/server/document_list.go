@@ -9,7 +9,7 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-type DocumentsListClient interface {
+type DocumentListClient interface {
 	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
 	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
 }
@@ -28,7 +28,7 @@ func ToUpper(s string) string {
 	return strings.ToUpper(s)
 }
 
-func DocumentsList(client DocumentsListClient, tmpl template.Template) Handler {
+func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
 			return err
