@@ -250,18 +250,24 @@ $govuk-assets-path: "../assets/";
 }
 
 .app-govuk-tag {
-    display: inline-flex;
-    padding: 2px 4px 1px 4px;
-    justify-content: center;
-    align-items: center;
-    border-radius: 4px;
-    gap: 10px;
-    font-size: 0.9rem;
+  display: inline-flex;
+  padding: 2px 4px 1px 4px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  gap: 10px;
+  font-size: 0.9rem;
 }
 
-.colour-govuk-turquoise { background: #28a197; }
-.colour-govuk-grass-green { background: #85994b; }
-.colour-govuk-brown { background: #b58840; }
+.colour-govuk-turquoise {
+  background: #28a197;
+}
+.colour-govuk-grass-green {
+  background: #85994b;
+}
+.colour-govuk-brown {
+  background: #b58840;
+}
 
 .app-progress-indicator-icon[data-progress-indicator="not-started"] {
   [data-svg-elt="background"] {

@@ -36,7 +36,7 @@
                 <tbody class="govuk-table__body">
                 {{ range .DocumentList.Documents }}
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__cell">[{{ documentDirection .Direction }}{{ if .NotifyStatus}} - {{ .NotifyStatus }}{{end}}]
+                        <td class="govuk-table__cell">[{{ documentDirection .Direction }}{{ if .NotifyStatus}} - {{ notifyStatus .NotifyStatus }}{{end}}]
                             <br>
                             <a class="govuk-link" href="/lpa/document/{{ .UUID }}">{{ .FriendlyDescription }}</a>
                         </td>
@@ -53,7 +53,7 @@
                             {{ if eq .Direction "Outgoing" }}
                                 {{ .SystemType }}
                             {{ else if eq .Direction "Incoming" }}
-                                {{ .Type }} - {{ .SubType }}
+                                {{ .Type }}{{ if .SubType }} - {{ ToUpper .SubType }}{{ end }}
                             {{ else if eq .Type "Correspondence" }}
                                 {{ .SubType }}
                             {{ end}}

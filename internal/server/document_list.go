@@ -30,6 +30,10 @@ func ToUpper(s string) string {
 
 func DocumentsList(client DocumentsListClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
+		if err := r.ParseForm(); err != nil {
+			return err
+		}
+
 		donorID, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
 			return err
