@@ -99,7 +99,7 @@
                                         {{ $case.CaseType }} - {{ subtypeShortFormat $case.SubType }}<br>
                                     {{ end }}
                                 </td>
-                                <td class="govuk-table__cell">
+                                <td class="govuk-table__cell table-cell-nowrap">
                                     {{ range $case := .Cases }}
                                         {{ if $case.Status }}
                                             {{ template "status-tag" $case.Status }}<br>
