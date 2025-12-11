@@ -3,7 +3,6 @@ package server
 import (
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -22,10 +21,6 @@ type documentListData struct {
 	DocumentList          sirius.DocumentList
 	SelectedCases         []sirius.Case
 	MultipleCasesSelected bool
-}
-
-func ToUpper(s string) string {
-	return strings.ToUpper(s)
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {

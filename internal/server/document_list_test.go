@@ -265,6 +265,16 @@ func TestGetDocumentList(t *testing.T) {
 	}
 }
 
+func TestDocumentListInvalidDonorID(t *testing.T) {
+	client := &mockDocumentListClient{}
+	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/donor/abc/documents", nil)
+	_, err := server.serve(req)
+
+	assert.Error(t, err)
+}
+
 func TestGetDocumentListWhenCasesByDonorErrors(t *testing.T) {
 	client := &mockDocumentListClient{}
 	client.

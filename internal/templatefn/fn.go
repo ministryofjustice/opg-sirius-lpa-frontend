@@ -302,22 +302,6 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "resolution outcome NOT RECOGNISED: " + s
 			}
 		},
-		"notifyStatus": func(s string) string {
-			switch s {
-			case "queued":
-				return "Queued"
-			case "posting":
-				return "Posting"
-			case "rejected":
-				return "Rejected"
-			case "posted":
-				return "Posted"
-			case "":
-				return "Not specified"
-			default:
-				return "notify status NOT RECOGNISED: " + s
-			}
-		},
 		"documentDirection": func(s string) string {
 			switch s {
 			case "Incoming":

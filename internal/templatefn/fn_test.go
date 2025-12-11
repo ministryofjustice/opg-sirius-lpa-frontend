@@ -178,6 +178,29 @@ func TestResolutionOutcome(t *testing.T) {
 	testStringMapper(t, "resolutionOutcome", expectations)
 }
 
+func TestDocumentDirection(t *testing.T) {
+	expectations := map[string]string{
+		"Incoming": "In",
+		"Outgoing": "Out",
+		"":         "Not specified",
+		"foo":      "document direction NOT RECOGNISED: foo",
+	}
+
+	testStringMapper(t, "documentDirection", expectations)
+}
+
+func TestCaseLabel(t *testing.T) {
+	expectations := map[string]string{
+		"EPA": "colour-govuk-brown",
+		"pfa": "colour-govuk-turquoise",
+		"hw":  "colour-govuk-grass-green",
+		"":    "Not specified",
+		"foo": "case label colour NOT RECOGNISED: foo",
+	}
+
+	testStringMapper(t, "caseLabel", expectations)
+}
+
 func TestCamelcaseToSentence(t *testing.T) {
 	expectations := map[string]string{
 		"uId":   "UID",
