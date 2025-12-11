@@ -17,7 +17,7 @@ type Document struct {
 	MimeType            string `json:"mimeType"`
 	SystemType          string `json:"systemType"`
 	SubType             string `json:"subType"`
-	FileName            string `json:"fileName,omitempty"`
+	FileName            string `json:"filename,omitempty"`
 	Content             string `json:"content,omitempty"`
 	Correspondent       Person `json:"correspondent"`
 	ChildCount          int    `json:"childCount"`
