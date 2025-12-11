@@ -255,7 +255,7 @@ func TestGetPersonDocument(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A donor exists with more than 1 case").
+					Given("A donor exists with more than 1 case and published documents").
 					UponReceiving("A request for the documents on the person").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
@@ -277,11 +277,11 @@ func TestGetPersonDocument(t *testing.T) {
 							"documents": matchers.EachLike(map[string]interface{}{
 								"id":                  matchers.Like(1),
 								"uuid":                matchers.String("dfef6714-b4fe-44c2-b26e-90dfe3663e95"),
-								"type":                matchers.String("Draft"),
+								"type":                matchers.String("Save"),
 								"friendlyDescription": matchers.String("Dr Consuela Aysien - LPA perfect + reg due date: applicant"),
 								"createdDate":         matchers.String(`15/12/2022 13:41:04`),
 								"direction":           matchers.String("Outgoing"),
-								"filename":            matchers.String("LP-A.pdf"),
+								"filename":            matchers.String("LP-GENERIC.pdf"),
 								"mimeType":            matchers.String(`application\/pdf`),
 								"correspondent": matchers.Like(map[string]interface{}{
 									"id":        matchers.Like(189),
@@ -289,7 +289,7 @@ func TestGetPersonDocument(t *testing.T) {
 									"surname":   matchers.String("Aysien"),
 								}),
 								"childCount": matchers.Like(0),
-								"systemType": matchers.String("LP-A"),
+								"systemType": matchers.String("LP-GENERIC"),
 							}, 1),
 						}),
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
@@ -306,13 +306,13 @@ func TestGetPersonDocument(t *testing.T) {
 					{
 						ID:                  1,
 						UUID:                "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-						Type:                "Draft",
+						Type:                "Save",
 						FriendlyDescription: "Dr Consuela Aysien - LPA perfect + reg due date: applicant",
 						CreatedDate:         `15/12/2022 13:41:04`,
 						Direction:           "Outgoing",
 						MimeType:            `application\/pdf`,
-						SystemType:          "LP-A",
-						FileName:            "LP-A.pdf",
+						SystemType:          "LP-GENERIC",
+						FileName:            "LP-GENERIC.pdf",
 						Correspondent:       Person{ID: 189, Firstname: "Consuela", Surname: "Aysien"},
 						ChildCount:          0,
 					},
