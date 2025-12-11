@@ -59,10 +59,10 @@ describe("View documents", () => {
               uuid: "5b4f0ad3-1e4a-4a55-b4a7-3f8e3d2bc3b9",
               type: "LPA",
               friendlyDescription: "LP1F - Finance Instrument",
-              createdDate: "29\/05\/2022 10:07:38",
+              createdDate: "29/05/2022 10:07:38",
               direction: "Incoming",
               filename: "LP1F.pdf",
-              mimeType: "application\/pdf",
+              mimeType: "application/pdf",
               caseItems: [
                 {
                   uId: "7000-1234-1234",
