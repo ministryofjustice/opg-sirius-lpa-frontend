@@ -238,6 +238,104 @@ func TestDocumentByUuid(t *testing.T) {
 	}
 }
 
+func TestGetPersonDocument(t *testing.T) {
+	t.Parallel()
+
+	pact, err := newPact()
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		name             string
+		setup            func()
+		expectedError    func(int) error
+		expectedResponse DocumentList
+	}{
+		{
+			name: "LPA",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A donor exists with more than 1 case").
+					UponReceiving("A request for the documents on the person").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodGet,
+						Path:   matchers.String("/lpa-api/v1/persons/400/documents"),
+						Query: matchers.MapMatcher{
+							"filter": matchers.String("draft:0,preview:0"),
+							"limit":  matchers.Like(999),
+						},
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status: http.StatusOK,
+						Body: matchers.Like(map[string]interface{}{
+							"limit": matchers.Like(999),
+							"pages": matchers.Like(1),
+							"total": matchers.Like(1),
+							"documents": matchers.EachLike(map[string]interface{}{
+								"id":                  matchers.Like(1),
+								"uuid":                matchers.String("dfef6714-b4fe-44c2-b26e-90dfe3663e95"),
+								"type":                matchers.String("Draft"),
+								"friendlyDescription": matchers.String("Dr Consuela Aysien - LPA perfect + reg due date: applicant"),
+								"createdDate":         matchers.String(`15/12/2022 13:41:04`),
+								"direction":           matchers.String("Outgoing"),
+								"filename":            matchers.String("LP-A.pdf"),
+								"mimeType":            matchers.String(`application\/pdf`),
+								"correspondent": matchers.Like(map[string]interface{}{
+									"id":        matchers.Like(189),
+									"firstname": matchers.String("Consuela"),
+									"surname":   matchers.String("Aysien"),
+								}),
+								"childCount": matchers.Like(0),
+								"systemType": matchers.String("LP-A"),
+							}, 1),
+						}),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+					})
+			},
+			expectedResponse: DocumentList{
+				Limit: 999,
+				Pages: 1,
+				Total: 1,
+				Documents: []Document{
+					{
+						ID:                  1,
+						UUID:                "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+						Type:                "Draft",
+						FriendlyDescription: "Dr Consuela Aysien - LPA perfect + reg due date: applicant",
+						CreatedDate:         `15/12/2022 13:41:04`,
+						Direction:           "Outgoing",
+						MimeType:            `application\/pdf`,
+						SystemType:          "LP-A",
+						FileName:            "LP-A.pdf",
+						Correspondent:       Person{ID: 189, Firstname: "Consuela", Surname: "Aysien"},
+						ChildCount:          0,
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
+
+				documents, err := client.GetPersonDocuments(Context{Context: context.Background()}, 400, []string(nil))
+
+				assert.Equal(t, tc.expectedResponse, documents)
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(config.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}
+
 // non-pact test
 func TestDocumentIsViewable(t *testing.T) {
 	d := Document{}

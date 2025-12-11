@@ -28,7 +28,7 @@ type Document struct {
 type DocumentList struct {
 	Limit     int        `json:"limit,omitempty"`
 	MetaData  any        `json:"metadata,omitempty"`
-	Pages     any        `json:"pages,omitempty"`
+	Pages     int        `json:"pages,omitempty"`
 	Total     int        `json:"total,omitempty"`
 	Documents []Document `json:"documents,omitempty"`
 }
