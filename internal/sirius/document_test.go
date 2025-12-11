@@ -269,8 +269,11 @@ func TestGetPersonDocument(t *testing.T) {
 						Status: http.StatusOK,
 						Body: matchers.Like(map[string]interface{}{
 							"limit": matchers.Like(999),
-							"pages": matchers.Like(1),
 							"total": matchers.Like(1),
+							"pages": matchers.Like(map[string]interface{}{
+								"current": matchers.Like(1),
+								"total":   matchers.Like(1),
+							}),
 							"documents": matchers.EachLike(map[string]interface{}{
 								"id":                  matchers.Like(1),
 								"uuid":                matchers.String("dfef6714-b4fe-44c2-b26e-90dfe3663e95"),
@@ -294,7 +297,10 @@ func TestGetPersonDocument(t *testing.T) {
 			},
 			expectedResponse: DocumentList{
 				Limit: 999,
-				Pages: 1,
+				Pages: Pages{
+					Current: 1,
+					Total:   1,
+				},
 				Total: 1,
 				Documents: []Document{
 					{

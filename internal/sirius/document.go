@@ -28,9 +28,14 @@ type Document struct {
 type DocumentList struct {
 	Limit     int        `json:"limit,omitempty"`
 	MetaData  any        `json:"metadata,omitempty"`
-	Pages     int        `json:"pages,omitempty"`
+	Pages     Pages      `json:"pages,omitempty"`
 	Total     int        `json:"total,omitempty"`
 	Documents []Document `json:"documents,omitempty"`
+}
+
+type Pages struct {
+	Current int `json:"current,omitempty"`
+	Total   int `json:"total,omitempty"`
 }
 
 func (d *Document) IsViewable() bool {

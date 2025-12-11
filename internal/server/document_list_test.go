@@ -25,7 +25,10 @@ func (m *mockDocumentListClient) GetPersonDocuments(ctx sirius.Context, personID
 
 var singleDocumentList = sirius.DocumentList{
 	Limit: 999,
-	Pages: 1,
+	Pages: sirius.Pages{
+		Current: 1,
+		Total:   1,
+	},
 	Total: 1,
 	Documents: []sirius.Document{
 		{
@@ -51,7 +54,10 @@ var singleDocumentList = sirius.DocumentList{
 
 var twoCasesDocumentList = sirius.DocumentList{
 	Limit: 999,
-	Pages: 1,
+	Pages: sirius.Pages{
+		Current: 1,
+		Total:   1,
+	},
 	Total: 2,
 	Documents: []sirius.Document{
 		{
@@ -95,7 +101,10 @@ var twoCasesDocumentList = sirius.DocumentList{
 
 var allDocumentList = sirius.DocumentList{
 	Limit: 999,
-	Pages: 1,
+	Pages: sirius.Pages{
+		Current: 1,
+		Total:   1,
+	},
 	Total: 3,
 	Documents: []sirius.Document{
 		{
