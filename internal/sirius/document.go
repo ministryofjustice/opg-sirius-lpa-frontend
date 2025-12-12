@@ -4,28 +4,44 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 )
 
 type Document struct {
-	ID                  int    `json:"id,omitempty"`
-	UUID                string `json:"uuid,omitempty"`
-	Type                string `json:"type"`
-	FriendlyDescription string `json:"friendlyDescription"`
-	CreatedDate         string `json:"createdDate"`
-	ReceivedDateTime    string `json:"receivedDateTime"`
-	Direction           string `json:"direction"`
-	MimeType            string `json:"mimeType"`
-	SystemType          string `json:"systemType"`
-	SubType             string `json:"subType"`
-	FileName            string `json:"fileName,omitempty"`
-	Content             string `json:"content,omitempty"`
-	Correspondent       Person `json:"correspondent"`
-	ChildCount          int    `json:"childCount"`
-	CaseItems           []Case `json:"caseItems,omitempty"`
+	ID                  int                      `json:"id,omitempty"`
+	UUID                string                   `json:"uuid,omitempty"`
+	Type                string                   `json:"type"`
+	FriendlyDescription string                   `json:"friendlyDescription"`
+	CreatedDate         string                   `json:"createdDate"`
+	ReceivedDateTime    string                   `json:"receivedDateTime"`
+	Direction           shared.DocumentDirection `json:"direction"`
+	MimeType            string                   `json:"mimeType"`
+	SystemType          string                   `json:"systemType"`
+	SubType             string                   `json:"subType"`
+	FileName            string                   `json:"filename,omitempty"`
+	Content             string                   `json:"content,omitempty"`
+	Correspondent       Person                   `json:"correspondent,omitempty"`
+	ChildCount          int                      `json:"childCount"`
+	CaseItems           []Case                   `json:"caseItems,omitempty"`
+	NotifyStatus        string                   `json:"notifyStatus,omitempty"`
+}
+
+type DocumentList struct {
+	Limit     int        `json:"limit,omitempty"`
+	MetaData  any        `json:"metadata,omitempty"`
+	Pages     Pages      `json:"pages,omitempty"`
+	Total     int        `json:"total,omitempty"`
+	Documents []Document `json:"documents,omitempty"`
+}
+
+type Pages struct {
+	Current int `json:"current,omitempty"`
+	Total   int `json:"total,omitempty"`
 }
 
 func (d *Document) IsViewable() bool {
-	if d.SubType == "Reduced fee request evidence" && d.Direction == "Incoming" {
+	if d.SubType == "Reduced fee request evidence" && d.Direction == shared.DocumentDirectionIn {
 		return d.ReceivedDateTime != ""
 	}
 	return true
@@ -71,6 +87,24 @@ func (c *Client) Documents(ctx Context, caseType CaseType, caseId int, docTypes 
 func (c *Client) DocumentByUUID(ctx Context, uuid string) (Document, error) {
 	var d Document
 	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/documents/%s", uuid), &d)
+
+	return d, err
+}
+
+func (c *Client) GetPersonDocuments(ctx Context, personID int, caseIDs []string) (DocumentList, error) {
+	var d DocumentList
+
+	query := "?filter=draft:0,preview:0"
+
+	for _, caseID := range caseIDs {
+		query = query + ",case:" + caseID
+	}
+
+	query = query + "&limit=999"
+
+	url := fmt.Sprintf("/lpa-api/v1/persons/%d/documents%s", personID, query)
+
+	err := c.get(ctx, url, &d)
 
 	return d, err
 }
