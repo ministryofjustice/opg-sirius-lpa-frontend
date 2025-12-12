@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -37,7 +38,7 @@ var singleDocumentList = sirius.DocumentList{
 			Type:                "Save",
 			FriendlyDescription: "Letter",
 			CreatedDate:         "25/07/2022 14:17:13",
-			Direction:           "Outgoing",
+			Direction:           shared.DocumentDirectionOut,
 			FileName:            "LP-NA-3A.pdf",
 			MimeType:            "application/pdf",
 			CaseItems: []sirius.Case{
@@ -66,7 +67,7 @@ var twoCasesDocumentList = sirius.DocumentList{
 			Type:                "LPA",
 			FriendlyDescription: "LP1H - Health Instrument",
 			CreatedDate:         "01/06/2022 15:39:01",
-			Direction:           "Incoming",
+			Direction:           shared.DocumentDirectionIn,
 			FileName:            "LP1H.pdf",
 			MimeType:            "application/pdf",
 			CaseItems: []sirius.Case{
@@ -84,7 +85,7 @@ var twoCasesDocumentList = sirius.DocumentList{
 			Type:                "Save",
 			FriendlyDescription: "Letter",
 			CreatedDate:         "25/07/2022 14:17:13",
-			Direction:           "Outgoing",
+			Direction:           shared.DocumentDirectionEmpty,
 			FileName:            "LP-NA-3A.pdf",
 			MimeType:            "application/pdf",
 			CaseItems: []sirius.Case{
@@ -113,7 +114,7 @@ var allDocumentList = sirius.DocumentList{
 			Type:                "LPA",
 			FriendlyDescription: "LP1H - Health Instrument",
 			CreatedDate:         "01/06/2022 15:39:01",
-			Direction:           "Incoming",
+			Direction:           shared.DocumentDirectionIn,
 			FileName:            "LP1H.pdf",
 			MimeType:            "application/pdf",
 			CaseItems: []sirius.Case{
@@ -131,7 +132,7 @@ var allDocumentList = sirius.DocumentList{
 			Type:                "Save",
 			FriendlyDescription: "Letter",
 			CreatedDate:         "25/07/2022 14:17:13",
-			Direction:           "Outgoing",
+			Direction:           shared.DocumentDirectionOut,
 			FileName:            "LP-NA-3A.pdf",
 			MimeType:            "application/pdf",
 			CaseItems: []sirius.Case{
@@ -149,7 +150,7 @@ var allDocumentList = sirius.DocumentList{
 			Type:                "Application Related",
 			FriendlyDescription: "EPA.pdf",
 			CreatedDate:         "08/01/2025 10:36:41",
-			Direction:           "Incoming",
+			Direction:           shared.DocumentDirectionIn,
 			FileName:            "EPA.pdf",
 			MimeType:            "application/pdf",
 			CaseItems: []sirius.Case{

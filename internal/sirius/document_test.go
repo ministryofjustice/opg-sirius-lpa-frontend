@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 
@@ -70,7 +71,7 @@ func TestDocument(t *testing.T) {
 					Type:                "Draft",
 					FriendlyDescription: "Dr Consuela Aysien - LPA perfect + reg due date: applicant",
 					CreatedDate:         `15/12/2022 13:41:04`,
-					Direction:           "Outgoing",
+					Direction:           shared.DocumentDirectionOut,
 					MimeType:            `application\/pdf`,
 					SystemType:          "LP-A",
 					FileName:            "LP-A.pdf",
@@ -124,7 +125,7 @@ func TestDocument(t *testing.T) {
 					Type:                "Draft",
 					FriendlyDescription: "Dr Consuela Aysien - LPA perfect + reg due date: applicant",
 					CreatedDate:         `15/12/2022 13:41:04`,
-					Direction:           "Outgoing",
+					Direction:           shared.DocumentDirectionOut,
 					MimeType:            `application\/pdf`,
 					SystemType:          "LP-A",
 					FileName:            "LP-A.pdf",
@@ -203,7 +204,7 @@ func TestDocumentByUuid(t *testing.T) {
 				Type:                "Draft",
 				FriendlyDescription: "Dr Consuela Aysien - LPA perfect + reg due date: applicant",
 				CreatedDate:         "15/12/2022 13:41:04",
-				Direction:           "Outgoing",
+				Direction:           shared.DocumentDirectionOut,
 				MimeType:            `application\/pdf`,
 				SystemType:          "LP-A",
 				FileName:            "LP-A.pdf",
@@ -276,7 +277,7 @@ func TestGetPersonDocumentBy(t *testing.T) {
 				Type:                "Save",
 				FriendlyDescription: "Dr Consuela Aysien - LPA perfect + reg due date: applicant",
 				CreatedDate:         `15/12/2022 13:41:04`,
-				Direction:           "Outgoing",
+				Direction:           shared.DocumentDirectionOut,
 				MimeType:            `application\/pdf`,
 				SystemType:          "LP-A",
 				FileName:            "LP-A.pdf",
@@ -363,7 +364,7 @@ func TestDocumentIsViewable(t *testing.T) {
 	d := Document{}
 	assert.True(t, d.IsViewable())
 
-	d.Direction = "Incoming"
+	d.Direction = shared.DocumentDirectionIn
 	assert.True(t, d.IsViewable())
 
 	d.SubType = "Reduced fee request evidence"

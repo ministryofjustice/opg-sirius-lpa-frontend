@@ -36,7 +36,7 @@
                 <tbody class="govuk-table__body">
                 {{ range .DocumentList.Documents }}
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__cell">[{{ documentDirection .Direction }}{{ if .NotifyStatus}} - {{ camelcaseToSentence .NotifyStatus }}{{end}}]
+                        <td class="govuk-table__cell">[{{ .Direction.Translation }}{{ if .NotifyStatus}} - {{ camelcaseToSentence .NotifyStatus }}{{end}}]
                             <br>
                             <a class="govuk-link" href="/lpa/document/{{ .UUID }}">{{ .FriendlyDescription }}</a>
                         </td>
@@ -50,9 +50,9 @@
                         {{ end }}
                         <td class="govuk-table__cell">{{ .CreatedDate }}</td>
                         <td class="govuk-table__cell">
-                            {{ if eq .Direction "Outgoing" }}
+                            {{ if eq .Direction.Key "Outgoing" }}
                                 {{ .SystemType }}
-                            {{ else if eq .Direction "Incoming" }}
+                            {{ else if eq .Direction.Key "Incoming" }}
                                 {{ .Type }}{{ if .SubType }} - {{ ToUpper .SubType }}{{ end }}
                             {{ else if eq .Type "Correspondence" }}
                                 {{ .SubType }}
