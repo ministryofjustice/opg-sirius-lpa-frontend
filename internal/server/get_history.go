@@ -7,9 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-
 	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
 type GetHistoryClient interface {
@@ -35,9 +34,19 @@ func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
 		eventDetails, err := client.GetCombinedEvents(ctx, uid)
 
 		for i := range eventDetails {
-			if eventDetails[i].Source == "lpa_store" {
+			if eventDetails[i].IsLpaStore() {
 				formattedUUID, _ := LPAEventIDFromUUID(eventDetails[i].ID)
 				eventDetails[i].FormattedLpaStoreId = formattedUUID
+
+				lsc := getLpaStoreCategoryFromChanges(eventDetails[i].Changes)
+				eventDetails[i].Category = lsc.Readable()
+
+				for j, c := range eventDetails[i].Changes {
+					ct := getLpaStoreChangeTypeFromChange(c)
+
+					eventDetails[i].Changes[j].Template = ct.GetTemplate()
+					eventDetails[i].Changes[j].Readable = ct.Readable()
+				}
 			}
 		}
 
