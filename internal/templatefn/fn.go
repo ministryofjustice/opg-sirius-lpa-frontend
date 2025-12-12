@@ -302,20 +302,6 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "resolution outcome NOT RECOGNISED: " + s
 			}
 		},
-		"caseLabel": func(s string) string {
-			switch s {
-			case "EPA":
-				return "colour-govuk-brown"
-			case "pfa":
-				return "colour-govuk-turquoise"
-			case "hw":
-				return "colour-govuk-grass-green"
-			case "":
-				return "Not specified"
-			default:
-				return "case label colour NOT RECOGNISED: " + s
-			}
-		},
 		"compareBoolPointers": func(i *bool, j bool) bool {
 			return *i == j
 		},

@@ -2,6 +2,6 @@
     {{ if eq .CaseType "EPA" }}
         <strong class="app-govuk-tag colour-govuk-brown">{{ ToUpper .CaseType }}</strong> {{ .UID }}
     {{ else }}
-        <strong class="app-govuk-tag {{ caseLabel .SubType }}">{{ ToUpper .SubType }}</strong> {{ .UID }}
+        <strong class="app-govuk-tag {{ .SubType.Translation }}">{{ ToUpper .SubType }}</strong> {{ .UID }}
     {{ end }}
 {{ end }}
