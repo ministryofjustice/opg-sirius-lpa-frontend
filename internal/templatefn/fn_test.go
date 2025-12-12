@@ -178,17 +178,6 @@ func TestResolutionOutcome(t *testing.T) {
 	testStringMapper(t, "resolutionOutcome", expectations)
 }
 
-func TestDocumentDirection(t *testing.T) {
-	expectations := map[string]string{
-		"Incoming": "In",
-		"Outgoing": "Out",
-		"":         "Not specified",
-		"foo":      "document direction NOT RECOGNISED: foo",
-	}
-
-	testStringMapper(t, "documentDirection", expectations)
-}
-
 func TestCaseLabel(t *testing.T) {
 	expectations := map[string]string{
 		"EPA": "colour-govuk-brown",

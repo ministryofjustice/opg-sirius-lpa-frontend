@@ -4,25 +4,27 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 )
 
 type Document struct {
-	ID                  int    `json:"id,omitempty"`
-	UUID                string `json:"uuid,omitempty"`
-	Type                string `json:"type"`
-	FriendlyDescription string `json:"friendlyDescription"`
-	CreatedDate         string `json:"createdDate"`
-	ReceivedDateTime    string `json:"receivedDateTime"`
-	Direction           string `json:"direction"`
-	MimeType            string `json:"mimeType"`
-	SystemType          string `json:"systemType"`
-	SubType             string `json:"subType"`
-	FileName            string `json:"filename,omitempty"`
-	Content             string `json:"content,omitempty"`
-	Correspondent       Person `json:"correspondent,omitempty"`
-	ChildCount          int    `json:"childCount"`
-	CaseItems           []Case `json:"caseItems,omitempty"`
-	NotifyStatus        string `json:"notifyStatus,omitempty"`
+	ID                  int                      `json:"id,omitempty"`
+	UUID                string                   `json:"uuid,omitempty"`
+	Type                string                   `json:"type"`
+	FriendlyDescription string                   `json:"friendlyDescription"`
+	CreatedDate         string                   `json:"createdDate"`
+	ReceivedDateTime    string                   `json:"receivedDateTime"`
+	Direction           shared.DocumentDirection `json:"direction"`
+	MimeType            string                   `json:"mimeType"`
+	SystemType          string                   `json:"systemType"`
+	SubType             string                   `json:"subType"`
+	FileName            string                   `json:"filename,omitempty"`
+	Content             string                   `json:"content,omitempty"`
+	Correspondent       Person                   `json:"correspondent,omitempty"`
+	ChildCount          int                      `json:"childCount"`
+	CaseItems           []Case                   `json:"caseItems,omitempty"`
+	NotifyStatus        string                   `json:"notifyStatus,omitempty"`
 }
 
 type DocumentList struct {
@@ -39,7 +41,7 @@ type Pages struct {
 }
 
 func (d *Document) IsViewable() bool {
-	if d.SubType == "Reduced fee request evidence" && d.Direction == "Incoming" {
+	if d.SubType == "Reduced fee request evidence" && d.Direction == shared.DocumentDirectionIn {
 		return d.ReceivedDateTime != ""
 	}
 	return true
