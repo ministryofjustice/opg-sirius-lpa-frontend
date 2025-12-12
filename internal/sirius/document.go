@@ -19,7 +19,7 @@ type Document struct {
 	SubType             string `json:"subType"`
 	FileName            string `json:"filename,omitempty"`
 	Content             string `json:"content,omitempty"`
-	Correspondent       Person `json:"correspondent"`
+	Correspondent       Person `json:"correspondent,omitempty"`
 	ChildCount          int    `json:"childCount"`
 	CaseItems           []Case `json:"caseItems,omitempty"`
 	NotifyStatus        string `json:"notifyStatus,omitempty"`
