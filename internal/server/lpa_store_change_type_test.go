@@ -1,9 +1,9 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,6 +21,40 @@ func TestGuessReadable(t *testing.T) {
 	const Test LpaStoreChangeType = "/test/lpaStore/changeType"
 
 	assert.Equal(t, "Test lpa store change type", Test.guessReadable())
+}
+
+func TestGetCategory(t *testing.T) {
+	testCases := map[string]struct {
+		changeType LpaStoreChangeType
+		category   LpaStoreCategory
+	}{
+		"Donor category": {
+			changeType: DonorAddressCountryChange,
+			category:   DonorCategory,
+		},
+		"CP category": {
+			changeType: CertificateProviderSignedAtChange,
+			category:   CertificateProvidersCategory,
+		},
+		"Attorney category": {
+			changeType: AttorneysEmailChange,
+			category:   AttorneysCategory,
+		},
+		"Trust corp category": {
+			changeType: TrustCorporationAddressLine2ChangeChange,
+			category:   TrustCorporationsCategory,
+		},
+		"Decisions category": {
+			changeType: HowReplacementAttorneysStepInChange,
+			category:   DecisionsCategory,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			assert.Equal(t, tc.category, tc.changeType.getCategory())
+		})
+	}
 }
 
 func TestGetLpaStoreChangeTypeFromChange(t *testing.T) {
