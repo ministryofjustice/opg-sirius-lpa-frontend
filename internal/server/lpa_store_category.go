@@ -22,42 +22,8 @@ func (lsc LpaStoreCategory) Readable() string {
 func getLpaStoreCategoryFromChanges(lscs []shared.LpaStoreChange) LpaStoreCategory {
 	for _, lsc := range lscs {
 		ct := getLpaStoreChangeTypeFromChange(lsc)
-		c := getLpaStoreCategoryFromChangeType(ct)
 
-		return c
-	}
-
-	return UnknownCategory
-}
-
-func getLpaStoreCategoryFromChangeType(ct LpaStoreChangeType) LpaStoreCategory {
-	switch ct {
-	case DonorFirstNamesChange,
-		DonorLastNameChange,
-		DonorOtherNamesKnowByChange,
-		DonorDateOfBirthChange,
-		DonorEmailChange,
-		DonorAddressLine1Change,
-		DonorAddressLine2Change,
-		DonorAddressLine3Change,
-		DonorAddressTownChange,
-		DonorAddressPostCodeChange,
-		DonorAddressCountryChange:
-		return DonorCategory
-	case CertificateProviderFirstNamesChange,
-		CertificateProviderLastNameChange,
-		CertificateProviderEmailChange,
-		CertificateProviderPhoneChange,
-		CertificateProviderAddressLine1Change,
-		CertificateProviderAddressLine2Change,
-		CertificateProviderAddressLine3Change,
-		CertificateProviderAddressTownChange,
-		CertificateProviderAddressPostCodeChange,
-		CertificateProviderAddressCountryChange,
-		CertificateProviderSignedAtChange,
-		CertificateProviderIdentityCheckedAtChange,
-		CertificateProviderIdentityCheckTypeChange:
-		return CertificateProvidersCategory
+		return ct.getCategory()
 	}
 
 	return UnknownCategory
