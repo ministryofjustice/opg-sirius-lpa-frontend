@@ -24,6 +24,13 @@ func TestParseDocumentDirection(t *testing.T) {
 	}
 }
 
+func TestParseDocumentDirectionUnknown(t *testing.T) {
+	got := ParseDocumentDirection("invalid")
+	if got != DocumentDirectionNotRecognised {
+		t.Errorf("ParseDocumentDirection() = %v, want %v", got, DocumentDirectionNotRecognised)
+	}
+}
+
 func TestDocumentDirectionTranslation(t *testing.T) {
 	tests := []struct {
 		name  string
@@ -56,10 +63,54 @@ func TestDocumentDirectionTranslation(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			got := tc.input.Translation()
 			if got != tc.want {
-				t.Fatalf("Translation() = %q, want %q", got, tc.want)
+				t.Errorf("Translation() = %q, want %q", got, tc.want)
 			}
 		})
 	}
+}
+
+func TestDocumentDirectionKey(t *testing.T) {
+	tests := []struct {
+		name  string
+		input DocumentDirection
+		want  string
+	}{
+		{
+			name:  "Incoming",
+			input: DocumentDirectionIn,
+			want:  "Incoming",
+		},
+		{
+			name:  "Outgoing",
+			input: DocumentDirectionOut,
+			want:  "Outgoing",
+		},
+		{
+			name:  "Empty",
+			input: DocumentDirectionEmpty,
+			want:  "Empty",
+		},
+		{
+			name:  "Not recognised",
+			input: DocumentDirectionNotRecognised,
+			want:  "Not Recognised",
+		},
+		{
+			name:  "Unrecognised value",
+			input: DocumentDirection(4),
+			want:  "",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := tc.input.Key()
+			if got != tc.want {
+				t.Errorf("Key() = %q, want %q", got, tc.want)
+			}
+		})
+	}
+
 }
 
 func TestDocumentDirectionUnmarshalJSON(t *testing.T) {
@@ -74,13 +125,22 @@ func TestDocumentDirectionUnmarshalJSON(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		var cs DocumentDirection
-		err := json.Unmarshal([]byte(tt.jsonInput), &cs)
+		var d DocumentDirection
+		err := json.Unmarshal([]byte(tt.jsonInput), &d)
 		if err != nil {
 			t.Errorf("UnmarshalJSON(%s) returned error: %v", tt.jsonInput, err)
 		}
-		if cs != tt.expected {
-			t.Errorf("UnmarshalJSON(%s) = %v, want %v", tt.jsonInput, cs, tt.expected)
+		if d != tt.expected {
+			t.Errorf("UnmarshalJSON(%s) = %v, want %v", tt.jsonInput, d, tt.expected)
 		}
+	}
+}
+
+func TestDocumentDirectionUnmarshalJSONErrors(t *testing.T) {
+	var d DocumentDirection
+
+	err := json.Unmarshal([]byte(`123`), &d)
+	if err == nil {
+		t.Errorf("expected error, got nil")
 	}
 }
