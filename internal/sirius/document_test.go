@@ -191,9 +191,12 @@ func TestDocumentByUuid(t *testing.T) {
 							"direction":           matchers.String("Outgoing"),
 							"filename":            matchers.String("LP-A.pdf"),
 							"mimeType":            matchers.String(`application\/pdf`),
-							"childCount":          matchers.Like(0),
-							"systemType":          matchers.String("LP-A"),
-							"content":             matchers.String("Test content"),
+							"correspondent": matchers.Like(map[string]interface{}{
+								"id": matchers.Like(189),
+							}),
+							"childCount": matchers.Like(0),
+							"systemType": matchers.String("LP-A"),
+							"content":    matchers.String("Test content"),
 						}),
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
@@ -209,6 +212,7 @@ func TestDocumentByUuid(t *testing.T) {
 				SystemType:          "LP-A",
 				FileName:            "LP-A.pdf",
 				Content:             "Test content",
+				Correspondent:       Person{ID: 189},
 				ChildCount:          0,
 			},
 		},
