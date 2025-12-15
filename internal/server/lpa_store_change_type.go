@@ -166,6 +166,85 @@ func (l LpaStoreChangeType) guessReadable() string {
 	return r
 }
 
+func (l LpaStoreChangeType) getCategory() LpaStoreCategory {
+	var categoryChangeTypeMap = map[LpaStoreCategory][]LpaStoreChangeType{
+		DonorCategory: {
+			DonorFirstNamesChange,
+			DonorLastNameChange,
+			DonorOtherNamesKnowByChange,
+			DonorDateOfBirthChange,
+			DonorEmailChange,
+			DonorAddressLine1Change,
+			DonorAddressLine2Change,
+			DonorAddressLine3Change,
+			DonorAddressTownChange,
+			DonorAddressPostCodeChange,
+			DonorAddressCountryChange,
+		},
+		CertificateProvidersCategory: {
+			CertificateProviderFirstNamesChange,
+			CertificateProviderLastNameChange,
+			CertificateProviderEmailChange,
+			CertificateProviderPhoneChange,
+			CertificateProviderAddressLine1Change,
+			CertificateProviderAddressLine2Change,
+			CertificateProviderAddressLine3Change,
+			CertificateProviderAddressTownChange,
+			CertificateProviderAddressPostCodeChange,
+			CertificateProviderAddressCountryChange,
+			CertificateProviderSignedAtChange,
+			CertificateProviderIdentityCheckedAtChange,
+			CertificateProviderIdentityCheckTypeChange,
+		},
+		AttorneysCategory: {
+			AttorneysFirstNamesChange,
+			AttorneysLastNameChange,
+			AttorneysDateOfBirthChange,
+			AttorneysEmailChange,
+			AttorneysMobileChange,
+			AttorneysAddressLine1Change,
+			AttorneysAddressLine2Change,
+			AttorneysAddressLine3Change,
+			AttorneysAddressTownChange,
+			AttorneysAddressPostCodeChange,
+			AttorneysAddressCountryChange,
+			AttorneysSignedAtChange,
+		},
+		TrustCorporationsCategory: {
+			TrustCorporationNameChange,
+			TrustCorporationEmailChange,
+			TrustCorporationMobileChange,
+			TrustCorporationCompanyNumberChange,
+			TrustCorporationAddressLine1ChangeChange,
+			TrustCorporationAddressLine2ChangeChange,
+			TrustCorporationAddressLine3ChangeChange,
+			TrustCorporationAddressTownChange,
+			TrustCorporationAddressPostcodeChange,
+			TrustCorporationAddressCountryChange,
+		},
+		DecisionsCategory: {
+			HowAttorneysMakeDecisionsChange,
+			HowAttorneysMakeDecisionsDetailsChange,
+			HowReplacementAttorneysStepInChange,
+			HowReplacementAttorneysStepInDetailsChange,
+			HowReplacementAttorneysMakeDecisionsChange,
+			HowReplacementAttorneysMakeDecisionsDetailsChange,
+			LifeSustainingTreatmentOptionChange,
+			WhenTheLpaCanBeUsedChange,
+		},
+	}
+
+	for cat, cts := range categoryChangeTypeMap {
+		for _, ct := range cts {
+			if l == ct {
+				return cat
+			}
+		}
+	}
+
+	return UnknownCategory
+}
+
 func getLpaStoreChangeTypeFromChange(lse shared.LpaStoreChange) LpaStoreChangeType {
 	m := regexp.MustCompile("/[0-9]+")
 	k := m.ReplaceAllString(lse.Key, "")
