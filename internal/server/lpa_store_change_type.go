@@ -132,9 +132,10 @@ func (l LpaStoreChangeType) Readable() string {
 
 	case CertificateProviderIdentityCheckedAtChange:
 		return "CP checked at"
-	}
 
-	return l.guessReadable()
+	default:
+		return l.guessReadable()
+	}
 }
 
 func (l LpaStoreChangeType) GetTemplate() string {
