@@ -62,6 +62,50 @@ func TestDocumentDirectionTranslation(t *testing.T) {
 	}
 }
 
+func TestDocumentDirectionKey(t *testing.T) {
+	tests := []struct {
+		name  string
+		input DocumentDirection
+		want  string
+	}{
+		{
+			name:  "Incoming",
+			input: DocumentDirectionIn,
+			want:  "Incoming",
+		},
+		{
+			name:  "Outgoing",
+			input: DocumentDirectionOut,
+			want:  "Outgoing",
+		},
+		{
+			name:  "Empty",
+			input: DocumentDirectionEmpty,
+			want:  "Empty",
+		},
+		{
+			name:  "Not recognised",
+			input: DocumentDirectionNotRecognised,
+			want:  "Not Recognised",
+		},
+		{
+			name:  "Unrecognised value",
+			input: DocumentDirection(4),
+			want:  "",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := tc.input.Key()
+			if got != tc.want {
+				t.Fatalf("Key() = %q, want %q", got, tc.want)
+			}
+		})
+	}
+
+}
+
 func TestDocumentDirectionUnmarshalJSON(t *testing.T) {
 	tests := []struct {
 		jsonInput string
