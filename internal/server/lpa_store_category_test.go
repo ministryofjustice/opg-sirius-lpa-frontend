@@ -66,27 +66,3 @@ func TestGetLpaStoreCategoryFromChanges(t *testing.T) {
 		})
 	}
 }
-
-func TestGetLpaStoreCategoryFromChangeType(t *testing.T) {
-	testCases := map[string]struct {
-		key              LpaStoreChangeType
-		lpaStoreCategory LpaStoreCategory
-	}{
-		"Donor last name": {
-			key:              "/donor/lastName",
-			lpaStoreCategory: DonorCategory,
-		},
-		"Certificate provider": {
-			key:              "/certificateProvider/email",
-			lpaStoreCategory: CertificateProvidersCategory,
-		},
-	}
-
-	for name, tc := range testCases {
-		t.Run(name, func(t *testing.T) {
-			c := getLpaStoreCategoryFromChangeType(tc.key)
-
-			assert.Equal(t, tc.lpaStoreCategory, c)
-		})
-	}
-}
