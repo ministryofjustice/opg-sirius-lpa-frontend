@@ -138,24 +138,7 @@ func (l LpaStoreChangeType) Readable() string {
 }
 
 func (l LpaStoreChangeType) GetTemplate() string {
-	switch l {
-	case DonorFirstNamesChange,
-		DonorLastNameChange,
-		DonorOtherNamesKnowByChange,
-		DonorDateOfBirthChange,
-		DonorEmailChange,
-		DonorAddressLine1Change,
-		DonorAddressLine2Change,
-		DonorAddressLine3Change,
-		DonorAddressTownChange,
-		DonorAddressPostCodeChange,
-		DonorAddressCountryChange,
-		DonorIdentityCheckedAtChange,
-		DonorIdentityCheckTypeChange:
-		return "history-updated-from-to"
-	}
-
-	return "generic-update"
+	return "history-updated-from-to"
 }
 
 func (l LpaStoreChangeType) guessReadable() string {
