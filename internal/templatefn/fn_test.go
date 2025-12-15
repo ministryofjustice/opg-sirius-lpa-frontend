@@ -178,6 +178,18 @@ func TestResolutionOutcome(t *testing.T) {
 	testStringMapper(t, "resolutionOutcome", expectations)
 }
 
+func TestCaseLabel(t *testing.T) {
+	expectations := map[string]string{
+		"EPA": "colour-govuk-brown",
+		"pfa": "colour-govuk-turquoise",
+		"hw":  "colour-govuk-grass-green",
+		"":    "Not specified",
+		"foo": "case label colour NOT RECOGNISED: foo",
+	}
+
+	testStringMapper(t, "caseLabel", expectations)
+}
+
 func TestCamelcaseToSentence(t *testing.T) {
 	expectations := map[string]string{
 		"uId":   "UID",
