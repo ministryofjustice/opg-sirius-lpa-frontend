@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestReadble(t *testing.T) {
+func TestChangeTypeReadable(t *testing.T) {
 	assert.Equal(t, "First names", DonorFirstNamesChange.Readable())
 	assert.Equal(t, "Last name", AttorneysLastNameChange.Readable())
 	assert.Equal(t, "Post code", CertificateProviderAddressPostCodeChange.Readable())
@@ -62,6 +62,22 @@ func TestGetLpaStoreChangeTypeFromChange(t *testing.T) {
 		change     shared.LpaStoreChange
 		changeType LpaStoreChangeType
 	}{
+		"Donor address line 1": {
+			change: shared.LpaStoreChange{
+				Key: "/donor/address/line1",
+				Old: "1 Beech Avenue",
+				New: "10 Beech Avenue",
+			},
+			changeType: DonorAddressLine1Change,
+		},
+		"Cp address line 1": {
+			change: shared.LpaStoreChange{
+				Key: "/certificateProvider/address/town",
+				Old: "Beechton",
+				New: "Willowton",
+			},
+			changeType: CertificateProviderAddressTownChange,
+		},
 		"Attorney DOB": {
 			change: shared.LpaStoreChange{
 				Key: "/attorneys/0/dateOfBirth",
@@ -70,13 +86,21 @@ func TestGetLpaStoreChangeTypeFromChange(t *testing.T) {
 			},
 			changeType: AttorneysDateOfBirthChange,
 		},
-		"Trust Corporations category": {
+		"Trust Corporation company number": {
 			change: shared.LpaStoreChange{
-				Key: "/certificateProvider/signedAt",
+				Key: "/trustCorporation/companyNumber",
+				Old: "11112222",
+				New: "33334444",
+			},
+			changeType: TrustCorporationCompanyNumberChange,
+		},
+		"How replacement attorneys make decisions": {
+			change: shared.LpaStoreChange{
+				Key: "/howReplacementAttorneysMakeDecisions",
 				Old: "2025-01-01",
 				New: "2025-01-10",
 			},
-			changeType: CertificateProviderSignedAtChange,
+			changeType: HowReplacementAttorneysMakeDecisionsChange,
 		},
 	}
 
