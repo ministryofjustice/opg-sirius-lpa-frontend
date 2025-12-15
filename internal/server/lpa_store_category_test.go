@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestReadable(t *testing.T) {
+func TestCategoryReadable(t *testing.T) {
 	testCases := map[string]struct {
 		category LpaStoreCategory
 		readable string
@@ -55,6 +55,16 @@ func TestGetLpaStoreCategoryFromChanges(t *testing.T) {
 				Readable: "First names",
 			}},
 			category: CertificateProvidersCategory,
+		},
+		"Attorneys mobile": {
+			changes: []shared.LpaStoreChange{{
+				Key:      "/attorneys/0/mobile",
+				Old:      "07697 780428",
+				New:      "07123 425784",
+				Template: "test-template",
+				Readable: "Mobile",
+			}},
+			category: AttorneysCategory,
 		},
 	}
 
