@@ -23,7 +23,9 @@ func getLpaStoreCategoryFromChanges(lscs []shared.LpaStoreChange) LpaStoreCatego
 	for _, lsc := range lscs {
 		ct := getLpaStoreChangeTypeFromChange(lsc)
 
-		return ct.getCategory()
+		if c := ct.getCategory(); c != "" {
+			return c
+		}
 	}
 
 	return UnknownCategory
