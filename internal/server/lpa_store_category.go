@@ -11,8 +11,6 @@ const (
 	CertificateProvidersCategory LpaStoreCategory = "Certificate Providers"
 	TrustCorporationsCategory    LpaStoreCategory = "Trust Corporations"
 	DecisionsCategory            LpaStoreCategory = "Decisions"
-
-	// Status ?
 )
 
 func (lsc LpaStoreCategory) Readable() string {
