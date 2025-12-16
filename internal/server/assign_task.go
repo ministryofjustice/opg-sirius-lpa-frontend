@@ -40,7 +40,7 @@ func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 
 		var taskIDs []int
 		for _, id := range r.Form["id"] {
-			taskID, err := strconv.Atoi(id)
+			taskID, err := strToIntOrStatusError(id)
 			if err != nil {
 				return err
 			}

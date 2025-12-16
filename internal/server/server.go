@@ -228,7 +228,7 @@ func xsrfHandler(logger *slog.Logger, tmplError template.Template, siriusURL str
 						Code:      http.StatusForbidden,
 						Error:     errorMessage,
 					})
-					logger.Error(errorMessage)
+					logger.Warn(errorMessage)
 
 					return
 				}
@@ -344,6 +344,20 @@ func postFormInt(r *http.Request, name string) (int, error) {
 
 func postFormDateString(r *http.Request, name string) sirius.DateString {
 	return sirius.DateString(postFormString(r, name))
+}
+
+func strToIntOrStatusError(val string) (int, error) {
+	if val == "" {
+		return 0, sirius.StatusError{Code: http.StatusNotFound}
+	}
+
+	i, err := strconv.Atoi(strings.TrimSpace(val))
+
+	if err != nil {
+		return 0, sirius.StatusError{Code: http.StatusBadRequest}
+	}
+
+	return i, nil
 }
 
 func translateRefData(types []sirius.RefDataItem, tmplHandle string) string {

@@ -23,7 +23,7 @@ type unlinkPersonData struct {
 
 func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		parentID, err := strconv.Atoi(r.FormValue("id"))
+		parentID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
 		}

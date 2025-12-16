@@ -2,11 +2,11 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
-	"net/http"
-	"strconv"
 )
 
 type AddComplaintClient interface {
@@ -30,7 +30,7 @@ type addComplaintData struct {
 
 func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		caseID, err := strconv.Atoi(r.FormValue("id"))
+		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
 		}
