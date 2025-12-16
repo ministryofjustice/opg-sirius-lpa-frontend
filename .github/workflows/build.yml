@@ -37,12 +37,12 @@ jobs:
       - name: Define commit SHA and branch
         id: commit_branch
         run: |
-          if [ "${{ github.head_ref }}" == "" ]; then
+          if [ "$GITHUB_HEAD_REF" == "" ]; then
               echo "COMMIT=${{github.sha}}" >> $GITHUB_OUTPUT
               echo "BRANCH=main" >> $GITHUB_OUTPUT
           else
               echo "COMMIT=${{github.event.pull_request.head.sha}}" >> $GITHUB_OUTPUT
-              echo "BRANCH=${{github.head_ref}}" >> $GITHUB_OUTPUT
+              echo "BRANCH=$GITHUB_HEAD_REF" >> $GITHUB_OUTPUT
           fi
     outputs:
       commit: ${{ steps.commit_branch.outputs.COMMIT }}
