@@ -36,7 +36,7 @@ func TestSetFlashAddsHeader(t *testing.T) {
 		Title: "title",
 	})
 
-	assert.Equal(t, "flash-lpa-frontend=eyJuYW1lIjoidGl0bGUifQ==; Path=/; HttpOnly", header.Get("Set-Cookie"))
+	assert.Equal(t, "flash-lpa-frontend=eyJuYW1lIjoidGl0bGUifQ==; Path=/; HttpOnly; Secure", header.Get("Set-Cookie"))
 }
 
 func TestGetFlashGetsHeader(t *testing.T) {
