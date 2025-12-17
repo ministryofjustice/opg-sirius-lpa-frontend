@@ -31,18 +31,18 @@ jobs:
     name: Identify version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
           fetch-depth: "0"
       - name: Define commit SHA and branch
         id: commit_branch
         run: |
-          if [ "${{ github.head_ref }}" == "" ]; then
+          if [ "$GITHUB_HEAD_REF" == "" ]; then
               echo "COMMIT=${{github.sha}}" >> $GITHUB_OUTPUT
               echo "BRANCH=main" >> $GITHUB_OUTPUT
           else
               echo "COMMIT=${{github.event.pull_request.head.sha}}" >> $GITHUB_OUTPUT
-              echo "BRANCH=${{github.head_ref}}" >> $GITHUB_OUTPUT
+              echo "BRANCH=$GITHUB_HEAD_REF" >> $GITHUB_OUTPUT
           fi
     outputs:
       commit: ${{ steps.commit_branch.outputs.COMMIT }}
@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: ["identify", "create-tag"]
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       - name: Cache Dependencies
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -78,10 +78,12 @@ jobs:
         run: make unit-test
 
       - name: Publish pacts
+        env:
+          BRANCH_NAME: ${{ needs.identify.outputs.branch }}
         run: |
           docker compose run --rm pact pact-broker publish ./pacts/sirius-lpa-frontend-sirius.json \
             --consumer-app-version ${{ needs.identify.outputs.commit }} \
-            --branch ${{ needs.identify.outputs.branch }} \
+            --branch $BRANCH_NAME \
             --tag ${{ needs.create-tag.outputs.tag }} \
             --broker-base-url https://pact-broker.api.opg.service.justice.gov.uk \
             --broker-username admin \
@@ -98,11 +100,11 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
       - name: Go & Yarn Lint
         run: make lint
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@014f16e7ab1402f30e7c3329d33797e7948572db # v4.31.3
+        uses: github/codeql-action/upload-sarif@fdbfb4d2750291e159f0156def62b853c2798ca2 # v4.31.5
         if: always()
         with:
           sarif_file: test-results/golangci-lint.sarif
@@ -114,7 +116,7 @@ jobs:
       - build
       - test
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       - name: Set up Docker
         run: |
@@ -144,7 +146,7 @@ jobs:
       - build
       - test
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       - name: Set up Docker
         run: |
@@ -183,7 +185,7 @@ jobs:
         "cypress",
       ]
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
           fetch-depth: "0"
       - uses: unfor19/install-aws-cli-action@f5b46b7f32cf5e7ebd652656c5036bf83dd1e60c # 1.0.8
@@ -202,7 +204,7 @@ jobs:
           docker load -i /tmp/images/multi-arch-image.tar
 
       - name: Configure OIDC AWS credentials for ECR push
-        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
         with:
           role-to-assume: arn:aws:iam::311462405659:role/sirius-component-ecr-role
           role-session-name: opg-sirius-lpa-frontend-github-actions-ecr-push
@@ -224,7 +226,7 @@ jobs:
         run: make scan
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@014f16e7ab1402f30e7c3329d33797e7948572db # v4.31.3
+        uses: github/codeql-action/upload-sarif@fdbfb4d2750291e159f0156def62b853c2798ca2 # v4.31.5
         if: always()
         with:
           sarif_file: "test-results/trivy.sarif"
@@ -278,10 +280,10 @@ jobs:
     needs: ["create-tag", "end_of_pr_workflow"]
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
 
       - name: Configure OIDC AWS credentials for SSM
-        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
         with:
           role-to-assume: arn:aws:iam::997462338508:role/sirius-component-ssm-role
           role-session-name: opg-sirius-lpa-frontend-github-actions-ssm-push

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -53,7 +54,7 @@ var testChangeCertificateProviderCaseSummary = sirius.CaseSummary{
 				},
 				Phone:                     "01452 927995",
 				Channel:                   "online",
-				ContactLanguagePreference: "email",
+				ContactLanguagePreference: shared.LanguageFormatEn,
 				SignedAt:                  "2024-01-12T10:09:09Z",
 			},
 		},
@@ -331,7 +332,7 @@ var testChangeCertificateProviderCaseSummaryWithEligibilityConfirmed = sirius.Ca
 				},
 				Phone:                     "01452 927995",
 				Channel:                   "online",
-				ContactLanguagePreference: "email",
+				ContactLanguagePreference: shared.LanguageFormatEn,
 				SignedAt:                  "2024-01-12T10:09:09Z",
 			},
 			Donor: sirius.LpaStoreDonor{
