@@ -4,13 +4,16 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"net/http"
+	"os"
 	"time"
 )
 
 const flashCookieName string = "flash-lpa-frontend"
 
+var secureCookies bool = os.Getenv("INSECURE_COOKIES") != "1"
+
 type FlashNotification struct {
-	Title       string `json:"name"`
+	Title string `json:"name"`
 }
 
 func SetFlash(w http.ResponseWriter, notification FlashNotification) {
@@ -24,6 +27,7 @@ func SetFlash(w http.ResponseWriter, notification FlashNotification) {
 		Value:    base64.URLEncoding.EncodeToString(str),
 		HttpOnly: true,
 		Path:     "/",
+		Secure:   secureCookies,
 	}
 	http.SetCookie(w, c)
 }
@@ -52,7 +56,7 @@ func GetFlash(w http.ResponseWriter, r *http.Request) (FlashNotification, error)
 		return FlashNotification{}, err
 	}
 
-	dc := &http.Cookie{Name: flashCookieName, MaxAge: -1, Expires: time.Unix(1, 0), Path: "/"}
+	dc := &http.Cookie{Name: flashCookieName, MaxAge: -1, Expires: time.Unix(1, 0), Path: "/", Secure: true}
 
 	http.SetCookie(w, dc)
 	return v, nil
