@@ -29,7 +29,7 @@ type warningData struct {
 
 func Warning(client WarningClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		personId, err := strconv.Atoi(r.FormValue("id"))
+		personId, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
 		}

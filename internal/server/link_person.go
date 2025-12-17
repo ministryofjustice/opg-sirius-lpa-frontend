@@ -2,7 +2,6 @@ package server
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -26,7 +25,7 @@ type linkPersonData struct {
 
 func LinkPerson(client LinkPersonClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		person1ID, err := strconv.Atoi(r.FormValue("id"))
+		person1ID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
 		}

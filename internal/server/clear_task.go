@@ -1,12 +1,11 @@
 package server
 
 import (
-	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"net/http"
-	"strconv"
 )
 
 type ClearTaskClient interface {
@@ -30,23 +29,10 @@ func ClearTask(client ClearTaskClient, tmpl template.Template) Handler {
 		}
 
 		var lpa *sirius.Case
-		var taskIDs []int
-
-		for _, id := range r.Form["id"] {
-			taskID, err := strconv.Atoi(id)
-			if err != nil {
-				return err
-			}
-			taskIDs = append(taskIDs, taskID)
-		}
-		if len(taskIDs) == 0 {
-			return errors.New("no tasks selected")
-		}
-
 		ctx := getContext(r)
 
 		data := clearTaskData{XSRFToken: ctx.XSRFToken}
-		taskID, err := strconv.Atoi(r.FormValue("id"))
+		taskID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
 		}

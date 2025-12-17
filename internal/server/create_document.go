@@ -66,7 +66,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 		}
 		ctx := getContext(r)
 
-		caseID, err := strconv.Atoi(r.FormValue("id"))
+		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
 		}

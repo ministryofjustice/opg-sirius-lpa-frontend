@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -28,7 +27,7 @@ type relationshipData struct {
 
 func Relationship(client RelationshipClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		personID, err := strconv.Atoi(r.FormValue("id"))
+		personID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
 		}
