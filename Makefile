@@ -59,7 +59,7 @@ lighthouse: setup-directories
 	docker compose run --entrypoint="lhci autorun" puppeteer
 
 cypress: setup-directories
-	docker compose run --rm cypress
+	INSECURE_COOKIES=1 docker compose run --rm cypress
 
 down: ## Stop everything
 	docker compose down
