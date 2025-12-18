@@ -2,7 +2,6 @@ package server
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -45,7 +44,7 @@ type createAdditionalDraftData struct {
 func CreateAdditionalDraft(client CreateAdditionalDraftClient, tmpl template.Template) Handler {
 
 	return func(w http.ResponseWriter, r *http.Request) error {
-		id, err := strconv.Atoi(r.FormValue("id"))
+		id, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
 		}

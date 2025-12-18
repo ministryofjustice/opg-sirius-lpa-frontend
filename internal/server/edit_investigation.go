@@ -1,10 +1,10 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"net/http"
-	"strconv"
 )
 
 type EditInvestigationClient interface {
@@ -24,7 +24,7 @@ var approvalOutcomeTypes = []string{"Court Application", "Further Action", "No F
 
 func EditInvestigation(client EditInvestigationClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		investigationID, err := strconv.Atoi(r.FormValue("id"))
+		investigationID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
 		}

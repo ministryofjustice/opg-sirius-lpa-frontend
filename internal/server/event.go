@@ -7,7 +7,6 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
-	"strconv"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -39,7 +38,7 @@ type eventData struct {
 
 func Event(client EventClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		entityID, err := strconv.Atoi(r.FormValue("id"))
+		entityID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
 		}

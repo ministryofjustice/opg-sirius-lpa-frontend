@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -100,20 +101,35 @@ func TestPostClearTaskSuccess(t *testing.T) {
 }
 
 func TestClearTaskBadQueryString(t *testing.T) {
-	testCases := map[string]string{
-		"no-id":      "/",
-		"bad-id":     "/?id=what",
-		"one-bad-id": "/?id=1&id=bad&id=2",
+	testCases := map[string]struct {
+		Path       string
+		StatusCode int
+	}{
+		"no-id": {
+			"/",
+			http.StatusNotFound,
+		},
+		"empty-id": {
+			"/?id=",
+			http.StatusNotFound,
+		},
+		"bad-id": {
+			"/?id=what",
+			http.StatusBadRequest,
+		},
 	}
 
-	for name, urlParams := range testCases {
+	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			r, _ := http.NewRequest(http.MethodGet, urlParams, nil)
+			r, _ := http.NewRequest(http.MethodGet, tc.Path, nil)
 			w := httptest.NewRecorder()
 
 			err := ClearTask(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
+			errStatus := sirius.StatusError{}
+			errors.As(err, &errStatus)
+			assert.Equal(t, tc.StatusCode, errStatus.Code)
 		})
 	}
 }

@@ -2,9 +2,9 @@ package server
 
 import (
 	"fmt"
-	"golang.org/x/sync/errgroup"
 	"net/http"
-	"strconv"
+
+	"golang.org/x/sync/errgroup"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -26,7 +26,7 @@ type deletePaymentData struct {
 
 func DeletePayment(client DeletePaymentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		id, err := strconv.Atoi(r.FormValue("id"))
+		id, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
 		}

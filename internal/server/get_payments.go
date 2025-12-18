@@ -2,7 +2,6 @@ package server
 
 import (
 	"net/http"
-	"strconv"
 
 	"golang.org/x/sync/errgroup"
 
@@ -58,7 +57,7 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 			}
 			caseID = data.CaseSummary.DigitalLpa.SiriusData.ID
 		} else {
-			caseID, err = strconv.Atoi(r.PathValue("id"))
+			caseID, err = strToIntOrStatusError(r.PathValue("id"))
 			if err != nil {
 				return err
 			}

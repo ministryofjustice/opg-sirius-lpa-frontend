@@ -2,10 +2,10 @@ package server
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"net/http"
-	"strconv"
 )
 
 type InvestigationHoldClient interface {
@@ -24,7 +24,7 @@ type investigationHoldData struct {
 
 func InvestigationHold(client InvestigationHoldClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		id, err := strconv.Atoi(r.FormValue("id"))
+		id, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
 		}
