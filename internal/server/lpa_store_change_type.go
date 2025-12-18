@@ -12,22 +12,33 @@ type LpaStoreChangeType string
 const (
 	UnknownChange LpaStoreChangeType = ""
 
-	DonorFirstNamesChange        LpaStoreChangeType = "/donor/firstNames"
-	DonorOtherNamesKnowByChange  LpaStoreChangeType = "/donor/otherNamesKnownBy"
-	DonorLastNameChange          LpaStoreChangeType = "/donor/lastName"
-	DonorDateOfBirthChange       LpaStoreChangeType = "/donor/dateOfBirth"
-	DonorEmailChange             LpaStoreChangeType = "/donor/email"
-	DonorAddressLine1Change      LpaStoreChangeType = "/donor/address/line1"
-	DonorAddressLine2Change      LpaStoreChangeType = "/donor/address/line2"
-	DonorAddressLine3Change      LpaStoreChangeType = "/donor/address/line3"
-	DonorAddressTownChange       LpaStoreChangeType = "/donor/address/town"
-	DonorAddressPostCodeChange   LpaStoreChangeType = "/donor/address/postcode"
-	DonorAddressCountryChange    LpaStoreChangeType = "/donor/address/country"
+	DonorFirstNamesChange       LpaStoreChangeType = "/donor/firstNames"
+	DonorOtherNamesKnowByChange LpaStoreChangeType = "/donor/otherNamesKnownBy"
+	DonorLastNameChange         LpaStoreChangeType = "/donor/lastName"
+	DonorDateOfBirthChange      LpaStoreChangeType = "/donor/dateOfBirth"
+	DonorEmailChange            LpaStoreChangeType = "/donor/email"
+	DonorAddressLine1Change     LpaStoreChangeType = "/donor/address/line1"
+	DonorAddressLine2Change     LpaStoreChangeType = "/donor/address/line2"
+	DonorAddressLine3Change     LpaStoreChangeType = "/donor/address/line3"
+	DonorAddressTownChange      LpaStoreChangeType = "/donor/address/town"
+	DonorAddressPostCodeChange  LpaStoreChangeType = "/donor/address/postcode"
+	DonorAddressCountryChange   LpaStoreChangeType = "/donor/address/country"
+	SignedAtChange              LpaStoreChangeType = "/signedAt"
+
 	DonorIdentityCheckedAtChange LpaStoreChangeType = "/donor/identityCheck/checkedAt"
 	DonorIdentityCheckTypeChange LpaStoreChangeType = "/donor/identityCheck/type"
 
 	AuthorisedSignatoryFirstNamesChange LpaStoreChangeType = "/authorisedSignatory/firstNames"
 	AuthorisedSignatoryLastNameChange   LpaStoreChangeType = "/authorisedSignatory/lastName"
+
+	IndependentWitnessFirstNamesChange      LpaStoreChangeType = "/independentWitness/firstNames"
+	IndependentWitnessLastNameChange        LpaStoreChangeType = "/independentWitness/lastName"
+	IndependentWitnessAddressLine1Change    LpaStoreChangeType = "/independentWitness/address/line1"
+	IndependentWitnessAddressLine2Change    LpaStoreChangeType = "/independentWitness/address/line2"
+	IndependentWitnessAddressLine3Change    LpaStoreChangeType = "/independentWitness/address/line3"
+	IndependentWitnessAddressTownChange     LpaStoreChangeType = "/independentWitness/address/town"
+	IndependentWitnessAddressPostCodeChange LpaStoreChangeType = "/independentWitness/address/postcode"
+	IndependentWitnessAddressCountryChange  LpaStoreChangeType = "/independentWitness/address/country"
 
 	CertificateProviderFirstNamesChange        LpaStoreChangeType = "/certificateProvider/firstNames"
 	CertificateProviderLastNameChange          LpaStoreChangeType = "/certificateProvider/lastName"
@@ -134,7 +145,8 @@ func (l LpaStoreChangeType) Readable() string {
 
 	case DonorAddressCountryChange,
 		AttorneysAddressCountryChange,
-		CertificateProviderAddressCountryChange:
+		CertificateProviderAddressCountryChange,
+		IndependentWitnessAddressCountryChange:
 		return "Country"
 
 	case AttorneysSignedAtChange,
@@ -143,6 +155,12 @@ func (l LpaStoreChangeType) Readable() string {
 
 	case CertificateProviderIdentityCheckedAtChange:
 		return "CP checked at"
+
+	case DonorIdentityCheckedAtChange:
+		return "Identity checked at"
+
+	case DonorIdentityCheckTypeChange:
+		return "Identity checked type"
 
 	default:
 		return l.guessReadable()
@@ -191,6 +209,19 @@ func (l LpaStoreChangeType) getCategory() LpaStoreCategory {
 			DonorAddressTownChange,
 			DonorAddressPostCodeChange,
 			DonorAddressCountryChange,
+			SignedAtChange,
+			DonorIdentityCheckedAtChange,
+			DonorIdentityCheckTypeChange,
+			AuthorisedSignatoryFirstNamesChange,
+			AuthorisedSignatoryLastNameChange,
+			IndependentWitnessFirstNamesChange,
+			IndependentWitnessLastNameChange,
+			IndependentWitnessAddressLine1Change,
+			IndependentWitnessAddressLine2Change,
+			IndependentWitnessAddressLine3Change,
+			IndependentWitnessAddressTownChange,
+			IndependentWitnessAddressPostCodeChange,
+			IndependentWitnessAddressCountryChange,
 		},
 		CertificateProvidersCategory: {
 			CertificateProviderFirstNamesChange,
