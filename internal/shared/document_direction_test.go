@@ -2,6 +2,7 @@ package shared
 
 import (
 	"encoding/json"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -18,17 +19,13 @@ func TestParseDocumentDirection(t *testing.T) {
 
 	for _, tc := range tests {
 		got := ParseDocumentDirection(tc.input)
-		if got != tc.expected {
-			t.Errorf("ParseDocumentDirection(%q) = %v, want %v", tc.input, got, tc.expected)
-		}
+		assert.Equal(t, tc.expected, got)
 	}
 }
 
 func TestParseDocumentDirectionUnknown(t *testing.T) {
 	got := ParseDocumentDirection("invalid")
-	if got != DocumentDirectionNotRecognised {
-		t.Errorf("ParseDocumentDirection() = %v, want %v", got, DocumentDirectionNotRecognised)
-	}
+	assert.Equal(t, DocumentDirectionNotRecognised, got)
 }
 
 func TestDocumentDirectionTranslation(t *testing.T) {
@@ -62,9 +59,7 @@ func TestDocumentDirectionTranslation(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			got := tc.input.Translation()
-			if got != tc.want {
-				t.Errorf("Translation() = %q, want %q", got, tc.want)
-			}
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
@@ -105,9 +100,7 @@ func TestDocumentDirectionKey(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			got := tc.input.Key()
-			if got != tc.want {
-				t.Errorf("Key() = %q, want %q", got, tc.want)
-			}
+			assert.Equal(t, tc.want, got)
 		})
 	}
 
@@ -128,9 +121,7 @@ func TestDocumentDirectionMarshalJSON(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			b, _ := json.Marshal(tc.input)
-			if string(b) != tc.want {
-				t.Errorf("MarshalJSON() = %s, want %s", b, tc.want)
-			}
+			assert.Equal(t, string(b), tc.want)
 		})
 	}
 }
@@ -149,20 +140,13 @@ func TestDocumentDirectionUnmarshalJSON(t *testing.T) {
 	for _, tt := range tests {
 		var d DocumentDirection
 		err := json.Unmarshal([]byte(tt.jsonInput), &d)
-		if err != nil {
-			t.Errorf("UnmarshalJSON(%s) returned error: %v", tt.jsonInput, err)
-		}
-		if d != tt.expected {
-			t.Errorf("UnmarshalJSON(%s) = %v, want %v", tt.jsonInput, d, tt.expected)
-		}
+		assert.Nil(t, err)
+		assert.Equal(t, tt.expected, d)
 	}
 }
 
 func TestDocumentDirectionUnmarshalJSONErrors(t *testing.T) {
 	var d DocumentDirection
-
 	err := json.Unmarshal([]byte(`123`), &d)
-	if err == nil {
-		t.Errorf("expected error, got nil")
-	}
+	assert.Error(t, err)
 }

@@ -183,8 +183,8 @@ func TestCaseLabel(t *testing.T) {
 		"EPA": "colour-govuk-brown",
 		"pfa": "colour-govuk-turquoise",
 		"hw":  "colour-govuk-grass-green",
-		"":    "Not specified",
-		"foo": "case label colour NOT RECOGNISED: foo",
+		"":    "",
+		"foo": "",
 	}
 
 	testStringMapper(t, "caseLabel", expectations)

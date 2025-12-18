@@ -1,7 +1,9 @@
 {{ define "CaseLabel" }}
-    {{ if eq .CaseType "EPA" }}
-        <strong class="app-govuk-tag {{ caseLabel .CaseType }}">{{ ToUpper .CaseType }}</strong> {{ .UID }}
-    {{ else }}
-        <strong class="app-govuk-tag {{ caseLabel .SubType }}">{{ ToUpper .SubType }}</strong> {{ .UID }}
-    {{ end }}
+    <strong class="app-govuk-tag
+        {{ if eq .CaseType "EPA" }}
+            {{ caseLabel .CaseType }}">{{ ToUpper .CaseType }}
+        {{ else }}
+            {{ caseLabel .SubType }}">{{ ToUpper .SubType }}
+        {{ end }}
+    </strong> {{ .UID }}
 {{ end }}

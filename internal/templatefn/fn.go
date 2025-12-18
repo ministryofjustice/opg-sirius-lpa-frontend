@@ -310,10 +310,8 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "colour-govuk-turquoise"
 			case "HW":
 				return "colour-govuk-grass-green"
-			case "":
-				return "Not specified"
 			default:
-				return "case label colour NOT RECOGNISED: " + s
+				return ""
 			}
 		},
 		"compareBoolPointers": func(i *bool, j bool) bool {
