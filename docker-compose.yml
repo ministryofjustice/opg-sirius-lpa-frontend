@@ -27,7 +27,7 @@ services:
       - LHCI_GITHUB_APP_TOKEN
 
   go-lint:
-    image: golangci/golangci-lint:v2.7.1
+    image: golangci/golangci-lint:v2.7.2
     working_dir: /go/src/app
     volumes:
       - ./:/go/src/app
@@ -77,7 +77,7 @@ services:
       - TRIVY_PASSWORD=${DOCKER_PASSWORD}
 
   cypress:
-    image: cypress/included:15.7.1
+    image: cypress/included:15.8.1
     command: run --browser electron
     entrypoint: cypress
     depends_on:
