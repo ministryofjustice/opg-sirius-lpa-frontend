@@ -35,6 +35,7 @@ $govuk-assets-path: "../assets/";
 
 .app-\!-html-class--embedded {
   font-size: 0.875em;
+  background-color: white;
 }
 
 .app-\!-full-width {
@@ -247,6 +248,26 @@ $govuk-assets-path: "../assets/";
   display: block;
   margin-right: govuk-spacing(2);
   height: 98%;
+}
+
+.app-govuk-tag {
+  display: inline-flex;
+  padding: 2px 4px 1px 4px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  gap: 10px;
+  font-size: 0.9rem;
+}
+
+.colour-govuk-turquoise {
+  background: #28a197;
+}
+.colour-govuk-grass-green {
+  background: #85994b;
+}
+.colour-govuk-brown {
+  background: #b58840;
 }
 
 .app-progress-indicator-icon[data-progress-indicator="not-started"] {

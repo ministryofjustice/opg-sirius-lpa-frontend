@@ -1,0 +1,69 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Document List{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+
+            {{ template "error-summary" .Error }}
+
+            {{ $multiCaseSelected := .MultipleCasesSelected }}
+
+            <table class="govuk-table" data-module="moj-sortable-table">
+                <caption class="govuk-table__caption">
+                    Documents ({{ .DocumentList.Total }})
+                    <span class="govuk-body">
+                        Viewing {{ len .SelectedCases }} POA{{ if $multiCaseSelected }}s{{ end }}:
+                            {{ range .SelectedCases }}
+                                {{ template "CaseLabel" . }}
+                            {{ end }}
+                    </span>
+                </caption>
+
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-half" aria-sort="none">Name</th>
+                        {{ if $multiCaseSelected }}
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter" aria-sort="none">Case number</th>
+                        {{ end }}
+                        <th scope="col" class="govuk-table__header" aria-sort="none">Date created</th>
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-quarter" aria-sort="none">Document Type</th>
+                    </tr>
+                </thead>
+
+
+                <tbody class="govuk-table__body">
+                {{ range .DocumentList.Documents }}
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">[{{ .Direction.Translation }}{{ if .NotifyStatus}} - {{ camelcaseToSentence .NotifyStatus }}{{end}}]
+                            <br>
+                            <a class="govuk-link" href="/lpa/document/{{ .UUID }}">{{ .FriendlyDescription }}</a>
+                        </td>
+                        {{ if $multiCaseSelected }}
+                            <td class="govuk-table__cell">
+                                {{ if gt (len .CaseItems) 0 -}}
+                                    {{ $case := index .CaseItems 0 -}}
+                                    {{ template "CaseLabel" $case }}
+                                {{ end -}}
+                            </td>
+                        {{ end }}
+                        <td class="govuk-table__cell">{{ .CreatedDate }}</td>
+                        <td class="govuk-table__cell">
+                            {{ if eq .Direction.Key "Outgoing" }}
+                                {{ .SystemType }}
+                            {{ else if eq .Direction.Key "Incoming" }}
+                                {{ .Type }}{{ if .SubType }} - {{ ToUpper .SubType }}{{ end }}
+                            {{ else if eq .Type "Correspondence" }}
+                                {{ .SubType }}
+                            {{ end}}
+                        </td>
+                    </tr>
+                {{ end }}
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+{{ end }}

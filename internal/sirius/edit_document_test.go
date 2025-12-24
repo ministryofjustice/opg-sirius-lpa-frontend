@@ -3,11 +3,13 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
 )
 
 func TestEditDocument(t *testing.T) {
@@ -63,7 +65,7 @@ func TestEditDocument(t *testing.T) {
 				Type:                "Draft",
 				FriendlyDescription: "Dr Consuela Aysien - LPA perfect + reg due date: applicant",
 				CreatedDate:         `15/12/2022 13:41:04`,
-				Direction:           "Outgoing",
+				Direction:           shared.DocumentDirectionOut,
 				MimeType:            `application\/pdf`,
 				SystemType:          "LP-A",
 				FileName:            "LP-A.pdf",
