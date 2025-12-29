@@ -1,35 +1,53 @@
 {{ define "pagination-inner" }}
-    <p class="moj-pagination__results">Showing <b>{{ .Start }}</b> to <b>{{ .End }}</b> of <b>{{ .TotalItems }}</b> results</p>
-
     {{ if ne 1 .TotalPages }}
-        <ul class="moj-pagination__list">
-            {{ if .HasPrevious }}
-                <li class="moj-pagination__item  moj-pagination__item--prev">
-                    <a class="moj-pagination__link" href="{{ .SearchTerm }}{{ .Filters }}&page={{ .PreviousPage }}">Previous<span class="govuk-visually-hidden"> page</span></a>
-                </li>
-            {{ end }}
+        {{ if .HasPrevious }}
+            <div class="govuk-pagination__prev">
+                <a class="govuk-link govuk-pagination__link" href="#" rel="prev">
+                    <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                        <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
+                    </svg>
+                    <span class="govuk-pagination__link-title">
+                        Previous<span class="govuk-visually-hidden"> page</span>
+                    </span>
+                </a>
+            </div>
+        {{ end }}
 
+        <ul class="govuk-pagination__list">
             {{ range .Pages }}
                 {{ if eq . -1 }}
-                    <li class="moj-pagination__item">&hellip;</li>
+                    <li class="govuk-pagination__item">&hellip;</li>
                 {{ else if eq . $.CurrentPage }}
-                    <li class="moj-pagination__item moj-pagination__item--active"><span class="govuk-visually-hidden">Page </span>{{ . }}<span class="govuk-visually-hidden"> of {{ $.TotalPages }}</span></li>
+                    <li class="govuk-pagination__item govuk-pagination__item--current">
+                        <a class="govuk-link govuk-pagination__link" href="{{ $.SearchTerm }}{{ $.Filters }}&page={{ . }}" aria-label="Page {{ . }} of {{ $.TotalPages }}" aria-current="page">
+                            {{ . }}
+                        </a>
+                    </li>
                 {{ else }}
-                    <li class="moj-pagination__item"><a class="moj-pagination__link" href="{{ $.SearchTerm }}{{ $.Filters }}&page={{ . }}"><span class="govuk-visually-hidden">Page </span>{{ . }}<span class="govuk-visually-hidden"> of {{ $.TotalPages }}</span></a></li>
+                    <li class="govuk-pagination__item"><a class="govuk-link govuk-pagination__link" href="{{ $.SearchTerm }}{{ $.Filters }}&page={{ . }}"><span class="govuk-visually-hidden">Page </span>{{ . }}<span class="govuk-visually-hidden"> of {{ $.TotalPages }}</span></a></li>
                 {{ end }}
             {{ end }}
-
-            {{ if .HasNext }}
-                <li class="moj-pagination__item  moj-pagination__item--next">
-                    <a class="moj-pagination__link" href="{{ .SearchTerm }}{{ .Filters }}&page={{ .NextPage }}">Next<span class="govuk-visually-hidden"> page</span></a>
-                </li>
-            {{ end }}
         </ul>
+
+        {{ if .HasNext }}
+            <div class="govuk-pagination__next">
+                <a class="govuk-link govuk-pagination__link" href="#" rel="next">
+                    <span class="govuk-pagination__link-title">
+                        Next<span class="govuk-visually-hidden"> page</span>
+                    </span>
+                    <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                        <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
+                    </svg>
+                </a>
+            </div>
+        {{ end }}
     {{ end }}
 {{ end }}
 
 {{ define "pagination-footer" }}
-    <nav class="moj-pagination" aria-label="Pagination navigation">
+    <nav class="govuk-pagination moj-pagination__pagination" aria-label="Pagination navigation">
         {{ template "pagination-inner" . }}
     </nav>
+
+    <p class="moj-pagination__results">Showing <b>{{ .Start }}</b> to <b>{{ .End }}</b> of <b>{{ .TotalItems }}</b> results</p>
 {{ end }}
