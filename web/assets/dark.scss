@@ -99,13 +99,14 @@ $sirius-bg-color: #29292e;
     border-color: govuk-colour("white");
   }
 
-  .moj-pagination__link::before,
-  .moj-pagination__link::after {
-    filter: invert(100%);
+  .govuk-pagination__item:hover,
+  .govuk-pagination__next:hover,
+  .govuk-pagination__prev:hover {
+    background-color: govuk-colour("dark-grey");
   }
 
-  .moj-pagination__link {
-    color: govuk-colour("light-blue");
+  .govuk-pagination__icon {
+    color: govuk-colour("light-grey");
   }
 
   .moj-alert {
