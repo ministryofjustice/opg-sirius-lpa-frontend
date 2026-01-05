@@ -19,7 +19,11 @@
     "accessible-autocomplete": "^3.0.0",
     "cypress": "15.8.1",
     "govuk-frontend": "^5.0.0",
+<<<<<<< HEAD
     "opg-sirius-search-ui": "https://github.com/ministryofjustice/opg-sirius-search-ui#v1.78.13",
+=======
+    "opg-sirius-search-ui": "https://github.com/ministryofjustice/opg-sirius-search-ui#VEGA-3474-simplify-results-format",
+>>>>>>> f839e262 (VEGA-3474: use new version of search-ui)
     "punycode": "^2.3.1",
     "hugerte": "https://github.com/ministryofjustice/opg-hugerte-dist#semver:v1.0.9"
   },
