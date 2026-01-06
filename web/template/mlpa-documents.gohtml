@@ -61,13 +61,13 @@
                         </td>
                         <td class="govuk-table__cell">
                             <strong>
-                                {{ if eq .Direction "Incoming" }}
+                                {{ if eq .Direction.Key "Incoming" }}
                                     {{ if .IsViewable }}
                                         [IN]
                                     {{ else }}
                                         [IN - pending]
                                     {{ end }}
-                                {{ else if eq .Direction "Outgoing" }}
+                                {{ else if eq .Direction.Key "Outgoing" }}
                                     [OUT] {{ .Correspondent.PersonType }}, {{ .Correspondent.Firstname }} {{.Correspondent.Surname }}
                                 {{ else }}
                                     [INT]
@@ -83,10 +83,10 @@
                             {{ end }}
                         </td>
                         <td class="govuk-table__cell">
-                            {{ if eq .Direction "Incoming" }}
+                            {{ if eq .Direction.Key "Incoming" }}
                                 {{ .Type }}
                                 {{ if .SubType }}<br />&ndash; {{ .SubType }}{{ end }}
-                            {{ else if eq .Direction "Outgoing" }}
+                            {{ else if eq .Direction.Key "Outgoing" }}
                                 {{ .SystemType }}
                             {{ end }}
                         </td>
