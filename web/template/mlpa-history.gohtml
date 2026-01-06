@@ -18,8 +18,8 @@
                 <div class="govuk-summary-card govuk-!-margin-bottom-0">
                     <div class="govuk-summary-card__title-wrapper govuk-!-padding-bottom-1 govuk-!-padding-top-1">
                         <h1 class="govuk-summary-card__title">
-                            {{ if .IsLpaStore }}
-                                LPA details{{ if .Category }}: {{ .Category }}{{ end }}
+                            {{ if eq .Source "lpa_store" }}
+                                LPA Store Event
                             {{ else }}
                                 {{ if eq .Type "INS" }}
                                     Created:
@@ -49,16 +49,15 @@
                                         - #{{.FormattedLpaStoreId}}
                                     {{ end }}
                                 </p>
-                                <div class="govuk-body">
-                                    {{ if .IsLpaStore }}
+                                <p class="govuk-body">
+                                    {{ if eq .Source "lpa_store" }}
                                         <ul class="govuk-list govuk-list--bullet">
                                         {{ range .Changes }}
-                                            <li>
-                                            {{- if eq .Template "history-updated-from-to" -}}
-                                                {{ template "history-updated-from-to" . }}
-                                            {{ else }}
-                                                {{ .Key }} changed from: {{ .Old }} to: {{ .New }}
-                                            {{- end -}}
+                                            <li>{{ .Key }}
+                                                <ul class="govuk-list govuk-list--bullet">
+                                                    <li><strong>From:</strong> {{ if .Old }}{{ .Old }}{{ else }}<em>(empty)</em>{{ end }}</li>
+                                                    <li> <strong>To:</strong> {{ if .New }}{{ .New }}{{ else }}<em>(empty)</em>{{ end }}</li>
+                                                </ul>
                                             </li>
                                         {{ end }}
                                         </ul>
@@ -92,7 +91,7 @@
                                             {{ end }}
                                         </dl>
                                     {{ end }}
-                                </div>
+                                </p>
                             </div>
                             <div class="govuk-summary-list__row">
                                 <p class="govuk-hint govuk-!-margin-bottom-1 govuk-!-margin-top-1">
