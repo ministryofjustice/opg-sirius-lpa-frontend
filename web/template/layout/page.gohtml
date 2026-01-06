@@ -23,7 +23,7 @@
 
       {{ template "header" . }}
 
-      <div class="govuk-width-container">
+      <div class="govuk-width-container{{ block "container-classes" . }}{{ end }}">
         {{ block "backlink" . }}{{ end }}
 
         <main class="govuk-main-wrapper" id="main-content" role="main">
