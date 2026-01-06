@@ -1,7 +1,7 @@
 {{ define "header" }}
   <div class="app-!-embedded-hide">
     <header role="banner" data-module="govuk-header" class="govuk-header">
-      <div class="govuk-header__container govuk-width-container app-align-service-name-center">
+      <div class="govuk-header__container govuk-width-container app-align-service-name-center{{ block "container-classes" . }}{{ end }}">
         <div class="moj-header__logo">
           {{ template "moj-crest" }}
           <span class="moj-header__link moj-header__link--organisation-name">OPG</span>
@@ -26,7 +26,7 @@
       </div>
     </header>
 
-    <div class="govuk-width-container">
+    <div class="govuk-width-container{{ block "container-classes" . }}{{ end }}">
       <div class="govuk-phase-banner">
         <div class="govuk-grid-row app-align-items-center">
           <div class="govuk-grid-column-two-thirds">
