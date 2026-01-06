@@ -293,18 +293,4 @@ const objections = {
   },
 };
 
-const events = {
-  async get(digitalLpaUid, body, priority = 1) {
-    await addMock(
-      `/lpa-api/v1/digital-lpas/${digitalLpaUid}/events`,
-      "GET",
-      {
-        status: 200,
-        body: body,
-      },
-      priority,
-    );
-  },
-};
-
-export { get, progressIndicators, anomalies, objections, events };
+export { get, progressIndicators, anomalies, objections };
