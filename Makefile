@@ -6,18 +6,18 @@ help:
 all: lint gosec unit-test build-all scan pa11y lighthouse cypress down
 
 lint: ## Lint source code
-lint: go-lint yarn-lint
+lint: go-lint npm-lint
 
 go-lint:
 	docker compose run --rm go-lint
 
-yarn-lint:
-	docker compose run --rm yarn
-	docker compose run --rm yarn lint
+npm-lint:
+	docker compose run --rm npm install
+	docker compose run --rm npm run lint
 
-yarn-prettier:
-	docker compose run --rm yarn
-	docker compose run --rm yarn prettier . --write
+npm-prettier:
+	docker compose run --rm npm install
+	docker compose run --rm npm run prettier . --write
 
 gosec: ## Scan Go code for security flaws
 	docker compose run --rm gosec
@@ -41,9 +41,9 @@ build-dev: ## Build frontend container for the dev environment
 	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml build lpa-frontend
 
 dev: ## Build and start dev application and watch JS and SASS files for changes
-	docker compose run --rm yarn
-	docker compose run --rm yarn build
-	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up --build lpa-frontend yarn
+	docker compose run --rm npm install
+	docker compose run --rm npm run build
+	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up --build lpa-frontend npm run watch
 
 up: ## Start application with mock Sirius API; mostly for use with Cypress tests
 	docker compose up -d lpa-frontend

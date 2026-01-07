@@ -8,8 +8,7 @@ RUN apk add --no-cache \
       freetype-dev \
       nodejs \
       nss \
-      ttf-freefont \
-      yarn
+      ttf-freefont
 
 # Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \

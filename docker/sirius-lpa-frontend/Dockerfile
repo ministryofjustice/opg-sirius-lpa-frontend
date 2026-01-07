@@ -6,11 +6,11 @@ RUN apk add --no-cache git \
     && mkdir -p web/static
 
 COPY package.json .
-COPY yarn.lock .
-RUN yarn install --frozen-lockfile --ignore-scripts
+COPY package-lock.json .
+RUN npm ci --ignore-scripts
 
 COPY web/assets web/assets
-RUN yarn build
+RUN npm run build
 
 FROM golang:1.25.5-alpine AS dev
 
