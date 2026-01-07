@@ -56,6 +56,8 @@
                                             <li>
                                             {{- if eq .Template "history-updated-from-to" -}}
                                                 {{ template "history-updated-from-to" . }}
+                                            {{- else if eq .Template "history-date-updated-from-to" -}}
+                                                {{ template "history-date-updated-from-to" . }}
                                             {{ else }}
                                                 {{ .Key }} changed from: {{ .Old }} to: {{ .New }}
                                             {{- end -}}
