@@ -168,6 +168,10 @@ func (l LpaStoreChangeType) Readable() string {
 }
 
 func (l LpaStoreChangeType) GetTemplate() string {
+	if l == DonorDateOfBirthChange || l == AttorneysDateOfBirthChange {
+		return "history-date-updated-from-to"
+	}
+
 	return "history-updated-from-to"
 }
 
