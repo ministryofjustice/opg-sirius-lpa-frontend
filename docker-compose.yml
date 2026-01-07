@@ -34,11 +34,11 @@ services:
       - ./.cache/golangci-lint/v1.53.3:/root/.cache
     command: golangci-lint run -v --timeout 5m --enable gosec --output.text.path stdout --output.sarif.path test-results/golangci-lint.sarif
 
-  yarn:
+  npm:
     build:
-      context: docker/yarn/
+      context: docker/npm/
     working_dir: /home/node
-    entrypoint: yarn
+    entrypoint: npm
     volumes:
       - ./:/home/node
 
