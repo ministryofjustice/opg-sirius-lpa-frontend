@@ -54,7 +54,7 @@ The application can also be **run without docker**. Start Sirius with `make dev-
 Then do:
 
 ```
-npm install && npm run build
+npm ci && npm run build
 npm run watch & SIRIUS_PUBLIC_URL=http://localhost:8080 SIRIUS_URL=http://localhost:8080 PORT=8888 go run main.go
 ```
 
