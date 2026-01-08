@@ -316,3 +316,7 @@ $govuk-assets-path: "../assets/";
 .sirius-govuk-tag__status {
   max-width: fit-content !important;
 }
+
+.js-enabled .moj-filter__search-button {
+  display: none;
+}
