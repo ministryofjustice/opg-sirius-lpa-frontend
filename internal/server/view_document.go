@@ -11,6 +11,11 @@ type ViewDocumentClient interface {
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 }
 
+type viewDocumentData struct {
+	XSRFToken string
+	Document  sirius.Document
+}
+
 func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
@@ -25,6 +30,11 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		return tmpl(w, documentData)
+		data := viewDocumentData{
+			XSRFToken: ctx.XSRFToken,
+			Document:  documentData,
+		}
+
+		return tmpl(w, data)
 	}
 }
