@@ -18,8 +18,8 @@
                 <div class="govuk-summary-card govuk-!-margin-bottom-0">
                     <div class="govuk-summary-card__title-wrapper govuk-!-padding-bottom-1 govuk-!-padding-top-1">
                         <h1 class="govuk-summary-card__title">
-                            {{ if eq .Source "lpa_store" }}
-                                LPA Store Event
+                            {{ if .IsLpaStore }}
+                                LPA details{{ if .Category }}: {{ .Category }}{{ end }}
                             {{ else }}
                                 {{ if eq .Type "INS" }}
                                     Created:
@@ -49,15 +49,18 @@
                                         - #{{.FormattedLpaStoreId}}
                                     {{ end }}
                                 </p>
-                                <p class="govuk-body">
-                                    {{ if eq .Source "lpa_store" }}
+                                <div class="govuk-body">
+                                    {{ if .IsLpaStore }}
                                         <ul class="govuk-list govuk-list--bullet">
                                         {{ range .Changes }}
-                                            <li>{{ .Key }}
-                                                <ul class="govuk-list govuk-list--bullet">
-                                                    <li><strong>From:</strong> {{ if .Old }}{{ .Old }}{{ else }}<em>(empty)</em>{{ end }}</li>
-                                                    <li> <strong>To:</strong> {{ if .New }}{{ .New }}{{ else }}<em>(empty)</em>{{ end }}</li>
-                                                </ul>
+                                            <li>
+                                            {{- if eq .Template "history-updated-from-to" -}}
+                                                {{ template "history-updated-from-to" . }}
+                                            {{- else if eq .Template "history-date-updated-from-to" -}}
+                                                {{ template "history-date-updated-from-to" . }}
+                                            {{ else }}
+                                                {{ .Key }} changed from: {{ .Old }} to: {{ .New }}
+                                            {{- end -}}
                                             </li>
                                         {{ end }}
                                         </ul>
@@ -91,7 +94,7 @@
                                             {{ end }}
                                         </dl>
                                     {{ end }}
-                                </p>
+                                </div>
                             </div>
                             <div class="govuk-summary-list__row">
                                 <p class="govuk-hint govuk-!-margin-bottom-1 govuk-!-margin-top-1">
