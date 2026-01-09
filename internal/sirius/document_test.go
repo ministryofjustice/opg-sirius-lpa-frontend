@@ -454,8 +454,9 @@ func TestDownloadMultiple(t *testing.T) {
 
 				if tc.assertResponse != nil {
 					tc.assertResponse(t, resp)
-					if resp != nil {
-						resp.Body.Close()
+					if assert.NotNil(t, resp) {
+						closeErr := resp.Body.Close()
+						assert.NoError(t, closeErr)
 					}
 				} else {
 					assert.Nil(t, resp)
