@@ -3,7 +3,8 @@
   "extends": [
     "config:recommended",
     "schedule:earlyMondays",
-    "helpers:pinGitHubActionDigests"
+    "helpers:pinGitHubActionDigests",
+    "docker:pinDigests"
   ],
   "branchNameStrict": true,
   "branchPrefix": "renovate-",
@@ -12,17 +13,6 @@
   "configMigration": true,
   "postUpdateOptions": ["gomodTidy"],
   "packageRules": [
-    {
-      "description": [
-        "Ignore Dockerfile Node upgrades",
-        "Node 20.3.x doesn't work with our local versions of Docker so we must lock to 20.2.x for now"
-      ],
-      "matchFileNames": ["docker/sirius-lpa-frontend/Dockerfile"],
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["node"],
-      "matchUpdateTypes": ["minor"],
-      "enabled": false
-    },
     {
       "automerge": true,
       "groupName": "Patch & Minor Updates",

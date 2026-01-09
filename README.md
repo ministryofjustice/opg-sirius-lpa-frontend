@@ -54,8 +54,8 @@ The application can also be **run without docker**. Start Sirius with `make dev-
 Then do:
 
 ```
-yarn && yarn build
-yarn watch & SIRIUS_PUBLIC_URL=http://localhost:8080 SIRIUS_URL=http://localhost:8080 PORT=8888 go run main.go
+npm ci && npm run build
+npm run watch & SIRIUS_PUBLIC_URL=http://localhost:8080 SIRIUS_URL=http://localhost:8080 PORT=8888 go run main.go
 ```
 
 Again, Ctrl-C stops the application.
@@ -111,7 +111,7 @@ mock backend and start cypress.
 
 ```
 make up
-yarn cypress open
+npm run cypress open
 ```
 
 ## Development
@@ -120,7 +120,7 @@ For CI Like linting locally you can run
 
 ```
 make go-lint
-make yarn-lint
+make npm-lint
 # or to run both linters simply
 make lint
 ```
