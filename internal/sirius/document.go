@@ -1,6 +1,7 @@
 package sirius
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -128,8 +129,11 @@ func (c *Client) DownloadMultiple(ctx Context, docIDs []string) (*http.Response,
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		resp.Body.Close()
-		return nil, newStatusError(resp)
+		statusErr := newStatusError(resp)
+		if errClose := resp.Body.Close(); errClose != nil {
+			return nil, errors.Join(statusErr, errClose)
+		}
+		return nil, statusErr
 	}
 
 	return resp, nil

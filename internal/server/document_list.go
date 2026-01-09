@@ -72,7 +72,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			if err != nil {
 				return err
 			}
-			defer downloadResp.Body.Close()
+			defer downloadResp.Body.Close() //nolint:errcheck // no need to check error when closing body
 
 			for key, values := range downloadResp.Header {
 				for _, value := range values {
