@@ -128,7 +128,7 @@ func (c *Client) DownloadMultiple(ctx Context, docIDs []string) (*http.Response,
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		resp.Body.Close()
+		resp.Body.Close() //nolint:errcheck // no need to check error when closing body
 		return nil, newStatusError(resp)
 	}
 
