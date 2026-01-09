@@ -18,10 +18,6 @@ type viewDocumentData struct {
 
 func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		if err := r.ParseForm(); err != nil {
-			return err
-		}
-
 		uuid := r.PathValue("uuid")
 		ctx := getContext(r)
 
