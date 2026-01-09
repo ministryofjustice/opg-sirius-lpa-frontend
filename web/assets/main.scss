@@ -16,6 +16,37 @@ $govuk-assets-path: "../assets/";
 @import "./dark.scss";
 @import "./wysiwyg.scss";
 
+// Match GOV.UK link styling for submit buttons presented as links.
+.govuk-button--link {
+  background: none;
+  border: none;
+  box-shadow: none;
+  color: $govuk-link-colour;
+  cursor: pointer;
+  font-weight: 400;
+  padding: 0;
+  text-align: left;
+  text-decoration: underline;
+}
+
+.govuk-button--link:hover {
+  color: $govuk-link-hover-colour;
+  text-decoration-thickness: 3px;
+  text-decoration-skip-ink: none;
+}
+
+.govuk-button--link:focus {
+  background: $govuk-focus-colour;
+  box-shadow: 0 -2px $govuk-focus-colour, 0 4px $govuk-focus-text-colour;
+  color: $govuk-focus-text-colour;
+  outline: 3px solid transparent;
+  text-decoration: none;
+}
+
+.govuk-button--link:focus:hover {
+  color: $govuk-focus-text-colour;
+}
+
 .app-\!-embedded .app-\!-embedded-hide {
   display: none;
 }
