@@ -37,7 +37,9 @@ $govuk-assets-path: "../assets/";
 
 .govuk-button--link:focus {
   background: $govuk-focus-colour;
-  box-shadow: 0 -2px $govuk-focus-colour, 0 4px $govuk-focus-text-colour;
+  box-shadow:
+    0 -2px $govuk-focus-colour,
+    0 4px $govuk-focus-text-colour;
   color: $govuk-focus-text-colour;
   outline: 3px solid transparent;
   text-decoration: none;
