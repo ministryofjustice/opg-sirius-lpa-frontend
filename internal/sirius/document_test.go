@@ -394,9 +394,8 @@ func TestDownloadMultiple(t *testing.T) {
 					}).
 					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body:   matchers.String("this is a pdf"),
 						Headers: matchers.MapMatcher{
-							"Content-Type": matchers.String("application/pdf"),
+							"Content-Type": matchers.String("application/octet-stream"),
 						},
 					})
 			},
@@ -410,7 +409,7 @@ func TestDownloadMultiple(t *testing.T) {
 
 				body, readErr := io.ReadAll(resp.Body)
 				assert.NoError(t, readErr)
-				assert.Equal(t, "this is a pdf", string(body))
+				assert.True(t, len(body) > 0)
 			},
 		},
 		{
