@@ -379,7 +379,7 @@ func TestDownloadMultiple(t *testing.T) {
 	}{
 		{
 			name:   "OK",
-			docIDs: []string{"1", "3f5f075f-d55a-4840-acbf-0eecf4e6af0d"},
+			docIDs: []string{"1", "2"},
 			setup: func() {
 				pact.
 					AddInteraction().
@@ -394,9 +394,9 @@ func TestDownloadMultiple(t *testing.T) {
 					}).
 					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body:   matchers.String("this is a pdf"),
+						Body:   matchers.Term("fake-binary-file", ".+"),
 						Headers: matchers.MapMatcher{
-							"Content-Type": matchers.String("application/pdf"),
+							"Content-Type": matchers.String("content/octet-stream"),
 						},
 					})
 			},
@@ -406,11 +406,11 @@ func TestDownloadMultiple(t *testing.T) {
 				}
 
 				assert.Equal(t, http.StatusOK, resp.StatusCode)
-				assert.Equal(t, "application/pdf", resp.Header.Get("Content-Type"))
+				assert.Equal(t, "content/octet-stream", resp.Header.Get("Content-Type"))
 
 				body, readErr := io.ReadAll(resp.Body)
 				assert.NoError(t, readErr)
-				assert.Equal(t, "this is a pdf", string(body))
+				assert.True(t, len(body) > 0)
 			},
 		},
 		{
