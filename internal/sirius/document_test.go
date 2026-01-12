@@ -3,7 +3,6 @@ package sirius
 import (
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"testing"
 
@@ -379,7 +378,7 @@ func TestDownloadMultiple(t *testing.T) {
 	}{
 		{
 			name:   "OK",
-			docIDs: []string{"1", "3f5f075f-d55a-4840-acbf-0eecf4e6af0d"},
+			docIDs: []string{"1", "2"},
 			setup: func() {
 				pact.
 					AddInteraction().
@@ -394,10 +393,10 @@ func TestDownloadMultiple(t *testing.T) {
 					}).
 					WithCompleteResponse(consumer.Response{
 						Status: http.StatusOK,
-						Body:   matchers.String("this is a pdf"),
 						Headers: matchers.MapMatcher{
-							"Content-Type": matchers.String("application/pdf"),
+							"Content-Type": matchers.String("content/octet-stream"),
 						},
+						// Body cannot be matched as it's binary data
 					})
 			},
 			assertResponse: func(t *testing.T, resp *http.Response) {
@@ -406,11 +405,7 @@ func TestDownloadMultiple(t *testing.T) {
 				}
 
 				assert.Equal(t, http.StatusOK, resp.StatusCode)
-				assert.Equal(t, "application/pdf", resp.Header.Get("Content-Type"))
-
-				body, readErr := io.ReadAll(resp.Body)
-				assert.NoError(t, readErr)
-				assert.Equal(t, "this is a pdf", string(body))
+				assert.Equal(t, "content/octet-stream", resp.Header.Get("Content-Type"))
 			},
 		},
 		{
