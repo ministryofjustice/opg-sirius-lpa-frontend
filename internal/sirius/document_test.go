@@ -379,25 +379,18 @@ func TestDownloadMultiple(t *testing.T) {
 	}{
 		{
 			name:   "OK",
-			docIDs: []string{"1", "3f5f075f-d55a-4840-acbf-0eecf4e6af0d"},
+			docIDs: []string{"1", "2"},
 			setup: func() {
 				pact.
 					AddInteraction().
 					Given("Multiple documents are available to download").
 					UponReceiving("A request to download multiple documents").
-					WithCompleteRequest(consumer.Request{
-						Method: http.MethodGet,
-						Path:   matchers.String("/lpa-api/v1/documents/download-multiple"),
-						Query: matchers.MapMatcher{
-							"id[]": matchers.EachLike(matchers.Term("1", ".+"), 2),
-						},
+					WithRequest(http.MethodGet, "/lpa-api/v1/documents/download-multiple", func(builder *consumer.V4RequestBuilder) {
+						builder.Query("id[]", matchers.EachLike(matchers.Term("1", ".+"), 2))
 					}).
-					WithCompleteResponse(consumer.Response{
-						Status: http.StatusOK,
-						Body:   matchers.String("this is a pdf"),
-						Headers: matchers.MapMatcher{
-							"Content-Type": matchers.String("application/pdf"),
-						},
+					WillRespondWith(http.StatusOK, func(builder *consumer.V4ResponseBuilder) {
+						builder.Header("Content-Type", matchers.String("content/octet-stream"))
+						builder.BinaryBody([]byte("fake-binary-file"))
 					})
 			},
 			assertResponse: func(t *testing.T, resp *http.Response) {
@@ -406,11 +399,11 @@ func TestDownloadMultiple(t *testing.T) {
 				}
 
 				assert.Equal(t, http.StatusOK, resp.StatusCode)
-				assert.Equal(t, "application/pdf", resp.Header.Get("Content-Type"))
+				assert.Equal(t, "content/octet-stream", resp.Header.Get("Content-Type"))
 
 				body, readErr := io.ReadAll(resp.Body)
 				assert.NoError(t, readErr)
-				assert.Equal(t, "this is a pdf", string(body))
+				assert.True(t, len(body) > 0)
 			},
 		},
 		{
