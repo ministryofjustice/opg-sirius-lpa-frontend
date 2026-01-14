@@ -37,7 +37,6 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 		}
 
 		caseUIDs := r.Form["uid[]"]
-		dismissValidation := r.FormValue("dismissValidation") == "true"
 
 		ctx := getContext(r)
 
@@ -67,7 +66,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 
 		selectedDocUUIDs := r.Form["document"]
 
-		if r.Method == http.MethodPost && len(selectedDocUUIDs) > 0 && !dismissValidation {
+		if r.Method == http.MethodPost && len(selectedDocUUIDs) > 0 && r.FormValue("actionDownload") == "true" {
 			downloadResp, err := client.DownloadMultiple(ctx, selectedDocUUIDs)
 			if err != nil {
 				return err
@@ -94,7 +93,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 		}
 
 		var validationErr sirius.ValidationError
-		if r.Method == http.MethodPost && len(selectedDocUUIDs) == 0 && !dismissValidation {
+		if r.Method == http.MethodPost && len(selectedDocUUIDs) == 0 && r.FormValue("actionDownload") == "true" {
 			validationErr.Detail = "Select one or more documents and try again."
 		}
 
