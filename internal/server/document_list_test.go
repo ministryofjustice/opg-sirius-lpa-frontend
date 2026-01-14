@@ -285,9 +285,9 @@ func TestDocumentListDownloadMultipleSuccess(t *testing.T) {
 	downloadResp := &http.Response{
 		StatusCode: http.StatusCreated,
 		Header: http.Header{
-			"Content-Type": []string{"application/zip"},
+			"Content-Type": []string{"content/octet-stream"},
 		},
-		Body: io.NopCloser(strings.NewReader("zip-bytes")),
+		Body: io.NopCloser(strings.NewReader("document-download-bytes")),
 	}
 
 	client.
@@ -305,8 +305,8 @@ func TestDocumentListDownloadMultipleSuccess(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusCreated, resp.Code)
-	assert.Equal(t, "application/zip", resp.Header().Get("Content-Type"))
-	assert.Equal(t, "zip-bytes", resp.Body.String())
+	assert.Equal(t, "content/octet-stream", resp.Header().Get("Content-Type"))
+	assert.Equal(t, "document-download-bytes", resp.Body.String())
 
 	mock.AssertExpectationsForObjects(t, client)
 	client.AssertNotCalled(t, "GetPersonDocuments")
