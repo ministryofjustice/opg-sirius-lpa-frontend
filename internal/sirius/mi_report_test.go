@@ -29,7 +29,7 @@ func TestMiReport(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a pending case assigned").
+					Given("I am a System Admin").
 					UponReceiving("A request for an MI report").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
