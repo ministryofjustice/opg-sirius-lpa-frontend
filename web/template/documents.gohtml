@@ -59,6 +59,7 @@
                 {{ range .DocumentList.Documents }}
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell">
+                            {{ if eq .MimeType "application/pdf" }}
                             <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                                 <div class="govuk-checkboxes__item">
                                     <input
@@ -72,6 +73,7 @@
                                 <label class="govuk-label govuk-checkboxes__label" for="document-{{ .UUID }}"></label>
                                 </div>
                             </div>
+                            {{ end }}
                         </td>
                         <td class="govuk-table__cell">[{{ .Direction.Translation }}{{ if .NotifyStatus}} - {{ camelcaseToSentence .NotifyStatus }}{{end}}]
                             <br>

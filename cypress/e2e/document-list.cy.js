@@ -373,6 +373,17 @@ describe("View documents", () => {
     cy.contains("Document Type");
   });
 
+  it("does not show selection checkbox for non-PDF documents", () => {
+    cy.visit("/donor/1/documents");
+
+    cy.contains("a", "email.msg")
+      .closest("tr")
+      .find('input[name="document"]')
+      .should("not.exist");
+
+    cy.get('input[name="document"]').should("have.length", 5);
+  });
+
   it("an EPA document", () => {
     cy.addMock(
       "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0,case:990&limit=999",
