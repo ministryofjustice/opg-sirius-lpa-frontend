@@ -28,6 +28,7 @@ func TestEditDates(t *testing.T) {
 				pact.
 					AddInteraction().
 					Given("I have a pending case assigned").
+					Given("I am a System Admin").
 					UponReceiving("A request to edit the dates").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
