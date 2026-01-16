@@ -38,8 +38,8 @@ async function reset() {
   });
 }
 
-function mappings() {
+function getMappings() {
   return fetch(`${Cypress.env("MOCK_SERVER_URI")}/__admin/mappings`);
 }
 
-export { addMock, reset, mappings };
+export { addMock, reset, getMappings };
