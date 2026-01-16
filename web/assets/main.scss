@@ -320,3 +320,8 @@ $govuk-assets-path: "../assets/";
 .js-enabled .moj-filter__search-button {
   display: none;
 }
+
+.document-viewer-container {
+  width: 100%;
+  min-height: 90vh;
+}
