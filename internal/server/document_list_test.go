@@ -298,6 +298,7 @@ func TestDocumentListDownloadMultipleSuccess(t *testing.T) {
 
 	form := url.Values{}
 	form.Add("document", "doc-uuid")
+	form.Add("actionDownload", "true")
 	req, _ := http.NewRequest(http.MethodPost, "/donor/82/documents", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", formUrlEncoded)
 
@@ -327,6 +328,7 @@ func TestDocumentListDownloadMultipleError(t *testing.T) {
 
 	form := url.Values{}
 	form.Add("document", "doc-uuid")
+	form.Add("actionDownload", "true")
 	req, _ := http.NewRequest(http.MethodPost, "/donor/82/documents", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", formUrlEncoded)
 
@@ -367,7 +369,9 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, template.Func))
 
-	req, _ := http.NewRequest(http.MethodPost, "/donor/82/documents", strings.NewReader(""))
+	form := url.Values{}
+	form.Add("actionDownload", "true")
+	req, _ := http.NewRequest(http.MethodPost, "/donor/82/documents", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", formUrlEncoded)
 
 	resp, err := server.serve(req)
