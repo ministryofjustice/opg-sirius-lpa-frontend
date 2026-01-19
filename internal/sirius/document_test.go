@@ -2,6 +2,7 @@ package sirius
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"testing"
@@ -467,6 +468,37 @@ func TestDownloadMultiple(t *testing.T) {
 			}))
 		})
 	}
+}
+
+type downloadMultipleErrorClient struct {
+	err error
+}
+
+func (c downloadMultipleErrorClient) Do(*http.Request) (*http.Response, error) {
+	return nil, c.err
+}
+
+func TestDownloadMultipleRequestCreationError(t *testing.T) {
+	t.Parallel()
+
+	client := NewClient(http.DefaultClient, "://NotAValidURL")
+
+	resp, err := client.DownloadMultiple(Context{Context: context.Background()}, []string{"1"})
+
+	assert.Nil(t, resp)
+	assert.Error(t, err)
+}
+
+func TestDownloadMultipleClientError(t *testing.T) {
+	t.Parallel()
+
+	expectedErr := errors.New("network failure")
+	client := NewClient(downloadMultipleErrorClient{err: expectedErr}, "http://example.com")
+
+	resp, err := client.DownloadMultiple(Context{Context: context.Background()}, []string{"1"})
+
+	assert.Nil(t, resp)
+	assert.Equal(t, expectedErr, err)
 }
 
 // non-pact test
