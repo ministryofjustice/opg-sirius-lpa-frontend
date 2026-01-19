@@ -1,7 +1,10 @@
 package server
 
 import (
+	"io"
 	"net/http"
+	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
@@ -22,6 +25,11 @@ func (m *mockDocumentListClient) CasesByDonor(ctx sirius.Context, id int) ([]sir
 func (m *mockDocumentListClient) GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error) {
 	args := m.Called(ctx, personID, caseIDs)
 	return args.Get(0).(sirius.DocumentList), args.Error(1)
+}
+
+func (m *mockDocumentListClient) DownloadMultiple(ctx sirius.Context, docIDs []string) (*http.Response, error) {
+	args := m.Called(ctx, docIDs)
+	return args.Get(0).(*http.Response), args.Error(1)
 }
 
 var singleDocumentList = sirius.DocumentList{
@@ -264,6 +272,161 @@ func TestGetDocumentList(t *testing.T) {
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
+}
+
+func TestDocumentListDownloadMultipleSuccess(t *testing.T) {
+	cases := []sirius.Case{{ID: 1, UID: "7000-1234-0000"}}
+
+	client := &mockDocumentListClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 82).
+		Return(cases, nil)
+
+	downloadResp := &http.Response{
+		StatusCode: http.StatusCreated,
+		Header: http.Header{
+			"Content-Type": []string{"content/octet-stream"},
+		},
+		Body: io.NopCloser(strings.NewReader("document-download-bytes")),
+	}
+
+	client.
+		On("DownloadMultiple", mock.Anything, []string{"doc-uuid"}).
+		Return(downloadResp, nil)
+
+	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
+
+	form := url.Values{}
+	form.Add("document", "doc-uuid")
+	form.Add("actionDownload", "true")
+	req, _ := http.NewRequest(http.MethodPost, "/donor/82/documents", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", formUrlEncoded)
+
+	resp, err := server.serve(req)
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusCreated, resp.Code)
+	assert.Equal(t, "content/octet-stream", resp.Header().Get("Content-Type"))
+	assert.Equal(t, "document-download-bytes", resp.Body.String())
+
+	mock.AssertExpectationsForObjects(t, client)
+	client.AssertNotCalled(t, "GetPersonDocuments")
+}
+
+func TestDocumentListDownloadMultipleError(t *testing.T) {
+	cases := []sirius.Case{{ID: 1, UID: "7000-1234-0000"}}
+
+	client := &mockDocumentListClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 82).
+		Return(cases, nil)
+	client.
+		On("DownloadMultiple", mock.Anything, []string{"doc-uuid"}).
+		Return((*http.Response)(nil), errExample)
+
+	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
+
+	form := url.Values{}
+	form.Add("document", "doc-uuid")
+	form.Add("actionDownload", "true")
+	req, _ := http.NewRequest(http.MethodPost, "/donor/82/documents", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", formUrlEncoded)
+
+	_, err := server.serve(req)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+	client.AssertNotCalled(t, "GetPersonDocuments")
+}
+
+func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
+	cases := []sirius.Case{
+		{ID: 1, UID: "7000-1234-0000"},
+		{ID: 2, UID: "7000-9876-0000"},
+	}
+
+	client := &mockDocumentListClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 82).
+		Return(cases, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 82, []string(nil)).
+		Return(allDocumentList, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything,
+			documentListData{
+				SelectedCases:         cases,
+				DocumentList:          allDocumentList,
+				MultipleCasesSelected: true,
+				Error: sirius.ValidationError{
+					Detail: "Select one or more documents and try again.",
+				},
+			},
+		).
+		Return(nil)
+
+	server := newMockServer("/donor/{id}/documents", DocumentList(client, template.Func))
+
+	form := url.Values{}
+	form.Add("actionDownload", "true")
+	req, _ := http.NewRequest(http.MethodPost, "/donor/82/documents", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", formUrlEncoded)
+
+	resp, err := server.serve(req)
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.Code)
+
+	mock.AssertExpectationsForObjects(t, client, template)
+	client.AssertNotCalled(t, "DownloadMultiple")
+}
+
+func TestDocumentListDismissValidation(t *testing.T) {
+	cases := []sirius.Case{
+		{ID: 1, UID: "7000-1234-0000"},
+		{ID: 2, UID: "7000-9876-0000"},
+		{ID: 3, UID: "7000-5678-0000"},
+	}
+
+	client := &mockDocumentListClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 82).
+		Return(cases, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 82, []string{"1", "2"}).
+		Return(twoCasesDocumentList, nil)
+
+	expectedCases := []sirius.Case{cases[0], cases[1]}
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything,
+			documentListData{
+				SelectedCases:         expectedCases,
+				DocumentList:          twoCasesDocumentList,
+				MultipleCasesSelected: true,
+			},
+		).
+		Return(nil)
+
+	server := newMockServer("/donor/{id}/documents", DocumentList(client, template.Func))
+
+	form := url.Values{}
+	form.Add("uid[]", "7000-1234-0000")
+	form.Add("uid[]", "7000-9876-0000")
+	form.Add("dismissValidation", "true")
+	req, _ := http.NewRequest(http.MethodPost, "/donor/82/documents", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", formUrlEncoded)
+
+	resp, err := server.serve(req)
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.Code)
+
+	mock.AssertExpectationsForObjects(t, client, template)
+	client.AssertNotCalled(t, "DownloadMultiple")
 }
 
 func TestDocumentListInvalidDonorID(t *testing.T) {

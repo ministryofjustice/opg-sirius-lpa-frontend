@@ -2,6 +2,7 @@ package sirius
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"testing"
@@ -361,6 +362,143 @@ func TestGetPersonDocumentBy(t *testing.T) {
 			}))
 		})
 	}
+}
+
+func TestDownloadMultiple(t *testing.T) {
+	t.Parallel()
+
+	pact, err := newPact()
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		name           string
+		docIDs         []string
+		setup          func()
+		expectedError  func(int) error
+		assertResponse func(*testing.T, *http.Response)
+	}{
+		{
+			name:   "OK",
+			docIDs: []string{"1", "2"},
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("Multiple documents are available to download").
+					UponReceiving("A request to download multiple documents").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodGet,
+						Path:   matchers.String("/lpa-api/v1/documents/download-multiple"),
+						Query: matchers.MapMatcher{
+							"id[]": matchers.EachLike(matchers.Term("1", ".+"), 2),
+						},
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status: http.StatusOK,
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("content/octet-stream"),
+						},
+						// Body cannot be matched as it's binary data
+					})
+			},
+			assertResponse: func(t *testing.T, resp *http.Response) {
+				if !assert.NotNil(t, resp) {
+					return
+				}
+
+				assert.Equal(t, http.StatusOK, resp.StatusCode)
+				assert.Equal(t, "content/octet-stream", resp.Header.Get("Content-Type"))
+			},
+		},
+		{
+			name:   "NotFound",
+			docIDs: []string{"999"},
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("No documents exist for the provided IDs").
+					UponReceiving("A request to download unavailable documents").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodGet,
+						Path:   matchers.String("/lpa-api/v1/documents/download-multiple"),
+						Query: matchers.MapMatcher{
+							"id[]": matchers.EachLike(matchers.Term("999", ".+"), 1),
+						},
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status: http.StatusNotFound,
+					})
+			},
+			expectedError: func(port int) error {
+				return StatusError{
+					Code:          http.StatusNotFound,
+					URL:           fmt.Sprintf("http://127.0.0.1:%d/lpa-api/v1/documents/download-multiple?id%%5B%%5D=999", port),
+					Method:        http.MethodGet,
+					CorrelationId: "",
+				}
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
+
+				resp, err := client.DownloadMultiple(Context{Context: context.Background()}, tc.docIDs)
+
+				if tc.assertResponse != nil {
+					tc.assertResponse(t, resp)
+					if assert.NotNil(t, resp) {
+						closeErr := resp.Body.Close()
+						assert.NoError(t, closeErr)
+					}
+				} else {
+					assert.Nil(t, resp)
+				}
+
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(config.Port), err)
+				}
+
+				return nil
+			}))
+		})
+	}
+}
+
+type downloadMultipleErrorClient struct {
+	err error
+}
+
+func (c downloadMultipleErrorClient) Do(*http.Request) (*http.Response, error) {
+	return nil, c.err
+}
+
+func TestDownloadMultipleRequestCreationError(t *testing.T) {
+	t.Parallel()
+
+	client := NewClient(http.DefaultClient, "://NotAValidURL")
+
+	resp, err := client.DownloadMultiple(Context{Context: context.Background()}, []string{"1"})
+
+	assert.Nil(t, resp)
+	assert.Error(t, err)
+}
+
+func TestDownloadMultipleClientError(t *testing.T) {
+	t.Parallel()
+
+	expectedErr := errors.New("network failure")
+	client := NewClient(downloadMultipleErrorClient{err: expectedErr}, "http://example.com")
+
+	resp, err := client.DownloadMultiple(Context{Context: context.Background()}, []string{"1"})
+
+	assert.Nil(t, resp)
+	assert.Equal(t, expectedErr, err)
 }
 
 // non-pact test

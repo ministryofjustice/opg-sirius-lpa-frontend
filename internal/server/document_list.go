@@ -1,6 +1,7 @@
 package server
 
 import (
+	"io"
 	"net/http"
 	"strconv"
 
@@ -11,6 +12,7 @@ import (
 type DocumentListClient interface {
 	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
 	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
+	DownloadMultiple(ctx sirius.Context, docIDs []string) (*http.Response, error)
 }
 
 type documentListData struct {
@@ -62,9 +64,37 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			selected = casesOnDonor
 		}
 
+		selectedDocUUIDs := r.Form["document"]
+
+		if r.Method == http.MethodPost && len(selectedDocUUIDs) > 0 && r.FormValue("actionDownload") == "true" {
+			downloadResp, err := client.DownloadMultiple(ctx, selectedDocUUIDs)
+			if err != nil {
+				return err
+			}
+			defer downloadResp.Body.Close() //nolint:errcheck // no need to check error when closing body
+
+			for key, values := range downloadResp.Header {
+				for _, value := range values {
+					w.Header().Add(key, value)
+				}
+			}
+
+			w.WriteHeader(downloadResp.StatusCode)
+			if _, err := io.Copy(w, downloadResp.Body); err != nil {
+				return err
+			}
+
+			return nil
+		}
+
 		docs, err := client.GetPersonDocuments(ctx, donorID, caseIDs)
 		if err != nil {
 			return err
+		}
+
+		var validationErr sirius.ValidationError
+		if r.Method == http.MethodPost && len(selectedDocUUIDs) == 0 && r.FormValue("actionDownload") == "true" {
+			validationErr.Detail = "Select one or more documents and try again."
 		}
 
 		data := documentListData{
@@ -72,6 +102,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			SelectedCases:         selected,
 			DocumentList:          docs,
 			MultipleCasesSelected: len(caseUIDs) > 1 || (len(caseUIDs) == 0 && len(casesOnDonor) > 1),
+			Error:                 validationErr,
 		}
 
 		return tmpl(w, data)

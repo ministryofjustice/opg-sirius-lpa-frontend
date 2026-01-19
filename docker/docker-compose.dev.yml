@@ -12,3 +12,5 @@ services:
     environment:
       SIRIUS_URL: http://docker.for.mac.localhost:8080
       SIRIUS_PUBLIC_URL: http://localhost:8080
+  npm:
+    command: run watch

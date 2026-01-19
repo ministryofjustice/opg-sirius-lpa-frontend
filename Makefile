@@ -43,7 +43,7 @@ build-dev: ## Build frontend container for the dev environment
 dev: ## Build and start dev application and watch JS and SASS files for changes
 	docker compose run --rm npm ci
 	docker compose run --rm npm run build
-	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up --build lpa-frontend npm run watch
+	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up --build lpa-frontend npm
 
 up: ## Start application with mock Sirius API; mostly for use with Cypress tests
 	docker compose up -d lpa-frontend

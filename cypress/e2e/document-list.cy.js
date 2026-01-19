@@ -373,6 +373,17 @@ describe("View documents", () => {
     cy.contains("Document Type");
   });
 
+  it("does not show selection checkbox for non-PDF documents", () => {
+    cy.visit("/donor/1/documents");
+
+    cy.contains("a", "email.msg")
+      .closest("tr")
+      .find('input[name="document"]')
+      .should("not.exist");
+
+    cy.get('input[name="document"]').should("have.length", 5);
+  });
+
   it("an EPA document", () => {
     cy.addMock(
       "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0,case:990&limit=999",
@@ -438,5 +449,98 @@ describe("View documents", () => {
     cy.contains("Case number").should("not.exist");
     cy.contains("Date created");
     cy.contains("Document Type");
+  });
+
+  it("downloads selected document", () => {
+    cy.addMock(
+      "/lpa-api/v1/documents/download-multiple?id%5B%5D=5b4f0ad3-1e4a-4a55-b4a7-3f8e3d2bc3b9",
+      "GET",
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": "attachment; filename=document.pdf",
+        },
+        body: "document",
+      },
+    );
+
+    cy.intercept("POST", "/donor/1/documents*").as("download");
+
+    cy.visit("/donor/1/documents");
+
+    cy.get('input[name="document"]').first().check({ force: true });
+    cy.contains("button", "Download").click();
+
+    cy.wait("@download").then(({ request, response }) => {
+      const requestContent = [request.url, request.body || ""].join("&");
+      expect(decodeURIComponent(requestContent)).to.contain(
+        "document=5b4f0ad3-1e4a-4a55-b4a7-3f8e3d2bc3b9",
+      );
+      expect(response.statusCode).to.eq(200);
+      expect(response.headers["content-type"]).to.contain("application/pdf");
+    });
+  });
+
+  it("downloads multiple selected documents", () => {
+    cy.addMock(
+      "/lpa-api/v1/documents/download-multiple?id%5B%5D=5b4f0ad3-1e4a-4a55-b4a7-3f8e3d2bc3b9&id%5B%5D=c8e3a1df-7b9b-4d45-94d9-2b8fc0d9e0fd",
+      "GET",
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": "attachment; filename=document.pdf",
+        },
+        body: "document",
+      },
+    );
+
+    cy.intercept("POST", "/donor/1/documents*").as("download");
+
+    cy.visit("/donor/1/documents");
+
+    cy.get('input[name="document"]').eq(0).check({ force: true });
+    cy.get('input[name="document"]').eq(1).check({ force: true });
+    cy.contains("button", "Download").click();
+
+    cy.wait("@download").then(({ request, response }) => {
+      const requestContent = [request.url, request.body || ""].join("&");
+      expect(decodeURIComponent(requestContent)).to.contain(
+        "document=5b4f0ad3-1e4a-4a55-b4a7-3f8e3d2bc3b9",
+      );
+      expect(decodeURIComponent(requestContent)).to.contain(
+        "document=c8e3a1df-7b9b-4d45-94d9-2b8fc0d9e0fd",
+      );
+      expect(response.statusCode).to.eq(200);
+    });
+  });
+
+  it("shows a validation error when nothing is selected", () => {
+    cy.intercept("POST", "/donor/1/documents*").as("submit");
+
+    cy.visit("/donor/1/documents");
+
+    cy.contains("button", "Download").click();
+
+    cy.wait("@submit");
+
+    cy.contains("No document selected");
+    cy.contains("Select one or more documents and try again.");
+  });
+
+  it("dismisses the validation error", () => {
+    cy.intercept("POST", "/donor/1/documents*").as("submit");
+
+    cy.visit("/donor/1/documents");
+
+    cy.contains("button", "Download").click();
+    cy.wait("@submit");
+    cy.contains("No document selected");
+
+    cy.contains("button", "Dismiss").click();
+    cy.wait("@submit");
+
+    cy.contains("No document selected").should("not.exist");
   });
 });

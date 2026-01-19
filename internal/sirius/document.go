@@ -1,7 +1,10 @@
 package sirius
 
 import (
+	"errors"
 	"fmt"
+	"net/http"
+	"net/url"
 	"sort"
 	"strings"
 
@@ -107,4 +110,31 @@ func (c *Client) GetPersonDocuments(ctx Context, personID int, caseIDs []string)
 	err := c.get(ctx, url, &d)
 
 	return d, err
+}
+
+func (c *Client) DownloadMultiple(ctx Context, docIDs []string) (*http.Response, error) {
+	params := url.Values{}
+	for _, id := range docIDs {
+		params.Add("id[]", id)
+	}
+
+	req, err := c.newRequestWithQuery(ctx, http.MethodGet, "/lpa-api/v1/documents/download-multiple", params, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		statusErr := newStatusError(resp)
+		if errClose := resp.Body.Close(); errClose != nil {
+			return nil, errors.Join(statusErr, errClose)
+		}
+		return nil, statusErr
+	}
+
+	return resp, nil
 }
