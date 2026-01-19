@@ -77,9 +77,13 @@
                         </td>
                         <td class="govuk-table__cell">[{{ .Direction.Translation }}{{ if .NotifyStatus}} - {{ camelcaseToSentence .NotifyStatus }}{{end}}]
                             <br>
-                            <a class="govuk-link" href="/lpa/document/{{ .UUID }}">{{ .FriendlyDescription }}</a>
+                            {{ if eq .MimeType "application/pdf"}}
+                            <a class="govuk-link" href="{{ prefix (printf "/view-document/%s" .UUID) }}">{{ .FriendlyDescription }}</a>
+                            {{ else }}
+                            <a class="govuk-link" href="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .UUID) }}" download="">{{ .FriendlyDescription }}</a>
+                            {{ end }}
                         </td>
-                        {{ if $multiCaseSelected }}
+                            {{ if $multiCaseSelected }}
                             <td class="govuk-table__cell">
                                 {{ if gt (len .CaseItems) 0 -}}
                                     {{ $case := index .CaseItems 0 -}}
