@@ -373,6 +373,100 @@ describe("View documents", () => {
     cy.contains("Document Type");
   });
 
+  it("sorts by friendly description regardless of direction label", () => {
+    cy.addMock(
+      "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0,case:78&limit=999",
+      "GET",
+      {
+        status: 200,
+        body: {
+          limit: 999,
+          metadata: {
+            doctype: {
+              correspondence: 2,
+              order: 0,
+              report: 0,
+              visit: 0,
+              finance: 0,
+              other: 0,
+            },
+            direction: {
+              Incoming: 1,
+              Outgoing: 1,
+              Internal: 0,
+            },
+          },
+          pages: {
+            current: 1,
+            total: 1,
+          },
+          total: 2,
+          documents: [
+            {
+              id: 201,
+              uuid: "3bb33aa0-1234-4891-8739-1aa0fbcdee01",
+              type: "Save",
+              friendlyDescription: "A Document",
+              createdDate: "02/09/2024 09:00:00",
+              direction: "Outgoing",
+              notifyStatus: "posted",
+              filename: "a.pdf",
+              mimeType: "application/pdf",
+              caseItems: [
+                {
+                  uId: "7000-5678-5678",
+                  caseSubtype: "hw",
+                  caseType: "LPA",
+                },
+              ],
+              persons: [],
+              systemType: "A",
+            },
+            {
+              id: 202,
+              uuid: "7cc44bb0-5678-4891-8739-5bb1facdef02",
+              type: "Correspondence",
+              friendlyDescription: "Z Document",
+              createdDate: "03/09/2024 10:00:00",
+              direction: "Incoming",
+              filename: "z.pdf",
+              mimeType: "application/pdf",
+              caseItems: [
+                {
+                  uId: "7000-5678-5678",
+                  caseSubtype: "hw",
+                  caseType: "LPA",
+                },
+              ],
+              persons: [],
+              subtype: "hw",
+            },
+          ],
+        },
+      },
+    );
+
+    cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
+
+    cy.contains("Documents (2)");
+
+    cy.contains("th", "Name").find("button").click();
+    cy.contains("th", "Name").should("have.attr", "aria-sort", "ascending");
+
+    cy.get("tbody tr td:nth-child(2) a").then(($links) => {
+      const names = [...$links].map((link) => link.textContent.trim());
+      expect(names).to.deep.equal(["A Document", "Z Document"]);
+    });
+
+    cy.contains("th", "Name").find("button").click();
+    cy.contains("th", "Name").should("have.attr", "aria-sort", "descending");
+
+    cy.get("tbody tr td:nth-child(2) a").then(($links) => {
+      const names = [...$links].map((link) => link.textContent.trim());
+      expect(names).to.deep.equal(["Z Document", "A Document"]);
+    });
+  });
+
   it("does not show selection checkbox for non-PDF documents", () => {
     cy.visit("/donor/1/documents");
 
