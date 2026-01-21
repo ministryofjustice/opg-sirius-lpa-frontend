@@ -93,6 +93,11 @@
                                         </div>
 
                                         <div class="govuk-body">
+                                            {{ if eq .SourceType "PhoneNumber" }}
+                                                {{ if ne .Type "DEL" }}
+                                                    {{ .SourcePhone.Type }} number was changed to {{ .SourcePhone.PhoneNumber }}
+                                                {{ end }}
+                                            {{ else }}
                                                 <dl class="govuk-summary-list">
                                                     <ul class="govuk-list govuk-list--bullet">
                                                     {{ range $k, $v := .Entity }}
@@ -109,6 +114,7 @@
                                                     {{ end }}
                                                     </ul>
                                                 </dl>
+                                            {{ end }}
                                         </div>
                                     </div>
                                     <div class="govuk-summary-list__row">
@@ -124,7 +130,7 @@
                             </div>
                         </div>
                     </div>
-                    {{ . }}
+{{/*                    {{ . }}*/}}
                 {{ end }}
             </div>
         </div>

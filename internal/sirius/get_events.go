@@ -35,21 +35,27 @@ type Event struct {
 }
 
 type LpaEvent struct {
-	Changes       any        `json:"changeSet,omitempty"`
-	CreatedOn     string     `json:"createdOn"`
-	Entity        any        `json:"entity,omitempty"`
-	Assignee      EventUser  `json:"assignee,omitempty"`
-	User          EventUser  `json:"user,omitempty"`
-	Hash          string     `json:"hash"`
-	OwningCase    OwningCase `json:"owningCase,omitempty"`
-	ID            int        `json:"id,omitempty"`
-	UID           string     `json:"uid,omitempty"`
-	SourceType    string     `json:"sourceType,omitempty"`
-	Type          string     `json:"type,omitempty"`
-	SourceTask    any        `json:"sourceTask,omitempty"`
-	SourceAddress any        `json:"sourceAddress,omitempty"`
-	SourceCase    any        `json:"sourceCase,omitempty"`
-	SourcePerson  any        `json:"sourcePerson,omitempty"`
+	Changes       any         `json:"changeSet,omitempty"`
+	CreatedOn     string      `json:"createdOn"`
+	Entity        any         `json:"entity,omitempty"`
+	Assignee      EventUser   `json:"assignee,omitempty"`
+	User          EventUser   `json:"user,omitempty"`
+	Hash          string      `json:"hash"`
+	OwningCase    OwningCase  `json:"owningCase,omitempty"`
+	ID            int         `json:"id,omitempty"`
+	UID           string      `json:"uid,omitempty"`
+	SourceType    string      `json:"sourceType,omitempty"`
+	Type          string      `json:"type,omitempty"`
+	SourceTask    any         `json:"sourceTask,omitempty"`
+	SourceAddress any         `json:"sourceAddress,omitempty"`
+	SourceCase    any         `json:"sourceCase,omitempty"`
+	SourcePerson  any         `json:"sourcePerson,omitempty"`
+	SourcePhone   SourcePhone `json:"sourcePhoneNumber,omitempty"`
+}
+
+type SourcePhone struct {
+	PhoneNumber string `json:"phoneNumber,omitempty"`
+	Type        string `json:"type,omitempty"`
 }
 
 type OwningCase struct {
