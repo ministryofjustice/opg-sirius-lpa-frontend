@@ -33,10 +33,15 @@ type OwningCase struct {
 }
 
 type LpaEventUser struct {
+	DisplayName string    `json:"displayName,omitempty"`
+	Email       string    `json:"email,omitempty"`
+	Deleted     bool      `json:"deleted,omitempty"`
+	PhoneNumber string    `json:"phoneNumber,omitempty"`
+	Teams       []LpaTeam `json:"teams,omitempty"`
+}
+
+type LpaTeam struct {
 	DisplayName string `json:"displayName,omitempty"`
-	Email       string `json:"email,omitempty"`
-	Deleted     bool   `json:"deleted,omitempty"`
-	PhoneNumber string `json:"phoneNumber,omitempty"`
 }
 
 // will refactor for getting events across multiple cases

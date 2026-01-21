@@ -54,10 +54,23 @@
                                     </div>
                                     <div class="govuk-summary-list__row">
                                         <p class="govuk-hint govuk-!-margin-bottom-1 govuk-!-margin-top-1">
+                                            {{ if eq .Type "INS"}}
+                                                Created by
+                                            {{ else if eq .Type "UPD" }}
+                                                Updated by
+                                            {{ else if eq .Type "DEL" }}
+                                                Deleted by
+                                            {{ end }}
                                             {{ if .User }}
-                                                Created by <a class="govuk-link" href="mailto:{{ .User.Email}}">{{ .User.DisplayName }}</a> {{ if .User.PhoneNumber }} -- {{ .User.PhoneNumber }}{{ end }}
+                                                {{ if .User.Deleted }}
+                                                    deleted user
+                                                {{ else }}
+                                                    <a class="govuk-link" href="mailto:{{ .User.Email}}">{{ .User.DisplayName }}</a>
+                                                    {{ if gt (len .User.Teams) 0 }}({{ (index .User.Teams 0).DisplayName }}){{ end }}
+                                                    {{ if .User.PhoneNumber }} &ndash; {{ .User.PhoneNumber }}{{ end }}
+                                                {{ end }}
                                             {{ else }}
-                                                Created by Unknown User
+                                                &ndash;
                                             {{ end }}
                                         </p>
                                     </div>
