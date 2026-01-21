@@ -73,6 +73,7 @@ type Client interface {
 	GetApplicationProgressClient
 	GetDocumentsClient
 	GetHistoryClient
+	GetLpaHistoryClient
 	GetLpaDetailsClient
 	GetPaymentsClient
 	InvestigationHoldClient
@@ -160,6 +161,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/lpa/{uid}/manage-attorney-decisions", wrap(AttorneyDecisions(client, templates.Get("mlpa-attorney-decisions.gohtml"), templates.Get("mlpa-confirm-attorney-decisions.gohtml"))))
 	mux.Handle("/lpa/{uid}/certificate-provider/change-details", wrap(ChangeCertificateProviderDetails(client, templates.Get("change-certificate-provider-details.gohtml"))))
 	mux.Handle("/lpa/{uid}/update-decisions", wrap(UpdateDecisions(client, templates.Get("mlpa-update-decisions.gohtml"))))
+	mux.Handle("/donor/{donorId}/{caseId}/history", wrap(GetLpaHistory(client, templates.Get("lpa-history.gohtml"))))
 	mux.Handle("/search-users", wrap(SearchUsers(client)))
 	mux.Handle("/search-persons", wrap(SearchDonors(client)))
 	mux.Handle("/search-postcode", wrap(SearchPostcode(client)))
