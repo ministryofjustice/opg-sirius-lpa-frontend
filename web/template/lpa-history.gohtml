@@ -1,0 +1,132 @@
+{{ template "page" . }}
+
+{{ define "title" }}History{{ end }}
+
+{{ define "main" }}
+
+{{/*    {{ .EventData }}*/}}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-third">
+        <div class="moj-filter" data-module="moj-filter">
+            <div class="moj-filter__header">
+                <div class="moj-filter__header-title">
+                    <h2 class="govuk-heading-m">Filter</h2>
+                </div>
+                <div class="moj-filter__header-action">
+                </div>
+            </div>
+            <div class="moj-filter__content">
+                <div class="moj-filter__options">
+                    <form class="form" method="POST">
+                        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+                        <button type="submit" class="govuk-button" data-module="govuk-button" data-test-id="submit-button">
+                            Apply filters
+                        </button>
+                        <div class="govuk-form-group">
+                            <fieldset class="govuk-fieldset">
+                                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                    Sort By
+                                </legend>
+                                <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                                    <div class="govuk-radios__item">
+                                        <input class="govuk-radios__input" id="f-desc"
+                                               name="sort" type="radio" value="desc" {{if eq .Form.Sort "desc"}}checked{{end}}>
+                                        <label class="govuk-label govuk-radios__label" for="f-desc">Descending</label>
+                                    </div>
+                                    <div class="govuk-radios__item">
+                                        <input class="govuk-radios__input" id="f-asc"
+                                               name="sort" type="radio" value="asc" {{if eq .Form.Sort "asc"}}checked{{end}}>
+                                        <label class="govuk-label govuk-radios__label" for="f-asc">Ascending</label>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="govuk-form-group">
+                            <fieldset class="govuk-fieldset">
+                                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                    Type
+                                </legend>
+                                <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                    {{ range .EventFilterData }}
+                                        <div class="govuk-checkboxes__item">
+                                            <input class="govuk-checkboxes__input" id="f-{{ .Type }}"
+                                                   name="type" type="checkbox" value="{{.Type}}" {{ if contains $.Form.Types .Type }}checked{{ end }}>
+                                            <label class="govuk-label govuk-checkboxes__label" for="f-{{ .Type }}">
+                                                {{.Type}} ({{.Count}})
+                                            </label>
+                                        </div>
+                                    {{ end }}
+                                </div>
+                            </fieldset>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="govuk-grid-column-two-thirds">
+        <div class="moj-timeline">
+                {{ range .EventData }}
+                    <div class="moj-timeline__item">
+                        <div hidden>Sirius {{.UID}}</div>
+                        <div class="govuk-summary-card govuk-!-margin-bottom-0">
+                            <div class="govuk-summary-card__title-wrapper govuk-!-padding-bottom-1 govuk-!-padding-top-1">
+                                <h1 class="govuk-summary-card__title">
+                                    {{ .SourceType }}
+                                </h1>
+                            </div>
+                            <div class="govuk-summary-card__content govuk-!-padding-top-1 govuk-!-padding-bottom-0">
+                                <dl class="govuk-summary-list">
+                                    <div class="govuk-summary-list__row">
+                                        <div class="govuk-body govuk-grid-row">
+                                            {{ if .OwningCase }}
+                                                <div class="govuk-!-text-align-left govuk-grid-column-one-half">
+                                                    {{ ToUpper .OwningCase.CaseSubtype }} {{ .OwningCase.UID }}
+                                                </div>
+                                            {{ end }}
+                                            <div class="govuk-!-text-align-right {{ if ne .OwningCase.UID "" }}govuk-grid-column-one-half{{else}}govuk-grid-column-full{{ end }}">
+                                                    <time datetime="{{ .CreatedOn }}">{{ parseAndFormatDate .CreatedOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
+                                                    - #{{ .Hash }}
+                                            </div>
+                                        </div>
+
+                                        <div class="govuk-body">
+                                                <dl class="govuk-summary-list">
+                                                    <ul class="govuk-list govuk-list--bullet">
+                                                    {{ range $k, $v := .Entity }}
+                                                        <li>
+                                                            {{ camelcaseToSentence $k }}:
+                                                            {{ if eq $k "assignee" }}
+                                                                {{ $v.DisplayName }} {{ $v.DisplayName }}
+                                                            {{ else if eq $k "uId" }}
+                                                                {{ printf "%.f" $v }}
+                                                            {{ else }}
+                                                                {{ $v }}
+                                                            {{ end }}
+                                                        </li>
+                                                    {{ end }}
+                                                    </ul>
+                                                </dl>
+                                        </div>
+                                    </div>
+                                    <div class="govuk-summary-list__row">
+                                        <p class="govuk-hint govuk-!-margin-bottom-1 govuk-!-margin-top-1">
+                                            {{ if .User }}
+                                                Created by <a class="govuk-link" href="mailto:{{ .User.Email}}">{{ .User.DisplayName }}</a> {{ if .User.PhoneNumber }} -- {{ .User.PhoneNumber }}{{ end }}
+                                            {{ else }}
+                                                Created by Unknown User
+                                            {{ end }}
+                                        </p>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    {{ . }}
+                {{ end }}
+            </div>
+        </div>
+    </div>
+{{ end }}
