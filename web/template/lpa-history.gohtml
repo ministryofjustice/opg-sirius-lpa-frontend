@@ -22,14 +22,22 @@
                                 <dl class="govuk-summary-list">
                                     <div class="govuk-summary-list__row">
                                         <div class="govuk-body govuk-grid-row">
-                                            {{ if .OwningCase }}
+                                            {{ if and .OwningCase .OwningCase.CaseSubtype}}
                                                 <div class="govuk-!-text-align-left govuk-grid-column-one-half">
-                                                    {{ ToUpper .OwningCase.CaseSubtype }} {{ .OwningCase.UID }}
+                                                    <strong class="govuk-tag app-govuk-tag-bold
+                                                        {{ if eq .OwningCase.CaseType "EPA" }}
+                                                            {{ caseLabel .OwningCase.CaseType }}">{{ ToUpper .OwningCase.CaseType }} {{ .OwningCase.UID }}
+                                                        {{ else }}
+                                                            {{ caseLabel .OwningCase.CaseSubtype }}">{{ ToUpper .OwningCase.CaseSubtype }} {{ .OwningCase.UID }}
+                                                        {{ end }}
+                                                    </strong>
                                                 </div>
                                             {{ end }}
                                             <div class="govuk-!-text-align-right {{ if ne .OwningCase.UID "" }}govuk-grid-column-one-half{{else}}govuk-grid-column-full{{ end }}">
-                                                <time datetime="{{ .CreatedOn }}">{{ parseAndFormatDate .CreatedOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
-                                                - #{{ .Hash }}
+                                                <div class="app-govuk-tag-bold color-govuk-black">
+                                                    <time datetime="{{ .CreatedOn }}">{{ parseAndFormatDate .CreatedOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
+                                                    - #{{ .Hash }}
+                                                </div>
                                             </div>
                                         </div>
 

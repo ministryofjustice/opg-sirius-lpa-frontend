@@ -34,6 +34,7 @@ type OwningCase struct {
 	ID          int    `json:"id,omitempty"`
 	UID         string `json:"uId,omitempty"`
 	CaseSubtype string `json:"caseSubtype,omitempty"`
+	CaseType    string `json:"caseType,omitempty"`
 }
 
 type LpaEventUser struct {

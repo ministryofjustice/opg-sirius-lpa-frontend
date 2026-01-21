@@ -260,6 +260,10 @@ $govuk-assets-path: "../assets/";
   font-size: 0.9rem;
 }
 
+.app-govuk-tag-bold {
+  font-weight: bold;
+}
+
 .colour-govuk-turquoise {
   background: #28a197;
 }
@@ -269,6 +273,11 @@ $govuk-assets-path: "../assets/";
 .colour-govuk-brown {
   background: #b58840;
 }
+.color-govuk-black {
+  background: #000000;
+  color: #D9E2EE;
+}
+
 
 .app-progress-indicator-icon[data-progress-indicator="not-started"] {
   [data-svg-elt="background"] {
