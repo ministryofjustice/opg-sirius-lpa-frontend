@@ -504,3 +504,131 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
+
+func TestSuccessMessageFormatter(t *testing.T) {
+	tests := []struct {
+		name            string
+		docFriendlyName string
+		docCreatedTime  string
+		layout          string
+		format          string
+		expectedResult  string
+	}{
+		{
+			name:            "valid date format",
+			docFriendlyName: "Letter",
+			docCreatedTime:  "02/07/2025 14:17:13",
+			layout:          "02/01/2006 15:04:05",
+			format:          "02/01/2006",
+			expectedResult:  "02/07/2025 Letter",
+		},
+		{
+			name:            "different valid date",
+			docFriendlyName: "LP1H - Health Instrument",
+			docCreatedTime:  "01/06/2022 15:39:01",
+			layout:          "02/01/2006 15:04:05",
+			format:          "02/01/2006",
+			expectedResult:  "01/06/2022 LP1H - Health Instrument",
+		},
+		{
+			name:            "invalid date format",
+			docFriendlyName: "Document",
+			docCreatedTime:  "invalid-date",
+			layout:          "02/01/2006 15:04:05",
+			format:          "02/01/2006",
+			expectedResult:  "invalid date",
+		},
+		{
+			name:            "empty friendly name",
+			docFriendlyName: "",
+			docCreatedTime:  "08/01/2025 10:36:41",
+			layout:          "02/01/2006 15:04:05",
+			format:          "02/01/2006",
+			expectedResult:  "08/01/2025 ",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := successMessageFormatter(tc.docFriendlyName, tc.docCreatedTime, tc.layout, tc.format)
+			assert.Equal(t, tc.expectedResult, result)
+		})
+	}
+}
+
+func TestDocumentListSuccessMessage(t *testing.T) {
+	cases := []sirius.Case{{ID: 1, UID: "7000-1234-0000"}}
+
+	tests := []struct {
+		name            string
+		queryParams     string
+		formValue       string
+		expectedSuccess bool
+		expectedMessage string
+	}{
+		{
+			name:            "success query with no dismiss notification",
+			queryParams:     "?success=true&documentFriendlyName=Letter&documentCreatedTime=02/07/2025%2014:17:13",
+			formValue:       "",
+			expectedSuccess: true,
+			expectedMessage: "02/07/2025 Letter",
+		},
+		{
+			name:            "success query with dismiss notification",
+			queryParams:     "?success=true&documentFriendlyName=Letter&documentCreatedTime=02/07/2025%2014:17:13",
+			formValue:       "true",
+			expectedSuccess: false,
+			expectedMessage: "",
+		},
+		{
+			name:            "no success query",
+			queryParams:     "?documentFriendlyName=Letter",
+			formValue:       "",
+			expectedSuccess: false,
+			expectedMessage: "",
+		},
+		{
+			name:            "success with invalid date",
+			queryParams:     "?success=true&documentFriendlyName=Letter&documentCreatedTime=invalid",
+			formValue:       "",
+			expectedSuccess: true,
+			expectedMessage: "invalid date",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &mockDocumentListClient{}
+			client.
+				On("CasesByDonor", mock.Anything, 82).
+				Return(cases, nil)
+			client.
+				On("GetPersonDocuments", mock.Anything, 82, []string(nil)).
+				Return(singleDocumentList, nil)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, mock.MatchedBy(func(data documentListData) bool {
+					return data.Success == tc.expectedSuccess && data.SuccessMessage == tc.expectedMessage
+				})).
+				Return(nil)
+
+			server := newMockServer("/donor/{id}/documents", DocumentList(client, template.Func))
+
+			form := url.Values{}
+			if tc.formValue != "" {
+				form.Add("dismissNotification", tc.formValue)
+			}
+			req, _ := http.NewRequest(http.MethodGet, "/donor/82/documents"+tc.queryParams, nil)
+			if len(form) > 0 {
+				req.Form = form
+			}
+
+			resp, err := server.serve(req)
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.Code)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}

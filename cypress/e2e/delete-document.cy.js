@@ -1,4 +1,4 @@
-describe("View documents", () => {
+describe("Delete documents", () => {
   beforeEach(() => {
     cy.addMock(
       "/lpa-api/v1/documents/dfef6714-b4fe-44c2-b26e-90dfe3663e95",
@@ -26,6 +26,9 @@ describe("View documents", () => {
               uId: "7001-0000-5678",
               caseSubtype: "pfa",
               caseType: "EPA",
+              donor: {
+                id: 33,
+              },
             },
           ],
         },
@@ -40,8 +43,9 @@ describe("View documents", () => {
   });
 
   it("on a person", () => {
-    cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95");
+    cy.visit("/delete-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95");
     cy.contains("7001-0000-5678");
-    cy.get(".govuk-button--warning").contains("Delete");
+    cy.get(".govuk-button--warning").contains("Yes, delete");
+    cy.get(".govuk-button--secondary").contains("No, cancel");
   });
 });

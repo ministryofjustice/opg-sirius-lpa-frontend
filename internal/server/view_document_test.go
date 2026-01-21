@@ -18,7 +18,13 @@ func (m *mockViewDocumentClient) DocumentByUUID(ctx sirius.Context, uuid string)
 	return args.Get(0).(sirius.Document), args.Error(1)
 }
 
+func (m *mockViewDocumentClient) GetUserDetails(ctx sirius.Context) (sirius.User, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(sirius.User), args.Error(1)
+}
+
 func TestGetViewDocument(t *testing.T) {
+	user := sirius.User{ID: 66, DisplayName: "Me", Roles: []string{"System Admin"}}
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
 			document := sirius.Document{
@@ -32,10 +38,14 @@ func TestGetViewDocument(t *testing.T) {
 			client.
 				On("DocumentByUUID", mock.Anything, document.UUID).
 				Return(document, nil)
+			client.
+				On("GetUserDetails", mock.Anything).
+				Return(user, nil)
 
 			template := &mockTemplate{}
 			templateData := viewDocumentData{
-				Document: document,
+				Document:       document,
+				IsSysAdminUser: true,
 			}
 
 			template.
