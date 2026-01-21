@@ -1,6 +1,10 @@
 package sirius
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
+)
 
 type LpaEvents []LpaEvent
 
@@ -13,17 +17,17 @@ type LpaEventsResponse struct {
 }
 
 type LpaEvent struct {
-	Changes    any          `json:"changeSet,omitempty"`
-	CreatedOn  string       `json:"createdOn"`
-	Entity     any          `json:"entity,omitempty"`
-	Assignee   LpaEventUser `json:"assignee,omitempty"`
-	User       LpaEventUser `json:"user,omitempty"`
-	Hash       string       `json:"hash"`
-	OwningCase OwningCase   `json:"owningCase,omitempty"`
-	ID         int          `json:"id,omitempty"`
-	UID        string       `json:"uid,omitempty"`
-	SourceType string       `json:"sourceType,omitempty"`
-	Type       string       `json:"type,omitempty"`
+	Changes    any                       `json:"changeSet,omitempty"`
+	CreatedOn  string                    `json:"createdOn"`
+	Entity     any                       `json:"entity,omitempty"`
+	Assignee   LpaEventUser              `json:"assignee,omitempty"`
+	User       LpaEventUser              `json:"user,omitempty"`
+	Hash       string                    `json:"hash"`
+	OwningCase OwningCase                `json:"owningCase,omitempty"`
+	ID         int                       `json:"id,omitempty"`
+	UID        string                    `json:"uid,omitempty"`
+	SourceType shared.LpaEventSourceType `json:"sourceType"`
+	Type       string                    `json:"type,omitempty"`
 }
 
 type OwningCase struct {
