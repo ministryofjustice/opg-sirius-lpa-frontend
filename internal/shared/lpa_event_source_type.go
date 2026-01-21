@@ -1,0 +1,38 @@
+package shared
+
+import (
+	"encoding/json"
+)
+
+type LpaEventSourceType int
+
+const (
+	LpaEventSourceTypeAddress LanguageFormat = iota
+	LpaEventSourceTypeAttorney
+	LpaEventSourceTypeCertificateProvider
+	LpaEventSourceTypeCheckAll
+	LpaEventSourceTypeClient
+	LpaEventSourceTypeComplaint
+	LpaEventSourceTypeCorrespondent
+	LpaEventSourceTypeCrec
+	LpaEventSourceTypeDeputy
+	LpaEventSourceTypeDonor
+	LpaEventSourceTypeEpa
+	LpaEventSourceTypeHoldPeriod
+	LpaEventSourceTypeIncomingDocument
+	LpaEventSourceTypeInvestigation
+	LpaEventSourceTypeLodgingChecklist
+	LpaEventSourceTypeLpa
+	LpaEventSourceTypeNote
+	LpaEventSourceTypeNotifiedPerson
+	LpaEventSourceTypeOrder
+	LpaEventSourceTypeOutgoingDocument
+	LpaEventSourceTypePayment
+	LpaEventSourceTypePhoneNumber
+	LpaEventSourceTypeReplacementAttorney
+	LpaEventSourceTypeTask
+	LpaEventSourceTypeTrustCorporation
+	LpaEventSourceTypeUncheckAll
+	LpaEventSourceTypeValidationCheck
+	LpaEventSourceTypeWarning
+)
