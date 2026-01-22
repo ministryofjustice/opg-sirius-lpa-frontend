@@ -50,8 +50,18 @@ type LpaTeam struct {
 }
 
 // will refactor for getting events across multiple cases
-func (c *Client) GetEvents(ctx Context, donorId int) (LpaEventsResponse, error) {
+func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string) (LpaEventsResponse, error) {
 	var resp LpaEventsResponse
-	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%d/events?sort=id:desc", donorId), &resp)
+
+	selectedCaseIds := ""
+	for i, caseId := range caseIds {
+		if i == 0 {
+			selectedCaseIds = selectedCaseIds + "filter=case:" + caseId
+		} else {
+			selectedCaseIds = selectedCaseIds + ",case:" + caseId
+		}
+	}
+
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%s/events?%s&sort=id:desc", donorId, selectedCaseIds), &resp)
 	return resp, err
 }
