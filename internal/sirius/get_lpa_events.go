@@ -62,6 +62,6 @@ func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string) (LpaEv
 		}
 	}
 
-	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%s/events?%s&sort=id:desc", donorId, selectedCaseIds), &resp)
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%s/events?%s&sort=id:desc&limit=999", donorId, selectedCaseIds), &resp)
 	return resp, err
 }
