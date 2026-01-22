@@ -349,3 +349,9 @@ $govuk-assets-path: "../assets/";
   white-space: nowrap;
   max-width: 500px;
 }
+
+.app-summary-card--padding {
+  padding-bottom: 5px;
+  padding-top: 5px;
+  justify-content: unset;
+}
