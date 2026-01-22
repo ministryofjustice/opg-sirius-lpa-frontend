@@ -334,3 +334,18 @@ $govuk-assets-path: "../assets/";
   width: 100%;
   min-height: 90vh;
 }
+
+.lpa-history__meta {
+  display: flex;
+}
+
+.lpa-history__meta-timestamp {
+  margin-left: auto;
+}
+
+.lpa-history__meta-tag {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  max-width: 500px;
+}

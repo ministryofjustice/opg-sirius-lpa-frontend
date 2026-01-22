@@ -18,12 +18,12 @@
                                     {{ .SourceType.Translation }}
                                 </h1>
                             </div>
-                            <div class="govuk-summary-card__content govuk-!-padding-top-1 govuk-!-padding-bottom-0">
+                            <div class="govuk-summary-card__content govuk-!-padding-top-2 govuk-!-padding-bottom-0 govuk-!-padding-left-2 govuk-!-padding-right-2">
                                 <dl class="govuk-summary-list">
                                     <div class="govuk-summary-list__row">
-                                        <div class="govuk-body govuk-grid-row">
+                                        <div class="govuk-body lpa-history__meta govuk-!-margin-bottom-2">
                                             {{ if and .OwningCase .OwningCase.CaseSubtype}}
-                                                <div class="govuk-!-text-align-left govuk-grid-column-one-half">
+                                                <div class="govuk-!-text-align-left">
                                                     <strong class="govuk-tag app-govuk-tag-bold
                                                         {{ if eq .OwningCase.CaseType "EPA" }}
                                                             {{ caseLabel .OwningCase.CaseType }}">{{ ToUpper .OwningCase.CaseType }} {{ .OwningCase.UID }}
@@ -33,8 +33,8 @@
                                                     </strong>
                                                 </div>
                                             {{ end }}
-                                            <div class="govuk-!-text-align-right {{ if ne .OwningCase.UID "" }}govuk-grid-column-one-half{{else}}govuk-grid-column-full{{ end }}">
-                                                <div class="app-govuk-tag-bold color-govuk-black">
+                                            <div class="govuk-!-text-align-right lpa-history__meta-timestamp">
+                                                <div class="govuk-tag app-govuk-tag-bold color-govuk-black lpa-history__meta-tag">
                                                     <time datetime="{{ .CreatedOn }}">{{ parseAndFormatDate .CreatedOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
                                                     - #{{ .Hash }}
                                                 </div>
@@ -86,7 +86,7 @@
                             </div>
                         </div>
                     </div>
-                    {{ . }}
+                    {# {{ . }} #}
                 {{ end }}
             </div>
         </div>
