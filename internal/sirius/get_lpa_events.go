@@ -6,14 +6,12 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 )
 
-type LpaEvents []LpaEvent
-
 type LpaEventsResponse struct {
-	Events   LpaEvents `json:"events"`
-	Limit    int       `json:"limit"`
-	Total    int       `json:"total"`
-	Pages    any       `json:"pages"`
-	Metadata any       `json:"metadata"`
+	Events   []LpaEvent `json:"events"`
+	Limit    int        `json:"limit"`
+	Total    int        `json:"total"`
+	Pages    any        `json:"pages"`
+	Metadata any        `json:"metadata"`
 }
 
 type LpaEvent struct {
