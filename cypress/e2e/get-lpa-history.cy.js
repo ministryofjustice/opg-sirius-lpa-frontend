@@ -350,6 +350,8 @@ describe("View LPA history timeline", () => {
         expect($items.eq(0)).to.contain.text("Task");
         expect($items.eq(1)).to.contain.text("LPA (Create / Edit)");
         expect($items.eq(2)).to.contain.text("Warning");
+
+        cy.wrap($items.eq(0)).find(".moj-alert--warning").should("not.exist");
         cy.wrap($items.eq(2)).find(".moj-alert--warning").should("exist");
       });
   });
@@ -359,14 +361,12 @@ describe("View LPA history timeline", () => {
       .should("have.length", 3)
       .then(($items) => {
         const normalise = (el) =>
-          Cypress.$(el).text().replace(/\s+/g, " ").trim();
+          Cypress.$(el).text().replaceAll(/\s+/g, " ").trim();
 
         expect(normalise($items[0])).to.include(
           "Created by Marty Test (Casework Team) – 0300 300 0300",
         );
-
         expect(normalise($items[1])).to.include("Updated by deleted user");
-
         expect(normalise($items[2])).to.include(
           "Deleted by Team Less – 03001234567",
         );

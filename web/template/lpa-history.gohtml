@@ -23,26 +23,22 @@
                                     {{ .SourceType.Translation }}
                                 </h1>
                             </div>
-                            <div class="govuk-summary-card__content govuk-!-padding-top-2 govuk-!-padding-bottom-0 govuk-!-padding-left-2 govuk-!-padding-right-2">
+                            <div class="govuk-summary-card__content app-summary-card-content--padding ">
                                 <dl class="govuk-summary-list">
                                     <div class="govuk-summary-list__row">
                                         <div class="govuk-body lpa-history__meta govuk-!-margin-bottom-2">
                                             {{ if and .OwningCase .OwningCase.CaseSubtype}}
-                                                <div class="govuk-!-text-align-left">
-                                                    <strong class="govuk-tag app-govuk-tag-bold
-                                                        {{ if eq .OwningCase.CaseType "EPA" }}
-                                                            {{ caseLabel .OwningCase.CaseType }}">{{ ToUpper .OwningCase.CaseType }} {{ .OwningCase.UID }}
-                                                        {{ else }}
-                                                            {{ caseLabel .OwningCase.CaseSubtype }}">{{ ToUpper .OwningCase.CaseSubtype }} {{ .OwningCase.UID }}
-                                                        {{ end }}
-                                                    </strong>
-                                                </div>
+                                                <strong class="govuk-tag app-govuk-tag-bold
+                                                    {{ if eq .OwningCase.CaseType "EPA" }}
+                                                        {{ caseLabel .OwningCase.CaseType }}">{{ ToUpper .OwningCase.CaseType }} {{ .OwningCase.UID }}
+                                                    {{ else }}
+                                                        {{ caseLabel .OwningCase.CaseSubtype }}">{{ ToUpper .OwningCase.CaseSubtype }} {{ .OwningCase.UID }}
+                                                    {{ end }}
+                                                </strong>
                                             {{ end }}
-                                            <div class="govuk-!-text-align-right lpa-history__meta-timestamp">
-                                                <div class="govuk-tag app-govuk-tag-bold color-govuk-black lpa-history__meta-tag">
-                                                    <time datetime="{{ .CreatedOn }}">{{ parseAndFormatDate .CreatedOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
-                                                    - #{{ .Hash }}
-                                                </div>
+                                            <div class="govuk-tag app-govuk-tag-bold color-govuk-black lpa-history__meta-timestamp">
+                                                <time datetime="{{ .CreatedOn }}">{{ parseAndFormatDate .CreatedOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
+                                                - #{{ .Hash }}
                                             </div>
                                         </div>
 
@@ -50,16 +46,18 @@
                                                 <dl class="govuk-summary-list">
                                                     <ul class="govuk-list govuk-list--bullet">
                                                         {{ range $k, $v := .Entity }}
-                                                            <li>
-                                                                {{ camelcaseToSentence $k }}:
-                                                                {{ if eq $k "assignee" }}
-                                                                    {{ $v.DisplayName }} {{ $v.DisplayName }}
-                                                                {{ else if eq $k "uId" }}
-                                                                    {{ printf "%.f" $v }}
-                                                                {{ else }}
-                                                                    {{ $v }}
-                                                                {{ end }}
-                                                            </li>
+                                                            {{ if and (ne $k "id") $v }}
+                                                                <li>
+                                                                    {{ camelcaseToSentence $k }}:
+                                                                    {{ if eq $k "assignee" }}
+                                                                        {{ $v.displayName }}
+                                                                    {{ else if eq $k "uId" }}
+                                                                        {{ printf "%.f" $v }}
+                                                                    {{ else }}
+                                                                        {{ $v }}
+                                                                    {{ end }}
+                                                                </li>
+                                                            {{ end }}
                                                         {{ end }}
                                                     </ul>
                                                 </dl>
