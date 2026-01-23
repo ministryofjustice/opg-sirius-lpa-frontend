@@ -77,3 +77,27 @@ func TestGetViewDocumentWhenCaseErrors(t *testing.T) {
 
 	assert.Equal(t, errExample, err)
 }
+
+func TestGetViewDocumentWhenGetUserDetailsErrors(t *testing.T) {
+	client := &mockViewDocumentClient{}
+	document := sirius.Document{
+		ID:         1,
+		UUID:       "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+		SystemType: "LP-LETTER",
+		Type:       sirius.TypeSave,
+	}
+
+	client.
+		On("DocumentByUUID", mock.Anything, document.UUID).
+		Return(document, nil)
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{}, errExample)
+
+	server := newMockServer("/view-document/{uuid}", ViewDocument(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, errExample, err)
+}

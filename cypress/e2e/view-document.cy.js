@@ -31,17 +31,29 @@ describe("View documents", () => {
         },
       },
     );
+  });
+
+  it("on a person", () => {
     cy.addMock("/lpa-api/v1/users/current", "GET", {
       status: 200,
       body: {
         roles: ["OPG User", "System Admin"],
       },
     });
-  });
-
-  it("on a person", () => {
     cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95");
     cy.contains("7001-0000-5678");
     cy.get(".govuk-button--warning").contains("Delete");
+  });
+
+  it("on a person with no System admin roll", () => {
+    cy.addMock("/lpa-api/v1/users/current", "GET", {
+      status: 200,
+      body: {
+        roles: ["OPG User"],
+      },
+    });
+    cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95");
+    cy.contains("7001-0000-5678");
+    cy.get(".govuk-button--warning").should("not.exist");
   });
 });
