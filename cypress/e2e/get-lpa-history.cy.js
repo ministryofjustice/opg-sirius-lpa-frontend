@@ -1,5 +1,9 @@
 describe("View LPA history timeline", () => {
   beforeEach(() => {
+    const taskClass = String.raw`Opg\Core\Model\Entity\Task\Task`;
+    const warningClass = String.raw`Opg\Core\Model\Entity\Warning\Warning`;
+    const lpaClass = String.raw`Opg\Core\Model\Entity\CaseItem\PowerOfAttorney\Lpa`;
+
     cy.addMock("/lpa-api/v1/persons/1/events?&sort=id:desc&limit=999", "GET", {
       status: 200,
       body: {
@@ -64,7 +68,7 @@ describe("View LPA history timeline", () => {
             type: "INS",
             changeSet: [],
             entity: {
-              _class: "Opg\\Core\\Model\\Entity\\Task\\Task",
+              _class: taskClass,
               assignee: {
                 displayName: "Registration Team",
               },
@@ -110,8 +114,7 @@ describe("View LPA history timeline", () => {
               },
             },
             entity: {
-              _class:
-                "Opg\\Core\\Model\\Entity\\CaseItem\\PowerOfAttorney\\Lpa",
+              _class: lpaClass,
             },
             createdOn: "2026-01-15T04:10:55+00:00",
             hash: "JI7",
@@ -139,7 +142,7 @@ describe("View LPA history timeline", () => {
             type: "DEL",
             changeSet: [],
             entity: {
-              _class: "Opg\\Core\\Model\\Entity\\Warning\\Warning",
+              _class: warningClass,
               closedBy: [],
               warningText: "Test",
               warningType: "Complaint Received",
@@ -226,7 +229,7 @@ describe("View LPA history timeline", () => {
               type: "INS",
               changeSet: [],
               entity: {
-                _class: "Opg\\Core\\Model\\Entity\\Task\\Task",
+                _class: taskClass,
                 assignee: {
                   displayName: "Registration Team",
                 },
@@ -272,8 +275,7 @@ describe("View LPA history timeline", () => {
                 },
               },
               entity: {
-                _class:
-                  "Opg\\Core\\Model\\Entity\\CaseItem\\PowerOfAttorney\\Lpa",
+                _class: lpaClass,
               },
               createdOn: "2026-01-15T04:10:55+00:00",
               hash: "JI7",
@@ -301,7 +303,7 @@ describe("View LPA history timeline", () => {
               type: "DEL",
               changeSet: [],
               entity: {
-                _class: "Opg\\Core\\Model\\Entity\\Warning\\Warning",
+                _class: warningClass,
                 closedBy: [],
                 warningText: "Test",
                 warningType: "Complaint Received",
@@ -326,7 +328,7 @@ describe("View LPA history timeline", () => {
               type: "INS",
               changeSet: [],
               entity: {
-                _class: "Opg\\Core\\Model\\Entity\\Warning\\Warning",
+                _class: warningClass,
                 closedBy: [],
                 warningType: "Payment Required",
               },
