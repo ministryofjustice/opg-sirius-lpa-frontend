@@ -18,7 +18,13 @@ func (m *mockViewDocumentClient) DocumentByUUID(ctx sirius.Context, uuid string)
 	return args.Get(0).(sirius.Document), args.Error(1)
 }
 
+func (m *mockViewDocumentClient) GetUserDetails(ctx sirius.Context) (sirius.User, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(sirius.User), args.Error(1)
+}
+
 func TestGetViewDocument(t *testing.T) {
+	user := sirius.User{ID: 66, DisplayName: "Me", Roles: []string{"System Admin"}}
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
 			document := sirius.Document{
@@ -32,10 +38,14 @@ func TestGetViewDocument(t *testing.T) {
 			client.
 				On("DocumentByUUID", mock.Anything, document.UUID).
 				Return(document, nil)
+			client.
+				On("GetUserDetails", mock.Anything).
+				Return(user, nil)
 
 			template := &mockTemplate{}
 			templateData := viewDocumentData{
-				Document: document,
+				Document:       document,
+				IsSysAdminUser: true,
 			}
 
 			template.
@@ -59,6 +69,30 @@ func TestGetViewDocumentWhenCaseErrors(t *testing.T) {
 	client.
 		On("DocumentByUUID", mock.Anything, "dfef6714-b4fe-44c2-b26e-90dfe3663e95").
 		Return(sirius.Document{}, errExample)
+
+	server := newMockServer("/view-document/{uuid}", ViewDocument(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, errExample, err)
+}
+
+func TestGetViewDocumentWhenGetUserDetailsErrors(t *testing.T) {
+	client := &mockViewDocumentClient{}
+	document := sirius.Document{
+		ID:         1,
+		UUID:       "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+		SystemType: "LP-LETTER",
+		Type:       sirius.TypeSave,
+	}
+
+	client.
+		On("DocumentByUUID", mock.Anything, document.UUID).
+		Return(document, nil)
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{}, errExample)
 
 	server := newMockServer("/view-document/{uuid}", ViewDocument(client, nil))
 

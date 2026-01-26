@@ -1,4 +1,4 @@
-describe("View documents", () => {
+describe("Delete documents", () => {
   beforeEach(() => {
     cy.addMock(
       "/lpa-api/v1/documents/dfef6714-b4fe-44c2-b26e-90dfe3663e95",
@@ -26,34 +26,26 @@ describe("View documents", () => {
               uId: "7001-0000-5678",
               caseSubtype: "pfa",
               caseType: "EPA",
+              donor: {
+                id: 33,
+              },
             },
           ],
         },
       },
     );
-  });
-
-  it("on a person", () => {
     cy.addMock("/lpa-api/v1/users/current", "GET", {
       status: 200,
       body: {
         roles: ["OPG User", "System Admin"],
       },
     });
-    cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95");
-    cy.contains("7001-0000-5678");
-    cy.get(".govuk-button--warning").contains("Delete");
   });
 
-  it("on a person with no System admin roll", () => {
-    cy.addMock("/lpa-api/v1/users/current", "GET", {
-      status: 200,
-      body: {
-        roles: ["OPG User"],
-      },
-    });
-    cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95");
+  it("on a person", () => {
+    cy.visit("/delete-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95");
     cy.contains("7001-0000-5678");
-    cy.get(".govuk-button--warning").should("not.exist");
+    cy.get(".govuk-button--warning").contains("Yes, delete");
+    cy.get(".govuk-button--secondary").contains("No, cancel");
   });
 });
