@@ -19,8 +19,6 @@
                 Hide filters
             </button>
 
-            <h3 class="govuk-heading-s govuk-!-margin-bottom-6">You searched for:  {{ .SearchTerm }}</h3>
-
             {{ if and (eq .Total 0) (eq 0 (len .DeletedCases)) }}
                 <div class="govuk-grid-row">
                     <div class="govuk-grid-column-one-half">
@@ -37,7 +35,7 @@
                 </div>
             {{ else }}
 
-                <p class="moj-pagination__results govuk-!-padding-0 govuk-!-margin-bottom-6">Showing <b>{{ .Pagination.Start }}</b> to <b>{{ .Pagination.End }}</b> of <b>{{ .Pagination.TotalItems }}</b> results</p>
+                <p class="moj-pagination__results govuk-!-padding-0 govuk-!-margin-bottom-6">Showing <b>{{ .Pagination.Start }}</b> of <b>{{ .Pagination.End }}</b> results for <b>{{ .SearchTerm }}</b></p>
 
                 {{ if eq 0 (len .DeletedCases) }}
                     <table class="govuk-table" data-module="moj-sortable-table">
