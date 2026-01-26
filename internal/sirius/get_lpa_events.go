@@ -10,7 +10,7 @@ type LpaEventsResponse struct {
 	Events   []LpaEvent `json:"events"`
 	Limit    int        `json:"limit"`
 	Total    int        `json:"total"`
-	Pages    any        `json:"pages"`
+	Pages    Pages      `json:"pages"`
 	Metadata any        `json:"metadata"`
 }
 
