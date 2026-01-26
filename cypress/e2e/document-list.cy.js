@@ -637,4 +637,13 @@ describe("View documents", () => {
 
     cy.contains("No document selected").should("not.exist");
   });
+
+  it("shows success notification when document is deleted", () => {
+    cy.visit(
+      "/donor/1/documents?success=true&documentFriendlyName=LP1F%20-%20Finance%20Instrument&documentCreatedTime=29/05/2022%2010:07:38",
+    );
+
+    cy.get("#govuk-notification-banner-title").contains("File deleted");
+    cy.contains("29/05/2022 LP1F - Finance Instrument");
+  });
 });

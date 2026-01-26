@@ -1,0 +1,35 @@
+{{ template "page" . }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <div class="govuk-body">
+                {{ range .Document.CaseItems }}
+                    {{ template "CaseLabel" . }}
+                {{ end }}
+                <strong>
+                    Are you sure you want to delete: <br>
+                    {{ (parseAndFormatDate .Document.CreatedDate "02/01/2006 15:04:05" "02/01/2006") }} {{ .Document.FriendlyDescription }}?
+                </strong>
+            </div>
+
+            <iframe
+                    class="document-viewer-container"
+                    src="/lpa-api/v1/documents/{{ .Document.UUID }}/file"
+            >
+            </iframe>
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+                    <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/donor/%d/documents" .DonorId) }}" >
+                        No, cancel
+                    </a>
+
+                    <button class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit">
+                        Yes, delete
+                    </button>
+            </form>
+        </div>
+    </div>
+
+{{ end }}

@@ -5,6 +5,23 @@
 {{ define "main" }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
+            {{ if .Success }}
+                <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="moj-alert">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                            File deleted
+                        </h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <p class="govuk-notification-banner__heading">
+                            {{ .SuccessMessage }}
+                        </p>
+                        <div class="sirius-moj-alert__action govuk-!-margin-top-2">
+                            <button class="moj-alert__dismiss" type="submit" name="dismissNotification" value="true" form="document-list-form">Dismiss</button>
+                        </div>
+                    </div>
+                </div>
+            {{ end }}
 
             {{ if .Error.Any }}
                 <div class="moj-alert moj-alert--warning moj-alert--with-heading" aria-label="warning: {{ .Error.Detail }}" data-module="moj-alert">

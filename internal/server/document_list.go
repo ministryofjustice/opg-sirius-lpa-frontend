@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -19,6 +20,7 @@ type documentListData struct {
 	XSRFToken             string
 	Entity                string
 	Success               bool
+	SuccessMessage        string
 	Error                 sirius.ValidationError
 	DocumentList          sirius.DocumentList
 	SelectedCases         []sirius.Case
@@ -97,14 +99,32 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			validationErr.Detail = "Select one or more documents and try again."
 		}
 
+		successMessage := ""
+		isSuccess := r.URL.Query().Get("success") == "true" && r.FormValue("dismissNotification") != "true"
+
+		if isSuccess {
+			successMessage = successMessageFormatter(r.URL.Query().Get("documentFriendlyName"), r.URL.Query().Get("documentCreatedTime"), "02/01/2006 15:04:05", "02/01/2006")
+		}
+
 		data := documentListData{
 			XSRFToken:             ctx.XSRFToken,
 			SelectedCases:         selected,
 			DocumentList:          docs,
 			MultipleCasesSelected: len(caseUIDs) > 1 || (len(caseUIDs) == 0 && len(casesOnDonor) > 1),
 			Error:                 validationErr,
+			Success:               isSuccess,
+			SuccessMessage:        successMessage,
 		}
 
 		return tmpl(w, data)
 	}
+}
+
+func successMessageFormatter(docFriendlyName string, docCreatedTime, layout string, format string) string {
+	t, err := time.Parse(layout, docCreatedTime)
+	if err != nil {
+		return "invalid date"
+	}
+
+	return t.Format(format) + " " + docFriendlyName
 }
