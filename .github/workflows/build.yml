@@ -9,19 +9,6 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  id-token: write
-  actions: read
-  checks: write
-  contents: write
-  deployments: none
-  issues: none
-  packages: none
-  pull-requests: write
-  repository-projects: none
-  security-events: write
-  statuses: none
-
 defaults:
   run:
     shell: bash
