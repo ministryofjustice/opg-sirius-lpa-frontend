@@ -12,7 +12,8 @@ type GetLpaHistoryClient interface {
 }
 
 type getLpaHistory struct {
-	Events []sirius.LpaEvent
+	Events          []sirius.LpaEvent
+	EventFilterData []sirius.SourceType
 }
 
 func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
@@ -28,7 +29,8 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 		}
 
 		data := getLpaHistory{
-			Events: eventsData.Events,
+			Events:          eventsData.Events,
+			EventFilterData: eventsData.Metadata.SourceTypes,
 		}
 
 		return tmpl(w, data)

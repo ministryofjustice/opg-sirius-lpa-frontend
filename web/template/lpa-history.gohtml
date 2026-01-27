@@ -6,6 +6,62 @@
 
     <div class="govuk-grid-row">
 
+        <div class="govuk-grid-column-one-third">
+            <div class="moj-filter" data-module="moj-filter">
+                <div class="moj-filter__header">
+                    <div class="moj-filter__header-title">
+                        <h2 class="govuk-heading-m">Filter</h2>
+                    </div>
+                    <div class="moj-filter__header-action">
+                    </div>
+                </div>
+                <div class="moj-filter__content">
+                    <div class="moj-filter__options">
+                            <button type="submit" class="govuk-button" data-module="govuk-button" data-test-id="submit-button">
+                                Apply filters
+                            </button>
+                            <div class="govuk-form-group">
+                                <fieldset class="govuk-fieldset">
+                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                        Sort By
+                                    </legend>
+                                    <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                                        <div class="govuk-radios__item">
+                                            <input class="govuk-radios__input" id="f-desc"
+                                                   name="sort" type="radio" value="desc">
+                                            <label class="govuk-label govuk-radios__label" for="f-desc">Descending</label>
+                                        </div>
+                                        <div class="govuk-radios__item">
+                                            <input class="govuk-radios__input" id="f-asc"
+                                                   name="sort" type="radio" value="asc" >
+                                            <label class="govuk-label govuk-radios__label" for="f-asc">Ascending</label>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="govuk-form-group">
+                                <fieldset class="govuk-fieldset">
+                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                        Type
+                                    </legend>
+                                    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                        {{ range .EventFilterData }}
+                                            <div class="govuk-checkboxes__item">
+                                                <input class="govuk-checkboxes__input" id="f-{{ .SourceType }}"
+                                                       name="type" type="checkbox" value="{{.SourceType}}">
+                                                <label class="govuk-label govuk-checkboxes__label" for="f-{{ .SourceType }}">
+                                                    {{ .SourceType }} ({{ .Total }})
+                                                </label>
+                                            </div>
+                                        {{ end }}
+                                    </div>
+                                </fieldset>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <div class="govuk-grid-column-two-thirds">
             <div class="moj-timeline">

@@ -7,11 +7,11 @@ import (
 )
 
 type LpaEventsResponse struct {
-	Events   []LpaEvent `json:"events"`
-	Limit    int        `json:"limit"`
-	Total    int        `json:"total"`
-	Pages    Pages      `json:"pages"`
-	Metadata any        `json:"metadata"`
+	Events   []LpaEvent    `json:"events"`
+	Limit    int           `json:"limit"`
+	Total    int           `json:"total"`
+	Pages    Pages         `json:"pages"`
+	Metadata EventMetaData `json:"metadata"`
 }
 
 type LpaEvent struct {
@@ -45,6 +45,16 @@ type LpaEventUser struct {
 
 type LpaTeam struct {
 	DisplayName string `json:"displayName,omitempty"`
+}
+
+type EventMetaData struct {
+	CaseIds     any          `json:"caseIds"`
+	SourceTypes []SourceType `json:"sourceTypes"`
+}
+
+type SourceType struct {
+	SourceType string `json:"sourceType"`
+	Total      int    `json:"total"`
 }
 
 func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string) (LpaEventsResponse, error) {
