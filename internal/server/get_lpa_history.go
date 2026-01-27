@@ -12,7 +12,7 @@ type GetLpaHistoryClient interface {
 }
 
 type getLpaHistory struct {
-	Events any
+	Events []sirius.LpaEvent
 }
 
 func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {

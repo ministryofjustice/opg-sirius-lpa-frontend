@@ -23,7 +23,7 @@ type LpaEvent struct {
 	Hash       string                    `json:"hash"`
 	OwningCase OwningCase                `json:"owningCase,omitempty"`
 	ID         int                       `json:"id,omitempty"`
-	UID        string                    `json:"uid,omitempty"`
+	UID        string                    `json:"uuid,omitempty"`
 	SourceType shared.LpaEventSourceType `json:"sourceType"`
 	Type       string                    `json:"type,omitempty"`
 }
