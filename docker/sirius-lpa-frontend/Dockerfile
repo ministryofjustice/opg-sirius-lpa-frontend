@@ -12,7 +12,7 @@ RUN npm ci --ignore-scripts
 COPY web/assets web/assets
 RUN npm run build
 
-FROM golang:1.25.5-alpine@sha256:ac09a5f469f307e5da71e766b0bd59c9c49ea460a528cc3e6686513d64a6f1fb AS dev
+FROM golang:1.25.6-alpine@sha256:d9b2e14101f27ec8d09674cd01186798d227bb0daec90e032aeb1cd22ac0f029 AS dev
 
 WORKDIR /app
 
@@ -38,7 +38,7 @@ RUN go install github.com/cosmtrek/air@v1.52.1 && go install github.com/go-delve
 
 ENTRYPOINT ["air"]
 
-FROM golang:1.25.5@sha256:0f406d34b7cb7255d0700af02ec28a2c88f1e00701055f4c282aa4c3ec0b3245 AS build-env
+FROM golang:1.25.6@sha256:ce63a16e0f7063787ebb4eb28e72d477b00b4726f79874b3205a965ffd797ab2 AS build-env
 
 ARG TARGETARCH
 WORKDIR /app
