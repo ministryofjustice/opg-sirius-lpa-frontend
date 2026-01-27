@@ -8,12 +8,19 @@ import (
 )
 
 type GetLpaHistoryClient interface {
-	GetEvents(ctx sirius.Context, donorId string, caseIds []string) (sirius.LpaEventsResponse, error)
+	GetEvents(ctx sirius.Context, donorId string, caseIds []string, sourceTypes []string, sortBy string) (sirius.LpaEventsResponse, error)
 }
 
 type getLpaHistory struct {
+	XSRFToken       string
 	Events          []sirius.LpaEvent
 	EventFilterData []sirius.SourceType
+	Form            FilterLpaEventsForm
+}
+
+type FilterLpaEventsForm struct {
+	Types []string `form:"type"`
+	Sort  string   `form:"sort"`
 }
 
 func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
@@ -23,14 +30,32 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 
 		ctx := getContext(r)
 
-		eventsData, err := client.GetEvents(ctx, donorId, caseIDs)
+		eventsData, err := client.GetEvents(ctx, donorId, caseIDs, []string{}, "desc")
 		if err != nil {
 			return err
 		}
 
 		data := getLpaHistory{
+			XSRFToken:       ctx.XSRFToken,
 			Events:          eventsData.Events,
 			EventFilterData: eventsData.Metadata.SourceTypes,
+			Form: FilterLpaEventsForm{
+				Sort: "desc",
+			},
+		}
+
+		if r.Method == http.MethodPost {
+			err := decoder.Decode(&data.Form, r.PostForm)
+			if err != nil {
+				return err
+			}
+
+			eventsData, err = client.GetEvents(ctx, donorId, caseIDs, data.Form.Types, data.Form.Sort)
+			if err != nil {
+				return err
+			}
+
+			data.Events = eventsData.Events
 		}
 
 		return tmpl(w, data)

@@ -57,9 +57,10 @@ type SourceType struct {
 	Total      int    `json:"total"`
 }
 
-func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string) (LpaEventsResponse, error) {
+func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string, sourceTypes []string, sortBy string) (LpaEventsResponse, error) {
 	var resp LpaEventsResponse
 
+	//TODO: Simplify this logic into a query builder
 	selectedCaseIds := ""
 	for i, caseId := range caseIds {
 		if i == 0 {
@@ -69,6 +70,15 @@ func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string) (LpaEv
 		}
 	}
 
-	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%s/events?%s&sort=id:desc&limit=999", donorId, selectedCaseIds), &resp)
+	filters := ""
+	for i, t := range sourceTypes {
+		if len(caseIds) == 0 && i == 0 {
+			filters = "filter=" + fmt.Sprintf("sourceType:%s", t)
+		} else {
+			filters += fmt.Sprintf(",sourceType:%s", t)
+		}
+	}
+
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%s/events?%s%s&sort=id:%s&limit=999", donorId, selectedCaseIds, filters, sortBy), &resp)
 	return resp, err
 }
