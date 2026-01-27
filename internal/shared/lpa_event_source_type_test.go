@@ -3,6 +3,8 @@ package shared
 import (
 	"encoding/json"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLpaEventSourceTypeTranslation(t *testing.T) {
@@ -48,6 +50,10 @@ func TestLpaEventSourceTypeTranslation(t *testing.T) {
 	}
 }
 
+func TestLpaEventSourceTypeTranslationDefault(t *testing.T) {
+	assert.Equal(t, "lpa event source type NOT RECOGNISED: ", LpaEventSourceTypeNotRecognised.Translation())
+}
+
 func TestLpaEventSourceTypeKey(t *testing.T) {
 	tests := []struct {
 		input    LpaEventSourceType
@@ -89,6 +95,10 @@ func TestLpaEventSourceTypeKey(t *testing.T) {
 			t.Errorf("LpaEventSourceType(%v) = %v, expected %v", tc.input, got, tc.expected)
 		}
 	}
+}
+
+func TestLpaEventSourceTypeStringDefault(t *testing.T) {
+	assert.Equal(t, "", LpaEventSourceTypeNotRecognised.Key())
 }
 
 func TestParseLpaEventSourceType(t *testing.T) {
@@ -134,6 +144,11 @@ func TestParseLpaEventSourceType(t *testing.T) {
 			t.Errorf("string(%v) = %v, expected %v", tc.input, got, tc.expected)
 		}
 	}
+}
+
+func TestParseLpaEventSourceTypeErrors(t *testing.T) {
+	got := ParseLpaEventSourceType("---")
+	assert.Equal(t, LpaEventSourceTypeNotRecognised, got)
 }
 
 func TestLpaEventSourceTypeMarshalJSON(t *testing.T) {
@@ -225,4 +240,10 @@ func TestLpaEventSourceTypeUnmarshalJSON(t *testing.T) {
 			t.Errorf("UnmarshalJSON(%s), expected %v", tc.input, tc.expected)
 		}
 	}
+}
+
+func TestLpaEventSourceTypeUnmarshalJSONErrors(t *testing.T) {
+	var est LpaEventSourceType
+	err := json.Unmarshal([]byte(`123`), &est)
+	assert.Error(t, err)
 }
