@@ -47,15 +47,15 @@ var lpaEventSourceTypeMap = map[string]LpaEventSourceType{
 	"Client":              LpaEventSourceTypeClient,
 	"Complaint":           LpaEventSourceTypeComplaint,
 	"Correspondent":       LpaEventSourceTypeCorrespondent,
-	"Crec":                LpaEventSourceTypeCrec, //CREC??
+	"Crec":                LpaEventSourceTypeCrec,
 	"Deputy":              LpaEventSourceTypeDeputy,
 	"Donor":               LpaEventSourceTypeDonor,
-	"Epa":                 LpaEventSourceTypeEpa, //EPA?
+	"Epa":                 LpaEventSourceTypeEpa,
 	"HoldPeriod":          LpaEventSourceTypeHoldPeriod,
 	"IncomingDocument":    LpaEventSourceTypeIncomingDocument,
 	"Investigation":       LpaEventSourceTypeInvestigation,
 	"LodgingChecklist":    LpaEventSourceTypeLodgingChecklist,
-	"Lpa":                 LpaEventSourceTypeLpa, //LPA?
+	"Lpa":                 LpaEventSourceTypeLpa,
 	"Note":                LpaEventSourceTypeNote,
 	"NotifiedPerson":      LpaEventSourceTypeNotifiedPerson,
 	"Order":               LpaEventSourceTypeOrder,
