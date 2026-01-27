@@ -18,11 +18,7 @@ type getLpaHistory struct {
 func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		donorId := r.PathValue("donorId")
-
-		if err := r.ParseForm(); err != nil {
-			return err
-		}
-		caseIDs := r.Form["id[]"]
+		caseIDs := r.URL.Query()["id[]"]
 
 		ctx := getContext(r)
 

@@ -47,7 +47,6 @@ type LpaTeam struct {
 	DisplayName string `json:"displayName,omitempty"`
 }
 
-// will refactor for getting events across multiple cases
 func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string) (LpaEventsResponse, error) {
 	var resp LpaEventsResponse
 
