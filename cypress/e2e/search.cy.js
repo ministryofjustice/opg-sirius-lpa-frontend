@@ -109,8 +109,7 @@ describe("Search", () => {
 
       cy.visit("/search?term=bob");
 
-      cy.contains("You searched for: bob");
-      cy.contains("Showing 1 to 4 of 4 results");
+      cy.contains("Showing 1 of 4 results for bob");
       cy.contains("Donor (2)");
       cy.contains("Deputy (1)");
     });
