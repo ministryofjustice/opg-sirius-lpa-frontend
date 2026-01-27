@@ -5,6 +5,23 @@
 {{ define "main" }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
+            {{ if .Success }}
+                <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="moj-alert">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                            File deleted
+                        </h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <p class="govuk-notification-banner__heading">
+                            {{ .SuccessMessage }}
+                        </p>
+                        <div class="sirius-moj-alert__action govuk-!-margin-top-2">
+                            <button class="moj-alert__dismiss" type="submit" name="dismissNotification" value="true" form="document-list-form">Dismiss</button>
+                        </div>
+                    </div>
+                </div>
+            {{ end }}
 
             {{ if .Error.Any }}
                 <div class="moj-alert moj-alert--warning moj-alert--with-heading" aria-label="warning: {{ .Error.Detail }}" data-module="moj-alert">
@@ -31,7 +48,7 @@
                 <table class="govuk-table" data-module="moj-sortable-table">
                 <caption class="govuk-table__caption">
                     Documents ({{ .DocumentList.Total }})
-                    <span class="govuk-body">
+                    <span class="govuk-body" id="viewing-selected-cases">
                         Viewing {{ len .SelectedCases }} POA{{ if $multiCaseSelected }}s{{ end }}:
                             {{ range .SelectedCases }}
                                 {{ template "CaseLabel" . }}
@@ -45,7 +62,7 @@
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
                         <th scope="col" class="govuk-table__header" aria-sort="none">Select</th>
-                        <th scope="col" class="govuk-table__header govuk-!-width-one-half" aria-sort="none">Name</th>
+                        <th scope="col" class="govuk-table__header" aria-sort="none">Name</th>
                         {{ if $multiCaseSelected }}
                             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter" aria-sort="none">Case number</th>
                         {{ end }}

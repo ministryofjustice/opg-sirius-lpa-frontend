@@ -117,7 +117,7 @@ npm run cypress open
 If you get an error message No version of Cypress is installed in:..... try running this command
 
 ```
- yarn add cypress
+npm ci cypress
 ```
 
 ## Development
