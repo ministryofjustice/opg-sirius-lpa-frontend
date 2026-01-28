@@ -54,10 +54,10 @@
                                     <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                                         {{ range .EventFilterData }}
                                             <div class="govuk-checkboxes__item">
-                                                <input class="govuk-checkboxes__input" id="f-{{ .SourceType }}"
-                                                       name="type" type="checkbox" value="{{.SourceType}}" {{ if contains $.Form.Types .SourceType }}checked{{ end }}>
-                                                <label class="govuk-label govuk-checkboxes__label" for="f-{{ .SourceType }}">
-                                                    {{ .SourceType }} ({{ .Total }})
+                                                <input class="govuk-checkboxes__input" id="f-{{ .SourceType.Key }}"
+                                                       name="type" type="checkbox" value="{{ .SourceType.Key }}" {{ if contains $.Form.Types .SourceType.Key }}checked{{ end }}>
+                                                <label class="govuk-label govuk-checkboxes__label" for="f-{{ .SourceType.Key }}">
+                                                    {{ .SourceType.Translation }} ({{ .Total }})
                                                 </label>
                                             </div>
                                         {{ end }}

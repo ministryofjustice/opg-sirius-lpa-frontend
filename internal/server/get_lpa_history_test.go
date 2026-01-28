@@ -51,7 +51,7 @@ func TestGetLpaHistory(t *testing.T) {
 					CaseIds: nil,
 					SourceTypes: []sirius.SourceType{
 						{
-							SourceType: "Lpa",
+							SourceType: shared.LpaEventSourceTypeLpa,
 							Total:      1,
 						},
 					},
@@ -94,7 +94,7 @@ func TestGetLpaHistory(t *testing.T) {
 					CaseIds: nil,
 					SourceTypes: []sirius.SourceType{
 						{
-							SourceType: "Lpa",
+							SourceType: shared.LpaEventSourceTypeLpa,
 							Total:      2,
 						},
 					},
