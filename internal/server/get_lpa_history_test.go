@@ -14,22 +14,22 @@ type mockGetLpaHistory struct {
 	mock.Mock
 }
 
-func (m *mockGetLpaHistory) GetEvents(ctx sirius.Context, donorId string, caseIds []string) (sirius.LpaEventsResponse, error) {
-	args := m.Called(ctx, donorId, caseIds)
+func (m *mockGetLpaHistory) GetEvents(ctx sirius.Context, donorId string, caseIds []string, sourceTypes []string, sortBy string) (sirius.LpaEventsResponse, error) {
+	args := m.Called(ctx, donorId, caseIds, sourceTypes, sortBy)
 	return args.Get(0).(sirius.LpaEventsResponse), args.Error(1)
 }
 
 func TestGetLpaHistory(t *testing.T) {
 	tests := []struct {
-		name          string
-		path          string
-		getEventsArgs []string
-		response      sirius.LpaEventsResponse
+		name        string
+		path        string
+		caseIdsArgs []string
+		response    sirius.LpaEventsResponse
 	}{
 		{
-			name:          "all history by default when no case ID provided",
-			path:          "/lpa-api/v1/persons/123/events",
-			getEventsArgs: []string(nil),
+			name:        "all history by default when no case ID provided",
+			path:        "/lpa-api/v1/persons/123/events",
+			caseIdsArgs: []string(nil),
 			response: sirius.LpaEventsResponse{
 				Events: []sirius.LpaEvent{
 					{
@@ -44,16 +44,24 @@ func TestGetLpaHistory(t *testing.T) {
 						},
 					},
 				},
-				Limit:    999,
-				Total:    1,
-				Pages:    sirius.Pages{},
-				Metadata: nil,
+				Limit: 999,
+				Total: 1,
+				Pages: sirius.Pages{},
+				Metadata: sirius.EventMetaData{
+					CaseIds: nil,
+					SourceTypes: []sirius.SourceType{
+						{
+							SourceType: "Lpa",
+							Total:      1,
+						},
+					},
+				},
 			},
 		},
 		{
-			name:          "case histories when multiple IDs provided",
-			path:          "/lpa-api/v1/persons/123/events?id[]=1&id[]=2",
-			getEventsArgs: []string{"1", "2"},
+			name:        "case histories when multiple IDs provided",
+			path:        "/lpa-api/v1/persons/123/events?id[]=1&id[]=2",
+			caseIdsArgs: []string{"1", "2"},
 			response: sirius.LpaEventsResponse{
 				Events: []sirius.LpaEvent{
 					{
@@ -79,10 +87,18 @@ func TestGetLpaHistory(t *testing.T) {
 						},
 					},
 				},
-				Limit:    999,
-				Total:    1,
-				Pages:    sirius.Pages{},
-				Metadata: nil,
+				Limit: 999,
+				Total: 2,
+				Pages: sirius.Pages{},
+				Metadata: sirius.EventMetaData{
+					CaseIds: nil,
+					SourceTypes: []sirius.SourceType{
+						{
+							SourceType: "Lpa",
+							Total:      2,
+						},
+					},
+				},
 			},
 		},
 	}
@@ -92,12 +108,18 @@ func TestGetLpaHistory(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			client.On("GetEvents", mock.Anything, "123", tc.getEventsArgs).Return(tc.response, err)
+			client.On("GetEvents", mock.Anything, "123", tc.caseIdsArgs, []string{}, "desc").Return(tc.response, err)
 
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, getLpaHistory{
-					Events: tc.response.Events,
+					Events:              tc.response.Events,
+					EventFilterData:     tc.response.Metadata.SourceTypes,
+					TotalEvents:         tc.response.Total,
+					TotalFilteredEvents: 0,
+					Form: FilterLpaEventsForm{
+						Sort: "desc",
+					},
 				}).
 				Return(nil)
 
@@ -115,7 +137,7 @@ func TestGetLpaHistory(t *testing.T) {
 
 func TestGetLpaHistoryWhenFailureOnGetEvents(t *testing.T) {
 	client := &mockGetLpaHistory{}
-	client.On("GetEvents", mock.Anything, "123", []string(nil)).Return(sirius.LpaEventsResponse{}, errExample)
+	client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, "desc").Return(sirius.LpaEventsResponse{}, errExample)
 
 	server := newMockServer("/lpa-api/v1/persons/{donorId}/events", GetLpaHistory(client, nil))
 

@@ -134,7 +134,7 @@ func TestGetLpaEvents(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				documents, err := client.GetEvents(Context{Context: context.Background()}, "189", tc.caseIDs)
+				documents, err := client.GetEvents(Context{Context: context.Background()}, "189", tc.caseIDs, []string{}, "desc")
 
 				assert.Equal(t, tc.expectedResponse, documents)
 				if tc.expectedError == nil {
