@@ -134,11 +134,109 @@ func TestGetLpaEvents(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				documents, err := client.GetEvents(Context{Context: context.Background()}, "189", tc.caseIDs, []string{}, "desc")
+				events, err := client.GetEvents(Context{Context: context.Background()}, "189", tc.caseIDs, []string{}, "desc")
 
-				assert.Equal(t, tc.expectedResponse, documents)
+				assert.Equal(t, tc.expectedResponse, events)
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(config.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}
+
+func TestGetLpaEventsFiltered(t *testing.T) {
+	t.Parallel()
+
+	pactResponse := consumer.Response{
+		Status: http.StatusOK,
+		Body: matchers.Like(map[string]interface{}{
+			"limit": matchers.Like(999),
+			"total": matchers.Like(1),
+			"pages": matchers.Like(map[string]interface{}{
+				"current": matchers.Like(1),
+				"total":   matchers.Like(1),
+			}),
+			"events": matchers.EachLike(map[string]interface{}{
+				"id":         matchers.Like(4056),
+				"sourceType": matchers.Like("Payment"),
+				"type":       matchers.Like("INS"),
+				"createdOn":  matchers.Like("2026-01-16T04:10:55+00:00"),
+				"hash":       matchers.Like("JIG"),
+			}, 1),
+		}),
+		Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+	}
+
+	expectedResponse := LpaEventsResponse{
+		Limit: 999,
+		Pages: Pages{
+			Current: 1,
+			Total:   1,
+		},
+		Total: 1,
+		Events: []LpaEvent{
+			{
+				ID:         4056,
+				Type:       "INS",
+				SourceType: shared.LpaEventSourceTypePayment,
+				CreatedOn:  "2026-01-16T04:10:55+00:00",
+				Hash:       "JIG",
+			},
+		},
+	}
+
+	pact, err := newPact()
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		name             string
+		caseIDs          []string
+		setup            func()
+		expectedError    func(int) error
+		expectedResponse LpaEventsResponse
+	}{
+		{
+			name:    "Can filter events with source type",
+			caseIDs: []string(nil),
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A donor exists with multiple cases and event history").
+					UponReceiving("A request for the events on a person").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodGet,
+						Path:   matchers.String("/lpa-api/v1/persons/189/events"),
+						Query: matchers.MapMatcher{
+							"filter": matchers.String("sourceType:Payment"),
+							"sort":   matchers.String("id:asc"),
+							"limit":  matchers.Like("999"),
+						},
+					}).
+					WithCompleteResponse(pactResponse)
+			},
+			expectedResponse: expectedResponse,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
+
+				events, err := client.GetEvents(Context{Context: context.Background()}, "189", tc.caseIDs, []string{"Payment"}, "asc")
+
+				assert.Equal(t, tc.expectedResponse, events)
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+					for _, event := range events.Events {
+						assert.Equal(t, shared.LpaEventSourceTypePayment, event.SourceType, "event ID %d has wrong sourceType", event.ID)
+					}
 				} else {
 					assert.Equal(t, tc.expectedError(config.Port), err)
 				}
