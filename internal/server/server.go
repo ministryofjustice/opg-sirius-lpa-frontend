@@ -74,6 +74,7 @@ type Client interface {
 	GetDocumentsClient
 	GetHistoryClient
 	GetLpaDetailsClient
+	GetLpaHistoryClient
 	GetPaymentsClient
 	InvestigationHoldClient
 	LinkPersonClient
@@ -107,6 +108,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/", http.NotFoundHandler())
 	mux.HandleFunc("/health-check", func(w http.ResponseWriter, r *http.Request) {})
 
+	//unsorted
 	mux.Handle("/lpa/{uid}/attorney/{attorneyUID}/change-details", wrap(ChangeAttorneyDetails(client, templates.Get("change-attorney-details.gohtml"))))
 	mux.Handle("/lpa/{uid}/trust-corporation/{trustCorporationUID}/change-details", wrap(ChangeTrustCorporationDetails(client, templates.Get("change-trust-corporation-details.gohtml"))))
 	mux.Handle("/lpa/{uid}/objection/{id}", wrap(UpdateObjection(client, templates.Get("objection.gohtml"), templates.Get("confirm-objection.gohtml"))))
@@ -132,7 +134,6 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/edit-dates", wrap(EditDates(client, templates.Get("edit_dates.gohtml"))))
 	mux.Handle("/link-person", wrap(LinkPerson(client, templates.Get("link_person.gohtml"))))
 	mux.Handle("/add-complaint", wrap(AddComplaint(client, templates.Get("add_complaint.gohtml"))))
-	mux.Handle("/donor/{id}/documents", wrap(DocumentList(client, templates.Get("documents.gohtml"))))
 	mux.Handle("/edit-complaint", wrap(EditComplaint(client, templates.Get("edit_complaint.gohtml"))))
 	mux.Handle("/unlink-person", wrap(UnlinkPerson(client, templates.Get("unlink_person.gohtml"))))
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change_status.gohtml"))))
@@ -150,6 +151,15 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/edit-payment", wrap(EditPayment(client, templates.Get("edit_payment.gohtml"))))
 	mux.Handle("/edit-fee-reduction", wrap(EditFeeReduction(client, templates.Get("edit_fee_reduction.gohtml"))))
 	mux.Handle("/payments/{id}", wrap(GetPayments(client, templates.Get("payments.gohtml"))))
+	mux.Handle("/lpa/{uid}/certificate-provider/change-details", wrap(ChangeCertificateProviderDetails(client, templates.Get("change-certificate-provider-details.gohtml"))))
+	mux.Handle("/lpa/{uid}/update-decisions", wrap(UpdateDecisions(client, templates.Get("mlpa-update-decisions.gohtml"))))
+	mux.Handle("/search-users", wrap(SearchUsers(client)))
+	mux.Handle("/search-persons", wrap(SearchDonors(client)))
+	mux.Handle("/search-postcode", wrap(SearchPostcode(client)))
+	mux.Handle("/search", wrap(Search(client, templates.Get("search.gohtml"))))
+	mux.Handle("/digital-lpa/create", wrap(CreateDraft(client, templates.Get("create_draft.gohtml"))))
+
+	//modernise
 	mux.Handle("/lpa/{uid}/lpa-details", wrap(GetLpaDetails(client, templates.Get("mlpa-details.gohtml"))))
 	mux.Handle("/lpa/{uid}", wrap(GetApplicationProgressDetails(client, templates.Get("mlpa-application-progress.gohtml"))))
 	mux.Handle("/lpa/{uid}/payments", wrap(GetPayments(client, templates.Get("mlpa-payments.gohtml"))))
@@ -159,13 +169,10 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/lpa/{uid}/manage-attorneys", wrap(ManageAttorneys(client, templates.Get("mlpa-manage-attorneys.gohtml"))))
 	mux.Handle("/lpa/{uid}/remove-an-attorney", wrap(RemoveAnAttorney(client, templates.Get("mlpa-remove-attorney.gohtml"), templates.Get("mlpa-confirm-attorney-removal.gohtml"), templates.Get("mlpa-attorney-decisions.gohtml"))))
 	mux.Handle("/lpa/{uid}/manage-attorney-decisions", wrap(AttorneyDecisions(client, templates.Get("mlpa-attorney-decisions.gohtml"), templates.Get("mlpa-confirm-attorney-decisions.gohtml"))))
-	mux.Handle("/lpa/{uid}/certificate-provider/change-details", wrap(ChangeCertificateProviderDetails(client, templates.Get("change-certificate-provider-details.gohtml"))))
-	mux.Handle("/lpa/{uid}/update-decisions", wrap(UpdateDecisions(client, templates.Get("mlpa-update-decisions.gohtml"))))
-	mux.Handle("/search-users", wrap(SearchUsers(client)))
-	mux.Handle("/search-persons", wrap(SearchDonors(client)))
-	mux.Handle("/search-postcode", wrap(SearchPostcode(client)))
-	mux.Handle("/search", wrap(Search(client, templates.Get("search.gohtml"))))
-	mux.Handle("/digital-lpa/create", wrap(CreateDraft(client, templates.Get("create_draft.gohtml"))))
+
+	//LPA
+	mux.Handle("/donor/{id}/documents", wrap(DocumentList(client, templates.Get("documents.gohtml"))))
+	mux.Handle("/donor/{donorId}/history", wrap(GetLpaHistory(client, templates.Get("lpa-history.gohtml"))))
 	mux.Handle("/view-document/{uuid}", wrap(ViewDocument(client, templates.Get("view-document.gohtml"))))
 	mux.Handle("/delete-document/{uuid}", wrap(DeleteDocument(client, templates.Get("delete-document.gohtml"))))
 
