@@ -162,10 +162,13 @@ func TestGetLpaEventsFiltered(t *testing.T) {
 			}),
 			"events": matchers.EachLike(map[string]interface{}{
 				"id":         matchers.Like(4056),
-				"sourceType": matchers.Like("Payment"),
+				"sourceType": matchers.String("Payment"),
 				"type":       matchers.Like("INS"),
 				"createdOn":  matchers.Like("2026-01-16T04:10:55+00:00"),
 				"hash":       matchers.Like("JIG"),
+				"owningCase": matchers.Like(map[string]interface{}{ // single object now
+					"id": matchers.Like(111111),
+				}),
 			}, 1),
 		}),
 		Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
@@ -185,6 +188,9 @@ func TestGetLpaEventsFiltered(t *testing.T) {
 				SourceType: shared.LpaEventSourceTypePayment,
 				CreatedOn:  "2026-01-16T04:10:55+00:00",
 				Hash:       "JIG",
+				OwningCase: OwningCase{
+					ID: 111111,
+				},
 			},
 		},
 	}
@@ -200,7 +206,7 @@ func TestGetLpaEventsFiltered(t *testing.T) {
 		expectedResponse LpaEventsResponse
 	}{
 		{
-			name:    "Can filter events with source type",
+			name:    "Can filter events by person with source type",
 			caseIDs: []string(nil),
 			setup: func() {
 				pact.
@@ -212,6 +218,27 @@ func TestGetLpaEventsFiltered(t *testing.T) {
 						Path:   matchers.String("/lpa-api/v1/persons/189/events"),
 						Query: matchers.MapMatcher{
 							"filter": matchers.String("sourceType:Payment"),
+							"sort":   matchers.String("id:asc"),
+							"limit":  matchers.Like("999"),
+						},
+					}).
+					WithCompleteResponse(pactResponse)
+			},
+			expectedResponse: expectedResponse,
+		},
+		{
+			name:    "Can filter events by case with source type",
+			caseIDs: []string{"111111"},
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A donor exists with multiple cases and event history").
+					UponReceiving("A request for the events on a person").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodGet,
+						Path:   matchers.String("/lpa-api/v1/persons/189/events"),
+						Query: matchers.MapMatcher{
+							"filter": matchers.String("case:111111,sourceType:Payment"),
 							"sort":   matchers.String("id:asc"),
 							"limit":  matchers.Like("999"),
 						},
