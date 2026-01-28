@@ -283,6 +283,14 @@ $govuk-assets-path: "../assets/";
   color: #d9e2ee;
 }
 
+.colour-govuk-dark-blue {
+   background: #003078;
+}
+
+.colour-govuk-white {
+    color: #FFFFFF
+}
+
 .app-progress-indicator-icon[data-progress-indicator="not-started"] {
   [data-svg-elt="background"] {
     stroke: govuk-colour("mid-grey");
