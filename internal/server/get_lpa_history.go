@@ -12,10 +12,13 @@ type GetLpaHistoryClient interface {
 }
 
 type getLpaHistory struct {
-	XSRFToken       string
-	Events          []sirius.LpaEvent
-	EventFilterData []sirius.SourceType
-	Form            FilterLpaEventsForm
+	XSRFToken           string
+	Events              []sirius.LpaEvent
+	EventFilterData     []sirius.SourceType
+	Form                FilterLpaEventsForm
+	TotalEvents         int
+	TotalFilteredEvents int
+	IsFiltered          bool
 }
 
 type FilterLpaEventsForm struct {
@@ -39,6 +42,8 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 			XSRFToken:       ctx.XSRFToken,
 			Events:          eventsData.Events,
 			EventFilterData: eventsData.Metadata.SourceTypes,
+			TotalEvents:     eventsData.Total,
+			IsFiltered:      false,
 			Form: FilterLpaEventsForm{
 				Sort: "desc",
 			},
@@ -55,7 +60,9 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 				return err
 			}
 
+			data.TotalFilteredEvents = eventsData.Total
 			data.Events = eventsData.Events
+			data.IsFiltered = true
 		}
 
 		return tmpl(w, data)

@@ -6,11 +6,16 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-third">
             <div class="moj-filter" data-module="moj-filter">
-                <div class="moj-filter__header">
+                <div class="moj-filter__header govuk-!-padding-bottom-0 colour-govuk-dark-blue">
                     <div class="moj-filter__header-title">
-                        <h2 class="govuk-heading-m">Filter</h2>
-                    </div>
-                    <div class="moj-filter__header-action">
+                        <h2 class="govuk-heading-m colour-govuk-white">Filter</h2>
+                        <div class="govuk-body colour-govuk-white">
+                            {{ if or (not .IsFiltered) (eq .TotalFilteredEvents .TotalEvents) }}
+                                (showing all {{ .TotalEvents }} items)
+                            {{ else }}
+                                (showing {{ .TotalFilteredEvents }} of {{ .TotalEvents }} items)
+                            {{ end }}
+                        </div>
                     </div>
                 </div>
                 <div class="moj-filter__content">
