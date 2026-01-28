@@ -2,6 +2,8 @@ package server
 
 import (
 	"net/http"
+	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
@@ -35,12 +37,12 @@ func TestGetLpaHistory(t *testing.T) {
 					{
 						ID:         99,
 						CreatedOn:  "2024-01-01T12:00:00Z",
-						Type:       "Save",
+						Type:       "INS",
 						Hash:       "a",
 						SourceType: shared.LpaEventSourceTypeLpa,
 						OwningCase: sirius.OwningCase{
 							ID:       1,
-							CaseType: "Lpa",
+							CaseType: "LPA",
 						},
 					},
 				},
@@ -67,23 +69,23 @@ func TestGetLpaHistory(t *testing.T) {
 					{
 						ID:         99,
 						CreatedOn:  "2024-01-01T12:00:00Z",
-						Type:       "Save",
+						Type:       "INS",
 						Hash:       "a",
 						SourceType: shared.LpaEventSourceTypeLpa,
 						OwningCase: sirius.OwningCase{
 							ID:       1,
-							CaseType: "Lpa",
+							CaseType: "LPA",
 						},
 					},
 					{
 						ID:         98,
 						CreatedOn:  "2024-02-01T12:00:00Z",
-						Type:       "Save",
+						Type:       "INS",
 						Hash:       "b",
 						SourceType: shared.LpaEventSourceTypeLpa,
 						OwningCase: sirius.OwningCase{
 							ID:       2,
-							CaseType: "Lpa",
+							CaseType: "LPA",
 						},
 					},
 				},
@@ -108,7 +110,9 @@ func TestGetLpaHistory(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			client.On("GetEvents", mock.Anything, "123", tc.caseIdsArgs, []string{}, "desc").Return(tc.response, err)
+			client.
+				On("GetEvents", mock.Anything, "123", tc.caseIdsArgs, []string{}, "desc").
+				Return(tc.response, err)
 
 			template := &mockTemplate{}
 			template.
@@ -146,4 +150,127 @@ func TestGetLpaHistoryWhenFailureOnGetEvents(t *testing.T) {
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestPostFiltersLpaHistory(t *testing.T) {
+
+	unfilteredResponse := sirius.LpaEventsResponse{
+		Events: []sirius.LpaEvent{
+			{
+				ID:         103,
+				CreatedOn:  "2025-03-03T12:00:00Z",
+				Type:       "INS",
+				Hash:       "E",
+				SourceType: shared.LpaEventSourceTypeAddress,
+				OwningCase: sirius.OwningCase{
+					ID:       3,
+					CaseType: "LPA",
+				},
+			},
+			{
+				ID:         102,
+				CreatedOn:  "2024-03-02T12:00:00Z",
+				Type:       "UPD",
+				Hash:       "D",
+				SourceType: shared.LpaEventSourceTypePayment,
+				OwningCase: sirius.OwningCase{
+					ID:       4,
+					CaseType: "LPA",
+				},
+			},
+			{
+				ID:         101,
+				CreatedOn:  "2023-03-01T12:00:00Z",
+				Type:       "INS",
+				Hash:       "C",
+				SourceType: shared.LpaEventSourceTypeLpa,
+				OwningCase: sirius.OwningCase{
+					ID:       3,
+					CaseType: "LPA",
+				},
+			},
+		},
+		Limit: 999,
+		Total: 3,
+		Pages: sirius.Pages{},
+		Metadata: sirius.EventMetaData{
+			CaseIds: nil,
+			SourceTypes: []sirius.SourceType{
+				{SourceType: shared.LpaEventSourceTypeLpa, Total: 1},
+				{SourceType: shared.LpaEventSourceTypePayment, Total: 1},
+				{SourceType: shared.LpaEventSourceTypeAddress, Total: 1},
+			},
+		},
+	}
+
+	filteredResponse := sirius.LpaEventsResponse{
+		Events: []sirius.LpaEvent{
+			{
+				ID:         101,
+				CreatedOn:  "2024-03-01T12:00:00Z",
+				Type:       "INS",
+				Hash:       "c",
+				SourceType: shared.LpaEventSourceTypeLpa,
+				OwningCase: sirius.OwningCase{
+					ID:       3,
+					CaseType: "LPA",
+				},
+			},
+			{
+				ID:         102,
+				CreatedOn:  "2024-03-02T12:00:00Z",
+				Type:       "UPD",
+				Hash:       "d",
+				SourceType: shared.LpaEventSourceTypePayment,
+				OwningCase: sirius.OwningCase{
+					ID:       4,
+					CaseType: "LPA",
+				},
+			},
+		},
+		Limit: 999,
+		Total: 2,
+		Pages: sirius.Pages{},
+		Metadata: sirius.EventMetaData{
+			CaseIds: nil,
+			SourceTypes: []sirius.SourceType{
+				{SourceType: shared.LpaEventSourceTypeLpa, Total: 1},
+				{SourceType: shared.LpaEventSourceTypePayment, Total: 1},
+			},
+		},
+	}
+
+	client := &mockGetLpaHistory{}
+	client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, "desc").
+		Return(unfilteredResponse, nil)
+	client.
+		On("GetEvents", mock.Anything, "123", []string(nil), []string{"Lpa", "Payment"}, "asc").
+		Return(filteredResponse, nil)
+
+	template := &mockTemplate{}
+	template.On("Func", mock.Anything, getLpaHistory{
+		Events:              filteredResponse.Events,
+		EventFilterData:     unfilteredResponse.Metadata.SourceTypes,
+		TotalEvents:         unfilteredResponse.Total,
+		TotalFilteredEvents: filteredResponse.Total,
+		IsFiltered:          true,
+		Form: FilterLpaEventsForm{
+			Types: []string{"Lpa", "Payment"},
+			Sort:  "asc",
+		},
+	}).Return(nil)
+
+	server := newMockServer("/lpa-api/v1/persons/{donorId}/events", GetLpaHistory(client, template.Func))
+
+	form := url.Values{
+		"sort": {"asc"},
+		"type": {"Lpa", "Payment"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/lpa-api/v1/persons/123/events", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	_, err := server.serve(r)
+
+	assert.Equal(t, nil, err)
+	mock.AssertExpectationsForObjects(t, client, template)
 }

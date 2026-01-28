@@ -166,7 +166,7 @@ func TestGetLpaEventsFiltered(t *testing.T) {
 				"type":       matchers.Like("INS"),
 				"createdOn":  matchers.Like("2026-01-16T04:10:55+00:00"),
 				"hash":       matchers.Like("JIG"),
-				"owningCase": matchers.Like(map[string]interface{}{ // single object now
+				"owningCase": matchers.Like(map[string]interface{}{
 					"id": matchers.Like(111111),
 				}),
 			}, 1),
