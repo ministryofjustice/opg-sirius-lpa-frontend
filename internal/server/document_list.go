@@ -16,15 +16,17 @@ type DocumentListClient interface {
 	DownloadMultiple(ctx sirius.Context, docIDs []string) (*http.Response, error)
 }
 
-type documentListData struct {
+type documentPageData struct {
 	XSRFToken             string
 	Entity                string
 	Success               bool
 	SuccessMessage        string
 	Error                 sirius.ValidationError
 	DocumentList          sirius.DocumentList
+	Document              sirius.Document
 	SelectedCases         []sirius.Case
 	MultipleCasesSelected bool
+	Comparing             bool
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
@@ -106,7 +108,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			successMessage = successMessageFormatter(r.URL.Query().Get("documentFriendlyName"), r.URL.Query().Get("documentCreatedTime"), "02/01/2006 15:04:05", "02/01/2006")
 		}
 
-		data := documentListData{
+		data := documentPageData{
 			XSRFToken:             ctx.XSRFToken,
 			SelectedCases:         selected,
 			DocumentList:          docs,
@@ -114,6 +116,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			Error:                 validationErr,
 			Success:               isSuccess,
 			SuccessMessage:        successMessage,
+			Comparing:             false,
 		}
 
 		return tmpl(w, data)

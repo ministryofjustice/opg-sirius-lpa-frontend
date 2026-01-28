@@ -1,0 +1,20 @@
+{{ define "viewingDocumnet" }}
+    <div class="govuk-grid-column-one-half">
+        <div class="govuk-body">
+            {{ range .CaseItems }}
+                {{ template "CaseLabel" . }}
+            {{ end }}
+            <strong>{{ (parseAndFormatDate .CreatedDate "02/01/2006 15:04:05" "02/01/2006") }} {{ .FriendlyDescription }}</strong>
+        </div>
+
+        {{ $caseItem := index .CaseItems 0 }}
+        <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ prefix (printf "/donor/%d/documents?uid[]=%s" $caseItem.Donor.ID $caseItem.UID) }}">Back to list</a>
+
+
+        <iframe
+                class="document-viewer-container"
+                src="/lpa-api/v1/documents/{{ .UUID }}/file"
+        >
+        </iframe>
+    </div>
+{{ end }}
