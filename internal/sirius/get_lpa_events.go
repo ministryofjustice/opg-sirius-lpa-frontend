@@ -53,8 +53,8 @@ type EventMetaData struct {
 }
 
 type SourceType struct {
-	SourceType string `json:"sourceType"`
-	Total      int    `json:"total"`
+	SourceType shared.LpaEventSourceType `json:"sourceType"`
+	Total      int                       `json:"total"`
 }
 
 func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string, sourceTypes []string, sortBy string) (LpaEventsResponse, error) {
