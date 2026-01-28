@@ -60,25 +60,23 @@ type SourceType struct {
 func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string, sourceTypes []string, sortBy string) (LpaEventsResponse, error) {
 	var resp LpaEventsResponse
 
-	//TODO: Simplify this logic into a query builder
-	selectedCaseIds := ""
+	query := ""
 	for i, caseId := range caseIds {
 		if i == 0 {
-			selectedCaseIds = selectedCaseIds + "filter=case:" + caseId
+			query = "filter=case:" + caseId
 		} else {
-			selectedCaseIds = selectedCaseIds + ",case:" + caseId
+			query += ",case:" + caseId
 		}
 	}
 
-	filters := ""
-	for i, t := range sourceTypes {
-		if len(caseIds) == 0 && i == 0 {
-			filters = "filter=" + fmt.Sprintf("sourceType:%s", t)
+	for _, sourceType := range sourceTypes {
+		if query == "" {
+			query = "filter=sourceType:" + sourceType
 		} else {
-			filters += fmt.Sprintf(",sourceType:%s", t)
+			query += ",sourceType:" + sourceType
 		}
 	}
 
-	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%s/events?%s%s&sort=id:%s&limit=999", donorId, selectedCaseIds, filters, sortBy), &resp)
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%s/events?%s&sort=id:%s&limit=999", donorId, query, sortBy), &resp)
 	return resp, err
 }
