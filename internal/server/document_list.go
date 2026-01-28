@@ -25,6 +25,7 @@ type documentListData struct {
 	DocumentList          sirius.DocumentList
 	SelectedCases         []sirius.Case
 	MultipleCasesSelected bool
+	Comparing             bool
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
@@ -114,6 +115,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			Error:                 validationErr,
 			Success:               isSuccess,
 			SuccessMessage:        successMessage,
+			Comparing:             false,
 		}
 
 		return tmpl(w, data)
