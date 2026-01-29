@@ -55,11 +55,15 @@ type Client interface {
 	ChangeStatusClient
 	ChangeTrustCorporationDetailsClient
 	ClearTaskClient
+	CompareDocumentClient
+	ComparingDocumentsClient
 	CreateAdditionalDraftClient
 	CreateDocumentClient
+	CreateDocumentDigitalLpaClient
 	CreateDonorClient
 	CreateDraftClient
 	CreateInvestigationClient
+	DeleteDocumentClient
 	DeletePaymentClient
 	DeleteRelationshipClient
 	DocumentListClient
@@ -67,6 +71,7 @@ type Client interface {
 	EditDatesClient
 	EditDocumentClient
 	EditDonorClient
+	EditFeeReductionClient
 	EditInvestigationClient
 	EditPaymentClient
 	EventClient
@@ -95,10 +100,7 @@ type Client interface {
 	UpdateDecisionsClient
 	UpdateObjectionClient
 	ViewDocumentClient
-	DeleteDocumentClient
 	WarningClient
-	CompareDocumentClient
-	ComparingDocumentsClient
 }
 
 var decoder = form.NewDecoder()
@@ -177,8 +179,6 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/donor/{donorId}/history", wrap(GetLpaHistory(client, templates.Get("lpa-history.gohtml"))))
 	mux.Handle("/view-document/{uuid}", wrap(ViewDocument(client, templates.Get("view-document.gohtml"))))
 	mux.Handle("/delete-document/{uuid}", wrap(DeleteDocument(client, templates.Get("delete-document.gohtml"))))
-	mux.Handle("/compare/{id}/documents", wrap(CompareDocument(client, templates.Get("compare-document.gohtml"))))
-	mux.Handle("/comparing-documents", wrap(ComparingDocuments(client, templates.Get("comparing-documents.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))
 	mux.Handle("/assets/{path...}", static)
