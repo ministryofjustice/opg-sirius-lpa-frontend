@@ -26,6 +26,9 @@ describe("View documents", () => {
               uId: "7001-0000-5678",
               caseSubtype: "pfa",
               caseType: "EPA",
+              donor: {
+                id: 33,
+              },
             },
           ],
         },
@@ -55,5 +58,6 @@ describe("View documents", () => {
     cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95");
     cy.contains("7001-0000-5678");
     cy.get(".govuk-button--warning").should("not.exist");
+    cy.get('a:contains("Back to list")').should("exist");
   });
 });
