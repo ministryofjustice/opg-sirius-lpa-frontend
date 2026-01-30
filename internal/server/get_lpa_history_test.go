@@ -269,8 +269,33 @@ func TestPostFiltersLpaHistory(t *testing.T) {
 
 	r, _ := http.NewRequest(http.MethodPost, "/lpa-api/v1/persons/123/events", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
+	r.PostForm = form
 	_, err := server.serve(r)
 
 	assert.Equal(t, nil, err)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostFiltersLpaHistoryWhenFailureOnGetEvents(t *testing.T) {
+	client := &mockGetLpaHistory{}
+
+	client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, "desc").
+		Return(sirius.LpaEventsResponse{}, nil)
+	client.
+		On("GetEvents", mock.Anything, "123", []string(nil), []string{"Lpa", "Payment"}, "asc").
+		Return(sirius.LpaEventsResponse{}, errExample)
+
+	server := newMockServer("/lpa-api/v1/persons/{donorId}/events", GetLpaHistory(client, nil))
+
+	form := url.Values{
+		"sort": {"asc"},
+		"type": {"Lpa", "Payment"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/lpa-api/v1/persons/123/events", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	_, err := server.serve(r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
 }
