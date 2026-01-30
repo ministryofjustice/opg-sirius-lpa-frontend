@@ -269,8 +269,104 @@ func TestPostFiltersLpaHistory(t *testing.T) {
 
 	r, _ := http.NewRequest(http.MethodPost, "/lpa-api/v1/persons/123/events", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
+	r.PostForm = form
 	_, err := server.serve(r)
 
 	assert.Equal(t, nil, err)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostFiltersLpaHistoryWhenFailureOnDecode(t *testing.T) {
+	unfilteredResponse := sirius.LpaEventsResponse{
+		Events: []sirius.LpaEvent{
+			{
+				ID:         103,
+				CreatedOn:  "2025-03-03T12:00:00Z",
+				Type:       "INS",
+				Hash:       "E",
+				SourceType: shared.LpaEventSourceTypeAddress,
+				OwningCase: sirius.OwningCase{
+					ID:       3,
+					CaseType: "LPA",
+				},
+			},
+			{
+				ID:         102,
+				CreatedOn:  "2024-03-02T12:00:00Z",
+				Type:       "UPD",
+				Hash:       "D",
+				SourceType: shared.LpaEventSourceTypePayment,
+				OwningCase: sirius.OwningCase{
+					ID:       4,
+					CaseType: "LPA",
+				},
+			},
+			{
+				ID:         101,
+				CreatedOn:  "2023-03-01T12:00:00Z",
+				Type:       "INS",
+				Hash:       "C",
+				SourceType: shared.LpaEventSourceTypeLpa,
+				OwningCase: sirius.OwningCase{
+					ID:       3,
+					CaseType: "LPA",
+				},
+			},
+		},
+		Limit: 999,
+		Total: 3,
+		Pages: sirius.Pages{},
+		Metadata: sirius.EventMetaData{
+			CaseIds: nil,
+			SourceTypes: []sirius.SourceType{
+				{SourceType: shared.LpaEventSourceTypeLpa, Total: 1},
+				{SourceType: shared.LpaEventSourceTypePayment, Total: 1},
+				{SourceType: shared.LpaEventSourceTypeAddress, Total: 1},
+			},
+		},
+	}
+
+	client := &mockGetLpaHistory{}
+
+	client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, "desc").
+		Return(unfilteredResponse, nil)
+	//client.
+	//	On("GetEvents", mock.Anything, "123", []string(nil), []string{"Lpa", "Payment"}, "asc").
+	//	Return(errExample)
+
+	server := newMockServer("/lpa-api/v1/persons/{donorId}/events", GetLpaHistory(client, nil))
+
+	form := url.Values{}
+	//input some invalid json
+	//r, _ := http.NewRequest(http.MethodPost, "/lpa-api/v1/persons/123/events", strings.NewReader("<invalid json>"))
+	r, _ := http.NewRequest(http.MethodPost, "/lpa-api/v1/persons/123/events", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	_, err := server.serve(r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestPostFiltersLpaHistoryWhenFailureOnGetEvents(t *testing.T) {
+	client := &mockGetLpaHistory{}
+
+	client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, "desc").
+		Return(sirius.LpaEventsResponse{}, nil)
+	client.
+		On("GetEvents", mock.Anything, "456", []string{}, []string{}, "asc").
+		Return(errExample, nil)
+
+	server := newMockServer("/lpa-api/v1/persons/{donorId}/events", GetLpaHistory(client, nil))
+
+	form := url.Values{
+		"sort": {"asc"},
+	}
+
+	r, err2 := http.NewRequest(http.MethodPost, "/lpa-api/v1/persons/123/events", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	_, err := server.serve(r)
+
+	assert.Equal(t, errExample, err2)
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
 }
