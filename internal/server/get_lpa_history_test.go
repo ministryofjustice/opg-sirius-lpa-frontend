@@ -269,6 +269,7 @@ func TestPostFiltersLpaHistory(t *testing.T) {
 
 	r, _ := http.NewRequest(http.MethodPost, "/lpa-api/v1/persons/123/events", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
+	r.PostForm = form
 	_, err := server.serve(r)
 
 	assert.Equal(t, nil, err)
