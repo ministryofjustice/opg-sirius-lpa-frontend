@@ -499,6 +499,7 @@ describe("View LPA history timeline", () => {
     cy.contains("Warning (2)").click();
     cy.contains("Apply filters").click();
 
+    cy.contains("(showing 2 of 4 items)");
     cy.get(".moj-timeline__item")
       .should("have.length", 2)
       .then(($items) => {
