@@ -35,7 +35,7 @@
                 </div>
             {{ else }}
 
-                <p class="moj-pagination__results govuk-!-padding-0 govuk-!-margin-bottom-6">Showing <b>{{ .Pagination.Start }}</b> of <b>{{ .Pagination.End }}</b> results for <b>{{ .SearchTerm }}</b></p>
+                <p class="moj-pagination__results govuk-!-padding-0 govuk-!-margin-bottom-6">Showing <b>{{ .Pagination.Start }}</b> to <b>{{ .Pagination.End }}</b> results for <b>{{ .SearchTerm }}</b></p>
 
                 {{ if eq 0 (len .DeletedCases) }}
                     <table class="govuk-table" data-module="moj-sortable-table">
