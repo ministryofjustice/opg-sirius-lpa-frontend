@@ -90,7 +90,7 @@ describe("Compare documents", () => {
     );
   });
 
-  it("compares documents for a person", () => {
+  it("compares documents for a donor", () => {
     cy.visit(
       "/compare/33/documents?uid[]=dfef6714-b4fe-44c2-b26e-90dfe3663e95",
     );
