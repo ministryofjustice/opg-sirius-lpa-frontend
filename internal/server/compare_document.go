@@ -9,9 +9,8 @@ import (
 )
 
 type CompareDocumentClient interface {
-	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
-	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
+	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
 }
 
 func CompareDocument(client CompareDocumentClient, tmpl template.Template) Handler {
@@ -20,7 +19,7 @@ func CompareDocument(client CompareDocumentClient, tmpl template.Template) Handl
 			return err
 		}
 
-		donorID, err := strconv.Atoi(r.PathValue("id"))
+		donorID, err := strToIntOrStatusError(r.PathValue("id"))
 		if err != nil {
 			return err
 		}
