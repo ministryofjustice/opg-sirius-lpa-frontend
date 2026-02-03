@@ -20,7 +20,7 @@ func CompareDocument(client CompareDocumentClient, tmpl template.Template) Handl
 			return err
 		}
 
-		docUUIDs := r.Form["uid[]"]
+		docUUIDs := r.URL.Query()["uid[]"]
 		ctx := getContext(r)
 
 		documentData, err := client.DocumentByUUID(ctx, docUUIDs[0])
