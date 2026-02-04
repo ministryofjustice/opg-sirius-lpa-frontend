@@ -67,14 +67,6 @@
                     </tr>
                     </thead>
 
-                    {{ $comparingDoc := "" }}
-                    {{ $isComparing := false }}
-                    {{ if eq .Comparing true }}
-                        {{ $comparingDoc = .Document.UUID }}
-                        {{ $isComparing = true }}
-                    {{ end }}
-
-
                     <tbody class="govuk-table__body">
                     {{ range .DocumentList.Documents }}
                         <tr class="govuk-table__row">
@@ -98,8 +90,8 @@
                             <td class="govuk-table__cell" data-sort-value="{{ .FriendlyDescription }}">[{{ .Direction.Translation }}{{ if .NotifyStatus}} - {{ camelcaseToSentence .NotifyStatus }}{{end}}]
                                 <br>
                                 {{ if eq .MimeType "application/pdf"}}
-                                    {{ if eq $isComparing true }}
-                                        <a class="govuk-link" href="{{ prefix (printf "/comparing-documents?docUid[]=%s&docUid[]=%s" .UUID $comparingDoc) }}">{{ .FriendlyDescription }}</a>
+                                    {{ if eq $.Comparing true }}
+                                        <a class="govuk-link" href="{{ prefix (printf "/comparing-documents?docUid[]=%s&docUid[]=%s" .UUID $.Document.UUID) }}">{{ .FriendlyDescription }}</a>
                                         {{else}}
                                         <a class="govuk-link" href="{{ prefix (printf "/view-document/%s" .UUID) }}">{{ .FriendlyDescription }}</a>
                                     {{ end }}
