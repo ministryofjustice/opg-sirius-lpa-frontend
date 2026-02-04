@@ -46,7 +46,7 @@ func TestGetComparingDocument(t *testing.T) {
 		On("Func", mock.Anything, templateData).
 		Return(nil)
 
-	server := newMockServer("/comparing-document", ComparingDocuments(client, template.Func))
+	server := newMockServer("/comparing-document", CompareDocWithDoc(client, template.Func))
 
 	req, _ := http.NewRequest(http.MethodGet, "/comparing-document?docUid[]=dfef6714-b4fe-44c2-b26e-90dfe3663e95&docUid[]=fweq6452-q4az-44c2-b26e-90dfe3679u22", nil)
 	_, err := server.serve(req)
@@ -62,7 +62,7 @@ func TestGetComparingDocumentErrors(t *testing.T) {
 		On("DocumentByUUID", mock.Anything, "dfef6714-b4fe-44c2-b26e-90dfe3663e95").
 		Return(sirius.Document{}, errExample)
 
-	server := newMockServer("/comparing-document", ComparingDocuments(client, nil))
+	server := newMockServer("/comparing-document", CompareDocWithDoc(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/comparing-document?docUid[]=dfef6714-b4fe-44c2-b26e-90dfe3663e95&docUid[]=fweq6452-q4az-44c2-b26e-90dfe3679u22", nil)
 	_, err := server.serve(req)
@@ -85,7 +85,7 @@ func TestGetComparingDocumentWhenGetSecondDocumentErrors(t *testing.T) {
 		On("DocumentByUUID", mock.Anything, "fweq6452-q4az-44c2-b26e-90dfe3679u22").
 		Return(sirius.Document{}, errExample)
 
-	server := newMockServer("/comparing-document", ComparingDocuments(client, nil))
+	server := newMockServer("/comparing-document", CompareDocWithDoc(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/comparing-document?docUid[]=dfef6714-b4fe-44c2-b26e-90dfe3663e95&docUid[]=fweq6452-q4az-44c2-b26e-90dfe3679u22", nil)
 	_, err := server.serve(req)

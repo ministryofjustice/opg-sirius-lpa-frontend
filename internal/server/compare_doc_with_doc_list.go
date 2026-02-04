@@ -8,12 +8,12 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-type CompareDocumentClient interface {
+type CompareDocWithDocListClient interface {
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
 }
 
-func CompareDocument(client CompareDocumentClient, tmpl template.Template) Handler {
+func CompareDocWithDocList(client CompareDocWithDocListClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		donorID, err := strToIntOrStatusError(r.PathValue("id"))
 		if err != nil {

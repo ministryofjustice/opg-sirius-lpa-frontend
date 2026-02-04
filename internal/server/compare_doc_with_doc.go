@@ -7,7 +7,7 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-type ComparingDocumentsClient interface {
+type CompareDocWithDocClient interface {
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 }
 
@@ -18,7 +18,7 @@ type comparingDocumentsData struct {
 	DocumentComparing sirius.Document
 }
 
-func ComparingDocuments(client ComparingDocumentsClient, tmpl template.Template) Handler {
+func CompareDocWithDoc(client CompareDocWithDocClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		docUUIDs := r.URL.Query()["docUid[]"]
 		ctx := getContext(r)

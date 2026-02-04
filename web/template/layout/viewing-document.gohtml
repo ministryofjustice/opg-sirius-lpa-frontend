@@ -10,7 +10,6 @@
         {{ $caseItem := index .CaseItems 0 }}
         <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ prefix (printf "/donor/%d/documents?uid[]=%s" $caseItem.Donor.ID $caseItem.UID) }}">Back to list</a>
 
-
         <iframe
                 class="document-viewer-container"
                 src="/lpa-api/v1/documents/{{ .UUID }}/file"

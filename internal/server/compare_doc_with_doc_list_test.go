@@ -53,7 +53,7 @@ func TestGetCompareDocument(t *testing.T) {
 		On("Func", mock.Anything, templateData).
 		Return(nil)
 
-	server := newMockServer("/comparing-document/{id}", CompareDocument(client, template.Func))
+	server := newMockServer("/comparing-document/{id}", CompareDocWithDocList(client, template.Func))
 
 	req, _ := http.NewRequest(http.MethodGet, "/comparing-document/77?uid[]=dfef6714-b4fe-44c2-b26e-90dfe3663e95", nil)
 	_, err := server.serve(req)
@@ -66,7 +66,7 @@ func TestGetCompareDocumentsBadID(t *testing.T) {
 	client := &mockCompareDocumentClient{}
 	template := &mockTemplate{}
 
-	server := newMockServer("/compare-document/{id}", CompareDocument(client, template.Func))
+	server := newMockServer("/compare-document/{id}", CompareDocWithDocList(client, template.Func))
 
 	req, _ := http.NewRequest(http.MethodGet, "/compare-document/bad-id", nil)
 	_, err := server.serve(req)
@@ -81,7 +81,7 @@ func TestGetCompareDocumentWhenCaseErrors(t *testing.T) {
 		On("DocumentByUUID", mock.Anything, "dfef6714-b4fe-44c2-b26e-90dfe3663e95").
 		Return(sirius.Document{}, errExample)
 
-	server := newMockServer("/compare-document/{id}", CompareDocument(client, nil))
+	server := newMockServer("/compare-document/{id}", CompareDocWithDocList(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/compare-document/81?uid[]=dfef6714-b4fe-44c2-b26e-90dfe3663e95", nil)
 	_, err := server.serve(req)
@@ -104,7 +104,7 @@ func TestGetCompareDocumentWhenGetUserDetailsErrors(t *testing.T) {
 		On("GetPersonDocuments", mock.Anything, 77, []string{"456"}).
 		Return(sirius.DocumentList{}, errExample)
 
-	server := newMockServer("/comparing-document/{id}", CompareDocument(client, nil))
+	server := newMockServer("/comparing-document/{id}", CompareDocWithDocList(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/comparing-document/77?uid[]=dfef6714-b4fe-44c2-b26e-90dfe3663e95", nil)
 	_, err := server.serve(req)
