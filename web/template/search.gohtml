@@ -55,20 +55,16 @@
                                     {{ range $case := .Cases }}
                                         {{ if eq $case.CaseType "DIGITAL_LPA" }}
                                             <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/frontend/lpa/%s" $case.UID) }}">{{ $case.UID }}</a><br>
-                                            <span class="govuk-!-margin-bottom-2 govuk-!-display-inline-block">{{ $case.CaseType }} - {{ subtypeShortFormat $case.SubType }}</span><br>
                                         {{ else if eq (ToLower $r.PersonType) "donor" }}
                                             <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" $r.ID $case.ID) }}">{{ $case.UID }}</a><br>
-                                            <span class="govuk-!-margin-bottom-2 govuk-!-display-inline-block">{{ $case.CaseType }} - {{ subtypeShortFormat $case.SubType }}</span><br>
                                         {{ else if eq (ToLower $r.PersonType) "client" }}
                                             <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/supervision#/clients/%d?order=%d" $r.ID $case.ID) }}">{{ $case.UID }}</a><br>
-                                            <span class="govuk-!-margin-bottom-2 govuk-!-display-inline-block">{{ $case.CaseType }} - {{ subtypeShortFormat $case.SubType }}</span><br>
                                         {{ else if not (eq (ToLower $r.PersonType) "deputy") }}
                                             <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" $case.Donor.ID $case.ID) }}">{{ $case.UID }}</a><br>
-                                            <span class="govuk-!-margin-bottom-2 govuk-!-display-inline-block">{{ $case.CaseType }} - {{ subtypeShortFormat $case.SubType }}</span><br>
                                         {{ else }}
                                             {{ $case.UID }}<br>
-                                            <span class="govuk-!-margin-bottom-2 govuk-!-display-inline-block">{{ $case.CaseType }} - {{ subtypeShortFormat $case.SubType }}</span><br>
                                         {{ end }}
+                                        <span class="govuk-!-margin-bottom-2 govuk-!-display-inline-block">{{ $case.CaseType }} - {{ subtypeShortFormat $case.SubType }}</span><br>
                                     {{ end }}
                                     {{ if eq 0 (len .Cases) }}
                                         Not associated with a case
