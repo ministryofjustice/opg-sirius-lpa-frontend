@@ -4,7 +4,7 @@ import (
 	"math"
 )
 
-const PageLimit = 25
+const PageLimit = 15
 
 type searchRequest struct {
 	Term        string   `json:"term"`
