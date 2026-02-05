@@ -255,7 +255,7 @@ func TestGetDocumentList(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything,
-					documentListData{
+					documentPageData{
 						SelectedCases:         tc.expectedCases,
 						DocumentList:          tc.documentList,
 						MultipleCasesSelected: tc.expectedMultiple,
@@ -356,7 +356,7 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything,
-			documentListData{
+			documentPageData{
 				SelectedCases:         cases,
 				DocumentList:          allDocumentList,
 				MultipleCasesSelected: true,
@@ -403,7 +403,7 @@ func TestDocumentListDismissValidation(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything,
-			documentListData{
+			documentPageData{
 				SelectedCases:         expectedCases,
 				DocumentList:          twoCasesDocumentList,
 				MultipleCasesSelected: true,
@@ -488,7 +488,7 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything,
-			documentListData{
+			documentPageData{
 				SelectedCases:         cases,
 				DocumentList:          singleDocumentList,
 				MultipleCasesSelected: false,
@@ -608,7 +608,7 @@ func TestDocumentListSuccessMessage(t *testing.T) {
 
 			template := &mockTemplate{}
 			template.
-				On("Func", mock.Anything, mock.MatchedBy(func(data documentListData) bool {
+				On("Func", mock.Anything, mock.MatchedBy(func(data documentPageData) bool {
 					return data.Success == tc.expectedSuccess && data.SuccessMessage == tc.expectedMessage
 				})).
 				Return(nil)
