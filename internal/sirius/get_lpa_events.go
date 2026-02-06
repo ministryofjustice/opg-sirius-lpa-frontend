@@ -7,11 +7,11 @@ import (
 )
 
 type LpaEventsResponse struct {
-	Events   []LpaEvent `json:"events"`
-	Limit    int        `json:"limit"`
-	Total    int        `json:"total"`
-	Pages    Pages      `json:"pages"`
-	Metadata any        `json:"metadata"`
+	Events   []LpaEvent    `json:"events"`
+	Limit    int           `json:"limit"`
+	Total    int           `json:"total"`
+	Pages    Pages         `json:"pages"`
+	Metadata EventMetaData `json:"metadata"`
 }
 
 type LpaEvent struct {
@@ -47,18 +47,36 @@ type LpaTeam struct {
 	DisplayName string `json:"displayName,omitempty"`
 }
 
-func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string) (LpaEventsResponse, error) {
+type EventMetaData struct {
+	CaseIds     any          `json:"caseIds"`
+	SourceTypes []SourceType `json:"sourceTypes"`
+}
+
+type SourceType struct {
+	SourceType shared.LpaEventSourceType `json:"sourceType"`
+	Total      int                       `json:"total"`
+}
+
+func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string, sourceTypes []string, sortBy string) (LpaEventsResponse, error) {
 	var resp LpaEventsResponse
 
-	selectedCaseIds := ""
+	query := ""
 	for i, caseId := range caseIds {
 		if i == 0 {
-			selectedCaseIds = selectedCaseIds + "filter=case:" + caseId
+			query = "filter=case:" + caseId
 		} else {
-			selectedCaseIds = selectedCaseIds + ",case:" + caseId
+			query += ",case:" + caseId
 		}
 	}
 
-	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%s/events?%s&sort=id:desc&limit=999", donorId, selectedCaseIds), &resp)
+	for _, sourceType := range sourceTypes {
+		if query == "" {
+			query = "filter=sourceType:" + sourceType
+		} else {
+			query += ",sourceType:" + sourceType
+		}
+	}
+
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%s/events?%s&sort=id:%s&limit=999", donorId, query, sortBy), &resp)
 	return resp, err
 }
