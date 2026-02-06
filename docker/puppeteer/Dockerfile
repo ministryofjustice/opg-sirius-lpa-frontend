@@ -1,14 +1,14 @@
-FROM node:22.12.0-alpine3.19@sha256:40dc4b415c17b85bea9be05314b4a753f45a4e1716bb31c01182e6c53d51a654
+FROM node:22.12.0-alpine3.19
 
 RUN apk add --no-cache \
-      ca-certificates \
-      chromium \
-      harfbuzz \
-      freetype \
-      freetype-dev \
-      nodejs \
-      nss \
-      ttf-freefont
+    ca-certificates \
+    chromium \
+    harfbuzz \
+    freetype \
+    freetype-dev \
+    nodejs \
+    nss \
+    ttf-freefont
 
 # Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \

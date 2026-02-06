@@ -12,7 +12,7 @@ services:
       SIRIUS_PUBLIC_URL: http://sirius-mock:8080
 
   sirius-mock:
-    image: wiremock/wiremock:3.13.2@sha256:8bdd64a25db911ba521a38aebf1590d96767c2d29f3e941e2f496a760bbdf47d
+    image: wiremock/wiremock:3.13.2
     ports: ["8563:8080"]
     volumes:
       - "./cypress/mocks:/home/wiremock/mappings"
@@ -27,7 +27,7 @@ services:
       - LHCI_GITHUB_APP_TOKEN
 
   go-lint:
-    image: golangci/golangci-lint:v2.8.0@sha256:bebcfa63db7df53e417845ed61e4540519cf74fcba22793cdd174b3415a9e4e2
+    image: golangci/golangci-lint:v2.8.0
     working_dir: /go/src/app
     volumes:
       - ./:/go/src/app
@@ -43,7 +43,7 @@ services:
       - ./:/home/node
 
   gosec:
-    image: securego/gosec:latest@sha256:4c42d880c93d9a38771dc130a705bae2480a45a1bb32240249806b12d7641d6d
+    image: securego/gosec:latest
     working_dir: /app
     volumes:
       - .:/app
@@ -59,13 +59,13 @@ services:
       - ./.gocache:/go/pkg/mod
 
   pact:
-    image: pactfoundation/pact-cli:1@sha256:2bac6b611119eb8444b2fc8b7504e8389222386f5ecefb7307b8ba99f5c6223d
+    image: pactfoundation/pact-cli:1
     working_dir: /go/src/app
     volumes:
       - ./pacts:/go/src/app/pacts
 
   trivy:
-    image: aquasec/trivy:latest@sha256:05d0126976bdedcd0782a0336f77832dbea1c81b9cc5e4b3a5ea5d2ec863aca7
+    image: aquasec/trivy:latest
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./.trivy-cache:/root/.cache
@@ -77,7 +77,7 @@ services:
       - TRIVY_PASSWORD=${DOCKER_PASSWORD}
 
   cypress:
-    image: cypress/included:15.9.0@sha256:91111352c3adf4a0ff5bee6f3f49af56a66deb81d74a784dbb68bc98a3fbd26e
+    image: cypress/included:15.9.0
     command: run --browser electron
     entrypoint: cypress
     depends_on:
