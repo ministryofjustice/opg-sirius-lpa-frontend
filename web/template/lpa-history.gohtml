@@ -4,6 +4,70 @@
 
 {{ define "main" }}
     <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-third">
+            <div class="moj-filter" data-module="moj-filter">
+                <div class="moj-filter__header govuk-!-padding-bottom-0 colour-govuk-dark-blue">
+                    <div class="moj-filter__header-title">
+                        <h2 class="govuk-heading-m colour-govuk-white">Filter</h2>
+                        <div class="govuk-body colour-govuk-white">
+                            {{ if or (not .IsFiltered) (eq .TotalFilteredEvents .TotalEvents) }}
+                                (showing all {{ .TotalEvents }} items)
+                            {{ else }}
+                                (showing {{ .TotalFilteredEvents }} of {{ .TotalEvents }} items)
+                            {{ end }}
+                        </div>
+                    </div>
+                </div>
+                <div class="moj-filter__content">
+                    <div class="moj-filter__options">
+                        <form class="form" method="POST">
+                            <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+                            <button type="submit" class="govuk-button" data-module="govuk-button" data-test-id="submit-button">
+                                Apply filters
+                            </button>
+                            <div class="govuk-form-group">
+                                <fieldset class="govuk-fieldset">
+                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                        Sort By
+                                    </legend>
+                                    <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                                        <div class="govuk-radios__item">
+                                            <input class="govuk-radios__input" id="f-desc"
+                                                   name="sort" type="radio" value="desc" {{if eq .Form.Sort "desc"}}checked{{end}}>
+                                            <label class="govuk-label govuk-radios__label" for="f-desc">Descending</label>
+                                        </div>
+                                        <div class="govuk-radios__item">
+                                            <input class="govuk-radios__input" id="f-asc"
+                                                   name="sort" type="radio" value="asc" {{if eq .Form.Sort "asc"}}checked{{end}}>
+                                            <label class="govuk-label govuk-radios__label" for="f-asc">Ascending</label>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="govuk-form-group">
+                                <fieldset class="govuk-fieldset">
+                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                        Type
+                                    </legend>
+                                    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                        {{ range .EventFilterData }}
+                                            <div class="govuk-checkboxes__item">
+                                                <input class="govuk-checkboxes__input" id="f-{{ .SourceType.Key }}"
+                                                       name="type" type="checkbox" value="{{ .SourceType.Key }}" {{ if contains $.Form.Types .SourceType.Key }}checked{{ end }}>
+                                                <label class="govuk-label govuk-checkboxes__label" for="f-{{ .SourceType.Key }}">
+                                                    {{ .SourceType.Translation }} ({{ .Total }})
+                                                </label>
+                                            </div>
+                                        {{ end }}
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="govuk-grid-column-two-thirds">
             <div class="moj-timeline">
                 {{ range .Events }}
