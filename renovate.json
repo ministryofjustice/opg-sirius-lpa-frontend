@@ -3,38 +3,57 @@
   "extends": [
     "config:recommended",
     "schedule:earlyMondays",
-    "helpers:pinGitHubActionDigests",
-    "docker:pinDigests"
+    "helpers:pinGitHubActionDigests"
   ],
   "branchNameStrict": true,
   "branchPrefix": "renovate-",
   "commitMessageAction": "Renovate Update",
-  "labels": ["Dependencies", "Renovate"],
+  "labels": [
+    "Dependencies",
+    "Renovate"
+  ],
   "configMigration": true,
-  "postUpdateOptions": ["gomodTidy"],
+  "postUpdateOptions": [
+    "gomodTidy"
+  ],
   "packageRules": [
     {
       "automerge": true,
       "groupName": "Patch & Minor Updates",
       "groupSlug": "all-minor-patch-updates",
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "prPriority": 1,
       "minimumReleaseAge": "3 days",
-      "matchPackageNames": ["*"]
+      "matchPackageNames": [
+        "*"
+      ]
     },
     {
       "automerge": true,
       "groupName": "Github Patch & Minor Updates",
       "groupSlug": "github-minor-patch-updates",
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "prPriority": 2,
       "minimumReleaseAge": "3 days",
-      "matchPackageNames": ["*"],
-      "matchFileNames": [".github/**"]
+      "matchPackageNames": [
+        "*"
+      ],
+      "matchFileNames": [
+        ".github/**"
+      ]
     }
   ],
   "major": {
-    "labels": ["Dependencies", "Renovate"],
+    "labels": [
+      "Dependencies",
+      "Renovate"
+    ],
     "minimumReleaseAge": "3 days"
   },
   "vulnerabilityAlerts": {
