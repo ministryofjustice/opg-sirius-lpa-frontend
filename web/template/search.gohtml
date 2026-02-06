@@ -45,7 +45,6 @@
                             <th scope="col" class="govuk-table__header">Name/Role</th>
                             <th scope="col" class="govuk-table__header">Date of birth</th>
                             <th scope="col" class="govuk-table__header govuk-!-width-one-third">Address</th>
-                            <th scope="col" class="govuk-table__header">Type</th>
                             <th scope="col" class="govuk-table__header">Status</th>
                         </tr>
                         </thead>
@@ -62,7 +61,10 @@
                                             <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/supervision#/clients/%d?order=%d" $r.ID $case.ID) }}">{{ $case.UID }}</a><br>
                                         {{ else if not (eq (ToLower $r.PersonType) "deputy") }}
                                             <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/person/%d/%d" $case.Donor.ID $case.ID) }}">{{ $case.UID }}</a><br>
+                                        {{ else }}
+                                            {{ $case.UID }}<br>
                                         {{ end }}
+                                        <span class="govuk-!-margin-bottom-2 govuk-!-display-inline-block">{{ $case.CaseType }} - {{ subtypeShortFormat $case.SubType }}</span><br>
                                     {{ end }}
                                     {{ if eq 0 (len .Cases) }}
                                         Not associated with a case
@@ -96,13 +98,8 @@
                                 <td class="govuk-table__cell">{{ .AddressSummary }}</td>
                                 <td class="govuk-table__cell table-cell-nowrap">
                                     {{ range $case := .Cases }}
-                                        {{ $case.CaseType }} - {{ subtypeShortFormat $case.SubType }}<br>
-                                    {{ end }}
-                                </td>
-                                <td class="govuk-table__cell table-cell-nowrap">
-                                    {{ range $case := .Cases }}
                                         {{ if $case.Status }}
-                                            <strong class="govuk-tag govuk-tag--{{ $case.Status.Colour }} sirius-govuk-tag__status">
+                                            <strong class="govuk-tag govuk-tag--{{ $case.Status.Colour }} sirius-govuk-tag__status govuk-!-margin-bottom-5">
                                                 {{ $case.Status.ReadableString }}
                                             </strong><br>
                                         {{ end }}
