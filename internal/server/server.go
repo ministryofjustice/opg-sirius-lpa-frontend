@@ -57,6 +57,7 @@ type Client interface {
 	ClearTaskClient
 	CompareDocWithDocListClient
 	CompareDocWithDocClient
+	CompareDocListWithDocListClient
 	CreateAdditionalDraftClient
 	CreateDocumentClient
 	CreateDocumentDigitalLpaClient
@@ -181,6 +182,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/delete-document/{uuid}", wrap(DeleteDocument(client, templates.Get("delete-document.gohtml"))))
 	mux.Handle("/compare/{id}/documents", wrap(CompareDocWithDocList(client, templates.Get("compare-doc-with-doc-list.gohtml"))))
 	mux.Handle("/comparing-documents", wrap(CompareDocWithDoc(client, templates.Get("compare-doc-with-doc.gohtml"))))
+	mux.Handle("/compare/{id}/lists/{caseId}", wrap(CompareDocListWithDocList(client, templates.Get("compare-doc-list-with-doc-list.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))
 	mux.Handle("/assets/{path...}", static)
