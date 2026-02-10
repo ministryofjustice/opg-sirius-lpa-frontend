@@ -1,19 +1,19 @@
 {{ define "viewingDocument" }}
-    <div class="govuk-grid-column-one-half">
         <div class="govuk-body">
-            {{ range .CaseItems }}
+            {{ range .Document.CaseItems }}
                 {{ template "CaseLabel" . }}
             {{ end }}
-            <strong>{{ (parseAndFormatDate .CreatedDate "02/01/2006 15:04:05" "02/01/2006") }} {{ .FriendlyDescription }}</strong>
+            <strong>{{ (parseAndFormatDate .Document.CreatedDate "02/01/2006 15:04:05" "02/01/2006") }} {{ .Document.FriendlyDescription }}</strong>
         </div>
 
-        {{ $caseItem := index .CaseItems 0 }}
-        <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ prefix (printf "/donor/%d/documents?uid[]=%s" $caseItem.Donor.ID $caseItem.UID) }}">Back to list</a>
+        <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
+           href="{{ prefix .BackURL }}">
+            Back to list
+        </a>
 
         <iframe
                 class="document-viewer-container"
-                src="/lpa-api/v1/documents/{{ .UUID }}/file"
+                src="/lpa-api/v1/documents/{{ .Document.UUID }}/file"
         >
         </iframe>
-    </div>
 {{ end }}

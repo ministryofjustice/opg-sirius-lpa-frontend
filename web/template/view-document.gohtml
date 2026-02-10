@@ -22,7 +22,11 @@
                 Delete
             </a>
             {{ end }}
-            <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ prefix (printf "/compare/%d/documents?uid[]=%s" $caseItem.Donor.ID .Document.UUID) }}">Compare</a>
+{{/*            <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ prefix (printf "/compare/%d/documents?uid[]=%s" $caseItem.Donor.ID .Document.UUID) }}">Compare</a>*/}}
+            <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
+               href="{{ prefix (printf "/compare/%d/%d?docUid[]=%s" $caseItem.Donor.ID $caseItem.ID .Document.UUID) }}">
+                Compare
+            </a>
 
             <iframe
                     class="document-viewer-container"

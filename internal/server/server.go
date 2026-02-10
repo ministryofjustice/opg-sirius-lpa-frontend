@@ -55,6 +55,7 @@ type Client interface {
 	ChangeStatusClient
 	ChangeTrustCorporationDetailsClient
 	ClearTaskClient
+	CompareDocsClient
 	CompareDocWithDocListClient
 	CompareDocWithDocClient
 	CompareDocListWithDocListClient
@@ -183,6 +184,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/compare/{id}/documents", wrap(CompareDocWithDocList(client, templates.Get("compare-doc-with-doc-list.gohtml"))))
 	mux.Handle("/comparing-documents", wrap(CompareDocWithDoc(client, templates.Get("compare-doc-with-doc.gohtml"))))
 	mux.Handle("/compare/{id}/lists/{caseId}", wrap(CompareDocListWithDocList(client, templates.Get("compare-doc-list-with-doc-list.gohtml"))))
+	mux.Handle("/compare/{id}/{caseId}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))
 	mux.Handle("/assets/{path...}", static)

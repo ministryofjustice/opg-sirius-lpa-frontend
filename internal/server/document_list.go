@@ -27,6 +27,8 @@ type documentPageData struct {
 	SelectedCases         []sirius.Case
 	MultipleCasesSelected bool
 	Comparing             bool
+	CompareBaseURL        string
+	DocUUIDs              []string
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
