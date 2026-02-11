@@ -28,6 +28,7 @@ type Document struct {
 	ChildCount          int                      `json:"childCount"`
 	CaseItems           []Case                   `json:"caseItems,omitempty"`
 	NotifyStatus        string                   `json:"notifyStatus,omitempty"`
+	Persons             []Person                 `json:"persons,omitempty"`
 }
 
 type DocumentList struct {
