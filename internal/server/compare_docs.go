@@ -15,14 +15,15 @@ type CompareDocsClient interface {
 }
 
 type compareDocsData struct {
-	DocListData documentPageData
-	Pane1       string
-	Pane2       string
-	Document1   sirius.Document
-	Document2   sirius.Document
-	View1       *viewingDocumentData
-	View2       *viewingDocumentData
-	docUUIDs    []string
+	DocListPane1Data documentPageData
+	DocListPane2Data documentPageData
+	Pane1            string
+	Pane2            string
+	Document1        sirius.Document
+	Document2        sirius.Document
+	View1            *viewingDocumentData
+	View2            *viewingDocumentData
+	docUUIDs         []string
 }
 
 type viewingDocumentData struct {
@@ -32,19 +33,21 @@ type viewingDocumentData struct {
 	DocUUIDs []string
 }
 
-func compareURL(donorID int, caseID string, uuids []string) string {
-	base := fmt.Sprintf("/compare/%d/%s", donorID, caseID)
+func compareURL(donorID int, caseID string, panes map[string]string) string {
+	baseUrl := fmt.Sprintf("/compare/%d/%s", donorID, caseID)
 
-	if len(uuids) == 0 {
-		return base
+	query := url.Values{}
+	for key, value := range panes {
+		if value != "" {
+			query.Set(key, value)
+		}
 	}
 
-	q := url.Values{}
-	for _, u := range uuids {
-		q.Add("docUid[]", u)
+	if len(query) == 0 {
+		return baseUrl
 	}
 
-	return base + "?" + q.Encode()
+	return baseUrl + "?" + query.Encode()
 }
 
 func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
@@ -65,32 +68,56 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 		selected := docs.Documents[0].CaseItems
 
 		data := compareDocsData{
-			DocListData: documentPageData{
+			DocListPane1Data: documentPageData{
 				XSRFToken:     ctx.XSRFToken,
 				DocumentList:  docs,
 				SelectedCases: selected,
 				Comparing:     true,
+				TargetPane:    1,
+			},
+			DocListPane2Data: documentPageData{
+				XSRFToken:     ctx.XSRFToken,
+				DocumentList:  docs,
+				SelectedCases: selected,
+				Comparing:     true,
+				TargetPane:    2,
 			},
 			Pane1: "list",
 			Pane2: "list",
 		}
 
-		docUUIDs := r.URL.Query()["docUid[]"]
-		data.docUUIDs = docUUIDs
+		pane1UUID := r.URL.Query().Get("pane1")
+		pane2UUID := r.URL.Query().Get("pane2")
 
-		data.DocListData.CompareBaseURL = fmt.Sprintf(
+		data.DocListPane1Data.CompareBaseURL = fmt.Sprintf(
 			"/compare/%d/%s",
 			donorID,
 			caseID,
 		)
-		data.DocListData.DocUUIDs = docUUIDs
+		data.DocListPane2Data.CompareBaseURL = fmt.Sprintf(
+			"/compare/%d/%s",
+			donorID,
+			caseID,
+		)
 
-		switch len(docUUIDs) {
-		case 0:
-		//	remains the same (list and list already set)
+		data.DocListPane1Data.CompareURLs = make(map[string]string)
+		for _, doc := range docs.Documents {
+			data.DocListPane1Data.CompareURLs[doc.UUID] = compareURL(donorID, caseID, map[string]string{
+				"pane1": doc.UUID,
+				"pane2": pane2UUID,
+			})
+		}
 
-		case 1:
-			doc, err := client.DocumentByUUID(ctx, docUUIDs[0])
+		data.DocListPane2Data.CompareURLs = make(map[string]string)
+		for _, doc := range docs.Documents {
+			data.DocListPane2Data.CompareURLs[doc.UUID] = compareURL(donorID, caseID, map[string]string{
+				"pane1": pane1UUID,
+				"pane2": doc.UUID,
+			})
+		}
+
+		if pane1UUID != "" && pane2UUID == "" {
+			doc, err := client.DocumentByUUID(ctx, pane1UUID)
 			if err != nil {
 				return err
 			}
@@ -99,34 +126,50 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 			data.View1 = &viewingDocumentData{
 				Document: doc,
 				Pane:     1,
-				BackURL:  compareURL(donorID, caseID, nil),
-				DocUUIDs: docUUIDs,
+				BackURL:  compareURL(donorID, caseID, map[string]string{}),
 			}
+		}
 
-		default:
-			doc1, err := client.DocumentByUUID(ctx, docUUIDs[0])
+		if pane1UUID == "" && pane2UUID != "" {
+			doc, err := client.DocumentByUUID(ctx, pane2UUID)
 			if err != nil {
 				return err
 			}
 
-			doc2, err := client.DocumentByUUID(ctx, docUUIDs[1])
+			data.Pane2 = "doc"
+			data.View2 = &viewingDocumentData{
+				Document: doc,
+				Pane:     2,
+				BackURL:  compareURL(donorID, caseID, map[string]string{}),
+			}
+		}
+
+		if pane1UUID != "" && pane2UUID != "" {
+			doc1, err := client.DocumentByUUID(ctx, pane1UUID)
+			if err != nil {
+				return err
+			}
+			doc2, err := client.DocumentByUUID(ctx, pane2UUID)
 			if err != nil {
 				return err
 			}
 
 			data.Pane1 = "doc"
-			data.Pane2 = "doc"
 			data.View1 = &viewingDocumentData{
 				Document: doc1,
 				Pane:     1,
-				BackURL:  compareURL(donorID, caseID, []string{docUUIDs[0]}),
-				DocUUIDs: docUUIDs,
+				BackURL: compareURL(donorID, caseID, map[string]string{
+					"pane2": pane2UUID,
+				}),
 			}
+
+			data.Pane2 = "doc"
 			data.View2 = &viewingDocumentData{
 				Document: doc2,
 				Pane:     2,
-				BackURL:  compareURL(donorID, caseID, []string{docUUIDs[1]}),
-				DocUUIDs: docUUIDs,
+				BackURL: compareURL(donorID, caseID, map[string]string{
+					"pane1": pane1UUID,
+				}),
 			}
 		}
 

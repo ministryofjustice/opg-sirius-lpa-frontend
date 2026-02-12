@@ -29,6 +29,8 @@ type documentPageData struct {
 	Comparing             bool
 	CompareBaseURL        string
 	DocUUIDs              []string
+	TargetPane            int
+	CompareURLs           map[string]string
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
