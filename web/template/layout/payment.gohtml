@@ -58,6 +58,51 @@
                                 </a>
                             </th>
                         </tr>
+
+                        <!-- POC Test Buttons -->
+                        <tr class="govuk-table__row">
+                            <td colspan="2" class="govuk-table__cell">
+                                <div style="border: 3px solid #1d70b8; padding: 15px; margin-top: 20px; background-color: #f3f2f1;">
+                                    <h3 class="govuk-heading-s" style="margin-top: 0;">POC: Delete Pattern Tests</h3>
+
+                                    <!-- Test 1: Full page confirmation (no JS) - USES EXISTING ENDPOINT -->
+                                    <div style="margin-bottom: 10px;">
+                                        <a class="govuk-button govuk-button--warning"
+                                           href="{{ prefix (printf "/delete-payment?id=%d" .ID) }}"
+                                           style="margin-bottom: 0;">
+                                            TEST 1: Delete Payment (full page no-js)
+                                        </a>
+                                    </div>
+
+                                    <!-- Test 2: Alert message with page refresh (no JS) - NEW ENDPOINT -->
+                                    <div style="margin-bottom: 10px;">
+                                        <form method="post" action="{{ prefix (printf "/delete-payment/alert?id=%d" .ID) }}">
+                                            <input type="hidden" name="xsrfToken" value="{{ $.XSRFToken }}" />
+                                            <button type="submit" class="govuk-button govuk-button--warning" style="margin-bottom: 0;">
+                                                TEST 2: Delete Payment (alert message no-js)
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Test 3: Alert message with HTMX (with JS) - SAME ENDPOINT AS TEST 2 -->
+                                    <div>
+                                        <!-- Form that HTMX will intercept -->
+                                        <form method="post" action="{{ prefix (printf "/delete-payment/alert?id=%d" .ID) }}"
+                                              hx-post="{{ prefix (printf "/delete-payment/alert?id=%d" .ID) }}"
+                                              hx-target="#alert-container-{{ .ID }}"
+                                              hx-swap="innerHTML">
+                                            <input type="hidden" name="xsrfToken" value="{{ $.XSRFToken }}" />
+                                            <button type="submit" class="govuk-button govuk-button--warning" style="margin-bottom: 0;">
+                                                TEST 3: Delete Payment (alert with HTMX)
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Container for HTMX alert response -->
+                                    <div id="alert-container-{{ .ID }}"></div>
+                                </div>
+                            </td>
+                        </tr>
                     {{ end }}
                     </tbody>
                 </table>
