@@ -91,24 +91,7 @@
                                 <br>
                                 {{ if eq .MimeType "application/pdf"}}
                                     {{ if eq $.Comparing true }}
-                                        {{ $uids := $.DocUUIDs }}
-                                        {{ if eq (len $uids) 0 }}
-                                            <a class="govuk-link"
-                                               href="{{ prefix (printf "%s?docUid[]=%s" $.CompareBaseURL .UUID) }}">
-                                                {{ .FriendlyDescription }}
-                                            </a>
-                                        {{ else if eq (len $uids) 1 }}
-                                            <a class="govuk-link"
-                                               href="{{ prefix (printf "%s?docUid[]=%s&docUid[]=%s" $.CompareBaseURL (index $uids 0) .UUID) }}">
-                                                {{ .FriendlyDescription }}
-                                            </a>
-                                        {{ else }}
-                                            <a class="govuk-link"
-                                               href="{{ prefix (printf "%s?docUid[]=%s&docUid[]=%s" $.CompareBaseURL (index $uids 0) .UUID) }}">
-                                                {{ .FriendlyDescription }}
-                                            </a>
-                                        {{ end }}
-
+                                        <a class="govuk-link" href="{{ prefix ( index $.CompareURLs .UUID )}}">{{ .FriendlyDescription }}</a>
                                     {{else}}
                                         <a class="govuk-link" href="{{ prefix (printf "/view-document/%s" .UUID) }}">{{ .FriendlyDescription }}</a>
                                     {{ end }}

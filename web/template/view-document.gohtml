@@ -29,7 +29,7 @@
             {{ end }}
 
             <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
-               href="{{ prefix (printf "/compare/%d/%d?docUid[]=%s" $caseItem.Donor.ID $caseItem.ID .Document.UUID) }}">
+               href="{{ prefix (printf "/compare/%d/%d?pane1=%s" $caseItem.Donor.ID $caseItem.ID .Document.UUID) }}">
                 Compare
             </a>
 
