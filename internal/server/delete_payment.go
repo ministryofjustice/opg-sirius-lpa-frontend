@@ -57,6 +57,11 @@ func DeletePaymentAlert(client DeletePaymentAlertClient, tmpl template.Template,
 			return fragmentTmpl(w, data)
 		}
 
+		// Test 4: redirect back to payments page with confirm param so alert shows inline
+		if r.FormValue("mode") == "inline" {
+			return RedirectError(fmt.Sprintf("/payments/%d?confirm=%d#alert-container-%d", p.Case.ID, p.ID, p.ID))
+		}
+
 		return tmpl(w, data)
 	}
 }
