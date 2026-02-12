@@ -48,10 +48,7 @@ describe("View documents", () => {
     cy.get('a:contains("Back to list")')
       .should("exist")
       .should("have.attr", "href")
-      .and(
-        "include",
-        "/donor/33/documents?uid[]=7001-0000-5678",
-      );
+      .and("include", "/donor/33/documents?uid[]=7001-0000-5678");
     cy.get('a:contains("Download")')
       .should("exist")
       .should("have.attr", "href")
@@ -75,10 +72,7 @@ describe("View documents", () => {
     cy.get('a:contains("Back to list")')
       .should("exist")
       .should("have.attr", "href")
-      .and(
-        "include",
-        "/donor/33/documents?uid[]=7001-0000-5678",
-      );
+      .and("include", "/donor/33/documents?uid[]=7001-0000-5678");
     cy.get('a:contains("Download")')
       .should("exist")
       .should("have.attr", "href")
@@ -96,7 +90,9 @@ describe("View documents", () => {
       },
     });
     cy.addMock(
-      "/lpa-api/v1/documents/e5b5acd1-c11c-41fe-a921-7fdd07e8f670", "GET", {
+      "/lpa-api/v1/documents/e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
+      "GET",
+      {
         status: 200,
         body: {
           createdDate: "15/12/2022 13:41:04",
@@ -116,10 +112,7 @@ describe("View documents", () => {
     cy.get('a:contains("Back to list")')
       .should("exist")
       .should("have.attr", "href")
-      .and(
-        "include",
-        "/donor/33/documents",
-      );
+      .and("include", "/donor/33/documents");
     cy.get('a:contains("Download")')
       .should("exist")
       .should("have.attr", "href")

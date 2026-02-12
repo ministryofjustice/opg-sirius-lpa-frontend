@@ -1,6 +1,5 @@
 describe("Compare documents", () => {
   beforeEach(() => {
-
     let $documentWithCase = {
       createdDate: "15/12/2022 13:41:04",
       friendlyDescription:
@@ -17,26 +16,25 @@ describe("Compare documents", () => {
           },
         },
       ],
-    }
+    };
 
     let $documentWithoutCase = {
       createdDate: "15/12/2022 13:41:04",
-      friendlyDescription:
-        "Dr Consuela Aysien - A document not linked to case",
+      friendlyDescription: "Dr Consuela Aysien - A document not linked to case",
       uuid: "e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
       persons: [
         {
           id: 33,
         },
       ],
-    }
+    };
 
     cy.addMock(
       "/lpa-api/v1/documents/dfef6714-b4fe-44c2-b26e-90dfe3663e95",
       "GET",
       {
         status: 200,
-        body: $documentWithCase
+        body: $documentWithCase,
       },
     );
 
@@ -56,10 +54,7 @@ describe("Compare documents", () => {
         status: 200,
         body: {
           total: 2,
-          documents: [
-            $documentWithCase,
-            $documentWithoutCase
-          ],
+          documents: [$documentWithCase, $documentWithoutCase],
         },
       },
     );
@@ -71,10 +66,7 @@ describe("Compare documents", () => {
         status: 200,
         body: {
           total: 2,
-          documents: [
-            $documentWithCase,
-            $documentWithoutCase,
-          ],
+          documents: [$documentWithCase, $documentWithoutCase],
         },
       },
     );
@@ -86,12 +78,9 @@ describe("Compare documents", () => {
     );
     cy.contains("7001-0000-5678");
     cy.get("#main-content > :nth-child(1) > .govuk-button")
-    .contains("Back to list")
+      .contains("Back to list")
       .should("have.attr", "href")
-      .and(
-        "include",
-        "/donor/33/documents?uid[]=7001-0000-5678",
-      );
+      .and("include", "/donor/33/documents?uid[]=7001-0000-5678");
     cy.get(".govuk-table__head .govuk-table__row").within(() => {
       cy.get("th").eq(0).should("contain", "Select");
       cy.get("th").eq(1).should("contain", "Name");
@@ -107,10 +96,7 @@ describe("Compare documents", () => {
     cy.get("#main-content > :nth-child(1) > .govuk-button")
       .contains("Back to list")
       .should("have.attr", "href")
-      .and(
-        "include",
-        "/donor/33/documents",
-      );
+      .and("include", "/donor/33/documents");
     cy.get(".govuk-table__head .govuk-table__row").within(() => {
       cy.get("th").eq(0).should("contain", "Select");
       cy.get("th").eq(1).should("contain", "Name");
@@ -132,12 +118,12 @@ describe("Compare documents", () => {
         "include",
         "/compare/33/documents?uid[]=dfef6714-b4fe-44c2-b26e-90dfe3663e95",
       );
-      cy.get("#main-content > :nth-child(2) > .govuk-button")
+    cy.get("#main-content > :nth-child(2) > .govuk-button")
       .contains("Back to list")
       .should("have.attr", "href")
       .and(
         "include",
         "/compare/33/documents?uid[]=e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
       );
-  })
+  });
 });
