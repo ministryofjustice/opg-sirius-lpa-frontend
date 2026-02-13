@@ -1,5 +1,6 @@
 import * as MOJFrontend from "@ministryofjustice/frontend";
 import * as GOVUKFrontend from "govuk-frontend";
+import "htmx.org";
 import "opg-sirius-search-ui";
 import autoResizeTextArea from "./auto-resize-text-area.js";
 import loadingButton from "./loading-button.js";
@@ -42,41 +43,41 @@ showHideCaseSummary();
 disableAfterClick();
 
 if (window.self !== window.parent) {
-  const success = document.querySelector('[data-app-reload~="page"]');
-  if (success) {
-    window.parent.postMessage(
-      "form-done",
-      `${window.location.protocol}//${window.location.host}`,
-    );
-  }
+    const success = document.querySelector('[data-app-reload~="page"]');
+    if (success) {
+        window.parent.postMessage(
+            "form-done",
+            `${window.location.protocol}//${window.location.host}`,
+        );
+    }
 
-  document.querySelectorAll("[data-app-iframe-cancel]").forEach((el) => {
-    el.addEventListener("click", (event) => {
-      window.parent.postMessage(
-        "form-cancel",
-        `${window.location.protocol}//${window.location.host}`,
-      );
-      event.preventDefault();
+    document.querySelectorAll("[data-app-iframe-cancel]").forEach((el) => {
+        el.addEventListener("click", (event) => {
+            window.parent.postMessage(
+                "form-cancel",
+                `${window.location.protocol}//${window.location.host}`,
+            );
+            event.preventDefault();
+        });
     });
-  });
 
-  const saveAndExit = document.querySelector(
-    '[data-app-reload~="saveAndExit"]',
-  );
-  if (saveAndExit) {
-    window.parent.postMessage(
-      "form-cancel",
-      `${window.location.protocol}//${window.location.host}`,
+    const saveAndExit = document.querySelector(
+        '[data-app-reload~="saveAndExit"]',
     );
-  }
+    if (saveAndExit) {
+        window.parent.postMessage(
+            "form-cancel",
+            `${window.location.protocol}//${window.location.host}`,
+        );
+    }
 
-  const reloadTimeline = document.querySelector(
-    '[data-app-reload~="reload-timeline"]',
-  );
-  if (reloadTimeline) {
-    window.parent.postMessage(
-      "reload-timeline",
-      `${window.location.protocol}//${window.location.host}`,
+    const reloadTimeline = document.querySelector(
+        '[data-app-reload~="reload-timeline"]',
     );
-  }
+    if (reloadTimeline) {
+        window.parent.postMessage(
+            "reload-timeline",
+            `${window.location.protocol}//${window.location.host}`,
+        );
+    }
 }
