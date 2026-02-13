@@ -12,7 +12,7 @@ RUN npm ci --ignore-scripts
 COPY web/assets web/assets
 RUN npm run build
 
-FROM golang:1.25.7-alpine AS dev
+FROM golang:1.26.0-alpine AS dev
 
 WORKDIR /app
 
