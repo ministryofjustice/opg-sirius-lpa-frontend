@@ -63,8 +63,13 @@ func (c *Client) Search(ctx Context, term string, page int, personTypeFilters []
 		return v, nil, err
 	}
 
+	totalItems := 0
+	for _, personTypeCount := range v.Aggregations.PersonType {
+		totalItems += personTypeCount
+	}
+
 	return v, &Pagination{
-		TotalItems:  v.Total.Count,
+		TotalItems:  totalItems,
 		CurrentPage: page,
 		TotalPages:  int(math.Ceil(float64(v.Total.Count) / float64(PageLimit))),
 		PageSize:    PageLimit,

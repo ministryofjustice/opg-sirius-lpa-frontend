@@ -6,7 +6,7 @@ describe("Search", () => {
         body: {
           aggregations: {
             personType: {
-              Donor: 2,
+              Donor: 3,
               Deputy: 1,
             },
           },
@@ -110,7 +110,7 @@ describe("Search", () => {
       cy.visit("/search?term=bob");
 
       cy.contains("Showing 1 to 4 results for bob");
-      cy.contains("Donor (2)");
+      cy.contains("Donor (3)");
       cy.contains("Deputy (1)");
     });
 
@@ -198,6 +198,39 @@ describe("Search", () => {
       $row.should("contain", "LPA");
       $row.should("contain", "Deleted");
       $row.should("contain", "7000-0000-5555");
+    });
+  });
+
+  describe("Shows total of aggregates as total results", () => {
+    beforeEach(() => {
+      cy.addMock("/lpa-api/v1/search/persons", "POST", {
+        status: 200,
+        body: {
+          total: {
+            count: 10000,
+          },
+          aggregations: {
+            personType: {
+              "Attorney": 243012,
+              "Certificate Provider": 107910,
+              "Client": 1910,
+              "Contact": 315,
+              "Correspondent": 184581,
+              "Deputy": 1536,
+              "Donor": 121810,
+              "Non-Case Contact": 2310,
+              "Notified Person": 10132,
+              "Replacement Attorney": 37970,
+              "Trust Corporation": 284
+            }
+          },
+        },
+      });
+      cy.visit("/search?term=bob");
+    });
+
+    it("show correct total cases", () => {
+      cy.contains("Showing 1 to 15 of 711770 results");
     });
   });
 });
