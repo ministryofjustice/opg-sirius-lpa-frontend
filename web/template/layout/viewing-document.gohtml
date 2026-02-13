@@ -7,8 +7,15 @@
             <strong>{{ (parseAndFormatDate .CreatedDate "02/01/2006 15:04:05" "02/01/2006") }} {{ .FriendlyDescription }}</strong>
         </div>
 
-        {{ $caseItem := index .CaseItems 0 }}
-        <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" href="{{ prefix (printf "/donor/%d/documents?uid[]=%s" $caseItem.Donor.ID $caseItem.UID) }}">Back to list</a>
+
+        {{ if gt (len .CaseItems) 0 }}
+            {{ $caseItem := index .CaseItems 0 }}
+            {{ $donor := $caseItem.Donor }}
+            <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2" href="{{ prefix (printf "/compare/%d/documents?uid[]=%s" $donor.ID .UUID) }}">Back to list</a>
+        {{ else }}
+            {{ $donor := index .Persons 0 }}
+            <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2" href="{{ prefix (printf "/compare/%d/documents?uid[]=%s" $donor.ID .UUID ) }}">Back to list</a>
+        {{ end }}
 
         <iframe
                 class="document-viewer-container"

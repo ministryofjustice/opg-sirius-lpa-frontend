@@ -111,3 +111,41 @@ func TestGetCompareDocumentWhenGetUserDetailsErrors(t *testing.T) {
 
 	assert.Equal(t, errExample, err)
 }
+
+func TestGetCompareDocumentWhenNoCasesOnDoc(t *testing.T) {
+	document := sirius.Document{
+		ID:   1,
+		UUID: "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+	}
+	documentList := sirius.DocumentList{
+		Documents: []sirius.Document{document},
+	}
+
+	client := &mockCompareDocumentClient{}
+	client.
+		On("DocumentByUUID", mock.Anything, document.UUID).
+		Return(document, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 77, []string{}).
+		Return(documentList, nil)
+
+	template := &mockTemplate{}
+	templateData := documentPageData{
+		DocumentList:  documentList,
+		Document:      document,
+		SelectedCases: []sirius.Case{},
+		Comparing:     true,
+	}
+
+	template.
+		On("Func", mock.Anything, templateData).
+		Return(nil)
+
+	server := newMockServer("/comparing-document/{id}", CompareDocWithDocList(client, template.Func))
+
+	req, _ := http.NewRequest(http.MethodGet, "/comparing-document/77?uid[]=dfef6714-b4fe-44c2-b26e-90dfe3663e95", nil)
+	_, err := server.serve(req)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
