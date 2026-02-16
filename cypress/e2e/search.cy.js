@@ -211,18 +211,18 @@ describe("Search", () => {
           },
           aggregations: {
             personType: {
-              "Attorney": 243012,
+              Attorney: 243012,
               "Certificate Provider": 107910,
-              "Client": 1910,
-              "Contact": 315,
-              "Correspondent": 184581,
-              "Deputy": 1536,
-              "Donor": 121810,
+              Client: 1910,
+              Contact: 315,
+              Correspondent: 184581,
+              Deputy: 1536,
+              Donor: 121810,
               "Non-Case Contact": 2310,
               "Notified Person": 10132,
               "Replacement Attorney": 37970,
-              "Trust Corporation": 284
-            }
+              "Trust Corporation": 284,
+            },
           },
         },
       });
