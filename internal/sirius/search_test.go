@@ -232,4 +232,5 @@ func TestSearchShowsAggregateTotalItems(t *testing.T) {
 	}
 	assert.Equal(t, pagination, &expectedPagination)
 	assert.Equal(t, results, searchResponse)
+	assert.Nil(t, err)
 }
