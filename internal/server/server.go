@@ -56,6 +56,11 @@ type Client interface {
 	ChangeTrustCorporationDetailsClient
 	ClearTaskClient
 	CompareDocsClient
+<<<<<<< HEAD
+=======
+	CompareDocWithDocListClient
+	CompareDocWithDocClient
+>>>>>>> 5c4e6ca (refactor code)
 	CreateAdditionalDraftClient
 	CreateDocumentClient
 	CreateDocumentDigitalLpaClient
