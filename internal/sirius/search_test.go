@@ -1,8 +1,11 @@
 package sirius
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"testing"
 
@@ -10,6 +13,7 @@ import (
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestSearch(t *testing.T) {
@@ -179,4 +183,53 @@ func TestSearch(t *testing.T) {
 			}))
 		})
 	}
+}
+
+type mockSearchHttpClient struct {
+	mock.Mock
+}
+
+func (m *mockSearchHttpClient) Do(req *http.Request) (*http.Response, error) {
+	args := m.Called(req)
+	return args.Get(0).(*http.Response), args.Error(1)
+}
+
+func TestSearchShowsAggregateTotalItems(t *testing.T) {
+
+	mockClient := &mockSearchHttpClient{}
+	var searchResultsBody bytes.Buffer
+	aggregations := map[string]int{
+		"Donor":                3,
+		"Attorney":             2,
+		"Certificate Provider": 2,
+	}
+	searchResponse := SearchResponse{
+		Total: SearchTotal{
+			Count: 7,
+		},
+		Aggregations: Aggregations{
+			PersonType: aggregations,
+		},
+	}
+	err := json.NewEncoder(&searchResultsBody).Encode(searchResponse)
+	if err != nil {
+		t.Fatal("Could not compile search response json")
+	}
+	respForSearch := http.Response{
+		StatusCode: 200,
+		Body:       io.NopCloser(bytes.NewReader(searchResultsBody.Bytes())),
+	}
+	mockClient.On("Do", mock.Anything).Return(&respForSearch, nil)
+	client := NewClient(mockClient, "http://localhost:8888")
+
+	results, pagination, err := client.Search(Context{Context: context.Background()}, "searchTerm", 1, []string{})
+
+	expectedPagination := Pagination{
+		TotalItems:  7,
+		CurrentPage: 1,
+		TotalPages:  1,
+		PageSize:    15,
+	}
+	assert.Equal(t, pagination, &expectedPagination)
+	assert.Equal(t, results, searchResponse)
 }
