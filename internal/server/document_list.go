@@ -27,9 +27,6 @@ type documentPageData struct {
 	SelectedCases         []sirius.Case
 	MultipleCasesSelected bool
 	Comparing             bool
-	CompareBaseURL        string
-	DocUUIDs              []string
-	TargetPane            int
 	CompareURLs           map[string]string
 }
 
