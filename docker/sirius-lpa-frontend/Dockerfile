@@ -53,20 +53,28 @@ COPY internal internal
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} go build -a -installsuffix cgo -o /go/bin/opg-sirius-lpa-frontend
 
-FROM alpine:3
+FROM build-env AS healthcheck-build
+WORKDIR /app
+
+COPY healthcheck healthcheck
+
+WORKDIR /app/healthcheck
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /go/bin/healthcheck
+
+FROM scratch
 
 WORKDIR /go/bin
 
-RUN apk update \
-    && apk add --no-cache ca-certificates tzdata \
-    && apk upgrade --no-cache busybox libcrypto3 libssl3
+COPY --from=build-env /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=build-env /usr/share/zoneinfo /usr/share/zoneinfo
 
 COPY --from=build-env /go/bin/opg-sirius-lpa-frontend opg-sirius-lpa-frontend
+COPY --from=healthcheck-build /go/bin/healthcheck healthcheck
 COPY --from=asset-env /app/web/static web/static
 COPY web/template web/template
 
-RUN addgroup -S app && \
-    adduser -S -g app app && \
-    chown -R app:app opg-sirius-lpa-frontend web/template web/static
-USER app
+USER 65532
+
+HEALTHCHECK --interval=5s --timeout=5s --start-period=5s --retries=3 CMD [ "/go/bin/healthcheck" ]
+
 ENTRYPOINT ["./opg-sirius-lpa-frontend"]
