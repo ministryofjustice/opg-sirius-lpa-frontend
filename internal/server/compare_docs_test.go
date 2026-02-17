@@ -313,6 +313,32 @@ func TestGetCompareDocsWhenCase1Errors(t *testing.T) {
 	assert.Equal(t, errExample, err)
 }
 
+func TestGetCompareDocsWhenCase2Errors(t *testing.T) {
+	document := sirius.Document{
+		ID:        1,
+		UUID:      "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+		CaseItems: []sirius.Case{{ID: 456}},
+	}
+	documentList := sirius.DocumentList{
+		Documents: []sirius.Document{document},
+	}
+
+	client := &mockCompareDocsClient{}
+	client.
+		On("GetPersonDocuments", mock.Anything, 77, []string{"456"}).
+		Return(documentList, nil)
+	client.
+		On("DocumentByUUID", mock.Anything, "dfef6714-b4fe-44c2-b26e-90dfe3663e95").
+		Return(sirius.Document{}, errExample)
+
+	server := newMockServer("/compare/{id}/{caseId}", CompareDocs(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/compare/77/456?pane2=dfef6714-b4fe-44c2-b26e-90dfe3663e95", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, errExample, err)
+}
+
 func TestGetCompareDocsBadID(t *testing.T) {
 	client := &mockCompareDocsClient{}
 	template := &mockTemplate{}
