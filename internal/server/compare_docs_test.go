@@ -200,6 +200,79 @@ func TestGetCompareDocs(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestGetCompareDocsPane1Pane2(t *testing.T) {
+	document1 := sirius.Document{
+		ID:        1,
+		UUID:      "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+		CaseItems: []sirius.Case{{ID: 456}},
+	}
+	document2 := sirius.Document{
+		ID:        2,
+		UUID:      "agyq4619-j3yq-88b1-p95d-03hes5772k46",
+		CaseItems: []sirius.Case{{ID: 456}},
+	}
+	documentList := sirius.DocumentList{
+		Documents: []sirius.Document{document1, document2},
+	}
+
+	client := &mockCompareDocsClient{}
+	client.
+		On("GetPersonDocuments", mock.Anything, 77, []string{"456"}).
+		Return(documentList, nil)
+	client.
+		On("DocumentByUUID", mock.Anything, document1.UUID).
+		Return(document1, nil)
+	client.
+		On("DocumentByUUID", mock.Anything, document2.UUID).
+		Return(document2, nil)
+
+	template := &mockTemplate{}
+	templateData := compareDocsData{
+		DocListPane1Data: documentPageData{
+			DocumentList:  documentList,
+			SelectedCases: document1.CaseItems,
+			Comparing:     true,
+			CompareURLs: map[string]string{
+				"agyq4619-j3yq-88b1-p95d-03hes5772k46": "/compare/77/456?pane1=agyq4619-j3yq-88b1-p95d-03hes5772k46&pane2=agyq4619-j3yq-88b1-p95d-03hes5772k46",
+				"dfef6714-b4fe-44c2-b26e-90dfe3663e95": "/compare/77/456?pane1=dfef6714-b4fe-44c2-b26e-90dfe3663e95&pane2=agyq4619-j3yq-88b1-p95d-03hes5772k46",
+			},
+		},
+		DocListPane2Data: documentPageData{
+			DocumentList:  documentList,
+			SelectedCases: document1.CaseItems,
+			Comparing:     true,
+			CompareURLs: map[string]string{
+				"agyq4619-j3yq-88b1-p95d-03hes5772k46": "/compare/77/456?pane2=agyq4619-j3yq-88b1-p95d-03hes5772k46&pane1=dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+				"dfef6714-b4fe-44c2-b26e-90dfe3663e95": "/compare/77/456?pane2=dfef6714-b4fe-44c2-b26e-90dfe3663e95&pane1=dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+			},
+		},
+		Pane1: "doc",
+		Pane2: "doc",
+		View1: &viewingDocumentData{
+			Document: document1,
+			Pane:     1,
+			BackURL:  "/compare/77/456?pane2=agyq4619-j3yq-88b1-p95d-03hes5772k46",
+		},
+		View2: &viewingDocumentData{
+			Document: document2,
+			Pane:     2,
+			BackURL:  "/compare/77/456?pane1=dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+		},
+	}
+
+	template.
+		On("Func", mock.Anything, templateData).
+		Return(nil)
+
+	server := newMockServer("/compare/{id}/{caseId}", CompareDocs(client, template.Func))
+
+	req, _ := http.NewRequest(http.MethodGet, "/compare/77/456?pane1=dfef6714-b4fe-44c2-b26e-90dfe3663e95&pane2=agyq4619-j3yq-88b1-p95d-03hes5772k46", nil)
+	_, err := server.serve(req)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestGetCompareDocsWhenGetUserDetailsErrors(t *testing.T) {
 	client := &mockCompareDocsClient{}
 	client.
@@ -235,32 +308,6 @@ func TestGetCompareDocsWhenCase1Errors(t *testing.T) {
 	server := newMockServer("/compare/{id}/{caseId}", CompareDocs(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/compare/77/456?pane1=dfef6714-b4fe-44c2-b26e-90dfe3663e95", nil)
-	_, err := server.serve(req)
-
-	assert.Equal(t, errExample, err)
-}
-
-func TestGetCompareDocsWhenCase2Errors(t *testing.T) {
-	document := sirius.Document{
-		ID:        1,
-		UUID:      "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-		CaseItems: []sirius.Case{{ID: 456}},
-	}
-	documentList := sirius.DocumentList{
-		Documents: []sirius.Document{document},
-	}
-
-	client := &mockCompareDocsClient{}
-	client.
-		On("GetPersonDocuments", mock.Anything, 77, []string{"456"}).
-		Return(documentList, nil)
-	client.
-		On("DocumentByUUID", mock.Anything, "dfef6714-b4fe-44c2-b26e-90dfe3663e95").
-		Return(sirius.Document{}, errExample)
-
-	server := newMockServer("/compare/{id}/{caseId}", CompareDocs(client, nil))
-
-	req, _ := http.NewRequest(http.MethodGet, "/compare/77/456?pane2=dfef6714-b4fe-44c2-b26e-90dfe3663e95", nil)
 	_, err := server.serve(req)
 
 	assert.Equal(t, errExample, err)
