@@ -19,6 +19,19 @@ describe("Create Digital LPA draft", () => {
       },
     });
 
+    cy.addMock(`/lpa-api/v1/digital-lpas/M-ABCD-1234-EF56`, "GET", {
+      status: 200,
+      body: {
+        "opg.poas.sirius": {
+          donor: {
+            id: 33,
+            firstname: "Coleen Stephanie",
+            surname: "Morneault",
+          },
+        },
+      },
+    });
+
     cy.visit("/digital-lpa/create");
   });
 
