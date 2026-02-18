@@ -327,6 +327,12 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		},
 		"formatEventType": formatEventType,
 		"eventTypeColor":  eventTypeColor,
+		"stringifyBool": func(b bool) string {
+			if b {
+				return "true"
+			}
+			return "false"
+		},
 	}
 }
 

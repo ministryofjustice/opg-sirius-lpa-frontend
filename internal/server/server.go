@@ -40,6 +40,7 @@ func getContext(r *http.Request) sirius.Context {
 
 type Client interface {
 	AddComplaintClient
+	AddEpaAttorneyClient
 	AddFeeDecisionClient
 	AddObjectionClient
 	AddPaymentClient
@@ -62,6 +63,7 @@ type Client interface {
 	CreateDocumentDigitalLpaClient
 	CreateDonorClient
 	CreateDraftClient
+	CreateEpaClient
 	CreateInvestigationClient
 	DeleteDocumentClient
 	DeletePaymentClient
@@ -98,6 +100,7 @@ type Client interface {
 	TaskClient
 	UnlinkPersonClient
 	UpdateDecisionsClient
+	UpdateEpaClient
 	UpdateObjectionClient
 	ViewDocumentClient
 	WarningClient
@@ -121,9 +124,12 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/lpa/{uid}/change-draft", wrap(ChangeDraft(client, templates.Get("change-draft.gohtml"))))
 	mux.Handle("/lpa/{uid}/manage-restrictions", wrap(ManageRestrictions(client, templates.Get("manage-restrictions.gohtml"), templates.Get("confirm-restrictions.gohtml"))))
 	mux.Handle("/add-objection", wrap(AddObjection(client, templates.Get("objection.gohtml"))))
+	mux.Handle("/add-epa-attorney", wrap(AddEpaAttorney(client, templates.Get("add_epa_attorney.gohtml"))))
 	mux.Handle("/change-donor-details", wrap(ChangeDonorDetails(client, templates.Get("change-donor-details.gohtml"))))
 	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning.gohtml"))))
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"))))
+	mux.Handle("/create-epa", wrap(CreateEpa(client, templates.Get("create_epa.gohtml"))))
+	mux.Handle("/edit-epa", wrap(UpdateEpa(client, templates.Get("edit_epa.gohtml"))))
 	mux.Handle("/create-task", wrap(Task(client, templates.Get("task.gohtml"))))
 	mux.Handle("/create-additional-draft-lpa", wrap(CreateAdditionalDraft(client, templates.Get("create_additional_draft.gohtml"))))
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("relationship.gohtml"))))
