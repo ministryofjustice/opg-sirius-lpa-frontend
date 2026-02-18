@@ -332,6 +332,12 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				DonorID:  donorID,
 			}
 		},
+		"stringifyBool": func(b bool) string {
+			if b {
+				return "true"
+			}
+			return "false"
+		},
 	}
 }
 

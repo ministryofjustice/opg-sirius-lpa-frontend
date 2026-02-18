@@ -372,3 +372,14 @@ $govuk-assets-path: "../assets/";
 .app-table__header--date {
   width: 8em;
 }
+
+.app-heading-with-link {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.app-heading-with-link__link {
+  padding-bottom: 20px;
+}
