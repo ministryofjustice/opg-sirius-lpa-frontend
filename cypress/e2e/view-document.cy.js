@@ -36,7 +36,7 @@ describe("View documents", () => {
     );
   });
 
-  it("on a person", () => {
+  it("views a document as a user with system admin role", () => {
     cy.addMock("/lpa-api/v1/users/current", "GET", {
       status: 200,
       body: {
@@ -45,7 +45,10 @@ describe("View documents", () => {
     });
     cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95");
     cy.contains("7001-0000-5678");
-    cy.get('a:contains("Back to list")').should("exist");
+    cy.get('a:contains("Back to list")')
+      .should("exist")
+      .should("have.attr", "href")
+      .and("include", "/donor/33/documents?uid[]=7001-0000-5678");
     cy.get('a:contains("Download")')
       .should("exist")
       .should("have.attr", "href")
@@ -56,7 +59,7 @@ describe("View documents", () => {
     cy.get(".govuk-button--warning").contains("Delete");
   });
 
-  it("on a person with no System admin roll", () => {
+  it("views a document as a user without system admin role", () => {
     cy.addMock("/lpa-api/v1/users/current", "GET", {
       status: 200,
       body: {
@@ -66,13 +69,56 @@ describe("View documents", () => {
     cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95");
     cy.contains("7001-0000-5678");
     cy.get(".govuk-button--warning").should("not.exist");
-    cy.get('a:contains("Back to list")').should("exist");
+    cy.get('a:contains("Back to list")')
+      .should("exist")
+      .should("have.attr", "href")
+      .and("include", "/donor/33/documents?uid[]=7001-0000-5678");
     cy.get('a:contains("Download")')
       .should("exist")
       .should("have.attr", "href")
       .and(
         "include",
         "/lpa-api/v1/documents/dfef6714-b4fe-44c2-b26e-90dfe3663e95/download",
+      );
+  });
+
+  it("views a document linked to a person not a case", () => {
+    cy.addMock("/lpa-api/v1/users/current", "GET", {
+      status: 200,
+      body: {
+        roles: ["OPG User"],
+      },
+    });
+    cy.addMock(
+      "/lpa-api/v1/documents/e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
+      "GET",
+      {
+        status: 200,
+        body: {
+          createdDate: "15/12/2022 13:41:04",
+          friendlyDescription:
+            "Dr Consuela Aysien - LPA perfect + reg due date: applicant",
+          uuid: "e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
+          persons: [
+            {
+              id: 33,
+            },
+          ],
+        },
+      },
+    );
+    cy.visit("/view-document/e5b5acd1-c11c-41fe-a921-7fdd07e8f670");
+    cy.get(".govuk-button--warning").should("not.exist");
+    cy.get('a:contains("Back to list")')
+      .should("exist")
+      .should("have.attr", "href")
+      .and("include", "/donor/33/documents");
+    cy.get('a:contains("Download")')
+      .should("exist")
+      .should("have.attr", "href")
+      .and(
+        "include",
+        "/lpa-api/v1/documents/e5b5acd1-c11c-41fe-a921-7fdd07e8f670/download",
       );
   });
 });

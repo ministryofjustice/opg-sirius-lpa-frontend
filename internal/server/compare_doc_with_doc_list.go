@@ -28,18 +28,26 @@ func CompareDocWithDocList(client CompareDocWithDocListClient, tmpl template.Tem
 			return err
 		}
 
-		docs, err := client.GetPersonDocuments(ctx, donorID, []string{strconv.Itoa(documentData.CaseItems[0].ID)})
+		caseItems := []sirius.Case{}
+		if len(documentData.CaseItems) > 0 {
+			caseItems = documentData.CaseItems
+		}
+
+		caseIDs := []string{}
+		for _, caseItem := range caseItems {
+			caseIDs = append(caseIDs, strconv.Itoa(caseItem.ID))
+		}
+
+		docs, err := client.GetPersonDocuments(ctx, donorID, caseIDs)
 		if err != nil {
 			return err
 		}
-
-		selected := documentData.CaseItems
 
 		data := documentPageData{
 			XSRFToken:     ctx.XSRFToken,
 			DocumentList:  docs,
 			Document:      documentData,
-			SelectedCases: selected,
+			SelectedCases: caseItems,
 			Comparing:     true,
 		}
 
