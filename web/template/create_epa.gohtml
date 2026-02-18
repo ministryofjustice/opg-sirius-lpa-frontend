@@ -1,0 +1,52 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create EPA{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+
+      <h1 class="govuk-heading-l">{{ if .Case.ID }}Update EPA{{ else }}Create EPA{{ end }}</h1>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+            {{ if .Epa.EpaDonorSignatureDate }}
+              {{ template "input-date" (field "epaDonorSignatureDate" "Date that the donor signed the Enduring Power of Attorney in Part B:" .Epa.EpaDonorSignatureDate .Error.Field.epaDonorSignatureDate) }}
+            {{ else }}
+              {{ template "input-date" (field "epaDonorSignatureDate" "Date that the donor signed the Enduring Power of Attorney in Part B:" .Case.StatusDate .Error.Field.epaDonorSignatureDate) }}
+            {{ end }}
+
+            {{ template "input-date" (field "epaDonorNoticeGivenDate" "Latest notification date given for applying to register this EPA" .Epa.EpaDonorNoticeGivenDate .Error.Field.epaDonorNoticeGivenDate) }}
+
+            {{ template "radios" (radios "donorHasOtherEpas" "To your knowledge has the donor made any other Enduring Powers of Attorney?" (or (stringifyBool .Epa.DonorHasOtherEpas) (stringifyBool .Case.DonorHasOtherEpas)) .Error.Field.donorHasOtherEpas
+            (item "true" "Yes")
+            (item "false" "No")
+            ) }}
+
+            {{ if .Epa.ReceiptDate }}
+              {{ template "input-date" (field "receiptDate" "Receipt date" .Epa.ReceiptDate .Error.Field.epaReceiptDate "max" today) }}
+            {{ else }}
+              {{ template "input-date" (field "receiptDate" "Receipt date" .Case.ReceiptDate .Error.Field.epaReceiptDate "max" today) }}
+            {{ end }}
+
+            {{ if .Epa.RegistrationDate }}
+              {{ template "input-date" (field "registrationDate" "Registration date" .Epa.RegistrationDate .Error.Field.epaRegistrationDate "max" today) }}
+            {{ else }}
+              {{ template "input-date" (field "registrationDate" "Registration date" .Case.RegistrationDate .Error.Field.epaRegistrationDate "max" today) }}
+            {{ end }}
+
+            {{ if .Epa.DispatchDate }}
+              {{ template "input-date" (field "dispatchDate" "Dispatch date" .Epa.DispatchDate .Error.Field.epaDispatchDate "max" today) }}
+            {{ else }}
+              {{ template "input-date" (field "dispatchDate" "Dispatch date" .Case.DispatchDate .Error.Field.epaDispatchDate "max" today) }}
+            {{ end }}
+
+        <div class="govuk-button-group govuk-!-padding-top-5">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save changes and exit</button>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ if .Case.ID }}{{ prefix (printf "/edit-epa?caseId=%d" .Case.ID) }}{{ else }}#{{ end }}">Cancel changes and exit</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
