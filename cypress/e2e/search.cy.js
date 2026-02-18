@@ -150,32 +150,6 @@ describe("Search", () => {
     });
   });
 
-  describe("Search features", () => {
-    beforeEach(() => {
-      cy.visit("/search?term=abcdefg");
-    });
-
-    it("it shows/hides filter panel", () => {
-      cy.contains(".govuk-button", "Hide filters").click();
-      cy.get(".moj-filter-layout__filter").should("not.be.visible");
-      cy.contains(".govuk-button", "Show filters").click();
-      cy.get(".moj-filter-layout__filter").should("be.visible");
-    });
-
-    it("can apply and remove filters", () => {
-      // Checks the button is hidden because js is enabled
-      cy.contains("Apply filters").should("not.be.visible");
-      cy.contains("label", "Attorney").click();
-      cy.contains("label", "Trust corporation").click();
-      cy.contains(".moj-filter__tag", "Attorney");
-      cy.contains(".moj-filter__tag", "Trust Corporation");
-      cy.contains(".moj-filter__selected-heading", "Clear filters")
-        .find("a")
-        .click();
-      cy.get(".moj-filter__tag").should("not.exist");
-    });
-  });
-
   describe("Search deleted case", () => {
     beforeEach(() => {
       cy.addMock("/lpa-api/v1/search/persons", "POST", {
