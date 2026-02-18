@@ -400,6 +400,12 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				Context:  context,
 			}
 		},
+		"stringifyBool": func(b bool) string {
+			if b {
+				return "true"
+			}
+			return "false"
+		},
 	}
 }
 
