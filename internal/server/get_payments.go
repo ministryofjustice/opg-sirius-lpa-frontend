@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"strconv"
 
 	"golang.org/x/sync/errgroup"
 
@@ -20,21 +21,22 @@ type GetPaymentsClient interface {
 type getPaymentsData struct {
 	XSRFToken string
 
-	CaseSummary       sirius.CaseSummary
-	Case              sirius.Case
-	Payments          []sirius.Payment
-	FeeReductions     []sirius.Payment
-	Refunds           []sirius.Payment
-	PaymentSources    []sirius.RefDataItem
-	ReferenceTypes    []sirius.RefDataItem
-	FeeReductionTypes []sirius.RefDataItem
-	IsReducedFeesUser bool
-	IsSysAdminUser    bool
-	TotalPaid         int
-	TotalRefunds      int
-	OutstandingFee    int
-	RefundAmount      int
-	FlashMessage      FlashNotification
+	CaseSummary            sirius.CaseSummary
+	Case                   sirius.Case
+	Payments               []sirius.Payment
+	FeeReductions          []sirius.Payment
+	Refunds                []sirius.Payment
+	PaymentSources         []sirius.RefDataItem
+	ReferenceTypes         []sirius.RefDataItem
+	FeeReductionTypes      []sirius.RefDataItem
+	IsReducedFeesUser      bool
+	IsSysAdminUser         bool
+	TotalPaid              int
+	TotalRefunds           int
+	OutstandingFee         int
+	RefundAmount           int
+	FlashMessage           FlashNotification
+	ConfirmDeletePaymentID int
 }
 
 func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
@@ -138,6 +140,11 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		}
 
 		data.FlashMessage, _ = GetFlash(w, r)
+
+		// Test 4: if confirm param present, show inline delete alert for that payment
+		if confirm := r.URL.Query().Get("confirm"); confirm != "" {
+			data.ConfirmDeletePaymentID, _ = strconv.Atoi(confirm)
+		}
 
 		return tmpl(w, data)
 	}

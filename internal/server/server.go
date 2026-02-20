@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -105,6 +106,20 @@ type Client interface {
 
 var decoder = form.NewDecoder()
 
+// getTemplateFragment executes a specific named template instead of always "page".
+// Used for HTMX requests that need a fragment rather than the full page layout.
+func getTemplateFragment(tmpls template.Templates, filename string, templateName string) template.Template {
+	tmpl := tmpls[filename]
+	if tmpl == nil {
+		return func(wr io.Writer, data interface{}) error {
+			return template.MissingError(filename)
+		}
+	}
+	return func(wr io.Writer, data interface{}) error {
+		return tmpl.ExecuteTemplate(wr, templateName, data)
+	}
+}
+
 func New(logger *slog.Logger, client Client, templates template.Templates, prefix, siriusPublicURL, webDir string) http.Handler {
 	wrap := errorHandler(templates.Get("error.gohtml"), prefix, siriusPublicURL)
 	mux := http.NewServeMux()
@@ -148,6 +163,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/mi-reporting", wrap(MiReporting(client, templates.Get("mi_reporting.gohtml"))))
 	mux.Handle("/add-payment", wrap(AddPayment(client, templates.Get("add_payment.gohtml"))))
 	mux.Handle("/delete-payment", wrap(DeletePayment(client, templates.Get("delete_payment.gohtml"))))
+	mux.Handle("/delete-payment/alert", wrap(DeletePaymentAlert(client, templates.Get("delete_payment_alert.gohtml"), getTemplateFragment(templates, "delete_payment_alert.gohtml", "alert-fragment"))))
 	mux.Handle("/manage-fees", wrap(AddFeeDecision(client, templates.Get("manage_fees.gohtml"))))
 	mux.Handle("/add-fee-decision", wrap(AddFeeDecision(client, templates.Get("add_fee_decision.gohtml"))))
 	mux.Handle("/apply-fee-reduction", wrap(ApplyFeeReduction(client, templates.Get("apply_fee_reduction.gohtml"))))
@@ -390,7 +406,7 @@ func translateRefData(types []sirius.RefDataItem, tmplHandle string) string {
 
 func setCSPHeader(h http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Security-Policy", "default-src 'self'; img-src 'self' data: s3.eu-west-1.amazonaws.com")
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: s3.eu-west-1.amazonaws.com")
 
 		h.ServeHTTP(w, r)
 	}
