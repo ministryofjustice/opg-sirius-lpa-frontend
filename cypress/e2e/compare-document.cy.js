@@ -73,14 +73,12 @@ describe("Compare documents", () => {
   });
 
   it("shows document alongside document list when first selecting compare", () => {
-    cy.visit(
-      "/compare/33/documents?uid[]=dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-    );
+    cy.visit("/compare/33/34?pane1=dfef6714-b4fe-44c2-b26e-90dfe3663e95");
     cy.contains("7001-0000-5678");
     cy.get("#main-content > :nth-child(1) > .govuk-button")
       .contains("Back to list")
       .should("have.attr", "href")
-      .and("include", "/donor/33/documents?uid[]=7001-0000-5678");
+      .and("include", "/compare/33/34");
     cy.get(".govuk-table__head .govuk-table__row").within(() => {
       cy.get("th").eq(0).should("contain", "Select");
       cy.get("th").eq(1).should("contain", "Name");
@@ -90,13 +88,12 @@ describe("Compare documents", () => {
   });
 
   it("shows document not linked to a case alongside document list when first selecting compare", () => {
-    cy.visit(
-      "/compare/33/documents?uid[]=e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
-    );
+    //need to revisit this
+    cy.visit("/compare/33/34?pane1=e5b5acd1-c11c-41fe-a921-7fdd07e8f670");
     cy.get("#main-content > :nth-child(1) > .govuk-button")
       .contains("Back to list")
       .should("have.attr", "href")
-      .and("include", "/donor/33/documents");
+      .and("include", "/compare/33/34");
     cy.get(".govuk-table__head .govuk-table__row").within(() => {
       cy.get("th").eq(0).should("contain", "Select");
       cy.get("th").eq(1).should("contain", "Name");
@@ -107,7 +104,7 @@ describe("Compare documents", () => {
 
   it("shows two documents alongside each other", () => {
     cy.visit(
-      "comparing-documents?docUid[]=dfef6714-b4fe-44c2-b26e-90dfe3663e95&docUid[]=e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
+      "compare/33/34?pane1=dfef6714-b4fe-44c2-b26e-90dfe3663e95&pane2=e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
     );
     cy.contains("7001-0000-5678");
     cy.contains("A document not linked to case");
@@ -116,14 +113,50 @@ describe("Compare documents", () => {
       .should("have.attr", "href")
       .and(
         "include",
-        "/compare/33/documents?uid[]=dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+        "/compare/33/34?pane2=e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
       );
     cy.get("#main-content > :nth-child(2) > .govuk-button")
       .contains("Back to list")
       .should("have.attr", "href")
       .and(
         "include",
-        "/compare/33/documents?uid[]=e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
+        "/compare/33/34?pane1=dfef6714-b4fe-44c2-b26e-90dfe3663e95",
       );
+  });
+
+  it("shows one document in view on the right", () => {
+    cy.visit("compare/33/34?pane2=e5b5acd1-c11c-41fe-a921-7fdd07e8f670");
+    cy.contains("7001-0000-5678");
+    cy.contains("A document not linked to case");
+    cy.get("#main-content > :nth-child(2) > .govuk-button")
+      .contains("Back to list")
+      .should("have.attr", "href")
+      .and("include", "/compare/33/34");
+  });
+
+  it("shows two lists", () => {
+    cy.visit("compare/33/34");
+    cy.contains("7001-0000-5678");
+    cy.get(".govuk-grid-column-one-half")
+      .eq(0)
+      .find("button")
+      .contains("Download")
+      .should("exist");
+
+    cy.get(".govuk-grid-column-one-half")
+      .eq(0)
+      .find("table.govuk-table")
+      .should("exist");
+
+    cy.get(".govuk-grid-column-one-half")
+      .eq(1)
+      .find("button")
+      .contains("Download")
+      .should("exist");
+
+    cy.get(".govuk-grid-column-one-half")
+      .eq(1)
+      .find("table.govuk-table")
+      .should("exist");
   });
 });
