@@ -15,17 +15,18 @@ type LpaEventsResponse struct {
 }
 
 type LpaEvent struct {
-	Changes    any                       `json:"changeSet,omitempty"`
-	CreatedOn  string                    `json:"createdOn"`
-	Entity     any                       `json:"entity,omitempty"`
-	Assignee   LpaEventUser              `json:"assignee,omitempty"`
-	User       LpaEventUser              `json:"user,omitempty"`
-	Hash       string                    `json:"hash"`
-	OwningCase OwningCase                `json:"owningCase,omitempty"`
-	ID         int                       `json:"id,omitempty"`
-	UID        string                    `json:"uuid,omitempty"`
-	SourceType shared.LpaEventSourceType `json:"sourceType"`
-	Type       string                    `json:"type,omitempty"`
+	Changes        any                       `json:"changeSet,omitempty"`
+	CreatedOn      string                    `json:"createdOn"`
+	Entity         any                       `json:"entity,omitempty"`
+	Assignee       LpaEventUser              `json:"assignee,omitempty"`
+	User           LpaEventUser              `json:"user,omitempty"`
+	Hash           string                    `json:"hash"`
+	OwningCase     OwningCase                `json:"owningCase,omitempty"`
+	ID             int                       `json:"id,omitempty"`
+	UID            string                    `json:"uuid,omitempty"`
+	SourceType     shared.LpaEventSourceType `json:"sourceType"`
+	Type           string                    `json:"type,omitempty"`
+	SourceDocument SourceDocument            `json:"sourceDocument,omitempty"`
 }
 
 type OwningCase struct {
@@ -55,6 +56,15 @@ type EventMetaData struct {
 type SourceType struct {
 	SourceType shared.LpaEventSourceType `json:"sourceType"`
 	Total      int                       `json:"total"`
+}
+
+type SourceDocument struct {
+	ID                  int    `json:"id"`
+	UUID                string `json:"uuid"`
+	FriendlyDescription string `json:"friendlyDescription"`
+	CreatedDate         string `json:"createdDate"`
+	Filename            string `json:"filename"`
+	MimeType            string `json:"mimeType"`
 }
 
 func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string, sourceTypes []string, sortBy string) (LpaEventsResponse, error) {
