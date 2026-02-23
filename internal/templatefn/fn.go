@@ -47,6 +47,9 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			float := float64(amount)
 			return fmt.Sprintf("%.2f", float/100)
 		},
+		"feeFromFloat": func(amount float64) string {
+			return fmt.Sprintf("%.2f", amount/100)
+		},
 		"formatDate": func(s sirius.DateString) (string, error) {
 			if s != "" {
 				return s.ToSirius()
@@ -327,6 +330,26 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		},
 		"formatEventType": formatEventType,
 		"eventTypeColor":  eventTypeColor,
+		"paymentSource": func(value string) string {
+			switch value {
+			case "PHONE":
+				return "paid over the phone"
+			case "ONLINE":
+				return "paid via GOV.UK Pay (card payment)"
+			case "MAKE":
+				return "paid through Make an LPA"
+			case "MIGRATED":
+				return "payment was migrated"
+			case "FEE_REDUCTION":
+				return "fee reduction"
+			case "CHEQUE":
+				return "paid by cheque"
+			case "OTHER":
+				return "paid through other method"
+			default:
+				return "paid through other method"
+			}
+		},
 	}
 }
 

@@ -479,6 +479,15 @@ func TestFee(t *testing.T) {
 	assert.Equal(t, expected, val)
 }
 
+func TestFeeFromFloat(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["feeFromFloat"].(func(float64) string)
+	expected := "82.00"
+
+	val := fn(float64(8200))
+	assert.Equal(t, expected, val)
+}
+
 func TestFormatDateForAnEmptyDate(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["formatDate"].(func(sirius.DateString) (string, error))
@@ -669,5 +678,25 @@ func TestEventTypeColor(t *testing.T) {
 	for input, expected := range tests {
 		result := eventTypeColor(input)
 		assert.Equal(t, expected, result, "eventTypeColor(%q) should return %q", input, expected)
+	}
+}
+
+func TestPaymentSource(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["paymentSource"].(func(string) string)
+
+	tests := map[string]string{
+		"PHONE":         "paid over the phone",
+		"ONLINE":        "paid via GOV.UK Pay (card payment)",
+		"MAKE":          "paid through Make an LPA",
+		"MIGRATED":      "payment was migrated",
+		"FEE_REDUCTION": "fee reduction",
+		"CHEQUE":        "paid by cheque",
+		"OTHER":         "paid through other method",
+	}
+
+	for input, expected := range tests {
+		result := fn(input)
+		assert.Equal(t, expected, result, "paymentSource(%q) should return %q", input, expected)
 	}
 }
