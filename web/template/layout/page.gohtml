@@ -1,39 +1,39 @@
 {{ define "page" }}
-  <!DOCTYPE html>
-  <html lang="en" class="govuk-template app-html-class">
+    <!DOCTYPE html>
+    <html lang="en" class="govuk-template app-html-class">
     <head>
-      <meta charset="utf-8">
-      <title>{{ block "title" . }}{{ end }} - Sirius</title>
-      <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-      <meta name="theme-color" content="blue">
+        <meta charset="utf-8">
+        <title>{{ block "title" . }}{{ end }} - Sirius</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+        <meta name="theme-color" content="blue">
 
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-      <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{{ prefix "/assets/images/favicon.ico" }}" type="image/x-icon">
-      <link rel="icon" sizes="any" href="{{ prefix "/assets/images/favicon.svg" }}" type="image/svg+xml">
-      <link rel="mask-icon" href="{{ prefix "/assets/images/govuk-icon-mask.svg" }}" color="blue">
-      <link rel="apple-touch-icon" href="{{ prefix "/assets/images/govuk-icon-180.png" }}">
+        <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{{ prefix "/assets/images/favicon.ico" }}" type="image/x-icon">
+        <link rel="icon" sizes="any" href="{{ prefix "/assets/images/favicon.svg" }}" type="image/svg+xml">
+        <link rel="mask-icon" href="{{ prefix "/assets/images/govuk-icon-mask.svg" }}" color="blue">
+        <link rel="apple-touch-icon" href="{{ prefix "/assets/images/govuk-icon-180.png" }}">
 
-      <link href="{{ prefixAsset "/stylesheets/all.css" }}" rel="stylesheet">
+        <link href="{{ prefixAsset "/stylesheets/all.css" }}" rel="stylesheet">
     </head>
 
     <body class="govuk-template__body app-body-class" data-prefix="{{ prefix "" }}">
-      <script src="{{ prefixAsset "/javascript/load-classes.js" }}"></script>
-      <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
+    <script src="{{ prefixAsset "/javascript/load-classes.js" }}"></script>
+    <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
 
-      {{ template "header" . }}
+    {{ template "header" . }}
 
-      <div class="govuk-width-container{{ block "container-classes" . }}{{ end }}">
+    <div class="govuk-width-container{{ block "container-classes" . }}{{ end }}">
         {{ block "backlink" . }}{{ end }}
 
         <main class="govuk-main-wrapper" id="main-content" role="main">
-          {{ block "main" . }}{{ end }}
+            {{ block "main" . }}{{ end }}
         </main>
-      </div>
+    </div>
 
-      <footer class="govuk-footer app-!-embedded-hide" role="contentinfo"></footer>
+    <footer class="govuk-footer app-!-embedded-hide" role="contentinfo"></footer>
 
-      <script src="{{ prefixAsset "/javascript/main.js" }}" type="module"></script>
+    <script src="{{ prefixAsset "/javascript/main.js" }}" type="module"></script>
     </body>
-  </html>
+    </html>
 {{ end }}

@@ -327,6 +327,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		},
 		"formatEventType": formatEventType,
 		"eventTypeColor":  eventTypeColor,
+		"deleteComponent": deleteComponent,
 	}
 }
 
@@ -534,6 +535,48 @@ func options(list interface{}, attrs ...interface{}) []optionData {
 	}
 
 	return datas
+}
+
+type deleteComponentData struct {
+	ID            int
+	ShowConfirm   bool
+	Heading       string
+	Body          string
+	Amount        int
+	PaymentDate   sirius.DateString
+	AlertAction   string
+	ConfirmAction string
+	CancelHref    string
+	XSRFToken     string
+	TriggerLabel  string
+	ConfirmLabel  string
+	CancelLabel   string
+}
+
+func deleteComponent(id int, showConfirm bool, heading, alertAction, confirmAction, cancelHref, xsrfToken, triggerLabel, confirmLabel, cancelLabel string, attrs ...interface{}) deleteComponentData {
+	d := deleteComponentData{
+		ID:            id,
+		ShowConfirm:   showConfirm,
+		Heading:       heading,
+		AlertAction:   alertAction,
+		ConfirmAction: confirmAction,
+		CancelHref:    cancelHref,
+		XSRFToken:     xsrfToken,
+		TriggerLabel:  triggerLabel,
+		ConfirmLabel:  confirmLabel,
+		CancelLabel:   cancelLabel,
+	}
+	a := collectAttrs(attrs)
+	if v, ok := a["body"].(string); ok {
+		d.Body = v
+	}
+	if v, ok := a["amount"].(int); ok {
+		d.Amount = v
+	}
+	if v, ok := a["paymentDate"].(sirius.DateString); ok {
+		d.PaymentDate = v
+	}
+	return d
 }
 
 func collectAttrs(attrs []interface{}) map[string]interface{} {
