@@ -104,6 +104,16 @@
                                         </div>
 
                                         <div class="govuk-body">
+                                            {{ if eq .SourceType.Key "Payment" }}
+                                                {{ if eq .Type "DEL" }}
+                                                    {{ template "partial-event-payment-deleted" . }}
+                                                {{ else }}
+                                                    {{ template "partial-event-payment" . }}
+                                                {{ end }}
+                                            {{ else if eq .SourceType.Key "OutboundDocument" }}
+                                                {{ template "partial-event-outgoing-document" . }}
+                                            {{/* TODO: add more event types here as needed */}}
+                                            {{ else }}
                                                 <dl class="govuk-summary-list">
                                                     <ul class="govuk-list govuk-list--bullet">
                                                         {{ range $k, $v := .Entity }}
@@ -122,6 +132,7 @@
                                                         {{ end }}
                                                     </ul>
                                                 </dl>
+                                            {{ end }}
                                         </div>
                                     </div>
                                     <div class="govuk-summary-list__row">
