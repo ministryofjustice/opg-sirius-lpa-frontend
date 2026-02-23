@@ -1,0 +1,46 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add EPA Attorney{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+
+      <h1 class="govuk-heading-l">Add EPA Attorney</h1>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+        <input type="hidden" name="id" value="{{ .CaseID }}"/>
+
+        {{ template "input" (field "salutation" "Salutation" .Attorney.Salutation .Error.Field.salutation) }}
+        {{ template "input" (field "firstname" "First name" .Attorney.FirstName .Error.Field.firstname) }}
+        {{ template "input" (field "middlenames" "Middle names" .Attorney.MiddleNames .Error.Field.middlenames) }}
+        {{ template "input" (field "surname" "Surname" .Attorney.Surname .Error.Field.surname) }}
+        {{ template "input" (field "otherNames" "Other names" .Attorney.OtherNames .Error.Field.otherNames) }}
+        {{ template "input-date" (field "dob" "Date of birth" .Attorney.DOB .Error.Field.dob) }}
+        {{ template "input" (field "phoneNumber" "Phone number" .Attorney.PhoneNumber .Error.Field.phoneNumber) }}
+        {{ template "input" (field "companyName" "Company name" .Attorney.CompanyName .Error.Field.companyName) }}
+        {{ template "input" (field "email" "Email" .Attorney.Email .Error.Field.email) }}
+        {{ template "input" (field "addressLine1" "Address line 1" .Attorney.AddressLine1 .Error.Field.addressLine1) }}
+        {{ template "input" (field "addressLine2" "Address line 2" .Attorney.AddressLine2 .Error.Field.addressLine2) }}
+        {{ template "input" (field "addressLine3" "Address line 3" .Attorney.AddressLine3 .Error.Field.addressLine3) }}
+        {{ template "input" (field "town" "Town" .Attorney.Town .Error.Field.town) }}
+        {{ template "input" (field "county" "County" .Attorney.County .Error.Field.county) }}
+        {{ template "input" (field "country" "Country" .Attorney.Country .Error.Field.country) }}
+        {{ template "input" (field "postcode" "Postcode" .Attorney.Postcode .Error.Field.postcode) }}
+
+        {{ template "radios" (radios "isAirmailRequired" "Airmail required" (stringifyBool .Attorney.IsAirmailRequired) .Error.Field.isAirmailRequired
+        (item "true" "Yes")
+        (item "false" "No")
+        ) }}
+
+
+        <div class="govuk-button-group govuk-!-padding-top-5">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Add attorney</button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}

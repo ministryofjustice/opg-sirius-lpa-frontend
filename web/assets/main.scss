@@ -368,3 +368,14 @@ $govuk-assets-path: "../assets/";
 #viewing-selected-cases {
   padding-inline-start: 1rem;
 }
+
+.app-heading-with-link {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.app-heading-with-link__link {
+  padding-bottom: 20px;
+}
