@@ -21,6 +21,7 @@ type documentPageData struct {
 	Entity                string
 	Success               bool
 	SuccessMessage        string
+	DonorID               int
 	Error                 sirius.ValidationError
 	DocumentList          sirius.DocumentList
 	Document              sirius.Document
@@ -118,6 +119,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			Success:               isSuccess,
 			SuccessMessage:        successMessage,
 			Comparing:             false,
+			DonorID:               donorID,
 		}
 
 		return tmpl(w, data)
