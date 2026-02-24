@@ -259,6 +259,7 @@ func TestGetDocumentList(t *testing.T) {
 						SelectedCases:         tc.expectedCases,
 						DocumentList:          tc.documentList,
 						MultipleCasesSelected: tc.expectedMultiple,
+						DonorID:               82,
 					},
 				).
 				Return(nil)
@@ -360,6 +361,7 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 				SelectedCases:         cases,
 				DocumentList:          allDocumentList,
 				MultipleCasesSelected: true,
+				DonorID:               82,
 				Error: sirius.ValidationError{
 					Detail: "Select one or more documents and try again.",
 				},
@@ -407,6 +409,7 @@ func TestDocumentListDismissValidation(t *testing.T) {
 				SelectedCases:         expectedCases,
 				DocumentList:          twoCasesDocumentList,
 				MultipleCasesSelected: true,
+				DonorID:               82,
 			},
 		).
 		Return(nil)
@@ -492,6 +495,7 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 				SelectedCases:         cases,
 				DocumentList:          singleDocumentList,
 				MultipleCasesSelected: false,
+				DonorID:               82,
 			},
 		).
 		Return(errExample)
