@@ -85,6 +85,15 @@ describe("Compare documents", () => {
       cy.get("th").eq(2).should("contain", "Date created");
       cy.get("th").eq(3).should("contain", "Document Type");
     });
+    // Check for Close button or link and its href if applicable
+    cy.get('button, a').contains('Close').should('exist').then($el => {
+      if ($el.is('a')) {
+        cy.wrap($el)
+          .should('have.attr', 'href')
+          .and('not.be.empty')
+          .and('include', '/donor/33/documents?uid[]=7001-0000-5678');
+      }
+    });
   });
 
   it("shows document not linked to a case alongside document list when first selecting compare", () => {
@@ -99,6 +108,15 @@ describe("Compare documents", () => {
       cy.get("th").eq(1).should("contain", "Name");
       cy.get("th").eq(2).should("contain", "Date created");
       cy.get("th").eq(3).should("contain", "Document Type");
+    });
+    // Check for Close button or link and its href if applicable
+    cy.get('button, a').contains('Close').should('exist').then($el => {
+      if ($el.is('a')) {
+        cy.wrap($el)
+          .should('have.attr', 'href')
+          .and('not.be.empty')
+          .and('include', '/donor/33/documents?uid[]=7001-0000-5678');
+      }
     });
   });
 
@@ -122,6 +140,27 @@ describe("Compare documents", () => {
         "include",
         "/compare/33/34?pane1=dfef6714-b4fe-44c2-b26e-90dfe3663e95",
       );
+    // Check for Close button or link and its href if applicable in both panes
+    cy.get('#main-content > :nth-child(1)').within(() => {
+      cy.get('button, a').contains('Close').should('exist').then($el => {
+        if ($el.is('a')) {
+          cy.wrap($el)
+            .should('have.attr', 'href')
+            .and('not.be.empty')
+            .and('include', '/donor/33/documents?uid[]=7001-0000-5678');
+        }
+      });
+    });
+    cy.get('#main-content > :nth-child(2)').within(() => {
+      cy.get('button, a').contains('Close').should('exist').then($el => {
+        if ($el.is('a')) {
+          cy.wrap($el)
+            .should('have.attr', 'href')
+            .and('not.be.empty')
+            .and('include', '/donor/33/documents?uid[]=7001-0000-5678');
+        }
+      });
+    });
   });
 
   it("shows one document in view on the right", () => {
@@ -132,6 +171,17 @@ describe("Compare documents", () => {
       .contains("Back to list")
       .should("have.attr", "href")
       .and("include", "/compare/33/34");
+    // Check for Close button or link and its href if applicable in right pane
+    cy.get('#main-content > :nth-child(2)').within(() => {
+      cy.get('button, a').contains('Close').should('exist').then($el => {
+        if ($el.is('a')) {
+          cy.wrap($el)
+            .should('have.attr', 'href')
+            .and('not.be.empty')
+            .and('include', '/donor/33/documents?uid[]=7001-0000-5678');
+        }
+      });
+    });
   });
 
   it("shows two lists", () => {
@@ -158,5 +208,26 @@ describe("Compare documents", () => {
       .eq(1)
       .find("table.govuk-table")
       .should("exist");
+    // Check for Close button or link and its href if applicable in both lists
+    cy.get('.govuk-grid-column-one-half').eq(0).within(() => {
+      cy.get('button, a').contains('Close').should('exist').then($el => {
+        if ($el.is('a')) {
+          cy.wrap($el)
+            .should('have.attr', 'href')
+            .and('not.be.empty')
+            .and('include', '/donor/33/documents?uid[]=7001-0000-5678');
+        }
+      });
+    });
+    cy.get('.govuk-grid-column-one-half').eq(1).within(() => {
+      cy.get('button, a').contains('Close').should('exist').then($el => {
+        if ($el.is('a')) {
+          cy.wrap($el)
+            .should('have.attr', 'href')
+            .and('not.be.empty')
+            .and('include', '/donor/33/documents?uid[]=7001-0000-5678');
+        }
+      });
+    });
   });
 });

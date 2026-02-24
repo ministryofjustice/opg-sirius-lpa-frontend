@@ -23,9 +23,10 @@ type compareDocsData struct {
 }
 
 type viewingDocumentData struct {
-	Document sirius.Document
-	Pane     int
-	BackURL  string
+	Document           sirius.Document
+	Pane               int
+	BackURL            string
+	CloseURLToDocument string
 }
 
 func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
@@ -125,6 +126,11 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 				Pane:     2,
 				BackURL:  backURL,
 			}
+		}
+
+		if data.View1 != nil && data.View2 != nil {
+			data.View1.CloseURLToDocument = fmt.Sprintf("/view-document/%s", data.View2.Document.UUID)
+			data.View2.CloseURLToDocument = fmt.Sprintf("/view-document/%s", data.View1.Document.UUID)
 		}
 
 		return tmpl(w, data)

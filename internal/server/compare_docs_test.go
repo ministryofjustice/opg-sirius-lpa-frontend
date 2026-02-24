@@ -73,9 +73,10 @@ func TestGetCompareDocsPanes(t *testing.T) {
 			pane1: "doc",
 			pane2: "list",
 			view1: &viewingDocumentData{
-				Document: document1,
-				Pane:     1,
-				BackURL:  "/compare/77/456",
+				Document:           document1,
+				Pane:               1,
+				BackURL:            "/compare/77/456",
+				CloseURLToDocument: "",
 			},
 			view2: nil,
 			compareURLs1: map[string]string{
@@ -95,9 +96,10 @@ func TestGetCompareDocsPanes(t *testing.T) {
 			pane2: "doc",
 			view1: nil,
 			view2: &viewingDocumentData{
-				Document: document1,
-				Pane:     2,
-				BackURL:  "/compare/77/456",
+				Document:           document1,
+				Pane:               2,
+				BackURL:            "/compare/77/456",
+				CloseURLToDocument: "",
 			},
 			compareURLs1: map[string]string{
 				"doc1-uuid": "/compare/77/456?pane1=doc1-uuid&pane2=doc1-uuid",
@@ -115,14 +117,16 @@ func TestGetCompareDocsPanes(t *testing.T) {
 			pane1: "doc",
 			pane2: "doc",
 			view1: &viewingDocumentData{
-				Document: document1,
-				Pane:     1,
-				BackURL:  "/compare/77/456?pane2=doc2-uuid",
+				Document:           document1,
+				Pane:               1,
+				BackURL:            "/compare/77/456?pane2=doc2-uuid",
+				CloseURLToDocument: "/view-document/doc2-uuid",
 			},
 			view2: &viewingDocumentData{
-				Document: document2,
-				Pane:     2,
-				BackURL:  "/compare/77/456?pane1=doc1-uuid",
+				Document:           document2,
+				Pane:               2,
+				BackURL:            "/compare/77/456?pane1=doc1-uuid",
+				CloseURLToDocument: "/view-document/doc1-uuid",
 			},
 			compareURLs1: map[string]string{
 				"doc1-uuid": "/compare/77/456?pane1=doc1-uuid&pane2=doc2-uuid",
