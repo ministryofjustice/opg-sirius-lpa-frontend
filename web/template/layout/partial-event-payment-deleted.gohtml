@@ -1,21 +1,3 @@
 {{ define "partial-event-payment-deleted" }}
-    <p>TODO: implement - render payment deletion event content</p>
-    <dl class="govuk-summary-list">
-        <ul class="govuk-list govuk-list--bullet">
-            {{ range $k, $v := .Entity }}
-                {{ if and (ne $k "id") $v }}
-                    <li>
-                        {{ camelcaseToSentence $k }}:
-                        {{ if eq $k "assignee" }}
-                            {{ $v.displayName }}
-                        {{ else if eq $k "uId" }}
-                            {{ printf "%.f" $v }}
-                        {{ else }}
-                            {{ $v }}
-                        {{ end }}
-                    </li>
-                {{ end }}
-            {{ end }}
-        </ul>
-    </dl>
+    Deleted - £{{ feeFromFloat .Entity.amount }} {{ paymentSource .Entity.source }} on {{ parseAndFormatDate .Entity.paymentDate "2006-01-02T15:04:05+00:00" "02/01/2006" }}
 {{ end }}
