@@ -61,13 +61,6 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 				DocumentList:  docs,
 				SelectedCases: selected,
 				Comparing:     true,
-				TargetPane:    1,
-			},
-			DocListPane2Data: documentPageData{
-				XSRFToken:     ctx.XSRFToken,
-				DocumentList:  docs,
-				SelectedCases: selected,
-				Comparing:     true,
 			},
 		}
 
