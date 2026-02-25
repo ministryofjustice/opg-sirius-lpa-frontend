@@ -111,7 +111,7 @@
                                                     {{ template "partial-event-payment" . }}
                                                 {{ end }}
                                             {{ else if eq .SourceType.Key "OutboundDocument" }}
-                                                {{ template "partial-event-outgoing-document" . }}
+                                                {{ template "partial-event-outgoing-document" (eventPartialContext . $.DonorID) }}
                                             {{/* TODO: add more event types here as needed */}}
                                             {{ else }}
                                                 <dl class="govuk-summary-list">

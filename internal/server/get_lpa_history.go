@@ -13,6 +13,7 @@ type GetLpaHistoryClient interface {
 
 type getLpaHistory struct {
 	XSRFToken           string
+	DonorID             string
 	Events              []sirius.LpaEvent
 	EventFilterData     []sirius.SourceType
 	Form                FilterLpaEventsForm
@@ -40,6 +41,7 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 
 		data := getLpaHistory{
 			XSRFToken:       ctx.XSRFToken,
+			DonorID:         donorId,
 			Events:          eventsData.Events,
 			EventFilterData: eventsData.Metadata.SourceTypes,
 			TotalEvents:     eventsData.Total,

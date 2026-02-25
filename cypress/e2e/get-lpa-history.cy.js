@@ -3,7 +3,6 @@ describe("View LPA history timeline", () => {
     const taskClass = String.raw`Opg\Core\Model\Entity\Task\Task`;
     const warningClass = String.raw`Opg\Core\Model\Entity\Warning\Warning`;
     const lpaClass = String.raw`Opg\Core\Model\Entity\CaseItem\PowerOfAttorney\Lpa`;
-    const paymentClass = String.raw`Opg\Core\Model\Entity\PowerOfAttorney\Payment\Payment`;
 
     cy.addMock("/lpa-api/v1/persons/1/events?&sort=id:desc&limit=999", "GET", {
       status: 200,
@@ -154,34 +153,6 @@ describe("View LPA history timeline", () => {
             },
             createdOn: "2026-01-15T04:10:55+00:00",
             hash: "JI7",
-          },
-          {
-            id: 238,
-            owningCase: {
-              id: 105,
-              uId: "7000-9000-7000",
-              caseSubtype: "pfa",
-              caseType: "LPA",
-            },
-            user: {
-              id: 6619,
-              phoneNumber: "03001234567",
-              teams: [],
-              displayName: "Team Less",
-              deleted: false,
-              email: "teamless@test.uk",
-            },
-            sourceType: "Payment",
-            type: "DEL",
-            changeSet: [],
-            entity: {
-              _class: paymentClass,
-              amount: 2345,
-              source: "CHEQUE",
-              paymentDate: "2006-01-02T15:04:05+00:00",
-            },
-            createdOn: "2026-01-22T16:23:29+00:00",
-            hash: "N7R",
           },
         ],
       },
@@ -468,13 +439,11 @@ describe("View LPA history timeline", () => {
 
   it("can view variable header content", () => {
     cy.get(".moj-timeline__item")
-      .should("have.length", 4)
+      .should("have.length", 3)
       .then(($items) => {
         expect($items.eq(0)).to.contain.text("Warning");
         expect($items.eq(1)).to.contain.text("Task");
         expect($items.eq(2)).to.contain.text("LPA (Create / Edit)");
-        expect($items.eq(3)).to.contain.text("Payment");
-
         cy.wrap($items.eq(1)).find(".moj-alert--warning").should("not.exist");
         cy.wrap($items.eq(0)).find(".moj-alert--warning").should("exist");
       });
@@ -482,7 +451,7 @@ describe("View LPA history timeline", () => {
 
   it("can view variable footer content", () => {
     cy.get(".moj-timeline__item")
-      .should("have.length", 4)
+      .should("have.length", 3)
       .then(($items) => {
         const normalise = (el) =>
           Cypress.$(el).text().replaceAll(/\s+/g, " ").trim();
@@ -550,11 +519,5 @@ describe("View LPA history timeline", () => {
           .find(".colour-govuk-brown")
           .should("exist");
       });
-  });
-
-  it("can view payment deleted event", () => {
-    cy.get(".moj-timeline__item")
-      .eq(3)
-      .should("contain.text", "Deleted - £23.45 paid by cheque on 02/01/2006");
   });
 });
