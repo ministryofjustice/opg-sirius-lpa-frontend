@@ -43,10 +43,8 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"options":               options,
 		"caseTabs":              caseTab,
 		"casesWarningAppliedTo": sirius.CasesWarningAppliedTo,
-		"fee": func(amount int) string {
-			float := float64(amount)
-			return fmt.Sprintf("%.2f", float/100)
-		},
+		"fee":                   shared.FormatMonetaryValue,
+		"feeFromFloat":          shared.FormatMonetaryFloat,
 		"formatDate": func(s sirius.DateString) (string, error) {
 			if s != "" {
 				return s.ToSirius()
@@ -327,6 +325,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		},
 		"formatEventType": formatEventType,
 		"eventTypeColor":  eventTypeColor,
+		"paymentSource":   shared.PaymentSourceToAction,
 	}
 }
 
