@@ -23,10 +23,10 @@ type compareDocsData struct {
 }
 
 type viewingDocumentData struct {
-	Document           sirius.Document
-	Pane               int
-	BackURL            string
-	CloseURLToDocument string
+	Document sirius.Document
+	Pane     int
+	BackURL  string
+	CloseURL string
 }
 
 func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
@@ -128,9 +128,28 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 			}
 		}
 
-		if data.View1 != nil && data.View2 != nil {
-			data.View1.CloseURLToDocument = fmt.Sprintf("/view-document/%s", data.View2.Document.UUID)
-			data.View2.CloseURLToDocument = fmt.Sprintf("/view-document/%s", data.View1.Document.UUID)
+		viewingADocumentAndList := data.View1 != nil
+		if viewingADocumentAndList {
+			data.DocListPane2Data.CloseURL = fmt.Sprintf("/view-document/%s", data.View1.Document.UUID)
+			data.View1.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", donorID, data.DocListPane2Data.DocumentList.Documents[0].CaseItems[0].UID)
+		}
+
+		viewingAListAndDocument := data.View1 == nil && data.View2 != nil
+		if viewingAListAndDocument {
+			data.DocListPane1Data.CloseURL = fmt.Sprintf("/view-document/%s", data.View2.Document.UUID)
+			data.View2.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", donorID, data.DocListPane1Data.DocumentList.Documents[0].CaseItems[0].UID)
+		}
+
+		bothSidesAreDocuments := data.View1 != nil && data.View2 != nil
+		if bothSidesAreDocuments {
+			data.View1.CloseURL = fmt.Sprintf("/view-document/%s", data.View2.Document.UUID)
+			data.View2.CloseURL = fmt.Sprintf("/view-document/%s", data.View1.Document.UUID)
+		}
+
+		bothSidesAreLists := data.View1 == nil && data.View2 == nil
+		if bothSidesAreLists {
+			data.DocListPane1Data.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", donorID, data.DocListPane2Data.DocumentList.Documents[0].CaseItems[0].UID)
+			data.DocListPane2Data.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", donorID, data.DocListPane1Data.DocumentList.Documents[0].CaseItems[0].UID)
 		}
 
 		return tmpl(w, data)

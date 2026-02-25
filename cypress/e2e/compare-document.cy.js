@@ -85,7 +85,6 @@ describe("Compare documents", () => {
       cy.get("th").eq(2).should("contain", "Date created");
       cy.get("th").eq(3).should("contain", "Document Type");
     });
-    // Check for Close button or link and its href if applicable
     cy.get('button, a').contains('Close').should('exist').then($el => {
       if ($el.is('a')) {
         cy.wrap($el)
@@ -109,13 +108,12 @@ describe("Compare documents", () => {
       cy.get("th").eq(2).should("contain", "Date created");
       cy.get("th").eq(3).should("contain", "Document Type");
     });
-    // Check for Close button or link and its href if applicable
     cy.get('button, a').contains('Close').should('exist').then($el => {
       if ($el.is('a')) {
         cy.wrap($el)
           .should('have.attr', 'href')
           .and('not.be.empty')
-          .and('include', '/donor/33/documents?uid[]=7001-0000-5678');
+          .and('include', '/donor/33/documents');
       }
     });
   });
@@ -140,14 +138,13 @@ describe("Compare documents", () => {
         "include",
         "/compare/33/34?pane1=dfef6714-b4fe-44c2-b26e-90dfe3663e95",
       );
-    // Check for Close button or link and its href if applicable in both panes
     cy.get('#main-content > :nth-child(1)').within(() => {
       cy.get('button, a').contains('Close').should('exist').then($el => {
         if ($el.is('a')) {
           cy.wrap($el)
             .should('have.attr', 'href')
             .and('not.be.empty')
-            .and('include', '/donor/33/documents?uid[]=7001-0000-5678');
+            .and('include', '/view-document/e5b5acd1-c11c-41fe-a921-7fdd07e8f670');
         }
       });
     });
@@ -157,12 +154,14 @@ describe("Compare documents", () => {
           cy.wrap($el)
             .should('have.attr', 'href')
             .and('not.be.empty')
-            .and('include', '/donor/33/documents?uid[]=7001-0000-5678');
+            .and('include', '/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95');
         }
       });
     });
   });
 
+
+  //not showing the close on the document list view
   it("shows one document in view on the right", () => {
     cy.visit("compare/33/34?pane2=e5b5acd1-c11c-41fe-a921-7fdd07e8f670");
     cy.contains("7001-0000-5678");
@@ -171,7 +170,6 @@ describe("Compare documents", () => {
       .contains("Back to list")
       .should("have.attr", "href")
       .and("include", "/compare/33/34");
-    // Check for Close button or link and its href if applicable in right pane
     cy.get('#main-content > :nth-child(2)').within(() => {
       cy.get('button, a').contains('Close').should('exist').then($el => {
         if ($el.is('a')) {
@@ -208,7 +206,6 @@ describe("Compare documents", () => {
       .eq(1)
       .find("table.govuk-table")
       .should("exist");
-    // Check for Close button or link and its href if applicable in both lists
     cy.get('.govuk-grid-column-one-half').eq(0).within(() => {
       cy.get('button, a').contains('Close').should('exist').then($el => {
         if ($el.is('a')) {
