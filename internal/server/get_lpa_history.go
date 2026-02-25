@@ -14,17 +14,12 @@ type GetLpaHistoryClient interface {
 type getLpaHistory struct {
 	XSRFToken           string
 	DonorID             string
-	Events              []LpaEventWithContext
+	Events              []sirius.LpaEvent
 	EventFilterData     []sirius.SourceType
 	Form                FilterLpaEventsForm
 	TotalEvents         int
 	TotalFilteredEvents int
 	IsFiltered          bool
-}
-
-type LpaEventWithContext struct {
-	sirius.LpaEvent
-	DonorID string
 }
 
 type FilterLpaEventsForm struct {
@@ -43,18 +38,11 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 		if err != nil {
 			return err
 		}
-		eventsWithContext := make([]LpaEventWithContext, len(eventsData.Events))
-		for i, event := range eventsData.Events {
-			eventsWithContext[i] = LpaEventWithContext{
-				LpaEvent: event,
-				DonorID:  donorId,
-			}
-		}
 
 		data := getLpaHistory{
 			XSRFToken:       ctx.XSRFToken,
 			DonorID:         donorId,
-			Events:          eventsWithContext,
+			Events:          eventsData.Events,
 			EventFilterData: eventsData.Metadata.SourceTypes,
 			TotalEvents:     eventsData.Total,
 			IsFiltered:      false,
@@ -75,14 +63,7 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 			}
 
 			data.TotalFilteredEvents = eventsData.Total
-			eventsWithContext = make([]LpaEventWithContext, len(eventsData.Events))
-			for i, event := range eventsData.Events {
-				eventsWithContext[i] = LpaEventWithContext{
-					LpaEvent: event,
-					DonorID:  donorId,
-				}
-			}
-			data.Events = eventsWithContext
+			data.Events = eventsData.Events
 			data.IsFiltered = true
 		}
 

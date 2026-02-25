@@ -59,12 +59,8 @@ type SourceType struct {
 }
 
 type SourceDocument struct {
-	ID                  int    `json:"id"`
 	UUID                string `json:"uuid"`
 	FriendlyDescription string `json:"friendlyDescription"`
-	CreatedDate         string `json:"createdDate"`
-	Filename            string `json:"filename"`
-	MimeType            string `json:"mimeType"`
 }
 
 func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string, sourceTypes []string, sortBy string) (LpaEventsResponse, error) {

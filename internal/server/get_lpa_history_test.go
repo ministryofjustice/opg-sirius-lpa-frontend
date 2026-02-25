@@ -114,19 +114,11 @@ func TestGetLpaHistory(t *testing.T) {
 				On("GetEvents", mock.Anything, "123", tc.caseIdsArgs, []string{}, "desc").
 				Return(tc.response, err)
 
-			eventsWithContext := make([]LpaEventWithContext, len(tc.response.Events))
-			for i, event := range tc.response.Events {
-				eventsWithContext[i] = LpaEventWithContext{
-					LpaEvent: event,
-					DonorID:  "123",
-				}
-			}
-
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, getLpaHistory{
 					DonorID:             "123",
-					Events:              eventsWithContext,
+					Events:              tc.response.Events,
 					EventFilterData:     tc.response.Metadata.SourceTypes,
 					TotalEvents:         tc.response.Total,
 					TotalFilteredEvents: 0,
@@ -256,18 +248,10 @@ func TestPostFiltersLpaHistory(t *testing.T) {
 		On("GetEvents", mock.Anything, "123", []string(nil), []string{"Lpa", "Payment"}, "asc").
 		Return(filteredResponse, nil)
 
-	eventsWithContext := make([]LpaEventWithContext, len(filteredResponse.Events))
-	for i, event := range filteredResponse.Events {
-		eventsWithContext[i] = LpaEventWithContext{
-			LpaEvent: event,
-			DonorID:  "123",
-		}
-	}
-
 	template := &mockTemplate{}
 	template.On("Func", mock.Anything, getLpaHistory{
 		DonorID:             "123",
-		Events:              eventsWithContext,
+		Events:              filteredResponse.Events,
 		EventFilterData:     unfilteredResponse.Metadata.SourceTypes,
 		TotalEvents:         unfilteredResponse.Total,
 		TotalFilteredEvents: filteredResponse.Total,
