@@ -385,6 +385,39 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 	client.AssertNotCalled(t, "DownloadMultiple")
 }
 
+func TestDocumentListReturnsNoContentWhenComparingAndNoDocumentsSelected(t *testing.T) {
+	cases := []sirius.Case{
+		{ID: 1, UID: "7000-1234-0000"},
+		{ID: 2, UID: "7000-9876-0000"},
+	}
+
+	client := &mockDocumentListClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 82).
+		Return(cases, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 82, []string(nil)).
+		Return(allDocumentList, nil)
+
+	template := &mockTemplate{}
+
+	server := newMockServer("/donor/{id}/documents", DocumentList(client, template.Func))
+
+	form := url.Values{}
+	form.Add("actionDownload", "true")
+	form.Add("comparing", "true")
+	req, _ := http.NewRequest(http.MethodPost, "/donor/82/documents", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", formUrlEncoded)
+
+	resp, err := server.serve(req)
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusNoContent, resp.Code)
+
+	client.AssertNotCalled(t, "DownloadMultiple")
+	mock.AssertExpectationsForObjects(t, client)
+}
+
 func TestDocumentListDismissValidation(t *testing.T) {
 	cases := []sirius.Case{
 		{ID: 1, UID: "7000-1234-0000"},
