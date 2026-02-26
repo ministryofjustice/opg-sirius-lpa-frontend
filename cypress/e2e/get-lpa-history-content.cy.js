@@ -53,6 +53,53 @@ describe("Show correct event content", () => {
       .should("contain.text", "Deleted - £23.45 paid by cheque on 02/01/2006");
   });
 
+  it("can view payment added event", () => {
+    mockEventHistory({
+      sourceType: "Payment",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\PowerOfAttorney\Payment\Payment`,
+        amount: 8200,
+        source: "CHEQUE",
+        paymentDate: "2006-01-02T15:04:05+00:00",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "£82.00 paid by cheque on 02/01/2006");
+  });
+
+  it("can view payment updated event", () => {
+    mockEventHistory({
+      sourceType: "Payment",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\PowerOfAttorney\Payment\Payment`,
+        amount: 9200,
+        source: "PHONE",
+        paymentDate: "2007-01-02T15:04:05+00:00",
+      },
+      changeSet: {
+        amount: [8200, 9200],
+        source: ["CHEQUE", "PHONE"],
+        paymentDate: ["2006-01-02T15:04:05+00:00", "2007-01-02T15:04:05+00:00"],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Amount: £82.00 changed to: £92.00")
+      .should(
+        "contain.text",
+        "Payment method: paid by cheque changed to: paid over the phone",
+      )
+      .should(
+        "contain.text",
+        "Payment date: 02/01/2006 changed to: 02/01/2007",
+      );
+  });
+
   it("can view outbound document event", () => {
     mockEventHistory({
       sourceType: "OutgoingDocument",
