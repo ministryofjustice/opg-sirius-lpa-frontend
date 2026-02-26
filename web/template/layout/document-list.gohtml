@@ -38,8 +38,11 @@
 
             {{ $multiCaseSelected := .MultipleCasesSelected }}
 
-            <form class="form" id="document-list-form" method="POST">
+            <form class="form" id="document-list-form" method="POST" action="{{ prefix (printf "/donor/%d/documents" .DonorID) }}">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+                {{ if .Comparing }}
+                    <input type="hidden" name="comparing" value="true">
+                {{ end }}
 
                 <table class="govuk-table" data-module="moj-sortable-table">
                     <caption class="govuk-table__caption">
