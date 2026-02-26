@@ -112,6 +112,12 @@
                                                 {{ end }}
                                             {{ else if eq .SourceType.Key "OutboundDocument" }}
                                                 {{ template "partial-event-outgoing-document" (eventPartialContext . $.DonorID) }}
+                                            {{ else if eq .SourceType.Key "Lpa" }}
+                                                {{ if and (eq .Type "UPD") (.Changes.status) (ne (len .Changes.status) 0)}}
+                                                    {{ template "partial-event-case-status" . }}
+                                                {{ else }}
+                                                    {{ template "partial-event-lpa" . }}
+                                                {{ end }}
                                             {{/* TODO: add more event types here as needed */}}
                                             {{ else }}
                                                 <dl class="govuk-summary-list">
