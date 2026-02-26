@@ -98,8 +98,13 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		compareView := r.FormValue("comparing") == "true"
 		var validationErr sirius.ValidationError
 		if r.Method == http.MethodPost && len(selectedDocUUIDs) == 0 && r.FormValue("actionDownload") == "true" {
+			if compareView {
+				w.WriteHeader(http.StatusNoContent)
+				return nil
+			}
 			validationErr.Detail = "Select one or more documents and try again."
 		}
 
@@ -118,7 +123,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			Error:                 validationErr,
 			Success:               isSuccess,
 			SuccessMessage:        successMessage,
-			Comparing:             false,
+			Comparing:             compareView,
 			DonorID:               donorID,
 		}
 
