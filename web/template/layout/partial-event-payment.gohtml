@@ -10,7 +10,7 @@
                 <li>Payment method: {{ paymentSource (index . 0) }} changed to: {{ paymentSource (index . 1) }}</li>
             {{ end }}
             {{ with index .Changes "paymentDate" }}
-                <li>Payment date: {{ parseAndFormatDate (index . 0) "2006-01-02T15:04:05+00:00" "02/01/2006" }} changed to: {{ parseAndFormatDate (index . 1) "2006-01-02T15:04:05+00:00" "02/01/2006" }}</li>
+                <li>Payment date: {{ parseAndFormatDate (index (index . 0) "date") "2006-01-02 15:04:05.999999" "02/01/2006" }} changed to: {{ parseAndFormatDate (index (index . 1) "date") "2006-01-02 15:04:05.999999" "02/01/2006" }}</li>
             {{ end }}
         </ul>
     {{ end }}
