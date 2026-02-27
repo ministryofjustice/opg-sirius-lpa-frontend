@@ -112,6 +112,8 @@
                                                 {{ end }}
                                             {{ else if eq .SourceType.Key "OutboundDocument" }}
                                                 {{ template "partial-event-outgoing-document" (eventPartialContext . $.DonorID) }}
+                                            {{ else if eq .SourceType.Key "Warning" }}
+                                                {{ template "partial-event-warning" . }}
                                             {{ else if eq .SourceType.Key "Lpa" }}
                                                 {{ if and (eq .Type "UPD") (.Changes.status) (ne (len .Changes.status) 0)}}
                                                     {{ template "partial-event-case-status" . }}

@@ -136,6 +136,44 @@ describe("Show correct event content", () => {
       );
   });
 
+  it("can view warning created event", () => {
+    mockEventHistory({
+      sourceType: "Warning",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\Warning\Warning`,
+        warningType: "Complaint Received",
+        warningText: "Test",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Complaint Received")
+      .should("contain.text", "Test");
+  });
+
+  it("can view warning deleted event", () => {
+    mockEventHistory({
+      sourceType: "Warning",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\Warning\Warning`,
+        warningType: "Complaint Received",
+        warningText: "Test",
+      },
+      changeSet: {
+        systemStatus: [false, true],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Complaint Received")
+      .should("contain.text", "Test")
+      .should("contains.text", "Warning removed by Team Less");
+  });
+
   it("can view case statement updated event", () => {
     mockEventHistory({
       sourceType: "Lpa",
