@@ -700,3 +700,27 @@ func TestPaymentSource(t *testing.T) {
 		assert.Equal(t, expected, result, "paymentSource(%q) should return %q", input, expected)
 	}
 }
+
+func TestEventPartialContext(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["eventPartialContext"].(func(sirius.LpaEvent, string) LpaEventWithContext)
+
+	event := sirius.LpaEvent{
+		ID:         1,
+		UID:        "uuid",
+		SourceType: shared.LpaEventSourceTypeOutgoingDocument,
+		Type:       "INS",
+		OwningCase: sirius.OwningCase{
+			ID:       2,
+			CaseType: "LPA",
+		},
+	}
+	donorID := "123"
+
+	expected := LpaEventWithContext{
+		LpaEvent: event,
+		DonorID:  donorID,
+	}
+	result := fn(event, donorID)
+	assert.Equal(t, expected, result)
+}

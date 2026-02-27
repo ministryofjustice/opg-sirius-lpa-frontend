@@ -117,6 +117,7 @@ func TestGetLpaHistory(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, getLpaHistory{
+					DonorID:             "123",
 					Events:              tc.response.Events,
 					EventFilterData:     tc.response.Metadata.SourceTypes,
 					TotalEvents:         tc.response.Total,
@@ -249,6 +250,7 @@ func TestPostFiltersLpaHistory(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.On("Func", mock.Anything, getLpaHistory{
+		DonorID:             "123",
 		Events:              filteredResponse.Events,
 		EventFilterData:     unfilteredResponse.Metadata.SourceTypes,
 		TotalEvents:         unfilteredResponse.Total,

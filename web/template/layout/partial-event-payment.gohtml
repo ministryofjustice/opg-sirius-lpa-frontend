@@ -1,21 +1,17 @@
 {{ define "partial-event-payment" }}
-    </p>TODO: implement - render payment insertion event content</p>
-    <dl class="govuk-summary-list">
-        <ul class="govuk-list govuk-list--bullet">
-            {{ range $k, $v := .Entity }}
-                {{ if and (ne $k "id") $v }}
-                    <li>
-                        {{ camelcaseToSentence $k }}:
-                        {{ if eq $k "assignee" }}
-                            {{ $v.displayName }}
-                        {{ else if eq $k "uId" }}
-                            {{ printf "%.f" $v }}
-                        {{ else }}
-                            {{ $v }}
-                        {{ end }}
-                    </li>
-                {{ end }}
+    {{ if eq .Type "INS" }}
+        £{{ feeFromFloat .Entity.amount }} {{ paymentSource .Entity.source }} on {{ parseAndFormatDate .Entity.paymentDate "2006-01-02T15:04:05+00:00" "02/01/2006" }}
+    {{ else if eq .Type "UPD" }}
+        <ul class="govuk-list">
+            {{ with index .Changes "amount" }}
+                <li>Amount: £{{ feeFromFloat (index . 0) }} changed to: £{{ feeFromFloat (index . 1) }}</li>
+            {{ end }}
+            {{ with index .Changes "source" }}
+                <li>Payment method: {{ paymentSource (index . 0) }} changed to: {{ paymentSource (index . 1) }}</li>
+            {{ end }}
+            {{ with index .Changes "paymentDate" }}
+                <li>Payment date: {{ parseAndFormatDate (index . 0) "2006-01-02T15:04:05+00:00" "02/01/2006" }} changed to: {{ parseAndFormatDate (index . 1) "2006-01-02T15:04:05+00:00" "02/01/2006" }}</li>
             {{ end }}
         </ul>
-    </dl>
+    {{ end }}
 {{ end }}
