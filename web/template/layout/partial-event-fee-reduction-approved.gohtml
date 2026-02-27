@@ -1,0 +1,4 @@
+{{ define "partial-event-fee-reduction-approved" }}
+    {{ $feeReductionTypes := $.Context.FeeReductionTypes }}
+    {{ translateRefData $feeReductionTypes .Entity.feeReductionType }} approved on {{ parseAndFormatDate .Entity.paymentDate "2006-01-02T15:04:05+00:00" "02/01/2006" }}
+{{ end }}
