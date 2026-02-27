@@ -28,27 +28,29 @@ func TestGetCompareDocsPanes(t *testing.T) {
 	document1 := sirius.Document{
 		ID:        1,
 		UUID:      "doc1-uuid",
-		CaseItems: []sirius.Case{{ID: 456}},
+		CaseItems: []sirius.Case{{ID: 456, UID: "case-uid"}},
 	}
 	document2 := sirius.Document{
 		ID:        2,
 		UUID:      "doc2-uuid",
-		CaseItems: []sirius.Case{{ID: 456}},
+		CaseItems: []sirius.Case{{ID: 456, UID: "case-uid"}},
 	}
 	documentList := sirius.DocumentList{
 		Documents: []sirius.Document{document1, document2},
 	}
 
 	tests := []struct {
-		name         string
-		query        string
-		pane1        string
-		pane2        string
-		view1        *viewingDocumentData
-		view2        *viewingDocumentData
-		compareURLs1 map[string]string
-		compareURLs2 map[string]string
-		getDocuments []sirius.Document
+		name                     string
+		query                    string
+		pane1                    string
+		pane2                    string
+		view1                    *viewingDocumentData
+		view2                    *viewingDocumentData
+		compareURLs1             map[string]string
+		compareURLs2             map[string]string
+		getDocuments             []sirius.Document
+		closeURLToDocumentPanel1 string
+		closeURLToDocumentPanel2 string
 	}{
 		{
 			name:  "Pane 1 and Pane 2 shows document lists",
@@ -65,7 +67,9 @@ func TestGetCompareDocsPanes(t *testing.T) {
 				"doc1-uuid": "/compare/77/456?pane2=doc1-uuid",
 				"doc2-uuid": "/compare/77/456?pane2=doc2-uuid",
 			},
-			getDocuments: nil,
+			getDocuments:             nil,
+			closeURLToDocumentPanel1: "/donor/77/documents?uid[]=case-uid",
+			closeURLToDocumentPanel2: "/donor/77/documents?uid[]=case-uid",
 		},
 		{
 			name:  "Pane 1 shows a document, Pane 2 shows a doc list",
@@ -76,6 +80,7 @@ func TestGetCompareDocsPanes(t *testing.T) {
 				Document: document1,
 				Pane:     1,
 				BackURL:  "/compare/77/456",
+				CloseURL: "/donor/77/documents?uid[]=case-uid",
 			},
 			view2: nil,
 			compareURLs1: map[string]string{
@@ -86,7 +91,9 @@ func TestGetCompareDocsPanes(t *testing.T) {
 				"doc1-uuid": "/compare/77/456?pane2=doc1-uuid&pane1=doc1-uuid",
 				"doc2-uuid": "/compare/77/456?pane2=doc2-uuid&pane1=doc1-uuid",
 			},
-			getDocuments: []sirius.Document{document1},
+			getDocuments:             []sirius.Document{document1},
+			closeURLToDocumentPanel1: "",
+			closeURLToDocumentPanel2: "/view-document/doc1-uuid",
 		},
 		{
 			name:  "Pane 1 shows a doc list, Pane 2 shows a document",
@@ -98,6 +105,7 @@ func TestGetCompareDocsPanes(t *testing.T) {
 				Document: document1,
 				Pane:     2,
 				BackURL:  "/compare/77/456",
+				CloseURL: "/donor/77/documents?uid[]=case-uid",
 			},
 			compareURLs1: map[string]string{
 				"doc1-uuid": "/compare/77/456?pane1=doc1-uuid&pane2=doc1-uuid",
@@ -107,7 +115,9 @@ func TestGetCompareDocsPanes(t *testing.T) {
 				"doc1-uuid": "/compare/77/456?pane2=doc1-uuid",
 				"doc2-uuid": "/compare/77/456?pane2=doc2-uuid",
 			},
-			getDocuments: []sirius.Document{document1},
+			getDocuments:             []sirius.Document{document1},
+			closeURLToDocumentPanel1: "/view-document/doc1-uuid",
+			closeURLToDocumentPanel2: "",
 		},
 		{
 			name:  "Pane 1 and Pane 2 shows a document each",
@@ -118,11 +128,13 @@ func TestGetCompareDocsPanes(t *testing.T) {
 				Document: document1,
 				Pane:     1,
 				BackURL:  "/compare/77/456?pane2=doc2-uuid",
+				CloseURL: "/view-document/doc2-uuid",
 			},
 			view2: &viewingDocumentData{
 				Document: document2,
 				Pane:     2,
 				BackURL:  "/compare/77/456?pane1=doc1-uuid",
+				CloseURL: "/view-document/doc1-uuid",
 			},
 			compareURLs1: map[string]string{
 				"doc1-uuid": "/compare/77/456?pane1=doc1-uuid&pane2=doc2-uuid",
@@ -132,7 +144,9 @@ func TestGetCompareDocsPanes(t *testing.T) {
 				"doc1-uuid": "/compare/77/456?pane2=doc1-uuid&pane1=doc1-uuid",
 				"doc2-uuid": "/compare/77/456?pane2=doc2-uuid&pane1=doc1-uuid",
 			},
-			getDocuments: []sirius.Document{document1, document2},
+			getDocuments:             []sirius.Document{document1, document2},
+			closeURLToDocumentPanel1: "",
+			closeURLToDocumentPanel2: "",
 		},
 	}
 
@@ -155,12 +169,14 @@ func TestGetCompareDocsPanes(t *testing.T) {
 					SelectedCases: document1.CaseItems,
 					Comparing:     true,
 					CompareURLs:   tc.compareURLs1,
+					CloseURL:      tc.closeURLToDocumentPanel1,
 				},
 				DocListPane2Data: documentPageData{
 					DocumentList:  documentList,
 					SelectedCases: document1.CaseItems,
 					Comparing:     true,
 					CompareURLs:   tc.compareURLs2,
+					CloseURL:      tc.closeURLToDocumentPanel2,
 				},
 				Pane1: tc.pane1,
 				Pane2: tc.pane2,

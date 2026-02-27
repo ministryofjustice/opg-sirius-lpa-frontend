@@ -28,6 +28,7 @@ type documentPageData struct {
 	MultipleCasesSelected bool
 	Comparing             bool
 	CompareURLs           map[string]string
+	CloseURL              string
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
