@@ -83,7 +83,18 @@ describe("Show correct event content", () => {
       changeSet: {
         amount: [8200, 9200],
         source: ["CHEQUE", "PHONE"],
-        paymentDate: ["2006-01-02T15:04:05+00:00", "2007-01-02T15:04:05+00:00"],
+        paymentDate: [
+          {
+            date: "2006-01-02 15:04:05.000000",
+            timezone_type: 3,
+            timezone: "UTC",
+          },
+          {
+            date: "2007-01-02 15:04:05.000000",
+            timezone_type: 3,
+            timezone: "UTC",
+          },
+        ],
       },
     });
     cy.visit("/donor/1/history");
