@@ -326,10 +326,27 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"formatEventType": formatEventType,
 		"eventTypeColor":  eventTypeColor,
 		"paymentSource":   shared.PaymentSourceToAction,
-		"eventPartialContext": func(event sirius.LpaEvent, donorID string) LpaEventWithContext {
+		"eventWithContext": func(event sirius.LpaEvent, values ...any) LpaEventWithContext {
+			context := EventContext{}
+			for i := 0; i+1 < len(values); i += 2 {
+				key, ok := values[i].(string)
+				if !ok {
+					continue
+				}
+				switch key {
+				case "feeReductionTypes":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.FeeReductionTypes = v
+					}
+				case "donorID":
+					if v, ok := values[i+1].(string); ok {
+						context.DonorID = v
+					}
+				}
+			}
 			return LpaEventWithContext{
 				LpaEvent: event,
-				DonorID:  donorID,
+				Context:  context,
 			}
 		},
 	}
@@ -337,7 +354,12 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 
 type LpaEventWithContext struct {
 	sirius.LpaEvent
-	DonorID string
+	Context EventContext
+}
+
+type EventContext struct {
+	FeeReductionTypes []sirius.RefDataItem
+	DonorID           string
 }
 
 type CaseTabData struct {

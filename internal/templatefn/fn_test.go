@@ -701,26 +701,21 @@ func TestPaymentSource(t *testing.T) {
 	}
 }
 
-func TestEventPartialContext(t *testing.T) {
+func TestEventWithContext(t *testing.T) {
 	fns := All("", "", "")
-	fn := fns["eventPartialContext"].(func(sirius.LpaEvent, string) LpaEventWithContext)
+	fn := fns["eventWithContext"].(func(event sirius.LpaEvent, values ...any) LpaEventWithContext)
 
-	event := sirius.LpaEvent{
-		ID:         1,
-		UID:        "uuid",
-		SourceType: shared.LpaEventSourceTypeOutgoingDocument,
-		Type:       "INS",
-		OwningCase: sirius.OwningCase{
-			ID:       2,
-			CaseType: "LPA",
-		},
-	}
+	event := sirius.LpaEvent{}
 	donorID := "123"
+	feeReductionTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 
 	expected := LpaEventWithContext{
 		LpaEvent: event,
-		DonorID:  donorID,
+		Context: EventContext{
+			DonorID:           donorID,
+			FeeReductionTypes: feeReductionTypes,
+		},
 	}
-	result := fn(event, donorID)
+	result := fn(event, "donorID", donorID, "feeReductionTypes", feeReductionTypes)
 	assert.Equal(t, expected, result)
 }
