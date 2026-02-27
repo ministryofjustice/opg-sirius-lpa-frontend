@@ -2,6 +2,8 @@
 
 {{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Document List{{ end }}
 
+{{ define "container-classes" }} app-!-max-full-width{{ end }}
+
 {{ define "main" }}
     {{ template "DocumentList" . }}
 {{ end }}
