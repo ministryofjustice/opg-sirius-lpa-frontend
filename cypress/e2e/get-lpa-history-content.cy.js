@@ -135,4 +135,21 @@ describe("Show correct event content", () => {
         "/lpa#/donor/1/documents?docUuid=123e4567-e89b-12d3-a456-426614174000",
       );
   });
+
+  it("can view case statement updated event", () => {
+    mockEventHistory({
+      sourceType: "Lpa",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseItem\PowerOfAttorney\Lpa`,
+      },
+      changeSet: {
+        status: ["Pending", "Withdrawn"],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Status changed from Pending to Withdrawn");
+  });
 });
