@@ -152,4 +152,56 @@ describe("Show correct event content", () => {
       .eq(0)
       .should("contain.text", "Status changed from Pending to Withdrawn");
   });
+
+  it("can view fee reduction approved event", () => {
+    mockEventHistory({
+      sourceType: "Payment",
+      type: "INS",
+      entity: {
+        source: "FEE_REDUCTION",
+        feeReductionType: "REMISSION",
+        paymentDate: "2026-01-02T15:04:05+00:00",
+      },
+    });
+    // RefData is mocked in ../mocks/common.json
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Remission approved on 02/01/2026");
+  });
+
+  it("can view fee reduction updated event", () => {
+    mockEventHistory({
+      sourceType: "Payment",
+      type: "UPD",
+      changeSet: {
+        feeReductionType: ["REMISSION", "EXEMPTION"],
+      },
+      entity: {
+        source: "FEE_REDUCTION",
+      },
+    });
+    // RefData is mocked in ../mocks/common.json
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Reduction type: Remission changed to Exemption");
+  });
+
+  it("can view fee reduction deleted event", () => {
+    mockEventHistory({
+      sourceType: "Payment",
+      type: "DEL",
+      entity: {
+        source: "FEE_REDUCTION",
+        feeReductionType: "REMISSION",
+        paymentDate: "2026-01-02T15:04:05+00:00",
+      },
+    });
+    // RefData is mocked in ../mocks/common.json
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Deleted - Remission approved on 02/01/2026");
+  });
 });

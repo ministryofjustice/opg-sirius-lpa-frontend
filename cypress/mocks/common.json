@@ -38,7 +38,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "[{\"handle\":\"REMISSION\",\"label\":\"Remission\"}]"
+        "body": "[{\"handle\":\"REMISSION\",\"label\":\"Remission\"}, {\"handle\":\"EXEMPTION\",\"label\":\"Exemption\"}]"
       }
     },
     {
