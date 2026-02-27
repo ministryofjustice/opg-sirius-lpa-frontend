@@ -5,9 +5,11 @@ import (
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"golang.org/x/sync/errgroup"
 )
 
 type GetLpaHistoryClient interface {
+	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	GetEvents(ctx sirius.Context, donorId string, caseIds []string, sourceTypes []string, sortBy string) (sirius.LpaEventsResponse, error)
 }
 
@@ -20,6 +22,7 @@ type getLpaHistory struct {
 	TotalEvents         int
 	TotalFilteredEvents int
 	IsFiltered          bool
+	FeeReductionTypes   []sirius.RefDataItem
 }
 
 type FilterLpaEventsForm struct {
@@ -33,22 +36,41 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 		caseIDs := r.URL.Query()["id[]"]
 
 		ctx := getContext(r)
-
-		eventsData, err := client.GetEvents(ctx, donorId, caseIDs, []string{}, "desc")
-		if err != nil {
-			return err
-		}
+		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		data := getLpaHistory{
-			XSRFToken:       ctx.XSRFToken,
-			DonorID:         donorId,
-			Events:          eventsData.Events,
-			EventFilterData: eventsData.Metadata.SourceTypes,
-			TotalEvents:     eventsData.Total,
-			IsFiltered:      false,
+			XSRFToken: ctx.XSRFToken,
+			DonorID:   donorId,
 			Form: FilterLpaEventsForm{
 				Sort: "desc",
 			},
+			IsFiltered: false,
+		}
+
+		group.Go(func() error {
+			eventsData, err := client.GetEvents(ctx.With(groupCtx), donorId, caseIDs, []string{}, "desc")
+			if err != nil {
+				return err
+			}
+			data.Events = eventsData.Events
+			data.EventFilterData = eventsData.Metadata.SourceTypes
+			data.TotalEvents = eventsData.Total
+			return nil
+		})
+
+		group.Go(func() error {
+			feeReductionTypes, err := client.RefDataByCategory(ctx.With(groupCtx), sirius.FeeReductionTypeCategory)
+			if err != nil {
+				// If the call to get fee reduction types fails, we can just fall-back and display the database values instead of the labels
+				data.FeeReductionTypes = []sirius.RefDataItem(nil)
+				return nil
+			}
+			data.FeeReductionTypes = feeReductionTypes
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
+			return err
 		}
 
 		if r.Method == http.MethodPost {
@@ -57,7 +79,7 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 				return err
 			}
 
-			eventsData, err = client.GetEvents(ctx, donorId, caseIDs, data.Form.Types, data.Form.Sort)
+			eventsData, err := client.GetEvents(ctx, donorId, caseIDs, data.Form.Types, data.Form.Sort)
 			if err != nil {
 				return err
 			}

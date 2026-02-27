@@ -105,13 +105,21 @@
 
                                         <div class="govuk-body">
                                             {{ if eq .SourceType.Key "Payment" }}
-                                                {{ if eq .Type "DEL" }}
+                                                {{ if eq .Entity.source "FEE_REDUCTION"}}
+                                                    {{ if eq .Type "INS" }}
+                                                        {{ template "partial-event-fee-reduction-approved" (eventWithContext . "feeReductionTypes" $.FeeReductionTypes) }}
+                                                    {{ else if eq .Type "UPD" }}
+                                                        {{ template "partial-event-fee-reduction-updated" (eventWithContext . "feeReductionTypes" $.FeeReductionTypes) }}
+                                                    {{ else if eq .Type "DEL" }}
+                                                        {{ template "partial-event-fee-reduction-deleted" (eventWithContext . "feeReductionTypes" $.FeeReductionTypes) }}
+                                                    {{ end }}
+                                                {{ else if eq .Type "DEL" }}
                                                     {{ template "partial-event-payment-deleted" . }}
                                                 {{ else }}
                                                     {{ template "partial-event-payment" . }}
                                                 {{ end }}
                                             {{ else if eq .SourceType.Key "OutboundDocument" }}
-                                                {{ template "partial-event-outgoing-document" (eventPartialContext . $.DonorID) }}
+                                                {{ template "partial-event-outgoing-document" (eventWithContext . "donorID" $.DonorID) }}
                                             {{ else if eq .SourceType.Key "Lpa" }}
                                                 {{ if and (eq .Type "UPD") (.Changes.status) (ne (len .Changes.status) 0)}}
                                                     {{ template "partial-event-case-status" . }}

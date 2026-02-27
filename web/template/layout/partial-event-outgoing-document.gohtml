@@ -1,3 +1,3 @@
 {{ define "partial-event-outgoing-document" }}
-    <a class="govuk-link" href="/lpa#/donor/{{ $.DonorID }}/documents?docUuid={{ .SourceDocument.UUID }}" target="_top">{{ .SourceDocument.FriendlyDescription }}</a>
+    <a class="govuk-link" href="/lpa#/donor/{{ .Context.DonorID }}/documents?docUuid={{ .SourceDocument.UUID }}" target="_top">{{ .SourceDocument.FriendlyDescription }}</a>
 {{ end }}»
