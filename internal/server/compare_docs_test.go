@@ -146,7 +146,7 @@ func TestGetCompareDocsPanes(t *testing.T) {
 			},
 			getDocuments:             []sirius.Document{document1, document2},
 			closeURLToDocumentPanel1: "",
-			closeURLToDocumentPanel2: "/view-document/doc1-uuid",
+			closeURLToDocumentPanel2: "",
 		},
 	}
 
