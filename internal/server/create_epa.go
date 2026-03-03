@@ -76,9 +76,9 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 				data.Error = ve
 			} else if err != nil {
 				return err
+			} else {
+				return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseID))
 			}
-
-			return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseID))
 		}
 
 		return tmpl(w, data)
