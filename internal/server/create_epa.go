@@ -80,7 +80,7 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			} else if err != nil {
 				return err
 			} else {
-				return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseID))
+				return RedirectError(fmt.Sprintf("/appointment-epa?caseId=%d", caseID))
 			}
 		}
 
