@@ -120,6 +120,8 @@
                                                 {{ else }}
                                                     {{ template "partial-event-lpa" . }}
                                                 {{ end }}
+                                            {{ else if eq .SourceType.Key "Complaint" }}
+                                                {{ template "partial-event-complaint" . }}
                                             {{/* TODO: add more event types here as needed */}}
                                             {{ else }}
                                                 <dl class="govuk-summary-list">
