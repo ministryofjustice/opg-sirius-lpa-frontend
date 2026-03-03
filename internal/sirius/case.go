@@ -46,6 +46,9 @@ type Case struct {
 	UID                                       string            `json:"uId,omitempty"`
 	ValidationChecks                          []interface{}     `json:"validationChecks,omitempty"`
 	WithdrawnDate                             DateString        `json:"withdrawnDate,omitempty"`
+	EpaDonorSignatureDate                     DateString        `json:"epaDonorSignatureDate,omitempty"`
+	EpaDonorNoticeGivenDate                   DateString        `json:"epaDonorNoticeGivenDate,omitempty"`
+	AttorneyRelationshipToDonor               string            `json:"attorneyRelationshipToDonor,omitempty"`
 }
 
 func (c Case) Summary() string {

@@ -46,8 +46,10 @@ type Client interface {
 	AddPaymentClient
 	AllocateCasesClient
 	ApplyFeeReductionClient
+	AppointmentTypeEpaClient
 	AssignTaskClient
 	AttorneyDecisionsClient
+	CaseActorsEpaClient
 	ChangeAttorneyDetailsClient
 	ChangeCaseStatusClient
 	ChangeCertificateProviderDetailsClient
@@ -89,6 +91,7 @@ type Client interface {
 	ManageRestrictionsClient
 	MiReportingClient
 	ObjectionOutcomeClient
+	PaymentEpaClient
 	PostcodeLookupClient
 	RelationshipClient
 	RemoveAnAttorneyClient
@@ -129,6 +132,9 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"))))
 	mux.Handle("/create-epa", wrap(CreateEpa(client, templates.Get("create_epa.gohtml"))))
 	mux.Handle("/edit-epa", wrap(UpdateEpa(client, templates.Get("edit_epa.gohtml"))))
+	mux.Handle("/appointment-epa", wrap(AppointmentTypeEpa(client, templates.Get("appointment_type_epa.gohtml"))))
+	mux.Handle("/case-actors-epa", wrap(CaseActorsEpa(client, templates.Get("case_actors_epa.gohtml"))))
+	mux.Handle("/payment-epa", wrap(PaymentEpa(client, templates.Get("payment_epa.gohtml"))))
 	mux.Handle("/create-task", wrap(Task(client, templates.Get("task.gohtml"))))
 	mux.Handle("/create-additional-draft-lpa", wrap(CreateAdditionalDraft(client, templates.Get("create_additional_draft.gohtml"))))
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("relationship.gohtml"))))
