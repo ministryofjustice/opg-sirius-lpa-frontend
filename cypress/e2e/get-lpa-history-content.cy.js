@@ -199,7 +199,7 @@ describe("Show correct event content", () => {
         _class: String.raw`Opg\Core\Model\Entity\PowerOfAttorney\Complaint\Complaint`,
         summary: "Test Complaint",
         severity: "Medium",
-        description: "123"
+        description: "123",
       },
     });
     cy.visit("/donor/1/history");
@@ -207,7 +207,7 @@ describe("Show correct event content", () => {
       .eq(0)
       .should("contain.text", "Medium - Test Complaint")
       .should("contain.text", "123");
-  })
+  });
 
   it("can view complaint updated event", () => {
     mockEventHistory({
@@ -217,25 +217,34 @@ describe("Show correct event content", () => {
         _class: String.raw`Opg\Core\Model\Entity\PowerOfAttorney\Complaint\Complaint`,
         summary: "Test Complaint",
         severity: "Medium",
-        description: "123"
+        description: "123",
       },
       changeSet: {
-        receivedDate: [{ date: "2006-12-01 00:00:00.000000" }, { date: "2006-12-02 00:00:00.000000" }],
+        receivedDate: [
+          { date: "2006-12-01 00:00:00.000000" },
+          { date: "2006-12-02 00:00:00.000000" },
+        ],
         resolutionDate: {
-          "1": {
-            date: "2006-12-04 00:00:00.000000"
-          }
+          1: {
+            date: "2006-12-04 00:00:00.000000",
+          },
         },
         category: ["01", "02"],
-        origin: { "1": "contact_centre" }
+        origin: { 1: "contact_centre" },
       },
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
       .eq(0)
-      .should("contain.text", "Received date: 01/12/2006 changed to: 02/12/2006")
+      .should(
+        "contain.text",
+        "Received date: 01/12/2006 changed to: 02/12/2006",
+      )
       .should("contain.text", "Resolution date: 04/12/2006")
-      .should("contain.text", "Category: Correspondence changed to: OPG Decisions")
+      .should(
+        "contain.text",
+        "Category: Correspondence changed to: OPG Decisions",
+      )
       .should("contain.text", "Origin: Contact centre");
   })
 
