@@ -323,9 +323,11 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return false
 		},
-		"formatEventType": formatEventType,
-		"eventTypeColor":  eventTypeColor,
-		"paymentSource":   shared.PaymentSourceToAction,
+		"formatEventType":   formatEventType,
+		"eventTypeColor":    eventTypeColor,
+		"paymentSource":     shared.PaymentSourceToAction,
+		"complaintProperty": shared.TranslateComplaintProperty,
+		"complaintValue":    shared.TranslateComplaintValue,
 		"eventPartialContext": func(event sirius.LpaEvent, donorID string) LpaEventWithContext {
 			return LpaEventWithContext{
 				LpaEvent: event,
