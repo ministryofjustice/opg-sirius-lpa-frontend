@@ -43,7 +43,7 @@
         {{ end }}
 
         <div class="govuk-button-group govuk-!-padding-top-5">
-          <button class="govuk-button" data-module="govuk-button" type="submit">Save changes and exit</button>
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save and continue to next step</button>
           {{ if .Case.ID }}
             <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/edit-epa?caseId=%d" .Case.ID) }}">Cancel changes and exit</a>
           {{else}}

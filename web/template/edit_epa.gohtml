@@ -73,19 +73,19 @@
                 <legend class="govuk-fieldset__legend">Select one option</legend>
                 <div class="govuk-radios" data-module="govuk-radios">
                   <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="f-caseAttorneySingular" name="caseAttorneySingular" type="radio" value="true" {{ if eq .Epa.AppointmentType "caseAttorneySingular" }}checked{{ end }}>
+                    <input class="govuk-radios__input" id="f-caseAttorneySingular" name="caseAttorneySingular" type="radio" value="true" {{ if .Case.CaseAttorneySingular }}checked{{ end }}>
                     <label class="govuk-label govuk-radios__label" for="f-caseAttorneySingular">
                       Only one attorney is appointed
                     </label>
                   </div>
                   <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="f-caseAttorneyJointlyAndSeverally" name="caseAttorneyJointlyAndSeverally" type="radio" value="true" {{ if eq .Epa.AppointmentType "caseAttorneyJointlyAndSeverally" }}checked{{ end }}>
+                    <input class="govuk-radios__input" id="f-caseAttorneyJointlyAndSeverally" name="caseAttorneyJointlyAndSeverally" type="radio" value="true" {{ if .Case.CaseAttorneyJointlyAndSeverally }}checked{{ end }}>
                     <label class="govuk-label govuk-radios__label" for="f-caseAttorneyJointlyAndSeverally">
                       Jointly and severally
                     </label>
                   </div>
                   <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="f-caseAttorneyJointly" name="caseAttorneyJointly" type="radio" value="true" {{ if eq .Epa.AppointmentType "caseAttorneyJointly" }}checked{{ end }}>
+                    <input class="govuk-radios__input" id="f-caseAttorneyJointly" name="caseAttorneyJointly" type="radio" value="true" {{ if .Case.CaseAttorneyJointly }}checked{{ end }}>
                     <label class="govuk-label govuk-radios__label" for="f-caseAttorneyJointly">
                       Jointly
                     </label>
