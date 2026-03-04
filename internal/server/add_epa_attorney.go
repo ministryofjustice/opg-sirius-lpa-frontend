@@ -72,7 +72,7 @@ func AddEpaAttorney(client AddEpaAttorneyClient, tmpl template.Template) Handler
 			} else if err != nil {
 				return err
 			}
-			return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
+			return RedirectError(fmt.Sprintf("/case-actors-epa?caseId=%d", caseId))
 		}
 
 		return tmpl(w, data)
