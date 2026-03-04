@@ -120,7 +120,8 @@
                                                 {{ else }}
                                                     {{ template "partial-event-lpa" . }}
                                                 {{ end }}
-                                            {{/* TODO: add more event types here as needed */}}
+                                            {{ else if eq .SourceType.Key "Task" }}
+                                                {{ template "partial-event-task" . }}
                                             {{ else }}
                                                 <dl class="govuk-summary-list">
                                                     <ul class="govuk-list govuk-list--bullet">

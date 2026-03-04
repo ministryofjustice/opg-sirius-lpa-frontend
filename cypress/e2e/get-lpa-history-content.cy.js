@@ -190,4 +190,106 @@ describe("Show correct event content", () => {
       .eq(0)
       .should("contain.text", "Status changed from Pending to Withdrawn");
   });
+
+  it("can view task created event", () => {
+    mockEventHistory({
+      sourceType: "Task",
+      type: "INS",
+      entity: {
+        type: "Test Type",
+        name: "Some Task",
+        description: "some description",
+        assignee: {
+          displayName: "Some User",
+        },
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .within(() => {
+        cy.get("p.govuk-body strong").should("have.text", "Test Type");
+        cy.root()
+          .should("contain.text", "Test Type now assigned to Some User")
+          .should("contain.text", "Some Task — some description");
+      });
+  });
+
+  it("can view task created event, no type", () => {
+    mockEventHistory({
+      sourceType: "Task",
+      type: "INS",
+      entity: {
+        name: "Some Task",
+        description: "some description",
+        assignee: {
+          displayName: "Some User",
+        },
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Some Task — some description");
+  });
+
+  it("can view task completed event", () => {
+    mockEventHistory({
+      sourceType: "Task",
+      type: "UPD",
+      entity: {
+        name: "Some Task",
+      },
+      changeSet: {
+        completedDate: {
+          0: null,
+          1: {
+            date: "2026-03-16 15:00:00.000000",
+          },
+        },
+        status: ["Not Started", "Completed"],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .within(() => {
+        cy.get("p.govuk-body strong").should("have.text", "Completed");
+        cy.root()
+          .should("contain.text", "Some Task")
+          .should("contain.text", "Date completed: 16/03/2026");
+      });
+  });
+
+  it("can view task reassigned event", () => {
+    mockEventHistory({
+      sourceType: "Task",
+      type: "UPD",
+      entity: {
+        name: "Some Task",
+      },
+      changeSet: {
+        assignee: [
+          {
+            details: {
+              displayName: "Some User",
+            },
+          },
+          {
+            details: {
+              displayName: "Another User",
+            },
+          },
+        ],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Some Task")
+      .should(
+        "contain.text",
+        "Task was assigned to Some User now assigned to Another User",
+      );
+  });
 });
