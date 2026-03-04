@@ -7,14 +7,13 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-type UpdateEpaClient interface {
-	UpdateEpa(ctx sirius.Context, caseId int, epa sirius.Epa) error
+type EditEpaClient interface {
+	UpdateEpa(ctx sirius.Context, caseId int, epa sirius.Case) error
 	Case(sirius.Context, int) (sirius.Case, error)
 }
 
-type updateEpaData struct {
+type editEpaData struct {
 	XSRFToken            string
-	Epa                  sirius.Epa
 	Case                 sirius.Case
 	Success              bool
 	Error                sirius.ValidationError
@@ -22,7 +21,7 @@ type updateEpaData struct {
 	RelationshipToDonors []sirius.RefDataItem
 }
 
-func UpdateEpa(client UpdateEpaClient, tmpl template.Template) Handler {
+func EditEpa(client EditEpaClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseId, err := strToIntOrStatusError(r.FormValue("caseId"))
 		if err != nil {
@@ -35,7 +34,7 @@ func UpdateEpa(client UpdateEpaClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data := updateEpaData{
+		data := editEpaData{
 			XSRFToken: ctx.XSRFToken,
 			Case:      caseitem,
 			RelationshipToDonors: []sirius.RefDataItem{
@@ -48,7 +47,7 @@ func UpdateEpa(client UpdateEpaClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			epa := sirius.Epa{
+			epa := sirius.Case{
 				EpaDonorSignatureDate:           postFormDateString(r, "epaDonorSignatureDate"),
 				EpaDonorNoticeGivenDate:         postFormDateString(r, "epaDonorNoticeGivenDate"),
 				DonorHasOtherEpas:               postFormString(r, "donorHasOtherEpas") == "true",
@@ -60,7 +59,7 @@ func UpdateEpa(client UpdateEpaClient, tmpl template.Template) Handler {
 				CaseAttorneyJointly:             r.FormValue("caseAttorneyJointly") == "true",
 				AttorneyRelationshipToDonor:     postFormString(r, "relationshipToDonors"),
 			}
-			data.Epa = epa
+			data.Case = epa
 
 			if r.FormValue("showAllSections") == "true" {
 				data.ShowAllSections = true
