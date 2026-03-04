@@ -270,6 +270,14 @@ func TestGetSearchGetDeletedCasesFailure(t *testing.T) {
 }
 
 func TestGetSearchBadQuery(t *testing.T) {
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, searchData{
+			SearchTerm: "",
+			Filters:    searchFilters{},
+		}).
+		Return(nil)
+
 	testCases := map[string]string{
 		"no-search-term": "/search?term=",
 		"bad-query":      "/search?abc=hello",
@@ -280,11 +288,13 @@ func TestGetSearchBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, urlParams, nil)
 			w := httptest.NewRecorder()
 
-			err := Search(nil, nil)(w, r)
+			err := Search(nil, template.Func)(w, r)
 
-			assert.NotNil(t, err)
+			assert.Nil(t, err)
 		})
 	}
+
+	mock.AssertExpectationsForObjects(t, template)
 }
 
 func TestGetSearchErrors(t *testing.T) {
