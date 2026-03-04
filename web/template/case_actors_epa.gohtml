@@ -3,61 +3,60 @@
 {{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create EPA{{ end }}
 
 {{ define "main" }}
-    <form class="form" method="POST">
-        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
-        <div class="govuk-heading-l">Step 3: case actors</div>
-        <div>Attorneys:</div>
-        <div class="govuk-details__text">
-            {{ if gt (len .Case.Attorneys) 0 }}
-                {{ range $attorney := .Case.Attorneys }}
-                    <details class="govuk-details" >
-                        <summary class="govuk-details__summary">
-                            <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }}{{ else }}{{ .Salutation }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}{{ end }}</span>
-                        </summary>
-                        <div class="govuk-details__text">
-                            <div class="govuk-summary-list">
-                                <h3 class="govuk-heading-s">Attorney</h3>
-                                <div class="govuk-summary-list__row">
-                                    <dt class="govuk-summary-list__key">Title</dt>
-                                    <dd class="govuk-summary-list__value">{{ .Salutation }}</dd>
-                                </div>
-                                <div class="govuk-summary-list__row">
-                                    <dt class="govuk-summary-list__key">First name</dt>
-                                    <dd class="govuk-summary-list__value">{{ .Firstname }}</dd>
-                                </div>
-                                <div class="govuk-summary-list__row">
-                                    <dt class="govuk-summary-list__key">Middle name</dt>
-                                    <dd class="govuk-summary-list__value">{{ .Middlenames }}</dd>
-                                </div>
-                                <div class="govuk-summary-list__row">
-                                    <dt class="govuk-summary-list__key">Last name</dt>
-                                    <dd class="govuk-summary-list__value">{{ .Surname }}</dd>
-                                </div>
-                                <div class="govuk-summary-list__row">
-                                    <dt class="govuk-summary-list__key">Date of birth</dt>
-                                    <dd class="govuk-summary-list__value">{{ .DateOfBirth }}</dd>
-                                </div>
-                                <div class="govuk-summary-list__row">
-                                    <dt class="govuk-summary-list__key">Company name</dt>
-                                    <dd class="govuk-summary-list__value">{{ .CompanyName }}</dd>
-                                </div>
-                                <div class="govuk-summary-list__row">
-                                    <dt class="govuk-summary-list__key">Address</dt>
-                                    <dd class="govuk-summary-list__value">
-                                        {{ .AddressLine1 }}{{ if .AddressLine2 }}<br>{{ .AddressLine2 }}{{ end }}{{ if .AddressLine3 }}<br>{{ .AddressLine3 }}{{ end }}{{ if .Town }}<br>{{ .Town }}{{ end }}{{ if .Postcode }}<br>{{ .Postcode }}{{ end }}{{ if .Country }}<br>{{ .Country }}{{ end }}
-                                    </dd>
-                                </div>
+    <div class="govuk-heading-l">Step 3: case actors</div>
+    <div>Attorneys:</div>
+    <div class="govuk-details__text">
+        {{ if gt (len .Epa.Attorneys) 0 }}
+            {{ range $attorney := .Epa.Attorneys }}
+                <details class="govuk-details" >
+                    <summary class="govuk-details__summary">
+                        <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }}{{ else }}{{ .Salutation }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}{{ end }}</span>
+                    </summary>
+                    <div class="govuk-details__text">
+                        <div class="govuk-summary-list">
+                            <h3 class="govuk-heading-s">Attorney</h3>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">Title</dt>
+                                <dd class="govuk-summary-list__value">{{ .Salutation }}</dd>
+                            </div>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">First name</dt>
+                                <dd class="govuk-summary-list__value">{{ .Firstname }}</dd>
+                            </div>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">Middle name</dt>
+                                <dd class="govuk-summary-list__value">{{ .Middlenames }}</dd>
+                            </div>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">Last name</dt>
+                                <dd class="govuk-summary-list__value">{{ .Surname }}</dd>
+                            </div>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">Date of birth</dt>
+                                <dd class="govuk-summary-list__value">{{ .DateOfBirth }}</dd>
+                            </div>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">Company name</dt>
+                                <dd class="govuk-summary-list__value">{{ .CompanyName }}</dd>
+                            </div>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">Address</dt>
+                                <dd class="govuk-summary-list__value">
+                                    {{ .AddressLine1 }}{{ if .AddressLine2 }}<br>{{ .AddressLine2 }}{{ end }}{{ if .AddressLine3 }}<br>{{ .AddressLine3 }}{{ end }}{{ if .Town }}<br>{{ .Town }}{{ end }}{{ if .Postcode }}<br>{{ .Postcode }}{{ end }}{{ if .Country }}<br>{{ .Country }}{{ end }}
+                                </dd>
                             </div>
                         </div>
-                    </details>
-                {{ end }}
-            {{ else }}
-                <p class="govuk-body">No attorneys have been added yet.</p>
+                    </div>
+                </details>
             {{ end }}
-        </div>
-        <div class="govuk-button-group govuk-!-padding-top-5">
-            <button class="govuk-button" data-module="govuk-button" type="submit">Save and continue to next step</button>
-            <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel changes and exit</a>
-        </div>
-    </form>
+        {{ else }}
+            <p class="govuk-body">No attorneys have been added yet.</p>
+        {{ end }}
+    </div>
+    <div class="govuk-button-group govuk-!-padding-top-5">
+        <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-epa-attorney?caseId=%d" .CaseID)}}">Add attorney</a>
+        <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-epa-correspondent?caseId=%d" .CaseID)}}">Add correspondent</a>
+        <button class="govuk-button" data-module="govuk-button" type="submit">Save and continue to next step</button>
+        <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel changes and exit</a>
+    </div>
 {{ end }}
