@@ -38,10 +38,10 @@ func (c *Client) CreateEpa(ctx Context, donorID int, epa Epa) (int, error) {
 	return response.Id, err
 }
 
-func (c *Client) UpdateEpa(ctx Context, caseId int, epa Epa) error {
-	return c.post(ctx, fmt.Sprintf("/lpa-api/v1/epas/%d", caseId), epa, nil)
-}
+//func (c *Client) UpdateEpa(ctx Context, caseId int, epa Epa) error {
+//	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/epas/%d", caseId), epa, nil)
+//}
 
-func (c *Client) UpdateEpaPut(ctx Context, caseId int, epa Case) error {
+func (c *Client) UpdateEpa(ctx Context, caseId int, epa Case) error {
 	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/epas/%d", caseId), epa, nil)
 }
