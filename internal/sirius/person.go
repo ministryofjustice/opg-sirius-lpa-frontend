@@ -11,6 +11,7 @@ type Person struct {
 	Salutation                   string     `json:"salutation"`
 	Firstname                    string     `json:"firstname"`
 	Middlenames                  string     `json:"middlenames"`
+	Othernames                   string     `json:"othernames"`
 	Surname                      string     `json:"surname"`
 	DateOfBirth                  DateString `json:"dob"`
 	PreviouslyKnownAs            string     `json:"previousNames"`
@@ -64,4 +65,8 @@ func (c *Client) Person(ctx Context, id int) (Person, error) {
 	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/persons/%d", id), &v)
 
 	return v, err
+}
+
+func (c *Client) UpdatePerson(ctx Context, id int, person Person) error {
+	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/persons/%d", id), person, nil)
 }
