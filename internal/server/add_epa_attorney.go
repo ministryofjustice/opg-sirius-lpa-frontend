@@ -10,11 +10,13 @@ import (
 
 type AddEpaAttorneyClient interface {
 	CreateAttorney(ctx sirius.Context, caseId int, attorney sirius.Attorney) error
+	Case(sirius.Context, int) (sirius.Case, error)
 }
 
 type addEpaAttorneyData struct {
 	XSRFToken string
 	CaseID    int
+	Epa       sirius.Case
 	Attorney  sirius.Attorney
 	Success   bool
 	Error     sirius.ValidationError
@@ -29,9 +31,15 @@ func AddEpaAttorney(client AddEpaAttorneyClient, tmpl template.Template) Handler
 
 		ctx := getContext(r)
 
+		caseitem, err := client.Case(ctx, caseId)
+		if err != nil {
+			return err
+		}
+
 		data := addEpaAttorneyData{
 			XSRFToken: ctx.XSRFToken,
 			CaseID:    caseId,
+			Epa:       caseitem,
 		}
 
 		if r.Method == http.MethodPost {
