@@ -9,7 +9,7 @@ import (
 )
 
 type AppointmentTypeEpaClient interface {
-	UpdateEpaPut(ctx sirius.Context, caseId int, epa sirius.Case) error
+	UpdateEpa(ctx sirius.Context, caseId int, epa sirius.Case) error
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
 }
 
@@ -35,19 +35,14 @@ func AppointmentTypeEpa(client AppointmentTypeEpaClient, tmpl template.Template)
 			Title:     "Create EPA details",
 		}
 
-		epa, err := client.Case(ctx, caseId)
-		if err != nil {
-			return err
-		}
-
 		if r.Method == http.MethodPost {
-			epa = sirius.Case{
+			epa := sirius.Case{
 				CaseAttorneySingular:            r.FormValue("caseAttorney") == "singular",
 				CaseAttorneyJointlyAndSeverally: r.FormValue("caseAttorney") == "jointly-and-severally",
 				CaseAttorneyJointly:             r.FormValue("caseAttorney") == "jointly",
 			}
 
-			err := client.UpdateEpaPut(ctx, caseId, epa)
+			err := client.UpdateEpa(ctx, caseId, epa)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)

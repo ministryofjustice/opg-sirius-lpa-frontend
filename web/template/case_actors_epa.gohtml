@@ -8,8 +8,8 @@
         <div class="govuk-heading-l">Step 3: case actors</div>
         <div>Attorneys:</div>
         <div class="govuk-details__text">
-            {{ if gt (len .Case.Attorneys) 0 }}
-                {{ range $attorney := .Case.Attorneys }}
+            {{ if gt (len .Epa.Attorneys) 0 }}
+                {{ range $attorney := .Epa.Attorneys }}
                     <details class="govuk-details" >
                         <summary class="govuk-details__summary">
                             <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }}{{ else }}{{ .Salutation }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}{{ end }}</span>

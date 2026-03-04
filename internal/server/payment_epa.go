@@ -9,7 +9,7 @@ import (
 )
 
 type PaymentEpaClient interface {
-	UpdateEpaPut(ctx sirius.Context, caseId int, epa sirius.Case) error
+	UpdateEpa(ctx sirius.Context, caseId int, epa sirius.Case) error
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
 }
 
@@ -35,15 +35,13 @@ func PaymentEpa(client PaymentEpaClient, tmpl template.Template) Handler {
 			Title:     "Create EPA details",
 		}
 
-		epa, err := client.Case(ctx, caseId)
-		if err != nil {
-			return err
-		}
-
 		if r.Method == http.MethodPost {
-			epa = sirius.Case{}
+			//paymentByCheque:true
+			//paymentDate:"04/03/2026"
+			//paymentExemption:true
+			epa := sirius.Case{}
 
-			err := client.UpdateEpaPut(ctx, caseId, epa)
+			err := client.UpdateEpa(ctx, caseId, epa)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
