@@ -4,55 +4,89 @@
 
 {{ define "main" }}
     <div class="govuk-heading-l">Step 3: case actors</div>
-    <div>Attorneys:</div>
-    <div class="govuk-details__text">
-        {{ if gt (len .Epa.Attorneys) 0 }}
-            {{ range $attorney := .Epa.Attorneys }}
-                <details class="govuk-details" >
-                    <summary class="govuk-details__summary">
-                        <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }}{{ else }}{{ .Salutation }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}{{ end }}</span>
-                    </summary>
-                    <div class="govuk-details__text">
-                        <div class="govuk-summary-list">
-                            <h3 class="govuk-heading-s">Attorney</h3>
-                            <div class="govuk-summary-list__row">
-                                <dt class="govuk-summary-list__key">Title</dt>
-                                <dd class="govuk-summary-list__value">{{ .Salutation }}</dd>
-                            </div>
-                            <div class="govuk-summary-list__row">
-                                <dt class="govuk-summary-list__key">First name</dt>
-                                <dd class="govuk-summary-list__value">{{ .Firstname }}</dd>
-                            </div>
-                            <div class="govuk-summary-list__row">
-                                <dt class="govuk-summary-list__key">Middle name</dt>
-                                <dd class="govuk-summary-list__value">{{ .Middlenames }}</dd>
-                            </div>
-                            <div class="govuk-summary-list__row">
-                                <dt class="govuk-summary-list__key">Last name</dt>
-                                <dd class="govuk-summary-list__value">{{ .Surname }}</dd>
-                            </div>
-                            <div class="govuk-summary-list__row">
-                                <dt class="govuk-summary-list__key">Date of birth</dt>
-                                <dd class="govuk-summary-list__value">{{ .DateOfBirth }}</dd>
-                            </div>
-                            <div class="govuk-summary-list__row">
-                                <dt class="govuk-summary-list__key">Company name</dt>
-                                <dd class="govuk-summary-list__value">{{ .CompanyName }}</dd>
-                            </div>
-                            <div class="govuk-summary-list__row">
-                                <dt class="govuk-summary-list__key">Address</dt>
-                                <dd class="govuk-summary-list__value">
-                                    {{ .AddressLine1 }}{{ if .AddressLine2 }}<br>{{ .AddressLine2 }}{{ end }}{{ if .AddressLine3 }}<br>{{ .AddressLine3 }}{{ end }}{{ if .Town }}<br>{{ .Town }}{{ end }}{{ if .Postcode }}<br>{{ .Postcode }}{{ end }}{{ if .Country }}<br>{{ .Country }}{{ end }}
-                                </dd>
-                            </div>
-                        </div>
-                    </div>
-                </details>
-            {{ end }}
-        {{ else }}
-            <p class="govuk-body">No attorneys have been added yet.</p>
+    <div class="govuk-heading-s">Attorneys:</div>
+    {{ if gt (len .Epa.Attorneys) 0 }}
+        {{ range $attorney := .Epa.Attorneys }}
+            <details class="govuk-details" >
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }}{{ else }}{{ .Salutation }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}{{ end }}</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <h3 class="govuk-heading-s">Attorney</h3>
+                    <table class="govuk-table">
+                        <tbody class="govuk-table__body">
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Title</th>
+                                <td class="govuk-table__cell">{{ .Salutation }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">First name</th>
+                                <td class="govuk-table__cell">{{ .Firstname }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Middle name</th>
+                                <td class="govuk-table__cell">{{ .Middlenames }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Last name</th>
+                                <td class="govuk-table__cell">{{ .Surname }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Date of birth</th>
+                                <td class="govuk-table__cell">{{ .DateOfBirth }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Company name</th>
+                                <td class="govuk-table__cell">{{ .CompanyName }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Address line 1</th>
+                                <td class="govuk-table__cell">{{ .AddressLine1 }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Address line 2</th>
+                                <td class="govuk-table__cell">{{ .AddressLine2 }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Address line 3</th>
+                                <td class="govuk-table__cell">{{ .AddressLine3 }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Town</th>
+                                <td class="govuk-table__cell">{{ .Town }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">County</th>
+                                <td class="govuk-table__cell">{{ .County }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Postcode</th>
+                                <td class="govuk-table__cell">{{ .Postcode }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Country</th>
+                                <td class="govuk-table__cell">{{ .Country }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Airmail required</th>
+                                <td class="govuk-table__cell">{{ .IsAirmailRequired }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Relationship to donor</th>
+                                <td class="govuk-table__cell">{{ .RelationshipToDonor }}</td>
+                            </tr>
+                            <tr class="govuk-table__row">
+                                <th scope="row" class="govuk-table__header">Is this attorney applying to register the EPA?</th>
+                                <td class="govuk-table__cell">{{ .IsAttorneyApplyingToRegister }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
         {{ end }}
-    </div>
+    {{ else }}
+        <p class="govuk-body">No attorneys have been added yet.</p>
+    {{ end }}
     <div class="govuk-button-group govuk-!-padding-top-5">
         <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-epa-attorney?caseId=%d" .CaseID)}}">Add attorney</a>
         <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-epa-correspondent?caseId=%d" .CaseID)}}">Add correspondent</a>
