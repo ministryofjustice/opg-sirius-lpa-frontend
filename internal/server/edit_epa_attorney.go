@@ -3,17 +3,18 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-type AddEpaAttorneyClient interface {
-	CreateAttorney(ctx sirius.Context, caseId int, attorney sirius.Person) error
+type EditEpaAttorneyClient interface {
+	UpdatePerson(ctx sirius.Context, caseId int, attorney sirius.Person) error
 	Person(sirius.Context, int) (sirius.Person, error)
 }
 
-type addEpaAttorneyData struct {
+type editEpaAttorneyData struct {
 	XSRFToken            string
 	CaseID               int
 	Attorney             sirius.Person
@@ -22,7 +23,7 @@ type addEpaAttorneyData struct {
 	RelationshipToDonors []sirius.RefDataItem
 }
 
-func AddEpaAttorney(client AddEpaAttorneyClient, tmpl template.Template) Handler {
+func EditEpaAttorney(client EditEpaAttorneyClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -31,9 +32,21 @@ func AddEpaAttorney(client AddEpaAttorneyClient, tmpl template.Template) Handler
 			return err
 		}
 
-		data := addEpaAttorneyData{
+		attorneyId, err := strconv.Atoi(r.FormValue("attorneyId"))
+		if err != nil {
+			return err
+		}
+		fmt.Println(caseId, attorneyId)
+
+		attorney, err := client.Person(ctx, attorneyId)
+		if err != nil {
+			return err
+		}
+
+		data := editEpaAttorneyData{
 			XSRFToken: ctx.XSRFToken,
 			CaseID:    caseId,
+			Attorney:  attorney,
 			RelationshipToDonors: []sirius.RefDataItem{
 				{Handle: "civil partner", Label: "civil partner"},
 				{Handle: "child", Label: "child"},
@@ -43,22 +56,9 @@ func AddEpaAttorney(client AddEpaAttorneyClient, tmpl template.Template) Handler
 			},
 		}
 
-		if r.FormValue("attorneyId") != "" {
-			attorneyId, err := strToIntOrStatusError(r.FormValue("attorneyId"))
-			if err != nil {
-				return err
-			}
-
-			attorney, err := client.Person(ctx, attorneyId)
-			if err != nil {
-				return err
-			}
-
-			data.Attorney = attorney
-		}
-
 		if r.Method == http.MethodPost {
-			attorney := sirius.Person{
+			fmt.Println(caseId, attorneyId)
+			updateAttorney := sirius.Person{
 				Salutation:                   postFormString(r, "salutation"),
 				Firstname:                    postFormString(r, "firstname"),
 				Middlenames:                  postFormString(r, "middlenames"),
@@ -81,7 +81,7 @@ func AddEpaAttorney(client AddEpaAttorneyClient, tmpl template.Template) Handler
 			}
 			data.Attorney = attorney
 
-			err := client.CreateAttorney(ctx, caseId, attorney)
+			err := client.UpdatePerson(ctx, attorneyId, updateAttorney)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)

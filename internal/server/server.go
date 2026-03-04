@@ -74,6 +74,8 @@ type Client interface {
 	EditDatesClient
 	EditDocumentClient
 	EditDonorClient
+	EditEpaAttorneyClient
+	EditEpaClient
 	EditFeeReductionClient
 	EditInvestigationClient
 	EditPaymentClient
@@ -102,7 +104,6 @@ type Client interface {
 	TaskClient
 	UnlinkPersonClient
 	UpdateDecisionsClient
-	EditEpaClient
 	UpdateObjectionClient
 	ViewDocumentClient
 	WarningClient
@@ -127,6 +128,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/lpa/{uid}/manage-restrictions", wrap(ManageRestrictions(client, templates.Get("manage-restrictions.gohtml"), templates.Get("confirm-restrictions.gohtml"))))
 	mux.Handle("/add-objection", wrap(AddObjection(client, templates.Get("objection.gohtml"))))
 	mux.Handle("/add-epa-attorney", wrap(AddEpaAttorney(client, templates.Get("add_epa_attorney.gohtml"))))
+	mux.Handle("/edit-epa-attorney", wrap(EditEpaAttorney(client, templates.Get("edit_epa_attorney.gohtml"))))
 	mux.Handle("/change-donor-details", wrap(ChangeDonorDetails(client, templates.Get("change-donor-details.gohtml"))))
 	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning.gohtml"))))
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"))))
