@@ -93,7 +93,7 @@
     <div class="govuk-button-group govuk-!-padding-top-5">
         <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/epa-attorney?caseId=%d" .CaseID)}}">Add attorney</a>
         <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-epa-correspondent?caseId=%d" .CaseID)}}">Add correspondent</a>
-        <button class="govuk-button" data-module="govuk-button" type="submit">Save and continue to next step</button>
+        <a class="govuk-button" href="{{ prefix (printf "/payment-epa?caseId=%d" .CaseID)}}">Save and continue to next step</a>
         <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel changes and exit</a>
     </div>
 {{ end }}
