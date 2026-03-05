@@ -37,7 +37,7 @@
 
         {{ template "select" (select "relationshipToDonor" "Relationship to donor" .Attorney.RelationshipToDonor .Error.Field.relationshipToDonor (options .RelationshipToDonors)) }}
 
-        {{ template "radios" (radios "isAttorneyApplyingToRegister" "Is this attorney applying to register the EPA" (stringifyBool .Attorney.IsAttorneyApplyingToRegister) .Error.Field.isAttorneyApplyingToRegister
+        {{ template "radios" (radios "isAttorneyActive" "Is this attorney active" (stringifyBool .Attorney.IsAttorneyApplyingToRegister) .Error.Field.isAttorneyApplyingToRegister
         (item "true" "Yes")
         (item "false" "No")
         ) }}
