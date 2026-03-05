@@ -230,7 +230,7 @@ describe("Show correct event content", () => {
           },
         },
         category: ["01", "02"],
-        origin: { 1: "contact_centre" },
+        origin: { 1: "CONTACT_CENTRE" },
       },
     });
     cy.visit("/donor/1/history");

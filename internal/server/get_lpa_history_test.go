@@ -28,8 +28,8 @@ func (m *mockGetLpaHistory) RefDataByCategory(ctx sirius.Context, category strin
 
 func TestGetLpaHistory(t *testing.T) {
 	feeReductionTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
-	complaintCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	subcomplaintCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complaintCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test", Subcategories: subcomplaintCategories}}
 	complainantCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	complaintOrigins := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	compensationTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
@@ -204,8 +204,8 @@ func TestGetLpaHistoryWhenFailureOnGetEvents(t *testing.T) {
 
 func TestPostFiltersLpaHistory(t *testing.T) {
 	feeReductionTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
-	complaintCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	subcomplaintCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complaintCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test", Subcategories: subcomplaintCategories}}
 	complainantCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	complaintOrigins := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	compensationTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
