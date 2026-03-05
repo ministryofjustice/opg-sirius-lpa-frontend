@@ -36,10 +36,11 @@ func PaymentEpa(client PaymentEpaClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			//paymentByCheque:true
-			//paymentDate:"04/03/2026"
-			//paymentExemption:true
-			epa := sirius.Case{}
+			epa := sirius.Case{
+				PaymentByCheque:  r.FormValue("paymentByCheque") == "No",
+				PaymentExemption: r.FormValue("paymentExemption") == "No",
+				PaymentDate:      postFormDateString(r, "paymentDate"),
+			}
 
 			err := client.UpdateEpa(ctx, caseId, epa)
 

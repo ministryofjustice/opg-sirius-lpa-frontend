@@ -49,6 +49,8 @@ type Case struct {
 	EpaDonorSignatureDate                     DateString        `json:"epaDonorSignatureDate,omitempty"`
 	EpaDonorNoticeGivenDate                   DateString        `json:"epaDonorNoticeGivenDate,omitempty"`
 	AttorneyRelationshipToDonor               string            `json:"attorneyRelationshipToDonor,omitempty"`
+	PaymentByCheque                           bool              `json:"paymentByCheque,omitempty"`
+	PaymentExemption                          bool              `json:"paymentExemption,omitempty"`
 }
 
 func (c Case) Summary() string {
