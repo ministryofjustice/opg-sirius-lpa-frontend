@@ -85,9 +85,7 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 
 			for _, category := range complaintCategories {
 				if len(category.Subcategories) != 0 {
-					for _, subcategory := range category.Subcategories {
-						data.ComplaintSubcategories = append(data.ComplaintSubcategories, subcategory)
-					}
+					data.ComplaintSubcategories = append(data.ComplaintSubcategories, category.Subcategories...)
 				}
 			}
 			return nil
