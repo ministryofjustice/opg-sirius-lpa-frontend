@@ -343,9 +343,9 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
 						context.ComplaintCategories = v
 					}
-				case "subcomplaintCategories":
+				case "complaintSubcategories":
 					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
-						context.SubcomplaintCategories = v
+						context.ComplaintSubcategories = v
 					}
 				case "complainantCategories":
 					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
@@ -381,7 +381,7 @@ type LpaEventWithContext struct {
 type EventContext struct {
 	FeeReductionTypes      []sirius.RefDataItem
 	ComplaintCategories    []sirius.RefDataItem
-	SubcomplaintCategories []sirius.RefDataItem
+	ComplaintSubcategories []sirius.RefDataItem
 	ComplainantCategories  []sirius.RefDataItem
 	ComplaintOrigins       []sirius.RefDataItem
 	CompensationTypes      []sirius.RefDataItem

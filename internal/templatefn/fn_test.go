@@ -723,14 +723,33 @@ func TestEventWithContext(t *testing.T) {
 	event := sirius.LpaEvent{}
 	donorID := "123"
 	feeReductionTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complaintCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complaintSubcategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complainantCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complaintOrigins := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	compensationTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 
 	expected := LpaEventWithContext{
 		LpaEvent: event,
 		Context: EventContext{
-			DonorID:           donorID,
-			FeeReductionTypes: feeReductionTypes,
+			DonorID:                donorID,
+			FeeReductionTypes:      feeReductionTypes,
+			ComplaintCategories:    complaintCategories,
+			ComplaintSubcategories: complaintSubcategories,
+			ComplainantCategories:  complainantCategories,
+			ComplaintOrigins:       complaintOrigins,
+			CompensationTypes:      compensationTypes,
 		},
 	}
-	result := fn(event, "donorID", donorID, "feeReductionTypes", feeReductionTypes)
+	result := fn(
+		event,
+		"donorID", donorID,
+		"feeReductionTypes", feeReductionTypes,
+		"complaintCategories", complaintCategories,
+		"complaintSubcategories", complaintSubcategories,
+		"complainantCategories", complainantCategories,
+		"complaintOrigins", complaintOrigins,
+		"compensationTypes", compensationTypes,
+	)
 	assert.Equal(t, expected, result)
 }

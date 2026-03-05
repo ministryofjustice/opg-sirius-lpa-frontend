@@ -24,7 +24,7 @@ type getLpaHistory struct {
 	IsFiltered             bool
 	FeeReductionTypes      []sirius.RefDataItem
 	ComplaintCategories    []sirius.RefDataItem
-	SubcomplaintCategories []sirius.RefDataItem
+	ComplaintSubcategories []sirius.RefDataItem
 	ComplainantCategories  []sirius.RefDataItem
 	ComplaintOrigins       []sirius.RefDataItem
 	CompensationTypes      []sirius.RefDataItem
@@ -44,12 +44,12 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		data := getLpaHistory{
-			XSRFToken:       ctx.XSRFToken,
-			DonorID:         donorId,
+			XSRFToken: ctx.XSRFToken,
+			DonorID:   donorId,
 			Form: FilterLpaEventsForm{
 				Sort: "desc",
 			},
-			IsFiltered:      false,
+			IsFiltered: false,
 		}
 
 		group.Go(func() error {
@@ -78,7 +78,7 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 			complaintCategories, err := client.RefDataByCategory(ctx.With(groupCtx), sirius.ComplaintCategory)
 			if err != nil {
 				data.ComplaintCategories = []sirius.RefDataItem(nil)
-				data.SubcomplaintCategories = []sirius.RefDataItem(nil)
+				data.ComplaintSubcategories = []sirius.RefDataItem(nil)
 				return nil
 			}
 			data.ComplaintCategories = complaintCategories
@@ -86,7 +86,7 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 			for _, category := range complaintCategories {
 				if len(category.Subcategories) != 0 {
 					for _, subcategory := range category.Subcategories {
-						data.SubcomplaintCategories = append(data.SubcomplaintCategories, subcategory)
+						data.ComplaintSubcategories = append(data.ComplaintSubcategories, subcategory)
 					}
 				}
 			}

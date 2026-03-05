@@ -1,6 +1,6 @@
 {{ define "partial-event-complaint" }}
     {{ $complaintCategories := $.Context.ComplaintCategories }}
-    {{ $subcomplaintCategories := $.Context.SubcomplaintCategories }}
+    {{ $complaintSubcategories := $.Context.ComplaintSubcategories }}
     {{ $complainantCategories := $.Context.ComplainantCategories }}
     {{ $complaintOrigins := $.Context.ComplaintOrigins }}
     {{ $compensationTypes := $.Context.CompensationTypes }}
@@ -23,7 +23,7 @@
                     {{ else if eq $k "category" }}
                         <li>{{ complaintProperty $k }}: {{ translateRefData $complaintCategories $oldValue}} changed to: {{ translateRefData $complaintCategories $newValue }}</li>
                     {{ else if eq $k "subCategory" }}
-                        <li>{{ complaintProperty $k }}: {{ translateRefData $subcomplaintCategories $oldValue }} changed to: {{ translateRefData $subcomplaintCategories $newValue }}</li>
+                        <li>{{ complaintProperty $k }}: {{ translateRefData $complaintSubcategories $oldValue }} changed to: {{ translateRefData $complaintSubcategories $newValue }}</li>
                     {{ else if eq $k "complainantCategory" }}
                         <li>{{ complaintProperty $k }}: {{ translateRefData $complainantCategories $oldValue}} changed to: {{ translateRefData $complainantCategories $newValue }}</li>
                     {{ else if eq $k "origin" }}
@@ -41,7 +41,7 @@
                     {{ else if eq $k "category" }}
                         <li>{{ complaintProperty $k }}: {{ translateRefData $complaintCategories $newValue }}</li>
                     {{ else if eq $k "subCategory" }}
-                        <li>{{ complaintProperty $k }}: {{ translateRefData $subcomplaintCategories $newValue }}</li>
+                        <li>{{ complaintProperty $k }}: {{ translateRefData $complaintSubcategories $newValue }}</li>
                     {{ else if eq $k "complainantCategory" }}
                         <li>{{ complaintProperty $k }}: {{ translateRefData $complainantCategories $newValue }}</li>
                     {{ else if eq $k "origin" }}
