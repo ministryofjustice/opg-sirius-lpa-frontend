@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -41,21 +40,6 @@ func CaseActorsEpa(client CaseActorsEpaClient, tmpl template.Template) Handler {
 			CaseID:    caseId,
 			Title:     "Create EPA details",
 			Epa:       epa,
-		}
-
-		if r.Method == http.MethodPost {
-			epa = sirius.Case{}
-
-			err := client.UpdateEpa(ctx, caseId, epa)
-
-			if ve, ok := err.(sirius.ValidationError); ok {
-				w.WriteHeader(http.StatusBadRequest)
-				data.Error = ve
-			} else if err != nil {
-				return err
-			} else {
-				return RedirectError(fmt.Sprintf("/payment-epa?caseId=%d", caseId))
-			}
 		}
 
 		return tmpl(w, data)
