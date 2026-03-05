@@ -372,3 +372,7 @@ $govuk-assets-path: "../assets/";
 .app-table__header--date {
   width: 8em;
 }
+
+.app-search-results--no-results {
+  overflow: visible;
+}
