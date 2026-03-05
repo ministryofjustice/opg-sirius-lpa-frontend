@@ -246,7 +246,7 @@ describe("Show correct event content", () => {
         "Category: Correspondence changed to: OPG Decisions",
       )
       .should("contain.text", "Origin: Contact centre");
-  })
+  });
 
   it("can view task created event", () => {
     mockEventHistory({

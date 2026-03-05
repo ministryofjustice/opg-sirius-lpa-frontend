@@ -28,6 +28,11 @@ func (m *mockGetLpaHistory) RefDataByCategory(ctx sirius.Context, category strin
 
 func TestGetLpaHistory(t *testing.T) {
 	feeReductionTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complaintCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	subcomplaintCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complainantCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complaintOrigins := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	compensationTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 
 	tests := []struct {
 		name        string
@@ -120,6 +125,18 @@ func TestGetLpaHistory(t *testing.T) {
 			client.
 				On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 				Return(feeReductionTypes, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+				Return(complaintCategories, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+				Return(complainantCategories, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+				Return(complaintOrigins, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+				Return(compensationTypes, nil)
 
 			client.
 				On("GetEvents", mock.Anything, "123", tc.caseIdsArgs, []string{}, "desc").
@@ -128,12 +145,17 @@ func TestGetLpaHistory(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, getLpaHistory{
-					FeeReductionTypes:   feeReductionTypes,
-					DonorID:             "123",
-					Events:              tc.response.Events,
-					EventFilterData:     tc.response.Metadata.SourceTypes,
-					TotalEvents:         tc.response.Total,
-					TotalFilteredEvents: 0,
+					FeeReductionTypes:      feeReductionTypes,
+					ComplaintCategories:    complaintCategories,
+					SubcomplaintCategories: subcomplaintCategories,
+					ComplainantCategories:  complainantCategories,
+					ComplaintOrigins:       complaintOrigins,
+					CompensationTypes:      compensationTypes,
+					DonorID:                "123",
+					Events:                 tc.response.Events,
+					EventFilterData:        tc.response.Metadata.SourceTypes,
+					TotalEvents:            tc.response.Total,
+					TotalFilteredEvents:    0,
 					Form: FilterLpaEventsForm{
 						Sort: "desc",
 					},
@@ -157,6 +179,18 @@ func TestGetLpaHistoryWhenFailureOnGetEvents(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return([]sirius.RefDataItem(nil), nil)
 	client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, "desc").Return(sirius.LpaEventsResponse{}, errExample)
 
 	server := newMockServer("/lpa-api/v1/persons/{donorId}/events", GetLpaHistory(client, nil))
@@ -170,6 +204,11 @@ func TestGetLpaHistoryWhenFailureOnGetEvents(t *testing.T) {
 
 func TestPostFiltersLpaHistory(t *testing.T) {
 	feeReductionTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complaintCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	subcomplaintCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complainantCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complaintOrigins := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	compensationTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 
 	unfilteredResponse := sirius.LpaEventsResponse{
 		Events: []sirius.LpaEvent{
@@ -261,6 +300,18 @@ func TestPostFiltersLpaHistory(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return(feeReductionTypes, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(complaintCategories, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(complainantCategories, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(complaintOrigins, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(compensationTypes, nil)
 	client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, "desc").
 		Return(unfilteredResponse, nil)
 	client.
@@ -269,13 +320,18 @@ func TestPostFiltersLpaHistory(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.On("Func", mock.Anything, getLpaHistory{
-		FeeReductionTypes:   feeReductionTypes,
-		DonorID:             "123",
-		Events:              filteredResponse.Events,
-		EventFilterData:     unfilteredResponse.Metadata.SourceTypes,
-		TotalEvents:         unfilteredResponse.Total,
-		TotalFilteredEvents: filteredResponse.Total,
-		IsFiltered:          true,
+		FeeReductionTypes:      feeReductionTypes,
+		ComplaintCategories:    complaintCategories,
+		SubcomplaintCategories: subcomplaintCategories,
+		ComplainantCategories:  complainantCategories,
+		ComplaintOrigins:       complaintOrigins,
+		CompensationTypes:      compensationTypes,
+		DonorID:                "123",
+		Events:                 filteredResponse.Events,
+		EventFilterData:        unfilteredResponse.Metadata.SourceTypes,
+		TotalEvents:            unfilteredResponse.Total,
+		TotalFilteredEvents:    filteredResponse.Total,
+		IsFiltered:             true,
 		Form: FilterLpaEventsForm{
 			Types: []string{"Lpa", "Payment"},
 			Sort:  "asc",
@@ -302,6 +358,18 @@ func TestPostFiltersLpaHistoryWhenFailureOnGetEvents(t *testing.T) {
 	client := &mockGetLpaHistory{}
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
 		Return([]sirius.RefDataItem(nil), nil)
 
 	client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, "desc").

@@ -327,7 +327,6 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"eventTypeColor":    eventTypeColor,
 		"paymentSource":     shared.PaymentSourceToAction,
 		"complaintProperty": shared.TranslateComplaintProperty,
-		"complaintValue":    shared.TranslateComplaintValue,
 		"eventWithContext": func(event sirius.LpaEvent, values ...any) LpaEventWithContext {
 			context := EventContext{}
 			for i := 0; i+1 < len(values); i += 2 {
@@ -339,6 +338,26 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				case "feeReductionTypes":
 					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
 						context.FeeReductionTypes = v
+					}
+				case "complaintCategories":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.ComplaintCategories = v
+					}
+				case "subcomplaintCategories":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.SubcomplaintCategories = v
+					}
+				case "complainantCategories":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.ComplainantCategories = v
+					}
+				case "complaintOrigins":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.ComplaintOrigins = v
+					}
+				case "compensationTypes":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.CompensationTypes = v
 					}
 				case "donorID":
 					if v, ok := values[i+1].(string); ok {
@@ -360,8 +379,13 @@ type LpaEventWithContext struct {
 }
 
 type EventContext struct {
-	FeeReductionTypes []sirius.RefDataItem
-	DonorID           string
+	FeeReductionTypes      []sirius.RefDataItem
+	ComplaintCategories    []sirius.RefDataItem
+	SubcomplaintCategories []sirius.RefDataItem
+	ComplainantCategories  []sirius.RefDataItem
+	ComplaintOrigins       []sirius.RefDataItem
+	CompensationTypes      []sirius.RefDataItem
+	DonorID                string
 }
 
 type CaseTabData struct {

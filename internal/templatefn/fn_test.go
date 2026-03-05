@@ -716,28 +716,6 @@ func TestComplaintProperty(t *testing.T) {
 	}
 }
 
-func TestComplaintValue(t *testing.T) {
-	fns := All("", "", "")
-	fn := fns["complaintValue"].(func(string, string) string)
-
-	tests := map[string]map[string]string{
-		"CATEGORY": {
-			"01":  "Correspondence",
-			"123": "123",
-		},
-		"234": {
-			"06": "06",
-		},
-	}
-
-	for property, test := range tests {
-		for value, expected := range test {
-			result := fn(property, value)
-			assert.Equal(t, expected, result, "TranslateComplaintValue(%q, %q) should return %q", property, value, expected)
-		}
-	}
-}
-
 func TestEventWithContext(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["eventWithContext"].(func(event sirius.LpaEvent, values ...any) LpaEventWithContext)

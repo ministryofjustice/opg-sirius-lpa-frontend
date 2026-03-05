@@ -129,7 +129,7 @@
                                                     {{ template "partial-event-lpa" . }}
                                                 {{ end }}
                                             {{ else if eq .SourceType.Key "Complaint" }}
-                                                {{ template "partial-event-complaint" . }}
+                                                {{ template "partial-event-complaint" (eventWithContext . "complaintCategories" $.ComplaintCategories "subcomplaintCategories" $.SubcomplaintCategories "complainantCategories" $.ComplainantCategories "complaintOrigins" $.ComplaintOrigins "compensationTypes" $.CompensationTypes) }}
                                             {{ else if eq .SourceType.Key "Task" }}
                                                 {{ template "partial-event-task" . }}
                                             {{ else }}
