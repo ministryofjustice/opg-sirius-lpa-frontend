@@ -13,13 +13,13 @@
         (item "jointly" "Jointly")
         ) }}
     </div>
-    {{ if .IsEditing }}
-        <input type="hidden" name="isEditing" value="true"/>
-        <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/edit-epa?caseId=%d" .Case.ID) }}">Cancel changes and exit</a>
-    {{else}}
-        <button class="govuk-button" data-module="govuk-button" type="submit">Save and continue to next step</button>
-        <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel changes and exit</a>
-    {{end}}
+    <div class="govuk-button-group govuk-!-padding-top-5">
+        <button class="govuk-button" data-module="govuk-button" type="submit">{{ .ButtonName }}</button>
+        {{ if .IsEditing }}
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/edit-epa?caseId=%d" .Case.ID) }}">Cancel</a>
+        {{else}}
+            <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        {{end}}
+    </div>
 </form>
 {{ end }}

@@ -392,6 +392,12 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return "false"
 		},
+		"boolToYesNo": func(b bool) string {
+			if b {
+				return "Yes"
+			}
+			return "No"
+		},
 	}
 }
 

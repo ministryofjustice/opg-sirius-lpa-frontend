@@ -25,74 +25,93 @@
           {{ end }}
         </div>
 
-        <div class="app-heading-with-link">
-          <div class="govuk-heading-l">Step 1: EPA details</div>
+        <div class="app-heading-with-link govuk-!-margin-bottom-6">
+          <div class="govuk-heading-l govuk-!-margin-0">Step 1: EPA details</div>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?caseId=%d&id=%d" .Case.ID .Case.Donor.ID) }}">Update</a>
         </div>
         <details class="govuk-details section-details" data-section="section-1" {{ if .ShowAllSections }}open{{ end }}>
           <summary class="govuk-details__summary">
             <span class="govuk-details__summary-text">Show</span>
           </summary>
           <div class="govuk-details__text">
-            <dl class="govuk-summary-list">
-              <div class="app-heading-with-link">
-                <div></div>
-                <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?caseId=%d&id=%d" .Case.ID .Case.Donor.ID) }}">update</a>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Donor's signature date</dt>
-                <dd class="govuk-summary-list__value">{{ parseAndFormatDate (printf "%s" .Case.EpaDonorSignatureDate) "2006-01-02" "2 January 2006" }}</dd>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Latest notification date</dt>
-                <dd class="govuk-summary-list__value">{{ parseAndFormatDate (printf "%s" .Case.EpaDonorNoticeGivenDate) "2006-01-02" "2 January 2006" }}</dd>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Receipt date</dt>
-                <dd class="govuk-summary-list__value">{{ parseAndFormatDate (printf "%s" .Case.ReceiptDate) "2006-01-02" "2 January 2006" }}</dd>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Registration date</dt>
-                <dd class="govuk-summary-list__value">
-                  {{ if .Case.RegistrationDate }}
-                  {{ parseAndFormatDate (printf "%s" .Case.RegistrationDate) "2006-01-02" "2 January 2006" }}
-                  {{ else }}
+            <table class="govuk-table">
+              <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                  <th scope="row" class="govuk-table__header">Donor's signature date</th>
+                  <td class="govuk-table__cell">
+                    {{ if .Case.EpaDonorSignatureDate }}
+                      {{ parseAndFormatDate (printf "%s" .Case.EpaDonorSignatureDate) "2006-01-02" "2 January 2006" }}
+                    {{ else }}
                       -
-                  {{ end }}
-                </dd>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Dispatch date</dt>
-                <dd class="govuk-summary-list__value">
-                  {{ if .Case.DispatchDate }}
-                  {{ parseAndFormatDate (printf "%s" .Case.DispatchDate) "2006-01-02" "2 January 2006" }}
-                  {{ else }}
+                    {{ end }}
+                  </td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <th scope="row" class="govuk-table__header">Latest notification date</th>
+                  <td class="govuk-table__cell">
+                    {{ if .Case.EpaDonorNoticeGivenDate }}
+                      {{ parseAndFormatDate (printf "%s" .Case.EpaDonorNoticeGivenDate) "2006-01-02" "2 January 2006" }}
+                    {{ else }}
                       -
-                  {{ end }}
-                </dd>
-              </div>
-            </dl>
+                    {{ end }}
+                  </td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <th scope="row" class="govuk-table__header">Receipt date</th>
+                  <td class="govuk-table__cell">
+                    {{ if .Case.ReceiptDate }}
+                      {{ parseAndFormatDate (printf "%s" .Case.ReceiptDate) "2006-01-02" "2 January 2006" }}
+                    {{ else }}
+                      -
+                    {{ end }}
+                  </td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <th scope="row" class="govuk-table__header">Registration date</th>
+                  <td class="govuk-table__cell">
+                    {{ if .Case.RegistrationDate }}
+                      {{ parseAndFormatDate (printf "%s" .Case.RegistrationDate) "2006-01-02" "2 January 2006" }}
+                    {{ else }}
+                      -
+                    {{ end }}
+                  </td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <th scope="row" class="govuk-table__header">Dispatch date</th>
+                  <td class="govuk-table__cell">
+                    {{ if .Case.DispatchDate }}
+                      {{ parseAndFormatDate (printf "%s" .Case.DispatchDate) "2006-01-02" "2 January 2006" }}
+                    {{ else }}
+                      -
+                    {{ end }}
+                  </td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <th scope="row" class="govuk-table__header">Has the donor made any other EPAs</th>
+                  <td class="govuk-table__cell">{{ boolToYesNo .Case.DonorHasOtherEpas }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </details>
 
-        <div class="govuk-heading-l">Step 2: appointment type</div>
+        <div class="app-heading-with-link govuk-!-margin-bottom-6">
+          <div class="govuk-heading-l govuk-!-margin-0">Step 2: appointment type</div>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/appointment-epa?caseId=%d&isEditing=true" .Case.ID) }}">Update</a>
+        </div>
         <details class="govuk-details section-details" data-section="section-2" {{ if .ShowAllSections }}open{{ end }}>
           <summary class="govuk-details__summary">
             <span class="govuk-details__summary-text">Show</span>
           </summary>
           <div class="govuk-details__text">
-            <dl class="govuk-summary-list">
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">
-                  <div class="app-heading-with-link">
-                    <div>Appointment type</div>
-                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/appointment-epa?caseId=%d&isEditing=true" .Case.ID) }}">update</a>
-                  </div>
-                </dt>
-                <dd class="govuk-summary-list__value">
-                  {{ if .Case.CaseAttorneySingular }}Only one attorney is appointed{{ else if .Case.CaseAttorneyJointlyAndSeverally }}Jointly and severally{{ else if .Case.CaseAttorneyJointly }}Jointly{{ else }}Not provided{{ end }}
-                </dd>
-              </div>
-            </dl>
+            <table class="govuk-table">
+              <tbody class="govuk-table__body">
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Appointment type</th>
+                <td class="govuk-table__cell">{{ if .Case.CaseAttorneySingular }}Only one attorney is appointed{{ else if .Case.CaseAttorneyJointlyAndSeverally }}Jointly and severally{{ else if .Case.CaseAttorneyJointly }}Jointly{{ else }}Not provided{{ end }}</td>
+              </tr>
+              </tbody>
+            </table>
           </div>
         </details>
 
@@ -101,7 +120,6 @@
           <summary class="govuk-details__summary">
             <span class="govuk-details__summary-text">Show</span>
           </summary>
-          <div>Attorneys:</div>
           <div class="govuk-details__text">
             {{ if gt (len .Case.Attorneys) 0 }}
               {{ range $attorney := .Case.Attorneys }}
@@ -110,84 +128,82 @@
                     <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }}{{ else }}{{ .Salutation }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}{{ end }}</span>
                   </summary>
                   <div class="govuk-details__text">
-                <div class="govuk-summary-list">
-                  <div class="app-heading-with-link">
-                    <div></div>
-                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/epa-attorney?caseId=%d&attorneyId=%d" $.CaseID .ID)}}">Update</a>
-                  </div>
-                  <table class="govuk-table">
-                    <tbody class="govuk-table__body">
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">Title</th>
-                      <td class="govuk-table__cell">{{ .Salutation }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">First name</th>
-                      <td class="govuk-table__cell">{{ .Firstname }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">Middle name</th>
-                      <td class="govuk-table__cell">{{ .Middlenames }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">Last name</th>
-                      <td class="govuk-table__cell">{{ .Surname }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">Date of birth</th>
-                      <td class="govuk-table__cell">{{ .DateOfBirth }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">Company name</th>
-                      <td class="govuk-table__cell">{{ .CompanyName }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">Address line 1</th>
-                      <td class="govuk-table__cell">{{ .AddressLine1 }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">Address line 2</th>
-                      <td class="govuk-table__cell">{{ .AddressLine2 }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">Address line 3</th>
-                      <td class="govuk-table__cell">{{ .AddressLine3 }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">Town</th>
-                      <td class="govuk-table__cell">{{ .Town }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">County</th>
-                      <td class="govuk-table__cell">{{ .County }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">Postcode</th>
-                      <td class="govuk-table__cell">{{ .Postcode }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">Country</th>
-                      <td class="govuk-table__cell">{{ .Country }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">Airmail required</th>
-                      <td class="govuk-table__cell">{{ .IsAirmailRequired }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">Relationship to donor</th>
-                      <td class="govuk-table__cell">{{ .RelationshipToDonor }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">Is this attorney applying to register the EPA?</th>
-                      <td class="govuk-table__cell">{{ .IsAttorneyApplyingToRegister }}</td>
-                    </tr>
-                    <tr class="govuk-table__row">
-                      <th scope="row" class="govuk-table__header">Is this attorney active?</th>
-                      <td class="govuk-table__cell">{{ .IsAttorneyActive }}</td>
-                    </tr>
-                    </tbody>
-                  </table>
-                </div>
+                    <div class="app-heading-with-link">
+                      <div></div>
+                      <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/epa-attorney?caseId=%d&attorneyId=%d" $.CaseID .ID)}}">Update</a>
+                    </div>
+                    <table class="govuk-table">
+                      <tbody class="govuk-table__body">
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Title</th>
+                        <td class="govuk-table__cell">{{ .Salutation }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">First name</th>
+                        <td class="govuk-table__cell">{{ .Firstname }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Middle name</th>
+                        <td class="govuk-table__cell">{{ .Middlenames }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Last name</th>
+                        <td class="govuk-table__cell">{{ .Surname }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Date of birth</th>
+                        <td class="govuk-table__cell">{{ .DateOfBirth }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Company name</th>
+                        <td class="govuk-table__cell">{{ .CompanyName }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Address line 1</th>
+                        <td class="govuk-table__cell">{{ .AddressLine1 }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Address line 2</th>
+                        <td class="govuk-table__cell">{{ .AddressLine2 }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Address line 3</th>
+                        <td class="govuk-table__cell">{{ .AddressLine3 }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Town</th>
+                        <td class="govuk-table__cell">{{ .Town }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">County</th>
+                        <td class="govuk-table__cell">{{ .County }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Postcode</th>
+                        <td class="govuk-table__cell">{{ .Postcode }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Country</th>
+                        <td class="govuk-table__cell">{{ .Country }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Airmail required</th>
+                        <td class="govuk-table__cell">{{ boolToYesNo .IsAirmailRequired }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Relationship to donor</th>
+                        <td class="govuk-table__cell">{{ .RelationshipToDonor }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Is this attorney applying to register the EPA?</th>
+                        <td class="govuk-table__cell">{{ boolToYesNo .IsAttorneyApplyingToRegister }}</td>
+                      </tr>
+                      <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Is this attorney active?</th>
+                        <td class="govuk-table__cell">{{ boolToYesNo .IsAttorneyActive }}</td>
+                      </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </details>
               {{ end }}
@@ -196,38 +212,42 @@
             {{ end }}
 
             <div class="govuk-button-group govuk-!-padding-top-5">
-              <a class="govuk-button" href="{{ prefix (printf "/epa-attorney?caseId=%d&isEditing=true" .Case.ID)}}">Add attorney</a>
-              <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="section" value="section-3">Save section</button>
+              <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/epa-attorney?caseId=%d&isEditing=true" .Case.ID)}}">Add attorney</a>
             </div>
           </div>
         </details>
 
-        <div class="app-heading-with-link">
-          <div class="govuk-heading-l">Step 4: payment</div>
+        <div class="app-heading-with-link govuk-!-margin-bottom-6">
+          <div class="govuk-heading-l govuk-!-margin-0">Step 4: payment</div>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/payment-epa?caseId=%d&isEditing=true" .Case.ID) }}">Update</a>
         </div>
         <details class="govuk-details section-details" data-section="section-4" {{ if .ShowAllSections }}open{{ end }}>
           <summary class="govuk-details__summary">
             <span class="govuk-details__summary-text">Show</span>
           </summary>
           <div class="govuk-details__text">
-            <dl class="govuk-summary-list">
-              <div class="app-heading-with-link">
-                <div></div>
-                <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/payment-epa?caseId=%d&isEditing=true" .Case.ID) }}">update</a>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Cheque enclosed</dt>
-                <dd class="govuk-summary-list__value">{{ .Case.PaymentByCheque }}</dd>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Application for postponement exemption or remission of the fee</dt>
-                <dd class="govuk-summary-list__value">{{ .Case.PaymentExemption }}</dd>
-              </div>
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Payment date</dt>
-                <dd class="govuk-summary-list__value">{{ parseAndFormatDate (printf "%s" .Case.PaymentDate) "2006-01-02" "2 January 2006" }}</dd>
-              </div>
-            </dl>
+            <table class="govuk-table">
+              <tbody class="govuk-table__body">
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Cheque enclosed</th>
+                <td class="govuk-table__cell">{{ if .Case.PaymentByCheque }}Yes{{ else }}No{{ end }}</td>
+              </tr>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Application for postponement exemption or remission of the fee</th>
+                <td class="govuk-table__cell">{{ if .Case.PaymentExemption }}Yes{{ else }}No{{ end }}</td>
+              </tr>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Payment date</th>
+                <td class="govuk-table__cell">
+                  {{ if .Case.PaymentDate }}
+                    {{ parseAndFormatDate (printf "%s" .Case.PaymentDate) "2006-01-02" "2 January 2006" }}
+                  {{ else }}
+                    -
+                  {{ end }}
+                </td>
+              </tr>
+              </tbody>
+            </table>
           </div>
         </details>
 
