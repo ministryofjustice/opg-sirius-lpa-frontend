@@ -15,6 +15,7 @@ type EditEpaClient interface {
 
 type editEpaData struct {
 	XSRFToken            string
+	CaseID               int
 	Case                 sirius.Case
 	Success              bool
 	Error                sirius.ValidationError
@@ -37,6 +38,7 @@ func EditEpa(client EditEpaClient, tmpl template.Template) Handler {
 
 		data := editEpaData{
 			XSRFToken: ctx.XSRFToken,
+			CaseID:    caseId,
 			Case:      caseitem,
 			RelationshipToDonors: []sirius.RefDataItem{
 				{Handle: "civil partner", Label: "civil partner"},

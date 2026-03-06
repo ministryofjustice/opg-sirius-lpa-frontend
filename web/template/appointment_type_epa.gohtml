@@ -7,31 +7,13 @@
     <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
     <div class="govuk-heading-l">Step 2: appointment type</div>
     <div class="govuk-form-group">
-        <fieldset class="govuk-fieldset">
-            <legend class="govuk-fieldset__legend">Select one option</legend>
-            <div class="govuk-radios" data-module="govuk-radios">
-                <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="f-caseAttorneySingular" name="caseAttorney" type="radio" value="singular">
-                    <label class="govuk-label govuk-radios__label" for="f-caseAttorneySingular">
-                        Only one attorney is appointed
-                    </label>
-                </div>
-                <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="f-caseAttorneyJointlyAndSeverally" name="caseAttorney" type="radio" value="jointly-and-severally">
-                    <label class="govuk-label govuk-radios__label" for="f-caseAttorneyJointlyAndSeverally">
-                        Jointly and severally
-                    </label>
-                </div>
-                <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="f-caseAttorneyJointly" name="caseAttorney" type="radio" value="jointly">
-                    <label class="govuk-label govuk-radios__label" for="f-caseAttorneyJointly">
-                        Jointly
-                    </label>
-                </div>
-            </div>
-        </fieldset>
+        {{ template "radios" (radios "caseAttorney" "Select one option" .CaseAttorneyType .Error.Field.donorHasOtherEpas
+        (item "singular" "Only one attorney is appointed")
+        (item "jointly-and-severally" "Jointly and severally")
+        (item "jointly" "Jointly")
+        ) }}
     </div>
-    {{ if .Case.ID }}
+    {{ if .IsEditing }}
         <input type="hidden" name="isEditing" value="true"/>
         <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
         <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/edit-epa?caseId=%d" .Case.ID) }}">Cancel changes and exit</a>

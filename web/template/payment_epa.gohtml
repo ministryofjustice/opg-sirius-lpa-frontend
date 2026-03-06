@@ -10,13 +10,13 @@
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
         {{ template "radios" (radios "paymentByCheque" "Cheque enclosed" (stringifyBool .Case.PaymentByCheque) .Error.Field.paymentByCheque
-        (item "Yes" "Yes")
-        (item "No" "No")
+        (item "true" "Yes")
+        (item "false" "No")
         ) }}
 
         {{ template "radios" (radios "paymentExemption" "Application for postponement, exemption or remission of the fee" (stringifyBool .Case.PaymentExemption) .Error.Field.paymentExemption
-        (item "Yes" "Yes")
-        (item "No" "No")
+        (item "true" "Yes")
+        (item "false" "No")
         ) }}
 
         {{ template "input-date" (field "paymentDate" "Payment date" .Case.PaymentDate .Error.Field.paymentDate) }}
