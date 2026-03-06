@@ -14,15 +14,20 @@ type GetLpaHistoryClient interface {
 }
 
 type getLpaHistory struct {
-	XSRFToken           string
-	DonorID             string
-	Events              []sirius.LpaEvent
-	EventFilterData     []sirius.SourceType
-	Form                FilterLpaEventsForm
-	TotalEvents         int
-	TotalFilteredEvents int
-	IsFiltered          bool
-	FeeReductionTypes   []sirius.RefDataItem
+	XSRFToken              string
+	DonorID                string
+	Events                 []sirius.LpaEvent
+	EventFilterData        []sirius.SourceType
+	Form                   FilterLpaEventsForm
+	TotalEvents            int
+	TotalFilteredEvents    int
+	IsFiltered             bool
+	FeeReductionTypes      []sirius.RefDataItem
+	ComplaintCategories    []sirius.RefDataItem
+	ComplaintSubcategories []sirius.RefDataItem
+	ComplainantCategories  []sirius.RefDataItem
+	ComplaintOrigins       []sirius.RefDataItem
+	CompensationTypes      []sirius.RefDataItem
 }
 
 type FilterLpaEventsForm struct {
@@ -66,6 +71,53 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 				return nil
 			}
 			data.FeeReductionTypes = feeReductionTypes
+			return nil
+		})
+
+		group.Go(func() error {
+			complaintCategories, err := client.RefDataByCategory(ctx.With(groupCtx), sirius.ComplaintCategory)
+			if err != nil {
+				data.ComplaintCategories = []sirius.RefDataItem(nil)
+				data.ComplaintSubcategories = []sirius.RefDataItem(nil)
+				return nil
+			}
+			data.ComplaintCategories = complaintCategories
+
+			for _, category := range complaintCategories {
+				if len(category.Subcategories) != 0 {
+					data.ComplaintSubcategories = append(data.ComplaintSubcategories, category.Subcategories...)
+				}
+			}
+			return nil
+		})
+
+		group.Go(func() error {
+			complainantCategories, err := client.RefDataByCategory(ctx.With(groupCtx), sirius.ComplainantCategory)
+			if err != nil {
+				data.ComplainantCategories = []sirius.RefDataItem(nil)
+				return nil
+			}
+			data.ComplainantCategories = complainantCategories
+			return nil
+		})
+
+		group.Go(func() error {
+			complaintOrigins, err := client.RefDataByCategory(ctx.With(groupCtx), sirius.ComplaintOrigin)
+			if err != nil {
+				data.ComplaintOrigins = []sirius.RefDataItem(nil)
+				return nil
+			}
+			data.ComplaintOrigins = complaintOrigins
+			return nil
+		})
+
+		group.Go(func() error {
+			compensationType, err := client.RefDataByCategory(ctx.With(groupCtx), sirius.CompensationType)
+			if err != nil {
+				data.CompensationTypes = []sirius.RefDataItem(nil)
+				return nil
+			}
+			data.CompensationTypes = compensationType
 			return nil
 		})
 
