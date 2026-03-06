@@ -27,8 +27,8 @@
         {{ template "input" (field "addressLine3" "Address line 3" .Attorney.AddressLine3 .Error.Field.addressLine3) }}
         {{ template "input" (field "town" "Town" .Attorney.Town .Error.Field.town) }}
         {{ template "input" (field "county" "County" .Attorney.County .Error.Field.county) }}
-        {{ template "input" (field "country" "Country" .Attorney.Country .Error.Field.country) }}
         {{ template "input" (field "postcode" "Postcode" .Attorney.Postcode .Error.Field.postcode) }}
+        {{ template "input" (field "country" "Country" .Attorney.Country .Error.Field.country) }}
 
         {{ template "radios" (radios "isAirmailRequired" "Airmail required" (stringifyBool .Attorney.IsAirmailRequired) .Error.Field.isAirmailRequired
         (item "true" "Yes")
