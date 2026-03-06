@@ -15,7 +15,7 @@ type CaseActorsEpaClient interface {
 type CaseActorsEpaData struct {
 	XSRFToken string
 	CaseID    int
-	Epa       sirius.Case
+	Case      sirius.Case
 	Success   bool
 	Error     sirius.ValidationError
 	Title     string
@@ -30,7 +30,7 @@ func CaseActorsEpa(client CaseActorsEpaClient, tmpl template.Template) Handler {
 
 		ctx := getContext(r)
 
-		epa, err := client.Case(ctx, caseId)
+		caseitem, err := client.Case(ctx, caseId)
 		if err != nil {
 			return err
 		}
@@ -39,7 +39,7 @@ func CaseActorsEpa(client CaseActorsEpaClient, tmpl template.Template) Handler {
 			XSRFToken: ctx.XSRFToken,
 			CaseID:    caseId,
 			Title:     "Create EPA details",
-			Epa:       epa,
+			Case:      caseitem,
 		}
 
 		return tmpl(w, data)

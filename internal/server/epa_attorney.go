@@ -22,7 +22,6 @@ type epaAttorneyData struct {
 	Error                sirius.ValidationError
 	RelationshipToDonors []sirius.RefDataItem
 	Title                string
-	ButtonName           string
 }
 
 func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
@@ -44,8 +43,7 @@ func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
 				{Handle: "other", Label: "other"},
 				{Handle: "other professional", Label: "other professional"},
 			},
-			Title:      "Add EPA attorney",
-			ButtonName: "Add attorney",
+			Title: "Add an attorney",
 		}
 
 		hasAttorneyId := r.FormValue("attorneyId") != ""
@@ -64,8 +62,7 @@ func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
 			}
 
 			data.Attorney = attorney
-			data.Title = "Edit EPA attorney"
-			data.ButtonName = "Update attorney"
+			data.Title = "Edit attorney"
 		}
 
 		if r.Method == http.MethodPost {
@@ -90,7 +87,6 @@ func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
 				RelationshipToDonor:          postFormString(r, "relationshipToDonor"),
 				IsAttorneyApplyingToRegister: postFormString(r, "isAttorneyApplyingToRegister") == "true",
 			}
-			data.Attorney = attorney
 
 			if hasAttorneyId {
 				err = client.UpdatePerson(ctx, attorneyId, attorney)
@@ -104,7 +100,7 @@ func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
 			} else if err != nil {
 				return err
 			}
-			if hasAttorneyId {
+			if r.FormValue("isEditing") == "true" {
 				return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
 			}
 			return RedirectError(fmt.Sprintf("/case-actors-epa?caseId=%d", caseId))

@@ -21,6 +21,7 @@ type createEpaData struct {
 	ShowAllSections      bool
 	RelationshipToDonors []sirius.RefDataItem
 	Title                string
+	ButtonName           string
 }
 
 func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
@@ -41,11 +42,13 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 				{Handle: "other", Label: "other"},
 				{Handle: "other professional", Label: "other professional"},
 			},
-			Title: "Create EPA details",
+			Title:      "Step 1: EPA details",
+			ButtonName: "Save and continue",
 		}
 
 		caseIdStr := r.FormValue("caseId")
-		if caseIdStr != "" {
+		isEditing := caseIdStr != ""
+		if isEditing {
 			caseId, err := strToIntOrStatusError(caseIdStr)
 			if err == nil {
 				caseItem, err := client.Case(ctx, caseId)
@@ -53,7 +56,8 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 					data.Case = caseItem
 				}
 			}
-			data.Title = "Edit EPA details"
+			data.Title = "EPA details"
+			data.ButtonName = "Save"
 		}
 
 		if r.Method == http.MethodPost {
@@ -78,7 +82,7 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 				return err
 			}
 
-			if r.FormValue("isEditing") == "true" {
+			if isEditing {
 				return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
 			}
 			return RedirectError(fmt.Sprintf("/appointment-epa?caseId=%d", caseId))
