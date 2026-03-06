@@ -30,8 +30,14 @@ func AppointmentTypeEpa(client AppointmentTypeEpaClient, tmpl template.Template)
 
 		ctx := getContext(r)
 
+		caseitem, err := client.Case(ctx, caseId)
+		if err != nil {
+			return err
+		}
+
 		data := AppointmentTypeEpaData{
 			XSRFToken: ctx.XSRFToken,
+			Case:      caseitem,
 			Title:     "Create EPA details",
 		}
 
@@ -49,9 +55,12 @@ func AppointmentTypeEpa(client AppointmentTypeEpaClient, tmpl template.Template)
 				data.Error = ve
 			} else if err != nil {
 				return err
-			} else {
-				return RedirectError(fmt.Sprintf("/case-actors-epa?caseId=%d", caseId))
 			}
+
+			if r.FormValue("isEditing") == "true" {
+				return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
+			}
+			return RedirectError(fmt.Sprintf("/case-actors-epa?caseId=%d", caseId))
 		}
 
 		return tmpl(w, data)

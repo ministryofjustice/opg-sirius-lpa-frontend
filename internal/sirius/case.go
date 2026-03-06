@@ -51,6 +51,7 @@ type Case struct {
 	AttorneyRelationshipToDonor               string            `json:"attorneyRelationshipToDonor,omitempty"`
 	PaymentByCheque                           bool              `json:"paymentByCheque,omitempty"`
 	PaymentExemption                          bool              `json:"paymentExemption,omitempty"`
+	NotificationDate                          DateString        `json:"notificationDate,omitempty"`
 }
 
 func (c Case) Summary() string {
