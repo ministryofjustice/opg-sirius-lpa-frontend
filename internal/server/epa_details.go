@@ -7,12 +7,12 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-type EditEpaClient interface {
+type EpaDetailsClient interface {
 	UpdateEpa(ctx sirius.Context, caseId int, epa sirius.Case) error
 	Case(sirius.Context, int) (sirius.Case, error)
 }
 
-type editEpaData struct {
+type EpaDetailsData struct {
 	XSRFToken            string
 	CaseID               int
 	Case                 sirius.Case
@@ -22,7 +22,7 @@ type editEpaData struct {
 	RelationshipToDonors []sirius.RefDataItem
 }
 
-func EditEpa(client EditEpaClient, tmpl template.Template) Handler {
+func EpaDetails(client EpaDetailsClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseId, err := strToIntOrStatusError(r.FormValue("caseId"))
 		if err != nil {
@@ -35,7 +35,7 @@ func EditEpa(client EditEpaClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data := editEpaData{
+		data := EpaDetailsData{
 			XSRFToken: ctx.XSRFToken,
 			CaseID:    caseId,
 			Case:      caseitem,

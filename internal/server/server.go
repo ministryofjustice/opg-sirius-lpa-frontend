@@ -74,10 +74,10 @@ type Client interface {
 	EditDatesClient
 	EditDocumentClient
 	EditDonorClient
-	EditEpaClient
 	EditFeeReductionClient
 	EditInvestigationClient
 	EditPaymentClient
+	EpaDetailsClient
 	EventClient
 	GetApplicationProgressClient
 	GetDocumentsClient
@@ -131,7 +131,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning.gohtml"))))
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"))))
 	mux.Handle("/create-epa", wrap(CreateEpa(client, templates.Get("create_epa.gohtml"))))
-	mux.Handle("/edit-epa", wrap(EditEpa(client, templates.Get("edit_epa.gohtml"))))
+	mux.Handle("/edit-epa", wrap(EpaDetails(client, templates.Get("epa_details.gohtml"))))
 	mux.Handle("/appointment-epa", wrap(AppointmentTypeEpa(client, templates.Get("appointment_type_epa.gohtml"))))
 	mux.Handle("/case-actors-epa", wrap(CaseActorsEpa(client, templates.Get("case_actors_epa.gohtml"))))
 	mux.Handle("/payment-epa", wrap(PaymentEpa(client, templates.Get("payment_epa.gohtml"))))
