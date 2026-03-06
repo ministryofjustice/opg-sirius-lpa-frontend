@@ -18,12 +18,15 @@
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
         <div class="govuk-!-margin-bottom-5">
-          <button type="submit" name="showAllSections" value="true" class="govuk-button govuk-button--secondary">Show all sections</button>
+          {{ if .ShowAllSections }}
+            <button type="submit" name="showAllSections" value="false" class="govuk-button govuk-button--secondary">Hide all sections</button>
+          {{ else }}
+            <button type="submit" name="showAllSections" value="true" class="govuk-button govuk-button--secondary">Show all sections</button>
+          {{ end }}
         </div>
 
         <div class="app-heading-with-link">
           <div class="govuk-heading-l">Step 1: EPA details</div>
-          <a class="app-heading-with-link__link govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?caseId=%d&id=%d" .Case.ID .Case.Donor.ID) }}">update</a>
         </div>
         <details class="govuk-details section-details" data-section="section-1" {{ if .ShowAllSections }}open{{ end }}>
           <summary class="govuk-details__summary">
@@ -31,28 +34,32 @@
           </summary>
           <div class="govuk-details__text">
             <dl class="govuk-summary-list">
+              <div class="app-heading-with-link">
+                <div></div>
+                <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?caseId=%d&id=%d" .Case.ID .Case.Donor.ID) }}">update</a>
+              </div>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Donor's signature date</dt>
-                <dd class="govuk-summary-list__value">{{ .Case.StatusDate }}</dd>
+                <dd class="govuk-summary-list__value">{{ parseAndFormatDate (printf "%s" .Case.StatusDate) "2006-01-02" "2 January 2006" }}</dd>
               </div>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Latest notification date</dt>
-                <dd class="govuk-summary-list__value">{{ if .Case.ReceiptDate }}{{ .Case.ReceiptDate }}{{ else }}Not provided{{ end }}</dd>
+                <dd class="govuk-summary-list__value">{{ parseAndFormatDate (printf "%s" .Case.EpaDonorNoticeGivenDate) "2006-01-02" "2 January 2006" }}</dd>
               </div>
             </dl>
 
             <dl class="govuk-summary-list">
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Receipt date</dt>
-                <dd class="govuk-summary-list__value">{{ if .Case.ReceiptDate }}{{ .Case.ReceiptDate }}{{ else }}Not provided{{ end }}</dd>
+                <dd class="govuk-summary-list__value">{{ parseAndFormatDate (printf "%s" .Case.ReceiptDate) "2006-01-02" "2 January 2006" }}</dd>
               </div>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Registration date</dt>
-                <dd class="govuk-summary-list__value">{{ if .Case.RegistrationDate }}{{ .Case.RegistrationDate }}{{ else }}Not provided{{ end }}</dd>
+                <dd class="govuk-summary-list__value">{{ parseAndFormatDate (printf "%s" .Case.RegistrationDate) "2006-01-02" "2 January 2006" }}</dd>
               </div>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Dispatch date</dt>
-                <dd class="govuk-summary-list__value">{{ if .Case.DispatchDate }}{{ .Case.DispatchDate }}{{ else }}Not provided{{ end }}</dd>
+                <dd class="govuk-summary-list__value">{{ parseAndFormatDate (printf "%s" .Case.DispatchDate) "2006-01-02" "2 January 2006" }}</dd>
               </div>
             </dl>
 
@@ -68,35 +75,19 @@
             <span class="govuk-details__summary-text">Show</span>
           </summary>
           <div class="govuk-details__text">
-            <div class="govuk-form-group">
-              <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend">Select one option</legend>
-                <div class="govuk-radios" data-module="govuk-radios">
-                  <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="f-caseAttorneySingular" name="caseAttorneySingular" type="radio" value="true" {{ if .Case.CaseAttorneySingular }}checked{{ end }}>
-                    <label class="govuk-label govuk-radios__label" for="f-caseAttorneySingular">
-                      Only one attorney is appointed
-                    </label>
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  <div class="app-heading-with-link">
+                    <div>Appointment type</div>
+                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?caseId=%d&id=%d" .Case.ID .Case.Donor.ID) }}">update</a>
                   </div>
-                  <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="f-caseAttorneyJointlyAndSeverally" name="caseAttorneyJointlyAndSeverally" type="radio" value="true" {{ if .Case.CaseAttorneyJointlyAndSeverally }}checked{{ end }}>
-                    <label class="govuk-label govuk-radios__label" for="f-caseAttorneyJointlyAndSeverally">
-                      Jointly and severally
-                    </label>
-                  </div>
-                  <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="f-caseAttorneyJointly" name="caseAttorneyJointly" type="radio" value="true" {{ if .Case.CaseAttorneyJointly }}checked{{ end }}>
-                    <label class="govuk-label govuk-radios__label" for="f-caseAttorneyJointly">
-                      Jointly
-                    </label>
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-
-            <div class="govuk-button-group govuk-!-padding-top-5">
-              <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="section" value="section-3">Save section</button>
-            </div>
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  {{ if .Case.CaseAttorneySingular }}Only one attorney is appointed{{ else if .Case.CaseAttorneyJointlyAndSeverally }}Jointly and severally{{ else if .Case.CaseAttorneyJointly }}Jointly{{ else }}Not provided{{ end }}
+                </dd>
+              </div>
+            </dl>
           </div>
         </details>
 
