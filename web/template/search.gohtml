@@ -14,7 +14,7 @@
     <div class="moj-filter-layout">
         {{ template "search-filter" . }}
 
-        <div class="moj-filter-layout__content govuk-!-padding-left-2 govuk-!-padding-right-2">
+        <div class="moj-filter-layout__content govuk-!-padding-left-2 govuk-!-padding-right-2{{ if and (eq .Total 0) (eq 0 (len .DeletedCases)) }} app-search-results--no-results{{ end }}">
             <button class="govuk-button govuk-button--secondary" aria-controls="app-filters" data-filter-toggle>
                 Hide filters
             </button>
