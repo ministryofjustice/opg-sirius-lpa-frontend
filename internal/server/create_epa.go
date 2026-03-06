@@ -9,13 +9,12 @@ import (
 )
 
 type CreateEpaClient interface {
-	CreateEpa(ctx sirius.Context, donorID int, epa sirius.Epa) (int, error)
+	CreateEpa(ctx sirius.Context, donorID int, epa sirius.Case) (int, error)
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
 }
 
 type createEpaData struct {
 	XSRFToken            string
-	Epa                  sirius.Epa
 	Case                 sirius.Case
 	Success              bool
 	Error                sirius.ValidationError
@@ -58,7 +57,7 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			epa := sirius.Epa{
+			epa := sirius.Case{
 				EpaDonorSignatureDate:           postFormDateString(r, "epaDonorSignatureDate"),
 				EpaDonorNoticeGivenDate:         postFormDateString(r, "epaDonorNoticeGivenDate"),
 				DonorHasOtherEpas:               postFormString(r, "donorHasOtherEpas") == "true",
@@ -70,7 +69,7 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 				CaseAttorneyJointly:             r.FormValue("caseAttorneyJointly") == "true",
 				AttorneyRelationshipToDonor:     postFormString(r, "relationshipToDonors"),
 			}
-			data.Epa = epa
+			data.Case = epa
 
 			caseId, err := client.CreateEpa(ctx, donorID, epa)
 
