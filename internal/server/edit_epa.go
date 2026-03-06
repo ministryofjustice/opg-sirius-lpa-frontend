@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -47,6 +48,15 @@ func EditEpa(client EditEpaClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
+			if r.FormValue("showAllSections") == "true" {
+				data.ShowAllSections = true
+				return tmpl(w, data)
+			}
+			if r.FormValue("showAllSections") == "false" {
+				data.ShowAllSections = false
+				return tmpl(w, data)
+			}
+
 			epa := sirius.Case{
 				EpaDonorSignatureDate:           postFormDateString(r, "epaDonorSignatureDate"),
 				EpaDonorNoticeGivenDate:         postFormDateString(r, "epaDonorNoticeGivenDate"),
@@ -59,12 +69,6 @@ func EditEpa(client EditEpaClient, tmpl template.Template) Handler {
 				CaseAttorneyJointly:             r.FormValue("caseAttorneyJointly") == "true",
 				AttorneyRelationshipToDonor:     postFormString(r, "relationshipToDonors"),
 			}
-			data.Case = epa
-
-			if r.FormValue("showAllSections") == "true" {
-				data.ShowAllSections = true
-				return tmpl(w, data)
-			}
 
 			err = client.UpdateEpa(ctx, caseId, epa)
 
@@ -76,6 +80,10 @@ func EditEpa(client EditEpaClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 			}
+		}
+
+		if r.FormValue("isEditing") == "true" {
+			return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
 		}
 
 		return tmpl(w, data)

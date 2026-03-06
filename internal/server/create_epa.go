@@ -72,16 +72,20 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			}
 			data.Epa = epa
 
-			caseID, err := client.CreateEpa(ctx, donorID, epa)
+			caseId, err := client.CreateEpa(ctx, donorID, epa)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
 			} else if err != nil {
 				return err
-			} else {
-				return RedirectError(fmt.Sprintf("/appointment-epa?caseId=%d", caseID))
 			}
+
+			if r.FormValue("isEditing") == "true" {
+				return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
+			}
+			return RedirectError(fmt.Sprintf("/appointment-epa?caseId=%d", caseId))
+
 		}
 
 		return tmpl(w, data)
