@@ -42,7 +42,7 @@ func AppointmentTypeEpa(client AppointmentTypeEpaClient, tmpl template.Template)
 		var caseAttorneyType string
 		if caseitem.CaseAttorneyJointly {
 			caseAttorneyType = "jointly"
-		} else if caseitem.CaseAttorneyJointly {
+		} else if caseitem.CaseAttorneySingular {
 			caseAttorneyType = "singular"
 		} else if caseitem.CaseAttorneyJointlyAndSeverally {
 			caseAttorneyType = "jointly-and-severally"
