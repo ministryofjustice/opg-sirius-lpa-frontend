@@ -5,16 +5,16 @@
 {{ define "main" }}
     <div class="govuk-heading-l">Step 3: case actors</div>
     <div class="govuk-heading-s">Attorneys:</div>
-    {{ if gt (len .Epa.Attorneys) 0 }}
-        {{ range $attorney := .Epa.Attorneys }}
+    {{ if gt (len .Case.Attorneys) 0 }}
+        {{ range $attorney := .Case.Attorneys }}
             <details class="govuk-details" >
                 <summary class="govuk-details__summary">
                     <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }}{{ else }}{{ .Salutation }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}{{ end }}</span>
                 </summary>
                 <div class="govuk-details__text">
-                    <div class="govuk-button-group">
-                        <a class="govuk-button govuk-button--warning" href="{{ prefix (printf "/add-epa-attorney?caseId=%d" $.CaseID)}}">Delete</a>
-                        <a class="govuk-button govuk-button" href="{{ prefix (printf "/epa-attorney?caseId=%d&attorneyId=%d" $.CaseID .ID)}}">Update</a>
+                    <div class="app-heading-with-link">
+                        <div></div>
+                        <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/epa-attorney?caseId=%d&attorneyId=%d" $.CaseID .ID)}}">Update</a>
                     </div>
                     <table class="govuk-table">
                         <tbody class="govuk-table__body">
@@ -72,7 +72,7 @@
                             </tr>
                             <tr class="govuk-table__row">
                                 <th scope="row" class="govuk-table__header">Airmail required</th>
-                                <td class="govuk-table__cell">{{ .IsAirmailRequired }}</td>
+                                <td class="govuk-table__cell">{{ boolToYesNo .IsAirmailRequired }}</td>
                             </tr>
                             <tr class="govuk-table__row">
                                 <th scope="row" class="govuk-table__header">Relationship to donor</th>
@@ -80,11 +80,11 @@
                             </tr>
                             <tr class="govuk-table__row">
                                 <th scope="row" class="govuk-table__header">Is this attorney applying to register the EPA?</th>
-                                <td class="govuk-table__cell">{{ .IsAttorneyApplyingToRegister }}</td>
+                                <td class="govuk-table__cell">{{ boolToYesNo .IsAttorneyApplyingToRegister }}</td>
                             </tr>
                             <tr class="govuk-table__row">
                                 <th scope="row" class="govuk-table__header">Is this attorney active?</th>
-                                <td class="govuk-table__cell">{{ .IsAttorneyActive }}</td>
+                                <td class="govuk-table__cell">{{ boolToYesNo .IsAttorneyActive }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -97,7 +97,9 @@
     <div class="govuk-button-group govuk-!-padding-top-5">
         <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/epa-attorney?caseId=%d" .CaseID)}}">Add attorney</a>
         <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-epa-correspondent?caseId=%d" .CaseID)}}">Add correspondent</a>
-        <a class="govuk-button" href="{{ prefix (printf "/payment-epa?caseId=%d" .CaseID)}}">Save and continue to next step</a>
-        <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel changes and exit</a>
+    </div>
+    <div class="govuk-button-group govuk-!-padding-top-5">
+        <a class="govuk-button" href="{{ prefix (printf "/payment-epa?caseId=%d" .CaseID)}}">Continue</a>
+        <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
     </div>
 {{ end }}

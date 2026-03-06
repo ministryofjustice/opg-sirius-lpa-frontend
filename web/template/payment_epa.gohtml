@@ -5,7 +5,7 @@
 {{ define "main" }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-l">Step 4: payment</h1>
+      <h1 class="govuk-heading-l">{{ .Title }}</h1>
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
