@@ -19,6 +19,7 @@ type AppointmentTypeEpaData struct {
 	Success          bool
 	Error            sirius.ValidationError
 	Title            string
+	ButtonName       string
 	IsEditing        bool
 	CaseAttorneyType string
 }
@@ -50,9 +51,15 @@ func AppointmentTypeEpa(client AppointmentTypeEpaClient, tmpl template.Template)
 		data := AppointmentTypeEpaData{
 			XSRFToken:        ctx.XSRFToken,
 			Case:             caseitem,
-			Title:            "Create EPA details",
+			Title:            "Step 2: appointment type",
+			ButtonName:       "Save and continue",
 			IsEditing:        isEditing,
 			CaseAttorneyType: caseAttorneyType,
+		}
+
+		if isEditing {
+			data.Title = "Appointment type"
+			data.ButtonName = "save"
 		}
 
 		if r.Method == http.MethodPost {

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -80,10 +79,6 @@ func EditEpa(client EditEpaClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 			}
-		}
-
-		if r.FormValue("isEditing") == "true" {
-			return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
 		}
 
 		return tmpl(w, data)

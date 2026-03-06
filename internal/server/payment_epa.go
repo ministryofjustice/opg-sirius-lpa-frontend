@@ -37,8 +37,12 @@ func PaymentEpa(client PaymentEpaClient, tmpl template.Template) Handler {
 
 		data := PaymentEpaData{
 			XSRFToken: ctx.XSRFToken,
-			Title:     "Create EPA details",
+			Title:     "Step 4: payment",
 			Case:      caseitem,
+		}
+
+		if r.FormValue("isEditing") == "true" {
+			data.Title = "Payment"
 		}
 
 		if r.Method == http.MethodPost {
