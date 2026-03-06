@@ -40,7 +40,7 @@
               </div>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Donor's signature date</dt>
-                <dd class="govuk-summary-list__value">{{ parseAndFormatDate (printf "%s" .Case.StatusDate) "2006-01-02" "2 January 2006" }}</dd>
+                <dd class="govuk-summary-list__value">{{ parseAndFormatDate (printf "%s" .Case.EpaDonorSignatureDate) "2006-01-02" "2 January 2006" }}</dd>
               </div>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Latest notification date</dt>
@@ -52,11 +52,23 @@
               </div>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Registration date</dt>
-                <dd class="govuk-summary-list__value">{{ parseAndFormatDate (printf "%s" .Case.RegistrationDate) "2006-01-02" "2 January 2006" }}</dd>
+                <dd class="govuk-summary-list__value">
+                  {{ if .Case.RegistrationDate }}
+                  {{ parseAndFormatDate (printf "%s" .Case.RegistrationDate) "2006-01-02" "2 January 2006" }}
+                  {{ else }}
+                      -
+                  {{ end }}
+                </dd>
               </div>
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Dispatch date</dt>
-                <dd class="govuk-summary-list__value">{{ parseAndFormatDate (printf "%s" .Case.DispatchDate) "2006-01-02" "2 January 2006" }}</dd>
+                <dd class="govuk-summary-list__value">
+                  {{ if .Case.DispatchDate }}
+                  {{ parseAndFormatDate (printf "%s" .Case.DispatchDate) "2006-01-02" "2 January 2006" }}
+                  {{ else }}
+                      -
+                  {{ end }}
+                </dd>
               </div>
             </dl>
           </div>

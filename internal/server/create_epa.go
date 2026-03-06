@@ -62,8 +62,6 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 				EpaDonorNoticeGivenDate:         postFormDateString(r, "epaDonorNoticeGivenDate"),
 				DonorHasOtherEpas:               postFormString(r, "donorHasOtherEpas") == "true",
 				ReceiptDate:                     postFormDateString(r, "receiptDate"),
-				RegistrationDate:                postFormDateString(r, "registrationDate"),
-				DispatchDate:                    postFormDateString(r, "dispatchDate"),
 				CaseAttorneySingular:            r.FormValue("caseAttorneySingular") == "true",
 				CaseAttorneyJointlyAndSeverally: r.FormValue("caseAttorneyJointlyAndSeverally") == "true",
 				CaseAttorneyJointly:             r.FormValue("caseAttorneyJointly") == "true",
