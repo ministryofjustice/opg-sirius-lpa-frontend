@@ -14,15 +14,18 @@ type AppointmentTypeEpaClient interface {
 }
 
 type AppointmentTypeEpaData struct {
-	XSRFToken string
-	Case      sirius.Case
-	Success   bool
-	Error     sirius.ValidationError
-	Title     string
+	XSRFToken        string
+	Case             sirius.Case
+	Success          bool
+	Error            sirius.ValidationError
+	Title            string
+	IsEditing        bool
+	CaseAttorneyType string
 }
 
 func AppointmentTypeEpa(client AppointmentTypeEpaClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
+		isEditing := r.FormValue("isEditing") == "true"
 		caseId, err := strToIntOrStatusError(r.FormValue("caseId"))
 		if err != nil {
 			return err
@@ -35,10 +38,21 @@ func AppointmentTypeEpa(client AppointmentTypeEpaClient, tmpl template.Template)
 			return err
 		}
 
+		var caseAttorneyType string
+		if caseitem.CaseAttorneyJointly {
+			caseAttorneyType = "jointly"
+		} else if caseitem.CaseAttorneyJointly {
+			caseAttorneyType = "singular"
+		} else if caseitem.CaseAttorneyJointlyAndSeverally {
+			caseAttorneyType = "jointly-and-severally"
+		}
+
 		data := AppointmentTypeEpaData{
-			XSRFToken: ctx.XSRFToken,
-			Case:      caseitem,
-			Title:     "Create EPA details",
+			XSRFToken:        ctx.XSRFToken,
+			Case:             caseitem,
+			Title:            "Create EPA details",
+			IsEditing:        isEditing,
+			CaseAttorneyType: caseAttorneyType,
 		}
 
 		if r.Method == http.MethodPost {
@@ -47,6 +61,8 @@ func AppointmentTypeEpa(client AppointmentTypeEpaClient, tmpl template.Template)
 				CaseAttorneyJointlyAndSeverally: r.FormValue("caseAttorney") == "jointly-and-severally",
 				CaseAttorneyJointly:             r.FormValue("caseAttorney") == "jointly",
 			}
+
+			fmt.Println(epa.CaseAttorneySingular, epa.CaseAttorneyJointlyAndSeverally, epa.CaseAttorneyJointly)
 
 			err := client.UpdateEpa(ctx, caseId, epa)
 
@@ -57,7 +73,7 @@ func AppointmentTypeEpa(client AppointmentTypeEpaClient, tmpl template.Template)
 				return err
 			}
 
-			if r.FormValue("isEditing") == "true" {
+			if isEditing {
 				return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
 			}
 			return RedirectError(fmt.Sprintf("/case-actors-epa?caseId=%d", caseId))
