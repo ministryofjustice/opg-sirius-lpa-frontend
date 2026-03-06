@@ -41,6 +41,7 @@ type Person struct {
 	SystemStatus                 bool       `json:"systemStatus,omitempty"`
 	RelationshipToDonor          string     `json:"relationshipToDonor,omitempty"`
 	IsAttorneyApplyingToRegister bool       `json:"isAttorneyApplyingToRegister,omitempty"`
+	IsAttorneyActive             bool       `json:"isAttorneyActive,omitempty"`
 }
 
 func (p Person) Summary() string {
