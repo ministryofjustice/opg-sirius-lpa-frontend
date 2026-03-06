@@ -104,6 +104,9 @@ func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
 			} else if err != nil {
 				return err
 			}
+			if hasAttorneyId {
+				return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
+			}
 			return RedirectError(fmt.Sprintf("/case-actors-epa?caseId=%d", caseId))
 		}
 

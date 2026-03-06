@@ -30,15 +30,21 @@ func PaymentEpa(client PaymentEpaClient, tmpl template.Template) Handler {
 
 		ctx := getContext(r)
 
+		caseitem, err := client.Case(ctx, caseId)
+		if err != nil {
+			return err
+		}
+
 		data := PaymentEpaData{
 			XSRFToken: ctx.XSRFToken,
 			Title:     "Create EPA details",
+			Case:      caseitem,
 		}
 
 		if r.Method == http.MethodPost {
 			epa := sirius.Case{
-				PaymentByCheque:  r.FormValue("paymentByCheque") == "No",
-				PaymentExemption: r.FormValue("paymentExemption") == "No",
+				PaymentByCheque:  r.FormValue("paymentByCheque") == "true",
+				PaymentExemption: r.FormValue("paymentExemption") == "true",
 				PaymentDate:      postFormDateString(r, "paymentDate"),
 			}
 
@@ -49,9 +55,8 @@ func PaymentEpa(client PaymentEpaClient, tmpl template.Template) Handler {
 				data.Error = ve
 			} else if err != nil {
 				return err
-			} else {
-				return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
 			}
+			return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
 		}
 
 		return tmpl(w, data)
