@@ -15,8 +15,6 @@
 
         {{ template "input-date" (field "epaDonorNoticeGivenDate" "Latest notification date" .Case.EpaDonorNoticeGivenDate .Error.Field.epaDonorNoticeGivenDate) }}
         {{ template "input-date" (field "receiptDate" "Receipt date" .Case.ReceiptDate .Error.Field.epaReceiptDate "max" today) }}
-        {{ template "input-date" (field "registrationDate" "Registration date" .Case.RegistrationDate .Error.Field.registrationDate "max" today) }}
-        {{ template "input-date" (field "dispatchDate" "Dispatch date" .Case.DispatchDate .Error.Field.epaDispatchDate "max" today) }}
 
         {{ template "radios" (radios "donorHasOtherEpas" "To your knowledge has the donor made any other Enduring Powers of Attorney?" (stringifyBool .Case.DonorHasOtherEpas) .Error.Field.donorHasOtherEpas
         (item "true" "Yes")
