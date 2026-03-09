@@ -17,7 +17,7 @@
         {{ template "input" (field "firstname" "First name" .Attorney.Firstname .Error.Field.firstname) }}
         {{ template "input" (field "middlenames" "Middle names" .Attorney.Middlenames .Error.Field.middlenames) }}
         {{ template "input" (field "surname" "Surname" .Attorney.Surname .Error.Field.surname) }}
-        {{ template "input" (field "otherNames" "Other names" .Attorney.Othernames .Error.Field.otherNames) }}
+        {{ template "input" (field "otherNames" "Other names" .Attorney.AlsoKnownAs .Error.Field.otherNames) }}
         {{ template "input-date" (field "dob" "Date of birth" .Attorney.DateOfBirth .Error.Field.dob) }}
         {{ template "input" (field "phoneNumber" "Phone number" .Attorney.PhoneNumber .Error.Field.phoneNumber) }}
         {{ template "input" (field "companyName" "Company name" .Attorney.CompanyName .Error.Field.companyName) }}

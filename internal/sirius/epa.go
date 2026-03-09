@@ -8,10 +8,6 @@ func (c *Client) CreateEpa(ctx Context, donorID int, epa Case) (int, error) {
 	return response.ID, err
 }
 
-//func (c *Client) UpdateEpa(ctx Context, caseId int, epa Epa) error {
-//	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/epas/%d", caseId), epa, nil)
-//}
-
 func (c *Client) UpdateEpa(ctx Context, caseId int, epa Case) error {
 	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/epas/%d", caseId), epa, nil)
 }
