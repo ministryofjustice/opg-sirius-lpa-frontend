@@ -43,10 +43,8 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"options":               options,
 		"caseTabs":              caseTab,
 		"casesWarningAppliedTo": sirius.CasesWarningAppliedTo,
-		"fee": func(amount int) string {
-			float := float64(amount)
-			return fmt.Sprintf("%.2f", float/100)
-		},
+		"fee":                   shared.FormatMonetaryValue,
+		"feeFromFloat":          shared.FormatMonetaryFloat,
 		"formatDate": func(s sirius.DateString) (string, error) {
 			if s != "" {
 				return s.ToSirius()
@@ -325,9 +323,69 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return false
 		},
-		"formatEventType": formatEventType,
-		"eventTypeColor":  eventTypeColor,
+		"formatEventType":   formatEventType,
+		"eventTypeColor":    eventTypeColor,
+		"paymentSource":     shared.PaymentSourceToAction,
+		"complaintProperty": shared.TranslateComplaintProperty,
+		"eventWithContext": func(event sirius.LpaEvent, values ...any) LpaEventWithContext {
+			context := EventContext{}
+			for i := 0; i+1 < len(values); i += 2 {
+				key, ok := values[i].(string)
+				if !ok {
+					continue
+				}
+				switch key {
+				case "feeReductionTypes":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.FeeReductionTypes = v
+					}
+				case "complaintCategories":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.ComplaintCategories = v
+					}
+				case "complaintSubcategories":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.ComplaintSubcategories = v
+					}
+				case "complainantCategories":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.ComplainantCategories = v
+					}
+				case "complaintOrigins":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.ComplaintOrigins = v
+					}
+				case "compensationTypes":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.CompensationTypes = v
+					}
+				case "donorID":
+					if v, ok := values[i+1].(string); ok {
+						context.DonorID = v
+					}
+				}
+			}
+			return LpaEventWithContext{
+				LpaEvent: event,
+				Context:  context,
+			}
+		},
 	}
+}
+
+type LpaEventWithContext struct {
+	sirius.LpaEvent
+	Context EventContext
+}
+
+type EventContext struct {
+	FeeReductionTypes      []sirius.RefDataItem
+	ComplaintCategories    []sirius.RefDataItem
+	ComplaintSubcategories []sirius.RefDataItem
+	ComplainantCategories  []sirius.RefDataItem
+	ComplaintOrigins       []sirius.RefDataItem
+	CompensationTypes      []sirius.RefDataItem
+	DonorID                string
 }
 
 type CaseTabData struct {

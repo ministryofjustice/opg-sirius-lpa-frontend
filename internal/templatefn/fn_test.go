@@ -479,6 +479,15 @@ func TestFee(t *testing.T) {
 	assert.Equal(t, expected, val)
 }
 
+func TestFeeFromFloat(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["feeFromFloat"].(func(float64) string)
+	expected := "82.00"
+
+	val := fn(float64(8200))
+	assert.Equal(t, expected, val)
+}
+
 func TestFormatDateForAnEmptyDate(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["formatDate"].(func(sirius.DateString) (string, error))
@@ -670,4 +679,77 @@ func TestEventTypeColor(t *testing.T) {
 		result := eventTypeColor(input)
 		assert.Equal(t, expected, result, "eventTypeColor(%q) should return %q", input, expected)
 	}
+}
+
+func TestPaymentSource(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["paymentSource"].(func(string) string)
+
+	tests := map[string]string{
+		"PHONE":         "paid over the phone",
+		"ONLINE":        "paid via GOV.UK Pay (card payment)",
+		"MAKE":          "paid through Make an LPA",
+		"MIGRATED":      "payment was migrated",
+		"FEE_REDUCTION": "fee reduction",
+		"CHEQUE":        "paid by cheque",
+		"OTHER":         "paid through other method",
+	}
+
+	for input, expected := range tests {
+		result := fn(input)
+		assert.Equal(t, expected, result, "paymentSource(%q) should return %q", input, expected)
+	}
+}
+
+func TestComplaintProperty(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["complaintProperty"].(func(string) string)
+
+	tests := map[string]string{
+		"CATEGORY": "Category",
+		"123":      "123",
+	}
+
+	for input, expected := range tests {
+		result := fn(input)
+		assert.Equal(t, expected, result, "TranslateComplaintProperty(%q) should return %q", input, expected)
+	}
+}
+
+func TestEventWithContext(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["eventWithContext"].(func(event sirius.LpaEvent, values ...any) LpaEventWithContext)
+
+	event := sirius.LpaEvent{}
+	donorID := "123"
+	feeReductionTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complaintCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complaintSubcategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complainantCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	complaintOrigins := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	compensationTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+
+	expected := LpaEventWithContext{
+		LpaEvent: event,
+		Context: EventContext{
+			DonorID:                donorID,
+			FeeReductionTypes:      feeReductionTypes,
+			ComplaintCategories:    complaintCategories,
+			ComplaintSubcategories: complaintSubcategories,
+			ComplainantCategories:  complainantCategories,
+			ComplaintOrigins:       complaintOrigins,
+			CompensationTypes:      compensationTypes,
+		},
+	}
+	result := fn(
+		event,
+		"donorID", donorID,
+		"feeReductionTypes", feeReductionTypes,
+		"complaintCategories", complaintCategories,
+		"complaintSubcategories", complaintSubcategories,
+		"complainantCategories", complainantCategories,
+		"complaintOrigins", complaintOrigins,
+		"compensationTypes", compensationTypes,
+	)
+	assert.Equal(t, expected, result)
 }

@@ -104,6 +104,35 @@
                                         </div>
 
                                         <div class="govuk-body">
+                                            {{ if eq .SourceType.Key "Payment" }}
+                                                {{ if eq .Entity.source "FEE_REDUCTION"}}
+                                                    {{ if eq .Type "INS" }}
+                                                        {{ template "partial-event-fee-reduction-approved" (eventWithContext . "feeReductionTypes" $.FeeReductionTypes) }}
+                                                    {{ else if eq .Type "UPD" }}
+                                                        {{ template "partial-event-fee-reduction-updated" (eventWithContext . "feeReductionTypes" $.FeeReductionTypes) }}
+                                                    {{ else if eq .Type "DEL" }}
+                                                        {{ template "partial-event-fee-reduction-deleted" (eventWithContext . "feeReductionTypes" $.FeeReductionTypes) }}
+                                                    {{ end }}
+                                                {{ else if eq .Type "DEL" }}
+                                                    {{ template "partial-event-payment-deleted" . }}
+                                                {{ else }}
+                                                    {{ template "partial-event-payment" . }}
+                                                {{ end }}
+                                            {{ else if eq .SourceType.Key "OutboundDocument" }}
+                                                {{ template "partial-event-outgoing-document" (eventWithContext . "donorID" $.DonorID) }}
+                                            {{ else if eq .SourceType.Key "Warning" }}
+                                                {{ template "partial-event-warning" . }}
+                                            {{ else if eq .SourceType.Key "Lpa" }}
+                                                {{ if and (eq .Type "UPD") (.Changes.status) (ne (len .Changes.status) 0)}}
+                                                    {{ template "partial-event-case-status" . }}
+                                                {{ else }}
+                                                    {{ template "partial-event-lpa" . }}
+                                                {{ end }}
+                                            {{ else if eq .SourceType.Key "Complaint" }}
+                                                {{ template "partial-event-complaint" (eventWithContext . "complaintCategories" $.ComplaintCategories "complaintSubcategories" $.ComplaintSubcategories "complainantCategories" $.ComplainantCategories "complaintOrigins" $.ComplaintOrigins "compensationTypes" $.CompensationTypes) }}
+                                            {{ else if eq .SourceType.Key "Task" }}
+                                                {{ template "partial-event-task" . }}
+                                            {{ else }}
                                                 <dl class="govuk-summary-list">
                                                     <ul class="govuk-list govuk-list--bullet">
                                                         {{ range $k, $v := .Entity }}
@@ -122,6 +151,7 @@
                                                         {{ end }}
                                                     </ul>
                                                 </dl>
+                                            {{ end }}
                                         </div>
                                     </div>
                                     <div class="govuk-summary-list__row">

@@ -38,8 +38,11 @@
 
             {{ $multiCaseSelected := .MultipleCasesSelected }}
 
-            <form class="form" id="document-list-form" method="POST">
+            <form class="form" id="document-list-form" method="POST" action="{{ prefix (printf "/donor/%d/documents" .DonorID) }}">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+                {{ if .Comparing }}
+                    <input type="hidden" name="comparing" value="true">
+                {{ end }}
 
                 <table class="govuk-table" data-module="moj-sortable-table">
                     <caption class="govuk-table__caption">
@@ -50,9 +53,16 @@
                                 {{ template "CaseLabel" . }}
                             {{ end }}
                     </span>
-                        <p>
-                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" type="submit" name="actionDownload" value="true">Download</button>
-                        </p>
+                        <div class="moj-button-group--inline govuk-!-margin-top-4">
+                            <button class="govuk-button govuk-button--secondary moj-button-menu__item" data-module="govuk-button" type="submit" name="actionDownload" value="true">Download</button>
+                            {{ if eq $.Comparing true }}
+                                {{ if .CloseURL }}
+                                    <a class="govuk-button govuk-button--secondary moj-button-menu__item"
+                                       href="{{ prefix .CloseURL }}"
+                                       aria-label="Close list">Close</a>
+                                {{end}}
+                            {{ end }}
+                        </div>
                     </caption>
 
                     <thead class="govuk-table__head">
@@ -62,7 +72,7 @@
                         {{ if $multiCaseSelected }}
                             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter" aria-sort="none">Case number</th>
                         {{ end }}
-                        <th scope="col" class="govuk-table__header" aria-sort="none">Date created</th>
+                        <th scope="col" class="govuk-table__header app-table__header--date" aria-sort="none">Date created</th>
                         <th scope="col" class="govuk-table__header govuk-!-width-one-quarter" aria-sort="none">Document Type</th>
                     </tr>
                     </thead>
@@ -91,8 +101,8 @@
                                 <br>
                                 {{ if eq .MimeType "application/pdf"}}
                                     {{ if eq $.Comparing true }}
-                                        <a class="govuk-link" href="{{ prefix (printf "/comparing-documents?docUid[]=%s&docUid[]=%s" .UUID $.Document.UUID) }}">{{ .FriendlyDescription }}</a>
-                                        {{else}}
+                                        <a class="govuk-link" href="{{ prefix ( index $.CompareURLs .UUID )}}">{{ .FriendlyDescription }}</a>
+                                    {{else}}
                                         <a class="govuk-link" href="{{ prefix (printf "/view-document/%s" .UUID) }}">{{ .FriendlyDescription }}</a>
                                     {{ end }}
                                 {{ else }}

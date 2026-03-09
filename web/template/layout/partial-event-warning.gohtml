@@ -1,0 +1,7 @@
+{{ define "partial-event-warning" }}
+    <p class="govuk-!-font-weight-bold">{{ .Entity.warningType }}</p>
+    <p>{{ .Entity.warningText }}</p>
+    {{ if and (eq .Type "UPD") .Changes.systemStatus (ne (len .Changes.systemStatus) 0) }}
+        <p>Warning removed by {{ .User.DisplayName }}</p>
+    {{ end }}
+{{ end }}

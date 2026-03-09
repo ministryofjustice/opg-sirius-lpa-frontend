@@ -38,7 +38,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "[{\"handle\":\"REMISSION\",\"label\":\"Remission\"}]"
+        "body": "[{\"handle\":\"REMISSION\",\"label\":\"Remission\"}, {\"handle\":\"EXEMPTION\",\"label\":\"Exemption\"}]"
       }
     },
     {
@@ -71,7 +71,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "[{\"handle\":\"PHONE\",\"label\":\"Phone call\"}]"
+        "body": "[{\"handle\":\"PHONE\",\"label\":\"Phone call\"}, {\"handle\":\"CONTACT_CENTRE\",\"label\":\"Contact centre\"}]"
       }
     },
     {
@@ -93,7 +93,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "[{\"handle\":\"02\",\"label\":\"OPG Decisions\",\"subcategories\":[{\"handle\":\"18\",\"label\":\"Fee Decision\"}]}]"
+        "body": "[{\"handle\":\"01\",\"label\":\"Correspondence\",\"subcategories\":[{\"handle\":\"06\",\"label\":\"General Query\"}]}, {\"handle\":\"02\",\"label\":\"OPG Decisions\",\"subcategories\":[{\"handle\":\"18\",\"label\":\"Fee Decision\"}]}]"
       }
     },
     {

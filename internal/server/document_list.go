@@ -21,12 +21,15 @@ type documentPageData struct {
 	Entity                string
 	Success               bool
 	SuccessMessage        string
+	DonorID               int
 	Error                 sirius.ValidationError
 	DocumentList          sirius.DocumentList
 	Document              sirius.Document
 	SelectedCases         []sirius.Case
 	MultipleCasesSelected bool
 	Comparing             bool
+	CompareURLs           map[string]string
+	CloseURL              string
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
@@ -96,8 +99,13 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		compareView := r.FormValue("comparing") == "true"
 		var validationErr sirius.ValidationError
 		if r.Method == http.MethodPost && len(selectedDocUUIDs) == 0 && r.FormValue("actionDownload") == "true" {
+			if compareView {
+				w.WriteHeader(http.StatusNoContent)
+				return nil
+			}
 			validationErr.Detail = "Select one or more documents and try again."
 		}
 
@@ -116,7 +124,8 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			Error:                 validationErr,
 			Success:               isSuccess,
 			SuccessMessage:        successMessage,
-			Comparing:             false,
+			Comparing:             compareView,
+			DonorID:               donorID,
 		}
 
 		return tmpl(w, data)

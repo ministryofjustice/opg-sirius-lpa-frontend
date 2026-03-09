@@ -1,0 +1,58 @@
+{{ define "partial-event-complaint" }}
+    {{ $complaintCategories := $.Context.ComplaintCategories }}
+    {{ $complaintSubcategories := $.Context.ComplaintSubcategories }}
+    {{ $complainantCategories := $.Context.ComplainantCategories }}
+    {{ $complaintOrigins := $.Context.ComplaintOrigins }}
+    {{ $compensationTypes := $.Context.CompensationTypes }}
+
+    <p class="govuk-!-font-weight-bold">{{ .Entity.severity }} - {{ .Entity.summary }}</p>
+    <p>{{ .Entity.description }}</p>
+    {{ if ne (len .Changes) 0 }}
+        <ul class="govuk-list">
+            {{ range $k, $v := .Changes }}
+                {{ $hasChanges := ne (len $v) 1 }}
+                {{ $oldValue := ""}}
+                {{ $newValue := "" }}
+
+                {{ if $hasChanges }}
+                    {{ $oldValue = index $v 0  }}
+                    {{ $newValue = index $v 1 }}
+
+                    {{ if or (eq $k "receivedDate") (eq $k "resolutionDate") }}
+                        <li>{{ complaintProperty $k }}: {{ parseAndFormatDate (index $oldValue "date") "2006-01-02 00:00:00.000000" "02/01/2006" }} changed to: {{ parseAndFormatDate (index $newValue "date") "2006-01-02 00:00:00.000000" "02/01/2006" }}</li>
+                    {{ else if eq $k "category" }}
+                        <li>{{ complaintProperty $k }}: {{ translateRefData $complaintCategories $oldValue}} changed to: {{ translateRefData $complaintCategories $newValue }}</li>
+                    {{ else if eq $k "subCategory" }}
+                        <li>{{ complaintProperty $k }}: {{ translateRefData $complaintSubcategories $oldValue }} changed to: {{ translateRefData $complaintSubcategories $newValue }}</li>
+                    {{ else if eq $k "complainantCategory" }}
+                        <li>{{ complaintProperty $k }}: {{ translateRefData $complainantCategories $oldValue}} changed to: {{ translateRefData $complainantCategories $newValue }}</li>
+                    {{ else if eq $k "origin" }}
+                        <li>{{ complaintProperty $k }}: {{ translateRefData $complaintOrigins $oldValue}} changed to: {{ translateRefData $complaintOrigins $newValue }}</li>
+                    {{ else if eq $k "compensationType" }}
+                        <li>{{ complaintProperty $k }}: {{ translateRefData $compensationTypes $oldValue}} changed to: {{ translateRefData $compensationTypes $newValue }}</li>
+                    {{ else }}
+                        <li>{{ complaintProperty $k }}: {{ $oldValue}} changed to: {{ $newValue }}</li>
+                    {{ end }}
+                {{ else }}
+                    {{ $newValue = index $v "1" }}
+
+                    {{ if or (eq $k "receivedDate") (eq $k "resolutionDate") }}
+                        <li>{{ complaintProperty $k }}: {{ parseAndFormatDate (index $newValue "date") "2006-01-02 00:00:00.000000" "02/01/2006" }}</li>
+                    {{ else if eq $k "category" }}
+                        <li>{{ complaintProperty $k }}: {{ translateRefData $complaintCategories $newValue }}</li>
+                    {{ else if eq $k "subCategory" }}
+                        <li>{{ complaintProperty $k }}: {{ translateRefData $complaintSubcategories $newValue }}</li>
+                    {{ else if eq $k "complainantCategory" }}
+                        <li>{{ complaintProperty $k }}: {{ translateRefData $complainantCategories $newValue }}</li>
+                    {{ else if eq $k "origin" }}
+                        <li>{{ complaintProperty $k }}: {{ translateRefData $complaintOrigins $newValue }}</li>
+                    {{ else if eq $k "compensationType" }}
+                        <li>{{ complaintProperty $k }}: {{ translateRefData $compensationTypes $newValue }}</li>
+                    {{ else }}
+                        <li>{{ complaintProperty $k }}: {{ $newValue }}</li>
+                    {{ end }}
+                {{ end }}
+            {{ end }}
+        </ul>
+    {{ end }}
+{{ end }}

@@ -1,0 +1,5 @@
+{{ define "partial-event-fee-reduction-updated" }}
+    {{ $changes := index .Changes "feeReductionType" }}
+    {{ $feeReductionTypes := $.Context.FeeReductionTypes }}
+    Reduction type: {{ translateRefData $feeReductionTypes (index $changes 0) }} changed to {{ translateRefData $feeReductionTypes (index $changes 1) }}
+{{ end }}

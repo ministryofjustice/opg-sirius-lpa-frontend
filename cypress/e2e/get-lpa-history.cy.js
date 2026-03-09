@@ -12,7 +12,7 @@ describe("View LPA history timeline", () => {
           caseIds: [
             {
               id: 105,
-              total: 3, //events on caseId
+              total: 4, //events on caseId
             },
             {
               total: 0, //events on person
@@ -31,13 +31,17 @@ describe("View LPA history timeline", () => {
               sourceType: "Warning",
               total: 1,
             },
+            {
+              sourceType: "Payment",
+              total: 1,
+            },
           ],
         },
         pages: {
           current: 1,
           total: 1,
         },
-        total: 3,
+        total: 4,
         events: [
           {
             id: 144,
@@ -440,7 +444,6 @@ describe("View LPA history timeline", () => {
         expect($items.eq(0)).to.contain.text("Warning");
         expect($items.eq(1)).to.contain.text("Task");
         expect($items.eq(2)).to.contain.text("LPA (Create / Edit)");
-
         cy.wrap($items.eq(1)).find(".moj-alert--warning").should("not.exist");
         cy.wrap($items.eq(0)).find(".moj-alert--warning").should("exist");
       });

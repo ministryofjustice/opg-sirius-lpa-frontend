@@ -1,0 +1,49 @@
+{{ define "partial-event-task" }}
+    {{ $taskType := .Entity.type }}
+    {{ $taskName := .Entity.name }}
+    {{ $taskDescription := .Entity.description }}
+
+    {{ if eq .Type "INS" }}
+        {{ if $taskType }}
+            <p class="govuk-body">
+                <strong>{{ $taskType }}</strong> now assigned to {{ .Entity.assignee.displayName }}
+            </p>
+        {{ end }}
+        {{ if or $taskName $taskDescription }}
+            <p class="govuk-body">
+                {{ if $taskName }}{{ $taskName }}{{ end }}{{ if and $taskName $taskDescription }} &mdash; {{ end }}{{ if $taskDescription }}{{ $taskDescription }}{{ end }}
+            </p>
+        {{ end }}
+    {{ else if eq .Type "UPD" }}
+        <p class="govuk-body">
+            {{ if $taskType }}
+                    <strong>{{ $taskType }}</strong>
+            {{ end }}
+            {{ if $taskName }}
+                {{ $taskName }}
+            {{ end }}
+            {{ if and .Changes.status (gt (len .Changes.status) 1) }}
+                {{ $updatedStatus := index .Changes.status 1 }}
+                <strong>{{ $updatedStatus }}</strong>
+            {{ end }}
+        </p>
+        {{ if .Changes.completedDate }}
+            {{ $completed := index .Changes.completedDate "1" }}
+            {{ $completedDate := index $completed "date" }}
+            {{ if $completedDate }}
+                <p class="govuk-body">
+                    Date completed: {{ parseAndFormatDate $completedDate "2006-01-02 15:04:05.000000" "02/01/2006" }}
+                </p>
+            {{ end }}
+        {{ end }}
+        {{ if .Changes.assignee }}
+            {{ $fromAssignee := index .Changes.assignee 0 }}
+            {{ $toAssignee := index .Changes.assignee 1 }}
+            {{ $fromName := index (index $fromAssignee "details") "displayName" }}
+            {{ $toName := index (index $toAssignee "details") "displayName" }}
+            <p class="govuk-body">
+                Task was assigned to {{ $fromName }} now assigned to {{ $toName }}
+            </p>
+        {{ end}}
+    {{ end }}
+{{ end }}

@@ -1,26 +1,25 @@
 {{ define "viewingDocument" }}
-    <div class="govuk-grid-column-one-half">
-        <div class="govuk-body">
-            {{ range .CaseItems }}
-                {{ template "CaseLabel" . }}
-            {{ end }}
-            <strong>{{ (parseAndFormatDate .CreatedDate "02/01/2006 15:04:05" "02/01/2006") }} {{ .FriendlyDescription }}</strong>
-        </div>
-
-
-        {{ if gt (len .CaseItems) 0 }}
-            {{ $caseItem := index .CaseItems 0 }}
-            {{ $donor := $caseItem.Donor }}
-            <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2" href="{{ prefix (printf "/compare/%d/documents?uid[]=%s" $donor.ID .UUID) }}">Back to list</a>
-        {{ else }}
-            {{ $donor := index .Persons 0 }}
-            <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2" href="{{ prefix (printf "/compare/%d/documents?uid[]=%s" $donor.ID .UUID ) }}">Back to list</a>
+    <div class="govuk-body">
+        {{ range .Document.CaseItems }}
+            {{ template "CaseLabel" . }}
         {{ end }}
-
-        <iframe
-                class="document-viewer-container"
-                src="/lpa-api/v1/documents/{{ .UUID }}/file"
-        >
-        </iframe>
+        <strong>{{ (parseAndFormatDate .Document.CreatedDate "02/01/2006 15:04:05" "02/01/2006") }} {{ .Document.FriendlyDescription }}</strong>
     </div>
+
+    <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
+       href="{{ prefix .BackURL }}">
+        Back to list
+    </a>
+
+    {{ if .CloseURL }}
+        <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2"
+           href="{{ prefix .CloseURL }}"
+           aria-label="Close list">Close</a>
+    {{end}}
+
+    <iframe
+            class="document-viewer-container"
+            src="/lpa-api/v1/documents/{{ .Document.UUID }}/file"
+    >
+    </iframe>
 {{ end }}
