@@ -57,8 +57,10 @@ var lpaEventSourceTypeMap = map[string]LpaEventSourceType{
 	"LodgingChecklist":    LpaEventSourceTypeLodgingChecklist,
 	"Lpa":                 LpaEventSourceTypeLpa,
 	"Note":                LpaEventSourceTypeNote,
+	"Event":               LpaEventSourceTypeNote,
 	"NotifiedPerson":      LpaEventSourceTypeNotifiedPerson,
 	"Order":               LpaEventSourceTypeOrder,
+	"OutboundDocument":    LpaEventSourceTypeOutgoingDocument,
 	"OutgoingDocument":    LpaEventSourceTypeOutgoingDocument,
 	"Payment":             LpaEventSourceTypePayment,
 	"PhoneNumber":         LpaEventSourceTypePhoneNumber,
@@ -221,4 +223,15 @@ func (l *LpaEventSourceType) UnmarshalJSON(data []byte) (err error) {
 	}
 	*l = ParseLpaEventSourceType(s)
 	return nil
+}
+
+func (l LpaEventSourceType) APIKey() string {
+	switch l {
+	case LpaEventSourceTypeNote:
+		return "Note"
+	case LpaEventSourceTypeOutgoingDocument:
+		return "OutgoingDocument"
+	default:
+		return l.Key()
+	}
 }
