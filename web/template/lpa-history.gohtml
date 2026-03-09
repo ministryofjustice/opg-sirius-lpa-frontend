@@ -53,7 +53,7 @@
                                         {{ range .EventFilterData }}
                                             <div class="govuk-checkboxes__item">
                                                 <input class="govuk-checkboxes__input" id="f-{{ .SourceType.Key }}"
-                                                       name="type" type="checkbox" value="{{ .SourceType.Key }}" {{ if contains $.Form.Types .SourceType.Key }}checked{{ end }}>
+                                                       name="type" type="checkbox" value="{{ .SourceType.APIKey }}" {{ if contains $.Form.Types .SourceType.APIKey }}checked{{ end }}>
                                                 <label class="govuk-label govuk-checkboxes__label" for="f-{{ .SourceType.Key }}">
                                                     {{ .SourceType.Translation }} ({{ .Total }})
                                                 </label>
