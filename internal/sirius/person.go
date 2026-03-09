@@ -11,7 +11,6 @@ type Person struct {
 	Salutation                   string     `json:"salutation"`
 	Firstname                    string     `json:"firstname"`
 	Middlenames                  string     `json:"middlenames"`
-	Othernames                   string     `json:"othernames"`
 	Surname                      string     `json:"surname"`
 	DateOfBirth                  DateString `json:"dob"`
 	PreviouslyKnownAs            string     `json:"previousNames"`

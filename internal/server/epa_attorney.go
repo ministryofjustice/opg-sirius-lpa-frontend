@@ -71,7 +71,7 @@ func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
 				Firstname:                    postFormString(r, "firstname"),
 				Middlenames:                  postFormString(r, "middlenames"),
 				Surname:                      postFormString(r, "surname"),
-				Othernames:                   postFormString(r, "otherNames"),
+				AlsoKnownAs:                  postFormString(r, "otherNames"),
 				DateOfBirth:                  postFormDateString(r, "dob"),
 				PhoneNumber:                  postFormString(r, "phoneNumber"),
 				Email:                        postFormString(r, "email"),
