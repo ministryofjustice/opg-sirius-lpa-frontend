@@ -147,6 +147,9 @@ describe("Search", () => {
       $row.should("contain", "Deputy");
       $row.should("contain", "100 Random Road");
       $row.should("contain", "ORDER - HW");
+      cy.contains("Bob Rogers")
+        .should("have.attr", "href")
+        .should("contain", "/supervision#/deputy-hub/65");
     });
   });
 
