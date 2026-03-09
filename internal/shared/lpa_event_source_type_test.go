@@ -247,3 +247,9 @@ func TestLpaEventSourceTypeUnmarshalJSONErrors(t *testing.T) {
 	err := json.Unmarshal([]byte(`123`), &est)
 	assert.Error(t, err)
 }
+
+func TestLpaEventSourceTypeAPIKey(t *testing.T) {
+	assert.Equal(t, "Note", LpaEventSourceTypeNote.APIKey())
+	assert.Equal(t, "OutgoingDocument", LpaEventSourceTypeOutgoingDocument.APIKey())
+	assert.Equal(t, "Address", LpaEventSourceTypeAddress.APIKey()) // default falls through to Key()
+}
