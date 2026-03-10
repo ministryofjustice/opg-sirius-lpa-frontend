@@ -28,7 +28,7 @@ func TestLpaEventSourceTypeTranslation(t *testing.T) {
 		{input: LpaEventSourceTypeInvestigation, expected: "Investigation"},
 		{input: LpaEventSourceTypeLodgingChecklist, expected: "Lodging Checklist"},
 		{input: LpaEventSourceTypeLpa, expected: "LPA (Create / Edit)"},
-		{input: LpaEventSourceTypeNote, expected: "Event"},
+		{input: LpaEventSourceTypeNote, expected: "Event"}, //translation of "Note" is "Event"
 		{input: LpaEventSourceTypeNotifiedPerson, expected: "Notified Person"},
 		{input: LpaEventSourceTypeOrder, expected: "Order"},
 		{input: LpaEventSourceTypeOutgoingDocument, expected: "Outbound document"},
@@ -75,10 +75,10 @@ func TestLpaEventSourceTypeKey(t *testing.T) {
 		{input: LpaEventSourceTypeInvestigation, expected: "Investigation"},
 		{input: LpaEventSourceTypeLodgingChecklist, expected: "LodgingChecklist"},
 		{input: LpaEventSourceTypeLpa, expected: "Lpa"},
-		{input: LpaEventSourceTypeNote, expected: "Event"},
+		{input: LpaEventSourceTypeNote, expected: "Note"},
 		{input: LpaEventSourceTypeNotifiedPerson, expected: "NotifiedPerson"},
 		{input: LpaEventSourceTypeOrder, expected: "Order"},
-		{input: LpaEventSourceTypeOutgoingDocument, expected: "OutboundDocument"},
+		{input: LpaEventSourceTypeOutgoingDocument, expected: "OutgoingDocument"},
 		{input: LpaEventSourceTypePayment, expected: "Payment"},
 		{input: LpaEventSourceTypePhoneNumber, expected: "PhoneNumber"},
 		{input: LpaEventSourceTypeReplacementAttorney, expected: "ReplacementAttorney"},
@@ -172,10 +172,10 @@ func TestLpaEventSourceTypeMarshalJSON(t *testing.T) {
 		{input: LpaEventSourceTypeInvestigation, expected: `"Investigation"`},
 		{input: LpaEventSourceTypeLodgingChecklist, expected: `"LodgingChecklist"`},
 		{input: LpaEventSourceTypeLpa, expected: `"Lpa"`},
-		{input: LpaEventSourceTypeNote, expected: `"Event"`},
+		{input: LpaEventSourceTypeNote, expected: `"Note"`},
 		{input: LpaEventSourceTypeNotifiedPerson, expected: `"NotifiedPerson"`},
 		{input: LpaEventSourceTypeOrder, expected: `"Order"`},
-		{input: LpaEventSourceTypeOutgoingDocument, expected: `"OutboundDocument"`},
+		{input: LpaEventSourceTypeOutgoingDocument, expected: `"OutgoingDocument"`},
 		{input: LpaEventSourceTypePayment, expected: `"Payment"`},
 		{input: LpaEventSourceTypePhoneNumber, expected: `"PhoneNumber"`},
 		{input: LpaEventSourceTypeReplacementAttorney, expected: `"ReplacementAttorney"`},
@@ -246,10 +246,4 @@ func TestLpaEventSourceTypeUnmarshalJSONErrors(t *testing.T) {
 	var est LpaEventSourceType
 	err := json.Unmarshal([]byte(`123`), &est)
 	assert.Error(t, err)
-}
-
-func TestLpaEventSourceTypeAPIKey(t *testing.T) {
-	assert.Equal(t, "Note", LpaEventSourceTypeNote.APIKey())
-	assert.Equal(t, "OutgoingDocument", LpaEventSourceTypeOutgoingDocument.APIKey())
-	assert.Equal(t, "Address", LpaEventSourceTypeAddress.APIKey()) // default falls through to Key()
 }
