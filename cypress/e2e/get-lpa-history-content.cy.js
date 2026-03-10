@@ -297,15 +297,15 @@ describe("Show correct event content", () => {
       entity: {
         name: "Some Task",
       },
-      changeSet: {
-        completedDate: {
-          0: null,
-          1: {
-            date: "2026-03-16 15:00:00.000000",
-          },
+        changeSet: {
+            completedDate: [
+                null,
+                {
+                    date: "2026-03-16 15:00:00.000000",
+                },
+            ],
+            status: ["Not Started", "Completed"],
         },
-        status: ["Not Started", "Completed"],
-      },
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
