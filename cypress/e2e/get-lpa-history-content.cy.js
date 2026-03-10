@@ -435,7 +435,7 @@ describe("Show correct event content", () => {
           { date: "2006-12-01 00:00:00.000000" },
           { date: "2006-12-02 00:00:00.000000" },
         ],
-        systemStatus: [ false, true ],
+        systemStatus: [false, true],
         CorrespondenceByPhone: [true, false],
       },
     });
@@ -447,7 +447,10 @@ describe("Show correct event content", () => {
         "Date of birth: 01/12/2006 changed to: 02/12/2006",
       )
       .should("contain.text", "Changed from inactive to: active")
-      .should("contain.text", "Correspondence by phone: true changed to: false")
+      .should(
+        "contain.text",
+        "Correspondence by phone: true changed to: false",
+      );
   });
 
   it("can view replacement attorney updated event without prior values", () => {
@@ -469,10 +472,7 @@ describe("Show correct event content", () => {
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
       .eq(0)
-      .should(
-        "contain.text",
-        "Date of birth: 01/12/2006",
-      )
+      .should("contain.text", "Date of birth: 01/12/2006")
       .should("contain.text", "Changed to: inactive")
       .should("contain.text", "Correspondence by email: true");
   });
