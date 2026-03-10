@@ -466,6 +466,108 @@ describe("View LPA history timeline", () => {
       });
   });
 
+  it("can view phone number event content", () => {
+    cy.addMock("/lpa-api/v1/persons/2/events?&sort=id:desc&limit=999", "GET", {
+      status: 200,
+      body: {
+        limit: 999,
+        metadata: {
+          caseIds: [
+            {
+              id: 900,
+              total: 1,
+            },
+            {
+              total: 1,
+            },
+          ],
+          sourceTypes: [
+            {
+              sourceType: "PhoneNumber",
+              total: 2,
+            },
+          ],
+        },
+        pages: {
+          current: 1,
+          total: 1,
+        },
+        total: 2,
+        events: [
+          {
+            id: 170,
+            owningCase: {
+              id: 900,
+              uId: "7000-0000-0009",
+              caseSubtype: "pfa",
+              caseType: "LPA",
+            },
+            user: {
+              id: 5,
+              phoneNumber: "030030000300",
+              teams: [],
+              displayName: "OPG User",
+              deleted: false,
+              email: "opg@test.gov.uk",
+            },
+            sourceType: "PhoneNumber",
+            sourcePhoneNumber: {
+              phoneNumber: "12345 678910",
+              type: "Work",
+            },
+            type: "UPD",
+            changeSet: {
+              phoneNumber: ["12345", "12345 678910"],
+            },
+            createdOn: "2026-03-06T14:39:20+00:00",
+            hash: "ABC",
+          },
+          {
+            id: 499,
+            owningCase: {
+              id: 900,
+              uId: "7000-0000-0009",
+              caseSubtype: "pfa",
+              caseType: "LPA",
+            },
+            user: {
+              id: 5,
+              phoneNumber: "030030000300",
+              teams: [],
+              displayName: "OPG User",
+              deleted: false,
+              email: "opg@test.gov.uk",
+            },
+            sourceType: "PhoneNumber",
+            sourcePhoneNumber: {
+              phoneNumber: "12345",
+              type: "Work",
+            },
+            type: "INS",
+            changeSet: [],
+            createdOn: "2026-01-22T10:30:01+00:00",
+            hash: "AB",
+          },
+        ],
+      },
+    });
+
+    cy.visit("/donor/2/history");
+
+    cy.get(".moj-timeline__item")
+      .should("have.length", 2)
+      .then(($items) => {
+        const normalise = (el) =>
+          Cypress.$(el).text().replaceAll(/\s+/g, " ").trim();
+        expect(normalise($items[0])).to.include(
+          "Phone number changed from 12345 to 12345 678910",
+        );
+        expect(normalise($items[1])).to.include(
+          "Phone number changed to 12345",
+        );
+      });
+  });
+
   it("can view variable case details content", () => {
     cy.visit("/donor/1/history?id[]=105&id[]=106&id[]=107");
 
