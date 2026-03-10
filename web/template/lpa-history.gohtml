@@ -132,6 +132,8 @@
                                                 {{ template "partial-event-complaint" (eventWithContext . "complaintCategories" $.ComplaintCategories "complaintSubcategories" $.ComplaintSubcategories "complainantCategories" $.ComplainantCategories "complaintOrigins" $.ComplaintOrigins "compensationTypes" $.CompensationTypes) }}
                                             {{ else if eq .SourceType.Key "Task" }}
                                                 {{ template "partial-event-task" . }}
+                                            {{ else if eq .SourceType.Key "ReplacementAttorney" }}
+                                                {{ template "partial-event-replacement-attorney" . }}
                                             {{ else }}
                                                 <dl class="govuk-summary-list">
                                                     <ul class="govuk-list govuk-list--bullet">
