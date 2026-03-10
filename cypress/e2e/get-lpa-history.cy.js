@@ -583,17 +583,17 @@ describe("View LPA history timeline", () => {
     cy.visit("/donor/2/history");
 
     cy.get(".moj-timeline__item")
-        .should("have.length", 2)
-        .then(($items) => {
-          const normalise = (el) =>
-              Cypress.$(el).text().replaceAll(/\s+/g, " ").trim();
-          expect(normalise($items[0])).to.include(
-              "Phone number changed from 12345 to 12345 678910",
-          );
-          expect(normalise($items[1])).to.include(
-              "Phone number changed to 12345",
-          );
-        });
+      .should("have.length", 2)
+      .then(($items) => {
+        const normalise = (el) =>
+          Cypress.$(el).text().replaceAll(/\s+/g, " ").trim();
+        expect(normalise($items[0])).to.include(
+          "Phone number changed from 12345 to 12345 678910",
+        );
+        expect(normalise($items[1])).to.include(
+          "Phone number changed to 12345",
+        );
+      });
   });
 
   it("can filter", () => {
