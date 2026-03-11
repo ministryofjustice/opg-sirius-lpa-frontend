@@ -46,9 +46,24 @@ func PaymentEpa(client PaymentEpaClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
+			paymentByCheque := r.FormValue("paymentByCheque")
+			paymentExemption := r.FormValue("paymentExemption")
+
+			var paymentByChequePtr *bool
+			if paymentByCheque != "" {
+				val := paymentByCheque == "true"
+				paymentByChequePtr = &val
+			}
+
+			var paymentExemptionPtr *bool
+			if paymentExemption != "" {
+				val := paymentExemption == "true"
+				paymentExemptionPtr = &val
+			}
+
 			epa := sirius.Case{
-				PaymentByCheque:  r.FormValue("paymentByCheque") == "true",
-				PaymentExemption: r.FormValue("paymentExemption") == "true",
+				PaymentByCheque:  paymentByChequePtr,
+				PaymentExemption: paymentExemptionPtr,
 				PaymentDate:      postFormDateString(r, "paymentDate"),
 			}
 
