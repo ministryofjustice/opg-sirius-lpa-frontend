@@ -156,11 +156,11 @@
               <tbody class="govuk-table__body">
               <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Cheque enclosed</th>
-                <td class="govuk-table__cell">{{ if .Case.PaymentByCheque }}Yes{{ else }}No{{ end }}</td>
+                <td class="govuk-table__cell">{{ if .Case.PaymentByCheque }}{{ if .Case.PaymentByCheque }}Yes{{ else }}No{{ end }}{{ end }}</td>
               </tr>
               <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Application for postponement exemption or remission of the fee</th>
-                <td class="govuk-table__cell">{{ if .Case.PaymentExemption }}Yes{{ else }}No{{ end }}</td>
+                <td class="govuk-table__cell">{{ if .Case.PaymentExemption }}{{ if .Case.PaymentExemption }}Yes{{ else }}No{{ end }}{{ end }}</td>
               </tr>
               <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Payment date</th>
