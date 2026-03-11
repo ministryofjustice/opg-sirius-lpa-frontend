@@ -9,12 +9,12 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        {{ template "radios" (radios "paymentByCheque" "Cheque enclosed" (stringifyBool .Case.PaymentByCheque) .Error.Field.paymentByCheque
+        {{ template "radios" (radios "paymentByCheque" "Cheque enclosed" (stringifyBoolPointer .Case.PaymentByCheque) .Error.Field.paymentByCheque
         (item "true" "Yes")
         (item "false" "No")
         ) }}
 
-        {{ template "radios" (radios "paymentExemption" "Application for postponement, exemption or remission of the fee" (stringifyBool .Case.PaymentExemption) .Error.Field.paymentExemption
+        {{ template "radios" (radios "paymentExemption" "Application for postponement, exemption or remission of the fee" (stringifyBoolPointer .Case.PaymentExemption) .Error.Field.paymentExemption
         (item "true" "Yes")
         (item "false" "No")
         ) }}
