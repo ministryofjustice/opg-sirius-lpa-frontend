@@ -34,6 +34,8 @@ func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		isEditing := r.FormValue("isEditing") == "true"
+
 		data := epaAttorneyData{
 			XSRFToken: ctx.XSRFToken,
 			CaseID:    caseId,
@@ -44,7 +46,8 @@ func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
 				{Handle: "other", Label: "other"},
 				{Handle: "other professional", Label: "other professional"},
 			},
-			Title: "Add an attorney",
+			Title:     "Add an attorney",
+			IsEditing: isEditing,
 		}
 
 		hasAttorneyId := r.FormValue("attorneyId") != ""
@@ -64,7 +67,6 @@ func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
 
 			data.Attorney = attorney
 			data.Title = "Edit attorney"
-			data.IsEditing = true
 		}
 
 		if r.Method == http.MethodPost {
@@ -102,8 +104,13 @@ func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
 			} else if err != nil {
 				return err
 			}
-			if hasAttorneyId {
+
+			if r.FormValue("fromDetails") == "true" {
 				return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
+			}
+
+			if isEditing {
+				return RedirectError(fmt.Sprintf("/case-actors-epa?caseId=%d&isEditing=true", caseId))
 			}
 			return RedirectError(fmt.Sprintf("/case-actors-epa?caseId=%d", caseId))
 		}

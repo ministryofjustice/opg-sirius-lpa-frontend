@@ -3,7 +3,7 @@
 {{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create EPA{{ end }}
 
 {{ define "main" }}
-    <div class="govuk-heading-l">Step 3: case actors</div>
+    <div class="govuk-heading-l">{{ .Title }}</div>
     <div class="govuk-heading-s">Attorneys:</div>
     {{ if gt (len .Case.Attorneys) 0 }}
         {{ range $attorney := .Case.Attorneys }}
@@ -14,7 +14,11 @@
                 <div class="govuk-details__text">
                     <div class="app-heading-with-link">
                         <div></div>
-                        <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/epa-attorney?caseId=%d&attorneyId=%d" $.CaseID .ID)}}">Update</a>
+                        {{ if $.IsEditing }}
+                            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/epa-attorney?caseId=%d&attorneyId=%d&isEditing=true" $.CaseID .ID)}}">Update</a>
+                        {{ else }}
+                            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/epa-attorney?caseId=%d&attorneyId=%d" $.CaseID .ID)}}">Update</a>
+                        {{ end }}
                     </div>
                     {{ template "attorney-details-table" . }}
                 </div>
@@ -24,7 +28,11 @@
         <p class="govuk-body">No attorneys have been added yet.</p>
     {{ end }}
     <div class="govuk-button-group govuk-!-padding-top-5">
-        <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/epa-attorney?caseId=%d" .CaseID)}}">Add attorney</a>
+        {{ if .IsEditing }}
+            <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/epa-attorney?caseId=%d&isEditing=true" .CaseID)}}">Add attorney</a>
+        {{ else }}
+            <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/epa-attorney?caseId=%d" .CaseID)}}">Add attorney</a>
+        {{ end }}
         <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-epa-correspondent?caseId=%d" .CaseID)}}">Add correspondent</a>
     </div>
     <div class="govuk-button-group govuk-!-padding-top-5">
