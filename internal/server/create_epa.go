@@ -78,6 +78,7 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
+				return tmpl(w, data)
 			} else if err != nil {
 				return err
 			}
