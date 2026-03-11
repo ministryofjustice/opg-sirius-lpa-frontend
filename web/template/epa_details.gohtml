@@ -129,7 +129,7 @@
                   <div class="govuk-details__text">
                     <div class="app-heading-with-link">
                       <div></div>
-                      <a class="govuk-!-display-block govuk-!-text-align-right govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/epa-attorney?caseId=%d&attorneyId=%d" $.CaseID .ID)}}">Update</a>
+                      <a class="govuk-!-display-block govuk-!-text-align-right govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/epa-attorney?caseId=%d&attorneyId=%d&isEditing=true&fromDetails=true" $.CaseID .ID)}}">Update</a>
                     </div>
                     {{ template "attorney-details-table" . }}
                   </div>
@@ -140,7 +140,7 @@
             {{ end }}
 
             <div class="govuk-button-group govuk-!-padding-top-5">
-              <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/epa-attorney?caseId=%d&isEditing=true" .Case.ID)}}">Add attorney</a>
+              <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/epa-attorney?caseId=%d&isEditing=true&fromDetails=true" .Case.ID)}}">Add attorney</a>
               <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-epa-correspondent?caseId=%d" .CaseID)}}">Add correspondent</a>
             </div>
             </div>

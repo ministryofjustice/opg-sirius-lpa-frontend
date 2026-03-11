@@ -41,9 +41,13 @@ func CaseActorsEpa(client CaseActorsEpaClient, tmpl template.Template) Handler {
 		data := CaseActorsEpaData{
 			XSRFToken: ctx.XSRFToken,
 			CaseID:    caseId,
-			Title:     "Create EPA details",
 			Case:      caseitem,
 			IsEditing: isEditing,
+			Title:     "Step 3: case actors",
+		}
+
+		if isEditing {
+			data.Title = "Case actors"
 		}
 
 		return tmpl(w, data)
