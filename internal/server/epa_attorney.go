@@ -22,6 +22,7 @@ type epaAttorneyData struct {
 	Error                sirius.ValidationError
 	RelationshipToDonors []sirius.RefDataItem
 	Title                string
+	IsEditing            bool
 }
 
 func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
@@ -63,6 +64,7 @@ func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
 
 			data.Attorney = attorney
 			data.Title = "Edit attorney"
+			data.IsEditing = true
 		}
 
 		if r.Method == http.MethodPost {
@@ -100,7 +102,7 @@ func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
 			} else if err != nil {
 				return err
 			}
-			if r.FormValue("isEditing") == "true" {
+			if hasAttorneyId {
 				return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
 			}
 			return RedirectError(fmt.Sprintf("/case-actors-epa?caseId=%d", caseId))
