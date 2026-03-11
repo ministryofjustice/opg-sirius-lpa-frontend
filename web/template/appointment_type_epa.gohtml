@@ -7,7 +7,7 @@
     <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
     <div class="govuk-heading-l">Step 2: appointment type</div>
     <div class="govuk-form-group">
-        {{ template "radios" (radios "caseAttorney" "Select one option" .CaseAttorneyType .Error.Field.donorHasOtherEpas
+        {{ template "radios" (radios "caseAttorney" "Select one option" .CaseAttorneyType .Error.Field.caseAttorneyType
         (item "singular" "Only one attorney is appointed")
         (item "jointly-and-severally" "Jointly and severally")
         (item "jointly" "Jointly")

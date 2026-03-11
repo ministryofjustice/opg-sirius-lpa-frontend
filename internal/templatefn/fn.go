@@ -386,6 +386,15 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				Context:  context,
 			}
 		},
+		"stringifyBoolPointer": func(b *bool) string {
+			if b == nil {
+				return ""
+			}
+			if *b {
+				return "true"
+			}
+			return "false"
+		},
 		"stringifyBool": func(b bool) string {
 			if b {
 				return "true"
