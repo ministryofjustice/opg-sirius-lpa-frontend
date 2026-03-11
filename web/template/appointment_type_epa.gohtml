@@ -5,7 +5,7 @@
 {{ define "main" }}
 <form class="form" method="POST">
     <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
-    <div class="govuk-heading-l">Step 2: appointment type</div>
+    <div class="govuk-heading-l">{{ .Title }}</div>
     <div class="govuk-form-group">
         {{ template "radios" (radios "caseAttorney" "Select one option" .CaseAttorneyType .Error.Field.caseAttorneyType
         (item "singular" "Only one attorney is appointed")
@@ -14,8 +14,9 @@
         ) }}
     </div>
     <div class="govuk-button-group govuk-!-padding-top-5">
-        <button class="govuk-button" data-module="govuk-button" type="submit">{{ .ButtonName }}</button>
+        <input class="govuk-button" type="submit" value="Save and continue" name="submit-continue" />
         {{ if .IsEditing }}
+            <input class="govuk-button" type="submit" value="Save and exit" name="submit-exit"/>
             <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/edit-epa?caseId=%d" .Case.ID) }}">Cancel</a>
         {{else}}
             <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
