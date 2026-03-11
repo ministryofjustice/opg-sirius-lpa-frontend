@@ -10,6 +10,7 @@ import (
 
 type CreateEpaClient interface {
 	CreateEpa(ctx sirius.Context, donorID int, epa sirius.Case) (int, error)
+	UpdateEpa(ctx sirius.Context, caseID int, epa sirius.Case) error
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
 }
 
@@ -21,7 +22,6 @@ type createEpaData struct {
 	ShowAllSections      bool
 	RelationshipToDonors []sirius.RefDataItem
 	Title                string
-	ButtonName           string
 }
 
 func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
@@ -42,8 +42,7 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 				{Handle: "other", Label: "other"},
 				{Handle: "other professional", Label: "other professional"},
 			},
-			Title:      "Step 1: EPA details",
-			ButtonName: "Save and continue",
+			Title: "Step 1: EPA details",
 		}
 
 		caseIdStr := r.FormValue("caseId")
@@ -57,7 +56,6 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 				}
 			}
 			data.Title = "EPA details"
-			data.ButtonName = "Save"
 		}
 
 		if r.Method == http.MethodPost {
@@ -73,7 +71,15 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			}
 			data.Case = epa
 
-			caseId, err := client.CreateEpa(ctx, donorID, epa)
+			var caseId int
+			if isEditing {
+				caseId, err = strToIntOrStatusError(caseIdStr)
+				if err == nil {
+					err = client.UpdateEpa(ctx, caseId, epa)
+				}
+			} else {
+				caseId, err = client.CreateEpa(ctx, donorID, epa)
+			}
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
@@ -83,11 +89,14 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 				return err
 			}
 
-			if isEditing {
+			if r.FormValue("submit-continue") == "" {
 				return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
 			}
-			return RedirectError(fmt.Sprintf("/appointment-epa?caseId=%d", caseId))
 
+			if isEditing {
+				return RedirectError(fmt.Sprintf("/appointment-epa?caseId=%d&isEditing=true", caseId))
+			}
+			return RedirectError(fmt.Sprintf("/appointment-epa?caseId=%d", caseId))
 		}
 
 		return tmpl(w, data)

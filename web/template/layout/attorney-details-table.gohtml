@@ -2,12 +2,22 @@
     <table class="govuk-table">
         <tbody class="govuk-table__body">
         <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">Title</th>
+            <th scope="row" class="govuk-table__header app-table__row--half-width">Salutation</th>
             <td class="govuk-table__cell">{{ .Salutation }}</td>
         </tr>
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">First name</th>
             <td class="govuk-table__cell">{{ .Firstname }}</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Date of birth</th>
+            <td class="govuk-table__cell">
+                {{ if .DateOfBirth }}
+                    {{ parseAndFormatDate (printf "%s" .DateOfBirth) "2006-01-02" "2 January 2006" }}
+                {{ else }}
+                    -
+                {{ end }}
+            </td>
         </tr>
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">Middle name</th>
@@ -16,10 +26,6 @@
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">Last name</th>
             <td class="govuk-table__cell">{{ .Surname }}</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">Date of birth</th>
-            <td class="govuk-table__cell">{{ .DateOfBirth }}</td>
         </tr>
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">Company name</th>
@@ -60,10 +66,6 @@
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">Relationship to donor</th>
             <td class="govuk-table__cell">{{ .RelationshipToDonor }}</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">Is this attorney applying to register the EPA?</th>
-            <td class="govuk-table__cell">{{ boolToYesNo .IsAttorneyApplyingToRegister }}</td>
         </tr>
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">Is this attorney active?</th>

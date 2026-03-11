@@ -11,7 +11,6 @@ type EpaDetailsClient interface {
 	UpdateEpa(ctx sirius.Context, caseId int, epa sirius.Case) error
 	Case(sirius.Context, int) (sirius.Case, error)
 }
-
 type EpaDetailsData struct {
 	XSRFToken            string
 	CaseID               int
@@ -46,39 +45,6 @@ func EpaDetails(client EpaDetailsClient, tmpl template.Template) Handler {
 				{Handle: "other", Label: "other"},
 				{Handle: "other professional", Label: "other professional"},
 			},
-		}
-
-		if r.Method == http.MethodPost {
-			if r.FormValue("showAllSections") == "true" {
-				data.ShowAllSections = true
-				return tmpl(w, data)
-			}
-			if r.FormValue("showAllSections") == "false" {
-				data.ShowAllSections = false
-				return tmpl(w, data)
-			}
-
-			epa := sirius.Case{
-				EpaDonorSignatureDate:           postFormDateString(r, "epaDonorSignatureDate"),
-				EpaDonorNoticeGivenDate:         postFormDateString(r, "epaDonorNoticeGivenDate"),
-				DonorHasOtherEpas:               postFormString(r, "donorHasOtherEpas") == "true",
-				ReceiptDate:                     postFormDateString(r, "receiptDate"),
-				CaseAttorneySingular:            r.FormValue("caseAttorneySingular") == "true",
-				CaseAttorneyJointlyAndSeverally: r.FormValue("caseAttorneyJointlyAndSeverally") == "true",
-				CaseAttorneyJointly:             r.FormValue("caseAttorneyJointly") == "true",
-				AttorneyRelationshipToDonor:     postFormString(r, "relationshipToDonors"),
-			}
-
-			err = client.UpdateEpa(ctx, caseId, epa)
-
-			if ve, ok := err.(sirius.ValidationError); ok {
-				w.WriteHeader(http.StatusBadRequest)
-				data.Error = ve
-			} else if err != nil {
-				return err
-			} else {
-				data.Success = true
-			}
 		}
 
 		return tmpl(w, data)

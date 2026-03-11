@@ -3,6 +3,10 @@
 {{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create EPA{{ end }}
 
 {{ define "main" }}
+  {{ if .Success }}
+    <meta data-app-reload="page" />
+  {{ end }}
+
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <h1 class="govuk-heading-l">{{ .Title }}</h1>
@@ -13,7 +17,7 @@
         (item "true" "Yes")
         (item "false" "No")
         ) }}
-
+  
         {{ template "radios" (radios "paymentExemption" "Application for postponement, exemption or remission of the fee" (stringifyBoolPointer .Case.PaymentExemption) .Error.Field.paymentExemption
         (item "true" "Yes")
         (item "false" "No")
@@ -22,8 +26,13 @@
         {{ template "input-date" (field "paymentDate" "Payment date" .Case.PaymentDate .Error.Field.paymentDate) }}
 
           <div class="govuk-button-group govuk-!-padding-top-5">
-          <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
-          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+            <input class="govuk-button" type="submit" value="Save and exit" name="submit-exit" />
+            {{ if .IsEditing }}
+              <input class="govuk-button" type="submit" value="Save and return to EPA summary" name="submit-return" />
+              <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/edit-epa?caseId=%d" .Case.ID) }}">Cancel</a>
+            {{ else }}
+              <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+            {{ end }}
         </div>
       </form>
     </div>

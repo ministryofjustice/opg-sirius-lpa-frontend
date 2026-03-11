@@ -30,7 +30,7 @@
             <table class="govuk-table">
               <tbody class="govuk-table__body">
                 <tr class="govuk-table__row">
-                  <th scope="row" class="govuk-table__header">Donor's signature date</th>
+                  <th scope="row" class="govuk-table__header app-table__row--half-width">Donor's signature date</th>
                   <td class="govuk-table__cell">
                     {{ if .Case.EpaDonorSignatureDate }}
                       {{ parseAndFormatDate (printf "%s" .Case.EpaDonorSignatureDate) "2006-01-02" "2 January 2006" }}
@@ -161,7 +161,7 @@
             <table class="govuk-table">
               <tbody class="govuk-table__body">
               <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header">Cheque enclosed</th>
+                <th scope="row" class="govuk-table__header app-table__row--half-width">Cheque enclosed</th>
                 <td class="govuk-table__cell">{{ if .Case.PaymentByCheque }}{{ if .Case.PaymentByCheque }}Yes{{ else }}No{{ end }}{{ end }}</td>
               </tr>
               <tr class="govuk-table__row">
