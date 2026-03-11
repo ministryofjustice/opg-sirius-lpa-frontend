@@ -1,0 +1,8 @@
+{{ define "partial-event-phone" }}
+    {{ if eq .Type "INS" }}
+        Phone number changed to {{ .SourcePhone.PhoneNumber }}
+    {{ else if eq .Type "UPD" }}
+        {{ $phoneNumbers := index .Changes "phoneNumber" }}
+        Phone number changed from {{ index $phoneNumbers 0 }} to {{ index $phoneNumbers 1 }}
+    {{ end }}
+{{ end }}
