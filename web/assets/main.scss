@@ -373,6 +373,9 @@ $govuk-assets-path: "../assets/";
   width: 8em;
 }
 
+.app-table__row--half-width {
+    width: 50%}
+
 .app-search-results--no-results {
   overflow: visible;
 }

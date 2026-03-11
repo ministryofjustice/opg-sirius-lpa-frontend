@@ -19,6 +19,7 @@ type PaymentEpaData struct {
 	Success   bool
 	Error     sirius.ValidationError
 	Title     string
+	IsEditing bool
 }
 
 func PaymentEpa(client PaymentEpaClient, tmpl template.Template) Handler {
@@ -35,13 +36,16 @@ func PaymentEpa(client PaymentEpaClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		isEditing := r.FormValue("isEditing") == "true"
+
 		data := PaymentEpaData{
 			XSRFToken: ctx.XSRFToken,
 			Title:     "Step 4: payment",
 			Case:      caseitem,
+			IsEditing: isEditing,
 		}
 
-		if r.FormValue("isEditing") == "true" {
+		if isEditing {
 			data.Title = "Payment"
 		}
 
@@ -75,7 +79,12 @@ func PaymentEpa(client PaymentEpaClient, tmpl template.Template) Handler {
 			} else if err != nil {
 				return err
 			}
-			return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
+
+			if r.FormValue("submit-exit") == "" {
+				return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
+			}
+
+			data.Success = true
 		}
 
 		return tmpl(w, data)

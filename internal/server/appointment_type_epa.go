@@ -59,7 +59,7 @@ func AppointmentTypeEpa(client AppointmentTypeEpaClient, tmpl template.Template)
 
 		if isEditing {
 			data.Title = "Appointment type"
-			data.ButtonName = "save"
+			data.ButtonName = "Save"
 		}
 
 		if r.Method == http.MethodPost {
@@ -68,8 +68,6 @@ func AppointmentTypeEpa(client AppointmentTypeEpaClient, tmpl template.Template)
 				CaseAttorneyJointlyAndSeverally: r.FormValue("caseAttorney") == "jointly-and-severally",
 				CaseAttorneyJointly:             r.FormValue("caseAttorney") == "jointly",
 			}
-
-			fmt.Println(epa.CaseAttorneySingular, epa.CaseAttorneyJointlyAndSeverally, epa.CaseAttorneyJointly)
 
 			err := client.UpdateEpa(ctx, caseId, epa)
 
@@ -80,8 +78,12 @@ func AppointmentTypeEpa(client AppointmentTypeEpaClient, tmpl template.Template)
 				return err
 			}
 
-			if isEditing {
+			if r.FormValue("submit-continue") == "" {
 				return RedirectError(fmt.Sprintf("/edit-epa?caseId=%d", caseId))
+			}
+
+			if isEditing {
+				return RedirectError(fmt.Sprintf("/case-actors-epa?caseId=%d&isEditing=true", caseId))
 			}
 			return RedirectError(fmt.Sprintf("/case-actors-epa?caseId=%d", caseId))
 		}

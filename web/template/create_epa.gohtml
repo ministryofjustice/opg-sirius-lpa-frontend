@@ -22,8 +22,9 @@
         ) }}
 
         <div class="govuk-button-group govuk-!-padding-top-5">
-          <button class="govuk-button" data-module="govuk-button" type="submit">{{ .ButtonName}}</button>
-            {{ if .Case.ID }}
+          <input class="govuk-button" type="submit" value="Save and continue" name="submit-continue" />
+          {{ if .Case.ID }}
+            <input class="govuk-button" type="submit" value="Save and exit" name="submit-exit"/>
               <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/edit-epa?caseId=%d" .Case.ID) }}">Cancel</a>
             {{else}}
               <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>

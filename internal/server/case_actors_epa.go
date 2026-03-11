@@ -19,6 +19,7 @@ type CaseActorsEpaData struct {
 	Success   bool
 	Error     sirius.ValidationError
 	Title     string
+	IsEditing bool
 }
 
 func CaseActorsEpa(client CaseActorsEpaClient, tmpl template.Template) Handler {
@@ -35,11 +36,14 @@ func CaseActorsEpa(client CaseActorsEpaClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		isEditing := r.FormValue("isEditing") == "true"
+
 		data := CaseActorsEpaData{
 			XSRFToken: ctx.XSRFToken,
 			CaseID:    caseId,
 			Title:     "Create EPA details",
 			Case:      caseitem,
+			IsEditing: isEditing,
 		}
 
 		return tmpl(w, data)
