@@ -44,7 +44,11 @@
 
         <div class="govuk-button-group govuk-!-padding-top-5">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
-          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+          {{ if .IsEditing }}
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/edit-epa?caseId=%d" .CaseID) }}">Cancel</a>
+          {{ else }}
+            <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+          {{ end }}
         </div>
       </form>
     </div>
