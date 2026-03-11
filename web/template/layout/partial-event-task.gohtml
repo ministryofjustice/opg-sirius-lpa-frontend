@@ -17,7 +17,7 @@
     {{ else if eq .Type "UPD" }}
         <p class="govuk-body">
             {{ if $taskType }}
-                    <strong>{{ $taskType }}</strong>
+                <strong>{{ $taskType }}</strong>
             {{ end }}
             {{ if $taskName }}
                 {{ $taskName }}
@@ -27,8 +27,8 @@
                 <strong>{{ $updatedStatus }}</strong>
             {{ end }}
         </p>
-        {{ if .Changes.completedDate }}
-            {{ $completed := index .Changes.completedDate "1" }}
+        {{ if and .Changes.completedDate (gt (len .Changes.completedDate) 1) }}
+            {{ $completed := index .Changes.completedDate 1 }}
             {{ $completedDate := index $completed "date" }}
             {{ if $completedDate }}
                 <p class="govuk-body">
@@ -36,7 +36,7 @@
                 </p>
             {{ end }}
         {{ end }}
-        {{ if .Changes.assignee }}
+        {{ if and .Changes.assignee (gt (len .Changes.assignee) 1) }}
             {{ $fromAssignee := index .Changes.assignee 0 }}
             {{ $toAssignee := index .Changes.assignee 1 }}
             {{ $fromName := index (index $fromAssignee "details") "displayName" }}
@@ -44,6 +44,6 @@
             <p class="govuk-body">
                 Task was assigned to {{ $fromName }} now assigned to {{ $toName }}
             </p>
-        {{ end}}
+        {{ end }}
     {{ end }}
 {{ end }}

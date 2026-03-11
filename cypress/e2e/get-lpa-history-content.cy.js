@@ -298,12 +298,12 @@ describe("Show correct event content", () => {
         name: "Some Task",
       },
       changeSet: {
-        completedDate: {
-          0: null,
-          1: {
+        completedDate: [
+          null,
+          {
             date: "2026-03-16 15:00:00.000000",
           },
-        },
+        ],
         status: ["Not Started", "Completed"],
       },
     });
