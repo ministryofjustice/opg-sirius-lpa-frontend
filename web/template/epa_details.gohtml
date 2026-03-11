@@ -14,23 +14,19 @@
 
       <h1 class="govuk-heading-l app-!-embedded-hide">Create an EPA</h1>
 
-        <div class="govuk-!-margin-bottom-5">
-          {{ if .ShowAllSections }}
-            <button type="submit" name="showAllSections" value="false" class="govuk-button govuk-button--secondary">Hide all sections</button>
-          {{ else }}
-            <button type="submit" name="showAllSections" value="true" class="govuk-button govuk-button--secondary">Show all sections</button>
-          {{ end }}
-        </div>
-
-        <div class="app-heading-with-link govuk-!-margin-bottom-6">
-          <div class="govuk-heading-l govuk-!-margin-0">Step 1: EPA details</div>
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?caseId=%d&id=%d" .Case.ID .Case.Donor.ID) }}">Update</a>
-        </div>
-        <details class="govuk-details section-details" data-section="section-1" {{ if .ShowAllSections }}open{{ end }}>
-          <summary class="govuk-details__summary">
-            <span class="govuk-details__summary-text">Show</span>
-          </summary>
-          <div class="govuk-details__text">
+        <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-epa-details">
+          <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+                <span class="govuk-accordion__section-button" id="accordion-epa-details-heading-1">
+                  Step 1: EPA details
+                </span>
+              </h2>
+            </div>
+            <div id="accordion-epa-details-content-1" class="govuk-accordion__section-content">
+              <div class="govuk-!-margin-bottom-4">
+                <a class="govuk-!-display-block govuk-!-text-align-right govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?caseId=%d&id=%d" .Case.ID .Case.Donor.ID) }}">Update</a>
+              </div>
             <table class="govuk-table">
               <tbody class="govuk-table__body">
                 <tr class="govuk-table__row">
@@ -89,18 +85,21 @@
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
-        </details>
 
-        <div class="app-heading-with-link govuk-!-margin-bottom-6">
-          <div class="govuk-heading-l govuk-!-margin-0">Step 2: appointment type</div>
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/appointment-epa?caseId=%d&isEditing=true" .Case.ID) }}">Update</a>
-        </div>
-        <details class="govuk-details section-details" data-section="section-2" {{ if .ShowAllSections }}open{{ end }}>
-          <summary class="govuk-details__summary">
-            <span class="govuk-details__summary-text">Show</span>
-          </summary>
-          <div class="govuk-details__text">
+          <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+                <span class="govuk-accordion__section-button" id="accordion-epa-details-heading-2">
+                  Step 2: appointment type
+                </span>
+              </h2>
+            </div>
+            <div id="accordion-epa-details-content-2" class="govuk-accordion__section-content">
+              <div class="govuk-!-margin-bottom-4">
+                <a class="govuk-!-display-block govuk-!-text-align-right govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/appointment-epa?caseId=%d&isEditing=true" .Case.ID) }}">Update</a>
+              </div>
             <table class="govuk-table">
               <tbody class="govuk-table__body">
               <tr class="govuk-table__row">
@@ -109,15 +108,18 @@
               </tr>
               </tbody>
             </table>
+            </div>
           </div>
-        </details>
 
-        <div class="govuk-heading-l">Step 3: case actors</div>
-        <details class="govuk-details section-details" data-section="section-3" {{ if .ShowAllSections }}open{{ end }}>
-          <summary class="govuk-details__summary">
-            <span class="govuk-details__summary-text">Show</span>
-          </summary>
-          <div class="govuk-details__text">
+          <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+                <span class="govuk-accordion__section-button" id="accordion-epa-details-heading-3">
+                  Step 3: case actors
+                </span>
+              </h2>
+            </div>
+            <div id="accordion-epa-details-content-3" class="govuk-accordion__section-content">
             {{ if gt (len .Case.Attorneys) 0 }}
               {{ range $attorney := .Case.Attorneys }}
                 <details class="govuk-details" >
@@ -127,7 +129,7 @@
                   <div class="govuk-details__text">
                     <div class="app-heading-with-link">
                       <div></div>
-                      <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/epa-attorney?caseId=%d&attorneyId=%d" $.CaseID .ID)}}">Update</a>
+                      <a class="govuk-!-display-block govuk-!-text-align-right govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/epa-attorney?caseId=%d&attorneyId=%d" $.CaseID .ID)}}">Update</a>
                     </div>
                     {{ template "attorney-details-table" . }}
                   </div>
@@ -141,18 +143,21 @@
               <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/epa-attorney?caseId=%d&isEditing=true" .Case.ID)}}">Add attorney</a>
               <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-epa-correspondent?caseId=%d" .CaseID)}}">Add correspondent</a>
             </div>
+            </div>
           </div>
-        </details>
 
-        <div class="app-heading-with-link govuk-!-margin-bottom-6">
-          <div class="govuk-heading-l govuk-!-margin-0">Step 4: payment</div>
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/payment-epa?caseId=%d&isEditing=true" .Case.ID) }}">Update</a>
-        </div>
-        <details class="govuk-details section-details" data-section="section-4" {{ if .ShowAllSections }}open{{ end }}>
-          <summary class="govuk-details__summary">
-            <span class="govuk-details__summary-text">Show</span>
-          </summary>
-          <div class="govuk-details__text">
+          <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+                <span class="govuk-accordion__section-button" id="accordion-epa-details-heading-4">
+                  Step 4: payment
+                </span>
+              </h2>
+            </div>
+            <div id="accordion-epa-details-content-4" class="govuk-accordion__section-content">
+              <div class="govuk-!-margin-bottom-4">
+                <a class="govuk-!-display-block govuk-!-text-align-right govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/payment-epa?caseId=%d&isEditing=true" .Case.ID) }}">Update</a>
+              </div>
             <table class="govuk-table">
               <tbody class="govuk-table__body">
               <tr class="govuk-table__row">
@@ -175,8 +180,9 @@
               </tr>
               </tbody>
             </table>
+            </div>
           </div>
-        </details>
+        </div>
     </div>
   </div>
 {{ end }}
