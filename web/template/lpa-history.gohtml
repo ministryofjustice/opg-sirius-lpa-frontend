@@ -134,6 +134,8 @@
                                                 {{ template "partial-event-task" . }}
                                             {{ else if eq .SourceType.Key "PhoneNumber"}}
                                                 {{ template "partial-event-phone" . }}
+                                            {{ else if eq .SourceType.Key "ReplacementAttorney" }}
+                                                {{ template "partial-event-replacement-attorney" . }}
                                             {{ else }}
                                                 <dl class="govuk-summary-list">
                                                     <ul class="govuk-list govuk-list--bullet">
