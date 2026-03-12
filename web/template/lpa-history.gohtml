@@ -118,6 +118,8 @@
                                                 {{ else }}
                                                     {{ template "partial-event-payment" . }}
                                                 {{ end }}
+                                            {{ else if eq .SourceType.Key "IncomingDocument" }}
+                                                {{ template "partial-event-incoming-document" (eventWithContext . "donorID" $.DonorID) }}
                                             {{ else if eq .SourceType.Key "OutgoingDocument" }}
                                                 {{ template "partial-event-outgoing-document" (eventWithContext . "donorID" $.DonorID) }}
                                             {{ else if eq .SourceType.Key "Warning" }}
