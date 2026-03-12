@@ -1,0 +1,8 @@
+{{ define "partial-event-incoming-document" }}
+    <a class="govuk-link" href="/lpa#/donor/{{ .Context.DonorID }}/documents?docUuid={{ .SourceDocument.UUID }}" target="_top">{{ .SourceDocument.FriendlyDescription }}</a>
+    {{ if .Entity.type }}
+        <strong class="govuk-tag govuk-!-margin-left-1">
+            {{ .Entity.type }}
+        </strong>
+    {{ end }}
+{{ end }}»
