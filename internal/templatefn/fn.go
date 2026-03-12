@@ -421,6 +421,12 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return "No"
 		},
+		"deref": func(b *bool) bool {
+			if b == nil {
+				return false
+			}
+			return *b
+		},
 	}
 }
 

@@ -8,6 +8,10 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
+func boolPtr(b bool) *bool {
+	return &b
+}
+
 type AppointmentTypeEpaClient interface {
 	UpdateEpa(ctx sirius.Context, caseId int, epa sirius.Case) error
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
@@ -40,11 +44,11 @@ func AppointmentTypeEpa(client AppointmentTypeEpaClient, tmpl template.Template)
 		}
 
 		var caseAttorneyType string
-		if caseitem.CaseAttorneyJointly {
+		if caseitem.CaseAttorneyJointly != nil && *caseitem.CaseAttorneyJointly {
 			caseAttorneyType = "jointly"
-		} else if caseitem.CaseAttorneySingular {
+		} else if caseitem.CaseAttorneySingular != nil && *caseitem.CaseAttorneySingular {
 			caseAttorneyType = "singular"
-		} else if caseitem.CaseAttorneyJointlyAndSeverally {
+		} else if caseitem.CaseAttorneyJointlyAndSeverally != nil && *caseitem.CaseAttorneyJointlyAndSeverally {
 			caseAttorneyType = "jointly-and-severally"
 		}
 
@@ -63,10 +67,12 @@ func AppointmentTypeEpa(client AppointmentTypeEpaClient, tmpl template.Template)
 		}
 
 		if r.Method == http.MethodPost {
+			caseAttorneyValue := r.FormValue("caseAttorney")
+
 			epa := sirius.Case{
-				CaseAttorneySingular:            r.FormValue("caseAttorney") == "singular",
-				CaseAttorneyJointlyAndSeverally: r.FormValue("caseAttorney") == "jointly-and-severally",
-				CaseAttorneyJointly:             r.FormValue("caseAttorney") == "jointly",
+				CaseAttorneySingular:            boolPtr(caseAttorneyValue == "singular"),
+				CaseAttorneyJointlyAndSeverally: boolPtr(caseAttorneyValue == "jointly-and-severally"),
+				CaseAttorneyJointly:             boolPtr(caseAttorneyValue == "jointly"),
 			}
 
 			err := client.UpdateEpa(ctx, caseId, epa)

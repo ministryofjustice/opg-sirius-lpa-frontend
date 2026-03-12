@@ -11,10 +11,10 @@ type Case struct {
 	Assignee                                  *Person           `json:"assignee,omitempty"`
 	Attorneys                                 []Person          `json:"attorneys,omitempty"`
 	CancellationDate                          DateString        `json:"cancellationDate,omitempty"`
-	CaseAttorneyJointly                       bool              `json:"caseAttorneyJointly"`
-	CaseAttorneyJointlyAndJointlyAndSeverally bool              `json:"caseAttorneyJointlyAndJointlyAndSeverally"`
-	CaseAttorneyJointlyAndSeverally           bool              `json:"caseAttorneyJointlyAndSeverally"`
-	CaseAttorneySingular                      bool              `json:"caseAttorneySingular"`
+	CaseAttorneyJointly                       *bool             `json:"caseAttorneyJointly,omitempty"`
+	CaseAttorneyJointlyAndJointlyAndSeverally *bool             `json:"caseAttorneyJointlyAndJointlyAndSeverally,omitempty"`
+	CaseAttorneyJointlyAndSeverally           *bool             `json:"caseAttorneyJointlyAndSeverally,omitempty"`
+	CaseAttorneySingular                      *bool             `json:"caseAttorneySingular,omitempty"`
 	CaseType                                  string            `json:"caseType,omitempty"`
 	Complaints                                []interface{}     `json:"complaints,omitempty"`
 	Correspondent                             *Person           `json:"correspondent,omitempty"`
