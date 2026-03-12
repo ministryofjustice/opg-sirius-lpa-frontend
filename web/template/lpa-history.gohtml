@@ -136,6 +136,10 @@
                                                 {{ template "partial-event-phone" . }}
                                             {{ else if or (eq .SourceType.Key "Attorney") (eq .SourceType.Key "ReplacementAttorney") }}
                                                 {{ template "partial-event-attorney" . }}
+                                            {{ else if eq .SourceType.Key "ReplacementAttorney" }}
+                                                {{ template "partial-event-replacement-attorney" . }}
+                                            {{ else if eq .SourceType.Key "Note"}}
+                                                {{ template "partial-event-note" (eventWithContext . "donorID" $.DonorID) }}
                                             {{ else }}
                                                 <dl class="govuk-summary-list">
                                                     <ul class="govuk-list govuk-list--bullet">
