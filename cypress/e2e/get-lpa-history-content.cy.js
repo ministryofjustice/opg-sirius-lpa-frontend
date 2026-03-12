@@ -415,11 +415,10 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Some User")
-      .should("contain.text", "ACME");
+        .eq(0)
+        .should("contain.text", "Some User")
+        .should("contain.text", "ACME");
   });
-
   it("can view replacement attorney updated event with prior values", () => {
     mockEventHistory({
       sourceType: "ReplacementAttorney",
@@ -441,16 +440,16 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should(
-        "contain.text",
-        "Date of birth: 01/12/2006 changed to: 02/12/2006",
-      )
-      .should("contain.text", "Changed from inactive to: active")
-      .should(
-        "contain.text",
-        "Correspondence by phone: true changed to: false",
-      );
+        .eq(0)
+        .should(
+            "contain.text",
+            "Date of birth: 01/12/2006 changed to: 02/12/2006",
+        )
+        .should("contain.text", "Changed from inactive to: active")
+        .should(
+            "contain.text",
+            "Correspondence by phone: true changed to: false",
+        );
   });
 
   it("can view replacement attorney updated event without prior values", () => {
@@ -471,9 +470,28 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Date of birth: 01/12/2006")
-      .should("contain.text", "Changed to: inactive")
-      .should("contain.text", "Correspondence by email: true");
+        .eq(0)
+        .should("contain.text", "Date of birth: 01/12/2006")
+        .should("contain.text", "Changed to: inactive")
+        .should("contain.text", "Correspondence by email: true");
+  });
+
+  it("can view a manual event", () => {
+    mockEventHistory({
+      sourceType: "Note",
+      type: "Application processing",
+      entity: {
+        name: "Test note",
+        description: "This is a test note",
+        document: {
+            UUID: "123e4567-e89b-12d3-a456-426614174000",
+            friendlyDescription: "Test document",
+        }
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+        .eq(0)
+        .should("contain.text", "Test note - This is a test note");
   });
 });
