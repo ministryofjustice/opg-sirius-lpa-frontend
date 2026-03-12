@@ -118,7 +118,7 @@ describe("Show correct event content", () => {
       entity: {
         _class: String.raw`Opg\Core\Model\Entity\Document\IncomingDocument`,
         friendlyDescription: "Incoming Document",
-        type: "Application related",
+        subType: "Application related",
       },
       sourceDocument: {
         UUID: "123e4567-e89b-12d3-a456-426614174000",
