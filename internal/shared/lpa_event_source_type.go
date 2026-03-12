@@ -174,13 +174,13 @@ func (l LpaEventSourceType) Key() string {
 	case LpaEventSourceTypeLpa:
 		return "Lpa"
 	case LpaEventSourceTypeNote:
-		return "Event"
+		return "Note"
 	case LpaEventSourceTypeNotifiedPerson:
 		return "NotifiedPerson"
 	case LpaEventSourceTypeOrder:
 		return "Order"
 	case LpaEventSourceTypeOutgoingDocument:
-		return "OutboundDocument"
+		return "OutgoingDocument"
 	case LpaEventSourceTypePayment:
 		return "Payment"
 	case LpaEventSourceTypePhoneNumber:
