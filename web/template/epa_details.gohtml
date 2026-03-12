@@ -104,7 +104,7 @@
               <tbody class="govuk-table__body">
               <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Appointment type</th>
-                <td class="govuk-table__cell">{{ if .Case.CaseAttorneySingular }}Only one attorney is appointed{{ else if .Case.CaseAttorneyJointlyAndSeverally }}Jointly and severally{{ else if .Case.CaseAttorneyJointly }}Jointly{{ else }}Not provided{{ end }}</td>
+                <td class="govuk-table__cell">{{ if deref .Case.CaseAttorneySingular }}Only one attorney is appointed{{ else if deref .Case.CaseAttorneyJointlyAndSeverally }}Jointly and severally{{ else if deref .Case.CaseAttorneyJointly }}Jointly{{ else }}Not provided{{ end }}</td>
               </tr>
               </tbody>
             </table>

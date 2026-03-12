@@ -60,14 +60,11 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 
 		if r.Method == http.MethodPost {
 			epa := sirius.Case{
-				EpaDonorSignatureDate:           postFormDateString(r, "epaDonorSignatureDate"),
-				EpaDonorNoticeGivenDate:         postFormDateString(r, "epaDonorNoticeGivenDate"),
-				DonorHasOtherEpas:               postFormString(r, "donorHasOtherEpas") == "true",
-				ReceiptDate:                     postFormDateString(r, "receiptDate"),
-				CaseAttorneySingular:            r.FormValue("caseAttorneySingular") == "true",
-				CaseAttorneyJointlyAndSeverally: r.FormValue("caseAttorneyJointlyAndSeverally") == "true",
-				CaseAttorneyJointly:             r.FormValue("caseAttorneyJointly") == "true",
-				AttorneyRelationshipToDonor:     postFormString(r, "relationshipToDonors"),
+				EpaDonorSignatureDate:       postFormDateString(r, "epaDonorSignatureDate"),
+				EpaDonorNoticeGivenDate:     postFormDateString(r, "epaDonorNoticeGivenDate"),
+				DonorHasOtherEpas:           postFormString(r, "donorHasOtherEpas") == "true",
+				ReceiptDate:                 postFormDateString(r, "receiptDate"),
+				AttorneyRelationshipToDonor: postFormString(r, "relationshipToDonors"),
 			}
 			data.Case = epa
 
