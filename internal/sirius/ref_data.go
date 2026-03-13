@@ -5,19 +5,20 @@ import (
 )
 
 const (
-	PaymentSourceCategory         string = "paymentSource"
-	WarningTypeCategory           string = "warningType"
+	AttorneyRemovedReasonCategory string = "attorneyRemovedReason"
+	CaseStatusChangeReason        string = "caseChangeReason"
+	CompensationType              string = "compensationType"
+	ComplainantCategory           string = "complainantCategory"
+	ComplaintCategory             string = "complaintCategory"
+	ComplaintOrigin               string = "complaintOrigin"
+	CountryCategory               string = "country"
+	DocumentTemplateIdCategory    string = "documentTemplateId"
+	FeeDecisionTypeCategory       string = "feeDecisionType"
 	FeeReductionTypeCategory      string = "feeReductionType"
 	PaymentReferenceType          string = "paymentReferenceType"
-	DocumentTemplateIdCategory    string = "documentTemplateId"
-	ComplainantCategory           string = "complainantCategory"
-	ComplaintOrigin               string = "complaintOrigin"
-	CompensationType              string = "compensationType"
-	ComplaintCategory             string = "complaintCategory"
-	CountryCategory               string = "country"
-	FeeDecisionTypeCategory       string = "feeDecisionType"
-	CaseStatusChangeReason        string = "caseChangeReason"
-	AttorneyRemovedReasonCategory string = "attorneyRemovedReason"
+	PaymentSourceCategory         string = "paymentSource"
+	RelationshipToDonorCategory   string = "relationshipToDonor"
+	WarningTypeCategory           string = "warningType"
 )
 
 type RefDataItem struct {
