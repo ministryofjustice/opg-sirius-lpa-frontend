@@ -2,6 +2,10 @@
     <p class="govuk-body">{{.Entity.type}}</p>
     <p>{{.Entity.name}} - {{.Entity.description}}</p>
         {{ if .Entity.document }}
-            <a class="govuk-link" href="/lpa#/donor/{{ .Context.DonorID }}/documents?docUuid={{ .Entity.document.uuid }}" target="_top">{{ .Entity.document.friendlyDescription }}</a>
+            <a class="govuk-link"
+               href="/lpa#/donor/{{ .Context.DonorID }}/documents?docUuid={{ .Entity.document.uuid }}" target="_top"
+            >
+                {{ .Entity.document.friendlyDescription }}
+            </a>
         {{ end}}
 {{ end }}
