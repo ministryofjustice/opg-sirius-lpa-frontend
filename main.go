@@ -62,6 +62,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		Addr:              ":" + port,
 		Handler:           server.New(logger, client, tmpls, prefix, siriusPublicURL, webDir),
 		ReadHeaderTimeout: 20 * time.Second,
+		WriteTimeout:      60 * time.Second,
 	}
 
 	go func() {
