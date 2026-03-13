@@ -551,4 +551,79 @@ describe("Show correct event content", () => {
       .should("contain.text", "Changed to: inactive")
       .should("contain.text", "Correspondence by email: true");
   });
+
+  it("can view correspondent added event", () => {
+    mockEventHistory({
+      sourceType: "Correspondent",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\Correspondent`,
+        firstname: "Some",
+        surname: "User",
+        companyName: "ACME",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Some User")
+      .should("contain.text", "ACME");
+  });
+
+  it("can view correspondent updated event with prior values", () => {
+    mockEventHistory({
+      sourceType: "Correspondent",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\Correspondent`,
+        firstname: "Some",
+        surname: "User",
+        companyName: "ACME",
+      },
+      changeSet: {
+        dob: [
+          { date: "2006-12-01 00:00:00.000000" },
+          { date: "2006-12-02 00:00:00.000000" },
+        ],
+        systemStatus: [false, true],
+        CorrespondenceByPhone: [true, false],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should(
+        "contain.text",
+        "Date of birth: 01/12/2006 changed to: 02/12/2006",
+      )
+      .should("contain.text", "Changed from inactive to: active")
+      .should(
+        "contain.text",
+        "Correspondence by phone: true changed to: false",
+      );
+  });
+
+  it("can view correspondent updated event without prior values", () => {
+    mockEventHistory({
+      sourceType: "Correspondent",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\Correspondent`,
+        firstname: "Some",
+        surname: "User",
+        companyName: "ACME",
+      },
+      changeSet: {
+        dob: { 1: { date: "2006-12-01 00:00:00.000000" } },
+        systemStatus: { 1: false },
+        CorrespondenceByEmail: { 1: true },
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Date of birth: 01/12/2006")
+      .should("contain.text", "Changed to: inactive")
+      .should("contain.text", "Correspondence by email: true");
+  });
 });
