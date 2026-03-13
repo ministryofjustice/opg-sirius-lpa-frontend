@@ -27,13 +27,14 @@ func SetFlash(w http.ResponseWriter, notification FlashNotification) {
 		Value:    base64.URLEncoding.EncodeToString(str),
 		HttpOnly: true,
 		Path:     "/",
+		Secure:   false,
 	}
 
 	if secureCookies {
 		c.SameSite = http.SameSiteLaxMode
 		c.Secure = true
 	}
-	
+
 	http.SetCookie(w, c)
 }
 
