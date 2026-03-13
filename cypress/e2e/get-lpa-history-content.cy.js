@@ -551,4 +551,24 @@ describe("Show correct event content", () => {
       .should("contain.text", "Changed to: inactive")
       .should("contain.text", "Correspondence by email: true");
   });
+
+  it("can view a manual event", () => {
+    mockEventHistory({
+      sourceType: "Note",
+      type: "Application processing",
+      entity: {
+        type: "Application processing",
+        name: "Test note",
+        description: "This is a test note",
+        document: {
+          UUID: "123e4567-e89b-12d3-a456-426614174000",
+          friendlyDescription: "Test document",
+        },
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Test note - This is a test note");
+  });
 });
