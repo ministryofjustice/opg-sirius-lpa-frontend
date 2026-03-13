@@ -27,8 +27,13 @@ func SetFlash(w http.ResponseWriter, notification FlashNotification) {
 		Value:    base64.URLEncoding.EncodeToString(str),
 		HttpOnly: true,
 		Path:     "/",
-		Secure:   secureCookies,
 	}
+
+	if secureCookies {
+		c.SameSite = http.SameSiteLaxMode
+		c.Secure = true
+	}
+	
 	http.SetCookie(w, c)
 }
 
@@ -56,7 +61,12 @@ func GetFlash(w http.ResponseWriter, r *http.Request) (FlashNotification, error)
 		return FlashNotification{}, err
 	}
 
-	dc := &http.Cookie{Name: flashCookieName, MaxAge: -1, Expires: time.Unix(1, 0), Path: "/", Secure: true}
+	dc := &http.Cookie{Name: flashCookieName, MaxAge: -1, Expires: time.Unix(1, 0), Path: "/"}
+
+	if secureCookies {
+		c.SameSite = http.SameSiteLaxMode
+		c.Secure = true
+	}
 
 	http.SetCookie(w, dc)
 	return v, nil
