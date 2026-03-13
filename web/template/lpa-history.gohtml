@@ -134,8 +134,8 @@
                                                 {{ template "partial-event-task" . }}
                                             {{ else if eq .SourceType.Key "PhoneNumber"}}
                                                 {{ template "partial-event-phone" . }}
-                                            {{ else if or (eq .SourceType.Key "Attorney") (eq .SourceType.Key "ReplacementAttorney") }}
-                                                {{ template "partial-event-attorney" . }}
+                                            {{ else if or (eq .SourceType.Key "Attorney") (eq .SourceType.Key "ReplacementAttorney") (eq .SourceType.Key "Correspondent") }}
+                                                {{ template "partial-event-person" . }}
                                             {{ else if eq .SourceType.Key "Note"}}
                                                 {{ template "partial-event-note" (eventWithContext . "donorID" $.DonorID) }}
                                             {{ else }}

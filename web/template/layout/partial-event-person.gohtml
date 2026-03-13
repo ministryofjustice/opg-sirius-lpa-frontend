@@ -1,4 +1,4 @@
-{{ define "partial-event-attorney" }}
+{{ define "partial-event-person" }}
     {{ if eq .Type "INS" }}
         {{ if or .Entity.firstname .Entity.surname }}
             <p><strong>{{ .Entity.firstname}} {{ .Entity.surname }}</strong></p>
