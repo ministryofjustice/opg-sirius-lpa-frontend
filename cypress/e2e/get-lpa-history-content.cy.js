@@ -111,6 +111,33 @@ describe("Show correct event content", () => {
       );
   });
 
+  it("can view incoming document event", () => {
+    mockEventHistory({
+      sourceType: "IncomingDocument",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\Document\IncomingDocument`,
+        friendlyDescription: "Incoming Document",
+        subType: "Application related",
+      },
+      sourceDocument: {
+        UUID: "123e4567-e89b-12d3-a456-426614174000",
+        friendlyDescription: "Incoming document",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Incoming Document")
+      .should("contain.text", "Application related")
+      .find("a")
+      .should(
+        "have.attr",
+        "href",
+        "/lpa#/donor/1/documents?docUuid=123e4567-e89b-12d3-a456-426614174000",
+      );
+  });
+
   it("can view outbound document event", () => {
     mockEventHistory({
       sourceType: "OutgoingDocument",
