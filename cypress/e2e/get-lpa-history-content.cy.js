@@ -49,8 +49,8 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Deleted - £23.45 paid by cheque on 02/01/2006");
+        .eq(0)
+        .should("contain.text", "Deleted - £23.45 paid by cheque on 02/01/2006");
   });
 
   it("can view payment added event", () => {
@@ -66,8 +66,8 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "£82.00 paid by cheque on 02/01/2006");
+        .eq(0)
+        .should("contain.text", "£82.00 paid by cheque on 02/01/2006");
   });
 
   it("can view payment updated event", () => {
@@ -99,16 +99,16 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Amount: £82.00 changed to: £92.00")
-      .should(
-        "contain.text",
-        "Payment method: paid by cheque changed to: paid over the phone",
-      )
-      .should(
-        "contain.text",
-        "Payment date: 02/01/2006 changed to: 02/01/2007",
-      );
+        .eq(0)
+        .should("contain.text", "Amount: £82.00 changed to: £92.00")
+        .should(
+            "contain.text",
+            "Payment method: paid by cheque changed to: paid over the phone",
+        )
+        .should(
+            "contain.text",
+            "Payment date: 02/01/2006 changed to: 02/01/2007",
+        );
   });
 
   it("can view outbound document event", () => {
@@ -126,14 +126,14 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Joe Bloggs - Letter sent to donor")
-      .find("a")
-      .should(
-        "have.attr",
-        "href",
-        "/lpa#/donor/1/documents?docUuid=123e4567-e89b-12d3-a456-426614174000",
-      );
+        .eq(0)
+        .should("contain.text", "Joe Bloggs - Letter sent to donor")
+        .find("a")
+        .should(
+            "have.attr",
+            "href",
+            "/lpa#/donor/1/documents?docUuid=123e4567-e89b-12d3-a456-426614174000",
+        );
   });
 
   it("can view warning created event", () => {
@@ -148,9 +148,9 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Complaint Received")
-      .should("contain.text", "Test");
+        .eq(0)
+        .should("contain.text", "Complaint Received")
+        .should("contain.text", "Test");
   });
 
   it("can view warning deleted event", () => {
@@ -168,10 +168,10 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Complaint Received")
-      .should("contain.text", "Test")
-      .should("contains.text", "Warning removed by Team Less");
+        .eq(0)
+        .should("contain.text", "Complaint Received")
+        .should("contain.text", "Test")
+        .should("contains.text", "Warning removed by Team Less");
   });
 
   it("can view case statement updated event", () => {
@@ -187,8 +187,8 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Status changed from Pending to Withdrawn");
+        .eq(0)
+        .should("contain.text", "Status changed from Pending to Withdrawn");
   });
 
   it("can view complaint added event", () => {
@@ -204,9 +204,9 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Medium - Test Complaint")
-      .should("contain.text", "123");
+        .eq(0)
+        .should("contain.text", "Medium - Test Complaint")
+        .should("contain.text", "123");
   });
 
   it("can view complaint updated event", () => {
@@ -235,17 +235,17 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should(
-        "contain.text",
-        "Received date: 01/12/2006 changed to: 02/12/2006",
-      )
-      .should("contain.text", "Resolution date: 04/12/2006")
-      .should(
-        "contain.text",
-        "Category: Correspondence changed to: OPG Decisions",
-      )
-      .should("contain.text", "Origin: Contact centre");
+        .eq(0)
+        .should(
+            "contain.text",
+            "Received date: 01/12/2006 changed to: 02/12/2006",
+        )
+        .should("contain.text", "Resolution date: 04/12/2006")
+        .should(
+            "contain.text",
+            "Category: Correspondence changed to: OPG Decisions",
+        )
+        .should("contain.text", "Origin: Contact centre");
   });
 
   it("can view task created event", () => {
@@ -263,13 +263,13 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .within(() => {
-        cy.get("p.govuk-body strong").should("have.text", "Test Type");
-        cy.root()
-          .should("contain.text", "Test Type now assigned to Some User")
-          .should("contain.text", "Some Task — some description");
-      });
+        .eq(0)
+        .within(() => {
+          cy.get("p.govuk-body strong").should("have.text", "Test Type");
+          cy.root()
+              .should("contain.text", "Test Type now assigned to Some User")
+              .should("contain.text", "Some Task — some description");
+        });
   });
 
   it("can view task created event, no type", () => {
@@ -286,8 +286,8 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Some Task — some description");
+        .eq(0)
+        .should("contain.text", "Some Task — some description");
   });
 
   it("can view task completed event", () => {
@@ -309,13 +309,13 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .within(() => {
-        cy.get("p.govuk-body strong").should("have.text", "Completed");
-        cy.root()
-          .should("contain.text", "Some Task")
-          .should("contain.text", "Date completed: 16/03/2026");
-      });
+        .eq(0)
+        .within(() => {
+          cy.get("p.govuk-body strong").should("have.text", "Completed");
+          cy.root()
+              .should("contain.text", "Some Task")
+              .should("contain.text", "Date completed: 16/03/2026");
+        });
   });
 
   it("can view task reassigned event", () => {
@@ -342,12 +342,12 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Some Task")
-      .should(
-        "contain.text",
-        "Task was assigned to Some User now assigned to Another User",
-      );
+        .eq(0)
+        .should("contain.text", "Some Task")
+        .should(
+            "contain.text",
+            "Task was assigned to Some User now assigned to Another User",
+        );
   });
 
   it("can view fee reduction approved event", () => {
@@ -363,8 +363,8 @@ describe("Show correct event content", () => {
     // RefData is mocked in ../mocks/common.json
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Remission approved on 02/01/2026");
+        .eq(0)
+        .should("contain.text", "Remission approved on 02/01/2026");
   });
 
   it("can view fee reduction updated event", () => {
@@ -381,8 +381,8 @@ describe("Show correct event content", () => {
     // RefData is mocked in ../mocks/common.json
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Reduction type: Remission changed to Exemption");
+        .eq(0)
+        .should("contain.text", "Reduction type: Remission changed to Exemption");
   });
 
   it("can view fee reduction deleted event", () => {
@@ -398,8 +398,8 @@ describe("Show correct event content", () => {
     // RefData is mocked in ../mocks/common.json
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Deleted - Remission approved on 02/01/2026");
+        .eq(0)
+        .should("contain.text", "Deleted - Remission approved on 02/01/2026");
   });
 
   it("can view attorney added event", () => {
@@ -415,9 +415,9 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Some User")
-      .should("contain.text", "ACME");
+        .eq(0)
+        .should("contain.text", "Some User")
+        .should("contain.text", "ACME");
   });
 
   it("can view attorney updated event with prior values", () => {
@@ -441,16 +441,16 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should(
-        "contain.text",
-        "Date of birth: 01/12/2006 changed to: 02/12/2006",
-      )
-      .should("contain.text", "Changed from inactive to: active")
-      .should(
-        "contain.text",
-        "Correspondence by phone: true changed to: false",
-      );
+        .eq(0)
+        .should(
+            "contain.text",
+            "Date of birth: 01/12/2006 changed to: 02/12/2006",
+        )
+        .should("contain.text", "Changed from inactive to: active")
+        .should(
+            "contain.text",
+            "Correspondence by phone: true changed to: false",
+        );
   });
 
   it("can view attorney updated event without prior values", () => {
@@ -471,10 +471,10 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Date of birth: 01/12/2006")
-      .should("contain.text", "Changed to: inactive")
-      .should("contain.text", "Correspondence by email: true");
+        .eq(0)
+        .should("contain.text", "Date of birth: 01/12/2006")
+        .should("contain.text", "Changed to: inactive")
+        .should("contain.text", "Correspondence by email: true");
   });
 
   it("can view replacement attorney added event", () => {
@@ -490,9 +490,9 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should("contain.text", "Some User")
-      .should("contain.text", "ACME");
+        .eq(0)
+        .should("contain.text", "Some User")
+        .should("contain.text", "ACME");
   });
 
   it("can view replacement attorney updated event with prior values", () => {
@@ -516,58 +516,59 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-      .eq(0)
-      .should(
-        "contain.text",
-        "Date of birth: 01/12/2006 changed to: 02/12/2006",
-      )
-      .should("contain.text", "Changed from inactive to: active")
-      .should(
-        "contain.text",
-        "Correspondence by phone: true changed to: false",
-      );
+        .eq(0)
+        .should(
+            "contain.text",
+            "Date of birth: 01/12/2006 changed to: 02/12/2006",
+        )
+        .should("contain.text", "Changed from inactive to: active")
+        .should(
+            "contain.text",
+            "Correspondence by phone: true changed to: false",
+        );
   });
 
-    it("can view replacement attorney updated event without prior values", () => {
-        mockEventHistory({
-            sourceType: "ReplacementAttorney",
-            type: "UPD",
-            entity: {
-                _class: String.raw`Opg\Core\Model\Entity\CaseActor\ReplacementAttorney`,
-                firstname: "Some",
-                surname: "User",
-                companyName: "ACME",
-            },
-            changeSet: {
-                dob: {1: {date: "2006-12-01 00:00:00.000000"}},
-                systemStatus: {1: false},
-                CorrespondenceByEmail: {1: true},
-            },
-        });
-        cy.visit("/donor/1/history");
-        cy.get(".moj-timeline__item")
-            .eq(0)
-            .should("contain.text", "Date of birth: 01/12/2006")
-            .should("contain.text", "Changed to: inactive")
-            .should("contain.text", "Correspondence by email: true");
+  it("can view replacement attorney updated event without prior values", () => {
+    mockEventHistory({
+      sourceType: "ReplacementAttorney",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\ReplacementAttorney`,
+        firstname: "Some",
+        surname: "User",
+        companyName: "ACME",
+      },
+      changeSet: {
+        dob: { 1: { date: "2006-12-01 00:00:00.000000" } },
+        systemStatus: { 1: false },
+        CorrespondenceByEmail: { 1: true },
+      },
     });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+        .eq(0)
+        .should("contain.text", "Date of birth: 01/12/2006")
+        .should("contain.text", "Changed to: inactive")
+        .should("contain.text", "Correspondence by email: true");
+  });
 
-    it("can view a manual event", () => {
-        mockEventHistory({
-            sourceType: "Note",
-            type: "Application processing",
-            entity: {
-                name: "Test note",
-                description: "This is a test note",
-                document: {
-                    UUID: "123e4567-e89b-12d3-a456-426614174000",
-                    friendlyDescription: "Test document",
-                }
-            },
-        });
-        cy.visit("/donor/1/history");
-        cy.get(".moj-timeline__item")
-            .eq(0)
-            .should("contain.text", "Test note - This is a test note");
+  it("can view a manual event", () => {
+    mockEventHistory({
+      sourceType: "Note",
+      type: "Application processing",
+      entity: {
+        type: "Application processing",
+        name: "Test note",
+        description: "This is a test note",
+        document: {
+          UUID: "123e4567-e89b-12d3-a456-426614174000",
+          friendlyDescription: "Test document",
+        },
+      },
     });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+        .eq(0)
+        .should("contain.text", "Test note - This is a test note");
+  });
 });
