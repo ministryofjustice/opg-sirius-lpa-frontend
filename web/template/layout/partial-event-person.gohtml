@@ -1,0 +1,42 @@
+{{ define "partial-event-person" }}
+    {{ if eq .Type "INS" }}
+        {{ if or .Entity.firstname .Entity.surname }}
+            <p><strong>{{ .Entity.firstname}} {{ .Entity.surname }}</strong></p>
+        {{ end }}
+        {{ with .Entity.companyName }}<p>{{ . }}</p>{{ end }}
+    {{ else }}
+        {{ if or .Entity.firstname .Entity.surname }}
+            <p><strong>{{ with .Entity.salutation }}{{ . }} {{ end }}{{ .Entity.firstname}} {{ .Entity.surname }}</strong></p>
+        {{ else }}
+            {{ with .Entity.companyName }}<p><strong>{{ . }}</strong></p>{{ end }}
+        {{ end }}
+        {{ if ne (len .Changes) 0 }}
+            <ul class="govuk-list">
+                {{ range $k, $v := .Changes }}
+                    {{ if ne (len $v) 1 }}
+                        {{ $oldValue := index $v 0  }}
+                        {{ $newValue := index $v 1 }}
+
+                        {{ if eq $k "dob" }}
+                            <li>Date of birth: {{ parseAndFormatDate $oldValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }} changed to: {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006"  }}</li>
+                        {{ else if eq $k "systemStatus" }}
+                            <li>Changed from {{ if $oldValue }}active{{ else }}inactive{{ end }} to: {{ if $newValue }}active{{ else }}inactive{{ end }}</li>
+                        {{ else }}
+                            <li>{{ camelcaseToSentence $k }}: {{ $oldValue }} changed to: {{ $newValue }}</li>
+                        {{ end }}
+                    {{ else }}
+                        {{ $newValue := index $v "1" }}
+
+                        {{ if eq $k "dob" }}
+                            <li>Date of birth: {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006"  }}</li>
+                        {{ else if eq $k "systemStatus" }}
+                            <li>Changed to: {{ if $newValue }}active{{ else }}inactive{{ end }}</li>
+                        {{ else }}
+                            <li>{{ camelcaseToSentence $k }}: {{ $newValue }}</li>
+                        {{ end }}
+                    {{ end }}
+                {{ end }}
+            </ul>
+        {{ end }}
+    {{ end }}
+{{ end }}

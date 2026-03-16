@@ -337,6 +337,33 @@ func TestRefDataByCategory(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "Relationship to donor category",
+			category: RelationshipToDonorCategory,
+			setup: func() {
+				pact.
+					AddInteraction().
+					UponReceiving("A request for relationship to donor category ref data").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodGet,
+						Path:   matchers.String(fmt.Sprintf("/lpa-api/v1/reference-data/%s", RelationshipToDonorCategory)),
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status: http.StatusOK,
+						Body: matchers.EachLike(map[string]interface{}{
+							"handle": matchers.String("solicitor"),
+							"label":  matchers.String("Solicitor"),
+						}, 1),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+					})
+			},
+			expectedResponse: []RefDataItem{
+				{
+					Handle: "solicitor",
+					Label:  "Solicitor",
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
