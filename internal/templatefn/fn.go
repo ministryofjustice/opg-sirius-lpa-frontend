@@ -129,6 +129,18 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return false
 		},
+		"isLinked": func(value interface{}) bool {
+			m, ok := value.(map[string]interface{})
+			if !ok {
+				return false
+			}
+			for k := range m {
+				if k == "1" {
+					return true
+				}
+			}
+			return false
+		},
 		"plusN": func(i int, n int) int {
 			return i + n
 		},

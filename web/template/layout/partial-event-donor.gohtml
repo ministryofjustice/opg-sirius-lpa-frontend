@@ -1,10 +1,41 @@
 {{ define "partial-event-donor" }}
+    {{ $hasChildKey := false }}
+    {{ $hasParentKey := false }}
+    {{ if eq (len .Changes) 1 }}
+        {{ range $key, $v := .Changes }}
+            {{ if eq $key "child" }}
+                {{ $hasChildKey = true }}
+            {{ end }}
+            {{ if eq $key "parent" }}
+                {{ $hasParentKey = true }}
+            {{ end }}
+        {{ end }}
+    {{ end}}
 
     {{ if eq .Type "INS" }}
         {{ if or .Entity.firstname .Entity.surname }}
             <p><strong>{{ .Entity.firstname}} {{ .Entity.surname }}</strong></p>
         {{ end }}
     {{ else if eq .Type "UPD" }}
+            {{ if $hasParentKey }}
+                {{/* This is the child record */}}
+                {{ range $key, $v := .Changes }}
+                    {{ if isLinked $v }}
+                        <p>TODO: Linking parent to child event - To be implemented</p>
+                    {{ else }}
+                        <p>TODO: Unlinking parent to child event - To be implemented</p>
+                    {{ end }}
+                {{ end }}
+            {{ else if $hasChildKey }}
+                {{/* This is the parent record */}}
+                {{ range $key, $v := .Changes }}
+                    {{ if eq (len (index $v 0)) 0 }}
+                        <p>TODO: Linking parent to child event - To be implemented</p>
+                    {{ else if eq (len (index $v 1)) 0 }}
+                        <p>TODO: Unlinking parent to child event - To be implemented</p>
+                    {{ end }}
+                {{ end }}
+            {{ else }}
                 <ul class="govuk-list">
                     {{ range $fieldName := .Context.DonorFieldOrder }}
                         {{ $changeValues := index $.Changes $fieldName }}
@@ -37,5 +68,6 @@
                         {{ end }}
                     {{ end }}
                 </ul>
+            {{ end }}
     {{ end }}
 {{ end }}
