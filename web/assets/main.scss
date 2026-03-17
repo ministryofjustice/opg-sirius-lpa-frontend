@@ -378,7 +378,7 @@ $govuk-assets-path: "../assets/";
 }
 
 .app-document-compare__separator {
-  @media ((min-width: 40.0625em)) {
+  @media (min-width: 40.0625em) {
     border-right: 1px solid $govuk-border-colour;
     min-height: calc(100vh - 40px);
   }
