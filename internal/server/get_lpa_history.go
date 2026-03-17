@@ -28,11 +28,27 @@ type getLpaHistory struct {
 	ComplainantCategories  []sirius.RefDataItem
 	ComplaintOrigins       []sirius.RefDataItem
 	CompensationTypes      []sirius.RefDataItem
+	DonorFieldOrder        []string
 }
 
 type FilterLpaEventsForm struct {
 	Types []string `form:"type"`
 	Sort  string   `form:"sort"`
+}
+
+var donorFieldOrder = []string{
+	"salutation",
+	"firstname",
+	"middlenames",
+	"surname",
+	"otherNames",
+	"previousNames",
+	"dob",
+	"email",
+	"correspondenceByPost",
+	"correspondenceByPhone",
+	"correspondenceByEmail",
+	"correspondenceByWelsh",
 }
 
 func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
@@ -49,7 +65,8 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 			Form: FilterLpaEventsForm{
 				Sort: "desc",
 			},
-			IsFiltered: false,
+			IsFiltered:      false,
+			DonorFieldOrder: donorFieldOrder,
 		}
 
 		group.Go(func() error {

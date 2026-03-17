@@ -363,6 +363,10 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 					if v, ok := values[i+1].(string); ok {
 						context.DonorID = v
 					}
+				case "donorFieldOrder":
+					if v, ok := values[i+1].([]string); ok {
+						context.DonorFieldOrder = v
+					}
 				}
 			}
 			return LpaEventWithContext{
@@ -386,6 +390,7 @@ type EventContext struct {
 	ComplaintOrigins       []sirius.RefDataItem
 	CompensationTypes      []sirius.RefDataItem
 	DonorID                string
+	DonorFieldOrder        []string
 }
 
 type CaseTabData struct {
