@@ -118,7 +118,7 @@
                                                 {{ else }}
                                                     {{ template "partial-event-payment" . }}
                                                 {{ end }}
-                                            {{ else if eq .SourceType.Key "OutboundDocument" }}
+                                            {{ else if eq .SourceType.Key "OutgoingDocument" }}
                                                 {{ template "partial-event-outgoing-document" (eventWithContext . "donorID" $.DonorID) }}
                                             {{ else if eq .SourceType.Key "Warning" }}
                                                 {{ template "partial-event-warning" . }}
@@ -132,6 +132,12 @@
                                                 {{ template "partial-event-complaint" (eventWithContext . "complaintCategories" $.ComplaintCategories "complaintSubcategories" $.ComplaintSubcategories "complainantCategories" $.ComplainantCategories "complaintOrigins" $.ComplaintOrigins "compensationTypes" $.CompensationTypes) }}
                                             {{ else if eq .SourceType.Key "Task" }}
                                                 {{ template "partial-event-task" . }}
+                                            {{ else if eq .SourceType.Key "PhoneNumber"}}
+                                                {{ template "partial-event-phone" . }}
+                                            {{ else if or (eq .SourceType.Key "Attorney") (eq .SourceType.Key "ReplacementAttorney") (eq .SourceType.Key "Correspondent") }}
+                                                {{ template "partial-event-person" . }}
+                                            {{ else if eq .SourceType.Key "Note"}}
+                                                {{ template "partial-event-note" (eventWithContext . "donorID" $.DonorID) }}
                                             {{ else }}
                                                 <dl class="govuk-summary-list">
                                                     <ul class="govuk-list govuk-list--bullet">
