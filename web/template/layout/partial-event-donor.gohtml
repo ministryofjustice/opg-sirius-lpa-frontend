@@ -20,7 +20,7 @@
         {{ if $hasParentKey }}
             {{/* This is the child record */}}
             {{ range $key, $v := .Changes }}
-                {{ if isLinked $v }}
+                {{ if isChildLinked $v }}
                     <p>TODO: Linking parent to child event - To be implemented</p>
                 {{ else }}
                     <p>TODO: Unlinking parent to child event - To be implemented</p>

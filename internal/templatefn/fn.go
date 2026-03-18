@@ -129,7 +129,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return false
 		},
-		"isLinked": func(value interface{}) bool {
+		"isChildLinked": func(value interface{}) bool {
 			m, ok := value.(map[string]interface{})
 			if !ok {
 				return false
