@@ -344,7 +344,7 @@ $govuk-assets-path: "../assets/";
 
 .document-viewer-container {
   width: 100%;
-  min-height: 90vh;
+  min-height: calc(100vh - 136px);
 }
 
 .lpa-history__meta {
@@ -375,4 +375,11 @@ $govuk-assets-path: "../assets/";
 
 .app-search-results--no-results {
   overflow: visible;
+}
+
+.app-document-compare__separator {
+  @media (min-width: 40.0625em) {
+    border-right: 1px solid $govuk-border-colour;
+    min-height: calc(100vh - 40px);
+  }
 }
