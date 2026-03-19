@@ -129,6 +129,18 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return false
 		},
+		"isChildLinked": func(value interface{}) bool {
+			m, ok := value.(map[string]interface{})
+			if !ok {
+				return false
+			}
+			for k := range m {
+				if k == "1" {
+					return true
+				}
+			}
+			return false
+		},
 		"plusN": func(i int, n int) int {
 			return i + n
 		},
@@ -363,6 +375,10 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 					if v, ok := values[i+1].(string); ok {
 						context.DonorID = v
 					}
+				case "donorFieldOrder":
+					if v, ok := values[i+1].([]string); ok {
+						context.DonorFieldOrder = v
+					}
 				}
 			}
 			return LpaEventWithContext{
@@ -386,6 +402,7 @@ type EventContext struct {
 	ComplaintOrigins       []sirius.RefDataItem
 	CompensationTypes      []sirius.RefDataItem
 	DonorID                string
+	DonorFieldOrder        []string
 }
 
 type CaseTabData struct {

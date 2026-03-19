@@ -596,6 +596,120 @@ describe("View LPA history timeline", () => {
       });
   });
 
+  it("can view donor event content", () => {
+    cy.addMock("/lpa-api/v1/persons/2/events?&sort=id:desc&limit=999", "GET", {
+      status: 200,
+      body: {
+        limit: 999,
+        metadata: {
+          caseIds: [
+            {
+              total: 2,
+            },
+          ],
+          sourceTypes: [
+            {
+              sourceType: "Donor",
+              total: 2,
+            },
+          ],
+        },
+        pages: {
+          current: 1,
+          total: 1,
+        },
+        total: 2,
+        events: [
+          {
+            id: 176,
+            user: {
+              id: 5,
+              phoneNumber: "030030000300",
+              teams: [],
+              displayName: "OPG User",
+              deleted: false,
+              email: "opg@test.gov.uk",
+            },
+            sourceType: "Donor",
+            sourcePerson: {
+              id: 17,
+              uId: "7000-0000-0009",
+              firstname: "Test",
+              surname: "Case",
+            },
+            type: "UPD",
+            changeSet: {
+              firstname: ["Testing", "Test"],
+              surname: ["Casing", "Case"],
+              email: ["test@test.com", "test@testcase.com"],
+              salutation: ["Mr", "Mrs"],
+              correspondenceByEmail: [false, true],
+              dob: {
+                1: {
+                  date: "1999-05-09 00:00:00.000000",
+                  timezone_type: 3,
+                  timezone: "UTC",
+                },
+              },
+            },
+            createdOn: "2026-01-31T14:39:20+00:00",
+            hash: "AAA",
+          },
+          {
+            id: 175,
+            user: {
+              id: 5,
+              phoneNumber: "030030000300",
+              teams: [],
+              displayName: "OPG User",
+              deleted: false,
+              email: "opg@test.gov.uk",
+            },
+            sourceType: "Donor",
+            sourcePerson: {
+              id: 17,
+              uId: "7000-0000-0009",
+              firstname: "Test",
+              surname: "Case",
+            },
+            type: "INS",
+            changeSet: [],
+            entity: {
+              _class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+              email: "test@test.com",
+              firstname: "Testing",
+              id: 17,
+              salutation: "Mr",
+              surname: "Casing",
+              uId: 700000000009,
+            },
+            createdOn: "2026-01-22T10:30:01+00:00",
+            hash: "AZ",
+          },
+        ],
+      },
+    });
+
+    cy.visit("/donor/2/history");
+
+    cy.get(".moj-timeline__item")
+      .first()
+      .within(() => {
+        cy.contains("Salutation: Mr changed to: Mrs");
+        cy.contains("Firstname: Testing changed to: Test");
+        cy.contains("Surname: Casing changed to: Case");
+        cy.contains("Date of birth: 09/05/1999");
+        cy.contains("Email: test@test.com changed to: test@testcase.com");
+        cy.contains("Correspondence by email: false changed to: true");
+      });
+
+    cy.get(".moj-timeline__item")
+      .last()
+      .within(() => {
+        cy.contains("Testing Casing");
+      });
+  });
+
   it("can filter", () => {
     cy.visit("/donor/1/history?id[]=105&id[]=106&id[]=107");
 

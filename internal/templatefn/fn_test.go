@@ -46,6 +46,28 @@ func TestParseAndFormatDate(t *testing.T) {
 	assert.Equal(t, "11 April 2024", val)
 }
 
+func TestIsChildLinked(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["isChildLinked"].(func(interface{}) bool)
+
+	var val bool
+
+	val = fn(nil)
+	assert.Equal(t, false, val)
+
+	val = fn("string")
+	assert.Equal(t, false, val)
+
+	val = fn(map[string]interface{}{})
+	assert.Equal(t, false, val)
+
+	val = fn(map[string]interface{}{"": "value"})
+	assert.Equal(t, false, val)
+
+	val = fn(map[string]interface{}{"1": "value"})
+	assert.Equal(t, true, val)
+}
+
 func TestPlusN(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["plusN"].(func(int, int) int)
@@ -728,6 +750,7 @@ func TestEventWithContext(t *testing.T) {
 	complainantCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	complaintOrigins := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	compensationTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	donorFieldOrder := []string{"test1", "test2", "test3"}
 
 	expected := LpaEventWithContext{
 		LpaEvent: event,
@@ -739,6 +762,7 @@ func TestEventWithContext(t *testing.T) {
 			ComplainantCategories:  complainantCategories,
 			ComplaintOrigins:       complaintOrigins,
 			CompensationTypes:      compensationTypes,
+			DonorFieldOrder:        donorFieldOrder,
 		},
 	}
 	result := fn(
@@ -750,6 +774,7 @@ func TestEventWithContext(t *testing.T) {
 		"complainantCategories", complainantCategories,
 		"complaintOrigins", complaintOrigins,
 		"compensationTypes", compensationTypes,
+		"donorFieldOrder", donorFieldOrder,
 	)
 	assert.Equal(t, expected, result)
 }

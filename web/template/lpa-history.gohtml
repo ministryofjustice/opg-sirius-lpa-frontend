@@ -140,6 +140,8 @@
                                                 {{ template "partial-event-person" . }}
                                             {{ else if eq .SourceType.Key "Note"}}
                                                 {{ template "partial-event-note" (eventWithContext . "donorID" $.DonorID) }}
+                                            {{ else if eq .SourceType.Key "Donor" }}
+                                                {{ template "partial-event-donor" (eventWithContext . "donorFieldOrder" $.DonorFieldOrder) }}
                                             {{ else }}
                                                 <dl class="govuk-summary-list">
                                                     <ul class="govuk-list govuk-list--bullet">

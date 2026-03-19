@@ -1,21 +1,73 @@
 {{ define "partial-event-donor" }}
-    <p>TODO: implement - render donor event content</p>
-    <dl class="govuk-summary-list">
-        <ul class="govuk-list govuk-list--bullet">
-            {{ range $k, $v := .Entity }}
-                {{ if and (ne $k "id") $v }}
-                    <li>
-                        {{ camelcaseToSentence $k }}:
-                        {{ if eq $k "assignee" }}
-                            {{ $v.displayName }}
-                        {{ else if eq $k "uId" }}
-                            {{ printf "%.f" $v }}
-                        {{ else }}
-                            {{ $v }}
-                        {{ end }}
-                    </li>
+    {{ $hasChildKey := false }}
+    {{ $hasParentKey := false }}
+    {{ if eq (len .Changes) 1 }}
+        {{ range $key, $v := .Changes }}
+            {{ if eq $key "child" }}
+                {{ $hasChildKey = true }}
+            {{ end }}
+            {{ if eq $key "parent" }}
+                {{ $hasParentKey = true }}
+            {{ end }}
+        {{ end }}
+    {{ end}}
+
+    {{ if eq .Type "INS" }}
+        {{ if or .Entity.firstname .Entity.surname }}
+            <p><strong>{{ .Entity.firstname}} {{ .Entity.surname }}</strong></p>
+        {{ end }}
+    {{ else if eq .Type "UPD" }}
+        {{ if $hasParentKey }}
+            {{/* This is the child record */}}
+            {{ range $key, $v := .Changes }}
+                {{ if isChildLinked $v }}
+                    <p>TODO: Linking parent to child event - To be implemented</p>
+                {{ else }}
+                    <p>TODO: Unlinking parent to child event - To be implemented</p>
                 {{ end }}
             {{ end }}
-        </ul>
-    </dl>
+        {{ else if $hasChildKey }}
+            {{/* This is the parent record */}}
+            {{ range $key, $v := .Changes }}
+                {{ if eq (len (index $v 0)) 0 }}
+                    <p>TODO: Linking parent to child event - To be implemented</p>
+                {{ else if eq (len (index $v 1)) 0 }}
+                    <p>TODO: Unlinking parent to child event - To be implemented</p>
+                {{ end }}
+            {{ end }}
+        {{ else }}
+            <ul class="govuk-list">
+                {{ range $fieldName := .Context.DonorFieldOrder }}
+                    {{ $changeValues := index $.Changes $fieldName }}
+                    {{ if ne $changeValues nil }}
+                        {{ if ne (len $changeValues) 1 }}
+                            {{ $oldValue := index $changeValues 0 }}
+                            {{ $newValue := index $changeValues 1 }}
+                            {{ if eq $fieldName "dob" }}
+                                <li>
+                                    Date of birth:
+                                    {{ parseAndFormatDate $oldValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }}
+                                    changed to:
+                                    {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }}
+                                </li>
+                            {{ else }}
+                                <li>
+                                    {{ camelcaseToSentence $fieldName }}:
+                                    {{ $oldValue }} changed to: {{ $newValue }}
+                                </li>
+                            {{ end }}
+                        {{ else }} {{/* This is being translated as a map, due to the old value being null, so only indexes "1" */}}
+                        {{ $newValue := index $changeValues "1" }}
+                        {{ if eq $fieldName "dob" }}
+                            <li>Date of birth: {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }}</li>
+                        {{ else }}
+                            {{/* Shouldn't hit this in Donor event but added in case of old events data */}}
+                            <li>{{ camelcaseToSentence $fieldName }}: {{ $newValue }}</li>
+                        {{ end }}
+                        {{ end }}
+                    {{ end }}
+                {{ end }}
+            </ul>
+        {{ end }}
+    {{ end }}
 {{ end }}
