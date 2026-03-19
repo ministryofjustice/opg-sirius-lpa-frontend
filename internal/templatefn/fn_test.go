@@ -46,7 +46,7 @@ func TestParseAndFormatDate(t *testing.T) {
 	assert.Equal(t, "11 April 2024", val)
 }
 
-func TestIssChildLinked(t *testing.T) {
+func TestIsChildLinked(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["isChildLinked"].(func(interface{}) bool)
 
