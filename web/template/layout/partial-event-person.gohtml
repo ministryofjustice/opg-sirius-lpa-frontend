@@ -1,11 +1,11 @@
 {{ define "partial-event-person" }}
     {{ if eq .Type "INS" }}
-        {{ if or .Entity.firstname .Entity.surname }}
+        {{ if and (ne .SourceType.Key "TrustCorporation") (or .Entity.firstname .Entity.surname) }}
             <p><strong>{{ .Entity.firstname}} {{ .Entity.surname }}</strong></p>
         {{ end }}
         {{ with .Entity.companyName }}<p>{{ . }}</p>{{ end }}
     {{ else }}
-        {{ if or .Entity.firstname .Entity.surname }}
+        {{ if and (ne .SourceType.Key "TrustCorporation") (or .Entity.firstname .Entity.surname) }}
             <p><strong>{{ with .Entity.salutation }}{{ . }} {{ end }}{{ .Entity.firstname}} {{ .Entity.surname }}</strong></p>
         {{ else }}
             {{ with .Entity.companyName }}<p><strong>{{ . }}</strong></p>{{ end }}
