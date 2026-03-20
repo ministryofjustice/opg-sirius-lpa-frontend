@@ -654,6 +654,51 @@ describe("Show correct event content", () => {
       .should("contain.text", "Correspondence by email: true");
   });
 
+  it("can view trust corporation added event", () => {
+    mockEventHistory({
+      sourceType: "TrustCorporation",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\TrustCorporation`,
+        companyName: "ACME",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item").eq(0).should("contain.text", "ACME");
+  });
+
+  it("can view trust corporation updated event", () => {
+    mockEventHistory({
+      sourceType: "TrustCorporation",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\TrustCorporation`,
+        companyName: "ACME",
+      },
+      changeSet: {
+        dob: [
+          { date: "2006-12-01 00:00:00.000000" },
+          { date: "2006-12-02 00:00:00.000000" },
+        ],
+        systemStatus: [false, true],
+        CorrespondenceByPhone: [true, false],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "ACME")
+      .should(
+        "contain.text",
+        "Date of birth: 01/12/2006 changed to: 02/12/2006",
+      )
+      .should("contain.text", "Changed from inactive to: active")
+      .should(
+        "contain.text",
+        "Correspondence by phone: true changed to: false",
+      );
+  });
+
   it("can view a manual event", () => {
     mockEventHistory({
       sourceType: "Note",
