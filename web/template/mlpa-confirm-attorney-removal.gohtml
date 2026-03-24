@@ -84,7 +84,7 @@
         </div>
 
 
-      {{ if eq .Decisions "jointly-for-some-severally-for-others" }}
+      {{ if eq .Decisions.String "jointly-for-some-severally-for-others" }}
         <div class="govuk-form-group{{ if .Error.Field.decisionAttorney }} govuk-form-group--error{{ end }}">
           <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend">
@@ -128,7 +128,7 @@
           <strong>Attorney appointment type</strong>
         </label>
         <div class="govuk-input__wrapper">
-          <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm (eq .ActiveAttorneyCount 1) .Decisions }}</p>
+          <p class="app-newlines-as-br">{{ .Decisions.Translation (eq .ActiveAttorneyCount 1) }}</p>
         </div>
       </div>
 
@@ -138,7 +138,7 @@
           <strong>Replacement attorney appointment type</strong>
         </label>
         <div class="govuk-input__wrapper">
-          <p class="app-newlines-as-br">{{ howAttorneysMakeDecisionsLongForm (eq .ReplacementAttorneyCount 1) .ReplacementAttorneyDecisions }}</p>
+          <p class="app-newlines-as-br">{{ .ReplacementAttorneyDecisions.Translation (eq .ReplacementAttorneyCount 1) }}</p>
         </div>
       </div>
 
@@ -153,7 +153,7 @@
         <input type="hidden" name="skipEnableAttorney" value="{{ .Form.SkipEnableAttorney }}"/>
         <input type="hidden" name="removedReason" value="{{ .RemovedReason.Handle }}">
 
-        {{ if eq .Decisions "jointly-for-some-severally-for-others" }}
+        {{ if eq .Decisions.String "jointly-for-some-severally-for-others" }}
           {{ range $attUid := .Form.DecisionAttorneysUids }}
             <input type="hidden" name="decisionAttorney" value="{{ $attUid }}"/>
           {{ end }}
