@@ -1,0 +1,56 @@
+{{ define "partial-event-address" }}
+    {{ if eq .Type "INS" }}
+        Address updated: {{ if .Entity.addressLine1 }}{{ .Entity.addressLine1 }},{{ end }}
+        {{- if .Entity.addressLine2 }} {{ .Entity.addressLine2 }},{{ end -}}
+        {{- if .Entity.addressLine3 }} {{ .Entity.addressLine3 }},{{ end -}}
+        {{- if .Entity.town }} {{ .Entity.town }},{{ end -}}
+        {{- if .Entity.county }} {{ .Entity.county }}, {{ end -}}
+        {{- if .Entity.postcode }}{{ .Entity.postcode }}, {{ end -}}
+        {{- if .Entity.country }}{{ .Entity.country }}{{ end -}}
+    {{ else if eq .Type "UPD" }}
+        {{ $firstChange := true }}
+        <ul class="govuk-list">
+            {{ with index .Changes "addressLines" }}
+                <li>
+                    Address updated: Address lines:
+                    {{- $first := true -}}
+                    {{- range index . 0 }}
+                        {{- if . }}
+                            {{- if not $first }}, {{ else }} {{ end -}}
+                            {{ . }}
+                            {{- $first = false -}}
+                        {{- end -}}
+                    {{- end }}
+
+                    changed to:
+
+                    {{- $first = true -}}
+                    {{- range index . 1 }}
+                        {{- if . }}
+                            {{- if not $first }}, {{ else }} {{ end -}}
+                            {{ . }}
+                            {{- $first = false -}}
+                        {{- end -}}
+                    {{- end -}}
+                </li>
+                {{ $firstChange = false }}
+            {{ end }}
+            {{ with index .Changes "town" }}
+                <li>{{ if $firstChange }}Address updated: {{ end }}Town: {{ index . 0 }} changed to: {{ index . 1 }}</li>
+                {{ $firstChange = false }}
+            {{ end }}
+            {{ with index .Changes "county" }}
+                <li>{{ if $firstChange }}Address updated: {{ end }}County: {{ index . 0 }} changed to: {{ index . 1 }}</li>
+                {{ $firstChange = false }}
+            {{ end }}
+            {{ with index .Changes "postcode" }}
+                <li>{{ if $firstChange }}Address updated: {{ end }}Postcode: {{ index . 0 }} changed to: {{ index . 1 }}</li>
+                {{ $firstChange = false }}
+            {{ end }}
+            {{ with index .Changes "country" }}
+                <li>{{ if $firstChange }}Address updated: {{ end }}Country: {{ index . 0 }} changed to: {{ index . 1 }}</li>
+                {{ $firstChange = false }}
+            {{ end }}
+        </ul>
+    {{ end }}
+{{ end }}
