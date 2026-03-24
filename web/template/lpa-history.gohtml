@@ -135,6 +135,8 @@
                                                 {{ template "partial-event-outgoing-document" (eventWithContext . "donorID" $.DonorID) }}
                                             {{ else if eq .SourceType.Key "Warning" }}
                                                 {{ template "partial-event-warning" . }}
+                                            {{ else if eq .SourceType.Key "Address" }}
+                                                {{ template "partial-event-address" . }}
                                             {{ else if eq .SourceType.Key "Lpa" }}
                                                 {{ if and (eq .Type "UPD") (.Changes.status) (ne (len .Changes.status) 0)}}
                                                     {{ template "partial-event-case-status" . }}
