@@ -2,216 +2,226 @@
 
 {{ define "title" }}History{{ end }}
 
+{{ define "container-classes" }} app-!-max-full-width{{ end }}
+
 {{ define "main" }}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-third">
-            <div class="moj-filter" data-module="moj-filter">
-                <div class="moj-filter__header govuk-!-padding-bottom-0 colour-govuk-dark-blue">
-                    <div class="moj-filter__header-title">
-                        <h2 class="govuk-heading-m colour-govuk-white">Filter</h2>
-                        <div class="govuk-body colour-govuk-white">
-                            {{ if or (not .IsFiltered) (eq .TotalFilteredEvents .TotalEvents) }}
-                                (showing all {{ .TotalEvents }} items)
-                            {{ else }}
-                                (showing {{ .TotalFilteredEvents }} of {{ .TotalEvents }} items)
-                            {{ end }}
-                        </div>
-                    </div>
-                </div>
-                <div class="moj-filter__content">
-                    <div class="moj-filter__options">
-                        <form class="form" method="POST">
-                            <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
-                            <button type="submit" class="govuk-button" data-module="govuk-button"
-                                    data-test-id="submit-button">
-                                Apply filters
-                            </button>
-                            <div class="govuk-form-group">
-                                <fieldset class="govuk-fieldset">
-                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                                        Sort By
-                                    </legend>
-                                    <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
-                                        <div class="govuk-radios__item">
-                                            <input class="govuk-radios__input" id="f-desc"
-                                                   name="sort" type="radio" value="desc"
-                                                   {{if eq .Form.Sort "desc"}}checked{{end}}>
-                                            <label class="govuk-label govuk-radios__label"
-                                                   for="f-desc">Descending</label>
-                                        </div>
-                                        <div class="govuk-radios__item">
-                                            <input class="govuk-radios__input" id="f-asc"
-                                                   name="sort" type="radio" value="asc"
-                                                   {{if eq .Form.Sort "asc"}}checked{{end}}>
-                                            <label class="govuk-label govuk-radios__label" for="f-asc">Ascending</label>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>
-                            <div class="govuk-form-group">
-                                <fieldset class="govuk-fieldset">
-                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                                        Type
-                                    </legend>
-                                    <div class="govuk-checkboxes govuk-checkboxes--small"
-                                         data-module="govuk-checkboxes">
-                                        {{ range .EventFilterData }}
-                                            <div class="govuk-checkboxes__item">
-                                                <input class="govuk-checkboxes__input" id="f-{{ .SourceType.Key }}"
-                                                       name="type" type="checkbox" value="{{ .SourceType.Key }}"
-                                                       {{ if contains $.Form.Types .SourceType.Key }}checked{{ end }}>
-                                                <label class="govuk-label govuk-checkboxes__label"
-                                                       for="f-{{ .SourceType.Key }}">
-                                                    {{ .SourceType.Translation }} ({{ .Total }})
-                                                </label>
-                                            </div>
-                                        {{ end }}
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </form>
-                    </div>
+    <div class="app-timeline-container">
+        <h2 class="govuk-heading-m colour-govuk-white colour-govuk-dark-blue govuk-!-padding-1 govuk-!-padding-left-2 govuk-!-margin-bottom-0">History</h2>
+        <div class="govuk-!-margin-4">
+            <div class="app-align-items-end app-!-gap-2 govuk-!-margin-bottom-5">
+                <button class="govuk-button govuk-button govuk-!-margin-bottom-0" aria-controls="app-filters" data-filter-toggle>
+                    Hide filters
+                </button>
+                <div class="govuk-body govuk-!-margin-bottom-0 govuk-!-display-none" data-filter-summary>
+                    {{ if or (not .IsFiltered) (eq .TotalFilteredEvents .TotalEvents) }}
+                        (showing all {{ .TotalEvents }} items)
+                    {{ else }}
+                        (showing {{ .TotalFilteredEvents }} of {{ .TotalEvents }} items)
+                    {{ end }}
                 </div>
             </div>
-        </div>
-
-        <div class="govuk-grid-column-two-thirds">
-            <div class="moj-timeline">
-                {{ range .Events }}
-                    <div class="moj-timeline__item">
-                        <div hidden>Sirius {{.UID}}</div>
-                        <div class="govuk-summary-card govuk-!-margin-bottom-0">
-                            <div class="govuk-summary-card__title-wrapper app-summary-card--padding">
-                                {{ if eq .SourceType.Translation "Warning" }}
-                                    <svg class="moj-alert--warning moj-alert__icon govuk-!-padding-right-1"
-                                         role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg"
-                                         viewBox="0 0 30 30" height="30" width="30">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                              d="M15 2.44922L28.75 26.1992H1.25L15 2.44922ZM13.5107 9.49579H16.4697L16.2431 17.7678H13.7461L13.5107 9.49579ZM13.1299 21.82C13.1299 21.5661 13.1787 21.3285 13.2764 21.1071C13.374 20.8793 13.5075 20.6807 13.6768 20.5114C13.8525 20.3421 14.0544 20.2087 14.2822 20.111C14.5101 20.0134 14.7542 19.9645 15.0146 19.9645C15.2686 19.9645 15.5062 20.0134 15.7275 20.111C15.9554 20.2087 16.154 20.3421 16.3232 20.5114C16.4925 20.6807 16.626 20.8793 16.7236 21.1071C16.8213 21.3285 16.8701 21.5661 16.8701 21.82C16.8701 22.0804 16.8213 22.3246 16.7236 22.5524C16.626 22.7803 16.4925 22.9789 16.3232 23.1481C16.154 23.3174 15.9554 23.4509 15.7275 23.5485C15.5062 23.6462 15.2686 23.695 15.0146 23.695C14.7542 23.695 14.5101 23.6462 14.2822 23.5485C14.0544 23.4509 13.8525 23.3174 13.6768 23.1481C13.5075 22.9789 13.374 22.7803 13.2764 22.5524C13.1787 22.3246 13.1299 22.0804 13.1299 21.82Z"
-                                              fill="currentColor"/>
-                                    </svg>
-                                {{ end }}
-                                <h1 class="govuk-summary-card__title">
-                                    {{ .SourceType.Translation }}
-                                </h1>
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-one-quarter">
+                    <div class="moj-filter moj-filter-layout__filter app-!-no-min-max-width" data-module="moj-filter">
+                        <div class="moj-filter__header govuk-!-padding-bottom-0 colour-govuk-dark-blue">
+                            <div class="moj-filter__header-title">
+                                <h2 class="govuk-heading-m colour-govuk-white">Filter</h2>
+                                <div class="govuk-body colour-govuk-white">
+                                    {{ if or (not .IsFiltered) (eq .TotalFilteredEvents .TotalEvents) }}
+                                        (showing all {{ .TotalEvents }} items)
+                                    {{ else }}
+                                        (showing {{ .TotalFilteredEvents }} of {{ .TotalEvents }} items)
+                                    {{ end }}
+                                </div>
                             </div>
-                            <div class="govuk-summary-card__content app-summary-card-content--padding ">
-                                <dl class="govuk-summary-list">
-                                    <div class="govuk-summary-list__row">
-                                        <div class="govuk-body lpa-history__meta govuk-!-margin-bottom-2">
-                                            {{ if and .OwningCase .OwningCase.CaseSubtype}}
-                                                <strong class="govuk-tag app-govuk-tag-bold
-                                                    {{ if eq .OwningCase.CaseType "EPA" }}
-                                                        {{ caseLabel .OwningCase.CaseType }}">{{ ToUpper .OwningCase.CaseType }} {{ .OwningCase.UID }}
-                                                    {{ else }}
-                                                        {{ caseLabel .OwningCase.CaseSubtype }}">{{ ToUpper .OwningCase.CaseSubtype }} {{ .OwningCase.UID }}
-                                                    {{ end }}
-                                                </strong>
-                                            {{ end }}
-                                            <div class="govuk-tag app-govuk-tag-bold color-govuk-black lpa-history__meta-timestamp">
-                                                <time datetime="{{ .CreatedOn }}">{{ parseAndFormatDate .CreatedOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
-                                                - #{{ .Hash }}
+                        </div>
+                        <div class="moj-filter__content">
+                            <div class="moj-filter__options">
+                                <form class="form" method="POST">
+                                    <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+                                    <button type="submit" class="govuk-button moj-filter__search-button" data-module="govuk-button" data-test-id="submit-button">
+                                        Apply filters
+                                    </button>
+                                    <div class="govuk-form-group">
+                                        <fieldset class="govuk-fieldset">
+                                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                                Sort By
+                                            </legend>
+                                            <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                                                <div class="govuk-radios__item">
+                                                    <input class="govuk-radios__input" id="f-desc"
+                                                            name="sort" type="radio" value="desc" data-module="app-auto-apply-filter"
+                                                            {{if eq .Form.Sort "desc"}}checked{{end}}>
+                                                    <label class="govuk-label govuk-radios__label" for="f-desc">Descending</label>
+                                                </div>
+                                                <div class="govuk-radios__item">
+                                                    <input class="govuk-radios__input" id="f-asc"
+                                                            name="sort" type="radio" value="asc" data-module="app-auto-apply-filter"
+                                                            {{if eq .Form.Sort "asc"}}checked{{end}}>
+                                                    <label class="govuk-label govuk-radios__label" for="f-asc">Ascending</label>
+                                                </div>
                                             </div>
-                                        </div>
-
-                                        <div class="govuk-body">
-                                            {{ if eq .SourceType.Key "Payment" }}
-                                                {{ if eq .Entity.source "FEE_REDUCTION"}}
-                                                    {{ if eq .Type "INS" }}
-                                                        {{ template "partial-event-fee-reduction-approved" (eventWithContext . "feeReductionTypes" $.FeeReductionTypes) }}
-                                                    {{ else if eq .Type "UPD" }}
-                                                        {{ template "partial-event-fee-reduction-updated" (eventWithContext . "feeReductionTypes" $.FeeReductionTypes) }}
-                                                    {{ else if eq .Type "DEL" }}
-                                                        {{ template "partial-event-fee-reduction-deleted" (eventWithContext . "feeReductionTypes" $.FeeReductionTypes) }}
-                                                    {{ end }}
-                                                {{ else if eq .Type "DEL" }}
-                                                    {{ template "partial-event-payment-deleted" . }}
-                                                {{ else }}
-                                                    {{ template "partial-event-payment" . }}
-                                                {{ end }}
-                                            {{ else if eq .SourceType.Key "IncomingDocument" }}
-                                                {{ template "partial-event-incoming-document" (eventWithContext . "donorID" $.DonorID) }}
-                                            {{ else if eq .SourceType.Key "OutgoingDocument" }}
-                                                {{ template "partial-event-outgoing-document" (eventWithContext . "donorID" $.DonorID) }}
-                                            {{ else if eq .SourceType.Key "Warning" }}
-                                                {{ template "partial-event-warning" . }}
-                                            {{ else if eq .SourceType.Key "Lpa" }}
-                                                {{ if and (eq .Type "UPD") (.Changes.status) (ne (len .Changes.status) 0)}}
-                                                    {{ template "partial-event-case-status" . }}
-                                                {{ else }}
-                                                    {{ template "partial-event-lpa" (eventWithContext . "eventFieldOrder" $.LpaFieldOrder) }}
-                                                {{ end }}
-                                            {{ else if eq .SourceType.Key "Epa" }}
-                                                {{ template "partial-event-epa" (eventWithContext . "eventFieldOrder" $.EpaFieldOrder) }}
-                                            {{ else if eq .SourceType.Key "Complaint" }}
-                                                {{ template "partial-event-complaint" (eventWithContext . "complaintCategories" $.ComplaintCategories "complaintSubcategories" $.ComplaintSubcategories "complainantCategories" $.ComplainantCategories "complaintOrigins" $.ComplaintOrigins "compensationTypes" $.CompensationTypes) }}
-                                            {{ else if eq .SourceType.Key "Task" }}
-                                                {{ template "partial-event-task" . }}
-                                            {{ else if eq .SourceType.Key "PhoneNumber"}}
-                                                {{ template "partial-event-phone" . }}
-                                            {{ else if or (eq .SourceType.Key "Attorney")
-                                            (eq .SourceType.Key "ReplacementAttorney")
-                                            (eq .SourceType.Key "Correspondent")
-                                            (eq .SourceType.Key "TrustCorporation")
-                                            (eq .SourceType.Key "CertificateProvider")
-                                            (eq .SourceType.Key "NotifiedPerson")}}
-                                                {{ template "partial-event-person" . }}
-                                            {{ else if eq .SourceType.Key "Note"}}
-                                                {{ template "partial-event-note" (eventWithContext . "donorID" $.DonorID) }}
-                                            {{ else if eq .SourceType.Key "Donor" }}
-                                                {{ template "partial-event-donor" (eventWithContext . "eventFieldOrder" $.DonorFieldOrder) }}
-                                            {{ else if eq .SourceType.Key "Investigation" }}
-                                                {{ template "partial-event-investigation" . }}
-                                            {{ else }}
-                                                <dl class="govuk-summary-list">
-                                                    <ul class="govuk-list govuk-list--bullet">
-                                                        {{ range $k, $v := .Entity }}
-                                                            {{ if and (ne $k "id") $v }}
-                                                                <li>
-                                                                    {{ camelcaseToSentence $k }}:
-                                                                    {{ if eq $k "assignee" }}
-                                                                        {{ $v.displayName }}
-                                                                    {{ else if eq $k "uId" }}
-                                                                        {{ printf "%.f" $v }}
-                                                                    {{ else }}
-                                                                        {{ $v }}
-                                                                    {{ end }}
-                                                                </li>
-                                                            {{ end }}
-                                                        {{ end }}
-                                                    </ul>
-                                                </dl>
-                                            {{ end }}
-                                        </div>
+                                        </fieldset>
                                     </div>
-                                    <div class="govuk-summary-list__row">
-                                        <p class="govuk-hint govuk-!-margin-bottom-1 govuk-!-margin-top-1">
-                                            {{ if eq .Type "INS"}}
-                                                Created by
-                                            {{ else if eq .Type "UPD" }}
-                                                Updated by
-                                            {{ else if eq .Type "DEL" }}
-                                                Deleted by
-                                            {{ end }}
-                                            {{ if .User }}
-                                                {{ if .User.Deleted }}
-                                                    deleted user
-                                                {{ else }}
-                                                    <a class="govuk-link"
-                                                       href="mailto:{{ .User.Email}}">{{ .User.DisplayName }}</a>
-                                                    {{ if gt (len .User.Teams) 0 }}({{ (index .User.Teams 0).DisplayName }}){{ end }}
-                                                    {{ if .User.PhoneNumber }} &ndash; {{ .User.PhoneNumber }}{{ end }}
+                                    <div class="govuk-form-group">
+                                        <fieldset class="govuk-fieldset">
+                                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                                Type
+                                            </legend>
+                                            <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                                {{ range .EventFilterData }}
+                                                    <div class="govuk-checkboxes__item">
+                                                        <input class="govuk-checkboxes__input" id="f-{{ .SourceType.Key }}"
+                                                                name="type" type="checkbox" value="{{ .SourceType.Key }}" data-module="app-auto-apply-filter"
+                                                                {{ if contains $.Form.Types .SourceType.Key }}checked{{ end }}>
+                                                        <label class="govuk-label govuk-checkboxes__label" for="f-{{ .SourceType.Key }}">
+                                                            {{ .SourceType.Translation }} ({{ .Total }})
+                                                        </label>
+                                                    </div>
                                                 {{ end }}
-                                            {{ else }}
-                                                &ndash;
-                                            {{ end }}
-                                        </p>
+                                            </div>
+                                        </fieldset>
                                     </div>
-                                </dl>
+                                </form>
                             </div>
                         </div>
                     </div>
-                {{ end }}
+                </div>
+
+                <div class="govuk-grid-column-three-quarters" data-filter-timeline>
+                    <div class="moj-timeline">
+                        {{ range .Events }}
+                            <div class="moj-timeline__item govuk-!-padding-bottom-4">
+                                <div hidden>Sirius {{.UID}}</div>
+                                <div class="govuk-summary-card govuk-!-margin-bottom-0 background-govuk-white">
+                                    <div class="govuk-summary-card__title-wrapper app-summary-card--padding">
+                                        {{ if eq .SourceType.Translation "Warning" }}
+                                            <svg class="moj-alert--warning moj-alert__icon govuk-!-padding-right-1" role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" height="30" width="30">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M15 2.44922L28.75 26.1992H1.25L15 2.44922ZM13.5107 9.49579H16.4697L16.2431 17.7678H13.7461L13.5107 9.49579ZM13.1299 21.82C13.1299 21.5661 13.1787 21.3285 13.2764 21.1071C13.374 20.8793 13.5075 20.6807 13.6768 20.5114C13.8525 20.3421 14.0544 20.2087 14.2822 20.111C14.5101 20.0134 14.7542 19.9645 15.0146 19.9645C15.2686 19.9645 15.5062 20.0134 15.7275 20.111C15.9554 20.2087 16.154 20.3421 16.3232 20.5114C16.4925 20.6807 16.626 20.8793 16.7236 21.1071C16.8213 21.3285 16.8701 21.5661 16.8701 21.82C16.8701 22.0804 16.8213 22.3246 16.7236 22.5524C16.626 22.7803 16.4925 22.9789 16.3232 23.1481C16.154 23.3174 15.9554 23.4509 15.7275 23.5485C15.5062 23.6462 15.2686 23.695 15.0146 23.695C14.7542 23.695 14.5101 23.6462 14.2822 23.5485C14.0544 23.4509 13.8525 23.3174 13.6768 23.1481C13.5075 22.9789 13.374 22.7803 13.2764 22.5524C13.1787 22.3246 13.1299 22.0804 13.1299 21.82Z" fill="currentColor" />
+                                            </svg>
+                                        {{ end }}
+                                        <h1 class="govuk-summary-card__title">
+                                            {{ .SourceType.Translation }}
+                                        </h1>
+                                    </div>
+                                    <div class="govuk-summary-card__content app-summary-card-content--padding">
+                                        <dl class="govuk-summary-list">
+                                            <div class="govuk-summary-list__row">
+                                                <div class="govuk-body lpa-history__meta govuk-!-margin-bottom-2">
+                                                    {{ if and .OwningCase .OwningCase.CaseSubtype}}
+                                                        <strong class="govuk-tag app-govuk-tag-bold
+                                                            {{ if eq .OwningCase.CaseType "EPA" }}
+                                                                {{ caseLabel .OwningCase.CaseType }}">{{ ToUpper .OwningCase.CaseType }} {{ .OwningCase.UID }}
+                                                            {{ else }}
+                                                                {{ caseLabel .OwningCase.CaseSubtype }}">{{ ToUpper .OwningCase.CaseSubtype }} {{ .OwningCase.UID }}
+                                                            {{ end }}
+                                                        </strong>
+                                                    {{ end }}
+                                                    <div class="govuk-tag app-govuk-tag-bold color-govuk-black lpa-history__meta-timestamp">
+                                                        <time datetime="{{ .CreatedOn }}">{{ parseAndFormatDate .CreatedOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
+                                                        - #{{ .Hash }}
+                                                    </div>
+                                                </div>
+
+                                                <div class="govuk-body">
+                                                    {{ if eq .SourceType.Key "Payment" }}
+                                                        {{ if eq .Entity.source "FEE_REDUCTION"}}
+                                                            {{ if eq .Type "INS" }}
+                                                                {{ template "partial-event-fee-reduction-approved" (eventWithContext . "feeReductionTypes" $.FeeReductionTypes) }}
+                                                            {{ else if eq .Type "UPD" }}
+                                                                {{ template "partial-event-fee-reduction-updated" (eventWithContext . "feeReductionTypes" $.FeeReductionTypes) }}
+                                                            {{ else if eq .Type "DEL" }}
+                                                                {{ template "partial-event-fee-reduction-deleted" (eventWithContext . "feeReductionTypes" $.FeeReductionTypes) }}
+                                                            {{ end }}
+                                                        {{ else if eq .Type "DEL" }}
+                                                            {{ template "partial-event-payment-deleted" . }}
+                                                        {{ else }}
+                                                            {{ template "partial-event-payment" . }}
+                                                        {{ end }}
+                                                    {{ else if eq .SourceType.Key "IncomingDocument" }}
+                                                        {{ template "partial-event-incoming-document" (eventWithContext . "donorID" $.DonorID) }}
+                                                    {{ else if eq .SourceType.Key "OutgoingDocument" }}
+                                                        {{ template "partial-event-outgoing-document" (eventWithContext . "donorID" $.DonorID) }}
+                                                    {{ else if eq .SourceType.Key "Warning" }}
+                                                        {{ template "partial-event-warning" . }}
+                                                    {{ else if eq .SourceType.Key "Lpa" }}
+                                                        {{ if and (eq .Type "UPD") (.Changes.status) (ne (len .Changes.status) 0)}}
+                                                            {{ template "partial-event-case-status" . }}
+                                                        {{ else }}
+                                                            {{ template "partial-event-lpa" (eventWithContext . "eventFieldOrder" $.LpaFieldOrder) }}
+                                                        {{ end }}
+                                                    {{ else if eq .SourceType.Key "Epa" }}
+                                                        {{ template "partial-event-epa" (eventWithContext . "eventFieldOrder" $.EpaFieldOrder) }}
+                                                    {{ else if eq .SourceType.Key "Complaint" }}
+                                                        {{ template "partial-event-complaint" (eventWithContext . "complaintCategories" $.ComplaintCategories "complaintSubcategories" $.ComplaintSubcategories "complainantCategories" $.ComplainantCategories "complaintOrigins" $.ComplaintOrigins "compensationTypes" $.CompensationTypes) }}
+                                                    {{ else if eq .SourceType.Key "Task" }}
+                                                        {{ template "partial-event-task" . }}
+                                                    {{ else if eq .SourceType.Key "PhoneNumber"}}
+                                                        {{ template "partial-event-phone" . }}
+                                                    {{ else if or (eq .SourceType.Key "Attorney")
+                                                    (eq .SourceType.Key "ReplacementAttorney")
+                                                    (eq .SourceType.Key "Correspondent")
+                                                    (eq .SourceType.Key "TrustCorporation")
+                                                    (eq .SourceType.Key "CertificateProvider")
+                                                    (eq .SourceType.Key "NotifiedPerson")}}
+                                                        {{ template "partial-event-person" . }}
+                                                    {{ else if eq .SourceType.Key "Note"}}
+                                                        {{ template "partial-event-note" (eventWithContext . "donorID" $.DonorID) }}
+                                                    {{ else if eq .SourceType.Key "Donor" }}
+                                                        {{ template "partial-event-donor" (eventWithContext . "eventFieldOrder" $.DonorFieldOrder) }}
+                                                    {{ else if eq .SourceType.Key "Investigation" }}
+                                                        {{ template "partial-event-investigation" . }}
+                                                    {{ else }}
+                                                        <dl class="govuk-summary-list">
+                                                            <ul class="govuk-list govuk-list--bullet">
+                                                                {{ range $k, $v := .Entity }}
+                                                                    {{ if and (ne $k "id") $v }}
+                                                                        <li>
+                                                                            {{ camelcaseToSentence $k }}:
+                                                                            {{ if eq $k "assignee" }}
+                                                                                {{ $v.displayName }}
+                                                                            {{ else if eq $k "uId" }}
+                                                                                {{ printf "%.f" $v }}
+                                                                            {{ else }}
+                                                                                {{ $v }}
+                                                                            {{ end }}
+                                                                        </li>
+                                                                    {{ end }}
+                                                                {{ end }}
+                                                            </ul>
+                                                        </dl>
+                                                    {{ end }}
+                                                </div>
+                                            </div>
+                                            <div class="govuk-summary-list__row">
+                                                <p class="govuk-hint govuk-!-margin-bottom-1 govuk-!-margin-top-1">
+                                                    {{ if eq .Type "INS"}}
+                                                        Created by
+                                                    {{ else if eq .Type "UPD" }}
+                                                        Updated by
+                                                    {{ else if eq .Type "DEL" }}
+                                                        Deleted by
+                                                    {{ end }}
+                                                    {{ if .User }}
+                                                        {{ if .User.Deleted }}
+                                                            deleted user
+                                                        {{ else }}
+                                                            <a class="govuk-link" href="mailto:{{ .User.Email}}">{{ .User.DisplayName }}</a>
+                                                            {{ if gt (len .User.Teams) 0 }}({{ (index .User.Teams 0).DisplayName }}){{ end }}
+                                                            {{ if .User.PhoneNumber }} &ndash; {{ .User.PhoneNumber }}{{ end }}
+                                                        {{ end }}
+                                                    {{ else }}
+                                                        &ndash;
+                                                    {{ end }}
+                                                </p>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        {{ end }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
