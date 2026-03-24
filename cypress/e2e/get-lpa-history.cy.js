@@ -713,10 +713,11 @@ describe("View LPA history timeline", () => {
   it("can filter", () => {
     cy.visit("/donor/1/history?id[]=105&id[]=106&id[]=107");
 
+    cy.contains("Apply filters").should("not.be.visible");
+
     cy.contains("(showing all 4 items)");
     cy.contains("Ascending").click();
     cy.contains("Warning (2)").click();
-    cy.contains("Apply filters").click();
 
     cy.contains("(showing 2 of 4 items)");
     cy.get(".moj-timeline__item")
@@ -735,5 +736,25 @@ describe("View LPA history timeline", () => {
           .find(".colour-govuk-brown")
           .should("exist");
       });
+  });
+
+  describe("Filter panel visibility", () => {
+    it("shows the filter panel by default", () => {
+      cy.get(".moj-filter-layout__filter").should("be.visible");
+      cy.get("div[data-filter-summary]").should("not.be.visible");
+    });
+
+    it("hides the filter panel when Hide filters is clicked", () => {
+      cy.contains(".govuk-button", "Hide filters").click();
+      cy.get(".moj-filter-layout__filter").should("not.be.visible");
+      cy.get("div[data-filter-summary]").should("be.visible");
+    });
+
+    it("shows the filter panel again when Show filters is clicked", () => {
+      cy.contains(".govuk-button", "Hide filters").click();
+      cy.contains(".govuk-button", "Show filters").click();
+      cy.get(".moj-filter-layout__filter").should("be.visible");
+      cy.get("div[data-filter-summary]").should("not.be.visible");
+    });
   });
 });
