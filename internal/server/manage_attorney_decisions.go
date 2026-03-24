@@ -32,8 +32,8 @@ type manageAttorneyDecisionsData struct {
 	DecisionAttorneysDetails     []AttorneyDetails
 	ActiveAttorneyCount          int
 	ReplacementAttorneyCount     int
-	Decisions                    string
-	ReplacementAttorneyDecisions string
+	Decisions                    shared.HowAttorneysMakeDecisions
+	ReplacementAttorneyDecisions shared.HowAttorneysMakeDecisions
 	Success                      bool
 	Error                        sirius.ValidationError
 	XSRFToken                    string
@@ -75,7 +75,7 @@ func AttorneyDecisions(client AttorneyDecisionsClient, decisionTmpl template.Tem
 			}
 		}
 
-		if data.ActiveAttorneyCount > 1 && data.ReplacementAttorneyCount > 1 && data.ReplacementAttorneyDecisions == "" {
+		if data.ActiveAttorneyCount > 1 && data.ReplacementAttorneyCount > 1 && data.ReplacementAttorneyDecisions == shared.HowAttorneysMakeDecisionsEmpty {
 			data.ReplacementAttorneyDecisions = data.Decisions
 		}
 

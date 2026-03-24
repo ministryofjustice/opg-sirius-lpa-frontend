@@ -26,7 +26,7 @@
             {{ template "errors" .Error.Field.howAttorneysMakeDecisions }}
             {{ if eq .ActiveAttorneyCount 1 }}
               <div class="govuk-inset-text">
-                {{ howAttorneysMakeDecisionsLongForm true .Form.HowAttorneysMakeDecisions }}
+                There is only one attorney appointed
               </div>
             {{ else }}
               <div class="govuk-radios" data-module="govuk-radios">
@@ -76,7 +76,7 @@
             {{ template "errors" .Error.Field.howReplacementAttorneysMakeDecisions }}
             {{ if eq .ReplacementAttorneyCount 1 }}
               <div class="govuk-inset-text">
-                {{ howAttorneysMakeDecisionsLongForm true .Form.HowReplacementAttorneysMakeDecisions }}
+                There is only one attorney appointed
               </div>
             {{ else }}
               <div class="govuk-radios" data-module="govuk-radios">
