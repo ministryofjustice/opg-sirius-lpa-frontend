@@ -2,8 +2,9 @@ package server
 
 import (
 	"fmt"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"net/http"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -54,11 +55,11 @@ func UpdateDecisions(client UpdateDecisionsClient, tmpl template.Template) Handl
 			Form: formDecisionsDetails{
 				WhenTheLpaCanBeUsed:                         lpaStoreData.WhenTheLpaCanBeUsed,
 				LifeSustainingTreatmentOption:               lpaStoreData.LifeSustainingTreatmentOption,
-				HowAttorneysMakeDecisions:                   lpaStoreData.HowAttorneysMakeDecisions,
+				HowAttorneysMakeDecisions:                   lpaStoreData.HowAttorneysMakeDecisions.String(),
 				HowAttorneysMakeDecisionsDetails:            lpaStoreData.HowAttorneysMakeDecisionsDetails,
-				HowReplacementAttorneysStepIn:               lpaStoreData.HowReplacementAttorneysStepIn,
+				HowReplacementAttorneysStepIn:               lpaStoreData.HowReplacementAttorneysStepIn.String(),
 				HowReplacementAttorneysStepInDetails:        lpaStoreData.HowReplacementAttorneysStepInDetails,
-				HowReplacementAttorneysMakeDecisions:        lpaStoreData.HowReplacementAttorneysMakeDecisions,
+				HowReplacementAttorneysMakeDecisions:        lpaStoreData.HowReplacementAttorneysMakeDecisions.String(),
 				HowReplacementAttorneysMakeDecisionsDetails: lpaStoreData.HowReplacementAttorneysMakeDecisionsDetails,
 			},
 		}
