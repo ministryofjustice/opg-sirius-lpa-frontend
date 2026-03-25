@@ -1,21 +1,57 @@
 {{ define "partial-event-investigation" }}
-    </p>TODO: implement - render investigation event content</p>
-    <dl class="govuk-summary-list">
-        <ul class="govuk-list govuk-list--bullet">
+    {{ if ne (len .Changes) 0 }}
+        <ul class="govuk-list">
+            {{ $changes := .Changes }}
             {{ range $k, $v := .Entity }}
-                {{ if and (ne $k "id") $v }}
-                    <li>
-                        {{ camelcaseToSentence $k }}:
-                        {{ if eq $k "assignee" }}
-                            {{ $v.displayName }}
-                        {{ else if eq $k "uId" }}
-                            {{ printf "%.f" $v }}
+                {{ if and (ne $k "_class") (ne $k "id") $v (not (index $changes $k)) }}
+                    {{ if or (eq $k "riskAssessmentDate") (eq $k "reportApprovalDate") (eq $k "investigationClosureDate") (eq $k "investigationReceivedDate") }}
+                        <li>{{ investigationEventProperty $k }}: {{ parseAndFormatDate $v "2006-01-02T15:04:05+00:00" "02/01/2006" }}</li>
+                    {{ else }}
+                        <li>{{ investigationEventProperty $k }}: {{ $v }}</li>
+                    {{ end }}
+                {{ end }}
+            {{ end }}
+            {{ range $k, $v := .Changes }}
+                {{ $hasChanges := ne (len $v) 1 }}
+                {{ if $hasChanges }}
+                    {{ $oldValue := index $v 0 }}
+                    {{ $newValue := index $v 1 }}
+                    {{ if not $oldValue }}
+                        {{ if or (eq $k "riskAssessmentDate") (eq $k "reportApprovalDate") (eq $k "investigationClosureDate") (eq $k "investigationReceivedDate") }}
+                            <li>{{ investigationEventProperty $k }}: {{ parseAndFormatDate (index $newValue "date") "2006-01-02 00:00:00.000000" "02/01/2006" }}</li>
                         {{ else }}
-                            {{ $v }}
+                            <li>{{ investigationEventProperty $k }}: {{ $newValue }}</li>
                         {{ end }}
-                    </li>
+                    {{ end }}
+                {{ else }}
+                    {{ $newValue := index $v "1" }}
+                    {{ if or (eq $k "riskAssessmentDate") (eq $k "reportApprovalDate") (eq $k "investigationClosureDate") (eq $k "investigationReceivedDate") }}
+                        <li>{{ investigationEventProperty $k }}: {{ parseAndFormatDate (index $newValue "date") "2006-01-02 00:00:00.000000" "02/01/2006" }}</li>
+                    {{ else }}
+                        <li>{{ investigationEventProperty $k }}: {{ $newValue }}</li>
+                    {{ end }}
+                {{ end }}
+            {{ end }}
+            {{ range $k, $v := .Changes }}
+                {{ $hasChanges := ne (len $v) 1 }}
+                {{ if $hasChanges }}
+                    {{ $oldValue := index $v 0 }}
+                    {{ $newValue := index $v 1 }}
+                    {{ if $oldValue }}
+                        {{ if or (eq $k "riskAssessmentDate") (eq $k "reportApprovalDate") (eq $k "investigationClosureDate") (eq $k "investigationReceivedDate") }}
+                            <li>{{ investigationEventProperty $k }}: {{ parseAndFormatDate (index $oldValue "date") "2006-01-02 00:00:00.000000" "02/01/2006" }} <strong>changed to</strong> {{ parseAndFormatDate (index $newValue "date") "2006-01-02 00:00:00.000000" "02/01/2006" }}</li>
+                        {{ else }}
+                            <li>{{ investigationEventProperty $k }}: {{ $oldValue }} <strong>changed to</strong> {{ $newValue }}</li>
+                        {{ end }}
+                    {{ end }}
                 {{ end }}
             {{ end }}
         </ul>
-    </dl>
+    {{ else }}
+        <p><strong>{{.Entity.type}} - {{.Entity.investigationTitle}}</strong></p>
+        <ul>
+            <li>{{.Entity.additionalInformation}}</li>
+            <li>Investigation received on {{ parseAndFormatDate .Entity.investigationReceivedDate "2006-01-02T15:04:05+00:00" "02/01/2006" }}</li>
+        </ul>
+    {{ end }}
 {{ end }}

@@ -142,6 +142,8 @@
                                                 {{ template "partial-event-note" (eventWithContext . "donorID" $.DonorID) }}
                                             {{ else if eq .SourceType.Key "Donor" }}
                                                 {{ template "partial-event-donor" (eventWithContext . "eventFieldOrder" $.DonorFieldOrder) }}
+                                            {{ else if eq .SourceType.Key "Investigation" }}
+                                                {{ template "partial-event-investigation" . }}
                                             {{ else }}
                                                 <dl class="govuk-summary-list">
                                                     <ul class="govuk-list govuk-list--bullet">
