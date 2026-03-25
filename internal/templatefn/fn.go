@@ -335,10 +335,11 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return false
 		},
-		"formatEventType":   formatEventType,
-		"eventTypeColor":    eventTypeColor,
-		"paymentSource":     shared.PaymentSourceToAction,
-		"complaintProperty": shared.TranslateComplaintProperty,
+		"formatEventType":            formatEventType,
+		"eventTypeColor":             eventTypeColor,
+		"paymentSource":              shared.PaymentSourceToAction,
+		"complaintProperty":          shared.TranslateComplaintProperty,
+		"investigationEventProperty": shared.TranslateInvestigationEventProperty,
 		"eventWithContext": func(event sirius.LpaEvent, values ...any) LpaEventWithContext {
 			context := EventContext{}
 			for i := 0; i+1 < len(values); i += 2 {

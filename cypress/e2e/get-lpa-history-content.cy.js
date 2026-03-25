@@ -699,6 +699,78 @@ describe("Show correct event content", () => {
       );
   });
 
+  it("can view investigation created event", () => {
+    mockEventHistory({
+      sourceType: "Investigation",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\Investigation\Investigation`,
+        type: "Aspect",
+        investigationTitle: "Test Investigation",
+        additionalInformation: "Some extra info",
+        investigationReceivedDate: "2026-03-01T00:00:00+00:00",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Aspect - Test Investigation")
+      .should("contain.text", "Some extra info")
+      .should("contain.text", "Investigation received on 01/03/2026");
+  });
+
+  it("can view investigation updated event with prior values", () => {
+    mockEventHistory({
+      sourceType: "Investigation",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\Investigation\Investigation`,
+        investigationTitle: "Test Investigation",
+        additionalInformation: "Some extra info",
+      },
+      changeSet: {
+        riskAssessmentDate: [
+          { date: "2026-01-01 00:00:00.000000" },
+          { date: "2026-02-01 00:00:00.000000" },
+        ],
+        reportApprovalOutcome: ["Outcome A", "Outcome B"],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should(
+        "contain.text",
+        "Risk assessment date: 01/01/2026 changed to 01/02/2026",
+      )
+      .should(
+        "contain.text",
+        "Report approval outcome: Outcome A changed to Outcome B",
+      );
+  });
+
+  it("can view investigation updated event without prior values", () => {
+    mockEventHistory({
+      sourceType: "Investigation",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\Investigation\Investigation`,
+        investigationTitle: "Test Investigation",
+      },
+      changeSet: {
+        investigationClosureDate: {
+          1: { date: "2026-06-15 00:00:00.000000" },
+        },
+        reportApprovalOutcome: { 1: "Approved" },
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Investigation closed: 15/06/2026")
+      .should("contain.text", "Report approval outcome: Approved");
+  });
+
   it("can view a manual event", () => {
     mockEventHistory({
       sourceType: "Note",
