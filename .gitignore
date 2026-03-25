@@ -13,6 +13,5 @@ log/
 docs/architecture/dsl/**/workspace.json
 .cache
 .gocache
-.trivy-cache
 test-results
 .DS_Store

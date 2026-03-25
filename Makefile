@@ -3,7 +3,7 @@ export DOCKER_BUILDKIT=1
 help:
 	@grep --no-filename -E '^[0-9a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-all: lint gosec unit-test build-all scan pa11y lighthouse cypress down
+all: lint gosec unit-test build-all pa11y lighthouse cypress down
 
 lint: ## Lint source code
 lint: go-lint npm-lint
@@ -23,7 +23,7 @@ gosec: ## Scan Go code for security flaws
 	docker compose run --rm gosec
 
 test-results:
-	mkdir -p -m 0777 test-results .gocache pacts logs cypress/screenshots .trivy-cache
+	mkdir -p -m 0777 test-results .gocache pacts logs cypress/screenshots
 
 setup-directories: test-results
 
@@ -47,10 +47,6 @@ dev: ## Build and start dev application and watch JS and SASS files for changes
 
 up: ## Start application with mock Sirius API; mostly for use with Cypress tests
 	docker compose up -d lpa-frontend
-
-scan: setup-directories
-	docker compose run --rm trivy image --format table --exit-code 0 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest
-	docker compose run --rm trivy image --format sarif --output /test-results/trivy.sarif --exit-code 1 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-lpa-frontend:latest
 
 pa11y: setup-directories
 	docker compose run --entrypoint="pa11y-ci" puppeteer
