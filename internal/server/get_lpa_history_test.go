@@ -155,6 +155,7 @@ func TestGetLpaHistory(t *testing.T) {
 					Events:                 tc.response.Events,
 					EventFilterData:        tc.response.Metadata.SourceTypes,
 					DonorFieldOrder:        donorFieldOrder,
+					LpaFieldOrder:          lpaFieldOrder,
 					TotalEvents:            tc.response.Total,
 					TotalFilteredEvents:    0,
 					Form: FilterLpaEventsForm{
@@ -333,6 +334,7 @@ func TestPostFiltersLpaHistory(t *testing.T) {
 		TotalEvents:            unfilteredResponse.Total,
 		TotalFilteredEvents:    filteredResponse.Total,
 		DonorFieldOrder:        donorFieldOrder,
+		LpaFieldOrder:          lpaFieldOrder,
 		IsFiltered:             true,
 		Form: FilterLpaEventsForm{
 			Types: []string{"Lpa", "Payment"},
