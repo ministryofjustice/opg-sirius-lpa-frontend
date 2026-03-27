@@ -53,7 +53,7 @@ func UpdateDecisions(client UpdateDecisionsClient, tmpl template.Template) Handl
 			XSRFToken:   ctx.XSRFToken,
 			CaseSummary: cs,
 			Form: formDecisionsDetails{
-				WhenTheLpaCanBeUsed:                         lpaStoreData.WhenTheLpaCanBeUsed,
+				WhenTheLpaCanBeUsed:                         lpaStoreData.WhenTheLpaCanBeUsed.StringForApi(),
 				LifeSustainingTreatmentOption:               lpaStoreData.LifeSustainingTreatmentOption,
 				HowAttorneysMakeDecisions:                   lpaStoreData.HowAttorneysMakeDecisions.String(),
 				HowAttorneysMakeDecisionsDetails:            lpaStoreData.HowAttorneysMakeDecisionsDetails,

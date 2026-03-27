@@ -177,19 +177,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"subtypeShortFormat":     sirius.SubtypeShortFormat,
 		"subtypeLongFormat":      subtypeLongFormat,
 		"subtypeColour":          subtypeColour,
-		"severanceRequiredLabel":            severanceRequiredLabel,
-		"whenTheLpaCanBeUsedLongForm": func(s string) string {
-			switch s {
-			case "when-has-capacity":
-				return "As soon as it's registered"
-			case "when-capacity-lost":
-				return "When capacity is lost"
-			case "":
-				return "Not specified"
-			default:
-				return "whenTheLpaCanBeUsed NOT RECOGNISED: " + s
-			}
-		},
+		"severanceRequiredLabel": severanceRequiredLabel,
 		"lifeSustainingTreatmentOptionLongForm": func(s string) string {
 			switch s {
 			case "option-a":
