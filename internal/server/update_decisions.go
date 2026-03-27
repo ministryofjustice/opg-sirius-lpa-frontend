@@ -2,8 +2,9 @@ package server
 
 import (
 	"fmt"
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"net/http"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -52,7 +53,7 @@ func UpdateDecisions(client UpdateDecisionsClient, tmpl template.Template) Handl
 			XSRFToken:   ctx.XSRFToken,
 			CaseSummary: cs,
 			Form: formDecisionsDetails{
-				WhenTheLpaCanBeUsed:                         lpaStoreData.WhenTheLpaCanBeUsed,
+				WhenTheLpaCanBeUsed:                         lpaStoreData.WhenTheLpaCanBeUsed.StringForApi(),
 				LifeSustainingTreatmentOption:               lpaStoreData.LifeSustainingTreatmentOption,
 				HowAttorneysMakeDecisions:                   lpaStoreData.HowAttorneysMakeDecisions,
 				HowAttorneysMakeDecisionsDetails:            lpaStoreData.HowAttorneysMakeDecisionsDetails,
