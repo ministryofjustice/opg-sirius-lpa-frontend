@@ -37,7 +37,7 @@
             {{ end }}
         {{ else }}
             <ul class="govuk-list">
-                {{ range $fieldName := .Context.DonorFieldOrder }}
+                {{ range $fieldName := .Context.EventFieldOrder }}
                     {{ $changeValues := index $.Changes $fieldName }}
                     {{ if ne $changeValues nil }}
                         {{ if ne (len $changeValues) 1 }}

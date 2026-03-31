@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/url"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -335,10 +336,23 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return false
 		},
-		"formatEventType":   formatEventType,
-		"eventTypeColor":    eventTypeColor,
-		"paymentSource":     shared.PaymentSourceToAction,
-		"complaintProperty": shared.TranslateComplaintProperty,
+		"isDateMap": func(value interface{}) bool {
+			dateMap, ok := value.(map[string]interface{})
+			if !ok {
+				return false
+			}
+			_, hasDate := dateMap["date"]
+			return hasDate
+		},
+		"isNumber": func(value interface{}) bool {
+			_, ok := value.(float64)
+			return ok
+		},
+		"formatEventType":           formatEventType,
+		"eventTypeColor":            eventTypeColor,
+		"paymentSource":             shared.PaymentSourceToAction,
+		"complaintProperty":         shared.TranslateComplaintProperty,
+		"translateNumberEventValue": translateNumberEventValue,
 		"eventWithContext": func(event sirius.LpaEvent, values ...any) LpaEventWithContext {
 			context := EventContext{}
 			for i := 0; i+1 < len(values); i += 2 {
@@ -375,9 +389,9 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 					if v, ok := values[i+1].(string); ok {
 						context.DonorID = v
 					}
-				case "donorFieldOrder":
+				case "eventFieldOrder":
 					if v, ok := values[i+1].([]string); ok {
-						context.DonorFieldOrder = v
+						context.EventFieldOrder = v
 					}
 				}
 			}
@@ -402,7 +416,7 @@ type EventContext struct {
 	ComplaintOrigins       []sirius.RefDataItem
 	CompensationTypes      []sirius.RefDataItem
 	DonorID                string
-	DonorFieldOrder        []string
+	EventFieldOrder        []string
 }
 
 type CaseTabData struct {
@@ -645,4 +659,53 @@ func formatEventType(eventType string) string {
 	formatted := strings.ReplaceAll(eventType, "_", " ")
 	// Title case each word
 	return cases.Title(language.English).String(strings.ToLower(formatted))
+}
+
+var numberEventValueTranslationMap = map[string]map[int]string{
+	"APPLICATIONTYPE": {
+		0: "Classic",
+		1: "Online",
+	},
+	"HAVEAPPLIEDFORFEEREMISSION": {
+		0: "No",
+		1: "No",
+		2: "Yes",
+	},
+	"ISATTORNEYAPPLYINGTOREGISTER": {
+		0: "Unknown",
+		1: "Donor",
+		2: "Attorney",
+	},
+	"PAYMENTBYCHEQUE": {
+		0: "Unknown",
+		1: "No",
+		2: "Yes",
+	},
+	"PAYMENTBYDEBITCREDITCARD": {
+		0: "Unknown",
+		1: "No",
+		2: "Yes",
+	},
+	"PAYMENTEXEMPTION": {
+		0: "Unknown",
+		1: "No",
+		2: "Yes",
+	},
+	"PAYMENTREMISSION": {
+		0: "Unknown",
+		1: "No",
+		2: "Yes",
+	},
+}
+
+func translateNumberEventValue(change string, value float64) string {
+	intValue := int(value)
+	changeType := strings.ToUpper(change)
+	if translations, exists := numberEventValueTranslationMap[changeType]; exists {
+		if translation, exists := translations[intValue]; exists {
+			return translation
+		}
+	}
+
+	return strconv.FormatFloat(value, 'f', -1, 64)
 }
