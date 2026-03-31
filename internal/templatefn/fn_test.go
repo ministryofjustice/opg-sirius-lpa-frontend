@@ -260,6 +260,38 @@ func TestInStringArray(t *testing.T) {
 	assert.Equal(t, false, val)
 }
 
+func TestIsDateMap(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["isDateMap"].(func(interface{}) bool)
+
+	var val bool
+
+	val = fn("123")
+	assert.Equal(t, false, val)
+
+	val = fn(map[string]interface{}{"key": "value"})
+	assert.Equal(t, false, val)
+
+	val = fn(map[string]interface{}{"date": "value"})
+	assert.Equal(t, true, val)
+}
+
+func TestIsNumber(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["isNumber"].(func(interface{}) bool)
+
+	var val bool
+
+	val = fn("123")
+	assert.Equal(t, false, val)
+
+	val = fn(map[string]string{"key": "value"})
+	assert.Equal(t, false, val)
+
+	val = fn(3.0)
+	assert.Equal(t, true, val)
+}
+
 func TestSirius(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["sirius"].(func(string) string)
@@ -724,8 +756,21 @@ func TestComplaintProperty(t *testing.T) {
 
 	for input, expected := range tests {
 		result := fn(input)
-		assert.Equal(t, expected, result, "TranslateComplaintProperty(%q) should return %q", input, expected)
+		assert.Equal(t, expected, result, "translateComplaintProperty(%q) should return %q", input, expected)
 	}
+}
+
+func TestTranslateNumberEventValue(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["translateNumberEventValue"].(func(string, float64) string)
+
+	var result string
+
+	result = fn("applicationtype", 0)
+	assert.Equal(t, "Classic", result)
+
+	result = fn("123", 5.3)
+	assert.Equal(t, "5.3", result)
 }
 
 func TestEventWithContext(t *testing.T) {
@@ -740,7 +785,7 @@ func TestEventWithContext(t *testing.T) {
 	complainantCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	complaintOrigins := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	compensationTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
-	donorFieldOrder := []string{"test1", "test2", "test3"}
+	eventFieldOrder := []string{"test1", "test2", "test3"}
 
 	expected := LpaEventWithContext{
 		LpaEvent: event,
@@ -752,7 +797,7 @@ func TestEventWithContext(t *testing.T) {
 			ComplainantCategories:  complainantCategories,
 			ComplaintOrigins:       complaintOrigins,
 			CompensationTypes:      compensationTypes,
-			DonorFieldOrder:        donorFieldOrder,
+			EventFieldOrder:        eventFieldOrder,
 		},
 	}
 	result := fn(
@@ -764,7 +809,7 @@ func TestEventWithContext(t *testing.T) {
 		"complainantCategories", complainantCategories,
 		"complaintOrigins", complaintOrigins,
 		"compensationTypes", compensationTypes,
-		"donorFieldOrder", donorFieldOrder,
+		"eventFieldOrder", eventFieldOrder,
 	)
 	assert.Equal(t, expected, result)
 }
