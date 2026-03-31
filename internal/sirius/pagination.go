@@ -5,4 +5,5 @@ type Pagination struct {
 	CurrentPage int
 	TotalPages  int
 	PageSize    int
+	FullCount   int
 }
