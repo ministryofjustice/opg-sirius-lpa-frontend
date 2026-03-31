@@ -117,6 +117,7 @@ func TestSearch(t *testing.T) {
 				CurrentPage: 1,
 				TotalPages:  1,
 				PageSize:    PageLimit,
+				FullCount:   1,
 			},
 		},
 		{
@@ -160,6 +161,7 @@ func TestSearch(t *testing.T) {
 				CurrentPage: 1,
 				TotalPages:  0,
 				PageSize:    PageLimit,
+				FullCount:   0,
 			},
 		},
 	}
@@ -194,18 +196,18 @@ func (m *mockSearchHttpClient) Do(req *http.Request) (*http.Response, error) {
 	return args.Get(0).(*http.Response), args.Error(1)
 }
 
-func TestSearchShowsAggregateTotalItems(t *testing.T) {
+func TestSearchShowsFullCount(t *testing.T) {
 
 	mockClient := &mockSearchHttpClient{}
 	var searchResultsBody bytes.Buffer
 	aggregations := map[string]int{
-		"Donor":                3,
-		"Attorney":             2,
-		"Certificate Provider": 2,
+		"Donor":                4000,
+		"Attorney":             4000,
+		"Certificate Provider": 4000,
 	}
 	searchResponse := SearchResponse{
 		Total: SearchTotal{
-			Count: 7,
+			Count: 10000,
 		},
 		Aggregations: Aggregations{
 			PersonType: aggregations,
@@ -225,10 +227,11 @@ func TestSearchShowsAggregateTotalItems(t *testing.T) {
 	results, pagination, err := client.Search(Context{Context: context.Background()}, "searchTerm", 1, []string{})
 
 	expectedPagination := Pagination{
-		TotalItems:  7,
+		TotalItems:  10000,
 		CurrentPage: 1,
-		TotalPages:  1,
+		TotalPages:  667,
 		PageSize:    15,
+		FullCount:   12000,
 	}
 	assert.Equal(t, pagination, &expectedPagination)
 	assert.Equal(t, results, searchResponse)

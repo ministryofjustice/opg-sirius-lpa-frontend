@@ -170,5 +170,27 @@ describe("Search pagination - Next and Previous link hrefs", () => {
       cy.get(".govuk-pagination__next").should("not.exist");
       cy.get(".govuk-pagination__prev").should("not.exist");
     });
+
+    it("should show results limit when search returns over 10,000 results", () => {
+      cy.addMock("/lpa-api/v1/search/persons", "POST", {
+        status: 200,
+        body: {
+          aggregations: { personType: { Donor: 4000, TrustCorporation: 4000, Attorney: 4000 } },
+          results: Array.from({ length: 12000 }, (_, i) => ({
+            id: i + 1,
+            uId: `7000-${i + 1}`,
+            personType: "Donor",
+            firstname: "Test",
+            surname: `Person${i}`,
+            cases: [],
+          })),
+          total: { count: 10000 },
+        },
+      });
+
+      cy.visit("/search?term=test");
+      
+      cy.get(".moj-pagination__results").eq(1).should("contain.text", "Showing 1 to 15 of 12000 results (limited to 10000 results)");
+    })
   });
 });

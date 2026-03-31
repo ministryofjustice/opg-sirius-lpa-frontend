@@ -49,5 +49,9 @@
         {{ template "pagination-inner" . }}
     </nav>
 
-    <p class="moj-pagination__results">Showing <b>{{ .Start }}</b> to <b>{{ .End }}</b> of <b>{{ .TotalItems }}</b> results</p>
+    {{ if ge .TotalItems 2 }}
+        <p class="moj-pagination__results">Showing <b>{{ .Start }}</b> to <b>{{ .End }}</b> of <b>{{ .FullCount }}</b> results (limited to <b>{{ .TotalItems }}</b> results)</p>
+    {{ else }}
+        <p class="moj-pagination__results">Showing <b>{{ .Start }}</b> to <b>{{ .End }}</b> of <b>{{ .TotalItems }}</b> results</p>
+    {{ end }}
 {{ end }}
