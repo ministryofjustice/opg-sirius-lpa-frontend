@@ -411,3 +411,8 @@ $govuk-assets-path: "../assets/";
   border-radius: 5px;
   color: #0b0c0c;
 }
+
+.app-timeline-event p:last-of-type,
+.app-timeline-event ul:last-of-type {
+  margin-bottom: 5px !important;
+}

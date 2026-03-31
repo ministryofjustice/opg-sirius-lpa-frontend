@@ -45,20 +45,20 @@
                                     <div class="govuk-form-group">
                                         <fieldset class="govuk-fieldset">
                                             <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                                                Sort By
+                                                Sort by
                                             </legend>
                                             <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
                                                 <div class="govuk-radios__item">
                                                     <input class="govuk-radios__input" id="f-desc"
                                                             name="sort" type="radio" value="desc" data-module="app-auto-apply-filter"
                                                             {{if eq .Form.Sort "desc"}}checked{{end}}>
-                                                    <label class="govuk-label govuk-radios__label" for="f-desc">Descending</label>
+                                                    <label class="govuk-label govuk-radios__label" for="f-desc">Newest first</label>
                                                 </div>
                                                 <div class="govuk-radios__item">
                                                     <input class="govuk-radios__input" id="f-asc"
                                                             name="sort" type="radio" value="asc" data-module="app-auto-apply-filter"
                                                             {{if eq .Form.Sort "asc"}}checked{{end}}>
-                                                    <label class="govuk-label govuk-radios__label" for="f-asc">Ascending</label>
+                                                    <label class="govuk-label govuk-radios__label" for="f-asc">Oldest first</label>
                                                 </div>
                                             </div>
                                         </fieldset>
@@ -123,7 +123,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="govuk-body">
+                                                <div class="govuk-body govuk-!-margin-bottom-1 app-timeline-event">
                                                     {{ if eq .SourceType.Key "Payment" }}
                                                         {{ if eq .Entity.source "FEE_REDUCTION"}}
                                                             {{ if eq .Type "INS" }}
