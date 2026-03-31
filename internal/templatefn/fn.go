@@ -661,34 +661,51 @@ func formatEventType(eventType string) string {
 	return cases.Title(language.English).String(strings.ToLower(formatted))
 }
 
-var numberEventValueTranslationMap = map[string]string{
-	"APPLICATIONTYPE0":              "Classic",
-	"APPLICATIONTYPE1":              "Online",
-	"HAVEAPPLIEDFORFEEREMISSION0":   "No",
-	"HAVEAPPLIEDFORFEEREMISSION1":   "No",
-	"HAVEAPPLIEDFORFEEREMISSION2":   "Yes",
-	"ISATTORNEYAPPLYINGTOREGISTER0": "Unknown",
-	"ISATTORNEYAPPLYINGTOREGISTER1": "Donor",
-	"ISATTORNEYAPPLYINGTOREGISTER2": "Attorney",
-	"PAYMENTBYCHEQUE0":              "Unknown",
-	"PAYMENTBYCHEQUE1":              "No",
-	"PAYMENTBYCHEQUE2":              "Yes",
-	"PAYMENTBYDEBITCREDITCARD0":     "Unknown",
-	"PAYMENTBYDEBITCREDITCARD1":     "No",
-	"PAYMENTBYDEBITCREDITCARD2":     "Yes",
-	"PAYMENTEXEMPTION0":             "Unknown",
-	"PAYMENTEXEMPTION1":             "No",
-	"PAYMENTEXEMPTION2":             "Yes",
-	"PAYMENTREMISSION0":             "Unknown",
-	"PAYMENTREMISSION1":             "No",
-	"PAYMENTREMISSION2":             "Yes",
+var numberEventValueTranslationMap = map[string]map[int]string{
+	"APPLICATIONTYPE": {
+		0: "Classic",
+		1: "Online",
+	},
+	"HAVEAPPLIEDFORFEEREMISSION": {
+		0: "No",
+		1: "No",
+		2: "Yes",
+	},
+	"ISATTORNEYAPPLYINGTOREGISTER": {
+		0: "Unknown",
+		1: "Donor",
+		2: "Attorney",
+	},
+	"PAYMENTBYCHEQUE": {
+		0: "Unknown",
+		1: "No",
+		2: "Yes",
+	},
+	"PAYMENTBYDEBITCREDITCARD": {
+		0: "Unknown",
+		1: "No",
+		2: "Yes",
+	},
+	"PAYMENTEXEMPTION": {
+		0: "Unknown",
+		1: "No",
+		2: "Yes",
+	},
+	"PAYMENTREMISSION": {
+		0: "Unknown",
+		1: "No",
+		2: "Yes",
+	},
 }
 
 func translateNumberEventValue(change string, value float64) string {
-	valueStr := strconv.FormatFloat(value, 'f', -1, 64)
-	if val, ok := numberEventValueTranslationMap[strings.ToUpper(change)+valueStr]; ok {
-		return val
+	intValue := int(value)
+	changeType := strings.ToUpper(change)
+	if translations, exists := numberEventValueTranslationMap[changeType]; exists {
+		if translation, exists := translations[intValue]; exists {
+			return translation
+		}
 	}
 
-	return valueStr
+	return strconv.FormatFloat(value, 'f', -1, 64)
 }
