@@ -30,6 +30,7 @@ type getLpaHistory struct {
 	CompensationTypes      []sirius.RefDataItem
 	DonorFieldOrder        []string
 	LpaFieldOrder          []string
+	EpaFieldOrder          []string
 }
 
 type FilterLpaEventsForm struct {
@@ -81,6 +82,31 @@ var lpaFieldOrder = []string{
 	"withdrawnDate",
 }
 
+var epaFieldOrder = []string{
+	"caseAttorneyJointly",
+	"caseAttorneySingular",
+	"caseAttorneyJointlyAndSeverally",
+	"epaDonorSignatureDate",
+	"epaDonorNoticeGivenDate",
+	"paymentByCheque",
+	"paymentExemption",
+	"paymentDate",
+	"donorHasOtherEpas",
+	"otherEpaInfo",
+	"assignee",
+	"cancellationDate",
+	"dispatchDate",
+	"dueDate",
+	"filingDate",
+	"invalidDate",
+	"paymentDate",
+	"receiptDate",
+	"registrationDate",
+	"rejectedDate",
+	"revokedDate",
+	"withdrawnDate",
+}
+
 func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		donorId := r.PathValue("donorId")
@@ -98,6 +124,7 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 			IsFiltered:      false,
 			DonorFieldOrder: donorFieldOrder,
 			LpaFieldOrder:   lpaFieldOrder,
+			EpaFieldOrder:   epaFieldOrder,
 		}
 
 		group.Go(func() error {

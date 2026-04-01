@@ -1,0 +1,54 @@
+{{ define "partial-event-epa" }}
+    {{ if eq .Type "INS" }}
+        EPA created
+    {{ else if eq .Type "UPD" }}
+        <ul class="govuk-list">
+            {{ range $fieldName := .Context.EventFieldOrder }}
+                {{ $changeValues := index $.Changes $fieldName }}
+                {{ if ne $changeValues nil }}
+                    {{ if ne (len $changeValues) 1 }}
+                        {{ $oldValue := index $changeValues 0 }}
+                        {{ $newValue := index $changeValues 1 }}
+                        {{ if isDateMap $oldValue }}
+                            <li>
+                                {{ camelcaseToSentence $fieldName }}: 
+                                {{ parseAndFormatDate $oldValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }}
+                                changed to: 
+                                {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }}
+                            </li>
+                        {{ else if isNumber $oldValue}}
+                            <li>
+                                {{ camelcaseToSentence $fieldName }}: 
+                                {{ translateNumberEventValue $fieldName $oldValue }} changed to: {{ translateNumberEventValue $fieldName $newValue }}
+                            </li>
+                        {{ else if eq $fieldName "assignee" }}
+                            <li>
+                                Assignee: 
+                                {{ index $oldValue "details" "displayName" }} changed to: {{ index $newValue "details" "displayName" }}
+                            </li>
+                        {{ else }}
+                            <li>
+                                {{ camelcaseToSentence $fieldName }}: 
+                                {{ $oldValue }} changed to: {{ $newValue }}
+                            </li>
+                        {{ end }}
+                    {{ else }}
+                        {{ $newValue := index $changeValues "1" }}
+                        {{ if isDateMap $newValue }}
+                            <li>
+                                {{ camelcaseToSentence $fieldName }}: 
+                                {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }}
+                            </li>
+                        {{ else if isNumber $newValue}}
+                            <li>{{ camelcaseToSentence $fieldName }}: {{ translateNumberEventValue $fieldName $newValue }}</li>
+                        {{ else if eq $fieldName "assignee" }}
+                            <li>Assignee: {{ index $newValue "details" "displayName" }}</li>
+                        {{ else }}
+                            <li>{{ camelcaseToSentence $fieldName }}: {{ $newValue }}</li>
+                        {{ end }}
+                    {{ end }}
+                {{ end }}
+            {{ end }}
+        </ul>
+    {{ end }}
+{{ end }}
