@@ -718,4 +718,84 @@ describe("Show correct event content", () => {
       .eq(0)
       .should("contain.text", "Test note - This is a test note");
   });
+
+  it("can view LPA added event", () => {
+    mockEventHistory({
+      sourceType: "Lpa",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseItem\PowerOfAttorney`,
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item").eq(0).should("contain.text", "LPA created");
+  });
+
+  it("can view LPA updated event", () => {
+    mockEventHistory({
+      sourceType: "Lpa",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseItem\PowerOfAttorney`,
+      },
+      changeSet: {
+        registrationDate: [
+          { date: "2006-12-01 00:00:00.000000" },
+          { date: "2006-12-02 00:00:00.000000" },
+        ],
+        paymentExemption: [1, 2],
+        assignee: { 1: { details: { displayName: "Test Assignee" } } },
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item").then(($items) => {
+      const text = Cypress.$($items[0]).text().replaceAll(/\s+/g, " ").trim();
+
+      expect(text).to.include("Payment exemption: No changed to: Yes");
+      expect(text).to.include(
+        "Registration date: 01/12/2006 changed to: 02/12/2006",
+      );
+      expect(text).to.include("Assignee: Test Assignee");
+    });
+  });
+
+  it("can view EPA added event", () => {
+    mockEventHistory({
+      sourceType: "Epa",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseItem\PowerOfAttorney\Epa`,
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item").eq(0).should("contain.text", "EPA created");
+  });
+
+  it("can view EPA updated event", () => {
+    mockEventHistory({
+      sourceType: "Epa",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseItem\PowerOfAttorney\Epa`,
+      },
+      changeSet: {
+        epaDonorSignatureDate: [
+          { date: "2006-12-01 00:00:00.000000" },
+          { date: "2006-12-02 00:00:00.000000" },
+        ],
+        paymentExemption: [1, 2],
+        otherEpaInfo: { 1: "Other info" },
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item").then(($items) => {
+      const text = Cypress.$($items[0]).text().replaceAll(/\s+/g, " ").trim();
+
+      expect(text).to.include("Payment exemption: No changed to: Yes");
+      expect(text).to.include(
+        "Epa donor signature date: 01/12/2006 changed to: 02/12/2006",
+      );
+      expect(text).to.include("Other epa info: Other info");
+    });
+  });
 });

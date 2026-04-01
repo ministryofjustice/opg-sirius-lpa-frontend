@@ -1,6 +1,6 @@
-{{ define "partial-event-lpa" }}
+{{ define "partial-event-epa" }}
     {{ if eq .Type "INS" }}
-        LPA created
+        EPA created
     {{ else if eq .Type "UPD" }}
         <ul class="govuk-list">
             {{ range $fieldName := .Context.EventFieldOrder }}
