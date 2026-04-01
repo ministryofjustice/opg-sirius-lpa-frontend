@@ -716,7 +716,7 @@ describe("View LPA history timeline", () => {
     cy.contains("Apply filters").should("not.be.visible");
 
     cy.contains("(showing all 4 items)");
-    cy.contains("Ascending").click();
+    cy.contains("Oldest first").click();
     cy.contains("Warning (2)").click();
 
     cy.contains("(showing 2 of 4 items)");
