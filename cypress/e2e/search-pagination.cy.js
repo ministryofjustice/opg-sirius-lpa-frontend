@@ -175,7 +175,9 @@ describe("Search pagination - Next and Previous link hrefs", () => {
       cy.addMock("/lpa-api/v1/search/persons", "POST", {
         status: 200,
         body: {
-          aggregations: { personType: { Donor: 4000, TrustCorporation: 4000, Attorney: 4000 } },
+          aggregations: {
+            personType: { Donor: 4000, TrustCorporation: 4000, Attorney: 4000 },
+          },
           results: Array.from({ length: 12000 }, (_, i) => ({
             id: i + 1,
             uId: `7000-${i + 1}`,
@@ -189,8 +191,13 @@ describe("Search pagination - Next and Previous link hrefs", () => {
       });
 
       cy.visit("/search?term=test");
-      
-      cy.get(".moj-pagination__results").eq(1).should("contain.text", "Showing 1 to 15 of 12000 results (limited to 10000 results)");
-    })
+
+      cy.get(".moj-pagination__results")
+        .eq(1)
+        .should(
+          "contain.text",
+          "Showing 1 to 15 of 12000 results (limited to 10000 results)",
+        );
+    });
   });
 });
