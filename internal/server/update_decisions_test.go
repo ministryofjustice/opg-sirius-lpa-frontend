@@ -1,11 +1,12 @@
 package server
 
 import (
-	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
@@ -156,8 +157,8 @@ var caseSummaryWithMultipleAttorneys = sirius.CaseSummary{
 					SignedAt:        "2024-11-18T19:22:11Z",
 				},
 			},
-			HowAttorneysMakeDecisions:            "jointly",
-			HowReplacementAttorneysMakeDecisions: "",
+			HowAttorneysMakeDecisions:            shared.HowAttorneysMakeDecisionsJointly,
+			HowReplacementAttorneysMakeDecisions: shared.HowAttorneysMakeDecisionsEmpty,
 		},
 	},
 }
