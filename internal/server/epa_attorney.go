@@ -23,6 +23,7 @@ type epaAttorneyData struct {
 	RelationshipToDonors []sirius.RefDataItem
 	Title                string
 	IsEditing            bool
+	IsCorrespondent      bool
 }
 
 func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
@@ -66,7 +67,14 @@ func EpaAttorney(client EpaAttorneyClient, tmpl template.Template) Handler {
 			}
 
 			data.Attorney = attorney
-			data.Title = "Edit attorney"
+			isCorrespondent := r.FormValue("correspondent") != ""
+
+			if isCorrespondent {
+				data.Title = "Edit correspondent"
+			} else {
+				data.Title = "Edit attorney"
+			}
+			data.IsCorrespondent = isCorrespondent
 		}
 
 		if r.Method == http.MethodPost {

@@ -63,14 +63,18 @@
             <th scope="row" class="govuk-table__header">Airmail required</th>
             <td class="govuk-table__cell">{{ boolToYesNo .IsAirmailRequired }}</td>
         </tr>
+        {{ if .RelationshipToDonor }}
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">Relationship to donor</th>
             <td class="govuk-table__cell">{{ .RelationshipToDonor }}</td>
         </tr>
+        {{ end }}
+        {{ if .IsAttorneyActive}}
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">Is this attorney active?</th>
             <td class="govuk-table__cell">{{ boolToYesNo .IsAttorneyActive }}</td>
         </tr>
+        {{ end }}
         </tbody>
     </table>
 {{ end }}

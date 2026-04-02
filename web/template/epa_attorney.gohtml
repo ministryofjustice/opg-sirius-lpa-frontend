@@ -37,12 +37,14 @@
         (item "false" "No")
         ) }}
 
-        {{ template "select" (select "relationshipToDonor" "Relationship to donor" .Attorney.RelationshipToDonor .Error.Field.relationshipToDonor (options .RelationshipToDonors)) }}
+        {{ if eq .IsCorrespondent false}}
+          {{ template "select" (select "relationshipToDonor" "Relationship to donor" .Attorney.RelationshipToDonor .Error.Field.relationshipToDonor (options .RelationshipToDonors)) }}
 
-        {{ template "radios" (radios "isAttorneyActive" "Is this attorney active" (stringifyBool .Attorney.IsAttorneyApplyingToRegister) .Error.Field.isAttorneyApplyingToRegister
-        (item "true" "Yes")
-        (item "false" "No")
-        ) }}
+          {{ template "radios" (radios "isAttorneyActive" "Is this attorney active" (stringifyBool .Attorney.IsAttorneyApplyingToRegister) .Error.Field.isAttorneyApplyingToRegister
+          (item "true" "Yes")
+          (item "false" "No")
+          ) }}
+        {{ end }}
 
         <div class="govuk-button-group govuk-!-padding-top-5">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
