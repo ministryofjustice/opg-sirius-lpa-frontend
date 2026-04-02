@@ -10,7 +10,6 @@ import (
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestSearch(t *testing.T) {
@@ -180,13 +179,4 @@ func TestSearch(t *testing.T) {
 			}))
 		})
 	}
-}
-
-type mockSearchHttpClient struct {
-	mock.Mock
-}
-
-func (m *mockSearchHttpClient) Do(req *http.Request) (*http.Response, error) {
-	args := m.Called(req)
-	return args.Get(0).(*http.Response), args.Error(1)
 }
