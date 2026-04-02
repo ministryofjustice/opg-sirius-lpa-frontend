@@ -696,7 +696,7 @@ describe("View LPA history timeline", () => {
       .first()
       .within(() => {
         cy.contains("Salutation: Mr changed to: Mrs");
-        cy.contains("Firstname: Testing changed to: Test");
+        cy.contains("First name: Testing changed to: Test");
         cy.contains("Surname: Casing changed to: Case");
         cy.contains("Date of birth: 09/05/1999");
         cy.contains("Email: test@test.com changed to: test@testcase.com");

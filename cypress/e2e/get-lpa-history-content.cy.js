@@ -791,6 +791,108 @@ describe("Show correct event content", () => {
       .should("contain.text", "Test note - This is a test note");
   });
 
+  it("can view certificate provider added event", () => {
+    mockEventHistory({
+      sourceType: "CertificateProvider",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\CertificateProvider`,
+        firstname: "Jane",
+        surname: "Certifier",
+        companyName: "Cert Services Ltd",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Jane Certifier")
+      .should("contain.text", "Cert Services Ltd");
+  });
+
+  it("can view certificate provider updated event with prior values", () => {
+    mockEventHistory({
+      sourceType: "CertificateProvider",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\CertificateProvider`,
+        firstname: "Jane",
+        surname: "Certifier",
+        companyName: "Cert Services Ltd",
+      },
+      changeSet: {
+        dob: [
+          { date: "1980-05-15 00:00:00.000000" },
+          { date: "1980-05-16 00:00:00.000000" },
+        ],
+        systemStatus: [false, true],
+        CorrespondenceByEmail: [false, true],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should(
+        "contain.text",
+        "Date of birth: 15/05/1980 changed to: 16/05/1980",
+      )
+      .should("contain.text", "Changed from inactive to: active")
+      .should(
+        "contain.text",
+        "Correspondence by email: false changed to: true",
+      );
+  });
+
+  it("can view notified person added event", () => {
+    mockEventHistory({
+      sourceType: "NotifiedPerson",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\NotifiedPerson`,
+        firstname: "John",
+        surname: "Notified",
+        companyName: "Notifications Inc",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "John Notified")
+      .should("contain.text", "Notifications Inc");
+  });
+
+  it("can view notified person updated event with prior values", () => {
+    mockEventHistory({
+      sourceType: "NotifiedPerson",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\NotifiedPerson`,
+        firstname: "John",
+        surname: "Notified",
+        companyName: "Notifications Inc",
+      },
+      changeSet: {
+        noticeGivenDate: [
+          { date: "2024-01-10 00:00:00.000000" },
+          { date: "2024-01-20 00:00:00.000000" },
+        ],
+        systemStatus: [true, false],
+        CorrespondenceByPhone: [true, false],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should(
+        "contain.text",
+        "Date notice given: 10/01/2024 changed to: 20/01/2024",
+      )
+      .should("contain.text", "Changed from active to: inactive")
+      .should(
+        "contain.text",
+        "Correspondence by phone: true changed to: false",
+      );
+  });
+
   it("can view LPA added event", () => {
     mockEventHistory({
       sourceType: "Lpa",
