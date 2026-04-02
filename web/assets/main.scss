@@ -46,6 +46,11 @@ $govuk-assets-path: "../assets/";
   max-width: 100%;
 }
 
+.app-\!-no-min-max-width {
+  min-width: unset;
+  max-width: unset;
+}
+
 .app-\!-table-row__no-border {
   border-bottom: none;
 }
@@ -98,6 +103,11 @@ $govuk-assets-path: "../assets/";
 .app-align-items-center {
   display: flex;
   align-items: center;
+}
+
+.app-align-items-end {
+  display: flex;
+  align-items: flex-end;
 }
 
 .app-\!-moj-header__link--service-name {
@@ -153,6 +163,10 @@ $govuk-assets-path: "../assets/";
 
 .app-\!-flex {
   display: flex;
+}
+
+.app-\!-gap-2 {
+  gap: 10px;
 }
 
 .app-colour-text-lighter {
@@ -291,6 +305,10 @@ $govuk-assets-path: "../assets/";
   color: #ffffff;
 }
 
+.background-govuk-white {
+  background: #ffffff;
+}
+
 .app-progress-indicator-icon[data-progress-indicator="not-started"] {
   [data-svg-elt="background"] {
     stroke: govuk-colour("mid-grey");
@@ -382,4 +400,19 @@ $govuk-assets-path: "../assets/";
     border-right: 1px solid $govuk-border-colour;
     min-height: calc(100vh - 40px);
   }
+}
+
+.app-timeline-container {
+  background: #d9e2ee;
+  border: 1px solid #00326e;
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  border-radius: 5px;
+  color: #0b0c0c;
+}
+
+.app-timeline-event p:last-of-type,
+.app-timeline-event ul:last-of-type {
+  margin-bottom: 5px !important;
 }
