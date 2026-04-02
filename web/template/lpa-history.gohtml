@@ -22,7 +22,8 @@
                     <div class="moj-filter__options">
                         <form class="form" method="POST">
                             <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
-                            <button type="submit" class="govuk-button" data-module="govuk-button" data-test-id="submit-button">
+                            <button type="submit" class="govuk-button" data-module="govuk-button"
+                                    data-test-id="submit-button">
                                 Apply filters
                             </button>
                             <div class="govuk-form-group">
@@ -33,12 +34,15 @@
                                     <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
                                         <div class="govuk-radios__item">
                                             <input class="govuk-radios__input" id="f-desc"
-                                                   name="sort" type="radio" value="desc" {{if eq .Form.Sort "desc"}}checked{{end}}>
-                                            <label class="govuk-label govuk-radios__label" for="f-desc">Descending</label>
+                                                   name="sort" type="radio" value="desc"
+                                                   {{if eq .Form.Sort "desc"}}checked{{end}}>
+                                            <label class="govuk-label govuk-radios__label"
+                                                   for="f-desc">Descending</label>
                                         </div>
                                         <div class="govuk-radios__item">
                                             <input class="govuk-radios__input" id="f-asc"
-                                                   name="sort" type="radio" value="asc" {{if eq .Form.Sort "asc"}}checked{{end}}>
+                                                   name="sort" type="radio" value="asc"
+                                                   {{if eq .Form.Sort "asc"}}checked{{end}}>
                                             <label class="govuk-label govuk-radios__label" for="f-asc">Ascending</label>
                                         </div>
                                     </div>
@@ -49,12 +53,15 @@
                                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
                                         Type
                                     </legend>
-                                    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                    <div class="govuk-checkboxes govuk-checkboxes--small"
+                                         data-module="govuk-checkboxes">
                                         {{ range .EventFilterData }}
                                             <div class="govuk-checkboxes__item">
                                                 <input class="govuk-checkboxes__input" id="f-{{ .SourceType.Key }}"
-                                                       name="type" type="checkbox" value="{{ .SourceType.Key }}" {{ if contains $.Form.Types .SourceType.Key }}checked{{ end }}>
-                                                <label class="govuk-label govuk-checkboxes__label" for="f-{{ .SourceType.Key }}">
+                                                       name="type" type="checkbox" value="{{ .SourceType.Key }}"
+                                                       {{ if contains $.Form.Types .SourceType.Key }}checked{{ end }}>
+                                                <label class="govuk-label govuk-checkboxes__label"
+                                                       for="f-{{ .SourceType.Key }}">
                                                     {{ .SourceType.Translation }} ({{ .Total }})
                                                 </label>
                                             </div>
@@ -76,8 +83,12 @@
                         <div class="govuk-summary-card govuk-!-margin-bottom-0">
                             <div class="govuk-summary-card__title-wrapper app-summary-card--padding">
                                 {{ if eq .SourceType.Translation "Warning" }}
-                                    <svg class="moj-alert--warning moj-alert__icon govuk-!-padding-right-1" role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" height="30" width="30">
-                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M15 2.44922L28.75 26.1992H1.25L15 2.44922ZM13.5107 9.49579H16.4697L16.2431 17.7678H13.7461L13.5107 9.49579ZM13.1299 21.82C13.1299 21.5661 13.1787 21.3285 13.2764 21.1071C13.374 20.8793 13.5075 20.6807 13.6768 20.5114C13.8525 20.3421 14.0544 20.2087 14.2822 20.111C14.5101 20.0134 14.7542 19.9645 15.0146 19.9645C15.2686 19.9645 15.5062 20.0134 15.7275 20.111C15.9554 20.2087 16.154 20.3421 16.3232 20.5114C16.4925 20.6807 16.626 20.8793 16.7236 21.1071C16.8213 21.3285 16.8701 21.5661 16.8701 21.82C16.8701 22.0804 16.8213 22.3246 16.7236 22.5524C16.626 22.7803 16.4925 22.9789 16.3232 23.1481C16.154 23.3174 15.9554 23.4509 15.7275 23.5485C15.5062 23.6462 15.2686 23.695 15.0146 23.695C14.7542 23.695 14.5101 23.6462 14.2822 23.5485C14.0544 23.4509 13.8525 23.3174 13.6768 23.1481C13.5075 22.9789 13.374 22.7803 13.2764 22.5524C13.1787 22.3246 13.1299 22.0804 13.1299 21.82Z" fill="currentColor" />
+                                    <svg class="moj-alert--warning moj-alert__icon govuk-!-padding-right-1"
+                                         role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg"
+                                         viewBox="0 0 30 30" height="30" width="30">
+                                        <path fill-rule="evenodd" clip-rule="evenodd"
+                                              d="M15 2.44922L28.75 26.1992H1.25L15 2.44922ZM13.5107 9.49579H16.4697L16.2431 17.7678H13.7461L13.5107 9.49579ZM13.1299 21.82C13.1299 21.5661 13.1787 21.3285 13.2764 21.1071C13.374 20.8793 13.5075 20.6807 13.6768 20.5114C13.8525 20.3421 14.0544 20.2087 14.2822 20.111C14.5101 20.0134 14.7542 19.9645 15.0146 19.9645C15.2686 19.9645 15.5062 20.0134 15.7275 20.111C15.9554 20.2087 16.154 20.3421 16.3232 20.5114C16.4925 20.6807 16.626 20.8793 16.7236 21.1071C16.8213 21.3285 16.8701 21.5661 16.8701 21.82C16.8701 22.0804 16.8213 22.3246 16.7236 22.5524C16.626 22.7803 16.4925 22.9789 16.3232 23.1481C16.154 23.3174 15.9554 23.4509 15.7275 23.5485C15.5062 23.6462 15.2686 23.695 15.0146 23.695C14.7542 23.695 14.5101 23.6462 14.2822 23.5485C14.0544 23.4509 13.8525 23.3174 13.6768 23.1481C13.5075 22.9789 13.374 22.7803 13.2764 22.5524C13.1787 22.3246 13.1299 22.0804 13.1299 21.82Z"
+                                              fill="currentColor"/>
                                     </svg>
                                 {{ end }}
                                 <h1 class="govuk-summary-card__title">
@@ -138,7 +149,12 @@
                                                 {{ template "partial-event-task" . }}
                                             {{ else if eq .SourceType.Key "PhoneNumber"}}
                                                 {{ template "partial-event-phone" . }}
-                                            {{ else if or (eq .SourceType.Key "Attorney") (eq .SourceType.Key "ReplacementAttorney") (eq .SourceType.Key "Correspondent") (eq .SourceType.Key "TrustCorporation") }}
+                                            {{ else if or (eq .SourceType.Key "Attorney")
+                                            (eq .SourceType.Key "ReplacementAttorney")
+                                            (eq .SourceType.Key "Correspondent")
+                                            (eq .SourceType.Key "TrustCorporation")
+                                            (eq .SourceType.Key "CertificateProvider")
+                                            (eq .SourceType.Key "NotifiedPerson")}}
                                                 {{ template "partial-event-person" . }}
                                             {{ else if eq .SourceType.Key "Note"}}
                                                 {{ template "partial-event-note" (eventWithContext . "donorID" $.DonorID) }}
@@ -179,7 +195,8 @@
                                                 {{ if .User.Deleted }}
                                                     deleted user
                                                 {{ else }}
-                                                    <a class="govuk-link" href="mailto:{{ .User.Email}}">{{ .User.DisplayName }}</a>
+                                                    <a class="govuk-link"
+                                                       href="mailto:{{ .User.Email}}">{{ .User.DisplayName }}</a>
                                                     {{ if gt (len .User.Teams) 0 }}({{ (index .User.Teams 0).DisplayName }}){{ end }}
                                                     {{ if .User.PhoneNumber }} &ndash; {{ .User.PhoneNumber }}{{ end }}
                                                 {{ end }}
