@@ -170,5 +170,22 @@ describe("Search pagination - Next and Previous link hrefs", () => {
       cy.get(".govuk-pagination__next").should("not.exist");
       cy.get(".govuk-pagination__prev").should("not.exist");
     });
+
+    it("shows the total count when the search returns more than 10000 results and filters are applied", () => {
+      cy.addMock("/lpa-api/v1/search/persons", "POST", {
+        status: 200,
+        body: {
+          aggregations: {
+            personType: { Donor: 12000, Attorney: 100, TrustCorporation: 50 },
+          },
+          results: [],
+          total: { count: 12150 },
+        },
+      });
+
+      cy.visit("/search?term=test&person-type=Donor&person-type=Attorney");
+
+      cy.contains("Showing 1 to 15 of 12100 results");
+    });
   });
 });
