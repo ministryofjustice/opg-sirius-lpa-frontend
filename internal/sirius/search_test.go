@@ -1,11 +1,8 @@
 package sirius
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"testing"
 
@@ -117,7 +114,6 @@ func TestSearch(t *testing.T) {
 				CurrentPage: 1,
 				TotalPages:  1,
 				PageSize:    PageLimit,
-				FullCount:   1,
 			},
 		},
 		{
@@ -161,7 +157,6 @@ func TestSearch(t *testing.T) {
 				CurrentPage: 1,
 				TotalPages:  0,
 				PageSize:    PageLimit,
-				FullCount:   0,
 			},
 		},
 	}
@@ -194,46 +189,4 @@ type mockSearchHttpClient struct {
 func (m *mockSearchHttpClient) Do(req *http.Request) (*http.Response, error) {
 	args := m.Called(req)
 	return args.Get(0).(*http.Response), args.Error(1)
-}
-
-func TestSearchShowsFullCount(t *testing.T) {
-
-	mockClient := &mockSearchHttpClient{}
-	var searchResultsBody bytes.Buffer
-	aggregations := map[string]int{
-		"Donor":                4000,
-		"Attorney":             4000,
-		"Certificate Provider": 4000,
-	}
-	searchResponse := SearchResponse{
-		Total: SearchTotal{
-			Count: 10000,
-		},
-		Aggregations: Aggregations{
-			PersonType: aggregations,
-		},
-	}
-	err := json.NewEncoder(&searchResultsBody).Encode(searchResponse)
-	if err != nil {
-		t.Fatal("Could not compile search response json")
-	}
-	respForSearch := http.Response{
-		StatusCode: 200,
-		Body:       io.NopCloser(bytes.NewReader(searchResultsBody.Bytes())),
-	}
-	mockClient.On("Do", mock.Anything).Return(&respForSearch, nil)
-	client := NewClient(mockClient, "http://localhost:8888")
-
-	results, pagination, err := client.Search(Context{Context: context.Background()}, "searchTerm", 1, []string{})
-
-	expectedPagination := Pagination{
-		TotalItems:  10000,
-		CurrentPage: 1,
-		TotalPages:  667,
-		PageSize:    15,
-		FullCount:   12000,
-	}
-	assert.Equal(t, pagination, &expectedPagination)
-	assert.Equal(t, results, searchResponse)
-	assert.Nil(t, err)
 }

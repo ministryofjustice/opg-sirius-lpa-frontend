@@ -11,7 +11,6 @@ type Pagination struct {
 	CurrentPage int
 	TotalPages  int
 	PageSize    int
-	FullCount   int
 }
 
 func newPagination(p *sirius.Pagination, s, f string) *Pagination {
@@ -34,7 +33,6 @@ func newPagination(p *sirius.Pagination, s, f string) *Pagination {
 		CurrentPage: p.CurrentPage,
 		TotalPages:  p.TotalPages,
 		PageSize:    p.PageSize,
-		FullCount:   p.FullCount,
 	}
 }
 
