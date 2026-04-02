@@ -57,7 +57,7 @@ type LpaStoreData struct {
 	PeopleToNotify                              []LpaStorePersonToNotify     `json:"peopleToNotify"`
 	HowAttorneysMakeDecisions                   string                       `json:"howAttorneysMakeDecisions"`
 	HowAttorneysMakeDecisionsDetails            string                       `json:"howAttorneysMakeDecisionsDetails"`
-	WhenTheLpaCanBeUsed                         string                       `json:"whenTheLpaCanBeUsed"`
+	WhenTheLpaCanBeUsed                         shared.WhenLpaCanBeUsed      `json:"whenTheLpaCanBeUsed"`
 	HowReplacementAttorneysMakeDecisions        string                       `json:"howReplacementAttorneysMakeDecisions"`
 	HowReplacementAttorneysMakeDecisionsDetails string                       `json:"howReplacementAttorneysMakeDecisionsDetails"`
 	HowReplacementAttorneysStepIn               string                       `json:"howReplacementAttorneysStepIn"`

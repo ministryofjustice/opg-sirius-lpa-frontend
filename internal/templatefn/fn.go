@@ -210,18 +210,6 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "howReplacementAttorneysStepIn NOT RECOGNISED: " + s
 			}
 		},
-		"whenTheLpaCanBeUsedLongForm": func(s string) string {
-			switch s {
-			case "when-has-capacity":
-				return "As soon as it's registered"
-			case "when-capacity-lost":
-				return "When capacity is lost"
-			case "":
-				return "Not specified"
-			default:
-				return "whenTheLpaCanBeUsed NOT RECOGNISED: " + s
-			}
-		},
 		"lifeSustainingTreatmentOptionLongForm": func(s string) string {
 			switch s {
 			case "option-a":
