@@ -101,6 +101,10 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "UID"
 			}
 
+			if text == "firstname" {
+				return "First name"
+			}
+
 			r, n := utf8.DecodeRuneInString(text)
 			text = text[n:]
 
