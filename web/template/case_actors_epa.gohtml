@@ -1,0 +1,47 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create EPA{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-heading-l">{{ .Title }}</div>
+    <div class="govuk-heading-s">Attorneys:</div>
+    {{ if gt (len .Case.Attorneys) 0 }}
+        {{ range $attorney := .Case.Attorneys }}
+            <details class="govuk-details" >
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }}{{ else }}{{ .Salutation }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}{{ end }}</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <div class="app-heading-with-link">
+                        <div></div>
+                        {{ if $.IsEditing }}
+                            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/epa-attorney?caseId=%d&attorneyId=%d&isEditing=true" $.CaseID .ID)}}">Update</a>
+                        {{ else }}
+                            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/epa-attorney?caseId=%d&attorneyId=%d" $.CaseID .ID)}}">Update</a>
+                        {{ end }}
+                    </div>
+                    {{ template "attorney-details-table" . }}
+                </div>
+            </details>
+        {{ end }}
+    {{ else }}
+        <p class="govuk-body">No attorneys have been added yet.</p>
+    {{ end }}
+    <div class="govuk-button-group govuk-!-padding-top-5">
+        {{ if .IsEditing }}
+            <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/epa-attorney?caseId=%d&isEditing=true" .CaseID)}}">Add attorney</a>
+        {{ else }}
+            <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/epa-attorney?caseId=%d" .CaseID)}}">Add attorney</a>
+        {{ end }}
+        <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-epa-correspondent?caseId=%d" .CaseID)}}">Add correspondent</a>
+    </div>
+    <div class="govuk-button-group govuk-!-padding-top-5">
+        {{ if .IsEditing }}
+            <a class="govuk-button" href="{{ prefix (printf "/payment-epa?caseId=%d&isEditing=true" .CaseID)}}">Continue</a>
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/edit-epa?caseId=%d" .Case.ID) }}">Cancel</a>
+        {{else}}
+            <a class="govuk-button" href="{{ prefix (printf "/payment-epa?caseId=%d" .CaseID)}}">Continue</a>
+            <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        {{end}}
+    </div>
+{{ end }}

@@ -373,8 +373,23 @@ $govuk-assets-path: "../assets/";
   width: 8em;
 }
 
+.app-table__row--half-width {
+  width: 50%;
+}
+
 .app-search-results--no-results {
   overflow: visible;
+}
+
+.app-heading-with-link {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.app-heading-with-link__link {
+  padding-bottom: 20px;
 }
 
 .app-document-compare__separator {

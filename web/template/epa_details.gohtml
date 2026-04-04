@@ -1,0 +1,188 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create EPA{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        <meta data-app-reload="page" />
+        {{ template "success-banner" "You have successfully created an EPA." }}
+      {{ end }}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">Create an EPA</h1>
+
+        <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-epa-details">
+          <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+                <span class="govuk-accordion__section-button" id="accordion-epa-details-heading-1">
+                  Step 1: EPA details
+                </span>
+              </h2>
+            </div>
+            <div id="accordion-epa-details-content-1" class="govuk-accordion__section-content">
+              <div class="govuk-!-margin-bottom-4">
+                <a class="govuk-!-display-block govuk-!-text-align-right govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?caseId=%d&id=%d" .Case.ID .Case.Donor.ID) }}">Update</a>
+              </div>
+            <table class="govuk-table">
+              <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                  <th scope="row" class="govuk-table__header app-table__row--half-width">Donor's signature date</th>
+                  <td class="govuk-table__cell">
+                    {{ if .Case.EpaDonorSignatureDate }}
+                      {{ parseAndFormatDate (printf "%s" .Case.EpaDonorSignatureDate) "2006-01-02" "2 January 2006" }}
+                    {{ else }}
+                      -
+                    {{ end }}
+                  </td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <th scope="row" class="govuk-table__header">Latest notification date</th>
+                  <td class="govuk-table__cell">
+                    {{ if .Case.EpaDonorNoticeGivenDate }}
+                      {{ parseAndFormatDate (printf "%s" .Case.EpaDonorNoticeGivenDate) "2006-01-02" "2 January 2006" }}
+                    {{ else }}
+                      -
+                    {{ end }}
+                  </td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <th scope="row" class="govuk-table__header">Receipt date</th>
+                  <td class="govuk-table__cell">
+                    {{ if .Case.ReceiptDate }}
+                      {{ parseAndFormatDate (printf "%s" .Case.ReceiptDate) "2006-01-02" "2 January 2006" }}
+                    {{ else }}
+                      -
+                    {{ end }}
+                  </td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <th scope="row" class="govuk-table__header">Registration date</th>
+                  <td class="govuk-table__cell">
+                    {{ if .Case.RegistrationDate }}
+                      {{ parseAndFormatDate (printf "%s" .Case.RegistrationDate) "2006-01-02" "2 January 2006" }}
+                    {{ else }}
+                      -
+                    {{ end }}
+                  </td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <th scope="row" class="govuk-table__header">Dispatch date</th>
+                  <td class="govuk-table__cell">
+                    {{ if .Case.DispatchDate }}
+                      {{ parseAndFormatDate (printf "%s" .Case.DispatchDate) "2006-01-02" "2 January 2006" }}
+                    {{ else }}
+                      -
+                    {{ end }}
+                  </td>
+                </tr>
+                <tr class="govuk-table__row">
+                  <th scope="row" class="govuk-table__header">Has the donor made any other EPAs</th>
+                  <td class="govuk-table__cell">{{ boolToYesNo .Case.DonorHasOtherEpas }}</td>
+                </tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+
+          <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+                <span class="govuk-accordion__section-button" id="accordion-epa-details-heading-2">
+                  Step 2: appointment type
+                </span>
+              </h2>
+            </div>
+            <div id="accordion-epa-details-content-2" class="govuk-accordion__section-content">
+              <div class="govuk-!-margin-bottom-4">
+                <a class="govuk-!-display-block govuk-!-text-align-right govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/appointment-epa?caseId=%d&isEditing=true" .Case.ID) }}">Update</a>
+              </div>
+            <table class="govuk-table">
+              <tbody class="govuk-table__body">
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Appointment type</th>
+                <td class="govuk-table__cell">{{ if deref .Case.CaseAttorneySingular }}Only one attorney is appointed{{ else if deref .Case.CaseAttorneyJointlyAndSeverally }}Jointly and severally{{ else if deref .Case.CaseAttorneyJointly }}Jointly{{ else }}Not provided{{ end }}</td>
+              </tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+
+          <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+                <span class="govuk-accordion__section-button" id="accordion-epa-details-heading-3">
+                  Step 3: case actors
+                </span>
+              </h2>
+            </div>
+            <div id="accordion-epa-details-content-3" class="govuk-accordion__section-content">
+            {{ if gt (len .Case.Attorneys) 0 }}
+              {{ range $attorney := .Case.Attorneys }}
+                <details class="govuk-details" >
+                  <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }}{{ else }}{{ .Salutation }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}{{ end }}</span>
+                  </summary>
+                  <div class="govuk-details__text">
+                    <div class="app-heading-with-link">
+                      <div></div>
+                      <a class="govuk-!-display-block govuk-!-text-align-right govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/epa-attorney?caseId=%d&attorneyId=%d&isEditing=true&fromDetails=true" $.CaseID .ID)}}">Update</a>
+                    </div>
+                    {{ template "attorney-details-table" . }}
+                  </div>
+                </details>
+              {{ end }}
+            {{ else }}
+              <p class="govuk-body">No attorneys have been added yet.</p>
+            {{ end }}
+
+            <div class="govuk-button-group govuk-!-padding-top-5">
+              <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/epa-attorney?caseId=%d&isEditing=true&fromDetails=true" .Case.ID)}}">Add attorney</a>
+              <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-epa-correspondent?caseId=%d" .CaseID)}}">Add correspondent</a>
+            </div>
+            </div>
+          </div>
+
+          <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+                <span class="govuk-accordion__section-button" id="accordion-epa-details-heading-4">
+                  Step 4: payment
+                </span>
+              </h2>
+            </div>
+            <div id="accordion-epa-details-content-4" class="govuk-accordion__section-content">
+              <div class="govuk-!-margin-bottom-4">
+                <a class="govuk-!-display-block govuk-!-text-align-right govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/payment-epa?caseId=%d&isEditing=true" .Case.ID) }}">Update</a>
+              </div>
+            <table class="govuk-table">
+              <tbody class="govuk-table__body">
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header app-table__row--half-width">Cheque enclosed</th>
+                <td class="govuk-table__cell">{{ if .Case.PaymentByCheque }}{{ if .Case.PaymentByCheque }}Yes{{ else }}No{{ end }}{{ end }}</td>
+              </tr>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Application for postponement exemption or remission of the fee</th>
+                <td class="govuk-table__cell">{{ if .Case.PaymentExemption }}{{ if .Case.PaymentExemption }}Yes{{ else }}No{{ end }}{{ end }}</td>
+              </tr>
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Payment date</th>
+                <td class="govuk-table__cell">
+                  {{ if .Case.PaymentDate }}
+                    {{ parseAndFormatDate (printf "%s" .Case.PaymentDate) "2006-01-02" "2 January 2006" }}
+                  {{ else }}
+                    -
+                  {{ end }}
+                </td>
+              </tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+{{ end }}
