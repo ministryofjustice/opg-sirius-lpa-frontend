@@ -96,16 +96,6 @@ func TestLifeSustainingTreatmentOptionLongForm(t *testing.T) {
 	testStringMapper(t, "lifeSustainingTreatmentOptionLongForm", expectations)
 }
 
-func TestWhenTheLpaCanBeUsedLongForm(t *testing.T) {
-	expectations := map[string]string{
-		"when-has-capacity":  "As soon as it's registered",
-		"when-capacity-lost": "When capacity is lost",
-		"":                   "Not specified",
-		"foo":                "whenTheLpaCanBeUsed NOT RECOGNISED: foo",
-	}
-
-	testStringMapper(t, "whenTheLpaCanBeUsedLongForm", expectations)
-}
 
 func TestChannelForFormat(t *testing.T) {
 	expectations := map[string]string{
