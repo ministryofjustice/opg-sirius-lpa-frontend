@@ -19,6 +19,8 @@
 
                         {{ if eq $k "dob" }}
                             <li>Date of birth: {{ parseAndFormatDate $oldValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }} changed to: {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006"  }}</li>
+                        {{ else if eq $k "noticeGivenDate" }}
+                            <li>Date notice given: {{ parseAndFormatDate $oldValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }} changed to: {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006"  }}</li>
                         {{ else if eq $k "systemStatus" }}
                             <li>Changed from {{ if $oldValue }}active{{ else }}inactive{{ end }} to: {{ if $newValue }}active{{ else }}inactive{{ end }}</li>
                         {{ else }}
@@ -29,6 +31,8 @@
 
                         {{ if eq $k "dob" }}
                             <li>Date of birth: {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006"  }}</li>
+                        {{ else if eq $k "noticeGivenDate" }}
+                            <li>Date notice given: {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006"  }}</li>
                         {{ else if eq $k "systemStatus" }}
                             <li>Changed to: {{ if $newValue }}active{{ else }}inactive{{ end }}</li>
                         {{ else }}
