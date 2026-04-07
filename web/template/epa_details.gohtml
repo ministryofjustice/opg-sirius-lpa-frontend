@@ -141,7 +141,7 @@
             {{ end }}
 
             <div class="govuk-!-font-weight-bold">Correspondent:</div>
-              {{ if .Case.Correspondent.ID }}
+              {{ if .Case.Correspondent }}
                   <details class="govuk-details" >
                     <summary class="govuk-details__summary">
                       <span class="govuk-details__summary-text">{{ if .Case.Correspondent.CompanyName }}{{ .Case.Correspondent.CompanyName }}{{ else }}{{ .Case.Correspondent.Salutation }}{{ if .Case.Correspondent.Firstname }} {{ .Case.Correspondent.Firstname }}{{ end }}{{ if .Case.Correspondent.Middlenames }} {{ .Case.Correspondent.Middlenames }}{{ end }}{{ if .Case.Correspondent.Surname }} {{ .Case.Correspondent.Surname }}{{ end }}{{ end }}</span>

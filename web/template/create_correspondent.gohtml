@@ -6,13 +6,10 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {{ template "error-summary" .Error }}
-
       <h1 class="govuk-heading-l">{{ .Title }}</h1>
-
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
         <input type="hidden" name="id" value="{{ .CaseID }}"/>
-
         {{ template "input" (field "salutation" "Salutation" .Correspondent.Salutation .Error.Field.salutation) }}
         {{ template "input" (field "firstname" "First name" .Correspondent.Firstname .Error.Field.firstname) }}
         {{ template "input" (field "middlenames" "Middle names" .Correspondent.Middlenames .Error.Field.middlenames) }}
@@ -31,12 +28,10 @@
           {{ template "input" (field "postcode" "Postcode" .Correspondent.Postcode .Error.Field.postcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
           {{ template "input" (field "country" "Country" .Correspondent.Country .Error.Field.country "data-app-address-finder-map" "country") }}
         </div>
-
         {{ template "radios" (radios "isAirmailRequired" "Airmail required" (stringifyBool .Correspondent.IsAirmailRequired) .Error.Field.isAirmailRequired
         (item "true" "Yes")
         (item "false" "No")
         ) }}
-
         <div class="govuk-button-group govuk-!-padding-top-5">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
           <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/edit-epa?caseId=%d" .CaseID) }}">Cancel</a>
