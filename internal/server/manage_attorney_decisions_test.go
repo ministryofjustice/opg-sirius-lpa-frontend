@@ -32,8 +32,8 @@ var manageAttorneyDecisionsSummary = sirius.CaseSummary{
 	DigitalLpa: sirius.DigitalLpa{
 		UID: "M-6666-6666-6666",
 		LpaStoreData: sirius.LpaStoreData{
-			HowAttorneysMakeDecisions:            "jointly-for-some-severally-for-others",
-			HowReplacementAttorneysMakeDecisions: "jointly-for-some-severally-for-others",
+			HowAttorneysMakeDecisions:            shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
+			HowReplacementAttorneysMakeDecisions: shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
 			Attorneys: []sirius.LpaStoreAttorney{
 				{
 					LpaStorePerson: sirius.LpaStorePerson{
@@ -147,8 +147,8 @@ func TestGetManageAttorneyDecisions(t *testing.T) {
 			FormName:                     "decisions",
 			CaseSummary:                  manageAttorneyDecisionsSummary,
 			DecisionAttorneys:            activeAttorneys,
-			Decisions:                    "jointly-for-some-severally-for-others",
-			ReplacementAttorneyDecisions: "jointly-for-some-severally-for-others",
+			Decisions:                    shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
+			ReplacementAttorneyDecisions: shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
 			ActiveAttorneyCount:          2,
 			ReplacementAttorneyCount:     2,
 			Error:                        sirius.ValidationError{Field: sirius.FieldErrors{}},
@@ -200,8 +200,8 @@ func TestGetManageAttorneyDecisionsTemplateErrors(t *testing.T) {
 			FormName:                     "decisions",
 			CaseSummary:                  manageAttorneyDecisionsSummary,
 			DecisionAttorneys:            activeAttorneys,
-			Decisions:                    "jointly-for-some-severally-for-others",
-			ReplacementAttorneyDecisions: "jointly-for-some-severally-for-others",
+			Decisions:                    shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
+			ReplacementAttorneyDecisions: shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
 			ActiveAttorneyCount:          2,
 			ReplacementAttorneyCount:     2,
 			Error:                        sirius.ValidationError{Field: sirius.FieldErrors{}},
@@ -258,8 +258,8 @@ func TestPostManageAttorneyDecisionsInvalidData(t *testing.T) {
 					FormName:                     "decisions",
 					CaseSummary:                  manageAttorneyDecisionsSummary,
 					DecisionAttorneys:            activeAttorneys,
-					Decisions:                    "jointly-for-some-severally-for-others",
-					ReplacementAttorneyDecisions: "jointly-for-some-severally-for-others",
+					Decisions:                    shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
+					ReplacementAttorneyDecisions: shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
 					ActiveAttorneyCount:          2,
 					ReplacementAttorneyCount:     2,
 					Form:                         tc.formData,
@@ -306,8 +306,8 @@ func TestPostManageAttorneyDecisionsValidData(t *testing.T) {
 			FormName:                     "decisions",
 			CaseSummary:                  manageAttorneyDecisionsSummary,
 			DecisionAttorneys:            activeAttorneys,
-			Decisions:                    "jointly-for-some-severally-for-others",
-			ReplacementAttorneyDecisions: "jointly-for-some-severally-for-others",
+			Decisions:                    shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
+			ReplacementAttorneyDecisions: shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
 			ActiveAttorneyCount:          2,
 			ReplacementAttorneyCount:     2,
 			Form: formManageAttorneyDecisions{
