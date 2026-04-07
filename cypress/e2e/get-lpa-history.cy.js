@@ -754,12 +754,12 @@ describe("View LPA history timeline", () => {
             type: "UPD",
             changeSet: {
               addressLines: [
-                  ["Street", "", ""],
-                  ["8 Street", "Road", ""]
+                ["Street", "", ""],
+                ["8 Street", "Road", ""],
               ],
               town: ["Town", "Birmingham"],
               county: ["", "Midlands"],
-              postcode: ["B1 1TF", "BT1 2TF"]
+              postcode: ["B1 1TF", "BT1 2TF"],
             },
             entity: {
               _class: String.raw`Opg\Core\Model\Entity\Address\Address`,
@@ -801,9 +801,7 @@ describe("View LPA history timeline", () => {
               country: "",
               isAirmailRequired: false,
               type: "Primary",
-              addressLines: [
-                  "Street"
-              ],
+              addressLines: ["Street"],
               firstname: "Test",
               surname: "Case",
             },
@@ -831,19 +829,21 @@ describe("View LPA history timeline", () => {
     cy.visit("/donor/2/history");
 
     cy.get(".moj-timeline__item")
-        .first()
-        .within(() => {
-          cy.contains("Address updated: Address lines: Street changed to: 8 Street, Road");
-          cy.contains("Town: Town changed to: Birmingham");
-          cy.contains("County: changed to: Midlands");
-          cy.contains("Postcode: B1 1TF changed to: BT1 2TF");
-        });
+      .first()
+      .within(() => {
+        cy.contains(
+          "Address updated: Address lines: Street changed to: 8 Street, Road",
+        );
+        cy.contains("Town: Town changed to: Birmingham");
+        cy.contains("County: changed to: Midlands");
+        cy.contains("Postcode: B1 1TF changed to: BT1 2TF");
+      });
 
     cy.get(".moj-timeline__item")
-        .last()
-        .within(() => {
-          cy.contains("Address updated: Street, Town, B1 1TF, United Kingdom");
-        });
+      .last()
+      .within(() => {
+        cy.contains("Address updated: Street, Town, B1 1TF, United Kingdom");
+      });
   });
 
   it("can filter", () => {
