@@ -71,12 +71,12 @@ AddressFinder.template = (id) => `
       No matching address found. Please try again using a UK postcode, or enter the address manually
     </p>
     <input
-      class="govuk-input govuk-input--width-10"
+      class="govuk-input govuk-input--width-10 govuk-!-margin-top-1"
       id="f-${id}-input"
       aria-describedby="f-${id}-hint"
     />
     <button
-      class="govuk-button govuk-button--secondary govuk-!-margin-left-2 govuk-!-margin-bottom-0"
+      class="govuk-button govuk-!-margin-top-1"
       type="button"
     >
       Find address

@@ -40,13 +40,16 @@ func getContext(r *http.Request) sirius.Context {
 
 type Client interface {
 	AddComplaintClient
+	EpaAttorneyClient
 	AddFeeDecisionClient
 	AddObjectionClient
 	AddPaymentClient
 	AllocateCasesClient
 	ApplyFeeReductionClient
+	AppointmentTypeEpaClient
 	AssignTaskClient
 	AttorneyDecisionsClient
+	CaseActorsEpaClient
 	ChangeAttorneyDetailsClient
 	ChangeCaseStatusClient
 	ChangeCertificateProviderDetailsClient
@@ -56,11 +59,14 @@ type Client interface {
 	ChangeTrustCorporationDetailsClient
 	ClearTaskClient
 	CompareDocsClient
+	CorrespondentClient
 	CreateAdditionalDraftClient
+	CreateCorrespondentClient
 	CreateDocumentClient
 	CreateDocumentDigitalLpaClient
 	CreateDonorClient
 	CreateDraftClient
+	CreateEpaClient
 	CreateInvestigationClient
 	DeleteDocumentClient
 	DeletePaymentClient
@@ -73,6 +79,7 @@ type Client interface {
 	EditFeeReductionClient
 	EditInvestigationClient
 	EditPaymentClient
+	EpaDetailsClient
 	EventClient
 	GetApplicationProgressClient
 	GetDocumentsClient
@@ -87,6 +94,7 @@ type Client interface {
 	ManageRestrictionsClient
 	MiReportingClient
 	ObjectionOutcomeClient
+	PaymentEpaClient
 	PostcodeLookupClient
 	RelationshipClient
 	RemoveAnAttorneyClient
@@ -120,9 +128,17 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/lpa/{uid}/change-draft", wrap(ChangeDraft(client, templates.Get("change-draft.gohtml"))))
 	mux.Handle("/lpa/{uid}/manage-restrictions", wrap(ManageRestrictions(client, templates.Get("manage-restrictions.gohtml"), templates.Get("confirm-restrictions.gohtml"))))
 	mux.Handle("/add-objection", wrap(AddObjection(client, templates.Get("objection.gohtml"))))
+	mux.Handle("/epa-attorney", wrap(EpaAttorney(client, templates.Get("epa_attorney.gohtml"))))
+	mux.Handle("/correspondent", wrap(Correspondent(client, templates.Get("correspondent.gohtml"))))
+	mux.Handle("/create-correnspondent", wrap(CreateCorrespondent(client, templates.Get("create_correspondent.gohtml"))))
 	mux.Handle("/change-donor-details", wrap(ChangeDonorDetails(client, templates.Get("change-donor-details.gohtml"))))
 	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning.gohtml"))))
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"))))
+	mux.Handle("/create-epa", wrap(CreateEpa(client, templates.Get("create_epa.gohtml"))))
+	mux.Handle("/edit-epa", wrap(EpaDetails(client, templates.Get("epa_details.gohtml"))))
+	mux.Handle("/appointment-epa", wrap(AppointmentTypeEpa(client, templates.Get("appointment_type_epa.gohtml"))))
+	mux.Handle("/case-actors-epa", wrap(CaseActorsEpa(client, templates.Get("case_actors_epa.gohtml"))))
+	mux.Handle("/payment-epa", wrap(PaymentEpa(client, templates.Get("payment_epa.gohtml"))))
 	mux.Handle("/create-task", wrap(Task(client, templates.Get("task.gohtml"))))
 	mux.Handle("/create-additional-draft-lpa", wrap(CreateAdditionalDraft(client, templates.Get("create_additional_draft.gohtml"))))
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("relationship.gohtml"))))
