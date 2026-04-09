@@ -768,6 +768,7 @@ describe("View LPA history timeline", () => {
               addressLine3: "",
               country: "United Kingdom",
               county: "Midlands",
+              displayName: "Company Name",
               id: 574,
               isAirmailRequired: false,
               postcode: "BT1 2TF",
@@ -814,6 +815,7 @@ describe("View LPA history timeline", () => {
               addressLine3: "",
               country: "United Kingdom",
               county: "",
+              displayName: "Actor Name",
               id: 574,
               isAirmailRequired: false,
               postcode: "B1 1TF",
@@ -831,9 +833,8 @@ describe("View LPA history timeline", () => {
     cy.get(".moj-timeline__item")
       .first()
       .within(() => {
-        cy.contains(
-          "Address updated: Address lines: Street changed to: 8 Street, Road",
-        );
+        cy.contains("Company Name",);
+        cy.contains("Street changed to: 8 Street, Road",);
         cy.contains("Town: Town changed to: Birmingham");
         cy.contains("County: changed to: Midlands");
         cy.contains("Postcode: B1 1TF changed to: BT1 2TF");
@@ -842,7 +843,8 @@ describe("View LPA history timeline", () => {
     cy.get(".moj-timeline__item")
       .last()
       .within(() => {
-        cy.contains("Address updated: Street, Town, B1 1TF, United Kingdom");
+        cy.contains("Actor Name");
+        cy.contains("Street, Town, B1 1TF, United Kingdom");
       });
   });
 
