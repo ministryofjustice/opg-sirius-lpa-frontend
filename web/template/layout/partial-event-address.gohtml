@@ -1,6 +1,7 @@
 {{ define "partial-event-address" }}
+    <p><strong>{{ .Entity.displayName }}</strong></p>
     {{ if eq .Type "INS" }}
-        Address updated: {{ if .Entity.addressLine1 }}{{ .Entity.addressLine1 }},{{ end }}
+        {{ if .Entity.addressLine1 }}{{ .Entity.addressLine1 }},{{ end }}
         {{- if .Entity.addressLine2 }} {{ .Entity.addressLine2 }},{{ end -}}
         {{- if .Entity.addressLine3 }} {{ .Entity.addressLine3 }},{{ end -}}
         {{- if .Entity.town }} {{ .Entity.town }},{{ end -}}
@@ -12,7 +13,6 @@
         <ul class="govuk-list">
             {{ with index .Changes "addressLines" }}
                 <li>
-                    Address updated: Address lines:
                     {{- $first := true -}}
                     {{- range index . 0 }}
                         {{- if . }}
