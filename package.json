@@ -30,5 +30,8 @@
   },
   "resolutions": {
     "colors": "1.4.0"
+  },
+  "overrides": {
+    "picomatch": "4.0.4"
   }
 }
