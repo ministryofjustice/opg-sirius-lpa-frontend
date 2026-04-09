@@ -38,6 +38,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		},
 		"field":                 field,
 		"radios":                radios,
+		"inlineRadios":          inlineRadios,
 		"item":                  item,
 		"fieldID":               fieldID,
 		"select":                select_,
@@ -361,6 +362,15 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				Context:  context,
 			}
 		},
+		"stringifyBoolPointer": func(b *bool) string {
+			if b == nil {
+				return ""
+			}
+			if *b {
+				return "true"
+			}
+			return "false"
+		},
 	}
 }
 
@@ -486,6 +496,7 @@ type radiosData struct {
 	Value  interface{}
 	Errors map[string]string
 	Items  []itemData
+	Inline bool
 }
 
 func radios(name, label string, value interface{}, errors map[string]string, items ...itemData) radiosData {
@@ -495,6 +506,18 @@ func radios(name, label string, value interface{}, errors map[string]string, ite
 		Value:  value,
 		Errors: errors,
 		Items:  items,
+		Inline: false,
+	}
+}
+
+func inlineRadios(name, label string, value interface{}, errors map[string]string, items ...itemData) radiosData {
+	return radiosData{
+		Name:   name,
+		Label:  label,
+		Value:  value,
+		Errors: errors,
+		Items:  items,
+		Inline: true,
 	}
 }
 
