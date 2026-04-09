@@ -96,7 +96,6 @@ func TestLifeSustainingTreatmentOptionLongForm(t *testing.T) {
 	testStringMapper(t, "lifeSustainingTreatmentOptionLongForm", expectations)
 }
 
-
 func TestChannelForFormat(t *testing.T) {
 	expectations := map[string]string{
 		"paper":  "Paper",
@@ -329,7 +328,27 @@ func TestRadios(t *testing.T) {
 		Errors: map[string]string{
 			"username": "required",
 		},
-		Items: items,
+		Items:  items,
+		Inline: false,
+	}
+
+	val := fn("name", "Name", "testing", map[string]string{"username": "required"}, items...)
+	assert.Equal(t, expected, val)
+}
+
+func TestInlineRadios(t *testing.T) {
+	items := []itemData{{Value: "foo", Label: "Foo"}}
+	fns := All("", "", "")
+	fn := fns["inlineRadios"].(func(string, string, interface{}, map[string]string, ...itemData) radiosData)
+	expected := radiosData{
+		Name:  "name",
+		Label: "Name",
+		Value: "testing",
+		Errors: map[string]string{
+			"username": "required",
+		},
+		Items:  items,
+		Inline: true,
 	}
 
 	val := fn("name", "Name", "testing", map[string]string{"username": "required"}, items...)
@@ -782,4 +801,23 @@ func TestEventWithContext(t *testing.T) {
 		"eventFieldOrder", eventFieldOrder,
 	)
 	assert.Equal(t, expected, result)
+}
+
+func TestStringifyBoolPointer(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["stringifyBoolPointer"].(func(*bool) string)
+
+	truePtr := true
+	falsePtr := false
+
+	tests := map[*bool]string{
+		&truePtr:  "true",
+		&falsePtr: "false",
+		nil:       "",
+	}
+
+	for input, expected := range tests {
+		result := fn(input)
+		assert.Equal(t, expected, result)
+	}
 }
