@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
 )
@@ -93,7 +94,7 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 				Category:             postFormString(r, "category"),
 				Description:          postFormString(r, "description"),
 				ReceivedDate:         postFormDateString(r, "receivedDate"),
-				Severity:             postFormString(r, "severity"),
+				Severity:             shared.ParseComplaintSeverity(postFormString(r, "severity")),
 				InvestigatingOfficer: postFormString(r, "investigatingOfficer"),
 				ComplainantName:      postFormString(r, "complainantName"),
 				SubCategory:          postFormString(r, "subCategory"),

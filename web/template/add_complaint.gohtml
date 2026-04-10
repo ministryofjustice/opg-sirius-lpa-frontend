@@ -19,7 +19,7 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        {{ template "radios" (radios "severity" "Severity" .Complaint.Severity .Error.Field.severity
+        {{ template "radios" (radios "severity" "Severity" .Complaint.Severity.Translation .Error.Field.severity
           (item "Minor" "Minor")
           (item "Major" "Major")
           (item "Security Breach" "Security Breach")
