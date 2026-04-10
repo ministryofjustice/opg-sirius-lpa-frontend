@@ -27,7 +27,7 @@ func TestEpa(t *testing.T) {
 		{
 			name: "OK",
 			Epa: Case{
-				ReceiptDate:          DateString("2015-03-04"),
+				ReceiptDate:          DateString("2015-03-05"),
 				ExpectedPaymentTotal: 0,
 				Status:               shared.CaseStatusTypePending,
 			},
@@ -43,7 +43,7 @@ func TestEpa(t *testing.T) {
 							"Content-Type": matchers.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"receiptDate":          matchers.Term("04/03/2015", `^\d{1,2}/\d{1,2}/\d{4}$`),
+							"receiptDate":          matchers.Term("05/03/2015", `^\d{1,2}/\d{1,2}/\d{4}$`),
 							"expectedPaymentTotal": matchers.Integer(0),
 							"status":               matchers.String("Pending"),
 						},
