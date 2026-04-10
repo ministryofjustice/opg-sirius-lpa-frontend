@@ -3,7 +3,7 @@
     <fieldset class="govuk-fieldset">
       <legend class="govuk-fieldset__legend">{{ .Label }}</legend>
       {{ template "errors" .Errors }}
-      <div class="govuk-radios {{ if .Errors }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+      <div class="govuk-radios {{ if .Errors }}govuk-radios--error{{ end }} {{ if .Inline }}app-!-radios--inline{{ end }}" data-module="govuk-radios">
         {{ range $i, $e := .Items }}
           <div class="govuk-radios__item">
             <input class="govuk-radios__input" id="f-{{ fieldID $.Name $i }}" name="{{ $.Name }}" type="radio" value="{{ $e.Value }}" {{ if eq $.Value $e.Value }}checked{{ end }} {{ if $e.Attrs.hint }}aria-describedby="{{ fieldID $.Name $i }}-item-hint"{{ end }}>
