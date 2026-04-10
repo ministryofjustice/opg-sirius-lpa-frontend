@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
@@ -72,7 +73,7 @@ func TestEditComplaint(t *testing.T) {
 					Category:             "02",
 					Description:          "This is seriously bad",
 					ReceivedDate:         DateString("2022-04-05"),
-					Severity:             "Major",
+					Severity:             shared.ParseComplaintSeverity(shared.ComplaintSeverityMajor.Translation()),
 					InvestigatingOfficer: "Test Officer",
 					ComplainantName:      "Someones name",
 					SubCategory:          "18",

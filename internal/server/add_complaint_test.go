@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -216,7 +217,7 @@ func TestPostAddComplaint(t *testing.T) {
 					Category:             "01",
 					Description:          "This is a complaint",
 					ReceivedDate:         sirius.DateString("2022-04-05"),
-					Severity:             "Minor",
+					Severity:             shared.ComplaintSeverityMinor,
 					InvestigatingOfficer: "Test Officer",
 					SubCategory:          "07",
 					Summary:              "In summary...",
@@ -263,7 +264,7 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 		Field: sirius.FieldErrors{"field": {"": "problem"}},
 	}
 
-	complaint := sirius.Complaint{Description: "This is a complaint"}
+	complaint := sirius.Complaint{Description: "This is a complaint", Severity: shared.ComplaintSeverityNotRecognised}
 
 	client := &mockAddComplaintClient{}
 	client.
@@ -311,7 +312,7 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 }
 
 func TestPostAddComplaintWhenAddComplaintOtherError(t *testing.T) {
-	complaint := sirius.Complaint{Description: "This is a complaint"}
+	complaint := sirius.Complaint{Description: "This is a complaint", Severity: shared.ComplaintSeverityNotRecognised}
 
 	client := &mockAddComplaintClient{}
 	client.

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -94,7 +95,7 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 				Category:             postFormString(r, "category"),
 				Description:          postFormString(r, "description"),
 				ReceivedDate:         postFormDateString(r, "receivedDate"),
-				Severity:             postFormString(r, "severity"),
+				Severity:             shared.ParseComplaintSeverity(postFormString(r, "severity")),
 				InvestigatingOfficer: postFormString(r, "investigatingOfficer"),
 				ComplainantName:      postFormString(r, "complainantName"),
 				SubCategory:          postFormString(r, "subCategory"),
