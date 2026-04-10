@@ -61,18 +61,19 @@ func TestGetCreateEpaBadQuery(t *testing.T) {
 func TestPostCreateEpa(t *testing.T) {
 	truePtr := true
 	falsePtr := false
+	dateString := "2022-04-05"
 	epa := sirius.Case{
-		EpaDonorSignatureDate:           sirius.DateString("2022-04-05"),
-		EpaDonorNoticeGivenDate:         sirius.DateString("2022-04-05"),
+		EpaDonorSignatureDate:           sirius.DateString(dateString),
+		EpaDonorNoticeGivenDate:         sirius.DateString(dateString),
 		DonorHasOtherEpas:               &truePtr,
 		OtherEpaInfo:                    "More info",
-		ReceiptDate:                     sirius.DateString("2022-04-05"),
+		ReceiptDate:                     sirius.DateString(dateString),
 		CaseAttorneySingular:            &truePtr,
 		CaseAttorneyJointlyAndSeverally: &falsePtr,
 		CaseAttorneyJointly:             &falsePtr,
 		PaymentByCheque:                 &falsePtr,
 		PaymentExemption:                &truePtr,
-		PaymentDate:                     sirius.DateString("2022-04-05"),
+		PaymentDate:                     sirius.DateString(dateString),
 	}
 	client := &mockCreateEpaClient{}
 	client.
@@ -89,15 +90,15 @@ func TestPostCreateEpa(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"epaDonorSignatureDate":   {"2022-04-05"},
-		"epaDonorNoticeGivenDate": {"2022-04-05"},
+		"epaDonorSignatureDate":   {dateString},
+		"epaDonorNoticeGivenDate": {dateString},
 		"donorHasOtherEpas":       {"true"},
 		"otherEpaInfo":            {"More info"},
-		"receiptDate":             {"2022-04-05"},
+		"receiptDate":             {dateString},
 		"caseAttorney":            {"singular"},
 		"paymentByCheque":         {"false"},
 		"paymentExemption":        {"true"},
-		"paymentDate":             {"2022-04-05"},
+		"paymentDate":             {dateString},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
@@ -119,9 +120,10 @@ func TestPostAddComplaintWhenCreateEpaValidationError(t *testing.T) {
 
 	truePtr := true
 	falsePtr := false
+	dateString := "2022-04-05"
 	epa := sirius.Case{
-		EpaDonorSignatureDate:           sirius.DateString("2022-04-05"),
-		EpaDonorNoticeGivenDate:         sirius.DateString("2022-04-05"),
+		EpaDonorSignatureDate:           sirius.DateString(dateString),
+		EpaDonorNoticeGivenDate:         sirius.DateString(dateString),
 		DonorHasOtherEpas:               &truePtr,
 		OtherEpaInfo:                    "More info",
 		CaseAttorneySingular:            &truePtr,
@@ -129,7 +131,7 @@ func TestPostAddComplaintWhenCreateEpaValidationError(t *testing.T) {
 		CaseAttorneyJointly:             &falsePtr,
 		PaymentByCheque:                 &falsePtr,
 		PaymentExemption:                &truePtr,
-		PaymentDate:                     sirius.DateString("2022-04-05"),
+		PaymentDate:                     sirius.DateString(dateString),
 	}
 
 	client := &mockCreateEpaClient{}
@@ -148,14 +150,14 @@ func TestPostAddComplaintWhenCreateEpaValidationError(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"epaDonorSignatureDate":   {"2022-04-05"},
-		"epaDonorNoticeGivenDate": {"2022-04-05"},
+		"epaDonorSignatureDate":   {dateString},
+		"epaDonorNoticeGivenDate": {dateString},
 		"donorHasOtherEpas":       {"true"},
 		"otherEpaInfo":            {"More info"},
 		"caseAttorney":            {"singular"},
 		"paymentByCheque":         {"false"},
 		"paymentExemption":        {"true"},
-		"paymentDate":             {"2022-04-05"},
+		"paymentDate":             {dateString},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
