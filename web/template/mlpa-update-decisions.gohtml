@@ -57,14 +57,14 @@
         </div>
 
         {{ if (eq .CaseSummary.DigitalLpa.SiriusData.Subtype "personal-welfare")}}
-          {{ template "radios" (radios "lifeSustainingTreatmentOption" "Can attorneys make decisions about life sustaining treatment?" .Form.LifeSustainingTreatmentOption $.Error.Field.lifeSustainingTreatmentOption
+          {{ template "radios" (radios "lifeSustainingTreatmentOption" "Can attorneys make decisions about life sustaining treatment?" .Form.LifeSustainingTreatmentOption $.Error.Field.lifeSustainingTreatmentOption false
             (item "option-a" "Attorneys can make decisions about life sustaining treatment")
             (item "option-b" "Attorneys cannot make decisions about life sustaining treatment")
           ) }}
         {{ end }}
 
         {{ if (eq .CaseSummary.DigitalLpa.SiriusData.Subtype "property-and-affairs")}}
-          {{ template "radios" (radios "whenTheLpaCanBeUsed" "When can attorneys use the LPA?" .Form.WhenTheLpaCanBeUsed $.Error.Field.whenTheLpaCanBeUsed
+          {{ template "radios" (radios "whenTheLpaCanBeUsed" "When can attorneys use the LPA?" .Form.WhenTheLpaCanBeUsed $.Error.Field.whenTheLpaCanBeUsed false
             (item "when-has-capacity" "When it is registered")
             (item "when-capacity-lost" "When the donor has lost capacity")
           ) }}
