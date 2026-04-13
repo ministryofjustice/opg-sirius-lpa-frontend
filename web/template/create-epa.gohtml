@@ -29,7 +29,7 @@
             <div id="accordion-create-epa-content-1" class="govuk-accordion__section-content">
               {{ template "input-date" (field "epaDonorSignatureDate" "Donor's signature date" .Case.EpaDonorSignatureDate .Error.Field.epaDonorSignatureDate "max" "2007-09-30") }}
               {{ template "input-date" (field "epaDonorNoticeGivenDate" "Latest notification date" .Case.EpaDonorNoticeGivenDate .Error.Field.epaDonorNoticeGivenDate) }}
-              {{ template "input-date" (field "receiptDate" "Receipt date" .Case.ReceiptDate .Error.Field.epaReceiptDate "max" today) }}
+              {{ template "input-date" (field "receiptDate" "Receipt date" .Case.ReceiptDate .Error.Field.receiptDate "max" today) }}
 
               {{ template "radios" (inlineRadios "donorHasOtherEpas" "Has the donor made any other EPAs?" (stringifyBoolPointer .Case.DonorHasOtherEpas) .Error.Field.donorHasOtherEpas
               (item "true" "Yes")
