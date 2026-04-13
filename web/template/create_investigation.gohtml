@@ -23,7 +23,7 @@
 
                 {{ template "textarea" (field "information" "Information" .Investigation.Information .Error.Field.additionalInformation) }}
 
-                {{ template "radios" (radios "type" "Type" .Investigation.Type .Error.Field.type
+                {{ template "radios" (radios "type" "Type" .Investigation.Type .Error.Field.type false
                   (item "Aspect" "Aspect")
                   (item "Normal" "Normal")
                   (item "Priority" "Priority")
