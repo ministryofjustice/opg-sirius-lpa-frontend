@@ -1,0 +1,107 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create EPA{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        <meta data-app-reload="page" />
+        {{ template "success-banner" "You have successfully created an EPA." }}
+      {{ end }}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">Create an EPA</h1>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+        <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-create-epa">
+          <div class="govuk-accordion__section govuk-accordion__section--expanded">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+                <span class="govuk-accordion__section-button" id="accordion-create-epa-heading-1">
+                  Step 1: EPA details
+                </span>
+              </h2>
+            </div>
+            <div id="accordion-create-epa-content-1" class="govuk-accordion__section-content">
+              {{ template "input-date" (field "epaDonorSignatureDate" "Donor's signature date" .Case.EpaDonorSignatureDate .Error.Field.epaDonorSignatureDate "max" "2007-09-30") }}
+              {{ template "input-date" (field "epaDonorNoticeGivenDate" "Latest notification date" .Case.EpaDonorNoticeGivenDate .Error.Field.epaDonorNoticeGivenDate) }}
+              {{ template "input-date" (field "receiptDate" "Receipt date" .Case.ReceiptDate .Error.Field.receiptDate "max" today) }}
+
+              {{ template "radios" (inlineRadios "donorHasOtherEpas" "Has the donor made any other EPAs?" (stringifyBoolPointer .Case.DonorHasOtherEpas) .Error.Field.donorHasOtherEpas
+              (item "true" "Yes")
+              (item "false" "No")
+              ) }}
+
+              {{ template "textarea" (field "otherEpaInfo" "Please give details of other EPAs, including date of registration if applicable" .Case.OtherEpaInfo .Error.Field.otherEpaInfo) }}
+            </div>
+          </div>
+
+          <div class="govuk-accordion__section govuk-accordion__section--expanded">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+                <span class="govuk-accordion__section-button" id="accordion-create-epa-heading-2">
+                  Step 2: Appointment type
+                </span>
+              </h2>
+            </div>
+            <div id="accordion-create-epa-content-2" class="govuk-accordion__section-content">
+              {{ template "radios" (radios "caseAttorney" "Select one option" .AppointmentType .Error.Field.appointmentType
+              (item "singular" "Only one attorney is appointed")
+              (item "jointly-and-severally" "Jointly and severally")
+              (item "jointly" "Jointly")
+              ) }}
+            </div>
+          </div>
+
+          <div class="govuk-accordion__section govuk-accordion__section--expanded">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+                <span class="govuk-accordion__section-button" id="accordion-create-epa-heading-3">
+                  Step 3: Actors
+                </span>
+              </h2>
+            </div>
+            <div id="accordion-create-epa-content-3" class="govuk-accordion__section-content">
+              <div class="govuk-button-group app-button-group--column">
+                <a class="govuk-button govuk-button--secondary">Add attorney</a>
+                <a class="govuk-button govuk-button--secondary">Add correspondent</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="govuk-accordion__section govuk-accordion__section--expanded">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+                <span class="govuk-accordion__section-button" id="accordion-create-epa-heading-4">
+                  Step 4: Payment
+                </span>
+              </h2>
+            </div>
+            <div id="accordion-create-epa-content-4" class="govuk-accordion__section-content">
+              {{ template "radios" (inlineRadios "paymentByCheque" "Cheque enclosed" (stringifyBoolPointer .Case.PaymentByCheque) .Error.Field.paymentByCheque
+              (item "true" "Yes")
+              (item "false" "No")
+              ) }}
+        
+              {{ template "radios" (inlineRadios "paymentExemption" "Application for postponement, exemption or remission of the fee" (stringifyBoolPointer .Case.PaymentExemption) .Error.Field.paymentExemption
+              (item "true" "Yes")
+              (item "false" "No")
+              ) }}
+
+              {{ template "input-date" (field "paymentDate" "Payment date" .Case.PaymentDate .Error.Field.paymentDate) }}
+            </div>
+          </div>
+        </div>
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit" data-disable-after-click="true">Save and exit</button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
