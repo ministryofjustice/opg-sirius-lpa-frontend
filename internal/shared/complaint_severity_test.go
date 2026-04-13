@@ -13,6 +13,9 @@ func TestParseComplaintSeverity(t *testing.T) {
 		{"Minor", ComplaintSeverityMinor},
 		{"Major", ComplaintSeverityMajor},
 		{"Security Breach", ComplaintSeveritySecurityBreach},
+		{"Complaint", ComplaintSeverityComplaint},
+		{"Complaints Correspondence", ComplaintSeverityComplaintsCorrespondence},
+		{"Tier 1+", ComplaintSeverityTier1},
 		{"NotRecognised", ComplaintSeverityNotRecognised},
 		{"unknown-severity", ComplaintSeverityNotRecognised},
 	}
@@ -33,6 +36,9 @@ func TestComplaintSeverityUnmarshalJSON(t *testing.T) {
 		{`"Minor"`, ComplaintSeverityMinor},
 		{`"Major"`, ComplaintSeverityMajor},
 		{`"Security Breach"`, ComplaintSeveritySecurityBreach},
+		{`"Complaint"`, ComplaintSeverityComplaint},
+		{`"Complaints Correspondence"`, ComplaintSeverityComplaintsCorrespondence},
+		{`"Tier 1+"`, ComplaintSeverityTier1},
 		{`"NotRecognised"`, ComplaintSeverityNotRecognised},
 		{`"Invalid"`, ComplaintSeverityNotRecognised},
 	}
@@ -57,6 +63,9 @@ func TestComplaintSeverityMarshalJSON(t *testing.T) {
 		{ComplaintSeverityMinor, `"Minor"`},
 		{ComplaintSeverityMajor, `"Major"`},
 		{ComplaintSeveritySecurityBreach, `"Security Breach"`},
+		{ComplaintSeverityComplaint, `"Complaint"`},
+		{ComplaintSeverityComplaintsCorrespondence, `"Complaints Correspondence"`},
+		{ComplaintSeverityTier1, `"Tier 1+"`},
 		{ComplaintSeverityNotRecognised, `"complaint severity NOT RECOGNISED"`},
 	}
 
@@ -79,6 +88,9 @@ func TestComplaintSeverityTranslation(t *testing.T) {
 		{ComplaintSeverityMinor, "Minor"},
 		{ComplaintSeverityMajor, "Major"},
 		{ComplaintSeveritySecurityBreach, "Security Breach"},
+		{ComplaintSeverityComplaint, "Complaint"},
+		{ComplaintSeverityComplaintsCorrespondence, "Complaints Correspondence"},
+		{ComplaintSeverityTier1, "Tier 1+"},
 		{ComplaintSeverityNotRecognised, "complaint severity NOT RECOGNISED"},
 	}
 
@@ -89,4 +101,3 @@ func TestComplaintSeverityTranslation(t *testing.T) {
 		}
 	}
 }
-
