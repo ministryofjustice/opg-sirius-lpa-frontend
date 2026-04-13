@@ -20,9 +20,10 @@
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
         {{ template "radios" (radios "severity" "Severity" .Complaint.Severity.Translation .Error.Field.severity false
-          (item "Minor" "Minor")
-          (item "Major" "Major")
+          (item "Complaint" "Complaint")
+          (item "Complaints Correspondence" "Complaints Correspondence")
           (item "Security Breach" "Security Breach")
+          (item "Tier 1+" "Tier 1+")
         ) }}
 
         {{ template "input" (field "investigatingOfficer" "Investigating officer" .Complaint.InvestigatingOfficer .Error.Field.investigatingOfficer) }}
