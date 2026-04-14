@@ -12,7 +12,7 @@
         {{ template "success-banner" "You have successfully created an EPA." }}
       {{ end }}
 
-      <h1 class="govuk-heading-l app-!-embedded-hide">Create an EPA</h1>
+      <h1 class="govuk-heading-l app-!-embedded-hide">{{ .Title }}</h1>
 
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
@@ -27,16 +27,16 @@
               </h2>
             </div>
             <div id="accordion-create-epa-content-1" class="govuk-accordion__section-content">
-              {{ template "input-date" (field "epaDonorSignatureDate" "Donor's signature date" .Case.EpaDonorSignatureDate .Error.Field.epaDonorSignatureDate "max" "2007-09-30") }}
-              {{ template "input-date" (field "epaDonorNoticeGivenDate" "Latest notification date" .Case.EpaDonorNoticeGivenDate .Error.Field.epaDonorNoticeGivenDate) }}
-              {{ template "input-date" (field "receiptDate" "Receipt date" .Case.ReceiptDate .Error.Field.receiptDate "max" today) }}
+              {{ template "input-date" (field "epaDonorSignatureDate" "Donor's signature date" .Epa.EpaDonorSignatureDate .Error.Field.epaDonorSignatureDate "max" "2007-09-30") }}
+              {{ template "input-date" (field "epaDonorNoticeGivenDate" "Latest notification date" .Epa.EpaDonorNoticeGivenDate .Error.Field.epaDonorNoticeGivenDate) }}
+              {{ template "input-date" (field "receiptDate" "Receipt date" .Epa.ReceiptDate .Error.Field.receiptDate "max" today) }}
 
-              {{ template "radios" (radios "donorHasOtherEpas" "Has the donor made any other EPAs?" (stringifyBoolPointer .Case.DonorHasOtherEpas) .Error.Field.donorHasOtherEpas true
+              {{ template "radios" (radios "donorHasOtherEpas" "Has the donor made any other EPAs?" (stringifyBoolPointer .Epa.DonorHasOtherEpas) .Error.Field.donorHasOtherEpas true
               (item "true" "Yes")
               (item "false" "No")
               ) }}
 
-              {{ template "textarea" (field "otherEpaInfo" "Please give details of other EPAs, including date of registration if applicable" .Case.OtherEpaInfo .Error.Field.otherEpaInfo) }}
+              {{ template "textarea" (field "otherEpaInfo" "Please give details of other EPAs, including date of registration if applicable" .Epa.OtherEpaInfo .Error.Field.otherEpaInfo) }}
             </div>
           </div>
 
@@ -82,17 +82,17 @@
               </h2>
             </div>
             <div id="accordion-create-epa-content-4" class="govuk-accordion__section-content">
-              {{ template "radios" (radios "paymentByCheque" "Cheque enclosed" (stringifyBoolPointer .Case.PaymentByCheque) .Error.Field.paymentByCheque true
+              {{ template "radios" (radios "paymentByCheque" "Cheque enclosed" (stringifyBoolPointer .Epa.PaymentByCheque) .Error.Field.paymentByCheque true
               (item "true" "Yes")
               (item "false" "No")
               ) }}
         
-              {{ template "radios" (radios "paymentExemption" "Application for postponement, exemption or remission of the fee" (stringifyBoolPointer .Case.PaymentExemption) .Error.Field.paymentExemption true
+              {{ template "radios" (radios "paymentExemption" "Application for postponement, exemption or remission of the fee" (stringifyBoolPointer .Epa.PaymentExemption) .Error.Field.paymentExemption true
               (item "true" "Yes")
               (item "false" "No")
               ) }}
 
-              {{ template "input-date" (field "paymentDate" "Payment date" .Case.PaymentDate .Error.Field.paymentDate) }}
+              {{ template "input-date" (field "paymentDate" "Payment date" .Epa.PaymentDate .Error.Field.paymentDate) }}
             </div>
           </div>
         </div>
