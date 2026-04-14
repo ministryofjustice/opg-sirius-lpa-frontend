@@ -65,7 +65,7 @@
                 {{ template "input" (field "town" "City/town" nil .Error.Field.town) }}
                 {{ template "input" (field "county" "County" nil .Error.Field.county) }}
                 {{ template "input" (field "postcode" "Postcode" nil .Error.Field.postcode) }}
-                {{ template "radios" (radios "isAirmailRequired" "Is airmail required" nil .Error.Field.isAirmailRequired
+                {{ template "radios" (radios "isAirmailRequired" "Is airmail required" nil .Error.Field.isAirmailRequired false
                 (item "Yes" "Yes")
                 (item "No" "No")
                 ) }}

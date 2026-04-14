@@ -710,6 +710,144 @@ describe("View LPA history timeline", () => {
       });
   });
 
+  it("can view address event content", () => {
+    cy.addMock("/lpa-api/v1/persons/2/events?&sort=id:desc&limit=999", "GET", {
+      status: 200,
+      body: {
+        limit: 999,
+        metadata: {
+          caseIds: [
+            {
+              total: 2,
+            },
+          ],
+          sourceTypes: [
+            {
+              sourceType: "Address",
+              total: 2,
+            },
+          ],
+        },
+        pages: {
+          current: 1,
+          total: 1,
+        },
+        total: 2,
+        events: [
+          {
+            id: 176,
+            owningCase: {
+              id: 908,
+              uid: "7000-0000-0008",
+              caseSubtype: "pfa",
+              caseType: "LPA",
+            },
+            user: {
+              id: 5,
+              phoneNumber: "030030000300",
+              teams: [],
+              displayName: "OPG User",
+              deleted: false,
+              email: "opg@test.gov.uk",
+            },
+            sourceType: "Address",
+            type: "UPD",
+            changeSet: {
+              addressLines: [
+                ["Street", "", ""],
+                ["8 Street", "Road", ""],
+              ],
+              town: ["Town", "Birmingham"],
+              county: ["", "Midlands"],
+              postcode: ["B1 1TF", "BT1 2TF"],
+            },
+            entity: {
+              _class: String.raw`Opg\Core\Model\Entity\Address\Address`,
+              addressLine1: "8 Street",
+              addressLine2: "Road",
+              addressLine3: "",
+              country: "United Kingdom",
+              county: "Midlands",
+              displayName: "Company Name",
+              id: 574,
+              isAirmailRequired: false,
+              postcode: "BT1 2TF",
+              town: "Birmingham",
+            },
+            createdOn: "2026-01-31T14:39:20+00:00",
+            hash: "AAA",
+          },
+          {
+            id: 175,
+            owningCase: {
+              id: 908,
+              uid: "7000-0000-0008",
+              caseSubtype: "pfa",
+              caseType: "LPA",
+            },
+            user: {
+              id: 5,
+              phoneNumber: "030030000300",
+              teams: [],
+              displayName: "OPG User",
+              deleted: false,
+              email: "opg@test.gov.uk",
+            },
+            sourceType: "Address",
+            sourceAddress: {
+              id: 17,
+              town: "Town",
+              county: "",
+              postcode: "B1 1TF",
+              country: "",
+              isAirmailRequired: false,
+              type: "Primary",
+              addressLines: ["Street"],
+              firstname: "Test",
+              surname: "Case",
+            },
+            type: "INS",
+            changeSet: [],
+            entity: {
+              _class: String.raw`Opg\Core\Model\Entity\Address\Address`,
+              addressLine1: "Street",
+              addressLine2: "",
+              addressLine3: "",
+              country: "United Kingdom",
+              county: "",
+              displayName: "Actor Name",
+              id: 574,
+              isAirmailRequired: false,
+              postcode: "B1 1TF",
+              town: "Town",
+            },
+            createdOn: "2026-01-22T10:30:01+00:00",
+            hash: "AZ",
+          },
+        ],
+      },
+    });
+
+    cy.visit("/donor/2/history");
+
+    cy.get(".moj-timeline__item")
+      .first()
+      .within(() => {
+        cy.contains("Company Name");
+        cy.contains("Street changed to: 8 Street, Road");
+        cy.contains("Town: Town changed to: Birmingham");
+        cy.contains("County: changed to: Midlands");
+        cy.contains("Postcode: B1 1TF changed to: BT1 2TF");
+      });
+
+    cy.get(".moj-timeline__item")
+      .last()
+      .within(() => {
+        cy.contains("Actor Name");
+        cy.contains("Street, Town, B1 1TF, United Kingdom");
+      });
+  });
+
   it("can filter", () => {
     cy.visit("/donor/1/history?id[]=105&id[]=106&id[]=107");
 

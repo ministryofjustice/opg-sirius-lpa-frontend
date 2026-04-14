@@ -361,6 +361,15 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				Context:  context,
 			}
 		},
+		"stringifyBoolPointer": func(b *bool) string {
+			if b == nil {
+				return ""
+			}
+			if *b {
+				return "true"
+			}
+			return "false"
+		},
 	}
 }
 
@@ -486,15 +495,17 @@ type radiosData struct {
 	Value  interface{}
 	Errors map[string]string
 	Items  []itemData
+	Inline bool
 }
 
-func radios(name, label string, value interface{}, errors map[string]string, items ...itemData) radiosData {
+func radios(name, label string, value interface{}, errors map[string]string, inline bool, items ...itemData) radiosData {
 	return radiosData{
 		Name:   name,
 		Label:  label,
 		Value:  value,
 		Errors: errors,
 		Items:  items,
+		Inline: inline,
 	}
 }
 

@@ -51,7 +51,7 @@
                 </table>
 
                 {{ if not .Investigation.IsOnHold }}
-                    {{ template "radios" (radios "reason" "Reason" .Reason .Error.Field.reason
+                    {{ template "radios" (radios "reason" "Reason" .Reason .Error.Field.reason false
                     (item "Police Investigation" "Police Investigation")
                     (item "LA Investigation" "Local Authority Investigation")
                     ) }}
