@@ -1,0 +1,136 @@
+{{ template "case-summary" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Case Summary{{ end }}
+
+{{ define "main" }}
+  <div data-id="caseworker-summary-container">
+    <div class="govuk-grid-row" data-id="case-summary">
+      <div>
+        <div class="govuk-!-margin-bottom-4">
+          <div class="govuk-!-margin-bottom-2">
+            <svg class="app-svg-icon--inline govuk-!-display-inline" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -2 19 19" overflow="visible">
+              <circle cx="9.5" cy="9.5" r="9.5" fill="#1D70B8"/>
+              <circle cx="9.5" fill="#fff" cy="13.8" r="1.3"/>
+              <path fill="#fff" d="M8.4 4.5h2.2l-.2 7H8.6l-.2-7Z"/>
+            </svg>
+            <h3 class="govuk-heading-s govuk-!-display-inline">Warnings</h3>
+          </div>
+          {{ if not .CasesWarnings }}
+            <p class="govuk-body-s">There are none in place.</p>
+          {{ else }}
+            <ul class="govuk-list">
+              {{ range .CasesWarnings }}
+                <li>
+                  <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>{{ .WarningType }}</strong></p>
+                  <p class="govuk-body-s govuk-!-margin-bottom-1">{{ .WarningText }}</p>
+                  <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">Added on {{ .DateAdded }}</p>
+                  {{ if .CaseItems }}
+                    <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter">
+                      Applied to cases: {{ range .CaseItems }}{{ .UID }} {{ end }}
+                    </p>
+                  {{ end }}
+                  <hr>
+                </li>
+              {{ end }}
+            </ul>
+          {{ end }}
+        </div>
+
+        <div class="govuk-!-margin-bottom-4">
+          <svg class="app-svg-icon--inline" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -2 19 19" overflow="visible">
+            <circle cx="9.5" cy="9.5" r="9.5" fill="#1D70B8"/>
+            <circle cx="9.5" fill="#fff" cy="13.8" r="1.3"/>
+            <path fill="#fff" d="M8.4 4.5h2.2l-.2 7H8.6l-.2-7Z"/>
+          </svg>
+          <h3 class="govuk-heading-s govuk-!-display-inline">Complaints</h3>
+
+          {{ if not .CasesComplaints }}
+            <p class="govuk-body-s">There are none in place.</p>
+          {{ else }}
+            <details class="govuk-details">
+              <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                  Complaints ({{ len .CasesComplaints }})
+                </span>
+              </summary>
+              <div class="govuk-details__text">
+                {{ range .CasesComplaints }}
+                  <a class="govuk-body-s govuk-link" href="#">
+                    <strong>{{ .Summary }}</strong>
+                  </a>
+                  <ul class="govuk-list">
+                    <li>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Description:</strong> {{ .Description }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Severity:</strong> {{ .Severity }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Category:</strong> {{ .Category }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Sub-Category:</strong> {{ .SubCategory }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter"><strong>Received Date:</strong> {{ .ReceivedDate }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Investigating Officer:</strong> {{ .InvestigatingOfficer }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Complainant Name:</strong> {{ .ComplainantName }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Complainant Category:</strong> {{ .ComplainantCategory }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Origin:</strong> {{ .Origin }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Compensation Type:</strong> {{ .CompensationType }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Compensation Amount:</strong> {{ .CompensationAmount }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Resolution:</strong> {{ .Resolution }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Resolution Info:</strong> {{ .ResolutionInfo }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Resolution Date:</strong> {{ .ResolutionDate }}</p>
+                    </li>
+                  </ul>
+                {{ end }}
+              </div>
+            </details>
+          {{ end }}
+        </div>
+
+        <div class="govuk-!-margin-bottom-4">
+          <svg class="app-svg-icon--inline" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -2 19 19" overflow="visible">
+            <circle cx="9.5" cy="9.5" r="9.5" fill="#1D70B8"/>
+            <circle cx="9.5" fill="#fff" cy="13.8" r="1.3"/>
+            <path fill="#fff" d="M8.4 4.5h2.2l-.2 7H8.6l-.2-7Z"/>
+          </svg>
+          <h3 class="govuk-heading-s govuk-!-display-inline">Investigations</h3>
+
+          {{ if not .CasesInvestigations }}
+            <p class="govuk-body-s">There are none in place.</p>
+          {{ else }}
+            <details class="govuk-details">
+              <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                  Investigations ({{ len .CasesInvestigations }})
+                </span>
+              </summary>
+              <div class="govuk-details__text">
+                {{ range .CasesInvestigations }}
+                  <a class="govuk-body-s govuk-link" href="#">
+                    <strong>{{ .Title }}</strong>
+                  </a>
+                  <ul class="govuk-list">
+                    <li>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>ID:</strong> {{ .ID }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Information:</strong> {{ .Information }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Type:</strong> {{ .Type }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1 app-colour-text-lighter"><strong>Date Received:</strong> {{ .DateReceived }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Is On Hold:</strong> {{ .IsOnHold }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Approval Date:</strong> {{ .ApprovalDate }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Risk Assessment Date:</strong> {{ .RiskAssessmentDate }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Approval Outcome:</strong> {{ .ApprovalOutcome }}</p>
+                      <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Investigation Closure Date:</strong> {{ .InvestigationClosureDate }}</p>
+                      {{ if .HoldPeriods }}
+                        <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>Hold Periods:</strong></p>
+                        <ul>
+                        {{ range .HoldPeriods }}
+                          <li class="govuk-body-s">{{ . }}</li>
+                        {{ end }}
+                        </ul>
+                      {{ end }}
+                    </li>
+                  </ul>
+                {{ end }}
+              </div>
+            </details>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+  </div>
+{{ end }}
