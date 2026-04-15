@@ -85,8 +85,9 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			data.Epa = epa
 			data.AppointmentType = caseAttorneyValue
 
+			var caseId int
 			if isEditing {
-				caseId, err := strToIntOrStatusError(caseIdStr)
+				caseId, err = strToIntOrStatusError(caseIdStr)
 				if err == nil {
 					err = client.UpdateEpa(ctx, caseId, epa)
 				}
