@@ -27,9 +27,9 @@
               </h2>
             </div>
             <div id="accordion-create-epa-content-1" class="govuk-accordion__section-content">
+              {{ template "input-date" (field "receiptDate" "Receipt date" .Epa.ReceiptDate .Error.Field.receiptDate "max" today) }}
               {{ template "input-date" (field "epaDonorSignatureDate" "Donor's signature date" .Epa.EpaDonorSignatureDate .Error.Field.epaDonorSignatureDate "max" "2007-09-30") }}
               {{ template "input-date" (field "epaDonorNoticeGivenDate" "Latest notification date" .Epa.EpaDonorNoticeGivenDate .Error.Field.epaDonorNoticeGivenDate) }}
-              {{ template "input-date" (field "receiptDate" "Receipt date" .Epa.ReceiptDate .Error.Field.receiptDate "max" today) }}
 
               {{ template "radios" (radios "donorHasOtherEpas" "Has the donor made any other EPAs?" (stringifyBoolPointer .Epa.DonorHasOtherEpas) .Error.Field.donorHasOtherEpas true
               (item "true" "Yes")
