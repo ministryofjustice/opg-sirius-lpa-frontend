@@ -73,7 +73,7 @@ services:
       - ./pacts:/go/src/app/pacts
 
   cypress:
-    image: cypress/included:15.9.0
+    image: cypress/included:15.13.0
     command: run --browser electron
     entrypoint: cypress
     depends_on:
