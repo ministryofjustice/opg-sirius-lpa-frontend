@@ -17,10 +17,13 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        {{ template "radios" (radios "severity" "Severity" .Complaint.Severity.Translation .Error.Field.severity false
+        {{ template "radios" (radios "severity" "Type" .Complaint.Severity.Translation .Error.Field.severity false
+          (item "Complaint" "Complaint")
+          (item "Complaints Correspondence" "Complaints Correspondence")
           (item "Minor" "Minor")
           (item "Major" "Major")
           (item "Security Breach" "Security Breach")
+          (item "Tier 1+" "Tier 1+")
         ) }}
 
         {{ template "input" (field "investigatingOfficer" "Investigating officer" .Complaint.InvestigatingOfficer .Error.Field.investigatingOfficer) }}
