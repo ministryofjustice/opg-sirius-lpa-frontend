@@ -9,6 +9,7 @@ import (
 type Case struct {
 	Applicants                                []Person          `json:"applicants,omitempty"`
 	Assignee                                  *Person           `json:"assignee,omitempty"`
+	AttorneyRelationshipToDonor               string            `json:"attorneyRelationshipToDonor,omitempty"`
 	Attorneys                                 []Person          `json:"attorneys,omitempty"`
 	CancellationDate                          DateString        `json:"cancellationDate,omitempty"`
 	CaseAttorneyJointly                       *bool             `json:"caseAttorneyJointly,omitempty"`
@@ -21,16 +22,17 @@ type Case struct {
 	DispatchDate                              DateString        `json:"dispatchDate,omitempty"`
 	Documents                                 []interface{}     `json:"documents,omitempty"`
 	Donor                                     *Person           `json:"donor,omitempty"`
-	DonorHasOtherEpas                         *bool             `json:"donorHasOtherEpas,omitempty"`
 	DueDate                                   DateString        `json:"dueDate,omitempty"`
 	ExpectedPaymentTotal                      int               `json:"expectedPaymentTotal"`
 	FilingDate                                DateString        `json:"filingDate,omitempty"`
 	ID                                        int               `json:"id,omitempty"`
 	InvalidDate                               DateString        `json:"invalidDate,omitempty"`
 	Investigations                            []interface{}     `json:"investigations,omitempty"`
-	NotifiedPersons                           []Person          `json:"notifiedPersons,omitempty"`
 	Notes                                     []interface{}     `json:"notes,omitempty"`
-	OtherEpaInfo                              string            `json:"otherEpaInfo,omitempty"`
+	NotificationDate                          DateString        `json:"notificationDate,omitempty"`
+	NotifiedPersons                           []Person          `json:"notifiedPersons,omitempty"`
+	PaymentByCheque                           *bool             `json:"paymentByCheque,omitempty"`
+	PaymentExemption                          *bool             `json:"paymentExemption,omitempty"`
 	PaymentDate                               DateString        `json:"paymentDate,omitempty"`
 	RagRating                                 int               `json:"ragRating,omitempty"`
 	ReceiptDate                               DateString        `json:"receiptDate,omitempty"`
@@ -46,12 +48,6 @@ type Case struct {
 	UID                                       string            `json:"uId,omitempty"`
 	ValidationChecks                          []interface{}     `json:"validationChecks,omitempty"`
 	WithdrawnDate                             DateString        `json:"withdrawnDate,omitempty"`
-	EpaDonorSignatureDate                     DateString        `json:"epaDonorSignatureDate,omitempty"`
-	EpaDonorNoticeGivenDate                   DateString        `json:"epaDonorNoticeGivenDate,omitempty"`
-	AttorneyRelationshipToDonor               string            `json:"attorneyRelationshipToDonor,omitempty"`
-	PaymentByCheque                           *bool             `json:"paymentByCheque,omitempty"`
-	PaymentExemption                          *bool             `json:"paymentExemption,omitempty"`
-	NotificationDate                          DateString        `json:"notificationDate,omitempty"`
 }
 
 func (c Case) Summary() string {
