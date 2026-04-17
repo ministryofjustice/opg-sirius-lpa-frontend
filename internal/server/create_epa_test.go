@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -58,9 +59,9 @@ func TestGetCreateEpaEdit(t *testing.T) {
 			epa := sirius.Epa{
 				Case: sirius.Case{
 					ReceiptDate:                     sirius.DateString("2022-04-05"),
-					CaseAttorneySingular:            boolPtr(appointmentType == "singular"),
-					CaseAttorneyJointlyAndSeverally: boolPtr(appointmentType == "jointly-and-severally"),
-					CaseAttorneyJointly:             boolPtr(appointmentType == "jointly"),
+					CaseAttorneySingular:            shared.BoolPtr(appointmentType == "singular"),
+					CaseAttorneyJointlyAndSeverally: shared.BoolPtr(appointmentType == "jointly-and-severally"),
+					CaseAttorneyJointly:             shared.BoolPtr(appointmentType == "jointly"),
 				},
 			}
 
@@ -288,7 +289,7 @@ func TestPostCreateEpaAddAttorney(t *testing.T) {
 		Return(sirius.Epa{Case: sirius.Case{ID: 456}}, nil)
 
 	template := &mockTemplate{}
-	
+
 	form := url.Values{
 		"epaDonorSignatureDate":   {dateString},
 		"epaDonorNoticeGivenDate": {dateString},
