@@ -31,7 +31,7 @@ type createDocumentData struct {
 	TemplateSelected           sirius.DocumentTemplateData
 	HasViewedInsertPage        bool
 	SelectedInserts            []string
-	Recipients                 []sirius.Person
+	Recipients                 []sirius.Recipient
 	DocumentInsertKeys         []string
 	ComponentDocumentData      ComponentDocumentData
 	HasSelectedAddNewRecipient bool
@@ -232,10 +232,10 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 	}
 }
 
-func getRecipients(caseItem sirius.Case) ([]sirius.Person, error) {
+func getRecipients(caseItem sirius.Case) ([]sirius.Recipient, error) {
 	caseItem = caseItem.FilterInactiveAttorneys()
 
-	var recipients []sirius.Person
+	var recipients []sirius.Recipient
 	recipients = append(recipients, *caseItem.Donor)
 
 	if caseItem.Correspondent != nil {
@@ -248,9 +248,12 @@ func getRecipients(caseItem sirius.Case) ([]sirius.Person, error) {
 		}
 		return caseItem.Attorneys[i].Surname < caseItem.Attorneys[j].Surname
 	})
-
-	recipients = append(recipients, caseItem.Attorneys...)
-	recipients = append(recipients, caseItem.TrustCorporations...)
+	for _, attorney := range caseItem.Attorneys {
+		recipients = append(recipients, attorney)
+	}
+	for _, trustCorporation := range caseItem.TrustCorporations {
+		recipients = append(recipients, trustCorporation)
+	}
 
 	return recipients, nil
 }
