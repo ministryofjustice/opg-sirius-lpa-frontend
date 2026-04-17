@@ -1,6 +1,6 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Create EPA{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ .Title }}{{ end }}
 
 {{ define "main" }}
   <div class="govuk-grid-row">
@@ -66,8 +66,21 @@
               </h2>
             </div>
             <div id="accordion-create-epa-content-3" class="govuk-accordion__section-content">
+              {{ if gt (len .Epa.Attorneys) 0 }}
+                <p class="govuk-heading-s">Attorneys:</p>
+                {{ range $attorney := .Epa.Attorneys }}
+                  <details class="govuk-details" >
+                    <summary class="govuk-details__summary">
+                      <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }}{{ else }}{{ .Salutation }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}{{ end }}</span>
+                    </summary>
+                    <div class="govuk-details__text">
+                      {{ template "attorney-details-table" . }}
+                    </div>
+                  </details>
+                {{ end }}
+              {{ end }}
               <div class="govuk-button-group app-button-group--column">
-                <a class="govuk-button govuk-button--secondary">Add attorney</a>
+                <input class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" data-disable-after-click="true" name="addAttorney" value="Add attorney" />
                 <a class="govuk-button govuk-button--secondary">Add correspondent</a>
               </div>
             </div>
