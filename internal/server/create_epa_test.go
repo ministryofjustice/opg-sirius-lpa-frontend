@@ -53,35 +53,43 @@ func TestGetCreateEpa(t *testing.T) {
 }
 
 func TestGetCreateEpaEdit(t *testing.T) {
-	epa := sirius.Epa{
-		Case: sirius.Case{
-			ReceiptDate: sirius.DateString("2022-04-05"),
-		},
+	for _, appointmentType := range []string{"singular", "jointly", "jointly-and-severally"} {
+		t.Run(appointmentType, func(t *testing.T) {
+			epa := sirius.Epa{
+				Case: sirius.Case{
+					ReceiptDate:                     sirius.DateString("2022-04-05"),
+					CaseAttorneySingular:            boolPtr(appointmentType == "singular"),
+					CaseAttorneyJointlyAndSeverally: boolPtr(appointmentType == "jointly-and-severally"),
+					CaseAttorneyJointly:             boolPtr(appointmentType == "jointly"),
+				},
+			}
+
+			client := &mockCreateEpaClient{}
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, createEpaData{
+					Title:           "Edit EPA",
+					Epa:             epa,
+					AppointmentType: appointmentType,
+				}).
+				Return(nil)
+
+			client.
+				On("Epa", mock.Anything, 234).
+				Return(epa, nil)
+
+			r, _ := http.NewRequest(http.MethodGet, "/?id=123&caseId=234", nil)
+			w := httptest.NewRecorder()
+
+			err := CreateEpa(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
 	}
-
-	client := &mockCreateEpaClient{}
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, createEpaData{
-			Title: "Edit EPA",
-			Epa:   epa,
-		}).
-		Return(nil)
-
-	client.
-		On("Epa", mock.Anything, 234).
-		Return(epa, nil)
-
-	r, _ := http.NewRequest(http.MethodGet, "/?id=123&caseId=234", nil)
-	w := httptest.NewRecorder()
-
-	err := CreateEpa(client, template.Func)(w, r)
-	resp := w.Result()
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestGetCreateEpaBadQuery(t *testing.T) {
@@ -101,6 +109,23 @@ func TestGetCreateEpaBadQuery(t *testing.T) {
 			assert.NotNil(t, err)
 		})
 	}
+}
+
+func TestGetCreateEpaEditWhenEpaErrors(t *testing.T) {
+	client := &mockCreateEpaClient{}
+	client.
+		On("Epa", mock.Anything, 234).
+		Return(sirius.Epa{}, errExample)
+
+	template := &mockTemplate{}
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&caseId=234", nil)
+	w := httptest.NewRecorder()
+
+	err := CreateEpa(client, template.Func)(w, r)
+
+	assert.Equal(t, err, errExample)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestPostCreateEpa(t *testing.T) {
