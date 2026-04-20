@@ -118,3 +118,27 @@ func TestCreateAttorney(t *testing.T) {
 		})
 	}
 }
+
+func TestAttorneySummary(t *testing.T) {
+	attorney := Attorney{
+		Person: Person{
+			Firstname: "Melanie",
+			Surname:   "Vanvolkenburg",
+		},
+	}
+	assert.Equal(t, "Melanie Vanvolkenburg", attorney.Summary())
+}
+
+func TestAttorneyAddress(t *testing.T) {
+	attorney := Attorney{
+		Person: Person{
+			AddressLine1: "29737 Andrew Plaza",
+			AddressLine2: "Apt. 814",
+			Town:         "Hirthehaven",
+			County:       "Saskatchewan",
+			Postcode:     "S7R 9F9",
+			Country:      "Canada",
+		},
+	}
+	assert.Equal(t, "29737 Andrew Plaza, Apt. 814, Hirthehaven, Saskatchewan, S7R 9F9, Canada", attorney.AddressSummary())
+}

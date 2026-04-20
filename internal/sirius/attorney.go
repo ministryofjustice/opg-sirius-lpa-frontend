@@ -2,6 +2,7 @@ package sirius
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 )
 
@@ -16,16 +17,9 @@ func (a Attorney) Summary() string {
 }
 
 func (a Attorney) AddressSummary() string {
-	i := 0
-	s := []string{a.AddressLine1, a.AddressLine2, a.AddressLine3, a.Town, a.County, a.Postcode, a.Country}
-	for _, x := range s {
-		if x != "" {
-			s[i] = x
-			i++
-		}
-	}
-	s = s[:i]
-	return strings.Join(s, ", ")
+	address := []string{a.AddressLine1, a.AddressLine2, a.AddressLine3, a.Town, a.County, a.Postcode, a.Country}
+	filteredAddress := slices.DeleteFunc(address, func(x string) bool { return x == "" })
+	return strings.Join(filteredAddress, ", ")
 }
 
 func (c *Client) CreateAttorney(ctx Context, caseId int, attorney Attorney) error {
