@@ -71,7 +71,7 @@
                 {{ range $attorney := .Epa.Attorneys }}
                   <details class="govuk-details" >
                     <summary class="govuk-details__summary">
-                      <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }}{{ else }}{{ .Salutation }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}{{ end }}</span>
+                      <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
                     </summary>
                     <div class="govuk-details__text">
                       {{ template "attorney-details-table" . }}

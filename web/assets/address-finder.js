@@ -61,7 +61,7 @@ function AddressFinder($module, options) {
 }
 
 AddressFinder.template = (id) => `
-  <div class="govuk-form-group">
+  <div class="govuk-form-group govuk-!-margin-bottom-0">
     <label class="govuk-label" for="f-${id}-input"></label>
     <div class="govuk-hint" id="f-${id}-hint">
       Enter a UK postcode, or enter the address manually.
