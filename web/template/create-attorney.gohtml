@@ -16,8 +16,7 @@
         {{ template "input" (field "firstname" "First name" .Attorney.Firstname .Error.Field.firstname) }}
         {{ template "input" (field "middlenames" "Middle names" .Attorney.Middlenames .Error.Field.middlenames) }}
         {{ template "input" (field "surname" "Last name" .Attorney.Surname .Error.Field.surname) }}
-        {{ template "input" (field "otherNames" "Other names" .Attorney.AlsoKnownAs .Error.Field.otherNames) }}
-        {{ template "input-date" (field "dob" "Date of birth" .Attorney.DateOfBirth .Error.Field.dob) }}
+        {{ template "input-date" (field "dob" "Date of birth" .Attorney.DateOfBirth .Error.Field.dob "max" today) }}
         {{ template "input" (field "companyName" "Company name" .Attorney.CompanyName .Error.Field.companyName) }}
         
         <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Address">

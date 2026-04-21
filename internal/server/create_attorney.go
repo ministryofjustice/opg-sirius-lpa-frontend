@@ -55,7 +55,6 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 					Firstname:         postFormString(r, "firstname"),
 					Middlenames:       postFormString(r, "middlenames"),
 					Surname:           postFormString(r, "surname"),
-					AlsoKnownAs:       postFormString(r, "otherNames"),
 					DateOfBirth:       postFormDateString(r, "dob"),
 					PhoneNumber:       postFormString(r, "phoneNumber"),
 					Email:             postFormString(r, "email"),
@@ -83,7 +82,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 			} else if err != nil {
 				return err
 			}
-			
+
 			return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, caseId))
 
 		}
