@@ -1,0 +1,47 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add a Correspondent{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        {{ template "error-summary" .Error }}
+
+      <h1 class="govuk-heading-l">Add a Correspondent</h1>
+
+        {{ if gt (len .Epa.Attorneys) 0 }}
+          <form class="form" method="POST">
+            <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+            <div class="govuk-form-group{{ if .Error.Field.attorney }} govuk-form-group--error{{ end }}">
+              <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend">Select an attorney</legend>
+                  {{ template "errors" .Error.Field.attorney }}
+
+                <div class="govuk-radios" data-module="govuk-radios">
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-attorney-new" name="attorneyId" type="radio" value="new">
+                    <label class="govuk-label govuk-radios__label" for="f-attorney-new">
+                      Create a new correspondent
+                    </label>
+                  </div>
+                  <div class="govuk-body">Or use an existing actor from this Power of Attorney:</div>
+                  {{ range $num, $attorney := .Epa.Attorneys }}
+                    <div class="govuk-radios__item">
+                      <input class="govuk-radios__input" id="f-attorney-{{ plusN $num 1 }}" name="attorneyId" type="radio" value="{{ $attorney.ID }}">
+                      <label class="govuk-label govuk-radios__label" for="f-attorney-{{ plusN $num 1 }}">
+                        {{ if $attorney.CompanyName }}{{ $attorney.CompanyName }}{{ else }}{{ $attorney.Firstname }} {{ $attorney.Surname }}{{ end }}
+                      </label>
+                    </div>
+                  {{ end }}
+                </div>
+              </fieldset>
+            </div>
+            <div class="govuk-button-group govuk-!-padding-top-5">
+              <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
+              <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?id=%d&caseId=%d" .DonorId .CaseId) }}">Cancel</a>
+            </div>
+          </form>
+        {{ end }}
+    </div>
+  </div>
+{{ end }}

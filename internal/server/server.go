@@ -58,6 +58,7 @@ type Client interface {
 	CompareDocsClient
 	CreateAdditionalDraftClient
 	CreateAttorneyClient
+	CreateCorrespondentClient
 	CreateDocumentClient
 	CreateDocumentDigitalLpaClient
 	CreateDonorClient
@@ -97,6 +98,7 @@ type Client interface {
 	SearchClient
 	SearchDonorsClient
 	SearchUsersClient
+	SelectOrCreateCorrespondentClient
 	TaskClient
 	UnlinkPersonClient
 	UpdateDecisionsClient
@@ -132,6 +134,8 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-donor", wrap(CreateDonor(client, templates.Get("donor.gohtml"))))
 	mux.Handle("/create-epa", wrap(CreateEpa(client, templates.Get("create-epa.gohtml"))))
 	mux.Handle("/create-attorney", wrap(CreateAttorney(client, templates.Get("create-attorney.gohtml"))))
+	mux.Handle("/select-or-create-correspondent", wrap(SelectOrCreateCorrespondent(client, templates.Get("select-or-create-correspondent.gohtml"))))
+	mux.Handle("/create-correspondent", wrap(CreateCorrespondent(client, templates.Get("create-correspondent.gohtml"))))
 	mux.Handle("/create-investigation", wrap(CreateInvestigation(client, templates.Get("create_investigation.gohtml"))))
 	mux.Handle("/create-document", wrap(CreateDocument(client, templates.Get("create_document.gohtml"))))
 	mux.Handle("/edit-document", wrap(EditDocument(client, templates.Get("edit_document.gohtml"))))

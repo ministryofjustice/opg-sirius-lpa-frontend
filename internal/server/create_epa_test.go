@@ -158,7 +158,6 @@ func TestPostCreateEpa(t *testing.T) {
 		On("Func", mock.Anything, createEpaData{
 			Title:           "Create an EPA",
 			Success:         true,
-			Epa:             epa,
 			AppointmentType: "singular",
 		}).
 		Return(nil)
@@ -234,7 +233,7 @@ func TestPostCreateEpaEdit(t *testing.T) {
 		On("Func", mock.Anything, createEpaData{
 			Title:           "Edit EPA",
 			Success:         true,
-			Epa:             newEpa,
+			Epa:             epa,
 			AppointmentType: "singular",
 		}).
 		Return(nil)
@@ -349,7 +348,6 @@ func TestPostCreateEpaWhenValidationError(t *testing.T) {
 			Title:           "Create an EPA",
 			Success:         false,
 			Error:           expectedError,
-			Epa:             epa,
 			AppointmentType: "singular",
 		}).
 		Return(nil)
