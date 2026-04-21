@@ -81,7 +81,6 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 					PaymentDate:                     postFormDateString(r, "paymentDate"),
 				},
 			}
-			data.Epa = epa
 			data.AppointmentType = caseAttorneyValue
 
 			if isEditing {
@@ -103,6 +102,11 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 
 			if r.FormValue("addAttorney") != "" {
 				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d", donorID, caseId))
+			} else if r.FormValue("addCorrespondent") != "" {
+				if len(data.Epa.Attorneys) > 0 {
+					return RedirectError(fmt.Sprintf("/select-or-create-correspondent?id=%d&caseId=%d", donorID, caseId))
+				}
+				return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d", donorID, caseId))
 			} else {
 				data.Success = true
 			}

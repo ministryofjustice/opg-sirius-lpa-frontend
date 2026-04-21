@@ -386,7 +386,7 @@ func TestGetRecipientsFiltersInactiveActors(t *testing.T) {
 func TestGetRecipientsWithCorrespondent(t *testing.T) {
 	donor := sirius.Person{ID: 1}
 	attorney := sirius.Attorney{Person: sirius.Person{ID: 3}, SystemStatus: shared.BoolPtr(true)}
-	correspondent := sirius.Person{ID: 4}
+	correspondent := sirius.Correspondent{Person: sirius.Person{ID: 4}}
 	caseItem := sirius.Case{Donor: &donor, Attorneys: []sirius.Attorney{attorney}, Correspondent: &correspondent}
 
 	recipients, _ := getRecipients(caseItem)
@@ -398,7 +398,7 @@ func TestGetRecipientsOrder(t *testing.T) {
 	attorney1 := sirius.Attorney{Person: sirius.Person{ID: 2, Firstname: "Gemma", Surname: "Taylor"}, SystemStatus: shared.BoolPtr(true)}
 	attorney2 := sirius.Attorney{Person: sirius.Person{ID: 3, Firstname: "Amy", Surname: "Taylor"}, SystemStatus: shared.BoolPtr(true)}
 	attorney3 := sirius.Attorney{Person: sirius.Person{ID: 4, Firstname: "Claire", Surname: "Smith"}, SystemStatus: shared.BoolPtr(true)}
-	correspondent := sirius.Person{ID: 5}
+	correspondent := sirius.Correspondent{Person: sirius.Person{ID: 5}}
 	trustCorp := sirius.Attorney{Person: sirius.Person{ID: 6}, SystemStatus: shared.BoolPtr(true)}
 	caseItem := sirius.Case{Donor: &donor, Attorneys: []sirius.Attorney{attorney1, attorney2, attorney3}, Correspondent: &correspondent, TrustCorporations: []sirius.Attorney{trustCorp}}
 
