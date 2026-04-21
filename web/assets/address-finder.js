@@ -76,7 +76,7 @@ AddressFinder.template = (id) => `
       aria-describedby="f-${id}-hint"
     />
     <button
-      class="govuk-button govuk-!-margin-top-1"
+      class="govuk-button govuk-!-margin-top-1 govuk-!-margin-bottom-1"
       type="button"
     >
       Find address

@@ -1,13 +1,13 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add an Attorney{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add an attorney{{ end }}
 
 {{ define "main" }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {{ template "error-summary" .Error }}
 
-      <h1 class="govuk-heading-l">Add an Attorney</h1>
+      <h1 class="govuk-heading-l">Add an attorney</h1>
 
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
@@ -20,7 +20,7 @@
         {{ template "input-date" (field "dob" "Date of birth" .Attorney.DateOfBirth .Error.Field.dob) }}
         {{ template "input" (field "companyName" "Company name" .Attorney.CompanyName .Error.Field.companyName) }}
         
-        <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Attorney address">
+        <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Address">
             {{ template "input" (field "addressLine1" "Address line 1" .Attorney.AddressLine1 .Error.Field.addressLine1 "data-app-address-finder-map" "addressLine1") }}
             {{ template "input" (field "addressLine2" "Address line 2" .Attorney.AddressLine2 .Error.Field.addressLine2 "data-app-address-finder-map" "addressLine2") }}
             {{ template "input" (field "addressLine3" "Address line 3" .Attorney.AddressLine3 .Error.Field.addressLine3 "data-app-address-finder-map" "addressLine3") }}
