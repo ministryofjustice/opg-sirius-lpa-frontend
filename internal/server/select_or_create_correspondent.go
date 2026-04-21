@@ -69,7 +69,6 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 						Firstname:         attorney.Firstname,
 						Middlenames:       attorney.Middlenames,
 						Surname:           attorney.Surname,
-						AlsoKnownAs:       attorney.AlsoKnownAs,
 						DateOfBirth:       attorney.DateOfBirth,
 						PhoneNumber:       attorney.PhoneNumber,
 						Email:             attorney.Email,
