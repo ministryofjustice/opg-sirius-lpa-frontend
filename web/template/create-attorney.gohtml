@@ -45,6 +45,7 @@
 
         <div class="govuk-button-group govuk-!-padding-top-5">
             <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+            <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add another attorney" />
             <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?id=%d&caseId=%d" .DonorId .CaseId) }}">Cancel</a>
         </div>
       </form>

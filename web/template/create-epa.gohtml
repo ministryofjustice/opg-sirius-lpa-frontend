@@ -69,7 +69,7 @@
               {{ if gt (len .Epa.Attorneys) 0 }}
                 <p class="govuk-heading-s">Attorneys:</p>
                 {{ range $attorney := .Epa.Attorneys }}
-                  <details class="govuk-details" >
+                  <details class="govuk-details">
                     <summary class="govuk-details__summary">
                       <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
                     </summary>
@@ -81,7 +81,7 @@
               {{ end }}
               <div class="govuk-button-group app-button-group--column">
                 <input class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" data-disable-after-click="true" name="addAttorney" value="Add attorney" />
-                <a class="govuk-button govuk-button--secondary">Add correspondent</a>
+                <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0">Add correspondent</a>
               </div>
             </div>
           </div>
