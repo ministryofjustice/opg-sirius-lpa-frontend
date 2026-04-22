@@ -53,9 +53,9 @@ func TestColour(t *testing.T) {
 		expected string
 	}{
 		{CaseStatusTypeRegistered, "green"},
-		{CaseStatusTypePerfect, "turquoise"},
+		{CaseStatusTypePerfect, "teal"},
 		{CaseStatusTypeStatutoryWaitingPeriod, "yellow"},
-		{CaseStatusTypeInProgress, "light-blue"},
+		{CaseStatusTypeInProgress, "blue"},
 		{CaseStatusTypeDraft, "purple"},
 		{CaseStatusTypeCancelled, "red"},
 		{CaseStatusTypeUnknown, "grey"},
