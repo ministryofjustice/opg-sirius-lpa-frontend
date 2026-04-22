@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -48,6 +49,7 @@ func TestGetCreateAttorney(t *testing.T) {
 			DonorId:              1,
 			CaseId:               2,
 			RelationshipToDonors: mockRelationshipToDonorCategories,
+			Attorney:             sirius.Attorney{SystemStatus: shared.BoolPtr(true)},
 		}).
 		Return(nil)
 

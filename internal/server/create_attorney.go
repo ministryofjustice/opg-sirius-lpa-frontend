@@ -48,6 +48,9 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 			return err
 		}
 
+		// Default the active status to true for new attorneys
+		data.Attorney.SystemStatus = shared.BoolPtr(true)
+
 		if r.Method == http.MethodPost {
 			attorney := sirius.Attorney{
 				Person: sirius.Person{
