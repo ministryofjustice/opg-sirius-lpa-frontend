@@ -429,3 +429,8 @@ $govuk-assets-path: "../assets/";
     width: auto;
   }
 }
+
+.app-donor-details-table th.app-donor-details-table__key {
+  width: 75px;
+  vertical-align: top;
+}
