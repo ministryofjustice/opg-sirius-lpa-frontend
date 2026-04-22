@@ -10,6 +10,14 @@
             <td class="govuk-table__cell">{{ .Firstname }}</td>
         </tr>
         <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Middle name</th>
+            <td class="govuk-table__cell">{{ .Middlenames }}</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Last name</th>
+            <td class="govuk-table__cell">{{ .Surname }}</td>
+        </tr>
+        <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">Date of birth</th>
             <td class="govuk-table__cell">
                 {{ if .DateOfBirth }}
@@ -18,14 +26,6 @@
                     -
                 {{ end }}
             </td>
-        </tr>
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">Middle name</th>
-            <td class="govuk-table__cell">{{ .Middlenames }}</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">Last name</th>
-            <td class="govuk-table__cell">{{ .Surname }}</td>
         </tr>
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">Company name</th>

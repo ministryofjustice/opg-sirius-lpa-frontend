@@ -83,6 +83,10 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 				return err
 			}
 
+			if r.FormValue("add-another") != "" {
+				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d", donorId, caseId))
+			}
+
 			return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, caseId))
 
 		}
