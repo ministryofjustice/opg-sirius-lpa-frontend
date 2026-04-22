@@ -38,7 +38,7 @@ RUN go install github.com/cosmtrek/air@v1.52.1 && go install github.com/go-delve
 
 ENTRYPOINT ["air"]
 
-FROM golang:1.26.0 AS build-env
+FROM golang:1.26.2 AS build-env
 
 ARG TARGETARCH
 WORKDIR /app
