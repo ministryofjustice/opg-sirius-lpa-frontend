@@ -68,6 +68,7 @@ type Client interface {
 	DeletePaymentClient
 	DeleteRelationshipClient
 	DocumentListClient
+	DonorDetailsClient
 	EditComplaintClient
 	EditDatesClient
 	EditDocumentClient
@@ -178,6 +179,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/lpa/{uid}/remove-an-attorney", wrap(RemoveAnAttorney(client, templates.Get("mlpa-remove-attorney.gohtml"), templates.Get("mlpa-confirm-attorney-removal.gohtml"), templates.Get("mlpa-attorney-decisions.gohtml"))))
 
 	//LPA
+	mux.Handle("/donor/{donorId}/details", wrap(DonorDetails(client, templates.Get("donor_details.gohtml"))))
 	mux.Handle("/donor/{id}/documents", wrap(DocumentList(client, templates.Get("documents.gohtml"))))
 	mux.Handle("/donor/{donorId}/history", wrap(GetLpaHistory(client, templates.Get("lpa-history.gohtml"))))
 	mux.Handle("/view-document/{uuid}", wrap(ViewDocument(client, templates.Get("view-document.gohtml"))))
