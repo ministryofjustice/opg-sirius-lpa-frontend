@@ -1,0 +1,20 @@
+{{ define "ActionPanel" }}
+    <div class="actions-panel" data-module="actions-panel">
+        <button
+            class="govuk-button govuk-button--secondary actions-panel__toggle"
+            id="actions-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="actions-content">
+            Actions
+        </button>
+        <div id="actions-content" class="actions-panel__content" hidden>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>Action 1</li>
+                <li>Action 2</li>
+                <li>Action 3</li>
+                <li>Action 4</li>
+            </ul>
+        </div>
+    </div>
+{{ end }}
