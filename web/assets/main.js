@@ -18,6 +18,7 @@ import addressFinder from "./address-finder";
 import autoApplyFilter from "./auto-apply-filter";
 import showHideCaseSummary from "./show-hide-case-summary";
 import disableAfterClick from "./disable-after-click";
+import showHideActions from "./action-panel";
 
 const prefix = document.body.getAttribute("data-prefix");
 
@@ -40,6 +41,7 @@ addressFinder(prefix);
 autoApplyFilter();
 showHideCaseSummary();
 disableAfterClick();
+showHideActions();
 
 if (window.self !== window.parent) {
   const success = document.querySelector('[data-app-reload~="page"]');
