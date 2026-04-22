@@ -19,7 +19,7 @@
         {{ template "input-date" (field "dob" "Date of birth" .Attorney.DateOfBirth .Error.Field.dob "max" today) }}
         {{ template "input" (field "companyName" "Company name" .Attorney.CompanyName .Error.Field.companyName) }}
         
-        <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Address">
+        <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Address" data-app-address-finder-fill-country="false">
             {{ template "input" (field "addressLine1" "Address line 1" .Attorney.AddressLine1 .Error.Field.addressLine1 "data-app-address-finder-map" "addressLine1") }}
             {{ template "input" (field "addressLine2" "Address line 2" .Attorney.AddressLine2 .Error.Field.addressLine2 "data-app-address-finder-map" "addressLine2") }}
             {{ template "input" (field "addressLine3" "Address line 3" .Attorney.AddressLine3 .Error.Field.addressLine3 "data-app-address-finder-map" "addressLine3") }}

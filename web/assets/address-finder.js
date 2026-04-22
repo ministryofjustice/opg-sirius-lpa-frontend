@@ -41,6 +41,10 @@ function AddressFinder($module, options) {
   const $label = $container.querySelector(`[for="f-${id}-input"]`);
   $label.innerText = this.$module.getAttribute("data-app-address-finder-label");
 
+  this.fillCountry = this.$module.getAttribute(
+    "data-app-address-finder-fill-country",
+  );
+
   const $link = $container.querySelector(".govuk-link");
   $link?.addEventListener("click", this.toggleInputs.bind(this));
 
@@ -205,7 +209,9 @@ AddressFinder.prototype.handleSelect = function () {
     this.underwriteValue(field, value),
   );
 
-  this.underwriteValue("country", "GB");
+  if (this.fillCountry !== "false") {
+    this.underwriteValue("country", "GB");
+  }
 };
 
 export default function init(prefix, $scope) {
