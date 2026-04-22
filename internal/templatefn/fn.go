@@ -278,7 +278,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			case "EPA":
 				return "colour-govuk-brown"
 			case "PFA":
-				return "colour-govuk-turquoise"
+				return "colour-govuk-teal"
 			case "HW":
 				return "colour-govuk-grass-green"
 			default:
@@ -423,7 +423,7 @@ func subtypeColour(subtype string) string {
 	case "personal-welfare":
 		return "light-green"
 	case "property-and-affairs":
-		return "turquoise"
+		return "teal"
 	default:
 		return ""
 	}

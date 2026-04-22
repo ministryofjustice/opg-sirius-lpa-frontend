@@ -41,7 +41,7 @@ type caseStatusMeta struct {
 
 var caseStatusMetadata = map[CaseStatus]caseStatusMeta{
 	CaseStatusTypeDraft:                  {"Draft", "draft", "purple"},
-	CaseStatusTypeInProgress:             {"In progress", "in-progress", "light-blue"},
+	CaseStatusTypeInProgress:             {"In progress", "in-progress", "blue"},
 	CaseStatusTypeStatutoryWaitingPeriod: {"Statutory waiting period", "statutory-waiting-period", "yellow"},
 	CaseStatusTypeDoNotRegister:          {"Do not register", "do-not-register", "red"},
 	CaseStatusTypeExpired:                {"Expired", "expired", "red"},
@@ -50,7 +50,7 @@ var caseStatusMetadata = map[CaseStatus]caseStatusMeta{
 	CaseStatusTypeCancelled:              {"Cancelled", "cancelled", "red"},
 	CaseStatusTypeDeRegistered:           {"De-registered", "de-registered", "red"},
 	CaseStatusTypeSuspended:              {"Suspended", "suspended", "red"},
-	CaseStatusTypePerfect:                {"Perfect", "", "turquoise"},
+	CaseStatusTypePerfect:                {"Perfect", "", "teal"},
 	CaseStatusTypePending:                {"Pending", "", "blue"},
 	CaseStatusTypePaymentPending:         {"Payment Pending", "", "blue"},
 	CaseStatusTypeReducedFeesPending:     {"Reduced Fees Pending", "", "blue"},

@@ -479,7 +479,7 @@ describe("View LPA history timeline", () => {
 
         cy.wrap($items.eq(1))
           .should("contain.text", "PFA 7000-9000-7000")
-          .find(".colour-govuk-turquoise")
+          .find(".colour-govuk-teal")
           .should("exist");
 
         cy.wrap($items.eq(2))
