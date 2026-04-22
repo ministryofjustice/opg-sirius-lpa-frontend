@@ -5,5 +5,12 @@
 {{ define "container-classes" }} app-!-max-full-width{{ end }}
 
 {{ define "main" }}
-    {{ template "DocumentList" . }}
+    <div class="document-main-wrapper">
+        <div class="document-list-section">
+            {{ template "DocumentList" . }}
+        </div>
+        <div class="action-panel-section">
+            {{ template "ActionPanel" . }}
+        </div>
+    </div>
 {{ end }}
