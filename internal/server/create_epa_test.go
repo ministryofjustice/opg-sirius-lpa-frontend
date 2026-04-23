@@ -130,21 +130,21 @@ func TestGetCreateEpaEditWhenEpaErrors(t *testing.T) {
 }
 
 func TestPostCreateEpa(t *testing.T) {
-	truePtr := true
-	falsePtr := false
+	truePtr := shared.BoolPtr(true)
+	falsePtr := shared.BoolPtr(false)
 	dateString := "2022-04-05"
 	epa := sirius.Epa{
 		EpaDonorSignatureDate:   sirius.DateString(dateString),
 		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
-		DonorHasOtherEpas:       &truePtr,
+		DonorHasOtherEpas:       truePtr,
 		OtherEpaInfo:            "More info",
 		Case: sirius.Case{
 			ReceiptDate:                     sirius.DateString(dateString),
-			CaseAttorneySingular:            &truePtr,
-			CaseAttorneyJointlyAndSeverally: &falsePtr,
-			CaseAttorneyJointly:             &falsePtr,
-			PaymentByCheque:                 &falsePtr,
-			PaymentExemption:                &truePtr,
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
 			PaymentDate:                     sirius.DateString(dateString),
 		},
 	}
@@ -187,36 +187,36 @@ func TestPostCreateEpa(t *testing.T) {
 }
 
 func TestPostCreateEpaEdit(t *testing.T) {
-	truePtr := true
-	falsePtr := false
+	truePtr := shared.BoolPtr(true)
+	falsePtr := shared.BoolPtr(false)
 	dateString := "2022-04-05"
 	epa := sirius.Epa{
 		EpaDonorSignatureDate:   sirius.DateString(dateString),
 		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
-		DonorHasOtherEpas:       &falsePtr,
+		DonorHasOtherEpas:       falsePtr,
 		OtherEpaInfo:            "More info 1",
 		Case: sirius.Case{
 			ReceiptDate:                     sirius.DateString(dateString),
-			CaseAttorneySingular:            &truePtr,
-			CaseAttorneyJointlyAndSeverally: &falsePtr,
-			CaseAttorneyJointly:             &falsePtr,
-			PaymentByCheque:                 &falsePtr,
-			PaymentExemption:                &truePtr,
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
 			PaymentDate:                     sirius.DateString(dateString),
 		},
 	}
 	newEpa := sirius.Epa{
 		EpaDonorSignatureDate:   sirius.DateString(dateString),
 		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
-		DonorHasOtherEpas:       &truePtr,
+		DonorHasOtherEpas:       truePtr,
 		OtherEpaInfo:            "More info 2",
 		Case: sirius.Case{
 			ReceiptDate:                     sirius.DateString(dateString),
-			CaseAttorneySingular:            &truePtr,
-			CaseAttorneyJointlyAndSeverally: &falsePtr,
-			CaseAttorneyJointly:             &falsePtr,
-			PaymentByCheque:                 &falsePtr,
-			PaymentExemption:                &truePtr,
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
 			PaymentDate:                     sirius.DateString(dateString),
 		},
 	}
@@ -264,21 +264,21 @@ func TestPostCreateEpaEdit(t *testing.T) {
 
 func TestPostCreateEpaAddAttorney(t *testing.T) {
 	expectedError := RedirectError("/create-attorney?id=123&caseId=456")
-	truePtr := true
-	falsePtr := false
+	truePtr := shared.BoolPtr(true)
+	falsePtr := shared.BoolPtr(false)
 	dateString := "2022-04-05"
 	epa := sirius.Epa{
 		EpaDonorSignatureDate:   sirius.DateString(dateString),
 		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
-		DonorHasOtherEpas:       &truePtr,
+		DonorHasOtherEpas:       truePtr,
 		OtherEpaInfo:            "More info",
 		Case: sirius.Case{
 			ReceiptDate:                     sirius.DateString(dateString),
-			CaseAttorneySingular:            &truePtr,
-			CaseAttorneyJointlyAndSeverally: &falsePtr,
-			CaseAttorneyJointly:             &falsePtr,
-			PaymentByCheque:                 &falsePtr,
-			PaymentExemption:                &truePtr,
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
 			PaymentDate:                     sirius.DateString(dateString),
 		},
 	}
@@ -316,21 +316,21 @@ func TestPostCreateEpaAddAttorney(t *testing.T) {
 
 func TestPostCreateEpaAddCorrespondent(t *testing.T) {
 	expectedError := RedirectError("/create-correspondent?id=123&caseId=456")
-	truePtr := true
-	falsePtr := false
+	truePtr := shared.BoolPtr(true)
+	falsePtr := shared.BoolPtr(false)
 	dateString := "2022-04-05"
 	epa := sirius.Epa{
 		EpaDonorSignatureDate:   sirius.DateString(dateString),
 		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
-		DonorHasOtherEpas:       &truePtr,
+		DonorHasOtherEpas:       truePtr,
 		OtherEpaInfo:            "More info",
 		Case: sirius.Case{
 			ReceiptDate:                     sirius.DateString(dateString),
-			CaseAttorneySingular:            &truePtr,
-			CaseAttorneyJointlyAndSeverally: &falsePtr,
-			CaseAttorneyJointly:             &falsePtr,
-			PaymentByCheque:                 &falsePtr,
-			PaymentExemption:                &truePtr,
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
 			PaymentDate:                     sirius.DateString(dateString),
 		},
 	}
@@ -368,21 +368,21 @@ func TestPostCreateEpaAddCorrespondent(t *testing.T) {
 
 func TestPostUpdateEpaWithAttorneysAddCorrespondent(t *testing.T) {
 	expectedError := RedirectError("/select-or-create-correspondent?id=123&caseId=456")
-	truePtr := true
-	falsePtr := false
+	truePtr := shared.BoolPtr(true)
+	falsePtr := shared.BoolPtr(false)
 	dateString := "2022-04-05"
 	epa := sirius.Epa{
 		EpaDonorSignatureDate:   sirius.DateString(dateString),
 		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
-		DonorHasOtherEpas:       &truePtr,
+		DonorHasOtherEpas:       truePtr,
 		OtherEpaInfo:            "More info",
 		Case: sirius.Case{
 			ReceiptDate:                     sirius.DateString(dateString),
-			CaseAttorneySingular:            &truePtr,
-			CaseAttorneyJointlyAndSeverally: &falsePtr,
-			CaseAttorneyJointly:             &falsePtr,
-			PaymentByCheque:                 &falsePtr,
-			PaymentExemption:                &truePtr,
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
 			PaymentDate:                     sirius.DateString(dateString),
 		},
 	}
@@ -430,20 +430,20 @@ func TestPostCreateEpaWhenValidationError(t *testing.T) {
 		Field: sirius.FieldErrors{"field": {"": "problem"}},
 	}
 
-	truePtr := true
-	falsePtr := false
+	truePtr := shared.BoolPtr(true)
+	falsePtr := shared.BoolPtr(false)
 	dateString := "2022-04-05"
 	epa := sirius.Epa{
 		EpaDonorSignatureDate:   sirius.DateString(dateString),
 		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
-		DonorHasOtherEpas:       &truePtr,
+		DonorHasOtherEpas:       truePtr,
 		OtherEpaInfo:            "More info",
 		Case: sirius.Case{
-			CaseAttorneySingular:            &truePtr,
-			CaseAttorneyJointlyAndSeverally: &falsePtr,
-			CaseAttorneyJointly:             &falsePtr,
-			PaymentByCheque:                 &falsePtr,
-			PaymentExemption:                &truePtr,
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
 			PaymentDate:                     sirius.DateString(dateString),
 		},
 	}
