@@ -19,6 +19,7 @@ import autoApplyFilter from "./auto-apply-filter";
 import showHideCaseSummary from "./show-hide-case-summary";
 import disableAfterClick from "./disable-after-click";
 import showHideActions from "./action-panel";
+import "htmx.org";
 
 const prefix = document.body.getAttribute("data-prefix");
 
@@ -42,6 +43,7 @@ autoApplyFilter();
 showHideCaseSummary();
 disableAfterClick();
 showHideActions();
+window.htmx = require("htmx.org");
 
 if (window.self !== window.parent) {
   const success = document.querySelector('[data-app-reload~="page"]');

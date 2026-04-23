@@ -27,7 +27,7 @@ type warningData struct {
 	Cases       []sirius.Case
 }
 
-func Warning(client WarningClient, tmpl template.Template) Handler {
+func Warning(client WarningClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		personId, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -91,6 +91,10 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 					}
 				}
 			}
+		}
+
+		if r.Header.Get("HX-Request") == "true" && partialTmpl != nil {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

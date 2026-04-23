@@ -46,6 +46,18 @@ $govuk-assets-path: "../assets/";
   max-width: 100%;
 }
 
+// GOV.UK Frontend applies width: 100% to .govuk-textarea by default.
+// In Sirius we want textareas to be narrower by default.
+.app-\!-textarea-75 {
+  width: 75%;
+}
+
+@include govuk-media-query($until: tablet) {
+  .app-\!-textarea-75 {
+    width: 100%;
+  }
+}
+
 .app-\!-no-min-max-width {
   min-width: unset;
   max-width: unset;
@@ -449,28 +461,37 @@ $govuk-assets-path: "../assets/";
   position: fixed;
   top: 51vh;
   right: 0;
-  z-index: 1000;
+  z-index: 1;
+}
+
+// When the panel is open we slide the toggle button left by the width of the
+// content. Use a CSS variable so we can keep it in sync with the content width.
+.actions-panel {
+  --actions-panel-width: 400px;
 }
 
 .actions-panel--open {
-  right: 280px;
+  right: var(--actions-panel-width);
 }
 
 .actions-panel__content {
   position: absolute;
-  top: -15vh;
-  width: 280px;
+  top: 0;
+  transform: translate(1rem, -50%);
+  width: var(--actions-panel-width);
   max-width: calc(100vw - 4rem);
   padding: 1rem;
   background: #ffffff;
   border: 1px solid #b1b4b6;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   z-index: 1;
-  transform: translateX(1rem);
   opacity: 0;
+  height: 0;
+  overflow: hidden;
   transition:
     transform 200ms ease,
-    opacity 200ms ease;
+    opacity 200ms ease,
+    height 200ms ease;
 }
 
 .actions-panel__content[hidden] {
@@ -483,13 +504,13 @@ $govuk-assets-path: "../assets/";
   transform: rotate(-90deg) translateY(-100%);
   left: 0;
   transform-origin: top left;
-  z-index: 2;
+  z-index: 1;
   margin: 0;
 }
 
 .actions-panel--open .actions-panel__content {
   display: block;
-  transform: translateX(0);
+  transform: translate(0, -50%);
   opacity: 1;
 }
 
