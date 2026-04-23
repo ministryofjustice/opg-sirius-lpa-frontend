@@ -1,6 +1,8 @@
 $govuk-page-width: 1220px;
 $moj-page-width: 1220px;
 
+$sirius-dark-blue: #00326e;
+
 $moj-assets-path: "../assets/";
 $govuk-assets-path: "../assets/";
 
@@ -297,8 +299,8 @@ $govuk-assets-path: "../assets/";
   color: #d9e2ee;
 }
 
-.colour-govuk-dark-blue {
-  background: govuk-colour("blue", $variant: "tint-50");
+.colour-sirius-dark-blue {
+  background: $sirius-dark-blue;
 }
 
 .colour-govuk-white {
@@ -404,7 +406,7 @@ $govuk-assets-path: "../assets/";
 
 .app-timeline-container {
   background: #d9e2ee;
-  border: 1px solid #00326e;
+  border: 1px solid $sirius-dark-blue;
   box-shadow: none;
   -moz-box-shadow: none;
   -webkit-box-shadow: none;
