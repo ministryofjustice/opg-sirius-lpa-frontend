@@ -40,6 +40,12 @@ $govuk-assets-path: "../assets/";
   background-color: white;
 }
 
+@include govuk-media-query($until: tablet) {
+  .app-\!-html-class--embedded {
+    font-size: 0.75em;
+  }
+}
+
 .app-\!-full-width {
   width: 100%;
 }
