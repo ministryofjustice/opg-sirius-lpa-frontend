@@ -9,12 +9,20 @@
             Actions
         </button>
         <div id="actions-content" class="actions-panel__content" hidden>
-            <ul class="govuk-list govuk-list--bullet">
-                <li>Action 1</li>
-                <li>Action 2</li>
-                <li>Action 3</li>
-                <li>Action 4</li>
-            </ul>
+            <div class="actions-panel__inner">
+                <div id="replace-action-panel">
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>
+                            <a hx-get="{{ prefix (printf "/create-warning?id=%d" .DonorID) }}"
+                               hx-target="#replace-action-panel"
+                               hx-swap="innerHTML"
+                            >
+                                Create warning
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 {{ end }}

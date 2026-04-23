@@ -65,7 +65,7 @@ func TestGetWarning(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/?id=89", nil)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template.Func)(w, req)
+	err := Warning(siriusClient, template.Func, nil)(w, req)
 
 	assert.Nil(t, err)
 	result := w.Result()
@@ -116,7 +116,7 @@ func TestPostWarningWithOneCase(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template.Func)(w, req)
+	err := Warning(siriusClient, template.Func, nil)(w, req)
 	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusOK, result.StatusCode)
@@ -173,7 +173,7 @@ func TestPostWarningWithMultipleCases(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template.Func)(w, req)
+	err := Warning(siriusClient, template.Func, nil)(w, req)
 	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusOK, result.StatusCode)
@@ -218,7 +218,7 @@ func TestPostWarningWithNoCases(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template.Func)(w, req)
+	err := Warning(siriusClient, template.Func, nil)(w, req)
 	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusOK, result.StatusCode)
@@ -271,7 +271,7 @@ func TestPostWarningValidationErrors(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template.Func)(w, req)
+	err := Warning(siriusClient, template.Func, nil)(w, req)
 	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusBadRequest, result.StatusCode)
@@ -302,7 +302,7 @@ func TestCreateWarningReturnsError(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, nil)(w, req)
+	err := Warning(siriusClient, nil, nil)(w, req)
 	assert.Equal(t, e, err)
 }
 
@@ -320,7 +320,7 @@ func TestGetWarningTypesFail(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, nil)(w, req)
+	err := Warning(siriusClient, nil, nil)(w, req)
 
 	assert.Equal(t, expectedErr, err)
 }
