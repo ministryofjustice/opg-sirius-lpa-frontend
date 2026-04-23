@@ -26,7 +26,7 @@
       <div class="govuk-width-container{{ block "container-classes" . }}{{ end }}">
         {{ block "backlink" . }}{{ end }}
 
-        <main class="govuk-main-wrapper" id="main-content" role="main">
+        <main class="govuk-main-wrapper{{ block "main-wrapper-classes" . }}{{ end }}" id="main-content" role="main">
           {{ block "main" . }}{{ end }}
         </main>
       </div>

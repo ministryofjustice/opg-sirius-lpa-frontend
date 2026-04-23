@@ -434,3 +434,7 @@ $govuk-assets-path: "../assets/";
   width: 75px;
   vertical-align: top;
 }
+
+.app-main-wrapper--no-top-padding {
+  padding-top: 0;
+}

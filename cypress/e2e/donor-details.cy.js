@@ -26,8 +26,10 @@ describe("Edit dates", () => {
     cy.get('[data-cy="donorDOB"]').contains("25/03/1960");
     cy.get('[data-cy="donorRecord"]').contains("7000-0000-0013");
     cy.get('[data-cy="donorEmail"]').contains("consuela@somesite.example");
-    cy.get('[data-cy="donorAddress"]').contains(
-      "3 Church Road, Blackpool, Lancashire, United Kingdom, FY48 7CY",
-    );
+    cy.get('[data-cy="donorAddress"]').within(() => {
+      cy.contains("3 Church Road,");
+      cy.contains("Blackpool, Lancashire,");
+      cy.contains("United Kingdom, FY48 7CY");
+    });
   });
 });

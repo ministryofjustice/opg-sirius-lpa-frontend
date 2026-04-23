@@ -10,14 +10,20 @@ const (
 	ComplaintSeverityMinor ComplaintSeverity = iota
 	ComplaintSeverityMajor
 	ComplaintSeveritySecurityBreach
+	ComplaintSeverityComplaint
+	ComplaintSeverityComplaintsCorrespondence
+	ComplaintSeverityTier1
 	ComplaintSeverityNotRecognised
 )
 
 var complaintSeverityMap = map[string]ComplaintSeverity{
-	"Minor":           ComplaintSeverityMinor,
-	"Major":           ComplaintSeverityMajor,
-	"Security Breach": ComplaintSeveritySecurityBreach,
-	"NotRecognised":   ComplaintSeverityNotRecognised,
+	"Minor":                     ComplaintSeverityMinor,
+	"Major":                     ComplaintSeverityMajor,
+	"Security Breach":           ComplaintSeveritySecurityBreach,
+	"Complaint":                 ComplaintSeverityComplaint,
+	"Complaints Correspondence": ComplaintSeverityComplaintsCorrespondence,
+	"Tier 1+":                   ComplaintSeverityTier1,
+	"NotRecognised":             ComplaintSeverityNotRecognised,
 }
 
 func (d ComplaintSeverity) Translation() string {
@@ -28,6 +34,12 @@ func (d ComplaintSeverity) Translation() string {
 		return "Major"
 	case ComplaintSeveritySecurityBreach:
 		return "Security Breach"
+	case ComplaintSeverityComplaint:
+		return "Complaint"
+	case ComplaintSeverityComplaintsCorrespondence:
+		return "Complaints Correspondence"
+	case ComplaintSeverityTier1:
+		return "Tier 1+"
 	default:
 		return "complaint severity NOT RECOGNISED"
 	}
