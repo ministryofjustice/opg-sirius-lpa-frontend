@@ -788,13 +788,10 @@ func TestStringifyBoolPointer(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["stringifyBoolPointer"].(func(*bool) string)
 
-	truePtr := true
-	falsePtr := false
-
 	tests := map[*bool]string{
-		&truePtr:  "true",
-		&falsePtr: "false",
-		nil:       "",
+		shared.BoolPtr(true):  "true",
+		shared.BoolPtr(false): "false",
+		nil:                   "",
 	}
 
 	for input, expected := range tests {
