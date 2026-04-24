@@ -54,7 +54,7 @@ func UpdateDecisions(client UpdateDecisionsClient, tmpl template.Template) Handl
 			CaseSummary: cs,
 			Form: formDecisionsDetails{
 				WhenTheLpaCanBeUsed:                         lpaStoreData.WhenTheLpaCanBeUsed.StringForApi(),
-				LifeSustainingTreatmentOption:               lpaStoreData.LifeSustainingTreatmentOption,
+				LifeSustainingTreatmentOption:               lpaStoreData.LifeSustainingTreatmentOption.String(),
 				HowAttorneysMakeDecisions:                   lpaStoreData.HowAttorneysMakeDecisions.String(),
 				HowAttorneysMakeDecisionsDetails:            lpaStoreData.HowAttorneysMakeDecisionsDetails,
 				HowReplacementAttorneysStepIn:               lpaStoreData.HowReplacementAttorneysStepIn.String(),
