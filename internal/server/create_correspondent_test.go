@@ -191,3 +191,60 @@ func TestPostCreateCorrespondentWhenValidationError(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
+
+func TestPostCreateCorrespondentCreationFails(t *testing.T) {
+	dateString := "2022-04-05"
+	correspondent := sirius.Correspondent{
+		Person: sirius.Person{
+			Salutation:        "Rev",
+			Firstname:         "Rudolph",
+			Middlenames:       "Modesto",
+			Surname:           "Stotesbury",
+			DateOfBirth:       sirius.DateString(dateString),
+			AddressLine1:      "Rotonda Gerardo 769",
+			AddressLine2:      "Appartamento 94",
+			AddressLine3:      "Augusto terme",
+			Town:              "San Sabazio",
+			County:            "Benevento",
+			Postcode:          "57797",
+			Country:           "Italy",
+			IsAirmailRequired: true,
+			PhoneNumber:       "079876543345",
+			Email:             "rm2@email.test",
+		},
+	}
+
+	client := &mockCreateCorrespondentClient{}
+	client.
+		On("CreateCorrespondent", mock.Anything, 2, correspondent).
+		Return(errExample)
+
+	template := &mockTemplate{}
+
+	form := url.Values{
+		"salutation":        {"Rev"},
+		"firstname":         {"Rudolph"},
+		"middlenames":       {"Modesto"},
+		"surname":           {"Stotesbury"},
+		"dob":               {dateString},
+		"addressLine1":      {"Rotonda Gerardo 769"},
+		"addressLine2":      {"Appartamento 94"},
+		"addressLine3":      {"Augusto terme"},
+		"town":              {"San Sabazio"},
+		"county":            {"Benevento"},
+		"postcode":          {"57797"},
+		"country":           {"Italy"},
+		"isAirmailRequired": {"true"},
+		"phoneNumber":       {"079876543345"},
+		"email":             {"rm2@email.test"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateCorrespondent(client, template.Func)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
