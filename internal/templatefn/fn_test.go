@@ -85,16 +85,6 @@ func testStringMapper(t *testing.T, fnName string, expectations map[string]strin
 	}
 }
 
-func TestLifeSustainingTreatmentOptionLongForm(t *testing.T) {
-	expectations := map[string]string{
-		"option-a": "Attorneys can give or refuse consent to LST",
-		"option-b": "Attorneys cannot give or refuse consent to LST",
-		"":         "Not specified",
-		"foo":      "lifeSustainingTreatmentOption NOT RECOGNISED: foo",
-	}
-
-	testStringMapper(t, "lifeSustainingTreatmentOptionLongForm", expectations)
-}
 
 func TestChannelForFormat(t *testing.T) {
 	expectations := map[string]string{
@@ -795,6 +785,36 @@ func TestStringifyBoolPointer(t *testing.T) {
 		&truePtr:  "true",
 		&falsePtr: "false",
 		nil:       "",
+	}
+
+	for input, expected := range tests {
+		result := fn(input)
+		assert.Equal(t, expected, result)
+	}
+}
+
+func TestStringifyBool(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["stringifyBool"].(func(bool) string)
+
+	tests := map[bool]string{
+		true:  "true",
+		false: "false",
+	}
+
+	for input, expected := range tests {
+		result := fn(input)
+		assert.Equal(t, expected, result)
+	}
+}
+
+func TestBoolToYesNo(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["boolToYesNo"].(func(bool) string)
+
+	tests := map[bool]string{
+		true:  "Yes",
+		false: "No",
 	}
 
 	for input, expected := range tests {

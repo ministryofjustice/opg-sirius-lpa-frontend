@@ -1,0 +1,54 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add an attorney{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+
+      <h1 class="govuk-heading-l">Add an attorney</h1>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+        {{ template "input" (field "salutation" "Title" .Attorney.Salutation .Error.Field.salutation) }}
+        {{ template "input" (field "firstname" "First name" .Attorney.Firstname .Error.Field.firstname) }}
+        {{ template "input" (field "middlenames" "Middle names" .Attorney.Middlenames .Error.Field.middlenames) }}
+        {{ template "input" (field "surname" "Last name" .Attorney.Surname .Error.Field.surname) }}
+        {{ template "input-date" (field "dob" "Date of birth" .Attorney.DateOfBirth .Error.Field.dob "max" today) }}
+        {{ template "input" (field "companyName" "Company name" .Attorney.CompanyName .Error.Field.companyName) }}
+        
+        <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Address" data-app-address-finder-fill-country="false">
+            {{ template "input" (field "addressLine1" "Address line 1" .Attorney.AddressLine1 .Error.Field.addressLine1 "data-app-address-finder-map" "addressLine1") }}
+            {{ template "input" (field "addressLine2" "Address line 2" .Attorney.AddressLine2 .Error.Field.addressLine2 "data-app-address-finder-map" "addressLine2") }}
+            {{ template "input" (field "addressLine3" "Address line 3" .Attorney.AddressLine3 .Error.Field.addressLine3 "data-app-address-finder-map" "addressLine3") }}
+            {{ template "input" (field "town" "Town" .Attorney.Town .Error.Field.town "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+            {{ template "input" (field "county" "County" .Attorney.County .Error.Field.county) }}
+            {{ template "input" (field "postcode" "Postcode" .Attorney.Postcode .Error.Field.postcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+            {{ template "input" (field "country" "Country" .Attorney.Country .Error.Field.country "data-app-address-finder-map" "country") }}
+        </div>
+        
+        {{ template "radios" (radios "isAirmailRequired" "Airmail required" ( stringifyBool .Attorney.IsAirmailRequired) .Error.Field.isAirmailRequired true
+        (item "true" "Yes")
+        (item "false" "No")
+        ) }}
+
+        {{ template "input" (field "phoneNumber" "Telephone number" .Attorney.PhoneNumber .Error.Field.phoneNumber) }}
+        {{ template "input" (field "email" "Email address" .Attorney.Email .Error.Field.email) }}
+        {{ template "select" (select "relationshipToDonor" "Relationship to donor" .Attorney.RelationshipToDonor .Error.Field.relationshipToDonor (options .RelationshipToDonors)) }}
+
+        {{ template "radios" (radios "isAttorneyActive" "Is this attorney active?" (stringifyBoolPointer .Attorney.SystemStatus) .Error.Field.SystemStatus true
+        (item "true" "Yes")
+        (item "false" "No")
+        ) }}
+
+        <div class="govuk-button-group govuk-!-padding-top-5">
+            <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+            <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add another attorney" />
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?id=%d&caseId=%d" .DonorId .CaseId) }}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}

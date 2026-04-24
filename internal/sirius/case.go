@@ -10,7 +10,7 @@ type Case struct {
 	Applicants                                []Person          `json:"applicants,omitempty"`
 	Assignee                                  *Person           `json:"assignee,omitempty"`
 	AttorneyRelationshipToDonor               string            `json:"attorneyRelationshipToDonor,omitempty"`
-	Attorneys                                 []Person          `json:"attorneys,omitempty"`
+	Attorneys                                 []Attorney        `json:"attorneys,omitempty"`
 	CancellationDate                          DateString        `json:"cancellationDate,omitempty"`
 	CaseAttorneyJointly                       *bool             `json:"caseAttorneyJointly,omitempty"`
 	CaseAttorneyJointlyAndJointlyAndSeverally *bool             `json:"caseAttorneyJointlyAndJointlyAndSeverally,omitempty"`
@@ -38,13 +38,13 @@ type Case struct {
 	ReceiptDate                               DateString        `json:"receiptDate,omitempty"`
 	RegistrationDate                          DateString        `json:"registrationDate,omitempty"`
 	RejectedDate                              DateString        `json:"rejectedDate,omitempty"`
-	ReplacementAttorneys                      []Person          `json:"replacementAttorneys,omitempty"`
+	ReplacementAttorneys                      []Attorney        `json:"replacementAttorneys,omitempty"`
 	RevokedDate                               DateString        `json:"revokedDate,omitempty"`
-	Status                                    shared.CaseStatus `json:"status"`
+	Status                                    shared.CaseStatus `json:"status,omitempty"`
 	StatusDate                                DateString        `json:"statusDate,omitempty"`
 	SubType                                   string            `json:"caseSubtype,omitempty"`
 	Tasks                                     []interface{}     `json:"tasks,omitempty"`
-	TrustCorporations                         []Person          `json:"trustCorporations,omitempty"`
+	TrustCorporations                         []Attorney        `json:"trustCorporations,omitempty"`
 	UID                                       string            `json:"uId,omitempty"`
 	ValidationChecks                          []interface{}     `json:"validationChecks,omitempty"`
 	WithdrawnDate                             DateString        `json:"withdrawnDate,omitempty"`
@@ -68,17 +68,17 @@ func (c *Client) Case(ctx Context, id int) (Case, error) {
 }
 
 func (c Case) FilterInactiveAttorneys() Case {
-	var activeAttorneys []Person
-	var activeTrustCorps []Person
+	var activeAttorneys []Attorney
+	var activeTrustCorps []Attorney
 
 	for _, attorney := range c.Attorneys {
-		if attorney.SystemStatus {
+		if attorney.SystemStatus != nil && *attorney.SystemStatus {
 			activeAttorneys = append(activeAttorneys, attorney)
 		}
 	}
 
 	for _, trustCorp := range c.TrustCorporations {
-		if trustCorp.SystemStatus {
+		if trustCorp.SystemStatus != nil && *trustCorp.SystemStatus {
 			activeTrustCorps = append(activeTrustCorps, trustCorp)
 		}
 	}

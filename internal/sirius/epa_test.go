@@ -19,14 +19,15 @@ func TestCreateEpa(t *testing.T) {
 	assert.NoError(t, err)
 
 	testCases := []struct {
-		name          string
-		setup         func()
-		expectedError func(int) error
-		Epa           Epa
+		name             string
+		setup            func()
+		expectedError    func(int) error
+		epa              Epa
+		expectedResponse Epa
 	}{
 		{
 			name: "OK",
-			Epa: Epa{
+			epa: Epa{
 				Case: Case{
 					ReceiptDate:          DateString("2015-03-05"),
 					ExpectedPaymentTotal: 0,
@@ -53,8 +54,13 @@ func TestCreateEpa(t *testing.T) {
 					WithCompleteResponse(consumer.Response{
 						Status:  http.StatusCreated,
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+						Body: map[string]interface{}{
+							"id":  matchers.Like(1),
+							"uId": matchers.Like("7000-0000-0000"),
+						},
 					})
 			},
+			expectedResponse: Epa{Case: Case{ID: 1, UID: "7000-0000-0000"}},
 		},
 	}
 
@@ -65,7 +71,8 @@ func TestCreateEpa(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				err := client.CreateEpa(Context{Context: context.Background()}, 189, tc.Epa)
+				epa, err := client.CreateEpa(Context{Context: context.Background()}, 189, tc.epa)
+				assert.Equal(t, epa, tc.expectedResponse)
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {
@@ -87,11 +94,11 @@ func TestUpdateEpa(t *testing.T) {
 		name          string
 		setup         func()
 		expectedError func(int) error
-		Epa           Epa
+		epa           Epa
 	}{
 		{
 			name: "OK",
-			Epa: Epa{
+			epa: Epa{
 				Case: Case{
 					ReceiptDate:          DateString("2015-03-05"),
 					ExpectedPaymentTotal: 0,
@@ -130,7 +137,7 @@ func TestUpdateEpa(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				err := client.UpdateEpa(Context{Context: context.Background()}, 800, tc.Epa)
+				err := client.UpdateEpa(Context{Context: context.Background()}, 800, tc.epa)
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {
