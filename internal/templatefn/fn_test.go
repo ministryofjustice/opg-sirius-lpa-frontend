@@ -792,3 +792,33 @@ func TestStringifyBoolPointer(t *testing.T) {
 		assert.Equal(t, expected, result)
 	}
 }
+
+func TestStringifyBool(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["stringifyBool"].(func(bool) string)
+
+	tests := map[bool]string{
+		true:  "true",
+		false: "false",
+	}
+
+	for input, expected := range tests {
+		result := fn(input)
+		assert.Equal(t, expected, result)
+	}
+}
+
+func TestBoolToYesNo(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["boolToYesNo"].(func(bool) string)
+
+	tests := map[bool]string{
+		true:  "Yes",
+		false: "No",
+	}
+
+	for input, expected := range tests {
+		result := fn(input)
+		assert.Equal(t, expected, result)
+	}
+}

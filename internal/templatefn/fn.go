@@ -349,6 +349,13 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				Context:  context,
 			}
 		},
+		"boolToYesNo": func(b bool) string {
+			if b {
+				return "Yes"
+			}
+			return "No"
+		},
+		"stringifyBool": strconv.FormatBool,
 		"stringifyBoolPointer": func(b *bool) string {
 			if b == nil {
 				return ""

@@ -41,6 +41,10 @@ function AddressFinder($module, options) {
   const $label = $container.querySelector(`[for="f-${id}-input"]`);
   $label.innerText = this.$module.getAttribute("data-app-address-finder-label");
 
+  this.fillCountry = this.$module.getAttribute(
+    "data-app-address-finder-fill-country",
+  );
+
   const $link = $container.querySelector(".govuk-link");
   $link?.addEventListener("click", this.toggleInputs.bind(this));
 
@@ -61,7 +65,7 @@ function AddressFinder($module, options) {
 }
 
 AddressFinder.template = (id) => `
-  <div class="govuk-form-group">
+  <div class="govuk-form-group govuk-!-margin-bottom-3">
     <label class="govuk-label" for="f-${id}-input"></label>
     <div class="govuk-hint" id="f-${id}-hint">
       Enter a UK postcode, or enter the address manually.
@@ -71,28 +75,25 @@ AddressFinder.template = (id) => `
       No matching address found. Please try again using a UK postcode, or enter the address manually
     </p>
     <input
-      class="govuk-input govuk-input--width-10"
+      class="govuk-input govuk-input--width-10 govuk-!-margin-top-1"
       id="f-${id}-input"
       aria-describedby="f-${id}-hint"
     />
-    <button
-      class="govuk-button govuk-button--secondary govuk-!-margin-left-2 govuk-!-margin-bottom-0"
-      type="button"
-    >
-      Find address
-    </button>
   </div>
-  <div class="govuk-form-group govuk-details__text govuk-!-display-none">
+  <button class="govuk-button  govuk-!-margin-bottom-3" type="button">
+    Find address
+  </button>
+  <div class="govuk-form-group govuk-details__text govuk-!-margin-bottom-3 govuk-!-display-none">
     <label class="govuk-label" for="f-${id}-select">
       Select an address
     </label>
     <select class="govuk-select" id="f-${id}-select"></select>
   </div>
-  <div class="govuk-body">
+  <p class="govuk-body govuk-!-margin-bottom-0">
     <a href="#" class="govuk-link govuk-link--no-visited-state">
       Enter address manually
     </a>
-  </div>
+  </p>
 `;
 
 AddressFinder.prototype.hideInputs = function () {
@@ -205,7 +206,9 @@ AddressFinder.prototype.handleSelect = function () {
     this.underwriteValue(field, value),
   );
 
-  this.underwriteValue("country", "GB");
+  if (this.fillCountry !== "false") {
+    this.underwriteValue("country", "GB");
+  }
 };
 
 export default function init(prefix, $scope) {

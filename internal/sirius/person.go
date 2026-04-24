@@ -5,6 +5,11 @@ import (
 	"strings"
 )
 
+type Recipient interface {
+	Summary() string
+	AddressSummary() string
+}
+
 type Person struct {
 	ID                    int        `json:"id,omitempty"`
 	UID                   string     `json:"uId,omitempty"`
@@ -22,7 +27,7 @@ type Person struct {
 	County                string     `json:"county"`
 	Postcode              string     `json:"postcode"`
 	Country               string     `json:"country"`
-	IsAirmailRequired     bool       `json:"isAirmailRequired"`
+	IsAirmailRequired     bool       `json:"isAirmailRequired,omitempty"`
 	PhoneNumber           string     `json:"phoneNumber"`
 	Email                 string     `json:"email"`
 	SageId                string     `json:"sageId"`
@@ -37,7 +42,6 @@ type Person struct {
 	CompanyReference      string     `json:"companyReference"`
 	PersonType            string     `json:"personType,omitempty"`
 	Cases                 []*Case    `json:"cases,omitempty"`
-	SystemStatus          bool       `json:"systemStatus,omitempty"`
 }
 
 func (p Person) Summary() string {
