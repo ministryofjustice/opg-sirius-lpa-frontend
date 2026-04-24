@@ -474,17 +474,17 @@ describe("View LPA history timeline", () => {
       .then(($items) => {
         cy.wrap($items.eq(0))
           .should("contain.text", "EPA 7000-7000-7000")
-          .find(".colour-govuk-brown")
+          .find(".colour-sirius-brown")
           .should("exist");
 
         cy.wrap($items.eq(1))
           .should("contain.text", "PFA 7000-9000-7000")
-          .find(".colour-govuk-teal")
+          .find(".colour-sirius-teal")
           .should("exist");
 
         cy.wrap($items.eq(2))
           .should("contain.text", "HW 7000-9000-6000")
-          .find(".colour-govuk-grass-green")
+          .find(".colour-sirius-green")
           .should("exist");
 
         cy.wrap($items.eq(3))
@@ -871,7 +871,7 @@ describe("View LPA history timeline", () => {
 
         cy.wrap($items.eq(1))
           .should("contain.text", "EPA 7000-7000-7000")
-          .find(".colour-govuk-brown")
+          .find(".colour-sirius-brown")
           .should("exist");
       });
   });
