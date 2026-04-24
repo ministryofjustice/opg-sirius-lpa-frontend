@@ -178,18 +178,6 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"subtypeLongFormat":      subtypeLongFormat,
 		"subtypeColour":          subtypeColour,
 		"severanceRequiredLabel": severanceRequiredLabel,
-		"lifeSustainingTreatmentOptionLongForm": func(s string) string {
-			switch s {
-			case "option-a":
-				return "Attorneys can give or refuse consent to LST"
-			case "option-b":
-				return "Attorneys cannot give or refuse consent to LST"
-			case "":
-				return "Not specified"
-			default:
-				return "lifeSustainingTreatmentOption NOT RECOGNISED: " + s
-			}
-		},
 		// translate channel code to long version for Format fields in display
 		"channelForFormat": func(s string) string {
 			switch s {

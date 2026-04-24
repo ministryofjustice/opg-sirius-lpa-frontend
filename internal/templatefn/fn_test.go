@@ -85,16 +85,6 @@ func testStringMapper(t *testing.T, fnName string, expectations map[string]strin
 	}
 }
 
-func TestLifeSustainingTreatmentOptionLongForm(t *testing.T) {
-	expectations := map[string]string{
-		"option-a": "Attorneys can give or refuse consent to LST",
-		"option-b": "Attorneys cannot give or refuse consent to LST",
-		"":         "Not specified",
-		"foo":      "lifeSustainingTreatmentOption NOT RECOGNISED: foo",
-	}
-
-	testStringMapper(t, "lifeSustainingTreatmentOptionLongForm", expectations)
-}
 
 func TestChannelForFormat(t *testing.T) {
 	expectations := map[string]string{
