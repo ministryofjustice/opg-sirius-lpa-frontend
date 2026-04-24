@@ -276,11 +276,11 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"caseLabel": func(s string) string {
 			switch strings.ToUpper(s) {
 			case "EPA":
-				return "colour-govuk-brown"
+				return "colour-sirius-brown"
 			case "PFA":
-				return "colour-govuk-teal"
+				return "colour-sirius-teal"
 			case "HW":
-				return "colour-govuk-grass-green"
+				return "colour-sirius-grass-green"
 			default:
 				return ""
 			}
@@ -421,7 +421,7 @@ func subtypeLongFormat(subtype string) string {
 func subtypeColour(subtype string) string {
 	switch strings.ToLower(subtype) {
 	case "personal-welfare":
-		return "light-green"
+		return "green"
 	case "property-and-affairs":
 		return "teal"
 	default:

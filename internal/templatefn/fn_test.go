@@ -161,9 +161,9 @@ func TestResolutionOutcome(t *testing.T) {
 
 func TestCaseLabel(t *testing.T) {
 	expectations := map[string]string{
-		"EPA": "colour-govuk-brown",
-		"pfa": "colour-govuk-teal",
-		"hw":  "colour-govuk-grass-green",
+		"EPA": "colour-sirius-brown",
+		"pfa": "colour-sirius-teal",
+		"hw":  "colour-sirius-grass-green",
 		"":    "",
 		"foo": "",
 	}
