@@ -151,9 +151,9 @@ func TestResolutionOutcome(t *testing.T) {
 
 func TestCaseLabel(t *testing.T) {
 	expectations := map[string]string{
-		"EPA": "colour-govuk-brown",
-		"pfa": "colour-govuk-turquoise",
-		"hw":  "colour-govuk-grass-green",
+		"EPA": "colour-sirius-brown",
+		"pfa": "colour-sirius-teal",
+		"hw":  "colour-sirius-green",
 		"":    "",
 		"foo": "",
 	}
@@ -644,7 +644,7 @@ func TestSubtypeLongFormat(t *testing.T) {
 func TestSubtypeColour(t *testing.T) {
 	var val string
 	val = subtypeColour("personal-welfare")
-	assert.Equal(t, "light-green", val)
+	assert.Equal(t, "green", val)
 
 	val = subtypeColour("not-in-list")
 	assert.Equal(t, "", val)

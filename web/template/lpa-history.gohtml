@@ -6,7 +6,7 @@
 
 {{ define "main" }}
     <div class="app-timeline-container">
-        <h2 class="govuk-heading-m colour-govuk-white colour-govuk-dark-blue govuk-!-padding-1 govuk-!-padding-left-2 govuk-!-margin-bottom-0">History</h2>
+        <h2 class="govuk-heading-m colour-govuk-white colour-sirius-dark-blue govuk-!-padding-1 govuk-!-padding-left-2 govuk-!-margin-bottom-0">History</h2>
         <div class="govuk-!-margin-4">
             <div class="app-align-items-end app-!-gap-2 govuk-!-margin-bottom-5">
                 <button class="govuk-button govuk-button govuk-!-margin-bottom-0" aria-controls="app-filters" data-filter-toggle>
@@ -23,7 +23,7 @@
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-one-quarter">
                     <div class="moj-filter moj-filter-layout__filter app-!-no-min-max-width" data-module="moj-filter">
-                        <div class="moj-filter__header govuk-!-padding-bottom-0 colour-govuk-dark-blue">
+                        <div class="moj-filter__header govuk-!-padding-bottom-0 colour-sirius-dark-blue">
                             <div class="moj-filter__header-title">
                                 <h2 class="govuk-heading-m colour-govuk-white">Filter</h2>
                                 <div class="govuk-body colour-govuk-white">
@@ -39,7 +39,7 @@
                             <div class="moj-filter__options">
                                 <form class="form" method="POST">
                                     <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
-                                    <button type="submit" class="govuk-button moj-filter__search-button" data-module="govuk-button" 
+                                    <button type="submit" class="govuk-button moj-filter__search-button" data-module="govuk-button"
                                             data-test-id="submit-button">
                                         Apply filters
                                     </button>
@@ -69,14 +69,14 @@
                                             <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
                                                 Type
                                             </legend>
-                                            <div class="govuk-checkboxes govuk-checkboxes--small" 
+                                            <div class="govuk-checkboxes govuk-checkboxes--small"
                                                  data-module="govuk-checkboxes">
                                                 {{ range .EventFilterData }}
                                                     <div class="govuk-checkboxes__item">
                                                         <input class="govuk-checkboxes__input" id="f-{{ .SourceType.Key }}"
                                                                 name="type" type="checkbox" value="{{ .SourceType.Key }}" data-module="app-auto-apply-filter"
                                                                 {{ if contains $.Form.Types .SourceType.Key }}checked{{ end }}>
-                                                        <label class="govuk-label govuk-checkboxes__label" 
+                                                        <label class="govuk-label govuk-checkboxes__label"
                                                                for="f-{{ .SourceType.Key }}">
                                                             {{ .SourceType.Translation }} ({{ .Total }})
                                                         </label>
@@ -124,7 +124,7 @@
                                                             {{ end }}
                                                         </strong>
                                                     {{ end }}
-                                                    <div class="govuk-tag app-govuk-tag-bold color-govuk-black lpa-history__meta-timestamp">
+                                                    <div class="govuk-tag app-govuk-tag-bold colour-govuk-black lpa-history__meta-timestamp">
                                                         <time datetime="{{ .CreatedOn }}">{{ parseAndFormatDate .CreatedOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
                                                         - #{{ .Hash }}
                                                     </div>
@@ -215,7 +215,7 @@
                                                         {{ if .User.Deleted }}
                                                             deleted user
                                                         {{ else }}
-                                                            <a class="govuk-link" 
+                                                            <a class="govuk-link"
                                                                href="mailto:{{ .User.Email}}">{{ .User.DisplayName }}</a>
                                                             {{ if gt (len .User.Teams) 0 }}({{ (index .User.Teams 0).DisplayName }}){{ end }}
                                                             {{ if .User.PhoneNumber }} &ndash; {{ .User.PhoneNumber }}{{ end }}

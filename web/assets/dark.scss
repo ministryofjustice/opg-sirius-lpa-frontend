@@ -22,7 +22,7 @@ $sirius-bg-color: #29292e;
   .govuk-caption-m,
   .govuk-caption-s,
   .govuk-caption-xs {
-    color: govuk-colour("light-grey");
+    color: govuk-colour("black", $variant: "tint-95");
   }
 
   h1,
@@ -47,19 +47,19 @@ $sirius-bg-color: #29292e;
   .govuk-details__summary-text,
   .govuk-link:link,
   .govuk-link--no-visited-state:visited {
-    color: lighten(govuk-colour("light-blue"), 20%);
+    color: lighten(govuk-colour("blue", $variant: "tint-25"), 20%);
   }
 
   .govuk-link:visited {
-    color: govuk-colour("light-pink");
+    color: govuk-colour("magenta", $variant: "tint-50");
   }
 
   .govuk-link:hover {
-    color: lighten(govuk-colour("light-blue"), 30%);
+    color: lighten(govuk-colour("blue", $variant: "tint-25"), 30%);
   }
 
   .govuk-link:active {
-    color: $govuk-link-active-colour;
+    color: govuk-functional-colour(link-active);
   }
 
   .govuk-label,
@@ -77,7 +77,7 @@ $sirius-bg-color: #29292e;
   }
 
   .govuk-hint {
-    color: govuk-colour("mid-grey");
+    color: govuk-colour("black", $variant: "tint-80");
   }
 
   .govuk-input,
@@ -102,11 +102,11 @@ $sirius-bg-color: #29292e;
   .govuk-pagination__item:hover,
   .govuk-pagination__next:hover,
   .govuk-pagination__prev:hover {
-    background-color: govuk-colour("dark-grey");
+    background-color: govuk-colour("black", $variant: "tint-25");
   }
 
   .govuk-pagination__icon {
-    color: govuk-colour("light-grey");
+    color: govuk-colour("black", $variant: "tint-95");
   }
 
   .moj-alert {
@@ -139,11 +139,7 @@ $sirius-bg-color: #29292e;
 
   .app-caseworker-summary,
   .app-caseworker-summary table {
-    background-color: #505a5f;
-  }
-
-  .govuk-header {
-    border-bottom: 10px solid govuk-colour("black");
+    background-color: govuk-colour("black", $variant: "tint-25");
   }
 
   .app-colour-text-lighter {
