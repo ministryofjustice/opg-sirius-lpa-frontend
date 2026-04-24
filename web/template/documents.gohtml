@@ -4,13 +4,14 @@
 
 {{ define "container-classes" }} app-!-max-full-width{{ end }}
 
+{{ define "action-panel" }}
+    {{ template "ActionPanel" . }}
+{{ end }}
+
 {{ define "main" }}
     <div class="document-main-wrapper">
         <div class="document-list-section">
             {{ template "DocumentList" . }}
-        </div>
-        <div class="action-panel-section">
-            {{ template "ActionPanel" . }}
         </div>
     </div>
 {{ end }}
