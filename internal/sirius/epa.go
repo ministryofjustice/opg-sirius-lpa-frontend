@@ -25,8 +25,10 @@ func (c *Client) Epa(ctx Context, id int) (Epa, error) {
 	return v, err
 }
 
-func (c *Client) CreateEpa(ctx Context, donorID int, epa Epa) error {
-	return c.post(ctx, fmt.Sprintf("/lpa-api/v1/donors/%d/epas", donorID), epa, nil)
+func (c *Client) CreateEpa(ctx Context, donorID int, epa Epa) (Epa, error) {
+	var v Epa
+	err := c.post(ctx, fmt.Sprintf("/lpa-api/v1/donors/%d/epas", donorID), epa, &v)
+	return v, err
 }
 
 func (c *Client) UpdateEpa(ctx Context, caseId int, epa Epa) error {
