@@ -81,3 +81,16 @@ func TestDonorDetailsSuccess(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.Code)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
+
+func TestDonorDetailsInvalidDonorId(t *testing.T) {
+	client := &mockDonorDetailsClient{}
+
+	template := &mockTemplate{}
+
+	server := newMockServer("/donor/{donorId}/details", DonorDetails(client, template.Func))
+
+	req, _ := http.NewRequest(http.MethodGet, "/donor/invalid/details", nil)
+	_, err := server.serve(req)
+
+	assert.Error(t, err)
+}
