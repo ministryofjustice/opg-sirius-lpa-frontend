@@ -1,0 +1,38 @@
+{{ define "page" }}
+    <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
+
+    {{ template "error-summary" .Error }}
+
+    {{ if .Success }}
+        <meta data-app-reload="page"/>
+        {{ template "success-banner" "You have successfully created an event." }}
+    {{ end }}
+
+    <h1 class="govuk-heading-l app-!-embedded-hide">Create Event</h1>
+
+    <form class="form" enctype="multipart/form-data" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+        {{ template "select" (select "type" "Event type" .Type .Error.Field.type (options .NoteTypes)) }}
+
+        {{ template "input" (field "name" "Subject" .Name .Error.Field.name) }}
+
+        {{ template "textarea" (field "description" "Notes" .Description .Error.Field.description) }}
+
+        <div class="govuk-form-group {{ if .Error.Field.file  }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-file">File upload</label>
+            {{ template "errors" .Error.Field.file }}
+            <input class="govuk-file-upload {{ if .Error.Field.file }}govuk-file-upload--error{{ end }}" type="file"
+                   name="file" id="f-file"/>
+        </div>
+
+        <div class="govuk-button-group">
+            <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+            <a class="govuk-link govuk-link--no-visited-state"
+               hx-get="{{ prefix (printf "/action-panel")}}"
+               hx-target="#replace-action-panel"
+               hx-swap="innerHTML"
+            >Cancel</a>
+        </div>
+    </form>
+{{ end }}
