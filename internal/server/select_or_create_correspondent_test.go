@@ -220,3 +220,36 @@ func TestPostSelectOrCreateCorrespondentValidationError(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
+
+func TestPostSelectOrCreateCorrespondentCreationFails(t *testing.T) {
+	epa := sirius.Epa{
+		Case: sirius.Case{
+			Attorneys: []sirius.Attorney{
+				{Person: sirius.Person{ID: 4, Firstname: "Rudolph", Surname: "Stotesbury"}},
+			},
+		},
+	}
+	correspondent := sirius.Correspondent{Person: sirius.Person{Firstname: "Rudolph", Surname: "Stotesbury"}}
+
+	client := &mockSelectOrCreateCorrespondentClient{}
+	client.
+		On("Epa", mock.Anything, 2).
+		Return(epa, nil).
+		On("CreateCorrespondent", mock.Anything, 2, correspondent).
+		Return(errExample)
+
+	template := &mockTemplate{}
+	
+	form := url.Values{
+		"attorneyId": {"4"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
