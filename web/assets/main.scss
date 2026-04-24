@@ -2,6 +2,9 @@ $govuk-page-width: 1220px;
 $moj-page-width: 1220px;
 
 $sirius-dark-blue: #00326e;
+$sirius-teal: #28a197;
+$sirius-green: #85994b;
+$sirius-brown: #b58840;
 
 $moj-assets-path: "../assets/";
 $govuk-assets-path: "../assets/";
@@ -135,12 +138,12 @@ $govuk-assets-path: "../assets/";
   color: govuk-colour("red") !important;
 }
 
-.app-\!-colour-text-light-green {
-  color: govuk-colour("green", $variant: "tint-25") !important;
+.app-\!-colour-text-green {
+  color: $sirius-green !important;
 }
 
 .app-\!-colour-text-teal {
-  color: govuk-colour("teal") !important;
+  color: $sirius-teal !important;
 }
 
 .app-\!-pre-wrap {
@@ -287,22 +290,19 @@ $govuk-assets-path: "../assets/";
   max-width: 500px;
 }
 
-.colour-govuk-teal {
-  background: govuk-colour("teal");
-  color: govuk-colour("black");
-}
-.colour-govuk-grass-green {
-  background: govuk-colour("green", $variant: "tint-25");
-  color: govuk-colour("black");
-}
-.colour-govuk-brown {
-  background: govuk-colour("brown");
+.colour-sirius-teal {
+  background: $sirius-teal;
   color: govuk-colour("black");
 }
 
-.color-govuk-black {
-  background: govuk-colour("black");
-  color: #d9e2ee;
+.colour-sirius-green {
+  background: $sirius-green;
+  color: govuk-colour("black");
+}
+
+.colour-sirius-brown {
+  background: $sirius-brown;
+  color: govuk-colour("black");
 }
 
 .colour-sirius-dark-blue {
