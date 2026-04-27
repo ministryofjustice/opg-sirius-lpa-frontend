@@ -14,7 +14,6 @@ describe("Create correspondent", () => {
     cy.get("#f-firstname").type("Melanie");
     cy.get("#f-middlenames").type("Josefina");
     cy.get("#f-surname").type("Vanvolkenburg");
-    cy.get("#f-dob").type("1978-04-19");
     cy.get("#f-companyName").type("ACME");
     cy.get('[data-module="app-address-finder"] .govuk-link').click();
     cy.get("#f-addressLine1").type("29737 Andrew Plaza");
