@@ -84,7 +84,7 @@
                 <p class="govuk-heading-s">Correspondent:</p>
                 <details class="govuk-details" >
                   <summary class="govuk-details__summary">
-                    <span class="govuk-details__summary-text">{{ if $correspondent.CompanyName }}{{ $correspondent.CompanyName }}{{ else }}{{ if $correspondent.Salutation }}{{ $correspondent.Salutation }}{{ end }}{{ if $correspondent.Firstname }} {{ $correspondent.Firstname }}{{ end }}{{ if $correspondent.Middlenames }} {{ $correspondent.Middlenames }}{{ end }}{{ if $correspondent.Surname }} {{ $correspondent.Surname }}{{ end }}{{ end }}</span>
+                    <span class="govuk-details__summary-text">{{ if $correspondent.Salutation }}{{ $correspondent.Salutation }}{{ end }}{{ if $correspondent.Firstname }} {{ $correspondent.Firstname }}{{ end }}{{ if $correspondent.Middlenames }} {{ $correspondent.Middlenames }}{{ end }}{{ if $correspondent.Surname }} {{ $correspondent.Surname }}{{ end }}</span>
                   </summary>
                   <div class="govuk-details__text">
                     {{ template "person-details-table" .Epa.Correspondent }}

@@ -64,14 +64,12 @@ func TestGetCreateCorrespondentBadQuery(t *testing.T) {
 
 func TestPostCreateCorrespondent(t *testing.T) {
 	expectedError := RedirectError("/create-epa?id=1&caseId=2")
-	dateString := "2022-04-05"
 	correspondent := sirius.Correspondent{
 		Person: sirius.Person{
 			Salutation:        "Rev",
 			Firstname:         "Rudolph",
 			Middlenames:       "Modesto",
 			Surname:           "Stotesbury",
-			DateOfBirth:       sirius.DateString(dateString),
 			AddressLine1:      "Rotonda Gerardo 769",
 			AddressLine2:      "Appartamento 94",
 			AddressLine3:      "Augusto terme",
@@ -96,7 +94,6 @@ func TestPostCreateCorrespondent(t *testing.T) {
 		"firstname":         {"Rudolph"},
 		"middlenames":       {"Modesto"},
 		"surname":           {"Stotesbury"},
-		"dob":               {dateString},
 		"addressLine1":      {"Rotonda Gerardo 769"},
 		"addressLine2":      {"Appartamento 94"},
 		"addressLine3":      {"Augusto terme"},
@@ -126,14 +123,12 @@ func TestPostCreateCorrespondentWhenValidationError(t *testing.T) {
 		Field: sirius.FieldErrors{"field": {"": "problem"}},
 	}
 
-	dateString := "2022-04-05"
 	correspondent := sirius.Correspondent{
 		Person: sirius.Person{
 			Salutation:        "Rev",
 			Firstname:         "Rudolph",
 			Middlenames:       "Modesto",
 			Surname:           "Stotesbury",
-			DateOfBirth:       sirius.DateString(dateString),
 			AddressLine1:      "Rotonda Gerardo 769",
 			AddressLine2:      "Appartamento 94",
 			AddressLine3:      "Augusto terme",
@@ -167,7 +162,6 @@ func TestPostCreateCorrespondentWhenValidationError(t *testing.T) {
 		"firstname":         {"Rudolph"},
 		"middlenames":       {"Modesto"},
 		"surname":           {"Stotesbury"},
-		"dob":               {dateString},
 		"addressLine1":      {"Rotonda Gerardo 769"},
 		"addressLine2":      {"Appartamento 94"},
 		"addressLine3":      {"Augusto terme"},
@@ -193,14 +187,12 @@ func TestPostCreateCorrespondentWhenValidationError(t *testing.T) {
 }
 
 func TestPostCreateCorrespondentCreationFails(t *testing.T) {
-	dateString := "2022-04-05"
 	correspondent := sirius.Correspondent{
 		Person: sirius.Person{
 			Salutation:        "Rev",
 			Firstname:         "Rudolph",
 			Middlenames:       "Modesto",
 			Surname:           "Stotesbury",
-			DateOfBirth:       sirius.DateString(dateString),
 			AddressLine1:      "Rotonda Gerardo 769",
 			AddressLine2:      "Appartamento 94",
 			AddressLine3:      "Augusto terme",
@@ -226,7 +218,6 @@ func TestPostCreateCorrespondentCreationFails(t *testing.T) {
 		"firstname":         {"Rudolph"},
 		"middlenames":       {"Modesto"},
 		"surname":           {"Stotesbury"},
-		"dob":               {dateString},
 		"addressLine1":      {"Rotonda Gerardo 769"},
 		"addressLine2":      {"Appartamento 94"},
 		"addressLine3":      {"Augusto terme"},

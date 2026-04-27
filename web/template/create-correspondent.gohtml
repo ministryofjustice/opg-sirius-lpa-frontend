@@ -15,11 +15,10 @@
         {{ template "input" (field "salutation" "Salutation" .Correspondent.Salutation .Error.Field.salutation) }}
         {{ template "input" (field "firstname" "First name" .Correspondent.Firstname .Error.Field.firstname) }}
         {{ template "input" (field "middlenames" "Middle names" .Correspondent.Middlenames .Error.Field.middlenames) }}
-        {{ template "input" (field "surname" "Surname" .Correspondent.Surname .Error.Field.surname) }}
-        {{ template "input-date" (field "dob" "Date of birth" .Correspondent.DateOfBirth .Error.Field.dob) }}
+        {{ template "input" (field "surname" "Last name" .Correspondent.Surname .Error.Field.surname) }}
         {{ template "input" (field "companyName" "Company name" .Correspondent.CompanyName .Error.Field.companyName) }}
 
-        <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Correspondent address">
+        <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Address" data-app-address-finder-fill-country="false">
             {{ template "input" (field "addressLine1" "Address line 1" .Correspondent.AddressLine1 .Error.Field.addressLine1 "data-app-address-finder-map" "addressLine1") }}
             {{ template "input" (field "addressLine2" "Address line 2" .Correspondent.AddressLine2 .Error.Field.addressLine2 "data-app-address-finder-map" "addressLine2") }}
             {{ template "input" (field "addressLine3" "Address line 3" .Correspondent.AddressLine3 .Error.Field.addressLine3 "data-app-address-finder-map" "addressLine3") }}

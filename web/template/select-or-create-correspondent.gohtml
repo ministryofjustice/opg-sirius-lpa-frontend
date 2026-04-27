@@ -13,7 +13,6 @@
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
         <div class="govuk-form-group{{ if .Error.Field.attorney }} govuk-form-group--error{{ end }}">
           <fieldset class="govuk-fieldset">
-            <legend class="govuk-fieldset__legend">Select an attorney</legend>
             {{ template "errors" .Error.Field.attorney }}
 
             <div class="govuk-radios" data-module="govuk-radios">
