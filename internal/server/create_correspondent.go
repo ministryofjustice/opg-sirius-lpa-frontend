@@ -47,7 +47,6 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 					Firstname:         postFormString(r, "firstname"),
 					Middlenames:       postFormString(r, "middlenames"),
 					Surname:           postFormString(r, "surname"),
-					DateOfBirth:       postFormDateString(r, "dob"),
 					PhoneNumber:       postFormString(r, "phoneNumber"),
 					Email:             postFormString(r, "email"),
 					AddressLine1:      postFormString(r, "addressLine1"),

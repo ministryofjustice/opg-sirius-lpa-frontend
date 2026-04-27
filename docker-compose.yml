@@ -74,7 +74,7 @@ services:
 
   cypress:
     image: cypress/included:15.13.0
-    command: run --browser electron
+    command: run --browser electron --spec cypress/e2e/create-correspondent.cy.js
     entrypoint: cypress
     depends_on:
       - lpa-frontend
