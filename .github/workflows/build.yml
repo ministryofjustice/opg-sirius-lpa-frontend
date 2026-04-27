@@ -178,7 +178,6 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: "0"
-      - uses: unfor19/install-aws-cli-action@f5b46b7f32cf5e7ebd652656c5036bf83dd1e60c # 1.0.8
 
       - name: Set up Docker
         run: |
@@ -280,10 +279,6 @@ jobs:
           role-session-name: opg-sirius-lpa-frontend-github-actions-ssm-push
           role-duration-seconds: 900
           aws-region: eu-west-1
-
-      - name: Install AWS CLI
-        id: install-aws-cli
-        uses: unfor19/install-aws-cli-action@f5b46b7f32cf5e7ebd652656c5036bf83dd1e60c # 1.0.8
 
       - name: Push Tag to Parameter Store
         run: |
