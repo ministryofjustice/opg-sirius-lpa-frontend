@@ -73,6 +73,7 @@ func TestGetCreateEpaEdit(t *testing.T) {
 					Title:           "Edit EPA",
 					Epa:             epa,
 					AppointmentType: appointmentType,
+					CaseId:          234,
 				}).
 				Return(nil)
 
@@ -159,6 +160,7 @@ func TestPostCreateEpa(t *testing.T) {
 			Title:           "Create an EPA",
 			Success:         true,
 			AppointmentType: "singular",
+			CaseId:          123,
 		}).
 		Return(nil)
 
@@ -235,6 +237,7 @@ func TestPostCreateEpaEdit(t *testing.T) {
 			Success:         true,
 			Epa:             epa,
 			AppointmentType: "singular",
+			CaseId:          234,
 		}).
 		Return(nil)
 
