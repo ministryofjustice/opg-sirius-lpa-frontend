@@ -22,6 +22,7 @@ type createEpaData struct {
 	Epa             sirius.Epa
 	AppointmentType string
 	Title           string
+	CaseId          int
 }
 
 func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
@@ -38,16 +39,15 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			Title:     "Create an EPA",
 		}
 
-		var caseId int
 		caseIdStr := r.FormValue("caseId")
 		isEditing := caseIdStr != ""
 		if isEditing {
-			caseId, err = strToIntOrStatusError(caseIdStr)
+			data.CaseId, err = strToIntOrStatusError(caseIdStr)
 			if err != nil {
 				return err
 			}
 
-			caseItem, err := client.Epa(ctx, caseId)
+			caseItem, err := client.Epa(ctx, data.CaseId)
 			if err != nil {
 				return err
 			}
@@ -85,11 +85,11 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			data.AppointmentType = caseAttorneyValue
 
 			if isEditing {
-				err = client.UpdateEpa(ctx, caseId, epa)
+				err = client.UpdateEpa(ctx, data.CaseId, epa)
 			} else {
 				epa, err = client.CreateEpa(ctx, donorID, epa)
 				if err == nil {
-					caseId = epa.ID
+					data.CaseId = epa.ID
 				}
 			}
 
@@ -102,7 +102,7 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			}
 
 			if r.FormValue("addAttorney") != "" {
-				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d", donorID, caseId))
+				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d", donorID, data.CaseId))
 			} else {
 				data.Success = true
 			}
