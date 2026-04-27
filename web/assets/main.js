@@ -79,4 +79,15 @@ if (window.self !== window.parent) {
       `${window.location.protocol}//${window.location.host}`,
     );
   }
+
+  const selectCase = document.querySelector("[data-app-select-case]");
+  if (selectCase) {
+    window.parent.postMessage(
+      {
+        message: "select-case",
+        caseId: selectCase.getAttribute("data-app-select-case"),
+      },
+      `${window.location.protocol}//${window.location.host}`,
+    );
+  }
 }
