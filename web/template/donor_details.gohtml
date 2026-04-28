@@ -1,0 +1,41 @@
+{{ template "donor-details" . }}
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-l app-!-embedded-hide">Donor details</h2>
+
+            <table class="govuk-table app-donor-details-table">
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <th class="govuk-!-text-align-left app-donor-details-table__key"><strong>Title:</strong></th>
+                        <td data-cy="donorTitle">{{ .Donor.Salutation }}</td>
+                    </tr>
+
+                    <tr class="govuk-table__row">
+                        <th class="govuk-!-text-align-left app-donor-details-table__key"><strong>DOB:</strong></th>
+                        <td data-cy="donorDOB">{{ formatDate .Donor.DateOfBirth }}</td>
+                    </tr>
+
+                    <tr class="govuk-table__row">
+                        <th class="govuk-!-text-align-left app-donor-details-table__key"><strong>Record #:</strong></th>
+                        <td data-cy="donorRecord">{{ .Donor.UID }}</td>
+                    </tr>
+
+                    <tr class="govuk-table__row">
+                        <th class="govuk-!-text-align-left app-donor-details-table__key"><strong>Email:</strong></th>
+                        <td data-cy="donorEmail">{{ .Donor.Email }}</td>
+                    </tr>
+
+                    {{ if .Donor.AddressLine1 }}
+                        <tr class="govuk-table__row">
+                            <th class="govuk-!-text-align-left app-donor-details-table__key"><strong>Address:</strong></th>
+                            <td data-cy="donorAddress">
+                                {{ .Donor.AddressLine1 }}{{ if .Donor.AddressLine2 }}, {{ .Donor.AddressLine2 }}{{ end }}{{ if .Donor.AddressLine3 }}, {{ .Donor.AddressLine3 }}{{ end }}{{ if .Donor.Town }}, {{ .Donor.Town }}{{ end }}{{ if .Donor.County }}, {{ .Donor.County }}{{ end }}{{ if .Donor.Country }}, {{ .Donor.Country }}{{ end }}{{ if .Donor.Postcode }}, {{ .Donor.Postcode }}{{ end }}
+                            </td>
+                        </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{{ end }}
