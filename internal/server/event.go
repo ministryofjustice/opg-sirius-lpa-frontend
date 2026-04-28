@@ -128,10 +128,6 @@ func Event(client EventClient, tmpl template.Template, partialTmpl template.Temp
 
 					return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
 				}
-
-				if r.Header.Get("HX-Request") == "true" {
-					return partialTmpl(w, data)
-				}
 			}
 		}
 

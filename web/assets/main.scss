@@ -57,8 +57,6 @@ $govuk-assets-path: "../assets/";
   max-width: 100%;
 }
 
-// GOV.UK Frontend applies width: 100% to .govuk-textarea by default.
-// In Sirius we want textareas to be narrower by default.
 .app-\!-textarea-75 {
   width: 75%;
 }

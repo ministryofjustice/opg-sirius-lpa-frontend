@@ -8,9 +8,6 @@ export default function showHideActions() {
     return;
   }
 
-  // Keep the animated height in sync with the content.
-  // Default/min height ensures the panel has a usable size even when content
-  // is very small (or still loading).
   const measureHeight = () => `${Math.max(inner.scrollHeight, 150)}px`;
 
   const syncHeightIfOpen = () => {
@@ -24,16 +21,12 @@ export default function showHideActions() {
     button.setAttribute("aria-expanded", String(open));
 
     if (open) {
-      // Make it measurable before we set the target height.
       content.hidden = false;
-      // Ensure we always transition from 0 to the measured value.
       content.style.height = "0px";
-      // Force a reflow so the browser picks up the starting height.
       // eslint-disable-next-line no-unused-expressions
       content.offsetHeight;
       content.style.height = measureHeight();
     } else {
-      // Animate to 0, then hide once the animation completes.
       content.style.height = "0px";
       content.addEventListener(
         "transitionend",
@@ -53,12 +46,10 @@ export default function showHideActions() {
     setOpen(!isOpen());
   });
 
-  // If content changes (e.g. HTMX swaps), resize while open.
   if (typeof ResizeObserver !== "undefined") {
     const ro = new ResizeObserver(() => syncHeightIfOpen());
     ro.observe(inner);
   }
 
-  // HTMX doesn't necessarily trigger a resize event; hook into swaps.
   document.body.addEventListener("htmx:afterSwap", () => syncHeightIfOpen());
 }
