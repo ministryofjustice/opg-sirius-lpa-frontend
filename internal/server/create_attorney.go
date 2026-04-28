@@ -10,8 +10,10 @@ import (
 )
 
 type CreateAttorneyClient interface {
+	Epa(ctx sirius.Context, id int) (sirius.Epa, error)
 	CreateAttorney(ctx sirius.Context, caseId int, attorney sirius.Attorney) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
+	UpdateAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
 }
 
 type createAttorneyData struct {
@@ -21,6 +23,8 @@ type createAttorneyData struct {
 	RelationshipToDonors []sirius.RefDataItem
 	DonorId              int
 	CaseId               int
+	IsEditing            bool
+	Title                string
 }
 
 func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler {
@@ -41,6 +45,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 			XSRFToken: ctx.XSRFToken,
 			DonorId:   donorId,
 			CaseId:    caseId,
+			Title:     "Add an attorney",
 		}
 
 		data.RelationshipToDonors, err = client.RefDataByCategory(ctx, sirius.RelationshipToDonorCategory)
@@ -50,6 +55,30 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 
 		// Default the active status to true for new attorneys
 		data.Attorney.SystemStatus = shared.BoolPtr(true)
+
+		var attorneyId int
+		attorneyIdStr := r.FormValue("attorneyId")
+		isEditing := attorneyIdStr != ""
+		if isEditing {
+			attorneyId, err = strToIntOrStatusError(attorneyIdStr)
+			if err != nil {
+				return err
+			}
+			epa, err := client.Epa(ctx, caseId)
+			if err != nil {
+				return err
+			}
+
+			for _, attorney := range epa.Attorneys {
+				if attorney.ID == attorneyId {
+					data.Attorney = attorney
+					break
+				}
+			}
+
+			data.Title = "Edit attorney"
+			data.IsEditing = true
+		}
 
 		if r.Method == http.MethodPost {
 			attorney := sirius.Attorney{
@@ -76,7 +105,11 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 			}
 			data.Attorney = attorney
 
-			err = client.CreateAttorney(ctx, caseId, attorney)
+			if isEditing {
+				err = client.UpdateAttorney(ctx, attorneyId, attorney)
+			} else {
+				err = client.CreateAttorney(ctx, caseId, attorney)
+			}
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)

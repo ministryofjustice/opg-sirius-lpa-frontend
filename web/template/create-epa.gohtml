@@ -69,14 +69,19 @@
               {{ if gt (len .Epa.Attorneys) 0 }}
                 <p class="govuk-heading-s">Attorneys:</p>
                 {{ range $attorney := .Epa.Attorneys }}
-                  <details class="govuk-details">
-                    <summary class="govuk-details__summary">
-                      <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
-                    </summary>
-                    <div class="govuk-details__text">
-                      {{ template "person-details-table" . }}
-                    </div>
-                  </details>
+                  <div class="app-create-epa__details-row">
+                    <details class="govuk-details">
+                      <summary class="govuk-details__summary">
+                        <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
+                      </summary>
+                      <div class="govuk-details__text">
+                        {{ template "person-details-table" . }}
+                      </div>
+                    </details>
+                    <span class="app-create-epa__summary-update-link">
+                      <a class="govuk-link govuk-link--no-visited-state" id="f-update-attorney-{{ .ID }}" href="{{ prefix (printf "/create-attorney?id=%d&caseId=%d&attorneyId=%d" $.DonorId $.Epa.ID .ID) }}">Update<span class="govuk-visually-hidden"> attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span></a>
+                    </span>
+                  </div>
                 {{ end }}
               {{ end }}
               <div class="govuk-button-group app-button-group--column">
@@ -85,14 +90,19 @@
               {{ if .Epa.Correspondent }}
                 {{ $correspondent := .Epa.Correspondent }}
                 <p class="govuk-heading-s">Correspondent:</p>
-                <details class="govuk-details" >
-                  <summary class="govuk-details__summary">
-                    <span class="govuk-details__summary-text">{{ if $correspondent.Salutation }}{{ $correspondent.Salutation }}{{ end }}{{ if $correspondent.Firstname }} {{ $correspondent.Firstname }}{{ end }}{{ if $correspondent.Middlenames }} {{ $correspondent.Middlenames }}{{ end }}{{ if $correspondent.Surname }} {{ $correspondent.Surname }}{{ end }}</span>
-                  </summary>
-                  <div class="govuk-details__text">
-                    {{ template "person-details-table" .Epa.Correspondent }}
-                  </div>
-                </details>
+                <div class="app-create-epa__details-row">
+                  <details class="govuk-details" >
+                    <summary class="govuk-details__summary">
+                      <span class="govuk-details__summary-text">{{ if $correspondent.Salutation }}{{ $correspondent.Salutation }}{{ end }}{{ if $correspondent.Firstname }} {{ $correspondent.Firstname }}{{ end }}{{ if $correspondent.Middlenames }} {{ $correspondent.Middlenames }}{{ end }}{{ if $correspondent.Surname }} {{ $correspondent.Surname }}{{ end }}</span>
+                    </summary>
+                    <div class="govuk-details__text">
+                      {{ template "person-details-table" .Epa.Correspondent }}
+                    </div>
+                  </details>
+                  <span class="app-create-epa__summary-update-link">
+                    <a class="govuk-link govuk-link--no-visited-state" id="f-update-correspondent-{{ $correspondent.ID }}" href="{{ prefix (printf "/create-correspondent?id=%d&caseId=%d" $.DonorId $.Epa.ID) }}">Update<span class="govuk-visually-hidden"> correspondent{{ if $correspondent.Salutation }} {{ $correspondent.Salutation }}{{ end }}{{ if $correspondent.Firstname }} {{ $correspondent.Firstname }}{{ end }}{{ if $correspondent.Middlenames }} {{ $correspondent.Middlenames }}{{ end }}{{ if $correspondent.Surname }} {{ $correspondent.Surname }}{{ end }}</span></a>
+                  </span>
+                </div>
               {{ end }}
               <div class="govuk-button-group app-button-group--column">
                 {{ if eq .Epa.Correspondent nil }}

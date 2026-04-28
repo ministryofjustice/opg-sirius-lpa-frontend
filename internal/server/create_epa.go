@@ -20,6 +20,7 @@ type createEpaData struct {
 	Success         bool
 	Error           sirius.ValidationError
 	Epa             sirius.Epa
+	DonorId         int
 	AppointmentType string
 	Title           string
 }
@@ -35,6 +36,7 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 
 		data := createEpaData{
 			XSRFToken: ctx.XSRFToken,
+			DonorId:   donorID,
 			Title:     "Create an EPA",
 		}
 
