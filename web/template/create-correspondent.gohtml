@@ -12,7 +12,7 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        {{ template "input" (field "salutation" "Salutation" .Correspondent.Salutation .Error.Field.salutation) }}
+        {{ template "input" (field "salutation" "Title" .Correspondent.Salutation .Error.Field.salutation) }}
         {{ template "input" (field "firstname" "First name" .Correspondent.Firstname .Error.Field.firstname) }}
         {{ template "input" (field "middlenames" "Middle names" .Correspondent.Middlenames .Error.Field.middlenames) }}
         {{ template "input" (field "surname" "Last name" .Correspondent.Surname .Error.Field.surname) }}
