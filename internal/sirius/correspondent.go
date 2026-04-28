@@ -28,3 +28,7 @@ func (c *Client) CreateCorrespondent(ctx Context, caseId int, correspondent Corr
 	correspondent.PersonType = "Correspondent"
 	return c.post(ctx, "/lpa-api/v1/persons", []Correspondent{correspondent}, nil)
 }
+
+func (c *Client) UpdateCorrespondent(ctx Context, correspondentId int, correspondent Correspondent) error {
+	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/persons/%d", correspondentId), correspondent, nil)
+}
