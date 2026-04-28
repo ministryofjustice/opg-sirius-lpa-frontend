@@ -92,10 +92,6 @@ func Warning(client WarningClient, tmpl template.Template, partialTmpl template.
 						return RedirectError(fmt.Sprintf("/lpa/%s", lpa.UID))
 					}
 				}
-
-				if r.Header.Get("HX-Request") == "true" {
-					return partialTmpl(w, data)
-				}
 			}
 		}
 

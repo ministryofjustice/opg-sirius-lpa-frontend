@@ -26,6 +26,7 @@ type documentPageData struct {
 	DocumentList          sirius.DocumentList
 	Document              sirius.Document
 	SelectedCases         []sirius.Case
+	Cases                 []sirius.Case
 	MultipleCasesSelected bool
 	Comparing             bool
 	CompareURLs           map[string]string
@@ -119,6 +120,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 		data := documentPageData{
 			XSRFToken:             ctx.XSRFToken,
 			SelectedCases:         selected,
+			Cases:                 selected,
 			DocumentList:          docs,
 			MultipleCasesSelected: len(caseUIDs) > 1 || (len(caseUIDs) == 0 && len(casesOnDonor) > 1),
 			Error:                 validationErr,

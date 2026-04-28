@@ -25,6 +25,18 @@
                     >
                         Create Event
                     </a>
+                    {{ if eq (len .Cases) 1 }}
+                        {{ with index .Cases 0 }}
+                            <br/>
+                            <a class="govuk-link govuk-link--no-visited-state"
+                               hx-get="{{ prefix (printf "/add-complaint?id=%d&case=%s" .ID (ToLower .CaseType)) }}"
+                               hx-target="#replace-action-panel"
+                               hx-swap="innerHTML"
+                            >
+                                Add Complaint
+                            </a>
+                        {{ end }}
+                    {{ end }}
                 </div>
             </div>
         </div>

@@ -38,7 +38,6 @@
 
     <div class="govuk-button-group">
       <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
-{{/*      <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="{{ if gt (len .Cases) 0}}{{ prefix (printf "/lpa/%s" (index .Cases 0).UID )}}{{ else }}#{{ end }}">Cancel</a>*/}}
       <a class="govuk-link govuk-link--no-visited-state"
          hx-get="{{ prefix (printf "/action-panel?id=%d&entity=person" .DonorId) }}"
          hx-target="#replace-action-panel"
