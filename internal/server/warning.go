@@ -25,6 +25,7 @@ type warningData struct {
 	WarningType string
 	WarningText string
 	Cases       []sirius.Case
+	DonorId     int
 }
 
 func Warning(client WarningClient, tmpl template.Template, partialTmpl template.Template) Handler {
@@ -50,6 +51,7 @@ func Warning(client WarningClient, tmpl template.Template, partialTmpl template.
 			XSRFToken:    ctx.XSRFToken,
 			WarningTypes: warningTypes,
 			Cases:        cases,
+			DonorId:      personId,
 		}
 
 		if r.Method == http.MethodPost {
@@ -89,6 +91,10 @@ func Warning(client WarningClient, tmpl template.Template, partialTmpl template.
 						})
 						return RedirectError(fmt.Sprintf("/lpa/%s", lpa.UID))
 					}
+				}
+
+				if r.Header.Get("HX-Request") == "true" {
+					return partialTmpl(w, data)
 				}
 			}
 		}
