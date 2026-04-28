@@ -18,6 +18,7 @@
     "@ministryofjustice/frontend": "^9.0.0",
     "accessible-autocomplete": "^3.0.0",
     "cypress": "15.13.0",
+    "cypress-axe": "^1.7.0",
     "govuk-frontend": "^6.1.0",
     "hugerte": "https://github.com/ministryofjustice/opg-hugerte-dist#semver:v1.0.9",
     "opg-sirius-search-ui": "https://github.com/ministryofjustice/opg-sirius-search-ui#v1.79.0",
