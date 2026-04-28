@@ -430,6 +430,12 @@ $govuk-assets-path: "../assets/";
   margin-bottom: 5px !important;
 }
 
+.app-timeline-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .app-\!-radios--inline {
   display: flex;
   flex-wrap: wrap;
