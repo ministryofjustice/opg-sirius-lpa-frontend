@@ -27,7 +27,7 @@ type Person struct {
 	County                string     `json:"county"`
 	Postcode              string     `json:"postcode"`
 	Country               string     `json:"country"`
-	IsAirmailRequired     bool       `json:"isAirmailRequired,omitempty"`
+	IsAirmailRequired     bool       `json:"isAirmailRequired"`
 	PhoneNumber           string     `json:"phoneNumber"`
 	Email                 string     `json:"email"`
 	SageId                string     `json:"sageId"`
