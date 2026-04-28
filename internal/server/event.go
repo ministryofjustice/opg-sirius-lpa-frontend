@@ -3,7 +3,6 @@ package server
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -28,6 +27,7 @@ type eventData struct {
 	Entity       string
 	IsDigitalLpa bool
 	CaseUID      string
+	EntityId     int
 	Success      bool
 	Error        sirius.ValidationError
 
@@ -50,6 +50,7 @@ func Event(client EventClient, tmpl template.Template, partialTmpl template.Temp
 
 		ctx := getContext(r)
 		data := eventData{XSRFToken: ctx.XSRFToken}
+		data.EntityId = entityID
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
@@ -124,7 +125,8 @@ func Event(client EventClient, tmpl template.Template, partialTmpl template.Temp
 						Title: "Event created",
 					})
 
-					return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
+					return partialTmpl(w, data)
+					//return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
 				}
 			}
 		}
