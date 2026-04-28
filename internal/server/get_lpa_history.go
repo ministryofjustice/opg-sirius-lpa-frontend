@@ -11,6 +11,7 @@ import (
 type GetLpaHistoryClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	GetEvents(ctx sirius.Context, donorId string, caseIds []string, sourceTypes []string, sortBy string) (sirius.LpaEventsResponse, error)
+	GetUserDetails(sirius.Context) (sirius.User, error)
 }
 
 type getLpaHistory struct {
@@ -31,6 +32,7 @@ type getLpaHistory struct {
 	DonorFieldOrder        []string
 	LpaFieldOrder          []string
 	EpaFieldOrder          []string
+	IsSysAdminUser         bool
 }
 
 type FilterLpaEventsForm struct {
@@ -126,6 +128,15 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 			LpaFieldOrder:   lpaFieldOrder,
 			EpaFieldOrder:   epaFieldOrder,
 		}
+
+		group.Go(func() error {
+			user, err := client.GetUserDetails(ctx)
+			if err != nil {
+				return err
+			}
+			data.IsSysAdminUser = user.HasRole("System Admin")
+			return nil
+		})
 
 		group.Go(func() error {
 			eventsData, err := client.GetEvents(ctx.With(groupCtx), donorId, caseIDs, []string{}, "desc")

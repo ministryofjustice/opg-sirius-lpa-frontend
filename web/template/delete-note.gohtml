@@ -1,0 +1,31 @@
+{{ template "page" . }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <a href="{{ prefix (printf "/donor/%d/history" .DonorId) }}" class="govuk-back-link">Back</a>
+
+      <p class="govuk-body">
+        <strong>Delete this event?</strong><br />
+        This will delete it permanently and cannot be undone.
+      </p>
+
+      <p class="govuk-body">
+        <strong>Any documents attached to this event will NOT be deleted.</strong><br />
+        To delete documents, go to the Documents area.
+      </p>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+        <div class="govuk-button-group">
+          <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/donor/%d/history" .DonorId) }}" >
+            No, cancel
+          </a>
+          <button class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit">
+            Yes, delete event
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
