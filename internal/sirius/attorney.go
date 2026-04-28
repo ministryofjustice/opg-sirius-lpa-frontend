@@ -25,3 +25,7 @@ func (a Attorney) AddressSummary() string {
 func (c *Client) CreateAttorney(ctx Context, caseId int, attorney Attorney) error {
 	return c.post(ctx, fmt.Sprintf("/lpa-api/v1/epas/%d/attorneys", caseId), attorney, nil)
 }
+
+func (c *Client) UpdateAttorney(ctx Context, attorneyId int, attorney Attorney) error {
+	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/attorneys/%d", attorneyId), attorney, nil)
+}
