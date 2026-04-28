@@ -28,6 +28,7 @@ type LpaEvent struct {
 	Type           string                    `json:"type,omitempty"`
 	SourceDocument SourceDocument            `json:"sourceDocument,omitempty"`
 	SourcePhone    *SourcePhoneNumber        `json:"sourcePhoneNumber,omitempty"`
+	SourceNote     SourceNote                `json:"sourceNote,omitempty"`
 }
 
 type OwningCase struct {
@@ -67,6 +68,10 @@ type SourceDocument struct {
 type SourcePhoneNumber struct {
 	PhoneNumber string `json:"phoneNumber"`
 	Type        string `json:"type"`
+}
+
+type SourceNote struct {
+	ID int `json:"id"`
 }
 
 func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string, sourceTypes []string, sortBy string) (LpaEventsResponse, error) {
