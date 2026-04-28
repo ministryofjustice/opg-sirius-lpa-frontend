@@ -10,8 +10,13 @@
 
     <h1 class="govuk-heading-l app-!-embedded-hide">Create Event</h1>
 
-    <form class="form" enctype="multipart/form-data" method="POST">
+    <form class="form" enctype="multipart/form-data" method="POST"
+          hx-post="{{ prefix (printf "/create-event") }}"
+          hx-target="#replace-action-panel"
+          hx-swap="innerHTML">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+        <input type="hidden" name="id" value="{{ .EntityId }}"/>
+        <input type="hidden" name="entity" value="person"/>
 
         {{ template "select" (select "type" "Event type" .Type .Error.Field.type (options .NoteTypes)) }}
 

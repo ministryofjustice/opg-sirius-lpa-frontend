@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"encoding/base64"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -125,8 +126,11 @@ func Event(client EventClient, tmpl template.Template, partialTmpl template.Temp
 						Title: "Event created",
 					})
 
+					return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
+				}
+
+				if r.Header.Get("HX-Request") == "true" {
 					return partialTmpl(w, data)
-					//return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
 				}
 			}
 		}
