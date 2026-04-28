@@ -27,3 +27,7 @@ func (c *Client) CreateNote(ctx Context, entityID int, entityType EntityType, no
 
 	return c.post(ctx, fmt.Sprintf("/lpa-api/v1/%ss/%d/notes", entityType, entityID), data, nil)
 }
+
+func (c *Client) DeleteNote(ctx Context, noteID int) error {
+	return c.delete(ctx, fmt.Sprintf("/lpa-api/v1/notes/%d", noteID))
+}
