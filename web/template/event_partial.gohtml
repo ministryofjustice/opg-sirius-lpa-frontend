@@ -29,9 +29,8 @@
         <div class="govuk-button-group">
             <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
             <a class="govuk-link govuk-link--no-visited-state"
-               hx-get="{{ prefix (printf "/action-panel")}}"
+               hx-get="{{ prefix (printf "/action-panel?id=%d&entity=person" .EntityId) }}"
                hx-target="#replace-action-panel"
-               hx-swap="innerHTML"
             >Cancel</a>
         </div>
     </form>
