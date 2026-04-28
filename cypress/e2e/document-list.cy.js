@@ -754,3 +754,329 @@ describe("View documents", () => {
     cy.contains("29/05/2022 LP1F - Finance Instrument");
   });
 });
+
+describe("sort by dropdown", () => {
+  beforeEach(() => {
+    cy.addMock("/lpa-api/v1/persons/1/cases", "GET", {
+      status: 200,
+      body: {
+        cases: [
+          {
+            caseType: "LPA",
+            caseSubtype: "pfa",
+            id: 34,
+            uId: "7000-1234-1234",
+          },
+          { caseType: "LPA", caseSubtype: "hw", id: 78, uId: "7000-5678-5678" },
+        ],
+      },
+    });
+
+    cy.addMock(
+      "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0,case:78&limit=999",
+      "GET",
+      {
+        status: 200,
+        body: {
+          limit: 999,
+          metadata: {
+            doctype: {
+              correspondence: 2,
+              order: 0,
+              report: 0,
+              visit: 0,
+              finance: 0,
+              other: 0,
+            },
+            direction: { Incoming: 1, Outgoing: 1, Internal: 0 },
+          },
+          pages: { current: 1, total: 1 },
+          total: 2,
+          documents: [
+            {
+              id: 201,
+              uuid: "3bb33aa0-1234-4891-8739-1aa0fbcdee01",
+              type: "Save",
+              friendlyDescription: "A Document",
+              createdDate: "02/09/2024 09:00:00",
+              direction: "Outgoing",
+              notifyStatus: "posted",
+              filename: "a.pdf",
+              mimeType: "application/pdf",
+              caseItems: [
+                { uId: "7000-5678-5678", caseSubtype: "hw", caseType: "LPA" },
+              ],
+              persons: [],
+              systemType: "A",
+            },
+            {
+              id: 202,
+              uuid: "7cc44bb0-5678-4891-8739-5bb1facdef02",
+              type: "Correspondence",
+              friendlyDescription: "Z Document",
+              createdDate: "01/09/2025 10:00:00",
+              direction: "Incoming",
+              filename: "z.pdf",
+              mimeType: "application/pdf",
+              caseItems: [
+                { uId: "7000-5678-5678", caseSubtype: "hw", caseType: "LPA" },
+              ],
+              persons: [],
+              subtype: "hw",
+            },
+          ],
+        },
+      },
+    );
+
+    cy.addMock(
+      "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0,case:34,case:78&limit=999",
+      "GET",
+      {
+        status: 200,
+        body: {
+          limit: 999,
+          metadata: {
+            doctype: {
+              correspondence: 3,
+              order: 0,
+              report: 0,
+              visit: 0,
+              finance: 0,
+              other: 0,
+            },
+            direction: { Incoming: 2, Outgoing: 1, Internal: 0 },
+          },
+          pages: { current: 1, total: 1 },
+          total: 4,
+          documents: [
+            {
+              id: 332,
+              uuid: "5b4f0ad3-1e4a-4a55-b4a7-3f8e3d2bc3b9",
+              type: "LPA",
+              friendlyDescription: "LP1F - Finance Instrument",
+              createdDate: "29/05/2022 10:07:38",
+              direction: "Incoming",
+              filename: "LP1F.pdf",
+              mimeType: "application/pdf",
+              caseItems: [
+                { uId: "7000-1234-1234", caseSubtype: "pfa", caseType: "LPA" },
+              ],
+              persons: [],
+              subtype: "pfa",
+            },
+            {
+              id: 443,
+              uuid: "c8e3a1df-7b9b-4d45-94d9-2b8fc0d9e0fd",
+              type: "LPA",
+              friendlyDescription: "LP1H - Health Instrument",
+              createdDate: "01/06/2022 15:39:01",
+              direction: "Incoming",
+              filename: "LP1H.pdf",
+              mimeType: "application/pdf",
+              caseItems: [
+                { uId: "7000-5678-5678", caseSubtype: "hw", caseType: "LPA" },
+              ],
+              subtype: "hw",
+            },
+            {
+              id: 639,
+              uuid: "31e6f4c2-5f8b-47c3-bc98-64b47c938e52",
+              type: "Save",
+              friendlyDescription: "Letter",
+              createdDate: "25/07/2022 14:17:13",
+              direction: "Outgoing",
+              filename: "LP-NA-3A.pdf",
+              mimeType: "application/pdf",
+              caseItems: [
+                { uId: "7000-5678-5678", caseSubtype: "hw", caseType: "LPA" },
+              ],
+              persons: [],
+              systemType: "LP-NA-3A",
+            },
+            {
+              id: 640,
+              uuid: "42e6f4c2-5f8b-47c3-bc98-64b47c938e52",
+              type: "Save",
+              friendlyDescription: "Letter",
+              createdDate: "26/08/2022 08:11:27",
+              direction: "Outgoing",
+              notifyStatus: "posted",
+              filename: "LP-WHAT.pdf",
+              mimeType: "application/pdf",
+              caseItems: [
+                { uId: "7000-5678-5678", caseSubtype: "hw", caseType: "LPA" },
+              ],
+              persons: [],
+              systemType: "LP-WHAT",
+            },
+          ],
+        },
+      },
+    );
+  });
+
+  it("renders the dropdown with a default placeholder and all expected options", () => {
+    cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
+    cy.get("[data-document-sort]").should("exist");
+    cy.get("[data-document-sort] option[value='']").should(
+      "have.text",
+      "Select an option",
+    );
+    const expectedOptions = [
+      "date-new-old",
+      "date-old-new",
+      "direction-incoming",
+      "direction-outgoing",
+      "type-az",
+      "type-za",
+      "name-az",
+      "name-za",
+    ];
+    expectedOptions.forEach((value) => {
+      cy.get(`[data-document-sort] option[value='${value}']`).should("exist");
+    });
+  });
+
+  it("does not show case number sort options when viewing a single case", () => {
+    cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
+    cy.get("[data-document-sort] option[value='case-low-high']").should(
+      "not.exist",
+    );
+    cy.get("[data-document-sort] option[value='case-high-low']").should(
+      "not.exist",
+    );
+  });
+
+  it("shows case number sort options when viewing multiple cases", () => {
+    cy.visit("/donor/1/documents?uid[]=7000-1234-1234&uid[]=7000-5678-5678");
+    cy.get("[data-document-sort] option[value='case-low-high']").should(
+      "exist",
+    );
+    cy.get("[data-document-sort] option[value='case-high-low']").should(
+      "exist",
+    );
+  });
+
+  it("sorts by name A-Z", () => {
+    cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
+    cy.get("[data-document-sort]").select("name-az");
+    cy.get("tbody tr td:nth-child(2) a").then(($links) => {
+      const names = [...$links].map((el) => el.textContent.trim());
+      expect(names).to.deep.equal(["A Document", "Z Document"]);
+    });
+  });
+
+  it("sorts by name Z-A", () => {
+    cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
+    cy.get("[data-document-sort]").select("name-za");
+    cy.get("tbody tr td:nth-child(2) a").then(($links) => {
+      const names = [...$links].map((el) => el.textContent.trim());
+      expect(names).to.deep.equal(["Z Document", "A Document"]);
+    });
+  });
+
+  it("sorts by date created new to old", () => {
+    cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
+    cy.get("[data-document-sort]").select("date-new-old");
+    cy.get("tbody tr [data-sort-type='date']").then(($cells) => {
+      const dates = [...$cells].map((el) => el.textContent.trim());
+      expect(dates).to.deep.equal([
+        "01/09/2025 10:00:00",
+        "02/09/2024 09:00:00",
+      ]);
+    });
+  });
+
+  it("sorts by date created old to new", () => {
+    cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
+    cy.get("[data-document-sort]").select("date-old-new");
+    cy.get("tbody tr [data-sort-type='date']").then(($cells) => {
+      const dates = [...$cells].map((el) => el.textContent.trim());
+      expect(dates).to.deep.equal([
+        "02/09/2024 09:00:00",
+        "01/09/2025 10:00:00",
+      ]);
+    });
+  });
+
+  it("sorts by direction with incoming first", () => {
+    cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
+    cy.get("[data-document-sort]").select("direction-incoming");
+
+    cy.get("tbody tr td:nth-child(2) a").then(($links) => {
+      const names = [...$links].map((el) => el.textContent.trim());
+      expect(names).to.deep.equal(["Z Document", "A Document"]);
+    });
+  });
+
+  it("sorts by direction with outgoing first", () => {
+    cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
+    cy.get("[data-document-sort]").select("direction-outgoing");
+
+    cy.get("tbody tr td:nth-child(2) a").then(($links) => {
+      const names = [...$links].map((el) => el.textContent.trim());
+      expect(names).to.deep.equal(["A Document", "Z Document"]);
+    });
+  });
+
+  it("sorts by document type A-Z", () => {
+    cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
+    cy.get("[data-document-sort]").select("type-az");
+
+    cy.get("tbody tr td:nth-child(2) a").then(($links) => {
+      const names = [...$links].map((el) => el.textContent.trim());
+      expect(names).to.deep.equal(["A Document", "Z Document"]);
+    });
+  });
+
+  it("sorts by document type Z-A", () => {
+    cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
+    cy.get("[data-document-sort]").select("type-za");
+    cy.get("tbody tr td:nth-child(2) a").then(($links) => {
+      const names = [...$links].map((el) => el.textContent.trim());
+      expect(names).to.deep.equal(["Z Document", "A Document"]);
+    });
+  });
+
+  it("sorts by case number low to high", () => {
+    cy.visit("/donor/1/documents?uid[]=7000-1234-1234&uid[]=7000-5678-5678");
+    cy.get("[data-document-sort]").select("case-low-high");
+
+    cy.get("tbody tr [data-sort-type='case']").then(($cells) => {
+      const uids = [...$cells].map((el) => el.dataset.sortValue);
+      expect(uids[0]).to.equal("7000-1234-1234");
+    });
+  });
+
+  it("sorts by case number high to low", () => {
+    cy.visit("/donor/1/documents?uid[]=7000-1234-1234&uid[]=7000-5678-5678");
+    cy.get("[data-document-sort]").select("case-high-low");
+    cy.get("tbody tr [data-sort-type='case']").then(($cells) => {
+      const uids = [...$cells].map((el) => el.dataset.sortValue);
+      expect(uids[0]).to.equal("7000-5678-5678");
+    });
+  });
+
+  it("resets any checked document selections when sort is changed", () => {
+    cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
+    cy.get('input[name="document"]').first().check({ force: true });
+    cy.get('input[name="document"]').first().should("be.checked");
+    cy.get("[data-document-sort]").select("name-az");
+    cy.get('input[name="document"]').each(($checkbox) => {
+      cy.wrap($checkbox).should("not.be.checked");
+    });
+  });
+
+  it("resets column header aria-sort indicators when sort dropdown is used", () => {
+    cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
+
+    cy.contains("th", "Name").find("button").click();
+    cy.contains("th", "Name").should("have.attr", "aria-sort", "ascending");
+
+    cy.get("[data-document-sort]").select("name-az");
+    cy.get("th[aria-sort]").each(($th) => {
+      cy.wrap($th).should("have.attr", "aria-sort", "none");
+    });
+  });
+});
