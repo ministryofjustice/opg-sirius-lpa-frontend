@@ -176,6 +176,17 @@ $govuk-assets-path: "../assets/";
   display: flex;
 }
 
+.app-create-epa__details-row {
+  position: relative;
+}
+
+.app-create-epa__summary-update-link {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+}
+
 .app-\!-gap-2 {
   gap: 10px;
 }

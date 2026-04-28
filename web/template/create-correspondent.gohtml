@@ -1,13 +1,13 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add a correspondent{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ .Title }}{{ end }}
 
 {{ define "main" }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         {{ template "error-summary" .Error }}
 
-      <h1 class="govuk-heading-l">Add a correspondent</h1>
+      <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
