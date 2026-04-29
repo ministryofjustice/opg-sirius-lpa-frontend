@@ -16,7 +16,7 @@
           hx-swap="innerHTML">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
         <input type="hidden" name="id" value="{{ .EntityId }}"/>
-        <input type="hidden" name="entity" value="person"/>
+        <input type="hidden" name="entity" value="{{ .EntityType }}"/>
 
         {{ template "select" (select "type" "Event type" .Type .Error.Field.type (options .NoteTypes)) }}
 
@@ -34,7 +34,7 @@
         <div class="govuk-button-group">
             <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
             <a class="govuk-link govuk-link--no-visited-state"
-               hx-get="{{ prefix (printf "/action-panel?id=%d&entity=person" .EntityId) }}"
+               hx-get="{{ prefix (printf "/action-panel?id=%d&entity=%s" .EntityId .EntityType) }}"
                hx-target="#replace-action-panel"
             >Cancel</a>
         </div>

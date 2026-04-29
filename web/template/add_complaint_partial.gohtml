@@ -70,7 +70,7 @@
     <div class="govuk-button-group">
       <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
       <a class="govuk-link govuk-link--no-visited-state"
-         hx-get="{{ prefix (printf "/action-panel?id=%d&entity=person&uid[]=%s" .DonorId .CaseUID) }}"
+         hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId .CaseType .CaseUID) }}"
          hx-target="#replace-action-panel"
       >Cancel</a>
     </div>

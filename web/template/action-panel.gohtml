@@ -7,15 +7,15 @@
         >
             Create Warning
         </a> <br/>
-        <a class="govuk-link govuk-link--no-visited-state"
-           hx-get="{{ prefix (printf "/create-event?id=%d&entity=person" .DonorID) }}"
-           hx-target="#replace-action-panel"
-           hx-swap="innerHTML"
-        >
-            Create Event
-        </a>
         {{ if eq (len .Cases) 1 }}
             {{ with index .Cases 0 }}
+                <a class="govuk-link govuk-link--no-visited-state"
+                   hx-get="{{ prefix (printf "/create-event?id=%d&entity=%s" .ID (ToLower .CaseType)) }}"
+                   hx-target="#replace-action-panel"
+                   hx-swap="innerHTML"
+                >
+                    Create Event
+                </a>
                 <br/>
                 <a class="govuk-link govuk-link--no-visited-state"
                    hx-get="{{ prefix (printf "/add-complaint?id=%d&case=%s" .ID (ToLower .CaseType)) }}"
@@ -25,6 +25,14 @@
                     Add Complaint
                 </a>
             {{ end }}
+        {{ else }}
+            <a class="govuk-link govuk-link--no-visited-state"
+               hx-get="{{ prefix (printf "/create-event?id=%d&entity=person" $.DonorID) }}"
+               hx-target="#replace-action-panel"
+               hx-swap="innerHTML"
+            >
+                Create Event
+            </a>
         {{ end }}
     </div>
 {{ end }}
