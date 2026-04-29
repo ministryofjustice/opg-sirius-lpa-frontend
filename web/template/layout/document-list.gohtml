@@ -44,6 +44,27 @@
                     <input type="hidden" name="comparing" value="true">
                 {{ end }}
 
+                <div class="govuk-!-text-align-right govuk-!-margin-bottom-2">
+                    <label class="govuk-label govuk-!-display-inline govuk-!-margin-right-2" for="document-sort">
+                        Sort by
+                    </label>
+                    <select class="govuk-select" id="document-sort" data-document-sort>
+                        <option value="">Select an option</option>
+                        <option value="date-new-old">Date Created (New-Old)</option>
+                        <option value="date-old-new">Date Created (Old-New)</option>
+                        <option value="direction-incoming">Direction (Incoming)</option>
+                        <option value="direction-outgoing">Direction (Outgoing)</option>
+                        <option value="type-az">Document Type (A-Z)</option>
+                        <option value="type-za">Document Type (Z-A)</option>
+                        <option value="name-az">Name (A-Z)</option>
+                        <option value="name-za">Name (Z-A)</option>
+                        {{ if $multiCaseSelected }}
+                            <option value="case-low-high">Case number (Low-High)</option>
+                            <option value="case-high-low">Case number (High-Low)</option>
+                        {{ end }}
+                    </select>
+                </div>
+
                 <table class="govuk-table" data-module="moj-sortable-table">
                     <caption class="govuk-table__caption">
                         Documents ({{ .DocumentList.Total }})
@@ -79,7 +100,7 @@
 
                     <tbody class="govuk-table__body">
                     {{ range .DocumentList.Documents }}
-                        <tr class="govuk-table__row">
+                        <tr class="govuk-table__row" data-direction="{{ .Direction.Key }}">
                             <td class="govuk-table__cell">
                                 {{ if eq .MimeType "application/pdf" }}
                                     <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
@@ -97,7 +118,7 @@
                                     </div>
                                 {{ end }}
                             </td>
-                            <td class="govuk-table__cell" data-sort-value="{{ .FriendlyDescription }}">[{{ .Direction.Translation }}{{ if .NotifyStatus}} - {{ camelcaseToSentence .NotifyStatus }}{{end}}]
+                            <td class="govuk-table__cell" data-sort-type="name" data-sort-value="{{ .FriendlyDescription }}">[{{ .Direction.Translation }}{{ if .NotifyStatus}} - {{ camelcaseToSentence .NotifyStatus }}{{end}}]
                                 <br>
                                 {{ if eq .MimeType "application/pdf"}}
                                     {{ if eq $.Comparing true }}
@@ -110,15 +131,15 @@
                                 {{ end }}
                             </td>
                             {{ if $multiCaseSelected }}
-                                <td class="govuk-table__cell">
+                                <td class="govuk-table__cell" data-sort-type="case"{{ if gt (len .CaseItems) 0 }} data-sort-value="{{ (index .CaseItems 0).UID }}"{{ end }}>
                                     {{ if gt (len .CaseItems) 0 -}}
                                         {{ $case := index .CaseItems 0 -}}
                                         {{ template "CaseLabel" $case }}
                                     {{ end -}}
                                 </td>
                             {{ end }}
-                            <td class="govuk-table__cell" data-sort-value="{{ parseAndFormatDate .CreatedDate "02/01/2006 15:04:05" "2006-01-02 15:04:05" }}">{{ .CreatedDate }}</td>
-                            <td class="govuk-table__cell">
+                            <td class="govuk-table__cell" data-sort-type="date" data-sort-value="{{ parseAndFormatDate .CreatedDate "02/01/2006 15:04:05" "2006-01-02 15:04:05" }}">{{ .CreatedDate }}</td>
+                            <td class="govuk-table__cell" data-sort-type="type" data-sort-value="{{ if eq .Direction.Key `Outgoing` }}{{ .SystemType }}{{ else if eq .Direction.Key `Incoming` }}{{ .Type }}{{ if .SubType }} - {{ ToUpper .SubType }}{{ end }}{{ else if eq .Type `Correspondence` }}{{ .SubType }}{{ end }}">
                                 {{ if eq .Direction.Key "Outgoing" }}
                                     {{ .SystemType }}
                                 {{ else if eq .Direction.Key "Incoming" }}
