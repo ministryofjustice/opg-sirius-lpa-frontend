@@ -1,9 +1,13 @@
 {{ template "page" . }}
 
+{{ define "title" }}Delete event{{ end }}
+
+{{ define "container-classes" }} app-!-max-full-width{{ end }}
+
 {{ define "main" }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <a href="{{ prefix (printf "/donor/%d/history" .DonorId) }}" class="govuk-back-link">Back</a>
+      <a href="{{ prefix (printf "/donor/%s/history" .DonorId) }}" class="govuk-back-link">Back</a>
 
       <p class="govuk-body">
         <strong>Delete this event?</strong><br />
@@ -15,10 +19,68 @@
         To delete documents, go to the Documents area.
       </p>
 
+      <div class="govuk-!-padding-bottom-6 govuk-!-padding-left-4">
+        <div class="govuk-!-margin-bottom-0 background-govuk-white">
+          <div class="govuk-summary-card__title-wrapper app-summary-card--padding">
+            <h1 class="govuk-summary-card__title">
+                {{ .Event.SourceType.Translation }}
+            </h1>
+          </div>
+          <div class="govuk-summary-card__content app-summary-card-content--padding">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <div class="govuk-body lpa-history__meta govuk-!-margin-bottom-2">
+                    {{ if and .Event.OwningCase .Event.OwningCase.CaseSubtype}}
+                      <strong class="govuk-tag app-govuk-tag-bold
+                          {{ if eq .Event.OwningCase.CaseType "EPA" }}
+                              {{ caseLabel .Event.OwningCase.CaseType }}">{{ ToUpper .Event.OwningCase.CaseType }} {{ .Event.OwningCase.UID }}
+                          {{ else }}
+                              {{ caseLabel .Event.OwningCase.CaseSubtype }}">{{ ToUpper .Event.OwningCase.CaseSubtype }} {{ .Event.OwningCase.UID }}
+                          {{ end }}
+                      </strong>
+                    {{ end }}
+                  <div class="govuk-tag app-govuk-tag-bold colour-govuk-black lpa-history__meta-timestamp">
+                    <time datetime="{{ .Event.CreatedOn }}">{{ parseAndFormatDate .Event.CreatedOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
+                    - #{{ .Event.Hash }}
+                  </div>
+                </div>
+
+                <div class="govuk-body govuk-!-margin-bottom-1 app-timeline-event">
+                  {{ template "partial-event-note" (eventWithContext .Event "donorID" .DonorId) }}
+                </div>
+              </div>
+              <div class="govuk-summary-list__row">
+                <p class="govuk-hint govuk-!-margin-bottom-1 govuk-!-margin-top-1">
+                    {{ if eq .Event.Type "INS"}}
+                      Created by
+                    {{ else if eq .Event.Type "UPD" }}
+                      Updated by
+                    {{ else if eq .Event.Type "DEL" }}
+                      Deleted by
+                    {{ end }}
+                    {{ if .Event.User }}
+                        {{ if .Event.User.Deleted }}
+                          deleted user
+                        {{ else }}
+                          <a class="govuk-link"
+                             href="mailto:{{ .Event.User.Email}}">{{ .Event.User.DisplayName }}</a>
+                          {{ if gt (len .Event.User.Teams) 0 }}({{ (index .Event.User.Teams 0).DisplayName }}){{ end }}
+                          {{ if .Event.User.PhoneNumber }} &ndash; {{ .Event.User.PhoneNumber }}{{ end }}
+                        {{ end }}
+                    {{ else }}
+                      &ndash;
+                    {{ end }}
+                </p>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
         <div class="govuk-button-group">
-          <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/donor/%d/history" .DonorId) }}" >
+          <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/donor/%s/history" .DonorId) }}" >
             No, cancel
           </a>
           <button class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit">
