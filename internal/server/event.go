@@ -36,6 +36,7 @@ type eventData struct {
 	Type        string
 	Name        string
 	Description string
+	CaseUids    string
 }
 
 func Event(client EventClient, tmpl template.Template, partialTmpl template.Template) Handler {
@@ -50,10 +51,16 @@ func Event(client EventClient, tmpl template.Template, partialTmpl template.Temp
 			return err
 		}
 
+		caseUIDs := r.Form["uid[]"]
+		if err != nil {
+			return err
+		}
+
 		ctx := getContext(r)
 		data := eventData{XSRFToken: ctx.XSRFToken}
 		data.EntityId = entityID
 		data.EntityType = string(entityType)
+		data.CaseUids = buildUIDQueryString(caseUIDs)
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
