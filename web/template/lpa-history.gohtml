@@ -225,7 +225,7 @@
                                                     {{ end }}
                                                 </p>
                                                 {{ if and $.IsSysAdminUser (eq .SourceType.Key "Note")}}
-                                                    <a class="govuk-link app-!-colour-text-red" href="{{ prefix (printf "/delete-note?donorId=%s&noteId=%d" $.DonorID .SourceNote.ID )}}">Delete event</a>
+                                                    <a class="govuk-link app-!-colour-text-red" href="{{ prefix (printf "/delete-note?donorId=%s&eventId=%d" $.DonorID .ID )}}">Delete event</a>
                                                 {{ end }}
                                             </div>
                                         </dl>
