@@ -28,6 +28,8 @@ type ActionPanelData struct {
 	Type        string
 	Name        string
 	Description string
+	CaseUids    string
+	CaseType    string
 }
 
 func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
@@ -51,6 +53,13 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		}
 
 		caseUIDs := r.Form["uid[]"]
+		data.CaseUids = buildUIDQueryString(caseUIDs)
+
+		entityType, err := sirius.ParseEntityType(r.FormValue("entity"))
+		if err != nil {
+			return err
+		}
+		data.CaseType = string(entityType)
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
