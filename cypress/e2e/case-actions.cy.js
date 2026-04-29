@@ -97,6 +97,14 @@ describe("Case actions drop down", () => {
   });
 
   it("creates a warning via case actions", () => {
+    cy.addMock("/lpa-api/v1/warnings", "POST", {
+      status: 201,
+      body: {
+        personId: 1111,
+        warningText: "Be warned!",
+        warningType: "Complaint Received",
+      },
+    });
     cy.contains(".govuk-button", "Case actions").click();
     cy.contains("Create a warning").click();
     cy.url().should("include", "/create-warning?id=1111");
