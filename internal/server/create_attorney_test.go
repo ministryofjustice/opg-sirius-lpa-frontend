@@ -100,7 +100,6 @@ func TestGetCreateAttorneyWhenRefDataErrors(t *testing.T) {
 
 func TestPostCreateAttorney(t *testing.T) {
 	expectedError := RedirectError("/create-epa?id=1&caseId=2")
-	truePtr := true
 	dateString := "2022-04-05"
 	attorney := sirius.Attorney{
 		Person: sirius.Person{
@@ -121,7 +120,7 @@ func TestPostCreateAttorney(t *testing.T) {
 			Email:             "rm2@email.test",
 		},
 		RelationshipToDonor: "no relation",
-		SystemStatus:        &truePtr,
+		SystemStatus:        shared.BoolPtr(true),
 	}
 	client := &mockCreateAttorneyClient{}
 	client.
@@ -166,7 +165,6 @@ func TestPostCreateAttorney(t *testing.T) {
 
 func TestPostCreateAttorneyAddAnother(t *testing.T) {
 	expectedError := RedirectError("/create-attorney?id=1&caseId=2")
-	truePtr := true
 	dateString := "2022-04-05"
 	attorney := sirius.Attorney{
 		Person: sirius.Person{
@@ -187,7 +185,7 @@ func TestPostCreateAttorneyAddAnother(t *testing.T) {
 			Email:             "rm2@email.test",
 		},
 		RelationshipToDonor: "no relation",
-		SystemStatus:        &truePtr,
+		SystemStatus:        shared.BoolPtr(true),
 	}
 	client := &mockCreateAttorneyClient{}
 	client.
@@ -236,7 +234,6 @@ func TestPostCreateAttorneyWhenValidationError(t *testing.T) {
 		Field: sirius.FieldErrors{"field": {"": "problem"}},
 	}
 
-	truePtr := true
 	dateString := "2022-04-05"
 	attorney := sirius.Attorney{
 		Person: sirius.Person{
@@ -257,7 +254,7 @@ func TestPostCreateAttorneyWhenValidationError(t *testing.T) {
 			Email:             "rm2@email.test",
 		},
 		RelationshipToDonor: "no relation",
-		SystemStatus:        &truePtr,
+		SystemStatus:        shared.BoolPtr(true),
 	}
 
 	client := &mockCreateAttorneyClient{}
