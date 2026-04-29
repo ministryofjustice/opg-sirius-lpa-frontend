@@ -74,7 +74,7 @@ type SourceNote struct {
 	ID int `json:"id"`
 }
 
-func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string, sourceTypes []string, sortBy string) (LpaEventsResponse, error) {
+func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string, sourceTypes []string, eventIds []string, sortBy string) (LpaEventsResponse, error) {
 	var resp LpaEventsResponse
 
 	query := ""
@@ -91,6 +91,14 @@ func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string, source
 			query = "filter=sourceType:" + sourceType
 		} else {
 			query += ",sourceType:" + sourceType
+		}
+	}
+
+	for _, eventId := range eventIds {
+		if query == "" {
+			query = "filter=eventId:" + eventId
+		} else {
+			query += ",eventId:" + eventId
 		}
 	}
 

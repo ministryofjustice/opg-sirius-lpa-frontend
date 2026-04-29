@@ -18,16 +18,30 @@ func (m *mockDeleteNoteClient) DeleteNote(ctx sirius.Context, id int) error {
 	return m.Called(ctx, id).Error(0)
 }
 
+func (m *mockDeleteNoteClient) GetEvents(ctx sirius.Context, donorId string, caseIds []string, sourceTypes []string, eventIds []string, sortBy string) (sirius.LpaEventsResponse, error) {
+	args := m.Called(ctx, donorId, caseIds, sourceTypes, eventIds, sortBy)
+	return args.Get(0).(sirius.LpaEventsResponse), args.Error(1)
+}
+
 func TestGetDeleteNote(t *testing.T) {
+	event := sirius.LpaEvent{ID: 456, SourceNote: sirius.SourceNote{ID: 789}}
+
 	client := &mockDeleteNoteClient{}
+	client.
+		On("GetEvents", mock.Anything, "123", []string{}, []string{}, []string{"456"}, "desc").
+		Return(sirius.LpaEventsResponse{
+			Events: []sirius.LpaEvent{event},
+		}, nil)
+
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, deleteNoteData{
-			DonorId: 123,
+			DonorId: "123",
+			Event:   event,
 		}).
 		Return(nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&noteId=456", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&eventId=456", nil)
 	w := httptest.NewRecorder()
 
 	err := DeleteNote(client, template.Func)(w, r)
@@ -38,35 +52,39 @@ func TestGetDeleteNote(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestGetDeleteNoteBadQuery(t *testing.T) {
-	testCases := map[string]string{
-		"no-donorId":  "/",
-		"bad-donorId": "/?donorId=test",
-		"no-noteId":   "/?donorId=123",
-		"bad-noteId":  "/?donorId=123&noteId=test",
-	}
+func TestGetDeleteNoteGetEventsFails(t *testing.T) {
+	client := &mockDeleteNoteClient{}
+	client.
+		On("GetEvents", mock.Anything, "123", []string{}, []string{}, []string{"456"}, "desc").
+		Return(sirius.LpaEventsResponse{}, errExample)
 
-	for name, url := range testCases {
-		t.Run(name, func(t *testing.T) {
-			r, _ := http.NewRequest(http.MethodGet, url, nil)
-			w := httptest.NewRecorder()
+	template := &mockTemplate{}
 
-			err := DeleteNote(nil, nil)(w, r)
+	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&eventId=456", nil)
+	w := httptest.NewRecorder()
 
-			assert.NotNil(t, err)
-		})
-	}
+	err := DeleteNote(client, template.Func)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestPostDeleteNote(t *testing.T) {
+	event := sirius.LpaEvent{ID: 456, SourceNote: sirius.SourceNote{ID: 789}}
+
 	client := &mockDeleteNoteClient{}
 	client.
-		On("DeleteNote", mock.Anything, 456).
+		On("GetEvents", mock.Anything, "123", []string{}, []string{}, []string{"456"}, "desc").
+		Return(sirius.LpaEventsResponse{
+			Events: []sirius.LpaEvent{event},
+		}, nil)
+	client.
+		On("DeleteNote", mock.Anything, 789).
 		Return(nil)
 
 	template := &mockTemplate{}
 
-	r, _ := http.NewRequest(http.MethodPost, "/?donorId=123&noteId=456", nil)
+	r, _ := http.NewRequest(http.MethodPost, "/?donorId=123&eventId=456", nil)
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
@@ -79,14 +97,21 @@ func TestPostDeleteNote(t *testing.T) {
 }
 
 func TestPostDeleteNoteError(t *testing.T) {
+	event := sirius.LpaEvent{ID: 456, SourceNote: sirius.SourceNote{ID: 789}}
+
 	client := &mockDeleteNoteClient{}
 	client.
-		On("DeleteNote", mock.Anything, 456).
+		On("GetEvents", mock.Anything, "123", []string{}, []string{}, []string{"456"}, "desc").
+		Return(sirius.LpaEventsResponse{
+			Events: []sirius.LpaEvent{event},
+		}, nil)
+	client.
+		On("DeleteNote", mock.Anything, 789).
 		Return(errExample)
 
 	template := &mockTemplate{}
 
-	r, _ := http.NewRequest(http.MethodPost, "/?donorId=123&noteId=456", nil)
+	r, _ := http.NewRequest(http.MethodPost, "/?donorId=123&eventId=456", nil)
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
