@@ -11,6 +11,7 @@ import (
 
 type ActionPanelClient interface {
 	NoteTypes(ctx sirius.Context) ([]string, error)
+	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
 }
 
 type ActionPanelData struct {
@@ -22,14 +23,17 @@ type ActionPanelData struct {
 	Success      bool
 	Error        sirius.ValidationError
 	DonorID      int
-
-	Type        string
-	Name        string
-	Description string
+	Cases        []sirius.Case
+	CaseUids     string
+	CaseType     string
 }
 
 func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
+		if err := r.ParseForm(); err != nil {
+			return err
+		}
+
 		ctx := getContext(r)
 		data := ActionPanelData{XSRFToken: ctx.XSRFToken}
 
@@ -44,6 +48,15 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			}
 		}
 
+		caseUIDs := r.Form["uid[]"]
+		data.CaseUids = buildUIDQueryString(caseUIDs)
+
+		entityType, err := sirius.ParseEntityType(r.FormValue("entity"))
+		if err != nil {
+			return err
+		}
+		data.CaseType = string(entityType)
+
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		group.Go(func() error {
@@ -53,6 +66,34 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			}
 
 			data.NoteTypes = noteTypes
+			return nil
+		})
+
+		group.Go(func() error {
+			if data.DonorID > 0 {
+				cases, err := client.CasesByDonor(ctx.With(groupCtx), data.DonorID)
+				if err != nil {
+					return err
+				}
+
+				// Filter cases by uid[] parameter if provided
+				if len(caseUIDs) > 0 {
+					casesByUID := make(map[string]sirius.Case, len(cases))
+					for _, c := range cases {
+						casesByUID[c.UID] = c
+					}
+
+					var filtered []sirius.Case
+					for _, uid := range caseUIDs {
+						if c, ok := casesByUID[uid]; ok {
+							filtered = append(filtered, c)
+						}
+					}
+					data.Cases = filtered
+				} else {
+					data.Cases = cases
+				}
+			}
 			return nil
 		})
 

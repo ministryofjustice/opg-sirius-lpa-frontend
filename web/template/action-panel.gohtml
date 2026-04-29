@@ -1,16 +1,16 @@
 {{ define "page" }}
     <div id="replace-action-panel">
-        <a class="govuk-link govuk-link--no-visited-state"
-           hx-get="{{ prefix (printf "/create-warning?id=%d" .DonorID) }}"
-           hx-target="#replace-action-panel"
-           hx-swap="innerHTML"
-        >
-            Create Warning
-        </a><br/>
         {{ if eq (len .Cases) 1 }}
             {{ with index .Cases 0 }}
                 <a class="govuk-link govuk-link--no-visited-state"
-                   hx-get="{{ prefix (printf "/create-event?id=%d&entity=%s" .ID (ToLower .CaseType)) }}"
+                   hx-get="{{ prefix (printf "/create-warning?id=%d&entity=%s%s" $.DonorID (ToLower .CaseType) $.CaseUids) }}"
+                   hx-target="#replace-action-panel"
+                   hx-swap="innerHTML"
+                >
+                    Create warning
+                </a> <br/>
+                <a class="govuk-link govuk-link--no-visited-state"
+                   hx-get="{{ prefix (printf "/create-event?id=%d&entity=%s%s" .ID (ToLower .CaseType) $.CaseUids) }}"
                    hx-target="#replace-action-panel"
                    hx-swap="innerHTML"
                 >
@@ -18,7 +18,7 @@
                 </a>
                 <br/>
                 <a class="govuk-link govuk-link--no-visited-state"
-                   hx-get="{{ prefix (printf "/add-complaint?id=%d&case=%s" .ID (ToLower .CaseType)) }}"
+                   hx-get="{{ prefix (printf "/add-complaint?id=%d&case=%s%s" .ID (ToLower .CaseType) $.CaseUids) }}"
                    hx-target="#replace-action-panel"
                    hx-swap="innerHTML"
                 >
@@ -27,7 +27,14 @@
             {{ end }}
         {{ else }}
             <a class="govuk-link govuk-link--no-visited-state"
-               hx-get="{{ prefix (printf "/create-event?id=%d&entity=person" $.DonorID) }}"
+               hx-get="{{ prefix (printf "/create-warning?id=%d&entity=person%s" $.DonorID $.CaseUids) }}"
+               hx-target="#replace-action-panel"
+               hx-swap="innerHTML"
+            >
+                Create warning
+            </a> <br/>
+            <a class="govuk-link govuk-link--no-visited-state"
+               hx-get="{{ prefix (printf "/create-event?id=%d&entity=person%s" $.DonorID $.CaseUids) }}"
                hx-target="#replace-action-panel"
                hx-swap="innerHTML"
             >
