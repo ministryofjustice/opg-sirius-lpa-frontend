@@ -203,6 +203,7 @@ func TestGetDocumentList(t *testing.T) {
 		expectedCases    []sirius.Case
 		caseIDs          []string
 		path             string
+		expectedCaseUids string
 	}{
 		{
 			name:             "on person with multiple cases",
@@ -212,6 +213,7 @@ func TestGetDocumentList(t *testing.T) {
 			expectedCases:    cases,
 			caseIDs:          []string(nil),
 			path:             "/donor/82/documents",
+			expectedCaseUids: "",
 		},
 		{
 			name:             "on person with one case",
@@ -221,6 +223,7 @@ func TestGetDocumentList(t *testing.T) {
 			expectedCases:    cases[:1],
 			caseIDs:          []string(nil),
 			path:             "/donor/82/documents",
+			expectedCaseUids: "",
 		},
 		{
 			name:             "one case specified",
@@ -230,6 +233,7 @@ func TestGetDocumentList(t *testing.T) {
 			expectedCases:    []sirius.Case{cases[0]},
 			caseIDs:          []string{"1"},
 			path:             "/donor/82/documents?uid[]=7000-1234-0000",
+			expectedCaseUids: "&uid[]=7000-1234-0000",
 		},
 		{
 			name:             "multiple cases specified",
@@ -239,6 +243,7 @@ func TestGetDocumentList(t *testing.T) {
 			expectedCases:    []sirius.Case{cases[0], cases[1]},
 			caseIDs:          []string{"1", "2"},
 			path:             "/donor/82/documents?uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+			expectedCaseUids: "&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 		},
 	}
 
@@ -260,6 +265,7 @@ func TestGetDocumentList(t *testing.T) {
 						DocumentList:          tc.documentList,
 						MultipleCasesSelected: tc.expectedMultiple,
 						DonorID:               82,
+						CaseUids:              tc.expectedCaseUids,
 					},
 				).
 				Return(nil)
@@ -443,6 +449,7 @@ func TestDocumentListDismissValidation(t *testing.T) {
 				DocumentList:          twoCasesDocumentList,
 				MultipleCasesSelected: true,
 				DonorID:               82,
+				CaseUids:              "&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 			},
 		).
 		Return(nil)

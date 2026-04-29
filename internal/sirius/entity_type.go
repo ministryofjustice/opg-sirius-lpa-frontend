@@ -5,9 +5,10 @@ import "errors"
 type EntityType string
 
 const (
-	EntityTypeLpa    = EntityType("lpa")
-	EntityTypeEpa    = EntityType("epa")
-	EntityTypePerson = EntityType("person")
+	EntityTypeLpa        = EntityType("lpa")
+	EntityTypeEpa        = EntityType("epa")
+	EntityTypePerson     = EntityType("person")
+	EntityTypeDigitalLpa = EntityType("digital_lpa")
 )
 
 func ParseEntityType(s string) (EntityType, error) {
@@ -18,6 +19,8 @@ func ParseEntityType(s string) (EntityType, error) {
 		return EntityTypeEpa, nil
 	case "person":
 		return EntityTypePerson, nil
+	case "digital_lpa":
+		return EntityTypeDigitalLpa, nil
 	}
 
 	return EntityType(""), errors.New("could not parse entity type")

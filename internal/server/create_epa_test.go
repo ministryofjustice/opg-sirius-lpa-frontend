@@ -130,21 +130,21 @@ func TestGetCreateEpaEditWhenEpaErrors(t *testing.T) {
 }
 
 func TestPostCreateEpa(t *testing.T) {
-	truePtr := true
-	falsePtr := false
+	truePtr := shared.BoolPtr(true)
+	falsePtr := shared.BoolPtr(false)
 	dateString := "2022-04-05"
 	epa := sirius.Epa{
 		EpaDonorSignatureDate:   sirius.DateString(dateString),
 		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
-		DonorHasOtherEpas:       &truePtr,
+		DonorHasOtherEpas:       truePtr,
 		OtherEpaInfo:            "More info",
 		Case: sirius.Case{
 			ReceiptDate:                     sirius.DateString(dateString),
-			CaseAttorneySingular:            &truePtr,
-			CaseAttorneyJointlyAndSeverally: &falsePtr,
-			CaseAttorneyJointly:             &falsePtr,
-			PaymentByCheque:                 &falsePtr,
-			PaymentExemption:                &truePtr,
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
 			PaymentDate:                     sirius.DateString(dateString),
 		},
 	}
@@ -158,7 +158,6 @@ func TestPostCreateEpa(t *testing.T) {
 		On("Func", mock.Anything, createEpaData{
 			Title:           "Create an EPA",
 			Success:         true,
-			Epa:             epa,
 			AppointmentType: "singular",
 		}).
 		Return(nil)
@@ -188,36 +187,36 @@ func TestPostCreateEpa(t *testing.T) {
 }
 
 func TestPostCreateEpaEdit(t *testing.T) {
-	truePtr := true
-	falsePtr := false
+	truePtr := shared.BoolPtr(true)
+	falsePtr := shared.BoolPtr(false)
 	dateString := "2022-04-05"
 	epa := sirius.Epa{
 		EpaDonorSignatureDate:   sirius.DateString(dateString),
 		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
-		DonorHasOtherEpas:       &falsePtr,
+		DonorHasOtherEpas:       falsePtr,
 		OtherEpaInfo:            "More info 1",
 		Case: sirius.Case{
 			ReceiptDate:                     sirius.DateString(dateString),
-			CaseAttorneySingular:            &truePtr,
-			CaseAttorneyJointlyAndSeverally: &falsePtr,
-			CaseAttorneyJointly:             &falsePtr,
-			PaymentByCheque:                 &falsePtr,
-			PaymentExemption:                &truePtr,
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
 			PaymentDate:                     sirius.DateString(dateString),
 		},
 	}
 	newEpa := sirius.Epa{
 		EpaDonorSignatureDate:   sirius.DateString(dateString),
 		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
-		DonorHasOtherEpas:       &truePtr,
+		DonorHasOtherEpas:       truePtr,
 		OtherEpaInfo:            "More info 2",
 		Case: sirius.Case{
 			ReceiptDate:                     sirius.DateString(dateString),
-			CaseAttorneySingular:            &truePtr,
-			CaseAttorneyJointlyAndSeverally: &falsePtr,
-			CaseAttorneyJointly:             &falsePtr,
-			PaymentByCheque:                 &falsePtr,
-			PaymentExemption:                &truePtr,
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
 			PaymentDate:                     sirius.DateString(dateString),
 		},
 	}
@@ -234,7 +233,7 @@ func TestPostCreateEpaEdit(t *testing.T) {
 		On("Func", mock.Anything, createEpaData{
 			Title:           "Edit EPA",
 			Success:         true,
-			Epa:             newEpa,
+			Epa:             epa,
 			AppointmentType: "singular",
 		}).
 		Return(nil)
@@ -265,21 +264,21 @@ func TestPostCreateEpaEdit(t *testing.T) {
 
 func TestPostCreateEpaAddAttorney(t *testing.T) {
 	expectedError := RedirectError("/create-attorney?id=123&caseId=456")
-	truePtr := true
-	falsePtr := false
+	truePtr := shared.BoolPtr(true)
+	falsePtr := shared.BoolPtr(false)
 	dateString := "2022-04-05"
 	epa := sirius.Epa{
 		EpaDonorSignatureDate:   sirius.DateString(dateString),
 		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
-		DonorHasOtherEpas:       &truePtr,
+		DonorHasOtherEpas:       truePtr,
 		OtherEpaInfo:            "More info",
 		Case: sirius.Case{
 			ReceiptDate:                     sirius.DateString(dateString),
-			CaseAttorneySingular:            &truePtr,
-			CaseAttorneyJointlyAndSeverally: &falsePtr,
-			CaseAttorneyJointly:             &falsePtr,
-			PaymentByCheque:                 &falsePtr,
-			PaymentExemption:                &truePtr,
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
 			PaymentDate:                     sirius.DateString(dateString),
 		},
 	}
@@ -315,25 +314,136 @@ func TestPostCreateEpaAddAttorney(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestPostCreateEpaAddCorrespondent(t *testing.T) {
+	expectedError := RedirectError("/create-correspondent?id=123&caseId=456")
+	truePtr := shared.BoolPtr(true)
+	falsePtr := shared.BoolPtr(false)
+	dateString := "2022-04-05"
+	epa := sirius.Epa{
+		EpaDonorSignatureDate:   sirius.DateString(dateString),
+		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
+		DonorHasOtherEpas:       truePtr,
+		OtherEpaInfo:            "More info",
+		Case: sirius.Case{
+			ReceiptDate:                     sirius.DateString(dateString),
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
+			PaymentDate:                     sirius.DateString(dateString),
+		},
+	}
+	client := &mockCreateEpaClient{}
+	client.
+		On("CreateEpa", mock.Anything, 123, epa).
+		Return(sirius.Epa{Case: sirius.Case{ID: 456}}, nil)
+
+	template := &mockTemplate{}
+
+	form := url.Values{
+		"epaDonorSignatureDate":   {dateString},
+		"epaDonorNoticeGivenDate": {dateString},
+		"donorHasOtherEpas":       {"true"},
+		"otherEpaInfo":            {"More info"},
+		"receiptDate":             {dateString},
+		"caseAttorney":            {"singular"},
+		"paymentByCheque":         {"false"},
+		"paymentExemption":        {"true"},
+		"paymentDate":             {dateString},
+		"addCorrespondent":        {"true"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateEpa(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Equal(t, err, expectedError)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostUpdateEpaWithAttorneysAddCorrespondent(t *testing.T) {
+	expectedError := RedirectError("/select-or-create-correspondent?id=123&caseId=456")
+	truePtr := shared.BoolPtr(true)
+	falsePtr := shared.BoolPtr(false)
+	dateString := "2022-04-05"
+	epa := sirius.Epa{
+		EpaDonorSignatureDate:   sirius.DateString(dateString),
+		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
+		DonorHasOtherEpas:       truePtr,
+		OtherEpaInfo:            "More info",
+		Case: sirius.Case{
+			ReceiptDate:                     sirius.DateString(dateString),
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
+			PaymentDate:                     sirius.DateString(dateString),
+		},
+	}
+	client := &mockCreateEpaClient{}
+	client.
+		On("Epa", mock.Anything, 456).
+		Return(sirius.Epa{
+			Case: sirius.Case{
+				ID:        456,
+				Attorneys: []sirius.Attorney{{Person: sirius.Person{ID: 1}}},
+			},
+		}, nil).
+		On("UpdateEpa", mock.Anything, 456, epa).
+		Return(nil)
+
+	template := &mockTemplate{}
+
+	form := url.Values{
+		"epaDonorSignatureDate":   {dateString},
+		"epaDonorNoticeGivenDate": {dateString},
+		"donorHasOtherEpas":       {"true"},
+		"otherEpaInfo":            {"More info"},
+		"receiptDate":             {dateString},
+		"caseAttorney":            {"singular"},
+		"paymentByCheque":         {"false"},
+		"paymentExemption":        {"true"},
+		"paymentDate":             {dateString},
+		"addCorrespondent":        {"true"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&caseId=456", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateEpa(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Equal(t, err, expectedError)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestPostCreateEpaWhenValidationError(t *testing.T) {
 	expectedError := sirius.ValidationError{
 		Field: sirius.FieldErrors{"field": {"": "problem"}},
 	}
 
-	truePtr := true
-	falsePtr := false
+	truePtr := shared.BoolPtr(true)
+	falsePtr := shared.BoolPtr(false)
 	dateString := "2022-04-05"
 	epa := sirius.Epa{
 		EpaDonorSignatureDate:   sirius.DateString(dateString),
 		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
-		DonorHasOtherEpas:       &truePtr,
+		DonorHasOtherEpas:       truePtr,
 		OtherEpaInfo:            "More info",
 		Case: sirius.Case{
-			CaseAttorneySingular:            &truePtr,
-			CaseAttorneyJointlyAndSeverally: &falsePtr,
-			CaseAttorneyJointly:             &falsePtr,
-			PaymentByCheque:                 &falsePtr,
-			PaymentExemption:                &truePtr,
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
 			PaymentDate:                     sirius.DateString(dateString),
 		},
 	}
@@ -349,7 +459,6 @@ func TestPostCreateEpaWhenValidationError(t *testing.T) {
 			Title:           "Create an EPA",
 			Success:         false,
 			Error:           expectedError,
-			Epa:             epa,
 			AppointmentType: "singular",
 		}).
 		Return(nil)
