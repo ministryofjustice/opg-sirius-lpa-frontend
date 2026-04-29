@@ -26,6 +26,7 @@ type eventData struct {
 	XSRFToken    string
 	NoteTypes    []string
 	Entity       string
+	EntityType   string
 	IsDigitalLpa bool
 	CaseUID      string
 	EntityId     int
@@ -52,6 +53,7 @@ func Event(client EventClient, tmpl template.Template, partialTmpl template.Temp
 		ctx := getContext(r)
 		data := eventData{XSRFToken: ctx.XSRFToken}
 		data.EntityId = entityID
+		data.EntityType = string(entityType)
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
