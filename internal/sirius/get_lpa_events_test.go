@@ -277,7 +277,7 @@ func TestGetLpaEventsFiltered(t *testing.T) {
 			expectedResponse: expectedResponse,
 		},
 		{
-			name:       "Can filter events by event ID with source typ",
+			name:       "Can filter events by event ID with source type",
 			caseIDs:    []string(nil),
 			eventIds:   []string{"4056"},
 			sourceType: []string{"Payment"},
