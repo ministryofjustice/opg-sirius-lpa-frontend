@@ -187,6 +187,39 @@ func TestGetLpaHistory(t *testing.T) {
 	}
 }
 
+func TestGetLpaHistoryWhenFailureOnGetUserDetails(t *testing.T) {
+	client := &mockGetLpaHistory{}
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{}, errExample)
+	client.
+		On("GetEvents", mock.Anything, "123", []string(nil), []string{}, []string{}, "desc").
+		Return(sirius.LpaEventsResponse{}, nil)
+
+	server := newMockServer("/lpa-api/v1/persons/{donorId}/events", GetLpaHistory(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/lpa-api/v1/persons/123/events", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
 func TestGetLpaHistoryWhenFailureOnGetEvents(t *testing.T) {
 	client := &mockGetLpaHistory{}
 	client.
