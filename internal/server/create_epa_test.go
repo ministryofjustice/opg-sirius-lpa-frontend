@@ -38,7 +38,8 @@ func TestGetCreateEpa(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createEpaData{
-			Title: "Create an EPA",
+			DonorId: 123,
+			Title:   "Create an EPA",
 		}).
 		Return(nil)
 
@@ -70,6 +71,7 @@ func TestGetCreateEpaEdit(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, createEpaData{
+					DonorId:         123,
 					Title:           "Edit EPA",
 					Epa:             epa,
 					AppointmentType: appointmentType,
@@ -156,6 +158,7 @@ func TestPostCreateEpa(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createEpaData{
+			DonorId:         123,
 			Title:           "Create an EPA",
 			Success:         true,
 			AppointmentType: "singular",
@@ -231,6 +234,7 @@ func TestPostCreateEpaEdit(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createEpaData{
+			DonorId:         123,
 			Title:           "Edit EPA",
 			Success:         true,
 			Epa:             epa,
@@ -456,6 +460,7 @@ func TestPostCreateEpaWhenValidationError(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createEpaData{
+			DonorId:         123,
 			Title:           "Create an EPA",
 			Success:         false,
 			Error:           expectedError,
