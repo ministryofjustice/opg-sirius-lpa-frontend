@@ -85,13 +85,12 @@ func testStringMapper(t *testing.T, fnName string, expectations map[string]strin
 	}
 }
 
-
 func TestChannelForFormat(t *testing.T) {
 	expectations := map[string]string{
 		"paper":  "Paper",
 		"online": "Online",
 		"":       "Not specified",
-		"foo":    "channel NOT RECOGNISED: foo",
+		"foo":    "channel NOT RECOGNISED: Not Recognised",
 	}
 
 	testStringMapper(t, "channelForFormat", expectations)

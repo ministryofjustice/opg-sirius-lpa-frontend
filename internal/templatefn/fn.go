@@ -178,19 +178,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"subtypeLongFormat":      subtypeLongFormat,
 		"subtypeColour":          subtypeColour,
 		"severanceRequiredLabel": severanceRequiredLabel,
-		// translate channel code to long version for Format fields in display
-		"channelForFormat": func(s string) string {
-			switch s {
-			case "paper":
-				return "Paper"
-			case "online":
-				return "Online"
-			case "":
-				return "Not specified"
-			default:
-				return "channel NOT RECOGNISED: " + s
-			}
-		},
+		"channelForFormat":       shared.ChannelForFormat,
 		// translate progress indicator context to long version for application progress page
 		"progressIndicatorContext": func(s string) string {
 			switch s {
