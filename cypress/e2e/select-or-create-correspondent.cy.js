@@ -67,9 +67,9 @@ describe("Select or create correspondent", () => {
     cy.url().should("include", "/create-epa");
   });
 
-  it("can create a new correspondent", () => {
+  it("select create a new correspondent by default", () => {
     cy.contains("Add a correspondent");
-    cy.get("label[for=f-attorney-new]").click();
+    cy.get("input#f-attorney-new").should("be.checked");
     cy.get("button[type=submit]").click();
     cy.url().should("include", "/create-correspondent");
   });
