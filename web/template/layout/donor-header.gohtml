@@ -1,0 +1,211 @@
+{{/*
+    donor-header.gohtml
+    -------------------
+    Shared component template defines for the donor name header bar.
+    defines the reusable blocks; wrapper files call {{ template "page" . }}
+    and include these defines.
+
+    Defines:
+      "donorHeader"            — the full header bar (name + panel icon buttons + dropdown)
+      "panelCalendar"          — three-month calendar + working-days calculator wrapper
+      "calendarMonth"          — single month grid (receives CalendarMonth)
+      "workingDaysCalculator"  — HTMX calculator fragment (receives WorkingDaysVars)
+                                 used both embedded in the page and as a standalone
+                                 partial response from DonorHeaderWorkingDays handler
+*/}}
+
+{{/*
+    donorHeader: the dark header bar.
+    Receives DonorHeaderData.
+    TODO: permission gating on icon buttons — currently ungated for POC.
+*/}}
+{{ define "donorHeader" }}
+    <header class="page-header" data-module="donor-header">
+        <div class="page-header__inner govuk-width-container">
+            <h1 aria-live="polite">
+                {{- .Person.Firstname -}}
+                {{- if .Person.Middlenames }} {{ .Person.Middlenames }}{{ end }}
+                {{- " " -}}{{ .Person.Surname }}
+                <span class="light">{{ .Person.PersonType }}</span>
+            </h1>
+
+            <div class="panel-tabs">
+                <div class="panel-tabs__buttons">
+
+                    {{/*
+                    Document icon — navigates to the Go document list page.
+                    Uses $window.location.href pattern from the updated panels directive,
+                    passing case UIDs as query params.
+                    TODO: gate on v1-documents.get permission.
+                */}}
+                    <a class="opg-icon panel-tabs__button"
+                       href="{{ prefix (printf "/donor/%d/documents" .DonorID) }}"
+                       title="Documents associated to this case">
+                        Copy
+                    </a>
+
+                    {{/*
+                    Calendar icon — toggles the calendar panel dropdown.
+                    TODO: gate on v1-persons-cases.get permission.
+                */}}
+                    <button class="opg-icon panel-tabs__button"
+                            id="panel-calendar-btn"
+                            aria-controls="panel-calendar"
+                            aria-expanded="false"
+                            title="Calendars"
+                            type="button">
+                        OpenCalendar
+                    </button>
+
+                </div>
+
+                {{/*
+                Calendar dropdown — pre-rendered server-side; toggled client-side.
+                No HTMX round trip on open since data is already in scope.
+            */}}
+                <div class="panel-tabs__dropdown" id="panel-calendar" hidden>
+                    {{ template "panelCalendar" . }}
+                </div>
+            </div>
+        </div>
+    </header>
+{{ end }}
+
+
+{{/*
+    panelCalendar: three-month calendar display + working-days calculator.
+    Receives DonorHeaderData.
+*/}}
+{{ define "panelCalendar" }}
+    <div class="panel-calendar">
+        <h2 class="panel-calendar__title">Calendar</h2>
+
+        <div class="panel-calendar__months">
+            {{ range .Months }}
+                {{ template "calendarMonth" . }}
+            {{ end }}
+        </div>
+
+        <div class="panel-calendar__difference">
+            {{ template "workingDaysCalculator" .Calculator }}
+        </div>
+    </div>
+{{ end }}
+
+
+{{/*
+    calendarMonth: renders a single month as an accessible HTML table.
+    Receives CalendarMonth.
+*/}}
+{{ define "calendarMonth" }}
+    <table class="calendar-month" role="grid" aria-label="{{ .Name }}">
+        <caption class="calendar-month__caption">{{ .Name }}</caption>
+        <thead>
+        <tr>
+            <th scope="col" abbr="Monday">Mon</th>
+            <th scope="col" abbr="Tuesday">Tue</th>
+            <th scope="col" abbr="Wednesday">Wed</th>
+            <th scope="col" abbr="Thursday">Thu</th>
+            <th scope="col" abbr="Friday">Fri</th>
+            <th scope="col" abbr="Saturday">Sat</th>
+            <th scope="col" abbr="Sunday">Sun</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range .Weeks }}
+            <tr>
+                {{ range . }}
+                    {{ if .Day }}
+                        <td class="calendar-month__day{{ if .IsToday }} calendar-month__day--today{{ end }}{{ if .IsBankHoliday }} calendar-month__day--bank-holiday{{ end }}"
+                            data-date="{{ .Date }}"
+                            role="gridcell">{{ .Day }}</td>
+                    {{ else }}
+                        <td class="calendar-month__day calendar-month__day--empty" role="gridcell" aria-hidden="true"></td>
+                    {{ end }}
+                {{ end }}
+            </tr>
+        {{ end }}
+        </tbody>
+    </table>
+{{ end }}
+
+
+{{/*
+    workingDaysCalculator: HTMX-powered working-days calculator fragment.
+    Receives WorkingDaysVars.
+
+    Rendered two ways:
+      1. Embedded in full page via {{ template "workingDaysCalculator" .Calculator }}
+      2. Standalone partial via DonorHeaderWorkingDays → working-days-partial.gohtml
+
+    Uses readonly (not disabled) on the calculated field so all values are
+    always submitted. The server uses .Mode to determine what to derive.
+
+    hx-trigger="change" on the form catches all input change events that
+    bubble up — covers both radio clicks and text/number input changes.
+*/}}
+{{ define "workingDaysCalculator" }}
+    <div class="date-difference" id="working-days-calculator">
+        <h3 class="govuk-heading-s">Difference Calculator</h3>
+
+        <form hx-post="{{ prefix "/working-days" }}"
+              hx-target="#working-days-calculator"
+              hx-swap="outerHTML"
+              hx-trigger="change">
+
+            <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+            <input type="hidden" name="donorId" value="{{ .DonorID }}"/>
+
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                    Calculate:
+                </legend>
+                <div class="govuk-radios govuk-radios--small govuk-radios--inline" data-module="govuk-radios">
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" type="radio"
+                               id="mode-date1" name="mode" value="date1"
+                               {{ if eq .Mode "date1" }}checked{{ end }}>
+                        <label class="govuk-label govuk-radios__label" for="mode-date1">Start date</label>
+                    </div>
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" type="radio"
+                               id="mode-date2" name="mode" value="date2"
+                               {{ if eq .Mode "date2" }}checked{{ end }}>
+                        <label class="govuk-label govuk-radios__label" for="mode-date2">End date</label>
+                    </div>
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" type="radio"
+                               id="mode-difference" name="mode" value="difference"
+                               {{ if eq .Mode "difference" }}checked{{ end }}>
+                        <label class="govuk-label govuk-radios__label" for="mode-difference">Working days</label>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="calc-date1">From:</label>
+                <input class="govuk-input govuk-input--width-10{{ if eq .Mode "date1" }} govuk-input--disabled{{ end }}"
+                       type="text" id="calc-date1" name="date1" value="{{ .Date1 }}"
+                       placeholder="DD/MM/YYYY"
+                       {{ if eq .Mode "date1" }}readonly aria-label="Start date (calculated)"{{ end }}>
+            </div>
+
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="calc-date2">To:</label>
+                <input class="govuk-input govuk-input--width-10{{ if eq .Mode "date2" }} govuk-input--disabled{{ end }}"
+                       type="text" id="calc-date2" name="date2" value="{{ .Date2 }}"
+                       placeholder="DD/MM/YYYY"
+                       {{ if eq .Mode "date2" }}readonly aria-label="End date (calculated)"{{ end }}>
+            </div>
+
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="calc-difference">Working days:</label>
+                <input class="govuk-input govuk-input--width-5{{ if eq .Mode "difference" }} govuk-input--disabled{{ end }}"
+                       type="number" id="calc-difference" name="difference" value="{{ .Difference }}"
+                       min="0"
+                       {{ if eq .Mode "difference" }}readonly aria-label="Working days (calculated)"{{ end }}>
+            </div>
+
+        </form>
+    </div>
+{{ end }}

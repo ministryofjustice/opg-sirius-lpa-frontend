@@ -1,0 +1,13 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ .Person.Firstname }} {{ .Person.Surname }} {{ .Person.PersonType }}{{ end }}
+
+{{ define "full-width-header" }}
+    {{ template "donorHeader" . }}
+{{ end }}
+
+{{ define "main" }}
+    <div class="layout-content">
+        [Case tiles and task list — out of scope for this POC]
+    </div>
+{{ end }}
