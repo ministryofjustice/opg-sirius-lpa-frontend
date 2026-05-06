@@ -11,7 +11,11 @@ export default function showHideActions() {
   // Keep the animated height in sync with the content.
   // Default/min height ensures the panel has a usable size even when content
   // is very small (or still loading).
-  const measureHeight = () => `${Math.max(inner.scrollHeight, 150)}px`;
+  // The CSS max-height handles overflow via scrolling.
+  const measureHeight = () => {
+    const desiredHeight = Math.max(inner.scrollHeight, 150);
+    return `${desiredHeight}px`;
+  };
 
   const syncHeightIfOpen = () => {
     if (isOpen()) {

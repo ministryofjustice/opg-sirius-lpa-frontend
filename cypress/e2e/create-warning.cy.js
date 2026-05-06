@@ -12,7 +12,7 @@ describe("Create a warning", () => {
         ],
       },
     });
-    cy.visit("/create-warning?id=189");
+    cy.visit("/create-warning?id=189&entity=lpa");
   });
 
   it("creates a warning", () => {
@@ -54,7 +54,7 @@ describe("Create a warning on multiple cases", () => {
       },
     });
 
-    cy.visit("/create-warning?id=400");
+    cy.visit("/create-warning?id=400&entity=lpa");
   });
 
   it("creates a warning on multiple cases", () => {

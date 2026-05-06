@@ -471,16 +471,14 @@ $govuk-assets-path: "../assets/";
 }
 
 .actions-panel {
+  // Position at middle of viewport; content panel will be constrained
+  // to appear below the header area
+  --actions-panel-top: 130px;
+  --actions-panel-width: 400px;
   position: fixed;
-  top: 51vh;
+  top: 50vh;
   right: 0;
   z-index: 1;
-}
-
-// When the panel is open we slide the toggle button left by the width of the
-// content. Use a CSS variable so we can keep it in sync with the content width.
-.actions-panel {
-  --actions-panel-width: 400px;
 }
 
 .actions-panel--open {
@@ -489,10 +487,14 @@ $govuk-assets-path: "../assets/";
 
 .actions-panel__content {
   position: absolute;
+  // Position at center of viewport (parent is at 50vh, translate up by 50% of content height)
   top: 0;
   transform: translate(1rem, -50%);
   width: var(--actions-panel-width);
   max-width: calc(100vw - 4rem);
+  // Limit height so content doesn't overflow the viewport; allow scrolling
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
   padding: 1rem;
   background: #ffffff;
   border: 1px solid #b1b4b6;
@@ -500,7 +502,6 @@ $govuk-assets-path: "../assets/";
   z-index: 1;
   opacity: 0;
   height: 0;
-  overflow: hidden;
   transition:
     transform 200ms ease,
     opacity 200ms ease,
