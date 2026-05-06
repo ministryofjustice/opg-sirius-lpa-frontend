@@ -1,0 +1,16 @@
+{{/*
+    working-days-partial.gohtml
+    ---------------------------
+    HTMX partial wrapper for the working-days calculator.
+    Redefines {{ define "page" }} to return only the calculator fragment,
+    following the same pattern as warning-partial-wrapper.gohtml /
+    event-partial-wrapper.gohtml / add-complaint-partial-wrapper.gohtml.
+
+    Receives WorkingDaysVars directly (not DonorHeaderData).
+
+    Wire in server.go:
+      mux.Handle("/working-days", wrap(DonorHeaderWorkingDays(templates.Get("working-days-partial.gohtml"))))
+*/}}
+{{ define "page" }}
+    {{ template "workingDaysCalculator" . }}
+{{ end }}
