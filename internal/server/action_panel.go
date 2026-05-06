@@ -15,17 +15,17 @@ type ActionPanelClient interface {
 }
 
 type ActionPanelData struct {
-	XSRFToken    string
-	NoteTypes    []string
-	Entity       string
-	IsDigitalLpa bool
-	CaseUID      string
-	Success      bool
-	Error        sirius.ValidationError
-	DonorID      int
-	Cases        []sirius.Case
-	CaseUids     string
-	CaseType     string
+	XSRFToken     string
+	NoteTypes     []string
+	Entity        string
+	IsDigitalLpa  bool
+	CaseUID       string
+	Success       bool
+	Error         sirius.ValidationError
+	DonorID       int
+	SelectedCases []sirius.Case
+	CaseUids      string
+	CaseType      string
 }
 
 func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
@@ -89,9 +89,9 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 							filtered = append(filtered, c)
 						}
 					}
-					data.Cases = filtered
+					data.SelectedCases = filtered
 				} else {
-					data.Cases = cases
+					data.SelectedCases = cases
 				}
 			}
 			return nil

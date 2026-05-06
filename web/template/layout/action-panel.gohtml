@@ -1,60 +1,45 @@
-{{ define "ActionPanel" }}
-    <div class="actions-panel" data-module="actions-panel">
-        <button
-            class="govuk-button govuk-button--secondary actions-panel__toggle"
-            id="actions-toggle"
-            type="button"
-            aria-expanded="false"
-            aria-controls="actions-content">
-            Actions
-        </button>
-        <div id="actions-content" class="actions-panel__content" hidden>
-            <div class="actions-panel__inner">
-                <div id="replace-action-panel">
-
-                    {{ if eq (len .SelectedCases) 1 }}
-                        {{ with index .SelectedCases 0 }}
-                            <a class="govuk-link govuk-link--no-visited-state"
-                               hx-get="{{ prefix (printf "/create-warning?id=%d&entity=%s%s" $.DonorID (ToLower .CaseType) $.CaseUids) }}"
-                               hx-target="#replace-action-panel"
-                               hx-swap="innerHTML"
-                            >
-                                Create warning
-                            </a> <br/>
-                            <a class="govuk-link govuk-link--no-visited-state"
-                               hx-get="{{ prefix (printf "/create-event?id=%d&entity=%s%s" .ID (ToLower .CaseType) $.CaseUids) }}"
-                               hx-target="#replace-action-panel"
-                               hx-swap="innerHTML"
-                            >
-                                Create Event
-                            </a>
-                            <br/>
-                            <a class="govuk-link govuk-link--no-visited-state"
-                               hx-get="{{ prefix (printf "/add-complaint?id=%d&case=%s%s" .ID (ToLower .CaseType) $.CaseUids) }}"
-                               hx-target="#replace-action-panel"
-                               hx-swap="innerHTML"
-                            >
-                                Add Complaint
-                            </a>
-                        {{ end }}
-                    {{ else }}
-                        <a class="govuk-link govuk-link--no-visited-state"
-                           hx-get="{{ prefix (printf "/create-warning?id=%d&entity=person%s" $.DonorID $.CaseUids) }}"
-                           hx-target="#replace-action-panel"
-                           hx-swap="innerHTML"
-                        >
-                            Create warning
-                        </a> <br/>
-                        <a class="govuk-link govuk-link--no-visited-state"
-                           hx-get="{{ prefix (printf "/create-event?id=%d&entity=person%s" $.DonorID $.CaseUids) }}"
-                           hx-target="#replace-action-panel"
-                           hx-swap="innerHTML"
-                        >
-                            Create Event
-                        </a>
-                    {{ end }}
-                </div>
-            </div>
-        </div>
+{{ define "actionPanel" }}
+    <div id="replace-action-panel">
+        {{ if eq (len .SelectedCases) 1 }}
+            {{ with index .SelectedCases 0 }}
+                <a class="govuk-link govuk-link--no-visited-state"
+                   hx-get="{{ prefix (printf "/create-warning?id=%d&entity=%s%s" $.DonorID (ToLower .CaseType) $.CaseUids) }}"
+                   hx-target="#replace-action-panel"
+                   hx-swap="innerHTML"
+                >
+                    Create warning
+                </a> <br/>
+                <a class="govuk-link govuk-link--no-visited-state"
+                   hx-get="{{ prefix (printf "/create-event?id=%d&entity=%s%s" .ID (ToLower .CaseType) $.CaseUids) }}"
+                   hx-target="#replace-action-panel"
+                   hx-swap="innerHTML"
+                >
+                    Create Event
+                </a>
+                <br/>
+                <a class="govuk-link govuk-link--no-visited-state"
+                   hx-get="{{ prefix (printf "/add-complaint?id=%d&case=%s%s" .ID (ToLower .CaseType) $.CaseUids) }}"
+                   hx-target="#replace-action-panel"
+                   hx-swap="innerHTML"
+                >
+                    Add Complaint
+                </a>
+            {{ end }}
+        {{ else }}
+            <a class="govuk-link govuk-link--no-visited-state"
+               hx-get="{{ prefix (printf "/create-warning?id=%d&entity=person%s" $.DonorID $.CaseUids) }}"
+               hx-target="#replace-action-panel"
+               hx-swap="innerHTML"
+            >
+                Create warning
+            </a> <br/>
+            <a class="govuk-link govuk-link--no-visited-state"
+               hx-get="{{ prefix (printf "/create-event?id=%d&entity=person%s" $.DonorID $.CaseUids) }}"
+               hx-target="#replace-action-panel"
+               hx-swap="innerHTML"
+            >
+                Create Event
+            </a>
+        {{ end }}
     </div>
 {{ end }}
