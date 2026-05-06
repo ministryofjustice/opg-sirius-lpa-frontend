@@ -87,9 +87,18 @@ $sirius-bg-color: #29292e;
   .govuk-tabs__list-item,
   .moj-filter,
   .moj-filter__selected,
-  .autocomplete__input {
+  .autocomplete__input,
+  .govuk-accordion__section-heading-text,
+  .govuk-summary-card,
+  .app-timeline-container {
     background-color: $sirius-bg-color;
     color: govuk-colour("white");
+  }
+
+  .govuk-summary-card__title-wrapper {
+    background-color: $sirius-bg-color;
+    color: govuk-colour("white");
+    border-color: govuk-colour("white");
   }
 
   .govuk-input,
@@ -101,7 +110,8 @@ $sirius-bg-color: #29292e;
 
   .govuk-pagination__item:hover,
   .govuk-pagination__next:hover,
-  .govuk-pagination__prev:hover {
+  .govuk-pagination__prev:hover,
+  .govuk-accordion__section-button:hover {
     background-color: govuk-colour("black", $variant: "tint-25");
   }
 
