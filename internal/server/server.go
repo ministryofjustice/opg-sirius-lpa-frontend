@@ -105,6 +105,7 @@ type Client interface {
 	UpdateObjectionClient
 	ViewDocumentClient
 	WarningClient
+	DonorHeaderClient
 }
 
 var decoder = form.NewDecoder()
@@ -170,6 +171,10 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/search-postcode", wrap(SearchPostcode(client)))
 	mux.Handle("/search", wrap(Search(client, templates.Get("search.gohtml"))))
 	mux.Handle("/digital-lpa/create", wrap(CreateDraft(client, templates.Get("create_draft.gohtml"))))
+
+	//poc
+	mux.Handle("/donor/{id}", wrap(DonorHeader(client, templates.Get("donor-header-wrapper.gohtml"))))
+	mux.Handle("/working-days", wrap(DonorHeaderWorkingDays(templates.Get("working-days-partial.gohtml"))))
 
 	//modernise
 	mux.Handle("/lpa/{uid}", wrap(GetApplicationProgressDetails(client, templates.Get("mlpa-application-progress.gohtml"))))
@@ -398,8 +403,9 @@ func translateRefData(types []sirius.RefDataItem, tmplHandle string) string {
 
 func setCSPHeader(h http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Security-Policy", "default-src 'self'; img-src 'self' data: s3.eu-west-1.amazonaws.com")
-
+		// TODO: remove 'unsafe-inline' once donor-header toggle JS is moved to a module
+		// and HTMX CSP nonce strategy is agreed with the action panel spike.
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: s3.eu-west-1.amazonaws.com")
 		h.ServeHTTP(w, r)
 	}
 }
