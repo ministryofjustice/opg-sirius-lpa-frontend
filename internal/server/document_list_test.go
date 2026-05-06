@@ -202,6 +202,7 @@ func TestGetDocumentList(t *testing.T) {
 		expectedMultiple bool
 		expectedCases    []sirius.Case
 		caseIDs          []string
+		caseUids         string
 		path             string
 	}{
 		{
@@ -229,6 +230,7 @@ func TestGetDocumentList(t *testing.T) {
 			expectedMultiple: false,
 			expectedCases:    []sirius.Case{cases[0]},
 			caseIDs:          []string{"1"},
+			caseUids:         "&uid[]=7000-1234-0000",
 			path:             "/donor/82/documents?uid[]=7000-1234-0000",
 		},
 		{
@@ -238,6 +240,7 @@ func TestGetDocumentList(t *testing.T) {
 			expectedMultiple: true,
 			expectedCases:    []sirius.Case{cases[0], cases[1]},
 			caseIDs:          []string{"1", "2"},
+			caseUids:         "&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 			path:             "/donor/82/documents?uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 		},
 	}
@@ -260,6 +263,7 @@ func TestGetDocumentList(t *testing.T) {
 						DocumentList:          tc.documentList,
 						MultipleCasesSelected: tc.expectedMultiple,
 						DonorID:               82,
+						CaseUids:              tc.caseUids,
 					},
 				).
 				Return(nil)
@@ -443,6 +447,7 @@ func TestDocumentListDismissValidation(t *testing.T) {
 				DocumentList:          twoCasesDocumentList,
 				MultipleCasesSelected: true,
 				DonorID:               82,
+				CaseUids:              "&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 			},
 		).
 		Return(nil)
