@@ -451,3 +451,108 @@ $govuk-assets-path: "../assets/";
   width: 75px;
   vertical-align: top;
 }
+
+
+// -------------------------------------------------------
+// Donor name header bar
+// POC styles — resolved from Angular computed values.
+// TODO: opg-icons font needs adding to the asset pipeline
+// before icon buttons render correctly.
+// TODO: revisit fixed positioning once Angular shell removed.
+// -------------------------------------------------------
+
+.page-header {
+  background-image: linear-gradient(rgb(67, 112, 168) 0px, rgb(0, 50, 110));
+  color: rgb(255, 255, 255);
+  font-family: "Open Sans", sans-serif;
+  min-height: 40px;
+  position: fixed;
+  top: 34px;
+  width: 100%;
+  z-index: 10;
+
+  h1 {
+    float: left;
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 21px;
+    margin: 0;
+    padding: 9px 0 10px 15px;
+    text-transform: uppercase;
+    color: rgb(255, 255, 255);
+
+    .light {
+      font-weight: 300;
+    }
+  }
+}
+
+.page-header__inner {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.panel-tabs {
+  border-left: 1px solid rgb(255, 255, 255);
+  color: rgb(255, 255, 255);
+  float: left;
+  height: 40px;
+  overflow: visible;
+  position: relative;
+  flex: 1;
+}
+
+.panel-tabs__buttons {
+  display: flex;
+  height: 40px;
+}
+
+.panel-tabs__button {
+  background-color: transparent;
+  border: none;
+  border-right: 1px solid rgb(255, 255, 255);
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+  display: block;
+  font-family: opg-icons;
+  font-feature-settings: "liga";
+  font-size: 22.4px;
+  height: 40px;
+  line-height: 31px;
+  min-width: 44.8px;
+  padding: 4.48px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: capitalize;
+  width: 44.8px;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.panel-tabs__dropdown {
+  background-image: linear-gradient(rgb(67, 112, 168) 0px, rgb(0, 50, 110));
+  color: rgb(255, 255, 255);
+  font-family: "Open Sans", sans-serif;
+  left: 0;
+  max-height: 626px;
+  overflow: auto;
+  position: absolute;
+  top: 40px;
+  transition: height 0.5s ease, top 0.1s ease;
+  width: 1245px;
+  z-index: -1;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+@font-face {
+  font-family: "opg-icons";
+  src: url("../assets/fonts/opg-icons.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
