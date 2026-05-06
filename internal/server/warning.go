@@ -42,11 +42,6 @@ func Warning(client WarningClient, tmpl template.Template, partialTmpl template.
 			return err
 		}
 
-		entityType, err := sirius.ParseEntityType(r.FormValue("entity"))
-		if err != nil {
-			return err
-		}
-
 		ctx := getContext(r)
 		warningTypes, err := client.RefDataByCategory(ctx, sirius.WarningTypeCategory)
 		if err != nil {
@@ -67,7 +62,13 @@ func Warning(client WarningClient, tmpl template.Template, partialTmpl template.
 		}
 
 		data.CaseUids = buildUIDQueryString(caseUIDs)
-		data.EntityType = string(entityType)
+		if r.FormValue("mlpa") != "true" {
+			entityType, err := sirius.ParseEntityType(r.FormValue("entity"))
+			if err != nil {
+				return err
+			}
+			data.EntityType = string(entityType)
+		}
 
 		if r.Method == http.MethodPost {
 			warningType := postFormString(r, "warningType")
