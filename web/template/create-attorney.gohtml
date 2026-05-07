@@ -48,7 +48,7 @@
             {{ if not .IsEditing }}
               <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add another attorney" />
             {{ end }}
-            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?id=%d&caseId=%d" .DonorId .CaseId) }}">Cancel</a>
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}">Cancel</a>
         </div>
       </form>
     </div>
