@@ -44,6 +44,7 @@ $sirius-bg-color: #29292e;
 
   .sirius-search--colour-text-blue,
   .govuk-accordion__show-all,
+  .govuk-accordion__section-toggle,
   .govuk-details__summary-text,
   .govuk-link:link,
   .govuk-link--no-visited-state:visited {
@@ -111,7 +112,8 @@ $sirius-bg-color: #29292e;
   .govuk-pagination__item:hover,
   .govuk-pagination__next:hover,
   .govuk-pagination__prev:hover,
-  .govuk-accordion__section-button:hover {
+  .govuk-accordion__section-button:hover,
+  .govuk-accordion__show-all:hover {
     background-color: govuk-colour("black", $variant: "tint-25");
   }
 
