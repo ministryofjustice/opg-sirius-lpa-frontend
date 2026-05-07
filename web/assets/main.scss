@@ -460,6 +460,9 @@ $govuk-assets-path: "../assets/";
 // before icon buttons render correctly.
 // TODO: revisit fixed positioning once Angular shell removed.
 // -------------------------------------------------------
+.govuk-phase-banner {
+    margin-top: 40px !important;
+ }
 
 .page-header {
   background-image: linear-gradient(rgb(67, 112, 168) 0px, rgb(0, 50, 110));
@@ -467,7 +470,7 @@ $govuk-assets-path: "../assets/";
   font-family: "Open Sans", sans-serif;
   min-height: 40px;
   position: fixed;
-  top: 34px;
+  top: 54px;
   width: 100%;
   z-index: 10;
 
@@ -476,8 +479,7 @@ $govuk-assets-path: "../assets/";
     font-size: 21px;
     font-weight: 600;
     line-height: 21px;
-    margin: 0;
-    padding: 9px 0 10px 15px;
+    margin-right: 10px;
     text-transform: uppercase;
     color: rgb(255, 255, 255);
 
@@ -497,7 +499,6 @@ $govuk-assets-path: "../assets/";
   border-left: 1px solid rgb(255, 255, 255);
   color: rgb(255, 255, 255);
   float: left;
-  height: 40px;
   overflow: visible;
   position: relative;
   flex: 1;
@@ -555,4 +556,84 @@ $govuk-assets-path: "../assets/";
   src: url("../assets/fonts/opg-icons.woff") format("woff");
   font-weight: normal;
   font-style: normal;
+}
+
+.panel-calendar {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0.5rem;
+  gap: 1rem;
+}
+
+.panel-calendar__months {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  flex: 3;
+}
+
+.panel-calendar__difference {
+  .govuk-input {
+    color: rgb(255, 255, 255);
+    background-color: transparent;
+    border-color: rgb(255, 255, 255);
+  }
+
+  .govuk-label {
+    color: rgb(255, 255, 255);
+  }
+
+  .govuk-fieldset__legend {
+    color: rgb(255, 255, 255);
+  }
+
+  .govuk-radios__label {
+    color: rgb(255, 255, 255);
+    white-space: nowrap;
+  }
+}
+
+.date-difference h3 {
+  color: rgb(255, 255, 255);
+}
+
+.calendar-month {
+  flex: 1;
+  border-collapse: collapse;
+  font-size: 0.75em;
+  color: rgb(255, 255, 255);
+
+  caption {
+    color: rgb(255, 255, 255);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
+  th {
+    font-weight: 300;
+    padding: 2px 6px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  td {
+    padding: 2px 6px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+
+    &.calendar-month__day--today {
+      background: rgba(255, 255, 255, 0.25);
+      font-weight: 700;
+    }
+
+    &.calendar-month__day--bank-holiday {
+      color: rgb(255, 165, 0);
+    }
+
+    &.calendar-month__day--empty {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  }
 }

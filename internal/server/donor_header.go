@@ -176,7 +176,7 @@ func buildCalendarMonths(bankHolidays []time.Time, today time.Time) [3]CalendarM
 //   "date1"      — step backward from date2 until <difference> working days elapsed
 // ---------------------------------------------------------------------------
 
-const dateLayout = "02/01/2006"
+const dateLayout = "2006-01-02"
 
 func isWorkingDay(t time.Time, bhSet map[string]bool) bool {
 	if t.Weekday() == time.Saturday || t.Weekday() == time.Sunday {

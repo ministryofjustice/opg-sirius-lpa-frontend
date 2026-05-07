@@ -185,7 +185,7 @@
             <div class="govuk-form-group">
                 <label class="govuk-label" for="calc-date1">From:</label>
                 <input class="govuk-input govuk-input--width-10{{ if eq .Mode "date1" }} govuk-input--disabled{{ end }}"
-                       type="text" id="calc-date1" name="date1" value="{{ .Date1 }}"
+                       type="date" id="calc-date1" name="date1" value="{{ .Date1 }}"
                        placeholder="DD/MM/YYYY"
                        {{ if eq .Mode "date1" }}readonly aria-label="Start date (calculated)"{{ end }}>
             </div>
@@ -193,7 +193,7 @@
             <div class="govuk-form-group">
                 <label class="govuk-label" for="calc-date2">To:</label>
                 <input class="govuk-input govuk-input--width-10{{ if eq .Mode "date2" }} govuk-input--disabled{{ end }}"
-                       type="text" id="calc-date2" name="date2" value="{{ .Date2 }}"
+                       type="date" id="calc-date2" name="date2" value="{{ .Date2 }}"
                        placeholder="DD/MM/YYYY"
                        {{ if eq .Mode "date2" }}readonly aria-label="End date (calculated)"{{ end }}>
             </div>
