@@ -20,6 +20,7 @@ $govuk-assets-path: "../assets/";
 @import "node_modules/opg-sirius-search-ui/src/search";
 @import "./dark.scss";
 @import "./wysiwyg.scss";
+@import "./pdf-viewer.scss";
 
 .app-\!-embedded .app-\!-embedded-hide {
   display: none;
