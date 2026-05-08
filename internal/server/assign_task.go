@@ -18,6 +18,7 @@ type AssignTaskClient interface {
 	Task(ctx sirius.Context, id int) (sirius.Task, error)
 	Teams(ctx sirius.Context) ([]sirius.Team, error)
 	GetUserDetails(ctx sirius.Context) (sirius.User, error)
+	Case(ctx sirius.Context, id int) (sirius.Case, error)
 }
 
 type assignTaskData struct {
@@ -115,6 +116,12 @@ func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 				}
 			case "team":
 				assigneeID, _ = postFormInt(r, "assigneeTeam")
+			case "caseOwner":
+				caseitem, err := client.Case(ctx, lpa.ID)
+				if err != nil {
+					return err
+				}
+				assigneeID = caseitem.Assignee.ID
 			}
 
 			err := client.AssignTasks(ctx, assigneeID, taskIDs)
