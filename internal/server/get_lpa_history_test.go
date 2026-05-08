@@ -16,14 +16,19 @@ type mockGetLpaHistory struct {
 	mock.Mock
 }
 
-func (m *mockGetLpaHistory) GetEvents(ctx sirius.Context, donorId string, caseIds []string, sourceTypes []string, sortBy string) (sirius.LpaEventsResponse, error) {
-	args := m.Called(ctx, donorId, caseIds, sourceTypes, sortBy)
+func (m *mockGetLpaHistory) GetEvents(ctx sirius.Context, donorId string, caseIds []string, sourceTypes []string, eventIds []string, sortBy string) (sirius.LpaEventsResponse, error) {
+	args := m.Called(ctx, donorId, caseIds, sourceTypes, eventIds, sortBy)
 	return args.Get(0).(sirius.LpaEventsResponse), args.Error(1)
 }
 
 func (m *mockGetLpaHistory) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
 	args := m.Called(ctx, category)
 	return args.Get(0).([]sirius.RefDataItem), args.Error(1)
+}
+
+func (m *mockGetLpaHistory) GetUserDetails(ctx sirius.Context) (sirius.User, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(sirius.User), args.Error(1)
 }
 
 func TestGetLpaHistory(t *testing.T) {
@@ -33,6 +38,7 @@ func TestGetLpaHistory(t *testing.T) {
 	complainantCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	complaintOrigins := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	compensationTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	user := sirius.User{Roles: []string{"System Admin"}}
 
 	tests := []struct {
 		name        string
@@ -137,9 +143,12 @@ func TestGetLpaHistory(t *testing.T) {
 			client.
 				On("RefDataByCategory", mock.Anything, sirius.CompensationType).
 				Return(compensationTypes, nil)
+			client.
+				On("GetUserDetails", mock.Anything).
+				Return(user, nil)
 
 			client.
-				On("GetEvents", mock.Anything, "123", tc.caseIdsArgs, []string{}, "desc").
+				On("GetEvents", mock.Anything, "123", tc.caseIdsArgs, []string{}, []string{}, "desc").
 				Return(tc.response, err)
 
 			template := &mockTemplate{}
@@ -162,6 +171,7 @@ func TestGetLpaHistory(t *testing.T) {
 					Form: FilterLpaEventsForm{
 						Sort: "desc",
 					},
+					IsSysAdminUser: true,
 				}).
 				Return(nil)
 
@@ -175,6 +185,39 @@ func TestGetLpaHistory(t *testing.T) {
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
+}
+
+func TestGetLpaHistoryWhenFailureOnGetUserDetails(t *testing.T) {
+	client := &mockGetLpaHistory{}
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{}, errExample)
+	client.
+		On("GetEvents", mock.Anything, "123", []string(nil), []string{}, []string{}, "desc").
+		Return(sirius.LpaEventsResponse{}, nil)
+
+	server := newMockServer("/lpa-api/v1/persons/{donorId}/events", GetLpaHistory(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/lpa-api/v1/persons/123/events", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
 }
 
 func TestGetLpaHistoryWhenFailureOnGetEvents(t *testing.T) {
@@ -194,7 +237,10 @@ func TestGetLpaHistoryWhenFailureOnGetEvents(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
 		Return([]sirius.RefDataItem(nil), nil)
-	client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, "desc").Return(sirius.LpaEventsResponse{}, errExample)
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{}, nil)
+	client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, []string{}, "desc").Return(sirius.LpaEventsResponse{}, errExample)
 
 	server := newMockServer("/lpa-api/v1/persons/{donorId}/events", GetLpaHistory(client, nil))
 
@@ -212,6 +258,7 @@ func TestPostFiltersLpaHistory(t *testing.T) {
 	complainantCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	complaintOrigins := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	compensationTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	user := sirius.User{Roles: []string{"System Admin"}}
 
 	unfilteredResponse := sirius.LpaEventsResponse{
 		Events: []sirius.LpaEvent{
@@ -315,11 +362,14 @@ func TestPostFiltersLpaHistory(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
 		Return(compensationTypes, nil)
-	client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, "desc").
+	client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, []string{}, "desc").
 		Return(unfilteredResponse, nil)
 	client.
-		On("GetEvents", mock.Anything, "123", []string(nil), []string{"Lpa", "Payment"}, "asc").
+		On("GetEvents", mock.Anything, "123", []string(nil), []string{"Lpa", "Payment"}, []string{}, "asc").
 		Return(filteredResponse, nil)
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(user, nil)
 
 	template := &mockTemplate{}
 	template.On("Func", mock.Anything, getLpaHistory{
@@ -342,6 +392,7 @@ func TestPostFiltersLpaHistory(t *testing.T) {
 			Types: []string{"Lpa", "Payment"},
 			Sort:  "asc",
 		},
+		IsSysAdminUser: true,
 	}).Return(nil)
 
 	server := newMockServer("/lpa-api/v1/persons/{donorId}/events", GetLpaHistory(client, template.Func))
@@ -377,11 +428,14 @@ func TestPostFiltersLpaHistoryWhenFailureOnGetEvents(t *testing.T) {
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
 		Return([]sirius.RefDataItem(nil), nil)
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{}, nil)
 
-	client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, "desc").
+	client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, []string{}, "desc").
 		Return(sirius.LpaEventsResponse{}, nil)
 	client.
-		On("GetEvents", mock.Anything, "123", []string(nil), []string{"Lpa", "Payment"}, "asc").
+		On("GetEvents", mock.Anything, "123", []string(nil), []string{"Lpa", "Payment"}, []string{}, "asc").
 		Return(sirius.LpaEventsResponse{}, errExample)
 
 	server := newMockServer("/lpa-api/v1/persons/{donorId}/events", GetLpaHistory(client, nil))
