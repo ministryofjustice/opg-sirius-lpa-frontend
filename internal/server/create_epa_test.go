@@ -528,6 +528,7 @@ func TestPostCreateEpaWhenValidationErrorOnReceiptDate(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createEpaData{
+			DonorId:         123,
 			Title:           "Create an EPA",
 			Success:         false,
 			Error:           expectedError,
@@ -594,6 +595,7 @@ func TestPostCreateEpaAddActorValidationErrorOnReceiptDate(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, createEpaData{
+					DonorId:         123,
 					Title:           "Create an EPA",
 					Success:         false,
 					Error:           expectedError,
