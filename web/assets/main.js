@@ -19,6 +19,7 @@ import autoApplyFilter from "./auto-apply-filter";
 import showHideCaseSummary from "./show-hide-case-summary";
 import disableAfterClick from "./disable-after-click";
 import documentListSort from "./document-list-sort";
+import copyToClipboard from "./copy-to-clipboard";
 
 const prefix = document.body.getAttribute("data-prefix");
 
@@ -42,6 +43,7 @@ autoApplyFilter();
 showHideCaseSummary();
 disableAfterClick();
 documentListSort();
+copyToClipboard();
 
 if (window.self !== window.parent) {
   const success = document.querySelector('[data-app-reload~="page"]');
