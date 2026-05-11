@@ -1,5 +1,7 @@
 export default async function copyToClipboard() {
-  const copyButtons = document.querySelectorAll("button[data-copy-to-clipboard]");
+  const copyButtons = document.querySelectorAll(
+    "button[data-copy-to-clipboard]",
+  );
 
   copyButtons.forEach((copyButton) => {
     copyButton.addEventListener("click", (e) => {
