@@ -65,10 +65,14 @@
             <th scope="row" class="govuk-table__header">Airmail required</th>
             <td class="govuk-table__cell">{{ boolToYesNo .IsAirmailRequired }}</td>
         </tr>
-        {{ if .RelationshipToDonor }}
+        {{ if eq .PersonType "Attorney" }}
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">Relationship to donor</th>
-            <td class="govuk-table__cell">{{ capitalise .RelationshipToDonor }}</td>
+            <td class="govuk-table__cell">
+                {{ if .RelationshipToDonor }}
+                    {{ capitalise .RelationshipToDonor }}
+                {{ end }}
+            </td>
         </tr>
         {{ end }}
         {{ if .SystemStatus }}

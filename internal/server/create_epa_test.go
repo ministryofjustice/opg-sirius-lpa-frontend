@@ -38,7 +38,8 @@ func TestGetCreateEpa(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createEpaData{
-			Title: "Create an EPA",
+			DonorId: 123,
+			Title:   "Create an EPA",
 		}).
 		Return(nil)
 
@@ -70,6 +71,7 @@ func TestGetCreateEpaEdit(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, createEpaData{
+					DonorId:         123,
 					Title:           "Edit EPA",
 					Epa:             epa,
 					AppointmentType: appointmentType,
@@ -157,6 +159,7 @@ func TestPostCreateEpa(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createEpaData{
+			DonorId:         123,
 			Title:           "Create an EPA",
 			Success:         true,
 			AppointmentType: "singular",
@@ -233,6 +236,7 @@ func TestPostCreateEpaEdit(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createEpaData{
+			DonorId:         123,
 			Title:           "Edit EPA",
 			Success:         true,
 			Epa:             epa,
@@ -459,6 +463,7 @@ func TestPostCreateEpaWhenValidationError(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createEpaData{
+			DonorId:         123,
 			Title:           "Create an EPA",
 			Success:         false,
 			Error:           expectedError,
@@ -487,4 +492,139 @@ func TestPostCreateEpaWhenValidationError(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateEpaWhenValidationErrorOnReceiptDate(t *testing.T) {
+	returnedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{"receiptDate": {"receiptDate": "problem"}},
+	}
+	expectedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{"receiptDate": {"receiptDate": "Enter or select a receipt date to save and exit"}},
+	}
+
+	truePtr := shared.BoolPtr(true)
+	falsePtr := shared.BoolPtr(false)
+	dateString := "2022-04-05"
+	epa := sirius.Epa{
+		EpaDonorSignatureDate:   sirius.DateString(dateString),
+		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
+		DonorHasOtherEpas:       truePtr,
+		OtherEpaInfo:            "More info",
+		Case: sirius.Case{
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
+			PaymentDate:                     sirius.DateString(dateString),
+		},
+	}
+
+	client := &mockCreateEpaClient{}
+	client.
+		On("CreateEpa", mock.Anything, 123, epa).
+		Return(sirius.Epa{}, returnedError)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createEpaData{
+			DonorId:         123,
+			Title:           "Create an EPA",
+			Success:         false,
+			Error:           expectedError,
+			AppointmentType: "singular",
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"epaDonorSignatureDate":   {dateString},
+		"epaDonorNoticeGivenDate": {dateString},
+		"donorHasOtherEpas":       {"true"},
+		"otherEpaInfo":            {"More info"},
+		"caseAttorney":            {"singular"},
+		"paymentByCheque":         {"false"},
+		"paymentExemption":        {"true"},
+		"paymentDate":             {dateString},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateEpa(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateEpaAddActorValidationErrorOnReceiptDate(t *testing.T) {
+	for _, actorType := range []string{"addAttorney", "addCorrespondent"} {
+		t.Run(actorType, func(t *testing.T) {
+			returnedError := sirius.ValidationError{
+				Field: sirius.FieldErrors{"receiptDate": {"receiptDate": "problem"}},
+			}
+			expectedError := sirius.ValidationError{
+				Field: sirius.FieldErrors{"receiptDate": {"receiptDate": "Enter or select a receipt date to continue to step 3"}},
+			}
+
+			truePtr := shared.BoolPtr(true)
+			falsePtr := shared.BoolPtr(false)
+			dateString := "2022-04-05"
+			epa := sirius.Epa{
+				EpaDonorSignatureDate:   sirius.DateString(dateString),
+				EpaDonorNoticeGivenDate: sirius.DateString(dateString),
+				DonorHasOtherEpas:       truePtr,
+				OtherEpaInfo:            "More info",
+				Case: sirius.Case{
+					CaseAttorneySingular:            truePtr,
+					CaseAttorneyJointlyAndSeverally: falsePtr,
+					CaseAttorneyJointly:             falsePtr,
+					PaymentByCheque:                 falsePtr,
+					PaymentExemption:                truePtr,
+					PaymentDate:                     sirius.DateString(dateString),
+				},
+			}
+
+			client := &mockCreateEpaClient{}
+			client.
+				On("CreateEpa", mock.Anything, 123, epa).
+				Return(sirius.Epa{}, returnedError)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, createEpaData{
+					DonorId:         123,
+					Title:           "Create an EPA",
+					Success:         false,
+					Error:           expectedError,
+					AppointmentType: "singular",
+				}).
+				Return(nil)
+
+			form := url.Values{
+				"epaDonorSignatureDate":   {dateString},
+				"epaDonorNoticeGivenDate": {dateString},
+				"donorHasOtherEpas":       {"true"},
+				"otherEpaInfo":            {"More info"},
+				"caseAttorney":            {"singular"},
+				"paymentByCheque":         {"false"},
+				"paymentExemption":        {"true"},
+				"paymentDate":             {dateString},
+				actorType:                 {"true"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := CreateEpa(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
 }
