@@ -177,6 +177,17 @@ $govuk-assets-path: "../assets/";
   display: flex;
 }
 
+.app-create-epa__details-row {
+  position: relative;
+}
+
+.app-create-epa__summary-update-link {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+}
+
 .app-\!-gap-2 {
   gap: 10px;
 }
@@ -429,6 +440,12 @@ $govuk-assets-path: "../assets/";
 .app-timeline-event p:last-of-type,
 .app-timeline-event ul:last-of-type {
   margin-bottom: 5px !important;
+}
+
+.app-timeline-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .app-\!-radios--inline {
