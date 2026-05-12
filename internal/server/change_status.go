@@ -11,6 +11,7 @@ import (
 
 type ChangeStatusClient interface {
 	Case(sirius.Context, int) (sirius.Case, error)
+	CreateNote(sirius.Context, int, sirius.EntityType, string, string, string, *sirius.NoteFile) error
 	EditCase(sirius.Context, int, sirius.CaseType, sirius.Case) error
 	AvailableStatuses(sirius.Context, int, sirius.CaseType) ([]string, error)
 }
@@ -23,7 +24,10 @@ type changeStatusData struct {
 
 	AvailableStatuses []string
 	NewStatus         string
+	Notes             string
 }
+
+const changeStatusNoteType = "Application processing"
 
 func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
@@ -54,6 +58,7 @@ func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
 			Entity:            fmt.Sprintf("%s %s", caseItem.CaseType, caseItem.UID),
 			AvailableStatuses: availableStatuses,
 			NewStatus:         postFormString(r, "status"),
+			Notes:             postFormString(r, "notes"),
 		}
 
 		if r.Method == http.MethodPost {
@@ -61,7 +66,15 @@ func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
 				Status: shared.ParseCaseStatusType(data.NewStatus),
 			}
 
+			noteEntityType := sirius.EntityTypeLpa
+			if caseType == sirius.CaseTypeEpa {
+				noteEntityType = sirius.EntityTypeEpa
+			}
+
 			err = client.EditCase(ctx, caseID, sirius.CaseType(caseItem.CaseType), caseDetails)
+			if err == nil && data.Notes != "" {
+				err = client.CreateNote(ctx, caseID, noteEntityType, changeStatusNoteType, fmt.Sprintf("Status changed to %s", data.NewStatus), data.Notes, nil)
+			}
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
