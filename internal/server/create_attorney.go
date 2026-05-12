@@ -14,6 +14,7 @@ type CreateAttorneyClient interface {
 	CreateAttorney(ctx sirius.Context, caseId int, attorney sirius.Attorney) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	UpdateAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
+	UpdateCorrespondent(ctx sirius.Context, correspondentId int, correspondent sirius.Correspondent) error
 }
 
 type createAttorneyData struct {
@@ -25,6 +26,7 @@ type createAttorneyData struct {
 	CaseId               int
 	IsEditing            bool
 	Title                string
+	Epa                  sirius.Epa
 }
 
 func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler {
@@ -65,6 +67,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 				return err
 			}
 			epa, err := client.Epa(ctx, caseId)
+			data.Epa = epa
 			if err != nil {
 				return err
 			}
@@ -103,10 +106,15 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 				RelationshipToDonor: postFormString(r, "relationshipToDonor"),
 				SystemStatus:        shared.BoolPtr(postFormString(r, "isAttorneyActive") == "true"),
 			}
+			originalAttorney := data.Attorney.Person
 			data.Attorney = attorney
 
 			if isEditing {
 				err = client.UpdateAttorney(ctx, attorneyId, attorney)
+				if data.Epa.Correspondent != nil && checkAttorneyIsCorrespondent(originalAttorney, *data.Epa.Correspondent) {
+					updateCorrespondent := sirius.Correspondent{Person: attorney.Person}
+					err = client.UpdateCorrespondent(ctx, data.Epa.Correspondent.ID, updateCorrespondent)
+				}
 			} else {
 				err = client.CreateAttorney(ctx, caseId, attorney)
 			}
@@ -129,4 +137,11 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 
 		return tmpl(w, data)
 	}
+}
+
+func checkAttorneyIsCorrespondent(attorney sirius.Person, correspondent sirius.Correspondent) bool {
+	if attorney.Summary() == correspondent.Summary() && attorney.DateOfBirth == correspondent.DateOfBirth {
+		return true
+	}
+	return false
 }

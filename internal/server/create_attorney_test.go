@@ -40,6 +40,11 @@ func (m *mockCreateAttorneyClient) UpdateAttorney(ctx sirius.Context, attorneyId
 	return args.Error(0)
 }
 
+func (m *mockCreateAttorneyClient) UpdateCorrespondent(ctx sirius.Context, correspondentId int, correspondent sirius.Correspondent) error {
+	args := m.Called(ctx, correspondentId, correspondent)
+	return args.Error(0)
+}
+
 var mockRelationshipToDonorCategories = []sirius.RefDataItem{
 	{
 		Handle: "LPA_DONOR",
@@ -102,6 +107,7 @@ func TestGetEditAttorney(t *testing.T) {
 			Attorney:             existingAttorney,
 			IsEditing:            true,
 			Title:                "Update attorney details",
+			Epa:                  sirius.Epa{Case: sirius.Case{Attorneys: []sirius.Attorney{existingAttorney}}},
 		}).
 		Return(nil)
 
@@ -427,4 +433,253 @@ func TestPostCreateAttorneyWhenValidationError(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostEditAttorneyWhenAttorneyIsCorrespondent(t *testing.T) {
+	expectedRedirect := RedirectError("/create-epa?id=1&caseId=2#accordion-create-epa-heading-3")
+	dateString := "2022-04-05"
+
+	existingAttorney := sirius.Attorney{
+		Person: sirius.Person{
+			ID:           4,
+			Salutation:   "Rev",
+			Firstname:    "Rudolph",
+			Middlenames:  "Modesto",
+			Surname:      "Stotesbury",
+			DateOfBirth:  sirius.DateString(dateString),
+			AddressLine1: "Old Address 1",
+			Town:         "Old Town",
+			Postcode:     "OLD123",
+		},
+		RelationshipToDonor: "no relation",
+		SystemStatus:        shared.BoolPtr(true),
+	}
+
+	updatedAttorney := sirius.Attorney{
+		Person: sirius.Person{
+			Salutation:        "Rev",
+			Firstname:         "Steve",
+			Middlenames:       "Modesto",
+			Surname:           "Stotesbury",
+			DateOfBirth:       sirius.DateString(dateString),
+			AddressLine1:      "New Address 1",
+			AddressLine2:      "Appartamento 94",
+			AddressLine3:      "Augusto terme",
+			Town:              "New Town",
+			County:            "Benevento",
+			Postcode:          "NEW123",
+			Country:           "Italy",
+			IsAirmailRequired: true,
+			PhoneNumber:       "079876543345",
+			Email:             "rm2@email.test",
+		},
+		RelationshipToDonor: "no relation",
+		SystemStatus:        shared.BoolPtr(true),
+	}
+
+	correspondent := sirius.Correspondent{
+		Person: sirius.Person{
+			ID:          10,
+			Firstname:   "Rudolph",
+			Middlenames: "Modesto",
+			Surname:     "Stotesbury",
+			DateOfBirth: sirius.DateString(dateString),
+		},
+	}
+
+	client := &mockCreateAttorneyClient{}
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
+		Return(mockRelationshipToDonorCategories, nil).
+		On("Epa", mock.Anything, 2).
+		Return(sirius.Epa{Case: sirius.Case{
+			Attorneys:     []sirius.Attorney{existingAttorney},
+			Correspondent: &correspondent,
+		}}, nil).
+		On("UpdateAttorney", mock.Anything, 4, updatedAttorney).
+		Return(nil).
+		On("UpdateCorrespondent", mock.Anything, 10, sirius.Correspondent{Person: updatedAttorney.Person}).
+		Return(nil)
+
+	template := &mockTemplate{}
+
+	form := url.Values{
+		"salutation":          {"Rev"},
+		"firstname":           {"Steve"},
+		"middlenames":         {"Modesto"},
+		"surname":             {"Stotesbury"},
+		"dob":                 {dateString},
+		"addressLine1":        {"New Address 1"},
+		"addressLine2":        {"Appartamento 94"},
+		"addressLine3":        {"Augusto terme"},
+		"town":                {"New Town"},
+		"county":              {"Benevento"},
+		"postcode":            {"NEW123"},
+		"country":             {"Italy"},
+		"isAirmailRequired":   {"true"},
+		"phoneNumber":         {"079876543345"},
+		"email":               {"rm2@email.test"},
+		"relationshipToDonor": {"no relation"},
+		"isAttorneyActive":    {"true"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&attorneyId=4", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	result := CreateAttorney(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Equal(t, result, expectedRedirect)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestCheckAttorneyIsCorrespondent(t *testing.T) {
+	tests := []struct {
+		name          string
+		attorney      sirius.Person
+		correspondent sirius.Correspondent
+		expected      bool
+	}{
+		{
+			name: "matching name and date of birth",
+			attorney: sirius.Person{
+				Firstname:   "John",
+				Surname:     "Doe",
+				DateOfBirth: sirius.DateString("1990-01-15"),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "John",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString("1990-01-15"),
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "non-matching first name",
+			attorney: sirius.Person{
+				Firstname:   "John",
+				Surname:     "Doe",
+				DateOfBirth: sirius.DateString("1990-01-15"),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "Jane",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString("1990-01-15"),
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "non-matching date of birth",
+			attorney: sirius.Person{
+				Firstname:   "John",
+				Surname:     "Doe",
+				DateOfBirth: sirius.DateString("1990-01-15"),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "John",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString("1995-06-20"),
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "both with empty date of birth",
+			attorney: sirius.Person{
+				Firstname:   "John",
+				Surname:     "Doe",
+				DateOfBirth: sirius.DateString(""),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "John",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString(""),
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "one missing date of birth",
+			attorney: sirius.Person{
+				Firstname:   "John",
+				Surname:     "Doe",
+				DateOfBirth: sirius.DateString("1990-01-15"),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "John",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString(""),
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "case sensitive names",
+			attorney: sirius.Person{
+				Firstname:   "john",
+				Surname:     "doe",
+				DateOfBirth: sirius.DateString("1990-01-15"),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "John",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString("1990-01-15"),
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "with middlenames (should match - Summary() ignores them)",
+			attorney: sirius.Person{
+				Firstname:   "John",
+				Middlenames: "Robert",
+				Surname:     "Doe",
+				DateOfBirth: sirius.DateString("1990-01-15"),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "John",
+					Middlenames: "Robert",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString("1990-01-15"),
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "different middlenames but same summary",
+			attorney: sirius.Person{
+				Firstname:   "John",
+				Middlenames: "Robert",
+				Surname:     "Doe",
+				DateOfBirth: sirius.DateString("1990-01-15"),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "John",
+					Middlenames: "James",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString("1990-01-15"),
+				},
+			},
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := checkAttorneyIsCorrespondent(tt.attorney, tt.correspondent)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
 }
