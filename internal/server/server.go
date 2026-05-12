@@ -67,6 +67,7 @@ type Client interface {
 	CreateEpaClient
 	CreateInvestigationClient
 	DeleteDocumentClient
+	DeleteNoteClient
 	DeletePaymentClient
 	DeleteRelationshipClient
 	DocumentListClient
@@ -145,6 +146,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/edit-investigation", wrap(EditInvestigation(client, templates.Get("edit_investigation.gohtml"))))
 	mux.Handle("/edit-donor", wrap(EditDonor(client, templates.Get("donor.gohtml"))))
 	mux.Handle("/delete-relationship", wrap(DeleteRelationship(client, templates.Get("delete_relationship.gohtml"))))
+	mux.Handle("/delete-note", wrap(DeleteNote(client, templates.Get("delete-note.gohtml"))))
 	mux.Handle("/edit-dates", wrap(EditDates(client, templates.Get("edit_dates.gohtml"))))
 	mux.Handle("/link-person", wrap(LinkPerson(client, templates.Get("link_person.gohtml"))))
 	mux.Handle("/add-complaint", wrap(AddComplaint(client, templates.Get("add-complaint-wrapper.gohtml"), templates.Get("add-complaint-partial-wrapper.gohtml"))))

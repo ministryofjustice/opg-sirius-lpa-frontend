@@ -96,4 +96,17 @@ if (window.self !== window.parent) {
       `${window.location.protocol}//${window.location.host}`,
     );
   }
+
+  window.addEventListener("message", (event) => {
+    if (
+      event.origin !== `${window.location.protocol}//${window.location.host}`
+    ) {
+      return;
+    }
+    if (event.data === "dark") {
+      document.documentElement.classList.add("app-!-html-class--dark");
+    } else {
+      document.documentElement.classList.remove("app-!-html-class--dark");
+    }
+  });
 }
