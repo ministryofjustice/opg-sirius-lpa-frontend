@@ -40,6 +40,11 @@ func (m *mockCreateAttorneyClient) UpdateAttorney(ctx sirius.Context, attorneyId
 	return args.Error(0)
 }
 
+func (m *mockCreateAttorneyClient) UpdateCorrespondent(ctx sirius.Context, correspondentId int, correspondent sirius.Correspondent) error {
+	args := m.Called(ctx, correspondentId, correspondent)
+	return args.Error(0)
+}
+
 var mockRelationshipToDonorCategories = []sirius.RefDataItem{
 	{
 		Handle: "LPA_DONOR",
@@ -102,6 +107,7 @@ func TestGetEditAttorney(t *testing.T) {
 			Attorney:             existingAttorney,
 			IsEditing:            true,
 			Title:                "Update attorney details",
+			Epa:                  sirius.Epa{Case: sirius.Case{Attorneys: []sirius.Attorney{existingAttorney}}},
 		}).
 		Return(nil)
 
@@ -428,3 +434,153 @@ func TestPostCreateAttorneyWhenValidationError(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
+
+func TestCheckAttorneyIsCorrespondent(t *testing.T) {
+	tests := []struct {
+		name          string
+		attorney      sirius.Person
+		correspondent sirius.Correspondent
+		expected      bool
+	}{
+		{
+			name: "matching name and date of birth",
+			attorney: sirius.Person{
+				Firstname:   "John",
+				Surname:     "Doe",
+				DateOfBirth: sirius.DateString("1990-01-15"),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "John",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString("1990-01-15"),
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "non-matching first name",
+			attorney: sirius.Person{
+				Firstname:   "John",
+				Surname:     "Doe",
+				DateOfBirth: sirius.DateString("1990-01-15"),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "Jane",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString("1990-01-15"),
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "non-matching date of birth",
+			attorney: sirius.Person{
+				Firstname:   "John",
+				Surname:     "Doe",
+				DateOfBirth: sirius.DateString("1990-01-15"),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "John",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString("1995-06-20"),
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "both with empty date of birth",
+			attorney: sirius.Person{
+				Firstname:   "John",
+				Surname:     "Doe",
+				DateOfBirth: sirius.DateString(""),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "John",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString(""),
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "one missing date of birth",
+			attorney: sirius.Person{
+				Firstname:   "John",
+				Surname:     "Doe",
+				DateOfBirth: sirius.DateString("1990-01-15"),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "John",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString(""),
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "case sensitive names",
+			attorney: sirius.Person{
+				Firstname:   "john",
+				Surname:     "doe",
+				DateOfBirth: sirius.DateString("1990-01-15"),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "John",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString("1990-01-15"),
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "with middlenames (should match - Summary() ignores them)",
+			attorney: sirius.Person{
+				Firstname:   "John",
+				Middlenames: "Robert",
+				Surname:     "Doe",
+				DateOfBirth: sirius.DateString("1990-01-15"),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "John",
+					Middlenames: "Robert",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString("1990-01-15"),
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "different middlenames but same summary",
+			attorney: sirius.Person{
+				Firstname:   "John",
+				Middlenames: "Robert",
+				Surname:     "Doe",
+				DateOfBirth: sirius.DateString("1990-01-15"),
+			},
+			correspondent: sirius.Correspondent{
+				Person: sirius.Person{
+					Firstname:   "John",
+					Middlenames: "James",
+					Surname:     "Doe",
+					DateOfBirth: sirius.DateString("1990-01-15"),
+				},
+			},
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := checkAttorneyIsCorrespondent(tt.attorney, tt.correspondent)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
