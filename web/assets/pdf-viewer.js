@@ -77,14 +77,18 @@ class PDFViewer {
     // Add event listener for page input
     const pageInput = controls.querySelector(".pdf-viewer-page-input");
     if (pageInput) {
-      pageInput.addEventListener("keydown", (e) => this.handlePageInputKeydown(e));
+      pageInput.addEventListener("keydown", (e) =>
+        this.handlePageInputKeydown(e),
+      );
       pageInput.addEventListener("blur", (e) => this.handlePageInputBlur(e));
     }
 
     // Add event listener for zoom input
     const zoomInput = controls.querySelector(".pdf-viewer-zoom-input");
     if (zoomInput) {
-      zoomInput.addEventListener("keydown", (e) => this.handleZoomInputKeydown(e));
+      zoomInput.addEventListener("keydown", (e) =>
+        this.handleZoomInputKeydown(e),
+      );
       zoomInput.addEventListener("blur", (e) => this.handleZoomInputBlur(e));
     }
   }
@@ -234,12 +238,23 @@ class PDFViewer {
 
   async toggleThumbnails() {
     this.thumbnailsVisible = !this.thumbnailsVisible;
-    this.thumbnailPanel.classList.toggle("pdf-viewer-thumbnail-panel--visible", this.thumbnailsVisible);
+    this.thumbnailPanel.classList.toggle(
+      "pdf-viewer-thumbnail-panel--visible",
+      this.thumbnailsVisible,
+    );
 
-    const toggleBtn = this.controls.querySelector('[data-action="toggle-thumbnails"]');
+    const toggleBtn = this.controls.querySelector(
+      '[data-action="toggle-thumbnails"]',
+    );
     if (toggleBtn) {
-      toggleBtn.setAttribute("aria-expanded", this.thumbnailsVisible.toString());
-      toggleBtn.classList.toggle("pdf-viewer-btn--active", this.thumbnailsVisible);
+      toggleBtn.setAttribute(
+        "aria-expanded",
+        this.thumbnailsVisible.toString(),
+      );
+      toggleBtn.classList.toggle(
+        "pdf-viewer-btn--active",
+        this.thumbnailsVisible,
+      );
     }
 
     if (this.thumbnailsVisible && !this.thumbnailsRendered) {
@@ -288,10 +303,15 @@ class PDFViewer {
   }
 
   updateThumbnailSelection() {
-    const thumbnails = this.thumbnailList.querySelectorAll(".pdf-viewer-thumbnail-item");
+    const thumbnails = this.thumbnailList.querySelectorAll(
+      ".pdf-viewer-thumbnail-item",
+    );
     thumbnails.forEach((thumb) => {
       const pageNum = parseInt(thumb.dataset.page, 10);
-      thumb.classList.toggle("pdf-viewer-thumbnail-item--active", pageNum === this.currentPage);
+      thumb.classList.toggle(
+        "pdf-viewer-thumbnail-item--active",
+        pageNum === this.currentPage,
+      );
     });
   }
 
@@ -304,7 +324,9 @@ class PDFViewer {
     this.updateThumbnailSelection();
 
     // Scroll to the page
-    const pageContainer = this.pagesWrapper.querySelector(`[data-page="${pageNum}"]`);
+    const pageContainer = this.pagesWrapper.querySelector(
+      `[data-page="${pageNum}"]`,
+    );
     if (pageContainer) {
       this.isScrolling = true;
       pageContainer.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -347,7 +369,9 @@ class PDFViewer {
     this.updatePageInfo();
     await this.renderAllPages();
     // Scroll back to current page after re-render
-    const pageContainer = this.pagesWrapper.querySelector(`[data-page="${this.currentPage}"]`);
+    const pageContainer = this.pagesWrapper.querySelector(
+      `[data-page="${this.currentPage}"]`,
+    );
     if (pageContainer) {
       pageContainer.scrollIntoView({ block: "start" });
     }
@@ -358,7 +382,9 @@ class PDFViewer {
     this.updatePageInfo();
     await this.renderAllPages();
     // Scroll back to current page after re-render
-    const pageContainer = this.pagesWrapper.querySelector(`[data-page="${this.currentPage}"]`);
+    const pageContainer = this.pagesWrapper.querySelector(
+      `[data-page="${this.currentPage}"]`,
+    );
     if (pageContainer) {
       pageContainer.scrollIntoView({ block: "start" });
     }
@@ -374,7 +400,9 @@ class PDFViewer {
     this.updatePageInfo();
     await this.renderAllPages();
     // Scroll back to current page after re-render
-    const pageContainer = this.pagesWrapper.querySelector(`[data-page="${this.currentPage}"]`);
+    const pageContainer = this.pagesWrapper.querySelector(
+      `[data-page="${this.currentPage}"]`,
+    );
     if (pageContainer) {
       pageContainer.scrollIntoView({ block: "start" });
     }
@@ -424,7 +452,9 @@ class PDFViewer {
       this.updatePageInfo();
       await this.renderAllPages();
       // Scroll back to current page after re-render
-      const pageContainer = this.pagesWrapper.querySelector(`[data-page="${this.currentPage}"]`);
+      const pageContainer = this.pagesWrapper.querySelector(
+        `[data-page="${this.currentPage}"]`,
+      );
       if (pageContainer) {
         pageContainer.scrollIntoView({ block: "start" });
       }
@@ -441,4 +471,3 @@ export default function initPdfViewer() {
     }
   });
 }
-
