@@ -1,5 +1,9 @@
 {{ define "partial-event-case-status" }}
     {{ with index .Changes "status" }}
         Status changed from {{ index . 0 }} to {{ index . 1 }}
+        {{ with $.Entity.eventNote }}
+            <br>
+            Note: {{ . }}
+        {{ end }}
     {{ end }}
 {{ end }}

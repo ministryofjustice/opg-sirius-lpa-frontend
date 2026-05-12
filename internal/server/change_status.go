@@ -23,6 +23,7 @@ type changeStatusData struct {
 
 	AvailableStatuses []string
 	NewStatus         string
+	Notes             string
 }
 
 func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
@@ -54,11 +55,13 @@ func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
 			Entity:            fmt.Sprintf("%s %s", caseItem.CaseType, caseItem.UID),
 			AvailableStatuses: availableStatuses,
 			NewStatus:         postFormString(r, "status"),
+			Notes:             postFormString(r, "notes"),
 		}
 
 		if r.Method == http.MethodPost {
 			caseDetails := sirius.Case{
-				Status: shared.ParseCaseStatusType(data.NewStatus),
+				Status:    shared.ParseCaseStatusType(data.NewStatus),
+				EventNote: data.Notes,
 			}
 
 			err = client.EditCase(ctx, caseID, sirius.CaseType(caseItem.CaseType), caseDetails)

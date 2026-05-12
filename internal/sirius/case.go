@@ -40,6 +40,7 @@ type Case struct {
 	RejectedDate                              DateString        `json:"rejectedDate,omitempty"`
 	ReplacementAttorneys                      []Attorney        `json:"replacementAttorneys,omitempty"`
 	RevokedDate                               DateString        `json:"revokedDate,omitempty"`
+	EventNote                                 string            `json:"eventNote,omitempty"`
 	Status                                    shared.CaseStatus `json:"status,omitempty"`
 	StatusDate                                DateString        `json:"statusDate,omitempty"`
 	SubType                                   string            `json:"caseSubtype,omitempty"`

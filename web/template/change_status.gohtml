@@ -21,6 +21,8 @@
 
         {{ template "select" (select "status" "Status" .NewStatus .Error.Field.status (options .AvailableStatuses) "required" true) }}
 
+        {{ template "textarea" (field "notes" "Notes" .Notes .Error.Field.notes) }}
+
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Submit</button>
           <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
