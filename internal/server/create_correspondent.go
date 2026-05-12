@@ -9,7 +9,9 @@ import (
 )
 
 type CreateCorrespondentClient interface {
+	Epa(ctx sirius.Context, id int) (sirius.Epa, error)
 	CreateCorrespondent(ctx sirius.Context, caseId int, correspondent sirius.Correspondent) error
+	UpdateCorrespondent(ctx sirius.Context, correspondentId int, correspondent sirius.Correspondent) error
 }
 
 type createCorrespondentData struct {
@@ -18,6 +20,8 @@ type createCorrespondentData struct {
 	CaseId        int
 	Correspondent sirius.Correspondent
 	Error         sirius.ValidationError
+	IsEditing     bool
+	Title         string
 }
 
 func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Template) Handler {
@@ -38,10 +42,24 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 			XSRFToken: ctx.XSRFToken,
 			DonorId:   donorId,
 			CaseId:    caseId,
+			Title:     "Add a correspondent",
+		}
+
+		epa, err := client.Epa(ctx, caseId)
+		if err != nil {
+			return err
+		}
+		correspondent := epa.Correspondent
+		isEditing := correspondent != nil
+
+		if isEditing {
+			data.Correspondent = *correspondent
+			data.Title = "Update correspondent details"
+			data.IsEditing = true
 		}
 
 		if r.Method == http.MethodPost {
-			correspondent := sirius.Correspondent{
+			updatedCorrespondent := sirius.Correspondent{
 				Person: sirius.Person{
 					Salutation:        postFormString(r, "salutation"),
 					Firstname:         postFormString(r, "firstname"),
@@ -60,9 +78,15 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 					IsAirmailRequired: postFormString(r, "isAirmailRequired") == "true",
 				},
 			}
-			data.Correspondent = correspondent
+			data.Correspondent = updatedCorrespondent
 
-			err = client.CreateCorrespondent(ctx, caseId, correspondent)
+			if isEditing {
+				updatedCorrespondent.ID = correspondent.ID
+				data.Correspondent = updatedCorrespondent
+				err = client.UpdateCorrespondent(ctx, updatedCorrespondent.ID, updatedCorrespondent)
+			} else {
+				err = client.CreateCorrespondent(ctx, caseId, updatedCorrespondent)
+			}
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
@@ -70,8 +94,9 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 			} else if err != nil {
 				return err
 			} else {
-				return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, caseId))
+				return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 			}
+
 		}
 
 		return tmpl(w, data)

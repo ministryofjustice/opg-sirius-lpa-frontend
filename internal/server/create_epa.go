@@ -20,6 +20,7 @@ type createEpaData struct {
 	Success         bool
 	Error           sirius.ValidationError
 	Epa             sirius.Epa
+	DonorId         int
 	AppointmentType string
 	Title           string
 	CaseId          int
@@ -36,6 +37,7 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 
 		data := createEpaData{
 			XSRFToken: ctx.XSRFToken,
+			DonorId:   donorID,
 			Title:     "Create an EPA",
 		}
 
@@ -95,6 +97,13 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
+				if data.Error.Field["receiptDate"] != nil {
+					if r.FormValue("addAttorney") != "" || r.FormValue("addCorrespondent") != "" {
+						data.Error.Field["receiptDate"]["receiptDate"] = "Enter or select a receipt date to continue to step 3"
+					} else {
+						data.Error.Field["receiptDate"]["receiptDate"] = "Enter or select a receipt date to save and exit"
+					}
+				}
 				return tmpl(w, data)
 			} else if err != nil {
 				return err
