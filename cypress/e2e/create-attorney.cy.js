@@ -40,8 +40,6 @@ describe("Create or Update Attorney", () => {
       status: 201,
       body: {},
     });
-
-    cy.visit("/create-attorney?id=1&caseId=2");
   });
 
   it("creates an attorney on an EPA", () => {
