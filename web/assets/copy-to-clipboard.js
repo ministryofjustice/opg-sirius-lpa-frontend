@@ -27,5 +27,5 @@ export default async function copyToClipboard() {
 
       copyButton.blur();
     }
-  })
+  });
 }
