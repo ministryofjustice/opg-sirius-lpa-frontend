@@ -56,7 +56,7 @@ func TestComplaint(t *testing.T) {
 				Severity:             shared.ComplaintSeverityMajor,
 				InvestigatingOfficer: "Test Officer",
 				SubCategory:          "07",
-				Summary:              "This and that",
+				Title:                "This and that",
 			},
 		},
 	}

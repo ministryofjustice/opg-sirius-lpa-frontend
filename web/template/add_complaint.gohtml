@@ -1,18 +1,20 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Edit Complaint{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add Complaint{{ end }}
 
 {{ define "main" }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
+
       {{ template "error-summary" .Error }}
 
       {{ if .Success }}
         <meta data-app-reload="page" />
-        {{ template "success-banner" "You have successfully edited a complaint." }}
+        {{ template "success-banner" "You have successfully added a complaint." }}
       {{ end }}
 
-      <h1 class="govuk-heading-l app-!-embedded-hide">Edit Complaint</h1>
+      <h1 class="govuk-heading-l app-!-embedded-hide">Add Complaint</h1>
 
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
@@ -20,8 +22,6 @@
         {{ template "radios" (radios "severity" "Type" .Complaint.Severity.Translation .Error.Field.severity false
           (item "Complaint" "Complaint")
           (item "Complaints Correspondence" "Complaints Correspondence")
-          (item "Minor" "Minor")
-          (item "Major" "Major")
           (item "Security Breach" "Security Breach")
           (item "Tier 1+" "Tier 1+")
         ) }}
@@ -69,54 +69,6 @@
         {{ template "select" (select "complainantCategory" "Complainant category" .Complaint.ComplainantCategory .Error.Field.complainantCategory (options .ComplainantCategories)) }}
 
         {{ template "select" (select "origin" "Origin" .Complaint.Origin .Error.Field.origin (options .Origins)) }}
-
-        {{ template "input-date" (field "resolutionDate" "Resolution date" .Complaint.ResolutionDate .Error.Field.resolutionDate) }}
-
-        <div class="govuk-form-group {{ if .Error.Field.compensationType }}govuk-form-group--error{{ end }}">
-          <label class="govuk-label" for="f-category">
-            Compensation
-          </label>
-          {{ template "errors" .Error.Field.compensationType }}
-
-          <div class="govuk-radios" data-module="govuk-radios">
-            {{ range $k, $v := .CompensationTypes }}
-              <div class="govuk-radios__item">
-                <input
-                  class="govuk-radios__input"
-                  id="f-compensation-type-{{ $k }}"
-                  name="compensationType"
-                  type="radio"
-                  value="{{ $v.Handle }}"
-                  {{ if not (eq $v.Handle "NOT_APPLICABLE") }}data-aria-controls="conditional-compensation-{{ $k }}"{{ end }}
-                  {{ if or (eq $v.Handle $.Complaint.CompensationType) (and (not $.Complaint.CompensationType) (eq $v.Handle "NOT_APPLICABLE")) }}checked{{ end }}
-                >
-                <label class="govuk-label govuk-radios__label" for="f-compensation-type-{{ $k }}">
-                  {{ $v.Label }}
-                </label>
-              </div>
-              {{ if not (eq $v.Handle "NOT_APPLICABLE") }}
-                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-compensation-{{ $k }}">
-                  <div class="govuk-!-width-one-half govuk-form-group {{ if $.Error.Field.compensationAmount }}govuk-form-group--error{{ end }}">
-                    <label class="govuk-label" for="f-compensation-amount-{{ $k }}">Compensation amount</label>
-                    {{ template "errors" $.Error.Field.compensationAmount }}
-                    <div class="govuk-input__wrapper">
-                      <div class="govuk-input__prefix" aria-hidden="true">£</div>
-                      <input class="govuk-input govuk-!-width-one-third {{ if $.Error.Field.compensationAmount }}govuk-input--error{{ end }}" id="f-compensation-amount-{{ $k }}" name="compensationAmount{{ $v.Handle }}" value="{{ if $.Complaint.CompensationAmount }}{{ $.Complaint.CompensationAmount }}{{ end }}" type="number" step="0.01">
-                    </div>
-                  </div>
-                </div>
-              {{ end }}
-            {{ end }}
-          </div>
-        </div>
-
-        {{ template "radios" (radios "resolution" "Resolution state" .Complaint.Resolution .Error.Field.resolution false
-          (item "complaint upheld" "Complaint Upheld")
-          (item "complaint partially upheld" "Complaint Partially Upheld")
-          (item "complaint not upheld" "Complaint Not Upheld")
-        ) }}
-
-        {{ template "textarea" (field "resolutionInfo" "Resolution notes" .Complaint.ResolutionInfo .Error.Field.resolutionInfo) }}
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
