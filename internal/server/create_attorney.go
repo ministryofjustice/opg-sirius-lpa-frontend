@@ -25,6 +25,7 @@ type createAttorneyData struct {
 	CaseId               int
 	IsEditing            bool
 	Title                string
+	NextAttorneyId       int
 }
 
 func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler {
@@ -78,6 +79,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 
 			data.Title = "Update attorney details"
 			data.IsEditing = true
+			data.NextAttorneyId = GetNextAttorneyId(attorneyId, epa.Attorneys)
 		}
 
 		if r.Method == http.MethodPost {
@@ -123,10 +125,23 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d", donorId, caseId))
 			}
 
+			if r.FormValue("next-attorney") != "" {
+				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&attorneyId=%d", donorId, caseId, data.NextAttorneyId))
+			}
+
 			return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 
 		}
 
 		return tmpl(w, data)
 	}
+}
+
+func GetNextAttorneyId(id int, attorneys []sirius.Attorney) int {
+	for _, attorney := range attorneys {
+		if attorney.ID == id+1 {
+			return attorney.ID
+		}
+	}
+	return 0
 }
