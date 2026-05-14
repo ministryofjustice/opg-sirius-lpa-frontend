@@ -428,3 +428,102 @@ func TestPostCreateAttorneyWhenValidationError(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
+
+func TestPostCreateAttorneyNextAnother(t *testing.T) {
+	expectedRedirect := RedirectError("/create-attorney?id=1&caseId=2&attorneyId=0")
+	dateString := "2022-04-05"
+	attorney := sirius.Attorney{
+		Person: sirius.Person{
+			Salutation:        "Rev",
+			Firstname:         "Rudolph",
+			Middlenames:       "Modesto",
+			Surname:           "Stotesbury",
+			DateOfBirth:       sirius.DateString(dateString),
+			AddressLine1:      "Rotonda Gerardo 769",
+			AddressLine2:      "Appartamento 94",
+			AddressLine3:      "Augusto terme",
+			Town:              "San Sabazio",
+			County:            "Benevento",
+			Postcode:          "57797",
+			Country:           "Italy",
+			IsAirmailRequired: true,
+			PhoneNumber:       "079876543345",
+			Email:             "rm2@email.test",
+		},
+		RelationshipToDonor: "no relation",
+		SystemStatus:        shared.BoolPtr(true),
+	}
+	client := &mockCreateAttorneyClient{}
+	client.
+		On("CreateAttorney", mock.Anything, 2, attorney).
+		Return(nil).
+		On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
+		Return(mockRelationshipToDonorCategories, nil)
+
+	template := &mockTemplate{}
+
+	form := url.Values{
+		"salutation":          {"Rev"},
+		"firstname":           {"Rudolph"},
+		"middlenames":         {"Modesto"},
+		"surname":             {"Stotesbury"},
+		"dob":                 {dateString},
+		"addressLine1":        {"Rotonda Gerardo 769"},
+		"addressLine2":        {"Appartamento 94"},
+		"addressLine3":        {"Augusto terme"},
+		"town":                {"San Sabazio"},
+		"county":              {"Benevento"},
+		"postcode":            {"57797"},
+		"country":             {"Italy"},
+		"isAirmailRequired":   {"true"},
+		"phoneNumber":         {"079876543345"},
+		"email":               {"rm2@email.test"},
+		"relationshipToDonor": {"no relation"},
+		"isAttorneyActive":    {"true"},
+		"add-another":         {""},
+		"next-attorney":       {"true"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateAttorney(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Equal(t, err, expectedRedirect)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetNextAttorneyIdAttorneyWillReturnNextNumber(t *testing.T) {
+	result := GetNextAttorneyId(2, []sirius.Attorney{
+		{
+			Person: sirius.Person{ID: 1},
+		},
+		{
+			Person: sirius.Person{ID: 2},
+		},
+		{
+			Person: sirius.Person{ID: 3},
+		},
+	})
+	expected := 3
+	assert.Equal(t, expected, result)
+}
+
+func TestGetNextAttorneyIdLastAttorneyWillReturnZero(t *testing.T) {
+	result := GetNextAttorneyId(3, []sirius.Attorney{
+		{
+			Person: sirius.Person{ID: 1},
+		},
+		{
+			Person: sirius.Person{ID: 2},
+		},
+		{
+			Person: sirius.Person{ID: 3},
+		},
+	})
+	expected := 0
+	assert.Equal(t, expected, result)
+}
