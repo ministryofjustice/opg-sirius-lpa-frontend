@@ -113,7 +113,7 @@ func TestGetCreateCorrespondentBadQuery(t *testing.T) {
 }
 
 func TestPostCreateCorrespondent(t *testing.T) {
-	expectedError := RedirectError("/create-epa?id=1&caseId=2")
+	expectedError := RedirectError("/create-epa?id=1&caseId=2#accordion-create-epa-heading-3")
 	correspondent := sirius.Correspondent{
 		Person: sirius.Person{
 			Salutation:        "Rev",
@@ -158,7 +158,7 @@ func TestPostCreateCorrespondent(t *testing.T) {
 		"email":             {"rm2@email.test"},
 	}
 
-	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
+	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2#accordion-create-epa-heading-3", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
@@ -171,7 +171,7 @@ func TestPostCreateCorrespondent(t *testing.T) {
 }
 
 func TestPostEditCorrespondent(t *testing.T) {
-	expectedError := RedirectError("/create-epa?id=1&caseId=2")
+	expectedError := RedirectError("/create-epa?id=1&caseId=2#accordion-create-epa-heading-3")
 	existingCorrespondent := sirius.Correspondent{Person: sirius.Person{ID: 7}}
 	updatedCorrespondent := sirius.Correspondent{
 		Person: sirius.Person{
@@ -219,7 +219,7 @@ func TestPostEditCorrespondent(t *testing.T) {
 		"email":             {"rm2@email.test"},
 	}
 
-	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
+	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2#accordion-create-epa-heading-3", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
@@ -290,7 +290,7 @@ func TestPostCreateCorrespondentWhenValidationError(t *testing.T) {
 		"email":             {"rm2@email.test"},
 	}
 
-	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
+	r, _ := http.NewRequest(http.MethodPost, "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
@@ -348,7 +348,7 @@ func TestPostCreateCorrespondentCreationFails(t *testing.T) {
 		"email":             {"rm2@email.test"},
 	}
 
-	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
+	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2#accordion-create-epa-heading-3", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 

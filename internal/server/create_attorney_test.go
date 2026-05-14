@@ -151,7 +151,7 @@ func TestGetCreateAttorneyWhenRefDataErrors(t *testing.T) {
 }
 
 func TestPostCreateAttorney(t *testing.T) {
-	expectedError := RedirectError("/create-epa?id=1&caseId=2")
+	expectedError := RedirectError("/create-epa?id=1&caseId=2#accordion-create-epa-heading-3")
 	dateString := "2022-04-05"
 	attorney := sirius.Attorney{
 		Person: sirius.Person{
@@ -216,7 +216,7 @@ func TestPostCreateAttorney(t *testing.T) {
 }
 
 func TestPostEditAttorney(t *testing.T) {
-	expectedError := RedirectError("/create-epa?id=1&caseId=2")
+	expectedError := RedirectError("/create-epa?id=1&caseId=2#accordion-create-epa-heading-3")
 	dateString := "2022-04-05"
 	existingAttorney := sirius.Attorney{Person: sirius.Person{ID: 4}}
 	updatedAttorney := sirius.Attorney{

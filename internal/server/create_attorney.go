@@ -123,7 +123,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d", donorId, caseId))
 			}
 
-			return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, caseId))
+			return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 
 		}
 
