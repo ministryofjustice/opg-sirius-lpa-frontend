@@ -43,6 +43,17 @@
         (item "false" "No")
         ) }}
 
+        <div class="govuk-form-group">
+          <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+            <div class="govuk-checkboxes__item">
+              <input class="govuk-checkboxes__input" id="f-isUpdateCorrespondent" name="isUpdateCorrespondent" type="checkbox" value="true">
+              <label class="no-top-padding govuk-label govuk-checkboxes__label" for="f-isUpdateCorrespondent">
+                Is this person also the correspondent - update correspondent with same information?
+              </label>
+            </div>
+          </div>
+        </div>
+
         <div class="govuk-button-group govuk-!-padding-top-5">
             <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
             {{ if not .IsEditing }}
