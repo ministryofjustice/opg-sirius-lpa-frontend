@@ -66,6 +66,17 @@
 
 .pdf-viewer-page-input {
   width: 3em;
+
+  // Hide spinner arrows for number input
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &[type="number"] {
+    -moz-appearance: textfield;
+  }
 }
 
 .pdf-viewer-zoom-input {

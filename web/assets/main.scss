@@ -40,8 +40,25 @@ $govuk-assets-path: "../assets/";
 }
 
 .app-\!-html-class--embedded {
+  min-height: 100dvh;
   font-size: 0.875em;
   background-color: white;
+}
+
+.app-\!-embedded.govuk-template__body {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-\!-embedded .govuk-width-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-\!-embedded .govuk-main-wrapper {
+  flex: 1;
 }
 
 @include govuk-media-query($until: tablet) {
