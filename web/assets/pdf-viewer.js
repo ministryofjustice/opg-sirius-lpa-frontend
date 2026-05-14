@@ -34,7 +34,9 @@ class PDFViewer {
       await this.renderAllPages();
 
       // Add keyboard navigation
-      document.addEventListener("keydown", (e) => this.handleKeyboardNavigation(e));
+      document.addEventListener("keydown", (e) =>
+        this.handleKeyboardNavigation(e),
+      );
     } catch (error) {
       console.error("Error loading PDF:", error);
       this.showError("Unable to load PDF document");
@@ -431,7 +433,8 @@ class PDFViewer {
 
   async handleScaleSelectChange(e) {
     const value = e.target.value;
-    const scaleType = e.target.options[e.target.selectedIndex].dataset.scaleType;
+    const scaleType =
+      e.target.options[e.target.selectedIndex].dataset.scaleType;
 
     if (scaleType === "auto") {
       this.scale = 1.0;
