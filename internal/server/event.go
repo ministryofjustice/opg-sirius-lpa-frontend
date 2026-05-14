@@ -26,17 +26,20 @@ type eventData struct {
 	XSRFToken    string
 	NoteTypes    []string
 	Entity       string
+	EntityType   string
 	IsDigitalLpa bool
 	CaseUID      string
+	EntityId     int
 	Success      bool
 	Error        sirius.ValidationError
 
 	Type        string
 	Name        string
 	Description string
+	CaseUids    string
 }
 
-func Event(client EventClient, tmpl template.Template) Handler {
+func Event(client EventClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		entityID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -48,8 +51,16 @@ func Event(client EventClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		caseUIDs := r.Form["uid[]"]
+		if err != nil {
+			return err
+		}
+
 		ctx := getContext(r)
 		data := eventData{XSRFToken: ctx.XSRFToken}
+		data.EntityId = entityID
+		data.EntityType = string(entityType)
+		data.CaseUids = buildUIDQueryString(caseUIDs)
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
@@ -126,7 +137,15 @@ func Event(client EventClient, tmpl template.Template) Handler {
 
 					return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
 				}
+
+				if r.Header.Get("HX-Request") == "true" {
+					return partialTmpl(w, data)
+				}
 			}
+		}
+
+		if r.Header.Get("HX-Request") == "true" && partialTmpl != nil {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

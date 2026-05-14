@@ -25,11 +25,19 @@ type warningData struct {
 	WarningType string
 	WarningText string
 	Cases       []sirius.Case
+	DonorId     int
+	CaseUids    string
+	EntityType  string
 }
 
-func Warning(client WarningClient, tmpl template.Template) Handler {
+func Warning(client WarningClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		personId, err := strToIntOrStatusError(r.FormValue("id"))
+		if err != nil {
+			return err
+		}
+
+		caseUIDs := r.Form["uid[]"]
 		if err != nil {
 			return err
 		}
@@ -50,6 +58,16 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 			XSRFToken:    ctx.XSRFToken,
 			WarningTypes: warningTypes,
 			Cases:        cases,
+			DonorId:      personId,
+		}
+
+		data.CaseUids = buildUIDQueryString(caseUIDs)
+		if r.FormValue("mlpa") != "true" {
+			entityType, err := sirius.ParseEntityType(r.FormValue("entity"))
+			if err != nil {
+				return err
+			}
+			data.EntityType = string(entityType)
 		}
 
 		if r.Method == http.MethodPost {
@@ -90,7 +108,15 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 						return RedirectError(fmt.Sprintf("/lpa/%s", lpa.UID))
 					}
 				}
+
+				if r.Header.Get("HX-Request") == "true" {
+					return partialTmpl(w, data)
+				}
 			}
+		}
+
+		if r.Header.Get("HX-Request") == "true" && partialTmpl != nil {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

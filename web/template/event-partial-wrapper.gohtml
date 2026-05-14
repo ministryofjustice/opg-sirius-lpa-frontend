@@ -1,0 +1,28 @@
+{{ define "page" }}
+    <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
+
+    {{ template "error-summary" .Error }}
+
+    {{ if .Success }}
+        <meta data-app-reload="page"/>
+        {{ template "success-banner" "You have successfully created an event." }}
+    {{ end }}
+
+    <h1 class="govuk-heading-l app-!-embedded-hide">Create Event</h1>
+
+    <form class="form" enctype="multipart/form-data" method="POST"
+          hx-post="{{ prefix (printf "/create-event") }}"
+          hx-target="#replace-action-panel"
+          hx-swap="innerHTML">
+        <input type="hidden" name="id" value="{{ .EntityId }}"/>
+        <input type="hidden" name="entity" value="{{ .EntityType }}"/>
+        {{ template "event" . }}
+        <div class="govuk-button-group">
+            <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+            <a class="govuk-link govuk-link--no-visited-state"
+               hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s%s" .EntityId .EntityType .CaseUids) }}"
+               hx-target="#replace-action-panel"
+            >Cancel</a>
+        </div>
+    </form>
+{{ end }}

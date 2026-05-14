@@ -1,0 +1,35 @@
+{{ define "page" }}
+  {{ template "error-summary" .Error }}
+
+  {{ if .Success }}
+    <meta data-app-reload="page" />
+    {{ template "success-banner" "You have successfully created a warning." }}
+  {{ end }}
+
+  <h1 class="govuk-heading-l app-!-embedded-hide">Create Warning</h1>
+
+  <form class="form" method="POST"
+        hx-post="{{ prefix (printf "/create-warning") }}"
+        hx-target="#replace-action-panel"
+        hx-swap="innerHTML">
+    <input type="hidden" name="id" value="{{ .DonorId }}"/>
+    {{ template "warning" . }}
+    <div class="govuk-button-group">
+      <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+      {{ if eq (len .Cases) 1 }}
+        {{ with index .Cases 0 }}
+          <a class="govuk-link govuk-link--no-visited-state"
+             hx-get="{{ prefix (printf "/action-panel?id=%d&entity=%s" .ID (ToLower .CaseType)) }}"
+             hx-target="#replace-action-panel"
+          >Cancel</a>
+        {{ end }}
+      {{ else }}
+        <a class="govuk-link govuk-link--no-visited-state"
+           hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId .EntityType .CaseUids) }}"
+           hx-target="#replace-action-panel"
+        >Cancel</a>
+      {{ end }}
+    </div>
+  </form>
+{{ end }}
+

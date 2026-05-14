@@ -1,0 +1,28 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add Complaint{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
+
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        <meta data-app-reload="page" />
+        {{ template "success-banner" "You have successfully added a complaint." }}
+      {{ end }}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">Add Complaint</h1>
+
+      <form class="form" method="POST">
+        {{ template "addComplaint" . }}
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
