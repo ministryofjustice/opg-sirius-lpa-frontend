@@ -40,6 +40,11 @@ func (m *mockCreateAttorneyClient) UpdateAttorney(ctx sirius.Context, attorneyId
 	return args.Error(0)
 }
 
+func (m *mockCreateAttorneyClient) UpdateCorrespondent(ctx sirius.Context, correspondentId int, correspondent sirius.Correspondent) error {
+	args := m.Called(ctx, correspondentId, correspondent)
+	return args.Error(0)
+}
+
 var mockRelationshipToDonorCategories = []sirius.RefDataItem{
 	{
 		Handle: "LPA_DONOR",
