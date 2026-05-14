@@ -49,24 +49,36 @@ class PDFViewer {
         <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="prev" aria-label="Previous page">
           <span aria-hidden="true">←</span> Previous
         </button>
-        <span class="pdf-viewer-page-info">
-          Page <input type="text" class="pdf-viewer-page-input" aria-label="Current page number" value="1"> of <span class="pdf-viewer-total-pages">-</span>
-        </span>
         <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="next" aria-label="Next page">
           Next <span aria-hidden="true">→</span>
         </button>
+        <span class="pdf-viewer-page-info">
+          Page <input type="text" class="pdf-viewer-page-input" aria-label="Current page number" value="1"> of <span class="pdf-viewer-total-pages">-</span>
+        </span>
       </div>
       <div class="pdf-viewer-controls-group">
         <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="zoom-out" aria-label="Zoom out">
           <span aria-hidden="true">−</span>
         </button>
-        <input type="text" class="pdf-viewer-zoom-input" aria-label="Zoom level" value="100%">
         <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="zoom-in" aria-label="Zoom in">
           <span aria-hidden="true">+</span>
         </button>
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="fit-width" aria-label="Fit to width">
-          Fit Width
-        </button>
+        <span class="pdf-viewer-scale-select-container">
+          <select class="pdf-viewer-scale-select" aria-label="Zoom level">
+            <option value="auto" data-scale-type="auto">Automatic Zoom</option>
+            <option value="page-actual" data-scale-type="page-actual">Actual Size</option>
+            <option value="page-fit" data-scale-type="page-fit">Page Fit</option>
+            <option value="page-width" data-scale-type="page-width" selected>Page Width</option>
+            <option value="0.5">50%</option>
+            <option value="0.75">75%</option>
+            <option value="1">100%</option>
+            <option value="1.25">125%</option>
+            <option value="1.5">150%</option>
+            <option value="2">200%</option>
+            <option value="3">300%</option>
+            <option value="4">400%</option>
+          </select>
+        </span>
       </div>
     `;
 
@@ -83,13 +95,12 @@ class PDFViewer {
       pageInput.addEventListener("blur", (e) => this.handlePageInputBlur(e));
     }
 
-    // Add event listener for zoom input
-    const zoomInput = controls.querySelector(".pdf-viewer-zoom-input");
-    if (zoomInput) {
-      zoomInput.addEventListener("keydown", (e) =>
-        this.handleZoomInputKeydown(e),
+    // Add event listener for scale select
+    const scaleSelect = controls.querySelector(".pdf-viewer-scale-select");
+    if (scaleSelect) {
+      scaleSelect.addEventListener("change", (e) =>
+        this.handleScaleSelectChange(e),
       );
-      zoomInput.addEventListener("blur", (e) => this.handleZoomInputBlur(e));
     }
   }
 
@@ -146,9 +157,6 @@ class PDFViewer {
         break;
       case "zoom-out":
         this.zoomOut();
-        break;
-      case "fit-width":
-        this.fitToWidth();
         break;
       case "toggle-thumbnails":
         this.toggleThumbnails();
@@ -340,11 +348,9 @@ class PDFViewer {
   updatePageInfo() {
     const pageInput = this.controls.querySelector(".pdf-viewer-page-input");
     const totalPagesEl = this.controls.querySelector(".pdf-viewer-total-pages");
-    const zoomInput = this.controls.querySelector(".pdf-viewer-zoom-input");
 
     if (pageInput) pageInput.value = this.currentPage;
     if (totalPagesEl) totalPagesEl.textContent = this.totalPages;
-    if (zoomInput) zoomInput.value = Math.round(this.scale * 100) + "%";
 
     // Update button states
     const prevBtn = this.controls.querySelector('[data-action="prev"]');
@@ -390,24 +396,6 @@ class PDFViewer {
     }
   }
 
-  async fitToWidth() {
-    if (!this.pdfDoc) return;
-
-    const page = await this.pdfDoc.getPage(this.currentPage);
-    const viewport = page.getViewport({ scale: 1.0 });
-    const containerWidth = this.canvasContainer.clientWidth - 40; // Account for padding
-    this.scale = containerWidth / viewport.width;
-    this.updatePageInfo();
-    await this.renderAllPages();
-    // Scroll back to current page after re-render
-    const pageContainer = this.pagesWrapper.querySelector(
-      `[data-page="${this.currentPage}"]`,
-    );
-    if (pageContainer) {
-      pageContainer.scrollIntoView({ block: "start" });
-    }
-  }
-
   showError(message) {
     const errorEl = document.createElement("div");
     errorEl.className = "pdf-viewer-error";
@@ -435,29 +423,39 @@ class PDFViewer {
     }
   }
 
-  handleZoomInputKeydown(e) {
-    if (e.key === "Enter") {
-      e.target.blur();
-    }
-  }
+  async handleScaleSelectChange(e) {
+    const value = e.target.value;
+    const scaleType = e.target.options[e.target.selectedIndex].dataset.scaleType;
 
-  async handleZoomInputBlur(e) {
-    const value = e.target.value.replace("%", "").trim();
-    const zoomPercent = parseInt(value, 10);
-
-    if (isNaN(zoomPercent) || zoomPercent < 25 || zoomPercent > 500) {
-      e.target.value = Math.round(this.scale * 100) + "%";
+    if (scaleType === "auto") {
+      this.scale = 1.0;
+    } else if (scaleType === "page-actual") {
+      this.scale = 1.0;
+    } else if (scaleType === "page-fit") {
+      if (!this.pdfDoc) return;
+      const page = await this.pdfDoc.getPage(this.currentPage);
+      const viewport = page.getViewport({ scale: 1.0 });
+      const containerHeight = this.canvasContainer.clientHeight - 40;
+      this.scale = containerHeight / viewport.height;
+    } else if (scaleType === "page-width") {
+      if (!this.pdfDoc) return;
+      const page = await this.pdfDoc.getPage(this.currentPage);
+      const viewport = page.getViewport({ scale: 1.0 });
+      const containerWidth = this.canvasContainer.clientWidth - 40;
+      this.scale = containerWidth / viewport.width;
     } else {
-      this.scale = zoomPercent / 100;
-      this.updatePageInfo();
-      await this.renderAllPages();
-      // Scroll back to current page after re-render
-      const pageContainer = this.pagesWrapper.querySelector(
-        `[data-page="${this.currentPage}"]`,
-      );
-      if (pageContainer) {
-        pageContainer.scrollIntoView({ block: "start" });
-      }
+      // Numeric scale value
+      this.scale = parseFloat(value);
+    }
+
+    this.updatePageInfo();
+    await this.renderAllPages();
+    // Scroll back to current page after re-render
+    const pageContainer = this.pagesWrapper.querySelector(
+      `[data-page="${this.currentPage}"]`,
+    );
+    if (pageContainer) {
+      pageContainer.scrollIntoView({ block: "start" });
     }
   }
 }
