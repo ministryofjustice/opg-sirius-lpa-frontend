@@ -66,6 +66,12 @@
                 {{ template "select" (select "assigneeTeam" "Team" .Task.AssigneeID .Error.Field.assigneeTeam (options .Teams)) }}
               </div>
             </div>
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="f-assignToCaseOwner" name="assignTo" type="radio" value="caseOwner" {{ if eq "caseOwner" .AssignTo }}checked{{ end }}>
+              <label class="govuk-label govuk-radios__label" for="f-assignToCaseOwner">
+                Case Owner
+              </label>
+            </div>
           </fieldset>
         </div>
 
