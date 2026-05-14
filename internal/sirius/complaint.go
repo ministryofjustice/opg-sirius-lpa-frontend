@@ -18,7 +18,7 @@ type Complaint struct {
 	Origin               string                   `json:"origin"`
 	CompensationType     string                   `json:"compensationType,omitempty"`
 	CompensationAmount   string                   `json:"compensationAmount,omitempty"`
-	Summary              string                   `json:"summary,omitempty"`
+	Title                string                   `json:"title,omitempty"`
 	Resolution           string                   `json:"resolution,omitempty"`
 	ResolutionInfo       string                   `json:"resolutionInfo,omitempty"`
 	ResolutionDate       DateString               `json:"resolutionDate,omitempty"`
