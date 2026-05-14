@@ -220,7 +220,7 @@ func TestPostAddComplaint(t *testing.T) {
 					Severity:             shared.ComplaintSeverityMinor,
 					InvestigatingOfficer: "Test Officer",
 					SubCategory:          "07",
-					Summary:              "In summary...",
+					Title:                "In summary...",
 				}).
 				Return(nil)
 
