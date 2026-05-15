@@ -46,7 +46,7 @@ func TestEditComplaint(t *testing.T) {
 							"subCategory":          "18",
 							"complainantCategory":  "LPA_DONOR",
 							"origin":               "PHONE",
-							"summary":              "This and that",
+							"title":                "This and that",
 							"resolution":           "complaint upheld",
 							"resolutionInfo":       "Because...",
 							"resolutionDate":       "07/06/2022",

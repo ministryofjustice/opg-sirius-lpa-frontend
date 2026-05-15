@@ -245,7 +245,7 @@ func TestPostEditComplaint(t *testing.T) {
 		"severity":                       {"Minor"},
 		"investigatingOfficer":           {"Test Officer"},
 		"subCategory":                    {"07"},
-		"summary":                        {"In summary..."},
+		"title":                          {"In summary..."},
 		"resolution":                     {"complaint upheld"},
 		"resolutionInfo":                 {"This is what we did"},
 		"resolutionDate":                 {"2022-05-06"},
