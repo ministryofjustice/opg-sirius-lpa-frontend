@@ -44,7 +44,7 @@ func TestComplaint(t *testing.T) {
 							"severity":             matchers.String("Major"),
 							"investigatingOfficer": matchers.String("Test Officer"),
 							"subCategory":          matchers.String("07"),
-							"summary":              matchers.String("This and that"),
+							"title":                matchers.String("This and that"),
 						}),
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
