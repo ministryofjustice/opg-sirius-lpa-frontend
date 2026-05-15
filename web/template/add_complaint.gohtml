@@ -30,7 +30,7 @@
 
         {{ template "input" (field "complainantName" "Complainant name" .Complaint.ComplainantName .Error.Field.complainantName) }}
 
-        {{ template "input" (field "summary" "Title (optional)" .Complaint.Summary .Error.Field.summary) }}
+        {{ template "input" (field "title" "Title (optional)" .Complaint.Title .Error.Field.title) }}
 
         {{ template "textarea" (field "description" "Description" .Complaint.Description .Error.Field.description) }}
 

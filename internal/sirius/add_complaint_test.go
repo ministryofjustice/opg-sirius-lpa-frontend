@@ -46,7 +46,7 @@ func TestAddComplaint(t *testing.T) {
 							"subCategory":          "18",
 							"complainantCategory":  "LPA_DONOR",
 							"origin":               "PHONE",
-							"summary":              "A title",
+							"title":                "A title",
 						}),
 					}).
 					WithCompleteResponse(consumer.Response{
@@ -75,7 +75,7 @@ func TestAddComplaint(t *testing.T) {
 					SubCategory:          "18",
 					ComplainantCategory:  "LPA_DONOR",
 					Origin:               "PHONE",
-					Summary:              "A title",
+					Title:                "A title",
 				})
 
 				if tc.expectedError == nil {

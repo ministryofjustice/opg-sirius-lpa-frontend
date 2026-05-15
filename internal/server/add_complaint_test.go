@@ -220,7 +220,7 @@ func TestPostAddComplaint(t *testing.T) {
 					Severity:             shared.ComplaintSeverityMinor,
 					InvestigatingOfficer: "Test Officer",
 					SubCategory:          "07",
-					Summary:              "In summary...",
+					Title:                "In summary...",
 				}).
 				Return(nil)
 
@@ -242,7 +242,7 @@ func TestPostAddComplaint(t *testing.T) {
 				"severity":             {"Minor"},
 				"investigatingOfficer": {"Test Officer"},
 				"subCategory":          {"07"},
-				"summary":              {"In summary..."},
+				"title":                {"In summary..."},
 			}
 
 			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))

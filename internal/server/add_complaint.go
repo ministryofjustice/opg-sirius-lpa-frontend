@@ -100,7 +100,7 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 				SubCategory:          postFormString(r, "subCategory"),
 				ComplainantCategory:  postFormString(r, "complainantCategory"),
 				Origin:               postFormString(r, "origin"),
-				Summary:              postFormString(r, "summary"),
+				Title:                postFormString(r, "title"),
 			}
 
 			err = client.AddComplaint(ctx, caseID, caseType, complaint)
