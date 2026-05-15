@@ -10,7 +10,7 @@ describe("Add a complaint", () => {
     cy.contains(".govuk-radios__label", "Complaint").click();
     cy.get("#f-investigatingOfficer").type("Test Officer");
     cy.get("#f-complainantName").type("Someones name");
-    cy.get("#f-summary").type("A title");
+    cy.get("#f-title").type("A title");
     cy.get("#f-description").type("A description");
     cy.get("#f-receivedDate").type("2022-04-05");
     cy.contains(".govuk-radios__label", "OPG Decisions").click();
