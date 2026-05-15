@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
-    "build": "npm run build:js && npm run build:css && npm run build:assets && npm run build:hugerte",
-    "build:js": "esbuild --bundle web/assets/load-classes.js web/assets/main.js --minify --outdir=web/static/javascript --sourcemap --resolve-extensions=.mjs,.js",
+    "build": "npm run build:js && npm run build:css && npm run build:assets && npm run build:hugerte && npm run build:pdfjs",
+    "build:js": "esbuild --bundle web/assets/load-classes.js web/assets/main.js --minify --outdir=web/static/javascript --sourcemap --resolve-extensions=.mjs,.js --format=esm",
     "build:css": "sass --load-path . --style compressed web/assets/main.scss web/static/stylesheets/all.css",
     "build:assets": "mkdir -p web/static/assets/images web/static/assets/fonts && cp node_modules/govuk-frontend/dist/govuk/assets/images/* node_modules/@ministryofjustice/frontend/moj/assets/images/* web/static/assets/images && cp node_modules/govuk-frontend/dist/govuk/assets/fonts/* web/static/assets/fonts",
     "build:hugerte": "cp -r node_modules/hugerte/skins web/static/javascript",
+    "build:pdfjs": "cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs web/static/javascript/",
     "clean": "rm -rf web/static",
     "cypress": "cypress open",
     "lint": "prettier --check .",
@@ -21,6 +22,7 @@
     "govuk-frontend": "^6.1.0",
     "hugerte": "https://github.com/ministryofjustice/opg-hugerte-dist#semver:v1.0.9",
     "opg-sirius-search-ui": "https://github.com/ministryofjustice/opg-sirius-search-ui#v1.79.0",
+    "pdfjs-dist": "^5.6.205",
     "punycode": "^2.3.1"
   },
   "devDependencies": {

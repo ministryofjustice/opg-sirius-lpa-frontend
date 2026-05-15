@@ -39,11 +39,10 @@
                     </a>
                 {{ end }}
 
-                <iframe
-                        class="document-viewer-container"
-                        src="/lpa-api/v1/documents/{{ .Document.UUID }}/file"
-                >
-                </iframe>
+                <div class="pdf-viewer-container"
+                     data-pdf-viewer
+                     data-pdf-url="{{ sirius (printf "/lpa-api/v1/documents/%s/file" .Document.UUID) }}">
+                </div>
 
             </div>
             </div>
