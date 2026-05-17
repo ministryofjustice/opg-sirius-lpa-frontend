@@ -124,6 +124,7 @@
                                                             {{ end }}
                                                         </strong>
                                                     {{ end }}
+                                                    <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-copy-to-clipboard="{{ .OwningCase.UID }}">Copy</button>
                                                     <div class="govuk-tag app-govuk-tag-bold colour-govuk-black lpa-history__meta-timestamp">
                                                         <time datetime="{{ .CreatedOn }}">{{ parseAndFormatDate .CreatedOn "2006-01-02T15:04:05+00:00" "2 January 2006 at 15:04" }}</time>
                                                         - #{{ .Hash }}
