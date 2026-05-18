@@ -19,6 +19,7 @@ import autoApplyFilter from "./auto-apply-filter";
 import showHideCaseSummary from "./show-hide-case-summary";
 import disableAfterClick from "./disable-after-click";
 import documentListSort from "./document-list-sort";
+import htmx from "htmx.org/dist/htmx.esm";
 
 const prefix = document.body.getAttribute("data-prefix");
 
@@ -42,6 +43,10 @@ autoApplyFilter();
 showHideCaseSummary();
 disableAfterClick();
 documentListSort();
+
+window.htmx = htmx;
+// Don't include indicator styles as CSP Policy blocks inline styles
+htmx.config.includeIndicatorStyles = false;
 
 if (window.self !== window.parent) {
   const success = document.querySelector('[data-app-reload~="page"]');
