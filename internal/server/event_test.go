@@ -38,10 +38,11 @@ func (m *mockEventClient) Case(ctx sirius.Context, id int) (sirius.Case, error) 
 
 func TestGetEvent(t *testing.T) {
 	testCases := map[string]struct {
-		url             string
-		clientSetup     func(*mockEventClient)
-		expectedEntity  string
-		expectedCaseUID string
+		url                string
+		clientSetup        func(*mockEventClient)
+		expectedEntity     string
+		expectedEntityType string
+		expectedCaseUID    string
 	}{
 		"person": {
 			url: "/?id=123&entity=person",
@@ -50,7 +51,8 @@ func TestGetEvent(t *testing.T) {
 					On("Person", mock.Anything, 123).
 					Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
 			},
-			expectedEntity: "John Doe",
+			expectedEntity:     "John Doe",
+			expectedEntityType: "person",
 		},
 		"lpa": {
 			url: "/?id=123&entity=lpa",
@@ -59,8 +61,9 @@ func TestGetEvent(t *testing.T) {
 					On("Case", mock.Anything, 123).
 					Return(sirius.Case{UID: "7000-0000-0001", CaseType: "LPA"}, nil)
 			},
-			expectedEntity:  "LPA 7000-0000-0001",
-			expectedCaseUID: "7000-0000-0001",
+			expectedEntity:     "LPA 7000-0000-0001",
+			expectedEntityType: "lpa",
+			expectedCaseUID:    "7000-0000-0001",
 		},
 		"epa": {
 			url: "/?id=123&entity=epa",
@@ -69,8 +72,9 @@ func TestGetEvent(t *testing.T) {
 					On("Case", mock.Anything, 123).
 					Return(sirius.Case{UID: "7000-0000-0001", CaseType: "EPA"}, nil)
 			},
-			expectedEntity:  "EPA 7000-0000-0001",
-			expectedCaseUID: "7000-0000-0001",
+			expectedEntity:     "EPA 7000-0000-0001",
+			expectedEntityType: "epa",
+			expectedCaseUID:    "7000-0000-0001",
 		},
 	}
 
@@ -85,16 +89,18 @@ func TestGetEvent(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, eventData{
-					NoteTypes: []string{"a", "b"},
-					Entity:    tc.expectedEntity,
-					CaseUID:   tc.expectedCaseUID,
+					NoteTypes:  []string{"a", "b"},
+					Entity:     tc.expectedEntity,
+					EntityType: tc.expectedEntityType,
+					CaseUID:    tc.expectedCaseUID,
+					EntityId:   123,
 				}).
 				Return(nil)
 
 			r, _ := http.NewRequest(http.MethodGet, tc.url, nil)
 			w := httptest.NewRecorder()
 
-			err := Event(client, template.Func)(w, r)
+			err := Event(client, template.Func, nil)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -127,7 +133,7 @@ func TestGetEventBadQueryString(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := Event(client, template.Func)(w, r)
+			err := Event(client, template.Func, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -146,7 +152,7 @@ func TestGetEventWhenNoteTypeErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=person", nil)
 	w := httptest.NewRecorder()
 
-	err := Event(client, nil)(w, r)
+	err := Event(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -168,7 +174,7 @@ func TestGetEventWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=person", nil)
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func)(w, r)
+	err := Event(client, template.Func, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -188,9 +194,11 @@ func TestPostEvent(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, eventData{
-			Success:   true,
-			NoteTypes: []string{"a", "b"},
-			Entity:    "John Doe",
+			Success:    true,
+			NoteTypes:  []string{"a", "b"},
+			Entity:     "John Doe",
+			EntityType: "person",
+			EntityId:   123,
 		}).
 		Return(nil)
 
@@ -205,7 +213,7 @@ func TestPostEvent(t *testing.T) {
 	r.Header.Add("Content-Type", form.FormDataContentType())
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func)(w, r)
+	err := Event(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -228,9 +236,11 @@ func TestPostEventWithFile(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, eventData{
-			Success:   true,
-			NoteTypes: []string{"a", "b"},
-			Entity:    "John Doe",
+			Success:    true,
+			NoteTypes:  []string{"a", "b"},
+			Entity:     "John Doe",
+			EntityType: "person",
+			EntityId:   123,
 		}).
 		Return(nil)
 
@@ -247,7 +257,7 @@ func TestPostEventWithFile(t *testing.T) {
 	r.Header.Add("Content-Type", form.FormDataContentType())
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func)(w, r)
+	err := Event(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -273,7 +283,7 @@ func TestPostEventWithBadForm(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123&entity=person", &buf)
 	w := httptest.NewRecorder()
 
-	err := Event(client, nil)(w, r)
+	err := Event(client, nil, nil)(w, r)
 
 	assert.NotNil(t, err)
 }
@@ -293,9 +303,11 @@ func TestPostEventWhenCreateNoteFails(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, eventData{
-			Success:   true,
-			NoteTypes: []string{"a", "b"},
-			Entity:    "John Doe",
+			Success:    true,
+			NoteTypes:  []string{"a", "b"},
+			Entity:     "John Doe",
+			EntityType: "person",
+			EntityId:   123,
 		}).
 		Return(nil)
 
@@ -310,7 +322,7 @@ func TestPostEventWhenCreateNoteFails(t *testing.T) {
 	r.Header.Add("Content-Type", form.FormDataContentType())
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func)(w, r)
+	err := Event(client, template.Func, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -340,6 +352,8 @@ func TestPostEventWhenValidationError(t *testing.T) {
 			NoteTypes:   []string{"a", "b"},
 			Error:       expectedErrors,
 			Entity:      "John Doe",
+			EntityType:  "person",
+			EntityId:    123,
 			Type:        "Application processing",
 			Name:        "Something",
 			Description: "More words",
@@ -357,7 +371,7 @@ func TestPostEventWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", form.FormDataContentType())
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func)(w, r)
+	err := Event(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -382,9 +396,11 @@ func TestPostEventDigitalLpaRedirect(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, eventData{
-			Success:   true,
-			NoteTypes: []string{"a", "b"},
-			Entity:    "DIGITAL_LPA M-EEEE-AAAA-TTTT",
+			Success:    true,
+			NoteTypes:  []string{"a", "b"},
+			Entity:     "DIGITAL_LPA M-EEEE-AAAA-TTTT",
+			EntityType: "lpa",
+			EntityId:   123,
 		}).
 		Return(nil)
 
@@ -399,7 +415,7 @@ func TestPostEventDigitalLpaRedirect(t *testing.T) {
 	r.Header.Add("Content-Type", form.FormDataContentType())
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func)(w, r)
+	err := Event(client, template.Func, nil)(w, r)
 
 	assert.Equal(t, RedirectError("/lpa/M-EEEE-AAAA-TTTT"), err)
 }

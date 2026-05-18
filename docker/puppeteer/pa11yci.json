@@ -15,5 +15,5 @@
     "hideElements": ".govuk-back-link, input[type='radio'][aria-expanded], .govuk-phase-banner",
     "runners": ["axe", "htmlcs"]
   },
-  "urls": ["http://lpa-frontend:8080/create-warning?id=189"]
+  "urls": ["http://lpa-frontend:8080/create-warning?id=189&entity=lpa"]
 }

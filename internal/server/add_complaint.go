@@ -27,9 +27,13 @@ type addComplaintData struct {
 	Origins               []sirius.RefDataItem
 
 	Complaint sirius.Complaint
+	DonorId   int
+	CaseId    int
+	CaseType  string
+	CaseUID   string
 }
 
-func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
+func AddComplaint(client AddComplaintClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -46,6 +50,8 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 
 		data := addComplaintData{
 			XSRFToken: ctx.XSRFToken,
+			CaseId:    caseID,
+			CaseType:  r.FormValue("case"),
 		}
 
 		group.Go(func() error {
@@ -55,6 +61,10 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 			}
 
 			data.Entity = fmt.Sprintf("%s %s", caseitem.CaseType, caseitem.UID)
+			data.CaseUID = caseitem.UID
+			if caseitem.Donor != nil {
+				data.DonorId = caseitem.Donor.ID
+			}
 			return nil
 		})
 
@@ -114,6 +124,10 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 			}
+		}
+
+		if r.Header.Get("HX-Request") == "true" && partialTmpl != nil {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

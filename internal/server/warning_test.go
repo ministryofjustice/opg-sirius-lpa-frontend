@@ -60,12 +60,14 @@ func TestGetWarning(t *testing.T) {
 		XSRFToken:    "",
 		WarningTypes: warningTypes,
 		Cases:        cases,
+		DonorId:      89,
+		EntityType:   "lpa",
 	}).Return(nil)
 
-	req, _ := http.NewRequest(http.MethodGet, "/?id=89", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/?id=89&entity=lpa", nil)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template.Func)(w, req)
+	err := Warning(siriusClient, template.Func, nil)(w, req)
 
 	assert.Nil(t, err)
 	result := w.Result()
@@ -103,12 +105,14 @@ func TestPostWarningWithOneCase(t *testing.T) {
 				Label:  "Complaint Received",
 			},
 		},
-		Cases: cases,
+		Cases:      cases,
+		DonorId:    89,
+		EntityType: "lpa",
 	}).Return(nil)
 
 	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "Some random warning notes", []int{0}).Return(nil)
 
-	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
+	req, _ := http.NewRequest(http.MethodPost, "/?id=89&entity=lpa", strings.NewReader(url.Values{
 		"warningType": {"Complaint Recieved"},
 		"warningText": {"Some random warning notes"},
 	}.Encode()))
@@ -116,7 +120,7 @@ func TestPostWarningWithOneCase(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template.Func)(w, req)
+	err := Warning(siriusClient, template.Func, nil)(w, req)
 	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusOK, result.StatusCode)
@@ -159,12 +163,14 @@ func TestPostWarningWithMultipleCases(t *testing.T) {
 				Label:  "Complaint Received",
 			},
 		},
-		Cases: cases,
+		Cases:      cases,
+		DonorId:    89,
+		EntityType: "lpa",
 	}).Return(nil)
 
 	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "Some random warning notes", []int{1, 2}).Return(nil)
 
-	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
+	req, _ := http.NewRequest(http.MethodPost, "/?id=89&entity=lpa", strings.NewReader(url.Values{
 		"case-id":     {"1", "2"},
 		"warningType": {"Complaint Recieved"},
 		"warningText": {"Some random warning notes"},
@@ -173,7 +179,7 @@ func TestPostWarningWithMultipleCases(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template.Func)(w, req)
+	err := Warning(siriusClient, template.Func, nil)(w, req)
 	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusOK, result.StatusCode)
@@ -205,12 +211,14 @@ func TestPostWarningWithNoCases(t *testing.T) {
 				Label:  "Complaint Received",
 			},
 		},
-		Cases: cases,
+		Cases:      cases,
+		DonorId:    89,
+		EntityType: "lpa",
 	}).Return(nil)
 
 	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "Some random warning notes", []int{}).Return(nil)
 
-	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
+	req, _ := http.NewRequest(http.MethodPost, "/?id=89&entity=lpa", strings.NewReader(url.Values{
 		"warningType": {"Complaint Recieved"},
 		"warningText": {"Some random warning notes"},
 	}.Encode()))
@@ -218,7 +226,7 @@ func TestPostWarningWithNoCases(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template.Func)(w, req)
+	err := Warning(siriusClient, template.Func, nil)(w, req)
 	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusOK, result.StatusCode)
@@ -261,9 +269,11 @@ func TestPostWarningValidationErrors(t *testing.T) {
 		Error:       ve,
 		WarningType: "Complaint Received",
 		Cases:       cases,
+		DonorId:     89,
+		EntityType:  "lpa",
 	}).Return(nil)
 
-	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
+	req, _ := http.NewRequest(http.MethodPost, "/?id=89&entity=lpa", strings.NewReader(url.Values{
 		"warningType": {"Complaint Received"},
 		"warningText": {""},
 	}.Encode()))
@@ -271,7 +281,7 @@ func TestPostWarningValidationErrors(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template.Func)(w, req)
+	err := Warning(siriusClient, template.Func, nil)(w, req)
 	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusBadRequest, result.StatusCode)
@@ -294,7 +304,7 @@ func TestCreateWarningReturnsError(t *testing.T) {
 
 	siriusClient.On("CreateWarning", mock.Anything, 89, "Complaint Recieved", "Some notes", []int{}).Return(e)
 
-	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
+	req, _ := http.NewRequest(http.MethodPost, "/?id=89&entity=lpa", strings.NewReader(url.Values{
 		"warningType": {"Complaint Recieved"},
 		"warningText": {"Some notes"},
 	}.Encode()))
@@ -302,7 +312,7 @@ func TestCreateWarningReturnsError(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, nil)(w, req)
+	err := Warning(siriusClient, nil, nil)(w, req)
 	assert.Equal(t, e, err)
 }
 
@@ -312,7 +322,7 @@ func TestGetWarningTypesFail(t *testing.T) {
 	siriusClient.
 		On("RefDataByCategory", mock.Anything, sirius.WarningTypeCategory).Return(nil, expectedErr)
 
-	req, _ := http.NewRequest(http.MethodPost, "/?id=89", strings.NewReader(url.Values{
+	req, _ := http.NewRequest(http.MethodPost, "/?id=89&entity=lpa", strings.NewReader(url.Values{
 		"warningType": {"Complaint Recieved"},
 		"warningText": {"Some notes"},
 	}.Encode()))
@@ -320,7 +330,7 @@ func TestGetWarningTypesFail(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, nil)(w, req)
+	err := Warning(siriusClient, nil, nil)(w, req)
 
 	assert.Equal(t, expectedErr, err)
 }

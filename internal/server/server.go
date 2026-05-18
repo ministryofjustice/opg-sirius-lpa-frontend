@@ -39,6 +39,7 @@ func getContext(r *http.Request) sirius.Context {
 }
 
 type Client interface {
+	ActionPanelClient
 	AddComplaintClient
 	AddFeeDecisionClient
 	AddObjectionClient
@@ -127,8 +128,9 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/lpa/{uid}/manage-restrictions", wrap(ManageRestrictions(client, templates.Get("manage-restrictions.gohtml"), templates.Get("confirm-restrictions.gohtml"))))
 	mux.Handle("/add-objection", wrap(AddObjection(client, templates.Get("objection.gohtml"))))
 	mux.Handle("/change-donor-details", wrap(ChangeDonorDetails(client, templates.Get("change-donor-details.gohtml"))))
-	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning.gohtml"))))
-	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"))))
+	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning-wrapper.gohtml"), templates.Get("warning-partial-wrapper.gohtml"))))
+	mux.Handle("/create-event", wrap(Event(client, templates.Get("event-wrapper.gohtml"), templates.Get("event-partial-wrapper.gohtml"))))
+	mux.Handle("/action-panel", wrap(ActionPanel(client, templates.Get("action-panel-wrapper.gohtml"))))
 	mux.Handle("/create-task", wrap(Task(client, templates.Get("task.gohtml"))))
 	mux.Handle("/create-additional-draft-lpa", wrap(CreateAdditionalDraft(client, templates.Get("create_additional_draft.gohtml"))))
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("relationship.gohtml"))))
@@ -147,7 +149,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/delete-note", wrap(DeleteNote(client, templates.Get("delete-note.gohtml"))))
 	mux.Handle("/edit-dates", wrap(EditDates(client, templates.Get("edit_dates.gohtml"))))
 	mux.Handle("/link-person", wrap(LinkPerson(client, templates.Get("link_person.gohtml"))))
-	mux.Handle("/add-complaint", wrap(AddComplaint(client, templates.Get("add_complaint.gohtml"))))
+	mux.Handle("/add-complaint", wrap(AddComplaint(client, templates.Get("add-complaint-wrapper.gohtml"), templates.Get("add-complaint-partial-wrapper.gohtml"))))
 	mux.Handle("/edit-complaint", wrap(EditComplaint(client, templates.Get("edit_complaint.gohtml"))))
 	mux.Handle("/unlink-person", wrap(UnlinkPerson(client, templates.Get("unlink_person.gohtml"))))
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change_status.gohtml"))))
