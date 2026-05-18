@@ -21,7 +21,7 @@ $govuk-assets-path: "../assets/";
 @import "./dark.scss";
 @import "./wysiwyg.scss";
 
-// Define HTMX indicator styles here to avoid inline styles which are blocked by CSP Policy
+// Define HTMX indicator styles here to avoid inline styles which are blocked by CSP
 .htmx-indicator {
   opacity: 0;
   visibility: hidden;

@@ -45,7 +45,7 @@ disableAfterClick();
 documentListSort();
 
 window.htmx = htmx;
-// Don't include indicator styles as CSP Policy blocks inline styles
+// Don't include indicator styles as CSP blocks inline styles
 htmx.config.includeIndicatorStyles = false;
 
 if (window.self !== window.parent) {
