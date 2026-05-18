@@ -7,6 +7,10 @@
 {{ define "main" }}
     <div class="app-timeline-container">
         <h2 class="govuk-heading-m colour-govuk-white colour-sirius-dark-blue govuk-!-padding-1 govuk-!-padding-left-2 govuk-!-margin-bottom-0">History</h2>
+        <svg aria-labelledby="change-status-text">
+            <title id="change-status-text">Change status</title>
+            <use href="{{ prefixSVG "aw-change-status" }}" />
+        </svg>
         <div class="govuk-!-margin-4">
             <div class="app-align-items-end app-!-gap-2 govuk-!-margin-bottom-5">
                 <button class="govuk-button govuk-button govuk-!-margin-bottom-0" aria-controls="app-filters" data-filter-toggle>
