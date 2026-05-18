@@ -23,14 +23,14 @@ $govuk-assets-path: "../assets/";
 
 // Define HTMX indicator styles here to avoid inline styles which are blocked by CSP Policy
 .htmx-indicator {
-    opacity: 0;
-    visibility: hidden;
+  opacity: 0;
+  visibility: hidden;
 }
 .htmx-request .htmx-indicator,
 .htmx-request.htmx-indicator {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 200ms ease-in;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 200ms ease-in;
 }
 
 .app-\!-embedded .app-\!-embedded-hide {
