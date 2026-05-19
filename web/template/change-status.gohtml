@@ -21,7 +21,7 @@
 
         {{ template "select" (select "status" "Status" .NewStatus .Error.Field.status (options .AvailableStatuses) "required" true) }}
 
-        {{ template "textarea" (field "notes" "Notes" .Notes .Error.Field.notes) }}
+        {{ template "textarea" (field "notes" "Notes" .Notes .Error.Field.notes "hint" "Optional") }}
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Submit</button>
