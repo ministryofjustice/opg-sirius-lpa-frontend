@@ -540,11 +540,10 @@ $govuk-assets-path: "../assets/";
   left: 0;
   max-height: 626px;
   overflow: auto;
-  position: absolute;
-  top: 40px;
-  transition: height 0.5s ease, top 0.1s ease;
-  width: 1245px;
-  z-index: -1;
+  position: fixed;
+  top: 104px;
+  width: 100vw;
+  z-index: 9;
 
   &[hidden] {
     display: none;
