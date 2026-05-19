@@ -44,7 +44,7 @@ showHideCaseSummary();
 disableAfterClick();
 documentListSort();
 
-window.htmx = htmx;
+globalThis.htmx = htmx;
 // Don't include indicator styles as CSP blocks inline styles
 htmx.config.includeIndicatorStyles = false;
 
