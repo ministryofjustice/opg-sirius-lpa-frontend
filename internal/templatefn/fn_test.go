@@ -266,8 +266,16 @@ func TestPrefix(t *testing.T) {
 	assert.Equal(t, "URL", val)
 }
 
-func TestPrefixSVG(t *testing.T) {
-	fns := All("", "prefix", "")
+func TestPrefixSVGValidHash(t *testing.T) {
+	fns := All("", "prefix", "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1")
+	fn := fns["prefixSVG"].(func(string) string)
+
+	val := fn("URL")
+	assert.Equal(t, "prefix/assets/images/icons.svg?d6a61d20#URL", val)
+}
+
+func TestPrefixSVGInvalidHash(t *testing.T) {
+	fns := All("", "prefix", "248d")
 	fn := fns["prefixSVG"].(func(string) string)
 
 	val := fn("URL")

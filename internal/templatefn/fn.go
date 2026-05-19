@@ -33,7 +33,14 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return prefix + s
 			}
 		},
-		"prefixSVG": func(s string) string { return prefix + "/assets/images/icons.svg#" + s },
+		"prefixSVG": func(s string) string {
+			path := prefix + "/assets/images/icons.svg"
+			if len(staticHash) >= 11 {
+				return path + "?" + url.QueryEscape(staticHash[3:11]) + "#" + s
+			} else {
+				return path + "#" + s
+			}
+		},
 		"today": func() string {
 			return time.Now().Format("2006-01-02")
 		},
