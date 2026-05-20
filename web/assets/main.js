@@ -18,6 +18,7 @@ import addressFinder from "./address-finder";
 import autoApplyFilter from "./auto-apply-filter";
 import showHideCaseSummary from "./show-hide-case-summary";
 import disableAfterClick from "./disable-after-click";
+import "htmx.org";
 import documentListSort from "./document-list-sort";
 
 const prefix = document.body.getAttribute("data-prefix");
@@ -41,6 +42,7 @@ addressFinder(prefix);
 autoApplyFilter();
 showHideCaseSummary();
 disableAfterClick();
+window.htmx = require("htmx.org");
 documentListSort();
 
 if (window.self !== window.parent) {
