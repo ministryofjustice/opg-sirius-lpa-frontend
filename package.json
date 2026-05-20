@@ -8,7 +8,7 @@
     "build:css": "sass --load-path . --style compressed web/assets/main.scss web/static/stylesheets/all.css",
     "build:assets": "mkdir -p web/static/assets/images web/static/assets/fonts && cp node_modules/govuk-frontend/dist/govuk/assets/images/* node_modules/@ministryofjustice/frontend/moj/assets/images/* web/static/assets/images && cp node_modules/govuk-frontend/dist/govuk/assets/fonts/* web/static/assets/fonts",
     "build:hugerte": "cp -r node_modules/hugerte/skins web/static/javascript",
-    "build:svg": "svgo -rf web/assets/icons -o web/assets/icons-min && svg-sprite-generate -d web/assets/icons-min -o web/static/assets/images/icons.svg",
+    "build:svg": "svgo -rf web/assets/icons -o web/assets/icons-min && svg-sprite-generate -d web/assets/icons-min -o web/static/assets/images/icons.svg && rm -rf web/assets/icons-min",
     "clean": "rm -rf web/static",
     "cypress": "cypress open",
     "lint": "prettier --check .",
