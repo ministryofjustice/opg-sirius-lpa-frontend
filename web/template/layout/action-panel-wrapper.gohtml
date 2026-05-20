@@ -1,0 +1,15 @@
+{{ define "ActionPanelWrapper" }}
+    <details class="action-panel">
+        <summary
+            class="govuk-button govuk-button--secondary action-panel__tab"
+            id="actions-tab"
+            aria-controls="actions-content">
+            Actions
+        </summary>
+        <div id="actions-content" class="action-panel__content">
+            <div class="action-panel__inner">
+                {{ template "actionPanel" . }}
+            </div>
+        </div>
+    </details>
+{{ end }}
