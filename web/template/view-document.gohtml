@@ -9,7 +9,9 @@
                 {{ range .Document.CaseItems }}
                     {{ template "CaseLabel" . }}
                 {{ end }}
-                <strong>{{ (parseAndFormatDate .Document.CreatedDate "02/01/2006 15:04:05" "02/01/2006") }} {{ .Document.FriendlyDescription }}</strong>
+                <h1 class="govuk-heading-m">
+                    {{ (parseAndFormatDate .Document.CreatedDate "02/01/2006 15:04:05" "02/01/2006") }} {{ .Document.FriendlyDescription }}
+                </h1>
             </div>
 
             <div class="moj-button-group--inline">
@@ -41,6 +43,7 @@
 
                 <iframe
                         class="document-viewer-container"
+                        title="Document viewer"
                         src="/lpa-api/v1/documents/{{ .Document.UUID }}/file"
                 >
                 </iframe>
