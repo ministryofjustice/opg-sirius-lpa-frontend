@@ -113,7 +113,7 @@ AddressFinder.editModeTemplate = (id) => `
       Look up UK postcode
     </a>
   </p>
-  <div id="address-finder-controls" class="govuk-!-display-none govuk-!-margin-bottom-4">
+  <div id="address-finder-controls" class="govuk-!-display-none govuk-!-margin-bottom-6">
     <div class="govuk-form-group govuk-!-margin-bottom-4">
       <div class="govuk-hint" id="f-${id}-hint">
         Enter a UK postcode
