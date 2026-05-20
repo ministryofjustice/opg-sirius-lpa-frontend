@@ -21,6 +21,18 @@ $govuk-assets-path: "../assets/";
 @import "./dark.scss";
 @import "./wysiwyg.scss";
 
+// Define HTMX indicator styles here to avoid inline styles which are blocked by CSP
+.htmx-indicator {
+  opacity: 0;
+  visibility: hidden;
+}
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 200ms ease-in;
+}
+
 .app-\!-embedded .app-\!-embedded-hide {
   display: none;
 }
@@ -72,6 +84,18 @@ $govuk-assets-path: "../assets/";
 
 .app-\!-max-full-width {
   max-width: 100%;
+}
+
+// GOV.UK Frontend applies width: 100% to .govuk-textarea by default.
+// In Sirius we want textareas to be narrower by default.
+.app-\!-textarea-75 {
+  width: 75%;
+}
+
+@include govuk-media-query($until: tablet) {
+  .app-\!-textarea-75 {
+    width: 100%;
+  }
 }
 
 .app-\!-no-min-max-width {
@@ -475,6 +499,74 @@ $govuk-assets-path: "../assets/";
   .govuk-button {
     width: auto;
   }
+}
+
+.document-main-wrapper {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.document-list-section {
+  flex: 1;
+}
+
+.action-panel-section {
+  flex-shrink: 0;
+  min-width: 250px;
+}
+
+.actions-panel {
+  // Position at middle of viewport; content panel will be constrained
+  // to appear below the header area
+  --actions-panel-top: 130px;
+  --actions-panel-width: 400px;
+  --actions-panel-height: 32rem;
+  position: fixed;
+  top: calc(50vh - (var(--actions-panel-height) / 2));
+  right: 0;
+  z-index: 1;
+
+  transition: right 200ms ease;
+}
+
+.actions-panel[open] {
+  right: var(--actions-panel-width);
+}
+
+.actions-panel__content {
+  position: absolute;
+  // Position from the panel's top edge so the tab and content share the same anchor.
+  top: 0;
+  transform: translate(1rem, 0);
+  width: var(--actions-panel-width);
+  height: var(--actions-panel-height);
+  max-width: calc(100vw - 4rem);
+  overflow-y: auto;
+  padding: 1rem;
+  background: #ffffff;
+  border: 1px solid #b1b4b6;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  opacity: 0;
+  transition:
+    transform 200ms ease,
+    opacity 200ms ease;
+}
+
+.actions-panel[open] .actions-panel__content {
+  transform: translate(0, 0);
+  opacity: 1;
+}
+
+.actions-panel__tab {
+  position: absolute;
+  top: 0;
+  transform: rotate(-90deg) translateX(-100%) translateY(-100%);
+  left: 0;
+  transform-origin: top left;
+  z-index: 1;
+  margin: 0;
 }
 
 .app-table__row--half-width {
