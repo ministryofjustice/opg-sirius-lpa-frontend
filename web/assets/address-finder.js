@@ -26,7 +26,7 @@ function AddressFinder($module, options) {
   /** @type {HTMLInputElement} */
   this.$input = $container.querySelector("input");
   /** @type {HTMLDivElement} */
-  this.$dropdownContainer = $container.querySelector(".govuk-details__text");
+  this.$dropdownContainer = $container.querySelector("#dropdown-container");
   /** @type {HTMLSelectElement} */
   this.$dropdown = $container.querySelector("select");
   /** @type {HTMLDivElement} */
@@ -45,22 +45,17 @@ function AddressFinder($module, options) {
     "data-app-address-finder-fill-country",
   );
 
-  const $link = $container.querySelector(".govuk-link");
-  $link?.addEventListener("click", this.toggleInputs.bind(this));
-
-  this.$inputContainer = document.createElement("div");
-  this.$inputContainer.classList.add("govuk-details__text");
+  this.$inputContainer = $container.querySelector(".govuk-details__text");
   nodeListForEach(this.$inputs, ($input) => {
     this.$inputContainer.appendChild($input);
   });
-  this.$module.appendChild(this.$inputContainer);
 
   if (
     0 ===
       this.$module.querySelectorAll('input[value]:not([value=""])').length &&
     0 === this.$module.querySelectorAll(".govuk-form-group--error").length
   ) {
-    this.hideInputs();
+    // this.hideInputs();
   }
 }
 
@@ -68,43 +63,39 @@ AddressFinder.template = (id) => `
   <div class="govuk-form-group govuk-!-margin-bottom-3">
     <label class="govuk-label" for="f-${id}-input"></label>
     <div class="govuk-hint" id="f-${id}-hint">
-      Enter a UK postcode, or enter the address manually.
+      Enter a UK postcode
     </div>
     <p id="f-${id}-error" class="govuk-error-message govuk-!-display-none">
       <span class="govuk-visually-hidden">Error:</span>
-      No matching address found. Please try again using a UK postcode, or enter the address manually
+      No matching address found. Please try again using a UK postcode or enter the address manually
     </p>
-    <input
-      class="govuk-input govuk-input--width-10 govuk-!-margin-top-1"
-      id="f-${id}-input"
-      aria-describedby="f-${id}-hint"
-    />
+    <div class="address-finder__container">
+      <input
+        class="govuk-input"
+        id="f-${id}-input"
+        aria-describedby="f-${id}-hint"
+      />
+      <button class="govuk-button govuk-!-margin-bottom-0" type="button">
+        Look up UK postcode
+      </button>
+    </div>
   </div>
-  <button class="govuk-button  govuk-!-margin-bottom-3" type="button">
-    Find address
-  </button>
-  <div class="govuk-form-group govuk-details__text govuk-!-margin-bottom-3 govuk-!-display-none">
-    <label class="govuk-label" for="f-${id}-select">
+  <div id="dropdown-container" class="govuk-form-group govuk-!-margin-bottom-3 govuk-!-display-none">
+    <label class="govuk-label govuk-visually-hidden" for="f-${id}-select">
       Select an address
     </label>
-    <select class="govuk-select" id="f-${id}-select"></select>
+    <select class="govuk-select govuk-!-padding-0" id="f-${id}-select"></select>
   </div>
-  <p class="govuk-body govuk-!-margin-bottom-0">
-    <a href="#" class="govuk-link govuk-link--no-visited-state">
-      Enter address manually
-    </a>
-  </p>
+  <details class="govuk-details govuk-!-margin-bottom-0">
+    <summary class="govuk-details__summary">
+      <span class="govuk-details__summary-text">
+        Enter address manually
+      </span>
+    </summary>
+    <div class="govuk-details__text">
+    </div>
+  </details>
 `;
-
-AddressFinder.prototype.hideInputs = function () {
-  this.$inputContainer.classList.add("govuk-!-display-none");
-};
-
-AddressFinder.prototype.toggleInputs = function (e) {
-  e.preventDefault();
-
-  this.$inputContainer.classList.toggle("govuk-!-display-none");
-};
 
 AddressFinder.prototype.showError = function () {
   this.$input.classList.add("govuk-input--error");
@@ -145,7 +136,6 @@ AddressFinder.prototype.handleKeydown = function (e) {
 };
 
 AddressFinder.prototype.handleSearch = function () {
-  this.hideInputs();
   this.$button.disabled = true;
   this.$dropdownContainer.classList.add("govuk-!-display-none");
 
@@ -162,6 +152,15 @@ AddressFinder.prototype.handleSearch = function () {
       this.results = results;
 
       this.$dropdown.innerHTML = "";
+
+      const $initialOption = document.createElement("option");
+      $initialOption.value = "";
+      $initialOption.innerHTML = "Select address";
+      $initialOption.selected = true;
+      $initialOption.disabled = true;
+      $initialOption.hidden = true;
+      this.$dropdown.appendChild($initialOption);
+
       this.results.forEach((result, i) => {
         const $option = document.createElement("option");
         $option.value = i.toString();
@@ -172,7 +171,6 @@ AddressFinder.prototype.handleSearch = function () {
 
       this.$dropdownContainer.classList.remove("govuk-!-display-none");
       this.$dropdown.focus();
-      this.$dropdown.dispatchEvent(new Event("change"));
     })
     .catch((err) => {
       this.$button.disabled = false;
