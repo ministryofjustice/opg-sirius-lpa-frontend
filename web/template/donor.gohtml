@@ -10,6 +10,7 @@
 
       {{ if .Success }}
         {{ if .IsNew }}
+          <h1 class="govuk-visually-hidden">Donor created</h1>
           <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
             <div class="govuk-notification-banner__header">
               <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
@@ -31,6 +32,7 @@
             </div>
           </div>
         {{ else }}
+          <h1 class="govuk-visually-hidden">Donor edited</h1>
           <meta data-app-reload="page" />
           {{ template "success-banner" "Donor was edited" }}
         {{ end }}
