@@ -63,12 +63,13 @@ describe("Create Digital LPA draft", () => {
     cy.get("#f-dob-year").type("1952");
 
     // Check postcode finder auto-populates
-    cy.contains("Enter a UK postcode, or enter the address manually")
+    cy.contains("Enter a UK postcode")
       .nextUntil(".govuk-input")
       .next()
       .type("SW1A 1AA");
-    cy.contains("Find address").click();
-    cy.contains("Enter address manually").click();
+    cy.contains("Look up UK postcode").click();
+    cy.get("#dropdown-container select").first().select("0");
+    cy.get(".govuk-details__summary").first().click();
     cy.get("#f-donorAddress\\.Line1").should(
       "have.value",
       "Office of the Public Guardian",

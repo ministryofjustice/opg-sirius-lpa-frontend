@@ -27,7 +27,7 @@ describe("Create or update correspondent", () => {
     cy.get("#f-middlenames").type("Josefina");
     cy.get("#f-surname").type("Vanvolkenburg");
     cy.get("#f-companyName").type("ACME");
-    cy.get('[data-module="app-address-finder"] .govuk-link').click();
+    cy.get(".govuk-details__summary").click();
     cy.get("#f-addressLine1").type("29737 Andrew Plaza");
     cy.get("#f-addressLine2").type("Apt. 814");
     cy.get("#f-addressLine3").type("Gislasonside");
