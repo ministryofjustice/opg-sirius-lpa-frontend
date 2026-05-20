@@ -60,7 +60,7 @@ function AddressFinder($module, options) {
 }
 
 AddressFinder.template = (id) => `
-  <div class="govuk-form-group govuk-!-margin-bottom-3">
+  <div class="govuk-form-group govuk-!-margin-bottom-4">
     <label class="govuk-label" for="f-${id}-input"></label>
     <div class="govuk-hint" id="f-${id}-hint">
       Enter a UK postcode
@@ -80,7 +80,7 @@ AddressFinder.template = (id) => `
       </button>
     </div>
   </div>
-  <div id="dropdown-container" class="govuk-form-group govuk-!-margin-bottom-3 govuk-!-display-none">
+  <div id="dropdown-container" class="govuk-form-group govuk-!-margin-bottom-4 govuk-!-display-none">
     <label class="govuk-label govuk-visually-hidden" for="f-${id}-select">
       Select an address
     </label>
