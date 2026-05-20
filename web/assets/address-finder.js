@@ -108,7 +108,7 @@ AddressFinder.template = (id) => `
 
 AddressFinder.editModeTemplate = (id) => `
   <label class="govuk-label" for="f-${id}-input"></label>
-  <p id="address-finder-link-container" class="govuk-body govuk-!-margin-bottom-4">
+  <p id="address-finder-link-container" class="govuk-body govuk-!-margin-bottom-4 govuk-!-margin-top-4">
     <a href="#" class="govuk-link govuk-link--no-visited-state">
       Look up UK postcode
     </a>
