@@ -485,3 +485,21 @@ $govuk-assets-path: "../assets/";
   width: 75px;
   vertical-align: top;
 }
+
+.address-finder__container {
+  display: flex;
+  gap: 1rem;
+  input {
+    flex: 1;
+  }
+  button {
+    height: calc(2.5rem - 2px);
+    width: auto;
+    padding: 5px 10px 5px;
+  }
+}
+
+#dropdown-container select {
+  text-overflow: ellipsis;
+  width: 100%;
+}
