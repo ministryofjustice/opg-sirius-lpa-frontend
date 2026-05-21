@@ -137,7 +137,9 @@ describe("Compare documents", () => {
         "include",
         "/compare/33/34?pane2=e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
       );
-    cy.get(".govuk-grid-column-one-half:not(.app-document-compare__separator) > .govuk-button")
+    cy.get(
+      ".govuk-grid-column-one-half:not(.app-document-compare__separator) > .govuk-button",
+    )
       .contains("Back to list")
       .should("have.attr", "href")
       .and(
@@ -160,7 +162,9 @@ describe("Compare documents", () => {
           }
         });
     });
-    cy.get(".govuk-grid-column-one-half:not(.app-document-compare__separator)").within(() => {
+    cy.get(
+      ".govuk-grid-column-one-half:not(.app-document-compare__separator)",
+    ).within(() => {
       cy.get("button, a")
         .contains("Close")
         .should("exist")
@@ -183,11 +187,15 @@ describe("Compare documents", () => {
     cy.visit("compare/33/34?pane2=e5b5acd1-c11c-41fe-a921-7fdd07e8f670");
     cy.contains("7001-0000-5678");
     cy.contains("A document not linked to case");
-    cy.get(".govuk-grid-column-one-half:not(.app-document-compare__separator) > .govuk-button")
+    cy.get(
+      ".govuk-grid-column-one-half:not(.app-document-compare__separator) > .govuk-button",
+    )
       .contains("Back to list")
       .should("have.attr", "href")
       .and("include", "/compare/33/34");
-    cy.get(".govuk-grid-column-one-half:not(.app-document-compare__separator)").within(() => {
+    cy.get(
+      ".govuk-grid-column-one-half:not(.app-document-compare__separator)",
+    ).within(() => {
       cy.get("button, a")
         .contains("Close")
         .should("exist")
