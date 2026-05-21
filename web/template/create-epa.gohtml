@@ -14,6 +14,12 @@
 
       <h1 class="govuk-heading-l app-!-embedded-hide">{{ .Title }}</h1>
 
+      {{ if .CaseId }}
+        <p class="govuk-body">
+          {{ template "CaseLabel" .Epa }}
+        </p>
+      {{ end }}
+
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
