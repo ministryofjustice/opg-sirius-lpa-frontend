@@ -99,7 +99,7 @@
                             <div class="govuk-summary-list__row">
                                 <p class="govuk-hint govuk-!-margin-bottom-1 govuk-!-margin-top-1">
                                     {{ if .User }}
-                                        Created by <a class="govuk-link" href="mailto:{{ .User.Email}}">{{ .User.DisplayName }}</a>
+                                        Created by {{ if .User.Email }}<a class="govuk-link" href="mailto:{{ .User.Email }}">{{ .User.DisplayName }}</a>{{ else }}{{ .User.DisplayName }}{{ end }}
                                     {{ else }}
                                         Created by Unknown User
                                     {{ end }}

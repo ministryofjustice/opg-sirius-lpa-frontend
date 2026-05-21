@@ -17,7 +17,7 @@
                 {{ template "select" (select "decisionType" "Type of decision" .DecisionType .Error.Field.decisionType (options .DecisionTypes "filterSelectable" false)) }}
 
                 <div class="govuk-form-group {{ if .Error.Field.amount }}govuk-form-group--error{{ end }}">
-                    <label class="govuk-label" for="f-decision-reason">
+                    <label class="govuk-label" for="f-decisionReason">
                         Reason for decision
                     </label>
                     {{ template "errors" .Error.Field.decisionReason }}

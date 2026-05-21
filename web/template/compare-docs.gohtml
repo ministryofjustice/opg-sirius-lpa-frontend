@@ -3,6 +3,7 @@
 {{ define "container-classes" }} app-!-max-full-width{{ end }}
 
 {{ define "main" }}
+    <h1 class="govuk-visually-hidden">Compare documents</h1>
     <div class="govuk-grid-column-one-half app-document-compare__separator">
         {{ if eq .Pane1 "doc" }}
             {{ template "viewingDocument" .View1 }}

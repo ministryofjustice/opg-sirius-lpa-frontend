@@ -4,6 +4,7 @@
 
 {{ define "main" }}
   {{ if .Success }}
+    <h1 class="govuk-visually-hidden">Draft LPA created</h1>
       {{ template "create_lpa_success_banner" . }}
   {{ else }}
     <div class="govuk-grid-row">
@@ -53,9 +54,9 @@
           <div class="govuk-form-group {{ if .Error.Field.donorDob }}govuk-form-group--error{{ end }}" id="f-donorDob">
             <fieldset class="govuk-fieldset" role="group" aria-describedby="f-dob-hint">
               <legend class="govuk-fieldset__legend">
-                <h1 class="govuk-fieldset__heading">
+                <span class="govuk-fieldset__heading">
                   Donor’s date of birth
-                </h1>
+                </span>
               </legend>
               <div id="f-dob-hint" class="govuk-hint">
                 For example, 12 01 1967.

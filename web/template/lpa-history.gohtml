@@ -22,7 +22,7 @@
             </div>
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-one-quarter">
-                    <div class="moj-filter moj-filter-layout__filter app-!-no-min-max-width" data-module="moj-filter">
+                    <div id="app-filters" class="moj-filter moj-filter-layout__filter app-!-no-min-max-width" data-module="moj-filter">
                         <div class="moj-filter__header govuk-!-padding-bottom-0 colour-sirius-dark-blue">
                             <div class="moj-filter__header-title">
                                 <h2 class="govuk-heading-m colour-govuk-white">Filter</h2>
@@ -215,8 +215,7 @@
                                                         {{ if .User.Deleted }}
                                                             deleted user
                                                         {{ else }}
-                                                            <a class="govuk-link"
-                                                               href="mailto:{{ .User.Email}}">{{ .User.DisplayName }}</a>
+                                                            {{ if .User.Email }}<a class="govuk-link" href="mailto:{{ .User.Email }}">{{ .User.DisplayName }}</a>{{ else }}{{ .User.DisplayName }}{{ end }}
                                                             {{ if gt (len .User.Teams) 0 }}({{ (index .User.Teams 0).DisplayName }}){{ end }}
                                                             {{ if .User.PhoneNumber }} &ndash; {{ .User.PhoneNumber }}{{ end }}
                                                         {{ end }}

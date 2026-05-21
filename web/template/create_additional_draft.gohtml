@@ -4,6 +4,7 @@
 
 {{ define "main" }}
 	{{ if .Success }}
+		<h1 class="govuk-visually-hidden">Draft LPA created</h1>
     {{ template "create_lpa_success_banner" . }}
 	{{ else }}
 		<a href="{{ prefix (printf "/lpa/%s" (index .Donor.Cases 0).UID )}}" class="govuk-back-link">Back</a>
