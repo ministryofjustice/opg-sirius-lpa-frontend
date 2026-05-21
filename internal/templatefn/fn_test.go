@@ -271,7 +271,7 @@ func TestPrefixSVGValidHash(t *testing.T) {
 	fn := fns["prefixSVG"].(func(string) string)
 
 	val := fn("URL")
-	assert.Equal(t, "prefix/assets/images/icons.svg?d6a61d20#URL", val)
+	assert.Equal(t, "prefix/assets/images/icons-sprite.svg?d6a61d20#URL", val)
 }
 
 func TestPrefixSVGInvalidHash(t *testing.T) {
@@ -279,7 +279,7 @@ func TestPrefixSVGInvalidHash(t *testing.T) {
 	fn := fns["prefixSVG"].(func(string) string)
 
 	val := fn("URL")
-	assert.Equal(t, "prefix/assets/images/icons.svg#URL", val)
+	assert.Equal(t, "prefix/assets/images/icons-sprite.svg#URL", val)
 }
 
 func TestPrefixAssetGivenValidCache(t *testing.T) {
