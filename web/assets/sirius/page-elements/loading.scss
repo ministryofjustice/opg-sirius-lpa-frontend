@@ -1,0 +1,21 @@
+// Loading icon and background
+.loading {
+    background: rgba($color-app-bg, 20%/100.0%) $loading-background-icon no-repeat center center;
+    background-size: 80px;
+    transition: opacity 0.5s;
+    opacity: 1;
+}
+
+.document-container {
+    .loading {
+        background: transparent $loading-background-icon no-repeat center center;
+        position: absolute;
+        z-index: 999;
+        top: 50%;
+        left: 50%;
+        height: 80px;
+        width: 80px;
+        margin-left: -50px;
+        margin-top: -50px;
+    }
+}

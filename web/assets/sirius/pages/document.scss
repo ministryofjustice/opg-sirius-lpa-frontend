@@ -1,0 +1,143 @@
+// --------------------------------------------
+// Mixins and variables
+// --------------------------------------------
+
+$document-page-header-border: 1px solid $color-sirius-white;
+$drop-down-container-height: 111px;
+
+@mixin document-page-header-button {
+
+    height: $page-header-bar-secondary-height;
+    display: inline-block;
+    margin: -$page-header-bar-secondary-padding 0 (-$page-header-bar-secondary-padding);
+
+    // centre icon vertically
+    line-height: $page-header-bar-secondary-height;
+    vertical-align: middle;
+
+}
+
+.document-page-header-button {
+    @include document-page-header-button;
+}
+
+// Document viewer header
+.document-container {
+
+    .page-header {
+
+        // Typography
+        h1, h3, a {
+            float: left;
+        }
+        h3 {
+            margin: 0;
+        }
+
+        // Buttons
+        a.opg-icon {
+            color: $color-sirius-white;
+        }
+
+        .back {
+            float: left;
+            font-size: 1.8em;
+            border-right: 1px solid $color-sirius-white;
+            @include document-page-header-button;
+            padding: 0 $spacer/2;
+            margin: 0;
+            @include gradient-blue;
+        }
+
+    }
+
+    .person-info {
+        width: calc(100% - 440px);
+    }
+}
+
+// Document list view
+.document-list {
+
+    padding: $spacer 0;
+    margin: 0 $gutter;
+
+    h2 {
+        margin-bottom: 0;
+    }
+
+    table {
+        position: relative;
+        margin-left: -$spacer / 2;
+        margin-bottom: $gutter;
+        font-size: 0.75em;
+
+        thead {
+            display: block;
+        }
+
+        th {
+            padding: 4px;
+            background: none;
+            text-align: left;
+            a {
+                color: $color-sirius-white;
+            }
+        }
+
+        tbody {
+            display: block;
+            max-height: 300px;
+            overflow: auto;
+        }
+
+        tr:nth-child(2n) {
+            background-color: $color-sirius-light-blue;
+        }
+
+        td {
+            padding: 4px;
+            vertical-align: top;
+            a {
+                color: $color-sirius-white;
+            }
+        }
+
+        tr td {
+            background-color: transparent;
+        }
+
+        th:nth-child(1),
+        td:nth-child(1) {
+            width: 40%;
+        }
+        th:nth-child(2),
+        td:nth-child(2) {
+            width: 11%;
+        }
+        th:nth-child(3),
+        td:nth-child(3) {
+            width: 20%;
+        }
+        th:nth-child(4),
+        td:nth-child(4) {
+            width: 10%;
+        }
+        th:nth-child(5),
+        td:nth-child(5) {
+            width: 9%;
+        }
+        th:nth-child(6),
+        td:nth-child(6) {
+            width: 15%;
+        }
+        th:nth-child(7),
+        td:nth-child(7) {
+            min-width: 30px;
+            text-align: center;
+            input {
+                margin: 0;
+            }
+        }
+    }
+}

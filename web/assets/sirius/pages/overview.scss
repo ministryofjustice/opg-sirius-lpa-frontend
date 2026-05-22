@@ -1,0 +1,197 @@
+/*
+
+    User workload overview
+
+    Provides a tabbed view for cases and a grid of outstanding
+    tasks.
+
+*/
+
+@mixin user-work-overview-border {
+    border: 2px solid $color-sirius-light-blue;
+}
+
+.user-work-overview-border {
+    @include user-work-overview-border;
+}
+
+.user-work-overview {
+    background: $color-app-bg;
+
+    p {
+        padding: $gutter/2;
+    }
+
+    .nav-tabs {
+        li {
+            width: 33.33%;
+            a {
+                @include user-work-overview-border;
+                @include color-tab-unselected;
+                display: block;
+                border-radius: 4px 4px 0 0;
+                padding: 0 $spacer/2;
+                text-transform: uppercase;
+                font-weight: $font-weight-sans-semibold;
+                height: 1.5em;
+            }
+            &.active {
+                a {
+                    @include gradient-blue;
+                }
+            }
+        }
+    }
+
+    .tab-content {
+        @include user-work-overview-border;
+        border-top: none;
+    }
+
+    .list {
+        @include pem(12, 16);
+    }
+
+    // Overflows
+    .cases-tile-view {
+        overflow-y: auto;
+        position: absolute;
+        bottom: 0;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 0 $spacer;
+    }
+
+    // Restyle of ng-grid
+    .ngTopPanel,
+    .ngAggregate {
+        @include gradient-blue-inv;
+        color: #fff;
+        border: none;
+    }
+
+    .ngSortButtonUp,
+    .ngSortButtonDown {
+        border-color: #fff transparent;
+        right: 11px;
+        top: 39%;
+        left: auto;
+        margin: 0;
+    }
+
+    .ngAggArrowExpanded {
+        border-color: transparent transparent #fff;
+    }
+
+    .ngAggArrowCollapsed {
+        border-color: transparent transparent transparent #fff;
+    }
+
+    .ngVerticalBarVisible {
+        background: transparent;
+    }
+
+    // Capitalise case subtypes
+    .ngCell.col3 {
+        text-transform: uppercase;
+    }
+
+    .ngViewport {
+        overflow: hidden;
+
+        // applied for static table header
+//        height: 80% !important;
+        overflow-y: auto;
+        position: absolute;
+
+    }
+
+    // Adjusted widths
+    .ngTopPanel,
+    .ngViewport {
+        width: 100% !important;
+        .ngHeaderContainer,
+        .ngHeaderScroller {
+            width: 100%;
+        }
+    }
+
+    .ngHeaderText {
+        border-right: 1px solid $color-sirius-light-blue;
+    }
+
+    .ngSorted .ngHeaderText {
+        padding-right: 25px;
+    }
+
+    .ngCanvas,
+    .ngRow {
+        width: 100% !important;
+    }
+
+    // Priority icons
+    .priority {
+        text-align: center;
+        b {
+            border-radius: 3px;
+            background: grey;
+            color: #fff;
+            font-weight: 200;
+            text-align: center;
+            display: inline-block;
+            width: 1.5em;
+            margin-top: 6px;
+        }
+
+        &.high b {
+            @include gradient-rag-high;
+        }
+
+        &.medium b {
+            @include gradient-rag-medium;
+        }
+
+        &.low b {
+            @include gradient-rag-low;
+        }
+
+    }
+
+    .ngSortPriority {
+        display: none;
+    }
+
+}
+
+.ngHeaderSortColumn {
+    height: 30px;
+    &:hover {
+        @include gradient-blue;
+    }
+}
+
+.task-list-tab {
+    .clear-sort {
+        @include button-styling;
+        float: right;
+        margin: 10px 10px 0 10px;
+        font-size: $govuk-font-size;
+        padding: 4px;
+    }
+}
+
+.case-list-tab {
+    .clear-sort {
+        @include button-styling;
+        float: right;
+        margin: 10px 10px 0 10px;
+        font-size: $govuk-font-size;
+        padding: 4px;
+    }
+}
+
+.case-message,
+.task-message {
+    clear: both;
+}
