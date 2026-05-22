@@ -1,0 +1,70 @@
+.form-field.add-item {
+
+    span {
+        float: left;
+        display: block;
+        line-height: 21px;
+
+        &.item-type {
+            @include aw-columns(1.80);
+        }
+
+        &.item-amount {
+            @include aw-columns(1.05);
+            margin-left: $spacer;
+        }
+
+        &.item-date {
+            @include aw-columns(0.69);
+            margin-left: $spacer;
+        }
+    }
+
+    .bold {
+      font-weight: $font-weight-sans-semibold;
+    }
+
+    input[type="text"] {
+        float: left;
+        display: block;
+        &.type {
+            @include aw-columns(1.75);
+        }
+        &.amount {
+            @include aw-columns(1.00);
+            margin-left: $spacer;
+        }
+        &.date {
+            margin-left: $spacer;
+        }
+    }
+
+    a {
+        float: left;
+    }
+
+    .remove {
+        &.hasDate {
+            margin-left: 30px;
+        }
+    }
+
+    .add {
+        &.hasDate {
+            margin-left: 30px;
+        }
+    }
+
+    .remove-icon {
+        color: #E80F29;
+    }
+
+    .ui-datepicker-trigger {
+        display: none;
+    }
+
+    .remove-icon,
+    .add-icon {
+        font-size: 1.8em;
+    }
+}

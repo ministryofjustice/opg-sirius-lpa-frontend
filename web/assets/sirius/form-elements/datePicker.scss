@@ -1,0 +1,200 @@
+input.hasDatepicker,
+.action-widget input.hasDatepicker,
+.action-widget .tab-pane .content input.hasDatepicker {
+    width: 100px !important;
+}
+
+.ui-datepicker-header,
+.ui-datepicker-calendar {
+    line-height: 1em;
+    padding: 5px 19px;
+    background: $color-element-bg;
+    @include form-el-border;
+}
+
+.ui-datepicker-trigger,
+.ui-icon {
+    @include opg-icon;
+}
+
+.ui-widget-content {
+    border: none;
+}
+
+// Reset the button to have an invisible background
+.ui-datepicker-trigger {
+
+    background:  none;
+    border: none;
+    display: inline-block;
+    height: 30px;
+    line-height: 2em;
+    min-width: 1px;
+    margin-left: 5px;
+    margin-top: -3px;
+    padding: 0 0 32px;
+    text-align: center;
+    vertical-align: top;
+    width: 22px;
+    position: relative;
+    z-index: 1;
+    transition: all 0.25s;
+
+    &:active,
+    &:hover {
+        background: none;
+        border: none;
+    }
+    &[disabled=disabled] {
+        cursor: default;
+    }
+    &.calendar-open {
+        background: none;
+        transition: all 0.25s;
+    }
+    &.below {
+        border-radius: 5px 5px 0 0;
+    }
+    &.above {
+        border-radius: 0 0 5px 5px;
+    }
+}
+
+// Helper class to apply button styles to calendar buttons
+@mixin calendar-button {
+
+    @include gradient-grey;
+    border: 1px solid $color-sirius-dark-grey;
+    border-radius: 50%;
+    color: $color-font;
+    display: inline-block;
+    height: 19px;
+    width:  19px;
+    text-align: center;
+    vertical-align: middle;
+
+    &:active {
+        @include gradient-grey-inv;
+        .disabled & {
+            @include gradient-grey;
+        }
+    }
+
+    &:hover {
+        border-color: $color-sirius-blue;
+    }
+
+    .ui-icon {
+        @include pem(9,12);
+        font-weight: normal;
+        line-height: 2em;
+        margin-left: -2px; // arrow alignment
+
+        // Prevent ligatures from being selected
+        &::selection {
+            background: none; /* Safari */
+        }
+        &::-moz-selection {
+            background: none; /* Firefox */
+        }
+    }
+}
+
+.calendar-button {
+    @include calendar-button;
+}
+
+.ui-datepicker-header {
+    border-radius: 5px 5px 0 0;
+    .ui-datepicker-prev {
+        @include calendar-button;
+        float: left;
+    }
+    .ui-datepicker-next {
+        @include calendar-button;
+        .ui-icon {
+            margin-right: -2px;
+        }
+        float: right;
+    }
+    .ui-datepicker-title {
+        text-align: center;
+        text-transform: uppercase;
+        font-weight: bold;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+}
+
+@mixin date-box-styles {
+    height: 20px;
+    min-width: 20px;
+    padding: 2px;
+    vertical-align: bottom;
+}
+
+.date-box-styles {
+    @include date-box-styles;
+}
+
+.ui-datepicker-calendar {
+    border-radius: 0 0 5px 5px;
+    border-top: none;
+    padding-bottom: 10px;
+    padding-top: 0;
+    th {
+        font-weight: normal;
+        @include date-box-styles;
+        padding-bottom: 0.5em;
+    }
+    td {
+        @include date-box-styles;
+        text-align: right;
+        border: 1px solid $color-font;
+        text-align: right;
+
+        &.ui-datepicker-current-day,
+        &.ui-datepicker-current-day:hover,
+        &.ui-datepicker-today:hover,
+        &:hover {
+            background: $color-sirius-light-blue;
+            cursor: pointer;
+            a {
+                color: $color-sirius-white;
+                background: none;
+            }
+        }
+
+        &.ui-datepicker-today {
+            background: none;
+            border: 2px solid $color-sirius-light-blue;
+            a {
+                color: $color-font;
+            }
+        }
+
+        &.ui-datepicker-current-day {
+            @include date-picker-today;
+        }
+        &.ui-datepicker-unselectable {
+            border: 1px solid $color-sirius-white;
+            background: none;
+            opacity: 0.1;
+            &:hover {
+                cursor: default;
+            }
+        }
+    }
+
+    .ui-state-hover {
+        border: none;
+    }
+}
+
+.ui-datepicker-trigger {
+    padding-bottom: 1.5em;
+}
+
+.ui-datepicker {
+    z-index: 10 !important;
+}

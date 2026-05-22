@@ -1,0 +1,70 @@
+
+@mixin opg-auto-complete {
+
+    position: relative;
+
+    i:before {
+        font-family: "opg-icons" !important;
+        content: "\e606" !important;
+        color: $color-form-border;
+        font-style: normal !important;
+    }
+
+    i {
+        float: left;
+        margin-bottom: -2.5em;
+        position: relative;
+        padding: $spacer/2;
+    }
+
+    input[type="search"] {
+        padding-left: 2em;
+        font-size: 1em;
+        background-color: $color-element-bg;
+        color: $color-font;
+
+        // For width styling inline with other input elements
+        // we use border-box sizing to include padding within
+        // width
+        -moz-box-sizing:    border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing:        border-box;
+    }
+
+    ::-webkit-input-placeholder {
+        color: $color-form-border;
+    }
+
+    ::-moz-placeholder {
+        color: $color-form-border;
+    }
+
+    :-ms-input-placeholder {
+        color: $color-form-border;
+    }
+
+    .ui-helper-hidden-accessible {
+        @include accessible-text;
+    }
+
+}
+
+.opg-auto-complete {
+    @include opg-auto-complete;
+}
+
+.action-widget .tab-pane .auto-complete {
+    @include opg-auto-complete;
+}
+
+ul.ui-autocomplete {
+    position: fixed;
+    max-height: 300px;
+    overflow-y: auto;
+
+    .ui-state-focus {
+        width: auto;
+        cursor: pointer;
+        border-width: 1px 0;
+    }
+}

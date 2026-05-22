@@ -1,0 +1,15 @@
+.createanlpa .applicantAttorney {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.createanlpa .applicantAttorney label, .createanlpa .applicantAttorney legend {
+    width: 100% !important;
+}
+
+.applicant-signature-date label {
+    float: left;
+    width: 46.75%;
+    margin-right: 2.75%;
+}

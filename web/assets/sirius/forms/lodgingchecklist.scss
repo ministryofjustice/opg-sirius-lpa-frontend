@@ -1,0 +1,47 @@
+.action-widget-content .lodgingchecklist {
+
+  textarea {
+    @include aw-columns(2);
+    height: 40px;
+  }
+
+  fieldset.overallSpending {
+      legend {
+        @include aw-columns(1.75);
+      }
+  }
+
+  input[type="text"] {
+     &.assets {
+        @include aw-columns(1.25);
+        margin-left: $spacer*2;
+     }
+  }
+
+  .bond,
+  .accountsTally,
+  .accountsBalance,
+  .deputySpendingSubLabel,
+  .assetsAndClosingBalances,
+  .satisfactoryDetailsProvidedLabel{
+      b {
+          font-weight: $font-weight-sans-semibold;
+      }
+  }
+
+  .form-field {
+      b,
+      legend {
+        @include aw-columns(1.75);
+      }
+  }
+
+  .form-field-radio label {
+      width: 10%;
+  }
+
+  .action-widget-button .opg-icon {
+    font-size: 3em;
+    line-height: 53px;
+  }
+}

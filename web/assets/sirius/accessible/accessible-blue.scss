@@ -1,0 +1,111 @@
+button,
+input,
+textarea,
+.task-list-tab .clear-sort,
+.case-list-tab .clear-sort,
+.action-widget .tab-pane .auto-complete input[type="search"],
+.ui-autocomplete,
+.pagination a {
+    color: #fff;
+    border-color: #fff;
+    background-color: $color-sirius-blue;
+    background-image: none !important;
+}
+
+button:hover {
+    background-color: $color-sirius-light-blue;
+}
+
+.timeline-event {
+    background-color: $color-sirius-blue;
+    color: #fff;
+
+    header h2 {
+        background: $color-sirius-light-blue;
+        color: #fff;
+    }
+}
+
+.timeline-container {
+    .tasks-list,
+    .case-summary {
+        background-color: $color-sirius-blue;
+        color: #fff;
+
+        a,
+        .timestamp {
+            color: #fff;
+        }
+
+        .icon-button .opg-icon {
+            background: $color-sirius-blue;
+            color: #fff;
+            border-color: #fff;
+        }
+    }
+}
+
+.card-face {
+    background-color: lighten($color-sirius-blue, 5%) !important;
+    a {
+        color: #fff;
+    }
+}
+
+.person-panel {
+    background: $color-sirius-blue;
+    color: #fff;
+
+    .case-tile-container .card-wrapper {
+        .case-tile-tasks dt,
+        .card-face.case > a,
+        .case-tile-info-title a,
+        .case-tile-people-title a {
+            background: $color-sirius-blue;
+            color: #fff;
+        }
+    }
+}
+
+.search-form-dropdown,
+.search-form-dropdown .show-all {
+    background: $color-sirius-blue;
+    color: #fff;
+
+    a {
+        color: #fff;
+    }
+}
+
+.document-table table {
+    th {
+        background: $color-sirius-blue;
+    }
+
+    tr:nth-child(1n) {
+        border-bottom: 1px solid #fff;
+
+        td,
+        a {
+            background: $color-sirius-blue;
+            color: #fff;
+        }
+    }
+
+    tr:nth-child(even) {
+        td,
+        a {
+            background: $color-sirius-light-blue;
+        }
+    }
+}
+.dropdown .dropdown-menu {
+    background-color: $color-sirius-blue;
+    li a {
+        color: #fff;
+        &:hover {
+            color: #fff;
+            background-color: $color-sirius-light-blue;
+        }
+    }
+}

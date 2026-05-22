@@ -1,0 +1,37 @@
+.action-widget-content .crec {
+
+  .form-field legend {
+      @include aw-columns(2.3);
+  }
+
+  .form-field label {
+      margin-right: -2% !important;
+      @include aw-columns(.75);
+  }
+
+  .action-widget-button .opg-icon {
+      font-size: 3em;
+      line-height: 53px;
+  }
+
+  .step-num {
+      width: 7em !important;
+  }
+
+  label input {
+      width: 22.375%;
+  }
+
+  .firstname,
+  .lastname,
+  .casrecId{
+      b {
+        margin-right: -75px;
+      }
+  }
+
+  textarea {
+      width: 98.7%;
+  }
+
+}
