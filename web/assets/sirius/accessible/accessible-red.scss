@@ -1,0 +1,41 @@
+$color-accessible-red-highlight: lighten($color-accessible-red, 15%);
+$color-req-field-invalid-border: $color-sirius-blue;
+
+.timeline-container {
+    .tasks-list,
+    .case-summary {
+        background-color: $color-accessible-red;
+
+        .icon-button .opg-icon {
+            background: $color-accessible-red;
+        }
+    }
+}
+
+.person-panel,
+.action-widget-content {
+    background-color: $color-accessible-red;
+}
+
+.timeline-event {
+    background-color: $color-accessible-red;
+
+    a {
+        font-weight: 900;
+        text-decoration: underline;
+        color: $color-sirius-black;
+    }
+}
+
+.card-face,
+.case-tile-info-title,
+.case-tile-people-title {
+    > a {
+        background-color: $color-accessible-red-highlight !important;
+    }
+}
+
+.person-info,
+.card-face {
+        background-color: $color-accessible-red-highlight !important;
+}

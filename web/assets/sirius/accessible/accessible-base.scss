@@ -1,0 +1,249 @@
+html {
+    font-family: 'Trebuchet MS', sans-serif !important;
+    font-size: 20px;
+}
+
+button {
+    font-family: 'Trebuchet MS', sans-serif;
+    &:hover {
+        color: $color-sirius-light-grey;
+    }
+}
+
+.app-wrapper {
+    .layout-home .layout-wrapper,
+    .layout-document .layout-wrapper {
+        top: 130px;
+    }
+    .layout-person {
+        .layout-wrapper .layout-content {
+            margin-top: 330px;
+        }
+    }
+}
+
+.person-panel {
+    box-shadow: none;
+    border-bottom: $spacer/2 solid $color-sirius-black;
+
+    .case-tile-group {
+        height: 160px;
+    }
+
+    .case-tile-container {
+
+        .card-wrapper {
+            width: 184px;
+
+            .card-face {
+                width: 184px;
+                height: 150px;
+
+                h3 {
+                    font-size: 1.05em;
+                }
+
+                &.case > a {
+                    min-height: 98px;
+                }
+            }
+        }
+
+        &.detailed {
+            .case-tile-info-container {
+                width: 176px;
+            }
+            .card-wrapper .card-face.back {
+                height: 150px;
+            }
+        }
+    }
+}
+
+.action-widget {
+    .action-widget-content {
+        top: 110px;
+
+        .form-field legend,
+        label b {
+            font-weight: 900;
+        }
+    }
+    .action-widget-buttons {
+        margin-top: 1em;
+        li {
+            width: 95%;
+            min-height: 2em;
+            font-size: 1.3em;
+            text-align: left;
+            text-transform: none;
+        }
+    }
+    .action-widget-button {
+        display: none;
+    }
+}
+
+.action-widget-expand-collapse {
+    .title {
+        margin-top: 0;
+    }
+}
+
+.page-person .action-widget {
+    top: 330px;
+}
+
+.timeline-container {
+    .summary-container {
+        float: left;
+        width: 48%;
+        margin-top: 3em;
+    }
+    .case-summary,
+    .tasks-list {
+        float: none;
+        display: block;
+        width: 100%;
+        margin-bottom: $gutter;
+    }
+    .timeline-facets,
+    .timeline {
+        float: right;
+        clear: none;
+        width: 46.5%;
+        top: 0;
+    }
+    .timeline {
+        background: none !important;
+        margin: 0 !important;
+        padding-top: $gutter;
+        width: 48%;
+
+        .timeline-event {
+            float: none;
+            box-shadow: none !important;
+            width: auto;
+            margin-bottom: 1em;
+            margin-top: 0;
+
+            &:before,
+            &:after {
+                top: -9999px;
+            }
+        }
+    }
+    .timeline-facets {
+        label {
+            font-size: 1.2em;
+            line-height: 1.6em;
+        }
+        button {
+            font-size: 1.2em;
+            padding: 4px;
+        }
+    }
+}
+
+.min-view {
+    .timeline-container {
+        margin-left: 0;
+        margin-top: 3em;
+    }
+}
+
+#timeline-filter {
+    font-size: 1.2em;
+}
+
+.layout-home,
+.layout-person,
+.layout-document {
+    .search-form {
+        font-size: 1em;
+        height: 32px;
+        width: 500px;
+        input {
+            width: 465px;
+            line-height: 1.4em;
+        }
+    }
+
+    .search-form-dropdown {
+        top: 78px;
+        max-height: 550px;
+        width: 500px;
+        ul {
+            overflow: auto;
+            height: 532px;
+            width: 98%;
+        }
+    }
+}
+
+
+.layout-home,
+.layout-document {
+    .search-form,
+    .old-search-form {
+        top: 42px;
+        z-index: 10;
+        right: 240px;
+        left: auto;
+    }
+    .search-form-dropdown {
+        max-height: 700px;
+        ul {
+            height: 652px;
+        }
+    }
+}
+
+.dropdown {
+    .case-info {
+        dt {
+            float: none;
+        }
+        dd {
+            float: none;
+            margin-left: 3em;
+        }
+    }
+    .dropdown-toggle {
+        font-size: 1em;
+    }
+    .dropdown-menu {
+        li a {
+            font-size: 1em;
+            font-weight: 900;
+        }
+    }
+    .document-list table td {
+        font-size: 1.1em;
+        font-weight: 900;
+    }
+}
+
+.person-info {
+    .type {
+        font-weight: bold;
+    }
+}
+
+.doc-viewer header {
+    padding: 0.3em 6px;
+}
+
+
+.search-results-container .search-result {
+    dt {
+        float: left;
+        clear: left;
+    }
+    dd {
+        display: block;
+    }
+    div {
+        clear: both;
+    }
+}

@@ -1,0 +1,34 @@
+// Icons
+@mixin iconPadding {
+    padding-left: 25px;
+}
+
+.iconPadding {
+    @include iconPadding;
+}
+
+@mixin pdf-icon {
+    @include iconPadding;
+    background: url(/lpa/build/img/pdf-icon.png) no-repeat top left;
+}
+
+.pdf-icon {
+    @include pdf-icon;
+}
+
+@mixin doc-icon {
+    @include iconPadding;
+    background: url(/lpa/build/img/doc-icon.png) no-repeat top left;
+}
+
+.doc-icon {
+    @include doc-icon;
+}
+
+.correspondence a {
+    @include pdf-icon;
+}
+
+.document a {
+    @include doc-icon;
+}
