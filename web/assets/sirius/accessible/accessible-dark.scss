@@ -1,0 +1,49 @@
+
+.person-panel {
+    .case-tile-container {
+        .card-wrapper {
+            a {
+                color: $color-sirius-white !important;
+            }
+        }
+    }
+}
+
+.layout-home,
+.layout-person,
+.layout-document {
+    .search-form {
+        border-color: $color-sirius-white;
+    }
+}
+
+.dropdown {
+    .dropdown-menu {
+        background-color: $color-app-bg;
+        border-color: $color-sirius-white;
+        li a {
+            background-color: $color-app-bg;
+            color: $color-sirius-white;
+
+            &:hover {
+                background-color: $color-sirius-white;
+                color: $color-app-bg;
+            }
+        }
+    }
+}
+
+.pagination {
+    a {
+        background-color: $color-sirius-white;
+        color: $color-sirius-black;
+        &:hover {
+            background-color: $color-sirius-black;
+            color: $color-sirius-white;
+        }
+    }
+    span {
+        background-color: $color-sirius-black;
+        color: $color-sirius-white;
+    }
+}

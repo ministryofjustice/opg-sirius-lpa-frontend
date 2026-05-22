@@ -1,0 +1,31 @@
+
+.action-widget-content {
+    .recipients label {
+        @include aw-columns(3);
+        float: right;
+    }
+
+    .new-recipient {
+        padding-right: 0;
+
+        .dropdown,
+        input {
+            @include aw-columns(1);
+        }
+    }
+
+    .inserts {
+        .checkboxselect .fields {
+            max-height: 175px;
+        }
+        b {
+            float: none;
+        }
+    }
+
+    .single-line-address {
+        margin-bottom: .5em;
+        margin-left: 21px;
+        color: $color-sirius-dark-grey;
+    }
+}

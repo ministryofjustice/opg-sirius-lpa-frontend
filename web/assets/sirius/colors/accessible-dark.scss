@@ -1,0 +1,53 @@
+// Gradients
+@mixin gradient-blue {
+    background: $color-sirius-blue;
+    color: #fff;
+}
+
+@mixin gradient-blue-inv {
+    background: $color-sirius-light-blue;
+    color: #fff;
+}
+
+@mixin gradient-rag-high {
+    background: $color-rag-high;
+}
+
+@mixin gradient-rag-medium {
+    background: $color-rag-medium;
+}
+
+@mixin gradient-rag-low {
+    background: $color-rag-low;
+}
+
+@mixin gradient-rag-high-vertical {
+    background: $color-rag-high;
+}
+
+@mixin gradient-rag-medium-vertical {
+    background: $color-rag-medium;
+}
+
+@mixin gradient-rag-low-vertical {
+    background: $color-rag-low;
+}
+
+@mixin gradient-grey {
+    background: $color-app-bg;
+}
+
+@mixin gradient-grey-left-to-right {
+    background: $color-sirius-dark-grey;
+}
+
+@mixin gradient-grey-inv {
+    background: $color-sirius-black;
+}
+
+@mixin gradient-grey-inv-dark {
+    background: $color-sirius-black;
+}
+
+$color-sirius-white: #ddd;
+

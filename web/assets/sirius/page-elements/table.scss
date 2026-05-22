@@ -1,0 +1,65 @@
+// Stylised tables within the application
+@mixin table-list {
+
+    border-collapse: collapse;
+    border-spacing: 0;
+    text-align: left;
+    width: 100%;
+    @include pem(12, $base-size);
+
+    th {
+
+        @include gradient-blue;
+        color: $color-table-header;
+        font-weight: $font-weight-sans-semibold;
+        padding: $table-cell-padding;
+        min-height: 21px;
+        position: relative;
+
+        a {
+            color: $color-table-header;
+        }
+    }
+
+    td {
+        padding: $table-cell-padding;
+        color: $color-table-cell;
+        a {
+            color: $color-table-cell-link;
+        }
+    }
+
+    tr:nth-child(even) {
+        td {
+            background: $color-table-zebra;
+            color: $color-font;
+        }
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    // Sort button icon
+    .sortButton {
+        border-style: solid;
+        height: 0;
+        position: absolute;
+        width: 0;
+        left: auto;
+        margin: 0;
+        top: 39%;
+        &.up {
+            border-width: 5px 5px 0;
+            border-color: $color-table-header transparent;
+        }
+        &.down {
+            border-width: 0 5px 5px;
+            border-color: $color-table-header transparent;
+        }
+    }
+}
+
+.table-list {
+    @include table-list;
+}
