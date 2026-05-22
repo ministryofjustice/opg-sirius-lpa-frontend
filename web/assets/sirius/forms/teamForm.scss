@@ -1,0 +1,46 @@
+#teamForm {
+
+    label,
+    .team-members {
+        b {
+            @include aw-columns(1.5);
+            font-weight: normal;
+        }
+    }
+
+    input[type="text"],
+    input[type="search"],
+    .team-members ul {
+        @include aw-columns(2.5);
+        margin-right: 0;
+    }
+
+    // Unique field styling
+    .team-members {
+
+        @include action-widget-zebra;
+        margin-bottom: $spacer;
+
+        ul {
+            @include form-el-border;
+            border-radius: $form-el-border-radius;
+            height: 108px;
+            overflow-y: auto;
+        }
+
+        li {
+            padding: $spacer/2;
+            padding-bottom: 0;
+            &:hover {
+                background: $color-sirius-blue;
+                color: $color-sirius-white;
+            }
+        }
+
+    }
+
+    .add-user {
+        text-align: right;
+    }
+
+}

@@ -1,0 +1,141 @@
+/*
+ * OPG Core
+ * Layout Styles
+ *
+ * Author:      Transform
+ * Author URI:  http://www.transformuk.com/
+ *
+ * Description:
+ * Main Page Layout
+ *
+ */
+
+// -------------------------------------------
+// Variables and mixins
+// -------------------------------------------
+
+//header is fixed so used as margin at top of everything else
+$header-height: $page-header-bar-height + $page-header-bar-secondary-height + $gutter;
+
+@mixin layout-transition {
+    transition: all 0.5s ease;
+}
+
+.layout-transition {
+    @include layout-transition;
+}
+
+// A scrollable page with a fixed aside
+@mixin layout-scrollable {
+    margin-right: ($col-width*6)+($column-padding*5)+$gutter+$gutter;
+    &.full-view {
+        margin-right: $gutter;
+    }
+    &.min-view {
+        margin-right: 830px;
+    }
+    &.search {
+        margin: 0;
+    }
+
+    .layout-content {
+        margin: 0 0 0 $gutter;
+    }
+
+}
+
+.layout-scrollable {
+    @include layout-scrollable;
+}
+
+// Page that doesn't scroll, elements have an overflow
+@mixin layout-fixed {
+    bottom: $vertical-spacing;
+    left: 0;
+    margin-top: 0;
+    position: fixed;
+    right: ($col-width*6)+($column-padding*6)+$gutter;
+    top: $header-height;
+    transition: all 0.5s;
+    &.full-view {
+        right: $gutter;
+    }
+    &.min-view {
+        margin-right: 388px;
+    }
+
+    .layout-content {
+        -moz-box-sizing: border-box;
+        min-height: 375px;
+        position: absolute;
+        bottom: 1.2em;
+        left: 0;
+        right: 0;
+        top: 0;
+    }
+}
+
+.layout-fixed {
+    @include layout-fixed;
+}
+
+// -------------------------------------------
+// Application
+// -------------------------------------------
+
+html {
+    display: block !important;
+}
+
+body {
+    background: $color-app-bg;
+    color: $color-font;
+    overflow-y: auto;
+    min-width: 1245px;
+}
+
+.action-widget {
+    @include cols(6);
+    &.hidden {
+        right: -($layout-aside-width + 4px) !important;
+    }
+    &.hidden-add,
+    &.expand-add,
+    &.hidden-remove,
+    &.expand-remove {
+        @include layout-transition;
+    }
+}
+
+
+/* Scroll Page */
+.app-wrapper {
+    .layout-person {
+        .layout-wrapper {
+            @include layout-scrollable;
+        }
+    }
+}
+
+/* Fixed Page */
+.app-wrapper {
+    .layout-home,
+    .layout-document {
+        .layout-wrapper {
+            @include layout-fixed;
+        }
+    }
+}
+
+// Timeline overide
+.app-wrapper .layout-person .layout-wrapper {
+    .layout-content {
+        margin-top: $header-height + $person-panel-height + ($vertical-spacing * 4);
+    }
+}
+
+// Home overide
+.app-wrapper .layout-home .layout-wrapper .layout-content {
+    left: $gutter;
+}
+

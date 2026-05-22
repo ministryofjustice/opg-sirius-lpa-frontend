@@ -1,0 +1,114 @@
+.modal-backdrop {
+    background: $color-sirius-black;
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    transition: opacity 0.3s linear;
+
+    &.in {
+        opacity: 0.6;
+    }
+}
+.modal {
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    transition: opacity 0.3s linear;
+    .modal-dialog {
+        background: $color-element-bg;
+        border: 1px solid $color-sirius-blue;
+        border-radius: 5px;
+        box-shadow: -4px 4px 5px 0 rgba(0, 0, 0, 0.75);
+        display: block;
+        margin: 0 auto;
+        width: 350px;
+        transition: margin 0.3s linear;
+        h1 {
+            @include gradient-blue;
+            @include pem(14);
+            border-radius: 5px 5px 0 0;
+            font-weight: normal;
+            text-transform: uppercase;
+            padding: 0.4em;
+        }
+        h2 {
+            @include pem(14);
+            font-weight: normal;
+            opacity: 0.8;
+            text-transform: none;
+            &:before {
+                background-color: #FFBE46;
+                border: 1px solid $color-sirius-black;
+                border-radius: 1em;
+                color: $color-sirius-black;
+                content: '?';
+                float: left;
+                font-size: 2em;
+                font-weight: 500;
+                height: 1.5em;
+                margin-right: 10px;
+                text-align: center;
+                width: 1.5em;
+            }
+        }
+        .modal-body {
+            padding: $gutter;
+            p {
+                @include pem(12);
+                background-color: $color-action-widget-bg;
+                border: 1px solid $color-modal-inner-border;
+                color: $color-font;
+                margin-bottom: 0;
+                padding: 0.5em 1em;
+
+                &.modal-warning {
+                    background: $error-text-overview-background;
+                    color: $error-text-overview-color;
+                    border: 1px solid $error-text-overview-color;
+                }
+
+                & + p {
+                    margin-top: 1em;
+                }
+            }
+        }
+        .modal-footer {
+            padding: 0 $gutter $gutter;
+            text-align: right;
+            button {
+                margin-left: 0.5em;
+            }
+        }
+    }
+
+    &.in {
+        opacity: 1;
+
+        .modal-dialog {
+            margin-top: 100px;
+        }
+    }
+}
+
+.remove-warning-modal {
+    padding: 25px;
+
+    ul {
+        margin: 1em 0;
+    }
+
+    button {
+        margin-right: 0.5em !important;
+    }
+
+    &::backdrop {
+        background: $color-sirius-black;
+        opacity: 0.6;
+    }
+}
