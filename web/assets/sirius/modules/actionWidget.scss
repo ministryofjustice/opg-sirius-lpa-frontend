@@ -1,0 +1,488 @@
+// OPG Core Action Widget styles
+
+$aw-border-width: 3px;
+
+// ----------------------------------------------
+// Mixins
+// ----------------------------------------------
+.aw-tab {
+    @include pem(50);
+    color: $color-action-widget-tab-icon;
+}
+
+@mixin aw-column-negative-margin-right($numberCols){
+    margin-right: -($numberCols * 22%) + (2.75% * ($numberCols - 1));
+}
+
+@mixin aw-columns-margin-left($numberCols){
+    margin-left: ($numberCols * 22%) + (2.75% * ($numberCols - 1)) + 2.75%;
+}
+
+@mixin aw-columns($numberCols){
+    width: ($numberCols * 22%) + (2.75% * ($numberCols - 1));
+    margin-right: 2.75%;
+    float: left;
+}
+
+// ----------------------------------------------
+// Widget styling
+// ----------------------------------------------
+.action-widget {
+
+    // Coloring
+    background: $color-action-widget-bg;
+    border-color: $color-sirius-light-blue;
+    position: fixed;
+    top: 89px;
+    bottom: 0;
+    right: $gutter;
+    width: 400px;
+    height: auto;
+    transition: .5s all;
+
+    &.expand {
+        width: 800px;
+    }
+
+
+    // Typography
+    h2 {
+        @include gradient-blue;
+        @include pem(14, 16);
+        line-height: 1.75em;
+        font-weight: $font-weight-for-bold;
+        border: none;
+        margin-bottom: 0px;
+    }
+
+    button {
+        margin-left: $spacer;
+        font-size: 1em;
+    }
+
+    .form-navigation {
+        text-align: right;
+        padding: 0 $spacer $spacer 0;
+        clear: both;
+    }
+
+    .filters-btn-group {
+        button {
+            margin-left: 0;
+            border-radius: 0;
+
+            &.active {
+                @include gradient-grey-inv;
+                position: relative;
+                z-index: 99;
+            }
+
+            &:first-child {
+                border-top-left-radius: 5px;
+                border-bottom-left-radius: 5px;
+            }
+
+            &:last-child {
+                border-top-right-radius: 5px;
+                border-bottom-right-radius: 5px;
+            }
+        }
+    }
+
+    .nav {
+        border-color: $color-sirius-light-blue;
+    }
+
+    .nav-tabs > li {
+        width: 20%;
+        margin: 0 6.66% 0 0;
+        a {
+            font-size: 3em;
+        }
+    }
+
+    .nav-tabs a:hover,
+    .nav-tabs > .active > a,
+    .nav-tabs > .active > a:hover,
+    .nav-tabs > .active > a:focus {
+        color: $color-action-widget-nav-icon;
+        background-color: $color-sirius-light-blue;
+    }
+
+    .error-message-overview {
+        font-size: 1em;
+    }
+
+    // Error heading within action-widget
+    .loading-msg.error {
+        @include error-message-text;
+        @include error-message-header-layout;
+        span {
+            @include error-message-header-text;
+        }
+        font-size: 1em;
+    }
+
+    // ActionWidget label
+    label {
+        b {
+            @include label;
+            font-weight: normal;
+            padding-top: 3px; // align with inputs
+        }
+    }
+
+    fieldset.error,
+    label.error {
+        @include error-message-inline-message;
+        margin-left: -$spacer/2 !important;
+    }
+
+    .action-widget-content {
+        top: 92px;
+        padding: 11px 1px 11px 11px;
+        @include pem(12, 16);
+        border-radius: 0 0 $aw-border-width $aw-border-width;
+    }
+
+    .action-widget-embed {
+        overflow: hidden !important;
+        padding: 0 !important;
+    }
+
+    iframe {
+        height: 100%;
+        width: 100%;
+        border: none;
+    }
+}
+
+// Expand and collapse
+.action-widget-expand-collapse {
+    @include pem(50);
+    @include gradient-grey-left-to-right;
+    @include drop-shadow-to-left;
+    .title {
+        font-size: .25em;
+    }
+    .icon {
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 4px 0 4px 6px;
+        border-color: transparent transparent transparent $color-sirius-blue;
+        display: inline-block;
+        position: relative;
+        top: -39px;
+        left: 5px;
+    }
+}
+
+.hidden .action-widget-expand-collapse {
+    .icon {
+        border-width: 4px 6px 4px 0;
+        border-color: transparent $color-sirius-blue transparent transparent;
+    }
+}
+
+// Buttons
+.action-widget-buttons {
+    font-weight: $font-weight-sans-bold;
+    text-transform: uppercase;
+    li {
+        min-height: 12em;
+        text-align: center;
+        @include aw-columns(1);
+        a {
+            color: $color-link-aw;
+        }
+    }
+}
+
+.action-widget-button {
+    @include round-button-grad;
+    transition: .5s all;
+    .opg-icon {
+        @include pem(54, 12);
+        line-height: 1;
+    }
+
+    .opg-icon {
+        @include opg-icon;
+    }
+}
+
+.action-widget-back {
+    background-image: url("/lpa/build/img/aw-back-icon.svg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    @include pem(14, 16);
+}
+
+// Messaging
+.action-widget-messaging {
+    font-weight: bold;
+    margin-bottom: 1em;
+    text-transform: uppercase;
+}
+
+//------------------------------------------
+// Unique element styles
+//------------------------------------------
+#actionUserAdministration {
+    margin-left: .115em;
+}
+
+// Action widget button and font file adjustments
+#UnlinkRecord .opg-icon {
+    font-size: 1.5em;
+    line-height: 3.15;
+}
+
+.action-widget-messaging-cases {
+    dd {
+        background-color: $color-sirius-white;
+        border: 2px solid $color-sirius-black;
+        color: $color-sirius-black;
+        border-radius: 12px;
+        display: block;
+        height: 1.5em;
+        margin-right: 0.4em;
+        text-align: center;
+        width: 1.5em;
+    }
+    dt {
+        color: $color-font;
+        line-height: 1.8em;
+    }
+}
+
+// $todo rename this class to more relevant
+.action-widget-state-buttons {
+    float: right;
+    margin-right: 12px;
+    margin-top: 1em;
+    padding-bottom: 12px;
+    button {
+        margin-left: 0.5em;
+        width: 100px;
+    }
+    .create-user {
+        width: 9em;
+    }
+    .cancel {
+        margin-right: 16px;
+    }
+}
+
+.selectedCases,
+.selectedTasks {
+    @include gradient-blue-inv;
+    left: -11px;
+    top: -11px;
+    margin: 0 -12px 1em 0;
+    padding: 0.4em 0;
+    position: relative;
+    text-align: center;
+}
+
+.selectedCases {
+    max-height: 20em;
+    overflow-y: auto;
+}
+
+@mixin action-widget-zebra {
+    background: $color-zebra-odd;
+    padding: $spacer;
+    margin-left: -$spacer;
+    overflow: auto;
+}
+
+.action-widget-zebra {
+    @include action-widget-zebra;
+}
+
+// Notification of form completion
+.notification {
+    background-color: $color-new-event-bg;
+    border-bottom: 1px solid $color-new-event-border;
+    box-shadow: 0px 0px 17px 4px $color-new-event-glow;
+    color: $color-sirius-black;
+    margin: -$spacer 0 $spacer (-$spacer);
+
+    a {
+        color: $color-sirius-black;
+        text-decoration: underline;
+        &:hover {
+            text-decoration: none;
+        }
+    }
+
+    .close {
+        background: url(/lpa/build/img/aw-notification-close-icon.svg) center center no-repeat;
+    }
+}
+
+// ----------------------------------------------
+// Widget forms
+// ----------------------------------------------
+
+// Form field layout
+.action-widget-content {
+
+    .form-field {
+        clear: left;
+    }
+
+    .pull-left {
+        float: left;
+    }
+
+    label {
+        width: 100%;
+        &.error span.error {
+            @include aw-columns-margin-left(1);
+        }
+    }
+
+    fieldset.error p.error {
+        @include aw-columns-margin-left(1);
+    }
+
+    .form-field {
+        float: left;
+        box-sizing: border-box;
+        margin-bottom: 1em !important;
+        padding-right: $spacer;
+        width: 100%;
+    }
+
+    label b,
+    .form-field legend,
+    .form-field-radio label,
+    .form-field-checkbox label {
+        @include aw-columns(1);
+    }
+
+    label.form-field-block {
+        display: block;
+        float: none;
+        width: 100%;
+    }
+
+    input[type=button]
+    button {
+        @include aw-columns(1);
+    }
+
+    input[type=text],
+    input[type=email],
+    input[type=password],
+    textarea,
+    select {
+        @include aw-columns(3);
+        margin-right: 0;
+    }
+
+    input[type=date] {
+        @include aw-columns(1);
+    }
+
+    // Large labels need more space and a smaller field
+    label.large {
+        b {
+            @include aw-columns(2);
+        }
+        input[type=text],
+        input[type=email],
+        input[type=password],
+        textarea,
+        select {
+            @include aw-columns(2);
+        }
+    }
+
+    // Associated data column layout
+    .form-field-associated-data {
+        .description {
+            @include aw-columns(1.5);
+            .address {
+                width: 115%;
+                margin-right: -130%;
+                float: right;
+            }
+        }
+        .fieldCollection {
+            input {
+                width: 200px;
+            }
+        }
+    }
+
+    .form-field.readonly {
+        b {
+            @include aw-columns(1);
+        }
+        span {
+            @include aw-columns(3);
+            margin-right: 0;
+        }
+    }
+
+    /* 10. Uneditable Content */
+    .action-widget-uneditable {
+        background: $color-element-bg;
+        border: 1px solid $color-sirius-mid-grey;
+        border-radius: $form-el-border-radius;
+        @include aw-columns(3);
+        margin-top: $spacer;
+        margin-bottom: $spacer;
+        margin-right: $spacer;
+        float: right;
+        overflow: hidden;
+
+        :nth-child(-n+2) {
+            border-top: 0;
+        }
+
+        dt, dd {
+            border-top: 1px solid $color-sirius-mid-grey;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            float: left;
+            padding: $spacer/2;
+        }
+
+        dt {
+            width: 25%;
+            clear: left;
+        }
+
+        dd {
+            width: 75%;
+            margin-right: 0;
+        }
+
+    }
+
+}
+
+// ------------------------------------------
+// Unique styling
+// ------------------------------------------
+
+.page-person .action-widget {
+    top: $header-height + $person-panel-height + ($vertical-spacing * 4);
+}
+
+// Action Widget Icons
+#AddInvestigation,
+#CreateRelationship,
+#DeleteRelationship,
+#EditDates {
+    .opg-icon {
+        font-size: 2.4em;
+        line-height: 1.9;
+    }
+}

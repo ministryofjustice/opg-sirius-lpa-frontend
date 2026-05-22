@@ -1,0 +1,131 @@
+// Mixins
+@mixin invalid-field {
+    border-color: $color-req-field-invalid-border;
+    box-shadow: 0 0 0 2px $color-req-field-invalid-border;
+}
+
+.invalid-field {
+    @include invalid-field;
+}
+
+@mixin invalid-text {
+    color: $color-req-field-text;
+}
+
+.invalid-text {
+    @include invalid-text;
+}
+
+@mixin button-group {
+    text-align: right;
+    padding: 0 $spacer $spacer;
+}
+
+.button-group {
+    @include button-group;
+}
+
+// Generic forms
+fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.loading-msg {
+    margin: 0;
+}
+
+:-moz-ui-invalid:not(output) {
+    box-shadow: none;
+}
+
+input, textarea {
+    &.ng-dirty.ng-invalid {
+        @include invalid-field;
+    }
+}
+
+.warning {
+    @include invalid-text;
+}
+
+// Actionwidget adjustments to form layout
+.action-widget {
+
+    .hideContent {
+        visibility: hidden;
+    }
+
+}
+
+.action-widget-content div.multi-page-form {
+
+    .page-title {
+        position: relative; // override the accessible helper
+
+        font-weight: $font-weight-sans-semibold;
+        width: 100%;
+        margin: 0 0 $spacer;
+        padding: 0;
+
+        a {
+            display: block;
+            padding: $spacer/2 $spacer $spacer/2 0;
+            margin-left: -1 * ($spacer + 1);
+            @include action-widget-title-bar;
+        }
+
+    }
+    .step-num {
+        @include gradient-blue;
+        color: $color-sirius-white;
+        padding: $spacer/2 $spacer;
+        margin-top: -$spacer/2;
+        text-transform: uppercase;
+        width: 7.5em;
+        float: left;
+    }
+    .title-content {
+        margin-left: $spacer;
+        font-weight: 700;
+    }
+    .field-collection {
+        margin-top: $spacer/2;
+    }
+    .form-field-select {
+        b {
+            padding-top: .5em;
+        }
+    }
+    .form-navigation {
+        padding: $spacer;
+        padding-left: 0;
+    }
+    .showHide {
+        float: right;
+        color: $color-link;
+        margin-top: .2em;
+    }
+    .disabled {
+        clear: both;
+    }
+    .readonly {
+        clear: both;
+    }
+
+    .extension {
+        width: 93%;
+        margin-top: -1.75em;
+        float: left;
+        label {
+            margin-top: 0;
+            b {
+                width: 85px;
+            }
+        }
+        .form-field-radio legend {
+            width: 85px;
+        }
+    }
+}

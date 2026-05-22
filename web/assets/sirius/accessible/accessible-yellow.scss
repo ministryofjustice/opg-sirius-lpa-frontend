@@ -1,0 +1,73 @@
+$color-accessibile-yellow: #ff9;
+
+body {
+    font-family: Arial;
+    font-size: 20px;
+}
+
+.timeline-container .tasks-list,
+.timeline-container .case-summary,
+.timeline-event,
+.person-panel,
+.action-widget {
+    background-color: $color-accessibile-yellow;
+}
+
+.case-tile-container.detailed.selected .card-wrapper .card-face,
+.action-widget-content div.multi-page-form .page-title a,
+.createasupervisionorder .actors,
+.createanlpa .actors,
+.createanepa .actors,
+.timeline-event header h2,
+.dropdown .dropdown-menu,
+.ui-datepicker-header,
+.ui-datepicker-calendar,
+button,
+input,
+textarea {
+    background-color: darken($color-accessibile-yellow, 20%);
+}
+
+.dropdown .dropdown-menu li a:hover {
+    background-color: $color-accessibile-yellow;
+    color: $color-sirius-blue;
+}
+
+.action-widget-content div.multi-page-form .step-num {
+    color: $color-sirius-blue;
+    background-color: darken($color-accessibile-yellow, 30%);
+}
+
+.search-form {
+    background-color: $color-accessibile-yellow;
+
+    label {
+        input {
+            background-color: $color-accessibile-yellow;
+        }
+    }
+}
+
+.search-toggle-container {
+    color: #000;
+
+    .toggle-label,
+    .toggle-option {
+        color: #000;
+    }
+}
+
+.search-form-dropdown {
+    background-color: $color-accessibile-yellow;
+    .show-all {
+        background-color: $color-accessibile-yellow;
+    }
+}
+
+.person-panel .case-tile-container .card-wrapper .card-face {
+    .case-tile-info-title a,
+    .case-tile-people-title a,
+    &.case > a {
+        background-color: darken($color-accessibile-yellow, 20%);
+    }
+}

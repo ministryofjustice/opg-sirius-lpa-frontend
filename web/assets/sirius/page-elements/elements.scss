@@ -1,0 +1,26 @@
+/* 
+ * OPG Core
+ * Element Styles
+ *
+ * Author:      Transform
+ * Author URI:  http://www.transformuk.com/
+ *
+ * Description: 
+ * Generic or specialised elements are placed here
+ */
+
+.opg-form-text-input-error {
+    background-color: $color-error-fade;
+    border-color: $color-error;
+}
+
+/* 4. Applicant Icon */
+.opg-applicant {
+    border: 1px solid #f47737;
+    border-radius: 2em;
+    color: #f47737;
+    display: inline-block;
+    font-size: 0.74em;
+    text-align: center;
+    width: 1.4em;
+}

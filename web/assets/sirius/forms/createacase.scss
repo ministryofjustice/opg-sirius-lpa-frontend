@@ -1,0 +1,149 @@
+.createasupervisionorder,
+.createanlpa,
+.createanepa {
+
+    .form-field.readonly {
+        b {
+            width: 34%;
+        }
+        span {
+            width: 60%;
+        }
+    }
+
+    label b,
+    .form-field legend {
+        @include aw-columns(1.5);
+    }
+
+    .caseType {
+        legend {
+            @include aw-columns(1.25);
+        }
+        label {
+            @include aw-columns(1.25);
+        }
+    }
+
+    input[type=text],
+    textarea,
+    .dropdown {
+        @include aw-columns(2.5);
+        margin-right: 0;
+    }
+
+    // Error alignment
+    label {
+        &.error p.error {
+            @include aw-columns-margin-left(2);
+        }
+    }
+
+    fieldset.error p.error {
+        @include aw-columns-margin-left(2);
+    }
+
+    // In the third section adjust the labels and elements
+    // back standard actionwidget widths
+    .fieldCollection:nth-child(3n) {
+        label b,
+        .form-field legend {
+            @include aw-columns(1.5);
+        }
+        input[type=text],
+        textarea,
+        .dropdown {
+            @include aw-columns(2.5);
+            margin-right: 0;
+        }
+
+        .form-field {
+            label {
+                @include aw-columns(1.25);
+            }
+        }
+
+        // Error alignment
+        label {
+            &.error p.error {
+                @include aw-columns-margin-left(1.5);
+            }
+        }
+
+        fieldset.error p.error {
+            @include aw-columns-margin-left(1.5);
+        }
+
+    }
+
+    .caseSubtype label {
+        text-transform: uppercase;
+    }
+
+    .deputies .addSubfields {
+        float: right;
+    }
+
+    .deputies,
+    .courtFunds {
+        .addSubfields {
+            float: right;
+            margin-right: $spacer;
+            margin-bottom: $spacer;
+        }
+    }
+
+    .case-actor {
+        clear: both;
+        margin-bottom: 0.5em;
+        .cta {
+            text-align: right;
+            button {
+                margin-right: 14px;
+                padding: 0.2em 0.4em;
+            }
+        }
+    }
+
+    .case-actor-details {
+        h3 {
+            font-size: 1em;
+            font-weight: 400;
+            margin-left: -11px;
+            cursor: pointer;
+            padding: 0.2em 0;
+
+            &.active {
+                @include gradient-blue;
+
+                .actor-type {
+                    width: 36%;
+                }
+            }
+        }
+        .actor-type {
+            display: inline-block;
+            width: 34%;
+            margin-left: 11px;
+        }
+        .subfield-label {
+            float: left;
+            width: 38%;
+            line-height: 2.5;
+        }
+
+        .user-choice {
+            float: left;
+            width: 25%;
+            line-height: 2.3;
+        }
+
+    }
+
+}
+
+.createasupervisionorder {
+    .field-collection .title b {
+        margin-right: $spacer;
+    }
+}

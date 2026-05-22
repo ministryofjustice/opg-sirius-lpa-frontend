@@ -1,0 +1,67 @@
+.action-widget-content.userForm {
+
+    $userForm-label-width: 1.25;
+
+    .form-field-radio {
+        legend {
+            @include aw-columns($userForm-label-width);
+        }
+        label {
+            @include aw-columns( (4-$userForm-label-width)/2 );
+        }
+        input {
+            width: auto;
+            margin-right: $spacer;
+        }
+    }
+
+    .form-field.readonly,
+    label {
+        b {
+            @include aw-columns($userForm-label-width);
+        }
+        input[type='text'],
+        select {
+            @include aw-columns(4 - $userForm-label-width);
+            margin-right: 0;
+        }
+        select {
+            margin-bottom: 0;
+            @include aw-columns(3.5 - $userForm-label-width);
+        }
+    }
+
+    // Error alignment
+    label {
+        &.error p.error {
+            @include aw-columns-margin-left($userForm-label-width);
+        }
+    }
+
+    fieldset.error p.error {
+        @include aw-columns-margin-left($userForm-label-width);
+    }
+
+    .add-another-role-btn {
+        text-align: right;
+    }
+
+    .ui-autocomplete-input {
+        width: auto;
+        float: none;
+    }
+
+    .action-widget-state-buttons button {
+        margin-right: 0;
+    }
+
+    .role-list {
+        p {
+            @include aw-columns($userForm-label-width);
+        }
+        ul {
+            @include aw-columns(4 - $userForm-label-width);
+        }
+    }
+
+}
