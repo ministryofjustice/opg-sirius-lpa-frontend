@@ -1,0 +1,28 @@
+// Standard label
+@mixin label {
+    font-size: $aw-font-size;
+    font-weight: normal;
+    display: inline-block;
+}
+
+.label {
+    @include label;
+}
+
+.form-field-checkbox,
+.form-field-radio {
+    legend {
+        display: block;
+        float: left;
+        // reset the accessibility hide that is applied by default
+        left: 0;
+        margin: 0;
+        padding: 0;
+        position: static;
+        @include label;
+    }
+    label {
+        float: left;
+        text-transform: capitalize;
+    }
+}

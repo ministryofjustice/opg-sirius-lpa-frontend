@@ -1,0 +1,82 @@
+// ------------------------------------------------
+// Viewer styling
+// ------------------------------------------------
+.doc-viewer {
+
+    background-color: $color-doc-viewer-bg;
+    background-image: url(img/texture.png);
+    z-index: $z-doc-viewer;
+
+    header {
+
+        @include gradient-blue-inv;
+        padding: .5em 6px;
+        overflow: auto;
+        color: $color-sirius-white;
+        min-height: 1.25em;
+        z-index: $z-doc-viewer-header;
+
+        h2 {
+            @include pem(12, 16);
+            display: inline;
+        }
+
+        .actions {
+            z-index: $z-doc-viewer-actions;
+        }
+
+        button {
+            background: none;
+            padding: none;
+            border: none;
+            @include pem(12, 16);
+            color: $color-sirius-white;
+        }
+
+    }
+
+    iframe {
+        z-index: $z-doc-viewer-iframe;
+        width: 100%;
+        height: 100%;
+    }
+
+    .subtype {
+        position: relative;
+        left: 0px;
+        white-space: nowrap;
+        background-color: $color-app-bg;
+        color: $color-font;
+        border-radius: $form-el-border-radius;
+        padding: 1px $spacer/2;
+        @include pem(8, 12);
+        font-weight: $font-weight-sans-bold;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .details {
+        margin-left: 110px;
+        margin-right: 110px;
+        h2 {
+            display: inline-block;
+            float: left;
+            margin-bottom: 0;
+            overflow: hidden;
+            padding-top: .5em;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+        }
+    }
+
+}
+
+.document-table table {
+    @include table-list;
+    z-index: $z-doc-viewer-table;
+    tr:nth-child(even) {
+        a {
+            color: $color-font;
+        }
+    }
+}
