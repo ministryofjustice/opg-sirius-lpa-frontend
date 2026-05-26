@@ -10,18 +10,11 @@ import (
 )
 
 type ActionPanelClient interface {
-	NoteTypes(ctx sirius.Context) ([]string, error)
 	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
 }
 
 type ActionPanelData struct {
 	XSRFToken     string
-	NoteTypes     []string
-	Entity        string
-	IsDigitalLpa  bool
-	CaseUID       string
-	Success       bool
-	Error         sirius.ValidationError
 	DonorID       int
 	SelectedCases []sirius.Case
 	CaseUids      string
@@ -60,16 +53,6 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		group.Go(func() error {
-			noteTypes, err := client.NoteTypes(ctx.With(groupCtx))
-			if err != nil {
-				return err
-			}
-
-			data.NoteTypes = noteTypes
-			return nil
-		})
-
-		group.Go(func() error {
 			if data.DonorID > 0 {
 				cases, err := client.CasesByDonor(ctx.With(groupCtx), data.DonorID)
 				if err != nil {
@@ -100,10 +83,6 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		if err := group.Wait(); err != nil {
 			return err
 		}
-
-		//if r.Header.Get("HX-Request") == "true" && partialTmpl != nil {
-		//	return partialTmpl(w, data)
-		//}
 
 		return tmpl(w, data)
 	}
