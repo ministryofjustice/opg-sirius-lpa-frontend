@@ -30,6 +30,7 @@ type documentPageData struct {
 	Comparing             bool
 	CompareURLs           map[string]string
 	CloseURL              string
+	CaseUids              string
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
@@ -128,6 +129,8 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			DonorID:               donorID,
 		}
 
+		data.CaseUids = buildUIDQueryString(caseUIDs)
+
 		return tmpl(w, data)
 	}
 }
@@ -139,4 +142,12 @@ func successMessageFormatter(docFriendlyName string, docCreatedTime, layout stri
 	}
 
 	return t.Format(format) + " " + docFriendlyName
+}
+
+func buildUIDQueryString(uids []string) string {
+	var result string
+	for _, uid := range uids {
+		result += "&uid[]=" + uid
+	}
+	return result
 }

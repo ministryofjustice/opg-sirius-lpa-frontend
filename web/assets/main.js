@@ -18,6 +18,8 @@ import addressFinder from "./address-finder";
 import autoApplyFilter from "./auto-apply-filter";
 import showHideCaseSummary from "./show-hide-case-summary";
 import disableAfterClick from "./disable-after-click";
+import "htmx.org";
+import htmx from "htmx.org/dist/htmx.esm";
 import documentListSort from "./document-list-sort";
 
 const prefix = document.body.getAttribute("data-prefix");
@@ -42,6 +44,10 @@ autoApplyFilter();
 showHideCaseSummary();
 disableAfterClick();
 documentListSort();
+
+globalThis.htmx = htmx;
+// Don't include indicator styles as CSP blocks inline styles
+htmx.config.includeIndicatorStyles = false;
 
 if (window.self !== window.parent) {
   const success = document.querySelector('[data-app-reload~="page"]');
