@@ -11,14 +11,12 @@ class PDFViewer {
     this.pdfDoc = null;
     this.currentPage = 1;
     this.totalPages = 0;
-    this.scale = 1.0;
+    this.scale = 1;
     this.rendering = false;
     this.thumbnailsVisible = false;
     this.thumbnailsRendered = false;
     this.pageCanvases = [];
     this.isScrolling = false;
-
-    this.init();
   }
 
   async init() {
@@ -213,8 +211,13 @@ class PDFViewer {
         canvas.style.height = Math.floor(viewport.height) + "px";
 
         const ctx = canvas.getContext("2d");
-        const transform =
-          outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
+
+        let transform;
+        if (outputScale == 1) {
+          transform = null;
+        } else {
+          transform = [outputScale, 0, 0, outputScale, 0, 0];
+        }
 
         const renderContext = {
           canvasContext: ctx,
@@ -307,7 +310,7 @@ class PDFViewer {
       ".pdf-viewer-thumbnail-item",
     );
     thumbnails.forEach((thumb) => {
-      const pageNum = parseInt(thumb.dataset.page, 10);
+      const pageNum = Number.parseInt(thumb.dataset.page, 10);
       thumb.classList.toggle(
         "pdf-viewer-thumbnail-item--active",
         pageNum === this.currentPage,
@@ -365,7 +368,7 @@ class PDFViewer {
   }
 
   async zoomIn() {
-    this.scale = Math.min(this.scale * 1.25, 5.0);
+    this.scale = Math.min(this.scale * 1.25, 5);
     this.updatePageInfo();
     await this.renderAllPages();
     // Scroll back to current page after re-render
@@ -394,7 +397,7 @@ class PDFViewer {
     if (!this.pdfDoc) return;
 
     const page = await this.pdfDoc.getPage(this.currentPage);
-    const viewport = page.getViewport({ scale: 1.0 });
+    const viewport = page.getViewport({ scale: 1 });
     const containerWidth = this.canvasContainer.clientWidth - 40; // Account for padding
     this.scale = containerWidth / viewport.width;
     this.updatePageInfo();
@@ -419,16 +422,16 @@ class PDFViewer {
 
   handlePageInputKeydown(e) {
     if (e.key === "Enter") {
-      const pageNum = parseInt(e.target.value, 10);
-      if (!isNaN(pageNum)) {
+      const pageNum = Number.parseInt(e.target.value, 10);
+      if (!Number.isNaN(pageNum)) {
         this.goToPage(pageNum);
       }
     }
   }
 
   handlePageInputBlur(e) {
-    const pageNum = parseInt(e.target.value, 10);
-    if (isNaN(pageNum) || pageNum < 1 || pageNum > this.totalPages) {
+    const pageNum = Number.parseInt(e.target.value, 10);
+    if (Number.isNaN(pageNum) || pageNum < 1 || pageNum > this.totalPages) {
       e.target.value = this.currentPage;
     } else {
       this.goToPage(pageNum);
@@ -443,9 +446,9 @@ class PDFViewer {
 
   async handleZoomInputBlur(e) {
     const value = e.target.value.replace("%", "").trim();
-    const zoomPercent = parseInt(value, 10);
+    const zoomPercent = Number.parseInt(value, 10);
 
-    if (isNaN(zoomPercent) || zoomPercent < 25 || zoomPercent > 500) {
+    if (Number.isNaN(zoomPercent) || zoomPercent < 25 || zoomPercent > 500) {
       e.target.value = Math.round(this.scale * 100) + "%";
     } else {
       this.scale = zoomPercent / 100;
@@ -467,7 +470,8 @@ export default function initPdfViewer() {
   viewers.forEach((container) => {
     const url = container.dataset.pdfUrl;
     if (url) {
-      new PDFViewer(container, url);
+      const pdfViewer = new PDFViewer(container, url);
+      pdfViewer.init();
     }
   });
 }
