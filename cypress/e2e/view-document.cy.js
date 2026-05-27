@@ -37,6 +37,8 @@ describe("View documents", () => {
   });
 
   it("views a document as a user with system admin role", () => {
+    cy.mockDocumentFile("dfef6714-b4fe-44c2-b26e-90dfe3663e95");
+
     cy.addMock("/lpa-api/v1/users/current", "GET", {
       status: 200,
       body: {
@@ -59,7 +61,42 @@ describe("View documents", () => {
     cy.get(".govuk-button--warning").contains("Delete");
   });
 
+  it("views a document and all the pdf actions work", () => {
+    cy.mockDocumentFile("dfef6714-b4fe-44c2-b26e-90dfe3663e95");
+
+    cy.addMock("/lpa-api/v1/users/current", "GET", {
+      status: 200,
+      body: {
+        roles: ["OPG User", "System Admin"],
+      },
+    });
+    cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95");
+    cy.contains("7001-0000-5678");
+    cy.get('a:contains("Back to list")')
+      .should("exist")
+      .should("have.attr", "href")
+      .and("include", "/donor/33/documents?uid[]=7001-0000-5678");
+    cy.get('a:contains("Download")')
+      .should("exist")
+      .should("have.attr", "href")
+      .and(
+        "include",
+        "/lpa-api/v1/documents/dfef6714-b4fe-44c2-b26e-90dfe3663e95/download",
+      );
+    cy.get('[data-action="toggle-thumbnails"]').click();
+    cy.get(".pdf-viewer-total-pages").contains("3");
+    cy.get('[data-action="prev"]').should("be.disabled");
+    cy.get('[data-action="next"]').should("be.not.disabled").click();
+    cy.get(".pdf-viewer-page-input").should("have.value", "2");
+    cy.get('[data-action="prev"]').should("be.not.disabled").click();
+    cy.get(".pdf-viewer-zoom-input").should("have.value", "100%");
+    cy.get('[data-action="zoom-in"]').click();
+    cy.get(".pdf-viewer-zoom-input").should("have.value", "125%");
+  });
+
   it("views a document as a user without system admin role", () => {
+    cy.mockDocumentFile("dfef6714-b4fe-44c2-b26e-90dfe3663e95");
+
     cy.addMock("/lpa-api/v1/users/current", "GET", {
       status: 200,
       body: {
@@ -89,6 +126,8 @@ describe("View documents", () => {
         roles: ["OPG User"],
       },
     });
+    cy.mockDocumentFile("e5b5acd1-c11c-41fe-a921-7fdd07e8f670");
+
     cy.addMock(
       "/lpa-api/v1/documents/e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
       "GET",
