@@ -1,0 +1,17 @@
+{{ define "action-panel-button" }}
+  <a class="govuk-body govuk-!-margin-bottom-0"
+     hx-get="{{ .URL }}"
+     hx-target=".action-panel__content"
+     hx-swap="innerHTML"
+  >
+    <div class="action-panel__button">
+            <span>
+              <svg aria-labelledby="{{ replace (ToLower .Label) " " "-" }}-text">
+                  <title id="{{ replace (ToLower .Label) " " "-" }}-text">{{ .Label }}</title>
+                  <use href="{{ prefixSVG .IconName }}" />
+              </svg>
+            </span>
+    </div>
+    {{ .Label }}
+  </a>
+{{ end }}
