@@ -17,6 +17,7 @@ class PDFViewer {
     this.thumbnailsRendered = false;
     this.pageCanvases = [];
     this.isScrolling = false;
+    this.rotation = 0;
   }
 
   async init() {
@@ -64,6 +65,14 @@ class PDFViewer {
         </button>
         <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="fit-width" aria-label="Fit to width">
           Fit Width
+        </button>
+      </div>
+      <div class="pdf-viewer-controls-group">
+        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="rotate-cw" aria-label="Rotate clockwise">
+          Rotate Clockwise
+        </button>
+        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="rotate-ccw" aria-label="Rotate counterclockwise">
+          Rotate Counterclockwise
         </button>
       </div>
     `;
@@ -150,6 +159,12 @@ class PDFViewer {
         break;
       case "toggle-thumbnails":
         this.toggleThumbnails();
+        break;
+      case "rotate-cw":
+        this.rotateCW();
+        break;
+      case "rotate-ccw":
+        this.rotateCCW();
         break;
     }
   }
@@ -409,6 +424,23 @@ class PDFViewer {
     if (pageContainer) {
       pageContainer.scrollIntoView({ block: "start" });
     }
+  }
+
+  rotateCW() {
+    this.rotation = (this.rotation + 90) % 360;
+    this.applyRotation();
+  }
+
+  rotateCCW() {
+    this.rotation = (this.rotation - 90 + 360) % 360;
+    this.applyRotation();
+  }
+
+  applyRotation() {
+    // Apply rotation transform to all page canvases
+    this.pageCanvases.forEach((canvas) => {
+      canvas.style.transform = `rotate(${this.rotation}deg)`;
+    });
   }
 
   showError(message) {

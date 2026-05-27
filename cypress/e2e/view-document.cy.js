@@ -68,6 +68,7 @@ describe("View documents", () => {
         roles: ["OPG User", "System Admin"],
       },
     });
+
     cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95");
     cy.contains("7001-0000-5678");
     cy.get('a:contains("Back to list")')
