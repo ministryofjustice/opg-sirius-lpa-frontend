@@ -412,33 +412,34 @@ class PDFViewer {
   }
 
   async zoomIn() {
+    // Preserve scroll position
+    const scrollPos = this.canvasContainer.scrollTop;
+
     this.scale = Math.min(this.scale * 1.25, 5);
     this.updatePageInfo();
     await this.renderAllPages();
-    // Scroll back to current page after re-render
-    const pageContainer = this.pagesWrapper.querySelector(
-      `[data-page="${this.currentPage}"]`,
-    );
-    if (pageContainer) {
-      pageContainer.scrollIntoView({ block: "start" });
-    }
+
+    // Restore scroll position
+    this.canvasContainer.scrollTop = scrollPos;
   }
 
   async zoomOut() {
+    // Preserve scroll position
+    const scrollPos = this.canvasContainer.scrollTop;
+
     this.scale = Math.max(this.scale / 1.25, 0.25);
     this.updatePageInfo();
     await this.renderAllPages();
-    // Scroll back to current page after re-render
-    const pageContainer = this.pagesWrapper.querySelector(
-      `[data-page="${this.currentPage}"]`,
-    );
-    if (pageContainer) {
-      pageContainer.scrollIntoView({ block: "start" });
-    }
+
+    // Restore scroll position
+    this.canvasContainer.scrollTop = scrollPos;
   }
 
   async fitToWidth() {
     if (!this.pdfDoc) return;
+
+    // Preserve scroll position
+    const scrollPos = this.canvasContainer.scrollTop;
 
     const page = await this.pdfDoc.getPage(this.currentPage);
     const viewport = page.getViewport({ scale: 1 });
@@ -446,13 +447,9 @@ class PDFViewer {
     this.scale = containerWidth / viewport.width;
     this.updatePageInfo();
     await this.renderAllPages();
-    // Scroll back to current page after re-render
-    const pageContainer = this.pagesWrapper.querySelector(
-      `[data-page="${this.currentPage}"]`,
-    );
-    if (pageContainer) {
-      pageContainer.scrollIntoView({ block: "start" });
-    }
+
+    // Restore scroll position
+    this.canvasContainer.scrollTop = scrollPos;
   }
 
   rotateCW() {
@@ -514,16 +511,15 @@ class PDFViewer {
     if (Number.isNaN(zoomPercent) || zoomPercent < 25 || zoomPercent > 500) {
       e.target.value = Math.round(this.scale * 100) + "%";
     } else {
+      // Preserve scroll position
+      const scrollPos = this.canvasContainer.scrollTop;
+
       this.scale = zoomPercent / 100;
       this.updatePageInfo();
       await this.renderAllPages();
-      // Scroll back to current page after re-render
-      const pageContainer = this.pagesWrapper.querySelector(
-        `[data-page="${this.currentPage}"]`,
-      );
-      if (pageContainer) {
-        pageContainer.scrollIntoView({ block: "start" });
-      }
+
+      // Restore scroll position
+      this.canvasContainer.scrollTop = scrollPos;
     }
   }
 }
