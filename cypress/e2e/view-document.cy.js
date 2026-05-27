@@ -1,6 +1,5 @@
 describe("View documents", () => {
   beforeEach(() => {
-
     cy.addMock(
       "/lpa-api/v1/documents/dfef6714-b4fe-44c2-b26e-90dfe3663e95",
       "GET",
@@ -85,14 +84,14 @@ describe("View documents", () => {
         "/lpa-api/v1/documents/dfef6714-b4fe-44c2-b26e-90dfe3663e95/download",
       );
     cy.get('[data-action="toggle-thumbnails"]').click();
-    cy.get('.pdf-viewer-total-pages').contains("3");
+    cy.get(".pdf-viewer-total-pages").contains("3");
     cy.get('[data-action="prev"]').should("be.disabled");
     cy.get('[data-action="next"]').should("be.not.disabled").click();
-    cy.get('.pdf-viewer-page-input').should('have.value', '2');
+    cy.get(".pdf-viewer-page-input").should("have.value", "2");
     cy.get('[data-action="prev"]').should("be.not.disabled").click();
-    cy.get('.pdf-viewer-zoom-input').should('have.value', '100%');
+    cy.get(".pdf-viewer-zoom-input").should("have.value", "100%");
     cy.get('[data-action="zoom-in"]').click();
-    cy.get('.pdf-viewer-zoom-input').should('have.value', '125%');
+    cy.get(".pdf-viewer-zoom-input").should("have.value", "125%");
   });
 
   it("views a document as a user without system admin role", () => {

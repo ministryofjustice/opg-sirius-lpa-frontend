@@ -9,16 +9,11 @@ Cypress.Commands.add("resetMocks", async () => {
 });
 
 Cypress.Commands.add("mockDocumentFile", (uuid) => {
-  cy.intercept(
-    "GET",
-    `/lpa-api/v1/documents/${uuid}/file`,
-    {
-      statusCode: 200,
-      headers: {
-        "Content-Type": "application/pdf",
-      },
-      fixture: "document.pdf",
-    }
-  ).as(`documentFile_${uuid}`);
+  cy.intercept("GET", `/lpa-api/v1/documents/${uuid}/file`, {
+    statusCode: 200,
+    headers: {
+      "Content-Type": "application/pdf",
+    },
+    fixture: "document.pdf",
+  }).as(`documentFile_${uuid}`);
 });
-
