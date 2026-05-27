@@ -834,3 +834,17 @@ func TestBoolToYesNo(t *testing.T) {
 		assert.Equal(t, expected, result)
 	}
 }
+
+func TestActionPanelButton(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["actionPanelButton"].(func(string, string, string) actionPanelButtonData)
+
+	expected := actionPanelButtonData{
+		Label:    "Name",
+		URL:      "testurl",
+		IconName: "testicon",
+	}
+
+	val := fn("Name", "testurl", "testicon")
+	assert.Equal(t, expected, val)
+}
