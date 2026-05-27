@@ -361,6 +361,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return "false"
 		},
+		"actionPanelButton": actionPanelButton,
 	}
 }
 
@@ -671,4 +672,18 @@ func translateNumberEventValue(change string, value float64) string {
 	}
 
 	return strconv.FormatFloat(value, 'f', -1, 64)
+}
+
+type actionPanelButtonData struct {
+	Label    string
+	URL      string
+	IconName string
+}
+
+func actionPanelButton(label, url, iconName string) actionPanelButtonData {
+	return actionPanelButtonData{
+		Label:    label,
+		URL:      url,
+		IconName: iconName,
+	}
 }
