@@ -21,6 +21,7 @@ import disableAfterClick from "./disable-after-click";
 import "htmx.org";
 import htmx from "htmx.org/dist/htmx.esm";
 import documentListSort from "./document-list-sort";
+import initPdfViewer from "./pdf-viewer";
 
 const prefix = document.body.getAttribute("data-prefix");
 
@@ -44,6 +45,7 @@ autoApplyFilter();
 showHideCaseSummary();
 disableAfterClick();
 documentListSort();
+initPdfViewer();
 
 globalThis.htmx = htmx;
 // Don't include indicator styles as CSP blocks inline styles
