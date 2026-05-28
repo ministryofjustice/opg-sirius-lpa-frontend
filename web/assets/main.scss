@@ -628,7 +628,8 @@ $govuk-assets-path: "../assets/";
   --action-panel-form-padding: 15px;
   padding: var(--action-panel-form-padding);
   background-color: govuk-functional-colour(body-background);
-  height: calc(100% - (var(--action-panel-form-padding) * 2));
+  min-height: calc(100% - (var(--action-panel-form-padding) * 2));
+  height: auto;
 }
 
 .action-panel__button {
