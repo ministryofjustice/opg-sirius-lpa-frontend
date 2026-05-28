@@ -74,7 +74,8 @@ services:
 
   cypress:
     image: cypress/included:15.13.0
-    command: run --browser electron
+    platform: "linux/amd64"
+    command: run --browser edge
     entrypoint: cypress
     depends_on:
       - lpa-frontend
