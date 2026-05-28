@@ -37,8 +37,6 @@ describe("View documents", () => {
   });
 
   it("views a document as a user with system admin role", () => {
-    cy.mockDocumentFile("dfef6714-b4fe-44c2-b26e-90dfe3663e95");
-
     cy.addMock("/lpa-api/v1/users/current", "GET", {
       status: 200,
       body: {
@@ -95,8 +93,6 @@ describe("View documents", () => {
   });
 
   it("views a document as a user without system admin role", () => {
-    cy.mockDocumentFile("dfef6714-b4fe-44c2-b26e-90dfe3663e95");
-
     cy.addMock("/lpa-api/v1/users/current", "GET", {
       status: 200,
       body: {
@@ -126,7 +122,6 @@ describe("View documents", () => {
         roles: ["OPG User"],
       },
     });
-    cy.mockDocumentFile("e5b5acd1-c11c-41fe-a921-7fdd07e8f670");
 
     cy.addMock(
       "/lpa-api/v1/documents/e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
