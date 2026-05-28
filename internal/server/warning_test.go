@@ -78,7 +78,7 @@ func TestGetWarning(t *testing.T) {
 			}
 
 			w := httptest.NewRecorder()
-			err := Warning(siriusClient, template.Func, nil)(w, req)
+			err := Warning(siriusClient, template.Func, template.Func)(w, req)
 
 			assert.Nil(t, err)
 			result := w.Result()
@@ -342,4 +342,34 @@ func TestGetWarningTypesFail(t *testing.T) {
 	err := Warning(siriusClient, nil, nil)(w, req)
 
 	assert.Equal(t, expectedErr, err)
+}
+
+func TestWarningMissingId(t *testing.T) {
+	req, _ := http.NewRequest(http.MethodGet, "/?entity=lpa", nil)
+	w := httptest.NewRecorder()
+	err := Warning(nil, nil, nil)(w, req)
+
+	assert.NotNil(t, err)
+}
+
+func TestWarningMissingEntityType(t *testing.T) {
+	siriusClient := &mockWarningClient{}
+	siriusClient.On("RefDataByCategory", mock.Anything, sirius.WarningTypeCategory).Return(
+		[]sirius.RefDataItem{
+			{
+				Handle: "Complaint Received",
+				Label:  "Complaint Received",
+			},
+		},
+		nil,
+	)
+	siriusClient.On("CasesByDonor", mock.Anything, 89).Return([]sirius.Case{}, nil)
+
+	req, _ := http.NewRequest(http.MethodGet, "/?id=89", nil)
+	req.Header.Add("hx-request", "true")
+
+	w := httptest.NewRecorder()
+	err := Warning(siriusClient, nil, nil)(w, req)
+
+	assert.NotNil(t, err)
 }
