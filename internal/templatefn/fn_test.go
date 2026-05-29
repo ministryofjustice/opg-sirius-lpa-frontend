@@ -848,3 +848,16 @@ func TestActionPanelButton(t *testing.T) {
 	val := fn("Name", "testurl", "testicon")
 	assert.Equal(t, expected, val)
 }
+
+func TestSuccessBanner(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["successBanner"].(func(string, bool) successBannerData)
+
+	expected := successBannerData{
+		Message:     "Success!",
+		Dismissible: true,
+	}
+
+	val := fn("Success!", true)
+	assert.Equal(t, expected, val)
+}

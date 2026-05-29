@@ -362,6 +362,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			return "false"
 		},
 		"actionPanelButton": actionPanelButton,
+		"successBanner":     successBanner,
 	}
 }
 
@@ -685,5 +686,17 @@ func actionPanelButton(label, url, iconName string) actionPanelButtonData {
 		Label:    label,
 		URL:      url,
 		IconName: iconName,
+	}
+}
+
+type successBannerData struct {
+	Message     string
+	Dismissible bool
+}
+
+func successBanner(message string, dismissible bool) successBannerData {
+	return successBannerData{
+		Message:     message,
+		Dismissible: dismissible,
 	}
 }

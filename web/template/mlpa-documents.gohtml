@@ -9,7 +9,7 @@
             {{ template "mlpa-header" (caseTabs .CaseSummary "documents") }}
 
             {{ if .FlashMessage.Title }}
-                {{ template "success-banner" .FlashMessage.Title }}
+                {{ template "success-banner" (successBanner .FlashMessage.Title false) }}
             {{ end }}
 
             <div class="moj-page-header-actions">

@@ -6,7 +6,7 @@
         {{ if eq (len .Cases) 1 }}
           {{ with index .Cases 0 }}
             <span class="govuk-!-display-none"
-              hx-get="{{ prefix (printf "/action-panel?id=%d&entity=%s" .ID (ToLower $.EntityType)) }}"
+              hx-get="{{ prefix (printf "/action-panel?id=%d&entity=%s&successMessage=%s" .ID (ToLower $.EntityType) "You have successfully created a warning.") }}"
               hx-target=".action-panel__content"
               hx-swap="innerHTML"
               hx-trigger="load"
@@ -14,13 +14,12 @@
           {{ end }}
         {{ else }}
           <span class="govuk-!-display-none"
-            hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId .EntityType .CaseUids) }}"
+            hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s&successMessage=%s" .DonorId .EntityType .CaseUids "You have successfully created a warning.") }}"
             hx-target=".action-panel__content"
             hx-swap="innerHTML"
             hx-trigger="load"
           ></span>
         {{ end }}
-        {{ template "success-banner" "You have successfully created a warning." }}
       {{ end }}
 
       <h1 class="govuk-heading-m">Create Warning</h1>

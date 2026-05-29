@@ -17,7 +17,7 @@
             {{ template "error-summary" .Error }}
 
             {{ if .RecipientAddedSuccess }}
-                {{ template "success-banner" "New recipient added" }}
+                {{ template "success-banner" (successBanner "New recipient added" false) }}
             {{ end }}
 
             {{ if .HasSelectedAddNewRecipient }}

@@ -11,7 +11,7 @@
 
       {{ if .Success }}
         <meta data-app-reload="page" />
-        {{ template "success-banner" "You have successfully added a complaint." }}
+        {{ template "success-banner" (successBanner "You have successfully added a complaint." false) }}
       {{ end }}
 
       <h1 class="govuk-heading-l app-!-embedded-hide">Add Complaint</h1>

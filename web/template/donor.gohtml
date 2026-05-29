@@ -34,7 +34,7 @@
         {{ else }}
           <h1 class="govuk-visually-hidden">Donor edited</h1>
           <meta data-app-reload="page" />
-          {{ template "success-banner" "Donor was edited" }}
+          {{ template "success-banner" (successBanner "Donor was edited" false) }}
         {{ end }}
       {{ else }}
         <h1 class="govuk-heading-l app-!-embedded-hide">

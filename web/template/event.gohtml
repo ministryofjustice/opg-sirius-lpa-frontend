@@ -11,7 +11,7 @@
 
       {{ if .Success }}
         <meta data-app-reload="page" />
-        {{ template "success-banner" "You have successfully created an event." }}
+        {{ template "success-banner" (successBanner "You have successfully created an event." false) }}
       {{ end }}
 
       <h1 class="govuk-heading-l app-!-embedded-hide">Create Event</h1>

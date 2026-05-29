@@ -14,11 +14,12 @@ type ActionPanelClient interface {
 }
 
 type ActionPanelData struct {
-	XSRFToken     string
-	DonorID       int
-	SelectedCases []sirius.Case
-	CaseUids      string
-	CaseType      string
+	XSRFToken      string
+	DonorID        int
+	SelectedCases  []sirius.Case
+	CaseUids       string
+	CaseType       string
+	SuccessMessage string
 }
 
 func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
@@ -83,6 +84,8 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		if err := group.Wait(); err != nil {
 			return err
 		}
+
+		data.SuccessMessage = r.FormValue("successMessage")
 
 		return tmpl(w, data)
 	}

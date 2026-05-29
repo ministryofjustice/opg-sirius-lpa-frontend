@@ -9,7 +9,7 @@
 
         {{ if .Success }}
           <meta data-app-reload="page" />
-          {{ template "success-banner" "You have successfully created a warning." }}
+          {{ template "success-banner" (successBanner "You have successfully created a warning." false) }}
         {{ end }}
 
       <h1 class="govuk-heading-l app-!-embedded-hide">Create Warning</h1>

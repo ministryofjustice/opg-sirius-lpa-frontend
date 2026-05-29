@@ -7,7 +7,7 @@
   {{ template "mlpa-header" (caseTabs .CaseSummary "application-progress") }}
 
   {{ if .FlashMessage.Title }}
-      {{ template "success-banner" .FlashMessage.Title }}
+      {{ template "success-banner" (successBanner .FlashMessage.Title false) }}
   {{ end }}
 
   {{ if gt (len .ProgressIndicators) 0 }}

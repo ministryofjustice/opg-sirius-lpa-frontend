@@ -9,7 +9,7 @@
             {{ template "error-summary" .Error }}
 
             {{ if .Success }}
-                {{ template "success-banner" "You have successfully cleared a task." }}
+                {{ template "success-banner" (successBanner "You have successfully cleared a task." false) }}
             {{ end }}
 
             <h1 class="govuk-heading-l">Clear Task</h1>
