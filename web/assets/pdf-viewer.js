@@ -17,7 +17,29 @@ class PDFViewer {
     this.thumbnailsRendered = false;
     this.pageCanvases = [];
     this.isScrolling = false;
-    this.rotation = 0;
+    this.rotation = this.loadRotation();
+  }
+
+  getRotationStorageKey() {
+    return `pdf-viewer-rotation-${this.url}`;
+  }
+
+  loadRotation() {
+    try {
+      const stored = sessionStorage.getItem(this.getRotationStorageKey());
+      const rotation = stored ? parseInt(stored, 10) : 0;
+      return isNaN(rotation) ? 0 : rotation;
+    } catch {
+      return 0;
+    }
+  }
+
+  saveRotation() {
+    try {
+      sessionStorage.setItem(this.getRotationStorageKey(), this.rotation.toString());
+    } catch {
+      // Ignore storage errors
+    }
   }
 
   async init() {
@@ -141,6 +163,7 @@ class PDFViewer {
     if (!btn) return;
 
     const action = btn.dataset.action;
+
     switch (action) {
       case "prev":
         this.prevPage();
@@ -246,6 +269,9 @@ class PDFViewer {
         this.pagesWrapper.appendChild(pageContainer);
         this.pageCanvases.push(canvas);
       }
+
+      // Re-apply rotation to newly rendered canvases
+      this.applyRotation();
 
       this.rendering = false;
     } catch (error) {
@@ -428,11 +454,13 @@ class PDFViewer {
 
   rotateCW() {
     this.rotation = (this.rotation + 90) % 360;
+    this.saveRotation();
     this.applyRotation();
   }
 
   rotateCCW() {
     this.rotation = (this.rotation - 90 + 360) % 360;
+    this.saveRotation();
     this.applyRotation();
   }
 
