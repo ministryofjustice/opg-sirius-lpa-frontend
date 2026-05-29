@@ -20,6 +20,7 @@
     <div class="pdf-viewer-container"
          title="Document viewer"
          data-pdf-viewer
-         data-pdf-url="{{ sirius (printf "/lpa-api/v1/documents/%s/file" .Document.UUID) }}">
+         data-pdf-url="{{ sirius (printf "/lpa-api/v1/documents/%s/file" .Document.UUID) }}"
+         {{ if .Pane }}data-pdf-pane="{{ .Pane }}"{{ end }}>
     </div>
 {{ end }}
