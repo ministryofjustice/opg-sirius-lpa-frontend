@@ -4,10 +4,14 @@ import * as pdfjsLib from "pdfjs-dist";
 const prefix = document.body.getAttribute("data-prefix") || "";
 pdfjsLib.GlobalWorkerOptions.workerSrc = `${prefix}/javascript/pdf.worker.min.mjs`;
 
+// Storage key for persisting viewer state across page navigations
+const STORAGE_KEY = "pdfViewerState";
+
 class PDFViewer {
-  constructor(container, url) {
+  constructor(container, url, paneId) {
     this.container = container;
     this.url = url;
+    this.paneId = paneId || "1";
     this.pdfDoc = null;
     this.currentPage = 1;
     this.totalPages = 0;
@@ -17,26 +21,140 @@ class PDFViewer {
     this.thumbnailsRendered = false;
     this.pageCanvases = [];
     this.isScrolling = false;
+    this.storageKey = this.getStorageKey();
+  }
+
+  getStorageKey() {
+    // Create a unique key based on the PDF URL and pane ID
+    // This ensures each pane maintains its own state for the same document
+    return `${STORAGE_KEY}_${this.paneId}_${this.url}`;
+  }
+
+  saveState() {
+    // Save state when navigating away, regardless of mode
+    // This allows state to transfer from single-pane view to compare mode
+    if (!this.canvasContainer) return;
+
+    const state = {
+      scale: this.scale,
+      scrollLeftRatio:
+        this.canvasContainer.scrollWidth > 0
+          ? this.canvasContainer.scrollLeft / this.canvasContainer.scrollWidth
+          : 0,
+      scrollTopRatio:
+        this.canvasContainer.scrollHeight > 0
+          ? this.canvasContainer.scrollTop / this.canvasContainer.scrollHeight
+          : 0,
+      currentPage: this.currentPage,
+      timestamp: Date.now(),
+    };
+
+     try {
+       sessionStorage.setItem(this.storageKey, JSON.stringify(state));
+     } catch (e) {
+       // sessionStorage might be unavailable or full
+       console.warn("Unable to save PDF viewer state:", e);
+     }
+  }
+
+  loadState() {
+    try {
+      const stored = sessionStorage.getItem(this.storageKey);
+      if (!stored) return null;
+
+      const state = JSON.parse(stored);
+
+      // Only restore state if it's less than 15 minutes old
+      const resetTime = 15 * 60 * 1000;
+      if (Date.now() - state.timestamp > resetTime) {
+        sessionStorage.removeItem(this.storageKey);
+        return null;
+      }
+
+      return state;
+    } catch (e) {
+      console.warn("Unable to load PDF viewer state:", e);
+      return null;
+    }
+  }
+
+  setupStatePreservation() {
+    // Save state before page unload
+    window.addEventListener("beforeunload", () => this.saveState());
+
+    // Save state when clicking navigation links (Back to list, Compare, Close, etc.)
+    document.addEventListener("click", (e) => {
+      const link = e.target.closest("a");
+      if (!link) return;
+
+      // Get the raw href attribute value (not the resolved URL)
+      const hrefAttr = link.getAttribute("href");
+
+      // Only save state for valid internal navigation links
+      // Skip empty hrefs and anchor-only links
+      if (!hrefAttr?.trim() || hrefAttr.startsWith("#")) {
+        return;
+      }
+
+      // Use URL parsing to safely check for non-http(s) protocols
+      // This avoids executing or referencing potentially dangerous URL schemes
+      try {
+        const url = new URL(link.href);
+        if (url.protocol !== "http:" && url.protocol !== "https:") {
+          return;
+        }
+      } catch {
+        // If URL parsing fails, it's likely a relative path which is safe
+      }
+
+      this.saveState();
+    });
   }
 
   async init() {
     try {
       this.createControls();
       this.createMainArea();
+       this.setupStatePreservation();
+
+       // Load saved state before loading PDF
+       const savedState = this.loadState();
+
+       // Restore state if available
+       // Each pane maintains its own state per document (independent from other panes)
+       const shouldRestoreState = savedState;
+
+       if (shouldRestoreState && savedState) {
+         this.scale = savedState.scale;
+         this.currentPage = savedState.currentPage;
+       }
 
       const loadingTask = pdfjsLib.getDocument(this.url);
       this.pdfDoc = await loadingTask.promise;
       this.totalPages = this.pdfDoc.numPages;
 
+      // Ensure current page is within bounds
+      if (this.currentPage > this.totalPages) {
+        this.currentPage = this.totalPages;
+      }
+
       this.updatePageInfo();
       await this.renderAllPages();
+
+      // Restore scroll position after rendering
+      if (shouldRestoreState && savedState) {
+        this.canvasContainer.scrollLeft =
+          savedState.scrollLeftRatio * this.canvasContainer.scrollWidth;
+        this.canvasContainer.scrollTop =
+          savedState.scrollTopRatio * this.canvasContainer.scrollHeight;
+      }
     } catch (error) {
       console.error("Error loading PDF:", error);
       this.showError("Unable to load PDF document");
     }
   }
 
-  createControls() {
+   createControls() {
     const controls = document.createElement("div");
     controls.className = "pdf-viewer-controls";
     controls.innerHTML = `
@@ -213,7 +331,7 @@ class PDFViewer {
         const ctx = canvas.getContext("2d");
 
         let transform;
-        if (outputScale == 1) {
+        if (outputScale === 1) {
           transform = null;
         } else {
           transform = [outputScale, 0, 0, outputScale, 0, 0];
@@ -318,27 +436,27 @@ class PDFViewer {
     });
   }
 
-  async goToPage(pageNum) {
-    if (pageNum < 1 || pageNum > this.totalPages) return;
-    if (pageNum === this.currentPage) return;
+   async goToPage(pageNum) {
+     if (pageNum < 1 || pageNum > this.totalPages) return;
+     if (pageNum === this.currentPage) return;
 
-    this.currentPage = pageNum;
-    this.updatePageInfo();
-    this.updateThumbnailSelection();
+     this.currentPage = pageNum;
+     this.updatePageInfo();
+     this.updateThumbnailSelection();
 
-    // Scroll to the page
-    const pageContainer = this.pagesWrapper.querySelector(
-      `[data-page="${pageNum}"]`,
-    );
-    if (pageContainer) {
-      this.isScrolling = true;
-      pageContainer.scrollIntoView({ behavior: "smooth", block: "start" });
-      // Reset scrolling flag after animation
-      setTimeout(() => {
-        this.isScrolling = false;
-      }, 500);
-    }
-  }
+     // Scroll to the page
+     const pageContainer = this.pagesWrapper.querySelector(
+       `[data-page="${pageNum}"]`,
+     );
+     if (pageContainer) {
+       this.isScrolling = true;
+       pageContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+       // Reset scrolling flag after animation
+       setTimeout(() => {
+         this.isScrolling = false;
+       }, 500);
+     }
+   }
 
   updatePageInfo() {
     const pageInput = this.controls.querySelector(".pdf-viewer-page-input");
@@ -368,44 +486,45 @@ class PDFViewer {
   }
 
   async zoomIn() {
-    // Preserve scroll position
-    const scrollPos = this.canvasContainer.scrollTop;
-
     this.scale = Math.min(this.scale * 1.25, 5);
-    this.updatePageInfo();
-    await this.renderAllPages();
-
-    // Restore scroll position
-    this.canvasContainer.scrollTop = scrollPos;
+    await this.applyZoom();
   }
 
   async zoomOut() {
-    // Preserve scroll position
-    const scrollPos = this.canvasContainer.scrollTop;
-
     this.scale = Math.max(this.scale / 1.25, 0.25);
-    this.updatePageInfo();
-    await this.renderAllPages();
-
-    // Restore scroll position
-    this.canvasContainer.scrollTop = scrollPos;
+    await this.applyZoom();
   }
+
+   async applyZoom() {
+     // Calculate scroll ratios before re-rendering
+     const scrollLeft = this.canvasContainer.scrollLeft;
+     const scrollTop = this.canvasContainer.scrollTop;
+     const scrollWidth = this.canvasContainer.scrollWidth;
+     const scrollHeight = this.canvasContainer.scrollHeight;
+
+     // Calculate the ratio of scroll position to total scrollable area
+     const scrollLeftRatio = scrollWidth > 0 ? scrollLeft / scrollWidth : 0;
+     const scrollTopRatio = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
+
+     this.updatePageInfo();
+     await this.renderAllPages();
+
+     // Apply the same ratio to the new scrollable area
+     this.canvasContainer.scrollLeft =
+       scrollLeftRatio * this.canvasContainer.scrollWidth;
+     this.canvasContainer.scrollTop =
+       scrollTopRatio * this.canvasContainer.scrollHeight;
+   }
 
   async fitToWidth() {
     if (!this.pdfDoc) return;
-
-    // Preserve scroll position
-    const scrollPos = this.canvasContainer.scrollTop;
 
     const page = await this.pdfDoc.getPage(this.currentPage);
     const viewport = page.getViewport({ scale: 1 });
     const containerWidth = this.canvasContainer.clientWidth - 40; // Account for padding
     this.scale = containerWidth / viewport.width;
-    this.updatePageInfo();
-    await this.renderAllPages();
-
-    // Restore scroll position
-    this.canvasContainer.scrollTop = scrollPos;
+    await this.applyZoom();
+    // applyZoom already saves compare state
   }
 
   showError(message) {
@@ -448,15 +567,8 @@ class PDFViewer {
     if (Number.isNaN(zoomPercent) || zoomPercent < 25 || zoomPercent > 500) {
       e.target.value = Math.round(this.scale * 100) + "%";
     } else {
-      // Preserve scroll position
-      const scrollPos = this.canvasContainer.scrollTop;
-
       this.scale = zoomPercent / 100;
-      this.updatePageInfo();
-      await this.renderAllPages();
-
-      // Restore scroll position
-      this.canvasContainer.scrollTop = scrollPos;
+      await this.applyZoom();
     }
   }
 }
@@ -465,8 +577,9 @@ export default function initPdfViewer() {
   const viewers = document.querySelectorAll("[data-pdf-viewer]");
   viewers.forEach((container) => {
     const url = container.dataset.pdfUrl;
+    const paneId = container.dataset.pdfPane;
     if (url) {
-      const pdfViewer = new PDFViewer(container, url);
+      const pdfViewer = new PDFViewer(container, url, paneId);
       pdfViewer.init();
     }
   });
