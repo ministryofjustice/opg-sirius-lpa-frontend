@@ -1,5 +1,6 @@
 {{ define "action-panel-button" }}
-  <a class="govuk-body govuk-!-margin-bottom-0"
+  <a id="action-panel-button-{{ replace (ToLower .Label) " " "-" }}"
+     class="govuk-body govuk-!-margin-bottom-0"
      hx-get="{{ .URL }}"
      hx-target=".action-panel__content"
      hx-swap="innerHTML"
