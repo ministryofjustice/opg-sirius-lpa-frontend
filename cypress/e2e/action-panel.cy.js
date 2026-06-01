@@ -45,5 +45,5 @@ describe("Action Panel", () => {
     cy.get("a#action-panel-button-create-warning").click();
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Create Warning");
-  })
+  });
 });
