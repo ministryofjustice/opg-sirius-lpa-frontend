@@ -1,0 +1,56 @@
+{{ define "page" }}
+    <div class="action-panel__form">
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        {{ if eq (len .Cases) 1 }}
+          {{ with index .Cases 0 }}
+            <span class="govuk-!-display-none"
+              hx-get="{{ prefix (printf "/action-panel?id=%d&entity=%s" .ID (ToLower $.EntityType)) }}"
+              hx-target=".action-panel__content"
+              hx-swap="innerHTML"
+              hx-trigger="load"
+            ></span>
+          {{ end }}
+        {{ else }}
+          <span class="govuk-!-display-none"
+            hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId .EntityType .CaseUids) }}"
+            hx-target=".action-panel__content"
+            hx-swap="innerHTML"
+            hx-trigger="load"
+          ></span>
+        {{ end }}
+        {{ template "success-banner" "You have successfully created a warning." }}
+      {{ end }}
+
+      <h1 class="govuk-heading-m">Create Warning</h1>
+
+      <form class="form" method="POST"
+        hx-post="{{ prefix (printf "/create-warning?id=%d&entity=%s%s" .DonorId (ToLower .EntityType) .CaseUids) }}"
+        hx-target=".action-panel__content"
+        hx-swap="innerHTML">
+        <input type="hidden" name="id" value="{{ .DonorId }}"/>
+          {{ template "warning" . }}
+        <div class="govuk-button-group govuk-!-margin-right-0">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+            {{ if eq (len .Cases) 1 }}
+                {{ with index .Cases 0 }}
+                  <a class="govuk-link govuk-link--no-visited-state"
+                     href=""
+                     hx-get="{{ prefix (printf "/action-panel?id=%d&entity=%s" .ID (ToLower $.EntityType)) }}"
+                     hx-target=".action-panel__content"
+                     hx-swap="innerHTML"
+                  >Cancel</a>
+                {{ end }}
+            {{ else }}
+              <a class="govuk-link govuk-link--no-visited-state"
+                 href=""
+                 hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId .EntityType .CaseUids) }}"
+                 hx-target=".action-panel__content"
+                 hx-swap="innerHTML"
+              >Cancel</a>
+            {{ end }}
+        </div>
+      </form>
+    </div>
+{{ end }}
