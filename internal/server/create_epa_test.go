@@ -76,6 +76,7 @@ func TestGetCreateEpaEdit(t *testing.T) {
 					Epa:             epa,
 					AppointmentType: appointmentType,
 					CaseId:          234,
+					IsUpdate:        true,
 				}).
 				Return(nil)
 
@@ -242,6 +243,7 @@ func TestPostCreateEpaEdit(t *testing.T) {
 			Epa:             epa,
 			AppointmentType: "singular",
 			CaseId:          234,
+			IsUpdate:        true,
 		}).
 		Return(nil)
 
@@ -627,4 +629,97 @@ func TestPostCreateEpaAddActorValidationErrorOnReceiptDate(t *testing.T) {
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
+}
+
+func TestGetCreateEpaDoesNotSetIsUpdate(t *testing.T) {
+	client := &mockCreateEpaClient{}
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createEpaData{
+			DonorId:  123,
+			Title:    "Create an EPA",
+			IsUpdate: false,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := CreateEpa(client, template.Func)(w, r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateEpaEditWhenValidationError(t *testing.T) {
+	expectedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{"field": {"": "problem"}},
+	}
+
+	truePtr := shared.BoolPtr(true)
+	falsePtr := shared.BoolPtr(false)
+	dateString := "2022-04-05"
+	existingEpa := sirius.Epa{
+		Case: sirius.Case{ReceiptDate: sirius.DateString(dateString)},
+	}
+	submittedEpa := sirius.Epa{
+		EpaDonorSignatureDate:   sirius.DateString(dateString),
+		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
+		DonorHasOtherEpas:       truePtr,
+		OtherEpaInfo:            "More info",
+		Case: sirius.Case{
+			ReceiptDate:                     sirius.DateString(dateString),
+			CaseAttorneySingular:            truePtr,
+			CaseAttorneyJointlyAndSeverally: falsePtr,
+			CaseAttorneyJointly:             falsePtr,
+			PaymentByCheque:                 falsePtr,
+			PaymentExemption:                truePtr,
+			PaymentDate:                     sirius.DateString(dateString),
+		},
+	}
+
+	client := &mockCreateEpaClient{}
+	client.
+		On("Epa", mock.Anything, 234).
+		Return(existingEpa, nil)
+	client.
+		On("UpdateEpa", mock.Anything, 234, submittedEpa).
+		Return(expectedError)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createEpaData{
+			DonorId:         123,
+			Title:           "Edit EPA",
+			IsUpdate:        true,
+			Success:         false,
+			Epa:             existingEpa,
+			Error:           expectedError,
+			AppointmentType: "singular",
+			CaseId:          234,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"epaDonorSignatureDate":   {dateString},
+		"epaDonorNoticeGivenDate": {dateString},
+		"donorHasOtherEpas":       {"true"},
+		"otherEpaInfo":            {"More info"},
+		"receiptDate":             {dateString},
+		"caseAttorney":            {"singular"},
+		"paymentByCheque":         {"false"},
+		"paymentExemption":        {"true"},
+		"paymentDate":             {dateString},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&caseId=234", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateEpa(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
