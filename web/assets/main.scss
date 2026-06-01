@@ -630,6 +630,19 @@ $govuk-assets-path: "../assets/";
   background-color: govuk-functional-colour(body-background);
   min-height: calc(100% - (var(--action-panel-form-padding) * 2));
   height: auto;
+  .govuk-label,
+  .govuk-select,
+  .govuk-button,
+  .govuk-link,
+  .govuk-fieldset__legend {
+    font-size: 0.875rem;
+  }
+  .govuk-select {
+    height: 1.875rem;
+  }
+  .govuk-form-group {
+    margin-bottom: 20px;
+  }
 }
 
 .action-panel__button {

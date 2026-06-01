@@ -23,7 +23,7 @@
         {{ template "success-banner" "You have successfully created a warning." }}
       {{ end }}
 
-      <h1 class="govuk-heading-l app-!-embedded-hide">Create Warning</h1>
+      <h1 class="govuk-heading-m">Create Warning</h1>
 
       <form class="form" method="POST"
         hx-post="{{ prefix (printf "/create-warning?id=%d&entity=%s%s" .DonorId (ToLower .EntityType) .CaseUids) }}"
