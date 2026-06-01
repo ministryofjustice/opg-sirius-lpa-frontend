@@ -36,4 +36,14 @@ describe("Action Panel", () => {
     cy.get("#actions-tab").click();
     cy.get("#actions-content").should("not.be.visible");
   });
+
+  it("displays the warning button on the action panel", () => {
+    cy.get("#actions-tab").click();
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Create warning");
+
+    cy.get("a#action-panel-button-create-warning").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Create Warning");
+  })
 });
