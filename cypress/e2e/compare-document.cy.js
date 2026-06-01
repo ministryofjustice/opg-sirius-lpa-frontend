@@ -146,40 +146,40 @@ describe("Compare documents", () => {
         "include",
         "/compare/33/34?pane1=dfef6714-b4fe-44c2-b26e-90dfe3663e95",
       );
-    cy.get(".app-document-compare__separator").within(() => {
-      cy.get("button, a")
-        .contains("Close")
-        .should("exist")
-        .then(($el) => {
-          if ($el.is("a")) {
-            cy.wrap($el)
-              .should("have.attr", "href")
-              .and("not.be.empty")
-              .and(
-                "include",
-                "/view-document/e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
-              );
-          }
-        });
-    });
-    cy.get(
-      ".govuk-grid-column-one-half:not(.app-document-compare__separator)",
-    ).within(() => {
-      cy.get("button, a")
-        .contains("Close")
-        .should("exist")
-        .then(($el) => {
-          if ($el.is("a")) {
-            cy.wrap($el)
-              .should("have.attr", "href")
-              .and("not.be.empty")
-              .and(
-                "include",
-                "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-              );
-          }
-        });
-    });
+     cy.get(".app-document-compare__separator").within(() => {
+       cy.get("button, a")
+         .contains("Close")
+         .should("exist")
+         .then(($el) => {
+           if ($el.is("a")) {
+             cy.wrap($el)
+               .should("have.attr", "href")
+               .and("not.be.empty")
+               .and(
+                 "include",
+                 "/view-document/e5b5acd1-c11c-41fe-a921-7fdd07e8f670?pane=2",
+               );
+           }
+         });
+     });
+     cy.get(
+       ".govuk-grid-column-one-half:not(.app-document-compare__separator)",
+     ).within(() => {
+       cy.get("button, a")
+         .contains("Close")
+         .should("exist")
+         .then(($el) => {
+           if ($el.is("a")) {
+             cy.wrap($el)
+               .should("have.attr", "href")
+               .and("not.be.empty")
+               .and(
+                 "include",
+                 "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95?pane=1",
+               );
+           }
+         });
+     });
   });
 
   //not showing the close on the document list view

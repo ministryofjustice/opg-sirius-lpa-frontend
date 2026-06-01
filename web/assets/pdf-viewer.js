@@ -27,6 +27,7 @@ class PDFViewer {
   getStorageKey() {
     // Create a unique key based on the PDF URL and pane ID
     // This ensures each pane maintains its own state for the same document
+    console.log(this.paneId)
     return `${STORAGE_KEY}_${this.paneId}_${this.url}`;
   }
 
