@@ -49,12 +49,12 @@ class PDFViewer {
       timestamp: Date.now(),
     };
 
-     try {
-       sessionStorage.setItem(this.storageKey, JSON.stringify(state));
-     } catch (e) {
-       // sessionStorage might be unavailable or full
-       console.warn("Unable to save PDF viewer state:", e);
-     }
+    try {
+      sessionStorage.setItem(this.storageKey, JSON.stringify(state));
+    } catch (e) {
+      // sessionStorage might be unavailable or full
+      console.warn("Unable to save PDF viewer state:", e);
+    }
   }
 
   loadState() {
@@ -81,53 +81,25 @@ class PDFViewer {
   setupStatePreservation() {
     // Save state before page unload
     window.addEventListener("beforeunload", () => this.saveState());
-
-    // Save state when clicking navigation links (Back to list, Compare, Close, etc.)
-    document.addEventListener("click", (e) => {
-      const link = e.target.closest("a");
-      if (!link) return;
-
-      // Get the raw href attribute value (not the resolved URL)
-      const hrefAttr = link.getAttribute("href");
-
-      // Only save state for valid internal navigation links
-      // Skip empty hrefs and anchor-only links
-      if (!hrefAttr?.trim() || hrefAttr.startsWith("#")) {
-        return;
-      }
-
-      // Use URL parsing to safely check for non-http(s) protocols
-      // This avoids executing or referencing potentially dangerous URL schemes
-      try {
-        const url = new URL(link.href);
-        if (url.protocol !== "http:" && url.protocol !== "https:") {
-          return;
-        }
-      } catch {
-        // If URL parsing fails, it's likely a relative path which is safe
-      }
-
-      this.saveState();
-    });
   }
 
   async init() {
     try {
       this.createControls();
       this.createMainArea();
-       this.setupStatePreservation();
+      this.setupStatePreservation();
 
-       // Load saved state before loading PDF
-       const savedState = this.loadState();
+      // Load saved state before loading PDF
+      const savedState = this.loadState();
 
-       // Restore state if available
-       // Each pane maintains its own state per document (independent from other panes)
-       const shouldRestoreState = savedState;
+      // Restore state if available
+      // Each pane maintains its own state per document (independent from other panes)
+      const shouldRestoreState = savedState;
 
-       if (shouldRestoreState && savedState) {
-         this.scale = savedState.scale;
-         this.currentPage = savedState.currentPage;
-       }
+      if (shouldRestoreState && savedState) {
+        this.scale = savedState.scale;
+        this.currentPage = savedState.currentPage;
+      }
 
       const loadingTask = pdfjsLib.getDocument(this.url);
       this.pdfDoc = await loadingTask.promise;
@@ -154,7 +126,7 @@ class PDFViewer {
     }
   }
 
-   createControls() {
+  createControls() {
     const controls = document.createElement("div");
     controls.className = "pdf-viewer-controls";
     controls.innerHTML = `
@@ -235,7 +207,6 @@ class PDFViewer {
     mainArea.appendChild(canvasContainer);
     this.container.appendChild(mainArea);
 
-    this.mainArea = mainArea;
     this.thumbnailPanel = thumbnailPanel;
     this.thumbnailList = thumbnailList;
     this.canvasContainer = canvasContainer;
@@ -436,27 +407,27 @@ class PDFViewer {
     });
   }
 
-   async goToPage(pageNum) {
-     if (pageNum < 1 || pageNum > this.totalPages) return;
-     if (pageNum === this.currentPage) return;
+  async goToPage(pageNum) {
+    if (pageNum < 1 || pageNum > this.totalPages) return;
+    if (pageNum === this.currentPage) return;
 
-     this.currentPage = pageNum;
-     this.updatePageInfo();
-     this.updateThumbnailSelection();
+    this.currentPage = pageNum;
+    this.updatePageInfo();
+    this.updateThumbnailSelection();
 
-     // Scroll to the page
-     const pageContainer = this.pagesWrapper.querySelector(
-       `[data-page="${pageNum}"]`,
-     );
-     if (pageContainer) {
-       this.isScrolling = true;
-       pageContainer.scrollIntoView({ behavior: "smooth", block: "start" });
-       // Reset scrolling flag after animation
-       setTimeout(() => {
-         this.isScrolling = false;
-       }, 500);
-     }
-   }
+    // Scroll to the page
+    const pageContainer = this.pagesWrapper.querySelector(
+      `[data-page="${pageNum}"]`,
+    );
+    if (pageContainer) {
+      this.isScrolling = true;
+      pageContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+      // Reset scrolling flag after animation
+      setTimeout(() => {
+        this.isScrolling = false;
+      }, 500);
+    }
+  }
 
   updatePageInfo() {
     const pageInput = this.controls.querySelector(".pdf-viewer-page-input");
@@ -495,26 +466,26 @@ class PDFViewer {
     await this.applyZoom();
   }
 
-   async applyZoom() {
-     // Calculate scroll ratios before re-rendering
-     const scrollLeft = this.canvasContainer.scrollLeft;
-     const scrollTop = this.canvasContainer.scrollTop;
-     const scrollWidth = this.canvasContainer.scrollWidth;
-     const scrollHeight = this.canvasContainer.scrollHeight;
+  async applyZoom() {
+    // Calculate scroll ratios before re-rendering
+    const scrollLeft = this.canvasContainer.scrollLeft;
+    const scrollTop = this.canvasContainer.scrollTop;
+    const scrollWidth = this.canvasContainer.scrollWidth;
+    const scrollHeight = this.canvasContainer.scrollHeight;
 
-     // Calculate the ratio of scroll position to total scrollable area
-     const scrollLeftRatio = scrollWidth > 0 ? scrollLeft / scrollWidth : 0;
-     const scrollTopRatio = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
+    // Calculate the ratio of scroll position to total scrollable area
+    const scrollLeftRatio = scrollWidth > 0 ? scrollLeft / scrollWidth : 0;
+    const scrollTopRatio = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
 
-     this.updatePageInfo();
-     await this.renderAllPages();
+    this.updatePageInfo();
+    await this.renderAllPages();
 
-     // Apply the same ratio to the new scrollable area
-     this.canvasContainer.scrollLeft =
-       scrollLeftRatio * this.canvasContainer.scrollWidth;
-     this.canvasContainer.scrollTop =
-       scrollTopRatio * this.canvasContainer.scrollHeight;
-   }
+    // Apply the same ratio to the new scrollable area
+    this.canvasContainer.scrollLeft =
+      scrollLeftRatio * this.canvasContainer.scrollWidth;
+    this.canvasContainer.scrollTop =
+      scrollTopRatio * this.canvasContainer.scrollHeight;
+  }
 
   async fitToWidth() {
     if (!this.pdfDoc) return;
