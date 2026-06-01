@@ -18,6 +18,7 @@ type CreateEpaClient interface {
 type createEpaData struct {
 	XSRFToken       string
 	Success         bool
+	IsUpdate        bool
 	Error           sirius.ValidationError
 	Epa             sirius.Epa
 	DonorId         int
@@ -63,6 +64,8 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			} else if caseItem.CaseAttorneyJointlyAndSeverally != nil && *caseItem.CaseAttorneyJointlyAndSeverally {
 				data.AppointmentType = "jointly-and-severally"
 			}
+
+			data.IsUpdate = true
 		}
 
 		if r.Method == http.MethodPost {
