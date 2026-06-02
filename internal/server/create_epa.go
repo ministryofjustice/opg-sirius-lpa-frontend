@@ -86,10 +86,15 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 					PaymentDate:                     postFormDateString(r, "paymentDate"),
 				},
 			}
-			data.AppointmentType = caseAttorneyValue
+		data.AppointmentType = caseAttorneyValue
+
+		if !*epa.DonorHasOtherEpas {
+			epa.OtherEpaInfo = ""
+		}
 
 			if isEditing {
 				err = client.UpdateEpa(ctx, data.CaseId, epa)
+				data.Epa = epa
 			} else {
 				epa, err = client.CreateEpa(ctx, donorID, epa)
 				if err == nil {
