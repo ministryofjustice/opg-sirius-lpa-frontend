@@ -88,8 +88,13 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			}
 			data.AppointmentType = caseAttorneyValue
 
+			if *epa.DonorHasOtherEpas == false {
+				epa.OtherEpaInfo = ""
+			}
+
 			if isEditing {
 				err = client.UpdateEpa(ctx, data.CaseId, epa)
+				data.Epa = epa
 			} else {
 				epa, err = client.CreateEpa(ctx, donorID, epa)
 				if err == nil {
