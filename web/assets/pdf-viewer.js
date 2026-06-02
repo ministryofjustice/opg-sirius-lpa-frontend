@@ -137,7 +137,7 @@ class PDFViewer {
           <span aria-hidden="true">←</span> Previous
         </button>
         <span class="pdf-viewer-page-info">
-          Page <input type="text" class="pdf-viewer-page-input" aria-label="Current page number" value="1"> of <span class="pdf-viewer-total-pages">-</span>
+          Page <input type="number" class="pdf-viewer-page-input" aria-label="Current page number" value="1"> of <span class="pdf-viewer-total-pages">-</span>
         </span>
         <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="next" aria-label="Next page">
           Next <span aria-hidden="true">→</span>
