@@ -9,15 +9,12 @@
 
       {{ if .Success }}
         <meta data-app-select-case="{{ .CaseId }}" />
-<<<<<<< HEAD
         {{ if .IsUpdate }}
           {{ template "success-banner" "You have successfully updated an EPA." }}
         {{ else }}
           {{ template "success-banner" "You have successfully created an EPA." }}
         {{ end }}
-=======
         {{ template "success-banner" (successBanner "You have successfully created an EPA." false) }}
->>>>>>> d8c1d0c0 (Add dismissible success banners to action panel)
       {{ end }}
 
       <h1 class="govuk-heading-l app-!-embedded-hide">{{ .Title }}</h1>
