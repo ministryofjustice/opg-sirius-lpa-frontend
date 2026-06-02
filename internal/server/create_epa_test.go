@@ -200,7 +200,7 @@ func TestPostCreateEpaEdit(t *testing.T) {
 		EpaDonorSignatureDate:   sirius.DateString(dateString),
 		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
 		DonorHasOtherEpas:       falsePtr,
-		OtherEpaInfo:            "More info 1",
+		OtherEpaInfo:            "",
 		Case: sirius.Case{
 			ReceiptDate:                     sirius.DateString(dateString),
 			CaseAttorneySingular:            truePtr,
@@ -240,7 +240,7 @@ func TestPostCreateEpaEdit(t *testing.T) {
 			DonorId:         123,
 			Title:           "Edit EPA",
 			Success:         true,
-			Epa:             epa,
+			Epa:             newEpa,
 			AppointmentType: "singular",
 			CaseId:          234,
 			IsUpdate:        true,
