@@ -65,10 +65,11 @@ var demoComplaintCategories = []sirius.RefDataItem{
 func TestGetAddComplaint(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
+			donor := sirius.Person{ID: 1}
 			client := &mockAddComplaintClient{}
 			client.
 				On("Case", mock.Anything, 123).
-				Return(sirius.Case{CaseType: caseType, UID: "7000"}, nil).
+				Return(sirius.Case{CaseType: caseType, UID: "7000", Donor: &donor}, nil).
 				On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
 				Return(demoComplainantCategories, nil).
 				On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
@@ -86,6 +87,7 @@ func TestGetAddComplaint(t *testing.T) {
 					CaseId:                123,
 					CaseType:              caseType,
 					CaseUID:               "7000",
+					DonorId:               1,
 				}).
 				Return(nil)
 
@@ -100,6 +102,46 @@ func TestGetAddComplaint(t *testing.T) {
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
+}
+
+func TestGetAddComplaintHTMX(t *testing.T) {
+	donor := sirius.Person{ID: 1}
+	client := &mockAddComplaintClient{}
+	client.
+		On("Case", mock.Anything, 123).
+		Return(sirius.Case{CaseType: "lpa", UID: "7000", Donor: &donor}, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, addComplaintData{
+			Entity:                "lpa 7000",
+			Categories:            demoComplaintCategories,
+			ComplainantCategories: demoComplainantCategories,
+			Origins:               demoComplaintOrigins,
+			CaseId:                123,
+			CaseType:              "lpa",
+			CaseUID:               "7000",
+			DonorId:               1,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
+	r.Header.Add("hx-request", "true")
+
+	w := httptest.NewRecorder()
+
+	err := AddComplaint(client, nil, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestGetAddComplaintBadQuery(t *testing.T) {
