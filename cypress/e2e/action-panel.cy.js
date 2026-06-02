@@ -52,7 +52,7 @@ describe("Action Panel", () => {
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Add complaint");
 
-    cy.addMock("/lpa-api/v1/cases/34", "GET", {status: 200, body: {}})
+    cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
 
     cy.get("a#action-panel-button-add-complaint").click();
     cy.get(".action-panel__form").should("exist");
