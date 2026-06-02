@@ -106,7 +106,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	if len(selectedCases) == 1 {
 		selectedCase := selectedCases[0]
 		warningUrl = fmt.Sprintf("/create-warning?id=%d&entity=%s%s", donorId, strings.ToLower(selectedCase.CaseType), caseUids)
-		complaintUrl = fmt.Sprintf("/add-complaint?donorId=%d&id=%d&case=%s%s", donorId, selectedCases[0].ID, strings.ToLower(selectedCase.CaseType), caseUids)
+		complaintUrl = fmt.Sprintf("/add-complaint?id=%d&case=%s%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType), caseUids)
 	}
 
 	return []ActionPanelButton{
