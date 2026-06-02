@@ -1,8 +1,10 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -14,11 +16,12 @@ type ActionPanelClient interface {
 }
 
 type ActionPanelData struct {
-	XSRFToken     string
-	DonorID       int
-	SelectedCases []sirius.Case
-	CaseUids      string
-	CaseType      string
+	XSRFToken          string
+	DonorID            int
+	SelectedCases      []sirius.Case
+	CaseUids           string
+	CaseType           string
+	ActionPanelButtons []ActionPanelButton
 }
 
 func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
@@ -84,6 +87,40 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids)
+
 		return tmpl(w, data)
+	}
+}
+
+type ActionPanelButton struct {
+	Label    string
+	URL      string
+	IconName string
+	Disabled bool
+}
+
+func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string) []ActionPanelButton {
+	warningUrl := fmt.Sprintf("/create-warning?id=%d&entity=person%s", donorId, caseUids)
+	complaintUrl := ""
+	if len(selectedCases) == 1 {
+		selectedCase := selectedCases[0]
+		warningUrl = fmt.Sprintf("/create-warning?id=%d&entity=%s%s", donorId, strings.ToLower(selectedCase.CaseType), caseUids)
+		complaintUrl = fmt.Sprintf("/add-complaint?donorId=%d&id=%d&case=%s%s", donorId, selectedCases[0].ID, strings.ToLower(selectedCase.CaseType), caseUids)
+	}
+
+	return []ActionPanelButton{
+		{
+			Label:    "Create warning",
+			URL:      warningUrl,
+			IconName: "aw-create-warning",
+			Disabled: false,
+		},
+		{
+			Label:    "Add complaint",
+			URL:      complaintUrl,
+			IconName: "aw-log-complaint",
+			Disabled: len(selectedCases) != 1,
+		},
 	}
 }

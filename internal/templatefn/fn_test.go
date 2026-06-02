@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/server"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
@@ -837,9 +838,9 @@ func TestBoolToYesNo(t *testing.T) {
 
 func TestActionPanelButton(t *testing.T) {
 	fns := All("", "", "")
-	fn := fns["actionPanelButton"].(func(string, string, string) actionPanelButtonData)
+	fn := fns["actionPanelButton"].(func(string, string, string) server.ActionPanelButton)
 
-	expected := actionPanelButtonData{
+	expected := server.ActionPanelButton{
 		Label:    "Name",
 		URL:      "testurl",
 		IconName: "testicon",

@@ -11,6 +11,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/server"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -674,15 +675,8 @@ func translateNumberEventValue(change string, value float64) string {
 	return strconv.FormatFloat(value, 'f', -1, 64)
 }
 
-type actionPanelButtonData struct {
-	Label    string
-	URL      string
-	IconName string
-	Disabled bool
-}
-
-func actionPanelButton(label, url, iconName string, disabled bool) actionPanelButtonData {
-	return actionPanelButtonData{
+func actionPanelButton(label, url, iconName string, disabled bool) server.ActionPanelButton {
+	return server.ActionPanelButton{
 		Label:    label,
 		URL:      url,
 		IconName: iconName,
