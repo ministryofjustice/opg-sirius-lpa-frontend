@@ -1,7 +1,7 @@
 {{ define "action-panel-button" }}
   <a id="action-panel-button-{{ replace (ToLower .Label) " " "-" }}"
      class="govuk-body govuk-!-margin-bottom-0{{ if .Disabled }} disabled{{ end }}"
-     hx-get="{{ .URL }}"
+     hx-get="{{ prefix .URL }}"
      hx-target=".action-panel__content"
      hx-swap="innerHTML"
      {{ if .Disabled }}aria-disabled="true"{{ end }}
