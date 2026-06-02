@@ -270,7 +270,7 @@ func TestGetDocumentList(t *testing.T) {
 				},
 				{
 					Label:    "Add complaint",
-					URL:      "/add-complaint?id=1&case=lpa&uid[]=7000-1234-0000",
+					URL:      "/add-complaint?id=1&case=lpa",
 					IconName: "aw-log-complaint",
 					Disabled: false,
 				},
