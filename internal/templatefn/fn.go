@@ -678,12 +678,14 @@ type actionPanelButtonData struct {
 	Label    string
 	URL      string
 	IconName string
+	Disabled bool
 }
 
-func actionPanelButton(label, url, iconName string) actionPanelButtonData {
+func actionPanelButton(label, url, iconName string, disabled bool) actionPanelButtonData {
 	return actionPanelButtonData{
 		Label:    label,
 		URL:      url,
 		IconName: iconName,
+		Disabled: disabled,
 	}
 }
