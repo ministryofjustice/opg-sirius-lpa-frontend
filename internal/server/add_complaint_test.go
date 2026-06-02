@@ -83,13 +83,16 @@ func TestGetAddComplaint(t *testing.T) {
 					Categories:            demoComplaintCategories,
 					ComplainantCategories: demoComplainantCategories,
 					Origins:               demoComplaintOrigins,
+					CaseId:                123,
+					CaseType:              caseType,
+					CaseUID:               "7000",
 				}).
 				Return(nil)
 
 			r, _ := http.NewRequest(http.MethodGet, "/?id=123&case="+caseType, nil)
 			w := httptest.NewRecorder()
 
-			err := AddComplaint(client, template.Func)(w, r)
+			err := AddComplaint(client, template.Func, nil)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -111,7 +114,7 @@ func TestGetAddComplaintBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := AddComplaint(nil, nil)(w, r)
+			err := AddComplaint(nil, nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -135,7 +138,7 @@ func TestGetAddComplaintWhenCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := AddComplaint(client, nil)(w, r)
+	err := AddComplaint(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -158,7 +161,7 @@ func TestGetAddComplaintWhenRefDataErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := AddComplaint(client, nil)(w, r)
+	err := AddComplaint(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -185,13 +188,16 @@ func TestGetAddComplaintWhenTemplateErrors(t *testing.T) {
 			Categories:            demoComplaintCategories,
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
+			CaseId:                123,
+			CaseType:              "lpa",
+			CaseUID:               "7000",
 		}).
 		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := AddComplaint(client, template.Func)(w, r)
+	err := AddComplaint(client, template.Func, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -232,6 +238,9 @@ func TestPostAddComplaint(t *testing.T) {
 					Categories:            demoComplaintCategories,
 					ComplainantCategories: demoComplainantCategories,
 					Origins:               demoComplaintOrigins,
+					CaseId:                123,
+					CaseType:              caseType,
+					CaseUID:               "7000",
 				}).
 				Return(nil)
 
@@ -249,7 +258,7 @@ func TestPostAddComplaint(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := AddComplaint(client, template.Func)(w, r)
+			err := AddComplaint(client, template.Func, nil)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -292,6 +301,9 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 			Categories:            demoComplaintCategories,
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
+			CaseId:                123,
+			CaseType:              "lpa",
+			CaseUID:               "7000",
 		}).
 		Return(nil)
 
@@ -303,7 +315,7 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AddComplaint(client, template.Func)(w, r)
+	err := AddComplaint(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -338,7 +350,7 @@ func TestPostAddComplaintWhenAddComplaintOtherError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AddComplaint(client, nil)(w, r)
+	err := AddComplaint(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
