@@ -850,3 +850,17 @@ func TestActionPanelButton(t *testing.T) {
 	val := fn("Name", "testurl", "testicon", false)
 	assert.Equal(t, expected, val)
 }
+
+func TestHeaderBarButton(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["headerBarButton"].(func(string, string, string) headerBarButtonData)
+
+	expected := headerBarButtonData{
+		Label:    "Name",
+		URL:      "testurl",
+		IconName: "testicon",
+	}
+
+	val := fn("Name", "testurl", "testicon")
+	assert.Equal(t, expected, val)
+}

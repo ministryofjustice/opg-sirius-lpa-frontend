@@ -1,0 +1,13 @@
+{{ define "header-button" }}
+  <a id="header-button-{{ replace (ToLower .Label) " " "-" }}"
+     class="panel-tabs__button"
+     href="{{ .URL }}"
+     aria-label="{{ .Label }}"
+     data-label="{{ .Label }}"
+  >
+    <svg aria-hidden="true" focusable="false" class="page-header__button-icon">
+      <use href="{{ prefixSVG .IconName }}" />
+    </svg>
+    <span class="govuk-visually-hidden">{{ .Label }}</span>
+  </a>
+{{ end }}
