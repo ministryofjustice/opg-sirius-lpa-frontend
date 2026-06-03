@@ -3,9 +3,11 @@
     {{ if eq (len .SelectedCases) 1 }}
       {{ with index .SelectedCases 0 }}
         {{ template "action-panel-button" actionPanelButton "Create warning" (prefix (printf "/create-warning?id=%d&entity=%s%s" $.DonorID (ToLower .CaseType) $.CaseUids)) "aw-create-warning" }}
+        {{ template "action-panel-button" actionPanelButton "Create event" (prefix (printf "/create-event?id=%d&entity=person%s" $.DonorID $.CaseUids)) "aw-new-event" }}
       {{ end }}
     {{ else }}
       {{ template "action-panel-button" actionPanelButton "Create warning" (prefix (printf "/create-warning?id=%d&entity=person%s" $.DonorID $.CaseUids)) "aw-create-warning" }}
+      {{ template "action-panel-button" actionPanelButton "Create event" (prefix (printf "/create-event?id=%d&entity=person%s" $.DonorID $.CaseUids)) "aw-new-event" }}
     {{ end }}
   </div>
 {{ end }}
