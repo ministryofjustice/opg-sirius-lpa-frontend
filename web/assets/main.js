@@ -22,6 +22,7 @@ import "htmx.org";
 import htmx from "htmx.org/dist/htmx.esm";
 import documentListSort from "./document-list-sort";
 import initPdfViewer from "./pdf-viewer";
+import initSiriusHeader from "./sirius-header.js";
 
 const prefix = document.body.getAttribute("data-prefix");
 
@@ -46,6 +47,7 @@ showHideCaseSummary();
 disableAfterClick();
 documentListSort();
 initPdfViewer();
+initSiriusHeader();
 
 globalThis.htmx = htmx;
 // Don't include indicator styles as CSP blocks inline styles
