@@ -11,7 +11,7 @@
             {{ template "error-summary" .Error }}
 
             {{ if .Success }}
-                {{ template "success-banner" "You have changed attorney details." }}
+                {{ template "success-banner" (successBanner "You have changed attorney details." false) }}
             {{ end }}
 
             <h1 class="govuk-heading-l app-!-embedded-hide">

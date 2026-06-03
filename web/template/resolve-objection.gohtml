@@ -10,7 +10,7 @@
             {{ template "error-summary" .Error }}
 
             {{ if .Success }}
-                {{ template "success-banner" "You have successfully resolved an objection." }}
+                {{ template "success-banner" (successBanner "You have successfully resolved an objection." false) }}
             {{ end }}
 
             <h1 class="govuk-heading-l app-!-embedded-hide">Record objection outcome</h1>

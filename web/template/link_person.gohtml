@@ -11,7 +11,7 @@
 
       {{ if .Success }}
         <meta data-app-reload="page" />
-        {{ template "success-banner" "You have successfully linked these records." }}
+        {{ template "success-banner" (successBanner "You have successfully linked these records." false) }}
       {{ end }}
 
       <h1 class="govuk-heading-l app-!-embedded-hide">Link record</h1>

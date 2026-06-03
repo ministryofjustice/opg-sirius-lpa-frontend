@@ -16,7 +16,7 @@
 
       {{ if .Success }}
         <meta data-app-reload="page" />
-        {{ template "success-banner" "You have successfully allocated cases." }}
+        {{ template "success-banner" (successBanner "You have successfully allocated cases." false) }}
       {{ end }}
 
       {{ if eq 1 (len .Entities) }}

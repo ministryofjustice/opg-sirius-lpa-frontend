@@ -10,9 +10,9 @@
             {{ if .Success }}
                 <meta data-app-reload="page" />
                 {{ if .Investigation.IsOnHold }}
-                    {{ template "success-banner" "You have taken the investigation off hold." }}
+                    {{ template "success-banner" (successBanner "You have taken the investigation off hold." false) }}
                 {{ else }}
-                    {{ template "success-banner" "You have placed the investigation on hold." }}
+                    {{ template "success-banner" (successBanner "You have placed the investigation on hold." false) }}
                 {{ end }}
             {{ end }}
 

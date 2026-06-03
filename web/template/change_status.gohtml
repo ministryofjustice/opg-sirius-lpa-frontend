@@ -11,7 +11,7 @@
 
       {{ if .Success }}
         <meta data-app-reload="page" />
-        {{ template "success-banner" (printf "Status changed to %s" .NewStatus) }}
+        {{ template "success-banner" successBanner ((printf "Status changed to %s" .NewStatus) false) }}
       {{ end }}
 
       <h1 class="govuk-heading-l app-!-embedded-hide">Change status</h1>

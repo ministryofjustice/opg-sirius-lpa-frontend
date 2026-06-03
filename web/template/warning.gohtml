@@ -7,9 +7,9 @@
     <div class="govuk-grid-column-two-thirds">
         {{ template "error-summary" .Error }}
 
-        {{ if .Success }}
+        {{ if .SuccessMessage }}
           <meta data-app-reload="page" />
-          {{ template "success-banner" "You have successfully created a warning." }}
+          {{ template "success-banner" (successBanner .SuccessMessage false) }}
         {{ end }}
 
       <h1 class="govuk-heading-l app-!-embedded-hide">Create Warning</h1>

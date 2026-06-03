@@ -17,10 +17,10 @@ type WarningClient interface {
 }
 
 type warningData struct {
-	XSRFToken    string
-	WarningTypes []sirius.RefDataItem
-	Success      bool
-	Error        sirius.ValidationError
+	XSRFToken      string
+	WarningTypes   []sirius.RefDataItem
+	SuccessMessage string
+	Error          sirius.ValidationError
 
 	WarningType string
 	WarningText string
@@ -49,7 +49,6 @@ func Warning(client WarningClient, tmpl template.Template, partialTmpl template.
 		}
 
 		data := warningData{
-			Success:      false,
 			XSRFToken:    ctx.XSRFToken,
 			WarningTypes: warningTypes,
 			Cases:        cases,
@@ -93,7 +92,7 @@ func Warning(client WarningClient, tmpl template.Template, partialTmpl template.
 			} else if err != nil {
 				return err
 			} else {
-				data.Success = true
+				data.SuccessMessage = "You have successfully created a warning."
 
 				for _, lpa := range data.Cases {
 					if lpa.CaseType == "DIGITAL_LPA" && slices.Contains(caseIDs, lpa.ID) {

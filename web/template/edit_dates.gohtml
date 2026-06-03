@@ -11,7 +11,7 @@
 
       {{ if .Success }}
         <meta data-app-reload="page" />
-        {{ template "success-banner" "You have successfully edited the dates." }}
+        {{ template "success-banner" (successBanner "You have successfully edited the dates." false) }}
       {{ end }}
 
       <h1 class="govuk-heading-l app-!-embedded-hide">Edit Dates</h1>

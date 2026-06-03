@@ -14,6 +14,7 @@
         {{ else }}
           {{ template "success-banner" "You have successfully created an EPA." }}
         {{ end }}
+        {{ template "success-banner" (successBanner "You have successfully created an EPA." false) }}
       {{ end }}
 
       <h1 class="govuk-heading-l app-!-embedded-hide">{{ .Title }}</h1>

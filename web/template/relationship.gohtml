@@ -11,7 +11,7 @@
 
       {{ if .Success }}
         <meta data-app-reload="page" />
-        {{ template "success-banner" "You have successfully created a relationship." }}
+        {{ template "success-banner" (successBanner "You have successfully created a relationship." false) }}
       {{ end }}
 
       <h1 class="govuk-heading-l app-!-embedded-hide">Create Relationship</h1>

@@ -1,4 +1,9 @@
 {{ define "actionPanel" }}
+  {{ if .SuccessMessage }}
+      <div class="govuk-!-margin-1">
+        {{ template "success-banner" (successBanner .SuccessMessage true) }}
+      </div>
+  {{ end }}
   <div class="action-panel__inner">
     {{ if eq (len .SelectedCases) 1 }}
       {{ with index .SelectedCases 0 }}
