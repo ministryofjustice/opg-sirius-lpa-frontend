@@ -1,21 +1,21 @@
 {{ define "header-dropdown-button" }}
-  <details class="panel-tabs__details" name="sirius-header-dropdown">
+  <details class="sirius-header__details" name="sirius-header-dropdown">
     <summary id="header-button-{{ replace (ToLower .Label) " " "-" }}"
-       class="panel-tabs__button panel-tabs__summary"
+       class="sirius-header__button sirius-header__summary"
        aria-label="{{ .Label }}"
-       aria-controls="panel-tabs__dropdown-{{ replace (ToLower .Label) " " "-" }}"
+       aria-controls="sirius-header__dropdown-{{ replace (ToLower .Label) " " "-" }}"
        data-label="{{ .Label }}"
     >
-      <svg aria-hidden="true" focusable="false" class="page-header__button-icon">
+      <svg aria-hidden="true" focusable="false" class="sirius-header__button-icon">
         <use href="{{ prefixSVG .IconName }}" />
       </svg>
       <span class="govuk-visually-hidden">{{ .Label }}</span>
     </summary>
 
-    <div class="panel-tabs__dropdown">
+    <div class="sirius-header__dropdown-panel">
       <div class="govuk-width-container">
-        <div id="panel-tabs__dropdown-{{ replace (ToLower .Label) " " "-" }}"
-             class="page-header__dropdown"
+        <div id="sirius-header__dropdown-{{ replace (ToLower .Label) " " "-" }}"
+             class="sirius-header__dropdown"
              role="region"
              aria-labelledby="header-button-{{ replace (ToLower .Label) " " "-" }}"
              hx-get="{{ .URL }}"
