@@ -640,7 +640,8 @@ $govuk-assets-path: "../assets/";
   .govuk-input,
   .govuk-button,
   .govuk-link,
-  .govuk-fieldset__legend {
+  .govuk-fieldset__legend,
+  .govuk-textarea {
     font-size: 0.875rem;
   }
   .govuk-select,
