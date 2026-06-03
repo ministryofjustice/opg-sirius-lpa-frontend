@@ -30,6 +30,7 @@ type documentPageData struct {
 	Comparing             bool
 	CompareURLs           map[string]string
 	CloseURL              string
+	PaneTarget            string
 	CaseUids              string
 }
 

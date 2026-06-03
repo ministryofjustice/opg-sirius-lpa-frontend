@@ -1,0 +1,16 @@
+{{ define "page" }}
+    <div id="compare-pane-1" class="govuk-grid-column-one-half app-document-compare__separator">
+        {{ if eq .Pane1 "doc" }}
+            {{ template "viewingDocument" .View1 }}
+        {{ else }}
+            {{ template "DocumentList" .DocListPane1Data  }}
+        {{ end }}
+    </div>
+    <div id="compare-pane-2" class="govuk-grid-column-one-half">
+        {{ if eq .Pane2 "doc" }}
+            {{ template "viewingDocument" .View2 }}
+        {{ else }}
+            {{ template "DocumentList" .DocListPane2Data  }}
+        {{ end }}
+    </div>
+{{ end }}

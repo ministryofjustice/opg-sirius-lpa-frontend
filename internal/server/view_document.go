@@ -18,7 +18,7 @@ type viewDocumentData struct {
 	IsSysAdminUser bool
 }
 
-func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
+func ViewDocument(client ViewDocumentClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		uuid := r.PathValue("uuid")
 		ctx := getContext(r)
@@ -38,6 +38,10 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			XSRFToken:      ctx.XSRFToken,
 			Document:       documentData,
 			IsSysAdminUser: isSysAdminUser,
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

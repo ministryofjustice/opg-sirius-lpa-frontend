@@ -80,7 +80,10 @@
                                 {{ if .CloseURL }}
                                     <a class="govuk-button govuk-button--secondary moj-button-menu__item"
                                        href="{{ prefix .CloseURL }}"
-                                       aria-label="Close list">Close</a>
+                                       hx-get="{{ prefix .CloseURL }}"
+                                       hx-target="#document-content-region"
+                                       hw-swap="innerHTML"
+                                       hx-push-url="true">Close</a>
                                 {{end}}
                             {{ end }}
                         </div>
@@ -122,9 +125,19 @@
                                 <br>
                                 {{ if eq .MimeType "application/pdf"}}
                                     {{ if eq $.Comparing true }}
-                                        <a class="govuk-link" href="{{ prefix ( index $.CompareURLs .UUID )}}">{{ .FriendlyDescription }}</a>
+                                        <a class="govuk-link"
+                                           href="{{ prefix ( index $.CompareURLs .UUID )}}"
+                                           hx-get="{{ prefix ( index $.CompareURLs .UUID )}}"
+                                           hx-target="#document-content-region"
+                                           hw-swap="innerHTML"
+                                           hx-push-url="true">{{ .FriendlyDescription }}</a>
                                     {{else}}
-                                        <a class="govuk-link" href="{{ prefix (printf "/view-document/%s" .UUID) }}">{{ .FriendlyDescription }}</a>
+                                        <a class="govuk-link"
+                                           href="{{ prefix (printf "/view-document/%s" .UUID) }}"
+                                           hx-get="{{ prefix (printf "/view-document/%s" .UUID) }}"
+                                           hx-target="#document-content-region"
+                                           hw-swap="innerHTML"
+                                           hx-push-url="true">{{ .FriendlyDescription }}</a>
                                     {{ end }}
                                 {{ else }}
                                     <a class="govuk-link" href="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .UUID) }}" download="">{{ .FriendlyDescription }}</a>

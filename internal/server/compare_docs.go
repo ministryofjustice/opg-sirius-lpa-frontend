@@ -29,7 +29,7 @@ type viewingDocumentData struct {
 	CloseURL string
 }
 
-func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
+func CompareDocs(client CompareDocsClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		donorID, err := strToIntOrStatusError(r.PathValue("id"))
 		if err != nil {
@@ -145,6 +145,10 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 		if bothSidesAreLists {
 			data.DocListPane1Data.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", donorID, data.DocListPane2Data.DocumentList.Documents[0].CaseItems[0].UID)
 			data.DocListPane2Data.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", donorID, data.DocListPane1Data.DocumentList.Documents[0].CaseItems[0].UID)
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

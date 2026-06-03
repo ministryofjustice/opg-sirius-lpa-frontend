@@ -1,0 +1,59 @@
+{{ define "page" }}
+    <div class="govuk-grid-column-full">
+        <div class="govuk-body">
+            {{ range .Document.CaseItems }}
+                {{ template "CaseLabel" . }}
+            {{ end }}
+            <h1 class="govuk-heading-m">
+                {{ (parseAndFormatDate .Document.CreatedDate "02/01/2006 15:04:05" "02/01/2006") }} {{ .Document.FriendlyDescription }}
+            </h1>
+        </div>
+
+        <div class="moj-button-group--inline">
+            {{ if gt (len .Document.CaseItems) 0 }}
+                {{ $caseItem := index .Document.CaseItems 0 }}
+                {{ $donor := $caseItem.Donor }}
+                <a class="govuk-button govuk-button--secondary moj-button-menu__item"
+                   href="{{ prefix (printf "/donor/%d/documents?uid[]=%s" $donor.ID $caseItem.UID) }}"
+                   hx-get="{{ prefix (printf "/donor/%d/documents?uid[]=%s" $donor.ID $caseItem.UID) }}"
+                   hx-target="#document-content-region"
+                   hw-swap="innerHTML"
+                   hx-push-url="true">Back to list</a>
+            {{ else }}
+                {{ $donor := index .Document.Persons 0 }}
+                <a class="govuk-button govuk-button--secondary moj-button-menu__item"
+                   href="{{ prefix (printf "/donor/%d/documents" $donor.ID ) }}"
+                   hx-get="{{ prefix (printf "/donor/%d/documents" $donor.ID ) }}"
+                   hx-target="#document-content-region"
+                   hw-swap="innerHTML"
+                   hx-push-url="true">Back to list</a>
+            {{ end }}
+            <a class="govuk-button govuk-button--secondary moj-button-menu__item" href="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .Document.UUID) }}" download="">Download</a>
+
+            {{ if .IsSysAdminUser }}
+                <a class="govuk-button govuk-button--warning moj-button-menu__item"
+                   href="{{ prefix (printf "/delete-document/%s" .Document.UUID) }}"
+                >
+                    Delete
+                </a>
+            {{ end }}
+
+            {{ if gt (len .Document.CaseItems) 0 }}
+                {{ $caseItem := index .Document.CaseItems 0 }}
+                <a class="govuk-button govuk-button--secondary moj-button-menu__item"
+                   href="{{ prefix (printf "/compare/%d/%d?pane1=%s" $caseItem.Donor.ID $caseItem.ID .Document.UUID) }}"
+                   hx-get="{{ prefix (printf "/compare/%d/%d?pane1=%s" $caseItem.Donor.ID $caseItem.ID .Document.UUID) }}"
+                   hx-target="#document-content-region"
+                   hw-swap="innerHTML"
+                   hx-push-url="true">Compare</a>
+            {{ end }}
+
+            <div class="pdf-viewer-container"
+                 title="Document viewer"
+                 data-pdf-viewer
+                 data-pdf-url="{{ sirius (printf "/lpa-api/v1/documents/%s/file" .Document.UUID) }}">
+            </div>
+
+        </div>
+    </div>
+{{ end }}
