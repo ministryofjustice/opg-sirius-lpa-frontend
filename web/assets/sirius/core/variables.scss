@@ -1,0 +1,55 @@
+@use "sass:math";
+
+// Minimal legacy Sirius layout tokens needed by the reduced import set in all.scss.
+
+// ---------------------------------------------
+// Columns and spacing
+// ---------------------------------------------
+$gutter: 15px;
+$spacer: 10px;
+$column-padding: $spacer;
+$col-width: 59px;
+
+@mixin cols($cols, $padding: 0) {
+    width: ($col-width * $cols) + ($column-padding * ($cols - 1)) - $padding;
+}
+
+// ---------------------------------------------
+// Z-indexes
+// ---------------------------------------------
+$z-page-header: 400;
+$z-page-header-search: 480;
+
+// ---------------------------------------------
+// Typography helpers
+// ---------------------------------------------
+$base-size: 16;
+
+@mixin pem($value: $base-size, $context: $base-size) {
+    font-size: math.div($value, $context) + 0em;
+}
+
+// ---------------------------------------------
+// Form elements
+// ---------------------------------------------
+$form-el-border-radius: 5px;
+
+@mixin form-el-border {
+    border: 1px solid $color-form-border;
+}
+
+@mixin form-el-disabled {
+    cursor: default;
+    opacity: .65;
+}
+
+// ---------------------------------------------
+// Legacy accessible theme token
+// ---------------------------------------------
+$color-accessible-red: #b53737;
+
+// ---------------------------------------------
+// Header layout dimensions
+// ---------------------------------------------
+$layout-aside-width: 400px;
+$page-header-bar-height: 34px;
