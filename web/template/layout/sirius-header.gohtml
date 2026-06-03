@@ -1,0 +1,14 @@
+{{ define "siriusHeader" }}
+    <header class="page-header" data-module="header">
+        <div class="govuk-width-container">
+            <div class="page-header__inner">
+                <h1 aria-live="polite">
+                    {{- .Person.Firstname -}}
+                    {{- if .Person.Middlenames }} {{ .Person.Middlenames }}{{ end }}
+                    {{- " " -}}{{ .Person.Surname }}
+                    <span class="light">{{ .Person.PersonType }}</span>
+                </h1>
+            </div>
+        </div>
+    </header>
+{{ end }}
