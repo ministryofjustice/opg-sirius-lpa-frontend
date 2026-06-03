@@ -365,6 +365,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			return "false"
 		},
 		"actionPanelButton": actionPanelButton,
+		"headerBarButton":   headerBarButton,
 	}
 }
 
@@ -685,6 +686,20 @@ type actionPanelButtonData struct {
 
 func actionPanelButton(label, url, iconName string) actionPanelButtonData {
 	return actionPanelButtonData{
+		Label:    label,
+		URL:      url,
+		IconName: iconName,
+	}
+}
+
+type headerBarButtonData struct {
+	Label    string
+	URL      string
+	IconName string
+}
+
+func headerBarButton(label, url, iconName string) headerBarButtonData {
+	return headerBarButtonData{
 		Label:    label,
 		URL:      url,
 		IconName: iconName,

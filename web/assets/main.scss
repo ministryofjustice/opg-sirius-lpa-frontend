@@ -774,7 +774,9 @@ $govuk-assets-path: "../assets/";
   border-right: 1px solid rgb(255, 255, 255);
   color: rgb(255, 255, 255);
   cursor: pointer;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: opg-icons;
   font-feature-settings: "liga";
   font-size: 22.4px;
@@ -790,6 +792,13 @@ $govuk-assets-path: "../assets/";
   &:hover {
     background-color: rgba(255, 255, 255, 0.15);
   }
+}
+
+.page-header__button-icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
 }
 
 .panel-tabs__dropdown {
