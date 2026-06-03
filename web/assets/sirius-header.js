@@ -9,7 +9,9 @@ const moveSearchIntoSiriusHeader = () => {
     return;
   }
 
-  const desktopSearch = document.querySelector(".app-search-inline-phase-banner");
+  const desktopSearch = document.querySelector(
+    ".app-search-inline-phase-banner",
+  );
   if (!(desktopSearch instanceof HTMLElement)) {
     return;
   }
@@ -56,7 +58,10 @@ const initSiriusHeaderDropdownToggle = () => {
     const detail = event.detail;
 
     const dropdown = event.detail?.target;
-    if (!(dropdown instanceof HTMLElement) || dropdown.id !== siriusHeaderDropdownId) {
+    if (
+      !(dropdown instanceof HTMLElement) ||
+      dropdown.id !== siriusHeaderDropdownId
+    ) {
       return;
     }
 
@@ -67,7 +72,8 @@ const initSiriusHeaderDropdownToggle = () => {
     }
 
     const isOpen =
-      dropdown.innerHTML.trim() !== "" && dropdown.dataset.openedBy === button.id;
+      dropdown.innerHTML.trim() !== "" &&
+      dropdown.dataset.openedBy === button.id;
     if (!isOpen) {
       return;
     }
@@ -82,7 +88,10 @@ const initSiriusHeaderDropdownToggle = () => {
     }
 
     const dropdown = document.querySelector(siriusHeaderDropdownSelector);
-    if (!(dropdown instanceof HTMLElement) || dropdown.innerHTML.trim() === "") {
+    if (
+      !(dropdown instanceof HTMLElement) ||
+      dropdown.innerHTML.trim() === ""
+    ) {
       return;
     }
 
@@ -92,7 +101,10 @@ const initSiriusHeaderDropdownToggle = () => {
   document.body.addEventListener("htmx:afterSwap", (event) => {
     const detail = event.detail;
     const dropdown = event.detail?.target;
-    if (!(dropdown instanceof HTMLElement) || dropdown.id !== siriusHeaderDropdownId) {
+    if (
+      !(dropdown instanceof HTMLElement) ||
+      dropdown.id !== siriusHeaderDropdownId
+    ) {
       return;
     }
 

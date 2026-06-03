@@ -11,7 +11,7 @@ $column-padding: $spacer;
 $col-width: 59px;
 
 @mixin cols($cols, $padding: 0) {
-    width: ($col-width * $cols) + ($column-padding * ($cols - 1)) - $padding;
+  width: ($col-width * $cols) + ($column-padding * ($cols - 1)) - $padding;
 }
 
 // ---------------------------------------------
@@ -26,7 +26,7 @@ $z-page-header-search: 480;
 $base-size: 16;
 
 @mixin pem($value: $base-size, $context: $base-size) {
-    font-size: math.div($value, $context) + 0em;
+  font-size: math.div($value, $context) + 0em;
 }
 
 // ---------------------------------------------
@@ -35,12 +35,12 @@ $base-size: 16;
 $form-el-border-radius: 5px;
 
 @mixin form-el-border {
-    border: 1px solid $color-form-border;
+  border: 1px solid $color-form-border;
 }
 
 @mixin form-el-disabled {
-    cursor: default;
-    opacity: .65;
+  cursor: default;
+  opacity: 0.65;
 }
 
 // ---------------------------------------------
