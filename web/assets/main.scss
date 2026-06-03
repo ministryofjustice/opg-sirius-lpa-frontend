@@ -843,3 +843,19 @@ $govuk-assets-path: "../assets/";
     display: none;
   }
 }
+
+.page-header__search {
+  margin-left: govuk-spacing(1);
+  max-width: 420px;
+  width: 100%;
+
+  .app-search-inline-phase-banner {
+    float: none;
+    padding: 0;
+    width: 100%;
+  }
+
+  .govuk-input__wrapper {
+    margin-bottom: 0;
+  }
+}
