@@ -26,6 +26,13 @@ describe("Action Panel", () => {
         },
       },
     );
+
+    // needed for the header bar
+    cy.addMock("/lpa-api/v1/persons/1", "GET", {
+      status: 200,
+      body: {},
+    });
+
     cy.visit("/donor/1/documents?uid[]=7000-1234-1234");
   });
 
