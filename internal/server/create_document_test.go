@@ -167,6 +167,48 @@ func TestPostCreateDocument(t *testing.T) {
 	}
 }
 
+func TestPostCreateDocumentHTMX(t *testing.T) {
+	caseItem := sirius.Case{CaseType: "lpa", UID: "7000"}
+
+	client := &mockCreateDocumentClient{}
+	client.
+		On("Case", mock.Anything, 123).
+		Return(caseItem, nil)
+	client.
+		On("CreateDocument", mock.Anything, 123, 1, "DD", []string{"DDINSERT"}).
+		Return(sirius.Document{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createDocumentData{
+			Case:         caseItem,
+			Document:     sirius.Document{},
+			HtmxRedirect: "/edit-document?id=123&case=lpa",
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"id":                {"123"},
+		"case":              {"lpa"},
+		"templateId":        {"DD"},
+		"selectRecipients":  {"1"},
+		"recipientControls": {"selectRecipients"},
+		"insert":            {"DDINSERT"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&case=lpa", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := CreateDocument(client, nil, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestPostCreateDocumentGenerateNewRecipient(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
