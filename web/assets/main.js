@@ -64,14 +64,17 @@ htmx.on("htmx:afterSwap", (event) => {
     select(prefix);
     handleCreateDocumentButton();
     insertSelector(swapDetails.target);
-    handleInsertCheckboxes({scope: swapDetails.target});
+    handleInsertCheckboxes({ scope: swapDetails.target });
 
     // Update the action panel width if swapping in create-document or edit-document content
     if (swapDetails.target.id === "actions-content") {
-      if (swapDetails.pathInfo.requestPath.includes("create-document") || swapDetails.pathInfo.requestPath.includes("create-document")) {
-        document.querySelector(".action-panel").classList.add("wide")
+      if (
+        swapDetails.pathInfo.requestPath.includes("create-document") ||
+        swapDetails.pathInfo.requestPath.includes("create-document")
+      ) {
+        document.querySelector(".action-panel").classList.add("wide");
       } else {
-        document.querySelector(".action-panel").classList.remove("wide")
+        document.querySelector(".action-panel").classList.remove("wide");
       }
     }
   }
