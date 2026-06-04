@@ -196,14 +196,15 @@ func TestGetDocumentList(t *testing.T) {
 	}
 
 	tests := []struct {
-		name             string
-		cases            []sirius.Case
-		documentList     sirius.DocumentList
-		expectedMultiple bool
-		expectedCases    []sirius.Case
-		caseIDs          []string
-		caseUids         string
-		path             string
+		name               string
+		cases              []sirius.Case
+		documentList       sirius.DocumentList
+		expectedMultiple   bool
+		expectedCases      []sirius.Case
+		caseIDs            []string
+		caseUids           string
+		path               string
+		actionPanelButtons []ActionPanelButton
 	}{
 		{
 			name:             "on person with multiple cases",
@@ -213,6 +214,20 @@ func TestGetDocumentList(t *testing.T) {
 			expectedCases:    cases,
 			caseIDs:          []string(nil),
 			path:             "/donor/82/documents",
+			actionPanelButtons: []ActionPanelButton{
+				{
+					Label:    "Create warning",
+					URL:      "/create-warning?id=82&entity=person",
+					IconName: "aw-create-warning",
+					Disabled: false,
+				},
+				{
+					Label:    "Add complaint",
+					URL:      "",
+					IconName: "aw-log-complaint",
+					Disabled: true,
+				},
+			},
 		},
 		{
 			name:             "on person with one case",
@@ -222,6 +237,20 @@ func TestGetDocumentList(t *testing.T) {
 			expectedCases:    cases[:1],
 			caseIDs:          []string(nil),
 			path:             "/donor/82/documents",
+			actionPanelButtons: []ActionPanelButton{
+				{
+					Label:    "Create warning",
+					URL:      "/create-warning?id=82&entity=lpa",
+					IconName: "aw-create-warning",
+					Disabled: false,
+				},
+				{
+					Label:    "Add complaint",
+					URL:      "/add-complaint?id=1&case=lpa",
+					IconName: "aw-log-complaint",
+					Disabled: false,
+				},
+			},
 		},
 		{
 			name:             "one case specified",
@@ -232,6 +261,20 @@ func TestGetDocumentList(t *testing.T) {
 			caseIDs:          []string{"1"},
 			caseUids:         "&uid[]=7000-1234-0000",
 			path:             "/donor/82/documents?uid[]=7000-1234-0000",
+			actionPanelButtons: []ActionPanelButton{
+				{
+					Label:    "Create warning",
+					URL:      "/create-warning?id=82&entity=lpa&uid[]=7000-1234-0000",
+					IconName: "aw-create-warning",
+					Disabled: false,
+				},
+				{
+					Label:    "Add complaint",
+					URL:      "/add-complaint?id=1&case=lpa",
+					IconName: "aw-log-complaint",
+					Disabled: false,
+				},
+			},
 		},
 		{
 			name:             "multiple cases specified",
@@ -242,6 +285,20 @@ func TestGetDocumentList(t *testing.T) {
 			caseIDs:          []string{"1", "2"},
 			caseUids:         "&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 			path:             "/donor/82/documents?uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+			actionPanelButtons: []ActionPanelButton{
+				{
+					Label:    "Create warning",
+					URL:      "/create-warning?id=82&entity=person&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+					IconName: "aw-create-warning",
+					Disabled: false,
+				},
+				{
+					Label:    "Add complaint",
+					URL:      "",
+					IconName: "aw-log-complaint",
+					Disabled: true,
+				},
+			},
 		},
 	}
 
@@ -264,6 +321,7 @@ func TestGetDocumentList(t *testing.T) {
 						MultipleCasesSelected: tc.expectedMultiple,
 						DonorID:               82,
 						CaseUids:              tc.caseUids,
+						ActionPanelButtons:    tc.actionPanelButtons,
 					},
 				).
 				Return(nil)
@@ -369,6 +427,20 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 				Error: sirius.ValidationError{
 					Detail: "Select one or more documents and try again.",
 				},
+				ActionPanelButtons: []ActionPanelButton{
+					{
+						Label:    "Create warning",
+						URL:      "/create-warning?id=82&entity=person",
+						IconName: "aw-create-warning",
+						Disabled: false,
+					},
+					{
+						Label:    "Add complaint",
+						URL:      "",
+						IconName: "aw-log-complaint",
+						Disabled: true,
+					},
+				},
 			},
 		).
 		Return(nil)
@@ -448,6 +520,20 @@ func TestDocumentListDismissValidation(t *testing.T) {
 				MultipleCasesSelected: true,
 				DonorID:               82,
 				CaseUids:              "&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+				ActionPanelButtons: []ActionPanelButton{
+					{
+						Label:    "Create warning",
+						URL:      "/create-warning?id=82&entity=person&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+						IconName: "aw-create-warning",
+						Disabled: false,
+					},
+					{
+						Label:    "Add complaint",
+						URL:      "",
+						IconName: "aw-log-complaint",
+						Disabled: true,
+					},
+				},
 			},
 		).
 		Return(nil)
@@ -534,6 +620,20 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 				DocumentList:          singleDocumentList,
 				MultipleCasesSelected: false,
 				DonorID:               82,
+				ActionPanelButtons: []ActionPanelButton{
+					{
+						Label:    "Create warning",
+						URL:      "/create-warning?id=82&entity=lpa",
+						IconName: "aw-create-warning",
+						Disabled: false,
+					},
+					{
+						Label:    "Add complaint",
+						URL:      "/add-complaint?id=1&case=lpa",
+						IconName: "aw-log-complaint",
+						Disabled: false,
+					},
+				},
 			},
 		).
 		Return(errExample)

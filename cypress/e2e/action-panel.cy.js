@@ -16,7 +16,7 @@ describe("Action Panel", () => {
     });
 
     cy.addMock(
-      "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0&limit=999",
+      "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0,case:34&limit=999",
       "GET",
       {
         status: 200,
@@ -26,7 +26,7 @@ describe("Action Panel", () => {
         },
       },
     );
-    cy.visit("/donor/1/documents");
+    cy.visit("/donor/1/documents?uid[]=7000-1234-1234");
   });
 
   it("can open and close the action panel", () => {
@@ -45,5 +45,17 @@ describe("Action Panel", () => {
     cy.get("a#action-panel-button-create-warning").click();
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Create Warning");
+  });
+
+  it("displays the complaint button on the action panel", () => {
+    cy.get("#actions-tab").click();
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Add complaint");
+
+    cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
+
+    cy.get("a#action-panel-button-add-complaint").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Add Complaint");
   });
 });

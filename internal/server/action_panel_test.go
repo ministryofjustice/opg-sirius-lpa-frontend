@@ -37,6 +37,20 @@ func TestGetActionPanel(t *testing.T) {
 			DonorID:       123,
 			SelectedCases: cases,
 			CaseType:      "lpa",
+			ActionPanelButtons: []ActionPanelButton{
+				{
+					Label:    "Create warning",
+					URL:      "/create-warning?id=123&entity=person",
+					IconName: "aw-create-warning",
+					Disabled: false,
+				},
+				{
+					Label:    "Add complaint",
+					URL:      "",
+					IconName: "aw-log-complaint",
+					Disabled: true,
+				},
+			},
 		}).
 		Return(nil)
 
@@ -69,6 +83,20 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 			SelectedCases: []sirius.Case{cases[0]},
 			CaseUids:      "&uid[]=7000-0000-0001",
 			CaseType:      "lpa",
+			ActionPanelButtons: []ActionPanelButton{
+				{
+					Label:    "Create warning",
+					URL:      "/create-warning?id=123&entity=lpa&uid[]=7000-0000-0001",
+					IconName: "aw-create-warning",
+					Disabled: false,
+				},
+				{
+					Label:    "Add complaint",
+					URL:      "/add-complaint?id=1&case=lpa",
+					IconName: "aw-log-complaint",
+					Disabled: false,
+				},
+			},
 		}).
 		Return(nil)
 
@@ -90,6 +118,20 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 	template.
 		On("Func", mock.Anything, ActionPanelData{
 			CaseType: "lpa",
+			ActionPanelButtons: []ActionPanelButton{
+				{
+					Label:    "Create warning",
+					URL:      "/create-warning?id=0&entity=person",
+					IconName: "aw-create-warning",
+					Disabled: false,
+				},
+				{
+					Label:    "Add complaint",
+					URL:      "",
+					IconName: "aw-log-complaint",
+					Disabled: true,
+				},
+			},
 		}).
 		Return(nil)
 
