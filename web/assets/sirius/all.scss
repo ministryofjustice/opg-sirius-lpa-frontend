@@ -1,8 +1,10 @@
 // Sirius variables needed for styling in main.scss
 
+// Font-weight variables from the legacy Sirius font partial. Keep these local
+// so we avoid importing the old Open Sans @font-face definitions globally.
+$font-weight-sans-light-normal: 300;
+$font-weight-sans-semibold: 600;
+
 // ── Colours ───────────────────────────────────────────────────────────────────
 @import "colors/base";
 @import "colors/light";
-
-// ── Action panel ──────────────────────────────────────────────────────────────
-@import "modules/actionWidget";
