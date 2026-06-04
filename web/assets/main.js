@@ -70,7 +70,7 @@ htmx.on("htmx:afterSwap", (event) => {
     if (swapDetails.target.id === "actions-content") {
       if (
         swapDetails.pathInfo.requestPath.includes("create-document") ||
-        swapDetails.pathInfo.requestPath.includes("create-document")
+        swapDetails.pathInfo.requestPath.includes("edit-document")
       ) {
         document.querySelector(".action-panel").classList.add("wide");
       } else {
