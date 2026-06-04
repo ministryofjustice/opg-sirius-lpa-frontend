@@ -68,4 +68,32 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Add Complaint");
   });
+
+  it("displays the create document button on the action panel", () => {
+    cy.get("#actions-tab").click();
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Create document");
+
+    cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
+    cy.addMock("/lpa-api/v1/templates/lpa", "GET", {
+      status: 200,
+      body: {
+        DD: {
+          label: "Donor deceased: Blank template",
+          inserts: {
+            all: {
+              DD1: {
+                label: "DD1 - Case complete",
+                order: 0,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    cy.get("a#action-panel-button-create-document").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Select a document template");
+  });
 });
