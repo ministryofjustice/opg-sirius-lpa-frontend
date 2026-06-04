@@ -93,10 +93,10 @@ class PDFViewer {
         </button>
       </div>
       <div class="pdf-viewer-controls-group">
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="rotate-cw" aria-label="Rotate clockwise">
+        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="rotate-cw">
           Rotate Clockwise
         </button>
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="rotate-ccw" aria-label="Rotate counterclockwise">
+        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="rotate-ccw">
           Rotate Counterclockwise
         </button>
       </div>
