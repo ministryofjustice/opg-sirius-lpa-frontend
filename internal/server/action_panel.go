@@ -103,10 +103,12 @@ type ActionPanelButton struct {
 func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string) []ActionPanelButton {
 	warningUrl := fmt.Sprintf("/create-warning?id=%d&entity=person%s", donorId, caseUids)
 	complaintUrl := ""
+	createDocumentUrl := ""
 	if len(selectedCases) == 1 {
 		selectedCase := selectedCases[0]
 		warningUrl = fmt.Sprintf("/create-warning?id=%d&entity=%s%s", donorId, strings.ToLower(selectedCase.CaseType), caseUids)
 		complaintUrl = fmt.Sprintf("/add-complaint?id=%d&case=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
+		createDocumentUrl = fmt.Sprintf("/create-document?id=%d&case=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
 	}
 
 	return []ActionPanelButton{
@@ -120,6 +122,12 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			Label:    "Add complaint",
 			URL:      complaintUrl,
 			IconName: "aw-log-complaint",
+			Disabled: len(selectedCases) != 1,
+		},
+		{
+			Label:    "Create document",
+			URL:      createDocumentUrl,
+			IconName: "aw-new-template",
 			Disabled: len(selectedCases) != 1,
 		},
 	}

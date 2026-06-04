@@ -36,6 +36,10 @@ type createDocumentData struct {
 	ComponentDocumentData      ComponentDocumentData
 	HasSelectedAddNewRecipient bool
 	Back                       string
+
+	DonorId      int
+	CaseType     string
+	HtmxRedirect string
 }
 
 type InsertDisplayData struct {
@@ -59,7 +63,7 @@ type ComponentDocumentData struct {
 	Translations map[string]string       `json:"translations"`
 }
 
-func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler {
+func CreateDocument(client CreateDocumentClient, tmpl template.Template, tmplHtmx template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
 			return err
@@ -84,6 +88,11 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 		data := createDocumentData{
 			XSRFToken: ctx.XSRFToken,
 			Case:      caseItem,
+			CaseType:  r.FormValue("case"),
+		}
+
+		if caseItem.Donor != nil {
+			data.DonorId = caseItem.Donor.ID
 		}
 
 		switch r.Method {
@@ -179,7 +188,11 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 				} else if err != nil {
 					return err
 				} else {
-					return RedirectError(fmt.Sprintf("/edit-document?id=%d&case=%s", caseID, caseType))
+					if r.Header.Get("HX-Request") == "true" {
+						data.HtmxRedirect = fmt.Sprintf("/edit-document?id=%d&case=%s", caseID, caseType)
+					} else {
+						return RedirectError(fmt.Sprintf("/edit-document?id=%d&case=%s", caseID, caseType))
+					}
 				}
 			case "addNewRecipient":
 				contact := sirius.Person{
@@ -226,6 +239,10 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 					}
 				}
 			}
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return tmplHtmx(w, data)
 		}
 
 		return tmpl(w, data)

@@ -528,6 +528,10 @@ $govuk-assets-path: "../assets/";
   z-index: 1;
 
   transition: right 200ms ease;
+
+  &.wide {
+    --action-panel-width: 800px;
+  }
 }
 
 .action-panel[open] {
@@ -550,7 +554,8 @@ $govuk-assets-path: "../assets/";
   opacity: 0;
   transition:
     transform 200ms ease,
-    opacity 200ms ease;
+    opacity 200ms ease,
+    width 200ms ease;
 }
 
 .action-panel[open] .action-panel__content {
