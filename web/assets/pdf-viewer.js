@@ -39,13 +39,13 @@ class PDFViewer {
     const state = {
       scale: this.scale,
       scrollLeftRatio:
-          this.canvasContainer.scrollWidth > 0
-              ? this.canvasContainer.scrollLeft / this.canvasContainer.scrollWidth
-              : 0,
+        this.canvasContainer.scrollWidth > 0
+          ? this.canvasContainer.scrollLeft / this.canvasContainer.scrollWidth
+          : 0,
       scrollTopRatio:
-          this.canvasContainer.scrollHeight > 0
-              ? this.canvasContainer.scrollTop / this.canvasContainer.scrollHeight
-              : 0,
+        this.canvasContainer.scrollHeight > 0
+          ? this.canvasContainer.scrollTop / this.canvasContainer.scrollHeight
+          : 0,
       currentPage: this.currentPage,
       timestamp: Date.now(),
     };
@@ -100,8 +100,8 @@ class PDFViewer {
   saveRotation() {
     try {
       sessionStorage.setItem(
-          this.getRotationStorageKey(),
-          this.rotation.toString(),
+        this.getRotationStorageKey(),
+        this.rotation.toString(),
       );
     } catch {
       // Ignore storage errors
@@ -141,9 +141,9 @@ class PDFViewer {
       // Restore scroll position after rendering
       if (shouldRestoreState && savedState) {
         this.canvasContainer.scrollLeft =
-            savedState.scrollLeftRatio * this.canvasContainer.scrollWidth;
+          savedState.scrollLeftRatio * this.canvasContainer.scrollWidth;
         this.canvasContainer.scrollTop =
-            savedState.scrollTopRatio * this.canvasContainer.scrollHeight;
+          savedState.scrollTopRatio * this.canvasContainer.scrollHeight;
       }
     } catch (error) {
       console.error("Error loading PDF:", error);
@@ -199,7 +199,7 @@ class PDFViewer {
     const pageInput = controls.querySelector(".pdf-viewer-page-input");
     if (pageInput) {
       pageInput.addEventListener("keydown", (e) =>
-          this.handlePageInputKeydown(e),
+        this.handlePageInputKeydown(e),
       );
       pageInput.addEventListener("blur", (e) => this.handlePageInputBlur(e));
     }
@@ -208,7 +208,7 @@ class PDFViewer {
     const zoomInput = controls.querySelector(".pdf-viewer-zoom-input");
     if (zoomInput) {
       zoomInput.addEventListener("keydown", (e) =>
-          this.handleZoomInputKeydown(e),
+        this.handleZoomInputKeydown(e),
       );
       zoomInput.addEventListener("blur", (e) => this.handleZoomInputBlur(e));
     }
@@ -372,21 +372,21 @@ class PDFViewer {
   async toggleThumbnails() {
     this.thumbnailsVisible = !this.thumbnailsVisible;
     this.thumbnailPanel.classList.toggle(
-        "pdf-viewer-thumbnail-panel--visible",
-        this.thumbnailsVisible,
+      "pdf-viewer-thumbnail-panel--visible",
+      this.thumbnailsVisible,
     );
 
     const toggleBtn = this.controls.querySelector(
-        '[data-action="toggle-thumbnails"]',
+      '[data-action="toggle-thumbnails"]',
     );
     if (toggleBtn) {
       toggleBtn.setAttribute(
-          "aria-expanded",
-          this.thumbnailsVisible.toString(),
+        "aria-expanded",
+        this.thumbnailsVisible.toString(),
       );
       toggleBtn.classList.toggle(
-          "pdf-viewer-btn--active",
-          this.thumbnailsVisible,
+        "pdf-viewer-btn--active",
+        this.thumbnailsVisible,
       );
     }
 
@@ -437,13 +437,13 @@ class PDFViewer {
 
   updateThumbnailSelection() {
     const thumbnails = this.thumbnailList.querySelectorAll(
-        ".pdf-viewer-thumbnail-item",
+      ".pdf-viewer-thumbnail-item",
     );
     thumbnails.forEach((thumb) => {
       const pageNum = Number.parseInt(thumb.dataset.page, 10);
       thumb.classList.toggle(
-          "pdf-viewer-thumbnail-item--active",
-          pageNum === this.currentPage,
+        "pdf-viewer-thumbnail-item--active",
+        pageNum === this.currentPage,
       );
     });
   }
@@ -458,7 +458,7 @@ class PDFViewer {
 
     // Scroll to the page
     const pageContainer = this.pagesWrapper.querySelector(
-        `[data-page="${pageNum}"]`,
+      `[data-page="${pageNum}"]`,
     );
     if (pageContainer) {
       this.isScrolling = true;
@@ -523,9 +523,9 @@ class PDFViewer {
 
     // Apply the same ratio to the new scrollable area
     this.canvasContainer.scrollLeft =
-        scrollLeftRatio * this.canvasContainer.scrollWidth;
+      scrollLeftRatio * this.canvasContainer.scrollWidth;
     this.canvasContainer.scrollTop =
-        scrollTopRatio * this.canvasContainer.scrollHeight;
+      scrollTopRatio * this.canvasContainer.scrollHeight;
   }
 
   async fitToWidth() {
