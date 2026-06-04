@@ -38,7 +38,6 @@ type createDocumentData struct {
 	Back                       string
 
 	DonorId      int
-	CaseType     string
 	HtmxRedirect string
 }
 
@@ -88,7 +87,6 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template, tmplHtm
 		data := createDocumentData{
 			XSRFToken: ctx.XSRFToken,
 			Case:      caseItem,
-			CaseType:  r.FormValue("case"),
 		}
 
 		if caseItem.Donor != nil {

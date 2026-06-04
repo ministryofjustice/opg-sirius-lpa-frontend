@@ -30,7 +30,7 @@
             <div class="govuk-body">
               <a class="govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-0"
                  href=""
-                 hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId (ToLower .CaseType) .Case.UID) }}"
+                 hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId (ToLower .Case.CaseType) .Case.UID) }}"
                  hx-target=".action-panel__content"
               >Back</a>
               <div class="app-!-float-right">
@@ -62,7 +62,7 @@
   <h1 class="govuk-heading-m">Add a new recipient</h1>
   <form class="form"
         method="POST"
-        hx-post="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .CaseType) }}"
+        hx-post="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .Case.CaseType) }}"
         hx-target=".action-panel__content"
         hx-swap="innerHTML"
   >
@@ -151,7 +151,7 @@
     <h1 class="govuk-heading-m app-!-float-left">Select a recipient</h1>
     <form class="form"
           method="GET"
-          hx-get="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .CaseType) }}"
+          hx-get="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .Case.CaseType) }}"
           hx-target=".action-panel__content"
           hx-swap="innerHTML"
     >
@@ -172,7 +172,7 @@
 
   <form class="form"
         method="POST"
-        hx-post="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .CaseType) }}"
+        hx-post="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .Case.CaseType) }}"
         hx-target=".action-panel__content"
         hx-swap="innerHTML"
   >
@@ -221,7 +221,7 @@
     <div class="govuk-body">
       <a class="govuk-link govuk-link--no-visited-state"
          href=""
-         hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId (ToLower .CaseType) .Case.UID) }}"
+         hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId (ToLower .Case.CaseType) .Case.UID) }}"
          hx-target=".action-panel__content"
       >Cancel</a>
     </div>
@@ -233,7 +233,7 @@
 
   <form class="form"
         method="GET"
-        hx-get="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .CaseType) }}"
+        hx-get="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .Case.CaseType) }}"
         hx-target=".action-panel__content"
         hx-swap="innerHTML"
   >
@@ -315,7 +315,7 @@
     <div class="govuk-body">
       <a class="govuk-link govuk-link--no-visited-state"
          href=""
-         hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId (ToLower .CaseType) .Case.UID) }}"
+         hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId (ToLower .Case.CaseType) .Case.UID) }}"
          hx-target=".action-panel__content"
       >Cancel</a>
     </div>
@@ -327,7 +327,7 @@
 
   <form class="form"
         method="GET"
-        hx-get="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .CaseType) }}"
+        hx-get="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .Case.CaseType) }}"
         hx-target=".action-panel__content"
         hx-swap="innerHTML"
   >
@@ -386,7 +386,7 @@
     <div class="govuk-body">
       <a class="govuk-link govuk-link--no-visited-state"
          href=""
-         hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId (ToLower .CaseType) .Case.UID) }}"
+         hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId (ToLower .Case.CaseType) .Case.UID) }}"
          hx-target=".action-panel__content"
       >Cancel</a>
     </div>
