@@ -290,7 +290,6 @@ class PDFViewer {
         const canvas = document.createElement("canvas");
         canvas.className = "pdf-viewer-canvas";
 
-        // Support high-DPI displays
         const outputScale = window.devicePixelRatio || 1;
 
         canvas.width = Math.floor(viewport.width * outputScale);
