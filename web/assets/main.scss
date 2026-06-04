@@ -621,6 +621,10 @@ $govuk-assets-path: "../assets/";
     cursor: pointer;
     font-weight: 700;
     font-size: 0.75rem;
+    &.disabled {
+      pointer-events: none;
+      opacity: 0.4;
+    }
   }
 }
 
@@ -630,14 +634,18 @@ $govuk-assets-path: "../assets/";
   background-color: govuk-functional-colour(body-background);
   min-height: calc(100% - (var(--action-panel-form-padding) * 2));
   height: auto;
+  .govuk-body,
   .govuk-label,
   .govuk-select,
+  .govuk-input,
   .govuk-button,
   .govuk-link,
-  .govuk-fieldset__legend {
+  .govuk-fieldset__legend,
+  .govuk-textarea {
     font-size: 0.875rem;
   }
-  .govuk-select {
+  .govuk-select,
+  .govuk-input {
     height: 1.875rem;
   }
   .govuk-form-group {

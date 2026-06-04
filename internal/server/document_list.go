@@ -31,6 +31,7 @@ type documentPageData struct {
 	CompareURLs           map[string]string
 	CloseURL              string
 	CaseUids              string
+	ActionPanelButtons    []ActionPanelButton
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
@@ -130,6 +131,8 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 		}
 
 		data.CaseUids = buildUIDQueryString(caseUIDs)
+
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids)
 
 		return tmpl(w, data)
 	}
