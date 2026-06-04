@@ -23,6 +23,18 @@ $govuk-assets-path: "../assets/";
 @import "./pdf-viewer.scss";
 @import "./sirius/all.scss";
 
+$gutter: 15px;
+$spacer: 10px;
+$app-sirius-header-top: 54px;
+$app-sirius-header-height: 40px;
+$app-sirius-header-min-width: $govuk-page-width + $gutter + $spacer;
+$app-sirius-header-search-height: $app-sirius-header-height - 6px;
+$app-sirius-header-dropdown-top: $app-sirius-header-top +
+  $app-sirius-header-height;
+$app-sirius-header-z-index: 10;
+$app-sirius-header-dropdown-z-index: 9;
+$app-action-panel-z-index: $app-sirius-header-z-index + 1;
+
 // Define HTMX indicator styles here to avoid inline styles which are blocked by CSP
 .htmx-indicator {
   opacity: 0;
@@ -465,7 +477,7 @@ $govuk-assets-path: "../assets/";
 .app-document-compare__separator {
   @media (min-width: 40.0625em) {
     border-right: 1px solid govuk-functional-colour(border);
-    min-height: calc(100vh - 40px);
+    min-height: calc(100vh - #{$app-sirius-header-height});
   }
 }
 
@@ -525,7 +537,7 @@ $govuk-assets-path: "../assets/";
   position: fixed;
   top: calc(50vh - (var(--action-panel-height) / 2));
   right: 0;
-  z-index: 1;
+  z-index: $app-action-panel-z-index;
 
   transition: right 200ms ease;
 
@@ -548,7 +560,7 @@ $govuk-assets-path: "../assets/";
   max-width: calc(100vw - 4rem);
   overflow-y: auto;
   background: $color-action-widget-bg;
-  border: $aw-border-width solid $color-sirius-light-blue;
+  border: 3px solid $color-sirius-light-blue;
   border-radius: 7px;
   z-index: 1;
   opacity: 0;
@@ -744,131 +756,140 @@ $govuk-assets-path: "../assets/";
   width: 100%;
 }
 
-.govuk-phase-banner {
-    margin-top: 40px !important;
-}
-
-.page-header {
-  background-image: linear-gradient(rgb(67, 112, 168) 0px, rgb(0, 50, 110));
-  color: rgb(255, 255, 255);
+.sirius-header {
+  @include gradient-blue;
+  color: $color-sirius-white;
   font-family: "Open Sans", sans-serif;
-  min-height: 40px;
+  height: $app-sirius-header-height;
+  min-width: $app-sirius-header-min-width;
   position: fixed;
-  top: 54px;
+  top: $app-sirius-header-top;
   width: 100%;
-  z-index: 10;
+  z-index: $app-sirius-header-z-index;
 
   h1 {
-    float: left;
+    display: flex;
+    align-items: center;
+    gap: govuk-spacing(1);
     font-size: 21px;
-    font-weight: 600;
+    font-weight: $font-weight-sans-semibold;
+    height: 100%;
     line-height: 21px;
-    margin-right: 10px;
+    margin: 0 10px 0 0;
+    padding: 9px 0 $spacer $gutter;
     text-transform: uppercase;
-    color: rgb(255, 255, 255);
+    color: $color-sirius-white;
 
     .light {
-      font-weight: 300;
+      font-weight: $font-weight-sans-light-normal;
+      padding-right: $gutter;
     }
   }
 }
 
-.page-header__inner {
+.sirius-header > .govuk-width-container {
+  max-width: none;
+  margin-left: govuk-spacing(2);
+  margin-right: govuk-spacing(2);
+  height: 100%;
   display: flex;
   align-items: center;
+}
+
+.sirius-header__dropdown-panel > .govuk-width-container {
+  max-width: none;
+  margin-left: govuk-spacing(2);
+  margin-right: govuk-spacing(2);
+}
+
+.sirius-header__inner {
+  display: flex;
   gap: govuk-spacing(2);
+  height: 100%;
   width: 100%;
 }
 
-.panel-tabs {
-  border-left: 1px solid rgb(255, 255, 255);
-  color: rgb(255, 255, 255);
-  float: left;
-  overflow: visible;
-  position: relative;
-  flex: 1;
-}
-
-.panel-tabs__buttons {
+.sirius-header__primary {
   display: flex;
-  height: 40px;
+  align-items: center;
+  gap: govuk-spacing(2);
+  height: 100%;
+  min-width: 0;
 }
 
-.panel-tabs__details {
+.sirius-header__actions {
+  border-left: 1px solid $color-sirius-white;
   display: flex;
-  height: 40px;
+  flex: 0 0 auto;
 }
 
-.panel-tabs__button {
+.sirius-header__button {
   background-color: transparent;
   border: none;
-  border-right: 1px solid rgb(255, 255, 255);
-  color: rgb(255, 255, 255);
+  border-right: 1px solid $color-sirius-white;
+  box-sizing: border-box;
+  color: $color-sirius-white;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: opg-icons;
-  font-feature-settings: "liga";
-  font-size: 22.4px;
-  height: 40px;
-  line-height: 31px;
-  min-width: 44.8px;
-  padding: 4.48px;
-  text-align: center;
-  text-decoration: none;
-  text-transform: capitalize;
-  width: 44.8px;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-  }
+  height: $app-sirius-header-height;
+  line-height: 1;
+  min-width: $app-sirius-header-height;
+  padding: govuk-spacing(1);
+  width: $app-sirius-header-height;
 }
 
-.panel-tabs__summary {
+.sirius-header__summary {
   list-style: none;
 
+  // stop browser default marker
   &::-webkit-details-marker {
     display: none;
   }
 }
 
-.panel-tabs__details[open] > .panel-tabs__summary {
-  background-color: rgba($color-sirius-white, 0.15);
+.sirius-header__button-icon {
+  width: 24px;
+  height: 24px;
 }
 
-.page-header__button-icon {
-  display: block;
-  width: 22px;
-  height: 22px;
-  flex: 0 0 22px;
-}
-
-.panel-tabs__dropdown {
-  background-image: linear-gradient(rgb(67, 112, 168) 0px, rgb(0, 50, 110));
-  color: rgb(255, 255, 255);
-  font-family: "Open Sans", sans-serif;
+.sirius-header__dropdown-panel {
+  @include gradient-blue;
   left: 0;
   max-height: 626px;
   overflow: auto;
   position: fixed;
-  top: 104px;
+  top: $app-sirius-header-dropdown-top;
   width: 100vw;
-  z-index: 9;
-
-  &[hidden] {
-    display: none;
-  }
+  z-index: $app-sirius-header-dropdown-z-index;
 }
 
-.page-header__dropdown {
-  min-height: 1px;
-}
-
-.page-header__search {
-  margin-left: govuk-spacing(1);
+.sirius-header__search {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  margin-left: auto;
+  flex: 0 1 420px;
   max-width: 420px;
   width: 100%;
+
+  .govuk-input,
+  .govuk-input__suffix {
+    height: $app-sirius-header-search-height;
+  }
+
+  .govuk-input {
+    font-size: 1rem;
+    line-height: 1.25;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .govuk-input__suffix {
+    min-width: $app-sirius-header-search-height;
+    padding: 0 govuk-spacing(1);
+  }
 
   .app-search-inline-phase-banner {
     float: none;
@@ -877,6 +898,7 @@ $govuk-assets-path: "../assets/";
   }
 
   .govuk-input__wrapper {
+    align-items: stretch;
     margin-bottom: 0;
   }
 }

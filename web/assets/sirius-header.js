@@ -9,7 +9,9 @@ const moveSearchIntoSiriusHeader = () => {
     return;
   }
 
-  const desktopSearch = document.querySelector(".app-search-inline-phase-banner");
+  const desktopSearch = document.querySelector(
+    ".app-search-inline-phase-banner",
+  );
   if (!(desktopSearch instanceof HTMLElement)) {
     return;
   }
