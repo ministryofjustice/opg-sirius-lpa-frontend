@@ -50,6 +50,12 @@ func TestGetActionPanel(t *testing.T) {
 					IconName: "aw-log-complaint",
 					Disabled: true,
 				},
+				{
+					Label:    "Create document",
+					URL:      "",
+					IconName: "aw-new-template",
+					Disabled: true,
+				},
 			},
 		}).
 		Return(nil)
@@ -96,6 +102,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					IconName: "aw-log-complaint",
 					Disabled: false,
 				},
+				{
+					Label:    "Create document",
+					URL:      "/create-document?id=1&case=lpa",
+					IconName: "aw-new-template",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -129,6 +141,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					Label:    "Add complaint",
 					URL:      "",
 					IconName: "aw-log-complaint",
+					Disabled: true,
+				},
+				{
+					Label:    "Create document",
+					URL:      "",
+					IconName: "aw-new-template",
 					Disabled: true,
 				},
 			},
