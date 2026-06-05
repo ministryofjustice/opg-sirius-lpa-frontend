@@ -1,14 +1,7 @@
 {{ define "actionPanel" }}
   <div class="action-panel__inner">
-  // I will refactor this to fit the new pattern in ActionPanelButtons - AM
-    {{ if eq (len .SelectedCases) 1 }}
-      {{ with index .SelectedCases 0 }}
-        {{ template "action-panel-button" actionPanelButton "Create event" (prefix (printf "/create-event?id=%d&entity=person%s" $.DonorID $.CaseUids)) "aw-new-event" }}
-      {{ end }}
-    {{ else }}
-      {{ template "action-panel-button" actionPanelButton "Create event" (prefix (printf "/create-event?id=%d&entity=person%s" $.DonorID $.CaseUids)) "aw-new-event" }}
     {{ range .ActionPanelButtons }}
-        {{ template "action-panel-button" actionPanelButton .Label .URL .IconName .Disabled }}
+      {{ template "action-panel-button" actionPanelButton .Label .URL .IconName .Disabled }}
     {{ end }}
   </div>
 {{ end }}
