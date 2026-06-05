@@ -658,6 +658,19 @@ $govuk-assets-path: "../assets/";
   }
 }
 
+.action-panel__form--wide {
+  .govuk-body,
+  .govuk-label,
+  .govuk-select,
+  .govuk-input,
+  .govuk-button,
+  .govuk-link,
+  .govuk-fieldset__legend,
+  .govuk-textarea {
+     font-size: 1.03906rem;
+  }
+ }
+
 .action-panel__button {
   background: linear-gradient(
     to bottom,

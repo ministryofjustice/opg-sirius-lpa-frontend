@@ -1,5 +1,5 @@
 {{ define "page" }}
-  <div class="action-panel__form">
+  <div class="action-panel__form action-panel__form--wide">
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
           {{ template "error-summary" .Error }}
@@ -356,7 +356,7 @@
         <div>
           <input type="hidden" name="hasViewedInserts" value="true" />
 
-          <h2 class="govuk-heading-m">Select document inserts</h2>
+          <h2 class="govuk-heading-s">Select document inserts</h2>
 
           <button class="govuk-button govuk-!-margin-bottom-0 app-!-float-right"
                   data-module="govuk-button" type="submit" name="skipInserts" value="true">
