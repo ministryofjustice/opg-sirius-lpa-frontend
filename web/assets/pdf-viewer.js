@@ -4,10 +4,14 @@ import * as pdfjsLib from "pdfjs-dist";
 const prefix = document.body.getAttribute("data-prefix") || "";
 pdfjsLib.GlobalWorkerOptions.workerSrc = `${prefix}/javascript/pdf.worker.min.mjs`;
 
+// Storage key for persisting viewer state across page navigations
+const STORAGE_KEY = "pdfViewerState";
+
 class PDFViewer {
-  constructor(container, url) {
+  constructor(container, url, paneId) {
     this.container = container;
     this.url = url;
+    this.paneId = paneId || "1";
     this.pdfDoc = null;
     this.currentPage = 1;
     this.totalPages = 0;
@@ -17,19 +21,130 @@ class PDFViewer {
     this.thumbnailsRendered = false;
     this.pageCanvases = [];
     this.isScrolling = false;
+    this.storageKey = this.getStorageKey();
+    this.rotation = this.loadRotation();
+  }
+
+  getStorageKey() {
+    // Create a unique key based on the PDF URL and pane ID
+    // This ensures each pane maintains its own state for the same document
+    return `${STORAGE_KEY}_${this.paneId}_${this.url}`;
+  }
+
+  saveState() {
+    // Save state when navigating away, regardless of mode
+    // This allows state to transfer from single-pane view to compare mode
+    if (!this.canvasContainer) return;
+
+    const state = {
+      scale: this.scale,
+      scrollLeftRatio:
+        this.canvasContainer.scrollWidth > 0
+          ? this.canvasContainer.scrollLeft / this.canvasContainer.scrollWidth
+          : 0,
+      scrollTopRatio:
+        this.canvasContainer.scrollHeight > 0
+          ? this.canvasContainer.scrollTop / this.canvasContainer.scrollHeight
+          : 0,
+      currentPage: this.currentPage,
+      timestamp: Date.now(),
+    };
+
+    try {
+      sessionStorage.setItem(this.storageKey, JSON.stringify(state));
+    } catch (e) {
+      console.warn("Unable to save PDF viewer state:", e);
+    }
+  }
+
+  loadState() {
+    try {
+      const stored = sessionStorage.getItem(this.storageKey);
+      if (!stored) return null;
+
+      const state = JSON.parse(stored);
+
+      // Only restore state if it's less than 15 minutes old
+      const resetTime = 15 * 60 * 1000;
+      if (Date.now() - state.timestamp > resetTime) {
+        sessionStorage.removeItem(this.storageKey);
+        return null;
+      }
+
+      return state;
+    } catch (e) {
+      console.warn("Unable to load PDF viewer state:", e);
+      return null;
+    }
+  }
+
+  setupStatePreservation() {
+    // Save state before page unload
+    window.addEventListener("beforeunload", () => this.saveState());
+  }
+
+  getRotationStorageKey() {
+    return `pdf-viewer-rotation-${this.url}`;
+  }
+
+  loadRotation() {
+    try {
+      const stored = sessionStorage.getItem(this.getRotationStorageKey());
+      const rotation = stored ? Number.parseInt(stored, 10) : 0;
+      return Number.isNaN(rotation) ? 0 : rotation;
+    } catch {
+      return 0;
+    }
+  }
+
+  saveRotation() {
+    try {
+      sessionStorage.setItem(
+        this.getRotationStorageKey(),
+        this.rotation.toString(),
+      );
+    } catch {
+      // Ignore storage errors
+    }
   }
 
   async init() {
     try {
       this.createControls();
       this.createMainArea();
+      this.setupStatePreservation();
+
+      // Load saved state before loading PDF
+      const savedState = this.loadState();
+
+      // Restore state if available
+      // Each pane maintains its own state per document (independent of other panes)
+      const shouldRestoreState = savedState;
+
+      if (shouldRestoreState && savedState) {
+        this.scale = savedState.scale;
+        this.currentPage = savedState.currentPage;
+      }
 
       const loadingTask = pdfjsLib.getDocument(this.url);
       this.pdfDoc = await loadingTask.promise;
       this.totalPages = this.pdfDoc.numPages;
 
+      // Ensure current page is within bounds
+      if (this.currentPage > this.totalPages) {
+        this.currentPage = this.totalPages;
+      }
+
       this.updatePageInfo();
       await this.renderAllPages();
+
+      // Restore scroll position after rendering
+      if (shouldRestoreState && savedState) {
+        this.canvasContainer.scrollLeft =
+          savedState.scrollLeftRatio * this.canvasContainer.scrollWidth;
+        this.canvasContainer.scrollTop =
+          savedState.scrollTopRatio * this.canvasContainer.scrollHeight;
+      }
     } catch (error) {
       console.error("Error loading PDF:", error);
       this.showError("Unable to load PDF document");
@@ -48,7 +163,7 @@ class PDFViewer {
           <span aria-hidden="true">←</span> Previous
         </button>
         <span class="pdf-viewer-page-info">
-          Page <input type="text" class="pdf-viewer-page-input" aria-label="Current page number" value="1"> of <span class="pdf-viewer-total-pages">-</span>
+          Page <input type="number" class="pdf-viewer-page-input" aria-label="Current page number" value="1"> of <span class="pdf-viewer-total-pages">-</span>
         </span>
         <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="next" aria-label="Next page">
           Next <span aria-hidden="true">→</span>
@@ -64,6 +179,14 @@ class PDFViewer {
         </button>
         <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="fit-width" aria-label="Fit to width">
           Fit Width
+        </button>
+      </div>
+      <div class="pdf-viewer-controls-group">
+        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="rotate-cw">
+          Rotate Clockwise
+        </button>
+        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="rotate-ccw">
+          Rotate Counterclockwise
         </button>
       </div>
     `;
@@ -117,7 +240,6 @@ class PDFViewer {
     mainArea.appendChild(canvasContainer);
     this.container.appendChild(mainArea);
 
-    this.mainArea = mainArea;
     this.thumbnailPanel = thumbnailPanel;
     this.thumbnailList = thumbnailList;
     this.canvasContainer = canvasContainer;
@@ -150,6 +272,12 @@ class PDFViewer {
         break;
       case "toggle-thumbnails":
         this.toggleThumbnails();
+        break;
+      case "rotate-cw":
+        this.rotateCW();
+        break;
+      case "rotate-ccw":
+        this.rotateCCW();
         break;
     }
   }
@@ -202,7 +330,6 @@ class PDFViewer {
         const canvas = document.createElement("canvas");
         canvas.className = "pdf-viewer-canvas";
 
-        // Support high-DPI displays
         const outputScale = window.devicePixelRatio || 1;
 
         canvas.width = Math.floor(viewport.width * outputScale);
@@ -213,7 +340,7 @@ class PDFViewer {
         const ctx = canvas.getContext("2d");
 
         let transform;
-        if (outputScale == 1) {
+        if (outputScale === 1) {
           transform = null;
         } else {
           transform = [outputScale, 0, 0, outputScale, 0, 0];
@@ -231,6 +358,9 @@ class PDFViewer {
         this.pagesWrapper.appendChild(pageContainer);
         this.pageCanvases.push(canvas);
       }
+
+      // Re-apply rotation to newly rendered canvases
+      this.applyRotation();
 
       this.rendering = false;
     } catch (error) {
@@ -369,28 +499,33 @@ class PDFViewer {
 
   async zoomIn() {
     this.scale = Math.min(this.scale * 1.25, 5);
-    this.updatePageInfo();
-    await this.renderAllPages();
-    // Scroll back to current page after re-render
-    const pageContainer = this.pagesWrapper.querySelector(
-      `[data-page="${this.currentPage}"]`,
-    );
-    if (pageContainer) {
-      pageContainer.scrollIntoView({ block: "start" });
-    }
+    await this.applyZoom();
   }
 
   async zoomOut() {
     this.scale = Math.max(this.scale / 1.25, 0.25);
+    await this.applyZoom();
+  }
+
+  async applyZoom() {
+    // Calculate scroll ratios before re-rendering
+    const scrollLeft = this.canvasContainer.scrollLeft;
+    const scrollTop = this.canvasContainer.scrollTop;
+    const scrollWidth = this.canvasContainer.scrollWidth;
+    const scrollHeight = this.canvasContainer.scrollHeight;
+
+    // Calculate the ratio of scroll position to total scrollable area
+    const scrollLeftRatio = scrollWidth > 0 ? scrollLeft / scrollWidth : 0;
+    const scrollTopRatio = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
+
     this.updatePageInfo();
     await this.renderAllPages();
-    // Scroll back to current page after re-render
-    const pageContainer = this.pagesWrapper.querySelector(
-      `[data-page="${this.currentPage}"]`,
-    );
-    if (pageContainer) {
-      pageContainer.scrollIntoView({ block: "start" });
-    }
+
+    // Apply the same ratio to the new scrollable area
+    this.canvasContainer.scrollLeft =
+      scrollLeftRatio * this.canvasContainer.scrollWidth;
+    this.canvasContainer.scrollTop =
+      scrollTopRatio * this.canvasContainer.scrollHeight;
   }
 
   async fitToWidth() {
@@ -400,15 +535,27 @@ class PDFViewer {
     const viewport = page.getViewport({ scale: 1 });
     const containerWidth = this.canvasContainer.clientWidth - 40; // Account for padding
     this.scale = containerWidth / viewport.width;
-    this.updatePageInfo();
-    await this.renderAllPages();
-    // Scroll back to current page after re-render
-    const pageContainer = this.pagesWrapper.querySelector(
-      `[data-page="${this.currentPage}"]`,
-    );
-    if (pageContainer) {
-      pageContainer.scrollIntoView({ block: "start" });
-    }
+    await this.applyZoom();
+    // applyZoom already saves compare state
+  }
+
+  rotateCW() {
+    this.rotation = (this.rotation + 90) % 360;
+    this.saveRotation();
+    this.applyRotation();
+  }
+
+  rotateCCW() {
+    this.rotation = (this.rotation - 90 + 360) % 360;
+    this.saveRotation();
+    this.applyRotation();
+  }
+
+  applyRotation() {
+    // Apply rotation transform to all page canvases
+    this.pageCanvases.forEach((canvas) => {
+      canvas.style.transform = `rotate(${this.rotation}deg)`;
+    });
   }
 
   showError(message) {
@@ -452,15 +599,7 @@ class PDFViewer {
       e.target.value = Math.round(this.scale * 100) + "%";
     } else {
       this.scale = zoomPercent / 100;
-      this.updatePageInfo();
-      await this.renderAllPages();
-      // Scroll back to current page after re-render
-      const pageContainer = this.pagesWrapper.querySelector(
-        `[data-page="${this.currentPage}"]`,
-      );
-      if (pageContainer) {
-        pageContainer.scrollIntoView({ block: "start" });
-      }
+      await this.applyZoom();
     }
   }
 }
@@ -469,8 +608,9 @@ export default function initPdfViewer() {
   const viewers = document.querySelectorAll("[data-pdf-viewer]");
   viewers.forEach((container) => {
     const url = container.dataset.pdfUrl;
+    const paneId = container.dataset.pdfPane;
     if (url) {
-      const pdfViewer = new PDFViewer(container, url);
+      const pdfViewer = new PDFViewer(container, url, paneId);
       pdfViewer.init();
     }
   });

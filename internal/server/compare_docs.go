@@ -123,23 +123,23 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 			}
 		}
 
-		viewingADocumentAndList := data.Pane1 == "doc" && data.Pane2 == "list"
-		if viewingADocumentAndList {
-			data.DocListPane2Data.CloseURL = fmt.Sprintf("/view-document/%s", data.View1.Document.UUID)
-			data.View1.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", donorID, data.DocListPane2Data.DocumentList.Documents[0].CaseItems[0].UID)
-		}
+	viewingADocumentAndList := data.Pane1 == "doc" && data.Pane2 == "list"
+	if viewingADocumentAndList {
+		data.DocListPane2Data.CloseURL = fmt.Sprintf("/view-document/%s?pane=1", data.View1.Document.UUID)
+		data.View1.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", donorID, data.DocListPane2Data.DocumentList.Documents[0].CaseItems[0].UID)
+	}
 
-		viewingAListAndDocument := data.Pane1 == "list" && data.Pane2 == "doc"
-		if viewingAListAndDocument {
-			data.DocListPane1Data.CloseURL = fmt.Sprintf("/view-document/%s", data.View2.Document.UUID)
-			data.View2.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", donorID, data.DocListPane1Data.DocumentList.Documents[0].CaseItems[0].UID)
-		}
+	viewingAListAndDocument := data.Pane1 == "list" && data.Pane2 == "doc"
+	if viewingAListAndDocument {
+		data.DocListPane1Data.CloseURL = fmt.Sprintf("/view-document/%s?pane=2", data.View2.Document.UUID)
+		data.View2.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", donorID, data.DocListPane1Data.DocumentList.Documents[0].CaseItems[0].UID)
+	}
 
-		bothSidesAreDocuments := data.Pane1 == "doc" && data.Pane2 == "doc"
-		if bothSidesAreDocuments {
-			data.View1.CloseURL = fmt.Sprintf("/view-document/%s", data.View2.Document.UUID)
-			data.View2.CloseURL = fmt.Sprintf("/view-document/%s", data.View1.Document.UUID)
-		}
+	bothSidesAreDocuments := data.Pane1 == "doc" && data.Pane2 == "doc"
+	if bothSidesAreDocuments {
+		data.View1.CloseURL = fmt.Sprintf("/view-document/%s?pane=2", data.View2.Document.UUID)
+		data.View2.CloseURL = fmt.Sprintf("/view-document/%s?pane=1", data.View1.Document.UUID)
+	}
 
 		bothSidesAreLists := data.Pane1 == "list" && data.Pane2 == "list"
 		if bothSidesAreLists {

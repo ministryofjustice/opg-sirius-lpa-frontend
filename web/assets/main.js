@@ -50,6 +50,19 @@ initPdfViewer();
 globalThis.htmx = htmx;
 // Don't include indicator styles as CSP blocks inline styles
 htmx.config.includeIndicatorStyles = false;
+// Allow responses with 400 error codes to be swapped in
+htmx.config.responseHandling.unshift({ code: "400", swap: true, error: false });
+
+htmx.on("htmx:afterSwap", (event) => {
+  const swapDetails = event.detail;
+
+  // Reinitialise MOJ and GOVUK frontend components after swapping in new content
+  // to ensure that they remain interactive
+  if (swapDetails.successful) {
+    GOVUKFrontend.initAll(swapDetails.target);
+    MOJFrontend.initAll(swapDetails.target);
+  }
+});
 
 if (window.self !== window.parent) {
   const success = document.querySelector('[data-app-reload~="page"]');

@@ -1,0 +1,19 @@
+{{ define "action-panel-button" }}
+  <a id="action-panel-button-{{ replace (ToLower .Label) " " "-" }}"
+     class="govuk-body govuk-!-margin-bottom-0{{ if .Disabled }} disabled{{ end }}"
+     hx-get="{{ prefix .URL }}"
+     hx-target=".action-panel__content"
+     hx-swap="innerHTML"
+     {{ if .Disabled }}aria-disabled="true"{{ end }}
+  >
+    <div class="action-panel__button">
+            <span>
+              <svg aria-labelledby="{{ replace (ToLower .Label) " " "-" }}-text">
+                  <title id="{{ replace (ToLower .Label) " " "-" }}-text">{{ .Label }}</title>
+                  <use href="{{ prefixSVG .IconName }}" />
+              </svg>
+            </span>
+    </div>
+    {{ .Label }}
+  </a>
+{{ end }}

@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/server"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
@@ -833,4 +834,19 @@ func TestBoolToYesNo(t *testing.T) {
 		result := fn(input)
 		assert.Equal(t, expected, result)
 	}
+}
+
+func TestActionPanelButton(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["actionPanelButton"].(func(string, string, string, bool) server.ActionPanelButton)
+
+	expected := server.ActionPanelButton{
+		Label:    "Name",
+		URL:      "testurl",
+		IconName: "testicon",
+		Disabled: false,
+	}
+
+	val := fn("Name", "testurl", "testicon", false)
+	assert.Equal(t, expected, val)
 }

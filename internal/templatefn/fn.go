@@ -11,6 +11,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/server"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -270,6 +271,9 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 		},
 		"compareBoolPointers": func(i *bool, j bool) bool {
+			if i == nil {
+				return false
+			}
 			return *i == j
 		},
 		"inStringArray": func(value string, array []string) bool {
@@ -361,6 +365,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return "false"
 		},
+		"actionPanelButton": actionPanelButton,
 	}
 }
 
@@ -671,4 +676,13 @@ func translateNumberEventValue(change string, value float64) string {
 	}
 
 	return strconv.FormatFloat(value, 'f', -1, 64)
+}
+
+func actionPanelButton(label, url, iconName string, disabled bool) server.ActionPanelButton {
+	return server.ActionPanelButton{
+		Label:    label,
+		URL:      url,
+		IconName: iconName,
+		Disabled: disabled,
+	}
 }
