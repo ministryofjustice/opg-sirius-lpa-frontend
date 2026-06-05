@@ -47,6 +47,16 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form").contains("Create Warning");
   });
 
+  it("displays the event button on the action panel", () => {
+    cy.get("#actions-tab").click();
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Create event");
+
+    cy.get("a#action-panel-button-create-event").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Create Event");
+  });
+
   it("displays the complaint button on the action panel", () => {
     cy.get("#actions-tab").click();
     cy.get("#actions-content").should("be.visible");
