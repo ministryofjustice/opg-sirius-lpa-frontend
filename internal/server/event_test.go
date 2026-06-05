@@ -88,13 +88,14 @@ func TestGetEvent(t *testing.T) {
 					NoteTypes: []string{"a", "b"},
 					Entity:    tc.expectedEntity,
 					CaseUID:   tc.expectedCaseUID,
+					DonorId:   123,
 				}).
 				Return(nil)
 
 			r, _ := http.NewRequest(http.MethodGet, tc.url, nil)
 			w := httptest.NewRecorder()
 
-			err := Event(client, template.Func)(w, r)
+			err := Event(client, template.Func, nil)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -127,7 +128,7 @@ func TestGetEventBadQueryString(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := Event(client, template.Func)(w, r)
+			err := Event(client, template.Func, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -146,7 +147,7 @@ func TestGetEventWhenNoteTypeErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=person", nil)
 	w := httptest.NewRecorder()
 
-	err := Event(client, nil)(w, r)
+	err := Event(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -168,7 +169,7 @@ func TestGetEventWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=person", nil)
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func)(w, r)
+	err := Event(client, template.Func, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -191,6 +192,7 @@ func TestPostEvent(t *testing.T) {
 			Success:   true,
 			NoteTypes: []string{"a", "b"},
 			Entity:    "John Doe",
+			DonorId:   123,
 		}).
 		Return(nil)
 
@@ -205,7 +207,7 @@ func TestPostEvent(t *testing.T) {
 	r.Header.Add("Content-Type", form.FormDataContentType())
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func)(w, r)
+	err := Event(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -231,6 +233,7 @@ func TestPostEventWithFile(t *testing.T) {
 			Success:   true,
 			NoteTypes: []string{"a", "b"},
 			Entity:    "John Doe",
+			DonorId:   123,
 		}).
 		Return(nil)
 
@@ -247,7 +250,7 @@ func TestPostEventWithFile(t *testing.T) {
 	r.Header.Add("Content-Type", form.FormDataContentType())
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func)(w, r)
+	err := Event(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -273,7 +276,7 @@ func TestPostEventWithBadForm(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123&entity=person", &buf)
 	w := httptest.NewRecorder()
 
-	err := Event(client, nil)(w, r)
+	err := Event(client, nil, nil)(w, r)
 
 	assert.NotNil(t, err)
 }
@@ -296,6 +299,7 @@ func TestPostEventWhenCreateNoteFails(t *testing.T) {
 			Success:   true,
 			NoteTypes: []string{"a", "b"},
 			Entity:    "John Doe",
+			DonorId:   123,
 		}).
 		Return(nil)
 
@@ -310,7 +314,7 @@ func TestPostEventWhenCreateNoteFails(t *testing.T) {
 	r.Header.Add("Content-Type", form.FormDataContentType())
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func)(w, r)
+	err := Event(client, template.Func, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -340,6 +344,7 @@ func TestPostEventWhenValidationError(t *testing.T) {
 			NoteTypes:   []string{"a", "b"},
 			Error:       expectedErrors,
 			Entity:      "John Doe",
+			DonorId:     123,
 			Type:        "Application processing",
 			Name:        "Something",
 			Description: "More words",
@@ -357,7 +362,7 @@ func TestPostEventWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", form.FormDataContentType())
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func)(w, r)
+	err := Event(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -399,7 +404,79 @@ func TestPostEventDigitalLpaRedirect(t *testing.T) {
 	r.Header.Add("Content-Type", form.FormDataContentType())
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func)(w, r)
+	err := Event(client, template.Func, nil)(w, r)
 
 	assert.Equal(t, RedirectError("/lpa/M-EEEE-AAAA-TTTT"), err)
+}
+
+func TestGetEventHtmx(t *testing.T) {
+	client := &mockEventClient{}
+	client.
+		On("NoteTypes", mock.Anything).
+		Return([]string{"a", "b"}, nil)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, eventData{
+			NoteTypes:  []string{"a", "b"},
+			Entity:     "John Doe",
+			DonorId:    123,
+			EntityType: "person",
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=person", nil)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := Event(client, nil, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestPostEventHtmx(t *testing.T) {
+	client := &mockEventClient{}
+	client.
+		On("NoteTypes", mock.Anything).
+		Return([]string{"a", "b"}, nil)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
+	client.
+		On("CreateNote", mock.Anything, 123, sirius.EntityTypePerson, "Application processing", "Something", "More words", (*sirius.NoteFile)(nil)).
+		Return(nil)
+
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, eventData{
+			Success:    true,
+			NoteTypes:  []string{"a", "b"},
+			Entity:     "John Doe",
+			DonorId:    123,
+			EntityType: "person",
+		}).
+		Return(nil)
+
+	var buf bytes.Buffer
+	form := multipart.NewWriter(&buf)
+	_ = form.WriteField("type", "Application processing")
+	_ = form.WriteField("name", "Something")
+	_ = form.WriteField("description", "More words")
+	_ = form.Close()
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&entity=person", &buf)
+	r.Header.Add("Content-Type", form.FormDataContentType())
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := Event(client, nil, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }

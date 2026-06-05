@@ -1,0 +1,47 @@
+{{ define "page" }}
+  <div class="action-panel__form">
+    {{ template "error-summary" .Error }}
+
+    {{ if .Success }}
+      <span class="govuk-!-display-none"
+            hx-get="{{ prefix (printf "/action-panel?id=%d&entity=%s%s" .DonorId .EntityType .CaseUids) }}"
+            hx-target=".action-panel__content"
+            hx-swap="innerHTML"
+            hx-trigger="load"
+      ></span>
+      {{ template "success-banner" "You have successfully created an event." }}
+    {{ end }}
+
+    <h1 class="govuk-heading-m">Create Event</h1>
+
+    <form class="form" enctype="multipart/form-data" method="POST"
+          hx-post="{{ prefix (printf "/create-event?id=%d&entity=%s%s" .DonorId .EntityType .CaseUids) }}"
+          hx-target=".action-panel__content"
+          hx-swap="innerHTML"
+          hx-encoding="multipart/form-data">
+      <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+      {{ template "select" (select "type" "Event type" .Type .Error.Field.type (options .NoteTypes)) }}
+
+      {{ template "input" (field "name" "Subject" .Name .Error.Field.name) }}
+
+      {{ template "textarea" (field "description" "Notes" .Description .Error.Field.description) }}
+
+      <div class="govuk-form-group {{ if .Error.Field.file }}govuk-form-group--error{{ end }}">
+        <label class="govuk-label" for="f-file">File upload</label>
+        {{ template "errors" .Error.Field.file }}
+        <input class="govuk-file-upload {{ if .Error.Field.file }}govuk-file-upload--error{{ end }}" type="file" name="file" id="f-file" />
+      </div>
+
+      <div class="govuk-button-group govuk-!-margin-right-0">
+        <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+        <a class="govuk-link govuk-link--no-visited-state"
+           href=""
+           hx-get="{{ prefix (printf "/action-panel?id=%d&entity=%s%s" .DonorId .EntityType .CaseUids) }}"
+           hx-target=".action-panel__content"
+           hx-swap="innerHTML"
+        >Cancel</a>
+      </div>
+    </form>
+  </div>
+{{ end }}

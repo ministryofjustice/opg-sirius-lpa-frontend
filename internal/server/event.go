@@ -34,9 +34,12 @@ type eventData struct {
 	Type        string
 	Name        string
 	Description string
+	DonorId     int
+	EntityType  string
+	CaseUids    string
 }
 
-func Event(client EventClient, tmpl template.Template) Handler {
+func Event(client EventClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		entityID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -65,6 +68,12 @@ func Event(client EventClient, tmpl template.Template) Handler {
 
 		data.CaseUID = ""
 		data.IsDigitalLpa = false
+		data.DonorId = entityID
+		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
+
+		if r.Header.Get("HX-Request") == "true" {
+			data.EntityType = string(entityType)
+		}
 
 		group.Go(func() error {
 			switch entityType {
@@ -127,6 +136,10 @@ func Event(client EventClient, tmpl template.Template) Handler {
 					return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
 				}
 			}
+		}
+
+		if r.Header.Get("HX-Request") == "true" && partialTmpl != nil {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

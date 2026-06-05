@@ -903,6 +903,30 @@
         "headers": { "Content-Type": "application/json" },
         "body": "{\"displayName\":\"Test User\",\"id\":105,\"roles\":[\"OPG User\",\"Reduced Fees User\",\"private-mlpa\"]}"
       }
+    },
+    {
+      "name": "Get note types for LPA",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/note-types/lpa"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[\"Application processing\",\"Call\",\"Letter\"]"
+      }
+    },
+    {
+      "name": "Get person by ID 1",
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/persons/1"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "{\"id\":1,\"firstname\":\"Test\",\"surname\":\"User\",\"personType\":\"Donor\"}"
+      }
     }
   ]
 }
