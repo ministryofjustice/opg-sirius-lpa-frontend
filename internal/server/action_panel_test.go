@@ -45,6 +45,12 @@ func TestGetActionPanel(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Create event",
+					URL:      "/create-event?id=123&entity=person",
+					IconName: "aw-new-event",
+					Disabled: false,
+				},
+				{
 					Label:    "Add complaint",
 					URL:      "",
 					IconName: "aw-log-complaint",
@@ -91,6 +97,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Create event",
+					URL:      "/create-event?id=123&entity=person&uid[]=7000-0000-0001",
+					IconName: "aw-new-event",
+					Disabled: false,
+				},
+				{
 					Label:    "Add complaint",
 					URL:      "/add-complaint?id=1&case=lpa",
 					IconName: "aw-log-complaint",
@@ -123,6 +135,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					Label:    "Create warning",
 					URL:      "/create-warning?id=0&entity=person",
 					IconName: "aw-create-warning",
+					Disabled: false,
+				},
+				{
+					Label:    "Create event",
+					URL:      "/create-event?id=0&entity=person",
+					IconName: "aw-new-event",
 					Disabled: false,
 				},
 				{

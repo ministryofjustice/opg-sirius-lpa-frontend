@@ -222,6 +222,12 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Create event",
+					URL:      "/create-event?id=82&entity=person",
+					IconName: "aw-new-event",
+					Disabled: false,
+				},
+				{
 					Label:    "Add complaint",
 					URL:      "",
 					IconName: "aw-log-complaint",
@@ -242,6 +248,12 @@ func TestGetDocumentList(t *testing.T) {
 					Label:    "Create warning",
 					URL:      "/create-warning?id=82&entity=lpa",
 					IconName: "aw-create-warning",
+					Disabled: false,
+				},
+				{
+					Label:    "Create event",
+					URL:      "/create-event?id=82&entity=person",
+					IconName: "aw-new-event",
 					Disabled: false,
 				},
 				{
@@ -269,6 +281,12 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Create event",
+					URL:      "/create-event?id=82&entity=person&uid[]=7000-1234-0000",
+					IconName: "aw-new-event",
+					Disabled: false,
+				},
+				{
 					Label:    "Add complaint",
 					URL:      "/add-complaint?id=1&case=lpa",
 					IconName: "aw-log-complaint",
@@ -290,6 +308,12 @@ func TestGetDocumentList(t *testing.T) {
 					Label:    "Create warning",
 					URL:      "/create-warning?id=82&entity=person&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 					IconName: "aw-create-warning",
+					Disabled: false,
+				},
+				{
+					Label:    "Create event",
+					URL:      "/create-event?id=82&entity=person&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+					IconName: "aw-new-event",
 					Disabled: false,
 				},
 				{
@@ -435,6 +459,12 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 						Disabled: false,
 					},
 					{
+						Label:    "Create event",
+						URL:      "/create-event?id=82&entity=person",
+						IconName: "aw-new-event",
+						Disabled: false,
+					},
+					{
 						Label:    "Add complaint",
 						URL:      "",
 						IconName: "aw-log-complaint",
@@ -525,6 +555,12 @@ func TestDocumentListDismissValidation(t *testing.T) {
 						Label:    "Create warning",
 						URL:      "/create-warning?id=82&entity=person&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 						IconName: "aw-create-warning",
+						Disabled: false,
+					},
+					{
+						Label:    "Create event",
+						URL:      "/create-event?id=82&entity=person&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+						IconName: "aw-new-event",
 						Disabled: false,
 					},
 					{
@@ -625,6 +661,12 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 						Label:    "Create warning",
 						URL:      "/create-warning?id=82&entity=lpa",
 						IconName: "aw-create-warning",
+						Disabled: false,
+					},
+					{
+						Label:    "Create event",
+						URL:      "/create-event?id=82&entity=person",
+						IconName: "aw-new-event",
 						Disabled: false,
 					},
 					{
