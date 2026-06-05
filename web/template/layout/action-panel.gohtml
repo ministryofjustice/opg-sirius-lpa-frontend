@@ -1,11 +1,7 @@
 {{ define "actionPanel" }}
   <div class="action-panel__inner">
-    {{ if eq (len .SelectedCases) 1 }}
-      {{ with index .SelectedCases 0 }}
-        {{ template "action-panel-button" actionPanelButton "Create warning" (prefix (printf "/create-warning?id=%d&entity=%s%s" $.DonorID (ToLower .CaseType) $.CaseUids)) "aw-create-warning" }}
-      {{ end }}
-    {{ else }}
-      {{ template "action-panel-button" actionPanelButton "Create warning" (prefix (printf "/create-warning?id=%d&entity=person%s" $.DonorID $.CaseUids)) "aw-create-warning" }}
+    {{ range .ActionPanelButtons }}
+        {{ template "action-panel-button" actionPanelButton .Label .URL .IconName .Disabled }}
     {{ end }}
   </div>
 {{ end }}
