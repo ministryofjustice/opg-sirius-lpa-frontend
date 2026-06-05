@@ -157,7 +157,7 @@ describe("Compare documents", () => {
               .and("not.be.empty")
               .and(
                 "include",
-                "/view-document/e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
+                "/view-document/e5b5acd1-c11c-41fe-a921-7fdd07e8f670?pane=2",
               );
           }
         });
@@ -175,7 +175,7 @@ describe("Compare documents", () => {
               .and("not.be.empty")
               .and(
                 "include",
-                "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+                "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95?pane=1",
               );
           }
         });
