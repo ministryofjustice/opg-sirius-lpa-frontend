@@ -15,3 +15,6 @@ docs/architecture/dsl/**/workspace.json
 .gocache
 test-results
 .DS_Store
+
+# Playwright
+/playwright/playwright-report/
