@@ -42,11 +42,12 @@ func TestGetViewDocument(t *testing.T) {
 				On("GetUserDetails", mock.Anything).
 				Return(user, nil)
 
-			template := &mockTemplate{}
-			templateData := viewDocumentData{
-				Document:       document,
-				IsSysAdminUser: true,
-			}
+		template := &mockTemplate{}
+		templateData := viewDocumentData{
+			Document:       document,
+			IsSysAdminUser: true,
+			Pane:           1,
+		}
 
 			template.
 				On("Func", mock.Anything, templateData).
