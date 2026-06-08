@@ -1,16 +1,13 @@
 {{ template "page" . }}
 
-{{ define "title" }}Delete {{ (translateRefData .FeeReductionTypes .Payment.FeeReductionType) | ToLower }}{{ end }}
+{{ define "title" }}Delete payment{{ end }}
 
 {{ define "main" }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             {{ template "case-details" . }}
-            {{$feeReductionTypeLabel := translateRefData .FeeReductionTypes .Payment.FeeReductionType}}
 
-            <h1 class="govuk-heading-l">Delete {{$feeReductionTypeLabel | ToLower}}</h1>
-
-            <p class="govuk-body govuk-!-padding-bottom-6">Are you sure you want to delete the <strong>{{$feeReductionTypeLabel | ToLower }}</strong>?</p>
+            {{ template "deletePayment" . }}
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
@@ -19,7 +16,7 @@
                         Delete
                     </button>
 
-                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/payments/%d" .Case.ID) }}">
+                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix .ReturnUrl }}">
                         Cancel
                     </a>
                 </div>

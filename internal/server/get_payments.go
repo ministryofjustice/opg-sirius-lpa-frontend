@@ -35,9 +35,10 @@ type getPaymentsData struct {
 	OutstandingFee    int
 	RefundAmount      int
 	FlashMessage      FlashNotification
+	InActionPanel     bool
 }
 
-func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
+func GetPayments(client GetPaymentsClient, tmpl template.Template, tmplHtmx template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 		group, groupCtx := errgroup.WithContext(ctx.Context)
@@ -138,6 +139,14 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		}
 
 		data.FlashMessage, _ = GetFlash(w, r)
+
+		if r.Header.Get("HX-Request") == "true" {
+			data.InActionPanel = true
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return tmplHtmx(w, data)
+		}
 
 		return tmpl(w, data)
 	}

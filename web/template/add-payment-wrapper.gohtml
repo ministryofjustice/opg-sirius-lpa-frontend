@@ -1,6 +1,6 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Apply fee reduction{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add payment{{ end }}
 
 {{ define "main" }}
     <div class="govuk-grid-row">
@@ -9,16 +9,10 @@
 
             {{ template "error-summary" .Error }}
 
-            <h1 class="govuk-heading-l">Apply a fee reduction</h1>
-
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-                {{ template "select" (select "feeReductionType" "Reduction type" .FeeReductionType .Error.Field.feeReductionType (options .FeeReductionTypes)) }}
-
-                {{ template "textarea" (field "paymentEvidence" "Evidence used to determine reduction" .PaymentEvidence .Error.Field.paymentEvidence "hint" "For example, income calculations") }}
-
-                {{ template "input-date" (field "paymentDate" "Date fee reduction applied" .PaymentDate .Error.Field.paymentDate "max" today "selectToday" true) }}
+                {{ template "addPayment" . }}
 
                 <div class="govuk-button-group govuk-!-padding-top-6">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
