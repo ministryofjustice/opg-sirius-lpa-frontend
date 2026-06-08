@@ -1,15 +1,13 @@
 {{ template "page" . }}
 
-{{ define "title" }}Delete payment{{ end }}
+{{ define "title" }}Delete {{ (translateRefData .FeeReductionTypes .Payment.FeeReductionType) | ToLower }}{{ end }}
 
 {{ define "main" }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             {{ template "case-details" . }}
 
-            <h1 class="govuk-heading-l">Delete payment</h1>
-
-            <p class="govuk-body govuk-!-padding-bottom-6">Are you sure you want to delete the payment of £{{ fee .Payment.Amount }}</p>
+            {{ template "deleteFeeReduction" . }}
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
@@ -18,7 +16,7 @@
                         Delete
                     </button>
 
-                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/payments/%d" .Case.ID) }}">
+                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix .ReturnUrl }}">
                         Cancel
                     </a>
                 </div>
