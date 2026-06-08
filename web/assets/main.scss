@@ -51,6 +51,15 @@ $app-action-panel-z-index: $app-sirius-header-z-index + 1;
   display: none;
 }
 
+#main-container {
+  display: flex;
+}
+
+.govuk-main-wrapper {
+  flex: 1;
+  transition: flex 0.5s ease;
+}
+
 // When embedded, always use mobile-size wrapper spacing
 @include govuk-media-query($from: tablet) {
   .app-\!-embedded .govuk-width-container {
@@ -531,15 +540,13 @@ $app-action-panel-z-index: $app-sirius-header-z-index + 1;
 }
 
 .action-panel {
-  --action-panel-top: 130px;
   --action-panel-width: 400px;
   --action-panel-height: 42rem;
-  position: fixed;
-  top: calc(50vh - (var(--action-panel-height) / 2));
-  right: 0;
-  z-index: $app-action-panel-z-index;
-
-  transition: right 200ms ease;
+  position: relative;
+  width: 0;
+  min-height: var(--action-panel-height);
+  margin-left: 1.5rem;
+  transition: width 0.5s ease;
 
   &.wide {
     --action-panel-width: 800px;
@@ -547,37 +554,30 @@ $app-action-panel-z-index: $app-sirius-header-z-index + 1;
 }
 
 .action-panel[open] {
-  right: var(--action-panel-width);
+  width: var(--action-panel-width);
+}
+
+.action-panel::details-content {
+  // Causes the <details> element to hide it's content at the end of the transition
+  transition: content-visibility 0.5s allow-discrete;
 }
 
 .action-panel__content {
+  box-sizing: border-box;
   display: block !important; // Override <details> display:none to enable CSS transitions
-  position: absolute;
-  top: 0;
-  transform: translate(1rem, 0);
   width: var(--action-panel-width);
-  height: var(--action-panel-height);
+  min-height: var(--action-panel-height);
   max-width: calc(100vw - 4rem);
   overflow-y: auto;
   background: $color-action-widget-bg;
   border: 3px solid $color-sirius-light-blue;
-  border-radius: 7px;
-  z-index: 1;
-  opacity: 0;
-  transition:
-    transform 200ms ease,
-    opacity 200ms ease,
-    width 200ms ease;
-}
-
-.action-panel[open] .action-panel__content {
-  transform: translate(0, 0);
-  opacity: 1;
+  border-radius: 7px 0 0 7px;
+  transition: width 0.5s ease;
 }
 
 .action-panel__tab {
   position: absolute;
-  top: 0;
+  top: 5px;
   transform: rotate(-90deg) translateX(-100%) translateY(-100%);
   left: 0;
   transform-origin: top left;
