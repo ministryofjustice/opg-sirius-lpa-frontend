@@ -51,13 +51,26 @@ $app-action-panel-z-index: $app-sirius-header-z-index + 1;
   display: none;
 }
 
-#main-container {
+.govuk-width-container:has(.action-panel) {
   display: flex;
+
+  & .govuk-main-wrapper {
+    flex: 1;
+    margin-right: 1.5rem;
+    transition: margin-right 0.5s ease;
+  }
 }
 
-.govuk-main-wrapper {
-  flex: 1;
-  transition: flex 0.5s ease;
+.govuk-width-container:has(.action-panel[open]) {
+  & .govuk-main-wrapper {
+    margin-right: calc(400px + 1.5rem);
+  }
+}
+
+.govuk-width-container:has(.action-panel[open].wide) {
+  & .govuk-main-wrapper {
+    margin-right: calc(800px + 1.5rem);
+  }
 }
 
 // When embedded, always use mobile-size wrapper spacing
@@ -542,10 +555,10 @@ $app-action-panel-z-index: $app-sirius-header-z-index + 1;
 .action-panel {
   --action-panel-width: 400px;
   --action-panel-height: 42rem;
-  position: relative;
+  position: fixed;
+  right: 0;
   width: 0;
   min-height: var(--action-panel-height);
-  margin-left: 1.5rem;
   transition: width 0.5s ease;
 
   &.wide {
