@@ -528,6 +528,10 @@ $govuk-assets-path: "../assets/";
   z-index: 1;
 
   transition: right 200ms ease;
+
+  &.wide {
+    --action-panel-width: 800px;
+  }
 }
 
 .action-panel[open] {
@@ -550,7 +554,8 @@ $govuk-assets-path: "../assets/";
   opacity: 0;
   transition:
     transform 200ms ease,
-    opacity 200ms ease;
+    opacity 200ms ease,
+    width 200ms ease;
 }
 
 .action-panel[open] .action-panel__content {
@@ -650,6 +655,19 @@ $govuk-assets-path: "../assets/";
   }
   .govuk-form-group {
     margin-bottom: 20px;
+  }
+}
+
+.action-panel__form--wide {
+  .govuk-body,
+  .govuk-label,
+  .govuk-select,
+  .govuk-input,
+  .govuk-button,
+  .govuk-link,
+  .govuk-fieldset__legend,
+  .govuk-textarea {
+    font-size: 1.03906rem;
   }
 }
 

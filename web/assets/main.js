@@ -61,6 +61,22 @@ htmx.on("htmx:afterSwap", (event) => {
   if (swapDetails.successful) {
     GOVUKFrontend.initAll(swapDetails.target);
     MOJFrontend.initAll(swapDetails.target);
+    select(prefix);
+    handleCreateDocumentButton();
+    insertSelector(swapDetails.target);
+    handleInsertCheckboxes({ scope: swapDetails.target });
+
+    // Update the action panel width if swapping in create-document or edit-document content
+    if (swapDetails.target.id === "actions-content") {
+      if (
+        swapDetails.pathInfo.requestPath.includes("create-document") ||
+        swapDetails.pathInfo.requestPath.includes("edit-document")
+      ) {
+        document.querySelector(".action-panel").classList.add("wide");
+      } else {
+        document.querySelector(".action-panel").classList.remove("wide");
+      }
+    }
   }
 });
 
