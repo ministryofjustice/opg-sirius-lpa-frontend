@@ -27,9 +27,10 @@ type addPaymentData struct {
 	PaymentDate    sirius.DateString
 	PaymentSources []sirius.RefDataItem
 	ReturnUrl      string
+	HtmxRedirect   string
 }
 
-func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
+func AddPayment(client AddPaymentClient, tmpl template.Template, tmplHtmx template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -91,6 +92,9 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 						"reason": "Value is required and can't be empty",
 					}
 				}
+				if r.Header.Get("HX-Request") == "true" {
+					return tmplHtmx(w, data)
+				}
 				return tmpl(w, data)
 			}
 
@@ -105,6 +109,10 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
+				if r.Header.Get("HX-Request") == "true" {
+					return tmplHtmx(w, data)
+				}
+				return tmpl(w, data)
 			} else if err != nil {
 				return err
 			} else {
@@ -112,8 +120,17 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 					Title: "Payment added",
 				})
 
+				if r.Header.Get("HX-Request") == "true" {
+					data.HtmxRedirect = data.ReturnUrl
+					return tmplHtmx(w, data)
+				}
+
 				return RedirectError(data.ReturnUrl)
 			}
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return tmplHtmx(w, data)
 		}
 
 		return tmpl(w, data)

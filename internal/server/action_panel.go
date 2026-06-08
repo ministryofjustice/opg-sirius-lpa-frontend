@@ -105,11 +105,13 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	eventUrl := fmt.Sprintf("/create-event?id=%d&entity=person%s", donorId, caseUids)
 	complaintUrl := ""
 	createDocumentUrl := ""
+	AddFeesUrl := ""
 	if len(selectedCases) == 1 {
 		selectedCase := selectedCases[0]
 		warningUrl = fmt.Sprintf("/create-warning?id=%d&entity=%s%s", donorId, strings.ToLower(selectedCase.CaseType), caseUids)
 		complaintUrl = fmt.Sprintf("/add-complaint?id=%d&case=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
 		createDocumentUrl = fmt.Sprintf("/create-document?id=%d&case=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
+		AddFeesUrl = fmt.Sprintf("/payments/%d", selectedCases[0].ID)
 	}
 
 	return []ActionPanelButton{
@@ -135,6 +137,12 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			Label:    "Create document",
 			URL:      createDocumentUrl,
 			IconName: "aw-new-template",
+			Disabled: len(selectedCases) != 1,
+		},
+		{
+			Label:    "Fees",
+			URL:      AddFeesUrl,
+			IconName: "aw-mi", // TODO: create the actual icon as it doesn't seem to have been migrated!
 			Disabled: len(selectedCases) != 1,
 		},
 	}

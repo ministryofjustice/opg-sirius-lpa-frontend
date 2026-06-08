@@ -1,0 +1,52 @@
+{{ define "page" }}
+<div class="action-panel__form">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-body">
+                <a class="govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-0"
+                   href=""
+                   hx-get="{{ prefix .ReturnUrl }}"
+                   hx-target=".action-panel__content"
+                   hx-swap="innerHTML">Back</a>
+            </div>
+
+            {{ template "case-details" . }}
+
+            {{ if .HtmxRedirect }}
+                <span class="govuk-!-display-none"
+                    hx-get="{{ prefix .HtmxRedirect }}"
+                    hx-target=".action-panel__content"
+                    hx-swap="innerHTML"
+                    hx-trigger="load"
+                ></span>
+            {{ end }}
+
+            <h1 class="govuk-heading-l">Delete payment</h1>
+
+            <p class="govuk-body govuk-!-padding-bottom-6">Are you sure you want to delete the payment of £{{ fee .Payment.Amount }}</p>
+
+            <form class="form"
+                  method="POST"
+                  hx-post="{{ prefix (printf "/delete-payment?id=%d" .Payment.ID) }}"
+                  hx-target=".action-panel__content"
+                  hx-swap="innerHTML">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+                <input type="hidden" name="id" value="{{ .Payment.ID }}"/>
+                <div class="govuk-button-group">
+                    <button class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit">
+                        Delete
+                    </button>
+
+                    <a class="govuk-link govuk-link--no-visited-state"
+                       href=""
+                       hx-get="{{ prefix .ReturnUrl }}"
+                       hx-target=".action-panel__content"
+                       hx-swap="innerHTML">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{ end }}
