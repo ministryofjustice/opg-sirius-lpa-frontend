@@ -26,9 +26,10 @@ type applyFeeReductionData struct {
 	PaymentDate       sirius.DateString
 	FeeReductionTypes []sirius.RefDataItem
 	ReturnUrl         string
+	HtmxRedirect      string
 }
 
-func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) Handler {
+func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template, tmplHtmx template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -77,6 +78,11 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) H
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
+				if r.Header.Get("HX-Request") == "true" {
+					return tmplHtmx(w, data)
+				}
+
+				return tmpl(w, data)
 			} else if err != nil {
 				return err
 			} else {
@@ -84,8 +90,17 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) H
 					Title: fmt.Sprintf("%s approved", translateRefData(data.FeeReductionTypes, data.FeeReductionType)),
 				})
 
+				if r.Header.Get("HX-Request") == "true" {
+					data.HtmxRedirect = data.ReturnUrl
+					return tmplHtmx(w, data)
+				}
+
 				return RedirectError(data.ReturnUrl)
 			}
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return tmplHtmx(w, data)
 		}
 
 		return tmpl(w, data)
