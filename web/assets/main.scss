@@ -566,7 +566,7 @@ $app-action-panel-z-index: $app-sirius-header-z-index + 1;
   box-sizing: border-box;
   display: block !important; // Override <details> display:none to enable CSS transitions
   width: var(--action-panel-width);
-  min-height: var(--action-panel-height);
+  height: var(--action-panel-height);
   max-width: calc(100vw - 4rem);
   overflow-y: auto;
   background: $color-action-widget-bg;
