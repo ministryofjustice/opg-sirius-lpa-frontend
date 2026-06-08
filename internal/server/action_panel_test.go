@@ -62,6 +62,12 @@ func TestGetActionPanel(t *testing.T) {
 					IconName: "aw-new-template",
 					Disabled: true,
 				},
+				{
+					Label:    "Change status",
+					URL:      "",
+					IconName: "aw-change-status",
+					Disabled: true,
+				},
 			},
 		}).
 		Return(nil)
@@ -120,6 +126,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					IconName: "aw-new-template",
 					Disabled: false,
 				},
+				{
+					Label:    "Change status",
+					URL:      "/change-status?id=1&case=lpa&donorId=123&uid[]=7000-0000-0001",
+					IconName: "aw-change-status",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -165,6 +177,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					Label:    "Create document",
 					URL:      "",
 					IconName: "aw-new-template",
+					Disabled: true,
+				},
+				{
+					Label:    "Change status",
+					URL:      "",
+					IconName: "aw-change-status",
 					Disabled: true,
 				},
 			},
