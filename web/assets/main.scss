@@ -34,6 +34,8 @@ $app-sirius-header-dropdown-top: $app-sirius-header-top +
 $app-sirius-header-z-index: 10;
 $app-sirius-header-dropdown-z-index: 9;
 $app-action-panel-z-index: $app-sirius-header-z-index + 1;
+$app-action-panel-top: $app-sirius-header-top + $app-sirius-header-height + 15px;
+$app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
 
 // Define HTMX indicator styles here to avoid inline styles which are blocked by CSP
 .htmx-indicator {
@@ -546,11 +548,11 @@ $app-action-panel-z-index: $app-sirius-header-z-index + 1;
 
 .action-panel {
   --action-panel-width: 400px;
-  --action-panel-height: 42rem;
   position: fixed;
+  top: $app-action-panel-top;
   right: 0;
   width: 0;
-  min-height: var(--action-panel-height);
+  min-height: $app-action-panel-height;
   transition: width 0.5s ease;
 
   &.wide {
@@ -571,7 +573,7 @@ $app-action-panel-z-index: $app-sirius-header-z-index + 1;
   box-sizing: border-box;
   display: block !important; // Override <details> display:none to enable CSS transitions
   width: var(--action-panel-width);
-  height: var(--action-panel-height);
+  height: $app-action-panel-height;
   max-width: calc(100vw - 4rem);
   overflow-y: auto;
   background: $color-action-widget-bg;
