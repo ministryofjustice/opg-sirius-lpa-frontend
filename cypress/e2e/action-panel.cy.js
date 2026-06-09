@@ -102,7 +102,10 @@ describe("Action Panel", () => {
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Change status");
 
-    cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: { caseType: "lpa" } });
+    cy.addMock("/lpa-api/v1/cases/34", "GET", {
+      status: 200,
+      body: { caseType: "lpa" },
+    });
     cy.addMock("/lpa-api/v1/lpas/34/available-statuses", "GET", {
       status: 200,
       body: ["Cancelled", "Withdrawn"],
@@ -112,5 +115,4 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Change Status");
   });
-
 });
