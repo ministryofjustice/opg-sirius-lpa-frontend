@@ -23,10 +23,18 @@ type changeStatusData struct {
 
 	AvailableStatuses []string
 	NewStatus         string
+	CaseID            int
+	CaseType          string
+	DonorID           int
+	CaseUids          string
 }
 
-func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
+func ChangeStatus(client ChangeStatusClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
+		if err := r.ParseForm(); err != nil {
+			return err
+		}
+
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
@@ -49,11 +57,20 @@ func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		donorID := 0
+		if caseItem.Donor != nil {
+			donorID = caseItem.Donor.ID
+		}
+
 		data := changeStatusData{
 			XSRFToken:         ctx.XSRFToken,
 			Entity:            fmt.Sprintf("%s %s", caseItem.CaseType, caseItem.UID),
 			AvailableStatuses: availableStatuses,
 			NewStatus:         postFormString(r, "status"),
+			CaseID:            caseID,
+			CaseType:          string(caseType),
+			DonorID:           donorID,
+			CaseUids:          buildUIDQueryString(r.Form["uid[]"]),
 		}
 
 		if r.Method == http.MethodPost {
@@ -71,6 +88,10 @@ func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 			}
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
