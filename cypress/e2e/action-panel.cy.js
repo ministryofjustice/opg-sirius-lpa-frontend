@@ -96,4 +96,21 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Select a document template");
   });
+
+  it("displays the change status button on the action panel", () => {
+    cy.get("#actions-tab").click();
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Change status");
+
+    cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: { caseType: "lpa" } });
+    cy.addMock("/lpa-api/v1/lpas/34/available-statuses", "GET", {
+      status: 200,
+      body: ["Cancelled", "Withdrawn"],
+    });
+
+    cy.get("a#action-panel-button-change-status").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Change Status");
+  });
+
 });
