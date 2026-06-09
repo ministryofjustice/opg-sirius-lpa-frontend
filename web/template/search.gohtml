@@ -52,9 +52,9 @@
                         {{ range $r := (slice .Results 0 (len .Results)) }}
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell govuk-link--no-visited-state">
-                                    <ul class="govuk-list">
+                                    <ul class="govuk-list govuk-!-margin-bottom-0">
                                         {{ range $case := .Cases }}
-                                            <li>
+                                            <li class="govuk-!-margin-bottom-0">
                                                 {{ if eq $case.CaseType "DIGITAL_LPA" }}
                                                     <a class="govuk-link govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/frontend/lpa/%s" $case.UID) }}">{{ $case.UID }}</a>
                                                 {{ else if eq (ToLower $r.PersonType) "donor" }}
@@ -67,7 +67,7 @@
                                                     {{ $case.UID }}
                                                 {{ end }}
                                             </li>
-                                            <li>
+                                            <li class="govuk-!-margin-bottom-0">
                                                 <span class="govuk-!-margin-bottom-2 govuk-!-display-inline-block">{{ $case.CaseType }} - {{ subtypeShortFormat $case.SubType }}</span>
                                             </li>
                                         {{ end }}
@@ -80,7 +80,7 @@
                                 </td>
                                 <td class="govuk-table__cell">
                                     <ul class="govuk-list">
-                                        <li>
+                                        <li class="govuk-!-margin-bottom-0">
                                             <strong>
                                                 {{ if and (gt (len .Cases) 0) (eq (index .Cases 0).CaseType "DIGITAL_LPA") }}
                                                     <a class="govuk-link govuk-link--no-underline govuk-link--no-visited-state" href="{{ sirius (printf "/lpa/frontend/lpa/%s" (index .Cases 0).UID) }}">
@@ -113,18 +113,17 @@
                                 <td class="govuk-table__cell">{{ formatDate .DateOfBirth }}</td>
                                 <td class="govuk-table__cell">{{ .AddressSummary }}</td>
                                 <td class="govuk-table__cell table-cell-nowrap">
-                                    <ul class="govuk-list">
+                                    <ul class="govuk-list govuk-!-margin-bottom-0">
                                         {{ range $case := .Cases }}
                                             <li>
-                                                <div class="govuk-!-margin-bottom-3">
-                                                    {{ if $case.Status }}
-                                                        <strong class="govuk-tag govuk-tag--{{ $case.Status.Colour }} sirius-govuk-tag__status govuk-!-margin-bottom-5">
-                                                            {{ $case.Status.ReadableString }}
-                                                        </strong>
-                                                    {{ end }}
-                                                </div>
+                                                {{ if $case.Status }}
+                                                    <strong class="govuk-tag govuk-tag--{{ $case.Status.Colour }} sirius-govuk-tag__status govuk-!-margin-bottom-5">
+                                                        {{ $case.Status.ReadableString }}
+                                                    </strong>
+                                                {{ end }}
                                             </li>
                                         {{ end }}
+                                    </ul>
                                 </td>
                             </tr>
                         {{ end }}
