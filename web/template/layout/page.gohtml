@@ -23,6 +23,8 @@
 
       {{ template "header" . }}
 
+      {{ block "sirius-header" . }}{{ end }}
+
       <div class="govuk-width-container{{ block "container-classes" . }}{{ end }}">
         {{ block "backlink" . }}{{ end }}
 
