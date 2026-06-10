@@ -71,7 +71,7 @@ func TestGetActionPanel(t *testing.T) {
 				{
 					Label:    "Fees",
 					URL:      "",
-					IconName: "aw-mi",
+					IconName: "aw-fees",
 					Disabled: true,
 				},
 			},
@@ -141,7 +141,7 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 				{
 					Label:    "Fees",
 					URL:      "/payments/1",
-					IconName: "aw-mi",
+					IconName: "aw-fees",
 					Disabled: false,
 				},
 			},
@@ -200,7 +200,7 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 				{
 					Label:    "Fees",
 					URL:      "",
-					IconName: "aw-mi",
+					IconName: "aw-fees",
 					Disabled: true,
 				},
 			},

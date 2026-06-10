@@ -150,7 +150,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		{
 			Label:    "Fees",
 			URL:      PaymentsUrl,
-			IconName: "aw-mi", // TODO: create the actual icon as it doesn't seem to have been migrated!
+			IconName: "aw-fees",
 			Disabled: len(selectedCases) != 1,
 		},
 	}
