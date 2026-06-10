@@ -37,7 +37,6 @@ describe("Action Panel", () => {
   });
 
   it("can open and close the action panel", () => {
-    cy.get("#actions-tab").click();
     cy.get("#actions-content").should("be.visible");
 
     cy.get("#actions-tab").click();
@@ -45,7 +44,6 @@ describe("Action Panel", () => {
   });
 
   it("displays the warning button on the action panel", () => {
-    cy.get("#actions-tab").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Create warning");
 
@@ -55,7 +53,6 @@ describe("Action Panel", () => {
   });
 
   it("displays the event button on the action panel", () => {
-    cy.get("#actions-tab").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Create event");
 
@@ -65,7 +62,6 @@ describe("Action Panel", () => {
   });
 
   it("displays the complaint button on the action panel", () => {
-    cy.get("#actions-tab").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Add complaint");
 
@@ -77,7 +73,6 @@ describe("Action Panel", () => {
   });
 
   it("displays the create document button on the action panel", () => {
-    cy.get("#actions-tab").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Create document");
 
@@ -105,7 +100,6 @@ describe("Action Panel", () => {
   });
 
   it("displays the change status button on the action panel", () => {
-    cy.get("#actions-tab").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Change status");
 
