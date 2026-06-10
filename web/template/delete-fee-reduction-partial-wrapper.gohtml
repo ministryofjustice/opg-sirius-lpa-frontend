@@ -15,7 +15,9 @@
 
     <h1 class="govuk-heading-m">Delete {{ $feeReductionTypeLabel | ToLower }}</h1>
 
-    {{ template "deleteFeeReduction" . }}
+    <p class="govuk-body govuk-!-padding-bottom-6">
+        Are you sure you want to delete the <strong>{{$feeReductionTypeLabel | ToLower }}</strong>?
+    </p>
 
     <form class="form"
             method="POST"
