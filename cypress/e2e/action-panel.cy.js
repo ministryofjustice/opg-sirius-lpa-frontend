@@ -116,4 +116,33 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Change Status");
   });
+
+  it("displays fees button on the action panel", () => {
+    cy.get("#actions-tab").click();
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Fees");
+
+    cy.addMock("/lpa-api/v1/cases/34/payments", "GET", {
+      status: 200,
+      body: [{ "amount": 100 }]
+    });
+    cy.addMock("/lpa-api/v1/users/current", "GET", {
+      status: 200,
+      body: {
+        roles: ["OPG User", "Reduced Fees User"],
+      },
+    });
+
+    cy.get("a#action-panel-button-fees").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Fee details");
+
+    cy.get(".action-panel__form").contains("Add payment").click();
+    cy.get(".action-panel__form h1").contains("Add payment");
+    cy.get(".action-panel__form .govuk-link").contains("Cancel").click();
+
+    cy.get(".action-panel__form").contains("Apply fee reduction").click();
+    cy.get(".action-panel__form h1").contains("Apply fee reduction");
+    cy.get(".action-panel__form .govuk-link").contains("Cancel").click(); 
+  });
 });
