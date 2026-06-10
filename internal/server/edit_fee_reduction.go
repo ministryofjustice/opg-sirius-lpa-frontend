@@ -29,7 +29,7 @@ type editFeeReductionData struct {
 	HtmxRedirect      string
 }
 
-func EditFeeReduction(client EditFeeReductionClient, tmpl template.Template, tmplHtmx template.Template) Handler {
+func EditFeeReduction(client EditFeeReductionClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		paymentID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -85,7 +85,7 @@ func EditFeeReduction(client EditFeeReductionClient, tmpl template.Template, tmp
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
 				if r.Header.Get("HX-Request") == "true" {
-					return tmplHtmx(w, data)
+					return partialTmpl(w, data)
 				}
 
 				return tmpl(w, data)
@@ -95,14 +95,14 @@ func EditFeeReduction(client EditFeeReductionClient, tmpl template.Template, tmp
 				SetFlash(w, FlashNotification{Title: "Fee reduction edited"})
 				if r.Header.Get("HX-Request") == "true" {
 					data.HtmxRedirect = data.ReturnUrl
-					return tmplHtmx(w, data)
+					return partialTmpl(w, data)
 				}
 				return RedirectError(data.ReturnUrl)
 			}
 		}
 
 		if r.Header.Get("HX-Request") == "true" {
-			return tmplHtmx(w, data)
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
