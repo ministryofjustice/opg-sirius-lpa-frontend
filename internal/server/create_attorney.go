@@ -138,10 +138,11 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 }
 
 func GetNextAttorneyId(id int, attorneys []sirius.Attorney) int {
+	nextAttorneyId := 0
 	for _, attorney := range attorneys {
-		if attorney.ID == id+1 {
-			return attorney.ID
+		if attorney.ID > id && (nextAttorneyId == 0 || attorney.ID < nextAttorneyId) {
+			nextAttorneyId = attorney.ID
 		}
 	}
-	return 0
+	return nextAttorneyId
 }
