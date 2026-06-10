@@ -13,7 +13,9 @@
 
     <h1 class="govuk-heading-m">Delete payment</h1>
 
-    {{ template "deletePayment" . }}
+    <p class="govuk-body govuk-!-padding-bottom-6">
+        Are you sure you want to delete the payment of £{{ fee .Payment.Amount }}?
+    </p>
 
     <form class="form"
             method="POST"
