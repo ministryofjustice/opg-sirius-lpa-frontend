@@ -34,6 +34,8 @@ $app-sirius-header-dropdown-top: $app-sirius-header-top +
 $app-sirius-header-z-index: 10;
 $app-sirius-header-dropdown-z-index: 9;
 $app-action-panel-z-index: $app-sirius-header-z-index + 1;
+$app-action-panel-top: $app-sirius-header-top + $app-sirius-header-height + 15px;
+$app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
 
 // Define HTMX indicator styles here to avoid inline styles which are blocked by CSP
 .htmx-indicator {
@@ -525,21 +527,33 @@ $app-action-panel-z-index: $app-sirius-header-z-index + 1;
   flex: 1;
 }
 
+.govuk-width-container:has(> .action-panel) {
+  display: grid;
+  grid-template-columns: 1fr 1.5rem;
+  transition: grid 0.5s ease;
+}
+
+.govuk-width-container:has(> .action-panel[open]) {
+  grid-template-columns: 1fr calc(400px + 1.5rem);
+}
+
+.govuk-width-container:has(> .action-panel[open].wide) {
+  grid-template-columns: 1fr calc(800px + 1.5rem);
+}
+
 .action-panel-section {
   flex-shrink: 0;
   min-width: 250px;
 }
 
 .action-panel {
-  --action-panel-top: 130px;
   --action-panel-width: 400px;
-  --action-panel-height: 42rem;
   position: fixed;
-  top: calc(50vh - (var(--action-panel-height) / 2));
+  top: $app-action-panel-top;
   right: 0;
-  z-index: $app-action-panel-z-index;
-
-  transition: right 200ms ease;
+  width: 0;
+  min-height: $app-action-panel-height;
+  transition: width 0.5s ease;
 
   &.wide {
     --action-panel-width: 800px;
@@ -547,37 +561,30 @@ $app-action-panel-z-index: $app-sirius-header-z-index + 1;
 }
 
 .action-panel[open] {
-  right: var(--action-panel-width);
+  width: var(--action-panel-width);
+}
+
+.action-panel::details-content {
+  // Causes the <details> element to hide it's content at the end of the transition
+  transition: content-visibility 0.5s allow-discrete;
 }
 
 .action-panel__content {
+  box-sizing: border-box;
   display: block !important; // Override <details> display:none to enable CSS transitions
-  position: absolute;
-  top: 0;
-  transform: translate(1rem, 0);
   width: var(--action-panel-width);
-  height: var(--action-panel-height);
+  height: $app-action-panel-height;
   max-width: calc(100vw - 4rem);
   overflow-y: auto;
   background: $color-action-widget-bg;
   border: 3px solid $color-sirius-light-blue;
-  border-radius: 7px;
-  z-index: 1;
-  opacity: 0;
-  transition:
-    transform 200ms ease,
-    opacity 200ms ease,
-    width 200ms ease;
-}
-
-.action-panel[open] .action-panel__content {
-  transform: translate(0, 0);
-  opacity: 1;
+  border-radius: 7px 0 0 7px;
+  transition: width 0.5s ease;
 }
 
 .action-panel__tab {
   position: absolute;
-  top: 0;
+  top: 5px;
   transform: rotate(-90deg) translateX(-100%) translateY(-100%);
   left: 0;
   transform-origin: top left;
