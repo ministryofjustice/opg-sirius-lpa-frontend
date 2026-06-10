@@ -1,6 +1,6 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Apply fee reduction{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Apply a fee reduction{{ end }}
 
 {{ define "main" }}
     <div class="govuk-grid-row">
@@ -9,7 +9,7 @@
 
             {{ template "error-summary" .Error }}
 
-            <h1 class="govuk-heading-l">Apply fee reduction</h1>
+            <h1 class="govuk-heading-l">Apply a fee reduction</h1>
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
