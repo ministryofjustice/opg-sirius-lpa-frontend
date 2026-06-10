@@ -1,6 +1,4 @@
 {{ define "editFeeReduction" }}
-    <h1 class="govuk-heading-l">Edit fee reduction</h1>
-
     {{ template "select" (select "feeReductionType" "Reduction type" .FeeReduction.FeeReductionType .Error.Field.feeReductionType (options .FeeReductionTypes)) }}
 
     {{ template "textarea" (field "paymentEvidence" "Evidence used to determine reduction" .FeeReduction.PaymentEvidence .Error.Field.paymentEvidence "hint" "For example, income calculations") }}

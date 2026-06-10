@@ -9,6 +9,8 @@
 
             {{ template "error-summary" .Error }}
 
+            <h1 class="govuk-heading-l">Add payment</h1>
+
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 

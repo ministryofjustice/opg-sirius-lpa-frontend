@@ -1,42 +1,42 @@
 {{ define "page" }}
 <div class="action-panel__form">
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-            {{ template "case-details" . }}
+    {{$feeReductionTypeLabel := translateRefData .FeeReductionTypes .Payment.FeeReductionType}}
 
-            {{ if .HtmxRedirect }}
-                <span class="govuk-!-display-none"
-                      hx-get="{{ prefix .HtmxRedirect }}"
-                      hx-target=".action-panel__content"
-                      hx-swap="innerHTML"
-                      hx-trigger="load"
-                ></span>
-            {{ end }}
+    {{ template "case-details" . }}
 
-            {{ template "deleteFeeReduction" . }}
+    {{ if .HtmxRedirect }}
+        <span class="govuk-!-display-none"
+                hx-get="{{ prefix .HtmxRedirect }}"
+                hx-target=".action-panel__content"
+                hx-swap="innerHTML"
+                hx-trigger="load"
+        ></span>
+    {{ end }}
 
-            <form class="form"
-                  method="POST"
-                  hx-post="{{ prefix (printf "/delete-fee-reduction?id=%d" .Payment.ID) }}"
-                  hx-target=".action-panel__content"
-                  hx-swap="innerHTML">
-                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
-                <input type="hidden" name="id" value="{{ .Payment.ID }}"/>
-                <div class="govuk-button-group">
-                    <button class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit">
-                        Delete
-                    </button>
+    <h1 class="govuk-heading-m">Delete {{ $feeReductionTypeLabel | ToLower }}</h1>
 
-                    <a class="govuk-link govuk-link--no-visited-state"
-                       href=""
-                       hx-get="{{ prefix .ReturnUrl }}"
-                       hx-target=".action-panel__content"
-                       hx-swap="innerHTML">
-                        Cancel
-                    </a>
-                </div>
-            </form>
+    {{ template "deleteFeeReduction" . }}
+
+    <form class="form"
+            method="POST"
+            hx-post="{{ prefix (printf "/delete-fee-reduction?id=%d" .Payment.ID) }}"
+            hx-target=".action-panel__content"
+            hx-swap="innerHTML">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+        <input type="hidden" name="id" value="{{ .Payment.ID }}"/>
+        <div class="govuk-button-group">
+            <button class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit">
+                Delete
+            </button>
+
+            <a class="govuk-link govuk-link--no-visited-state"
+                href=""
+                hx-get="{{ prefix .ReturnUrl }}"
+                hx-target=".action-panel__content"
+                hx-swap="innerHTML">
+                Cancel
+            </a>
         </div>
-    </div>
+    </form>
 </div>
 {{ end }}
