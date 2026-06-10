@@ -29,7 +29,7 @@ type applyFeeReductionData struct {
 	HtmxRedirect      string
 }
 
-func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template, tmplHtmx template.Template) Handler {
+func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -79,7 +79,7 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template, t
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
 				if r.Header.Get("HX-Request") == "true" {
-					return tmplHtmx(w, data)
+					return partialTmpl(w, data)
 				}
 
 				return tmpl(w, data)
@@ -92,7 +92,7 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template, t
 
 				if r.Header.Get("HX-Request") == "true" {
 					data.HtmxRedirect = data.ReturnUrl
-					return tmplHtmx(w, data)
+					return partialTmpl(w, data)
 				}
 
 				return RedirectError(data.ReturnUrl)
@@ -100,7 +100,7 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template, t
 		}
 
 		if r.Header.Get("HX-Request") == "true" {
-			return tmplHtmx(w, data)
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
