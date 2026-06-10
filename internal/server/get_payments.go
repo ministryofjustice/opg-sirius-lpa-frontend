@@ -140,11 +140,8 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template, partialTmpl t
 
 		data.FlashMessage, _ = GetFlash(w, r)
 
-		if r.Header.Get("HX-Request") == "true" {
+		if r.Header.Get("HX-Request") == "true" && partialTmpl != nil {
 			data.InActionPanel = true
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
 			return partialTmpl(w, data)
 		}
 
