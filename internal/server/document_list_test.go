@@ -259,7 +259,7 @@ func TestGetDocumentList(t *testing.T) {
 				{
 					Label:    "Fees",
 					URL:      "",
-					IconName: "aw-mi",
+					IconName: "aw-fees",
 					Disabled: true,
 				},
 			},
@@ -306,7 +306,7 @@ func TestGetDocumentList(t *testing.T) {
 				{
 					Label:    "Fees",
 					URL:      "/payments/1",
-					IconName: "aw-mi",
+					IconName: "aw-fees",
 					Disabled: false,
 				},
 			},
@@ -354,7 +354,7 @@ func TestGetDocumentList(t *testing.T) {
 				{
 					Label:    "Fees",
 					URL:      "/payments/1",
-					IconName: "aw-mi",
+					IconName: "aw-fees",
 					Disabled: false,
 				},
 			},
@@ -402,7 +402,7 @@ func TestGetDocumentList(t *testing.T) {
 				{
 					Label:    "Fees",
 					URL:      "",
-					IconName: "aw-mi",
+					IconName: "aw-fees",
 					Disabled: true,
 				},
 			},
@@ -576,7 +576,7 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 					{
 						Label:    "Fees",
 						URL:      "",
-						IconName: "aw-mi",
+						IconName: "aw-fees",
 						Disabled: true,
 					},
 				},
@@ -700,7 +700,7 @@ func TestDocumentListDismissValidation(t *testing.T) {
 					{
 						Label:    "Fees",
 						URL:      "",
-						IconName: "aw-mi",
+						IconName: "aw-fees",
 						Disabled: true,
 					},
 				},
@@ -851,7 +851,7 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 					{
 						Label:    "Fees",
 						URL:      "/payments/1",
-						IconName: "aw-mi",
+						IconName: "aw-fees",
 						Disabled: false,
 					},
 				},
