@@ -30,7 +30,7 @@ type addPaymentData struct {
 	HtmxRedirect   string
 }
 
-func AddPayment(client AddPaymentClient, tmpl template.Template, tmplHtmx template.Template) Handler {
+func AddPayment(client AddPaymentClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -93,7 +93,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template, tmplHtmx templa
 					}
 				}
 				if r.Header.Get("HX-Request") == "true" {
-					return tmplHtmx(w, data)
+					return partialTmpl(w, data)
 				}
 
 				return tmpl(w, data)
@@ -111,7 +111,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template, tmplHtmx templa
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
 				if r.Header.Get("HX-Request") == "true" {
-					return tmplHtmx(w, data)
+					return partialTmpl(w, data)
 				}
 
 				return tmpl(w, data)
@@ -124,7 +124,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template, tmplHtmx templa
 
 				if r.Header.Get("HX-Request") == "true" {
 					data.HtmxRedirect = data.ReturnUrl
-					return tmplHtmx(w, data)
+					return partialTmpl(w, data)
 				}
 
 				return RedirectError(data.ReturnUrl)
@@ -132,7 +132,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template, tmplHtmx templa
 		}
 
 		if r.Header.Get("HX-Request") == "true" {
-			return tmplHtmx(w, data)
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

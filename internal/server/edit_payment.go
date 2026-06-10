@@ -32,7 +32,7 @@ type editPaymentData struct {
 	HtmxRedirect   string
 }
 
-func EditPayment(client EditPaymentClient, tmpl template.Template, tmplHtmx template.Template) Handler {
+func EditPayment(client EditPaymentClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		paymentID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -104,7 +104,7 @@ func EditPayment(client EditPaymentClient, tmpl template.Template, tmplHtmx temp
 					}
 				}
 				if r.Header.Get("HX-Request") == "true" {
-					return tmplHtmx(w, data)
+					return partialTmpl(w, data)
 				}
 
 				return tmpl(w, data)
@@ -128,7 +128,7 @@ func EditPayment(client EditPaymentClient, tmpl template.Template, tmplHtmx temp
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
 				if r.Header.Get("HX-Request") == "true" {
-					return tmplHtmx(w, data)
+					return partialTmpl(w, data)
 				}
 
 				return tmpl(w, data)
@@ -138,14 +138,14 @@ func EditPayment(client EditPaymentClient, tmpl template.Template, tmplHtmx temp
 				SetFlash(w, FlashNotification{Title: "Payment saved"})
 				if r.Header.Get("HX-Request") == "true" {
 					data.HtmxRedirect = data.ReturnUrl
-					return tmplHtmx(w, data)
+					return partialTmpl(w, data)
 				}
 				return RedirectError(data.ReturnUrl)
 			}
 		}
 
 		if r.Header.Get("HX-Request") == "true" {
-			return tmplHtmx(w, data)
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

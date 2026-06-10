@@ -26,7 +26,7 @@ type deletePaymentData struct {
 	HtmxRedirect      string
 }
 
-func DeletePayment(client DeletePaymentClient, tmpl template.Template, tmplHtmx template.Template) Handler {
+func DeletePayment(client DeletePaymentClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		id, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -90,13 +90,13 @@ func DeletePayment(client DeletePaymentClient, tmpl template.Template, tmplHtmx 
 			})
 			if r.Header.Get("HX-Request") == "true" {
 				data.HtmxRedirect = data.ReturnUrl
-				return tmplHtmx(w, data)
+				return partialTmpl(w, data)
 			}
 			return RedirectError(data.ReturnUrl)
 		}
 
 		if r.Header.Get("HX-Request") == "true" {
-			return tmplHtmx(w, data)
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

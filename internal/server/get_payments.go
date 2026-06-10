@@ -38,7 +38,7 @@ type getPaymentsData struct {
 	InActionPanel     bool
 }
 
-func GetPayments(client GetPaymentsClient, tmpl template.Template, tmplHtmx template.Template) Handler {
+func GetPayments(client GetPaymentsClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 		group, groupCtx := errgroup.WithContext(ctx.Context)
@@ -145,7 +145,7 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template, tmplHtmx temp
 		}
 
 		if r.Header.Get("HX-Request") == "true" {
-			return tmplHtmx(w, data)
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
