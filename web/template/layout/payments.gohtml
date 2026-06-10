@@ -1,7 +1,5 @@
 {{ define "payments" }}
-	<h1 class="govuk-heading-s govuk-!-padding-bottom-2">
-		<strong>{{ subtypeShortFormat .Case.SubType }} {{ .Case.UID }}</strong>
-	</h1>
+	{{ template "case-details" . }}
 
 	{{ if .FlashMessage.Title }}
 		{{ template "success-banner" .FlashMessage.Title }}

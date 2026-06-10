@@ -1,41 +1,38 @@
 {{ define "page" }}
-<div class="action-panel__form action-panel__form--wide">
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-            {{ template "case-details" . }}
+<div class="action-panel__form">
+    {{ template "case-details" . }}
 
-            {{ template "error-summary" .Error }}
+    {{ template "error-summary" .Error }}
 
-            {{ if .HtmxRedirect }}
-                <span class="govuk-!-display-none"
-                      hx-get="{{ prefix .HtmxRedirect }}"
-                      hx-target=".action-panel__content"
-                      hx-swap="innerHTML"
-                      hx-trigger="load"
-                ></span>
-            {{ end }}
+    {{ if .HtmxRedirect }}
+        <span class="govuk-!-display-none"
+                hx-get="{{ prefix .HtmxRedirect }}"
+                hx-target=".action-panel__content"
+                hx-swap="innerHTML"
+                hx-trigger="load"
+        ></span>
+    {{ end }}
 
-            <form class="form"
-                  method="POST"
-                  hx-post="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}"
-                  hx-target=".action-panel__content"
-                  hx-swap="innerHTML">
-                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
-                <input type="hidden" name="id" value="{{ .Case.ID }}"/>
+            <h1 class="govuk-heading-m">Add payment</h1>
 
-                {{ template "addPayment" . }}
+    <form class="form"
+            method="POST"
+            hx-post="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}"
+            hx-target=".action-panel__content"
+            hx-swap="innerHTML">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+        <input type="hidden" name="id" value="{{ .Case.ID }}"/>
 
-                <div class="govuk-button-group govuk-!-padding-top-6">
-                    <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
-                    <a class="govuk-link govuk-link--no-visited-state"
-                       href=""
-                       hx-get="{{ prefix .ReturnUrl }}"
-                       hx-target=".action-panel__content"
-                       hx-swap="innerHTML">Cancel</a>
-                </div>
-            </form>
+        {{ template "addPayment" . }}
 
+        <div class="govuk-button-group govuk-!-padding-top-6">
+            <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+            <a class="govuk-link govuk-link--no-visited-state"
+                href=""
+                hx-get="{{ prefix .ReturnUrl }}"
+                hx-target=".action-panel__content"
+                hx-swap="innerHTML">Cancel</a>
         </div>
-    </div>
+    </form>
 </div>
 {{ end }}
