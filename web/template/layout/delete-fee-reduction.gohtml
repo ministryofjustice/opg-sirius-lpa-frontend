@@ -1,5 +1,0 @@
-{{ define "deleteFeeReduction" }}
-    {{$feeReductionTypeLabel := translateRefData .FeeReductionTypes .Payment.FeeReductionType}}
-
-    <p class="govuk-body govuk-!-padding-bottom-6">Are you sure you want to delete the <strong>{{$feeReductionTypeLabel | ToLower }}</strong>?</p>
-{{ end }}
