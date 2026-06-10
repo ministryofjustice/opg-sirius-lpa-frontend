@@ -665,11 +665,24 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   .govuk-button,
   .govuk-link,
   .govuk-fieldset__legend,
-  .govuk-textarea {
+  .govuk-textarea,
+  .govuk-hint,
+  .govuk-error-message,
+  .govuk-input__prefix,
+  .govuk-table__header,
+  .govuk-table__cell,
+  .govuk-details__summary,
+  .govuk-details__summary-text,
+  .govuk-details__text {
     font-size: 0.875rem;
   }
   .govuk-select,
   .govuk-input {
+    height: 1.875rem;
+  }
+  .govuk-input__prefix,
+  .govuk-input__suffix {
+    min-height: 1.875rem;
     height: 1.875rem;
   }
   .govuk-form-group {
