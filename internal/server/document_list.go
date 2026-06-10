@@ -12,6 +12,7 @@ import (
 
 type DocumentListClient interface {
 	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
+	Person(ctx sirius.Context, id int) (sirius.Person, error)
 	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
 	DownloadMultiple(ctx sirius.Context, docIDs []string) (*http.Response, error)
 }
@@ -22,6 +23,7 @@ type documentPageData struct {
 	Success               bool
 	SuccessMessage        string
 	DonorID               int
+	Person                sirius.Person
 	Error                 sirius.ValidationError
 	DocumentList          sirius.DocumentList
 	Document              sirius.Document
@@ -101,6 +103,11 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		person, err := client.Person(ctx, donorID)
+		if err != nil {
+			return err
+		}
+
 		compareView := r.FormValue("comparing") == "true"
 		var validationErr sirius.ValidationError
 		if r.Method == http.MethodPost && len(selectedDocUUIDs) == 0 && r.FormValue("actionDownload") == "true" {
@@ -121,6 +128,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 		data := documentPageData{
 			XSRFToken:             ctx.XSRFToken,
 			SelectedCases:         selected,
+			Person:                person,
 			DocumentList:          docs,
 			MultipleCasesSelected: len(caseUIDs) > 1 || (len(caseUIDs) == 0 && len(casesOnDonor) > 1),
 			Error:                 validationErr,

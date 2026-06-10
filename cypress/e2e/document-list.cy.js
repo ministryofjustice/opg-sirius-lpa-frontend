@@ -1,5 +1,11 @@
 describe("View documents", () => {
   beforeEach(() => {
+    // needed for the header bar
+    cy.addMock("/lpa-api/v1/persons/1", "GET", {
+      status: 200,
+      body: {},
+    });
+
     cy.addMock("/lpa-api/v1/persons/1/cases", "GET", {
       status: 200,
       body: {
@@ -757,6 +763,12 @@ describe("View documents", () => {
 
 describe("sort by dropdown", () => {
   beforeEach(() => {
+    // needed for the header bar
+    cy.addMock("/lpa-api/v1/persons/1", "GET", {
+      status: 200,
+      body: {},
+    });
+
     cy.addMock("/lpa-api/v1/persons/1/cases", "GET", {
       status: 200,
       body: {
