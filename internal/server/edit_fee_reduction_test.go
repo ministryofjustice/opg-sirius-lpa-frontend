@@ -76,13 +76,14 @@ func TestGetEditFeeReduction(t *testing.T) {
 			PaymentID:         123,
 			FeeReduction:      feeReduction,
 			FeeReductionTypes: feeReductionTypes,
+			ReturnUrl:         "/payments/4",
 		}).
 		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditFeeReduction(client, template.Func)(w, r)
+	err := EditFeeReduction(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -108,7 +109,7 @@ func TestEditFeeReductionWhenFailureOnGetPaymentByID(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditFeeReduction(client, nil)(w, r)
+	err := EditFeeReduction(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -143,7 +144,7 @@ func TestEditFeeReductionWhenFailureOnGetCase(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditFeeReduction(client, nil)(w, r)
+	err := EditFeeReduction(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -176,7 +177,7 @@ func TestEditFeeReductionWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditFeeReduction(client, nil)(w, r)
+	err := EditFeeReduction(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -220,13 +221,14 @@ func TestEditFeeReductionWhenTemplateErrors(t *testing.T) {
 			PaymentID:         123,
 			FeeReduction:      feeReduction,
 			FeeReductionTypes: feeReductionTypes,
+			ReturnUrl:         "/payments/4",
 		}).
 		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditFeeReduction(client, template.Func)(w, r)
+	err := EditFeeReduction(client, template.Func, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -276,6 +278,7 @@ func TestPostEditFeeReductionValidationError(t *testing.T) {
 			FeeReduction:      feeReduction,
 			FeeReductionTypes: feeReductionTypes,
 			Error:             validationError,
+			ReturnUrl:         "/payments/4",
 		}).
 		Return(nil)
 
@@ -291,7 +294,7 @@ func TestPostEditFeeReductionValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditFeeReduction(client, template.Func)(w, r)
+	err := EditFeeReduction(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -352,10 +355,82 @@ func TestPostEditFeeReduction(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditFeeReduction(client, template.Func)(w, r)
+	err := EditFeeReduction(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/payments/4"), err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostEditFeeReductionHtmx(t *testing.T) {
+	caseItem := sirius.Case{ID: 4, CaseType: "lpa", UID: "700700"}
+
+	feeReduction := sirius.Payment{
+		ID:               123,
+		PaymentEvidence:  "Test evidence",
+		FeeReductionType: "REMISSION",
+		Source:           sirius.FeeReductionSource,
+		PaymentDate:      sirius.DateString("2022-07-23"),
+		Case:             &caseItem,
+	}
+
+	editedFeeReduction := sirius.Payment{
+		ID:               123,
+		PaymentEvidence:  "Edited evidence",
+		FeeReductionType: "REMISSION",
+		PaymentDate:      sirius.DateString("2022-07-23"),
+		Source:           sirius.FeeReductionSource,
+		Case:             &caseItem,
+	}
+
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
+		},
+	}
+
+	client := &mockEditFeeReductionClient{}
+	client.
+		On("PaymentByID", mock.Anything, 123).
+		Return(feeReduction, nil).
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil).
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil).
+		On("EditPayment", mock.Anything, 123, editedFeeReduction).
+		Return(nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, editFeeReductionData{
+			Case:              caseItem,
+			PaymentID:         123,
+			FeeReduction:      editedFeeReduction,
+			FeeReductionTypes: feeReductionTypes,
+			ReturnUrl:         "/payments/4",
+			HtmxRedirect:      "/payments/4",
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"id":               {"123"},
+		"source":           {sirius.FeeReductionSource},
+		"paymentEvidence":  {"Edited evidence"},
+		"paymentDate":      {"2022-07-23"},
+		"feeReductionType": {"REMISSION"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := EditFeeReduction(client, nil, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

@@ -68,6 +68,12 @@ func TestGetActionPanel(t *testing.T) {
 					IconName: "aw-change-status",
 					Disabled: true,
 				},
+				{
+					Label:    "Fees",
+					URL:      "",
+					IconName: "aw-mi",
+					Disabled: true,
+				},
 			},
 		}).
 		Return(nil)
@@ -132,6 +138,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					IconName: "aw-change-status",
 					Disabled: false,
 				},
+				{
+					Label:    "Fees",
+					URL:      "/payments/1",
+					IconName: "aw-mi",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -183,6 +195,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					Label:    "Change status",
 					URL:      "",
 					IconName: "aw-change-status",
+					Disabled: true,
+				},
+				{
+					Label:    "Fees",
+					URL:      "",
+					IconName: "aw-mi",
 					Disabled: true,
 				},
 			},

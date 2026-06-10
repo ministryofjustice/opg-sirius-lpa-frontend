@@ -67,7 +67,7 @@ func TestGetApplyFeeReduction(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
 	w := httptest.NewRecorder()
 
-	err := ApplyFeeReduction(client, template.Func)(w, r)
+	err := ApplyFeeReduction(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -86,7 +86,7 @@ func TestApplyFeeReductionNoID(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, testUrl, nil)
 			w := httptest.NewRecorder()
 
-			err := ApplyFeeReduction(nil, nil)(w, r)
+			err := ApplyFeeReduction(nil, nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -111,7 +111,7 @@ func TestApplyFeeReductionWhenFailureOnGetCase(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
 	w := httptest.NewRecorder()
 
-	err := ApplyFeeReduction(client, nil)(w, r)
+	err := ApplyFeeReduction(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -150,7 +150,7 @@ func TestApplyFeeReductionWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=222", nil)
 	w := httptest.NewRecorder()
 
-	err := ApplyFeeReduction(client, template.Func)(w, r)
+	err := ApplyFeeReduction(client, template.Func, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -173,7 +173,7 @@ func TestApplyFeeReductionWhenFailureOnGetFeeReductionTypesRefData(t *testing.T)
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := ApplyFeeReduction(client, nil)(w, r)
+	err := ApplyFeeReduction(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -234,11 +234,64 @@ func TestPostFeeReduction(t *testing.T) {
 		r.Header.Add("Content-Type", formUrlEncoded)
 		w := httptest.NewRecorder()
 
-		err := ApplyFeeReduction(client, template.Func)(w, r)
+		err := ApplyFeeReduction(client, template.Func, template.Func)(w, r)
 		resp := w.Result()
 
 		assert.Equal(t, RedirectError(tc.expectedRedirect), err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 		mock.AssertExpectationsForObjects(t, client, template)
 	}
+}
+
+func TestPostFeeReductionHtmx(t *testing.T) {
+	caseItem := sirius.Case{CaseType: "LPA", UID: "700700"}
+
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
+		},
+	}
+
+	client := &mockApplyFeeReductionClient{}
+	client.
+		On("ApplyFeeReduction", mock.Anything, 123, "REMISSION", "Test evidence", sirius.DateString("2022-01-23")).
+		Return(nil)
+	client.
+		On("Case", mock.Anything, 123).
+		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, applyFeeReductionData{
+			Case:              caseItem,
+			PaymentEvidence:   "Test evidence",
+			FeeReductionType:  "REMISSION",
+			PaymentDate:       sirius.DateString("2022-01-23"),
+			FeeReductionTypes: feeReductionTypes,
+			ReturnUrl:         "/payments/123",
+			HtmxRedirect:      "/payments/123",
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"feeReductionType": {"REMISSION"},
+		"paymentDate":      {"2022-01-23"},
+		"paymentEvidence":  {"Test evidence"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := ApplyFeeReduction(client, nil, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
 }

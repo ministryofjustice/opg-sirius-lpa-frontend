@@ -183,7 +183,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/lpa/{uid}/lpa-details", wrap(GetLpaDetails(client, templates.Get("mlpa-details.gohtml"))))
 	mux.Handle("/lpa/{uid}/manage-attorney-decisions", wrap(AttorneyDecisions(client, templates.Get("mlpa-attorney-decisions.gohtml"), templates.Get("mlpa-confirm-attorney-decisions.gohtml"))))
 	mux.Handle("/lpa/{uid}/manage-attorneys", wrap(ManageAttorneys(client, templates.Get("mlpa-manage-attorneys.gohtml"))))
-	mux.Handle("/lpa/{uid}/payments", wrap(GetPayments(client, templates.Get("mlpa-payments.gohtml"), templates.Get("payments-partial-wrapper.gohtml")))) // TODO: should we split out modernised and legacy payment pages?
+	mux.Handle("/lpa/{uid}/payments", wrap(GetPayments(client, templates.Get("mlpa-payments.gohtml"), nil)))
 	mux.Handle("/lpa/{uid}/remove-an-attorney", wrap(RemoveAnAttorney(client, templates.Get("mlpa-remove-attorney.gohtml"), templates.Get("mlpa-confirm-attorney-removal.gohtml"), templates.Get("mlpa-attorney-decisions.gohtml"))))
 
 	//LPA
