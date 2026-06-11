@@ -118,6 +118,16 @@ func TestGetTaskWithHXRequest(t *testing.T) {
 	partialTemplate.AssertCalled(t, "Func", mock.Anything, mock.Anything)
 }
 
+func TestGetTaskParseFormError(t *testing.T) {
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader("%zz"))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := Task(nil, nil, nil)(w, r)
+
+	assert.NotNil(t, err)
+}
+
 func TestGetTaskBadQueryString(t *testing.T) {
 	testCases := map[string]string{
 		"no-id":  "/",
