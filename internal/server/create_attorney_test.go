@@ -512,6 +512,25 @@ func TestGetNextAttorneyIdAttorneyWillReturnNextNumber(t *testing.T) {
 	assert.Equal(t, expected, result)
 }
 
+func TestGetNextAttorneyIdAttorneyWillReturnNextHigherIdWhenSequenceHasGaps(t *testing.T) {
+	result := GetNextAttorneyId(2, []sirius.Attorney{
+		{
+			Person: sirius.Person{ID: 1},
+		},
+		{
+			Person: sirius.Person{ID: 5},
+		},
+		{
+			Person: sirius.Person{ID: 2},
+		},
+		{
+			Person: sirius.Person{ID: 9},
+		},
+	})
+	expected := 5
+	assert.Equal(t, expected, result)
+}
+
 func TestGetNextAttorneyIdLastAttorneyWillReturnZero(t *testing.T) {
 	result := GetNextAttorneyId(3, []sirius.Attorney{
 		{

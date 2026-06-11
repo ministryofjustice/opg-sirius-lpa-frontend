@@ -1,0 +1,26 @@
+{{ define "siriusHeader" }}
+    <header class="sirius-header" data-module="header">
+        <div class="govuk-width-container">
+            <div class="sirius-header__inner">
+                <div class="sirius-header__primary">
+                    <div class="sirius-header__actions">
+                        {{ template "header-button" headerBarButton "Back to timeline" (sirius (printf "/lpa/person/%d" .DonorID)) "icon-backtotimeline" }}
+                    </div>
+                    <h1 aria-live="polite">
+                        {{- .Person.Firstname -}}
+                        {{- if .Person.Middlenames }} {{ .Person.Middlenames }}{{ end }}
+                        {{- " " -}}{{ .Person.Surname }}
+                        <span class="light">{{ .Person.PersonType }}</span>
+                    </h1>
+                    <div class="sirius-header__actions">
+                        {{ template "header-button" headerBarButton "Documents associated to this case" (prefix (printf "/donor/%d/documents%s" .DonorID .CaseUids)) "icon-office-copy" }}
+                        {{ template "header-dropdown-button" headerBarButton "Case Information" (prefix "/sirius-header-case-info" ) "icon-caseinfo" }}
+                        {{ template "header-dropdown-button" headerBarButton "Details on the people involved in this case" (prefix "/sirius-header-people-info" ) "icon-caseperson" }}
+                        {{ template "header-dropdown-button" headerBarButton "Calendars" (prefix "/sirius-header-calendars") "calendar-open" }}
+                    </div>
+                </div>
+                <div class="sirius-header__search" data-header-search-slot></div>
+            </div>
+        </div>
+    </header>
+{{ end }}

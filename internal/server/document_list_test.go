@@ -22,6 +22,11 @@ func (m *mockDocumentListClient) CasesByDonor(ctx sirius.Context, id int) ([]sir
 	return args.Get(0).([]sirius.Case), args.Error(1)
 }
 
+func (m *mockDocumentListClient) Person(ctx sirius.Context, id int) (sirius.Person, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.Person), args.Error(1)
+}
+
 func (m *mockDocumentListClient) GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error) {
 	args := m.Called(ctx, personID, caseIDs)
 	return args.Get(0).(sirius.DocumentList), args.Error(1)
@@ -173,6 +178,12 @@ var allDocumentList = sirius.DocumentList{
 	},
 }
 
+var expectedDonor = sirius.Person{
+	ID:        82,
+	Firstname: "Jane",
+	Surname:   "Doe",
+}
+
 func TestGetDocumentList(t *testing.T) {
 	cases := []sirius.Case{
 		{
@@ -239,6 +250,12 @@ func TestGetDocumentList(t *testing.T) {
 					IconName: "aw-new-template",
 					Disabled: true,
 				},
+				{
+					Label:    "Change status",
+					URL:      "",
+					IconName: "aw-change-status",
+					Disabled: true,
+				},
 			},
 		},
 		{
@@ -272,6 +289,12 @@ func TestGetDocumentList(t *testing.T) {
 					Label:    "Create document",
 					URL:      "/create-document?id=1&case=lpa",
 					IconName: "aw-new-template",
+					Disabled: false,
+				},
+				{
+					Label:    "Change status",
+					URL:      "/change-status?id=1&case=lpa&donorId=82",
+					IconName: "aw-change-status",
 					Disabled: false,
 				},
 			},
@@ -310,6 +333,12 @@ func TestGetDocumentList(t *testing.T) {
 					IconName: "aw-new-template",
 					Disabled: false,
 				},
+				{
+					Label:    "Change status",
+					URL:      "/change-status?id=1&case=lpa&donorId=82&uid[]=7000-1234-0000",
+					IconName: "aw-change-status",
+					Disabled: false,
+				},
 			},
 		},
 		{
@@ -346,6 +375,12 @@ func TestGetDocumentList(t *testing.T) {
 					IconName: "aw-new-template",
 					Disabled: true,
 				},
+				{
+					Label:    "Change status",
+					URL:      "",
+					IconName: "aw-change-status",
+					Disabled: true,
+				},
 			},
 		},
 	}
@@ -359,12 +394,16 @@ func TestGetDocumentList(t *testing.T) {
 			client.
 				On("GetPersonDocuments", mock.Anything, 82, tc.caseIDs).
 				Return(tc.documentList, nil)
+			client.
+				On("Person", mock.Anything, 82).
+				Return(expectedDonor, nil)
 
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything,
 					documentPageData{
 						SelectedCases:         tc.expectedCases,
+						Person:                expectedDonor,
 						DocumentList:          tc.documentList,
 						MultipleCasesSelected: tc.expectedMultiple,
 						DonorID:               82,
@@ -463,12 +502,16 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 	client.
 		On("GetPersonDocuments", mock.Anything, 82, []string(nil)).
 		Return(allDocumentList, nil)
+	client.
+		On("Person", mock.Anything, 82).
+		Return(expectedDonor, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything,
 			documentPageData{
 				SelectedCases:         cases,
+				Person:                expectedDonor,
 				DocumentList:          allDocumentList,
 				MultipleCasesSelected: true,
 				DonorID:               82,
@@ -498,6 +541,12 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 						Label:    "Create document",
 						URL:      "",
 						IconName: "aw-new-template",
+						Disabled: true,
+					},
+					{
+						Label:    "Change status",
+						URL:      "",
+						IconName: "aw-change-status",
 						Disabled: true,
 					},
 				},
@@ -534,6 +583,9 @@ func TestDocumentListReturnsNoContentWhenComparingAndNoDocumentsSelected(t *test
 	client.
 		On("GetPersonDocuments", mock.Anything, 82, []string(nil)).
 		Return(allDocumentList, nil)
+	client.
+		On("Person", mock.Anything, 82).
+		Return(expectedDonor, nil)
 
 	template := &mockTemplate{}
 
@@ -568,6 +620,9 @@ func TestDocumentListDismissValidation(t *testing.T) {
 	client.
 		On("GetPersonDocuments", mock.Anything, 82, []string{"1", "2"}).
 		Return(twoCasesDocumentList, nil)
+	client.
+		On("Person", mock.Anything, 82).
+		Return(expectedDonor, nil)
 
 	expectedCases := []sirius.Case{cases[0], cases[1]}
 
@@ -576,6 +631,7 @@ func TestDocumentListDismissValidation(t *testing.T) {
 		On("Func", mock.Anything,
 			documentPageData{
 				SelectedCases:         expectedCases,
+				Person:                expectedDonor,
 				DocumentList:          twoCasesDocumentList,
 				MultipleCasesSelected: true,
 				DonorID:               82,
@@ -603,6 +659,12 @@ func TestDocumentListDismissValidation(t *testing.T) {
 						Label:    "Create document",
 						URL:      "",
 						IconName: "aw-new-template",
+						Disabled: true,
+					},
+					{
+						Label:    "Change status",
+						URL:      "",
+						IconName: "aw-change-status",
 						Disabled: true,
 					},
 				},
@@ -673,6 +735,29 @@ func TestGetDocumentListWhenGetPersonDocumentsErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
+func TestGetDocumentListWhenPersonErrors(t *testing.T) {
+	cases := []sirius.Case{{ID: 1, CaseType: "LPA", SubType: "PFA", UID: "7000-1234-0000"}}
+
+	client := &mockDocumentListClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 82).
+		Return(cases, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 82, []string(nil)).
+		Return(singleDocumentList, nil)
+	client.
+		On("Person", mock.Anything, 82).
+		Return(sirius.Person{}, errExample)
+
+	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/donor/82/documents", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
 func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 	cases := []sirius.Case{{ID: 1, CaseType: "LPA", SubType: "PFA", UID: "7000-1234-0000"}}
 
@@ -683,12 +768,16 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 	client.
 		On("GetPersonDocuments", mock.Anything, 82, []string(nil)).
 		Return(singleDocumentList, nil)
+	client.
+		On("Person", mock.Anything, 82).
+		Return(expectedDonor, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything,
 			documentPageData{
 				SelectedCases:         cases,
+				Person:                expectedDonor,
 				DocumentList:          singleDocumentList,
 				MultipleCasesSelected: false,
 				DonorID:               82,
@@ -715,6 +804,12 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 						Label:    "Create document",
 						URL:      "/create-document?id=1&case=lpa",
 						IconName: "aw-new-template",
+						Disabled: false,
+					},
+					{
+						Label:    "Change status",
+						URL:      "/change-status?id=1&case=lpa&donorId=82",
+						IconName: "aw-change-status",
 						Disabled: false,
 					},
 				},
@@ -831,6 +926,9 @@ func TestDocumentListSuccessMessage(t *testing.T) {
 			client.
 				On("GetPersonDocuments", mock.Anything, 82, []string(nil)).
 				Return(singleDocumentList, nil)
+			client.
+				On("Person", mock.Anything, 82).
+				Return(expectedDonor, nil)
 
 			template := &mockTemplate{}
 			template.

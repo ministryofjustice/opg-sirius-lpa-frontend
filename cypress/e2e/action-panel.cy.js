@@ -26,11 +26,17 @@ describe("Action Panel", () => {
         },
       },
     );
+
+    // needed for the header bar
+    cy.addMock("/lpa-api/v1/persons/1", "GET", {
+      status: 200,
+      body: {},
+    });
+
     cy.visit("/donor/1/documents?uid[]=7000-1234-1234");
   });
 
   it("can open and close the action panel", () => {
-    cy.get("#actions-tab").click();
     cy.get("#actions-content").should("be.visible");
 
     cy.get("#actions-tab").click();
@@ -38,7 +44,6 @@ describe("Action Panel", () => {
   });
 
   it("displays the warning button on the action panel", () => {
-    cy.get("#actions-tab").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Create warning");
 
@@ -48,7 +53,6 @@ describe("Action Panel", () => {
   });
 
   it("displays the event button on the action panel", () => {
-    cy.get("#actions-tab").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Create event");
 
@@ -58,7 +62,6 @@ describe("Action Panel", () => {
   });
 
   it("displays the complaint button on the action panel", () => {
-    cy.get("#actions-tab").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Add complaint");
 
@@ -70,7 +73,6 @@ describe("Action Panel", () => {
   });
 
   it("displays the create document button on the action panel", () => {
-    cy.get("#actions-tab").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Create document");
 
@@ -95,5 +97,23 @@ describe("Action Panel", () => {
     cy.get("a#action-panel-button-create-document").click();
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Select a document template");
+  });
+
+  it("displays the change status button on the action panel", () => {
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Change status");
+
+    cy.addMock("/lpa-api/v1/cases/34", "GET", {
+      status: 200,
+      body: { caseType: "lpa" },
+    });
+    cy.addMock("/lpa-api/v1/lpas/34/available-statuses", "GET", {
+      status: 200,
+      body: ["Cancelled", "Withdrawn"],
+    });
+
+    cy.get("a#action-panel-button-change-status").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Change Status");
   });
 });

@@ -152,7 +152,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/add-complaint", wrap(AddComplaint(client, templates.Get("add-complaint-wrapper.gohtml"), templates.Get("add-complaint-partial-wrapper.gohtml"))))
 	mux.Handle("/edit-complaint", wrap(EditComplaint(client, templates.Get("edit_complaint.gohtml"))))
 	mux.Handle("/unlink-person", wrap(UnlinkPerson(client, templates.Get("unlink_person.gohtml"))))
-	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change_status.gohtml"))))
+	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change-status.gohtml"), templates.Get("change-status-partial.gohtml"))))
 	mux.Handle("/change-case-status", wrap(ChangeCaseStatus(client, templates.Get("change_case_status.gohtml"))))
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate_cases.gohtml"))))
 	mux.Handle("/assign-task", wrap(AssignTask(client, templates.Get("assign_task.gohtml"))))
@@ -193,6 +193,9 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/view-document/{uuid}", wrap(ViewDocument(client, templates.Get("view-document.gohtml"))))
 	mux.Handle("/delete-document/{uuid}", wrap(DeleteDocument(client, templates.Get("delete-document.gohtml"))))
 	mux.Handle("/compare/{id}/{caseId}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
+	mux.Handle("/sirius-header-calendars", wrap(SiriusHeaderCalendars(templates.Get("sirius-header-partial-calendars.gohtml"))))
+	mux.Handle("/sirius-header-case-info", wrap(SiriusHeaderCaseInfo(templates.Get("sirius-header-partial-case-info.gohtml"))))
+	mux.Handle("/sirius-header-people-info", wrap(SiriusHeaderPeopleInfo(templates.Get("sirius-header-partial-people-info.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))
 	mux.Handle("/assets/{path...}", static)
