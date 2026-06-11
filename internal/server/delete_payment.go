@@ -22,9 +22,11 @@ type deletePaymentData struct {
 	Payment           sirius.Payment
 	Case              sirius.Case
 	FeeReductionTypes []sirius.RefDataItem
+	ReturnUrl         string
+	HtmxRedirect      string
 }
 
-func DeletePayment(client DeletePaymentClient, tmpl template.Template) Handler {
+func DeletePayment(client DeletePaymentClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		id, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -66,6 +68,12 @@ func DeletePayment(client DeletePaymentClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		if data.Case.CaseType == "DIGITAL_LPA" {
+			data.ReturnUrl = fmt.Sprintf("/lpa/%s/payments", data.Case.UID)
+		} else {
+			data.ReturnUrl = fmt.Sprintf("/payments/%d", p.Case.ID)
+		}
+
 		if r.Method == http.MethodPost {
 			err = client.DeletePayment(ctx, id)
 			if err != nil {
@@ -80,7 +88,15 @@ func DeletePayment(client DeletePaymentClient, tmpl template.Template) Handler {
 			SetFlash(w, FlashNotification{
 				Title: fmt.Sprintf("%s deleted", item),
 			})
-			return RedirectError(fmt.Sprintf("/payments/%d", p.Case.ID))
+			if r.Header.Get("HX-Request") == "true" {
+				data.HtmxRedirect = data.ReturnUrl
+				return partialTmpl(w, data)
+			}
+			return RedirectError(data.ReturnUrl)
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

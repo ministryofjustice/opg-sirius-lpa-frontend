@@ -1,0 +1,38 @@
+{{ define "page" }}
+<div class="action-panel__form">
+    {{ template "case-details" . }}
+
+    {{ template "error-summary" .Error }}
+
+    {{ if .HtmxRedirect }}
+        <span class="govuk-!-display-none"
+                hx-get="{{ prefix .HtmxRedirect }}"
+                hx-target=".action-panel__content"
+                hx-swap="innerHTML"
+                hx-trigger="load"
+        ></span>
+    {{ end }}
+
+            <h1 class="govuk-heading-m">Edit payment</h1>
+
+    <form class="form"
+            method="POST"
+            hx-post="{{ prefix (printf "/edit-payment?id=%d" .PaymentID) }}"
+            hx-target=".action-panel__content"
+            hx-swap="innerHTML">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+        <input type="hidden" name="id" value="{{ .PaymentID }}"/>
+
+        {{ template "editPayment" . }}
+
+        <div class="govuk-button-group govuk-!-padding-top-6">
+            <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+            <a class="govuk-link govuk-link--no-visited-state"
+                href=""
+                hx-get="{{ prefix .ReturnUrl }}"
+                hx-target=".action-panel__content"
+                hx-swap="innerHTML">Cancel</a>
+        </div>
+    </form>
+</div>
+{{ end }}

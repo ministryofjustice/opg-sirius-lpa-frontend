@@ -64,6 +64,7 @@ htmx.on("htmx:afterSwap", (event) => {
     GOVUKFrontend.initAll(swapDetails.target);
     MOJFrontend.initAll(swapDetails.target);
     select(prefix);
+    todaysDate(swapDetails.target);
     handleCreateDocumentButton();
     insertSelector(swapDetails.target);
     handleInsertCheckboxes({ scope: swapDetails.target });

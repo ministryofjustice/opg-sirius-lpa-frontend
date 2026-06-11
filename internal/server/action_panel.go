@@ -106,12 +106,14 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	complaintUrl := ""
 	createDocumentUrl := ""
 	changeStatusUrl := ""
+	PaymentsUrl := ""
 	if len(selectedCases) == 1 {
 		selectedCase := selectedCases[0]
 		warningUrl = fmt.Sprintf("/create-warning?id=%d&entity=%s%s", donorId, strings.ToLower(selectedCase.CaseType), caseUids)
 		complaintUrl = fmt.Sprintf("/add-complaint?id=%d&case=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
 		createDocumentUrl = fmt.Sprintf("/create-document?id=%d&case=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
 		changeStatusUrl = fmt.Sprintf("/change-status?id=%d&case=%s&donorId=%d%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType), donorId, caseUids)
+		PaymentsUrl = fmt.Sprintf("/payments/%d", selectedCases[0].ID)
 	}
 
 	return []ActionPanelButton{
@@ -143,6 +145,12 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			Label:    "Change status",
 			URL:      changeStatusUrl,
 			IconName: "aw-change-status",
+			Disabled: len(selectedCases) != 1,
+		},
+		{
+			Label:    "Fees",
+			URL:      PaymentsUrl,
+			IconName: "aw-fees",
 			Disabled: len(selectedCases) != 1,
 		},
 	}
