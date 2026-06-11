@@ -74,6 +74,50 @@ func TestGetTask(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
+func TestGetTaskWithHXRequest(t *testing.T) {
+	client := &mockTaskClient{}
+	client.
+		On("TaskTypes", mock.Anything).
+		Return([]string{"a", "b"}, nil)
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Case", mock.Anything, 123).
+		Return(sirius.Case{
+			UID:      "7000-0000-0000",
+			CaseType: "LPA",
+			Donor:    &sirius.Person{ID: 42},
+		}, nil)
+
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, taskData{
+			TaskTypes:  []string{"a", "b"},
+			Teams:      []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			Entity:     "LPA 7000-0000-0000",
+			CaseUID:    "7000-0000-0000",
+			CaseID:     123,
+			DonorID:    42,
+			EntityType: "lpa",
+		}).
+		Return(nil)
+
+	template := &mockTemplate{}
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=lpa", nil)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := Task(client, template.Func, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	template.AssertNotCalled(t, "Func")
+	partialTemplate.AssertCalled(t, "Func", mock.Anything, mock.Anything)
+}
+
 func TestGetTaskBadQueryString(t *testing.T) {
 	testCases := map[string]string{
 		"no-id":  "/",
