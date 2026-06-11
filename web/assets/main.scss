@@ -244,6 +244,13 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   z-index: 1;
 }
 
+.app-create-epa__summary-update-button {
+  background: none;
+  border: 0;
+  color: govuk-colour("blue");
+  cursor: pointer;
+}
+
 .app-\!-gap-2 {
   gap: 10px;
 }

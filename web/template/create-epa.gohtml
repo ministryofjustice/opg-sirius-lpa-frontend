@@ -115,10 +115,17 @@
                                                 </div>
                                             </details>
                                             <span class="app-create-epa__summary-update-link">
-                          <a class="govuk-link govuk-link--no-visited-state" id="f-update-attorney-{{ .ID }}"
-                             href="{{ prefix (printf "/create-attorney?id=%d&caseId=%d&attorneyId=%d" $.DonorId $.Epa.ID .ID) }}">Update<span
-                                      class="govuk-visually-hidden"> attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span></a>
-                        </span>
+                                                <button class="app-create-epa__summary-update-button govuk-link govuk-link--no-visited-state"
+                                                        id="f-update-attorney-{{ .ID }}"
+                                                        name="updateAttorney"
+                                                        type="submit"
+                                                        value="{{ .ID }}">
+                                                    Update
+                                                    <span class="govuk-visually-hidden">
+                                                        attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                                                    </span>
+                                                </button>
+                                            </span>
                                         </div>
                                     {{ end }}
                                 {{ end }}
@@ -140,11 +147,17 @@
                                             </div>
                                         </details>
                                         <span class="app-create-epa__summary-update-link">
-                        <a class="govuk-link govuk-link--no-visited-state"
-                           id="f-update-correspondent-{{ $correspondent.ID }}"
-                           href="{{ prefix (printf "/create-correspondent?id=%d&caseId=%d" $.DonorId $.Epa.ID) }}">Update<span
-                                    class="govuk-visually-hidden"> correspondent{{ if $correspondent.Salutation }} {{ $correspondent.Salutation }}{{ end }}{{ if $correspondent.Firstname }} {{ $correspondent.Firstname }}{{ end }}{{ if $correspondent.Middlenames }} {{ $correspondent.Middlenames }}{{ end }}{{ if $correspondent.Surname }} {{ $correspondent.Surname }}{{ end }}</span></a>
-                      </span>
+                                            <button class="app-create-epa__summary-update-button govuk-link govuk-link--no-visited-state"
+                                                    id="f-update-correspondent-{{ $correspondent.ID }}"
+                                                    name="updateCorrespondent"
+                                                    type="submit"
+                                                    value="{{ $correspondent.ID }}">
+                                                Update
+                                                <span class="govuk-visually-hidden">
+                                                    correspondent{{ if $correspondent.Salutation }} {{ $correspondent.Salutation }}{{ end }}{{ if $correspondent.Firstname }} {{ $correspondent.Firstname }}{{ end }}{{ if $correspondent.Middlenames }} {{ $correspondent.Middlenames }}{{ end }}{{ if $correspondent.Surname }} {{ $correspondent.Surname }}{{ end }}
+                                                </span>
+                                            </button>
+                                        </span>
                                     </div>
                                 {{ end }}
                                 <div class="govuk-button-group app-button-group--column">
