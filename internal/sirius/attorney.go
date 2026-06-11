@@ -10,6 +10,7 @@ type Attorney struct {
 	Person
 	SystemStatus        *bool  `json:"systemStatus,omitempty"`
 	RelationshipToDonor string `json:"relationshipToDonor,omitempty"`
+	CompanyNumber       string `json:"companyNumber,omitempty"`
 }
 
 func (a Attorney) Summary() string {

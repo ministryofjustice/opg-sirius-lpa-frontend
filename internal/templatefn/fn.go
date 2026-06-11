@@ -367,6 +367,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		},
 		"actionPanelButton": actionPanelButton,
 		"headerBarButton":   headerBarButton,
+		"personInfoRow":     personInfoRow,
 	}
 }
 
@@ -699,5 +700,25 @@ func headerBarButton(label, url, iconName string) headerBarButtonData {
 		Label:    label,
 		URL:      url,
 		IconName: iconName,
+	}
+}
+
+type personInfoRowData struct {
+	Label        string
+	Person       sirius.Person
+	CaseID       int
+	SelectedID   int
+	Index        int
+	SystemStatus bool
+}
+
+func personInfoRow(label string, person sirius.Person, caseID, selectedID, index int, systemStatus bool) personInfoRowData {
+	return personInfoRowData{
+		Label:        label,
+		Person:       person,
+		CaseID:       caseID,
+		SelectedID:   selectedID,
+		Index:        index,
+		SystemStatus: systemStatus,
 	}
 }

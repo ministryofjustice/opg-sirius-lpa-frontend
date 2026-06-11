@@ -1,5 +1,130 @@
 {{ define "page" }}
-<div class="sirius-header__dropdown">
-Implement person information in the header dropdown
-</div>
+  <div class="app-person-info__container">
+    <div class="app-person-info__people">
+      <table class="govuk-table govuk-!-margin-bottom-0">
+        <tbody class="govuk-table__body">
+          {{ template "person-row" personInfoRow "Donor" .Case.Donor .CaseID .SelectedID 0 false }}
+
+          {{ if gt (len .Case.Attorneys) 0 }}
+            {{ range $index, $attorney := .Case.Attorneys }}
+              {{ template "person-row" personInfoRow "Attorney" $attorney.Person $.CaseID $.SelectedID (plusN $index 1) $attorney.SystemStatus}}
+            {{ end }}
+          {{ end }}
+
+          {{ if gt (len .Case.ReplacementAttorneys) 0 }}
+            {{ range $index, $replacementAttorney := .Case.ReplacementAttorneys }}
+              {{ template "person-row" personInfoRow "Replacement Attorney" $replacementAttorney.Person $.CaseID $.SelectedID (plusN $index 1) $replacementAttorney.SystemStatus }}
+            {{ end }}
+          {{ end }}
+
+          {{ if gt (len .Case.TrustCorporations) 0 }}
+            {{ range $index, $trustCorporation := .Case.TrustCorporations }}
+              {{ template "person-row" personInfoRow "Trust Corporation" $trustCorporation.Person $.CaseID $.SelectedID (plusN $index 1) $trustCorporation.SystemStatus }}
+            {{ end }}
+          {{ end }}
+
+          {{ if gt (len .Case.CertificateProviders) 0 }}
+            {{ range $index, $certificateProvider := .Case.CertificateProviders }}
+              {{ template "person-row" personInfoRow "Certified Provider" $certificateProvider $.CaseID $.SelectedID (plusN $index 1) false }}
+            {{ end }}
+          {{ end }}
+
+          {{ if gt (len .Case.NotifiedPersons) 0 }}
+            {{ range $index, $notifiedPerson := .Case.NotifiedPersons }}
+                {{ template "person-row" personInfoRow "Notified Person" $notifiedPerson $.CaseID $.SelectedID (plusN $index 1) false }}
+            {{ end }}
+          {{ end }}
+
+          {{ if .Case.Correspondent }}
+              {{ template "person-row" personInfoRow "Correspondent" .Case.Correspondent.Person .CaseID .SelectedID 0 false }}
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="app-person-info__details">
+      <dl class="govuk-summary-list govuk-summary-list--no-border">
+        {{ if .SelectedPerson.CompanyName }}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Company Name:</dt>
+            <dd class="govuk-summary-list__value">{{ .SelectedPerson.CompanyName }}</dd>
+          </div>
+        {{ end }}
+        {{ if .SelectedPerson.DateOfBirth }}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">DOB:</dt>
+            <dd class="govuk-summary-list__value">{{ formatDate .SelectedPerson.DateOfBirth }}</dd>
+          </div>
+        {{ end }}
+        {{ if .SelectedPerson.DateOfDeath }}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Date of death:</dt>
+            <dd class="govuk-summary-list__value">{{ formatDate .SelectedPerson.DateOfDeath }}</dd>
+          </div>
+        {{ end }}
+        {{ if or .SelectedPerson.AddressLine1 .SelectedPerson.AddressLine2 .SelectedPerson.AddressLine3 .SelectedPerson.Town .SelectedPerson.County .SelectedPerson.Postcode .SelectedPerson.Country }}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Address:</dt>
+            <dd class="govuk-summary-list__value">
+                {{ if .SelectedPerson.IsAirmailRequired }}AIRMAIL{{ end }}
+                {{ if .SelectedPerson.AddressLine1 }}{{ .SelectedPerson.AddressLine1 }}, {{ end }}
+                {{ if .SelectedPerson.AddressLine2 }}{{ .SelectedPerson.AddressLine2 }}, {{ end }}
+                {{ if .SelectedPerson.AddressLine3 }}{{ .SelectedPerson.AddressLine3 }}, {{ end }}
+                {{ if .SelectedPerson.Town }}{{ .SelectedPerson.Town }}, {{ end }}
+                {{ if .SelectedPerson.County }}{{ .SelectedPerson.County }}, {{ end }}
+                {{ if .SelectedPerson.Postcode }}{{ .SelectedPerson.Postcode }}, {{ end }}
+                {{ if .SelectedPerson.Country }}{{ .SelectedPerson.Country }}{{ end }}
+            </dd>
+          </div>
+        {{ end }}
+        {{ if .SelectedPerson.PhoneNumber }}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Tel:</dt>
+            <dd class="govuk-summary-list__value">{{ .SelectedPerson.PhoneNumber }}</dd>
+          </div>
+        {{ end }}
+        {{ if .SelectedPerson.Email }}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Email:</dt>
+            <dd class="govuk-summary-list__value"><a href="mailto:{{ .SelectedPerson.Email }}">{{ .SelectedPerson.Email }}</a></dd>
+          </div>
+        {{ end }}
+
+        {{ $isAttorney := or (eq .SelectedPerson.PersonType "Attorney") (eq .SelectedPerson.PersonType "Replacement Attorney") (eq .SelectedPerson.PersonType "Trust Corporation")}}
+        {{ if and $isAttorney .SelectedPerson.RelationshipToDonor }}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Relationship to donor:</dt>
+            <dd class="govuk-summary-list__value">{{ capitalise .SelectedPerson.RelationshipToDonor }}</dd>
+          </div>
+        {{ end }}
+        {{ if and $isAttorney .SelectedPerson.CompanyNumber }}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Company number:</dt>
+            <dd class="govuk-summary-list__value">{{ capitalise .SelectedPerson.CompanyNumber }}</dd>
+          </div>
+        {{ end }}
+      </dl>
+    </div>
+  </div>
+{{ end }}
+
+{{ define "person-row" }}
+  <tr class="govuk-table__row{{ if eq .SelectedID .Person.ID }} selected{{ end }}"
+      {{ if ne .SelectedID .Person.ID }}
+      hx-get="{{ (prefix (printf "/sirius-header-people-info?id=%d&selected=%d" .CaseID .Person.ID)) }}"
+      hx-swap="innerHTML"
+      hx-target="#sirius-header__dropdown-details-on-the-people-involved-in-this-case"
+      {{ end }}
+  >
+    <th class="govuk-table__header" scope="row">{{ .Label }}{{ if ne .Index 0}} {{ .Index }}{{ end }}:</th>
+    <td class="govuk-table__cell">{{ with .Person }}{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}{{ if .CompanyName }} {{ .CompanyName }}{{ end }}{{ end }}</td>
+    <td class="govuk-table__cell">
+        {{ if .SystemStatus }}
+          <svg aria-labelledby="is-active-text" class="app-person-info__icon">
+            <title id="is-active-text">Is active</title>
+            <use href="{{ prefixSVG "icon-confirm" }}" />
+          </svg>
+        {{ end }}
+    </td>
+  </tr>
 {{ end }}
