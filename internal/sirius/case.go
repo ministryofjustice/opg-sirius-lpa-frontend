@@ -17,6 +17,7 @@ type Case struct {
 	CaseAttorneyJointlyAndSeverally           *bool             `json:"caseAttorneyJointlyAndSeverally,omitempty"`
 	CaseAttorneySingular                      *bool             `json:"caseAttorneySingular,omitempty"`
 	CaseType                                  string            `json:"caseType,omitempty"`
+	CertificateProviders                      []Person          `json:"certificateProviders,omitempty"`
 	Complaints                                []interface{}     `json:"complaints,omitempty"`
 	Correspondent                             *Correspondent    `json:"correspondent,omitempty"`
 	DispatchDate                              DateString        `json:"dispatchDate,omitempty"`

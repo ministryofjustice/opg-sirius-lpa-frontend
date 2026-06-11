@@ -101,6 +101,7 @@ type Client interface {
 	SearchDonorsClient
 	SearchUsersClient
 	SelectOrCreateCorrespondentClient
+	SiriusHeaderPeopleInfoClient
 	TaskClient
 	UnlinkPersonClient
 	UpdateDecisionsClient
@@ -195,7 +196,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/compare/{id}/{caseId}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
 	mux.Handle("/sirius-header-calendars", wrap(SiriusHeaderCalendars(templates.Get("sirius-header-partial-calendars.gohtml"))))
 	mux.Handle("/sirius-header-case-info", wrap(SiriusHeaderCaseInfo(templates.Get("sirius-header-partial-case-info.gohtml"))))
-	mux.Handle("/sirius-header-people-info", wrap(SiriusHeaderPeopleInfo(templates.Get("sirius-header-partial-people-info.gohtml"))))
+	mux.Handle("/sirius-header-people-info", wrap(SiriusHeaderPeopleInfo(client, templates.Get("sirius-header-partial-people-info.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))
 	mux.Handle("/assets/{path...}", static)
