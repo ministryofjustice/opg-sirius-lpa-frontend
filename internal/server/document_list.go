@@ -15,25 +15,27 @@ type DocumentListClient interface {
 	Person(ctx sirius.Context, id int) (sirius.Person, error)
 	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
 	DownloadMultiple(ctx sirius.Context, docIDs []string) (*http.Response, error)
+	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
 }
 
 type documentPageData struct {
-	XSRFToken             string
-	Entity                string
-	Success               bool
-	SuccessMessage        string
-	DonorID               int
-	Person                sirius.Person
-	Error                 sirius.ValidationError
-	DocumentList          sirius.DocumentList
-	Document              sirius.Document
-	SelectedCases         []sirius.Case
-	MultipleCasesSelected bool
-	Comparing             bool
-	CompareURLs           map[string]string
-	CloseURL              string
-	CaseUids              string
-	ActionPanelButtons    []ActionPanelButton
+	XSRFToken                 string
+	Entity                    string
+	Success                   bool
+	SuccessMessage            string
+	DonorID                   int
+	Person                    sirius.Person
+	Error                     sirius.ValidationError
+	DocumentList              sirius.DocumentList
+	Document                  sirius.Document
+	SelectedCases             []sirius.Case
+	MultipleCasesSelected     bool
+	Comparing                 bool
+	CompareURLs               map[string]string
+	CloseURL                  string
+	CaseUids                  string
+	ActionPanelButtons        []ActionPanelButton
+	HasV1PersonsGetPermission bool
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
@@ -141,6 +143,13 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 		data.CaseUids = buildUIDQueryString(caseUIDs)
 
 		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids)
+
+		userPermissions, err := client.GetUserPermissions(ctx)
+		if err != nil {
+			return err
+		}
+
+		data.HasV1PersonsGetPermission = userPermissions.Includes("v1-persons", "GET")
 
 		return tmpl(w, data)
 	}
