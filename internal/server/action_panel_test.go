@@ -68,6 +68,12 @@ func TestGetActionPanel(t *testing.T) {
 					IconName: "aw-change-status",
 					Disabled: true,
 				},
+				{
+					Label:    "New task",
+					URL:      "",
+					IconName: "aw-new-task",
+					Disabled: true,
+				},
 			},
 		}).
 		Return(nil)
@@ -132,6 +138,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					IconName: "aw-change-status",
 					Disabled: false,
 				},
+				{
+					Label:    "New task",
+					URL:      "/create-task?id=1&entity=lpa",
+					IconName: "aw-new-task",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -183,6 +195,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					Label:    "Change status",
 					URL:      "",
 					IconName: "aw-change-status",
+					Disabled: true,
+				},
+				{
+					Label:    "New task",
+					URL:      "",
+					IconName: "aw-new-task",
 					Disabled: true,
 				},
 			},

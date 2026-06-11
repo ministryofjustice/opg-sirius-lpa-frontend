@@ -60,13 +60,14 @@ func TestGetTask(t *testing.T) {
 			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entity:    "LPA 7000-0000-0000",
 			CaseUID:   "7000-0000-0000",
+			CaseID:    123,
 		}).
 		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -84,7 +85,7 @@ func TestGetTaskBadQueryString(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := Task(nil, nil)(w, r)
+			err := Task(nil, nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -106,7 +107,7 @@ func TestGetTaskWhenTaskTypeErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Task(client, nil)(w, r)
+	err := Task(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -126,7 +127,7 @@ func TestGetTaskWhenTeamsErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Task(client, nil)(w, r)
+	err := Task(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -146,7 +147,7 @@ func TestGetTaskWhenCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Task(client, nil)(w, r)
+	err := Task(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -171,7 +172,7 @@ func TestGetTaskWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -206,6 +207,7 @@ func TestPostTask(t *testing.T) {
 			AssigneeUserName: "System user",
 			Entity:           "LPA 7000-0000-0000",
 			CaseUID:          "7000-0000-0000",
+			CaseID:           123,
 		}).
 		Return(nil)
 
@@ -222,7 +224,7 @@ func TestPostTask(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -264,6 +266,7 @@ func TestPostTaskWhenAssignToMe(t *testing.T) {
 			AssigneeUserName: "Me",
 			Entity:           "LPA 7000-0000-0000",
 			CaseUID:          "7000-0000-0000",
+			CaseID:           123,
 		}).
 		Return(nil)
 
@@ -279,7 +282,7 @@ func TestPostTaskWhenAssignToMe(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -319,6 +322,7 @@ func TestGetTaskWhenGetUserDetailsErrors(t *testing.T) {
 			AssigneeUserName: "Me",
 			Entity:           "LPA 7000-0000-0000",
 			CaseUID:          "7000-0000-0000",
+			CaseID:           123,
 		}).
 		Return(nil)
 
@@ -334,7 +338,7 @@ func TestGetTaskWhenGetUserDetailsErrors(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -360,6 +364,7 @@ func TestPostTaskWhenCreateTaskFails(t *testing.T) {
 			TaskTypes: []string{"a", "b"},
 			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entity:    "LPA 7000-0000-0000",
+			CaseID:    123,
 		}).
 		Return(nil)
 
@@ -376,7 +381,7 @@ func TestPostTaskWhenCreateTaskFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(w, r)
 	assert.Equal(t, errExample, err)
 }
 
@@ -406,6 +411,7 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entity:    "LPA 7000-0000-0000",
 			CaseUID:   "7000-0000-0000",
+			CaseID:    123,
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{
 					"assignTo": {"": "Assignee not set"},
@@ -432,7 +438,7 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(w, r)
 	assert.Nil(t, err)
 
 	resp := w.Result()
@@ -488,6 +494,7 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 					Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 					Entity:    "LPA 7000-0000-0000",
 					CaseUID:   "7000-0000-0000",
+					CaseID:    123,
 					Error:     sirius.ValidationError{Field: expectedErrors},
 					Task: sirius.TaskRequest{
 						Type:        "Some task type",
@@ -513,7 +520,7 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := Task(client, template.Func)(w, r)
+			err := Task(client, template.Func, template.Func)(w, r)
 			assert.Nil(t, err)
 
 			resp := w.Result()
