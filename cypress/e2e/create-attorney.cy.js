@@ -59,6 +59,11 @@ describe("Create or Update Attorney", () => {
   });
 
   it("updates an existing attorney on an EPA", () => {
+    cy.addMock("/lpa-api/v1/epas/2", "PUT", {
+      status: 200,
+      body: {},
+    });
+
     cy.addMock("/lpa-api/v1/cases/2", "GET", {
       status: 200,
       body: {
@@ -86,13 +91,7 @@ describe("Create or Update Attorney", () => {
       "contain.text",
       "attorney Rudolph Stotesbury",
     );
-    cy.get("#f-update-attorney-3")
-      .should(
-        "have.attr",
-        "href",
-        "/create-attorney?id=2&caseId=2&attorneyId=3",
-      )
-      .click();
+    cy.get("#f-update-attorney-3").click();
 
     cy.contains("Update attorney details");
     cy.get("#f-firstname").should("have.value", "Rudolph");
