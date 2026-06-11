@@ -10,6 +10,7 @@ type PostcodeLookupAddress struct {
 	Line2       string `json:"addressLine2"`
 	Line3       string `json:"addressLine3"`
 	Town        string `json:"town"`
+	County      string `json:"county"`
 	Postcode    string `json:"postcode"`
 	Country     string `json:"country"`
 	Description string `json:"description"`
