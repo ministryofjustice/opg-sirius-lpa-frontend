@@ -67,7 +67,9 @@ describe("Person info panel on the header bar", () => {
     cy.contains("DOB:");
     cy.contains("19/04/1978");
     cy.contains("Address:");
-    cy.contains("AIRMAIL 29737 Andrew Plaza, Apt. 814, Gislasonside, Hirthehaven, Saskatchewan, S7R 9F9, Canada");
+    cy.contains(
+      "AIRMAIL 29737 Andrew Plaza, Apt. 814, Gislasonside, Hirthehaven, Saskatchewan, S7R 9F9, Canada",
+    );
     cy.contains("Tel:");
     cy.contains("072345678");
     cy.contains("Email:");
