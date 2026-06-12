@@ -5,24 +5,16 @@
 {{ define "main" }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
-
-      {{ template "error-summary" .Error }}
 
       {{ if .Success }}
         <meta data-app-reload="page" />
         {{ template "success-banner" (printf "Status changed to %s" .NewStatus) }}
       {{ end }}
 
-      <h1 class="govuk-heading-l app-!-embedded-hide">Change status</h1>
-
       <form class="form" method="POST">
-        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
-
-        {{ template "select" (select "status" "Status" .NewStatus .Error.Field.status (options .AvailableStatuses) "required" true) }}
-
-        {{ template "textarea" (field "notes" "Notes" .Notes .Error.Field.notes "hint" "Optional") }}
-
+        
+        {{ template "changeStatus" . }}
+        
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Submit</button>
           <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
