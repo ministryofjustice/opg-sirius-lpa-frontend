@@ -178,7 +178,7 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 				},
 				{
 					Label:    "Change status",
-					URL:      "/change-status?id=1&case=lpa&donorId=123&uid[]=7000-0000-0001",
+					URL:      "/change-status?id=1&case=lpa",
 					IconName: "aw-change-status",
 					Disabled: false,
 				},

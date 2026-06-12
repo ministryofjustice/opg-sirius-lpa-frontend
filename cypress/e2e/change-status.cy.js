@@ -4,7 +4,7 @@ describe("Change status", () => {
   });
 
   it("changes the case status", () => {
-    cy.contains("Change status");
+    cy.contains("Change Status");
     cy.contains("LPA 7000-0000-0000");
     cy.get(".moj-alert").should("not.exist");
     cy.get("#f-status").select("Perfect");
@@ -13,7 +13,7 @@ describe("Change status", () => {
   });
 
   it("changes the case status and adds a note", () => {
-    cy.contains("Change status");
+    cy.contains("Change Status");
     cy.contains("LPA 7000-0000-0000");
     cy.get(".moj-alert").should("not.exist");
     cy.get("#f-status").select("Perfect");
