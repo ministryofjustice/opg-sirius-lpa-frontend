@@ -56,6 +56,7 @@ func TestGetChangeStatus(t *testing.T) {
 					AvailableStatuses: []string{"Cancelled", "Withdrawn"},
 					CaseID:            123,
 					CaseType:          caseType,
+					CaseUid:           "700700",
 				}).
 				Return(nil)
 
@@ -148,6 +149,7 @@ func TestGetChangeStatusWhenTemplateErrors(t *testing.T) {
 			AvailableStatuses: []string{"Cancelled", "Withdrawn"},
 			CaseID:            123,
 			CaseType:          "lpa",
+			CaseUid:           "700700",
 		}).
 		Return(errExample)
 
@@ -189,6 +191,7 @@ func TestPostChangeStatus(t *testing.T) {
 					NewStatus:         "Withdrawn",
 					CaseID:            123,
 					CaseType:          caseType,
+					CaseUid:           "700700",
 				}).
 				Return(nil)
 
@@ -247,6 +250,9 @@ func TestPostChangeStatusWithNotes(t *testing.T) {
 					Entity:            caseType + " 700700",
 					AvailableStatuses: []string{"Cancelled", "Withdrawn"},
 					NewStatus:         "Withdrawn",
+					CaseID:            123,
+					CaseType:          caseType,
+					CaseUid:           "700700",
 					Notes:             "Case note details",
 				}).
 				Return(nil)
@@ -260,7 +266,7 @@ func TestPostChangeStatusWithNotes(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := ChangeStatus(client, template.Func)(w, r)
+			err := ChangeStatus(client, template.Func, nil)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -321,6 +327,7 @@ func TestGetChangeStatusHtmx(t *testing.T) {
 			AvailableStatuses: []string{"Cancelled", "Withdrawn"},
 			CaseID:            123,
 			CaseType:          "lpa",
+			CaseUid:           "700700",
 		}).
 		Return(nil)
 
@@ -363,6 +370,7 @@ func TestPostChangeStatusHtmx(t *testing.T) {
 			NewStatus:         "Withdrawn",
 			CaseID:            123,
 			CaseType:          "lpa",
+			CaseUid:           "700700",
 		}).
 		Return(nil)
 
