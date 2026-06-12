@@ -142,6 +142,11 @@ func TestGetSiriusHeaderPersonInfoGetSelectedPerson(t *testing.T) {
 		SelectedPerson sirius.Recipient
 	}{
 		{
+			Name:           "donor",
+			SelectedID:     "0",
+			SelectedPerson: *caseItem.Donor,
+		},
+		{
 			Name:           "attorney",
 			SelectedID:     "2",
 			SelectedPerson: caseItem.Attorneys[0],
