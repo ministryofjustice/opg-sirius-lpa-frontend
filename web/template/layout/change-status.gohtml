@@ -1,0 +1,14 @@
+{{ define "changeStatus" }}
+    <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
+    
+    {{ template "error-summary" .Error }}
+
+    <h1 class="govuk-heading-l app-!-embedded-hide">Change status</h1>
+
+    <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+    {{ template "select" (select "status" "Status" .NewStatus .Error.Field.status (options .AvailableStatuses) "required" true) }}
+
+    {{ template "textarea" (field "notes" "Notes" .Notes .Error.Field.notes "hint" "Optional") }}
+
+{{ end }}
