@@ -342,6 +342,11 @@ describe("View documents", () => {
         },
       },
     );
+
+    cy.addMock("/lpa-api/v1/permissions", "GET", {
+      status: 200,
+      body: {},
+    })
   });
 
   it("on a person", () => {
@@ -926,6 +931,11 @@ describe("sort by dropdown", () => {
         },
       },
     );
+
+    cy.addMock("/lpa-api/v1/permissions", "GET", {
+      status: 200,
+      body: {},
+    })
   });
 
   it("renders the dropdown with a default placeholder and all expected options", () => {
