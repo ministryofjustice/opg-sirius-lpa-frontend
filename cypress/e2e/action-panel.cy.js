@@ -36,7 +36,7 @@ describe("Action Panel", () => {
     cy.addMock("/lpa-api/v1/permissions", "GET", {
       status: 200,
       body: {},
-    })
+    });
 
     cy.visit("/donor/1/documents?uid[]=7000-1234-1234");
   });
