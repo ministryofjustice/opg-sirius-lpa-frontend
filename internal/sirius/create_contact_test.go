@@ -3,10 +3,11 @@ package sirius
 import (
 	"context"
 	"fmt"
-	"github.com/pact-foundation/pact-go/v2/consumer"
-	"github.com/pact-foundation/pact-go/v2/matchers"
 	"net/http"
 	"testing"
+
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -69,6 +70,7 @@ func TestCreateContact(t *testing.T) {
 							"middlenames":           "Josefina",
 							"surname":               "Vanvolkenburg",
 							"dob":                   nil,
+							"dateOfDeath":           nil,
 							"previousNames":         "",
 							"otherNames":            "",
 							"addressLine1":          "29737 Andrew Plaza",
