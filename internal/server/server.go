@@ -155,7 +155,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/add-complaint", wrap(AddComplaint(client, templates.Get("add-complaint-wrapper.gohtml"), templates.Get("add-complaint-partial-wrapper.gohtml"))))
 	mux.Handle("/edit-complaint", wrap(EditComplaint(client, templates.Get("edit_complaint.gohtml"))))
 	mux.Handle("/unlink-person", wrap(UnlinkPerson(client, templates.Get("unlink_person.gohtml"))))
-	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change-status.gohtml"), templates.Get("change-status-partial.gohtml"))))
+	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change-status-wrapper.gohtml"), templates.Get("change-status-partial-wrapper.gohtml"))))
 	mux.Handle("/change-case-status", wrap(ChangeCaseStatus(client, templates.Get("change_case_status.gohtml"))))
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate_cases.gohtml"))))
 	mux.Handle("/assign-task", wrap(AssignTask(client, templates.Get("assign_task.gohtml"))))
