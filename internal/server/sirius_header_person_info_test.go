@@ -146,6 +146,31 @@ func TestGetSiriusHeaderPersonInfoGetSelectedPerson(t *testing.T) {
 			SelectedID:     "2",
 			SelectedPerson: caseItem.Attorneys[0],
 		},
+		{
+			Name:           "replacement attorney",
+			SelectedID:     "3",
+			SelectedPerson: caseItem.ReplacementAttorneys[0],
+		},
+		{
+			Name:           "trust corporation",
+			SelectedID:     "4",
+			SelectedPerson: caseItem.TrustCorporations[0],
+		},
+		{
+			Name:           "certified providers",
+			SelectedID:     "5",
+			SelectedPerson: caseItem.CertificateProviders[0],
+		},
+		{
+			Name:           "notified persons",
+			SelectedID:     "6",
+			SelectedPerson: caseItem.NotifiedPersons[0],
+		},
+		{
+			Name:           "correspondent",
+			SelectedID:     "7",
+			SelectedPerson: *caseItem.Correspondent,
+		},
 	}
 
 	for _, tc := range testCases {
