@@ -112,7 +112,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		warningUrl = fmt.Sprintf("/create-warning?id=%d&entity=%s%s", donorId, strings.ToLower(selectedCase.CaseType), caseUids)
 		complaintUrl = fmt.Sprintf("/add-complaint?id=%d&case=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
 		createDocumentUrl = fmt.Sprintf("/create-document?id=%d&case=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
-		changeStatusUrl = fmt.Sprintf("/change-status?id=%d&case=%s&donorId=%d%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType), donorId, caseUids)
+		changeStatusUrl = fmt.Sprintf("/change-status?id=%d&case=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
 		PaymentsUrl = fmt.Sprintf("/payments/%d", selectedCases[0].ID)
 	}
 
