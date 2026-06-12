@@ -37,6 +37,11 @@ func (m *mockDocumentListClient) DownloadMultiple(ctx sirius.Context, docIDs []s
 	return args.Get(0).(*http.Response), args.Error(1)
 }
 
+func (m *mockDocumentListClient) GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(sirius.Permissions), args.Error(1)
+}
+
 var singleDocumentList = sirius.DocumentList{
 	Limit: 999,
 	Pages: sirius.Pages{
@@ -207,24 +212,26 @@ func TestGetDocumentList(t *testing.T) {
 	}
 
 	tests := []struct {
-		name               string
-		cases              []sirius.Case
-		documentList       sirius.DocumentList
-		expectedMultiple   bool
-		expectedCases      []sirius.Case
-		caseIDs            []string
-		caseUids           string
-		path               string
-		actionPanelButtons []ActionPanelButton
+		name                      string
+		cases                     []sirius.Case
+		documentList              sirius.DocumentList
+		expectedMultiple          bool
+		expectedCases             []sirius.Case
+		caseIDs                   []string
+		caseUids                  string
+		path                      string
+		actionPanelButtons        []ActionPanelButton
+		hasV1PersonsGetPermission bool
 	}{
 		{
-			name:             "on person with multiple cases",
-			cases:            cases,
-			documentList:     allDocumentList,
-			expectedMultiple: true,
-			expectedCases:    cases,
-			caseIDs:          []string(nil),
-			path:             "/donor/82/documents",
+			name:                      "on person with multiple cases",
+			cases:                     cases,
+			documentList:              allDocumentList,
+			expectedMultiple:          true,
+			expectedCases:             cases,
+			caseIDs:                   []string(nil),
+			path:                      "/donor/82/documents",
+			hasV1PersonsGetPermission: true,
 			actionPanelButtons: []ActionPanelButton{
 				{
 					Label:    "Create warning",
@@ -265,13 +272,14 @@ func TestGetDocumentList(t *testing.T) {
 			},
 		},
 		{
-			name:             "on person with one case",
-			cases:            cases[:1],
-			documentList:     singleDocumentList,
-			expectedMultiple: false,
-			expectedCases:    cases[:1],
-			caseIDs:          []string(nil),
-			path:             "/donor/82/documents",
+			name:                      "on person with one case",
+			cases:                     cases[:1],
+			documentList:              singleDocumentList,
+			expectedMultiple:          false,
+			expectedCases:             cases[:1],
+			caseIDs:                   []string(nil),
+			path:                      "/donor/82/documents",
+			hasV1PersonsGetPermission: false,
 			actionPanelButtons: []ActionPanelButton{
 				{
 					Label:    "Create warning",
@@ -312,14 +320,15 @@ func TestGetDocumentList(t *testing.T) {
 			},
 		},
 		{
-			name:             "one case specified",
-			cases:            cases,
-			documentList:     singleDocumentList,
-			expectedMultiple: false,
-			expectedCases:    []sirius.Case{cases[0]},
-			caseIDs:          []string{"1"},
-			caseUids:         "&uid[]=7000-1234-0000",
-			path:             "/donor/82/documents?uid[]=7000-1234-0000",
+			name:                      "one case specified",
+			cases:                     cases,
+			documentList:              singleDocumentList,
+			expectedMultiple:          false,
+			expectedCases:             []sirius.Case{cases[0]},
+			caseIDs:                   []string{"1"},
+			caseUids:                  "&uid[]=7000-1234-0000",
+			path:                      "/donor/82/documents?uid[]=7000-1234-0000",
+			hasV1PersonsGetPermission: false,
 			actionPanelButtons: []ActionPanelButton{
 				{
 					Label:    "Create warning",
@@ -360,14 +369,15 @@ func TestGetDocumentList(t *testing.T) {
 			},
 		},
 		{
-			name:             "multiple cases specified",
-			cases:            cases,
-			documentList:     twoCasesDocumentList,
-			expectedMultiple: true,
-			expectedCases:    []sirius.Case{cases[0], cases[1]},
-			caseIDs:          []string{"1", "2"},
-			caseUids:         "&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
-			path:             "/donor/82/documents?uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+			name:                      "multiple cases specified",
+			cases:                     cases,
+			documentList:              twoCasesDocumentList,
+			expectedMultiple:          true,
+			expectedCases:             []sirius.Case{cases[0], cases[1]},
+			caseIDs:                   []string{"1", "2"},
+			caseUids:                  "&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+			path:                      "/donor/82/documents?uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+			hasV1PersonsGetPermission: false,
 			actionPanelButtons: []ActionPanelButton{
 				{
 					Label:    "Create warning",
@@ -411,6 +421,10 @@ func TestGetDocumentList(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			permissions := sirius.Permissions{}
+			if tc.hasV1PersonsGetPermission {
+				permissions = sirius.Permissions{"v1-persons": sirius.PermissionType{Permissions: []string{"GET"}}}
+			}
 			client := &mockDocumentListClient{}
 			client.
 				On("CasesByDonor", mock.Anything, 82).
@@ -421,18 +435,22 @@ func TestGetDocumentList(t *testing.T) {
 			client.
 				On("Person", mock.Anything, 82).
 				Return(expectedDonor, nil)
+			client.
+				On("GetUserPermissions", mock.Anything).
+				Return(permissions, nil)
 
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything,
 					documentPageData{
-						SelectedCases:         tc.expectedCases,
-						Person:                expectedDonor,
-						DocumentList:          tc.documentList,
-						MultipleCasesSelected: tc.expectedMultiple,
-						DonorID:               82,
-						CaseUids:              tc.caseUids,
-						ActionPanelButtons:    tc.actionPanelButtons,
+						SelectedCases:             tc.expectedCases,
+						Person:                    expectedDonor,
+						DocumentList:              tc.documentList,
+						MultipleCasesSelected:     tc.expectedMultiple,
+						DonorID:                   82,
+						CaseUids:                  tc.caseUids,
+						ActionPanelButtons:        tc.actionPanelButtons,
+						HasV1PersonsGetPermission: tc.hasV1PersonsGetPermission,
 					},
 				).
 				Return(nil)
@@ -529,6 +547,9 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 82).
 		Return(expectedDonor, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -542,6 +563,7 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 				Error: sirius.ValidationError{
 					Detail: "Select one or more documents and try again.",
 				},
+				HasV1PersonsGetPermission: false,
 				ActionPanelButtons: []ActionPanelButton{
 					{
 						Label:    "Create warning",
@@ -653,6 +675,9 @@ func TestDocumentListDismissValidation(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 82).
 		Return(expectedDonor, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
 
 	expectedCases := []sirius.Case{cases[0], cases[1]}
 
@@ -660,12 +685,13 @@ func TestDocumentListDismissValidation(t *testing.T) {
 	template.
 		On("Func", mock.Anything,
 			documentPageData{
-				SelectedCases:         expectedCases,
-				Person:                expectedDonor,
-				DocumentList:          twoCasesDocumentList,
-				MultipleCasesSelected: true,
-				DonorID:               82,
-				CaseUids:              "&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+				SelectedCases:             expectedCases,
+				Person:                    expectedDonor,
+				DocumentList:              twoCasesDocumentList,
+				MultipleCasesSelected:     true,
+				DonorID:                   82,
+				CaseUids:                  "&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+				HasV1PersonsGetPermission: false,
 				ActionPanelButtons: []ActionPanelButton{
 					{
 						Label:    "Create warning",
@@ -794,6 +820,32 @@ func TestGetDocumentListWhenPersonErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
+func TestGetDocumentListWhenPermissionsErrors(t *testing.T) {
+	cases := []sirius.Case{{ID: 1, CaseType: "LPA", SubType: "PFA", UID: "7000-1234-0000"}}
+
+	client := &mockDocumentListClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 82).
+		Return(cases, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 82, []string(nil)).
+		Return(singleDocumentList, nil)
+	client.
+		On("Person", mock.Anything, 82).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, errExample)
+
+	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/donor/82/documents", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
 func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 	cases := []sirius.Case{{ID: 1, CaseType: "LPA", SubType: "PFA", UID: "7000-1234-0000"}}
 
@@ -807,16 +859,20 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 82).
 		Return(expectedDonor, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything,
 			documentPageData{
-				SelectedCases:         cases,
-				Person:                expectedDonor,
-				DocumentList:          singleDocumentList,
-				MultipleCasesSelected: false,
-				DonorID:               82,
+				SelectedCases:             cases,
+				Person:                    expectedDonor,
+				DocumentList:              singleDocumentList,
+				MultipleCasesSelected:     false,
+				DonorID:                   82,
+				HasV1PersonsGetPermission: false,
 				ActionPanelButtons: []ActionPanelButton{
 					{
 						Label:    "Create warning",
@@ -971,6 +1027,9 @@ func TestDocumentListSuccessMessage(t *testing.T) {
 			client.
 				On("Person", mock.Anything, 82).
 				Return(expectedDonor, nil)
+			client.
+				On("GetUserPermissions", mock.Anything).
+				Return(sirius.Permissions{}, nil)
 
 			template := &mockTemplate{}
 			template.

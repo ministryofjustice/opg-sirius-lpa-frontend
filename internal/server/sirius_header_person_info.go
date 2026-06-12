@@ -87,7 +87,7 @@ func getSelectedPerson(caseItem sirius.Case, selectedId int) sirius.Recipient {
 			}
 		}
 		if caseItem.Correspondent != nil && caseItem.Correspondent.ID == selectedId {
-			return caseItem.Correspondent
+			return *caseItem.Correspondent
 		}
 	}
 	return *caseItem.Donor
