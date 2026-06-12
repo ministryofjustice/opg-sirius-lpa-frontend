@@ -131,7 +131,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"), templates.Get("event-partial.gohtml"))))
 	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning-wrapper.gohtml"), templates.Get("warning-partial-wrapper.gohtml"))))
 	mux.Handle("/action-panel", wrap(ActionPanel(client, templates.Get("action-panel-wrapper.gohtml"))))
-	mux.Handle("/create-task", wrap(Task(client, templates.Get("task.gohtml"))))
+	mux.Handle("/create-task", wrap(Task(client, templates.Get("create-task-wrapper.gohtml"), templates.Get("create-task-partial-wrapper.gohtml"))))
 	mux.Handle("/create-additional-draft-lpa", wrap(CreateAdditionalDraft(client, templates.Get("create_additional_draft.gohtml"))))
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("relationship.gohtml"))))
 	mux.Handle("/create-donor", wrap(CreateDonor(client, templates.Get("donor.gohtml"))))
