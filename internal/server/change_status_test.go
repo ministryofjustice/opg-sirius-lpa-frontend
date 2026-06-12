@@ -17,6 +17,10 @@ type mockChangeStatusClient struct {
 	mock.Mock
 }
 
+func (m *mockChangeStatusClient) CreateNote(ctx sirius.Context, entityID int, entityType sirius.EntityType, noteType, name, description string, file *sirius.NoteFile) error {
+	return m.Called(ctx, entityID, entityType, noteType, name, description, file).Error(0)
+}
+
 func (m *mockChangeStatusClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(sirius.Case), args.Error(1)
@@ -52,6 +56,7 @@ func TestGetChangeStatus(t *testing.T) {
 					AvailableStatuses: []string{"Cancelled", "Withdrawn"},
 					CaseID:            123,
 					CaseType:          caseType,
+					CaseUid:           "700700",
 				}).
 				Return(nil)
 
@@ -144,6 +149,7 @@ func TestGetChangeStatusWhenTemplateErrors(t *testing.T) {
 			AvailableStatuses: []string{"Cancelled", "Withdrawn"},
 			CaseID:            123,
 			CaseType:          "lpa",
+			CaseUid:           "700700",
 		}).
 		Return(errExample)
 
@@ -185,6 +191,7 @@ func TestPostChangeStatus(t *testing.T) {
 					NewStatus:         "Withdrawn",
 					CaseID:            123,
 					CaseType:          caseType,
+					CaseUid:           "700700",
 				}).
 				Return(nil)
 
@@ -197,6 +204,69 @@ func TestPostChangeStatus(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			err := ChangeStatus(client, template.Func, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			client.AssertNotCalled(t, "CreateNote", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
+func TestPostChangeStatusWithNotes(t *testing.T) {
+	testCases := map[string]sirius.EntityType{
+		"lpa": sirius.EntityTypeLpa,
+		"epa": sirius.EntityTypeEpa,
+	}
+
+	for caseType, noteEntityType := range testCases {
+		t.Run(caseType, func(t *testing.T) {
+			caseItem := sirius.Case{CaseType: caseType, UID: "700700"}
+
+			client := &mockChangeStatusClient{}
+			client.
+				On("EditCase", mock.Anything, 123, sirius.CaseType(caseType), sirius.Case{
+					Status: shared.CaseStatusTypeWithdrawn,
+				}).
+				Return(nil)
+
+			client.
+				On("CreateNote", mock.Anything, 123, noteEntityType, "Status change - Notes", "Status changed to Withdrawn", "Case note details", (*sirius.NoteFile)(nil)).
+				Return(nil)
+
+			client.
+				On("Case", mock.Anything, 123).
+				Return(caseItem, nil)
+
+			client.
+				On("AvailableStatuses", mock.Anything, 123, sirius.CaseType(caseType)).
+				Return([]string{"Cancelled", "Withdrawn"}, nil)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, changeStatusData{
+					Success:           true,
+					Entity:            caseType + " 700700",
+					AvailableStatuses: []string{"Cancelled", "Withdrawn"},
+					NewStatus:         "Withdrawn",
+					CaseID:            123,
+					CaseType:          caseType,
+					CaseUid:           "700700",
+					Notes:             "Case note details",
+				}).
+				Return(nil)
+
+			form := url.Values{
+				"status": {"Withdrawn"},
+				"notes":  {"Case note details"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := ChangeStatus(client, template.Func, nil)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -257,6 +327,7 @@ func TestGetChangeStatusHtmx(t *testing.T) {
 			AvailableStatuses: []string{"Cancelled", "Withdrawn"},
 			CaseID:            123,
 			CaseType:          "lpa",
+			CaseUid:           "700700",
 		}).
 		Return(nil)
 
@@ -299,6 +370,7 @@ func TestPostChangeStatusHtmx(t *testing.T) {
 			NewStatus:         "Withdrawn",
 			CaseID:            123,
 			CaseType:          "lpa",
+			CaseUid:           "700700",
 		}).
 		Return(nil)
 

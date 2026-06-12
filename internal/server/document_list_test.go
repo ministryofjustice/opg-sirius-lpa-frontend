@@ -299,7 +299,7 @@ func TestGetDocumentList(t *testing.T) {
 				},
 				{
 					Label:    "Change status",
-					URL:      "/change-status?id=1&case=lpa&donorId=82",
+					URL:      "/change-status?id=1&case=lpa",
 					IconName: "aw-change-status",
 					Disabled: false,
 				},
@@ -347,7 +347,7 @@ func TestGetDocumentList(t *testing.T) {
 				},
 				{
 					Label:    "Change status",
-					URL:      "/change-status?id=1&case=lpa&donorId=82&uid[]=7000-1234-0000",
+					URL:      "/change-status?id=1&case=lpa",
 					IconName: "aw-change-status",
 					Disabled: false,
 				},
@@ -844,7 +844,7 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 					},
 					{
 						Label:    "Change status",
-						URL:      "/change-status?id=1&case=lpa&donorId=82",
+						URL:      "/change-status?id=1&case=lpa",
 						IconName: "aw-change-status",
 						Disabled: false,
 					},
