@@ -27,7 +27,7 @@ type changeStatusData struct {
 	CaseID            int
 	CaseType          string
 	DonorID           int
-	CaseUids          string
+	CaseUid           string
 	Notes             string
 }
 
@@ -72,7 +72,7 @@ func ChangeStatus(client ChangeStatusClient, tmpl template.Template, partialTmpl
 			CaseID:            caseID,
 			CaseType:          string(caseType),
 			DonorID:           donorID,
-			CaseUids:          buildUIDQueryString(r.Form["uid[]"]),
+			CaseUid:           caseItem.UID,
 			Notes:             postFormString(r, "notes"),
 		}
 
