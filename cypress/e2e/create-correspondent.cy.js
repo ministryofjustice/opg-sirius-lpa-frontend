@@ -43,6 +43,11 @@ describe("Create or update correspondent", () => {
   });
 
   it("updates a correspondent on an EPA", () => {
+    cy.addMock("/lpa-api/v1/epas/2", "PUT", {
+      status: 200,
+      body: {},
+    });
+
     cy.addMock("/lpa-api/v1/cases/2", "GET", {
       status: 200,
       body: {
@@ -62,9 +67,7 @@ describe("Create or update correspondent", () => {
       "contain.text",
       "correspondent Melanie Vanvolkenburg",
     );
-    cy.get("#f-update-correspondent-3")
-      .should("have.attr", "href", "/create-correspondent?id=2&caseId=2")
-      .click();
+    cy.get("#f-update-correspondent-3").click();
 
     cy.contains("Update correspondent details");
     cy.get("#f-firstname").should("have.value", "Melanie");
