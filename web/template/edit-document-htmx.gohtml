@@ -1,0 +1,136 @@
+{{ define "page" }}
+<div class="action-panel__form action-panel__form--wide">
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {{ template "error-summary" .Error }}
+
+        {{ if .Success }}
+          {{ template "success-banner" "Draft document published" }}
+          <span class="govuk-!-display-none"
+                hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId (ToLower .Case.CaseType) .Case.UID) }}"
+                hx-target=".action-panel__content"
+                hx-swap="innerHTML"
+                hx-trigger="load"
+          ></span>
+        {{ else if .SaveAndExit }}
+          <span class="govuk-!-display-none"
+                hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId (ToLower .Case.CaseType) .Case.UID) }}"
+                hx-target=".action-panel__content"
+                hx-swap="innerHTML"
+                hx-trigger="load"
+          ></span>
+        {{ else if .PreviewDraft }}
+          <a href="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .DownloadUUID) }}" target="_blank"
+             data-module="app-auto-click">Download preview document</a>
+        {{ end }}
+
+        {{ if .CaseSummary.DigitalLpa.SiriusData.ID }}
+            {{ template "mlpa-header" (caseTabs .CaseSummary "documents") }}
+
+            <div class="govuk-body">
+              <a href="{{ prefix (printf "/lpa/%s/documents" .CaseSummary.DigitalLpa.UID) }}" class="govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+                Back
+              </a>
+            </div>
+
+            <h1 class="govuk-heading-l">Edit draft document</h1>
+        {{ else }}
+          <div class="govuk-body">
+            <a class="govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-0"
+               href=""
+               hx-get="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .Case.CaseType) }}"
+               hx-target=".action-panel__content"
+            >Back</a>
+            <div class="app-!-float-right">
+                {{ subtypeShortFormat .Case.SubType }} {{ .Case.UID }}
+            </div>
+          </div>
+
+          <h1 class="govuk-heading-m">Edit draft document</h1>
+        {{ end }}
+
+        {{ if not .Documents }}
+          <span class="govuk-!-display-none"
+                hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId (ToLower .Case.CaseType) .Case.UID) }}"
+                hx-target=".action-panel__content"
+                hx-swap="innerHTML"
+                hx-trigger="load"
+          ></span>
+        {{ else }}
+          <form class="form"
+                method="GET"
+                hx-get="{{ prefix (printf "/edit-document?id=%d&case=%s" .Case.ID (ToLower .Case.CaseType)) }}"
+                hx-target=".action-panel__content"
+                hx-swap="innerHTML"
+          >
+            <input type="hidden" name="id" value="{{ .Case.ID }}"/>
+            <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
+
+            <div class="govuk-form-group {{ if .Error.Field.document }}govuk-form-group--error{{ end }} govuk-!-margin-bottom-0">
+              <label class="govuk-label" for="f-document">
+                Select a draft to edit
+              </label>
+                {{ template "errors" .Error.Field.document }}
+              <div class="app-!-flex">
+                <select class="govuk-select {{ if .Error.Field.document }}govuk-select--error{{ end }} app-!-full-width govuk-!-margin-right-2"
+                        id="f-document" name="document">
+                  <option hidden {{ if not nil }}selected{{ end }} disabled></option>
+                    {{ $documentID := .Document.ID }}
+                    {{ range .Documents }}
+                      <option value="{{ .UUID }}" {{ if eq .ID $documentID }}selected{{ end }}>{{ .ID }}: {{ .CreatedDate }}: {{ .Correspondent.Firstname }} {{ .Correspondent.Surname }}: {{ .SystemType }}</option>
+                    {{ end }}
+                </select>
+                <button class="govuk-button govuk-button--secondary"
+                        data-module="govuk-button" type="submit">Select
+                </button>
+              </div>
+            </div>
+          </form>
+          <form class="form"
+                method="POST"
+                hx-get="{{ prefix (printf "/edit-document?id=%d&case=%s" .Case.ID (ToLower .Case.CaseType)) }}"
+                hx-target=".action-panel__content"
+                hx-swap="innerHTML"
+          >
+            <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+            <input type="hidden" name="id" value="{{ .Case.ID }}"/>
+            <input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
+            <input type="hidden" name="documentUUID" value="{{ .Document.UUID }}"/>
+
+            <div class="govuk-form-group {{ if .Error.Field.documentTextEditor }}govuk-form-group--error{{ end }} govuk-!-margin-bottom-3">
+              <textarea id="documentTextEditor" name="documentTextEditor">{{ filterContent .Document.Content }}</textarea>
+            </div>
+
+              {{ if .UsesNotify }}
+                <div class="govuk-notification-banner govuk-!-margin-bottom-3" role="region" aria-labelledby="notify-warning" data-module="govuk-notification-banner">
+                  <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title" id="notify-warning">
+                      Warning
+                    </h2>
+                  </div>
+                  <div class="govuk-notification-banner__content">
+                    When you publish this letter it will automatically be sent via GOV.UK Notify
+                  </div>
+                </div>
+              {{ end }}
+
+            <div class="govuk-button-group">
+              <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="save">Save draft</button>
+              <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="saveAndExit" id="saveAndExit">Save and exit</button>
+              <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="delete">Delete draft</button>
+              <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="preview">Preview draft</button>
+              <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit" value="publish">{{ if .UsesNotify }}Publish and Send{{ else }}Publish draft{{ end }}</button>
+            </div>
+            <div class="govuk-body">
+              <a class="govuk-link govuk-link--no-visited-state"
+                 href=""
+                 hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId (ToLower .Case.CaseType) .Case.UID) }}"
+                 hx-target=".action-panel__content"
+              >Cancel</a>
+            </div>
+          </form>
+        {{ end }}
+    </div>
+  </div>
+</div>
+{{ end }}
