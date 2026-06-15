@@ -15,13 +15,14 @@ type donorData struct {
 	XSRFToken  string
 	Success    bool
 	Error      sirius.ValidationError
+	DonorId    int
 	Donor      sirius.Person
 	IsNew      bool
 	CaseUids   string
 	EntityType string
 }
 
-func CreateDonor(client CreateDonorClient, tmpl template.Template) Handler {
+func CreateDonor(client CreateDonorClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -29,6 +30,9 @@ func CreateDonor(client CreateDonorClient, tmpl template.Template) Handler {
 			XSRFToken: ctx.XSRFToken,
 			IsNew:     true,
 		}
+
+		donorId, _ := strToIntOrStatusError(r.FormValue("id"))
+		data.DonorId = donorId
 
 		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
 
@@ -75,6 +79,10 @@ func CreateDonor(client CreateDonorClient, tmpl template.Template) Handler {
 				data.Success = true
 				data.Donor = createdDonor
 			}
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
