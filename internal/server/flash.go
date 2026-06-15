@@ -61,11 +61,14 @@ func GetFlash(w http.ResponseWriter, r *http.Request) (FlashNotification, error)
 		return FlashNotification{}, err
 	}
 
-	dc := &http.Cookie{Name: flashCookieName, MaxAge: -1, Expires: time.Unix(1, 0), Path: "/"}
-
-	if secureCookies {
-		dc.SameSite = http.SameSiteLaxMode
-		dc.Secure = true
+	dc := &http.Cookie{
+		Name:     flashCookieName,
+		MaxAge:   -1,
+		Expires:  time.Unix(1, 0),
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   secureCookies,
+		SameSite: http.SameSiteLaxMode,
 	}
 
 	http.SetCookie(w, dc)
