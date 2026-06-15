@@ -3,40 +3,42 @@
     <div class="app-person-info__people">
       <table class="govuk-table govuk-!-margin-bottom-0">
         <tbody class="govuk-table__body">
-          {{ template "person-row" personInfoRow "Donor" .Case.Donor .CaseID .SelectedID 0 false }}
+          {{ template "person-row" personInfoRow "Donor" .Case.Donor .CaseID .SelectedID 0 false false }}
 
           {{ if gt (len .Case.Attorneys) 0 }}
             {{ range $index, $attorney := .Case.Attorneys }}
-              {{ template "person-row" personInfoRow "Attorney" $attorney.Person $.CaseID $.SelectedID (plusN $index 1) $attorney.SystemStatus}}
+              {{ $isApplicant := contains $.ApplicantIds (printf "%d" $attorney.ID) }}
+              {{ template "person-row" personInfoRow "Attorney" $attorney.Person $.CaseID $.SelectedID (plusN $index 1) $isApplicant $attorney.SystemStatus}}
             {{ end }}
           {{ end }}
 
           {{ if gt (len .Case.ReplacementAttorneys) 0 }}
             {{ range $index, $replacementAttorney := .Case.ReplacementAttorneys }}
-              {{ template "person-row" personInfoRow "Replacement Attorney" $replacementAttorney.Person $.CaseID $.SelectedID (plusN $index 1) $replacementAttorney.SystemStatus }}
+              {{ template "person-row" personInfoRow "Replacement Attorney" $replacementAttorney.Person $.CaseID $.SelectedID (plusN $index 1) false $replacementAttorney.SystemStatus }}
             {{ end }}
           {{ end }}
 
           {{ if gt (len .Case.TrustCorporations) 0 }}
             {{ range $index, $trustCorporation := .Case.TrustCorporations }}
-              {{ template "person-row" personInfoRow "Trust Corporation" $trustCorporation.Person $.CaseID $.SelectedID (plusN $index 1) $trustCorporation.SystemStatus }}
+              {{ $isApplicant := contains $.ApplicantIds (printf "%d" $trustCorporation.ID) }}
+              {{ template "person-row" personInfoRow "Trust Corporation" $trustCorporation.Person $.CaseID $.SelectedID (plusN $index 1) $isApplicant $trustCorporation.SystemStatus }}
             {{ end }}
           {{ end }}
 
           {{ if gt (len .Case.CertificateProviders) 0 }}
             {{ range $index, $certificateProvider := .Case.CertificateProviders }}
-              {{ template "person-row" personInfoRow "Certified Provider" $certificateProvider $.CaseID $.SelectedID (plusN $index 1) false }}
+              {{ template "person-row" personInfoRow "Certified Provider" $certificateProvider $.CaseID $.SelectedID (plusN $index 1) false false }}
             {{ end }}
           {{ end }}
 
           {{ if gt (len .Case.NotifiedPersons) 0 }}
             {{ range $index, $notifiedPerson := .Case.NotifiedPersons }}
-                {{ template "person-row" personInfoRow "Notified Person" $notifiedPerson $.CaseID $.SelectedID (plusN $index 1) false }}
+                {{ template "person-row" personInfoRow "Notified Person" $notifiedPerson $.CaseID $.SelectedID (plusN $index 1) false false }}
             {{ end }}
           {{ end }}
 
           {{ if .Case.Correspondent }}
-              {{ template "person-row" personInfoRow "Correspondent" .Case.Correspondent.Person .CaseID .SelectedID 0 false }}
+              {{ template "person-row" personInfoRow "Correspondent" .Case.Correspondent.Person .CaseID .SelectedID 0 false false }}
           {{ end }}
         </tbody>
       </table>
@@ -119,12 +121,17 @@
     <th class="govuk-table__header" scope="row">{{ .Label }}{{ if ne .Index 0}} {{ .Index }}{{ end }}:</th>
     <td class="govuk-table__cell">{{ with .Person }}{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}{{ if .CompanyName }} {{ .CompanyName }}{{ end }}{{ end }}</td>
     <td class="govuk-table__cell">
+      <div class="app-person-info__icons">
         {{ if .SystemStatus }}
           <svg aria-labelledby="is-active-text" class="app-person-info__icon">
             <title id="is-active-text">Is active</title>
             <use href="{{ prefixSVG "icon-confirm" }}" />
           </svg>
         {{ end }}
+        {{ if .IsApplicant }}
+          <span class="app-person-info__applicant"><abbr title="Applicant">A</abbr></span>
+        {{ end }}
+      </div>
     </td>
   </tr>
 {{ end }}

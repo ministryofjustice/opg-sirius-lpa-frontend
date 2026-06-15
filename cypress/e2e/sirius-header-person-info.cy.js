@@ -47,6 +47,7 @@ describe("Person info panel on the header bar", () => {
           middlenames: "J",
           surname: "Name",
         },
+        applicants: [{ id: 2 }],
       },
     });
 
@@ -74,5 +75,6 @@ describe("Person info panel on the header bar", () => {
     cy.contains("072345678");
     cy.contains("Email:");
     cy.contains("m.vancolkenburg@ca.test");
+    cy.get("abbr").should("exist");
   });
 });

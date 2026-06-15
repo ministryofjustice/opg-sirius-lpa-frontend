@@ -867,7 +867,7 @@ func TestHeaderBarButton(t *testing.T) {
 
 func TestPersonInfoRow(t *testing.T) {
 	fns := All("", "", "")
-	fn := fns["personInfoRow"].(func(string, sirius.Person, int, int, int, bool) personInfoRowData)
+	fn := fns["personInfoRow"].(func(string, sirius.Person, int, int, int, bool, bool) personInfoRowData)
 
 	expected := personInfoRowData{
 		Label:        "Name",
@@ -876,8 +876,9 @@ func TestPersonInfoRow(t *testing.T) {
 		SelectedID:   456,
 		Index:        1,
 		SystemStatus: true,
+		IsApplicant:  true,
 	}
 
-	val := fn("Name", sirius.Person{}, 123, 456, 1, true)
+	val := fn("Name", sirius.Person{}, 123, 456, 1, true, true)
 	assert.Equal(t, expected, val)
 }

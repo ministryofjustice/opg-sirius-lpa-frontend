@@ -134,6 +134,7 @@ func TestGetSiriusHeaderPersonInfoGetSelectedPerson(t *testing.T) {
 		CertificateProviders: []sirius.Person{{ID: 5}},
 		NotifiedPersons:      []sirius.Person{{ID: 6}},
 		Correspondent:        &sirius.Correspondent{Person: sirius.Person{ID: 7}},
+		Applicants:           []sirius.Person{{ID: 2}, {ID: 4}},
 	}
 
 	testCases := []struct {
@@ -194,6 +195,7 @@ func TestGetSiriusHeaderPersonInfoGetSelectedPerson(t *testing.T) {
 					Case:           caseItem,
 					SelectedPerson: tc.SelectedPerson,
 					SelectedID:     selectedIdInt,
+					ApplicantIds:   []string{"2", "4"},
 				}).
 				Return(nil)
 
