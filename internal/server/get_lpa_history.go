@@ -1,9 +1,11 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
 )
@@ -109,6 +111,11 @@ var epaFieldOrder = []string{
 	"withdrawnDate",
 }
 
+type FieldChange struct {
+	OldValue *string
+	NewValue *string
+}
+
 func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		donorId := r.PathValue("donorId")
@@ -143,6 +150,18 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 			if err != nil {
 				return err
 			}
+
+			for i, event := range eventsData.Events {
+				if event.SourceType == shared.LpaEventSourceTypeComplaint {
+					if changes, ok := event.Changes.(map[string]interface{}); ok {
+						if v, ok := changes["title"]; ok {
+							changes["title"] = normaliseChange(v)
+						}
+						eventsData.Events[i].Changes = changes
+					}
+				}
+			}
+
 			data.Events = eventsData.Events
 			data.EventFilterData = eventsData.Metadata.SourceTypes
 			data.TotalEvents = eventsData.Total
@@ -222,6 +241,17 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 				return err
 			}
 
+			for i, event := range eventsData.Events {
+				if event.SourceType == shared.LpaEventSourceTypeComplaint {
+					if changes, ok := event.Changes.(map[string]interface{}); ok {
+						if v, ok := changes["title"]; ok {
+							changes["title"] = normaliseChange(v)
+						}
+						eventsData.Events[i].Changes = changes
+					}
+				}
+			}
+
 			data.TotalFilteredEvents = eventsData.Total
 			data.Events = eventsData.Events
 			data.IsFiltered = true
@@ -229,4 +259,32 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 
 		return tmpl(w, data)
 	}
+}
+
+func normaliseChange(v interface{}) FieldChange {
+	var change FieldChange
+
+	switch val := v.(type) {
+	case []interface{}:
+		if len(val) >= 1 {
+			s := fmt.Sprintf("%v", val[0])
+			change.OldValue = &s
+		}
+		if len(val) >= 2 {
+			s := fmt.Sprintf("%v", val[1])
+			change.NewValue = &s
+		}
+
+	case map[string]interface{}:
+		if newValue, ok := val["1"]; ok {
+			s := fmt.Sprintf("%v", newValue)
+			change.NewValue = &s
+		}
+		if oldValue, ok := val["0"]; ok {
+			s := fmt.Sprintf("%v", oldValue)
+			change.OldValue = &s
+		}
+	}
+
+	return change
 }
