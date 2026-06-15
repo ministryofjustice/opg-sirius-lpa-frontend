@@ -148,8 +148,8 @@ func TestGetContext(t *testing.T) {
 	assert := assert.New(t)
 
 	r, _ := http.NewRequest("GET", "/", nil)
-	r.AddCookie(&http.Cookie{Name: "XSRF-TOKEN", Value: "z3tVRZ00yx4dHz3KWYv3boLWHZ4/RsCsVAKbvo2SBNc%3D"})
-	r.AddCookie(&http.Cookie{Name: "another", Value: "one"})
+	r.AddCookie(&http.Cookie{Name: "XSRF-TOKEN", Value: "z3tVRZ00yx4dHz3KWYv3boLWHZ4/RsCsVAKbvo2SBNc%3D", Secure: true, HttpOnly: true, SameSite: http.SameSiteStrictMode})
+	r.AddCookie(&http.Cookie{Name: "another", Value: "one", Secure: true, HttpOnly: true, SameSite: http.SameSiteStrictMode})
 
 	ctx := getContext(r)
 	assert.Equal(r.Context(), ctx.Context)
@@ -161,8 +161,8 @@ func TestGetContextBadXSRFToken(t *testing.T) {
 	assert := assert.New(t)
 
 	r, _ := http.NewRequest("GET", "/", nil)
-	r.AddCookie(&http.Cookie{Name: "XSRF-TOKEN", Value: "%"})
-	r.AddCookie(&http.Cookie{Name: "another", Value: "one"})
+	r.AddCookie(&http.Cookie{Name: "XSRF-TOKEN", Value: "%", Secure: true, HttpOnly: true, SameSite: http.SameSiteStrictMode})
+	r.AddCookie(&http.Cookie{Name: "another", Value: "one", Secure: true, HttpOnly: true, SameSite: http.SameSiteStrictMode})
 
 	ctx := getContext(r)
 	assert.Equal(r.Context(), ctx.Context)
@@ -174,7 +174,7 @@ func TestGetContextMissingXSRFToken(t *testing.T) {
 	assert := assert.New(t)
 
 	r, _ := http.NewRequest("GET", "/", nil)
-	r.AddCookie(&http.Cookie{Name: "another", Value: "one"})
+	r.AddCookie(&http.Cookie{Name: "another", Value: "one", Secure: true, HttpOnly: true, SameSite: http.SameSiteStrictMode})
 
 	ctx := getContext(r)
 	assert.Equal(r.Context(), ctx.Context)
@@ -203,7 +203,7 @@ func TestXsrfHandlerIncorrectXSRFToken(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/", strings.NewReader("xsrfToken=xZKapp6sHWgRoXHJr5W3cy=="))
 	req.Header.Add("Content-Type", formUrlEncoded)
-	req.AddCookie(&http.Cookie{Name: "XSRF-TOKEN", Value: "cGoJkHDPgQyzRM8TPByxKT=="})
+	req.AddCookie(&http.Cookie{Name: "XSRF-TOKEN", Value: "cGoJkHDPgQyzRM8TPByxKT==", Secure: true, HttpOnly: true, SameSite: http.SameSiteStrictMode})
 
 	respRecorder := httptest.NewRecorder()
 	httpHandler.ServeHTTP(respRecorder, req)
@@ -225,7 +225,7 @@ func TestXsrfHandlerMatchesXSRFToken(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/", strings.NewReader("xsrfToken=HEXyWv4XQyee6TMu7LRsn9=="))
 	req.Header.Add("Content-Type", formUrlEncoded)
-	req.AddCookie(&http.Cookie{Name: "XSRF-TOKEN", Value: "HEXyWv4XQyee6TMu7LRsn9=="})
+	req.AddCookie(&http.Cookie{Name: "XSRF-TOKEN", Value: "HEXyWv4XQyee6TMu7LRsn9==", Secure: true, HttpOnly: true, SameSite: http.SameSiteStrictMode})
 
 	respRecorder := httptest.NewRecorder()
 	httpHandler.ServeHTTP(respRecorder, req)
