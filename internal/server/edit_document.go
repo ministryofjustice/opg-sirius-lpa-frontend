@@ -33,6 +33,7 @@ type editDocumentData struct {
 	SaveAndExit  bool
 	PreviewDraft bool
 	DownloadUUID string
+	DonorId      int
 }
 
 func publishDraftDocument(
@@ -66,7 +67,7 @@ func publishDraftDocument(
 	return nil
 }
 
-func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
+func EditDocument(client EditDocumentClient, tmpl template.Template, tmplHtmx template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -300,6 +301,10 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					break
 				}
 			}
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return tmplHtmx(w, data)
 		}
 
 		return tmpl(w, data)
