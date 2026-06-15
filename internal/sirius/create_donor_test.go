@@ -3,10 +3,11 @@ package sirius
 import (
 	"context"
 	"fmt"
-	"github.com/pact-foundation/pact-go/v2/consumer"
-	"github.com/pact-foundation/pact-go/v2/matchers"
 	"net/http"
 	"testing"
+
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -67,6 +68,7 @@ func TestCreateDonor(t *testing.T) {
 							"middlenames":           "Josefina",
 							"surname":               "Vanvolkenburg",
 							"dob":                   "19/04/1978",
+							"dateOfDeath":           nil,
 							"previousNames":         "Colton Bacman",
 							"otherNames":            "Mel",
 							"addressLine1":          "29737 Andrew Plaza",

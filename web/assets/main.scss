@@ -825,8 +825,6 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
 
 .sirius-header__dropdown-panel > .govuk-width-container {
   max-width: none;
-  margin-left: govuk-spacing(2);
-  margin-right: govuk-spacing(2);
 }
 
 .sirius-header__inner {
@@ -879,6 +877,96 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
 .sirius-header__button-icon {
   width: 24px;
   height: 24px;
+}
+
+.app-person-info__icons {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+
+  & svg {
+    color: govuk-colour("white");
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.app-person-info__container {
+  display: flex;
+  flex-direction: row;
+}
+
+.app-person-info__people {
+  border-right: 1px solid govuk-colour("white");
+  width: 40%;
+
+  & table {
+    color: govuk-colour("white");
+    font-size: 1rem;
+
+    & th,
+    td {
+      padding: 5px;
+      border: 0;
+      height: 30px;
+      font-weight: 400;
+    }
+
+    & td {
+      font-weight: 700;
+    }
+
+    & tr {
+      cursor: pointer;
+
+      &.selected {
+        background-color: $color-sirius-blue;
+      }
+
+      &:hover {
+        background-color: $color-sirius-light-blue;
+      }
+    }
+  }
+}
+
+.app-person-info__details {
+  flex: 1;
+  margin: 0 0 0 5px;
+
+  & .govuk-summary-list {
+    font-size: 1rem;
+    color: govuk-colour("white");
+  }
+
+  & .govuk-summary-list__key {
+    width: 15%;
+    padding-bottom: 0;
+    font-weight: 400;
+  }
+
+  & .govuk-summary-list__value {
+    padding-bottom: 0;
+    font-weight: 700;
+  }
+
+  & a {
+    color: govuk-colour("white");
+    text-decoration: underline;
+  }
+}
+
+.app-person-info__applicant {
+  border: 1px solid #f47737;
+  border-radius: 28px;
+  color: #f47737;
+  display: inline-block;
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-align: center;
+  width: 2rem;
+  height: 1.1rem;
 }
 
 .sirius-header__dropdown-panel {
