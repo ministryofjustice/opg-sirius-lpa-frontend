@@ -72,6 +72,17 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form").contains("Add Complaint");
   });
 
+  it("displays the new task button on the action panel", () => {
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("New task");
+
+    cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
+
+    cy.get("a#action-panel-button-new-task").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Create Task");
+  });
+
   it("displays the create document button on the action panel", () => {
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Create document");
