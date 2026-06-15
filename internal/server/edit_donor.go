@@ -29,6 +29,7 @@ func EditDonor(client EditDonorClient, tmpl template.Template, partialTmpl templ
 		data := donorData{
 			XSRFToken: ctx.XSRFToken,
 			Donor:     donor,
+			DonorId:   id,
 		}
 
 		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
