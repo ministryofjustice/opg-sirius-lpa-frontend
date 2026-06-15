@@ -103,6 +103,7 @@ type ActionPanelButton struct {
 func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string) []ActionPanelButton {
 	warningUrl := fmt.Sprintf("/create-warning?id=%d&entity=person%s", donorId, caseUids)
 	eventUrl := fmt.Sprintf("/create-event?id=%d&entity=person%s", donorId, caseUids)
+	editDonorUrl := fmt.Sprintf("/edit-donor?id=%d&entity=person%s", donorId, caseUids)
 	complaintUrl := ""
 	createDocumentUrl := ""
 	changeStatusUrl := ""
@@ -161,6 +162,12 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			URL:      newTaskUrl,
 			IconName: "aw-new-task",
 			Disabled: len(selectedCases) != 1,
+		},
+		{
+			Label:    "Edit donor",
+			URL:      editDonorUrl,
+			IconName: "aw-edit-person",
+			Disabled: false,
 		},
 	}
 }

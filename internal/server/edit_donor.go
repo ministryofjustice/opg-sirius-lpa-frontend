@@ -12,7 +12,7 @@ type EditDonorClient interface {
 	Person(ctx sirius.Context, personID int) (sirius.Person, error)
 }
 
-func EditDonor(client EditDonorClient, tmpl template.Template) Handler {
+func EditDonor(client EditDonorClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		id, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -29,6 +29,12 @@ func EditDonor(client EditDonorClient, tmpl template.Template) Handler {
 		data := donorData{
 			XSRFToken: ctx.XSRFToken,
 			Donor:     donor,
+		}
+
+		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
+
+		if entityType, err := sirius.ParseEntityType(r.FormValue("entity")); err == nil {
+			data.EntityType = string(entityType)
 		}
 
 		if r.Method == http.MethodPost {
@@ -66,6 +72,10 @@ func EditDonor(client EditDonorClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 			}
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
