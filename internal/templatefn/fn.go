@@ -709,16 +709,18 @@ type personInfoRowData struct {
 	CaseID       int
 	SelectedID   int
 	Index        int
+	IsApplicant  bool
 	SystemStatus bool
 }
 
-func personInfoRow(label string, person sirius.Person, caseID, selectedID, index int, systemStatus bool) personInfoRowData {
+func personInfoRow(label string, person sirius.Person, caseID, selectedID, index int, isApplicant, systemStatus bool) personInfoRowData {
 	return personInfoRowData{
 		Label:        label,
 		Person:       person,
 		CaseID:       caseID,
 		SelectedID:   selectedID,
 		Index:        index,
+		IsApplicant:  isApplicant,
 		SystemStatus: systemStatus,
 	}
 }
