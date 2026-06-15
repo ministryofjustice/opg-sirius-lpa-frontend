@@ -12,11 +12,13 @@ type CreateDonorClient interface {
 }
 
 type donorData struct {
-	XSRFToken string
-	Success   bool
-	Error     sirius.ValidationError
-	Donor     sirius.Person
-	IsNew     bool
+	XSRFToken  string
+	Success    bool
+	Error      sirius.ValidationError
+	Donor      sirius.Person
+	IsNew      bool
+	CaseUids   string
+	EntityType string
 }
 
 func CreateDonor(client CreateDonorClient, tmpl template.Template) Handler {
@@ -26,6 +28,12 @@ func CreateDonor(client CreateDonorClient, tmpl template.Template) Handler {
 		data := donorData{
 			XSRFToken: ctx.XSRFToken,
 			IsNew:     true,
+		}
+
+		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
+
+		if entityType, err := sirius.ParseEntityType(r.FormValue("entity")); err == nil {
+			data.EntityType = string(entityType)
 		}
 
 		if r.Method == http.MethodPost {
