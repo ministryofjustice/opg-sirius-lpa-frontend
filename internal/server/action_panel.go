@@ -84,11 +84,11 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			}
 
 			if len(data.SelectedCases) == 1 {
-				resp, err := client.GetDraftCount(ctx.With(groupCtx), data.SelectedCases[0].CaseType, data.SelectedCases[0].ID)
+				documentDraftCount, err := client.GetDraftCount(ctx.With(groupCtx), strings.ToLower(data.SelectedCases[0].CaseType), data.SelectedCases[0].ID)
 				if err != nil {
 					return err
 				}
-				draftCount = resp.DraftCount
+				draftCount = documentDraftCount.DraftCount
 			}
 			return nil
 		})
