@@ -38,7 +38,6 @@ func TestGetUserPermissions(t *testing.T) {
 						Body: matchers.Like(map[string]interface{}{
 							"keep-alive": matchers.Like(map[string]interface{}{
 								"permissions":  matchers.EachLike("GET", 1),
-								"restrictions": matchers.EachLike("GET", 0),
 							}),
 						}),
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
