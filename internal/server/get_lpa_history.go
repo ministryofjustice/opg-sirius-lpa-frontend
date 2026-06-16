@@ -280,11 +280,6 @@ func normaliseChange(v interface{}) FieldChange {
 			s := fmt.Sprintf("%v", newValue)
 			change.NewValue = &s
 		}
-		oldValue, hasOldValue := val2["0"]
-		if hasOldValue {
-			s := fmt.Sprintf("%v", oldValue)
-			change.OldValue = &s
-		}
 	}
 
 	return change
