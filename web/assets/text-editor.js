@@ -6,7 +6,7 @@ import "hugerte/models/dom";
 
 const textEditor = () => {
   const prefix = document.body.getAttribute("data-prefix");
-  
+
   hugerte.init({
     selector: "#documentTextEditor",
     menubar: false,
