@@ -173,7 +173,7 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form h1").contains("Apply a fee reduction");
     cy.get(".action-panel__form .govuk-link").contains("Cancel").click();
   });
-  
+
   it("displays the create donor button on the action panel", () => {
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Create donor");
