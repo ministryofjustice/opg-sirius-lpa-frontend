@@ -42,9 +42,9 @@ func (m *mockDocumentListClient) GetUserPermissions(ctx sirius.Context) (sirius.
 	return args.Get(0).(sirius.Permissions), args.Error(1)
 }
 
-func (m *mockDocumentListClient) GetDraftCount(ctx sirius.Context, caseType string, caseId int) (int, error) {
+func (m *mockDocumentListClient) GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error) {
 	args := m.Called(ctx, caseType, caseId)
-	return args.Int(0), args.Error(1)
+	return args.Get(0).(sirius.DocumentDraftCount), args.Error(1)
 }
 
 var singleDocumentList = sirius.DocumentList{
@@ -543,7 +543,7 @@ func TestGetDocumentList(t *testing.T) {
 			if len(tc.expectedCases) == 1 {
 				client.
 					On("GetDraftCount", mock.Anything, "LPA", 1).
-					Return(1, nil)
+					Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 			}
 
 			template := &mockTemplate{}
@@ -582,7 +582,7 @@ func TestDocumentListDownloadMultipleSuccess(t *testing.T) {
 		Return(cases, nil)
 	client.
 		On("GetDraftCount", mock.Anything, "LPA", 1).
-		Return(1, nil)
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 
 	downloadResp := &http.Response{
 		StatusCode: http.StatusCreated,
@@ -627,7 +627,7 @@ func TestDocumentListDownloadMultipleError(t *testing.T) {
 		Return((*http.Response)(nil), errExample)
 	client.
 		On("GetDraftCount", mock.Anything, "LPA", 1).
-		Return(1, nil)
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -950,7 +950,7 @@ func TestGetDocumentListWhenGetPersonDocumentsErrors(t *testing.T) {
 		Return(sirius.DocumentList{}, errExample)
 	client.
 		On("GetDraftCount", mock.Anything, "LPA", 1).
-		Return(1, nil)
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -976,7 +976,7 @@ func TestGetDocumentListWhenPersonErrors(t *testing.T) {
 		Return(sirius.Person{}, errExample)
 	client.
 		On("GetDraftCount", mock.Anything, "LPA", 1).
-		Return(1, nil)
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -1005,7 +1005,7 @@ func TestGetDocumentListWhenPermissionsErrors(t *testing.T) {
 		Return(sirius.Permissions{}, errExample)
 	client.
 		On("GetDraftCount", mock.Anything, "LPA", 1).
-		Return(1, nil)
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -1025,7 +1025,7 @@ func TestGetDocumentListWhenGetDraftCountErrors(t *testing.T) {
 		Return(cases, nil)
 	client.
 		On("GetDraftCount", mock.Anything, "LPA", 1).
-		Return(0, errExample)
+		Return(sirius.DocumentDraftCount{}, errExample)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -1054,7 +1054,7 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 		Return(sirius.Permissions{}, nil)
 	client.
 		On("GetDraftCount", mock.Anything, "LPA", 1).
-		Return(1, nil)
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -1249,7 +1249,7 @@ func TestDocumentListSuccessMessage(t *testing.T) {
 				Return(sirius.Permissions{}, nil)
 			client.
 				On("GetDraftCount", mock.Anything, "LPA", 1).
-				Return(1, nil)
+				Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 
 			template := &mockTemplate{}
 			template.

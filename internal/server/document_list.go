@@ -16,7 +16,7 @@ type DocumentListClient interface {
 	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
 	DownloadMultiple(ctx sirius.Context, docIDs []string) (*http.Response, error)
 	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
-	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (int, error)
+	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
 }
 
 type documentPageData struct {
@@ -80,10 +80,11 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 
 		var draftCount int
 		if len(selected) == 1 {
-			draftCount, err = client.GetDraftCount(ctx, selected[0].CaseType, selected[0].ID)
+			resp, err := client.GetDraftCount(ctx, selected[0].CaseType, selected[0].ID)
 			if err != nil {
 				return err
 			}
+			draftCount = resp.DraftCount
 		}
 
 		selectedDocUUIDs := r.Form["document"]
