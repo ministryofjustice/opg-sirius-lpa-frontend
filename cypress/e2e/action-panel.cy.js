@@ -38,6 +38,13 @@ describe("Action Panel", () => {
       body: {},
     });
 
+    cy.addMock("/lpa-api/v1/lpas/34/draft-count", "GET", {
+      status: 200,
+      body: {
+        draftCount: 1,
+      },
+    });
+
     cy.visit("/donor/1/documents?uid[]=7000-1234-1234");
   });
 
@@ -93,6 +100,7 @@ describe("Action Panel", () => {
     cy.get("#actions-content").contains("Create document");
 
     cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
+    cy.addMock("/lpa-api/v1/documents/%s", "GET", { status: 200, body: {} });
     cy.addMock("/lpa-api/v1/templates/lpa", "GET", {
       status: 200,
       body: {
@@ -113,6 +121,48 @@ describe("Action Panel", () => {
     cy.get("a#action-panel-button-create-document").click();
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Select a document template");
+  });
+
+  it("displays the edit document button on the action panel", () => {
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Retrieve draft");
+
+    cy.addMock("/lpa-api/v1/cases/34", "GET", {
+      status: 200,
+      body: {
+        donor: { id: 33 },
+      },
+    });
+    cy.addMock("/lpa-api/v1/lpas/34/documents?type[]=Draft", "GET", {
+      status: 200,
+      body: [
+        {
+          id: 789,
+          uuid: "6789",
+        },
+      ],
+    });
+    cy.addMock("/lpa-api/v1/documents/6789", "GET", { status: 200, body: {} });
+    cy.addMock("/lpa-api/v1/templates/lpa", "GET", {
+      status: 200,
+      body: {
+        DD: {
+          label: "Donor deceased: Blank template",
+          inserts: {
+            all: {
+              DD1: {
+                label: "DD1 - Case complete",
+                order: 0,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    cy.get("a#action-panel-button-retrieve-draft").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Edit draft document");
   });
 
   it("displays the change status button on the action panel", () => {

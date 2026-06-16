@@ -1,5 +1,13 @@
 describe("Edit a document", () => {
   beforeEach(() => {
+    cy.addMock("/lpa-api/v1/cases/800", "GET", {
+      status: 200,
+      body: {
+        id: 800,
+        caseType: "lpa",
+        donor: { id: 33 },
+      },
+    });
     cy.addMock("/lpa-api/v1/lpas/800/documents?type[]=Draft", "GET", {
       status: 200,
       body: [
