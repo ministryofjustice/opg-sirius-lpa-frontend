@@ -347,6 +347,19 @@ describe("View documents", () => {
       status: 200,
       body: {},
     });
+
+    [
+      {id: 34, type: "lpa"},
+      {id: 78, type: "lpa"},
+      {id: 990, type: "epa"}
+    ].forEach((caseItem) => {
+      cy.addMock(`/lpa-api/v1/${caseItem.type}s/${caseItem.id}/draft-count`, "GET", {
+        status: 200,
+        body: {
+          draftCount: 1,
+        },
+      });
+    })
   });
 
   it("on a person", () => {
@@ -936,6 +949,13 @@ describe("sort by dropdown", () => {
       status: 200,
       body: {},
     });
+
+    cy.addMock("/lpa-api/v1/lpas/78/draft-count", "GET", {
+      status: 200,
+      body: {
+        draftCount: 1,
+      },
+    })
   });
 
   it("renders the dropdown with a default placeholder and all expected options", () => {

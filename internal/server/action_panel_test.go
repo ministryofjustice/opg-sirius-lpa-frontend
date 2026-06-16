@@ -117,7 +117,7 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 		On("CasesByDonor", mock.Anything, 123).
 		Return(cases, nil)
 	client.
-		On("GetDraftCount", mock.Anything, "LPA", 1).
+		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 
 	template := &mockTemplate{}
@@ -301,7 +301,7 @@ func TestGetActionPanelWhenGetDraftCountErrors(t *testing.T) {
 		On("CasesByDonor", mock.Anything, 123).
 		Return(cases, nil)
 	client.
-		On("GetDraftCount", mock.Anything, "LPA", 1).
+		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{}, expectedError)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
