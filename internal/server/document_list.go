@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -80,11 +81,11 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 
 		var draftCount int
 		if len(selected) == 1 {
-			resp, err := client.GetDraftCount(ctx, selected[0].CaseType, selected[0].ID)
+			documentDraftCount, err := client.GetDraftCount(ctx, strings.ToLower(selected[0].CaseType), selected[0].ID)
 			if err != nil {
 				return err
 			}
-			draftCount = resp.DraftCount
+			draftCount = documentDraftCount.DraftCount
 		}
 
 		selectedDocUUIDs := r.Form["document"]
