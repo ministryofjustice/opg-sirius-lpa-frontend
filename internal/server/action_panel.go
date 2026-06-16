@@ -13,7 +13,7 @@ import (
 
 type ActionPanelClient interface {
 	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
-	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (int, error)
+	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
 }
 
 type ActionPanelData struct {
@@ -84,10 +84,11 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			}
 
 			if len(data.SelectedCases) == 1 {
-				draftCount, err = client.GetDraftCount(ctx.With(groupCtx), data.SelectedCases[0].CaseType, data.SelectedCases[0].ID)
+				resp, err := client.GetDraftCount(ctx.With(groupCtx), data.SelectedCases[0].CaseType, data.SelectedCases[0].ID)
 				if err != nil {
 					return err
 				}
+				draftCount = resp.DraftCount
 			}
 			return nil
 		})

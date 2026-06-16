@@ -144,11 +144,10 @@ func (c *Client) DownloadMultiple(ctx Context, docIDs []string) (*http.Response,
 	return resp, nil
 }
 
-func (c *Client) GetDraftCount(ctx Context, caseType string, caseId int) (int, error) {
+func (c *Client) GetDraftCount(ctx Context, caseType string, caseId int) (DocumentDraftCount, error) {
 	var count DocumentDraftCount
 
-	caseType = fmt.Sprintf("%ss", strings.ToLower(caseType))
-	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/%s/%d/draft-count", caseType, caseId), &count)
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/%s/%d/draft-count", caseType+"s", caseId), &count)
 
-	return count.DraftCount, err
+	return count, err
 }

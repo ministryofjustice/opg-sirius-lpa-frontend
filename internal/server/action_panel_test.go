@@ -20,9 +20,9 @@ func (m *mockActionPanelClient) CasesByDonor(ctx sirius.Context, id int) ([]siri
 	return args.Get(0).([]sirius.Case), args.Error(1)
 }
 
-func (m *mockActionPanelClient) GetDraftCount(ctx sirius.Context, caseType string, caseId int) (int, error) {
+func (m *mockActionPanelClient) GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error) {
 	args := m.Called(ctx, caseType, caseId)
-	return args.Int(0), args.Error(1)
+	return args.Get(0).(sirius.DocumentDraftCount), args.Error(1)
 }
 
 func TestGetActionPanel(t *testing.T) {
@@ -118,7 +118,7 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 		Return(cases, nil)
 	client.
 		On("GetDraftCount", mock.Anything, "LPA", 1).
-		Return(1, nil)
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -302,7 +302,7 @@ func TestGetActionPanelWhenGetDraftCountErrors(t *testing.T) {
 		Return(cases, nil)
 	client.
 		On("GetDraftCount", mock.Anything, "LPA", 1).
-		Return(0, expectedError)
+		Return(sirius.DocumentDraftCount{}, expectedError)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()
