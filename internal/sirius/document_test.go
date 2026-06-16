@@ -470,6 +470,63 @@ func TestDownloadMultiple(t *testing.T) {
 	}
 }
 
+func TestGetDraftCount(t *testing.T) {
+	t.Parallel()
+
+	pact, err := newPact()
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		name             string
+		setup            func()
+		expectedError    func(int) error
+		expectedResponse DocumentDraftCount
+	}{
+		{
+			name: "OK",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have an lpa with a draft document").
+					UponReceiving("A request to get the draft document count").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodGet,
+						Path:   matchers.String("/lpa-api/v1/lpas/800/draft-count"),
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status:  http.StatusOK,
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+						Body: matchers.Like(map[string]interface{}{
+							"draftCount": matchers.Like(1),
+						}),
+					})
+			},
+			expectedResponse: DocumentDraftCount{DraftCount: 1},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
+
+				documentDraftCount, err := client.GetDraftCount(Context{Context: context.Background()}, "lpa", 800)
+
+				assert.Equal(t, tc.expectedResponse, documentDraftCount)
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(config.Port), err)
+				}
+
+				return nil
+			}))
+		})
+	}
+}
+
 type downloadMultipleErrorClient struct {
 	err error
 }
