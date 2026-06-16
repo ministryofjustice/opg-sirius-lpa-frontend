@@ -40,14 +40,15 @@ func TestGetEditDonor(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, donorData{
-			Donor: person,
+			Donor:   person,
+			DonorId: 123,
 		}).
 		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/edit-donor?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditDonor(client, template.Func)(w, r)
+	err := EditDonor(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -94,6 +95,7 @@ func TestPostEditDonor(t *testing.T) {
 	template.
 		On("Func", mock.Anything, donorData{
 			Donor:   newPerson,
+			DonorId: 123,
 			Success: true,
 		}).
 		Return(nil)
@@ -125,7 +127,7 @@ func TestPostEditDonor(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditDonor(client, template.Func)(w, r)
+	err := EditDonor(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -157,7 +159,7 @@ func TestPostEditDonorWhenAPIFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditDonor(client, template.Func)(w, r)
+	err := EditDonor(client, template.Func, nil)(w, r)
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
@@ -182,6 +184,7 @@ func TestPostEditDonorWhenValidationError(t *testing.T) {
 			Donor: sirius.Person{
 				Firstname: "Rudolph",
 			},
+			DonorId: 123,
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{
 					"surname": {"required": "This field is required"},
@@ -198,7 +201,7 @@ func TestPostEditDonorWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditDonor(client, template.Func)(w, r)
+	err := EditDonor(client, template.Func, nil)(w, r)
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
