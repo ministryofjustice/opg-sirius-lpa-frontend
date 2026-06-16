@@ -38,7 +38,7 @@
           <div class="govuk-body">
             <a class="govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-0"
                href=""
-               hx-get="{{ prefix (printf "/create-document?id=%d&case=%s" .Case.ID .Case.CaseType) }}"
+               hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId (ToLower .Case.CaseType) .Case.UID) }}"
                hx-target=".action-panel__content"
             >Back</a>
             <div class="app-!-float-right">
@@ -88,7 +88,7 @@
           </form>
           <form class="form"
                 method="POST"
-                hx-get="{{ prefix (printf "/edit-document?id=%d&case=%s" .Case.ID (ToLower .Case.CaseType)) }}"
+                hx-post="{{ prefix (printf "/edit-document?id=%d&case=%s" .Case.ID (ToLower .Case.CaseType)) }}"
                 hx-target=".action-panel__content"
                 hx-swap="innerHTML"
           >

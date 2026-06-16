@@ -81,31 +81,29 @@ func EditDocument(client EditDocumentClient, tmpl template.Template, tmplHtmx te
 			return err
 		}
 
-		var documentTemplates []sirius.DocumentTemplateData
 		data := editDocumentData{
 			XSRFToken: ctx.XSRFToken,
 		}
 
+		caseItem, err := client.Case(ctx, caseID)
+		if err != nil {
+			return err
+		}
+		data.Case = caseItem
+		data.DonorId = caseItem.Donor.ID
+
+		if caseType == sirius.CaseTypeDigitalLpa {
+			data.CaseSummary, err = client.CaseSummary(ctx, data.Case.UID)
+			if err != nil {
+				return err
+			}
+		}
+
+		var documentTemplates []sirius.DocumentTemplateData
+
 		switch r.Method {
 		case http.MethodGet:
 			group, groupCtx := errgroup.WithContext(ctx.Context)
-
-			group.Go(func() error {
-				caseItem, err := client.Case(ctx.With(groupCtx), caseID)
-				if err != nil {
-					return err
-				}
-				data.Case = caseItem
-
-				if caseType == sirius.CaseTypeDigitalLpa {
-					data.CaseSummary, err = client.CaseSummary(ctx.With(groupCtx), data.Case.UID)
-					if err != nil {
-						return err
-					}
-				}
-
-				return nil
-			})
 
 			group.Go(func() error {
 				documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID, []string{sirius.TypeDraft}, []string{})

@@ -13,6 +13,7 @@ import (
 
 type ActionPanelClient interface {
 	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
+	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (int, error)
 }
 
 type ActionPanelData struct {
@@ -55,6 +56,7 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
+		var draftCount int
 		group.Go(func() error {
 			if data.DonorID > 0 {
 				cases, err := client.CasesByDonor(ctx.With(groupCtx), data.DonorID)
@@ -80,6 +82,13 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 					data.SelectedCases = cases
 				}
 			}
+
+			if len(data.SelectedCases) == 1 {
+				draftCount, err = client.GetDraftCount(ctx.With(groupCtx), data.SelectedCases[0].CaseType, data.SelectedCases[0].ID)
+				if err != nil {
+					return err
+				}
+			}
 			return nil
 		})
 
@@ -87,7 +96,7 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids, draftCount > 0)
 
 		return tmpl(w, data)
 	}
@@ -100,7 +109,7 @@ type ActionPanelButton struct {
 	Disabled bool
 }
 
-func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string) []ActionPanelButton {
+func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string, hasDrafts bool) []ActionPanelButton {
 	warningUrl := fmt.Sprintf("/create-warning?id=%d&entity=person%s", donorId, caseUids)
 	eventUrl := fmt.Sprintf("/create-event?id=%d&entity=person%s", donorId, caseUids)
 	complaintUrl := ""
@@ -116,10 +125,13 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		warningUrl = fmt.Sprintf("/create-warning?id=%d&entity=%s%s", donorId, caseType, caseUids)
 		complaintUrl = fmt.Sprintf("/add-complaint?id=%d&case=%s", selectedCases[0].ID, caseType)
 		createDocumentUrl = fmt.Sprintf("/create-document?id=%d&case=%s", selectedCases[0].ID, caseType)
-		editDocumentUrl = fmt.Sprintf("/edit-document?id=%d&case=%s", selectedCases[0].ID, caseType)
 		changeStatusUrl = fmt.Sprintf("/change-status?id=%d&case=%s&donorId=%d%s", selectedCases[0].ID, caseType, donorId, caseUids)
 		PaymentsUrl = fmt.Sprintf("/payments/%d", selectedCases[0].ID)
 		newTaskUrl = fmt.Sprintf("/create-task?id=%d&entity=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
+
+		if hasDrafts {
+			editDocumentUrl = fmt.Sprintf("/edit-document?id=%d&case=%s", selectedCases[0].ID, caseType)
+		}
 	}
 
 	return []ActionPanelButton{
@@ -151,7 +163,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			Label:    "Retrieve draft",
 			URL:      editDocumentUrl,
 			IconName: "aw-new-template",
-			Disabled: len(selectedCases) != 1,
+			Disabled: len(selectedCases) != 1 || !hasDrafts,
 		},
 		{
 			Label:    "Change status",
