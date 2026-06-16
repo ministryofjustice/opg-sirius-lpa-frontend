@@ -68,6 +68,8 @@ htmx.on("htmx:afterSwap", (event) => {
     handleCreateDocumentButton();
     insertSelector(swapDetails.target);
     handleInsertCheckboxes({ scope: swapDetails.target });
+    autoClick(swapDetails.target);
+    textEditor();
 
     // Update the action panel width if swapping in create-document or edit-document content
     if (swapDetails.target.id === "actions-content") {
