@@ -101,6 +101,7 @@ type Client interface {
 	SearchDonorsClient
 	SearchUsersClient
 	SelectOrCreateCorrespondentClient
+	SiriusHeaderPeopleInfoClient
 	TaskClient
 	UnlinkPersonClient
 	UpdateDecisionsClient
@@ -131,7 +132,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"), templates.Get("event-partial.gohtml"))))
 	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning-wrapper.gohtml"), templates.Get("warning-partial-wrapper.gohtml"))))
 	mux.Handle("/action-panel", wrap(ActionPanel(client, templates.Get("action-panel-wrapper.gohtml"))))
-	mux.Handle("/create-task", wrap(Task(client, templates.Get("task.gohtml"))))
+	mux.Handle("/create-task", wrap(Task(client, templates.Get("create-task-wrapper.gohtml"), templates.Get("create-task-partial-wrapper.gohtml"))))
 	mux.Handle("/create-additional-draft-lpa", wrap(CreateAdditionalDraft(client, templates.Get("create_additional_draft.gohtml"))))
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("relationship.gohtml"))))
 	mux.Handle("/create-donor", wrap(CreateDonor(client, templates.Get("donor.gohtml"))))
@@ -195,7 +196,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/compare/{id}/{caseId}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
 	mux.Handle("/sirius-header-calendars", wrap(SiriusHeaderCalendars(templates.Get("sirius-header-partial-calendars.gohtml"))))
 	mux.Handle("/sirius-header-case-info", wrap(SiriusHeaderCaseInfo(templates.Get("sirius-header-partial-case-info.gohtml"))))
-	mux.Handle("/sirius-header-people-info", wrap(SiriusHeaderPeopleInfo(templates.Get("sirius-header-partial-people-info.gohtml"))))
+	mux.Handle("/sirius-header-people-info", wrap(SiriusHeaderPeopleInfo(client, templates.Get("sirius-header-partial-people-info.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))
 	mux.Handle("/assets/{path...}", static)
