@@ -20,6 +20,11 @@ func (m *mockActionPanelClient) CasesByDonor(ctx sirius.Context, id int) ([]siri
 	return args.Get(0).([]sirius.Case), args.Error(1)
 }
 
+func (m *mockActionPanelClient) GetDraftCount(ctx sirius.Context, caseType string, caseId int) (int, error) {
+	args := m.Called(ctx, caseType, caseId)
+	return args.Int(0), args.Error(1)
+}
+
 func TestGetActionPanel(t *testing.T) {
 	cases := []sirius.Case{
 		{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"},
@@ -58,6 +63,12 @@ func TestGetActionPanel(t *testing.T) {
 				},
 				{
 					Label:    "Create document",
+					URL:      "",
+					IconName: "aw-new-template",
+					Disabled: true,
+				},
+				{
+					Label:    "Retrieve draft",
 					URL:      "",
 					IconName: "aw-new-template",
 					Disabled: true,
@@ -105,6 +116,9 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 	client.
 		On("CasesByDonor", mock.Anything, 123).
 		Return(cases, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "LPA", 1).
+		Return(1, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -135,6 +149,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 				{
 					Label:    "Create document",
 					URL:      "/create-document?id=1&case=lpa",
+					IconName: "aw-new-template",
+					Disabled: false,
+				},
+				{
+					Label:    "Retrieve draft",
+					URL:      "/edit-document?id=1&case=lpa",
 					IconName: "aw-new-template",
 					Disabled: false,
 				},
@@ -204,6 +224,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					Disabled: true,
 				},
 				{
+					Label:    "Retrieve draft",
+					URL:      "",
+					IconName: "aw-new-template",
+					Disabled: true,
+				},
+				{
 					Label:    "Change status",
 					URL:      "",
 					IconName: "aw-change-status",
@@ -255,6 +281,30 @@ func TestGetActionPanelWhenCasesByDonorErrors(t *testing.T) {
 		Return([]sirius.Case{}, expectedError)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa", nil)
+	w := httptest.NewRecorder()
+
+	err := ActionPanel(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
+}
+
+func TestGetActionPanelWhenGetDraftCountErrors(t *testing.T) {
+	expectedError := errors.New("get draft count error")
+
+	cases := []sirius.Case{
+		{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"},
+		{ID: 2, UID: "7000-0000-0002", CaseType: "LPA"},
+	}
+
+	client := &mockActionPanelClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 123).
+		Return(cases, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "LPA", 1).
+		Return(0, expectedError)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()
 
 	err := ActionPanel(client, nil)(w, r)
