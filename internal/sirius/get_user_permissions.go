@@ -4,7 +4,6 @@ import "slices"
 
 type PermissionType struct {
 	Permissions  []string `json:"permissions"`
-	Restrictions []string `json:"restrictions"`
 }
 
 type Permissions map[string]PermissionType

@@ -101,7 +101,7 @@ func Event(client EventClient, tmpl template.Template, partialTmpl template.Temp
 		}
 
 		if r.Method == http.MethodPost {
-			if err := r.ParseMultipartForm(64 * Megabyte); err != nil {
+			if err := r.ParseMultipartForm(64 * Megabyte); err != nil { //#nosec G120 -- This value is high to allow large file uploads
 				return err
 			}
 
