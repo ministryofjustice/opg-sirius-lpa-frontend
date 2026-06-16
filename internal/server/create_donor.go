@@ -31,8 +31,7 @@ func CreateDonor(client CreateDonorClient, tmpl template.Template, partialTmpl t
 			IsNew:     true,
 		}
 
-		donorId, _ := strToIntOrStatusError(r.FormValue("id"))
-		if donorId > 0 {
+		if donorId, err := strToIntOrStatusError(r.FormValue("id")); err == nil {
 			data.DonorId = donorId
 		}
 

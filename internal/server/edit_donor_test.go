@@ -56,6 +56,42 @@ func TestGetEditDonor(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestGetEditDonorHtmxRequest(t *testing.T) {
+	person := sirius.Person{
+		Firstname: "Wanda",
+		Surname:   "Bratu",
+	}
+
+	client := &mockEditDonorClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(person, nil)
+
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, donorData{
+			Donor:      person,
+			DonorId:    123,
+			CaseUids:   "&uid[]=7000-1234-1234",
+			EntityType: "person",
+		}).
+		Return(nil)
+
+	template := &mockTemplate{}
+
+	r, _ := http.NewRequest(http.MethodGet, "/edit-donor?id=123&entity=person&uid[]=7000-1234-1234", nil)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := EditDonor(client, template.Func, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	template.AssertNotCalled(t, "Func")
+	mock.AssertExpectationsForObjects(t, client, partialTemplate)
+}
+
 func TestPostEditDonor(t *testing.T) {
 	newPerson := sirius.Person{
 		Salutation:            "Rev",
