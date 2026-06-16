@@ -34,7 +34,7 @@ func TestGetCreateDonor(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/create-donor", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateDonor(client, template.Func)(w, r)
+	err := CreateDonor(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -110,7 +110,7 @@ func TestPostCreateDonor(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateDonor(client, template.Func)(w, r)
+	err := CreateDonor(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -138,7 +138,7 @@ func TestPostCreateDonorWhenAPIFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateDonor(client, template.Func)(w, r)
+	err := CreateDonor(client, template.Func, nil)(w, r)
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
@@ -176,7 +176,7 @@ func TestPostCreateDonorWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateDonor(client, template.Func)(w, r)
+	err := CreateDonor(client, template.Func, nil)(w, r)
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

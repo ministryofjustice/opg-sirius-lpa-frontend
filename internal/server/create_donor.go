@@ -32,7 +32,9 @@ func CreateDonor(client CreateDonorClient, tmpl template.Template, partialTmpl t
 		}
 
 		donorId, _ := strToIntOrStatusError(r.FormValue("id"))
-		data.DonorId = donorId
+		if donorId > 0 {
+			data.DonorId = donorId
+		}
 
 		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
 
