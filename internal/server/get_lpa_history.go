@@ -151,16 +151,7 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 				return err
 			}
 
-			for i, event := range eventsData.Events {
-				if event.SourceType == shared.LpaEventSourceTypeComplaint {
-					if changes, ok := event.Changes.(map[string]interface{}); ok {
-						if v, ok := changes["title"]; ok {
-							changes["title"] = normaliseChange(v)
-						}
-						eventsData.Events[i].Changes = changes
-					}
-				}
-			}
+			normaliseComplaintTitleChanges(eventsData.Events)
 
 			data.Events = eventsData.Events
 			data.EventFilterData = eventsData.Metadata.SourceTypes
@@ -241,16 +232,7 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 				return err
 			}
 
-			for i, event := range eventsData.Events {
-				if event.SourceType == shared.LpaEventSourceTypeComplaint {
-					if changes, ok := event.Changes.(map[string]interface{}); ok {
-						if v, ok := changes["title"]; ok {
-							changes["title"] = normaliseChange(v)
-						}
-						eventsData.Events[i].Changes = changes
-					}
-				}
-			}
+			normaliseComplaintTitleChanges(eventsData.Events)
 
 			data.TotalFilteredEvents = eventsData.Total
 			data.Events = eventsData.Events
@@ -261,11 +243,23 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 	}
 }
 
+func normaliseComplaintTitleChanges(events []sirius.LpaEvent) {
+	for i, event := range events {
+		if event.SourceType == shared.LpaEventSourceTypeComplaint {
+			if changes, ok := event.Changes.(map[string]interface{}); ok {
+				if v, ok := changes["title"]; ok {
+					changes["title"] = normaliseChange(v)
+				}
+				events[i].Changes = changes
+			}
+		}
+	}
+}
+
 func normaliseChange(v interface{}) FieldChange {
 	var change FieldChange
 
-	switch val := v.(type) {
-	case []interface{}:
+	if val, ok := v.([]interface{}); ok {
 		if len(val) >= 1 {
 			s := fmt.Sprintf("%v", val[0])
 			change.OldValue = &s
@@ -274,8 +268,9 @@ func normaliseChange(v interface{}) FieldChange {
 			s := fmt.Sprintf("%v", val[1])
 			change.NewValue = &s
 		}
+	}
 
-	case map[string]interface{}:
+	if val, ok := v.(map[string]interface{}); ok {
 		if newValue, ok := val["1"]; ok {
 			s := fmt.Sprintf("%v", newValue)
 			change.NewValue = &s
