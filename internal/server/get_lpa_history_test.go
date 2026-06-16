@@ -191,58 +191,84 @@ func TestGetLpaHistoryNormalisesComplaintTitleChanges(t *testing.T) {
 	oldTitle := "Old title"
 	newTitle := "New title"
 
-	response := sirius.LpaEventsResponse{
-		Events: []sirius.LpaEvent{
-			{
-				ID:         99,
-				CreatedOn:  "2024-01-01T12:00:00Z",
-				Type:       "UPD",
-				Hash:       "a",
-				SourceType: shared.LpaEventSourceTypeComplaint,
-				OwningCase: sirius.OwningCase{ID: 1, CaseType: "LPA"},
-				Changes:    map[string]interface{}{"title": []interface{}{"Old title", "New title"}},
-			},
-		},
-		Total: 1,
-		Metadata: sirius.EventMetaData{
-			SourceTypes: []sirius.SourceType{{SourceType: shared.LpaEventSourceTypeComplaint, Total: 1}},
-		},
-	}
-
-	expectedEvents := []sirius.LpaEvent{
+	tests := []struct {
+		name           string
+		inputChanges   interface{}
+		expectedChange FieldChange
+	}{
 		{
-			ID:         99,
-			CreatedOn:  "2024-01-01T12:00:00Z",
-			Type:       "UPD",
-			Hash:       "a",
-			SourceType: shared.LpaEventSourceTypeComplaint,
-			OwningCase: sirius.OwningCase{ID: 1, CaseType: "LPA"},
-			Changes:    map[string]interface{}{"title": FieldChange{OldValue: &oldTitle, NewValue: &newTitle}},
+			name:           "Complaint title changes from text to text (slice with two elements)",
+			inputChanges:   map[string]interface{}{"title": []interface{}{"Old title", "New title"}},
+			expectedChange: FieldChange{OldValue: &oldTitle, NewValue: &newTitle},
+		},
+		{
+			name:           "Complaint title changes from null to text (map with new value only)",
+			inputChanges:   map[string]interface{}{"title": map[string]interface{}{"1": "New title"}},
+			expectedChange: FieldChange{OldValue: nil, NewValue: &newTitle},
+		},
+		{
+			name:           "Complaint title changes from text to null (slice with one element only)",
+			inputChanges:   map[string]interface{}{"title": []interface{}{"Old title"}},
+			expectedChange: FieldChange{OldValue: &oldTitle, NewValue: nil},
 		},
 	}
 
-	client := &mockGetLpaHistory{}
-	client.On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).Return([]sirius.RefDataItem(nil), nil)
-	client.On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).Return([]sirius.RefDataItem(nil), nil)
-	client.On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).Return([]sirius.RefDataItem(nil), nil)
-	client.On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).Return([]sirius.RefDataItem(nil), nil)
-	client.On("RefDataByCategory", mock.Anything, sirius.CompensationType).Return([]sirius.RefDataItem(nil), nil)
-	client.On("GetUserDetails", mock.Anything).Return(sirius.User{}, nil)
-	client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, []string{}, "desc").Return(response, nil)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			response := sirius.LpaEventsResponse{
+				Events: []sirius.LpaEvent{
+					{
+						ID:         99,
+						CreatedOn:  "2024-01-01T12:00:00Z",
+						Type:       "UPD",
+						Hash:       "a",
+						SourceType: shared.LpaEventSourceTypeComplaint,
+						OwningCase: sirius.OwningCase{ID: 1, CaseType: "LPA"},
+						Changes:    tc.inputChanges,
+					},
+				},
+				Total: 1,
+				Metadata: sirius.EventMetaData{
+					SourceTypes: []sirius.SourceType{{SourceType: shared.LpaEventSourceTypeComplaint, Total: 1}},
+				},
+			}
 
-	template := &mockTemplate{}
-	template.On("Func", mock.Anything, mock.MatchedBy(func(data getLpaHistory) bool {
-		return assert.Equal(t, expectedEvents, data.Events)
-	})).Return(nil)
+			expectedEvents := []sirius.LpaEvent{
+				{
+					ID:         99,
+					CreatedOn:  "2024-01-01T12:00:00Z",
+					Type:       "UPD",
+					Hash:       "a",
+					SourceType: shared.LpaEventSourceTypeComplaint,
+					OwningCase: sirius.OwningCase{ID: 1, CaseType: "LPA"},
+					Changes:    map[string]interface{}{"title": tc.expectedChange},
+				},
+			}
 
-	server := newMockServer("/lpa-api/v1/persons/{donorId}/events", GetLpaHistory(client, template.Func))
+			client := &mockGetLpaHistory{}
+			client.On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).Return([]sirius.RefDataItem(nil), nil)
+			client.On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).Return([]sirius.RefDataItem(nil), nil)
+			client.On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).Return([]sirius.RefDataItem(nil), nil)
+			client.On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).Return([]sirius.RefDataItem(nil), nil)
+			client.On("RefDataByCategory", mock.Anything, sirius.CompensationType).Return([]sirius.RefDataItem(nil), nil)
+			client.On("GetUserDetails", mock.Anything).Return(sirius.User{}, nil)
+			client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, []string{}, "desc").Return(response, nil)
 
-	req, _ := http.NewRequest(http.MethodGet, "/lpa-api/v1/persons/123/events", nil)
-	resp, err := server.serve(req)
+			template := &mockTemplate{}
+			template.On("Func", mock.Anything, mock.MatchedBy(func(data getLpaHistory) bool {
+				return assert.Equal(t, expectedEvents, data.Events)
+			})).Return(nil)
 
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.Code)
-	mock.AssertExpectationsForObjects(t, client, template)
+			server := newMockServer("/lpa-api/v1/persons/{donorId}/events", GetLpaHistory(client, template.Func))
+
+			req, _ := http.NewRequest(http.MethodGet, "/lpa-api/v1/persons/123/events", nil)
+			resp, err := server.serve(req)
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.Code)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
 }
 
 func TestGetLpaHistoryWhenFailureOnGetUserDetails(t *testing.T) {
