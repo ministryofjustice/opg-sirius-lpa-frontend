@@ -16,6 +16,7 @@ type DocumentListClient interface {
 	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
 	DownloadMultiple(ctx sirius.Context, docIDs []string) (*http.Response, error)
 	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
+	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (int, error)
 }
 
 type documentPageData struct {
@@ -75,6 +76,14 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			}
 		} else {
 			selected = casesOnDonor
+		}
+
+		var draftCount int
+		if len(selected) == 1 {
+			draftCount, err = client.GetDraftCount(ctx, selected[0].CaseType, selected[0].ID)
+			if err != nil {
+				return err
+			}
 		}
 
 		selectedDocUUIDs := r.Form["document"]
@@ -142,7 +151,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 
 		data.CaseUids = buildUIDQueryString(caseUIDs)
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids, draftCount > 0)
 
 		userPermissions, err := client.GetUserPermissions(ctx)
 		if err != nil {
