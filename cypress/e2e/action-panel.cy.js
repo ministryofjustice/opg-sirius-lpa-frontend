@@ -173,4 +173,26 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form h1").contains("Apply a fee reduction");
     cy.get(".action-panel__form .govuk-link").contains("Cancel").click();
   });
+
+  it("displays the create donor button on the action panel", () => {
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Create donor");
+
+    cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
+
+    cy.get("a#action-panel-button-create-donor").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Create Donor");
+  });
+
+  it("displays the edit donor button on the action panel", () => {
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Edit donor");
+
+    cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
+
+    cy.get("a#action-panel-button-edit-donor").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Edit Donor");
+  });
 });

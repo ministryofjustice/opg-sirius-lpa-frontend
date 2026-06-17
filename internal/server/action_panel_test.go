@@ -80,6 +80,18 @@ func TestGetActionPanel(t *testing.T) {
 					IconName: "aw-new-task",
 					Disabled: true,
 				},
+				{
+					Label:    "Create donor",
+					URL:      "/create-donor?id=123&entity=person",
+					IconName: "aw-create-person",
+					Disabled: false,
+				},
+				{
+					Label:    "Edit donor",
+					URL:      "/edit-donor?id=123&entity=person",
+					IconName: "aw-edit-person",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -156,6 +168,18 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					IconName: "aw-new-task",
 					Disabled: false,
 				},
+				{
+					Label:    "Create donor",
+					URL:      "/create-donor?id=123&entity=person&uid[]=7000-0000-0001",
+					IconName: "aw-create-person",
+					Disabled: false,
+				},
+				{
+					Label:    "Edit donor",
+					URL:      "/edit-donor?id=123&entity=person&uid[]=7000-0000-0001",
+					IconName: "aw-edit-person",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -220,6 +244,18 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					URL:      "",
 					IconName: "aw-new-task",
 					Disabled: true,
+				},
+				{
+					Label:    "Create donor",
+					URL:      "/create-donor?id=0&entity=person",
+					IconName: "aw-create-person",
+					Disabled: false,
+				},
+				{
+					Label:    "Edit donor",
+					URL:      "/edit-donor?id=0&entity=person",
+					IconName: "aw-edit-person",
+					Disabled: false,
 				},
 			},
 		}).
