@@ -123,15 +123,6 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   border-bottom: none;
 }
 
-.app-hidden-submit {
-  width: 0;
-  height: 0;
-  margin: 0;
-  padding: 0;
-  outline: none;
-  border: 0;
-}
-
 .app-caseworker-summary {
   background-color: #f2f6fc;
   padding: 2px govuk-spacing(4) 4px govuk-spacing(4); // the 2px top 4px bottom is so that on click/hover of the show/hide button, the box shadow doesnt exceed the height of the case summary when collapsed
