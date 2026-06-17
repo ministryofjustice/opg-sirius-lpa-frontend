@@ -224,6 +224,7 @@ func TestGetDocumentList(t *testing.T) {
 		expectedCases             []sirius.Case
 		caseIDs                   []string
 		caseUids                  string
+		selectedCaseIds           string
 		path                      string
 		actionPanelButtons        []ActionPanelButton
 		hasV1PersonsGetPermission bool
@@ -234,6 +235,7 @@ func TestGetDocumentList(t *testing.T) {
 			documentList:              allDocumentList,
 			expectedMultiple:          true,
 			expectedCases:             cases,
+			selectedCaseIds:           "1+2+3",
 			caseIDs:                   []string(nil),
 			path:                      "/donor/82/documents",
 			hasV1PersonsGetPermission: true,
@@ -307,6 +309,7 @@ func TestGetDocumentList(t *testing.T) {
 			expectedMultiple:          false,
 			expectedCases:             cases[:1],
 			caseIDs:                   []string(nil),
+			selectedCaseIds:           "1",
 			path:                      "/donor/82/documents",
 			hasV1PersonsGetPermission: false,
 			actionPanelButtons: []ActionPanelButton{
@@ -380,6 +383,7 @@ func TestGetDocumentList(t *testing.T) {
 			expectedCases:             []sirius.Case{cases[0]},
 			caseIDs:                   []string{"1"},
 			caseUids:                  "&uid[]=7000-1234-0000",
+			selectedCaseIds:           "1",
 			path:                      "/donor/82/documents?uid[]=7000-1234-0000",
 			hasV1PersonsGetPermission: false,
 			actionPanelButtons: []ActionPanelButton{
@@ -453,6 +457,7 @@ func TestGetDocumentList(t *testing.T) {
 			expectedCases:             []sirius.Case{cases[0], cases[1]},
 			caseIDs:                   []string{"1", "2"},
 			caseUids:                  "&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+			selectedCaseIds:           "1+2",
 			path:                      "/donor/82/documents?uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 			hasV1PersonsGetPermission: false,
 			actionPanelButtons: []ActionPanelButton{
@@ -558,6 +563,7 @@ func TestGetDocumentList(t *testing.T) {
 						CaseUids:                  tc.caseUids,
 						ActionPanelButtons:        tc.actionPanelButtons,
 						HasV1PersonsGetPermission: tc.hasV1PersonsGetPermission,
+						SelectedCaseIds:           tc.selectedCaseIds,
 					},
 				).
 				Return(nil)
@@ -669,6 +675,7 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 		On("Func", mock.Anything,
 			documentPageData{
 				SelectedCases:         cases,
+				SelectedCaseIds:       "1+2",
 				Person:                expectedDonor,
 				DocumentList:          allDocumentList,
 				MultipleCasesSelected: true,
@@ -823,6 +830,7 @@ func TestDocumentListDismissValidation(t *testing.T) {
 		On("Func", mock.Anything,
 			documentPageData{
 				SelectedCases:             expectedCases,
+				SelectedCaseIds:           "1+2",
 				Person:                    expectedDonor,
 				DocumentList:              twoCasesDocumentList,
 				MultipleCasesSelected:     true,
@@ -1061,6 +1069,7 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything,
 			documentPageData{
 				SelectedCases:             cases,
+				SelectedCaseIds:           "1",
 				Person:                    expectedDonor,
 				DocumentList:              singleDocumentList,
 				MultipleCasesSelected:     false,
