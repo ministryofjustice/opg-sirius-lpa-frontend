@@ -14,7 +14,11 @@
                     </h1>
                     <div class="sirius-header__actions">
                         {{ template "header-button" headerBarButton "Documents associated to this case" (prefix (printf "/donor/%d/documents%s" .DonorID .CaseUids)) "icon-office-copy" }}
-                        {{ template "header-dropdown-button" headerBarButton "Case Information" (prefix "/sirius-header-case-info" ) "icon-caseinfo" }}
+                        {{ if and .HasV1PersonsCasesGetPermission (not .MultipleCasesSelected) }}
+                            {{ with index .SelectedCases 0 }}
+                                {{ template "header-dropdown-button" headerBarButton "Case Information" (prefix (printf "/sirius-header-case-info?id=%d" .ID)) "icon-caseinfo" }}
+                            {{ end }}
+                        {{ end }}
                         {{ if and .HasV1PersonsGetPermission (not .MultipleCasesSelected) }}
                             {{ with index .SelectedCases 0 }}
                                 {{ template "header-dropdown-button" headerBarButton "Details on the people involved in this case" (prefix (printf "/sirius-header-people-info?id=%d" .ID)) "icon-caseperson" }}
