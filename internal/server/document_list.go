@@ -21,23 +21,24 @@ type DocumentListClient interface {
 }
 
 type documentPageData struct {
-	XSRFToken                 string
-	Entity                    string
-	Success                   bool
-	SuccessMessage            string
-	DonorID                   int
-	Person                    sirius.Person
-	Error                     sirius.ValidationError
-	DocumentList              sirius.DocumentList
-	Document                  sirius.Document
-	SelectedCases             []sirius.Case
-	MultipleCasesSelected     bool
-	Comparing                 bool
-	CompareURLs               map[string]string
-	CloseURL                  string
-	CaseUids                  string
-	ActionPanelButtons        []ActionPanelButton
-	HasV1PersonsGetPermission bool
+	XSRFToken                      string
+	Entity                         string
+	Success                        bool
+	SuccessMessage                 string
+	DonorID                        int
+	Person                         sirius.Person
+	Error                          sirius.ValidationError
+	DocumentList                   sirius.DocumentList
+	Document                       sirius.Document
+	SelectedCases                  []sirius.Case
+	MultipleCasesSelected          bool
+	Comparing                      bool
+	CompareURLs                    map[string]string
+	CloseURL                       string
+	CaseUids                       string
+	ActionPanelButtons             []ActionPanelButton
+	HasV1PersonsGetPermission      bool
+	HasV1PersonsCasesGetPermission bool
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
@@ -161,6 +162,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 		}
 
 		data.HasV1PersonsGetPermission = userPermissions.Includes("v1-persons", "GET")
+		data.HasV1PersonsCasesGetPermission = userPermissions.Includes("v1-persons-cases", "GET")
 
 		return tmpl(w, data)
 	}
