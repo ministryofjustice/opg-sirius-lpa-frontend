@@ -972,6 +972,28 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   height: 1.1rem;
 }
 
+.app-case-info {
+  & .govuk-summary-list {
+    font-size: 1rem;
+    color: govuk-colour("white");
+  }
+
+  & .govuk-summary-list__key {
+    width: 35%;
+    padding-bottom: govuk-spacing(2);
+    font-weight: 400;
+  }
+
+  & .govuk-summary-list__value {
+    padding-bottom: govuk-spacing(2);
+    font-weight: 700;
+
+    & p {
+      margin: 0;
+    }
+  }
+}
+
 .sirius-header__dropdown-panel {
   @include gradient-blue;
   left: 0;
