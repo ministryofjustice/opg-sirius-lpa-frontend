@@ -7,7 +7,7 @@ import "hugerte/models/dom";
 const textEditor = () => {
   const prefix = document.body.getAttribute("data-prefix");
 
-  hugerte.remove("#documentTextEditor")
+  hugerte.remove("#documentTextEditor");
 
   hugerte.init({
     selector: "#documentTextEditor",
@@ -27,7 +27,7 @@ const textEditor = () => {
     )
       ? "app-!-html-class--dark"
       : "",
-  })
+  });
 };
 
 export default textEditor;
