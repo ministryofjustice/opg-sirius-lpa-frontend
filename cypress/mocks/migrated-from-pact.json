@@ -830,15 +830,6 @@
       }
     },
     {
-      "name": "A request for the MI config",
-      "request": { "method": "GET", "url": "/api/reporting/config" },
-      "response": {
-        "status": 200,
-        "headers": { "Content-Type": "application/json" },
-        "body": "{\"data\":{\"items\":[{\"properties\":{\"reportType\":{\"description\":\"radio\",\"enum\":[{\"description\":\"Number of EPAs received\",\"name\":\"epasReceived\"}],\"type\":\"reportType\"}}}]}}"
-      }
-    },
-    {
       "name": "A request for an MI report",
       "request": {
         "method": "GET",

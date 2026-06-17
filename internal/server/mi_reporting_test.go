@@ -16,13 +16,13 @@ type mockMiReportingClient struct {
 	mock.Mock
 }
 
-func (m *mockMiReportingClient) MiConfig(ctx sirius.Context) (map[string]sirius.MiConfigProperty, error) {
+func (m *mockMiReportingClient) MiConfig(ctx sirius.Context) (sirius.MiConfig, error) {
 	args := m.Called(ctx)
 
-	if v, ok := args.Get(0).(map[string]sirius.MiConfigProperty); ok {
+	if v, ok := args.Get(0).(sirius.MiConfig); ok {
 		return v, args.Error(1)
 	}
-	return nil, args.Error(1)
+	return sirius.MiConfig{}, args.Error(1)
 }
 
 func (m *mockMiReportingClient) MiReport(ctx sirius.Context, form url.Values) (*sirius.MiReportResponse, error) {
@@ -34,18 +34,20 @@ func (m *mockMiReportingClient) MiReport(ctx sirius.Context, form url.Values) (*
 }
 
 func TestGetMiReporting(t *testing.T) {
-	reportTypes := []sirius.MiConfigEnum{
-		{Name: "epaReport", Description: "EPA Report"},
-		{Name: "lpaReport", Description: "LPA Report"},
+	reportTypes := map[string]sirius.MiReportConfig{
+		"epaReport": {
+			Description: "EPA Report",
+		},
+		"lpaReport": {
+			Description: "LPA Report",
+		},
 	}
 
 	client := &mockMiReportingClient{}
 	client.
 		On("MiConfig", mock.Anything).
-		Return(map[string]sirius.MiConfigProperty{
-			"reportType": {
-				Enum: reportTypes,
-			},
+		Return(sirius.MiConfig{
+			Reports: reportTypes,
 		}, nil)
 
 	template := &mockTemplate{}
@@ -67,29 +69,42 @@ func TestGetMiReporting(t *testing.T) {
 }
 
 func TestGetMiReportingWhenReportTypeSelected(t *testing.T) {
-	reportTypes := []sirius.MiConfigEnum{
-		{Name: "epaReport", Description: "EPA Report"},
-		{Name: "lpaReport", Description: "LPA Report"},
+	reportTypes := map[string]sirius.MiReportConfig{
+		"epaReport": {
+			Description: "EPA Report",
+		},
+		"lpaReport": {
+			Description: "LPA Report",
+			Fields: []struct {
+				Name     string `json:"name"`
+				Optional bool   `json:"optional"`
+			}{
+				{Name: "startDate"},
+				{Name: "endDate"},
+			},
+		},
 	}
 
-	dateControl := sirius.MiConfigProperty{
-		Description: "date",
-		DependsOn: sirius.MiConfigDependsOn{
-			ReportType: []sirius.MiConfigReportType{{Name: "lpaReport"}},
-		},
+	dateControl := sirius.MiConfigField{
+		Type:    "date",
+		MaxDate: "today",
 	}
 
 	client := &mockMiReportingClient{}
 	client.
 		On("MiConfig", mock.Anything).
-		Return(map[string]sirius.MiConfigProperty{
-			"reportType": {
-				Enum: reportTypes,
-			},
-			"endDate":   dateControl,
-			"startDate": dateControl,
-			"otherThing": {
-				Description: "date",
+		Return(sirius.MiConfig{
+			Reports: reportTypes,
+			Fields: map[string]sirius.MiConfigField{
+				"startDate": dateControl,
+				"endDate":   dateControl,
+				"applicationType": {
+					Type: "checkbox",
+					Options: []sirius.MiConfigEnum{
+						{Value: "HW", Label: "HW"},
+						{Value: "PFA", Label: "PFA"},
+					},
+				},
 			},
 		}, nil)
 
@@ -101,14 +116,18 @@ func TestGetMiReportingWhenReportTypeSelected(t *testing.T) {
 			ReportName:  "LPA Report",
 			Controls: []namedControl{
 				{
-					Name:       "startDate",
-					Label:      "From",
-					Properties: dateControl,
+					Name:    "startDate",
+					Label:   "From",
+					Type:    "date",
+					MaxDate: "today",
+					Options: nil,
 				},
 				{
-					Name:       "endDate",
-					Label:      "To",
-					Properties: dateControl,
+					Name:    "endDate",
+					Label:   "To",
+					Type:    "date",
+					MaxDate: "today",
+					Options: nil,
 				},
 			},
 		}).
@@ -141,18 +160,20 @@ func TestGetMiReportingWhenConfigErrors(t *testing.T) {
 }
 
 func TestGetMiReportingWhenTemplateErrors(t *testing.T) {
-	reportTypes := []sirius.MiConfigEnum{
-		{Name: "epaReport", Description: "EPA Report"},
-		{Name: "lpaReport", Description: "LPA Report"},
+	reportTypes := map[string]sirius.MiReportConfig{
+		"epaReport": {
+			Description: "EPA Report",
+		},
+		"lpaReport": {
+			Description: "LPA Report",
+		},
 	}
 
 	client := &mockMiReportingClient{}
 	client.
 		On("MiConfig", mock.Anything).
-		Return(map[string]sirius.MiConfigProperty{
-			"reportType": {
-				Enum: reportTypes,
-			},
+		Return(sirius.MiConfig{
+			Reports: reportTypes,
 		}, nil)
 
 	template := &mockTemplate{}

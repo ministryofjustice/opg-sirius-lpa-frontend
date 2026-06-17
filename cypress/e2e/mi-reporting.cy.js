@@ -1,5 +1,10 @@
 describe("MI Reporting", () => {
   beforeEach(() => {
+    cy.addMock("/lpa-api/reporting/config", "GET", {
+      status: 200,
+      body:{"reports":{"epasReceived":{"description":"Number of EPAs received"}}}
+    });
+
     cy.visit("/mi-reporting");
   });
 
