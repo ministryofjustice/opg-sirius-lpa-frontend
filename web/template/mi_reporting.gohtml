@@ -35,24 +35,24 @@
           <input type="hidden" name="reportType" value="{{ .ReportType }}" />
 
           {{ range .Controls }}
-            {{ if eq .Properties.Format "date" }}
+            {{ if eq .Type "date" }}
               <div class="govuk-form-group">
                 <label class="govuk-label" for="f-{{ .Name }}">{{ .Label }}</label>
-                <input class="govuk-input govuk-!-width-one-third" type="date" id="f-{{ .Name }}" name="{{ .Name }}" {{ if eq .Properties.FormatMaximum "today" }}max="{{ today }}"{{ end }} />
+                <input class="govuk-input govuk-!-width-one-third" type="date" id="f-{{ .Name }}" name="{{ .Name }}" {{ if eq .MaxDate "today" }}max="{{ today }}"{{ end }} />
               </div>
             {{ end }}
 
-            {{ if eq .Properties.Description "checkbox" }}
+            {{ if eq .Type "checkbox" }}
               <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
                   <legend class="govuk-fieldset__legend">{{ .Label }}</legend>
                   <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                     {{ $name := .Name }}
-                    {{ range $i, $e := .Properties.Enum }}
+                    {{ range $i, $e := .Options }}
                       <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="{{ $name }}-{{ $i }}" name="{{ $name }}" type="checkbox" value="{{ $e.Name }}">
+                        <input class="govuk-checkboxes__input" id="{{ $name }}-{{ $i }}" name="{{ $name }}" type="checkbox" value="{{ $e.Value }}">
                         <label class="govuk-label govuk-checkboxes__label" for="{{ $name }}-{{ $i }}">
-                          {{ $e.Description }}
+                          {{ $e.Label }}
                         </label>
                       </div>
                     {{ end }}

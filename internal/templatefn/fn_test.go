@@ -396,8 +396,8 @@ func TestOptionsStringSlice(t *testing.T) {
 
 func TestOptionsMiConfigEnumSlice(t *testing.T) {
 	input := []sirius.MiConfigEnum{
-		{Name: "opt1", Description: "Option 1"},
-		{Name: "opt2", Description: "Option 2"},
+		{Value: "opt1", Label: "Option 1"},
+		{Value: "opt2", Label: "Option 2"},
 	}
 	expected := []optionData{
 		{Value: "opt1", Label: "Option 1"},

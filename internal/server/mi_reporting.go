@@ -10,12 +10,12 @@ import (
 )
 
 type MiReportingClient interface {
-	MiConfig(sirius.Context) (map[string]sirius.MiConfigProperty, error)
+	MiConfig(sirius.Context) (sirius.MiConfig, error)
 	MiReport(sirius.Context, url.Values) (*sirius.MiReportResponse, error)
 }
 
 type miReportingData struct {
-	ReportTypes []sirius.MiConfigEnum
+	ReportTypes map[string]sirius.MiReportConfig
 	ReportType  string
 	ReportName  string
 	Controls    []namedControl
@@ -25,9 +25,11 @@ type miReportingData struct {
 }
 
 type namedControl struct {
-	Name       string
-	Label      string
-	Properties sirius.MiConfigProperty
+	Name    string
+	Label   string
+	Type    string
+	MaxDate string
+	Options []sirius.MiConfigEnum
 }
 
 var miLabels = map[string]string{
@@ -58,23 +60,30 @@ func MiReporting(client MiReportingClient, tmpl template.Template) Handler {
 				return err
 			}
 
-			data.ReportTypes = config["reportType"].Enum
+			data.ReportTypes = config.Reports
 			data.ReportType = r.FormValue("reportType")
 
 			if data.ReportType != "" {
-				for _, report := range data.ReportTypes {
-					if report.Name == data.ReportType {
+				for reportType, report := range data.ReportTypes {
+					if reportType == data.ReportType {
 						data.ReportName = report.Description
 						break
 					}
 				}
 
-				for name, properties := range config {
-					for _, reportType := range properties.DependsOn.ReportType {
-						if reportType.Name == data.ReportType {
-							data.Controls = append(data.Controls, namedControl{Name: name, Label: miLabels[name], Properties: properties})
-						}
+				for _, field := range config.Reports[data.ReportType].Fields {
+					properties, ok := config.Fields[field.Name]
+					if !ok {
+						continue
 					}
+
+					data.Controls = append(data.Controls, namedControl{
+						Name:    field.Name,
+						Label:   miLabels[field.Name],
+						Type:    properties.Type,
+						MaxDate: properties.MaxDate,
+						Options: properties.Options,
+					})
 				}
 
 				orderMap := map[string]int{}
