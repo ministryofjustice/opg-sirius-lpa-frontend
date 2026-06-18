@@ -258,6 +258,7 @@ describe("Show correct event content", () => {
         },
         category: ["01", "02"],
         origin: { 1: "CONTACT_CENTRE" },
+        title: { 1: "New title" },
       },
     });
     cy.visit("/donor/1/history");
@@ -272,7 +273,48 @@ describe("Show correct event content", () => {
         "contain.text",
         "Category: Correspondence changed to: OPG Decisions",
       )
-      .should("contain.text", "Origin: Contact centre");
+      .should("contain.text", "Origin: Contact centre")
+      .should("contain.text", "Title: New title");
+  });
+
+  it("can view complaint updated event when title updated", () => {
+    mockEventHistory({
+      sourceType: "Complaint",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\PowerOfAttorney\Complaint\Complaint`,
+        summary: "Test Complaint",
+        severity: "Medium",
+        description: "123",
+      },
+      changeSet: {
+        title: ["Old title", "New title"],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Title: Old title changed to: New title");
+  });
+
+  it("can view complaint updated event when title removed", () => {
+    mockEventHistory({
+      sourceType: "Complaint",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\PowerOfAttorney\Complaint\Complaint`,
+        summary: "Test Complaint",
+        severity: "Medium",
+        description: "123",
+      },
+      changeSet: {
+        title: ["Old title"],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Title: Old title changed to:");
   });
 
   it("can view task created event", () => {
