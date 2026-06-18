@@ -316,6 +316,7 @@ class PDFViewer {
     // Clear existing pages
     this.pagesWrapper.innerHTML = "";
     this.pageCanvases = [];
+    this.pageContainers = [];
 
     try {
       for (let pageNum = 1; pageNum <= this.totalPages; pageNum++) {
@@ -336,6 +337,8 @@ class PDFViewer {
         canvas.height = Math.floor(viewport.height * outputScale);
         canvas.style.width = Math.floor(viewport.width) + "px";
         canvas.style.height = Math.floor(viewport.height) + "px";
+        pageContainer.style.width = canvas.style.width;
+        pageContainer.style.height = canvas.style.height;
 
         const ctx = canvas.getContext("2d");
 
@@ -356,6 +359,7 @@ class PDFViewer {
 
         pageContainer.appendChild(canvas);
         this.pagesWrapper.appendChild(pageContainer);
+        this.pageContainers.push(pageContainer);
         this.pageCanvases.push(canvas);
       }
 
@@ -534,7 +538,11 @@ class PDFViewer {
     const page = await this.pdfDoc.getPage(this.currentPage);
     const viewport = page.getViewport({ scale: 1 });
     const containerWidth = this.canvasContainer.clientWidth - 40; // Account for padding
-    this.scale = containerWidth / viewport.width;
+    if ([90,270].includes(this.rotation)) {
+      this.scale = containerWidth / viewport.height;
+    } else {
+      this.scale = containerWidth / viewport.width;
+    }
     await this.applyZoom();
     // applyZoom already saves compare state
   }
@@ -552,9 +560,21 @@ class PDFViewer {
   }
 
   applyRotation() {
-    // Apply rotation transform to all page canvases
-    this.pageCanvases.forEach((canvas) => {
-      canvas.style.transform = `rotate(${this.rotation}deg)`;
+    // Apply rotation transform to all page canvases.
+    // Apply translation to the canvases and flip the dimensions of the page containers
+    // for canvases that have been rotated 90 degrees clockwise or counterclockwise
+    // to remove the extra space caused by the rotation.
+    this.pageCanvases.forEach((canvas, index) => {
+      const pageContainer = this.pageContainers[index];
+      if ([90, 270].includes(this.rotation)) {
+        canvas.style.transform = `rotate(${this.rotation}deg) translate(${(this.rotation === 90 ? -1 : 1) * ((canvas.height - canvas.width) / 2)}px, 0)`;
+        pageContainer.style.width = canvas.style.height;
+        pageContainer.style.height = canvas.style.width;
+      } else {
+        canvas.style.transform = `rotate(${this.rotation}deg)`;
+        pageContainer.style.width = canvas.style.width;
+        pageContainer.style.height = canvas.style.height;
+      }
     });
   }
 
