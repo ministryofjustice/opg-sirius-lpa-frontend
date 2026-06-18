@@ -538,7 +538,7 @@ class PDFViewer {
     const page = await this.pdfDoc.getPage(this.currentPage);
     const viewport = page.getViewport({ scale: 1 });
     const containerWidth = this.canvasContainer.clientWidth - 40; // Account for padding
-    if ([90,270].includes(this.rotation)) {
+    if ([90, 270].includes(this.rotation)) {
       this.scale = containerWidth / viewport.height;
     } else {
       this.scale = containerWidth / viewport.width;
