@@ -1,15 +1,6 @@
 {{ define "page" }}
   <div class="action-panel__form">
-    {{ template "error-summary" .Error }}
-
-    {{ if .HtmxRedirect }}
-      <span class="govuk-!-display-none"
-              hx-get="{{ prefix .HtmxRedirect }}"
-              hx-target=".action-panel__content"
-              hx-swap="innerHTML"
-              hx-trigger="load"
-      ></span>
-    {{ end }}
+    {{ template "error-summary" .Error }}   
 
     <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
@@ -31,7 +22,7 @@
           {{ end }}
           <a class="govuk-link govuk-link--no-visited-state" 
              ref=""
-             hx-get="{{ prefix .ReturnUrl }}"
+             hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
              hx-target=".action-panel__content"
              hx-swap="innerHTML">Cancel</a>
       </div>
