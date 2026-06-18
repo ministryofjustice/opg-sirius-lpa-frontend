@@ -18,17 +18,20 @@ type AllocateCasesClient interface {
 }
 
 type allocateCasesData struct {
-	XSRFToken string
-	Entities  []string
-	Success   bool
-	Error     sirius.ValidationError
-
+	XSRFToken        string
+	Entities         []string
+	Success          bool
+	Error            sirius.ValidationError
+	CaseID           int
+	DonorID          int
+	EntityType       string
+	CaseUids         string
 	Teams            []sirius.Team
 	AssignTo         string
 	AssigneeUserName string
 }
 
-func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
+func AllocateCases(client AllocateCasesClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
 			return err
@@ -54,7 +57,7 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-		data := allocateCasesData{XSRFToken: ctx.XSRFToken}
+		data := allocateCasesData{XSRFToken: ctx.XSRFToken, CaseID: caseIDs[0]}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
@@ -86,6 +89,9 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
 					ID:       caseID,
 					CaseType: caseitem.CaseType,
 				})
+				if caseitem.Donor != nil {
+					data.DonorID = caseitem.Donor.ID
+				}
 				casesMu.Unlock()
 				return nil
 			})
@@ -93,6 +99,12 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
 
 		if err := group.Wait(); err != nil {
 			return err
+		}
+
+		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
+
+		if entityType, err := sirius.ParseEntityType(r.FormValue("entity")); err == nil {
+			data.EntityType = string(entityType)
 		}
 
 		if r.Method == http.MethodPost {
@@ -131,6 +143,9 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 			}
+		}
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
