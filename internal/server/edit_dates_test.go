@@ -28,7 +28,7 @@ func (m *mockEditDatesClient) EditDates(ctx sirius.Context, caseID int, caseType
 func TestGetEditDates(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa", "htmx"} {
 		t.Run(caseType, func(t *testing.T) {
-			var htmx bool
+			var htmx = false
 			if caseType == "htmx" {
 				caseType = "lpa"
 				htmx = true
@@ -60,7 +60,7 @@ func TestGetEditDates(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			if htmx {
-				w.Header().Set("HX-Request", "true")
+				r.Header.Add("HX-Request", "true")
 			}
 
 			err := EditDates(client, template.Func, template.Func)(w, r)
