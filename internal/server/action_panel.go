@@ -116,6 +116,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	createDonorUrl := fmt.Sprintf("/create-donor?id=%d&entity=person%s", donorId, caseUids)
 	editDonorUrl := fmt.Sprintf("/edit-donor?id=%d&entity=person%s", donorId, caseUids)
 	createEpaUrl := fmt.Sprintf("/create-epa?id=%d", donorId)
+	editEpaUrl := ""
 	complaintUrl := ""
 	createDocumentUrl := ""
 	editDocumentUrl := ""
@@ -126,6 +127,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		selectedCase := selectedCases[0]
 		caseType := strings.ToLower(selectedCase.CaseType)
 
+		editEpaUrl = fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, selectedCases[0].ID)
 		warningUrl = fmt.Sprintf("/create-warning?id=%d&entity=%s%s", donorId, caseType, caseUids)
 		complaintUrl = fmt.Sprintf("/add-complaint?id=%d&case=%s", selectedCases[0].ID, caseType)
 		createDocumentUrl = fmt.Sprintf("/create-document?id=%d&case=%s", selectedCases[0].ID, caseType)
@@ -205,6 +207,12 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			URL:      createEpaUrl,
 			IconName: "aw-create-case",
 			Disabled: false, //TODO: should be something like `len(selectedCases) > 0,` but not currently possible
+		},
+		{
+			Label:    "Edit epa case",
+			URL:      editEpaUrl,
+			IconName: "aw-edit-case",
+			Disabled: len(selectedCases) != 1,
 		},
 	}
 }

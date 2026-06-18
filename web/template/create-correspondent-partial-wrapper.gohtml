@@ -1,0 +1,26 @@
+{{ define "page" }}
+  <div class="action-panel__form">
+    
+    {{ template "error-summary" .Error }}
+
+    <h1 class="govuk-heading-l">{{ .Title }}</h1>
+
+    <form class="form"
+          method="POST"
+          hx-post="{{ prefix (printf "/create-correspondent?id=%d&caseId=%d" .DonorId .CaseId) }}"
+          hx-target=".action-panel__content"
+          hx-swap="innerHTML">
+
+      {{ template "createCorrespondent" . }}
+
+      <div class="govuk-button-group govuk-!-padding-top-5">
+        <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+        <a class="govuk-link govuk-link--no-visited-state" 
+            ref=""
+            hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d" .DonorId .CaseId) }}"
+            hx-target=".action-panel__content"
+            hx-swap="innerHTML">Cancel</a>
+      </div>
+    </form>
+  </div>
+{{ end }}

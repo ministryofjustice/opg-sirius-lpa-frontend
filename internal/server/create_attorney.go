@@ -26,8 +26,6 @@ type createAttorneyData struct {
 	IsEditing            bool
 	Title                string
 	NextAttorneyId       int
-	ReturnUrl            string
-	HtmxRedirect         string
 }
 
 func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partialTmpl template.Template) Handler {
@@ -49,7 +47,6 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partial
 			DonorId:   donorId,
 			CaseId:    caseId,
 			Title:     "Add an attorney",
-			ReturnUrl: fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId),
 		}
 
 		data.RelationshipToDonors, err = client.RefDataByCategory(ctx, sirius.RelationshipToDonorCategory)
@@ -129,25 +126,13 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partial
 			}
 
 			if r.FormValue("add-another") != "" {
-				if r.Header.Get("HX-Request") == "true" {
-					data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d", donorId, caseId)
-					return partialTmpl(w, data)
-				}
 				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d", donorId, caseId))
 			}
 
 			if r.FormValue("next-attorney") != "" {
-				if r.Header.Get("HX-Request") == "true" {
-					data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d&attorneyId=%d", donorId, caseId, data.NextAttorneyId)
-					return partialTmpl(w, data)
-				}
 				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&attorneyId=%d", donorId, caseId, data.NextAttorneyId))
 			}
 
-			if r.Header.Get("HX-Request") == "true" {
-				data.HtmxRedirect = fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId)
-				return partialTmpl(w, data)
-			}
 			return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 
 		}

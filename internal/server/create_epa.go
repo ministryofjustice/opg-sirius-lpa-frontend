@@ -98,6 +98,7 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template, partialTmpl templ
 			} else {
 				epa, err = client.CreateEpa(ctx, donorID, epa)
 				if err == nil {
+					data.Epa = epa
 					data.CaseId = epa.ID
 				}
 			}
