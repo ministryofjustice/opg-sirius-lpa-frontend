@@ -1,0 +1,40 @@
+{{ define "page" }}
+  <div class="action-panel__form">
+    {{ template "error-summary" .Error }}
+
+    {{ if .HtmxRedirect }}
+      <span class="govuk-!-display-none"
+              hx-get="{{ prefix .HtmxRedirect }}"
+              hx-target=".action-panel__content"
+              hx-swap="innerHTML"
+              hx-trigger="load"
+      ></span>
+    {{ end }}
+
+    <h1 class="govuk-heading-l">{{ .Title }}</h1>
+
+    <form class="form"
+          method="POST"
+          hx-post="{{ prefix (printf "/create-attorney?id=%d&caseId=%d" .DonorId .CaseId) }}"
+          hx-target=".action-panel__content"
+          hx-swap="innerHTML">
+
+      {{ template "createAttorney" . }}
+
+      <div class="govuk-button-group govuk-!-padding-top-5">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+          {{ if not .IsEditing }}
+            <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add another attorney" />
+          {{ end }}
+          {{ if ne .NextAttorneyId 0 }}
+            <input class="govuk-button" data-module="govuk-button" type="submit" name="next-attorney" value="Save and edit next attorney" />
+          {{ end }}
+          <a class="govuk-link govuk-link--no-visited-state" 
+             ref=""
+             hx-get="{{ prefix .ReturnUrl }}"
+             hx-target=".action-panel__content"
+             hx-swap="innerHTML">Cancel</a>
+      </div>
+    </form>
+  </div>
+{{ end }}
