@@ -708,6 +708,9 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   .govuk-textarea {
     font-size: 1.03906rem;
   }
+  .govuk-select {
+    height: 2.10527em;
+  }
 }
 
 .action-panel__button {
@@ -1016,4 +1019,8 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
     align-items: stretch;
     margin-bottom: 0;
   }
+}
+
+#documentTextEditor {
+  display: none;
 }
