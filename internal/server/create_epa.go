@@ -27,7 +27,7 @@ type createEpaData struct {
 	CaseId          int
 }
 
-func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
+func CreateEpa(client CreateEpaClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -112,6 +112,10 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 						data.Error.Field["receiptDate"]["receiptDate"] = "Enter or select a receipt date to save and exit"
 					}
 				}
+
+				if r.Header.Get("HX-Request") == "true" {
+					return partialTmpl(w, data)
+				}
 				return tmpl(w, data)
 			} else if err != nil {
 				return err
@@ -136,6 +140,10 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 			}
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

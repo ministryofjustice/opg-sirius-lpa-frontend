@@ -115,6 +115,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	eventUrl := fmt.Sprintf("/create-event?id=%d&entity=person%s", donorId, caseUids)
 	createDonorUrl := fmt.Sprintf("/create-donor?id=%d&entity=person%s", donorId, caseUids)
 	editDonorUrl := fmt.Sprintf("/edit-donor?id=%d&entity=person%s", donorId, caseUids)
+	createEpaUrl := fmt.Sprintf("/create-epa?id=%d", donorId)
 	complaintUrl := ""
 	createDocumentUrl := ""
 	editDocumentUrl := ""
@@ -206,6 +207,12 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			URL:      editDatesUrl,
 			IconName: "calendar-open",
 			Disabled: len(selectedCases) != 1,
+		},
+		{
+			Label:    "Create epa case",
+			URL:      createEpaUrl,
+			IconName: "aw-create-case",
+			Disabled: false, //TODO: should be something like `len(selectedCases) > 0,` but not currently possible
 		},
 	}
 }
