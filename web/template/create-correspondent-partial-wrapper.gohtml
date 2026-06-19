@@ -16,8 +16,8 @@
       <div class="govuk-button-group govuk-!-padding-top-5">
         <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
         <a class="govuk-link govuk-link--no-visited-state" 
-            ref=""
-            hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d" .DonorId .CaseId) }}"
+            href=""
+            hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
             hx-target=".action-panel__content"
             hx-swap="innerHTML">Cancel</a>
       </div>
