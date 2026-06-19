@@ -19,7 +19,7 @@ describe("create an EPA", () => {
 
     cy.get("#f-paymentDate").type("2026-06-19");
 
-    cy.get("button[type=submit]").click();
+    cy.contains("button", "Save and exit").click();
   });
 
   it("updates an existing EPA", () => {
@@ -58,6 +58,6 @@ describe("create an EPA", () => {
     cy.get("#f-paymentDate").should("have.value", "2026-06-19");
     cy.get("#f-paymentDate").type("2026-06-18");
 
-    cy.get("button[type=submit]").click();
+    cy.contains("button", "Save and exit").click();
   });
 });
