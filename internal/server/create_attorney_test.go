@@ -67,11 +67,42 @@ func TestGetCreateAttorney(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateAttorney(client, template.Func)(w, r)
+	err := CreateAttorney(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetCreateAttorneyHtmxRequest(t *testing.T) {
+	client := &mockCreateAttorneyClient{}
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
+		Return(mockRelationshipToDonorCategories, nil)
+
+	template := &mockTemplate{}
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, createAttorneyData{
+			DonorId:              1,
+			CaseId:               2,
+			RelationshipToDonors: mockRelationshipToDonorCategories,
+			Attorney:             sirius.Attorney{SystemStatus: shared.BoolPtr(true)},
+			Title:                "Add an attorney",
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := CreateAttorney(client, template.Func, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	template.AssertNotCalled(t, "Func", mock.Anything, mock.Anything)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
@@ -108,7 +139,7 @@ func TestGetEditAttorney(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&attorneyId=4", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateAttorney(client, template.Func)(w, r)
+	err := CreateAttorney(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -128,7 +159,7 @@ func TestGetCreateAttorneyBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, query, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateAttorney(nil, nil)(w, r)
+			err := CreateAttorney(nil, nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -144,7 +175,7 @@ func TestGetCreateAttorneyWhenRefDataErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateAttorney(client, nil)(w, r)
+	err := CreateAttorney(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -207,7 +238,7 @@ func TestPostCreateAttorney(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateAttorney(client, template.Func)(w, r)
+	err := CreateAttorney(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Equal(t, err, expectedError)
@@ -276,7 +307,7 @@ func TestPostEditAttorney(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateAttorney(client, template.Func)(w, r)
+	err := CreateAttorney(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Equal(t, err, expectedError)
@@ -342,7 +373,7 @@ func TestPostCreateAttorneyAddAnother(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateAttorney(client, template.Func)(w, r)
+	err := CreateAttorney(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Equal(t, err, expectedError)
@@ -421,12 +452,69 @@ func TestPostCreateAttorneyWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateAttorney(client, template.Func)(w, r)
+	err := CreateAttorney(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateAttorneyWhenValidationErrorHtmxRequest(t *testing.T) {
+	expectedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{"field": {"": "problem"}},
+	}
+
+	attorney := sirius.Attorney{
+		Person: sirius.Person{
+			Salutation: "Rev",
+			Firstname:  "Rudolph",
+			Surname:    "Stotesbury",
+		},
+		RelationshipToDonor: "no relation",
+		SystemStatus:        shared.BoolPtr(true),
+	}
+
+	client := &mockCreateAttorneyClient{}
+	client.
+		On("CreateAttorney", mock.Anything, 2, attorney).
+		Return(expectedError).
+		On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
+		Return(mockRelationshipToDonorCategories, nil)
+
+	template := &mockTemplate{}
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, createAttorneyData{
+			Attorney:             attorney,
+			DonorId:              1,
+			CaseId:               2,
+			Error:                expectedError,
+			RelationshipToDonors: mockRelationshipToDonorCategories,
+			Title:                "Add an attorney",
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"salutation":          {"Rev"},
+		"firstname":           {"Rudolph"},
+		"surname":             {"Stotesbury"},
+		"relationshipToDonor": {"no relation"},
+		"isAttorneyActive":    {"true"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := CreateAttorney(client, template.Func, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	template.AssertNotCalled(t, "Func", mock.Anything, mock.Anything)
+	mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
 }
 
 func TestPostCreateAttorneyNextAnother(t *testing.T) {
@@ -488,7 +576,7 @@ func TestPostCreateAttorneyNextAnother(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateAttorney(client, template.Func)(w, r)
+	err := CreateAttorney(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Equal(t, err, expectedRedirect)

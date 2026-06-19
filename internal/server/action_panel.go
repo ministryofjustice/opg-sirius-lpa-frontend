@@ -128,7 +128,6 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		selectedCase := selectedCases[0]
 		caseType := strings.ToLower(selectedCase.CaseType)
 
-		editEpaUrl = fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, selectedCases[0].ID)
 		warningUrl = fmt.Sprintf("/create-warning?id=%d&entity=%s%s", donorId, caseType, caseUids)
 		complaintUrl = fmt.Sprintf("/add-complaint?id=%d&case=%s", selectedCases[0].ID, caseType)
 		createDocumentUrl = fmt.Sprintf("/create-document?id=%d&case=%s", selectedCases[0].ID, caseType)
@@ -136,6 +135,10 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		PaymentsUrl = fmt.Sprintf("/payments/%d", selectedCases[0].ID)
 		newTaskUrl = fmt.Sprintf("/create-task?id=%d&entity=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
 		editDatesUrl = fmt.Sprintf("/edit-dates?id=%d&case=%s", selectedCases[0].ID, caseType)
+
+		if strings.ToLower(selectedCase.CaseType) == "epa" {
+			editEpaUrl = fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, selectedCases[0].ID)
+		}
 
 		if hasDrafts {
 			editDocumentUrl = fmt.Sprintf("/edit-document?id=%d&case=%s", selectedCases[0].ID, caseType)
@@ -214,13 +217,13 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			Label:    "Create epa case",
 			URL:      createEpaUrl,
 			IconName: "aw-create-case",
-			Disabled: false, //TODO: should be something like `len(selectedCases) > 0,` but not currently possible
+			Disabled: caseUids != "",
 		},
 		{
 			Label:    "Edit epa case",
 			URL:      editEpaUrl,
 			IconName: "aw-edit-case",
-			Disabled: len(selectedCases) != 1,
+			Disabled: len(selectedCases) != 1 || strings.ToLower(selectedCases[0].CaseType) != "epa",
 		},
 	}
 }
