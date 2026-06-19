@@ -28,7 +28,7 @@
                   method="POST"
                   hx-post="{{ if .IsUpdate }}{{ prefix (printf "/create-epa?id=%d&caseId=%d" .DonorId .CaseId) }}{{ else }}{{ prefix (printf "/create-epa?id=%d" .DonorId) }}{{ end }}"
                   hx-target=".action-panel__content"
-                  hx-swap="innerHTML">
+                  hx-swap="innerHTML scroll:.action-panel__content:top">
                
                 {{ template "createEpa" . }}
 
@@ -40,7 +40,7 @@
                         href=""
                         hx-get="{{ if .IsUpdate }}{{ prefix (printf "/action-panel?donorId=%d&entity=epa&uid[]=%s" .DonorId .Epa.UID) }}{{ else }}{{ prefix (printf "/action-panel?donorId=%d&entity=person" .DonorId) }}{{ end }}"
                         hx-target=".action-panel__content"
-                        hx-swap="innerHTML">Cancel</a>
+                        hx-swap="innerHTML scroll:.action-panel__content:top">Cancel</a>
                 </div>
             </form>
         {{ end }}

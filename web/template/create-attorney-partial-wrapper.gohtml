@@ -8,7 +8,7 @@
           method="POST"
           hx-post={{if .IsEditing}}"{{ prefix (printf "/create-attorney?id=%d&caseId=%d&attorneyId=%d" .DonorId .CaseId .Attorney.ID) }}"{{else}}"{{ prefix (printf "/create-attorney?id=%d&caseId=%d" .DonorId .CaseId) }}"{{end}}
           hx-target=".action-panel__content"
-          hx-swap="innerHTML">
+          hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">
 
       {{ template "createAttorney" . }}
 
@@ -24,7 +24,7 @@
              href=""
              hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
              hx-target=".action-panel__content"
-             hx-swap="innerHTML">Cancel</a>
+             hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Cancel</a>
       </div>
     </form>
   </div>
