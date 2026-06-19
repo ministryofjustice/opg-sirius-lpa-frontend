@@ -102,7 +102,7 @@ func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
 				ComplainantCategory:  postFormString(r, "complainantCategory"),
 				Origin:               postFormString(r, "origin"),
 				CompensationType:     postFormString(r, "compensationType"),
-				Summary:              postFormString(r, "summary"),
+				Title:                postFormString(r, "title"),
 				Resolution:           postFormString(r, "resolution"),
 				ResolutionInfo:       postFormString(r, "resolutionInfo"),
 				ResolutionDate:       postFormDateString(r, "resolutionDate"),
