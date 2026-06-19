@@ -70,6 +70,7 @@ htmx.on("htmx:afterSwap", (event) => {
     handleInsertCheckboxes({ scope: swapDetails.target });
     autoClick(swapDetails.target);
     textEditor();
+    addressFinder(prefix);
 
     // Update the action panel width if swapping in create-document or edit-document content
     if (swapDetails.target.id === "actions-content") {
