@@ -1,5 +1,4 @@
 {{ define "page" }}
-<div class="sirius-header__dropdown">
-Implement calendars in the header dropdown
+<div class="sirius-header__dropdown" data-module="calendar" data-bank-holidays='{{ .BankHolidaysJSON }}'>
 </div>
 {{ end }}
