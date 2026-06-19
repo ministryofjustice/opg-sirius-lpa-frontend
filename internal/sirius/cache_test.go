@@ -6,11 +6,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func getCountries() []RefDataItem {
-	return []RefDataItem{
-		{
-			Handle: "UK",
-			Label:  "United Kingdom",
+func getCountries() interface{} {
+	return []interface{}{
+		map[string]string{
+			"Handle": "UK",
+			"Label":  "United Kingdom",
 		},
 	}
 }
@@ -18,7 +18,7 @@ func getCountries() []RefDataItem {
 func TestCacheWhenEmpty(t *testing.T) {
 	val, ok := getCached("not set")
 
-	assert.Len(t, val, 0)
+	assert.Nil(t, val)
 	assert.Equal(t, ok, false)
 }
 
@@ -34,6 +34,6 @@ func TestCacheWhenMiss(t *testing.T) {
 	setCached("countries", getCountries())
 	val, ok := getCached("cities")
 
-	assert.Len(t, val, 0)
+	assert.Nil(t, val)
 	assert.Equal(t, ok, false)
 }
