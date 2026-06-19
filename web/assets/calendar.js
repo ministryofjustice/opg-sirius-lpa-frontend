@@ -187,7 +187,7 @@ const renderMonth = (month, year, bankHolidays, index) => {
     month === today.getMonth() && year === today.getFullYear();
 
   const isBankHoliday = (day) => {
-    if (!bankHolidays || !bankHolidays[year]) return false;
+    if (!bankHolidays?.[year]) return false;
 
     const monthStr = String(month + 1).padStart(2, "0");
     const dayStr = String(day).padStart(2, "0");
@@ -200,6 +200,12 @@ const renderMonth = (month, year, bankHolidays, index) => {
       }
     }
     return false;
+  };
+
+  const getDayClass = (isBankHolidayDay, isToday) => {
+    if (isBankHolidayDay) return "default disabled";
+    if (isToday) return "default";
+    return "";
   };
 
   let html = `<opg-calendar>
@@ -233,11 +239,7 @@ const renderMonth = (month, year, bankHolidays, index) => {
     const isToday = isCurrentMonth && day === today.getDate();
     const isLastDay = day === daysInMonth;
     const isBankHolidayDay = isBankHoliday(day);
-    const dayClass = isBankHolidayDay
-      ? "default disabled"
-      : isToday
-        ? "default"
-        : "";
+    const dayClass = getDayClass(isBankHolidayDay, isToday);
     const bankHolidayAttr = isBankHolidayDay ? 'data-bank-holiday="true"' : "";
     html += `<div class="day ${dayClass}" ${isLastDay ? 'data-last-day="true"' : ""} ${bankHolidayAttr}><div class="day-number">${day}</div><div class="event-title"></div></div>`;
     dayCount++;

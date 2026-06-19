@@ -70,3 +70,29 @@ func TestGetSiriusCalendarsWhenBankHolidaysErrors(t *testing.T) {
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
+
+func TestGetSiriusCalendarsWithEmptyBankHolidaysJSON(t *testing.T) {
+	bankHolidays := sirius.BankHolidays{}
+
+	client := &mockSiriusCalendarsClient{}
+	client.
+		On("BankHolidays", mock.Anything).
+		Return(bankHolidays, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, siriusHeaderCalendarData{
+			BankHolidaysJSON: `{}`,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/lpa-api/v1/dates/bank-holidays", nil)
+	w := httptest.NewRecorder()
+
+	err := SiriusHeaderCalendars(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
