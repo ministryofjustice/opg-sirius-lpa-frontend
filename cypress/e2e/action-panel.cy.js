@@ -291,10 +291,6 @@ describe("Action Panel", () => {
       status: 200,
       body: { id: 123 },
     });
-    cy.addMock("/lpa-api/v1/reference-data/relationshipToDonor", "GET", {
-      status: 200,
-      body: [],
-    });
 
     cy.addMock("/lpa-api/v1/cases/123", "GET", {
       status: 200,
