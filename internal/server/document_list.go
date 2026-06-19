@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -16,6 +17,7 @@ type DocumentListClient interface {
 	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
 	DownloadMultiple(ctx sirius.Context, docIDs []string) (*http.Response, error)
 	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
+	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
 }
 
 type documentPageData struct {
@@ -34,6 +36,7 @@ type documentPageData struct {
 	CompareURLs               map[string]string
 	CloseURL                  string
 	CaseUids                  string
+	SelectedCaseIds           string
 	ActionPanelButtons        []ActionPanelButton
 	HasV1PersonsGetPermission bool
 }
@@ -75,6 +78,15 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			}
 		} else {
 			selected = casesOnDonor
+		}
+
+		var draftCount int
+		if len(selected) == 1 {
+			documentDraftCount, err := client.GetDraftCount(ctx, strings.ToLower(selected[0].CaseType), selected[0].ID)
+			if err != nil {
+				return err
+			}
+			draftCount = documentDraftCount.DraftCount
 		}
 
 		selectedDocUUIDs := r.Form["document"]
@@ -140,9 +152,16 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			DonorID:               donorID,
 		}
 
+		for index, selectedCase := range data.SelectedCases {
+			if index != 0 {
+				data.SelectedCaseIds += "+"
+			}
+			data.SelectedCaseIds += strconv.Itoa(selectedCase.ID)
+		}
+
 		data.CaseUids = buildUIDQueryString(caseUIDs)
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids, draftCount > 0)
 
 		userPermissions, err := client.GetUserPermissions(ctx)
 		if err != nil {

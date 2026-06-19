@@ -42,6 +42,11 @@ func (m *mockDocumentListClient) GetUserPermissions(ctx sirius.Context) (sirius.
 	return args.Get(0).(sirius.Permissions), args.Error(1)
 }
 
+func (m *mockDocumentListClient) GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error) {
+	args := m.Called(ctx, caseType, caseId)
+	return args.Get(0).(sirius.DocumentDraftCount), args.Error(1)
+}
+
 var singleDocumentList = sirius.DocumentList{
 	Limit: 999,
 	Pages: sirius.Pages{
@@ -219,6 +224,7 @@ func TestGetDocumentList(t *testing.T) {
 		expectedCases             []sirius.Case
 		caseIDs                   []string
 		caseUids                  string
+		selectedCaseIds           string
 		path                      string
 		actionPanelButtons        []ActionPanelButton
 		hasV1PersonsGetPermission bool
@@ -229,6 +235,7 @@ func TestGetDocumentList(t *testing.T) {
 			documentList:              allDocumentList,
 			expectedMultiple:          true,
 			expectedCases:             cases,
+			selectedCaseIds:           "1+2+3",
 			caseIDs:                   []string(nil),
 			path:                      "/donor/82/documents",
 			hasV1PersonsGetPermission: true,
@@ -253,6 +260,12 @@ func TestGetDocumentList(t *testing.T) {
 				},
 				{
 					Label:    "Create document",
+					URL:      "",
+					IconName: "aw-new-template",
+					Disabled: true,
+				},
+				{
+					Label:    "Retrieve draft",
 					URL:      "",
 					IconName: "aw-new-template",
 					Disabled: true,
@@ -296,6 +309,7 @@ func TestGetDocumentList(t *testing.T) {
 			expectedMultiple:          false,
 			expectedCases:             cases[:1],
 			caseIDs:                   []string(nil),
+			selectedCaseIds:           "1",
 			path:                      "/donor/82/documents",
 			hasV1PersonsGetPermission: false,
 			actionPanelButtons: []ActionPanelButton{
@@ -320,6 +334,12 @@ func TestGetDocumentList(t *testing.T) {
 				{
 					Label:    "Create document",
 					URL:      "/create-document?id=1&case=lpa",
+					IconName: "aw-new-template",
+					Disabled: false,
+				},
+				{
+					Label:    "Retrieve draft",
+					URL:      "/edit-document?id=1&case=lpa",
 					IconName: "aw-new-template",
 					Disabled: false,
 				},
@@ -363,6 +383,7 @@ func TestGetDocumentList(t *testing.T) {
 			expectedCases:             []sirius.Case{cases[0]},
 			caseIDs:                   []string{"1"},
 			caseUids:                  "&uid[]=7000-1234-0000",
+			selectedCaseIds:           "1",
 			path:                      "/donor/82/documents?uid[]=7000-1234-0000",
 			hasV1PersonsGetPermission: false,
 			actionPanelButtons: []ActionPanelButton{
@@ -387,6 +408,12 @@ func TestGetDocumentList(t *testing.T) {
 				{
 					Label:    "Create document",
 					URL:      "/create-document?id=1&case=lpa",
+					IconName: "aw-new-template",
+					Disabled: false,
+				},
+				{
+					Label:    "Retrieve draft",
+					URL:      "/edit-document?id=1&case=lpa",
 					IconName: "aw-new-template",
 					Disabled: false,
 				},
@@ -430,6 +457,7 @@ func TestGetDocumentList(t *testing.T) {
 			expectedCases:             []sirius.Case{cases[0], cases[1]},
 			caseIDs:                   []string{"1", "2"},
 			caseUids:                  "&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+			selectedCaseIds:           "1+2",
 			path:                      "/donor/82/documents?uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 			hasV1PersonsGetPermission: false,
 			actionPanelButtons: []ActionPanelButton{
@@ -453,6 +481,12 @@ func TestGetDocumentList(t *testing.T) {
 				},
 				{
 					Label:    "Create document",
+					URL:      "",
+					IconName: "aw-new-template",
+					Disabled: true,
+				},
+				{
+					Label:    "Retrieve draft",
 					URL:      "",
 					IconName: "aw-new-template",
 					Disabled: true,
@@ -511,6 +545,12 @@ func TestGetDocumentList(t *testing.T) {
 				On("GetUserPermissions", mock.Anything).
 				Return(permissions, nil)
 
+			if len(tc.expectedCases) == 1 {
+				client.
+					On("GetDraftCount", mock.Anything, "lpa", 1).
+					Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+			}
+
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything,
@@ -523,6 +563,7 @@ func TestGetDocumentList(t *testing.T) {
 						CaseUids:                  tc.caseUids,
 						ActionPanelButtons:        tc.actionPanelButtons,
 						HasV1PersonsGetPermission: tc.hasV1PersonsGetPermission,
+						SelectedCaseIds:           tc.selectedCaseIds,
 					},
 				).
 				Return(nil)
@@ -539,12 +580,15 @@ func TestGetDocumentList(t *testing.T) {
 }
 
 func TestDocumentListDownloadMultipleSuccess(t *testing.T) {
-	cases := []sirius.Case{{ID: 1, UID: "7000-1234-0000"}}
+	cases := []sirius.Case{{ID: 1, CaseType: "LPA", UID: "7000-1234-0000"}}
 
 	client := &mockDocumentListClient{}
 	client.
 		On("CasesByDonor", mock.Anything, 82).
 		Return(cases, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 
 	downloadResp := &http.Response{
 		StatusCode: http.StatusCreated,
@@ -578,7 +622,7 @@ func TestDocumentListDownloadMultipleSuccess(t *testing.T) {
 }
 
 func TestDocumentListDownloadMultipleError(t *testing.T) {
-	cases := []sirius.Case{{ID: 1, UID: "7000-1234-0000"}}
+	cases := []sirius.Case{{ID: 1, CaseType: "LPA", UID: "7000-1234-0000"}}
 
 	client := &mockDocumentListClient{}
 	client.
@@ -587,6 +631,9 @@ func TestDocumentListDownloadMultipleError(t *testing.T) {
 	client.
 		On("DownloadMultiple", mock.Anything, []string{"doc-uuid"}).
 		Return((*http.Response)(nil), errExample)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -628,6 +675,7 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 		On("Func", mock.Anything,
 			documentPageData{
 				SelectedCases:         cases,
+				SelectedCaseIds:       "1+2",
 				Person:                expectedDonor,
 				DocumentList:          allDocumentList,
 				MultipleCasesSelected: true,
@@ -657,6 +705,12 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 					},
 					{
 						Label:    "Create document",
+						URL:      "",
+						IconName: "aw-new-template",
+						Disabled: true,
+					},
+					{
+						Label:    "Retrieve draft",
 						URL:      "",
 						IconName: "aw-new-template",
 						Disabled: true,
@@ -776,6 +830,7 @@ func TestDocumentListDismissValidation(t *testing.T) {
 		On("Func", mock.Anything,
 			documentPageData{
 				SelectedCases:             expectedCases,
+				SelectedCaseIds:           "1+2",
 				Person:                    expectedDonor,
 				DocumentList:              twoCasesDocumentList,
 				MultipleCasesSelected:     true,
@@ -803,6 +858,12 @@ func TestDocumentListDismissValidation(t *testing.T) {
 					},
 					{
 						Label:    "Create document",
+						URL:      "",
+						IconName: "aw-new-template",
+						Disabled: true,
+					},
+					{
+						Label:    "Retrieve draft",
 						URL:      "",
 						IconName: "aw-new-template",
 						Disabled: true,
@@ -895,6 +956,9 @@ func TestGetDocumentListWhenGetPersonDocumentsErrors(t *testing.T) {
 	client.
 		On("GetPersonDocuments", mock.Anything, 82, []string(nil)).
 		Return(sirius.DocumentList{}, errExample)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -918,6 +982,9 @@ func TestGetDocumentListWhenPersonErrors(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 82).
 		Return(sirius.Person{}, errExample)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -944,6 +1011,29 @@ func TestGetDocumentListWhenPermissionsErrors(t *testing.T) {
 	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(sirius.Permissions{}, errExample)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+
+	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/donor/82/documents", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestGetDocumentListWhenGetDraftCountErrors(t *testing.T) {
+	cases := []sirius.Case{{ID: 1, CaseType: "LPA", SubType: "PFA", UID: "7000-1234-0000"}}
+
+	client := &mockDocumentListClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 82).
+		Return(cases, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{}, errExample)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -970,12 +1060,16 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(sirius.Permissions{}, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything,
 			documentPageData{
 				SelectedCases:             cases,
+				SelectedCaseIds:           "1",
 				Person:                    expectedDonor,
 				DocumentList:              singleDocumentList,
 				MultipleCasesSelected:     false,
@@ -1003,6 +1097,12 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 					{
 						Label:    "Create document",
 						URL:      "/create-document?id=1&case=lpa",
+						IconName: "aw-new-template",
+						Disabled: false,
+					},
+					{
+						Label:    "Retrieve draft",
+						URL:      "/edit-document?id=1&case=lpa",
 						IconName: "aw-new-template",
 						Disabled: false,
 					},
@@ -1102,7 +1202,7 @@ func TestSuccessMessageFormatter(t *testing.T) {
 }
 
 func TestDocumentListSuccessMessage(t *testing.T) {
-	cases := []sirius.Case{{ID: 1, UID: "7000-1234-0000"}}
+	cases := []sirius.Case{{ID: 1, CaseType: "LPA", UID: "7000-1234-0000"}}
 
 	tests := []struct {
 		name            string
@@ -1156,6 +1256,9 @@ func TestDocumentListSuccessMessage(t *testing.T) {
 			client.
 				On("GetUserPermissions", mock.Anything).
 				Return(sirius.Permissions{}, nil)
+			client.
+				On("GetDraftCount", mock.Anything, "lpa", 1).
+				Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 
 			template := &mockTemplate{}
 			template.

@@ -1,9 +1,11 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
 )
@@ -109,6 +111,11 @@ var epaFieldOrder = []string{
 	"withdrawnDate",
 }
 
+type FieldChange struct {
+	OldValue *string
+	NewValue *string
+}
+
 func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		donorId := r.PathValue("donorId")
@@ -143,6 +150,9 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 			if err != nil {
 				return err
 			}
+
+			normaliseComplaintTitleChanges(eventsData.Events)
+
 			data.Events = eventsData.Events
 			data.EventFilterData = eventsData.Metadata.SourceTypes
 			data.TotalEvents = eventsData.Total
@@ -222,6 +232,8 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 				return err
 			}
 
+			normaliseComplaintTitleChanges(eventsData.Events)
+
 			data.TotalFilteredEvents = eventsData.Total
 			data.Events = eventsData.Events
 			data.IsFiltered = true
@@ -229,4 +241,46 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 
 		return tmpl(w, data)
 	}
+}
+
+func normaliseComplaintTitleChanges(events []sirius.LpaEvent) {
+	for i, event := range events {
+		if event.SourceType == shared.LpaEventSourceTypeComplaint {
+			changes, isMap := event.Changes.(map[string]interface{})
+			if isMap {
+				title, hasTitle := changes["title"]
+				if hasTitle {
+					changes["title"] = normaliseChange(title)
+				}
+				events[i].Changes = changes
+			}
+		}
+	}
+}
+
+func normaliseChange(v interface{}) FieldChange {
+	var change FieldChange
+
+	val, isList := v.([]interface{})
+	if isList {
+		if len(val) >= 1 {
+			s := fmt.Sprintf("%v", val[0])
+			change.OldValue = &s
+		}
+		if len(val) >= 2 {
+			s := fmt.Sprintf("%v", val[1])
+			change.NewValue = &s
+		}
+	}
+
+	val2, isMap := v.(map[string]interface{})
+	if isMap {
+		newValue, hasNewValue := val2["1"]
+		if hasNewValue {
+			s := fmt.Sprintf("%v", newValue)
+			change.NewValue = &s
+		}
+	}
+
+	return change
 }

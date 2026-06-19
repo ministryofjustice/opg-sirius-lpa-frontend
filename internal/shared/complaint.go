@@ -11,6 +11,7 @@ var ComplaintPropertyTranslationMap = map[string]string{
 	"INVESTIGATINGOFFICER": "Investigating officer",
 	"COMPLAINANTNAME":      "Complainant name",
 	"SUMMARY":              "Title",
+	"TITLE":                "Title",
 	"DESCRIPTION":          "Description",
 	"COMPENSATIONAMOUNT":   "Compensation amount",
 	"COMPENSATIONTYPE":     "Compensation type",
