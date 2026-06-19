@@ -36,6 +36,7 @@ type documentPageData struct {
 	CompareURLs               map[string]string
 	CloseURL                  string
 	CaseUids                  string
+	SelectedCaseIds           string
 	ActionPanelButtons        []ActionPanelButton
 	HasV1PersonsGetPermission bool
 }
@@ -149,6 +150,13 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			SuccessMessage:        successMessage,
 			Comparing:             compareView,
 			DonorID:               donorID,
+		}
+
+		for index, selectedCase := range data.SelectedCases {
+			if index != 0 {
+				data.SelectedCaseIds += "+"
+			}
+			data.SelectedCaseIds += strconv.Itoa(selectedCase.ID)
 		}
 
 		data.CaseUids = buildUIDQueryString(caseUIDs)
