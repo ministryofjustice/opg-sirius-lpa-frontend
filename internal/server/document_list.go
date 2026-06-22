@@ -36,6 +36,7 @@ type documentPageData struct {
 	CompareURLs                    map[string]string
 	CloseURL                       string
 	CaseUids                       string
+	SelectedCaseIds                string
 	ActionPanelButtons             []ActionPanelButton
 	HasV1PersonsGetPermission      bool
 	HasV1PersonsCasesGetPermission bool
