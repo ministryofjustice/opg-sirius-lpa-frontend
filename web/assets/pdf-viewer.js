@@ -567,7 +567,9 @@ class PDFViewer {
     this.pageCanvases.forEach((canvas, index) => {
       const pageContainer = this.pageContainers[index];
       if ([90, 270].includes(this.rotation)) {
-        canvas.style.transform = `rotate(${this.rotation}deg) translate(${(this.rotation === 90 ? -1 : 1) * ((canvas.height - canvas.width) / 2)}px, 0)`;
+        const width = Number.parseInt(canvas.style.width, 10);
+        const height = Number.parseInt(canvas.style.height, 10);
+        canvas.style.transform = `rotate(${this.rotation}deg) translate(${(this.rotation === 90 ? -1 : 1) * ((height - width) / 2)}px, 0)`;
         pageContainer.style.width = canvas.style.height;
         pageContainer.style.height = canvas.style.width;
       } else {
