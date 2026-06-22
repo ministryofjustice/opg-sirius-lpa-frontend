@@ -36,6 +36,9 @@
             {{ end }}
 
             <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+            {{ range .CaseIDs }}
+                <input type="hidden" name="id" value="{{ . }}"/>
+            {{ end }}
 
             <div class="govuk-form-group {{ if .Error.Field.assignTo }}govuk-form-group--error{{ end }}">
                 <fieldset class="govuk-fieldset">
