@@ -135,6 +135,18 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		newTaskUrl = fmt.Sprintf("/create-task?id=%d&entity=%s", id, caseType)
 		allocateCasesUrl = fmt.Sprintf("/allocate-cases?id=%d&entity=%s", id, caseType)
 	}
+	if len(selectedCases) > 1 {
+		idQuery := ""
+		caseType := strings.ToLower(selectedCases[0].CaseType)
+		for i, c := range selectedCases {
+			if i == 0 {
+				idQuery += fmt.Sprintf("id=%d", c.ID)
+			} else {
+				idQuery += fmt.Sprintf("&id=%d", c.ID)
+			}
+		}
+		allocateCasesUrl = fmt.Sprintf("/allocate-cases?%s&entity=%s", idQuery, caseType)
+	}
 
 	return []ActionPanelButton{
 		{
