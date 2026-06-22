@@ -159,7 +159,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate_cases.gohtml"))))
 	mux.Handle("/assign-task", wrap(AssignTask(client, templates.Get("assign_task.gohtml"))))
 	mux.Handle("/clear-task", wrap(ClearTask(client, templates.Get("clear_task.gohtml"))))
-	mux.Handle("/mi-reporting", wrap(MiReporting(client, templates.Get("mi_reporting.gohtml"))))
+	mux.Handle("/mi-reporting", wrap(MiReporting(client, templates.Get("mi-reporting.gohtml"), templates.Get("mi-reporting-partial.gohtml"))))
 	mux.Handle("/add-payment", wrap(AddPayment(client, templates.Get("add-payment-wrapper.gohtml"), templates.Get("add-payment-partial-wrapper.gohtml"))))
 	mux.Handle("/delete-payment", wrap(DeletePayment(client, templates.Get("delete-payment-wrapper.gohtml"), templates.Get("delete-payment-partial-wrapper.gohtml"))))
 	mux.Handle("/manage-fees", wrap(AddFeeDecision(client, templates.Get("manage_fees.gohtml"))))
