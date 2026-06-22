@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -81,8 +80,6 @@ func EditDates(client EditDatesClient, tmpl template.Template, partialTmpl templ
 		if caseitem.Donor != nil {
 			data.DonorId = caseitem.Donor.ID
 		}
-
-		fmt.Println("Receipt Date" + caseitem.ReceiptDate)
 
 		if r.Method != http.MethodPost || data.Success {
 			data.Dates = sirius.Dates{
