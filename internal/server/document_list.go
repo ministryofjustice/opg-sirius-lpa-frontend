@@ -155,6 +155,13 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 
 		data.CaseUids = buildUIDQueryString(caseUIDs)
 
+		for index, selectedCase := range data.SelectedCases {
+			if index != 0 {
+				data.SelectedCaseIds += "+"
+			}
+			data.SelectedCaseIds += strconv.Itoa(selectedCase.ID)
+		}
+
 		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids, draftCount > 0)
 
 		userPermissions, err := client.GetUserPermissions(ctx)
