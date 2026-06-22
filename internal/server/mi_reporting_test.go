@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -34,36 +35,45 @@ func (m *mockMiReportingClient) MiReport(ctx sirius.Context, form url.Values) (*
 }
 
 func TestGetMiReporting(t *testing.T) {
-	reportTypes := []sirius.MiConfigEnum{
-		{Name: "epaReport", Description: "EPA Report"},
-		{Name: "lpaReport", Description: "LPA Report"},
+	for _, isHtmx := range []bool{true, false} {
+		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
+			reportTypes := []sirius.MiConfigEnum{
+				{Name: "epaReport", Description: "EPA Report"},
+				{Name: "lpaReport", Description: "LPA Report"},
+			}
+
+			client := &mockMiReportingClient{}
+			client.
+				On("MiConfig", mock.Anything).
+				Return(map[string]sirius.MiConfigProperty{
+					"reportType": {
+						Enum: reportTypes,
+					},
+				}, nil)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, miReportingData{
+					ReportTypes: reportTypes,
+					DonorId:     123,
+				}).
+				Return(nil)
+
+			r, _ := http.NewRequest(http.MethodGet, "/?donorId=123", nil)
+			w := httptest.NewRecorder()
+
+			if isHtmx {
+				r.Header.Add("HX-Request", "true")
+			}
+
+			err := MiReporting(client, template.Func, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
 	}
-
-	client := &mockMiReportingClient{}
-	client.
-		On("MiConfig", mock.Anything).
-		Return(map[string]sirius.MiConfigProperty{
-			"reportType": {
-				Enum: reportTypes,
-			},
-		}, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, miReportingData{
-			ReportTypes: reportTypes,
-		}).
-		Return(nil)
-
-	r, _ := http.NewRequest(http.MethodGet, "/", nil)
-	w := httptest.NewRecorder()
-
-	err := MiReporting(client, template.Func)(w, r)
-	resp := w.Result()
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestGetMiReportingWhenReportTypeSelected(t *testing.T) {
@@ -117,7 +127,7 @@ func TestGetMiReportingWhenReportTypeSelected(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?reportType=lpaReport", nil)
 	w := httptest.NewRecorder()
 
-	err := MiReporting(client, template.Func)(w, r)
+	err := MiReporting(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -134,7 +144,7 @@ func TestGetMiReportingWhenConfigErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
-	err := MiReporting(client, nil)(w, r)
+	err := MiReporting(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -165,7 +175,7 @@ func TestGetMiReportingWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
-	err := MiReporting(client, template.Func)(w, r)
+	err := MiReporting(client, template.Func, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -206,7 +216,7 @@ func TestPostMiReporting(t *testing.T) {
 	_ = r.ParseMultipartForm(32 << 20)
 	w := httptest.NewRecorder()
 
-	err := MiReporting(client, template.Func)(w, r)
+	err := MiReporting(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -225,7 +235,7 @@ func TestPostMiReportingWhenError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := MiReporting(client, nil)(w, r)
+	err := MiReporting(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
