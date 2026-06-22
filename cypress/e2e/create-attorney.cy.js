@@ -16,26 +16,12 @@ const fillInAttorneyDetails = () => {
   cy.get("label[for=f-isAirmailRequired]").click();
   cy.get("#f-phoneNumber").type("072345678");
   cy.get("#f-email").type("m.vancolkenburg@ca.test");
-  cy.wait(500);
   cy.get("#f-relationshipToDonor").select("Other relation");
   cy.get("label[for=f-isAttorneyActive]").click();
 };
 
 describe("Create or Update Attorney", () => {
   beforeEach(() => {
-    cy.addMock("/lpa-api/v1/reference-data/relationshipToDonor", "GET", {
-      status: 200,
-      body: [
-        {
-          handle: "NO RELATION",
-          label: "No relation",
-        },
-        {
-          handle: "OTHER RELATION",
-          label: "Other relation",
-        },
-      ],
-    });
 
     cy.addMock("/lpa-api/v1/epas/2/attorneys", "POST", {
       status: 201,
