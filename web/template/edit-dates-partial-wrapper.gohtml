@@ -15,7 +15,7 @@
     <h1 class="govuk-heading-m">Edit Dates</h1>
 
     <form class="form" method="POST"
-          hx-post="{{ prefix (printf "/edit-dates?id=%d&case=%s" .DonorId .CaseType) }}"
+          hx-post="{{ prefix (printf "/edit-dates?id=%d&case=%s" .CaseId (ToLower .CaseType)) }}"
           hx-target=".action-panel__content"
           hx-swap="innerHTML"
     >

@@ -53,6 +53,7 @@ func TestGetEditDates(t *testing.T) {
 					DonorId:  1,
 					CaseType: caseType,
 					CaseUid:  "700700",
+					CaseId:   123,
 				}).
 				Return(nil)
 
@@ -128,6 +129,7 @@ func TestGetEditDatesWhenTemplateErrors(t *testing.T) {
 			DonorId:  1,
 			CaseType: "PFA",
 			CaseUid:  "700700",
+			CaseId:   123,
 		}).
 		Return(errExample)
 
@@ -179,6 +181,7 @@ func TestPostEditDates(t *testing.T) {
 					DonorId:  1,
 					CaseType: caseType,
 					CaseUid:  "700700",
+					CaseId:   123,
 				}).
 				Return(nil)
 
@@ -265,6 +268,7 @@ func TestPostEditDatesWhenValidationError(t *testing.T) {
 			DonorId:  1,
 			CaseType: "LPA",
 			CaseUid:  "700700",
+			CaseId:   123,
 		}).
 		Return(nil)
 

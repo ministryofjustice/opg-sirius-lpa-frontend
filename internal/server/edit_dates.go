@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -22,6 +23,7 @@ type editDatesData struct {
 	DonorId  int
 	CaseUid  string
 	CaseType string
+	CaseId   int
 }
 
 func EditDates(client EditDatesClient, tmpl template.Template, partialTmpl template.Template) Handler {
@@ -37,7 +39,10 @@ func EditDates(client EditDatesClient, tmpl template.Template, partialTmpl templ
 		}
 
 		ctx := getContext(r)
-		data := editDatesData{XSRFToken: ctx.XSRFToken}
+		data := editDatesData{
+			XSRFToken: ctx.XSRFToken,
+			CaseId:    caseID,
+		}
 
 		if r.Method == http.MethodPost {
 			dates := sirius.Dates{
@@ -76,6 +81,8 @@ func EditDates(client EditDatesClient, tmpl template.Template, partialTmpl templ
 		if caseitem.Donor != nil {
 			data.DonorId = caseitem.Donor.ID
 		}
+
+		fmt.Println("Receipt Date" + caseitem.ReceiptDate)
 
 		if r.Method != http.MethodPost || data.Success {
 			data.Dates = sirius.Dates{
