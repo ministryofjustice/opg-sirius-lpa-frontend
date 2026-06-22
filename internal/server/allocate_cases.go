@@ -23,6 +23,7 @@ type allocateCasesData struct {
 	Success          bool
 	Error            sirius.ValidationError
 	CaseID           int
+	CaseIDs          []int
 	DonorID          int
 	EntityType       string
 	CaseUids         string
@@ -57,7 +58,7 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template, partialTm
 		}
 
 		ctx := getContext(r)
-		data := allocateCasesData{XSRFToken: ctx.XSRFToken, CaseID: caseIDs[0]}
+		data := allocateCasesData{XSRFToken: ctx.XSRFToken, CaseID: caseIDs[0], CaseIDs: caseIDs}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
