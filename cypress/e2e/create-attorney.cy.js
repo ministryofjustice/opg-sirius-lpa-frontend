@@ -16,7 +16,11 @@ const fillInAttorneyDetails = () => {
   cy.get("label[for=f-isAirmailRequired]").click();
   cy.get("#f-phoneNumber").type("072345678");
   cy.get("#f-email").type("m.vancolkenburg@ca.test");
-  cy.get("#f-relationshipToDonor").select("Other relation");
+  cy.task("log", "Relationship to donor options:");
+  cy.get("#f-relationshipToDonor option").each(($option) => {
+    cy.task("log", Cypress.$($option).text());
+  });
+  cy.get("#f-relationshipToDonor").select("OTHER RELATION");
   cy.get("label[for=f-isAttorneyActive]").click();
 };
 
@@ -96,6 +100,10 @@ describe("Create or Update Attorney", () => {
     cy.contains("Update attorney details");
     cy.get("#f-firstname").should("have.value", "Rudolph");
     cy.get("#f-surname").should("have.value", "Stotesbury");
+    cy.task("log", "Relationship to donor options:");
+    cy.get("#f-relationshipToDonor option").each(($option) => {
+      cy.task("log", Cypress.$($option).text());
+    });
     cy.get("#f-relationshipToDonor").should("have.value", "NO RELATION");
     cy.get("input[type=submit][name=add-another]").should("not.exist");
 
