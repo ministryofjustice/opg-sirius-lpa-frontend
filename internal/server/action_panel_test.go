@@ -112,6 +112,12 @@ func TestGetActionPanel(t *testing.T) {
 					IconName: "aw-mi",
 					Disabled: false,
 				},
+				{
+					Label:    "Link record",
+					URL:      "/link-person?id=123",
+					IconName: "aw-link",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -217,6 +223,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					IconName: "aw-mi",
 					Disabled: false,
 				},
+				{
+					Label:    "Link record",
+					URL:      "/link-person?id=123&uid[]=7000-0000-0001",
+					IconName: "aw-link",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -310,6 +322,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					URL:      "/mi-reporting?donorId=0",
 					IconName: "aw-mi",
 					Disabled: false,
+				},
+				{
+					Label:    "Link record",
+					URL:      "/link-person?id=0",
+					IconName: "aw-link",
+					Disabled: true,
 				},
 			},
 		}).
