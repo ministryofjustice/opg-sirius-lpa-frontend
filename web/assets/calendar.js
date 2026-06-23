@@ -20,9 +20,8 @@ const initCalendar = () => {
     }
 
     const now = new Date();
-    const startMonth = now.getMonth() - index; // First calendar shows current month, second shows prev, third shows next
+    const startMonth = now.getMonth(); // First calendar shows current month, second shows prev, third shows next
     const startYear = now.getFullYear();
-
     renderCalendars(container, startMonth, startYear, bankHolidays);
   });
 };
