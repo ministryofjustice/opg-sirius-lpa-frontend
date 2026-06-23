@@ -760,6 +760,10 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   }
 }
 
+#action-panel-button-edit-dates svg {
+  width: 30px;
+}
+
 .app-table__row--half-width {
   width: 50%;
 }

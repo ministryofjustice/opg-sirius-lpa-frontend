@@ -245,4 +245,22 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Edit Donor");
   });
+
+  it("displays the edit dates button on the action panel", () => {
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Edit dates");
+
+    cy.addMock("/lpa-api/v1/cases/34", "GET", {
+      status: 200,
+      body: {
+        uid: "7000-1234-1234",
+        caseType: "LPA",
+        donor: { id: 1 },
+      },
+    });
+
+    cy.get("a#action-panel-button-edit-dates").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Edit Dates");
+  });
 });

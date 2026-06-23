@@ -103,6 +103,12 @@ func TestGetActionPanel(t *testing.T) {
 					IconName: "aw-edit-person",
 					Disabled: false,
 				},
+				{
+					Label:    "Edit dates",
+					URL:      "",
+					IconName: "calendar-open",
+					Disabled: true,
+				},
 			},
 		}).
 		Return(nil)
@@ -200,6 +206,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					IconName: "aw-edit-person",
 					Disabled: false,
 				},
+				{
+					Label:    "Edit dates",
+					URL:      "/edit-dates?id=1&case=lpa",
+					IconName: "calendar-open",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -282,6 +294,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					URL:      "/edit-donor?id=0&entity=person",
 					IconName: "aw-edit-person",
 					Disabled: false,
+				},
+				{
+					Label:    "Edit dates",
+					URL:      "",
+					IconName: "calendar-open",
+					Disabled: true,
 				},
 			},
 		}).

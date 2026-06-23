@@ -18,10 +18,14 @@ type editDatesData struct {
 	Success   bool
 	Error     sirius.ValidationError
 
-	Dates sirius.Dates
+	Dates    sirius.Dates
+	DonorId  int
+	CaseUid  string
+	CaseType string
+	CaseId   int
 }
 
-func EditDates(client EditDatesClient, tmpl template.Template) Handler {
+func EditDates(client EditDatesClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -34,7 +38,10 @@ func EditDates(client EditDatesClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-		data := editDatesData{XSRFToken: ctx.XSRFToken}
+		data := editDatesData{
+			XSRFToken: ctx.XSRFToken,
+			CaseId:    caseID,
+		}
 
 		if r.Method == http.MethodPost {
 			dates := sirius.Dates{
@@ -68,6 +75,12 @@ func EditDates(client EditDatesClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		data.CaseUid = caseitem.UID
+		data.CaseType = caseitem.CaseType
+		if caseitem.Donor != nil {
+			data.DonorId = caseitem.Donor.ID
+		}
+
 		if r.Method != http.MethodPost || data.Success {
 			data.Dates = sirius.Dates{
 				CancellationDate: caseitem.CancellationDate,
@@ -84,6 +97,10 @@ func EditDates(client EditDatesClient, tmpl template.Template) Handler {
 			}
 		}
 		data.Entity = caseitem.Summary()
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
+		}
 
 		return tmpl(w, data)
 	}
