@@ -1,0 +1,38 @@
+{{ template "page" . }}
+
+{{ define "title" }}Link record{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body"><strong>{{ .Entity.Summary }}</strong></p>
+
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        <meta data-app-reload="page" />
+        {{ template "success-banner" "You have successfully linked these records." }}
+      {{ end }}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">Link record</h1>
+
+      <form class="form" method="POST">
+
+        {{ template "link-person" . }}
+
+        <div class="govuk-button-group">
+            {{ if .OtherPerson.ID }}
+              <button class="govuk-button" data-module="app-submit-loading-button" type="submit">
+                Link records
+              </button>
+            {{ else }}
+              <button class="govuk-button" data-module="govuk-button" type="submit">
+                Search
+              </button>
+            {{ end }}
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
