@@ -3,10 +3,11 @@ package sirius
 import (
 	"context"
 	"fmt"
-	"github.com/pact-foundation/pact-go/v2/consumer"
-	"github.com/pact-foundation/pact-go/v2/matchers"
 	"net/http"
 	"testing"
+
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -20,7 +21,7 @@ func TestMiConfig(t *testing.T) {
 	testCases := []struct {
 		name           string
 		setup          func()
-		expectedResult map[string]MiConfigProperty
+		expectedResult MiConfig
 		expectedError  func(int) error
 	}{
 		{
@@ -38,30 +39,49 @@ func TestMiConfig(t *testing.T) {
 						Status:  http.StatusOK,
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 						Body: matchers.Like(map[string]interface{}{
-							"data": matchers.Like(map[string]interface{}{
-								"items": matchers.EachLike(map[string]interface{}{
-									"properties": matchers.Like(map[string]interface{}{
-										"reportType": matchers.Like(map[string]interface{}{
-											"description": matchers.String("radio"),
-											"type":        matchers.String("reportType"),
-											"enum": matchers.EachLike(map[string]interface{}{
-												"name":        matchers.String("epasReceived"),
-												"description": matchers.String("Number of EPAs received"),
-											}, 1),
-										}),
-									}),
-								}, 1),
+							"reports": matchers.Like(map[string]interface{}{
+								"epasReceived": matchers.Like(map[string]interface{}{
+									"class":       matchers.String("EPAReceived"),
+									"description": matchers.String("Number of EPAs received"),
+									"fields": matchers.EachLike(map[string]interface{}{
+										"name": matchers.String("startDate"),
+									}, 1),
+								}),
+							}),
+							"fields": matchers.Like(map[string]interface{}{
+								"startDate": matchers.Like(map[string]interface{}{
+									"type":    matchers.String("date"),
+									"maxDate": matchers.String("today"),
+								}),
+								"applicationType": matchers.Like(map[string]interface{}{
+									"type": matchers.String("checkbox"),
+									"options": matchers.EachLike(map[string]interface{}{
+										"value": matchers.String("HW"),
+										"label": matchers.String("HW"),
+									}, 1),
+								}),
 							}),
 						}),
 					})
 			},
-			expectedResult: map[string]MiConfigProperty{
-				"reportType": {
-					Description: "radio",
-					Type:        "reportType",
-					Enum: []MiConfigEnum{
-						{Name: "epasReceived", Description: "Number of EPAs received"},
+			expectedResult: MiConfig{
+				Reports: map[string]MiReportConfig{
+					"epasReceived": {
+						Class:       "EPAReceived",
+						Description: "Number of EPAs received",
+						Fields: []struct {
+							Name     string `json:"name"`
+							Optional bool   `json:"optional"`
+						}{
+							{Name: "startDate", Optional: false},
+						},
 					},
+				},
+				Fields: map[string]MiConfigField{
+					"startDate": {Type: "date", MaxDate: "today"},
+					"applicationType": {Type: "checkbox", Options: []MiConfigEnum{
+						{Value: "HW", Label: "HW"},
+					}},
 				},
 			},
 		},

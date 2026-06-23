@@ -565,10 +565,18 @@ func options(list interface{}, attrs ...interface{}) []optionData {
 			datas[i] = optionData{Value: item, Label: item}
 		}
 
+	case map[string]sirius.MiReportConfig:
+		datas = make([]optionData, len(v))
+		i := 0
+		for reportId, item := range v {
+			datas[i] = optionData{Value: reportId, Label: item.Description}
+			i++
+		}
+
 	case []sirius.MiConfigEnum:
 		datas = make([]optionData, len(v))
 		for i, item := range v {
-			datas[i] = optionData{Value: item.Name, Label: item.Description}
+			datas[i] = optionData{Value: item.Value, Label: item.Label}
 		}
 
 	case []sirius.RefDataItem:
