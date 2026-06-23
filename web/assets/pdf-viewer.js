@@ -135,6 +135,9 @@ class PDFViewer {
         this.currentPage = this.totalPages;
       }
 
+      const pageInput = this.controls.querySelector(".pdf-viewer-page-input");
+      if (pageInput) pageInput.max = this.totalPages.toString();
+
       this.updatePageInfo();
       await this.renderAllPages();
 
@@ -163,7 +166,7 @@ class PDFViewer {
           <span aria-hidden="true">←</span> Previous
         </button>
         <span class="pdf-viewer-page-info">
-          Page <input type="number" class="pdf-viewer-page-input" aria-label="Current page number" value="1"> of <span class="pdf-viewer-total-pages">-</span>
+          Page <input type="number" class="pdf-viewer-page-input" aria-label="Current page number" value="1" min="1"> of <span class="pdf-viewer-total-pages">-</span>
         </span>
         <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="next" aria-label="Next page">
           Next <span aria-hidden="true">→</span>
@@ -595,6 +598,8 @@ class PDFViewer {
       if (!Number.isNaN(pageNum)) {
         this.goToPage(pageNum);
       }
+    } else if (["-", "+", "e", "."].includes(e.key)) {
+      e.preventDefault();
     }
   }
 
