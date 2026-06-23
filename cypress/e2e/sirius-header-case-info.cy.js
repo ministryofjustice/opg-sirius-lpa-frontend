@@ -76,7 +76,7 @@ describe("Case info panel on the header bar", () => {
 
     cy.visit("/sirius-header-case-info?id=456");
 
-    cy.contains("Case owner:");
-    cy.contains("Unallocated");
+    cy.contains("Case owner:").should("exist");
+    cy.contains("Unallocated").should("exist");
   });
 });
