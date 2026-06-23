@@ -7,8 +7,7 @@ describe("Case info panel on the header bar", () => {
         applicationType: "Online",
         assignee: {
           id: 99,
-          firstname: "Sarah",
-          surname: "Jones",
+          displayName: "Sarah Jones",
           phoneNumber: "03004560300",
         },
         applicants: [
