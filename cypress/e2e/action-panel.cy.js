@@ -277,4 +277,13 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("MI Reporting");
   });
+
+  it("displays the link record button on the action panel", () => {
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Link record");
+
+    cy.get("a#action-panel-button-link-record").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Link record");
+  });
 });
