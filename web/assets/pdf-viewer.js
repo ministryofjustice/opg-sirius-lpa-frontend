@@ -135,6 +135,9 @@ class PDFViewer {
         this.currentPage = this.totalPages;
       }
 
+      const pageInput = this.controls.querySelector(".pdf-viewer-page-input");
+      if (pageInput) pageInput.max = this.totalPages.toString();
+
       this.updatePageInfo();
       await this.renderAllPages();
 
@@ -163,7 +166,7 @@ class PDFViewer {
           <span aria-hidden="true">←</span> Previous
         </button>
         <span class="pdf-viewer-page-info">
-          Page <input type="number" class="pdf-viewer-page-input" aria-label="Current page number" value="1"> of <span class="pdf-viewer-total-pages">-</span>
+          Page <input type="number" class="pdf-viewer-page-input" aria-label="Current page number" value="1" min="1"> of <span class="pdf-viewer-total-pages">-</span>
         </span>
         <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="next" aria-label="Next page">
           Next <span aria-hidden="true">→</span>
@@ -316,6 +319,7 @@ class PDFViewer {
     // Clear existing pages
     this.pagesWrapper.innerHTML = "";
     this.pageCanvases = [];
+    this.pageContainers = [];
 
     try {
       for (let pageNum = 1; pageNum <= this.totalPages; pageNum++) {
@@ -336,6 +340,8 @@ class PDFViewer {
         canvas.height = Math.floor(viewport.height * outputScale);
         canvas.style.width = Math.floor(viewport.width) + "px";
         canvas.style.height = Math.floor(viewport.height) + "px";
+        pageContainer.style.width = canvas.style.width;
+        pageContainer.style.height = canvas.style.height;
 
         const ctx = canvas.getContext("2d");
 
@@ -356,6 +362,7 @@ class PDFViewer {
 
         pageContainer.appendChild(canvas);
         this.pagesWrapper.appendChild(pageContainer);
+        this.pageContainers.push(pageContainer);
         this.pageCanvases.push(canvas);
       }
 
@@ -534,7 +541,11 @@ class PDFViewer {
     const page = await this.pdfDoc.getPage(this.currentPage);
     const viewport = page.getViewport({ scale: 1 });
     const containerWidth = this.canvasContainer.clientWidth - 40; // Account for padding
-    this.scale = containerWidth / viewport.width;
+    if ([90, 270].includes(this.rotation)) {
+      this.scale = containerWidth / viewport.height;
+    } else {
+      this.scale = containerWidth / viewport.width;
+    }
     await this.applyZoom();
     // applyZoom already saves compare state
   }
@@ -552,9 +563,23 @@ class PDFViewer {
   }
 
   applyRotation() {
-    // Apply rotation transform to all page canvases
-    this.pageCanvases.forEach((canvas) => {
-      canvas.style.transform = `rotate(${this.rotation}deg)`;
+    // Apply rotation transform to all page canvases.
+    // Apply translation to the canvases and flip the dimensions of the page containers
+    // for canvases that have been rotated 90 degrees clockwise or counterclockwise
+    // to remove the extra space caused by the rotation.
+    this.pageCanvases.forEach((canvas, index) => {
+      const pageContainer = this.pageContainers[index];
+      if ([90, 270].includes(this.rotation)) {
+        const width = Number.parseInt(canvas.style.width, 10);
+        const height = Number.parseInt(canvas.style.height, 10);
+        canvas.style.transform = `rotate(${this.rotation}deg) translate(${(this.rotation === 90 ? -1 : 1) * ((height - width) / 2)}px, 0)`;
+        pageContainer.style.width = canvas.style.height;
+        pageContainer.style.height = canvas.style.width;
+      } else {
+        canvas.style.transform = `rotate(${this.rotation}deg)`;
+        pageContainer.style.width = canvas.style.width;
+        pageContainer.style.height = canvas.style.height;
+      }
     });
   }
 
@@ -573,6 +598,8 @@ class PDFViewer {
       if (!Number.isNaN(pageNum)) {
         this.goToPage(pageNum);
       }
+    } else if (["-", "+", "e", "."].includes(e.key)) {
+      e.preventDefault();
     }
   }
 
