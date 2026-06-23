@@ -121,6 +121,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	changeStatusUrl := ""
 	PaymentsUrl := ""
 	newTaskUrl := ""
+	editDatesUrl := ""
 	if len(selectedCases) == 1 {
 		selectedCase := selectedCases[0]
 		caseType := strings.ToLower(selectedCase.CaseType)
@@ -131,6 +132,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		changeStatusUrl = fmt.Sprintf("/change-status?id=%d&case=%s&donorId=%d%s", selectedCases[0].ID, caseType, donorId, caseUids)
 		PaymentsUrl = fmt.Sprintf("/payments/%d", selectedCases[0].ID)
 		newTaskUrl = fmt.Sprintf("/create-task?id=%d&entity=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
+		editDatesUrl = fmt.Sprintf("/edit-dates?id=%d&case=%s", selectedCases[0].ID, caseType)
 
 		if hasDrafts {
 			editDocumentUrl = fmt.Sprintf("/edit-document?id=%d&case=%s", selectedCases[0].ID, caseType)
@@ -198,6 +200,12 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			URL:      editDonorUrl,
 			IconName: "aw-edit-person",
 			Disabled: false,
+		},
+		{
+			Label:    "Edit dates",
+			URL:      editDatesUrl,
+			IconName: "calendar-open",
+			Disabled: len(selectedCases) != 1,
 		},
 	}
 }

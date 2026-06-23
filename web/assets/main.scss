@@ -21,6 +21,7 @@ $govuk-assets-path: "../assets/";
 @import "./dark.scss";
 @import "./wysiwyg.scss";
 @import "./pdf-viewer.scss";
+@import "./calendar.scss";
 @import "./sirius/all.scss";
 
 $gutter: 15px;
@@ -757,6 +758,10 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
       color: white;
     }
   }
+}
+
+#action-panel-button-edit-dates svg {
+  width: 30px;
 }
 
 .app-table__row--half-width {

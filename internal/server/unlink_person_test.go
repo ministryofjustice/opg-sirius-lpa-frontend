@@ -80,7 +80,7 @@ func TestUnlinkPersonNoID(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, testUrl, nil)
 			w := httptest.NewRecorder()
 
-			err := EditDates(nil, nil)(w, r)
+			err := UnlinkPerson(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
