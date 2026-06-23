@@ -195,7 +195,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/delete-document/{uuid}", wrap(DeleteDocument(client, templates.Get("delete-document.gohtml"))))
 	mux.Handle("/edit-investigation", wrap(EditInvestigation(client, templates.Get("edit_investigation.gohtml"))))
 	mux.Handle("/investigation-hold", wrap(InvestigationHold(client, templates.Get("investigation_hold.gohtml"))))
-	mux.Handle("/link-person", wrap(LinkPerson(client, templates.Get("link_person.gohtml"))))
+	mux.Handle("/link-person", wrap(LinkPerson(client, templates.Get("link-person-wrapper.gohtml"), templates.Get("link-person-partial-wrapper.gohtml"))))
 	mux.Handle("/sirius-header-calendars", wrap(SiriusHeaderCalendars(client, templates.Get("sirius-header-partial-calendars.gohtml"))))
 	mux.Handle("/sirius-header-case-info", wrap(SiriusHeaderCaseInfo(client, templates.Get("sirius-header-partial-case-info.gohtml"))))
 	mux.Handle("/sirius-header-people-info", wrap(SiriusHeaderPeopleInfo(client, templates.Get("sirius-header-partial-people-info.gohtml"))))

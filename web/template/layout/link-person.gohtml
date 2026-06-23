@@ -1,0 +1,56 @@
+{{ define "link-person" }}
+  <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+  {{ if .OtherPerson.ID }}
+    <input type="hidden" name="uid" value="{{ .OtherPerson.UID }}" />
+
+    <table class="govuk-table">
+      <tbody class="govuk-table__body">
+      <tr class="govuk-table__row">
+        <th scope="row" class="govuk-table__header">Name</th>
+        <td class="govuk-table__cell">{{ .Entity.Firstname }} {{ .Entity.Surname }}</td>
+        <td class="govuk-table__cell">{{ .OtherPerson.Firstname }} {{ .OtherPerson.Surname }}</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <th scope="row" class="govuk-table__header">Contact ref #</th>
+        <td class="govuk-table__cell">{{ .Entity.UID }}</td>
+        <td class="govuk-table__cell">{{ .OtherPerson.UID }}</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <th scope="row" class="govuk-table__header">Date of Birth</th>
+        <td class="govuk-table__cell">{{ formatDate .Entity.DateOfBirth }}</td>
+        <td class="govuk-table__cell">{{ formatDate .OtherPerson.DateOfBirth }}</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <th scope="row" class="govuk-table__header">Number of links</th>
+        <td class="govuk-table__cell">{{ len .Entity.Children }}</td>
+        <td class="govuk-table__cell">{{ len .OtherPerson.Children }}</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <th scope="row" class="govuk-table__header">Primary record</th>
+        <td class="govuk-table__cell">
+            {{ if not .CanChangePrimary }}
+              <input id="f-primary-id-hidden" name="primary-id" type="hidden" value="{{ .PrimaryId }}">
+            {{ end }}
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="f-primary-id-1" name="primary-id" type="radio" value="{{ .Entity.ID }}" {{ if not .CanChangePrimary }}disabled{{ end }} {{ if eq .Entity.ID .PrimaryId }}checked{{ end }}>
+            <label class="govuk-label govuk-radios__label" for="f-primary-id-1">
+              <span class="govuk-visually-hidden">Make "{{ .Entity.Firstname }} {{ .Entity.Surname }}" the primary record</span>
+            </label>
+          </div>
+        </td>
+        <td class="govuk-table__cell">
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="f-primary-id-2" name="primary-id" type="radio" value="{{ .OtherPerson.ID }}" {{ if not .CanChangePrimary }}disabled{{ end }} {{ if eq .OtherPerson.ID .PrimaryId }}checked{{ end }}>
+            <label class="govuk-label govuk-radios__label" for="f-primary-id-2">
+              <span class="govuk-visually-hidden">Make "{{ .OtherPerson.Firstname }} {{ .OtherPerson.Surname }}" the primary record</span>
+            </label>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  {{ else }}
+      {{ template "input" (field "uid" "Person UID" .OtherPerson.UID .Error.Field.uid) }}
+  {{ end }}
+{{ end }}
