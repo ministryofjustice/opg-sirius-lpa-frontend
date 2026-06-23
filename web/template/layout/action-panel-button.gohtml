@@ -7,12 +7,12 @@
      {{ if .Disabled }}aria-disabled="true"{{ end }}
   >
     <div class="action-panel__button">
-            <span>
-              <svg aria-labelledby="{{ replace (ToLower .Label) " " "-" }}-text">
-                  <title id="{{ replace (ToLower .Label) " " "-" }}-text">{{ .Label }}</title>
-                  <use href="{{ prefixSVG .IconName }}" />
-              </svg>
-            </span>
+      <span>
+        <svg aria-labelledby="{{ replace (ToLower .Label) " " "-" }}-text">
+            <title id="{{ replace (ToLower .Label) " " "-" }}-text">{{ .Label }}</title>
+            <use href="{{ prefixSVG .IconName }}" />
+        </svg>
+      </span>
     </div>
     {{ .Label }}
   </a>
