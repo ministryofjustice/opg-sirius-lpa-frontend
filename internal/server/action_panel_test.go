@@ -118,6 +118,12 @@ func TestGetActionPanel(t *testing.T) {
 					IconName: "aw-allocate-case",
 					Disabled: false,
 				},
+				{
+					Label:    "Link record",
+					URL:      "/link-person?id=123",
+					IconName: "aw-link",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -218,7 +224,6 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					Disabled: false,
 				},
 				{
-
 					Label:    "MI reporting",
 					URL:      "/mi-reporting?donorId=123&uid[]=7000-0000-0001",
 					IconName: "aw-mi",
@@ -228,6 +233,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					Label:    "Allocate Case",
 					URL:      "/allocate-cases?id=1&entity=lpa&uid[]=7000-0000-0001",
 					IconName: "aw-allocate-case",
+					Disabled: false,
+				},
+				{
+					Label:    "Link record",
+					URL:      "/link-person?id=123&uid[]=7000-0000-0001",
+					IconName: "aw-link",
 					Disabled: false,
 				},
 			},
@@ -328,6 +339,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					Label:    "Allocate Case",
 					URL:      "",
 					IconName: "aw-allocate-case",
+					Disabled: true,
+				},
+				{
+					Label:    "Link record",
+					URL:      "/link-person?id=0",
+					IconName: "aw-link",
 					Disabled: true,
 				},
 			},
