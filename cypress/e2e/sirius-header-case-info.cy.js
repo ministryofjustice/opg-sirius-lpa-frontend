@@ -30,27 +30,27 @@ describe("Case info panel on the header bar", () => {
   });
 
   it("displays the case info panel", () => {
-    cy.contains("Case owner:");
-    cy.contains("Sarah Jones");
-    cy.contains("03004560300");
+    cy.contains("Case owner:").should("exist");
+    cy.contains("Sarah Jones").should("exist");
+    cy.contains("03004560300").should("exist");
 
-    cy.contains("Case ID:");
-    cy.contains("7000-0000-0123");
+    cy.contains("Case ID:").should("exist");
+    cy.contains("7000-0000-0123").should("exist");
 
-    cy.contains("Who applied to register:");
-    cy.contains("Melanie Vanvolkenburg");
+    cy.contains("Who applied to register:").should("exist");
+    cy.contains("Melanie Vanvolkenburg").should("exist");
 
-    cy.contains("Online or Classic application:");
-    cy.contains("Online");
+    cy.contains("Online or Classic application:").should("exist");
+    cy.contains("Online").should("exist");
 
-    cy.contains("Receipt date:");
-    cy.contains("21/06/2026");
+    cy.contains("Receipt date:").should("exist");
+    cy.contains("21/06/2026").should("exist");
 
-    cy.contains("Date Donor signed Instrument:");
-    cy.contains("17/06/2026");
+    cy.contains("Date Donor signed Instrument:").should("exist");
+    cy.contains("17/06/2026").should("exist");
 
-    cy.contains("Attorneys appointed:");
-    cy.contains("Singular");
+    cy.contains("Attorneys appointed:").should("exist");
+    cy.contains("Singular").should("exist");
   });
 
   it("does not display fields with no data", () => {
