@@ -973,13 +973,16 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
 }
 
 .app-case-info {
+  overflow: hidden;
+  padding: 10px 15px 15px;
+
   & .govuk-summary-list {
     font-size: 1rem;
     color: govuk-colour("white");
   }
 
   & .govuk-summary-list__key {
-    width: 35%;
+    width: 20%;
     padding-bottom: govuk-spacing(2);
     font-weight: 400;
   }
