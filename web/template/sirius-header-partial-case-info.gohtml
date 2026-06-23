@@ -5,7 +5,7 @@
                 <dt class="govuk-summary-list__key">Case owner:</dt>
                 <dd class="govuk-summary-list__value app-case-info__assignee">
                     {{ if .Case.Assignee }}
-                        {{ .Case.Assignee.Summary }}{{ if .Case.Assignee.PhoneNumber }} ({{ .Case.Assignee.PhoneNumber }}){{ end }}
+                        {{ if .Case.Assignee.DisplayName }}{{ .Case.Assignee.DisplayName }}{{ else }}{{ .Case.Assignee.Summary }}{{ end }}{{ if .Case.Assignee.PhoneNumber }} ({{ .Case.Assignee.PhoneNumber }}){{ end }}
                     {{ else }}
                         Unallocated
                     {{ end }}
