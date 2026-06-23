@@ -110,6 +110,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	createDonorUrl := fmt.Sprintf("/create-donor?id=%d&entity=person%s", donorId, caseUids)
 	editDonorUrl := fmt.Sprintf("/edit-donor?id=%d&entity=person%s", donorId, caseUids)
 	miReportingUrl := fmt.Sprintf("/mi-reporting?donorId=%d%s", donorId, caseUids)
+	linkPersonUrl := fmt.Sprintf("/link-person?id=%d%s", donorId, caseUids)
 	complaintUrl := ""
 	createDocumentUrl := ""
 	editDocumentUrl := ""
@@ -207,6 +208,12 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			URL:      miReportingUrl,
 			IconName: "aw-mi",
 			Disabled: false,
+		},
+		{
+			Label:    "Link record",
+			URL:      linkPersonUrl,
+			IconName: "aw-link",
+			Disabled: donorId == 0,
 		},
 	}
 }
