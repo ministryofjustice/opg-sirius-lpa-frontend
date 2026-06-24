@@ -61,29 +61,28 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 		if r.Method == http.MethodPost {
 			updatedCorrespondent := sirius.Correspondent{
 				Person: sirius.Person{
-					Salutation:        postFormString(r, "salutation"),
-					Firstname:         postFormString(r, "firstname"),
-					Middlenames:       postFormString(r, "middlenames"),
-					Surname:           postFormString(r, "surname"),
-					PhoneNumber:       postFormString(r, "phoneNumber"),
-					Email:             postFormString(r, "email"),
 					AddressLine1:      postFormString(r, "addressLine1"),
 					AddressLine2:      postFormString(r, "addressLine2"),
 					AddressLine3:      postFormString(r, "addressLine3"),
-					Town:              postFormString(r, "town"),
-					County:            postFormString(r, "county"),
-					Country:           postFormString(r, "country"),
-					Postcode:          postFormString(r, "postcode"),
 					CompanyName:       postFormString(r, "companyName"),
+					CompanyNumber:     postFormString(r, "companyNumber"),
+					Country:           postFormString(r, "country"),
+					County:            postFormString(r, "county"),
+					Email:             postFormString(r, "email"),
+					Firstname:         postFormString(r, "firstname"),
 					IsAirmailRequired: postFormString(r, "isAirmailRequired") == "true",
+					Middlenames:       postFormString(r, "middlenames"),
+					PhoneNumber:       postFormString(r, "phoneNumber"),
+					Postcode:          postFormString(r, "postcode"),
+					Salutation:        postFormString(r, "salutation"),
+					Surname:           postFormString(r, "surname"),
+					Town:              postFormString(r, "town"),
 				},
 			}
 			data.Correspondent = updatedCorrespondent
 
 			if isEditing {
-				updatedCorrespondent.ID = correspondent.ID
-				data.Correspondent = updatedCorrespondent
-				err = client.UpdateCorrespondent(ctx, updatedCorrespondent.ID, updatedCorrespondent)
+				err = client.UpdateCorrespondent(ctx, correspondent.ID, updatedCorrespondent)
 			} else {
 				err = client.CreateCorrespondent(ctx, caseId, updatedCorrespondent)
 			}
