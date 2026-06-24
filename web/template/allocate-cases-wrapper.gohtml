@@ -1,0 +1,40 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Allocate Cases{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body">
+        {{ range .Entities }}
+          <strong>{{ . }}</strong>
+          <br/>
+        {{ end }}
+      </p>
+
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        <meta data-app-reload="page" />
+        {{ template "success-banner" "You have successfully allocated cases." }}
+      {{ end }}
+
+      {{ if eq 1 (len .Entities) }}
+        <h1 class="govuk-heading-l app-!-embedded-hide">Allocate Case</h1>
+      {{ else }}
+        <h1 class="govuk-heading-l app-!-embedded-hide">Allocate {{ len .Entities }} Cases</h1>
+      {{ end }}
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+        {{ template "allocate-cases" . }}
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Allocate</button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}

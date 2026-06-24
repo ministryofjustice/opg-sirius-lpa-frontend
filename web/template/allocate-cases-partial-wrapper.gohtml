@@ -35,44 +35,12 @@
                 <h1 class="govuk-heading-l app-!-embedded-hide">Allocate {{ len .Entities }} Cases</h1>
             {{ end }}
 
-            <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
-            {{ range .CaseIDs }}
-                <input type="hidden" name="id" value="{{ . }}"/>
-            {{ end }}
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+        {{ range .CaseIDs }}
+            <input type="hidden" name="id" value="{{ . }}"/>
+        {{ end }}
 
-            <div class="govuk-form-group {{ if .Error.Field.assignTo }}govuk-form-group--error{{ end }}">
-                <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend">Assign to</legend>
-                    {{ template "errors" .Error.Field.assignTo }}
-                    <div class="govuk-radios" data-module="govuk-radios">
-                        <div class="govuk-radios__item">
-                            <input class="govuk-radios__input" id="f-assignTo" name="assignTo" type="radio" value="user" data-aria-controls="conditional-assignTo" {{ if eq "user" .AssignTo }}checked{{ end }}>
-                            <label class="govuk-label govuk-radios__label" for="f-assignTo">
-                                User
-                            </label>
-                        </div>
-                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-assignTo">
-                            <div class="govuk-!-width-one-half govuk-form-group {{ if .Error.Field.assigneeUser }}govuk-form-group--error{{ end }}">
-                                <label class="govuk-label" for="f-assigneeUser">User</label>
-                                {{ template "errors" .Error.Field.assigneeUser }}
-                                <select class="govuk-select {{ if .Error.Field.assigneeUser }}govuk-select--error{{ end }}" id="f-assigneeUser" name="assigneeUser" data-select-user>
-                                    <option value="" selected></option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="govuk-radios__item">
-                            <input class="govuk-radios__input" id="f-assignTo-2" name="assignTo" type="radio" value="team" data-aria-controls="conditional-assignTo-2" {{ if eq "team" .AssignTo }}checked{{ end }}>
-                            <label class="govuk-label govuk-radios__label" for="f-assignTo-2">
-                                Team
-                            </label>
-                        </div>
-                        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-assignTo-2">
-                            {{ template "select" (select "assigneeTeam" "Team" nil .Error.Field.assigneeTeam (options .Teams)) }}
-                        </div>
-                    </div>
-                </fieldset>
-            </div>
+        {{ template "allocate-cases" . }}
 
         <div class="govuk-button-group">
             <button class="govuk-button" data-module="govuk-button" type="submit">Allocate</button>
