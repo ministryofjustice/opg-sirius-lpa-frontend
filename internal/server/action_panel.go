@@ -18,16 +18,13 @@ type ActionPanelClient interface {
 
 type ActionPanelData struct {
 	XSRFToken          string
-	DonorID            int
-	SelectedCases      []sirius.Case
-	CaseUids           string
-	CaseType           string
 	ActionPanelButtons []ActionPanelButton
 }
 
 func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		if err := r.ParseForm(); err != nil {
+		err := r.ParseForm()
+		if err != nil {
 			return err
 		}
 
@@ -39,27 +36,24 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		if donorIDStr == "" {
 			donorIDStr = r.URL.Query().Get("id")
 		}
+
+		var donorId int
 		if donorIDStr != "" {
-			if donorID, err := strconv.Atoi(donorIDStr); err == nil {
-				data.DonorID = donorID
+			if donorId, err = strconv.Atoi(donorIDStr); err != nil {
+				return err
 			}
 		}
 
 		caseUIDs := r.Form["uid[]"]
-		data.CaseUids = buildUIDQueryString(caseUIDs)
-
-		entityType, err := sirius.ParseEntityType(r.FormValue("entity"))
-		if err != nil {
-			return err
-		}
-		data.CaseType = string(entityType)
+		caseUidsString := buildUIDQueryString(caseUIDs)
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
 		var draftCount int
+		var selectedCases []sirius.Case
 		group.Go(func() error {
-			if data.DonorID > 0 {
-				cases, err := client.CasesByDonor(ctx.With(groupCtx), data.DonorID)
+			if donorId > 0 {
+				cases, err := client.CasesByDonor(ctx.With(groupCtx), donorId)
 				if err != nil {
 					return err
 				}
@@ -77,14 +71,14 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 							filtered = append(filtered, c)
 						}
 					}
-					data.SelectedCases = filtered
+					selectedCases = filtered
 				} else {
-					data.SelectedCases = cases
+					selectedCases = cases
 				}
 			}
 
-			if len(data.SelectedCases) == 1 {
-				documentDraftCount, err := client.GetDraftCount(ctx.With(groupCtx), strings.ToLower(data.SelectedCases[0].CaseType), data.SelectedCases[0].ID)
+			if len(selectedCases) == 1 {
+				documentDraftCount, err := client.GetDraftCount(ctx.With(groupCtx), strings.ToLower(selectedCases[0].CaseType), selectedCases[0].ID)
 				if err != nil {
 					return err
 				}
@@ -97,7 +91,7 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids, draftCount > 0)
+		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0)
 
 		return tmpl(w, data)
 	}
@@ -115,6 +109,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	eventUrl := fmt.Sprintf("/create-event?id=%d&entity=person%s", donorId, caseUids)
 	createDonorUrl := fmt.Sprintf("/create-donor?id=%d&entity=person%s", donorId, caseUids)
 	editDonorUrl := fmt.Sprintf("/edit-donor?id=%d&entity=person%s", donorId, caseUids)
+	miReportingUrl := fmt.Sprintf("/mi-reporting?donorId=%d%s", donorId, caseUids)
 	complaintUrl := ""
 	createDocumentUrl := ""
 	editDocumentUrl := ""
@@ -206,6 +201,12 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			URL:      editDatesUrl,
 			IconName: "calendar-open",
 			Disabled: len(selectedCases) != 1,
+		},
+		{
+			Label:    "MI reporting",
+			URL:      miReportingUrl,
+			IconName: "aw-mi",
+			Disabled: false,
 		},
 	}
 }

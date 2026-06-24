@@ -39,9 +39,6 @@ func TestGetActionPanel(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, ActionPanelData{
-			DonorID:       123,
-			SelectedCases: cases,
-			CaseType:      "lpa",
 			ActionPanelButtons: []ActionPanelButton{
 				{
 					Label:    "Create warning",
@@ -109,6 +106,12 @@ func TestGetActionPanel(t *testing.T) {
 					IconName: "calendar-open",
 					Disabled: true,
 				},
+				{
+					Label:    "MI reporting",
+					URL:      "/mi-reporting?donorId=123",
+					IconName: "aw-mi",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -141,10 +144,6 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, ActionPanelData{
-			DonorID:       123,
-			SelectedCases: []sirius.Case{cases[0]},
-			CaseUids:      "&uid[]=7000-0000-0001",
-			CaseType:      "lpa",
 			ActionPanelButtons: []ActionPanelButton{
 				{
 					Label:    "Create warning",
@@ -212,6 +211,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					IconName: "calendar-open",
 					Disabled: false,
 				},
+				{
+					Label:    "MI reporting",
+					URL:      "/mi-reporting?donorId=123&uid[]=7000-0000-0001",
+					IconName: "aw-mi",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -233,7 +238,6 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, ActionPanelData{
-			CaseType: "lpa",
 			ActionPanelButtons: []ActionPanelButton{
 				{
 					Label:    "Create warning",
@@ -301,6 +305,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					IconName: "calendar-open",
 					Disabled: true,
 				},
+				{
+					Label:    "MI reporting",
+					URL:      "/mi-reporting?donorId=0",
+					IconName: "aw-mi",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -315,15 +325,6 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 	client.AssertNotCalled(t, "CasesByDonor")
-}
-
-func TestGetActionPanelInvalidEntityType(t *testing.T) {
-	r, _ := http.NewRequest(http.MethodGet, "/?entity=invalid", nil)
-	w := httptest.NewRecorder()
-
-	err := ActionPanel(nil, nil)(w, r)
-
-	assert.NotNil(t, err)
 }
 
 func TestGetActionPanelWhenCasesByDonorErrors(t *testing.T) {
