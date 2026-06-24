@@ -96,6 +96,58 @@ func TestGetAllocateCasesMultiple(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestGetAllocateCaseWithHXRequest(t *testing.T) {
+	client := &mockAllocateCasesClient{}
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Case", mock.Anything, 123).
+		Return(sirius.Case{
+			UID:      "7000-0000-0000",
+			CaseType: "LPA",
+			Donor:    &sirius.Person{ID: 42},
+		}, nil)
+
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, allocateCasesData{
+			Teams:      []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			Entities:   []string{"LPA 7000-0000-0000"},
+			CaseIDs:    []int{123},
+			CaseID:     123,
+			DonorID:    42,
+			EntityType: "lpa",
+		}).
+		Return(nil)
+
+	template := &mockTemplate{}
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=lpa", nil)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := AllocateCases(client, template.Func, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, partialTemplate)
+	mock.AssertExpectationsForObjects(t, client, template)
+	template.AssertNotCalled(t, "Func")
+	partialTemplate.AssertCalled(t, "Func", mock.Anything, mock.Anything)
+}
+
+func TestAllocateCaseParseFormError(t *testing.T) {
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader("%zz"))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AllocateCases(nil, nil, nil)(w, r)
+
+	assert.NotNil(t, err)
+}
+
 func TestGetAllocateCasesBadQueryString(t *testing.T) {
 	testCases := map[string]string{
 		"no-id":      "/",
