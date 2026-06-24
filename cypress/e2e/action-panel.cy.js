@@ -246,6 +246,17 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form").contains("Edit Donor");
   });
 
+  it("displays the allocate case button on the action panel", () => {
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Allocate Case");
+
+    cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
+
+    cy.get("a#action-panel-button-allocate-case").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Allocate Case");
+  });
+
   it("displays the edit dates button on the action panel", () => {
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Edit dates");
