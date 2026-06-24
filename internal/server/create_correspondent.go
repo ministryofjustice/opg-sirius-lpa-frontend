@@ -82,6 +82,8 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 			data.Correspondent = updatedCorrespondent
 
 			if isEditing {
+				updatedCorrespondent.ID = correspondent.ID
+				data.Correspondent = updatedCorrespondent
 				err = client.UpdateCorrespondent(ctx, correspondent.ID, updatedCorrespondent)
 			} else {
 				err = client.CreateCorrespondent(ctx, caseId, updatedCorrespondent)

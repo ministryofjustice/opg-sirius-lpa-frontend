@@ -90,6 +90,7 @@ func TestCreateCorrespondent(t *testing.T) {
 							"correspondenceByWelsh": false,
 							"researchOptOut":        true,
 							"companyName":           "",
+							"companyNumber":         "",
 							"companyReference":      "",
 						}},
 					}).
@@ -200,6 +201,7 @@ func TestUpdateCorrespondent(t *testing.T) {
 							"researchOptOut":        true,
 							"companyName":           "",
 							"companyReference":      "",
+							"companyNumber":         "",
 						},
 					}).
 					WithCompleteResponse(consumer.Response{
