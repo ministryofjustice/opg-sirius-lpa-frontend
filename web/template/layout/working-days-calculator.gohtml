@@ -1,0 +1,77 @@
+{{ define "workingDaysCalculator" }}
+    <div class="date-difference">
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Difference Calculator</h3>
+
+        <form hx-post="{{ prefix "/working-days" }}"
+              hx-target=".date-difference"
+              hx-swap="outerHTML"
+              hx-trigger="keyup changed delay:500ms from:input[type=date], change from:input[type=radio], keyup changed delay:500ms from:input[type=number]">
+
+            <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                    Calculate:
+                </legend>
+                <div class="govuk-radios govuk-radios--small govuk-radios--inline" data-module="govuk-radios">
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" type="radio"
+                               id="mode-{{ .ModeStartDate }}" name="mode" value={{ .ModeStartDate }}
+                               {{ if eq .Mode .ModeStartDate }}checked{{ end }}>
+                        <label class="govuk-label govuk-radios__label" for="mode-{{ .ModeStartDate }}">Start date</label>
+                    </div>
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" type="radio"
+                               id="mode-{{ .ModeEndDate }}" name="mode" value={{ .ModeEndDate }}
+                               {{ if eq .Mode .ModeEndDate }}checked{{ end }}>
+                        <label class="govuk-label govuk-radios__label" for="mode-{{ .ModeEndDate }}">End date</label>
+                    </div>
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" type="radio"
+                               id="mode-{{ .ModeNumWorkingDays }}" name="mode" value={{ .ModeNumWorkingDays }}
+                               {{ if eq .Mode .ModeNumWorkingDays }}checked{{ end }}>
+                        <label class="govuk-label govuk-radios__label" for="mode-{{ .ModeNumWorkingDays }}">Working days</label>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="calc-startdate">Start date:</label>
+                <input class="govuk-input govuk-input--width-10"
+                       type="date" id="calc-startdate" name="startdate" value="{{ .StartDate }}"
+                       placeholder="DD/MM/YYYY"
+                       {{ if eq .Mode .ModeStartDate }}aria-label="Start date (calculated)" disabled{{ end }}>
+                {{ if eq .Mode .ModeStartDate }}
+                    <input type="hidden" name="startdate" value="{{ .StartDate }}">
+                    <p class="govuk-visually-hidden" aria-live="polite" aria-atomic="true" role="status">
+                        Start date calculated: {{ .StartDate }}
+                    </p>
+                {{ end }}
+
+                <label class="govuk-label" for="calc-enddate">End date:</label>
+                <input class="govuk-input govuk-input--width-10"
+                       type="date" id="calc-enddate" name="enddate" value="{{ .EndDate }}"
+                       placeholder="DD/MM/YYYY"
+                       {{ if eq .Mode .ModeEndDate }}aria-label="End date (calculated)" disabled{{ end }}>
+                {{ if eq .Mode .ModeEndDate }}
+                    <input type="hidden" name="enddate" value="{{ .EndDate }}">
+                    <p class="govuk-visually-hidden" aria-live="polite" aria-atomic="true" role="status">
+                        End date calculated: {{ .EndDate }}
+                    </p>
+                {{ end }}
+
+                <label class="govuk-label" for="calc-numworkingdays">Working days:</label>
+                <input class="govuk-input govuk-input--width-10"
+                       type="number" id="calc-numworkingdays" name="numworkingdays" value="{{ .NumWorkingDays }}"
+                       min="0"
+                       {{ if eq .Mode .ModeNumWorkingDays }}aria-label="Working days (calculated)" disabled{{ end }}>
+                {{ if eq .Mode .ModeNumWorkingDays }}
+                    <input type="hidden" name="numworkingdays" value="{{ .NumWorkingDays }}">
+                    <p class="govuk-visually-hidden" aria-live="polite" aria-atomic="true" role="status">
+                        Working days calculated: {{ .NumWorkingDays }}
+                    </p>
+                {{ end }}
+            </div>
+        </form>
+    </div>
+{{ end }}
