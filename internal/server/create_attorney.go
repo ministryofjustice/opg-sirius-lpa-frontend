@@ -28,7 +28,7 @@ type createAttorneyData struct {
 	NextAttorneyId       int
 }
 
-func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler {
+func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -116,6 +116,10 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
+
+				if r.Header.Get("HX-Request") == "true" {
+					return partialTmpl(w, data)
+				}
 				return tmpl(w, data)
 			} else if err != nil {
 				return err
@@ -131,6 +135,10 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 
 			return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

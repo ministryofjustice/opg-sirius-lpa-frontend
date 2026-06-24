@@ -115,6 +115,8 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	eventUrl := fmt.Sprintf("/create-event?id=%d&entity=person%s", donorId, caseUids)
 	createDonorUrl := fmt.Sprintf("/create-donor?id=%d&entity=person%s", donorId, caseUids)
 	editDonorUrl := fmt.Sprintf("/edit-donor?id=%d&entity=person%s", donorId, caseUids)
+	createEpaUrl := fmt.Sprintf("/create-epa?id=%d", donorId)
+	editEpaUrl := ""
 	complaintUrl := ""
 	createDocumentUrl := ""
 	editDocumentUrl := ""
@@ -133,6 +135,10 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		PaymentsUrl = fmt.Sprintf("/payments/%d", selectedCases[0].ID)
 		newTaskUrl = fmt.Sprintf("/create-task?id=%d&entity=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
 		editDatesUrl = fmt.Sprintf("/edit-dates?id=%d&case=%s", selectedCases[0].ID, caseType)
+
+		if strings.ToLower(selectedCase.CaseType) == "epa" {
+			editEpaUrl = fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, selectedCases[0].ID)
+		}
 
 		if hasDrafts {
 			editDocumentUrl = fmt.Sprintf("/edit-document?id=%d&case=%s", selectedCases[0].ID, caseType)
@@ -206,6 +212,18 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			URL:      editDatesUrl,
 			IconName: "calendar-open",
 			Disabled: len(selectedCases) != 1,
+		},
+		{
+			Label:    "Create epa case",
+			URL:      createEpaUrl,
+			IconName: "aw-create-case",
+			Disabled: caseUids != "",
+		},
+		{
+			Label:    "Edit epa case",
+			URL:      editEpaUrl,
+			IconName: "aw-edit-case",
+			Disabled: len(selectedCases) != 1 || strings.ToLower(selectedCases[0].CaseType) != "epa",
 		},
 	}
 }

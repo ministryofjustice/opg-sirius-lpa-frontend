@@ -1,0 +1,26 @@
+{{ define "selectOrCreateCorrespondent" }}
+  <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+  <div class="govuk-form-group{{ if .Error.Field.attorney }} govuk-form-group--error{{ end }}">
+    <fieldset class="govuk-fieldset">
+      {{ template "errors" .Error.Field.attorney }}
+
+      <div class="govuk-radios" data-module="govuk-radios">
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="f-attorney-new" name="attorneyId" type="radio" value="new" checked>
+          <label class="govuk-label govuk-radios__label" for="f-attorney-new">
+            Create a new correspondent
+          </label>
+        </div>
+        <div class="govuk-body">Or use an existing actor from this Power of Attorney:</div>
+        {{ range $num, $attorney := .Epa.Attorneys }}
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="f-attorney-{{ plusN $num 1 }}" name="attorneyId" type="radio" value="{{ $attorney.ID }}">
+            <label class="govuk-label govuk-radios__label" for="f-attorney-{{ plusN $num 1 }}">
+              {{ $attorney.Firstname }} {{ $attorney.Surname }}
+            </label>
+          </div>
+        {{ end }}
+      </div>
+    </fieldset>
+  </div>
+{{ end }}

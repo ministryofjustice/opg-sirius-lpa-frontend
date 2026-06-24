@@ -1,0 +1,23 @@
+{{ define "page" }}
+  <div class="action-panel__form">
+    {{ template "error-summary" .Error }}
+
+    <h1 class="govuk-heading-m">Add a correspondent</h1>
+
+    <form class="form"
+          method="POST"
+          hx-post="{{ prefix (printf "/select-or-create-correspondent?id=%d&caseId=%d" .DonorId .CaseId) }}"
+          hx-target=".action-panel__content"
+          hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">
+      {{ template "selectOrCreateCorrespondent" . }}
+      <div class="govuk-button-group govuk-!-padding-top-5">
+        <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
+        <a class="govuk-link govuk-link--no-visited-state" 
+            href=""
+            hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
+            hx-target=".action-panel__content"
+            hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Cancel</a>
+      </div>
+    </form>
+  </div>
+{{ end }}
