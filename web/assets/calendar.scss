@@ -76,36 +76,64 @@
   .date-difference {
     float: right;
     width: 24%;
+    color: #ffffff;
 
-    .selector {
-      label:first-child {
-        height: 4em;
-      }
-      label:not(:first-child) {
-        width: 30%;
-      }
-      label:last-child {
-        width: 60%;
-      }
+    .govuk-heading-s,
+    .govuk-fieldset__legend,
+    .govuk-label,
+    .govuk-radios__label {
+      color: #ffffff;
     }
 
-    div {
-      clear: both;
-      margin-bottom: 0.5em;
+    .govuk-fieldset {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5em; 
+      margin-bottom: 1em;
     }
 
-    label {
+    .govuk-fieldset__legend {
+      margin-bottom: 0;
+      width: auto;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .govuk-radios {
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 0.25em 0.5em;
+    }
+
+    .govuk-radios__item {
+      margin-bottom: 0;
+      margin-right: 0;
+      float: none;
+    }
+
+    .govuk-radios__label {
+      float: none;
+      width: auto;
+      line-height: 1.2;
+      font-size: 0.9rem;
+    }
+
+    .govuk-form-group > .govuk-label {
       float: left;
       width: 40%;
       line-height: 2em;
+      margin-bottom: 0;
     }
 
-    input[type="text"],
-    input[type="number"] {
+    .govuk-input[type="date"],
+    .govuk-input[type="number"] {
       width: 40% !important;
+      max-width: none;
     }
 
-    input[disabled] {
+    .govuk-input[disabled] {
       background-color: transparent;
       color: #ffffff;
       font-weight: 700;
@@ -113,12 +141,10 @@
       border: none;
     }
 
-    button {
-      color: #ffffff;
-
-      &[disabled] {
-        display: none;
-      }
+    .govuk-form-group::after {
+      content: "";
+      display: table;
+      clear: both;
     }
   }
 }

@@ -1,4 +1,7 @@
 {{ define "page" }}
 <div class="sirius-header__dropdown" data-module="calendar" data-bank-holidays='{{ .BankHolidaysJSON }}'>
+    <div class="panel-calendar">
+        {{ template "workingDaysCalculator" .Calculator }}
+    </div>
 </div>
 {{ end }}
