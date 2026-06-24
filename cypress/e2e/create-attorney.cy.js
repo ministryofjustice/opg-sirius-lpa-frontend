@@ -58,6 +58,16 @@ describe("Create or Update Attorney", () => {
     cy.url().should("include", "create-attorney");
   });
 
+  it("has a back link to the EPA form", () => {
+    cy.get(".govuk-back-link")
+      .should("exist")
+      .and("have.attr", "href")
+      .and(
+        "include",
+        "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3",
+      );
+  });
+
   it("updates an existing attorney on an EPA", () => {
     cy.addMock("/lpa-api/v1/epas/2", "PUT", {
       status: 200,
