@@ -8,14 +8,18 @@ import (
 
 type Case struct {
 	Applicants                                []Person          `json:"applicants,omitempty"`
+	ApplicationType                           string            `json:"applicationType,omitempty"`
 	Assignee                                  *Person           `json:"assignee,omitempty"`
+	AttorneyDeclarationSignatureDate          DateString        `json:"attorneyDeclarationSignatureDate,omitempty"`
 	AttorneyRelationshipToDonor               string            `json:"attorneyRelationshipToDonor,omitempty"`
 	Attorneys                                 []Attorney        `json:"attorneys,omitempty"`
+	BatchID                                   string            `json:"batchId,omitempty"`
 	CancellationDate                          DateString        `json:"cancellationDate,omitempty"`
 	CaseAttorneyJointly                       *bool             `json:"caseAttorneyJointly,omitempty"`
 	CaseAttorneyJointlyAndJointlyAndSeverally *bool             `json:"caseAttorneyJointlyAndJointlyAndSeverally,omitempty"`
 	CaseAttorneyJointlyAndSeverally           *bool             `json:"caseAttorneyJointlyAndSeverally,omitempty"`
 	CaseAttorneySingular                      *bool             `json:"caseAttorneySingular,omitempty"`
+	CaseRecNumber                             string            `json:"caseRecNumber,omitempty"`
 	CaseType                                  string            `json:"caseType,omitempty"`
 	CertificateProviders                      []Person          `json:"certificateProviders,omitempty"`
 	Complaints                                []interface{}     `json:"complaints,omitempty"`
@@ -29,7 +33,12 @@ type Case struct {
 	ID                                        int               `json:"id,omitempty"`
 	InvalidDate                               DateString        `json:"invalidDate,omitempty"`
 	Investigations                            []interface{}     `json:"investigations,omitempty"`
+	LifeSustainingTreatment                   string            `json:"lifeSustainingTreatment,omitempty"`
+	LifeSustainingTreatmentSignatureDateA     DateString        `json:"lifeSustainingTreatmentSignatureDateA,omitempty"`
+	LifeSustainingTreatmentSignatureDateB     DateString        `json:"lifeSustainingTreatmentSignatureDateB,omitempty"`
+	LpaDonorSignatureDate                     DateString        `json:"lpaDonorSignatureDate,omitempty"`
 	Notes                                     []interface{}     `json:"notes,omitempty"`
+	NoticeGivenDate                           DateString        `json:"noticeGivenDate,omitempty"`
 	NotificationDate                          DateString        `json:"notificationDate,omitempty"`
 	NotifiedPersons                           []Person          `json:"notifiedPersons,omitempty"`
 	PaymentByCheque                           *bool             `json:"paymentByCheque,omitempty"`
@@ -38,6 +47,7 @@ type Case struct {
 	RagRating                                 int               `json:"ragRating,omitempty"`
 	ReceiptDate                               DateString        `json:"receiptDate,omitempty"`
 	RegistrationDate                          DateString        `json:"registrationDate,omitempty"`
+	RegistrationDueDate                       DateString        `json:"registrationDueDate,omitempty"`
 	RejectedDate                              DateString        `json:"rejectedDate,omitempty"`
 	ReplacementAttorneys                      []Attorney        `json:"replacementAttorneys,omitempty"`
 	RevokedDate                               DateString        `json:"revokedDate,omitempty"`
