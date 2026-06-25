@@ -89,7 +89,6 @@ func TestEditDonor(t *testing.T) {
 							"correspondenceByWelsh": true,
 							"researchOptOut":        true,
 							"companyName":           "",
-							"companyNumber":         "",
 							"companyReference":      "",
 							"dateOfDeath":           nil,
 						},

@@ -19,7 +19,6 @@ type Person struct {
 	Children              []Person   `json:"children,omitempty"`
 	CompanyName           string     `json:"companyName"`
 	CompanyReference      string     `json:"companyReference"`
-	CompanyNumber         string     `json:"companyNumber"`
 	CorrespondenceByEmail bool       `json:"correspondenceByEmail"`
 	CorrespondenceByPhone bool       `json:"correspondenceByPhone"`
 	CorrespondenceByPost  bool       `json:"correspondenceByPost"`

@@ -65,7 +65,6 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 					AddressLine2:      postFormString(r, "addressLine2"),
 					AddressLine3:      postFormString(r, "addressLine3"),
 					CompanyName:       postFormString(r, "companyName"),
-					CompanyNumber:     postFormString(r, "companyNumber"),
 					Country:           postFormString(r, "country"),
 					County:            postFormString(r, "county"),
 					Email:             postFormString(r, "email"),
@@ -78,6 +77,7 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 					Surname:           postFormString(r, "surname"),
 					Town:              postFormString(r, "town"),
 				},
+				CompanyNumber: postFormString(r, "companyNumber"),
 			}
 			data.Correspondent = updatedCorrespondent
 

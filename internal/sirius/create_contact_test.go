@@ -89,7 +89,6 @@ func TestCreateContact(t *testing.T) {
 							"correspondenceByPhone": true,
 							"correspondenceByWelsh": false,
 							"companyName":           "",
-							"companyNumber":         "",
 							"companyReference":      "",
 							"researchOptOut":        false,
 						},

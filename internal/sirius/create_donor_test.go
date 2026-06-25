@@ -89,7 +89,6 @@ func TestCreateDonor(t *testing.T) {
 							"researchOptOut":        true,
 							"companyName":           "",
 							"companyReference":      "",
-							"companyNumber":         "",
 						},
 					}).
 					WithCompleteResponse(consumer.Response{
