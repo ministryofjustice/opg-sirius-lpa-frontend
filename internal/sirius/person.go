@@ -27,6 +27,7 @@ type Person struct {
 	County                string     `json:"county"`
 	DateOfBirth           DateString `json:"dob"`
 	DateOfDeath           DateString `json:"dateOfDeath"`
+	DisplayName           string     `json:"displayName,omitempty"`
 	Email                 string     `json:"email"`
 	Firstname             string     `json:"firstname"`
 	ID                    int        `json:"id,omitempty"`
