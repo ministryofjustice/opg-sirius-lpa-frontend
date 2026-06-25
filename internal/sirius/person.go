@@ -41,6 +41,7 @@ type Person struct {
 	Parent                *Person    `json:"parent,omitempty"`
 	CompanyName           string     `json:"companyName"`
 	CompanyReference      string     `json:"companyReference"`
+	DisplayName           string     `json:"displayName,omitempty"`
 	PersonType            string     `json:"personType,omitempty"`
 	Cases                 []*Case    `json:"cases,omitempty"`
 }
