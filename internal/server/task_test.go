@@ -378,6 +378,7 @@ func TestPostTaskWhenAssignToCaseOwner(t *testing.T) {
 			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entity:    "LPA 7000-0000-0000",
 			CaseUID:   "7000-0000-0000",
+			CaseID:    123,
 		}).
 		Return(nil)
 
@@ -393,7 +394,7 @@ func TestPostTaskWhenAssignToCaseOwner(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
