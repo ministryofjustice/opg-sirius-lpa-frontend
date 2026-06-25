@@ -20,12 +20,20 @@ type relationshipData struct {
 	Success   bool
 	Error     sirius.ValidationError
 
+	ActionPanelData actionPanelData
+
 	SearchUID  string
 	SearchName string
 	Reason     string
 }
 
-func Relationship(client RelationshipClient, tmpl template.Template) Handler {
+type actionPanelData struct {
+	DonorID    int
+	CaseUIDs   string
+	EntityType string
+}
+
+func Relationship(client RelationshipClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		personID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -42,6 +50,15 @@ func Relationship(client RelationshipClient, tmpl template.Template) Handler {
 		data := relationshipData{
 			XSRFToken: ctx.XSRFToken,
 			Entity:    fmt.Sprintf("%s %s", person.Firstname, person.Surname),
+			ActionPanelData: actionPanelData{
+				DonorID: personID,
+			},
+		}
+
+		data.ActionPanelData.CaseUIDs = buildUIDQueryString(r.Form["uid[]"])
+
+		if entityType, err := sirius.ParseEntityType(r.FormValue("entity")); err == nil {
+			data.ActionPanelData.EntityType = string(entityType)
 		}
 
 		if r.Method == http.MethodPost {
@@ -70,6 +87,9 @@ func Relationship(client RelationshipClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 			}
+		}
+		if r.Header.Get("HX-Request") == "true" && partialTmpl != nil {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
