@@ -115,6 +115,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	eventUrl := fmt.Sprintf("/create-event?id=%d&entity=person%s", donorId, caseUids)
 	createDonorUrl := fmt.Sprintf("/create-donor?id=%d&entity=person%s", donorId, caseUids)
 	editDonorUrl := fmt.Sprintf("/edit-donor?id=%d&entity=person%s", donorId, caseUids)
+	createRelationship := fmt.Sprintf("/create-relationship?id=%d&entity=person%s", donorId, caseUids)
 	complaintUrl := ""
 	createDocumentUrl := ""
 	editDocumentUrl := ""
@@ -206,6 +207,12 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			URL:      editDatesUrl,
 			IconName: "calendar-open",
 			Disabled: len(selectedCases) != 1,
+		},
+		{
+			Label:    "Create relationship",
+			URL:      createRelationship,
+			IconName: "aw-relationship",
+			Disabled: false,
 		},
 	}
 }
