@@ -109,6 +109,12 @@ func TestGetActionPanel(t *testing.T) {
 					IconName: "calendar-open",
 					Disabled: true,
 				},
+				{
+					Label:    "Allocate Case",
+					URL:      "/allocate-cases?id=1&id=2&entity=lpa",
+					IconName: "aw-allocate-case",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -190,7 +196,7 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 				},
 				{
 					Label:    "New task",
-					URL:      "/create-task?id=1&entity=lpa",
+					URL:      "/create-task?id=1&entity=lpa&uid[]=7000-0000-0001",
 					IconName: "aw-new-task",
 					Disabled: false,
 				},
@@ -210,6 +216,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					Label:    "Edit dates",
 					URL:      "/edit-dates?id=1&case=lpa",
 					IconName: "calendar-open",
+					Disabled: false,
+				},
+				{
+					Label:    "Allocate Case",
+					URL:      "/allocate-cases?id=1&entity=lpa&uid[]=7000-0000-0001",
+					IconName: "aw-allocate-case",
 					Disabled: false,
 				},
 			},
@@ -299,6 +311,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					Label:    "Edit dates",
 					URL:      "",
 					IconName: "calendar-open",
+					Disabled: true,
+				},
+				{
+					Label:    "Allocate Case",
+					URL:      "",
+					IconName: "aw-allocate-case",
 					Disabled: true,
 				},
 			},
