@@ -50,6 +50,7 @@ type WorkingDaysData struct {
 	EndDate        string
 	NumWorkingDays int
 	Mode           WorkingDaysMode
+	PreviousMode   WorkingDaysMode
 }
 
 type siriusHeaderCalendarData struct {
@@ -103,6 +104,7 @@ func WorkingDays(client SiriusHeaderCalendarClient, tmpl template.Template) Hand
 		startDate, _ := time.Parse(time.DateOnly, r.FormValue("startdate"))
 		endDate, _ := time.Parse(time.DateOnly, r.FormValue("enddate"))
 		mode := parseWorkingDaysMode(r.FormValue("mode"))
+		previousMode := parseWorkingDaysMode(r.FormValue("previousmode"))
 
 		bankHolidays, err := client.BankHolidays(ctx)
 		if err != nil {
@@ -110,7 +112,7 @@ func WorkingDays(client SiriusHeaderCalendarClient, tmpl template.Template) Hand
 		}
 
 		data := calculateWorkingDays(startDate, endDate, numWorkingDays, mode, bankHolidays)
-
+		data.PreviousMode = previousMode
 		data.XSRFToken = ctx.XSRFToken
 
 		return tmpl(w, data)
