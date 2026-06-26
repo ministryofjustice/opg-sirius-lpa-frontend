@@ -24,6 +24,7 @@ type allocateCasesData struct {
 	Error            sirius.ValidationError
 	CaseID           int
 	CaseIDs          []int
+	CaseUIDs         string
 	DonorID          int
 	EntityType       string
 	CaseUids         string
@@ -102,7 +103,8 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template, partialTm
 			return err
 		}
 
-		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
+		//data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
+		data.CaseUIDs = buildUIDQueryString(r.Form["uid[]"])
 
 		if entityType, err := sirius.ParseEntityType(r.FormValue("entity")); err == nil {
 			data.EntityType = string(entityType)

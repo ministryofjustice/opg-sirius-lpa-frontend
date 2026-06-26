@@ -220,7 +220,7 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 				},
 				{
 					Label:    "Allocate Case",
-					URL:      "/allocate-cases?id=1&entity=lpa",
+					URL:      "/allocate-cases?id=1&entity=lpa&uid[]=7000-0000-0001",
 					IconName: "aw-allocate-case",
 					Disabled: false,
 				},

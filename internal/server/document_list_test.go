@@ -479,7 +479,7 @@ func TestGetDocumentList(t *testing.T) {
 				},
 				{
 					Label:    "Allocate Case",
-					URL:      "/allocate-cases?id=1&entity=lpa",
+					URL:      "/allocate-cases?id=1&entity=lpa&uid[]=7000-1234-0000",
 					IconName: "aw-allocate-case",
 
 					Disabled: false,
@@ -566,7 +566,7 @@ func TestGetDocumentList(t *testing.T) {
 				},
 				{
 					Label:    "Allocate Case",
-					URL:      "/allocate-cases?id=1&id=2&entity=lpa",
+					URL:      "/allocate-cases?id=1&id=2&entity=lpa&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 					IconName: "aw-allocate-case",
 					Disabled: false,
 				},
@@ -1024,7 +1024,7 @@ func TestDocumentListDismissValidation(t *testing.T) {
 					},
 					{
 						Label:    "Allocate Case",
-						URL:      "/allocate-cases?id=1&id=2&entity=",
+						URL:      "/allocate-cases?id=1&id=2&entity=&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 						IconName: "aw-allocate-case",
 						Disabled: false,
 					},
