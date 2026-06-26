@@ -131,7 +131,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		paymentsUrl = fmt.Sprintf("/payments/%d", id)
 		newTaskUrl = fmt.Sprintf("/create-task?id=%d&entity=%s", id, caseType)
 		editDatesUrl = fmt.Sprintf("/edit-dates?id=%d&case=%s", id, caseType)
-		allocateCasesUrl = fmt.Sprintf("/allocate-cases?id=%d&entity=%s", id, caseType)
+		allocateCasesUrl = fmt.Sprintf("/allocate-cases?id=%d&entity=%s%s", id, caseType, caseUids)
 
 		if hasDrafts {
 			editDocumentUrl = fmt.Sprintf("/edit-document?id=%d&case=%s", id, caseType)
@@ -147,7 +147,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 				idQuery += fmt.Sprintf("&id=%d", c.ID)
 			}
 		}
-		allocateCasesUrl = fmt.Sprintf("/allocate-cases?%s&entity=%s", idQuery, caseType)
+		allocateCasesUrl = fmt.Sprintf("/allocate-cases?%s&entity=%s%s", idQuery, caseType, caseUids)
 	}
 
 	return []ActionPanelButton{
