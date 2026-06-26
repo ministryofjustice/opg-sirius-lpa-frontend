@@ -64,4 +64,35 @@ describe("Calendars on the header bar", () => {
       "February 2025",
     );
   });
+
+  it("shows the working-days calculator and updates disabled fields by mode", () => {
+    cy.visit("/donor/1/documents");
+    cy.get("#header-button-calendars").click();
+
+    cy.get(".panel-calendar").should("be.visible");
+    cy.contains("h3", "Difference Calculator").should("be.visible");
+
+    cy.get("#mode-enddate").should("be.checked");
+    cy.get("#calc-enddate").should("be.disabled");
+    cy.get("#calc-startdate").should("not.be.disabled");
+    cy.get("#calc-numworkingdays").should("not.be.disabled");
+
+    cy.get("#mode-startdate").check({ force: true });
+    cy.get("#mode-startdate").should("be.checked");
+    cy.get("#calc-startdate").should("be.disabled");
+    cy.get("#calc-enddate").should("not.be.disabled");
+    cy.get("#calc-numworkingdays").should("not.be.disabled");
+
+    cy.get("#mode-numworkingdays").check({ force: true });
+    cy.get("#mode-numworkingdays").should("be.checked");
+    cy.get("#calc-numworkingdays").should("be.disabled");
+    cy.get("#calc-startdate").should("not.be.disabled");
+    cy.get("#calc-enddate").should("not.be.disabled");
+
+    cy.get("#mode-enddate").check({ force: true });
+    cy.get("#mode-enddate").should("be.checked");
+    cy.get("#calc-enddate").should("be.disabled");
+    cy.get("#calc-startdate").should("not.be.disabled");
+    cy.get("#calc-numworkingdays").should("not.be.disabled");
+  });
 });
