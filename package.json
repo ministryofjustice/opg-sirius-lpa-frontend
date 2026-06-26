@@ -23,7 +23,7 @@
     "htmx.org": "^2.0.10",
     "govuk-frontend": "^6.1.0",
     "hugerte": "https://github.com/ministryofjustice/opg-hugerte-dist#semver:v1.0.9",
-    "opg-sirius-search-ui": "https://github.com/ministryofjustice/opg-sirius-search-ui#v1.79.0",
+    "opg-sirius-search-ui": "https://github.com/ministryofjustice/opg-sirius-search-ui#v1.79.14",
     "pdfjs-dist": "^5.6.205",
     "punycode": "^2.3.1"
   },
