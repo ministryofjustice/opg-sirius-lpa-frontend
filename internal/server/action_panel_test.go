@@ -196,7 +196,7 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 				},
 				{
 					Label:    "New task",
-					URL:      "/create-task?id=1&entity=lpa",
+					URL:      "/create-task?id=1&entity=lpa&uid[]=7000-0000-0001",
 					IconName: "aw-new-task",
 					Disabled: false,
 				},
