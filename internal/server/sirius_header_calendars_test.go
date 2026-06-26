@@ -150,6 +150,7 @@ func TestWorkingDays(t *testing.T) {
 		WorkingDaysModeEndDate,
 		bankHolidays,
 	)
+	expectedCalculator.PreviousMode = WorkingDaysModeStartDate
 
 	client := &mockSiriusCalendarsClient{}
 	client.
@@ -161,6 +162,7 @@ func TestWorkingDays(t *testing.T) {
 		"enddate":        {""},
 		"numworkingdays": {"20"},
 		"mode":           {"enddate"},
+		"previousmode":   {"startdate"},
 	}
 
 	template := &mockTemplate{}
