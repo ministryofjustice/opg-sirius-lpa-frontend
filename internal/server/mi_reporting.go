@@ -22,6 +22,8 @@ type miReportingData struct {
 	ResultCount int
 	Download    string
 	XSRFToken   string
+	DonorId     int
+	CaseUids    string
 }
 
 type namedControl struct {
@@ -44,12 +46,21 @@ var miLabels = map[string]string{
 	"state":             "Status",
 }
 
-func MiReporting(client MiReportingClient, tmpl template.Template) Handler {
+func MiReporting(client MiReportingClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 		data := miReportingData{
 			XSRFToken: ctx.XSRFToken,
 		}
+
+		donorIdString := r.FormValue("donorId")
+		if donorIdString != "" {
+			if donorId, err := strToIntOrStatusError(donorIdString); err == nil {
+				data.DonorId = donorId
+			}
+		}
+
+		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
 
 		switch r.Method {
 		case http.MethodGet:
@@ -128,6 +139,10 @@ func MiReporting(client MiReportingClient, tmpl template.Template) Handler {
 
 			form.Add("OPG-Bypass-Membrane", "1")
 			data.Download = "/api/reporting/export?" + form.Encode()
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
