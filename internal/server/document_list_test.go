@@ -307,6 +307,12 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: true,
 				},
 				{
+					Label:    "MI reporting",
+					URL:      "/mi-reporting?donorId=82",
+					IconName: "aw-mi",
+					Disabled: false,
+				},
+				{
 					Label:    "Create epa case",
 					URL:      "/create-epa?id=82",
 					IconName: "aw-create-case",
@@ -395,6 +401,12 @@ func TestGetDocumentList(t *testing.T) {
 					Label:    "Edit dates",
 					URL:      "/edit-dates?id=1&case=lpa",
 					IconName: "calendar-open",
+					Disabled: false,
+				},
+				{
+					Label:    "MI reporting",
+					URL:      "/mi-reporting?donorId=82",
+					IconName: "aw-mi",
 					Disabled: false,
 				},
 				{
@@ -490,6 +502,12 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "MI reporting",
+					URL:      "/mi-reporting?donorId=82&uid[]=7000-1234-0000",
+					IconName: "aw-mi",
+					Disabled: false,
+				},
+				{
 					Label:    "Create epa case",
 					URL:      "/create-epa?id=82",
 					IconName: "aw-create-case",
@@ -582,6 +600,12 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: true,
 				},
 				{
+					Label:    "MI reporting",
+					URL:      "/mi-reporting?donorId=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+					IconName: "aw-mi",
+					Disabled: false,
+				},
+				{
 					Label:    "Create epa case",
 					URL:      "/create-epa?id=82",
 					IconName: "aw-create-case",
@@ -644,6 +668,63 @@ func TestGetDocumentList(t *testing.T) {
 
 			r, _ := http.NewRequest(http.MethodGet, tc.path, nil)
 			_, err := server.serve(r)
+
+			assert.Nil(t, err)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
+func TestGetDocumentListHasV1PersonsCasesGetPermission(t *testing.T) {
+	cases := []sirius.Case{{ID: 1, CaseType: "LPA", UID: "7000-1234-0000"}}
+
+	testCases := []struct {
+		name                                   string
+		permissions                            sirius.Permissions
+		expectedHasV1PersonsCasesGetPermission bool
+	}{
+		{
+			name:                                   "with v1-persons-cases GET permission",
+			permissions:                            sirius.Permissions{"v1-persons-cases": sirius.PermissionType{Permissions: []string{"GET"}}},
+			expectedHasV1PersonsCasesGetPermission: true,
+		},
+		{
+			name:                                   "without v1-persons-cases GET permission",
+			permissions:                            sirius.Permissions{},
+			expectedHasV1PersonsCasesGetPermission: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &mockDocumentListClient{}
+			client.
+				On("CasesByDonor", mock.Anything, 82).
+				Return(cases, nil)
+			client.
+				On("GetPersonDocuments", mock.Anything, 82, []string(nil)).
+				Return(singleDocumentList, nil)
+			client.
+				On("Person", mock.Anything, 82).
+				Return(sirius.Person{}, nil)
+			client.
+				On("GetUserPermissions", mock.Anything).
+				Return(tc.permissions, nil)
+			client.
+				On("GetDraftCount", mock.Anything, "lpa", 1).
+				Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, mock.MatchedBy(func(data documentPageData) bool {
+					return data.HasV1PersonsCasesGetPermission == tc.expectedHasV1PersonsCasesGetPermission
+				})).
+				Return(nil)
+
+			server := newMockServer("/donor/{id}/documents", DocumentList(client, template.Func))
+
+			req, _ := http.NewRequest(http.MethodGet, "/donor/82/documents", nil)
+			_, err := server.serve(req)
 
 			assert.Nil(t, err)
 			mock.AssertExpectationsForObjects(t, client, template)
@@ -824,6 +905,12 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 						Disabled: true,
 					},
 					{
+						Label:    "MI reporting",
+						URL:      "/mi-reporting?donorId=82",
+						IconName: "aw-mi",
+						Disabled: false,
+					},
+					{
 						Label:    "Create epa case",
 						URL:      "/create-epa?id=82",
 						IconName: "aw-create-case",
@@ -993,6 +1080,12 @@ func TestDocumentListDismissValidation(t *testing.T) {
 						URL:      "",
 						IconName: "calendar-open",
 						Disabled: true,
+					},
+					{
+						Label:    "MI reporting",
+						URL:      "/mi-reporting?donorId=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+						IconName: "aw-mi",
+						Disabled: false,
 					},
 					{
 						Label:    "Create epa case",
@@ -1248,6 +1341,12 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 						Label:    "Edit dates",
 						URL:      "/edit-dates?id=1&case=lpa",
 						IconName: "calendar-open",
+						Disabled: false,
+					},
+					{
+						Label:    "MI reporting",
+						URL:      "/mi-reporting?donorId=82",
+						IconName: "aw-mi",
 						Disabled: false,
 					},
 					{

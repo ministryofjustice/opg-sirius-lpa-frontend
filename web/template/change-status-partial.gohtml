@@ -17,12 +17,14 @@
     <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
 
     <form class="form" method="POST"
-          hx-post="{{ prefix (printf "/change-status?id=%d&case=%s" .CaseID .CaseType) }}"
+          hx-post="{{ prefix (printf "/change-status?id=%d&case=%s&donorId=%d%s" .CaseID .CaseType .DonorID .CaseUids) }}"
           hx-target=".action-panel__content"
           hx-swap="innerHTML">
       <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
       {{ template "select" (select "status" "Status" .NewStatus .Error.Field.status (options .AvailableStatuses) "required" true) }}
+
+      {{ template "textarea" (field "notes" "Notes" .Notes .Error.Field.notes "hint" "Optional") }}
 
       <div class="govuk-button-group">
         <button class="govuk-button" data-module="govuk-button" type="submit">Submit</button>
