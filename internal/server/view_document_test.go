@@ -23,6 +23,26 @@ func (m *mockViewDocumentClient) GetUserDetails(ctx sirius.Context) (sirius.User
 	return args.Get(0).(sirius.User), args.Error(1)
 }
 
+func (m *mockViewDocumentClient) Person(ctx sirius.Context, id int) (sirius.Person, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.Person), args.Error(1)
+}
+
+func (m *mockViewDocumentClient) GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(sirius.Permissions), args.Error(1)
+}
+
+func (m *mockViewDocumentClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.Case), args.Error(1)
+}
+
+func (m *mockViewDocumentClient) GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error) {
+	args := m.Called(ctx, caseType, caseId)
+	return args.Get(0).(sirius.DocumentDraftCount), args.Error(1)
+}
+
 func TestGetViewDocument(t *testing.T) {
 	user := sirius.User{ID: 66, DisplayName: "Me", Roles: []string{"System Admin"}}
 	for _, caseType := range []string{"lpa", "epa"} {
@@ -42,12 +62,12 @@ func TestGetViewDocument(t *testing.T) {
 				On("GetUserDetails", mock.Anything).
 				Return(user, nil)
 
-		template := &mockTemplate{}
-		templateData := viewDocumentData{
-			Document:       document,
-			IsSysAdminUser: true,
-			Pane:           1,
-		}
+			template := &mockTemplate{}
+			templateData := viewDocumentData{
+				Document:       document,
+				IsSysAdminUser: true,
+				Pane:           1,
+			}
 
 			template.
 				On("Func", mock.Anything, templateData).
