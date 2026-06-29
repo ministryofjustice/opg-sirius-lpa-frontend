@@ -21,9 +21,11 @@ type deleteRelationshipData struct {
 	Error     sirius.ValidationError
 
 	PersonReferences []sirius.PersonReference
+	DonorId          int
+	CaseUIDs         string
 }
 
-func DeleteRelationship(client DeleteRelationshipClient, tmpl template.Template) Handler {
+func DeleteRelationship(client DeleteRelationshipClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		personID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -31,7 +33,11 @@ func DeleteRelationship(client DeleteRelationshipClient, tmpl template.Template)
 		}
 
 		ctx := getContext(r)
-		data := deleteRelationshipData{XSRFToken: ctx.XSRFToken}
+		data := deleteRelationshipData{
+			XSRFToken: ctx.XSRFToken,
+			DonorId:   personID,
+			CaseUIDs:  buildUIDQueryString(r.Form["uid[]"]),
+		}
 
 		if r.Method == http.MethodPost {
 			referenceID, err := postFormInt(r, "reference-id")
@@ -73,6 +79,10 @@ func DeleteRelationship(client DeleteRelationshipClient, tmpl template.Template)
 
 		if err := group.Wait(); err != nil {
 			return err
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
