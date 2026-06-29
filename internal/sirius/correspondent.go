@@ -11,6 +11,7 @@ type Correspondent struct {
 	SystemStatus        *bool  `json:"systemStatus,omitempty"`
 	RelationshipToDonor string `json:"relationshipToDonor,omitempty"`
 	CaseId              int    `json:"caseId,omitempty"`
+	CompanyNumber       string `json:"companyNumber"`
 }
 
 func (c Correspondent) Summary() string {

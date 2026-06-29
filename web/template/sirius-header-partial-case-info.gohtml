@@ -1,5 +1,151 @@
 {{ define "page" }}
-<div class="sirius-header__dropdown">
-Implement case information in the header dropdown
-</div>
+    <div class="app-case-info">
+        <dl class="govuk-summary-list govuk-summary-list--no-border">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Case owner:</dt>
+                <dd class="govuk-summary-list__value app-case-info__assignee">
+                    {{ if .Case.Assignee }}
+                        {{ if .Case.Assignee.DisplayName }}{{ .Case.Assignee.DisplayName }}{{ else }}{{ .Case.Assignee.Summary }}{{ end }}{{ if .Case.Assignee.PhoneNumber }} ({{ .Case.Assignee.PhoneNumber }}){{ end }}
+                    {{ else }}
+                        Unallocated
+                    {{ end }}
+                </dd>
+            </div>
+
+            {{ if .Case.UID }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Case ID:</dt>
+                    <dd class="govuk-summary-list__value app-case-info__case-id">{{ .Case.UID }}</dd>
+                </div>
+            {{ end }}
+
+            {{ if gt (len .Case.Applicants) 0 }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Who applied to register:</dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ range $index, $applicant := .Case.Applicants }}{{ if $index }}, {{ end }}{{ $applicant.Firstname }} {{ $applicant.Surname }}{{ end }}
+                    </dd>
+                </div>
+            {{ end }}
+
+            {{ if .Case.ApplicationType }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Online or Classic application:</dt>
+                    <dd class="govuk-summary-list__value app-case-info__application-type">{{ .Case.ApplicationType }}</dd>
+                </div>
+            {{ end }}
+
+            {{ if .Case.ReceiptDate }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Receipt date:</dt>
+                    <dd class="govuk-summary-list__value">{{ formatDate .Case.ReceiptDate }}</dd>
+                </div>
+            {{ end }}
+
+            {{ if .Case.NotificationDate }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Notification date:</dt>
+                    <dd class="govuk-summary-list__value">{{ formatDate .Case.NotificationDate }}</dd>
+                </div>
+            {{ end }}
+
+            {{ if .Case.RegistrationDueDate }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Registration due date:</dt>
+                    <dd class="govuk-summary-list__value">{{ formatDate .Case.RegistrationDueDate }}</dd>
+                </div>
+            {{ end }}
+
+            {{ if .Case.RegistrationDate }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Registration date:</dt>
+                    <dd class="govuk-summary-list__value">{{ formatDate .Case.RegistrationDate }}</dd>
+                </div>
+            {{ end }}
+
+            {{ if .Case.DispatchDate }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Dispatch date:</dt>
+                    <dd class="govuk-summary-list__value">{{ formatDate .Case.DispatchDate }}</dd>
+                </div>
+            {{ end }}
+
+            {{ if .Case.StatusDate }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Closed date:</dt>
+                    <dd class="govuk-summary-list__value">{{ formatDate .Case.StatusDate }}</dd>
+                </div>
+            {{ end }}
+
+            {{ if .Case.LpaDonorSignatureDate }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Date Donor signed Instrument:</dt>
+                    <dd class="govuk-summary-list__value">{{ formatDate .Case.LpaDonorSignatureDate }}</dd>
+                </div>
+            {{ end }}
+
+            {{ if .Case.AttorneyDeclarationSignatureDate }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Attorney declaration signature date:</dt>
+                    <dd class="govuk-summary-list__value">{{ formatDate .Case.AttorneyDeclarationSignatureDate }}</dd>
+                </div>
+            {{ end }}
+
+            {{ if .Case.NoticeGivenDate }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Notice given date:</dt>
+                    <dd class="govuk-summary-list__value">{{ formatDate .Case.NoticeGivenDate }}</dd>
+                </div>
+            {{ end }}
+
+            {{ $isHWCase := or (eq (ToLower .Case.SubType) "hw") (eq (ToLower .Case.SubType) "personal-welfare") }}
+
+            {{ if and $isHWCase .Case.LifeSustainingTreatment }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Life sustaining treatment:</dt>
+                    <dd class="govuk-summary-list__value">{{ .Case.LifeSustainingTreatment }}</dd>
+                </div>
+            {{ end }}
+
+            {{ if .Case.LifeSustainingTreatmentSignatureDateA }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Life sustaining treatment signature date:</dt>
+                    <dd class="govuk-summary-list__value">{{ formatDate .Case.LifeSustainingTreatmentSignatureDateA }}</dd>
+                </div>
+            {{ end }}
+
+            {{ if .Case.LifeSustainingTreatmentSignatureDateB }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Life sustaining treatment signature date B:</dt>
+                    <dd class="govuk-summary-list__value">{{ formatDate .Case.LifeSustainingTreatmentSignatureDateB }}</dd>
+                </div>
+            {{ end }}
+
+            {{ if .Case.BatchID }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Batch ID:</dt>
+                    <dd class="govuk-summary-list__value">{{ .Case.BatchID }}</dd>
+                </div>
+            {{ end }}
+
+            {{ if .Case.CaseRecNumber }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">CaseRec number:</dt>
+                    <dd class="govuk-summary-list__value">{{ .Case.CaseRecNumber }}</dd>
+                </div>
+            {{ end }}
+
+            {{ if or (compareBoolPointers .Case.CaseAttorneySingular true) (compareBoolPointers .Case.CaseAttorneyJointly true) (compareBoolPointers .Case.CaseAttorneyJointlyAndSeverally true) (compareBoolPointers .Case.CaseAttorneyJointlyAndJointlyAndSeverally true) }}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Attorneys appointed:</dt>
+                    <dd class="govuk-summary-list__value">
+                        {{ if compareBoolPointers .Case.CaseAttorneySingular true }}<p>Singular</p>{{ end }}
+                        {{ if compareBoolPointers .Case.CaseAttorneyJointly true }}<p>Jointly</p>{{ end }}
+                        {{ if compareBoolPointers .Case.CaseAttorneyJointlyAndSeverally true }}<p>Jointly and severally</p>{{ end }}
+                        {{ if compareBoolPointers .Case.CaseAttorneyJointlyAndJointlyAndSeverally true }}<p>Jointly for some decisions, and jointly and severally for others</p>{{ end }}
+                    </dd>
+                </div>
+            {{ end }}
+        </dl>
+    </div>
 {{ end }}

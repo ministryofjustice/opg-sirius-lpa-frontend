@@ -1,6 +1,12 @@
 {{ define "page" }}
   <div class="action-panel__form">
-    {{ template "error-summary" .Error }}   
+    {{ template "error-summary" .Error }}
+
+    <a class="govuk-back-link"
+       href=""
+       hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
+       hx-target=".action-panel__content"
+       hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Back</a>
 
     <h1 class="govuk-heading-m">{{ .Title }}</h1>
 
@@ -20,7 +26,7 @@
           {{ if ne .NextAttorneyId 0 }}
             <input class="govuk-button" data-module="govuk-button" type="submit" name="next-attorney" value="Save and edit next attorney" />
           {{ end }}
-          <a class="govuk-link govuk-link--no-visited-state" 
+          <a class="govuk-link govuk-link--no-visited-state"
              href=""
              hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
              hx-target=".action-panel__content"

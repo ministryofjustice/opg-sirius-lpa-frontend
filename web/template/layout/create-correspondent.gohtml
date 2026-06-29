@@ -6,6 +6,7 @@
   {{ template "input" (field "middlenames" "Middle names" .Correspondent.Middlenames .Error.Field.middlenames) }}
   {{ template "input" (field "surname" "Last name" .Correspondent.Surname .Error.Field.surname) }}
   {{ template "input" (field "companyName" "Company name" .Correspondent.CompanyName .Error.Field.companyName) }}
+  {{ template "input" (field "companyNumber" "Company reference" .Correspondent.CompanyNumber .Error.Field.companyNumber) }}
 
   <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Address" data-app-address-finder-fill-country="false">
     {{ template "input" (field "addressLine1" "Address line 1" .Correspondent.AddressLine1 .Error.Field.addressLine1 "data-app-address-finder-map" "addressLine1") }}

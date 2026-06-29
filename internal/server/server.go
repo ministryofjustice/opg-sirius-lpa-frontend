@@ -101,6 +101,7 @@ type Client interface {
 	SearchDonorsClient
 	SearchUsersClient
 	SelectOrCreateCorrespondentClient
+	SiriusHeaderCaseInfoClient
 	SiriusHeaderCalendarClient
 	SiriusHeaderPeopleInfoClient
 	TaskClient
@@ -159,7 +160,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate_cases.gohtml"))))
 	mux.Handle("/assign-task", wrap(AssignTask(client, templates.Get("assign_task.gohtml"))))
 	mux.Handle("/clear-task", wrap(ClearTask(client, templates.Get("clear_task.gohtml"))))
-	mux.Handle("/mi-reporting", wrap(MiReporting(client, templates.Get("mi_reporting.gohtml"))))
+	mux.Handle("/mi-reporting", wrap(MiReporting(client, templates.Get("mi-reporting.gohtml"), templates.Get("mi-reporting-partial.gohtml"))))
 	mux.Handle("/add-payment", wrap(AddPayment(client, templates.Get("add-payment-wrapper.gohtml"), templates.Get("add-payment-partial-wrapper.gohtml"))))
 	mux.Handle("/delete-payment", wrap(DeletePayment(client, templates.Get("delete-payment-wrapper.gohtml"), templates.Get("delete-payment-partial-wrapper.gohtml"))))
 	mux.Handle("/manage-fees", wrap(AddFeeDecision(client, templates.Get("manage_fees.gohtml"))))
@@ -195,8 +196,8 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/view-document/{uuid}", wrap(ViewDocument(client, templates.Get("view-document.gohtml"))))
 	mux.Handle("/delete-document/{uuid}", wrap(DeleteDocument(client, templates.Get("delete-document.gohtml"))))
 	mux.Handle("/compare/{id}/{caseId}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
+	mux.Handle("/sirius-header-case-info", wrap(SiriusHeaderCaseInfo(client, templates.Get("sirius-header-partial-case-info.gohtml"))))
 	mux.Handle("/sirius-header-calendars", wrap(SiriusHeaderCalendars(client, templates.Get("sirius-header-partial-calendars.gohtml"))))
-	mux.Handle("/sirius-header-case-info", wrap(SiriusHeaderCaseInfo(templates.Get("sirius-header-partial-case-info.gohtml"))))
 	mux.Handle("/sirius-header-people-info", wrap(SiriusHeaderPeopleInfo(client, templates.Get("sirius-header-partial-people-info.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))

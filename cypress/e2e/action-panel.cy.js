@@ -270,6 +270,20 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form").contains("Edit Dates");
   });
 
+  it("displays the MI reporting button on the action panel", () => {
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("MI reporting");
+
+    cy.addMock("/lpa-api/v1/reporting/config", "GET", {
+      status: 200,
+      body: {},
+    });
+
+    cy.get("a#action-panel-button-mi-reporting").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("MI Reporting");
+  });
+
   it("displays the create epa button on the action panel and can click through to subforms", () => {
     cy.addMock(
       "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0&limit=999",
