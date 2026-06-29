@@ -24,7 +24,7 @@
     </p>
 
     <form class="form" method="POST"
-          hx-post="{{ prefix (printf "/allocate-cases?id=%d&entity=%s%s" .CaseID .EntityType .CaseUIDs) }}"
+          hx-post="{{ prefix (printf "/allocate-cases?entity=%s%s" .EntityType .CaseUIDs) }}"
           hx-target=".action-panel__content"
           hx-swap="innerHTML">
 

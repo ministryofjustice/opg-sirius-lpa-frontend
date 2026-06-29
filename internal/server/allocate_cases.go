@@ -103,7 +103,6 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template, partialTm
 			return err
 		}
 
-		//data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
 		data.CaseUIDs = buildUIDQueryString(r.Form["uid[]"])
 
 		if entityType, err := sirius.ParseEntityType(r.FormValue("entity")); err == nil {
