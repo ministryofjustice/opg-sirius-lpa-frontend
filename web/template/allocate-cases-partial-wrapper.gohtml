@@ -14,7 +14,7 @@
     {{ end }}
 
 
-    <h1 class="govuk-heading-m">Allocate Cases</h1>
+    <h1 class="govuk-heading-m">Allocate Case</h1>
 
     <p class="govuk-body">
         {{ range .Entities }}
@@ -27,13 +27,6 @@
           hx-post="{{ prefix (printf "/allocate-cases?entity=%s%s" .EntityType .CaseUIDs) }}"
           hx-target=".action-panel__content"
           hx-swap="innerHTML">
-
-
-            {{ if eq 1 (len .Entities) }}
-                <h1 class="govuk-heading-m app-!-embedded-hide">Allocate Case</h1>
-            {{ else }}
-                <h1 class="govuk-heading-m app-!-embedded-hide">Allocate {{ len .Entities }} Cases</h1>
-            {{ end }}
 
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
         {{ range .CaseIDs }}
