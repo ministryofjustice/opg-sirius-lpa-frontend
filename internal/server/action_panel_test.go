@@ -112,6 +112,12 @@ func TestGetActionPanel(t *testing.T) {
 					IconName: "aw-mi",
 					Disabled: false,
 				},
+				{
+					Label:    "Allocate Case",
+					URL:      "/allocate-cases?id=1&id=2&entity=lpa",
+					IconName: "aw-allocate-case",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -189,7 +195,7 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 				},
 				{
 					Label:    "New task",
-					URL:      "/create-task?id=1&entity=lpa",
+					URL:      "/create-task?id=1&entity=lpa&uid[]=7000-0000-0001",
 					IconName: "aw-new-task",
 					Disabled: false,
 				},
@@ -212,9 +218,16 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					Disabled: false,
 				},
 				{
+
 					Label:    "MI reporting",
 					URL:      "/mi-reporting?donorId=123&uid[]=7000-0000-0001",
 					IconName: "aw-mi",
+					Disabled: false,
+				},
+				{
+					Label:    "Allocate Case",
+					URL:      "/allocate-cases?id=1&entity=lpa&uid[]=7000-0000-0001",
+					IconName: "aw-allocate-case",
 					Disabled: false,
 				},
 			},
@@ -310,6 +323,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					URL:      "/mi-reporting?donorId=0",
 					IconName: "aw-mi",
 					Disabled: false,
+				},
+				{
+					Label:    "Allocate Case",
+					URL:      "",
+					IconName: "aw-allocate-case",
+					Disabled: true,
 				},
 			},
 		}).

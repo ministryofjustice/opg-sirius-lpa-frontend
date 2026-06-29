@@ -114,24 +114,40 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	createDocumentUrl := ""
 	editDocumentUrl := ""
 	changeStatusUrl := ""
-	PaymentsUrl := ""
+	paymentsUrl := ""
 	newTaskUrl := ""
 	editDatesUrl := ""
+	allocateCasesUrl := ""
+
 	if len(selectedCases) == 1 {
 		selectedCase := selectedCases[0]
 		caseType := strings.ToLower(selectedCase.CaseType)
+		id := selectedCase.ID
 
 		warningUrl = fmt.Sprintf("/create-warning?id=%d&entity=%s%s", donorId, caseType, caseUids)
-		complaintUrl = fmt.Sprintf("/add-complaint?id=%d&case=%s", selectedCases[0].ID, caseType)
-		createDocumentUrl = fmt.Sprintf("/create-document?id=%d&case=%s", selectedCases[0].ID, caseType)
-		changeStatusUrl = fmt.Sprintf("/change-status?id=%d&case=%s&donorId=%d%s", selectedCases[0].ID, caseType, donorId, caseUids)
-		PaymentsUrl = fmt.Sprintf("/payments/%d", selectedCases[0].ID)
-		newTaskUrl = fmt.Sprintf("/create-task?id=%d&entity=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
-		editDatesUrl = fmt.Sprintf("/edit-dates?id=%d&case=%s", selectedCases[0].ID, caseType)
+		complaintUrl = fmt.Sprintf("/add-complaint?id=%d&case=%s", id, caseType)
+		createDocumentUrl = fmt.Sprintf("/create-document?id=%d&case=%s", id, caseType)
+		changeStatusUrl = fmt.Sprintf("/change-status?id=%d&case=%s&donorId=%d%s", id, caseType, donorId, caseUids)
+		paymentsUrl = fmt.Sprintf("/payments/%d", id)
+		newTaskUrl = fmt.Sprintf("/create-task?id=%d&entity=%s%s", id, caseType, caseUids)
+		editDatesUrl = fmt.Sprintf("/edit-dates?id=%d&case=%s", id, caseType)
+		allocateCasesUrl = fmt.Sprintf("/allocate-cases?id=%d&entity=%s%s", id, caseType, caseUids)
 
 		if hasDrafts {
-			editDocumentUrl = fmt.Sprintf("/edit-document?id=%d&case=%s", selectedCases[0].ID, caseType)
+			editDocumentUrl = fmt.Sprintf("/edit-document?id=%d&case=%s", id, caseType)
 		}
+	}
+	if len(selectedCases) > 1 {
+		idQuery := ""
+		caseType := strings.ToLower(selectedCases[0].CaseType)
+		for i, c := range selectedCases {
+			if i == 0 {
+				idQuery += fmt.Sprintf("id=%d", c.ID)
+			} else {
+				idQuery += fmt.Sprintf("&id=%d", c.ID)
+			}
+		}
+		allocateCasesUrl = fmt.Sprintf("/allocate-cases?%s&entity=%s%s", idQuery, caseType, caseUids)
 	}
 
 	return []ActionPanelButton{
@@ -172,9 +188,8 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			Disabled: len(selectedCases) != 1,
 		},
 		{
-
 			Label:    "Fees",
-			URL:      PaymentsUrl,
+			URL:      paymentsUrl,
 			IconName: "aw-fees",
 			Disabled: len(selectedCases) != 1,
 		},
@@ -207,6 +222,12 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			URL:      miReportingUrl,
 			IconName: "aw-mi",
 			Disabled: false,
+		},
+		{
+			Label:    "Allocate Case",
+			URL:      allocateCasesUrl,
+			IconName: "aw-allocate-case",
+			Disabled: len(selectedCases) == 0,
 		},
 	}
 }
