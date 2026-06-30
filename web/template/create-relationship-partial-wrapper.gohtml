@@ -24,19 +24,7 @@
               hx-swap="innerHTML">
              <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-                <div class="govuk-form-group {{ if .Error.Field.search }}govuk-form-group--error{{ end }}">
-                    <label class="govuk-label" for="f-search">Search</label>
-                    {{ template "errors" .Error.Field.search }}
-                    <select class="govuk-select {{ if .Error.Field.search }}govuk-select--error{{ end }}" id="f-search" name="search" data-select-person>
-                        {{ if .SearchUID }}
-                            <option value="{{ .SearchUID }}:{{ .SearchName }}" selected>{{ .SearchName }}</option>
-                        {{ else }}
-                            <option value="" selected></option>
-                        {{ end }}
-                    </select>
-                </div>
-
-                {{ template "input" (field "reason" "Relationship" .Reason .Error.Field.reason) }}
+            {{ template "create-relationship" . }}
 
             <div class="govuk-button-group">
                 <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
@@ -44,8 +32,7 @@
                    href=""
                    hx-get="{{ $url }}"
                    hx-target=".action-panel__content"
-                   hx-swap="innerHTML"
-                >Cancel</a>
+                   hx-swap="innerHTML">Cancel</a>
             </div>
         </form>
     </div>
