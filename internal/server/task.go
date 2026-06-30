@@ -33,7 +33,7 @@ type taskData struct {
 	AssigneeUserName string
 	DonorID          int
 	EntityType       string
-	CaseUids         string
+	CaseUIDs         string
 }
 
 func Task(client TaskClient, tmpl template.Template, partialTmpl template.Template) Handler {
@@ -94,7 +94,7 @@ func Task(client TaskClient, tmpl template.Template, partialTmpl template.Templa
 			data.DonorID = caseitem.Donor.ID
 		}
 
-		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
+		data.CaseUIDs = buildUIDQueryString(r.Form["uid[]"])
 
 		if entityType, err := sirius.ParseEntityType(r.FormValue("entity")); err == nil {
 			data.EntityType = string(entityType)
