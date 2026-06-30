@@ -156,7 +156,7 @@
       max-width: none;
     }
 
-    .govuk-input[disabled] {
+    .govuk-input[readonly] {
       background-color: transparent;
       color: #ffffff;
       font-weight: 700;
