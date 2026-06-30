@@ -10,10 +10,10 @@
             <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
             <input type="hidden" name="previousmode" value="{{ .Mode }}"/>
 
-            <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+            <div class="govuk-fieldset" role="group" aria-labelledby="calc-mode-label">
+                <span id="calc-mode-label" class="govuk-fieldset__legend govuk-fieldset__legend--s">
                     Calculate:
-                </legend>
+                </span>
                 <div class="govuk-radios govuk-radios--small govuk-radios--inline" data-module="govuk-radios">
                     <div class="govuk-radios__item">
                         <input class="govuk-radios__input" type="radio"
@@ -34,7 +34,7 @@
                         <label class="govuk-label govuk-radios__label" for="mode-{{ .ModeNumWorkingDays }}">Working days</label>
                     </div>
                 </div>
-            </fieldset>
+            </div>
 
             <div class="govuk-form-group">
                 <label class="govuk-label" for="calc-startdate">Start date:</label>
