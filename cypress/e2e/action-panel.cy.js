@@ -45,6 +45,15 @@ describe("Action Panel", () => {
       },
     });
 
+    cy.addMock("/lpa-api/v1/persons/1/references", "GET", {
+      status: 200,
+      body: [
+        {
+          referenceId: 123,
+        },
+      ],
+    });
+
     cy.visit("/donor/1/documents?uid[]=7000-1234-1234");
   });
 
@@ -296,5 +305,14 @@ describe("Action Panel", () => {
     cy.get("a#action-panel-button-link-record").click();
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Link record");
+  });
+
+  it("displays the delete relationship button on the action panel", () => {
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Delete relationship");
+
+    cy.get("a#action-panel-button-delete-relationship").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Delete Relationship");
   });
 });
