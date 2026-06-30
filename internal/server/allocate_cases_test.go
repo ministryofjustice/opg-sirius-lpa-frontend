@@ -46,13 +46,15 @@ func TestGetAllocateCases(t *testing.T) {
 		On("Func", mock.Anything, allocateCasesData{
 			Teams:    []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entities: []string{"LPA 7000-0000-0000"},
+			CaseID:   123,
+			CaseIDs:  []int{123},
 		}).
 		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, template.Func)(w, r)
+	err := AllocateCases(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -86,12 +88,64 @@ func TestGetAllocateCasesMultiple(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&id=456", nil)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, template.Func)(w, r)
+	err := AllocateCases(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetAllocateCaseWithHXRequest(t *testing.T) {
+	client := &mockAllocateCasesClient{}
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Case", mock.Anything, 123).
+		Return(sirius.Case{
+			UID:      "7000-0000-0000",
+			CaseType: "LPA",
+			Donor:    &sirius.Person{ID: 42},
+		}, nil)
+
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, allocateCasesData{
+			Teams:      []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			Entities:   []string{"LPA 7000-0000-0000"},
+			CaseIDs:    []int{123},
+			CaseID:     123,
+			DonorID:    42,
+			EntityType: "lpa",
+		}).
+		Return(nil)
+
+	template := &mockTemplate{}
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=lpa", nil)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := AllocateCases(client, template.Func, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, partialTemplate)
+	mock.AssertExpectationsForObjects(t, client, template)
+	template.AssertNotCalled(t, "Func")
+	partialTemplate.AssertCalled(t, "Func", mock.Anything, mock.Anything)
+}
+
+func TestAllocateCaseParseFormError(t *testing.T) {
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader("%zz"))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AllocateCases(nil, nil, nil)(w, r)
+
+	assert.NotNil(t, err)
 }
 
 func TestGetAllocateCasesBadQueryString(t *testing.T) {
@@ -107,7 +161,7 @@ func TestGetAllocateCasesBadQueryString(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := AllocateCases(nil, nil)(w, r)
+			err := AllocateCases(nil, nil, nil)(w, r)
 
 			assert.Equal(t, err, sirius.StatusError{Code: 404})
 		})
@@ -126,7 +180,7 @@ func TestGetAllocateCasesWhenTeamsErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, nil)(w, r)
+	err := AllocateCases(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -144,7 +198,7 @@ func TestGetAllocateCasesWhenCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, nil)(w, r)
+	err := AllocateCases(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -167,7 +221,7 @@ func TestGetAllocateCasesWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, template.Func)(w, r)
+	err := AllocateCases(client, template.Func, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -192,6 +246,8 @@ func TestPostAllocateCases(t *testing.T) {
 			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			AssigneeUserName: "System user",
 			Entities:         []string{"LPA 7000-0000-0000"},
+			CaseID:           123,
+			CaseIDs:          []int{123},
 		}).
 		Return(nil)
 
@@ -204,7 +260,7 @@ func TestPostAllocateCases(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, template.Func)(w, r)
+	err := AllocateCases(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -254,7 +310,7 @@ func TestPostAllocateCasesMultiple(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, template.Func)(w, r)
+	err := AllocateCases(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -283,7 +339,7 @@ func TestPostAllocateCasesWhenAllocateCasesFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, nil)(w, r)
+	err := AllocateCases(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -309,6 +365,8 @@ func TestPostAllocateCasesWhenAssignToNotSet(t *testing.T) {
 	template.
 		On("Func", mock.Anything, allocateCasesData{
 			Teams:    []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			CaseID:   123,
+			CaseIDs:  []int{123},
 			Entities: []string{"LPA 7000-0000-0000"},
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{
@@ -326,7 +384,7 @@ func TestPostAllocateCasesWhenAssignToNotSet(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, template.Func)(w, r)
+	err := AllocateCases(client, template.Func, template.Func)(w, r)
 	assert.Nil(t, err)
 
 	resp := w.Result()
@@ -375,6 +433,8 @@ func TestPostAllocateCasesWhenValidationError(t *testing.T) {
 			template.
 				On("Func", mock.Anything, allocateCasesData{
 					AssignTo:         name,
+					CaseID:           123,
+					CaseIDs:          []int{123},
 					Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 					Entities:         []string{"LPA 7000-0000-0000"},
 					Error:            sirius.ValidationError{Field: expectedErrors},
@@ -391,7 +451,7 @@ func TestPostAllocateCasesWhenValidationError(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := AllocateCases(client, template.Func)(w, r)
+			err := AllocateCases(client, template.Func, template.Func)(w, r)
 			assert.Nil(t, err)
 
 			resp := w.Result()
