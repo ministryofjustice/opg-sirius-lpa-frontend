@@ -1495,16 +1495,17 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 						URL:      "/link-person?id=82",
 						IconName: "aw-link",
 						Disabled: false,
-					}, {
-						Label:    "Create relationship",
-						URL:      "/create-relationship?id=82&entity=person",
-						IconName: "aw-relationship",
-						Disabled: false,
 					},
 					{
 						Label:    "Delete relationship",
 						URL:      "/delete-relationship?id=82",
 						IconName: "icon-minus",
+						Disabled: false,
+					},
+					{
+						Label:    "Create relationship",
+						URL:      "/create-relationship?id=82&entity=person",
+						IconName: "aw-relationship",
 						Disabled: false,
 					},
 				},
