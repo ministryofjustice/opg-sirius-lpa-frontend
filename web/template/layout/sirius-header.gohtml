@@ -13,7 +13,7 @@
                         <span class="light">{{ .Person.PersonType }}</span>
                     </h1>
                     <div class="sirius-header__actions">
-                        {{ template "header-button" headerBarButton "Documents associated to this case" (prefix (printf "/donor/%d/documents%s" .DonorID .CaseUids)) "icon-office-copy" }}
+                        {{ template "header-button" headerBarButton "Documents associated to this case" (prefix (printf "/donor/%d/documents%s" .DonorID (replace .CaseUids "&" "?"))) "icon-office-copy" }}
                         {{ if and .HasV1PersonsCasesGetPermission (eq (len .SelectedCases) 1) }}
                             {{ with index .SelectedCases 0 }}
                                 {{ template "header-dropdown-button" headerBarButton "Case Information" (prefix (printf "/sirius-header-case-info?id=%d" .ID)) "icon-caseinfo" }}

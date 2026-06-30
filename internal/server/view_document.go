@@ -83,6 +83,13 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 		}
 		draftCount = documentDraftCount.DraftCount
 
+		caseUidsStr := ""
+		uidParams := ""
+		if len(selectedCase) > 0 {
+			caseUidsStr = "&uid[]=" + selectedCase[0].UID
+			uidParams = caseUidsStr
+		}
+
 		data := viewDocumentData{
 			XSRFToken:       ctx.XSRFToken,
 			Document:        documentData,
@@ -91,11 +98,11 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			DonorID:         donorID,
 			SelectedCaseIds: caseId,
 			Person:          person,
-			CaseUids:        "?uid[]=" + uuid,
+			CaseUids:        caseUidsStr,
 			SelectedCases:   selectedCase,
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uuid, draftCount > 0)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0)
 
 		userPermissions, err := client.GetUserPermissions(ctx)
 		if err != nil {
