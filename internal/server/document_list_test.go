@@ -313,6 +313,18 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Allocate Case",
+					URL:      "/allocate-cases?id=1&id=2&id=3&entity=lpa",
+					IconName: "aw-allocate-case",
+					Disabled: false,
+				},
+				{
+					Label:    "Link record",
+					URL:      "/link-person?id=82",
+					IconName: "aw-link",
+					Disabled: false,
+				},
+				{
 					Label:    "Create epa case",
 					URL:      "/create-epa?id=82",
 					IconName: "aw-create-case",
@@ -410,6 +422,18 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Allocate Case",
+					URL:      "/allocate-cases?id=1&entity=lpa",
+					IconName: "aw-allocate-case",
+					Disabled: false,
+				},
+				{
+					Label:    "Link record",
+					URL:      "/link-person?id=82",
+					IconName: "aw-link",
+					Disabled: false,
+				},
+				{
 					Label:    "Create epa case",
 					URL:      "/create-epa?id=82",
 					IconName: "aw-create-case",
@@ -479,7 +503,7 @@ func TestGetDocumentList(t *testing.T) {
 				},
 				{
 					Label:    "New task",
-					URL:      "/create-task?id=1&entity=lpa",
+					URL:      "/create-task?id=1&entity=lpa&uid[]=7000-1234-0000",
 					IconName: "aw-new-task",
 					Disabled: false,
 				},
@@ -505,6 +529,18 @@ func TestGetDocumentList(t *testing.T) {
 					Label:    "MI reporting",
 					URL:      "/mi-reporting?donorId=82&uid[]=7000-1234-0000",
 					IconName: "aw-mi",
+					Disabled: false,
+				},
+				{
+					Label:    "Allocate Case",
+					URL:      "/allocate-cases?id=1&entity=lpa&uid[]=7000-1234-0000",
+					IconName: "aw-allocate-case",
+					Disabled: false,
+				},
+				{
+					Label:    "Link record",
+					URL:      "/link-person?id=82&uid[]=7000-1234-0000",
+					IconName: "aw-link",
 					Disabled: false,
 				},
 				{
@@ -603,6 +639,18 @@ func TestGetDocumentList(t *testing.T) {
 					Label:    "MI reporting",
 					URL:      "/mi-reporting?donorId=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 					IconName: "aw-mi",
+					Disabled: false,
+				},
+				{
+					Label:    "Allocate Case",
+					URL:      "/allocate-cases?id=1&id=2&entity=lpa&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+					IconName: "aw-allocate-case",
+					Disabled: false,
+				},
+				{
+					Label:    "Link record",
+					URL:      "/link-person?id=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+					IconName: "aw-link",
 					Disabled: false,
 				},
 				{
@@ -911,6 +959,18 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 						Disabled: false,
 					},
 					{
+						Label:    "Allocate Case",
+						URL:      "/allocate-cases?id=1&id=2&entity=",
+						IconName: "aw-allocate-case",
+						Disabled: false,
+					},
+					{
+						Label:    "Link record",
+						URL:      "/link-person?id=82",
+						IconName: "aw-link",
+						Disabled: false,
+					},
+					{
 						Label:    "Create epa case",
 						URL:      "/create-epa?id=82",
 						IconName: "aw-create-case",
@@ -1085,6 +1145,18 @@ func TestDocumentListDismissValidation(t *testing.T) {
 						Label:    "MI reporting",
 						URL:      "/mi-reporting?donorId=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 						IconName: "aw-mi",
+						Disabled: false,
+					},
+					{
+						Label:    "Allocate Case",
+						URL:      "/allocate-cases?id=1&id=2&entity=&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+						IconName: "aw-allocate-case",
+						Disabled: false,
+					},
+					{
+						Label:    "Link record",
+						URL:      "/link-person?id=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+						IconName: "aw-link",
 						Disabled: false,
 					},
 					{
@@ -1347,6 +1419,18 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 						Label:    "MI reporting",
 						URL:      "/mi-reporting?donorId=82",
 						IconName: "aw-mi",
+						Disabled: false,
+					},
+					{
+						Label:    "Allocate Case",
+						URL:      "/allocate-cases?id=1&entity=lpa",
+						IconName: "aw-allocate-case",
+						Disabled: false,
+					},
+					{
+						Label:    "Link record",
+						URL:      "/link-person?id=82",
+						IconName: "aw-link",
 						Disabled: false,
 					},
 					{
