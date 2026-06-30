@@ -81,6 +81,7 @@ type Client interface {
 	EditPaymentClient
 	EventClient
 	GetApplicationProgressClient
+	GetCaseSummaryClient
 	GetDocumentsClient
 	GetHistoryClient
 	GetLpaDetailsClient
@@ -183,6 +184,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/delete-relationship", wrap(DeleteRelationship(client, templates.Get("delete_relationship.gohtml"))))
 	mux.Handle("/donor/{donorId}/details", wrap(DonorDetails(client, templates.Get("donor_details.gohtml"))))
 	mux.Handle("/donor/{id}/documents", wrap(DocumentList(client, templates.Get("documents.gohtml"))))
+	mux.Handle("/donor/{donorId}/case-summary", wrap(GetCaseSummary(client, templates.Get("case-summary.gohtml"))))
 	mux.Handle("/donor/{donorId}/history", wrap(GetLpaHistory(client, templates.Get("lpa-history.gohtml"))))
 	mux.Handle("/delete-document/{uuid}", wrap(DeleteDocument(client, templates.Get("delete-document.gohtml"))))
 	mux.Handle("/edit-complaint", wrap(EditComplaint(client, templates.Get("edit_complaint.gohtml"))))
