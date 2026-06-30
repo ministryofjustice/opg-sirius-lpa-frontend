@@ -20,17 +20,13 @@ type relationshipData struct {
 	Success   bool
 	Error     sirius.ValidationError
 
-	ActionPanelData actionPanelData
+	DonorID    int
+	CaseUIDs   string
+	EntityType string
 
 	SearchUID  string
 	SearchName string
 	Reason     string
-}
-
-type actionPanelData struct {
-	DonorID    int
-	CaseUIDs   string
-	EntityType string
 }
 
 func Relationship(client RelationshipClient, tmpl template.Template, partialTmpl template.Template) Handler {
@@ -50,15 +46,13 @@ func Relationship(client RelationshipClient, tmpl template.Template, partialTmpl
 		data := relationshipData{
 			XSRFToken: ctx.XSRFToken,
 			Entity:    fmt.Sprintf("%s %s", person.Firstname, person.Surname),
-			ActionPanelData: actionPanelData{
-				DonorID: personID,
-			},
+			DonorID:   personID,
 		}
 
-		data.ActionPanelData.CaseUIDs = buildUIDQueryString(r.Form["uid[]"])
+		data.CaseUIDs = buildUIDQueryString(r.Form["uid[]"])
 
 		if entityType, err := sirius.ParseEntityType(r.FormValue("entity")); err == nil {
-			data.ActionPanelData.EntityType = string(entityType)
+			data.EntityType = string(entityType)
 		}
 
 		if r.Method == http.MethodPost {
