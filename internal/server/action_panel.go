@@ -126,7 +126,6 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	linkPersonUrl := fmt.Sprintf("/link-person?id=%d%s", donorId, caseUids)
 	deleteRelationshipUrl := fmt.Sprintf("/delete-relationship?id=%d%s", donorId, caseUids)
 	createRelationship := fmt.Sprintf("/create-relationship?id=%d&entity=person%s", donorId, caseUids)
-
 	complaintUrl := ""
 	createDocumentUrl := ""
 	editDocumentUrl := ""
