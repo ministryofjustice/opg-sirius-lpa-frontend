@@ -74,7 +74,7 @@ describe("Calendars on the header bar", () => {
     );
   });
 
-  it("shows the working-days calculator and updates disabled fields by mode", () => {
+  it("shows the working-days calculator and updates readonly fields by mode", () => {
     cy.visit("/donor/1/documents");
     cy.get("#header-button-calendars").click();
 
@@ -82,26 +82,26 @@ describe("Calendars on the header bar", () => {
     cy.contains("h3", "Difference Calculator").should("be.visible");
 
     cy.get("#mode-enddate").should("be.checked");
-    cy.get("#calc-enddate").should("be.disabled");
-    cy.get("#calc-startdate").should("not.be.disabled");
-    cy.get("#calc-numworkingdays").should("not.be.disabled");
+    cy.get("#calc-enddate").should("have.attr", "readonly");
+    cy.get("#calc-startdate").should("not.have.attr", "readonly");
+    cy.get("#calc-numworkingdays").should("not.have.attr", "readonly");
 
     cy.get("#mode-startdate").check({ force: true });
     cy.get("#mode-startdate").should("be.checked");
-    cy.get("#calc-startdate").should("be.disabled");
-    cy.get("#calc-enddate").should("not.be.disabled");
-    cy.get("#calc-numworkingdays").should("not.be.disabled");
+    cy.get("#calc-startdate").should("have.attr", "readonly");
+    cy.get("#calc-enddate").should("not.have.attr", "readonly");
+    cy.get("#calc-numworkingdays").should("not.have.attr", "readonly");
 
     cy.get("#mode-numworkingdays").check({ force: true });
     cy.get("#mode-numworkingdays").should("be.checked");
-    cy.get("#calc-numworkingdays").should("be.disabled");
-    cy.get("#calc-startdate").should("not.be.disabled");
-    cy.get("#calc-enddate").should("not.be.disabled");
+    cy.get("#calc-numworkingdays").should("have.attr", "readonly");
+    cy.get("#calc-startdate").should("not.have.attr", "readonly");
+    cy.get("#calc-enddate").should("not.have.attr", "readonly");
 
     cy.get("#mode-enddate").check({ force: true });
     cy.get("#mode-enddate").should("be.checked");
-    cy.get("#calc-enddate").should("be.disabled");
-    cy.get("#calc-startdate").should("not.be.disabled");
-    cy.get("#calc-numworkingdays").should("not.be.disabled");
+    cy.get("#calc-enddate").should("have.attr", "readonly");
+    cy.get("#calc-startdate").should("not.have.attr", "readonly");
+    cy.get("#calc-numworkingdays").should("not.have.attr", "readonly");
   });
 });
