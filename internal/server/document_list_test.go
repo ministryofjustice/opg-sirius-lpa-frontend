@@ -47,6 +47,11 @@ func (m *mockDocumentListClient) GetDraftCount(ctx sirius.Context, caseType stri
 	return args.Get(0).(sirius.DocumentDraftCount), args.Error(1)
 }
 
+func (m *mockDocumentListClient) PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]sirius.PersonReference), args.Error(1)
+}
+
 var singleDocumentList = sirius.DocumentList{
 	Limit: 999,
 	Pages: sirius.Pages{
@@ -324,6 +329,12 @@ func TestGetDocumentList(t *testing.T) {
 					IconName: "aw-link",
 					Disabled: false,
 				},
+				{
+					Label:    "Delete relationship",
+					URL:      "/delete-relationship?id=82",
+					IconName: "icon-minus",
+					Disabled: false,
+				},
 			},
 		},
 		{
@@ -419,6 +430,12 @@ func TestGetDocumentList(t *testing.T) {
 					Label:    "Link record",
 					URL:      "/link-person?id=82",
 					IconName: "aw-link",
+					Disabled: false,
+				},
+				{
+					Label:    "Delete relationship",
+					URL:      "/delete-relationship?id=82",
+					IconName: "icon-minus",
 					Disabled: false,
 				},
 			},
@@ -519,6 +536,12 @@ func TestGetDocumentList(t *testing.T) {
 					IconName: "aw-link",
 					Disabled: false,
 				},
+				{
+					Label:    "Delete relationship",
+					URL:      "/delete-relationship?id=82&uid[]=7000-1234-0000",
+					IconName: "icon-minus",
+					Disabled: false,
+				},
 			},
 		},
 		{
@@ -617,6 +640,12 @@ func TestGetDocumentList(t *testing.T) {
 					IconName: "aw-link",
 					Disabled: false,
 				},
+				{
+					Label:    "Delete relationship",
+					URL:      "/delete-relationship?id=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+					IconName: "icon-minus",
+					Disabled: false,
+				},
 			},
 		},
 	}
@@ -640,6 +669,9 @@ func TestGetDocumentList(t *testing.T) {
 			client.
 				On("GetUserPermissions", mock.Anything).
 				Return(permissions, nil)
+			client.
+				On("PersonReferences", mock.Anything, 82).
+				Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 			if len(tc.expectedCases) == 1 {
 				client.
@@ -713,6 +745,9 @@ func TestGetDocumentListHasV1PersonsCasesGetPermission(t *testing.T) {
 			client.
 				On("GetDraftCount", mock.Anything, "lpa", 1).
 				Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+			client.
+				On("PersonReferences", mock.Anything, 82).
+				Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 			template := &mockTemplate{}
 			template.
@@ -742,6 +777,9 @@ func TestDocumentListDownloadMultipleSuccess(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 82).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	downloadResp := &http.Response{
 		StatusCode: http.StatusCreated,
@@ -787,6 +825,9 @@ func TestDocumentListDownloadMultipleError(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 82).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -822,6 +863,9 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(sirius.Permissions{}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 82).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -922,6 +966,12 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 						IconName: "aw-link",
 						Disabled: false,
 					},
+					{
+						Label:    "Delete relationship",
+						URL:      "/delete-relationship?id=82",
+						IconName: "icon-minus",
+						Disabled: false,
+					},
 				},
 			},
 		).
@@ -959,6 +1009,9 @@ func TestDocumentListReturnsNoContentWhenComparingAndNoDocumentsSelected(t *test
 	client.
 		On("Person", mock.Anything, 82).
 		Return(expectedDonor, nil)
+	client.
+		On("PersonReferences", mock.Anything, 82).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	template := &mockTemplate{}
 
@@ -999,6 +1052,9 @@ func TestDocumentListDismissValidation(t *testing.T) {
 	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(sirius.Permissions{}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 82).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	expectedCases := []sirius.Case{cases[0], cases[1]}
 
@@ -1099,6 +1155,12 @@ func TestDocumentListDismissValidation(t *testing.T) {
 						IconName: "aw-link",
 						Disabled: false,
 					},
+					{
+						Label:    "Delete relationship",
+						URL:      "/delete-relationship?id=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+						IconName: "icon-minus",
+						Disabled: false,
+					},
 				},
 			},
 		).
@@ -1160,6 +1222,9 @@ func TestGetDocumentListWhenGetPersonDocumentsErrors(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 82).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -1186,6 +1251,9 @@ func TestGetDocumentListWhenPersonErrors(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 82).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -1215,6 +1283,9 @@ func TestGetDocumentListWhenPermissionsErrors(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 82).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -1245,6 +1316,29 @@ func TestGetDocumentListWhenGetDraftCountErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
+func TestGetDocumentListWhenGetPersonReferencesErrors(t *testing.T) {
+	cases := []sirius.Case{{ID: 1, CaseType: "LPA", SubType: "PFA", UID: "7000-1234-0000"}}
+
+	client := &mockDocumentListClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 82).
+		Return(cases, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 82).
+		Return([]sirius.PersonReference{}, errExample)
+
+	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/donor/82/documents", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
 func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 	cases := []sirius.Case{{ID: 1, CaseType: "LPA", SubType: "PFA", UID: "7000-1234-0000"}}
 
@@ -1264,6 +1358,9 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 82).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -1359,6 +1456,12 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 						Label:    "Link record",
 						URL:      "/link-person?id=82",
 						IconName: "aw-link",
+						Disabled: false,
+					},
+					{
+						Label:    "Delete relationship",
+						URL:      "/delete-relationship?id=82",
+						IconName: "icon-minus",
 						Disabled: false,
 					},
 				},
@@ -1484,6 +1587,9 @@ func TestDocumentListSuccessMessage(t *testing.T) {
 			client.
 				On("GetDraftCount", mock.Anything, "lpa", 1).
 				Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+			client.
+				On("PersonReferences", mock.Anything, 82).
+				Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 			template := &mockTemplate{}
 			template.

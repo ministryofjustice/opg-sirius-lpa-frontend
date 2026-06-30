@@ -25,6 +25,11 @@ func (m *mockActionPanelClient) GetDraftCount(ctx sirius.Context, caseType strin
 	return args.Get(0).(sirius.DocumentDraftCount), args.Error(1)
 }
 
+func (m *mockActionPanelClient) PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]sirius.PersonReference), args.Error(1)
+}
+
 func TestGetActionPanel(t *testing.T) {
 	cases := []sirius.Case{
 		{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"},
@@ -35,6 +40,9 @@ func TestGetActionPanel(t *testing.T) {
 	client.
 		On("CasesByDonor", mock.Anything, 123).
 		Return(cases, nil)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -124,6 +132,12 @@ func TestGetActionPanel(t *testing.T) {
 					IconName: "aw-link",
 					Disabled: false,
 				},
+				{
+					Label:    "Delete relationship",
+					URL:      "/delete-relationship?id=123",
+					IconName: "icon-minus",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -152,6 +166,9 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -239,6 +256,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					Label:    "Link record",
 					URL:      "/link-person?id=123&uid[]=7000-0000-0001",
 					IconName: "aw-link",
+					Disabled: false,
+				},
+				{
+					Label:    "Delete relationship",
+					URL:      "/delete-relationship?id=123&uid[]=7000-0000-0001",
+					IconName: "icon-minus",
 					Disabled: false,
 				},
 			},
@@ -347,6 +370,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					IconName: "aw-link",
 					Disabled: true,
 				},
+				{
+					Label:    "Delete relationship",
+					URL:      "/delete-relationship?id=0",
+					IconName: "icon-minus",
+					Disabled: true,
+				},
 			},
 		}).
 		Return(nil)
@@ -370,6 +399,9 @@ func TestGetActionPanelWhenCasesByDonorErrors(t *testing.T) {
 	client.
 		On("CasesByDonor", mock.Anything, 123).
 		Return([]sirius.Case{}, expectedError)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa", nil)
 	w := httptest.NewRecorder()
@@ -394,6 +426,36 @@ func TestGetActionPanelWhenGetDraftCountErrors(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{}, expectedError)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
+	w := httptest.NewRecorder()
+
+	err := ActionPanel(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
+}
+
+func TestGetActionPanelWhenPersonReferencesErrors(t *testing.T) {
+	expectedError := errors.New("get person references error")
+
+	cases := []sirius.Case{
+		{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"},
+		{ID: 2, UID: "7000-0000-0002", CaseType: "LPA"},
+	}
+
+	client := &mockActionPanelClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 123).
+		Return(cases, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{}, expectedError)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()
