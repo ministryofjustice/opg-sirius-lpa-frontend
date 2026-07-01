@@ -16,6 +16,7 @@ type ViewDocumentClient interface {
 	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
 	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
+	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
 }
 
 type viewDocumentData struct {
@@ -62,6 +63,12 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 		}
 		isSysAdminUser := user.HasRole("System Admin")
 
+		personReferences, err := client.PersonReferences(ctx, donorID)
+		if err != nil {
+			return err
+		}
+		personHasReferences := len(personReferences) > 0
+
 		// Extract pane parameter from query string if present
 		pane := 1 // Default to pane 1
 		if paneStr := r.URL.Query().Get("pane"); paneStr != "" {
@@ -70,20 +77,20 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			}
 		}
 
-	id, _ := strconv.Atoi(caseId)
-	var selectedCase []sirius.Case
-	if caseData, err := client.Case(ctx, id); err == nil {
-		selectedCase = []sirius.Case{caseData}
-	}
-
-	var draftCount int
-	if len(selectedCase) > 0 {
-		documentDraftCount, err := client.GetDraftCount(ctx, strings.ToLower(selectedCase[0].CaseType), selectedCase[0].ID)
-		if err != nil {
-			return err
+		id, _ := strconv.Atoi(caseId)
+		var selectedCase []sirius.Case
+		if caseData, err := client.Case(ctx, id); err == nil {
+			selectedCase = []sirius.Case{caseData}
 		}
-		draftCount = documentDraftCount.DraftCount
-	}
+
+		var draftCount int
+		if len(selectedCase) > 0 {
+			documentDraftCount, err := client.GetDraftCount(ctx, strings.ToLower(selectedCase[0].CaseType), selectedCase[0].ID)
+			if err != nil {
+				return err
+			}
+			draftCount = documentDraftCount.DraftCount
+		}
 
 		caseUidsStr := ""
 		uidParams := ""
@@ -104,7 +111,7 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			SelectedCases:   selectedCase,
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences)
 
 		userPermissions, err := client.GetUserPermissions(ctx)
 		if err != nil {

@@ -44,6 +44,11 @@ func (m *mockViewDocumentClient) GetDraftCount(ctx sirius.Context, caseType stri
 	return args.Get(0).(sirius.DocumentDraftCount), args.Error(1)
 }
 
+func (m *mockViewDocumentClient) PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]sirius.PersonReference), args.Error(1)
+}
+
 func TestGetViewDocument(t *testing.T) {
 	user := sirius.User{ID: 66, DisplayName: "Me", Roles: []string{"System Admin"}}
 	person := sirius.Person{ID: 33}
@@ -81,6 +86,9 @@ func TestGetViewDocument(t *testing.T) {
 			client.
 				On("GetUserPermissions", mock.Anything).
 				Return(sirius.Permissions{}, nil)
+			client.
+				On("PersonReferences", mock.Anything, 33).
+				Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 			template := &mockTemplate{}
 			templateData := viewDocumentData{
