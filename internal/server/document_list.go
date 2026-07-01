@@ -170,7 +170,6 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			}
 			data.SelectedCaseIds += strconv.Itoa(selectedCase.ID)
 		}
-		//fmt.Println("Selected Case IDs:", data.SelectedCaseIds)
 
 		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences)
 

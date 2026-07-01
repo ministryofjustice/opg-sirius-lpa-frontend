@@ -70,18 +70,20 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			}
 		}
 
-		id, _ := strconv.Atoi(caseId)
-		var selectedCase []sirius.Case
-		if caseData, err := client.Case(ctx, id); err == nil {
-			selectedCase = []sirius.Case{caseData}
-		}
+	id, _ := strconv.Atoi(caseId)
+	var selectedCase []sirius.Case
+	if caseData, err := client.Case(ctx, id); err == nil {
+		selectedCase = []sirius.Case{caseData}
+	}
 
-		var draftCount int
+	var draftCount int
+	if len(selectedCase) > 0 {
 		documentDraftCount, err := client.GetDraftCount(ctx, strings.ToLower(selectedCase[0].CaseType), selectedCase[0].ID)
 		if err != nil {
 			return err
 		}
 		draftCount = documentDraftCount.DraftCount
+	}
 
 		caseUidsStr := ""
 		uidParams := ""
