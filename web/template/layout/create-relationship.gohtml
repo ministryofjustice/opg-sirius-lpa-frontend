@@ -9,7 +9,6 @@
                 <option value="" selected></option>
             {{ end }}
         </select>
-
-        {{ template "input" (field "reason" "Relationship" .Reason .Error.Field.reason) }}
     </div>
+    {{ template "input" (field "reason" "Relationship" .Reason .Error.Field.reason) }}
 {{ end }}
