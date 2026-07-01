@@ -124,7 +124,7 @@
                                     {{ if eq $.Comparing true }}
                                         <a class="govuk-link" href="{{ prefix ( index $.CompareURLs .UUID )}}">{{ .FriendlyDescription }}</a>
                                     {{else}}
-                                        <a class="govuk-link" href="{{ prefix (printf "/view-document/%s" .UUID) }}">{{ .FriendlyDescription }}</a>
+                                        <a class="govuk-link" href="{{ prefix (printf "/view-document/%s/%d?case=%s" .UUID $.DonorID $.SelectedCaseIds) }}">{{ .FriendlyDescription }}</a>
                                     {{ end }}
                                 {{ else }}
                                     <a class="govuk-link" href="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .UUID) }}" download="">{{ .FriendlyDescription }}</a>

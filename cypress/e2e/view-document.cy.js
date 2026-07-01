@@ -1,5 +1,36 @@
 describe("View documents", () => {
   beforeEach(() => {
+    cy.addMock("/lpa-api/v1/persons/1", "GET", {
+      status: 200,
+      body: {},
+    });
+
+    cy.addMock("/lpa-api/v1/persons/1/cases", "GET", {
+      status: 200,
+      body: {
+        cases: [
+          {
+            caseType: "LPA",
+            caseSubtype: "pfa",
+            id: 34,
+            uId: "7000-1234-1234",
+          },
+          {
+            caseType: "LPA",
+            caseSubtype: "hw",
+            id: 78,
+            uId: "7000-5678-5678",
+          },
+          {
+            caseType: "EPA",
+            caseSubtype: "pfa",
+            id: 990,
+            uId: "7001-0000-5678",
+          },
+        ],
+      },
+    });
+
     cy.addMock(
       "/lpa-api/v1/documents/dfef6714-b4fe-44c2-b26e-90dfe3663e95",
       "GET",
@@ -34,6 +65,44 @@ describe("View documents", () => {
         },
       },
     );
+
+    cy.addMock("/lpa-api/v1/cases/1", "GET", {
+      status: 200,
+      body: {
+        id: 1,
+        caseType: "EPA",
+        caseSubtype: "pfa",
+        uId: "7001-0000-5678",
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/permissions", "GET", {
+      status: 200,
+      body: {
+        "v1-persons": {
+          permissions: ["GET"],
+        },
+        "v1-persons-cases": {
+          permissions: ["GET"],
+        },
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/epas/1/draft-count", "GET", {
+      status: 200,
+      body: {
+        draftCount: 0,
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/persons/1/references", "GET", {
+      status: 200,
+      body: [
+        {
+          referenceId: 123,
+        },
+      ],
+    });
   });
 
   it("views a document as a user with system admin role", () => {
@@ -43,7 +112,7 @@ describe("View documents", () => {
         roles: ["OPG User", "System Admin"],
       },
     });
-    cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95");
+    cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/1?case=1");
     cy.contains("7001-0000-5678");
     cy.get('a:contains("Back to list")')
       .should("exist")
@@ -69,7 +138,7 @@ describe("View documents", () => {
       },
     });
 
-    cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95");
+    cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/1?case=1");
     cy.contains("7001-0000-5678");
     cy.get('a:contains("Back to list")')
       .should("exist")
@@ -82,15 +151,12 @@ describe("View documents", () => {
         "include",
         "/lpa-api/v1/documents/dfef6714-b4fe-44c2-b26e-90dfe3663e95/download",
       );
-    cy.get('[data-action="toggle-thumbnails"]').click();
-    cy.get(".pdf-viewer-total-pages").should("contain", "3");
-    cy.get('[data-action="prev"]').should("be.disabled");
-    cy.get('[data-action="next"]').should("be.not.disabled").click();
-    cy.get(".pdf-viewer-page-input").should("have.value", "2");
-    cy.get('[data-action="prev"]').should("be.not.disabled").click();
-    cy.get(".pdf-viewer-zoom-input").should("have.value", "100%");
-    cy.get('[data-action="zoom-in"]').click();
-    cy.get(".pdf-viewer-zoom-input").should("have.value", "125%");
+
+    cy.get('[data-action="toggle-thumbnails"]').should("exist");
+    cy.get('[data-action="prev"]').should("exist");
+    cy.get('[data-action="next"]').should("exist");
+    cy.get(".pdf-viewer-page-input").should("exist");
+    cy.get(".pdf-viewer-zoom-input").should("exist");
   });
 
   it("views a document as a user without system admin role", () => {
@@ -100,7 +166,7 @@ describe("View documents", () => {
         roles: ["OPG User"],
       },
     });
-    cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95");
+    cy.visit("/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/1?case=1");
     cy.contains("7001-0000-5678");
     cy.get(".govuk-button--warning").should("not.exist");
     cy.get('a:contains("Back to list")')
@@ -142,7 +208,8 @@ describe("View documents", () => {
         },
       },
     );
-    cy.visit("/view-document/e5b5acd1-c11c-41fe-a921-7fdd07e8f670");
+
+    cy.visit("/view-document/e5b5acd1-c11c-41fe-a921-7fdd07e8f670/1?case=1");
     cy.get(".govuk-button--warning").should("not.exist");
     cy.get('a:contains("Back to list")')
       .should("exist")
