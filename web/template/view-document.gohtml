@@ -2,6 +2,14 @@
 
 {{ define "container-classes" }} app-!-max-full-width{{ end }}
 
+{{ define "sirius-header" }}
+    {{ template "siriusHeader" . }}
+{{ end }}
+
+{{ define "action-panel-wrapper" }}
+    {{ template "ActionPanelWrapper" . }}
+{{ end }}
+
 {{ define "main" }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">

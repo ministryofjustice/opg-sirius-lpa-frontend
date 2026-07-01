@@ -160,7 +160,9 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			DonorID:               donorID,
 		}
 
-		data.CaseUids = buildUIDQueryString(caseUIDs)
+		uidParams := buildUIDQueryString(caseUIDs)
+
+		data.CaseUids = uidParams
 
 		for index, selectedCase := range data.SelectedCases {
 			if index != 0 {
@@ -169,7 +171,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			data.SelectedCaseIds += strconv.Itoa(selectedCase.ID)
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids, draftCount > 0, personHasReferences)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences)
 
 		userPermissions, err := client.GetUserPermissions(ctx)
 		if err != nil {
