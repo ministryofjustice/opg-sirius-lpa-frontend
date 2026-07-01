@@ -94,6 +94,15 @@ describe("View documents", () => {
         draftCount: 0,
       },
     });
+
+    cy.addMock("/lpa-api/v1/persons/1/references", "GET", {
+      status: 200,
+      body: [
+        {
+          referenceId: 123,
+        },
+      ],
+    });
   });
 
   it("views a document as a user with system admin role", () => {
