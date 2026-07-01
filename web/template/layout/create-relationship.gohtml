@@ -1,0 +1,14 @@
+{{ define "create-relationship" }}
+    <div class="govuk-form-group {{ if .Error.Field.search }}govuk-form-group--error{{ end }}">
+        <label class="govuk-label" for="f-search">Search</label>
+        {{ template "errors" .Error.Field.search }}
+        <select class="govuk-select {{ if .Error.Field.search }}govuk-select--error{{ end }}" id="f-search" name="search" data-select-person>
+            {{ if .SearchUID }}
+                <option value="{{ .SearchUID }}:{{ .SearchName }}" selected>{{ .SearchName }}</option>
+            {{ else }}
+                <option value="" selected></option>
+            {{ end }}
+        </select>
+    </div>
+    {{ template "input" (field "reason" "Relationship" .Reason .Error.Field.reason) }}
+{{ end }}
