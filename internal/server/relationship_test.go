@@ -71,6 +71,38 @@ func TestGetRelationshipNoID(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+func TestGetCreateRelationshipWithHXRequest(t *testing.T) {
+	client := &mockRelationshipClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
+
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, relationshipData{
+			Entity:     "John Doe",
+			DonorID:    123,
+			EntityType: "person",
+		}).
+		Return(nil)
+
+	template := &mockTemplate{}
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=person", nil)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := Relationship(client, template.Func, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, partialTemplate)
+	mock.AssertExpectationsForObjects(t, client, template)
+	template.AssertNotCalled(t, "Func")
+	partialTemplate.AssertCalled(t, "Func", mock.Anything, mock.Anything)
+}
+
 func TestGetRelationshipWhenPersonErrors(t *testing.T) {
 	client := &mockRelationshipClient{}
 	client.
