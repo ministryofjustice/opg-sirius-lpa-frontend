@@ -32,6 +32,15 @@ describe("Calendars on the header bar", () => {
       status: 200,
       body: {},
     });
+
+    cy.addMock("/lpa-api/v1/persons/1/references", "GET", {
+      status: 200,
+      body: [
+        {
+          referenceId: 123,
+        },
+      ],
+    });
   });
 
   it("displays the calendars panel", () => {

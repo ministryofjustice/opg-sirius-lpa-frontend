@@ -364,6 +364,15 @@ describe("View documents", () => {
         },
       );
     });
+
+    cy.addMock("/lpa-api/v1/persons/1/references", "GET", {
+      status: 200,
+      body: [
+        {
+          referenceId: 123,
+        },
+      ],
+    });
   });
 
   it("on a person", () => {
@@ -959,6 +968,15 @@ describe("sort by dropdown", () => {
       body: {
         draftCount: 1,
       },
+    });
+
+    cy.addMock("/lpa-api/v1/persons/1/references", "GET", {
+      status: 200,
+      body: [
+        {
+          referenceId: 123,
+        },
+      ],
     });
   });
 
