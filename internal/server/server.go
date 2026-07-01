@@ -180,7 +180,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/delete-fee-reduction", wrap(DeletePayment(client, templates.Get("delete-fee-reduction-wrapper.gohtml"), templates.Get("delete-fee-reduction-partial-wrapper.gohtml"))))
 	mux.Handle("/delete-note", wrap(DeleteNote(client, templates.Get("delete-note.gohtml"))))
 	mux.Handle("/delete-payment", wrap(DeletePayment(client, templates.Get("delete-payment-wrapper.gohtml"), templates.Get("delete-payment-partial-wrapper.gohtml"))))
-	mux.Handle("/delete-relationship", wrap(DeleteRelationship(client, templates.Get("delete_relationship.gohtml"))))
+	mux.Handle("/delete-relationship", wrap(DeleteRelationship(client, templates.Get("delete-relationship-wrapper.gohtml"), templates.Get("delete-relationship-partial-wrapper.gohtml"))))
 	mux.Handle("/donor/{donorId}/details", wrap(DonorDetails(client, templates.Get("donor_details.gohtml"))))
 	mux.Handle("/donor/{id}/documents", wrap(DocumentList(client, templates.Get("documents.gohtml"))))
 	mux.Handle("/donor/{donorId}/history", wrap(GetLpaHistory(client, templates.Get("lpa-history.gohtml"))))
