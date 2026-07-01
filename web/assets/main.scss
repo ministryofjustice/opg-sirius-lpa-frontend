@@ -684,11 +684,19 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   .govuk-table__cell,
   .govuk-details__summary,
   .govuk-details__summary-text,
-  .govuk-details__text {
+  .govuk-details__text,
+  .govuk-accordion__show-all,
+  .govuk-accordion__section-toggle {
     font-size: 0.875rem;
+  }
+  .govuk-accordion__section-button,
+  .govuk-accordion__section-heading-text {
+    font-size: 1rem;
   }
   .govuk-select,
   .govuk-input,
+  .govuk-button,
+  .address-finder__container,
   .autocomplete__input,
   .autocomplete__hint {
     height: 1.875rem;
