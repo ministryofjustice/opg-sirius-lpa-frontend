@@ -114,6 +114,20 @@ class PDFViewer {
       this.createMainArea();
       this.setupStatePreservation();
 
+      this.container.setAttribute(
+        "aria-label",
+        `Select Document ${this.paneId}`,
+      );
+      this.container.setAttribute("role", "region");
+
+      if (this.paneId === "1") {
+        this.container.classList.add("pdf-viewer-pane--active");
+        this.container.setAttribute("aria-current", "true");
+        this.pagesWrapper.focus();
+      } else {
+        this.container.setAttribute("aria-current", "false");
+      }
+
       // Load saved state before loading PDF
       const savedState = this.loadState();
 
@@ -221,6 +235,38 @@ class PDFViewer {
     const mainArea = document.createElement("div");
     mainArea.className = "pdf-viewer-main-area";
 
+    window.addEventListener("keydown", async (e) => {
+      // Handle pane selection keys (1 and 2) - these work regardless of focus
+      if (e.key === "1" && this.paneId === "1") {
+        this.highlightPane();
+        return;
+      }
+
+      if (e.key === "2" && this.paneId === "2") {
+        this.highlightPane();
+        return;
+      }
+
+      // For arrow keys, only respond if this viewer has focus
+      if (
+        this.pagesWrapper !== e.target &&
+        !this.pagesWrapper.contains(e.target)
+      ) {
+        return; // Exit if focus is not in this viewer
+      }
+
+      switch (e.key) {
+        case "ArrowRight":
+          e.preventDefault();
+          await this.nextPage();
+          break;
+        case "ArrowLeft":
+          e.preventDefault();
+          await this.prevPage();
+          break;
+      }
+    });
+
     // Create thumbnail panel
     const thumbnailPanel = document.createElement("div");
     thumbnailPanel.className = "pdf-viewer-thumbnail-panel";
@@ -237,6 +283,7 @@ class PDFViewer {
     // Create pages wrapper for all pages
     const pagesWrapper = document.createElement("div");
     pagesWrapper.className = "pdf-viewer-pages-wrapper";
+    pagesWrapper.setAttribute("tabindex", "0");
     canvasContainer.appendChild(pagesWrapper);
 
     mainArea.appendChild(thumbnailPanel);
@@ -250,6 +297,11 @@ class PDFViewer {
 
     // Add scroll listener to track current page
     canvasContainer.addEventListener("scroll", () => this.handleScroll());
+
+    // Highlight this pane on click
+    canvasContainer.addEventListener("click", () => {
+      this.highlightPane();
+    });
   }
 
   handleControlClick(e) {
@@ -455,25 +507,63 @@ class PDFViewer {
     });
   }
 
+  highlightPane() {
+    this.container.classList.add("pdf-viewer-pane--active");
+    this.container.setAttribute("aria-current", "true");
+    this.pagesWrapper.focus();
+
+    document.querySelectorAll("[data-pdf-viewer]").forEach((viewer) => {
+      if (viewer !== this.container) {
+        viewer.classList.remove("pdf-viewer-pane--active");
+        viewer.setAttribute("aria-current", "false");
+      }
+    });
+  }
+
+  async preserveScrollPosition(callback) {
+    // Calculate scroll ratios before action
+    const scrollLeft = this.canvasContainer.scrollLeft;
+    const scrollTop = this.canvasContainer.scrollTop;
+    const scrollWidth = this.canvasContainer.scrollWidth;
+    const scrollHeight = this.canvasContainer.scrollHeight;
+
+    const scrollLeftRatio = scrollWidth > 0 ? scrollLeft / scrollWidth : 0;
+    const scrollTopRatio = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
+
+    // Execute the action (handles both sync and async callbacks)
+    await callback();
+
+    // Restore scroll position using ratios
+    this.canvasContainer.scrollLeft =
+      scrollLeftRatio * this.canvasContainer.scrollWidth;
+    this.canvasContainer.scrollTop =
+      scrollTopRatio * this.canvasContainer.scrollHeight;
+  }
+
   async goToPage(pageNum) {
     if (pageNum < 1 || pageNum > this.totalPages) return;
     if (pageNum === this.currentPage) return;
+
+    // Save current scroll offset within the page
+    const currentPageContainer = this.pagesWrapper.querySelector(
+      `[data-page="${this.currentPage}"]`,
+    );
+    let scrollOffset = 0;
+    if (currentPageContainer) {
+      scrollOffset =
+        this.canvasContainer.scrollTop - currentPageContainer.offsetTop;
+    }
 
     this.currentPage = pageNum;
     this.updatePageInfo();
     this.updateThumbnailSelection();
 
-    // Scroll to the page
+    // Scroll to the new page with same offset
     const pageContainer = this.pagesWrapper.querySelector(
       `[data-page="${pageNum}"]`,
     );
     if (pageContainer) {
-      this.isScrolling = true;
-      pageContainer.scrollIntoView({ behavior: "smooth", block: "start" });
-      // Reset scrolling flag after animation
-      setTimeout(() => {
-        this.isScrolling = false;
-      }, 500);
+      this.canvasContainer.scrollTop = pageContainer.offsetTop + scrollOffset;
     }
   }
 
@@ -500,6 +590,8 @@ class PDFViewer {
   }
 
   async nextPage() {
+    console.log("this.currentPage, this.totalPages");
+    console.log(this.currentPage, this.totalPages);
     if (this.currentPage >= this.totalPages) return;
     await this.goToPage(this.currentPage + 1);
   }
@@ -515,24 +607,10 @@ class PDFViewer {
   }
 
   async applyZoom() {
-    // Calculate scroll ratios before re-rendering
-    const scrollLeft = this.canvasContainer.scrollLeft;
-    const scrollTop = this.canvasContainer.scrollTop;
-    const scrollWidth = this.canvasContainer.scrollWidth;
-    const scrollHeight = this.canvasContainer.scrollHeight;
-
-    // Calculate the ratio of scroll position to total scrollable area
-    const scrollLeftRatio = scrollWidth > 0 ? scrollLeft / scrollWidth : 0;
-    const scrollTopRatio = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
-
-    this.updatePageInfo();
-    await this.renderAllPages();
-
-    // Apply the same ratio to the new scrollable area
-    this.canvasContainer.scrollLeft =
-      scrollLeftRatio * this.canvasContainer.scrollWidth;
-    this.canvasContainer.scrollTop =
-      scrollTopRatio * this.canvasContainer.scrollHeight;
+    await this.preserveScrollPosition(async () => {
+      this.updatePageInfo();
+      await this.renderAllPages();
+    });
   }
 
   async fitToWidth() {
