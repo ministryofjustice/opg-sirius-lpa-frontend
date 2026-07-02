@@ -31,7 +31,7 @@ $app-sirius-header-height: 40px;
 $app-sirius-header-min-width: $govuk-page-width + $gutter + $spacer;
 $app-sirius-header-search-height: $app-sirius-header-height - 6px;
 $app-fixed-headers-height: $app-moj-header-height + $app-sirius-header-height;
-$app-sirius-header-z-index: 1010;
+$app-sirius-header-z-index: 15;
 $app-sirius-header-dropdown-z-index: $app-sirius-header-z-index - 1;
 $app-action-panel-top: $app-moj-header-height + $app-sirius-header-height + 15px;
 $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
