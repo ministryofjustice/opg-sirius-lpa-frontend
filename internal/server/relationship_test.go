@@ -35,14 +35,15 @@ func TestGetRelationship(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, relationshipData{
-			Entity: "John Doe",
+			Entity:  "John Doe",
+			DonorID: 123,
 		}).
 		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Relationship(client, template.Func)(w, r)
+	err := Relationship(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -65,9 +66,41 @@ func TestGetRelationshipNoID(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
-	err := Relationship(client, template.Func)(w, r)
+	err := Relationship(client, template.Func, nil)(w, r)
 
 	assert.NotNil(t, err)
+}
+
+func TestGetCreateRelationshipWithHXRequest(t *testing.T) {
+	client := &mockRelationshipClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
+
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, relationshipData{
+			Entity:     "John Doe",
+			DonorID:    123,
+			EntityType: "person",
+		}).
+		Return(nil)
+
+	template := &mockTemplate{}
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=person", nil)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := Relationship(client, template.Func, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, partialTemplate)
+	mock.AssertExpectationsForObjects(t, client, template)
+	template.AssertNotCalled(t, "Func")
+	partialTemplate.AssertCalled(t, "Func", mock.Anything, mock.Anything)
 }
 
 func TestGetRelationshipWhenPersonErrors(t *testing.T) {
@@ -86,7 +119,7 @@ func TestGetRelationshipWhenPersonErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Relationship(client, template.Func)(w, r)
+	err := Relationship(client, template.Func, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -100,14 +133,15 @@ func TestGetRelationshipWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, relationshipData{
-			Entity: "John Doe",
+			Entity:  "John Doe",
+			DonorID: 123,
 		}).
 		Return(errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Relationship(client, template.Func)(w, r)
+	err := Relationship(client, template.Func, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -126,6 +160,7 @@ func TestPostRelationship(t *testing.T) {
 		On("Func", mock.Anything, relationshipData{
 			Success: true,
 			Entity:  "John Doe",
+			DonorID: 123,
 		}).
 		Return(nil)
 
@@ -138,7 +173,7 @@ func TestPostRelationship(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Relationship(client, template.Func)(w, r)
+	err := Relationship(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -163,6 +198,7 @@ func TestPostRelationshipWhenCreatePersonReferenceValidationError(t *testing.T) 
 		On("Func", mock.Anything, relationshipData{
 			Success:    false,
 			Error:      expectedError,
+			DonorID:    123,
 			Entity:     "John Doe",
 			SearchUID:  "7000-1000-1111",
 			SearchName: "Some Person (7000-1000-1111)",
@@ -179,7 +215,7 @@ func TestPostRelationshipWhenCreatePersonReferenceValidationError(t *testing.T) 
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Relationship(client, template.Func)(w, r)
+	err := Relationship(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -204,7 +240,7 @@ func TestPostRelationshipWhenCreatePersonReferenceOtherError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Relationship(client, nil)(w, r)
+	err := Relationship(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
