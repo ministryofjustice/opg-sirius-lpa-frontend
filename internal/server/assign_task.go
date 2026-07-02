@@ -24,6 +24,10 @@ type assignTaskData struct {
 	XSRFToken string
 	Entities  []string
 	Uid       string
+	CaseType  string
+	DonorID   int
+	CaseUids  string
+	TaskIDs   string
 	Success   bool
 	Error     sirius.ValidationError
 
@@ -32,7 +36,7 @@ type assignTaskData struct {
 	AssigneeUserName string
 }
 
-func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
+func AssignTask(client AssignTaskClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
 			return err
@@ -51,8 +55,31 @@ func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 			return errors.New("no tasks selected")
 		}
 
+		taskIDQuery := ""
+		for i, taskID := range taskIDs {
+			if i == 0 {
+				taskIDQuery += fmt.Sprintf("id=%d", taskID)
+			} else {
+				taskIDQuery += fmt.Sprintf("&id=%d", taskID)
+			}
+		}
+
+		donorID := 0
+		if donorIDStr := r.URL.Query().Get("donorId"); donorIDStr != "" {
+			var err error
+			donorID, err = strconv.Atoi(donorIDStr)
+			if err != nil {
+				return err
+			}
+		}
+
 		ctx := getContext(r)
-		data := assignTaskData{XSRFToken: ctx.XSRFToken}
+		data := assignTaskData{
+			XSRFToken: ctx.XSRFToken,
+			DonorID:   donorID,
+			CaseUids:  buildUIDQueryString(r.Form["uid[]"]),
+			TaskIDs:   taskIDQuery,
+		}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
@@ -81,6 +108,7 @@ func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 				if lpa == nil && len(task.CaseItems) > 0 {
 					lpa = &task.CaseItems[0]
 					data.Uid = lpa.UID
+					data.CaseType = strings.ToLower(lpa.CaseType)
 				}
 
 				tasksMu.Lock()
@@ -144,6 +172,10 @@ func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 			} else {
 				data.Success = true
 			}
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
