@@ -52,6 +52,11 @@ func (m *mockDocumentListClient) PersonReferences(ctx sirius.Context, id int) ([
 	return args.Get(0).([]sirius.PersonReference), args.Error(1)
 }
 
+func (m *mockDocumentListClient) TasksForCase(ctx sirius.Context, caseId int) ([]sirius.Task, error) {
+	args := m.Called(ctx, caseId)
+	return args.Get(0).([]sirius.Task), args.Error(1)
+}
+
 var singleDocumentList = sirius.DocumentList{
 	Limit: 999,
 	Pages: sirius.Pages{
@@ -294,6 +299,12 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: true,
 				},
 				{
+					Label:    "Assign task",
+					URL:      "",
+					IconName: "aw-assign-task",
+					Disabled: true,
+				},
+				{
 					Label:    "Create donor",
 					URL:      "/create-donor?id=82&entity=person",
 					IconName: "aw-create-person",
@@ -400,6 +411,12 @@ func TestGetDocumentList(t *testing.T) {
 					Label:    "New task",
 					URL:      "/create-task?id=1&entity=lpa",
 					IconName: "aw-new-task",
+					Disabled: false,
+				},
+				{
+					Label:    "Assign task",
+					URL:      "/assign-task?id=990&donorId=82",
+					IconName: "aw-assign-task",
 					Disabled: false,
 				},
 				{
@@ -514,6 +531,12 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Assign task",
+					URL:      "/assign-task?id=990&donorId=82&uid[]=7000-1234-0000",
+					IconName: "aw-assign-task",
+					Disabled: false,
+				},
+				{
 					Label:    "Create donor",
 					URL:      "/create-donor?id=82&entity=person&uid[]=7000-1234-0000",
 					IconName: "aw-create-person",
@@ -624,6 +647,12 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: true,
 				},
 				{
+					Label:    "Assign task",
+					URL:      "",
+					IconName: "aw-assign-task",
+					Disabled: true,
+				},
+				{
 					Label:    "Create donor",
 					URL:      "/create-donor?id=82&entity=person&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 					IconName: "aw-create-person",
@@ -703,6 +732,9 @@ func TestGetDocumentList(t *testing.T) {
 				client.
 					On("GetDraftCount", mock.Anything, "lpa", 1).
 					Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+				client.
+					On("TasksForCase", mock.Anything, 1).
+					Return([]sirius.Task{{ID: 990}}, nil)
 			}
 
 			template := &mockTemplate{}
@@ -772,6 +804,9 @@ func TestGetDocumentListHasV1PersonsCasesGetPermission(t *testing.T) {
 				On("GetDraftCount", mock.Anything, "lpa", 1).
 				Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 			client.
+				On("TasksForCase", mock.Anything, 1).
+				Return([]sirius.Task{}, nil)
+			client.
 				On("PersonReferences", mock.Anything, 82).
 				Return([]sirius.PersonReference{{ID: 987}}, nil)
 
@@ -803,6 +838,9 @@ func TestDocumentListDownloadMultipleSuccess(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("TasksForCase", mock.Anything, 1).
+		Return([]sirius.Task{}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 82).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
@@ -851,6 +889,9 @@ func TestDocumentListDownloadMultipleError(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("TasksForCase", mock.Anything, 1).
+		Return([]sirius.Task{}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 82).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
@@ -954,6 +995,12 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 						Label:    "New task",
 						URL:      "",
 						IconName: "aw-new-task",
+						Disabled: true,
+					},
+					{
+						Label:    "Assign task",
+						URL:      "",
+						IconName: "aw-assign-task",
 						Disabled: true,
 					},
 					{
@@ -1152,6 +1199,12 @@ func TestDocumentListDismissValidation(t *testing.T) {
 						Disabled: true,
 					},
 					{
+						Label:    "Assign task",
+						URL:      "",
+						IconName: "aw-assign-task",
+						Disabled: true,
+					},
+					{
 						Label:    "Create donor",
 						URL:      "/create-donor?id=82&entity=person&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 						IconName: "aw-create-person",
@@ -1261,6 +1314,9 @@ func TestGetDocumentListWhenGetPersonDocumentsErrors(t *testing.T) {
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 	client.
+		On("TasksForCase", mock.Anything, 1).
+		Return([]sirius.Task{}, nil)
+	client.
 		On("PersonReferences", mock.Anything, 82).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
@@ -1289,6 +1345,9 @@ func TestGetDocumentListWhenPersonErrors(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("TasksForCase", mock.Anything, 1).
+		Return([]sirius.Task{}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 82).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
@@ -1322,6 +1381,9 @@ func TestGetDocumentListWhenPermissionsErrors(t *testing.T) {
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 	client.
+		On("TasksForCase", mock.Anything, 1).
+		Return([]sirius.Task{}, nil)
+	client.
 		On("PersonReferences", mock.Anything, 82).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
@@ -1352,6 +1414,7 @@ func TestGetDocumentListWhenGetDraftCountErrors(t *testing.T) {
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
+	client.AssertNotCalled(t, "TasksForCase")
 }
 
 func TestGetDocumentListWhenGetPersonReferencesErrors(t *testing.T) {
@@ -1364,6 +1427,9 @@ func TestGetDocumentListWhenGetPersonReferencesErrors(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("TasksForCase", mock.Anything, 1).
+		Return([]sirius.Task{}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 82).
 		Return([]sirius.PersonReference{}, errExample)
@@ -1396,6 +1462,9 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("TasksForCase", mock.Anything, 1).
+		Return([]sirius.Task{{ID: 990}}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 82).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
@@ -1458,6 +1527,12 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 						Label:    "New task",
 						URL:      "/create-task?id=1&entity=lpa",
 						IconName: "aw-new-task",
+						Disabled: false,
+					},
+					{
+						Label:    "Assign task",
+						URL:      "/assign-task?id=990&donorId=82",
+						IconName: "aw-assign-task",
 						Disabled: false,
 					},
 					{
@@ -1631,6 +1706,9 @@ func TestDocumentListSuccessMessage(t *testing.T) {
 			client.
 				On("GetDraftCount", mock.Anything, "lpa", 1).
 				Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+			client.
+				On("TasksForCase", mock.Anything, 1).
+				Return([]sirius.Task{}, nil)
 			client.
 				On("PersonReferences", mock.Anything, 82).
 				Return([]sirius.PersonReference{{ID: 987}}, nil)
