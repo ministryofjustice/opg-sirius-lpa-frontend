@@ -45,6 +45,19 @@ describe("Action Panel", () => {
       },
     });
 
+    cy.addMock(
+      "/lpa-api/v1/cases/34/tasks?filter=status:Not started,active:true&limit=99&sort=duedate:ASC",
+      "GET",
+      {
+        status: 200,
+        body: {
+          tasks: [
+            { id: 990, name: "Review application", dueDate: "2026-07-01" },
+          ],
+        },
+      },
+    );
+
     cy.addMock("/lpa-api/v1/persons/1/references", "GET", {
       status: 200,
       body: [
@@ -323,5 +336,28 @@ describe("Action Panel", () => {
     cy.get("a#action-panel-button-delete-relationship").click();
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Delete Relationship");
+  });
+
+  it("displays the assign task button on the action panel", () => {
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Assign task");
+
+    cy.addMock("/lpa-api/v1/tasks/990", "GET", {
+      status: 200,
+      body: {
+        id: 990,
+        name: "Review application",
+        caseItems: [{ caseType: "LPA", uId: "7000-1234-1234" }],
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/teams", "GET", {
+      status: 200,
+      body: [{ id: 23, displayName: "Cool Team" }],
+    });
+
+    cy.get("a#action-panel-button-assign-task").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Assign Task");
   });
 });
