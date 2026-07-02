@@ -311,6 +311,15 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form").contains("MI Reporting");
   });
 
+  it("displays the create relationship button on the action panel", () => {
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Create relationship");
+
+    cy.get("a#action-panel-button-create-relationship").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Create Relationship");
+  });
+
   it("displays the link record button on the action panel", () => {
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Link record");
