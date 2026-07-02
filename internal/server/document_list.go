@@ -19,6 +19,7 @@ type DocumentListClient interface {
 	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
 	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
 	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
+	TasksForCase(ctx sirius.Context, caseId int) ([]sirius.Task, error)
 }
 
 type documentPageData struct {
@@ -84,12 +85,21 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 		}
 
 		var draftCount int
+		var taskIDs []int
 		if len(selected) == 1 {
 			documentDraftCount, err := client.GetDraftCount(ctx, strings.ToLower(selected[0].CaseType), selected[0].ID)
 			if err != nil {
 				return err
 			}
 			draftCount = documentDraftCount.DraftCount
+
+			tasks, err := client.TasksForCase(ctx, selected[0].ID)
+			if err != nil {
+				return err
+			}
+			for _, task := range tasks {
+				taskIDs = append(taskIDs, task.ID)
+			}
 		}
 
 		personReferences, err := client.PersonReferences(ctx, donorID)
@@ -172,12 +182,13 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			data.SelectedCaseIds += strconv.Itoa(selectedCase.ID)
 		}
 
+
 		userPermissions, err := client.GetUserPermissions(ctx)
 		if err != nil {
 			return err
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, userPermissions)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, taskIDs, len(person.Children) > 0, userPermissions)
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,
 			Calendar:       true,
