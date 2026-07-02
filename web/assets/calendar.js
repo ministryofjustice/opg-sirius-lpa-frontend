@@ -48,13 +48,20 @@ const renderCalendars = (container, startMonth, startYear, bankHolidays) => {
     calendars.push(renderMonth(month, year, bankHolidays, index));
   });
 
-  container.innerHTML = "";
+  let calendarGrid = container.querySelector(".panel-calendar");
 
-  const calendarGrid = document.createElement("div");
-  calendarGrid.className = "panel-calendar";
-  calendarGrid.innerHTML = calendars.join("");
+  if (!calendarGrid) {
+    calendarGrid = document.createElement("div");
+    calendarGrid.className = "panel-calendar";
+    container.appendChild(calendarGrid);
+  }
 
-  container.appendChild(calendarGrid);
+  // Keep existing content (i.e. working days calculator) and only refresh calendar components.
+  calendarGrid.querySelectorAll("opg-calendar").forEach((calendar) => {
+    calendar.remove();
+  });
+
+  calendarGrid.insertAdjacentHTML("afterbegin", calendars.join(""));
 
   calendarMonths.forEach(({ month, year, index }) => {
     const prevButton = container.querySelector(`.prev-month-${index}`);
