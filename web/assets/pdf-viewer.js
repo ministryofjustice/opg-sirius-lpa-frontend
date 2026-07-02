@@ -80,7 +80,7 @@ class PDFViewer {
 
   setupStatePreservation() {
     // Save state before page unload
-    window.addEventListener("beforeunload", () => this.saveState());
+    globalThis.addEventListener("beforeunload", () => this.saveState());
   }
 
   getRotationStorageKey() {
@@ -114,7 +114,10 @@ class PDFViewer {
       this.createMainArea();
       this.setupStatePreservation();
 
-      this.container.setAttribute("aria-label", `Select Document ${this.paneId}`);
+      this.container.setAttribute(
+        "aria-label",
+        `Select Document ${this.paneId}`,
+      );
       this.container.setAttribute("role", "region");
 
       if (this.paneId === "1") {
@@ -232,7 +235,7 @@ class PDFViewer {
     const mainArea = document.createElement("div");
     mainArea.className = "pdf-viewer-main-area";
 
-    window.addEventListener("keydown", async (e) => {
+    globalThis.addEventListener("keydown", async (e) => {
       // Handle pane selection keys (1 and 2) - these work regardless of focus
       if (e.key === "1" && this.paneId === "1") {
         this.highlightPane();
@@ -245,22 +248,24 @@ class PDFViewer {
       }
 
       // For arrow keys, only respond if this viewer has focus
-      if (this.pagesWrapper !== e.target && !this.pagesWrapper.contains(e.target)) {
+      if (
+        this.pagesWrapper !== e.target &&
+        !this.pagesWrapper.contains(e.target)
+      ) {
         return; // Exit if focus is not in this viewer
       }
 
-      switch(e.key) {
+      switch (e.key) {
         case "ArrowRight":
           e.preventDefault();
-          await this.nextPage()
+          await this.nextPage();
           break;
         case "ArrowLeft":
           e.preventDefault();
-          await this.prevPage()
+          await this.prevPage();
           break;
       }
     });
-
 
     // Create thumbnail panel
     const thumbnailPanel = document.createElement("div");
@@ -381,7 +386,7 @@ class PDFViewer {
         const canvas = document.createElement("canvas");
         canvas.className = "pdf-viewer-canvas";
 
-        const outputScale = window.devicePixelRatio || 1;
+        const outputScale = globalThis.devicePixelRatio || 1;
 
         canvas.width = Math.floor(viewport.width * outputScale);
         canvas.height = Math.floor(viewport.height * outputScale);
@@ -515,51 +520,52 @@ class PDFViewer {
     });
   }
 
-   async preserveScrollPosition(callback) {
-     // Calculate scroll ratios before action
-     const scrollLeft = this.canvasContainer.scrollLeft;
-     const scrollTop = this.canvasContainer.scrollTop;
-     const scrollWidth = this.canvasContainer.scrollWidth;
-     const scrollHeight = this.canvasContainer.scrollHeight;
+  async preserveScrollPosition(callback) {
+    // Calculate scroll ratios before action
+    const scrollLeft = this.canvasContainer.scrollLeft;
+    const scrollTop = this.canvasContainer.scrollTop;
+    const scrollWidth = this.canvasContainer.scrollWidth;
+    const scrollHeight = this.canvasContainer.scrollHeight;
 
-     const scrollLeftRatio = scrollWidth > 0 ? scrollLeft / scrollWidth : 0;
-     const scrollTopRatio = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
+    const scrollLeftRatio = scrollWidth > 0 ? scrollLeft / scrollWidth : 0;
+    const scrollTopRatio = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
 
-     // Execute the action (handles both sync and async callbacks)
-     await callback();
+    // Execute the action (handles both sync and async callbacks)
+    await callback();
 
-     // Restore scroll position using ratios
-     this.canvasContainer.scrollLeft =
-       scrollLeftRatio * this.canvasContainer.scrollWidth;
-     this.canvasContainer.scrollTop =
-       scrollTopRatio * this.canvasContainer.scrollHeight;
-   }
+    // Restore scroll position using ratios
+    this.canvasContainer.scrollLeft =
+      scrollLeftRatio * this.canvasContainer.scrollWidth;
+    this.canvasContainer.scrollTop =
+      scrollTopRatio * this.canvasContainer.scrollHeight;
+  }
 
-   async goToPage(pageNum) {
-     if (pageNum < 1 || pageNum > this.totalPages) return;
-     if (pageNum === this.currentPage) return;
+  async goToPage(pageNum) {
+    if (pageNum < 1 || pageNum > this.totalPages) return;
+    if (pageNum === this.currentPage) return;
 
-     // Save current scroll offset within the page
-     const currentPageContainer = this.pagesWrapper.querySelector(
-       `[data-page="${this.currentPage}"]`,
-     );
-     let scrollOffset = 0;
-     if (currentPageContainer) {
-       scrollOffset = this.canvasContainer.scrollTop - currentPageContainer.offsetTop;
-     }
+    // Save current scroll offset within the page
+    const currentPageContainer = this.pagesWrapper.querySelector(
+      `[data-page="${this.currentPage}"]`,
+    );
+    let scrollOffset = 0;
+    if (currentPageContainer) {
+      scrollOffset =
+        this.canvasContainer.scrollTop - currentPageContainer.offsetTop;
+    }
 
-     this.currentPage = pageNum;
-     this.updatePageInfo();
-     this.updateThumbnailSelection();
+    this.currentPage = pageNum;
+    this.updatePageInfo();
+    this.updateThumbnailSelection();
 
-     // Scroll to the new page with same offset
-     const pageContainer = this.pagesWrapper.querySelector(
-       `[data-page="${pageNum}"]`,
-     );
-     if (pageContainer) {
-       this.canvasContainer.scrollTop = pageContainer.offsetTop + scrollOffset;
-     }
-   }
+    // Scroll to the new page with same offset
+    const pageContainer = this.pagesWrapper.querySelector(
+      `[data-page="${pageNum}"]`,
+    );
+    if (pageContainer) {
+      this.canvasContainer.scrollTop = pageContainer.offsetTop + scrollOffset;
+    }
+  }
 
   updatePageInfo() {
     const pageInput = this.controls.querySelector(".pdf-viewer-page-input");
@@ -600,12 +606,12 @@ class PDFViewer {
     await this.applyZoom();
   }
 
-   async applyZoom() {
-     await this.preserveScrollPosition(async () => {
-       this.updatePageInfo();
-       await this.renderAllPages();
-     });
-   }
+  async applyZoom() {
+    await this.preserveScrollPosition(async () => {
+      this.updatePageInfo();
+      await this.renderAllPages();
+    });
+  }
 
   async fitToWidth() {
     if (!this.pdfDoc) return;
