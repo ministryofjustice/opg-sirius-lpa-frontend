@@ -194,6 +194,9 @@ func calculateWorkingDays(startDate time.Time, endDate time.Time, numWorkingDays
 			}
 		}
 		output.EndDate = d.Format(time.DateOnly)
+
+	default:
+
 	}
 
 	return output

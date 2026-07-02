@@ -86,19 +86,19 @@ describe("Calendars on the header bar", () => {
     cy.get("#calc-startdate").should("not.have.attr", "readonly");
     cy.get("#calc-numworkingdays").should("not.have.attr", "readonly");
 
-    cy.get("#mode-startdate").check({ force: true });
+    cy.get("#mode-startdate").click();
     cy.get("#mode-startdate").should("be.checked");
     cy.get("#calc-startdate").should("have.attr", "readonly");
     cy.get("#calc-enddate").should("not.have.attr", "readonly");
     cy.get("#calc-numworkingdays").should("not.have.attr", "readonly");
 
-    cy.get("#mode-numworkingdays").check({ force: true });
+    cy.get("#mode-numworkingdays").click();
     cy.get("#mode-numworkingdays").should("be.checked");
     cy.get("#calc-numworkingdays").should("have.attr", "readonly");
     cy.get("#calc-startdate").should("not.have.attr", "readonly");
     cy.get("#calc-enddate").should("not.have.attr", "readonly");
 
-    cy.get("#mode-enddate").check({ force: true });
+    cy.get("#mode-enddate").click();
     cy.get("#mode-enddate").should("be.checked");
     cy.get("#calc-enddate").should("have.attr", "readonly");
     cy.get("#calc-startdate").should("not.have.attr", "readonly");
