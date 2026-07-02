@@ -17,6 +17,7 @@ type ViewDocumentClient interface {
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
 	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
 	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
+	TasksForCase(ctx sirius.Context, caseId int) ([]sirius.Task, error)
 }
 
 type viewDocumentData struct {
@@ -84,12 +85,21 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 		}
 
 		var draftCount int
+		var taskIDs []int
 		if len(selectedCase) > 0 {
 			documentDraftCount, err := client.GetDraftCount(ctx, strings.ToLower(selectedCase[0].CaseType), selectedCase[0].ID)
 			if err != nil {
 				return err
 			}
 			draftCount = documentDraftCount.DraftCount
+
+			tasks, err := client.TasksForCase(ctx, selectedCase[0].ID)
+			if err != nil {
+				return err
+			}
+			for _, task := range tasks {
+				taskIDs = append(taskIDs, task.ID)
+			}
 		}
 
 		caseUidsStr := ""
@@ -116,7 +126,7 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, userPermissions)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, taskIDs, len(person.Children) > 0, userPermissions)
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,
 			CaseInfo:       true,

@@ -49,6 +49,11 @@ func (m *mockViewDocumentClient) PersonReferences(ctx sirius.Context, id int) ([
 	return args.Get(0).([]sirius.PersonReference), args.Error(1)
 }
 
+func (m *mockViewDocumentClient) TasksForCase(ctx sirius.Context, caseId int) ([]sirius.Task, error) {
+	args := m.Called(ctx, caseId)
+	return args.Get(0).([]sirius.Task), args.Error(1)
+}
+
 func TestGetViewDocument(t *testing.T) {
 	user := sirius.User{ID: 66, DisplayName: "Me", Roles: []string{"System Admin"}}
 	person := sirius.Person{ID: 33}
@@ -83,6 +88,9 @@ func TestGetViewDocument(t *testing.T) {
 			client.
 				On("GetDraftCount", mock.Anything, strings.ToLower(caseType), 34).
 				Return(draftCount, nil)
+			client.
+				On("TasksForCase", mock.Anything, 34).
+				Return([]sirius.Task{}, nil)
 			client.
 				On("GetUserPermissions", mock.Anything).
 				Return(sirius.Permissions{}, nil)
