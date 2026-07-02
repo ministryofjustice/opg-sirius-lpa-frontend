@@ -30,6 +30,11 @@ func (m *mockActionPanelClient) PersonReferences(ctx sirius.Context, id int) ([]
 	return args.Get(0).([]sirius.PersonReference), args.Error(1)
 }
 
+func (m *mockActionPanelClient) TasksForCase(ctx sirius.Context, caseId int) ([]sirius.Task, error) {
+	args := m.Called(ctx, caseId)
+	return args.Get(0).([]sirius.Task), args.Error(1)
+}
+
 func TestGetActionPanel(t *testing.T) {
 	cases := []sirius.Case{
 		{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"},
@@ -97,6 +102,12 @@ func TestGetActionPanel(t *testing.T) {
 					Disabled: true,
 				},
 				{
+					Label:    "Assign task",
+					URL:      "",
+					IconName: "aw-assign-task",
+					Disabled: true,
+				},
+				{
 					Label:    "Create donor",
 					URL:      "/create-donor?id=123&entity=person",
 					IconName: "aw-create-person",
@@ -158,6 +169,7 @@ func TestGetActionPanel(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
+	client.AssertNotCalled(t, "TasksForCase")
 }
 
 func TestGetActionPanelWithUIDFilter(t *testing.T) {
@@ -173,6 +185,9 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("TasksForCase", mock.Anything, 1).
+		Return([]sirius.Task{{ID: 990}}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
@@ -230,6 +245,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Assign task",
+					URL:      "/assign-task?id=990&donorId=123&uid[]=7000-0000-0001",
+					IconName: "aw-assign-task",
+					Disabled: false,
+				},
+				{
 					Label:    "Create donor",
 					URL:      "/create-donor?id=123&entity=person&uid[]=7000-0000-0001",
 					IconName: "aw-create-person",
@@ -282,6 +303,48 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
+	w := httptest.NewRecorder()
+
+	err := ActionPanel(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetActionPanelNoOutstandingTasks(t *testing.T) {
+	cases := []sirius.Case{
+		{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"},
+	}
+
+	client := &mockActionPanelClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 123).
+		Return(cases, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{}, nil)
+	client.
+		On("TasksForCase", mock.Anything, 1).
+		Return([]sirius.Task{}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.MatchedBy(func(data ActionPanelData) bool {
+			for _, btn := range data.ActionPanelButtons {
+				if btn.Label == "Assign task" {
+					return assert.Equal(t, "", btn.URL) && assert.True(t, btn.Disabled)
+				}
+			}
+			return false
+		})).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := ActionPanel(client, template.Func)(w, r)
@@ -348,6 +411,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					Disabled: true,
 				},
 				{
+					Label:    "Assign task",
+					URL:      "",
+					IconName: "aw-assign-task",
+					Disabled: true,
+				},
+				{
 					Label:    "Create donor",
 					URL:      "/create-donor?id=0&entity=person",
 					IconName: "aw-create-person",
@@ -409,6 +478,7 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 	client.AssertNotCalled(t, "CasesByDonor")
+	client.AssertNotCalled(t, "TasksForCase")
 }
 
 func TestGetActionPanelWhenCasesByDonorErrors(t *testing.T) {
@@ -455,6 +525,37 @@ func TestGetActionPanelWhenGetDraftCountErrors(t *testing.T) {
 	err := ActionPanel(client, nil)(w, r)
 
 	assert.Equal(t, expectedError, err)
+	client.AssertNotCalled(t, "TasksForCase")
+}
+
+func TestGetActionPanelWhenTasksForCaseErrors(t *testing.T) {
+	expectedError := errors.New("tasks for case error")
+
+	cases := []sirius.Case{
+		{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"},
+		{ID: 2, UID: "7000-0000-0002", CaseType: "LPA"},
+	}
+
+	client := &mockActionPanelClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 123).
+		Return(cases, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("TasksForCase", mock.Anything, 1).
+		Return([]sirius.Task{}, expectedError)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
+	w := httptest.NewRecorder()
+
+	err := ActionPanel(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
 }
 
 func TestGetActionPanelWhenPersonReferencesErrors(t *testing.T) {
@@ -472,6 +573,9 @@ func TestGetActionPanelWhenPersonReferencesErrors(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{}, nil)
+	client.
+		On("TasksForCase", mock.Anything, 1).
+		Return([]sirius.Task{}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{}, expectedError)
