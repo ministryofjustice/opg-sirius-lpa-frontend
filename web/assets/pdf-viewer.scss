@@ -166,3 +166,7 @@
   align-items: center;
   padding: govuk-spacing(4);
 }
+
+.pdf-viewer-pane--active {
+  border: 2px solid blue;
+}
