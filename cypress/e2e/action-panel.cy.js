@@ -46,13 +46,13 @@ describe("Action Panel", () => {
     });
 
     cy.addMock(
-      "/lpa-api/v1/cases/34/tasks?filter=status:Not started,active:true&limit=99&sort=duedate:ASC",
+      "/lpa-api/v1/cases/34/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
       "GET",
       {
         status: 200,
         body: {
           tasks: [
-            { id: 990, name: "Review application", dueDate: "2026-07-01" },
+            { id: 990, name: "Review application", dueDate: "01/07/2026" },
           ],
         },
       },
