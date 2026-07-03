@@ -1,0 +1,45 @@
+{{ define "calendarMonth" }}
+    <div class="opg-calendar">
+        <div class="calendar" role="grid" aria-label="{{ .Name }}" id="calendar-month-{{ .Year }}-{{ .Month }}">
+            <div class="current-month">
+                <button class="move-month prev-month-{{ .Year }}-{{ .Month }}"
+                    hx-get="{{ prefix .PrevMonthURL }}"
+                    hx-target="#calendar-month-{{ .Year }}-{{ .Month }}"
+                    hx-swap="outerHTML"
+                    type="button"
+                    aria-label="Previous month">
+                    ←
+                </button>
+                <span>{{ .Name }}</span>
+                <button class="move-month next-month-{{ .Year }}-{{ .Month }}"
+                    hx-get="{{ prefix .NextMonthURL }}"
+                    hx-target="#calendar-month-{{ .Year }}-{{ .Month }}"
+                    hx-swap="outerHTML"
+                    type="button"
+                    aria-label="Next month">
+                    →
+                </button>
+            </div>
+            <div class="weekday">Mon</div>
+            <div class="weekday">Tue</div>
+            <div class="weekday">Wed</div>
+            <div class="weekday">Thu</div>
+            <div class="weekday">Fri</div>
+            <div class="weekday">Sat</div>
+            <div class="weekday">Sun</div>
+            {{ range .Weeks }}
+                {{ range . }}
+                    {{ if .Date }}
+                        <div class="day {{ if .IsToday }}today{{ else }}default{{ end }}"
+                            data-date="{{ .Date }}"
+                            role="gridcell">
+                            <span class="day-number">{{ .Day }}</span>
+                        </div>
+                    {{ else }}
+                        <div class="day disabled" role="gridcell" aria-hidden="true"></div>
+                    {{ end }}
+                {{ end }}
+            {{ end }}
+        </div>
+    </div>
+{{ end }}
