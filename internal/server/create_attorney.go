@@ -26,6 +26,8 @@ type createAttorneyData struct {
 	IsEditing            bool
 	Title                string
 	NextAttorneyId       int
+	HtmxRedirect         string
+	HtmxSwap             string
 }
 
 func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partialTmpl template.Template) Handler {
@@ -126,13 +128,28 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partial
 			}
 
 			if r.FormValue("add-another") != "" {
+				if r.Header.Get("HX-Request") == "true" {
+					data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d", donorId, caseId)
+					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
+					return partialTmpl(w, data)
+				}
 				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d", donorId, caseId))
 			}
 
 			if r.FormValue("next-attorney") != "" {
+				if r.Header.Get("HX-Request") == "true" {
+					data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d&attorneyId=%d", donorId, caseId, data.NextAttorneyId)
+					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
+					return partialTmpl(w, data)
+				}
 				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&attorneyId=%d", donorId, caseId, data.NextAttorneyId))
 			}
 
+			if r.Header.Get("HX-Request") == "true" {
+				data.HtmxRedirect = fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, caseId)
+				data.HtmxSwap = "innerHTML show:#accordion-create-epa-heading-3:top"
+				return partialTmpl(w, data)
+			}
 			return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 
 		}

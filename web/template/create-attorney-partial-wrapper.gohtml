@@ -1,5 +1,15 @@
 {{ define "page" }}
   <div class="action-panel__form">
+
+    {{ if .HtmxRedirect }}
+        <span class="govuk-!-display-none"
+              hx-get="{{ prefix .HtmxRedirect }}"
+              hx-target=".action-panel__content"
+              hx-swap="{{ .HtmxSwap }}"
+              hx-trigger="load"
+        ></span>
+    {{ end }}
+
     {{ template "error-summary" .Error }}
 
     <a class="govuk-back-link"
@@ -14,7 +24,7 @@
           method="POST"
           hx-post={{if .IsEditing}}"{{ prefix (printf "/create-attorney?id=%d&caseId=%d&attorneyId=%d" .DonorId .CaseId .Attorney.ID) }}"{{else}}"{{ prefix (printf "/create-attorney?id=%d&caseId=%d" .DonorId .CaseId) }}"{{end}}
           hx-target=".action-panel__content"
-          hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">
+          hx-swap="innerHTML">
 
       {{ template "createAttorney" . }}
 

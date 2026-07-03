@@ -339,6 +339,7 @@ describe("Action Panel", () => {
       status: 200,
       body: { id: 123 },
     });
+
     cy.addMock("/lpa-api/v1/epas/123", "PUT", {
       status: 200,
       body: { id: 123 },
@@ -351,6 +352,11 @@ describe("Action Panel", () => {
         receiptDate: "10/06/2026",
         attorneys: [],
       },
+    });
+
+    cy.addMock("/lpa-api/v1/epas/123/attorneys", "POST", {
+      status: 200,
+      body: { id: 123 },
     });
 
     cy.visit("/donor/1/documents"); // create epa button is only clickable when no cases are selected
@@ -366,7 +372,20 @@ describe("Action Panel", () => {
 
     cy.get(".action-panel__form").contains("Add attorney").click();
     cy.get(".action-panel__form h1").contains("Add an attorney");
+    cy.get(".action-panel__form .govuk-button")
+      .contains("Save and add another attorney")
+      .click();
+
+    // assert we're scrolled to the top of the new form
+    cy.get(".action-panel__form h1")
+      .contains("Add an attorney")
+      .should("be.visible");
     cy.get(".action-panel__form .govuk-link").contains("Cancel").click();
+
+    // assert we are back on the create epa form and scrolled to step 3
+    cy.get(
+      "#accordion-create-epa-heading-3 span.govuk-accordion__section-heading-text-focus",
+    ).should("be.visible");
 
     cy.get(".action-panel__form").contains("Add correspondent").click();
     cy.get(".action-panel__form h1").contains("Add a correspondent");
