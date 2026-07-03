@@ -26,16 +26,14 @@ $govuk-assets-path: "../assets/";
 
 $gutter: 15px;
 $spacer: 10px;
-$app-sirius-header-top: 54px;
+$app-moj-header-height: 60px;
 $app-sirius-header-height: 40px;
 $app-sirius-header-min-width: $govuk-page-width + $gutter + $spacer;
 $app-sirius-header-search-height: $app-sirius-header-height - 6px;
-$app-sirius-header-dropdown-top: $app-sirius-header-top +
-  $app-sirius-header-height;
-$app-sirius-header-z-index: 10;
-$app-sirius-header-dropdown-z-index: 9;
-$app-action-panel-z-index: $app-sirius-header-z-index + 1;
-$app-action-panel-top: $app-sirius-header-top + $app-sirius-header-height + 15px;
+$app-fixed-headers-height: $app-moj-header-height + $app-sirius-header-height;
+$app-sirius-header-z-index: 15;
+$app-sirius-header-dropdown-z-index: $app-sirius-header-z-index - 1;
+$app-action-panel-top: $app-moj-header-height + $app-sirius-header-height + 15px;
 $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
 
 // Define HTMX indicator styles here to avoid inline styles which are blocked by CSP
@@ -190,6 +188,19 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
 .app-\!-moj-header__navigation-item:hover {
   text-decoration-thickness: 3px;
   text-decoration-skip-ink: none;
+}
+
+.moj-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: $app-sirius-header-z-index - 10;
+}
+
+// Push page content below the fixed Sirius header when it is present
+.moj-header + .govuk-width-container {
+  padding-top: $app-moj-header-height;
 }
 
 .app-\!-colour-text-red {
@@ -805,7 +816,7 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   height: $app-sirius-header-height;
   min-width: $app-sirius-header-min-width;
   position: fixed;
-  top: $app-sirius-header-top;
+  top: $app-moj-header-height;
   width: 100%;
   z-index: $app-sirius-header-z-index;
 
@@ -836,6 +847,10 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   height: 100%;
   display: flex;
   align-items: center;
+}
+
+.sirius-header + .govuk-width-container {
+  padding-top: $app-sirius-header-height;
 }
 
 .sirius-header__dropdown-panel > .govuk-width-container {
@@ -1015,7 +1030,7 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   max-height: 626px;
   overflow: auto;
   position: fixed;
-  top: $app-sirius-header-dropdown-top;
+  top: $app-fixed-headers-height;
   width: 100vw;
   z-index: $app-sirius-header-dropdown-z-index;
 }
