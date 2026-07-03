@@ -18,7 +18,6 @@ import addressFinder from "./address-finder";
 import autoApplyFilter from "./auto-apply-filter";
 import showHideCaseSummary from "./show-hide-case-summary";
 import disableAfterClick from "./disable-after-click";
-import initCalendar from "./calendar.js";
 import "htmx.org";
 import htmx from "htmx.org/dist/htmx.esm";
 import documentListSort from "./document-list-sort";
@@ -49,7 +48,6 @@ disableAfterClick();
 documentListSort();
 initPdfViewer();
 initSiriusHeader();
-initCalendar();
 
 globalThis.htmx = htmx;
 // Don't include indicator styles as CSP blocks inline styles
@@ -72,7 +70,6 @@ htmx.on("htmx:afterSwap", (event) => {
     handleInsertCheckboxes({ scope: swapDetails.target });
     autoClick(swapDetails.target);
     textEditor();
-    initCalendar();
 
     // Update the action panel width if swapping in create-document or edit-document content
     if (swapDetails.target.id === "actions-content") {
