@@ -28,9 +28,11 @@ type editPaymentData struct {
 	Source         string
 	PaymentDate    sirius.DateString
 	PaymentSources []sirius.RefDataItem
+	ReturnUrl      string
+	HtmxRedirect   string
 }
 
-func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
+func EditPayment(client EditPaymentClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		paymentID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -73,6 +75,12 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		if data.Case.CaseType == "DIGITAL_LPA" {
+			data.ReturnUrl = fmt.Sprintf("/lpa/%s/payments", data.Case.UID)
+		} else {
+			data.ReturnUrl = fmt.Sprintf("/payments/%d", data.Case.ID)
+		}
+
 		if r.Method == http.MethodPost {
 			data.Amount = postFormString(r, "amount")
 			data.Source = postFormString(r, "source")
@@ -95,6 +103,10 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 						"reason": "Value is required and can't be empty",
 					}
 				}
+				if r.Header.Get("HX-Request") == "true" {
+					return partialTmpl(w, data)
+				}
+
 				return tmpl(w, data)
 			}
 
@@ -115,12 +127,25 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
+				if r.Header.Get("HX-Request") == "true" {
+					return partialTmpl(w, data)
+				}
+
+				return tmpl(w, data)
 			} else if err != nil {
 				return err
 			} else {
 				SetFlash(w, FlashNotification{Title: "Payment saved"})
-				return RedirectError(fmt.Sprintf("/payments/%d", data.Case.ID))
+				if r.Header.Get("HX-Request") == "true" {
+					data.HtmxRedirect = data.ReturnUrl
+					return partialTmpl(w, data)
+				}
+				return RedirectError(data.ReturnUrl)
 			}
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -15,25 +16,31 @@ type DocumentListClient interface {
 	Person(ctx sirius.Context, id int) (sirius.Person, error)
 	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
 	DownloadMultiple(ctx sirius.Context, docIDs []string) (*http.Response, error)
+	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
+	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
+	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
 }
 
 type documentPageData struct {
-	XSRFToken             string
-	Entity                string
-	Success               bool
-	SuccessMessage        string
-	DonorID               int
-	Person                sirius.Person
-	Error                 sirius.ValidationError
-	DocumentList          sirius.DocumentList
-	Document              sirius.Document
-	SelectedCases         []sirius.Case
-	MultipleCasesSelected bool
-	Comparing             bool
-	CompareURLs           map[string]string
-	CloseURL              string
-	CaseUids              string
-	ActionPanelButtons    []ActionPanelButton
+	XSRFToken                      string
+	Entity                         string
+	Success                        bool
+	SuccessMessage                 string
+	DonorID                        int
+	Person                         sirius.Person
+	Error                          sirius.ValidationError
+	DocumentList                   sirius.DocumentList
+	Document                       sirius.Document
+	SelectedCases                  []sirius.Case
+	MultipleCasesSelected          bool
+	Comparing                      bool
+	CompareURLs                    map[string]string
+	CloseURL                       string
+	CaseUids                       string
+	SelectedCaseIds                string
+	ActionPanelButtons             []ActionPanelButton
+	HasV1PersonsGetPermission      bool
+	HasV1PersonsCasesGetPermission bool
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
@@ -74,6 +81,21 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 		} else {
 			selected = casesOnDonor
 		}
+
+		var draftCount int
+		if len(selected) == 1 {
+			documentDraftCount, err := client.GetDraftCount(ctx, strings.ToLower(selected[0].CaseType), selected[0].ID)
+			if err != nil {
+				return err
+			}
+			draftCount = documentDraftCount.DraftCount
+		}
+
+		personReferences, err := client.PersonReferences(ctx, donorID)
+		if err != nil {
+			return err
+		}
+		personHasReferences := len(personReferences) > 0
 
 		selectedDocUUIDs := r.Form["document"]
 
@@ -138,9 +160,26 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			DonorID:               donorID,
 		}
 
-		data.CaseUids = buildUIDQueryString(caseUIDs)
+		uidParams := buildUIDQueryString(caseUIDs)
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids)
+		data.CaseUids = uidParams
+
+		for index, selectedCase := range data.SelectedCases {
+			if index != 0 {
+				data.SelectedCaseIds += "+"
+			}
+			data.SelectedCaseIds += strconv.Itoa(selectedCase.ID)
+		}
+
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences)
+
+		userPermissions, err := client.GetUserPermissions(ctx)
+		if err != nil {
+			return err
+		}
+
+		data.HasV1PersonsGetPermission = userPermissions.Includes("v1-persons", "GET")
+		data.HasV1PersonsCasesGetPermission = userPermissions.Includes("v1-persons-cases", "GET")
 
 		return tmpl(w, data)
 	}

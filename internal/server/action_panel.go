@@ -13,20 +13,19 @@ import (
 
 type ActionPanelClient interface {
 	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
+	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
+	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
 }
 
 type ActionPanelData struct {
 	XSRFToken          string
-	DonorID            int
-	SelectedCases      []sirius.Case
-	CaseUids           string
-	CaseType           string
 	ActionPanelButtons []ActionPanelButton
 }
 
 func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		if err := r.ParseForm(); err != nil {
+		err := r.ParseForm()
+		if err != nil {
 			return err
 		}
 
@@ -38,26 +37,25 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		if donorIDStr == "" {
 			donorIDStr = r.URL.Query().Get("id")
 		}
+
+		var donorId int
 		if donorIDStr != "" {
-			if donorID, err := strconv.Atoi(donorIDStr); err == nil {
-				data.DonorID = donorID
+			if donorId, err = strconv.Atoi(donorIDStr); err != nil {
+				return err
 			}
 		}
 
 		caseUIDs := r.Form["uid[]"]
-		data.CaseUids = buildUIDQueryString(caseUIDs)
-
-		entityType, err := sirius.ParseEntityType(r.FormValue("entity"))
-		if err != nil {
-			return err
-		}
-		data.CaseType = string(entityType)
+		caseUidsString := buildUIDQueryString(caseUIDs)
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
+		var draftCount int
+		var personHasReferences bool
+		var selectedCases []sirius.Case
 		group.Go(func() error {
-			if data.DonorID > 0 {
-				cases, err := client.CasesByDonor(ctx.With(groupCtx), data.DonorID)
+			if donorId > 0 {
+				cases, err := client.CasesByDonor(ctx.With(groupCtx), donorId)
 				if err != nil {
 					return err
 				}
@@ -75,10 +73,29 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 							filtered = append(filtered, c)
 						}
 					}
-					data.SelectedCases = filtered
+					selectedCases = filtered
 				} else {
-					data.SelectedCases = cases
+					selectedCases = cases
 				}
+			}
+
+			if len(selectedCases) == 1 {
+				documentDraftCount, err := client.GetDraftCount(ctx.With(groupCtx), strings.ToLower(selectedCases[0].CaseType), selectedCases[0].ID)
+				if err != nil {
+					return err
+				}
+				draftCount = documentDraftCount.DraftCount
+			}
+			return nil
+		})
+
+		group.Go(func() error {
+			if donorId > 0 {
+				personReferences, err := client.PersonReferences(ctx.With(groupCtx), donorId)
+				if err != nil {
+					return err
+				}
+				personHasReferences = len(personReferences) > 0
 			}
 			return nil
 		})
@@ -87,7 +104,7 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids)
+		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences)
 
 		return tmpl(w, data)
 	}
@@ -100,18 +117,53 @@ type ActionPanelButton struct {
 	Disabled bool
 }
 
-func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string) []ActionPanelButton {
+func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string, hasDrafts bool, hasReferences bool) []ActionPanelButton {
 	warningUrl := fmt.Sprintf("/create-warning?id=%d&entity=person%s", donorId, caseUids)
 	eventUrl := fmt.Sprintf("/create-event?id=%d&entity=person%s", donorId, caseUids)
+	createDonorUrl := fmt.Sprintf("/create-donor?id=%d&entity=person%s", donorId, caseUids)
+	editDonorUrl := fmt.Sprintf("/edit-donor?id=%d&entity=person%s", donorId, caseUids)
+	miReportingUrl := fmt.Sprintf("/mi-reporting?donorId=%d%s", donorId, caseUids)
+	linkPersonUrl := fmt.Sprintf("/link-person?id=%d%s", donorId, caseUids)
+	deleteRelationshipUrl := fmt.Sprintf("/delete-relationship?id=%d%s", donorId, caseUids)
+	createRelationship := fmt.Sprintf("/create-relationship?id=%d&entity=person%s", donorId, caseUids)
 	complaintUrl := ""
 	createDocumentUrl := ""
+	editDocumentUrl := ""
 	changeStatusUrl := ""
+	paymentsUrl := ""
+	newTaskUrl := ""
+	editDatesUrl := ""
+	allocateCasesUrl := ""
+
 	if len(selectedCases) == 1 {
 		selectedCase := selectedCases[0]
-		warningUrl = fmt.Sprintf("/create-warning?id=%d&entity=%s%s", donorId, strings.ToLower(selectedCase.CaseType), caseUids)
-		complaintUrl = fmt.Sprintf("/add-complaint?id=%d&case=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
-		createDocumentUrl = fmt.Sprintf("/create-document?id=%d&case=%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType))
-		changeStatusUrl = fmt.Sprintf("/change-status?id=%d&case=%s&donorId=%d%s", selectedCases[0].ID, strings.ToLower(selectedCase.CaseType), donorId, caseUids)
+		caseType := strings.ToLower(selectedCase.CaseType)
+		id := selectedCase.ID
+
+		warningUrl = fmt.Sprintf("/create-warning?id=%d&entity=%s%s", donorId, caseType, caseUids)
+		complaintUrl = fmt.Sprintf("/add-complaint?id=%d&case=%s", id, caseType)
+		createDocumentUrl = fmt.Sprintf("/create-document?id=%d&case=%s", id, caseType)
+		changeStatusUrl = fmt.Sprintf("/change-status?id=%d&case=%s&donorId=%d%s", id, caseType, donorId, caseUids)
+		paymentsUrl = fmt.Sprintf("/payments/%d", id)
+		newTaskUrl = fmt.Sprintf("/create-task?id=%d&entity=%s%s", id, caseType, caseUids)
+		editDatesUrl = fmt.Sprintf("/edit-dates?id=%d&case=%s", id, caseType)
+		allocateCasesUrl = fmt.Sprintf("/allocate-cases?id=%d&entity=%s%s", id, caseType, caseUids)
+
+		if hasDrafts {
+			editDocumentUrl = fmt.Sprintf("/edit-document?id=%d&case=%s", id, caseType)
+		}
+	}
+	if len(selectedCases) > 1 {
+		idQuery := ""
+		caseType := strings.ToLower(selectedCases[0].CaseType)
+		for i, c := range selectedCases {
+			if i == 0 {
+				idQuery += fmt.Sprintf("id=%d", c.ID)
+			} else {
+				idQuery += fmt.Sprintf("&id=%d", c.ID)
+			}
+		}
+		allocateCasesUrl = fmt.Sprintf("/allocate-cases?%s&entity=%s%s", idQuery, caseType, caseUids)
 	}
 
 	return []ActionPanelButton{
@@ -140,10 +192,76 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			Disabled: len(selectedCases) != 1,
 		},
 		{
+			Label:    "Retrieve draft",
+			URL:      editDocumentUrl,
+			IconName: "aw-new-template",
+			Disabled: len(selectedCases) != 1 || !hasDrafts,
+		},
+		{
 			Label:    "Change status",
 			URL:      changeStatusUrl,
 			IconName: "aw-change-status",
 			Disabled: len(selectedCases) != 1,
+		},
+		{
+			Label:    "Fees",
+			URL:      paymentsUrl,
+			IconName: "aw-fees",
+			Disabled: len(selectedCases) != 1,
+		},
+		{
+			Label:    "New task",
+			URL:      newTaskUrl,
+			IconName: "aw-new-task",
+			Disabled: len(selectedCases) != 1,
+		},
+		{
+			Label:    "Create donor",
+			URL:      createDonorUrl,
+			IconName: "aw-create-person",
+			Disabled: false,
+		},
+		{
+			Label:    "Edit donor",
+			URL:      editDonorUrl,
+			IconName: "aw-edit-person",
+			Disabled: false,
+		},
+		{
+			Label:    "Edit dates",
+			URL:      editDatesUrl,
+			IconName: "calendar-open",
+			Disabled: len(selectedCases) != 1,
+		},
+		{
+			Label:    "MI reporting",
+			URL:      miReportingUrl,
+			IconName: "aw-mi",
+			Disabled: false,
+		},
+		{
+			Label:    "Allocate Case",
+			URL:      allocateCasesUrl,
+			IconName: "aw-allocate-case",
+			Disabled: len(selectedCases) == 0,
+		},
+		{
+			Label:    "Link record",
+			URL:      linkPersonUrl,
+			IconName: "aw-link",
+			Disabled: donorId == 0,
+		},
+		{
+			Label:    "Delete relationship",
+			URL:      deleteRelationshipUrl,
+			IconName: "icon-minus",
+			Disabled: !hasReferences,
+		},
+		{
+			Label:    "Create relationship",
+			URL:      createRelationship,
+			IconName: "aw-relationship",
+			Disabled: false,
 		},
 	}
 }

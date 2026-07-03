@@ -1,0 +1,7 @@
+{{ define "editFeeReduction" }}
+    {{ template "select" (select "feeReductionType" "Reduction type" .FeeReduction.FeeReductionType .Error.Field.feeReductionType (options .FeeReductionTypes)) }}
+
+    {{ template "textarea" (field "paymentEvidence" "Evidence used to determine reduction" .FeeReduction.PaymentEvidence .Error.Field.paymentEvidence "hint" "For example, income calculations") }}
+
+    {{ template "input-date" (field "paymentDate" "Date fee reduction applied" .FeeReduction.PaymentDate .Error.Field.paymentDate "max" today "selectToday" true) }}
+{{ end }}

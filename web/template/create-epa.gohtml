@@ -24,6 +24,7 @@
                 {{ end }}
 
                 <form class="form" method="POST">
+                    <button class="govuk-visually-hidden" tabindex="-1" aria-hidden="true" data-module="govuk-button" type="submit"></button>
                     <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
                     <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-create-epa">
@@ -43,9 +44,9 @@
                                 <div class="govuk-form-group">
                                     <fieldset class="govuk-fieldset" aria-describedby="contact-hint">
                                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                                            <h1 class="govuk-fieldset__heading">
+                                            <label class="govuk-label">
                                                 Has the donor made any other EPAs?
-                                            </h1>
+                                            </label>
                                         </legend>
                                         <div class="govuk-radios" data-module="govuk-radios">
                                             <div class="govuk-radios__item">
@@ -115,10 +116,17 @@
                                                 </div>
                                             </details>
                                             <span class="app-create-epa__summary-update-link">
-                          <a class="govuk-link govuk-link--no-visited-state" id="f-update-attorney-{{ .ID }}"
-                             href="{{ prefix (printf "/create-attorney?id=%d&caseId=%d&attorneyId=%d" $.DonorId $.Epa.ID .ID) }}">Update<span
-                                      class="govuk-visually-hidden"> attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span></a>
-                        </span>
+                                                <button class="app-create-epa__summary-update-button govuk-link govuk-link--no-visited-state"
+                                                        id="f-update-attorney-{{ .ID }}"
+                                                        name="updateAttorney"
+                                                        type="submit"
+                                                        value="{{ .ID }}">
+                                                    Update
+                                                    <span class="govuk-visually-hidden">
+                                                        attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                                                    </span>
+                                                </button>
+                                            </span>
                                         </div>
                                     {{ end }}
                                 {{ end }}
@@ -140,11 +148,17 @@
                                             </div>
                                         </details>
                                         <span class="app-create-epa__summary-update-link">
-                        <a class="govuk-link govuk-link--no-visited-state"
-                           id="f-update-correspondent-{{ $correspondent.ID }}"
-                           href="{{ prefix (printf "/create-correspondent?id=%d&caseId=%d" $.DonorId $.Epa.ID) }}">Update<span
-                                    class="govuk-visually-hidden"> correspondent{{ if $correspondent.Salutation }} {{ $correspondent.Salutation }}{{ end }}{{ if $correspondent.Firstname }} {{ $correspondent.Firstname }}{{ end }}{{ if $correspondent.Middlenames }} {{ $correspondent.Middlenames }}{{ end }}{{ if $correspondent.Surname }} {{ $correspondent.Surname }}{{ end }}</span></a>
-                      </span>
+                                            <button class="app-create-epa__summary-update-button govuk-link govuk-link--no-visited-state"
+                                                    id="f-update-correspondent-{{ $correspondent.ID }}"
+                                                    name="updateCorrespondent"
+                                                    type="submit"
+                                                    value="{{ $correspondent.ID }}">
+                                                Update
+                                                <span class="govuk-visually-hidden">
+                                                    correspondent{{ if $correspondent.Salutation }} {{ $correspondent.Salutation }}{{ end }}{{ if $correspondent.Firstname }} {{ $correspondent.Firstname }}{{ end }}{{ if $correspondent.Middlenames }} {{ $correspondent.Middlenames }}{{ end }}{{ if $correspondent.Surname }} {{ $correspondent.Surname }}{{ end }}
+                                                </span>
+                                            </button>
+                                        </span>
                                     </div>
                                 {{ end }}
                                 <div class="govuk-button-group app-button-group--column">

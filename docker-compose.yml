@@ -20,7 +20,7 @@ services:
       start_period: 30s
 
   sirius-mock:
-    image: wiremock/wiremock:3.13.2
+    image: wiremock/wiremock:3.13.2@sha256:fd27e46090916e85326229e5102ee169ae729059f3374549615bd20a35fee1f2
     ports: ["8563:8080"]
     volumes:
       - "./cypress/mocks:/home/wiremock/mappings"
@@ -35,7 +35,7 @@ services:
       - LHCI_GITHUB_APP_TOKEN
 
   go-lint:
-    image: golangci/golangci-lint:v2.8.0
+    image: golangci/golangci-lint:v2.12.2@sha256:5cceeef04e53efe1470638d4b4b4f5ceefd574955ab3941b2d9a68a8c9ad5240
     working_dir: /go/src/app
     volumes:
       - ./:/go/src/app
@@ -51,7 +51,7 @@ services:
       - ./:/home/node
 
   gosec:
-    image: securego/gosec:latest
+    image: securego/gosec:latest@sha256:2cf71ea78210c496c65e3a987576a9c8317b68e20f2960520b3f6f8f9f539be5
     working_dir: /app
     volumes:
       - .:/app
@@ -67,13 +67,13 @@ services:
       - ./.gocache:/go/pkg/mod
 
   pact:
-    image: pactfoundation/pact-cli:1
+    image: pactfoundation/pact-cli:1@sha256:cd239d7b1665263ac30d2d1b411238dff783ce2b547ddcec51ab460555371cca
     working_dir: /go/src/app
     volumes:
       - ./pacts:/go/src/app/pacts
 
   cypress:
-    image: cypress/included:15.13.0
+    image: cypress/included:15.16.0@sha256:057f6c6bbb661342ea712f94f5b870823823e3617354db7a78a01f2aabbfc2ad
     platform: "linux/amd64"
     command: run --browser edge
     entrypoint: cypress

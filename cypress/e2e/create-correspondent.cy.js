@@ -42,7 +42,28 @@ describe("Create or update correspondent", () => {
     cy.url().should("include", "/create-epa");
   });
 
+  it("has a back link to the EPA form", () => {
+    cy.addMock("/lpa-api/v1/cases/2", "GET", {
+      status: 200,
+      body: { id: 2 },
+    });
+
+    cy.visit("/create-correspondent?id=1&caseId=2");
+    cy.get(".govuk-back-link")
+      .should("exist")
+      .and("have.attr", "href")
+      .and(
+        "include",
+        "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3",
+      );
+  });
+
   it("updates a correspondent on an EPA", () => {
+    cy.addMock("/lpa-api/v1/epas/2", "PUT", {
+      status: 200,
+      body: {},
+    });
+
     cy.addMock("/lpa-api/v1/cases/2", "GET", {
       status: 200,
       body: {
@@ -62,9 +83,7 @@ describe("Create or update correspondent", () => {
       "contain.text",
       "correspondent Melanie Vanvolkenburg",
     );
-    cy.get("#f-update-correspondent-3")
-      .should("have.attr", "href", "/create-correspondent?id=2&caseId=2")
-      .click();
+    cy.get("#f-update-correspondent-3").click();
 
     cy.contains("Update correspondent details");
     cy.get("#f-firstname").should("have.value", "Melanie");

@@ -20,6 +20,16 @@ func (m *mockActionPanelClient) CasesByDonor(ctx sirius.Context, id int) ([]siri
 	return args.Get(0).([]sirius.Case), args.Error(1)
 }
 
+func (m *mockActionPanelClient) GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error) {
+	args := m.Called(ctx, caseType, caseId)
+	return args.Get(0).(sirius.DocumentDraftCount), args.Error(1)
+}
+
+func (m *mockActionPanelClient) PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]sirius.PersonReference), args.Error(1)
+}
+
 func TestGetActionPanel(t *testing.T) {
 	cases := []sirius.Case{
 		{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"},
@@ -30,13 +40,13 @@ func TestGetActionPanel(t *testing.T) {
 	client.
 		On("CasesByDonor", mock.Anything, 123).
 		Return(cases, nil)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, ActionPanelData{
-			DonorID:       123,
-			SelectedCases: cases,
-			CaseType:      "lpa",
 			ActionPanelButtons: []ActionPanelButton{
 				{
 					Label:    "Create warning",
@@ -63,10 +73,77 @@ func TestGetActionPanel(t *testing.T) {
 					Disabled: true,
 				},
 				{
+					Label:    "Retrieve draft",
+					URL:      "",
+					IconName: "aw-new-template",
+					Disabled: true,
+				},
+				{
 					Label:    "Change status",
 					URL:      "",
 					IconName: "aw-change-status",
 					Disabled: true,
+				},
+				{
+					Label:    "Fees",
+					URL:      "",
+					IconName: "aw-fees",
+					Disabled: true,
+				},
+				{
+					Label:    "New task",
+					URL:      "",
+					IconName: "aw-new-task",
+					Disabled: true,
+				},
+				{
+					Label:    "Create donor",
+					URL:      "/create-donor?id=123&entity=person",
+					IconName: "aw-create-person",
+					Disabled: false,
+				},
+				{
+					Label:    "Edit donor",
+					URL:      "/edit-donor?id=123&entity=person",
+					IconName: "aw-edit-person",
+					Disabled: false,
+				},
+				{
+					Label:    "Edit dates",
+					URL:      "",
+					IconName: "calendar-open",
+					Disabled: true,
+				},
+				{
+					Label:    "MI reporting",
+					URL:      "/mi-reporting?donorId=123",
+					IconName: "aw-mi",
+					Disabled: false,
+				},
+				{
+					Label:    "Allocate Case",
+					URL:      "/allocate-cases?id=1&id=2&entity=lpa",
+					IconName: "aw-allocate-case",
+					Disabled: false,
+				},
+				{
+					Label:    "Link record",
+					URL:      "/link-person?id=123",
+					IconName: "aw-link",
+					Disabled: false,
+				},
+				{
+					Label:    "Delete relationship",
+					URL:      "/delete-relationship?id=123",
+					IconName: "icon-minus",
+					Disabled: false,
+				},
+				{
+					Label:    "Create relationship",
+					URL:      "/create-relationship?id=123&entity=person",
+					IconName: "aw-relationship",
+
+					Disabled: false,
 				},
 			},
 		}).
@@ -93,14 +170,16 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 	client.
 		On("CasesByDonor", mock.Anything, 123).
 		Return(cases, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, ActionPanelData{
-			DonorID:       123,
-			SelectedCases: []sirius.Case{cases[0]},
-			CaseUids:      "&uid[]=7000-0000-0001",
-			CaseType:      "lpa",
 			ActionPanelButtons: []ActionPanelButton{
 				{
 					Label:    "Create warning",
@@ -127,9 +206,75 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Retrieve draft",
+					URL:      "/edit-document?id=1&case=lpa",
+					IconName: "aw-new-template",
+					Disabled: false,
+				},
+				{
 					Label:    "Change status",
 					URL:      "/change-status?id=1&case=lpa&donorId=123&uid[]=7000-0000-0001",
 					IconName: "aw-change-status",
+					Disabled: false,
+				},
+				{
+					Label:    "Fees",
+					URL:      "/payments/1",
+					IconName: "aw-fees",
+					Disabled: false,
+				},
+				{
+					Label:    "New task",
+					URL:      "/create-task?id=1&entity=lpa&uid[]=7000-0000-0001",
+					IconName: "aw-new-task",
+					Disabled: false,
+				},
+				{
+					Label:    "Create donor",
+					URL:      "/create-donor?id=123&entity=person&uid[]=7000-0000-0001",
+					IconName: "aw-create-person",
+					Disabled: false,
+				},
+				{
+					Label:    "Edit donor",
+					URL:      "/edit-donor?id=123&entity=person&uid[]=7000-0000-0001",
+					IconName: "aw-edit-person",
+					Disabled: false,
+				},
+				{
+					Label:    "Edit dates",
+					URL:      "/edit-dates?id=1&case=lpa",
+					IconName: "calendar-open",
+					Disabled: false,
+				},
+				{
+					Label:    "MI reporting",
+					URL:      "/mi-reporting?donorId=123&uid[]=7000-0000-0001",
+					IconName: "aw-mi",
+					Disabled: false,
+				},
+				{
+					Label:    "Allocate Case",
+					URL:      "/allocate-cases?id=1&entity=lpa&uid[]=7000-0000-0001",
+					IconName: "aw-allocate-case",
+					Disabled: false,
+				},
+				{
+					Label:    "Link record",
+					URL:      "/link-person?id=123&uid[]=7000-0000-0001",
+					IconName: "aw-link",
+					Disabled: false,
+				},
+				{
+					Label:    "Delete relationship",
+					URL:      "/delete-relationship?id=123&uid[]=7000-0000-0001",
+					IconName: "icon-minus",
+					Disabled: false,
+				},
+				{
+					Label:    "Create relationship",
+					URL:      "/create-relationship?id=123&entity=person&uid[]=7000-0000-0001",
+					IconName: "aw-relationship",
 					Disabled: false,
 				},
 			},
@@ -153,7 +298,6 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, ActionPanelData{
-			CaseType: "lpa",
 			ActionPanelButtons: []ActionPanelButton{
 				{
 					Label:    "Create warning",
@@ -180,10 +324,76 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					Disabled: true,
 				},
 				{
+					Label:    "Retrieve draft",
+					URL:      "",
+					IconName: "aw-new-template",
+					Disabled: true,
+				},
+				{
 					Label:    "Change status",
 					URL:      "",
 					IconName: "aw-change-status",
 					Disabled: true,
+				},
+				{
+					Label:    "Fees",
+					URL:      "",
+					IconName: "aw-fees",
+					Disabled: true,
+				},
+				{
+					Label:    "New task",
+					URL:      "",
+					IconName: "aw-new-task",
+					Disabled: true,
+				},
+				{
+					Label:    "Create donor",
+					URL:      "/create-donor?id=0&entity=person",
+					IconName: "aw-create-person",
+					Disabled: false,
+				},
+				{
+					Label:    "Edit donor",
+					URL:      "/edit-donor?id=0&entity=person",
+					IconName: "aw-edit-person",
+					Disabled: false,
+				},
+				{
+					Label:    "Edit dates",
+					URL:      "",
+					IconName: "calendar-open",
+					Disabled: true,
+				},
+				{
+					Label:    "MI reporting",
+					URL:      "/mi-reporting?donorId=0",
+					IconName: "aw-mi",
+					Disabled: false,
+				},
+				{
+					Label:    "Allocate Case",
+					URL:      "",
+					IconName: "aw-allocate-case",
+					Disabled: true,
+				},
+				{
+					Label:    "Link record",
+					URL:      "/link-person?id=0",
+					IconName: "aw-link",
+					Disabled: true,
+				},
+				{
+					Label:    "Delete relationship",
+					URL:      "/delete-relationship?id=0",
+					IconName: "icon-minus",
+					Disabled: true,
+				},
+				{
+					Label:    "Create relationship",
+					URL:      "/create-relationship?id=0&entity=person",
+					IconName: "aw-relationship",
+					Disabled: false,
 				},
 			},
 		}).
@@ -201,15 +411,6 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 	client.AssertNotCalled(t, "CasesByDonor")
 }
 
-func TestGetActionPanelInvalidEntityType(t *testing.T) {
-	r, _ := http.NewRequest(http.MethodGet, "/?entity=invalid", nil)
-	w := httptest.NewRecorder()
-
-	err := ActionPanel(nil, nil)(w, r)
-
-	assert.NotNil(t, err)
-}
-
 func TestGetActionPanelWhenCasesByDonorErrors(t *testing.T) {
 	expectedError := errors.New("cases by donor error")
 
@@ -217,8 +418,65 @@ func TestGetActionPanelWhenCasesByDonorErrors(t *testing.T) {
 	client.
 		On("CasesByDonor", mock.Anything, 123).
 		Return([]sirius.Case{}, expectedError)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa", nil)
+	w := httptest.NewRecorder()
+
+	err := ActionPanel(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
+}
+
+func TestGetActionPanelWhenGetDraftCountErrors(t *testing.T) {
+	expectedError := errors.New("get draft count error")
+
+	cases := []sirius.Case{
+		{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"},
+		{ID: 2, UID: "7000-0000-0002", CaseType: "LPA"},
+	}
+
+	client := &mockActionPanelClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 123).
+		Return(cases, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{}, expectedError)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
+	w := httptest.NewRecorder()
+
+	err := ActionPanel(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
+}
+
+func TestGetActionPanelWhenPersonReferencesErrors(t *testing.T) {
+	expectedError := errors.New("get person references error")
+
+	cases := []sirius.Case{
+		{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"},
+		{ID: 2, UID: "7000-0000-0002", CaseType: "LPA"},
+	}
+
+	client := &mockActionPanelClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 123).
+		Return(cases, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{}, expectedError)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()
 
 	err := ActionPanel(client, nil)(w, r)

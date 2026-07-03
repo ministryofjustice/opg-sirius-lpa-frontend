@@ -60,17 +60,72 @@ func TestGetTask(t *testing.T) {
 			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entity:    "LPA 7000-0000-0000",
 			CaseUID:   "7000-0000-0000",
+			CaseID:    123,
 		}).
 		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestGetTaskWithHXRequest(t *testing.T) {
+	client := &mockTaskClient{}
+	client.
+		On("TaskTypes", mock.Anything).
+		Return([]string{"a", "b"}, nil)
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Case", mock.Anything, 123).
+		Return(sirius.Case{
+			UID:      "7000-0000-0000",
+			CaseType: "LPA",
+			Donor:    &sirius.Person{ID: 42},
+		}, nil)
+
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, taskData{
+			TaskTypes:  []string{"a", "b"},
+			Teams:      []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			Entity:     "LPA 7000-0000-0000",
+			CaseUID:    "7000-0000-0000",
+			CaseID:     123,
+			DonorID:    42,
+			EntityType: "lpa",
+		}).
+		Return(nil)
+
+	template := &mockTemplate{}
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=lpa", nil)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := Task(client, template.Func, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	template.AssertNotCalled(t, "Func")
+	partialTemplate.AssertCalled(t, "Func", mock.Anything, mock.Anything)
+}
+
+func TestGetTaskParseFormError(t *testing.T) {
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader("%zz"))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := Task(nil, nil, nil)(w, r)
+
+	assert.NotNil(t, err)
 }
 
 func TestGetTaskBadQueryString(t *testing.T) {
@@ -84,7 +139,7 @@ func TestGetTaskBadQueryString(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := Task(nil, nil)(w, r)
+			err := Task(nil, nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -106,7 +161,7 @@ func TestGetTaskWhenTaskTypeErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Task(client, nil)(w, r)
+	err := Task(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -126,7 +181,7 @@ func TestGetTaskWhenTeamsErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Task(client, nil)(w, r)
+	err := Task(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -146,7 +201,7 @@ func TestGetTaskWhenCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Task(client, nil)(w, r)
+	err := Task(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -171,7 +226,7 @@ func TestGetTaskWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -206,6 +261,7 @@ func TestPostTask(t *testing.T) {
 			AssigneeUserName: "System user",
 			Entity:           "LPA 7000-0000-0000",
 			CaseUID:          "7000-0000-0000",
+			CaseID:           123,
 		}).
 		Return(nil)
 
@@ -222,7 +278,7 @@ func TestPostTask(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -264,6 +320,7 @@ func TestPostTaskWhenAssignToMe(t *testing.T) {
 			AssigneeUserName: "Me",
 			Entity:           "LPA 7000-0000-0000",
 			CaseUID:          "7000-0000-0000",
+			CaseID:           123,
 		}).
 		Return(nil)
 
@@ -279,7 +336,65 @@ func TestPostTaskWhenAssignToMe(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestPostTaskWhenAssignToCaseOwner(t *testing.T) {
+	caseOwner := &sirius.Person{ID: 99, Firstname: "Case", Surname: "Owner"}
+
+	client := &mockTaskClient{}
+	client.
+		On("TaskTypes", mock.Anything).
+		Return([]string{"a", "b"}, nil)
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Case", mock.Anything, 123).
+		Return(sirius.Case{
+			UID:      "7000-0000-0000",
+			CaseType: "LPA",
+			Assignee: caseOwner,
+		}, nil)
+	client.
+		On("CreateTask", mock.Anything, 123, sirius.TaskRequest{
+			Type:        "Some task type",
+			DueDate:     "2022-03-04",
+			Name:        "Do this",
+			Description: "Please",
+			AssigneeID:  99,
+		}).
+		Return(nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, taskData{
+			Success:   true,
+			TaskTypes: []string{"a", "b"},
+			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			Entity:    "LPA 7000-0000-0000",
+			CaseUID:   "7000-0000-0000",
+			CaseID:    123,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"assignTo":    {"caseOwner"},
+		"taskType":    {"Some task type"},
+		"dueDate":     {"2022-03-04"},
+		"name":        {"Do this"},
+		"description": {"Please"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := Task(client, template.Func, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -319,6 +434,7 @@ func TestGetTaskWhenGetUserDetailsErrors(t *testing.T) {
 			AssigneeUserName: "Me",
 			Entity:           "LPA 7000-0000-0000",
 			CaseUID:          "7000-0000-0000",
+			CaseID:           123,
 		}).
 		Return(nil)
 
@@ -334,7 +450,7 @@ func TestGetTaskWhenGetUserDetailsErrors(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -360,6 +476,7 @@ func TestPostTaskWhenCreateTaskFails(t *testing.T) {
 			TaskTypes: []string{"a", "b"},
 			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entity:    "LPA 7000-0000-0000",
+			CaseID:    123,
 		}).
 		Return(nil)
 
@@ -376,7 +493,7 @@ func TestPostTaskWhenCreateTaskFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(w, r)
 	assert.Equal(t, errExample, err)
 }
 
@@ -406,6 +523,7 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entity:    "LPA 7000-0000-0000",
 			CaseUID:   "7000-0000-0000",
+			CaseID:    123,
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{
 					"assignTo": {"": "Assignee not set"},
@@ -432,7 +550,7 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(w, r)
 	assert.Nil(t, err)
 
 	resp := w.Result()
@@ -444,20 +562,33 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 		field            string
 		value            string
 		assigneeUserName string
+		shouldMapError   bool
 	}{
 		"team": {
-			field: "assigneeTeam",
-			value: "66",
+			field:          "assigneeTeam",
+			value:          "66",
+			shouldMapError: true,
 		},
 		"user": {
 			field:            "assigneeUser",
 			value:            "66:Some user",
 			assigneeUserName: "Some user",
+			shouldMapError:   false,
+		},
+		"caseOwner": {
+			field:          "assigneeUser",
+			value:          "",
+			shouldMapError: true,
 		},
 	}
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
+			assigneeID := 66
+			if name == "caseOwner" {
+				assigneeID = 99
+			}
+
 			client := &mockTaskClient{}
 			client.
 				On("TaskTypes", mock.Anything).
@@ -467,7 +598,11 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 				Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
 			client.
 				On("Case", mock.Anything, 123).
-				Return(sirius.Case{UID: "7000-0000-0000", CaseType: "LPA"}, nil)
+				Return(sirius.Case{
+					UID:      "7000-0000-0000",
+					CaseType: "LPA",
+					Assignee: &sirius.Person{ID: 99, Firstname: "Case", Surname: "Owner"},
+				}, nil)
 			client.
 				On("CreateTask", mock.Anything, mock.Anything, mock.Anything).
 				Return(sirius.ValidationError{Field: sirius.FieldErrors{
@@ -478,7 +613,9 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 			expectedErrors := sirius.FieldErrors{
 				"field": {"reason": "Description"},
 			}
-			expectedErrors[tc.field] = map[string]string{"problem": "Because"}
+			if tc.shouldMapError {
+				expectedErrors[tc.field] = map[string]string{"problem": "Because"}
+			}
 
 			template := &mockTemplate{}
 			template.
@@ -488,13 +625,14 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 					Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 					Entity:    "LPA 7000-0000-0000",
 					CaseUID:   "7000-0000-0000",
+					CaseID:    123,
 					Error:     sirius.ValidationError{Field: expectedErrors},
 					Task: sirius.TaskRequest{
 						Type:        "Some task type",
 						DueDate:     "2022-03-04",
 						Name:        "Do this",
 						Description: "Please",
-						AssigneeID:  66,
+						AssigneeID:  assigneeID,
 					},
 					AssigneeUserName: tc.assigneeUserName,
 				}).
@@ -507,13 +645,15 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 				"name":        {"Do this"},
 				"description": {"Please"},
 			}
-			form.Add(tc.field, tc.value)
+			if tc.value != "" {
+				form.Add(tc.field, tc.value)
+			}
 
 			r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := Task(client, template.Func)(w, r)
+			err := Task(client, template.Func, template.Func)(w, r)
 			assert.Nil(t, err)
 
 			resp := w.Result()

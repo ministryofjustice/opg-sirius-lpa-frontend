@@ -21,20 +21,19 @@ $govuk-assets-path: "../assets/";
 @import "./dark.scss";
 @import "./wysiwyg.scss";
 @import "./pdf-viewer.scss";
+@import "./calendar.scss";
 @import "./sirius/all.scss";
 
 $gutter: 15px;
 $spacer: 10px;
-$app-sirius-header-top: 54px;
+$app-moj-header-height: 60px;
 $app-sirius-header-height: 40px;
 $app-sirius-header-min-width: $govuk-page-width + $gutter + $spacer;
 $app-sirius-header-search-height: $app-sirius-header-height - 6px;
-$app-sirius-header-dropdown-top: $app-sirius-header-top +
-  $app-sirius-header-height;
-$app-sirius-header-z-index: 10;
-$app-sirius-header-dropdown-z-index: 9;
-$app-action-panel-z-index: $app-sirius-header-z-index + 1;
-$app-action-panel-top: $app-sirius-header-top + $app-sirius-header-height + 15px;
+$app-fixed-headers-height: $app-moj-header-height + $app-sirius-header-height;
+$app-sirius-header-z-index: 15;
+$app-sirius-header-dropdown-z-index: $app-sirius-header-z-index - 1;
+$app-action-panel-top: $app-moj-header-height + $app-sirius-header-height + 15px;
 $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
 
 // Define HTMX indicator styles here to avoid inline styles which are blocked by CSP
@@ -191,6 +190,19 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   text-decoration-skip-ink: none;
 }
 
+.moj-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: $app-sirius-header-z-index - 10;
+}
+
+// Push page content below the fixed Sirius header when it is present
+.moj-header + .govuk-width-container {
+  padding-top: $app-moj-header-height;
+}
+
 .app-\!-colour-text-red {
   color: govuk-colour("red") !important;
 }
@@ -242,6 +254,13 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   right: 0;
   top: 0;
   z-index: 1;
+}
+
+.app-create-epa__summary-update-button {
+  background: none;
+  border: 0;
+  color: govuk-colour("blue");
+  cursor: pointer;
 }
 
 .app-\!-gap-2 {
@@ -658,6 +677,9 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   background-color: govuk-functional-colour(body-background);
   min-height: calc(100% - (var(--action-panel-form-padding) * 2));
   height: auto;
+  .autocomplete__hint,
+  .autocomplete__input,
+  .autocomplete__option,
   .govuk-body,
   .govuk-label,
   .govuk-select,
@@ -665,11 +687,26 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   .govuk-button,
   .govuk-link,
   .govuk-fieldset__legend,
-  .govuk-textarea {
+  .govuk-textarea,
+  .govuk-hint,
+  .govuk-error-message,
+  .govuk-input__prefix,
+  .govuk-table__header,
+  .govuk-table__cell,
+  .govuk-details__summary,
+  .govuk-details__summary-text,
+  .govuk-details__text {
     font-size: 0.875rem;
   }
   .govuk-select,
-  .govuk-input {
+  .govuk-input,
+  .autocomplete__input,
+  .autocomplete__hint {
+    height: 1.875rem;
+  }
+  .govuk-input__prefix,
+  .govuk-input__suffix {
+    min-height: 1.875rem;
     height: 1.875rem;
   }
   .govuk-form-group {
@@ -687,6 +724,9 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   .govuk-fieldset__legend,
   .govuk-textarea {
     font-size: 1.03906rem;
+  }
+  .govuk-select {
+    height: 2.10527em;
   }
 }
 
@@ -736,6 +776,12 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   }
 }
 
+#action-panel-button-create-relationship svg,
+#action-panel-button-delete-relationship svg,
+#action-panel-button-edit-dates svg {
+  width: 30px;
+}
+
 .app-table__row--half-width {
   width: 50%;
 }
@@ -770,7 +816,7 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   height: $app-sirius-header-height;
   min-width: $app-sirius-header-min-width;
   position: fixed;
-  top: $app-sirius-header-top;
+  top: $app-moj-header-height;
   width: 100%;
   z-index: $app-sirius-header-z-index;
 
@@ -803,10 +849,12 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   align-items: center;
 }
 
+.sirius-header + .govuk-width-container {
+  padding-top: $app-sirius-header-height;
+}
+
 .sirius-header__dropdown-panel > .govuk-width-container {
   max-width: none;
-  margin-left: govuk-spacing(2);
-  margin-right: govuk-spacing(2);
 }
 
 .sirius-header__inner {
@@ -861,13 +909,128 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   height: 24px;
 }
 
+.app-person-info__icons {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+
+  & svg {
+    color: govuk-colour("white");
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.app-person-info__container {
+  display: flex;
+  flex-direction: row;
+}
+
+.app-person-info__people {
+  border-right: 1px solid govuk-colour("white");
+  width: 40%;
+
+  & table {
+    color: govuk-colour("white");
+    font-size: 1rem;
+
+    & th,
+    td {
+      padding: 5px;
+      border: 0;
+      height: 30px;
+      font-weight: 400;
+    }
+
+    & td {
+      font-weight: 700;
+    }
+
+    & tr {
+      cursor: pointer;
+
+      &.selected {
+        background-color: $color-sirius-blue;
+      }
+
+      &:hover {
+        background-color: $color-sirius-light-blue;
+      }
+    }
+  }
+}
+
+.app-person-info__details {
+  flex: 1;
+  margin: 0 0 0 5px;
+
+  & .govuk-summary-list {
+    font-size: 1rem;
+    color: govuk-colour("white");
+  }
+
+  & .govuk-summary-list__key {
+    width: 15%;
+    padding-bottom: 0;
+    font-weight: 400;
+  }
+
+  & .govuk-summary-list__value {
+    padding-bottom: 0;
+    font-weight: 700;
+  }
+
+  & a {
+    color: govuk-colour("white");
+    text-decoration: underline;
+  }
+}
+
+.app-person-info__applicant {
+  border: 1px solid #f47737;
+  border-radius: 28px;
+  color: #f47737;
+  display: inline-block;
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-align: center;
+  width: 2rem;
+  height: 1.1rem;
+}
+
+.app-case-info {
+  overflow: hidden;
+  padding: 10px 15px 15px;
+
+  & .govuk-summary-list {
+    font-size: 1rem;
+    color: govuk-colour("white");
+  }
+
+  & .govuk-summary-list__key {
+    width: 20%;
+    padding-bottom: govuk-spacing(2);
+    font-weight: 400;
+  }
+
+  & .govuk-summary-list__value {
+    padding-bottom: govuk-spacing(2);
+    font-weight: 700;
+
+    & p {
+      margin: 0;
+    }
+  }
+}
+
 .sirius-header__dropdown-panel {
   @include gradient-blue;
   left: 0;
   max-height: 626px;
   overflow: auto;
   position: fixed;
-  top: $app-sirius-header-dropdown-top;
+  top: $app-fixed-headers-height;
   width: 100vw;
   z-index: $app-sirius-header-dropdown-z-index;
 }
@@ -908,4 +1071,8 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
     align-items: stretch;
     margin-bottom: 0;
   }
+}
+
+#documentTextEditor {
+  display: none;
 }

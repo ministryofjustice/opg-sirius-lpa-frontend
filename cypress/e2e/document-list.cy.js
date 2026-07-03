@@ -342,6 +342,37 @@ describe("View documents", () => {
         },
       },
     );
+
+    cy.addMock("/lpa-api/v1/permissions", "GET", {
+      status: 200,
+      body: {},
+    });
+
+    [
+      { id: 34, type: "lpa" },
+      { id: 78, type: "lpa" },
+      { id: 990, type: "epa" },
+    ].forEach((caseItem) => {
+      cy.addMock(
+        `/lpa-api/v1/${caseItem.type}s/${caseItem.id}/draft-count`,
+        "GET",
+        {
+          status: 200,
+          body: {
+            draftCount: 1,
+          },
+        },
+      );
+    });
+
+    cy.addMock("/lpa-api/v1/persons/1/references", "GET", {
+      status: 200,
+      body: [
+        {
+          referenceId: 123,
+        },
+      ],
+    });
   });
 
   it("on a person", () => {
@@ -926,6 +957,27 @@ describe("sort by dropdown", () => {
         },
       },
     );
+
+    cy.addMock("/lpa-api/v1/permissions", "GET", {
+      status: 200,
+      body: {},
+    });
+
+    cy.addMock("/lpa-api/v1/lpas/78/draft-count", "GET", {
+      status: 200,
+      body: {
+        draftCount: 1,
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/persons/1/references", "GET", {
+      status: 200,
+      body: [
+        {
+          referenceId: 123,
+        },
+      ],
+    });
   });
 
   it("renders the dropdown with a default placeholder and all expected options", () => {

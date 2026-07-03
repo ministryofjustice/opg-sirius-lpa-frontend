@@ -1,0 +1,63 @@
+{{ define "workingDaysCalculator" }}
+    <div class="date-difference" role="region" aria-labelledby="working-days-calculator-title" tabindex="0">
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-2" id="working-days-calculator-title">Difference Calculator</h3>
+
+        <form hx-post="{{ prefix "/working-days" }}"
+              hx-target=".date-difference"
+              hx-swap="outerHTML"
+              hx-trigger="change from:input, keyup changed from:input[type=number]">
+
+            <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+            <input type="hidden" name="previousmode" value="{{ .Mode }}"/>
+
+            <div class="govuk-fieldset" role="group" aria-labelledby="calc-mode-label">
+                <span id="calc-mode-label" class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                    Calculate:
+                </span>
+                <div class="govuk-radios govuk-radios--small govuk-radios--inline" data-module="govuk-radios">
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" type="radio"
+                               id="mode-{{ .ModeStartDate }}" name="mode" value={{ .ModeStartDate }}
+                               {{ if eq .Mode .ModeStartDate }}checked{{ end }}>
+                        <label class="govuk-label govuk-radios__label" for="mode-{{ .ModeStartDate }}">Start date</label>
+                    </div>
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" type="radio"
+                               id="mode-{{ .ModeEndDate }}" name="mode" value={{ .ModeEndDate }}
+                               {{ if eq .Mode .ModeEndDate }}checked{{ end }}>
+                        <label class="govuk-label govuk-radios__label" for="mode-{{ .ModeEndDate }}">End date</label>
+                    </div>
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" type="radio"
+                               id="mode-{{ .ModeNumWorkingDays }}" name="mode" value={{ .ModeNumWorkingDays }}
+                               {{ if eq .Mode .ModeNumWorkingDays }}checked{{ end }}>
+                        <label class="govuk-label govuk-radios__label" for="mode-{{ .ModeNumWorkingDays }}">Working days</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="calc-startdate">Start date:</label>
+                <input class="govuk-input govuk-input--width-10"
+                       type="date" id="calc-startdate" name="startdate" value="{{ .StartDate }}"
+                       placeholder="DD/MM/YYYY"
+                       {{ if eq .Mode .ModeStartDate }}aria-label="Start date (calculated)" readonly aria-readonly="true"{{ end }}
+                       {{ if and (eq .Mode .PreviousMode) (ne .Mode .ModeStartDate) }}hx-preserve{{ end }}>
+
+                <label class="govuk-label" for="calc-enddate">End date:</label>
+                <input class="govuk-input govuk-input--width-10"
+                       type="date" id="calc-enddate" name="enddate" value="{{ .EndDate }}"
+                       placeholder="DD/MM/YYYY"
+                       {{ if eq .Mode .ModeEndDate }}aria-label="End date (calculated)" readonly aria-readonly="true"{{ end }}
+                       {{ if and (eq .Mode .PreviousMode) (ne .Mode .ModeEndDate) }}hx-preserve{{ end }}>
+
+                <label class="govuk-label" for="calc-numworkingdays">Working days:</label>
+                <input class="govuk-input govuk-input--width-10"
+                       type="number" id="calc-numworkingdays" name="numworkingdays" value="{{ .NumWorkingDays }}"
+                       min="0"
+                       {{ if eq .Mode .ModeNumWorkingDays }}aria-label="Working days (calculated)" readonly aria-readonly="true"{{ end }}
+                       {{ if and (eq .Mode .PreviousMode) (ne .Mode .ModeNumWorkingDays) }}hx-preserve{{ end }}>
+            </div>
+        </form>
+    </div>
+{{ end }}

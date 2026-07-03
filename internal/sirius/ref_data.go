@@ -34,7 +34,7 @@ func (c *Client) RefDataByCategory(ctx Context, category string) ([]RefDataItem,
 	var v []RefDataItem
 
 	if cached, ok := getCached(category); ok {
-		return cached, nil
+		return cached.([]RefDataItem), nil
 	}
 
 	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/reference-data/%s", category), &v)
