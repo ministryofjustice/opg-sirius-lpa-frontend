@@ -128,6 +128,8 @@ func Task(client TaskClient, tmpl template.Template, partialTmpl template.Templa
 			case "team":
 				assigneeID, _ := postFormInt(r, "assigneeTeam")
 				task.AssigneeID = assigneeID
+			case "caseOwner":
+				task.AssigneeID = caseitem.Assignee.ID
 			}
 
 			err = client.CreateTask(ctx, caseID, task)
@@ -141,6 +143,7 @@ func Task(client TaskClient, tmpl template.Template, partialTmpl template.Templa
 				switch data.AssignTo {
 				case "me":
 				case "user":
+				case "caseOwner":
 					data.Error.Field["assigneeUser"] = data.Error.Field["assigneeId"]
 				case "team":
 					data.Error.Field["assigneeTeam"] = data.Error.Field["assigneeId"]

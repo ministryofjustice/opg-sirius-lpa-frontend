@@ -139,6 +139,13 @@ func TestGetActionPanel(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Create relationship",
+					URL:      "/create-relationship?id=123&entity=person",
+					IconName: "aw-relationship",
+
+					Disabled: false,
+				},
+				{
 					Label:    "Create epa case",
 					URL:      "/create-epa?id=123",
 					IconName: "aw-create-case",
@@ -277,6 +284,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Create relationship",
+					URL:      "/create-relationship?id=123&entity=person&uid[]=7000-0000-0001",
+					IconName: "aw-relationship",
+					Disabled: false,
+				},
+				{
 					Label:    "Create epa case",
 					URL:      "/create-epa?id=123",
 					IconName: "aw-create-case",
@@ -399,6 +412,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					URL:      "/delete-relationship?id=0",
 					IconName: "icon-minus",
 					Disabled: true,
+				},
+				{
+					Label:    "Create relationship",
+					URL:      "/create-relationship?id=0&entity=person",
+					IconName: "aw-relationship",
+					Disabled: false,
 				},
 				{
 					Label:    "Create epa case",
@@ -538,6 +557,12 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 					Label:    "Delete relationship",
 					URL:      "/delete-relationship?id=123&uid[]=7000-0000-0003",
 					IconName: "icon-minus",
+					Disabled: false,
+				},
+				{
+					Label:    "Create relationship",
+					URL:      "/create-relationship?id=123&entity=person&uid[]=7000-0000-0003",
+					IconName: "aw-relationship",
 					Disabled: false,
 				},
 				{

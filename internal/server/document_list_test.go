@@ -336,6 +336,12 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Create relationship",
+					URL:      "/create-relationship?id=82&entity=person",
+					IconName: "aw-relationship",
+					Disabled: false,
+				},
+				{
 					Label:    "Create epa case",
 					URL:      "/create-epa?id=82",
 					IconName: "aw-create-case",
@@ -445,9 +451,16 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: false,
 				},
 				{
+
 					Label:    "Delete relationship",
 					URL:      "/delete-relationship?id=82",
 					IconName: "icon-minus",
+					Disabled: false,
+				},
+				{
+					Label:    "Create relationship",
+					URL:      "/create-relationship?id=82&entity=person",
+					IconName: "aw-relationship",
 					Disabled: false,
 				},
 				{
@@ -567,6 +580,12 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Create relationship",
+					URL:      "/create-relationship?id=82&entity=person&uid[]=7000-1234-0000",
+					IconName: "aw-relationship",
+					Disabled: false,
+				},
+				{
 					Label:    "Create epa case",
 					URL:      "/create-epa?id=82",
 					IconName: "aw-create-case",
@@ -677,9 +696,16 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: false,
 				},
 				{
+
 					Label:    "Delete relationship",
 					URL:      "/delete-relationship?id=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 					IconName: "icon-minus",
+					Disabled: false,
+				},
+				{
+					Label:    "Create relationship",
+					URL:      "/create-relationship?id=82&entity=person&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+					IconName: "aw-relationship",
 					Disabled: false,
 				},
 				{
@@ -1021,6 +1047,12 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 						Disabled: false,
 					},
 					{
+						Label:    "Create relationship",
+						URL:      "/create-relationship?id=82&entity=person",
+						IconName: "aw-relationship",
+						Disabled: false,
+					},
+					{
 						Label:    "Create epa case",
 						URL:      "/create-epa?id=82",
 						IconName: "aw-create-case",
@@ -1219,6 +1251,12 @@ func TestDocumentListDismissValidation(t *testing.T) {
 						Label:    "Delete relationship",
 						URL:      "/delete-relationship?id=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 						IconName: "icon-minus",
+						Disabled: false,
+					},
+					{
+						Label:    "Create relationship",
+						URL:      "/create-relationship?id=82&entity=person&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+						IconName: "aw-relationship",
 						Disabled: false,
 					},
 					{
@@ -1534,6 +1572,12 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 						Label:    "Delete relationship",
 						URL:      "/delete-relationship?id=82",
 						IconName: "icon-minus",
+						Disabled: false,
+					},
+					{
+						Label:    "Create relationship",
+						URL:      "/create-relationship?id=82&entity=person",
+						IconName: "aw-relationship",
 						Disabled: false,
 					},
 					{

@@ -1,0 +1,39 @@
+{{ define "page" }}
+    <div class="action-panel__form">
+        <p class="govuk-body govuk-!-margin-bottom-1"><strong>{{ .Entity }}</strong></p>
+
+        {{ template "error-summary" .Error }}
+
+        {{ $url := prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorID .EntityType .CaseUIDs) }}
+
+        {{ if .Success }}
+            <span class="govuk-!-display-none"
+                  hx-get="{{ $url }}"
+                  hx-target=".action-panel__content"
+                  hx-swap="innerHTML"
+                  hx-trigger="load"
+            ></span>
+            {{ template "success-banner" "You have successfully created a relationship." }}
+        {{ end }}
+
+        <h1 class="govuk-heading-m">Create Relationship</h1>
+
+        <form class="form" method="POST"
+              hx-post="{{ prefix (printf "/create-relationship?id=%d&entity=%s" .DonorID .EntityType) }}"
+              hx-target=".action-panel__content"
+              hx-swap="innerHTML">
+             <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+            {{ template "create-relationship" . }}
+
+            <div class="govuk-button-group">
+                <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
+                <a class="govuk-link govuk-link--no-visited-state"
+                   href=""
+                   hx-get="{{ $url }}"
+                   hx-target=".action-panel__content"
+                   hx-swap="innerHTML">Cancel</a>
+            </div>
+        </form>
+    </div>
+{{ end }}
