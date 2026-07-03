@@ -675,6 +675,8 @@ func TestPostAssignTaskToCaseOwner(t *testing.T) {
 			AssigneeUserName: "",
 			Entities:         []string{"LPA 7000-0000-0000: A task"},
 			Uid:              "7000-0000-0000",
+			CaseType:         "lpa",
+			TaskIDs:          "id=123",
 		}).
 		Return(nil)
 
