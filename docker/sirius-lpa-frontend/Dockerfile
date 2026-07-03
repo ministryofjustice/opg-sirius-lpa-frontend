@@ -40,6 +40,15 @@ ENTRYPOINT ["air"]
 
 FROM golang:1.26.3@sha256:2d6c80227255c3112a4d08e67ba98e58efd3846daf15d9d7d4c389565d881b1a AS build-env
 
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid 65532 \
+    app
+
 ARG TARGETARCH
 WORKDIR /app
 
@@ -67,13 +76,15 @@ WORKDIR /go/bin
 
 COPY --from=build-env /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=build-env /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=build-env /etc/passwd /etc/passwd
+COPY --from=build-env /etc/group /etc/group
 
 COPY --from=build-env /go/bin/opg-sirius-lpa-frontend opg-sirius-lpa-frontend
 COPY --from=healthcheck-build /go/bin/healthcheck healthcheck
 COPY --from=asset-env /app/web/static web/static
 COPY web/template web/template
 
-USER 65532
+USER app
 
 HEALTHCHECK --interval=5s --timeout=5s --start-period=5s --retries=3 CMD [ "/go/bin/healthcheck" ]
 
