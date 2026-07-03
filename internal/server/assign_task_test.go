@@ -686,7 +686,7 @@ func TestPostAssignTaskToCaseOwner(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, template.Func)(w, r)
+	err := AssignTask(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -735,7 +735,7 @@ func TestPostAssignTaskToCaseOwnerMultiple(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, template.Func)(w, r)
+	err := AssignTask(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -763,7 +763,7 @@ func TestPostAssignTaskToCaseOwnerWhenCaseErrors(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, nil)(w, r)
+	err := AssignTask(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -794,9 +794,8 @@ func TestPostAssignTaskToCaseOwnerWhenAssignTaskFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, nil)(w, r)
+	err := AssignTask(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
-
