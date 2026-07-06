@@ -18,16 +18,20 @@ type createInvestigationData struct {
 	Error         sirius.ValidationError
 	Case          sirius.Case
 	Investigation sirius.Investigation
+	DonorID       int
+	CaseUIDs      string
+	EntityType    string
 }
 
-func CreateInvestigation(client CreateInvestigationClient, tmpl template.Template) Handler {
+func CreateInvestigation(client CreateInvestigationClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
 		}
 
-		caseType, err := sirius.ParseCaseType(r.FormValue("case"))
+		caseTypeString := r.FormValue("case")
+		caseType, err := sirius.ParseCaseType(caseTypeString)
 		if err != nil {
 			return err
 		}
@@ -40,8 +44,11 @@ func CreateInvestigation(client CreateInvestigationClient, tmpl template.Templat
 		}
 
 		data := createInvestigationData{
-			XSRFToken: ctx.XSRFToken,
-			Case:      caseItem,
+			XSRFToken:  ctx.XSRFToken,
+			Case:       caseItem,
+			DonorID:    caseItem.Donor.ID,
+			CaseUIDs:   buildUIDQueryString(r.Form["uid[]"]),
+			EntityType: caseTypeString,
 		}
 
 		if r.Method == http.MethodPost {
@@ -63,6 +70,9 @@ func CreateInvestigation(client CreateInvestigationClient, tmpl template.Templat
 			} else {
 				data.Success = true
 			}
+		}
+		if r.Header.Get("HX-Request") == "true" && partialTmpl != nil {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

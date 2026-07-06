@@ -125,11 +125,12 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	miReportingUrl := fmt.Sprintf("/mi-reporting?donorId=%d%s", donorId, caseUids)
 	linkPersonUrl := fmt.Sprintf("/link-person?id=%d%s", donorId, caseUids)
 	deleteRelationshipUrl := fmt.Sprintf("/delete-relationship?id=%d%s", donorId, caseUids)
-	createRelationship := fmt.Sprintf("/create-relationship?id=%d&entity=person%s", donorId, caseUids)
+	createRelationshipUrl := fmt.Sprintf("/create-relationship?id=%d&entity=person%s", donorId, caseUids)
 	createEpaUrl := fmt.Sprintf("/create-epa?id=%d", donorId)
 	editEpaUrl := ""
 	complaintUrl := ""
 	createDocumentUrl := ""
+	createInvestigationUrl := ""
 	editDocumentUrl := ""
 	changeStatusUrl := ""
 	paymentsUrl := ""
@@ -150,6 +151,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		newTaskUrl = fmt.Sprintf("/create-task?id=%d&entity=%s%s", id, caseType, caseUids)
 		editDatesUrl = fmt.Sprintf("/edit-dates?id=%d&case=%s", id, caseType)
 		allocateCasesUrl = fmt.Sprintf("/allocate-cases?id=%d&entity=%s%s", id, caseType, caseUids)
+		createInvestigationUrl = fmt.Sprintf("/create-investigation?id=%d&case=%s%s", donorId, caseType, caseUids)
 
 		if strings.ToLower(selectedCase.CaseType) == "epa" {
 			editEpaUrl = fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, selectedCases[0].ID)
@@ -265,7 +267,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		},
 		{
 			Label:    "Create relationship",
-			URL:      createRelationship,
+			URL:      createRelationshipUrl,
 			IconName: "aw-relationship",
 			Disabled: false,
 		},
@@ -280,6 +282,12 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			URL:      editEpaUrl,
 			IconName: "aw-edit-case",
 			Disabled: len(selectedCases) != 1 || strings.ToLower(selectedCases[0].CaseType) != "epa",
+		},
+		{
+			Label:    "Add investigation",
+			URL:      createInvestigationUrl,
+			IconName: "icon-investigation",
+			Disabled: len(selectedCases) != 1,
 		},
 	}
 }
