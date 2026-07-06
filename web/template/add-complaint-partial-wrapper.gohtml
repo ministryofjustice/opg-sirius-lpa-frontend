@@ -5,12 +5,7 @@
     {{ template "error-summary" .Error }}
 
     {{ if .Success }}
-      <span class="govuk-!-display-none"
-            hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId .CaseType .CaseUID) }}"
-            hx-target=".action-panel__content"
-            hx-swap="innerHTML"
-            hx-trigger="load"
-      ></span>
+      <meta http-equiv="refresh" content="0" />
       {{ template "success-banner" "You have successfully added a complaint." }}
     {{ end }}
 
