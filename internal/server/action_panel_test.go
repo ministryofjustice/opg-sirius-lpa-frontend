@@ -142,7 +142,6 @@ func TestGetActionPanel(t *testing.T) {
 					Label:    "Create relationship",
 					URL:      "/create-relationship?id=123&entity=person",
 					IconName: "aw-relationship",
-
 					Disabled: false,
 				},
 				{
@@ -155,6 +154,12 @@ func TestGetActionPanel(t *testing.T) {
 					Label:    "Edit epa case",
 					URL:      "",
 					IconName: "aw-edit-case",
+					Disabled: true,
+				},
+				{
+					Label:    "Add investigation",
+					URL:      "",
+					IconName: "icon-investigation",
 					Disabled: true,
 				},
 			},
@@ -301,6 +306,13 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					IconName: "aw-edit-case",
 					Disabled: true,
 				},
+				{
+					Label:    "Add investigation",
+					URL:      "/create-investigation?id=1&case=lpa&uid[]=7000-0000-0001",
+					IconName: "icon-investigation",
+					Disabled: false,
+
+				},
 			},
 		}).
 		Return(nil)
@@ -429,6 +441,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					Label:    "Edit epa case",
 					URL:      "",
 					IconName: "aw-edit-case",
+					Disabled: false,
+				},
+				{
+					Label:    "Add investigation",
+					URL:      "",
+					IconName: "icon-investigation",
 					Disabled: true,
 				},
 			},
