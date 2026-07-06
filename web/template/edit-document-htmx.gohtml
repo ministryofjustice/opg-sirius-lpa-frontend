@@ -6,9 +6,9 @@
 
         {{ if .Success }}
           {{ template "success-banner" "Draft document published" }}
-          <meta http-equiv="refresh" content="0" />
+          <meta http-equiv="Refresh" content="0" />
         {{ else if .SaveAndExit }}
-          <meta http-equiv="refresh" content="0" />
+          <meta http-equiv="Refresh" content="0" />
         {{ else if .PreviewDraft }}
           <a href="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .DownloadUUID) }}" target="_blank"
              data-module="app-auto-click">Download preview document</a>

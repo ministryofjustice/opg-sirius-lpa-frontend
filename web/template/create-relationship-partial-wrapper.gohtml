@@ -7,7 +7,7 @@
         {{ $url := prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorID .EntityType .CaseUIDs) }}
 
         {{ if .Success }}
-            <meta http-equiv="refresh" content="0" />
+            <meta http-equiv="Refresh" content="0" />
             {{ template "success-banner" "You have successfully created a relationship." }}
         {{ end }}
 
