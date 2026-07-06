@@ -753,6 +753,11 @@ func TestGetDocumentList(t *testing.T) {
 					Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
 			}
 
+			headerButtons := SiriusHeadButtons{
+				BackToTimeline: true,
+				Calendar:       true,
+			}
+
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything,
@@ -766,6 +771,7 @@ func TestGetDocumentList(t *testing.T) {
 						ActionPanelButtons:        tc.actionPanelButtons,
 						HasV1PersonsGetPermission: tc.hasV1PersonsGetPermission,
 						SelectedCaseIds:           tc.selectedCaseIds,
+						HeaderButtons:             headerButtons,
 					},
 				).
 				Return(nil)
@@ -1065,6 +1071,10 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 						Disabled: true,
 					},
 				},
+				HeaderButtons: SiriusHeadButtons{
+					BackToTimeline: true,
+					Calendar:       true,
+				},
 			},
 		).
 		Return(nil)
@@ -1271,6 +1281,10 @@ func TestDocumentListDismissValidation(t *testing.T) {
 						IconName: "aw-edit-case",
 						Disabled: true,
 					},
+				},
+				HeaderButtons: SiriusHeadButtons{
+					BackToTimeline: true,
+					Calendar:       true,
 				},
 			},
 		).
@@ -1592,6 +1606,10 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 						IconName: "aw-edit-case",
 						Disabled: true,
 					},
+				},
+				HeaderButtons: SiriusHeadButtons{
+					BackToTimeline: true,
+					Calendar:       true,
 				},
 			},
 		).

@@ -39,6 +39,7 @@ type documentPageData struct {
 	CaseUids                       string
 	SelectedCaseIds                string
 	ActionPanelButtons             []ActionPanelButton
+	HeaderButtons                  SiriusHeadButtons
 	HasV1PersonsGetPermission      bool
 	HasV1PersonsCasesGetPermission bool
 }
@@ -172,6 +173,10 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 		}
 
 		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences)
+		data.HeaderButtons = SiriusHeadButtons{
+			BackToTimeline: true,
+			Calendar:       true,
+		}
 
 		userPermissions, err := client.GetUserPermissions(ctx)
 		if err != nil {
