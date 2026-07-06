@@ -1,0 +1,23 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add a correspondent{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+
+      <a href="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+
+      <h1 class="govuk-heading-l">Add a correspondent</h1>
+
+      <form class="form" method="POST">
+        {{ template "selectOrCreateCorrespondent" . }}
+        <div class="govuk-button-group govuk-!-padding-top-5">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?id=%d&caseId=%d" .DonorId .CaseId) }}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}

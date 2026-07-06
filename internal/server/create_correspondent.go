@@ -24,7 +24,7 @@ type createCorrespondentData struct {
 	Title         string
 }
 
-func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Template) Handler {
+func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Template, partialTemplate template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -98,6 +98,10 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 				return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 			}
 
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTemplate(w, data)
 		}
 
 		return tmpl(w, data)

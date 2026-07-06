@@ -46,12 +46,43 @@ func TestGetSelectOrCreateCorrespondent(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetSelectOrCreateCorrespondentHtmxRequest(t *testing.T) {
+	epa := sirius.Epa{Case: sirius.Case{ID: 2}}
+
+	client := &mockSelectOrCreateCorrespondentClient{}
+	client.
+		On("Epa", mock.Anything, 2).
+		Return(epa, nil)
+
+	template := &mockTemplate{}
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, selectOrCreateCorrespondentData{
+			DonorId: 1,
+			CaseId:  2,
+			Epa:     epa,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := SelectOrCreateCorrespondent(client, template.Func, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	template.AssertNotCalled(t, "Func", mock.Anything, mock.Anything)
+	mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
 }
 
 func TestGetSelectOrCreateCorrespondentBadQuery(t *testing.T) {
@@ -66,7 +97,7 @@ func TestGetSelectOrCreateCorrespondentBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, query, nil)
 			w := httptest.NewRecorder()
 
-			err := SelectOrCreateCorrespondent(nil, nil)(w, r)
+			err := SelectOrCreateCorrespondent(nil, nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -82,7 +113,7 @@ func TestGetSelectOrCreateCorrespondentWhenEpaErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, nil)(w, r)
+	err := SelectOrCreateCorrespondent(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -106,7 +137,7 @@ func TestPostSelectOrCreateCorrespondentNew(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Equal(t, err, expectedError)
@@ -143,7 +174,7 @@ func TestPostSelectOrCreateCorrespondentFromAttorney(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Equal(t, err, expectedError)
@@ -168,7 +199,7 @@ func TestPostSelectOrCreateCorrespondentBadAttorneyId(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
 
 	assert.Equal(t, err, expectedErr)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -213,12 +244,62 @@ func TestPostSelectOrCreateCorrespondentValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostSelectOrCreateCorrespondentValidationErrorHtmxRequest(t *testing.T) {
+	expectedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{"field": {"": "problem"}},
+	}
+
+	epa := sirius.Epa{
+		Case: sirius.Case{
+			Attorneys: []sirius.Attorney{
+				{Person: sirius.Person{ID: 4, Firstname: "Rudolph", Surname: "Stotesbury"}},
+			},
+		},
+	}
+	correspondent := sirius.Correspondent{Person: sirius.Person{Firstname: "Rudolph", Surname: "Stotesbury"}}
+
+	client := &mockSelectOrCreateCorrespondentClient{}
+	client.
+		On("Epa", mock.Anything, 2).
+		Return(epa, nil).
+		On("CreateCorrespondent", mock.Anything, 2, correspondent).
+		Return(expectedError)
+
+	template := &mockTemplate{}
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, selectOrCreateCorrespondentData{
+			DonorId: 1,
+			CaseId:  2,
+			Epa:     epa,
+			Error:   expectedError,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"attorneyId": {"4"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := SelectOrCreateCorrespondent(client, template.Func, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	template.AssertNotCalled(t, "Func", mock.Anything, mock.Anything)
+	mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
 }
 
 func TestPostSelectOrCreateCorrespondentCreationFails(t *testing.T) {
@@ -239,7 +320,7 @@ func TestPostSelectOrCreateCorrespondentCreationFails(t *testing.T) {
 		Return(errExample)
 
 	template := &mockTemplate{}
-	
+
 	form := url.Values{
 		"attorneyId": {"4"},
 	}
@@ -248,7 +329,7 @@ func TestPostSelectOrCreateCorrespondentCreationFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
