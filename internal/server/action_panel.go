@@ -151,7 +151,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		newTaskUrl = fmt.Sprintf("/create-task?id=%d&entity=%s%s", id, caseType, caseUids)
 		editDatesUrl = fmt.Sprintf("/edit-dates?id=%d&case=%s", id, caseType)
 		allocateCasesUrl = fmt.Sprintf("/allocate-cases?id=%d&entity=%s%s", id, caseType, caseUids)
-		createInvestigationUrl = fmt.Sprintf("/create-investigation?id=%d&case=%s%s", donorId, caseType, caseUids)
+		createInvestigationUrl = fmt.Sprintf("/create-investigation?id=%d&case=%s%s", id, caseType, caseUids)
 
 		if strings.ToLower(selectedCase.CaseType) == "epa" {
 			editEpaUrl = fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, selectedCases[0].ID)

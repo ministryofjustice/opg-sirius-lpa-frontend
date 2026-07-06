@@ -18,7 +18,7 @@ type createInvestigationData struct {
 	Error         sirius.ValidationError
 	Case          sirius.Case
 	Investigation sirius.Investigation
-	DonorID       int
+	CaseID        int
 	CaseUIDs      string
 	EntityType    string
 }
@@ -46,7 +46,7 @@ func CreateInvestigation(client CreateInvestigationClient, tmpl template.Templat
 		data := createInvestigationData{
 			XSRFToken:  ctx.XSRFToken,
 			Case:       caseItem,
-			DonorID:    caseItem.Donor.ID,
+			CaseID:     caseID,
 			CaseUIDs:   buildUIDQueryString(r.Form["uid[]"]),
 			EntityType: caseTypeString,
 		}
