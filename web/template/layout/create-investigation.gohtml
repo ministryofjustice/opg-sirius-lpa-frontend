@@ -1,0 +1,13 @@
+{{ define "create-investigation" }}
+    {{ template "input" (field "title" "Title" .Investigation.Title .Error.Field.investigationTitle) }}
+
+    {{ template "textarea" (field "information" "Information" .Investigation.Information .Error.Field.additionalInformation) }}
+
+    {{ template "radios" (radios "type" "Type" .Investigation.Type .Error.Field.type false
+    (item "Aspect" "Aspect")
+    (item "Normal" "Normal")
+    (item "Priority" "Priority")
+    ) }}
+
+    {{ template "input-date" (field "dateReceived" "Date Recieved" .Investigation.DateReceived .Error.Field.investigationReceivedDate "max" today) }}
+{{ end }}
