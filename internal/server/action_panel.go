@@ -14,6 +14,7 @@ import (
 type ActionPanelClient interface {
 	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
 	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
+	Person(ctx sirius.Context, id int) (sirius.Person, error)
 	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
 }
 
@@ -100,11 +101,23 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			return nil
 		})
 
+		var personHasLinks bool
+		group.Go(func() error {
+			if donorId > 0 {
+				person, err := client.Person(ctx.With(groupCtx), donorId)
+				if err != nil {
+					return err
+				}
+				personHasLinks = len(person.Children) > 0
+			}
+			return nil
+		})
+
 		if err := group.Wait(); err != nil {
 			return err
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences)
+		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences, personHasLinks)
 
 		return tmpl(w, data)
 	}
@@ -117,13 +130,14 @@ type ActionPanelButton struct {
 	Disabled bool
 }
 
-func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string, hasDrafts bool, hasReferences bool) []ActionPanelButton {
+func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string, hasDrafts bool, hasReferences bool, hasLinks bool) []ActionPanelButton {
 	warningUrl := fmt.Sprintf("/create-warning?id=%d&entity=person%s", donorId, caseUids)
 	eventUrl := fmt.Sprintf("/create-event?id=%d&entity=person%s", donorId, caseUids)
 	createDonorUrl := fmt.Sprintf("/create-donor?id=%d&entity=person%s", donorId, caseUids)
 	editDonorUrl := fmt.Sprintf("/edit-donor?id=%d&entity=person%s", donorId, caseUids)
 	miReportingUrl := fmt.Sprintf("/mi-reporting?donorId=%d%s", donorId, caseUids)
 	linkPersonUrl := fmt.Sprintf("/link-person?id=%d%s", donorId, caseUids)
+	unlinkPersonUrl := fmt.Sprintf("/unlink-person?id=%d%s", donorId, caseUids)
 	deleteRelationshipUrl := fmt.Sprintf("/delete-relationship?id=%d%s", donorId, caseUids)
 	createRelationship := fmt.Sprintf("/create-relationship?id=%d&entity=person%s", donorId, caseUids)
 	createEpaUrl := fmt.Sprintf("/create-epa?id=%d", donorId)
@@ -256,6 +270,12 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			URL:      linkPersonUrl,
 			IconName: "aw-link",
 			Disabled: donorId == 0,
+		},
+		{
+			Label:    "Unlink record",
+			URL:      unlinkPersonUrl,
+			IconName: "aw-link",
+			Disabled: donorId == 0 || !hasLinks,
 		},
 		{
 			Label:    "Delete relationship",
