@@ -34,6 +34,7 @@ type viewDocumentData struct {
 	SelectedCases                  []sirius.Case
 	ID                             int
 	ActionPanelButtons             []ActionPanelButton
+	HeaderButtons                  SiriusHeaderButtons
 }
 
 func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
@@ -122,6 +123,13 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 		}
 
 		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, taskIDs)
+
+		data.HeaderButtons = SiriusHeaderButtons{
+			BackToTimeline: true,
+			CaseInfo:       true,
+			PersonInfo:     true,
+			Calendar:       true,
+		}
 
 		userPermissions, err := client.GetUserPermissions(ctx)
 		if err != nil {

@@ -3,23 +3,7 @@
       {{ template "error-summary" .Error }}
 
       {{ if .Success }}
-        {{ if eq (len .Cases) 1 }}
-          {{ with index .Cases 0 }}
-            <span class="govuk-!-display-none"
-              hx-get="{{ prefix (printf "/action-panel?id=%d&entity=%s" .ID (ToLower $.EntityType)) }}"
-              hx-target=".action-panel__content"
-              hx-swap="innerHTML"
-              hx-trigger="load"
-            ></span>
-          {{ end }}
-        {{ else }}
-          <span class="govuk-!-display-none"
-            hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId .EntityType .CaseUids) }}"
-            hx-target=".action-panel__content"
-            hx-swap="innerHTML"
-            hx-trigger="load"
-          ></span>
-        {{ end }}
+        <meta http-equiv="Refresh" content="0" />
         {{ template "success-banner" "You have successfully created a warning." }}
       {{ end }}
 

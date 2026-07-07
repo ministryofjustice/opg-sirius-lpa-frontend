@@ -352,6 +352,18 @@ func TestGetDocumentList(t *testing.T) {
 					IconName: "aw-relationship",
 					Disabled: false,
 				},
+				{
+					Label:    "Create epa case",
+					URL:      "/create-epa?id=82",
+					IconName: "aw-create-case",
+					Disabled: false,
+				},
+				{
+					Label:    "Edit epa case",
+					URL:      "",
+					IconName: "aw-edit-case",
+					Disabled: true,
+				},
 			},
 		},
 		{
@@ -468,6 +480,18 @@ func TestGetDocumentList(t *testing.T) {
 					IconName: "aw-relationship",
 					Disabled: false,
 				},
+				{
+					Label:    "Create epa case",
+					URL:      "/create-epa?id=82",
+					IconName: "aw-create-case",
+					Disabled: false,
+				},
+				{
+					Label:    "Edit epa case",
+					URL:      "",
+					IconName: "aw-edit-case",
+					Disabled: true,
+				},
 			},
 		},
 		{
@@ -583,6 +607,18 @@ func TestGetDocumentList(t *testing.T) {
 					URL:      "/create-relationship?id=82&entity=person&uid[]=7000-1234-0000",
 					IconName: "aw-relationship",
 					Disabled: false,
+				},
+				{
+					Label:    "Create epa case",
+					URL:      "/create-epa?id=82",
+					IconName: "aw-create-case",
+					Disabled: true,
+				},
+				{
+					Label:    "Edit epa case",
+					URL:      "",
+					IconName: "aw-edit-case",
+					Disabled: true,
 				},
 			},
 		},
@@ -701,6 +737,18 @@ func TestGetDocumentList(t *testing.T) {
 					IconName: "aw-relationship",
 					Disabled: false,
 				},
+				{
+					Label:    "Create epa case",
+					URL:      "/create-epa?id=82",
+					IconName: "aw-create-case",
+					Disabled: true,
+				},
+				{
+					Label:    "Edit epa case",
+					URL:      "",
+					IconName: "aw-edit-case",
+					Disabled: true,
+				},
 			},
 		},
 	}
@@ -737,6 +785,11 @@ func TestGetDocumentList(t *testing.T) {
 					Return([]sirius.Task{{ID: 990}}, nil)
 			}
 
+			headerButtons := SiriusHeaderButtons{
+				BackToTimeline: true,
+				Calendar:       true,
+			}
+
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything,
@@ -750,6 +803,7 @@ func TestGetDocumentList(t *testing.T) {
 						ActionPanelButtons:        tc.actionPanelButtons,
 						HasV1PersonsGetPermission: tc.hasV1PersonsGetPermission,
 						SelectedCaseIds:           tc.selectedCaseIds,
+						HeaderButtons:             headerButtons,
 					},
 				).
 				Return(nil)
@@ -1051,6 +1105,22 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 						IconName: "aw-relationship",
 						Disabled: false,
 					},
+					{
+						Label:    "Create epa case",
+						URL:      "/create-epa?id=82",
+						IconName: "aw-create-case",
+						Disabled: false,
+					},
+					{
+						Label:    "Edit epa case",
+						URL:      "",
+						IconName: "aw-edit-case",
+						Disabled: true,
+					},
+				},
+				HeaderButtons: SiriusHeaderButtons{
+					BackToTimeline: true,
+					Calendar:       true,
 				},
 			},
 		).
@@ -1252,6 +1322,22 @@ func TestDocumentListDismissValidation(t *testing.T) {
 						IconName: "aw-relationship",
 						Disabled: false,
 					},
+					{
+						Label:    "Create epa case",
+						URL:      "/create-epa?id=82",
+						IconName: "aw-create-case",
+						Disabled: true,
+					},
+					{
+						Label:    "Edit epa case",
+						URL:      "",
+						IconName: "aw-edit-case",
+						Disabled: true,
+					},
+				},
+				HeaderButtons: SiriusHeaderButtons{
+					BackToTimeline: true,
+					Calendar:       true,
 				},
 			},
 		).
@@ -1583,6 +1669,22 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 						IconName: "aw-relationship",
 						Disabled: false,
 					},
+					{
+						Label:    "Create epa case",
+						URL:      "/create-epa?id=82",
+						IconName: "aw-create-case",
+						Disabled: false,
+					},
+					{
+						Label:    "Edit epa case",
+						URL:      "",
+						IconName: "aw-edit-case",
+						Disabled: true,
+					},
+				},
+				HeaderButtons: SiriusHeaderButtons{
+					BackToTimeline: true,
+					Calendar:       true,
 				},
 			},
 		).

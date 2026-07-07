@@ -22,7 +22,7 @@ type selectOrCreateCorrespondentData struct {
 	Error         sirius.ValidationError
 }
 
-func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl template.Template) Handler {
+func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -89,6 +89,9 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 				if ve, ok := err.(sirius.ValidationError); ok {
 					w.WriteHeader(http.StatusBadRequest)
 					data.Error = ve
+					if r.Header.Get("HX-Request") == "true" {
+						return partialTmpl(w, data)
+					}
 					return tmpl(w, data)
 				} else if err != nil {
 					return err
@@ -100,6 +103,9 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 			return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d", donorId, caseId))
 		}
 
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
+		}
 		return tmpl(w, data)
 	}
 }
