@@ -365,6 +365,8 @@ describe("Action Panel", () => {
     cy.get("a#action-panel-button-assign-task").click();
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Assign Task");
+  });
+
   it("displays the create epa button on the action panel and can click through to subforms", () => {
     cy.addMock(
       "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0&limit=999",
