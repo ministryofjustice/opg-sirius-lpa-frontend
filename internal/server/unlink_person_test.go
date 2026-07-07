@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -26,47 +27,55 @@ func (m *mockUnlinkPerson) UnlinkPerson(ctx sirius.Context, parentId int, childI
 }
 
 func TestUnlinkPerson(t *testing.T) {
-	children := []sirius.Person{
-		{
-			ID:         5,
-			Salutation: "Mr",
-			Firstname:  "First",
-			Surname:    "Child",
-			Children:   nil,
-		},
+	for _, isHtmx := range []bool{true, false} {
+		t.Run("Is HTMX"+strconv.FormatBool(isHtmx), func(t *testing.T) {
+			children := []sirius.Person{
+				{
+					ID:         5,
+					Salutation: "Mr",
+					Firstname:  "First",
+					Surname:    "Child",
+					Children:   nil,
+				},
+			}
+
+			person := sirius.Person{
+				ID:           189,
+				UID:          "700000001234",
+				Firstname:    "John",
+				Surname:      "Doe",
+				DateOfBirth:  "1998-09-02",
+				AddressLine1: "123 Somewhere Street",
+				Children:     children,
+			}
+
+			client := &mockUnlinkPerson{}
+			client.
+				On("Person", mock.Anything, 189).
+				Return(person, nil)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, unlinkPersonData{
+					Person: person,
+				}).
+				Return(nil)
+
+			r, _ := http.NewRequest(http.MethodGet, "/?id=189", nil)
+			w := httptest.NewRecorder()
+
+			if isHtmx {
+				r.Header.Add("HX-Request", "true")
+			}
+
+			err := UnlinkPerson(client, template.Func, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
 	}
-
-	person := sirius.Person{
-		ID:           189,
-		UID:          "700000001234",
-		Firstname:    "John",
-		Surname:      "Doe",
-		DateOfBirth:  "1998-09-02",
-		AddressLine1: "123 Somewhere Street",
-		Children:     children,
-	}
-
-	client := &mockUnlinkPerson{}
-	client.
-		On("Person", mock.Anything, 189).
-		Return(person, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, unlinkPersonData{
-			Person: person,
-		}).
-		Return(nil)
-
-	r, _ := http.NewRequest(http.MethodGet, "/?id=189", nil)
-	w := httptest.NewRecorder()
-
-	err := UnlinkPerson(client, template.Func)(w, r)
-	resp := w.Result()
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestUnlinkPersonNoID(t *testing.T) {
@@ -80,7 +89,7 @@ func TestUnlinkPersonNoID(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, testUrl, nil)
 			w := httptest.NewRecorder()
 
-			err := UnlinkPerson(nil, nil)(w, r)
+			err := UnlinkPerson(nil, nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -96,7 +105,7 @@ func TestUnlinkPersonsWhenFailure(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=189", nil)
 	w := httptest.NewRecorder()
 
-	err := UnlinkPerson(client, nil)(w, r)
+	err := UnlinkPerson(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -120,7 +129,7 @@ func TestUnlinkPersonWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=189", nil)
 	w := httptest.NewRecorder()
 
-	err := UnlinkPerson(client, template.Func)(w, r)
+	err := UnlinkPerson(client, template.Func, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -152,7 +161,7 @@ func TestPostUnlinkPersonWhenChildNotSelected(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := UnlinkPerson(client, template.Func)(w, r)
+	err := UnlinkPerson(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -196,7 +205,7 @@ func TestUnlinkPersonWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := UnlinkPerson(client, template.Func)(w, r)
+	err := UnlinkPerson(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -248,7 +257,7 @@ func TestPostUnlinkPerson(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := UnlinkPerson(client, template.Func)(w, r)
+	err := UnlinkPerson(client, template.Func, nil)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
