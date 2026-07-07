@@ -7,7 +7,7 @@
   gap: 1rem;
   align-items: flex-start;
 
-  opg-calendar {
+  .opg-calendar {
     flex: 1 1 0;
     min-width: 14rem;
     margin-right: 0;
@@ -20,6 +20,9 @@
       padding: 0;
       border: 1px solid #dddddd;
       user-select: none;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0;
     }
 
     .move-month {
@@ -38,12 +41,13 @@
       text-align: center;
       padding: 20px 0;
       margin: 0 8px;
+      grid-column: 1 / -1;
     }
 
     .weekday,
     .day {
-      display: inline-block;
-      width: calc(100% / 7);
+      display: block;
+      width: 100%;
     }
 
     .weekday {
@@ -67,6 +71,13 @@
         cursor: default;
         color: #00326e;
         background-color: #ffffff;
+      }
+
+      &.today {
+        cursor: default;
+        color: #ffffff;
+        background-color: #00326e;
+        font-weight: bold;
       }
 
       &.disabled {
@@ -171,19 +182,19 @@
   }
 
   @media (max-width: 1100px) {
-    opg-calendar {
+    .opg-calendar {
       min-width: 12rem;
     }
   }
 
   @media (max-width: 800px) {
-    opg-calendar {
+    .opg-calendar {
       min-width: 10rem;
     }
   }
 
   @media (max-width: 560px) {
-    opg-calendar {
+    .opg-calendar {
       min-width: 8.5rem;
     }
 
