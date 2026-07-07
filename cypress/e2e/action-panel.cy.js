@@ -335,6 +335,15 @@ describe("Action Panel", () => {
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Add investigation");
 
+    cy.addMock("/lpa-api/v1/permissions", "GET", {
+      status: 200,
+      body: {
+        "v1-lpas-investigations": {
+          permissions: ["GET"],
+        },
+      },
+    });
+
     cy.get("a#action-panel-button-add-investigation").click();
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Create Investigation");
