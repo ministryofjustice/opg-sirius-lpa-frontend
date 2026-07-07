@@ -111,7 +111,7 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			SelectedCases:   selectedCase,
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0)
 
 		userPermissions, err := client.GetUserPermissions(ctx)
 		if err != nil {
