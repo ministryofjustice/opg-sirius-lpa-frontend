@@ -616,6 +616,9 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
 	client.
+		On("TasksForCase", mock.Anything, 3).
+		Return([]sirius.Task{}, nil)
+	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
 	client.
@@ -673,6 +676,12 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 					URL:      "/create-task?id=3&entity=epa&uid[]=7000-0000-0003",
 					IconName: "aw-new-task",
 					Disabled: false,
+				},
+				{
+					Label:    "Assign task",
+					URL:      "",
+					IconName: "aw-assign-task",
+					Disabled: true,
 				},
 				{
 					Label:    "Create donor",
