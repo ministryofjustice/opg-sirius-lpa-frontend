@@ -14,7 +14,7 @@
         <h1 class="govuk-heading-m">Create Relationship</h1>
 
         <form class="form" method="POST"
-              hx-post="{{ prefix (printf "/create-relationship?id=%d&entity=%s" .CaseID .EntityType) }}"
+              hx-post="{{ prefix (printf "/create-relationship?id=%d&entity=%s" .DonorID .EntityType) }}"
               hx-target=".action-panel__content"
               hx-swap="innerHTML">
              <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>

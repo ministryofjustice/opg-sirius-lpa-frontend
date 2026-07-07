@@ -327,7 +327,6 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					URL:      "/create-investigation?id=1&case=lpa&uid[]=7000-0000-0001",
 					IconName: "icon-investigation",
 					Disabled: false,
-
 				},
 			},
 		}).
@@ -460,7 +459,7 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					Label:    "Edit epa case",
 					URL:      "",
 					IconName: "aw-edit-case",
-					Disabled: false,
+					Disabled: true,
 				},
 				{
 					Label:    "Add investigation",
@@ -501,6 +500,9 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -612,6 +614,12 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 					Label:    "Edit epa case",
 					URL:      "/create-epa?id=123&caseId=3",
 					IconName: "aw-edit-case",
+					Disabled: false,
+				},
+				{
+					Label:    "Add investigation",
+					URL:      "/create-investigation?id=3&case=epa&uid[]=7000-0000-0003",
+					IconName: "icon-investigation",
 					Disabled: false,
 				},
 			},
