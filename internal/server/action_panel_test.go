@@ -494,6 +494,9 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -584,6 +587,12 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 					Disabled: false,
 				},
 				{
+					Label:    "Unlink record",
+					URL:      "/unlink-person?id=123&uid[]=7000-0000-0003",
+					IconName: "aw-link",
+					Disabled: true,
+				},
+				{
 					Label:    "Delete relationship",
 					URL:      "/delete-relationship?id=123&uid[]=7000-0000-0003",
 					IconName: "icon-minus",
@@ -620,9 +629,6 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
-	client.AssertNotCalled(t, "CasesByDonor")
-	client.AssertNotCalled(t, "Person")
-
 }
 
 func TestGetActionPanelWhenCasesByDonorErrors(t *testing.T) {
