@@ -31,4 +31,17 @@
   (item "true" "Yes")
   (item "false" "No")
   ) }}
+
+  {{ if and .IsEditing .Epa.Correspondent }}
+      <div class="govuk-form-group">
+          <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+              <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="f-isUpdateCorrespondent" name="isUpdateCorrespondent" type="checkbox" value="true">
+                  <label class="no-top-padding govuk-label govuk-checkboxes__label" for="f-isUpdateCorrespondent">
+                      Is this person also the correspondent - update correspondent with same information?
+                  </label>
+              </div>
+          </div>
+      </div>
+  {{ end }}
 {{ end }}
