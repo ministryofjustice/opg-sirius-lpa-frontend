@@ -30,6 +30,16 @@ func (m *mockActionPanelClient) PersonReferences(ctx sirius.Context, id int) ([]
 	return args.Get(0).([]sirius.PersonReference), args.Error(1)
 }
 
+func (m *mockActionPanelClient) GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(sirius.Permissions), args.Error(1)
+}
+
+var actionPanelPermissions = sirius.Permissions{
+	"v1-persons":             sirius.PermissionType{Permissions: []string{"GET"}},
+	"v1-lpas-investigations": sirius.PermissionType{Permissions: []string{"POST"}},
+}
+
 func TestGetActionPanel(t *testing.T) {
 	cases := []sirius.Case{
 		{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"},
@@ -43,6 +53,9 @@ func TestGetActionPanel(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -193,6 +206,9 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -330,6 +346,9 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 
 func TestGetActionPanelNoDonorID(t *testing.T) {
 	client := &mockActionPanelClient{}
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -621,6 +640,9 @@ func TestGetActionPanelWhenCasesByDonorErrors(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa", nil)
 	w := httptest.NewRecorder()
@@ -648,6 +670,9 @@ func TestGetActionPanelWhenGetDraftCountErrors(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()
@@ -675,6 +700,9 @@ func TestGetActionPanelWhenPersonReferencesErrors(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{}, expectedError)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()
