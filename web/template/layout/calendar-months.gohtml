@@ -30,7 +30,7 @@
             {{ range .Weeks }}
                 {{ range . }}
                     {{ if .Date }}
-                        <div class="day {{ if .IsToday }}today{{ else }}default{{ end }}"
+                        <div class="day {{ if .IsToday }}today{{ else if .IsBankHoliday}}disabled{{ else }}default{{ end }}"
                             data-date="{{ .Date }}"
                             role="gridcell">
                             <span class="day-number">{{ .Day }}</span>
