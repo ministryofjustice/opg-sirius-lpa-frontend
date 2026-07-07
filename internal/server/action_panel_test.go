@@ -666,6 +666,7 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 	client.AssertNotCalled(t, "CasesByDonor")
+	client.AssertNotCalled(t, "Person")
 }
 
 func TestGetActionPanelWhenCasesByDonorErrors(t *testing.T) {
