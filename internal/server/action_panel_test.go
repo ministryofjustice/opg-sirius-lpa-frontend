@@ -660,6 +660,29 @@ func TestGetActionPanelWhenCasesByDonorErrors(t *testing.T) {
 	assert.Equal(t, expectedError, err)
 }
 
+func TestGetActionPanelWhenPermissionsErrors(t *testing.T) {
+	client := &mockActionPanelClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 123).
+		Return([]sirius.Case{{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"}}, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{DraftCount: 0}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, errExample)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa", nil)
+	w := httptest.NewRecorder()
+
+	err := ActionPanel(client, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
+}
+
 func TestGetActionPanelWhenGetDraftCountErrors(t *testing.T) {
 	expectedError := errors.New("get draft count error")
 
