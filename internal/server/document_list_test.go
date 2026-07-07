@@ -330,6 +330,12 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Unlink record",
+					URL:      "/unlink-person?id=82",
+					IconName: "aw-link",
+					Disabled: true,
+				},
+				{
 					Label:    "Delete relationship",
 					URL:      "/delete-relationship?id=82",
 					IconName: "icon-minus",
@@ -449,6 +455,12 @@ func TestGetDocumentList(t *testing.T) {
 					URL:      "/link-person?id=82",
 					IconName: "aw-link",
 					Disabled: false,
+				},
+				{
+					Label:    "Unlink record",
+					URL:      "/unlink-person?id=82",
+					IconName: "aw-link",
+					Disabled: true,
 				},
 				{
 
@@ -574,6 +586,12 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Unlink record",
+					URL:      "/unlink-person?id=82&uid[]=7000-1234-0000",
+					IconName: "aw-link",
+					Disabled: true,
+				},
+				{
 					Label:    "Delete relationship",
 					URL:      "/delete-relationship?id=82&uid[]=7000-1234-0000",
 					IconName: "icon-minus",
@@ -694,6 +712,12 @@ func TestGetDocumentList(t *testing.T) {
 					URL:      "/link-person?id=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 					IconName: "aw-link",
 					Disabled: false,
+				},
+				{
+					Label:    "Unlink record",
+					URL:      "/unlink-person?id=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+					IconName: "aw-link",
+					Disabled: true,
 				},
 				{
 
@@ -1047,6 +1071,12 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 						Disabled: false,
 					},
 					{
+						Label:    "Unlink record",
+						URL:      "/unlink-person?id=82",
+						IconName: "aw-link",
+						Disabled: true,
+					},
+					{
 						Label:    "Delete relationship",
 						URL:      "/delete-relationship?id=82",
 						IconName: "icon-minus",
@@ -1256,6 +1286,12 @@ func TestDocumentListDismissValidation(t *testing.T) {
 						URL:      "/link-person?id=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 						IconName: "aw-link",
 						Disabled: false,
+					},
+					{
+						Label:    "Unlink record",
+						URL:      "/unlink-person?id=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
+						IconName: "aw-link",
+						Disabled: true,
 					},
 					{
 						Label:    "Delete relationship",
@@ -1581,6 +1617,12 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 						URL:      "/link-person?id=82",
 						IconName: "aw-link",
 						Disabled: false,
+					},
+					{
+						Label:    "Unlink record",
+						URL:      "/unlink-person?id=82",
+						IconName: "aw-link",
+						Disabled: true,
 					},
 					{
 						Label:    "Delete relationship",
