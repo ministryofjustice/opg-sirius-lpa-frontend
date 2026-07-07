@@ -533,6 +533,9 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(actionPanelPermissions, nil)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -621,6 +624,12 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 					URL:      "/link-person?id=123&uid[]=7000-0000-0003",
 					IconName: "aw-link",
 					Disabled: false,
+				},
+				{
+					Label:    "Unlink record",
+					URL:      "/unlink-person?id=123&uid[]=7000-0000-0003",
+					IconName: "aw-unlink",
+					Disabled: true,
 				},
 				{
 					Label:    "Delete relationship",
