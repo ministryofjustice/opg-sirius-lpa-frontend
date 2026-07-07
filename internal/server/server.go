@@ -203,6 +203,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/unlink-person", wrap(UnlinkPerson(client, templates.Get("unlink_person.gohtml"))))
 	mux.Handle("/view-document/{uuid}", wrap(ViewDocument(client, templates.Get("view-document.gohtml"))))
 	mux.Handle("/working-days", wrap(WorkingDays(client, templates.Get("working-days-partial.gohtml"))))
+	mux.Handle("/calendar-month", wrap(CalendarMonthPartial(client, templates.Get("calendar-month-partial.gohtml"))))
 
 	static := http.FileServer(http.Dir("web/static"))
 	mux.Handle("/assets/{path...}", static)
