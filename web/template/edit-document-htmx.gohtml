@@ -6,19 +6,9 @@
 
         {{ if .Success }}
           {{ template "success-banner" "Draft document published" }}
-          <span class="govuk-!-display-none"
-                hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId (ToLower .Case.CaseType) .Case.UID) }}"
-                hx-target=".action-panel__content"
-                hx-swap="innerHTML"
-                hx-trigger="load"
-          ></span>
+          <meta http-equiv="Refresh" content="0" />
         {{ else if .SaveAndExit }}
-          <span class="govuk-!-display-none"
-                hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorId (ToLower .Case.CaseType) .Case.UID) }}"
-                hx-target=".action-panel__content"
-                hx-swap="innerHTML"
-                hx-trigger="load"
-          ></span>
+          <meta http-equiv="Refresh" content="0" />
         {{ else if .PreviewDraft }}
           <a href="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .DownloadUUID) }}" target="_blank"
              data-module="app-auto-click">Download preview document</a>
