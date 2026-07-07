@@ -17,11 +17,12 @@ type unlinkPersonData struct {
 	XSRFToken string
 	Success   bool
 	Error     sirius.ValidationError
+	CaseUids  string
 
 	Person sirius.Person
 }
 
-func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template) Handler {
+func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		parentID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -29,7 +30,10 @@ func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-		data := unlinkPersonData{XSRFToken: ctx.XSRFToken}
+		data := unlinkPersonData{
+			XSRFToken: ctx.XSRFToken,
+			CaseUids:  buildUIDQueryString(r.Form["uid[]"]),
+		}
 
 		if r.Method == http.MethodPost {
 			var childId int
@@ -63,6 +67,10 @@ func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template) Handler {
 		data.Person, err = client.Person(ctx, parentID)
 		if err != nil {
 			return err
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
