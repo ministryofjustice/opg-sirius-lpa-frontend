@@ -1,0 +1,74 @@
+{{ define "unlink-person" }}
+    <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+    <table class="govuk-table">
+        <caption class="govuk-table__caption govuk-table__caption--m">Primary record</caption>
+        <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Name</th>
+            <td class="govuk-table__cell">{{ .Person.Firstname }} {{ .Person.Surname }}</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Contact ref #</th>
+            <td class="govuk-table__cell">{{ .Person.UID }}</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Address</th>
+            <td class="govuk-table__cell">{{ .Person.AddressLine1 }}</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Date of birth</th>
+            <td class="govuk-table__cell">{{ formatDate .Person.DateOfBirth }}</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Number of links</th>
+            <td class="govuk-table__cell">{{ len .Person.Children }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    {{ if eq 0 (len .Person.Children) }}
+        <h2 class="govuk-heading-m">This record has no links</h2>
+    {{ else }}
+        <p class="govuk-heading-m">Secondary records</p>
+
+        <div class="govuk-form-group {{ if .Error.Field.child }}govuk-form-group--error{{ end }}">
+            <fieldset class="govuk-fieldset">
+                {{ template "errors" .Error.Field.child }}
+                <div class="govuk-radios" data-module="govuk-radios">
+                    {{ range $i, $e := .Person.Children }}
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="child-id-{{ $i }}" name="child-id" type="radio" value="{{ $e.ID }}">
+                            <label class="govuk-label govuk-radios__label app-!-full-width" for="child-id-{{ $i }}">
+                                <table class="govuk-table">
+                                    <tbody class="govuk-table__body">
+                                    <tr class="govuk-table__row">
+                                        <th scope="row" class="govuk-table__header">Name</th>
+                                        <td class="govuk-table__cell">{{ .Firstname }} {{ .Surname }}</td>
+                                    </tr>
+                                    <tr class="govuk-table__row">
+                                        <th scope="row" class="govuk-table__header">Contact ref #</th>
+                                        <td class="govuk-table__cell">{{ .UID }}</td>
+                                    </tr>
+                                    <tr class="govuk-table__row">
+                                        <th scope="row" class="govuk-table__header">Address</th>
+                                        <td class="govuk-table__cell">{{ .AddressLine1 }}</td>
+                                    </tr>
+                                    <tr class="govuk-table__row">
+                                        <th scope="row" class="govuk-table__header">Date of birth</th>
+                                        <td class="govuk-table__cell">{{ formatDate .DateOfBirth }}</td>
+                                    </tr>
+                                    <tr class="govuk-table__row">
+                                        <th scope="row" class="govuk-table__header">Number of links</th>
+                                        <td class="govuk-table__cell">{{ len .Children }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </label>
+                        </div>
+                    {{ end }}
+                </div>
+            </fieldset>
+        </div>
+    {{ end }}
+{{ end }}
