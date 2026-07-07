@@ -1,7 +1,7 @@
 {{ define "actionPanel" }}
   <div class="action-panel__inner">
     {{ range .ActionPanelButtons }}
-      {{ template "action-panel-button" actionPanelButton .Label .URL .IconName .Disabled }}
+      {{ template "action-panel-button" actionPanelButton .Label .URL .IconName .Disabled .Hidden }}
     {{ end }}
   </div>
 {{ end }}

@@ -15,6 +15,7 @@ type ActionPanelClient interface {
 	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
 	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
 	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
+	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
 }
 
 type ActionPanelData struct {
@@ -53,6 +54,7 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		var draftCount int
 		var personHasReferences bool
 		var selectedCases []sirius.Case
+		var userPermissions sirius.Permissions
 		group.Go(func() error {
 			if donorId > 0 {
 				cases, err := client.CasesByDonor(ctx.With(groupCtx), donorId)
@@ -90,6 +92,15 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		})
 
 		group.Go(func() error {
+			userPermissions, err = client.GetUserPermissions(ctx)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		group.Go(func() error {
 			if donorId > 0 {
 				personReferences, err := client.PersonReferences(ctx.With(groupCtx), donorId)
 				if err != nil {
@@ -104,7 +115,7 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences)
+		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences, userPermissions)
 
 		return tmpl(w, data)
 	}
@@ -115,9 +126,10 @@ type ActionPanelButton struct {
 	URL      string
 	IconName string
 	Disabled bool
+	Hidden   bool
 }
 
-func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string, hasDrafts bool, hasReferences bool) []ActionPanelButton {
+func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string, hasDrafts bool, hasReferences bool, userPermissions sirius.Permissions) []ActionPanelButton {
 	warningUrl := fmt.Sprintf("/create-warning?id=%d&entity=person%s", donorId, caseUids)
 	eventUrl := fmt.Sprintf("/create-event?id=%d&entity=person%s", donorId, caseUids)
 	createDonorUrl := fmt.Sprintf("/create-donor?id=%d&entity=person%s", donorId, caseUids)
@@ -288,6 +300,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			URL:      createInvestigationUrl,
 			IconName: "icon-investigation",
 			Disabled: len(selectedCases) != 1,
+			Hidden:   !userPermissions.Includes("v1-lpas-investigations", "POST"),
 		},
 	}
 }
