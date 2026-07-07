@@ -200,7 +200,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/sirius-header-calendars", wrap(SiriusHeaderCalendars(client, templates.Get("sirius-header-partial-calendars.gohtml"))))
 	mux.Handle("/sirius-header-case-info", wrap(SiriusHeaderCaseInfo(client, templates.Get("sirius-header-partial-case-info.gohtml"))))
 	mux.Handle("/sirius-header-people-info", wrap(SiriusHeaderPeopleInfo(client, templates.Get("sirius-header-partial-people-info.gohtml"))))
-	mux.Handle("/unlink-person", wrap(UnlinkPerson(client, templates.Get("unlink_person.gohtml"))))
+	mux.Handle("/unlink-person", wrap(UnlinkPerson(client, templates.Get("unlink-person-wrapper.gohtml"), templates.Get("unlink-person-partial-wrapper.gohtml"))))
 	mux.Handle("/view-document/{uuid}", wrap(ViewDocument(client, templates.Get("view-document.gohtml"))))
 	mux.Handle("/working-days", wrap(WorkingDays(client, templates.Get("working-days-partial.gohtml"))))
 
