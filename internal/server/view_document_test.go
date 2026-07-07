@@ -100,6 +100,12 @@ func TestGetViewDocument(t *testing.T) {
 				Person:          person,
 				CaseUids:        "&uid[]=7000-1234-1234",
 				SelectedCases:   []sirius.Case{caseData},
+				HeaderButtons: SiriusHeaderButtons{
+					BackToTimeline: true,
+					Calendar:       true,
+					CaseInfo:       true,
+					PersonInfo:     true,
+				},
 			}
 
 			template.
@@ -109,7 +115,8 @@ func TestGetViewDocument(t *testing.T) {
 						data.Pane == templateData.Pane &&
 						data.DonorID == templateData.DonorID &&
 						data.SelectedCaseIds == templateData.SelectedCaseIds &&
-						data.CaseUids == templateData.CaseUids
+						data.CaseUids == templateData.CaseUids &&
+						data.HeaderButtons == templateData.HeaderButtons
 				})).
 				Return(nil)
 

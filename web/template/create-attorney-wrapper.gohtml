@@ -1,0 +1,31 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ .Title }}{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+
+      <a href="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+
+      <h1 class="govuk-heading-l">{{ .Title }}</h1>
+
+      <form class="form" method="POST">
+
+        {{ template "createAttorney" . }}
+
+        <div class="govuk-button-group govuk-!-padding-top-5">
+            <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+            {{ if not .IsEditing }}
+              <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add another attorney" />
+            {{ end }}
+            {{ if ne .NextAttorneyId 0 }}
+            <input class="govuk-button" data-module="govuk-button" type="submit" name="next-attorney" value="Save and edit next attorney" />
+            {{ end }}
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
