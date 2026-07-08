@@ -601,7 +601,7 @@ func TestGetDocumentList(t *testing.T) {
 				},
 				{
 					Label:    "Unlink record",
-					URL:      "/unlink-person?id=82",
+					URL:      "/unlink-person?id=82&uid[]=7000-1234-0000",
 					IconName: "aw-unlink",
 					Disabled: true,
 				},
@@ -736,7 +736,7 @@ func TestGetDocumentList(t *testing.T) {
 				},
 				{
 					Label:    "Unlink record",
-					URL:      "/unlink-person?id=82",
+					URL:      "/unlink-person?id=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 					IconName: "aw-unlink",
 					Disabled: true,
 				},
@@ -1325,7 +1325,7 @@ func TestDocumentListDismissValidation(t *testing.T) {
 					},
 					{
 						Label:    "Unlink record",
-						URL:      "/unlink-person?id=82",
+						URL:      "/unlink-person?id=82&uid[]=7000-1234-0000&uid[]=7000-9876-0000",
 						IconName: "aw-unlink",
 						Disabled: true,
 					},
