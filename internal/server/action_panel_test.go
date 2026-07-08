@@ -25,6 +25,11 @@ func (m *mockActionPanelClient) GetDraftCount(ctx sirius.Context, caseType strin
 	return args.Get(0).(sirius.DocumentDraftCount), args.Error(1)
 }
 
+func (m *mockActionPanelClient) Person(ctx sirius.Context, id int) (sirius.Person, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.Person), args.Error(1)
+}
+
 func (m *mockActionPanelClient) PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).([]sirius.PersonReference), args.Error(1)
@@ -53,6 +58,9 @@ func TestGetActionPanel(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{ID: 123}, nil)
 	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(actionPanelPermissions, nil)
@@ -146,6 +154,12 @@ func TestGetActionPanel(t *testing.T) {
 					Disabled: false,
 				},
 				{
+					Label:    "Unlink record",
+					URL:      "/unlink-person?id=123",
+					IconName: "aw-unlink",
+					Disabled: true,
+				},
+				{
 					Label:    "Delete relationship",
 					URL:      "/delete-relationship?id=123",
 					IconName: "icon-minus",
@@ -206,6 +220,9 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{ID: 123, Children: []sirius.Person{{ID: 456}}}, nil)
 	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(actionPanelPermissions, nil)
@@ -296,6 +313,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					Label:    "Link record",
 					URL:      "/link-person?id=123&uid[]=7000-0000-0001",
 					IconName: "aw-link",
+					Disabled: false,
+				},
+				{
+					Label:    "Unlink record",
+					URL:      "/unlink-person?id=123&uid[]=7000-0000-0001",
+					IconName: "aw-unlink",
 					Disabled: false,
 				},
 				{
@@ -438,6 +461,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					Disabled: true,
 				},
 				{
+					Label:    "Unlink record",
+					URL:      "/unlink-person?id=0",
+					IconName: "aw-unlink",
+					Disabled: true,
+				},
+				{
 					Label:    "Delete relationship",
 					URL:      "/delete-relationship?id=0",
 					IconName: "icon-minus",
@@ -481,6 +510,7 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 	client.AssertNotCalled(t, "CasesByDonor")
+	client.AssertNotCalled(t, "Person")
 }
 
 func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T) {
@@ -497,6 +527,9 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 	client.
 		On("GetDraftCount", mock.Anything, "epa", 3).
 		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
@@ -593,6 +626,12 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 					Disabled: false,
 				},
 				{
+					Label:    "Unlink record",
+					URL:      "/unlink-person?id=123&uid[]=7000-0000-0003",
+					IconName: "aw-unlink",
+					Disabled: true,
+				},
+				{
 					Label:    "Delete relationship",
 					URL:      "/delete-relationship?id=123&uid[]=7000-0000-0003",
 					IconName: "icon-minus",
@@ -636,6 +675,7 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 	client.AssertNotCalled(t, "CasesByDonor")
+	client.AssertNotCalled(t, "Person")
 }
 
 func TestGetActionPanelWhenCasesByDonorErrors(t *testing.T) {
@@ -645,6 +685,9 @@ func TestGetActionPanelWhenCasesByDonorErrors(t *testing.T) {
 	client.
 		On("CasesByDonor", mock.Anything, 123).
 		Return([]sirius.Case{}, expectedError)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
@@ -699,6 +742,9 @@ func TestGetActionPanelWhenGetDraftCountErrors(t *testing.T) {
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{}, expectedError)
 	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
 	client.
@@ -729,11 +775,44 @@ func TestGetActionPanelWhenPersonReferencesErrors(t *testing.T) {
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{}, nil)
 	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{}, expectedError)
 	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(actionPanelPermissions, nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
+	w := httptest.NewRecorder()
+
+	err := ActionPanel(client, nil)(w, r)
+
+	assert.Equal(t, expectedError, err)
+}
+
+func TestGetActionPanelWhenPersonErrors(t *testing.T) {
+	expectedError := errors.New("get person error")
+
+	cases := []sirius.Case{
+		{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"},
+		{ID: 2, UID: "7000-0000-0002", CaseType: "LPA"},
+	}
+
+	client := &mockActionPanelClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 123).
+		Return(cases, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, expectedError)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()
