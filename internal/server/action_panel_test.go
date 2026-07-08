@@ -143,7 +143,7 @@ func TestGetActionPanel(t *testing.T) {
 				{
 					Label:    "Unlink record",
 					URL:      "/unlink-person?id=123",
-					IconName: "aw-link",
+					IconName: "aw-unlink",
 					Disabled: true,
 				},
 				{
@@ -297,7 +297,7 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 				{
 					Label:    "Unlink record",
 					URL:      "/unlink-person?id=123&uid[]=7000-0000-0001",
-					IconName: "aw-link",
+					IconName: "aw-unlink",
 					Disabled: false,
 				},
 				{
@@ -433,7 +433,7 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 				{
 					Label:    "Unlink record",
 					URL:      "/unlink-person?id=0",
-					IconName: "aw-link",
+					IconName: "aw-unlink",
 					Disabled: true,
 				},
 				{
@@ -589,7 +589,7 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 				{
 					Label:    "Unlink record",
 					URL:      "/unlink-person?id=123&uid[]=7000-0000-0003",
-					IconName: "aw-link",
+					IconName: "aw-unlink",
 					Disabled: true,
 				},
 				{

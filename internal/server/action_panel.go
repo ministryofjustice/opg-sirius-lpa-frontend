@@ -274,7 +274,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		{
 			Label:    "Unlink record",
 			URL:      unlinkPersonUrl,
-			IconName: "aw-link",
+			IconName: "aw-unlink",
 			Disabled: donorId == 0 || !hasLinks,
 		},
 		{
