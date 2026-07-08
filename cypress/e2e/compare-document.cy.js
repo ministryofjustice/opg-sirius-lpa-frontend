@@ -10,7 +10,7 @@ describe("Compare documents", () => {
           id: 34,
           uId: "7001-0000-5678",
           caseSubtype: "pfa",
-          caseType: "EPA",
+          caseType: "LPA",
           donor: {
             id: 33,
           },
@@ -28,6 +28,25 @@ describe("Compare documents", () => {
         },
       ],
     };
+
+    cy.addMock("/lpa-api/v1/persons/33", "GET", {
+      status: 200,
+      body: {},
+    });
+
+    cy.addMock("/lpa-api/v1/persons/33/cases", "GET", {
+      status: 200,
+      body: {
+        cases: [
+          {
+            caseType: "LPA",
+            caseSubtype: "pfa",
+            id: 34,
+            uId: "7001-0000-5678",
+          },
+        ],
+      },
+    });
 
     cy.addMock(
       "/lpa-api/v1/documents/dfef6714-b4fe-44c2-b26e-90dfe3663e95",
@@ -70,6 +89,44 @@ describe("Compare documents", () => {
         },
       },
     );
+
+    cy.addMock("/lpa-api/v1/cases/34", "GET", {
+      status: 200,
+      body: {
+        id: 34,
+        caseType: "LPA",
+        caseSubtype: "pfa",
+        uId: "7001-0000-5678",
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/permissions", "GET", {
+      status: 200,
+      body: {
+        "v1-persons": {
+          permissions: ["GET"],
+        },
+        "v1-persons-cases": {
+          permissions: ["GET"],
+        },
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/lpas/34/draft-count", "GET", {
+      status: 200,
+      body: {
+        draftCount: 0,
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/persons/33/references", "GET", {
+      status: 200,
+      body: [
+        {
+          referenceId: 123,
+        },
+      ],
+    });
   });
 
   it("shows document alongside document list when first selecting compare", () => {
@@ -157,7 +214,7 @@ describe("Compare documents", () => {
               .and("not.be.empty")
               .and(
                 "include",
-                "/view-document/e5b5acd1-c11c-41fe-a921-7fdd07e8f670?pane=2",
+                "/view-document/e5b5acd1-c11c-41fe-a921-7fdd07e8f670/33?case=34&pane=2",
               );
           }
         });
@@ -175,7 +232,7 @@ describe("Compare documents", () => {
               .and("not.be.empty")
               .and(
                 "include",
-                "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95?pane=1",
+                "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33?case=34&pane=1",
               );
           }
         });
