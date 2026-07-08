@@ -715,6 +715,9 @@ func TestGetActionPanelWhenPermissionsErrors(t *testing.T) {
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
 	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(actionPanelPermissions, errExample)
 
