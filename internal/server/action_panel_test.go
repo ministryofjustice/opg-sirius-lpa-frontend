@@ -816,6 +816,9 @@ func TestGetActionPanelWhenPersonErrors(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, expectedError)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()
