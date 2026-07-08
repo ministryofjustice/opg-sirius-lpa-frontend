@@ -3,13 +3,7 @@
         {{ template "error-summary" .Error }}
 
         {{ if .Success }}
-            <meta data-app-select-case="{{ .CaseId }}"/>
-            <span class="govuk-!-display-none"
-                hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=epa&uid[]=%s" .DonorId .Epa.UID) }}"
-                hx-target=".action-panel__content"
-                hx-swap="innerHTML"
-                hx-trigger="load"
-            ></span>
+            <meta http-equiv="Refresh" content="0" />
             {{ if .IsUpdate }}
                 {{ template "success-banner" "You have successfully updated an EPA." }}
             {{ else }}

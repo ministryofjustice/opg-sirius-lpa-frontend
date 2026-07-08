@@ -31,12 +31,7 @@
           </div>
         </div>
       {{ else }}
-        <span class="govuk-!-display-none"
-            hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s%s" .DonorId .EntityType .CaseUids) }}"
-            hx-target=".action-panel__content"
-            hx-swap="innerHTML"
-            hx-trigger="load"
-        ></span>
+        <meta http-equiv="Refresh" content="0" />
         <h1 class="govuk-visually-hidden">Donor edited</h1>
         {{ template "success-banner" "Donor was edited" }}
       {{ end }}
