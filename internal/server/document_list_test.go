@@ -353,6 +353,13 @@ func TestGetDocumentList(t *testing.T) {
 					IconName: "aw-edit-case",
 					Disabled: true,
 				},
+				{
+					Label:    "Add investigation",
+					URL:      "",
+					IconName: "icon-investigation",
+					Disabled: true,
+					Hidden:   true,
+				},
 			},
 		},
 		{
@@ -474,6 +481,13 @@ func TestGetDocumentList(t *testing.T) {
 					URL:      "",
 					IconName: "aw-edit-case",
 					Disabled: true,
+				},
+				{
+					Label:    "Add investigation",
+					URL:      "/create-investigation?id=1&case=lpa",
+					IconName: "icon-investigation",
+					Disabled: false,
+					Hidden:   true,
 				},
 			},
 		},
@@ -597,6 +611,13 @@ func TestGetDocumentList(t *testing.T) {
 					IconName: "aw-edit-case",
 					Disabled: true,
 				},
+				{
+					Label:    "Add investigation",
+					URL:      "/create-investigation?id=1&case=lpa&uid[]=7000-1234-0000",
+					IconName: "icon-investigation",
+					Disabled: false,
+					Hidden:   true,
+				},
 			},
 		},
 		{
@@ -709,6 +730,7 @@ func TestGetDocumentList(t *testing.T) {
 					Disabled: false,
 				},
 				{
+
 					Label:    "Create epa case",
 					URL:      "/create-epa?id=82",
 					IconName: "aw-create-case",
@@ -719,6 +741,13 @@ func TestGetDocumentList(t *testing.T) {
 					URL:      "",
 					IconName: "aw-edit-case",
 					Disabled: true,
+				},
+				{
+					Label:    "Add investigation",
+					URL:      "",
+					IconName: "icon-investigation",
+					Disabled: true,
+					Hidden:   true,
 				},
 			},
 		},
@@ -1070,6 +1099,13 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 						IconName: "aw-edit-case",
 						Disabled: true,
 					},
+					{
+						Label:    "Add investigation",
+						URL:      "",
+						IconName: "icon-investigation",
+						Disabled: true,
+						Hidden:   true,
+					},
 				},
 				HeaderButtons: SiriusHeaderButtons{
 					BackToTimeline: true,
@@ -1280,6 +1316,13 @@ func TestDocumentListDismissValidation(t *testing.T) {
 						URL:      "",
 						IconName: "aw-edit-case",
 						Disabled: true,
+					},
+					{
+						Label:    "Add investigation",
+						URL:      "",
+						IconName: "icon-investigation",
+						Disabled: true,
+						Hidden:   true,
 					},
 				},
 				HeaderButtons: SiriusHeaderButtons{
@@ -1605,6 +1648,13 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 						URL:      "",
 						IconName: "aw-edit-case",
 						Disabled: true,
+					},
+					{
+						Label:    "Add investigation",
+						URL:      "/create-investigation?id=1&case=lpa",
+						IconName: "icon-investigation",
+						Disabled: false,
+						Hidden:   true,
 					},
 				},
 				HeaderButtons: SiriusHeaderButtons{

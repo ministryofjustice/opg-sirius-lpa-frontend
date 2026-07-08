@@ -30,6 +30,16 @@ func (m *mockActionPanelClient) PersonReferences(ctx sirius.Context, id int) ([]
 	return args.Get(0).([]sirius.PersonReference), args.Error(1)
 }
 
+func (m *mockActionPanelClient) GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(sirius.Permissions), args.Error(1)
+}
+
+var actionPanelPermissions = sirius.Permissions{
+	"v1-persons":             sirius.PermissionType{Permissions: []string{"GET"}},
+	"v1-lpas-investigations": sirius.PermissionType{Permissions: []string{"POST"}},
+}
+
 func TestGetActionPanel(t *testing.T) {
 	cases := []sirius.Case{
 		{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"},
@@ -43,6 +53,9 @@ func TestGetActionPanel(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -142,7 +155,6 @@ func TestGetActionPanel(t *testing.T) {
 					Label:    "Create relationship",
 					URL:      "/create-relationship?id=123&entity=person",
 					IconName: "aw-relationship",
-
 					Disabled: false,
 				},
 				{
@@ -155,6 +167,12 @@ func TestGetActionPanel(t *testing.T) {
 					Label:    "Edit epa case",
 					URL:      "",
 					IconName: "aw-edit-case",
+					Disabled: true,
+				},
+				{
+					Label:    "Add investigation",
+					URL:      "",
+					IconName: "icon-investigation",
 					Disabled: true,
 				},
 			},
@@ -188,6 +206,9 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -301,6 +322,12 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					IconName: "aw-edit-case",
 					Disabled: true,
 				},
+				{
+					Label:    "Add investigation",
+					URL:      "/create-investigation?id=1&case=lpa&uid[]=7000-0000-0001",
+					IconName: "icon-investigation",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -318,6 +345,9 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 
 func TestGetActionPanelNoDonorID(t *testing.T) {
 	client := &mockActionPanelClient{}
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -431,6 +461,12 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					IconName: "aw-edit-case",
 					Disabled: true,
 				},
+				{
+					Label:    "Add investigation",
+					URL:      "",
+					IconName: "icon-investigation",
+					Disabled: true,
+				},
 			},
 		}).
 		Return(nil)
@@ -464,6 +500,9 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -577,6 +616,12 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 					IconName: "aw-edit-case",
 					Disabled: false,
 				},
+				{
+					Label:    "Add investigation",
+					URL:      "/create-investigation?id=3&case=epa&uid[]=7000-0000-0003",
+					IconName: "icon-investigation",
+					Disabled: false,
+				},
 			},
 		}).
 		Return(nil)
@@ -603,6 +648,9 @@ func TestGetActionPanelWhenCasesByDonorErrors(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa", nil)
 	w := httptest.NewRecorder()
@@ -610,6 +658,29 @@ func TestGetActionPanelWhenCasesByDonorErrors(t *testing.T) {
 	err := ActionPanel(client, nil)(w, r)
 
 	assert.Equal(t, expectedError, err)
+}
+
+func TestGetActionPanelWhenPermissionsErrors(t *testing.T) {
+	client := &mockActionPanelClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 123).
+		Return([]sirius.Case{{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"}}, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 1).
+		Return(sirius.DocumentDraftCount{DraftCount: 0}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, errExample)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa", nil)
+	w := httptest.NewRecorder()
+
+	err := ActionPanel(client, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
 }
 
 func TestGetActionPanelWhenGetDraftCountErrors(t *testing.T) {
@@ -630,6 +701,9 @@ func TestGetActionPanelWhenGetDraftCountErrors(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()
@@ -657,6 +731,9 @@ func TestGetActionPanelWhenPersonReferencesErrors(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{}, expectedError)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()

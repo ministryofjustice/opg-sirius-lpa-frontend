@@ -4,7 +4,7 @@
 
         {{ template "error-summary" .Error }}
 
-        {{ $url := prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .DonorID .EntityType .CaseUIDs) }}
+        {{ $url := prefix (printf "/action-panel?donorId=%d&entity=%s%s" .DonorID .EntityType .CaseUIDs) }}
 
         {{ if .Success }}
             <meta http-equiv="Refresh" content="0" />
