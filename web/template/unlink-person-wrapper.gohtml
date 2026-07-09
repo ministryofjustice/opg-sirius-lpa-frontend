@@ -1,37 +1,28 @@
-{{ define "page" }}
-    <div class="action-panel__form">
+{{ template "page" . }}
 
-        {{ if .Success }}
-            <span class="govuk-!-display-none"
-                  hx-get="{{ prefix (printf "/action-panel?donorId=%d%s" .Person.ID .CaseUids) }}"
-                  hx-target=".action-panel__content"
-                  hx-swap="innerHTML"
-                  hx-trigger="load"
-            ></span>
-            {{ template "success-banner" "You have successfully unlinked the record(s)." }}
-        {{ end }}
+{{ define "title" }}Unlink Record{{ end }}
 
-        <h1 class="govuk-heading-m">Unlink Record</h1>
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
 
-        <form class="form"
-              method="POST"
-              hx-post="{{ prefix (printf "/unlink-person?id=%d%s" .Person.ID .CaseUids) }}"
-              hx-target=".action-panel__content"
-              hx-swap="innerHTML"
-        >
-            {{ template "unlink-person" . }}
-
-            {{ if gt (len .Person.Children) 0 }}
-                <div class="govuk-button-group">
-                    <button class="govuk-button" data-module="govuk-button" type="submit">Unlink</button>
-                    <a class="govuk-link govuk-link--no-visited-state"
-                       href=""
-                       hx-get="{{ prefix (printf "/action-panel?donorId=%d%s" .Person.ID .CaseUids) }}"
-                       hx-target=".action-panel__content"
-                       hx-swap="innerHTML"
-                    >Cancel</a>
-                </div>
+            {{ if .Success }}
+                <meta data-app-reload="page" />
+                {{ template "success-banner" "You have successfully unlinked the record(s)." }}
             {{ end }}
-        </form>
+
+            <h1 class="govuk-heading-l app-!-embedded-hide">Unlink Record</h1>
+
+            <form class="form" method="POST">
+                {{ template "unlink-person" . }}
+
+                {{ if gt (len .Person.Children) 0 }}
+                    <div class="govuk-button-group">
+                        <button class="govuk-button" data-module="govuk-button" type="submit">Unlink</button>
+                        <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+                    </div>
+                {{ end }}
+            </form>
+        </div>
     </div>
 {{ end }}
