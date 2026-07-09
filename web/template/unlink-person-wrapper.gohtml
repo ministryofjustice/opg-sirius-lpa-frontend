@@ -1,0 +1,28 @@
+{{ template "page" . }}
+
+{{ define "title" }}Unlink Record{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            {{ if .Success }}
+                <meta data-app-reload="page" />
+                {{ template "success-banner" "You have successfully unlinked the record(s)." }}
+            {{ end }}
+
+            <h1 class="govuk-heading-l app-!-embedded-hide">Unlink Record</h1>
+
+            <form class="form" method="POST">
+                {{ template "unlink-person" . }}
+
+                {{ if gt (len .Person.Children) 0 }}
+                    <div class="govuk-button-group">
+                        <button class="govuk-button" data-module="govuk-button" type="submit">Unlink</button>
+                        <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+                    </div>
+                {{ end }}
+            </form>
+        </div>
+    </div>
+{{ end }}
