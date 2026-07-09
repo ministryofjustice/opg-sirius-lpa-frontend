@@ -237,7 +237,7 @@ func TestGetCompareDocsPanes(t *testing.T) {
 				HasV1PersonsGetPermission:      true,
 				HasV1PersonsCasesGetPermission: true,
 				SelectedCases:                  []sirius.Case{selectedCase},
-				ActionPanelButtons:             GetActionPanelButtons([]sirius.Case{selectedCase}, 77, "&uid[]=case-uid", false, false, permissions),
+				ActionPanelButtons:             GetActionPanelButtons([]sirius.Case{selectedCase}, 77, "&uid[]=case-uid", false, false, false, permissions),
 				HeaderButtons: SiriusHeaderButtons{
 					BackToTimeline: true,
 					CaseInfo:       true,
