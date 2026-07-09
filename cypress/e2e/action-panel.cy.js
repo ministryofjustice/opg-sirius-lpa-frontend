@@ -41,7 +41,14 @@ describe("Action Panel", () => {
 
     cy.addMock("/lpa-api/v1/permissions", "GET", {
       status: 200,
-      body: {},
+      body: {
+        "v1-lpas-investigations": {
+          permissions: ["POST"],
+        },
+        "v1-persons-cases": {
+          permissions: ["GET"],
+        },
+      },
     });
 
     cy.addMock("/lpa-api/v1/lpas/34/draft-count", "GET", {
@@ -329,6 +336,17 @@ describe("Action Panel", () => {
     cy.get("a#action-panel-button-delete-relationship").click();
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Delete Relationship");
+  });
+
+  it("displays the add investigation button on the action panel", () => {
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Add investigation");
+
+    cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
+
+    cy.get("a#action-panel-button-add-investigation").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Create Investigation");
   });
 
   it("displays the create epa button on the action panel and can click through to subforms", () => {

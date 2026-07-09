@@ -15,6 +15,7 @@ type ActionPanelClient interface {
 	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
 	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
 	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
+	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
 }
 
 type ActionPanelData struct {
@@ -53,6 +54,7 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		var draftCount int
 		var personHasReferences bool
 		var selectedCases []sirius.Case
+		var userPermissions sirius.Permissions
 		group.Go(func() error {
 			if donorId > 0 {
 				cases, err := client.CasesByDonor(ctx.With(groupCtx), donorId)
@@ -90,6 +92,15 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		})
 
 		group.Go(func() error {
+			userPermissions, err = client.GetUserPermissions(ctx)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		group.Go(func() error {
 			if donorId > 0 {
 				personReferences, err := client.PersonReferences(ctx.With(groupCtx), donorId)
 				if err != nil {
@@ -104,7 +115,7 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences)
+		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences, userPermissions)
 
 		return tmpl(w, data)
 	}
@@ -115,9 +126,10 @@ type ActionPanelButton struct {
 	URL      string
 	IconName string
 	Disabled bool
+	Hidden   bool
 }
 
-func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string, hasDrafts bool, hasReferences bool) []ActionPanelButton {
+func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string, hasDrafts bool, hasReferences bool, userPermissions sirius.Permissions) []ActionPanelButton {
 	warningUrl := fmt.Sprintf("/create-warning?id=%d&entity=person%s", donorId, caseUids)
 	eventUrl := fmt.Sprintf("/create-event?id=%d&entity=person%s", donorId, caseUids)
 	createDonorUrl := fmt.Sprintf("/create-donor?id=%d&entity=person%s", donorId, caseUids)
@@ -125,11 +137,12 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	miReportingUrl := fmt.Sprintf("/mi-reporting?donorId=%d%s", donorId, caseUids)
 	linkPersonUrl := fmt.Sprintf("/link-person?id=%d%s", donorId, caseUids)
 	deleteRelationshipUrl := fmt.Sprintf("/delete-relationship?id=%d%s", donorId, caseUids)
-	createRelationship := fmt.Sprintf("/create-relationship?id=%d&entity=person%s", donorId, caseUids)
+	createRelationshipUrl := fmt.Sprintf("/create-relationship?id=%d&entity=person%s", donorId, caseUids)
 	createEpaUrl := fmt.Sprintf("/create-epa?id=%d", donorId)
 	editEpaUrl := ""
 	complaintUrl := ""
 	createDocumentUrl := ""
+	createInvestigationUrl := ""
 	editDocumentUrl := ""
 	changeStatusUrl := ""
 	paymentsUrl := ""
@@ -150,6 +163,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		newTaskUrl = fmt.Sprintf("/create-task?id=%d&entity=%s%s", id, caseType, caseUids)
 		editDatesUrl = fmt.Sprintf("/edit-dates?id=%d&case=%s", id, caseType)
 		allocateCasesUrl = fmt.Sprintf("/allocate-cases?id=%d&entity=%s%s", id, caseType, caseUids)
+		createInvestigationUrl = fmt.Sprintf("/create-investigation?id=%d&case=%s%s", id, caseType, caseUids)
 
 		if strings.ToLower(selectedCase.CaseType) == "epa" {
 			editEpaUrl = fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, selectedCases[0].ID)
@@ -265,7 +279,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		},
 		{
 			Label:    "Create relationship",
-			URL:      createRelationship,
+			URL:      createRelationshipUrl,
 			IconName: "aw-relationship",
 			Disabled: false,
 		},
@@ -280,6 +294,13 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			URL:      editEpaUrl,
 			IconName: "aw-edit-case",
 			Disabled: len(selectedCases) != 1 || strings.ToLower(selectedCases[0].CaseType) != "epa",
+		},
+		{
+			Label:    "Add investigation",
+			URL:      createInvestigationUrl,
+			IconName: "icon-investigation",
+			Disabled: len(selectedCases) != 1,
+			Hidden:   !userPermissions.Includes("v1-lpas-investigations", "POST"),
 		},
 	}
 }

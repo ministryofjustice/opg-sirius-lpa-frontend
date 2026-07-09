@@ -680,12 +680,13 @@ func translateNumberEventValue(change string, value float64) string {
 	return strconv.FormatFloat(value, 'f', -1, 64)
 }
 
-func actionPanelButton(label, url, iconName string, disabled bool) server.ActionPanelButton {
+func actionPanelButton(label, url, iconName string, disabled bool, hidden bool) server.ActionPanelButton {
 	return server.ActionPanelButton{
 		Label:    label,
 		URL:      url,
 		IconName: iconName,
 		Disabled: disabled,
+		Hidden:   hidden,
 	}
 }
 
