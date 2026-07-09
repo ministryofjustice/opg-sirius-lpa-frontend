@@ -111,17 +111,18 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			CaseUids:        caseUidsStr,
 			SelectedCases:   selectedCase,
 		}
+		
+		userPermissions, err := client.GetUserPermissions(ctx)
+		if err != nil {
+			return err
+		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, userPermissions)
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,
 			CaseInfo:       true,
 			PersonInfo:     true,
 			Calendar:       true,
-		}
-		userPermissions, err := client.GetUserPermissions(ctx)
-		if err != nil {
-			return err
 		}
 
 		data.HasV1PersonsGetPermission = userPermissions.Includes("v1-persons", "GET")
