@@ -1,4 +1,4 @@
-import { PDFViewer } from "./pdf-viewer";
+import { PDFViewer } from "./pdf-viewer.js";
 
 // Mock canvas.getContext before importing pdf-viewer
 HTMLCanvasElement.prototype.getContext = jest.fn(() => ({
