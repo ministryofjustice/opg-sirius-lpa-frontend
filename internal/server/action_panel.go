@@ -14,6 +14,7 @@ import (
 type ActionPanelClient interface {
 	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
 	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
+	Person(ctx sirius.Context, id int) (sirius.Person, error)
 	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
 	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
 }
@@ -111,11 +112,23 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			return nil
 		})
 
+		var personHasLinks bool
+		group.Go(func() error {
+			if donorId > 0 {
+				person, err := client.Person(ctx.With(groupCtx), donorId)
+				if err != nil {
+					return err
+				}
+				personHasLinks = len(person.Children) > 0
+			}
+			return nil
+		})
+
 		if err := group.Wait(); err != nil {
 			return err
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences, userPermissions)
+		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences, personHasLinks, userPermissions)
 
 		return tmpl(w, data)
 	}
@@ -129,13 +142,14 @@ type ActionPanelButton struct {
 	Hidden   bool
 }
 
-func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string, hasDrafts bool, hasReferences bool, userPermissions sirius.Permissions) []ActionPanelButton {
+func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string, hasDrafts bool, hasReferences bool, hasLinks bool, userPermissions sirius.Permissions) []ActionPanelButton {
 	warningUrl := fmt.Sprintf("/create-warning?id=%d&entity=person%s", donorId, caseUids)
 	eventUrl := fmt.Sprintf("/create-event?id=%d&entity=person%s", donorId, caseUids)
 	createDonorUrl := fmt.Sprintf("/create-donor?id=%d&entity=person%s", donorId, caseUids)
 	editDonorUrl := fmt.Sprintf("/edit-donor?id=%d&entity=person%s", donorId, caseUids)
 	miReportingUrl := fmt.Sprintf("/mi-reporting?donorId=%d%s", donorId, caseUids)
 	linkPersonUrl := fmt.Sprintf("/link-person?id=%d%s", donorId, caseUids)
+	unlinkPersonUrl := fmt.Sprintf("/unlink-person?id=%d%s", donorId, caseUids)
 	deleteRelationshipUrl := fmt.Sprintf("/delete-relationship?id=%d%s", donorId, caseUids)
 	createRelationshipUrl := fmt.Sprintf("/create-relationship?id=%d&entity=person%s", donorId, caseUids)
 	createEpaUrl := fmt.Sprintf("/create-epa?id=%d", donorId)
@@ -192,108 +206,133 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			URL:      warningUrl,
 			IconName: "aw-create-warning",
 			Disabled: false,
+			Hidden:   !userPermissions.Includes("v1-warnings", "POST"),
 		},
 		{
 			Label:    "Create event",
 			URL:      eventUrl,
 			IconName: "aw-new-event",
 			Disabled: false,
+			Hidden:   !userPermissions.Includes("v1-notes", "POST"),
 		},
 		{
 			Label:    "Add complaint",
 			URL:      complaintUrl,
 			IconName: "aw-log-complaint",
 			Disabled: len(selectedCases) != 1,
+			Hidden:   !userPermissions.Includes("v1-warnings", "POST"),
 		},
 		{
 			Label:    "Create document",
 			URL:      createDocumentUrl,
 			IconName: "aw-new-template",
 			Disabled: len(selectedCases) != 1,
+			Hidden:   !userPermissions.Includes("v1-lpas-documents-draft", "POST"),
 		},
 		{
 			Label:    "Retrieve draft",
 			URL:      editDocumentUrl,
 			IconName: "aw-new-template",
 			Disabled: len(selectedCases) != 1 || !hasDrafts,
+			Hidden:   !userPermissions.Includes("v1-lpas-documents-draft", "POST"),
 		},
 		{
 			Label:    "Change status",
 			URL:      changeStatusUrl,
 			IconName: "aw-change-status",
 			Disabled: len(selectedCases) != 1,
+			Hidden:   !userPermissions.Includes("v1-lpas", "PUT"),
 		},
 		{
 			Label:    "Fees",
 			URL:      paymentsUrl,
 			IconName: "aw-fees",
 			Disabled: len(selectedCases) != 1,
+			Hidden:   !userPermissions.Includes("v1-payments", "GET"),
 		},
 		{
 			Label:    "New task",
 			URL:      newTaskUrl,
 			IconName: "aw-new-task",
 			Disabled: len(selectedCases) != 1,
+			Hidden:   !userPermissions.Includes("v1-cases-tasks-post", "POST"),
 		},
 		{
 			Label:    "Create donor",
 			URL:      createDonorUrl,
 			IconName: "aw-create-person",
 			Disabled: false,
+			Hidden:   !userPermissions.Includes("v1-donors", "POST"),
 		},
 		{
 			Label:    "Edit donor",
 			URL:      editDonorUrl,
 			IconName: "aw-edit-person",
 			Disabled: false,
+			Hidden:   !userPermissions.Includes("v1-donors", "PUT"),
 		},
 		{
 			Label:    "Edit dates",
 			URL:      editDatesUrl,
 			IconName: "calendar-open",
 			Disabled: len(selectedCases) != 1,
+			Hidden:   !userPermissions.Includes("v1-lpas", "PUT"),
 		},
 		{
 			Label:    "MI reporting",
 			URL:      miReportingUrl,
 			IconName: "aw-mi",
 			Disabled: false,
+			Hidden:   !userPermissions.Includes("reporting", "GET"),
 		},
 		{
 			Label:    "Allocate Case",
 			URL:      allocateCasesUrl,
 			IconName: "aw-allocate-case",
 			Disabled: len(selectedCases) == 0,
+			Hidden:   !userPermissions.Includes("v1-users-updateusercases", "PUT"),
 		},
 		{
 			Label:    "Link record",
 			URL:      linkPersonUrl,
 			IconName: "aw-link",
 			Disabled: donorId == 0,
+			Hidden:   !userPermissions.Includes("v1-person-links", "POST"),
+		},
+		{
+			Label:    "Unlink record",
+			URL:      unlinkPersonUrl,
+			IconName: "aw-unlink",
+			Disabled: donorId == 0 || !hasLinks,
+			Hidden:   !userPermissions.Includes("v1-person-links", "PATCH"),
 		},
 		{
 			Label:    "Delete relationship",
 			URL:      deleteRelationshipUrl,
 			IconName: "icon-minus",
 			Disabled: !hasReferences,
+			Hidden:   !userPermissions.Includes("v1-person-references", "DELETE"),
 		},
 		{
 			Label:    "Create relationship",
 			URL:      createRelationshipUrl,
 			IconName: "aw-relationship",
 			Disabled: false,
+			Hidden:   !userPermissions.Includes("v1-persons-references", "POST"),
 		},
 		{
 			Label:    "Create epa case",
 			URL:      createEpaUrl,
 			IconName: "aw-create-case",
 			Disabled: caseUids != "",
+			Hidden:   !userPermissions.Includes("v1-donors-epas", "POST"),
 		},
 		{
 			Label:    "Edit epa case",
 			URL:      editEpaUrl,
 			IconName: "aw-edit-case",
 			Disabled: len(selectedCases) != 1 || strings.ToLower(selectedCases[0].CaseType) != "epa",
+			Hidden:   !userPermissions.Includes("v1-lpas", "PUT"),
 		},
 		{
 			Label:    "Add investigation",

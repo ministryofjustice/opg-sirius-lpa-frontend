@@ -2,6 +2,14 @@
 
 {{ define "container-classes" }} app-!-max-full-width{{ end }}
 
+{{ define "sirius-header" }}
+    {{ template "siriusHeader" . }}
+{{ end }}
+
+{{ define "action-panel-wrapper" }}
+    {{ template "ActionPanelWrapper" . }}
+{{ end }}
+
 {{ define "main" }}
     <h1 class="govuk-visually-hidden">Compare documents</h1>
     <div class="govuk-grid-column-one-half app-document-compare__separator">
