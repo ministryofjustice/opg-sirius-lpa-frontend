@@ -700,7 +700,15 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   .govuk-details__summary-text,
   .govuk-details__text,
   .govuk-accordion__show-all,
-  .govuk-accordion__section-toggle {
+  .govuk-accordion__section-toggle,
+  .govuk-notification-banner__heading,
+  .govuk-notification-banner__content,
+  .govuk-notification-banner__title,
+  .moj-alert__content,
+  .govuk-error-summary,
+  .govuk-error-summary__title,
+  .govuk-error-summary__body,
+  .govuk-error-summary__list {
     font-size: 0.875rem;
   }
   .govuk-accordion__section-button,
