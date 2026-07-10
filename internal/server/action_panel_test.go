@@ -41,8 +41,23 @@ func (m *mockActionPanelClient) GetUserPermissions(ctx sirius.Context) (sirius.P
 }
 
 var actionPanelPermissions = sirius.Permissions{
-	"v1-persons":             sirius.PermissionType{Permissions: []string{"GET"}},
-	"v1-lpas-investigations": sirius.PermissionType{Permissions: []string{"POST"}},
+	"v1-persons":               sirius.PermissionType{Permissions: []string{"GET"}},
+	"v1-cases-tasks-post":      sirius.PermissionType{Permissions: []string{"POST"}},
+	"v1-donors":                sirius.PermissionType{Permissions: []string{"POST", "PUT"}},
+	"v1-donors-epas":           sirius.PermissionType{Permissions: []string{"POST"}},
+	"v1-donors-lpas":           sirius.PermissionType{Permissions: []string{"POST"}},
+	"v1-lpas":                  sirius.PermissionType{Permissions: []string{"PUT"}},
+	"v1-lpas-documents-draft":  sirius.PermissionType{Permissions: []string{"POST"}},
+	"v1-lpas-investigations":   sirius.PermissionType{Permissions: []string{"POST"}},
+	"v1-notes":                 sirius.PermissionType{Permissions: []string{"POST"}},
+	"v1-payments":              sirius.PermissionType{Permissions: []string{"GET"}},
+	"v1-person-links":          sirius.PermissionType{Permissions: []string{"POST", "PATCH"}},
+	"v1-person-references":     sirius.PermissionType{Permissions: []string{"DELETE"}},
+	"v1-persons-references":    sirius.PermissionType{Permissions: []string{"POST"}},
+	"v1-poa-tasks":             sirius.PermissionType{Permissions: []string{"PUT"}},
+	"v1-users-updateusercases": sirius.PermissionType{Permissions: []string{"PUT"}},
+	"v1-warnings":              sirius.PermissionType{Permissions: []string{"POST"}},
+	"reporting":                sirius.PermissionType{Permissions: []string{"GET"}},
 }
 
 func TestGetActionPanel(t *testing.T) {
