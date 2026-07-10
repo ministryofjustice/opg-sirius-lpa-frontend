@@ -31,7 +31,6 @@ type viewDocumentData struct {
 	HasV1PersonsGetPermission      bool
 	HasV1PersonsCasesGetPermission bool
 	SelectedCases                  []sirius.Case
-	ID                             int
 	ActionPanelButtons             []ActionPanelButton
 	HeaderButtons                  SiriusHeaderButtons
 }
