@@ -33,6 +33,18 @@ describe("Action Panel", () => {
       },
     );
 
+    cy.addMock(
+      "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0,case:78&limit=999",
+      "GET",
+      {
+        status: 200,
+        body: {
+          total: 0,
+          documents: [],
+        },
+      },
+    );
+
     // needed for the header bar
     cy.addMock("/lpa-api/v1/persons/1", "GET", {
       status: 200,
@@ -42,16 +54,71 @@ describe("Action Panel", () => {
     cy.addMock("/lpa-api/v1/permissions", "GET", {
       status: 200,
       body: {
+        "v1-persons": {
+          permissions: ["GET"],
+        },
+        "v1-persons-cases": {
+          permissions: ["GET"],
+        },
+        "v1-cases-tasks-post": {
+          permissions: ["POST"],
+        },
+        "v1-donors": {
+          permissions: ["POST", "PUT"],
+        },
+        "v1-donors-epas": {
+          permissions: ["POST"],
+        },
+        "v1-donors-lpas": {
+          permissions: ["POST"],
+        },
+        "v1-lpas": {
+          permissions: ["PUT"],
+        },
+        "v1-lpas-documents-draft": {
+          permissions: ["POST"],
+        },
         "v1-lpas-investigations": {
           permissions: ["POST"],
         },
-        "v1-persons-cases": {
+        "v1-notes": {
+          permissions: ["POST"],
+        },
+        "v1-payments": {
+          permissions: ["GET"],
+        },
+        "v1-person-links": {
+          permissions: ["POST", "PATCH"],
+        },
+        "v1-person-references": {
+          permissions: ["DELETE"],
+        },
+        "v1-persons-references": {
+          permissions: ["POST"],
+        },
+        "v1-poa-tasks": {
+          permissions: ["PUT"],
+        },
+        "v1-users-updateusercases": {
+          permissions: ["PUT"],
+        },
+        "v1-warnings": {
+          permissions: ["POST"],
+        },
+        reporting: {
           permissions: ["GET"],
         },
       },
     });
 
     cy.addMock("/lpa-api/v1/lpas/34/draft-count", "GET", {
+      status: 200,
+      body: {
+        draftCount: 1,
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/lpas/78/draft-count", "GET", {
       status: 200,
       body: {
         draftCount: 1,
@@ -75,6 +142,40 @@ describe("Action Panel", () => {
 
     cy.get("#actions-tab").click();
     cy.get("#actions-content").should("not.be.visible");
+  });
+
+  it("does not display any buttons on the action panel without permissions", () => {
+    cy.addMock("/lpa-api/v1/permissions", "GET", {
+      status: 200,
+      body: {
+        "v1-persons-cases": {
+          permissions: ["GET"],
+        },
+      },
+    });
+
+    cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
+
+    cy.contains("Add investigation").should("not.be.visible");
+    cy.contains("Add complaint").should("not.be.visible");
+    cy.contains("Allocate Case").should("not.be.visible");
+    cy.contains("Change status").should("not.be.visible");
+    cy.contains("Create document").should("not.be.visible");
+    cy.contains("Create donor").should("not.be.visible");
+    cy.contains("Create epa case").should("not.be.visible");
+    cy.contains("Create event").should("not.be.visible");
+    cy.contains("Create relationship").should("not.be.visible");
+    cy.contains("Create warning").should("not.be.visible");
+    cy.contains("Delete relationship").should("not.be.visible");
+    cy.contains("Edit dates").should("not.be.visible");
+    cy.contains("Edit donor").should("not.be.visible");
+    cy.contains("Edit epa case").should("not.be.visible");
+    cy.contains("Fees").should("not.be.visible");
+    cy.contains("Unlink record").should("not.be.visible");
+    cy.contains("Link record").should("not.be.visible");
+    cy.contains("MI reporting").should("not.be.visible");
+    cy.contains("New task").should("not.be.visible");
+    cy.contains("Retrieve draft").should("not.be.visible");
   });
 
   it("displays the warning button on the action panel", () => {
