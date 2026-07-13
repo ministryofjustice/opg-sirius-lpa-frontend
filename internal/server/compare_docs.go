@@ -3,6 +3,8 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -11,15 +13,29 @@ import (
 type CompareDocsClient interface {
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
+	Person(ctx sirius.Context, id int) (sirius.Person, error)
+	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
+	Case(ctx sirius.Context, id int) (sirius.Case, error)
+	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
+	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
 }
 
 type compareDocsData struct {
-	DocListPane1Data documentPageData
-	DocListPane2Data documentPageData
-	Pane1            string
-	Pane2            string
-	View1            *viewingDocumentData
-	View2            *viewingDocumentData
+	DocListPane1Data               documentPageData
+	DocListPane2Data               documentPageData
+	Pane1                          string
+	Pane2                          string
+	View1                          *viewingDocumentData
+	View2                          *viewingDocumentData
+	DonorID                        int
+	SelectedCaseIds                string
+	Person                         sirius.Person
+	CaseUids                       string
+	HasV1PersonsGetPermission      bool
+	HasV1PersonsCasesGetPermission bool
+	SelectedCases                  []sirius.Case
+	ActionPanelButtons             []ActionPanelButton
+	HeaderButtons                  SiriusHeaderButtons
 }
 
 type viewingDocumentData struct {
@@ -44,7 +60,31 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		selected := docs.Documents[0].CaseItems
+		person, err := client.Person(ctx, donorID)
+		if err != nil {
+			return err
+		}
+
+		personReferences, err := client.PersonReferences(ctx, donorID)
+		if err != nil {
+			return err
+		}
+		personHasReferences := len(personReferences) > 0
+
+		id, _ := strconv.Atoi(caseID)
+		var selectedCase []sirius.Case
+		if caseData, err := client.Case(ctx, id); err == nil {
+			selectedCase = []sirius.Case{caseData}
+		}
+		var draftCount int
+		if len(selectedCase) > 0 {
+			documentDraftCount, err := client.GetDraftCount(ctx, strings.ToLower(selectedCase[0].CaseType), selectedCase[0].ID)
+			if err != nil {
+				return err
+			}
+			draftCount = documentDraftCount.DraftCount
+		}
+
 		baseURL := fmt.Sprintf("/compare/%d/%s", donorID, caseID)
 
 		data := compareDocsData{
@@ -53,17 +93,22 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 			DocListPane1Data: documentPageData{
 				XSRFToken:     ctx.XSRFToken,
 				DocumentList:  docs,
-				SelectedCases: selected,
+				SelectedCases: selectedCase,
 				Comparing:     true,
 				DonorID:       donorID,
 			},
 			DocListPane2Data: documentPageData{
 				XSRFToken:     ctx.XSRFToken,
 				DocumentList:  docs,
-				SelectedCases: selected,
+				SelectedCases: selectedCase,
 				Comparing:     true,
 				DonorID:       donorID,
 			},
+			DonorID:         donorID,
+			SelectedCaseIds: caseID,
+			Person:          person,
+			CaseUids:        "&uid[]=" + selectedCase[0].UID,
+			SelectedCases:   selectedCase,
 		}
 
 		pane1UUID := r.URL.Query().Get("pane1")
@@ -122,24 +167,39 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 				BackURL:  backURL,
 			}
 		}
+		userPermissions, err := client.GetUserPermissions(ctx)
+		if err != nil {
+			return err
+		}
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids, draftCount > 0, personHasReferences, len(person.Children) > 0, userPermissions)
 
-	viewingADocumentAndList := data.Pane1 == "doc" && data.Pane2 == "list"
-	if viewingADocumentAndList {
-		data.DocListPane2Data.CloseURL = fmt.Sprintf("/view-document/%s?pane=1", data.View1.Document.UUID)
-		data.View1.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", donorID, data.DocListPane2Data.DocumentList.Documents[0].CaseItems[0].UID)
-	}
+		data.HeaderButtons = SiriusHeaderButtons{
+			BackToTimeline: true,
+			CaseInfo:       true,
+			PersonInfo:     true,
+			Calendar:       true,
+		}
 
-	viewingAListAndDocument := data.Pane1 == "list" && data.Pane2 == "doc"
-	if viewingAListAndDocument {
-		data.DocListPane1Data.CloseURL = fmt.Sprintf("/view-document/%s?pane=2", data.View2.Document.UUID)
-		data.View2.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", donorID, data.DocListPane1Data.DocumentList.Documents[0].CaseItems[0].UID)
-	}
+		data.HasV1PersonsGetPermission = userPermissions.Includes("v1-persons", "GET")
+		data.HasV1PersonsCasesGetPermission = userPermissions.Includes("v1-persons-cases", "GET")
 
-	bothSidesAreDocuments := data.Pane1 == "doc" && data.Pane2 == "doc"
-	if bothSidesAreDocuments {
-		data.View1.CloseURL = fmt.Sprintf("/view-document/%s?pane=2", data.View2.Document.UUID)
-		data.View2.CloseURL = fmt.Sprintf("/view-document/%s?pane=1", data.View1.Document.UUID)
-	}
+		viewingADocumentAndList := data.Pane1 == "doc" && data.Pane2 == "list"
+		if viewingADocumentAndList {
+			data.DocListPane2Data.CloseURL = fmt.Sprintf("/view-document/%s/%d?case=%d&pane=1", data.View1.Document.UUID, donorID, selectedCase[0].ID)
+			data.View1.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", donorID, data.DocListPane2Data.DocumentList.Documents[0].CaseItems[0].UID)
+		}
+
+		viewingAListAndDocument := data.Pane1 == "list" && data.Pane2 == "doc"
+		if viewingAListAndDocument {
+			data.DocListPane1Data.CloseURL = fmt.Sprintf("/view-document/%s/%d?case=%d&pane=2", data.View2.Document.UUID, donorID, selectedCase[0].ID)
+			data.View2.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", donorID, data.DocListPane1Data.DocumentList.Documents[0].CaseItems[0].UID)
+		}
+
+		bothSidesAreDocuments := data.Pane1 == "doc" && data.Pane2 == "doc"
+		if bothSidesAreDocuments {
+			data.View1.CloseURL = fmt.Sprintf("/view-document/%s/%d?case=%d&pane=2", data.View2.Document.UUID, donorID, selectedCase[0].ID)
+			data.View2.CloseURL = fmt.Sprintf("/view-document/%s/%d?case=%d&pane=1", data.View1.Document.UUID, donorID, selectedCase[0].ID)
+		}
 
 		bothSidesAreLists := data.Pane1 == "list" && data.Pane2 == "list"
 		if bothSidesAreLists {

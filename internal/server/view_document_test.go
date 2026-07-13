@@ -100,6 +100,12 @@ func TestGetViewDocument(t *testing.T) {
 				Person:          person,
 				CaseUids:        "&uid[]=7000-1234-1234",
 				SelectedCases:   []sirius.Case{caseData},
+				HeaderButtons: SiriusHeaderButtons{
+					BackToTimeline: true,
+					Calendar:       true,
+					CaseInfo:       true,
+					PersonInfo:     true,
+				},
 			}
 
 			template.
@@ -109,7 +115,8 @@ func TestGetViewDocument(t *testing.T) {
 						data.Pane == templateData.Pane &&
 						data.DonorID == templateData.DonorID &&
 						data.SelectedCaseIds == templateData.SelectedCaseIds &&
-						data.CaseUids == templateData.CaseUids
+						data.CaseUids == templateData.CaseUids &&
+						data.HeaderButtons == templateData.HeaderButtons
 				})).
 				Return(nil)
 
@@ -137,6 +144,46 @@ func TestGetViewDocumentWhenCaseErrors(t *testing.T) {
 	server := newMockServer("/view-document/{uuid}/{donorId}", ViewDocument(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33", nil)
+	_, err := server.serve(req)
+
+	assert.Equal(t, errExample, err)
+}
+
+func TestGetViewDocumentWhenPermissionsErrors(t *testing.T) {
+	client := &mockViewDocumentClient{}
+
+	document := sirius.Document{
+		ID:         1,
+		UUID:       "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+		SystemType: "LP-LETTER",
+		Type:       sirius.TypeSave,
+	}
+
+	client.
+		On("Person", mock.Anything, 33).
+		Return(sirius.Person{ID: 33}, nil)
+	client.
+		On("DocumentByUUID", mock.Anything, "dfef6714-b4fe-44c2-b26e-90dfe3663e95").
+		Return(document, nil)
+	client.
+		On("GetUserDetails", mock.Anything).
+		Return(sirius.User{}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 33).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("Case", mock.Anything, 34).
+		Return(sirius.Case{ID: 34, UID: "7000-1234-1234", CaseType: "lpa"}, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 34).
+		Return(sirius.DocumentDraftCount{DraftCount: 0}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, errExample)
+
+	server := newMockServer("/view-document/{uuid}/{donorId}", ViewDocument(client, nil))
+
+	req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33?case=34", nil)
 	_, err := server.serve(req)
 
 	assert.Equal(t, errExample, err)

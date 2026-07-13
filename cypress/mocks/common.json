@@ -141,6 +141,17 @@
         },
         "body": "[{\"handle\":\"LPA_DOES_NOT_WORK\",\"label\":\"The LPA does not work and cannot be changed\", \"parentSources\":[\"cannot-register\"]}]"
       }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/reference-data/relationshipToDonor"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"handle\":\"NO RELATION\",\"label\":\"No relation\"}, {\"handle\":\"OTHER RELATION\",\"label\":\"Other relation\"}]"
+      }
     }
   ]
 }

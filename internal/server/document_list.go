@@ -39,6 +39,7 @@ type documentPageData struct {
 	CaseUids                       string
 	SelectedCaseIds                string
 	ActionPanelButtons             []ActionPanelButton
+	HeaderButtons                  SiriusHeaderButtons
 	HasV1PersonsGetPermission      bool
 	HasV1PersonsCasesGetPermission bool
 }
@@ -171,11 +172,15 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			data.SelectedCaseIds += strconv.Itoa(selectedCase.ID)
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences)
-
 		userPermissions, err := client.GetUserPermissions(ctx)
 		if err != nil {
 			return err
+		}
+
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, userPermissions)
+		data.HeaderButtons = SiriusHeaderButtons{
+			BackToTimeline: true,
+			Calendar:       true,
 		}
 
 		data.HasV1PersonsGetPermission = userPermissions.Includes("v1-persons", "GET")

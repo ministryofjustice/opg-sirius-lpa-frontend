@@ -668,6 +668,9 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
       pointer-events: none;
       opacity: 0.4;
     }
+    &.hidden {
+      display: none;
+    }
   }
 }
 
@@ -695,11 +698,27 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   .govuk-table__cell,
   .govuk-details__summary,
   .govuk-details__summary-text,
-  .govuk-details__text {
+  .govuk-details__text,
+  .govuk-accordion__show-all,
+  .govuk-accordion__section-toggle,
+  .govuk-notification-banner__heading,
+  .govuk-notification-banner__content,
+  .govuk-notification-banner__title,
+  .moj-alert__content,
+  .govuk-error-summary,
+  .govuk-error-summary__title,
+  .govuk-error-summary__body,
+  .govuk-error-summary__list {
     font-size: 0.875rem;
+  }
+  .govuk-accordion__section-button,
+  .govuk-accordion__section-heading-text {
+    font-size: 1rem;
   }
   .govuk-select,
   .govuk-input,
+  .govuk-button,
+  .address-finder__container,
   .autocomplete__input,
   .autocomplete__hint {
     height: 1.875rem;
@@ -776,6 +795,7 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   }
 }
 
+#action-panel-button-add-investigation svg,
 #action-panel-button-create-relationship svg,
 #action-panel-button-delete-relationship svg,
 #action-panel-button-edit-dates svg {

@@ -31,8 +31,8 @@ type viewDocumentData struct {
 	HasV1PersonsGetPermission      bool
 	HasV1PersonsCasesGetPermission bool
 	SelectedCases                  []sirius.Case
-	ID                             int
 	ActionPanelButtons             []ActionPanelButton
+	HeaderButtons                  SiriusHeaderButtons
 }
 
 func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
@@ -111,11 +111,17 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			SelectedCases:   selectedCase,
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences)
-
 		userPermissions, err := client.GetUserPermissions(ctx)
 		if err != nil {
 			return err
+		}
+
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, userPermissions)
+		data.HeaderButtons = SiriusHeaderButtons{
+			BackToTimeline: true,
+			CaseInfo:       true,
+			PersonInfo:     true,
+			Calendar:       true,
 		}
 
 		data.HasV1PersonsGetPermission = userPermissions.Includes("v1-persons", "GET")

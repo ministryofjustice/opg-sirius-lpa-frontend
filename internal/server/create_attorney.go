@@ -26,9 +26,11 @@ type createAttorneyData struct {
 	IsEditing            bool
 	Title                string
 	NextAttorneyId       int
+	HtmxRedirect         string
+	HtmxSwap             string
 }
 
-func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler {
+func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -116,21 +118,44 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
+
+				if r.Header.Get("HX-Request") == "true" {
+					return partialTmpl(w, data)
+				}
 				return tmpl(w, data)
 			} else if err != nil {
 				return err
 			}
 
 			if r.FormValue("add-another") != "" {
+				if r.Header.Get("HX-Request") == "true" {
+					data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d", donorId, caseId)
+					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
+					return partialTmpl(w, data)
+				}
 				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d", donorId, caseId))
 			}
 
 			if r.FormValue("next-attorney") != "" {
+				if r.Header.Get("HX-Request") == "true" {
+					data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d&attorneyId=%d", donorId, caseId, data.NextAttorneyId)
+					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
+					return partialTmpl(w, data)
+				}
 				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&attorneyId=%d", donorId, caseId, data.NextAttorneyId))
 			}
 
+			if r.Header.Get("HX-Request") == "true" {
+				data.HtmxRedirect = fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, caseId)
+				data.HtmxSwap = "innerHTML show:#accordion-create-epa-heading-3:top"
+				return partialTmpl(w, data)
+			}
 			return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
