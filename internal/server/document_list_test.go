@@ -311,6 +311,7 @@ func TestGetDocumentList(t *testing.T) {
 					URL:      "",
 					IconName: "aw-assign-task",
 					Disabled: true,
+					Hidden:   true,
 				},
 				{
 					Label:    "Create donor",
@@ -470,6 +471,7 @@ func TestGetDocumentList(t *testing.T) {
 					URL:      "/assign-task?id=990&donorId=82",
 					IconName: "aw-assign-task",
 					Disabled: false,
+					Hidden:   true,
 				},
 				{
 					Label:    "Create donor",
@@ -631,6 +633,7 @@ func TestGetDocumentList(t *testing.T) {
 					URL:      "/assign-task?id=990&donorId=82&uid[]=7000-1234-0000",
 					IconName: "aw-assign-task",
 					Disabled: false,
+					Hidden:   true,
 				},
 				{
 					Label:    "Create donor",
@@ -791,6 +794,7 @@ func TestGetDocumentList(t *testing.T) {
 					URL:      "",
 					IconName: "aw-assign-task",
 					Disabled: true,
+					Hidden:   true,
 				},
 				{
 					Label:    "Create donor",
@@ -1193,6 +1197,7 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 						URL:      "",
 						IconName: "aw-assign-task",
 						Disabled: true,
+						Hidden:   true,
 					},
 					{
 						Label:    "Create donor",
@@ -1442,6 +1447,7 @@ func TestDocumentListDismissValidation(t *testing.T) {
 						URL:      "",
 						IconName: "aw-assign-task",
 						Disabled: true,
+						Hidden:   true,
 					},
 					{
 						Label:    "Create donor",
@@ -1821,6 +1827,7 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 						URL:      "/assign-task?id=990&donorId=82",
 						IconName: "aw-assign-task",
 						Disabled: false,
+						Hidden:   true,
 					},
 					{
 						Label:    "Create donor",
