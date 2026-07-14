@@ -89,3 +89,7 @@ services:
     working_dir: /e2e
     volumes:
       - ./:/e2e
+
+  js-test:
+    build:
+      dockerfile: docker/js-test/Dockerfile
