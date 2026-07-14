@@ -119,6 +119,17 @@ describe("Compare documents", () => {
       },
     });
 
+    cy.addMock(
+      "/lpa-api/v1/cases/34/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
+      "GET",
+      {
+        status: 200,
+        body: {
+          tasks: [],
+        },
+      },
+    );
+
     cy.addMock("/lpa-api/v1/persons/33/references", "GET", {
       status: 200,
       body: [
