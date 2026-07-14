@@ -103,15 +103,6 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		})
 
 		group.Go(func() error {
-			userPermissions, err = client.GetUserPermissions(ctx)
-			if err != nil {
-				return err
-			}
-
-			return nil
-		})
-
-		group.Go(func() error {
 			if donorId > 0 {
 				personReferences, err := client.PersonReferences(ctx.With(groupCtx), donorId)
 				if err != nil {

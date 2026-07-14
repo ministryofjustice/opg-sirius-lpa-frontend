@@ -182,19 +182,15 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			data.SelectedCaseIds += strconv.Itoa(selectedCase.ID)
 		}
 
-		userPermissions, err := client.GetUserPermissions(ctx)
-		if err != nil {
-			return err
-		}
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, ctx.Permissions)
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, userPermissions)
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,
 			Calendar:       true,
 		}
 
-		data.HasV1PersonsGetPermission = userPermissions.Includes("v1-persons", "GET")
-		data.HasV1PersonsCasesGetPermission = userPermissions.Includes("v1-persons-cases", "GET")
+		data.HasV1PersonsGetPermission = ctx.Permissions.Includes("v1-persons", "GET")
+		data.HasV1PersonsCasesGetPermission = ctx.Permissions.Includes("v1-persons-cases", "GET")
 
 		return tmpl(w, data)
 	}
