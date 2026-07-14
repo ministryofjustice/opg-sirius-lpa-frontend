@@ -92,4 +92,4 @@ services:
 
   js-test:
     build:
-        dockerfile: docker/js-test/Dockerfile
+      dockerfile: docker/js-test/Dockerfile
