@@ -213,6 +213,10 @@ $color-dark-bg-grey: #363639;
     box-shadow: inset 0px 0px 3px 2px govuk-colour("black");
   }
 
+  .action-panel__form {
+    background-color: $sirius-bg-color;
+  }
+
   .action-panel__button {
     span {
       background: linear-gradient(
