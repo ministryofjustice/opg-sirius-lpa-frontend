@@ -17,6 +17,7 @@ type ActionPanelClient interface {
 	Person(ctx sirius.Context, id int) (sirius.Person, error)
 	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
 	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
+	TasksForCase(ctx sirius.Context, caseId int) ([]sirius.Task, error)
 }
 
 type ActionPanelData struct {
@@ -56,6 +57,7 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		var personHasReferences bool
 		var selectedCases []sirius.Case
 		var userPermissions sirius.Permissions
+		var taskIDs []int
 		group.Go(func() error {
 			if donorId > 0 {
 				cases, err := client.CasesByDonor(ctx.With(groupCtx), donorId)
@@ -88,6 +90,14 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 					return err
 				}
 				draftCount = documentDraftCount.DraftCount
+
+				tasks, err := client.TasksForCase(ctx.With(groupCtx), selectedCases[0].ID)
+				if err != nil {
+					return err
+				}
+				for _, task := range tasks {
+					taskIDs = append(taskIDs, task.ID)
+				}
 			}
 			return nil
 		})
@@ -128,7 +138,7 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences, personHasLinks, userPermissions)
+		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences, personHasLinks, taskIDs, userPermissions)
 
 		return tmpl(w, data)
 	}
@@ -142,7 +152,7 @@ type ActionPanelButton struct {
 	Hidden   bool
 }
 
-func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string, hasDrafts bool, hasReferences bool, hasLinks bool, userPermissions sirius.Permissions) []ActionPanelButton {
+func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string, hasDrafts bool, hasReferences bool, hasLinks bool, taskIDs []int, userPermissions sirius.Permissions) []ActionPanelButton {
 	warningUrl := fmt.Sprintf("/create-warning?id=%d&entity=person%s", donorId, caseUids)
 	eventUrl := fmt.Sprintf("/create-event?id=%d&entity=person%s", donorId, caseUids)
 	createDonorUrl := fmt.Sprintf("/create-donor?id=%d&entity=person%s", donorId, caseUids)
@@ -163,6 +173,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	newTaskUrl := ""
 	editDatesUrl := ""
 	allocateCasesUrl := ""
+	assignTaskUrl := ""
 
 	if len(selectedCases) == 1 {
 		selectedCase := selectedCases[0]
@@ -185,6 +196,18 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 
 		if hasDrafts {
 			editDocumentUrl = fmt.Sprintf("/edit-document?id=%d&case=%s", id, caseType)
+		}
+
+		if len(taskIDs) > 0 {
+			idQuery := ""
+			for i, taskID := range taskIDs {
+				if i == 0 {
+					idQuery += fmt.Sprintf("id=%d", taskID)
+				} else {
+					idQuery += fmt.Sprintf("&id=%d", taskID)
+				}
+			}
+			assignTaskUrl = fmt.Sprintf("/assign-task?%s&donorId=%d%s", idQuery, donorId, caseUids)
 		}
 	}
 	if len(selectedCases) > 1 {
@@ -255,6 +278,13 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			URL:      newTaskUrl,
 			IconName: "aw-new-task",
 			Disabled: len(selectedCases) != 1,
+			Hidden:   !userPermissions.Includes("v1-cases-tasks-post", "POST"),
+		},
+		{
+			Label:    "Assign task",
+			URL:      assignTaskUrl,
+			IconName: "aw-assign-task",
+			Disabled: len(selectedCases) != 1 || len(taskIDs) == 0,
 			Hidden:   !userPermissions.Includes("v1-cases-tasks-post", "POST"),
 		},
 		{
