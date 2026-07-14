@@ -186,6 +186,9 @@ func TestGetViewDocumentWhenPermissionsErrors(t *testing.T) {
 		On("GetDraftCount", mock.Anything, "lpa", 34).
 		Return(sirius.DocumentDraftCount{DraftCount: 0}, nil)
 	client.
+		On("TasksForCase", mock.Anything, 34).
+		Return([]sirius.Task{}, nil)
+	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(sirius.Permissions{}, errExample)
 
