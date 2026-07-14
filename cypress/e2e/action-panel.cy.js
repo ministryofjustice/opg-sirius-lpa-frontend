@@ -167,6 +167,24 @@ describe("Action Panel", () => {
       },
     });
 
+    cy.addMock("/lpa-api/v1/lpas/78/draft-count", "GET", {
+      status: 200,
+      body: {
+        draftCount: 0,
+      },
+    });
+
+    cy.addMock(
+      "/lpa-api/v1/cases/78/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
+      "GET",
+      {
+        status: 200,
+        body: {
+          tasks: [],
+        },
+      },
+    );
+
     cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
 
     cy.contains("Add investigation").should("not.be.visible");
@@ -557,6 +575,17 @@ describe("Action Panel", () => {
         draftCount: 1,
       },
     });
+
+    cy.addMock(
+      "/lpa-api/v1/cases/111/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
+      "GET",
+      {
+        status: 200,
+        body: {
+          tasks: [],
+        },
+      },
+    );
 
     cy.visit("/donor/1/documents?uid[]=7000-9876-5432");
 

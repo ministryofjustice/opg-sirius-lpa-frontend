@@ -420,6 +420,12 @@ func TestGetActionPanelNoOutstandingTasks(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{}, nil)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -806,6 +812,9 @@ func TestGetActionPanelWhenPermissionsErrors(t *testing.T) {
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{DraftCount: 0}, nil)
 	client.
+		On("TasksForCase", mock.Anything, 1).
+		Return([]sirius.Task{}, nil)
+	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
 	client.
@@ -878,6 +887,12 @@ func TestGetActionPanelWhenTasksForCaseErrors(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()
@@ -938,6 +953,9 @@ func TestGetActionPanelWhenPersonErrors(t *testing.T) {
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{}, nil)
+	client.
+		On("TasksForCase", mock.Anything, 1).
+		Return([]sirius.Task{}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)

@@ -90,6 +90,14 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 					return err
 				}
 				draftCount = documentDraftCount.DraftCount
+
+				tasks, err := client.TasksForCase(ctx.With(groupCtx), selectedCases[0].ID)
+				if err != nil {
+					return err
+				}
+				for _, task := range tasks {
+					taskIDs = append(taskIDs, task.ID)
+				}
 			}
 			return nil
 		})
