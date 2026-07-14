@@ -55,7 +55,6 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		var draftCount int
 		var personHasReferences bool
 		var selectedCases []sirius.Case
-		var userPermissions sirius.Permissions
 		group.Go(func() error {
 			if donorId > 0 {
 				cases, err := client.CasesByDonor(ctx.With(groupCtx), donorId)
@@ -93,15 +92,6 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		})
 
 		group.Go(func() error {
-			userPermissions, err = client.GetUserPermissions(ctx)
-			if err != nil {
-				return err
-			}
-
-			return nil
-		})
-
-		group.Go(func() error {
 			if donorId > 0 {
 				personReferences, err := client.PersonReferences(ctx.With(groupCtx), donorId)
 				if err != nil {
@@ -128,7 +118,7 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences, personHasLinks, userPermissions)
+		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences, personHasLinks, ctx.Permissions)
 
 		return tmpl(w, data)
 	}

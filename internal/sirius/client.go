@@ -13,9 +13,10 @@ import (
 )
 
 type Context struct {
-	Context   context.Context
-	Cookies   []*http.Cookie
-	XSRFToken string
+	Context     context.Context
+	Cookies     []*http.Cookie
+	XSRFToken   string
+	Permissions Permissions
 }
 
 type HttpClient interface {
@@ -24,9 +25,10 @@ type HttpClient interface {
 
 func (ctx Context) With(c context.Context) Context {
 	return Context{
-		Context:   c,
-		Cookies:   ctx.Cookies,
-		XSRFToken: ctx.XSRFToken,
+		Context:     c,
+		Cookies:     ctx.Cookies,
+		XSRFToken:   ctx.XSRFToken,
+		Permissions: ctx.Permissions,
 	}
 }
 

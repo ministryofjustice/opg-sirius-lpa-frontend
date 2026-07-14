@@ -167,11 +167,8 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 				BackURL:  backURL,
 			}
 		}
-		userPermissions, err := client.GetUserPermissions(ctx)
-		if err != nil {
-			return err
-		}
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids, draftCount > 0, personHasReferences, len(person.Children) > 0, userPermissions)
+
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids, draftCount > 0, personHasReferences, len(person.Children) > 0, ctx.Permissions)
 
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,
@@ -180,8 +177,8 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 			Calendar:       true,
 		}
 
-		data.HasV1PersonsGetPermission = userPermissions.Includes("v1-persons", "GET")
-		data.HasV1PersonsCasesGetPermission = userPermissions.Includes("v1-persons-cases", "GET")
+		data.HasV1PersonsGetPermission = ctx.Permissions.Includes("v1-persons", "GET")
+		data.HasV1PersonsCasesGetPermission = ctx.Permissions.Includes("v1-persons-cases", "GET")
 
 		viewingADocumentAndList := data.Pane1 == "doc" && data.Pane2 == "list"
 		if viewingADocumentAndList {
