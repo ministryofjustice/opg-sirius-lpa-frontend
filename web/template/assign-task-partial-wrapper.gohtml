@@ -10,12 +10,7 @@
     {{ template "error-summary" .Error }}
 
     {{ if .Success }}
-      <span class="govuk-!-display-none"
-            hx-get="{{ prefix (printf "/action-panel?id=%d&entity=%s%s" .DonorID .CaseType .CaseUids) }}"
-            hx-target=".action-panel__content"
-            hx-swap="innerHTML"
-            hx-trigger="load"
-      ></span>
+      <meta http-equiv="Refresh" content="0" />
       {{ template "success-banner" "You have successfully assigned a task." }}
     {{ end }}
 
