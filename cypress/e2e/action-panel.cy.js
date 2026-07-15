@@ -619,4 +619,15 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Assign Task");
   });
+
+  it("applies large font styling to the action panel when an accessible theme is set", () => {
+    cy.setCookie("siriusTheme", "accessible-light");
+    cy.visit("/donor/1/documents?uid[]=7000-1234-1234");
+
+    cy.get("html").should("have.class", "app-!-html-class--large-font");
+    cy.get(".action-panel__button").should("not.be.visible");
+    cy.get("a#action-panel-button-create-warning")
+      .should("be.visible")
+      .and("contain", "Create warning");
+  });
 });
