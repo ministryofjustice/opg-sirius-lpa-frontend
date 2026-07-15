@@ -590,8 +590,6 @@ class PDFViewer {
   }
 
   async nextPage() {
-    console.log("this.currentPage, this.totalPages");
-    console.log(this.currentPage, this.totalPages);
     if (this.currentPage >= this.totalPages) return;
     await this.goToPage(this.currentPage + 1);
   }
