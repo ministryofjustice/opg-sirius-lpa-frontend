@@ -125,6 +125,19 @@ describe("Action Panel", () => {
       },
     });
 
+    cy.addMock(
+      "/lpa-api/v1/cases/34/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
+      "GET",
+      {
+        status: 200,
+        body: {
+          tasks: [
+            { id: 990, name: "Review application", dueDate: "01/07/2026" },
+          ],
+        },
+      },
+    );
+
     cy.addMock("/lpa-api/v1/persons/1/references", "GET", {
       status: 200,
       body: [
@@ -153,6 +166,24 @@ describe("Action Panel", () => {
         },
       },
     });
+
+    cy.addMock("/lpa-api/v1/lpas/78/draft-count", "GET", {
+      status: 200,
+      body: {
+        draftCount: 0,
+      },
+    });
+
+    cy.addMock(
+      "/lpa-api/v1/cases/78/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
+      "GET",
+      {
+        status: 200,
+        body: {
+          tasks: [],
+        },
+      },
+    );
 
     cy.visit("/donor/1/documents?uid[]=7000-5678-5678");
 
@@ -545,6 +576,17 @@ describe("Action Panel", () => {
       },
     });
 
+    cy.addMock(
+      "/lpa-api/v1/cases/111/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
+      "GET",
+      {
+        status: 200,
+        body: {
+          tasks: [],
+        },
+      },
+    );
+
     cy.visit("/donor/1/documents?uid[]=7000-9876-5432");
 
     cy.get("#actions-content").should("be.visible");
@@ -553,5 +595,28 @@ describe("Action Panel", () => {
     cy.get("a#action-panel-button-edit-epa-case").click();
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Edit EPA");
+  });
+
+  it("displays the assign task button on the action panel", () => {
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Assign task");
+
+    cy.addMock("/lpa-api/v1/tasks/990", "GET", {
+      status: 200,
+      body: {
+        id: 990,
+        name: "Review application",
+        caseItems: [{ caseType: "LPA", uId: "7000-1234-1234" }],
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/teams", "GET", {
+      status: 200,
+      body: [{ id: 23, displayName: "Cool Team" }],
+    });
+
+    cy.get("a#action-panel-button-assign-task").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Assign Task");
   });
 });

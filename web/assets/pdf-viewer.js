@@ -718,3 +718,5 @@ export default function initPdfViewer() {
     }
   });
 }
+
+export { PDFViewer };

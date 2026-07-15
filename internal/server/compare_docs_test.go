@@ -49,6 +49,11 @@ func (m *mockCompareDocsClient) PersonReferences(ctx sirius.Context, id int) ([]
 	return args.Get(0).([]sirius.PersonReference), args.Error(1)
 }
 
+func (m *mockCompareDocsClient) TasksForCase(ctx sirius.Context, caseId int) ([]sirius.Task, error) {
+	args := m.Called(ctx, caseId)
+	return args.Get(0).([]sirius.Task), args.Error(1)
+}
+
 func TestGetCompareDocsPanes(t *testing.T) {
 	document1 := sirius.Document{
 		ID:        1,
@@ -200,6 +205,9 @@ func TestGetCompareDocsPanes(t *testing.T) {
 				On("GetDraftCount", mock.Anything, "", 456).
 				Return(sirius.DocumentDraftCount{DraftCount: 0}, nil)
 			client.
+				On("TasksForCase", mock.Anything, 456).
+				Return([]sirius.Task{}, nil)
+			client.
 				On("GetUserPermissions", mock.Anything).
 				Return(permissions, nil)
 			for _, doc := range tc.getDocuments {
@@ -237,7 +245,7 @@ func TestGetCompareDocsPanes(t *testing.T) {
 				HasV1PersonsGetPermission:      true,
 				HasV1PersonsCasesGetPermission: true,
 				SelectedCases:                  []sirius.Case{selectedCase},
-				ActionPanelButtons:             GetActionPanelButtons([]sirius.Case{selectedCase}, 77, "&uid[]=case-uid", false, false, false, permissions),
+				ActionPanelButtons:             GetActionPanelButtons([]sirius.Case{selectedCase}, 77, "&uid[]=case-uid", false, false, false, []int{}, permissions),
 				HeaderButtons: SiriusHeaderButtons{
 					BackToTimeline: true,
 					CaseInfo:       true,
@@ -318,6 +326,9 @@ func TestGetCompareDocsWhenCaseErrors(t *testing.T) {
 			client.
 				On("GetDraftCount", mock.Anything, "", 456).
 				Return(sirius.DocumentDraftCount{DraftCount: 0}, nil)
+			client.
+				On("TasksForCase", mock.Anything, 456).
+				Return([]sirius.Task{}, nil)
 			client.
 				On("DocumentByUUID", mock.Anything, "abcd").
 				Return(sirius.Document{}, errExample)
