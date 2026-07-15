@@ -217,11 +217,12 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 
 	muxWithHeaders := securityheaders.Use(setCSPHeader(mux))
 
-	userPermissionMiddleware := permissionMiddleware(client)
+	//userPermissionMiddleware := permissionMiddleware(client)
 	loggerMiddleware := telemetry.Middleware(logger)
 	xsrfMiddleware := xsrfHandler(logger, templates.Get("error.gohtml"), siriusPublicURL)
 
-	return otelhttp.NewHandler(http.StripPrefix(prefix, userPermissionMiddleware(xsrfMiddleware(loggerMiddleware(muxWithHeaders)))), "lpa-frontend")
+	//return otelhttp.NewHandler(http.StripPrefix(prefix, userPermissionMiddleware(xsrfMiddleware(loggerMiddleware(muxWithHeaders)))), "lpa-frontend")
+	return otelhttp.NewHandler(http.StripPrefix(prefix, xsrfMiddleware(loggerMiddleware(muxWithHeaders))), "lpa-frontend")
 }
 
 type Handler func(w http.ResponseWriter, r *http.Request) error
@@ -365,25 +366,25 @@ func errorHandler(tmplError template.Template, prefix, siriusURL string) func(ne
 	}
 }
 
-func permissionMiddleware(client Client) func(next http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := getContext(r)
-
-			userPermissions, err := client.GetUserPermissions(ctx)
-
-			if err != nil {
-				http.Error(w, "Could not get user permissions", http.StatusInternalServerError)
-				return
-			}
-
-			ctx.Permissions = userPermissions
-
-			r = r.WithContext(context.WithValue(r.Context(), "ctx", ctx))
-			next.ServeHTTP(w, r)
-		})
-	}
-}
+//func permissionMiddleware(client Client) func(next http.Handler) http.Handler {
+//	return func(next http.Handler) http.Handler {
+//		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//			ctx := getContext(r)
+//
+//			userPermissions, err := client.GetUserPermissions(ctx)
+//
+//			if err != nil {
+//				http.Error(w, "Could not get user permissions", http.StatusInternalServerError)
+//				return
+//			}
+//
+//			ctx.Permissions = userPermissions
+//
+//			r = r.WithContext(context.WithValue(r.Context(), "ctx", ctx))
+//			next.ServeHTTP(w, r)
+//		})
+//	}
+//}
 
 func postFormKeySet(r *http.Request, name string) bool {
 	if _, val := r.PostForm[name]; val {

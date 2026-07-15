@@ -4,7 +4,6 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -12,9 +11,7 @@ import (
 )
 
 type DocumentListClient interface {
-	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
-	Person(ctx sirius.Context, id int) (sirius.Person, error)
-	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
+	PageVarsClient
 	DownloadMultiple(ctx sirius.Context, docIDs []string) (*http.Response, error)
 	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
 	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
@@ -27,86 +24,36 @@ type documentPageData struct {
 	Entity                         string
 	Success                        bool
 	SuccessMessage                 string
-	DonorID                        int
-	Person                         sirius.Person
 	Error                          sirius.ValidationError
 	DocumentList                   sirius.DocumentList
 	Document                       sirius.Document
-	SelectedCases                  []sirius.Case
 	MultipleCasesSelected          bool
 	Comparing                      bool
 	CompareURLs                    map[string]string
 	CloseURL                       string
-	CaseUids                       string
+	DonorID                        int
 	SelectedCaseIds                string
-	ActionPanelButtons             []ActionPanelButton
-	HeaderButtons                  SiriusHeaderButtons
+	Person                         sirius.Person
+	CaseUids                       string
 	HasV1PersonsGetPermission      bool
 	HasV1PersonsCasesGetPermission bool
+	ActionPanelButtons             []ActionPanelButton
+	SelectedCases                  []sirius.Case
+	HeaderButtons                  SiriusHeaderButtons
+	PageVars
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
+		ctx := getContext(r)
 		if err := r.ParseForm(); err != nil {
 			return err
 		}
 
-		donorID, err := strconv.Atoi(r.PathValue("id"))
+		pageVars, err := PageValues(client, r)
 		if err != nil {
 			return err
 		}
-
-		caseUIDs := r.Form["uid[]"]
-
-		ctx := getContext(r)
-
-		casesOnDonor, err := client.CasesByDonor(ctx, donorID)
-		if err != nil {
-			return err
-		}
-
-		var selected []sirius.Case
-		var caseIDs []string
-
-		if len(caseUIDs) > 0 {
-			casesByUID := make(map[string]sirius.Case, len(casesOnDonor))
-			for _, c := range casesOnDonor {
-				casesByUID[c.UID] = c
-			}
-
-			for _, uid := range caseUIDs {
-				if c, ok := casesByUID[uid]; ok {
-					selected = append(selected, c)
-					caseIDs = append(caseIDs, strconv.Itoa(c.ID))
-				}
-			}
-		} else {
-			selected = casesOnDonor
-		}
-
-		var draftCount int
-		var taskIDs []int
-		if len(selected) == 1 {
-			documentDraftCount, err := client.GetDraftCount(ctx, strings.ToLower(selected[0].CaseType), selected[0].ID)
-			if err != nil {
-				return err
-			}
-			draftCount = documentDraftCount.DraftCount
-
-			tasks, err := client.TasksForCase(ctx, selected[0].ID)
-			if err != nil {
-				return err
-			}
-			for _, task := range tasks {
-				taskIDs = append(taskIDs, task.ID)
-			}
-		}
-
-		personReferences, err := client.PersonReferences(ctx, donorID)
-		if err != nil {
-			return err
-		}
-		personHasReferences := len(personReferences) > 0
 
 		selectedDocUUIDs := r.Form["document"]
 
@@ -131,16 +78,6 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			return nil
 		}
 
-		docs, err := client.GetPersonDocuments(ctx, donorID, caseIDs)
-		if err != nil {
-			return err
-		}
-
-		person, err := client.Person(ctx, donorID)
-		if err != nil {
-			return err
-		}
-
 		compareView := r.FormValue("comparing") == "true"
 		var validationErr sirius.ValidationError
 		if r.Method == http.MethodPost && len(selectedDocUUIDs) == 0 && r.FormValue("actionDownload") == "true" {
@@ -160,18 +97,18 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 
 		data := documentPageData{
 			XSRFToken:             ctx.XSRFToken,
-			SelectedCases:         selected,
-			Person:                person,
-			DocumentList:          docs,
-			MultipleCasesSelected: len(caseUIDs) > 1 || (len(caseUIDs) == 0 && len(casesOnDonor) > 1),
+			SelectedCases:         pageVars.SelectedCases,
+			Person:                pageVars.Person,
+			DocumentList:          pageVars.DocumentList,
+			MultipleCasesSelected: len(pageVars.CaseUidsCollection) > 1 || (len(pageVars.CaseUidsCollection) == 0 && len(pageVars.CasesOnDonor) > 1),
 			Error:                 validationErr,
 			Success:               isSuccess,
 			SuccessMessage:        successMessage,
 			Comparing:             compareView,
-			DonorID:               donorID,
+			DonorID:               pageVars.DonorID,
 		}
 
-		uidParams := buildUIDQueryString(caseUIDs)
+		uidParams := buildUIDQueryString(pageVars.CaseUidsCollection)
 
 		data.CaseUids = uidParams
 
@@ -182,15 +119,15 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			data.SelectedCaseIds += strconv.Itoa(selectedCase.ID)
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, ctx.Permissions)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, pageVars.UserPermissions)
 
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,
 			Calendar:       true,
 		}
 
-		data.HasV1PersonsGetPermission = ctx.Permissions.Includes("v1-persons", "GET")
-		data.HasV1PersonsCasesGetPermission = ctx.Permissions.Includes("v1-persons-cases", "GET")
+		data.HasV1PersonsGetPermission = pageVars.HasV1PersonsGetPermission
+		data.HasV1PersonsCasesGetPermission = pageVars.HasV1PersonsCasesGetPermission
 
 		return tmpl(w, data)
 	}
