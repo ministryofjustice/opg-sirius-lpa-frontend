@@ -2,28 +2,30 @@
 <div class="action-panel__form">
     {{ template "payments" . }}
 
-    <a class="govuk-button govuk-button--secondary"
-        href=""
-        hx-get="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}"
-        hx-target=".action-panel__content"
-        hx-swap="innerHTML">
-        Add payment
-    </a>
-    {{ if and (.IsReducedFeesUser) (not .FeeReductions) }}
-        <a class="govuk-button govuk-button--secondary" id="f-apply-fee-reduction-button"
-            href=""
-            hx-get="{{ prefix (printf "/apply-fee-reduction?id=%d" .Case.ID) }}"
-            hx-target=".action-panel__content"
-            hx-swap="innerHTML">
-            Apply fee reduction
+    <div class="govuk-button-group">
+        <a class="govuk-button govuk-button--secondary"
+           href=""
+           hx-get="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}"
+           hx-target=".action-panel__content"
+           hx-swap="innerHTML">
+            Add payment
         </a>
-    {{ end }}
-    <div class="govuk-body">
-        <a class="govuk-link govuk-link--no-visited-state"
-            href=""
-            hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .Case.Donor.ID (ToLower .Case.CaseType) .Case.UID) }}"
-            hx-target=".action-panel__content"
-        >Cancel</a>
+        {{ if and (.IsReducedFeesUser) (not .FeeReductions) }}
+            <a class="govuk-button govuk-button--secondary" id="f-apply-fee-reduction-button"
+               href=""
+               hx-get="{{ prefix (printf "/apply-fee-reduction?id=%d" .Case.ID) }}"
+               hx-target=".action-panel__content"
+               hx-swap="innerHTML">
+                Apply fee reduction
+            </a>
+        {{ end }}
+        <div class="govuk-body">
+            <a class="govuk-link govuk-link--no-visited-state"
+               href=""
+               hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s&uid[]=%s" .Case.Donor.ID (ToLower .Case.CaseType) .Case.UID) }}"
+               hx-target=".action-panel__content"
+            >Cancel</a>
+        </div>
     </div>
 </div>
 {{ end }}

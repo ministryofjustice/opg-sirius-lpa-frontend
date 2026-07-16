@@ -731,6 +731,22 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   .govuk-form-group {
     margin-bottom: 20px;
   }
+  .govuk-button-group:not(.govuk-button-group--row) {
+    flex-direction: column;
+    align-items: center;
+    margin-right: 0;
+    margin-bottom: 5px;
+
+    .govuk-button {
+      margin-right: 0;
+      margin-bottom: 22px;
+      width: 100%;
+    }
+    .govuk-link {
+      margin-right: 0;
+      text-align: center;
+    }
+  }
 }
 
 .action-panel__form--wide {
