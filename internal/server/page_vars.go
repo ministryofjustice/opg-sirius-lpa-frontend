@@ -39,12 +39,19 @@ type PageVarsClient interface {
 func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 	ctx := getContext(r)
 
-	donorID, err := strconv.Atoi(r.PathValue("id"))
+	donorID, err := strToIntOrStatusError(r.PathValue("id"))
 	if err != nil {
 		return PageVars{}, err
 	}
 
 	caseUIDs := r.Form["uid[]"]
+
+	if len(caseUIDs) == 0 {
+		caseUID := r.PathValue("caseUid")
+		if caseUID != "" {
+			caseUIDs = []string{caseUID}
+		}
+	}
 
 	fmt.Println("caseUIDs:", caseUIDs)
 

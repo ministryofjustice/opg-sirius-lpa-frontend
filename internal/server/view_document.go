@@ -3,7 +3,6 @@ package server
 import (
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -12,9 +11,8 @@ import (
 type ViewDocumentClient interface {
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 	GetUserDetails(sirius.Context) (sirius.User, error)
-	Person(ctx sirius.Context, id int) (sirius.Person, error)
-	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
+	PageVarsClient
 	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
 	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
 	TasksForCase(ctx sirius.Context, caseId int) ([]sirius.Task, error)
@@ -41,12 +39,7 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 		uuid := r.PathValue("uuid")
 		ctx := getContext(r)
 
-		donorID, err := strconv.Atoi(r.PathValue("donorId"))
-		if err != nil {
-			return err
-		}
-
-		person, err := client.Person(ctx, donorID)
+		pageVars, err := PageValues(client, r)
 		if err != nil {
 			return err
 		}
@@ -64,12 +57,6 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 		}
 		isSysAdminUser := user.HasRole("System Admin")
 
-		personReferences, err := client.PersonReferences(ctx, donorID)
-		if err != nil {
-			return err
-		}
-		personHasReferences := len(personReferences) > 0
-
 		// Extract pane parameter from query string if present
 		pane := 1 // Default to pane 1
 		if paneStr := r.URL.Query().Get("pane"); paneStr != "" {
@@ -84,24 +71,6 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			selectedCase = []sirius.Case{caseData}
 		}
 
-		var draftCount int
-		var taskIDs []int
-		if len(selectedCase) > 0 {
-			documentDraftCount, err := client.GetDraftCount(ctx, strings.ToLower(selectedCase[0].CaseType), selectedCase[0].ID)
-			if err != nil {
-				return err
-			}
-			draftCount = documentDraftCount.DraftCount
-
-			tasks, err := client.TasksForCase(ctx, selectedCase[0].ID)
-			if err != nil {
-				return err
-			}
-			for _, task := range tasks {
-				taskIDs = append(taskIDs, task.ID)
-			}
-		}
-
 		caseUidsStr := ""
 		uidParams := ""
 		if len(selectedCase) > 0 {
@@ -114,14 +83,14 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			Document:        documentData,
 			IsSysAdminUser:  isSysAdminUser,
 			Pane:            pane,
-			DonorID:         donorID,
+			DonorID:         pageVars.DonorID,
 			SelectedCaseIds: caseId,
-			Person:          person,
+			Person:          pageVars.Person,
 			CaseUids:        caseUidsStr,
 			SelectedCases:   selectedCase,
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, ctx.Permissions)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, pageVars.UserPermissions)
 
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,
@@ -130,8 +99,8 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			Calendar:       true,
 		}
 
-		data.HasV1PersonsGetPermission = ctx.Permissions.Includes("v1-persons", "GET")
-		data.HasV1PersonsCasesGetPermission = ctx.Permissions.Includes("v1-persons-cases", "GET")
+		data.HasV1PersonsGetPermission = pageVars.HasV1PersonsGetPermission
+		data.HasV1PersonsCasesGetPermission = pageVars.HasV1PersonsCasesGetPermission
 
 		return tmpl(w, data)
 	}

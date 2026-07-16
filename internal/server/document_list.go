@@ -40,7 +40,6 @@ type documentPageData struct {
 	ActionPanelButtons             []ActionPanelButton
 	SelectedCases                  []sirius.Case
 	HeaderButtons                  SiriusHeaderButtons
-	PageVars
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
