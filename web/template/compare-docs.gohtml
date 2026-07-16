@@ -1,6 +1,6 @@
 {{ template "page" . }}
 
-{{ define "container-classes" }} app-!-max-full-width{{ end }}
+{{ define "container-classes" }} app-!-max-full-width app-page-compare-docs{{ end }}
 
 {{ define "sirius-header" }}
     {{ template "siriusHeader" . }}
@@ -12,18 +12,29 @@
 
 {{ define "main" }}
     <h1 class="govuk-visually-hidden">Compare documents</h1>
-    <div class="govuk-grid-column-one-half app-document-compare__separator">
-        {{ if eq .Pane1 "doc" }}
-            {{ template "viewingDocument" .View1 }}
-        {{ else }}
-            <div class="document-list-scrollable">{{ template "DocumentList" .DocListPane1Data  }}</div>
+    <div class="app-compare-docs-wrapper">
+        <!-- Pane containers (empty when showing lists) -->
+        <div class="govuk-grid-column-one-half app-document-compare__separator app-compare-pane app-compare-pane-1">
+            {{ if eq .Pane1 "doc" }}
+                {{ template "viewingDocument" .View1 }}
+            {{ end }}
+        </div>
+        <div class="govuk-grid-column-one-half app-compare-pane app-compare-pane-2">
+            {{ if eq .Pane2 "doc" }}
+                {{ template "viewingDocument" .View2 }}
+            {{ end }}
+        </div>
+        
+        <!-- Absolutely positioned list containers -->
+        {{ if ne .Pane1 "doc" }}
+            <div class="app-compare-list-container app-compare-list-1">
+                <div class="document-list-scrollable">{{ template "DocumentList" .DocListPane1Data }}</div>
+            </div>
         {{ end }}
-    </div>
-    <div class="govuk-grid-column-one-half">
-        {{ if eq .Pane2 "doc" }}
-            {{ template "viewingDocument" .View2 }}
-        {{ else }}
-            <div class="document-list-scrollable">{{ template "DocumentList" .DocListPane2Data  }}</div>
+        {{ if ne .Pane2 "doc" }}
+            <div class="app-compare-list-container app-compare-list-2">
+                <div class="document-list-scrollable">{{ template "DocumentList" .DocListPane2Data }}</div>
+            </div>
         {{ end }}
     </div>
 {{ end }}

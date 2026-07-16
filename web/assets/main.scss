@@ -548,7 +548,97 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
 }
 
 .document-list-scrollable {
-  max-height: 100vh;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+// Compare docs page - absolute positioning solution
+.app-page-compare-docs .app-compare-docs-wrapper {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 80vh;
+  min-height: 0;
+}
+
+// Pane containers stay in normal flow for document viewing
+.app-page-compare-docs .app-compare-pane {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  
+  // When showing documents, they fill the pane
+  &:has(iframe) {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+// Absolutely positioned list containers - layer over panes
+.app-page-compare-docs .app-compare-list-container {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #ddd;
+  
+  &.app-compare-list-1 {
+    left: 0;
+    width: 50%;
+  }
+  
+  &.app-compare-list-2 {
+    right: 0;
+    width: 50%;
+    border-right: none;
+    border-left: 1px solid #ddd;
+  }
+}
+
+// Document list inside absolute container
+.app-page-compare-docs .app-compare-list-container .document-list-scrollable {
+  flex: 1;
+  min-height: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 15px;
+}
+
+html:has(.app-page-compare-docs) {
+  scroll-behavior: smooth;
+}
+
+body:has(.app-page-compare-docs) {
+  max-height: auto;
+}
+
+.app-page-compare-docs {
+  max-height: 80vh;
+  overflow: hidden;
+  display: block;
+}
+
+.app-page-compare-docs .govuk-main-wrapper {
+  display: flex;
+  flex-direction: row;
+  height: 80vh;
+  min-height: 0;
+  
+  > .govuk-grid-column-one-half {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.app-page-compare-docs .document-list-scrollable {
+  flex: 1;
+  min-height: 0;
+  max-height: 100%;
   overflow-y: auto;
 }
 
