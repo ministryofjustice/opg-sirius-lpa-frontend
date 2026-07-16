@@ -63,3 +63,6 @@ down: ## Stop everything
 run-structurizr:
 	docker pull structurizr/lite
 	docker run -it --rm -p 8020:8080 -v $(PWD)/docs/architecture/dsl/local:/usr/local/structurizr structurizr/lite
+
+js-test:
+	docker compose run js-test
