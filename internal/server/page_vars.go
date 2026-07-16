@@ -109,6 +109,10 @@ func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 		return PageVars{}, err
 	}
 
+	fmt.Println("caseIDs:", caseIDs)
+	fmt.Println("selected:", selected)
+	fmt.Println("CaseUidsCollection:", caseUIDs)
+
 	vars := PageVars{
 		DonorID:            donorID,
 		Person:             person,

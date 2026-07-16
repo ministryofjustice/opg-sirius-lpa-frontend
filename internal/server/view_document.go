@@ -44,7 +44,10 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		caseId := r.FormValue("case")
+		caseId, err := strToIntOrStatusError(r.FormValue("case"))
+		if err != nil {
+			return err
+		}
 
 		documentData, err := client.DocumentByUUID(ctx, uuid)
 		if err != nil {
@@ -65,17 +68,15 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			}
 		}
 
-		id, _ := strconv.Atoi(caseId)
-		var selectedCase []sirius.Case
-		if caseData, err := client.Case(ctx, id); err == nil {
-			selectedCase = []sirius.Case{caseData}
-		}
-
 		caseUidsStr := ""
-		uidParams := ""
-		if len(selectedCase) > 0 {
-			caseUidsStr = "&uid[]=" + selectedCase[0].UID
-			uidParams = caseUidsStr
+		var selectedCase []sirius.Case
+		if len(pageVars.SelectedCases) > 0 {
+			for _, c := range pageVars.SelectedCases {
+				if c.ID == caseId {
+					caseUidsStr = "&uid[]=" + c.UID
+					selectedCase = []sirius.Case{c}
+				}
+			}
 		}
 
 		data := viewDocumentData{
@@ -84,7 +85,7 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			IsSysAdminUser:  isSysAdminUser,
 			Pane:            pane,
 			DonorID:         pageVars.DonorID,
-			SelectedCaseIds: caseId,
+			SelectedCaseIds: strconv.Itoa(caseId),
 			Person:          pageVars.Person,
 			CaseUids:        caseUidsStr,
 			SelectedCases:   selectedCase,
