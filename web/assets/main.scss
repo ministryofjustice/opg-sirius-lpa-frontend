@@ -1113,3 +1113,7 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
 #documentTextEditor {
   display: none;
 }
+
+.no-top-padding {
+  padding-top: 0;
+}

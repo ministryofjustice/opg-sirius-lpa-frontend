@@ -14,6 +14,7 @@ type CreateAttorneyClient interface {
 	CreateAttorney(ctx sirius.Context, caseId int, attorney sirius.Attorney) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	UpdateAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
+	UpdateCorrespondent(ctx sirius.Context, correspondentId int, correspondent sirius.Correspondent) error
 }
 
 type createAttorneyData struct {
@@ -25,6 +26,7 @@ type createAttorneyData struct {
 	CaseId               int
 	IsEditing            bool
 	Title                string
+	Epa                  sirius.Epa
 	NextAttorneyId       int
 	HtmxRedirect         string
 	HtmxSwap             string
@@ -68,6 +70,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partial
 				return err
 			}
 			epa, err := client.Epa(ctx, caseId)
+			data.Epa = epa
 			if err != nil {
 				return err
 			}
@@ -111,6 +114,11 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partial
 
 			if isEditing {
 				err = client.UpdateAttorney(ctx, attorneyId, attorney)
+				isUpdatingCorrespondent := data.Epa.Correspondent != nil && postFormString(r, "isUpdateCorrespondent") == "true"
+				if isUpdatingCorrespondent {
+					updateCorrespondent := sirius.Correspondent{Person: attorney.Person}
+					err = client.UpdateCorrespondent(ctx, data.Epa.Correspondent.ID, updateCorrespondent)
+				}
 			} else {
 				err = client.CreateAttorney(ctx, caseId, attorney)
 			}

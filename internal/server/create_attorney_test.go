@@ -41,6 +41,11 @@ func (m *mockCreateAttorneyClient) UpdateAttorney(ctx sirius.Context, attorneyId
 	return args.Error(0)
 }
 
+func (m *mockCreateAttorneyClient) UpdateCorrespondent(ctx sirius.Context, correspondentId int, correspondent sirius.Correspondent) error {
+	args := m.Called(ctx, correspondentId, correspondent)
+	return args.Error(0)
+}
+
 var mockRelationshipToDonorCategories = []sirius.RefDataItem{
 	{
 		Handle: "LPA_DONOR",
@@ -86,6 +91,7 @@ func TestGetCreateAttorney(t *testing.T) {
 }
 
 func TestGetEditAttorney(t *testing.T) {
+
 	existingAttorney := sirius.Attorney{
 		Person: sirius.Person{
 			ID:        4,
@@ -96,18 +102,25 @@ func TestGetEditAttorney(t *testing.T) {
 		SystemStatus:        shared.BoolPtr(true),
 	}
 
+	epa := sirius.Epa{
+		Case: sirius.Case{
+			Attorneys: []sirius.Attorney{existingAttorney},
+		},
+	}
+
 	client := &mockCreateAttorneyClient{}
 	client.
 		On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
 		Return(mockRelationshipToDonorCategories, nil).
 		On("Epa", mock.Anything, 2).
-		Return(sirius.Epa{Case: sirius.Case{Attorneys: []sirius.Attorney{existingAttorney}}}, nil)
+		Return(epa, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createAttorneyData{
 			DonorId:              1,
 			CaseId:               2,
+			Epa:                  epa,
 			RelationshipToDonors: mockRelationshipToDonorCategories,
 			Attorney:             existingAttorney,
 			IsEditing:            true,
@@ -277,12 +290,18 @@ func TestPostEditAttorney(t *testing.T) {
 				SystemStatus:        shared.BoolPtr(true),
 			}
 
+			epa := sirius.Epa{
+				Case: sirius.Case{
+					Attorneys: []sirius.Attorney{existingAttorney},
+				},
+			}
+
 			client := &mockCreateAttorneyClient{}
 			client.
 				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
 				Return(mockRelationshipToDonorCategories, nil).
 				On("Epa", mock.Anything, 2).
-				Return(sirius.Epa{Case: sirius.Case{Attorneys: []sirius.Attorney{existingAttorney}}}, nil).
+				Return(epa, nil).
 				On("UpdateAttorney", mock.Anything, 4, updatedAttorney).
 				Return(nil)
 
@@ -294,6 +313,7 @@ func TestPostEditAttorney(t *testing.T) {
 					On("Func", mock.Anything, createAttorneyData{
 						DonorId:              1,
 						CaseId:               2,
+						Epa:                  epa,
 						RelationshipToDonors: mockRelationshipToDonorCategories,
 						Attorney:             updatedAttorney,
 						IsEditing:            true,
