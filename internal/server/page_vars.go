@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -52,8 +51,6 @@ func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 			caseUIDs = []string{caseUID}
 		}
 	}
-
-	fmt.Println("caseUIDs:", caseUIDs)
 
 	userPermissions, err := client.GetUserPermissions(ctx)
 	if err != nil {
@@ -108,10 +105,6 @@ func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 	if err != nil {
 		return PageVars{}, err
 	}
-
-	fmt.Println("caseIDs:", caseIDs)
-	fmt.Println("selected:", selected)
-	fmt.Println("CaseUidsCollection:", caseUIDs)
 
 	vars := PageVars{
 		DonorID:            donorID,
