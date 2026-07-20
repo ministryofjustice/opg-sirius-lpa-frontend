@@ -4,13 +4,13 @@ go 1.25.7
 
 require (
 	github.com/go-playground/form/v4 v4.3.0
-	github.com/ministryofjustice/opg-go-common v1.165.13
+	github.com/ministryofjustice/opg-go-common v1.165.19
 	github.com/pact-foundation/pact-go/v2 v2.5.1
 	github.com/stretchr/testify v1.11.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.69.0
-	golang.org/x/mod v0.36.0
-	golang.org/x/sync v0.21.0
-	golang.org/x/text v0.37.0
+	golang.org/x/mod v0.38.0
+	golang.org/x/sync v0.22.0
+	golang.org/x/text v0.40.0
 )
 
 require (
