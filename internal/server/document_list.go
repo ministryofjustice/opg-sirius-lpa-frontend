@@ -20,26 +20,26 @@ type DocumentListClient interface {
 }
 
 type documentPageData struct {
-	XSRFToken                      string
-	Entity                         string
-	Success                        bool
-	SuccessMessage                 string
-	Error                          sirius.ValidationError
-	DocumentList                   sirius.DocumentList
-	Document                       sirius.Document
-	MultipleCasesSelected          bool
+	ActionPanelButtons             []ActionPanelButton
+	CaseUids                       string
+	CloseURL                       string
 	Comparing                      bool
 	CompareURLs                    map[string]string
-	CloseURL                       string
+	Document                       sirius.Document
+	DocumentList                   sirius.DocumentList
 	DonorID                        int
-	SelectedCaseIds                string
-	Person                         sirius.Person
-	CaseUids                       string
-	HasV1PersonsGetPermission      bool
+	Entity                         string
+	Error                          sirius.ValidationError
 	HasV1PersonsCasesGetPermission bool
-	ActionPanelButtons             []ActionPanelButton
-	SelectedCases                  []sirius.Case
+	HasV1PersonsGetPermission      bool
 	HeaderButtons                  SiriusHeaderButtons
+	MultipleCasesSelected          bool
+	Person                         sirius.Person
+	SelectedCaseIds                string
+	SelectedCases                  []sirius.Case
+	Success                        bool
+	SuccessMessage                 string
+	XSRFToken                      string
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
@@ -95,16 +95,18 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 		}
 
 		data := documentPageData{
-			XSRFToken:             ctx.XSRFToken,
-			SelectedCases:         pageVars.SelectedCases,
-			Person:                pageVars.Person,
-			DocumentList:          pageVars.DocumentList,
-			MultipleCasesSelected: len(pageVars.CaseUidsCollection) > 1 || (len(pageVars.CaseUidsCollection) == 0 && len(pageVars.CasesOnDonor) > 1),
-			Error:                 validationErr,
-			Success:               isSuccess,
-			SuccessMessage:        successMessage,
-			Comparing:             compareView,
-			DonorID:               pageVars.DonorID,
+			Comparing:                      compareView,
+			DocumentList:                   pageVars.DocumentList,
+			DonorID:                        pageVars.DonorID,
+			Error:                          validationErr,
+			HasV1PersonsCasesGetPermission: pageVars.HasV1PersonsCasesGetPermission,
+			HasV1PersonsGetPermission:      pageVars.HasV1PersonsGetPermission,
+			MultipleCasesSelected:          len(pageVars.CaseUidsCollection) > 1 || (len(pageVars.CaseUidsCollection) == 0 && len(pageVars.CasesOnDonor) > 1),
+			Person:                         pageVars.Person,
+			SelectedCases:                  pageVars.SelectedCases,
+			Success:                        isSuccess,
+			SuccessMessage:                 successMessage,
+			XSRFToken:                      ctx.XSRFToken,
 		}
 
 		uidParams := buildUIDQueryString(pageVars.CaseUidsCollection)

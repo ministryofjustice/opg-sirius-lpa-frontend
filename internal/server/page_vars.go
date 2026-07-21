@@ -1,30 +1,31 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"golang.org/x/sync/errgroup"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
 type PageVars struct {
-	DonorID                        int
-	SelectedCaseIds                string
-	Person                         sirius.Person
-	CaseUidsCollection             []string
-	HasV1PersonsGetPermission      bool
-	HasV1PersonsCasesGetPermission bool
 	ActionPanelButtons             []ActionPanelButton
-	SelectedCases                  []sirius.Case
-	HeaderButtons                  SiriusHeaderButtons
-	PersonReferences               bool
-	CasesOnDonor                   []sirius.Case
-	UserPermissions                sirius.Permissions
-	DraftCount                     int
 	CaseIDs                        []string
+	CaseUidsCollection             []string
+	CasesOnDonor                   []sirius.Case
 	DocumentList                   sirius.DocumentList
+	DonorID                        int
+	DraftCount                     int
+	HasV1PersonsCasesGetPermission bool
+	HasV1PersonsGetPermission      bool
+	HeaderButtons                  SiriusHeaderButtons
+	Person                         sirius.Person
+	PersonReferences               bool
+	SelectedCaseIds                string
+	SelectedCases                  []sirius.Case
+	UserPermissions                sirius.Permissions
 }
 
 type PageVarsClient interface {
@@ -40,6 +41,10 @@ func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 	ctx := getContext(r)
 
 	donorID, err := strToIntOrStatusError(r.PathValue("id"))
+	if err != nil || donorID == 0 {
+		donorID, err = strToIntOrStatusError(r.URL.Query().Get("id"))
+	}
+
 	if err != nil {
 		return PageVars{}, err
 	}
@@ -53,25 +58,41 @@ func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 		}
 	}
 
-	userPermissions, err := client.GetUserPermissions(ctx)
-	if err != nil {
+	var userPermissions sirius.Permissions
+	var casesOnDonor []sirius.Case
+	var person sirius.Person
+	var personReferences []sirius.PersonReference
+
+	group, _ := errgroup.WithContext(ctx.Context)
+
+	group.Go(func() error {
+		var err error
+		userPermissions, err = client.GetUserPermissions(ctx)
+		return err
+	})
+
+	group.Go(func() error {
+		var err error
+		casesOnDonor, err = client.CasesByDonor(ctx, donorID)
+		return err
+	})
+
+	group.Go(func() error {
+		var err error
+		person, err = client.Person(ctx, donorID)
+		return err
+	})
+
+	group.Go(func() error {
+		var err error
+		personReferences, err = client.PersonReferences(ctx, donorID)
+		return err
+	})
+
+	if err := group.Wait(); err != nil {
 		return PageVars{}, err
 	}
 
-	casesOnDonor, err := client.CasesByDonor(ctx, donorID)
-	if err != nil {
-		return PageVars{}, err
-	}
-
-	person, err := client.Person(ctx, donorID)
-	if err != nil {
-		return PageVars{}, err
-	}
-
-	personReferences, err := client.PersonReferences(ctx, donorID)
-	if err != nil {
-		return PageVars{}, err
-	}
 	personHasReferences := len(personReferences) > 0
 
 	var selected []sirius.Case
@@ -94,32 +115,42 @@ func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 	}
 
 	var draftCount int
+	var docs sirius.DocumentList
+
+	group, _ = errgroup.WithContext(ctx.Context)
+
 	if len(selected) == 1 {
-		documentDraftCount, err := client.GetDraftCount(ctx, strings.ToLower(selected[0].CaseType), selected[0].ID)
-		if err != nil {
-			return PageVars{}, err
-		}
-		draftCount = documentDraftCount.DraftCount
+		group.Go(func() error {
+			documentDraftCount, err := client.GetDraftCount(ctx, strings.ToLower(selected[0].CaseType), selected[0].ID)
+			if err != nil {
+				return err
+			}
+			draftCount = documentDraftCount.DraftCount
+			return nil
+		})
 	}
 
-	docs, err := client.GetPersonDocuments(ctx, donorID, caseIDs)
-	if err != nil {
+	group.Go(func() error {
+		var err error
+		docs, err = client.GetPersonDocuments(ctx, donorID, caseIDs)
+		return err
+	})
+
+	if err := group.Wait(); err != nil {
 		return PageVars{}, err
 	}
 
-	fmt.Println("caseIDs PAGEVARS:", caseIDs)
-
 	vars := PageVars{
-		DonorID:            donorID,
-		Person:             person,
-		CaseUidsCollection: caseUIDs,
 		CaseIDs:            caseIDs,
+		CaseUidsCollection: caseUIDs,
 		CasesOnDonor:       casesOnDonor,
-		PersonReferences:   personHasReferences,
-		UserPermissions:    userPermissions,
-		DraftCount:         draftCount,
-		SelectedCases:      selected,
 		DocumentList:       docs,
+		DonorID:            donorID,
+		DraftCount:         draftCount,
+		Person:             person,
+		PersonReferences:   personHasReferences,
+		SelectedCases:      selected,
+		UserPermissions:    userPermissions,
 	}
 
 	vars.HasV1PersonsGetPermission = userPermissions.Includes("v1-persons", "GET")

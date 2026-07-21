@@ -11,7 +11,6 @@ import (
 type ViewDocumentClient interface {
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 	GetUserDetails(sirius.Context) (sirius.User, error)
-	Case(ctx sirius.Context, id int) (sirius.Case, error)
 	PageVarsClient
 	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
 	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
@@ -19,19 +18,19 @@ type ViewDocumentClient interface {
 }
 
 type viewDocumentData struct {
-	XSRFToken                      string
+	ActionPanelButtons             []ActionPanelButton
+	CaseUids                       string
 	Document                       sirius.Document
+	DonorID                        int
+	HasV1PersonsCasesGetPermission bool
+	HasV1PersonsGetPermission      bool
+	HeaderButtons                  SiriusHeaderButtons
 	IsSysAdminUser                 bool
 	Pane                           int
-	DonorID                        int
-	SelectedCaseIds                string
 	Person                         sirius.Person
-	CaseUids                       string
-	HasV1PersonsGetPermission      bool
-	HasV1PersonsCasesGetPermission bool
+	SelectedCaseIds                string
 	SelectedCases                  []sirius.Case
-	ActionPanelButtons             []ActionPanelButton
-	HeaderButtons                  SiriusHeaderButtons
+	XSRFToken                      string
 }
 
 func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
@@ -80,15 +79,17 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 		}
 
 		data := viewDocumentData{
-			XSRFToken:       ctx.XSRFToken,
-			Document:        documentData,
-			IsSysAdminUser:  isSysAdminUser,
-			Pane:            pane,
-			DonorID:         pageVars.DonorID,
-			SelectedCaseIds: strconv.Itoa(caseId),
-			Person:          pageVars.Person,
-			CaseUids:        caseUidsStr,
-			SelectedCases:   selectedCase,
+			CaseUids:                       caseUidsStr,
+			Document:                       documentData,
+			DonorID:                        pageVars.DonorID,
+			HasV1PersonsCasesGetPermission: pageVars.HasV1PersonsCasesGetPermission,
+			HasV1PersonsGetPermission:      pageVars.HasV1PersonsGetPermission,
+			IsSysAdminUser:                 isSysAdminUser,
+			Pane:                           pane,
+			Person:                         pageVars.Person,
+			SelectedCaseIds:                strconv.Itoa(caseId),
+			SelectedCases:                  selectedCase,
+			XSRFToken:                      ctx.XSRFToken,
 		}
 
 		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, pageVars.UserPermissions)

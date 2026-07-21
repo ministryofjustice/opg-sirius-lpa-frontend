@@ -3,20 +3,14 @@ package server
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
-	"golang.org/x/sync/errgroup"
 )
 
 type ActionPanelClient interface {
-	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
-	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
-	Person(ctx sirius.Context, id int) (sirius.Person, error)
-	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
-	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
+	PageVarsClient
 	TasksForCase(ctx sirius.Context, caseId int) ([]sirius.Task, error)
 }
 
@@ -35,110 +29,19 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		ctx := getContext(r)
 		data := ActionPanelData{XSRFToken: ctx.XSRFToken}
 
-		// Support both query-string usage (?donorId=123) and path-based params
-		donorIDStr := r.URL.Query().Get("donorId")
-		if donorIDStr == "" {
-			donorIDStr = r.URL.Query().Get("id")
-		}
-
-		var donorId int
-		if donorIDStr != "" {
-			if donorId, err = strconv.Atoi(donorIDStr); err != nil {
-				return err
-			}
-		}
-
-		caseUIDs := r.Form["uid[]"]
-		caseUidsString := buildUIDQueryString(caseUIDs)
-
-		group, groupCtx := errgroup.WithContext(ctx.Context)
-
-		var draftCount int
-		var personHasReferences bool
-		var selectedCases []sirius.Case
-		var userPermissions sirius.Permissions
-		var taskIDs []int
-		group.Go(func() error {
-			if donorId > 0 {
-				cases, err := client.CasesByDonor(ctx.With(groupCtx), donorId)
-				if err != nil {
-					return err
-				}
-
-				// Filter cases by uid[] parameter if provided
-				if len(caseUIDs) > 0 {
-					casesByUID := make(map[string]sirius.Case, len(cases))
-					for _, c := range cases {
-						casesByUID[c.UID] = c
-					}
-
-					var filtered []sirius.Case
-					for _, uid := range caseUIDs {
-						if c, ok := casesByUID[uid]; ok {
-							filtered = append(filtered, c)
-						}
-					}
-					selectedCases = filtered
-				} else {
-					selectedCases = cases
-				}
-			}
-
-			if len(selectedCases) == 1 {
-				documentDraftCount, err := client.GetDraftCount(ctx.With(groupCtx), strings.ToLower(selectedCases[0].CaseType), selectedCases[0].ID)
-				if err != nil {
-					return err
-				}
-				draftCount = documentDraftCount.DraftCount
-
-				tasks, err := client.TasksForCase(ctx.With(groupCtx), selectedCases[0].ID)
-				if err != nil {
-					return err
-				}
-				for _, task := range tasks {
-					taskIDs = append(taskIDs, task.ID)
-				}
-			}
-			return nil
-		})
-
-		group.Go(func() error {
-			userPermissions, err = client.GetUserPermissions(ctx)
-			if err != nil {
-				return err
-			}
-
-			return nil
-		})
-
-		group.Go(func() error {
-			if donorId > 0 {
-				personReferences, err := client.PersonReferences(ctx.With(groupCtx), donorId)
-				if err != nil {
-					return err
-				}
-				personHasReferences = len(personReferences) > 0
-			}
-			return nil
-		})
-
-		var personHasLinks bool
-		group.Go(func() error {
-			if donorId > 0 {
-				person, err := client.Person(ctx.With(groupCtx), donorId)
-				if err != nil {
-					return err
-				}
-				personHasLinks = len(person.Children) > 0
-			}
-			return nil
-		})
-
-		if err := group.Wait(); err != nil {
+		pageVars, err := PageValues(client, r)
+		if err != nil {
 			return err
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences, personHasLinks, taskIDs, userPermissions)
+		caseUidsString := buildUIDQueryString(pageVars.CaseUidsCollection)
+
+		var personHasLinks bool
+		if pageVars.DonorID > 0 {
+			personHasLinks = len(pageVars.Person.Children) > 0
+		}
+
+		data.ActionPanelButtons = GetActionPanelButtons(pageVars.SelectedCases, pageVars.DonorID, caseUidsString, pageVars.DraftCount > 0, pageVars.PersonReferences, personHasLinks, pageVars.UserPermissions)
 
 		return tmpl(w, data)
 	}
