@@ -1,0 +1,38 @@
+{{ define "page" }}
+  <div class="action-panel__form">
+    {{ template "error-summary" .Error }}
+
+    {{ if .Success }}
+      <meta http-equiv="Refresh" content="0" />
+      {{ if .CaseId }}
+          {{ template "success-banner" "You have successfully updated an LPA." }}
+      {{ else }}
+          {{ template "success-banner" "You have successfully created an LPA." }}
+      {{ end }}
+    {{ end }}
+
+    <p class="govuk-body app-lpa__donor-info">{{ .DonorName }}{{ if .CaseId }} – <span class="app-lpa__donor-info--{{ .CaseItem.SubType }}">{{ ToUpper .CaseItem.SubType }}</span> {{ .CaseItem.UID }}{{ end }}</p>
+
+    <h1 class="govuk-heading-m">{{ .Title }}</h1>
+
+    <form class="form"
+          method="POST"
+          hx-post="{{ if .CaseId }}{{ prefix (printf "/create-lpa?id=%d&caseId=%d" .DonorId .CaseId) }}{{ else }}{{ prefix (printf "/create-lpa?id=%d" .DonorId) }}{{ end }}"
+          hx-target=".action-panel__content"
+          hx-swap="innerHTML scroll:.action-panel__content:top"
+    >
+      {{ template "create-lpa" . }}
+
+      <div class="govuk-button-group">
+        <button class="govuk-button" data-module="govuk-button" type="submit"
+                data-disable-after-click="true">Save and exit
+        </button>
+        <a class="govuk-link govuk-link--no-visited-state"
+           href=""
+           hx-get="{{ prefix (printf "/action-panel?donorId=%d" .DonorId) }}"
+           hx-target=".action-panel__content"
+           hx-swap="innerHTML scroll:.action-panel__content:top">Cancel</a>
+      </div>
+    </form>
+  </div>
+{{ end }}
