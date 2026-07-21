@@ -194,13 +194,14 @@ describe("Action Panel", () => {
     cy.contains("Create document").should("not.be.visible");
     cy.contains("Create donor").should("not.be.visible");
     cy.contains("Create epa case").should("not.be.visible");
+    cy.contains("Create lpa case").should("not.be.visible");
     cy.contains("Create event").should("not.be.visible");
     cy.contains("Create relationship").should("not.be.visible");
     cy.contains("Create warning").should("not.be.visible");
     cy.contains("Delete relationship").should("not.be.visible");
     cy.contains("Edit dates").should("not.be.visible");
     cy.contains("Edit donor").should("not.be.visible");
-    cy.contains("Edit epa case").should("not.be.visible");
+    cy.contains("Edit case").should("not.be.visible");
     cy.contains("Fees").should("not.be.visible");
     cy.contains("Unlink record").should("not.be.visible");
     cy.contains("Link record").should("not.be.visible");
@@ -551,7 +552,30 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form .govuk-link").contains("Cancel").click();
   });
 
-  it("displays the edit epa button on the action panel", () => {
+  it("displays the create lpa button on the action panel", () => {
+    cy.addMock(
+      "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0&limit=999",
+      "GET",
+      {
+        status: 200,
+        body: {
+          total: 0,
+          documents: [],
+        },
+      },
+    );
+
+    cy.visit("/donor/1/documents"); // create lpa button is only clickable when no cases are selected
+
+    cy.get("#actions-content").should("be.visible");
+    cy.get("#actions-content").contains("Create lpa case");
+
+    cy.get("a#action-panel-button-create-lpa-case").click();
+    cy.get(".action-panel__form").should("exist");
+    cy.get(".action-panel__form").contains("Create an LPA");
+  });
+
+  it("displays the edit case button on the action panel", () => {
     cy.addMock("/lpa-api/v1/cases/111", "GET", {
       status: 200,
       body: { id: 111 },
@@ -590,9 +614,9 @@ describe("Action Panel", () => {
     cy.visit("/donor/1/documents?uid[]=7000-9876-5432");
 
     cy.get("#actions-content").should("be.visible");
-    cy.get("#actions-content").contains("Edit epa case");
+    cy.get("#actions-content").contains("Edit case");
 
-    cy.get("a#action-panel-button-edit-epa-case").click();
+    cy.get("a#action-panel-button-edit-case").click();
     cy.get(".action-panel__form").should("exist");
     cy.get(".action-panel__form").contains("Edit EPA");
   });
