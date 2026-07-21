@@ -3,8 +3,6 @@ package server
 import (
 	"fmt"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -56,30 +54,7 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		id, _ := strconv.Atoi(pageVars.CaseIDs[0])
-		var selectedCase []sirius.Case
-		if caseData, err := client.Case(ctx, id); err == nil {
-			selectedCase = []sirius.Case{caseData}
-		}
-		var draftCount int
-		var taskIDs []int
-		if len(selectedCase) > 0 {
-			documentDraftCount, err := client.GetDraftCount(ctx, strings.ToLower(selectedCase[0].CaseType), selectedCase[0].ID)
-			if err != nil {
-				return err
-			}
-			draftCount = documentDraftCount.DraftCount
-
-			tasks, err := client.TasksForCase(ctx, selectedCase[0].ID)
-			if err != nil {
-				return err
-			}
-			for _, task := range tasks {
-				taskIDs = append(taskIDs, task.ID)
-			}
-		}
-
-		baseURL := fmt.Sprintf("/compare/%d/%s", pageVars.DonorID, pageVars.CaseIDs[0])
+		baseURL := fmt.Sprintf("/compare/%d/%s", pageVars.DonorID, pageVars.CaseUidsCollection[0])
 
 		data := compareDocsData{
 			Pane1: "list",
@@ -87,22 +62,22 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 			DocListPane1Data: documentPageData{
 				XSRFToken:     ctx.XSRFToken,
 				DocumentList:  pageVars.DocumentList,
-				SelectedCases: selectedCase,
+				SelectedCases: pageVars.SelectedCases,
 				Comparing:     true,
 				DonorID:       pageVars.DonorID,
 			},
 			DocListPane2Data: documentPageData{
 				XSRFToken:     ctx.XSRFToken,
 				DocumentList:  pageVars.DocumentList,
-				SelectedCases: selectedCase,
+				SelectedCases: pageVars.SelectedCases,
 				Comparing:     true,
 				DonorID:       pageVars.DonorID,
 			},
 			DonorID:         pageVars.DonorID,
 			SelectedCaseIds: pageVars.CaseIDs[0],
 			Person:          pageVars.Person,
-			CaseUids:        "&uid[]=" + selectedCase[0].UID,
-			SelectedCases:   selectedCase,
+			CaseUids:        "&uid[]=" + pageVars.SelectedCases[0].UID,
+			SelectedCases:   pageVars.SelectedCases,
 		}
 
 		pane1UUID := r.URL.Query().Get("pane1")
@@ -176,20 +151,20 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 
 		viewingADocumentAndList := data.Pane1 == "doc" && data.Pane2 == "list"
 		if viewingADocumentAndList {
-			data.DocListPane2Data.CloseURL = fmt.Sprintf("/view-document/%s/%d?case=%d&pane=1", data.View1.Document.UUID, pageVars.DonorID, selectedCase[0].ID)
+			data.DocListPane2Data.CloseURL = fmt.Sprintf("/view-document/%s/%d?case=%d&pane=1", data.View1.Document.UUID, pageVars.DonorID, pageVars.SelectedCases[0].ID)
 			data.View1.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", pageVars.DonorID, data.DocListPane2Data.DocumentList.Documents[0].CaseItems[0].UID)
 		}
 
 		viewingAListAndDocument := data.Pane1 == "list" && data.Pane2 == "doc"
 		if viewingAListAndDocument {
-			data.DocListPane1Data.CloseURL = fmt.Sprintf("/view-document/%s/%d?case=%d&pane=2", data.View2.Document.UUID, pageVars.DonorID, selectedCase[0].ID)
+			data.DocListPane1Data.CloseURL = fmt.Sprintf("/view-document/%s/%d?case=%d&pane=2", data.View2.Document.UUID, pageVars.DonorID, pageVars.SelectedCases[0].ID)
 			data.View2.CloseURL = fmt.Sprintf("/donor/%d/documents?uid[]=%s", pageVars.DonorID, data.DocListPane1Data.DocumentList.Documents[0].CaseItems[0].UID)
 		}
 
 		bothSidesAreDocuments := data.Pane1 == "doc" && data.Pane2 == "doc"
 		if bothSidesAreDocuments {
-			data.View1.CloseURL = fmt.Sprintf("/view-document/%s/%d?case=%d&pane=2", data.View2.Document.UUID, pageVars.DonorID, selectedCase[0].ID)
-			data.View2.CloseURL = fmt.Sprintf("/view-document/%s/%d?case=%d&pane=1", data.View1.Document.UUID, pageVars.DonorID, selectedCase[0].ID)
+			data.View1.CloseURL = fmt.Sprintf("/view-document/%s/%d?case=%d&pane=2", data.View2.Document.UUID, pageVars.DonorID, pageVars.SelectedCases[0].ID)
+			data.View2.CloseURL = fmt.Sprintf("/view-document/%s/%d?case=%d&pane=1", data.View1.Document.UUID, pageVars.DonorID, pageVars.SelectedCases[0].ID)
 		}
 
 		bothSidesAreLists := data.Pane1 == "list" && data.Pane2 == "list"

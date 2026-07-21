@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -105,6 +106,8 @@ func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 	if err != nil {
 		return PageVars{}, err
 	}
+
+	fmt.Println("caseIDs PAGEVARS:", caseIDs)
 
 	vars := PageVars{
 		DonorID:            donorID,

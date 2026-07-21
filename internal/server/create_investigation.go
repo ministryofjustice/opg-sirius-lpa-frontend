@@ -21,6 +21,7 @@ type createInvestigationData struct {
 	CaseID        int
 	CaseUIDs      string
 	EntityType    string
+	DonorId       int
 }
 
 func CreateInvestigation(client CreateInvestigationClient, tmpl template.Template, partialTmpl template.Template) Handler {
@@ -49,6 +50,7 @@ func CreateInvestigation(client CreateInvestigationClient, tmpl template.Templat
 			CaseID:     caseID,
 			CaseUIDs:   buildUIDQueryString(r.Form["uid[]"]),
 			EntityType: caseTypeString,
+			DonorId:    caseItem.Donor.ID,
 		}
 
 		if r.Method == http.MethodPost {
