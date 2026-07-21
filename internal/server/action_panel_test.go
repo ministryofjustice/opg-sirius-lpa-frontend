@@ -15,6 +15,11 @@ type mockActionPanelClient struct {
 	mock.Mock
 }
 
+func (m *mockActionPanelClient) GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error) {
+	args := m.Called(ctx, personID, caseIDs)
+	return args.Get(0).(sirius.DocumentList), args.Error(1)
+}
+
 func (m *mockActionPanelClient) CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).([]sirius.Case), args.Error(1)

@@ -14,6 +14,16 @@ type mockViewDocumentClient struct {
 	mock.Mock
 }
 
+func (m *mockViewDocumentClient) CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]sirius.Case), args.Error(1)
+}
+
+func (m *mockViewDocumentClient) GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error) {
+	args := m.Called(ctx, personID, caseIDs)
+	return args.Get(0).(sirius.DocumentList), args.Error(1)
+}
+
 func (m *mockViewDocumentClient) DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error) {
 	args := m.Called(ctx, uuid)
 	return args.Get(0).(sirius.Document), args.Error(1)

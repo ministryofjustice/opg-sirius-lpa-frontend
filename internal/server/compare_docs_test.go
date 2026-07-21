@@ -14,6 +14,11 @@ type mockCompareDocsClient struct {
 	mock.Mock
 }
 
+func (m *mockCompareDocsClient) CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]sirius.Case), args.Error(1)
+}
+
 func (m *mockCompareDocsClient) DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error) {
 	args := m.Called(ctx, uuid)
 	return args.Get(0).(sirius.Document), args.Error(1)
