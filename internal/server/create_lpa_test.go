@@ -92,16 +92,22 @@ func TestGetCreateLpaEdit(t *testing.T) {
 
 func TestGetCreateLpaBadQuery(t *testing.T) {
 	testCases := map[string]string{
-		"no-id":  "/",
-		"bad-id": "/?id=test",
+		"no-id":       "/",
+		"bad-id":      "/?id=test",
+		"bad-case-id": "/?id=123&caseId=test",
 	}
 
 	for name, url := range testCases {
 		t.Run(name, func(t *testing.T) {
+			client := &mockCreateLpaClient{}
+			client.
+				On("Person", mock.Anything, 123).
+				Return(sirius.Person{}, nil)
+
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateLpa(nil, nil, nil)(w, r)
+			err := CreateLpa(client, nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
