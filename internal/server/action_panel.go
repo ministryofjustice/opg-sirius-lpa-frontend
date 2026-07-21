@@ -11,7 +11,6 @@ import (
 
 type ActionPanelClient interface {
 	PageVarsClient
-	TasksForCase(ctx sirius.Context, caseId int) ([]sirius.Task, error)
 }
 
 type ActionPanelData struct {
@@ -41,7 +40,7 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			personHasLinks = len(pageVars.Person.Children) > 0
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(pageVars.SelectedCases, pageVars.DonorID, caseUidsString, pageVars.DraftCount > 0, pageVars.PersonReferences, personHasLinks, pageVars.UserPermissions)
+		data.ActionPanelButtons = GetActionPanelButtons(pageVars.SelectedCases, pageVars.DonorID, caseUidsString, pageVars.DraftCount > 0, pageVars.PersonReferences, personHasLinks, pageVars.TaskIDs, pageVars.UserPermissions)
 
 		return tmpl(w, data)
 	}

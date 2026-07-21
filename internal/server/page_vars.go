@@ -25,6 +25,7 @@ type PageVars struct {
 	PersonReferences               bool
 	SelectedCaseIds                string
 	SelectedCases                  []sirius.Case
+	TaskIDs                        []int
 	UserPermissions                sirius.Permissions
 }
 
@@ -35,6 +36,7 @@ type PageVarsClient interface {
 	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
 	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
 	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
+	TasksForCase(ctx sirius.Context, id int) ([]sirius.Task, error)
 }
 
 func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
@@ -116,6 +118,7 @@ func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 
 	var draftCount int
 	var docs sirius.DocumentList
+	var taskIDs []int
 
 	group, _ = errgroup.WithContext(ctx.Context)
 
@@ -126,6 +129,17 @@ func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 				return err
 			}
 			draftCount = documentDraftCount.DraftCount
+			return nil
+		})
+
+		group.Go(func() error {
+			tasks, err := client.TasksForCase(ctx, selected[0].ID)
+			if err != nil {
+				return err
+			}
+			for _, task := range tasks {
+				taskIDs = append(taskIDs, task.ID)
+			}
 			return nil
 		})
 	}
@@ -150,6 +164,7 @@ func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 		Person:             person,
 		PersonReferences:   personHasReferences,
 		SelectedCases:      selected,
+		TaskIDs:            taskIDs,
 		UserPermissions:    userPermissions,
 	}
 

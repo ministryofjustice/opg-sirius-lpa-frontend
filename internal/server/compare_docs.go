@@ -11,7 +11,6 @@ import (
 type CompareDocsClient interface {
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 	PageVarsClient
-	TasksForCase(ctx sirius.Context, caseId int) ([]sirius.Task, error)
 }
 
 type compareDocsData struct {
@@ -133,7 +132,7 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 			}
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(pageVars.SelectedCases, data.DonorID, data.CaseUids, draftCount > 0, pageVars.PersonReferences, len(pageVars.Person.Children) > 0, taskIDs, ctx.Permissions)
+		data.ActionPanelButtons = GetActionPanelButtons(pageVars.SelectedCases, data.DonorID, data.CaseUids, pageVars.DraftCount > 0, pageVars.PersonReferences, len(pageVars.Person.Children) > 0, pageVars.TaskIDs, ctx.Permissions)
 
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,

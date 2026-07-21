@@ -11,12 +11,8 @@ import (
 )
 
 type DocumentListClient interface {
-	PageVarsClient
 	DownloadMultiple(ctx sirius.Context, docIDs []string) (*http.Response, error)
-	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
-	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
-	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
-	TasksForCase(ctx sirius.Context, caseId int) ([]sirius.Task, error)
+	PageVarsClient
 }
 
 type documentPageData struct {
@@ -120,7 +116,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			data.SelectedCaseIds += strconv.Itoa(selectedCase.ID)
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, pageVars.UserPermissions)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, pageVars.DraftCount > 0, pageVars.PersonReferences, len(pageVars.Person.Children) > 0, pageVars.TaskIDs, pageVars.UserPermissions)
 
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,

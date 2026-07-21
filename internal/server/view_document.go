@@ -12,9 +12,6 @@ type ViewDocumentClient interface {
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 	GetUserDetails(sirius.Context) (sirius.User, error)
 	PageVarsClient
-	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
-	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
-	TasksForCase(ctx sirius.Context, caseId int) ([]sirius.Task, error)
 }
 
 type viewDocumentData struct {
@@ -92,7 +89,7 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			XSRFToken:                      ctx.XSRFToken,
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, pageVars.UserPermissions)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, caseUidsStr, pageVars.DraftCount > 0, pageVars.PersonReferences, len(pageVars.Person.Children) > 0, pageVars.TaskIDs, pageVars.UserPermissions)
 
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,
