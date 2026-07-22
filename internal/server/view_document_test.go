@@ -83,6 +83,17 @@ func TestGetViewDocument(t *testing.T) {
 			draftCount := sirius.DocumentDraftCount{DraftCount: 0}
 
 			client := &mockViewDocumentClient{}
+
+			permissions := sirius.Permissions{
+				"v1-persons":       {Permissions: []string{"GET"}},
+				"v1-persons-cases": {Permissions: []string{"GET"}},
+			}
+			client.
+				On("GetUserPermissions", mock.Anything).
+				Return(permissions, nil)
+			client.
+				On("GetPersonDocuments", mock.Anything, 33, []string(nil)).
+				Return(sirius.DocumentList{}, nil)
 			client.
 				On("DocumentByUUID", mock.Anything, document.UUID).
 				Return(document, nil)
@@ -93,8 +104,8 @@ func TestGetViewDocument(t *testing.T) {
 				On("Person", mock.Anything, 33).
 				Return(person, nil)
 			client.
-				On("Case", mock.Anything, 34).
-				Return(caseData, nil)
+				On("CasesByDonor", mock.Anything, 33).
+				Return([]sirius.Case{caseData}, nil)
 			client.
 				On("GetDraftCount", mock.Anything, strings.ToLower(caseType), 34).
 				Return(draftCount, nil)
@@ -102,43 +113,29 @@ func TestGetViewDocument(t *testing.T) {
 				On("TasksForCase", mock.Anything, 34).
 				Return([]sirius.Task{}, nil)
 			client.
-				On("GetUserPermissions", mock.Anything).
-				Return(sirius.Permissions{}, nil)
-			client.
 				On("PersonReferences", mock.Anything, 33).
 				Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 			template := &mockTemplate{}
-			templateData := viewDocumentData{
-				Document:        document,
-				IsSysAdminUser:  true,
-				Pane:            1,
-				DonorID:         33,
-				SelectedCaseIds: "34",
-				Person:          person,
-				CaseUids:        "&uid[]=7000-1234-1234",
-				SelectedCases:   []sirius.Case{caseData},
-				HeaderButtons: SiriusHeaderButtons{
-					BackToTimeline: true,
-					Calendar:       true,
-					CaseInfo:       true,
-					PersonInfo:     true,
-				},
-			}
-
 			template.
 				On("Func", mock.Anything, mock.MatchedBy(func(data viewDocumentData) bool {
-					return data.Document.UUID == templateData.Document.UUID &&
-						data.IsSysAdminUser == templateData.IsSysAdminUser &&
-						data.Pane == templateData.Pane &&
-						data.DonorID == templateData.DonorID &&
-						data.SelectedCaseIds == templateData.SelectedCaseIds &&
-						data.CaseUids == templateData.CaseUids &&
-						data.HeaderButtons == templateData.HeaderButtons
+					return data.Document.UUID == document.UUID &&
+						data.IsSysAdminUser == true &&
+						data.Pane == 1 &&
+						data.DonorID == 33 &&
+						data.SelectedCaseIds == "34" &&
+						data.CaseUids == "&uid[]=7000-1234-1234" &&
+						data.HeaderButtons.BackToTimeline == true &&
+						data.HeaderButtons.Calendar == true &&
+						data.HeaderButtons.CaseInfo == true &&
+						data.HeaderButtons.PersonInfo == true &&
+						data.HasV1PersonsGetPermission == true &&
+						data.HasV1PersonsCasesGetPermission == true &&
+						len(data.ActionPanelButtons) > 0
 				})).
 				Return(nil)
 
-			server := newMockServer("/view-document/{uuid}/{donorId}", ViewDocument(client, template.Func))
+			server := newMockServer("/view-document/{uuid}/{id}", ViewDocument(client, template.Func))
 
 			req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33?case=34", nil)
 			_, err := server.serve(req)
@@ -153,15 +150,27 @@ func TestGetViewDocumentWhenCaseErrors(t *testing.T) {
 	client := &mockViewDocumentClient{}
 
 	client.
+		On("CasesByDonor", mock.Anything, 33).
+		Return([]sirius.Case{}, nil)
+	client.
 		On("Person", mock.Anything, 33).
 		Return(sirius.Person{ID: 33}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 33).
+		Return([]sirius.PersonReference{}, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 33, []string(nil)).
+		Return(sirius.DocumentList{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
 	client.
 		On("DocumentByUUID", mock.Anything, "dfef6714-b4fe-44c2-b26e-90dfe3663e95").
 		Return(sirius.Document{}, errExample)
 
 	server := newMockServer("/view-document/{uuid}/{donorId}", ViewDocument(client, nil))
 
-	req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33?case=34", nil)
 	_, err := server.serve(req)
 
 	assert.Equal(t, errExample, err)
@@ -212,26 +221,32 @@ func TestGetViewDocumentWhenPermissionsErrors(t *testing.T) {
 
 func TestGetViewDocumentWhenGetUserDetailsErrors(t *testing.T) {
 	client := &mockViewDocumentClient{}
-	document := sirius.Document{
-		ID:         1,
-		UUID:       "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-		SystemType: "LP-LETTER",
-		Type:       sirius.TypeSave,
-	}
 
+	client.
+		On("CasesByDonor", mock.Anything, 33).
+		Return([]sirius.Case{}, nil)
 	client.
 		On("Person", mock.Anything, 33).
 		Return(sirius.Person{ID: 33}, nil)
 	client.
-		On("DocumentByUUID", mock.Anything, document.UUID).
-		Return(document, nil)
+		On("PersonReferences", mock.Anything, 33).
+		Return([]sirius.PersonReference{}, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 33, []string(nil)).
+		Return(sirius.DocumentList{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("DocumentByUUID", mock.Anything, "dfef6714-b4fe-44c2-b26e-90dfe3663e95").
+		Return(sirius.Document{UUID: "dfef6714-b4fe-44c2-b26e-90dfe3663e95"}, nil)
 	client.
 		On("GetUserDetails", mock.Anything).
 		Return(sirius.User{}, errExample)
 
 	server := newMockServer("/view-document/{uuid}/{donorId}", ViewDocument(client, nil))
 
-	req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33?case=34", nil)
 	_, err := server.serve(req)
 
 	assert.Equal(t, errExample, err)
