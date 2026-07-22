@@ -45,11 +45,6 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		pageVars, err := PageValues(client, r)
-		if err != nil {
-			return err
-		}
-
 		selectedDocUUIDs := r.Form["document"]
 
 		if r.Method == http.MethodPost && len(selectedDocUUIDs) > 0 && r.FormValue("actionDownload") == "true" {
@@ -81,6 +76,15 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 				return nil
 			}
 			validationErr.Detail = "Select one or more documents and try again."
+		}
+
+		pageVars, err := PageValues(client, r)
+		if err != nil {
+			return err
+		}
+
+		if pageVars.DonorID == 0 {
+			return sirius.StatusError{Code: 400}
 		}
 
 		successMessage := ""

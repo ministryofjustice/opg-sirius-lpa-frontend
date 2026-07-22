@@ -1016,21 +1016,7 @@ func TestGetDocumentListHasV1PersonsCasesGetPermission(t *testing.T) {
 }
 
 func TestDocumentListDownloadMultipleSuccess(t *testing.T) {
-	cases := []sirius.Case{{ID: 1, CaseType: "LPA", UID: "7000-1234-0000"}}
-
 	client := &mockDocumentListClient{}
-	client.
-		On("CasesByDonor", mock.Anything, 82).
-		Return(cases, nil)
-	client.
-		On("GetDraftCount", mock.Anything, "lpa", 1).
-		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
-	client.
-		On("TasksForCase", mock.Anything, 1).
-		Return([]sirius.Task{}, nil)
-	client.
-		On("PersonReferences", mock.Anything, 82).
-		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	downloadResp := &http.Response{
 		StatusCode: http.StatusCreated,
@@ -1064,24 +1050,10 @@ func TestDocumentListDownloadMultipleSuccess(t *testing.T) {
 }
 
 func TestDocumentListDownloadMultipleError(t *testing.T) {
-	cases := []sirius.Case{{ID: 1, CaseType: "LPA", UID: "7000-1234-0000"}}
-
 	client := &mockDocumentListClient{}
-	client.
-		On("CasesByDonor", mock.Anything, 82).
-		Return(cases, nil)
 	client.
 		On("DownloadMultiple", mock.Anything, []string{"doc-uuid"}).
 		Return((*http.Response)(nil), errExample)
-	client.
-		On("GetDraftCount", mock.Anything, "lpa", 1).
-		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
-	client.
-		On("TasksForCase", mock.Anything, 1).
-		Return([]sirius.Task{}, nil)
-	client.
-		On("PersonReferences", mock.Anything, 82).
-		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -1309,24 +1281,7 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 }
 
 func TestDocumentListReturnsNoContentWhenComparingAndNoDocumentsSelected(t *testing.T) {
-	cases := []sirius.Case{
-		{ID: 1, UID: "7000-1234-0000"},
-		{ID: 2, UID: "7000-9876-0000"},
-	}
-
 	client := &mockDocumentListClient{}
-	client.
-		On("CasesByDonor", mock.Anything, 82).
-		Return(cases, nil)
-	client.
-		On("GetPersonDocuments", mock.Anything, 82, []string(nil)).
-		Return(allDocumentList, nil)
-	client.
-		On("Person", mock.Anything, 82).
-		Return(expectedDonor, nil)
-	client.
-		On("PersonReferences", mock.Anything, 82).
-		Return([]sirius.PersonReference{{ID: 987}}, nil)
 
 	template := &mockTemplate{}
 
@@ -1344,7 +1299,7 @@ func TestDocumentListReturnsNoContentWhenComparingAndNoDocumentsSelected(t *test
 	assert.Equal(t, http.StatusNoContent, resp.Code)
 
 	client.AssertNotCalled(t, "DownloadMultiple")
-	mock.AssertExpectationsForObjects(t, client)
+	client.AssertNotCalled(t, "GetPersonDocuments")
 }
 
 func TestDocumentListDismissValidation(t *testing.T) {
@@ -1562,6 +1517,13 @@ func TestDocumentListDismissValidation(t *testing.T) {
 
 func TestDocumentListInvalidDonorID(t *testing.T) {
 	client := &mockDocumentListClient{}
+	permissions := sirius.Permissions{
+		"v1-persons":       {Permissions: []string{"GET"}},
+		"v1-persons-cases": {Permissions: []string{"GET"}},
+	}
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(permissions, nil)
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
 	req, _ := http.NewRequest(http.MethodGet, "/donor/abc/documents", nil)
