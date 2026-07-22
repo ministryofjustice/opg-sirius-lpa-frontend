@@ -882,3 +882,21 @@ func TestPersonInfoRow(t *testing.T) {
 	val := fn("Name", sirius.Person{}, 123, 456, 1, true, true)
 	assert.Equal(t, expected, val)
 }
+
+func TestHasField(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["hasField"].(func(interface{}, string) bool)
+
+	tests := map[interface{}]bool{
+		"not-struct": false,
+		struct{ ExistingField string }{ExistingField: "123"}:        true,
+		struct{ NonExistingField string }{NonExistingField: "123"}:  false,
+		&struct{ ExistingField string }{ExistingField: "123"}:       true,
+		&struct{ NonExistingField string }{NonExistingField: "123"}: false,
+	}
+
+	for input, expected := range tests {
+		result := fn(input, "ExistingField")
+		assert.Equal(t, expected, result)
+	}
+}
