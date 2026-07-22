@@ -29,7 +29,7 @@ func (m *mockCreateInvestigationClient) Case(ctx sirius.Context, id int) (sirius
 func TestGetCreateInvestigation(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseItem := sirius.Case{CaseType: caseType, UID: "7000"}
+			caseItem := sirius.Case{CaseType: caseType, UID: "7000", Donor: &sirius.Person{ID: 357}}
 			client := &mockCreateInvestigationClient{}
 			client.
 				On("Case", mock.Anything, 123).
@@ -41,6 +41,7 @@ func TestGetCreateInvestigation(t *testing.T) {
 					Case:       caseItem,
 					CaseID:     123,
 					EntityType: caseType,
+					DonorId:    357,
 				}).
 				Return(nil)
 
