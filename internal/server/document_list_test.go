@@ -1534,16 +1534,20 @@ func TestDocumentListInvalidDonorID(t *testing.T) {
 
 func TestGetDocumentListWhenCasesByDonorErrors(t *testing.T) {
 	client := &mockDocumentListClient{}
+	permissions := sirius.Permissions{
+		"v1-persons":       {Permissions: []string{"GET"}},
+		"v1-persons-cases": {Permissions: []string{"GET"}},
+	}
 	client.
-		On("CasesByDonor", mock.Anything, 82).
-		Return([]sirius.Case{}, errExample)
+		On("GetUserPermissions", mock.Anything).
+		Return(permissions, nil)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
-	req, _ := http.NewRequest(http.MethodGet, "/donor/82/documents", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/donor/0/documents", nil)
 	_, err := server.serve(req)
 
-	assert.Equal(t, errExample, err)
+	assert.Equal(t, "donor not found", err.Error())
 	mock.AssertExpectationsForObjects(t, client)
 }
 
@@ -1551,6 +1555,13 @@ func TestGetDocumentListWhenGetPersonDocumentsErrors(t *testing.T) {
 	cases := []sirius.Case{{ID: 1, CaseType: "LPA", SubType: "PFA", UID: "7000-1234-0000"}}
 
 	client := &mockDocumentListClient{}
+	permissions := sirius.Permissions{
+		"v1-persons":       {Permissions: []string{"GET"}},
+		"v1-persons-cases": {Permissions: []string{"GET"}},
+	}
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(permissions, nil)
 	client.
 		On("CasesByDonor", mock.Anything, 82).
 		Return(cases, nil)
@@ -1566,6 +1577,9 @@ func TestGetDocumentListWhenGetPersonDocumentsErrors(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 82).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("Person", mock.Anything, 82).
+		Return(sirius.Person{ID: 82}, nil)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -1584,17 +1598,8 @@ func TestGetDocumentListWhenPersonErrors(t *testing.T) {
 		On("CasesByDonor", mock.Anything, 82).
 		Return(cases, nil)
 	client.
-		On("GetPersonDocuments", mock.Anything, 82, []string(nil)).
-		Return(singleDocumentList, nil)
-	client.
 		On("Person", mock.Anything, 82).
 		Return(sirius.Person{}, errExample)
-	client.
-		On("GetDraftCount", mock.Anything, "lpa", 1).
-		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
-	client.
-		On("TasksForCase", mock.Anything, 1).
-		Return([]sirius.Task{}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 82).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
@@ -1647,12 +1652,31 @@ func TestGetDocumentListWhenGetDraftCountErrors(t *testing.T) {
 	cases := []sirius.Case{{ID: 1, CaseType: "LPA", SubType: "PFA", UID: "7000-1234-0000"}}
 
 	client := &mockDocumentListClient{}
+	permissions := sirius.Permissions{
+		"v1-persons":       {Permissions: []string{"GET"}},
+		"v1-persons-cases": {Permissions: []string{"GET"}},
+	}
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(permissions, nil)
 	client.
 		On("CasesByDonor", mock.Anything, 82).
 		Return(cases, nil)
 	client.
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{}, errExample)
+	client.
+		On("PersonReferences", mock.Anything, 82).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("Person", mock.Anything, 82).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 82, []string(nil)).
+		Return(singleDocumentList, nil)
+	client.
+		On("TasksForCase", mock.Anything, 1).
+		Return([]sirius.Task{}, nil)
 
 	server := newMockServer("/donor/{id}/documents", DocumentList(client, nil))
 
@@ -1672,11 +1696,8 @@ func TestGetDocumentListWhenGetPersonReferencesErrors(t *testing.T) {
 		On("CasesByDonor", mock.Anything, 82).
 		Return(cases, nil)
 	client.
-		On("GetDraftCount", mock.Anything, "lpa", 1).
-		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
-	client.
-		On("TasksForCase", mock.Anything, 1).
-		Return([]sirius.Task{}, nil)
+		On("Person", mock.Anything, 82).
+		Return(sirius.Person{}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 82).
 		Return([]sirius.PersonReference{}, errExample)

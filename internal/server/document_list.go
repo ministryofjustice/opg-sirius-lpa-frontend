@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -84,7 +85,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 		}
 
 		if pageVars.DonorID == 0 {
-			return sirius.StatusError{Code: 400}
+			return errors.New("donor not found")
 		}
 
 		successMessage := ""
