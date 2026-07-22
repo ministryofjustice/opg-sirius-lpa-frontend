@@ -54,6 +54,9 @@ func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 
 	if len(caseUIDs) == 0 {
 		caseUID := r.PathValue("caseUid")
+		if caseUID == "" {
+			caseUID = r.PathValue("caseId")
+		}
 		if caseUID != "" {
 			caseUIDs = []string{caseUID}
 		}
@@ -98,14 +101,21 @@ func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 
 	if len(caseUIDs) > 0 {
 		casesByUID := make(map[string]sirius.Case, len(casesOnDonor))
+		casesByID := make(map[string]sirius.Case, len(casesOnDonor))
 		for _, c := range casesOnDonor {
 			casesByUID[c.UID] = c
+			casesByID[strconv.Itoa(c.ID)] = c
 		}
 
 		for _, uid := range caseUIDs {
+			// Try to match by UID first
 			if c, ok := casesByUID[uid]; ok {
 				selected = append(selected, c)
 				caseIDs = append(caseIDs, strconv.Itoa(c.ID))
+			} else if c, ok := casesByID[uid]; ok {
+				// If not found by UID, try by ID (for path parameters like caseId)
+				selected = append(selected, c)
+				caseIDs = append(caseIDs, uid)
 			}
 		}
 	} else {

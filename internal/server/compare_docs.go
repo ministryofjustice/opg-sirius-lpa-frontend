@@ -47,6 +47,10 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		if len(pageVars.CaseUidsCollection) == 0 || len(pageVars.SelectedCases) == 0 {
+			return sirius.StatusError{Code: 400}
+		}
+
 		baseURL := fmt.Sprintf("/compare/%d/%s", pageVars.DonorID, pageVars.CaseUidsCollection[0])
 
 		data := compareDocsData{

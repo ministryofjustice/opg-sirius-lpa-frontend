@@ -39,11 +39,6 @@ func (m *mockCompareDocsClient) GetUserPermissions(ctx sirius.Context) (sirius.P
 	return args.Get(0).(sirius.Permissions), args.Error(1)
 }
 
-func (m *mockCompareDocsClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
-	args := m.Called(ctx, id)
-	return args.Get(0).(sirius.Case), args.Error(1)
-}
-
 func (m *mockCompareDocsClient) GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error) {
 	args := m.Called(ctx, caseType, caseId)
 	return args.Get(0).(sirius.DocumentDraftCount), args.Error(1)
@@ -74,6 +69,7 @@ func TestGetCompareDocsPanes(t *testing.T) {
 		Documents: []sirius.Document{document1, document2},
 	}
 	person := sirius.Person{ID: 77}
+	caseItems := []sirius.Case{{ID: 456, UID: "case-uid"}}
 	selectedCase := document1.CaseItems[0]
 	permissions := sirius.Permissions{
 		"v1-persons":       {Permissions: []string{"GET"}},
@@ -204,9 +200,6 @@ func TestGetCompareDocsPanes(t *testing.T) {
 				On("PersonReferences", mock.Anything, 77).
 				Return([]sirius.PersonReference{}, nil)
 			client.
-				On("Case", mock.Anything, 456).
-				Return(selectedCase, nil)
-			client.
 				On("GetDraftCount", mock.Anything, "", 456).
 				Return(sirius.DocumentDraftCount{DraftCount: 0}, nil)
 			client.
@@ -220,6 +213,9 @@ func TestGetCompareDocsPanes(t *testing.T) {
 					On("DocumentByUUID", mock.Anything, doc.UUID).
 					Return(doc, nil)
 			}
+			client.
+				On("CasesByDonor", mock.Anything, 77).
+				Return(caseItems, nil)
 
 			template := &mockTemplate{}
 			templateData := compareDocsData{
@@ -277,8 +273,28 @@ func TestGetCompareDocsPanes(t *testing.T) {
 func TestGetCompareDocsWhenGetUserDetailsErrors(t *testing.T) {
 	client := &mockCompareDocsClient{}
 	client.
-		On("GetPersonDocuments", mock.Anything, 77, []string{"456"}).
+		On("CasesByDonor", mock.Anything, 77).
+		Return([]sirius.Case{{ID: 456, UID: "case-uid"}}, nil)
+	client.
+		On("Person", mock.Anything, 77).
+		Return(sirius.Person{}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 77).
+		Return([]sirius.PersonReference{}, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "", 456).
+		Return(sirius.DocumentDraftCount{DraftCount: 0}, nil)
+	client.
+		On("TasksForCase", mock.Anything, 456).
+		Return([]sirius.Task{}, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 77, mock.MatchedBy(func(ids []string) bool {
+			return len(ids) == 1 && ids[0] == "456"
+		})).
 		Return(sirius.DocumentList{}, errExample)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
 
 	server := newMockServer("/compare/{id}/{caseId}", CompareDocs(client, nil))
 
@@ -317,7 +333,12 @@ func TestGetCompareDocsWhenCaseErrors(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := &mockCompareDocsClient{}
 			client.
-				On("GetPersonDocuments", mock.Anything, 77, []string{"456"}).
+				On("CasesByDonor", mock.Anything, 77).
+				Return([]sirius.Case{{ID: 456, UID: "case-uid"}}, nil)
+			client.
+				On("GetPersonDocuments", mock.Anything, 77, mock.MatchedBy(func(ids []string) bool {
+					return len(ids) == 1 && ids[0] == "456"
+				})).
 				Return(documentList, nil)
 			client.
 				On("Person", mock.Anything, 77).
@@ -325,9 +346,6 @@ func TestGetCompareDocsWhenCaseErrors(t *testing.T) {
 			client.
 				On("PersonReferences", mock.Anything, 77).
 				Return([]sirius.PersonReference{}, nil)
-			client.
-				On("Case", mock.Anything, 456).
-				Return(document.CaseItems[0], nil)
 			client.
 				On("GetDraftCount", mock.Anything, "", 456).
 				Return(sirius.DocumentDraftCount{DraftCount: 0}, nil)
@@ -353,6 +371,9 @@ func TestGetCompareDocsWhenCaseErrors(t *testing.T) {
 
 func TestGetCompareDocsBadID(t *testing.T) {
 	client := &mockCompareDocsClient{}
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
 	template := &mockTemplate{}
 
 	server := newMockServer("/compare/{id}/{caseId}", CompareDocs(client, template.Func))
