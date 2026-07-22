@@ -29,7 +29,7 @@
         </button>
         <a class="govuk-link govuk-link--no-visited-state"
            href=""
-           hx-get="{{ prefix (printf "/action-panel?donorId=%d" .DonorId) }}"
+           hx-get="{{ if .CaseId }}{{ prefix (printf "/action-panel?donorId=%d&uid[]=%s" .DonorId .CaseItem.UID) }}{{ else }}{{ prefix (printf "/action-panel?donorId=%d" .DonorId) }}{{ end }}"
            hx-target=".action-panel__content"
            hx-swap="innerHTML scroll:.action-panel__content:top">Cancel</a>
       </div>
