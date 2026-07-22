@@ -42,13 +42,12 @@ type PageVarsClient interface {
 func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 	ctx := getContext(r)
 
-	donorID, err := strToIntOrStatusError(r.PathValue("id"))
-	if err != nil || donorID == 0 {
-		donorID, err = strToIntOrStatusError(r.URL.Query().Get("id"))
+	donorID, _ := strToIntOrStatusError(r.PathValue("id"))
+	if donorID == 0 {
+		donorID, _ = strToIntOrStatusError(r.URL.Query().Get("id"))
 	}
-
-	if err != nil {
-		return PageVars{}, err
+	if donorID == 0 {
+		donorID, _ = strToIntOrStatusError(r.URL.Query().Get("donorId"))
 	}
 
 	caseUIDs := r.Form["uid[]"]
@@ -64,38 +63,35 @@ func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 	var casesOnDonor []sirius.Case
 	var person sirius.Person
 	var personReferences []sirius.PersonReference
+	var personHasReferences bool
 
-	group, _ := errgroup.WithContext(ctx.Context)
+	if donorID > 0 {
+		group, _ := errgroup.WithContext(ctx.Context)
 
-	group.Go(func() error {
-		var err error
-		userPermissions, err = client.GetUserPermissions(ctx)
-		return err
-	})
+		group.Go(func() error {
+			var err error
+			casesOnDonor, err = client.CasesByDonor(ctx, donorID)
+			return err
+		})
 
-	group.Go(func() error {
-		var err error
-		casesOnDonor, err = client.CasesByDonor(ctx, donorID)
-		return err
-	})
+		group.Go(func() error {
+			var err error
+			person, err = client.Person(ctx, donorID)
+			return err
+		})
 
-	group.Go(func() error {
-		var err error
-		person, err = client.Person(ctx, donorID)
-		return err
-	})
+		group.Go(func() error {
+			var err error
+			personReferences, err = client.PersonReferences(ctx, donorID)
+			return err
+		})
 
-	group.Go(func() error {
-		var err error
-		personReferences, err = client.PersonReferences(ctx, donorID)
-		return err
-	})
+		if err := group.Wait(); err != nil {
+			return PageVars{}, err
+		}
 
-	if err := group.Wait(); err != nil {
-		return PageVars{}, err
+		personHasReferences = len(personReferences) > 0
 	}
-
-	personHasReferences := len(personReferences) > 0
 
 	var selected []sirius.Case
 	var caseIDs []string
@@ -120,7 +116,7 @@ func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 	var docs sirius.DocumentList
 	var taskIDs []int
 
-	group, _ = errgroup.WithContext(ctx.Context)
+	group, _ := errgroup.WithContext(ctx.Context)
 
 	if len(selected) == 1 {
 		group.Go(func() error {
@@ -144,9 +140,18 @@ func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 		})
 	}
 
+	if donorID != 0 || len(caseIDs) != 0 {
+		group.Go(func() error {
+			var err error
+			docs, err = client.GetPersonDocuments(ctx, donorID, caseIDs)
+			return err
+		})
+
+	}
+
 	group.Go(func() error {
 		var err error
-		docs, err = client.GetPersonDocuments(ctx, donorID, caseIDs)
+		userPermissions, err = client.GetUserPermissions(ctx)
 		return err
 	})
 
