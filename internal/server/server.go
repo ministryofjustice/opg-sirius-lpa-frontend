@@ -119,7 +119,7 @@ type Client interface {
 var decoder = form.NewDecoder()
 
 func New(logger *slog.Logger, client Client, templates template.Templates, prefix, siriusPublicURL, webDir string) http.Handler {
-	wrap := errorHandler(client, templates.Get("error.gohtml"), prefix, siriusPublicURL)
+	wrap := errorHandler(templates.Get("error.gohtml"), prefix, siriusPublicURL)
 	mux := http.NewServeMux()
 
 	mux.Handle("/", http.NotFoundHandler())
@@ -185,8 +185,8 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/delete-note", wrap(DeleteNote(client, templates.Get("delete-note.gohtml"))))
 	mux.Handle("/delete-payment", wrap(DeletePayment(client, templates.Get("delete-payment-wrapper.gohtml"), templates.Get("delete-payment-partial-wrapper.gohtml"))))
 	mux.Handle("/delete-relationship", wrap(DeleteRelationship(client, templates.Get("delete-relationship-wrapper.gohtml"), templates.Get("delete-relationship-partial-wrapper.gohtml"))))
-	mux.Handle("/donor/{donorId}/details", wrap(DonorDetails(client, templates.Get("donor_details.gohtml"))))
-	mux.Handle("/donor/{id}/documents", wrap(DocumentList(client, templates.Get("documents.gohtml"))))
+	mux.Handle("/donor/{donorId}/details", wrap(NoPageVarsHandler(DonorDetails(client, templates.Get("donor_details.gohtml")))))
+	mux.Handle("/donor/{id}/documents", wrap(PageVarsHandler(client, DocumentList(client, templates.Get("documents.gohtml")))))
 	mux.Handle("/donor/{donorId}/history", wrap(GetLpaHistory(client, templates.Get("lpa-history.gohtml"))))
 	mux.Handle("/view-document/{uuid}/{donorId}", wrap(ViewDocument(client, templates.Get("view-document.gohtml"))))
 	mux.Handle("/delete-document/{uuid}", wrap(DeleteDocument(client, templates.Get("delete-document.gohtml"))))
@@ -223,6 +223,13 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 }
 
 type Handler func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error
+type SimpleHandler func(w http.ResponseWriter, r *http.Request) error
+
+func NoPageVarsHandler(handler SimpleHandler) Handler {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
+		return handler(w, r)
+	}
+}
 
 type errorVars struct {
 	SiriusURL     string
@@ -285,12 +292,12 @@ func xsrfHandler(logger *slog.Logger, tmplError template.Template, siriusURL str
 	}
 }
 
-func errorHandler(client Client, tmplError template.Template, prefix, siriusURL string) func(next Handler) http.Handler {
+func errorHandler(tmplError template.Template, prefix, siriusURL string) func(next Handler) http.Handler {
 	return func(next Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			vars, err := permissionMiddleware(client, r)
+			vars := &PageVars{}
 
-			if err = next(*vars, w, r); err != nil {
+			if err := next(*vars, w, r); err != nil {
 				if errors.Is(err, context.Canceled) {
 					w.WriteHeader(499)
 					return
@@ -362,6 +369,16 @@ func errorHandler(client Client, tmplError template.Template, prefix, siriusURL 
 				}
 			}
 		})
+	}
+}
+
+func PageVarsHandler(client Client, handler Handler) Handler {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
+		vars, err := permissionMiddleware(client, r)
+		if err != nil {
+			return err
+		}
+		return handler(*vars, w, r)
 	}
 }
 
