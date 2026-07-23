@@ -21,26 +21,26 @@
     </head>
 
     <body class="govuk-template__body app-body-class" data-prefix="{{ prefix "" }}">
-    <script src="{{ prefixAsset "/javascript/load-classes.js" }}"></script>
-    <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
+      <script src="{{ prefixAsset "/javascript/load-classes.js" }}"></script>
+      <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
 
-    {{ template "header" . }}
+      {{ template "header" . }}
 
-    {{ block "sirius-header" . }}{{ end }}
+      {{ block "sirius-header" . }}{{ end }}
 
-    <div class="govuk-width-container{{ block "container-classes" . }}{{ end }}">
+      <div class="govuk-width-container{{ block "container-classes" . }}{{ end }}">
         {{ block "backlink" . }}{{ end }}
 
-      <main class="govuk-main-wrapper" id="main-content" role="main">
-          {{ block "main" . }}{{ end }}
-      </main>
+        <main class="govuk-main-wrapper" id="main-content" role="main">
+            {{ block "main" . }}{{ end }}
+        </main>
 
         {{ block "action-panel-wrapper" . }}{{ end }}
-    </div>
+      </div>
 
-    <footer class="govuk-footer app-!-embedded-hide" role="contentinfo"></footer>
+      <footer class="govuk-footer app-!-embedded-hide" role="contentinfo"></footer>
 
-    <script src="{{ prefixAsset "/javascript/main.js" }}" type="module"></script>
+      <script src="{{ prefixAsset "/javascript/main.js" }}" type="module"></script>
     </body>
     </html>
   {{ end }}
