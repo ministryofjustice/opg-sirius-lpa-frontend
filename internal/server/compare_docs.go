@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -47,7 +48,11 @@ type viewingDocumentData struct {
 }
 
 func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
+		if pageVars.UserPermissions == nil {
+			return errors.New("could not retrieve user permissions")
+		}
+
 		donorID, err := strToIntOrStatusError(r.PathValue("id"))
 		if err != nil {
 			return err
@@ -178,7 +183,7 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 			}
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, ctx.Permissions)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, data.CaseUids, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, pageVars.UserPermissions)
 
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,
@@ -187,8 +192,8 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 			Calendar:       true,
 		}
 
-		data.HasV1PersonsGetPermission = ctx.Permissions.Includes("v1-persons", "GET")
-		data.HasV1PersonsCasesGetPermission = ctx.Permissions.Includes("v1-persons-cases", "GET")
+		data.HasV1PersonsGetPermission = pageVars.UserPermissions.Includes("v1-persons", "GET")
+		data.HasV1PersonsCasesGetPermission = pageVars.UserPermissions.Includes("v1-persons-cases", "GET")
 
 		viewingADocumentAndList := data.Pane1 == "doc" && data.Pane2 == "list"
 		if viewingADocumentAndList {

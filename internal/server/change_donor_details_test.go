@@ -128,7 +128,7 @@ func TestGetChangeDonorDetails(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/change-donor-details/?uid=M-AAAA-1111-BBBB", nil)
 	w := httptest.NewRecorder()
 
-	err := ChangeDonorDetails(client, template.Func)(w, r)
+	err := ChangeDonorDetails(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -179,7 +179,7 @@ func assertChangeDonorDetailsErrors(t *testing.T, client *mockChangeDonorDetails
 	r, _ := http.NewRequest(http.MethodGet, "/change-donor-details/?uid="+uid, nil)
 	w := httptest.NewRecorder()
 
-	err := ChangeDonorDetails(client, nil)(w, r)
+	err := ChangeDonorDetails(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, expectedError, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -234,7 +234,7 @@ func TestGetChangeDonorDetailsWithDonorIdentityCheck(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/change-donor-details/?uid=M-AAAA-1111-BBBB", nil)
 	w := httptest.NewRecorder()
 
-	err := ChangeDonorDetails(client, template.Func)(w, r)
+	err := ChangeDonorDetails(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -291,7 +291,7 @@ func TestGetChangeDonorDetailsWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/change-donor-details/?uid=M-AAAA-1111-BBBB", nil)
 	w := httptest.NewRecorder()
 
-	err := ChangeDonorDetails(client, template.Func)(w, r)
+	err := ChangeDonorDetails(client, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -379,7 +379,7 @@ func TestPostChangeDonorDetails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := ChangeDonorDetails(client, template.Func)(w, r)
+	err := ChangeDonorDetails(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/lpa/M-AAAA-1111-BBBB/lpa-details"), err)
@@ -469,7 +469,7 @@ func TestPostChangeDonorDetailsWhenAPIFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := ChangeDonorDetails(client, template.Func)(w, r)
+	err := ChangeDonorDetails(client, template.Func)(PageVars{}, w, r)
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
@@ -531,7 +531,7 @@ func TestPostChangeDonorDetailsWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := ChangeDonorDetails(client, template.Func)(w, r)
+	err := ChangeDonorDetails(client, template.Func)(PageVars{}, w, r)
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

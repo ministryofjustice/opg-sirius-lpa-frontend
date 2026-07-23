@@ -62,7 +62,7 @@ func TestGetManageFees(t *testing.T) {
 		r, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/?id=%d", test.caseItem.ID), nil)
 		w := httptest.NewRecorder()
 
-		err := ManageFees(client, template.Func)(w, r)
+		err := ManageFees(client, template.Func)(PageVars{}, w, r)
 		resp := w.Result()
 
 		assert.Nil(t, err)

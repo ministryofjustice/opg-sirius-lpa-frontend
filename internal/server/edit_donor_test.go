@@ -48,7 +48,7 @@ func TestGetEditDonor(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/edit-donor?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditDonor(client, template.Func, nil)(w, r)
+	err := EditDonor(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -83,7 +83,7 @@ func TestGetEditDonorHtmxRequest(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := EditDonor(client, template.Func, partialTemplate.Func)(w, r)
+	err := EditDonor(client, template.Func, partialTemplate.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -163,7 +163,7 @@ func TestPostEditDonor(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditDonor(client, template.Func, nil)(w, r)
+	err := EditDonor(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -195,7 +195,7 @@ func TestPostEditDonorWhenAPIFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditDonor(client, template.Func, nil)(w, r)
+	err := EditDonor(client, template.Func, nil)(PageVars{}, w, r)
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
@@ -237,7 +237,7 @@ func TestPostEditDonorWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditDonor(client, template.Func, nil)(w, r)
+	err := EditDonor(client, template.Func, nil)(PageVars{}, w, r)
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

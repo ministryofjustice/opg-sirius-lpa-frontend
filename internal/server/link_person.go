@@ -25,7 +25,7 @@ type linkPersonData struct {
 }
 
 func LinkPerson(client LinkPersonClient, tmpl template.Template, partialTmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		person1ID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err

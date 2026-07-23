@@ -38,7 +38,7 @@ type formDecisionsDetails struct {
 
 func UpdateDecisions(client UpdateDecisionsClient, tmpl template.Template) Handler {
 
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		caseUID := r.PathValue("uid")
 		ctx := getContext(r)
 

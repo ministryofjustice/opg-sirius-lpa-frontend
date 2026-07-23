@@ -95,7 +95,7 @@ func TestGetEvent(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, tc.url, nil)
 			w := httptest.NewRecorder()
 
-			err := Event(client, template.Func, nil)(w, r)
+			err := Event(client, template.Func, nil)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -128,7 +128,7 @@ func TestGetEventBadQueryString(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := Event(client, template.Func, nil)(w, r)
+			err := Event(client, template.Func, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -147,7 +147,7 @@ func TestGetEventWhenNoteTypeErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=person", nil)
 	w := httptest.NewRecorder()
 
-	err := Event(client, nil, nil)(w, r)
+	err := Event(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -169,7 +169,7 @@ func TestGetEventWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=person", nil)
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func, nil)(w, r)
+	err := Event(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -207,7 +207,7 @@ func TestPostEvent(t *testing.T) {
 	r.Header.Add("Content-Type", form.FormDataContentType())
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func, nil)(w, r)
+	err := Event(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -250,7 +250,7 @@ func TestPostEventWithFile(t *testing.T) {
 	r.Header.Add("Content-Type", form.FormDataContentType())
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func, nil)(w, r)
+	err := Event(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -276,7 +276,7 @@ func TestPostEventWithBadForm(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123&entity=person", &buf)
 	w := httptest.NewRecorder()
 
-	err := Event(client, nil, nil)(w, r)
+	err := Event(client, nil, nil)(PageVars{}, w, r)
 
 	assert.NotNil(t, err)
 }
@@ -314,7 +314,7 @@ func TestPostEventWhenCreateNoteFails(t *testing.T) {
 	r.Header.Add("Content-Type", form.FormDataContentType())
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func, nil)(w, r)
+	err := Event(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -362,7 +362,7 @@ func TestPostEventWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", form.FormDataContentType())
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func, nil)(w, r)
+	err := Event(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -404,7 +404,7 @@ func TestPostEventDigitalLpaRedirect(t *testing.T) {
 	r.Header.Add("Content-Type", form.FormDataContentType())
 	w := httptest.NewRecorder()
 
-	err := Event(client, template.Func, nil)(w, r)
+	err := Event(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, RedirectError("/lpa/M-EEEE-AAAA-TTTT"), err)
 }
@@ -432,7 +432,7 @@ func TestGetEventHtmx(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := Event(client, nil, template.Func)(w, r)
+	err := Event(client, nil, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -474,7 +474,7 @@ func TestPostEventHtmx(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := Event(client, nil, partialTemplate.Func)(w, r)
+	err := Event(client, nil, partialTemplate.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)

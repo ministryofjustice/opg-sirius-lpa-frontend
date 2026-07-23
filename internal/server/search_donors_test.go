@@ -31,7 +31,7 @@ func TestGetSearchDonors(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/?q=something", nil)
 
 	w := httptest.NewRecorder()
-	err := SearchDonors(client)(w, req)
+	err := SearchDonors(client)(PageVars{}, w, req)
 
 	assert.Nil(t, err)
 	resp := w.Result()
@@ -53,7 +53,7 @@ func TestGetSearchDonorsWhenError(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/?q=something", nil)
 
 	w := httptest.NewRecorder()
-	err := SearchDonors(client)(w, req)
+	err := SearchDonors(client)(PageVars{}, w, req)
 
 	assert.Equal(t, errExample, err)
 }

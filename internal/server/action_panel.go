@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -16,7 +17,6 @@ type ActionPanelClient interface {
 	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
 	Person(ctx sirius.Context, id int) (sirius.Person, error)
 	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
-	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
 	TasksForCase(ctx sirius.Context, caseId int) ([]sirius.Task, error)
 }
 
@@ -26,7 +26,11 @@ type ActionPanelData struct {
 }
 
 func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
+		if pageVars.UserPermissions == nil {
+			return errors.New("could not retrieve user permissions")
+		}
+
 		err := r.ParseForm()
 		if err != nil {
 			return err
@@ -56,7 +60,6 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		var draftCount int
 		var personHasReferences bool
 		var selectedCases []sirius.Case
-		var userPermissions sirius.Permissions
 		var taskIDs []int
 		group.Go(func() error {
 			if donorId > 0 {
@@ -129,7 +132,7 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences, personHasLinks, taskIDs, ctx.Permissions)
+		data.ActionPanelButtons = GetActionPanelButtons(selectedCases, donorId, caseUidsString, draftCount > 0, personHasReferences, personHasLinks, taskIDs, pageVars.UserPermissions)
 
 		return tmpl(w, data)
 	}

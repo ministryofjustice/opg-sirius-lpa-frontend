@@ -70,7 +70,7 @@ func TestGetSearch(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/search?term=bob", nil)
 	w := httptest.NewRecorder()
 
-	err := Search(client, template.Func)(w, req)
+	err := Search(client, template.Func)(PageVars{}, w, req)
 	assert.Nil(t, err)
 
 	resp := w.Result()
@@ -125,7 +125,7 @@ func TestGetSearchFiltered(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/search?term=bob&person-type=Donor&person-type=Attorney", nil)
 	w := httptest.NewRecorder()
 
-	err := Search(client, template.Func)(w, req)
+	err := Search(client, template.Func)(PageVars{}, w, req)
 	assert.Nil(t, err)
 
 	resp := w.Result()
@@ -177,7 +177,7 @@ func TestGetSearchPaginationCalculations(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/search?term=bob&page=2", nil)
 	w := httptest.NewRecorder()
 
-	err := Search(client, template.Func)(w, req)
+	err := Search(client, template.Func)(PageVars{}, w, req)
 	assert.Nil(t, err)
 
 	resp := w.Result()
@@ -232,7 +232,7 @@ func TestGetSearchCallsDeletedCasesOnFallback(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/search?term=7000-0000-5678", nil)
 	w := httptest.NewRecorder()
 
-	err := Search(client, template.Func)(w, req)
+	err := Search(client, template.Func)(PageVars{}, w, req)
 	assert.Nil(t, err)
 
 	resp := w.Result()
@@ -263,7 +263,7 @@ func TestGetSearchGetDeletedCasesFailure(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/search?term=7000-0000-5678", nil)
 	w := httptest.NewRecorder()
 
-	err := Search(client, nil)(w, req)
+	err := Search(client, nil)(PageVars{}, w, req)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -288,7 +288,7 @@ func TestGetSearchBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, urlParams, nil)
 			w := httptest.NewRecorder()
 
-			err := Search(nil, template.Func)(w, r)
+			err := Search(nil, template.Func)(PageVars{}, w, r)
 
 			assert.Nil(t, err)
 		})
@@ -308,7 +308,7 @@ func TestGetSearchErrors(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/search?term=bob", nil)
 	w := httptest.NewRecorder()
 
-	err := Search(client, nil)(w, req)
+	err := Search(client, nil)(PageVars{}, w, req)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -352,7 +352,7 @@ func TestGetSearchTemplateErrors(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/search?term=bob", nil)
 	w := httptest.NewRecorder()
 
-	err := Search(client, template.Func)(w, req)
+	err := Search(client, template.Func)(PageVars{}, w, req)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)

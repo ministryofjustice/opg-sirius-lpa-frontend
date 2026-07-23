@@ -27,7 +27,7 @@ type updateObjectionData struct {
 
 func UpdateObjection(client UpdateObjectionClient, formTmpl template.Template, confirmTmpl template.Template) Handler {
 
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		caseUID := r.PathValue("uid")
 		objectionID := r.PathValue("id")
 

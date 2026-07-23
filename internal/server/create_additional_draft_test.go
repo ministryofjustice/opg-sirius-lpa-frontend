@@ -66,7 +66,7 @@ func TestGetCreateAdditionalDraft(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/create-additional-draft-lpa/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateAdditionalDraft(client, template.Func)(w, r)
+	err := CreateAdditionalDraft(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -91,7 +91,7 @@ func TestGetCreateAdditionalDraftForbidden(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/create-additional-draft-lpa/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateAdditionalDraft(client, template.Func)(w, r)
+	err := CreateAdditionalDraft(client, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, sirius.StatusError{Code: 403}, err)
 
@@ -181,7 +181,7 @@ func TestPostCreateAdditionalDraft(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateAdditionalDraft(client, template.Func)(w, r)
+	err := CreateAdditionalDraft(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -253,7 +253,7 @@ func TestPostCreateAdditionalDraftDonorOtherAddress(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateAdditionalDraft(client, template.Func)(w, r)
+	err := CreateAdditionalDraft(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -289,7 +289,7 @@ func TestPostCreateAdditionalDraftWhenAPIFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateAdditionalDraft(client, template.Func)(w, r)
+	err := CreateAdditionalDraft(client, template.Func)(PageVars{}, w, r)
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
@@ -338,7 +338,7 @@ func TestPostCreateAdditionalDraftWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateAdditionalDraft(client, template.Func)(w, r)
+	err := CreateAdditionalDraft(client, template.Func)(PageVars{}, w, r)
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
@@ -354,7 +354,7 @@ func TestCreateAdditionalDraftNoID(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, testUrl, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateAdditionalDraft(nil, nil)(w, r)
+			err := CreateAdditionalDraft(nil, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -390,7 +390,7 @@ func TestPostCreateAdditionalDraftWhenUserDetailsErrors(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateAdditionalDraft(client, template.Func)(w, r)
+	err := CreateAdditionalDraft(client, template.Func)(PageVars{}, w, r)
 	assert.Equal(t, errExample, err)
 }
 
@@ -423,6 +423,6 @@ func TestPostCreateAdditionalDraftWhenPersonErrors(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateAdditionalDraft(client, template.Func)(w, r)
+	err := CreateAdditionalDraft(client, template.Func)(PageVars{}, w, r)
 	assert.Equal(t, errExample, err)
 }

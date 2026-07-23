@@ -67,7 +67,7 @@ func TestGetAddPayment(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, template.Func, template.Func)(w, r)
+	err := AddPayment(client, template.Func, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -86,7 +86,7 @@ func TestAddPaymentNoID(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, testUrl, nil)
 			w := httptest.NewRecorder()
 
-			err := AddPayment(nil, nil, nil)(w, r)
+			err := AddPayment(nil, nil, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -113,7 +113,7 @@ func TestAddPaymentWhenFailureOnGetCase(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, nil, nil)(w, r)
+	err := AddPayment(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -153,7 +153,7 @@ func TestAddPaymentWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, template.Func, template.Func)(w, r)
+	err := AddPayment(client, template.Func, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -176,7 +176,7 @@ func TestAddPaymentWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, nil, nil)(w, r)
+	err := AddPayment(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -216,7 +216,7 @@ func TestPostAddPayment(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, template.Func, template.Func)(w, r)
+	err := AddPayment(client, template.Func, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/payments/123"), err)
@@ -270,7 +270,7 @@ func TestPostAddPaymentHTMX(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, nil, template.Func)(w, r)
+	err := AddPayment(client, nil, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -328,7 +328,7 @@ func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := AddPayment(client, template.Func, template.Func)(w, r)
+			err := AddPayment(client, template.Func, template.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -372,7 +372,7 @@ func TestPostAddPaymentToDigitalLpa(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, template.Func, template.Func)(w, r)
+	err := AddPayment(client, template.Func, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/lpa/M-AAAA-BBBB-CCCC/payments"), err)

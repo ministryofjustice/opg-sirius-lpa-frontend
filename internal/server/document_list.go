@@ -46,7 +46,7 @@ type documentPageData struct {
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(app PageVars, w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
 			return err
 		}
@@ -182,14 +182,14 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			data.SelectedCaseIds += strconv.Itoa(selectedCase.ID)
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, ctx.Permissions)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, app.UserPermissions)
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,
 			Calendar:       true,
 		}
 
-		data.HasV1PersonsGetPermission = ctx.Permissions.Includes("v1-persons", "GET")
-		data.HasV1PersonsCasesGetPermission = ctx.Permissions.Includes("v1-persons-cases", "GET")
+		data.HasV1PersonsGetPermission = app.UserPermissions.Includes("v1-persons", "GET")
+		data.HasV1PersonsCasesGetPermission = app.UserPermissions.Includes("v1-persons-cases", "GET")
 
 		return tmpl(w, data)
 	}

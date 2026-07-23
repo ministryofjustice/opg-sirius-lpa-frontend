@@ -58,7 +58,7 @@ func TestGetDeleteRelationship(t *testing.T) {
 				r.Header.Add("HX-Request", "true")
 			}
 
-			err := DeleteRelationship(client, template.Func, template.Func)(w, r)
+			err := DeleteRelationship(client, template.Func, template.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -72,7 +72,7 @@ func TestGetDeleteRelationshipNoID(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
-	err := DeleteRelationship(nil, nil, nil)(w, r)
+	err := DeleteRelationship(nil, nil, nil)(PageVars{}, w, r)
 
 	assert.NotNil(t, err)
 }
@@ -89,7 +89,7 @@ func TestGetDeleteRelationshipWhenPersonErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := DeleteRelationship(client, nil, nil)(w, r)
+	err := DeleteRelationship(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -107,7 +107,7 @@ func TestGetDeleteRelationshipWhenPersonReferencesErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := DeleteRelationship(client, nil, nil)(w, r)
+	err := DeleteRelationship(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -134,7 +134,7 @@ func TestGetDeleteRelationshipWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := DeleteRelationship(client, template.Func, nil)(w, r)
+	err := DeleteRelationship(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -170,7 +170,7 @@ func TestPostDeleteRelationship(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := DeleteRelationship(client, template.Func, nil)(w, r)
+	err := DeleteRelationship(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -192,7 +192,7 @@ func TestPostDeleteRelationshipWhenDeletePersonReferenceErrors(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := DeleteRelationship(client, nil, nil)(w, r)
+	err := DeleteRelationship(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -230,7 +230,7 @@ func TestPostDeleteRelationshipWhenNoRelationshipSelectedValidationError(t *test
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	_ = DeleteRelationship(client, template.Func, nil)(w, r)
+	_ = DeleteRelationship(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)

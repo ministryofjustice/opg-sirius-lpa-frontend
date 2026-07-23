@@ -31,7 +31,7 @@ type formResolveObjection struct {
 
 func ResolveObjection(client ResolveObjectionClient, formTmpl template.Template) Handler {
 
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		caseUID := r.PathValue("uid")
 		objectionID := r.PathValue("id")
 

@@ -128,7 +128,7 @@ func TestGetEditDocument(t *testing.T) {
 				r.Header.Add("HX-Request", "true")
 			}
 
-			err := EditDocument(client, template.Func, template.Func)(w, r)
+			err := EditDocument(client, template.Func, template.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -202,7 +202,7 @@ func TestPostSaveDocument(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := EditDocument(client, template.Func, nil)(w, r)
+			err := EditDocument(client, template.Func, nil)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -280,7 +280,7 @@ func TestPostDeleteDocument(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := EditDocument(client, template.Func, nil)(w, r)
+			err := EditDocument(client, template.Func, nil)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Equal(t, errExample, err)
@@ -367,7 +367,7 @@ func TestPostPublishDocument(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := EditDocument(client, template.Func, nil)(w, r)
+			err := EditDocument(client, template.Func, nil)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Equal(t, errExample, err)
@@ -443,7 +443,7 @@ func TestPostPreviewDocument(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditDocument(client, template.Func, nil)(w, r)
+	err := EditDocument(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -497,7 +497,7 @@ func TestPostSaveDocumentAndExit(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := EditDocument(client, template.Func, nil)(w, r)
+			err := EditDocument(client, template.Func, nil)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Equal(t, errExample, err)
@@ -519,7 +519,7 @@ func TestGetEditDocumentBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := EditDocument(nil, nil, nil)(w, r)
+			err := EditDocument(nil, nil, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -535,7 +535,7 @@ func TestGetEditDocumentWhenCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=222&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := EditDocument(client, nil, nil)(w, r)
+	err := EditDocument(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -558,7 +558,7 @@ func TestGetCreateDocumentWhenFailureOnDocuments(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=535&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := EditDocument(client, nil, nil)(w, r)
+	err := EditDocument(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -594,7 +594,7 @@ func TestGetCreateDocumentWhenFailureOnDocumentByUUID(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=843&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := EditDocument(client, nil, nil)(w, r)
+	err := EditDocument(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -640,7 +640,7 @@ func TestGetEditDocumentWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := EditDocument(client, template.Func, nil)(w, r)
+	err := EditDocument(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)

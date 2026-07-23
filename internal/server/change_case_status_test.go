@@ -94,7 +94,7 @@ func TestGetChangeCaseStatus(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/change-case-status?uid=M-9876-9876-9876", nil)
 	w := httptest.NewRecorder()
 
-	err := ChangeCaseStatus(client, template.Func)(w, r)
+	err := ChangeCaseStatus(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -166,7 +166,7 @@ func TestPostChangeCaseStatus(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := ChangeCaseStatus(client, template.Func)(w, r)
+	err := ChangeCaseStatus(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/lpa/M-9876-9876-9876"), err)
@@ -240,7 +240,7 @@ func TestPostChangeCaseStatusWithReason(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := ChangeCaseStatus(client, template.Func)(w, r)
+	err := ChangeCaseStatus(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/lpa/M-9876-9876-9876"), err)

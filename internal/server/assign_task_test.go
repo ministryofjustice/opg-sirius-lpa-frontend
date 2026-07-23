@@ -66,7 +66,7 @@ func TestGetAssignTask(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, template.Func, nil)(w, r)
+	err := AssignTask(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -99,7 +99,7 @@ func TestGetAssignTaskWithDonorAndUID(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&donorId=82&uid[]=7000-0000-0000", nil)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, template.Func, nil)(w, r)
+	err := AssignTask(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -133,7 +133,7 @@ func TestGetAssignTaskMultiple(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&id=456", nil)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, template.Func, nil)(w, r)
+	err := AssignTask(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -153,7 +153,7 @@ func TestGetAssignTaskBadQueryString(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := AssignTask(nil, nil, nil)(w, r)
+			err := AssignTask(nil, nil, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -164,7 +164,7 @@ func TestGetAssignTaskBadDonorID(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&donorId=what", nil)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(nil, nil, nil)(w, r)
+	err := AssignTask(nil, nil, nil)(PageVars{}, w, r)
 
 	assert.NotNil(t, err)
 }
@@ -181,7 +181,7 @@ func TestGetAssignTaskWhenTeamsErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, nil, nil)(w, r)
+	err := AssignTask(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -199,7 +199,7 @@ func TestGetAssignTaskWhenTaskErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, nil, nil)(w, r)
+	err := AssignTask(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -222,7 +222,7 @@ func TestGetAssignTaskWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, template.Func, nil)(w, r)
+	err := AssignTask(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -254,7 +254,7 @@ func TestGetAssignTaskHtmx(t *testing.T) {
 	r.Header.Set("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, nil, partialTemplate.Func)(w, r)
+	err := AssignTask(client, nil, partialTemplate.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -296,7 +296,7 @@ func TestPostAssignTask(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, template.Func, nil)(w, r)
+	err := AssignTask(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -342,7 +342,7 @@ func TestPostAssignTaskToMe(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, template.Func, nil)(w, r)
+	err := AssignTask(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -373,7 +373,7 @@ func TestPostAssignTaskWhenUserDetailsErrors(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, nil, nil)(w, r)
+	err := AssignTask(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -419,7 +419,7 @@ func TestPostAssignTaskMultiple(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, template.Func, nil)(w, r)
+	err := AssignTask(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -448,7 +448,7 @@ func TestPostAssignTaskWhenAssignTaskFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, nil, nil)(w, r)
+	err := AssignTask(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -494,7 +494,7 @@ func TestPostAssignTaskWhenAssignToNotSet(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, template.Func, nil)(w, r)
+	err := AssignTask(client, template.Func, nil)(PageVars{}, w, r)
 	assert.Nil(t, err)
 
 	resp := w.Result()
@@ -562,7 +562,7 @@ func TestPostAssignTaskWhenValidationError(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := AssignTask(client, template.Func, nil)(w, r)
+			err := AssignTask(client, template.Func, nil)(PageVars{}, w, r)
 			assert.Nil(t, err)
 
 			resp := w.Result()
@@ -599,7 +599,7 @@ func TestPostAssignTaskToDigitalLpaRedirects(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, template.Func, nil)(w, r)
+	err := AssignTask(client, template.Func, nil)(PageVars{}, w, r)
 
 	redirectError := RedirectError(fmt.Sprintf("/lpa/%s", uid))
 	assert.Equal(t, redirectError, err)
@@ -642,7 +642,7 @@ func TestPostAssignTaskHtmx(t *testing.T) {
 	r.Header.Set("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, nil, partialTemplate.Func)(w, r)
+	err := AssignTask(client, nil, partialTemplate.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -688,7 +688,7 @@ func TestPostAssignTaskToCaseOwner(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, template.Func, nil)(w, r)
+	err := AssignTask(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -737,7 +737,7 @@ func TestPostAssignTaskToCaseOwnerMultiple(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, template.Func, nil)(w, r)
+	err := AssignTask(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -765,7 +765,7 @@ func TestPostAssignTaskToCaseOwnerWhenCaseErrors(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, nil, nil)(w, r)
+	err := AssignTask(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -796,7 +796,7 @@ func TestPostAssignTaskToCaseOwnerWhenAssignTaskFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, nil, nil)(w, r)
+	err := AssignTask(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
