@@ -371,7 +371,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"personInfoRow":     personInfoRow,
 		"hasField": func(v interface{}, name string) bool {
 			rv := reflect.ValueOf(v)
-			if rv.Kind() == reflect.Ptr {
+			if rv.Kind() == reflect.Pointer {
 				rv = rv.Elem()
 			}
 			if rv.Kind() != reflect.Struct {
