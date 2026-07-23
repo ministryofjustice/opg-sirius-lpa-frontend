@@ -10,7 +10,12 @@ describe("Action Panel", () => {
             id: 34,
             uId: "7000-1234-1234",
           },
-          { caseType: "LPA", caseSubtype: "hw", id: 78, uId: "7000-5678-5678" },
+          {
+            caseType: "LPA",
+            caseSubtype: "hw",
+            id: 78,
+            uId: "7000-5678-5678",
+          },
           {
             caseType: "EPA",
             caseSubtype: "pfa",
@@ -474,7 +479,16 @@ describe("Action Panel", () => {
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Add investigation");
 
-    cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
+    cy.addMock("/lpa-api/v1/cases/34", "GET", {
+      status: 200,
+      body: {
+        caseType: "LPA",
+        caseSubtype: "pfa",
+        id: 34,
+        uId: "7000-1234-1234",
+        donor: { id: 1 },
+      },
+    });
 
     cy.get("a#action-panel-button-add-investigation").click();
     cy.get(".action-panel__form").should("exist");

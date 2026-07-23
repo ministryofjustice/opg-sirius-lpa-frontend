@@ -114,6 +114,24 @@ describe("View documents", () => {
         },
       ],
     });
+
+    cy.addMock(
+      "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0&limit=999",
+      "GET",
+      {
+        status: 200,
+        body: {
+          documents: [
+            {
+              uuid: "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+              filename: "LP-A.pdf",
+              direction: "Outgoing",
+              createdDate: "15/12/2022 13:41:04",
+            },
+          ],
+        },
+      },
+    );
   });
 
   it("views a document as a user with system admin role", () => {
