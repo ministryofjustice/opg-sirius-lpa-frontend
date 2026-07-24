@@ -1,0 +1,35 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ .Title }}{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        <meta data-app-select-case="{{ .CaseId }}"/>
+        {{ if .CaseId }}
+            {{ template "success-banner" "You have successfully updated an LPA." }}
+        {{ else }}
+            {{ template "success-banner" "You have successfully created an LPA." }}
+        {{ end }}
+      {{ end }}
+
+      <p class="govuk-body app-lpa__donor-info">{{ .DonorName }}{{ if .CaseId }} – <span class="app-lpa__donor-info--{{ .CaseItem.SubType }}">{{ ToUpper .CaseItem.SubType }}</span> {{ .CaseItem.UID }}{{ end }}</p>
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">{{ .Title }}</h1>
+
+      <form class="form" method="POST">
+        {{ template "create-lpa" . }}
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit"
+                  data-disable-after-click="true">Save and exit
+          </button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}

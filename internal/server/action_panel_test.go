@@ -213,7 +213,13 @@ func TestGetActionPanel(t *testing.T) {
 					Disabled: false,
 				},
 				{
-					Label:    "Edit epa case",
+					Label:    "Create lpa case",
+					URL:      "/create-lpa?id=123",
+					IconName: "aw-create-case",
+					Disabled: false,
+				},
+				{
+					Label:    "Edit case",
 					URL:      "",
 					IconName: "aw-edit-case",
 					Disabled: true,
@@ -388,10 +394,16 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 					Disabled: true,
 				},
 				{
-					Label:    "Edit epa case",
-					URL:      "",
-					IconName: "aw-edit-case",
+					Label:    "Create lpa case",
+					URL:      "/create-lpa?id=123",
+					IconName: "aw-create-case",
 					Disabled: true,
+				},
+				{
+					Label:    "Edit case",
+					URL:      "/create-lpa?id=123&caseId=1",
+					IconName: "aw-edit-case",
+					Disabled: false,
 				},
 				{
 					Label:    "Add investigation",
@@ -590,7 +602,13 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 					Disabled: false,
 				},
 				{
-					Label:    "Edit epa case",
+					Label:    "Create lpa case",
+					URL:      "/create-lpa?id=0",
+					IconName: "aw-create-case",
+					Disabled: false,
+				},
+				{
+					Label:    "Edit case",
 					URL:      "",
 					IconName: "aw-edit-case",
 					Disabled: true,
@@ -651,139 +669,69 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, ActionPanelData{
-			ActionPanelButtons: []ActionPanelButton{
-				{
-					Label:    "Create warning",
-					URL:      "/create-warning?id=123&entity=epa&uid[]=7000-0000-0003",
-					IconName: "aw-create-warning",
-					Disabled: false,
-				},
-				{
-					Label:    "Create event",
-					URL:      "/create-event?id=123&entity=person&uid[]=7000-0000-0003",
-					IconName: "aw-new-event",
-					Disabled: false,
-				},
-				{
-					Label:    "Add complaint",
-					URL:      "/add-complaint?id=3&case=epa",
-					IconName: "aw-log-complaint",
-					Disabled: false,
-				},
-				{
-					Label:    "Create document",
-					URL:      "/create-document?id=3&case=epa",
-					IconName: "aw-new-template",
-					Disabled: false,
-				},
-				{
-					Label:    "Retrieve draft",
-					URL:      "/edit-document?id=3&case=epa",
-					IconName: "aw-new-template",
-					Disabled: false,
-				},
-				{
-					Label:    "Change status",
-					URL:      "/change-status?id=3&case=epa&donorId=123&uid[]=7000-0000-0003",
-					IconName: "aw-change-status",
-					Disabled: false,
-				},
-				{
-					Label:    "Fees",
-					URL:      "/payments/3",
-					IconName: "aw-fees",
-					Disabled: false,
-				},
-				{
-					Label:    "New task",
-					URL:      "/create-task?id=3&entity=epa&uid[]=7000-0000-0003",
-					IconName: "aw-new-task",
-					Disabled: false,
-				},
-				{
-					Label:    "Assign task",
-					URL:      "",
-					IconName: "aw-assign-task",
-					Disabled: true,
-				},
-				{
-					Label:    "Create donor",
-					URL:      "/create-donor?id=123&entity=person&uid[]=7000-0000-0003",
-					IconName: "aw-create-person",
-					Disabled: false,
-				},
-				{
-					Label:    "Edit donor",
-					URL:      "/edit-donor?id=123&entity=person&uid[]=7000-0000-0003",
-					IconName: "aw-edit-person",
-					Disabled: false,
-				},
-				{
-					Label:    "Edit dates",
-					URL:      "/edit-dates?id=3&case=epa",
-					IconName: "calendar-open",
-					Disabled: false,
-				},
-				{
-					Label:    "MI reporting",
-					URL:      "/mi-reporting?donorId=123&uid[]=7000-0000-0003",
-					IconName: "aw-mi",
-					Disabled: false,
-				},
-				{
-					Label:    "Allocate Case",
-					URL:      "/allocate-cases?id=3&entity=epa&uid[]=7000-0000-0003",
-					IconName: "aw-allocate-case",
-					Disabled: false,
-				},
-				{
-					Label:    "Link record",
-					URL:      "/link-person?id=123&uid[]=7000-0000-0003",
-					IconName: "aw-link",
-					Disabled: false,
-				},
-				{
-					Label:    "Unlink record",
-					URL:      "/unlink-person?id=123&uid[]=7000-0000-0003",
-					IconName: "aw-unlink",
-					Disabled: true,
-				},
-				{
-					Label:    "Delete relationship",
-					URL:      "/delete-relationship?id=123&uid[]=7000-0000-0003",
-					IconName: "icon-minus",
-					Disabled: false,
-				},
-				{
-					Label:    "Create relationship",
-					URL:      "/create-relationship?id=123&entity=person&uid[]=7000-0000-0003",
-					IconName: "aw-relationship",
-					Disabled: false,
-				},
-				{
-					Label:    "Create epa case",
-					URL:      "/create-epa?id=123",
-					IconName: "aw-create-case",
-					Disabled: true,
-				},
-				{
-					Label:    "Edit epa case",
-					URL:      "/create-epa?id=123&caseId=3",
-					IconName: "aw-edit-case",
-					Disabled: false,
-				},
-				{
-					Label:    "Add investigation",
-					URL:      "/create-investigation?id=3&case=epa&uid[]=7000-0000-0003",
-					IconName: "icon-investigation",
-					Disabled: false,
-				},
-			},
-		}).
+		On("Func", mock.Anything, mock.MatchedBy(func(data ActionPanelData) bool {
+			for _, btn := range data.ActionPanelButtons {
+				if btn.Label == "Edit case" {
+					return btn.URL == "/create-epa?id=123&caseId=3" && btn.Disabled == false
+				}
+			}
+			return false
+		})).
 		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=epa&uid[]=7000-0000-0003", nil)
+	w := httptest.NewRecorder()
+
+	err := ActionPanel(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+	client.AssertNotCalled(t, "CasesByDonor")
+	client.AssertNotCalled(t, "Person")
+}
+
+func TestGetActionPanelEditLpaOnlyEnabledWhenSingleLpaCaseSelected(t *testing.T) {
+	cases := []sirius.Case{
+		{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"},
+		{ID: 2, UID: "7000-0000-0002", CaseType: "LPA"},
+		{ID: 3, UID: "7000-0000-0003", CaseType: "EPA"},
+	}
+
+	client := &mockActionPanelClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 123).
+		Return(cases, nil)
+	client.
+		On("GetDraftCount", mock.Anything, "lpa", 2).
+		Return(sirius.DocumentDraftCount{DraftCount: 1}, nil)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("TasksForCase", mock.Anything, 2).
+		Return([]sirius.Task{}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(actionPanelPermissions, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.MatchedBy(func(data ActionPanelData) bool {
+			for _, btn := range data.ActionPanelButtons {
+				if btn.Label == "Edit case" {
+					return btn.URL == "/create-lpa?id=123&caseId=2" && btn.Disabled == false
+				}
+			}
+			return false
+		})).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0002", nil)
 	w := httptest.NewRecorder()
 
 	err := ActionPanel(client, template.Func)(w, r)

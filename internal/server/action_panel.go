@@ -65,7 +65,8 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	deleteRelationshipUrl := fmt.Sprintf("/delete-relationship?id=%d%s", donorId, caseUids)
 	createRelationshipUrl := fmt.Sprintf("/create-relationship?id=%d&entity=person%s", donorId, caseUids)
 	createEpaUrl := fmt.Sprintf("/create-epa?id=%d", donorId)
-	editEpaUrl := ""
+	createLpaUrl := fmt.Sprintf("/create-lpa?id=%d", donorId)
+	editCaseUrl := ""
 	complaintUrl := ""
 	createDocumentUrl := ""
 	createInvestigationUrl := ""
@@ -93,7 +94,9 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		createInvestigationUrl = fmt.Sprintf("/create-investigation?id=%d&case=%s%s", id, caseType, caseUids)
 
 		if strings.ToLower(selectedCase.CaseType) == "epa" {
-			editEpaUrl = fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, selectedCases[0].ID)
+			editCaseUrl = fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, selectedCases[0].ID)
+		} else if strings.ToLower(selectedCase.CaseType) == "lpa" {
+			editCaseUrl = fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, selectedCases[0].ID)
 		}
 
 		if hasDrafts {
@@ -260,10 +263,17 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 			Hidden:   !userPermissions.Includes("v1-donors-epas", "POST"),
 		},
 		{
-			Label:    "Edit epa case",
-			URL:      editEpaUrl,
+			Label:    "Create lpa case",
+			URL:      createLpaUrl,
+			IconName: "aw-create-case",
+			Disabled: caseUids != "",
+			Hidden:   !userPermissions.Includes("v1-donors-lpas", "POST"),
+		},
+		{
+			Label:    "Edit case",
+			URL:      editCaseUrl,
 			IconName: "aw-edit-case",
-			Disabled: len(selectedCases) != 1 || strings.ToLower(selectedCases[0].CaseType) != "epa",
+			Disabled: len(selectedCases) != 1,
 			Hidden:   !userPermissions.Includes("v1-lpas", "PUT"),
 		},
 		{

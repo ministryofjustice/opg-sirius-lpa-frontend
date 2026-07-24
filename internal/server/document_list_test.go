@@ -384,7 +384,14 @@ func TestGetDocumentList(t *testing.T) {
 					Hidden:   true,
 				},
 				{
-					Label:    "Edit epa case",
+					Label:    "Create lpa case",
+					URL:      "/create-lpa?id=82",
+					IconName: "aw-create-case",
+					Disabled: false,
+					Hidden:   true,
+				},
+				{
+					Label:    "Edit case",
 					URL:      "",
 					IconName: "aw-edit-case",
 					Disabled: true,
@@ -545,10 +552,17 @@ func TestGetDocumentList(t *testing.T) {
 					Hidden:   true,
 				},
 				{
-					Label:    "Edit epa case",
-					URL:      "",
+					Label:    "Create lpa case",
+					URL:      "/create-lpa?id=82",
+					IconName: "aw-create-case",
+					Disabled: false,
+					Hidden:   true,
+				},
+				{
+					Label:    "Edit case",
+					URL:      "/create-lpa?id=82&caseId=1",
 					IconName: "aw-edit-case",
-					Disabled: true,
+					Disabled: false,
 					Hidden:   true,
 				},
 				{
@@ -706,10 +720,17 @@ func TestGetDocumentList(t *testing.T) {
 					Hidden:   true,
 				},
 				{
-					Label:    "Edit epa case",
-					URL:      "",
-					IconName: "aw-edit-case",
+					Label:    "Create lpa case",
+					URL:      "/create-lpa?id=82",
+					IconName: "aw-create-case",
 					Disabled: true,
+					Hidden:   true,
+				},
+				{
+					Label:    "Edit case",
+					URL:      "/create-lpa?id=82&caseId=1",
+					IconName: "aw-edit-case",
+					Disabled: false,
 					Hidden:   true,
 				},
 				{
@@ -861,7 +882,6 @@ func TestGetDocumentList(t *testing.T) {
 					Hidden:   true,
 				},
 				{
-
 					Label:    "Create epa case",
 					URL:      "/create-epa?id=82",
 					IconName: "aw-create-case",
@@ -869,7 +889,14 @@ func TestGetDocumentList(t *testing.T) {
 					Hidden:   true,
 				},
 				{
-					Label:    "Edit epa case",
+					Label:    "Create lpa case",
+					URL:      "/create-lpa?id=82",
+					IconName: "aw-create-case",
+					Disabled: true,
+					Hidden:   true,
+				},
+				{
+					Label:    "Edit case",
 					URL:      "",
 					IconName: "aw-edit-case",
 					Disabled: true,
@@ -1242,7 +1269,14 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 						Hidden:   true,
 					},
 					{
-						Label:    "Edit epa case",
+						Label:    "Create lpa case",
+						URL:      "/create-lpa?id=82",
+						IconName: "aw-create-case",
+						Disabled: false,
+						Hidden:   true,
+					},
+					{
+						Label:    "Edit case",
 						URL:      "",
 						IconName: "aw-edit-case",
 						Disabled: true,
@@ -1475,7 +1509,14 @@ func TestDocumentListDismissValidation(t *testing.T) {
 						Hidden:   true,
 					},
 					{
-						Label:    "Edit epa case",
+						Label:    "Create lpa case",
+						URL:      "/create-lpa?id=82",
+						IconName: "aw-create-case",
+						Disabled: true,
+						Hidden:   true,
+					},
+					{
+						Label:    "Edit case",
 						URL:      "",
 						IconName: "aw-edit-case",
 						Disabled: true,
@@ -1883,10 +1924,17 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 						Hidden:   true,
 					},
 					{
-						Label:    "Edit epa case",
-						URL:      "",
+						Label:    "Create lpa case",
+						URL:      "/create-lpa?id=82",
+						IconName: "aw-create-case",
+						Disabled: false,
+						Hidden:   true,
+					},
+					{
+						Label:    "Edit case",
+						URL:      "/create-lpa?id=82&caseId=1",
 						IconName: "aw-edit-case",
-						Disabled: true,
+						Disabled: false,
 						Hidden:   true,
 					},
 					{
