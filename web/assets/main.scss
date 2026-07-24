@@ -713,7 +713,8 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
     font-size: 0.875rem;
   }
   .govuk-accordion__section-button,
-  .govuk-accordion__section-heading-text {
+  .govuk-accordion__section-heading-text,
+  .govuk-summary-card__title {
     font-size: 1rem;
   }
   .govuk-select,
@@ -1112,4 +1113,21 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
 
 #documentTextEditor {
   display: none;
+}
+
+.app-lpa__donor-info {
+  margin-left: -15px;
+  margin-right: -15px;
+  padding-bottom: 5px;
+  text-align: center;
+  border-bottom: 1px solid #cecece;
+
+  .app-lpa__donor-info--pfa {
+    font-weight: bold;
+    color: $sirius-teal;
+  }
+  .app-lpa__donor-info--hw {
+    font-weight: bold;
+    color: $sirius-green;
+  }
 }
