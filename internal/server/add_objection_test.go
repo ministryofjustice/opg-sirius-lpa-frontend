@@ -110,7 +110,7 @@ func TestGetAddObjectionsTemplate(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "add-objection?uid=M-9898-9898-9898", nil)
 			w := httptest.NewRecorder()
 
-			err := AddObjection(client, template.Func)(w, r)
+			err := AddObjection(client, template.Func)(PageVars{}, w, r)
 
 			if tc.errorReturned != nil {
 				assert.Equal(t, tc.errorReturned, err)
@@ -134,7 +134,7 @@ func TestGetAddObjectionWhenCaseSummaryErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "add-objection?uid=M-9898-9898-9898", nil)
 	w := httptest.NewRecorder()
 
-	err := AddObjection(client, nil)(w, r)
+	err := AddObjection(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -187,7 +187,7 @@ func TestPostAddObjection(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := AddObjection(client, template.Func)(w, r)
+			err := AddObjection(client, template.Func)(PageVars{}, w, r)
 			assert.Equal(t, tc.expectedError, err)
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
@@ -231,7 +231,7 @@ func TestPostAddObjectionWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AddObjection(client, template.Func)(w, r)
+	err := AddObjection(client, template.Func)(PageVars{}, w, r)
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

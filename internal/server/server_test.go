@@ -64,7 +64,7 @@ func TestErrorHandlerError(t *testing.T) {
 		}).
 		Return(nil)
 
-	handler := errorHandler(template.Func, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
+	handler := errorHandler(nil, template.Func, "http://prefix", "http://sirius")(func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		return errors.New("hey")
 	})
 
@@ -90,7 +90,9 @@ func TestErrorHandlerUnauthorizedError(t *testing.T) {
 
 	expectedErr := anUnauthorizedError{is: true}
 
-	handler := errorHandler(nil, "/prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
+	template := &mockTemplate{}
+
+	handler := errorHandler(nil, template.Func, "/prefix", "http://sirius")(func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		return expectedErr
 	})
 
@@ -122,7 +124,9 @@ func TestErrorHandlerJsonError(t *testing.T) {
 
 	ctx := telemetry.ContextWithLogger(context.Background(), slog.New(logHandler))
 
-	handler := errorHandler(nil, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
+	template := &mockTemplate{}
+
+	handler := errorHandler(nil, template.Func, "http://prefix", "http://sirius")(func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		return expectedError
 	})
 
@@ -264,7 +268,7 @@ func TestCancelledContext(t *testing.T) {
 
 	template := &mockTemplate{}
 
-	handler := errorHandler(template.Func, "http://prefix", "http://sirius")(func(w http.ResponseWriter, r *http.Request) error {
+	handler := errorHandler(nil, template.Func, "http://prefix", "http://sirius")(func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		return expectedErr
 	})
 

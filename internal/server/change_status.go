@@ -32,7 +32,7 @@ type changeStatusData struct {
 }
 
 func ChangeStatus(client ChangeStatusClient, tmpl template.Template, partialTmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
 			return err
 		}

@@ -47,7 +47,7 @@ func TestGetEditInvestigation(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditInvestigation(client, template.Func)(w, r)
+	err := EditInvestigation(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -59,7 +59,7 @@ func TestGetEditInvestigationNoID(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
-	err := EditInvestigation(nil, nil)(w, r)
+	err := EditInvestigation(nil, nil)(PageVars{}, w, r)
 
 	assert.NotNil(t, err)
 }
@@ -73,7 +73,7 @@ func TestGetEditInvestigationWhenInvestigationErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditInvestigation(client, nil)(w, r)
+	err := EditInvestigation(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -95,7 +95,7 @@ func TestGetEditInvestigationWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditInvestigation(client, template.Func)(w, r)
+	err := EditInvestigation(client, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -145,7 +145,7 @@ func TestPostEditInvestigation(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditInvestigation(client, template.Func)(w, r)
+	err := EditInvestigation(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -186,7 +186,7 @@ func TestPostEditInvestigationWhenEditInvestigationValidationError(t *testing.T)
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditInvestigation(client, template.Func)(w, r)
+	err := EditInvestigation(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -210,7 +210,7 @@ func TestPostEditInvestigationWhenEditInvestigationOtherError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditInvestigation(client, nil)(w, r)
+	err := EditInvestigation(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)

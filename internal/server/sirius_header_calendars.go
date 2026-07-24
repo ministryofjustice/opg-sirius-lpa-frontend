@@ -80,7 +80,7 @@ func SiriusHeaderCalendars(client SiriusHeaderCalendarClient, tmpl template.Temp
 }
 
 func siriusHeaderCalendarsWithNow(client SiriusHeaderCalendarClient, tmpl template.Template, now func() time.Time) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
 		bankHolidays, err := client.BankHolidays(ctx)
@@ -104,7 +104,7 @@ func siriusHeaderCalendarsWithNow(client SiriusHeaderCalendarClient, tmpl templa
 }
 
 func WorkingDays(client SiriusHeaderCalendarClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
 			return err
 		}
@@ -288,7 +288,7 @@ func buildCalendarMonths(bankHolidays sirius.BankHolidays, today time.Time) [3]C
 }
 
 func CalendarMonthPartial(client SiriusHeaderCalendarClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
 		// Parse year and month from query parameters

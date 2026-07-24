@@ -32,7 +32,7 @@ type editComplaintData struct {
 }
 
 func EditComplaint(client EditComplaintClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		id, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err

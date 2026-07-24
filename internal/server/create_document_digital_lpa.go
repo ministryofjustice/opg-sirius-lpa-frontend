@@ -32,7 +32,7 @@ type createDocumentDigitalLpaData struct {
 }
 
 func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		var err error
 		if err := r.ParseForm(); err != nil {
 			return err

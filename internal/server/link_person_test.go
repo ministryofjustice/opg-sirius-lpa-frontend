@@ -56,7 +56,7 @@ func TestLinkPerson(t *testing.T) {
 				r.Header.Add("HX-Request", "true")
 			}
 
-			err := LinkPerson(client, template.Func, template.Func)(w, r)
+			err := LinkPerson(client, template.Func, template.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -83,7 +83,7 @@ func TestLinkPersonNoID(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
-	err := LinkPerson(client, template.Func, nil)(w, r)
+	err := LinkPerson(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.NotNil(t, err)
 }
@@ -102,7 +102,7 @@ func TestLinkPersonGetFails(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := LinkPerson(client, template.Func, nil)(w, r)
+	err := LinkPerson(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -125,7 +125,7 @@ func TestLinkPersonTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := LinkPerson(client, template.Func, nil)(w, r)
+	err := LinkPerson(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -202,7 +202,7 @@ func TestLinkPersonSearch(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := LinkPerson(client, template.Func, nil)(w, r)
+			err := LinkPerson(client, template.Func, nil)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -244,7 +244,7 @@ func TestLinkPersonSearchNotFound(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := LinkPerson(client, template.Func, nil)(w, r)
+	err := LinkPerson(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -286,7 +286,7 @@ func TestLinkPersonSave(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := LinkPerson(client, template.Func, nil)(w, r)
+	err := LinkPerson(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -328,7 +328,7 @@ func TestLinkPersonSaveOtherPrimary(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := LinkPerson(client, template.Func, nil)(w, r)
+	err := LinkPerson(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -371,7 +371,7 @@ func TestLinkPersonSaveValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := LinkPerson(client, template.Func, nil)(w, r)
+	err := LinkPerson(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)

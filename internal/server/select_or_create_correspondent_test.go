@@ -46,7 +46,7 @@ func TestGetSelectOrCreateCorrespondent(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -76,7 +76,7 @@ func TestGetSelectOrCreateCorrespondentHtmxRequest(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func, partialTemplate.Func)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func, partialTemplate.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -97,7 +97,7 @@ func TestGetSelectOrCreateCorrespondentBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, query, nil)
 			w := httptest.NewRecorder()
 
-			err := SelectOrCreateCorrespondent(nil, nil, nil)(w, r)
+			err := SelectOrCreateCorrespondent(nil, nil, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -113,7 +113,7 @@ func TestGetSelectOrCreateCorrespondentWhenEpaErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, nil, nil)(w, r)
+	err := SelectOrCreateCorrespondent(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -137,7 +137,7 @@ func TestPostSelectOrCreateCorrespondentNew(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Equal(t, err, expectedError)
@@ -174,7 +174,7 @@ func TestPostSelectOrCreateCorrespondentFromAttorney(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Equal(t, err, expectedError)
@@ -199,7 +199,7 @@ func TestPostSelectOrCreateCorrespondentBadAttorneyId(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, err, expectedErr)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -244,7 +244,7 @@ func TestPostSelectOrCreateCorrespondentValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -293,7 +293,7 @@ func TestPostSelectOrCreateCorrespondentValidationErrorHtmxRequest(t *testing.T)
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func, partialTemplate.Func)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func, partialTemplate.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -329,7 +329,7 @@ func TestPostSelectOrCreateCorrespondentCreationFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)

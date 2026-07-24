@@ -22,7 +22,7 @@ type deleteDocumentData struct {
 }
 
 func DeleteDocument(client DeleteDocumentClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		uuid := r.PathValue("uuid")
 		ctx := getContext(r)
 

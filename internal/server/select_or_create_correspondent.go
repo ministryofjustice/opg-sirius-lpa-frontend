@@ -23,7 +23,7 @@ type selectOrCreateCorrespondentData struct {
 }
 
 func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl template.Template, partialTmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
 		donorId, err := strToIntOrStatusError(r.FormValue("id"))

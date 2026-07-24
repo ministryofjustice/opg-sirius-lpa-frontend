@@ -40,11 +40,6 @@ func (m *mockActionPanelClient) TasksForCase(ctx sirius.Context, caseId int) ([]
 	return args.Get(0).([]sirius.Task), args.Error(1)
 }
 
-func (m *mockActionPanelClient) GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error) {
-	args := m.Called(ctx)
-	return args.Get(0).(sirius.Permissions), args.Error(1)
-}
-
 var actionPanelPermissions = sirius.Permissions{
 	"v1-persons":               sirius.PermissionType{Permissions: []string{"GET"}},
 	"v1-cases-tasks-post":      sirius.PermissionType{Permissions: []string{"POST"}},
@@ -81,9 +76,6 @@ func TestGetActionPanel(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{ID: 123}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(actionPanelPermissions, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -228,7 +220,7 @@ func TestGetActionPanel(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := ActionPanel(client, template.Func)(w, r)
+	err := ActionPanel(client, template.Func)(PageVars{UserPermissions: actionPanelPermissions}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -259,9 +251,6 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{ID: 123, Children: []sirius.Person{{ID: 456}}}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(actionPanelPermissions, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -406,7 +395,7 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()
 
-	err := ActionPanel(client, template.Func)(w, r)
+	err := ActionPanel(client, template.Func)(PageVars{UserPermissions: actionPanelPermissions}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -435,9 +424,6 @@ func TestGetActionPanelNoOutstandingTasks(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -454,7 +440,7 @@ func TestGetActionPanelNoOutstandingTasks(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := ActionPanel(client, template.Func)(w, r)
+	err := ActionPanel(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -464,9 +450,6 @@ func TestGetActionPanelNoOutstandingTasks(t *testing.T) {
 
 func TestGetActionPanelNoDonorID(t *testing.T) {
 	client := &mockActionPanelClient{}
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(actionPanelPermissions, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -611,7 +594,7 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?entity=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := ActionPanel(client, template.Func)(w, r)
+	err := ActionPanel(client, template.Func)(PageVars{UserPermissions: actionPanelPermissions}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -645,9 +628,6 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(actionPanelPermissions, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -664,7 +644,7 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=epa&uid[]=7000-0000-0003", nil)
 	w := httptest.NewRecorder()
 
-	err := ActionPanel(client, template.Func)(w, r)
+	err := ActionPanel(client, template.Func)(PageVars{UserPermissions: actionPanelPermissions}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -739,14 +719,11 @@ func TestGetActionPanelWhenCasesByDonorErrors(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(actionPanelPermissions, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := ActionPanel(client, nil)(w, r)
+	err := ActionPanel(client, nil)(PageVars{UserPermissions: actionPanelPermissions}, w, r)
 
 	assert.Equal(t, expectedError, err)
 }
@@ -768,16 +745,13 @@ func TestGetActionPanelWhenPermissionsErrors(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(actionPanelPermissions, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := ActionPanel(client, nil)(w, r)
+	err := ActionPanel(client, nil)(PageVars{UserPermissions: nil}, w, r)
 
-	assert.Equal(t, errExample, err)
+	assert.Equal(t, "could not retrieve user permissions", err.Error())
 }
 
 func TestGetActionPanelWhenGetDraftCountErrors(t *testing.T) {
@@ -801,14 +775,11 @@ func TestGetActionPanelWhenGetDraftCountErrors(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(actionPanelPermissions, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()
 
-	err := ActionPanel(client, nil)(w, r)
+	err := ActionPanel(client, nil)(PageVars{UserPermissions: actionPanelPermissions}, w, r)
 
 	assert.Equal(t, expectedError, err)
 	client.AssertNotCalled(t, "TasksForCase")
@@ -845,7 +816,7 @@ func TestGetActionPanelWhenTasksForCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()
 
-	err := ActionPanel(client, nil)(w, r)
+	err := ActionPanel(client, nil)(PageVars{UserPermissions: actionPanelPermissions}, w, r)
 
 	assert.Equal(t, expectedError, err)
 }
@@ -874,14 +845,11 @@ func TestGetActionPanelWhenPersonReferencesErrors(t *testing.T) {
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{}, expectedError)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(actionPanelPermissions, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()
 
-	err := ActionPanel(client, nil)(w, r)
+	err := ActionPanel(client, nil)(PageVars{UserPermissions: actionPanelPermissions}, w, r)
 
 	assert.Equal(t, expectedError, err)
 }
@@ -910,14 +878,11 @@ func TestGetActionPanelWhenPersonErrors(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, expectedError)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(actionPanelPermissions, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&entity=lpa&uid[]=7000-0000-0001", nil)
 	w := httptest.NewRecorder()
 
-	err := ActionPanel(client, nil)(w, r)
+	err := ActionPanel(client, nil)(PageVars{UserPermissions: actionPanelPermissions}, w, r)
 
 	assert.Equal(t, expectedError, err)
 }

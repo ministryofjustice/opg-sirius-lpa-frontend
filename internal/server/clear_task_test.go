@@ -47,7 +47,7 @@ func TestClearTask(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/clear-task?id=33", nil)
 	w := httptest.NewRecorder()
 
-	err := ClearTask(client, template.Func)(w, r)
+	err := ClearTask(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -67,7 +67,7 @@ func TestPostClearTaskRedirects(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := ClearTask(client, template.Func)(w, r)
+	err := ClearTask(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/lpa/M-DIGI-0001-0001"), err)
@@ -92,7 +92,7 @@ func TestPostClearTaskSuccess(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := ClearTask(client, template.Func)(w, r)
+	err := ClearTask(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -124,7 +124,7 @@ func TestClearTaskBadQueryString(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, tc.Path, nil)
 			w := httptest.NewRecorder()
 
-			err := ClearTask(nil, nil)(w, r)
+			err := ClearTask(nil, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 			errStatus := sirius.StatusError{}
@@ -140,7 +140,7 @@ func TestClearTaskWhenTaskErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := ClearTask(client, nil)(w, r)
+	err := ClearTask(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -157,7 +157,7 @@ func TestClearTaskWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := ClearTask(client, template.Func)(w, r)
+	err := ClearTask(client, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -185,7 +185,7 @@ func TestPostClearTaskWhenValidationErrors(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := ClearTask(client, template.Func)(w, r)
+	err := ClearTask(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -203,7 +203,7 @@ func TestPostClearTaskWhenOtherError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := ClearTask(client, nil)(w, r)
+	err := ClearTask(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)

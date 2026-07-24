@@ -117,7 +117,7 @@ type FieldChange struct {
 }
 
 func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		donorId := r.PathValue("donorId")
 		caseIDs := r.URL.Query()["id[]"]
 

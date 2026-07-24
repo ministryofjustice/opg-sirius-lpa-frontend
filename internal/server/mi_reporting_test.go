@@ -66,7 +66,7 @@ func TestGetMiReporting(t *testing.T) {
 				r.Header.Add("HX-Request", "true")
 			}
 
-			err := MiReporting(client, template.Func, template.Func)(w, r)
+			err := MiReporting(client, template.Func, template.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -127,7 +127,7 @@ func TestGetMiReportingWhenReportTypeSelected(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?reportType=lpaReport", nil)
 	w := httptest.NewRecorder()
 
-	err := MiReporting(client, template.Func, nil)(w, r)
+	err := MiReporting(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -144,7 +144,7 @@ func TestGetMiReportingWhenConfigErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
-	err := MiReporting(client, nil, nil)(w, r)
+	err := MiReporting(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -175,7 +175,7 @@ func TestGetMiReportingWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
-	err := MiReporting(client, template.Func, nil)(w, r)
+	err := MiReporting(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -216,7 +216,7 @@ func TestPostMiReporting(t *testing.T) {
 	_ = r.ParseMultipartForm(32 << 20)
 	w := httptest.NewRecorder()
 
-	err := MiReporting(client, template.Func, nil)(w, r)
+	err := MiReporting(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -235,7 +235,7 @@ func TestPostMiReportingWhenError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := MiReporting(client, nil, nil)(w, r)
+	err := MiReporting(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)

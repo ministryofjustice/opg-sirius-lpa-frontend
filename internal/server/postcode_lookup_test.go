@@ -37,7 +37,7 @@ func TestGetPostcodeLookup(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/?postcode=SW1A 0AA", nil)
 
 	w := httptest.NewRecorder()
-	err := SearchPostcode(client)(w, req)
+	err := SearchPostcode(client)(PageVars{}, w, req)
 
 	assert.Nil(t, err)
 	resp := w.Result()
@@ -59,7 +59,7 @@ func TestGetPostcodeLookupWhenError(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/?postcode=SW1A 0AA", nil)
 
 	w := httptest.NewRecorder()
-	err := SearchPostcode(client)(w, req)
+	err := SearchPostcode(client)(PageVars{}, w, req)
 
 	assert.Equal(t, errExample, err)
 }

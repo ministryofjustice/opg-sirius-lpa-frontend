@@ -47,7 +47,7 @@ func TestGetCreateInvestigation(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "/?id=123&case="+caseType, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateInvestigation(client, template.Func, template.Func)(w, r)
+			err := CreateInvestigation(client, template.Func, template.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -79,7 +79,7 @@ func TestGetCreateInvestigationWithHXRequest(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := CreateInvestigation(client, template.Func, partialTemplate.Func)(w, r)
+	err := CreateInvestigation(client, template.Func, partialTemplate.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -102,7 +102,7 @@ func TestGetCreateInvestigationBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateInvestigation(nil, nil, nil)(w, r)
+			err := CreateInvestigation(nil, nil, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -118,7 +118,7 @@ func TestGetCreateInvestigationWhenCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateInvestigation(client, nil, nil)(w, r)
+	err := CreateInvestigation(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -144,7 +144,7 @@ func TestGetCreateInvestigationWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateInvestigation(client, template.Func, template.Func)(w, r)
+	err := CreateInvestigation(client, template.Func, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -188,7 +188,7 @@ func TestPostCreateInvestigation(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := CreateInvestigation(client, template.Func, template.Func)(w, r)
+			err := CreateInvestigation(client, template.Func, template.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -236,7 +236,7 @@ func TestPostCreateInvestigationWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateInvestigation(client, template.Func, template.Func)(w, r)
+	err := CreateInvestigation(client, template.Func, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -266,7 +266,7 @@ func TestPostCreateInvestigationWhenOtherError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateInvestigation(client, nil, nil)(w, r)
+	err := CreateInvestigation(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)

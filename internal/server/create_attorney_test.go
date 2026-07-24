@@ -75,7 +75,7 @@ func TestGetCreateAttorney(t *testing.T) {
 				r.Header.Add("HX-Request", "true")
 			}
 
-			err := CreateAttorney(client, template.Func, template.Func)(w, r)
+			err := CreateAttorney(client, template.Func, template.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -118,7 +118,7 @@ func TestGetEditAttorney(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&attorneyId=4", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateAttorney(client, template.Func, nil)(w, r)
+	err := CreateAttorney(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -138,7 +138,7 @@ func TestGetCreateAttorneyBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, query, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateAttorney(nil, nil, nil)(w, r)
+			err := CreateAttorney(nil, nil, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -154,7 +154,7 @@ func TestGetCreateAttorneyWhenRefDataErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateAttorney(client, nil, nil)(w, r)
+	err := CreateAttorney(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -237,7 +237,7 @@ func TestPostCreateAttorney(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateAttorney(client, template.Func, partialTmpl.Func)(w, r)
+			err := CreateAttorney(client, template.Func, partialTmpl.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			if !isHtmx {
@@ -331,7 +331,7 @@ func TestPostEditAttorney(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateAttorney(client, template.Func, partialTemplate.Func)(w, r)
+			err := CreateAttorney(client, template.Func, partialTemplate.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			if !isHtmx {
@@ -423,7 +423,7 @@ func TestPostCreateAttorneyAddAnother(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateAttorney(client, template.Func, partialTemplate.Func)(w, r)
+			err := CreateAttorney(client, template.Func, partialTemplate.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			if !isHtmx {
@@ -524,7 +524,7 @@ func TestPostCreateAttorneyWhenValidationError(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateAttorney(client, template.Func, partialTemplate.Func)(w, r)
+			err := CreateAttorney(client, template.Func, partialTemplate.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -612,7 +612,7 @@ func TestPostCreateAttorneyNextAnother(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateAttorney(client, template.Func, partialTemplate.Func)(w, r)
+			err := CreateAttorney(client, template.Func, partialTemplate.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			if !isHtmx {

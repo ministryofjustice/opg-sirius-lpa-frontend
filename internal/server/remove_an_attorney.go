@@ -56,7 +56,7 @@ type removeAnAttorneyData struct {
 
 func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Template, confirmTmpl template.Template, decisionsTmpl template.Template) Handler {
 
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		uid := r.PathValue("uid")
 		ctx := getContext(r)
 

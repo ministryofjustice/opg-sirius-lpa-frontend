@@ -16,7 +16,7 @@ type DonorDetailsData struct {
 	Donor sirius.Person
 }
 
-func DonorDetails(client DonorDetailsClient, tmpl template.Template) Handler {
+func DonorDetails(client DonorDetailsClient, tmpl template.Template) SimpleHandler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
 			return err
