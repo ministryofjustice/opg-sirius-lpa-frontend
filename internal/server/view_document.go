@@ -3,7 +3,6 @@ package server
 import (
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -12,28 +11,23 @@ import (
 type ViewDocumentClient interface {
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 	GetUserDetails(sirius.Context) (sirius.User, error)
-	Person(ctx sirius.Context, id int) (sirius.Person, error)
-	GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error)
-	Case(ctx sirius.Context, id int) (sirius.Case, error)
-	GetDraftCount(ctx sirius.Context, caseType string, caseId int) (sirius.DocumentDraftCount, error)
-	PersonReferences(ctx sirius.Context, id int) ([]sirius.PersonReference, error)
-	TasksForCase(ctx sirius.Context, caseId int) ([]sirius.Task, error)
+	PageVarsClient
 }
 
 type viewDocumentData struct {
-	XSRFToken                      string
+	ActionPanelButtons             []ActionPanelButton
+	CaseUids                       string
 	Document                       sirius.Document
+	DonorID                        int
+	HasV1PersonsCasesGetPermission bool
+	HasV1PersonsGetPermission      bool
+	HeaderButtons                  SiriusHeaderButtons
 	IsSysAdminUser                 bool
 	Pane                           int
-	DonorID                        int
-	SelectedCaseIds                string
 	Person                         sirius.Person
-	CaseUids                       string
-	HasV1PersonsGetPermission      bool
-	HasV1PersonsCasesGetPermission bool
+	SelectedCaseIds                string
 	SelectedCases                  []sirius.Case
-	ActionPanelButtons             []ActionPanelButton
-	HeaderButtons                  SiriusHeaderButtons
+	XSRFToken                      string
 }
 
 func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
@@ -41,17 +35,15 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 		uuid := r.PathValue("uuid")
 		ctx := getContext(r)
 
-		donorID, err := strconv.Atoi(r.PathValue("donorId"))
+		pageVars, err := PageValues(client, r)
 		if err != nil {
 			return err
 		}
 
-		person, err := client.Person(ctx, donorID)
+		caseId, err := strToIntOrStatusError(r.FormValue("case"))
 		if err != nil {
 			return err
 		}
-
-		caseId := r.FormValue("case")
 
 		documentData, err := client.DocumentByUUID(ctx, uuid)
 		if err != nil {
@@ -64,12 +56,6 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 		}
 		isSysAdminUser := user.HasRole("System Admin")
 
-		personReferences, err := client.PersonReferences(ctx, donorID)
-		if err != nil {
-			return err
-		}
-		personHasReferences := len(personReferences) > 0
-
 		// Extract pane parameter from query string if present
 		pane := 1 // Default to pane 1
 		if paneStr := r.URL.Query().Get("pane"); paneStr != "" {
@@ -78,55 +64,33 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			}
 		}
 
-		id, _ := strconv.Atoi(caseId)
-		var selectedCase []sirius.Case
-		if caseData, err := client.Case(ctx, id); err == nil {
-			selectedCase = []sirius.Case{caseData}
-		}
-
-		var draftCount int
-		var taskIDs []int
-		if len(selectedCase) > 0 {
-			documentDraftCount, err := client.GetDraftCount(ctx, strings.ToLower(selectedCase[0].CaseType), selectedCase[0].ID)
-			if err != nil {
-				return err
-			}
-			draftCount = documentDraftCount.DraftCount
-
-			tasks, err := client.TasksForCase(ctx, selectedCase[0].ID)
-			if err != nil {
-				return err
-			}
-			for _, task := range tasks {
-				taskIDs = append(taskIDs, task.ID)
-			}
-		}
-
 		caseUidsStr := ""
-		uidParams := ""
-		if len(selectedCase) > 0 {
-			caseUidsStr = "&uid[]=" + selectedCase[0].UID
-			uidParams = caseUidsStr
+		var selectedCase []sirius.Case
+		if len(pageVars.SelectedCases) > 0 {
+			for _, c := range pageVars.SelectedCases {
+				if c.ID == caseId {
+					caseUidsStr = "&uid[]=" + c.UID
+					selectedCase = []sirius.Case{c}
+				}
+			}
 		}
 
 		data := viewDocumentData{
-			XSRFToken:       ctx.XSRFToken,
-			Document:        documentData,
-			IsSysAdminUser:  isSysAdminUser,
-			Pane:            pane,
-			DonorID:         donorID,
-			SelectedCaseIds: caseId,
-			Person:          person,
-			CaseUids:        caseUidsStr,
-			SelectedCases:   selectedCase,
+			CaseUids:                       caseUidsStr,
+			Document:                       documentData,
+			DonorID:                        pageVars.DonorID,
+			HasV1PersonsCasesGetPermission: pageVars.HasV1PersonsCasesGetPermission,
+			HasV1PersonsGetPermission:      pageVars.HasV1PersonsGetPermission,
+			IsSysAdminUser:                 isSysAdminUser,
+			Pane:                           pane,
+			Person:                         pageVars.Person,
+			SelectedCaseIds:                strconv.Itoa(caseId),
+			SelectedCases:                  selectedCase,
+			XSRFToken:                      ctx.XSRFToken,
 		}
 
-		userPermissions, err := client.GetUserPermissions(ctx)
-		if err != nil {
-			return err
-		}
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, caseUidsStr, pageVars.DraftCount > 0, pageVars.PersonReferences, len(pageVars.Person.Children) > 0, pageVars.TaskIDs, pageVars.UserPermissions)
 
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, userPermissions)
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,
 			CaseInfo:       true,
@@ -134,8 +98,8 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			Calendar:       true,
 		}
 
-		data.HasV1PersonsGetPermission = userPermissions.Includes("v1-persons", "GET")
-		data.HasV1PersonsCasesGetPermission = userPermissions.Includes("v1-persons-cases", "GET")
+		data.HasV1PersonsGetPermission = pageVars.HasV1PersonsGetPermission
+		data.HasV1PersonsCasesGetPermission = pageVars.HasV1PersonsCasesGetPermission
 
 		return tmpl(w, data)
 	}

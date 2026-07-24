@@ -25,6 +25,11 @@ type Server struct {
 }
 
 func getContext(r *http.Request) sirius.Context {
+	// Try to get the context from the request context (set by permissionMiddleware)
+	if ctx, ok := r.Context().Value("ctx").(sirius.Context); ok {
+		return ctx
+	}
+
 	token := ""
 
 	if cookie, err := r.Cookie("XSRF-TOKEN"); err == nil {
@@ -177,7 +182,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-investigation", wrap(CreateInvestigation(client, templates.Get("create-investigation-wrapper.gohtml"), templates.Get("create-investigation-partial-wrapper.gohtml"))))
 	mux.Handle("/create-lpa", wrap(CreateLpa(client, templates.Get("create-lpa-wrapper.gohtml"), templates.Get("create-lpa-partial-wrapper.gohtml"))))
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("create-relationship-wrapper.gohtml"), templates.Get("create-relationship-partial-wrapper.gohtml"))))
-	mux.Handle("/compare/{id}/{caseId}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
+	mux.Handle("/compare/{id}/{caseUid}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
 	mux.Handle("/delete-fee-reduction", wrap(DeletePayment(client, templates.Get("delete-fee-reduction-wrapper.gohtml"), templates.Get("delete-fee-reduction-partial-wrapper.gohtml"))))
 	mux.Handle("/delete-note", wrap(DeleteNote(client, templates.Get("delete-note.gohtml"))))
 	mux.Handle("/delete-payment", wrap(DeletePayment(client, templates.Get("delete-payment-wrapper.gohtml"), templates.Get("delete-payment-partial-wrapper.gohtml"))))
@@ -185,7 +190,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/donor/{donorId}/details", wrap(DonorDetails(client, templates.Get("donor_details.gohtml"))))
 	mux.Handle("/donor/{id}/documents", wrap(DocumentList(client, templates.Get("documents.gohtml"))))
 	mux.Handle("/donor/{donorId}/history", wrap(GetLpaHistory(client, templates.Get("lpa-history.gohtml"))))
-	mux.Handle("/view-document/{uuid}/{donorId}", wrap(ViewDocument(client, templates.Get("view-document.gohtml"))))
+	mux.Handle("/view-document/{uuid}/{id}", wrap(ViewDocument(client, templates.Get("view-document.gohtml"))))
 	mux.Handle("/delete-document/{uuid}", wrap(DeleteDocument(client, templates.Get("delete-document.gohtml"))))
 	mux.Handle("/edit-complaint", wrap(EditComplaint(client, templates.Get("edit_complaint.gohtml"))))
 	mux.Handle("/edit-dates", wrap(EditDates(client, templates.Get("edit-dates-wrapper.gohtml"), templates.Get("edit-dates-partial-wrapper.gohtml"))))
@@ -213,9 +218,11 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 
 	muxWithHeaders := securityheaders.Use(setCSPHeader(mux))
 
+	//userPermissionMiddleware := permissionMiddleware(client)
 	loggerMiddleware := telemetry.Middleware(logger)
 	xsrfMiddleware := xsrfHandler(logger, templates.Get("error.gohtml"), siriusPublicURL)
 
+	//return otelhttp.NewHandler(http.StripPrefix(prefix, userPermissionMiddleware(xsrfMiddleware(loggerMiddleware(muxWithHeaders)))), "lpa-frontend")
 	return otelhttp.NewHandler(http.StripPrefix(prefix, xsrfMiddleware(loggerMiddleware(muxWithHeaders))), "lpa-frontend")
 }
 
@@ -359,6 +366,26 @@ func errorHandler(tmplError template.Template, prefix, siriusURL string) func(ne
 		})
 	}
 }
+
+//func permissionMiddleware(client Client) func(next http.Handler) http.Handler {
+//	return func(next http.Handler) http.Handler {
+//		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//			ctx := getContext(r)
+//
+//			userPermissions, err := client.GetUserPermissions(ctx)
+//
+//			if err != nil {
+//				http.Error(w, "Could not get user permissions", http.StatusInternalServerError)
+//				return
+//			}
+//
+//			ctx.Permissions = userPermissions
+//
+//			r = r.WithContext(context.WithValue(r.Context(), "ctx", ctx))
+//			next.ServeHTTP(w, r)
+//		})
+//	}
+//}
 
 func postFormKeySet(r *http.Request, name string) bool {
 	if _, val := r.PostForm[name]; val {

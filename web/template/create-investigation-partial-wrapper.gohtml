@@ -6,8 +6,6 @@
 
         {{ template "error-summary" .Error }}
 
-        {{ $url := prefix (printf "/action-panel?donorId=%d&case=%s%s" .CaseID .EntityType .CaseUIDs) }}
-
         {{ if .Success }}
             <meta http-equiv="Refresh" content="0" />
             {{ template "success-banner" "You have successfully added an investigation." }}
@@ -27,7 +25,7 @@
                     <button class="govuk-button" data-module="govuk-button" type="submit">Save and exit</button>
                     <a class="govuk-link govuk-link--no-visited-state"
                        href=""
-                       hx-get="{{ $url }}"
+                       hx-get="{{ prefix (printf "/action-panel?donorId=%d&case=%s%s" .DonorId .EntityType .CaseUIDs) }}"
                        hx-target=".action-panel__content"
                        hx-swap="innerHTML">Cancel</a>
                 </div>
