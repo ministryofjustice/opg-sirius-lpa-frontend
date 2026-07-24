@@ -1,0 +1,118 @@
+{{ template "page" . }}
+
+{{ define "partial-content" }}
+  <div class="action-panel__form">
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        <meta http-equiv="Refresh" content="0" />
+        {{ template "success-banner" "You have successfully allocated a case." }}
+      {{ end }}
+
+    <h1 class="govuk-heading-m">Allocate Case</h1>
+
+    <p class="govuk-body">
+        {{ range .Entities }}
+          <strong>{{ . }}</strong>
+          <br/>
+        {{ end }}
+    </p>
+
+    <form class="form" method="POST"
+          hx-post="{{ prefix (printf "/allocate-cases?entity=%s%s" .EntityType .CaseUIDs) }}"
+          hx-target=".action-panel__content"
+          hx-swap="innerHTML">
+
+      <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+        {{ range .CaseIDs }}
+          <input type="hidden" name="id" value="{{ . }}"/>
+        {{ end }}
+
+        {{ template "allocate-cases" . }}
+
+      <div class="govuk-button-group">
+        <button class="govuk-button" data-module="govuk-button" type="submit">Allocate</button>
+        <a class="govuk-link govuk-link--no-visited-state"
+           href=""
+           hx-get="{{ prefix (printf "/action-panel?donorId=%d&entity=%s%s" .DonorID .EntityType .CaseUIDs) }}"
+           hx-target=".action-panel__content"
+           hx-swap="innerHTML">Cancel</a>
+      </div>
+    </form>
+  </div>
+{{ end }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Allocate Cases{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p class="govuk-body">
+          {{ range .Entities }}
+            <strong>{{ . }}</strong>
+            <br/>
+          {{ end }}
+      </p>
+
+        {{ template "error-summary" .Error }}
+
+        {{ if .Success }}
+          <meta data-app-reload="page" />
+          {{ template "success-banner" "You have successfully allocated cases." }}
+        {{ end }}
+
+        {{ if eq 1 (len .Entities) }}
+          <h1 class="govuk-heading-l app-!-embedded-hide">Allocate Case</h1>
+        {{ else }}
+          <h1 class="govuk-heading-l app-!-embedded-hide">Allocate {{ len .Entities }} Cases</h1>
+        {{ end }}
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+          {{ template "allocate-cases" . }}
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Allocate</button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
+
+{{ define "allocate-cases" }}
+  <div class="govuk-form-group {{ if .Error.Field.assignTo }}govuk-form-group--error{{ end }}">
+    <fieldset class="govuk-fieldset">
+      <legend class="govuk-fieldset__legend">Assign to</legend>
+        {{ template "errors" .Error.Field.assignTo }}
+      <div class="govuk-radios" data-module="govuk-radios">
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="f-assignTo" name="assignTo" type="radio" value="user" data-aria-controls="conditional-assignTo" {{ if eq "user" .AssignTo }}checked{{ end }}>
+          <label class="govuk-label govuk-radios__label" for="f-assignTo">
+            User
+          </label>
+        </div>
+        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-assignTo">
+          <div class="govuk-!-width-one-half govuk-form-group {{ if .Error.Field.assigneeUser }}govuk-form-group--error{{ end }}">
+            <label class="govuk-label" for="f-assigneeUser">User</label>
+              {{ template "errors" .Error.Field.assigneeUser }}
+            <select class="govuk-select {{ if .Error.Field.assigneeUser }}govuk-select--error{{ end }}" id="f-assigneeUser" name="assigneeUser" data-select-user>
+              <option value="" selected></option>
+            </select>
+          </div>
+        </div>
+
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="f-assignTo-2" name="assignTo" type="radio" value="team" data-aria-controls="conditional-assignTo-2" {{ if eq "team" .AssignTo }}checked{{ end }}>
+          <label class="govuk-label govuk-radios__label" for="f-assignTo-2">
+            Team
+          </label>
+        </div>
+        <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-assignTo-2">
+            {{ template "select" (select "assigneeTeam" "Team" nil .Error.Field.assigneeTeam (options .Teams)) }}
+        </div>
+      </div>
+    </fieldset>
+  </div>
+{{ end }}

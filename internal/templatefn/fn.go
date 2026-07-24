@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/url"
+	"reflect"
 	"sort"
 	"strconv"
 	"strings"
@@ -368,6 +369,16 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"actionPanelButton": actionPanelButton,
 		"headerBarButton":   headerBarButton,
 		"personInfoRow":     personInfoRow,
+		"hasField": func(v interface{}, name string) bool {
+			rv := reflect.ValueOf(v)
+			if rv.Kind() == reflect.Pointer {
+				rv = rv.Elem()
+			}
+			if rv.Kind() != reflect.Struct {
+				return false
+			}
+			return rv.FieldByName(name).IsValid()
+		},
 	}
 }
 

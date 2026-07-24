@@ -1,6 +1,9 @@
 {{ define "page" }}
-  <!DOCTYPE html>
-  <html lang="en" class="govuk-template app-html-class">
+  {{ if and (hasField . "IsPartial") .IsPartial }}
+    {{ block "partial-content" . }}{{ end }}
+  {{ else }}
+    <!DOCTYPE html>
+    <html lang="en" class="govuk-template app-html-class">
     <head>
       <meta charset="utf-8">
       <title>{{ block "title" . }}{{ end }} - Sirius</title>
@@ -39,5 +42,6 @@
 
       <script src="{{ prefixAsset "/javascript/main.js" }}" type="module"></script>
     </body>
-  </html>
+    </html>
+  {{ end }}
 {{ end }}
