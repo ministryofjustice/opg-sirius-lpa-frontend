@@ -833,6 +833,23 @@ describe("Show correct event content", () => {
       .should("contain.text", "Test note - This is a test note");
   });
 
+  it("can view activation key used event", () => {
+    mockEventHistory({
+      sourceType: "Note",
+      type: "Activation key used",
+      entity: {
+        type: "Activation key used",
+        description: "Date used: 2:30PM 15 March 2024\nJane Doe",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Activation key used")
+      .should("contain.text", "Date used: 2:30PM 15 March 2024")
+      .should("contain.text", "Jane Doe");
+  });
+
   it("can view certificate provider added event", () => {
     mockEventHistory({
       sourceType: "CertificateProvider",

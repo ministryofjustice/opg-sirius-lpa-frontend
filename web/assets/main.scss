@@ -675,6 +675,10 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   }
 }
 
+.preserve-whitespace {
+  white-space: pre-wrap;
+}
+
 .action-panel__form {
   --action-panel-form-padding: 15px;
   padding: var(--action-panel-form-padding);
