@@ -111,7 +111,7 @@ func TestUpdateLpa(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a pending LPA assigned").
+					Given("I have a pending case assigned").
 					UponReceiving("A request to update the LPA").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
@@ -170,7 +170,7 @@ func TestLpa(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("I have a pending LPA assigned").
+					Given("I have a pending case assigned").
 					UponReceiving("A request for the LPA").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodGet,
