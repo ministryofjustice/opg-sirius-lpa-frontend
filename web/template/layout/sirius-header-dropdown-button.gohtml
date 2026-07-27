@@ -5,6 +5,7 @@
        aria-label="{{ .Label }}"
        aria-controls="sirius-header__dropdown-{{ replace (ToLower .Label) " " "-" }}"
        data-label="{{ .Label }}"
+       title="{{ .Label }}"
     >
       <svg aria-hidden="true" focusable="false" class="sirius-header__button-icon">
         <use href="{{ prefixSVG .IconName }}" />
