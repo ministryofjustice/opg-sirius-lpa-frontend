@@ -333,4 +333,28 @@ describe("Compare documents", () => {
           });
       });
   });
+
+  it("should display the header button labels on hover", () => {
+    cy.visit("compare/33/34");
+    cy.get("#header-button-return-to-timeline").should(
+      "have.attr",
+      "title",
+      "Return to timeline",
+    );
+    cy.get("#header-button-case-information").should(
+      "have.attr",
+      "title",
+      "Case information",
+    );
+    cy.get("#header-button-details-on-the-people-involved-in-this-case").should(
+      "have.attr",
+      "title",
+      "Details on the people involved in this case",
+    );
+    cy.get("#header-button-calendars").should(
+      "have.attr",
+      "title",
+      "Calendars",
+    );
+  });
 });
