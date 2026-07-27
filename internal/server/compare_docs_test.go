@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -70,10 +71,10 @@ func TestGetCompareDocsPanes(t *testing.T) {
 	}
 	person := sirius.Person{ID: 77}
 	selectedCase := document1.CaseItems[0]
-	permissions := sirius.Permissions{
-		"v1-persons":       {Permissions: []string{"GET"}},
-		"v1-persons-cases": {Permissions: []string{"GET"}},
-	}
+	//permissions := sirius.Permissions{
+	//	"v1-persons":       {Permissions: []string{"GET"}},
+	//	"v1-persons-cases": {Permissions: []string{"GET"}},
+	//}
 
 	tests := []struct {
 		name                     string
@@ -207,9 +208,9 @@ func TestGetCompareDocsPanes(t *testing.T) {
 			client.
 				On("TasksForCase", mock.Anything, 456).
 				Return([]sirius.Task{}, nil)
-			client.
-				On("GetUserPermissions", mock.Anything).
-				Return(permissions, nil)
+			//client.
+			//	On("GetUserPermissions", mock.Anything).
+			//	Return(permissions, nil)
 			for _, doc := range tc.getDocuments {
 				client.
 					On("DocumentByUUID", mock.Anything, doc.UUID).
@@ -245,7 +246,7 @@ func TestGetCompareDocsPanes(t *testing.T) {
 				HasV1PersonsGetPermission:      true,
 				HasV1PersonsCasesGetPermission: true,
 				SelectedCases:                  []sirius.Case{selectedCase},
-				ActionPanelButtons:             GetActionPanelButtons([]sirius.Case{selectedCase}, 77, "&uid[]=case-uid", false, false, false, []int{}, permissions),
+				ActionPanelButtons:             GetActionPanelButtons([]sirius.Case{selectedCase}, 77, "&uid[]=case-uid", false, false, false, []int{}, actionPanelPermissions),
 				HeaderButtons: SiriusHeaderButtons{
 					BackToTimeline: true,
 					CaseInfo:       true,
@@ -258,10 +259,14 @@ func TestGetCompareDocsPanes(t *testing.T) {
 				On("Func", mock.Anything, templateData).
 				Return(nil)
 
-			server := newMockServer("/compare/{id}/{caseId}", CompareDocs(client, template.Func))
+			//server := newMockServer("/compare/{id}/{caseId}", CompareDocs(client, template.Func)(PageVars{UserPermissions: actionPanelPermissions}, w, r))
+			//
+			//req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/compare/77/456%s", tc.query), nil)
+			//_, err := server.serve(req)
 
-			req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/compare/77/456%s", tc.query), nil)
-			_, err := server.serve(req)
+			r, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/compare/77/456%s", tc.query), nil)
+			w := httptest.NewRecorder()
+			err := CompareDocs(client, template.Func)(PageVars{UserPermissions: actionPanelPermissions}, w, r)
 
 			assert.Nil(t, err)
 			mock.AssertExpectationsForObjects(t, client, template)

@@ -68,7 +68,7 @@ func publishDraftDocument(
 }
 
 func EditDocument(client EditDocumentClient, tmpl template.Template, tmplHtmx template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))

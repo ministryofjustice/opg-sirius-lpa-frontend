@@ -43,7 +43,7 @@ func TestGetRelationship(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Relationship(client, template.Func, template.Func)(w, r)
+	err := Relationship(client, template.Func, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -66,7 +66,7 @@ func TestGetRelationshipNoID(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
-	err := Relationship(client, template.Func, nil)(w, r)
+	err := Relationship(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.NotNil(t, err)
 }
@@ -92,7 +92,7 @@ func TestGetCreateRelationshipWithHXRequest(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := Relationship(client, template.Func, partialTemplate.Func)(w, r)
+	err := Relationship(client, template.Func, partialTemplate.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -119,7 +119,7 @@ func TestGetRelationshipWhenPersonErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Relationship(client, template.Func, nil)(w, r)
+	err := Relationship(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -141,7 +141,7 @@ func TestGetRelationshipWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Relationship(client, template.Func, template.Func)(w, r)
+	err := Relationship(client, template.Func, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -173,7 +173,7 @@ func TestPostRelationship(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Relationship(client, template.Func, nil)(w, r)
+	err := Relationship(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -215,7 +215,7 @@ func TestPostRelationshipWhenCreatePersonReferenceValidationError(t *testing.T) 
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Relationship(client, template.Func, nil)(w, r)
+	err := Relationship(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -240,7 +240,7 @@ func TestPostRelationshipWhenCreatePersonReferenceOtherError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Relationship(client, nil, nil)(w, r)
+	err := Relationship(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 }

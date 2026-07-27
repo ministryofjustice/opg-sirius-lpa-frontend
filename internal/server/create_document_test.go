@@ -76,7 +76,7 @@ func TestGetCreateDocument(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "/?id=123&case="+caseType, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateDocument(client, template.Func, nil)(w, r)
+			err := CreateDocument(client, template.Func, nil)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -121,7 +121,7 @@ func TestGetCreateDocumentHTMX(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	err := CreateDocument(client, nil, template.Func)(w, r)
+	err := CreateDocument(client, nil, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -157,7 +157,7 @@ func TestPostCreateDocument(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := CreateDocument(client, template.Func, nil)(w, r)
+			err := CreateDocument(client, template.Func, nil)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Equal(t, RedirectError("/edit-document?id=123&case="+caseType), err)
@@ -201,7 +201,7 @@ func TestPostCreateDocumentHTMX(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := CreateDocument(client, nil, template.Func)(w, r)
+	err := CreateDocument(client, nil, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -283,7 +283,7 @@ func TestPostCreateDocumentGenerateNewRecipient(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := CreateDocument(client, template.Func, nil)(w, r)
+			err := CreateDocument(client, template.Func, nil)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -321,7 +321,7 @@ func TestPostCreateDocumentPrioritiseInvalidInserts(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := CreateDocument(client, template.Func, nil)(w, r)
+			err := CreateDocument(client, template.Func, nil)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Equal(t, RedirectError("/edit-document?id=123&case="+caseType), err)
@@ -343,7 +343,7 @@ func TestGetCreateDocumentBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateDocument(nil, nil, nil)(w, r)
+			err := CreateDocument(nil, nil, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -359,7 +359,7 @@ func TestGetCreateDocumentWhenCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateDocument(client, nil, nil)(w, r)
+	err := CreateDocument(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -379,7 +379,7 @@ func TestGetCreateDocumentWhenFailureOnGetDocumentTemplates(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateDocument(client, nil, nil)(w, r)
+	err := CreateDocument(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -417,7 +417,7 @@ func TestGetCreateDocumentWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateDocument(client, template.Func, nil)(w, r)
+	err := CreateDocument(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)

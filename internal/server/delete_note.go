@@ -20,7 +20,7 @@ type deleteNoteData struct {
 }
 
 func DeleteNote(client DeleteNoteClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
 		donorId := r.FormValue("donorId")

@@ -47,7 +47,7 @@ var miLabels = map[string]string{
 }
 
 func MiReporting(client MiReportingClient, tmpl template.Template, partialTmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 		data := miReportingData{
 			XSRFToken: ctx.XSRFToken,

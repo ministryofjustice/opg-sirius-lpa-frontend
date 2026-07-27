@@ -23,7 +23,7 @@ type editInvestigationData struct {
 var approvalOutcomeTypes = []string{"Court Application", "Further Action", "No Further Action", "Instrument no longer Valid"}
 
 func EditInvestigation(client EditInvestigationClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		investigationID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err

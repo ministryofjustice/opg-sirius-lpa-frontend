@@ -23,7 +23,7 @@ type clearTaskData struct {
 }
 
 func ClearTask(client ClearTaskClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
 			return err
 		}

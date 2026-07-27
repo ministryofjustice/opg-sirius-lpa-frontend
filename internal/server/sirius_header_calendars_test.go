@@ -60,7 +60,7 @@ func TestGetSiriusCalendars(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/lpa-api/v1/dates/bank-holidays", nil)
 	w := httptest.NewRecorder()
 
-	err := siriusHeaderCalendarsWithNow(client, template.Func, now)(w, r)
+	err := siriusHeaderCalendarsWithNow(client, template.Func, now)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -99,7 +99,7 @@ func TestGetSiriusCalendarsWhenBankHolidaysErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/lpa-api/v1/dates/bank-holidays", nil)
 	w := httptest.NewRecorder()
 
-	err := siriusHeaderCalendarsWithNow(client, template.Func, now)(w, r)
+	err := siriusHeaderCalendarsWithNow(client, template.Func, now)(PageVars{}, w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -138,7 +138,7 @@ func TestGetSiriusCalendarsWithEmptyBankHolidaysJSON(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/lpa-api/v1/dates/bank-holidays", nil)
 	w := httptest.NewRecorder()
 
-	err := siriusHeaderCalendarsWithNow(client, template.Func, now)(w, r)
+	err := siriusHeaderCalendarsWithNow(client, template.Func, now)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -184,7 +184,7 @@ func TestWorkingDays(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := WorkingDays(client, template.Func)(w, r)
+	err := WorkingDays(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -359,7 +359,7 @@ func TestCalendarMonthPartialWithValidParameters(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/calendar-month?year=2026&month=4", nil)
 	w := httptest.NewRecorder()
 
-	err := CalendarMonthPartial(client, template.Func)(w, r)
+	err := CalendarMonthPartial(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -386,7 +386,7 @@ func TestCalendarMonthPartialWithMissingYear(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/calendar-month?month=6", nil)
 	w := httptest.NewRecorder()
 
-	err := CalendarMonthPartial(client, template.Func)(w, r)
+	err := CalendarMonthPartial(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -413,7 +413,7 @@ func TestCalendarMonthPartialWithMissingMonth(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/calendar-month?year=2026", nil)
 	w := httptest.NewRecorder()
 
-	err := CalendarMonthPartial(client, template.Func)(w, r)
+	err := CalendarMonthPartial(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -441,7 +441,7 @@ func TestCalendarMonthPartialWithMissingBoth(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/calendar-month", nil)
 	w := httptest.NewRecorder()
 
-	err := CalendarMonthPartial(client, template.Func)(w, r)
+	err := CalendarMonthPartial(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -456,7 +456,7 @@ func TestCalendarMonthPartialWithInvalidYear(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/calendar-month?year=notanumber&month=6", nil)
 	w := httptest.NewRecorder()
 
-	err := CalendarMonthPartial(client, template.Func)(w, r)
+	err := CalendarMonthPartial(client, template.Func)(PageVars{}, w, r)
 
 	assert.NotNil(t, err)
 }
@@ -468,7 +468,7 @@ func TestCalendarMonthPartialWithInvalidMonth(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/calendar-month?year=2026&month=notanumber", nil)
 	w := httptest.NewRecorder()
 
-	err := CalendarMonthPartial(client, template.Func)(w, r)
+	err := CalendarMonthPartial(client, template.Func)(PageVars{}, w, r)
 
 	assert.NotNil(t, err)
 }
@@ -480,7 +480,7 @@ func TestCalendarMonthPartialWithMonthTooSmall(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/calendar-month?year=2026&month=0", nil)
 	w := httptest.NewRecorder()
 
-	err := CalendarMonthPartial(client, template.Func)(w, r)
+	err := CalendarMonthPartial(client, template.Func)(PageVars{}, w, r)
 
 	assert.NotNil(t, err)
 	assert.ErrorContains(t, err, "invalid month")
@@ -493,7 +493,7 @@ func TestCalendarMonthPartialWithMonthTooLarge(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/calendar-month?year=2026&month=13", nil)
 	w := httptest.NewRecorder()
 
-	err := CalendarMonthPartial(client, template.Func)(w, r)
+	err := CalendarMonthPartial(client, template.Func)(PageVars{}, w, r)
 
 	assert.NotNil(t, err)
 	assert.ErrorContains(t, err, "invalid month")
@@ -516,7 +516,7 @@ func TestCalendarMonthPartialWhenBankHolidaysErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/calendar-month?year=2026&month=4", nil)
 	w := httptest.NewRecorder()
 
-	err := CalendarMonthPartial(client, template.Func)(w, r)
+	err := CalendarMonthPartial(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -540,7 +540,7 @@ func TestCalendarMonthPartialWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/calendar-month?year=2026&month=4", nil)
 	w := httptest.NewRecorder()
 
-	err := CalendarMonthPartial(client, template.Func)(w, r)
+	err := CalendarMonthPartial(client, template.Func)(PageVars{}, w, r)
 
 	assert.NotNil(t, err)
 	assert.Equal(t, errExample, err)

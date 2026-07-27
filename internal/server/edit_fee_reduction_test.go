@@ -83,7 +83,7 @@ func TestGetEditFeeReduction(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditFeeReduction(client, template.Func, template.Func)(w, r)
+	err := EditFeeReduction(client, template.Func, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -109,7 +109,7 @@ func TestEditFeeReductionWhenFailureOnGetPaymentByID(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditFeeReduction(client, nil, nil)(w, r)
+	err := EditFeeReduction(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -144,7 +144,7 @@ func TestEditFeeReductionWhenFailureOnGetCase(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditFeeReduction(client, nil, nil)(w, r)
+	err := EditFeeReduction(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -177,7 +177,7 @@ func TestEditFeeReductionWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditFeeReduction(client, nil, nil)(w, r)
+	err := EditFeeReduction(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -228,7 +228,7 @@ func TestEditFeeReductionWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditFeeReduction(client, template.Func, template.Func)(w, r)
+	err := EditFeeReduction(client, template.Func, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -294,7 +294,7 @@ func TestPostEditFeeReductionValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditFeeReduction(client, template.Func, template.Func)(w, r)
+	err := EditFeeReduction(client, template.Func, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -355,7 +355,7 @@ func TestPostEditFeeReduction(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditFeeReduction(client, template.Func, template.Func)(w, r)
+	err := EditFeeReduction(client, template.Func, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/payments/4"), err)
@@ -427,7 +427,7 @@ func TestPostEditFeeReductionHtmx(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := EditFeeReduction(client, nil, template.Func)(w, r)
+	err := EditFeeReduction(client, nil, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)

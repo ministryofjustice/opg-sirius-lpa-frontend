@@ -12,7 +12,7 @@ type PostcodeLookupClient interface {
 }
 
 func SearchPostcode(client PostcodeLookupClient) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
 		addresses, err := client.PostcodeLookup(ctx, r.FormValue("postcode"))

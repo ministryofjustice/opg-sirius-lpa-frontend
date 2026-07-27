@@ -12,7 +12,7 @@ type SearchUsersClient interface {
 }
 
 func SearchUsers(client SearchUsersClient) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
 		users, err := client.SearchUsers(ctx, r.FormValue("q"))

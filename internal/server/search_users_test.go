@@ -31,7 +31,7 @@ func TestGetSearchUsers(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/?q=something", nil)
 
 	w := httptest.NewRecorder()
-	err := SearchUsers(client)(w, req)
+	err := SearchUsers(client)(PageVars{}, w, req)
 
 	assert.Nil(t, err)
 	resp := w.Result()
@@ -53,7 +53,7 @@ func TestGetSearchUsersWhenError(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/?q=something", nil)
 
 	w := httptest.NewRecorder()
-	err := SearchUsers(client)(w, req)
+	err := SearchUsers(client)(PageVars{}, w, req)
 
 	assert.Equal(t, errExample, err)
 }

@@ -18,7 +18,7 @@ type siriusHeaderCaseInfoData struct {
 }
 
 func SiriusHeaderCaseInfo(client SiriusHeaderCaseInfoClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		caseId, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err

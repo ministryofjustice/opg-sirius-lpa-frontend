@@ -67,7 +67,7 @@ func TestGetTask(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -109,7 +109,7 @@ func TestGetTaskWithHXRequest(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func, partialTemplate.Func)(w, r)
+	err := Task(client, template.Func, partialTemplate.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -123,7 +123,7 @@ func TestGetTaskParseFormError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(nil, nil, nil)(w, r)
+	err := Task(nil, nil, nil)(PageVars{}, w, r)
 
 	assert.NotNil(t, err)
 }
@@ -139,7 +139,7 @@ func TestGetTaskBadQueryString(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := Task(nil, nil, nil)(w, r)
+			err := Task(nil, nil, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -161,7 +161,7 @@ func TestGetTaskWhenTaskTypeErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Task(client, nil, nil)(w, r)
+	err := Task(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -181,7 +181,7 @@ func TestGetTaskWhenTeamsErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Task(client, nil, nil)(w, r)
+	err := Task(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -201,7 +201,7 @@ func TestGetTaskWhenCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Task(client, nil, nil)(w, r)
+	err := Task(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -226,7 +226,7 @@ func TestGetTaskWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -278,7 +278,7 @@ func TestPostTask(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -336,7 +336,7 @@ func TestPostTaskWhenAssignToMe(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -394,7 +394,7 @@ func TestPostTaskWhenAssignToCaseOwner(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -450,7 +450,7 @@ func TestGetTaskWhenGetUserDetailsErrors(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -493,7 +493,7 @@ func TestPostTaskWhenCreateTaskFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(PageVars{}, w, r)
 	assert.Equal(t, errExample, err)
 }
 
@@ -550,7 +550,7 @@ func TestPostTaskWhenAssignToNotSet(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := Task(client, template.Func, template.Func)(w, r)
+	err := Task(client, template.Func, template.Func)(PageVars{}, w, r)
 	assert.Nil(t, err)
 
 	resp := w.Result()
@@ -653,7 +653,7 @@ func TestPostTaskWhenValidationError(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := Task(client, template.Func, template.Func)(w, r)
+			err := Task(client, template.Func, template.Func)(PageVars{}, w, r)
 			assert.Nil(t, err)
 
 			resp := w.Result()

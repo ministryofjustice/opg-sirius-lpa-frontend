@@ -49,7 +49,7 @@ func TestGetCreateCorrespondent(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateCorrespondent(client, template.Func, nil)(w, r)
+	err := CreateCorrespondent(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -77,7 +77,7 @@ func TestGetCreateCorrespondentHtmxRequest(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := CreateCorrespondent(client, template.Func, partialTemplate.Func)(w, r)
+	err := CreateCorrespondent(client, template.Func, partialTemplate.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -114,7 +114,7 @@ func TestGetEditCorrespondent(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateCorrespondent(client, template.Func, nil)(w, r)
+	err := CreateCorrespondent(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -134,7 +134,7 @@ func TestGetCreateCorrespondentBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, query, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateCorrespondent(nil, nil, nil)(w, r)
+			err := CreateCorrespondent(nil, nil, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -191,7 +191,7 @@ func TestPostCreateCorrespondent(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateCorrespondent(client, template.Func, nil)(w, r)
+	err := CreateCorrespondent(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Equal(t, err, expectedError)
@@ -252,7 +252,7 @@ func TestPostEditCorrespondent(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateCorrespondent(client, template.Func, nil)(w, r)
+	err := CreateCorrespondent(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Equal(t, err, expectedError)
@@ -323,7 +323,7 @@ func TestPostCreateCorrespondentWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateCorrespondent(client, template.Func, nil)(w, r)
+	err := CreateCorrespondent(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -381,7 +381,7 @@ func TestPostCreateCorrespondentCreationFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateCorrespondent(client, template.Func, nil)(w, r)
+	err := CreateCorrespondent(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)

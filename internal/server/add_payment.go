@@ -31,7 +31,7 @@ type addPaymentData struct {
 }
 
 func AddPayment(client AddPaymentClient, tmpl template.Template, partialTmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err

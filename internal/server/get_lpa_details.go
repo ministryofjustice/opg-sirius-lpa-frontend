@@ -34,7 +34,7 @@ type getLpaDetails struct {
 }
 
 func GetLpaDetails(client GetLpaDetailsClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		uid := r.PathValue("uid")
 		ctx := getContext(r)
 

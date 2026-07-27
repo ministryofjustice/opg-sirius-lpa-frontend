@@ -42,7 +42,7 @@ func TestGetSiriusHeaderPersonInfo(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1", nil)
 	w := httptest.NewRecorder()
 
-	err := SiriusHeaderPeopleInfo(client, template.Func)(w, r)
+	err := SiriusHeaderPeopleInfo(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -71,7 +71,7 @@ func TestGetSiriusHeaderPersonInfoWithSelected(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&selected=2", nil)
 	w := httptest.NewRecorder()
 
-	err := SiriusHeaderPeopleInfo(client, template.Func)(w, r)
+	err := SiriusHeaderPeopleInfo(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -97,7 +97,7 @@ func TestGetSiriusHeaderPersonInfoBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, query, nil)
 			w := httptest.NewRecorder()
 
-			err := SiriusHeaderPeopleInfo(client, nil)(w, r)
+			err := SiriusHeaderPeopleInfo(client, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -113,7 +113,7 @@ func TestGetSiriusHeaderPersonInfoWhenCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1", nil)
 	w := httptest.NewRecorder()
 
-	err := SiriusHeaderPeopleInfo(client, nil)(w, r)
+	err := SiriusHeaderPeopleInfo(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -202,7 +202,7 @@ func TestGetSiriusHeaderPersonInfoGetSelectedPerson(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/?id=123&selected=%s", tc.SelectedID), nil)
 			w := httptest.NewRecorder()
 
-			err := SiriusHeaderPeopleInfo(client, template.Func)(w, r)
+			err := SiriusHeaderPeopleInfo(client, template.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)

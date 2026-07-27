@@ -42,7 +42,7 @@ type manageAttorneyDecisionsData struct {
 
 func AttorneyDecisions(client AttorneyDecisionsClient, decisionTmpl template.Template, confirmTmpl template.Template) Handler {
 
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		uid := r.PathValue("uid")
 		ctx := getContext(r)
 

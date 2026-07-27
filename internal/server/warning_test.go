@@ -78,7 +78,7 @@ func TestGetWarning(t *testing.T) {
 			}
 
 			w := httptest.NewRecorder()
-			err := Warning(siriusClient, template.Func, template.Func)(w, req)
+			err := Warning(siriusClient, template.Func, template.Func)(PageVars{}, w, req)
 
 			assert.Nil(t, err)
 			result := w.Result()
@@ -132,7 +132,7 @@ func TestPostWarningWithOneCase(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template.Func, nil)(w, req)
+	err := Warning(siriusClient, template.Func, nil)(PageVars{}, w, req)
 	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusOK, result.StatusCode)
@@ -190,7 +190,7 @@ func TestPostWarningWithMultipleCases(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template.Func, nil)(w, req)
+	err := Warning(siriusClient, template.Func, nil)(PageVars{}, w, req)
 	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusOK, result.StatusCode)
@@ -236,7 +236,7 @@ func TestPostWarningWithNoCases(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template.Func, nil)(w, req)
+	err := Warning(siriusClient, template.Func, nil)(PageVars{}, w, req)
 	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusOK, result.StatusCode)
@@ -290,7 +290,7 @@ func TestPostWarningValidationErrors(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, template.Func, nil)(w, req)
+	err := Warning(siriusClient, template.Func, nil)(PageVars{}, w, req)
 	assert.Nil(t, err)
 	result := w.Result()
 	assert.Equal(t, http.StatusBadRequest, result.StatusCode)
@@ -321,7 +321,7 @@ func TestCreateWarningReturnsError(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, nil, nil)(w, req)
+	err := Warning(siriusClient, nil, nil)(PageVars{}, w, req)
 	assert.Equal(t, e, err)
 }
 
@@ -339,7 +339,7 @@ func TestGetWarningTypesFail(t *testing.T) {
 	req.Header.Add("content-type", formUrlEncoded)
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, nil, nil)(w, req)
+	err := Warning(siriusClient, nil, nil)(PageVars{}, w, req)
 
 	assert.Equal(t, expectedErr, err)
 }
@@ -347,7 +347,7 @@ func TestGetWarningTypesFail(t *testing.T) {
 func TestWarningMissingId(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/?entity=lpa", nil)
 	w := httptest.NewRecorder()
-	err := Warning(nil, nil, nil)(w, req)
+	err := Warning(nil, nil, nil)(PageVars{}, w, req)
 
 	assert.NotNil(t, err)
 }
@@ -369,7 +369,7 @@ func TestWarningMissingEntityType(t *testing.T) {
 	req.Header.Add("hx-request", "true")
 
 	w := httptest.NewRecorder()
-	err := Warning(siriusClient, nil, nil)(w, req)
+	err := Warning(siriusClient, nil, nil)(PageVars{}, w, req)
 
 	assert.NotNil(t, err)
 }

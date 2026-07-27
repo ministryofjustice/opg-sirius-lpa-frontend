@@ -31,7 +31,7 @@ type getApplicationProgressDetails struct {
 }
 
 func GetApplicationProgressDetails(client GetApplicationProgressClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		var data getApplicationProgressDetails
 
 		uid := r.PathValue("uid")

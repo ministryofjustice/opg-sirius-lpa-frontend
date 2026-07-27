@@ -82,7 +82,7 @@ func TestGetEditComplaint(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditComplaint(client, template.Func)(w, r)
+	err := EditComplaint(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -94,7 +94,7 @@ func TestGetEditComplaintNoID(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
-	err := EditComplaint(nil, nil)(w, r)
+	err := EditComplaint(nil, nil)(PageVars{}, w, r)
 
 	assert.NotNil(t, err)
 }
@@ -123,7 +123,7 @@ func TestGetEditComplaintWhenRefDataErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditComplaint(client, nil)(w, r)
+	err := EditComplaint(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -149,7 +149,7 @@ func TestGetEditComplaintWhenComplaintErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditComplaint(client, nil)(w, r)
+	err := EditComplaint(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -185,7 +185,7 @@ func TestGetEditComplaintWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditComplaint(client, template.Func)(w, r)
+	err := EditComplaint(client, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -257,7 +257,7 @@ func TestPostEditComplaint(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditComplaint(client, template.Func)(w, r)
+	err := EditComplaint(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -312,7 +312,7 @@ func TestPostEditComplaintWhenEditComplaintValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditComplaint(client, template.Func)(w, r)
+	err := EditComplaint(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -350,7 +350,7 @@ func TestPostEditComplaintWhenEditComplaintOtherError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditComplaint(client, nil)(w, r)
+	err := EditComplaint(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)

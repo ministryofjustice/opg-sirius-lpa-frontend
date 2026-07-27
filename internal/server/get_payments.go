@@ -39,7 +39,7 @@ type getPaymentsData struct {
 }
 
 func GetPayments(client GetPaymentsClient, tmpl template.Template, partialTmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 		data := getPaymentsData{

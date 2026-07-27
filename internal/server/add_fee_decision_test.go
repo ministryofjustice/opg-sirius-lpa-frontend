@@ -65,7 +65,7 @@ func TestGetAddFeeDecision(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
 	w := httptest.NewRecorder()
 
-	err := AddFeeDecision(client, template.Func)(w, r)
+	err := AddFeeDecision(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -84,7 +84,7 @@ func TestAddFeeDecisionNoID(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, testUrl, nil)
 			w := httptest.NewRecorder()
 
-			err := AddFeeDecision(nil, nil)(w, r)
+			err := AddFeeDecision(nil, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -168,7 +168,7 @@ func TestAddFeeDecisionInvalidPostData(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := AddFeeDecision(client, template.Func)(w, r)
+			err := AddFeeDecision(client, template.Func)(PageVars{}, w, r)
 
 			resp := w.Result()
 			mock.AssertExpectationsForObjects(t, client, template)
@@ -190,7 +190,7 @@ func TestAddFeeDecisionWhenFailureOnGetCase(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=75757", nil)
 	w := httptest.NewRecorder()
 
-	err := AddFeeDecision(client, nil)(w, r)
+	err := AddFeeDecision(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -222,7 +222,7 @@ func TestAddFeeDecisionWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=111", nil)
 	w := httptest.NewRecorder()
 
-	err := AddFeeDecision(client, template.Func)(w, r)
+	err := AddFeeDecision(client, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -245,7 +245,7 @@ func TestAddFeeDecisionWhenFailureOnGetRefData(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=232", nil)
 	w := httptest.NewRecorder()
 
-	err := AddFeeDecision(client, nil)(w, r)
+	err := AddFeeDecision(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -285,7 +285,7 @@ func TestAddFeeDecisionNonValidationClientError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AddFeeDecision(client, template.Func)(w, r)
+	err := AddFeeDecision(client, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, serverError, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -317,7 +317,7 @@ func TestAddFeeDecisionToDigitalLpaPostSuccess(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AddFeeDecision(client, template.Func)(w, r)
+	err := AddFeeDecision(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/lpa/M-AAAA-BBBB-DDDD/payments"), err)

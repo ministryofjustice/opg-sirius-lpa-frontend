@@ -64,7 +64,7 @@ func TestGetEditDates(t *testing.T) {
 				r.Header.Add("HX-Request", "true")
 			}
 
-			err := EditDates(client, template.Func, template.Func)(w, r)
+			err := EditDates(client, template.Func, template.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -86,7 +86,7 @@ func TestGetEditDatesNoID(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := EditDates(nil, nil, nil)(w, r)
+			err := EditDates(nil, nil, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -104,7 +104,7 @@ func TestGetEditDatesWhenCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := EditDates(client, nil, nil)(w, r)
+	err := EditDates(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -136,7 +136,7 @@ func TestGetEditDatesWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := EditDates(client, template.Func, nil)(w, r)
+	err := EditDates(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -203,7 +203,7 @@ func TestPostEditDates(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := EditDates(client, template.Func, nil)(w, r)
+			err := EditDates(client, template.Func, nil)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -229,7 +229,7 @@ func TestPostEditDatesWhenEditDatesErrors(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditDates(client, nil, nil)(w, r)
+	err := EditDates(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -280,7 +280,7 @@ func TestPostEditDatesWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditDates(client, template.Func, nil)(w, r)
+	err := EditDates(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)

@@ -31,7 +31,7 @@ type warningData struct {
 }
 
 func Warning(client WarningClient, tmpl template.Template, partialTmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		personId, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err

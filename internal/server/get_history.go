@@ -22,7 +22,7 @@ type getHistory struct {
 }
 
 func GetHistory(client GetHistoryClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		uid := r.PathValue("uid")
 		ctx := getContext(r)
 

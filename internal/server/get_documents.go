@@ -21,7 +21,7 @@ type getDocumentsData struct {
 }
 
 func GetDocuments(client GetDocumentsClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		var err error
 
 		uid := r.PathValue("uid")

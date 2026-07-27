@@ -53,7 +53,7 @@ func TestGetPlaceInvestigationOnHold(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := InvestigationHold(client, template.Func)(w, r)
+	err := InvestigationHold(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -72,7 +72,7 @@ func TestGetInvestigationOnHoldBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, urlParams, nil)
 			w := httptest.NewRecorder()
 
-			err := InvestigationHold(nil, nil)(w, r)
+			err := InvestigationHold(nil, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -88,7 +88,7 @@ func TestInvestigationOnHoldWhenGetInvestigationErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := InvestigationHold(client, nil)(w, r)
+	err := InvestigationHold(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -115,7 +115,7 @@ func TestGetPlaceInvestigationOnHoldWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := InvestigationHold(client, template.Func)(w, r)
+	err := InvestigationHold(client, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -151,7 +151,7 @@ func TestPostPlaceInvestigationOnHold(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := InvestigationHold(client, template.Func)(w, r)
+	err := InvestigationHold(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -194,7 +194,7 @@ func TestPostPlaceInvestigationOnHoldWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := InvestigationHold(client, template.Func)(w, r)
+	err := InvestigationHold(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -223,7 +223,7 @@ func TestPostPlaceInvestigationOnHoldWhenOtherError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := InvestigationHold(client, nil)(w, r)
+	err := InvestigationHold(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -257,7 +257,7 @@ func TestGetTakeInvestigationOffHold(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := InvestigationHold(client, template.Func)(w, r)
+	err := InvestigationHold(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -289,7 +289,7 @@ func TestGetTakeInvestigationOffHoldErrorsIfNoOpenHoldPeriodOnInvestigation(t *t
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := InvestigationHold(client, template.Func)(w, r)
+	err := InvestigationHold(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	expected := errors.New("could not find open hold period on investigation")
@@ -331,7 +331,7 @@ func TestPostTakeInvestigationOffHold(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := InvestigationHold(client, template.Func)(w, r)
+	err := InvestigationHold(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -378,7 +378,7 @@ func TestPostTakeInvestigationOnHoldUsesCorrectHoldPeriodWhenMultiple(t *testing
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := InvestigationHold(client, template.Func)(w, r)
+	err := InvestigationHold(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -423,7 +423,7 @@ func TestPostTakeInvestigationOffHoldWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := InvestigationHold(client, template.Func)(w, r)
+	err := InvestigationHold(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -454,7 +454,7 @@ func TestPostTakeInvestigationOffHoldWhenOtherError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := InvestigationHold(client, nil)(w, r)
+	err := InvestigationHold(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)

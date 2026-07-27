@@ -23,7 +23,7 @@ type siriusHeaderPeopleInfoData struct {
 }
 
 func SiriusHeaderPeopleInfo(client SiriusHeaderPeopleInfoClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		caseId, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err

@@ -68,7 +68,7 @@ func TestUnlinkPerson(t *testing.T) {
 				r.Header.Add("HX-Request", "true")
 			}
 
-			err := UnlinkPerson(client, template.Func, template.Func)(w, r)
+			err := UnlinkPerson(client, template.Func, template.Func)(PageVars{}, w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -89,7 +89,7 @@ func TestUnlinkPersonNoID(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, testUrl, nil)
 			w := httptest.NewRecorder()
 
-			err := UnlinkPerson(nil, nil, nil)(w, r)
+			err := UnlinkPerson(nil, nil, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -105,7 +105,7 @@ func TestUnlinkPersonsWhenFailure(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=189", nil)
 	w := httptest.NewRecorder()
 
-	err := UnlinkPerson(client, nil, nil)(w, r)
+	err := UnlinkPerson(client, nil, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -129,7 +129,7 @@ func TestUnlinkPersonWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=189", nil)
 	w := httptest.NewRecorder()
 
-	err := UnlinkPerson(client, template.Func, nil)(w, r)
+	err := UnlinkPerson(client, template.Func, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -161,7 +161,7 @@ func TestPostUnlinkPersonWhenChildNotSelected(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := UnlinkPerson(client, template.Func, nil)(w, r)
+	err := UnlinkPerson(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -205,7 +205,7 @@ func TestUnlinkPersonWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := UnlinkPerson(client, template.Func, nil)(w, r)
+	err := UnlinkPerson(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -257,7 +257,7 @@ func TestPostUnlinkPerson(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := UnlinkPerson(client, template.Func, nil)(w, r)
+	err := UnlinkPerson(client, template.Func, nil)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)

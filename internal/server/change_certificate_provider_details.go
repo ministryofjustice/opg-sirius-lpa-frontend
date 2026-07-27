@@ -35,7 +35,7 @@ type formCertificateProviderDetails struct {
 
 func ChangeCertificateProviderDetails(client ChangeCertificateProviderDetailsClient, tmpl template.Template) Handler {
 
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		caseUid := r.PathValue("uid")
 		ctx := getContext(r)
 		caseSummary, err := client.CaseSummary(ctx, caseUid)

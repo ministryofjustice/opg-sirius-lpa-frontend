@@ -41,7 +41,7 @@ func TestGetSiriusHeaderCaseInfo(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1", nil)
 	w := httptest.NewRecorder()
 
-	err := SiriusHeaderCaseInfo(client, template.Func)(w, r)
+	err := SiriusHeaderCaseInfo(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -62,7 +62,7 @@ func TestGetSiriusHeaderCaseInfoBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, query, nil)
 			w := httptest.NewRecorder()
 
-			err := SiriusHeaderCaseInfo(client, nil)(w, r)
+			err := SiriusHeaderCaseInfo(client, nil)(PageVars{}, w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -78,7 +78,7 @@ func TestGetSiriusHeaderCaseInfoWhenCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1", nil)
 	w := httptest.NewRecorder()
 
-	err := SiriusHeaderCaseInfo(client, nil)(w, r)
+	err := SiriusHeaderCaseInfo(client, nil)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)

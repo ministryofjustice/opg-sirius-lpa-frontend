@@ -18,7 +18,7 @@ type manageFeesData struct {
 }
 
 func ManageFees(client ManageFeesClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err

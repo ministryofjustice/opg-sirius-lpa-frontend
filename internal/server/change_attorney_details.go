@@ -38,7 +38,7 @@ type formAttorneyDetails struct {
 
 func ChangeAttorneyDetails(client ChangeAttorneyDetailsClient, tmpl template.Template) Handler {
 
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		caseUID := r.PathValue("uid")
 		attorneyUID := r.PathValue("attorneyUID")
 

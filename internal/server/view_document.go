@@ -37,7 +37,7 @@ type viewDocumentData struct {
 }
 
 func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		uuid := r.PathValue("uuid")
 		ctx := getContext(r)
 
@@ -121,12 +121,7 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			SelectedCases:   selectedCase,
 		}
 
-		userPermissions, err := client.GetUserPermissions(ctx)
-		if err != nil {
-			return err
-		}
-
-		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, userPermissions)
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, draftCount > 0, personHasReferences, len(person.Children) > 0, taskIDs, pageVars.UserPermissions)
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,
 			CaseInfo:       true,
@@ -134,8 +129,8 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			Calendar:       true,
 		}
 
-		data.HasV1PersonsGetPermission = userPermissions.Includes("v1-persons", "GET")
-		data.HasV1PersonsCasesGetPermission = userPermissions.Includes("v1-persons-cases", "GET")
+		data.HasV1PersonsGetPermission = pageVars.UserPermissions.Includes("v1-persons", "GET")
+		data.HasV1PersonsCasesGetPermission = pageVars.UserPermissions.Includes("v1-persons-cases", "GET")
 
 		return tmpl(w, data)
 	}

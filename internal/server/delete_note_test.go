@@ -44,7 +44,7 @@ func TestGetDeleteNote(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&eventId=456", nil)
 	w := httptest.NewRecorder()
 
-	err := DeleteNote(client, template.Func)(w, r)
+	err := DeleteNote(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -63,7 +63,7 @@ func TestGetDeleteNoteGetEventsFails(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?donorId=123&eventId=456", nil)
 	w := httptest.NewRecorder()
 
-	err := DeleteNote(client, template.Func)(w, r)
+	err := DeleteNote(client, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -88,7 +88,7 @@ func TestPostDeleteNote(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := DeleteNote(client, template.Func)(w, r)
+	err := DeleteNote(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/donor/123/history"), err)
@@ -115,7 +115,7 @@ func TestPostDeleteNoteError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := DeleteNote(client, template.Func)(w, r)
+	err := DeleteNote(client, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)

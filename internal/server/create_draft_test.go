@@ -58,7 +58,7 @@ func TestGetCreateDraft(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/digital-lpa/create", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateDraft(client, template.Func)(w, r)
+	err := CreateDraft(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -80,7 +80,7 @@ func TestGetCreateDraftForbidden(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/digital-lpa/create", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateDraft(client, template.Func)(w, r)
+	err := CreateDraft(client, template.Func)(PageVars{}, w, r)
 
 	assert.Equal(t, sirius.StatusError{Code: 403}, err)
 
@@ -206,7 +206,7 @@ func TestPostCreateDraft(t *testing.T) {
 	_ = r.ParseMultipartForm(32 << 20)
 	w := httptest.NewRecorder()
 
-	err := CreateDraft(client, template.Func)(w, r)
+	err := CreateDraft(client, template.Func)(PageVars{}, w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -242,7 +242,7 @@ func TestPostCreateDraftWhenAPIFails(t *testing.T) {
 	_ = r.ParseMultipartForm(32 << 20)
 	w := httptest.NewRecorder()
 
-	err := CreateDraft(client, template.Func)(w, r)
+	err := CreateDraft(client, template.Func)(PageVars{}, w, r)
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
@@ -288,7 +288,7 @@ func TestPostCreateDraftWhenValidationError(t *testing.T) {
 	_ = r.ParseMultipartForm(32 << 20)
 	w := httptest.NewRecorder()
 
-	err := CreateDraft(client, template.Func)(w, r)
+	err := CreateDraft(client, template.Func)(PageVars{}, w, r)
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

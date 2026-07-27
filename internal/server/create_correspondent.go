@@ -25,7 +25,7 @@ type createCorrespondentData struct {
 }
 
 func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Template, partialTemplate template.Template) Handler {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
 		donorId, err := strToIntOrStatusError(r.FormValue("id"))

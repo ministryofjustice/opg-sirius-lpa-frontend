@@ -43,7 +43,7 @@ type createAdditionalDraftData struct {
 
 func CreateAdditionalDraft(client CreateAdditionalDraftClient, tmpl template.Template) Handler {
 
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		id, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err

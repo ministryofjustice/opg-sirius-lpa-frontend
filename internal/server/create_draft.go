@@ -82,7 +82,7 @@ type createDraftData struct {
 
 func CreateDraft(client CreateDraftClient, tmpl template.Template) Handler {
 
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(pageVars PageVars, w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
