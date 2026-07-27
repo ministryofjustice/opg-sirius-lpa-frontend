@@ -18,6 +18,11 @@ type mockCreateLpaClient struct {
 	mock.Mock
 }
 
+func (m *mockCreateLpaClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.Case), args.Error(1)
+}
+
 func (m *mockCreateLpaClient) Person(ctx sirius.Context, id int) (sirius.Person, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(sirius.Person), args.Error(1)
