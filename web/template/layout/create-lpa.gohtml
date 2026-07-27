@@ -19,6 +19,45 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
+            {{ template "radios" (radios "caseSubtype" "LPA type" .Lpa.SubType .Error.Field.caseSubtype false
+            (item "pfa" "Property and finance")
+            (item "hw" "Health and welfare")
+            ) }}
+
+            <div class="govuk-form-group {{ if .Error.Field.applicationType }}govuk-form-group--error{{ end }}">
+              <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend">Application type</legend>
+                {{ template "errors" .Error.Field.applicationType }}
+                <div class="govuk-radios" data-module="govuk-radios">
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-applicationType" name="applicationType" type="radio"
+                           value="Online" data-aria-controls="onlineLpaIdReveal"
+                           {{ if eq .Lpa.ApplicationType "Online" }}checked{{ end }}>
+                    <label class="govuk-label govuk-radios__label" for="f-applicationType">Online</label>
+                  </div>
+                  <div class="govuk-radios__conditional {{ if ne .Lpa.ApplicationType "Online" }}govuk-radios__conditional--hidden{{ end }}"
+                       id="onlineLpaIdReveal">
+                    <div class="govuk-form-group">
+                      {{ template "input" (field "onlineLpaId" "A-reference" .Lpa.OnlineLpaId .Error.Field.onlineLpaId) }}
+                    </div>
+                  </div>
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-applicationType-2" name="applicationType" type="radio"
+                           value="Classic" {{ if eq .Lpa.ApplicationType "Classic" }}checked{{ end }}>
+                    <label class="govuk-label govuk-radios__label" for="f-applicationType-2">Classic</label>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+
+            {{ if .CanEditReceiptDate }}
+              {{ template "input-date" (field "receiptDate" "Receipt date" .Lpa.ReceiptDate .Error.Field.receiptDate "max" today) }}
+            {{ else }}
+              <div class="govuk-form-group">
+                <label class="govuk-label">Receipt date</label>
+                <p class="govuk-body" id="f-receiptDate-readonly">{{ if .Lpa.ReceiptDate }}{{ formatDate .Lpa.ReceiptDate }}{{ else }}Not yet set{{ end }}</p>
+              </div>
+            {{ end }}
           </div>
         </div>
         <div class="govuk-summary-card">
@@ -28,6 +67,25 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
+            {{ if gt (len .Lpa.Attorneys) 0 }}
+              {{ range $attorney := .Lpa.Attorneys }}
+                <div class="app-create-epa__details-row">
+                  <details class="govuk-details">
+                    <summary class="govuk-details__summary">
+                      <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
+                    </summary>
+                    <div class="govuk-details__text">
+                      {{ template "person-details-table" . }}
+                    </div>
+                  </details>
+                </div>
+              {{ end }}
+            {{ end }}
+            <div class="govuk-button-group app-button-group--column">
+              <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                     type="button" disabled="disabled"
+                     value="Add attorney"/>
+            </div>
           </div>
         </div>
         <div class="govuk-summary-card">
@@ -37,6 +95,12 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
+            {{ template "radios" (radios "caseAttorney" "Select one option" .AppointmentType .Error.Field.appointmentType false
+            (item "singular" "Only one attorney appointed")
+            (item "jointly-and-severally" "Jointly and severally")
+            (item "jointly" "Jointly")
+            (item "jointly-and-jointly-and-severally" "Jointly for some, jointly and severally for others")
+            ) }}
           </div>
         </div>
         <div class="govuk-summary-card">
@@ -46,6 +110,25 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
+            {{ if gt (len .Lpa.ReplacementAttorneys) 0 }}
+              {{ range $attorney := .Lpa.ReplacementAttorneys }}
+                <div class="app-create-epa__details-row">
+                  <details class="govuk-details">
+                    <summary class="govuk-details__summary">
+                      <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
+                    </summary>
+                    <div class="govuk-details__text">
+                      {{ template "person-details-table" . }}
+                    </div>
+                  </details>
+                </div>
+              {{ end }}
+            {{ end }}
+            <div class="govuk-button-group app-button-group--column">
+              <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                     type="button" disabled="disabled"
+                     value="Add replacement attorney"/>
+            </div>
           </div>
         </div>
       </div>
@@ -63,10 +146,27 @@
         <div class="govuk-summary-card">
           <div class="govuk-summary-card__title-wrapper">
             <h2 class="govuk-summary-card__title">
-              When can the LPA be used?
+              {{ if eq .Lpa.SubType "hw" }}Life sustaining treatment (LST){{ else }}When can the LPA be used?{{ end }}
             </h2>
           </div>
           <div class="govuk-summary-card__content">
+            {{ if eq .Lpa.SubType "hw" }}
+              {{ template "radios" (radios "lifeSustainingTreatment" "Life sustaining treatment (LST)" .Lpa.LifeSustainingTreatment .Error.Field.lifeSustainingTreatment true
+              (item "Option A" "Option A")
+              (item "Option B" "Option B")
+              (item "None" "Neither selected")
+              ) }}
+              {{ template "input-date" (field "lifeSustainingTreatmentSignatureDate" "Date signed" .Lpa.LifeSustainingTreatmentSignatureDateA .Error.Field.lifeSustainingTreatmentSignatureDate) }}
+              {{ template "radios" (radios "lifeSustainingTreatmentSignedAndWitnessed" "Signed and witnessed correctly" (stringifyBoolPointer .Lpa.LifeSustainingTreatmentSignedAndWitnessed) .Error.Field.lifeSustainingTreatmentSignedAndWitnessed true
+              (item "true" "Yes")
+              (item "false" "No")
+              ) }}
+            {{ else }}
+              {{ template "radios" (radios "attorneyActDecisions" "When can the LPA be used?" .Lpa.AttorneyActDecisions .Error.Field.attorneyActDecisions false
+              (item "When Registered" "As soon as it's registered")
+              (item "Loss of capacity" "Only when the donor doesn't have mental capacity")
+              ) }}
+            {{ end }}
           </div>
         </div>
         <div class="govuk-summary-card">
@@ -76,6 +176,11 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
+            <div class="govuk-button-group app-button-group--column">
+              <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                     type="button" disabled="disabled"
+                     value="Add notified person"/>
+            </div>
           </div>
         </div>
         <div class="govuk-summary-card">
@@ -85,6 +190,38 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
+            <div class="govuk-form-group {{ if .Error.Field.preferencesAndInstructions }}govuk-form-group--error{{ end }}">
+              <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-visually-hidden">Does the donor have any preferences or instructions?</legend>
+                {{ template "errors" .Error.Field.preferencesAndInstructions }}
+                <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="f-preferencesAndInstructions" name="preferencesAndInstructions"
+                           type="checkbox" value="guidance"
+                           {{ if compareBoolPointers .Lpa.ApplicationHasGuidance true }}checked{{ end }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="f-preferencesAndInstructions">
+                      Preferences
+                    </label>
+                  </div>
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="f-preferencesAndInstructions-2" name="preferencesAndInstructions"
+                           type="checkbox" value="restrictions"
+                           {{ if compareBoolPointers .Lpa.ApplicationHasRestrictions true }}checked{{ end }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="f-preferencesAndInstructions-2">
+                      Instructions
+                    </label>
+                  </div>
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="f-preferencesAndInstructions-3" name="preferencesAndInstructions"
+                           type="checkbox" value="none" data-behaviour="exclusive"
+                           {{ if and (compareBoolPointers .Lpa.ApplicationHasGuidance false) (compareBoolPointers .Lpa.ApplicationHasRestrictions false) }}checked{{ end }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="f-preferencesAndInstructions-3">
+                      None
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
           </div>
         </div>
       </div>
@@ -94,7 +231,7 @@
       <div class="govuk-accordion__section-header">
         <h2 class="govuk-accordion__section-heading">
           <span class="govuk-accordion__section-button" id="accordion-create-lpa-heading-1">
-              Section 9–11: Signatures and certified provider details
+              Section 9–11: Signatures and Certificate Provider details
           </span>
         </h2>
       </div>
@@ -102,19 +239,60 @@
         <div class="govuk-summary-card">
           <div class="govuk-summary-card__title-wrapper">
             <h2 class="govuk-summary-card__title">
-              Donor
+              Signatures and certificate provider details
             </h2>
           </div>
           <div class="govuk-summary-card__content">
-          </div>
-        </div>
-        <div class="govuk-summary-card">
-          <div class="govuk-summary-card__title-wrapper">
-            <h2 class="govuk-summary-card__title">
-              Certified provider
-            </h2>
-          </div>
-          <div class="govuk-summary-card__content">
+            <h3 class="govuk-heading-s">LPA donor</h3>
+            <p class="govuk-body">{{ .DonorName }}</p>
+            {{ template "input-date" (field "lpaDonorSignatureDate" "Date signed" .Lpa.LpaDonorSignatureDate .Error.Field.lpaDonorSignatureDate) }}
+
+            <h3 class="govuk-heading-s">Certificate provider</h3>
+            {{ if gt (len .Lpa.CertificateProviders) 0 }}
+              {{ range $cp := .Lpa.CertificateProviders }}
+                <div class="app-create-epa__details-row">
+                  <details class="govuk-details">
+                    <summary class="govuk-details__summary">
+                      <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
+                    </summary>
+                    <div class="govuk-details__text">
+                      {{ template "person-details-table" . }}
+                    </div>
+                  </details>
+
+                  <div class="govuk-form-group">
+                    <input class="govuk-input" type="text" placeholder="DD/MM/YYYY" disabled="disabled"/>
+                  </div>
+                </div>
+              {{ end }}
+            {{ end }}
+
+            {{ if lt (len .Lpa.CertificateProviders) 2 }}
+              <div class="govuk-button-group app-button-group--column">
+                <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                       type="button" disabled="disabled"
+                       value="Add Certificate Provider"/>
+              </div>
+            {{ end }}
+
+            {{ if gt (len .Lpa.Attorneys) 0 }}
+              <h3 class="govuk-heading-s">Attorneys</h3>
+              {{ range $attorney := .Lpa.Attorneys }}
+                <div class="govuk-form-group">
+                  <label class="govuk-label">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</label>
+                  <input class="govuk-input" type="text" placeholder="DD/MM/YYYY" disabled="disabled"/>
+                </div>
+              {{ end }}
+            {{ end }}
+            {{ if gt (len .Lpa.ReplacementAttorneys) 0 }}
+              <h3 class="govuk-heading-s">Replacement attorneys</h3>
+              {{ range $attorney := .Lpa.ReplacementAttorneys }}
+                <div class="govuk-form-group">
+                  <label class="govuk-label">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</label>
+                  <input class="govuk-input" type="text" placeholder="DD/MM/YYYY" disabled="disabled"/>
+                </div>
+              {{ end }}
+            {{ end }}
           </div>
         </div>
       </div>
@@ -132,10 +310,42 @@
         <div class="govuk-summary-card">
           <div class="govuk-summary-card__title-wrapper">
             <h2 class="govuk-summary-card__title">
-              LPA applicant
+              Applicant
             </h2>
           </div>
           <div class="govuk-summary-card__content">
+            <div class="govuk-form-group {{ if .Error.Field.applicantType }}govuk-form-group--error{{ end }}">
+              <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend">Who is applying to register the Lasting Power of Attorney?</legend>
+                {{ template "errors" .Error.Field.applicantType }}
+                <div class="govuk-radios" data-module="govuk-radios">
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-applicantType" name="applicantType" type="radio"
+                           value="donor" {{ if eq .Lpa.ApplicantType "donor" }}checked{{ end }}>
+                    <label class="govuk-label govuk-radios__label" for="f-applicantType">Donor</label>
+                  </div>
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-applicantType-2" name="applicantType" type="radio"
+                           value="attorney" data-aria-controls="applicantAttorneysReveal"
+                           {{ if eq .Lpa.ApplicantType "attorney" }}checked{{ end }}>
+                    <label class="govuk-label govuk-radios__label" for="f-applicantType-2">Attorney</label>
+                  </div>
+                  <div class="govuk-radios__conditional {{ if ne .Lpa.ApplicantType "attorney" }}govuk-radios__conditional--hidden{{ end }}"
+                       id="applicantAttorneysReveal">
+                    {{ range $attorney := .Lpa.Attorneys }}
+                      <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" id="f-applicantIds-{{ .ID }}" name="applicantIds"
+                               type="checkbox" value="{{ .ID }}">
+                        <label class="govuk-label govuk-checkboxes__label" for="f-applicantIds-{{ .ID }}">
+                          {{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                        </label>
+                      </div>
+                    {{ end }}
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+            {{ template "input-date" (field "applicantSignatureDate" "Date signed" .Lpa.ApplicantSignatureDate .Error.Field.applicantSignatureDate) }}
           </div>
         </div>
         <div class="govuk-summary-card">
@@ -145,6 +355,25 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
+            {{ if .Lpa.Correspondent }}
+              <p class="govuk-heading-s">Correspondent:</p>
+              <div class="app-create-epa__details-row">
+                <details class="govuk-details">
+                  <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">{{ if .Lpa.Correspondent.Salutation }}{{ .Lpa.Correspondent.Salutation }}{{ end }}{{ if .Lpa.Correspondent.Firstname }} {{ .Lpa.Correspondent.Firstname }}{{ end }}{{ if .Lpa.Correspondent.Middlenames }} {{ .Lpa.Correspondent.Middlenames }}{{ end }}{{ if .Lpa.Correspondent.Surname }} {{ .Lpa.Correspondent.Surname }}{{ end }}</span>
+                  </summary>
+                  <div class="govuk-details__text">
+                    {{ template "person-details-table" .Lpa.Correspondent }}
+                  </div>
+                </details>
+              </div>
+            {{ else }}
+              <div class="govuk-button-group app-button-group--column">
+                <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                       type="button" disabled="disabled"
+                       value="Add correspondent"/>
+              </div>
+            {{ end }}
           </div>
         </div>
         <div class="govuk-summary-card">
@@ -154,6 +383,71 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
+            <div class="govuk-form-group {{ if .Error.Field.applicationFee }}govuk-form-group--error{{ end }}">
+              <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-visually-hidden">How is the application fee being paid?</legend>
+                {{ template "errors" .Error.Field.applicationFee }}
+                <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="f-applicationFee" name="applicationFee"
+                           type="checkbox" value="card" data-aria-controls="cardPaymentContactReveal"
+                           {{ if compareBoolPointers .Lpa.PaymentByDebitCreditCard true }}checked{{ end }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="f-applicationFee">
+                      Pay fee by credit or debit card
+                    </label>
+                  </div>
+                  <div class="govuk-checkboxes__conditional {{ if not (compareBoolPointers .Lpa.PaymentByDebitCreditCard true) }}govuk-checkboxes__conditional--hidden{{ end }}"
+                       id="cardPaymentContactReveal">
+                    <div class="govuk-form-group">
+                      {{ template "input" (field "cardPaymentContact" "Contact details for credit or debit card" .Lpa.CardPaymentContact .Error.Field.cardPaymentContact) }}
+                    </div>
+                  </div>
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="f-applicationFee-2" name="applicationFee"
+                           type="checkbox" value="cheque"
+                           {{ if compareBoolPointers .Lpa.PaymentByCheque true }}checked{{ end }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="f-applicationFee-2">
+                      Cheque enclosed
+                    </label>
+                  </div>
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="f-applicationFee-3" name="applicationFee"
+                           type="checkbox" value="reducedFee" data-aria-controls="reducedFeeTypeReveal"
+                           {{ if or (compareBoolPointers .Lpa.PaymentExemption true) (compareBoolPointers .Lpa.PaymentRemission true) }}checked{{ end }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="f-applicationFee-3">
+                      Apply for a reduced fee
+                    </label>
+                  </div>
+                  <div class="govuk-checkboxes__conditional {{ if not (or (compareBoolPointers .Lpa.PaymentExemption true) (compareBoolPointers .Lpa.PaymentRemission true)) }}govuk-checkboxes__conditional--hidden{{ end }}"
+                       id="reducedFeeTypeReveal">
+                    {{ $reducedFeeType := "" }}
+                    {{ if compareBoolPointers .Lpa.PaymentExemption true }}{{ $reducedFeeType = "exemption" }}{{ end }}
+                    {{ if compareBoolPointers .Lpa.PaymentRemission true }}{{ $reducedFeeType = "remission" }}{{ end }}
+                    {{ template "radios" (radios "reducedFeeType" "Reduced fee type" $reducedFeeType .Error.Field.reducedFeeType true
+                    (item "exemption" "Exemption")
+                    (item "remission" "Remission")
+                    ) }}
+                  </div>
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="f-applicationFee-4" name="applicationFee"
+                           type="checkbox" value="repeatApplication" data-aria-controls="repeatApplicationReferenceReveal"
+                           {{ if compareBoolPointers .Lpa.RepeatApplication true }}checked{{ end }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="f-applicationFee-4">
+                      Repeat application
+                    </label>
+                  </div>
+                  <div class="govuk-checkboxes__conditional {{ if not (compareBoolPointers .Lpa.RepeatApplication true) }}govuk-checkboxes__conditional--hidden{{ end }}"
+                       id="repeatApplicationReferenceReveal">
+                    <div class="govuk-form-group">
+                      <label class="govuk-label" for="f-repeatApplicationReference">Repeat application reference</label>
+                      <p class="govuk-hint">Not yet saved - this field cannot currently be persisted (see note in create_lpa.go)</p>
+                      <input class="govuk-input" id="f-repeatApplicationReference" name="repeatApplicationReference"
+                             value="{{ .Lpa.RepeatApplicationReference }}" disabled="disabled"/>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
           </div>
         </div>
         <div class="govuk-summary-card">
@@ -163,6 +457,24 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
+            <div class="govuk-form-group">
+              <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="f-anyOtherInfo" name="anyOtherInfo"
+                         type="checkbox" value="true" data-aria-controls="additionalInfoReveal"
+                         {{ if compareBoolPointers .Lpa.AnyOtherInfo true }}checked{{ end }}>
+                  <label class="govuk-label govuk-checkboxes__label" for="f-anyOtherInfo">
+                    Yes
+                  </label>
+                </div>
+                <div class="govuk-checkboxes__conditional {{ if not (compareBoolPointers .Lpa.AnyOtherInfo true) }}govuk-checkboxes__conditional--hidden{{ end }}"
+                     id="additionalInfoReveal">
+                  <div class="govuk-form-group">
+                    {{ template "textarea" (field "additionalInfo" "Give details" .Lpa.AdditionalInfo .Error.Field.additionalInfo) }}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
