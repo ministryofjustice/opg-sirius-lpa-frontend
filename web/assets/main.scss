@@ -264,6 +264,41 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   cursor: pointer;
 }
 
+.app-details-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: inherit;
+  color: govuk-functional-colour(link);
+  text-align: left;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    color: govuk-functional-colour(link-hover);
+  }
+
+  &::before {
+    content: "\27A4";
+    display: inline-block;
+    margin-right: govuk-spacing(1);
+    font-size: 1em;
+  }
+
+  &[aria-expanded="true"]::before {
+    transform: rotate(90deg);
+  }
+}
+
+.app-details-content {
+  padding: govuk-spacing(2) govuk-spacing(2);
+  background-color: govuk-colour("white");
+}
+
+.govuk-details__summary-text.summary-text-padding {
+    padding-left: .5em;
+}
+
 .app-\!-gap-2 {
   gap: 10px;
 }

@@ -97,9 +97,9 @@
                         <div class="govuk-accordion__section govuk-accordion__section--expanded">
                             <div class="govuk-accordion__section-header">
                                 <h2 class="govuk-accordion__section-heading">
-                    <span class="govuk-accordion__section-button" id="accordion-create-epa-heading-3">
-                      Step 3: Actors
-                    </span>
+                                    <span class="govuk-accordion__section-button" id="accordion-create-epa-heading-3">
+                                      Step 3: Actors
+                                    </span>
                                 </h2>
                             </div>
                             <div id="accordion-create-epa-content-3" class="govuk-accordion__section-content">
@@ -107,14 +107,14 @@
                                     <p class="govuk-heading-s">Attorneys:</p>
                                     {{ range $attorney := .Epa.Attorneys }}
                                         <div class="app-create-epa__details-row">
-                                            <details class="govuk-details">
-                                                <summary class="govuk-details__summary">
+                                            <div class="govuk-details">
+                                                <button type="button" class="app-details-toggle" data-details-id="attorney-{{ .ID }}">
                                                     <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
-                                                </summary>
-                                                <div class="govuk-details__text">
+                                                </button>
+                                                <div class="govuk-details__text app-details-content" id="attorney-{{ .ID }}">
                                                     {{ template "person-details-table" . }}
                                                 </div>
-                                            </details>
+                                            </div>
                                             <span class="app-create-epa__summary-update-link">
                                                 <button class="app-create-epa__summary-update-button govuk-link govuk-link--no-visited-state"
                                                         id="f-update-attorney-{{ .ID }}"
@@ -139,14 +139,14 @@
                                     {{ $correspondent := .Epa.Correspondent }}
                                     <p class="govuk-heading-s">Correspondent:</p>
                                     <div class="app-create-epa__details-row">
-                                        <details class="govuk-details">
-                                            <summary class="govuk-details__summary">
+                                        <div class="govuk-details">
+                                            <button type="button" class="app-details-toggle" data-details-id="correspondent-{{ $correspondent.ID }}">
                                                 <span class="govuk-details__summary-text">{{ if $correspondent.Salutation }}{{ $correspondent.Salutation }}{{ end }}{{ if $correspondent.Firstname }} {{ $correspondent.Firstname }}{{ end }}{{ if $correspondent.Middlenames }} {{ $correspondent.Middlenames }}{{ end }}{{ if $correspondent.Surname }} {{ $correspondent.Surname }}{{ end }}</span>
-                                            </summary>
-                                            <div class="govuk-details__text">
+                                            </button>
+                                            <div class="govuk-details__text app-details-content" id="correspondent-{{ $correspondent.ID }}">
                                                 {{ template "person-details-table" .Epa.Correspondent }}
                                             </div>
-                                        </details>
+                                        </div>
                                         <span class="app-create-epa__summary-update-link">
                                             <button class="app-create-epa__summary-update-button govuk-link govuk-link--no-visited-state"
                                                     id="f-update-correspondent-{{ $correspondent.ID }}"
