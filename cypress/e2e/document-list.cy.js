@@ -801,6 +801,20 @@ describe("View documents", () => {
     cy.get("#govuk-notification-banner-title").contains("File deleted");
     cy.contains("29/05/2022 LP1F - Finance Instrument");
   });
+
+  it("should display the header button labels on hover", () => {
+    cy.visit("/donor/1/documents");
+    cy.get("#header-button-return-to-timeline").should(
+      "have.attr",
+      "title",
+      "Return to timeline",
+    );
+    cy.get("#header-button-calendars").should(
+      "have.attr",
+      "title",
+      "Calendars",
+    );
+  });
 });
 
 describe("sort by dropdown", () => {
