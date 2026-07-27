@@ -5,7 +5,7 @@
                 <div class="sirius-header__primary">
                     {{ if .HeaderButtons.BackToTimeline }}
                         <div class="sirius-header__actions">
-                            {{ template "header-button" headerBarButton "Back to timeline" (sirius (printf "/lpa/person/%d/%s" .DonorID .SelectedCaseIds)) "icon-backtotimeline" }}
+                            {{ template "header-button" headerBarButton "Return to timeline" (sirius (printf "/lpa/person/%d/%s" .DonorID .SelectedCaseIds)) "icon-backtotimeline" }}
                         </div>
                     {{ end }}
                     {{ if .Person }}
@@ -22,7 +22,7 @@
                         {{ end }}
                         {{ if and .HasV1PersonsCasesGetPermission (eq (len .SelectedCases) 1)  (.HeaderButtons.CaseInfo) }}
                             {{ with index .SelectedCases 0 }}
-                                {{ template "header-dropdown-button" headerBarButton "Case Information" (prefix (printf "/sirius-header-case-info?id=%d" .ID)) "icon-caseinfo" }}
+                                {{ template "header-dropdown-button" headerBarButton "Case information" (prefix (printf "/sirius-header-case-info?id=%d" .ID)) "icon-caseinfo" }}
                             {{ end }}
                         {{ end }}
                         {{ if and .HasV1PersonsGetPermission (eq (len .SelectedCases) 1) (.HeaderButtons.PersonInfo) }}
