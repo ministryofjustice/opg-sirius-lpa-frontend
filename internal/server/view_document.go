@@ -35,7 +35,7 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 		uuid := r.PathValue("uuid")
 		ctx := getContext(r)
 
-		pageVars, err := PageValues(client, r)
+		pageVars, err := GetPageValues(client, r)
 		if err != nil {
 			return err
 		}

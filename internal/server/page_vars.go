@@ -11,7 +11,6 @@ import (
 )
 
 type PageVars struct {
-	ActionPanelButtons             []ActionPanelButton
 	CaseIDs                        []string
 	CaseUidsCollection             []string
 	CasesOnDonor                   []sirius.Case
@@ -20,7 +19,6 @@ type PageVars struct {
 	DraftCount                     int
 	HasV1PersonsCasesGetPermission bool
 	HasV1PersonsGetPermission      bool
-	HeaderButtons                  SiriusHeaderButtons
 	Person                         sirius.Person
 	PersonReferences               bool
 	SelectedCaseIds                string
@@ -39,7 +37,7 @@ type PageVarsClient interface {
 	TasksForCase(ctx sirius.Context, id int) ([]sirius.Task, error)
 }
 
-func PageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
+func GetPageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 	ctx := getContext(r)
 
 	donorID, _ := strToIntOrStatusError(r.PathValue("id"))
