@@ -21,7 +21,7 @@
                 {{ with index .Cases 0 }}
                   <a class="govuk-link govuk-link--no-visited-state"
                      href=""
-                     hx-get="{{ prefix (printf "/action-panel?id=%d&entity=%s" .ID (ToLower $.EntityType)) }}"
+                     hx-get="{{ prefix (printf "/action-panel?id=%d&entity=%s" $.DonorId (ToLower $.EntityType)) }}"
                      hx-target=".action-panel__content"
                      hx-swap="innerHTML"
                   >Cancel</a>

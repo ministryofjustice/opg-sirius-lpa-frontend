@@ -15,6 +15,11 @@ type mockActionPanelClient struct {
 	mock.Mock
 }
 
+func (m *mockActionPanelClient) GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error) {
+	args := m.Called(ctx, personID, caseIDs)
+	return args.Get(0).(sirius.DocumentList), args.Error(1)
+}
+
 func (m *mockActionPanelClient) CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).([]sirius.Case), args.Error(1)
@@ -46,7 +51,7 @@ func (m *mockActionPanelClient) GetUserPermissions(ctx sirius.Context) (sirius.P
 }
 
 var actionPanelPermissions = sirius.Permissions{
-	"v1-persons":               sirius.PermissionType{Permissions: []string{"GET"}},
+	"reporting":                sirius.PermissionType{Permissions: []string{"GET"}},
 	"v1-cases-tasks-post":      sirius.PermissionType{Permissions: []string{"POST"}},
 	"v1-donors":                sirius.PermissionType{Permissions: []string{"POST", "PUT"}},
 	"v1-donors-epas":           sirius.PermissionType{Permissions: []string{"POST"}},
@@ -58,11 +63,12 @@ var actionPanelPermissions = sirius.Permissions{
 	"v1-payments":              sirius.PermissionType{Permissions: []string{"GET"}},
 	"v1-person-links":          sirius.PermissionType{Permissions: []string{"POST", "PATCH"}},
 	"v1-person-references":     sirius.PermissionType{Permissions: []string{"DELETE"}},
+	"v1-persons":               sirius.PermissionType{Permissions: []string{"GET"}},
+	"v1-persons-cases":         sirius.PermissionType{Permissions: []string{"GET"}},
 	"v1-persons-references":    sirius.PermissionType{Permissions: []string{"POST"}},
 	"v1-poa-tasks":             sirius.PermissionType{Permissions: []string{"PUT"}},
 	"v1-users-updateusercases": sirius.PermissionType{Permissions: []string{"PUT"}},
 	"v1-warnings":              sirius.PermissionType{Permissions: []string{"POST"}},
-	"reporting":                sirius.PermissionType{Permissions: []string{"GET"}},
 }
 
 func TestGetActionPanel(t *testing.T) {
@@ -84,6 +90,9 @@ func TestGetActionPanel(t *testing.T) {
 	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(actionPanelPermissions, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 123, []string(nil)).
+		Return(sirius.DocumentList{}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -262,6 +271,9 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(actionPanelPermissions, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 123, []string{"1"}).
+		Return(sirius.DocumentList{}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -438,6 +450,9 @@ func TestGetActionPanelNoOutstandingTasks(t *testing.T) {
 	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(sirius.Permissions{}, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 123, []string(nil)).
+		Return(sirius.DocumentList{}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -646,6 +661,9 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
 	client.
+		On("GetPersonDocuments", mock.Anything, 123, []string{"3"}).
+		Return(sirius.DocumentList{}, nil)
+	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(actionPanelPermissions, nil)
 
@@ -700,6 +718,9 @@ func TestGetActionPanelEditLpaOnlyEnabledWhenSingleLpaCaseSelected(t *testing.T)
 	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(actionPanelPermissions, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 123, []string{"2"}).
+		Return(sirius.DocumentList{}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -769,6 +790,9 @@ func TestGetActionPanelWhenPermissionsErrors(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
 	client.
+		On("GetPersonDocuments", mock.Anything, 123, []string(nil)).
+		Return(sirius.DocumentList{}, nil)
+	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(actionPanelPermissions, errExample)
 
@@ -796,11 +820,17 @@ func TestGetActionPanelWhenGetDraftCountErrors(t *testing.T) {
 		On("GetDraftCount", mock.Anything, "lpa", 1).
 		Return(sirius.DocumentDraftCount{}, expectedError)
 	client.
+		On("TasksForCase", mock.Anything, 1).
+		Return([]sirius.Task{}, nil)
+	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 123, []string{"1"}).
+		Return(sirius.DocumentList{}, nil)
 	client.
 		On("GetUserPermissions", mock.Anything).
 		Return(actionPanelPermissions, nil)
@@ -832,6 +862,9 @@ func TestGetActionPanelWhenTasksForCaseErrors(t *testing.T) {
 	client.
 		On("TasksForCase", mock.Anything, 1).
 		Return([]sirius.Task{}, expectedError)
+	client.
+		On("GetPersonDocuments", mock.Anything, 123, []string{"1"}).
+		Return(sirius.DocumentList{}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
@@ -872,6 +905,9 @@ func TestGetActionPanelWhenPersonReferencesErrors(t *testing.T) {
 		On("TasksForCase", mock.Anything, 1).
 		Return([]sirius.Task{}, nil)
 	client.
+		On("GetPersonDocuments", mock.Anything, 123, []string{"1"}).
+		Return(sirius.DocumentList{}, nil)
+	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{}, expectedError)
 	client.
@@ -904,6 +940,9 @@ func TestGetActionPanelWhenPersonErrors(t *testing.T) {
 	client.
 		On("TasksForCase", mock.Anything, 1).
 		Return([]sirius.Task{}, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 123, []string{"1"}).
+		Return(sirius.DocumentList{}, nil)
 	client.
 		On("PersonReferences", mock.Anything, 123).
 		Return([]sirius.PersonReference{{ID: 987}}, nil)
