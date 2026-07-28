@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -640,7 +641,6 @@ func TestPostCreateLpaDropsCardPaymentContactWhenCardNotSelected(t *testing.T) {
 }
 
 func TestPostCreateLpaDropsAdditionalInfoWhenAnyOtherInfoNotSelected(t *testing.T) {
-	// AdditionalInfo left empty - anyOtherInfo not "true"
 	lpa := sirius.Lpa{
 		ApplicationHasGuidance:     shared.BoolPtr(false),
 		ApplicationHasRestrictions: shared.BoolPtr(false),
@@ -984,6 +984,23 @@ func TestPostCreateLpaEditWhenValidationError(t *testing.T) {
 
 	existingLpa := sirius.Lpa{Case: sirius.Case{ID: 456, ReceiptDate: sirius.DateString("2022-01-01")}}
 
+	submittedLpa := sirius.Lpa{
+		ApplicationHasGuidance:     shared.BoolPtr(false),
+		ApplicationHasRestrictions: shared.BoolPtr(false),
+		PaymentByDebitCreditCard:   shared.BoolPtr(false),
+		PaymentRemission:           shared.BoolPtr(false),
+		RepeatApplication:          shared.BoolPtr(false),
+		AnyOtherInfo:               shared.BoolPtr(false),
+		Case: sirius.Case{
+			CaseAttorneySingular:                      shared.BoolPtr(true),
+			CaseAttorneyJointly:                       shared.BoolPtr(false),
+			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentExemption:                          shared.BoolPtr(false),
+		},
+	}
+
 	client := &mockCreateLpaClient{}
 	client.
 		On("Person", mock.Anything, 123).
@@ -993,15 +1010,20 @@ func TestPostCreateLpaEditWhenValidationError(t *testing.T) {
 		Return(sirius.Permissions{"v1-lpas-edit-dates": sirius.PermissionType{Permissions: []string{"PUT"}}}, nil)
 	client.
 		On("Lpa", mock.Anything, 456).
-		Return(existingLpa, nil)
+		Return(existingLpa, nil).
+		Once()
 	client.
-		On("UpdateLpa", mock.Anything, 456, mock.Anything).
+		On("UpdateLpa", mock.Anything, 456, submittedLpa).
 		Return(expectedError)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, mock.MatchedBy(func(d createLpaData) bool {
-			return d.Error.Error() == expectedError.Error() && !d.Success && d.IsUpdate && d.CaseId == 456
+			return d.Error.Error() == expectedError.Error() &&
+				!d.Success &&
+				d.IsUpdate &&
+				d.CaseId == 456 &&
+				reflect.DeepEqual(d.Lpa, submittedLpa)
 		})).
 		Return(nil)
 
