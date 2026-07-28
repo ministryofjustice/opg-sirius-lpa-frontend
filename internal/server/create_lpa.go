@@ -148,10 +148,13 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			}
 
 			data.AppointmentType = caseAttorneyValue
+			data.Lpa = lpa
 
 			if isEditing {
 				err = client.UpdateLpa(ctx, data.CaseId, lpa)
-				data.Lpa, _ = client.Lpa(ctx, data.CaseId)
+				if err == nil {
+					data.Lpa, _ = client.Lpa(ctx, data.CaseId)
+				}
 			} else {
 				lpa, err = client.CreateLpa(ctx, donorID, lpa)
 				if err == nil {
