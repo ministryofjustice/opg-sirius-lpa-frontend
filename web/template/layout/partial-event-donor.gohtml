@@ -19,20 +19,57 @@
     {{ else if eq .Type "UPD" }}
         {{ if $hasParentKey }}
             {{/* This is the child record */}}
+            {{ $firstname := index $.Entity "firstname" }}
+            {{ $surname := index $.Entity "surname" }}
+            {{ $childId := index $.Entity "id" }}
+
             {{ range $key, $v := .Changes }}
                 {{ if isChildLinked $v }}
-                    <p>TODO: Linking parent to child event - To be implemented</p>
+                    {{/* Linking parent to child event (on child donor)*/}}
+                    {{ $identifierMap := index $v "1" }}
+                    {{ $parentId := index (index $identifierMap "identifier") "id" }}
+                    <p>
+                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $parentId) }}">Primary record</a>
+                        was linked to
+                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $childId) }}">child record</a>
+                    </p>
                 {{ else }}
-                    <p>TODO: Unlinking parent to child event - To be implemented</p>
+                    {{/* Unlinking parent to child event (on child donor)*/}}
+                    {{ $identifierMap := index $v 0 }}
+                    {{ $parentId := index (index $identifierMap "identifier") "id" }}
+                    <p>
+                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $childId) }}">{{ $firstname }} {{$surname}}</a>
+                        was unlinked from
+                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $parentId) }}">Primary record</a>
+                    </p>
                 {{ end }}
             {{ end }}
         {{ else if $hasChildKey }}
-            {{/* This is the parent record */}}
+            {{/* This is the parent/primary record */}}
+            {{ $firstname := index $.Entity "firstname" }}
+            {{ $surname := index $.Entity "surname" }}
+            {{ $parentId := index $.Entity "id" }}
+
             {{ range $key, $v := .Changes }}
                 {{ if eq (len (index $v 0)) 0 }}
-                    <p>TODO: Linking parent to child event - To be implemented</p>
+                    {{/* Linking parent to child event (on parent/primary donor */}}
+                    {{ $identifierMap := index (index $v 1) 0 }}
+                    {{ $childId := index (index $identifierMap "identifier") "id" }}
+                    <p>
+                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $parentId) }}">Primary record</a>
+                        was linked to
+                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $childId) }}">child record</a>
+                    </p>
                 {{ else if eq (len (index $v 1)) 0 }}
-                    <p>TODO: Unlinking parent to child event - To be implemented</p>
+                    {{/* Unlinking parent to child event (on parent/primary donor) */}}
+                    {{ $identifierMap := index (index $v 0) 0 }}
+                    {{ $childId := index (index $identifierMap "identifier") "id" }}
+                    <p>
+                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $parentId)}}">{{ $firstname }} {{ $surname }}</a>
+                        had a
+                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $childId) }}">child record</a>
+                        unlinked
+                    </p>
                 {{ end }}
             {{ end }}
         {{ else }}
