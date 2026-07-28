@@ -42,7 +42,7 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
-		pageVars, err := PageValues(client, r)
+		pageVars, err := GetPageValues(client, r)
 		if err != nil {
 			return err
 		}
@@ -136,7 +136,7 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 			}
 		}
 
-		data.ActionPanelButtons = GetActionPanelButtons(pageVars.SelectedCases, data.DonorID, data.CaseUids, pageVars.DraftCount > 0, pageVars.PersonReferences, len(pageVars.Person.Children) > 0, pageVars.TaskIDs, ctx.Permissions)
+		data.ActionPanelButtons = GetActionPanelButtons(pageVars.SelectedCases, data.DonorID, data.CaseUids, pageVars.DraftCount > 0, pageVars.PersonReferences, len(pageVars.Person.Children) > 0, pageVars.TaskIDs, pageVars.UserPermissions)
 
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,
