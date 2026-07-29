@@ -8,9 +8,10 @@ import (
 
 type Attorney struct {
 	Person
-	SystemStatus        *bool  `json:"systemStatus,omitempty"`
-	RelationshipToDonor string `json:"relationshipToDonor,omitempty"`
-	CompanyNumber       string `json:"companyNumber,omitempty"`
+	LpaPartCSignatureDate DateString `json:"lpaPartCSignatureDate,omitempty"`
+	CompanyNumber         string     `json:"companyNumber,omitempty"`
+	RelationshipToDonor   string     `json:"relationshipToDonor,omitempty"`
+	SystemStatus          *bool      `json:"systemStatus,omitempty"`
 }
 
 func (a Attorney) Summary() string {

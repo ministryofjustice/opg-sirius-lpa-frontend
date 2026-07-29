@@ -379,7 +379,7 @@
               {{ range $attorney := .Lpa.Attorneys }}
                 <div class="govuk-form-group">
                   <label class="govuk-label">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</label>
-                  <input class="govuk-input" type="text" placeholder="DD/MM/YYYY" disabled="disabled"/>
+                  {{ template "input-date" (field (printf "lpaPartCSignatureDate-%d" .ID) "Date signed" .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
                 </div>
               {{ end }}
             {{ end }}
