@@ -95,6 +95,17 @@ if (window.self !== window.parent) {
     );
   }
 
+  document.querySelectorAll("[data-app-iframe-redirect]").forEach((el) => {
+    el.addEventListener("click", (event) => {
+      event.preventDefault();
+      const url = el.getAttribute("href");
+      window.parent.postMessage(
+          { type: "form-redirect", url: url },
+          `${window.location.protocol}//${window.location.host}`,
+      );
+    });
+  });
+
   document.querySelectorAll("[data-app-iframe-cancel]").forEach((el) => {
     el.addEventListener("click", (event) => {
       window.parent.postMessage(
