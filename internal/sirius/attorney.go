@@ -23,8 +23,8 @@ func (a Attorney) AddressSummary() string {
 	return strings.Join(filteredAddress, ", ")
 }
 
-func (c *Client) CreateAttorney(ctx Context, caseId int, attorney Attorney) error {
-	return c.post(ctx, fmt.Sprintf("/lpa-api/v1/epas/%d/attorneys", caseId), attorney, nil)
+func (c *Client) CreateAttorney(ctx Context, caseId int, caseType string, attorney Attorney) error {
+	return c.post(ctx, fmt.Sprintf("/lpa-api/v1/%ss/%d/attorneys", caseType, caseId), attorney, nil)
 }
 
 func (c *Client) UpdateAttorney(ctx Context, attorneyId int, attorney Attorney) error {
