@@ -882,3 +882,16 @@ func TestPersonInfoRow(t *testing.T) {
 	val := fn("Name", sirius.Person{}, 123, 456, 1, true, true)
 	assert.Equal(t, expected, val)
 }
+
+func TestStatusTag(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["statusTag"].(func(string, string) statusTagData)
+
+	expected := statusTagData{
+		ReadableString: "Test",
+		Colour:         "green",
+	}
+
+	val := fn("Test", "green")
+	assert.Equal(t, expected, val)
+}

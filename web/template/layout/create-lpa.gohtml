@@ -83,7 +83,7 @@
           <div class="govuk-summary-card__content">
             {{ if gt (len .Lpa.Attorneys) 0 }}
               {{ range $attorney := .Lpa.Attorneys }}
-                <div class="app-create-epa__details-row">
+                <div class="app-create-lpa__details-row">
                   <details class="govuk-details">
                     <summary class="govuk-details__summary">
                       <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
@@ -92,12 +92,31 @@
                       {{ template "person-details-table" . }}
                     </div>
                   </details>
+                  <span class="app-create-lpa__summary-update-link">
+                    {{ if eq (stringifyBoolPointer .SystemStatus) "true" }}
+                      {{ template "status-tag" (statusTag "Active" "green") }}
+                    {{ else }}
+                      {{ template "status-tag" (statusTag "Inactive" "red") }}
+                    {{ end }}
+                    <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
+                            id="f-update-attorney-{{ .ID }}"
+                            name="updateAttorney"
+                            type="submit"
+                            value="{{ .ID }}"
+                            disabled="disabled"
+                    >
+                      Update
+                      <span class="govuk-visually-hidden">
+                          attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                      </span>
+                    </button>
+                </span>
                 </div>
               {{ end }}
             {{ end }}
             <div class="govuk-button-group app-button-group--column">
               <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
-                     type="button" disabled="disabled"
+                     type="submit" data-disable-after-click="true" name="addAttorney"
                      value="Add attorney"/>
             </div>
           </div>
@@ -148,7 +167,7 @@
           <div class="govuk-summary-card__content">
             {{ if gt (len .Lpa.ReplacementAttorneys) 0 }}
               {{ range $attorney := .Lpa.ReplacementAttorneys }}
-                <div class="app-create-epa__details-row">
+                <div class="app-create-lpa__details-row">
                   <details class="govuk-details">
                     <summary class="govuk-details__summary">
                       <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
@@ -332,7 +351,7 @@
             <h3 class="govuk-heading-s">Certificate provider</h3>
             {{ if gt (len .Lpa.CertificateProviders) 0 }}
               {{ range $cp := .Lpa.CertificateProviders }}
-                <div class="app-create-epa__details-row">
+                <div class="app-create-lpa__details-row">
                   <details class="govuk-details">
                     <summary class="govuk-details__summary">
                       <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
@@ -437,7 +456,7 @@
           <div class="govuk-summary-card__content">
             {{ if .Lpa.Correspondent }}
               <p class="govuk-heading-s">Correspondent:</p>
-              <div class="app-create-epa__details-row">
+              <div class="app-create-lpa__details-row">
                 <details class="govuk-details">
                   <summary class="govuk-details__summary">
                     <span class="govuk-details__summary-text">{{ if .Lpa.Correspondent.Salutation }}{{ .Lpa.Correspondent.Salutation }}{{ end }}{{ if .Lpa.Correspondent.Firstname }} {{ .Lpa.Correspondent.Firstname }}{{ end }}{{ if .Lpa.Correspondent.Middlenames }} {{ .Lpa.Correspondent.Middlenames }}{{ end }}{{ if .Lpa.Correspondent.Surname }} {{ .Lpa.Correspondent.Surname }}{{ end }}</span>
