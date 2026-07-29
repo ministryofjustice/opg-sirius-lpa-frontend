@@ -38,8 +38,7 @@
                     {{ $identifierMap := index $v 0 }}
                     {{ $parentId := index (index $identifierMap "identifier") "id" }}
                     <p>
-                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $childId) }}">{{ $firstname }} {{$surname}}</a>
-                        was unlinked from
+                        {{ $firstname }} {{$surname}} was unlinked from
                         <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $parentId) }}">Primary record</a>
                     </p>
                 {{ end }}
@@ -65,8 +64,7 @@
                     {{ $identifierMap := index (index $v 0) 0 }}
                     {{ $childId := index (index $identifierMap "identifier") "id" }}
                     <p>
-                        <a data-app-iframe-redirect class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $parentId)}}">{{ $firstname }} {{ $surname }}</a>
-                        had a
+                        {{ $firstname }} {{ $surname }} had a
                         <a data-app-iframe-redirect class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $childId) }}">child record</a>
                         unlinked
                     </p>
