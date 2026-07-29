@@ -25,7 +25,7 @@ require (
 	github.com/cilium/ebpf v0.11.0 // indirect
 	github.com/cli/safeexec v1.0.1 // indirect
 	github.com/cosiner/argv v0.1.0 // indirect
-	github.com/cosmtrek/air v1.52.1 // indirect
+	github.com/cosmtrek/air v1.67.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
 	github.com/creack/pty v1.1.21 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
