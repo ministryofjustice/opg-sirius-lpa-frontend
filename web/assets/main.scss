@@ -246,18 +246,21 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   display: flex;
 }
 
-.app-create-epa__details-row, .app-create-lpa__details-row {
+.app-create-epa__details-row,
+.app-create-lpa__details-row {
   position: relative;
 }
 
-.app-create-epa__summary-update-link, .app-create-lpa__summary-update-link {
+.app-create-epa__summary-update-link,
+.app-create-lpa__summary-update-link {
   position: absolute;
   right: 0;
   top: 0;
   z-index: 1;
 }
 
-.app-create-epa__summary-update-button, .app-create-lpa__summary-update-button {
+.app-create-epa__summary-update-button,
+.app-create-lpa__summary-update-button {
   background: none;
   border: 0;
   color: govuk-colour("blue");
