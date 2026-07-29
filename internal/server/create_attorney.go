@@ -12,7 +12,7 @@ import (
 type CreateAttorneyClient interface {
 	Epa(ctx sirius.Context, id int) (sirius.Epa, error)
 	Lpa(ctx sirius.Context, id int) (sirius.Lpa, error)
-	CreateAttorney(ctx sirius.Context, caseId int, attorney sirius.Attorney) error
+	CreateAttorney(ctx sirius.Context, caseId int, caseTyp string, attorney sirius.Attorney) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	UpdateAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
 }
@@ -133,7 +133,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partial
 			if isEditing {
 				err = client.UpdateAttorney(ctx, attorneyId, attorney)
 			} else {
-				err = client.CreateAttorney(ctx, caseId, attorney)
+				err = client.CreateAttorney(ctx, caseId, caseType, attorney)
 			}
 
 			if ve, ok := err.(sirius.ValidationError); ok {
