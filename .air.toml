@@ -1,4 +1,4 @@
-# Hot-reloading with Air - https://github.com/cosmtrek/air
+# Hot-reloading with Air - https://github.com/air-verse/air
 
 root = "."
 tmp_dir = "tmp"
