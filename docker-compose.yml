@@ -61,8 +61,9 @@ services:
 
   test-runner:
     build:
-      context: docker/test-runner/
-    command: gotestsum --junitfile test-results/unit-tests.xml -- ./... -coverprofile=test-results/test-coverage.txt
+      context: .
+      dockerfile: docker/test-runner/Dockerfile
+    command: go tool gotestsum --junitfile test-results/unit-tests.xml -- ./... -coverprofile=test-results/test-coverage.txt
     working_dir: /go/src/app
     volumes:
       - ./:/go/src/app
