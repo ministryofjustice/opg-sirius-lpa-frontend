@@ -15,6 +15,7 @@ type CreateLpaClient interface {
 	Lpa(sirius.Context, int) (sirius.Lpa, error)
 	CreateLpa(ctx sirius.Context, donorID int, lpa sirius.Lpa) (sirius.Lpa, error)
 	UpdateLpa(ctx sirius.Context, caseID int, lpa sirius.Lpa) error
+	UpdateAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
 	GetUserPermissions(sirius.Context) (sirius.Permissions, error)
 }
 
@@ -161,6 +162,16 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 				if err == nil {
 					data.Lpa = lpa
 					data.CaseId = lpa.ID
+				}
+			}
+
+			if err == nil {
+				for _, attorney := range data.Lpa.Attorneys {
+					formValue := postFormString(r, fmt.Sprintf("lpaPartCSignatureDate-%d", attorney.ID))
+					if formValue != "" && formValue != string(attorney.LpaPartCSignatureDate) {
+						attorney.LpaPartCSignatureDate = sirius.DateString(formValue)
+						err = client.UpdateAttorney(ctx, attorney.ID, attorney)
+					}
 				}
 			}
 
