@@ -49,10 +49,10 @@ up: ## Start application with mock Sirius API; mostly for use with Cypress tests
 	docker compose up -d lpa-frontend
 
 pa11y: setup-directories
-	docker compose run --entrypoint="pa11y-ci" puppeteer
+	docker compose run puppeteer npm run pa11y-ci
 
 lighthouse: setup-directories
-	docker compose run --entrypoint="lhci autorun" puppeteer
+	docker compose run puppeteer npm run lhci autorun
 
 cypress: setup-directories
 	INSECURE_COOKIES=1 docker compose run --rm cypress
