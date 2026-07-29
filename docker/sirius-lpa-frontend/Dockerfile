@@ -34,9 +34,7 @@ RUN apk update \
 
 COPY --from=asset-env /app/web/static web/static
 
-RUN go install github.com/cosmtrek/air@v1.52.1 && go install github.com/go-delve/delve/cmd/dlv@latest
-
-ENTRYPOINT ["air"]
+ENTRYPOINT ["go", "tool", "air"]
 
 FROM golang:1.26.5@sha256:3aff6657219a4d9c14e27fb1d8976c49c29fddb70ba835014f477e1c70636647 AS build-env
 
