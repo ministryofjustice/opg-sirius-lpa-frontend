@@ -246,18 +246,18 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   display: flex;
 }
 
-.app-create-epa__details-row {
+.app-create-epa__details-row, .app-create-lpa__details-row {
   position: relative;
 }
 
-.app-create-epa__summary-update-link {
+.app-create-epa__summary-update-link, .app-create-lpa__summary-update-link {
   position: absolute;
   right: 0;
   top: 0;
   z-index: 1;
 }
 
-.app-create-epa__summary-update-button {
+.app-create-epa__summary-update-button, .app-create-lpa__summary-update-button {
   background: none;
   border: 0;
   color: govuk-colour("blue");
@@ -1124,7 +1124,7 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   margin-right: -15px;
   padding-bottom: 5px;
   text-align: center;
-  border-bottom: 1px solid #cecece;
+  border-bottom: 1px solid govuk-functional-colour(border);
 
   .app-lpa__donor-info--pfa {
     font-weight: bold;
@@ -1133,5 +1133,11 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   .app-lpa__donor-info--hw {
     font-weight: bold;
     color: $sirius-green;
+  }
+}
+
+.app-lpa__radios--border-bottom {
+  .govuk-form-group {
+    border-bottom: 1px solid govuk-functional-colour(border);
   }
 }

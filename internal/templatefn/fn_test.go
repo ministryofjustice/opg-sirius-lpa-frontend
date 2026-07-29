@@ -883,6 +883,19 @@ func TestPersonInfoRow(t *testing.T) {
 	assert.Equal(t, expected, val)
 }
 
+func TestStatusTag(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["statusTag"].(func(string, string) statusTagData)
+
+	expected := statusTagData{
+		ReadableString: "Test",
+		Colour:         "green",
+	}
+
+	val := fn("Test", "green")
+	assert.Equal(t, expected, val)
+}
+
 func TestHasField(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["hasField"].(func(interface{}, string) bool)

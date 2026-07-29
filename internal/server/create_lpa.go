@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -173,6 +174,10 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 				return tmpl(w, data)
 			} else if err != nil {
 				return err
+			}
+
+			if r.FormValue("addAttorney") != "" {
+				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa", donorID, data.CaseId))
 			}
 
 			data.Success = true
