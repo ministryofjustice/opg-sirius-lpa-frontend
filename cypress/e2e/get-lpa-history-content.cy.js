@@ -952,6 +952,170 @@ describe("Show correct event content", () => {
       );
   });
 
+  it("can view cases linked event - parent/primary donor", () => {
+    mockEventHistory({
+      sourceType: "Donor",
+      sourcePerson: {
+        id: 1,
+        firstname: "Alice",
+        surname: "Archer",
+      },
+      type: "UPD",
+      changeset: {
+        child: [
+          [],
+          [
+            {
+              identifier: {
+                id: 2,
+              },
+              class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+            },
+          ],
+        ],
+      },
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+        id: 1,
+        firstname: "Alice",
+        surname: "Archer",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "was linked to")
+      .within(() => {
+        cy.contains("a", "Primary record")
+          .should("have.attr", "href")
+          .and("include", "/lpa/person/1");
+
+        cy.contains("a", "child record")
+          .should("have.attr", "href")
+          .and("include", "/lpa/person/2");
+      });
+  });
+
+  it("can view cases linked event - child donor", () => {
+    mockEventHistory({
+      sourceType: "Donor",
+      sourcePerson: {
+        id: 2,
+        firstname: "Beth",
+        surname: "Bennett",
+      },
+      type: "UPD",
+      changeset: {
+        parent: {
+          1: {
+            class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+            identifier: {
+              id: 1,
+            },
+          },
+        },
+      },
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+        id: 2,
+        firstname: "Beth",
+        surname: "Bennett",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "was linked to")
+      .within(() => {
+        cy.contains("a", "Primary record")
+          .should("have.attr", "href")
+          .and("include", "/lpa/person/1");
+
+        cy.contains("a", "child record")
+          .should("have.attr", "href")
+          .and("include", "/lpa/person/2");
+      });
+  });
+
+  it("can view cases unlinked event - parent/primary donor", () => {
+    mockEventHistory({
+      sourceType: "Donor",
+      sourcePerson: {
+        id: 1,
+        firstname: "Alice",
+        surname: "Archer",
+      },
+      type: "UPD",
+      changeset: {
+        child: [
+          [
+            {
+              identifier: {
+                id: 2,
+              },
+              class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+            },
+          ],
+          [],
+        ],
+      },
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+        id: 1,
+        firstname: "Alice",
+        surname: "Archer",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Alice Archer had a")
+      .should("contain.text", "unlinked")
+      .within(() => {
+        cy.contains("a", "child record")
+          .should("have.attr", "href")
+          .and("include", "/lpa/person/2");
+      });
+  });
+
+  it("can view cases unlinked event - child donor", () => {
+    mockEventHistory({
+      sourceType: "Donor",
+      sourcePerson: {
+        id: 2,
+        firstname: "Beth",
+        surname: "Bennett",
+      },
+      type: "UPD",
+      changeset: {
+        parent: [
+          {
+            class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+            identifier: {
+              id: 1,
+            },
+          },
+        ],
+      },
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+        id: 2,
+        firstname: "Beth",
+        surname: "Bennett",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Beth Bennett was unlinked from")
+      .should("contain.text", "unlinked")
+      .within(() => {
+        cy.contains("a", "Primary record")
+          .should("have.attr", "href")
+          .and("include", "/lpa/person/1");
+      });
+  });
+
   it("can view LPA added event", () => {
     mockEventHistory({
       sourceType: "Lpa",
