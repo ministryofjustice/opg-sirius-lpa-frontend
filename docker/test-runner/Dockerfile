@@ -1,6 +1,8 @@
-FROM golang:1.26.3-bookworm@sha256:386d475a660466863d9f8c766fec64d7fdad3edac2c6a05020c09534d71edb4b
+FROM golang:1.26.5-bookworm@sha256:1ecb7edf62a0408027bd5729dfd6b1b8766e578e8df93995b225dfd0944eb651
 
-RUN go install gotest.tools/gotestsum@latest
+WORKDIR /go/src/app
 
-RUN go install github.com/pact-foundation/pact-go/v2@v2.2.0
-RUN pact-go -l DEBUG install
+COPY go.mod go.sum ./
+RUN go mod download
+
+RUN go tool pact-go -l DEBUG install

@@ -31,10 +31,6 @@ services:
     build: docker/puppeteer
     depends_on:
       - lpa-frontend
-    environment:
-      - LHCI_BUILD_CONTEXT__CURRENT_HASH=$GITHUB_SHA
-      - LHCI_BUILD_CONTEXT__GITHUB_REPO_SLUG=ministryofjustice/opg-sirius-lpa-frontend
-      - LHCI_GITHUB_APP_TOKEN
 
   go-lint:
     image: golangci/golangci-lint:v2.12.2@sha256:5cceeef04e53efe1470638d4b4b4f5ceefd574955ab3941b2d9a68a8c9ad5240
@@ -61,8 +57,9 @@ services:
 
   test-runner:
     build:
-      context: docker/test-runner/
-    command: gotestsum --junitfile test-results/unit-tests.xml -- ./... -coverprofile=test-results/test-coverage.txt
+      context: .
+      dockerfile: docker/test-runner/Dockerfile
+    command: go tool gotestsum --junitfile test-results/unit-tests.xml -- ./... -coverprofile=test-results/test-coverage.txt
     working_dir: /go/src/app
     volumes:
       - ./:/go/src/app
@@ -75,7 +72,7 @@ services:
       - ./pacts:/go/src/app/pacts
 
   cypress:
-    image: cypress/included:15.16.0@sha256:057f6c6bbb661342ea712f94f5b870823823e3617354db7a78a01f2aabbfc2ad
+    image: cypress/included:15.19.0@sha256:fe59f2cac5c7451644c8780cb2fb6735fde512d06642117199a7479269702f03
     platform: "linux/amd64"
     command: run --browser edge
     entrypoint: cypress

@@ -144,7 +144,7 @@ if (window.self !== window.parent) {
     }
     if (event.data === "dark") {
       document.documentElement.classList.add("app-!-html-class--dark");
-    } else {
+    } else if (event.data === "light") {
       document.documentElement.classList.remove("app-!-html-class--dark");
     }
   });
