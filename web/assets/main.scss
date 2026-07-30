@@ -716,7 +716,8 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   .govuk-error-summary,
   .govuk-error-summary__title,
   .govuk-error-summary__body,
-  .govuk-error-summary__list {
+  .govuk-error-summary__list,
+  .govuk-tag {
     font-size: 0.875rem;
   }
   .govuk-accordion__section-button,
