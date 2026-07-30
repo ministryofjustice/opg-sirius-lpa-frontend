@@ -10,9 +10,7 @@ export default function select(prefix, scope) {
     scope.querySelector("[data-select-person]"),
     fetchPerson(prefix),
   );
-  enhanceTemplateSearchElement(
-    scope.querySelector("[data-select-template]"),
-  );
+  enhanceTemplateSearchElement(scope.querySelector("[data-select-template]"));
 }
 
 function enhanceTemplateSearchElement(element) {
