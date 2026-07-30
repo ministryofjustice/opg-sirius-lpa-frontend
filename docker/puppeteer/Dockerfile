@@ -18,4 +18,3 @@ COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
 
 COPY pa11yci.json .pa11yci
-COPY lighthouserc.js .
