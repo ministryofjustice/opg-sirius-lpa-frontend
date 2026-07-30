@@ -55,7 +55,7 @@ htmx.config.includeIndicatorStyles = false;
 // Allow responses with 400 error codes to be swapped in
 htmx.config.responseHandling.unshift({ code: "400", swap: true, error: false });
 
-htmx.on("htmx:afterSwap", (event) => {
+htmx.on("htmx:afterSettle", (event) => {
   const swapDetails = event.detail;
 
   // Reinitialise MOJ and GOVUK frontend components after swapping in new content
