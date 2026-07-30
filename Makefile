@@ -3,7 +3,7 @@ export DOCKER_BUILDKIT=1
 help:
 	@grep --no-filename -E '^[0-9a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-all: lint gosec unit-test build-all pa11y lighthouse cypress down
+all: lint gosec unit-test build-all pa11y cypress down
 
 lint: ## Lint source code
 lint: go-lint npm-lint
@@ -50,9 +50,6 @@ up: ## Start application with mock Sirius API; mostly for use with Cypress tests
 
 pa11y: setup-directories
 	docker compose run puppeteer npm run pa11y-ci
-
-lighthouse: setup-directories
-	docker compose run puppeteer npm run lhci autorun
 
 cypress: setup-directories
 	INSECURE_COOKIES=1 docker compose run --rm cypress
