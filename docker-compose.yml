@@ -31,10 +31,6 @@ services:
     build: docker/puppeteer
     depends_on:
       - lpa-frontend
-    environment:
-      - LHCI_BUILD_CONTEXT__CURRENT_HASH=$GITHUB_SHA
-      - LHCI_BUILD_CONTEXT__GITHUB_REPO_SLUG=ministryofjustice/opg-sirius-lpa-frontend
-      - LHCI_GITHUB_APP_TOKEN
 
   go-lint:
     image: golangci/golangci-lint:v2.12.2@sha256:5cceeef04e53efe1470638d4b4b4f5ceefd574955ab3941b2d9a68a8c9ad5240
