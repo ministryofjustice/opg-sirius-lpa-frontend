@@ -1,6 +1,7 @@
 services:
   lpa-frontend:
     ports: ["8888:8080"]
+    user: !reset
     build:
       target: dev
     volumes:
