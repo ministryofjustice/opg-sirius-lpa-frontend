@@ -19,14 +19,28 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
-            {{ template "radios" (radios "caseSubtype" "LPA type" .Lpa.SubType .Error.Field.caseSubtype true
-            (item "pfa" "PFA")
-            (item "hw" "HW")
-            ) }}
+            <div class="govuk-form-group {{ if .Error.Field.caseSubtype }}govuk-form-group--error{{ end }}">
+              <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">LPA type</legend>
+                {{ template "errors" .Error.Field.caseSubtype }}
+                <div class="govuk-radios app-!-radios--inline {{ if .Error.Field.caseSubtype }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-caseSubtype" name="caseSubtype" type="radio"
+                           value="pfa" {{ if eq .Lpa.SubType "pfa" }}checked{{ end }}>
+                    <label class="govuk-label govuk-radios__label" for="f-caseSubtype">PFA</label>
+                  </div>
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-caseSubtype-2" name="caseSubtype" type="radio"
+                           value="hw" {{ if eq .Lpa.SubType "hw" }}checked{{ end }}>
+                    <label class="govuk-label govuk-radios__label" for="f-caseSubtype-2">HW</label>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
 
             <div class="govuk-form-group {{ if .Error.Field.applicationType }}govuk-form-group--error{{ end }}">
               <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend">Application type</legend>
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Application type</legend>
                 {{ template "errors" .Error.Field.applicationType }}
                 <div class="govuk-radios" data-module="govuk-radios">
                   <div class="govuk-radios__item">
@@ -51,10 +65,10 @@
             </div>
 
             {{ if .CanEditReceiptDate }}
-              {{ template "input-date" (field "receiptDate" "Receipt date" .Lpa.ReceiptDate .Error.Field.receiptDate "max" today) }}
+              {{ template "input-date" (field "receiptDate" "Receipt date" .Lpa.ReceiptDate .Error.Field.receiptDate "max" today "boldLabel" true) }}
             {{ else }}
               <div class="govuk-form-group">
-                <label class="govuk-label">Receipt date</label>
+                <label class="govuk-label"><strong>Receipt date</strong></label>
                 <p class="govuk-body" id="f-receiptDate-readonly">{{ if .Lpa.ReceiptDate }}{{ formatDate .Lpa.ReceiptDate }}{{ else }}Not yet set{{ end }}</p>
               </div>
             {{ end }}
@@ -173,16 +187,48 @@
           </div>
           <div class="govuk-summary-card__content">
             {{ if eq .Lpa.SubType "hw" }}
-              {{ template "radios" (radios "lifeSustainingTreatment" "Life sustaining treatment (LST)" .Lpa.LifeSustainingTreatment .Error.Field.lifeSustainingTreatment true
-              (item "Option A" "Option A")
-              (item "Option B" "Option B")
-              (item "None" "Neither selected")
-              ) }}
+              <div class="govuk-form-group {{ if .Error.Field.lifeSustainingTreatment }}govuk-form-group--error{{ end }}">
+                <fieldset class="govuk-fieldset">
+                  <legend class="govuk-fieldset__legend govuk-visually-hidden">Life sustaining treatment</legend>
+                  {{ template "errors" .Error.Field.lifeSustainingTreatment }}
+                  <div class="govuk-radios app-!-radios--inline {{ if .Error.Field.lifeSustainingTreatment }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+                    <div class="govuk-radios__item">
+                      <input class="govuk-radios__input" id="f-lifeSustainingTreatment" name="lifeSustainingTreatment" type="radio"
+                             value="Option A" {{ if eq .Lpa.LifeSustainingTreatment "Option A" }}checked{{ end }}>
+                      <label class="govuk-label govuk-radios__label" for="f-lifeSustainingTreatment">Option A</label>
+                    </div>
+                    <div class="govuk-radios__item">
+                      <input class="govuk-radios__input" id="f-lifeSustainingTreatment-2" name="lifeSustainingTreatment" type="radio"
+                             value="Option B" {{ if eq .Lpa.LifeSustainingTreatment "Option B" }}checked{{ end }}>
+                      <label class="govuk-label govuk-radios__label" for="f-lifeSustainingTreatment-2">Option B</label>
+                    </div>
+                    <div class="govuk-radios__item">
+                      <input class="govuk-radios__input" id="f-lifeSustainingTreatment-3" name="lifeSustainingTreatment" type="radio"
+                             value="None" {{ if eq .Lpa.LifeSustainingTreatment "None" }}checked{{ end }}>
+                      <label class="govuk-label govuk-radios__label" for="f-lifeSustainingTreatment-3">Neither selected</label>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
               {{ template "input-date" (field "lifeSustainingTreatmentSignatureDate" "Date signed" .Lpa.LifeSustainingTreatmentSignatureDateA .Error.Field.lifeSustainingTreatmentSignatureDate) }}
-              {{ template "radios" (radios "lifeSustainingTreatmentSignedAndWitnessed" "Signed and witnessed correctly" (stringifyBoolPointer .Lpa.LifeSustainingTreatmentSignedAndWitnessed) .Error.Field.lifeSustainingTreatmentSignedAndWitnessed true
-              (item "true" "Yes")
-              (item "false" "No")
-              ) }}
+              <div class="govuk-form-group {{ if .Error.Field.lifeSustainingTreatmentSignedAndWitnessed }}govuk-form-group--error{{ end }}">
+                <fieldset class="govuk-fieldset">
+                  <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Signed and witnessed correctly</legend>
+                  {{ template "errors" .Error.Field.lifeSustainingTreatmentSignedAndWitnessed }}
+                  <div class="govuk-radios app-!-radios--inline {{ if .Error.Field.lifeSustainingTreatmentSignedAndWitnessed }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+                    <div class="govuk-radios__item">
+                      <input class="govuk-radios__input" id="f-lifeSustainingTreatmentSignedAndWitnessed" name="lifeSustainingTreatmentSignedAndWitnessed" type="radio"
+                             value="true" {{ if compareBoolPointers .Lpa.LifeSustainingTreatmentSignedAndWitnessed true }}checked{{ end }}>
+                      <label class="govuk-label govuk-radios__label" for="f-lifeSustainingTreatmentSignedAndWitnessed">Yes</label>
+                    </div>
+                    <div class="govuk-radios__item">
+                      <input class="govuk-radios__input" id="f-lifeSustainingTreatmentSignedAndWitnessed-2" name="lifeSustainingTreatmentSignedAndWitnessed" type="radio"
+                             value="false" {{ if compareBoolPointers .Lpa.LifeSustainingTreatmentSignedAndWitnessed false }}checked{{ end }}>
+                      <label class="govuk-label govuk-radios__label" for="f-lifeSustainingTreatmentSignedAndWitnessed-2">No</label>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
             {{ else }}
               <div class="govuk-form-group {{ if .Error.Field.attorneyActDecisions }}govuk-form-group--error{{ end }}">
                 <fieldset class="govuk-fieldset">
@@ -350,7 +396,7 @@
           <div class="govuk-summary-card__content">
             <div class="govuk-form-group {{ if .Error.Field.applicantType }}govuk-form-group--error{{ end }}">
               <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend">Who is applying to register the Lasting Power of Attorney?</legend>
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Who is applying to register the Lasting Power of Attorney?</legend>
                 {{ template "errors" .Error.Field.applicantType }}
                 <div class="govuk-radios" data-module="govuk-radios">
                   <div class="govuk-radios__item">
@@ -457,10 +503,24 @@
                     {{ $reducedFeeType := "" }}
                     {{ if compareBoolPointers .Lpa.PaymentExemption true }}{{ $reducedFeeType = "exemption" }}{{ end }}
                     {{ if compareBoolPointers .Lpa.PaymentRemission true }}{{ $reducedFeeType = "remission" }}{{ end }}
-                    {{ template "radios" (radios "reducedFeeType" "Reduced fee type" $reducedFeeType .Error.Field.reducedFeeType true
-                    (item "exemption" "Exemption")
-                    (item "remission" "Remission")
-                    ) }}
+                    <div class="govuk-form-group {{ if .Error.Field.reducedFeeType }}govuk-form-group--error{{ end }}">
+                      <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Reduced fee type</legend>
+                        {{ template "errors" .Error.Field.reducedFeeType }}
+                        <div class="govuk-radios app-!-radios--inline {{ if .Error.Field.reducedFeeType }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+                          <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="f-reducedFeeType" name="reducedFeeType" type="radio"
+                                   value="exemption" {{ if eq $reducedFeeType "exemption" }}checked{{ end }}>
+                            <label class="govuk-label govuk-radios__label" for="f-reducedFeeType">Exemption</label>
+                          </div>
+                          <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="f-reducedFeeType-2" name="reducedFeeType" type="radio"
+                                   value="remission" {{ if eq $reducedFeeType "remission" }}checked{{ end }}>
+                            <label class="govuk-label govuk-radios__label" for="f-reducedFeeType-2">Remission</label>
+                          </div>
+                        </div>
+                      </fieldset>
+                    </div>
                   </div>
                   <div class="govuk-checkboxes__item">
                     <input class="govuk-checkboxes__input" id="f-applicationFee-4" name="applicationFee"
