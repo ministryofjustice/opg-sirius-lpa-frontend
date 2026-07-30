@@ -19,9 +19,9 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
-            {{ template "radios" (radios "caseSubtype" "LPA type" .Lpa.SubType .Error.Field.caseSubtype false
-            (item "pfa" "Property and finance")
-            (item "hw" "Health and welfare")
+            {{ template "radios" (radios "caseSubtype" "LPA type" .Lpa.SubType .Error.Field.caseSubtype true
+            (item "pfa" "PFA")
+            (item "hw" "HW")
             ) }}
 
             <div class="govuk-form-group {{ if .Error.Field.applicationType }}govuk-form-group--error{{ end }}">
@@ -95,12 +95,34 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
-            {{ template "radios" (radios "caseAttorney" "Select one option" .AppointmentType .Error.Field.appointmentType false
-            (item "singular" "Only one attorney appointed")
-            (item "jointly-and-severally" "Jointly and severally")
-            (item "jointly" "Jointly")
-            (item "jointly-and-jointly-and-severally" "Jointly for some, jointly and severally for others")
-            ) }}
+            <div class="govuk-form-group {{ if .Error.Field.appointmentType }}govuk-form-group--error{{ end }}">
+              <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-visually-hidden">Appointment type</legend>
+                {{ template "errors" .Error.Field.appointmentType }}
+                <div class="govuk-radios {{ if .Error.Field.appointmentType }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-caseAttorney" name="caseAttorney" type="radio"
+                           value="singular" {{ if eq .AppointmentType "singular" }}checked{{ end }}>
+                    <label class="govuk-label govuk-radios__label" for="f-caseAttorney">Only one attorney appointed</label>
+                  </div>
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-caseAttorney-2" name="caseAttorney" type="radio"
+                           value="jointly-and-severally" {{ if eq .AppointmentType "jointly-and-severally" }}checked{{ end }}>
+                    <label class="govuk-label govuk-radios__label" for="f-caseAttorney-2">Jointly and severally</label>
+                  </div>
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-caseAttorney-3" name="caseAttorney" type="radio"
+                           value="jointly" {{ if eq .AppointmentType "jointly" }}checked{{ end }}>
+                    <label class="govuk-label govuk-radios__label" for="f-caseAttorney-3">Jointly</label>
+                  </div>
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-caseAttorney-4" name="caseAttorney" type="radio"
+                           value="jointly-and-jointly-and-severally" {{ if eq .AppointmentType "jointly-and-jointly-and-severally" }}checked{{ end }}>
+                    <label class="govuk-label govuk-radios__label" for="f-caseAttorney-4">Jointly for some, jointly and severally for others</label>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
           </div>
         </div>
         <div class="govuk-summary-card">
@@ -162,10 +184,24 @@
               (item "false" "No")
               ) }}
             {{ else }}
-              {{ template "radios" (radios "attorneyActDecisions" "When can the LPA be used?" .Lpa.AttorneyActDecisions .Error.Field.attorneyActDecisions false
-              (item "When Registered" "As soon as it's registered")
-              (item "Loss of capacity" "Only when the donor doesn't have mental capacity")
-              ) }}
+              <div class="govuk-form-group {{ if .Error.Field.attorneyActDecisions }}govuk-form-group--error{{ end }}">
+                <fieldset class="govuk-fieldset">
+                  <legend class="govuk-fieldset__legend govuk-visually-hidden">When can the LPA be used?</legend>
+                  {{ template "errors" .Error.Field.attorneyActDecisions }}
+                  <div class="govuk-radios app-!-radios--inline {{ if .Error.Field.attorneyActDecisions }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+                    <div class="govuk-radios__item">
+                      <input class="govuk-radios__input" id="f-attorneyActDecisions" name="attorneyActDecisions" type="radio"
+                             value="When Registered" {{ if eq .Lpa.AttorneyActDecisions "When Registered" }}checked{{ end }}>
+                      <label class="govuk-label govuk-radios__label" for="f-attorneyActDecisions">When registered</label>
+                    </div>
+                    <div class="govuk-radios__item">
+                      <input class="govuk-radios__input" id="f-attorneyActDecisions-2" name="attorneyActDecisions" type="radio"
+                             value="Loss of capacity" {{ if eq .Lpa.AttorneyActDecisions "Loss of capacity" }}checked{{ end }}>
+                      <label class="govuk-label govuk-radios__label" for="f-attorneyActDecisions-2">Loss of capacity</label>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
             {{ end }}
           </div>
         </div>
@@ -259,14 +295,12 @@
                       {{ template "person-details-table" . }}
                     </div>
                   </details>
-
                   <div class="govuk-form-group">
                     <input class="govuk-input" type="text" placeholder="DD/MM/YYYY" disabled="disabled"/>
                   </div>
                 </div>
               {{ end }}
             {{ end }}
-
             {{ if lt (len .Lpa.CertificateProviders) 2 }}
               <div class="govuk-button-group app-button-group--column">
                 <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
@@ -440,7 +474,6 @@
                        id="repeatApplicationReferenceReveal">
                     <div class="govuk-form-group">
                       <label class="govuk-label" for="f-repeatApplicationReference">Repeat application reference</label>
-                      <p class="govuk-hint">Not yet saved - this field cannot currently be persisted (see note in create_lpa.go)</p>
                       <input class="govuk-input" id="f-repeatApplicationReference" name="repeatApplicationReference"
                              value="{{ .Lpa.RepeatApplicationReference }}" disabled="disabled"/>
                     </div>
