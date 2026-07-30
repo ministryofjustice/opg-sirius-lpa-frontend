@@ -5,7 +5,7 @@
         <form hx-post="{{ prefix "/working-days" }}"
               hx-target=".date-difference"
               hx-swap="outerHTML"
-              hx-trigger="change from:input, keyup changed from:input[type=number]">
+              hx-trigger="change from:(.date-difference input), keyup changed from:(.date-difference input[type=number])">
 
             <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
             <input type="hidden" name="previousmode" value="{{ .Mode }}"/>
