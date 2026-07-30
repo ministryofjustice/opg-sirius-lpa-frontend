@@ -29,9 +29,9 @@
                     {{ $identifierMap := index $v "1" }}
                     {{ $parentId := index (index $identifierMap "identifier") "id" }}
                     <p>
-                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $parentId) }}">Primary record</a>
+                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $parentId) }}" target="_top">Primary record</a>
                         was linked to
-                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $childId) }}">child record</a>
+                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $childId) }}" target="_top">child record</a>
                     </p>
                 {{ else }}
                     {{/* Unlinking parent to child event (on child donor)*/}}
@@ -39,7 +39,7 @@
                     {{ $parentId := index (index $identifierMap "identifier") "id" }}
                     <p>
                         {{ $firstname }} {{$surname}} was unlinked from
-                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $parentId) }}">Primary record</a>
+                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $parentId) }}" target="_top">Primary record</a>
                     </p>
                 {{ end }}
             {{ end }}
@@ -55,9 +55,9 @@
                     {{ $identifierMap := index (index $v 1) 0 }}
                     {{ $childId := index (index $identifierMap "identifier") "id" }}
                     <p>
-                        <a data-app-iframe-redirect class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $parentId) }}">Primary record</a>
+                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $parentId) }}" target="_top">Primary record</a>
                         was linked to
-                        <a data-app-iframe-redirect class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $childId) }}">child record</a>
+                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $childId) }}" target="_top">child record</a>
                     </p>
                 {{ else if eq (len (index $v 1)) 0 }}
                     {{/* Unlinking parent to child event (on parent/primary donor) */}}
@@ -65,7 +65,7 @@
                     {{ $childId := index (index $identifierMap "identifier") "id" }}
                     <p>
                         {{ $firstname }} {{ $surname }} had a
-                        <a data-app-iframe-redirect class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $childId) }}">child record</a>
+                        <a class="govuk-link" href="{{ sirius (printf "/lpa/person/%v" $childId) }}" target="_top">child record</a>
                         unlinked
                     </p>
                 {{ end }}
