@@ -11,13 +11,16 @@ import (
 type SelectOrCreateCorrespondentClient interface {
 	CreateCorrespondent(ctx sirius.Context, caseId int, correspondent sirius.Correspondent) error
 	Epa(ctx sirius.Context, id int) (sirius.Epa, error)
+	Lpa(ctx sirius.Context, id int) (sirius.Lpa, error)
 }
 
 type selectOrCreateCorrespondentData struct {
 	XSRFToken     string
 	DonorId       int
 	CaseId        int
+	CaseType      string
 	Epa           sirius.Epa
+	Lpa           sirius.Lpa
 	Correspondent sirius.Correspondent
 	Error         sirius.ValidationError
 }
@@ -36,51 +39,64 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 			return err
 		}
 
-		caseItem, err := client.Epa(ctx, caseId)
-		if err != nil {
-			return err
-		}
-
 		data := selectOrCreateCorrespondentData{
 			XSRFToken: ctx.XSRFToken,
 			DonorId:   donorId,
 			CaseId:    caseId,
-			Epa:       caseItem,
+			CaseType:  r.FormValue("caseType"),
+		}
+
+		if data.CaseType == "epa" {
+			caseItem, err := client.Epa(ctx, caseId)
+			if err != nil {
+				return err
+			}
+			data.Epa = caseItem
+		} else {
+			caseItem, err := client.Lpa(ctx, caseId)
+			if err != nil {
+				return err
+			}
+			data.Lpa = caseItem
 		}
 
 		if r.Method == http.MethodPost {
-			if postFormString(r, "attorneyId") != "new" {
-				attorneyId, err := strToIntOrStatusError(postFormString(r, "attorneyId"))
+			if postFormString(r, "actorId") != "new" {
+				actorId, err := strToIntOrStatusError(postFormString(r, "actorId"))
 				if err != nil {
 					return err
 				}
 
-				var attorney *sirius.Attorney
-				for _, caseAttorney := range caseItem.Attorneys {
-					if caseAttorney.ID == attorneyId {
-						attorney = &caseAttorney
-						break
+				var person sirius.Person
+				if data.CaseType == "epa" {
+					for _, caseAttorney := range data.Epa.Attorneys {
+						if caseAttorney.ID == actorId {
+							person = caseAttorney.Person
+							break
+						}
 					}
+				} else {
+					person = getSelectedActorForLpa(data.Lpa, actorId)
 				}
 
 				correspondent := sirius.Correspondent{
 					Person: sirius.Person{
-						Salutation:        attorney.Salutation,
-						Firstname:         attorney.Firstname,
-						Middlenames:       attorney.Middlenames,
-						Surname:           attorney.Surname,
-						DateOfBirth:       attorney.DateOfBirth,
-						PhoneNumber:       attorney.PhoneNumber,
-						Email:             attorney.Email,
-						AddressLine1:      attorney.AddressLine1,
-						AddressLine2:      attorney.AddressLine2,
-						AddressLine3:      attorney.AddressLine3,
-						Town:              attorney.Town,
-						County:            attorney.County,
-						Country:           attorney.Country,
-						Postcode:          attorney.Postcode,
-						CompanyName:       attorney.CompanyName,
-						IsAirmailRequired: attorney.IsAirmailRequired,
+						Salutation:        person.Salutation,
+						Firstname:         person.Firstname,
+						Middlenames:       person.Middlenames,
+						Surname:           person.Surname,
+						DateOfBirth:       person.DateOfBirth,
+						PhoneNumber:       person.PhoneNumber,
+						Email:             person.Email,
+						AddressLine1:      person.AddressLine1,
+						AddressLine2:      person.AddressLine2,
+						AddressLine3:      person.AddressLine3,
+						Town:              person.Town,
+						County:            person.County,
+						Country:           person.Country,
+						Postcode:          person.Postcode,
+						CompanyName:       person.CompanyName,
+						IsAirmailRequired: person.IsAirmailRequired,
 					},
 				}
 
@@ -96,11 +112,11 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 				} else if err != nil {
 					return err
 				} else {
-					return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, caseId))
+					return RedirectError(fmt.Sprintf("/create-%s?id=%d&caseId=%d", data.CaseType, donorId, caseId))
 				}
 			}
 
-			return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d", donorId, caseId))
+			return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d&caseType=%s", donorId, caseId, data.CaseType))
 		}
 
 		if r.Header.Get("HX-Request") == "true" {
@@ -108,4 +124,42 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 		}
 		return tmpl(w, data)
 	}
+}
+
+func getSelectedActorForLpa(lpa sirius.Lpa, actorId int) sirius.Person {
+	if actorId == lpa.Donor.ID {
+		return *lpa.Donor
+	}
+
+	for _, attorney := range lpa.Attorneys {
+		if attorney.ID == actorId {
+			return attorney.Person
+		}
+	}
+
+	for _, attorney := range lpa.ReplacementAttorneys {
+		if attorney.ID == actorId {
+			return attorney.Person
+		}
+	}
+
+	for _, certifiedProvider := range lpa.CertificateProviders {
+		if certifiedProvider.ID == actorId {
+			return certifiedProvider
+		}
+	}
+
+	for _, notifiedPerson := range lpa.NotifiedPersons {
+		if notifiedPerson.ID == actorId {
+			return notifiedPerson
+		}
+	}
+
+	for _, trustCorporation := range lpa.TrustCorporations {
+		if trustCorporation.ID == actorId {
+			return trustCorporation.Person
+		}
+	}
+
+	return sirius.Person{}
 }
