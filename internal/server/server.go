@@ -66,6 +66,7 @@ type Client interface {
 	CreateDraftClient
 	CreateEpaClient
 	CreateInvestigationClient
+	CreateLpaClient
 	DeleteDocumentClient
 	DeleteNoteClient
 	DeletePaymentClient
@@ -368,12 +369,6 @@ func postFormKeySet(r *http.Request, name string) bool {
 }
 
 func postFormString(r *http.Request, name string) string {
-	return strings.TrimSpace(r.PostFormValue(name))
-}
-
-func postFormDobString(r *http.Request, name string) string {
-	//fmt.Println("r.FormValue(name)")
-	//fmt.Println(r.FormValue(name))
 	return strings.TrimSpace(r.PostFormValue(name))
 }
 
