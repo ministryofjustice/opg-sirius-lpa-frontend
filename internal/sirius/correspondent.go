@@ -14,6 +14,11 @@ type Correspondent struct {
 	CompanyNumber       string `json:"companyNumber"`
 }
 
+type AssignActorAsCorrespondent struct {
+	CaseId   int `json:"caseId"`
+	PersonId int `json:"personId"`
+}
+
 func (c Correspondent) Summary() string {
 	return fmt.Sprintf("%s %s", c.Firstname, c.Surname)
 }
@@ -32,4 +37,13 @@ func (c *Client) CreateCorrespondent(ctx Context, caseId int, correspondent Corr
 
 func (c *Client) UpdateCorrespondent(ctx Context, correspondentId int, correspondent Correspondent) error {
 	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/persons/%d", correspondentId), correspondent, nil)
+}
+
+func (c *Client) AssignActorAsCorrespondent(ctx Context, caseId int, personId int) error {
+	command := AssignActorAsCorrespondent{
+		CaseId:   caseId,
+		PersonId: personId,
+	}
+
+	return c.post(ctx, fmt.Sprintf("/lpa-api/v1/correspondents/assign-actor"), command, nil)
 }

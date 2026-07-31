@@ -254,6 +254,7 @@ func getRecipients(caseItem sirius.Case) ([]sirius.Recipient, error) {
 	recipients = append(recipients, *caseItem.Donor)
 
 	if caseItem.Correspondent != nil {
+		// TODO: if correspondent is an attorney, do we want to change their personType to correspondent here?
 		recipients = append(recipients, *caseItem.Correspondent)
 	}
 
@@ -264,10 +265,18 @@ func getRecipients(caseItem sirius.Case) ([]sirius.Recipient, error) {
 		return caseItem.Attorneys[i].Surname < caseItem.Attorneys[j].Surname
 	})
 	for _, attorney := range caseItem.Attorneys {
-		recipients = append(recipients, attorney)
+		// don't add attorney if they are already the correspondent
+		// TODO might want a cleaner more generic solution to this
+		if attorney.ID != caseItem.Correspondent.ID {
+			recipients = append(recipients, attorney)
+		}
 	}
 	for _, trustCorporation := range caseItem.TrustCorporations {
-		recipients = append(recipients, trustCorporation)
+		// don't add attorney if they are already the correspondent
+		// TODO might want a cleaner more generic solution to this
+		if trustCorporation.ID != caseItem.Correspondent.ID {
+			recipients = append(recipients, trustCorporation)
+		}
 	}
 
 	return recipients, nil
