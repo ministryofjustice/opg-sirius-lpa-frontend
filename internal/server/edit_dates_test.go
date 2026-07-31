@@ -49,7 +49,7 @@ func TestGetEditDates(t *testing.T) {
 			template.
 				On("Func", mock.Anything, editDatesData{
 					Entity:   caseType + " 700700",
-					Dates:    sirius.Dates{CancellationDate: sirius.DateString("2021-01-01")},
+					Dates:    sirius.Dates{CancellationDate: "2021-01-01"},
 					DonorId:  1,
 					CaseType: caseType,
 					CaseUid:  "700700",
@@ -155,17 +155,12 @@ func TestPostEditDates(t *testing.T) {
 			client := &mockEditDatesClient{}
 			client.
 				On("EditDates", mock.Anything, 123, sirius.CaseType(caseType), sirius.Dates{
-					CancellationDate: sirius.DateString("2022-01-03"),
-					DispatchDate:     sirius.DateString("2022-02-03"),
-					DueDate:          sirius.DateString("2022-03-05"),
-					InvalidDate:      sirius.DateString("2022-04-03"),
-					PaymentDate:      sirius.DateString("2022-05-03"),
-					FilingDate:       sirius.DateString("2022-05-01"),
-					ReceiptDate:      sirius.DateString("2021-11-23"),
-					RegistrationDate: sirius.DateString("2022-05-03"),
-					RejectedDate:     sirius.DateString("2022-06-03"),
-					RevokedDate:      sirius.DateString("2022-12-03"),
-					WithdrawnDate:    sirius.DateString("2022-07-03"),
+					CancellationDate: "2022-01-03",
+					DispatchDate:     "2022-02-03",
+					InvalidDate:      "2022-04-03",
+					RejectedDate:     "2022-06-03",
+					RevokedDate:      "2022-12-03",
+					WithdrawnDate:    "2022-07-03",
 				}).
 				Return(nil)
 			client.
@@ -177,7 +172,7 @@ func TestPostEditDates(t *testing.T) {
 				On("Func", mock.Anything, editDatesData{
 					Success:  true,
 					Entity:   caseType + " 700700",
-					Dates:    sirius.Dates{CancellationDate: sirius.DateString("2021-01-01")},
+					Dates:    sirius.Dates{CancellationDate: "2021-01-01"},
 					DonorId:  1,
 					CaseType: caseType,
 					CaseUid:  "700700",
@@ -252,7 +247,7 @@ func TestPostEditDatesWhenValidationError(t *testing.T) {
 	client := &mockEditDatesClient{}
 	client.
 		On("EditDates", mock.Anything, 123, sirius.CaseTypeLpa, sirius.Dates{
-			RegistrationDate: sirius.DateString("2022-01-03"),
+			RegistrationDate: "2022-01-03",
 		}).
 		Return(expectedError)
 	client.

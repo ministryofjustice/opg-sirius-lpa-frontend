@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -110,15 +111,10 @@ func EditDates(client EditDatesClient, tmpl template.Template, partialTmpl templ
 			data.Dates = sirius.Dates{
 				CancellationDate: caseitem.CancellationDate,
 				DispatchDate:     caseitem.DispatchDate,
-				//DueDate:          caseitem.DueDate,
-				InvalidDate: caseitem.InvalidDate,
-				//PaymentDate:      caseitem.PaymentDate,
-				//FilingDate:       caseitem.FilingDate,
-				//ReceiptDate:      caseitem.ReceiptDate,
-				//RegistrationDate: caseitem.RegistrationDate,
-				RejectedDate:  caseitem.RejectedDate,
-				RevokedDate:   caseitem.RevokedDate,
-				WithdrawnDate: caseitem.WithdrawnDate,
+				InvalidDate:      caseitem.InvalidDate,
+				RejectedDate:     caseitem.RejectedDate,
+				RevokedDate:      caseitem.RevokedDate,
+				WithdrawnDate:    caseitem.WithdrawnDate,
 			}
 			data.ReceiptDate = receiptDate
 			data.PaymentDate = paymentDate
@@ -126,6 +122,7 @@ func EditDates(client EditDatesClient, tmpl template.Template, partialTmpl templ
 			data.DueDate = dueDate
 			data.RegistrationDate = registrationDate
 		}
+		fmt.Println(data.FilingDate)
 		data.Entity = caseitem.Summary()
 
 		if r.Header.Get("HX-Request") == "true" {
