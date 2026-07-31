@@ -171,7 +171,11 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partial
 				data.HtmxSwap = "innerHTML show:#accordion-create-epa-heading-3:top"
 				return partialTmpl(w, data)
 			}
-			return RedirectError(fmt.Sprintf("/create-%s?id=%d&caseId=%d#accordion-create-epa-heading-3", caseType, donorId, caseId))
+
+			if caseType == "epa" {
+				return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
+			}
+			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1", donorId, caseId))
 		}
 
 		if r.Header.Get("HX-Request") == "true" {
