@@ -3,9 +3,12 @@ package server
 import (
 	"net/http"
 	"net/http/httptest"
-	"strconv"
+	"net/url"
+	"reflect"
+	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -15,39 +18,187 @@ type mockCreateLpaClient struct {
 	mock.Mock
 }
 
-func (m *mockCreateLpaClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
-	args := m.Called(ctx, id)
-	return args.Get(0).(sirius.Case), args.Error(1)
-}
-
 func (m *mockCreateLpaClient) Person(ctx sirius.Context, id int) (sirius.Person, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(sirius.Person), args.Error(1)
 }
 
+func (m *mockCreateLpaClient) Lpa(ctx sirius.Context, id int) (sirius.Lpa, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.Lpa), args.Error(1)
+}
+
+func (m *mockCreateLpaClient) CreateLpa(ctx sirius.Context, donorID int, lpa sirius.Lpa) (sirius.Lpa, error) {
+	args := m.Called(ctx, donorID, lpa)
+	return args.Get(0).(sirius.Lpa), args.Error(1)
+}
+
+func (m *mockCreateLpaClient) UpdateLpa(ctx sirius.Context, caseID int, lpa sirius.Lpa) error {
+	args := m.Called(ctx, caseID, lpa)
+	return args.Error(0)
+}
+
+func (m *mockCreateLpaClient) GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(sirius.Permissions), args.Error(1)
+}
+
 func TestGetCreateLpa(t *testing.T) {
-	for _, isHtmx := range []bool{false, true} {
-		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createLpaData{
+			DonorId:   123,
+			DonorName: "Firstname Surname",
+			Title:     "Create an LPA",
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetCreateLpaHtmxRequest(t *testing.T) {
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+
+	template := &mockTemplate{}
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, createLpaData{
+			DonorId:   123,
+			DonorName: "Firstname Surname",
+			Title:     "Create an LPA",
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	template.AssertNotCalled(t, "Func", mock.Anything, mock.Anything)
+	mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+}
+
+func TestGetCreateLpaDoesNotSetIsUpdate(t *testing.T) {
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createLpaData{
+			DonorId:   123,
+			DonorName: "Firstname Surname",
+			Title:     "Create an LPA",
+			IsUpdate:  false,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetCreateLpaCanEditReceiptDate(t *testing.T) {
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{"v1-lpas-edit-dates": sirius.PermissionType{Permissions: []string{"PUT"}}}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createLpaData{
+			DonorId:            123,
+			DonorName:          "Firstname Surname",
+			Title:              "Create an LPA",
+			CanEditReceiptDate: true,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetCreateLpaEdit(t *testing.T) {
+	for _, tc := range []struct {
+		formValue string
+		lpa       sirius.Lpa
+	}{
+		{"singular", sirius.Lpa{Case: sirius.Case{CaseAttorneySingular: shared.BoolPtr(true)}}},
+		{"jointly", sirius.Lpa{Case: sirius.Case{CaseAttorneyJointly: shared.BoolPtr(true)}}},
+		{"jointly-and-severally", sirius.Lpa{Case: sirius.Case{CaseAttorneyJointlyAndSeverally: shared.BoolPtr(true)}}},
+		{"jointly-and-jointly-and-severally", sirius.Lpa{Case: sirius.Case{CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(true)}}},
+	} {
+		t.Run(tc.formValue, func(t *testing.T) {
 			client := &mockCreateLpaClient{}
 			client.
 				On("Person", mock.Anything, 123).
 				Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
+			client.
+				On("GetUserPermissions", mock.Anything).
+				Return(sirius.Permissions{}, nil)
+			client.
+				On("Lpa", mock.Anything, 456).
+				Return(tc.lpa, nil)
 
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, createLpaData{
-					DonorId:   123,
-					DonorName: "Firstname Surname",
-					Title:     "Create an LPA",
+					DonorId:         123,
+					DonorName:       "Firstname Surname",
+					Title:           "Edit LPA",
+					CaseId:          456,
+					Lpa:             tc.lpa,
+					AppointmentType: tc.formValue,
+					IsUpdate:        true,
 				}).
 				Return(nil)
 
-			r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+			r, _ := http.NewRequest(http.MethodGet, "/?id=123&caseId=456", nil)
 			w := httptest.NewRecorder()
-
-			if isHtmx {
-				r.Header.Add("HX-Request", "true")
-			}
 
 			err := CreateLpa(client, template.Func, template.Func)(w, r)
 			resp := w.Result()
@@ -57,37 +208,6 @@ func TestGetCreateLpa(t *testing.T) {
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
-}
-
-func TestGetCreateLpaEdit(t *testing.T) {
-	client := &mockCreateLpaClient{}
-	client.
-		On("Person", mock.Anything, 123).
-		Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
-	client.
-		On("Case", mock.Anything, 456).
-		Return(sirius.Case{}, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, createLpaData{
-			DonorId:   123,
-			DonorName: "Firstname Surname",
-			Title:     "Edit LPA",
-			CaseId:    456,
-			CaseItem:  sirius.Case{},
-		}).
-		Return(nil)
-
-	r, _ := http.NewRequest(http.MethodGet, "/?id=123&caseId=456", nil)
-	w := httptest.NewRecorder()
-
-	err := CreateLpa(client, template.Func, template.Func)(w, r)
-	resp := w.Result()
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestGetCreateLpaBadQuery(t *testing.T) {
@@ -103,6 +223,9 @@ func TestGetCreateLpaBadQuery(t *testing.T) {
 			client.
 				On("Person", mock.Anything, 123).
 				Return(sirius.Person{}, nil)
+			client.
+				On("GetUserPermissions", mock.Anything).
+				Return(sirius.Permissions{}, nil)
 
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
@@ -129,14 +252,35 @@ func TestCreateLpaWhenPersonErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestCreateLpaWhenCaseErrors(t *testing.T) {
+func TestCreateLpaWhenPermissionsError(t *testing.T) {
 	client := &mockCreateLpaClient{}
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
 	client.
-		On("Case", mock.Anything, 456).
-		Return(sirius.Case{}, errExample)
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, errExample)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, nil, nil)(w, r)
+
+	assert.Equal(t, err, errExample)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestCreateLpaWhenLpaErrors(t *testing.T) {
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("Lpa", mock.Anything, 456).
+		Return(sirius.Lpa{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&caseId=456", nil)
 	w := httptest.NewRecorder()
@@ -144,5 +288,779 @@ func TestCreateLpaWhenCaseErrors(t *testing.T) {
 	err := CreateLpa(client, nil, nil)(w, r)
 
 	assert.Equal(t, err, errExample)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestPostCreateLpa(t *testing.T) {
+	dateString := "2022-04-05"
+	lpa := sirius.Lpa{
+		OnlineLpaId:                "A12345678901",
+		AttorneyActDecisions:       "When Registered",
+		ApplicantType:              "donor",
+		AnyOtherInfo:               shared.BoolPtr(true),
+		AdditionalInfo:             "Some extra info",
+		ApplicationHasGuidance:     shared.BoolPtr(true),
+		ApplicationHasRestrictions: shared.BoolPtr(false),
+		PaymentByDebitCreditCard:   shared.BoolPtr(true),
+		PaymentRemission:           shared.BoolPtr(false),
+		RepeatApplication:          shared.BoolPtr(false),
+		CardPaymentContact:         "01234 567890",
+		Case: sirius.Case{
+			SubType:                         "pfa",
+			ApplicationType:                 "Online",
+			ReceiptDate:                     sirius.DateString(dateString),
+			LpaDonorSignatureDate:           sirius.DateString(dateString),
+			CaseAttorneySingular:            shared.BoolPtr(true),
+			CaseAttorneyJointly:             shared.BoolPtr(false),
+			CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:  shared.BoolPtr(false),
+			PaymentExemption: shared.BoolPtr(false),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{"v1-lpas-edit-dates": sirius.PermissionType{Permissions: []string{"PUT"}}}, nil)
+	client.
+		On("CreateLpa", mock.Anything, 123, lpa).
+		Return(sirius.Lpa{Case: sirius.Case{ID: 456}}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createLpaData{
+			DonorId:            123,
+			DonorName:          "Firstname Surname",
+			Title:              "Create an LPA",
+			Success:            true,
+			CanEditReceiptDate: true,
+			AppointmentType:    "singular",
+			CaseId:             456,
+			Lpa:                sirius.Lpa{Case: sirius.Case{ID: 456}},
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"caseSubtype":                {"pfa"},
+		"applicationType":            {"Online"},
+		"onlineLpaId":                {"A12345678901"},
+		"receiptDate":                {dateString},
+		"lpaDonorSignatureDate":      {dateString},
+		"caseAttorney":               {"singular"},
+		"attorneyActDecisions":       {"When Registered"},
+		"preferencesAndInstructions": {"guidance"},
+		"applicantType":              {"donor"},
+		"applicationFee":             {"card"},
+		"cardPaymentContact":         {"01234 567890"},
+		"anyOtherInfo":               {"true"},
+		"additionalInfo":             {"Some extra info"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateLpaClearsMismatchedSubtypeOnlyFields(t *testing.T) {
+	lpa := sirius.Lpa{
+		ApplicationHasGuidance:                    shared.BoolPtr(false),
+		ApplicationHasRestrictions:                shared.BoolPtr(false),
+		PaymentByDebitCreditCard:                  shared.BoolPtr(false),
+		PaymentRemission:                          shared.BoolPtr(false),
+		RepeatApplication:                         shared.BoolPtr(false),
+		AnyOtherInfo:                              shared.BoolPtr(false),
+		LifeSustainingTreatmentSignedAndWitnessed: shared.BoolPtr(false),
+		Case: sirius.Case{
+			SubType:                                   "hw",
+			LifeSustainingTreatment:                   "Option A",
+			CaseAttorneySingular:                      shared.BoolPtr(true),
+			CaseAttorneyJointly:                       shared.BoolPtr(false),
+			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentExemption:                          shared.BoolPtr(false),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("CreateLpa", mock.Anything, 123, lpa).
+		Return(sirius.Lpa{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.Anything).
+		Return(nil)
+
+	form := url.Values{
+		"caseSubtype":             {"hw"},
+		"lifeSustainingTreatment": {"Option A"},
+		"attorneyActDecisions":    {"When Registered"},
+		"caseAttorney":            {"singular"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateLpaPreferencesNoneClearsOtherSelections(t *testing.T) {
+	lpa := sirius.Lpa{
+		ApplicationHasGuidance:     shared.BoolPtr(false),
+		ApplicationHasRestrictions: shared.BoolPtr(false),
+		PaymentByDebitCreditCard:   shared.BoolPtr(false),
+		PaymentRemission:           shared.BoolPtr(false),
+		RepeatApplication:          shared.BoolPtr(false),
+		AnyOtherInfo:               shared.BoolPtr(false),
+		Case: sirius.Case{
+			CaseAttorneySingular:                      shared.BoolPtr(true),
+			CaseAttorneyJointly:                       shared.BoolPtr(false),
+			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentExemption:                          shared.BoolPtr(false),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("CreateLpa", mock.Anything, 123, lpa).
+		Return(sirius.Lpa{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.Anything).
+		Return(nil)
+
+	form := url.Values{
+		"caseAttorney":               {"singular"},
+		"preferencesAndInstructions": {"guidance", "restrictions", "none"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateLpaDropsOnlineLpaIdWhenNotOnline(t *testing.T) {
+	lpa := sirius.Lpa{
+		ApplicationHasGuidance:     shared.BoolPtr(false),
+		ApplicationHasRestrictions: shared.BoolPtr(false),
+		PaymentByDebitCreditCard:   shared.BoolPtr(false),
+		PaymentRemission:           shared.BoolPtr(false),
+		RepeatApplication:          shared.BoolPtr(false),
+		AnyOtherInfo:               shared.BoolPtr(false),
+		Case: sirius.Case{
+			SubType:                                   "pfa",
+			ApplicationType:                           "Classic",
+			CaseAttorneySingular:                      shared.BoolPtr(true),
+			CaseAttorneyJointly:                       shared.BoolPtr(false),
+			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentExemption:                          shared.BoolPtr(false),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("CreateLpa", mock.Anything, 123, lpa).
+		Return(sirius.Lpa{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.Anything).
+		Return(nil)
+
+	form := url.Values{
+		"caseSubtype":     {"pfa"},
+		"applicationType": {"Classic"},
+		"onlineLpaId":     {"A12345678901"},
+		"caseAttorney":    {"singular"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateLpaIgnoresReceiptDateWithoutPermission(t *testing.T) {
+	existingLpa := sirius.Lpa{Case: sirius.Case{ID: 456, ReceiptDate: sirius.DateString("2022-01-01")}}
+	submittedLpa := sirius.Lpa{
+		ApplicationHasGuidance:                    shared.BoolPtr(false),
+		ApplicationHasRestrictions:                shared.BoolPtr(false),
+		PaymentByDebitCreditCard:                  shared.BoolPtr(false),
+		PaymentRemission:                          shared.BoolPtr(false),
+		RepeatApplication:                         shared.BoolPtr(false),
+		AnyOtherInfo:                              shared.BoolPtr(false),
+		LifeSustainingTreatmentSignedAndWitnessed: shared.BoolPtr(false),
+		Case: sirius.Case{
+			SubType:                         "hw",
+			ReceiptDate:                     sirius.DateString("2022-01-01"),
+			CaseAttorneySingular:            shared.BoolPtr(false),
+			CaseAttorneyJointly:             shared.BoolPtr(true),
+			CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:  shared.BoolPtr(false),
+			PaymentExemption: shared.BoolPtr(false),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("Lpa", mock.Anything, 456).
+		Return(existingLpa, nil).
+		Once()
+	client.
+		On("UpdateLpa", mock.Anything, 456, submittedLpa).
+		Return(nil)
+	client.
+		On("Lpa", mock.Anything, 456).
+		Return(sirius.Lpa{Case: sirius.Case{ID: 456}}, nil).
+		Once()
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.Anything).
+		Return(nil)
+
+	form := url.Values{
+		"caseSubtype":  {"hw"},
+		"receiptDate":  {"2099-01-01"},
+		"caseAttorney": {"jointly"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&caseId=456", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateLpaDropsCardPaymentContactWhenCardNotSelected(t *testing.T) {
+	lpa := sirius.Lpa{
+		ApplicationHasGuidance:     shared.BoolPtr(false),
+		ApplicationHasRestrictions: shared.BoolPtr(false),
+		PaymentByDebitCreditCard:   shared.BoolPtr(false),
+		PaymentRemission:           shared.BoolPtr(false),
+		RepeatApplication:          shared.BoolPtr(false),
+		AnyOtherInfo:               shared.BoolPtr(false),
+		Case: sirius.Case{
+			CaseAttorneySingular:                      shared.BoolPtr(true),
+			CaseAttorneyJointly:                       shared.BoolPtr(false),
+			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(true),
+			PaymentExemption:                          shared.BoolPtr(false),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("CreateLpa", mock.Anything, 123, lpa).
+		Return(sirius.Lpa{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.Anything).
+		Return(nil)
+
+	form := url.Values{
+		"caseAttorney":       {"singular"},
+		"applicationFee":     {"cheque"}, // not "card"
+		"cardPaymentContact": {"01234 567890"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateLpaDropsAdditionalInfoWhenAnyOtherInfoNotSelected(t *testing.T) {
+	lpa := sirius.Lpa{
+		ApplicationHasGuidance:     shared.BoolPtr(false),
+		ApplicationHasRestrictions: shared.BoolPtr(false),
+		PaymentByDebitCreditCard:   shared.BoolPtr(false),
+		PaymentRemission:           shared.BoolPtr(false),
+		RepeatApplication:          shared.BoolPtr(false),
+		AnyOtherInfo:               shared.BoolPtr(false),
+		Case: sirius.Case{
+			CaseAttorneySingular:                      shared.BoolPtr(true),
+			CaseAttorneyJointly:                       shared.BoolPtr(false),
+			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentExemption:                          shared.BoolPtr(false),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("CreateLpa", mock.Anything, 123, lpa).
+		Return(sirius.Lpa{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.Anything).
+		Return(nil)
+
+	form := url.Values{
+		"caseAttorney":   {"singular"},
+		"additionalInfo": {"Some info the user typed then unchecked yes"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateLpaApplicationFeeReducedFeeExemption(t *testing.T) {
+	lpa := sirius.Lpa{
+		ApplicationHasGuidance:     shared.BoolPtr(false),
+		ApplicationHasRestrictions: shared.BoolPtr(false),
+		PaymentByDebitCreditCard:   shared.BoolPtr(false),
+		PaymentRemission:           shared.BoolPtr(false),
+		RepeatApplication:          shared.BoolPtr(true),
+		AnyOtherInfo:               shared.BoolPtr(false),
+		Case: sirius.Case{
+			CaseAttorneySingular:                      shared.BoolPtr(true),
+			CaseAttorneyJointly:                       shared.BoolPtr(false),
+			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(true),
+			PaymentExemption:                          shared.BoolPtr(true),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("CreateLpa", mock.Anything, 123, lpa).
+		Return(sirius.Lpa{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.Anything).
+		Return(nil)
+
+	form := url.Values{
+		"caseAttorney":   {"singular"},
+		"applicationFee": {"cheque", "reducedFee", "repeatApplication"},
+		"reducedFeeType": {"exemption"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateLpaApplicationFeeReducedFeeRemission(t *testing.T) {
+	lpa := sirius.Lpa{
+		ApplicationHasGuidance:     shared.BoolPtr(false),
+		ApplicationHasRestrictions: shared.BoolPtr(false),
+		PaymentByDebitCreditCard:   shared.BoolPtr(false),
+		PaymentRemission:           shared.BoolPtr(true),
+		RepeatApplication:          shared.BoolPtr(false),
+		AnyOtherInfo:               shared.BoolPtr(false),
+		Case: sirius.Case{
+			CaseAttorneySingular:                      shared.BoolPtr(true),
+			CaseAttorneyJointly:                       shared.BoolPtr(false),
+			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentExemption:                          shared.BoolPtr(false),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("CreateLpa", mock.Anything, 123, lpa).
+		Return(sirius.Lpa{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.Anything).
+		Return(nil)
+
+	form := url.Values{
+		"caseAttorney":   {"singular"},
+		"applicationFee": {"reducedFee"},
+		"reducedFeeType": {"remission"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateLpaApplicationFeeReducedFeeTypeIgnoredWhenNotSelected(t *testing.T) {
+	lpa := sirius.Lpa{
+		ApplicationHasGuidance:     shared.BoolPtr(false),
+		ApplicationHasRestrictions: shared.BoolPtr(false),
+		PaymentByDebitCreditCard:   shared.BoolPtr(false),
+		PaymentRemission:           shared.BoolPtr(false),
+		RepeatApplication:          shared.BoolPtr(false),
+		AnyOtherInfo:               shared.BoolPtr(false),
+		Case: sirius.Case{
+			CaseAttorneySingular:                      shared.BoolPtr(true),
+			CaseAttorneyJointly:                       shared.BoolPtr(false),
+			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentExemption:                          shared.BoolPtr(false),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("CreateLpa", mock.Anything, 123, lpa).
+		Return(sirius.Lpa{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.Anything).
+		Return(nil)
+
+	form := url.Values{
+		"caseAttorney":   {"singular"},
+		"reducedFeeType": {"exemption"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateLpaApplicantAndLifeSustainingTreatmentFields(t *testing.T) {
+	lpa := sirius.Lpa{
+		ApplicationHasGuidance:                    shared.BoolPtr(false),
+		ApplicationHasRestrictions:                shared.BoolPtr(false),
+		PaymentByDebitCreditCard:                  shared.BoolPtr(false),
+		PaymentRemission:                          shared.BoolPtr(false),
+		RepeatApplication:                         shared.BoolPtr(false),
+		AnyOtherInfo:                              shared.BoolPtr(false),
+		LifeSustainingTreatmentSignedAndWitnessed: shared.BoolPtr(true),
+		ApplicantType:                             "attorney",
+		ApplicantSignatureDate:                    "2022-04-06",
+		ApplicantIds:                              []int{1, 2},
+		Case: sirius.Case{
+			SubType:                                   "hw",
+			LifeSustainingTreatment:                   "None",
+			LifeSustainingTreatmentSignatureDateA:     "2022-04-05",
+			CaseAttorneySingular:                      shared.BoolPtr(false),
+			CaseAttorneyJointly:                       shared.BoolPtr(true),
+			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentExemption:                          shared.BoolPtr(false),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("CreateLpa", mock.Anything, 123, lpa).
+		Return(sirius.Lpa{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.Anything).
+		Return(nil)
+
+	form := url.Values{
+		"caseSubtype":                               {"hw"},
+		"caseAttorney":                              {"jointly"},
+		"lifeSustainingTreatment":                   {"None"},
+		"lifeSustainingTreatmentSignatureDate":      {"2022-04-05"},
+		"lifeSustainingTreatmentSignedAndWitnessed": {"true"},
+		"applicantType":                             {"attorney"},
+		"applicantSignatureDate":                    {"2022-04-06"},
+		"applicantIds":                              {"1", "2"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateLpaWhenValidationError(t *testing.T) {
+	expectedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{"receiptDate": {"receiptDate": "Select the date of receipt"}},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{"v1-lpas-edit-dates": sirius.PermissionType{Permissions: []string{"PUT"}}}, nil)
+	client.
+		On("CreateLpa", mock.Anything, 123, mock.Anything).
+		Return(sirius.Lpa{}, expectedError)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.MatchedBy(func(d createLpaData) bool {
+			return d.Error.Error() == expectedError.Error() && !d.Success
+		})).
+		Return(nil)
+
+	form := url.Values{"caseAttorney": {"singular"}}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateLpaWhenValidationErrorHtmxRequest(t *testing.T) {
+	expectedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{"receiptDate": {"receiptDate": "Select the date of receipt"}},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{"v1-lpas-edit-dates": sirius.PermissionType{Permissions: []string{"PUT"}}}, nil)
+	client.
+		On("CreateLpa", mock.Anything, 123, mock.Anything).
+		Return(sirius.Lpa{}, expectedError)
+
+	template := &mockTemplate{}
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, mock.MatchedBy(func(d createLpaData) bool {
+			return d.Error.Error() == expectedError.Error() && !d.Success
+		})).
+		Return(nil)
+
+	form := url.Values{"caseAttorney": {"singular"}}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	template.AssertNotCalled(t, "Func", mock.Anything, mock.Anything)
+	mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+}
+
+func TestPostCreateLpaEditWhenValidationError(t *testing.T) {
+	expectedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{"receiptDate": {"receiptDate": "Select the date of receipt"}},
+	}
+
+	existingLpa := sirius.Lpa{Case: sirius.Case{ID: 456, ReceiptDate: sirius.DateString("2022-01-01")}}
+
+	submittedLpa := sirius.Lpa{
+		ApplicationHasGuidance:     shared.BoolPtr(false),
+		ApplicationHasRestrictions: shared.BoolPtr(false),
+		PaymentByDebitCreditCard:   shared.BoolPtr(false),
+		PaymentRemission:           shared.BoolPtr(false),
+		RepeatApplication:          shared.BoolPtr(false),
+		AnyOtherInfo:               shared.BoolPtr(false),
+		Case: sirius.Case{
+			CaseAttorneySingular:                      shared.BoolPtr(true),
+			CaseAttorneyJointly:                       shared.BoolPtr(false),
+			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentExemption:                          shared.BoolPtr(false),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{"v1-lpas-edit-dates": sirius.PermissionType{Permissions: []string{"PUT"}}}, nil)
+	client.
+		On("Lpa", mock.Anything, 456).
+		Return(existingLpa, nil).
+		Once()
+	client.
+		On("UpdateLpa", mock.Anything, 456, submittedLpa).
+		Return(expectedError)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.MatchedBy(func(d createLpaData) bool {
+			return d.Error.Error() == expectedError.Error() &&
+				!d.Success &&
+				d.IsUpdate &&
+				d.CaseId == 456 &&
+				reflect.DeepEqual(d.Lpa, submittedLpa)
+		})).
+		Return(nil)
+
+	form := url.Values{"caseAttorney": {"singular"}}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&caseId=456", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateLpaWhenGenericError(t *testing.T) {
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("CreateLpa", mock.Anything, 123, mock.Anything).
+		Return(sirius.Lpa{}, errExample)
+
+	form := url.Values{"caseAttorney": {"singular"}}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, nil, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
