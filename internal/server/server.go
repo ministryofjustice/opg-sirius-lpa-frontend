@@ -371,6 +371,12 @@ func postFormString(r *http.Request, name string) string {
 	return strings.TrimSpace(r.PostFormValue(name))
 }
 
+func postFormDobString(r *http.Request, name string) string {
+	//fmt.Println("r.FormValue(name)")
+	//fmt.Println(r.FormValue(name))
+	return strings.TrimSpace(r.PostFormValue(name))
+}
+
 func postFormCheckboxChecked(r *http.Request, name string, value string) bool {
 	for _, val := range r.PostForm[name] {
 		if val == value {
@@ -387,6 +393,23 @@ func postFormInt(r *http.Request, name string) (int, error) {
 
 func postFormDateString(r *http.Request, name string) sirius.DateString {
 	return sirius.DateString(postFormString(r, name))
+}
+
+func postFormDayMonthYear(r *http.Request, name string) sirius.DateString {
+	_ = r.ParseForm()
+	firstVal := func(key string) string {
+		if v := r.PostForm[key]; len(v) > 0 {
+			return v[0]
+		}
+		return ""
+	}
+
+	if firstVal(name+".year") == "" || firstVal(name+".month") == "" || firstVal(name+".day") == "" {
+		return ""
+	}
+
+	formatDate := fmt.Sprintf(`%s-%s-%s`, firstVal(name+".year"), firstVal(name+".month"), firstVal(name+".day"))
+	return sirius.DateString(formatDate)
 }
 
 func strToIntOrStatusError(val string) (int, error) {

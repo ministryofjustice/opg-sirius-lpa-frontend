@@ -18,11 +18,16 @@ type editDatesData struct {
 	Success   bool
 	Error     sirius.ValidationError
 
-	Dates    sirius.Dates
-	DonorId  int
-	CaseUid  string
-	CaseType string
-	CaseId   int
+	Dates            sirius.Dates
+	DonorId          int
+	CaseUid          string
+	CaseType         string
+	CaseId           int
+	ReceiptDate      dob
+	PaymentDate      dob
+	FilingDate       dob
+	DueDate          dob
+	RegistrationDate dob
 }
 
 func EditDates(client EditDatesClient, tmpl template.Template, partialTmpl template.Template) Handler {
@@ -47,12 +52,12 @@ func EditDates(client EditDatesClient, tmpl template.Template, partialTmpl templ
 			dates := sirius.Dates{
 				CancellationDate: postFormDateString(r, "cancellationDate"),
 				DispatchDate:     postFormDateString(r, "dispatchDate"),
-				DueDate:          postFormDateString(r, "dueDate"),
-				FilingDate:       postFormDateString(r, "filingDate"),
+				DueDate:          postFormDayMonthYear(r, "dueDate"),
+				FilingDate:       postFormDayMonthYear(r, "filingDate"),
 				InvalidDate:      postFormDateString(r, "invalidDate"),
-				PaymentDate:      postFormDateString(r, "paymentDate"),
-				ReceiptDate:      postFormDateString(r, "receiptDate"),
-				RegistrationDate: postFormDateString(r, "registrationDate"),
+				PaymentDate:      postFormDayMonthYear(r, "paymentDate"),
+				ReceiptDate:      postFormDayMonthYear(r, "receiptDate"),
+				RegistrationDate: postFormDayMonthYear(r, "registrationDate"),
 				RejectedDate:     postFormDateString(r, "rejectedDate"),
 				RevokedDate:      postFormDateString(r, "revokedDate"),
 				WithdrawnDate:    postFormDateString(r, "withdrawnDate"),
@@ -82,19 +87,44 @@ func EditDates(client EditDatesClient, tmpl template.Template, partialTmpl templ
 		}
 
 		if r.Method != http.MethodPost || data.Success {
+			receiptDate, err := checkDobValue(caseitem.ReceiptDate)
+			if err != nil {
+				return err
+			}
+			paymentDate, err := checkDobValue(caseitem.PaymentDate)
+			if err != nil {
+				return err
+			}
+			filingDate, err := checkDobValue(caseitem.FilingDate)
+			if err != nil {
+				return err
+			}
+			dueDate, err := checkDobValue(caseitem.DueDate)
+			if err != nil {
+				return err
+			}
+			registrationDate, err := checkDobValue(caseitem.RegistrationDate)
+			if err != nil {
+				return err
+			}
 			data.Dates = sirius.Dates{
 				CancellationDate: caseitem.CancellationDate,
 				DispatchDate:     caseitem.DispatchDate,
-				DueDate:          caseitem.DueDate,
-				InvalidDate:      caseitem.InvalidDate,
-				PaymentDate:      caseitem.PaymentDate,
-				FilingDate:       caseitem.FilingDate,
-				ReceiptDate:      caseitem.ReceiptDate,
-				RegistrationDate: caseitem.RegistrationDate,
-				RejectedDate:     caseitem.RejectedDate,
-				RevokedDate:      caseitem.RevokedDate,
-				WithdrawnDate:    caseitem.WithdrawnDate,
+				//DueDate:          caseitem.DueDate,
+				InvalidDate: caseitem.InvalidDate,
+				//PaymentDate:      caseitem.PaymentDate,
+				//FilingDate:       caseitem.FilingDate,
+				//ReceiptDate:      caseitem.ReceiptDate,
+				//RegistrationDate: caseitem.RegistrationDate,
+				RejectedDate:  caseitem.RejectedDate,
+				RevokedDate:   caseitem.RevokedDate,
+				WithdrawnDate: caseitem.WithdrawnDate,
 			}
+			data.ReceiptDate = receiptDate
+			data.PaymentDate = paymentDate
+			data.FilingDate = filingDate
+			data.DueDate = dueDate
+			data.RegistrationDate = registrationDate
 		}
 		data.Entity = caseitem.Summary()
 
@@ -104,4 +134,17 @@ func EditDates(client EditDatesClient, tmpl template.Template, partialTmpl templ
 
 		return tmpl(w, data)
 	}
+}
+
+func checkDobValue(date sirius.DateString) (dob, error) {
+	if date == "" {
+		return dob{}, nil
+	}
+
+	dateString, err := date.ToHyphenateDates()
+	if err != nil {
+		return dob{}, err
+	}
+
+	return parseDate(dateString)
 }
