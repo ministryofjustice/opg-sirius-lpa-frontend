@@ -216,6 +216,10 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorID, data.CaseId))
 		}
 
+		if r.FormValue("addCorrespondent") != "" {
+			return RedirectError(fmt.Sprintf("/select-or-create-correspondent?id=%d&caseId=%d&caseType=lpa", donorID, data.CaseId))
+		}
+
 		if r.Header.Get("HX-Request") == "true" {
 			return partialTmpl(w, data)
 		}

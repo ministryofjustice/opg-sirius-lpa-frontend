@@ -365,7 +365,7 @@
                       <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
                     </summary>
                     <div class="govuk-details__text">
-                      {{ template "person-details-table" . }}
+{{/*                      {{ template "person-details-table" . }}*/}}
                     </div>
                   </details>
                   <div class="govuk-form-group">
@@ -471,12 +471,26 @@
                     {{ template "person-details-table" .Lpa.Correspondent }}
                   </div>
                 </details>
+                <span class="app-create-lpa__summary-update-link">
+                  <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
+                          id="f-update-correspondent-{{ .Lpa.Correspondent.ID }}"
+                          name="updateCorrespondent"
+                          type="submit"
+                          value="{{ .Lpa.Correspondent.ID }}"
+                          disabled="disabled"
+                  >
+                    Update
+                    <span class="govuk-visually-hidden">
+                      correspondent{{ if .Lpa.Correspondent.Salutation }} {{ .Lpa.Correspondent.Salutation }}{{ end }}{{ if .Lpa.Correspondent.Firstname }} {{ .Lpa.Correspondent.Firstname }}{{ end }}{{ if .Lpa.Correspondent.Middlenames }} {{ .Lpa.Correspondent.Middlenames }}{{ end }}{{ if .Lpa.Correspondent.Surname }} {{ .Lpa.Correspondent.Surname }}{{ end }}
+                    </span>
+                  </button>
+                </span>
               </div>
             {{ else }}
               <div class="govuk-button-group app-button-group--column">
-                <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
-                       type="button" disabled="disabled"
-                       value="Add correspondent"/>
+                <input class="govuk-button govuk-button--secondary"
+                       data-module="govuk-button" type="submit" data-disable-after-click="true"
+                       name="addCorrespondent" value="Add correspondent"/>
               </div>
             {{ end }}
           </div>
