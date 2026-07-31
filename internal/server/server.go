@@ -66,6 +66,7 @@ type Client interface {
 	CreateDraftClient
 	CreateEpaClient
 	CreateInvestigationClient
+	CreateLpaClient
 	DeleteDocumentClient
 	DeleteNoteClient
 	DeletePaymentClient
