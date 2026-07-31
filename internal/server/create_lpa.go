@@ -195,6 +195,10 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			data.Success = true
 		}
 
+		if r.FormValue("addCorrespondent") != "" {
+			return RedirectError(fmt.Sprintf("/select-or-create-correspondent?id=%d&caseId=%d&caseType=lpa", donorID, data.CaseId))
+		}
+
 		if r.Header.Get("HX-Request") == "true" {
 			return partialTmpl(w, data)
 		}

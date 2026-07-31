@@ -3,29 +3,45 @@
 
     {{ template "error-summary" .Error }}
 
-    <a class="govuk-back-link"
-       href=""
-       hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
-       hx-target=".action-panel__content"
-       hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Back</a>
+    {{ if eq .CaseType "epa" }}
+      <a class="govuk-back-link"
+         href=""
+         hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
+         hx-target=".action-panel__content"
+         hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Back</a>
+    {{ else }}
+      <a class="govuk-back-link"
+         href=""
+         hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}"
+         hx-target=".action-panel__content"
+         hx-swap="innerHTML show:#accordion-create-lpa-heading-1:top">Back</a>
+    {{ end }}
 
     <h1 class="govuk-heading-m">{{ .Title }}</h1>
 
     <form class="form"
           method="POST"
-          hx-post="{{ prefix (printf "/create-correspondent?id=%d&caseId=%d" .DonorId .CaseId) }}"
+          hx-post="{{ prefix (printf "/create-correspondent?id=%d&caseId=%d&caseType=%s" .DonorId .CaseId .CaseType) }}"
           hx-target=".action-panel__content"
-          hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">
+          hx-swap="innerHTML">
 
       {{ template "createCorrespondent" . }}
 
       <div class="govuk-button-group govuk-!-padding-top-5">
         <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
-        <a class="govuk-link govuk-link--no-visited-state"
-           href=""
-           hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
-           hx-target=".action-panel__content"
-           hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Cancel</a>
+          {{ if eq .CaseType "epa" }}
+            <a class="govuk-link govuk-link--no-visited-state"
+               href=""
+               hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
+               hx-target=".action-panel__content"
+               hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Cancel</a>
+          {{ else }}
+            <a class="govuk-link govuk-link--no-visited-state"
+               href=""
+               hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}"
+               hx-target=".action-panel__content"
+               hx-swap="innerHTML show:#accordion-create-lpa-heading-1:top">Cancel</a>
+          {{ end }}
       </div>
     </form>
   </div>
