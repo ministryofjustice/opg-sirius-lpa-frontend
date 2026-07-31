@@ -6,19 +6,68 @@
 
       <div class="govuk-radios" data-module="govuk-radios">
         <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="f-attorney-new" name="attorneyId" type="radio" value="new" checked>
-          <label class="govuk-label govuk-radios__label" for="f-attorney-new">
+          <input class="govuk-radios__input" id="f-actor-new" name="actorId" type="radio" value="new" checked>
+          <label class="govuk-label govuk-radios__label" for="f-actor-new">
             Create a new correspondent
           </label>
         </div>
-        <div class="govuk-body">Or use an existing actor from this Power of Attorney:</div>
-        {{ range $num, $attorney := .Epa.Attorneys }}
+        <div class="govuk-body">Or select a person named on this {{ ToUpper .CaseType }}:</div>
+        {{ if eq .CaseType "epa" }}
+          {{ range $num, $attorney := .Epa.Attorneys }}
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="f-actor-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $attorney.ID }}">
+              <label class="govuk-label govuk-radios__label" for="f-actor-{{ plusN $num 1 }}">
+                {{ $attorney.Firstname }} {{ $attorney.Surname }}
+              </label>
+            </div>
+          {{ end }}
+        {{ else }}
           <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="f-attorney-{{ plusN $num 1 }}" name="attorneyId" type="radio" value="{{ $attorney.ID }}">
-            <label class="govuk-label govuk-radios__label" for="f-attorney-{{ plusN $num 1 }}">
-              {{ $attorney.Firstname }} {{ $attorney.Surname }}
+            <input class="govuk-radios__input" id="f-actor-donor" name="actorId" type="radio" value="{{ .Lpa.Donor.ID }}">
+            <label class="govuk-label govuk-radios__label" for="f-actor-donor">
+                {{ .Lpa.Donor.Firstname }} {{ .Lpa.Donor.Surname }} (donor)
             </label>
           </div>
+          {{ range $num, $attorney := .Lpa.Attorneys }}
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="f-actor-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $attorney.ID }}">
+              <label class="govuk-label govuk-radios__label" for="f-actor-{{ plusN $num 1 }}">
+                  {{ $attorney.Firstname }} {{ $attorney.Surname }} (attorney)
+              </label>
+            </div>
+          {{ end }}
+          {{ range $num, $attorney := .Lpa.ReplacementAttorneys }}
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="f-actor-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $attorney.ID }}">
+              <label class="govuk-label govuk-radios__label" for="f-actor-{{ plusN $num 1 }}">
+                  {{ $attorney.Firstname }} {{ $attorney.Surname }} (replacement attorney)
+              </label>
+            </div>
+          {{ end }}
+          {{ range $num, $certifiedProvider := .Lpa.CertificateProviders }}
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="f-actor-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $certifiedProvider.ID }}">
+              <label class="govuk-label govuk-radios__label" for="f-actor-{{ plusN $num 1 }}">
+                  {{ $certifiedProvider.Firstname }} {{ $certifiedProvider.Surname }} (certified provider)
+              </label>
+            </div>
+          {{ end }}
+          {{ range $num, $notifiedPerson := .Lpa.NotifiedPersons }}
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="f-actor-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $notifiedPerson.ID }}">
+              <label class="govuk-label govuk-radios__label" for="f-actor-{{ plusN $num 1 }}">
+                  {{ $notifiedPerson.Firstname }} {{ $notifiedPerson.Surname }} (notified person)
+              </label>
+            </div>
+          {{ end }}
+          {{ range $num, $trustCorporation := .Lpa.TrustCorporations }}
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="f-actor-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $trustCorporation.ID }}">
+              <label class="govuk-label govuk-radios__label" for="f-actor-{{ plusN $num 1 }}">
+                  {{ $trustCorporation.Firstname }} {{ $trustCorporation.Surname }} (trust corporation)
+              </label>
+            </div>
+          {{ end }}
         {{ end }}
       </div>
     </fieldset>

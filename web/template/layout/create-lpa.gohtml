@@ -83,7 +83,7 @@
           <div class="govuk-summary-card__content">
             {{ if gt (len .Lpa.Attorneys) 0 }}
               {{ range $attorney := .Lpa.Attorneys }}
-                <div class="app-create-epa__details-row">
+                <div class="app-create-lpa__details-row">
                   <details class="govuk-details">
                     <summary class="govuk-details__summary">
                       <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
@@ -148,7 +148,7 @@
           <div class="govuk-summary-card__content">
             {{ if gt (len .Lpa.ReplacementAttorneys) 0 }}
               {{ range $attorney := .Lpa.ReplacementAttorneys }}
-                <div class="app-create-epa__details-row">
+                <div class="app-create-lpa__details-row">
                   <details class="govuk-details">
                     <summary class="govuk-details__summary">
                       <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
@@ -173,12 +173,12 @@
     <div class="govuk-accordion__section">
       <div class="govuk-accordion__section-header">
         <h2 class="govuk-accordion__section-heading">
-          <span class="govuk-accordion__section-button" id="accordion-create-lpa-heading-1">
+          <span class="govuk-accordion__section-button" id="accordion-create-lpa-heading-2">
               Section 5–8: LPA instructions and notified people
           </span>
         </h2>
       </div>
-      <div id="accordion-create-lpa-content-1" class="govuk-accordion__section-content">
+      <div id="accordion-create-lpa-content-2" class="govuk-accordion__section-content">
         <div class="govuk-summary-card">
           <div class="govuk-summary-card__title-wrapper">
             <h2 class="govuk-summary-card__title">
@@ -312,12 +312,12 @@
     <div class="govuk-accordion__section">
       <div class="govuk-accordion__section-header">
         <h2 class="govuk-accordion__section-heading">
-          <span class="govuk-accordion__section-button" id="accordion-create-lpa-heading-1">
+          <span class="govuk-accordion__section-button" id="accordion-create-lpa-heading-3">
               Section 9–11: Signatures and Certificate Provider details
           </span>
         </h2>
       </div>
-      <div id="accordion-create-lpa-content-1" class="govuk-accordion__section-content">
+      <div id="accordion-create-lpa-content-3" class="govuk-accordion__section-content">
         <div class="govuk-summary-card">
           <div class="govuk-summary-card__title-wrapper">
             <h2 class="govuk-summary-card__title">
@@ -332,13 +332,13 @@
             <h3 class="govuk-heading-s">Certificate provider</h3>
             {{ if gt (len .Lpa.CertificateProviders) 0 }}
               {{ range $cp := .Lpa.CertificateProviders }}
-                <div class="app-create-epa__details-row">
+                <div class="app-create-lpa__details-row">
                   <details class="govuk-details">
                     <summary class="govuk-details__summary">
                       <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
                     </summary>
                     <div class="govuk-details__text">
-                      {{ template "person-details-table" . }}
+{{/*                      {{ template "person-details-table" . }}*/}}
                     </div>
                   </details>
                   <div class="govuk-form-group">
@@ -381,12 +381,12 @@
     <div class="govuk-accordion__section">
       <div class="govuk-accordion__section-header">
         <h2 class="govuk-accordion__section-heading">
-          <span class="govuk-accordion__section-button" id="accordion-create-lpa-heading-1">
+          <span class="govuk-accordion__section-button" id="accordion-create-lpa-heading-4">
               Section 12–15: Application form
           </span>
         </h2>
       </div>
-      <div id="accordion-create-lpa-content-1" class="govuk-accordion__section-content">
+      <div id="accordion-create-lpa-content-4" class="govuk-accordion__section-content">
         <div class="govuk-summary-card">
           <div class="govuk-summary-card__title-wrapper">
             <h2 class="govuk-summary-card__title">
@@ -437,7 +437,7 @@
           <div class="govuk-summary-card__content">
             {{ if .Lpa.Correspondent }}
               <p class="govuk-heading-s">Correspondent:</p>
-              <div class="app-create-epa__details-row">
+              <div class="app-create-lpa__details-row">
                 <details class="govuk-details">
                   <summary class="govuk-details__summary">
                     <span class="govuk-details__summary-text">{{ if .Lpa.Correspondent.Salutation }}{{ .Lpa.Correspondent.Salutation }}{{ end }}{{ if .Lpa.Correspondent.Firstname }} {{ .Lpa.Correspondent.Firstname }}{{ end }}{{ if .Lpa.Correspondent.Middlenames }} {{ .Lpa.Correspondent.Middlenames }}{{ end }}{{ if .Lpa.Correspondent.Surname }} {{ .Lpa.Correspondent.Surname }}{{ end }}</span>
@@ -446,12 +446,26 @@
                     {{ template "person-details-table" .Lpa.Correspondent }}
                   </div>
                 </details>
+                <span class="app-create-lpa__summary-update-link">
+                  <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
+                          id="f-update-correspondent-{{ .Lpa.Correspondent.ID }}"
+                          name="updateCorrespondent"
+                          type="submit"
+                          value="{{ .Lpa.Correspondent.ID }}"
+                          disabled="disabled"
+                  >
+                    Update
+                    <span class="govuk-visually-hidden">
+                      correspondent{{ if .Lpa.Correspondent.Salutation }} {{ .Lpa.Correspondent.Salutation }}{{ end }}{{ if .Lpa.Correspondent.Firstname }} {{ .Lpa.Correspondent.Firstname }}{{ end }}{{ if .Lpa.Correspondent.Middlenames }} {{ .Lpa.Correspondent.Middlenames }}{{ end }}{{ if .Lpa.Correspondent.Surname }} {{ .Lpa.Correspondent.Surname }}{{ end }}
+                    </span>
+                  </button>
+                </span>
               </div>
             {{ else }}
               <div class="govuk-button-group app-button-group--column">
-                <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
-                       type="button" disabled="disabled"
-                       value="Add correspondent"/>
+                <input class="govuk-button govuk-button--secondary"
+                       data-module="govuk-button" type="submit" data-disable-after-click="true"
+                       name="addCorrespondent" value="Add correspondent"/>
               </div>
             {{ end }}
           </div>
