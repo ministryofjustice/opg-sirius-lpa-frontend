@@ -9,7 +9,7 @@ import (
 )
 
 type SelectOrCreateCorrespondentClient interface {
-	CreateCorrespondent(ctx sirius.Context, caseId int, correspondent sirius.Correspondent) error
+	AssignActorAsCorrespondent(ctx sirius.Context, caseId int, personId int) error
 	Epa(ctx sirius.Context, id int) (sirius.Epa, error)
 }
 
@@ -63,28 +63,7 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 					}
 				}
 
-				correspondent := sirius.Correspondent{
-					Person: sirius.Person{
-						Salutation:        attorney.Salutation,
-						Firstname:         attorney.Firstname,
-						Middlenames:       attorney.Middlenames,
-						Surname:           attorney.Surname,
-						DateOfBirth:       attorney.DateOfBirth,
-						PhoneNumber:       attorney.PhoneNumber,
-						Email:             attorney.Email,
-						AddressLine1:      attorney.AddressLine1,
-						AddressLine2:      attorney.AddressLine2,
-						AddressLine3:      attorney.AddressLine3,
-						Town:              attorney.Town,
-						County:            attorney.County,
-						Country:           attorney.Country,
-						Postcode:          attorney.Postcode,
-						CompanyName:       attorney.CompanyName,
-						IsAirmailRequired: attorney.IsAirmailRequired,
-					},
-				}
-
-				err = client.CreateCorrespondent(ctx, caseId, correspondent)
+				err = client.AssignActorAsCorrespondent(ctx, caseId, attorney.ID)
 
 				if ve, ok := err.(sirius.ValidationError); ok {
 					w.WriteHeader(http.StatusBadRequest)
