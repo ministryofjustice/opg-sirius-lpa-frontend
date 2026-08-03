@@ -19,6 +19,7 @@ type AllocateCasesClient interface {
 
 type allocateCasesData struct {
 	XSRFToken        string
+	IsPartial        bool
 	Entities         []string
 	Success          bool
 	Error            sirius.ValidationError
@@ -33,7 +34,7 @@ type allocateCasesData struct {
 	AssigneeUserName string
 }
 
-func AllocateCases(client AllocateCasesClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
 			return err
@@ -146,9 +147,8 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template, partialTm
 				data.Success = true
 			}
 		}
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
-		}
+
+		data.IsPartial = r.Header.Get("HX-Request") == "true"
 
 		return tmpl(w, data)
 	}

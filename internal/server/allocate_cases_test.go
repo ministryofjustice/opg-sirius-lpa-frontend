@@ -54,7 +54,7 @@ func TestGetAllocateCases(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, template.Func, template.Func)(w, r)
+	err := AllocateCases(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -88,7 +88,7 @@ func TestGetAllocateCasesMultiple(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&id=456", nil)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, template.Func, template.Func)(w, r)
+	err := AllocateCases(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -109,8 +109,8 @@ func TestGetAllocateCaseWithHXRequest(t *testing.T) {
 			Donor:    &sirius.Person{ID: 42},
 		}, nil)
 
-	partialTemplate := &mockTemplate{}
-	partialTemplate.
+	template := &mockTemplate{}
+	template.
 		On("Func", mock.Anything, allocateCasesData{
 			Teams:      []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entities:   []string{"LPA 7000-0000-0000"},
@@ -118,24 +118,20 @@ func TestGetAllocateCaseWithHXRequest(t *testing.T) {
 			CaseID:     123,
 			DonorID:    42,
 			EntityType: "lpa",
+			IsPartial:  true,
 		}).
 		Return(nil)
-
-	template := &mockTemplate{}
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=lpa", nil)
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, template.Func, partialTemplate.Func)(w, r)
+	err := AllocateCases(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, partialTemplate)
 	mock.AssertExpectationsForObjects(t, client, template)
-	template.AssertNotCalled(t, "Func")
-	partialTemplate.AssertCalled(t, "Func", mock.Anything, mock.Anything)
 }
 
 func TestAllocateCaseParseFormError(t *testing.T) {
@@ -143,7 +139,7 @@ func TestAllocateCaseParseFormError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(nil, nil, nil)(w, r)
+	err := AllocateCases(nil, nil)(w, r)
 
 	assert.NotNil(t, err)
 }
@@ -161,7 +157,7 @@ func TestGetAllocateCasesBadQueryString(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := AllocateCases(nil, nil, nil)(w, r)
+			err := AllocateCases(nil, nil)(w, r)
 
 			assert.Equal(t, err, sirius.StatusError{Code: 404})
 		})
@@ -180,7 +176,7 @@ func TestGetAllocateCasesWhenTeamsErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, nil, nil)(w, r)
+	err := AllocateCases(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -198,7 +194,7 @@ func TestGetAllocateCasesWhenCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, nil, nil)(w, r)
+	err := AllocateCases(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -221,7 +217,7 @@ func TestGetAllocateCasesWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, template.Func, template.Func)(w, r)
+	err := AllocateCases(client, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -260,7 +256,7 @@ func TestPostAllocateCases(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, template.Func, template.Func)(w, r)
+	err := AllocateCases(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -310,7 +306,7 @@ func TestPostAllocateCasesMultiple(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, template.Func, template.Func)(w, r)
+	err := AllocateCases(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -339,7 +335,7 @@ func TestPostAllocateCasesWhenAllocateCasesFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, nil, nil)(w, r)
+	err := AllocateCases(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -384,7 +380,7 @@ func TestPostAllocateCasesWhenAssignToNotSet(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AllocateCases(client, template.Func, template.Func)(w, r)
+	err := AllocateCases(client, template.Func)(w, r)
 	assert.Nil(t, err)
 
 	resp := w.Result()
@@ -451,7 +447,7 @@ func TestPostAllocateCasesWhenValidationError(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := AllocateCases(client, template.Func, template.Func)(w, r)
+			err := AllocateCases(client, template.Func)(w, r)
 			assert.Nil(t, err)
 
 			resp := w.Result()
