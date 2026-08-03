@@ -60,7 +60,7 @@ describe("Select or create correspondent", () => {
       "contain.text",
       "Melanie Vanvolkenburg",
     );
-    cy.get("label[for=f-attorney-2]")
+    cy.get("label[for=f-actor-2]")
       .should("contain.text", "Will Niesborella")
       .click();
     cy.get("button[type=submit]").click();
