@@ -12,9 +12,9 @@
     {{ else }}
       <a class="govuk-back-link"
          href=""
-         hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}"
+         hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-4" .DonorId .CaseId) }}"
          hx-target=".action-panel__content"
-         hx-swap="innerHTML show:#accordion-create-lpa-heading-1:top">Back</a>
+         hx-swap="innerHTML show:#accordion-create-lpa-heading-4:top">Back</a>
     {{ end }}
 
     <h1 class="govuk-heading-m">{{ .Title }}</h1>
@@ -38,9 +38,9 @@
           {{ else }}
             <a class="govuk-link govuk-link--no-visited-state"
                href=""
-               hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}"
+               hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-4" .DonorId .CaseId) }}"
                hx-target=".action-panel__content"
-               hx-swap="innerHTML show:#accordion-create-lpa-heading-1:top">Cancel</a>
+               hx-swap="innerHTML show:#accordion-create-lpa-heading-4:top">Cancel</a>
           {{ end }}
       </div>
     </form>
