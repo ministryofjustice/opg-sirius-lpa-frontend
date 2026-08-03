@@ -19,7 +19,7 @@ describe("Create or update correspondent", () => {
       },
     });
 
-    cy.visit("/create-correspondent?id=1&caseId=2");
+    cy.visit("/create-correspondent?id=1&caseId=2&caseType=epa");
 
     cy.contains("Add a correspondent");
     cy.get("#f-salutation").type("Prof");
@@ -48,7 +48,7 @@ describe("Create or update correspondent", () => {
       body: { id: 2 },
     });
 
-    cy.visit("/create-correspondent?id=1&caseId=2");
+    cy.visit("/create-correspondent?id=1&caseId=2&caseType=epa");
     cy.get(".govuk-back-link")
       .should("exist")
       .and("have.attr", "href")
@@ -93,5 +93,33 @@ describe("Create or update correspondent", () => {
     cy.get("#f-firstname").clear().type("Mindy");
     cy.get("button[type=submit]").click();
     cy.url().should("include", "create-epa");
+  });
+
+  it("creates a correspondent on an LPA", () => {
+    cy.visit("/create-correspondent?id=1&caseId=2&caseType=lpa");
+
+    cy.contains("Add a correspondent");
+    cy.get("#f-salutation").type("Prof");
+    cy.get("#f-firstname").type("Melanie");
+    cy.get("#f-middlenames").type("Josefina");
+    cy.get("#f-surname").type("Vanvolkenburg");
+    cy.get("#f-companyName").type("ACME");
+    cy.get(".govuk-details__summary").click();
+    cy.get("#f-addressLine1").type("29737 Andrew Plaza");
+    cy.get("#f-addressLine2").type("Apt. 814");
+    cy.get("#f-addressLine3").type("Gislasonside");
+    cy.get("#f-town").type("Hirthehaven");
+    cy.get("#f-county").type("Saskatchewan");
+    cy.get("#f-postcode").type("S7R 9F9");
+    cy.get("#f-country").type("Canada");
+    cy.get("label[for=f-isAirmailRequired]").click();
+    cy.get("#f-phoneNumber").type("072345678");
+    cy.get("#f-email").type("m.vancolkenburg@ca.test");
+    cy.get("label[for=f-correspondenceBy-post]").click();
+    cy.get("label[for=f-correspondenceBy-email]").click();
+    cy.get("label[for=f-correspondenceBy-phone]").click();
+    cy.get("label[for=f-correspondenceBy-welsh]").click();
+    cy.get("button[type=submit]").click();
+    cy.url().should("include", "/create-lpa");
   });
 });

@@ -25,37 +25,38 @@
   {{ template "input" (field "phoneNumber" "Telephone number" .Correspondent.PhoneNumber .Error.Field.phoneNumber) }}
   {{ template "input" (field "email" "Email address" .Correspondent.Email .Error.Field.email) }}
 
-  <div class="govuk-form-group {{ if .Error.Field.correspondenceBy }}govuk-form-group--error{{ end }}">
-    <fieldset class="govuk-fieldset">
-      <legend class="govuk-fieldset__legend">Correspondence by</legend>
-        {{ template "errors" .Error.Field.correspondenceBy }}
-      <div class="govuk-checkboxes govuk-checkboxes--inline" data-module="govuk-checkboxes">
-        <div class="govuk-checkboxes__item">
-          <input class="govuk-checkboxes__input" id="f-correspondenceBy-post" name="correspondenceBy" type="checkbox" value="post" {{ if .Correspondent.CorrespondenceByPost }}checked{{ end }}>
-          <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-post">
-            Post
-          </label>
+  {{ if eq .CaseType "lpa" }}
+    <div class="govuk-form-group {{ if .Error.Field.correspondenceBy }}govuk-form-group--error{{ end }}">
+      <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend">Correspondence by</legend>
+          {{ template "errors" .Error.Field.correspondenceBy }}
+        <div class="govuk-checkboxes govuk-checkboxes--inline" data-module="govuk-checkboxes">
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input" id="f-correspondenceBy-post" name="correspondenceBy" type="checkbox" value="post" {{ if .Correspondent.CorrespondenceByPost }}checked{{ end }}>
+            <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-post">
+              Post
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input" id="f-correspondenceBy-email" name="correspondenceBy" type="checkbox" value="email" {{ if .Correspondent.CorrespondenceByEmail }}checked{{ end }}>
+            <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-email">
+              Email
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input" id="f-correspondenceBy-phone" name="correspondenceBy" type="checkbox" value="phone" {{ if .Correspondent.CorrespondenceByPhone }}checked{{ end }}>
+            <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-phone">
+              Phone
+            </label>
+          </div>
+          <div class="govuk-checkboxes__item">
+            <input class="govuk-checkboxes__input" id="f-correspondenceBy-welsh" name="correspondenceBy" type="checkbox" value="welsh" {{ if .Correspondent.CorrespondenceByWelsh }}checked{{ end }}>
+            <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-welsh">
+              Welsh
+            </label>
+          </div>
         </div>
-        <div class="govuk-checkboxes__item">
-          <input class="govuk-checkboxes__input" id="f-correspondenceBy-email" name="correspondenceBy" type="checkbox" value="email" {{ if .Correspondent.CorrespondenceByEmail }}checked{{ end }}>
-          <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-email">
-            Email
-          </label>
-        </div>
-        <div class="govuk-checkboxes__item">
-          <input class="govuk-checkboxes__input" id="f-correspondenceBy-phone" name="correspondenceBy" type="checkbox" value="phone" {{ if .Correspondent.CorrespondenceByPhone }}checked{{ end }}>
-          <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-phone">
-            Phone
-          </label>
-        </div>
-        <div class="govuk-checkboxes__item">
-          <input class="govuk-checkboxes__input" id="f-correspondenceBy-welsh" name="correspondenceBy" type="checkbox" value="welsh" {{ if .Correspondent.CorrespondenceByWelsh }}checked{{ end }}>
-          <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-welsh">
-            Welsh
-          </label>
-        </div>
-      </div>
-    </fieldset>
-  </div>
-
+      </fieldset>
+    </div>
+  {{ end }}
 {{ end }}
