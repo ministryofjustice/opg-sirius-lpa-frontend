@@ -56,7 +56,7 @@ describe("Select or create correspondent", () => {
 
   it("can select an existing attorney to create a correspondent", () => {
     cy.contains("Add a correspondent");
-    cy.get("label[for=f-attorney-1]").should(
+    cy.get("label[for=f-actor-1]").should(
       "contain.text",
       "Melanie Vanvolkenburg",
     );
@@ -69,7 +69,7 @@ describe("Select or create correspondent", () => {
 
   it("select create a new correspondent by default", () => {
     cy.contains("Add a correspondent");
-    cy.get("input#f-attorney-new").should("be.checked");
+    cy.get("input#f-actor-new").should("be.checked");
     cy.get("button[type=submit]").click();
     cy.url().should("include", "/create-correspondent");
   });
