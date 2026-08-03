@@ -74,7 +74,7 @@ services:
   cypress:
     image: cypress/included:15.19.0@sha256:fe59f2cac5c7451644c8780cb2fb6735fde512d06642117199a7479269702f03
     platform: "linux/amd64"
-    command: run --browser edge --spec cypress/e2e/create-correspondent.cy.js
+    command: run --browser edge
     entrypoint: cypress
     depends_on:
       - lpa-frontend
