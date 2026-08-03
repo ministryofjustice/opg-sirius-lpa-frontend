@@ -238,7 +238,7 @@ func TestPostSelectOrCreateCorrespondentFromAttorney(t *testing.T) {
 	}
 }
 
-func TestPostSelectOrCreateCorrespondentBadactorId(t *testing.T) {
+func TestPostSelectOrCreateCorrespondentBadActorId(t *testing.T) {
 	expectedErr := sirius.StatusError{Code: http.StatusBadRequest}
 	client := &mockSelectOrCreateCorrespondentClient{}
 	client.
