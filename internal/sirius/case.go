@@ -40,7 +40,7 @@ type Case struct {
 	Notes                                     []interface{}     `json:"notes,omitempty"`
 	NoticeGivenDate                           DateString        `json:"noticeGivenDate,omitempty"`
 	NotificationDate                          DateString        `json:"notificationDate,omitempty"`
-	NotifiedPersons                           []Person          `json:"notifiedPersons,omitempty"`
+	NotifiedPersons                           []NotifiedPerson  `json:"notifiedPersons,omitempty"`
 	PaymentByCheque                           *bool             `json:"paymentByCheque,omitempty"`
 	PaymentExemption                          *bool             `json:"paymentExemption,omitempty"`
 	PaymentDate                               DateString        `json:"paymentDate,omitempty"`

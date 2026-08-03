@@ -20,20 +20,21 @@ type CreateLpaClient interface {
 }
 
 type createLpaData struct {
-	AppointmentType    string
-	CanEditReceiptDate bool
-	CaseId             int
-	DonorId            int
-	DonorName          string
-	Error              sirius.ValidationError
-	HtmxRedirect       string
-	HtmxSwap           string
-	IsUpdate           bool
-	Lpa                sirius.Lpa
-	Success            bool
-	SuccessMessage     string
-	Title              string
-	XSRFToken          string
+	AppointmentType        string
+	AllowNewNotifiedPerson bool
+	CanEditReceiptDate     bool
+	CaseId                 int
+	DonorId                int
+	DonorName              string
+	Error                  sirius.ValidationError
+	HtmxRedirect           string
+	HtmxSwap               string
+	IsUpdate               bool
+	Lpa                    sirius.Lpa
+	Success                bool
+	SuccessMessage         string
+	Title                  string
+	XSRFToken              string
 }
 
 func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl template.Template) Handler {
@@ -56,11 +57,12 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 		}
 
 		data := createLpaData{
-			XSRFToken:          ctx.XSRFToken,
-			DonorId:            donorID,
-			DonorName:          donor.Firstname + " " + donor.Surname,
-			Title:              "Create an LPA",
-			CanEditReceiptDate: userPermissions.Includes("v1-lpas-edit-dates", "PUT"),
+			XSRFToken:              ctx.XSRFToken,
+			DonorId:                donorID,
+			DonorName:              donor.Firstname + " " + donor.Surname,
+			Title:                  "Create an LPA",
+			AllowNewNotifiedPerson: allowNewNotifiedPerson(0),
+			CanEditReceiptDate:     userPermissions.Includes("v1-lpas-edit-dates", "PUT"),
 		}
 
 		caseIdStr := r.FormValue("caseId")
@@ -77,6 +79,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			}
 
 			data.AppointmentType = appointmentTypeFromCase(data.Lpa.Case)
+			data.AllowNewNotifiedPerson = allowNewNotifiedPerson(len(data.Lpa.NotifiedPersons))
 			data.Title = "Edit LPA"
 			data.IsUpdate = true
 		}
@@ -204,6 +207,15 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			if r.FormValue("updateCorrespondent") != "" {
 				return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d&caseType=lpa", donorID, data.CaseId))
 			}
+			if r.FormValue("addNotifiedPerson") != "" {
+				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d", donorID, data.CaseId))
+			} else if updateNotifiedPerson := r.FormValue("updateNotifiedPerson"); updateNotifiedPerson != "" {
+				notifiedPersonID, err := strToIntOrStatusError(updateNotifiedPerson)
+				if err != nil {
+					return err
+				}
+				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d&notifiedPersonId=%d", donorID, data.CaseId, notifiedPersonID))
+			}
 
 			data.Success = true
 			if isEditing {
@@ -211,6 +223,8 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			} else {
 				data.SuccessMessage = "You have successfully created an LPA."
 			}
+			data.AllowNewNotifiedPerson = allowNewNotifiedPerson(len(data.Lpa.NotifiedPersons))
+
 		}
 
 		if r.FormValue("addReplacementAttorney") != "" {
