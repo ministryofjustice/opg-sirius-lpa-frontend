@@ -344,7 +344,7 @@ func TestPostCreateEpaRedirects(t *testing.T) {
 			query:         "/?id=123",
 			formField:     "addCorrespondent",
 			formValue:     "true",
-			expectedError: RedirectError("/create-correspondent?id=123&caseId=456"),
+			expectedError: RedirectError("/create-correspondent?id=123&caseId=456&caseType=epa"),
 			setupMocks: func(client *mockCreateEpaClient, epa sirius.Epa) {
 				client.
 					On("CreateEpa", mock.Anything, 123, epa).
@@ -355,7 +355,7 @@ func TestPostCreateEpaRedirects(t *testing.T) {
 			query:         "/?id=123&caseId=456",
 			formField:     "addCorrespondent",
 			formValue:     "true",
-			expectedError: RedirectError("/select-or-create-correspondent?id=123&caseId=456"),
+			expectedError: RedirectError("/select-or-create-correspondent?id=123&caseId=456&caseType=epa"),
 			setupMocks: func(client *mockCreateEpaClient, epa sirius.Epa) {
 				client.
 					On("Epa", mock.Anything, 456).
@@ -374,7 +374,7 @@ func TestPostCreateEpaRedirects(t *testing.T) {
 			query:         "/?id=123&caseId=456",
 			formField:     "updateCorrespondent",
 			formValue:     "1",
-			expectedError: RedirectError("/create-correspondent?id=123&caseId=456"),
+			expectedError: RedirectError("/create-correspondent?id=123&caseId=456&caseType=epa"),
 			setupMocks: func(client *mockCreateEpaClient, epa sirius.Epa) {
 				client.
 					On("Epa", mock.Anything, 456).

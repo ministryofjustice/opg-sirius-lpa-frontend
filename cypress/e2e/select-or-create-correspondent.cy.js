@@ -51,7 +51,7 @@ describe("Select or create correspondent", () => {
       body: {},
     });
 
-    cy.visit("/select-or-create-correspondent?id=1&caseId=2");
+    cy.visit("/select-or-create-correspondent?id=1&caseId=2&caseType=epa");
   });
 
   it("can select an existing attorney to create a correspondent", () => {

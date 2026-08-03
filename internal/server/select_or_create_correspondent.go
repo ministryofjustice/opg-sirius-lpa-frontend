@@ -76,7 +76,7 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 						}
 					}
 				} else {
-					person = getSelectedActorForLpa(data.Lpa, actorId)
+					person = GetSelectedActorForLpa(data.Lpa, actorId)
 				}
 
 				correspondent := sirius.Correspondent{
@@ -112,7 +112,10 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 				} else if err != nil {
 					return err
 				} else {
-					return RedirectError(fmt.Sprintf("/create-%s?id=%d&caseId=%d", data.CaseType, donorId, caseId))
+					if data.CaseType == "epa" {
+						return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
+					}
+					return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-4", donorId, caseId))
 				}
 			}
 
@@ -126,7 +129,7 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 	}
 }
 
-func getSelectedActorForLpa(lpa sirius.Lpa, actorId int) sirius.Person {
+func GetSelectedActorForLpa(lpa sirius.Lpa, actorId int) sirius.Person {
 	if actorId == lpa.Donor.ID {
 		return *lpa.Donor
 	}
