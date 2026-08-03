@@ -1,0 +1,97 @@
+{{ template "page" . }}
+
+{{ define "partial-content" }}
+  <div class="action-panel__form">
+
+    {{ if .HtmxRedirect }}
+        <span class="govuk-!-display-none"
+              hx-get="{{ prefix .HtmxRedirect }}"
+              hx-target=".action-panel__content"
+              hx-trigger="load"
+        ></span>
+    {{ end }}
+
+    {{ template "error-summary" .Error }}
+
+    <a class="govuk-back-link"
+       href=""
+       hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-2" .DonorId .CaseId) }}"
+       hx-target=".action-panel__content"
+       hx-swap="innerHTML show:#accordion-create-lpa-heading-2:top">Back</a>
+
+    <h1 class="govuk-heading-m">{{ .Title }}</h1>
+
+    <form class="form" method="POST"
+          hx-post={{ if .IsEditing }}"{{ prefix (printf "/create-notified-person?id=%d&caseId=%d&notifiedPersonId=%d" .DonorId .CaseId .NotifiedPerson.ID) }}"{{ else }}"{{ prefix (printf "/create-notified-person?id=%d&caseId=%d" .DonorId .CaseId) }}"{{ end }}
+          hx-target=".action-panel__content"
+          hx-swap="innerHTML">
+
+      {{ template "addNotifiedPerson" . }}
+
+      <div class="govuk-button-group govuk-!-padding-top-5">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+          {{if .AllowNewNotifiedPerson }}
+            {{ if not .IsEditing }}
+              <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another-notified-person" value="Save and add another notified person" />
+            {{ end }}
+            {{ if ne .NextNotifiedPersonId 0 }}
+              <input class="govuk-button" data-module="govuk-button" type="submit" name="next-notified-person" value="Save and edit next notified person" />
+            {{ end }}
+          {{ end }}
+          <a class="govuk-link govuk-link--no-visited-state"
+              href=""
+              hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-2" .DonorId .CaseId) }}"
+              hx-target=".action-panel__content"
+              hx-swap="innerHTML show:#accordion-create-lpa-heading-2:top">Cancel</a>
+      </div>
+    </form>
+  </div>
+{{ end }}
+
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ .Title }}{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">{{ .Title }}</h1>
+
+      <form class="form" method="POST">
+          {{ template "addNotifiedPerson" . }}
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
+
+
+{{ define "addNotifiedPerson" }}
+  <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+  {{ template "input" (field "salutation" "Title" .NotifiedPerson.Salutation .Error.Field.salutation) }}
+  {{ template "input" (field "firstname" "First name" .NotifiedPerson.Firstname .Error.Field.firstname) }}
+  {{ template "input" (field "middlenames" "Middle names" .NotifiedPerson.Middlenames .Error.Field.middlenames) }}
+  {{ template "input" (field "surname" "Last name" .NotifiedPerson.Surname .Error.Field.surname) }}
+
+  <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Address" data-app-address-finder-fill-country="false">
+      {{ template "input" (field "addressLine1" "Address line 1" .NotifiedPerson.AddressLine1 .Error.Field.addressLine1 "data-app-address-finder-map" "addressLine1") }}
+      {{ template "input" (field "addressLine2" "Address line 2" .NotifiedPerson.AddressLine2 .Error.Field.addressLine2 "data-app-address-finder-map" "addressLine2") }}
+      {{ template "input" (field "addressLine3" "Address line 3" .NotifiedPerson.AddressLine3 .Error.Field.addressLine3 "data-app-address-finder-map" "addressLine3") }}
+      {{ template "input" (field "town" "Town" .NotifiedPerson.Town .Error.Field.town "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+      {{ template "input" (field "county" "County" .NotifiedPerson.County .Error.Field.county) }}
+      {{ template "input" (field "postcode" "Postcode" .NotifiedPerson.Postcode .Error.Field.postcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+      {{ template "input" (field "country" "Country" .NotifiedPerson.Country .Error.Field.country "data-app-address-finder-map" "country") }}
+
+      {{ template "radios" (radios "isAirmailRequired" "Airmail required" ( stringifyBool .NotifiedPerson.IsAirmailRequired) .Error.Field.isAirmailRequired true
+        (item "true" "Yes")
+        (item "false" "No")
+      ) }}
+  </div>
+
+  {{ template "input" (field "noticeGivenDate" "Date Notice Given" .NotifiedPerson.NoticeGivenDate .Error.Field.noticeGivenDate "type" "date") }}
+{{ end }}

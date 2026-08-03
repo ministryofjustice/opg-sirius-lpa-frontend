@@ -17,7 +17,7 @@
             <th scope="row" class="govuk-table__header">Last name</th>
             <td class="govuk-table__cell">{{ .Surname }}</td>
         </tr>
-        {{ if or (ne .PersonType "Correspondent") (ne .PersonType "Certificate Provider") }}
+        {{ if and (ne .PersonType "Correspondent") (ne .PersonType "Certificate Provider") (ne .PersonType "Notified Person") }}
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Date of birth</th>
                 <td class="govuk-table__cell">
@@ -29,12 +29,12 @@
                 </td>
             </tr>
         {{ end }}
-        {{ if ne .PersonType "Certificate Provider" }}
+        {{ if and (ne .PersonType "Certificate Provider") (ne .PersonType "Notified Person") }}
             {{ if .CompanyName }}
-            <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header">Company name</th>
-                <td class="govuk-table__cell">{{ .CompanyName }}</td>
-            </tr>
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">Company name</th>
+                    <td class="govuk-table__cell">{{ .CompanyName }}</td>
+                </tr>
             {{ end }}
             {{ if .CompanyNumber }}
                 <tr class="govuk-table__row">
@@ -77,7 +77,7 @@
                 </td>
             </tr>
         {{ end }}
-        {{ if and (ne .PersonType "Replacement Attorney") (ne .PersonType "Certificate Provider") }}
+        {{ if and (ne .PersonType "Replacement Attorney") (ne .PersonType "Certificate Provider") (ne .PersonType "Notified Person") }}
             {{ if .SystemStatus }}
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header">Is this attorney active?</th>
@@ -85,6 +85,12 @@
                 </tr>
             {{ end }}
         {{ end }}
+        {{ if eq .PersonType "Notified Person" }}
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Date Notice Given</th>
+                <td class="govuk-table__cell"> {{ parseAndFormatDate (printf "%s" .NoticeGivenDate) "2006-01-02" "2 January 2006" }}</td>
+            </tr>
+        {{end }}
         </tbody>
     </table>
 {{ end }}
