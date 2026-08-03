@@ -47,12 +47,13 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 			Title:     "Add a correspondent",
 		}
 
+		var correspondent *sirius.Correspondent
 		if data.CaseType == "epa" {
 			epa, err := client.Epa(ctx, caseId)
 			if err != nil {
 				return err
 			}
-			correspondent := epa.Correspondent
+			correspondent = epa.Correspondent
 			isEditing := correspondent != nil
 
 			if isEditing {
@@ -90,7 +91,7 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 			data.Correspondent = updatedCorrespondent
 
 			if data.IsEditing {
-				updatedCorrespondent.ID = data.Correspondent.ID
+				updatedCorrespondent.ID = correspondent.ID
 				data.Correspondent = updatedCorrespondent
 				err = client.UpdateCorrespondent(ctx, data.Correspondent.ID, updatedCorrespondent)
 			} else {
