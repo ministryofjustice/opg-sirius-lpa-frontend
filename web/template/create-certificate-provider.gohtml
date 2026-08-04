@@ -31,10 +31,9 @@
 
                 <div class="govuk-button-group govuk-!-padding-top-5">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
-{{/*                    check if can just add 2*/}}
-{{/*                    {{ if not .IsEditing }}*/}}
-{{/*                        <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add a second certificate provider" />*/}}
-{{/*                    {{ end }}*/}}
+                    {{ if .CanAddActor }}
+                        <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add a second certificate provider" />
+                    {{ end }}
                     <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-3" .DonorId .CaseId) }}">Cancel</a>
                 </div>
             </form>

@@ -17,7 +17,7 @@
             <th scope="row" class="govuk-table__header">Last name</th>
             <td class="govuk-table__cell">{{ .Surname }}</td>
         </tr>
-        {{ if ne .PersonType "Correspondent" }}
+        {{ if or (ne .PersonType "Correspondent") (ne .PersonType "Certificate Provider") }}
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Date of birth</th>
                 <td class="govuk-table__cell">
@@ -29,17 +29,19 @@
                 </td>
             </tr>
         {{ end }}
-        {{ if .CompanyName }}
+        {{ if ne .PersonType "Certificate Provider" }}
+            {{ if .CompanyName }}
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Company name</th>
                 <td class="govuk-table__cell">{{ .CompanyName }}</td>
             </tr>
-        {{ end }}
-        {{ if .CompanyNumber }}
-            <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header">Company reference</th>
-                <td class="govuk-table__cell">{{ .CompanyNumber }}</td>
-            </tr>
+            {{ end }}
+            {{ if .CompanyNumber }}
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">Company reference</th>
+                    <td class="govuk-table__cell">{{ .CompanyNumber }}</td>
+                </tr>
+            {{ end }}
         {{ end }}
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">Address line 1</th>
@@ -75,12 +77,14 @@
                 </td>
             </tr>
         {{ end }}
-        {{ if and (ne .PersonType "Replacement Attorney") .SystemStatus }}
-            <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header">Is this attorney active?</th>
-                <td class="govuk-table__cell">{{ boolToYesNo .SystemStatus }}</td>
-            </tr>
-        {{end }}
+        {{ if and (ne .PersonType "Replacement Attorney") (ne .PersonType "Certificate Provider") }}
+            {{ if .SystemStatus }}
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">Is this attorney active?</th>
+                    <td class="govuk-table__cell">{{ boolToYesNo .SystemStatus }}</td>
+                </tr>
+            {{ end }}
+        {{ end }}
         </tbody>
     </table>
 {{ end }}

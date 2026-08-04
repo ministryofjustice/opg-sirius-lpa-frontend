@@ -197,7 +197,7 @@
           </span>
         </h2>
       </div>
-      <div id="accordion-create-lpa-content-1" class="govuk-accordion__section-content">
+      <div id="accordion-create-lpa-content-2" class="govuk-accordion__section-content">
         <div class="govuk-summary-card">
           <div data-module="app-lpa-form-subtype-hw">
             <div class="govuk-summary-card__title-wrapper">
@@ -344,7 +344,7 @@
           </span>
         </h2>
       </div>
-      <div id="accordion-create-lpa-content-1" class="govuk-accordion__section-content">
+      <div id="accordion-create-lpa-content-3" class="govuk-accordion__section-content">
         <div class="govuk-summary-card">
           <div class="govuk-summary-card__title-wrapper">
             <h2 class="govuk-summary-card__title">
@@ -374,13 +374,11 @@
                 </div>
               {{ end }}
             {{ end }}
-            {{ if lt (len .Lpa.CertificateProviders) 2 }}
-              <div class="govuk-button-group app-button-group--column">
-                <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
-                       type="submit" data-disable-after-click="true"
-                       name="addCertificateProvider" value="Add Certificate Provider"/>
-              </div>
-            {{ end }}
+            <div class="govuk-button-group app-button-group--column">
+              <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                     type="submit" data-disable-after-click="true"
+                     name="addCertificateProvider" {{ if eq (len .Lpa.CertificateProviders) 2 }}disabled{{ end }} value="Add Certificate Provider"/>
+            </div>
 
             {{ if gt (len .Lpa.Attorneys) 0 }}
               <h3 class="govuk-heading-s">Attorneys</h3>
@@ -413,7 +411,7 @@
           </span>
         </h2>
       </div>
-      <div id="accordion-create-lpa-content-1" class="govuk-accordion__section-content">
+      <div id="accordion-create-lpa-content-4" class="govuk-accordion__section-content">
         <div class="govuk-summary-card">
           <div class="govuk-summary-card__title-wrapper">
             <h2 class="govuk-summary-card__title">
