@@ -150,7 +150,6 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			}
 
 			data.AppointmentType = caseAttorneyValue
-			data.Lpa = lpa
 
 			if isEditing {
 				err = client.UpdateLpa(ctx, data.CaseId, lpa)
@@ -178,6 +177,8 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
+				lpa.Attorneys = data.Lpa.Attorneys
+				data.Lpa = lpa
 
 				if r.Header.Get("HX-Request") == "true" {
 					return partialTmpl(w, data)
