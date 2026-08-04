@@ -1143,7 +1143,7 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 				"cardPaymentContact":         {"01234 567890"},
 				"anyOtherInfo":               {"true"},
 				"additionalInfo":             {"Some extra info"},
-				"addReplacementAttorney":     {""},
+				"addReplacementAttorney":     {"Add replacement attorney"},
 			}
 
 			r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))

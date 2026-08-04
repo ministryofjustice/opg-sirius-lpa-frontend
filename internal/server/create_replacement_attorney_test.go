@@ -402,7 +402,7 @@ func TestPostCreateReplacementAttorneyAddAnother(t *testing.T) {
 	form := url.Values{
 		"firstname":   {"Rudolph"},
 		"surname":     {"Stotesbury"},
-		"add-another": {""},
+		"add-another": {"true"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
