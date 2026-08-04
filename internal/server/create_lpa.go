@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -29,6 +30,8 @@ type createLpaData struct {
 	Lpa                sirius.Lpa
 	AppointmentType    string
 	CanEditReceiptDate bool
+	HtmxRedirect       string
+	HtmxSwap           string
 }
 
 func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl template.Template) Handler {
@@ -176,6 +179,15 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			}
 
 			data.Success = true
+		}
+
+		if r.FormValue("addReplacementAttorney") != "" {
+			if r.Header.Get("HX-Request") == "true" {
+				data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorID, data.CaseId)
+				data.HtmxSwap = "innerHTML"
+				return partialTmpl(w, data)
+			}
+			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorID, data.CaseId))
 		}
 
 		if r.Header.Get("HX-Request") == "true" {

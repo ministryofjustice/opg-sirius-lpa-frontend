@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -1063,4 +1064,106 @@ func TestPostCreateLpaWhenGenericError(t *testing.T) {
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
+	for _, isHtmx := range []bool{false, true} {
+		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
+			dateString := "2022-04-05"
+			lpa := sirius.Lpa{
+				OnlineLpaId:                "A12345678901",
+				AttorneyActDecisions:       "When Registered",
+				ApplicantType:              "donor",
+				AnyOtherInfo:               shared.BoolPtr(true),
+				AdditionalInfo:             "Some extra info",
+				ApplicationHasGuidance:     shared.BoolPtr(true),
+				ApplicationHasRestrictions: shared.BoolPtr(false),
+				PaymentByDebitCreditCard:   shared.BoolPtr(true),
+				PaymentRemission:           shared.BoolPtr(false),
+				RepeatApplication:          shared.BoolPtr(false),
+				CardPaymentContact:         "01234 567890",
+				Case: sirius.Case{
+					SubType:                         "pfa",
+					ApplicationType:                 "Online",
+					ReceiptDate:                     sirius.DateString(dateString),
+					LpaDonorSignatureDate:           sirius.DateString(dateString),
+					CaseAttorneySingular:            shared.BoolPtr(true),
+					CaseAttorneyJointly:             shared.BoolPtr(false),
+					CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
+					CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+					PaymentByCheque:  shared.BoolPtr(false),
+					PaymentExemption: shared.BoolPtr(false),
+				},
+			}
+
+			client := &mockCreateLpaClient{}
+			client.
+				On("Person", mock.Anything, 123).
+				Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
+			client.
+				On("GetUserPermissions", mock.Anything).
+				Return(sirius.Permissions{"v1-lpas-edit-dates": sirius.PermissionType{Permissions: []string{"PUT"}}}, nil)
+			client.
+				On("CreateLpa", mock.Anything, 123, lpa).
+				Return(sirius.Lpa{Case: sirius.Case{ID: 456}}, nil)
+
+			template := &mockTemplate{}
+			partialTemplate := &mockTemplate{}
+
+			expectedData := createLpaData{
+				DonorId:            123,
+				DonorName:          "Firstname Surname",
+				Title:              "Create an LPA",
+				Success:            true,
+				CanEditReceiptDate: true,
+				AppointmentType:    "singular",
+				CaseId:             456,
+				Lpa:                sirius.Lpa{Case: sirius.Case{ID: 456}},
+				HtmxRedirect:       "/create-replacement-attorney?id=123&caseId=456",
+				HtmxSwap:           "innerHTML",
+			}
+
+			if isHtmx {
+				partialTemplate.
+					On("Func", mock.Anything, expectedData).
+					Return(nil)
+			}
+
+			form := url.Values{
+				"caseSubtype":                {"pfa"},
+				"applicationType":            {"Online"},
+				"onlineLpaId":                {"A12345678901"},
+				"receiptDate":                {dateString},
+				"lpaDonorSignatureDate":      {dateString},
+				"caseAttorney":               {"singular"},
+				"attorneyActDecisions":       {"When Registered"},
+				"preferencesAndInstructions": {"guidance"},
+				"applicantType":              {"donor"},
+				"applicationFee":             {"card"},
+				"cardPaymentContact":         {"01234 567890"},
+				"anyOtherInfo":               {"true"},
+				"additionalInfo":             {"Some extra info"},
+				"addReplacementAttorney":     {""},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			if isHtmx {
+				r.Header.Add("HX-Request", "true")
+			}
+			w := httptest.NewRecorder()
+
+			err := CreateLpa(client, template.Func, partialTemplate.Func)(w, r)
+			resp := w.Result()
+
+			if !isHtmx {
+				expectedRedirect := RedirectError("/create-replacement-attorney?id=123&caseId=456")
+				assert.Equal(t, expectedRedirect, err)
+			} else {
+				assert.Nil(t, err)
+			}
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+		})
+	}
 }
