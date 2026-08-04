@@ -109,7 +109,7 @@ func TestCreateAttorney(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				err := client.CreateAttorney(Context{Context: context.Background()}, 800, tc.attorney)
+				err := client.CreateAttorney(Context{Context: context.Background()}, 800, "epa", tc.attorney)
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {

@@ -23,8 +23,13 @@ func (m *mockCreateAttorneyClient) Epa(ctx sirius.Context, id int) (sirius.Epa, 
 	return args.Get(0).(sirius.Epa), args.Error(1)
 }
 
-func (m *mockCreateAttorneyClient) CreateAttorney(ctx sirius.Context, caseId int, attorney sirius.Attorney) error {
-	args := m.Called(ctx, caseId, attorney)
+func (m *mockCreateAttorneyClient) Lpa(ctx sirius.Context, id int) (sirius.Lpa, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.Lpa), args.Error(1)
+}
+
+func (m *mockCreateAttorneyClient) CreateAttorney(ctx sirius.Context, caseId int, caseType string, attorney sirius.Attorney) error {
+	args := m.Called(ctx, caseId, caseType, attorney)
 	return args.Error(0)
 }
 
@@ -62,13 +67,14 @@ func TestGetCreateAttorney(t *testing.T) {
 				RelationshipToDonors: mockRelationshipToDonorCategories,
 				Attorney:             sirius.Attorney{SystemStatus: shared.BoolPtr(true)},
 				Title:                "Add an attorney",
+				CaseType:             "lpa",
 			}
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, expectedData).
 				Return(nil)
 
-			r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
+			r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType=lpa", nil)
 			w := httptest.NewRecorder()
 
 			if isHtmx {
@@ -86,44 +92,55 @@ func TestGetCreateAttorney(t *testing.T) {
 }
 
 func TestGetEditAttorney(t *testing.T) {
-	existingAttorney := sirius.Attorney{
-		Person: sirius.Person{
-			ID:        4,
-			Firstname: "Rudolph",
-			Surname:   "Stotesbury",
-		},
-		RelationshipToDonor: "no relation",
-		SystemStatus:        shared.BoolPtr(true),
+	for _, caseType := range []string{"lpa", "epa"} {
+		t.Run("Case Type: "+caseType, func(t *testing.T) {
+			existingAttorney := sirius.Attorney{
+				Person: sirius.Person{
+					ID:        4,
+					Firstname: "Rudolph",
+					Surname:   "Stotesbury",
+				},
+				RelationshipToDonor: "no relation",
+				SystemStatus:        shared.BoolPtr(true),
+			}
+
+			client := &mockCreateAttorneyClient{}
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
+				Return(mockRelationshipToDonorCategories, nil)
+
+			if caseType == "lpa" {
+				client.On("Lpa", mock.Anything, 2).
+					Return(sirius.Lpa{Case: sirius.Case{Attorneys: []sirius.Attorney{existingAttorney}}}, nil)
+			} else {
+				client.On("Epa", mock.Anything, 2).
+					Return(sirius.Epa{Case: sirius.Case{Attorneys: []sirius.Attorney{existingAttorney}}}, nil)
+			}
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, createAttorneyData{
+					DonorId:              1,
+					CaseId:               2,
+					RelationshipToDonors: mockRelationshipToDonorCategories,
+					Attorney:             existingAttorney,
+					IsEditing:            true,
+					Title:                "Update attorney details",
+					CaseType:             caseType,
+				}).
+				Return(nil)
+
+			r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&attorneyId=4&caseType="+caseType, nil)
+			w := httptest.NewRecorder()
+
+			err := CreateAttorney(client, template.Func, nil)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
 	}
-
-	client := &mockCreateAttorneyClient{}
-	client.
-		On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
-		Return(mockRelationshipToDonorCategories, nil).
-		On("Epa", mock.Anything, 2).
-		Return(sirius.Epa{Case: sirius.Case{Attorneys: []sirius.Attorney{existingAttorney}}}, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, createAttorneyData{
-			DonorId:              1,
-			CaseId:               2,
-			RelationshipToDonors: mockRelationshipToDonorCategories,
-			Attorney:             existingAttorney,
-			IsEditing:            true,
-			Title:                "Update attorney details",
-		}).
-		Return(nil)
-
-	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&attorneyId=4", nil)
-	w := httptest.NewRecorder()
-
-	err := CreateAttorney(client, template.Func, nil)(w, r)
-	resp := w.Result()
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestGetCreateAttorneyBadQuery(t *testing.T) {
@@ -187,7 +204,7 @@ func TestPostCreateAttorney(t *testing.T) {
 			}
 			client := &mockCreateAttorneyClient{}
 			client.
-				On("CreateAttorney", mock.Anything, 2, attorney).
+				On("CreateAttorney", mock.Anything, 2, "epa", attorney).
 				Return(nil).
 				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
 				Return(mockRelationshipToDonorCategories, nil)
@@ -206,6 +223,7 @@ func TestPostCreateAttorney(t *testing.T) {
 						Title:                "Add an attorney",
 						HtmxRedirect:         "/create-epa?id=1&caseId=2",
 						HtmxSwap:             "innerHTML show:#accordion-create-epa-heading-3:top",
+						CaseType:             "epa",
 					}).
 					Return(nil)
 			}
@@ -230,7 +248,7 @@ func TestPostCreateAttorney(t *testing.T) {
 				"isAttorneyActive":    {"true"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType=epa", strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			if isHtmx {
 				r.Header.Add("HX-Request", "true")
@@ -300,6 +318,7 @@ func TestPostEditAttorney(t *testing.T) {
 						Title:                "Update attorney details",
 						HtmxRedirect:         "/create-epa?id=1&caseId=2",
 						HtmxSwap:             "innerHTML show:#accordion-create-epa-heading-3:top",
+						CaseType:             "epa",
 					}).
 					Return(nil)
 			}
@@ -324,7 +343,7 @@ func TestPostEditAttorney(t *testing.T) {
 				"isAttorneyActive":    {"true"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&attorneyId=4", strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&attorneyId=4&caseType=epa", strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			if isHtmx {
 				r.Header.Add("HX-Request", "true")
@@ -373,7 +392,7 @@ func TestPostCreateAttorneyAddAnother(t *testing.T) {
 			}
 			client := &mockCreateAttorneyClient{}
 			client.
-				On("CreateAttorney", mock.Anything, 2, attorney).
+				On("CreateAttorney", mock.Anything, 2, "epa", attorney).
 				Return(nil).
 				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
 				Return(mockRelationshipToDonorCategories, nil)
@@ -389,8 +408,9 @@ func TestPostCreateAttorneyAddAnother(t *testing.T) {
 						RelationshipToDonors: mockRelationshipToDonorCategories,
 						Attorney:             attorney,
 						Title:                "Add an attorney",
-						HtmxRedirect:         "/create-attorney?id=1&caseId=2",
+						HtmxRedirect:         "/create-attorney?id=1&caseId=2&caseType=epa",
 						HtmxSwap:             "innerHTML scroll:.action-panel__content:top",
+						CaseType:             "epa",
 					}).
 					Return(nil)
 			}
@@ -416,7 +436,7 @@ func TestPostCreateAttorneyAddAnother(t *testing.T) {
 				"add-another":         {"true"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType=epa", strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			if isHtmx {
 				r.Header.Add("HX-Request", "true")
@@ -427,7 +447,7 @@ func TestPostCreateAttorneyAddAnother(t *testing.T) {
 			resp := w.Result()
 
 			if !isHtmx {
-				expectedError := RedirectError("/create-attorney?id=1&caseId=2")
+				expectedError := RedirectError("/create-attorney?id=1&caseId=2&caseType=epa")
 				assert.Equal(t, err, expectedError)
 			} else {
 				assert.Nil(t, err)
@@ -470,7 +490,7 @@ func TestPostCreateAttorneyWhenValidationError(t *testing.T) {
 
 			client := &mockCreateAttorneyClient{}
 			client.
-				On("CreateAttorney", mock.Anything, 2, attorney).
+				On("CreateAttorney", mock.Anything, 2, "epa", attorney).
 				Return(expectedError).
 				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
 				Return(mockRelationshipToDonorCategories, nil)
@@ -485,6 +505,7 @@ func TestPostCreateAttorneyWhenValidationError(t *testing.T) {
 				Error:                expectedError,
 				RelationshipToDonors: mockRelationshipToDonorCategories,
 				Title:                "Add an attorney",
+				CaseType:             "epa",
 			}
 
 			if isHtmx {
@@ -517,7 +538,7 @@ func TestPostCreateAttorneyWhenValidationError(t *testing.T) {
 				"isAttorneyActive":    {"true"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType=epa", strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			if isHtmx {
 				r.Header.Add("HX-Request", "true")
@@ -561,7 +582,7 @@ func TestPostCreateAttorneyNextAnother(t *testing.T) {
 			}
 			client := &mockCreateAttorneyClient{}
 			client.
-				On("CreateAttorney", mock.Anything, 2, attorney).
+				On("CreateAttorney", mock.Anything, 2, "epa", attorney).
 				Return(nil).
 				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
 				Return(mockRelationshipToDonorCategories, nil)
@@ -577,8 +598,9 @@ func TestPostCreateAttorneyNextAnother(t *testing.T) {
 						RelationshipToDonors: mockRelationshipToDonorCategories,
 						Attorney:             attorney,
 						Title:                "Add an attorney",
-						HtmxRedirect:         "/create-attorney?id=1&caseId=2&attorneyId=0",
+						HtmxRedirect:         "/create-attorney?id=1&caseId=2&caseType=epa&attorneyId=0",
 						HtmxSwap:             "innerHTML scroll:.action-panel__content:top",
+						CaseType:             "epa",
 					}).
 					Return(nil)
 			}
@@ -605,7 +627,7 @@ func TestPostCreateAttorneyNextAnother(t *testing.T) {
 				"next-attorney":       {"true"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType=epa", strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			if isHtmx {
 				r.Header.Add("HX-Request", "true")
@@ -616,7 +638,7 @@ func TestPostCreateAttorneyNextAnother(t *testing.T) {
 			resp := w.Result()
 
 			if !isHtmx {
-				expectedRedirect := RedirectError("/create-attorney?id=1&caseId=2&attorneyId=0")
+				expectedRedirect := RedirectError("/create-attorney?id=1&caseId=2&caseType=epa&attorneyId=0")
 				assert.Equal(t, err, expectedRedirect)
 			} else {
 				assert.Nil(t, err)
