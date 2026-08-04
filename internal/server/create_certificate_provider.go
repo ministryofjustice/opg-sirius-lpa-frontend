@@ -45,7 +45,7 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 			XSRFToken:   ctx.XSRFToken,
 			DonorId:     donorId,
 			CaseId:      caseId,
-			CanAddActor: len(caseItem.Case.CertificateProviders) < 1,
+			CanAddActor: len(caseItem.CertificateProviders) < 1,
 		}
 
 		if r.Method == http.MethodPost {
