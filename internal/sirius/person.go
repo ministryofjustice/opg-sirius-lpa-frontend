@@ -15,6 +15,7 @@ type Person struct {
 	AddressLine2          string     `json:"addressLine2"`
 	AddressLine3          string     `json:"addressLine3"`
 	AlsoKnownAs           string     `json:"otherNames"`
+	CaseId                int        `json:"caseId,omitempty"`
 	Cases                 []*Case    `json:"cases,omitempty"`
 	Children              []Person   `json:"children,omitempty"`
 	CompanyName           string     `json:"companyName"`
