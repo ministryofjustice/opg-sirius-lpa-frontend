@@ -85,8 +85,7 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 
 			data.Title = "Update replacement attorney details"
 			data.IsEditing = true
-			// GetNextAttorneyId is already defined in create_attorney.go,
-			// same package - reused as-is rather than duplicated.
+
 			data.NextAttorneyId = GetNextAttorneyId(attorneyId, lpa.ReplacementAttorneys)
 		}
 
