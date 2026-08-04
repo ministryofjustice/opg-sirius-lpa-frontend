@@ -15,10 +15,10 @@ type CreateCertificateProviderClient interface {
 
 type CreateCertificateProviderData struct {
 	XSRFToken           string
-	DonorId             int
 	CanAddActor         bool
 	CaseId              int
 	CertificateProvider sirius.Person
+	DonorId             int
 	Error               sirius.ValidationError
 }
 
@@ -69,10 +69,6 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
-				//if r.Header.Get("HX-Request") == "true" {
-				//	return partialTmpl(w, data)
-				//}
-				//return tmpl(w, data)
 			} else if err != nil {
 				return err
 			} else {
@@ -82,10 +78,7 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 			if r.FormValue("add-another") != "" {
 				return RedirectError(fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorId, caseId))
 			}
-
-			//return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d", donorId, caseId))
 		}
-
 		return tmpl(w, data)
 	}
 }
