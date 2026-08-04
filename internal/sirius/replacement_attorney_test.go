@@ -41,7 +41,7 @@ func TestCreateReplacementAttorney(t *testing.T) {
 			setup: func() {
 				pact.
 					AddInteraction().
-					Given("A case exists for a replacement attorney to be added to").
+					Given("I have a pending case assigned").
 					UponReceiving("A request to create a replacement attorney").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPost,
