@@ -42,6 +42,7 @@ type Person struct {
 	ResearchOptOut        bool       `json:"researchOptOut"`
 	SageId                string     `json:"sageId"`
 	Salutation            string     `json:"salutation"`
+	SignatureDate         DateString `json:"signatureDate,omitempty"`
 	Surname               string     `json:"surname"`
 	Town                  string     `json:"town"`
 	UID                   string     `json:"uId,omitempty"`

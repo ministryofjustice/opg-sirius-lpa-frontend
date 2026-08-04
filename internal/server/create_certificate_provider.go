@@ -10,13 +10,14 @@ import (
 
 type CreateCertificateProviderClient interface {
 	CreateCertificateProvider(ctx sirius.Context, caseId int, certificateProvider sirius.Person) error
+	Lpa(sirius.Context, int) (sirius.Lpa, error)
 }
 
 type CreateCertificateProviderData struct {
 	XSRFToken           string
 	DonorId             int
+	CanAddActor         bool
 	CaseId              int
-	Lpa                 sirius.Lpa
 	CertificateProvider sirius.Person
 	Error               sirius.ValidationError
 }
@@ -35,10 +36,16 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 			return err
 		}
 
+		caseItem, err := client.Lpa(ctx, caseId)
+		if err != nil {
+			return err
+		}
+
 		data := CreateCertificateProviderData{
-			XSRFToken: ctx.XSRFToken,
-			DonorId:   donorId,
-			CaseId:    caseId,
+			XSRFToken:   ctx.XSRFToken,
+			DonorId:     donorId,
+			CaseId:      caseId,
+			CanAddActor: len(caseItem.Case.CertificateProviders) < 1,
 		}
 
 		if r.Method == http.MethodPost {
@@ -70,6 +77,10 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 				return err
 			} else {
 				return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId))
+			}
+
+			if r.FormValue("add-another") != "" {
+				return RedirectError(fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorId, caseId))
 			}
 
 			//return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d", donorId, caseId))
