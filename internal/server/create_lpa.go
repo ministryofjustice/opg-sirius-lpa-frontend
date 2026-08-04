@@ -213,6 +213,10 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorID, data.CaseId))
 		}
 
+		if r.FormValue("addCertificateProvider") != "" {
+			return RedirectError(fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorID, data.CaseId))
+		}
+
 		if r.Header.Get("HX-Request") == "true" {
 			return partialTmpl(w, data)
 		}
