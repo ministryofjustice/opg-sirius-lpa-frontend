@@ -123,14 +123,14 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template, partialTmpl templ
 			}
 
 			if r.FormValue("addAttorney") != "" {
-				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d", donorID, data.CaseId))
+				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=epa", donorID, data.CaseId))
 			} else if updateAttorney := r.FormValue("updateAttorney"); updateAttorney != "" {
 				attorneyID, err := strToIntOrStatusError(updateAttorney)
 				if err != nil {
 					return err
 				}
 
-				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&attorneyId=%d", donorID, data.CaseId, attorneyID))
+				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=epa&attorneyId=%d", donorID, data.CaseId, attorneyID))
 			} else if r.FormValue("addCorrespondent") != "" {
 				if len(data.Epa.Attorneys) > 0 {
 					return RedirectError(fmt.Sprintf("/select-or-create-correspondent?id=%d&caseId=%d", donorID, data.CaseId))

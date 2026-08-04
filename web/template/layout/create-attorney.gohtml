@@ -1,13 +1,25 @@
 {{ define "createAttorney" }}
   <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
+  {{ if eq .CaseType "lpa" }}
+    <div class="app-lpa__radios--border-bottom">
+      {{ template "radios" (radios "isAttorneyActive" "Active?" (stringifyBoolPointer .Attorney.SystemStatus) .Error.Field.SystemStatus true
+      (item "true" "Yes")
+      (item "false" "No")
+      ) }}
+    </div>
+  {{ end }}
+
   {{ template "input" (field "salutation" "Title" .Attorney.Salutation .Error.Field.salutation) }}
   {{ template "input" (field "firstname" "First name" .Attorney.Firstname .Error.Field.firstname) }}
   {{ template "input" (field "middlenames" "Middle names" .Attorney.Middlenames .Error.Field.middlenames) }}
   {{ template "input" (field "surname" "Last name" .Attorney.Surname .Error.Field.surname) }}
   {{ template "input-date" (field "dob" "Date of birth" .Attorney.DateOfBirth .Error.Field.dob "max" today) }}
-  {{ template "input" (field "companyName" "Company name" .Attorney.CompanyName .Error.Field.companyName) }}
-  
+
+  {{ if eq .CaseType "epa" }}
+    {{ template "input" (field "companyName" "Company name" .Attorney.CompanyName .Error.Field.companyName) }}
+  {{ end }}
+
   <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Address" data-app-address-finder-fill-country="false">
       {{ template "input" (field "addressLine1" "Address line 1" .Attorney.AddressLine1 .Error.Field.addressLine1 "data-app-address-finder-map" "addressLine1") }}
       {{ template "input" (field "addressLine2" "Address line 2" .Attorney.AddressLine2 .Error.Field.addressLine2 "data-app-address-finder-map" "addressLine2") }}
@@ -16,19 +28,21 @@
       {{ template "input" (field "county" "County" .Attorney.County .Error.Field.county) }}
       {{ template "input" (field "postcode" "Postcode" .Attorney.Postcode .Error.Field.postcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
       {{ template "input" (field "country" "Country" .Attorney.Country .Error.Field.country "data-app-address-finder-map" "country") }}
+
+      {{ template "radios" (radios "isAirmailRequired" "Airmail required" ( stringifyBool .Attorney.IsAirmailRequired) .Error.Field.isAirmailRequired true
+      (item "true" "Yes")
+      (item "false" "No")
+      ) }}
   </div>
-  
-  {{ template "radios" (radios "isAirmailRequired" "Airmail required" ( stringifyBool .Attorney.IsAirmailRequired) .Error.Field.isAirmailRequired true
-  (item "true" "Yes")
-  (item "false" "No")
-  ) }}
 
   {{ template "input" (field "phoneNumber" "Telephone number" .Attorney.PhoneNumber .Error.Field.phoneNumber) }}
   {{ template "input" (field "email" "Email address" .Attorney.Email .Error.Field.email) }}
-  {{ template "select" (select "relationshipToDonor" "Relationship to donor" .Attorney.RelationshipToDonor .Error.Field.relationshipToDonor (options .RelationshipToDonors)) }}
 
-  {{ template "radios" (radios "isAttorneyActive" "Is this attorney active?" (stringifyBoolPointer .Attorney.SystemStatus) .Error.Field.SystemStatus true
-  (item "true" "Yes")
-  (item "false" "No")
-  ) }}
+  {{ if eq .CaseType "epa" }}
+    {{ template "select" (select "relationshipToDonor" "Relationship to donor" .Attorney.RelationshipToDonor .Error.Field.relationshipToDonor (options .RelationshipToDonors)) }}
+    {{ template "radios" (radios "isAttorneyActive" "Is this attorney active?" (stringifyBoolPointer .Attorney.SystemStatus) .Error.Field.SystemStatus true
+    (item "true" "Yes")
+    (item "false" "No")
+    ) }}
+  {{ end }}
 {{ end }}

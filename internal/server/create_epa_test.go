@@ -322,7 +322,7 @@ func TestPostCreateEpaRedirects(t *testing.T) {
 			query:         "/?id=123",
 			formField:     "addAttorney",
 			formValue:     "true",
-			expectedError: RedirectError("/create-attorney?id=123&caseId=456"),
+			expectedError: RedirectError("/create-attorney?id=123&caseId=456&caseType=epa"),
 			setupMocks: func(client *mockCreateEpaClient, epa sirius.Epa) {
 				client.
 					On("CreateEpa", mock.Anything, 123, epa).
@@ -333,7 +333,7 @@ func TestPostCreateEpaRedirects(t *testing.T) {
 			query:         "/?id=123",
 			formField:     "updateAttorney",
 			formValue:     "789",
-			expectedError: RedirectError("/create-attorney?id=123&caseId=456&attorneyId=789"),
+			expectedError: RedirectError("/create-attorney?id=123&caseId=456&caseType=epa&attorneyId=789"),
 			setupMocks: func(client *mockCreateEpaClient, epa sirius.Epa) {
 				client.
 					On("CreateEpa", mock.Anything, 123, epa).

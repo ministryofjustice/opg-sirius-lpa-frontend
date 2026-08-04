@@ -16,7 +16,9 @@ function AddressFinder($module, options) {
   this.baseUrl = options.prefix;
 
   this.$editMode =
-    this.$module.querySelectorAll('input[value]:not([value=""])').length > 0;
+    this.$module.querySelectorAll(
+      'input[value]:not([type=radio]):not([value=""])',
+    ).length > 0;
 
   this.$inputs = this.$module.querySelectorAll(".govuk-form-group");
   const id = this.$module.id || Math.random().toString(36).substring(2);
