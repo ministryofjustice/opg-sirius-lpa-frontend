@@ -11,7 +11,8 @@ import (
 
 type CreateAttorneyClient interface {
 	Epa(ctx sirius.Context, id int) (sirius.Epa, error)
-	CreateAttorney(ctx sirius.Context, caseId int, attorney sirius.Attorney) error
+	Lpa(ctx sirius.Context, id int) (sirius.Lpa, error)
+	CreateAttorney(ctx sirius.Context, caseId int, caseTyp string, attorney sirius.Attorney) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	UpdateAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
 }
@@ -23,6 +24,7 @@ type createAttorneyData struct {
 	RelationshipToDonors []sirius.RefDataItem
 	DonorId              int
 	CaseId               int
+	CaseType             string
 	IsEditing            bool
 	Title                string
 	NextAttorneyId       int
@@ -44,10 +46,13 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partial
 			return err
 		}
 
+		caseType := r.FormValue("caseType")
+
 		data := createAttorneyData{
 			XSRFToken: ctx.XSRFToken,
 			DonorId:   donorId,
 			CaseId:    caseId,
+			CaseType:  caseType,
 			Title:     "Add an attorney",
 		}
 
@@ -67,12 +72,25 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partial
 			if err != nil {
 				return err
 			}
-			epa, err := client.Epa(ctx, caseId)
-			if err != nil {
-				return err
+
+			var attorneys []sirius.Attorney
+			if caseType == "epa" {
+				epa, err := client.Epa(ctx, caseId)
+				if err != nil {
+					return err
+				}
+
+				attorneys = epa.Attorneys
+			} else {
+				lpa, err := client.Lpa(ctx, caseId)
+				if err != nil {
+					return err
+				}
+
+				attorneys = lpa.Attorneys
 			}
 
-			for _, attorney := range epa.Attorneys {
+			for _, attorney := range attorneys {
 				if attorney.ID == attorneyId {
 					data.Attorney = attorney
 					break
@@ -81,7 +99,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partial
 
 			data.Title = "Update attorney details"
 			data.IsEditing = true
-			data.NextAttorneyId = GetNextAttorneyId(attorneyId, epa.Attorneys)
+			data.NextAttorneyId = GetNextAttorneyId(attorneyId, attorneys)
 		}
 
 		if r.Method == http.MethodPost {
@@ -101,18 +119,21 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partial
 					County:            postFormString(r, "county"),
 					Country:           postFormString(r, "country"),
 					Postcode:          postFormString(r, "postcode"),
-					CompanyName:       postFormString(r, "companyName"),
 					IsAirmailRequired: postFormString(r, "isAirmailRequired") == "true",
 				},
-				RelationshipToDonor: postFormString(r, "relationshipToDonor"),
-				SystemStatus:        shared.BoolPtr(postFormString(r, "isAttorneyActive") == "true"),
+				SystemStatus: shared.BoolPtr(postFormString(r, "isAttorneyActive") == "true"),
+			}
+
+			if caseType == "epa" {
+				attorney.CompanyName = postFormString(r, "companyName")
+				attorney.RelationshipToDonor = postFormString(r, "relationshipToDonor")
 			}
 			data.Attorney = attorney
 
 			if isEditing {
 				err = client.UpdateAttorney(ctx, attorneyId, attorney)
 			} else {
-				err = client.CreateAttorney(ctx, caseId, attorney)
+				err = client.CreateAttorney(ctx, caseId, caseType, attorney)
 			}
 
 			if ve, ok := err.(sirius.ValidationError); ok {
@@ -129,29 +150,32 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partial
 
 			if r.FormValue("add-another") != "" {
 				if r.Header.Get("HX-Request") == "true" {
-					data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d", donorId, caseId)
+					data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s", donorId, caseId, caseType)
 					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
 					return partialTmpl(w, data)
 				}
-				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d", donorId, caseId))
+				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s", donorId, caseId, caseType))
 			}
 
 			if r.FormValue("next-attorney") != "" {
 				if r.Header.Get("HX-Request") == "true" {
-					data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d&attorneyId=%d", donorId, caseId, data.NextAttorneyId)
+					data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s&attorneyId=%d", donorId, caseId, caseType, data.NextAttorneyId)
 					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
 					return partialTmpl(w, data)
 				}
-				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&attorneyId=%d", donorId, caseId, data.NextAttorneyId))
+				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s&attorneyId=%d", donorId, caseId, caseType, data.NextAttorneyId))
 			}
 
 			if r.Header.Get("HX-Request") == "true" {
-				data.HtmxRedirect = fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, caseId)
+				data.HtmxRedirect = fmt.Sprintf("/create-%s?id=%d&caseId=%d", caseType, donorId, caseId)
 				data.HtmxSwap = "innerHTML show:#accordion-create-epa-heading-3:top"
 				return partialTmpl(w, data)
 			}
-			return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 
+			if caseType == "epa" {
+				return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
+			}
+			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1", donorId, caseId))
 		}
 
 		if r.Header.Get("HX-Request") == "true" {

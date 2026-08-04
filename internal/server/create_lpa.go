@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -14,6 +15,7 @@ type CreateLpaClient interface {
 	Lpa(sirius.Context, int) (sirius.Lpa, error)
 	CreateLpa(ctx sirius.Context, donorID int, lpa sirius.Lpa) (sirius.Lpa, error)
 	UpdateLpa(ctx sirius.Context, caseID int, lpa sirius.Lpa) error
+	UpdateAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
 	GetUserPermissions(sirius.Context) (sirius.Permissions, error)
 }
 
@@ -148,7 +150,6 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			}
 
 			data.AppointmentType = caseAttorneyValue
-			data.Lpa = lpa
 
 			if isEditing {
 				err = client.UpdateLpa(ctx, data.CaseId, lpa)
@@ -163,9 +164,21 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 				}
 			}
 
+			if err == nil {
+				for _, attorney := range data.Lpa.Attorneys {
+					formValue := postFormString(r, fmt.Sprintf("lpaPartCSignatureDate-%d", attorney.ID))
+					if formValue != "" && formValue != string(attorney.LpaPartCSignatureDate) {
+						attorney.LpaPartCSignatureDate = sirius.DateString(formValue)
+						err = client.UpdateAttorney(ctx, attorney.ID, attorney)
+					}
+				}
+			}
+
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
+				lpa.Attorneys = data.Lpa.Attorneys
+				data.Lpa = lpa
 
 				if r.Header.Get("HX-Request") == "true" {
 					return partialTmpl(w, data)
@@ -173,6 +186,10 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 				return tmpl(w, data)
 			} else if err != nil {
 				return err
+			}
+
+			if r.FormValue("addAttorney") != "" {
+				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa", donorID, data.CaseId))
 			}
 
 			data.Success = true
