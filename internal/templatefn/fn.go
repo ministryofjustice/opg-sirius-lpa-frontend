@@ -369,6 +369,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"actionPanelButton": actionPanelButton,
 		"headerBarButton":   headerBarButton,
 		"personInfoRow":     personInfoRow,
+		"statusTag":         statusTag,
 		"hasField": func(v interface{}, name string) bool {
 			rv := reflect.ValueOf(v)
 			if rv.Kind() == reflect.Pointer {
@@ -734,5 +735,17 @@ func personInfoRow(label string, person sirius.Person, caseID, selectedID, index
 		Index:        index,
 		IsApplicant:  isApplicant,
 		SystemStatus: systemStatus,
+	}
+}
+
+type statusTagData struct {
+	ReadableString string
+	Colour         string
+}
+
+func statusTag(readableString string, colour string) statusTagData {
+	return statusTagData{
+		ReadableString: readableString,
+		Colour:         colour,
 	}
 }
