@@ -1,10 +1,9 @@
-const fillInAttorneyDetails = () => {
+const fillInAttorneyDetails = (caseType = "epa") => {
   cy.get("#f-salutation").type("Prof");
   cy.get("#f-firstname").type("Melanie");
   cy.get("#f-middlenames").type("Josefina");
   cy.get("#f-surname").type("Vanvolkenburg");
   cy.get("#f-dob").type("1978-04-19");
-  cy.get("#f-companyName").type("ACME");
   cy.get(".govuk-details__summary").click();
   cy.get("#f-addressLine1").type("29737 Andrew Plaza");
   cy.get("#f-addressLine2").type("Apt. 814");
@@ -16,18 +15,22 @@ const fillInAttorneyDetails = () => {
   cy.get("label[for=f-isAirmailRequired]").click();
   cy.get("#f-phoneNumber").type("072345678");
   cy.get("#f-email").type("m.vancolkenburg@ca.test");
-  cy.get("#f-relationshipToDonor").select("Other relation");
   cy.get("label[for=f-isAttorneyActive]").click();
+
+  if (caseType === "epa") {
+    cy.get("#f-relationshipToDonor").select("Other relation");
+    cy.get("#f-companyName").type("ACME");
+  }
 };
 
-describe("Create or Update Attorney", () => {
+describe("Create or Update Attorney on an EPA", () => {
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/epas/2/attorneys", "POST", {
       status: 201,
       body: {},
     });
 
-    cy.visit("/create-attorney?id=1&caseId=2");
+    cy.visit("/create-attorney?id=1&caseId=2&caseType=epa");
   });
 
   it("creates an attorney on an EPA", () => {
@@ -80,7 +83,7 @@ describe("Create or Update Attorney", () => {
       body: {},
     });
 
-    cy.visit("/create-epa?id=2&caseId=2");
+    cy.visit("/create-epa?id=2&caseId=2&caseType=epa");
     cy.contains("Edit EPA");
     cy.contains("Rudolph Stotesbury");
     cy.get("#f-update-attorney-3 .govuk-visually-hidden").should(
@@ -98,5 +101,40 @@ describe("Create or Update Attorney", () => {
     cy.get("#f-firstname").clear().type("Rafael");
     cy.get("button[type=submit]").click();
     cy.url().should("include", "create-epa");
+  });
+});
+
+describe("Create or Update Attorney on an LPA", () => {
+  beforeEach(() => {
+    cy.addMock("/lpa-api/v1/lpas/2/attorneys", "POST", {
+      status: 201,
+      body: {},
+    });
+
+    cy.visit("/create-attorney?id=1&caseId=2&caseType=lpa");
+  });
+
+  it("creates an attorney on an LPA", () => {
+    fillInAttorneyDetails("lpa");
+    cy.contains("Add an attorney");
+    cy.get("button[type=submit]").click();
+    cy.url().should("include", "create-lpa");
+  });
+
+  it("creates an attorney on an LPA and add another attorney", () => {
+    fillInAttorneyDetails("lpa");
+    cy.contains("Add an attorney");
+    cy.get("input[type=submit][name=add-another]").click();
+    cy.url().should("include", "create-attorney");
+  });
+
+  it("has a back link to the LPA form", () => {
+    cy.get(".govuk-back-link")
+      .should("exist")
+      .and("have.attr", "href")
+      .and(
+        "include",
+        "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-1",
+      );
   });
 });
