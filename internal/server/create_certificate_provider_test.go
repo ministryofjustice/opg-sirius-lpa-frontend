@@ -72,7 +72,7 @@ func TestGetCreateCertificateProviders(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "/create-certificate-provider/?id=1&caseId=2", nil)
 			w := httptest.NewRecorder()
 
-			err := CreateCertificateProvider(client, template.Func)(w, r)
+			err := CreateCertificateProvider(client, template.Func, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -95,7 +95,7 @@ func TestGetCreateCertificateProviderLpaFail(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/create-certificate-provider/?id=1&caseId=2", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateCertificateProvider(client, template.Func)(w, r)
+	err := CreateCertificateProvider(client, template.Func, template.Func)(w, r)
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
@@ -112,7 +112,7 @@ func TestGetCreateCertificateProviderBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, query, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateCertificateProvider(nil, nil)(w, r)
+			err := CreateCertificateProvider(nil, nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -180,7 +180,7 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := CreateCertificateProvider(client, template.Func)(w, r)
+			err := CreateCertificateProvider(client, template.Func, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Equal(t, RedirectError(tc.redirectURL), err)
@@ -231,7 +231,7 @@ func TestPostCreateCertificateProviderWhenAPIFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateCertificateProvider(client, template.Func)(w, r)
+	err := CreateCertificateProvider(client, template.Func, template.Func)(w, r)
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
@@ -281,7 +281,7 @@ func TestPostCreateCertificateProviderValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateCertificateProvider(client, template.Func)(w, r)
+	err := CreateCertificateProvider(client, template.Func, template.Func)(w, r)
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
