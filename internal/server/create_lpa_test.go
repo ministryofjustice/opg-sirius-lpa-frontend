@@ -61,9 +61,10 @@ func TestGetCreateLpa(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createLpaData{
-			DonorId:   123,
-			DonorName: "Firstname Surname",
-			Title:     "Create an LPA",
+			DonorId:                123,
+			DonorName:              "Firstname Surname",
+			Title:                  "Create an LPA",
+			AllowNewNotifiedPerson: true,
 		}).
 		Return(nil)
 
@@ -91,9 +92,10 @@ func TestGetCreateLpaHtmxRequest(t *testing.T) {
 	partialTemplate := &mockTemplate{}
 	partialTemplate.
 		On("Func", mock.Anything, createLpaData{
-			DonorId:   123,
-			DonorName: "Firstname Surname",
-			Title:     "Create an LPA",
+			DonorId:                123,
+			DonorName:              "Firstname Surname",
+			Title:                  "Create an LPA",
+			AllowNewNotifiedPerson: true,
 		}).
 		Return(nil)
 
@@ -122,10 +124,11 @@ func TestGetCreateLpaDoesNotSetIsUpdate(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createLpaData{
-			DonorId:   123,
-			DonorName: "Firstname Surname",
-			Title:     "Create an LPA",
-			IsUpdate:  false,
+			DonorId:                123,
+			DonorName:              "Firstname Surname",
+			Title:                  "Create an LPA",
+			IsUpdate:               false,
+			AllowNewNotifiedPerson: true,
 		}).
 		Return(nil)
 
@@ -150,10 +153,11 @@ func TestGetCreateLpaCanEditReceiptDate(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createLpaData{
-			DonorId:            123,
-			DonorName:          "Firstname Surname",
-			Title:              "Create an LPA",
-			CanEditReceiptDate: true,
+			DonorId:                123,
+			DonorName:              "Firstname Surname",
+			Title:                  "Create an LPA",
+			CanEditReceiptDate:     true,
+			AllowNewNotifiedPerson: true,
 		}).
 		Return(nil)
 
@@ -193,13 +197,14 @@ func TestGetCreateLpaEdit(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, createLpaData{
-					DonorId:         123,
-					DonorName:       "Firstname Surname",
-					Title:           "Edit LPA",
-					CaseId:          456,
-					Lpa:             tc.lpa,
-					AppointmentType: tc.formValue,
-					IsUpdate:        true,
+					DonorId:                123,
+					DonorName:              "Firstname Surname",
+					Title:                  "Edit LPA",
+					CaseId:                 456,
+					Lpa:                    tc.lpa,
+					AppointmentType:        tc.formValue,
+					IsUpdate:               true,
+					AllowNewNotifiedPerson: true,
 				}).
 				Return(nil)
 
@@ -339,15 +344,16 @@ func TestPostCreateLpa(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createLpaData{
-			DonorId:            123,
-			DonorName:          "Firstname Surname",
-			Title:              "Create an LPA",
-			Success:            true,
-			SuccessMessage:     "You have successfully created an LPA.",
-			CanEditReceiptDate: true,
-			AppointmentType:    "singular",
-			CaseId:             456,
-			Lpa:                sirius.Lpa{Case: sirius.Case{ID: 456}},
+			DonorId:                123,
+			DonorName:              "Firstname Surname",
+			Title:                  "Create an LPA",
+			Success:                true,
+			SuccessMessage:         "You have successfully created an LPA.",
+			CanEditReceiptDate:     true,
+			AppointmentType:        "singular",
+			CaseId:                 456,
+			Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
+			AllowNewNotifiedPerson: true,
 		}).
 		Return(nil)
 
@@ -1256,17 +1262,18 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 			partialTemplate := &mockTemplate{}
 
 			expectedData := createLpaData{
-				DonorId:            123,
-				DonorName:          "Firstname Surname",
-				Title:              "Create an LPA",
-				Success:            true,
-				SuccessMessage:     "You have successfully created an LPA.",
-				CanEditReceiptDate: true,
-				AppointmentType:    "singular",
-				CaseId:             456,
-				Lpa:                sirius.Lpa{Case: sirius.Case{ID: 456}},
-				HtmxRedirect:       "/create-replacement-attorney?id=123&caseId=456",
-				HtmxSwap:           "innerHTML",
+				AllowNewNotifiedPerson: true,
+				DonorId:                123,
+				DonorName:              "Firstname Surname",
+				Title:                  "Create an LPA",
+				Success:                true,
+				SuccessMessage:         "You have successfully created an LPA.",
+				CanEditReceiptDate:     true,
+				AppointmentType:        "singular",
+				CaseId:                 456,
+				Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
+				HtmxRedirect:           "/create-replacement-attorney?id=123&caseId=456",
+				HtmxSwap:               "innerHTML",
 			}
 
 			if isHtmx {
@@ -1318,17 +1325,32 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 	tests := []struct {
 		name        string
 		formKey     string
+		formValue   string
 		redirectURL string
 	}{
 		{
 			name:        "Add attorney redirects",
 			formKey:     "addAttorney",
+			formValue:   "true",
 			redirectURL: "/create-attorney?id=1&caseId=2&caseType=lpa",
 		},
 		{
 			name:        "Add certificate provider redirects",
 			formKey:     "addCertificateProvider",
+			formValue:   "true",
 			redirectURL: "/create-certificate-provider?id=1&caseId=2",
+		},
+		{
+			name:        "Add notified person redirects",
+			formKey:     "addNotifiedPerson",
+			formValue:   "true",
+			redirectURL: "/create-notified-person?id=1&caseId=2",
+		},
+		{
+			name:        "Update notified person redirects",
+			formKey:     "updateNotifiedPerson",
+			formValue:   "111",
+			redirectURL: "/create-notified-person?id=1&caseId=2&notifiedPersonId=111",
 		},
 	}
 
@@ -1349,7 +1371,7 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 
 			form := url.Values{
 				"caseSubtype": {"pfa"},
-				tc.formKey:    {"true"},
+				tc.formKey:    {tc.formValue},
 			}
 
 			r, _ := http.NewRequest(http.MethodPost, "/create-lpa?id=1", strings.NewReader(form.Encode()))
