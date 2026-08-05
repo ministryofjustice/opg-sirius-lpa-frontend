@@ -39,8 +39,8 @@ describe("LPA form subtype", () => {
   });
 
   test("should hide both sections when no radios are checked", async () => {
-    expect(hwSection.hidden).true;
-    expect(pfaSection.hidden).true;
+    expect(hwSection.hidden).toBe(true);
+    expect(pfaSection.hidden).toBe(true);
   });
 
   test("should show the pfa section if the pfa radio is already checked", async () => {
@@ -50,10 +50,18 @@ describe("LPA form subtype", () => {
       <div data-module="app-lpa-form-subtype-hw"></div>
       <div data-module="app-lpa-form-subtype-pfa"></div>
     `;
+
+    hwSection = document.querySelector(
+      '[data-module="app-lpa-form-subtype-hw"]',
+    );
+    pfaSection = document.querySelector(
+      '[data-module="app-lpa-form-subtype-pfa"]',
+    );
+
     lpaFormSubtype();
 
-    expect(hwSection.hidden).true;
-    expect(pfaSection.hidden).false;
+    expect(hwSection.hidden).toBe(true);
+    expect(pfaSection.hidden).toBe(false);
   });
 
   test("should show the hw section if the hw radio is already checked", async () => {
@@ -63,23 +71,31 @@ describe("LPA form subtype", () => {
       <div data-module="app-lpa-form-subtype-hw"></div>
       <div data-module="app-lpa-form-subtype-pfa"></div>
     `;
+
+    hwSection = document.querySelector(
+      '[data-module="app-lpa-form-subtype-hw"]',
+    );
+    pfaSection = document.querySelector(
+      '[data-module="app-lpa-form-subtype-pfa"]',
+    );
+
     lpaFormSubtype();
 
-    expect(hwSection.hidden).false;
-    expect(pfaSection.hidden).true;
+    expect(hwSection.hidden).toBe(false);
+    expect(pfaSection.hidden).toBe(true);
   });
 
   test("should show the pfa section when the pfa radio is checked", async () => {
     pfaRadio.checked = true;
     pfaRadio.dispatchEvent(new Event("change"));
-    expect(hwSection.hidden).true;
-    expect(pfaSection.hidden).false;
+    expect(hwSection.hidden).toBe(true);
+    expect(pfaSection.hidden).toBe(false);
   });
 
   test("should show the hw section when the hw radio is checked", async () => {
     hwRadio.checked = true;
     hwRadio.dispatchEvent(new Event("change"));
-    expect(hwSection.hidden).false;
-    expect(pfaSection.hidden).true;
+    expect(hwSection.hidden).toBe(false);
+    expect(pfaSection.hidden).toBe(true);
   });
 });

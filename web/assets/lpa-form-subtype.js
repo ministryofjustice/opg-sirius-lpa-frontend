@@ -27,6 +27,8 @@ export default function lpaFormSubtype(scope) {
 
     hwSection.hidden = value !== "hw";
     pfaSection.hidden = value !== "pfa";
+
+    console.log(pfaSection.hidden);
   }
 
   handleFormSubtype();
