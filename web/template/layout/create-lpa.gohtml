@@ -26,12 +26,12 @@
                 <div class="govuk-radios app-!-radios--inline {{ if .Error.Field.caseSubtype }}govuk-radios--error{{ end }}" data-module="govuk-radios">
                   <div class="govuk-radios__item">
                     <input class="govuk-radios__input" id="f-caseSubtype" name="caseSubtype" type="radio"
-                           value="pfa" {{ if eq .Lpa.SubType "pfa" }}checked{{ end }}>
+                           value="pfa" {{ if eq .Lpa.SubType "pfa" }}checked{{ end }} data-module="app-lpa-form-subtype-input">
                     <label class="govuk-label govuk-radios__label" for="f-caseSubtype">PFA</label>
                   </div>
                   <div class="govuk-radios__item">
                     <input class="govuk-radios__input" id="f-caseSubtype-2" name="caseSubtype" type="radio"
-                           value="hw" {{ if eq .Lpa.SubType "hw" }}checked{{ end }}>
+                           value="hw" {{ if eq .Lpa.SubType "hw" }}checked{{ end }} data-module="app-lpa-form-subtype-input">
                     <label class="govuk-label govuk-radios__label" for="f-caseSubtype-2">HW</label>
                   </div>
                 </div>
@@ -199,13 +199,13 @@
       </div>
       <div id="accordion-create-lpa-content-1" class="govuk-accordion__section-content">
         <div class="govuk-summary-card">
-          <div class="govuk-summary-card__title-wrapper">
-            <h2 class="govuk-summary-card__title">
-              {{ if eq .Lpa.SubType "hw" }}Life sustaining treatment (LST){{ else }}When can the LPA be used?{{ end }}
-            </h2>
-          </div>
-          <div class="govuk-summary-card__content">
-            {{ if eq .Lpa.SubType "hw" }}
+          <div data-module="app-lpa-form-subtype-hw">
+            <div class="govuk-summary-card__title-wrapper">
+              <h2 class="govuk-summary-card__title">
+                Life sustaining treatment (LST)
+              </h2>
+            </div>
+            <div class="govuk-summary-card__content">
               <div class="govuk-form-group {{ if .Error.Field.lifeSustainingTreatment }}govuk-form-group--error{{ end }}">
                 <fieldset class="govuk-fieldset">
                   <legend class="govuk-fieldset__legend govuk-visually-hidden">Life sustaining treatment</legend>
@@ -248,7 +248,15 @@
                   </div>
                 </fieldset>
               </div>
-            {{ else }}
+            </div>
+          </div>
+          <div data-module="app-lpa-form-subtype-pfa">
+            <div class="govuk-summary-card__title-wrapper">
+              <h2 class="govuk-summary-card__title">
+                When can the LPA be used?
+              </h2>
+            </div>
+            <div class="govuk-summary-card__content">
               <div class="govuk-form-group {{ if .Error.Field.attorneyActDecisions }}govuk-form-group--error{{ end }}">
                 <fieldset class="govuk-fieldset">
                   <legend class="govuk-fieldset__legend govuk-visually-hidden">When can the LPA be used?</legend>
@@ -267,7 +275,7 @@
                   </div>
                 </fieldset>
               </div>
-            {{ end }}
+            </div>
           </div>
         </div>
         <div class="govuk-summary-card">
