@@ -390,6 +390,23 @@ func postFormDateString(r *http.Request, name string) sirius.DateString {
 	return sirius.DateString(postFormString(r, name))
 }
 
+func postFormDayMonthYear(r *http.Request, name string) sirius.DateString {
+	_ = r.ParseForm()
+	firstVal := func(key string) string {
+		if v := r.PostForm[key]; len(v) > 0 {
+			return v[0]
+		}
+		return ""
+	}
+
+	if firstVal(name+".year") == "" || firstVal(name+".month") == "" || firstVal(name+".day") == "" {
+		return ""
+	}
+
+	formatDate := fmt.Sprintf(`%s-%s-%s`, firstVal(name+".year"), firstVal(name+".month"), firstVal(name+".day"))
+	return sirius.DateString(formatDate)
+}
+
 func strToIntOrStatusError(val string) (int, error) {
 	if val == "" {
 		return 0, sirius.StatusError{Code: http.StatusNotFound}

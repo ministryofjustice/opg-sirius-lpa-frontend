@@ -68,6 +68,15 @@ func (s DateString) SplitDateString() ([]string, error) {
 	return parts, nil
 }
 
+func (s DateString) ToHyphenateDates() (string, error) {
+	parts, err := s.SplitDateString()
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf(`%s-%s-%s`, parts[0], parts[1], parts[2]), nil
+}
+
 func (s DateString) GetYear() (string, error) {
 	parts, err := s.SplitDateString()
 	if err != nil {
