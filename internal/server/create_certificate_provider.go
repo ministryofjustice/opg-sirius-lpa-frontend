@@ -72,11 +72,10 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 			} else if err != nil {
 				return err
 			} else {
+				if r.FormValue("add-another") != "" {
+					return RedirectError(fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorId, caseId))
+				}
 				return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId))
-			}
-
-			if r.FormValue("add-another") != "" {
-				return RedirectError(fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorId, caseId))
 			}
 		}
 		return tmpl(w, data)
