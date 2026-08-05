@@ -18,6 +18,7 @@ type AddComplaintClient interface {
 
 type addComplaintData struct {
 	XSRFToken string
+	IsPartial bool
 	Entity    string
 	Success   bool
 	Error     sirius.ValidationError
@@ -34,7 +35,7 @@ type addComplaintData struct {
 	CaseUID  string
 }
 
-func AddComplaint(client AddComplaintClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -51,6 +52,7 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template, partialTmpl
 
 		data := addComplaintData{
 			XSRFToken: ctx.XSRFToken,
+			IsPartial: r.Header.Get("HX-Request") == "true",
 			CaseId:    caseID,
 			CaseType:  r.FormValue("case"),
 		}
@@ -125,10 +127,6 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template, partialTmpl
 			} else {
 				data.Success = true
 			}
-		}
-
-		if r.Header.Get("HX-Request") == "true" && partialTmpl != nil {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
