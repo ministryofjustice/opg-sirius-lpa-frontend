@@ -82,6 +82,38 @@ func TestGetCreateCertificateProviders(t *testing.T) {
 	}
 }
 
+func TestGetCreateCertificateWithHXRequest(t *testing.T) {
+	client := &mockCreateCertificateProviderClient{}
+	client.
+		On("Lpa", mock.Anything, 2).
+		Return(sirius.Lpa{Case: sirius.Case{ID: 2}}, nil)
+
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, CreateCertificateProviderData{
+			DonorId:     1,
+			CaseId:      2,
+			CanAddActor: true,
+		}).
+		Return(nil)
+
+	template := &mockTemplate{}
+
+	r, _ := http.NewRequest(http.MethodGet, "/create-certificate-provider/?id=1&caseId=2", nil)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := CreateCertificateProvider(client, template.Func, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, partialTemplate)
+	mock.AssertExpectationsForObjects(t, client, template)
+	template.AssertNotCalled(t, "Func")
+	partialTemplate.AssertCalled(t, "Func", mock.Anything, mock.Anything)
+}
+
 func TestGetCreateCertificateProviderLpaFail(t *testing.T) {
 	lpa := sirius.Lpa{Case: sirius.Case{ID: 2}}
 
@@ -124,16 +156,34 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 		name        string
 		addActor    string
 		redirectURL string
+		htmxRequest bool
+		swap        string
 	}{
 		{
 			name:        "Submit",
 			addActor:    "",
 			redirectURL: "/create-lpa?id=1&caseId=2",
+			htmxRequest: false,
+		},
+		{
+			name:        "Submit htmx request",
+			addActor:    "",
+			redirectURL: "/create-lpa?id=1&caseId=2",
+			htmxRequest: true,
+			swap:        "innerHTML show:#accordion-create-lpa-heading-3:top",
 		},
 		{
 			name:        "Submit and add another certificate provider",
 			addActor:    "true",
 			redirectURL: "/create-certificate-provider?id=1&caseId=2",
+			htmxRequest: false,
+		},
+		{
+			name:        "Submit and add another certificate provider htmx request",
+			addActor:    "true",
+			redirectURL: "/create-certificate-provider?id=1&caseId=2",
+			htmxRequest: true,
+			swap:        "innerHTML scroll:.action-panel__content:top",
 		},
 	}
 
@@ -160,6 +210,18 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 				Return(nil)
 
 			template := &mockTemplate{}
+			partialTemplate := &mockTemplate{}
+			if tc.htmxRequest {
+				partialTemplate.
+					On("Func", mock.Anything, CreateCertificateProviderData{
+						DonorId:      1,
+						CaseId:       2,
+						CanAddActor:  true,
+						HtmxRedirect: tc.redirectURL,
+						HtmxSwap:     tc.swap,
+					}).
+					Return(nil)
+			}
 
 			form := url.Values{
 				"salutation":   {"Sir"},
@@ -178,14 +240,22 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 
 			r, _ := http.NewRequest(http.MethodPost, "/create-certificate-provider/?id=1&caseId=2", strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
+			if tc.htmxRequest {
+				r.Header.Add("HX-Request", "true")
+			}
 			w := httptest.NewRecorder()
 
-			err := CreateCertificateProvider(client, template.Func, template.Func)(w, r)
+			err := CreateCertificateProvider(client, template.Func, partialTemplate.Func)(w, r)
 			resp := w.Result()
 
-			assert.Equal(t, RedirectError(tc.redirectURL), err)
+			if tc.htmxRequest {
+				assert.Nil(t, err)
+			} else {
+				assert.Equal(t, RedirectError(tc.redirectURL), err)
+			}
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client, template)
+			mock.AssertExpectationsForObjects(t, client, partialTemplate)
 		})
 	}
 }
