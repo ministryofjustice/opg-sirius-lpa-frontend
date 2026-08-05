@@ -72,14 +72,14 @@ describe("Create Digital LPA draft", () => {
     cy.get(".govuk-details__summary").first().click();
     cy.get("#f-donorAddress\\.Line1").should(
       "have.value",
-      "Office of the Public Guardian",
+      "OFFICE OF THE PUBLIC GUARDIAN",
     );
     cy.get("#f-donorAddress\\.Line2").should(
       "have.value",
-      "1 Something Street",
+      "1 SOMETHING STREET",
     );
-    cy.get("#f-donorAddress\\.Line3").should("have.value", "Someborough");
-    cy.get("#f-donorAddress\\.Town").should("have.value", "Someton");
+    cy.get("#f-donorAddress\\.Line3").should("have.value", "SOMEBOROUGH");
+    cy.get("#f-donorAddress\\.Town").should("have.value", "SOMETON");
     cy.get("#f-donorAddress\\.Postcode").should("have.value", "SW1A 1AA");
     cy.get("#f-donorAddress\\.Country").should("have.value", "GB");
 
