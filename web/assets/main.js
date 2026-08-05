@@ -23,6 +23,7 @@ import htmx from "htmx.org/dist/htmx.esm";
 import documentListSort from "./document-list-sort";
 import initPdfViewer from "./pdf-viewer";
 import initSiriusHeader from "./sirius-header.js";
+import lpaFormSubtype from "./lpa-form-subtype.js";
 
 const prefix = document.body.getAttribute("data-prefix");
 
@@ -48,6 +49,7 @@ disableAfterClick();
 documentListSort();
 initPdfViewer();
 initSiriusHeader();
+lpaFormSubtype();
 
 globalThis.htmx = htmx;
 // Don't include indicator styles as CSP blocks inline styles
@@ -71,6 +73,7 @@ htmx.on("htmx:afterSettle", (event) => {
     autoClick(swapDetails.target);
     textEditor();
     addressFinder(prefix, swapDetails.target);
+    lpaFormSubtype(swapDetails.target);
 
     // Update the action panel width if swapping in create-document or edit-document content
     if (swapDetails.target.id === "actions-content") {
