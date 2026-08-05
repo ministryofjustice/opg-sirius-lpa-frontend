@@ -22,6 +22,7 @@ type CreateLpaClient interface {
 type createLpaData struct {
 	XSRFToken          string
 	Success            bool
+	SuccessMessage     string
 	IsUpdate           bool
 	Error              sirius.ValidationError
 	DonorId            int
@@ -180,6 +181,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
 				lpa.Attorneys = data.Lpa.Attorneys
+				lpa.ReplacementAttorneys = data.Lpa.ReplacementAttorneys
 				data.Lpa = lpa
 
 				if r.Header.Get("HX-Request") == "true" {
@@ -195,6 +197,11 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			}
 
 			data.Success = true
+			if isEditing {
+				data.SuccessMessage = "You have successfully updated an LPA."
+			} else {
+				data.SuccessMessage = "You have successfully created an LPA."
+			}
 		}
 
 		if r.FormValue("addReplacementAttorney") != "" {
