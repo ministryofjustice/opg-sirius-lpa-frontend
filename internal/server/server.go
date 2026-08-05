@@ -173,7 +173,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate-cases-wrapper.gohtml"), templates.Get("allocate-cases-partial-wrapper.gohtml"))))
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change-status.gohtml"), templates.Get("change-status-partial.gohtml"))))
 	mux.Handle("/create-attorney", wrap(CreateAttorney(client, templates.Get("create-attorney-wrapper.gohtml"), templates.Get("create-attorney-partial-wrapper.gohtml"))))
-	mux.Handle("/create-certificate-provider", wrap(CreateCertificateProvider(client, templates.Get("create-certificate-provider.gohtml"))))
+	mux.Handle("/create-certificate-provider", wrap(CreateCertificateProvider(client, templates.Get("create-certificate-provider-wrapper.gohtml"), templates.Get("create-certificate-provider-partial-wrapper.gohtml"))))
 	mux.Handle("/create-correspondent", wrap(CreateCorrespondent(client, templates.Get("create-correspondent-wrapper.gohtml"), templates.Get("create-correspondent-partial-wrapper.gohtml"))))
 	mux.Handle("/create-donor", wrap(CreateDonor(client, templates.Get("donor-wrapper.gohtml"), templates.Get("donor-partial-wrapper.gohtml"))))
 	mux.Handle("/create-document", wrap(CreateDocument(client, templates.Get("create_document.gohtml"), templates.Get("create-document-htmx.gohtml"))))
