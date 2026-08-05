@@ -20,9 +20,11 @@ type CreateCertificateProviderData struct {
 	CertificateProvider sirius.Person
 	DonorId             int
 	Error               sirius.ValidationError
+	HtmxRedirect        string
+	HtmxSwap            string
 }
 
-func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl template.Template) Handler {
+func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -72,12 +74,29 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 			} else if err != nil {
 				return err
 			} else {
+				var redirect, swap string
+
 				if r.FormValue("add-another") != "" {
-					return RedirectError(fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorId, caseId))
+					redirect = fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorId, caseId)
+					swap = "innerHTML scroll:.action-panel__content:top"
+				} else {
+					redirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId)
+					swap = "innerHTML show:#accordion-create-lpa-heading-3:top"
 				}
-				return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId))
+
+				if r.Header.Get("HX-Request") == "true" {
+					data.HtmxRedirect = redirect
+					data.HtmxSwap = swap
+					return partialTmpl(w, data)
+				}
+
+				return RedirectError(redirect)
 			}
 		}
+		if r.Header.Get("HX-Request") == "true" {
+			return partialTmpl(w, data)
+		}
+
 		return tmpl(w, data)
 	}
 }
