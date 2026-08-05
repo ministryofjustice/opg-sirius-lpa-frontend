@@ -235,7 +235,6 @@ AddressFinder.prototype.handleSearch = function () {
 
 AddressFinder.prototype.underwriteValue = function (field, value) {
   let $input = this.$module.querySelector(`[name="${field}"]`);
-
   if (!$input) {
     $input = this.$module.querySelector(
       `[data-app-address-finder-map="${field}"]`,
@@ -246,7 +245,7 @@ AddressFinder.prototype.underwriteValue = function (field, value) {
     $input instanceof HTMLInputElement ||
     $input instanceof HTMLSelectElement
   ) {
-    $input.value = value;
+    $input.value = value.toUpperCase();
   }
 };
 
@@ -272,3 +271,5 @@ export default function init(prefix, $scope) {
     new AddressFinder($addressFinder, { prefix });
   });
 }
+
+export { AddressFinder };
