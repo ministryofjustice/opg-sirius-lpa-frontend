@@ -70,7 +70,8 @@ func CreateNotifiedPerson(client CreateNotifiedPersonClient, tmpl template.Templ
 			return err
 		}
 
-		data.AllowNewNotifiedPerson = allowNewNotifiedPerson(len(lpa.NotifiedPersons))
+		// +1 because this is before we save the final allowed notified person
+		data.AllowNewNotifiedPerson = allowNewNotifiedPerson(len(lpa.NotifiedPersons) + 1)
 
 		var notifiedPersonId int
 		notifiedPersonIdStr := r.FormValue("notifiedPersonId")

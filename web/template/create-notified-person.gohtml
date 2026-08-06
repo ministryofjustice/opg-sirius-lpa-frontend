@@ -8,6 +8,7 @@
               hx-get="{{ prefix .HtmxRedirect }}"
               hx-target=".action-panel__content"
               hx-trigger="load"
+              hx-swap="{{ .HtmxSwap }}"
         ></span>
     {{ end }}
 
@@ -62,6 +63,14 @@
           {{ template "addNotifiedPerson" . }}
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+          {{if .AllowNewNotifiedPerson }}
+            {{ if not .IsEditing }}
+              <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another-notified-person" value="Save and add another notified person" />
+            {{ end }}
+            {{ if ne .NextNotifiedPersonId 0 }}
+              <input class="govuk-button" data-module="govuk-button" type="submit" name="next-notified-person" value="Save and edit next notified person" />
+            {{ end }}
+          {{ end }}
           <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}">Cancel</a>
         </div>
       </form>
