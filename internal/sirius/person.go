@@ -15,6 +15,7 @@ type Person struct {
 	AddressLine2          string     `json:"addressLine2"`
 	AddressLine3          string     `json:"addressLine3"`
 	AlsoKnownAs           string     `json:"otherNames"`
+	CaseId                int        `json:"caseId,omitempty"`
 	Cases                 []*Case    `json:"cases,omitempty"`
 	Children              []Person   `json:"children,omitempty"`
 	CompanyName           string     `json:"companyName"`
@@ -41,6 +42,7 @@ type Person struct {
 	ResearchOptOut        bool       `json:"researchOptOut"`
 	SageId                string     `json:"sageId"`
 	Salutation            string     `json:"salutation"`
+	SignatureDate         DateString `json:"signatureDate,omitempty"`
 	Surname               string     `json:"surname"`
 	Town                  string     `json:"town"`
 	UID                   string     `json:"uId,omitempty"`
