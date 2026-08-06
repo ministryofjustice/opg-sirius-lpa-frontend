@@ -14,7 +14,7 @@ func (c *Client) CreateNotifiedPerson(ctx Context, caseId int, notifiedPerson No
 	notifiedPerson.CaseId = caseId
 	notifiedPerson.PersonType = "NotifiedPerson"
 
-	return c.post(ctx, fmt.Sprintf("/lpa-api/v1/persons"), []NotifiedPerson{notifiedPerson}, nil)
+	return c.post(ctx, "/lpa-api/v1/persons", []NotifiedPerson{notifiedPerson}, nil)
 }
 
 func (c *Client) UpdateNotifiedPerson(ctx Context, notifiedPersonId int, notifiedPerson NotifiedPerson) error {
