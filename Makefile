@@ -62,4 +62,5 @@ run-structurizr:
 	docker run -it --rm -p 8020:8080 -v $(PWD)/docs/architecture/dsl/local:/usr/local/structurizr structurizr/lite
 
 js-test:
-	docker compose run js-test
+	docker compose build js-test
+	docker compose run --rm js-test

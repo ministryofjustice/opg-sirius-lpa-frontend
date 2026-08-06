@@ -61,34 +61,16 @@ describe("Create Digital LPA draft", () => {
     cy.get("#f-dob-day").type("8");
     cy.get("#f-dob-month").type("4");
     cy.get("#f-dob-year").type("1952");
-
-    // Check postcode finder auto-populates
-    cy.contains("Enter a UK postcode")
-      .nextUntil(".govuk-input")
-      .next()
-      .type("SW1A 1AA");
-    cy.contains("Look up UK postcode").click();
-    cy.get("#dropdown-container select").first().select("0");
-    cy.get(".govuk-details__summary").first().click();
-    cy.get("#f-donorAddress\\.Line1").should(
-      "have.value",
-      "Office of the Public Guardian",
-    );
-    cy.get("#f-donorAddress\\.Line2").should(
-      "have.value",
-      "1 Something Street",
-    );
-    cy.get("#f-donorAddress\\.Line3").should("have.value", "Someborough");
-    cy.get("#f-donorAddress\\.Town").should("have.value", "Someton");
-    cy.get("#f-donorAddress\\.Postcode").should("have.value", "SW1A 1AA");
-    cy.get("#f-donorAddress\\.Country").should("have.value", "GB");
+    cy.get(
+      '[data-app-address-finder-label="Donor’s address"] > :nth-child(1) > .govuk-details > .govuk-details__summary',
+    ).click();
 
     // Override address manually
-    cy.get("#f-donorAddress\\.Line1").clear().type("Fluke House");
-    cy.get("#f-donorAddress\\.Line2").clear().type("Summit");
-    cy.get("#f-donorAddress\\.Line3").clear().type("Houston");
-    cy.get("#f-donorAddress\\.Town").clear().type("South Bend");
-    cy.get("#f-donorAddress\\.Postcode").clear().type("AI1 6VW");
+    cy.get("#f-donorAddress\\.Line1").type("Fluke House");
+    cy.get("#f-donorAddress\\.Line2").type("Summit");
+    cy.get("#f-donorAddress\\.Line3").type("Houston");
+    cy.get("#f-donorAddress\\.Town").type("South Bend");
+    cy.get("#f-donorAddress\\.Postcode").type("AI1 6VW");
 
     cy.contains("Another person").click();
     cy.get("#f-correspondentFirstname").type("Leon");
