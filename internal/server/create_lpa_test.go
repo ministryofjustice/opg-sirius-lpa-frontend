@@ -1335,6 +1335,11 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			formKey:     "addCorrespondent",
 			redirectURL: "/select-or-create-correspondent?id=1&caseId=2&caseType=lpa",
 		},
+		{
+			name:        "Update correspondent",
+			formKey:     "updateCorrespondent",
+			redirectURL: "/create-correspondent?id=1&caseId=2&caseType=lpa",
+		},
 	}
 
 	for _, tc := range tests {
