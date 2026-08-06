@@ -66,6 +66,7 @@ type Client interface {
 	CreateDraftClient
 	CreateEpaClient
 	CreateInvestigationClient
+	CreateReplacementAttorneyClient
 	CreateLpaClient
 	DeleteDocumentClient
 	DeleteNoteClient
@@ -178,6 +179,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-investigation", wrap(CreateInvestigation(client, templates.Get("create-investigation-wrapper.gohtml"), templates.Get("create-investigation-partial-wrapper.gohtml"))))
 	mux.Handle("/create-lpa", wrap(CreateLpa(client, templates.Get("create-lpa-wrapper.gohtml"), templates.Get("create-lpa-partial-wrapper.gohtml"))))
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("create-relationship-wrapper.gohtml"), templates.Get("create-relationship-partial-wrapper.gohtml"))))
+	mux.Handle("/create-replacement-attorney", wrap(CreateReplacementAttorney(client, templates.Get("create-replacement-attorney-wrapper.gohtml"), templates.Get("create-replacement-attorney-partial-wrapper.gohtml"))))
 	mux.Handle("/compare/{id}/{caseUid}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
 	mux.Handle("/delete-fee-reduction", wrap(DeletePayment(client, templates.Get("delete-fee-reduction-wrapper.gohtml"), templates.Get("delete-fee-reduction-partial-wrapper.gohtml"))))
 	mux.Handle("/delete-note", wrap(DeleteNote(client, templates.Get("delete-note.gohtml"))))
