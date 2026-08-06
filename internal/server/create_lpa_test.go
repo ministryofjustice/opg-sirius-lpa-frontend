@@ -1313,3 +1313,55 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 		})
 	}
 }
+
+func TestPostCreateLpaRedirects(t *testing.T) {
+	tests := []struct {
+		name        string
+		formKey     string
+		redirectURL string
+	}{
+		{
+			name:        "Add attorney redirects",
+			formKey:     "addAttorney",
+			redirectURL: "/create-attorney?id=1&caseId=2&caseType=lpa",
+		},
+		{
+			name:        "Add certificate provider redirects",
+			formKey:     "addCertificateProvider",
+			redirectURL: "/create-certificate-provider?id=1&caseId=2",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &mockCreateLpaClient{}
+			client.
+				On("Person", mock.Anything, 1).
+				Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
+			client.
+				On("GetUserPermissions", mock.Anything).
+				Return(sirius.Permissions{}, nil)
+			client.
+				On("CreateLpa", mock.Anything, 1, mock.Anything).
+				Return(sirius.Lpa{Case: sirius.Case{ID: 2}}, nil)
+
+			template := &mockTemplate{}
+
+			form := url.Values{
+				"caseSubtype": {"pfa"},
+				tc.formKey:    {"true"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/create-lpa?id=1", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := CreateLpa(client, template.Func, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Equal(t, RedirectError(tc.redirectURL), err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}

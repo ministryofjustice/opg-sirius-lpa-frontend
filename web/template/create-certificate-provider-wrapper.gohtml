@@ -1,0 +1,29 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add a certificate provider{{ end }}
+
+{{ define "main" }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            {{ template "error-summary" .Error }}
+
+            <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-3" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+
+            <h1 class="govuk-heading-l">Add a certificate provider</h1>
+
+            <form class="form" method="POST">
+                <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+                {{ template "create-certificate-provider" . }}
+
+                <div class="govuk-button-group govuk-!-padding-top-5">
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+                    {{ if .CanAddActor }}
+                        <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add a second certificate provider" />
+                    {{ end }}
+                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-3" .DonorId .CaseId) }}">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{{ end }}
