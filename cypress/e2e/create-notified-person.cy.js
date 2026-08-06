@@ -29,7 +29,7 @@ describe("Create notified person form", () => {
     cy.get("#f-county").type("Saskatchewan");
     cy.get("#f-postcode").type("S7R 9F9");
     cy.get("#f-country").type("Canada");
-    cy.get('#f-noticeGivenDate').type('2023-01-01');
+    cy.get("#f-noticeGivenDate").type("2023-01-01");
     cy.get("button[type=submit]").click();
     cy.url().should("include", "create-lpa");
   });
@@ -65,7 +65,7 @@ describe("Create notified person form", () => {
           },
           {
             id: 12,
-          }
+          },
         ],
       },
     });
@@ -84,7 +84,7 @@ describe("Create notified person form", () => {
     cy.get("#f-county").should("have.value", "Saskatchewan");
     cy.get("#f-postcode").should("have.value", "S7R 9F9");
     cy.get("#f-country").should("have.value", "Canada");
-    cy.get('#f-noticeGivenDate').should('have.value', '2023-01-01');
+    cy.get("#f-noticeGivenDate").should("have.value", "2023-01-01");
     cy.get("input[type=submit][name=next-notified-person]").click();
     cy.url().should("include", "create-notified-person");
   });
@@ -94,14 +94,12 @@ describe("Create notified person form", () => {
       status: 200,
       body: {
         id: 4,
-        notifiedPersons: [
-          { id: 11 },
-          { id: 12 },
-          { id: 13 },
-        ],
+        notifiedPersons: [{ id: 11 }, { id: 12 }, { id: 13 }],
       },
     });
     cy.visit("/create-notified-person?id=1&caseId=4");
-      cy.get("input[type=submit][name=add-another-notified-person]").should("not.exist");
+    cy.get("input[type=submit][name=add-another-notified-person]").should(
+      "not.exist",
+    );
   });
 });
