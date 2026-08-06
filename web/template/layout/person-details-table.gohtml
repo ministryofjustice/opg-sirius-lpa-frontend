@@ -66,16 +66,16 @@
             <td class="govuk-table__cell">{{ boolToYesNo .IsAirmailRequired }}</td>
         </tr>
         {{ if and (eq .PersonType "Attorney") .RelationshipToDonor }}
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">Relationship to donor</th>
-            <td class="govuk-table__cell">
-                {{ if .RelationshipToDonor }}
-                    {{ capitalise .RelationshipToDonor }}
-                {{ end }}
-            </td>
-        </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Relationship to donor</th>
+                <td class="govuk-table__cell">
+                    {{ if .RelationshipToDonor }}
+                        {{ capitalise .RelationshipToDonor }}
+                    {{ end }}
+                </td>
+            </tr>
         {{ end }}
-        {{ if .SystemStatus }}
+        {{ if and (ne .PersonType "Replacement Attorney") .SystemStatus }}
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Is this attorney active?</th>
                 <td class="govuk-table__cell">{{ boolToYesNo .SystemStatus }}</td>

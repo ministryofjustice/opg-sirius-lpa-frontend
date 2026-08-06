@@ -1,38 +1,44 @@
 {{ define "page" }}
-  <div class="action-panel__form">
-    {{ template "error-summary" .Error }}
+    <div class="action-panel__form">
 
-    {{ if .Success }}
-      <meta http-equiv="Refresh" content="0" />
-      {{ if .IsUpdate }}
-        {{ template "success-banner" "You have successfully updated an LPA." }}
-      {{ else }}
-        {{ template "success-banner" "You have successfully created an LPA." }}
-      {{ end }}
-    {{ end }}
+        {{ if .HtmxRedirect }}
+            <span class="govuk-!-display-none"
+                  hx-get="{{ prefix .HtmxRedirect }}"
+                  hx-target=".action-panel__content"
+                  hx-swap="{{ .HtmxSwap }}"
+                  hx-trigger="load"
+            ></span>
+        {{ end }}
 
-    <p class="govuk-body app-lpa__donor-info">{{ .DonorName }}{{ if .CaseId }} – <span class="app-lpa__donor-info--{{ .Lpa.SubType }}">{{ ToUpper .Lpa.SubType }}</span> {{ .Lpa.UID }}{{ end }}</p>
+        {{ template "error-summary" .Error }}
 
-    <h1 class="govuk-heading-m">{{ .Title }}</h1>
+        {{ if and .Success (not .HtmxRedirect) }}
+            <meta http-equiv="Refresh" content="0" />
+            {{ template "success-banner" .SuccessMessage }}
+        {{ end }}
 
-    <form class="form"
-          method="POST"
-          hx-post="{{ if .IsUpdate }}{{ prefix (printf "/create-lpa?id=%d&caseId=%d" .DonorId .CaseId) }}{{ else }}{{ prefix (printf "/create-lpa?id=%d" .DonorId) }}{{ end }}"
-          hx-target=".action-panel__content"
-          hx-swap="innerHTML scroll:.action-panel__content:top"
-    >
-      {{ template "create-lpa" . }}
+        <p class="govuk-body app-lpa__donor-info">{{ .DonorName }}{{ if .CaseId }} – <span class="app-lpa__donor-info--{{ .Lpa.SubType }}">{{ ToUpper .Lpa.SubType }}</span> {{ .Lpa.UID }}{{ end }}</p>
 
-      <div class="govuk-button-group">
-        <button class="govuk-button" data-module="govuk-button" type="submit"
-                data-disable-after-click="true">Save and exit
-        </button>
-        <a class="govuk-link govuk-link--no-visited-state"
-           href=""
-           hx-get="{{ if .IsUpdate }}{{ prefix (printf "/action-panel?donorId=%d&uid[]=%s" .DonorId .Lpa.UID) }}{{ else }}{{ prefix (printf "/action-panel?donorId=%d" .DonorId) }}{{ end }}"
-           hx-target=".action-panel__content"
-           hx-swap="innerHTML scroll:.action-panel__content:top">Cancel</a>
-      </div>
-    </form>
-  </div>
+        <h1 class="govuk-heading-m">{{ .Title }}</h1>
+
+        <form class="form"
+              method="POST"
+              hx-post="{{ if .IsUpdate }}{{ prefix (printf "/create-lpa?id=%d&caseId=%d" .DonorId .CaseId) }}{{ else }}{{ prefix (printf "/create-lpa?id=%d" .DonorId) }}{{ end }}"
+              hx-target=".action-panel__content"
+              hx-swap="innerHTML scroll:.action-panel__content:top"
+        >
+            {{ template "create-lpa" . }}
+
+            <div class="govuk-button-group">
+                <button class="govuk-button" data-module="govuk-button" type="submit"
+                        data-disable-after-click="true">Save and exit
+                </button>
+                <a class="govuk-link govuk-link--no-visited-state"
+                   href=""
+                   hx-get="{{ if .IsUpdate }}{{ prefix (printf "/action-panel?donorId=%d&uid[]=%s" .DonorId .Lpa.UID) }}{{ else }}{{ prefix (printf "/action-panel?donorId=%d" .DonorId) }}{{ end }}"
+                   hx-target=".action-panel__content"
+                   hx-swap="innerHTML scroll:.action-panel__content:top">Cancel</a>
+            </div>
+        </form>
+    </div>
 {{ end }}
