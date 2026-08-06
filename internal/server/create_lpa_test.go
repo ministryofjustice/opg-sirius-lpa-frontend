@@ -1046,95 +1046,6 @@ func TestPostCreateLpaEditAttorneySignatureDatesError(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestPostCreateLpaRedirects(t *testing.T) {
-	dateString := "2022-04-05"
-	lpa := sirius.Lpa{
-		OnlineLpaId:                "A12345678901",
-		AttorneyActDecisions:       "When Registered",
-		ApplicantType:              "donor",
-		AnyOtherInfo:               shared.BoolPtr(true),
-		AdditionalInfo:             "Some extra info",
-		ApplicationHasGuidance:     shared.BoolPtr(true),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(true),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		CardPaymentContact:         "01234 567890",
-		Case: sirius.Case{
-			SubType:                         "pfa",
-			ApplicationType:                 "Online",
-			ReceiptDate:                     sirius.DateString(dateString),
-			LpaDonorSignatureDate:           sirius.DateString(dateString),
-			CaseAttorneySingular:            shared.BoolPtr(true),
-			CaseAttorneyJointly:             shared.BoolPtr(false),
-			CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
-			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque:  shared.BoolPtr(false),
-			PaymentExemption: shared.BoolPtr(false),
-		},
-	}
-
-	testCases := map[string]struct {
-		query         string
-		formField     string
-		formValue     string
-		expectedError error
-		setupMocks    func(client *mockCreateLpaClient, epa sirius.Lpa)
-	}{
-		"add correspondent": {
-			query:         "/?id=123",
-			expectedError: RedirectError("/select-or-create-correspondent?id=123&caseId=456&caseType=lpa"),
-			formField:     "addCorrespondent",
-			formValue:     "true",
-			setupMocks: func(client *mockCreateLpaClient, lpa sirius.Lpa) {
-				client.
-					On("CreateLpa", mock.Anything, 123, lpa).
-					Return(sirius.Lpa{Case: sirius.Case{ID: 456}}, nil).
-					On("Person", mock.Anything, 123).
-					Return(sirius.Person{}, nil).
-					On("GetUserPermissions", mock.Anything).
-					Return(sirius.Permissions{"v1-lpas-edit-dates": sirius.PermissionType{Permissions: []string{"PUT"}}}, nil)
-			},
-		},
-	}
-
-	for name, tc := range testCases {
-		t.Run(name, func(t *testing.T) {
-			client := &mockCreateLpaClient{}
-
-			tc.setupMocks(client, lpa)
-
-			form := url.Values{
-				"caseSubtype":                {"pfa"},
-				"applicationType":            {"Online"},
-				"onlineLpaId":                {"A12345678901"},
-				"receiptDate":                {dateString},
-				"lpaDonorSignatureDate":      {dateString},
-				"caseAttorney":               {"singular"},
-				"attorneyActDecisions":       {"When Registered"},
-				"preferencesAndInstructions": {"guidance"},
-				"applicantType":              {"donor"},
-				"applicationFee":             {"card"},
-				"cardPaymentContact":         {"01234 567890"},
-				"anyOtherInfo":               {"true"},
-				"additionalInfo":             {"Some extra info"},
-				tc.formField:                 {tc.formValue},
-			}
-
-			r, _ := http.NewRequest(http.MethodPost, tc.query, strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", formUrlEncoded)
-			w := httptest.NewRecorder()
-
-			err := CreateLpa(client, nil, nil)(w, r)
-			resp := w.Result()
-
-			assert.Equal(t, tc.expectedError, err)
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client)
-		})
-	}
-}
-
 func TestPostCreateLpaWhenValidationError(t *testing.T) {
 	expectedError := sirius.ValidationError{
 		Field: sirius.FieldErrors{"receiptDate": {"receiptDate": "Select the date of receipt"}},
@@ -1418,6 +1329,11 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			name:        "Add certificate provider redirects",
 			formKey:     "addCertificateProvider",
 			redirectURL: "/create-certificate-provider?id=1&caseId=2",
+		},
+		{
+			name:        "Add correspondent",
+			formKey:     "addCorrespondent",
+			redirectURL: "/select-or-create-correspondent?id=1&caseId=2&caseType=lpa",
 		},
 	}
 
