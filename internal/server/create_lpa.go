@@ -20,20 +20,20 @@ type CreateLpaClient interface {
 }
 
 type createLpaData struct {
-	XSRFToken          string
-	Success            bool
-	SuccessMessage     string
-	IsUpdate           bool
-	Error              sirius.ValidationError
-	DonorId            int
-	DonorName          string
-	Title              string
-	CaseId             int
-	Lpa                sirius.Lpa
 	AppointmentType    string
 	CanEditReceiptDate bool
+	CaseId             int
+	DonorId            int
+	DonorName          string
+	Error              sirius.ValidationError
 	HtmxRedirect       string
 	HtmxSwap           string
+	IsUpdate           bool
+	Lpa                sirius.Lpa
+	Success            bool
+	SuccessMessage     string
+	Title              string
+	XSRFToken          string
 }
 
 func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl template.Template) Handler {
