@@ -195,6 +195,9 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			if r.FormValue("addAttorney") != "" {
 				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa", donorID, data.CaseId))
 			}
+			if r.FormValue("addCertificateProvider") != "" {
+				return RedirectError(fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorID, data.CaseId))
+			}
 
 			data.Success = true
 			if isEditing {
