@@ -20,17 +20,20 @@ type CreateLpaClient interface {
 }
 
 type createLpaData struct {
-	XSRFToken          string
-	Success            bool
-	IsUpdate           bool
-	Error              sirius.ValidationError
-	DonorId            int
-	DonorName          string
-	Title              string
-	CaseId             int
-	Lpa                sirius.Lpa
 	AppointmentType    string
 	CanEditReceiptDate bool
+	CaseId             int
+	DonorId            int
+	DonorName          string
+	Error              sirius.ValidationError
+	HtmxRedirect       string
+	HtmxSwap           string
+	IsUpdate           bool
+	Lpa                sirius.Lpa
+	Success            bool
+	SuccessMessage     string
+	Title              string
+	XSRFToken          string
 }
 
 func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl template.Template) Handler {
@@ -178,6 +181,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
 				lpa.Attorneys = data.Lpa.Attorneys
+				lpa.ReplacementAttorneys = data.Lpa.ReplacementAttorneys
 				data.Lpa = lpa
 
 				if r.Header.Get("HX-Request") == "true" {
@@ -193,6 +197,20 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			}
 
 			data.Success = true
+			if isEditing {
+				data.SuccessMessage = "You have successfully updated an LPA."
+			} else {
+				data.SuccessMessage = "You have successfully created an LPA."
+			}
+		}
+
+		if r.FormValue("addReplacementAttorney") != "" {
+			if r.Header.Get("HX-Request") == "true" {
+				data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorID, data.CaseId)
+				data.HtmxSwap = "innerHTML"
+				return partialTmpl(w, data)
+			}
+			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorID, data.CaseId))
 		}
 
 		if r.Header.Get("HX-Request") == "true" {

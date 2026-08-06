@@ -9,11 +9,7 @@
 
       {{ if .Success }}
         <meta data-app-select-case="{{ .CaseId }}"/>
-        {{ if .IsUpdate }}
-          {{ template "success-banner" "You have successfully updated an LPA." }}
-        {{ else }}
-          {{ template "success-banner" "You have successfully created an LPA." }}
-        {{ end }}
+        {{ template "success-banner" .SuccessMessage }}
       {{ end }}
 
       <p class="govuk-body app-lpa__donor-info">{{ .DonorName }}{{ if .CaseId }} – <span class="app-lpa__donor-info--{{ .Lpa.SubType }}">{{ ToUpper .Lpa.SubType }}</span> {{ .Lpa.UID }}{{ end }}</p>
