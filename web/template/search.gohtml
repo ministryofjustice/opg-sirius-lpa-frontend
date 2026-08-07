@@ -10,7 +10,7 @@
             {{ if and (eq .Total 0) (eq 0 (len .DeletedCases)) }}
                 <h1 class="govuk-heading-m">No cases were found</h1>
             {{ else }}
-                <h1 class="moj-pagination__results govuk-!-padding-0 govuk-!-margin-bottom-6"><b>{{ .Total }} results for "{{ .SearchTerm }}"</b></h1>
+                <h1 class="govuk-heading-m moj-pagination__results govuk-!-padding-0 govuk-!-margin-bottom-6"><b>{{ .Total }} results for "{{ .SearchTerm }}"</b></h1>
             {{ end }}
         </div>
     </div>

@@ -1330,6 +1330,11 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			formKey:     "addCertificateProvider",
 			redirectURL: "/create-certificate-provider?id=1&caseId=2",
 		},
+		{
+			name:        "Add correspondent",
+			formKey:     "addCorrespondent",
+			redirectURL: "/select-or-create-correspondent?id=1&caseId=2&caseType=lpa",
+		},
 	}
 
 	for _, tc := range tests {
