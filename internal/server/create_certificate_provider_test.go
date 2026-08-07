@@ -66,6 +66,7 @@ func TestGetCreateCertificateProviders(t *testing.T) {
 					DonorId:     1,
 					CaseId:      2,
 					CanAddActor: tc.canAddActor,
+					Title:       "Add a certificate provider",
 				}).
 				Return(nil)
 
@@ -94,6 +95,7 @@ func TestGetCreateCertificateWithHXRequest(t *testing.T) {
 			DonorId:     1,
 			CaseId:      2,
 			CanAddActor: true,
+			Title:       "Add a certificate provider",
 		}).
 		Return(nil)
 
@@ -219,6 +221,7 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 						CanAddActor:  true,
 						HtmxRedirect: tc.redirectURL,
 						HtmxSwap:     tc.swap,
+						Title:        "Add a certificate provider",
 					}).
 					Return(nil)
 			}
@@ -335,6 +338,7 @@ func TestPostCreateCertificateProviderValidationError(t *testing.T) {
 					"firstname": {"required": "This field is required"},
 				},
 			},
+			Title: "Add a certificate provider",
 		}).
 		Return(nil)
 
