@@ -7,7 +7,11 @@
 {{ define "main" }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            <h1 class="govuk-heading-l">Search results</h1>
+            {{ if and (eq .Total 0) (eq 0 (len .DeletedCases)) }}
+                <h1 class="govuk-heading-m">No cases were found</h1>
+            {{ else }}
+                <h1 class="govuk-heading-m moj-pagination__results govuk-!-padding-0 govuk-!-margin-bottom-6"><b>{{ .Total }} results for "{{ .SearchTerm }}"</b></h1>
+            {{ end }}
         </div>
     </div>
 
@@ -22,7 +26,6 @@
             {{ if and (eq .Total 0) (eq 0 (len .DeletedCases)) }}
                 <div class="govuk-grid-row">
                     <div class="govuk-grid-column-one-half">
-                        <h2 class="govuk-heading-m">No cases were found</h2>
                         <p class="govuk-body">This could be because the paper LPA or Court Order hasn't been scanned yet</p>
 
                         <p class="govuk-body">For the best search results try searching with the case number.</p>
@@ -34,9 +37,6 @@
                     </div>
                 </div>
             {{ else }}
-
-                <p class="moj-pagination__results govuk-!-padding-0 govuk-!-margin-bottom-6">Showing <b>{{ .Pagination.Start }}</b> to <b>{{ .Pagination.End }}</b> of <b>{{ .Total }}</b> results for <b>{{ .SearchTerm }}</b></p>
-
                 {{ if eq 0 (len .DeletedCases) }}
                     <table class="govuk-table" data-module="moj-sortable-table">
                         <thead class="govuk-table__head">
