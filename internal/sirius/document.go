@@ -29,6 +29,7 @@ type Document struct {
 	CaseItems           []Case                   `json:"caseItems,omitempty"`
 	NotifyStatus        string                   `json:"notifyStatus,omitempty"`
 	Persons             []Person                 `json:"persons,omitempty"`
+	IsInfected          bool                     `json:"infected"`
 }
 
 type DocumentList struct {

@@ -140,8 +140,19 @@ class PDFViewer {
         this.currentPage = savedState.currentPage;
       }
 
+      const documentUrl = this.url.replace("/file", "/download");
+      const checkFileInfected = await fetch(documentUrl, { method: "HEAD" });
+
+      if (checkFileInfected.status >= 400) {
+        this.showError(
+          "This file is blocked. A suspected virus has been detected. Please request a different file from the sender and notify the Implementation team",
+        );
+        return;
+      }
+
       const loadingTask = pdfjsLib.getDocument(this.url);
       this.pdfDoc = await loadingTask.promise;
+
       this.totalPages = this.pdfDoc.numPages;
 
       // Ensure current page is within bounds

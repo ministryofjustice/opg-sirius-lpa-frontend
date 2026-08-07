@@ -1145,3 +1145,10 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
     border-bottom: 1px solid govuk-functional-colour(border);
   }
 }
+
+.fileIsInfected {
+  color: var(--govuk-error-colour, #ca3535);
+  font-weight: 700;
+  font-size: 1.1875rem;
+  line-height: 1.3157894737;
+}
