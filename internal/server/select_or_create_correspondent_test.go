@@ -406,8 +406,8 @@ func TestGetSelectedActorForLpa(t *testing.T) {
 			CertificateProviders: []sirius.Person{
 				{ID: 4},
 			},
-			NotifiedPersons: []sirius.Person{
-				{ID: 5},
+			NotifiedPersons: []sirius.NotifiedPerson{
+				{Person: sirius.Person{ID: 5}},
 			},
 			TrustCorporations: []sirius.Attorney{
 				{Person: sirius.Person{ID: 6}},
@@ -423,7 +423,7 @@ func TestGetSelectedActorForLpa(t *testing.T) {
 		{actorId: 2, expectedPerson: lpa.Attorneys[0].Person},
 		{actorId: 3, expectedPerson: lpa.ReplacementAttorneys[0].Person},
 		{actorId: 4, expectedPerson: lpa.CertificateProviders[0]},
-		{actorId: 5, expectedPerson: lpa.NotifiedPersons[0]},
+		{actorId: 5, expectedPerson: lpa.NotifiedPersons[0].Person},
 		{actorId: 6, expectedPerson: lpa.TrustCorporations[0].Person},
 	}
 
