@@ -56,8 +56,9 @@
     <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {{ template "error-summary" .Error }}
+      <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-2" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
 
-      <h1 class="govuk-heading-l app-!-embedded-hide">{{ .Title }}</h1>
+      <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
       <form class="form" method="POST">
           {{ template "addNotifiedPerson" . }}

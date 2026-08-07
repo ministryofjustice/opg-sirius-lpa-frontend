@@ -8,8 +8,7 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-// TODO: fix this cause its wrong when you're adding the final notified person
-const maxNotifiedPersons = 4
+const maxNotifiedPersons = 5
 
 func allowNewNotifiedPerson(currentCount int) bool {
 	return currentCount < (maxNotifiedPersons)

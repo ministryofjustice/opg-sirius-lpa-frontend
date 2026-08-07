@@ -89,12 +89,12 @@ describe("Create notified person form", () => {
     cy.url().should("include", "create-notified-person");
   });
 
-  it("does not allow you to add another notified person you are creating the 4th", () => {
+  it("does not allow you to add another notified person you are creating the 5th", () => {
     cy.addMock("/lpa-api/v1/cases/4", "GET", {
       status: 200,
       body: {
         id: 4,
-        notifiedPersons: [{ id: 11 }, { id: 12 }, { id: 13 }],
+        notifiedPersons: [{ id: 11 }, { id: 12 }, { id: 13 }, { id: 14 }],
       },
     });
     cy.visit("/create-notified-person?id=1&caseId=4");
