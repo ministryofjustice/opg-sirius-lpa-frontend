@@ -1,6 +1,6 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add a certificate provider{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ .Title }}{{ end }}
 
 {{ define "main" }}
     <div class="govuk-grid-row">

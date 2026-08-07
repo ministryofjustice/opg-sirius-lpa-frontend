@@ -201,6 +201,13 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			if r.FormValue("addCorrespondent") != "" {
 				return RedirectError(fmt.Sprintf("/select-or-create-correspondent?id=%d&caseId=%d&caseType=lpa", donorID, data.CaseId))
 			}
+			if r.FormValue("updateCertificateProvider") != "" {
+				personID, err := strconv.Atoi(r.FormValue("updateCertificateProvider"))
+				if err != nil {
+					return err
+				}
+				return RedirectError(fmt.Sprintf("/edit-certificate-provider?id=%d&caseId=%d&personId=%d", donorID, data.CaseId, personID))
+			}
 
 			data.Success = true
 			if isEditing {
