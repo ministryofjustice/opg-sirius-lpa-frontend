@@ -88,7 +88,13 @@
         {{ if eq .PersonType "Notified Person" }}
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Date Notice Given</th>
-                <td class="govuk-table__cell"> {{ parseAndFormatDate (printf "%s" .NoticeGivenDate) "2006-01-02" "2 January 2006" }}</td>
+                <td class="govuk-table__cell">
+                    {{ if .NoticeGivenDate }}
+                        {{ parseAndFormatDate (printf "%s" .NoticeGivenDate) "2006-01-02" "2 January 2006" }}
+                    {{ else }}
+                        -
+                    {{ end }}
+                </td>
             </tr>
         {{end }}
         </tbody>
