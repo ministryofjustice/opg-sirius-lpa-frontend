@@ -154,7 +154,7 @@ func GetSelectedActorForLpa(lpa sirius.Lpa, actorId int) sirius.Person {
 
 	for _, notifiedPerson := range lpa.NotifiedPersons {
 		if notifiedPerson.ID == actorId {
-			return notifiedPerson
+			return notifiedPerson.Person
 		}
 	}
 
