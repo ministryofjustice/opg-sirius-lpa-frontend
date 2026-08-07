@@ -47,30 +47,30 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 		}
 
 		selectedDocUUIDs := r.Form["document"]
-
+		var validationErr sirius.ValidationError
 		if r.Method == http.MethodPost && len(selectedDocUUIDs) > 0 && r.FormValue("actionDownload") == "true" {
 			downloadResp, err := client.DownloadMultiple(ctx, selectedDocUUIDs)
 			if err != nil {
-				return err
-			}
-			defer downloadResp.Body.Close() //nolint:errcheck // no need to check error when closing body
+				validationErr.Detail = "One or more of the following documents could not be downloaded due to being infected"
+			} else {
+				defer downloadResp.Body.Close() //nolint:errcheck // no need to check error when closing body
 
-			for key, values := range downloadResp.Header {
-				for _, value := range values {
-					w.Header().Add(key, value)
+				for key, values := range downloadResp.Header {
+					for _, value := range values {
+						w.Header().Add(key, value)
+					}
 				}
-			}
 
-			w.WriteHeader(downloadResp.StatusCode)
-			if _, err := io.Copy(w, downloadResp.Body); err != nil {
-				return err
-			}
+				w.WriteHeader(downloadResp.StatusCode)
+				if _, err := io.Copy(w, downloadResp.Body); err != nil {
+					return err
+				}
 
-			return nil
+				return nil
+			}
 		}
 
 		compareView := r.FormValue("comparing") == "true"
-		var validationErr sirius.ValidationError
 		if r.Method == http.MethodPost && len(selectedDocUUIDs) == 0 && r.FormValue("actionDownload") == "true" {
 			if compareView {
 				w.WriteHeader(http.StatusNoContent)
