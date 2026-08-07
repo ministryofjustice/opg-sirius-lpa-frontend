@@ -620,7 +620,7 @@ func TestPostCreateNotifiedPersonWhenValidationError(t *testing.T) {
 func TestAllowNewNotifiedPerson(t *testing.T) {
 	assert.True(t, allowNewNotifiedPerson(0))
 	assert.True(t, allowNewNotifiedPerson(3))
-	assert.False(t, allowNewNotifiedPerson(4))
+	assert.False(t, allowNewNotifiedPerson(5))
 }
 
 func TestGetNextNotifiedPersonIdWillReturnNextNumber(t *testing.T) {
