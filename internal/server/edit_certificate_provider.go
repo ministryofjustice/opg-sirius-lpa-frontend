@@ -8,12 +8,12 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-type CreateCertificateProviderClient interface {
-	CreateCertificateProvider(ctx sirius.Context, caseId int, certificateProvider sirius.Person) error
-	Lpa(sirius.Context, int) (sirius.Lpa, error)
+type EditCertificateProviderClient interface {
+	UpdateCertificateProvider(ctx sirius.Context, certificateProviderId int, certificateProvider sirius.Person) error
+	Person(sirius.Context, int) (sirius.Person, error)
 }
 
-type CreateCertificateProviderData struct {
+type EditCertificateProviderData struct {
 	XSRFToken           string
 	CanAddActor         bool
 	CaseId              int
@@ -25,7 +25,7 @@ type CreateCertificateProviderData struct {
 	Title               string
 }
 
-func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func EditCertificateProvider(client EditCertificateProviderClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -39,17 +39,23 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 			return err
 		}
 
-		caseItem, err := client.Lpa(ctx, caseId)
+		personId, err := strToIntOrStatusError(r.FormValue("personId"))
 		if err != nil {
 			return err
 		}
 
-		data := CreateCertificateProviderData{
-			XSRFToken:   ctx.XSRFToken,
-			DonorId:     donorId,
-			CaseId:      caseId,
-			CanAddActor: len(caseItem.CertificateProviders) < 1,
-			Title:       "Add a certificate provider",
+		certificateProvider, err := client.Person(ctx, personId)
+		if err != nil {
+			return err
+		}
+
+		data := EditCertificateProviderData{
+			XSRFToken:           ctx.XSRFToken,
+			DonorId:             donorId,
+			CaseId:              caseId,
+			CanAddActor:         false,
+			CertificateProvider: certificateProvider,
+			Title:               "Edit Certificate Provider",
 		}
 
 		if r.Method == http.MethodPost {
@@ -68,7 +74,7 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 				Postcode:     postFormString(r, "postcode"),
 			}
 
-			err = client.CreateCertificateProvider(ctx, caseId, certificateProvider)
+			err = client.UpdateCertificateProvider(ctx, personId, certificateProvider)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
@@ -76,23 +82,13 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 			} else if err != nil {
 				return err
 			} else {
-				var redirect, swap string
-
-				if r.FormValue("add-another") != "" {
-					redirect = fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorId, caseId)
-					swap = "innerHTML scroll:.action-panel__content:top"
-				} else {
-					redirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId)
-					swap = "innerHTML show:#accordion-create-lpa-heading-3:top"
-				}
-
 				if r.Header.Get("HX-Request") == "true" {
-					data.HtmxRedirect = redirect
-					data.HtmxSwap = swap
+					data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId)
+					data.HtmxSwap = "innerHTML show:#accordion-create-lpa-heading-3:top"
 					return partialTmpl(w, data)
 				}
 
-				return RedirectError(redirect)
+				return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId))
 			}
 		}
 		if r.Header.Get("HX-Request") == "true" {

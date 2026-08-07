@@ -397,6 +397,18 @@
                       {{ template "person-details-table" . }}
                     </div>
                   </details>
+                  <span class="app-create-lpa__summary-update-link">
+                    <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
+                            id="f-update-certificate-provider-{{ .ID }}"
+                            name="updateCertificateProvider"
+                            type="submit"
+                            value="{{ .ID }}"
+                    >Update
+                      <span class="govuk-visually-hidden">
+                        certificate provider{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                      </span>
+                    </button>
+                  </span>
                   <div class="govuk-form-group">
                     <input class="govuk-input" type="text" placeholder="DD/MM/YYYY" />
                   </div>
