@@ -59,6 +59,14 @@ describe("Pdf Viewer", () => {
   let canvas;
 
   beforeEach(async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        status: 200,
+        ok: true,
+        blob: () => Promise.resolve(new Blob()),
+      }),
+    );
+
     document.body.innerHTML = `
     <div id="test-container"></div>
   `;
@@ -263,6 +271,48 @@ describe("Pdf Viewer", () => {
           "pdf-viewer-thumbnail-panel--visible",
         ),
       ).toBe(false);
+    });
+  });
+
+  describe("Given the fetch request fails", () => {
+    test("the pdf will send the correct error message when file is blocked", async () => {
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          status: 400,
+          ok: false,
+          blob: () => Promise.resolve(new Blob()),
+        }),
+      );
+
+      document.body.innerHTML = `
+        <div id="test-container-blocked"></div>
+      `;
+
+      const blockedContainer = document.getElementById(
+        "test-container-blocked",
+      );
+      const blockedViewer = new PDFViewer(
+        blockedContainer,
+        "http://localhost/infected.pdf",
+        "1",
+      );
+
+      const showErrorSpy = jest.spyOn(blockedViewer, "showError");
+
+      await blockedViewer.init();
+
+      await new Promise((resolve) => setTimeout(resolve));
+
+      expect(showErrorSpy).toHaveBeenCalledWith(
+        "This file is blocked. A suspected virus has been detected. Please request a different file from the sender",
+      );
+
+      const errorElement = blockedContainer.querySelector(".pdf-viewer-error");
+      expect(errorElement).toBeTruthy();
+      expect(errorElement.textContent).toContain("This file is blocked");
+
+      showErrorSpy.mockRestore();
+      blockedContainer.remove();
     });
   });
 });

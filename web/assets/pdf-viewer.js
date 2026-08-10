@@ -143,9 +143,9 @@ class PDFViewer {
       const documentUrl = this.url.replace("/file", "/download");
       const checkFileInfected = await fetch(documentUrl, { method: "HEAD" });
 
-      if (checkFileInfected.status >= 400) {
+      if (checkFileInfected.status === 400) {
         this.showError(
-          "This file is blocked. A suspected virus has been detected. Please request a different file from the sender and notify the Implementation team",
+          "This file is blocked. A suspected virus has been detected. Please request a different file from the sender",
         );
         return;
       }

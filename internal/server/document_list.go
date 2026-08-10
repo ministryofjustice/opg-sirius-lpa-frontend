@@ -51,7 +51,11 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 		if r.Method == http.MethodPost && len(selectedDocUUIDs) > 0 && r.FormValue("actionDownload") == "true" {
 			downloadResp, err := client.DownloadMultiple(ctx, selectedDocUUIDs)
 			if err != nil {
-				validationErr.Detail = "One or more of the following documents could not be downloaded due to being infected"
+				if err.Error() == "400" {
+					validationErr.Detail = "One or more of the following documents could not be downloaded due to being infected."
+				} else {
+					return err
+				}
 			} else {
 				defer downloadResp.Body.Close() //nolint:errcheck // no need to check error when closing body
 

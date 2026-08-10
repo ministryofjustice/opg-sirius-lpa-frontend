@@ -134,6 +134,10 @@ func (c *Client) DownloadMultiple(ctx Context, docIDs []string) (*http.Response,
 		return nil, err
 	}
 
+	if resp.StatusCode == http.StatusBadRequest {
+		return nil, errors.New("400")
+	}
+
 	if resp.StatusCode != http.StatusOK {
 		statusErr := newStatusError(resp)
 		if errClose := resp.Body.Close(); errClose != nil {
