@@ -145,7 +145,7 @@ class PDFViewer {
 
       if (checkFileInfected.status === 400) {
         this.showError(
-          "This file is blocked. A suspected virus has been detected. Please request a different file from the sender",
+          "This file is blocked. A suspected virus has been detected. Please request a different file from the sender and notify the Implementation team",
         );
         return;
       }
