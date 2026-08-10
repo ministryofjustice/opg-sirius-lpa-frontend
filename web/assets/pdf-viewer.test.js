@@ -304,7 +304,7 @@ describe("Pdf Viewer", () => {
       await new Promise((resolve) => setTimeout(resolve));
 
       expect(showErrorSpy).toHaveBeenCalledWith(
-        "This file is blocked. A suspected virus has been detected. Please request a different file from the sender",
+        "This file is blocked. A suspected virus has been detected. Please request a different file from the sender and notify the Implementation team",
       );
 
       const errorElement = blockedContainer.querySelector(".pdf-viewer-error");
