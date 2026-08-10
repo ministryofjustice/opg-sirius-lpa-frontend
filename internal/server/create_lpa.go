@@ -163,10 +163,11 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 					data.Lpa, _ = client.Lpa(ctx, data.CaseId)
 				}
 			} else {
-				lpa, err = client.CreateLpa(ctx, donorID, lpa)
+				var createdLpa sirius.Lpa
+				createdLpa, err = client.CreateLpa(ctx, donorID, lpa)
 				if err == nil {
-					data.Lpa = lpa
-					data.CaseId = lpa.ID
+					data.Lpa = createdLpa
+					data.CaseId = createdLpa.ID
 				}
 			}
 
