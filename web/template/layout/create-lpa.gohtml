@@ -285,11 +285,40 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
-            <div class="govuk-button-group app-button-group--column">
-              <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
-                     type="button" disabled="disabled"
-                     value="Add notified person"/>
-            </div>
+            {{ if gt (len .Lpa.NotifiedPersons) 0 }}
+              {{ range $notifiedPerson := .Lpa.NotifiedPersons }}
+                <div class="app-create-lpa__details-row">
+                  <details class="govuk-details">
+                    <summary class="govuk-details__summary">
+                      <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
+                    </summary>
+                    <div class="govuk-details__text">
+                      {{ template "person-details-table" . }}
+                    </div>
+                  </details>
+                  <span class="app-create-lpa__summary-update-link">
+                    <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
+                            id="f-update-notifiedPerson-{{ .ID }}"
+                            name="updateNotifiedPerson"
+                            type="submit"
+                            value="{{ .ID }}"
+                    >
+                      Update
+                      <span class="govuk-visually-hidden">
+                          notified person{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                      </span>
+                    </button>
+                </span>
+                </div>
+              {{ end }}
+            {{ end }}
+            {{ if .AllowNewNotifiedPerson }}
+              <div class="govuk-button-group app-button-group--column">
+                <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                      type="submit" data-disable-after-click="true" name="addNotifiedPerson"
+                      value="Add notified person"/>
+              </div>
+            {{ end }}
           </div>
         </div>
         <div class="govuk-summary-card">
@@ -477,7 +506,6 @@
                           name="updateCorrespondent"
                           type="submit"
                           value="{{ .Lpa.Correspondent.ID }}"
-                          disabled="disabled"
                   >
                     Update
                     <span class="govuk-visually-hidden">
