@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -2103,4 +2104,226 @@ func TestDocumentListSuccessMessage(t *testing.T) {
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
+}
+
+func TestDocumentListDownloadMultipleInfectedError(t *testing.T) {
+	infectedFileStatus := errors.New("400")
+	cases := []sirius.Case{
+		{ID: 1, UID: "7000-1234-0000"},
+		{ID: 2, UID: "7000-9876-0000"},
+	}
+
+	client := &mockDocumentListClient{}
+	client.
+		On("DownloadMultiple", mock.Anything, []string{"doc-uuid"}).
+		Return((*http.Response)(nil), infectedFileStatus)
+	client.
+		On("CasesByDonor", mock.Anything, 82).
+		Return(cases, nil)
+	client.
+		On("GetPersonDocuments", mock.Anything, 82, []string(nil)).
+		Return(allDocumentList, nil)
+	client.
+		On("Person", mock.Anything, 82).
+		Return(expectedDonor, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("PersonReferences", mock.Anything, 82).
+		Return([]sirius.PersonReference{{ID: 987}}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything,
+			documentPageData{
+				SelectedCases:         cases,
+				SelectedCaseIds:       "1+2",
+				Person:                expectedDonor,
+				DocumentList:          allDocumentList,
+				MultipleCasesSelected: true,
+				DonorID:               82,
+				Error: sirius.ValidationError{
+					Detail: "One or more of the following documents could not be downloaded due to being infected.",
+				},
+				HasV1PersonsGetPermission: false,
+				ActionPanelButtons: []ActionPanelButton{
+					{
+						Label:    "Create warning",
+						URL:      "/create-warning?id=82&entity=person",
+						IconName: "aw-create-warning",
+						Disabled: false,
+						Hidden:   true,
+					},
+					{
+						Label:    "Create event",
+						URL:      "/create-event?id=82&entity=person",
+						IconName: "aw-new-event",
+						Disabled: false,
+						Hidden:   true,
+					},
+					{
+						Label:    "Add complaint",
+						URL:      "",
+						IconName: "aw-log-complaint",
+						Disabled: true,
+						Hidden:   true,
+					},
+					{
+						Label:    "Create document",
+						URL:      "",
+						IconName: "aw-new-template",
+						Disabled: true,
+						Hidden:   true,
+					},
+					{
+						Label:    "Retrieve draft",
+						URL:      "",
+						IconName: "aw-new-template",
+						Disabled: true,
+						Hidden:   true,
+					},
+					{
+						Label:    "Change status",
+						URL:      "",
+						IconName: "aw-change-status",
+						Disabled: true,
+						Hidden:   true,
+					},
+					{
+						Label:    "Fees",
+						URL:      "",
+						IconName: "aw-fees",
+						Disabled: true,
+						Hidden:   true,
+					},
+					{
+						Label:    "New task",
+						URL:      "",
+						IconName: "aw-new-task",
+						Disabled: true,
+						Hidden:   true,
+					},
+					{
+						Label:    "Assign task",
+						URL:      "",
+						IconName: "aw-assign-task",
+						Disabled: true,
+						Hidden:   true,
+					},
+					{
+						Label:    "Create donor",
+						URL:      "/create-donor?id=82&entity=person",
+						IconName: "aw-create-person",
+						Disabled: false,
+						Hidden:   true,
+					},
+					{
+						Label:    "Edit donor",
+						URL:      "/edit-donor?id=82&entity=person",
+						IconName: "aw-edit-person",
+						Disabled: false,
+						Hidden:   true,
+					},
+					{
+						Label:    "Edit dates",
+						URL:      "",
+						IconName: "calendar-open",
+						Disabled: true,
+						Hidden:   true,
+					},
+					{
+						Label:    "MI reporting",
+						URL:      "/mi-reporting?donorId=82",
+						IconName: "aw-mi",
+						Disabled: false,
+						Hidden:   true,
+					},
+					{
+						Label:    "Allocate Case",
+						URL:      "/allocate-cases?id=1&id=2&entity=",
+						IconName: "aw-allocate-case",
+						Disabled: false,
+						Hidden:   true,
+					},
+					{
+						Label:    "Link record",
+						URL:      "/link-person?id=82",
+						IconName: "aw-link",
+						Disabled: false,
+						Hidden:   true,
+					},
+					{
+						Label:    "Unlink record",
+						URL:      "/unlink-person?id=82",
+						IconName: "aw-unlink",
+						Disabled: true,
+						Hidden:   true,
+					},
+					{
+						Label:    "Delete relationship",
+						URL:      "/delete-relationship?id=82",
+						IconName: "icon-minus",
+						Disabled: false,
+						Hidden:   true,
+					},
+					{
+						Label:    "Create relationship",
+						URL:      "/create-relationship?id=82&entity=person",
+						IconName: "aw-relationship",
+						Disabled: false,
+						Hidden:   true,
+					},
+					{
+						Label:    "Create epa case",
+						URL:      "/create-epa?id=82",
+						IconName: "aw-create-case",
+						Disabled: false,
+						Hidden:   true,
+					},
+					{
+						Label:    "Create lpa case",
+						URL:      "/create-lpa?id=82",
+						IconName: "aw-create-case",
+						Disabled: false,
+						Hidden:   true,
+					},
+					{
+						Label:    "Edit case",
+						URL:      "",
+						IconName: "aw-edit-case",
+						Disabled: true,
+						Hidden:   true,
+					},
+					{
+						Label:    "Add investigation",
+						URL:      "",
+						IconName: "icon-investigation",
+						Disabled: true,
+						Hidden:   true,
+					},
+				},
+				HeaderButtons: SiriusHeaderButtons{
+					BackToTimeline: true,
+					Calendar:       true,
+				},
+			},
+		).
+		Return(nil)
+
+	server := newMockServer("/donor/{id}/documents", DocumentList(client, template.Func))
+
+	form := url.Values{}
+	form.Add("document", "doc-uuid")
+	form.Add("actionDownload", "true")
+	req, _ := http.NewRequest(http.MethodPost, "/donor/82/documents", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", formUrlEncoded)
+
+	resp, err := server.serve(req)
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.Code)
+
+	mock.AssertExpectationsForObjects(t, client, template)
+	client.AssertNotCalled(t, "DownloadMultiple")
 }
