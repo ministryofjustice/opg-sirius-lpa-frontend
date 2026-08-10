@@ -1364,6 +1364,12 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			formValue:   "111",
 			redirectURL: "/create-notified-person?id=1&caseId=2&notifiedPersonId=111",
 		},
+		{
+			name:        "Update certificate provider redirects",
+			formKey:     "updateCertificateProvider",
+			formValue:   "3",
+			redirectURL: "/edit-certificate-provider?id=1&caseId=2&personId=3",
+		},
 	}
 
 	for _, tc := range tests {

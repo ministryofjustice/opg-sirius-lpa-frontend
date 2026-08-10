@@ -55,7 +55,7 @@ func EditCertificateProvider(client EditCertificateProviderClient, tmpl template
 			CaseId:              caseId,
 			CanAddActor:         false,
 			CertificateProvider: certificateProvider,
-			Title:               "Edit Certificate Provider",
+			Title:               "Edit a certificate provider",
 		}
 
 		if r.Method == http.MethodPost {
