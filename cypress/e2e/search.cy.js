@@ -109,7 +109,7 @@ describe("Search", () => {
 
       cy.visit("/search?term=bob");
 
-      cy.contains("Showing 1 to 4 of 4 results for bob");
+      cy.contains('4 results for "bob"');
       cy.contains("Donor (3)");
       cy.contains("Deputy (1)");
     });
@@ -207,7 +207,7 @@ describe("Search", () => {
     });
 
     it("show correct total cases", () => {
-      cy.contains("Showing 1 to 15 of 711770 results");
+      cy.contains('711770 results for "bob"');
     });
   });
 });
