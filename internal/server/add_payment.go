@@ -118,6 +118,10 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 					Title: "Payment added",
 				})
 
+				if data.IsPartial {
+					data.HtmxRedirect = data.ReturnUrl
+				}
+
 				return RedirectError(data.ReturnUrl)
 			}
 		}
