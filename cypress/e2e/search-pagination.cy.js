@@ -185,7 +185,7 @@ describe("Search pagination - Next and Previous link hrefs", () => {
 
       cy.visit("/search?term=test&person-type=Donor&person-type=Attorney");
 
-      cy.contains("Showing 1 to 15 of 12100 results");
+      cy.contains('12100 results for "test"');
     });
   });
 });
