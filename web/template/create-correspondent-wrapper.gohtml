@@ -7,7 +7,11 @@
     <div class="govuk-grid-column-two-thirds">
       {{ template "error-summary" .Error }}
 
-      <a href="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+      {{ if eq .CaseType "epa" }}
+        <a href="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+      {{ else }}
+        <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-4" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+      {{ end }}
 
       <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
@@ -17,7 +21,7 @@
 
         <div class="govuk-button-group govuk-!-padding-top-5">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?id=%d&caseId=%d" .DonorId .CaseId) }}">Cancel</a>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-%s?id=%d&caseId=%d" .CaseType .DonorId .CaseId) }}">Cancel</a>
         </div>
       </form>
     </div>

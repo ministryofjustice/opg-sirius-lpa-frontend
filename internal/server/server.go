@@ -59,6 +59,7 @@ type Client interface {
 	CompareDocsClient
 	CreateAdditionalDraftClient
 	CreateAttorneyClient
+	CreateCertificateProviderClient
 	CreateCorrespondentClient
 	CreateDocumentClient
 	CreateDocumentDigitalLpaClient
@@ -68,6 +69,7 @@ type Client interface {
 	CreateInvestigationClient
 	CreateReplacementAttorneyClient
 	CreateLpaClient
+	CreateNotifiedPersonClient
 	DeleteDocumentClient
 	DeleteNoteClient
 	DeletePaymentClient
@@ -168,10 +170,11 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 
 	//LPA
 	mux.Handle("/action-panel", wrap(ActionPanel(client, templates.Get("action-panel-wrapper.gohtml"))))
-	mux.Handle("/add-complaint", wrap(AddComplaint(client, templates.Get("add-complaint-wrapper.gohtml"), templates.Get("add-complaint-partial-wrapper.gohtml"))))
+	mux.Handle("/add-complaint", wrap(AddComplaint(client, templates.Get("add-complaint.gohtml"))))
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate-cases-wrapper.gohtml"), templates.Get("allocate-cases-partial-wrapper.gohtml"))))
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change-status.gohtml"), templates.Get("change-status-partial.gohtml"))))
 	mux.Handle("/create-attorney", wrap(CreateAttorney(client, templates.Get("create-attorney-wrapper.gohtml"), templates.Get("create-attorney-partial-wrapper.gohtml"))))
+	mux.Handle("/create-certificate-provider", wrap(CreateCertificateProvider(client, templates.Get("create-certificate-provider-wrapper.gohtml"), templates.Get("create-certificate-provider-partial-wrapper.gohtml"))))
 	mux.Handle("/create-correspondent", wrap(CreateCorrespondent(client, templates.Get("create-correspondent-wrapper.gohtml"), templates.Get("create-correspondent-partial-wrapper.gohtml"))))
 	mux.Handle("/create-donor", wrap(CreateDonor(client, templates.Get("donor-wrapper.gohtml"), templates.Get("donor-partial-wrapper.gohtml"))))
 	mux.Handle("/create-document", wrap(CreateDocument(client, templates.Get("create_document.gohtml"), templates.Get("create-document-htmx.gohtml"))))
@@ -179,6 +182,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-investigation", wrap(CreateInvestigation(client, templates.Get("create-investigation-wrapper.gohtml"), templates.Get("create-investigation-partial-wrapper.gohtml"))))
 	mux.Handle("/create-lpa", wrap(CreateLpa(client, templates.Get("create-lpa-wrapper.gohtml"), templates.Get("create-lpa-partial-wrapper.gohtml"))))
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("create-relationship-wrapper.gohtml"), templates.Get("create-relationship-partial-wrapper.gohtml"))))
+	mux.Handle("/create-notified-person", wrap(CreateNotifiedPerson(client, templates.Get("create-notified-person.gohtml"))))
 	mux.Handle("/create-replacement-attorney", wrap(CreateReplacementAttorney(client, templates.Get("create-replacement-attorney-wrapper.gohtml"), templates.Get("create-replacement-attorney-partial-wrapper.gohtml"))))
 	mux.Handle("/compare/{id}/{caseUid}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
 	mux.Handle("/delete-fee-reduction", wrap(DeletePayment(client, templates.Get("delete-fee-reduction-wrapper.gohtml"), templates.Get("delete-fee-reduction-partial-wrapper.gohtml"))))
