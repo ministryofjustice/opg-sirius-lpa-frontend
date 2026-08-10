@@ -156,7 +156,7 @@ func TestGetEditCertificateProviderBadQuery(t *testing.T) {
 		"no-id":         "/",
 		"bad-id":        "/?id=test",
 		"bad-case-id":   "/?id=123&caseId=test",
-		"bad-person-id": "/?id=123&caseId=123?personId=test",
+		"bad-person-id": "/?id=123&caseId=123&personId=test",
 	}
 
 	for name, query := range testCases {

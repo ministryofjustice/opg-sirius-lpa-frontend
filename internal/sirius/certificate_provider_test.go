@@ -106,3 +106,99 @@ func TestCreateCertificateProvider(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateCertificateProvider(t *testing.T) {
+	t.Parallel()
+
+	pact, err := newPact()
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		name                string
+		certificateProvider Person
+		setup               func()
+		expectedError       func(int) error
+	}{
+		{
+			name: "OK",
+			certificateProvider: Person{
+				ID:           123,
+				Salutation:   "Prof",
+				Firstname:    "Melanie",
+				Middlenames:  "Josefina",
+				Surname:      "Vanvolkenburg",
+				AddressLine1: "29737 Andrew Plaza",
+				AddressLine2: "Apt. 814",
+				AddressLine3: "Gislasonside",
+				Town:         "Hirthehaven",
+				County:       "Saskatchewan",
+				Postcode:     "S7R 9F9",
+				Country:      "Canada",
+			},
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have an lpa with a certificate provider").
+					UponReceiving("A request to update that certificate provider").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodPut,
+						Path:   matchers.String("/lpa-api/v1/certificate-providers/123"),
+						Headers: matchers.MapMatcher{
+							"Content-Type": matchers.String("application/json"),
+						},
+						Body: map[string]interface{}{
+							"id":                    123,
+							"salutation":            "Prof",
+							"firstname":             "Melanie",
+							"middlenames":           "Josefina",
+							"surname":               "Vanvolkenburg",
+							"addressLine1":          "29737 Andrew Plaza",
+							"addressLine2":          "Apt. 814",
+							"addressLine3":          "Gislasonside",
+							"otherNames":            "",
+							"companyName":           "",
+							"companyReference":      "",
+							"correspondenceByEmail": false,
+							"correspondenceByPhone": false,
+							"correspondenceByPost":  false,
+							"correspondenceByWelsh": false,
+							"town":                  "Hirthehaven",
+							"county":                "Saskatchewan",
+							"postcode":              "S7R 9F9",
+							"country":               "Canada",
+							"dob":                   nil,
+							"dateOfDeath":           nil,
+							"email":                 "",
+							"isAirmailRequired":     false,
+							"phoneNumber":           "",
+							"previousNames":         "",
+							"researchOptOut":        false,
+							"sageId":                "",
+						},
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status:  http.StatusOK,
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+					})
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
+
+				err := client.UpdateCertificateProvider(Context{Context: context.Background()}, 123, tc.certificateProvider)
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(config.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}
