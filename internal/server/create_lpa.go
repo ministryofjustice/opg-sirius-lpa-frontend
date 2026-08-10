@@ -220,7 +220,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			}
 
 			if r.FormValue("updateCertificateProvider") != "" {
-				personID, err := strconv.Atoi(r.FormValue("updateCertificateProvider"))
+				personID, err := strToIntOrStatusError(r.FormValue("updateCertificateProvider"))
 				if err != nil {
 					return err
 				}
