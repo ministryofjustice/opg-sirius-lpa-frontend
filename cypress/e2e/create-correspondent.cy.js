@@ -96,6 +96,13 @@ describe("Create or update correspondent", () => {
   });
 
   it("creates a correspondent on an LPA", () => {
+    cy.addMock("/lpa-api/v1/cases/2", "GET", {
+      status: 200,
+      body: {
+        id: 2,
+      },
+    });
+
     cy.visit("/create-correspondent?id=1&caseId=2&caseType=lpa");
 
     cy.contains("Add a correspondent");
@@ -119,6 +126,31 @@ describe("Create or update correspondent", () => {
     cy.get("label[for=f-correspondenceBy-email]").click();
     cy.get("label[for=f-correspondenceBy-phone]").click();
     cy.get("label[for=f-correspondenceBy-welsh]").click();
+    cy.get("button[type=submit]").click();
+    cy.url().should("include", "/create-lpa");
+  });
+
+  it("updates a correspondent on an LPA", () => {
+    cy.addMock("/lpa-api/v1/cases/2", "GET", {
+      status: 200,
+      body: {
+        id: 2,
+        correspondent: {
+          id: 3,
+          firstName: "Melanie",
+          surname: "Vanvolkenburg",
+        },
+      },
+    });
+
+    cy.visit("/create-correspondent?id=1&caseId=2&caseType=lpa");
+
+    cy.contains("Update correspondent details");
+    cy.get("#f-firstname").should("have.value", "Melanie");
+    cy.get("#f-surname").should("have.value", "Vanvolkenburg");
+    cy.get("input[type=submit][name=add-another]").should("not.exist");
+
+    cy.get("#f-firstname").clear().type("Mindy");
     cy.get("button[type=submit]").click();
     cy.url().should("include", "/create-lpa");
   });

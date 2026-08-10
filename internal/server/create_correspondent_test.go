@@ -22,6 +22,11 @@ func (m *mockCreateCorrespondentClient) Epa(ctx sirius.Context, id int) (sirius.
 	return args.Get(0).(sirius.Epa), args.Error(1)
 }
 
+func (m *mockCreateCorrespondentClient) Lpa(ctx sirius.Context, id int) (sirius.Lpa, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.Lpa), args.Error(1)
+}
+
 func (m *mockCreateCorrespondentClient) CreateCorrespondent(ctx sirius.Context, caseId int, correspondent sirius.Correspondent) error {
 	args := m.Called(ctx, caseId, correspondent)
 	return args.Error(0)
@@ -90,40 +95,50 @@ func TestGetCreateCorrespondentHtmxRequest(t *testing.T) {
 }
 
 func TestGetEditCorrespondent(t *testing.T) {
-	existingCorrespondent := sirius.Correspondent{
-		Person: sirius.Person{
-			ID:        7,
-			Firstname: "Rudolph",
-			Surname:   "Stotesbury",
-		},
+	for _, caseType := range []string{"epa", "lpa"} {
+		t.Run(caseType, func(t *testing.T) {
+			existingCorrespondent := sirius.Correspondent{
+				Person: sirius.Person{
+					ID:        7,
+					Firstname: "Rudolph",
+					Surname:   "Stotesbury",
+				},
+			}
+
+			client := &mockCreateCorrespondentClient{}
+			if caseType == "epa" {
+				client.
+					On("Epa", mock.Anything, 2).
+					Return(sirius.Epa{Case: sirius.Case{Correspondent: &existingCorrespondent}}, nil)
+			} else {
+				client.
+					On("Lpa", mock.Anything, 2).
+					Return(sirius.Lpa{Case: sirius.Case{Correspondent: &existingCorrespondent}}, nil)
+			}
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, createCorrespondentData{
+					DonorId:       1,
+					CaseId:        2,
+					CaseType:      caseType,
+					Correspondent: existingCorrespondent,
+					IsEditing:     true,
+					Title:         "Update correspondent details",
+				}).
+				Return(nil)
+
+			r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType="+caseType, nil)
+			w := httptest.NewRecorder()
+
+			err := CreateCorrespondent(client, template.Func, nil)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
 	}
-
-	client := &mockCreateCorrespondentClient{}
-	client.
-		On("Epa", mock.Anything, 2).
-		Return(sirius.Epa{Case: sirius.Case{Correspondent: &existingCorrespondent}}, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, createCorrespondentData{
-			DonorId:       1,
-			CaseId:        2,
-			CaseType:      "epa",
-			Correspondent: existingCorrespondent,
-			IsEditing:     true,
-			Title:         "Update correspondent details",
-		}).
-		Return(nil)
-
-	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType=epa", nil)
-	w := httptest.NewRecorder()
-
-	err := CreateCorrespondent(client, template.Func, nil)(w, r)
-	resp := w.Result()
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestGetCreateCorrespondentBadQuery(t *testing.T) {
@@ -141,6 +156,31 @@ func TestGetCreateCorrespondentBadQuery(t *testing.T) {
 			err := CreateCorrespondent(nil, nil, nil)(w, r)
 
 			assert.NotNil(t, err)
+		})
+	}
+}
+
+func TestGetCreateCorrespondentWhenFetchCaseFails(t *testing.T) {
+	for _, caseType := range []string{"epa", "lpa"} {
+		t.Run(caseType, func(t *testing.T) {
+			client := &mockCreateCorrespondentClient{}
+			if caseType == "epa" {
+				client.
+					On("Epa", mock.Anything, 2).
+					Return(sirius.Epa{}, errExample)
+			} else {
+				client.
+					On("Lpa", mock.Anything, 2).
+					Return(sirius.Lpa{}, errExample)
+			}
+
+			r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType="+caseType, nil)
+			w := httptest.NewRecorder()
+
+			err := CreateCorrespondent(client, nil, nil)(w, r)
+
+			assert.Equal(t, errExample, err)
+			mock.AssertExpectationsForObjects(t, client)
 		})
 	}
 }
@@ -179,6 +219,10 @@ func TestPostCreateCorrespondent(t *testing.T) {
 				client.
 					On("Epa", mock.Anything, 2).
 					Return(sirius.Epa{}, nil)
+			} else {
+				client.
+					On("Lpa", mock.Anything, 2).
+					Return(sirius.Lpa{}, nil)
 			}
 
 			client.

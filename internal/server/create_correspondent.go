@@ -10,6 +10,7 @@ import (
 
 type CreateCorrespondentClient interface {
 	Epa(ctx sirius.Context, id int) (sirius.Epa, error)
+	Lpa(ctx sirius.Context, id int) (sirius.Lpa, error)
 	CreateCorrespondent(ctx sirius.Context, caseId int, correspondent sirius.Correspondent) error
 	UpdateCorrespondent(ctx sirius.Context, correspondentId int, correspondent sirius.Correspondent) error
 }
@@ -54,13 +55,18 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 				return err
 			}
 			correspondent = epa.Correspondent
-			isEditing := correspondent != nil
-
-			if isEditing {
-				data.Correspondent = *correspondent
-				data.Title = "Update correspondent details"
-				data.IsEditing = true
+		} else {
+			lpa, err := client.Lpa(ctx, caseId)
+			if err != nil {
+				return err
 			}
+			correspondent = lpa.Correspondent
+		}
+
+		if correspondent != nil {
+			data.Correspondent = *correspondent
+			data.Title = "Update correspondent details"
+			data.IsEditing = true
 		}
 
 		if r.Method == http.MethodPost {
