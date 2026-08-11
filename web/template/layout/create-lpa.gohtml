@@ -418,7 +418,7 @@
             <div class="govuk-button-group app-button-group--column">
               <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
                      type="submit" data-disable-after-click="true"
-                     name="addCertificateProvider" {{ if eq (len .Lpa.CertificateProviders) 2 }}disabled{{ end }} value="Add Certificate Provider"/>
+                     name="addCertificateProvider" {{ if gt (len .Lpa.CertificateProviders) 1 }}disabled{{ end }} value="Add Certificate Provider"/>
             </div>
 
             {{ if gt (len .Lpa.Attorneys) 0 }}

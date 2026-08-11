@@ -67,12 +67,13 @@ func TestGetEditCertificateProvidersTest(t *testing.T) {
 
 			template := &mockTemplate{}
 			partialTemplate := &mockTemplate{}
-			expectedData := EditCertificateProviderData{
+			expectedData := CertificateProviderData{
 				DonorId:             1,
 				CaseId:              2,
 				CanAddActor:         false,
 				CertificateProvider: mockCertificateProvider,
 				Title:               "Edit a certificate provider",
+				PostURL:             "/edit-certificate-provider?id=1&caseId=2&personId=3",
 			}
 
 			if tc.isHtmxRequest {
@@ -114,16 +115,17 @@ func TestGetEditCertificateProviders(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, EditCertificateProviderData{
+		On("Func", mock.Anything, CertificateProviderData{
 			DonorId:             1,
 			CaseId:              2,
 			CanAddActor:         false,
 			CertificateProvider: mockCertificateProvider,
 			Title:               "Edit a certificate provider",
+			PostURL:             "/edit-certificate-provider?id=1&caseId=2&personId=3",
 		}).
 		Return(nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/edit-certificate-provider/?id=1&caseId=2&personId=3", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/edit-certificate-provider?id=1&caseId=2&personId=3", nil)
 	w := httptest.NewRecorder()
 
 	err := EditCertificateProvider(client, template.Func, template.Func)(w, r)
@@ -143,7 +145,7 @@ func TestGetEditCertificateProviderPersonFail(t *testing.T) {
 
 	template := &mockTemplate{}
 
-	r, _ := http.NewRequest(http.MethodGet, "/edit-certificate-provider/?id=1&caseId=2&personId=3", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/edit-certificate-provider?id=1&caseId=2&personId=3", nil)
 	w := httptest.NewRecorder()
 
 	err := EditCertificateProvider(client, template.Func, template.Func)(w, r)
@@ -226,7 +228,7 @@ func TestPostEditCertificateProvider(t *testing.T) {
 			partialTemplate := &mockTemplate{}
 			if tc.htmxRequest {
 				partialTemplate.
-					On("Func", mock.Anything, EditCertificateProviderData{
+					On("Func", mock.Anything, CertificateProviderData{
 						DonorId:             1,
 						CaseId:              2,
 						CanAddActor:         false,
@@ -234,6 +236,7 @@ func TestPostEditCertificateProvider(t *testing.T) {
 						HtmxRedirect:        "/create-lpa?id=1&caseId=2",
 						HtmxSwap:            tc.swap,
 						Title:               "Edit a certificate provider",
+						PostURL:             "/edit-certificate-provider?id=1&caseId=2&personId=3",
 					}).
 					Return(nil)
 			}
@@ -252,7 +255,7 @@ func TestPostEditCertificateProvider(t *testing.T) {
 				"country":      {"United Kingdom"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/edit-certificate-provider/?id=1&caseId=2&personId=3", strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/edit-certificate-provider?id=1&caseId=2&personId=3", strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			if tc.htmxRequest {
 				r.Header.Add("HX-Request", "true")
@@ -289,7 +292,7 @@ func TestPostEditCertificateProviderValidationError(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, EditCertificateProviderData{
+		On("Func", mock.Anything, CertificateProviderData{
 			CanAddActor:         false,
 			CaseId:              2,
 			CertificateProvider: mockCertificateProvider,
@@ -299,7 +302,8 @@ func TestPostEditCertificateProviderValidationError(t *testing.T) {
 					"firstname": {"required": "This field is required"},
 				},
 			},
-			Title: "Edit a certificate provider",
+			Title:   "Edit a certificate provider",
+			PostURL: "/edit-certificate-provider?id=1&caseId=2&personId=3",
 		}).
 		Return(nil)
 
@@ -312,7 +316,7 @@ func TestPostEditCertificateProviderValidationError(t *testing.T) {
 		"country":      {"United Kingdom"},
 	}
 
-	r, _ := http.NewRequest(http.MethodPost, "/edit-certificate-provider/?id=1&caseId=2&personId=3", strings.NewReader(form.Encode()))
+	r, _ := http.NewRequest(http.MethodPost, "/edit-certificate-provider?id=1&caseId=2&personId=3", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 

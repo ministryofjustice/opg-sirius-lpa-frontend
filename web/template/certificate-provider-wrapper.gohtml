@@ -14,7 +14,7 @@
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-                {{ template "create-certificate-provider" . }}
+                {{ template "certificate-provider" . }}
 
                 <div class="govuk-button-group govuk-!-padding-top-5">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>

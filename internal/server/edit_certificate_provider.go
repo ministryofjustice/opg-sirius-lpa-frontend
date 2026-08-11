@@ -13,18 +13,6 @@ type EditCertificateProviderClient interface {
 	Person(sirius.Context, int) (sirius.Person, error)
 }
 
-type EditCertificateProviderData struct {
-	XSRFToken           string
-	CanAddActor         bool
-	CaseId              int
-	CertificateProvider sirius.Person
-	DonorId             int
-	Error               sirius.ValidationError
-	HtmxRedirect        string
-	HtmxSwap            string
-	Title               string
-}
-
 func EditCertificateProvider(client EditCertificateProviderClient, tmpl template.Template, partialTmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
@@ -49,13 +37,14 @@ func EditCertificateProvider(client EditCertificateProviderClient, tmpl template
 			return err
 		}
 
-		data := EditCertificateProviderData{
+		data := CertificateProviderData{
 			XSRFToken:           ctx.XSRFToken,
 			DonorId:             donorId,
 			CaseId:              caseId,
 			CanAddActor:         false,
 			CertificateProvider: certificateProvider,
 			Title:               "Edit a certificate provider",
+			PostURL:             fmt.Sprintf("/edit-certificate-provider?id=%d&caseId=%d&personId=%d", donorId, caseId, personId),
 		}
 
 		if r.Method == http.MethodPost {
