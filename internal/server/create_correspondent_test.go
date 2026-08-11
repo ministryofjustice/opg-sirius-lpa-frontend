@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -19,6 +20,11 @@ type mockCreateCorrespondentClient struct {
 func (m *mockCreateCorrespondentClient) Epa(ctx sirius.Context, id int) (sirius.Epa, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(sirius.Epa), args.Error(1)
+}
+
+func (m *mockCreateCorrespondentClient) Lpa(ctx sirius.Context, id int) (sirius.Lpa, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.Lpa), args.Error(1)
 }
 
 func (m *mockCreateCorrespondentClient) CreateCorrespondent(ctx sirius.Context, caseId int, correspondent sirius.Correspondent) error {
@@ -40,13 +46,14 @@ func TestGetCreateCorrespondent(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createCorrespondentData{
-			DonorId: 1,
-			CaseId:  2,
-			Title:   "Add a correspondent",
+			DonorId:  1,
+			CaseId:   2,
+			CaseType: "epa",
+			Title:    "Add a correspondent",
 		}).
 		Return(nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType=epa", nil)
 	w := httptest.NewRecorder()
 
 	err := CreateCorrespondent(client, template.Func, nil)(w, r)
@@ -67,13 +74,14 @@ func TestGetCreateCorrespondentHtmxRequest(t *testing.T) {
 	partialTemplate := &mockTemplate{}
 	partialTemplate.
 		On("Func", mock.Anything, createCorrespondentData{
-			DonorId: 1,
-			CaseId:  2,
-			Title:   "Add a correspondent",
+			DonorId:  1,
+			CaseId:   2,
+			CaseType: "epa",
+			Title:    "Add a correspondent",
 		}).
 		Return(nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType=epa", nil)
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
@@ -87,39 +95,50 @@ func TestGetCreateCorrespondentHtmxRequest(t *testing.T) {
 }
 
 func TestGetEditCorrespondent(t *testing.T) {
-	existingCorrespondent := sirius.Correspondent{
-		Person: sirius.Person{
-			ID:        7,
-			Firstname: "Rudolph",
-			Surname:   "Stotesbury",
-		},
+	for _, caseType := range []string{"epa", "lpa"} {
+		t.Run(caseType, func(t *testing.T) {
+			existingCorrespondent := sirius.Correspondent{
+				Person: sirius.Person{
+					ID:        7,
+					Firstname: "Rudolph",
+					Surname:   "Stotesbury",
+				},
+			}
+
+			client := &mockCreateCorrespondentClient{}
+			if caseType == "epa" {
+				client.
+					On("Epa", mock.Anything, 2).
+					Return(sirius.Epa{Case: sirius.Case{Correspondent: &existingCorrespondent}}, nil)
+			} else {
+				client.
+					On("Lpa", mock.Anything, 2).
+					Return(sirius.Lpa{Case: sirius.Case{Correspondent: &existingCorrespondent}}, nil)
+			}
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, createCorrespondentData{
+					DonorId:       1,
+					CaseId:        2,
+					CaseType:      caseType,
+					Correspondent: existingCorrespondent,
+					IsEditing:     true,
+					Title:         "Update correspondent details",
+				}).
+				Return(nil)
+
+			r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType="+caseType, nil)
+			w := httptest.NewRecorder()
+
+			err := CreateCorrespondent(client, template.Func, nil)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
 	}
-
-	client := &mockCreateCorrespondentClient{}
-	client.
-		On("Epa", mock.Anything, 2).
-		Return(sirius.Epa{Case: sirius.Case{Correspondent: &existingCorrespondent}}, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, createCorrespondentData{
-			DonorId:       1,
-			CaseId:        2,
-			Correspondent: existingCorrespondent,
-			IsEditing:     true,
-			Title:         "Update correspondent details",
-		}).
-		Return(nil)
-
-	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
-	w := httptest.NewRecorder()
-
-	err := CreateCorrespondent(client, template.Func, nil)(w, r)
-	resp := w.Result()
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestGetCreateCorrespondentBadQuery(t *testing.T) {
@@ -141,62 +160,104 @@ func TestGetCreateCorrespondentBadQuery(t *testing.T) {
 	}
 }
 
+func TestGetCreateCorrespondentWhenFetchCaseFails(t *testing.T) {
+	for _, caseType := range []string{"epa", "lpa"} {
+		t.Run(caseType, func(t *testing.T) {
+			client := &mockCreateCorrespondentClient{}
+			if caseType == "epa" {
+				client.
+					On("Epa", mock.Anything, 2).
+					Return(sirius.Epa{}, errExample)
+			} else {
+				client.
+					On("Lpa", mock.Anything, 2).
+					Return(sirius.Lpa{}, errExample)
+			}
+
+			r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType="+caseType, nil)
+			w := httptest.NewRecorder()
+
+			err := CreateCorrespondent(client, nil, nil)(w, r)
+
+			assert.Equal(t, errExample, err)
+			mock.AssertExpectationsForObjects(t, client)
+		})
+	}
+}
+
 func TestPostCreateCorrespondent(t *testing.T) {
-	expectedError := RedirectError("/create-epa?id=1&caseId=2#accordion-create-epa-heading-3")
-	correspondent := sirius.Correspondent{
-		Person: sirius.Person{
-			Salutation:        "Rev",
-			Firstname:         "Rudolph",
-			Middlenames:       "Modesto",
-			Surname:           "Stotesbury",
-			AddressLine1:      "Rotonda Gerardo 769",
-			AddressLine2:      "Appartamento 94",
-			AddressLine3:      "Augusto terme",
-			Town:              "San Sabazio",
-			County:            "Benevento",
-			Postcode:          "57797",
-			Country:           "Italy",
-			IsAirmailRequired: true,
-			PhoneNumber:       "079876543345",
-			Email:             "rm2@email.test",
-		},
+	for _, caseType := range []string{"epa", "lpa"} {
+		t.Run(caseType, func(t *testing.T) {
+			var expectedError error
+			if caseType == "epa" {
+				expectedError = RedirectError("/create-epa?id=1&caseId=2#accordion-create-epa-heading-3")
+			} else {
+				expectedError = RedirectError("/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-4")
+			}
+
+			correspondent := sirius.Correspondent{
+				Person: sirius.Person{
+					Salutation:        "Rev",
+					Firstname:         "Rudolph",
+					Middlenames:       "Modesto",
+					Surname:           "Stotesbury",
+					AddressLine1:      "Rotonda Gerardo 769",
+					AddressLine2:      "Appartamento 94",
+					AddressLine3:      "Augusto terme",
+					Town:              "San Sabazio",
+					County:            "Benevento",
+					Postcode:          "57797",
+					Country:           "Italy",
+					IsAirmailRequired: true,
+					PhoneNumber:       "079876543345",
+					Email:             "rm2@email.test",
+				},
+			}
+			client := &mockCreateCorrespondentClient{}
+
+			if caseType == "epa" {
+				client.
+					On("Epa", mock.Anything, 2).
+					Return(sirius.Epa{}, nil)
+			} else {
+				client.
+					On("Lpa", mock.Anything, 2).
+					Return(sirius.Lpa{}, nil)
+			}
+
+			client.
+				On("CreateCorrespondent", mock.Anything, 2, correspondent).
+				Return(nil)
+
+			form := url.Values{
+				"salutation":        {"Rev"},
+				"firstname":         {"Rudolph"},
+				"middlenames":       {"Modesto"},
+				"surname":           {"Stotesbury"},
+				"addressLine1":      {"Rotonda Gerardo 769"},
+				"addressLine2":      {"Appartamento 94"},
+				"addressLine3":      {"Augusto terme"},
+				"town":              {"San Sabazio"},
+				"county":            {"Benevento"},
+				"postcode":          {"57797"},
+				"country":           {"Italy"},
+				"isAirmailRequired": {"true"},
+				"phoneNumber":       {"079876543345"},
+				"email":             {"rm2@email.test"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("/?id=1&caseId=2&caseType=%s", caseType), strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := CreateCorrespondent(client, nil, nil)(w, r)
+			resp := w.Result()
+
+			assert.Equal(t, err, expectedError)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client)
+		})
 	}
-	client := &mockCreateCorrespondentClient{}
-	client.
-		On("Epa", mock.Anything, 2).
-		Return(sirius.Epa{}, nil).
-		On("CreateCorrespondent", mock.Anything, 2, correspondent).
-		Return(nil)
-
-	template := &mockTemplate{}
-
-	form := url.Values{
-		"salutation":        {"Rev"},
-		"firstname":         {"Rudolph"},
-		"middlenames":       {"Modesto"},
-		"surname":           {"Stotesbury"},
-		"addressLine1":      {"Rotonda Gerardo 769"},
-		"addressLine2":      {"Appartamento 94"},
-		"addressLine3":      {"Augusto terme"},
-		"town":              {"San Sabazio"},
-		"county":            {"Benevento"},
-		"postcode":          {"57797"},
-		"country":           {"Italy"},
-		"isAirmailRequired": {"true"},
-		"phoneNumber":       {"079876543345"},
-		"email":             {"rm2@email.test"},
-	}
-
-	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2#accordion-create-epa-heading-3", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := CreateCorrespondent(client, template.Func, nil)(w, r)
-	resp := w.Result()
-
-	assert.Equal(t, err, expectedError)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestPostEditCorrespondent(t *testing.T) {
@@ -229,8 +290,6 @@ func TestPostEditCorrespondent(t *testing.T) {
 		On("UpdateCorrespondent", mock.Anything, 7, updatedCorrespondent).
 		Return(nil)
 
-	template := &mockTemplate{}
-
 	form := url.Values{
 		"salutation":        {"Rev"},
 		"firstname":         {"Rudolph"},
@@ -248,16 +307,16 @@ func TestPostEditCorrespondent(t *testing.T) {
 		"email":             {"rm2@email.test"},
 	}
 
-	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2#accordion-create-epa-heading-3", strings.NewReader(form.Encode()))
+	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType=epa", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateCorrespondent(client, template.Func, nil)(w, r)
+	err := CreateCorrespondent(client, nil, nil)(w, r)
 	resp := w.Result()
 
 	assert.Equal(t, err, expectedError)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
+	mock.AssertExpectationsForObjects(t, client)
 }
 
 func TestPostCreateCorrespondentWhenValidationError(t *testing.T) {
@@ -296,6 +355,7 @@ func TestPostCreateCorrespondentWhenValidationError(t *testing.T) {
 		On("Func", mock.Anything, createCorrespondentData{
 			DonorId:       1,
 			CaseId:        2,
+			CaseType:      "epa",
 			Error:         expectedError,
 			Correspondent: correspondent,
 			Title:         "Add a correspondent",
@@ -319,7 +379,7 @@ func TestPostCreateCorrespondentWhenValidationError(t *testing.T) {
 		"email":             {"rm2@email.test"},
 	}
 
-	r, _ := http.NewRequest(http.MethodPost, "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3", strings.NewReader(form.Encode()))
+	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType=epa", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
@@ -358,8 +418,6 @@ func TestPostCreateCorrespondentCreationFails(t *testing.T) {
 		On("CreateCorrespondent", mock.Anything, 2, correspondent).
 		Return(errExample)
 
-	template := &mockTemplate{}
-
 	form := url.Values{
 		"salutation":        {"Rev"},
 		"firstname":         {"Rudolph"},
@@ -377,12 +435,12 @@ func TestPostCreateCorrespondentCreationFails(t *testing.T) {
 		"email":             {"rm2@email.test"},
 	}
 
-	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2#accordion-create-epa-heading-3", strings.NewReader(form.Encode()))
+	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType=epa", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateCorrespondent(client, template.Func, nil)(w, r)
+	err := CreateCorrespondent(client, nil, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
-	mock.AssertExpectationsForObjects(t, client, template)
+	mock.AssertExpectationsForObjects(t, client)
 }
