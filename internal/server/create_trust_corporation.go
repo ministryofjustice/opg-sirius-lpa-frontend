@@ -26,8 +26,6 @@ type createTrustCorporationData struct {
 	IsEditing              bool
 	Title                  string
 	NextTrustCorporationId int
-	HtmxRedirect           string
-	HtmxSwap               string
 	HtmxPost               string
 	AppointedAs            string
 }
@@ -147,27 +145,11 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 			}
 
 			if r.FormValue("add-another-trust-corporation") != "" {
-				if data.IsPartial {
-					data.HtmxRedirect = fmt.Sprintf("/create-trust-corportation?id=%d&caseId=%d&replacement=%s", donorId, caseId, strconv.FormatBool(trustCorporation.IsReplacementAttorney))
-					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
-					return tmpl(w, data)
-				}
 				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&replacement=%s", donorId, caseId, strconv.FormatBool(trustCorporation.IsReplacementAttorney)))
 			}
 
 			if r.FormValue("edit-next-trust-corporation") != "" {
-				if data.IsPartial {
-					data.HtmxRedirect = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s", donorId, caseId, data.NextTrustCorporationId, strconv.FormatBool(trustCorporation.IsReplacementAttorney))
-					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
-					return tmpl(w, data)
-				}
 				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s", donorId, caseId, data.NextTrustCorporationId, strconv.FormatBool(trustCorporation.IsReplacementAttorney)))
-			}
-
-			if data.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId)
-				data.HtmxSwap = "innerHTML show:#accordion-create-lpa-heading-1:top"
-				return tmpl(w, data)
 			}
 
 			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1", donorId, caseId))
