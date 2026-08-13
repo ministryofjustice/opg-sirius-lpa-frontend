@@ -90,7 +90,7 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 
 			data.Title = "Update trust corporation details"
 			data.IsEditing = true
-			data.NextTrustCorporationId = GetNextTrustCorporationId(trustCorporationId, lpa.TrustCorporations)
+			data.NextTrustCorporationId = GetNextTrustCorporationId(trustCorporationId, data.TrustCorporation.IsReplacementAttorney, lpa.TrustCorporations)
 			data.HtmxPost = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&isReplacementAttorney=%s", donorId, caseId, trustCorporationId, strconv.FormatBool(isReplacementAttorney))
 
 			if data.TrustCorporation.IsReplacementAttorney {
@@ -177,10 +177,10 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 	}
 }
 
-func GetNextTrustCorporationId(id int, trustCorporations []sirius.TrustCorporation) int {
+func GetNextTrustCorporationId(id int, isReplacementAttorney bool, trustCorporations []sirius.TrustCorporation) int {
 	nextTrustCorporationId := 0
 	for _, trustCorporation := range trustCorporations {
-		if trustCorporation.ID > id && (nextTrustCorporationId == 0 || trustCorporation.ID < nextTrustCorporationId) {
+		if trustCorporation.ID > id && (nextTrustCorporationId == 0 || trustCorporation.ID < nextTrustCorporationId) && trustCorporation.IsReplacementAttorney == isReplacementAttorney {
 			nextTrustCorporationId = trustCorporation.ID
 		}
 	}
