@@ -24,6 +24,7 @@ import documentListSort from "./document-list-sort";
 import initPdfViewer from "./pdf-viewer";
 import initSiriusHeader from "./sirius-header.js";
 import lpaFormSubtype from "./lpa-form-subtype.js";
+import showHideTrustCorpActiveRadios from "./show-hide-trust-corp-active-radios.js";
 import scrollSectionIntoView from "./scroll-section-into-view.js";
 
 const prefix = document.body.getAttribute("data-prefix");
@@ -51,6 +52,7 @@ documentListSort();
 initPdfViewer();
 initSiriusHeader();
 lpaFormSubtype();
+showHideTrustCorpActiveRadios();
 scrollSectionIntoView();
 
 globalThis.htmx = htmx;
@@ -77,6 +79,7 @@ htmx.on("htmx:afterSettle", (event) => {
     addressFinder(prefix, swapDetails.target);
     lpaFormSubtype(swapDetails.target);
     scrollSectionIntoView(swapDetails.target);
+    showHideTrustCorpActiveRadios(swapDetails.target);
 
     // Update the action panel width if swapping in create-document or edit-document content
     if (swapDetails.target.id === "actions-content") {

@@ -198,13 +198,13 @@ func TestCaseWithFeeReduction(t *testing.T) {
 
 func TestCaseFiltersInactiveActors(t *testing.T) {
 	actor1 := Attorney{Person: Person{ID: 1}, SystemStatus: shared.BoolPtr(true)}
-	actor2 := Attorney{Person: Person{ID: 2}, SystemStatus: shared.BoolPtr(true)}
+	actor2 := TrustCorporation{Attorney: Attorney{Person: Person{ID: 2}, SystemStatus: shared.BoolPtr(true)}}
 	inactiveActor1 := Attorney{Person: Person{ID: 3}, SystemStatus: shared.BoolPtr(false)}
-	inactiveActor2 := Attorney{Person: Person{ID: 4}, SystemStatus: shared.BoolPtr(false)}
+	inactiveActor2 := TrustCorporation{Attorney: Attorney{Person: Person{ID: 4}, SystemStatus: shared.BoolPtr(false)}}
 
-	caseItem := Case{ID: 1, Attorneys: []Attorney{actor1, inactiveActor1}, TrustCorporations: []Attorney{actor2, inactiveActor2}}
+	caseItem := Case{ID: 1, Attorneys: []Attorney{actor1, inactiveActor1}, TrustCorporations: []TrustCorporation{actor2, inactiveActor2}}
 	filteredCase := caseItem.FilterInactiveAttorneys()
 
 	assert.Equal(t, []Attorney{actor1}, filteredCase.Attorneys)
-	assert.Equal(t, []Attorney{actor2}, filteredCase.TrustCorporations)
+	assert.Equal(t, []TrustCorporation{actor2}, filteredCase.TrustCorporations)
 }
