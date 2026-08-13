@@ -11,6 +11,14 @@
 
             <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
+            {{ if not .IsEditing }}
+                <div class="govuk-button-group govuk-button-group--row">
+                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-trust-corporation?id=%d&caseId=%d&replacement=true" .DonorId .CaseId) }}">
+                        Add a trust corporation as a replacement attorney
+                    </a>
+                </div>
+            {{ end }}
+
             <form class="form" method="POST">
 
                 {{ template "createReplacementAttorney" . }}
