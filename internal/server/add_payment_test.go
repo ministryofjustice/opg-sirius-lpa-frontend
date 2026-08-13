@@ -271,7 +271,7 @@ func TestPostAddPaymentHTMX(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, nil)(w, r)
+	err := AddPayment(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
