@@ -176,6 +176,19 @@
                       {{ template "person-details-table" . }}
                     </div>
                   </details>
+                  <span class="app-create-lpa__summary-update-link">
+                    <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
+                            id="f-update-replacementAttorney-{{ .ID }}"
+                            name="updateReplacementAttorney"
+                            type="submit"
+                            value="{{ .ID }}"
+                    >
+                      Update
+                      <span class="govuk-visually-hidden">
+                          replacement attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                      </span>
+                    </button>
+                  </span>
                 </div>
               {{ end }}
             {{ end }}
@@ -315,8 +328,8 @@
             {{ if .AllowNewNotifiedPerson }}
               <div class="govuk-button-group app-button-group--column">
                 <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
-                      type="submit" data-disable-after-click="true" name="addNotifiedPerson"
-                      value="Add notified person"/>
+                       type="submit" data-disable-after-click="true" name="addNotifiedPerson"
+                       value="Add notified person"/>
               </div>
             {{ end }}
           </div>

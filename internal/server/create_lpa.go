@@ -237,6 +237,20 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorID, data.CaseId))
 		}
 
+		if updateReplacementAttorney := r.FormValue("updateReplacementAttorney"); updateReplacementAttorney != "" {
+			attorneyID, err := strToIntOrStatusError(updateReplacementAttorney)
+			if err != nil {
+				return err
+			}
+
+			if r.Header.Get("HX-Request") == "true" {
+				data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d", donorID, data.CaseId, attorneyID)
+				data.HtmxSwap = "innerHTML"
+				return partialTmpl(w, data)
+			}
+			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d", donorID, data.CaseId, attorneyID))
+		}
+
 		if r.Header.Get("HX-Request") == "true" {
 			return partialTmpl(w, data)
 		}
