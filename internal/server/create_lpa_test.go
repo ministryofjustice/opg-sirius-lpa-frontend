@@ -1075,7 +1075,7 @@ func TestPostCreateLpaEditTrustCorporationSignatureDates(t *testing.T) {
 			TrustCorporations: []sirius.TrustCorporation{
 				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 876}, LpaPartCSignatureDate: sirius.DateString("2022-01-01")}},
 				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 987}, LpaPartCSignatureDate: sirius.DateString("2022-01-02")}},
-				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 786}}},
+				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 786}}, TrustCorporationAppointedAs: "Replacement Attorney"},
 			},
 		},
 	}
