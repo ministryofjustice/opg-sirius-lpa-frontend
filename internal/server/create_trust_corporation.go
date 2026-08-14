@@ -17,17 +17,17 @@ type CreateTrustCorporationClient interface {
 }
 
 type createTrustCorporationData struct {
-	XSRFToken              string
-	IsPartial              bool
-	TrustCorporation       sirius.TrustCorporation
-	Error                  sirius.ValidationError
-	DonorId                int
-	CaseId                 int
-	IsEditing              bool
-	Title                  string
-	NextTrustCorporationId int
-	HtmxPost               string
 	AppointedAs            string
+	CaseId                 int
+	DonorId                int
+	Error                  sirius.ValidationError
+	HtmxPost               string
+	IsEditing              bool
+	IsPartial              bool
+	NextTrustCorporationId int
+	Title                  string
+	TrustCorporation       sirius.TrustCorporation
+	XSRFToken              string
 }
 
 func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.Template) Handler {
