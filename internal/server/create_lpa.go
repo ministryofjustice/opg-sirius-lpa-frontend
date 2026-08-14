@@ -22,8 +22,9 @@ type CreateLpaClient interface {
 }
 
 type createLpaData struct {
-	AppointmentType                      string
 	AllowNewNotifiedPerson               bool
+	AppointmentType                      string
+	AttorneyTrustCorporations            []sirius.TrustCorporation
 	CanEditReceiptDate                   bool
 	CaseId                               int
 	DonorId                              int
@@ -33,7 +34,6 @@ type createLpaData struct {
 	HtmxSwap                             string
 	IsUpdate                             bool
 	Lpa                                  sirius.Lpa
-	AttorneyTrustCorporations            []sirius.TrustCorporation
 	ReplacementAttorneyTrustCorporations []sirius.TrustCorporation
 	Success                              bool
 	SuccessMessage                       string
