@@ -54,6 +54,11 @@ func (m *mockCreateLpaClient) UpdateReplacementAttorney(ctx sirius.Context, atto
 	return args.Error(0)
 }
 
+func (m *mockCreateLpaClient) UpdateTrustCorporation(ctx sirius.Context, trustCorporationId int, trustCorporation sirius.TrustCorporation) error {
+	args := m.Called(ctx, trustCorporationId, trustCorporation)
+	return args.Error(0)
+}
+
 func TestGetCreateLpa(t *testing.T) {
 	client := &mockCreateLpaClient{}
 	client.
@@ -1062,6 +1067,78 @@ func TestPostCreateLpaEditReplacementAttorneySignatureDates(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestPostCreateLpaEditTrustCorporationSignatureDates(t *testing.T) {
+	existingLpa := sirius.Lpa{
+		Case: sirius.Case{
+			ID:          456,
+			ReceiptDate: sirius.DateString("2022-01-01"),
+			TrustCorporations: []sirius.TrustCorporation{
+				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 876}, LpaPartCSignatureDate: sirius.DateString("2022-01-01")}},
+				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 987}, LpaPartCSignatureDate: sirius.DateString("2022-01-02")}},
+				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 786}}},
+			},
+		},
+	}
+	submittedLpa := sirius.Lpa{
+		ApplicationHasGuidance:                    shared.BoolPtr(false),
+		ApplicationHasRestrictions:                shared.BoolPtr(false),
+		PaymentByDebitCreditCard:                  shared.BoolPtr(false),
+		PaymentRemission:                          shared.BoolPtr(false),
+		RepeatApplication:                         shared.BoolPtr(false),
+		AnyOtherInfo:                              shared.BoolPtr(false),
+		LifeSustainingTreatmentSignedAndWitnessed: shared.BoolPtr(false),
+		Case: sirius.Case{
+			SubType:                         "hw",
+			ReceiptDate:                     sirius.DateString("2022-01-01"),
+			CaseAttorneySingular:            shared.BoolPtr(false),
+			CaseAttorneyJointly:             shared.BoolPtr(true),
+			CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:  shared.BoolPtr(false),
+			PaymentExemption: shared.BoolPtr(false),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("Lpa", mock.Anything, 456).
+		Return(existingLpa, nil)
+	client.
+		On("UpdateLpa", mock.Anything, 456, submittedLpa).
+		Return(nil)
+	client.
+		On("UpdateTrustCorporation", mock.Anything, 876, sirius.TrustCorporation{Attorney: sirius.Attorney{Person: sirius.Person{ID: 876}, LpaPartCSignatureDate: sirius.DateString("2022-01-02")}}).
+		Return(nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.Anything).
+		Return(nil)
+
+	form := url.Values{
+		"caseSubtype":               {"hw"},
+		"receiptDate":               {"2099-01-01"},
+		"caseAttorney":              {"jointly"},
+		"lpaPartCSignatureDate-876": {"2022-01-02"},
+		"lpaPartCSignatureDate-987": {"2022-01-02"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&caseId=456", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestPostCreateLpaEditAttorneySignatureDatesError(t *testing.T) {
 	existingLpa := sirius.Lpa{
 		Case: sirius.Case{
@@ -1176,6 +1253,73 @@ func TestPostCreateLpaEditReplacementAttorneySignatureDatesError(t *testing.T) {
 		Return(nil)
 	client.
 		On("UpdateReplacementAttorney", mock.Anything, 876, sirius.Attorney{Person: sirius.Person{ID: 876}, LpaPartCSignatureDate: sirius.DateString("2022-01-02")}).
+		Return(errExample)
+
+	form := url.Values{
+		"caseSubtype":               {"hw"},
+		"receiptDate":               {"2099-01-01"},
+		"caseAttorney":              {"jointly"},
+		"lpaPartCSignatureDate-876": {"2022-01-02"},
+		"lpaPartCSignatureDate-987": {"2022-01-02"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&caseId=456", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, nil, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestPostCreateLpaEditTrustCorporationSignatureDatesError(t *testing.T) {
+	existingLpa := sirius.Lpa{
+		Case: sirius.Case{
+			ID:          456,
+			ReceiptDate: sirius.DateString("2022-01-01"),
+			TrustCorporations: []sirius.TrustCorporation{
+				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 876}, LpaPartCSignatureDate: sirius.DateString("2022-01-01")}},
+				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 987}, LpaPartCSignatureDate: sirius.DateString("2022-01-02")}},
+				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 786}}},
+			},
+		},
+	}
+	submittedLpa := sirius.Lpa{
+		ApplicationHasGuidance:                    shared.BoolPtr(false),
+		ApplicationHasRestrictions:                shared.BoolPtr(false),
+		PaymentByDebitCreditCard:                  shared.BoolPtr(false),
+		PaymentRemission:                          shared.BoolPtr(false),
+		RepeatApplication:                         shared.BoolPtr(false),
+		AnyOtherInfo:                              shared.BoolPtr(false),
+		LifeSustainingTreatmentSignedAndWitnessed: shared.BoolPtr(false),
+		Case: sirius.Case{
+			SubType:                         "hw",
+			ReceiptDate:                     sirius.DateString("2022-01-01"),
+			CaseAttorneySingular:            shared.BoolPtr(false),
+			CaseAttorneyJointly:             shared.BoolPtr(true),
+			CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:  shared.BoolPtr(false),
+			PaymentExemption: shared.BoolPtr(false),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("Lpa", mock.Anything, 456).
+		Return(existingLpa, nil)
+	client.
+		On("UpdateLpa", mock.Anything, 456, submittedLpa).
+		Return(nil)
+	client.
+		On("UpdateTrustCorporation", mock.Anything, 876, sirius.TrustCorporation{Attorney: sirius.Attorney{Person: sirius.Person{ID: 876}, LpaPartCSignatureDate: sirius.DateString("2022-01-02")}}).
 		Return(errExample)
 
 	form := url.Values{
@@ -1465,6 +1609,42 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 	}
 }
 
+func TestPostCreateLpaUpdateTrustCorporationBadId(t *testing.T) {
+	for _, isReplacementAttorney := range []bool{false, true} {
+		t.Run("Is Replacement Attorney: "+strconv.FormatBool(isReplacementAttorney), func(t *testing.T) {
+			client := &mockCreateLpaClient{}
+			client.
+				On("Person", mock.Anything, 1).
+				Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
+			client.
+				On("GetUserPermissions", mock.Anything).
+				Return(sirius.Permissions{}, nil)
+			client.
+				On("CreateLpa", mock.Anything, 1, mock.Anything).
+				Return(sirius.Lpa{Case: sirius.Case{ID: 2}}, nil)
+
+			form := url.Values{
+				"caseSubtype": {"pfa"},
+			}
+
+			if isReplacementAttorney {
+				form["updateTrustCorporationReplacementAttorney"] = []string{"bad-id"}
+			} else {
+				form["updateTrustCorporationAttorney"] = []string{"bad-id"}
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/create-lpa?id=1", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := CreateLpa(client, nil, nil)(w, r)
+
+			assert.NotNil(t, err)
+			mock.AssertExpectationsForObjects(t, client)
+		})
+	}
+}
+
 func TestPostCreateLpaRedirects(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -1507,6 +1687,18 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			formKey:     "updateNotifiedPerson",
 			formValue:   "111",
 			redirectURL: "/create-notified-person?id=1&caseId=2&notifiedPersonId=111",
+		},
+		{
+			name:        "Update attorney trust corporation redirects",
+			formKey:     "updateTrustCorporationAttorney",
+			formValue:   "111",
+			redirectURL: "/create-trust-corporation?id=1&caseId=2&trustCorporationId=111&replacement=false",
+		},
+		{
+			name:        "Update replacement attorney trust corporation redirects",
+			formKey:     "updateTrustCorporationReplacementAttorney",
+			formValue:   "111",
+			redirectURL: "/create-trust-corporation?id=1&caseId=2&trustCorporationId=111&replacement=true",
 		},
 	}
 

@@ -39,9 +39,9 @@
       <div class="govuk-button-group govuk-!-padding-top-5">
         <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
         {{ if not .IsEditing }}
-          <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another-trust-corporation" value="Save and add another {{ ToLower .AppointedAs }}" />
+          <input class="govuk-button" data-module="govuk-button" type="submit" name="addAnotherTrustCorporation" value="Save and add another {{ ToLower .AppointedAs }}" />
         {{ else }}
-          <input class="govuk-button" data-module="govuk-button" type="submit" name="edit-next-trust-corporation" value="Save and update next {{ ToLower .AppointedAs }}" />
+          <input class="govuk-button" data-module="govuk-button" type="submit" name="editNextTrustCorporation" value="Save and update next {{ ToLower .AppointedAs }}" />
         {{ end }}
         <a class="govuk-link govuk-link--no-visited-state"
            href=""
@@ -83,10 +83,10 @@
         <div class="govuk-button-group govuk-!-padding-top-5">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
           {{ if not .IsEditing }}
-            <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another-trust-corporation" value="Save and add another {{ ToLower .AppointedAs }}" />
+            <input class="govuk-button" data-module="govuk-button" type="submit" name="addAnotherTrustCorporation" value="Save and add another {{ ToLower .AppointedAs }}" />
           {{ else }}
             {{ if ne .NextTrustCorporationId 0 }}
-              <input class="govuk-button" data-module="govuk-button" type="submit" name="edit-next-trust-corporation" value="Save and update next {{ ToLower .AppointedAs }}" />
+              <input class="govuk-button" data-module="govuk-button" type="submit" name="editNextTrustCorporation" value="Save and update next {{ ToLower .AppointedAs }}" />
             {{ end }}
           {{ end }}
           <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}">Cancel</a>
@@ -114,7 +114,7 @@
   </div>
 
   {{ template "input" (field "companyName" "Trust corporation name" .TrustCorporation.CompanyName .Error.Field.companyName) }}
-  {{ template "input" (field "companyReference" "Trust corporation registration number" .TrustCorporation.CompanyReference .Error.Field.companyReference) }}
+  {{ template "input" (field "companyNumber" "Trust corporation registration number" .TrustCorporation.CompanyNumber .Error.Field.companyNumber) }}
 
   <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Address" data-app-address-finder-fill-country="false">
     {{ template "input" (field "addressLine1" "Address line 1" .TrustCorporation.AddressLine1 .Error.Field.addressLine1 "data-app-address-finder-map" "addressLine1") }}
