@@ -347,6 +347,56 @@ func TestPostEditTrustCorporationWhenUpdateFails(t *testing.T) {
 	assert.Equal(t, errExample, err)
 }
 
+func TestPostCreateTrustCorporationWhenValidationError(t *testing.T) {
+	expectedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{"field": {"": "problem"}},
+	}
+
+	client := &mockCreateTrustCorporationClient{}
+	client.
+		On("CreateTrustCorporation", mock.Anything, 2, mock.Anything).
+		Return(expectedError)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createTrustCorporationData{
+			AppointedAs: "Attorney",
+			DonorId:     1,
+			CaseId:      2,
+			TrustCorporation: sirius.TrustCorporation{
+				IsReplacementAttorney:       false,
+				TrustCorporationAppointedAs: "Attorney",
+				Attorney: sirius.Attorney{
+					Person: sirius.Person{
+						CompanyName: "ACME",
+					},
+					SystemStatus: shared.BoolPtr(true),
+				},
+			},
+			Title:    "Add a trust corporation",
+			HtmxPost: "/create-trust-corporation?id=1&caseId=2&replacement=false",
+			Error:    expectedError,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"companyName":              {"ACME"},
+		"isReplacementAttorney":    {"false"},
+		"isTrustCorporationActive": {"true"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "create-trust-corporation/?id=1&caseId=2&replacement=false", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateTrustCorporation(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestPostCreateTrustCorporationAddAnotherRedirects(t *testing.T) {
 	expectedTrustCorporation := sirius.TrustCorporation{
 		Attorney: sirius.Attorney{
