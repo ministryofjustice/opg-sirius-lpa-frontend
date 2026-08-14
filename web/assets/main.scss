@@ -1149,7 +1149,8 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   .govuk-form-group {
     border-bottom: 1px solid govuk-functional-colour(border);
   }
-  .govuk-radios__item:last-child, .govuk-radios__item:last-of-type {
+  .govuk-radios__item:last-child,
+  .govuk-radios__item:last-of-type {
     margin-bottom: 10px;
   }
 }
