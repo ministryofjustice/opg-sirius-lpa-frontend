@@ -65,16 +65,16 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 			data.AppointedAs = "Attorney"
 		}
 
-		lpa, err := client.Lpa(ctx, caseId)
-		if err != nil {
-			return err
-		}
-
 		var trustCorporationId int
 		trustCorporationIdStr := r.FormValue("trustCorporationId")
 		isEditing := trustCorporationIdStr != ""
 		if isEditing {
 			trustCorporationId, err = strToIntOrStatusError(trustCorporationIdStr)
+			if err != nil {
+				return err
+			}
+
+			lpa, err := client.Lpa(ctx, caseId)
 			if err != nil {
 				return err
 			}
@@ -89,7 +89,7 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 			data.Title = "Update trust corporation details"
 			data.IsEditing = true
 			data.NextTrustCorporationId = GetNextTrustCorporationId(trustCorporationId, data.TrustCorporation.IsReplacementAttorney, lpa.TrustCorporations)
-			data.HtmxPost = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&isReplacementAttorney=%s", donorId, caseId, trustCorporationId, strconv.FormatBool(isReplacementAttorney))
+			data.HtmxPost = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s", donorId, caseId, trustCorporationId, strconv.FormatBool(isReplacementAttorney))
 
 			if data.TrustCorporation.IsReplacementAttorney {
 				data.AppointedAs = "Replacement attorney"
@@ -103,7 +103,6 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 				Attorney: sirius.Attorney{
 					Person: sirius.Person{
 						CompanyName:       postFormString(r, "companyName"),
-						CompanyReference:  postFormString(r, "companyReference"),
 						PhoneNumber:       postFormString(r, "phoneNumber"),
 						Email:             postFormString(r, "email"),
 						AddressLine1:      postFormString(r, "addressLine1"),
@@ -115,6 +114,7 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 						Postcode:          postFormString(r, "postcode"),
 						IsAirmailRequired: postFormString(r, "isAirmailRequired") == "true",
 					},
+					CompanyNumber: postFormString(r, "companyNumber"),
 				},
 				IsReplacementAttorney: postFormString(r, "isReplacementAttorney") == "true",
 			}
@@ -144,11 +144,11 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 				return err
 			}
 
-			if r.FormValue("add-another-trust-corporation") != "" {
+			if r.FormValue("addAnotherTrustCorporation") != "" {
 				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&replacement=%s", donorId, caseId, strconv.FormatBool(trustCorporation.IsReplacementAttorney)))
 			}
 
-			if r.FormValue("edit-next-trust-corporation") != "" {
+			if r.FormValue("editNextTrustCorporation") != "" {
 				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s", donorId, caseId, data.NextTrustCorporationId, strconv.FormatBool(trustCorporation.IsReplacementAttorney)))
 			}
 
