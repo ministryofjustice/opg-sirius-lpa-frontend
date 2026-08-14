@@ -24,6 +24,7 @@ import documentListSort from "./document-list-sort";
 import initPdfViewer from "./pdf-viewer";
 import initSiriusHeader from "./sirius-header.js";
 import lpaFormSubtype from "./lpa-form-subtype.js";
+import scrollSectionIntoView from "./scroll-section-into-view.js";
 
 const prefix = document.body.getAttribute("data-prefix");
 
@@ -50,6 +51,7 @@ documentListSort();
 initPdfViewer();
 initSiriusHeader();
 lpaFormSubtype();
+scrollSectionIntoView();
 
 globalThis.htmx = htmx;
 // Don't include indicator styles as CSP blocks inline styles
@@ -74,6 +76,7 @@ htmx.on("htmx:afterSettle", (event) => {
     textEditor();
     addressFinder(prefix, swapDetails.target);
     lpaFormSubtype(swapDetails.target);
+    scrollSectionIntoView(swapDetails.target);
 
     // Update the action panel width if swapping in create-document or edit-document content
     if (swapDetails.target.id === "actions-content") {
