@@ -49,6 +49,11 @@ func (m *mockCreateLpaClient) UpdateAttorney(ctx sirius.Context, attorneyId int,
 	return args.Error(0)
 }
 
+func (m *mockCreateLpaClient) UpdateReplacementAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error {
+	args := m.Called(ctx, attorneyId, attorney)
+	return args.Error(0)
+}
+
 func TestGetCreateLpa(t *testing.T) {
 	client := &mockCreateLpaClient{}
 	client.
@@ -985,6 +990,78 @@ func TestPostCreateLpaEditAttorneySignatureDates(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestPostCreateLpaEditReplacementAttorneySignatureDates(t *testing.T) {
+	existingLpa := sirius.Lpa{
+		Case: sirius.Case{
+			ID:          456,
+			ReceiptDate: sirius.DateString("2022-01-01"),
+			ReplacementAttorneys: []sirius.Attorney{
+				{Person: sirius.Person{ID: 876}, LpaPartCSignatureDate: sirius.DateString("2022-01-01")},
+				{Person: sirius.Person{ID: 987}, LpaPartCSignatureDate: sirius.DateString("2022-01-02")},
+				{Person: sirius.Person{ID: 786}},
+			},
+		},
+	}
+	submittedLpa := sirius.Lpa{
+		ApplicationHasGuidance:                    shared.BoolPtr(false),
+		ApplicationHasRestrictions:                shared.BoolPtr(false),
+		PaymentByDebitCreditCard:                  shared.BoolPtr(false),
+		PaymentRemission:                          shared.BoolPtr(false),
+		RepeatApplication:                         shared.BoolPtr(false),
+		AnyOtherInfo:                              shared.BoolPtr(false),
+		LifeSustainingTreatmentSignedAndWitnessed: shared.BoolPtr(false),
+		Case: sirius.Case{
+			SubType:                         "hw",
+			ReceiptDate:                     sirius.DateString("2022-01-01"),
+			CaseAttorneySingular:            shared.BoolPtr(false),
+			CaseAttorneyJointly:             shared.BoolPtr(true),
+			CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:  shared.BoolPtr(false),
+			PaymentExemption: shared.BoolPtr(false),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("Lpa", mock.Anything, 456).
+		Return(existingLpa, nil)
+	client.
+		On("UpdateLpa", mock.Anything, 456, submittedLpa).
+		Return(nil)
+	client.
+		On("UpdateReplacementAttorney", mock.Anything, 876, sirius.Attorney{Person: sirius.Person{ID: 876}, LpaPartCSignatureDate: sirius.DateString("2022-01-02")}).
+		Return(nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.Anything).
+		Return(nil)
+
+	form := url.Values{
+		"caseSubtype":               {"hw"},
+		"receiptDate":               {"2099-01-01"},
+		"caseAttorney":              {"jointly"},
+		"lpaPartCSignatureDate-876": {"2022-01-02"},
+		"lpaPartCSignatureDate-987": {"2022-01-02"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&caseId=456", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func, nil)(w, r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestPostCreateLpaEditAttorneySignatureDatesError(t *testing.T) {
 	existingLpa := sirius.Lpa{
 		Case: sirius.Case{
@@ -1032,6 +1109,73 @@ func TestPostCreateLpaEditAttorneySignatureDatesError(t *testing.T) {
 		Return(nil)
 	client.
 		On("UpdateAttorney", mock.Anything, 876, sirius.Attorney{Person: sirius.Person{ID: 876}, LpaPartCSignatureDate: sirius.DateString("2022-01-02")}).
+		Return(errExample)
+
+	form := url.Values{
+		"caseSubtype":               {"hw"},
+		"receiptDate":               {"2099-01-01"},
+		"caseAttorney":              {"jointly"},
+		"lpaPartCSignatureDate-876": {"2022-01-02"},
+		"lpaPartCSignatureDate-987": {"2022-01-02"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&caseId=456", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, nil, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestPostCreateLpaEditReplacementAttorneySignatureDatesError(t *testing.T) {
+	existingLpa := sirius.Lpa{
+		Case: sirius.Case{
+			ID:          456,
+			ReceiptDate: sirius.DateString("2022-01-01"),
+			ReplacementAttorneys: []sirius.Attorney{
+				{Person: sirius.Person{ID: 876}, LpaPartCSignatureDate: sirius.DateString("2022-01-01")},
+				{Person: sirius.Person{ID: 987}, LpaPartCSignatureDate: sirius.DateString("2022-01-02")},
+				{Person: sirius.Person{ID: 786}},
+			},
+		},
+	}
+	submittedLpa := sirius.Lpa{
+		ApplicationHasGuidance:                    shared.BoolPtr(false),
+		ApplicationHasRestrictions:                shared.BoolPtr(false),
+		PaymentByDebitCreditCard:                  shared.BoolPtr(false),
+		PaymentRemission:                          shared.BoolPtr(false),
+		RepeatApplication:                         shared.BoolPtr(false),
+		AnyOtherInfo:                              shared.BoolPtr(false),
+		LifeSustainingTreatmentSignedAndWitnessed: shared.BoolPtr(false),
+		Case: sirius.Case{
+			SubType:                         "hw",
+			ReceiptDate:                     sirius.DateString("2022-01-01"),
+			CaseAttorneySingular:            shared.BoolPtr(false),
+			CaseAttorneyJointly:             shared.BoolPtr(true),
+			CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
+			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+			PaymentByCheque:  shared.BoolPtr(false),
+			PaymentExemption: shared.BoolPtr(false),
+		},
+	}
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+	client.
+		On("Lpa", mock.Anything, 456).
+		Return(existingLpa, nil)
+	client.
+		On("UpdateLpa", mock.Anything, 456, submittedLpa).
+		Return(nil)
+	client.
+		On("UpdateReplacementAttorney", mock.Anything, 876, sirius.Attorney{Person: sirius.Person{ID: 876}, LpaPartCSignatureDate: sirius.DateString("2022-01-02")}).
 		Return(errExample)
 
 	form := url.Values{
@@ -1443,43 +1587,61 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 		name        string
 		formKey     string
 		formValue   string
-		redirectURL string
+		expectedErr error
 	}{
 		{
 			name:        "Add attorney redirects",
 			formKey:     "addAttorney",
 			formValue:   "true",
-			redirectURL: "/create-attorney?id=1&caseId=2&caseType=lpa",
+			expectedErr: RedirectError("/create-attorney?id=1&caseId=2&caseType=lpa"),
 		},
 		{
 			name:        "Add certificate provider redirects",
 			formKey:     "addCertificateProvider",
 			formValue:   "true",
-			redirectURL: "/create-certificate-provider?id=1&caseId=2",
+			expectedErr: RedirectError("/create-certificate-provider?id=1&caseId=2"),
 		},
 		{
 			name:        "Add correspondent",
 			formKey:     "addCorrespondent",
 			formValue:   "true",
-			redirectURL: "/select-or-create-correspondent?id=1&caseId=2&caseType=lpa",
+			expectedErr: RedirectError("/select-or-create-correspondent?id=1&caseId=2&caseType=lpa"),
 		},
 		{
 			name:        "Update correspondent",
 			formKey:     "updateCorrespondent",
 			formValue:   "true",
-			redirectURL: "/create-correspondent?id=1&caseId=2&caseType=lpa",
+			expectedErr: RedirectError("/create-correspondent?id=1&caseId=2&caseType=lpa"),
 		},
 		{
 			name:        "Add notified person redirects",
 			formKey:     "addNotifiedPerson",
 			formValue:   "true",
-			redirectURL: "/create-notified-person?id=1&caseId=2",
+			expectedErr: RedirectError("/create-notified-person?id=1&caseId=2"),
 		},
 		{
 			name:        "Update notified person redirects",
 			formKey:     "updateNotifiedPerson",
 			formValue:   "111",
-			redirectURL: "/create-notified-person?id=1&caseId=2&notifiedPersonId=111",
+			expectedErr: RedirectError("/create-notified-person?id=1&caseId=2&notifiedPersonId=111"),
+		},
+		{
+			name:        "Update certificate provider redirects",
+			formKey:     "updateCertificateProvider",
+			formValue:   "3",
+			expectedErr: RedirectError("/edit-certificate-provider?id=1&caseId=2&personId=3"),
+		},
+		{
+			name:        "Update notified person with invalid ID errors",
+			formKey:     "updateNotifiedPerson",
+			formValue:   "not-a-number",
+			expectedErr: sirius.StatusError{Code: http.StatusBadRequest},
+		},
+		{
+			name:        "Update certificate provider with invalid ID errors",
+			formKey:     "updateCertificateProvider",
+			formValue:   "not-a-number",
+			expectedErr: sirius.StatusError{Code: http.StatusBadRequest},
 		},
 		{
 			name:        "Update replacement attorney redirects",
@@ -1516,7 +1678,7 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			err := CreateLpa(client, template.Func, template.Func)(w, r)
 			resp := w.Result()
 
-			assert.Equal(t, RedirectError(tc.redirectURL), err)
+			assert.Equal(t, tc.expectedErr, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client, template)
 		})

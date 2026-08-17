@@ -1,6 +1,6 @@
 {{ template "page" . }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add a certificate provider{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ .Title }}{{ end }}
 
 {{ define "main" }}
     <div class="govuk-grid-row">
@@ -9,12 +9,12 @@
 
             <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-3" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
 
-            <h1 class="govuk-heading-l">Add a certificate provider</h1>
+            <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
             <form class="form" method="POST">
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-                {{ template "create-certificate-provider" . }}
+                {{ template "certificate-provider" . }}
 
                 <div class="govuk-button-group govuk-!-padding-top-5">
                     <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
