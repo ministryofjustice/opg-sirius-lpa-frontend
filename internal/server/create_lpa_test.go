@@ -231,6 +231,55 @@ func TestGetCreateLpaEdit(t *testing.T) {
 	}
 }
 
+func TestGetCreateLpaEditWithTrustCorporations(t *testing.T) {
+	for _, isReplacementAttorney := range []string{"true", "false"} {
+		t.Run("Is Replacement Attorney"+isReplacementAttorney, func(t *testing.T) {
+			lpa := sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{{IsReplacementAttorney: isReplacementAttorney == "true"}}}}
+			client := &mockCreateLpaClient{}
+			client.
+				On("Person", mock.Anything, 123).
+				Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
+			client.
+				On("GetUserPermissions", mock.Anything).
+				Return(sirius.Permissions{}, nil)
+			client.
+				On("Lpa", mock.Anything, 456).
+				Return(lpa, nil)
+
+			data := createLpaData{
+				DonorId:                123,
+				DonorName:              "Firstname Surname",
+				Title:                  "Edit LPA",
+				CaseId:                 456,
+				Lpa:                    lpa,
+				IsUpdate:               true,
+				AllowNewNotifiedPerson: true,
+			}
+
+			if isReplacementAttorney == "true" {
+				data.ReplacementAttorneyTrustCorporations = []sirius.TrustCorporation{{IsReplacementAttorney: true}}
+			} else {
+				data.AttorneyTrustCorporations = []sirius.TrustCorporation{{IsReplacementAttorney: false}}
+			}
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, data).
+				Return(nil)
+
+			r, _ := http.NewRequest(http.MethodGet, "/?id=123&caseId=456", nil)
+			w := httptest.NewRecorder()
+
+			err := CreateLpa(client, template.Func, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
 func TestGetCreateLpaBadQuery(t *testing.T) {
 	testCases := map[string]string{
 		"no-id":       "/",
