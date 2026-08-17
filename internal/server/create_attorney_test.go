@@ -62,6 +62,7 @@ func TestGetCreateAttorney(t *testing.T) {
 				Return(mockRelationshipToDonorCategories, nil)
 
 			expectedData := createAttorneyData{
+				IsPartial:            isHtmx,
 				DonorId:              1,
 				CaseId:               2,
 				RelationshipToDonors: mockRelationshipToDonorCategories,
@@ -78,10 +79,11 @@ func TestGetCreateAttorney(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			if isHtmx {
+
 				r.Header.Add("HX-Request", "true")
 			}
 
-			err := CreateAttorney(client, template.Func, template.Func)(w, r)
+			err := CreateAttorney(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -133,7 +135,7 @@ func TestGetEditAttorney(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&attorneyId=4&caseType="+caseType, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateAttorney(client, template.Func, nil)(w, r)
+			err := CreateAttorney(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -155,7 +157,7 @@ func TestGetCreateAttorneyBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, query, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateAttorney(nil, nil, nil)(w, r)
+			err := CreateAttorney(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -171,7 +173,7 @@ func TestGetCreateAttorneyWhenRefDataErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateAttorney(client, nil, nil)(w, r)
+	err := CreateAttorney(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -210,11 +212,11 @@ func TestPostCreateAttorney(t *testing.T) {
 				Return(mockRelationshipToDonorCategories, nil)
 
 			template := &mockTemplate{}
-			partialTmpl := &mockTemplate{}
 
 			if isHtmx {
-				partialTmpl.
+				template.
 					On("Func", mock.Anything, createAttorneyData{
+						IsPartial:            true,
 						DonorId:              1,
 						CaseId:               2,
 						RelationshipToDonors: mockRelationshipToDonorCategories,
@@ -255,7 +257,7 @@ func TestPostCreateAttorney(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateAttorney(client, template.Func, partialTmpl.Func)(w, r)
+			err := CreateAttorney(client, template.Func)(w, r)
 			resp := w.Result()
 
 			if !isHtmx {
@@ -263,7 +265,7 @@ func TestPostCreateAttorney(t *testing.T) {
 				assert.Equal(t, err, expectedError)
 			}
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template, partialTmpl)
+			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -305,11 +307,11 @@ func TestPostEditAttorney(t *testing.T) {
 				Return(nil)
 
 			template := &mockTemplate{}
-			partialTemplate := &mockTemplate{}
 
 			if isHtmx {
-				partialTemplate.
+				template.
 					On("Func", mock.Anything, createAttorneyData{
+						IsPartial:            true,
 						DonorId:              1,
 						CaseId:               2,
 						RelationshipToDonors: mockRelationshipToDonorCategories,
@@ -350,7 +352,7 @@ func TestPostEditAttorney(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateAttorney(client, template.Func, partialTemplate.Func)(w, r)
+			err := CreateAttorney(client, template.Func)(w, r)
 			resp := w.Result()
 
 			if !isHtmx {
@@ -360,7 +362,7 @@ func TestPostEditAttorney(t *testing.T) {
 				assert.Nil(t, err)
 			}
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -398,11 +400,11 @@ func TestPostCreateAttorneyAddAnother(t *testing.T) {
 				Return(mockRelationshipToDonorCategories, nil)
 
 			template := &mockTemplate{}
-			partialTemplate := &mockTemplate{}
 
 			if isHtmx {
-				partialTemplate.
+				template.
 					On("Func", mock.Anything, createAttorneyData{
+						IsPartial:            true,
 						DonorId:              1,
 						CaseId:               2,
 						RelationshipToDonors: mockRelationshipToDonorCategories,
@@ -443,7 +445,7 @@ func TestPostCreateAttorneyAddAnother(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateAttorney(client, template.Func, partialTemplate.Func)(w, r)
+			err := CreateAttorney(client, template.Func)(w, r)
 			resp := w.Result()
 
 			if !isHtmx {
@@ -453,7 +455,7 @@ func TestPostCreateAttorneyAddAnother(t *testing.T) {
 				assert.Nil(t, err)
 			}
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -496,27 +498,18 @@ func TestPostCreateAttorneyWhenValidationError(t *testing.T) {
 				Return(mockRelationshipToDonorCategories, nil)
 
 			template := &mockTemplate{}
-			partialTemplate := &mockTemplate{}
-
-			expectedData := createAttorneyData{
-				Attorney:             attorney,
-				DonorId:              1,
-				CaseId:               2,
-				Error:                expectedError,
-				RelationshipToDonors: mockRelationshipToDonorCategories,
-				Title:                "Add an attorney",
-				CaseType:             "epa",
-			}
-
-			if isHtmx {
-				partialTemplate.
-					On("Func", mock.Anything, expectedData).
-					Return(nil)
-			} else {
-				template.
-					On("Func", mock.Anything, expectedData).
-					Return(nil)
-			}
+			template.
+				On("Func", mock.Anything, createAttorneyData{
+					IsPartial:            isHtmx,
+					Attorney:             attorney,
+					DonorId:              1,
+					CaseId:               2,
+					Error:                expectedError,
+					RelationshipToDonors: mockRelationshipToDonorCategories,
+					Title:                "Add an attorney",
+					CaseType:             "epa",
+				}).
+				Return(nil)
 
 			form := url.Values{
 				"salutation":          {"Rev"},
@@ -545,12 +538,12 @@ func TestPostCreateAttorneyWhenValidationError(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateAttorney(client, template.Func, partialTemplate.Func)(w, r)
+			err := CreateAttorney(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
 			assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -588,11 +581,11 @@ func TestPostCreateAttorneyNextAnother(t *testing.T) {
 				Return(mockRelationshipToDonorCategories, nil)
 
 			template := &mockTemplate{}
-			partialTemplate := &mockTemplate{}
 
 			if isHtmx {
-				partialTemplate.
+				template.
 					On("Func", mock.Anything, createAttorneyData{
+						IsPartial:            true,
 						DonorId:              1,
 						CaseId:               2,
 						RelationshipToDonors: mockRelationshipToDonorCategories,
@@ -634,7 +627,7 @@ func TestPostCreateAttorneyNextAnother(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateAttorney(client, template.Func, partialTemplate.Func)(w, r)
+			err := CreateAttorney(client, template.Func)(w, r)
 			resp := w.Result()
 
 			if !isHtmx {
@@ -644,7 +637,7 @@ func TestPostCreateAttorneyNextAnother(t *testing.T) {
 				assert.Nil(t, err)
 			}
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
