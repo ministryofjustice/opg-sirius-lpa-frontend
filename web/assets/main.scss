@@ -1150,3 +1150,7 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
     border-bottom: 1px solid govuk-functional-colour(border);
   }
 }
+
+.govuk-table[data-module="moj-sortable-table"] + div[role="status"] {
+  bottom: 0;
+}
