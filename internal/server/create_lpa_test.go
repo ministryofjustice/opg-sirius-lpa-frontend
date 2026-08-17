@@ -1465,6 +1465,123 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 	}
 }
 
+func TestPostCreateLpaUpdateReplacementAttorney(t *testing.T) {
+	for _, isHtmx := range []bool{false, true} {
+		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
+			existingLpa := sirius.Lpa{
+				Case: sirius.Case{
+					ID:          456,
+					ReceiptDate: sirius.DateString("2022-01-01"),
+					ReplacementAttorneys: []sirius.Attorney{
+						{Person: sirius.Person{ID: 999, Firstname: "Rudolph", Surname: "Stotesbury"}},
+					},
+				},
+			}
+
+			submittedLpa := sirius.Lpa{
+				ApplicationHasGuidance:                    shared.BoolPtr(false),
+				ApplicationHasRestrictions:                shared.BoolPtr(false),
+				PaymentByDebitCreditCard:                  shared.BoolPtr(false),
+				PaymentRemission:                          shared.BoolPtr(false),
+				RepeatApplication:                         shared.BoolPtr(false),
+				AnyOtherInfo:                              shared.BoolPtr(false),
+				LifeSustainingTreatmentSignedAndWitnessed: shared.BoolPtr(false),
+				Case: sirius.Case{
+					SubType:                         "hw",
+					ReceiptDate:                     sirius.DateString("2022-01-01"),
+					CaseAttorneySingular:            shared.BoolPtr(false),
+					CaseAttorneyJointly:             shared.BoolPtr(true),
+					CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
+					CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+					PaymentByCheque:  shared.BoolPtr(false),
+					PaymentExemption: shared.BoolPtr(false),
+				},
+			}
+
+			client := &mockCreateLpaClient{}
+			client.
+				On("Person", mock.Anything, 123).
+				Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
+			client.
+				On("GetUserPermissions", mock.Anything).
+				Return(sirius.Permissions{}, nil)
+			client.
+				On("Lpa", mock.Anything, 456).
+				Return(existingLpa, nil)
+			client.
+				On("UpdateLpa", mock.Anything, 456, submittedLpa).
+				Return(nil)
+
+			template := &mockTemplate{}
+			partialTemplate := &mockTemplate{}
+
+			expectedData := createLpaData{
+				AllowNewNotifiedPerson: true,
+				DonorId:                123,
+				DonorName:              "Firstname Surname",
+				Title:                  "Edit LPA",
+				IsUpdate:               true,
+				Success:                true,
+				SuccessMessage:         "You have successfully updated an LPA.",
+				AppointmentType:        "jointly",
+				CaseId:                 456,
+				Lpa:                    existingLpa,
+				HtmxRedirect:           "/create-replacement-attorney?id=123&caseId=456&attorneyId=999",
+				HtmxSwap:               "innerHTML",
+			}
+
+			if isHtmx {
+				partialTemplate.
+					On("Func", mock.Anything, expectedData).
+					Return(nil)
+			}
+
+			form := url.Values{
+				"caseSubtype":               {"hw"},
+				"caseAttorney":              {"jointly"},
+				"updateReplacementAttorney": {"999"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=123&caseId=456", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			if isHtmx {
+				r.Header.Add("HX-Request", "true")
+			}
+			w := httptest.NewRecorder()
+
+			err := CreateLpa(client, template.Func, partialTemplate.Func)(w, r)
+			resp := w.Result()
+
+			if !isHtmx {
+				expectedRedirect := RedirectError("/create-replacement-attorney?id=123&caseId=456&attorneyId=999")
+				assert.Equal(t, expectedRedirect, err)
+			} else {
+				assert.Nil(t, err)
+			}
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+		})
+	}
+}
+
+func TestPostCreateLpaUpdateReplacementAttorneyBadId(t *testing.T) {
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{}, nil)
+	client.
+		On("GetUserPermissions", mock.Anything).
+		Return(sirius.Permissions{}, nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&updateReplacementAttorney=not-a-number", nil)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, nil, nil)(w, r)
+
+	assert.NotNil(t, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
 func TestPostCreateLpaRedirects(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -1523,6 +1640,18 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 		{
 			name:        "Update certificate provider with invalid ID errors",
 			formKey:     "updateCertificateProvider",
+			formValue:   "not-a-number",
+			expectedErr: sirius.StatusError{Code: http.StatusBadRequest},
+		},
+		{
+			name:        "Update replacement attorney redirects",
+			formKey:     "updateReplacementAttorney",
+			formValue:   "999",
+			expectedErr: RedirectError("/create-replacement-attorney?id=1&caseId=2&attorneyId=999"),
+		},
+		{
+			name:        "Update replacement attorney with invalid ID errors",
+			formKey:     "updateReplacementAttorney",
 			formValue:   "not-a-number",
 			expectedErr: sirius.StatusError{Code: http.StatusBadRequest},
 		},
