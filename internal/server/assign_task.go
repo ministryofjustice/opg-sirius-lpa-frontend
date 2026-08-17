@@ -23,6 +23,7 @@ type AssignTaskClient interface {
 
 type assignTaskData struct {
 	XSRFToken string
+	IsPartial bool
 	Entities  []string
 	Uid       string
 	CaseType  string
@@ -37,7 +38,7 @@ type assignTaskData struct {
 	AssigneeUserName string
 }
 
-func AssignTask(client AssignTaskClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
 			return err
@@ -77,6 +78,7 @@ func AssignTask(client AssignTaskClient, tmpl template.Template, partialTmpl tem
 		ctx := getContext(r)
 		data := assignTaskData{
 			XSRFToken: ctx.XSRFToken,
+			IsPartial: r.Header.Get("HX-Request") == "true",
 			DonorID:   donorID,
 			CaseUids:  buildUIDQueryString(r.Form["uid[]"]),
 			TaskIDs:   taskIDQuery,
@@ -179,10 +181,6 @@ func AssignTask(client AssignTaskClient, tmpl template.Template, partialTmpl tem
 			} else {
 				data.Success = true
 			}
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
