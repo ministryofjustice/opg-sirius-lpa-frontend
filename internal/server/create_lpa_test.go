@@ -1647,7 +1647,13 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			name:        "Update replacement attorney redirects",
 			formKey:     "updateReplacementAttorney",
 			formValue:   "999",
-			redirectURL: "/create-replacement-attorney?id=1&caseId=2&attorneyId=999",
+			expectedErr: RedirectError("/create-replacement-attorney?id=1&caseId=2&attorneyId=999"),
+		},
+		{
+			name:        "Update replacement attorney with invalid ID errors",
+			formKey:     "updateReplacementAttorney",
+			formValue:   "not-a-number",
+			expectedErr: sirius.StatusError{Code: http.StatusBadRequest},
 		},
 	}
 
