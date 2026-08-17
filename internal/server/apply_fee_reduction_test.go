@@ -67,7 +67,7 @@ func TestGetApplyFeeReduction(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
 	w := httptest.NewRecorder()
 
-	err := ApplyFeeReduction(client, template.Func, template.Func)(w, r)
+	err := ApplyFeeReduction(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -86,7 +86,7 @@ func TestApplyFeeReductionNoID(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, testUrl, nil)
 			w := httptest.NewRecorder()
 
-			err := ApplyFeeReduction(nil, nil, nil)(w, r)
+			err := ApplyFeeReduction(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -111,7 +111,7 @@ func TestApplyFeeReductionWhenFailureOnGetCase(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
 	w := httptest.NewRecorder()
 
-	err := ApplyFeeReduction(client, nil, nil)(w, r)
+	err := ApplyFeeReduction(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -150,7 +150,7 @@ func TestApplyFeeReductionWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=222", nil)
 	w := httptest.NewRecorder()
 
-	err := ApplyFeeReduction(client, template.Func, template.Func)(w, r)
+	err := ApplyFeeReduction(client, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -173,7 +173,7 @@ func TestApplyFeeReductionWhenFailureOnGetFeeReductionTypesRefData(t *testing.T)
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := ApplyFeeReduction(client, nil, nil)(w, r)
+	err := ApplyFeeReduction(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -234,7 +234,7 @@ func TestPostFeeReduction(t *testing.T) {
 		r.Header.Add("Content-Type", formUrlEncoded)
 		w := httptest.NewRecorder()
 
-		err := ApplyFeeReduction(client, template.Func, template.Func)(w, r)
+		err := ApplyFeeReduction(client, template.Func)(w, r)
 		resp := w.Result()
 
 		assert.Equal(t, RedirectError(tc.expectedRedirect), err)
@@ -274,6 +274,7 @@ func TestPostFeeReductionHtmx(t *testing.T) {
 			FeeReductionTypes: feeReductionTypes,
 			ReturnUrl:         "/payments/123",
 			HtmxRedirect:      "/payments/123",
+			IsPartial:         true,
 		}).
 		Return(nil)
 
@@ -288,7 +289,7 @@ func TestPostFeeReductionHtmx(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := ApplyFeeReduction(client, nil, template.Func)(w, r)
+	err := ApplyFeeReduction(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
