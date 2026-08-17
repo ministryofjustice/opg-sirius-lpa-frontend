@@ -18,6 +18,7 @@ type ApplyFeeReductionClient interface {
 
 type applyFeeReductionData struct {
 	XSRFToken string
+	IsPartial bool
 	Error     sirius.ValidationError
 
 	Case              sirius.Case
@@ -29,7 +30,7 @@ type applyFeeReductionData struct {
 	HtmxRedirect      string
 }
 
-func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -40,6 +41,7 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template, p
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 		data := applyFeeReductionData{
 			XSRFToken:        ctx.XSRFToken,
+			IsPartial:        r.Header.Get("HX-Request") == "true",
 			PaymentEvidence:  postFormString(r, "paymentEvidence"),
 			FeeReductionType: postFormString(r, "feeReductionType"),
 			PaymentDate:      postFormDateString(r, "paymentDate"),
@@ -78,10 +80,6 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template, p
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
-				if r.Header.Get("HX-Request") == "true" {
-					return partialTmpl(w, data)
-				}
-
 				return tmpl(w, data)
 			} else if err != nil {
 				return err
@@ -90,19 +88,14 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template, p
 					Title: fmt.Sprintf("%s approved", translateRefData(data.FeeReductionTypes, data.FeeReductionType)),
 				})
 
-				if r.Header.Get("HX-Request") == "true" {
+				if data.IsPartial {
 					data.HtmxRedirect = data.ReturnUrl
-					return partialTmpl(w, data)
+					return tmpl(w, data)
 				}
 
 				return RedirectError(data.ReturnUrl)
 			}
 		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
-		}
-
 		return tmpl(w, data)
 	}
 }
