@@ -19,6 +19,7 @@ type CreateAttorneyClient interface {
 
 type createAttorneyData struct {
 	XSRFToken            string
+	IsPartial            bool
 	Attorney             sirius.Attorney
 	Error                sirius.ValidationError
 	RelationshipToDonors []sirius.RefDataItem
@@ -32,7 +33,7 @@ type createAttorneyData struct {
 	HtmxSwap             string
 }
 
-func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -50,6 +51,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partial
 
 		data := createAttorneyData{
 			XSRFToken: ctx.XSRFToken,
+			IsPartial: r.Header.Get("HX-Request") == "true",
 			DonorId:   donorId,
 			CaseId:    caseId,
 			CaseType:  caseType,
@@ -139,47 +141,39 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template, partial
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
-
-				if r.Header.Get("HX-Request") == "true" {
-					return partialTmpl(w, data)
-				}
 				return tmpl(w, data)
 			} else if err != nil {
 				return err
 			}
 
 			if r.FormValue("add-another") != "" {
-				if r.Header.Get("HX-Request") == "true" {
+				if data.IsPartial {
 					data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s", donorId, caseId, caseType)
 					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
-					return partialTmpl(w, data)
+					return tmpl(w, data)
 				}
 				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s", donorId, caseId, caseType))
 			}
 
 			if r.FormValue("next-attorney") != "" {
-				if r.Header.Get("HX-Request") == "true" {
+				if data.IsPartial {
 					data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s&attorneyId=%d", donorId, caseId, caseType, data.NextAttorneyId)
 					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
-					return partialTmpl(w, data)
+					return tmpl(w, data)
 				}
 				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s&attorneyId=%d", donorId, caseId, caseType, data.NextAttorneyId))
 			}
 
-			if r.Header.Get("HX-Request") == "true" {
+			if data.IsPartial {
 				data.HtmxRedirect = fmt.Sprintf("/create-%s?id=%d&caseId=%d", caseType, donorId, caseId)
 				data.HtmxSwap = "innerHTML show:#accordion-create-epa-heading-3:top"
-				return partialTmpl(w, data)
+				return tmpl(w, data)
 			}
 
 			if caseType == "epa" {
 				return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 			}
 			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1", donorId, caseId))
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
