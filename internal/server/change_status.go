@@ -21,6 +21,7 @@ type changeStatusData struct {
 	Entity    string
 	Success   bool
 	Error     sirius.ValidationError
+	IsPartial bool
 
 	AvailableStatuses []string
 	NewStatus         string
@@ -31,7 +32,7 @@ type changeStatusData struct {
 	Notes             string
 }
 
-func ChangeStatus(client ChangeStatusClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
 			return err
@@ -74,6 +75,7 @@ func ChangeStatus(client ChangeStatusClient, tmpl template.Template, partialTmpl
 			DonorID:           donorID,
 			CaseUids:          buildUIDQueryString(r.Form["uid[]"]),
 			Notes:             postFormString(r, "notes"),
+			IsPartial:         r.Header.Get("HX-Request") == "true",
 		}
 
 		if r.Method == http.MethodPost {
@@ -99,10 +101,6 @@ func ChangeStatus(client ChangeStatusClient, tmpl template.Template, partialTmpl
 			} else {
 				data.Success = true
 			}
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

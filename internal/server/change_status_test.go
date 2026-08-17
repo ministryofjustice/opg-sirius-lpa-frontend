@@ -62,7 +62,7 @@ func TestGetChangeStatus(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "/?id=123&case="+caseType, nil)
 			w := httptest.NewRecorder()
 
-			err := ChangeStatus(client, template.Func, template.Func)(w, r)
+			err := ChangeStatus(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -84,7 +84,7 @@ func TestGetChangeStatusNoID(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := ChangeStatus(nil, nil, nil)(w, r)
+			err := ChangeStatus(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -102,7 +102,7 @@ func TestGetChangeStatusWhenCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := ChangeStatus(client, nil, nil)(w, r)
+	err := ChangeStatus(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -123,7 +123,7 @@ func TestGetChangeStatusWhenAvailableStatusesErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := ChangeStatus(client, nil, nil)(w, r)
+	err := ChangeStatus(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -154,7 +154,7 @@ func TestGetChangeStatusWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := ChangeStatus(client, template.Func, template.Func)(w, r)
+	err := ChangeStatus(client, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -200,7 +200,7 @@ func TestPostChangeStatus(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := ChangeStatus(client, template.Func, template.Func)(w, r)
+			err := ChangeStatus(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -262,7 +262,7 @@ func TestPostChangeStatusWithNotes(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := ChangeStatus(client, template.Func, nil)(w, r)
+			err := ChangeStatus(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -298,7 +298,7 @@ func TestPostChangeStatusWhenChangeStatusErrors(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := ChangeStatus(client, nil, nil)(w, r)
+	err := ChangeStatus(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -323,6 +323,7 @@ func TestGetChangeStatusHtmx(t *testing.T) {
 			AvailableStatuses: []string{"Cancelled", "Withdrawn"},
 			CaseID:            123,
 			CaseType:          "lpa",
+			IsPartial:         true,
 		}).
 		Return(nil)
 
@@ -330,7 +331,7 @@ func TestGetChangeStatusHtmx(t *testing.T) {
 	r.Header.Set("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := ChangeStatus(client, nil, partialTemplate.Func)(w, r)
+	err := ChangeStatus(client, partialTemplate.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -365,6 +366,7 @@ func TestPostChangeStatusHtmx(t *testing.T) {
 			NewStatus:         "Withdrawn",
 			CaseID:            123,
 			CaseType:          "lpa",
+			IsPartial:         true,
 		}).
 		Return(nil)
 
@@ -377,7 +379,7 @@ func TestPostChangeStatusHtmx(t *testing.T) {
 	r.Header.Set("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := ChangeStatus(client, nil, partialTemplate.Func)(w, r)
+	err := ChangeStatus(client, partialTemplate.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
