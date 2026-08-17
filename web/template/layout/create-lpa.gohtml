@@ -397,6 +397,18 @@
                       {{ template "person-details-table" . }}
                     </div>
                   </details>
+                  <span class="app-create-lpa__summary-update-link">
+                    <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
+                            id="f-update-certificate-provider-{{ .ID }}"
+                            name="updateCertificateProvider"
+                            type="submit"
+                            value="{{ .ID }}"
+                    >Update
+                      <span class="govuk-visually-hidden">
+                        certificate provider{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                      </span>
+                    </button>
+                  </span>
                   <div class="govuk-form-group">
                     <input class="govuk-input" type="text" placeholder="DD/MM/YYYY" />
                   </div>
@@ -406,7 +418,7 @@
             <div class="govuk-button-group app-button-group--column">
               <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
                      type="submit" data-disable-after-click="true"
-                     name="addCertificateProvider" {{ if eq (len .Lpa.CertificateProviders) 2 }}disabled{{ end }} value="Add Certificate Provider"/>
+                     name="addCertificateProvider" {{ if gt (len .Lpa.CertificateProviders) 1 }}disabled{{ end }} value="Add Certificate Provider"/>
             </div>
 
             {{ if gt (len .Lpa.Attorneys) 0 }}

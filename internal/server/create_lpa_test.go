@@ -1470,43 +1470,61 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 		name        string
 		formKey     string
 		formValue   string
-		redirectURL string
+		expectedErr error
 	}{
 		{
 			name:        "Add attorney redirects",
 			formKey:     "addAttorney",
 			formValue:   "true",
-			redirectURL: "/create-attorney?id=1&caseId=2&caseType=lpa",
+			expectedErr: RedirectError("/create-attorney?id=1&caseId=2&caseType=lpa"),
 		},
 		{
 			name:        "Add certificate provider redirects",
 			formKey:     "addCertificateProvider",
 			formValue:   "true",
-			redirectURL: "/create-certificate-provider?id=1&caseId=2",
+			expectedErr: RedirectError("/create-certificate-provider?id=1&caseId=2"),
 		},
 		{
 			name:        "Add correspondent",
 			formKey:     "addCorrespondent",
 			formValue:   "true",
-			redirectURL: "/select-or-create-correspondent?id=1&caseId=2&caseType=lpa",
+			expectedErr: RedirectError("/select-or-create-correspondent?id=1&caseId=2&caseType=lpa"),
 		},
 		{
 			name:        "Update correspondent",
 			formKey:     "updateCorrespondent",
 			formValue:   "true",
-			redirectURL: "/create-correspondent?id=1&caseId=2&caseType=lpa",
+			expectedErr: RedirectError("/create-correspondent?id=1&caseId=2&caseType=lpa"),
 		},
 		{
 			name:        "Add notified person redirects",
 			formKey:     "addNotifiedPerson",
 			formValue:   "true",
-			redirectURL: "/create-notified-person?id=1&caseId=2",
+			expectedErr: RedirectError("/create-notified-person?id=1&caseId=2"),
 		},
 		{
 			name:        "Update notified person redirects",
 			formKey:     "updateNotifiedPerson",
 			formValue:   "111",
-			redirectURL: "/create-notified-person?id=1&caseId=2&notifiedPersonId=111",
+			expectedErr: RedirectError("/create-notified-person?id=1&caseId=2&notifiedPersonId=111"),
+		},
+		{
+			name:        "Update certificate provider redirects",
+			formKey:     "updateCertificateProvider",
+			formValue:   "3",
+			expectedErr: RedirectError("/edit-certificate-provider?id=1&caseId=2&personId=3"),
+		},
+		{
+			name:        "Update notified person with invalid ID errors",
+			formKey:     "updateNotifiedPerson",
+			formValue:   "not-a-number",
+			expectedErr: sirius.StatusError{Code: http.StatusBadRequest},
+		},
+		{
+			name:        "Update certificate provider with invalid ID errors",
+			formKey:     "updateCertificateProvider",
+			formValue:   "not-a-number",
+			expectedErr: sirius.StatusError{Code: http.StatusBadRequest},
 		},
 	}
 
@@ -1537,7 +1555,7 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			err := CreateLpa(client, template.Func, template.Func)(w, r)
 			resp := w.Result()
 
-			assert.Equal(t, RedirectError(tc.redirectURL), err)
+			assert.Equal(t, tc.expectedErr, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client, template)
 		})

@@ -1,4 +1,4 @@
-{{ define "create-certificate-provider" }}
+{{ define "certificate-provider" }}
     {{ template "input" (field "salutation" "Title" .CertificateProvider.Salutation .Error.Field.salutation) }}
     {{ template "input" (field "firstname" "First name" .CertificateProvider.Firstname .Error.Field.firstname) }}
     {{ template "input" (field "middlenames" "Middle names" .CertificateProvider.Middlenames .Error.Field.middlenames) }}

@@ -213,6 +213,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			if r.FormValue("addCorrespondent") != "" {
 				return RedirectError(fmt.Sprintf("/select-or-create-correspondent?id=%d&caseId=%d&caseType=lpa", donorID, data.CaseId))
 			}
+
 			if r.FormValue("updateCorrespondent") != "" {
 				return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d&caseType=lpa", donorID, data.CaseId))
 			}
@@ -224,6 +225,14 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 					return err
 				}
 				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d&notifiedPersonId=%d", donorID, data.CaseId, notifiedPersonID))
+			}
+
+			if r.FormValue("updateCertificateProvider") != "" {
+				personID, err := strToIntOrStatusError(r.FormValue("updateCertificateProvider"))
+				if err != nil {
+					return err
+				}
+				return RedirectError(fmt.Sprintf("/edit-certificate-provider?id=%d&caseId=%d&personId=%d", donorID, data.CaseId, personID))
 			}
 
 			data.Success = true

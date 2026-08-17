@@ -14,11 +14,11 @@
 
         <a class="govuk-back-link"
            href=""
-           hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-3" .DonorId .CaseId) }}"
+           hx-get="{{ prefix .PostUrl }}"
            hx-target=".action-panel__content"
            hx-swap="innerHTML show:#accordion-create-lpa-heading-3:top">Back</a>
 
-        <h1 class="govuk-heading-m">Add a certificate provider</h1>
+        <h1 class="govuk-heading-m">{{ .Title }}</h1>
 
         <form class="form"
               method="POST"
@@ -27,7 +27,7 @@
               hx-swap="innerHTML">
             <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-            {{ template "create-certificate-provider" . }}
+            {{ template "certificate-provider" . }}
 
             <div class="govuk-button-group govuk-!-padding-top-5">
                 <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
