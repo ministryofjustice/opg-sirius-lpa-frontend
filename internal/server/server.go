@@ -133,7 +133,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/search", wrap(Search(client, templates.Get("search.gohtml"))))
 
 	//shared templates (Used in both modernise and LPA)
-	mux.Handle("/add-payment", wrap(AddPayment(client, templates.Get("add-payment-wrapper.gohtml"), templates.Get("add-payment-partial-wrapper.gohtml"))))
+	mux.Handle("/add-payment", wrap(AddPayment(client, templates.Get("add-payment.gohtml"))))
 	mux.Handle("/apply-fee-reduction", wrap(ApplyFeeReduction(client, templates.Get("apply-fee-reduction-wrapper.gohtml"), templates.Get("apply-fee-reduction-partial-wrapper.gohtml"))))
 	mux.Handle("/assign-task", wrap(AssignTask(client, templates.Get("assign-task-wrapper.gohtml"), templates.Get("assign-task-partial-wrapper.gohtml"))))
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"), templates.Get("event-partial.gohtml"))))

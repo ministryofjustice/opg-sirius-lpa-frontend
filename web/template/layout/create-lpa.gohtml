@@ -2,7 +2,7 @@
   <button class="govuk-visually-hidden" tabindex="-1" aria-hidden="true" data-module="govuk-button" type="submit"></button>
   <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-  <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-create-lpa">
+  <div class="govuk-accordion govuk-accordion--scroll-sections" data-module="govuk-accordion" id="accordion-create-lpa">
     <div class="govuk-accordion__section">
       <div class="govuk-accordion__section-header">
         <h2 class="govuk-accordion__section-heading">
@@ -435,7 +435,7 @@
               {{ range $attorney := .Lpa.ReplacementAttorneys }}
                 <div class="govuk-form-group">
                   <label class="govuk-label">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</label>
-                  <input class="govuk-input" type="text" placeholder="DD/MM/YYYY" disabled="disabled"/>
+                  {{ template "input-date" (field (printf "lpaPartCSignatureDate-%d" .ID) "Date signed" .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
                 </div>
               {{ end }}
             {{ end }}
