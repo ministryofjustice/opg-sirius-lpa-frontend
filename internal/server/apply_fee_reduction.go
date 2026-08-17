@@ -96,11 +96,6 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) H
 				return RedirectError(data.ReturnUrl)
 			}
 		}
-
-		if data.IsPartial {
-			return tmpl(w, data)
-		}
-
 		return tmpl(w, data)
 	}
 }
