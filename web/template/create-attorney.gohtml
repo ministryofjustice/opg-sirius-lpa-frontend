@@ -30,6 +30,16 @@
 
     <h1 class="govuk-heading-m">{{ .Title }}</h1>
 
+    {{ if and (eq .CaseType "lpa") (not .IsEditing) }}
+      <div class="govuk-button-group govuk-button-group--row">
+        <a class="govuk-link govuk-link--no-visited-state"
+           href=""
+           hx-get="{{ prefix (printf "/create-trust-corporation?id=%d&caseId=%d" .DonorId .CaseId) }}"
+           hx-target=".action-panel__content"
+           hx-swap="innerHTML scroll:.action-panel__content:top">Add a trust corporation as an attorney</a>
+      </div>
+    {{ end }}
+
     <form class="form"
           method="POST"
           hx-post={{ if .IsEditing }}"{{ prefix (printf "/create-attorney?id=%d&caseId=%d&caseType=%s&attorneyId=%d" .DonorId .CaseId .CaseType .Attorney.ID) }}"{{ else }}"{{ prefix (printf "/create-attorney?id=%d&caseId=%d&caseType=%s" .DonorId .CaseId .CaseType) }}"{{ end }}
@@ -79,6 +89,14 @@
       {{ end }}
 
       <h1 class="govuk-heading-l">{{ .Title }}</h1>
+
+      {{ if and (eq .CaseType "lpa") (not .IsEditing) }}
+        <div class="govuk-button-group govuk-button-group--row">
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-trust-corporation?id=%d&caseId=%d" .DonorId .CaseId) }}">
+            Add a trust corporation as an attorney
+          </a>
+        </div>
+      {{ end }}
 
       <form class="form" method="POST">
 
