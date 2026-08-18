@@ -22,9 +22,10 @@ type createInvestigationData struct {
 	CaseUIDs      string
 	EntityType    string
 	DonorId       int
+	IsPartial     bool
 }
 
-func CreateInvestigation(client CreateInvestigationClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func CreateInvestigation(client CreateInvestigationClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -51,6 +52,7 @@ func CreateInvestigation(client CreateInvestigationClient, tmpl template.Templat
 			CaseUIDs:   buildUIDQueryString(r.Form["uid[]"]),
 			EntityType: caseTypeString,
 			DonorId:    caseItem.Donor.ID,
+			IsPartial:  r.Header.Get("HX-Request") == "true",
 		}
 
 		if r.Method == http.MethodPost {
@@ -72,9 +74,6 @@ func CreateInvestigation(client CreateInvestigationClient, tmpl template.Templat
 			} else {
 				data.Success = true
 			}
-		}
-		if r.Header.Get("HX-Request") == "true" && partialTmpl != nil {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
