@@ -16,6 +16,7 @@ type CreateLpaClient interface {
 	CreateLpa(ctx sirius.Context, donorID int, lpa sirius.Lpa) (sirius.Lpa, error)
 	UpdateLpa(ctx sirius.Context, caseID int, lpa sirius.Lpa) error
 	UpdateAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
+	UpdateReplacementAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
 	GetUserPermissions(sirius.Context) (sirius.Permissions, error)
 }
 
@@ -179,6 +180,13 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 						err = client.UpdateAttorney(ctx, attorney.ID, attorney)
 					}
 				}
+				for _, replacementAttorney := range data.Lpa.ReplacementAttorneys {
+					formValue := postFormString(r, fmt.Sprintf("lpaPartCSignatureDate-%d", replacementAttorney.ID))
+					if formValue != "" && formValue != string(replacementAttorney.LpaPartCSignatureDate) {
+						replacementAttorney.LpaPartCSignatureDate = sirius.DateString(formValue)
+						err = client.UpdateReplacementAttorney(ctx, replacementAttorney.ID, replacementAttorney)
+					}
+				}
 			}
 
 			if ve, ok := err.(sirius.ValidationError); ok {
@@ -205,6 +213,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			if r.FormValue("addCorrespondent") != "" {
 				return RedirectError(fmt.Sprintf("/select-or-create-correspondent?id=%d&caseId=%d&caseType=lpa", donorID, data.CaseId))
 			}
+
 			if r.FormValue("updateCorrespondent") != "" {
 				return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d&caseType=lpa", donorID, data.CaseId))
 			}
@@ -216,6 +225,14 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 					return err
 				}
 				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d&notifiedPersonId=%d", donorID, data.CaseId, notifiedPersonID))
+			}
+
+			if r.FormValue("updateCertificateProvider") != "" {
+				personID, err := strToIntOrStatusError(r.FormValue("updateCertificateProvider"))
+				if err != nil {
+					return err
+				}
+				return RedirectError(fmt.Sprintf("/edit-certificate-provider?id=%d&caseId=%d&personId=%d", donorID, data.CaseId, personID))
 			}
 
 			data.Success = true
@@ -235,6 +252,20 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 				return partialTmpl(w, data)
 			}
 			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorID, data.CaseId))
+		}
+
+		if updateReplacementAttorney := r.FormValue("updateReplacementAttorney"); updateReplacementAttorney != "" {
+			attorneyID, err := strToIntOrStatusError(updateReplacementAttorney)
+			if err != nil {
+				return err
+			}
+
+			if r.Header.Get("HX-Request") == "true" {
+				data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d", donorID, data.CaseId, attorneyID)
+				data.HtmxSwap = "innerHTML"
+				return partialTmpl(w, data)
+			}
+			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d", donorID, data.CaseId, attorneyID))
 		}
 
 		if r.Header.Get("HX-Request") == "true" {

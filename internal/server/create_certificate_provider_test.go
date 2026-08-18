@@ -62,14 +62,16 @@ func TestGetCreateCertificateProviders(t *testing.T) {
 
 			template := &mockTemplate{}
 			template.
-				On("Func", mock.Anything, CreateCertificateProviderData{
+				On("Func", mock.Anything, CertificateProviderData{
 					DonorId:     1,
 					CaseId:      2,
 					CanAddActor: tc.canAddActor,
+					Title:       "Add a certificate provider",
+					PostURL:     "/create-certificate-provider?id=1&caseId=2",
 				}).
 				Return(nil)
 
-			r, _ := http.NewRequest(http.MethodGet, "/create-certificate-provider/?id=1&caseId=2", nil)
+			r, _ := http.NewRequest(http.MethodGet, "/create-certificate-provider?id=1&caseId=2", nil)
 			w := httptest.NewRecorder()
 
 			err := CreateCertificateProvider(client, template.Func, template.Func)(w, r)
@@ -90,16 +92,18 @@ func TestGetCreateCertificateWithHXRequest(t *testing.T) {
 
 	partialTemplate := &mockTemplate{}
 	partialTemplate.
-		On("Func", mock.Anything, CreateCertificateProviderData{
+		On("Func", mock.Anything, CertificateProviderData{
 			DonorId:     1,
 			CaseId:      2,
 			CanAddActor: true,
+			Title:       "Add a certificate provider",
+			PostURL:     "/create-certificate-provider?id=1&caseId=2",
 		}).
 		Return(nil)
 
 	template := &mockTemplate{}
 
-	r, _ := http.NewRequest(http.MethodGet, "/create-certificate-provider/?id=1&caseId=2", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/create-certificate-provider?id=1&caseId=2", nil)
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
@@ -124,7 +128,7 @@ func TestGetCreateCertificateProviderLpaFail(t *testing.T) {
 
 	template := &mockTemplate{}
 
-	r, _ := http.NewRequest(http.MethodGet, "/create-certificate-provider/?id=1&caseId=2", nil)
+	r, _ := http.NewRequest(http.MethodGet, "/create-certificate-provider?id=1&caseId=2", nil)
 	w := httptest.NewRecorder()
 
 	err := CreateCertificateProvider(client, template.Func, template.Func)(w, r)
@@ -213,12 +217,14 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 			partialTemplate := &mockTemplate{}
 			if tc.htmxRequest {
 				partialTemplate.
-					On("Func", mock.Anything, CreateCertificateProviderData{
+					On("Func", mock.Anything, CertificateProviderData{
 						DonorId:      1,
 						CaseId:       2,
 						CanAddActor:  true,
 						HtmxRedirect: tc.redirectURL,
 						HtmxSwap:     tc.swap,
+						Title:        "Add a certificate provider",
+						PostURL:      "/create-certificate-provider?id=1&caseId=2",
 					}).
 					Return(nil)
 			}
@@ -238,7 +244,7 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 				"add-another":  {tc.addActor},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/create-certificate-provider/?id=1&caseId=2", strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/create-certificate-provider?id=1&caseId=2", strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			if tc.htmxRequest {
 				r.Header.Add("HX-Request", "true")
@@ -297,7 +303,7 @@ func TestPostCreateCertificateProviderWhenAPIFails(t *testing.T) {
 		"country":      {"United Kingdom"},
 	}
 
-	r, _ := http.NewRequest(http.MethodPost, "/create-certificate-provider/?id=1&caseId=2", strings.NewReader(form.Encode()))
+	r, _ := http.NewRequest(http.MethodPost, "/create-certificate-provider?id=1&caseId=2", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
@@ -326,7 +332,7 @@ func TestPostCreateCertificateProviderValidationError(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, CreateCertificateProviderData{
+		On("Func", mock.Anything, CertificateProviderData{
 			CanAddActor: true,
 			CaseId:      2,
 			DonorId:     1,
@@ -335,6 +341,8 @@ func TestPostCreateCertificateProviderValidationError(t *testing.T) {
 					"firstname": {"required": "This field is required"},
 				},
 			},
+			Title:   "Add a certificate provider",
+			PostURL: "/create-certificate-provider?id=1&caseId=2",
 		}).
 		Return(nil)
 
@@ -347,7 +355,7 @@ func TestPostCreateCertificateProviderValidationError(t *testing.T) {
 		"country":      {"United Kingdom"},
 	}
 
-	r, _ := http.NewRequest(http.MethodPost, "/create-certificate-provider/?id=1&caseId=2", strings.NewReader(form.Encode()))
+	r, _ := http.NewRequest(http.MethodPost, "/create-certificate-provider?id=1&caseId=2", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 

@@ -13,7 +13,7 @@ type CreateCertificateProviderClient interface {
 	Lpa(sirius.Context, int) (sirius.Lpa, error)
 }
 
-type CreateCertificateProviderData struct {
+type CertificateProviderData struct {
 	XSRFToken           string
 	CanAddActor         bool
 	CaseId              int
@@ -22,6 +22,8 @@ type CreateCertificateProviderData struct {
 	Error               sirius.ValidationError
 	HtmxRedirect        string
 	HtmxSwap            string
+	Title               string
+	PostURL             string
 }
 
 func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl template.Template, partialTmpl template.Template) Handler {
@@ -43,11 +45,13 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 			return err
 		}
 
-		data := CreateCertificateProviderData{
+		data := CertificateProviderData{
 			XSRFToken:   ctx.XSRFToken,
 			DonorId:     donorId,
 			CaseId:      caseId,
 			CanAddActor: len(caseItem.CertificateProviders) < 1,
+			Title:       "Add a certificate provider",
+			PostURL:     fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorId, caseId),
 		}
 
 		if r.Method == http.MethodPost {

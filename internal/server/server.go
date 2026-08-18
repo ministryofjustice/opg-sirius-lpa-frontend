@@ -76,6 +76,7 @@ type Client interface {
 	DeleteRelationshipClient
 	DocumentListClient
 	DonorDetailsClient
+	EditCertificateProviderClient
 	EditComplaintClient
 	EditDatesClient
 	EditDocumentClient
@@ -132,8 +133,8 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/search", wrap(Search(client, templates.Get("search.gohtml"))))
 
 	//shared templates (Used in both modernise and LPA)
-	mux.Handle("/add-payment", wrap(AddPayment(client, templates.Get("add-payment-wrapper.gohtml"), templates.Get("add-payment-partial-wrapper.gohtml"))))
-	mux.Handle("/apply-fee-reduction", wrap(ApplyFeeReduction(client, templates.Get("apply-fee-reduction-wrapper.gohtml"), templates.Get("apply-fee-reduction-partial-wrapper.gohtml"))))
+	mux.Handle("/add-payment", wrap(AddPayment(client, templates.Get("add-payment.gohtml"))))
+	mux.Handle("/apply-fee-reduction", wrap(ApplyFeeReduction(client, templates.Get("apply-fee-reduction.gohtml"))))
 	mux.Handle("/assign-task", wrap(AssignTask(client, templates.Get("assign-task-wrapper.gohtml"), templates.Get("assign-task-partial-wrapper.gohtml"))))
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"), templates.Get("event-partial.gohtml"))))
 	mux.Handle("/create-task", wrap(Task(client, templates.Get("create-task-wrapper.gohtml"), templates.Get("create-task-partial-wrapper.gohtml"))))
@@ -171,10 +172,10 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	//LPA
 	mux.Handle("/action-panel", wrap(ActionPanel(client, templates.Get("action-panel-wrapper.gohtml"))))
 	mux.Handle("/add-complaint", wrap(AddComplaint(client, templates.Get("add-complaint.gohtml"))))
-	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate-cases-wrapper.gohtml"), templates.Get("allocate-cases-partial-wrapper.gohtml"))))
+	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate-cases.gohtml"))))
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change-status.gohtml"), templates.Get("change-status-partial.gohtml"))))
 	mux.Handle("/create-attorney", wrap(CreateAttorney(client, templates.Get("create-attorney-wrapper.gohtml"), templates.Get("create-attorney-partial-wrapper.gohtml"))))
-	mux.Handle("/create-certificate-provider", wrap(CreateCertificateProvider(client, templates.Get("create-certificate-provider-wrapper.gohtml"), templates.Get("create-certificate-provider-partial-wrapper.gohtml"))))
+	mux.Handle("/create-certificate-provider", wrap(CreateCertificateProvider(client, templates.Get("certificate-provider-wrapper.gohtml"), templates.Get("certificate-provider-partial-wrapper.gohtml"))))
 	mux.Handle("/create-correspondent", wrap(CreateCorrespondent(client, templates.Get("create-correspondent-wrapper.gohtml"), templates.Get("create-correspondent-partial-wrapper.gohtml"))))
 	mux.Handle("/create-donor", wrap(CreateDonor(client, templates.Get("donor-wrapper.gohtml"), templates.Get("donor-partial-wrapper.gohtml"))))
 	mux.Handle("/create-document", wrap(CreateDocument(client, templates.Get("create_document.gohtml"), templates.Get("create-document-htmx.gohtml"))))
@@ -194,6 +195,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/donor/{donorId}/history", wrap(GetLpaHistory(client, templates.Get("lpa-history.gohtml"))))
 	mux.Handle("/view-document/{uuid}/{id}", wrap(ViewDocument(client, templates.Get("view-document.gohtml"))))
 	mux.Handle("/delete-document/{uuid}", wrap(DeleteDocument(client, templates.Get("delete-document.gohtml"))))
+	mux.Handle("/edit-certificate-provider", wrap(EditCertificateProvider(client, templates.Get("certificate-provider-wrapper.gohtml"), templates.Get("certificate-provider-partial-wrapper.gohtml"))))
 	mux.Handle("/edit-complaint", wrap(EditComplaint(client, templates.Get("edit_complaint.gohtml"))))
 	mux.Handle("/edit-dates", wrap(EditDates(client, templates.Get("edit-dates-wrapper.gohtml"), templates.Get("edit-dates-partial-wrapper.gohtml"))))
 	mux.Handle("/edit-donor", wrap(EditDonor(client, templates.Get("donor-wrapper.gohtml"), templates.Get("donor-partial-wrapper.gohtml"))))
