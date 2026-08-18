@@ -56,7 +56,7 @@ func TestGetCreateCorrespondent(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType=epa", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateCorrespondent(client, template.Func, nil)(w, r)
+	err := CreateCorrespondent(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -71,13 +71,13 @@ func TestGetCreateCorrespondentHtmxRequest(t *testing.T) {
 		Return(sirius.Epa{}, nil)
 
 	template := &mockTemplate{}
-	partialTemplate := &mockTemplate{}
-	partialTemplate.
+	template.
 		On("Func", mock.Anything, createCorrespondentData{
-			DonorId:  1,
-			CaseId:   2,
-			CaseType: "epa",
-			Title:    "Add a correspondent",
+			IsPartial: true,
+			DonorId:   1,
+			CaseId:    2,
+			CaseType:  "epa",
+			Title:     "Add a correspondent",
 		}).
 		Return(nil)
 
@@ -85,13 +85,12 @@ func TestGetCreateCorrespondentHtmxRequest(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := CreateCorrespondent(client, template.Func, partialTemplate.Func)(w, r)
+	err := CreateCorrespondent(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	template.AssertNotCalled(t, "Func", mock.Anything, mock.Anything)
-	mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestGetEditCorrespondent(t *testing.T) {
@@ -131,7 +130,7 @@ func TestGetEditCorrespondent(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType="+caseType, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateCorrespondent(client, template.Func, nil)(w, r)
+			err := CreateCorrespondent(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -153,7 +152,7 @@ func TestGetCreateCorrespondentBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, query, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateCorrespondent(nil, nil, nil)(w, r)
+			err := CreateCorrespondent(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -177,7 +176,7 @@ func TestGetCreateCorrespondentWhenFetchCaseFails(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType="+caseType, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateCorrespondent(client, nil, nil)(w, r)
+			err := CreateCorrespondent(client, nil)(w, r)
 
 			assert.Equal(t, errExample, err)
 			mock.AssertExpectationsForObjects(t, client)
@@ -250,7 +249,7 @@ func TestPostCreateCorrespondent(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := CreateCorrespondent(client, nil, nil)(w, r)
+			err := CreateCorrespondent(client, nil)(w, r)
 			resp := w.Result()
 
 			assert.Equal(t, err, expectedError)
@@ -311,7 +310,7 @@ func TestPostEditCorrespondent(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateCorrespondent(client, nil, nil)(w, r)
+	err := CreateCorrespondent(client, nil)(w, r)
 	resp := w.Result()
 
 	assert.Equal(t, err, expectedError)
@@ -383,7 +382,7 @@ func TestPostCreateCorrespondentWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateCorrespondent(client, template.Func, nil)(w, r)
+	err := CreateCorrespondent(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -439,7 +438,7 @@ func TestPostCreateCorrespondentCreationFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateCorrespondent(client, nil, nil)(w, r)
+	err := CreateCorrespondent(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
