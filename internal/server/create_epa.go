@@ -19,6 +19,7 @@ type createEpaData struct {
 	XSRFToken       string
 	Success         bool
 	IsUpdate        bool
+	IsPartial       bool
 	Error           sirius.ValidationError
 	Epa             sirius.Epa
 	DonorId         int
@@ -27,7 +28,7 @@ type createEpaData struct {
 	CaseId          int
 }
 
-func CreateEpa(client CreateEpaClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -40,6 +41,7 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template, partialTmpl templ
 			XSRFToken: ctx.XSRFToken,
 			DonorId:   donorID,
 			Title:     "Create an EPA",
+			IsPartial: r.Header.Get("HX-Request") == "true",
 		}
 
 		caseIdStr := r.FormValue("caseId")
@@ -114,9 +116,6 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template, partialTmpl templ
 					}
 				}
 
-				if r.Header.Get("HX-Request") == "true" {
-					return partialTmpl(w, data)
-				}
 				return tmpl(w, data)
 			} else if err != nil {
 				return err
@@ -141,10 +140,6 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template, partialTmpl templ
 			} else {
 				data.Success = true
 			}
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
