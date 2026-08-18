@@ -13,7 +13,7 @@ type EditCertificateProviderClient interface {
 	Person(sirius.Context, int) (sirius.Person, error)
 }
 
-func EditCertificateProvider(client EditCertificateProviderClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func EditCertificateProvider(client EditCertificateProviderClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -45,6 +45,7 @@ func EditCertificateProvider(client EditCertificateProviderClient, tmpl template
 			CertificateProvider: certificateProvider,
 			Title:               "Edit a certificate provider",
 			PostURL:             fmt.Sprintf("/edit-certificate-provider?id=%d&caseId=%d&personId=%d", donorId, caseId, personId),
+			IsPartial:           r.Header.Get("HX-Request") == "true",
 		}
 
 		if r.Method == http.MethodPost {
@@ -71,17 +72,13 @@ func EditCertificateProvider(client EditCertificateProviderClient, tmpl template
 			} else if err != nil {
 				return err
 			} else {
-				if r.Header.Get("HX-Request") == "true" {
+				if data.IsPartial {
 					data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId)
 					data.HtmxSwap = "innerHTML show:#accordion-create-lpa-heading-3:top"
-					return partialTmpl(w, data)
 				}
 
 				return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId))
 			}
-		}
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
