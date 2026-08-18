@@ -91,7 +91,6 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 				}
 
 				if data.IsPartial {
-					data.HtmxRedirect = redirect
 					data.HtmxSwap = swap
 				}
 

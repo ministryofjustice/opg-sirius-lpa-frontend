@@ -66,25 +66,17 @@ func TestGetEditCertificateProvidersTest(t *testing.T) {
 				Return(mockCertificateProvider, nil)
 
 			template := &mockTemplate{}
-			partialTemplate := &mockTemplate{}
-			expectedData := CertificateProviderData{
-				DonorId:             1,
-				CaseId:              2,
-				CanAddActor:         false,
-				CertificateProvider: mockCertificateProvider,
-				Title:               "Edit a certificate provider",
-				PostURL:             "/edit-certificate-provider?id=1&caseId=2&personId=3",
-			}
-
-			if tc.isHtmxRequest {
-				partialTemplate.
-					On("Func", mock.Anything, expectedData).
-					Return(nil)
-			} else {
-				template.
-					On("Func", mock.Anything, expectedData).
-					Return(nil)
-			}
+			template.
+				On("Func", mock.Anything, CertificateProviderData{
+					DonorId:             1,
+					CaseId:              2,
+					CanAddActor:         false,
+					CertificateProvider: mockCertificateProvider,
+					Title:               "Edit a certificate provider",
+					PostURL:             "/edit-certificate-provider?id=1&caseId=2&personId=3",
+					IsPartial:           tc.isHtmxRequest,
+				}).
+				Return(nil)
 
 			r, _ := http.NewRequest(http.MethodGet, "/edit-certificate-provider/?id=1&caseId=2&personId=3", nil)
 			if tc.isHtmxRequest {
@@ -92,17 +84,12 @@ func TestGetEditCertificateProvidersTest(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := EditCertificateProvider(client, template.Func, partialTemplate.Func)(w, r)
+			err := EditCertificateProvider(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
-			if tc.isHtmxRequest {
-				template.AssertNotCalled(t, "Func")
-			} else {
-				partialTemplate.AssertNotCalled(t, "Func")
-			}
+			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -128,7 +115,7 @@ func TestGetEditCertificateProviders(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/edit-certificate-provider?id=1&caseId=2&personId=3", nil)
 	w := httptest.NewRecorder()
 
-	err := EditCertificateProvider(client, template.Func, template.Func)(w, r)
+	err := EditCertificateProvider(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -148,7 +135,7 @@ func TestGetEditCertificateProviderPersonFail(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/edit-certificate-provider?id=1&caseId=2&personId=3", nil)
 	w := httptest.NewRecorder()
 
-	err := EditCertificateProvider(client, template.Func, template.Func)(w, r)
+	err := EditCertificateProvider(client, template.Func)(w, r)
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
@@ -166,7 +153,7 @@ func TestGetEditCertificateProviderBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, query, nil)
 			w := httptest.NewRecorder()
 
-			err := EditCertificateProvider(nil, nil, nil)(w, r)
+			err := EditCertificateProvider(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -198,7 +185,7 @@ func TestPostEditCertificateProvider(t *testing.T) {
 			htmxRequest: true,
 			swap:        "innerHTML show:#accordion-create-lpa-heading-3:top",
 			error:       nil,
-			expectedErr: nil,
+			expectedErr: RedirectError("/create-lpa?id=1&caseId=2"),
 		},
 	}
 
@@ -262,12 +249,12 @@ func TestPostEditCertificateProvider(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := EditCertificateProvider(client, template.Func, partialTemplate.Func)(w, r)
+			err := EditCertificateProvider(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Equal(t, tc.expectedErr, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -320,7 +307,7 @@ func TestPostEditCertificateProviderValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditCertificateProvider(client, template.Func, template.Func)(w, r)
+	err := EditCertificateProvider(client, template.Func)(w, r)
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

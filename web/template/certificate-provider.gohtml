@@ -3,15 +3,6 @@
 {{ define "partial-content" }}
     <div class="action-panel__form">
 
-        {{ if .HtmxRedirect }}
-            <span class="govuk-!-display-none"
-                  hx-get="{{ prefix .HtmxRedirect }}"
-                  hx-target=".action-panel__content"
-                  hx-swap="{{ .HtmxSwap }}"
-                  hx-trigger="load"
-            ></span>
-        {{ end }}
-
         {{ template "error-summary" .Error }}
 
         <a class="govuk-back-link"
