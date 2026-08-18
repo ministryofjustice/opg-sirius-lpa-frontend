@@ -17,6 +17,7 @@ type CreateCorrespondentClient interface {
 
 type createCorrespondentData struct {
 	XSRFToken     string
+	IsPartial     bool
 	DonorId       int
 	CaseId        int
 	CaseType      string
@@ -26,7 +27,7 @@ type createCorrespondentData struct {
 	Title         string
 }
 
-func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Template, partialTemplate template.Template) Handler {
+func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -42,6 +43,7 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 
 		data := createCorrespondentData{
 			XSRFToken: ctx.XSRFToken,
+			IsPartial: r.Header.Get("HX-Request") == "true",
 			DonorId:   donorId,
 			CaseId:    caseId,
 			CaseType:  r.FormValue("caseType"),
@@ -117,10 +119,6 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 				}
 			}
 
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTemplate(w, data)
 		}
 
 		return tmpl(w, data)
