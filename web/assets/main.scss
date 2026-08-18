@@ -550,6 +550,11 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   flex: 1;
 }
 
+.document-list-scrollable {
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
 .govuk-width-container:has(> .action-panel) {
   display: grid;
   grid-template-columns: 1fr 1.5rem;
@@ -1144,4 +1149,8 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   .govuk-form-group {
     border-bottom: 1px solid govuk-functional-colour(border);
   }
+}
+
+.govuk-table[data-module="moj-sortable-table"] + div[role="status"] {
+  bottom: 0;
 }
