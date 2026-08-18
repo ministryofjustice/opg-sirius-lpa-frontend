@@ -1,5 +1,39 @@
 {{ template "page" . }}
 
+{{ define "partial-content" }}
+  <div class="action-panel__form">
+    {{ template "error-summary" .Error }}
+
+    {{ if .Success }}
+      <meta http-equiv="Refresh" content="0" />
+      {{ template "success-banner" (printf "Status changed to %s" .NewStatus) }}
+    {{ end }}
+
+    <h1 class="govuk-heading-m">Change Status</h1>
+
+    <p class="govuk-body"><strong>{{ .Entity }}</strong></p>
+
+    <form class="form" method="POST"
+          hx-post="{{ prefix (printf "/change-status?id=%d&case=%s&donorId=%d%s" .CaseID .CaseType .DonorID .CaseUids) }}"
+          hx-target=".action-panel__content"
+          hx-swap="innerHTML">
+      <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+      {{ template "form-content" . }}
+
+      <div class="govuk-button-group">
+        <button class="govuk-button" data-module="govuk-button" type="submit">Submit</button>
+        <a class="govuk-link govuk-link--no-visited-state"
+           href=""
+           hx-get="{{ prefix (printf "/action-panel?id=%d&entity=%s%s" .DonorID .CaseType .CaseUids) }}"
+           hx-target=".action-panel__content"
+           hx-swap="innerHTML"
+        >Cancel</a>
+      </div>
+    </form>
+  </div>
+{{ end }}
+
 {{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Change status{{ end }}
 
 {{ define "main" }}
@@ -19,9 +53,7 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        {{ template "select" (select "status" "Status" .NewStatus .Error.Field.status (options .AvailableStatuses) "required" true) }}
-
-        {{ template "textarea" (field "notes" "Notes" .Notes .Error.Field.notes "hint" "Optional") }}
+        {{ template "form-content" . }}
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Submit</button>
@@ -30,4 +62,9 @@
       </form>
     </div>
   </div>
+{{ end }}
+
+{{ define "form-content" }}
+  {{ template "select" (select "status" "Status" .NewStatus .Error.Field.status (options .AvailableStatuses) "required" true) }}
+  {{ template "textarea" (field "notes" "Notes" .Notes .Error.Field.notes "hint" "Optional") }}
 {{ end }}

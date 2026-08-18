@@ -173,7 +173,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/action-panel", wrap(ActionPanel(client, templates.Get("action-panel-wrapper.gohtml"))))
 	mux.Handle("/add-complaint", wrap(AddComplaint(client, templates.Get("add-complaint.gohtml"))))
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate-cases.gohtml"))))
-	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change-status.gohtml"), templates.Get("change-status-partial.gohtml"))))
+	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change-status.gohtml"))))
 	mux.Handle("/create-attorney", wrap(CreateAttorney(client, templates.Get("create-attorney-wrapper.gohtml"), templates.Get("create-attorney-partial-wrapper.gohtml"))))
 	mux.Handle("/create-certificate-provider", wrap(CreateCertificateProvider(client, templates.Get("certificate-provider-wrapper.gohtml"), templates.Get("certificate-provider-partial-wrapper.gohtml"))))
 	mux.Handle("/create-correspondent", wrap(CreateCorrespondent(client, templates.Get("create-correspondent-wrapper.gohtml"), templates.Get("create-correspondent-partial-wrapper.gohtml"))))
