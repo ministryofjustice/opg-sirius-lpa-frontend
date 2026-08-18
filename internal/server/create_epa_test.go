@@ -46,7 +46,7 @@ func TestGetCreateEpa(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateEpa(client, template.Func, nil)(w, r)
+	err := CreateEpa(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -58,11 +58,11 @@ func TestGetCreateEpaHtmxRequest(t *testing.T) {
 	client := &mockCreateEpaClient{}
 
 	template := &mockTemplate{}
-	partialTemplate := &mockTemplate{}
-	partialTemplate.
+	template.
 		On("Func", mock.Anything, createEpaData{
-			DonorId: 123,
-			Title:   "Create an EPA",
+			DonorId:   123,
+			Title:     "Create an EPA",
+			IsPartial: true,
 		}).
 		Return(nil)
 
@@ -70,13 +70,12 @@ func TestGetCreateEpaHtmxRequest(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := CreateEpa(client, template.Func, partialTemplate.Func)(w, r)
+	err := CreateEpa(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	template.AssertNotCalled(t, "Func", mock.Anything, mock.Anything)
-	mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestGetCreateEpaEdit(t *testing.T) {
@@ -112,7 +111,7 @@ func TestGetCreateEpaEdit(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "/?id=123&caseId=234", nil)
 			w := httptest.NewRecorder()
 
-			err := CreateEpa(client, template.Func, nil)(w, r)
+			err := CreateEpa(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -134,7 +133,7 @@ func TestGetCreateEpaBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateEpa(nil, nil, nil)(w, r)
+			err := CreateEpa(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -152,7 +151,7 @@ func TestGetCreateEpaEditWhenEpaErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&caseId=234", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateEpa(client, template.Func, nil)(w, r)
+	err := CreateEpa(client, template.Func)(w, r)
 
 	assert.Equal(t, err, errExample)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -210,7 +209,7 @@ func TestPostCreateEpa(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateEpa(client, template.Func, nil)(w, r)
+	err := CreateEpa(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -289,7 +288,7 @@ func TestPostCreateEpaEdit(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateEpa(client, template.Func, nil)(w, r)
+	err := CreateEpa(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -402,7 +401,7 @@ func TestPostCreateEpaRedirects(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := CreateEpa(client, template.Func, nil)(w, r)
+			err := CreateEpa(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Equal(t, tc.expectedError, err)
@@ -466,7 +465,7 @@ func TestPostCreateEpaWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateEpa(client, template.Func, nil)(w, r)
+	err := CreateEpa(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -497,13 +496,13 @@ func TestPostCreateEpaWhenValidationErrorHtmxRequest(t *testing.T) {
 		Return(sirius.Epa{}, expectedError)
 
 	template := &mockTemplate{}
-	partialTemplate := &mockTemplate{}
-	partialTemplate.
+	template.
 		On("Func", mock.Anything, createEpaData{
-			DonorId: 123,
-			Title:   "Create an EPA",
-			Success: false,
-			Error:   expectedError,
+			DonorId:   123,
+			Title:     "Create an EPA",
+			Success:   false,
+			Error:     expectedError,
+			IsPartial: true,
 		}).
 		Return(nil)
 
@@ -514,13 +513,12 @@ func TestPostCreateEpaWhenValidationErrorHtmxRequest(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := CreateEpa(client, template.Func, partialTemplate.Func)(w, r)
+	err := CreateEpa(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	template.AssertNotCalled(t, "Func", mock.Anything, mock.Anything)
-	mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestPostCreateEpaWhenValidationErrorOnReceiptDate(t *testing.T) {
@@ -580,7 +578,7 @@ func TestPostCreateEpaWhenValidationErrorOnReceiptDate(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateEpa(client, template.Func, nil)(w, r)
+	err := CreateEpa(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -648,7 +646,7 @@ func TestPostCreateEpaAddActorValidationErrorOnReceiptDate(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := CreateEpa(client, template.Func, nil)(w, r)
+			err := CreateEpa(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -672,7 +670,7 @@ func TestGetCreateEpaDoesNotSetIsUpdate(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateEpa(client, template.Func, nil)(w, r)
+	err := CreateEpa(client, template.Func)(w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -743,7 +741,7 @@ func TestPostCreateEpaEditWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateEpa(client, template.Func, nil)(w, r)
+	err := CreateEpa(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
