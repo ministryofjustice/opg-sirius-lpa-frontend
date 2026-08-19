@@ -199,6 +199,9 @@ class PDFViewer {
         </button>
       </div>
       <div class="pdf-viewer-controls-group">
+        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="print-doc">
+          Print
+        </button>
         <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="rotate-cw">
           Rotate Clockwise
         </button>
@@ -327,6 +330,9 @@ class PDFViewer {
         break;
       case "toggle-thumbnails":
         this.toggleThumbnails();
+        break;
+      case "print-doc":
+        this.printDoc();
         break;
       case "rotate-cw":
         this.rotateCW();
@@ -624,6 +630,19 @@ class PDFViewer {
     }
     await this.applyZoom();
     // applyZoom already saves compare state
+  }
+
+  printDoc() {
+    if (!this.pdfDoc) return;
+    this.pdfDoc.getData().then((data) => {
+      const blob = new Blob([data], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const iframe = document.createElement("iframe");
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      // iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    });
   }
 
   rotateCW() {
