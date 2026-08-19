@@ -14,11 +14,11 @@
                 <th scope="row" class="govuk-table__header">Middle name</th>
                 <td class="govuk-table__cell">{{ .Middlenames }}</td>
             </tr>
-            <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header">Last name</th>
-                <td class="govuk-table__cell">{{ .Surname }}</td>
-            </tr>
         {{ end }}
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Last name</th>
+            <td class="govuk-table__cell">{{ .Surname }}</td>
+        </tr>
         {{ if and (ne .PersonType "Correspondent") (ne .PersonType "Certificate Provider") (ne .PersonType "Notified Person") (ne .PersonType "Trust Corporation") }}
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Date of birth</th>
