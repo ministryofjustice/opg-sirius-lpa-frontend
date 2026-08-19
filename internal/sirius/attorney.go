@@ -8,7 +8,7 @@ import (
 
 type Attorney struct {
 	Person
-	CompanyNumber         string     `json:"companyNumber,omitempty"`
+	CompanyNumber         string     `json:"companyNumber"`
 	LpaPartCSignatureDate DateString `json:"lpaPartCSignatureDate,omitempty"`
 	RelationshipToDonor   string     `json:"relationshipToDonor,omitempty"`
 	SystemStatus          *bool      `json:"systemStatus,omitempty"`

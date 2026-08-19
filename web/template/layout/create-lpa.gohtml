@@ -117,7 +117,7 @@
                 <div class="app-create-lpa__details-row">
                   <details class="govuk-details">
                     <summary class="govuk-details__summary app-table__row--half-width">
-                      <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }}{{ end }}</span>
+                      <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }} {{ end }}(trust corporation)</span>
                     </summary>
                     <div class="govuk-details__text">
                         {{ template "person-details-table" . }}
@@ -199,7 +199,7 @@
               {{ range $attorney := .Lpa.ReplacementAttorneys }}
                 <div class="app-create-lpa__details-row">
                   <details class="govuk-details">
-                    <summary class="govuk-details__summary">
+                    <summary class="govuk-details__summary app-table__row--half-width">
                       <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
                     </summary>
                     <div class="govuk-details__text">
@@ -224,8 +224,8 @@
               {{ range $trustCorporation := .ReplacementAttorneyTrustCorporations }}
                 <div class="app-create-lpa__details-row">
                   <details class="govuk-details">
-                    <summary class="govuk-details__summary">
-                      <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }}{{ end }}</span>
+                    <summary class="govuk-details__summary app-table__row--half-width">
+                      <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }} {{ end }}(trust corporation)</span>
                     </summary>
                     <div class="govuk-details__text">
                         {{ template "person-details-table" . }}
