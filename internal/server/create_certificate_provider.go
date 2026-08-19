@@ -91,10 +91,12 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 				}
 
 				if data.IsPartial {
+					data.HtmxRedirect = redirect
 					data.HtmxSwap = swap
+					return tmpl(w, data)
 				}
 
-				return RedirectError(redirect)
+				return RedirectError(fmt.Sprintf("%s#accordion-create-lpa-heading-3", redirect))
 			}
 		}
 
