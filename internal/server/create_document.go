@@ -22,6 +22,7 @@ type CreateDocumentClient interface {
 
 type createDocumentData struct {
 	XSRFToken                  string
+	IsPartial                  bool
 	RecipientAddedSuccess      bool
 	Error                      sirius.ValidationError
 	Case                       sirius.Case
@@ -62,7 +63,7 @@ type ComponentDocumentData struct {
 	Translations map[string]string       `json:"translations"`
 }
 
-func CreateDocument(client CreateDocumentClient, tmpl template.Template, tmplHtmx template.Template) Handler {
+func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
 			return err
@@ -86,6 +87,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template, tmplHtm
 
 		data := createDocumentData{
 			XSRFToken: ctx.XSRFToken,
+			IsPartial: r.Header.Get("HX-Request") == "true",
 			Case:      caseItem,
 		}
 
@@ -237,10 +239,6 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template, tmplHtm
 					}
 				}
 			}
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return tmplHtmx(w, data)
 		}
 
 		return tmpl(w, data)
