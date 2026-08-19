@@ -19,6 +19,7 @@ type relationshipData struct {
 	Entity    string
 	Success   bool
 	Error     sirius.ValidationError
+	IsPartial bool
 
 	DonorID    int
 	CaseUIDs   string
@@ -29,7 +30,7 @@ type relationshipData struct {
 	Reason     string
 }
 
-func Relationship(client RelationshipClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func Relationship(client RelationshipClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		personID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -47,6 +48,7 @@ func Relationship(client RelationshipClient, tmpl template.Template, partialTmpl
 			XSRFToken: ctx.XSRFToken,
 			Entity:    fmt.Sprintf("%s %s", person.Firstname, person.Surname),
 			DonorID:   personID,
+			IsPartial: r.Header.Get("HX-Request") == "true",
 		}
 
 		data.CaseUIDs = buildUIDQueryString(r.Form["uid[]"])
@@ -81,9 +83,6 @@ func Relationship(client RelationshipClient, tmpl template.Template, partialTmpl
 			} else {
 				data.Success = true
 			}
-		}
-		if r.Header.Get("HX-Request") == "true" && partialTmpl != nil {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
