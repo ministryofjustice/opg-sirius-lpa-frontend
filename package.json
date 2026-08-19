@@ -29,8 +29,8 @@
     "punycode": "^2.3.1"
   },
   "devDependencies": {
-    "@babel/plugin-transform-runtime": "^7.29.7",
-    "@babel/preset-env": "^7.29.7",
+    "@babel/plugin-transform-runtime": "^8.0.0",
+    "@babel/preset-env": "^8.0.0",
     "esbuild": "^0.28.0",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
