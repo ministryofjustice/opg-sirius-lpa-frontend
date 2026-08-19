@@ -202,6 +202,9 @@ class PDFViewer {
         </button>
       </div>
       <div class="pdf-viewer-controls-group">
+        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="print-doc">
+          Print
+        </button>
         <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="rotate-cw">
           Rotate Clockwise
         </button>
@@ -333,6 +336,9 @@ class PDFViewer {
         break;
       case "toggle-thumbnails":
         this.toggleThumbnails();
+        break;
+      case "print-doc":
+        this.printDoc();
         break;
       case "rotate-cw":
         this.rotateCW();
