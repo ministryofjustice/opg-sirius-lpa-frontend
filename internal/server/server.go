@@ -182,7 +182,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-epa", wrap(CreateEpa(client, templates.Get("create-epa.gohtml"))))
 	mux.Handle("/create-investigation", wrap(CreateInvestigation(client, templates.Get("create-investigation.gohtml"))))
 	mux.Handle("/create-lpa", wrap(CreateLpa(client, templates.Get("create-lpa-wrapper.gohtml"), templates.Get("create-lpa-partial-wrapper.gohtml"))))
-	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("create-relationship-wrapper.gohtml"), templates.Get("create-relationship-partial-wrapper.gohtml"))))
+	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("create-relationship.gohtml"))))
 	mux.Handle("/create-notified-person", wrap(CreateNotifiedPerson(client, templates.Get("create-notified-person.gohtml"))))
 	mux.Handle("/create-replacement-attorney", wrap(CreateReplacementAttorney(client, templates.Get("create-replacement-attorney-wrapper.gohtml"), templates.Get("create-replacement-attorney-partial-wrapper.gohtml"))))
 	mux.Handle("/compare/{id}/{caseUid}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
