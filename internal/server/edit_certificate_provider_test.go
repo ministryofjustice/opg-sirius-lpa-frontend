@@ -172,7 +172,7 @@ func TestPostEditCertificateProvider(t *testing.T) {
 			name:        "Submit",
 			htmxRequest: false,
 			error:       nil,
-			expectedErr: RedirectError("/create-lpa?id=1&caseId=2"),
+			expectedErr: RedirectError("/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-3"),
 		},
 		{
 			name:        "Submit API Failure",
@@ -185,7 +185,7 @@ func TestPostEditCertificateProvider(t *testing.T) {
 			htmxRequest: true,
 			swap:        "innerHTML show:#accordion-create-lpa-heading-3:top",
 			error:       nil,
-			expectedErr: RedirectError("/create-lpa?id=1&caseId=2"),
+			expectedErr: nil,
 		},
 	}
 
@@ -212,18 +212,18 @@ func TestPostEditCertificateProvider(t *testing.T) {
 				Return(tc.error)
 
 			template := &mockTemplate{}
-			partialTemplate := &mockTemplate{}
 			if tc.htmxRequest {
-				partialTemplate.
+				template.
 					On("Func", mock.Anything, CertificateProviderData{
 						DonorId:             1,
 						CaseId:              2,
 						CanAddActor:         false,
 						CertificateProvider: mockCertificateProvider,
-						HtmxRedirect:        "/create-lpa?id=1&caseId=2",
+						HtmxRedirect:        "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-3",
 						HtmxSwap:            tc.swap,
 						Title:               "Edit a certificate provider",
 						PostURL:             "/edit-certificate-provider?id=1&caseId=2&personId=3",
+						IsPartial:           true,
 					}).
 					Return(nil)
 			}

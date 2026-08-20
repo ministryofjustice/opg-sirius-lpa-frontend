@@ -86,7 +86,7 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 					redirect = fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorId, caseId)
 					swap = "innerHTML scroll:.action-panel__content:top"
 				} else {
-					redirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId)
+					redirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-3", donorId, caseId)
 					swap = "innerHTML show:#accordion-create-lpa-heading-3:top"
 				}
 
@@ -96,7 +96,7 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 					return tmpl(w, data)
 				}
 
-				return RedirectError(fmt.Sprintf("%s#accordion-create-lpa-heading-3", redirect))
+				return RedirectError(redirect)
 			}
 		}
 

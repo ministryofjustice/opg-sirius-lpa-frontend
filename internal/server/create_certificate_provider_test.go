@@ -139,25 +139,29 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 		redirectURL string
 		htmxRequest bool
 		swap        string
+		expectedErr error
 	}{
 		{
 			name:        "Submit",
 			addActor:    "",
-			redirectURL: "/create-lpa?id=1&caseId=2",
+			redirectURL: "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-3",
 			htmxRequest: false,
+			expectedErr: RedirectError("/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-3"),
 		},
 		{
 			name:        "Submit htmx request",
 			addActor:    "",
-			redirectURL: "/create-lpa?id=1&caseId=2",
+			redirectURL: "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-3",
 			htmxRequest: true,
 			swap:        "innerHTML show:#accordion-create-lpa-heading-3:top",
+			expectedErr: nil,
 		},
 		{
 			name:        "Submit and add another certificate provider",
 			addActor:    "true",
 			redirectURL: "/create-certificate-provider?id=1&caseId=2",
 			htmxRequest: false,
+			expectedErr: RedirectError("/create-certificate-provider?id=1&caseId=2"),
 		},
 		{
 			name:        "Submit and add another certificate provider htmx request",
@@ -165,6 +169,7 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 			redirectURL: "/create-certificate-provider?id=1&caseId=2",
 			htmxRequest: true,
 			swap:        "innerHTML scroll:.action-panel__content:top",
+			expectedErr: nil,
 		},
 	}
 
@@ -191,9 +196,8 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 				Return(nil)
 
 			template := &mockTemplate{}
-			partialTemplate := &mockTemplate{}
 			if tc.htmxRequest {
-				partialTemplate.
+				template.
 					On("Func", mock.Anything, CertificateProviderData{
 						DonorId:      1,
 						CaseId:       2,
@@ -202,6 +206,7 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 						HtmxSwap:     tc.swap,
 						Title:        "Add a certificate provider",
 						PostURL:      "/create-certificate-provider?id=1&caseId=2",
+						IsPartial:    tc.htmxRequest,
 					}).
 					Return(nil)
 			}
@@ -230,7 +235,7 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 
 			err := CreateCertificateProvider(client, template.Func)(w, r)
 			resp := w.Result()
-			assert.Equal(t, RedirectError(tc.redirectURL), err)
+			assert.Equal(t, tc.expectedErr, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client, template)
 		})

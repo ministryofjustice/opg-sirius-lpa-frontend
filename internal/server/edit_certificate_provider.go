@@ -73,7 +73,7 @@ func EditCertificateProvider(client EditCertificateProviderClient, tmpl template
 				return err
 			} else {
 				if data.IsPartial {
-					data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId)
+					data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-3", donorId, caseId)
 					data.HtmxSwap = "innerHTML show:#accordion-create-lpa-heading-3:top"
 					return tmpl(w, data)
 				}
