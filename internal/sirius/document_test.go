@@ -558,6 +558,18 @@ func TestDownloadMultipleClientError(t *testing.T) {
 	assert.Equal(t, expectedErr, err)
 }
 
+func TestDownloadMultipleInfectedClientError(t *testing.T) {
+	t.Parallel()
+
+	expectedErr := errors.New("400")
+	client := NewClient(downloadMultipleErrorClient{err: expectedErr}, "http://example.com")
+
+	resp, err := client.DownloadMultiple(Context{Context: context.Background()}, []string{"1"})
+
+	assert.Nil(t, resp)
+	assert.Equal(t, expectedErr, err)
+}
+
 // non-pact test
 func TestDocumentIsViewable(t *testing.T) {
 	d := Document{}
