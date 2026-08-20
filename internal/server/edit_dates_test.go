@@ -48,12 +48,13 @@ func TestGetEditDates(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, editDatesData{
-					Entity:   caseType + " 700700",
-					Dates:    sirius.Dates{CancellationDate: sirius.DateString("2021-01-01")},
-					DonorId:  1,
-					CaseType: caseType,
-					CaseUid:  "700700",
-					CaseId:   123,
+					Entity:    caseType + " 700700",
+					Dates:     sirius.Dates{CancellationDate: sirius.DateString("2021-01-01")},
+					DonorId:   1,
+					CaseType:  caseType,
+					CaseUid:   "700700",
+					CaseId:    123,
+					IsPartial: htmx,
 				}).
 				Return(nil)
 
@@ -64,7 +65,7 @@ func TestGetEditDates(t *testing.T) {
 				r.Header.Add("HX-Request", "true")
 			}
 
-			err := EditDates(client, template.Func, template.Func)(w, r)
+			err := EditDates(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -86,7 +87,7 @@ func TestGetEditDatesNoID(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := EditDates(nil, nil, nil)(w, r)
+			err := EditDates(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -104,7 +105,7 @@ func TestGetEditDatesWhenCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := EditDates(client, nil, nil)(w, r)
+	err := EditDates(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -136,7 +137,7 @@ func TestGetEditDatesWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := EditDates(client, template.Func, nil)(w, r)
+	err := EditDates(client, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -203,7 +204,7 @@ func TestPostEditDates(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := EditDates(client, template.Func, nil)(w, r)
+			err := EditDates(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -229,7 +230,7 @@ func TestPostEditDatesWhenEditDatesErrors(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditDates(client, nil, nil)(w, r)
+	err := EditDates(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -280,7 +281,7 @@ func TestPostEditDatesWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditDates(client, template.Func, nil)(w, r)
+	err := EditDates(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
