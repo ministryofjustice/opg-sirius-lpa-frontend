@@ -128,8 +128,8 @@ func TestGetSiriusHeaderPersonInfoGetSelectedPerson(t *testing.T) {
 		ReplacementAttorneys: []sirius.Attorney{
 			{Person: sirius.Person{ID: 3}},
 		},
-		TrustCorporations: []sirius.Attorney{
-			{Person: sirius.Person{ID: 4}},
+		TrustCorporations: []sirius.TrustCorporation{
+			{Attorney: sirius.Attorney{Person: sirius.Person{ID: 4}}},
 		},
 		CertificateProviders: []sirius.Person{{ID: 5}},
 		NotifiedPersons:      []sirius.NotifiedPerson{{Person: sirius.Person{ID: 6}}},

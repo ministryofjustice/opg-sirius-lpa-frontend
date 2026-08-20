@@ -31,9 +31,10 @@ func TestGetCreateCertificateProviders(t *testing.T) {
 		name                 string
 		certificateProviders []sirius.Person
 		canAddActor          bool
+		isPartial            bool
 	}{
 		{
-			name:                 "Can add certificate provider",
+			name:                 "Can add another certificate provider",
 			certificateProviders: nil,
 			canAddActor:          true,
 		},
@@ -43,6 +44,12 @@ func TestGetCreateCertificateProviders(t *testing.T) {
 				{ID: 1},
 			},
 			canAddActor: false,
+		},
+		{
+			name:                 "Can add certificate provider on htmx",
+			certificateProviders: nil,
+			canAddActor:          true,
+			isPartial:            true,
 		},
 	}
 
@@ -68,13 +75,17 @@ func TestGetCreateCertificateProviders(t *testing.T) {
 					CanAddActor: tc.canAddActor,
 					Title:       "Add a certificate provider",
 					PostURL:     "/create-certificate-provider?id=1&caseId=2",
+					IsPartial:   tc.isPartial,
 				}).
 				Return(nil)
 
 			r, _ := http.NewRequest(http.MethodGet, "/create-certificate-provider?id=1&caseId=2", nil)
+			if tc.isPartial {
+				r.Header.Add("HX-Request", "true")
+			}
 			w := httptest.NewRecorder()
 
-			err := CreateCertificateProvider(client, template.Func, template.Func)(w, r)
+			err := CreateCertificateProvider(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -82,40 +93,6 @@ func TestGetCreateCertificateProviders(t *testing.T) {
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
-}
-
-func TestGetCreateCertificateWithHXRequest(t *testing.T) {
-	client := &mockCreateCertificateProviderClient{}
-	client.
-		On("Lpa", mock.Anything, 2).
-		Return(sirius.Lpa{Case: sirius.Case{ID: 2}}, nil)
-
-	partialTemplate := &mockTemplate{}
-	partialTemplate.
-		On("Func", mock.Anything, CertificateProviderData{
-			DonorId:     1,
-			CaseId:      2,
-			CanAddActor: true,
-			Title:       "Add a certificate provider",
-			PostURL:     "/create-certificate-provider?id=1&caseId=2",
-		}).
-		Return(nil)
-
-	template := &mockTemplate{}
-
-	r, _ := http.NewRequest(http.MethodGet, "/create-certificate-provider?id=1&caseId=2", nil)
-	r.Header.Add("HX-Request", "true")
-	w := httptest.NewRecorder()
-
-	err := CreateCertificateProvider(client, template.Func, partialTemplate.Func)(w, r)
-	resp := w.Result()
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, partialTemplate)
-	mock.AssertExpectationsForObjects(t, client, template)
-	template.AssertNotCalled(t, "Func")
-	partialTemplate.AssertCalled(t, "Func", mock.Anything, mock.Anything)
 }
 
 func TestGetCreateCertificateProviderLpaFail(t *testing.T) {
@@ -131,7 +108,7 @@ func TestGetCreateCertificateProviderLpaFail(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/create-certificate-provider?id=1&caseId=2", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateCertificateProvider(client, template.Func, template.Func)(w, r)
+	err := CreateCertificateProvider(client, template.Func)(w, r)
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
@@ -148,7 +125,7 @@ func TestGetCreateCertificateProviderBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, query, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateCertificateProvider(nil, nil, nil)(w, r)
+			err := CreateCertificateProvider(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -162,25 +139,29 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 		redirectURL string
 		htmxRequest bool
 		swap        string
+		expectedErr error
 	}{
 		{
 			name:        "Submit",
 			addActor:    "",
-			redirectURL: "/create-lpa?id=1&caseId=2",
+			redirectURL: "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-3",
 			htmxRequest: false,
+			expectedErr: RedirectError("/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-3"),
 		},
 		{
 			name:        "Submit htmx request",
 			addActor:    "",
-			redirectURL: "/create-lpa?id=1&caseId=2",
+			redirectURL: "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-3",
 			htmxRequest: true,
 			swap:        "innerHTML show:#accordion-create-lpa-heading-3:top",
+			expectedErr: nil,
 		},
 		{
 			name:        "Submit and add another certificate provider",
 			addActor:    "true",
 			redirectURL: "/create-certificate-provider?id=1&caseId=2",
 			htmxRequest: false,
+			expectedErr: RedirectError("/create-certificate-provider?id=1&caseId=2"),
 		},
 		{
 			name:        "Submit and add another certificate provider htmx request",
@@ -188,6 +169,7 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 			redirectURL: "/create-certificate-provider?id=1&caseId=2",
 			htmxRequest: true,
 			swap:        "innerHTML scroll:.action-panel__content:top",
+			expectedErr: nil,
 		},
 	}
 
@@ -214,9 +196,8 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 				Return(nil)
 
 			template := &mockTemplate{}
-			partialTemplate := &mockTemplate{}
 			if tc.htmxRequest {
-				partialTemplate.
+				template.
 					On("Func", mock.Anything, CertificateProviderData{
 						DonorId:      1,
 						CaseId:       2,
@@ -225,6 +206,7 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 						HtmxSwap:     tc.swap,
 						Title:        "Add a certificate provider",
 						PostURL:      "/create-certificate-provider?id=1&caseId=2",
+						IsPartial:    tc.htmxRequest,
 					}).
 					Return(nil)
 			}
@@ -251,17 +233,11 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateCertificateProvider(client, template.Func, partialTemplate.Func)(w, r)
+			err := CreateCertificateProvider(client, template.Func)(w, r)
 			resp := w.Result()
-
-			if tc.htmxRequest {
-				assert.Nil(t, err)
-			} else {
-				assert.Equal(t, RedirectError(tc.redirectURL), err)
-			}
+			assert.Equal(t, tc.expectedErr, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client, template)
-			mock.AssertExpectationsForObjects(t, client, partialTemplate)
 		})
 	}
 }
@@ -307,7 +283,7 @@ func TestPostCreateCertificateProviderWhenAPIFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateCertificateProvider(client, template.Func, template.Func)(w, r)
+	err := CreateCertificateProvider(client, template.Func)(w, r)
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
@@ -359,7 +335,7 @@ func TestPostCreateCertificateProviderValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateCertificateProvider(client, template.Func, template.Func)(w, r)
+	err := CreateCertificateProvider(client, template.Func)(w, r)
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
