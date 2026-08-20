@@ -24,9 +24,10 @@ type CertificateProviderData struct {
 	HtmxSwap            string
 	Title               string
 	PostURL             string
+	IsPartial           bool
 }
 
-func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -52,6 +53,7 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 			CanAddActor: len(caseItem.CertificateProviders) < 1,
 			Title:       "Add a certificate provider",
 			PostURL:     fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorId, caseId),
+			IsPartial:   r.Header.Get("HX-Request") == "true",
 		}
 
 		if r.Method == http.MethodPost {
@@ -84,21 +86,18 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 					redirect = fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorId, caseId)
 					swap = "innerHTML scroll:.action-panel__content:top"
 				} else {
-					redirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId)
+					redirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-3", donorId, caseId)
 					swap = "innerHTML show:#accordion-create-lpa-heading-3:top"
 				}
 
-				if r.Header.Get("HX-Request") == "true" {
+				if data.IsPartial {
 					data.HtmxRedirect = redirect
 					data.HtmxSwap = swap
-					return partialTmpl(w, data)
+					return tmpl(w, data)
 				}
 
 				return RedirectError(redirect)
 			}
-		}
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
