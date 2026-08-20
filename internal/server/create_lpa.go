@@ -39,9 +39,10 @@ type createLpaData struct {
 	SuccessMessage                       string
 	Title                                string
 	XSRFToken                            string
+	IsPartial                            bool
 }
 
-func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -62,6 +63,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 
 		data := createLpaData{
 			XSRFToken:              ctx.XSRFToken,
+			IsPartial:              r.Header.Get("HX-Request") == "true",
 			DonorId:                donorID,
 			DonorName:              donor.Firstname + " " + donor.Surname,
 			Title:                  "Create an LPA",
@@ -214,9 +216,6 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 				lpa.ReplacementAttorneys = data.Lpa.ReplacementAttorneys
 				data.Lpa = lpa
 
-				if r.Header.Get("HX-Request") == "true" {
-					return partialTmpl(w, data)
-				}
 				return tmpl(w, data)
 			} else if err != nil {
 				return err
@@ -278,10 +277,10 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 		}
 
 		if r.FormValue("addReplacementAttorney") != "" {
-			if r.Header.Get("HX-Request") == "true" {
+			if data.IsPartial {
 				data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorID, data.CaseId)
 				data.HtmxSwap = "innerHTML"
-				return partialTmpl(w, data)
+				return tmpl(w, data)
 			}
 			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorID, data.CaseId))
 		}
@@ -292,10 +291,10 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 				return err
 			}
 
-			if r.Header.Get("HX-Request") == "true" {
+			if data.IsPartial {
 				data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d", donorID, data.CaseId, attorneyID)
 				data.HtmxSwap = "innerHTML"
-				return partialTmpl(w, data)
+				return tmpl(w, data)
 			}
 			return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d", donorID, data.CaseId, attorneyID))
 		}
@@ -306,16 +305,12 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 				return err
 			}
 
-			if r.Header.Get("HX-Request") == "true" {
+			if data.IsPartial {
 				data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d", donorID, data.CaseId, attorneyID)
 				data.HtmxSwap = "innerHTML"
-				return partialTmpl(w, data)
+				return tmpl(w, data)
 			}
 			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d", donorID, data.CaseId, attorneyID))
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
