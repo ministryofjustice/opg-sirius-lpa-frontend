@@ -40,7 +40,7 @@
                 <th scope="row" class="govuk-table__header">Trust corporation registration number</th>
                 <td class="govuk-table__cell">{{ .CompanyNumber }}</td>
             </tr>
-        {{ else }}
+        {{ else if and (ne .PersonType "Certificate Provider") (ne .PersonType "Notified Person")}}
             {{ if .CompanyName }}
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header">Company name</th>

@@ -81,7 +81,7 @@ func TestGetCreateLpa(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -99,13 +99,13 @@ func TestGetCreateLpaHtmxRequest(t *testing.T) {
 		Return(sirius.Permissions{}, nil)
 
 	template := &mockTemplate{}
-	partialTemplate := &mockTemplate{}
-	partialTemplate.
+	template.
 		On("Func", mock.Anything, createLpaData{
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
 			Title:                  "Create an LPA",
 			AllowNewNotifiedPerson: true,
+			IsPartial:              true,
 		}).
 		Return(nil)
 
@@ -113,13 +113,12 @@ func TestGetCreateLpaHtmxRequest(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, partialTemplate.Func)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	template.AssertNotCalled(t, "Func", mock.Anything, mock.Anything)
-	mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestGetCreateLpaDoesNotSetIsUpdate(t *testing.T) {
@@ -145,7 +144,7 @@ func TestGetCreateLpaDoesNotSetIsUpdate(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -174,7 +173,7 @@ func TestGetCreateLpaCanEditReceiptDate(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, template.Func)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -221,7 +220,7 @@ func TestGetCreateLpaEdit(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "/?id=123&caseId=456", nil)
 			w := httptest.NewRecorder()
 
-			err := CreateLpa(client, template.Func, template.Func)(w, r)
+			err := CreateLpa(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -270,7 +269,7 @@ func TestGetCreateLpaEditWithTrustCorporations(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "/?id=123&caseId=456", nil)
 			w := httptest.NewRecorder()
 
-			err := CreateLpa(client, template.Func, template.Func)(w, r)
+			err := CreateLpa(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -300,7 +299,7 @@ func TestGetCreateLpaBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateLpa(client, nil, nil)(w, r)
+			err := CreateLpa(client, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -316,7 +315,7 @@ func TestCreateLpaWhenPersonErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, nil, nil)(w, r)
+	err := CreateLpa(client, nil)(w, r)
 
 	assert.Equal(t, err, errExample)
 	mock.AssertExpectationsForObjects(t, client)
@@ -334,7 +333,7 @@ func TestCreateLpaWhenPermissionsError(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, nil, nil)(w, r)
+	err := CreateLpa(client, nil)(w, r)
 
 	assert.Equal(t, err, errExample)
 	mock.AssertExpectationsForObjects(t, client)
@@ -355,7 +354,7 @@ func TestCreateLpaWhenLpaErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&caseId=456", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, nil, nil)(w, r)
+	err := CreateLpa(client, nil)(w, r)
 
 	assert.Equal(t, err, errExample)
 	mock.AssertExpectationsForObjects(t, client)
@@ -436,7 +435,7 @@ func TestPostCreateLpa(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -492,7 +491,7 @@ func TestPostCreateLpaClearsMismatchedSubtypeOnlyFields(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -541,7 +540,7 @@ func TestPostCreateLpaPreferencesNoneClearsOtherSelections(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -594,7 +593,7 @@ func TestPostCreateLpaDropsOnlineLpaIdWhenNotOnline(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -656,7 +655,7 @@ func TestPostCreateLpaIgnoresReceiptDateWithoutPermission(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -706,7 +705,7 @@ func TestPostCreateLpaDropsCardPaymentContactWhenCardNotSelected(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -755,7 +754,7 @@ func TestPostCreateLpaDropsAdditionalInfoWhenAnyOtherInfoNotSelected(t *testing.
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -805,7 +804,7 @@ func TestPostCreateLpaApplicationFeeReducedFeeExemption(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -855,7 +854,7 @@ func TestPostCreateLpaApplicationFeeReducedFeeRemission(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -904,7 +903,7 @@ func TestPostCreateLpaApplicationFeeReducedFeeTypeIgnoredWhenNotSelected(t *test
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -966,7 +965,7 @@ func TestPostCreateLpaApplicantAndLifeSustainingTreatmentFields(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -1038,7 +1037,7 @@ func TestPostCreateLpaEditAttorneySignatureDates(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -1110,7 +1109,7 @@ func TestPostCreateLpaEditReplacementAttorneySignatureDates(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -1182,7 +1181,7 @@ func TestPostCreateLpaEditTrustCorporationSignatureDates(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -1249,7 +1248,7 @@ func TestPostCreateLpaEditAttorneySignatureDatesError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, nil, nil)(w, r)
+	err := CreateLpa(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -1316,7 +1315,7 @@ func TestPostCreateLpaEditReplacementAttorneySignatureDatesError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, nil, nil)(w, r)
+	err := CreateLpa(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -1383,7 +1382,7 @@ func TestPostCreateLpaEditTrustCorporationSignatureDatesError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, nil, nil)(w, r)
+	err := CreateLpa(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -1418,7 +1417,7 @@ func TestPostCreateLpaWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -1443,8 +1442,7 @@ func TestPostCreateLpaWhenValidationErrorHtmxRequest(t *testing.T) {
 		Return(sirius.Lpa{}, expectedError)
 
 	template := &mockTemplate{}
-	partialTemplate := &mockTemplate{}
-	partialTemplate.
+	template.
 		On("Func", mock.Anything, mock.MatchedBy(func(d createLpaData) bool {
 			return d.Error.Error() == expectedError.Error() && !d.Success
 		})).
@@ -1457,13 +1455,12 @@ func TestPostCreateLpaWhenValidationErrorHtmxRequest(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, partialTemplate.Func)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	template.AssertNotCalled(t, "Func", mock.Anything, mock.Anything)
-	mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestPostCreateLpaEditWhenValidationError(t *testing.T) {
@@ -1522,7 +1519,7 @@ func TestPostCreateLpaEditWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, template.Func, nil)(w, r)
+	err := CreateLpa(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -1548,7 +1545,7 @@ func TestPostCreateLpaWhenGenericError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, nil, nil)(w, r)
+	err := CreateLpa(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -1596,7 +1593,6 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 				Return(sirius.Lpa{Case: sirius.Case{ID: 456}}, nil)
 
 			template := &mockTemplate{}
-			partialTemplate := &mockTemplate{}
 
 			expectedData := createLpaData{
 				AllowNewNotifiedPerson: true,
@@ -1611,10 +1607,11 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 				Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
 				HtmxRedirect:           "/create-replacement-attorney?id=123&caseId=456",
 				HtmxSwap:               "innerHTML",
+				IsPartial:              isHtmx,
 			}
 
 			if isHtmx {
-				partialTemplate.
+				template.
 					On("Func", mock.Anything, expectedData).
 					Return(nil)
 			}
@@ -1643,7 +1640,7 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateLpa(client, template.Func, partialTemplate.Func)(w, r)
+			err := CreateLpa(client, template.Func)(w, r)
 			resp := w.Result()
 
 			if !isHtmx {
@@ -1653,7 +1650,7 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 				assert.Nil(t, err)
 			}
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -1706,7 +1703,6 @@ func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 				Return(nil)
 
 			template := &mockTemplate{}
-			partialTemplate := &mockTemplate{}
 
 			expectedData := createLpaData{
 				AllowNewNotifiedPerson: true,
@@ -1721,10 +1717,11 @@ func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 				Lpa:                    existingLpa,
 				HtmxRedirect:           "/create-attorney?id=123&caseId=456&caseType=lpa&attorneyId=999",
 				HtmxSwap:               "innerHTML",
+				IsPartial:              isHtmx,
 			}
 
 			if isHtmx {
-				partialTemplate.
+				template.
 					On("Func", mock.Anything, expectedData).
 					Return(nil)
 			}
@@ -1742,7 +1739,7 @@ func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateLpa(client, template.Func, partialTemplate.Func)(w, r)
+			err := CreateLpa(client, template.Func)(w, r)
 			resp := w.Result()
 
 			if !isHtmx {
@@ -1752,7 +1749,7 @@ func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 				assert.Nil(t, err)
 			}
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -1769,7 +1766,7 @@ func TestPostCreateLpaUpdateAttorneyBadId(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&updateAttorney=not-a-number", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, nil, nil)(w, r)
+	err := CreateLpa(client, nil)(w, r)
 
 	assert.NotNil(t, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -1803,7 +1800,7 @@ func TestPostCreateLpaUpdateTrustCorporationBadId(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := CreateLpa(client, nil, nil)(w, r)
+			err := CreateLpa(client, nil)(w, r)
 
 			assert.NotNil(t, err)
 			mock.AssertExpectationsForObjects(t, client)
@@ -1859,7 +1856,6 @@ func TestPostCreateLpaUpdateReplacementAttorney(t *testing.T) {
 				Return(nil)
 
 			template := &mockTemplate{}
-			partialTemplate := &mockTemplate{}
 
 			expectedData := createLpaData{
 				AllowNewNotifiedPerson: true,
@@ -1874,10 +1870,11 @@ func TestPostCreateLpaUpdateReplacementAttorney(t *testing.T) {
 				Lpa:                    existingLpa,
 				HtmxRedirect:           "/create-replacement-attorney?id=123&caseId=456&attorneyId=999",
 				HtmxSwap:               "innerHTML",
+				IsPartial:              isHtmx,
 			}
 
 			if isHtmx {
-				partialTemplate.
+				template.
 					On("Func", mock.Anything, expectedData).
 					Return(nil)
 			}
@@ -1895,7 +1892,7 @@ func TestPostCreateLpaUpdateReplacementAttorney(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateLpa(client, template.Func, partialTemplate.Func)(w, r)
+			err := CreateLpa(client, template.Func)(w, r)
 			resp := w.Result()
 
 			if !isHtmx {
@@ -1905,7 +1902,7 @@ func TestPostCreateLpaUpdateReplacementAttorney(t *testing.T) {
 				assert.Nil(t, err)
 			}
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -1922,7 +1919,7 @@ func TestPostCreateLpaUpdateReplacementAttorneyBadId(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&updateReplacementAttorney=not-a-number", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, nil, nil)(w, r)
+	err := CreateLpa(client, nil)(w, r)
 
 	assert.NotNil(t, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -2051,7 +2048,7 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := CreateLpa(client, template.Func, template.Func)(w, r)
+			err := CreateLpa(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Equal(t, tc.expectedErr, err)
