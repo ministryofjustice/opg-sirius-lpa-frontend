@@ -138,7 +138,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/assign-task", wrap(AssignTask(client, templates.Get("assign-task.gohtml"))))
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"), templates.Get("event-partial.gohtml"))))
 	mux.Handle("/create-task", wrap(Task(client, templates.Get("create-task-wrapper.gohtml"), templates.Get("create-task-partial-wrapper.gohtml"))))
-	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning-wrapper.gohtml"), templates.Get("warning-partial-wrapper.gohtml"))))
+	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning.gohtml"))))
 	mux.Handle("/edit-document", wrap(EditDocument(client, templates.Get("edit-document.gohtml"), templates.Get("edit-document-htmx.gohtml"))))
 
 	//modernise
@@ -178,11 +178,11 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-certificate-provider", wrap(CreateCertificateProvider(client, templates.Get("certificate-provider-wrapper.gohtml"), templates.Get("certificate-provider-partial-wrapper.gohtml"))))
 	mux.Handle("/create-correspondent", wrap(CreateCorrespondent(client, templates.Get("create-correspondent.gohtml"))))
 	mux.Handle("/create-donor", wrap(CreateDonor(client, templates.Get("donor-wrapper.gohtml"), templates.Get("donor-partial-wrapper.gohtml"))))
-	mux.Handle("/create-document", wrap(CreateDocument(client, templates.Get("create_document.gohtml"), templates.Get("create-document-htmx.gohtml"))))
+	mux.Handle("/create-document", wrap(CreateDocument(client, templates.Get("create-document.gohtml"))))
 	mux.Handle("/create-epa", wrap(CreateEpa(client, templates.Get("create-epa.gohtml"))))
 	mux.Handle("/create-investigation", wrap(CreateInvestigation(client, templates.Get("create-investigation.gohtml"))))
 	mux.Handle("/create-lpa", wrap(CreateLpa(client, templates.Get("create-lpa-wrapper.gohtml"), templates.Get("create-lpa-partial-wrapper.gohtml"))))
-	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("create-relationship-wrapper.gohtml"), templates.Get("create-relationship-partial-wrapper.gohtml"))))
+	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("create-relationship.gohtml"))))
 	mux.Handle("/create-notified-person", wrap(CreateNotifiedPerson(client, templates.Get("create-notified-person.gohtml"))))
 	mux.Handle("/create-replacement-attorney", wrap(CreateReplacementAttorney(client, templates.Get("create-replacement-attorney-wrapper.gohtml"), templates.Get("create-replacement-attorney-partial-wrapper.gohtml"))))
 	mux.Handle("/compare/{id}/{caseUid}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
