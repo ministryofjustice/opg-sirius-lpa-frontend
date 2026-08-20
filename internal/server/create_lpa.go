@@ -17,25 +17,28 @@ type CreateLpaClient interface {
 	UpdateLpa(ctx sirius.Context, caseID int, lpa sirius.Lpa) error
 	UpdateAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
 	UpdateReplacementAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
+	UpdateTrustCorporation(ctx sirius.Context, trustCorporationId int, trustCorporation sirius.TrustCorporation) error
 	GetUserPermissions(sirius.Context) (sirius.Permissions, error)
 }
 
 type createLpaData struct {
-	AppointmentType        string
-	AllowNewNotifiedPerson bool
-	CanEditReceiptDate     bool
-	CaseId                 int
-	DonorId                int
-	DonorName              string
-	Error                  sirius.ValidationError
-	HtmxRedirect           string
-	HtmxSwap               string
-	IsUpdate               bool
-	Lpa                    sirius.Lpa
-	Success                bool
-	SuccessMessage         string
-	Title                  string
-	XSRFToken              string
+	AllowNewNotifiedPerson               bool
+	AppointmentType                      string
+	AttorneyTrustCorporations            []sirius.TrustCorporation
+	CanEditReceiptDate                   bool
+	CaseId                               int
+	DonorId                              int
+	DonorName                            string
+	Error                                sirius.ValidationError
+	HtmxRedirect                         string
+	HtmxSwap                             string
+	IsUpdate                             bool
+	Lpa                                  sirius.Lpa
+	ReplacementAttorneyTrustCorporations []sirius.TrustCorporation
+	Success                              bool
+	SuccessMessage                       string
+	Title                                string
+	XSRFToken                            string
 }
 
 func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl template.Template) Handler {
@@ -83,6 +86,14 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 			data.AllowNewNotifiedPerson = allowNewNotifiedPerson(len(data.Lpa.NotifiedPersons))
 			data.Title = "Edit LPA"
 			data.IsUpdate = true
+
+			for _, trustCorporation := range data.Lpa.TrustCorporations {
+				if trustCorporation.IsReplacementAttorney {
+					data.ReplacementAttorneyTrustCorporations = append(data.ReplacementAttorneyTrustCorporations, trustCorporation)
+				} else {
+					data.AttorneyTrustCorporations = append(data.AttorneyTrustCorporations, trustCorporation)
+				}
+			}
 		}
 
 		if r.Method == http.MethodPost {
@@ -187,6 +198,13 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 						err = client.UpdateReplacementAttorney(ctx, replacementAttorney.ID, replacementAttorney)
 					}
 				}
+				for _, trustCorporation := range data.Lpa.TrustCorporations {
+					formValue := postFormString(r, fmt.Sprintf("lpaPartCSignatureDate-%d", trustCorporation.ID))
+					if formValue != "" && formValue != string(trustCorporation.LpaPartCSignatureDate) {
+						trustCorporation.LpaPartCSignatureDate = sirius.DateString(formValue)
+						err = client.UpdateTrustCorporation(ctx, trustCorporation.ID, trustCorporation)
+					}
+				}
 			}
 
 			if ve, ok := err.(sirius.ValidationError); ok {
@@ -225,6 +243,20 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template, partialTmpl templ
 					return err
 				}
 				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d&notifiedPersonId=%d", donorID, data.CaseId, notifiedPersonID))
+			}
+			if trustCorporationIdStr := r.FormValue("updateTrustCorporationAttorney"); trustCorporationIdStr != "" {
+				trustCorporationId, err := strToIntOrStatusError(trustCorporationIdStr)
+				if err != nil {
+					return err
+				}
+				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=false", donorID, data.CaseId, trustCorporationId))
+			}
+			if trustCorporationIdStr := r.FormValue("updateTrustCorporationReplacementAttorney"); trustCorporationIdStr != "" {
+				trustCorporationId, err := strToIntOrStatusError(trustCorporationIdStr)
+				if err != nil {
+					return err
+				}
+				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=true", donorID, data.CaseId, trustCorporationId))
 			}
 
 			if r.FormValue("updateCertificateProvider") != "" {

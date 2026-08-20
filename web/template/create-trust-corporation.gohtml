@@ -1,0 +1,136 @@
+{{ template "page" . }}
+
+{{ define "partial-content" }}
+  <div class="action-panel__form">
+    {{ template "error-summary" .Error }}
+
+    <a class="govuk-back-link"
+       href=""
+       hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}"
+       hx-target=".action-panel__content"
+       hx-swap="innerHTML show:#accordion-create-lpa-heading-1:top">Back</a>
+
+    <h1 class="govuk-heading-m">{{ .Title }}</h1>
+
+    {{ if not .IsEditing }}
+      <div class="govuk-button-group govuk-button-group--row">
+        {{ if .TrustCorporation.IsReplacementAttorney }}
+          <a class="govuk-link govuk-link--no-visited-state"
+             href=""
+             hx-get="{{ prefix (printf "/create-replacement-attorney?id=%d&caseId=%d" .DonorId .CaseId) }}"
+             hx-target=".action-panel__content"
+             hx-swap="innerHTML scroll:.action-panel__content:top">Add a person as a replacement attorney</a>
+        {{ else }}
+          <a class="govuk-link govuk-link--no-visited-state"
+             href=""
+             hx-get="{{ prefix (printf "/create-attorney?id=%d&caseId=%d&caseType=lpa" .DonorId .CaseId) }}"
+             hx-target=".action-panel__content"
+             hx-swap="innerHTML scroll:.action-panel__content:top">Add a person as an attorney</a>
+        {{ end }}
+      </div>
+    {{ end }}
+
+    <form class="form" method="POST"
+          hx-post="{{ prefix .HtmxPost }}"
+          hx-target=".action-panel__content" hx-swap="innerHTML"
+    >
+      {{ template "form-content" . }}
+
+      <div class="govuk-button-group govuk-!-padding-top-5">
+        <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+        {{ if not .IsEditing }}
+          <input class="govuk-button" data-module="govuk-button" type="submit" name="addAnotherTrustCorporation" value="Save and add another {{ ToLower .AppointedAs }}" />
+        {{ else }}
+          <input class="govuk-button" data-module="govuk-button" type="submit" name="editNextTrustCorporation" value="Save and update next {{ ToLower .AppointedAs }}" />
+        {{ end }}
+        <a class="govuk-link govuk-link--no-visited-state"
+           href=""
+           hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}"
+           hx-target=".action-panel__content"
+           hx-swap="innerHTML show:#accordion-create-lpa-heading-1:top">Cancel</a>
+      </div>
+    </form>
+  </div>
+{{ end }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ .Title }}{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+      <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+
+      <h1 class="govuk-heading-l">{{ .Title }}</h1>
+
+      {{ if not .IsEditing }}
+        <div class="govuk-button-group govuk-button-group--row">
+          {{ if .TrustCorporation.IsReplacementAttorney }}
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-replacement-attorney?id=%d&caseId=%d" .DonorId .CaseId) }}">
+              Add a person as a replacement attorney
+            </a>
+          {{ else }}
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-attorney?id=%d&caseId=%d&caseType=lpa" .DonorId .CaseId) }}">
+              Add a person as an attorney
+            </a>
+          {{ end }}
+        </div>
+      {{ end }}
+
+      <form class="form" method="POST">
+        {{ template "form-content" . }}
+
+        <div class="govuk-button-group govuk-!-padding-top-5">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+          {{ if not .IsEditing }}
+            <input class="govuk-button" data-module="govuk-button" type="submit" name="addAnotherTrustCorporation" value="Save and add another {{ ToLower .AppointedAs }}" />
+          {{ else }}
+            {{ if ne .NextTrustCorporationId 0 }}
+              <input class="govuk-button" data-module="govuk-button" type="submit" name="editNextTrustCorporation" value="Save and update next {{ ToLower .AppointedAs }}" />
+            {{ end }}
+          {{ end }}
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
+
+{{ define "form-content" }}
+  <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+  <div class="app-lpa__radios--border-bottom" data-module="trust-corp-replacement-input">
+    {{ template "radios" (radios "isReplacementAttorney" "Appointed as" (stringifyBool .TrustCorporation.IsReplacementAttorney) .Error.Field.isReplacementAttorney false
+    (item "false" "Attorney")
+    (item "true" "Replacement Attorney")
+    ) }}
+  </div>
+
+  <div class="app-lpa__radios--border-bottom" data-module="trust-corp-active-input">
+    {{ template "radios" (radios "isTrustCorporationActive" "Active?" (stringifyBoolPointer .TrustCorporation.SystemStatus) .Error.Field.SystemStatus true
+    (item "true" "Yes")
+    (item "false" "No")
+    ) }}
+  </div>
+
+  {{ template "input" (field "companyName" "Trust corporation name" .TrustCorporation.CompanyName .Error.Field.companyName) }}
+  {{ template "input" (field "companyNumber" "Trust corporation registration number" .TrustCorporation.CompanyNumber .Error.Field.companyNumber) }}
+
+  <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Address" data-app-address-finder-fill-country="false">
+    {{ template "input" (field "addressLine1" "Address line 1" .TrustCorporation.AddressLine1 .Error.Field.addressLine1 "data-app-address-finder-map" "addressLine1") }}
+    {{ template "input" (field "addressLine2" "Address line 2" .TrustCorporation.AddressLine2 .Error.Field.addressLine2 "data-app-address-finder-map" "addressLine2") }}
+    {{ template "input" (field "addressLine3" "Address line 3" .TrustCorporation.AddressLine3 .Error.Field.addressLine3 "data-app-address-finder-map" "addressLine3") }}
+    {{ template "input" (field "town" "Town" .TrustCorporation.Town .Error.Field.town "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+    {{ template "input" (field "county" "County" .TrustCorporation.County .Error.Field.county) }}
+    {{ template "input" (field "postcode" "Postcode" .TrustCorporation.Postcode .Error.Field.postcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+    {{ template "input" (field "country" "Country" .TrustCorporation.Country .Error.Field.country "data-app-address-finder-map" "country") }}
+
+    {{ template "radios" (radios "isAirmailRequired" "Airmail required" ( stringifyBool .TrustCorporation.IsAirmailRequired) .Error.Field.isAirmailRequired true
+    (item "true" "Yes")
+    (item "false" "No")
+    ) }}
+  </div>
+
+  {{ template "input" (field "phoneNumber" "Telephone number" .TrustCorporation.PhoneNumber .Error.Field.phoneNumber) }}
+  {{ template "input" (field "email" "Email address" .TrustCorporation.Email .Error.Field.email) }}
+{{ end }}
