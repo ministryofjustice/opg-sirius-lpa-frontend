@@ -1149,8 +1149,26 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   .govuk-form-group {
     border-bottom: 1px solid govuk-functional-colour(border);
   }
+  .govuk-radios__item:last-child,
+  .govuk-radios__item:last-of-type {
+    margin-bottom: 10px;
+  }
+}
+
+.govuk-button-group--row {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin-right: -15px;
 }
 
 .govuk-table[data-module="moj-sortable-table"] + div[role="status"] {
   bottom: 0;
+}
+
+.fileIsInfected {
+  color: var(--govuk-error-colour, #ca3535);
+  font-weight: 700;
+  font-size: 1.1875rem;
+  line-height: 1.3157894737;
 }
