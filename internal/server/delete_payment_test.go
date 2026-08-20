@@ -81,7 +81,7 @@ func TestGetDeletePayment(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := DeletePayment(client, template.Func, template.Func)(w, r)
+	err := DeletePayment(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -98,7 +98,7 @@ func TestDeletePaymentWhenFailureOnGetPaymentByID(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := DeletePayment(client, nil, nil)(w, r)
+	err := DeletePayment(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -134,7 +134,7 @@ func TestDeletePaymentWhenFailureOnGetCase(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := DeletePayment(client, nil, nil)(w, r)
+	err := DeletePayment(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -168,7 +168,7 @@ func TestDeletePaymentWhenFailureOnGetFeeReductionTypes(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := DeletePayment(client, nil, nil)(w, r)
+	err := DeletePayment(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -219,7 +219,7 @@ func TestDeletePaymentWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := DeletePayment(client, template.Func, template.Func)(w, r)
+	err := DeletePayment(client, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -263,7 +263,7 @@ func TestPostDeletePayment(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := DeletePayment(client, template.Func, template.Func)(w, r)
+	err := DeletePayment(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/payments/4"), err)
@@ -311,6 +311,7 @@ func TestPostDeletePaymentHtmx(t *testing.T) {
 			FeeReductionTypes: feeReductionTypes,
 			ReturnUrl:         "/payments/4",
 			HtmxRedirect:      "/payments/4",
+			IsPartial:         true,
 		}).
 		Return(nil)
 
@@ -319,7 +320,7 @@ func TestPostDeletePaymentHtmx(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := DeletePayment(client, nil, template.Func)(w, r)
+	err := DeletePayment(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
