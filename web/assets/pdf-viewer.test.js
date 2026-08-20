@@ -76,6 +76,10 @@ describe("Pdf Viewer", () => {
       value: 960,
       configurable: true,
     });
+    Object.defineProperty(viewer.canvasContainer, "clientHeight", {
+      value: 517,
+      configurable: true,
+    });
   });
 
   afterEach(() => {
@@ -136,6 +140,29 @@ describe("Pdf Viewer", () => {
       expect(newWidth).toBe("920px");
       expect(newHeight).not.toBe(initialHeight);
       expect(newHeight).toBe("1190px");
+    });
+  });
+
+  describe("Given the fit page button is pressed", () => {
+    test("the width and height style will change", async () => {
+      const initialWidth = canvas.style.width;
+      const initialHeight = canvas.style.height;
+      expect(initialWidth).toBe("612px");
+      expect(initialHeight).toBe("792px");
+
+      await viewer.fitToPage();
+
+      await new Promise((resolve) => setTimeout(resolve));
+
+      const newCanvas = viewer.pageCanvases[0];
+      const newWidth = newCanvas.style.width;
+      const newHeight = newCanvas.style.height;
+
+      // The dimensions should change based on the new scale
+      expect(newWidth).not.toBe(initialWidth);
+      expect(newWidth).toBe("384px");
+      expect(newHeight).not.toBe(initialHeight);
+      expect(newHeight).toBe("496px");
     });
   });
 
