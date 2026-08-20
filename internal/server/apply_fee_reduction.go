@@ -41,7 +41,7 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) H
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 		data := applyFeeReductionData{
 			XSRFToken:        ctx.XSRFToken,
-			IsPartial:        r.Header.Get("HX-Request") == "true",
+			IsPartial:        ctx.IsPartial,
 			PaymentEvidence:  postFormString(r, "paymentEvidence"),
 			FeeReductionType: postFormString(r, "feeReductionType"),
 			PaymentDate:      postFormDateString(r, "paymentDate"),
