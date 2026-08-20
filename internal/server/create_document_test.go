@@ -461,10 +461,10 @@ func TestTranslateInsertData(t *testing.T) {
 
 func TestGetRecipientsFiltersInactiveActors(t *testing.T) {
 	donor := sirius.Person{ID: 1}
-	trustCorp := sirius.Attorney{Person: sirius.Person{ID: 2}, SystemStatus: shared.BoolPtr(true)}
+	trustCorp := sirius.TrustCorporation{Attorney: sirius.Attorney{Person: sirius.Person{ID: 2}, SystemStatus: shared.BoolPtr(true)}}
 	activeAttorney := sirius.Attorney{Person: sirius.Person{ID: 3}, SystemStatus: shared.BoolPtr(true)}
 	inactiveAttorney := sirius.Attorney{Person: sirius.Person{ID: 4}, SystemStatus: shared.BoolPtr(false)}
-	caseItem := sirius.Case{Donor: &donor, TrustCorporations: []sirius.Attorney{trustCorp}, Attorneys: []sirius.Attorney{activeAttorney, inactiveAttorney}}
+	caseItem := sirius.Case{Donor: &donor, TrustCorporations: []sirius.TrustCorporation{trustCorp}, Attorneys: []sirius.Attorney{activeAttorney, inactiveAttorney}}
 
 	recipients, _ := getRecipients(caseItem)
 	assert.Equal(t, 3, len(recipients))
@@ -487,8 +487,8 @@ func TestGetRecipientsOrder(t *testing.T) {
 	attorney2 := sirius.Attorney{Person: sirius.Person{ID: 3, Firstname: "Amy", Surname: "Taylor"}, SystemStatus: shared.BoolPtr(true)}
 	attorney3 := sirius.Attorney{Person: sirius.Person{ID: 4, Firstname: "Claire", Surname: "Smith"}, SystemStatus: shared.BoolPtr(true)}
 	correspondent := sirius.Correspondent{Person: sirius.Person{ID: 5}}
-	trustCorp := sirius.Attorney{Person: sirius.Person{ID: 6}, SystemStatus: shared.BoolPtr(true)}
-	caseItem := sirius.Case{Donor: &donor, Attorneys: []sirius.Attorney{attorney1, attorney2, attorney3}, Correspondent: &correspondent, TrustCorporations: []sirius.Attorney{trustCorp}}
+	trustCorp := sirius.TrustCorporation{Attorney: sirius.Attorney{Person: sirius.Person{ID: 6}, SystemStatus: shared.BoolPtr(true)}}
+	caseItem := sirius.Case{Donor: &donor, Attorneys: []sirius.Attorney{attorney1, attorney2, attorney3}, Correspondent: &correspondent, TrustCorporations: []sirius.TrustCorporation{trustCorp}}
 
 	recipients, _ := getRecipients(caseItem)
 	assert.Equal(t, 6, len(recipients))

@@ -98,7 +98,7 @@ func TestDeletePaymentWhenFailureOnGetPaymentByID(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := DeletePayment(client, l)(w, r)
+	err := DeletePayment(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -311,6 +311,7 @@ func TestPostDeletePaymentHtmx(t *testing.T) {
 			FeeReductionTypes: feeReductionTypes,
 			ReturnUrl:         "/payments/4",
 			HtmxRedirect:      "/payments/4",
+			IsPartial:         true,
 		}).
 		Return(nil)
 
@@ -319,7 +320,7 @@ func TestPostDeletePaymentHtmx(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := DeletePayment(client, nil, template.Func)(w, r)
+	err := DeletePayment(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
