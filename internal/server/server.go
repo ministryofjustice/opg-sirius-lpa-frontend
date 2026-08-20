@@ -67,9 +67,10 @@ type Client interface {
 	CreateDraftClient
 	CreateEpaClient
 	CreateInvestigationClient
-	CreateReplacementAttorneyClient
 	CreateLpaClient
 	CreateNotifiedPersonClient
+	CreateReplacementAttorneyClient
+	CreateTrustCorporationClient
 	DeleteDocumentClient
 	DeleteNoteClient
 	DeletePaymentClient
@@ -137,8 +138,8 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/apply-fee-reduction", wrap(ApplyFeeReduction(client, templates.Get("apply-fee-reduction.gohtml"))))
 	mux.Handle("/assign-task", wrap(AssignTask(client, templates.Get("assign-task.gohtml"))))
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"), templates.Get("event-partial.gohtml"))))
-	mux.Handle("/create-task", wrap(Task(client, templates.Get("create-task-wrapper.gohtml"), templates.Get("create-task-partial-wrapper.gohtml"))))
-	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning-wrapper.gohtml"), templates.Get("warning-partial-wrapper.gohtml"))))
+	mux.Handle("/create-task", wrap(Task(client, templates.Get("create-task.gohtml"))))
+	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning.gohtml"))))
 	mux.Handle("/edit-document", wrap(EditDocument(client, templates.Get("edit-document.gohtml"), templates.Get("edit-document-htmx.gohtml"))))
 
 	//modernise
@@ -185,6 +186,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("create-relationship.gohtml"))))
 	mux.Handle("/create-notified-person", wrap(CreateNotifiedPerson(client, templates.Get("create-notified-person.gohtml"))))
 	mux.Handle("/create-replacement-attorney", wrap(CreateReplacementAttorney(client, templates.Get("create-replacement-attorney-wrapper.gohtml"), templates.Get("create-replacement-attorney-partial-wrapper.gohtml"))))
+	mux.Handle("/create-trust-corporation", wrap(CreateTrustCorporation(client, templates.Get("create-trust-corporation.gohtml"))))
 	mux.Handle("/compare/{id}/{caseUid}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
 	mux.Handle("/delete-fee-reduction", wrap(DeletePayment(client, templates.Get("delete-fee-reduction-wrapper.gohtml"), templates.Get("delete-fee-reduction-partial-wrapper.gohtml"))))
 	mux.Handle("/delete-note", wrap(DeleteNote(client, templates.Get("delete-note.gohtml"))))
@@ -197,7 +199,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/delete-document/{uuid}", wrap(DeleteDocument(client, templates.Get("delete-document.gohtml"))))
 	mux.Handle("/edit-certificate-provider", wrap(EditCertificateProvider(client, templates.Get("certificate-provider.gohtml"))))
 	mux.Handle("/edit-complaint", wrap(EditComplaint(client, templates.Get("edit_complaint.gohtml"))))
-	mux.Handle("/edit-dates", wrap(EditDates(client, templates.Get("edit-dates-wrapper.gohtml"), templates.Get("edit-dates-partial-wrapper.gohtml"))))
+	mux.Handle("/edit-dates", wrap(EditDates(client, templates.Get("edit-dates.gohtml"))))
 	mux.Handle("/edit-donor", wrap(EditDonor(client, templates.Get("donor-wrapper.gohtml"), templates.Get("donor-partial-wrapper.gohtml"))))
 	mux.Handle("/edit-fee-reduction", wrap(EditFeeReduction(client, templates.Get("edit-fee-reduction-wrapper.gohtml"), templates.Get("edit-fee-reduction-partial-wrapper.gohtml"))))
 	mux.Handle("/edit-investigation", wrap(EditInvestigation(client, templates.Get("edit_investigation.gohtml"))))

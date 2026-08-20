@@ -20,6 +20,16 @@
 
         <h1 class="govuk-heading-m">{{ .Title }}</h1>
 
+        {{ if not .IsEditing }}
+            <div class="govuk-button-group govuk-button-group--row">
+                <a class="govuk-link govuk-link--no-visited-state"
+                   href=""
+                   hx-get="{{ prefix (printf "/create-trust-corporation?id=%d&caseId=%d&replacement=true" .DonorId .CaseId) }}"
+                   hx-target=".action-panel__content"
+                   hx-swap="innerHTML scroll:.action-panel__content:top">Add a trust corporation as a replacement attorney</a>
+            </div>
+        {{ end }}
+
         <form class="form"
               method="POST"
               hx-post={{if .IsEditing}}"{{ prefix (printf "/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d" .DonorId .CaseId .Attorney.ID) }}"{{else}}"{{ prefix (printf "/create-replacement-attorney?id=%d&caseId=%d" .DonorId .CaseId) }}"{{end}}

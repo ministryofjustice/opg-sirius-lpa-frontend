@@ -1,23 +1,25 @@
 {{ define "person-details-table" }}
     <table class="govuk-table">
         <tbody class="govuk-table__body">
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header app-table__row--half-width">Title</th>
-            <td class="govuk-table__cell">{{ .Salutation }}</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">First name</th>
-            <td class="govuk-table__cell">{{ .Firstname }}</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">Middle name</th>
-            <td class="govuk-table__cell">{{ .Middlenames }}</td>
-        </tr>
+        {{ if ne .PersonType "Trust Corporation" }}
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header app-table__row--half-width">Title</th>
+                <td class="govuk-table__cell">{{ .Salutation }}</td>
+            </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">First name</th>
+                <td class="govuk-table__cell">{{ .Firstname }}</td>
+            </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Middle name</th>
+                <td class="govuk-table__cell">{{ .Middlenames }}</td>
+            </tr>
+        {{ end }}
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">Last name</th>
             <td class="govuk-table__cell">{{ .Surname }}</td>
         </tr>
-        {{ if and (ne .PersonType "Correspondent") (ne .PersonType "Certificate Provider") (ne .PersonType "Notified Person") }}
+        {{ if and (ne .PersonType "Correspondent") (ne .PersonType "Certificate Provider") (ne .PersonType "Notified Person") (ne .PersonType "Trust Corporation") }}
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Date of birth</th>
                 <td class="govuk-table__cell">
@@ -29,7 +31,16 @@
                 </td>
             </tr>
         {{ end }}
-        {{ if and (ne .PersonType "Certificate Provider") (ne .PersonType "Notified Person") }}
+        {{ if eq .PersonType "Trust Corporation" }}
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Trust corporation name</th>
+                <td class="govuk-table__cell">{{ .CompanyName }}</td>
+            </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Trust corporation registration number</th>
+                <td class="govuk-table__cell">{{ .CompanyNumber }}</td>
+            </tr>
+        {{ else }}
             {{ if .CompanyName }}
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header">Company name</th>
