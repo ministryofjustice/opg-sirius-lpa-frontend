@@ -29,6 +29,7 @@ type Document struct {
 	CaseItems           []Case                   `json:"caseItems,omitempty"`
 	NotifyStatus        string                   `json:"notifyStatus,omitempty"`
 	Persons             []Person                 `json:"persons,omitempty"`
+	IsInfected          bool                     `json:"infected"`
 }
 
 type DocumentList struct {
@@ -131,6 +132,10 @@ func (c *Client) DownloadMultiple(ctx Context, docIDs []string) (*http.Response,
 	resp, err := c.http.Do(req)
 	if err != nil {
 		return nil, err
+	}
+
+	if resp.StatusCode == http.StatusBadRequest {
+		return nil, errors.New("400")
 	}
 
 	if resp.StatusCode != http.StatusOK {
