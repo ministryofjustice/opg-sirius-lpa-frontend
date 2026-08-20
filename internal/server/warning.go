@@ -28,9 +28,10 @@ type warningData struct {
 	DonorId     int
 	CaseUids    string
 	EntityType  string
+	IsPartial   bool
 }
 
-func Warning(client WarningClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func Warning(client WarningClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		personId, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -54,10 +55,11 @@ func Warning(client WarningClient, tmpl template.Template, partialTmpl template.
 			WarningTypes: warningTypes,
 			Cases:        cases,
 			DonorId:      personId,
+			IsPartial:    r.Header.Get("HX-Request") == "true",
 		}
 
 		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
-		if r.Header.Get("HX-Request") == "true" && r.FormValue("mlpa") != "true" {
+		if data.IsPartial && r.FormValue("mlpa") != "true" {
 			entityType, err := sirius.ParseEntityType(r.FormValue("entity"))
 			if err != nil {
 				return err
@@ -104,10 +106,6 @@ func Warning(client WarningClient, tmpl template.Template, partialTmpl template.
 					}
 				}
 			}
-		}
-
-		if r.Header.Get("HX-Request") == "true" && partialTmpl != nil {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

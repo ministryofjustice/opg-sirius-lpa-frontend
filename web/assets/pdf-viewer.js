@@ -208,6 +208,9 @@ class PDFViewer {
         <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="fit-width" aria-label="Fit to width">
           Fit Width
         </button>
+        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="fit-page" aria-label="Fit to page">
+          Fit Page
+        </button>
       </div>
       <div class="pdf-viewer-controls-group">
         <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="rotate-cw">
@@ -335,6 +338,9 @@ class PDFViewer {
         break;
       case "fit-width":
         this.fitToWidth();
+        break;
+      case "fit-page":
+        this.fitToPage();
         break;
       case "toggle-thumbnails":
         this.toggleThumbnails();
@@ -632,6 +638,21 @@ class PDFViewer {
       this.scale = containerWidth / viewport.height;
     } else {
       this.scale = containerWidth / viewport.width;
+    }
+    await this.applyZoom();
+    // applyZoom already saves compare state
+  }
+
+  async fitToPage() {
+    if (!this.pdfDoc) return;
+
+    const page = await this.pdfDoc.getPage(this.currentPage);
+    const viewport = page.getViewport({ scale: 1 });
+    const containerHeight = this.canvasContainer.clientHeight - 20; // Account for padding
+    if ([90, 270].includes(this.rotation)) {
+      this.scale = containerHeight / viewport.width;
+    } else {
+      this.scale = containerHeight / viewport.height;
     }
     await this.applyZoom();
     // applyZoom already saves compare state
