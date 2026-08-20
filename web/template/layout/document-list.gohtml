@@ -102,23 +102,25 @@
                     {{ range .DocumentList.Documents }}
                         <tr class="govuk-table__row" data-direction="{{ .Direction.Key }}">
                             <td class="govuk-table__cell">
-                                {{ if eq .MimeType "application/pdf" }}
-                                    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-                                        <div class="govuk-checkboxes__item">
-                                            <input
-                                                    class="govuk-checkboxes__input"
-                                                    id="document-{{ .UUID }}"
-                                                    name="document"
-                                                    type="checkbox"
-                                                    value="{{ .UUID }}"
-                                                    aria-label="Select row for Document {{ .FriendlyDescription }}"
-                                            />
-                                            <label class="govuk-label govuk-checkboxes__label" for="document-{{ .UUID }}"></label>
+                                {{ if not (eq .IsInfected true) }}
+                                    {{ if eq .MimeType "application/pdf" }}
+                                        <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                            <div class="govuk-checkboxes__item">
+                                                <input
+                                                        class="govuk-checkboxes__input"
+                                                        id="document-{{ .UUID }}"
+                                                        name="document"
+                                                        type="checkbox"
+                                                        value="{{ .UUID }}"
+                                                        aria-label="Select row for Document {{ .FriendlyDescription }}"
+                                                />
+                                                <label class="govuk-label govuk-checkboxes__label" for="document-{{ .UUID }}"></label>
+                                            </div>
                                         </div>
-                                    </div>
+                                    {{ end }}
                                 {{ end }}
                             </td>
-                            <td class="govuk-table__cell" data-sort-type="name" data-sort-value="{{ .FriendlyDescription }}">[{{ .Direction.Translation }}{{ if .NotifyStatus}} - {{ camelcaseToSentence .NotifyStatus }}{{end}}]
+                            <td class="govuk-table__cell" data-sort-type="name" data-sort-value="{{ .FriendlyDescription }}">[{{ if not (eq .IsInfected true) }}{{ .Direction.Translation }}{{ if .NotifyStatus}} - {{ camelcaseToSentence .NotifyStatus }}{{end}}{{else}}<span class="fileIsInfected">Infected</span>{{end}}]
                                 <br>
                                 {{ if eq .MimeType "application/pdf"}}
                                     {{ if eq $.Comparing true }}
