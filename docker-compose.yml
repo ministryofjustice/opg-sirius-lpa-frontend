@@ -67,7 +67,7 @@ services:
       - ./.gocache:/go/pkg/mod
 
   pact:
-    image: pactfoundation/pact-cli:1@sha256:cd239d7b1665263ac30d2d1b411238dff783ce2b547ddcec51ab460555371cca
+    image: pactfoundation/pact-cli:1@sha256:385589b97b5cc6ce11dd09226f6c8ccdc127602b92e6807d4eeed1115d81e2bf
     working_dir: /go/src/app
     volumes:
       - ./pacts:/go/src/app/pacts
