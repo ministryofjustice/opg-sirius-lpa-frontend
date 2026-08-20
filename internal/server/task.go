@@ -24,6 +24,7 @@ type taskData struct {
 	Entity           string
 	Success          bool
 	Error            sirius.ValidationError
+	IsPartial        bool
 	CaseID           int
 	CaseUID          string
 	TaskTypes        []string
@@ -36,7 +37,7 @@ type taskData struct {
 	CaseUIDs         string
 }
 
-func Task(client TaskClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func Task(client TaskClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if err := r.ParseForm(); err != nil {
 			return err
@@ -51,6 +52,7 @@ func Task(client TaskClient, tmpl template.Template, partialTmpl template.Templa
 		data := taskData{
 			XSRFToken: ctx.XSRFToken,
 			CaseID:    caseID,
+			IsPartial: r.Header.Get("HX-Request") == "true",
 		}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
@@ -164,10 +166,6 @@ func Task(client TaskClient, tmpl template.Template, partialTmpl template.Templa
 					return RedirectError(fmt.Sprintf("/lpa/%s", caseitem.UID))
 				}
 			}
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
