@@ -34,7 +34,7 @@ func TestGetCreateDonor(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/create-donor", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateDonor(client, template.Func, nil)(w, r)
+	err := CreateDonor(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -45,29 +45,27 @@ func TestGetCreateDonor(t *testing.T) {
 func TestGetCreateDonorHtmxRequest(t *testing.T) {
 	client := &mockCreateDonorClient{}
 
-	partialTemplate := &mockTemplate{}
-	partialTemplate.
+	template := &mockTemplate{}
+	template.
 		On("Func", mock.Anything, donorData{
 			IsNew:      true,
 			DonorId:    123,
 			CaseUids:   "&uid[]=7000-1234-1234",
 			EntityType: "person",
+			IsPartial:  true,
 		}).
 		Return(nil)
-
-	template := &mockTemplate{}
 
 	r, _ := http.NewRequest(http.MethodGet, "/create-donor?id=123&entity=person&uid[]=7000-1234-1234", nil)
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := CreateDonor(client, template.Func, partialTemplate.Func)(w, r)
+	err := CreateDonor(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	template.AssertNotCalled(t, "Func")
-	mock.AssertExpectationsForObjects(t, client, partialTemplate)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestPostCreateDonor(t *testing.T) {
@@ -138,7 +136,7 @@ func TestPostCreateDonor(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateDonor(client, template.Func, nil)(w, r)
+	err := CreateDonor(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -155,8 +153,8 @@ func TestPostCreateDonorHtmxRequest(t *testing.T) {
 		}).
 		Return(sirius.Person{ID: 809, UID: "7123-4567-8901"}, nil)
 
-	partialTemplate := &mockTemplate{}
-	partialTemplate.
+	template := &mockTemplate{}
+	template.
 		On("Func", mock.Anything, donorData{
 			IsNew: true,
 			Donor: sirius.Person{
@@ -167,10 +165,9 @@ func TestPostCreateDonorHtmxRequest(t *testing.T) {
 			DonorId:    123,
 			CaseUids:   "&uid[]=7000-1234-1234",
 			EntityType: "person",
+			IsPartial:  true,
 		}).
 		Return(nil)
-
-	template := &mockTemplate{}
 
 	form := url.Values{
 		"firstname":   {"Rudolph"},
@@ -182,13 +179,12 @@ func TestPostCreateDonorHtmxRequest(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := CreateDonor(client, template.Func, partialTemplate.Func)(w, r)
+	err := CreateDonor(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	template.AssertNotCalled(t, "Func")
-	mock.AssertExpectationsForObjects(t, client, partialTemplate)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestPostCreateDonorWhenAPIFails(t *testing.T) {
@@ -211,7 +207,7 @@ func TestPostCreateDonorWhenAPIFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateDonor(client, template.Func, nil)(w, r)
+	err := CreateDonor(client, template.Func)(w, r)
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
@@ -249,7 +245,7 @@ func TestPostCreateDonorWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateDonor(client, template.Func, nil)(w, r)
+	err := CreateDonor(client, template.Func)(w, r)
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

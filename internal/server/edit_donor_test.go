@@ -48,7 +48,7 @@ func TestGetEditDonor(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/edit-donor?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditDonor(client, template.Func, nil)(w, r)
+	err := EditDonor(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -67,29 +67,27 @@ func TestGetEditDonorHtmxRequest(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(person, nil)
 
-	partialTemplate := &mockTemplate{}
-	partialTemplate.
+	template := &mockTemplate{}
+	template.
 		On("Func", mock.Anything, donorData{
 			Donor:      person,
 			DonorId:    123,
 			CaseUids:   "&uid[]=7000-1234-1234",
 			EntityType: "person",
+			IsPartial:  true,
 		}).
 		Return(nil)
-
-	template := &mockTemplate{}
 
 	r, _ := http.NewRequest(http.MethodGet, "/edit-donor?id=123&entity=person&uid[]=7000-1234-1234", nil)
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := EditDonor(client, template.Func, partialTemplate.Func)(w, r)
+	err := EditDonor(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	template.AssertNotCalled(t, "Func")
-	mock.AssertExpectationsForObjects(t, client, partialTemplate)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestPostEditDonor(t *testing.T) {
@@ -163,7 +161,7 @@ func TestPostEditDonor(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditDonor(client, template.Func, nil)(w, r)
+	err := EditDonor(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -195,7 +193,7 @@ func TestPostEditDonorWhenAPIFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditDonor(client, template.Func, nil)(w, r)
+	err := EditDonor(client, template.Func)(w, r)
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
@@ -237,7 +235,7 @@ func TestPostEditDonorWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditDonor(client, template.Func, nil)(w, r)
+	err := EditDonor(client, template.Func)(w, r)
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
