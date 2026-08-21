@@ -653,6 +653,18 @@ class PDFViewer {
     // applyZoom already saves compare state
   }
 
+  printDoc() {
+    if (!this.pdfDoc) return;
+    this.pdfDoc.getData().then((data) => {
+      const blob = new Blob([data], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const iframe = document.createElement("iframe");
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      iframe.contentWindow.print();
+    });
+  }
+
   rotateCW() {
     this.rotation = (this.rotation + 90) % 360;
     this.saveRotation();
