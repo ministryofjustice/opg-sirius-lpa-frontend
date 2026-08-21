@@ -23,10 +23,11 @@ type deletePaymentData struct {
 	Case              sirius.Case
 	FeeReductionTypes []sirius.RefDataItem
 	ReturnUrl         string
+	IsPartial         bool
 	HtmxRedirect      string
 }
 
-func DeletePayment(client DeletePaymentClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func DeletePayment(client DeletePaymentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		id, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -44,6 +45,7 @@ func DeletePayment(client DeletePaymentClient, tmpl template.Template, partialTm
 		data := deletePaymentData{
 			XSRFToken: ctx.XSRFToken,
 			Payment:   p,
+			IsPartial: ctx.IsPartial,
 		}
 
 		group.Go(func() error {
@@ -88,15 +90,13 @@ func DeletePayment(client DeletePaymentClient, tmpl template.Template, partialTm
 			SetFlash(w, FlashNotification{
 				Title: fmt.Sprintf("%s deleted", item),
 			})
-			if r.Header.Get("HX-Request") == "true" {
-				data.HtmxRedirect = data.ReturnUrl
-				return partialTmpl(w, data)
-			}
-			return RedirectError(data.ReturnUrl)
-		}
 
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
+			if ctx.IsPartial {
+				data.HtmxRedirect = data.ReturnUrl
+				return tmpl(w, data)
+			}
+
+			return RedirectError(data.ReturnUrl)
 		}
 
 		return tmpl(w, data)
