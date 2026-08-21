@@ -123,6 +123,7 @@ describe("Show correct event content", () => {
       sourceDocument: {
         UUID: "123e4567-e89b-12d3-a456-426614174000",
         friendlyDescription: "Incoming document",
+        mimeType: "application/pdf",
       },
     });
     cy.visit("/donor/1/history");
@@ -134,7 +135,7 @@ describe("Show correct event content", () => {
       .should(
         "have.attr",
         "href",
-        "/lpa#/donor/1/documents?docUuid=123e4567-e89b-12d3-a456-426614174000",
+        "/lpa/frontend/view-document/123e4567-e89b-12d3-a456-426614174000/1",
       );
   });
 
@@ -149,6 +150,7 @@ describe("Show correct event content", () => {
       sourceDocument: {
         UUID: "123e4567-e89b-12d3-a456-426614174000",
         friendlyDescription: "Joe Bloggs - Letter sent to donor",
+        mimeType: "application/pdf",
       },
     });
     cy.visit("/donor/1/history");
@@ -159,7 +161,35 @@ describe("Show correct event content", () => {
       .should(
         "have.attr",
         "href",
-        "/lpa#/donor/1/documents?docUuid=123e4567-e89b-12d3-a456-426614174000",
+        "/lpa/frontend/view-document/123e4567-e89b-12d3-a456-426614174000/1",
+      );
+  });
+
+  it("can download incoming document event when not pdf", () => {
+    mockEventHistory({
+      sourceType: "IncomingDocument",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\Document\IncomingDocument`,
+        friendlyDescription: "Incoming Document",
+        subType: "Application related",
+      },
+      sourceDocument: {
+        UUID: "123e4567-e89b-12d3-a456-426614174000",
+        friendlyDescription: "Incoming document",
+        mimeType: "text",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Incoming Document")
+      .should("contain.text", "Application related")
+      .find("a")
+      .should("have.attr", "href")
+      .and(
+        "include",
+        "/lpa-api/v1/documents/123e4567-e89b-12d3-a456-426614174000/download",
       );
   });
 
