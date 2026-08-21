@@ -221,6 +221,7 @@
 		<input type="hidden" name="id" value="{{ .Case.ID }}"/>
 		<input type="hidden" name="case" value="{{ .Case.CaseType }}"/>
 		<input type="hidden" name="templateId" value="{{ .TemplateSelected.TemplateId }}"/>
+		{{ range .SelectedInserts }}<input type="hidden" name="insert" value="{{ . }}"/>{{ end }}
 		<input type="hidden" name="hasViewedInserts" value="true"/>
 		<input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 		<div class="govuk-form-group {{ if .Error.Field.selectRecipient }}govuk-form-group--error{{ end }}">
