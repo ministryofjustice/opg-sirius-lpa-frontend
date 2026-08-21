@@ -123,6 +123,7 @@ describe("Show correct event content", () => {
       sourceDocument: {
         UUID: "123e4567-e89b-12d3-a456-426614174000",
         friendlyDescription: "Incoming document",
+        mimeType: "application/pdf",
       },
     });
     cy.visit("/donor/1/history");
@@ -134,7 +135,7 @@ describe("Show correct event content", () => {
       .should(
         "have.attr",
         "href",
-        "/lpa#/donor/1/documents?docUuid=123e4567-e89b-12d3-a456-426614174000",
+        "/lpa/frontend/view-document/123e4567-e89b-12d3-a456-426614174000/1?case=105",
       );
   });
 
@@ -149,6 +150,7 @@ describe("Show correct event content", () => {
       sourceDocument: {
         UUID: "123e4567-e89b-12d3-a456-426614174000",
         friendlyDescription: "Joe Bloggs - Letter sent to donor",
+        mimeType: "application/pdf",
       },
     });
     cy.visit("/donor/1/history");
@@ -159,7 +161,7 @@ describe("Show correct event content", () => {
       .should(
         "have.attr",
         "href",
-        "/lpa#/donor/1/documents?docUuid=123e4567-e89b-12d3-a456-426614174000",
+        "/lpa/frontend/view-document/123e4567-e89b-12d3-a456-426614174000/1?case=105",
       );
   });
 
