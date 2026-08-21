@@ -1,6 +1,6 @@
 {{ define "partial-event-outgoing-document" }}
     {{ if eq .SourceDocument.MimeType "application/pdf" }}
-        <a class="govuk-link" href="/lpa/frontend/view-document/{{ .SourceDocument.UUID }}/{{ .Context.DonorID }}?case={{ .OwningCase.ID }}" target="_top">
+        <a class="govuk-link" href="/lpa/frontend/view-document/{{ .SourceDocument.UUID }}/{{ .Context.DonorID }}" target="_top">
             {{ .SourceDocument.FriendlyDescription }}
         </a>
     {{ else }}

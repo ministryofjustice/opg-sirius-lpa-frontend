@@ -135,7 +135,7 @@ describe("Show correct event content", () => {
       .should(
         "have.attr",
         "href",
-        "/lpa/frontend/view-document/123e4567-e89b-12d3-a456-426614174000/1?case=105",
+        "/lpa/frontend/view-document/123e4567-e89b-12d3-a456-426614174000/1",
       );
   });
 
@@ -161,7 +161,7 @@ describe("Show correct event content", () => {
       .should(
         "have.attr",
         "href",
-        "/lpa/frontend/view-document/123e4567-e89b-12d3-a456-426614174000/1?case=105",
+        "/lpa/frontend/view-document/123e4567-e89b-12d3-a456-426614174000/1",
       );
   });
 
