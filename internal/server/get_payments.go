@@ -36,15 +36,17 @@ type getPaymentsData struct {
 	RefundAmount      int
 	FlashMessage      FlashNotification
 	InActionPanel     bool
+	IsPartial         bool
 }
 
-func GetPayments(client GetPaymentsClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 		data := getPaymentsData{
 			XSRFToken:   ctx.XSRFToken,
 			CaseSummary: sirius.CaseSummary{},
+			IsPartial:   ctx.IsPartial,
 		}
 
 		var caseID int
@@ -140,9 +142,9 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template, partialTmpl t
 
 		data.FlashMessage, _ = GetFlash(w, r)
 
-		if r.Header.Get("HX-Request") == "true" && partialTmpl != nil {
+		if ctx.IsPartial {
 			data.InActionPanel = true
-			return partialTmpl(w, data)
+			return tmpl(w, data)
 		}
 
 		return tmpl(w, data)
