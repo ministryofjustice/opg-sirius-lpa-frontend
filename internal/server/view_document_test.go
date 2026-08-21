@@ -80,6 +80,7 @@ func TestGetViewDocument(t *testing.T) {
 				UID:      "7000-1234-1234",
 				CaseType: strings.ToUpper(caseType),
 			}
+			document.CaseItems = []sirius.Case{caseData}
 			draftCount := sirius.DocumentDraftCount{DraftCount: 0}
 
 			client := &mockViewDocumentClient{}
@@ -137,7 +138,7 @@ func TestGetViewDocument(t *testing.T) {
 
 			server := newMockServer("/view-document/{uuid}/{id}", ViewDocument(client, template.Func))
 
-			req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33?case=34", nil)
+			req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33", nil)
 			_, err := server.serve(req)
 
 			assert.Nil(t, err)
@@ -170,7 +171,7 @@ func TestGetViewDocumentWhenCaseErrors(t *testing.T) {
 
 	server := newMockServer("/view-document/{uuid}/{donorId}", ViewDocument(client, nil))
 
-	req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33?case=34", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33", nil)
 	_, err := server.serve(req)
 
 	assert.Equal(t, errExample, err)
@@ -213,7 +214,7 @@ func TestGetViewDocumentWhenPermissionsErrors(t *testing.T) {
 
 	server := newMockServer("/view-document/{uuid}/{donorId}", ViewDocument(client, nil))
 
-	req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33?case=34", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33", nil)
 	_, err := server.serve(req)
 
 	assert.Equal(t, errExample, err)
@@ -246,8 +247,42 @@ func TestGetViewDocumentWhenGetUserDetailsErrors(t *testing.T) {
 
 	server := newMockServer("/view-document/{uuid}/{donorId}", ViewDocument(client, nil))
 
-	req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33?case=34", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33", nil)
 	_, err := server.serve(req)
 
 	assert.Equal(t, errExample, err)
+}
+
+func TestSelectedCaseForDocument(t *testing.T) {
+	caseData := sirius.Case{ID: 34, UID: "7000-1234-1234"}
+
+	testCases := map[string]struct {
+		documentCases []sirius.Case
+		selectedCases []sirius.Case
+		wantCase      sirius.Case
+		wantFound     bool
+	}{
+		"document has no cases": {
+			selectedCases: []sirius.Case{caseData},
+		},
+		"selected cases do not contain document case": {
+			documentCases: []sirius.Case{{ID: 35}},
+			selectedCases: []sirius.Case{caseData},
+		},
+		"selected cases contain document case": {
+			documentCases: []sirius.Case{{ID: 34}},
+			selectedCases: []sirius.Case{caseData},
+			wantCase:      caseData,
+			wantFound:     true,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			selected, found := selectedCaseForDocument(sirius.Document{CaseItems: tc.documentCases}, tc.selectedCases)
+
+			assert.Equal(t, tc.wantCase, selected)
+			assert.Equal(t, tc.wantFound, found)
+		})
+	}
 }
