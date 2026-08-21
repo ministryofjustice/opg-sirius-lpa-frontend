@@ -63,6 +63,7 @@ type SourceType struct {
 type SourceDocument struct {
 	UUID                string `json:"uuid"`
 	FriendlyDescription string `json:"friendlyDescription"`
+	MimeType            string `json:"mimeType"`
 }
 
 type SourcePhoneNumber struct {
