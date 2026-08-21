@@ -91,7 +91,7 @@ func DeletePayment(client DeletePaymentClient, tmpl template.Template) Handler {
 				Title: fmt.Sprintf("%s deleted", item),
 			})
 
-			if r.Header.Get("HX-Request") == "true" {
+			if ctx.IsPartial {
 				data.HtmxRedirect = data.ReturnUrl
 				return tmpl(w, data)
 			}
