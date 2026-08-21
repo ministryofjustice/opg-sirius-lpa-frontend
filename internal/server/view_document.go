@@ -40,11 +40,6 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		caseId, err := strToIntOrStatusError(r.FormValue("case"))
-		if err != nil {
-			return err
-		}
-
 		documentData, err := client.DocumentByUUID(ctx, uuid)
 		if err != nil {
 			return err
@@ -65,14 +60,14 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 		}
 
 		caseUidsStr := ""
-		var selectedCase []sirius.Case
-		if len(pageVars.SelectedCases) > 0 {
-			for _, c := range pageVars.SelectedCases {
-				if c.ID == caseId {
-					caseUidsStr = "&uid[]=" + c.UID
-					selectedCase = []sirius.Case{c}
-				}
-			}
+		selectedCaseIds := ""
+		// selected case is case on the document if present in the selected cases, else no selected case
+		selectedCase, caseFound := selectedCaseForDocument(documentData, pageVars.SelectedCases)
+		var selectedCases []sirius.Case
+		if caseFound {
+			selectedCases = []sirius.Case{selectedCase}
+			caseUidsStr = "&uid[]=" + selectedCase.UID
+			selectedCaseIds = strconv.Itoa(selectedCase.ID)
 		}
 
 		data := viewDocumentData{
@@ -84,8 +79,8 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			IsSysAdminUser:                 isSysAdminUser,
 			Pane:                           pane,
 			Person:                         pageVars.Person,
-			SelectedCaseIds:                strconv.Itoa(caseId),
-			SelectedCases:                  selectedCase,
+			SelectedCaseIds:                selectedCaseIds,
+			SelectedCases:                  selectedCases,
 			XSRFToken:                      ctx.XSRFToken,
 		}
 
@@ -103,4 +98,18 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 
 		return tmpl(w, data)
 	}
+}
+
+func selectedCaseForDocument(document sirius.Document, selectedCases []sirius.Case) (sirius.Case, bool) {
+	if len(document.CaseItems) == 0 {
+		return sirius.Case{}, false
+	}
+
+	for _, selected := range selectedCases {
+		if selected.ID == document.CaseItems[0].ID {
+			return selected, true
+		}
+	}
+
+	return sirius.Case{}, false
 }
