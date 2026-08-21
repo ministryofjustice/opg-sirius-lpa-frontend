@@ -27,10 +27,10 @@ const textEditor = () => {
     )
       ? "app-!-html-class--dark"
       : "",
-    setup: editor => {
-      editor.on('blur', () => {
-        editor.save()
-      })
+    setup: (editor) => {
+      editor.on("blur", () => {
+        editor.save();
+      });
     },
   });
 };
