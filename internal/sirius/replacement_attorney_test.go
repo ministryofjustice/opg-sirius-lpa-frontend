@@ -78,6 +78,7 @@ func TestCreateReplacementAttorney(t *testing.T) {
 								"correspondenceByWelsh": false,
 								"researchOptOut":        false,
 								"companyName":           "",
+								"companyNumber":         "",
 								"companyReference":      "",
 							},
 						},

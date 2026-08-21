@@ -19,13 +19,14 @@ type deleteRelationshipData struct {
 	Entity    string
 	Success   bool
 	Error     sirius.ValidationError
+	IsPartial bool
 
 	PersonReferences []sirius.PersonReference
 	DonorId          int
 	CaseUIDs         string
 }
 
-func DeleteRelationship(client DeleteRelationshipClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func DeleteRelationship(client DeleteRelationshipClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		personID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -37,6 +38,7 @@ func DeleteRelationship(client DeleteRelationshipClient, tmpl template.Template,
 			XSRFToken: ctx.XSRFToken,
 			DonorId:   personID,
 			CaseUIDs:  buildUIDQueryString(r.Form["uid[]"]),
+			IsPartial: r.Header.Get("HX-Request") == "true",
 		}
 
 		if r.Method == http.MethodPost {
@@ -79,10 +81,6 @@ func DeleteRelationship(client DeleteRelationshipClient, tmpl template.Template,
 
 		if err := group.Wait(); err != nil {
 			return err
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

@@ -35,6 +35,7 @@ func getContext(r *http.Request) sirius.Context {
 		Context:   r.Context(),
 		Cookies:   r.Cookies(),
 		XSRFToken: token,
+		IsPartial: r.Header.Get("HX-Request") == "true",
 	}
 }
 
@@ -67,9 +68,10 @@ type Client interface {
 	CreateDraftClient
 	CreateEpaClient
 	CreateInvestigationClient
-	CreateReplacementAttorneyClient
 	CreateLpaClient
 	CreateNotifiedPersonClient
+	CreateReplacementAttorneyClient
+	CreateTrustCorporationClient
 	DeleteDocumentClient
 	DeleteNoteClient
 	DeletePaymentClient
@@ -175,30 +177,31 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate-cases.gohtml"))))
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change-status.gohtml"))))
 	mux.Handle("/create-attorney", wrap(CreateAttorney(client, templates.Get("create-attorney.gohtml"))))
-	mux.Handle("/create-certificate-provider", wrap(CreateCertificateProvider(client, templates.Get("certificate-provider-wrapper.gohtml"), templates.Get("certificate-provider-partial-wrapper.gohtml"))))
+	mux.Handle("/create-certificate-provider", wrap(CreateCertificateProvider(client, templates.Get("certificate-provider.gohtml"))))
 	mux.Handle("/create-correspondent", wrap(CreateCorrespondent(client, templates.Get("create-correspondent.gohtml"))))
-	mux.Handle("/create-donor", wrap(CreateDonor(client, templates.Get("donor-wrapper.gohtml"), templates.Get("donor-partial-wrapper.gohtml"))))
+	mux.Handle("/create-donor", wrap(CreateDonor(client, templates.Get("donor.gohtml"))))
 	mux.Handle("/create-document", wrap(CreateDocument(client, templates.Get("create-document.gohtml"))))
 	mux.Handle("/create-epa", wrap(CreateEpa(client, templates.Get("create-epa.gohtml"))))
 	mux.Handle("/create-investigation", wrap(CreateInvestigation(client, templates.Get("create-investigation.gohtml"))))
-	mux.Handle("/create-lpa", wrap(CreateLpa(client, templates.Get("create-lpa-wrapper.gohtml"), templates.Get("create-lpa-partial-wrapper.gohtml"))))
+	mux.Handle("/create-lpa", wrap(CreateLpa(client, templates.Get("create-lpa.gohtml"))))
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("create-relationship.gohtml"))))
 	mux.Handle("/create-notified-person", wrap(CreateNotifiedPerson(client, templates.Get("create-notified-person.gohtml"))))
 	mux.Handle("/create-replacement-attorney", wrap(CreateReplacementAttorney(client, templates.Get("create-replacement-attorney-wrapper.gohtml"), templates.Get("create-replacement-attorney-partial-wrapper.gohtml"))))
+	mux.Handle("/create-trust-corporation", wrap(CreateTrustCorporation(client, templates.Get("create-trust-corporation.gohtml"))))
 	mux.Handle("/compare/{id}/{caseUid}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
-	mux.Handle("/delete-fee-reduction", wrap(DeletePayment(client, templates.Get("delete-fee-reduction-wrapper.gohtml"), templates.Get("delete-fee-reduction-partial-wrapper.gohtml"))))
+	mux.Handle("/delete-fee-reduction", wrap(DeletePayment(client, templates.Get("delete-fee-reduction.gohtml"))))
 	mux.Handle("/delete-note", wrap(DeleteNote(client, templates.Get("delete-note.gohtml"))))
-	mux.Handle("/delete-payment", wrap(DeletePayment(client, templates.Get("delete-payment-wrapper.gohtml"), templates.Get("delete-payment-partial-wrapper.gohtml"))))
-	mux.Handle("/delete-relationship", wrap(DeleteRelationship(client, templates.Get("delete-relationship-wrapper.gohtml"), templates.Get("delete-relationship-partial-wrapper.gohtml"))))
+	mux.Handle("/delete-payment", wrap(DeletePayment(client, templates.Get("delete-payment.gohtml"))))
+	mux.Handle("/delete-relationship", wrap(DeleteRelationship(client, templates.Get("delete-relationship.gohtml"))))
 	mux.Handle("/donor/{donorId}/details", wrap(DonorDetails(client, templates.Get("donor_details.gohtml"))))
 	mux.Handle("/donor/{id}/documents", wrap(DocumentList(client, templates.Get("documents.gohtml"))))
 	mux.Handle("/donor/{donorId}/history", wrap(GetLpaHistory(client, templates.Get("lpa-history.gohtml"))))
 	mux.Handle("/view-document/{uuid}/{id}", wrap(ViewDocument(client, templates.Get("view-document.gohtml"))))
 	mux.Handle("/delete-document/{uuid}", wrap(DeleteDocument(client, templates.Get("delete-document.gohtml"))))
-	mux.Handle("/edit-certificate-provider", wrap(EditCertificateProvider(client, templates.Get("certificate-provider-wrapper.gohtml"), templates.Get("certificate-provider-partial-wrapper.gohtml"))))
+	mux.Handle("/edit-certificate-provider", wrap(EditCertificateProvider(client, templates.Get("certificate-provider.gohtml"))))
 	mux.Handle("/edit-complaint", wrap(EditComplaint(client, templates.Get("edit_complaint.gohtml"))))
 	mux.Handle("/edit-dates", wrap(EditDates(client, templates.Get("edit-dates.gohtml"))))
-	mux.Handle("/edit-donor", wrap(EditDonor(client, templates.Get("donor-wrapper.gohtml"), templates.Get("donor-partial-wrapper.gohtml"))))
+	mux.Handle("/edit-donor", wrap(EditDonor(client, templates.Get("donor.gohtml"))))
 	mux.Handle("/edit-fee-reduction", wrap(EditFeeReduction(client, templates.Get("edit-fee-reduction-wrapper.gohtml"), templates.Get("edit-fee-reduction-partial-wrapper.gohtml"))))
 	mux.Handle("/edit-investigation", wrap(EditInvestigation(client, templates.Get("edit_investigation.gohtml"))))
 	mux.Handle("/edit-payment", wrap(EditPayment(client, templates.Get("edit-payment-wrapper.gohtml"), templates.Get("edit-payment-partial-wrapper.gohtml"))))

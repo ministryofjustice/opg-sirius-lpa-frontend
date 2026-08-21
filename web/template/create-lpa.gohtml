@@ -1,3 +1,81 @@
+{{ template "page" . }}
+
+{{ define "partial-content" }}
+  <div class="action-panel__form">
+    {{ if .HtmxRedirect }}
+      <span class="govuk-!-display-none"
+            hx-get="{{ prefix .HtmxRedirect }}"
+            hx-target=".action-panel__content"
+            hx-swap="{{ .HtmxSwap }}"
+            hx-trigger="load"
+      ></span>
+    {{ end }}
+
+    {{ template "error-summary" .Error }}
+
+    {{ if and .Success (not .HtmxRedirect) }}
+      <meta http-equiv="Refresh" content="0" />
+      {{ template "success-banner" .SuccessMessage }}
+    {{ end }}
+
+    <p class="govuk-body app-lpa__donor-info">{{ .DonorName }}{{ if .CaseId }} – <span class="app-lpa__donor-info--{{ .Lpa.SubType }}">{{ ToUpper .Lpa.SubType }}</span> {{ .Lpa.UID }}{{ end }}</p>
+
+    <h1 class="govuk-heading-m">{{ .Title }}</h1>
+
+    <form class="form"
+          method="POST"
+          hx-post="{{ if .IsUpdate }}{{ prefix (printf "/create-lpa?id=%d&caseId=%d" .DonorId .CaseId) }}{{ else }}{{ prefix (printf "/create-lpa?id=%d" .DonorId) }}{{ end }}"
+          hx-target=".action-panel__content"
+          hx-swap="innerHTML scroll:.action-panel__content:top"
+    >
+      {{ template "create-lpa" . }}
+
+      <div class="govuk-button-group">
+        <button class="govuk-button" data-module="govuk-button" type="submit"
+                data-disable-after-click="true">Save and exit
+        </button>
+        <a class="govuk-link govuk-link--no-visited-state"
+            href=""
+            hx-get="{{ if .IsUpdate }}{{ prefix (printf "/action-panel?donorId=%d&uid[]=%s" .DonorId .Lpa.UID) }}{{ else }}{{ prefix (printf "/action-panel?donorId=%d" .DonorId) }}{{ end }}"
+            hx-target=".action-panel__content"
+            hx-swap="innerHTML scroll:.action-panel__content:top">Cancel</a>
+      </div>
+    </form>
+  </div>
+{{ end }}
+
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ .Title }}{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+
+      {{ if .Success }}
+        <meta data-app-select-case="{{ .CaseId }}"/>
+        {{ template "success-banner" .SuccessMessage }}
+      {{ end }}
+
+      <p class="govuk-body app-lpa__donor-info">{{ .DonorName }}{{ if .CaseId }} – <span class="app-lpa__donor-info--{{ .Lpa.SubType }}">{{ ToUpper .Lpa.SubType }}</span> {{ .Lpa.UID }}{{ end }}</p>
+
+      <h1 class="govuk-heading-l app-!-embedded-hide">{{ .Title }}</h1>
+
+      <form class="form" method="POST">
+        {{ template "create-lpa" . }}
+
+        <div class="govuk-button-group">
+          <button class="govuk-button" data-module="govuk-button" type="submit"
+                  data-disable-after-click="true">Save and exit
+          </button>
+          <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
+
+
 {{ define "create-lpa" }}
   <button class="govuk-visually-hidden" tabindex="-1" aria-hidden="true" data-module="govuk-button" type="submit"></button>
   <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
@@ -81,7 +159,7 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
-            {{ if gt (len .Lpa.Attorneys) 0 }}
+            {{ if or (gt (len .Lpa.Attorneys) 0) (gt (len .AttorneyTrustCorporations) 0) }}
               {{ range $attorney := .Lpa.Attorneys }}
                 <div class="app-create-lpa__details-row">
                   <details class="govuk-details">
@@ -107,6 +185,36 @@
                       Update
                       <span class="govuk-visually-hidden">
                           attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                      </span>
+                    </button>
+                </span>
+                </div>
+              {{ end }}
+              {{ range $trustCorporation := .AttorneyTrustCorporations }}
+                <div class="app-create-lpa__details-row">
+                  <details class="govuk-details">
+                    <summary class="govuk-details__summary app-table__row--half-width">
+                      <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }} {{ end }}(trust corporation)</span>
+                    </summary>
+                    <div class="govuk-details__text">
+                        {{ template "person-details-table" . }}
+                    </div>
+                  </details>
+                  <span class="app-create-lpa__summary-update-link">
+                    {{ if eq (stringifyBoolPointer .SystemStatus) "true" }}
+                        {{ template "status-tag" (statusTag "Active" "green") }}
+                    {{ else }}
+                        {{ template "status-tag" (statusTag "Inactive" "red") }}
+                    {{ end }}
+                    <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
+                            id="f-update-trust-corporation-{{ .ID }}"
+                            name="updateTrustCorporationAttorney"
+                            type="submit"
+                            value="{{ .ID }}"
+                    >
+                      Update
+                      <span class="govuk-visually-hidden">
+                          trust corporation appointed as attorney{{ if .CompanyName }} {{ .CompanyName }}{{ end }}
                       </span>
                     </button>
                 </span>
@@ -164,11 +272,11 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
-            {{ if gt (len .Lpa.ReplacementAttorneys) 0 }}
+            {{ if or (gt (len .Lpa.ReplacementAttorneys) 0) (gt (len .ReplacementAttorneyTrustCorporations) 0) }}
               {{ range $attorney := .Lpa.ReplacementAttorneys }}
                 <div class="app-create-lpa__details-row">
                   <details class="govuk-details">
-                    <summary class="govuk-details__summary">
+                    <summary class="govuk-details__summary app-table__row--half-width">
                       <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
                     </summary>
                     <div class="govuk-details__text">
@@ -185,6 +293,31 @@
                       Update
                       <span class="govuk-visually-hidden">
                           replacement attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                      </span>
+                    </button>
+                  </span>
+                </div>
+              {{ end }}
+              {{ range $trustCorporation := .ReplacementAttorneyTrustCorporations }}
+                <div class="app-create-lpa__details-row">
+                  <details class="govuk-details">
+                    <summary class="govuk-details__summary app-table__row--half-width">
+                      <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }} {{ end }}(trust corporation)</span>
+                    </summary>
+                    <div class="govuk-details__text">
+                        {{ template "person-details-table" . }}
+                    </div>
+                  </details>
+                  <span class="app-create-lpa__summary-update-link">
+                    <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
+                            id="f-update-trust-corporation-{{ .ID }}"
+                            name="updateTrustCorporationReplacementAttorney"
+                            type="submit"
+                            value="{{ .ID }}"
+                    >
+                      Update
+                      <span class="govuk-visually-hidden">
+                          trust corporation appointed as replacement attorney{{ if .CompanyName }} {{ .CompanyName }}{{ end }}
                       </span>
                     </button>
                   </span>
@@ -433,7 +566,7 @@
                      name="addCertificateProvider" {{ if gt (len .Lpa.CertificateProviders) 1 }}disabled{{ end }} value="Add Certificate Provider"/>
             </div>
 
-            {{ if gt (len .Lpa.Attorneys) 0 }}
+            {{ if or (gt (len .Lpa.Attorneys) 0) (gt (len .AttorneyTrustCorporations) 0) }}
               <h3 class="govuk-heading-s">Attorneys</h3>
               {{ range $attorney := .Lpa.Attorneys }}
                 <div class="govuk-form-group">
@@ -441,13 +574,25 @@
                   {{ template "input-date" (field (printf "lpaPartCSignatureDate-%d" .ID) "Date signed" .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
                 </div>
               {{ end }}
+              {{ range $trustCorporation := .AttorneyTrustCorporations }}
+                <div class="govuk-form-group">
+                  <label class="govuk-label">{{ if .CompanyName }}{{ .CompanyName }}{{ end }}</label>
+                    {{ template "input-date" (field (printf "lpaPartCSignatureDate-%d" .ID) "Date signed" .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
+                </div>
+              {{ end }}
             {{ end }}
-            {{ if gt (len .Lpa.ReplacementAttorneys) 0 }}
+              {{ if or (gt (len .Lpa.ReplacementAttorneys) 0) (gt (len .ReplacementAttorneyTrustCorporations) 0) }}
               <h3 class="govuk-heading-s">Replacement attorneys</h3>
               {{ range $attorney := .Lpa.ReplacementAttorneys }}
                 <div class="govuk-form-group">
                   <label class="govuk-label">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</label>
                   {{ template "input-date" (field (printf "lpaPartCSignatureDate-%d" .ID) "Date signed" .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
+                </div>
+              {{ end }}
+              {{ range $trustCorporation := .ReplacementAttorneyTrustCorporations }}
+                <div class="govuk-form-group">
+                  <label class="govuk-label">{{ if .CompanyName }}{{ .CompanyName }}{{ end }}</label>
+                    {{ template "input-date" (field (printf "lpaPartCSignatureDate-%d" .ID) "Date signed" .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
                 </div>
               {{ end }}
             {{ end }}

@@ -20,15 +20,17 @@ type donorData struct {
 	IsNew      bool
 	CaseUids   string
 	EntityType string
+	IsPartial  bool
 }
 
-func CreateDonor(client CreateDonorClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func CreateDonor(client CreateDonorClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
 		data := donorData{
 			XSRFToken: ctx.XSRFToken,
 			IsNew:     true,
+			IsPartial: r.Header.Get("HX-Request") == "true",
 		}
 
 		if donorId, err := strToIntOrStatusError(r.FormValue("id")); err == nil {
@@ -80,10 +82,6 @@ func CreateDonor(client CreateDonorClient, tmpl template.Template, partialTmpl t
 				data.Success = true
 				data.Donor = createdDonor
 			}
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
