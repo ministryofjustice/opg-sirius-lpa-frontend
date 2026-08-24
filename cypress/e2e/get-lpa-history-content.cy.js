@@ -277,6 +277,7 @@ describe("Show correct event content", () => {
       .should("contain.text", "Title: New title");
   });
 
+  //this test is now covered in TestGetLPAHistoryContentComplaintUpdated and can be removed
   it("can view complaint updated event when title updated", () => {
     mockEventHistory({
       sourceType: "Complaint",
@@ -297,6 +298,7 @@ describe("Show correct event content", () => {
       .should("contain.text", "Title: Old title changed to: New title");
   });
 
+  //this test covered in TestGetLPAHistoryContentComplaintUpdated and can be removed
   it("can view complaint updated event when title removed", () => {
     mockEventHistory({
       sourceType: "Complaint",
@@ -1078,6 +1080,7 @@ describe("Show correct event content", () => {
       });
   });
 
+  //This test is partially covered but needs more work on seeing if we can check attributes
   it("can view cases unlinked event - child donor", () => {
     mockEventHistory({
       sourceType: "Donor",
