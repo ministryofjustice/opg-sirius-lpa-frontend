@@ -1,28 +1,32 @@
 package sirius
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
 
 type cacheItem struct {
 	time  time.Time
-	value interface{}
+	value []RefDataItem
 }
 
 var mutex = &sync.RWMutex{}
 
 var cache map[string]cacheItem
 
-func getCached(category string) (interface{}, bool) {
-	var v interface{}
+func getCached(category string) ([]RefDataItem, bool) {
+	var v []RefDataItem
 	found := false
 
 	oneHourAgo := time.Now().Add(-1 * time.Hour)
 
 	mutex.RLock()
-
-	if cache[category].time.After(oneHourAgo) && cache[category].value != nil {
+	fmt.Println("cached")
+	fmt.Println(category)
+	fmt.Println(cache[category].value)
+	fmt.Println(cache[category])
+	if cache[category].time.After(oneHourAgo) && len(cache[category].value) > 0 {
 		v = cache[category].value
 		found = true
 	}
@@ -32,7 +36,7 @@ func getCached(category string) (interface{}, bool) {
 	return v, found
 }
 
-func setCached(category string, value interface{}) {
+func setCached(category string, value []RefDataItem) {
 	if cache == nil {
 		cache = map[string]cacheItem{}
 	}
