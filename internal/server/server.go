@@ -138,7 +138,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/add-payment", wrap(AddPayment(client, templates.Get("add-payment.gohtml"))))
 	mux.Handle("/apply-fee-reduction", wrap(ApplyFeeReduction(client, templates.Get("apply-fee-reduction.gohtml"))))
 	mux.Handle("/assign-task", wrap(AssignTask(client, templates.Get("assign-task.gohtml"))))
-	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"), templates.Get("event-partial.gohtml"))))
+	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"))))
 	mux.Handle("/create-task", wrap(Task(client, templates.Get("create-task.gohtml"))))
 	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning.gohtml"))))
 	mux.Handle("/edit-document", wrap(EditDocument(client, templates.Get("edit-document.gohtml"), templates.Get("edit-document-htmx.gohtml"))))
