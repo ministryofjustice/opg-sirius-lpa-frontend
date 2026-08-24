@@ -52,7 +52,7 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 
 		data := addComplaintData{
 			XSRFToken: ctx.XSRFToken,
-			IsPartial: r.Header.Get("HX-Request") == "true",
+			IsPartial: ctx.IsPartial,
 			CaseId:    caseID,
 			CaseType:  r.FormValue("case"),
 		}

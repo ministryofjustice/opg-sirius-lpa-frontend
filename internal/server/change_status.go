@@ -75,7 +75,7 @@ func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
 			DonorID:           donorID,
 			CaseUids:          buildUIDQueryString(r.Form["uid[]"]),
 			Notes:             postFormString(r, "notes"),
-			IsPartial:         r.Header.Get("HX-Request") == "true",
+			IsPartial:         ctx.IsPartial,
 		}
 
 		if r.Method == http.MethodPost {
