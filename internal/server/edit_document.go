@@ -22,6 +22,7 @@ type EditDocumentClient interface {
 
 type editDocumentData struct {
 	XSRFToken    string
+	IsPartial    bool
 	Success      bool
 	Error        sirius.ValidationError
 	Case         sirius.Case
@@ -67,7 +68,7 @@ func publishDraftDocument(
 	return nil
 }
 
-func EditDocument(client EditDocumentClient, tmpl template.Template, tmplHtmx template.Template) Handler {
+func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -83,6 +84,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template, tmplHtmx te
 
 		data := editDocumentData{
 			XSRFToken: ctx.XSRFToken,
+			IsPartial: ctx.IsPartial,
 		}
 
 		caseItem, err := client.Case(ctx, caseID)
@@ -281,10 +283,6 @@ func EditDocument(client EditDocumentClient, tmpl template.Template, tmplHtmx te
 					break
 				}
 			}
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return tmplHtmx(w, data)
 		}
 
 		return tmpl(w, data)
