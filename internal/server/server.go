@@ -206,7 +206,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/edit-investigation", wrap(EditInvestigation(client, templates.Get("edit_investigation.gohtml"))))
 	mux.Handle("/edit-payment", wrap(EditPayment(client, templates.Get("edit-payment.gohtml"))))
 	mux.Handle("/investigation-hold", wrap(InvestigationHold(client, templates.Get("investigation_hold.gohtml"))))
-	mux.Handle("/link-person", wrap(LinkPerson(client, templates.Get("link-person-wrapper.gohtml"), templates.Get("link-person-partial-wrapper.gohtml"))))
+	mux.Handle("/link-person", wrap(LinkPerson(client, templates.Get("link-person.gohtml"))))
 	mux.Handle("/mi-reporting", wrap(MiReporting(client, templates.Get("mi-reporting.gohtml"))))
 	mux.Handle("/payments/{id}", wrap(GetPayments(client, templates.Get("payments.gohtml"))))
 	mux.Handle("/select-or-create-correspondent", wrap(SelectOrCreateCorrespondent(client, templates.Get("select-or-create-correspondent.gohtml"))))
