@@ -69,6 +69,7 @@ htmx.on("htmx:afterSettle", (event) => {
   if (swapDetails.successful) {
     GOVUKFrontend.initAll(swapDetails.target);
     MOJFrontend.initAll(swapDetails.target);
+    loadingButton(swapDetails.target);
     select(prefix, swapDetails.target);
     todaysDate(swapDetails.target);
     handleCreateDocumentButton();

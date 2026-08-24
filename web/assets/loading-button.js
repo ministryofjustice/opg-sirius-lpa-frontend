@@ -1,6 +1,8 @@
-const loadingButton = () => {
+const loadingButton = (scope) => {
+  scope = scope || document;
+
   /** @type HTMLAnchorElement|null loadingButton */
-  const loadingButton = document.querySelector(
+  const loadingButton = scope.querySelector(
     '[data-module="app-loading-button"]',
   );
 
@@ -18,7 +20,7 @@ const loadingButton = () => {
 
         const messageSelector =
           loadingButton.getAttribute("data-loading-button-message") ?? "";
-        const message = document.querySelector(messageSelector);
+        const message = scope.querySelector(messageSelector);
 
         if (message !== null) {
           message.classList.remove("govuk-!-display-none");
