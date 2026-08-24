@@ -24,6 +24,7 @@ type miReportingData struct {
 	XSRFToken   string
 	DonorId     int
 	CaseUids    string
+	IsPartial   bool
 }
 
 type namedControl struct {
@@ -46,11 +47,12 @@ var miLabels = map[string]string{
 	"state":             "Status",
 }
 
-func MiReporting(client MiReportingClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func MiReporting(client MiReportingClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 		data := miReportingData{
 			XSRFToken: ctx.XSRFToken,
+			IsPartial: ctx.IsPartial,
 		}
 
 		donorIdString := r.FormValue("donorId")
@@ -139,10 +141,6 @@ func MiReporting(client MiReportingClient, tmpl template.Template, partialTmpl t
 
 			form.Add("OPG-Bypass-Membrane", "1")
 			data.Download = "/api/reporting/export?" + form.Encode()
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
