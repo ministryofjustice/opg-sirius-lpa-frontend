@@ -30,7 +30,7 @@ func EditDonor(client EditDonorClient, tmpl template.Template) Handler {
 			XSRFToken: ctx.XSRFToken,
 			Donor:     donor,
 			DonorId:   id,
-			IsPartial: r.Header.Get("HX-Request") == "true",
+			IsPartial: ctx.IsPartial,
 		}
 
 		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])

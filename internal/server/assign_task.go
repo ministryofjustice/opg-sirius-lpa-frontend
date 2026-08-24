@@ -78,7 +78,7 @@ func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 		ctx := getContext(r)
 		data := assignTaskData{
 			XSRFToken: ctx.XSRFToken,
-			IsPartial: r.Header.Get("HX-Request") == "true",
+			IsPartial: ctx.IsPartial,
 			DonorID:   donorID,
 			CaseUids:  buildUIDQueryString(r.Form["uid[]"]),
 			TaskIDs:   taskIDQuery,

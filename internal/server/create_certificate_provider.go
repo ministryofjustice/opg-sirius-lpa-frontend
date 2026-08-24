@@ -53,7 +53,7 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 			CanAddActor: len(caseItem.CertificateProviders) < 1,
 			Title:       "Add a certificate provider",
 			PostURL:     fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorId, caseId),
-			IsPartial:   r.Header.Get("HX-Request") == "true",
+			IsPartial:   ctx.IsPartial,
 		}
 
 		if r.Method == http.MethodPost {

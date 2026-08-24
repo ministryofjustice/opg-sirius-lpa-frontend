@@ -30,9 +30,10 @@ type editPaymentData struct {
 	PaymentSources []sirius.RefDataItem
 	ReturnUrl      string
 	HtmxRedirect   string
+	IsPartial      bool
 }
 
-func EditPayment(client EditPaymentClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		paymentID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -43,6 +44,7 @@ func EditPayment(client EditPaymentClient, tmpl template.Template, partialTmpl t
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 		data := editPaymentData{
 			XSRFToken: ctx.XSRFToken,
+			IsPartial: ctx.IsPartial,
 		}
 
 		group.Go(func() error {
@@ -103,8 +105,8 @@ func EditPayment(client EditPaymentClient, tmpl template.Template, partialTmpl t
 						"reason": "Value is required and can't be empty",
 					}
 				}
-				if r.Header.Get("HX-Request") == "true" {
-					return partialTmpl(w, data)
+				if ctx.IsPartial {
+					return tmpl(w, data)
 				}
 
 				return tmpl(w, data)
@@ -127,8 +129,8 @@ func EditPayment(client EditPaymentClient, tmpl template.Template, partialTmpl t
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
-				if r.Header.Get("HX-Request") == "true" {
-					return partialTmpl(w, data)
+				if ctx.IsPartial {
+					return tmpl(w, data)
 				}
 
 				return tmpl(w, data)
@@ -136,16 +138,12 @@ func EditPayment(client EditPaymentClient, tmpl template.Template, partialTmpl t
 				return err
 			} else {
 				SetFlash(w, FlashNotification{Title: "Payment saved"})
-				if r.Header.Get("HX-Request") == "true" {
+				if ctx.IsPartial {
 					data.HtmxRedirect = data.ReturnUrl
-					return partialTmpl(w, data)
+					return tmpl(w, data)
 				}
 				return RedirectError(data.ReturnUrl)
 			}
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

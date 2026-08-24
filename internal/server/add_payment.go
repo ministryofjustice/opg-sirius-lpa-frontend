@@ -43,7 +43,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		data := addPaymentData{
 			XSRFToken:   ctx.XSRFToken,
 			Amount:      postFormString(r, "amount"),
-			IsPartial:   r.Header.Get("HX-Request") == "true",
+			IsPartial:   ctx.IsPartial,
 			Source:      postFormString(r, "source"),
 			PaymentDate: postFormDateString(r, "paymentDate"),
 		}

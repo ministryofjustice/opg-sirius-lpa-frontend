@@ -48,7 +48,7 @@ func Relationship(client RelationshipClient, tmpl template.Template) Handler {
 			XSRFToken: ctx.XSRFToken,
 			Entity:    fmt.Sprintf("%s %s", person.Firstname, person.Surname),
 			DonorID:   personID,
-			IsPartial: r.Header.Get("HX-Request") == "true",
+			IsPartial: ctx.IsPartial,
 		}
 
 		data.CaseUIDs = buildUIDQueryString(r.Form["uid[]"])
