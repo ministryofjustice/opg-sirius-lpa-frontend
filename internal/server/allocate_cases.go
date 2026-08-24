@@ -62,7 +62,7 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
 		ctx := getContext(r)
 		data := allocateCasesData{
 			XSRFToken: ctx.XSRFToken,
-			IsPartial: r.Header.Get("HX-Request") == "true",
+			IsPartial: ctx.IsPartial,
 			CaseID:    caseIDs[0],
 			CaseIDs:   caseIDs,
 		}

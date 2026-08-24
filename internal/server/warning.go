@@ -55,7 +55,7 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 			WarningTypes: warningTypes,
 			Cases:        cases,
 			DonorId:      personId,
-			IsPartial:    r.Header.Get("HX-Request") == "true",
+			IsPartial:    ctx.IsPartial,
 		}
 
 		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])

@@ -53,7 +53,7 @@ func CreateNotifiedPerson(client CreateNotifiedPersonClient, tmpl template.Templ
 
 		data := createNotifiedPersonData{
 			XSRFToken: ctx.XSRFToken,
-			IsPartial: r.Header.Get("HX-Request") == "true",
+			IsPartial: ctx.IsPartial,
 			DonorId:   donorId,
 			CaseId:    caseId,
 			Title:     "Add a notified person",
