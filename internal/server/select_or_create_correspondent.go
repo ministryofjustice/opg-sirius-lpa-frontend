@@ -16,6 +16,7 @@ type SelectOrCreateCorrespondentClient interface {
 
 type selectOrCreateCorrespondentData struct {
 	XSRFToken     string
+	IsPartial     bool
 	DonorId       int
 	CaseId        int
 	CaseType      string
@@ -25,7 +26,7 @@ type selectOrCreateCorrespondentData struct {
 	Error         sirius.ValidationError
 }
 
-func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -44,6 +45,7 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 			DonorId:   donorId,
 			CaseId:    caseId,
 			CaseType:  r.FormValue("caseType"),
+			IsPartial: ctx.IsPartial,
 		}
 
 		if data.CaseType == "epa" {
@@ -105,9 +107,6 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 				if ve, ok := err.(sirius.ValidationError); ok {
 					w.WriteHeader(http.StatusBadRequest)
 					data.Error = ve
-					if r.Header.Get("HX-Request") == "true" {
-						return partialTmpl(w, data)
-					}
 					return tmpl(w, data)
 				} else if err != nil {
 					return err
@@ -122,9 +121,6 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 			return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d&caseType=%s", donorId, caseId, data.CaseType))
 		}
 
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
-		}
 		return tmpl(w, data)
 	}
 }
