@@ -105,9 +105,6 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 						"reason": "Value is required and can't be empty",
 					}
 				}
-				if ctx.IsPartial {
-					return tmpl(w, data)
-				}
 
 				return tmpl(w, data)
 			}
@@ -129,9 +126,6 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
-				if ctx.IsPartial {
-					return tmpl(w, data)
-				}
 
 				return tmpl(w, data)
 			} else if err != nil {
