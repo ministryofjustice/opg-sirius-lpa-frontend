@@ -22,9 +22,10 @@ type linkPersonData struct {
 	Error            sirius.ValidationError
 	Success          bool
 	CaseUids         string
+	IsPartial        bool
 }
 
-func LinkPerson(client LinkPersonClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func LinkPerson(client LinkPersonClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		person1ID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -35,8 +36,9 @@ func LinkPerson(client LinkPersonClient, tmpl template.Template, partialTmpl tem
 		data := linkPersonData{
 			XSRFToken: ctx.XSRFToken,
 			CaseUids:  buildUIDQueryString(r.Form["uid[]"]),
+			IsPartial: ctx.IsPartial,
 		}
-		
+
 		data.Entity, err = client.Person(ctx, person1ID)
 		if err != nil {
 			return err
@@ -95,10 +97,6 @@ func LinkPerson(client LinkPersonClient, tmpl template.Template, partialTmpl tem
 					data.Success = true
 				}
 			}
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
