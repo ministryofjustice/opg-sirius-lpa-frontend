@@ -83,6 +83,5 @@
     </div>
 
     {{ template "select" (select "source" "Payment method" .Source .Error.Field.source (options .PaymentSources "filterSelectable" true)) }}
-
     {{ template "input-date" (field "paymentDate" "Date of payment" .PaymentDate .Error.Field.paymentDate "max" today "selectToday" true) }}
 {{ end }}
