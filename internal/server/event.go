@@ -71,7 +71,7 @@ func Event(client EventClient, tmpl template.Template) Handler {
 			data.NoteTypes = noteTypes
 			return nil
 		})
-		
+
 		if r.Header.Get("HX-Request") == "true" {
 			data.EntityType = string(entityType)
 		}
