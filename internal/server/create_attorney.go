@@ -51,7 +51,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 
 		data := createAttorneyData{
 			XSRFToken: ctx.XSRFToken,
-			IsPartial: r.Header.Get("HX-Request") == "true",
+			IsPartial: ctx.IsPartial,
 			DonorId:   donorId,
 			CaseId:    caseId,
 			CaseType:  caseType,

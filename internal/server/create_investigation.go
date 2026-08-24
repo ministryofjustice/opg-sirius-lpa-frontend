@@ -52,7 +52,7 @@ func CreateInvestigation(client CreateInvestigationClient, tmpl template.Templat
 			CaseUIDs:   buildUIDQueryString(r.Form["uid[]"]),
 			EntityType: caseTypeString,
 			DonorId:    caseItem.Donor.ID,
-			IsPartial:  r.Header.Get("HX-Request") == "true",
+			IsPartial:  ctx.IsPartial,
 		}
 
 		if r.Method == http.MethodPost {

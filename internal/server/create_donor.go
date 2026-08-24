@@ -30,7 +30,7 @@ func CreateDonor(client CreateDonorClient, tmpl template.Template) Handler {
 		data := donorData{
 			XSRFToken: ctx.XSRFToken,
 			IsNew:     true,
-			IsPartial: r.Header.Get("HX-Request") == "true",
+			IsPartial: ctx.IsPartial,
 		}
 
 		if donorId, err := strToIntOrStatusError(r.FormValue("id")); err == nil {

@@ -87,7 +87,7 @@ func TestGetEditPayment(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditPayment(client, template.Func, template.Func)(w, r)
+	err := EditPayment(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -113,7 +113,7 @@ func TestEditPaymentWhenFailureOnGetPaymentByID(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditPayment(client, nil, nil)(w, r)
+	err := EditPayment(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -148,7 +148,7 @@ func TestEditPaymentWhenFailureOnGetCase(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditPayment(client, nil, nil)(w, r)
+	err := EditPayment(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -182,7 +182,7 @@ func TestEditPaymentWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditPayment(client, nil, nil)(w, r)
+	err := EditPayment(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -237,7 +237,7 @@ func TestEditPaymentWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := EditPayment(client, template.Func, template.Func)(w, r)
+	err := EditPayment(client, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -305,7 +305,7 @@ func TestPostEditPaymentAmountIncorrectFormat(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := EditPayment(client, template.Func, template.Func)(w, r)
+			err := EditPayment(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -366,7 +366,7 @@ func TestPostEditPayment(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := EditPayment(client, template.Func, template.Func)(w, r)
+	err := EditPayment(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/payments/4"), err)
@@ -420,10 +420,11 @@ func TestPostEditPaymentHtmx(t *testing.T) {
 			PaymentID:      123,
 			Amount:         "33.00",
 			Source:         "PHONE",
-			PaymentDate:    sirius.DateString("2022-02-18"),
+			PaymentDate:    "2022-02-18",
 			PaymentSources: paymentSources,
 			ReturnUrl:      "/payments/4",
 			HtmxRedirect:   "/payments/4",
+			IsPartial:      true,
 		}).
 		Return(nil)
 
@@ -438,7 +439,7 @@ func TestPostEditPaymentHtmx(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := EditPayment(client, nil, template.Func)(w, r)
+	err := EditPayment(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)

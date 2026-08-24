@@ -38,7 +38,7 @@ func DeleteRelationship(client DeleteRelationshipClient, tmpl template.Template)
 			XSRFToken: ctx.XSRFToken,
 			DonorId:   personID,
 			CaseUIDs:  buildUIDQueryString(r.Form["uid[]"]),
-			IsPartial: r.Header.Get("HX-Request") == "true",
+			IsPartial: ctx.IsPartial,
 		}
 
 		if r.Method == http.MethodPost {
