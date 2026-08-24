@@ -87,7 +87,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 
 		data := createDocumentData{
 			XSRFToken: ctx.XSRFToken,
-			IsPartial: r.Header.Get("HX-Request") == "true",
+			IsPartial: ctx.IsPartial,
 			Case:      caseItem,
 		}
 
