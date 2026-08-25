@@ -1,7 +1,6 @@
 package sirius
 
 import (
-	"fmt"
 	"sync"
 	"time"
 )
@@ -22,10 +21,6 @@ func getCached(category string) ([]RefDataItem, bool) {
 	oneHourAgo := time.Now().Add(-1 * time.Hour)
 
 	mutex.RLock()
-	fmt.Println("cached")
-	fmt.Println(category)
-	fmt.Println(cache[category].value)
-	fmt.Println(cache[category])
 	if cache[category].time.After(oneHourAgo) && len(cache[category].value) > 0 {
 		v = cache[category].value
 		found = true
