@@ -72,7 +72,7 @@
               <input class="govuk-button" data-module="govuk-button" type="submit" name="next-notified-person" value="Save and edit next notified person" />
             {{ end }}
           {{ end }}
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}">Cancel</a>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-notified-person" .DonorId .CaseId) }}">Cancel</a>
         </div>
       </form>
     </div>
