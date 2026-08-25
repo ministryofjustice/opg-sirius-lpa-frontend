@@ -528,7 +528,7 @@
           <div class="govuk-summary-card__content">
             <h3 class="govuk-heading-s">LPA donor</h3>
             {{ template "input-signed-date" (field "lpaDonorSignatureDate" .DonorName .Lpa.LpaDonorSignatureDate .Error.Field.lpaDonorSignatureDate) }}
-            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible app-section-break--no-top-margin">
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
             <h3 class="govuk-heading-s">Certificate provider</h3>
             {{ if gt (len .Lpa.CertificateProviders) 0 }}
@@ -564,9 +564,9 @@
                      type="submit" data-disable-after-click="true"
                      name="addCertificateProvider" {{ if gt (len .Lpa.CertificateProviders) 1 }}disabled{{ end }} value="Add Certificate Provider"/>
             </div>
-            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
             {{ if or (gt (len .Lpa.Attorneys) 0) (gt (len .AttorneyTrustCorporations) 0) }}
+              <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible app-section-break--no-top-margin">
               <h3 class="govuk-heading-s">Attorneys</h3>
               {{ range $attorney := .Lpa.Attorneys }}
                 {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s" .Firstname .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
@@ -575,8 +575,8 @@
                 {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) .CompanyName .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
               {{ end }}
             {{ end }}
-            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
             {{ if or (gt (len .Lpa.ReplacementAttorneys) 0) (gt (len .ReplacementAttorneyTrustCorporations) 0) }}
+              <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
               <h3 class="govuk-heading-s">Replacement attorneys</h3>
               {{ range $attorney := .Lpa.ReplacementAttorneys }}
                 {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s" .Firstname .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
