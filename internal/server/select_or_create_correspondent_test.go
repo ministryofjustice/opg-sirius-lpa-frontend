@@ -52,7 +52,7 @@ func TestGetSelectOrCreateCorrespondent(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType=epa", nil)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -69,13 +69,13 @@ func TestGetSelectOrCreateCorrespondentHtmxRequest(t *testing.T) {
 		Return(epa, nil)
 
 	template := &mockTemplate{}
-	partialTemplate := &mockTemplate{}
-	partialTemplate.
+	template.
 		On("Func", mock.Anything, selectOrCreateCorrespondentData{
-			DonorId:  1,
-			CaseId:   2,
-			CaseType: "epa",
-			Epa:      epa,
+			DonorId:   1,
+			CaseId:    2,
+			CaseType:  "epa",
+			Epa:       epa,
+			IsPartial: true,
 		}).
 		Return(nil)
 
@@ -83,13 +83,12 @@ func TestGetSelectOrCreateCorrespondentHtmxRequest(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func, partialTemplate.Func)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	template.AssertNotCalled(t, "Func", mock.Anything, mock.Anything)
-	mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestGetSelectOrCreateCorrespondentBadQuery(t *testing.T) {
@@ -104,7 +103,7 @@ func TestGetSelectOrCreateCorrespondentBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, query, nil)
 			w := httptest.NewRecorder()
 
-			err := SelectOrCreateCorrespondent(nil, nil, nil)(w, r)
+			err := SelectOrCreateCorrespondent(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -120,7 +119,7 @@ func TestGetSelectOrCreateCorrespondentWhenEpaErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType=epa", nil)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, nil, nil)(w, r)
+	err := SelectOrCreateCorrespondent(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -135,7 +134,7 @@ func TestGetSelectOrCreateCorrespondentWhenLpaErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, nil, nil)(w, r)
+	err := SelectOrCreateCorrespondent(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -166,7 +165,7 @@ func TestPostSelectOrCreateCorrespondentNew(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := SelectOrCreateCorrespondent(client, nil, nil)(w, r)
+			err := SelectOrCreateCorrespondent(client, nil)(w, r)
 			resp := w.Result()
 
 			assert.Equal(t, err, expectedError)
@@ -228,7 +227,7 @@ func TestPostSelectOrCreateCorrespondentFromAttorney(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := SelectOrCreateCorrespondent(client, nil, nil)(w, r)
+			err := SelectOrCreateCorrespondent(client, nil)(w, r)
 			resp := w.Result()
 
 			assert.Equal(t, err, expectedError)
@@ -255,7 +254,7 @@ func TestPostSelectOrCreateCorrespondentBadActorId(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
 
 	assert.Equal(t, err, expectedErr)
 	mock.AssertExpectationsForObjects(t, client, template)
@@ -301,7 +300,7 @@ func TestPostSelectOrCreateCorrespondentValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -331,14 +330,14 @@ func TestPostSelectOrCreateCorrespondentValidationErrorHtmxRequest(t *testing.T)
 		Return(expectedError)
 
 	template := &mockTemplate{}
-	partialTemplate := &mockTemplate{}
-	partialTemplate.
+	template.
 		On("Func", mock.Anything, selectOrCreateCorrespondentData{
-			DonorId:  1,
-			CaseId:   2,
-			CaseType: "epa",
-			Epa:      epa,
-			Error:    expectedError,
+			DonorId:   1,
+			CaseId:    2,
+			CaseType:  "epa",
+			Epa:       epa,
+			Error:     expectedError,
+			IsPartial: true,
 		}).
 		Return(nil)
 
@@ -351,13 +350,12 @@ func TestPostSelectOrCreateCorrespondentValidationErrorHtmxRequest(t *testing.T)
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func, partialTemplate.Func)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	template.AssertNotCalled(t, "Func", mock.Anything, mock.Anything)
-	mock.AssertExpectationsForObjects(t, client, template, partialTemplate)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestPostSelectOrCreateCorrespondentCreationFails(t *testing.T) {
@@ -387,7 +385,7 @@ func TestPostSelectOrCreateCorrespondentCreationFails(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func, nil)(w, r)
+	err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
