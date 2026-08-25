@@ -134,7 +134,7 @@ describe("Create or Update Attorney on an LPA", () => {
       .and("have.attr", "href")
       .and(
         "include",
-        "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-1",
+        "/create-lpa?id=1&caseId=2#scroll-to-attorneys",
       );
   });
 });

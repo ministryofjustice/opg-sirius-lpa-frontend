@@ -149,10 +149,10 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 
 			if r.Header.Get("HX-Request") == "true" {
 				data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId)
-				data.HtmxSwap = "innerHTML show:#accordion-create-lpa-heading-1:top"
+				data.HtmxSwap = "innerHTML show:#scroll-to-replacement-attorneys:top"
 				return partialTmpl(w, data)
 			}
-			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1", donorId, caseId))
+			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#scroll-to-replacement-attorneys", donorId, caseId))
 		}
 
 		if r.Header.Get("HX-Request") == "true" {

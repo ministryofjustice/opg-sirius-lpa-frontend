@@ -228,7 +228,7 @@ func TestPostCreateReplacementAttorney(t *testing.T) {
 						Attorney:     attorney,
 						Title:        "Add a replacement attorney",
 						HtmxRedirect: "/create-lpa?id=1&caseId=2",
-						HtmxSwap:     "innerHTML show:#accordion-create-lpa-heading-1:top",
+						HtmxSwap:     "innerHTML show:#scroll-to-replacement-attorneys:top",
 					}).
 					Return(nil)
 			}
@@ -261,7 +261,7 @@ func TestPostCreateReplacementAttorney(t *testing.T) {
 			resp := w.Result()
 
 			if !isHtmx {
-				expectedError := RedirectError("/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-1")
+				expectedError := RedirectError("/create-lpa?id=1&caseId=2#scroll-to-replacement-attorneys")
 				assert.Equal(t, err, expectedError)
 			}
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
@@ -305,7 +305,7 @@ func TestPostEditReplacementAttorney(t *testing.T) {
 						IsEditing:    true,
 						Title:        "Update replacement attorney details",
 						HtmxRedirect: "/create-lpa?id=1&caseId=2",
-						HtmxSwap:     "innerHTML show:#accordion-create-lpa-heading-1:top",
+						HtmxSwap:     "innerHTML show:#scroll-to-replacement-attorneys:top",
 					}).
 					Return(nil)
 			}
@@ -326,7 +326,7 @@ func TestPostEditReplacementAttorney(t *testing.T) {
 			resp := w.Result()
 
 			if !isHtmx {
-				expectedError := RedirectError("/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-1")
+				expectedError := RedirectError("/create-lpa?id=1&caseId=2#scroll-to-replacement-attorneys")
 				assert.Equal(t, err, expectedError)
 			}
 			assert.Equal(t, http.StatusOK, resp.StatusCode)

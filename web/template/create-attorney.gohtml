@@ -23,9 +23,9 @@
     {{ else }}
       <a class="govuk-back-link"
          href=""
-         hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}"
+         hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-attorneys" .DonorId .CaseId) }}"
          hx-target=".action-panel__content"
-         hx-swap="innerHTML show:#accordion-create-lpa-heading-1:top">Back</a>
+         hx-swap="innerHTML show:#scroll-to-attorneys:top">Back</a>
     {{ end }}
 
     <h1 class="govuk-heading-m">{{ .Title }}</h1>
@@ -66,9 +66,9 @@
           {{ else }}
             <a class="govuk-link govuk-link--no-visited-state"
                href=""
-               hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}"
+               hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-attorneys" .DonorId .CaseId) }}"
                hx-target=".action-panel__content"
-               hx-swap="innerHTML show:#accordion-create-lpa-heading-1:top">Cancel</a>
+               hx-swap="innerHTML show:#scroll-to-attorneys:top">Cancel</a>
           {{ end }}
       </div>
     </form>
@@ -85,7 +85,7 @@
       {{ if eq .CaseType "epa" }}
         <a href="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
       {{ else }}
-        <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+        <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-attorneys" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
       {{ end }}
 
       <h1 class="govuk-heading-l">{{ .Title }}</h1>
@@ -114,7 +114,7 @@
           {{ if eq .CaseType "epa" }}
             <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}">Cancel</a>
           {{ else }}
-            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}">Cancel</a>
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-attorneys" .DonorId .CaseId) }}">Cancel</a>
           {{ end }}
         </div>
       </form>

@@ -7,7 +7,7 @@
         <div class="govuk-grid-column-two-thirds">
             {{ template "error-summary" .Error }}
 
-            <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+            <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-replacement-attorneys" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
 
             <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
@@ -31,7 +31,7 @@
                     {{ if ne .NextAttorneyId 0 }}
                         <input class="govuk-button" data-module="govuk-button" type="submit" name="next-attorney" value="Save and update next replacement attorney" />
                     {{ end }}
-                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}">Cancel</a>
+                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-replacement-attorneys" .DonorId .CaseId) }}">Cancel</a>
                 </div>
             </form>
         </div>

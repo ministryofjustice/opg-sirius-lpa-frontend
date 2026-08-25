@@ -152,7 +152,7 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s", donorId, caseId, data.NextTrustCorporationId, strconv.FormatBool(trustCorporation.IsReplacementAttorney)))
 			}
 
-			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1", donorId, caseId))
+			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#scroll-to-attorneys-corporation", donorId, caseId))
 		}
 
 		return tmpl(w, data)
