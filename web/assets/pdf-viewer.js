@@ -150,7 +150,7 @@ class PDFViewer {
         return;
       }
 
-      const loadingTask = pdfjsLib.getDocument(this.url);
+      const loadingTask = pdfjsLib.getDocument({ url: this.url });
       this.pdfDoc = await loadingTask.promise;
 
       this.totalPages = this.pdfDoc.numPages;
