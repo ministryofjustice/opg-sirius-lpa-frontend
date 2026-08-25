@@ -41,7 +41,7 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			XSRFToken: ctx.XSRFToken,
 			DonorId:   donorID,
 			Title:     "Create an EPA",
-			IsPartial: r.Header.Get("HX-Request") == "true",
+			IsPartial: ctx.IsPartial,
 		}
 
 		caseIdStr := r.FormValue("caseId")

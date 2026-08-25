@@ -63,7 +63,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 
 		data := createLpaData{
 			XSRFToken:              ctx.XSRFToken,
-			IsPartial:              r.Header.Get("HX-Request") == "true",
+			IsPartial:              ctx.IsPartial,
 			DonorId:                donorID,
 			DonorName:              donor.Firstname + " " + donor.Surname,
 			Title:                  "Create an LPA",

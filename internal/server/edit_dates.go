@@ -42,7 +42,7 @@ func EditDates(client EditDatesClient, tmpl template.Template) Handler {
 		data := editDatesData{
 			XSRFToken: ctx.XSRFToken,
 			CaseId:    caseID,
-			IsPartial: r.Header.Get("HX-Request") == "true",
+			IsPartial: ctx.IsPartial,
 		}
 
 		if r.Method == http.MethodPost {

@@ -30,6 +30,7 @@ type eventData struct {
 	CaseUID      string
 	Success      bool
 	Error        sirius.ValidationError
+	IsPartial    bool
 
 	Type        string
 	Name        string
@@ -39,7 +40,7 @@ type eventData struct {
 	CaseUids    string
 }
 
-func Event(client EventClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func Event(client EventClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		entityID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -52,7 +53,12 @@ func Event(client EventClient, tmpl template.Template, partialTmpl template.Temp
 		}
 
 		ctx := getContext(r)
-		data := eventData{XSRFToken: ctx.XSRFToken}
+		data := eventData{
+			XSRFToken: ctx.XSRFToken,
+			IsPartial: ctx.IsPartial,
+			DonorId:   entityID,
+			CaseUids:  buildUIDQueryString(r.Form["uid[]"]),
+		}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
@@ -65,11 +71,6 @@ func Event(client EventClient, tmpl template.Template, partialTmpl template.Temp
 			data.NoteTypes = noteTypes
 			return nil
 		})
-
-		data.CaseUID = ""
-		data.IsDigitalLpa = false
-		data.DonorId = entityID
-		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
 
 		if r.Header.Get("HX-Request") == "true" {
 			data.EntityType = string(entityType)
@@ -136,10 +137,6 @@ func Event(client EventClient, tmpl template.Template, partialTmpl template.Temp
 					return RedirectError(fmt.Sprintf("/lpa/%s", data.CaseUID))
 				}
 			}
-		}
-
-		if r.Header.Get("HX-Request") == "true" && partialTmpl != nil {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

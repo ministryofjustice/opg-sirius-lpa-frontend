@@ -52,7 +52,7 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 		data := taskData{
 			XSRFToken: ctx.XSRFToken,
 			CaseID:    caseID,
-			IsPartial: r.Header.Get("HX-Request") == "true",
+			IsPartial: ctx.IsPartial,
 		}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)

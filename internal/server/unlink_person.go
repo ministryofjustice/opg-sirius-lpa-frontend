@@ -18,11 +18,12 @@ type unlinkPersonData struct {
 	Success   bool
 	Error     sirius.ValidationError
 	CaseUids  string
+	IsPartial bool
 
 	Person sirius.Person
 }
 
-func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		parentID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -33,6 +34,7 @@ func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template, partialTmpl
 		data := unlinkPersonData{
 			XSRFToken: ctx.XSRFToken,
 			CaseUids:  buildUIDQueryString(r.Form["uid[]"]),
+			IsPartial: ctx.IsPartial,
 		}
 
 		if r.Method == http.MethodPost {
@@ -67,10 +69,6 @@ func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template, partialTmpl
 		data.Person, err = client.Person(ctx, parentID)
 		if err != nil {
 			return err
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)

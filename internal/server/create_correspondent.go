@@ -43,7 +43,7 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 
 		data := createCorrespondentData{
 			XSRFToken: ctx.XSRFToken,
-			IsPartial: r.Header.Get("HX-Request") == "true",
+			IsPartial: ctx.IsPartial,
 			DonorId:   donorId,
 			CaseId:    caseId,
 			CaseType:  r.FormValue("caseType"),
