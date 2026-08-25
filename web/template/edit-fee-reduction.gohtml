@@ -1,0 +1,72 @@
+{{ template "page" . }}
+
+{{ define "partial-content" }}
+  <div class="action-panel__form">
+    {{ template "case-details" . }}
+
+    {{ template "error-summary" .Error }}
+
+    {{ if .HtmxRedirect }}
+      <span class="govuk-!-display-none"
+            hx-get="{{ prefix .HtmxRedirect }}"
+            hx-target=".action-panel__content"
+            hx-swap="innerHTML"
+            hx-trigger="load"
+      ></span>
+    {{ end }}
+
+    <h1 class="govuk-heading-m">Edit fee reduction</h1>
+
+    <form class="form"
+          method="POST"
+          hx-post="{{ prefix (printf "/edit-fee-reduction?id=%d" .PaymentID) }}"
+          hx-target=".action-panel__content"
+          hx-swap="innerHTML">
+      <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+      <input type="hidden" name="id" value="{{ .PaymentID }}"/>
+
+      {{ template "form-content" . }}
+
+      <div class="govuk-button-group govuk-!-padding-top-6">
+        <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+        <a class="govuk-link govuk-link--no-visited-state"
+           href=""
+           hx-get="{{ prefix .ReturnUrl }}"
+           hx-target=".action-panel__content"
+           hx-swap="innerHTML">Cancel</a>
+      </div>
+    </form>
+  </div>
+{{ end }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Edit fee reduction{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "case-details" . }}
+
+      {{ template "error-summary" .Error }}
+
+      <h1 class="govuk-heading-l">Edit fee reduction</h1>
+
+      <form class="form" method="POST">
+        <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+        {{ template "form-content" . }}
+
+        <div class="govuk-button-group govuk-!-padding-top-6">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix .ReturnUrl }}">Cancel</a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+{{ end }}
+
+{{ define "form-content" }}
+  {{ template "select" (select "feeReductionType" "Reduction type" .FeeReduction.FeeReductionType .Error.Field.feeReductionType (options .FeeReductionTypes)) }}
+  {{ template "textarea" (field "paymentEvidence" "Evidence used to determine reduction" .FeeReduction.PaymentEvidence .Error.Field.paymentEvidence "hint" "For example, income calculations") }}
+  {{ template "input-date" (field "paymentDate" "Date fee reduction applied" .FeeReduction.PaymentDate .Error.Field.paymentDate "max" today "selectToday" true) }}
+{{ end }}
