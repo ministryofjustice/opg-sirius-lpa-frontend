@@ -363,17 +363,18 @@ func TestCreateLpaWhenLpaErrors(t *testing.T) {
 func TestPostCreateLpa(t *testing.T) {
 	dateString := "2022-04-05"
 	lpa := sirius.Lpa{
-		OnlineLpaId:                "A12345678901",
-		AttorneyActDecisions:       "When Registered",
-		ApplicantType:              "donor",
-		AnyOtherInfo:               shared.BoolPtr(true),
-		AdditionalInfo:             "Some extra info",
-		ApplicationHasGuidance:     shared.BoolPtr(true),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(true),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		CardPaymentContact:         "01234 567890",
+		OnlineLpaId:                      "A12345678901",
+		AttorneyActDecisions:             "When Registered",
+		ApplicantType:                    "donor",
+		AnyOtherInfo:                     shared.BoolPtr(true),
+		AdditionalInfo:                   "Some extra info",
+		ApplicationHasGuidance:           shared.BoolPtr(true),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(true),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(false),
+		CardPaymentContact:               "01234 567890",
+		CertificateProviderSignatureDate: sirius.DateString(dateString),
 		Case: sirius.Case{
 			SubType:                         "pfa",
 			ApplicationType:                 "Online",
@@ -416,19 +417,20 @@ func TestPostCreateLpa(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"caseSubtype":                {"pfa"},
-		"applicationType":            {"Online"},
-		"onlineLpaId":                {"A12345678901"},
-		"receiptDate":                {dateString},
-		"lpaDonorSignatureDate":      {dateString},
-		"caseAttorney":               {"singular"},
-		"attorneyActDecisions":       {"When Registered"},
-		"preferencesAndInstructions": {"guidance"},
-		"applicantType":              {"donor"},
-		"applicationFee":             {"card"},
-		"cardPaymentContact":         {"01234 567890"},
-		"anyOtherInfo":               {"true"},
-		"additionalInfo":             {"Some extra info"},
+		"caseSubtype":                      {"pfa"},
+		"applicationType":                  {"Online"},
+		"onlineLpaId":                      {"A12345678901"},
+		"receiptDate":                      {dateString},
+		"lpaDonorSignatureDate":            {dateString},
+		"certificateProviderSignatureDate": {dateString},
+		"caseAttorney":                     {"singular"},
+		"attorneyActDecisions":             {"When Registered"},
+		"preferencesAndInstructions":       {"guidance"},
+		"applicantType":                    {"donor"},
+		"applicationFee":                   {"card"},
+		"cardPaymentContact":               {"01234 567890"},
+		"anyOtherInfo":                     {"true"},
+		"additionalInfo":                   {"Some extra info"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
