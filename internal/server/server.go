@@ -141,7 +141,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"))))
 	mux.Handle("/create-task", wrap(Task(client, templates.Get("create-task.gohtml"))))
 	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning.gohtml"))))
-	mux.Handle("/edit-document", wrap(EditDocument(client, templates.Get("edit-document.gohtml"), templates.Get("edit-document-htmx.gohtml"))))
+	mux.Handle("/edit-document", wrap(EditDocument(client, templates.Get("edit-document.gohtml"))))
 
 	//modernise
 	mux.Handle("/add-fee-decision", wrap(AddFeeDecision(client, templates.Get("add_fee_decision.gohtml"))))
@@ -209,7 +209,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/link-person", wrap(LinkPerson(client, templates.Get("link-person.gohtml"))))
 	mux.Handle("/mi-reporting", wrap(MiReporting(client, templates.Get("mi-reporting.gohtml"))))
 	mux.Handle("/payments/{id}", wrap(GetPayments(client, templates.Get("payments.gohtml"))))
-	mux.Handle("/select-or-create-correspondent", wrap(SelectOrCreateCorrespondent(client, templates.Get("select-or-create-correspondent-wrapper.gohtml"), templates.Get("select-or-create-correspondent-partial-wrapper.gohtml"))))
+	mux.Handle("/select-or-create-correspondent", wrap(SelectOrCreateCorrespondent(client, templates.Get("select-or-create-correspondent.gohtml"))))
 	mux.Handle("/sirius-header-calendars", wrap(SiriusHeaderCalendars(client, templates.Get("sirius-header-partial-calendars.gohtml"))))
 	mux.Handle("/sirius-header-case-info", wrap(SiriusHeaderCaseInfo(client, templates.Get("sirius-header-partial-case-info.gohtml"))))
 	mux.Handle("/sirius-header-people-info", wrap(SiriusHeaderPeopleInfo(client, templates.Get("sirius-header-partial-people-info.gohtml"))))
