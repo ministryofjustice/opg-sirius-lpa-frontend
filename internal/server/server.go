@@ -186,7 +186,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-lpa", wrap(CreateLpa(client, templates.Get("create-lpa.gohtml"))))
 	mux.Handle("/create-relationship", wrap(Relationship(client, templates.Get("create-relationship.gohtml"))))
 	mux.Handle("/create-notified-person", wrap(CreateNotifiedPerson(client, templates.Get("create-notified-person.gohtml"))))
-	mux.Handle("/create-replacement-attorney", wrap(CreateReplacementAttorney(client, templates.Get("create-replacement-attorney-wrapper.gohtml"), templates.Get("create-replacement-attorney-partial-wrapper.gohtml"))))
+	mux.Handle("/create-replacement-attorney", wrap(CreateReplacementAttorney(client, templates.Get("create-replacement-attorney.gohtml"))))
 	mux.Handle("/create-trust-corporation", wrap(CreateTrustCorporation(client, templates.Get("create-trust-corporation.gohtml"))))
 	mux.Handle("/compare/{id}/{caseUid}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
 	mux.Handle("/delete-fee-reduction", wrap(DeletePayment(client, templates.Get("delete-fee-reduction.gohtml"))))

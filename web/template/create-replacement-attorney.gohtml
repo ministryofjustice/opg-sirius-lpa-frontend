@@ -1,0 +1,123 @@
+{{ template "page" . }}
+
+{{ define "partial-content" }}
+  <div class="action-panel__form">
+    {{ if .HtmxRedirect }}
+      <span class="govuk-!-display-none"
+            hx-get="{{ prefix .HtmxRedirect }}"
+            hx-target=".action-panel__content"
+            hx-swap="{{ .HtmxSwap }}"
+            hx-trigger="load"
+      ></span>
+    {{ end }}
+
+    {{ template "error-summary" .Error }}
+
+    <a class="govuk-back-link"
+       href=""
+       hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}"
+       hx-target=".action-panel__content"
+       hx-swap="innerHTML show:#accordion-create-lpa-heading-1:top">Back</a>
+
+    <h1 class="govuk-heading-m">{{ .Title }}</h1>
+
+    {{ if not .IsEditing }}
+      <div class="govuk-button-group govuk-button-group--row">
+        <a class="govuk-link govuk-link--no-visited-state"
+           href=""
+           hx-get="{{ prefix (printf "/create-trust-corporation?id=%d&caseId=%d&replacement=true" .DonorId .CaseId) }}"
+           hx-target=".action-panel__content"
+           hx-swap="innerHTML scroll:.action-panel__content:top">Add a trust corporation as a replacement attorney</a>
+      </div>
+    {{ end }}
+
+    <form class="form"
+          method="POST"
+          hx-post={{if .IsEditing}}"{{ prefix (printf "/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d" .DonorId .CaseId .Attorney.ID) }}"{{else}}"{{ prefix (printf "/create-replacement-attorney?id=%d&caseId=%d" .DonorId .CaseId) }}"{{end}}
+          hx-target=".action-panel__content"
+          hx-swap="innerHTML">
+
+      {{ template "form-content" . }}
+
+      <div class="govuk-button-group govuk-!-padding-top-5">
+        <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+        {{ if not .IsEditing }}
+          <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add another replacement attorney" />
+        {{ end }}
+        {{ if ne .NextAttorneyId 0 }}
+          <input class="govuk-button" data-module="govuk-button" type="submit" name="next-attorney" value="Save and update next replacement attorney" />
+        {{ end }}
+        <a class="govuk-link govuk-link--no-visited-state"
+           href=""
+           hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}"
+           hx-target=".action-panel__content"
+           hx-swap="innerHTML show:#accordion-create-lpa-heading-1:top">Cancel</a>
+      </div>
+    </form>
+  </div>
+{{ end }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ .Title }}{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+
+      <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+
+      <h1 class="govuk-heading-l">{{ .Title }}</h1>
+
+      {{ if not .IsEditing }}
+        <div class="govuk-button-group govuk-button-group--row">
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-trust-corporation?id=%d&caseId=%d&replacement=true" .DonorId .CaseId) }}">
+            Add a trust corporation as a replacement attorney
+          </a>
+        </div>
+      {{ end }}
+
+      <form class="form" method="POST">
+
+        {{ template "form-content" . }}
+
+        <div class="govuk-button-group govuk-!-padding-top-5">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+          {{ if not .IsEditing }}
+            <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add another replacement attorney" />
+          {{ end }}
+          {{ if ne .NextAttorneyId 0 }}
+            <input class="govuk-button" data-module="govuk-button" type="submit" name="next-attorney" value="Save and update next replacement attorney" />
+          {{ end }}
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
+
+{{ define "form-content" }}
+  <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+
+  {{ template "input" (field "salutation" "Title" .Attorney.Salutation .Error.Field.salutation) }}
+  {{ template "input" (field "firstname" "First name" .Attorney.Firstname .Error.Field.firstname) }}
+  {{ template "input" (field "middlenames" "Middle names" .Attorney.Middlenames .Error.Field.middlenames) }}
+  {{ template "input" (field "surname" "Last name" .Attorney.Surname .Error.Field.surname) }}
+  {{ template "input-date" (field "dob" "Date of birth" .Attorney.DateOfBirth .Error.Field.dob "max" today) }}
+
+  <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Address" data-app-address-finder-fill-country="false">
+    {{ template "input" (field "addressLine1" "Address line 1" .Attorney.AddressLine1 .Error.Field.addressLine1 "data-app-address-finder-map" "addressLine1") }}
+    {{ template "input" (field "addressLine2" "Address line 2" .Attorney.AddressLine2 .Error.Field.addressLine2 "data-app-address-finder-map" "addressLine2") }}
+    {{ template "input" (field "addressLine3" "Address line 3" .Attorney.AddressLine3 .Error.Field.addressLine3 "data-app-address-finder-map" "addressLine3") }}
+    {{ template "input" (field "town" "Town" .Attorney.Town .Error.Field.town "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+    {{ template "input" (field "county" "County" .Attorney.County .Error.Field.county) }}
+    {{ template "input" (field "postcode" "Postcode" .Attorney.Postcode .Error.Field.postcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+    {{ template "input" (field "country" "Country" .Attorney.Country .Error.Field.country "data-app-address-finder-map" "country") }}
+    {{ template "radios" (radios "isAirmailRequired" "Airmail required" (stringifyBool .Attorney.IsAirmailRequired) .Error.Field.isAirmailRequired true
+    (item "true" "Yes")
+    (item "false" "No")
+    ) }}
+  </div>
+
+  {{ template "input" (field "phoneNumber" "Phone number" .Attorney.PhoneNumber .Error.Field.phoneNumber) }}
+  {{ template "input" (field "email" "Email address" .Attorney.Email .Error.Field.email) }}
+{{ end }}
