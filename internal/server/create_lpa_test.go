@@ -39,11 +39,6 @@ func (m *mockCreateLpaClient) UpdateLpa(ctx sirius.Context, caseID int, lpa siri
 	return args.Error(0)
 }
 
-func (m *mockCreateLpaClient) GetUserPermissions(ctx sirius.Context) (sirius.Permissions, error) {
-	args := m.Called(ctx)
-	return args.Get(0).(sirius.Permissions), args.Error(1)
-}
-
 func (m *mockCreateLpaClient) UpdateAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error {
 	args := m.Called(ctx, attorneyId, attorney)
 	return args.Error(0)
@@ -64,9 +59,6 @@ func TestGetCreateLpa(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -94,9 +86,6 @@ func TestGetCreateLpaHtmxRequest(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -126,9 +115,6 @@ func TestGetCreateLpaDoesNotSetIsUpdate(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -155,9 +141,6 @@ func TestGetCreateLpaCanEditReceiptDate(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{"v1-lpas-edit-dates": sirius.PermissionType{Permissions: []string{"PUT"}}}, nil)
 
 	template := &mockTemplate{}
 	template.
@@ -165,7 +148,6 @@ func TestGetCreateLpaCanEditReceiptDate(t *testing.T) {
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
 			Title:                  "Create an LPA",
-			CanEditReceiptDate:     true,
 			AllowNewNotifiedPerson: true,
 		}).
 		Return(nil)
@@ -196,9 +178,6 @@ func TestGetCreateLpaEdit(t *testing.T) {
 			client.
 				On("Person", mock.Anything, 123).
 				Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
-			client.
-				On("GetUserPermissions", mock.Anything).
-				Return(sirius.Permissions{}, nil)
 			client.
 				On("Lpa", mock.Anything, 456).
 				Return(tc.lpa, nil)
@@ -238,9 +217,6 @@ func TestGetCreateLpaEditWithTrustCorporations(t *testing.T) {
 			client.
 				On("Person", mock.Anything, 123).
 				Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
-			client.
-				On("GetUserPermissions", mock.Anything).
-				Return(sirius.Permissions{}, nil)
 			client.
 				On("Lpa", mock.Anything, 456).
 				Return(lpa, nil)
@@ -292,9 +268,6 @@ func TestGetCreateLpaBadQuery(t *testing.T) {
 			client.
 				On("Person", mock.Anything, 123).
 				Return(sirius.Person{}, nil)
-			client.
-				On("GetUserPermissions", mock.Anything).
-				Return(sirius.Permissions{}, nil)
 
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
@@ -321,32 +294,11 @@ func TestCreateLpaWhenPersonErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestCreateLpaWhenPermissionsError(t *testing.T) {
-	client := &mockCreateLpaClient{}
-	client.
-		On("Person", mock.Anything, 123).
-		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, errExample)
-
-	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
-	w := httptest.NewRecorder()
-
-	err := CreateLpa(client, nil)(w, r)
-
-	assert.Equal(t, err, errExample)
-	mock.AssertExpectationsForObjects(t, client)
-}
-
 func TestCreateLpaWhenLpaErrors(t *testing.T) {
 	client := &mockCreateLpaClient{}
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
 	client.
 		On("Lpa", mock.Anything, 456).
 		Return(sirius.Lpa{}, errExample)
@@ -393,9 +345,6 @@ func TestPostCreateLpa(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
 	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{"v1-lpas-edit-dates": sirius.PermissionType{Permissions: []string{"PUT"}}}, nil)
-	client.
 		On("CreateLpa", mock.Anything, 123, lpa).
 		Return(sirius.Lpa{Case: sirius.Case{ID: 456}}, nil)
 
@@ -407,7 +356,6 @@ func TestPostCreateLpa(t *testing.T) {
 			Title:                  "Create an LPA",
 			Success:                true,
 			SuccessMessage:         "You have successfully created an LPA.",
-			CanEditReceiptDate:     true,
 			AppointmentType:        "singular",
 			CaseId:                 456,
 			Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
@@ -469,9 +417,6 @@ func TestPostCreateLpaClearsMismatchedSubtypeOnlyFields(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
 	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
-	client.
 		On("CreateLpa", mock.Anything, 123, lpa).
 		Return(sirius.Lpa{}, nil)
 
@@ -519,9 +464,6 @@ func TestPostCreateLpaPreferencesNoneClearsOtherSelections(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
 	client.
 		On("CreateLpa", mock.Anything, 123, lpa).
 		Return(sirius.Lpa{}, nil)
@@ -571,9 +513,6 @@ func TestPostCreateLpaDropsOnlineLpaIdWhenNotOnline(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
 	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
-	client.
 		On("CreateLpa", mock.Anything, 123, lpa).
 		Return(sirius.Lpa{}, nil)
 
@@ -590,68 +529,6 @@ func TestPostCreateLpaDropsOnlineLpaIdWhenNotOnline(t *testing.T) {
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := CreateLpa(client, template.Func)(w, r)
-
-	assert.Nil(t, err)
-	mock.AssertExpectationsForObjects(t, client, template)
-}
-
-func TestPostCreateLpaIgnoresReceiptDateWithoutPermission(t *testing.T) {
-	existingLpa := sirius.Lpa{Case: sirius.Case{ID: 456, ReceiptDate: sirius.DateString("2022-01-01")}}
-	submittedLpa := sirius.Lpa{
-		ApplicationHasGuidance:                    shared.BoolPtr(false),
-		ApplicationHasRestrictions:                shared.BoolPtr(false),
-		PaymentByDebitCreditCard:                  shared.BoolPtr(false),
-		PaymentRemission:                          shared.BoolPtr(false),
-		RepeatApplication:                         shared.BoolPtr(false),
-		AnyOtherInfo:                              shared.BoolPtr(false),
-		LifeSustainingTreatmentSignedAndWitnessed: shared.BoolPtr(false),
-		Case: sirius.Case{
-			SubType:                         "hw",
-			ReceiptDate:                     sirius.DateString("2022-01-01"),
-			CaseAttorneySingular:            shared.BoolPtr(false),
-			CaseAttorneyJointly:             shared.BoolPtr(true),
-			CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
-			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque:  shared.BoolPtr(false),
-			PaymentExemption: shared.BoolPtr(false),
-		},
-	}
-
-	client := &mockCreateLpaClient{}
-	client.
-		On("Person", mock.Anything, 123).
-		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
-	client.
-		On("Lpa", mock.Anything, 456).
-		Return(existingLpa, nil).
-		Once()
-	client.
-		On("UpdateLpa", mock.Anything, 456, submittedLpa).
-		Return(nil)
-	client.
-		On("Lpa", mock.Anything, 456).
-		Return(sirius.Lpa{Case: sirius.Case{ID: 456}}, nil).
-		Once()
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, mock.Anything).
-		Return(nil)
-
-	form := url.Values{
-		"caseSubtype":  {"hw"},
-		"receiptDate":  {"2099-01-01"},
-		"caseAttorney": {"jointly"},
-	}
-
-	r, _ := http.NewRequest(http.MethodPost, "/?id=123&caseId=456", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
@@ -683,9 +560,6 @@ func TestPostCreateLpaDropsCardPaymentContactWhenCardNotSelected(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
 	client.
 		On("CreateLpa", mock.Anything, 123, lpa).
 		Return(sirius.Lpa{}, nil)
@@ -734,9 +608,6 @@ func TestPostCreateLpaDropsAdditionalInfoWhenAnyOtherInfoNotSelected(t *testing.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
 	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
-	client.
 		On("CreateLpa", mock.Anything, 123, lpa).
 		Return(sirius.Lpa{}, nil)
 
@@ -782,9 +653,6 @@ func TestPostCreateLpaApplicationFeeReducedFeeExemption(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
 	client.
 		On("CreateLpa", mock.Anything, 123, lpa).
 		Return(sirius.Lpa{}, nil)
@@ -833,9 +701,6 @@ func TestPostCreateLpaApplicationFeeReducedFeeRemission(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
 	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
-	client.
 		On("CreateLpa", mock.Anything, 123, lpa).
 		Return(sirius.Lpa{}, nil)
 
@@ -882,9 +747,6 @@ func TestPostCreateLpaApplicationFeeReducedFeeTypeIgnoredWhenNotSelected(t *test
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
 	client.
 		On("CreateLpa", mock.Anything, 123, lpa).
 		Return(sirius.Lpa{}, nil)
@@ -939,9 +801,6 @@ func TestPostCreateLpaApplicantAndLifeSustainingTreatmentFields(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
 	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
-	client.
 		On("CreateLpa", mock.Anything, 123, lpa).
 		Return(sirius.Lpa{}, nil)
 
@@ -993,7 +852,7 @@ func TestPostCreateLpaEditAttorneySignatureDates(t *testing.T) {
 		LifeSustainingTreatmentSignedAndWitnessed: shared.BoolPtr(false),
 		Case: sirius.Case{
 			SubType:                         "hw",
-			ReceiptDate:                     sirius.DateString("2022-01-01"),
+			ReceiptDate:                     "",
 			CaseAttorneySingular:            shared.BoolPtr(false),
 			CaseAttorneyJointly:             shared.BoolPtr(true),
 			CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
@@ -1007,9 +866,6 @@ func TestPostCreateLpaEditAttorneySignatureDates(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
 	client.
 		On("Lpa", mock.Anything, 456).
 		Return(existingLpa, nil)
@@ -1027,7 +883,6 @@ func TestPostCreateLpaEditAttorneySignatureDates(t *testing.T) {
 
 	form := url.Values{
 		"caseSubtype":               {"hw"},
-		"receiptDate":               {"2099-01-01"},
 		"caseAttorney":              {"jointly"},
 		"lpaPartCSignatureDate-876": {"2022-01-02"},
 		"lpaPartCSignatureDate-987": {"2022-01-02"},
@@ -1079,9 +934,6 @@ func TestPostCreateLpaEditReplacementAttorneySignatureDates(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
 	client.
 		On("Lpa", mock.Anything, 456).
 		Return(existingLpa, nil)
@@ -1152,9 +1004,6 @@ func TestPostCreateLpaEditTrustCorporationSignatureDates(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
 	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
-	client.
 		On("Lpa", mock.Anything, 456).
 		Return(existingLpa, nil)
 	client.
@@ -1224,9 +1073,6 @@ func TestPostCreateLpaEditAttorneySignatureDatesError(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
 	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
-	client.
 		On("Lpa", mock.Anything, 456).
 		Return(existingLpa, nil)
 	client.
@@ -1290,9 +1136,6 @@ func TestPostCreateLpaEditReplacementAttorneySignatureDatesError(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
 	client.
 		On("Lpa", mock.Anything, 456).
 		Return(existingLpa, nil)
@@ -1358,9 +1201,6 @@ func TestPostCreateLpaEditTrustCorporationSignatureDatesError(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
 	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
-	client.
 		On("Lpa", mock.Anything, 456).
 		Return(existingLpa, nil)
 	client.
@@ -1398,9 +1238,6 @@ func TestPostCreateLpaWhenValidationError(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
 	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{"v1-lpas-edit-dates": sirius.PermissionType{Permissions: []string{"PUT"}}}, nil)
-	client.
 		On("CreateLpa", mock.Anything, 123, mock.Anything).
 		Return(sirius.Lpa{}, expectedError)
 
@@ -1434,9 +1271,6 @@ func TestPostCreateLpaWhenValidationErrorHtmxRequest(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{"v1-lpas-edit-dates": sirius.PermissionType{Permissions: []string{"PUT"}}}, nil)
 	client.
 		On("CreateLpa", mock.Anything, 123, mock.Anything).
 		Return(sirius.Lpa{}, expectedError)
@@ -1492,9 +1326,6 @@ func TestPostCreateLpaEditWhenValidationError(t *testing.T) {
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
 	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{"v1-lpas-edit-dates": sirius.PermissionType{Permissions: []string{"PUT"}}}, nil)
-	client.
 		On("Lpa", mock.Anything, 456).
 		Return(existingLpa, nil).
 		Once()
@@ -1532,9 +1363,6 @@ func TestPostCreateLpaWhenGenericError(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
 	client.
 		On("CreateLpa", mock.Anything, 123, mock.Anything).
 		Return(sirius.Lpa{}, errExample)
@@ -1586,9 +1414,6 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 				On("Person", mock.Anything, 123).
 				Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
 			client.
-				On("GetUserPermissions", mock.Anything).
-				Return(sirius.Permissions{"v1-lpas-edit-dates": sirius.PermissionType{Permissions: []string{"PUT"}}}, nil)
-			client.
 				On("CreateLpa", mock.Anything, 123, lpa).
 				Return(sirius.Lpa{Case: sirius.Case{ID: 456}}, nil)
 
@@ -1601,7 +1426,6 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 				Title:                  "Create an LPA",
 				Success:                true,
 				SuccessMessage:         "You have successfully created an LPA.",
-				CanEditReceiptDate:     true,
 				AppointmentType:        "singular",
 				CaseId:                 456,
 				Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
@@ -1693,9 +1517,6 @@ func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 				On("Person", mock.Anything, 123).
 				Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
 			client.
-				On("GetUserPermissions", mock.Anything).
-				Return(sirius.Permissions{}, nil)
-			client.
 				On("Lpa", mock.Anything, 456).
 				Return(existingLpa, nil)
 			client.
@@ -1759,9 +1580,6 @@ func TestPostCreateLpaUpdateAttorneyBadId(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&updateAttorney=not-a-number", nil)
 	w := httptest.NewRecorder()
@@ -1779,9 +1597,6 @@ func TestPostCreateLpaUpdateTrustCorporationBadId(t *testing.T) {
 			client.
 				On("Person", mock.Anything, 1).
 				Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
-			client.
-				On("GetUserPermissions", mock.Anything).
-				Return(sirius.Permissions{}, nil)
 			client.
 				On("CreateLpa", mock.Anything, 1, mock.Anything).
 				Return(sirius.Lpa{Case: sirius.Case{ID: 2}}, nil)
@@ -1846,9 +1661,6 @@ func TestPostCreateLpaUpdateReplacementAttorney(t *testing.T) {
 				On("Person", mock.Anything, 123).
 				Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
 			client.
-				On("GetUserPermissions", mock.Anything).
-				Return(sirius.Permissions{}, nil)
-			client.
 				On("Lpa", mock.Anything, 456).
 				Return(existingLpa, nil)
 			client.
@@ -1912,9 +1724,6 @@ func TestPostCreateLpaUpdateReplacementAttorneyBadId(t *testing.T) {
 	client.
 		On("Person", mock.Anything, 123).
 		Return(sirius.Person{}, nil)
-	client.
-		On("GetUserPermissions", mock.Anything).
-		Return(sirius.Permissions{}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&updateReplacementAttorney=not-a-number", nil)
 	w := httptest.NewRecorder()
@@ -2030,9 +1839,6 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			client.
 				On("Person", mock.Anything, 1).
 				Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
-			client.
-				On("GetUserPermissions", mock.Anything).
-				Return(sirius.Permissions{}, nil)
 			client.
 				On("CreateLpa", mock.Anything, 1, mock.Anything).
 				Return(sirius.Lpa{Case: sirius.Case{ID: 2}}, nil)
