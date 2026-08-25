@@ -102,6 +102,25 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   max-width: 100%;
 }
 
+.app-signed-date-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: govuk-spacing(3);
+
+  .govuk-label {
+    margin-bottom: 0;
+  }
+
+  .govuk-input {
+    flex: 0 0 33.3333%;
+  }
+}
+
+.app-section-break--no-top-margin {
+  margin-top: 0;
+}
+
 // GOV.UK Frontend applies width: 100% to .govuk-textarea by default.
 // In Sirius we want textareas to be narrower by default.
 .app-\!-textarea-75 {
