@@ -202,7 +202,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/edit-complaint", wrap(EditComplaint(client, templates.Get("edit_complaint.gohtml"))))
 	mux.Handle("/edit-dates", wrap(EditDates(client, templates.Get("edit-dates.gohtml"))))
 	mux.Handle("/edit-donor", wrap(EditDonor(client, templates.Get("donor.gohtml"))))
-	mux.Handle("/edit-fee-reduction", wrap(EditFeeReduction(client, templates.Get("edit-fee-reduction-wrapper.gohtml"), templates.Get("edit-fee-reduction-partial-wrapper.gohtml"))))
+	mux.Handle("/edit-fee-reduction", wrap(EditFeeReduction(client, templates.Get("edit-fee-reduction.gohtml"))))
 	mux.Handle("/edit-investigation", wrap(EditInvestigation(client, templates.Get("edit_investigation.gohtml"))))
 	mux.Handle("/edit-payment", wrap(EditPayment(client, templates.Get("edit-payment.gohtml"))))
 	mux.Handle("/investigation-hold", wrap(InvestigationHold(client, templates.Get("investigation_hold.gohtml"))))
