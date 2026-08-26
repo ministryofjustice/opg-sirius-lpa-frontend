@@ -34,13 +34,13 @@
 
 	{{ if .HasSelectedAddNewRecipient }}
 		{{ template "create-document-back-and-case-details" . }}
-		{{ template "add-recipient" . }}
+		{{ template "form-add-recipient" . }}
 	{{ else if .HasViewedInsertPage }}
 		{{ template "create-document-back-and-case-details" . }}
-		{{ template "select-recipient" . }}
+		{{ template "form-select-recipient" . }}
 	{{ else if .TemplateSelected.TemplateId }}
 		{{ template "create-document-back-and-case-details" . }}
-		{{ template "select-insert" . }}
+		{{ template "form-select-insert" . }}
 	{{ else }}
 		<div class="govuk-body">
 			{{ if .IsPartial }}
@@ -101,7 +101,7 @@
 	</div>
 {{ end }}
 
-{{ define "add-recipient" }}
+{{ define "form-add-recipient" }}
 	<h1 class="govuk-heading-m">Add a new recipient</h1>
 	<form class="form"
 	      method="POST"
@@ -187,7 +187,7 @@
 	</form>
 {{ end }}
 
-{{ define "select-recipient" }}
+{{ define "form-select-recipient" }}
 	<div class="govuk-clearfix">
 		<h1 class="govuk-heading-m app-!-float-left">Select a recipient</h1>
 		<form class="form"
@@ -279,7 +279,7 @@
 	</form>
 {{ end }}
 
-{{ define "select-insert" }}
+{{ define "form-select-insert" }}
 	<h1 class="govuk-heading-m">Select document inserts</h1>
 	<form class="form"
 	      method="GET"

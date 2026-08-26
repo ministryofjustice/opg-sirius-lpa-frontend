@@ -24,7 +24,7 @@
           hx-swap="innerHTML">
       <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-      {{ template "assign-task" . }}
+      {{ template "form-content" . }}
 
       <div class="govuk-button-group">
         <button class="govuk-button" data-module="govuk-button" type="submit">Assign Task</button>
@@ -63,7 +63,7 @@
       <form class="form" method="POST">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
-        {{ template "assign-task" . }}
+        {{ template "form-content" . }}
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Assign Task</button>
@@ -74,7 +74,7 @@
   </div>
 {{ end }}
 
-{{ define "assign-task" }}
+{{ define "form-content" }}
   <div class="govuk-form-group {{ if .Error.Field.assignTo }}govuk-form-group--error{{ end }}">
     <fieldset class="govuk-fieldset">
       <legend class="govuk-fieldset__legend">Assign to</legend>
