@@ -47,9 +47,10 @@ func TestGetCreateReplacementAttorney(t *testing.T) {
 				Return(lpaWithReceiptDate, nil)
 
 			expectedData := createReplacementAttorneyData{
-				DonorId: 1,
-				CaseId:  2,
-				Title:   "Add a replacement attorney",
+				DonorId:   1,
+				CaseId:    2,
+				Title:     "Add a replacement attorney",
+				IsPartial: isHtmx,
 			}
 			template := &mockTemplate{}
 			template.
@@ -63,7 +64,7 @@ func TestGetCreateReplacementAttorney(t *testing.T) {
 				r.Header.Add("HX-Request", "true")
 			}
 
-			err := CreateReplacementAttorney(client, template.Func, template.Func)(w, r)
+			err := CreateReplacementAttorney(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -90,6 +91,7 @@ func TestGetCreateReplacementAttorneyNoReceiptDate(t *testing.T) {
 						"receiptDate": {"receiptDate": "A receipt date must be added to the LPA before a replacement attorney can be added"},
 					},
 				},
+				IsPartial: isHtmx,
 			}
 			template := &mockTemplate{}
 			template.
@@ -103,7 +105,7 @@ func TestGetCreateReplacementAttorneyNoReceiptDate(t *testing.T) {
 				r.Header.Add("HX-Request", "true")
 			}
 
-			err := CreateReplacementAttorney(client, template.Func, template.Func)(w, r)
+			err := CreateReplacementAttorney(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -146,7 +148,7 @@ func TestGetEditReplacementAttorney(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&attorneyId=4", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateReplacementAttorney(client, template.Func, nil)(w, r)
+	err := CreateReplacementAttorney(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -166,7 +168,7 @@ func TestGetCreateReplacementAttorneyBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, query, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateReplacementAttorney(nil, nil, nil)(w, r)
+			err := CreateReplacementAttorney(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
@@ -182,7 +184,7 @@ func TestGetCreateReplacementAttorneyWhenLpaErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateReplacementAttorney(client, nil, nil)(w, r)
+	err := CreateReplacementAttorney(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
@@ -218,10 +220,9 @@ func TestPostCreateReplacementAttorney(t *testing.T) {
 				Return(sirius.Attorney{Person: sirius.Person{ID: 88}}, nil)
 
 			template := &mockTemplate{}
-			partialTmpl := &mockTemplate{}
 
 			if isHtmx {
-				partialTmpl.
+				template.
 					On("Func", mock.Anything, createReplacementAttorneyData{
 						DonorId:      1,
 						CaseId:       2,
@@ -229,6 +230,7 @@ func TestPostCreateReplacementAttorney(t *testing.T) {
 						Title:        "Add a replacement attorney",
 						HtmxRedirect: "/create-lpa?id=1&caseId=2",
 						HtmxSwap:     "innerHTML show:#accordion-create-lpa-heading-1:top",
+						IsPartial:    true,
 					}).
 					Return(nil)
 			}
@@ -257,7 +259,7 @@ func TestPostCreateReplacementAttorney(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateReplacementAttorney(client, template.Func, partialTmpl.Func)(w, r)
+			err := CreateReplacementAttorney(client, template.Func)(w, r)
 			resp := w.Result()
 
 			if !isHtmx {
@@ -265,7 +267,7 @@ func TestPostCreateReplacementAttorney(t *testing.T) {
 				assert.Equal(t, err, expectedError)
 			}
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template, partialTmpl)
+			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -294,10 +296,9 @@ func TestPostEditReplacementAttorney(t *testing.T) {
 				Return(nil)
 
 			template := &mockTemplate{}
-			partialTmpl := &mockTemplate{}
 
 			if isHtmx {
-				partialTmpl.
+				template.
 					On("Func", mock.Anything, createReplacementAttorneyData{
 						DonorId:      1,
 						CaseId:       2,
@@ -306,6 +307,7 @@ func TestPostEditReplacementAttorney(t *testing.T) {
 						Title:        "Update replacement attorney details",
 						HtmxRedirect: "/create-lpa?id=1&caseId=2",
 						HtmxSwap:     "innerHTML show:#accordion-create-lpa-heading-1:top",
+						IsPartial:    true,
 					}).
 					Return(nil)
 			}
@@ -322,7 +324,7 @@ func TestPostEditReplacementAttorney(t *testing.T) {
 			}
 			w := httptest.NewRecorder()
 
-			err := CreateReplacementAttorney(client, template.Func, partialTmpl.Func)(w, r)
+			err := CreateReplacementAttorney(client, template.Func)(w, r)
 			resp := w.Result()
 
 			if !isHtmx {
@@ -330,7 +332,7 @@ func TestPostEditReplacementAttorney(t *testing.T) {
 				assert.Equal(t, err, expectedError)
 			}
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template, partialTmpl)
+			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -377,7 +379,7 @@ func TestPostCreateReplacementAttorneyWhenValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateReplacementAttorney(client, template.Func, template.Func)(w, r)
+	err := CreateReplacementAttorney(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -409,7 +411,7 @@ func TestPostCreateReplacementAttorneyAddAnother(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := CreateReplacementAttorney(client, nil, nil)(w, r)
+	err := CreateReplacementAttorney(client, nil)(w, r)
 	resp := w.Result()
 
 	expectedRedirect := RedirectError("/create-replacement-attorney?id=1&caseId=2")
