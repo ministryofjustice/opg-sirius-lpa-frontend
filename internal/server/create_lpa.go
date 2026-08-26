@@ -94,11 +94,12 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			caseAttorneyValue := r.FormValue("caseAttorney")
 
 			lpa := sirius.Lpa{
-				OnlineLpaId:            postFormString(r, "onlineLpaId"),
-				AttorneyActDecisions:   postFormString(r, "attorneyActDecisions"),
-				ApplicantType:          postFormString(r, "applicantType"),
-				ApplicantSignatureDate: postFormDateString(r, "applicantSignatureDate"),
-				CardPaymentContact:     postFormString(r, "cardPaymentContact"),
+				OnlineLpaId:                      postFormString(r, "onlineLpaId"),
+				AttorneyActDecisions:             postFormString(r, "attorneyActDecisions"),
+				ApplicantType:                    postFormString(r, "applicantType"),
+				ApplicantSignatureDate:           postFormDateString(r, "applicantSignatureDate"),
+				CardPaymentContact:               postFormString(r, "cardPaymentContact"),
+				CertificateProviderSignatureDate: postFormDateString(r, "certificateProviderSignatureDate"),
 				Case: sirius.Case{
 					SubType:                                   postFormString(r, "caseSubtype"),
 					ApplicationType:                           postFormString(r, "applicationType"),
