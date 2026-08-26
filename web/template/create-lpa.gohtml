@@ -527,8 +527,8 @@
           </div>
           <div class="govuk-summary-card__content">
             <h3 class="govuk-heading-s">LPA donor</h3>
-            <p class="govuk-body">{{ .DonorName }}</p>
-            {{ template "input-date" (field "lpaDonorSignatureDate" "Date signed" .Lpa.LpaDonorSignatureDate .Error.Field.lpaDonorSignatureDate) }}
+            {{ template "input-signed-date" (field "lpaDonorSignatureDate" .DonorName .Lpa.LpaDonorSignatureDate .Error.Field.lpaDonorSignatureDate) }}
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
             <h3 class="govuk-heading-s">Certificate provider</h3>
             {{ if gt (len .Lpa.CertificateProviders) 0 }}
@@ -554,12 +554,11 @@
                       </span>
                     </button>
                   </span>
-                  <div class="govuk-form-group">
-                    <input class="govuk-input" type="text" placeholder="DD/MM/YYYY" />
-                  </div>
+                  {{ template "input-signed-date" (field "certificateProviderSignatureDate" "" $.Lpa.CertificateProviderSignatureDate $.Error.Field.certificateProviderSignatureDate) }}
                 </div>
               {{ end }}
             {{ end }}
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
             <div class="govuk-button-group app-button-group--column">
               <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
                      type="submit" data-disable-after-click="true"
@@ -567,33 +566,23 @@
             </div>
 
             {{ if or (gt (len .Lpa.Attorneys) 0) (gt (len .AttorneyTrustCorporations) 0) }}
+              <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible app-section-break--no-top-margin">
               <h3 class="govuk-heading-s">Attorneys</h3>
               {{ range $attorney := .Lpa.Attorneys }}
-                <div class="govuk-form-group">
-                  <label class="govuk-label">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</label>
-                  {{ template "input-date" (field (printf "lpaPartCSignatureDate-%d" .ID) "Date signed" .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
-                </div>
+                {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s" .Firstname .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
               {{ end }}
               {{ range $trustCorporation := .AttorneyTrustCorporations }}
-                <div class="govuk-form-group">
-                  <label class="govuk-label">{{ if .CompanyName }}{{ .CompanyName }}{{ end }}</label>
-                    {{ template "input-date" (field (printf "lpaPartCSignatureDate-%d" .ID) "Date signed" .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
-                </div>
+                {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) .CompanyName .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
               {{ end }}
             {{ end }}
-              {{ if or (gt (len .Lpa.ReplacementAttorneys) 0) (gt (len .ReplacementAttorneyTrustCorporations) 0) }}
+            {{ if or (gt (len .Lpa.ReplacementAttorneys) 0) (gt (len .ReplacementAttorneyTrustCorporations) 0) }}
+              <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
               <h3 class="govuk-heading-s">Replacement attorneys</h3>
               {{ range $attorney := .Lpa.ReplacementAttorneys }}
-                <div class="govuk-form-group">
-                  <label class="govuk-label">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</label>
-                  {{ template "input-date" (field (printf "lpaPartCSignatureDate-%d" .ID) "Date signed" .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
-                </div>
+                {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s" .Firstname .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
               {{ end }}
               {{ range $trustCorporation := .ReplacementAttorneyTrustCorporations }}
-                <div class="govuk-form-group">
-                  <label class="govuk-label">{{ if .CompanyName }}{{ .CompanyName }}{{ end }}</label>
-                    {{ template "input-date" (field (printf "lpaPartCSignatureDate-%d" .ID) "Date signed" .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
-                </div>
+                {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) .CompanyName .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
               {{ end }}
             {{ end }}
           </div>

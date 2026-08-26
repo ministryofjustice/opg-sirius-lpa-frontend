@@ -20,6 +20,7 @@ type EditFeeReductionClient interface {
 type editFeeReductionData struct {
 	XSRFToken string
 	Error     sirius.ValidationError
+	IsPartial bool
 
 	Case              sirius.Case
 	PaymentID         int
@@ -29,7 +30,7 @@ type editFeeReductionData struct {
 	HtmxRedirect      string
 }
 
-func EditFeeReduction(client EditFeeReductionClient, tmpl template.Template, partialTmpl template.Template) Handler {
+func EditFeeReduction(client EditFeeReductionClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		paymentID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -41,6 +42,7 @@ func EditFeeReduction(client EditFeeReductionClient, tmpl template.Template, par
 		data := editFeeReductionData{
 			XSRFToken: ctx.XSRFToken,
 			PaymentID: paymentID,
+			IsPartial: ctx.IsPartial,
 		}
 
 		group.Go(func() error {
@@ -84,25 +86,18 @@ func EditFeeReduction(client EditFeeReductionClient, tmpl template.Template, par
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
-				if r.Header.Get("HX-Request") == "true" {
-					return partialTmpl(w, data)
-				}
 
 				return tmpl(w, data)
 			} else if err != nil {
 				return err
 			} else {
 				SetFlash(w, FlashNotification{Title: "Fee reduction edited"})
-				if r.Header.Get("HX-Request") == "true" {
+				if ctx.IsPartial {
 					data.HtmxRedirect = data.ReturnUrl
-					return partialTmpl(w, data)
+					return tmpl(w, data)
 				}
 				return RedirectError(data.ReturnUrl)
 			}
-		}
-
-		if r.Header.Get("HX-Request") == "true" {
-			return partialTmpl(w, data)
 		}
 
 		return tmpl(w, data)
