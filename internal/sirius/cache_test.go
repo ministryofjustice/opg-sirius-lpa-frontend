@@ -6,11 +6,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func getCountries() interface{} {
-	return []interface{}{
-		map[string]string{
-			"Handle": "UK",
-			"Label":  "United Kingdom",
+func getCountries() []RefDataItem {
+	return []RefDataItem{
+		{
+			Handle: "UK",
+			Label:  "United Kingdom",
 		},
 	}
 }
