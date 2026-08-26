@@ -27,7 +27,7 @@
           hx-target=".action-panel__content"
           hx-swap="innerHTML">
 
-      {{ template "createCorrespondent" . }}
+      {{ template "form-content" . }}
 
       <div class="govuk-button-group govuk-!-padding-top-5">
         <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
@@ -66,7 +66,7 @@
 
       <form class="form" method="POST">
 
-        {{ template "createCorrespondent" . }}
+        {{ template "form-content" . }}
 
         <div class="govuk-button-group govuk-!-padding-top-5">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
@@ -77,7 +77,7 @@
   </div>
 {{ end }}
 
-{{ define "createCorrespondent" }}
+{{ define "form-content" }}
   <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
   {{ template "input" (field "salutation" "Title" .Correspondent.Salutation .Error.Field.salutation) }}
