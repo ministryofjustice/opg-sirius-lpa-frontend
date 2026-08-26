@@ -27,7 +27,7 @@
           hx-target=".action-panel__content"
           hx-swap="innerHTML">
 
-      {{ template "addNotifiedPerson" . }}
+      {{ template "form-content" . }}
 
       <div class="govuk-button-group govuk-!-padding-top-5">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
@@ -61,7 +61,7 @@
       <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
       <form class="form" method="POST">
-          {{ template "addNotifiedPerson" . }}
+          {{ template "form-content" . }}
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
           {{if .AllowNewNotifiedPerson }}
@@ -80,7 +80,7 @@
 {{ end }}
 
 
-{{ define "addNotifiedPerson" }}
+{{ define "form-content" }}
   <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
   {{ template "input" (field "salutation" "Title" .NotifiedPerson.Salutation .Error.Field.salutation) }}

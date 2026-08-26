@@ -28,7 +28,7 @@
           hx-target=".action-panel__content"
           hx-swap="innerHTML scroll:.action-panel__content:top"
     >
-      {{ template "create-lpa" . }}
+      {{ template "form-content" . }}
 
       <div class="govuk-button-group">
         <button class="govuk-button" data-module="govuk-button" type="submit"
@@ -62,7 +62,7 @@
       <h1 class="govuk-heading-l app-!-embedded-hide">{{ .Title }}</h1>
 
       <form class="form" method="POST">
-        {{ template "create-lpa" . }}
+        {{ template "form-content" . }}
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit"
@@ -76,7 +76,7 @@
 {{ end }}
 
 
-{{ define "create-lpa" }}
+{{ define "form-content" }}
   <button class="govuk-visually-hidden" tabindex="-1" aria-hidden="true" data-module="govuk-button" type="submit"></button>
   <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
