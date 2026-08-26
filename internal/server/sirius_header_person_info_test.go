@@ -195,7 +195,7 @@ func TestGetSiriusHeaderPersonInfoGetSelectedPerson(t *testing.T) {
 					Case:           caseItem,
 					SelectedPerson: tc.SelectedPerson,
 					SelectedID:     selectedIdInt,
-					ApplicantIds:   []string{"2", "4"},
+					ApplicantIds:   []int{2, 4},
 				}).
 				Return(nil)
 

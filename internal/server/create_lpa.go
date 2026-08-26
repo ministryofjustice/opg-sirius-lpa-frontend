@@ -23,6 +23,7 @@ type CreateLpaClient interface {
 type createLpaData struct {
 	AllowNewNotifiedPerson               bool
 	AppointmentType                      string
+	ApplicantIds                         []int
 	AttorneyTrustCorporations            []sirius.TrustCorporation
 	CaseId                               int
 	DonorId                              int
@@ -80,6 +81,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			data.AllowNewNotifiedPerson = allowNewNotifiedPerson(len(data.Lpa.NotifiedPersons))
 			data.Title = "Edit LPA"
 			data.IsUpdate = true
+			data.ApplicantIds = data.Lpa.GetApplicantIds()
 
 			for _, trustCorporation := range data.Lpa.TrustCorporations {
 				if trustCorporation.IsReplacementAttorney {
@@ -113,9 +115,13 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				},
 			}
 
-			for _, idStr := range r.PostForm["applicantIds"] {
-				if id, err := strconv.Atoi(idStr); err == nil {
-					lpa.ApplicantIds = append(lpa.ApplicantIds, id)
+			if lpa.ApplicantType == "donor" {
+				lpa.ApplicantIds = append(lpa.ApplicantIds, donorID)
+			} else {
+				for _, idStr := range r.PostForm["applicantIds"] {
+					if id, err := strconv.Atoi(idStr); err == nil {
+						lpa.ApplicantIds = append(lpa.ApplicantIds, id)
+					}
 				}
 			}
 
