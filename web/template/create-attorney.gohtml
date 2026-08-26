@@ -46,7 +46,7 @@
           hx-target=".action-panel__content"
           hx-swap="innerHTML">
 
-      {{ template "createAttorney" . }}
+      {{ template "form-content" . }}
 
       <div class="govuk-button-group govuk-!-padding-top-5">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
@@ -100,7 +100,7 @@
 
       <form class="form" method="POST">
 
-        {{ template "createAttorney" . }}
+        {{ template "form-content" . }}
 
         <div class="govuk-button-group govuk-!-padding-top-5">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
@@ -122,7 +122,7 @@
   </div>
 {{ end }}
 
-{{ define "createAttorney" }}
+{{ define "form-content" }}
   <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
   {{ if eq .CaseType "lpa" }}
