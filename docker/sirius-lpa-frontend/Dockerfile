@@ -1,4 +1,4 @@
-FROM node:24.18.0-alpine3.23@sha256:595398b0081eacda8e1c4c5b97b76cd1020e4d58a8ebcb4843b9bca1e79e7436 AS asset-env
+FROM node:24.19.0-alpine3.23@sha256:244cc2b53f46f9e876304391d17682b0ddae9ac33491f4857e25e35a36ba7995 AS asset-env
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ RUN npm ci --ignore-scripts
 COPY web/assets web/assets
 RUN npm run build
 
-FROM golang:1.26.5-alpine@sha256:0178a641fbb4858c5f1b48e34bdaabe0350a330a1b1149aabd498d0699ff5fb2 AS dev
+FROM golang:1.26.6-alpine@sha256:3889b425f035be855a72fb4755265311293b6d414521f0a519d819df32222d83 AS dev
 
 WORKDIR /app
 
@@ -36,7 +36,7 @@ COPY --from=asset-env /app/web/static web/static
 
 ENTRYPOINT ["go", "tool", "air"]
 
-FROM golang:1.26.5@sha256:3aff6657219a4d9c14e27fb1d8976c49c29fddb70ba835014f477e1c70636647 AS build-env
+FROM golang:1.26.6@sha256:0d1d3a794be25f809dd2cb3160d8c73276c4056a9f8242a138e908ddeee7b6b6 AS build-env
 
 RUN adduser \
     --disabled-password \
