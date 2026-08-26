@@ -127,7 +127,7 @@ describe("create an LPA", () => {
     cy.get("#f-caseSubtype").should("be.checked");
     cy.get("#f-applicationType").should("be.checked");
     cy.get("#f-onlineLpaId").should("have.value", "A12345678901");
-    cy.get("#f-receiptDate").should("have.value", "2026-06-19");
+    cy.get("#f-receiptDate-readonly").should("have.text", "19/06/2026");
     cy.get("#f-caseAttorney").should("be.checked");
 
     cy.contains(".govuk-details__summary-text", "Mr Active Attorney");
