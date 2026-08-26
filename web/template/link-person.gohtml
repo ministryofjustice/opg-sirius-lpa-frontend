@@ -19,7 +19,7 @@
           hx-target=".action-panel__content"
           hx-swap="innerHTML"
     >
-      {{ template "link-person" . }}
+      {{ template "form-content" . }}
 
       <div class="govuk-button-group">
         {{ if .OtherPerson.ID }}
@@ -60,7 +60,7 @@
 
       <form class="form" method="POST">
 
-        {{ template "link-person" . }}
+        {{ template "form-content" . }}
 
         <div class="govuk-button-group">
           {{ if .OtherPerson.ID }}
@@ -79,7 +79,7 @@
   </div>
 {{ end }}
 
-{{ define "link-person" }}
+{{ define "form-content" }}
   <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
   {{ if .OtherPerson.ID }}
