@@ -98,3 +98,11 @@ func (c Case) FilterInactiveAttorneys() Case {
 	c.TrustCorporations = activeTrustCorps
 	return c
 }
+
+func (c Case) GetApplicantIds() []int {
+	var applicantIds []int
+	for _, applicant := range c.Applicants {
+		applicantIds = append(applicantIds, applicant.ID)
+	}
+	return applicantIds
+}

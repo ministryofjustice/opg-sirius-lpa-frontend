@@ -613,13 +613,14 @@
                 <div class="govuk-radios" data-module="govuk-radios">
                   <div class="govuk-radios__item">
                     <input class="govuk-radios__input" id="f-applicantType" name="applicantType" type="radio"
-                           value="donor" {{ if eq .Lpa.ApplicantType "donor" }}checked{{ end }}>
+                           value="donor" {{ if containsInt .ApplicantIds .DonorId }}checked{{ end }}>
                     <label class="govuk-label govuk-radios__label" for="f-applicantType">Donor</label>
                   </div>
                   <div class="govuk-radios__item">
                     <input class="govuk-radios__input" id="f-applicantType-2" name="applicantType" type="radio"
                            value="attorney" data-aria-controls="applicantAttorneysReveal"
-                           {{ if eq .Lpa.ApplicantType "attorney" }}checked{{ end }}>
+                           {{ if and (ne (len .ApplicantIds) 0) (eq (containsInt .ApplicantIds .DonorId) false) }}checked{{ end }}
+                           {{ if eq (len .Lpa.Attorneys) 0 }}disabled{{ end }}>
                     <label class="govuk-label govuk-radios__label" for="f-applicantType-2">Attorney</label>
                   </div>
                   <div class="govuk-radios__conditional {{ if ne .Lpa.ApplicantType "attorney" }}govuk-radios__conditional--hidden{{ end }}"
@@ -627,7 +628,7 @@
                     {{ range $attorney := .Lpa.Attorneys }}
                       <div class="govuk-checkboxes__item">
                         <input class="govuk-checkboxes__input" id="f-applicantIds-{{ .ID }}" name="applicantIds"
-                               type="checkbox" value="{{ .ID }}">
+                               type="checkbox" value="{{ .ID }}" {{ if containsInt $.ApplicantIds .ID }}checked{{ end }}>
                         <label class="govuk-label govuk-checkboxes__label" for="f-applicantIds-{{ .ID }}">
                           {{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
                         </label>
