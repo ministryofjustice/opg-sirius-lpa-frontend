@@ -144,6 +144,14 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return false
 		},
+		"containsInt": func(xs []int, needle int) bool {
+			for _, x := range xs {
+				if x == needle {
+					return true
+				}
+			}
+			return false
+		},
 		"isChildLinked": func(value interface{}) bool {
 			m, ok := value.(map[string]interface{})
 			if !ok {
