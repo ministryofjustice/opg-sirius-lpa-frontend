@@ -117,6 +117,11 @@ describe("create an LPA", () => {
           surname: "Correspondent",
           personType: "Correspondent",
         },
+        applicants: [
+          {
+            id: 1,
+          },
+        ],
       },
     });
 
