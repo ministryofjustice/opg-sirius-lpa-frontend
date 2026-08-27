@@ -33,6 +33,7 @@ unit-test: setup-directories
 
 build:
 	docker compose build lpa-frontend
+	cd playwright && docker compose build playwright
 
 build-all: ## Build containers
 	docker compose build --parallel lpa-frontend puppeteer cypress test-runner
@@ -60,6 +61,18 @@ down: ## Stop everything
 run-structurizr:
 	docker pull structurizr/lite
 	docker run -it --rm -p 8020:8080 -v $(PWD)/docs/architecture/dsl/local:/usr/local/structurizr structurizr/lite
+
+lint:
+	cd playwright && docker compose $(DOCKER_FEATURE_FILES) run --rm playwright lint
+
+check-format:
+	cd playwright && docker compose $(DOCKER_FEATURE_FILES) run --rm playwright check-format
+
+run-playwright:
+	docker compose run --rm playwright test
+
+run-playwright-ui: down build up ## Start container so Playwright tests can be run through the browser on http://localhost:9525
+	cd playwright && BASE_URL=http://localhost:8888 npx playwright test --ui
 
 js-test:
 	docker compose build js-test
