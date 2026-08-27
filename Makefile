@@ -69,7 +69,7 @@ check-format:
 	cd playwright && docker compose $(DOCKER_FEATURE_FILES) run --rm playwright check-format
 
 run-playwright:
-	cd playwright && docker compose $(DOCKER_FEATURE_FILES) run --rm playwright test
+	docker compose run --rm playwright test
 
 js-test:
 	docker compose build js-test

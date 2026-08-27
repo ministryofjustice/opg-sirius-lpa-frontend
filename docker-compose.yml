@@ -88,6 +88,19 @@ services:
     volumes:
       - ./:/e2e
 
+  playwright:
+    build:
+      context: playwright
+      dockerfile: Dockerfile
+    depends_on:
+      - lpa-frontend
+      - sirius-mock
+    environment:
+      - BASE_URL=http://lpa-frontend:8080
+    working_dir: /e2e
+    volumes:
+      - ./playwright:/e2e
+
   js-test:
     build:
       dockerfile: docker/js-test/Dockerfile
