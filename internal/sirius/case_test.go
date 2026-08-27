@@ -208,3 +208,10 @@ func TestCaseFiltersInactiveActors(t *testing.T) {
 	assert.Equal(t, []Attorney{actor1}, filteredCase.Attorneys)
 	assert.Equal(t, []TrustCorporation{actor2}, filteredCase.TrustCorporations)
 }
+
+func TestCaseGetApplicantIds(t *testing.T) {
+	caseItem := Case{Applicants: []Person{{ID: 1}, {ID: 2}}}
+	applicantIds := caseItem.GetApplicantIds()
+
+	assert.Equal(t, []int{1, 2}, applicantIds)
+}

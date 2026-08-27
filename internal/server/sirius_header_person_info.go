@@ -2,7 +2,6 @@ package server
 
 import (
 	"net/http"
-	"slices"
 	"strconv"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -19,7 +18,7 @@ type siriusHeaderPeopleInfoData struct {
 	SelectedID     int
 	Case           sirius.Case
 	SelectedPerson sirius.Recipient
-	ApplicantIds   []string
+	ApplicantIds   []int
 }
 
 func SiriusHeaderPeopleInfo(client SiriusHeaderPeopleInfoClient, tmpl template.Template) Handler {
@@ -53,7 +52,7 @@ func SiriusHeaderPeopleInfo(client SiriusHeaderPeopleInfoClient, tmpl template.T
 		data.Case = caseItem
 		data.SelectedPerson = selectedPerson
 		data.SelectedID = selectedIdInt
-		data.ApplicantIds = getApplicantIds(caseItem)
+		data.ApplicantIds = caseItem.GetApplicantIds()
 
 		return tmpl(w, data)
 	}
@@ -94,24 +93,4 @@ func getSelectedPerson(caseItem sirius.Case, selectedId int) sirius.Recipient {
 		}
 	}
 	return *caseItem.Donor
-}
-
-func getApplicantIds(caseItem sirius.Case) []string {
-	var applicantIds []string
-	for _, attorney := range caseItem.Attorneys {
-		if slices.ContainsFunc(caseItem.Applicants, func(applicant sirius.Person) bool {
-			return applicant.ID == attorney.ID
-		}) {
-			applicantIds = append(applicantIds, strconv.Itoa(attorney.ID))
-		}
-	}
-	for _, trustCorporation := range caseItem.TrustCorporations {
-		if slices.ContainsFunc(caseItem.Applicants, func(applicant sirius.Person) bool {
-			return applicant.ID == trustCorporation.ID
-		}) {
-			applicantIds = append(applicantIds, strconv.Itoa(trustCorporation.ID))
-		}
-	}
-
-	return applicantIds
 }
