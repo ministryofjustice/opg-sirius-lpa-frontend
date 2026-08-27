@@ -593,6 +593,19 @@ func TestContains(t *testing.T) {
 	assert.Equal(t, false, val)
 }
 
+func TestContainsInt(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["containsInt"].(func([]int, int) bool)
+
+	var val bool
+
+	val = fn([]int{1, 2, 3}, 3)
+	assert.Equal(t, true, val)
+
+	val = fn([]int{1, 2, 3}, 4)
+	assert.Equal(t, false, val)
+}
+
 func TestReplace(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["replace"].(func(string, string, string) string)
