@@ -71,6 +71,9 @@ check-format:
 run-playwright:
 	docker compose run --rm playwright test
 
+run-playwright-ui: down build up ## Start container so Playwright tests can be run through the browser on http://localhost:9525
+	cd playwright && BASE_URL=http://localhost:8888 npx playwright test --ui
+
 js-test:
 	docker compose build js-test
 	docker compose run --rm js-test

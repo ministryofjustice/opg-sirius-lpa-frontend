@@ -13,5 +13,5 @@ make run-playwright
 To run with the UI:
 
 ```sh
-make test-ui
+make run-playwright-ui
 ```
