@@ -18,7 +18,6 @@ type CreateLpaClient interface {
 	UpdateAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
 	UpdateReplacementAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
 	UpdateTrustCorporation(ctx sirius.Context, trustCorporationId int, trustCorporation sirius.TrustCorporation) error
-	GetUserPermissions(sirius.Context) (sirius.Permissions, error)
 }
 
 type createLpaData struct {
@@ -26,7 +25,6 @@ type createLpaData struct {
 	AppointmentType                      string
 	ApplicantIds                         []int
 	AttorneyTrustCorporations            []sirius.TrustCorporation
-	CanEditReceiptDate                   bool
 	CaseId                               int
 	DonorId                              int
 	DonorName                            string
@@ -57,11 +55,6 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		userPermissions, err := client.GetUserPermissions(ctx)
-		if err != nil {
-			return err
-		}
-
 		data := createLpaData{
 			XSRFToken:              ctx.XSRFToken,
 			IsPartial:              ctx.IsPartial,
@@ -69,7 +62,6 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			DonorName:              donor.Firstname + " " + donor.Surname,
 			Title:                  "Create an LPA",
 			AllowNewNotifiedPerson: allowNewNotifiedPerson(0),
-			CanEditReceiptDate:     userPermissions.Includes("v1-lpas-edit-dates", "PUT"),
 		}
 
 		caseIdStr := r.FormValue("caseId")
@@ -166,10 +158,8 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			lpa.ApplicationHasGuidance = shared.BoolPtr(!preferencesNone && postFormCheckboxChecked(r, "preferencesAndInstructions", "guidance"))
 			lpa.ApplicationHasRestrictions = shared.BoolPtr(!preferencesNone && postFormCheckboxChecked(r, "preferencesAndInstructions", "restrictions"))
 
-			if data.CanEditReceiptDate {
+			if !data.IsUpdate {
 				lpa.ReceiptDate = postFormDateString(r, "receiptDate")
-			} else if isEditing {
-				lpa.ReceiptDate = data.Lpa.ReceiptDate
 			}
 
 			if lpa.ApplicationType != "Online" {
