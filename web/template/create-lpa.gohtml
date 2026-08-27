@@ -142,7 +142,7 @@
               </fieldset>
             </div>
 
-            {{ if .CanEditReceiptDate }}
+            {{ if not .IsUpdate }}
               {{ template "input-date" (field "receiptDate" "Receipt date" .Lpa.ReceiptDate .Error.Field.receiptDate "max" today "boldLabel" true) }}
             {{ else }}
               <div class="govuk-form-group">
