@@ -2,6 +2,7 @@ version: v1.25.1
 ignore:
   "SNYK-GOLANG-GITHUBCOMGRPCECOSYSTEMGRPCGATEWAYV2RUNTIME-19432132":
     - "*":
-        reason: "No fixed version available"
+        reason: "No fixed version available. We don't use the vulnerable component."
+        created: "2026-08-30T00:00:00.000Z"
         expires: "2026-10-01T00:00:00.000Z"
 patch: {}
