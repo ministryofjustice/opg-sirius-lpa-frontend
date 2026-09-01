@@ -1,3 +1,7 @@
 version: v1.25.1
-ignore: {}
+ignore:
+  "SNYK-GOLANG-GITHUBCOMGRPCECOSYSTEMGRPCGATEWAYV2RUNTIME-19432132":
+    - "*":
+        reason: "No fixed version available"
+        expires: "2026-10-01T00:00:00.000Z"
 patch: {}
