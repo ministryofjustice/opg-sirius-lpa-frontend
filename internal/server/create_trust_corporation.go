@@ -47,6 +47,11 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 			return err
 		}
 
+		lpa, err := client.Lpa(ctx, caseId)
+		if err != nil {
+			return err
+		}
+
 		isReplacementAttorney := r.FormValue("replacement") == "true"
 
 		data := createTrustCorporationData{
@@ -54,6 +59,7 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 			IsPartial: r.Header.Get("HX-Request") == "true",
 			DonorId:   donorId,
 			CaseId:    caseId,
+			CaseType:  strings.ToLower(lpa.CaseType),
 			Title:     "Add a trust corporation",
 			HtmxPost:  fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&replacement=%s", donorId, caseId, strconv.FormatBool(isReplacementAttorney)),
 			TrustCorporation: sirius.TrustCorporation{
@@ -70,12 +76,6 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 
 		var trustCorporationId int
 		trustCorporationIdStr := r.FormValue("trustCorporationId")
-
-		lpa, err := client.Lpa(ctx, caseId)
-		if err != nil {
-			return err
-		}
-		data.CaseType = strings.ToLower(lpa.CaseType)
 
 		isEditing := trustCorporationIdStr != ""
 		if isEditing {
@@ -156,7 +156,7 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 				}
 			}
 
-			if r.FormValue("editNextTrustCorporation") != "" {
+			if r.FormValue("next-attorney") != "" {
 				if trustCorporation.IsReplacementAttorney {
 					data.NextPersonId, data.NextPersonType = GetIdForNextAttorney(trustCorporationId, true, lpa.TrustCorporations, lpa.ReplacementAttorneys)
 					if data.NextPersonType == "Trust Corporation" {

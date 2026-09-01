@@ -36,8 +36,9 @@ func TestGetCreateTrustCorporation(t *testing.T) {
 	for _, isReplacementAttorney := range []string{"false", "true"} {
 		t.Run("Is Replacement Attorney: "+isReplacementAttorney, func(t *testing.T) {
 			expectedData := createTrustCorporationData{
-				DonorId: 1,
-				CaseId:  2,
+				DonorId:  1,
+				CaseId:   2,
+				CaseType: "lpa",
 				TrustCorporation: sirius.TrustCorporation{
 					IsReplacementAttorney: isReplacementAttorney == "true",
 					Attorney:              sirius.Attorney{SystemStatus: shared.BoolPtr(true)},
@@ -52,6 +53,13 @@ func TestGetCreateTrustCorporation(t *testing.T) {
 				expectedData.AppointedAs = "Attorney"
 			}
 
+			client := &mockCreateTrustCorporationClient{}
+			client.
+				On("Lpa", mock.Anything, 2).
+				Return(sirius.Lpa{Case: sirius.Case{
+					CaseType: "LPA",
+				}}, nil)
+
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, expectedData).
@@ -60,7 +68,7 @@ func TestGetCreateTrustCorporation(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&replacement="+isReplacementAttorney, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateTrustCorporation(nil, template.Func)(w, r)
+			err := CreateTrustCorporation(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -119,11 +127,10 @@ func TestGetEditTrustCorporation(t *testing.T) {
 
 func TestGetCreateTrustCorporationBadQuery(t *testing.T) {
 	testCases := map[string]string{
-		"no-id":                    "/",
-		"bad-id":                   "/?id=test",
-		"no-case-id":               "/?id=123",
-		"bad-case-id":              "/?id=123&caseId=test",
-		"bad-trust-corporation-id": "/?id=123&caseId=123&trustCorporationId=test",
+		"no-id":       "/",
+		"bad-id":      "/?id=test",
+		"no-case-id":  "/?id=123",
+		"bad-case-id": "/?id=123&caseId=test",
 	}
 
 	for name, query := range testCases {
@@ -136,6 +143,20 @@ func TestGetCreateTrustCorporationBadQuery(t *testing.T) {
 			assert.NotNil(t, err)
 		})
 	}
+}
+
+func TestGetCreateTrustCorporationBadTrustCorpQuery(t *testing.T) {
+	client := &mockCreateTrustCorporationClient{}
+	client.
+		On("Lpa", mock.Anything, 123).
+		Return(sirius.Lpa{}, nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&caseId=123&trustCorporationId=test", nil)
+	w := httptest.NewRecorder()
+
+	err := CreateTrustCorporation(client, nil)(w, r)
+
+	assert.NotNil(t, err)
 }
 
 func TestGetEditTrustCorporationWhenLpaFails(t *testing.T) {
@@ -186,6 +207,9 @@ func TestPostCreateTrustCorporation(t *testing.T) {
 			client.
 				On("CreateTrustCorporation", mock.Anything, 2, expectedTrustCorporation).
 				Return(nil)
+			client.
+				On("Lpa", mock.Anything, 2).
+				Return(sirius.Lpa{Case: sirius.Case{CaseType: "LPA", ID: 2}}, nil)
 
 			form := url.Values{
 				"companyName":              {"ACME"},
@@ -290,6 +314,9 @@ func TestPostCreateTrustCorporationWhenCreateFails(t *testing.T) {
 
 	client := &mockCreateTrustCorporationClient{}
 	client.
+		On("Lpa", mock.Anything, 2).
+		Return(sirius.Lpa{Case: sirius.Case{CaseType: "LPA", ID: 2}}, nil)
+	client.
 		On("CreateTrustCorporation", mock.Anything, 2, expectedTrustCorporation).
 		Return(errExample)
 
@@ -354,6 +381,9 @@ func TestPostCreateTrustCorporationWhenValidationError(t *testing.T) {
 
 	client := &mockCreateTrustCorporationClient{}
 	client.
+		On("Lpa", mock.Anything, 2).
+		Return(sirius.Lpa{Case: sirius.Case{CaseType: "LPA", ID: 2}}, nil)
+	client.
 		On("CreateTrustCorporation", mock.Anything, 2, mock.Anything).
 		Return(expectedError)
 
@@ -363,6 +393,7 @@ func TestPostCreateTrustCorporationWhenValidationError(t *testing.T) {
 			AppointedAs: "Attorney",
 			DonorId:     1,
 			CaseId:      2,
+			CaseType:    "lpa",
 			TrustCorporation: sirius.TrustCorporation{
 				IsReplacementAttorney:       false,
 				TrustCorporationAppointedAs: "Attorney",
@@ -411,14 +442,17 @@ func TestPostCreateTrustCorporationAddAnotherRedirects(t *testing.T) {
 
 	client := &mockCreateTrustCorporationClient{}
 	client.
+		On("Lpa", mock.Anything, 2).
+		Return(sirius.Lpa{Case: sirius.Case{CaseType: "LPA", ID: 2}}, nil)
+	client.
 		On("CreateTrustCorporation", mock.Anything, 2, expectedTrustCorporation).
 		Return(nil)
 
 	form := url.Values{
-		"companyName":                {"ACME"},
-		"isReplacementAttorney":      {"false"},
-		"isTrustCorporationActive":   {"true"},
-		"addAnotherTrustCorporation": {"true"},
+		"companyName":              {"ACME"},
+		"isReplacementAttorney":    {"false"},
+		"isTrustCorporationActive": {"true"},
+		"add-another":              {"true"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "create-trust-corporation/?id=1&caseId=2&replacement=false", strings.NewReader(form.Encode()))
@@ -427,20 +461,22 @@ func TestPostCreateTrustCorporationAddAnotherRedirects(t *testing.T) {
 
 	err := CreateTrustCorporation(client, nil)(w, r)
 
-	assert.Equal(t, RedirectError("/create-trust-corporation?id=1&caseId=2&replacement=false"), err)
+	assert.Equal(t, RedirectError("/create-attorney?id=1&caseId=2&caseType=lpa"), err)
 }
 
 func TestPostEditTrustCorporationEditNextRedirects(t *testing.T) {
-	lpa := sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3}},
-			IsReplacementAttorney: false,
-		},
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 4}},
-			IsReplacementAttorney: false,
-		},
-	}}}
+	lpa := sirius.Lpa{Case: sirius.Case{
+		CaseType: "LPA",
+		TrustCorporations: []sirius.TrustCorporation{
+			{
+				Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3}},
+				IsReplacementAttorney: false,
+			},
+			{
+				Attorney:              sirius.Attorney{Person: sirius.Person{ID: 4}},
+				IsReplacementAttorney: false,
+			},
+		}}}
 	expectedTrustCorporation := sirius.TrustCorporation{
 		Attorney: sirius.Attorney{
 			Person: sirius.Person{
@@ -464,7 +500,7 @@ func TestPostEditTrustCorporationEditNextRedirects(t *testing.T) {
 		"companyName":              {"ACME"},
 		"isReplacementAttorney":    {"false"},
 		"isTrustCorporationActive": {"true"},
-		"editNextTrustCorporation": {"true"},
+		"next-attorney":            {"true"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "create-trust-corporation/?id=1&caseId=2&trustCorporationId=3&replacement=false", strings.NewReader(form.Encode()))
@@ -473,11 +509,11 @@ func TestPostEditTrustCorporationEditNextRedirects(t *testing.T) {
 
 	err := CreateTrustCorporation(client, nil)(w, r)
 
-	assert.Equal(t, RedirectError("/create-trust-corporation?id=1&caseId=2&trustCorporationId=4&replacement=false"), err)
+	assert.Equal(t, RedirectError("/create-attorney?id=1&caseId=2&caseType=lpa&attorneyId=4"), err)
 }
 
 func TestGetNextTrustCorporationIdWillReturnNextNumber(t *testing.T) {
-	result := GetNextTrustCorporationId(2, false, []sirius.TrustCorporation{
+	result, _ := GetIdForNextAttorney(2, false, []sirius.TrustCorporation{
 		{
 			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 1}},
 			IsReplacementAttorney: false,
@@ -490,12 +526,12 @@ func TestGetNextTrustCorporationIdWillReturnNextNumber(t *testing.T) {
 			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3}},
 			IsReplacementAttorney: false,
 		},
-	})
+	}, []sirius.Attorney{})
 	assert.Equal(t, 3, result)
 }
 
 func TestGetNextTrustCorporationIdWillReturnNextHigherIdWhenSequenceHasGaps(t *testing.T) {
-	result := GetNextTrustCorporationId(2, false, []sirius.TrustCorporation{
+	result, _ := GetIdForNextAttorney(2, false, []sirius.TrustCorporation{
 		{
 			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 1}},
 			IsReplacementAttorney: false,
@@ -512,12 +548,12 @@ func TestGetNextTrustCorporationIdWillReturnNextHigherIdWhenSequenceHasGaps(t *t
 			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 9}},
 			IsReplacementAttorney: false,
 		},
-	})
+	}, []sirius.Attorney{})
 	assert.Equal(t, 5, result)
 }
 
 func TestGetNextTrustCorporationIdWillReturnZero(t *testing.T) {
-	result := GetNextTrustCorporationId(3, false, []sirius.TrustCorporation{
+	result, _ := GetIdForNextAttorney(3, false, []sirius.TrustCorporation{
 		{
 			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 1}},
 			IsReplacementAttorney: false,
@@ -530,12 +566,12 @@ func TestGetNextTrustCorporationIdWillReturnZero(t *testing.T) {
 			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3}},
 			IsReplacementAttorney: false,
 		},
-	})
+	}, []sirius.Attorney{})
 	assert.Equal(t, 0, result)
 }
 
 func TestGetNextTrustCorporationIdWillReturnNextNumberWithSameAppointedType(t *testing.T) {
-	result := GetNextTrustCorporationId(2, false, []sirius.TrustCorporation{
+	result, _ := GetIdForNextAttorney(2, false, []sirius.TrustCorporation{
 		{
 			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3}},
 			IsReplacementAttorney: true,
@@ -548,6 +584,6 @@ func TestGetNextTrustCorporationIdWillReturnNextNumberWithSameAppointedType(t *t
 			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 5}},
 			IsReplacementAttorney: true,
 		},
-	})
+	}, []sirius.Attorney{})
 	assert.Equal(t, 4, result)
 }
