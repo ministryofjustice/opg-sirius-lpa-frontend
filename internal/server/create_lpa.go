@@ -115,14 +115,26 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				},
 			}
 
-			if lpa.ApplicantType == "donor" {
+			hasAttorneyIdBeenSelected := len(r.PostForm["applicantIds"]) > 0
+
+			switch lpa.ApplicantType {
+			case "donor":
 				lpa.ApplicantIds = append(lpa.ApplicantIds, donorID)
-			} else {
-				for _, idStr := range r.PostForm["applicantIds"] {
-					if id, err := strconv.Atoi(idStr); err == nil {
-						lpa.ApplicantIds = append(lpa.ApplicantIds, id)
+			case "attorney":
+				if !hasAttorneyIdBeenSelected {
+					data.Error.Field = make(sirius.FieldErrors)
+					data.Error.Field["applicantType"] = map[string]string{
+						"": "Select an applicant",
+					}
+				} else {
+					for _, idStr := range r.PostForm["applicantIds"] {
+						if id, err := strconv.Atoi(idStr); err == nil {
+							lpa.ApplicantIds = append(lpa.ApplicantIds, id)
+						}
 					}
 				}
+			default:
+				lpa.ApplicantIds = nil
 			}
 
 			lpa.LifeSustainingTreatmentSignedAndWitnessed = shared.BoolPtr(postFormString(r, "lifeSustainingTreatmentSignedAndWitnessed") == "true")
@@ -167,6 +179,17 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			}
 
 			data.AppointmentType = caseAttorneyValue
+
+			if !hasAttorneyIdBeenSelected && lpa.ApplicantType == "attorney" {
+				lpa.Attorneys = data.Lpa.Attorneys
+				lpa.ReplacementAttorneys = data.Lpa.ReplacementAttorneys
+				data.ApplicantIds = data.Lpa.GetApplicantIds()
+				data.AppointmentType = caseAttorneyValue
+				data.Lpa = lpa
+
+				w.WriteHeader(http.StatusBadRequest)
+				return tmpl(w, data)
+			}
 
 			if isEditing {
 				err = client.UpdateLpa(ctx, data.CaseId, lpa)
