@@ -1827,3 +1827,84 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 		})
 	}
 }
+
+func TestPostErrorWhenAttorneyRadioSelected(t *testing.T) {
+	dateString := "2022-04-05"
+
+	client := &mockCreateLpaClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createLpaData{
+			AllowNewNotifiedPerson: true,
+			AppointmentType:        "singular",
+			DonorId:                123,
+			DonorName:              "Firstname Surname",
+			Error: sirius.ValidationError{
+				Field: sirius.FieldErrors{"applicantType": {"": "Select an applicant"}},
+			},
+			IsUpdate: false,
+			Lpa: sirius.Lpa{
+				Case: sirius.Case{
+					ApplicationType:                           "Online",
+					CaseAttorneyJointly:                       shared.BoolPtr(false),
+					CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
+					CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
+					CaseAttorneySingular:                      shared.BoolPtr(true),
+					LpaDonorSignatureDate:                     sirius.DateString(dateString),
+					PaymentByCheque:                           shared.BoolPtr(false),
+					PaymentExemption:                          shared.BoolPtr(false),
+					ReceiptDate:                               sirius.DateString(dateString),
+					SubType:                                   "pfa",
+				},
+				AdditionalInfo:                   "Some extra info",
+				AnyOtherInfo:                     shared.BoolPtr(true),
+				ApplicantType:                    "attorney",
+				ApplicationHasGuidance:           shared.BoolPtr(true),
+				ApplicationHasRestrictions:       shared.BoolPtr(false),
+				AttorneyActDecisions:             "When Registered",
+				CardPaymentContact:               "01234 567890",
+				CertificateProviderSignatureDate: sirius.DateString(dateString),
+				OnlineLpaId:                      "A12345678901",
+				PaymentByDebitCreditCard:         shared.BoolPtr(true),
+				PaymentRemission:                 shared.BoolPtr(false),
+				RepeatApplication:                shared.BoolPtr(false),
+			},
+			Success:        false,
+			SuccessMessage: "",
+			Title:          "Create an LPA",
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"caseSubtype":                      {"pfa"},
+		"applicationType":                  {"Online"},
+		"applicantIds":                     {},
+		"onlineLpaId":                      {"A12345678901"},
+		"receiptDate":                      {dateString},
+		"lpaDonorSignatureDate":            {dateString},
+		"certificateProviderSignatureDate": {dateString},
+		"caseAttorney":                     {"singular"},
+		"attorneyActDecisions":             {"When Registered"},
+		"preferencesAndInstructions":       {"guidance"},
+		"applicantType":                    {"attorney"},
+		"applicationFee":                   {"card"},
+		"cardPaymentContact":               {"01234 567890"},
+		"anyOtherInfo":                     {"true"},
+		"additionalInfo":                   {"Some extra info"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateLpa(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
