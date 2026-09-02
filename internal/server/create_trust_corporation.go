@@ -144,8 +144,12 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 				return err
 			}
 
-			if r.FormValue("addAnotherTrustCorporation") != "" {
-				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&replacement=%s", donorId, caseId, strconv.FormatBool(trustCorporation.IsReplacementAttorney)))
+			if r.FormValue("add-another") != "" {
+				if trustCorporation.IsReplacementAttorney {
+					return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorId, caseId))
+				} else {
+					return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa", donorId, caseId))
+				}
 			}
 
 			if r.FormValue("editNextTrustCorporation") != "" {
