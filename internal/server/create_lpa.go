@@ -115,11 +115,12 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				},
 			}
 
-			hasAttorneyIdBeenSelected := r.PostForm["applicantIds"] != nil && len(r.PostForm["applicantIds"]) > 0
+			hasAttorneyIdBeenSelected := len(r.PostForm["applicantIds"]) > 0
 
-			if lpa.ApplicantType == "donor" {
+			switch lpa.ApplicantType {
+			case "donor":
 				lpa.ApplicantIds = append(lpa.ApplicantIds, donorID)
-			} else if lpa.ApplicantType == "attorney" {
+			case "attorney":
 				if !hasAttorneyIdBeenSelected {
 					data.Error.Field = make(sirius.FieldErrors)
 					data.Error.Field["applicantType"] = map[string]string{
@@ -132,6 +133,8 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 						}
 					}
 				}
+			default:
+				lpa.ApplicantIds = nil
 			}
 
 			lpa.LifeSustainingTreatmentSignedAndWitnessed = shared.BoolPtr(postFormString(r, "lifeSustainingTreatmentSignedAndWitnessed") == "true")
