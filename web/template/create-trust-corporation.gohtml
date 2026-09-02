@@ -39,7 +39,7 @@
       <div class="govuk-button-group govuk-!-padding-top-5">
         <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
         {{ if not .IsEditing }}
-          <input class="govuk-button" data-module="govuk-button" type="submit" name="addAnotherTrustCorporation" value="Save and add another {{ ToLower .AppointedAs }}" />
+          <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add another {{ ToLower .AppointedAs }}" />
         {{ else }}
           <input class="govuk-button" data-module="govuk-button" type="submit" name="editNextTrustCorporation" value="Save and update next {{ ToLower .AppointedAs }}" />
         {{ end }}
@@ -83,7 +83,7 @@
         <div class="govuk-button-group govuk-!-padding-top-5">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
           {{ if not .IsEditing }}
-            <input class="govuk-button" data-module="govuk-button" type="submit" name="addAnotherTrustCorporation" value="Save and add another {{ ToLower .AppointedAs }}" />
+            <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add another {{ ToLower .AppointedAs }}" />
           {{ else }}
             {{ if ne .NextTrustCorporationId 0 }}
               <input class="govuk-button" data-module="govuk-button" type="submit" name="editNextTrustCorporation" value="Save and update next {{ ToLower .AppointedAs }}" />
