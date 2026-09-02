@@ -173,7 +173,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 			if caseType == "epa" {
 				return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 			}
-			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1", donorId, caseId))
+			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#scroll-to-attorneys", donorId, caseId))
 		}
 
 		return tmpl(w, data)
