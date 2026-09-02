@@ -1,9 +1,11 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -398,36 +400,63 @@ func TestPostCreateTrustCorporationWhenValidationError(t *testing.T) {
 }
 
 func TestPostCreateTrustCorporationAddAnotherRedirects(t *testing.T) {
-	expectedTrustCorporation := sirius.TrustCorporation{
-		Attorney: sirius.Attorney{
-			Person: sirius.Person{
-				CompanyName: "ACME",
-			},
-			SystemStatus: shared.BoolPtr(true),
+	tests := []struct {
+		name                  string
+		isReplacementAttorney bool
+		redirect              string
+		attorneyType          string
+		systemStatus          *bool
+	}{
+		{
+			name:                  "Redirects when attorney",
+			isReplacementAttorney: false,
+			redirect:              "/create-attorney?id=1&caseId=2&caseType=lpa",
+			attorneyType:          "Attorney",
+			systemStatus:          shared.BoolPtr(true),
 		},
-		IsReplacementAttorney:       false,
-		TrustCorporationAppointedAs: "Attorney",
+		{
+			name:                  "Redirects when replacement attorney",
+			isReplacementAttorney: true,
+			redirect:              "/create-replacement-attorney?id=1&caseId=2",
+			attorneyType:          "Replacement Attorney",
+			systemStatus:          shared.BoolPtr(false),
+		},
 	}
 
-	client := &mockCreateTrustCorporationClient{}
-	client.
-		On("CreateTrustCorporation", mock.Anything, 2, expectedTrustCorporation).
-		Return(nil)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			expectedTrustCorporation := sirius.TrustCorporation{
+				Attorney: sirius.Attorney{
+					Person: sirius.Person{
+						CompanyName: "ACME",
+					},
+					SystemStatus: tc.systemStatus,
+				},
+				IsReplacementAttorney:       tc.isReplacementAttorney,
+				TrustCorporationAppointedAs: tc.attorneyType,
+			}
 
-	form := url.Values{
-		"companyName":                {"ACME"},
-		"isReplacementAttorney":      {"false"},
-		"isTrustCorporationActive":   {"true"},
-		"addAnotherTrustCorporation": {"true"},
+			client := &mockCreateTrustCorporationClient{}
+			client.
+				On("CreateTrustCorporation", mock.Anything, 2, expectedTrustCorporation).
+				Return(nil)
+
+			form := url.Values{
+				"companyName":              {"ACME"},
+				"isReplacementAttorney":    {strconv.FormatBool(tc.isReplacementAttorney)},
+				"isTrustCorporationActive": {"true"},
+				"add-another":              {"true"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("create-trust-corporation/?id=1&caseId=2&replacement=%t", tc.isReplacementAttorney), strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := CreateTrustCorporation(client, nil)(w, r)
+
+			assert.Equal(t, RedirectError(tc.redirect), err)
+		})
 	}
-
-	r, _ := http.NewRequest(http.MethodPost, "create-trust-corporation/?id=1&caseId=2&replacement=false", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := CreateTrustCorporation(client, nil)(w, r)
-
-	assert.Equal(t, RedirectError("/create-trust-corporation?id=1&caseId=2&replacement=false"), err)
 }
 
 func TestPostEditTrustCorporationEditNextRedirects(t *testing.T) {
