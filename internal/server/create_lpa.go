@@ -115,7 +115,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				},
 			}
 
-			hasAttorneyIdBeenSelected := r.PostForm["applicantIds"] != nil && len(r.PostForm["applicantIds"]) > 0
+			hasAttorneyIdBeenSelected := len(r.PostForm["applicantIds"]) > 0
 
 			if lpa.ApplicantType == "donor" {
 				lpa.ApplicantIds = append(lpa.ApplicantIds, donorID)

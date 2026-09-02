@@ -147,10 +147,10 @@ func CreateNotifiedPerson(client CreateNotifiedPersonClient, tmpl template.Templ
 
 			if data.IsPartial {
 				data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId)
-				data.HtmxSwap = "innerHTML show:#accordion-create-lpa-heading-2:top"
+				data.HtmxSwap = "innerHTML show:#scroll-to-notified-person:top"
 				return tmpl(w, data)
 			}
-			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-2", donorId, caseId))
+			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#scroll-to-notified-person", donorId, caseId))
 
 		}
 

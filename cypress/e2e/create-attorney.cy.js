@@ -132,9 +132,6 @@ describe("Create or Update Attorney on an LPA", () => {
     cy.get(".govuk-back-link")
       .should("exist")
       .and("have.attr", "href")
-      .and(
-        "include",
-        "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-1",
-      );
+      .and("include", "/create-lpa?id=1&caseId=2#scroll-to-attorneys");
   });
 });
