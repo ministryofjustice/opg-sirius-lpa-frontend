@@ -210,7 +210,7 @@ func TestPostCreateTrustCorporation(t *testing.T) {
 
 			err := CreateTrustCorporation(client, nil)(w, r)
 
-			assert.Equal(t, RedirectError("/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-1"), err)
+			assert.Equal(t, RedirectError("/create-lpa?id=1&caseId=2#scroll-to-attorneys-corporation"), err)
 		})
 	}
 }
@@ -273,7 +273,7 @@ func TestPostEditTrustCorporation(t *testing.T) {
 
 	err := CreateTrustCorporation(client, nil)(w, r)
 
-	assert.Equal(t, RedirectError("/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-1"), err)
+	assert.Equal(t, RedirectError("/create-lpa?id=1&caseId=2#scroll-to-attorneys-corporation"), err)
 }
 
 func TestPostCreateTrustCorporationWhenCreateFails(t *testing.T) {
