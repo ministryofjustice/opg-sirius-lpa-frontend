@@ -223,7 +223,7 @@ func TestPostCreateNotifiedPerson(t *testing.T) {
 						Title:                  "Add a notified person",
 						AllowNewNotifiedPerson: true,
 						HtmxRedirect:           "/create-lpa?id=1&caseId=2",
-						HtmxSwap:               "innerHTML show:#accordion-create-lpa-heading-2:top",
+						HtmxSwap:               "innerHTML show:#scroll-to-notified-person:top",
 					}).
 					Return(nil)
 			}
@@ -255,7 +255,7 @@ func TestPostCreateNotifiedPerson(t *testing.T) {
 			resp := w.Result()
 
 			if !isHtmx {
-				expectedError := RedirectError("/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-2")
+				expectedError := RedirectError("/create-lpa?id=1&caseId=2#scroll-to-notified-person")
 				assert.Equal(t, expectedError, err)
 			} else {
 				assert.Nil(t, err)
@@ -311,7 +311,7 @@ func TestPostEditNotifiedPerson(t *testing.T) {
 						Title:                  "Update notified person details",
 						AllowNewNotifiedPerson: true,
 						HtmxRedirect:           "/create-lpa?id=1&caseId=2",
-						HtmxSwap:               "innerHTML show:#accordion-create-lpa-heading-2:top",
+						HtmxSwap:               "innerHTML show:#scroll-to-notified-person:top",
 					}).
 					Return(nil)
 			}
@@ -343,7 +343,7 @@ func TestPostEditNotifiedPerson(t *testing.T) {
 			resp := w.Result()
 
 			if !isHtmx {
-				expectedError := RedirectError("/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-2")
+				expectedError := RedirectError("/create-lpa?id=1&caseId=2#scroll-to-notified-person")
 				assert.Equal(t, expectedError, err)
 			} else {
 				assert.Nil(t, err)
