@@ -1787,13 +1787,13 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			name:        "Update attorney trust corporation redirects",
 			formKey:     "updateTrustCorporationAttorney",
 			formValue:   "111",
-			expectedErr: RedirectError("/create-trust-corporation?id=1&caseId=2&trustCorporationId=111&replacement=false"),
+			expectedErr: RedirectError("/update-trust-corporation?id=1&caseId=2&trustCorporationId=111&replacement=false"),
 		},
 		{
 			name:        "Update replacement attorney trust corporation redirects",
 			formKey:     "updateTrustCorporationReplacementAttorney",
 			formValue:   "111",
-			expectedErr: RedirectError("/create-trust-corporation?id=1&caseId=2&trustCorporationId=111&replacement=true"),
+			expectedErr: RedirectError("/update-trust-corporation?id=1&caseId=2&trustCorporationId=111&replacement=true"),
 		},
 	}
 
