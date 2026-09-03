@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	html "html/template"
 	"log/slog"
+	"maps"
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
@@ -42,10 +45,24 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		return err
 	}
 
-	tmpls, err := template.Parse(webDir+"/template", templatefn.All(siriusPublicURL, prefix, staticHash))
+	layouts, err := parseLayoutTemplates(webDir+"/template/layout", templatefn.All(siriusPublicURL, prefix, staticHash))
 	if err != nil {
 		return err
 	}
+	tmpls, err := parseTemplates(webDir+"/template", layouts)
+	if err != nil {
+		return err
+	}
+	mlpaTmpls, err := parseTemplates(webDir+"/template/mlpa", layouts)
+	if err != nil {
+		return err
+	}
+	poasTmpls, err := parseTemplates(webDir+"/template/poas", layouts)
+	if err != nil {
+		return err
+	}
+
+	templates := combineAllLayouts(tmpls, mlpaTmpls, poasTmpls)
 
 	shutdown, err := telemetry.StartTracerProvider(ctx, logger, exportTraces)
 	defer shutdown()
@@ -60,7 +77,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 
 	server := &http.Server{
 		Addr:              ":" + port,
-		Handler:           server.New(logger, client, tmpls, prefix, siriusPublicURL, webDir),
+		Handler:           server.New(logger, client, templates, prefix, siriusPublicURL, webDir),
 		ReadHeaderTimeout: 20 * time.Second,
 		WriteTimeout:      60 * time.Second,
 	}
@@ -84,4 +101,41 @@ func run(ctx context.Context, logger *slog.Logger) error {
 	defer cancel()
 
 	return server.Shutdown(tc)
+}
+
+func combineAllLayouts(tmpls template.Templates, mlpaTmpls template.Templates, poasTmpls template.Templates) template.Templates {
+	templates := make(template.Templates)
+
+	maps.Copy(templates, tmpls)
+	maps.Copy(templates, mlpaTmpls)
+	maps.Copy(templates, poasTmpls)
+	return templates
+}
+
+func parseLayoutTemplates(layoutDir string, funcs html.FuncMap) (*html.Template, error) {
+	return html.New("").Funcs(funcs).ParseGlob(filepath.Join(layoutDir, "*.*"))
+}
+
+func parseTemplates(templateDir string, layouts *html.Template) (template.Templates, error) {
+	files, err := filepath.Glob(filepath.Join(templateDir, "*.*"))
+	if err != nil {
+		return nil, err
+	}
+
+	tmpls := map[string]*html.Template{}
+	for _, file := range files {
+		clone, err := layouts.Clone()
+		if err != nil {
+			return nil, err
+		}
+
+		tmpl, err := clone.ParseFiles(file)
+		if err != nil {
+			return nil, err
+		}
+
+		tmpls[filepath.Base(file)] = tmpl
+	}
+
+	return tmpls, nil
 }
