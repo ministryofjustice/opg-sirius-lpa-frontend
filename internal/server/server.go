@@ -114,6 +114,7 @@ type Client interface {
 	TaskClient
 	UnlinkPersonClient
 	UpdateDecisionsClient
+	UpdateTrustCorporationClient
 	UpdateObjectionClient
 	ViewDocumentClient
 	WarningClient

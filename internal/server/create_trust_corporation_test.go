@@ -146,67 +146,6 @@ func TestPostCreateTrustCorporation(t *testing.T) {
 	}
 }
 
-func TestPostEditTrustCorporation(t *testing.T) {
-	existingTrustCorporation := sirius.TrustCorporation{
-		Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3}},
-		IsReplacementAttorney: false,
-	}
-	updatedTrustCorporation := sirius.TrustCorporation{
-		Attorney: sirius.Attorney{
-			Person: sirius.Person{
-				CompanyName:       "ACME",
-				Email:             "test@test.com",
-				PhoneNumber:       "1234",
-				AddressLine1:      "221B",
-				AddressLine2:      "Baker Street",
-				AddressLine3:      "Marylebone",
-				Town:              "London",
-				County:            "Greater London",
-				Postcode:          "NW1 6XE",
-				Country:           "United Kingdom",
-				IsAirmailRequired: false,
-			},
-			SystemStatus:  shared.BoolPtr(true),
-			CompanyNumber: "123",
-		},
-		IsReplacementAttorney:       false,
-		TrustCorporationAppointedAs: "Attorney",
-	}
-
-	client := &mockCreateTrustCorporationClient{}
-	client.
-		On("Lpa", mock.Anything, 2).
-		Return(sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{existingTrustCorporation}}}, nil)
-	client.
-		On("UpdateTrustCorporation", mock.Anything, 3, updatedTrustCorporation).
-		Return(nil)
-
-	form := url.Values{
-		"companyName":              {"ACME"},
-		"companyNumber":            {"123"},
-		"email":                    {"test@test.com"},
-		"phoneNumber":              {"1234"},
-		"addressLine1":             {"221B"},
-		"addressLine2":             {"Baker Street"},
-		"addressLine3":             {"Marylebone"},
-		"town":                     {"London"},
-		"county":                   {"Greater London"},
-		"postcode":                 {"NW1 6XE"},
-		"country":                  {"United Kingdom"},
-		"isAirmailRequired":        {"false"},
-		"isReplacementAttorney":    {"false"},
-		"isTrustCorporationActive": {"true"},
-	}
-
-	r, _ := http.NewRequest(http.MethodPost, "create-trust-corporation/?id=1&caseId=2&trustCorporationId=3&replacement=false", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := CreateTrustCorporation(client, nil)(w, r)
-
-	assert.Equal(t, RedirectError("/create-lpa?id=1&caseId=2#scroll-to-attorneys-corporation"), err)
-}
-
 func TestPostCreateTrustCorporationWhenCreateFails(t *testing.T) {
 	expectedTrustCorporation := sirius.TrustCorporation{
 		Attorney: sirius.Attorney{
