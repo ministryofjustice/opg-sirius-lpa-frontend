@@ -26,6 +26,7 @@ type createAttorneyData struct {
 	DonorId              int
 	CaseId               int
 	CaseType             string
+	CaseSubType          string
 	IsEditing            bool
 	Title                string
 	NextAttorneyId       int
@@ -58,6 +59,16 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 			Title:     "Add an attorney",
 		}
 
+		var lpa sirius.Lpa
+		if caseType == "lpa" {
+			lpa, err = client.Lpa(ctx, caseId)
+			if err != nil {
+				return err
+			}
+
+			data.CaseSubType = lpa.SubType
+		}
+
 		data.RelationshipToDonors, err = client.RefDataByCategory(ctx, sirius.RelationshipToDonorCategory)
 		if err != nil {
 			return err
@@ -84,11 +95,6 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 
 				attorneys = epa.Attorneys
 			} else {
-				lpa, err := client.Lpa(ctx, caseId)
-				if err != nil {
-					return err
-				}
-
 				attorneys = lpa.Attorneys
 			}
 
