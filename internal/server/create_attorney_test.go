@@ -60,6 +60,8 @@ func TestGetCreateAttorney(t *testing.T) {
 			client.
 				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
 				Return(mockRelationshipToDonorCategories, nil)
+			client.On("Lpa", mock.Anything, 2).
+				Return(sirius.Lpa{Case: sirius.Case{SubType: "pfa"}}, nil)
 
 			expectedData := createAttorneyData{
 				IsPartial:            isHtmx,
@@ -69,6 +71,7 @@ func TestGetCreateAttorney(t *testing.T) {
 				Attorney:             sirius.Attorney{SystemStatus: shared.BoolPtr(true)},
 				Title:                "Add an attorney",
 				CaseType:             "lpa",
+				CaseSubType:          "pfa",
 			}
 			template := &mockTemplate{}
 			template.
@@ -171,6 +174,21 @@ func TestGetCreateAttorneyWhenRefDataErrors(t *testing.T) {
 		Return([]sirius.RefDataItem{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
+	w := httptest.NewRecorder()
+
+	err := CreateAttorney(client, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestGetCreateAttorneyWhenLpaErrors(t *testing.T) {
+	client := &mockCreateAttorneyClient{}
+	client.
+		On("Lpa", mock.Anything, 2).
+		Return(sirius.Lpa{}, errExample)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType=lpa", nil)
 	w := httptest.NewRecorder()
 
 	err := CreateAttorney(client, nil)(w, r)
