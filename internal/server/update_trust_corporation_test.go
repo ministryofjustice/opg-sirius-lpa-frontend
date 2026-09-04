@@ -74,23 +74,6 @@ func TestGetEditTrustCorporation(t *testing.T) {
 	}
 }
 
-func TestUpdateTrustCorporationBadQuery(t *testing.T) {
-	testCases := map[string]string{
-		"bad-trust-corporation-id": "/?id=123&caseId=123&trustCorporationId=test",
-	}
-
-	for name, query := range testCases {
-		t.Run(name, func(t *testing.T) {
-			r, _ := http.NewRequest(http.MethodGet, query, nil)
-			w := httptest.NewRecorder()
-
-			err := UpdateTrustCorporation(nil, nil)(w, r)
-
-			assert.NotNil(t, err)
-		})
-	}
-}
-
 func TestUpdateTrustCorporationWhenLpaFails(t *testing.T) {
 	client := &mockUpdateTrustCorporationClient{}
 	client.
@@ -327,4 +310,92 @@ func TestGetNextTrustCorporationIdWillReturnNextNumberWithSameAppointedType(t *t
 		},
 	})
 	assert.Equal(t, 4, result)
+}
+
+func TestGetEditTrustCorporationBadQuery(t *testing.T) {
+	testCases := map[string]struct {
+		query        string
+		expectedCode int
+	}{
+		"no-id":                    {"/update-trust-corporation/", http.StatusNotFound},
+		"bad-id":                   {"/update-trust-corporation/?id=test", http.StatusBadRequest},
+		"no-case-id":               {"/update-trust-corporation/?id=123", http.StatusNotFound},
+		"bad-case-id":              {"/update-trust-corporation/?id=123&caseId=test", http.StatusBadRequest},
+		"bad-trust-corporation-id": {"/update-trust-corporation/?id=123&caseId=123&trustCorporationId=test", http.StatusBadRequest},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			r, _ := http.NewRequest(http.MethodGet, tc.query, nil)
+			w := httptest.NewRecorder()
+
+			err := UpdateTrustCorporation(nil, nil)(w, r)
+
+			if assert.Error(t, err) {
+				if se, ok := err.(sirius.StatusError); ok {
+					assert.Equal(t, tc.expectedCode, se.Code)
+				}
+			}
+		})
+	}
+}
+
+func TestPostUpdateTrustCorporationValidationError(t *testing.T) {
+	expectedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{"field": {"": "problem"}},
+	}
+
+	existingTrustCorporation := sirius.TrustCorporation{
+		Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3}},
+		IsReplacementAttorney: false,
+	}
+
+	client := &mockUpdateTrustCorporationClient{}
+	client.
+		On("Lpa", mock.Anything, 2).
+		Return(sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{existingTrustCorporation}}}, nil)
+	client.
+		On("UpdateTrustCorporation", mock.Anything, 3, mock.Anything).
+		Return(expectedError)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, TrustCorporationData{
+			AppointedAs: "Attorney",
+			DonorId:     1,
+			CaseId:      2,
+			TrustCorporation: sirius.TrustCorporation{
+				IsReplacementAttorney:       false,
+				TrustCorporationAppointedAs: "Attorney",
+				Attorney: sirius.Attorney{
+					Person: sirius.Person{
+						ID:          3,
+						CompanyName: "ACME",
+					},
+					SystemStatus: shared.BoolPtr(true),
+				},
+			},
+			Title:     "Update trust corporation details",
+			HtmxPost:  "/update-trust-corporation?id=1&caseId=2&trustCorporationId=3&replacement=false",
+			IsEditing: true,
+			Error:     expectedError,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"companyName":              {"ACME"},
+		"isReplacementAttorney":    {"false"},
+		"isTrustCorporationActive": {"true"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "update-trust-corporation/?id=1&caseId=2&trustCorporationId=3&replacement=false", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := UpdateTrustCorporation(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
