@@ -182,6 +182,21 @@ func TestGetCreateAttorneyWhenRefDataErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
+func TestGetCreateAttorneyWhenLpaErrors(t *testing.T) {
+	client := &mockCreateAttorneyClient{}
+	client.
+		On("Lpa", mock.Anything, 2).
+		Return(sirius.Lpa{}, errExample)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType=lpa", nil)
+	w := httptest.NewRecorder()
+
+	err := CreateAttorney(client, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
 func TestPostCreateAttorney(t *testing.T) {
 	for _, isHtmx := range []bool{false, true} {
 		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
