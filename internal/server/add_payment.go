@@ -23,6 +23,7 @@ type addPaymentData struct {
 
 	Case           sirius.Case
 	Amount         string
+	AmountOther    string
 	IsPartial      bool
 	Source         string
 	PaymentDate    sirius.DateString
@@ -39,15 +40,17 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-		group, groupCtx := errgroup.WithContext(ctx.Context)
+
 		data := addPaymentData{
 			XSRFToken:   ctx.XSRFToken,
-			Amount:      postFormString(r, "amount"),
 			IsPartial:   ctx.IsPartial,
 			Source:      postFormString(r, "source"),
 			PaymentDate: postFormDateString(r, "paymentDate"),
+			Amount:      postFormString(r, "amount"),
+			AmountOther: postFormString(r, "amountOther"),
 		}
 
+		group, groupCtx := errgroup.WithContext(ctx.Context)
 		group.Go(func() error {
 			data.Case, err = client.Case(ctx.With(groupCtx), caseID)
 			if err != nil {
@@ -77,7 +80,11 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			if !sirius.IsAmountValid(data.Amount) {
+			amount := data.Amount
+			if amount == "other" {
+				amount = data.AmountOther
+			}
+			if !sirius.IsAmountValid(amount) {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = sirius.ValidationError{
 					Field: sirius.FieldErrors{
@@ -98,7 +105,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 				return tmpl(w, data)
 			}
 
-			amountFloat, err := strconv.ParseFloat(data.Amount, 64)
+			amountFloat, err := strconv.ParseFloat(amount, 64)
 			if err != nil {
 				return err
 			}

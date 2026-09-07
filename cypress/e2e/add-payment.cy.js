@@ -5,11 +5,23 @@ describe("Add a payment to a non-digital LPA", () => {
     cy.visit("/add-payment?id=800");
   });
 
-  it("adds a payment to the case", () => {
+  it("adds a payment to the case using a predefined amount", () => {
     cy.contains("Add a payment");
     cy.contains("7000-0000-0000");
     cy.get(".moj-alert").should("not.exist");
-    cy.get("#f-amount").type("41.00");
+    cy.get("#f-amount-92").click();
+    cy.get("#f-source").select("PHONE");
+    cy.get("#f-paymentDate").type("2022-04-25");
+    cy.get("button[type=submit]").click();
+    cy.get(".moj-alert").should("exist");
+  });
+
+  it("adds a payment to the case using a custom amount", () => {
+    cy.contains("Add a payment");
+    cy.contains("7000-0000-0000");
+    cy.get(".moj-alert").should("not.exist");
+    cy.get("#f-amount-other").click();
+    cy.get("#f-amount").type("11.50");
     cy.get("#f-source").select("PHONE");
     cy.get("#f-paymentDate").type("2022-04-25");
     cy.get("button[type=submit]").click();
@@ -33,7 +45,7 @@ describe("Add a payment to a digital LPA", () => {
     cy.contains("Add a payment");
     cy.contains("M-9999-4567-AAAA");
     cy.get(".moj-alert").should("not.exist");
-    cy.get("#f-amount").type("82.00");
+    cy.get("#f-amount-92").click();
     cy.get("#f-source").select("PHONE");
     cy.get("#f-paymentDate").type("2023-08-31");
     cy.get("button[type=submit]").click();
