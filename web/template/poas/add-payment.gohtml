@@ -67,14 +67,36 @@
 
 {{ define "form-content"}}
     <div class="govuk-form-group {{ if .Error.Field.amount }}govuk-form-group--error{{ end }}">
-        <label class="govuk-label" for="f-amount">
-            Enter amount paid
-        </label>
-        {{ template "errors" .Error.Field.amount }}
-        <div class="govuk-input__wrapper">
-            <div class="govuk-input__prefix" aria-hidden="true">£</div>
-            <input class="govuk-input govuk-input--width-5 {{ if .Error.Field.amount }}govuk-input--error{{ end }}" id="f-amount" name="amount" type="number" step="0.01" value="{{ if ne .Amount "0" }}{{ .Amount }}{{ end }}">
-        </div>
+        <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Payment amount</legend>
+            {{ template "errors" .Error.Field.amount }}
+            <div class="govuk-radios" data-module="govuk-radios">
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-amount-92" name="amount" type="radio" value="92.00" {{if eq .Amount "92.00"}}checked{{end}} data-module="app-clear-payment-trigger">
+                    <label class="govuk-label govuk-radios__label" for="f-amount-92">£92</label>
+                </div>
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-amount-46" name="amount" type="radio" value="46.00" {{if eq .Amount "46.00"}}checked{{end}} data-module="app-clear-payment-trigger">
+                    <label class="govuk-label govuk-radios__label" for="f-amount-46">£46</label>
+                </div>
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-amount-23" name="amount" type="radio" value="23.00" {{if eq .Amount "23.00"}}checked{{end}} data-module="app-clear-payment-trigger">
+                    <label class="govuk-label govuk-radios__label" for="f-amount-23">£23</label>
+                </div>
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-amount-other" name="amount" type="radio" value="other" data-aria-controls="conditional-amount" {{if eq .Amount "other"}}checked{{end}}>
+                    <label class="govuk-label govuk-radios__label" for="f-amount-other">Other</label>
+                </div>
+                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-amount">
+                    <label class="govuk-label govuk-visually-hidden" for="f-amount">Payment amount</label>
+                    <div class="govuk-input__wrapper">
+                        <div class="govuk-input__prefix" aria-hidden="true">£</div>
+                        <input class="govuk-input govuk-input--width-5 {{ if .Error.Field.amount }}govuk-input--error{{ end }}" id="f-amount" name="amountOther" type="number" step="0.01"
+                               value="{{ if ne .AmountOther "0" }}{{ .AmountOther }}{{ end }}" data-module="app-clear-payment-target">
+                    </div>
+                </div>
+            </div>
+        </fieldset>
     </div>
 
     {{ template "select" (select "source" "Payment method" .Source .Error.Field.source (options .PaymentSources "filterSelectable" true)) }}
