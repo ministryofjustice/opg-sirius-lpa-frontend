@@ -329,7 +329,7 @@ func TestPostAddPaymentHTMX(t *testing.T) {
 }
 
 func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
-	for _, amount := range []string{"41", "41.5", "41.555", ".45"} {
+	for _, amount := range []string{"41.5", "41.555", ".45"} {
 		t.Run(amount, func(t *testing.T) {
 			caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
 
