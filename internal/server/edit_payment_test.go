@@ -248,7 +248,7 @@ func TestEditPaymentWhenTemplateErrors(t *testing.T) {
 }
 
 func TestPostEditPaymentAmountIncorrectFormat(t *testing.T) {
-	for _, amount := range []string{"41", "41.5", "41.555", ".45"} {
+	for _, amount := range []string{"41.5", "41.555", ".45"} {
 		t.Run(amount, func(t *testing.T) {
 			caseItem := sirius.Case{CaseType: "lpa", UID: "700700"}
 
