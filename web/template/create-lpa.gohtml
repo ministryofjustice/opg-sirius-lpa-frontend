@@ -634,6 +634,17 @@
                         </label>
                       </div>
                     {{ end }}
+                    {{ range $trustCorporation := .Lpa.TrustCorporations }}
+                      {{ if not $trustCorporation.IsReplacementAttorney }}
+                        <div class="govuk-checkboxes__item">
+                          <input class="govuk-checkboxes__input" id="f-applicantIds-{{ .ID }}" name="applicantIds"
+                                 type="checkbox" value="{{ .ID }}" {{ if containsInt $.ApplicantIds .ID }}checked{{ end }}>
+                          <label class="govuk-label govuk-checkboxes__label" for="f-applicantIds-{{ .ID }}">
+                            {{ if .CompanyName }}{{ .CompanyName }}{{ end }}{{ if .CompanyNumber }} {{ .CompanyNumber }}{{ end }}
+                          </label>
+                        </div>
+                      {{ end}}
+                    {{ end }}
                   </div>
                 </div>
               </fieldset>
