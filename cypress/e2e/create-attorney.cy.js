@@ -111,6 +111,22 @@ describe("Create or Update Attorney on an LPA", () => {
       body: {},
     });
 
+    cy.addMock("/lpa-api/v1/cases/2", "GET", {
+      status: 200,
+      body: {
+        id: 2,
+        caseSubtype: "pfa",
+        attorneys: [
+          {
+            id: 3,
+            firstname: "Rudolph",
+            surname: "Stotesbury",
+            relationshipToDonor: "NO RELATION",
+          },
+        ],
+      },
+    });
+
     cy.visit("/create-attorney?id=1&caseId=2&caseType=lpa");
   });
 
@@ -133,5 +149,48 @@ describe("Create or Update Attorney on an LPA", () => {
       .should("exist")
       .and("have.attr", "href")
       .and("include", "/create-lpa?id=1&caseId=2#scroll-to-attorneys");
+  });
+
+  it("updates an existing attorney on an LPA", () => {
+    cy.addMock("/lpa-api/v1/attorneys/3", "PUT", {
+      status: 200,
+      body: {},
+    });
+
+    cy.visit("/create-attorney?id=1&caseId=2&attorneyId=3&caseType=lpa");
+    cy.contains("Update attorney details");
+    cy.get("#f-firstname").should("have.value", "Rudolph");
+    cy.get("#f-surname").should("have.value", "Stotesbury");
+    cy.get("input[type=submit][name=add-another]").should("not.exist");
+
+    cy.get("#f-firstname").clear().type("Rafael");
+    cy.get("button[type=submit]").click();
+    cy.url().should("include", "create-lpa");
+  });
+
+  it("should show the trust corporation link on a pfa lpa", () => {
+    cy.contains("Add a trust corporation as an attorney");
+  });
+
+  it("should not show the trust corporation link on a hw lpa", () => {
+    cy.addMock("/lpa-api/v1/cases/2", "GET", {
+      status: 200,
+      body: {
+        id: 2,
+        caseSubtype: "hw",
+        attorneys: [
+          {
+            id: 3,
+            firstname: "Rudolph",
+            surname: "Stotesbury",
+            relationshipToDonor: "NO RELATION",
+          },
+        ],
+      },
+    });
+
+    cy.visit("/create-attorney?id=1&caseId=2&caseType=lpa");
+
+    cy.contains("Add a trust corporation as an attorney").should("not.exist");
   });
 });
