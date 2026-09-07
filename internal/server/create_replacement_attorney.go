@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -15,17 +16,20 @@ type CreateReplacementAttorneyClient interface {
 }
 
 type createReplacementAttorneyData struct {
-	XSRFToken      string
-	Attorney       sirius.Attorney
-	Error          sirius.ValidationError
-	DonorId        int
-	CaseId         int
-	IsEditing      bool
-	Title          string
-	NextAttorneyId int
-	HtmxRedirect   string
-	HtmxSwap       string
-	IsPartial      bool
+	XSRFToken              string
+	Attorney               sirius.Attorney
+	Error                  sirius.ValidationError
+	DonorId                int
+	CaseId                 int
+	IsEditing              bool
+	Title                  string
+	NextAttorneyId         int
+	HtmxRedirect           string
+	HtmxSwap               string
+	IsPartial              bool
+	NextTrustCorporationId int
+	AppointedAs            string
+	IsReplacementAttorney  bool
 }
 
 func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl template.Template) Handler {
@@ -86,6 +90,21 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 			data.IsEditing = true
 
 			data.NextAttorneyId = GetNextAttorneyId(attorneyId, lpa.ReplacementAttorneys)
+
+			if data.NextAttorneyId == 0 && len(lpa.TrustCorporations) > 0 {
+				data.NextTrustCorporationId = 0
+				for _, trustCorporation := range lpa.TrustCorporations {
+					if data.NextTrustCorporationId == 0 || trustCorporation.ID < data.NextTrustCorporationId {
+						data.NextTrustCorporationId = trustCorporation.ID
+						data.IsReplacementAttorney = trustCorporation.IsReplacementAttorney
+						if trustCorporation.IsReplacementAttorney {
+							data.AppointedAs = "Replacement attorney"
+						} else {
+							data.AppointedAs = "Attorney"
+						}
+					}
+				}
+			}
 		}
 
 		if r.Method == http.MethodPost {
@@ -123,6 +142,10 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 				return tmpl(w, data)
 			} else if err != nil {
 				return err
+			}
+
+			if r.FormValue("next-trust-corporation") != "" {
+				return RedirectError(fmt.Sprintf("/update-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s", donorId, data.CaseId, data.NextTrustCorporationId, strconv.FormatBool(data.IsReplacementAttorney)))
 			}
 
 			if r.FormValue("add-another") != "" {

@@ -419,3 +419,95 @@ func TestPostCreateReplacementAttorneyAddAnother(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client)
 }
+
+func TestPostEditReplacementAttorneyGoesToNextTrustCorporation(t *testing.T) {
+	trustCorporations := []sirius.TrustCorporation{
+		{
+			Attorney: sirius.Attorney{
+				Person: sirius.Person{
+					ID:        9,
+					Firstname: "Second",
+					Surname:   "Stotesbury",
+				},
+			},
+			TrustCorporationAppointedAs: "",
+			IsReplacementAttorney:       false,
+		},
+		{
+			Attorney: sirius.Attorney{
+				Person: sirius.Person{
+					ID:        5,
+					Firstname: "First",
+					Surname:   "Stotesbury",
+				},
+			},
+			TrustCorporationAppointedAs: "",
+			IsReplacementAttorney:       true,
+		},
+	}
+
+	dateString := "2022-04-05"
+	attorney := sirius.Attorney{
+		Person: sirius.Person{
+			Salutation:   "Rev",
+			Firstname:    "Rudolph",
+			Middlenames:  "Modesto",
+			Surname:      "Stotesbury",
+			DateOfBirth:  sirius.DateString(dateString),
+			AddressLine1: "Rotonda Gerardo 769",
+			AddressLine2: "Appartamento 94",
+			AddressLine3: "Augusto terme",
+			Town:         "San Sabazio",
+			County:       "Benevento",
+			Postcode:     "57797",
+			Country:      "Italy",
+			PhoneNumber:  "079876543345",
+			Email:        "rm2@email.test",
+		},
+	}
+	client := &mockCreateReplacementAttorneyClient{}
+	client.
+		On("Lpa", mock.Anything, 2).
+		Return(sirius.Lpa{
+			Case: sirius.Case{
+				TrustCorporations:    trustCorporations,
+				ReceiptDate:          "2026-08-01",
+				ReplacementAttorneys: []sirius.Attorney{attorney},
+			},
+		}, nil).
+		On("UpdateReplacementAttorney", mock.Anything, 88, attorney).
+		Return(nil)
+
+	template := &mockTemplate{}
+
+	form := url.Values{
+		"salutation":             {"Rev"},
+		"firstname":              {"Rudolph"},
+		"middlenames":            {"Modesto"},
+		"surname":                {"Stotesbury"},
+		"dob":                    {dateString},
+		"addressLine1":           {"Rotonda Gerardo 769"},
+		"addressLine2":           {"Appartamento 94"},
+		"addressLine3":           {"Augusto terme"},
+		"town":                   {"San Sabazio"},
+		"county":                 {"Benevento"},
+		"postcode":               {"57797"},
+		"country":                {"Italy"},
+		"phoneNumber":            {"079876543345"},
+		"email":                  {"rm2@email.test"},
+		"next-trust-corporation": {"true"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&attorneyId=88", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+
+	w := httptest.NewRecorder()
+
+	err := CreateReplacementAttorney(client, template.Func)(w, r)
+	resp := w.Result()
+
+	expectedRedirect := RedirectError("/update-trust-corporation?id=1&caseId=2&trustCorporationId=5&replacement=true")
+	assert.Equal(t, err, expectedRedirect)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client)
+}

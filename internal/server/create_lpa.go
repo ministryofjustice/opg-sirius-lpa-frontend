@@ -268,14 +268,14 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				if err != nil {
 					return err
 				}
-				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=false", donorID, data.CaseId, trustCorporationId))
+				return RedirectError(fmt.Sprintf("/update-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=false", donorID, data.CaseId, trustCorporationId))
 			}
 			if trustCorporationIdStr := r.FormValue("updateTrustCorporationReplacementAttorney"); trustCorporationIdStr != "" {
 				trustCorporationId, err := strToIntOrStatusError(trustCorporationIdStr)
 				if err != nil {
 					return err
 				}
-				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=true", donorID, data.CaseId, trustCorporationId))
+				return RedirectError(fmt.Sprintf("/update-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=true", donorID, data.CaseId, trustCorporationId))
 			}
 
 			if r.FormValue("updateCertificateProvider") != "" {

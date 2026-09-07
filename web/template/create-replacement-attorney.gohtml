@@ -88,6 +88,9 @@
           {{ if ne .NextAttorneyId 0 }}
             <input class="govuk-button" data-module="govuk-button" type="submit" name="next-attorney" value="Save and update next replacement attorney" />
           {{ end }}
+          {{ if ne .NextTrustCorporationId 0 }}
+            <input class="govuk-button" data-module="govuk-button" type="submit" name="next-trust-corporation" value="Save and update next {{ ToLower .AppointedAs }}" />
+          {{ end }}
           <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-1" .DonorId .CaseId) }}">Cancel</a>
         </div>
       </form>
