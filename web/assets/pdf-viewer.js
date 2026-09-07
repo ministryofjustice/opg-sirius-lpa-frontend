@@ -256,8 +256,10 @@ class PDFViewer {
       // Don't swap panes when typing into any input fields
       const target = e.target;
       const isTypingInField =
-          target &&
-          (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable);
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable);
 
       // Escape when in a field to allow Enter
       if (isTypingInField) {
