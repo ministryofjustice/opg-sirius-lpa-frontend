@@ -224,6 +224,49 @@ func TestPostAddPayment(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestPostAddPaymentOther(t *testing.T) {
+	caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
+	client := &mockAddPaymentClient{}
+	client.
+		On("AddPayment", mock.Anything, 123, 1100, "MAKE", sirius.DateString("2022-01-23")).
+		Return(nil)
+	client.
+		On("Case", mock.Anything, 123).
+		Return(caseitem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
+
+	template := &mockTemplate{}
+
+	form := url.Values{
+		"amount":      {"other"},
+		"amountOther": {"11.00"},
+		"source":      {"MAKE"},
+		"paymentDate": {"2022-01-23"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AddPayment(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Equal(t, RedirectError("/payments/123"), err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestPostAddPaymentHTMX(t *testing.T) {
 	caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
 
