@@ -29,8 +29,7 @@
     {{ end }}
 
     <h1 class="govuk-heading-m">{{ .Title }}</h1>
-
-    {{ if and (eq .CaseType "lpa") (not .IsEditing) }}
+    {{ if and (not .IsEditing) (eq .CaseType "lpa") (eq .CaseSubType "pfa") }}
       <div class="govuk-button-group govuk-button-group--row">
         <a class="govuk-link govuk-link--no-visited-state"
            href=""
@@ -90,7 +89,7 @@
 
       <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
-      {{ if and (eq .CaseType "lpa") (not .IsEditing) }}
+      {{ if and (not .IsEditing) (eq .CaseType "lpa") (eq .CaseSubType "pfa") }}
         <div class="govuk-button-group govuk-button-group--row">
           <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-trust-corporation?id=%d&caseId=%d" .DonorId .CaseId) }}">
             Add a trust corporation as an attorney

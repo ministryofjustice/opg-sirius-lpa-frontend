@@ -41,16 +41,19 @@ var lpaWithReceiptDate = sirius.Lpa{
 func TestGetCreateReplacementAttorney(t *testing.T) {
 	for _, isHtmx := range []bool{false, true} {
 		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
+			lpa := lpaWithReceiptDate
+			lpa.SubType = "pfa"
 			client := &mockCreateReplacementAttorneyClient{}
 			client.
 				On("Lpa", mock.Anything, 2).
-				Return(lpaWithReceiptDate, nil)
+				Return(lpa, nil)
 
 			expectedData := createReplacementAttorneyData{
-				DonorId:   1,
-				CaseId:    2,
-				Title:     "Add a replacement attorney",
-				IsPartial: isHtmx,
+				DonorId:     1,
+				CaseId:      2,
+				Title:       "Add a replacement attorney",
+				IsPartial:   isHtmx,
+				CaseSubType: "pfa",
 			}
 			template := &mockTemplate{}
 			template.

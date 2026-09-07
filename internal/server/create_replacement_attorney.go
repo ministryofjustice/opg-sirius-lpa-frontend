@@ -20,6 +20,7 @@ type createReplacementAttorneyData struct {
 	Error          sirius.ValidationError
 	DonorId        int
 	CaseId         int
+	CaseSubType    string
 	IsEditing      bool
 	Title          string
 	NextAttorneyId int
@@ -48,11 +49,12 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 		}
 
 		data := createReplacementAttorneyData{
-			XSRFToken: ctx.XSRFToken,
-			DonorId:   donorId,
-			CaseId:    caseId,
-			Title:     "Add a replacement attorney",
-			IsPartial: ctx.IsPartial,
+			XSRFToken:   ctx.XSRFToken,
+			DonorId:     donorId,
+			CaseId:      caseId,
+			CaseSubType: lpa.SubType,
+			Title:       "Add a replacement attorney",
+			IsPartial:   ctx.IsPartial,
 		}
 
 		if lpa.ReceiptDate == "" {
