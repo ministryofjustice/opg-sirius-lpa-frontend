@@ -58,9 +58,11 @@ func TestGetAddPayment(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addPaymentData{
-			Case:           caseItem,
-			PaymentSources: paymentSources,
-			ReturnUrl:      "/payments/4",
+			Case: caseItem,
+			PaymentSources: []PaymentSourceRadioOption{
+				{Value: "PHONE", Label: "Paid over the phone"},
+			},
+			ReturnUrl: "/payments/4",
 		}).
 		Return(nil)
 
@@ -144,9 +146,11 @@ func TestAddPaymentWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addPaymentData{
-			Case:           caseItem,
-			PaymentSources: paymentSources,
-			ReturnUrl:      "/payments/123",
+			Case: caseItem,
+			PaymentSources: []PaymentSourceRadioOption{
+				{Value: "PHONE", Label: "Paid over the phone"},
+			},
+			ReturnUrl: "/payments/123",
 		}).
 		Return(errExample)
 
@@ -292,14 +296,16 @@ func TestPostAddPaymentHTMX(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addPaymentData{
-			Case:           caseitem,
-			Amount:         "41.00",
-			IsPartial:      true,
-			Source:         "MAKE",
-			PaymentDate:    sirius.DateString("2022-01-23"),
-			PaymentSources: paymentSources,
-			ReturnUrl:      "/payments/123",
-			HtmxRedirect:   "/payments/123",
+			Case:        caseitem,
+			Amount:      "41.00",
+			IsPartial:   true,
+			Source:      "MAKE",
+			PaymentDate: sirius.DateString("2022-01-23"),
+			PaymentSources: []PaymentSourceRadioOption{
+				{Value: "PHONE", Label: "Paid over the phone"},
+			},
+			ReturnUrl:    "/payments/123",
+			HtmxRedirect: "/payments/123",
 		}).
 		Return(nil)
 
@@ -352,14 +358,16 @@ func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, addPaymentData{
-					Case:           caseitem,
-					Amount:         amount,
-					IsPartial:      false,
-					Source:         "MAKE",
-					PaymentDate:    sirius.DateString("2022-01-23"),
-					Error:          validationError,
-					PaymentSources: paymentSources,
-					ReturnUrl:      "/payments/123",
+					Case:        caseitem,
+					Amount:      amount,
+					IsPartial:   false,
+					Source:      "MAKE",
+					PaymentDate: sirius.DateString("2022-01-23"),
+					Error:       validationError,
+					PaymentSources: []PaymentSourceRadioOption{
+						{Value: "PHONE", Label: "Paid over the phone"},
+					},
+					ReturnUrl: "/payments/123",
 				}).
 				Return(nil)
 

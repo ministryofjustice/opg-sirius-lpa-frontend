@@ -10,7 +10,7 @@ describe("Add a payment to a non-digital LPA", () => {
     cy.contains("7000-0000-0000");
     cy.get(".moj-alert").should("not.exist");
     cy.get("#f-amount-92").click();
-    cy.get("#f-source").select("PHONE");
+    cy.get("#f-source").click();
     cy.get("#f-paymentDate").type("2022-04-25");
     cy.get("button[type=submit]").click();
     cy.get(".moj-alert").should("exist");
@@ -22,7 +22,7 @@ describe("Add a payment to a non-digital LPA", () => {
     cy.get(".moj-alert").should("not.exist");
     cy.get("#f-amount-other").click();
     cy.get("#f-amount").type("11.50");
-    cy.get("#f-source").select("PHONE");
+    cy.get("#f-source").click();
     cy.get("#f-paymentDate").type("2022-04-25");
     cy.get("button[type=submit]").click();
     cy.get(".moj-alert").should("exist");
@@ -46,7 +46,7 @@ describe("Add a payment to a digital LPA", () => {
     cy.contains("M-9999-4567-AAAA");
     cy.get(".moj-alert").should("not.exist");
     cy.get("#f-amount-92").click();
-    cy.get("#f-source").select("PHONE");
+    cy.get("#f-source").click();
     cy.get("#f-paymentDate").type("2023-08-31");
     cy.get("button[type=submit]").click();
     cy.get(".moj-alert").should("exist");
