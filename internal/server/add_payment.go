@@ -17,6 +17,12 @@ type AddPaymentClient interface {
 	Case(sirius.Context, int) (sirius.Case, error)
 }
 
+type PaymentSourceRadioOption struct {
+	Value string
+	Label string
+	Attrs map[string]interface{}
+}
+
 type addPaymentData struct {
 	XSRFToken string
 	Error     sirius.ValidationError
@@ -27,7 +33,7 @@ type addPaymentData struct {
 	IsPartial      bool
 	Source         string
 	PaymentDate    sirius.DateString
-	PaymentSources []sirius.RefDataItem
+	PaymentSources []PaymentSourceRadioOption
 	ReturnUrl      string
 	HtmxRedirect   string
 }
@@ -61,9 +67,18 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		})
 
 		group.Go(func() error {
-			data.PaymentSources, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.PaymentSourceCategory)
+			paymentSources, err := client.RefDataByCategory(ctx.With(groupCtx), sirius.PaymentSourceCategory)
 			if err != nil {
 				return err
+			}
+
+			for _, paymentSource := range paymentSources {
+				if paymentSource.UserSelectable {
+					data.PaymentSources = append(data.PaymentSources, PaymentSourceRadioOption{
+						Value: paymentSource.Handle,
+						Label: paymentSource.Label,
+					})
+				}
 			}
 
 			return nil
