@@ -253,6 +253,17 @@ class PDFViewer {
     mainArea.className = "pdf-viewer-main-area";
 
     window.addEventListener("keydown", async (e) => {
+      // Don't swap panes when typing into any input fields
+      const target = e.target;
+      const isTypingInField =
+          target &&
+          (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable);
+
+      // Escape when in a field to allow Enter
+      if (isTypingInField) {
+        return;
+      }
+
       // Handle pane selection keys (1 and 2) - these work regardless of focus
       if (e.key === "1" && this.paneId === "1") {
         this.highlightPane();
