@@ -38,8 +38,7 @@ type createDocumentData struct {
 	HasSelectedAddNewRecipient bool
 	Back                       string
 
-	DonorId      int
-	HtmxRedirect string
+	DonorId int
 }
 
 type InsertDisplayData struct {
@@ -188,11 +187,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 				} else if err != nil {
 					return err
 				} else {
-					if r.Header.Get("HX-Request") == "true" {
-						data.HtmxRedirect = fmt.Sprintf("/edit-document?id=%d&case=%s", caseID, caseType)
-					} else {
-						return RedirectError(fmt.Sprintf("/edit-document?id=%d&case=%s", caseID, caseType))
-					}
+					return RedirectError(fmt.Sprintf("/edit-document?id=%d&case=%s", caseID, caseType))
 				}
 			case "addNewRecipient":
 				contact := sirius.Person{
