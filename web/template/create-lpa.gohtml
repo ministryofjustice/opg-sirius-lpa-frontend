@@ -625,25 +625,18 @@
                   </div>
                   <div class="govuk-radios__conditional {{ if ne .Lpa.ApplicantType "attorney" }}govuk-radios__conditional--hidden{{ end }}"
                        id="applicantAttorneysReveal">
-                    {{ range $attorney := .Lpa.Attorneys }}
+                    {{ range $applicant := .Applicants }}
                       <div class="govuk-checkboxes__item">
                         <input class="govuk-checkboxes__input" id="f-applicantIds-{{ .ID }}" name="applicantIds"
-                               type="checkbox" value="{{ .ID }}" {{ if containsInt $.ApplicantIds .ID }}checked{{ end }}>
-                        <label class="govuk-label govuk-checkboxes__label" for="f-applicantIds-{{ .ID }}">
-                          {{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                               type="checkbox" value="{{ .ID }}" {{ if containsInt $.ApplicantIds $applicant.ID }}checked{{ end }}>
+                        <label class="govuk-label govuk-checkboxes__label" for="f-applicantIds-{{.ID }}">
+                          {{ if .CompanyName }}
+                            {{ .CompanyName }}
+                          {{ else }}
+                            {{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                          {{ end }}
                         </label>
                       </div>
-                    {{ end }}
-                    {{ range $trustCorporation := .Lpa.TrustCorporations }}
-                      {{ if not $trustCorporation.IsReplacementAttorney }}
-                        <div class="govuk-checkboxes__item">
-                          <input class="govuk-checkboxes__input" id="f-applicantIds-{{ .ID }}" name="applicantIds"
-                                 type="checkbox" value="{{ .ID }}" {{ if containsInt $.ApplicantIds .ID }}checked{{ end }}>
-                          <label class="govuk-label govuk-checkboxes__label" for="f-applicantIds-{{ .ID }}">
-                            {{ if .CompanyName }}{{ .CompanyName }}{{ end }}{{ if .CompanyNumber }} {{ .CompanyNumber }}{{ end }}
-                          </label>
-                        </div>
-                      {{ end}}
                     {{ end }}
                   </div>
                 </div>
