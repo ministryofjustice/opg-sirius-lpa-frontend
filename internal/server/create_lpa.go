@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -39,6 +40,7 @@ type createLpaData struct {
 	Title                                string
 	XSRFToken                            string
 	IsPartial                            bool
+	AttorneyApplicants                   []sirius.Attorney
 }
 
 func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
@@ -82,6 +84,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			data.Title = "Edit LPA"
 			data.IsUpdate = true
 			data.ApplicantIds = data.Lpa.GetApplicantIds()
+			data.AttorneyApplicants = Applicants(data.Lpa.Attorneys, data.Lpa.TrustCorporations)
 
 			for _, trustCorporation := range data.Lpa.TrustCorporations {
 				if trustCorporation.IsReplacementAttorney {
@@ -350,4 +353,22 @@ func appointmentTypeFromCase(c sirius.Case) string {
 	default:
 		return ""
 	}
+}
+
+func Applicants(attorneys []sirius.Attorney, trustCorporations []sirius.TrustCorporation) []sirius.Attorney {
+	applicants := make([]sirius.Attorney, 0, len(attorneys)+len(trustCorporations))
+
+	applicants = append(applicants, attorneys...)
+
+	for _, tc := range trustCorporations {
+		if !tc.IsReplacementAttorney {
+			applicants = append(applicants, tc.Attorney)
+		}
+	}
+
+	sort.Slice(applicants, func(i, j int) bool {
+		return applicants[i].ID < applicants[j].ID
+	})
+
+	return applicants
 }
