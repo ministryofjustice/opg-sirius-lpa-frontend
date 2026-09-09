@@ -15,17 +15,20 @@ type LpaEventsResponse struct {
 }
 
 type LpaEvent struct {
-	Changes    any                       `json:"changeSet,omitempty"`
-	CreatedOn  string                    `json:"createdOn"`
-	Entity     any                       `json:"entity,omitempty"`
-	Assignee   LpaEventUser              `json:"assignee,omitempty"`
-	User       LpaEventUser              `json:"user,omitempty"`
-	Hash       string                    `json:"hash"`
-	OwningCase OwningCase                `json:"owningCase,omitempty"`
-	ID         int                       `json:"id,omitempty"`
-	UID        string                    `json:"uuid,omitempty"`
-	SourceType shared.LpaEventSourceType `json:"sourceType"`
-	Type       string                    `json:"type,omitempty"`
+	Changes        any                       `json:"changeSet,omitempty"`
+	CreatedOn      string                    `json:"createdOn"`
+	Entity         any                       `json:"entity,omitempty"`
+	Assignee       LpaEventUser              `json:"assignee,omitempty"`
+	User           LpaEventUser              `json:"user,omitempty"`
+	Hash           string                    `json:"hash"`
+	OwningCase     OwningCase                `json:"owningCase,omitempty"`
+	ID             int                       `json:"id,omitempty"`
+	UID            string                    `json:"uuid,omitempty"`
+	SourceType     shared.LpaEventSourceType `json:"sourceType"`
+	Type           string                    `json:"type,omitempty"`
+	SourceDocument SourceDocument            `json:"sourceDocument,omitempty"`
+	SourcePhone    *SourcePhoneNumber        `json:"sourcePhoneNumber,omitempty"`
+	SourceNote     SourceNote                `json:"sourceNote,omitempty"`
 }
 
 type OwningCase struct {
@@ -57,7 +60,22 @@ type SourceType struct {
 	Total      int                       `json:"total"`
 }
 
-func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string, sourceTypes []string, sortBy string) (LpaEventsResponse, error) {
+type SourceDocument struct {
+	UUID                string `json:"uuid"`
+	FriendlyDescription string `json:"friendlyDescription"`
+	MimeType            string `json:"mimeType"`
+}
+
+type SourcePhoneNumber struct {
+	PhoneNumber string `json:"phoneNumber"`
+	Type        string `json:"type"`
+}
+
+type SourceNote struct {
+	ID int `json:"id"`
+}
+
+func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string, sourceTypes []string, eventIds []string, sortBy string) (LpaEventsResponse, error) {
 	var resp LpaEventsResponse
 
 	query := ""
@@ -74,6 +92,14 @@ func (c *Client) GetEvents(ctx Context, donorId string, caseIds []string, source
 			query = "filter=sourceType:" + sourceType
 		} else {
 			query += ",sourceType:" + sourceType
+		}
+	}
+
+	for _, eventId := range eventIds {
+		if query == "" {
+			query = "filter=eventId:" + eventId
+		} else {
+			query += ",eventId:" + eventId
 		}
 	}
 

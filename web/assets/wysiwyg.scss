@@ -37,7 +37,7 @@ body#hugerte {
 
   &#hugerte {
     .user-instruction {
-      color: lighten(govuk-colour("light-blue"), 20%);
+      color: lighten(govuk-colour("blue", $variant: "tint-25"), 20%);
     }
   }
 }

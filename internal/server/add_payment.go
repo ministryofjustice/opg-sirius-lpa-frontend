@@ -23,10 +23,12 @@ type addPaymentData struct {
 
 	Case           sirius.Case
 	Amount         string
+	IsPartial      bool
 	Source         string
 	PaymentDate    sirius.DateString
 	PaymentSources []sirius.RefDataItem
 	ReturnUrl      string
+	HtmxRedirect   string
 }
 
 func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
@@ -41,6 +43,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		data := addPaymentData{
 			XSRFToken:   ctx.XSRFToken,
 			Amount:      postFormString(r, "amount"),
+			IsPartial:   ctx.IsPartial,
 			Source:      postFormString(r, "source"),
 			PaymentDate: postFormDateString(r, "paymentDate"),
 		}
@@ -91,6 +94,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 						"reason": "Value is required and can't be empty",
 					}
 				}
+
 				return tmpl(w, data)
 			}
 
@@ -105,12 +109,19 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
+
+				return tmpl(w, data)
 			} else if err != nil {
 				return err
 			} else {
 				SetFlash(w, FlashNotification{
 					Title: "Payment added",
 				})
+
+				if data.IsPartial {
+					data.HtmxRedirect = data.ReturnUrl
+					return tmpl(w, data)
+				}
 
 				return RedirectError(data.ReturnUrl)
 			}

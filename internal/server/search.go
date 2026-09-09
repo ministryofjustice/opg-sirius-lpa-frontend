@@ -1,10 +1,10 @@
 package server
 
 import (
-	"errors"
 	"net/http"
 	"net/url"
 	"regexp"
+	"slices"
 	"strconv"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -66,9 +66,6 @@ func Search(client SearchClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 		searchTerm := r.FormValue("term")
-		if searchTerm == "" {
-			return errors.New("search term required")
-		}
 		search := url.Values{}
 		search.Add("term", r.FormValue("term"))
 
@@ -77,6 +74,11 @@ func Search(client SearchClient, tmpl template.Template) Handler {
 		data := searchData{
 			SearchTerm: searchTerm,
 			Filters:    filters,
+		}
+
+		// If no search term, just render the template (front-end will handle the empty state)
+		if searchTerm == "" {
+			return tmpl(w, data)
 		}
 
 		results, pagination, err := client.Search(ctx, searchTerm, getPage(r), filters.PersonType)
@@ -103,8 +105,16 @@ func Search(client SearchClient, tmpl template.Template) Handler {
 			}
 		}
 
+		total := 0
+		hasFilters := len(filters.PersonType) > 0
+		for personType, personTypeCount := range results.Aggregations.PersonType {
+			if !hasFilters || slices.Contains(filters.PersonType, personType) {
+				total += personTypeCount
+			}
+		}
+
+		data.Total = total
 		data.Results = results.Results
-		data.Total = results.Total.Count
 		data.Aggregations = results.Aggregations
 		data.Pagination = newPagination(pagination, search.Encode(), filters.Encode())
 

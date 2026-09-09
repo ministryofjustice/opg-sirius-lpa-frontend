@@ -25,6 +25,10 @@ type warningData struct {
 	WarningType string
 	WarningText string
 	Cases       []sirius.Case
+	DonorId     int
+	CaseUids    string
+	EntityType  string
+	IsPartial   bool
 }
 
 func Warning(client WarningClient, tmpl template.Template) Handler {
@@ -50,6 +54,17 @@ func Warning(client WarningClient, tmpl template.Template) Handler {
 			XSRFToken:    ctx.XSRFToken,
 			WarningTypes: warningTypes,
 			Cases:        cases,
+			DonorId:      personId,
+			IsPartial:    ctx.IsPartial,
+		}
+
+		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
+		if data.IsPartial && r.FormValue("mlpa") != "true" {
+			entityType, err := sirius.ParseEntityType(r.FormValue("entity"))
+			if err != nil {
+				return err
+			}
+			data.EntityType = string(entityType)
 		}
 
 		if r.Method == http.MethodPost {

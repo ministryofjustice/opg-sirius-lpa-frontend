@@ -15,3 +15,7 @@ if (
 ) {
   document.documentElement.className += " app-!-html-class--dark";
 }
+
+if (document.cookie.indexOf("siriusTheme=accessible-") > -1) {
+  document.documentElement.className += " app-!-html-class--large-font";
+}

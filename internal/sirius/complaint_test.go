@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
@@ -43,7 +44,7 @@ func TestComplaint(t *testing.T) {
 							"severity":             matchers.String("Major"),
 							"investigatingOfficer": matchers.String("Test Officer"),
 							"subCategory":          matchers.String("07"),
-							"summary":              matchers.String("This and that"),
+							"title":                matchers.String("This and that"),
 						}),
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
@@ -52,10 +53,10 @@ func TestComplaint(t *testing.T) {
 				Category:             "01",
 				Description:          "This is seriously bad",
 				ReceivedDate:         DateString("2022-04-05"),
-				Severity:             "Major",
+				Severity:             shared.ComplaintSeverityMajor,
 				InvestigatingOfficer: "Test Officer",
 				SubCategory:          "07",
-				Summary:              "This and that",
+				Title:                "This and that",
 			},
 		},
 	}

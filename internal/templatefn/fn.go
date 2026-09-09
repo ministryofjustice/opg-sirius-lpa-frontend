@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"html/template"
 	"net/url"
+	"reflect"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/server"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -32,6 +35,14 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return prefix + s
 			}
 		},
+		"prefixSVG": func(s string) string {
+			path := prefix + "/assets/images/icons-sprite.svg"
+			if len(staticHash) >= 11 {
+				return path + "?" + url.QueryEscape(staticHash[3:11]) + "#" + s
+			} else {
+				return path + "#" + s
+			}
+		},
 		"today": func() string {
 			return time.Now().Format("2006-01-02")
 		},
@@ -43,10 +54,8 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"options":               options,
 		"caseTabs":              caseTab,
 		"casesWarningAppliedTo": sirius.CasesWarningAppliedTo,
-		"fee": func(amount int) string {
-			float := float64(amount)
-			return fmt.Sprintf("%.2f", float/100)
-		},
+		"fee":                   shared.FormatMonetaryValue,
+		"feeFromFloat":          shared.FormatMonetaryFloat,
 		"formatDate": func(s sirius.DateString) (string, error) {
 			if s != "" {
 				return s.ToSirius()
@@ -102,6 +111,10 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				return "UID"
 			}
 
+			if text == "firstname" {
+				return "First name"
+			}
+
 			r, n := utf8.DecodeRuneInString(text)
 			text = text[n:]
 
@@ -126,6 +139,26 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"contains": func(xs []string, needle string) bool {
 			for _, x := range xs {
 				if x == needle {
+					return true
+				}
+			}
+			return false
+		},
+		"containsInt": func(xs []int, needle int) bool {
+			for _, x := range xs {
+				if x == needle {
+					return true
+				}
+			}
+			return false
+		},
+		"isChildLinked": func(value interface{}) bool {
+			m, ok := value.(map[string]interface{})
+			if !ok {
+				return false
+			}
+			for k := range m {
+				if k == "1" {
 					return true
 				}
 			}
@@ -163,75 +196,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"subtypeLongFormat":      subtypeLongFormat,
 		"subtypeColour":          subtypeColour,
 		"severanceRequiredLabel": severanceRequiredLabel,
-		"howAttorneysMakeDecisionsLongForm": func(isSoleAttorney bool, s string) string {
-			if isSoleAttorney {
-				return "There is only one attorney appointed"
-			}
-
-			switch s {
-			case "jointly":
-				return "Jointly"
-			case "jointly-and-severally":
-				return "Jointly & severally"
-			case "jointly-for-some-severally-for-others":
-				return "Jointly for some, severally for others"
-			case "":
-				return "Not specified"
-			default:
-				return "howAttorneysMakeDecisions NOT RECOGNISED: " + s
-			}
-		},
-		"howReplacementAttorneysStepInLongForm": func(s string) string {
-			switch s {
-			case "all-can-no-longer-act":
-				return "When all can no longer act"
-			case "one-can-no-longer-act":
-				return "When one can no longer act"
-			case "another-way":
-				return "Another way"
-			case "":
-				return "Not specified"
-			default:
-				return "howReplacementAttorneysStepIn NOT RECOGNISED: " + s
-			}
-		},
-		"whenTheLpaCanBeUsedLongForm": func(s string) string {
-			switch s {
-			case "when-has-capacity":
-				return "As soon as it's registered"
-			case "when-capacity-lost":
-				return "When capacity is lost"
-			case "":
-				return "Not specified"
-			default:
-				return "whenTheLpaCanBeUsed NOT RECOGNISED: " + s
-			}
-		},
-		"lifeSustainingTreatmentOptionLongForm": func(s string) string {
-			switch s {
-			case "option-a":
-				return "Attorneys can give or refuse consent to LST"
-			case "option-b":
-				return "Attorneys cannot give or refuse consent to LST"
-			case "":
-				return "Not specified"
-			default:
-				return "lifeSustainingTreatmentOption NOT RECOGNISED: " + s
-			}
-		},
-		// translate channel code to long version for Format fields in display
-		"channelForFormat": func(s string) string {
-			switch s {
-			case "paper":
-				return "Paper"
-			case "online":
-				return "Online"
-			case "":
-				return "Not specified"
-			default:
-				return "channel NOT RECOGNISED: " + s
-			}
-		},
+		"channelForFormat":       shared.ChannelForFormat,
 		// translate progress indicator context to long version for application progress page
 		"progressIndicatorContext": func(s string) string {
 			switch s {
@@ -305,16 +270,19 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"caseLabel": func(s string) string {
 			switch strings.ToUpper(s) {
 			case "EPA":
-				return "colour-govuk-brown"
+				return "colour-sirius-brown"
 			case "PFA":
-				return "colour-govuk-turquoise"
+				return "colour-sirius-teal"
 			case "HW":
-				return "colour-govuk-grass-green"
+				return "colour-sirius-green"
 			default:
 				return ""
 			}
 		},
 		"compareBoolPointers": func(i *bool, j bool) bool {
+			if i == nil {
+				return false
+			}
 			return *i == j
 		},
 		"inStringArray": func(value string, array []string) bool {
@@ -325,9 +293,118 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return false
 		},
-		"formatEventType": formatEventType,
-		"eventTypeColor":  eventTypeColor,
+		"isDateMap": func(value interface{}) bool {
+			dateMap, ok := value.(map[string]interface{})
+			if !ok {
+				return false
+			}
+			_, hasDate := dateMap["date"]
+			return hasDate
+		},
+		"isNumber": func(value interface{}) bool {
+			_, ok := value.(float64)
+			return ok
+		},
+		"formatEventType":            formatEventType,
+		"eventTypeColor":             eventTypeColor,
+		"paymentSource":              shared.PaymentSourceToAction,
+		"complaintProperty":          shared.TranslateComplaintProperty,
+		"translateNumberEventValue":  translateNumberEventValue,
+		"investigationEventProperty": shared.TranslateInvestigationEventProperty,
+		"eventWithContext": func(event sirius.LpaEvent, values ...any) LpaEventWithContext {
+			context := EventContext{}
+			for i := 0; i+1 < len(values); i += 2 {
+				key, ok := values[i].(string)
+				if !ok {
+					continue
+				}
+				switch key {
+				case "feeReductionTypes":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.FeeReductionTypes = v
+					}
+				case "complaintCategories":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.ComplaintCategories = v
+					}
+				case "complaintSubcategories":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.ComplaintSubcategories = v
+					}
+				case "complainantCategories":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.ComplainantCategories = v
+					}
+				case "complaintOrigins":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.ComplaintOrigins = v
+					}
+				case "compensationTypes":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.CompensationTypes = v
+					}
+				case "donorID":
+					if v, ok := values[i+1].(string); ok {
+						context.DonorID = v
+					}
+				case "eventFieldOrder":
+					if v, ok := values[i+1].([]string); ok {
+						context.EventFieldOrder = v
+					}
+				}
+			}
+			return LpaEventWithContext{
+				LpaEvent: event,
+				Context:  context,
+			}
+		},
+		"boolToYesNo": func(b bool) string {
+			if b {
+				return "Yes"
+			}
+			return "No"
+		},
+		"stringifyBool": strconv.FormatBool,
+		"stringifyBoolPointer": func(b *bool) string {
+			if b == nil {
+				return ""
+			}
+			if *b {
+				return "true"
+			}
+			return "false"
+		},
+		"actionPanelButton": actionPanelButton,
+		"headerBarButton":   headerBarButton,
+		"personInfoRow":     personInfoRow,
+		"statusTag":         statusTag,
+		"hasField": func(v interface{}, name string) bool {
+			rv := reflect.ValueOf(v)
+			if rv.Kind() == reflect.Pointer {
+				rv = rv.Elem()
+			}
+			if rv.Kind() != reflect.Struct {
+				return false
+			}
+			return rv.FieldByName(name).IsValid()
+		},
 	}
+}
+
+type LpaEventWithContext struct {
+	sirius.LpaEvent
+	Context EventContext
+}
+
+type EventContext struct {
+	FeeReductionTypes      []sirius.RefDataItem
+	ComplaintCategories    []sirius.RefDataItem
+	ComplaintSubcategories []sirius.RefDataItem
+	ComplainantCategories  []sirius.RefDataItem
+	ComplaintOrigins       []sirius.RefDataItem
+	CompensationTypes      []sirius.RefDataItem
+	DonorID                string
+	EventFieldOrder        []string
 }
 
 type CaseTabData struct {
@@ -362,9 +439,9 @@ func subtypeLongFormat(subtype string) string {
 func subtypeColour(subtype string) string {
 	switch strings.ToLower(subtype) {
 	case "personal-welfare":
-		return "light-green"
+		return "green"
 	case "property-and-affairs":
-		return "turquoise"
+		return "teal"
 	default:
 		return ""
 	}
@@ -436,15 +513,17 @@ type radiosData struct {
 	Value  interface{}
 	Errors map[string]string
 	Items  []itemData
+	Inline bool
 }
 
-func radios(name, label string, value interface{}, errors map[string]string, items ...itemData) radiosData {
+func radios(name, label string, value interface{}, errors map[string]string, inline bool, items ...itemData) radiosData {
 	return radiosData{
 		Name:   name,
 		Label:  label,
 		Value:  value,
 		Errors: errors,
 		Items:  items,
+		Inline: inline,
 	}
 }
 
@@ -570,4 +649,111 @@ func formatEventType(eventType string) string {
 	formatted := strings.ReplaceAll(eventType, "_", " ")
 	// Title case each word
 	return cases.Title(language.English).String(strings.ToLower(formatted))
+}
+
+var numberEventValueTranslationMap = map[string]map[int]string{
+	"APPLICATIONTYPE": {
+		0: "Classic",
+		1: "Online",
+	},
+	"HAVEAPPLIEDFORFEEREMISSION": {
+		0: "No",
+		1: "No",
+		2: "Yes",
+	},
+	"ISATTORNEYAPPLYINGTOREGISTER": {
+		0: "Unknown",
+		1: "Donor",
+		2: "Attorney",
+	},
+	"PAYMENTBYCHEQUE": {
+		0: "Unknown",
+		1: "No",
+		2: "Yes",
+	},
+	"PAYMENTBYDEBITCREDITCARD": {
+		0: "Unknown",
+		1: "No",
+		2: "Yes",
+	},
+	"PAYMENTEXEMPTION": {
+		0: "Unknown",
+		1: "No",
+		2: "Yes",
+	},
+	"PAYMENTREMISSION": {
+		0: "Unknown",
+		1: "No",
+		2: "Yes",
+	},
+}
+
+func translateNumberEventValue(change string, value float64) string {
+	intValue := int(value)
+	changeType := strings.ToUpper(change)
+	if translations, exists := numberEventValueTranslationMap[changeType]; exists {
+		if translation, exists := translations[intValue]; exists {
+			return translation
+		}
+	}
+
+	return strconv.FormatFloat(value, 'f', -1, 64)
+}
+
+func actionPanelButton(label, url, iconName string, disabled bool, hidden bool) server.ActionPanelButton {
+	return server.ActionPanelButton{
+		Label:    label,
+		URL:      url,
+		IconName: iconName,
+		Disabled: disabled,
+		Hidden:   hidden,
+	}
+}
+
+type headerBarButtonData struct {
+	Label    string
+	URL      string
+	IconName string
+}
+
+func headerBarButton(label, url, iconName string) headerBarButtonData {
+	return headerBarButtonData{
+		Label:    label,
+		URL:      url,
+		IconName: iconName,
+	}
+}
+
+type personInfoRowData struct {
+	Label        string
+	Person       sirius.Person
+	CaseID       int
+	SelectedID   int
+	Index        int
+	IsApplicant  bool
+	SystemStatus bool
+}
+
+func personInfoRow(label string, person sirius.Person, caseID, selectedID, index int, isApplicant, systemStatus bool) personInfoRowData {
+	return personInfoRowData{
+		Label:        label,
+		Person:       person,
+		CaseID:       caseID,
+		SelectedID:   selectedID,
+		Index:        index,
+		IsApplicant:  isApplicant,
+		SystemStatus: systemStatus,
+	}
+}
+
+type statusTagData struct {
+	ReadableString string
+	Colour         string
+}
+
+func statusTag(readableString string, colour string) statusTagData {
+	return statusTagData{
+		ReadableString: readableString,
+		Colour:         colour,
+	}
 }

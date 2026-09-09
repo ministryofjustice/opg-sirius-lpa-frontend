@@ -1,0 +1,20 @@
+.app-\!-html-class--large-font {
+  .action-panel__inner {
+    display: block;
+
+    a {
+      display: block;
+      width: 95%;
+      min-height: 2em;
+      margin-bottom: 1em;
+      text-align: left;
+      text-transform: none;
+      font-weight: 900;
+      font-size: 1.3em;
+
+      .action-panel__button {
+        display: none;
+      }
+    }
+  }
+}

@@ -12,6 +12,12 @@ describe("View and edit anomalies for a digital LPA", () => {
           uId: "M-DIGI-QQQQ-1111",
           status: "Processing",
           caseSubtype: "property-and-affairs",
+          application: {
+            donorFirstNames: "Steven",
+            donorLastName: "Munnell",
+            donorDob: "17/06/1982",
+            donorAddress: { postcode: "EH6 18J" },
+          },
         },
         "opg.poas.lpastore": {
           channel: "online",
@@ -172,6 +178,12 @@ describe("View and edit anomalies for a digital LPA", () => {
           uId: "M-DIGI-TTTT-3333",
           status: "Processing",
           caseSubtype: "property-and-affairs",
+          application: {
+            donorFirstNames: "Steven",
+            donorLastName: "Munnell",
+            donorDob: "17/06/1982",
+            donorAddress: { postcode: "EH6 18J" },
+          },
         },
         "opg.poas.lpastore": {
           channel: "online",
@@ -226,6 +238,12 @@ describe("View and edit anomalies for a digital LPA", () => {
           uId: "M-DIGI-SSSS-3333",
           status: "Processing",
           caseSubtype: "personal-welfare",
+          application: {
+            donorFirstNames: "Steven",
+            donorLastName: "Munnell",
+            donorDob: "17/06/1982",
+            donorAddress: { postcode: "EH6 18J" },
+          },
         },
         "opg.poas.lpastore": {
           channel: "online",

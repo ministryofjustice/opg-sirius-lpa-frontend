@@ -224,6 +224,61 @@ func TestPostAddPayment(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestPostAddPaymentHTMX(t *testing.T) {
+	caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
+	client := &mockAddPaymentClient{}
+	client.
+		On("AddPayment", mock.Anything, 123, 4100, "MAKE", sirius.DateString("2022-01-23")).
+		Return(nil)
+	client.
+		On("Case", mock.Anything, 123).
+		Return(caseitem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, addPaymentData{
+			Case:           caseitem,
+			Amount:         "41.00",
+			IsPartial:      true,
+			Source:         "MAKE",
+			PaymentDate:    sirius.DateString("2022-01-23"),
+			PaymentSources: paymentSources,
+			ReturnUrl:      "/payments/123",
+			HtmxRedirect:   "/payments/123",
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"amount":      {"41.00"},
+		"source":      {"MAKE"},
+		"paymentDate": {"2022-01-23"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := AddPayment(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
 	for _, amount := range []string{"41", "41.5", "41.555", ".45"} {
 		t.Run(amount, func(t *testing.T) {
@@ -256,6 +311,7 @@ func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
 				On("Func", mock.Anything, addPaymentData{
 					Case:           caseitem,
 					Amount:         amount,
+					IsPartial:      false,
 					Source:         "MAKE",
 					PaymentDate:    sirius.DateString("2022-01-23"),
 					Error:          validationError,

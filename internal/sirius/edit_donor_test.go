@@ -90,6 +90,7 @@ func TestEditDonor(t *testing.T) {
 							"researchOptOut":        true,
 							"companyName":           "",
 							"companyReference":      "",
+							"dateOfDeath":           nil,
 						},
 					}).
 					WithCompleteResponse(consumer.Response{

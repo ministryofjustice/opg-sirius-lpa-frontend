@@ -3,6 +3,7 @@
   "extends": [
     "config:recommended",
     "schedule:earlyMondays",
+    "docker:pinDigests",
     "helpers:pinGitHubActionDigests"
   ],
   "branchNameStrict": true,
@@ -11,6 +12,7 @@
   "labels": ["Dependencies", "Renovate"],
   "configMigration": true,
   "postUpdateOptions": ["gomodTidy"],
+  "minimumReleaseAge": "7 days",
   "packageRules": [
     {
       "automerge": true,
@@ -18,7 +20,6 @@
       "groupSlug": "all-minor-patch-updates",
       "matchUpdateTypes": ["minor", "patch"],
       "prPriority": 1,
-      "minimumReleaseAge": "3 days",
       "matchPackageNames": ["*"]
     },
     {
@@ -27,14 +28,12 @@
       "groupSlug": "github-minor-patch-updates",
       "matchUpdateTypes": ["minor", "patch"],
       "prPriority": 2,
-      "minimumReleaseAge": "3 days",
       "matchPackageNames": ["*"],
       "matchFileNames": [".github/**"]
     }
   ],
   "major": {
-    "labels": ["Dependencies", "Renovate"],
-    "minimumReleaseAge": "3 days"
+    "labels": ["Dependencies", "Renovate"]
   },
   "vulnerabilityAlerts": {
     "groupName": "Vulnerability Patches",

@@ -18,11 +18,17 @@ type AllocateCasesClient interface {
 }
 
 type allocateCasesData struct {
-	XSRFToken string
-	Entities  []string
-	Success   bool
-	Error     sirius.ValidationError
-
+	XSRFToken        string
+	IsPartial        bool
+	Entities         []string
+	Success          bool
+	Error            sirius.ValidationError
+	CaseID           int
+	CaseIDs          []int
+	CaseUIDs         string
+	DonorID          int
+	EntityType       string
+	CaseUids         string
 	Teams            []sirius.Team
 	AssignTo         string
 	AssigneeUserName string
@@ -54,7 +60,12 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-		data := allocateCasesData{XSRFToken: ctx.XSRFToken}
+		data := allocateCasesData{
+			XSRFToken: ctx.XSRFToken,
+			IsPartial: ctx.IsPartial,
+			CaseID:    caseIDs[0],
+			CaseIDs:   caseIDs,
+		}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
@@ -86,6 +97,9 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
 					ID:       caseID,
 					CaseType: caseitem.CaseType,
 				})
+				if caseitem.Donor != nil {
+					data.DonorID = caseitem.Donor.ID
+				}
 				casesMu.Unlock()
 				return nil
 			})
@@ -93,6 +107,12 @@ func AllocateCases(client AllocateCasesClient, tmpl template.Template) Handler {
 
 		if err := group.Wait(); err != nil {
 			return err
+		}
+
+		data.CaseUIDs = buildUIDQueryString(r.Form["uid[]"])
+
+		if entityType, err := sirius.ParseEntityType(r.FormValue("entity")); err == nil {
+			data.EntityType = string(entityType)
 		}
 
 		if r.Method == http.MethodPost {

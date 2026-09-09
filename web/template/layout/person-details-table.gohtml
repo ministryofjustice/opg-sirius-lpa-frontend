@@ -1,0 +1,113 @@
+{{ define "person-details-table" }}
+    <table class="govuk-table">
+        <tbody class="govuk-table__body">
+        {{ if ne .PersonType "Trust Corporation" }}
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header app-table__row--half-width">Title</th>
+                <td class="govuk-table__cell">{{ .Salutation }}</td>
+            </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">First name</th>
+                <td class="govuk-table__cell">{{ .Firstname }}</td>
+            </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Middle name</th>
+                <td class="govuk-table__cell">{{ .Middlenames }}</td>
+            </tr>
+        {{ end }}
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Last name</th>
+            <td class="govuk-table__cell">{{ .Surname }}</td>
+        </tr>
+        {{ if and (ne .PersonType "Correspondent") (ne .PersonType "Certificate Provider") (ne .PersonType "Notified Person") (ne .PersonType "Trust Corporation") }}
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Date of birth</th>
+                <td class="govuk-table__cell">
+                    {{ if .DateOfBirth }}
+                        {{ parseAndFormatDate (printf "%s" .DateOfBirth) "2006-01-02" "2 January 2006" }}
+                    {{ else }}
+                        -
+                    {{ end }}
+                </td>
+            </tr>
+        {{ end }}
+        {{ if eq .PersonType "Trust Corporation" }}
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Trust corporation name</th>
+                <td class="govuk-table__cell">{{ .CompanyName }}</td>
+            </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Trust corporation registration number</th>
+                <td class="govuk-table__cell">{{ .CompanyNumber }}</td>
+            </tr>
+        {{ else if and (ne .PersonType "Certificate Provider") (ne .PersonType "Notified Person")}}
+            {{ if .CompanyName }}
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">Company name</th>
+                    <td class="govuk-table__cell">{{ .CompanyName }}</td>
+                </tr>
+            {{ end }}
+            {{ if .CompanyNumber }}
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">Company reference</th>
+                    <td class="govuk-table__cell">{{ .CompanyNumber }}</td>
+                </tr>
+            {{ end }}
+        {{ end }}
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Address line 1</th>
+            <td class="govuk-table__cell">{{ .AddressLine1 }}</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Address line 2</th>
+            <td class="govuk-table__cell">{{ .AddressLine2 }}</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Address line 3</th>
+            <td class="govuk-table__cell">{{ .AddressLine3 }}</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Postcode</th>
+            <td class="govuk-table__cell">{{ .Postcode }}</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Country</th>
+            <td class="govuk-table__cell">{{ .Country }}</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Airmail required</th>
+            <td class="govuk-table__cell">{{ boolToYesNo .IsAirmailRequired }}</td>
+        </tr>
+        {{ if and (eq .PersonType "Attorney") .RelationshipToDonor }}
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Relationship to donor</th>
+                <td class="govuk-table__cell">
+                    {{ if .RelationshipToDonor }}
+                        {{ capitalise .RelationshipToDonor }}
+                    {{ end }}
+                </td>
+            </tr>
+        {{ end }}
+        {{ if and (ne .PersonType "Replacement Attorney") (ne .PersonType "Certificate Provider") (ne .PersonType "Notified Person") }}
+            {{ if .SystemStatus }}
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">Is this attorney active?</th>
+                    <td class="govuk-table__cell">{{ boolToYesNo .SystemStatus }}</td>
+                </tr>
+            {{ end }}
+        {{ end }}
+        {{ if eq .PersonType "Notified Person" }}
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Date Notice Given</th>
+                <td class="govuk-table__cell">
+                    {{ if .NoticeGivenDate }}
+                        {{ parseAndFormatDate (printf "%s" .NoticeGivenDate) "2006-01-02" "2 January 2006" }}
+                    {{ else }}
+                        -
+                    {{ end }}
+                </td>
+            </tr>
+        {{end }}
+        </tbody>
+    </table>
+{{ end }}

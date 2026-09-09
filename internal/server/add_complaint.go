@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
 )
@@ -17,6 +18,7 @@ type AddComplaintClient interface {
 
 type addComplaintData struct {
 	XSRFToken string
+	IsPartial bool
 	Entity    string
 	Success   bool
 	Error     sirius.ValidationError
@@ -26,6 +28,11 @@ type addComplaintData struct {
 	Origins               []sirius.RefDataItem
 
 	Complaint sirius.Complaint
+
+	DonorId  int
+	CaseId   int
+	CaseType string
+	CaseUID  string
 }
 
 func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
@@ -45,6 +52,9 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 
 		data := addComplaintData{
 			XSRFToken: ctx.XSRFToken,
+			IsPartial: ctx.IsPartial,
+			CaseId:    caseID,
+			CaseType:  r.FormValue("case"),
 		}
 
 		group.Go(func() error {
@@ -54,6 +64,10 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 			}
 
 			data.Entity = fmt.Sprintf("%s %s", caseitem.CaseType, caseitem.UID)
+			data.CaseUID = caseitem.UID
+			if caseitem.Donor != nil {
+				data.DonorId = caseitem.Donor.ID
+			}
 			return nil
 		})
 
@@ -93,13 +107,13 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 				Category:             postFormString(r, "category"),
 				Description:          postFormString(r, "description"),
 				ReceivedDate:         postFormDateString(r, "receivedDate"),
-				Severity:             postFormString(r, "severity"),
+				Severity:             shared.ParseComplaintSeverity(postFormString(r, "severity")),
 				InvestigatingOfficer: postFormString(r, "investigatingOfficer"),
 				ComplainantName:      postFormString(r, "complainantName"),
 				SubCategory:          postFormString(r, "subCategory"),
 				ComplainantCategory:  postFormString(r, "complainantCategory"),
 				Origin:               postFormString(r, "origin"),
-				Summary:              postFormString(r, "summary"),
+				Title:                postFormString(r, "title"),
 			}
 
 			err = client.AddComplaint(ctx, caseID, caseType, complaint)

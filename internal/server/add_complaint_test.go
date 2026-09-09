@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -64,10 +65,11 @@ var demoComplaintCategories = []sirius.RefDataItem{
 func TestGetAddComplaint(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
+			donor := sirius.Person{ID: 1}
 			client := &mockAddComplaintClient{}
 			client.
 				On("Case", mock.Anything, 123).
-				Return(sirius.Case{CaseType: caseType, UID: "7000"}, nil).
+				Return(sirius.Case{CaseType: caseType, UID: "7000", Donor: &donor}, nil).
 				On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
 				Return(demoComplainantCategories, nil).
 				On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
@@ -82,6 +84,10 @@ func TestGetAddComplaint(t *testing.T) {
 					Categories:            demoComplaintCategories,
 					ComplainantCategories: demoComplainantCategories,
 					Origins:               demoComplaintOrigins,
+					CaseId:                123,
+					CaseType:              caseType,
+					CaseUID:               "7000",
+					DonorId:               1,
 				}).
 				Return(nil)
 
@@ -96,6 +102,47 @@ func TestGetAddComplaint(t *testing.T) {
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
+}
+
+func TestGetAddComplaintHTMX(t *testing.T) {
+	donor := sirius.Person{ID: 1}
+	client := &mockAddComplaintClient{}
+	client.
+		On("Case", mock.Anything, 123).
+		Return(sirius.Case{CaseType: "lpa", UID: "7000", Donor: &donor}, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, addComplaintData{
+			IsPartial:             true,
+			Entity:                "lpa 7000",
+			Categories:            demoComplaintCategories,
+			ComplainantCategories: demoComplainantCategories,
+			Origins:               demoComplaintOrigins,
+			CaseId:                123,
+			CaseType:              "lpa",
+			CaseUID:               "7000",
+			DonorId:               1,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
+	r.Header.Add("hx-request", "true")
+
+	w := httptest.NewRecorder()
+
+	err := AddComplaint(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestGetAddComplaintBadQuery(t *testing.T) {
@@ -184,6 +231,9 @@ func TestGetAddComplaintWhenTemplateErrors(t *testing.T) {
 			Categories:            demoComplaintCategories,
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
+			CaseId:                123,
+			CaseType:              "lpa",
+			CaseUID:               "7000",
 		}).
 		Return(errExample)
 
@@ -216,10 +266,10 @@ func TestPostAddComplaint(t *testing.T) {
 					Category:             "01",
 					Description:          "This is a complaint",
 					ReceivedDate:         sirius.DateString("2022-04-05"),
-					Severity:             "Minor",
+					Severity:             shared.ComplaintSeverityMinor,
 					InvestigatingOfficer: "Test Officer",
 					SubCategory:          "07",
-					Summary:              "In summary...",
+					Title:                "In summary...",
 				}).
 				Return(nil)
 
@@ -231,6 +281,9 @@ func TestPostAddComplaint(t *testing.T) {
 					Categories:            demoComplaintCategories,
 					ComplainantCategories: demoComplainantCategories,
 					Origins:               demoComplaintOrigins,
+					CaseId:                123,
+					CaseType:              caseType,
+					CaseUID:               "7000",
 				}).
 				Return(nil)
 
@@ -241,7 +294,7 @@ func TestPostAddComplaint(t *testing.T) {
 				"severity":             {"Minor"},
 				"investigatingOfficer": {"Test Officer"},
 				"subCategory":          {"07"},
-				"summary":              {"In summary..."},
+				"title":                {"In summary..."},
 			}
 
 			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))
@@ -263,7 +316,7 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 		Field: sirius.FieldErrors{"field": {"": "problem"}},
 	}
 
-	complaint := sirius.Complaint{Description: "This is a complaint"}
+	complaint := sirius.Complaint{Description: "This is a complaint", Severity: shared.ComplaintSeverityNotRecognised}
 
 	client := &mockAddComplaintClient{}
 	client.
@@ -291,6 +344,9 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 			Categories:            demoComplaintCategories,
 			ComplainantCategories: demoComplainantCategories,
 			Origins:               demoComplaintOrigins,
+			CaseId:                123,
+			CaseType:              "lpa",
+			CaseUID:               "7000",
 		}).
 		Return(nil)
 
@@ -311,7 +367,7 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 }
 
 func TestPostAddComplaintWhenAddComplaintOtherError(t *testing.T) {
-	complaint := sirius.Complaint{Description: "This is a complaint"}
+	complaint := sirius.Complaint{Description: "This is a complaint", Severity: shared.ComplaintSeverityNotRecognised}
 
 	client := &mockAddComplaintClient{}
 	client.

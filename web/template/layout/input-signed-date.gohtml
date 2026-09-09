@@ -1,0 +1,12 @@
+{{ define "input-signed-date" }}
+  <div class="govuk-form-group {{ if .Error }}govuk-form-group--error{{ end }}">
+    <div class="app-signed-date-row">
+      <label class="govuk-label" for="f-{{ .Name }}">{{ if .Attrs.boldLabel }}<strong>{{ .Label }}</strong>{{ else }}{{ .Label }}{{ end }}</label>
+      <input class="govuk-input {{ if .Attrs.selectToday }}date-picker{{ else }}govuk-!-width-one-third{{ end }} {{ if .Error }}govuk-input--error{{ end }}" type="date" id="f-{{ .Name }}" name="{{ .Name }}" value="{{ .Value }}" {{ if .Attrs.max }}max="{{ .Attrs.max }}"{{ else }}max="9999-12-31"{{ end }} {{ if .Attrs.min }}min="{{ .Attrs.min }}"{{ end }} />
+    </div>
+    {{ template "errors" .Error }}
+  </div>
+  {{ if .Attrs.selectToday }}
+    <a href="#" class="govuk-link govuk-link--no-visited-state govuk-!-display-inline-block" data-module="select-todays-date">Use today's date</a>
+  {{ end }}
+{{ end }}

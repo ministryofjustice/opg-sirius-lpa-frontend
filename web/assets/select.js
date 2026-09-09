@@ -1,17 +1,16 @@
 import accessibleAutocomplete from "accessible-autocomplete";
 
-export default function select(prefix) {
+export default function select(prefix, scope) {
+  scope = scope || document;
   enhanceUserPersonSearchElement(
-    document.querySelector("[data-select-user]"),
+    scope.querySelector("[data-select-user]"),
     fetchUser(prefix),
   );
   enhanceUserPersonSearchElement(
-    document.querySelector("[data-select-person]"),
+    scope.querySelector("[data-select-person]"),
     fetchPerson(prefix),
   );
-  enhanceTemplateSearchElement(
-    document.querySelector("[data-select-template]"),
-  );
+  enhanceTemplateSearchElement(scope.querySelector("[data-select-template]"));
 }
 
 function enhanceTemplateSearchElement(element) {

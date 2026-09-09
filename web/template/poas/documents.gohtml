@@ -1,0 +1,22 @@
+{{ template "page" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Document List{{ end }}
+
+{{ define "container-classes" }} app-!-max-full-width{{ end }}
+
+{{ define "sirius-header" }}
+    {{ template "siriusHeader" . }}
+{{ end }}
+
+{{ define "action-panel-wrapper" }}
+    {{ template "ActionPanelWrapper" . }}
+{{ end }}
+
+{{ define "main" }}
+    <h1 class="govuk-visually-hidden">Documents</h1>
+    <div class="document-main-wrapper">
+        <div class="document-list-section">
+            {{ template "DocumentList" . }}
+        </div>
+    </div>
+{{ end }}

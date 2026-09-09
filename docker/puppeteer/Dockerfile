@@ -1,4 +1,4 @@
-FROM node:22.12.0-alpine3.19
+FROM node:24.19.0-alpine3.23@sha256:244cc2b53f46f9e876304391d17682b0ddae9ac33491f4857e25e35a36ba7995
 
 RUN apk add --no-cache \
     ca-certificates \
@@ -14,9 +14,7 @@ RUN apk add --no-cache \
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-RUN npm i --ignore-scripts -g pa11y-ci@2.4 @lhci/cli@0.4.x
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
 
 COPY pa11yci.json .pa11yci
-COPY lighthouserc.js .
-
-CMD ["pa11y-ci"]

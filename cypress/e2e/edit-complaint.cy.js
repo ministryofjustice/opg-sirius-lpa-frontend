@@ -1,6 +1,25 @@
 describe("Edit complaint", () => {
   beforeEach(() => {
-    cy.visit("/edit-complaint?id=986");
+    cy.addMock("/lpa-api/v1/complaints/66", "GET", {
+      status: 200,
+      body: {
+        id: 66,
+        category: "01",
+        description: "This is seriously bad",
+        investigatingOfficer: "Test Officer",
+        receivedDate: "05/04/2022",
+        severity: "Major",
+        subCategory: "07",
+        title: "This and that",
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/complaints/66", "PUT", {
+      status: 200,
+      body: {},
+    });
+
+    cy.visit("/edit-complaint?id=66");
   });
 
   it("edits a complaint", () => {
@@ -12,7 +31,7 @@ describe("Edit complaint", () => {
       .should("be.checked");
     cy.get("#f-investigatingOfficer").should("have.value", "Test Officer");
     cy.get("#f-complainantName").type("Someones name");
-    cy.get("#f-summary").should("have.value", "This and that");
+    cy.get("#f-title").should("have.value", "This and that");
     cy.get("#f-description").should("have.value", "This is seriously bad");
     cy.get("#f-receivedDate").should("have.value", "2022-04-05");
     cy.contains("label", "OPG Decisions")

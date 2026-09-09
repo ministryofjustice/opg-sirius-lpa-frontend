@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -195,10 +196,10 @@ func TestPostEditComplaint(t *testing.T) {
 		Category:             "01",
 		Description:          "This is a complaint",
 		ReceivedDate:         sirius.DateString("2022-04-05"),
-		Severity:             "Minor",
+		Severity:             shared.ComplaintSeverityMinor,
 		InvestigatingOfficer: "Test Officer",
 		SubCategory:          "07",
-		Summary:              "In summary...",
+		Title:                "In summary...",
 		Resolution:           "complaint upheld",
 		ResolutionInfo:       "This is what we did",
 		ResolutionDate:       sirius.DateString("2022-05-06"),
@@ -244,7 +245,7 @@ func TestPostEditComplaint(t *testing.T) {
 		"severity":                       {"Minor"},
 		"investigatingOfficer":           {"Test Officer"},
 		"subCategory":                    {"07"},
-		"summary":                        {"In summary..."},
+		"title":                          {"In summary..."},
 		"resolution":                     {"complaint upheld"},
 		"resolutionInfo":                 {"This is what we did"},
 		"resolutionDate":                 {"2022-05-06"},
@@ -269,7 +270,7 @@ func TestPostEditComplaintWhenEditComplaintValidationError(t *testing.T) {
 		Field: sirius.FieldErrors{"field": {"": "problem"}},
 	}
 
-	complaint := sirius.Complaint{Description: "This is a complaint"}
+	complaint := sirius.Complaint{Description: "This is a complaint", Severity: shared.ComplaintSeverityNotRecognised}
 
 	client := &mockEditComplaintClient{}
 	client.
@@ -320,7 +321,7 @@ func TestPostEditComplaintWhenEditComplaintValidationError(t *testing.T) {
 }
 
 func TestPostEditComplaintWhenEditComplaintOtherError(t *testing.T) {
-	complaint := sirius.Complaint{Description: "This is a complaint"}
+	complaint := sirius.Complaint{Description: "This is a complaint", Severity: shared.ComplaintSeverityNotRecognised}
 
 	client := &mockEditComplaintClient{}
 	client.

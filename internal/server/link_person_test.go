@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -32,28 +33,37 @@ func (m *mockLinkPersonClient) PersonByUid(ctx sirius.Context, uid string) (siri
 }
 
 func TestLinkPerson(t *testing.T) {
-	person := sirius.Person{Firstname: "John", Surname: "Doe"}
+	for _, isHtmx := range []bool{true, false} {
+		t.Run("Is HTMX"+strconv.FormatBool(isHtmx), func(t *testing.T) {
+			person := sirius.Person{Firstname: "John", Surname: "Doe"}
 
-	client := &mockLinkPersonClient{}
-	client.
-		On("Person", mock.Anything, 123).
-		Return(person, nil)
+			client := &mockLinkPersonClient{}
+			client.
+				On("Person", mock.Anything, 123).
+				Return(person, nil)
 
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, linkPersonData{
-			Entity: person,
-		}).
-		Return(nil)
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, linkPersonData{
+					Entity:    person,
+					IsPartial: isHtmx,
+				}).
+				Return(nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
-	w := httptest.NewRecorder()
+			r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+			w := httptest.NewRecorder()
 
-	err := LinkPerson(client, template.Func)(w, r)
-	resp := w.Result()
+			if isHtmx {
+				r.Header.Add("HX-Request", "true")
+			}
 
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+			err := LinkPerson(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+		})
+	}
 }
 
 func TestLinkPersonNoID(t *testing.T) {

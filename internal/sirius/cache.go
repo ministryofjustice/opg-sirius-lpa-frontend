@@ -21,7 +21,6 @@ func getCached(category string) ([]RefDataItem, bool) {
 	oneHourAgo := time.Now().Add(-1 * time.Hour)
 
 	mutex.RLock()
-
 	if cache[category].time.After(oneHourAgo) && len(cache[category].value) > 0 {
 		v = cache[category].value
 		found = true

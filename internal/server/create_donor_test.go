@@ -42,6 +42,32 @@ func TestGetCreateDonor(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestGetCreateDonorHtmxRequest(t *testing.T) {
+	client := &mockCreateDonorClient{}
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, donorData{
+			IsNew:      true,
+			DonorId:    123,
+			CaseUids:   "&uid[]=7000-1234-1234",
+			EntityType: "person",
+			IsPartial:  true,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/create-donor?id=123&entity=person&uid[]=7000-1234-1234", nil)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := CreateDonor(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestPostCreateDonor(t *testing.T) {
 	client := &mockCreateDonorClient{}
 	client.
@@ -108,6 +134,49 @@ func TestPostCreateDonor(t *testing.T) {
 
 	r, _ := http.NewRequest(http.MethodPost, "/create-donor", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CreateDonor(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateDonorHtmxRequest(t *testing.T) {
+	client := &mockCreateDonorClient{}
+	client.
+		On("CreateDonor", mock.Anything, sirius.Person{
+			Firstname:   "Rudolph",
+			Middlenames: "Modesto",
+		}).
+		Return(sirius.Person{ID: 809, UID: "7123-4567-8901"}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, donorData{
+			IsNew: true,
+			Donor: sirius.Person{
+				ID:  809,
+				UID: "7123-4567-8901",
+			},
+			Success:    true,
+			DonorId:    123,
+			CaseUids:   "&uid[]=7000-1234-1234",
+			EntityType: "person",
+			IsPartial:  true,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"firstname":   {"Rudolph"},
+		"middlenames": {"Modesto"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/create-donor?id=123&entity=person&uid[]=7000-1234-1234", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
 	err := CreateDonor(client, template.Func)(w, r)

@@ -1,6 +1,6 @@
-const autoClick = () => {
+const autoClick = ($scope) => {
   /** @type HTMLAnchorElement|null autoClickLink */
-  const autoClickLinks = document.querySelectorAll(
+  const autoClickLinks = ($scope || document).querySelectorAll(
     '[data-module~="app-auto-click"]',
   );
 

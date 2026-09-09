@@ -192,8 +192,8 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 								},
 							},
 						},
-						HowAttorneysMakeDecisions:            "jointly",
-						HowReplacementAttorneysMakeDecisions: "",
+					HowAttorneysMakeDecisions:            shared.HowAttorneysMakeDecisionsJointly,
+					HowReplacementAttorneysMakeDecisions: shared.HowAttorneysMakeDecisionsEmpty,
 					},
 				},
 				TaskList: tc.taskList,
@@ -390,7 +390,7 @@ func TestGetLpaDetailsSuccess(t *testing.T) {
 							},
 						},
 					},
-					ReplacementAttorneysDecisions: "jointly",
+					ReplacementAttorneysDecisions: shared.HowAttorneysMakeDecisionsJointly,
 				}).
 				Return(nil)
 

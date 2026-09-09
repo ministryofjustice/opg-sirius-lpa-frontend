@@ -1,0 +1,16 @@
+{{ define "partial-event-incoming-document" }}
+    {{ if eq .SourceDocument.MimeType "application/pdf" }}
+        <a class="govuk-link" href="/lpa/frontend/view-document/{{ .SourceDocument.UUID }}/{{ .Context.DonorID }}" target="_top">
+            {{ .SourceDocument.FriendlyDescription }}
+        </a>
+    {{ else }}
+        <a class="govuk-link" href="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .SourceDocument.UUID) }}" download>
+            {{ .SourceDocument.FriendlyDescription }}
+        </a>
+    {{ end }}
+    {{ if .Entity.subType }}
+        <strong class="govuk-tag govuk-!-margin-left-1">
+            {{ .Entity.subType }}
+        </strong>
+    {{ end }}
+{{ end }}

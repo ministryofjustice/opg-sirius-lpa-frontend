@@ -47,29 +47,29 @@ type Donor struct {
 }
 
 type LpaStoreData struct {
-	Donor                                       LpaStoreDonor                `json:"donor"`
-	Channel                                     string                       `json:"channel"`
-	Status                                      shared.CaseStatus            `json:"status"`
-	Attorneys                                   []LpaStoreAttorney           `json:"attorneys"`
-	TrustCorporations                           []LpaStoreTrustCorporation   `json:"trustCorporations"`
-	CertificateProvider                         LpaStoreCertificateProvider  `json:"certificateProvider"`
-	CertificateProviderNotRelatedConfirmedAt    string                       `json:"certificateProviderNotRelatedConfirmedAt"`
-	PeopleToNotify                              []LpaStorePersonToNotify     `json:"peopleToNotify"`
-	HowAttorneysMakeDecisions                   string                       `json:"howAttorneysMakeDecisions"`
-	HowAttorneysMakeDecisionsDetails            string                       `json:"howAttorneysMakeDecisionsDetails"`
-	WhenTheLpaCanBeUsed                         string                       `json:"whenTheLpaCanBeUsed"`
-	HowReplacementAttorneysMakeDecisions        string                       `json:"howReplacementAttorneysMakeDecisions"`
-	HowReplacementAttorneysMakeDecisionsDetails string                       `json:"howReplacementAttorneysMakeDecisionsDetails"`
-	HowReplacementAttorneysStepIn               string                       `json:"howReplacementAttorneysStepIn"`
-	HowReplacementAttorneysStepInDetails        string                       `json:"howReplacementAttorneysStepInDetails"`
-	LifeSustainingTreatmentOption               string                       `json:"lifeSustainingTreatmentOption"`
-	RestrictionsAndConditions                   string                       `json:"restrictionsAndConditions"`
-	RestrictionsAndConditionsImages             []LpaStoreImage              `json:"restrictionsAndConditionsImages"`
-	SignedAt                                    string                       `json:"signedAt"`
-	AuthorisedSignatory                         *LpaStoreAuthorisedSignatory `json:"authorisedSignatory,omitempty"`
-	WitnessedByCertificateProviderAt            string                       `json:"witnessedByCertificateProviderAt"`
-	WitnessedByIndependentWitnessAt             string                       `json:"witnessedByIndependentWitnessAt"`
-	IndependentWitness                          *LpaStoreIndependentWitness  `json:"independentWitness,omitempty"`
+	Donor                                       LpaStoreDonor                        `json:"donor"`
+	Channel                                     string                               `json:"channel"`
+	Status                                      shared.CaseStatus                    `json:"status"`
+	Attorneys                                   []LpaStoreAttorney                   `json:"attorneys"`
+	TrustCorporations                           []LpaStoreTrustCorporation           `json:"trustCorporations"`
+	CertificateProvider                         LpaStoreCertificateProvider          `json:"certificateProvider"`
+	CertificateProviderNotRelatedConfirmedAt    string                               `json:"certificateProviderNotRelatedConfirmedAt"`
+	PeopleToNotify                              []LpaStorePersonToNotify             `json:"peopleToNotify"`
+	HowAttorneysMakeDecisions                   shared.HowAttorneysMakeDecisions     `json:"howAttorneysMakeDecisions"`
+	HowAttorneysMakeDecisionsDetails            string                               `json:"howAttorneysMakeDecisionsDetails"`
+	WhenTheLpaCanBeUsed                         shared.WhenLpaCanBeUsed              `json:"whenTheLpaCanBeUsed"`
+	HowReplacementAttorneysMakeDecisions        shared.HowAttorneysMakeDecisions     `json:"howReplacementAttorneysMakeDecisions"`
+	HowReplacementAttorneysMakeDecisionsDetails string                               `json:"howReplacementAttorneysMakeDecisionsDetails"`
+	HowReplacementAttorneysStepIn               shared.HowReplacementAttorneysStepIn `json:"howReplacementAttorneysStepIn"`
+	HowReplacementAttorneysStepInDetails        string                               `json:"howReplacementAttorneysStepInDetails"`
+	LifeSustainingTreatmentOption               shared.LifeSustainingTreatmentOption `json:"lifeSustainingTreatmentOption"`
+	RestrictionsAndConditions                   string                               `json:"restrictionsAndConditions"`
+	RestrictionsAndConditionsImages             []LpaStoreImage                      `json:"restrictionsAndConditionsImages"`
+	SignedAt                                    string                               `json:"signedAt"`
+	AuthorisedSignatory                         *LpaStoreAuthorisedSignatory         `json:"authorisedSignatory,omitempty"`
+	WitnessedByCertificateProviderAt            string                               `json:"witnessedByCertificateProviderAt"`
+	WitnessedByIndependentWitnessAt             string                               `json:"witnessedByIndependentWitnessAt"`
+	IndependentWitness                          *LpaStoreIndependentWitness          `json:"independentWitness,omitempty"`
 }
 
 type ActorIdentityCheck struct {

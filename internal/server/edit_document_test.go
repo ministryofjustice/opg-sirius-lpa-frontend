@@ -57,9 +57,14 @@ func (m *mockEditDocumentClient) DocumentTemplates(ctx sirius.Context, caseType 
 }
 
 func TestGetEditDocument(t *testing.T) {
-	for _, caseType := range []string{"lpa", "epa", "digital_lpa"} {
+	for _, caseType := range []string{"lpa", "epa", "digital_lpa", "lpa_htmx"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseItem := sirius.Case{CaseType: caseType, UID: "7000"}
+			htmx := false
+			if caseType == "lpa_htmx" {
+				htmx = true
+				caseType = "lpa"
+			}
+			caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: caseType, UID: "7000"}
 
 			document := sirius.Document{
 				ID:         1,
@@ -95,7 +100,9 @@ func TestGetEditDocument(t *testing.T) {
 
 			template := &mockTemplate{}
 			templateData := editDocumentData{
+				IsPartial:  htmx,
 				Case:       caseItem,
+				DonorId:    1,
 				Documents:  documents,
 				Document:   document,
 				UsesNotify: true,
@@ -118,6 +125,10 @@ func TestGetEditDocument(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "/?id=155&case="+caseType, nil)
 			w := httptest.NewRecorder()
 
+			if htmx {
+				r.Header.Add("HX-Request", "true")
+			}
+
 			err := EditDocument(client, template.Func)(w, r)
 			resp := w.Result()
 
@@ -131,7 +142,7 @@ func TestGetEditDocument(t *testing.T) {
 func TestPostSaveDocument(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa", "digital_lpa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseItem := sirius.Case{CaseType: caseType, UID: "7000"}
+			caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: caseType, UID: "7000"}
 
 			document := sirius.Document{
 				ID:      1,
@@ -161,6 +172,7 @@ func TestPostSaveDocument(t *testing.T) {
 			template := &mockTemplate{}
 			templateData := editDocumentData{
 				Case:      caseItem,
+				DonorId:   1,
 				Documents: documents,
 				Document:  document,
 			}
@@ -204,7 +216,7 @@ func TestPostSaveDocument(t *testing.T) {
 func TestPostDeleteDocument(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa", "digital_lpa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseItem := sirius.Case{CaseType: caseType, UID: "700700"}
+			caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: caseType, UID: "700700"}
 
 			document := sirius.Document{
 				ID:      1,
@@ -250,6 +262,7 @@ func TestPostDeleteDocument(t *testing.T) {
 				template.
 					On("Func", mock.Anything, editDocumentData{
 						Case:      caseItem,
+						DonorId:   1,
 						Documents: documents,
 						Document:  document,
 					}).
@@ -282,7 +295,7 @@ func TestPostDeleteDocument(t *testing.T) {
 func TestPostPublishDocument(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa", "digital_lpa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseItem := sirius.Case{CaseType: caseType, UID: "700700"}
+			caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: caseType, UID: "700700"}
 
 			document := sirius.Document{
 				ID:      1,
@@ -334,6 +347,7 @@ func TestPostPublishDocument(t *testing.T) {
 				template.
 					On("Func", mock.Anything, editDocumentData{
 						Case:      caseItem,
+						DonorId:   1,
 						Documents: documents,
 						Document:  document,
 						Success:   true,
@@ -365,7 +379,7 @@ func TestPostPublishDocument(t *testing.T) {
 }
 
 func TestPostPreviewDocument(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "lpa", UID: "700700"}
+	caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: "lpa", UID: "7000"}
 
 	document := sirius.Document{
 		ID:      1,
@@ -410,6 +424,7 @@ func TestPostPreviewDocument(t *testing.T) {
 	template.
 		On("Func", mock.Anything, editDocumentData{
 			Case:         caseItem,
+			DonorId:      1,
 			Documents:    documents,
 			Document:     document,
 			PreviewDraft: true,
@@ -438,8 +453,9 @@ func TestPostPreviewDocument(t *testing.T) {
 }
 
 func TestPostSaveDocumentAndExit(t *testing.T) {
-	for _, caseType := range []string{"lpa", "epa", "digital_lpa_1", "digital_lpa_2"} {
+	for _, caseType := range []string{"lpa", "epa", "digital_lpa"} {
 		t.Run(caseType, func(t *testing.T) {
+			caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: caseType, UID: "700700"}
 			document := sirius.Document{
 				ID:      1,
 				UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
@@ -451,31 +467,21 @@ func TestPostSaveDocumentAndExit(t *testing.T) {
 			client.
 				On("EditDocument", mock.Anything, document.UUID, "Test content").
 				Return(document, nil)
+			client.
+				On("Case", mock.Anything, 987).
+				Return(caseItem, nil)
 
 			template := &mockTemplate{}
 
-			switch caseType {
-			case "digital_lpa_1":
-				caseType = "digital_lpa"
+			if caseType == "digital_lpa" {
+				errExample = RedirectError("/lpa/700700/documents")
+			} else {
 				errExample = nil
-
-				client.
-					On("Case", mock.Anything, 987).
-					Return(sirius.Case{CaseType: caseType, UID: "M-1234-4567-8999"}, nil)
-
-				errExample = RedirectError("/lpa/M-1234-4567-8999/documents")
-			case "digital_lpa_2":
-				caseType = "digital_lpa"
-
-				client.
-					On("Case", mock.Anything, 987).
-					Return(sirius.Case{}, errExample)
-			default:
-				errExample = nil
-
 				template.
 					On("Func", mock.Anything, editDocumentData{
 						SaveAndExit: true,
+						Case:        caseItem,
+						DonorId:     1,
 					}).
 					Return(nil)
 			}
@@ -526,12 +532,6 @@ func TestGetEditDocumentWhenCaseErrors(t *testing.T) {
 	client.
 		On("Case", mock.Anything, 222).
 		Return(sirius.Case{}, errExample)
-	client.
-		On("Documents", mock.Anything, sirius.CaseTypeLpa, 222, []string{sirius.TypeDraft}, []string{}).
-		Return([]sirius.Document{}, nil)
-	client.
-		On("DocumentTemplates", mock.Anything, sirius.CaseTypeLpa).
-		Return([]sirius.DocumentTemplateData{}, nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=222&case=lpa", nil)
 	w := httptest.NewRecorder()
@@ -543,7 +543,7 @@ func TestGetEditDocumentWhenCaseErrors(t *testing.T) {
 }
 
 func TestGetCreateDocumentWhenFailureOnDocuments(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "lpa", UID: "7000"}
+	caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: "lpa", UID: "7000"}
 
 	client := &mockEditDocumentClient{}
 	client.
@@ -566,7 +566,7 @@ func TestGetCreateDocumentWhenFailureOnDocuments(t *testing.T) {
 }
 
 func TestGetCreateDocumentWhenFailureOnDocumentByUUID(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "lpa", UID: "7000"}
+	caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: "lpa", UID: "7000"}
 
 	document := sirius.Document{
 		ID:   1,
@@ -602,7 +602,7 @@ func TestGetCreateDocumentWhenFailureOnDocumentByUUID(t *testing.T) {
 }
 
 func TestGetEditDocumentWhenTemplateErrors(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "lpa", UID: "7000"}
+	caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: "lpa", UID: "7000"}
 
 	document := sirius.Document{
 		ID:   1,
@@ -632,6 +632,7 @@ func TestGetEditDocumentWhenTemplateErrors(t *testing.T) {
 	template.
 		On("Func", mock.Anything, editDocumentData{
 			Case:      caseItem,
+			DonorId:   1,
 			Document:  document,
 			Documents: documents,
 		}).

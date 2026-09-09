@@ -29,6 +29,14 @@ func EditDonor(client EditDonorClient, tmpl template.Template) Handler {
 		data := donorData{
 			XSRFToken: ctx.XSRFToken,
 			Donor:     donor,
+			DonorId:   id,
+			IsPartial: ctx.IsPartial,
+		}
+
+		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
+
+		if entityType, err := sirius.ParseEntityType(r.FormValue("entity")); err == nil {
+			data.EntityType = string(entityType)
 		}
 
 		if r.Method == http.MethodPost {

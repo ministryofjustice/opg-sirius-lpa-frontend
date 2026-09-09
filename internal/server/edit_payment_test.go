@@ -80,6 +80,7 @@ func TestGetEditPayment(t *testing.T) {
 			Source:         "PHONE",
 			PaymentDate:    sirius.DateString("2022-07-23"),
 			PaymentSources: paymentSources,
+			ReturnUrl:      "/payments/0",
 		}).
 		Return(nil)
 
@@ -229,6 +230,7 @@ func TestEditPaymentWhenTemplateErrors(t *testing.T) {
 			Source:         "PHONE",
 			PaymentDate:    sirius.DateString("2022-07-23"),
 			PaymentSources: paymentSources,
+			ReturnUrl:      "/payments/0",
 		}).
 		Return(errExample)
 
@@ -289,6 +291,7 @@ func TestPostEditPaymentAmountIncorrectFormat(t *testing.T) {
 					PaymentDate:    sirius.DateString("2022-01-23"),
 					PaymentSources: paymentSources,
 					Error:          validationError,
+					ReturnUrl:      "/payments/0",
 				}).
 				Return(nil)
 
@@ -367,6 +370,79 @@ func TestPostEditPayment(t *testing.T) {
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/payments/4"), err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostEditPaymentHtmx(t *testing.T) {
+	caseItem := sirius.Case{CaseType: "lpa", UID: "700700", ID: 4}
+
+	payment := sirius.Payment{
+		ID:          123,
+		Amount:      8200,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-02-18"),
+		Case:        &sirius.Case{ID: 4},
+	}
+
+	editedPayment := sirius.Payment{
+		Amount:      3300,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-02-18"),
+	}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
+	client := &mockEditPaymentClient{}
+	client.
+		On("PaymentByID", mock.Anything, 123).
+		Return(payment, nil)
+	client.
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
+	client.
+		On("EditPayment", mock.Anything, 123, editedPayment).
+		Return(nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, editPaymentData{
+			Case:           caseItem,
+			PaymentID:      123,
+			Amount:         "33.00",
+			Source:         "PHONE",
+			PaymentDate:    "2022-02-18",
+			PaymentSources: paymentSources,
+			ReturnUrl:      "/payments/4",
+			HtmxRedirect:   "/payments/4",
+			IsPartial:      true,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"amount":      {"33.00"},
+		"source":      {"PHONE"},
+		"paymentDate": {"2022-02-18"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := EditPayment(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

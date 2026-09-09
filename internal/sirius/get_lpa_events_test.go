@@ -134,7 +134,7 @@ func TestGetLpaEvents(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				events, err := client.GetEvents(Context{Context: context.Background()}, "189", tc.caseIDs, []string{}, "desc")
+				events, err := client.GetEvents(Context{Context: context.Background()}, "189", tc.caseIDs, []string{}, []string{}, "desc")
 
 				assert.Equal(t, tc.expectedResponse, events)
 				if tc.expectedError == nil {
@@ -201,13 +201,17 @@ func TestGetLpaEventsFiltered(t *testing.T) {
 	testCases := []struct {
 		name             string
 		caseIDs          []string
+		eventIds         []string
+		sourceType       []string
 		setup            func()
 		expectedError    func(int) error
 		expectedResponse LpaEventsResponse
 	}{
 		{
-			name:    "Can filter events by person with source type",
-			caseIDs: []string(nil),
+			name:       "Can filter events by person with source type",
+			caseIDs:    []string(nil),
+			eventIds:   []string(nil),
+			sourceType: []string{"Payment"},
 			setup: func() {
 				pact.
 					AddInteraction().
@@ -227,8 +231,10 @@ func TestGetLpaEventsFiltered(t *testing.T) {
 			expectedResponse: expectedResponse,
 		},
 		{
-			name:    "Can filter events by case with source type",
-			caseIDs: []string{"111111"},
+			name:       "Can filter events by case with source type",
+			caseIDs:    []string{"111111"},
+			eventIds:   []string(nil),
+			sourceType: []string{"Payment"},
 			setup: func() {
 				pact.
 					AddInteraction().
@@ -247,6 +253,52 @@ func TestGetLpaEventsFiltered(t *testing.T) {
 			},
 			expectedResponse: expectedResponse,
 		},
+		{
+			name:       "Can filter events by event ID",
+			caseIDs:    []string(nil),
+			eventIds:   []string{"4056"},
+			sourceType: []string(nil),
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A donor exists with multiple cases and event history").
+					UponReceiving("A request for the events filtered by case IDs").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodGet,
+						Path:   matchers.String("/lpa-api/v1/persons/189/events"),
+						Query: matchers.MapMatcher{
+							"filter": matchers.String("eventId:4056"),
+							"sort":   matchers.String("id:asc"),
+							"limit":  matchers.Like("999"),
+						},
+					}).
+					WithCompleteResponse(pactResponse)
+			},
+			expectedResponse: expectedResponse,
+		},
+		{
+			name:       "Can filter events by event ID with source type",
+			caseIDs:    []string(nil),
+			eventIds:   []string{"4056"},
+			sourceType: []string{"Payment"},
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("A donor exists with multiple cases and event history").
+					UponReceiving("A request for the events filtered by case IDs").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodGet,
+						Path:   matchers.String("/lpa-api/v1/persons/189/events"),
+						Query: matchers.MapMatcher{
+							"filter": matchers.String("sourceType:Payment,eventId:4056"),
+							"sort":   matchers.String("id:asc"),
+							"limit":  matchers.Like("999"),
+						},
+					}).
+					WithCompleteResponse(pactResponse)
+			},
+			expectedResponse: expectedResponse,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -256,7 +308,7 @@ func TestGetLpaEventsFiltered(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				events, err := client.GetEvents(Context{Context: context.Background()}, "189", tc.caseIDs, []string{"Payment"}, "asc")
+				events, err := client.GetEvents(Context{Context: context.Background()}, "189", tc.caseIDs, tc.sourceType, tc.eventIds, "asc")
 
 				assert.Equal(t, tc.expectedResponse, events)
 				if tc.expectedError == nil {

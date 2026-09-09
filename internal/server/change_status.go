@@ -11,6 +11,7 @@ import (
 
 type ChangeStatusClient interface {
 	Case(sirius.Context, int) (sirius.Case, error)
+	CreateNote(sirius.Context, int, sirius.EntityType, string, string, string, *sirius.NoteFile) error
 	EditCase(sirius.Context, int, sirius.CaseType, sirius.Case) error
 	AvailableStatuses(sirius.Context, int, sirius.CaseType) ([]string, error)
 }
@@ -20,13 +21,23 @@ type changeStatusData struct {
 	Entity    string
 	Success   bool
 	Error     sirius.ValidationError
+	IsPartial bool
 
 	AvailableStatuses []string
 	NewStatus         string
+	CaseID            int
+	CaseType          string
+	DonorID           int
+	CaseUids          string
+	Notes             string
 }
 
 func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
+		if err := r.ParseForm(); err != nil {
+			return err
+		}
+
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
@@ -49,11 +60,22 @@ func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		donorID := 0
+		if caseItem.Donor != nil {
+			donorID = caseItem.Donor.ID
+		}
+
 		data := changeStatusData{
 			XSRFToken:         ctx.XSRFToken,
 			Entity:            fmt.Sprintf("%s %s", caseItem.CaseType, caseItem.UID),
 			AvailableStatuses: availableStatuses,
 			NewStatus:         postFormString(r, "status"),
+			CaseID:            caseID,
+			CaseType:          string(caseType),
+			DonorID:           donorID,
+			CaseUids:          buildUIDQueryString(r.Form["uid[]"]),
+			Notes:             postFormString(r, "notes"),
+			IsPartial:         ctx.IsPartial,
 		}
 
 		if r.Method == http.MethodPost {
@@ -61,7 +83,15 @@ func ChangeStatus(client ChangeStatusClient, tmpl template.Template) Handler {
 				Status: shared.ParseCaseStatusType(data.NewStatus),
 			}
 
+			noteEntityType := sirius.EntityTypeLpa
+			if caseType == sirius.CaseTypeEpa {
+				noteEntityType = sirius.EntityTypeEpa
+			}
+
 			err = client.EditCase(ctx, caseID, sirius.CaseType(caseItem.CaseType), caseDetails)
+			if err == nil && data.Notes != "" {
+				err = client.CreateNote(ctx, caseID, noteEntityType, "Status change - Notes", fmt.Sprintf("Status changed to %s", data.NewStatus), data.Notes, nil)
+			}
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)

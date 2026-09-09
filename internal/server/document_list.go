@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -11,94 +12,84 @@ import (
 )
 
 type DocumentListClient interface {
-	CasesByDonor(ctx sirius.Context, id int) ([]sirius.Case, error)
-	GetPersonDocuments(ctx sirius.Context, personID int, caseIDs []string) (sirius.DocumentList, error)
 	DownloadMultiple(ctx sirius.Context, docIDs []string) (*http.Response, error)
+	PageVarsClient
 }
 
 type documentPageData struct {
-	XSRFToken             string
-	Entity                string
-	Success               bool
-	SuccessMessage        string
-	Error                 sirius.ValidationError
-	DocumentList          sirius.DocumentList
-	Document              sirius.Document
-	SelectedCases         []sirius.Case
-	MultipleCasesSelected bool
-	Comparing             bool
+	ActionPanelButtons             []ActionPanelButton
+	CaseUids                       string
+	CloseURL                       string
+	Comparing                      bool
+	CompareURLs                    map[string]string
+	Document                       sirius.Document
+	DocumentList                   sirius.DocumentList
+	DonorID                        int
+	Entity                         string
+	Error                          sirius.ValidationError
+	HasV1PersonsCasesGetPermission bool
+	HasV1PersonsGetPermission      bool
+	HeaderButtons                  SiriusHeaderButtons
+	MultipleCasesSelected          bool
+	Person                         sirius.Person
+	SelectedCaseIds                string
+	SelectedCases                  []sirius.Case
+	Success                        bool
+	SuccessMessage                 string
+	XSRFToken                      string
 }
 
 func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
+		ctx := getContext(r)
 		if err := r.ParseForm(); err != nil {
 			return err
 		}
 
-		donorID, err := strconv.Atoi(r.PathValue("id"))
-		if err != nil {
-			return err
-		}
-
-		caseUIDs := r.Form["uid[]"]
-
-		ctx := getContext(r)
-
-		casesOnDonor, err := client.CasesByDonor(ctx, donorID)
-		if err != nil {
-			return err
-		}
-
-		var selected []sirius.Case
-		var caseIDs []string
-
-		if len(caseUIDs) > 0 {
-			casesByUID := make(map[string]sirius.Case, len(casesOnDonor))
-			for _, c := range casesOnDonor {
-				casesByUID[c.UID] = c
-			}
-
-			for _, uid := range caseUIDs {
-				if c, ok := casesByUID[uid]; ok {
-					selected = append(selected, c)
-					caseIDs = append(caseIDs, strconv.Itoa(c.ID))
-				}
-			}
-		} else {
-			selected = casesOnDonor
-		}
-
 		selectedDocUUIDs := r.Form["document"]
-
+		var validationErr sirius.ValidationError
 		if r.Method == http.MethodPost && len(selectedDocUUIDs) > 0 && r.FormValue("actionDownload") == "true" {
 			downloadResp, err := client.DownloadMultiple(ctx, selectedDocUUIDs)
 			if err != nil {
-				return err
-			}
-			defer downloadResp.Body.Close() //nolint:errcheck // no need to check error when closing body
-
-			for key, values := range downloadResp.Header {
-				for _, value := range values {
-					w.Header().Add(key, value)
+				if err.Error() == "400" {
+					validationErr.Detail = "One or more of the following documents could not be downloaded due to being infected."
+				} else {
+					return err
 				}
-			}
+			} else {
+				defer downloadResp.Body.Close() //nolint:errcheck // no need to check error when closing body
 
-			w.WriteHeader(downloadResp.StatusCode)
-			if _, err := io.Copy(w, downloadResp.Body); err != nil {
-				return err
-			}
+				for key, values := range downloadResp.Header {
+					for _, value := range values {
+						w.Header().Add(key, value)
+					}
+				}
 
-			return nil
+				w.WriteHeader(downloadResp.StatusCode)
+				if _, err := io.Copy(w, downloadResp.Body); err != nil {
+					return err
+				}
+
+				return nil
+			}
 		}
 
-		docs, err := client.GetPersonDocuments(ctx, donorID, caseIDs)
+		compareView := r.FormValue("comparing") == "true"
+		if r.Method == http.MethodPost && len(selectedDocUUIDs) == 0 && r.FormValue("actionDownload") == "true" {
+			if compareView {
+				w.WriteHeader(http.StatusNoContent)
+				return nil
+			}
+			validationErr.Detail = "Select one or more documents and try again."
+		}
+
+		pageVars, err := GetPageValues(client, r)
 		if err != nil {
 			return err
 		}
 
-		var validationErr sirius.ValidationError
-		if r.Method == http.MethodPost && len(selectedDocUUIDs) == 0 && r.FormValue("actionDownload") == "true" {
-			validationErr.Detail = "Select one or more documents and try again."
+		if pageVars.DonorID == 0 {
+			return errors.New("donor not found")
 		}
 
 		successMessage := ""
@@ -109,15 +100,40 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 		}
 
 		data := documentPageData{
-			XSRFToken:             ctx.XSRFToken,
-			SelectedCases:         selected,
-			DocumentList:          docs,
-			MultipleCasesSelected: len(caseUIDs) > 1 || (len(caseUIDs) == 0 && len(casesOnDonor) > 1),
-			Error:                 validationErr,
-			Success:               isSuccess,
-			SuccessMessage:        successMessage,
-			Comparing:             false,
+			Comparing:                      compareView,
+			DocumentList:                   pageVars.DocumentList,
+			DonorID:                        pageVars.DonorID,
+			Error:                          validationErr,
+			HasV1PersonsCasesGetPermission: pageVars.HasV1PersonsCasesGetPermission,
+			HasV1PersonsGetPermission:      pageVars.HasV1PersonsGetPermission,
+			MultipleCasesSelected:          len(pageVars.CaseUidsCollection) > 1 || (len(pageVars.CaseUidsCollection) == 0 && len(pageVars.CasesOnDonor) > 1),
+			Person:                         pageVars.Person,
+			SelectedCases:                  pageVars.SelectedCases,
+			Success:                        isSuccess,
+			SuccessMessage:                 successMessage,
+			XSRFToken:                      ctx.XSRFToken,
 		}
+
+		uidParams := buildUIDQueryString(pageVars.CaseUidsCollection)
+
+		data.CaseUids = uidParams
+
+		for index, selectedCase := range data.SelectedCases {
+			if index != 0 {
+				data.SelectedCaseIds += "+"
+			}
+			data.SelectedCaseIds += strconv.Itoa(selectedCase.ID)
+		}
+
+		data.ActionPanelButtons = GetActionPanelButtons(data.SelectedCases, data.DonorID, uidParams, pageVars.DraftCount > 0, pageVars.PersonReferences, len(pageVars.Person.Children) > 0, pageVars.TaskIDs, pageVars.UserPermissions)
+
+		data.HeaderButtons = SiriusHeaderButtons{
+			BackToTimeline: true,
+			Calendar:       true,
+		}
+
+		data.HasV1PersonsGetPermission = pageVars.HasV1PersonsGetPermission
+		data.HasV1PersonsCasesGetPermission = pageVars.HasV1PersonsCasesGetPermission
 
 		return tmpl(w, data)
 	}
@@ -130,4 +146,12 @@ func successMessageFormatter(docFriendlyName string, docCreatedTime, layout stri
 	}
 
 	return t.Format(format) + " " + docFriendlyName
+}
+
+func buildUIDQueryString(uids []string) string {
+	var result string
+	for _, uid := range uids {
+		result += "&uid[]=" + uid
+	}
+	return result
 }

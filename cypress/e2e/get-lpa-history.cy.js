@@ -12,7 +12,7 @@ describe("View LPA history timeline", () => {
           caseIds: [
             {
               id: 105,
-              total: 3, //events on caseId
+              total: 4, //events on caseId
             },
             {
               total: 0, //events on person
@@ -31,13 +31,17 @@ describe("View LPA history timeline", () => {
               sourceType: "Warning",
               total: 1,
             },
+            {
+              sourceType: "Payment",
+              total: 1,
+            },
           ],
         },
         pages: {
           current: 1,
           total: 1,
         },
-        total: 3,
+        total: 4,
         events: [
           {
             id: 144,
@@ -440,7 +444,6 @@ describe("View LPA history timeline", () => {
         expect($items.eq(0)).to.contain.text("Warning");
         expect($items.eq(1)).to.contain.text("Task");
         expect($items.eq(2)).to.contain.text("LPA (Create / Edit)");
-
         cy.wrap($items.eq(1)).find(".moj-alert--warning").should("not.exist");
         cy.wrap($items.eq(0)).find(".moj-alert--warning").should("exist");
       });
@@ -471,17 +474,17 @@ describe("View LPA history timeline", () => {
       .then(($items) => {
         cy.wrap($items.eq(0))
           .should("contain.text", "EPA 7000-7000-7000")
-          .find(".colour-govuk-brown")
+          .find(".colour-sirius-brown")
           .should("exist");
 
         cy.wrap($items.eq(1))
           .should("contain.text", "PFA 7000-9000-7000")
-          .find(".colour-govuk-turquoise")
+          .find(".colour-sirius-teal")
           .should("exist");
 
         cy.wrap($items.eq(2))
           .should("contain.text", "HW 7000-9000-6000")
-          .find(".colour-govuk-grass-green")
+          .find(".colour-sirius-green")
           .should("exist");
 
         cy.wrap($items.eq(3))
@@ -491,13 +494,368 @@ describe("View LPA history timeline", () => {
       });
   });
 
+  it("can view phone number event content", () => {
+    cy.addMock("/lpa-api/v1/persons/2/events?&sort=id:desc&limit=999", "GET", {
+      status: 200,
+      body: {
+        limit: 999,
+        metadata: {
+          caseIds: [
+            {
+              id: 900,
+              total: 1,
+            },
+            {
+              total: 1,
+            },
+          ],
+          sourceTypes: [
+            {
+              sourceType: "PhoneNumber",
+              total: 2,
+            },
+          ],
+        },
+        pages: {
+          current: 1,
+          total: 1,
+        },
+        total: 2,
+        events: [
+          {
+            id: 170,
+            owningCase: {
+              id: 900,
+              uId: "7000-0000-0009",
+              caseSubtype: "pfa",
+              caseType: "LPA",
+            },
+            user: {
+              id: 5,
+              phoneNumber: "030030000300",
+              teams: [],
+              displayName: "OPG User",
+              deleted: false,
+              email: "opg@test.gov.uk",
+            },
+            sourceType: "PhoneNumber",
+            sourcePhoneNumber: {
+              phoneNumber: "12345 678910",
+              type: "Work",
+            },
+            type: "UPD",
+            changeSet: {
+              phoneNumber: ["12345", "12345 678910"],
+            },
+            createdOn: "2026-03-06T14:39:20+00:00",
+            hash: "ABC",
+          },
+          {
+            id: 499,
+            owningCase: {
+              id: 900,
+              uId: "7000-0000-0009",
+              caseSubtype: "pfa",
+              caseType: "LPA",
+            },
+            user: {
+              id: 5,
+              phoneNumber: "030030000300",
+              teams: [],
+              displayName: "OPG User",
+              deleted: false,
+              email: "opg@test.gov.uk",
+            },
+            sourceType: "PhoneNumber",
+            sourcePhoneNumber: {
+              phoneNumber: "12345",
+              type: "Work",
+            },
+            type: "INS",
+            changeSet: [],
+            createdOn: "2026-01-22T10:30:01+00:00",
+            hash: "AB",
+          },
+        ],
+      },
+    });
+
+    cy.visit("/donor/2/history");
+
+    cy.get(".moj-timeline__item")
+      .should("have.length", 2)
+      .then(($items) => {
+        const normalise = (el) =>
+          Cypress.$(el).text().replaceAll(/\s+/g, " ").trim();
+        expect(normalise($items[0])).to.include(
+          "Phone number changed from 12345 to 12345 678910",
+        );
+        expect(normalise($items[1])).to.include(
+          "Phone number changed to 12345",
+        );
+      });
+  });
+
+  it("can view donor event content", () => {
+    cy.addMock("/lpa-api/v1/persons/2/events?&sort=id:desc&limit=999", "GET", {
+      status: 200,
+      body: {
+        limit: 999,
+        metadata: {
+          caseIds: [
+            {
+              total: 2,
+            },
+          ],
+          sourceTypes: [
+            {
+              sourceType: "Donor",
+              total: 2,
+            },
+          ],
+        },
+        pages: {
+          current: 1,
+          total: 1,
+        },
+        total: 2,
+        events: [
+          {
+            id: 176,
+            user: {
+              id: 5,
+              phoneNumber: "030030000300",
+              teams: [],
+              displayName: "OPG User",
+              deleted: false,
+              email: "opg@test.gov.uk",
+            },
+            sourceType: "Donor",
+            sourcePerson: {
+              id: 17,
+              uId: "7000-0000-0009",
+              firstname: "Test",
+              surname: "Case",
+            },
+            type: "UPD",
+            changeSet: {
+              firstname: ["Testing", "Test"],
+              surname: ["Casing", "Case"],
+              email: ["test@test.com", "test@testcase.com"],
+              salutation: ["Mr", "Mrs"],
+              correspondenceByEmail: [false, true],
+              dob: {
+                1: {
+                  date: "1999-05-09 00:00:00.000000",
+                  timezone_type: 3,
+                  timezone: "UTC",
+                },
+              },
+            },
+            createdOn: "2026-01-31T14:39:20+00:00",
+            hash: "AAA",
+          },
+          {
+            id: 175,
+            user: {
+              id: 5,
+              phoneNumber: "030030000300",
+              teams: [],
+              displayName: "OPG User",
+              deleted: false,
+              email: "opg@test.gov.uk",
+            },
+            sourceType: "Donor",
+            sourcePerson: {
+              id: 17,
+              uId: "7000-0000-0009",
+              firstname: "Test",
+              surname: "Case",
+            },
+            type: "INS",
+            changeSet: [],
+            entity: {
+              _class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+              email: "test@test.com",
+              firstname: "Testing",
+              id: 17,
+              salutation: "Mr",
+              surname: "Casing",
+              uId: 700000000009,
+            },
+            createdOn: "2026-01-22T10:30:01+00:00",
+            hash: "AZ",
+          },
+        ],
+      },
+    });
+
+    cy.visit("/donor/2/history");
+
+    cy.get(".moj-timeline__item")
+      .first()
+      .within(() => {
+        cy.contains("Salutation: Mr changed to: Mrs");
+        cy.contains("First name: Testing changed to: Test");
+        cy.contains("Surname: Casing changed to: Case");
+        cy.contains("Date of birth: 09/05/1999");
+        cy.contains("Email: test@test.com changed to: test@testcase.com");
+        cy.contains("Correspondence by email: false changed to: true");
+      });
+
+    cy.get(".moj-timeline__item")
+      .last()
+      .within(() => {
+        cy.contains("Testing Casing");
+      });
+  });
+
+  it("can view address event content", () => {
+    cy.addMock("/lpa-api/v1/persons/2/events?&sort=id:desc&limit=999", "GET", {
+      status: 200,
+      body: {
+        limit: 999,
+        metadata: {
+          caseIds: [
+            {
+              total: 2,
+            },
+          ],
+          sourceTypes: [
+            {
+              sourceType: "Address",
+              total: 2,
+            },
+          ],
+        },
+        pages: {
+          current: 1,
+          total: 1,
+        },
+        total: 2,
+        events: [
+          {
+            id: 176,
+            owningCase: {
+              id: 908,
+              uid: "7000-0000-0008",
+              caseSubtype: "pfa",
+              caseType: "LPA",
+            },
+            user: {
+              id: 5,
+              phoneNumber: "030030000300",
+              teams: [],
+              displayName: "OPG User",
+              deleted: false,
+              email: "opg@test.gov.uk",
+            },
+            sourceType: "Address",
+            type: "UPD",
+            changeSet: {
+              addressLines: [
+                ["Street", "", ""],
+                ["8 Street", "Road", ""],
+              ],
+              town: ["Town", "Birmingham"],
+              county: ["", "Midlands"],
+              postcode: ["B1 1TF", "BT1 2TF"],
+            },
+            entity: {
+              _class: String.raw`Opg\Core\Model\Entity\Address\Address`,
+              addressLine1: "8 Street",
+              addressLine2: "Road",
+              addressLine3: "",
+              country: "United Kingdom",
+              county: "Midlands",
+              displayName: "Company Name",
+              id: 574,
+              isAirmailRequired: false,
+              postcode: "BT1 2TF",
+              town: "Birmingham",
+            },
+            createdOn: "2026-01-31T14:39:20+00:00",
+            hash: "AAA",
+          },
+          {
+            id: 175,
+            owningCase: {
+              id: 908,
+              uid: "7000-0000-0008",
+              caseSubtype: "pfa",
+              caseType: "LPA",
+            },
+            user: {
+              id: 5,
+              phoneNumber: "030030000300",
+              teams: [],
+              displayName: "OPG User",
+              deleted: false,
+              email: "opg@test.gov.uk",
+            },
+            sourceType: "Address",
+            sourceAddress: {
+              id: 17,
+              town: "Town",
+              county: "",
+              postcode: "B1 1TF",
+              country: "",
+              isAirmailRequired: false,
+              type: "Primary",
+              addressLines: ["Street"],
+              firstname: "Test",
+              surname: "Case",
+            },
+            type: "INS",
+            changeSet: [],
+            entity: {
+              _class: String.raw`Opg\Core\Model\Entity\Address\Address`,
+              addressLine1: "Street",
+              addressLine2: "",
+              addressLine3: "",
+              country: "United Kingdom",
+              county: "",
+              displayName: "Actor Name",
+              id: 574,
+              isAirmailRequired: false,
+              postcode: "B1 1TF",
+              town: "Town",
+            },
+            createdOn: "2026-01-22T10:30:01+00:00",
+            hash: "AZ",
+          },
+        ],
+      },
+    });
+
+    cy.visit("/donor/2/history");
+
+    cy.get(".moj-timeline__item")
+      .first()
+      .within(() => {
+        cy.contains("Company Name");
+        cy.contains("Street changed to: 8 Street, Road");
+        cy.contains("Town: Town changed to: Birmingham");
+        cy.contains("County: changed to: Midlands");
+        cy.contains("Postcode: B1 1TF changed to: BT1 2TF");
+      });
+
+    cy.get(".moj-timeline__item")
+      .last()
+      .within(() => {
+        cy.contains("Actor Name");
+        cy.contains("Street, Town, B1 1TF, United Kingdom");
+      });
+  });
+
   it("can filter", () => {
     cy.visit("/donor/1/history?id[]=105&id[]=106&id[]=107");
 
+    cy.contains("Apply filters").should("not.be.visible");
+
     cy.contains("(showing all 4 items)");
-    cy.contains("Ascending").click();
+    cy.contains("Oldest first").click();
     cy.contains("Warning (2)").click();
-    cy.contains("Apply filters").click();
 
     cy.contains("(showing 2 of 4 items)");
     cy.get(".moj-timeline__item")
@@ -513,8 +871,28 @@ describe("View LPA history timeline", () => {
 
         cy.wrap($items.eq(1))
           .should("contain.text", "EPA 7000-7000-7000")
-          .find(".colour-govuk-brown")
+          .find(".colour-sirius-brown")
           .should("exist");
       });
+  });
+
+  describe("Filter panel visibility", () => {
+    it("shows the filter panel by default", () => {
+      cy.get(".moj-filter-layout__filter").should("be.visible");
+      cy.get("div[data-filter-summary]").should("not.be.visible");
+    });
+
+    it("hides the filter panel when Hide filters is clicked", () => {
+      cy.contains(".govuk-button", "Hide filters").click();
+      cy.get(".moj-filter-layout__filter").should("not.be.visible");
+      cy.get("div[data-filter-summary]").should("be.visible");
+    });
+
+    it("shows the filter panel again when Show filters is clicked", () => {
+      cy.contains(".govuk-button", "Hide filters").click();
+      cy.contains(".govuk-button", "Show filters").click();
+      cy.get(".moj-filter-layout__filter").should("be.visible");
+      cy.get("div[data-filter-summary]").should("not.be.visible");
+    });
   });
 });

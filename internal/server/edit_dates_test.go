@@ -26,9 +26,19 @@ func (m *mockEditDatesClient) EditDates(ctx sirius.Context, caseID int, caseType
 }
 
 func TestGetEditDates(t *testing.T) {
-	for _, caseType := range []string{"lpa", "epa"} {
+	for _, caseType := range []string{"lpa", "epa", "htmx"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseItem := sirius.Case{CaseType: caseType, UID: "700700", CancellationDate: sirius.DateString("2021-01-01")}
+			var htmx = false
+			if caseType == "htmx" {
+				caseType = "lpa"
+				htmx = true
+			}
+			caseItem := sirius.Case{
+				Donor:            &sirius.Person{ID: 1},
+				CaseType:         caseType,
+				UID:              "700700",
+				CancellationDate: sirius.DateString("2021-01-01"),
+			}
 
 			client := &mockEditDatesClient{}
 			client.
@@ -38,13 +48,22 @@ func TestGetEditDates(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, editDatesData{
-					Entity: caseType + " 700700",
-					Dates:  sirius.Dates{CancellationDate: sirius.DateString("2021-01-01")},
+					Entity:    caseType + " 700700",
+					Dates:     sirius.Dates{CancellationDate: sirius.DateString("2021-01-01")},
+					DonorId:   1,
+					CaseType:  caseType,
+					CaseUid:   "700700",
+					CaseId:    123,
+					IsPartial: htmx,
 				}).
 				Return(nil)
 
 			r, _ := http.NewRequest(http.MethodGet, "/?id=123&case="+caseType, nil)
 			w := httptest.NewRecorder()
+
+			if htmx {
+				r.Header.Add("HX-Request", "true")
+			}
 
 			err := EditDates(client, template.Func)(w, r)
 			resp := w.Result()
@@ -93,7 +112,11 @@ func TestGetEditDatesWhenCaseErrors(t *testing.T) {
 }
 
 func TestGetEditDatesWhenTemplateErrors(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "PFA", UID: "700700"}
+	caseItem := sirius.Case{
+		Donor:    &sirius.Person{ID: 1},
+		CaseType: "PFA",
+		UID:      "700700",
+	}
 
 	client := &mockEditDatesClient{}
 	client.
@@ -103,7 +126,11 @@ func TestGetEditDatesWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, editDatesData{
-			Entity: "PFA 700700",
+			Entity:   "PFA 700700",
+			DonorId:  1,
+			CaseType: "PFA",
+			CaseUid:  "700700",
+			CaseId:   123,
 		}).
 		Return(errExample)
 
@@ -119,7 +146,12 @@ func TestGetEditDatesWhenTemplateErrors(t *testing.T) {
 func TestPostEditDates(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseItem := sirius.Case{CaseType: caseType, UID: "700700", CancellationDate: sirius.DateString("2021-01-01")}
+			caseItem := sirius.Case{
+				Donor:            &sirius.Person{ID: 1},
+				CaseType:         caseType,
+				UID:              "700700",
+				CancellationDate: sirius.DateString("2021-01-01"),
+			}
 
 			client := &mockEditDatesClient{}
 			client.
@@ -144,9 +176,13 @@ func TestPostEditDates(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, editDatesData{
-					Success: true,
-					Entity:  caseType + " 700700",
-					Dates:   sirius.Dates{CancellationDate: sirius.DateString("2021-01-01")},
+					Success:  true,
+					Entity:   caseType + " 700700",
+					Dates:    sirius.Dates{CancellationDate: sirius.DateString("2021-01-01")},
+					DonorId:  1,
+					CaseType: caseType,
+					CaseUid:  "700700",
+					CaseId:   123,
 				}).
 				Return(nil)
 
@@ -201,7 +237,12 @@ func TestPostEditDatesWhenEditDatesErrors(t *testing.T) {
 }
 
 func TestPostEditDatesWhenValidationError(t *testing.T) {
-	caseItem := sirius.Case{CaseType: "LPA", UID: "700700", CancellationDate: sirius.DateString("2021-01-01")}
+	caseItem := sirius.Case{
+		Donor:            &sirius.Person{ID: 1},
+		CaseType:         "LPA",
+		UID:              "700700",
+		CancellationDate: sirius.DateString("2021-01-01"),
+	}
 
 	expectedError := sirius.ValidationError{
 		Field: sirius.FieldErrors{
@@ -222,9 +263,13 @@ func TestPostEditDatesWhenValidationError(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, editDatesData{
-			Entity: "LPA 700700",
-			Dates:  sirius.Dates{RegistrationDate: "2022-01-03"},
-			Error:  expectedError,
+			Entity:   "LPA 700700",
+			Dates:    sirius.Dates{RegistrationDate: "2022-01-03"},
+			Error:    expectedError,
+			DonorId:  1,
+			CaseType: "LPA",
+			CaseUid:  "700700",
+			CaseId:   123,
 		}).
 		Return(nil)
 

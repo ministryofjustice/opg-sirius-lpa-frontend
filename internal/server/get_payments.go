@@ -35,6 +35,8 @@ type getPaymentsData struct {
 	OutstandingFee    int
 	RefundAmount      int
 	FlashMessage      FlashNotification
+	InActionPanel     bool
+	IsPartial         bool
 }
 
 func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
@@ -44,6 +46,7 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		data := getPaymentsData{
 			XSRFToken:   ctx.XSRFToken,
 			CaseSummary: sirius.CaseSummary{},
+			IsPartial:   ctx.IsPartial,
 		}
 
 		var caseID int
@@ -138,6 +141,11 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 		}
 
 		data.FlashMessage, _ = GetFlash(w, r)
+
+		if ctx.IsPartial {
+			data.InActionPanel = true
+			return tmpl(w, data)
+		}
 
 		return tmpl(w, data)
 	}

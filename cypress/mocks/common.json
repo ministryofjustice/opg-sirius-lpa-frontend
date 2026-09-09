@@ -38,7 +38,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "[{\"handle\":\"REMISSION\",\"label\":\"Remission\"}]"
+        "body": "[{\"handle\":\"REMISSION\",\"label\":\"Remission\"}, {\"handle\":\"EXEMPTION\",\"label\":\"Exemption\"}]"
       }
     },
     {
@@ -71,7 +71,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "[{\"handle\":\"PHONE\",\"label\":\"Phone call\"}]"
+        "body": "[{\"handle\":\"PHONE\",\"label\":\"Phone call\"}, {\"handle\":\"CONTACT_CENTRE\",\"label\":\"Contact centre\"}]"
       }
     },
     {
@@ -93,7 +93,7 @@
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" },
-        "body": "[{\"handle\":\"02\",\"label\":\"OPG Decisions\",\"subcategories\":[{\"handle\":\"18\",\"label\":\"Fee Decision\"}]}]"
+        "body": "[{\"handle\":\"01\",\"label\":\"Correspondence\",\"subcategories\":[{\"handle\":\"06\",\"label\":\"General Query\"}]}, {\"handle\":\"02\",\"label\":\"OPG Decisions\",\"subcategories\":[{\"handle\":\"18\",\"label\":\"Fee Decision\"}]}]"
       }
     },
     {
@@ -105,17 +105,6 @@
         "status": 200,
         "headers": { "Content-Type": "application/json" },
         "body": "[{\"handle\":\"GB\",\"label\":\"Great Britain\"}]"
-      }
-    },
-    {
-      "request": {
-        "method": "GET",
-        "url": "/lpa-api/v1/lpas/800/documents?type[-][]=Draft&type[-][]=Preview"
-      },
-      "response": {
-        "status": 200,
-        "headers": { "Content-Type": "application/json" },
-        "body": "[{\"id\":1,\"uuid\":\"7327f57d-e3d5-4300-95a8-67b3337c7231\",\"friendlyDescription\": \"Mr Test Person - Blank Template\",\"direction\": \"Outgoing\",\"createdDate\": \"24/08/2023 15:27:16\",\"systemType\": \"EP-BB\",\"correspondent\": {\"uId\": \"7000-0000-0013\",\"firstname\": \"Test\",\"surname\": \"Person\",\"personType\": \"Donor\"}},{\"id\":2,\"uuid\":\"40fa2847-27ae-4976-a93a-9f45ec0a4e98\",\"friendlyDescription\": \"Mr John Doe - Donor deceased: Case Withdrawn\",\"direction\": \"Outgoing\",\"createdDate\": \"15/05/2023 11:09:28\",\"systemType\": \"DD-4\",\"correspondent\": {\"uId\": \"7000-0000-0013\",\"firstname\": \"John\",\"surname\": \"Doe\",\"personType\": \"Correspondent\"}}]"
       }
     },
     {
@@ -140,6 +129,17 @@
           "Content-Type": "application/json"
         },
         "body": "[{\"handle\":\"LPA_DOES_NOT_WORK\",\"label\":\"The LPA does not work and cannot be changed\", \"parentSources\":[\"cannot-register\"]}]"
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "url": "/lpa-api/v1/reference-data/relationshipToDonor"
+      },
+      "response": {
+        "status": 200,
+        "headers": { "Content-Type": "application/json" },
+        "body": "[{\"handle\":\"NO RELATION\",\"label\":\"No relation\"}, {\"handle\":\"OTHER RELATION\",\"label\":\"Other relation\"}]"
       }
     }
   ]

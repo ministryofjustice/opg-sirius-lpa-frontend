@@ -29,6 +29,7 @@ type Document struct {
 	CaseItems           []Case                   `json:"caseItems,omitempty"`
 	NotifyStatus        string                   `json:"notifyStatus,omitempty"`
 	Persons             []Person                 `json:"persons,omitempty"`
+	IsInfected          bool                     `json:"infected"`
 }
 
 type DocumentList struct {
@@ -42,6 +43,10 @@ type DocumentList struct {
 type Pages struct {
 	Current int `json:"current,omitempty"`
 	Total   int `json:"total,omitempty"`
+}
+
+type DocumentDraftCount struct {
+	DraftCount int `json:"draftCount"`
 }
 
 func (d *Document) IsViewable() bool {
@@ -129,6 +134,10 @@ func (c *Client) DownloadMultiple(ctx Context, docIDs []string) (*http.Response,
 		return nil, err
 	}
 
+	if resp.StatusCode == http.StatusBadRequest {
+		return nil, errors.New("400")
+	}
+
 	if resp.StatusCode != http.StatusOK {
 		statusErr := newStatusError(resp)
 		if errClose := resp.Body.Close(); errClose != nil {
@@ -138,4 +147,12 @@ func (c *Client) DownloadMultiple(ctx Context, docIDs []string) (*http.Response,
 	}
 
 	return resp, nil
+}
+
+func (c *Client) GetDraftCount(ctx Context, caseType string, caseId int) (DocumentDraftCount, error) {
+	var count DocumentDraftCount
+
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/%s/%d/draft-count", caseType+"s", caseId), &count)
+
+	return count, err
 }

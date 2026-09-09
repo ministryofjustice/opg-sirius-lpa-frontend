@@ -3,30 +3,40 @@
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
-    "build": "npm run build:js && npm run build:css && npm run build:assets && npm run build:hugerte",
-    "build:js": "esbuild --bundle web/assets/load-classes.js web/assets/main.js --minify --outdir=web/static/javascript --sourcemap --resolve-extensions=.mjs,.js",
+    "build": "npm run build:js && npm run build:css && npm run build:assets && npm run build:hugerte && npm run build:svg && npm run build:pdfjs",
+    "build:js": "esbuild --bundle web/assets/load-classes.js web/assets/main.js --minify --outdir=web/static/javascript --sourcemap --resolve-extensions=.mjs,.js --format=esm",
     "build:css": "sass --load-path . --style compressed web/assets/main.scss web/static/stylesheets/all.css",
     "build:assets": "mkdir -p web/static/assets/images web/static/assets/fonts && cp node_modules/govuk-frontend/dist/govuk/assets/images/* node_modules/@ministryofjustice/frontend/moj/assets/images/* web/static/assets/images && cp node_modules/govuk-frontend/dist/govuk/assets/fonts/* web/static/assets/fonts",
     "build:hugerte": "cp -r node_modules/hugerte/skins web/static/javascript",
+    "build:svg": "cp web/assets/icons/icons-sprite.svg web/static/assets/images/icons-sprite.svg",
+    "build:pdfjs": "cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs web/static/javascript/",
     "clean": "rm -rf web/static",
     "cypress": "cypress open",
     "lint": "prettier --check .",
     "prettier": "prettier --write .",
+    "jsTest": "jest",
     "watch": "npm run build:js --watch=forever & npm run build:css --watch"
   },
   "dependencies": {
-    "@ministryofjustice/frontend": "^8.0.0",
+    "@ministryofjustice/frontend": "^9.0.0",
     "accessible-autocomplete": "^3.0.0",
-    "cypress": "15.9.0",
-    "govuk-frontend": "^5.0.0",
+    "cypress": "15.21.0",
+    "govuk-frontend": "^6.1.0",
+    "htmx.org": "^2.0.10",
     "hugerte": "https://github.com/ministryofjustice/opg-hugerte-dist#semver:v1.0.9",
-    "opg-sirius-search-ui": "https://github.com/ministryofjustice/opg-sirius-search-ui#v1.78.28",
+    "opg-sirius-search-ui": "https://github.com/ministryofjustice/opg-sirius-search-ui#v1.79.24",
+    "pdfjs-dist": "^6.0.0",
     "punycode": "^2.3.1"
   },
   "devDependencies": {
-    "esbuild": "^0.27.0",
+    "@babel/plugin-transform-runtime": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "esbuild": "^0.28.0",
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1",
     "prettier": "^3.0.0",
-    "sass": "^1.26.11"
+    "sass": "^1.26.11",
+    "regenerator-runtime": "^0.14.1"
   },
   "resolutions": {
     "colors": "1.4.0"

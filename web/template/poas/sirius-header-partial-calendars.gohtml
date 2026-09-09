@@ -1,0 +1,11 @@
+{{ define "page" }}
+<div class="sirius-header__dropdown">
+    <div class="panel-calendar">
+        {{ range .Months }}
+            {{ template "calendarMonth" . }}
+        {{ end }}
+
+        {{ template "workingDaysCalculator" .Calculator }}
+    </div>
+</div>
+{{ end }}
