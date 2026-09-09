@@ -312,7 +312,7 @@ func errorHandler(tmplError template.Template, prefix, siriusURL string) func(ne
 					urlString := prefix + redirect.To()
 
 					if r.Header.Get("HX-Request") == "true" {
-						u, parseErr := url.Parse(prefix + redirect.To())
+						u, parseErr := url.Parse(urlString)
 						if parseErr == nil && u.Fragment != "" {
 							q := u.Query()
 							q.Set("scrollTo", u.Fragment)
