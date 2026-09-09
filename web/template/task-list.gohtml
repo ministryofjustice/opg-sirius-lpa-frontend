@@ -1,0 +1,65 @@
+{{ template "task-list" . }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Task List{{ end }}
+
+{{ define "main" }}
+  <div data-id="task-list-container">
+    <div class="govuk-grid-row" data-id="task-list">
+      <div>
+        <table class="govuk-table" data-role="tasks-table">
+          <thead class="govuk-table__head app-table-head--no-vertical-padding" data-role="tasks-table-header">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">
+                <svg class="app-svg-icon--inline govuk-!-display-inline" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 -2 19 19" overflow="visible">
+                  <circle cx="9.5" cy="9.5" r="9.5" fill="#1D70B8"/>
+                  <path d="m6 10 2 2 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Tasks
+              </th>
+              <th scope="col" class="govuk-table__header">Due date</th>
+              <th scope="col" class="govuk-table__header">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {{ if not .CasesTasks }}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell app-!-table-row__no-border" colspan="3">
+                  <p class="govuk-body-s govuk-!-margin-bottom-0">There are no live tasks</p>
+                </td>
+              </tr>
+            {{ end }}
+
+            {{ range .CasesTasks }}
+              <tr class="govuk-table__row" data-role="tasks-table-task-row">
+                <td class="govuk-table__cell govuk-!-width-one-half">
+                  <p class="govuk-body-s govuk-!-margin-bottom-0">{{ .Name }}</p>
+                  <p class="govuk-body-s govuk-!-margin-bottom-0">{{ .Description }}</p>
+                  <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>Status:</strong> {{ .Status }}</p>
+                  {{ if .Assignee }}
+                    <p class="govuk-body-s govuk-!-margin-bottom-0 app-colour-text-lighter">
+                      Assigned to {{ .Assignee.DisplayName }}
+                    </p>
+                  {{ end }}
+                </td>
+                <td class="govuk-table__cell govuk-!-width-one-quarter">
+                  <p class="govuk-body-s govuk-!-margin-bottom-0">
+                    {{ .DueDate }}
+                  </p>
+                </td>
+                <td class="govuk-table__cell govuk-!-width-one-quarter">
+                  <a class="govuk-body-s govuk-!-margin-bottom-0 govuk-link" href="{{ prefix (printf "/clear-task?id=%d" .ID) }}">
+                    Clear task
+                  </a>
+                  <br/>
+                  <a class="govuk-body-s govuk-link" href="{{ prefix (printf "/assign-task?id=%d" .ID) }}">
+                    Reassign task
+                  </a>
+                </td>
+              </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{{ end }}
