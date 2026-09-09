@@ -24,7 +24,6 @@ export default function showHideCaseSummary(prefix) {
             "govuk-accordion-nav__chevron--down",
           );
           caseSummary.hidden = true;
-          caseSummary.ariaExpanded = "false";
         } else {
           buttonText.innerText = "Hide";
           buttonIcon.classList.replace(
@@ -32,7 +31,6 @@ export default function showHideCaseSummary(prefix) {
             "govuk-accordion-nav__chevron--up",
           );
           caseSummary.hidden = false;
-          caseSummary.ariaExpanded = "true";
         }
       });
     }

@@ -35,7 +35,8 @@ func TestGetRelationship(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, relationshipData{
-			Entity: "John Doe",
+			Entity:  "John Doe",
+			DonorID: 123,
 		}).
 		Return(nil)
 
@@ -70,6 +71,34 @@ func TestGetRelationshipNoID(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+func TestGetCreateRelationshipWithHXRequest(t *testing.T) {
+	client := &mockRelationshipClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, relationshipData{
+			Entity:     "John Doe",
+			DonorID:    123,
+			EntityType: "person",
+			IsPartial:  true,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=person", nil)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := Relationship(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestGetRelationshipWhenPersonErrors(t *testing.T) {
 	client := &mockRelationshipClient{}
 	client.
@@ -100,7 +129,8 @@ func TestGetRelationshipWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, relationshipData{
-			Entity: "John Doe",
+			Entity:  "John Doe",
+			DonorID: 123,
 		}).
 		Return(errExample)
 
@@ -126,6 +156,7 @@ func TestPostRelationship(t *testing.T) {
 		On("Func", mock.Anything, relationshipData{
 			Success: true,
 			Entity:  "John Doe",
+			DonorID: 123,
 		}).
 		Return(nil)
 
@@ -163,6 +194,7 @@ func TestPostRelationshipWhenCreatePersonReferenceValidationError(t *testing.T) 
 		On("Func", mock.Anything, relationshipData{
 			Success:    false,
 			Error:      expectedError,
+			DonorID:    123,
 			Entity:     "John Doe",
 			SearchUID:  "7000-1000-1111",
 			SearchName: "Some Person (7000-1000-1111)",

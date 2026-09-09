@@ -135,6 +135,103 @@ func TestGetPayments(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestGetPaymentsHtmx(t *testing.T) {
+	allPayments := []sirius.Payment{
+		{
+			ID:     2,
+			Amount: 4100,
+		},
+		{
+			ID:     3,
+			Amount: 1438,
+		},
+	}
+
+	nonReductionPayments := []sirius.Payment{
+		{
+			ID:     2,
+			Amount: 4100,
+		},
+		{
+			ID:     3,
+			Amount: 1438,
+		},
+	}
+
+	expectedPaymentTotal := 8000
+
+	caseItem := sirius.Case{
+		UID:                  "7000-0000-0021",
+		SubType:              "pfa",
+		ExpectedPaymentTotal: expectedPaymentTotal,
+	}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle: "PHONE",
+			Label:  "Paid over the phone",
+		},
+	}
+
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
+		},
+	}
+
+	user := sirius.User{ID: 1, DisplayName: "Test User", Roles: []string{"OPG User", "Reduced Fees User"}}
+
+	referenceTypes := []sirius.RefDataItem{
+		{
+			Handle: "GOVUK",
+			Label:  "GOV.UK Pay",
+		},
+	}
+
+	client := &mockGetPayments{}
+	client.
+		On("Payments", mock.Anything, 901).
+		Return(allPayments, nil).
+		On("Case", mock.Anything, 901).
+		Return(caseItem, nil).
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil).
+		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
+		Return(referenceTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil).
+		On("GetUserDetails", mock.Anything).
+		Return(user, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, getPaymentsData{
+			PaymentSources:    paymentSources,
+			ReferenceTypes:    referenceTypes,
+			Payments:          nonReductionPayments,
+			FeeReductionTypes: feeReductionTypes,
+			Case:              caseItem,
+			TotalPaid:         5538,
+			IsReducedFeesUser: true,
+			IsSysAdminUser:    false,
+			OutstandingFee:    expectedPaymentTotal - 5538,
+			InActionPanel:     true,
+			IsPartial:         true,
+		}).
+		Return(nil)
+
+	server := newMockServer("/payments/{id}", GetPayments(client, template.Func))
+
+	req, _ := http.NewRequest(http.MethodGet, "/payments/901", nil)
+	req.Header.Add("HX-Request", "true")
+	resp, err := server.serve(req)
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.Code)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestGetPaymentsBadID(t *testing.T) {
 	client := &mockGetPayments{}
 	template := &mockTemplate{}

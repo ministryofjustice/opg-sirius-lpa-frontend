@@ -1,4 +1,4 @@
-FROM node:22.12.0-alpine3.19 AS asset-env
+FROM node:24.19.0-alpine3.23@sha256:244cc2b53f46f9e876304391d17682b0ddae9ac33491f4857e25e35a36ba7995 AS asset-env
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ RUN npm ci --ignore-scripts
 COPY web/assets web/assets
 RUN npm run build
 
-FROM golang:1.25.8-alpine AS dev
+FROM golang:1.26.6-alpine@sha256:3889b425f035be855a72fb4755265311293b6d414521f0a519d819df32222d83 AS dev
 
 WORKDIR /app
 
@@ -34,11 +34,18 @@ RUN apk update \
 
 COPY --from=asset-env /app/web/static web/static
 
-RUN go install github.com/cosmtrek/air@v1.52.1 && go install github.com/go-delve/delve/cmd/dlv@latest
+ENTRYPOINT ["go", "tool", "air"]
 
-ENTRYPOINT ["air"]
+FROM golang:1.26.6@sha256:0d1d3a794be25f809dd2cb3160d8c73276c4056a9f8242a138e908ddeee7b6b6 AS build-env
 
-FROM golang:1.25.8 AS build-env
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid 65532 \
+    app
 
 ARG TARGETARCH
 WORKDIR /app
@@ -67,13 +74,15 @@ WORKDIR /go/bin
 
 COPY --from=build-env /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=build-env /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=build-env /etc/passwd /etc/passwd
+COPY --from=build-env /etc/group /etc/group
 
 COPY --from=build-env /go/bin/opg-sirius-lpa-frontend opg-sirius-lpa-frontend
 COPY --from=healthcheck-build /go/bin/healthcheck healthcheck
 COPY --from=asset-env /app/web/static web/static
 COPY web/template web/template
 
-USER 65532
+USER app
 
 HEALTHCHECK --interval=5s --timeout=5s --start-period=5s --retries=3 CMD [ "/go/bin/healthcheck" ]
 

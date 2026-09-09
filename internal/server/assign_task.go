@@ -18,12 +18,18 @@ type AssignTaskClient interface {
 	Task(ctx sirius.Context, id int) (sirius.Task, error)
 	Teams(ctx sirius.Context) ([]sirius.Team, error)
 	GetUserDetails(ctx sirius.Context) (sirius.User, error)
+	Case(ctx sirius.Context, id int) (sirius.Case, error)
 }
 
 type assignTaskData struct {
 	XSRFToken string
+	IsPartial bool
 	Entities  []string
 	Uid       string
+	CaseType  string
+	DonorID   int
+	CaseUids  string
+	TaskIDs   string
 	Success   bool
 	Error     sirius.ValidationError
 
@@ -51,8 +57,32 @@ func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 			return errors.New("no tasks selected")
 		}
 
+		taskIDQuery := ""
+		for i, taskID := range taskIDs {
+			if i == 0 {
+				taskIDQuery += fmt.Sprintf("id=%d", taskID)
+			} else {
+				taskIDQuery += fmt.Sprintf("&id=%d", taskID)
+			}
+		}
+
+		donorID := 0
+		if donorIDStr := r.URL.Query().Get("donorId"); donorIDStr != "" {
+			var err error
+			donorID, err = strconv.Atoi(donorIDStr)
+			if err != nil {
+				return err
+			}
+		}
+
 		ctx := getContext(r)
-		data := assignTaskData{XSRFToken: ctx.XSRFToken}
+		data := assignTaskData{
+			XSRFToken: ctx.XSRFToken,
+			IsPartial: ctx.IsPartial,
+			DonorID:   donorID,
+			CaseUids:  buildUIDQueryString(r.Form["uid[]"]),
+			TaskIDs:   taskIDQuery,
+		}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
@@ -81,6 +111,7 @@ func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 				if lpa == nil && len(task.CaseItems) > 0 {
 					lpa = &task.CaseItems[0]
 					data.Uid = lpa.UID
+					data.CaseType = strings.ToLower(lpa.CaseType)
 				}
 
 				tasksMu.Lock()
@@ -115,6 +146,12 @@ func AssignTask(client AssignTaskClient, tmpl template.Template) Handler {
 				}
 			case "team":
 				assigneeID, _ = postFormInt(r, "assigneeTeam")
+			case "caseOwner":
+				caseitem, err := client.Case(ctx, lpa.ID)
+				if err != nil {
+					return err
+				}
+				assigneeID = caseitem.Assignee.ID
 			}
 
 			err := client.AssignTasks(ctx, assigneeID, taskIDs)

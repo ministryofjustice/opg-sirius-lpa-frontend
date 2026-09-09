@@ -21,6 +21,8 @@ type linkPersonData struct {
 	CanChangePrimary bool
 	Error            sirius.ValidationError
 	Success          bool
+	CaseUids         string
+	IsPartial        bool
 }
 
 func LinkPerson(client LinkPersonClient, tmpl template.Template) Handler {
@@ -31,7 +33,11 @@ func LinkPerson(client LinkPersonClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-		data := linkPersonData{XSRFToken: ctx.XSRFToken}
+		data := linkPersonData{
+			XSRFToken: ctx.XSRFToken,
+			CaseUids:  buildUIDQueryString(r.Form["uid[]"]),
+			IsPartial: ctx.IsPartial,
+		}
 
 		data.Entity, err = client.Person(ctx, person1ID)
 		if err != nil {

@@ -17,8 +17,13 @@ type editDatesData struct {
 	Entity    string
 	Success   bool
 	Error     sirius.ValidationError
+	IsPartial bool
 
-	Dates sirius.Dates
+	Dates    sirius.Dates
+	DonorId  int
+	CaseUid  string
+	CaseType string
+	CaseId   int
 }
 
 func EditDates(client EditDatesClient, tmpl template.Template) Handler {
@@ -34,7 +39,11 @@ func EditDates(client EditDatesClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-		data := editDatesData{XSRFToken: ctx.XSRFToken}
+		data := editDatesData{
+			XSRFToken: ctx.XSRFToken,
+			CaseId:    caseID,
+			IsPartial: ctx.IsPartial,
+		}
 
 		if r.Method == http.MethodPost {
 			dates := sirius.Dates{
@@ -66,6 +75,12 @@ func EditDates(client EditDatesClient, tmpl template.Template) Handler {
 		caseitem, err := client.Case(ctx, caseID)
 		if err != nil {
 			return err
+		}
+
+		data.CaseUid = caseitem.UID
+		data.CaseType = caseitem.CaseType
+		if caseitem.Donor != nil {
+			data.DonorId = caseitem.Donor.ID
 		}
 
 		if r.Method != http.MethodPost || data.Success {

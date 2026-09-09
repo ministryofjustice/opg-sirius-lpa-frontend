@@ -1,0 +1,242 @@
+// Gradients
+@mixin gradient-blue {
+  background: linear-gradient(
+    to bottom,
+    $color-sirius-light-blue 0%,
+    $color-sirius-blue 100%
+  );
+  color: #fff;
+}
+
+@mixin gradient-blue-inv {
+  background: linear-gradient(
+    to top,
+    $color-sirius-light-blue 0%,
+    $color-sirius-blue 100%
+  );
+  color: #fff;
+}
+
+@mixin gradient-rag-high {
+  background: linear-gradient(
+    to top,
+    $color-rag-high-shade 0%,
+    $color-rag-high 100%
+  );
+}
+
+@mixin gradient-rag-medium {
+  background: linear-gradient(
+    to left,
+    $color-rag-medium-shade 0%,
+    $color-rag-medium 100%
+  );
+}
+
+@mixin gradient-rag-low {
+  background: linear-gradient(
+    to left,
+    $color-rag-low-shade 0%,
+    $color-rag-low 100%
+  );
+}
+
+@mixin gradient-rag-high-vertical {
+  background: linear-gradient(
+    to top,
+    $color-rag-high-shade 0%,
+    $color-rag-high 100%
+  );
+}
+
+@mixin gradient-rag-medium-vertical {
+  background: linear-gradient(
+    to top,
+    $color-rag-medium-shade 0%,
+    $color-rag-medium 100%
+  );
+}
+
+@mixin gradient-rag-low-vertical {
+  background: linear-gradient(
+    to top,
+    $color-rag-low-shade 0%,
+    $color-rag-low 100%
+  );
+}
+
+@mixin gradient-grey {
+  background: linear-gradient(
+    to bottom,
+    $color-sirius-white 0%,
+    $color-sirius-mid-grey 100%
+  );
+}
+
+@mixin gradient-grey-left-to-right {
+  background: linear-gradient(
+    to right,
+    $color-sirius-white 0%,
+    $color-sirius-mid-grey 100%
+  );
+}
+
+@mixin gradient-grey-inv {
+  background: linear-gradient(
+    to top,
+    $color-sirius-white 0%,
+    $color-sirius-mid-grey 100%
+  );
+}
+
+@mixin gradient-grey-inv-dark {
+  background: linear-gradient(
+    to top,
+    $color-sirius-mid-grey 0%,
+    $color-sirius-dark-grey 100%
+  );
+}
+
+// ----------------------------------------------------
+// Application colors
+// ----------------------------------------------------
+
+// Fonts
+$color-text-on-dark: $color-sirius-white;
+$color-font: $color-sirius-black;
+
+// Application wide
+$color-app-bg: #f3f3f3;
+$color-search-bg: $color-sirius-white;
+$color-drop-shadow: $color-sirius-mid-grey;
+
+// Header
+$color-header: $color-sirius-blue;
+
+// Buttons
+$color-button-icon: $color-sirius-blue;
+$color-button-inner-border: $color-sirius-white;
+
+// Error messages
+$error-text-overview-color: #f05a28;
+$error-text-inline-color: #f05a28;
+$error-text-overview-background: #e7e7e7;
+$error-text-inline-background: #f1f2f2;
+$error-text-overview-icon: "/lpa/build/img/error-warning-icon.png";
+$error-text-inline-icon: "/lpa/build/img/error-warning-icon.png";
+
+// Tables
+$color-table-header: $color-text-on-dark;
+$color-table-cell: $color-sirius-light-grey;
+$color-table-cell-link: $color-sirius-light-grey;
+$color-table-zebra: $color-sirius-mid-grey;
+$color-zebra-odd: $color-sirius-white;
+$color-zebra-even: $color-zebra-blue;
+
+//  Case colors
+$color-case-hw: $color-govuk-grass-green;
+$color-case-pfa: $color-govuk-turquoise;
+$color-case-dep: $color-govuk-mauve;
+$color-case-epa: $color-govuk-brown;
+
+//  Rag Rating
+$color-rag-high: #d63234;
+$color-rag-high-shade: #9c2525;
+$color-rag-medium: $color-govuk-orange;
+$color-rag-medium-shade: #9c4525;
+$color-rag-low: #009933;
+$color-rag-low-shade: $color-govuk-green;
+
+//  New Timeline Event
+$color-new-event-border: #fbaf97;
+$color-new-event-glow: #fba389;
+$color-new-event-bg: #ffeed5;
+
+// Document viewer
+$color-doc-viewer-bg: #404040;
+
+//  Form colours
+$color-req-field-invalid-bg: rgba(
+  $color-govuk-mellow-red,
+  0.2
+); // LESS: fadeout($color-govuk-mellow-red, 80%)
+$color-req-field-invalid-border: $color-govuk-mellow-red;
+$color-req-field-text: $color-govuk-mellow-red;
+$color-form-border: $color-sirius-mid-grey;
+$color-button-border: $color-sirius-mid-grey;
+
+$color-element-bg: $color-sirius-white;
+$color-selected-element-bg: #bec0c2;
+$color-link: $color-sirius-blue;
+$color-link-aw: $color-sirius-blue;
+
+// date picker
+@mixin date-picker-today {
+  background: $color-link;
+  a {
+    color: $color-sirius-white;
+  }
+}
+
+.date-picker-today {
+  @include date-picker-today;
+}
+
+@mixin action-widget-title-bar {
+  @include gradient-grey;
+}
+
+.action-widget-title-bar {
+  @include action-widget-title-bar;
+}
+
+// Modal window
+$color-modal-inner-border: $color-sirius-blue;
+
+// Loading background icon
+$loading-background-icon: url(/lpa/build/img/loading-icon.svg);
+
+// ------------------------------------------------------
+// Element Specific overides
+// Colors that don't follow the theme and have specific overrides
+// ------------------------------------------------------
+
+@mixin color-tab-unselected {
+  background: #d9e2ee;
+  color: #555;
+}
+
+.color-tab-unselected {
+  @include color-tab-unselected;
+}
+
+$color-case-tile-icon: $color-sirius-blue;
+$color-action-widget-nav-icon: $color-sirius-white;
+$color-action-widget-tab-icon: $color-sirius-blue;
+$color-action-widget-bg: #d9e2ee;
+
+.help-expand-collapse,
+.action-widget-expand-collapse {
+  color: $color-sirius-blue !important;
+}
+
+$case-tile-people-icon: $color-sirius-dark-grey;
+$case-tile-people-status-icon: $color-govuk-green;
+
+/* 3. Site wide element colors */
+
+@mixin element-border {
+  border: 2px solid $color-sirius-light-grey;
+}
+
+.element-border {
+  @include element-border;
+}
+
+@mixin selected-element-border {
+  border-color: $color-sirius-black;
+}
+
+.selected-element-border {
+  @include selected-element-border;
+}

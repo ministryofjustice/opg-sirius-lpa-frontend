@@ -10,7 +10,7 @@ describe("Compare documents", () => {
           id: 34,
           uId: "7001-0000-5678",
           caseSubtype: "pfa",
-          caseType: "EPA",
+          caseType: "LPA",
           donor: {
             id: 33,
           },
@@ -28,6 +28,25 @@ describe("Compare documents", () => {
         },
       ],
     };
+
+    cy.addMock("/lpa-api/v1/persons/33", "GET", {
+      status: 200,
+      body: {},
+    });
+
+    cy.addMock("/lpa-api/v1/persons/33/cases", "GET", {
+      status: 200,
+      body: {
+        cases: [
+          {
+            caseType: "LPA",
+            caseSubtype: "pfa",
+            id: 34,
+            uId: "7001-0000-5678",
+          },
+        ],
+      },
+    });
 
     cy.addMock(
       "/lpa-api/v1/documents/dfef6714-b4fe-44c2-b26e-90dfe3663e95",
@@ -70,12 +89,61 @@ describe("Compare documents", () => {
         },
       },
     );
+
+    cy.addMock("/lpa-api/v1/cases/34", "GET", {
+      status: 200,
+      body: {
+        id: 34,
+        caseType: "LPA",
+        caseSubtype: "pfa",
+        uId: "7001-0000-5678",
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/permissions", "GET", {
+      status: 200,
+      body: {
+        "v1-persons": {
+          permissions: ["GET"],
+        },
+        "v1-persons-cases": {
+          permissions: ["GET"],
+        },
+      },
+    });
+
+    cy.addMock("/lpa-api/v1/lpas/34/draft-count", "GET", {
+      status: 200,
+      body: {
+        draftCount: 0,
+      },
+    });
+
+    cy.addMock(
+      "/lpa-api/v1/cases/34/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
+      "GET",
+      {
+        status: 200,
+        body: {
+          tasks: [],
+        },
+      },
+    );
+
+    cy.addMock("/lpa-api/v1/persons/33/references", "GET", {
+      status: 200,
+      body: [
+        {
+          referenceId: 123,
+        },
+      ],
+    });
   });
 
   it("shows document alongside document list when first selecting compare", () => {
     cy.visit("/compare/33/34?pane1=dfef6714-b4fe-44c2-b26e-90dfe3663e95");
     cy.contains("7001-0000-5678");
-    cy.get("#main-content > :nth-child(1) > .govuk-button")
+    cy.get(".app-document-compare__separator > .govuk-button")
       .contains("Back to list")
       .should("have.attr", "href")
       .and("include", "/compare/33/34");
@@ -101,7 +169,7 @@ describe("Compare documents", () => {
   it("shows document not linked to a case alongside document list when first selecting compare", () => {
     //need to revisit this
     cy.visit("/compare/33/34?pane1=e5b5acd1-c11c-41fe-a921-7fdd07e8f670");
-    cy.get("#main-content > :nth-child(1) > .govuk-button")
+    cy.get(".app-document-compare__separator > .govuk-button")
       .contains("Back to list")
       .should("have.attr", "href")
       .and("include", "/compare/33/34");
@@ -130,21 +198,23 @@ describe("Compare documents", () => {
     );
     cy.contains("7001-0000-5678");
     cy.contains("A document not linked to case");
-    cy.get("#main-content > :nth-child(1) > .govuk-button")
+    cy.get(".app-document-compare__separator > .govuk-button")
       .contains("Back to list")
       .should("have.attr", "href")
       .and(
         "include",
         "/compare/33/34?pane2=e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
       );
-    cy.get("#main-content > :nth-child(2) > .govuk-button")
+    cy.get(
+      ".govuk-grid-column-one-half:not(.app-document-compare__separator) > .govuk-button",
+    )
       .contains("Back to list")
       .should("have.attr", "href")
       .and(
         "include",
         "/compare/33/34?pane1=dfef6714-b4fe-44c2-b26e-90dfe3663e95",
       );
-    cy.get("#main-content > :nth-child(1)").within(() => {
+    cy.get(".app-document-compare__separator").within(() => {
       cy.get("button, a")
         .contains("Close")
         .should("exist")
@@ -155,12 +225,14 @@ describe("Compare documents", () => {
               .and("not.be.empty")
               .and(
                 "include",
-                "/view-document/e5b5acd1-c11c-41fe-a921-7fdd07e8f670",
+                "/view-document/e5b5acd1-c11c-41fe-a921-7fdd07e8f670/33?case=34&pane=2",
               );
           }
         });
     });
-    cy.get("#main-content > :nth-child(2)").within(() => {
+    cy.get(
+      ".govuk-grid-column-one-half:not(.app-document-compare__separator)",
+    ).within(() => {
       cy.get("button, a")
         .contains("Close")
         .should("exist")
@@ -171,7 +243,7 @@ describe("Compare documents", () => {
               .and("not.be.empty")
               .and(
                 "include",
-                "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+                "/view-document/dfef6714-b4fe-44c2-b26e-90dfe3663e95/33?case=34&pane=1",
               );
           }
         });
@@ -183,11 +255,15 @@ describe("Compare documents", () => {
     cy.visit("compare/33/34?pane2=e5b5acd1-c11c-41fe-a921-7fdd07e8f670");
     cy.contains("7001-0000-5678");
     cy.contains("A document not linked to case");
-    cy.get("#main-content > :nth-child(2) > .govuk-button")
+    cy.get(
+      ".govuk-grid-column-one-half:not(.app-document-compare__separator) > .govuk-button",
+    )
       .contains("Back to list")
       .should("have.attr", "href")
       .and("include", "/compare/33/34");
-    cy.get("#main-content > :nth-child(2)").within(() => {
+    cy.get(
+      ".govuk-grid-column-one-half:not(.app-document-compare__separator)",
+    ).within(() => {
       cy.get("button, a")
         .contains("Close")
         .should("exist")
@@ -256,5 +332,29 @@ describe("Compare documents", () => {
             }
           });
       });
+  });
+
+  it("should display the header button labels on hover", () => {
+    cy.visit("compare/33/34");
+    cy.get("#header-button-return-to-timeline").should(
+      "have.attr",
+      "title",
+      "Return to timeline",
+    );
+    cy.get("#header-button-case-information").should(
+      "have.attr",
+      "title",
+      "Case information",
+    );
+    cy.get("#header-button-details-on-the-people-involved-in-this-case").should(
+      "have.attr",
+      "title",
+      "Details on the people involved in this case",
+    );
+    cy.get("#header-button-calendars").should(
+      "have.attr",
+      "title",
+      "Calendars",
+    );
   });
 });

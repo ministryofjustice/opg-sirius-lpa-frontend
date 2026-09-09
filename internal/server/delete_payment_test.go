@@ -74,6 +74,7 @@ func TestGetDeletePayment(t *testing.T) {
 			Case:              caseItem,
 			Payment:           payment,
 			FeeReductionTypes: feeReductionTypes,
+			ReturnUrl:         "/payments/4",
 		}).
 		Return(nil)
 
@@ -211,6 +212,7 @@ func TestDeletePaymentWhenTemplateErrors(t *testing.T) {
 			Case:              caseItem,
 			Payment:           payment,
 			FeeReductionTypes: feeReductionTypes,
+			ReturnUrl:         "/payments/4",
 		}).
 		Return(errExample)
 
@@ -265,6 +267,63 @@ func TestPostDeletePayment(t *testing.T) {
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/payments/4"), err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostDeletePaymentHtmx(t *testing.T) {
+	caseItem := sirius.Case{CaseType: "lpa", UID: "700700"}
+
+	payment := sirius.Payment{
+		ID:          123,
+		Amount:      8200,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-02-18"),
+		Case:        &sirius.Case{ID: 4},
+	}
+
+	feeReductionTypes := []sirius.RefDataItem{
+		{
+			Handle: "REMISSION",
+			Label:  "Remission",
+		},
+	}
+
+	client := &mockDeletePaymentClient{}
+	client.
+		On("PaymentByID", mock.Anything, 123).
+		Return(payment, nil)
+	client.
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
+		Return(feeReductionTypes, nil)
+	client.
+		On("DeletePayment", mock.Anything, 123).
+		Return(nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, deletePaymentData{
+			Case:              caseItem,
+			Payment:           payment,
+			FeeReductionTypes: feeReductionTypes,
+			ReturnUrl:         "/payments/4",
+			HtmxRedirect:      "/payments/4",
+			IsPartial:         true,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", nil)
+	r.Header.Add("Content-Type", formUrlEncoded)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := DeletePayment(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

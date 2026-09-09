@@ -50,8 +50,8 @@ type removeAnAttorneyData struct {
 	Error                        sirius.ValidationError
 	XSRFToken                    string
 	FormName                     string
-	Decisions                    string
-	ReplacementAttorneyDecisions string
+	Decisions                    shared.HowAttorneysMakeDecisions
+	ReplacementAttorneyDecisions shared.HowAttorneysMakeDecisions
 }
 
 func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Template, confirmTmpl template.Template, decisionsTmpl template.Template) Handler {
@@ -118,7 +118,7 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 			data.ReplacementAttorneyCount++
 		}
 
-		if data.ActiveAttorneyCount > 1 && data.ReplacementAttorneyCount > 1 && data.ReplacementAttorneyDecisions == "" {
+		if data.ActiveAttorneyCount > 1 && data.ReplacementAttorneyCount > 1 && data.ReplacementAttorneyDecisions == shared.HowAttorneysMakeDecisionsEmpty {
 			data.ReplacementAttorneyDecisions = data.Decisions
 		}
 
@@ -139,7 +139,7 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 
 			validateRemoveAttorneyPage(r, data.Form.RemovedAttorneyUid, data.Form.RemovedReason, data.Form.EnabledAttorneyUids, data.Error.Field)
 
-			if submissionStep == "decision" && data.Decisions == "jointly-for-some-severally-for-others" {
+			if submissionStep == "decision" && data.Decisions == shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers {
 				validateManageAttorneysPage(r, data.Form.DecisionAttorneysUids, data.Error.Field)
 				if _, ok := data.Error.Field["decisionAttorney"]; ok {
 					data.DecisionAttorneys = decisionAttorneysListAfterRemoval(lpa.LpaStoreData.Attorneys, data.Form.EnabledAttorneyUids, data.Form.RemovedAttorneyUid)
@@ -182,7 +182,7 @@ func RemoveAnAttorney(client RemoveAnAttorneyClient, removeTmpl template.Templat
 						data.DecisionAttorneysDetails = updateDecisionAttorneyDetails(data.CaseSummary.DigitalLpa.LpaStoreData.Attorneys, data.Form.DecisionAttorneysUids)
 					}
 
-					if data.Decisions != "jointly-for-some-severally-for-others" {
+					if data.Decisions != shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers {
 						return confirmTmpl(w, data)
 					}
 					data.DecisionAttorneys = decisionAttorneysListAfterRemoval(lpa.LpaStoreData.Attorneys, data.Form.EnabledAttorneyUids, data.Form.RemovedAttorneyUid)
@@ -336,7 +336,7 @@ func confirmStep(
 	client RemoveAnAttorneyClient,
 	digitalLpaUid string,
 	validationError *sirius.ValidationError,
-	decisions string,
+	decisions shared.HowAttorneysMakeDecisions,
 	w http.ResponseWriter,
 	attorneyUpdatedStatus []sirius.AttorneyUpdatedStatus,
 	attorneyDecisions []sirius.AttorneyDecisions,
@@ -349,7 +349,7 @@ func confirmStep(
 		return err
 	}
 
-	if decisions == "jointly-for-some-severally-for-others" {
+	if decisions == shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers {
 		err = client.ManageAttorneyDecisions(ctx, digitalLpaUid, attorneyDecisions)
 
 		if ve, ok := err.(sirius.ValidationError); ok {

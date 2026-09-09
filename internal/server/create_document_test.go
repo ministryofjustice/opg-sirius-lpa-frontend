@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -83,6 +84,50 @@ func TestGetCreateDocument(t *testing.T) {
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
+}
+
+func TestGetCreateDocumentHTMX(t *testing.T) {
+	caseItem := sirius.Case{CaseType: "lpa", UID: "7000"}
+
+	documentTemplateData := []sirius.DocumentTemplateData{
+		{
+			Inserts:    nil,
+			TemplateId: "DD",
+			Label:      "DD Template Label",
+		},
+	}
+
+	client := &mockCreateDocumentClient{}
+	client.
+		On("Case", mock.Anything, 123).
+		Return(caseItem, nil)
+	client.
+		On("DocumentTemplates", mock.Anything, sirius.CaseType("lpa")).
+		Return(documentTemplateData, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createDocumentData{
+			IsPartial:             true,
+			Case:                  caseItem,
+			DocumentTemplates:     documentTemplateData,
+			ComponentDocumentData: buildComponentDocumentData(documentTemplateData),
+			Back:                  "/create-document?id=0&case=lpa",
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
+
+	r.Header.Add("HX-Request", "true")
+
+	w := httptest.NewRecorder()
+
+	err := CreateDocument(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestPostCreateDocument(t *testing.T) {
@@ -168,7 +213,8 @@ func TestPostCreateDocumentGenerateNewRecipient(t *testing.T) {
 					RecipientAddedSuccess: true,
 					SelectedInserts:       []string{"DDINSERT"},
 					HasViewedInsertPage:   true,
-					Recipients:            []sirius.Person{donor, contact},
+					Recipients:            []sirius.Recipient{donor, contact},
+					DonorId:               1,
 				}).
 				Return(nil)
 
@@ -372,10 +418,10 @@ func TestTranslateInsertData(t *testing.T) {
 
 func TestGetRecipientsFiltersInactiveActors(t *testing.T) {
 	donor := sirius.Person{ID: 1}
-	trustCorp := sirius.Person{ID: 2, SystemStatus: true}
-	activeAttorney := sirius.Person{ID: 3, SystemStatus: true}
-	inactiveAttorney := sirius.Person{ID: 4, SystemStatus: false}
-	caseItem := sirius.Case{Donor: &donor, TrustCorporations: []sirius.Person{trustCorp}, Attorneys: []sirius.Person{activeAttorney, inactiveAttorney}}
+	trustCorp := sirius.TrustCorporation{Attorney: sirius.Attorney{Person: sirius.Person{ID: 2}, SystemStatus: shared.BoolPtr(true)}}
+	activeAttorney := sirius.Attorney{Person: sirius.Person{ID: 3}, SystemStatus: shared.BoolPtr(true)}
+	inactiveAttorney := sirius.Attorney{Person: sirius.Person{ID: 4}, SystemStatus: shared.BoolPtr(false)}
+	caseItem := sirius.Case{Donor: &donor, TrustCorporations: []sirius.TrustCorporation{trustCorp}, Attorneys: []sirius.Attorney{activeAttorney, inactiveAttorney}}
 
 	recipients, _ := getRecipients(caseItem)
 	assert.Equal(t, 3, len(recipients))
@@ -384,9 +430,9 @@ func TestGetRecipientsFiltersInactiveActors(t *testing.T) {
 
 func TestGetRecipientsWithCorrespondent(t *testing.T) {
 	donor := sirius.Person{ID: 1}
-	attorney := sirius.Person{ID: 3, SystemStatus: true}
-	correspondent := sirius.Person{ID: 4}
-	caseItem := sirius.Case{Donor: &donor, Attorneys: []sirius.Person{attorney}, Correspondent: &correspondent}
+	attorney := sirius.Attorney{Person: sirius.Person{ID: 3}, SystemStatus: shared.BoolPtr(true)}
+	correspondent := sirius.Correspondent{Person: sirius.Person{ID: 4}}
+	caseItem := sirius.Case{Donor: &donor, Attorneys: []sirius.Attorney{attorney}, Correspondent: &correspondent}
 
 	recipients, _ := getRecipients(caseItem)
 	assert.Equal(t, 3, len(recipients))
@@ -394,12 +440,12 @@ func TestGetRecipientsWithCorrespondent(t *testing.T) {
 
 func TestGetRecipientsOrder(t *testing.T) {
 	donor := sirius.Person{ID: 1}
-	attorney1 := sirius.Person{ID: 2, Firstname: "Gemma", Surname: "Taylor", SystemStatus: true}
-	attorney2 := sirius.Person{ID: 3, Firstname: "Amy", Surname: "Taylor", SystemStatus: true}
-	attorney3 := sirius.Person{ID: 4, Firstname: "Claire", Surname: "Smith", SystemStatus: true}
-	correspondent := sirius.Person{ID: 5}
-	trustCorp := sirius.Person{ID: 6, SystemStatus: true}
-	caseItem := sirius.Case{Donor: &donor, Attorneys: []sirius.Person{attorney1, attorney2, attorney3}, Correspondent: &correspondent, TrustCorporations: []sirius.Person{trustCorp}}
+	attorney1 := sirius.Attorney{Person: sirius.Person{ID: 2, Firstname: "Gemma", Surname: "Taylor"}, SystemStatus: shared.BoolPtr(true)}
+	attorney2 := sirius.Attorney{Person: sirius.Person{ID: 3, Firstname: "Amy", Surname: "Taylor"}, SystemStatus: shared.BoolPtr(true)}
+	attorney3 := sirius.Attorney{Person: sirius.Person{ID: 4, Firstname: "Claire", Surname: "Smith"}, SystemStatus: shared.BoolPtr(true)}
+	correspondent := sirius.Correspondent{Person: sirius.Person{ID: 5}}
+	trustCorp := sirius.TrustCorporation{Attorney: sirius.Attorney{Person: sirius.Person{ID: 6}, SystemStatus: shared.BoolPtr(true)}}
+	caseItem := sirius.Case{Donor: &donor, Attorneys: []sirius.Attorney{attorney1, attorney2, attorney3}, Correspondent: &correspondent, TrustCorporations: []sirius.TrustCorporation{trustCorp}}
 
 	recipients, _ := getRecipients(caseItem)
 	assert.Equal(t, 6, len(recipients))

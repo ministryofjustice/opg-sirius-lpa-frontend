@@ -18,6 +18,7 @@ type ApplyFeeReductionClient interface {
 
 type applyFeeReductionData struct {
 	XSRFToken string
+	IsPartial bool
 	Error     sirius.ValidationError
 
 	Case              sirius.Case
@@ -26,6 +27,7 @@ type applyFeeReductionData struct {
 	PaymentDate       sirius.DateString
 	FeeReductionTypes []sirius.RefDataItem
 	ReturnUrl         string
+	HtmxRedirect      string
 }
 
 func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) Handler {
@@ -39,6 +41,7 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) H
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 		data := applyFeeReductionData{
 			XSRFToken:        ctx.XSRFToken,
+			IsPartial:        ctx.IsPartial,
 			PaymentEvidence:  postFormString(r, "paymentEvidence"),
 			FeeReductionType: postFormString(r, "feeReductionType"),
 			PaymentDate:      postFormDateString(r, "paymentDate"),
@@ -77,6 +80,7 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) H
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
+				return tmpl(w, data)
 			} else if err != nil {
 				return err
 			} else {
@@ -84,10 +88,14 @@ func ApplyFeeReduction(client ApplyFeeReductionClient, tmpl template.Template) H
 					Title: fmt.Sprintf("%s approved", translateRefData(data.FeeReductionTypes, data.FeeReductionType)),
 				})
 
+				if data.IsPartial {
+					data.HtmxRedirect = data.ReturnUrl
+					return tmpl(w, data)
+				}
+
 				return RedirectError(data.ReturnUrl)
 			}
 		}
-
 		return tmpl(w, data)
 	}
 }

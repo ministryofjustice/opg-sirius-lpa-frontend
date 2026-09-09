@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/server"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
@@ -46,6 +47,28 @@ func TestParseAndFormatDate(t *testing.T) {
 	assert.Equal(t, "11 April 2024", val)
 }
 
+func TestIsChildLinked(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["isChildLinked"].(func(interface{}) bool)
+
+	var val bool
+
+	val = fn(nil)
+	assert.Equal(t, false, val)
+
+	val = fn("string")
+	assert.Equal(t, false, val)
+
+	val = fn(map[string]interface{}{})
+	assert.Equal(t, false, val)
+
+	val = fn(map[string]interface{}{"": "value"})
+	assert.Equal(t, false, val)
+
+	val = fn(map[string]interface{}{"1": "value"})
+	assert.Equal(t, true, val)
+}
+
 func TestPlusN(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["plusN"].(func(int, int) int)
@@ -63,64 +86,12 @@ func testStringMapper(t *testing.T, fnName string, expectations map[string]strin
 	}
 }
 
-func TestHowAttorneysMakeDecisionsLongForm(t *testing.T) {
-	fns := All("", "", "")
-	fn := fns["howAttorneysMakeDecisionsLongForm"].(func(bool, string) string)
-
-	tests := map[string]map[string]interface{}{
-		"Jointly":                          {"isSoleAttorney": false, "value": "jointly", "result": "Jointly"},
-		"JointlyAndSeverally":              {"isSoleAttorney": false, "value": "jointly-and-severally", "result": "Jointly & severally"},
-		"JointlyForSomeSeverallyForOthers": {"isSoleAttorney": false, "value": "jointly-for-some-severally-for-others", "result": "Jointly for some, severally for others"},
-		"Empty":                            {"isSoleAttorney": false, "value": "", "result": "Not specified"},
-		"NotValid":                         {"isSoleAttorney": false, "value": "foo", "result": "howAttorneysMakeDecisions NOT RECOGNISED: foo"},
-		"IsSoleAttorney":                   {"isSoleAttorney": true, "value": "jointly-for-some-severally-for-others", "result": "There is only one attorney appointed"},
-	}
-
-	for _, test := range tests {
-		assert.Equal(t, test["result"], fn(test["isSoleAttorney"].(bool), test["value"].(string)))
-	}
-}
-
-func TestHowReplacementAttorneysStepInLongForm(t *testing.T) {
-	expectations := map[string]string{
-		"all-can-no-longer-act": "When all can no longer act",
-		"one-can-no-longer-act": "When one can no longer act",
-		"another-way":           "Another way",
-		"":                      "Not specified",
-		"foo":                   "howReplacementAttorneysStepIn NOT RECOGNISED: foo",
-	}
-
-	testStringMapper(t, "howReplacementAttorneysStepInLongForm", expectations)
-}
-
-func TestLifeSustainingTreatmentOptionLongForm(t *testing.T) {
-	expectations := map[string]string{
-		"option-a": "Attorneys can give or refuse consent to LST",
-		"option-b": "Attorneys cannot give or refuse consent to LST",
-		"":         "Not specified",
-		"foo":      "lifeSustainingTreatmentOption NOT RECOGNISED: foo",
-	}
-
-	testStringMapper(t, "lifeSustainingTreatmentOptionLongForm", expectations)
-}
-
-func TestWhenTheLpaCanBeUsedLongForm(t *testing.T) {
-	expectations := map[string]string{
-		"when-has-capacity":  "As soon as it's registered",
-		"when-capacity-lost": "When capacity is lost",
-		"":                   "Not specified",
-		"foo":                "whenTheLpaCanBeUsed NOT RECOGNISED: foo",
-	}
-
-	testStringMapper(t, "whenTheLpaCanBeUsedLongForm", expectations)
-}
-
 func TestChannelForFormat(t *testing.T) {
 	expectations := map[string]string{
 		"paper":  "Paper",
 		"online": "Online",
 		"":       "Not specified",
-		"foo":    "channel NOT RECOGNISED: foo",
+		"foo":    "channel NOT RECOGNISED: Not Recognised",
 	}
 
 	testStringMapper(t, "channelForFormat", expectations)
@@ -180,9 +151,9 @@ func TestResolutionOutcome(t *testing.T) {
 
 func TestCaseLabel(t *testing.T) {
 	expectations := map[string]string{
-		"EPA": "colour-govuk-brown",
-		"pfa": "colour-govuk-turquoise",
-		"hw":  "colour-govuk-grass-green",
+		"EPA": "colour-sirius-brown",
+		"pfa": "colour-sirius-teal",
+		"hw":  "colour-sirius-green",
 		"":    "",
 		"foo": "",
 	}
@@ -248,6 +219,38 @@ func TestInStringArray(t *testing.T) {
 	assert.Equal(t, false, val)
 }
 
+func TestIsDateMap(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["isDateMap"].(func(interface{}) bool)
+
+	var val bool
+
+	val = fn("123")
+	assert.Equal(t, false, val)
+
+	val = fn(map[string]interface{}{"key": "value"})
+	assert.Equal(t, false, val)
+
+	val = fn(map[string]interface{}{"date": "value"})
+	assert.Equal(t, true, val)
+}
+
+func TestIsNumber(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["isNumber"].(func(interface{}) bool)
+
+	var val bool
+
+	val = fn("123")
+	assert.Equal(t, false, val)
+
+	val = fn(map[string]string{"key": "value"})
+	assert.Equal(t, false, val)
+
+	val = fn(3.0)
+	assert.Equal(t, true, val)
+}
+
 func TestSirius(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["sirius"].(func(string) string)
@@ -262,6 +265,22 @@ func TestPrefix(t *testing.T) {
 
 	val := fn("URL")
 	assert.Equal(t, "URL", val)
+}
+
+func TestPrefixSVGValidHash(t *testing.T) {
+	fns := All("", "prefix", "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1")
+	fn := fns["prefixSVG"].(func(string) string)
+
+	val := fn("URL")
+	assert.Equal(t, "prefix/assets/images/icons-sprite.svg?d6a61d20#URL", val)
+}
+
+func TestPrefixSVGInvalidHash(t *testing.T) {
+	fns := All("", "prefix", "248d")
+	fn := fns["prefixSVG"].(func(string) string)
+
+	val := fn("URL")
+	assert.Equal(t, "prefix/assets/images/icons-sprite.svg#URL", val)
 }
 
 func TestPrefixAssetGivenValidCache(t *testing.T) {
@@ -307,7 +326,7 @@ func TestField(t *testing.T) {
 func TestRadios(t *testing.T) {
 	items := []itemData{{Value: "foo", Label: "Foo"}}
 	fns := All("", "", "")
-	fn := fns["radios"].(func(string, string, interface{}, map[string]string, ...itemData) radiosData)
+	fn := fns["radios"].(func(string, string, interface{}, map[string]string, bool, ...itemData) radiosData)
 	expected := radiosData{
 		Name:  "name",
 		Label: "Name",
@@ -315,10 +334,11 @@ func TestRadios(t *testing.T) {
 		Errors: map[string]string{
 			"username": "required",
 		},
-		Items: items,
+		Items:  items,
+		Inline: false,
 	}
 
-	val := fn("name", "Name", "testing", map[string]string{"username": "required"}, items...)
+	val := fn("name", "Name", "testing", map[string]string{"username": "required"}, false, items...)
 	assert.Equal(t, expected, val)
 }
 
@@ -573,6 +593,19 @@ func TestContains(t *testing.T) {
 	assert.Equal(t, false, val)
 }
 
+func TestContainsInt(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["containsInt"].(func([]int, int) bool)
+
+	var val bool
+
+	val = fn([]int{1, 2, 3}, 3)
+	assert.Equal(t, true, val)
+
+	val = fn([]int{1, 2, 3}, 4)
+	assert.Equal(t, false, val)
+}
+
 func TestReplace(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["replace"].(func(string, string, string) string)
@@ -640,7 +673,7 @@ func TestSubtypeLongFormat(t *testing.T) {
 func TestSubtypeColour(t *testing.T) {
 	var val string
 	val = subtypeColour("personal-welfare")
-	assert.Equal(t, "light-green", val)
+	assert.Equal(t, "green", val)
 
 	val = subtypeColour("not-in-list")
 	assert.Equal(t, "", val)
@@ -712,8 +745,21 @@ func TestComplaintProperty(t *testing.T) {
 
 	for input, expected := range tests {
 		result := fn(input)
-		assert.Equal(t, expected, result, "TranslateComplaintProperty(%q) should return %q", input, expected)
+		assert.Equal(t, expected, result, "translateComplaintProperty(%q) should return %q", input, expected)
 	}
+}
+
+func TestTranslateNumberEventValue(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["translateNumberEventValue"].(func(string, float64) string)
+
+	var result string
+
+	result = fn("applicationtype", 0)
+	assert.Equal(t, "Classic", result)
+
+	result = fn("123", 5.3)
+	assert.Equal(t, "5.3", result)
 }
 
 func TestEventWithContext(t *testing.T) {
@@ -728,6 +774,7 @@ func TestEventWithContext(t *testing.T) {
 	complainantCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	complaintOrigins := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	compensationTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
+	eventFieldOrder := []string{"test1", "test2", "test3"}
 
 	expected := LpaEventWithContext{
 		LpaEvent: event,
@@ -739,6 +786,7 @@ func TestEventWithContext(t *testing.T) {
 			ComplainantCategories:  complainantCategories,
 			ComplaintOrigins:       complaintOrigins,
 			CompensationTypes:      compensationTypes,
+			EventFieldOrder:        eventFieldOrder,
 		},
 	}
 	result := fn(
@@ -750,6 +798,131 @@ func TestEventWithContext(t *testing.T) {
 		"complainantCategories", complainantCategories,
 		"complaintOrigins", complaintOrigins,
 		"compensationTypes", compensationTypes,
+		"eventFieldOrder", eventFieldOrder,
 	)
 	assert.Equal(t, expected, result)
+}
+
+func TestStringifyBoolPointer(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["stringifyBoolPointer"].(func(*bool) string)
+
+	tests := map[*bool]string{
+		shared.BoolPtr(true):  "true",
+		shared.BoolPtr(false): "false",
+		nil:                   "",
+	}
+
+	for input, expected := range tests {
+		result := fn(input)
+		assert.Equal(t, expected, result)
+	}
+}
+
+func TestStringifyBool(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["stringifyBool"].(func(bool) string)
+
+	tests := map[bool]string{
+		true:  "true",
+		false: "false",
+	}
+
+	for input, expected := range tests {
+		result := fn(input)
+		assert.Equal(t, expected, result)
+	}
+}
+
+func TestBoolToYesNo(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["boolToYesNo"].(func(bool) string)
+
+	tests := map[bool]string{
+		true:  "Yes",
+		false: "No",
+	}
+
+	for input, expected := range tests {
+		result := fn(input)
+		assert.Equal(t, expected, result)
+	}
+}
+
+func TestActionPanelButton(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["actionPanelButton"].(func(string, string, string, bool, bool) server.ActionPanelButton)
+
+	expected := server.ActionPanelButton{
+		Label:    "Name",
+		URL:      "testurl",
+		IconName: "testicon",
+		Disabled: false,
+	}
+
+	val := fn("Name", "testurl", "testicon", false, false)
+	assert.Equal(t, expected, val)
+}
+
+func TestHeaderBarButton(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["headerBarButton"].(func(string, string, string) headerBarButtonData)
+
+	expected := headerBarButtonData{
+		Label:    "Name",
+		URL:      "testurl",
+		IconName: "testicon",
+	}
+
+	val := fn("Name", "testurl", "testicon")
+	assert.Equal(t, expected, val)
+}
+
+func TestPersonInfoRow(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["personInfoRow"].(func(string, sirius.Person, int, int, int, bool, bool) personInfoRowData)
+
+	expected := personInfoRowData{
+		Label:        "Name",
+		Person:       sirius.Person{},
+		CaseID:       123,
+		SelectedID:   456,
+		Index:        1,
+		SystemStatus: true,
+		IsApplicant:  true,
+	}
+
+	val := fn("Name", sirius.Person{}, 123, 456, 1, true, true)
+	assert.Equal(t, expected, val)
+}
+
+func TestStatusTag(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["statusTag"].(func(string, string) statusTagData)
+
+	expected := statusTagData{
+		ReadableString: "Test",
+		Colour:         "green",
+	}
+
+	val := fn("Test", "green")
+	assert.Equal(t, expected, val)
+}
+
+func TestHasField(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["hasField"].(func(interface{}, string) bool)
+
+	tests := map[interface{}]bool{
+		"not-struct": false,
+		struct{ ExistingField string }{ExistingField: "123"}:        true,
+		struct{ NonExistingField string }{NonExistingField: "123"}:  false,
+		&struct{ ExistingField string }{ExistingField: "123"}:       true,
+		&struct{ NonExistingField string }{NonExistingField: "123"}: false,
+	}
+
+	for input, expected := range tests {
+		result := fn(input, "ExistingField")
+		assert.Equal(t, expected, result)
+	}
 }

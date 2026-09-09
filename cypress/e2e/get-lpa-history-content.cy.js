@@ -111,6 +111,34 @@ describe("Show correct event content", () => {
       );
   });
 
+  it("can view incoming document event", () => {
+    mockEventHistory({
+      sourceType: "IncomingDocument",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\Document\IncomingDocument`,
+        friendlyDescription: "Incoming Document",
+        subType: "Application related",
+      },
+      sourceDocument: {
+        UUID: "123e4567-e89b-12d3-a456-426614174000",
+        friendlyDescription: "Incoming document",
+        mimeType: "application/pdf",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Incoming Document")
+      .should("contain.text", "Application related")
+      .find("a")
+      .should(
+        "have.attr",
+        "href",
+        "/lpa/frontend/view-document/123e4567-e89b-12d3-a456-426614174000/1",
+      );
+  });
+
   it("can view outbound document event", () => {
     mockEventHistory({
       sourceType: "OutgoingDocument",
@@ -122,6 +150,7 @@ describe("Show correct event content", () => {
       sourceDocument: {
         UUID: "123e4567-e89b-12d3-a456-426614174000",
         friendlyDescription: "Joe Bloggs - Letter sent to donor",
+        mimeType: "application/pdf",
       },
     });
     cy.visit("/donor/1/history");
@@ -132,7 +161,35 @@ describe("Show correct event content", () => {
       .should(
         "have.attr",
         "href",
-        "/lpa#/donor/1/documents?docUuid=123e4567-e89b-12d3-a456-426614174000",
+        "/lpa/frontend/view-document/123e4567-e89b-12d3-a456-426614174000/1",
+      );
+  });
+
+  it("can download incoming document event when not pdf", () => {
+    mockEventHistory({
+      sourceType: "IncomingDocument",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\Document\IncomingDocument`,
+        friendlyDescription: "Incoming Document",
+        subType: "Application related",
+      },
+      sourceDocument: {
+        UUID: "123e4567-e89b-12d3-a456-426614174000",
+        friendlyDescription: "Incoming document",
+        mimeType: "text",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Incoming Document")
+      .should("contain.text", "Application related")
+      .find("a")
+      .should("have.attr", "href")
+      .and(
+        "include",
+        "/lpa-api/v1/documents/123e4567-e89b-12d3-a456-426614174000/download",
       );
   });
 
@@ -231,6 +288,7 @@ describe("Show correct event content", () => {
         },
         category: ["01", "02"],
         origin: { 1: "CONTACT_CENTRE" },
+        title: { 1: "New title" },
       },
     });
     cy.visit("/donor/1/history");
@@ -245,7 +303,48 @@ describe("Show correct event content", () => {
         "contain.text",
         "Category: Correspondence changed to: OPG Decisions",
       )
-      .should("contain.text", "Origin: Contact centre");
+      .should("contain.text", "Origin: Contact centre")
+      .should("contain.text", "Title: New title");
+  });
+
+  it("can view complaint updated event when title updated", () => {
+    mockEventHistory({
+      sourceType: "Complaint",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\PowerOfAttorney\Complaint\Complaint`,
+        summary: "Test Complaint",
+        severity: "Medium",
+        description: "123",
+      },
+      changeSet: {
+        title: ["Old title", "New title"],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Title: Old title changed to: New title");
+  });
+
+  it("can view complaint updated event when title removed", () => {
+    mockEventHistory({
+      sourceType: "Complaint",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\PowerOfAttorney\Complaint\Complaint`,
+        summary: "Test Complaint",
+        severity: "Medium",
+        description: "123",
+      },
+      changeSet: {
+        title: ["Old title"],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Title: Old title changed to:");
   });
 
   it("can view task created event", () => {
@@ -298,12 +397,12 @@ describe("Show correct event content", () => {
         name: "Some Task",
       },
       changeSet: {
-        completedDate: {
-          0: null,
-          1: {
+        completedDate: [
+          null,
+          {
             date: "2026-03-16 15:00:00.000000",
           },
-        },
+        ],
         status: ["Not Started", "Completed"],
       },
     });
@@ -400,5 +499,730 @@ describe("Show correct event content", () => {
     cy.get(".moj-timeline__item")
       .eq(0)
       .should("contain.text", "Deleted - Remission approved on 02/01/2026");
+  });
+
+  it("can view attorney added event", () => {
+    mockEventHistory({
+      sourceType: "Attorney",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\ReplacementAttorney`,
+        firstname: "Some",
+        surname: "User",
+        companyName: "ACME",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Some User")
+      .should("contain.text", "ACME");
+  });
+
+  it("can view attorney updated event with prior values", () => {
+    mockEventHistory({
+      sourceType: "Attorney",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\ReplacementAttorney`,
+        firstname: "Some",
+        surname: "User",
+        companyName: "ACME",
+      },
+      changeSet: {
+        dob: [
+          { date: "2006-12-01 00:00:00.000000" },
+          { date: "2006-12-02 00:00:00.000000" },
+        ],
+        systemStatus: [false, true],
+        CorrespondenceByPhone: [true, false],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should(
+        "contain.text",
+        "Date of birth: 01/12/2006 changed to: 02/12/2006",
+      )
+      .should("contain.text", "Changed from inactive to: active")
+      .should(
+        "contain.text",
+        "Correspondence by phone: true changed to: false",
+      );
+  });
+
+  it("can view attorney updated event without prior values", () => {
+    mockEventHistory({
+      sourceType: "Attorney",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\ReplacementAttorney`,
+        firstname: "Some",
+        surname: "User",
+        companyName: "ACME",
+      },
+      changeSet: {
+        dob: { 1: { date: "2006-12-01 00:00:00.000000" } },
+        systemStatus: { 1: false },
+        CorrespondenceByEmail: { 1: true },
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Date of birth: 01/12/2006")
+      .should("contain.text", "Changed to: inactive")
+      .should("contain.text", "Correspondence by email: true");
+  });
+
+  it("can view replacement attorney added event", () => {
+    mockEventHistory({
+      sourceType: "ReplacementAttorney",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\ReplacementAttorney`,
+        firstname: "Some",
+        surname: "User",
+        companyName: "ACME",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Some User")
+      .should("contain.text", "ACME");
+  });
+
+  it("can view replacement attorney updated event with prior values", () => {
+    mockEventHistory({
+      sourceType: "ReplacementAttorney",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\ReplacementAttorney`,
+        firstname: "Some",
+        surname: "User",
+        companyName: "ACME",
+      },
+      changeSet: {
+        dob: [
+          { date: "2006-12-01 00:00:00.000000" },
+          { date: "2006-12-02 00:00:00.000000" },
+        ],
+        systemStatus: [false, true],
+        CorrespondenceByPhone: [true, false],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should(
+        "contain.text",
+        "Date of birth: 01/12/2006 changed to: 02/12/2006",
+      )
+      .should("contain.text", "Changed from inactive to: active")
+      .should(
+        "contain.text",
+        "Correspondence by phone: true changed to: false",
+      );
+  });
+
+  it("can view replacement attorney updated event without prior values", () => {
+    mockEventHistory({
+      sourceType: "ReplacementAttorney",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\ReplacementAttorney`,
+        firstname: "Some",
+        surname: "User",
+        companyName: "ACME",
+      },
+      changeSet: {
+        dob: { 1: { date: "2006-12-01 00:00:00.000000" } },
+        systemStatus: { 1: false },
+        CorrespondenceByEmail: { 1: true },
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Date of birth: 01/12/2006")
+      .should("contain.text", "Changed to: inactive")
+      .should("contain.text", "Correspondence by email: true");
+  });
+
+  it("can view correspondent added event", () => {
+    mockEventHistory({
+      sourceType: "Correspondent",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\Correspondent`,
+        firstname: "Some",
+        surname: "User",
+        companyName: "ACME",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Some User")
+      .should("contain.text", "ACME");
+  });
+
+  it("can view correspondent updated event with prior values", () => {
+    mockEventHistory({
+      sourceType: "Correspondent",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\Correspondent`,
+        firstname: "Some",
+        surname: "User",
+        companyName: "ACME",
+      },
+      changeSet: {
+        dob: [
+          { date: "2006-12-01 00:00:00.000000" },
+          { date: "2006-12-02 00:00:00.000000" },
+        ],
+        systemStatus: [false, true],
+        CorrespondenceByPhone: [true, false],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should(
+        "contain.text",
+        "Date of birth: 01/12/2006 changed to: 02/12/2006",
+      )
+      .should("contain.text", "Changed from inactive to: active")
+      .should(
+        "contain.text",
+        "Correspondence by phone: true changed to: false",
+      );
+  });
+
+  it("can view correspondent updated event without prior values", () => {
+    mockEventHistory({
+      sourceType: "Correspondent",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\Correspondent`,
+        firstname: "Some",
+        surname: "User",
+        companyName: "ACME",
+      },
+      changeSet: {
+        dob: { 1: { date: "2006-12-01 00:00:00.000000" } },
+        systemStatus: { 1: false },
+        CorrespondenceByEmail: { 1: true },
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Date of birth: 01/12/2006")
+      .should("contain.text", "Changed to: inactive")
+      .should("contain.text", "Correspondence by email: true");
+  });
+
+  it("can view trust corporation added event", () => {
+    mockEventHistory({
+      sourceType: "TrustCorporation",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\TrustCorporation`,
+        companyName: "ACME",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item").eq(0).should("contain.text", "ACME");
+  });
+
+  it("can view trust corporation updated event", () => {
+    mockEventHistory({
+      sourceType: "TrustCorporation",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\TrustCorporation`,
+        companyName: "ACME",
+      },
+      changeSet: {
+        dob: [
+          { date: "2006-12-01 00:00:00.000000" },
+          { date: "2006-12-02 00:00:00.000000" },
+        ],
+        systemStatus: [false, true],
+        CorrespondenceByPhone: [true, false],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "ACME")
+      .should(
+        "contain.text",
+        "Date of birth: 01/12/2006 changed to: 02/12/2006",
+      )
+      .should("contain.text", "Changed from inactive to: active")
+      .should(
+        "contain.text",
+        "Correspondence by phone: true changed to: false",
+      );
+  });
+
+  it("can view investigation created event", () => {
+    mockEventHistory({
+      sourceType: "Investigation",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\Investigation\Investigation`,
+        type: "Aspect",
+        investigationTitle: "Test Investigation",
+        additionalInformation: "Some extra info",
+        investigationReceivedDate: "2026-03-01T00:00:00+00:00",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Aspect - Test Investigation")
+      .should("contain.text", "Some extra info")
+      .should("contain.text", "Investigation received on 01/03/2026");
+  });
+
+  it("can view investigation updated event with prior values", () => {
+    mockEventHistory({
+      sourceType: "Investigation",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\Investigation\Investigation`,
+        investigationTitle: "Test Investigation",
+        additionalInformation: "Some extra info",
+      },
+      changeSet: {
+        riskAssessmentDate: [
+          { date: "2026-01-01 00:00:00.000000" },
+          { date: "2026-02-01 00:00:00.000000" },
+        ],
+        reportApprovalOutcome: ["Outcome A", "Outcome B"],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should(
+        "contain.text",
+        "Risk assessment date: 01/01/2026 changed to 01/02/2026",
+      )
+      .should(
+        "contain.text",
+        "Report approval outcome: Outcome A changed to Outcome B",
+      );
+  });
+
+  it("can view investigation updated event without prior values", () => {
+    mockEventHistory({
+      sourceType: "Investigation",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\Investigation\Investigation`,
+        investigationTitle: "Test Investigation",
+      },
+      changeSet: {
+        investigationClosureDate: {
+          1: { date: "2026-06-15 00:00:00.000000" },
+        },
+        reportApprovalOutcome: { 1: "Approved" },
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Investigation closed: 15/06/2026")
+      .should("contain.text", "Report approval outcome: Approved");
+  });
+
+  it("can view a manual event", () => {
+    mockEventHistory({
+      sourceType: "Note",
+      type: "Application processing",
+      entity: {
+        type: "Application processing",
+        name: "Test note",
+        description: "This is a test note",
+        document: {
+          UUID: "123e4567-e89b-12d3-a456-426614174000",
+          friendlyDescription: "Test document",
+        },
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Test note - This is a test note");
+  });
+
+  it("can view activation key used event", () => {
+    mockEventHistory({
+      sourceType: "Note",
+      type: "Activation key used",
+      entity: {
+        type: "Activation key used",
+        description: "Date used: 2:30PM 15 March 2024\nJane Doe",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Activation key used")
+      .should("contain.text", "Date used: 2:30PM 15 March 2024")
+      .should("contain.text", "Jane Doe");
+  });
+
+  it("can view certificate provider added event", () => {
+    mockEventHistory({
+      sourceType: "CertificateProvider",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\CertificateProvider`,
+        firstname: "Jane",
+        surname: "Certifier",
+        companyName: "Cert Services Ltd",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Jane Certifier")
+      .should("contain.text", "Cert Services Ltd");
+  });
+
+  it("can view certificate provider updated event with prior values", () => {
+    mockEventHistory({
+      sourceType: "CertificateProvider",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\CertificateProvider`,
+        firstname: "Jane",
+        surname: "Certifier",
+        companyName: "Cert Services Ltd",
+      },
+      changeSet: {
+        dob: [
+          { date: "1980-05-15 00:00:00.000000" },
+          { date: "1980-05-16 00:00:00.000000" },
+        ],
+        systemStatus: [false, true],
+        CorrespondenceByEmail: [false, true],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should(
+        "contain.text",
+        "Date of birth: 15/05/1980 changed to: 16/05/1980",
+      )
+      .should("contain.text", "Changed from inactive to: active")
+      .should(
+        "contain.text",
+        "Correspondence by email: false changed to: true",
+      );
+  });
+
+  it("can view notified person added event", () => {
+    mockEventHistory({
+      sourceType: "NotifiedPerson",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\NotifiedPerson`,
+        firstname: "John",
+        surname: "Notified",
+        companyName: "Notifications Inc",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "John Notified")
+      .should("contain.text", "Notifications Inc");
+  });
+
+  it("can view notified person updated event with prior values", () => {
+    mockEventHistory({
+      sourceType: "NotifiedPerson",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\NotifiedPerson`,
+        firstname: "John",
+        surname: "Notified",
+        companyName: "Notifications Inc",
+      },
+      changeSet: {
+        noticeGivenDate: [
+          { date: "2024-01-10 00:00:00.000000" },
+          { date: "2024-01-20 00:00:00.000000" },
+        ],
+        systemStatus: [true, false],
+        CorrespondenceByPhone: [true, false],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should(
+        "contain.text",
+        "Date notice given: 10/01/2024 changed to: 20/01/2024",
+      )
+      .should("contain.text", "Changed from active to: inactive")
+      .should(
+        "contain.text",
+        "Correspondence by phone: true changed to: false",
+      );
+  });
+
+  it("can view cases linked event - parent/primary donor", () => {
+    mockEventHistory({
+      sourceType: "Donor",
+      sourcePerson: {
+        id: 1,
+        firstname: "Alice",
+        surname: "Archer",
+      },
+      type: "UPD",
+      changeset: {
+        child: [
+          [],
+          [
+            {
+              identifier: {
+                id: 2,
+              },
+              class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+            },
+          ],
+        ],
+      },
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+        id: 1,
+        firstname: "Alice",
+        surname: "Archer",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "was linked to")
+      .within(() => {
+        cy.contains("a", "Primary record")
+          .should("have.attr", "href")
+          .and("include", "/lpa/person/1");
+
+        cy.contains("a", "child record")
+          .should("have.attr", "href")
+          .and("include", "/lpa/person/2");
+      });
+  });
+
+  it("can view cases linked event - child donor", () => {
+    mockEventHistory({
+      sourceType: "Donor",
+      sourcePerson: {
+        id: 2,
+        firstname: "Beth",
+        surname: "Bennett",
+      },
+      type: "UPD",
+      changeset: {
+        parent: {
+          1: {
+            class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+            identifier: {
+              id: 1,
+            },
+          },
+        },
+      },
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+        id: 2,
+        firstname: "Beth",
+        surname: "Bennett",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "was linked to")
+      .within(() => {
+        cy.contains("a", "Primary record")
+          .should("have.attr", "href")
+          .and("include", "/lpa/person/1");
+
+        cy.contains("a", "child record")
+          .should("have.attr", "href")
+          .and("include", "/lpa/person/2");
+      });
+  });
+
+  it("can view cases unlinked event - parent/primary donor", () => {
+    mockEventHistory({
+      sourceType: "Donor",
+      sourcePerson: {
+        id: 1,
+        firstname: "Alice",
+        surname: "Archer",
+      },
+      type: "UPD",
+      changeset: {
+        child: [
+          [
+            {
+              identifier: {
+                id: 2,
+              },
+              class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+            },
+          ],
+          [],
+        ],
+      },
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+        id: 1,
+        firstname: "Alice",
+        surname: "Archer",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Alice Archer had a")
+      .should("contain.text", "unlinked")
+      .within(() => {
+        cy.contains("a", "child record")
+          .should("have.attr", "href")
+          .and("include", "/lpa/person/2");
+      });
+  });
+
+  it("can view cases unlinked event - child donor", () => {
+    mockEventHistory({
+      sourceType: "Donor",
+      sourcePerson: {
+        id: 2,
+        firstname: "Beth",
+        surname: "Bennett",
+      },
+      type: "UPD",
+      changeset: {
+        parent: [
+          {
+            class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+            identifier: {
+              id: 1,
+            },
+          },
+        ],
+      },
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseActor\Donor`,
+        id: 2,
+        firstname: "Beth",
+        surname: "Bennett",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+      .eq(0)
+      .should("contain.text", "Beth Bennett was unlinked from")
+      .should("contain.text", "unlinked")
+      .within(() => {
+        cy.contains("a", "Primary record")
+          .should("have.attr", "href")
+          .and("include", "/lpa/person/1");
+      });
+  });
+
+  it("can view LPA added event", () => {
+    mockEventHistory({
+      sourceType: "Lpa",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseItem\PowerOfAttorney`,
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item").eq(0).should("contain.text", "LPA created");
+  });
+
+  it("can view LPA updated event", () => {
+    mockEventHistory({
+      sourceType: "Lpa",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseItem\PowerOfAttorney`,
+      },
+      changeSet: {
+        registrationDate: [
+          { date: "2006-12-01 00:00:00.000000" },
+          { date: "2006-12-02 00:00:00.000000" },
+        ],
+        paymentExemption: [1, 2],
+        assignee: { 1: { details: { displayName: "Test Assignee" } } },
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item").then(($items) => {
+      const text = Cypress.$($items[0]).text().replaceAll(/\s+/g, " ").trim();
+
+      expect(text).to.include("Payment exemption: No changed to: Yes");
+      expect(text).to.include(
+        "Registration date: 01/12/2006 changed to: 02/12/2006",
+      );
+      expect(text).to.include("Assignee: Test Assignee");
+    });
+  });
+
+  it("can view EPA added event", () => {
+    mockEventHistory({
+      sourceType: "Epa",
+      type: "INS",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseItem\PowerOfAttorney\Epa`,
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item").eq(0).should("contain.text", "EPA created");
+  });
+
+  it("can view EPA updated event", () => {
+    mockEventHistory({
+      sourceType: "Epa",
+      type: "UPD",
+      entity: {
+        _class: String.raw`Opg\Core\Model\Entity\CaseItem\PowerOfAttorney\Epa`,
+      },
+      changeSet: {
+        epaDonorSignatureDate: [
+          { date: "2006-12-01 00:00:00.000000" },
+          { date: "2006-12-02 00:00:00.000000" },
+        ],
+        paymentExemption: [1, 2],
+        otherEpaInfo: { 1: "Other info" },
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item").then(($items) => {
+      const text = Cypress.$($items[0]).text().replaceAll(/\s+/g, " ").trim();
+
+      expect(text).to.include("Payment exemption: No changed to: Yes");
+      expect(text).to.include(
+        "Epa donor signature date: 01/12/2006 changed to: 02/12/2006",
+      );
+      expect(text).to.include("Other epa info: Other info");
+    });
   });
 });

@@ -40,11 +40,46 @@ func TestGetEditDonor(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, donorData{
-			Donor: person,
+			Donor:   person,
+			DonorId: 123,
 		}).
 		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/edit-donor?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := EditDonor(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetEditDonorHtmxRequest(t *testing.T) {
+	person := sirius.Person{
+		Firstname: "Wanda",
+		Surname:   "Bratu",
+	}
+
+	client := &mockEditDonorClient{}
+	client.
+		On("Person", mock.Anything, 123).
+		Return(person, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, donorData{
+			Donor:      person,
+			DonorId:    123,
+			CaseUids:   "&uid[]=7000-1234-1234",
+			EntityType: "person",
+			IsPartial:  true,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/edit-donor?id=123&entity=person&uid[]=7000-1234-1234", nil)
+	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
 	err := EditDonor(client, template.Func)(w, r)
@@ -94,6 +129,7 @@ func TestPostEditDonor(t *testing.T) {
 	template.
 		On("Func", mock.Anything, donorData{
 			Donor:   newPerson,
+			DonorId: 123,
 			Success: true,
 		}).
 		Return(nil)
@@ -182,6 +218,7 @@ func TestPostEditDonorWhenValidationError(t *testing.T) {
 			Donor: sirius.Person{
 				Firstname: "Rudolph",
 			},
+			DonorId: 123,
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{
 					"surname": {"required": "This field is required"},

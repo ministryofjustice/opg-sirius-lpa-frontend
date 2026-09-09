@@ -16,6 +16,7 @@ type Context struct {
 	Context   context.Context
 	Cookies   []*http.Cookie
 	XSRFToken string
+	IsPartial bool
 }
 
 type HttpClient interface {

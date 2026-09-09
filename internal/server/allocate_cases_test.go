@@ -46,6 +46,8 @@ func TestGetAllocateCases(t *testing.T) {
 		On("Func", mock.Anything, allocateCasesData{
 			Teams:    []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entities: []string{"LPA 7000-0000-0000"},
+			CaseID:   123,
+			CaseIDs:  []int{123},
 		}).
 		Return(nil)
 
@@ -87,11 +89,61 @@ func TestGetAllocateCasesMultiple(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	err := AllocateCases(client, template.Func)(w, r)
+
 	resp := w.Result()
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetAllocateCaseWithHXRequest(t *testing.T) {
+	client := &mockAllocateCasesClient{}
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Case", mock.Anything, 123).
+		Return(sirius.Case{
+			UID:      "7000-0000-0000",
+			CaseType: "LPA",
+			Donor:    &sirius.Person{ID: 42},
+		}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, allocateCasesData{
+			IsPartial:  true,
+			Teams:      []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			Entities:   []string{"LPA 7000-0000-0000"},
+			CaseIDs:    []int{123},
+			CaseID:     123,
+			DonorID:    42,
+			EntityType: "lpa",
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&entity=lpa", nil)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := AllocateCases(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+	template.AssertCalled(t, "Func", mock.Anything, mock.Anything)
+}
+
+func TestAllocateCaseParseFormError(t *testing.T) {
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader("%zz"))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AllocateCases(nil, nil)(w, r)
+
+	assert.NotNil(t, err)
 }
 
 func TestGetAllocateCasesBadQueryString(t *testing.T) {
@@ -192,6 +244,8 @@ func TestPostAllocateCases(t *testing.T) {
 			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			AssigneeUserName: "System user",
 			Entities:         []string{"LPA 7000-0000-0000"},
+			CaseID:           123,
+			CaseIDs:          []int{123},
 		}).
 		Return(nil)
 
@@ -309,6 +363,8 @@ func TestPostAllocateCasesWhenAssignToNotSet(t *testing.T) {
 	template.
 		On("Func", mock.Anything, allocateCasesData{
 			Teams:    []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			CaseID:   123,
+			CaseIDs:  []int{123},
 			Entities: []string{"LPA 7000-0000-0000"},
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{
@@ -375,6 +431,8 @@ func TestPostAllocateCasesWhenValidationError(t *testing.T) {
 			template.
 				On("Func", mock.Anything, allocateCasesData{
 					AssignTo:         name,
+					CaseID:           123,
+					CaseIDs:          []int{123},
 					Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 					Entities:         []string{"LPA 7000-0000-0000"},
 					Error:            sirius.ValidationError{Field: expectedErrors},

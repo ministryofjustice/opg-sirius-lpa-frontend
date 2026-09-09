@@ -47,8 +47,8 @@ var removeAnAttorneyCaseSummary = sirius.CaseSummary{
 			Subtype: "personal-welfare",
 		},
 		LpaStoreData: sirius.LpaStoreData{
-			HowAttorneysMakeDecisions:            "jointly",
-			HowReplacementAttorneysMakeDecisions: "jointly",
+			HowAttorneysMakeDecisions:            shared.HowAttorneysMakeDecisionsJointly,
+			HowReplacementAttorneysMakeDecisions: shared.HowAttorneysMakeDecisionsJointly,
 			Attorneys: []sirius.LpaStoreAttorney{
 				{
 					LpaStorePerson: sirius.LpaStorePerson{
@@ -300,8 +300,8 @@ func TestGetRemoveAnAttorney(t *testing.T) {
 	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
 			FormName:                     "remove",
-			Decisions:                    "jointly",
-			ReplacementAttorneyDecisions: "jointly",
+			Decisions:                    shared.HowAttorneysMakeDecisionsJointly,
+			ReplacementAttorneyDecisions: shared.HowAttorneysMakeDecisionsJointly,
 			ActiveAttorneyCount:          2,
 			ReplacementAttorneyCount:     2,
 			CaseSummary:                  removeAnAttorneyCaseSummary,
@@ -367,8 +367,8 @@ func TestGetRemoveAnAttorneyTemplateErrors(t *testing.T) {
 	removeTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
 			FormName:                     "remove",
-			Decisions:                    "jointly",
-			ReplacementAttorneyDecisions: "jointly",
+			Decisions:                    shared.HowAttorneysMakeDecisionsJointly,
+			ReplacementAttorneyDecisions: shared.HowAttorneysMakeDecisionsJointly,
 			ActiveAttorneyCount:          2,
 			ReplacementAttorneyCount:     2,
 			CaseSummary:                  removeAnAttorneyCaseSummary,
@@ -439,8 +439,8 @@ func TestPostRemoveAnAttorneyValidationErrorsRemoveTemplate(t *testing.T) {
 			removeTemplate.
 				On("Func", mock.Anything, removeAnAttorneyData{
 					FormName:                     "remove",
-					Decisions:                    "jointly",
-					ReplacementAttorneyDecisions: "jointly",
+					Decisions:                    shared.HowAttorneysMakeDecisionsJointly,
+					ReplacementAttorneyDecisions: shared.HowAttorneysMakeDecisionsJointly,
 					ActiveAttorneyCount:          2,
 					ReplacementAttorneyCount:     2,
 					CaseSummary:                  removeAnAttorneyCaseSummary,
@@ -484,8 +484,8 @@ func TestPostDecisionAttorneyValidationError(t *testing.T) {
 	decisionsTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
 			FormName:                     "remove",
-			Decisions:                    "jointly-for-some-severally-for-others",
-			ReplacementAttorneyDecisions: "jointly-for-some-severally-for-others",
+			Decisions:                    shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
+			ReplacementAttorneyDecisions: shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
 			ActiveAttorneyCount:          2,
 			ReplacementAttorneyCount:     2,
 			CaseSummary:                  manageAttorneyDecisionsSummary,
@@ -542,8 +542,8 @@ func TestPostRemoveAnAttorneyWithoutDecisionsConfirmTemplate(t *testing.T) {
 	confirmTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
 			FormName:                     "remove",
-			Decisions:                    "jointly",
-			ReplacementAttorneyDecisions: "jointly",
+			Decisions:                    shared.HowAttorneysMakeDecisionsJointly,
+			ReplacementAttorneyDecisions: shared.HowAttorneysMakeDecisionsJointly,
 			ActiveAttorneyCount:          2,
 			ReplacementAttorneyCount:     2,
 			CaseSummary:                  removeAnAttorneyCaseSummary,
@@ -643,8 +643,8 @@ func TestPostRemoveAttorneyWithDecisionsOnDecisionsTemplate(t *testing.T) {
 	decisionsTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
 			FormName:                     "remove",
-			Decisions:                    "jointly-for-some-severally-for-others",
-			ReplacementAttorneyDecisions: "jointly-for-some-severally-for-others",
+			Decisions:                    shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
+			ReplacementAttorneyDecisions: shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
 			ActiveAttorneyCount:          2,
 			ReplacementAttorneyCount:     2,
 			CaseSummary:                  manageAttorneyDecisionsSummary,
@@ -707,8 +707,8 @@ func TestPostRemoveAttorneyWithDecisionsOnConfirmTemplate(t *testing.T) {
 	confirmTemplate.
 		On("Func", mock.Anything, removeAnAttorneyData{
 			FormName:                     "remove",
-			Decisions:                    "jointly-for-some-severally-for-others",
-			ReplacementAttorneyDecisions: "jointly-for-some-severally-for-others",
+			Decisions:                    shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
+			ReplacementAttorneyDecisions: shared.HowAttorneysMakeDecisionsJointlyForSomeSeverallyForOthers,
 			ActiveAttorneyCount:          2,
 			ReplacementAttorneyCount:     2,
 			CaseSummary:                  manageAttorneyDecisionsSummary,

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
@@ -45,7 +46,7 @@ func TestEditComplaint(t *testing.T) {
 							"subCategory":          "18",
 							"complainantCategory":  "LPA_DONOR",
 							"origin":               "PHONE",
-							"summary":              "This and that",
+							"title":                "This and that",
 							"resolution":           "complaint upheld",
 							"resolutionInfo":       "Because...",
 							"resolutionDate":       "07/06/2022",
@@ -72,13 +73,13 @@ func TestEditComplaint(t *testing.T) {
 					Category:             "02",
 					Description:          "This is seriously bad",
 					ReceivedDate:         DateString("2022-04-05"),
-					Severity:             "Major",
+					Severity:             shared.ParseComplaintSeverity(shared.ComplaintSeverityMajor.Translation()),
 					InvestigatingOfficer: "Test Officer",
 					ComplainantName:      "Someones name",
 					SubCategory:          "18",
 					ComplainantCategory:  "LPA_DONOR",
 					Origin:               "PHONE",
-					Summary:              "This and that",
+					Title:                "This and that",
 					Resolution:           "complaint upheld",
 					ResolutionInfo:       "Because...",
 					ResolutionDate:       DateString("2022-06-07"),

@@ -18,6 +18,11 @@ type createInvestigationData struct {
 	Error         sirius.ValidationError
 	Case          sirius.Case
 	Investigation sirius.Investigation
+	CaseID        int
+	CaseUIDs      string
+	EntityType    string
+	DonorId       int
+	IsPartial     bool
 }
 
 func CreateInvestigation(client CreateInvestigationClient, tmpl template.Template) Handler {
@@ -27,7 +32,8 @@ func CreateInvestigation(client CreateInvestigationClient, tmpl template.Templat
 			return err
 		}
 
-		caseType, err := sirius.ParseCaseType(r.FormValue("case"))
+		caseTypeString := r.FormValue("case")
+		caseType, err := sirius.ParseCaseType(caseTypeString)
 		if err != nil {
 			return err
 		}
@@ -40,8 +46,13 @@ func CreateInvestigation(client CreateInvestigationClient, tmpl template.Templat
 		}
 
 		data := createInvestigationData{
-			XSRFToken: ctx.XSRFToken,
-			Case:      caseItem,
+			XSRFToken:  ctx.XSRFToken,
+			Case:       caseItem,
+			CaseID:     caseID,
+			CaseUIDs:   buildUIDQueryString(r.Form["uid[]"]),
+			EntityType: caseTypeString,
+			DonorId:    caseItem.Donor.ID,
+			IsPartial:  ctx.IsPartial,
 		}
 
 		if r.Method == http.MethodPost {

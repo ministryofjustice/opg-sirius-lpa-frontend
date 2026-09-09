@@ -7,27 +7,58 @@ import (
 )
 
 type Case struct {
-	Attorneys            []Person          `json:"attorneys,omitempty"`
-	CancellationDate     DateString        `json:"cancellationDate,omitempty"`
-	CaseType             string            `json:"caseType,omitempty"`
-	Correspondent        *Person           `json:"correspondent,omitempty"`
-	DispatchDate         DateString        `json:"dispatchDate,omitempty"`
-	Donor                *Person           `json:"donor,omitempty"`
-	DueDate              DateString        `json:"dueDate,omitempty"`
-	ExpectedPaymentTotal int               `json:"expectedPaymentTotal"`
-	FilingDate           DateString        `json:"filingDate,omitempty"`
-	ID                   int               `json:"id,omitempty"`
-	InvalidDate          DateString        `json:"invalidDate,omitempty"`
-	PaymentDate          DateString        `json:"paymentDate,omitempty"`
-	ReceiptDate          DateString        `json:"receiptDate,omitempty"`
-	RegistrationDate     DateString        `json:"registrationDate,omitempty"`
-	RejectedDate         DateString        `json:"rejectedDate,omitempty"`
-	RevokedDate          DateString        `json:"revokedDate,omitempty"`
-	Status               shared.CaseStatus `json:"status"`
-	SubType              string            `json:"caseSubtype,omitempty"`
-	TrustCorporations    []Person          `json:"trustCorporations,omitempty"`
-	UID                  string            `json:"uId,omitempty"`
-	WithdrawnDate        DateString        `json:"withdrawnDate,omitempty"`
+	Applicants                                []Person           `json:"applicants,omitempty"`
+	ApplicationType                           string             `json:"applicationType,omitempty"`
+	Assignee                                  *Person            `json:"assignee,omitempty"`
+	AttorneyDeclarationSignatureDate          DateString         `json:"attorneyDeclarationSignatureDate,omitempty"`
+	AttorneyRelationshipToDonor               string             `json:"attorneyRelationshipToDonor,omitempty"`
+	Attorneys                                 []Attorney         `json:"attorneys,omitempty"`
+	BatchID                                   string             `json:"batchId,omitempty"`
+	CancellationDate                          DateString         `json:"cancellationDate,omitempty"`
+	CaseAttorneyJointly                       *bool              `json:"caseAttorneyJointly,omitempty"`
+	CaseAttorneyJointlyAndJointlyAndSeverally *bool              `json:"caseAttorneyJointlyAndJointlyAndSeverally,omitempty"`
+	CaseAttorneyJointlyAndSeverally           *bool              `json:"caseAttorneyJointlyAndSeverally,omitempty"`
+	CaseAttorneySingular                      *bool              `json:"caseAttorneySingular,omitempty"`
+	CaseRecNumber                             string             `json:"caseRecNumber,omitempty"`
+	CaseType                                  string             `json:"caseType,omitempty"`
+	CertificateProviders                      []Person           `json:"certificateProviders,omitempty"`
+	Complaints                                []interface{}      `json:"complaints,omitempty"`
+	Correspondent                             *Correspondent     `json:"correspondent,omitempty"`
+	DispatchDate                              DateString         `json:"dispatchDate,omitempty"`
+	Documents                                 []interface{}      `json:"documents,omitempty"`
+	Donor                                     *Person            `json:"donor,omitempty"`
+	DueDate                                   DateString         `json:"dueDate,omitempty"`
+	ExpectedPaymentTotal                      int                `json:"expectedPaymentTotal"`
+	FilingDate                                DateString         `json:"filingDate,omitempty"`
+	ID                                        int                `json:"id,omitempty"`
+	InvalidDate                               DateString         `json:"invalidDate,omitempty"`
+	Investigations                            []interface{}      `json:"investigations,omitempty"`
+	LifeSustainingTreatment                   string             `json:"lifeSustainingTreatment,omitempty"`
+	LifeSustainingTreatmentSignatureDateA     DateString         `json:"lifeSustainingTreatmentSignatureDateA,omitempty"`
+	LifeSustainingTreatmentSignatureDateB     DateString         `json:"lifeSustainingTreatmentSignatureDateB,omitempty"`
+	LpaDonorSignatureDate                     DateString         `json:"lpaDonorSignatureDate,omitempty"`
+	Notes                                     []interface{}      `json:"notes,omitempty"`
+	NoticeGivenDate                           DateString         `json:"noticeGivenDate,omitempty"`
+	NotificationDate                          DateString         `json:"notificationDate,omitempty"`
+	NotifiedPersons                           []NotifiedPerson   `json:"notifiedPersons,omitempty"`
+	PaymentByCheque                           *bool              `json:"paymentByCheque,omitempty"`
+	PaymentExemption                          *bool              `json:"paymentExemption,omitempty"`
+	PaymentDate                               DateString         `json:"paymentDate,omitempty"`
+	RagRating                                 int                `json:"ragRating,omitempty"`
+	ReceiptDate                               DateString         `json:"receiptDate,omitempty"`
+	RegistrationDate                          DateString         `json:"registrationDate,omitempty"`
+	RegistrationDueDate                       DateString         `json:"registrationDueDate,omitempty"`
+	RejectedDate                              DateString         `json:"rejectedDate,omitempty"`
+	ReplacementAttorneys                      []Attorney         `json:"replacementAttorneys,omitempty"`
+	RevokedDate                               DateString         `json:"revokedDate,omitempty"`
+	Status                                    shared.CaseStatus  `json:"status,omitempty"`
+	StatusDate                                DateString         `json:"statusDate,omitempty"`
+	SubType                                   string             `json:"caseSubtype,omitempty"`
+	Tasks                                     []interface{}      `json:"tasks,omitempty"`
+	TrustCorporations                         []TrustCorporation `json:"trustCorporations,omitempty"`
+	UID                                       string             `json:"uId,omitempty"`
+	ValidationChecks                          []interface{}      `json:"validationChecks,omitempty"`
+	WithdrawnDate                             DateString         `json:"withdrawnDate,omitempty"`
 }
 
 func (c Case) Summary() string {
@@ -48,17 +79,17 @@ func (c *Client) Case(ctx Context, id int) (Case, error) {
 }
 
 func (c Case) FilterInactiveAttorneys() Case {
-	var activeAttorneys []Person
-	var activeTrustCorps []Person
+	var activeAttorneys []Attorney
+	var activeTrustCorps []TrustCorporation
 
 	for _, attorney := range c.Attorneys {
-		if attorney.SystemStatus {
+		if attorney.SystemStatus != nil && *attorney.SystemStatus {
 			activeAttorneys = append(activeAttorneys, attorney)
 		}
 	}
 
 	for _, trustCorp := range c.TrustCorporations {
-		if trustCorp.SystemStatus {
+		if trustCorp.SystemStatus != nil && *trustCorp.SystemStatus {
 			activeTrustCorps = append(activeTrustCorps, trustCorp)
 		}
 	}
@@ -66,4 +97,12 @@ func (c Case) FilterInactiveAttorneys() Case {
 	c.Attorneys = activeAttorneys
 	c.TrustCorporations = activeTrustCorps
 	return c
+}
+
+func (c Case) GetApplicantIds() []int {
+	var applicantIds []int
+	for _, applicant := range c.Applicants {
+		applicantIds = append(applicantIds, applicant.ID)
+	}
+	return applicantIds
 }

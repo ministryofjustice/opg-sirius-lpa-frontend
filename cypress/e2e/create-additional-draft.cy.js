@@ -80,11 +80,11 @@ describe("Create Additional Digital LPA draft", () => {
     cy.contains("Property and affairs").click();
     cy.contains("The donor, using a different address").click();
 
-    cy.contains("Enter a UK postcode, or enter the address manually")
+    cy.contains("Enter a UK postcode")
       .nextUntil(".govuk-input")
       .next()
       .type("SW1A 1AA");
-    cy.contains("Find address").click();
+    cy.contains("Look up UK postcode").click();
 
     cy.contains("Confirm and create draft LPA").click();
 

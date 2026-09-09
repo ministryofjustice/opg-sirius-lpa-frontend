@@ -1,3 +1,11 @@
 {{ define "partial-event-outgoing-document" }}
-    <a class="govuk-link" href="/lpa#/donor/{{ .Context.DonorID }}/documents?docUuid={{ .SourceDocument.UUID }}" target="_top">{{ .SourceDocument.FriendlyDescription }}</a>
-{{ end }}»
+    {{ if eq .SourceDocument.MimeType "application/pdf" }}
+        <a class="govuk-link" href="/lpa/frontend/view-document/{{ .SourceDocument.UUID }}/{{ .Context.DonorID }}" target="_top">
+            {{ .SourceDocument.FriendlyDescription }}
+        </a>
+    {{ else }}
+        <a class="govuk-link" href="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .SourceDocument.UUID) }}" download>
+            {{ .SourceDocument.FriendlyDescription }}
+        </a>
+    {{ end }}
+{{ end }}

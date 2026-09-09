@@ -1,0 +1,105 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 8 0 R 13 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /MediaBox [0 0 612 792] /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 199 >>
+stream
+BT
+/F1 24 Tf
+100 700 Td
+(Test Document - Page 1) Tj
+0 -40 Td
+/F1 12 Tf
+(This is the first page of the test document.) Tj
+0 -20 Td
+(It contains sample content for PDF rendering tests.) Tj
+0 -20 Td
+(The document has multiple pages to test pagination.) Tj
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+7 0 obj
+<< /Length 189 >>
+stream
+BT
+/F1 24 Tf
+100 700 Td
+(Test Document - Page 2) Tj
+0 -40 Td
+/F1 12 Tf
+(This is the second page of the test document.) Tj
+0 -20 Td
+(It demonstrates multi-page PDF handling.) Tj
+0 -20 Td
+(Navigation between pages should work smoothly.) Tj
+ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 6 0 R >> >> /MediaBox [0 0 612 792] /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+10 0 obj
+<< /Length 169 >>
+stream
+BT
+/F1 24 Tf
+100 700 Td
+(Test Document - Page 3) Tj
+0 -40 Td
+/F1 12 Tf
+(This is the third and final page.) Tj
+0 -20 Td
+(All pages render with consistent formatting.) Tj
+0 -20 Td
+(End of test document.) Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+12 0 obj
+<< /Length 10 >>
+stream
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 11 0 R >> >> /MediaBox [0 0 612 792] /Contents 10 0 R >>
+endobj
+xref
+0 14
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000132 00000 n 
+0000000231 00000 n 
+0000000310 00000 n 
+0000000559 00000 n 
+0000000638 00000 n 
+0000000877 00000 n 
+0000000976 00000 n 
+0000001055 00000 n 
+0000001274 00000 n 
+0000001353 00000 n 
+0000001413 00000 n 
+trailer
+<< /Size 14 /Root 1 0 R >>
+startxref
+1512
+%%EOF

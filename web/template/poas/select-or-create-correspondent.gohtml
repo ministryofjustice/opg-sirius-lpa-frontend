@@ -1,0 +1,150 @@
+{{ template "page" . }}
+
+{{ define "partial-content" }}
+  <div class="action-panel__form">
+    {{ template "error-summary" .Error }}
+
+    {{ if eq .CaseType "epa" }}
+      <a class="govuk-back-link"
+         href=""
+         hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
+         hx-target=".action-panel__content"
+         hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Back</a>
+    {{ else }}
+      <a class="govuk-back-link"
+         href=""
+         hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-4" .DonorId .CaseId) }}"
+         hx-target=".action-panel__content"
+         hx-swap="innerHTML show:#accordion-create-lpa-heading-4:top">Back</a>
+    {{ end }}
+
+    <h1 class="govuk-heading-m">Add a correspondent</h1>
+
+    <form class="form"
+          method="POST"
+          hx-post="{{ prefix (printf "/select-or-create-correspondent?id=%d&caseId=%d&caseType=%s" .DonorId .CaseId .CaseType) }}"
+          hx-target=".action-panel__content"
+          hx-swap="innerHTML">
+      {{ template "form-content" . }}
+
+      <div class="govuk-button-group govuk-!-padding-top-5">
+        <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
+        {{ if eq .CaseType "epa" }}
+          <a class="govuk-link govuk-link--no-visited-state"
+             href=""
+             hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
+             hx-target=".action-panel__content"
+             hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Cancel</a>
+        {{ else }}
+          <a class="govuk-link govuk-link--no-visited-state"
+             href=""
+             hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-4" .DonorId .CaseId) }}"
+             hx-target=".action-panel__content"
+             hx-swap="innerHTML show:#accordion-create-lpa-heading-4:top">Cancel</a>
+        {{ end }}
+      </div>
+    </form>
+  </div>
+{{ end }}
+
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Add a correspondent{{ end }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ template "error-summary" .Error }}
+
+      {{ if eq .CaseType "epa" }}
+        <a href="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+      {{ else }}
+        <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-4" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+      {{ end }}
+
+      <h1 class="govuk-heading-l">Add a correspondent</h1>
+
+      <form class="form" method="POST">
+        {{ template "form-content" . }}
+        <div class="govuk-button-group govuk-!-padding-top-5">
+          <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-%s?id=%d&caseId=%d" .CaseType .DonorId .CaseId) }}">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{{ end }}
+
+{{ define "form-content" }}
+  <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
+  <div class="govuk-form-group{{ if .Error.Field.attorney }} govuk-form-group--error{{ end }}">
+    <fieldset class="govuk-fieldset">
+      {{ template "errors" .Error.Field.attorney }}
+
+      <div class="govuk-radios" data-module="govuk-radios">
+        <div class="govuk-radios__item">
+          <input class="govuk-radios__input" id="f-actor-new" name="actorId" type="radio" value="new" checked>
+          <label class="govuk-label govuk-radios__label" for="f-actor-new">
+            Create a new correspondent
+          </label>
+        </div>
+        <div class="govuk-body">Or select a person named on this {{ ToUpper .CaseType }}:</div>
+        {{ if eq .CaseType "epa" }}
+          {{ range $num, $attorney := .Epa.Attorneys }}
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="f-actor-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $attorney.ID }}">
+              <label class="govuk-label govuk-radios__label" for="f-actor-{{ plusN $num 1 }}">
+                  {{ $attorney.Firstname }} {{ $attorney.Surname }}
+              </label>
+            </div>
+          {{ end }}
+        {{ else }}
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="f-actor-donor" name="actorId" type="radio" value="{{ .Lpa.Donor.ID }}">
+            <label class="govuk-label govuk-radios__label" for="f-actor-donor">
+                {{ .Lpa.Donor.Firstname }} {{ .Lpa.Donor.Surname }} (donor)
+            </label>
+          </div>
+          {{ range $num, $attorney := .Lpa.Attorneys }}
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="f-actor-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $attorney.ID }}">
+              <label class="govuk-label govuk-radios__label" for="f-actor-{{ plusN $num 1 }}">
+                  {{ $attorney.Firstname }} {{ $attorney.Surname }} (attorney)
+              </label>
+            </div>
+          {{ end }}
+          {{ range $num, $attorney := .Lpa.ReplacementAttorneys }}
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="f-actor-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $attorney.ID }}">
+              <label class="govuk-label govuk-radios__label" for="f-actor-{{ plusN $num 1 }}">
+                  {{ $attorney.Firstname }} {{ $attorney.Surname }} (replacement attorney)
+              </label>
+            </div>
+          {{ end }}
+          {{ range $num, $certifiedProvider := .Lpa.CertificateProviders }}
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="f-actor-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $certifiedProvider.ID }}">
+              <label class="govuk-label govuk-radios__label" for="f-actor-{{ plusN $num 1 }}">
+                  {{ $certifiedProvider.Firstname }} {{ $certifiedProvider.Surname }} (certified provider)
+              </label>
+            </div>
+          {{ end }}
+          {{ range $num, $notifiedPerson := .Lpa.NotifiedPersons }}
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="f-actor-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $notifiedPerson.ID }}">
+              <label class="govuk-label govuk-radios__label" for="f-actor-{{ plusN $num 1 }}">
+                  {{ $notifiedPerson.Firstname }} {{ $notifiedPerson.Surname }} (notified person)
+              </label>
+            </div>
+          {{ end }}
+          {{ range $num, $trustCorporation := .Lpa.TrustCorporations }}
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="f-actor-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $trustCorporation.ID }}">
+              <label class="govuk-label govuk-radios__label" for="f-actor-{{ plusN $num 1 }}">
+                  {{ $trustCorporation.Firstname }} {{ $trustCorporation.Surname }} (trust corporation)
+              </label>
+            </div>
+          {{ end }}
+        {{ end }}
+      </div>
+    </fieldset>
+  </div>
+{{ end }}

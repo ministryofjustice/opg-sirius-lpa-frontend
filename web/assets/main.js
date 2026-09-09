@@ -18,6 +18,14 @@ import addressFinder from "./address-finder";
 import autoApplyFilter from "./auto-apply-filter";
 import showHideCaseSummary from "./show-hide-case-summary";
 import disableAfterClick from "./disable-after-click";
+import "htmx.org";
+import htmx from "htmx.org/dist/htmx.esm";
+import documentListSort from "./document-list-sort";
+import initPdfViewer from "./pdf-viewer";
+import initSiriusHeader from "./sirius-header.js";
+import lpaFormSubtype from "./lpa-form-subtype.js";
+import showHideTrustCorpActiveRadios from "./show-hide-trust-corp-active-radios.js";
+import scrollSectionIntoView from "./scroll-section-into-view.js";
 
 const prefix = document.body.getAttribute("data-prefix");
 
@@ -40,6 +48,53 @@ addressFinder(prefix);
 autoApplyFilter();
 showHideCaseSummary();
 disableAfterClick();
+documentListSort();
+initPdfViewer();
+initSiriusHeader();
+lpaFormSubtype();
+showHideTrustCorpActiveRadios();
+scrollSectionIntoView();
+
+globalThis.htmx = htmx;
+// Don't include indicator styles as CSP blocks inline styles
+htmx.config.includeIndicatorStyles = false;
+// Allow responses with 400 error codes to be swapped in
+htmx.config.responseHandling.unshift({ code: "400", swap: true, error: false });
+
+htmx.on("htmx:afterSettle", (event) => {
+  const swapDetails = event.detail;
+
+  // Reinitialise MOJ and GOVUK frontend components after swapping in new content
+  // to ensure that they remain interactive
+  if (swapDetails.successful) {
+    GOVUKFrontend.initAll(swapDetails.target);
+    MOJFrontend.initAll(swapDetails.target);
+    loadingButton(swapDetails.target);
+    select(prefix, swapDetails.target);
+    todaysDate(swapDetails.target);
+    handleCreateDocumentButton();
+    insertSelector(swapDetails.target);
+    handleInsertCheckboxes({ scope: swapDetails.target });
+    autoClick(swapDetails.target);
+    textEditor();
+    addressFinder(prefix, swapDetails.target);
+    lpaFormSubtype(swapDetails.target);
+    scrollSectionIntoView(swapDetails.target);
+    showHideTrustCorpActiveRadios(swapDetails.target);
+
+    // Update the action panel width if swapping in create-document or edit-document content
+    if (swapDetails.target.id === "actions-content") {
+      if (
+        swapDetails.pathInfo.requestPath.includes("create-document") ||
+        swapDetails.pathInfo.requestPath.includes("edit-document")
+      ) {
+        document.querySelector(".action-panel").classList.add("wide");
+      } else {
+        document.querySelector(".action-panel").classList.remove("wide");
+      }
+    }
+  }
+});
 
 if (window.self !== window.parent) {
   const success = document.querySelector('[data-app-reload~="page"]');
@@ -79,4 +134,28 @@ if (window.self !== window.parent) {
       `${window.location.protocol}//${window.location.host}`,
     );
   }
+
+  const selectCase = document.querySelector("[data-app-select-case]");
+  if (selectCase) {
+    window.parent.postMessage(
+      {
+        message: "select-case",
+        caseId: selectCase.getAttribute("data-app-select-case"),
+      },
+      `${window.location.protocol}//${window.location.host}`,
+    );
+  }
+
+  window.addEventListener("message", (event) => {
+    if (
+      event.origin !== `${window.location.protocol}//${window.location.host}`
+    ) {
+      return;
+    }
+    if (event.data === "dark") {
+      document.documentElement.classList.add("app-!-html-class--dark");
+    } else if (event.data === "light") {
+      document.documentElement.classList.remove("app-!-html-class--dark");
+    }
+  });
 }

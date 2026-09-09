@@ -52,11 +52,11 @@
                 {{ template "date" (field "lpaSignedOn" "LPA signed on" .Form.LpaSignedOn .Error.Field.LpaSignedOn) }}
 
                 {{ template "input" (field "authorisedSignatory" "Name of the person who signed on behalf of the donor" .Form.AuthorisedSignatory .Error.Field.AuthorisedSignatory) }}
-                {{ template "radios" (radios "signedByWitnessOne" "Signed by witness 1 (certificate provider)" .Form.SignedByWitnessOne .Error.Field.SignedByWitnessOne
+                {{ template "radios" (radios "signedByWitnessOne" "Signed by witness 1 (certificate provider)" .Form.SignedByWitnessOne .Error.Field.SignedByWitnessOne false
                 (item "Yes" "Yes")
                 (item "No" "No")
                 ) }}
-                {{ template "radios" (radios "signedByWitnessTwo" .SignedByWitnessTwoLabel .Form.SignedByWitnessTwo .Error.Field.SignedByWitnessTwo
+                {{ template "radios" (radios "signedByWitnessTwo" .SignedByWitnessTwoLabel .Form.SignedByWitnessTwo .Error.Field.SignedByWitnessTwo false
                 (item "Yes" "Yes")
                 (item "No" "No")
                 ) }}

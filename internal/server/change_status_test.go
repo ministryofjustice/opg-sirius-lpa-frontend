@@ -17,6 +17,10 @@ type mockChangeStatusClient struct {
 	mock.Mock
 }
 
+func (m *mockChangeStatusClient) CreateNote(ctx sirius.Context, entityID int, entityType sirius.EntityType, noteType, name, description string, file *sirius.NoteFile) error {
+	return m.Called(ctx, entityID, entityType, noteType, name, description, file).Error(0)
+}
+
 func (m *mockChangeStatusClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(sirius.Case), args.Error(1)
@@ -50,6 +54,8 @@ func TestGetChangeStatus(t *testing.T) {
 				On("Func", mock.Anything, changeStatusData{
 					Entity:            caseType + " 700700",
 					AvailableStatuses: []string{"Cancelled", "Withdrawn"},
+					CaseID:            123,
+					CaseType:          caseType,
 				}).
 				Return(nil)
 
@@ -140,6 +146,8 @@ func TestGetChangeStatusWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, changeStatusData{
 			Entity:            "PFA 700700",
 			AvailableStatuses: []string{"Cancelled", "Withdrawn"},
+			CaseID:            123,
+			CaseType:          "lpa",
 		}).
 		Return(errExample)
 
@@ -179,11 +187,75 @@ func TestPostChangeStatus(t *testing.T) {
 					Entity:            caseType + " 700700",
 					AvailableStatuses: []string{"Cancelled", "Withdrawn"},
 					NewStatus:         "Withdrawn",
+					CaseID:            123,
+					CaseType:          caseType,
 				}).
 				Return(nil)
 
 			form := url.Values{
 				"status": {"Withdrawn"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := ChangeStatus(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			client.AssertNotCalled(t, "CreateNote", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
+func TestPostChangeStatusWithNotes(t *testing.T) {
+	testCases := map[string]sirius.EntityType{
+		"lpa": sirius.EntityTypeLpa,
+		"epa": sirius.EntityTypeEpa,
+	}
+
+	for caseType, noteEntityType := range testCases {
+		t.Run(caseType, func(t *testing.T) {
+			caseItem := sirius.Case{CaseType: caseType, UID: "700700"}
+
+			client := &mockChangeStatusClient{}
+			client.
+				On("EditCase", mock.Anything, 123, sirius.CaseType(caseType), sirius.Case{
+					Status: shared.CaseStatusTypeWithdrawn,
+				}).
+				Return(nil)
+
+			client.
+				On("CreateNote", mock.Anything, 123, noteEntityType, "Status change - Notes", "Status changed to Withdrawn", "Case note details", (*sirius.NoteFile)(nil)).
+				Return(nil)
+
+			client.
+				On("Case", mock.Anything, 123).
+				Return(caseItem, nil)
+
+			client.
+				On("AvailableStatuses", mock.Anything, 123, sirius.CaseType(caseType)).
+				Return([]string{"Cancelled", "Withdrawn"}, nil)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, changeStatusData{
+					Success:           true,
+					Entity:            caseType + " 700700",
+					AvailableStatuses: []string{"Cancelled", "Withdrawn"},
+					NewStatus:         "Withdrawn",
+					CaseID:            123,
+					CaseType:          caseType,
+					Notes:             "Case note details",
+				}).
+				Return(nil)
+
+			form := url.Values{
+				"status": {"Withdrawn"},
+				"notes":  {"Case note details"},
 			}
 
 			r, _ := http.NewRequest(http.MethodPost, "/?id=123&case="+caseType, strings.NewReader(form.Encode()))
@@ -230,4 +302,87 @@ func TestPostChangeStatusWhenChangeStatusErrors(t *testing.T) {
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestGetChangeStatusHtmx(t *testing.T) {
+	caseItem := sirius.Case{CaseType: "lpa", UID: "700700"}
+
+	client := &mockChangeStatusClient{}
+	client.
+		On("Case", mock.Anything, 123).
+		Return(caseItem, nil)
+
+	client.
+		On("AvailableStatuses", mock.Anything, 123, sirius.CaseTypeLpa).
+		Return([]string{"Cancelled", "Withdrawn"}, nil)
+
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, changeStatusData{
+			Entity:            "lpa 700700",
+			AvailableStatuses: []string{"Cancelled", "Withdrawn"},
+			CaseID:            123,
+			CaseType:          "lpa",
+			IsPartial:         true,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
+	r.Header.Set("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := ChangeStatus(client, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, partialTemplate)
+}
+
+func TestPostChangeStatusHtmx(t *testing.T) {
+	caseItem := sirius.Case{CaseType: "lpa", UID: "700700"}
+
+	client := &mockChangeStatusClient{}
+	client.
+		On("EditCase", mock.Anything, 123, sirius.CaseTypeLpa, sirius.Case{
+			Status: shared.CaseStatusTypeWithdrawn,
+		}).
+		Return(nil)
+
+	client.
+		On("Case", mock.Anything, 123).
+		Return(caseItem, nil)
+
+	client.
+		On("AvailableStatuses", mock.Anything, 123, sirius.CaseTypeLpa).
+		Return([]string{"Cancelled", "Withdrawn"}, nil)
+
+	partialTemplate := &mockTemplate{}
+	partialTemplate.
+		On("Func", mock.Anything, changeStatusData{
+			Success:           true,
+			Entity:            "lpa 700700",
+			AvailableStatuses: []string{"Cancelled", "Withdrawn"},
+			NewStatus:         "Withdrawn",
+			CaseID:            123,
+			CaseType:          "lpa",
+			IsPartial:         true,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"status": {"Withdrawn"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&case=lpa", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	r.Header.Set("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := ChangeStatus(client, partialTemplate.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, partialTemplate)
 }

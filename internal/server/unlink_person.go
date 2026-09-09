@@ -17,6 +17,8 @@ type unlinkPersonData struct {
 	XSRFToken string
 	Success   bool
 	Error     sirius.ValidationError
+	CaseUids  string
+	IsPartial bool
 
 	Person sirius.Person
 }
@@ -29,7 +31,11 @@ func UnlinkPerson(client UnlinkPersonClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-		data := unlinkPersonData{XSRFToken: ctx.XSRFToken}
+		data := unlinkPersonData{
+			XSRFToken: ctx.XSRFToken,
+			CaseUids:  buildUIDQueryString(r.Form["uid[]"]),
+			IsPartial: ctx.IsPartial,
+		}
 
 		if r.Method == http.MethodPost {
 			var childId int

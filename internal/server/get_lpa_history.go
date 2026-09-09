@@ -1,16 +1,19 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"golang.org/x/sync/errgroup"
 )
 
 type GetLpaHistoryClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
-	GetEvents(ctx sirius.Context, donorId string, caseIds []string, sourceTypes []string, sortBy string) (sirius.LpaEventsResponse, error)
+	GetEvents(ctx sirius.Context, donorId string, caseIds []string, sourceTypes []string, eventIds []string, sortBy string) (sirius.LpaEventsResponse, error)
+	GetUserDetails(sirius.Context) (sirius.User, error)
 }
 
 type getLpaHistory struct {
@@ -28,11 +31,89 @@ type getLpaHistory struct {
 	ComplainantCategories  []sirius.RefDataItem
 	ComplaintOrigins       []sirius.RefDataItem
 	CompensationTypes      []sirius.RefDataItem
+	DonorFieldOrder        []string
+	LpaFieldOrder          []string
+	EpaFieldOrder          []string
+	IsSysAdminUser         bool
 }
 
 type FilterLpaEventsForm struct {
 	Types []string `form:"type"`
 	Sort  string   `form:"sort"`
+}
+
+var donorFieldOrder = []string{
+	"salutation",
+	"firstname",
+	"middlenames",
+	"surname",
+	"otherNames",
+	"previousNames",
+	"dob",
+	"email",
+	"correspondenceByPost",
+	"correspondenceByPhone",
+	"correspondenceByEmail",
+	"correspondenceByWelsh",
+}
+
+var lpaFieldOrder = []string{
+	"applicationType",
+	"onlineLpaId",
+	"caseAttorneySingular",
+	"caseAttorneyJointly",
+	"caseAttorneyJointlyAndSeverally",
+	"caseAttorneyJointlyAndJointlyAndSeverally",
+	"attorneyActDecisions",
+	"lifeSustainingTreatment",
+	"applicationHasRestrictions",
+	"applicationHasGuidance",
+	"lpaDonorSignatureDate",
+	"certificateProviderSignatureDate",
+	"applicantSignatureDate",
+	"paymentByDebitCreditCard",
+	"paymentByCheque",
+	"paymentExemption",
+	"paymentRemission",
+	"haveAppliedForFeeRemission",
+	"anyOtherInfo",
+	"additionalInfo",
+	"assignee",
+	"cancellationDate",
+	"registrationDate",
+	"dispatchDate",
+	"noticeGivenDate",
+	"withdrawnDate",
+}
+
+var epaFieldOrder = []string{
+	"caseAttorneyJointly",
+	"caseAttorneySingular",
+	"caseAttorneyJointlyAndSeverally",
+	"epaDonorSignatureDate",
+	"epaDonorNoticeGivenDate",
+	"paymentByCheque",
+	"paymentExemption",
+	"paymentDate",
+	"donorHasOtherEpas",
+	"otherEpaInfo",
+	"assignee",
+	"cancellationDate",
+	"dispatchDate",
+	"dueDate",
+	"filingDate",
+	"invalidDate",
+	"paymentDate",
+	"receiptDate",
+	"registrationDate",
+	"rejectedDate",
+	"revokedDate",
+	"withdrawnDate",
+}
+
+type FieldChange struct {
+	OldValue *string
+	NewValue *string
 }
 
 func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
@@ -49,14 +130,29 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 			Form: FilterLpaEventsForm{
 				Sort: "desc",
 			},
-			IsFiltered: false,
+			IsFiltered:      false,
+			DonorFieldOrder: donorFieldOrder,
+			LpaFieldOrder:   lpaFieldOrder,
+			EpaFieldOrder:   epaFieldOrder,
 		}
 
 		group.Go(func() error {
-			eventsData, err := client.GetEvents(ctx.With(groupCtx), donorId, caseIDs, []string{}, "desc")
+			user, err := client.GetUserDetails(ctx)
 			if err != nil {
 				return err
 			}
+			data.IsSysAdminUser = user.HasRole("System Admin")
+			return nil
+		})
+
+		group.Go(func() error {
+			eventsData, err := client.GetEvents(ctx.With(groupCtx), donorId, caseIDs, []string{}, []string{}, "desc")
+			if err != nil {
+				return err
+			}
+
+			normaliseComplaintTitleChanges(eventsData.Events)
+
 			data.Events = eventsData.Events
 			data.EventFilterData = eventsData.Metadata.SourceTypes
 			data.TotalEvents = eventsData.Total
@@ -131,10 +227,12 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 				return err
 			}
 
-			eventsData, err := client.GetEvents(ctx, donorId, caseIDs, data.Form.Types, data.Form.Sort)
+			eventsData, err := client.GetEvents(ctx, donorId, caseIDs, data.Form.Types, []string{}, data.Form.Sort)
 			if err != nil {
 				return err
 			}
+
+			normaliseComplaintTitleChanges(eventsData.Events)
 
 			data.TotalFilteredEvents = eventsData.Total
 			data.Events = eventsData.Events
@@ -143,4 +241,46 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 
 		return tmpl(w, data)
 	}
+}
+
+func normaliseComplaintTitleChanges(events []sirius.LpaEvent) {
+	for i, event := range events {
+		if event.SourceType == shared.LpaEventSourceTypeComplaint {
+			changes, isMap := event.Changes.(map[string]interface{})
+			if isMap {
+				title, hasTitle := changes["title"]
+				if hasTitle {
+					changes["title"] = normaliseChange(title)
+				}
+				events[i].Changes = changes
+			}
+		}
+	}
+}
+
+func normaliseChange(v interface{}) FieldChange {
+	var change FieldChange
+
+	val, isList := v.([]interface{})
+	if isList {
+		if len(val) >= 1 {
+			s := fmt.Sprintf("%v", val[0])
+			change.OldValue = &s
+		}
+		if len(val) >= 2 {
+			s := fmt.Sprintf("%v", val[1])
+			change.NewValue = &s
+		}
+	}
+
+	val2, isMap := v.(map[string]interface{})
+	if isMap {
+		newValue, hasNewValue := val2["1"]
+		if hasNewValue {
+			s := fmt.Sprintf("%v", newValue)
+			change.NewValue = &s
+		}
+	}
+
+	return change
 }

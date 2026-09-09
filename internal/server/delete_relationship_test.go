@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -31,31 +32,41 @@ func (m *mockDeleteRelationshipClient) Person(ctx sirius.Context, id int) (siriu
 }
 
 func TestGetDeleteRelationship(t *testing.T) {
-	client := &mockDeleteRelationshipClient{}
-	client.
-		On("Person", mock.Anything, 123).
-		Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
-	client.
-		On("PersonReferences", mock.Anything, 123).
-		Return([]sirius.PersonReference{{ReferenceID: 1}}, nil)
+	for _, isHtmx := range []bool{true, false} {
+		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
+			client := &mockDeleteRelationshipClient{}
+			client.
+				On("Person", mock.Anything, 123).
+				Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
+			client.
+				On("PersonReferences", mock.Anything, 123).
+				Return([]sirius.PersonReference{{ReferenceID: 1}}, nil)
 
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, deleteRelationshipData{
-			Entity:           "John Doe",
-			PersonReferences: []sirius.PersonReference{{ReferenceID: 1}},
-		}).
-		Return(nil)
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, deleteRelationshipData{
+					Entity:           "John Doe",
+					PersonReferences: []sirius.PersonReference{{ReferenceID: 1}},
+					DonorId:          123,
+					IsPartial:        isHtmx,
+				}).
+				Return(nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
-	w := httptest.NewRecorder()
+			r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+			w := httptest.NewRecorder()
 
-	err := DeleteRelationship(client, template.Func)(w, r)
-	resp := w.Result()
+			if isHtmx {
+				r.Header.Add("HX-Request", "true")
+			}
 
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
+			err := DeleteRelationship(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
 }
 
 func TestGetDeleteRelationshipNoID(t *testing.T) {
@@ -117,6 +128,7 @@ func TestGetDeleteRelationshipWhenTemplateErrors(t *testing.T) {
 		On("Func", mock.Anything, deleteRelationshipData{
 			Entity:           "John Doe",
 			PersonReferences: []sirius.PersonReference{{ReferenceID: 1}},
+			DonorId:          123,
 		}).
 		Return(errExample)
 
@@ -147,6 +159,7 @@ func TestPostDeleteRelationship(t *testing.T) {
 			Entity:           "John Doe",
 			Success:          true,
 			PersonReferences: []sirius.PersonReference{{ReferenceID: 1}},
+			DonorId:          123,
 		}).
 		Return(nil)
 
@@ -206,6 +219,7 @@ func TestPostDeleteRelationshipWhenNoRelationshipSelectedValidationError(t *test
 			Success:          false,
 			PersonReferences: []sirius.PersonReference{{ReferenceID: 1}},
 			Error:            expectedError,
+			DonorId:          123,
 		}).
 		Return(nil)
 

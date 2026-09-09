@@ -3,11 +3,13 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
 )
 
 func TestAddComplaint(t *testing.T) {
@@ -38,13 +40,13 @@ func TestAddComplaint(t *testing.T) {
 							"category":             "02",
 							"description":          "A description",
 							"receivedDate":         "05/04/2022",
-							"severity":             "Major",
+							"severity":             "Complaint",
 							"investigatingOfficer": "Test Officer",
 							"complainantName":      "Someones name",
 							"subCategory":          "18",
 							"complainantCategory":  "LPA_DONOR",
 							"origin":               "PHONE",
-							"summary":              "A title",
+							"title":                "A title",
 						}),
 					}).
 					WithCompleteResponse(consumer.Response{
@@ -67,13 +69,13 @@ func TestAddComplaint(t *testing.T) {
 					Category:             "02",
 					Description:          "A description",
 					ReceivedDate:         DateString("2022-04-05"),
-					Severity:             "Major",
+					Severity:             shared.ParseComplaintSeverity(shared.ComplaintSeverityComplaint.Translation()),
 					InvestigatingOfficer: "Test Officer",
 					ComplainantName:      "Someones name",
 					SubCategory:          "18",
 					ComplainantCategory:  "LPA_DONOR",
 					Origin:               "PHONE",
-					Summary:              "A title",
+					Title:                "A title",
 				})
 
 				if tc.expectedError == nil {

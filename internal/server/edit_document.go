@@ -22,6 +22,7 @@ type EditDocumentClient interface {
 
 type editDocumentData struct {
 	XSRFToken    string
+	IsPartial    bool
 	Success      bool
 	Error        sirius.ValidationError
 	Case         sirius.Case
@@ -33,6 +34,7 @@ type editDocumentData struct {
 	SaveAndExit  bool
 	PreviewDraft bool
 	DownloadUUID string
+	DonorId      int
 }
 
 func publishDraftDocument(
@@ -80,31 +82,33 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		var documentTemplates []sirius.DocumentTemplateData
 		data := editDocumentData{
 			XSRFToken: ctx.XSRFToken,
+			IsPartial: ctx.IsPartial,
 		}
+
+		caseItem, err := client.Case(ctx, caseID)
+		if err != nil {
+			return err
+		}
+		data.Case = caseItem
+		data.DonorId = caseItem.Donor.ID
+
+		var documentTemplates []sirius.DocumentTemplateData
 
 		switch r.Method {
 		case http.MethodGet:
 			group, groupCtx := errgroup.WithContext(ctx.Context)
 
-			group.Go(func() error {
-				caseItem, err := client.Case(ctx.With(groupCtx), caseID)
-				if err != nil {
-					return err
-				}
-				data.Case = caseItem
-
-				if caseType == sirius.CaseTypeDigitalLpa {
-					data.CaseSummary, err = client.CaseSummary(ctx.With(groupCtx), data.Case.UID)
+			if caseType == sirius.CaseTypeDigitalLpa {
+				group.Go(func() error {
+					data.CaseSummary, err = client.CaseSummary(ctx, data.Case.UID)
 					if err != nil {
 						return err
 					}
-				}
-
-				return nil
-			})
+					return nil
+				})
+			}
 
 			group.Go(func() error {
 				documents, err := client.Documents(ctx.With(groupCtx), caseType, caseID, []string{sirius.TypeDraft}, []string{})
@@ -180,11 +184,6 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					return err
 				}
 
-				caseItem, err := client.Case(ctx, caseID)
-				if err != nil {
-					return err
-				}
-
 				if caseType == sirius.CaseTypeDigitalLpa {
 					SetFlash(w, FlashNotification{
 						Title: "Draft document deleted",
@@ -202,11 +201,6 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					return err
 				} else {
 					if caseType == sirius.CaseTypeDigitalLpa {
-						caseItem, err := client.Case(ctx, caseID)
-						if err != nil {
-							return err
-						}
-
 						SetFlash(w, FlashNotification{
 							Title: "Document published",
 						})
@@ -224,11 +218,6 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				}
 
 				if caseType == sirius.CaseTypeDigitalLpa {
-					caseItem, err := client.Case(ctx, caseID)
-					if err != nil {
-						return err
-					}
-
 					SetFlash(w, FlashNotification{
 						Title: "Document saved",
 					})
@@ -243,12 +232,6 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				group, groupCtx := errgroup.WithContext(ctx.Context)
 
 				group.Go(func() error {
-					caseItem, err := client.Case(ctx.With(groupCtx), caseID)
-					if err != nil {
-						return err
-					}
-					data.Case = caseItem
-
 					if caseType == sirius.CaseTypeDigitalLpa {
 						data.CaseSummary, err = client.CaseSummary(ctx.With(groupCtx), data.Case.UID)
 						if err != nil {

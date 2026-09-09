@@ -36,7 +36,7 @@ func TestSetFlashAddsHeader(t *testing.T) {
 		Title: "title",
 	})
 
-	assert.Equal(t, "flash-lpa-frontend=eyJuYW1lIjoidGl0bGUifQ==; Path=/; HttpOnly; Secure", header.Get("Set-Cookie"))
+	assert.Equal(t, "flash-lpa-frontend=eyJuYW1lIjoidGl0bGUifQ==; Path=/; HttpOnly; Secure; SameSite=Lax", header.Get("Set-Cookie"))
 }
 
 func TestGetFlashGetsHeader(t *testing.T) {
@@ -48,8 +48,11 @@ func TestGetFlashGetsHeader(t *testing.T) {
 
 	r, _ := http.NewRequest("GET", "/some-url", nil)
 	r.AddCookie(&http.Cookie{
-		Name:  "flash-lpa-frontend",
-		Value: "eyJuYW1lIjoidGl0bGUifQ==",
+		Name:     "flash-lpa-frontend",
+		Value:    "eyJuYW1lIjoidGl0bGUifQ==",
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
 	})
 
 	notification, err := GetFlash(w, r)
@@ -83,8 +86,11 @@ func TestGetFlashReturnsErrorIfCannotDecodeBase64(t *testing.T) {
 
 	r, _ := http.NewRequest("GET", "/some-url", nil)
 	r.AddCookie(&http.Cookie{
-		Name:  "flash-lpa-frontend",
-		Value: "badstring",
+		Name:     "flash-lpa-frontend",
+		Value:    "badstring",
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
 	})
 
 	notification, err := GetFlash(w, r)
@@ -102,8 +108,11 @@ func TestGetFlashReturnsErrorIfCannotDecodeJSON(t *testing.T) {
 
 	r, _ := http.NewRequest("GET", "/some-url", nil)
 	r.AddCookie(&http.Cookie{
-		Name:  "flash-lpa-frontend",
-		Value: "dGhpcyBpcyBub3QgSlNPTg==",
+		Name:     "flash-lpa-frontend",
+		Value:    "dGhpcyBpcyBub3QgSlNPTg==",
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
 	})
 
 	notification, err := GetFlash(w, r)

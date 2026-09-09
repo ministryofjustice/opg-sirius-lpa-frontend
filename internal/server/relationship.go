@@ -19,6 +19,11 @@ type relationshipData struct {
 	Entity    string
 	Success   bool
 	Error     sirius.ValidationError
+	IsPartial bool
+
+	DonorID    int
+	CaseUIDs   string
+	EntityType string
 
 	SearchUID  string
 	SearchName string
@@ -42,6 +47,14 @@ func Relationship(client RelationshipClient, tmpl template.Template) Handler {
 		data := relationshipData{
 			XSRFToken: ctx.XSRFToken,
 			Entity:    fmt.Sprintf("%s %s", person.Firstname, person.Surname),
+			DonorID:   personID,
+			IsPartial: ctx.IsPartial,
+		}
+
+		data.CaseUIDs = buildUIDQueryString(r.Form["uid[]"])
+
+		if entityType, err := sirius.ParseEntityType(r.FormValue("entity")); err == nil {
+			data.EntityType = string(entityType)
 		}
 
 		if r.Method == http.MethodPost {

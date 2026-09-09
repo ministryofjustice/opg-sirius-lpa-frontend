@@ -38,6 +38,11 @@ func (m *mockAssignTaskClient) GetUserDetails(ctx sirius.Context) (sirius.User, 
 	return args.Get(0).(sirius.User), args.Error(1)
 }
 
+func (m *mockAssignTaskClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.Case), args.Error(1)
+}
+
 func TestGetAssignTask(t *testing.T) {
 	client := &mockAssignTaskClient{}
 	client.
@@ -53,10 +58,45 @@ func TestGetAssignTask(t *testing.T) {
 			Teams:    []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entities: []string{"LPA 7000-0000-0000: A task"},
 			Uid:      "7000-0000-0000",
+			CaseType: "lpa",
+			TaskIDs:  "id=123",
 		}).
 		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := AssignTask(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetAssignTaskWithDonorAndUID(t *testing.T) {
+	client := &mockAssignTaskClient{}
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Task", mock.Anything, 123).
+		Return(sirius.Task{Name: "A task", CaseItems: []sirius.Case{{UID: "7000-0000-0000", CaseType: "LPA"}}}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, assignTaskData{
+			Teams:    []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			Entities: []string{"LPA 7000-0000-0000: A task"},
+			Uid:      "7000-0000-0000",
+			CaseType: "lpa",
+			TaskIDs:  "id=123",
+			DonorID:  82,
+			CaseUids: "&uid[]=7000-0000-0000",
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&donorId=82&uid[]=7000-0000-0000", nil)
 	w := httptest.NewRecorder()
 
 	err := AssignTask(client, template.Func)(w, r)
@@ -85,7 +125,8 @@ func TestGetAssignTaskMultiple(t *testing.T) {
 			sort.Strings(d.Entities)
 
 			return assert.Equal(t, []sirius.Team{{ID: 1, DisplayName: "A Team"}}, d.Teams) &&
-				assert.Equal(t, []string{"EPA 7000-0000-1111: Another task", "LPA 7000-0000-0000: A task"}, d.Entities)
+				assert.Equal(t, []string{"EPA 7000-0000-1111: Another task", "LPA 7000-0000-0000: A task"}, d.Entities) &&
+				assert.Equal(t, "id=123&id=456", d.TaskIDs)
 		})).
 		Return(nil)
 
@@ -117,6 +158,15 @@ func TestGetAssignTaskBadQueryString(t *testing.T) {
 			assert.NotNil(t, err)
 		})
 	}
+}
+
+func TestGetAssignTaskBadDonorID(t *testing.T) {
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&donorId=what", nil)
+	w := httptest.NewRecorder()
+
+	err := AssignTask(nil, nil)(w, r)
+
+	assert.NotNil(t, err)
 }
 
 func TestGetAssignTaskWhenTeamsErrors(t *testing.T) {
@@ -178,6 +228,41 @@ func TestGetAssignTaskWhenTemplateErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestGetAssignTaskHtmx(t *testing.T) {
+	client := &mockAssignTaskClient{}
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Task", mock.Anything, 123).
+		Return(sirius.Task{Name: "A task", CaseItems: []sirius.Case{{UID: "7000-0000-0000", CaseType: "LPA"}}}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, assignTaskData{
+			IsPartial: true,
+			Teams:     []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			Entities:  []string{"LPA 7000-0000-0000: A task"},
+			Uid:       "7000-0000-0000",
+			CaseType:  "lpa",
+			TaskIDs:   "id=123",
+			DonorID:   82,
+			CaseUids:  "&uid[]=7000-0000-0000",
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123&donorId=82&uid[]=7000-0000-0000", nil)
+	r.Header.Set("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := AssignTask(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestPostAssignTask(t *testing.T) {
 	client := &mockAssignTaskClient{}
 	client.
@@ -198,6 +283,8 @@ func TestPostAssignTask(t *testing.T) {
 			AssigneeUserName: "System user",
 			Entities:         []string{"LPA 7000-0000-0000: A task"},
 			Uid:              "7000-0000-0000",
+			CaseType:         "lpa",
+			TaskIDs:          "id=123",
 		}).
 		Return(nil)
 
@@ -243,6 +330,8 @@ func TestPostAssignTaskToMe(t *testing.T) {
 			AssigneeUserName: "Me",
 			Entities:         []string{"LPA 7000-0000-0000: A task"},
 			Uid:              "7000-0000-0000",
+			CaseType:         "lpa",
+			TaskIDs:          "id=123",
 		}).
 		Return(nil)
 
@@ -277,17 +366,6 @@ func TestPostAssignTaskWhenUserDetailsErrors(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(sirius.User{}, errExample)
 
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, assignTaskData{
-			Success:          true,
-			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
-			AssigneeUserName: "Me",
-			Entities:         []string{"LPA 7000-0000-0000: A task"},
-			Uid:              "7000-0000-0000",
-		}).
-		Return(nil)
-
 	form := url.Values{
 		"assignTo": {"me"},
 	}
@@ -296,7 +374,7 @@ func TestPostAssignTaskWhenUserDetailsErrors(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AssignTask(client, template.Func)(w, r)
+	err := AssignTask(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 }
@@ -328,7 +406,8 @@ func TestPostAssignTaskMultiple(t *testing.T) {
 			return assert.True(t, d.Success) &&
 				assert.Equal(t, "System user", d.AssigneeUserName) &&
 				assert.Equal(t, []sirius.Team{{ID: 1, DisplayName: "A Team"}}, d.Teams) &&
-				assert.Equal(t, []string{"EPA 7000-0000-1111: Another task", "LPA 7000-0000-0000: A task"}, d.Entities)
+				assert.Equal(t, []string{"EPA 7000-0000-1111: Another task", "LPA 7000-0000-0000: A task"}, d.Entities) &&
+				assert.Equal(t, "id=123&id=456", d.TaskIDs)
 		})).
 		Return(nil)
 
@@ -398,6 +477,8 @@ func TestPostAssignTaskWhenAssignToNotSet(t *testing.T) {
 			Teams:    []sirius.Team{{ID: 1, DisplayName: "A Team"}},
 			Entities: []string{"LPA 7000-0000-0000: A task"},
 			Uid:      "7000-0000-0000",
+			CaseType: "lpa",
+			TaskIDs:  "id=123",
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{
 					"assignTo": {"": "Assignee not set"},
@@ -467,6 +548,8 @@ func TestPostAssignTaskWhenValidationError(t *testing.T) {
 					Entities:         []string{"LPA 7000-0000-0000: A task"},
 					Error:            sirius.ValidationError{Field: expectedErrors},
 					Uid:              "7000-0000-0000",
+					CaseType:         "lpa",
+					TaskIDs:          "id=123",
 					AssigneeUserName: tc.assigneeUserName,
 				}).
 				Return(nil)
@@ -521,4 +604,202 @@ func TestPostAssignTaskToDigitalLpaRedirects(t *testing.T) {
 
 	redirectError := RedirectError(fmt.Sprintf("/lpa/%s", uid))
 	assert.Equal(t, redirectError, err)
+}
+
+func TestPostAssignTaskHtmx(t *testing.T) {
+	client := &mockAssignTaskClient{}
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Task", mock.Anything, 123).
+		Return(sirius.Task{Name: "A task", CaseItems: []sirius.Case{{UID: "7000-0000-0000", CaseType: "LPA"}}}, nil)
+	client.
+		On("AssignTasks", mock.Anything, 66, []int{123}).
+		Return(nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, assignTaskData{
+			IsPartial:        true,
+			Success:          true,
+			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			AssigneeUserName: "System user",
+			Entities:         []string{"LPA 7000-0000-0000: A task"},
+			Uid:              "7000-0000-0000",
+			CaseType:         "lpa",
+			TaskIDs:          "id=123",
+			DonorID:          82,
+			CaseUids:         "&uid[]=7000-0000-0000",
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"assignTo":     {"user"},
+		"assigneeUser": {"66:System user"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&donorId=82&uid[]=7000-0000-0000", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	r.Header.Set("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := AssignTask(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostAssignTaskToCaseOwner(t *testing.T) {
+	caseOwner := &sirius.Person{ID: 99, Firstname: "Case", Surname: "Owner"}
+
+	client := &mockAssignTaskClient{}
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Task", mock.Anything, 123).
+		Return(sirius.Task{Name: "A task", CaseItems: []sirius.Case{{ID: 456, UID: "7000-0000-0000", CaseType: "LPA"}}}, nil)
+	client.
+		On("Case", mock.Anything, 456).
+		Return(sirius.Case{ID: 456, UID: "7000-0000-0000", CaseType: "LPA", Assignee: caseOwner}, nil)
+	client.
+		On("AssignTasks", mock.Anything, 99, []int{123}).
+		Return(nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, assignTaskData{
+			Success:          true,
+			Teams:            []sirius.Team{{ID: 1, DisplayName: "A Team"}},
+			AssigneeUserName: "",
+			Entities:         []string{"LPA 7000-0000-0000: A task"},
+			Uid:              "7000-0000-0000",
+			CaseType:         "lpa",
+			TaskIDs:          "id=123",
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"assignTo": {"caseOwner"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AssignTask(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostAssignTaskToCaseOwnerMultiple(t *testing.T) {
+	caseOwner := &sirius.Person{ID: 99, Firstname: "Case", Surname: "Owner"}
+
+	client := &mockAssignTaskClient{}
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Task", mock.Anything, 123).
+		Return(sirius.Task{Name: "A task", CaseItems: []sirius.Case{{ID: 456, UID: "7000-0000-0000", CaseType: "LPA"}}}, nil)
+	client.
+		On("Task", mock.Anything, 789).
+		Return(sirius.Task{Name: "Another task", CaseItems: []sirius.Case{{ID: 456, UID: "7000-0000-0000", CaseType: "LPA"}}}, nil)
+	client.
+		On("Case", mock.Anything, 456).
+		Return(sirius.Case{ID: 456, UID: "7000-0000-0000", CaseType: "LPA", Assignee: caseOwner}, nil)
+	client.
+		On("AssignTasks", mock.Anything, 99, mock.MatchedBy(func(a []int) bool {
+			sort.Ints(a)
+			return assert.Equal(t, []int{123, 789}, a)
+		})).
+		Return(nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, mock.MatchedBy(func(d assignTaskData) bool {
+			sort.Strings(d.Entities)
+			return assert.True(t, d.Success) &&
+				assert.Equal(t, []sirius.Team{{ID: 1, DisplayName: "A Team"}}, d.Teams) &&
+				assert.Equal(t, []string{"LPA 7000-0000-0000: A task", "LPA 7000-0000-0000: Another task"}, d.Entities)
+		})).
+		Return(nil)
+
+	form := url.Values{
+		"assignTo": {"caseOwner"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123&id=789", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AssignTask(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostAssignTaskToCaseOwnerWhenCaseErrors(t *testing.T) {
+	client := &mockAssignTaskClient{}
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Task", mock.Anything, 123).
+		Return(sirius.Task{Name: "A task", CaseItems: []sirius.Case{{ID: 456, UID: "7000-0000-0000", CaseType: "LPA"}}}, nil)
+	client.
+		On("Case", mock.Anything, 456).
+		Return(sirius.Case{}, errExample)
+
+	form := url.Values{
+		"assignTo": {"caseOwner"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AssignTask(client, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestPostAssignTaskToCaseOwnerWhenAssignTaskFails(t *testing.T) {
+	caseOwner := &sirius.Person{ID: 99, Firstname: "Case", Surname: "Owner"}
+
+	client := &mockAssignTaskClient{}
+	client.
+		On("Teams", mock.Anything).
+		Return([]sirius.Team{{ID: 1, DisplayName: "A Team"}}, nil)
+	client.
+		On("Task", mock.Anything, 123).
+		Return(sirius.Task{Name: "A task", CaseItems: []sirius.Case{{ID: 456, UID: "7000-0000-0000", CaseType: "LPA"}}}, nil)
+	client.
+		On("Case", mock.Anything, 456).
+		Return(sirius.Case{ID: 456, UID: "7000-0000-0000", CaseType: "LPA", Assignee: caseOwner}, nil)
+	client.
+		On("AssignTasks", mock.Anything, 99, []int{123}).
+		Return(errExample)
+
+	form := url.Values{
+		"assignTo": {"caseOwner"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AssignTask(client, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
 }

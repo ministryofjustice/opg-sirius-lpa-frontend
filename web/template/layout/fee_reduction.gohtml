@@ -32,7 +32,14 @@
                             <th scope="row" class="govuk-table__header app-!-table-row__no-border"
                                 colspan="2">
                                 <a class="govuk-link"
-                                   href="{{ prefix (printf "/edit-fee-reduction?id=%d" .ID) }}">
+                                   {{ if $.InActionPanel }}
+                                   href=""
+                                   hx-get="{{ prefix (printf "/edit-fee-reduction?id=%d" .ID) }}"
+                                   hx-target=".action-panel__content"
+                                   hx-swap="innerHTML"
+                                   {{ else }}
+                                   href="{{ prefix (printf "/edit-fee-reduction?id=%d" .ID) }}"
+                                   {{ end }}>
                                     Edit fee reduction
                                 </a>
                             </th>
@@ -41,7 +48,14 @@
                             <th scope="row" class="govuk-table__header app-!-table-row__no-border"
                                 colspan="2">
                                 <a class="govuk-link govuk-link--no-visited-state app-!-colour-text-red"
-                                   href="{{ prefix (printf "/delete-fee-reduction?id=%d" .ID) }}">
+                                   {{ if $.InActionPanel }}
+                                   href=""
+                                   hx-get="{{ prefix (printf "/delete-fee-reduction?id=%d" .ID) }}"
+                                   hx-target=".action-panel__content"
+                                   hx-swap="innerHTML"
+                                   {{ else }}
+                                   href="{{ prefix (printf "/delete-fee-reduction?id=%d" .ID) }}"
+                                   {{ end }}>
                                     Delete fee reduction
                                 </a>
                             </th>

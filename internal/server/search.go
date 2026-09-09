@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"slices"
 	"strconv"
 
 	"github.com/ministryofjustice/opg-go-common/template"
@@ -104,8 +105,16 @@ func Search(client SearchClient, tmpl template.Template) Handler {
 			}
 		}
 
+		total := 0
+		hasFilters := len(filters.PersonType) > 0
+		for personType, personTypeCount := range results.Aggregations.PersonType {
+			if !hasFilters || slices.Contains(filters.PersonType, personType) {
+				total += personTypeCount
+			}
+		}
+
+		data.Total = total
 		data.Results = results.Results
-		data.Total = results.Total.Count
 		data.Aggregations = results.Aggregations
 		data.Pagination = newPagination(pagination, search.Encode(), filters.Encode())
 

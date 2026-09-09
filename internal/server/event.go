@@ -30,10 +30,14 @@ type eventData struct {
 	CaseUID      string
 	Success      bool
 	Error        sirius.ValidationError
+	IsPartial    bool
 
 	Type        string
 	Name        string
 	Description string
+	DonorId     int
+	EntityType  string
+	CaseUids    string
 }
 
 func Event(client EventClient, tmpl template.Template) Handler {
@@ -49,7 +53,12 @@ func Event(client EventClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-		data := eventData{XSRFToken: ctx.XSRFToken}
+		data := eventData{
+			XSRFToken: ctx.XSRFToken,
+			IsPartial: ctx.IsPartial,
+			DonorId:   entityID,
+			CaseUids:  buildUIDQueryString(r.Form["uid[]"]),
+		}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
@@ -63,8 +72,9 @@ func Event(client EventClient, tmpl template.Template) Handler {
 			return nil
 		})
 
-		data.CaseUID = ""
-		data.IsDigitalLpa = false
+		if r.Header.Get("HX-Request") == "true" {
+			data.EntityType = string(entityType)
+		}
 
 		group.Go(func() error {
 			switch entityType {
@@ -92,7 +102,7 @@ func Event(client EventClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			if err := r.ParseMultipartForm(64 * Megabyte); err != nil {
+			if err := r.ParseMultipartForm(64 * Megabyte); err != nil { //#nosec G120 -- This value is high to allow large file uploads
 				return err
 			}
 

@@ -20,21 +20,29 @@ type TaskClient interface {
 }
 
 type taskData struct {
-	XSRFToken string
-	Entity    string
-	Success   bool
-	Error     sirius.ValidationError
-
+	XSRFToken        string
+	Entity           string
+	Success          bool
+	Error            sirius.ValidationError
+	IsPartial        bool
+	CaseID           int
 	CaseUID          string
 	TaskTypes        []string
 	Teams            []sirius.Team
 	Task             sirius.TaskRequest
 	AssignTo         string
 	AssigneeUserName string
+	DonorID          int
+	EntityType       string
+	CaseUIDs         string
 }
 
 func Task(client TaskClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
+		if err := r.ParseForm(); err != nil {
+			return err
+		}
+
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
@@ -43,6 +51,8 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 		ctx := getContext(r)
 		data := taskData{
 			XSRFToken: ctx.XSRFToken,
+			CaseID:    caseID,
+			IsPartial: ctx.IsPartial,
 		}
 
 		group, groupCtx := errgroup.WithContext(ctx.Context)
@@ -82,6 +92,16 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 			return err
 		}
 
+		if caseitem.Donor != nil {
+			data.DonorID = caseitem.Donor.ID
+		}
+
+		data.CaseUIDs = buildUIDQueryString(r.Form["uid[]"])
+
+		if entityType, err := sirius.ParseEntityType(r.FormValue("entity")); err == nil {
+			data.EntityType = string(entityType)
+		}
+
 		if r.Method == http.MethodPost {
 			task := sirius.TaskRequest{
 				Type:        postFormString(r, "taskType"),
@@ -110,6 +130,8 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 			case "team":
 				assigneeID, _ := postFormInt(r, "assigneeTeam")
 				task.AssigneeID = assigneeID
+			case "caseOwner":
+				task.AssigneeID = caseitem.Assignee.ID
 			}
 
 			err = client.CreateTask(ctx, caseID, task)
@@ -123,6 +145,7 @@ func Task(client TaskClient, tmpl template.Template) Handler {
 				switch data.AssignTo {
 				case "me":
 				case "user":
+				case "caseOwner":
 					data.Error.Field["assigneeUser"] = data.Error.Field["assigneeId"]
 				case "team":
 					data.Error.Field["assigneeTeam"] = data.Error.Field["assigneeId"]

@@ -1,0 +1,13 @@
+{
+  "name": "puppeteer",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "scripts": {
+    "pa11y-ci": "pa11y-ci"
+  },
+  "dependencies": {
+    "pa11y-ci": "^4.1.1"
+  }
+}

@@ -1,0 +1,15 @@
+{{ define "partial-event-note" }}
+    <p class="govuk-body"><strong>{{.Entity.type}}</strong></p>
+    {{ if eq .Entity.type "Activation key used" }}
+        <p class="preserve-whitespace">{{.Entity.description}}</p>
+    {{ else }}
+    <p>{{.Entity.name}} - {{.Entity.description}}</p>
+        {{ if .Entity.document }}
+            <a class="govuk-link"
+               href="/lpa/frontend/view-document/{{ .Entity.document.uuid }}/{{ .Context.DonorID }}" target="_top"
+            >
+                {{ .Entity.document.friendlyDescription }}
+            </a>
+        {{ end}}
+    {{ end }}
+{{ end }}

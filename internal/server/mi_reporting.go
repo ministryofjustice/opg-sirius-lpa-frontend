@@ -22,6 +22,9 @@ type miReportingData struct {
 	ResultCount int
 	Download    string
 	XSRFToken   string
+	DonorId     int
+	CaseUids    string
+	IsPartial   bool
 }
 
 type namedControl struct {
@@ -49,7 +52,17 @@ func MiReporting(client MiReportingClient, tmpl template.Template) Handler {
 		ctx := getContext(r)
 		data := miReportingData{
 			XSRFToken: ctx.XSRFToken,
+			IsPartial: ctx.IsPartial,
 		}
+
+		donorIdString := r.FormValue("donorId")
+		if donorIdString != "" {
+			if donorId, err := strToIntOrStatusError(donorIdString); err == nil {
+				data.DonorId = donorId
+			}
+		}
+
+		data.CaseUids = buildUIDQueryString(r.Form["uid[]"])
 
 		switch r.Method {
 		case http.MethodGet:
