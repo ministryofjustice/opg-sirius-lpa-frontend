@@ -159,12 +159,18 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
-            {{ if or (gt (len .Lpa.Attorneys) 0) (gt (len .AttorneyTrustCorporations) 0) }}
-              {{ range $attorney := .Lpa.Attorneys }}
+            {{ if gt (len .AttorneyApplicants) 0 }}
+              {{ range $attorneys := .AttorneyApplicants }}
                 <div class="app-create-lpa__details-row">
                   <details class="govuk-details">
                     <summary class="govuk-details__summary app-table__row--half-width">
-                      <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
+                      <span class="govuk-details__summary-text">
+                        {{ if eq .PersonType "Trust Corporation" }}
+                          {{ if .CompanyName }}{{ .CompanyName }} {{ end }}(trust corporation)
+                        {{ else }}
+                          {{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                        {{ end }}
+                      </span>
                     </summary>
                     <div class="govuk-details__text">
                       {{ template "person-details-table" . }}
@@ -176,51 +182,33 @@
                     {{ else }}
                       {{ template "status-tag" (statusTag "Inactive" "red") }}
                     {{ end }}
-                    <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
-                            id="f-update-attorney-{{ .ID }}"
-                            name="updateAttorney"
-                            type="submit"
-                            value="{{ .ID }}"
-                    >
-                      Update
-                      <span class="govuk-visually-hidden">
-                          attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
-                      </span>
-                    </button>
-                </span>
-                </div>
-              {{ end }}
-              {{ range $trustCorporation := .AttorneyTrustCorporations }}
-                <div class="app-create-lpa__details-row">
-                  <details class="govuk-details">
-                    <summary class="govuk-details__summary app-table__row--half-width">
-                      <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }} {{ end }}(trust corporation)</span>
-                    </summary>
-                    <div class="govuk-details__text">
-                        {{ template "person-details-table" . }}
-                    </div>
-                  </details>
-                  <span class="app-create-lpa__summary-update-link">
-                    {{ if eq (stringifyBoolPointer .SystemStatus) "true" }}
-                        {{ template "status-tag" (statusTag "Active" "green") }}
-                    {{ else }}
-                        {{ template "status-tag" (statusTag "Inactive" "red") }}
-                    {{ end }}
-                    <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
-                            id="f-update-trust-corporation-{{ .ID }}"
-                            name="updateTrustCorporationAttorney"
-                            type="submit"
-                            value="{{ .ID }}"
-                    >
-                      Update
+                    {{ if eq .PersonType "Trust Corporation" }}
+                      <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
+                              id="f-update-trust-corporation-{{ .ID }}"
+                              name="updateTrustCorporationAttorney"
+                              type="submit"
+                              value="{{ .ID }}"
+                      >Update
                       <span class="govuk-visually-hidden">
                           trust corporation appointed as attorney{{ if .CompanyName }} {{ .CompanyName }}{{ end }}
                       </span>
                     </button>
-                </span>
+                    {{ else }}
+                      <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
+                              id="f-update-attorney-{{ .ID }}"
+                              name="updateAttorney"
+                              type="submit"
+                              value="{{ .ID }}">Update
+                      <span class="govuk-visually-hidden">
+                          attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                      </span>
+                      </button>
+                    {{ end }}
+                  </span>
                 </div>
               {{ end }}
             {{ end }}
+
             <div class="govuk-button-group app-button-group--column">
               <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
                      type="submit" data-disable-after-click="true" name="addAttorney"
