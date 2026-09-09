@@ -93,6 +93,16 @@ htmx.on("htmx:afterSettle", (event) => {
         document.querySelector(".action-panel").classList.remove("wide");
       }
     }
+
+    if (swapDetails.pathInfo.responsePath.includes("scrollTo")) {
+      const params = new URLSearchParams(swapDetails.pathInfo.responsePath);
+      const scrollId = params.get("scrollTo");
+      if (scrollId) {
+        document
+          .querySelector(`#${scrollId}`)
+          .scrollIntoView({ behavior: "instant" });
+      }
+    }
   }
 });
 
