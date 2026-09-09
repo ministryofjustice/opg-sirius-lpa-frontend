@@ -628,7 +628,7 @@
                     {{ range $applicant := .AttorneyApplicants }}
                       <div class="govuk-checkboxes__item">
                         <input class="govuk-checkboxes__input" id="f-applicantIds-{{ .ID }}" name="applicantIds"
-                               type="checkbox" value="{{ .ID }}" {{ if containsInt $.ApplicantIds $applicant.ID }}checked{{ end }}>
+                               type="checkbox" value="{{ .ID }}" {{ if containsInt $.ApplicantIds .ID }}checked{{ end }}>
                         <label class="govuk-label govuk-checkboxes__label" for="f-applicantIds-{{.ID }}">
                           {{ if .CompanyName }}
                             {{ .CompanyName }}
