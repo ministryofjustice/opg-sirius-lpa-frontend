@@ -26,6 +26,7 @@ import initSiriusHeader from "./sirius-header.js";
 import lpaFormSubtype from "./lpa-form-subtype.js";
 import showHideTrustCorpActiveRadios from "./show-hide-trust-corp-active-radios.js";
 import scrollSectionIntoView from "./scroll-section-into-view.js";
+import autoCheckSingleAttorneyApplicant from "./auto-check-single-attorney-applicant.js";
 
 const prefix = document.body.getAttribute("data-prefix");
 
@@ -54,6 +55,7 @@ initSiriusHeader();
 lpaFormSubtype();
 showHideTrustCorpActiveRadios();
 scrollSectionIntoView();
+autoCheckSingleAttorneyApplicant();
 
 globalThis.htmx = htmx;
 // Don't include indicator styles as CSP blocks inline styles
@@ -81,12 +83,13 @@ htmx.on("htmx:afterSettle", (event) => {
     lpaFormSubtype(swapDetails.target);
     scrollSectionIntoView(swapDetails.target);
     showHideTrustCorpActiveRadios(swapDetails.target);
+    autoCheckSingleAttorneyApplicant(swapDetails.target);
 
     // Update the action panel width if swapping in create-document or edit-document content
     if (swapDetails.target.id === "actions-content") {
       if (
-        swapDetails.pathInfo.requestPath.includes("create-document") ||
-        swapDetails.pathInfo.requestPath.includes("edit-document")
+          swapDetails.pathInfo.requestPath.includes("create-document") ||
+          swapDetails.pathInfo.requestPath.includes("edit-document")
       ) {
         document.querySelector(".action-panel").classList.add("wide");
       } else {
@@ -100,55 +103,55 @@ if (window.self !== window.parent) {
   const success = document.querySelector('[data-app-reload~="page"]');
   if (success) {
     window.parent.postMessage(
-      "form-done",
-      `${window.location.protocol}//${window.location.host}`,
+        "form-done",
+        `${window.location.protocol}//${window.location.host}`,
     );
   }
 
   document.querySelectorAll("[data-app-iframe-cancel]").forEach((el) => {
     el.addEventListener("click", (event) => {
       window.parent.postMessage(
-        "form-cancel",
-        `${window.location.protocol}//${window.location.host}`,
+          "form-cancel",
+          `${window.location.protocol}//${window.location.host}`,
       );
       event.preventDefault();
     });
   });
 
   const saveAndExit = document.querySelector(
-    '[data-app-reload~="saveAndExit"]',
+      '[data-app-reload~="saveAndExit"]',
   );
   if (saveAndExit) {
     window.parent.postMessage(
-      "form-cancel",
-      `${window.location.protocol}//${window.location.host}`,
+        "form-cancel",
+        `${window.location.protocol}//${window.location.host}`,
     );
   }
 
   const reloadTimeline = document.querySelector(
-    '[data-app-reload~="reload-timeline"]',
+      '[data-app-reload~="reload-timeline"]',
   );
   if (reloadTimeline) {
     window.parent.postMessage(
-      "reload-timeline",
-      `${window.location.protocol}//${window.location.host}`,
+        "reload-timeline",
+        `${window.location.protocol}//${window.location.host}`,
     );
   }
 
   const selectCase = document.querySelector("[data-app-select-case]");
   if (selectCase) {
     window.parent.postMessage(
-      {
-        message: "select-case",
-        caseId: selectCase.getAttribute("data-app-select-case"),
-      },
-      `${window.location.protocol}//${window.location.host}`,
+        {
+          message: "select-case",
+          caseId: selectCase.getAttribute("data-app-select-case"),
+        },
+        `${window.location.protocol}//${window.location.host}`,
     );
   }
 
   window.addEventListener("message", (event) => {
     if (
-      event.origin !== `${window.location.protocol}//${window.location.host}`
+        event.origin !== `${window.location.protocol}//${window.location.host}`
     ) {
       return;
     }
