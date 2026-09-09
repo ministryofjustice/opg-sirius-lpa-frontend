@@ -84,7 +84,6 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			data.Title = "Edit LPA"
 			data.IsUpdate = true
 			data.ApplicantIds = data.Lpa.GetApplicantIds()
-			data.AttorneyApplicants = Applicants(data.Lpa.Attorneys, data.Lpa.TrustCorporations)
 
 			for _, trustCorporation := range data.Lpa.TrustCorporations {
 				if trustCorporation.IsReplacementAttorney {
@@ -93,6 +92,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 					data.AttorneyTrustCorporations = append(data.AttorneyTrustCorporations, trustCorporation)
 				}
 			}
+			data.AttorneyApplicants = Applicants(data.Lpa.Attorneys, data.AttorneyTrustCorporations)
 		}
 
 		if r.Method == http.MethodPost {
@@ -361,9 +361,7 @@ func Applicants(attorneys []sirius.Attorney, trustCorporations []sirius.TrustCor
 	applicants = append(applicants, attorneys...)
 
 	for _, tc := range trustCorporations {
-		if !tc.IsReplacementAttorney {
-			applicants = append(applicants, tc.Attorney)
-		}
+		applicants = append(applicants, tc.Attorney)
 	}
 
 	sort.Slice(applicants, func(i, j int) bool {
