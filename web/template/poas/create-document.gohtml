@@ -23,15 +23,6 @@
 		{{ template "success-banner" "New recipient added" }}
 	{{ end }}
 
-	{{ if and .IsPartial .HtmxRedirect }}
-		<span class="govuk-!-display-none"
-					hx-get="{{ prefix .HtmxRedirect }}"
-					hx-target=".action-panel__content"
-					hx-swap="innerHTML"
-					hx-trigger="load"
-		></span>
-	{{ end }}
-
 	{{ if .HasSelectedAddNewRecipient }}
 		{{ template "create-document-back-and-case-details" . }}
 		{{ template "form-add-recipient" . }}
