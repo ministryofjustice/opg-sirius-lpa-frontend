@@ -41,7 +41,7 @@
         {{ if not .IsEditing }}
           <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add another {{ ToLower .AppointedAs }}" />
         {{ else }}
-          <input class="govuk-button" data-module="govuk-button" type="submit" name="editNextTrustCorporation" value="Save and update next {{ ToLower .AppointedAs }}" />
+          <input class="govuk-button" data-module="govuk-button" type="submit" name="next-attorney" value="Save and update next {{ ToLower .AppointedAs }}" />
         {{ end }}
         <a class="govuk-link govuk-link--no-visited-state"
            href=""

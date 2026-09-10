@@ -580,3 +580,44 @@ func TestGetNextTrustCorporationIdWillReturnNextNumberWithSameAppointedType(t *t
 	})
 	assert.Equal(t, 4, result)
 }
+
+func TestGetIdForNextAttorneyWillReturnNextNumberWithSameAppointedType(t *testing.T) {
+
+	trustCorporations := []sirius.TrustCorporation{
+		{
+			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 1, PersonType: "Trust Corporation"}},
+			IsReplacementAttorney: true,
+		},
+		{
+			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}},
+			IsReplacementAttorney: false,
+		},
+		{
+			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 5, PersonType: "Trust Corporation"}},
+			IsReplacementAttorney: true,
+		},
+	}
+
+	attorneys := []sirius.Attorney{
+		{
+			Person:       sirius.Person{ID: 2, PersonType: "Attorney"},
+			SystemStatus: shared.BoolPtr(true),
+		},
+		{
+			Person:       sirius.Person{ID: 4, PersonType: "Attorney"},
+			SystemStatus: shared.BoolPtr(true),
+		},
+		{
+			Person:       sirius.Person{ID: 6, PersonType: "Attorney"},
+			SystemStatus: shared.BoolPtr(true),
+		},
+	}
+
+	result, personType := GetIdForNextAttorney(2, false, trustCorporations, attorneys)
+	assert.Equal(t, 4, result)
+	assert.Equal(t, "Attorney", personType)
+}
+
+//scenarios to consider:
+//on a trust corp:
+//

@@ -187,21 +187,20 @@
                               id="f-update-trust-corporation-{{ .ID }}"
                               name="updateTrustCorporationAttorney"
                               type="submit"
-                              value="{{ .ID }}"
-                      >Update
-                      <span class="govuk-visually-hidden">
-                          trust corporation appointed as attorney{{ if .CompanyName }} {{ .CompanyName }}{{ end }}
-                      </span>
-                    </button>
+                              value="{{ .ID }}">Update
+                        <span class="govuk-visually-hidden">
+                            trust corporation appointed as attorney{{ if .CompanyName }} {{ .CompanyName }}{{ end }}
+                        </span>
+                      </button>
                     {{ else }}
                       <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
                               id="f-update-attorney-{{ .ID }}"
                               name="updateAttorney"
                               type="submit"
                               value="{{ .ID }}">Update
-                      <span class="govuk-visually-hidden">
-                          attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
-                      </span>
+                        <span class="govuk-visually-hidden">
+                            attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                        </span>
                       </button>
                     {{ end }}
                   </span>
