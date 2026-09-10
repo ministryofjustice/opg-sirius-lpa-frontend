@@ -462,11 +462,11 @@ func TestPostCreateTrustCorporationAddAnotherRedirects(t *testing.T) {
 func TestPostEditTrustCorporationEditNextRedirects(t *testing.T) {
 	lpa := sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{
 		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3}},
+			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}},
 			IsReplacementAttorney: false,
 		},
 		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 4}},
+			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 4, PersonType: "Trust Corporation"}},
 			IsReplacementAttorney: false,
 		},
 	}}}
@@ -493,7 +493,7 @@ func TestPostEditTrustCorporationEditNextRedirects(t *testing.T) {
 		"companyName":              {"ACME"},
 		"isReplacementAttorney":    {"false"},
 		"isTrustCorporationActive": {"true"},
-		"editNextTrustCorporation": {"true"},
+		"update-next-attorney":     {"true"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "create-trust-corporation/?id=1&caseId=2&trustCorporationId=3&replacement=false", strings.NewReader(form.Encode()))
@@ -614,10 +614,6 @@ func TestGetIdForNextAttorneyWillReturnNextNumberWithSameAppointedType(t *testin
 	}
 
 	result, personType := GetIdForNextAttorney(2, false, trustCorporations, attorneys)
-	assert.Equal(t, 4, result)
-	assert.Equal(t, "Attorney", personType)
+	assert.Equal(t, 3, result)
+	assert.Equal(t, "Trust Corporation", personType)
 }
-
-//scenarios to consider:
-//on a trust corp:
-//
