@@ -309,7 +309,19 @@ func errorHandler(tmplError template.Template, prefix, siriusURL string) func(ne
 				}
 
 				if redirect, ok := err.(RedirectError); ok {
-					http.Redirect(w, r, prefix+redirect.To(), http.StatusFound)
+					urlString := prefix + redirect.To()
+
+					if r.Header.Get("HX-Request") == "true" {
+						u, parseErr := url.Parse(urlString)
+						if parseErr == nil && u.Fragment != "" {
+							q := u.Query()
+							q.Set("scrollTo", u.Fragment)
+							u.RawQuery = q.Encode()
+							urlString = u.String()
+						}
+					}
+
+					http.Redirect(w, r, urlString, http.StatusFound)
 					return
 				}
 
