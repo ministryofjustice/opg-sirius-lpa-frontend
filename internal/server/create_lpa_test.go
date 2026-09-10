@@ -166,6 +166,7 @@ func TestGetCreateLpaEdit(t *testing.T) {
 					AppointmentType:        tc.formValue,
 					IsUpdate:               true,
 					AllowNewNotifiedPerson: true,
+					AttorneyApplicants:     []sirius.Attorney{},
 				}).
 				Return(nil)
 
@@ -183,9 +184,30 @@ func TestGetCreateLpaEdit(t *testing.T) {
 }
 
 func TestGetCreateLpaEditWithTrustCorporations(t *testing.T) {
-	for _, isReplacementAttorney := range []string{"true", "false"} {
-		t.Run("Is Replacement Attorney"+isReplacementAttorney, func(t *testing.T) {
-			lpa := sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{{IsReplacementAttorney: isReplacementAttorney == "true"}}}}
+	tests := []struct {
+		name                  string
+		isReplacementAttorney bool
+		AttorneyApplicants    []sirius.Attorney
+	}{
+		{
+			name:                  "Trust corp is a replacement attorney",
+			isReplacementAttorney: true,
+			AttorneyApplicants:    []sirius.Attorney{},
+		},
+		{
+			name:                  "Trust corp is an attorney",
+			isReplacementAttorney: false,
+			AttorneyApplicants:    []sirius.Attorney{{Person: sirius.Person{ID: 1}}},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			trustCorporation := sirius.TrustCorporation{
+				IsReplacementAttorney: tc.isReplacementAttorney,
+				Attorney:              sirius.Attorney{Person: sirius.Person{ID: 1}},
+			}
+
+			lpa := sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{trustCorporation}}}
 			client := &mockCreateLpaClient{}
 			client.
 				On("Person", mock.Anything, 123).
@@ -202,12 +224,13 @@ func TestGetCreateLpaEditWithTrustCorporations(t *testing.T) {
 				Lpa:                    lpa,
 				IsUpdate:               true,
 				AllowNewNotifiedPerson: true,
+				AttorneyApplicants:     tc.AttorneyApplicants,
 			}
 
-			if isReplacementAttorney == "true" {
-				data.ReplacementAttorneyTrustCorporations = []sirius.TrustCorporation{{IsReplacementAttorney: true}}
+			if tc.isReplacementAttorney {
+				data.ReplacementAttorneyTrustCorporations = []sirius.TrustCorporation{trustCorporation}
 			} else {
-				data.AttorneyTrustCorporations = []sirius.TrustCorporation{{IsReplacementAttorney: false}}
+				data.AttorneyTrustCorporations = []sirius.TrustCorporation{trustCorporation}
 			}
 
 			template := &mockTemplate{}
@@ -335,6 +358,7 @@ func TestPostCreateLpa(t *testing.T) {
 			CaseId:                 456,
 			Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
 			AllowNewNotifiedPerson: true,
+			AttorneyApplicants:     nil,
 		}).
 		Return(nil)
 
@@ -1448,13 +1472,12 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 	for _, isHtmx := range []bool{false, true} {
 		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
+			attorney := sirius.Attorney{Person: sirius.Person{ID: 999, Firstname: "Rudolph", Surname: "Stotesbury"}}
 			existingLpa := sirius.Lpa{
 				Case: sirius.Case{
 					ID:          456,
 					ReceiptDate: sirius.DateString("2022-01-01"),
-					Attorneys: []sirius.Attorney{
-						{Person: sirius.Person{ID: 999, Firstname: "Rudolph", Surname: "Stotesbury"}},
-					},
+					Attorneys:   []sirius.Attorney{attorney},
 				},
 			}
 
@@ -1504,6 +1527,7 @@ func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 				HtmxRedirect:           "/create-attorney?id=123&caseId=456&caseType=lpa&attorneyId=999",
 				HtmxSwap:               "innerHTML",
 				IsPartial:              isHtmx,
+				AttorneyApplicants:     []sirius.Attorney{attorney},
 			}
 
 			if isHtmx {
@@ -1647,6 +1671,7 @@ func TestPostCreateLpaUpdateReplacementAttorney(t *testing.T) {
 				HtmxRedirect:           "/create-replacement-attorney?id=123&caseId=456&attorneyId=999",
 				HtmxSwap:               "innerHTML",
 				IsPartial:              isHtmx,
+				AttorneyApplicants:     []sirius.Attorney{},
 			}
 
 			if isHtmx {
@@ -1841,6 +1866,7 @@ func TestPostErrorWhenAttorneyRadioSelected(t *testing.T) {
 		On("Func", mock.Anything, createLpaData{
 			AllowNewNotifiedPerson: true,
 			AppointmentType:        "singular",
+			AttorneyApplicants:     nil,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
 			Error: sirius.ValidationError{
