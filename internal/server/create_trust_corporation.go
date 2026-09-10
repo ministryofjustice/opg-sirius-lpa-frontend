@@ -90,7 +90,6 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 
 			data.Title = "Update trust corporation details"
 			data.IsEditing = true
-			//data.NextTrustCorporationId = GetNextTrustCorporationId(trustCorporationId, data.TrustCorporation.IsReplacementAttorney, lpa.TrustCorporations)
 			data.NextPersonId, data.NextPersonType = GetIdForNextAttorney(trustCorporationId, data.TrustCorporation.IsReplacementAttorney, lpa.TrustCorporations, lpa.Attorneys)
 			data.HtmxPost = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s", donorId, caseId, trustCorporationId, strconv.FormatBool(isReplacementAttorney))
 
@@ -155,7 +154,7 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 				}
 			}
 
-			if r.FormValue("next-attorney") != "" {
+			if r.FormValue("update-next-attorney") != "" {
 				if data.NextPersonType == "Attorney" {
 					return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d", donorId, caseId, data.NextPersonId))
 				} else if data.NextPersonType == "Trust Corporation" {
