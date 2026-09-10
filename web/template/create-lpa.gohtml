@@ -625,12 +625,16 @@
                   </div>
                   <div class="govuk-radios__conditional {{ if ne .Lpa.ApplicantType "attorney" }}govuk-radios__conditional--hidden{{ end }}"
                        id="applicantAttorneysReveal">
-                    {{ range $attorney := .Lpa.Attorneys }}
+                    {{ range $applicant := .AttorneyApplicants }}
                       <div class="govuk-checkboxes__item">
                         <input class="govuk-checkboxes__input" id="f-applicantIds-{{ .ID }}" name="applicantIds"
                                type="checkbox" value="{{ .ID }}" {{ if containsInt $.ApplicantIds .ID }}checked{{ end }}>
-                        <label class="govuk-label govuk-checkboxes__label" for="f-applicantIds-{{ .ID }}">
-                          {{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                        <label class="govuk-label govuk-checkboxes__label" for="f-applicantIds-{{.ID }}">
+                          {{ if eq .PersonType "Trust Corporation" }}
+                            {{ if .CompanyName }}{{ .CompanyName }}{{ end }}
+                          {{ else }}
+                            {{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                          {{ end }}
                         </label>
                       </div>
                     {{ end }}
