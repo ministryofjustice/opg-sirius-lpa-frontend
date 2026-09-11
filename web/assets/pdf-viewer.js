@@ -4,6 +4,8 @@ import * as pdfjsLib from "pdfjs-dist";
 const prefix = document.body.getAttribute("data-prefix") || "";
 pdfjsLib.GlobalWorkerOptions.workerSrc = `${prefix}/javascript/pdf.worker.min.mjs`;
 
+const svgSpritePrefix = prefix + "/assets/images/icons-sprite.svg";
+
 // Storage key for persisting viewer state across page navigations
 const STORAGE_KEY = "pdfViewerState";
 
@@ -184,43 +186,82 @@ class PDFViewer {
     controls.className = "pdf-viewer-controls";
     controls.innerHTML = `
       <div class="pdf-viewer-controls-group">
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="toggle-thumbnails" aria-label="Toggle thumbnails" aria-expanded="false">
-          Thumbnails
+        <button class="pdf-viewer-btn" data-action="toggle-thumbnails" aria-expanded="false">
+          <svg aria-labelledby="thumbnails-text">
+            <title id="thumbnails-text">Toggle thumbnails</title>
+            <use href="${svgSpritePrefix + "#icon-letter"}" />
+          </svg>
         </button>
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="prev" aria-label="Previous page">
-          <span aria-hidden="true">←</span> Previous
-        </button>
+      </div>
+      <div class="pdf-viewer-controls-group">
+        <div class="pdf-viewer-button-group">
+          <button class="pdf-viewer-btn" data-action="prev">
+            <svg aria-labelledby="prev-text">
+              <title id="prev-text">Previous page</title>
+              <use href="${svgSpritePrefix + "#icon-letter"}" />
+            </svg>
+          </button>
+          <div class="pdf-viewer-separator"></div>
+          <button class="pdf-viewer-btn" data-action="next">
+            <svg aria-labelledby="next-text">
+              <title id="next-text">Next page</title>
+              <use href="${svgSpritePrefix + "#icon-letter"}" />
+            </svg>
+          </button>
+        </div>
         <span class="pdf-viewer-page-info">
-          Page <input type="number" class="pdf-viewer-page-input" aria-label="Current page number" value="1" min="1"> of <span class="pdf-viewer-total-pages">-</span>
+          <input type="number" class="pdf-viewer-page-input" aria-label="Current page number" value="1" min="1"> of <span class="pdf-viewer-total-pages">-</span>
         </span>
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="next" aria-label="Next page">
-          Next <span aria-hidden="true">→</span>
-        </button>
       </div>
       <div class="pdf-viewer-controls-group">
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="zoom-out" aria-label="Zoom out">
-          <span aria-hidden="true">−</span>
-        </button>
+        <div class="pdf-viewer-button-group">
+          <button class="pdf-viewer-btn" data-action="zoom-out">
+            <svg aria-labelledby="zoom-out-text">
+              <title id="zoom-out-text">Zoom out</title>
+              <use href="${svgSpritePrefix + "#icon-letter"}" />
+            </svg>
+          </button>
+          <div class="pdf-viewer-separator"></div>
+          <button class="pdf-viewer-btn" data-action="zoom-in">
+            <svg aria-labelledby="zoom-in-text">
+              <title id="zoom-in-text">Zoom in</title>
+              <use href="${svgSpritePrefix + "#icon-letter"}" />
+            </svg>
+          </button>
+        </div>
         <input type="text" class="pdf-viewer-zoom-input" aria-label="Zoom level" value="100%">
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="zoom-in" aria-label="Zoom in">
-          <span aria-hidden="true">+</span>
-        </button>
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="fit-width" aria-label="Fit to width">
-          Fit Width
-        </button>
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="fit-page" aria-label="Fit to page">
-          Fit Page
+      </div>
+      <div class="pdf-viewer-controls-group">
+        <div class="pdf-viewer-button-group">
+          <button class="pdf-viewer-btn" data-action="fit-width">
+            <svg aria-labelledby="fit-width-text">
+              <title id="fit-width-text">Fit to width</title>
+              <use href="${svgSpritePrefix + "#icon-letter"}" />
+            </svg>
+          </button>
+          <div class="pdf-viewer-separator"></div>
+          <button class="pdf-viewer-btn" data-action="fit-page">
+            <svg aria-labelledby="fit-page-text">
+              <title id="fit-page-text">Fit to page</title>
+              <use href="${svgSpritePrefix + "#icon-letter"}" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="pdf-viewer-controls-group">
+        <button class="pdf-viewer-btn" data-action="rotate-cw">
+          <svg aria-labelledby="rotate-cw-text">
+            <title id="rotate-cw-text">Rotate clockwise</title>
+            <use href="${svgSpritePrefix + "#icon-letter"}" />
+          </svg>
         </button>
       </div>
       <div class="pdf-viewer-controls-group">
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="print-doc">
-          Print
-        </button>
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="rotate-cw">
-          Rotate Clockwise
-        </button>
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="rotate-ccw">
-          Rotate Counterclockwise
+        <button class="pdf-viewer-btn" data-action="print-doc">
+          <svg aria-labelledby="print-text">
+            <title id="print-text">Print</title>
+            <use href="${svgSpritePrefix + "#icon-letter"}" />
+          </svg>
         </button>
       </div>
     `;

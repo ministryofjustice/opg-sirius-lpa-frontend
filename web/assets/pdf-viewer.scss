@@ -24,10 +24,27 @@
   gap: govuk-spacing(2);
 }
 
+.pdf-viewer-button-group {
+  display: flex;
+  align-items: center;
+}
+
 .pdf-viewer-btn {
-  margin-bottom: 0 !important;
-  padding: govuk-spacing(1) govuk-spacing(2);
-  min-width: auto;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  & svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  &:hover:enabled:not(.pdf-viewer-btn--active) {
+    opacity: 0.5;
+  }
 
   &:disabled {
     opacity: 0.5;
@@ -77,6 +94,12 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
+}
+
+.pdf-viewer-separator {
+  height: 1.5rem;
+  width: 1px;
+  background: govuk-colour("black", $variant: "tint-80");
 }
 
 .pdf-viewer-thumbnail-panel {
