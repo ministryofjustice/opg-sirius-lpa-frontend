@@ -186,7 +186,7 @@ class PDFViewer {
     controls.className = "pdf-viewer-controls";
     controls.innerHTML = `
       <div class="pdf-viewer-controls-group">
-        <button class="pdf-viewer-btn" data-action="toggle-thumbnails" aria-expanded="false">
+        <button type="button" class="pdf-viewer-btn" data-action="toggle-thumbnails" aria-expanded="false">
           <svg aria-labelledby="thumbnails-text">
             <title id="thumbnails-text">Toggle thumbnails</title>
             <use href="${svgSpritePrefix + "#icon-letter"}" />
@@ -195,14 +195,14 @@ class PDFViewer {
       </div>
       <div class="pdf-viewer-controls-group">
         <div class="pdf-viewer-button-group">
-          <button class="pdf-viewer-btn" data-action="prev">
+          <button type="button" class="pdf-viewer-btn" data-action="prev">
             <svg aria-labelledby="prev-text">
               <title id="prev-text">Previous page</title>
               <use href="${svgSpritePrefix + "#icon-letter"}" />
             </svg>
           </button>
           <div class="pdf-viewer-separator"></div>
-          <button class="pdf-viewer-btn" data-action="next">
+          <button type="button" class="pdf-viewer-btn" data-action="next">
             <svg aria-labelledby="next-text">
               <title id="next-text">Next page</title>
               <use href="${svgSpritePrefix + "#icon-letter"}" />
@@ -215,14 +215,14 @@ class PDFViewer {
       </div>
       <div class="pdf-viewer-controls-group">
         <div class="pdf-viewer-button-group">
-          <button class="pdf-viewer-btn" data-action="zoom-out">
+          <button type="button" class="pdf-viewer-btn" data-action="zoom-out">
             <svg aria-labelledby="zoom-out-text">
               <title id="zoom-out-text">Zoom out</title>
               <use href="${svgSpritePrefix + "#icon-letter"}" />
             </svg>
           </button>
           <div class="pdf-viewer-separator"></div>
-          <button class="pdf-viewer-btn" data-action="zoom-in">
+          <button type="button" class="pdf-viewer-btn" data-action="zoom-in">
             <svg aria-labelledby="zoom-in-text">
               <title id="zoom-in-text">Zoom in</title>
               <use href="${svgSpritePrefix + "#icon-letter"}" />
@@ -233,14 +233,14 @@ class PDFViewer {
       </div>
       <div class="pdf-viewer-controls-group">
         <div class="pdf-viewer-button-group">
-          <button class="pdf-viewer-btn" data-action="fit-width">
+          <button type="button" class="pdf-viewer-btn" data-action="fit-width">
             <svg aria-labelledby="fit-width-text">
               <title id="fit-width-text">Fit to width</title>
               <use href="${svgSpritePrefix + "#icon-letter"}" />
             </svg>
           </button>
           <div class="pdf-viewer-separator"></div>
-          <button class="pdf-viewer-btn" data-action="fit-page">
+          <button type="button" class="pdf-viewer-btn" data-action="fit-page">
             <svg aria-labelledby="fit-page-text">
               <title id="fit-page-text">Fit to page</title>
               <use href="${svgSpritePrefix + "#icon-letter"}" />
@@ -249,7 +249,7 @@ class PDFViewer {
         </div>
       </div>
       <div class="pdf-viewer-controls-group">
-        <button class="pdf-viewer-btn" data-action="rotate-cw">
+        <button type="button" class="pdf-viewer-btn" data-action="rotate-cw">
           <svg aria-labelledby="rotate-cw-text">
             <title id="rotate-cw-text">Rotate clockwise</title>
             <use href="${svgSpritePrefix + "#icon-letter"}" />
@@ -257,7 +257,7 @@ class PDFViewer {
         </button>
       </div>
       <div class="pdf-viewer-controls-group">
-        <button class="pdf-viewer-btn" data-action="print-doc">
+        <button type="button" class="pdf-viewer-btn" data-action="print-doc">
           <svg aria-labelledby="print-text">
             <title id="print-text">Print</title>
             <use href="${svgSpritePrefix + "#icon-letter"}" />
