@@ -181,33 +181,28 @@ class PDFViewer {
     }
   }
 
+  createControlButton(icon, label, action, setAriaExpanded = false) {
+    return `
+      <button type="button" class="pdf-viewer-btn" data-action="${action}" aria-label="${label}" title="${label}"${setAriaExpanded ? ' aria-expanded="false"' : ""}>
+          <svg aria-hidden="true" focusable="false">
+            <use href="${svgSpritePrefix + "#" + icon}" />
+          </svg>
+      </button>
+    `;
+  }
+
   createControls() {
     const controls = document.createElement("div");
     controls.className = "pdf-viewer-controls";
     controls.innerHTML = `
       <div class="pdf-viewer-controls-group">
-        <button type="button" class="pdf-viewer-btn" data-action="toggle-thumbnails" aria-expanded="false">
-          <svg aria-labelledby="thumbnails-text">
-            <title id="thumbnails-text">Toggle thumbnails</title>
-            <use href="${svgSpritePrefix + "#icon-letter"}" />
-          </svg>
-        </button>
+        ${this.createControlButton("icon-letter", "Toggle thumbnails", "toggle-thumbnails", true)}
       </div>
       <div class="pdf-viewer-controls-group">
         <div class="pdf-viewer-button-group">
-          <button type="button" class="pdf-viewer-btn" data-action="prev">
-            <svg aria-labelledby="prev-text">
-              <title id="prev-text">Previous page</title>
-              <use href="${svgSpritePrefix + "#icon-letter"}" />
-            </svg>
-          </button>
+          ${this.createControlButton("icon-letter", "Previous page", "prev")}
           <div class="pdf-viewer-separator"></div>
-          <button type="button" class="pdf-viewer-btn" data-action="next">
-            <svg aria-labelledby="next-text">
-              <title id="next-text">Next page</title>
-              <use href="${svgSpritePrefix + "#icon-letter"}" />
-            </svg>
-          </button>
+          ${this.createControlButton("icon-letter", "Next page", "next")}
         </div>
         <span class="pdf-viewer-page-info">
           <input type="number" class="pdf-viewer-page-input" aria-label="Current page number" value="1" min="1"> of <span class="pdf-viewer-total-pages">-</span>
@@ -215,54 +210,24 @@ class PDFViewer {
       </div>
       <div class="pdf-viewer-controls-group">
         <div class="pdf-viewer-button-group">
-          <button type="button" class="pdf-viewer-btn" data-action="zoom-out">
-            <svg aria-labelledby="zoom-out-text">
-              <title id="zoom-out-text">Zoom out</title>
-              <use href="${svgSpritePrefix + "#icon-letter"}" />
-            </svg>
-          </button>
+          ${this.createControlButton("icon-letter", "Zoom out", "zoom-out")}
           <div class="pdf-viewer-separator"></div>
-          <button type="button" class="pdf-viewer-btn" data-action="zoom-in">
-            <svg aria-labelledby="zoom-in-text">
-              <title id="zoom-in-text">Zoom in</title>
-              <use href="${svgSpritePrefix + "#icon-letter"}" />
-            </svg>
-          </button>
+          ${this.createControlButton("icon-letter", "Zoom in", "zoom-in")}
         </div>
         <input type="text" class="pdf-viewer-zoom-input" aria-label="Zoom level" value="100%">
       </div>
       <div class="pdf-viewer-controls-group">
         <div class="pdf-viewer-button-group">
-          <button type="button" class="pdf-viewer-btn" data-action="fit-width">
-            <svg aria-labelledby="fit-width-text">
-              <title id="fit-width-text">Fit to width</title>
-              <use href="${svgSpritePrefix + "#icon-letter"}" />
-            </svg>
-          </button>
+          ${this.createControlButton("icon-letter", "Fit to width", "fit-width")}
           <div class="pdf-viewer-separator"></div>
-          <button type="button" class="pdf-viewer-btn" data-action="fit-page">
-            <svg aria-labelledby="fit-page-text">
-              <title id="fit-page-text">Fit to page</title>
-              <use href="${svgSpritePrefix + "#icon-letter"}" />
-            </svg>
-          </button>
+          ${this.createControlButton("icon-letter", "Fit to page", "fit-page")}
         </div>
       </div>
       <div class="pdf-viewer-controls-group">
-        <button type="button" class="pdf-viewer-btn" data-action="rotate-cw">
-          <svg aria-labelledby="rotate-cw-text">
-            <title id="rotate-cw-text">Rotate clockwise</title>
-            <use href="${svgSpritePrefix + "#icon-letter"}" />
-          </svg>
-        </button>
+        ${this.createControlButton("icon-letter", "Rotate clockwise", "rotate-cw")}
       </div>
       <div class="pdf-viewer-controls-group">
-        <button type="button" class="pdf-viewer-btn" data-action="print-doc">
-          <svg aria-labelledby="print-text">
-            <title id="print-text">Print</title>
-            <use href="${svgSpritePrefix + "#icon-letter"}" />
-          </svg>
-        </button>
+        ${this.createControlButton("icon-letter", "Print", "print-doc")}
       </div>
     `;
 
