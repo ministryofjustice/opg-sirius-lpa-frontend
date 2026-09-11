@@ -75,7 +75,7 @@ func PenceToPounds(pence int) float64 {
 }
 
 func IsAmountValid(amount string) bool {
-	m, err := regexp.Match(`^\d+\.\d{2}$`, []byte(amount))
+	m, err := regexp.Match(`^(\d+|\d+\.\d{2})$`, []byte(amount))
 	if err != nil {
 		return false
 	}

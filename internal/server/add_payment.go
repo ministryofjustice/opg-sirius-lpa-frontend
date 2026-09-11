@@ -17,16 +17,23 @@ type AddPaymentClient interface {
 	Case(sirius.Context, int) (sirius.Case, error)
 }
 
+type PaymentSourceRadioOption struct {
+	Value string
+	Label string
+	Attrs map[string]interface{}
+}
+
 type addPaymentData struct {
 	XSRFToken string
 	Error     sirius.ValidationError
 
 	Case           sirius.Case
 	Amount         string
+	AmountOther    string
 	IsPartial      bool
 	Source         string
 	PaymentDate    sirius.DateString
-	PaymentSources []sirius.RefDataItem
+	PaymentSources []PaymentSourceRadioOption
 	ReturnUrl      string
 	HtmxRedirect   string
 }
@@ -39,15 +46,17 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		}
 
 		ctx := getContext(r)
-		group, groupCtx := errgroup.WithContext(ctx.Context)
+
 		data := addPaymentData{
 			XSRFToken:   ctx.XSRFToken,
-			Amount:      postFormString(r, "amount"),
 			IsPartial:   ctx.IsPartial,
 			Source:      postFormString(r, "source"),
 			PaymentDate: postFormDateString(r, "paymentDate"),
+			Amount:      postFormString(r, "amount"),
+			AmountOther: postFormString(r, "amountOther"),
 		}
 
+		group, groupCtx := errgroup.WithContext(ctx.Context)
 		group.Go(func() error {
 			data.Case, err = client.Case(ctx.With(groupCtx), caseID)
 			if err != nil {
@@ -58,9 +67,18 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		})
 
 		group.Go(func() error {
-			data.PaymentSources, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.PaymentSourceCategory)
+			paymentSources, err := client.RefDataByCategory(ctx.With(groupCtx), sirius.PaymentSourceCategory)
 			if err != nil {
 				return err
+			}
+
+			for _, paymentSource := range paymentSources {
+				if paymentSource.UserSelectable {
+					data.PaymentSources = append(data.PaymentSources, PaymentSourceRadioOption{
+						Value: paymentSource.Handle,
+						Label: paymentSource.Label,
+					})
+				}
 			}
 
 			return nil
@@ -77,7 +95,11 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 		}
 
 		if r.Method == http.MethodPost {
-			if !sirius.IsAmountValid(data.Amount) {
+			amount := data.Amount
+			if amount == "other" {
+				amount = data.AmountOther
+			}
+			if !sirius.IsAmountValid(amount) {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = sirius.ValidationError{
 					Field: sirius.FieldErrors{
@@ -98,7 +120,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 				return tmpl(w, data)
 			}
 
-			amountFloat, err := strconv.ParseFloat(data.Amount, 64)
+			amountFloat, err := strconv.ParseFloat(amount, 64)
 			if err != nil {
 				return err
 			}

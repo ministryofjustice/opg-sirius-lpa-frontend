@@ -74,13 +74,15 @@ func TestGetEditPayment(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, editPaymentData{
-			Case:           caseItem,
-			PaymentID:      123,
-			Amount:         "82.00",
-			Source:         "PHONE",
-			PaymentDate:    sirius.DateString("2022-07-23"),
-			PaymentSources: paymentSources,
-			ReturnUrl:      "/payments/0",
+			Case:        caseItem,
+			PaymentID:   123,
+			Amount:      "82.00",
+			Source:      "PHONE",
+			PaymentDate: sirius.DateString("2022-07-23"),
+			PaymentSources: []PaymentSourceRadioOption{
+				{Value: "PHONE", Label: "Paid over the phone"},
+			},
+			ReturnUrl: "/payments/0",
 		}).
 		Return(nil)
 
@@ -224,13 +226,15 @@ func TestEditPaymentWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, editPaymentData{
-			Case:           caseItem,
-			PaymentID:      123,
-			Amount:         "82.00",
-			Source:         "PHONE",
-			PaymentDate:    sirius.DateString("2022-07-23"),
-			PaymentSources: paymentSources,
-			ReturnUrl:      "/payments/0",
+			Case:        caseItem,
+			PaymentID:   123,
+			Amount:      "82.00",
+			Source:      "PHONE",
+			PaymentDate: sirius.DateString("2022-07-23"),
+			PaymentSources: []PaymentSourceRadioOption{
+				{Value: "PHONE", Label: "Paid over the phone"},
+			},
+			ReturnUrl: "/payments/0",
 		}).
 		Return(errExample)
 
@@ -244,7 +248,7 @@ func TestEditPaymentWhenTemplateErrors(t *testing.T) {
 }
 
 func TestPostEditPaymentAmountIncorrectFormat(t *testing.T) {
-	for _, amount := range []string{"41", "41.5", "41.555", ".45"} {
+	for _, amount := range []string{"41.5", "41.555", ".45"} {
 		t.Run(amount, func(t *testing.T) {
 			caseItem := sirius.Case{CaseType: "lpa", UID: "700700"}
 
@@ -284,14 +288,16 @@ func TestPostEditPaymentAmountIncorrectFormat(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, editPaymentData{
-					Case:           caseItem,
-					PaymentID:      123,
-					Amount:         amount,
-					Source:         "MAKE",
-					PaymentDate:    sirius.DateString("2022-01-23"),
-					PaymentSources: paymentSources,
-					Error:          validationError,
-					ReturnUrl:      "/payments/0",
+					Case:        caseItem,
+					PaymentID:   123,
+					Amount:      amount,
+					Source:      "MAKE",
+					PaymentDate: sirius.DateString("2022-01-23"),
+					PaymentSources: []PaymentSourceRadioOption{
+						{Value: "PHONE", Label: "Paid over the phone"},
+					},
+					Error:     validationError,
+					ReturnUrl: "/payments/0",
 				}).
 				Return(nil)
 
@@ -416,15 +422,17 @@ func TestPostEditPaymentHtmx(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, editPaymentData{
-			Case:           caseItem,
-			PaymentID:      123,
-			Amount:         "33.00",
-			Source:         "PHONE",
-			PaymentDate:    "2022-02-18",
-			PaymentSources: paymentSources,
-			ReturnUrl:      "/payments/4",
-			HtmxRedirect:   "/payments/4",
-			IsPartial:      true,
+			Case:        caseItem,
+			PaymentID:   123,
+			Amount:      "33.00",
+			Source:      "PHONE",
+			PaymentDate: "2022-02-18",
+			PaymentSources: []PaymentSourceRadioOption{
+				{Value: "PHONE", Label: "Paid over the phone"},
+			},
+			ReturnUrl:    "/payments/4",
+			HtmxRedirect: "/payments/4",
+			IsPartial:    true,
 		}).
 		Return(nil)
 
