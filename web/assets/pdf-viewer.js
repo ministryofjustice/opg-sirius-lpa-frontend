@@ -4,6 +4,8 @@ import * as pdfjsLib from "pdfjs-dist";
 const prefix = document.body.getAttribute("data-prefix") || "";
 pdfjsLib.GlobalWorkerOptions.workerSrc = `${prefix}/javascript/pdf.worker.min.mjs`;
 
+const svgSpritePrefix = prefix + "/assets/images/icons-sprite.svg";
+
 // Storage key for persisting viewer state across page navigations
 const STORAGE_KEY = "pdfViewerState";
 
@@ -179,49 +181,53 @@ class PDFViewer {
     }
   }
 
+  createControlButton(icon, label, action, setAriaExpanded = false) {
+    return `
+      <button type="button" class="pdf-viewer-btn" data-action="${action}" aria-label="${label}" title="${label}"${setAriaExpanded ? ' aria-expanded="false"' : ""}>
+          <svg aria-hidden="true" focusable="false">
+            <use href="${svgSpritePrefix + "#" + icon}" />
+          </svg>
+      </button>
+    `;
+  }
+
   createControls() {
     const controls = document.createElement("div");
     controls.className = "pdf-viewer-controls";
     controls.innerHTML = `
       <div class="pdf-viewer-controls-group">
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="toggle-thumbnails" aria-label="Toggle thumbnails" aria-expanded="false">
-          Thumbnails
-        </button>
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="prev" aria-label="Previous page">
-          <span aria-hidden="true">←</span> Previous
-        </button>
+        ${this.createControlButton("icon-letter", "Toggle thumbnails", "toggle-thumbnails", true)}
+      </div>
+      <div class="pdf-viewer-controls-group">
+        <div class="pdf-viewer-button-group">
+          ${this.createControlButton("icon-letter", "Previous page", "prev")}
+          <div class="pdf-viewer-separator"></div>
+          ${this.createControlButton("icon-letter", "Next page", "next")}
+        </div>
         <span class="pdf-viewer-page-info">
-          Page <input type="number" class="pdf-viewer-page-input" aria-label="Current page number" value="1" min="1"> of <span class="pdf-viewer-total-pages">-</span>
+          <input type="number" class="pdf-viewer-page-input" aria-label="Current page number" value="1" min="1"> of <span class="pdf-viewer-total-pages">-</span>
         </span>
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="next" aria-label="Next page">
-          Next <span aria-hidden="true">→</span>
-        </button>
       </div>
       <div class="pdf-viewer-controls-group">
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="zoom-out" aria-label="Zoom out">
-          <span aria-hidden="true">−</span>
-        </button>
+        <div class="pdf-viewer-button-group">
+          ${this.createControlButton("icon-letter", "Zoom out", "zoom-out")}
+          <div class="pdf-viewer-separator"></div>
+          ${this.createControlButton("icon-letter", "Zoom in", "zoom-in")}
+        </div>
         <input type="text" class="pdf-viewer-zoom-input" aria-label="Zoom level" value="100%">
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="zoom-in" aria-label="Zoom in">
-          <span aria-hidden="true">+</span>
-        </button>
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="fit-width" aria-label="Fit to width">
-          Fit Width
-        </button>
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="fit-page" aria-label="Fit to page">
-          Fit Page
-        </button>
       </div>
       <div class="pdf-viewer-controls-group">
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="print-doc">
-          Print
-        </button>
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="rotate-cw">
-          Rotate Clockwise
-        </button>
-        <button type="button" class="govuk-button govuk-button--secondary pdf-viewer-btn" data-action="rotate-ccw">
-          Rotate Counterclockwise
-        </button>
+        <div class="pdf-viewer-button-group">
+          ${this.createControlButton("icon-letter", "Fit to width", "fit-width")}
+          <div class="pdf-viewer-separator"></div>
+          ${this.createControlButton("icon-letter", "Fit to page", "fit-page")}
+        </div>
+      </div>
+      <div class="pdf-viewer-controls-group">
+        ${this.createControlButton("icon-letter", "Rotate clockwise", "rotate-cw")}
+      </div>
+      <div class="pdf-viewer-controls-group">
+        ${this.createControlButton("icon-letter", "Print", "print-doc")}
       </div>
     `;
 
