@@ -616,15 +616,15 @@
                            value="donor" {{ if containsInt .ApplicantIds .DonorId }}checked{{ end }}>
                     <label class="govuk-label govuk-radios__label" for="f-applicantType">Donor</label>
                   </div>
-                  <div class="govuk-radios__item">
+                  <div class="govuk-radios__item" data-module="applicant-attorney-radio">
                     <input class="govuk-radios__input" id="f-applicantType-2" name="applicantType" type="radio"
                            value="attorney" data-aria-controls="applicantAttorneysReveal"
                            {{ if and (ne (len .ApplicantIds) 0) (eq (containsInt .ApplicantIds .DonorId) false) }}checked{{ end }}
                            {{ if eq (len .Lpa.Attorneys) 0 }}disabled{{ end }}>
                     <label class="govuk-label govuk-radios__label" for="f-applicantType-2">Attorney</label>
                   </div>
-                  <div class="govuk-radios__conditional {{ if ne .Lpa.ApplicantType "attorney" }}govuk-radios__conditional--hidden{{ end }}"
-                       id="applicantAttorneysReveal">
+                   <div class="govuk-radios__conditional {{ if ne .Lpa.ApplicantType "attorney" }}govuk-radios__conditional--hidden{{ end }}"
+                       id="applicantAttorneysReveal" data-module="applicant-attorney-checkboxes">
                     {{ range $applicant := .AttorneyApplicants }}
                       <div class="govuk-checkboxes__item">
                         <input class="govuk-checkboxes__input" id="f-applicantIds-{{ .ID }}" name="applicantIds"
