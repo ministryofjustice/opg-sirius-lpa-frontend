@@ -84,6 +84,10 @@
                     <label class="govuk-label govuk-radios__label" for="f-amount-23">£23</label>
                 </div>
                 <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="f-amount-0" name="amount" type="radio" value="0.00" {{if eq .Amount "0.00"}}checked{{end}} data-module="app-clear-payment-trigger">
+                    <label class="govuk-label govuk-radios__label" for="f-amount-0">£0</label>
+                </div>
+                <div class="govuk-radios__item">
                     <input class="govuk-radios__input" id="f-amount-other" name="amount" type="radio" value="other" data-aria-controls="conditional-amount" {{if eq .Amount "other"}}checked{{end}}>
                     <label class="govuk-label govuk-radios__label" for="f-amount-other">Other</label>
                 </div>
