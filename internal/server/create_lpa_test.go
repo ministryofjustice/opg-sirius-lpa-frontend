@@ -167,6 +167,7 @@ func TestGetCreateLpaEdit(t *testing.T) {
 					IsUpdate:               true,
 					AllowNewNotifiedPerson: true,
 					AttorneyApplicants:     []sirius.Attorney{},
+					ReplacementAttorneys:   []sirius.Attorney{},
 				}).
 				Return(nil)
 
