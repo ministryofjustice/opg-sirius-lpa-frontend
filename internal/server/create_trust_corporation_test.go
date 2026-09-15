@@ -459,50 +459,68 @@ func TestPostCreateTrustCorporationAddAnotherRedirects(t *testing.T) {
 	}
 }
 
-func TestPostEditTrustCorporationEditNextRedirects(t *testing.T) {
-	lpa := sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{
+func TestPostEditTrustCorporationUpdateNextAttorney(t *testing.T) {
+	tests := []struct {
+		name             string
+		lpa              sirius.Lpa
+		expectedRedirect string
+	}{
 		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}},
-			IsReplacementAttorney: false,
+			name: "Redirects to trust corporation",
+			lpa: sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{
+				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}},
+				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 4, PersonType: "Trust Corporation"}}},
+			}}},
+			expectedRedirect: "/create-trust-corporation?id=1&caseId=2&trustCorporationId=4&replacement=false",
 		},
 		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 4, PersonType: "Trust Corporation"}},
-			IsReplacementAttorney: false,
+			name: "Redirects to attorney",
+			lpa: sirius.Lpa{Case: sirius.Case{
+				TrustCorporations: []sirius.TrustCorporation{{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}}},
+				Attorneys:         []sirius.Attorney{{SystemStatus: shared.BoolPtr(true), Person: sirius.Person{ID: 4, PersonType: "Attorney"}}},
+			}},
+			expectedRedirect: "/create-attorney?id=1&caseId=2&caseType=lpa&attorneyId=4",
 		},
-	}}}
-	expectedTrustCorporation := sirius.TrustCorporation{
-		Attorney: sirius.Attorney{
-			Person: sirius.Person{
-				CompanyName: "ACME",
-			},
-			SystemStatus: shared.BoolPtr(true),
-		},
-		IsReplacementAttorney:       false,
-		TrustCorporationAppointedAs: "Attorney",
 	}
 
-	client := &mockCreateTrustCorporationClient{}
-	client.
-		On("Lpa", mock.Anything, 2).
-		Return(lpa, nil)
-	client.
-		On("UpdateTrustCorporation", mock.Anything, 3, expectedTrustCorporation).
-		Return(nil)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			expectedTrustCorporation := sirius.TrustCorporation{
+				Attorney: sirius.Attorney{
+					Person: sirius.Person{
+						CompanyName: "ACME",
+					},
+					SystemStatus: shared.BoolPtr(true),
+				},
+				IsReplacementAttorney:       false,
+				TrustCorporationAppointedAs: "Attorney",
+			}
 
-	form := url.Values{
-		"companyName":              {"ACME"},
-		"isReplacementAttorney":    {"false"},
-		"isTrustCorporationActive": {"true"},
-		"update-next-attorney":     {"true"},
+			client := &mockCreateTrustCorporationClient{}
+			client.
+				On("Lpa", mock.Anything, 2).
+				Return(tc.lpa, nil)
+			client.
+				On("UpdateTrustCorporation", mock.Anything, 3, expectedTrustCorporation).
+				Return(nil)
+
+			form := url.Values{
+				"companyName":              {"ACME"},
+				"isReplacementAttorney":    {"false"},
+				"isTrustCorporationActive": {"true"},
+				"update-next-attorney":     {"true"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "create-trust-corporation/?id=1&caseId=2&trustCorporationId=3&replacement=false", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := CreateTrustCorporation(client, nil)(w, r)
+
+			assert.Equal(t, RedirectError(tc.expectedRedirect), err)
+			mock.AssertExpectationsForObjects(t, client)
+		})
 	}
-
-	r, _ := http.NewRequest(http.MethodPost, "create-trust-corporation/?id=1&caseId=2&trustCorporationId=3&replacement=false", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := CreateTrustCorporation(client, nil)(w, r)
-
-	assert.Equal(t, RedirectError("/create-trust-corporation?id=1&caseId=2&trustCorporationId=4&replacement=false"), err)
 }
 
 func TestGetNextTrustCorporationIdWillReturnNextNumber(t *testing.T) {
@@ -581,20 +599,20 @@ func TestGetNextTrustCorporationIdWillReturnNextNumberWithSameAppointedType(t *t
 	assert.Equal(t, 4, result)
 }
 
-func TestGetIdForNextAttorneyWillReturnNextNumberWithSameAppointedType(t *testing.T) {
-
+func TestGetIdForNextAttorneyTrustCorpsAndActiveAttorneys(t *testing.T) {
 	trustCorporations := []sirius.TrustCorporation{
 		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 1, PersonType: "Trust Corporation"}},
+			Attorney: sirius.Attorney{Person: sirius.Person{ID: 1, PersonType: "Trust Corporation"}},
+		},
+		{
+			Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}},
+		},
+		{
+			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 4, PersonType: "Trust Corporation"}},
 			IsReplacementAttorney: true,
 		},
 		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}},
-			IsReplacementAttorney: false,
-		},
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 5, PersonType: "Trust Corporation"}},
-			IsReplacementAttorney: true,
+			Attorney: sirius.Attorney{Person: sirius.Person{ID: 5, PersonType: "Trust Corporation"}},
 		},
 	}
 
@@ -604,16 +622,52 @@ func TestGetIdForNextAttorneyWillReturnNextNumberWithSameAppointedType(t *testin
 			SystemStatus: shared.BoolPtr(true),
 		},
 		{
-			Person:       sirius.Person{ID: 4, PersonType: "Attorney"},
+			Person:       sirius.Person{ID: 6, PersonType: "Attorney"},
 			SystemStatus: shared.BoolPtr(true),
 		},
 		{
-			Person:       sirius.Person{ID: 6, PersonType: "Attorney"},
+			Person:       sirius.Person{ID: 7, PersonType: "Attorney"},
 			SystemStatus: shared.BoolPtr(true),
 		},
 	}
 
-	result, personType := GetIdForNextAttorney(2, false, trustCorporations, attorneys)
-	assert.Equal(t, 3, result)
-	assert.Equal(t, "Trust Corporation", personType)
+	tests := []struct {
+		name           string
+		currentID      int
+		expectedNextID int
+		personType     string
+	}{
+		{
+			name:           "Current is attorney, next is trust corp",
+			currentID:      2,
+			expectedNextID: 3,
+			personType:     "Trust Corporation",
+		},
+		{
+			name:           "Current is attorney, next is attorney",
+			currentID:      6,
+			expectedNextID: 7,
+			personType:     "Attorney",
+		},
+		{
+			name:           "Current is trust corp, next is attorney",
+			currentID:      1,
+			expectedNextID: 2,
+			personType:     "Attorney",
+		},
+		{
+			name:           "Current is trust corp, next is trust corp",
+			currentID:      3,
+			expectedNextID: 5,
+			personType:     "Trust Corporation",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result, personType := GetIdForNextAttorney(tc.currentID, false, trustCorporations, attorneys)
+			assert.Equal(t, tc.expectedNextID, result)
+			assert.Equal(t, tc.personType, personType)
+		})
+	}
 }
