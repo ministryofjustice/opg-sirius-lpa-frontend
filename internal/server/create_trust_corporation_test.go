@@ -530,7 +530,7 @@ func TestPostEditTrustCorporationUpdateNextAttorney(t *testing.T) {
 	}
 }
 
-func TestGetIdForNextAttorneyWillReturnNextNumberWithSameAppointedType(t *testing.T) {
+func TestGetIdForNextAttorneyTrustCorpsAndActiveAttorneys(t *testing.T) {
 
 	trustCorporations := []sirius.TrustCorporation{
 		{
