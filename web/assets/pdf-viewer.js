@@ -4,7 +4,11 @@ import * as pdfjsLib from "pdfjs-dist";
 const prefix = document.body.getAttribute("data-prefix") || "";
 pdfjsLib.GlobalWorkerOptions.workerSrc = `${prefix}/javascript/pdf.worker.min.mjs`;
 
-const svgSpritePrefix = prefix + "/assets/images/icons-sprite.svg";
+let svgSpritePrefix = prefix + "/assets/images/icons-sprite.svg";
+const staticHash = document.body.getAttribute("data-static-hash") || "";
+if (staticHash) {
+  svgSpritePrefix = svgSpritePrefix + "?" + encodeURIComponent(staticHash);
+}
 
 // Storage key for persisting viewer state across page navigations
 const STORAGE_KEY = "pdfViewerState";
