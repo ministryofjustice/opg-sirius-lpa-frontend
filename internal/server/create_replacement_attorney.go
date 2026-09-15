@@ -68,6 +68,7 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 			return tmpl(w, data)
 		}
 
+		var nextPersonType string
 		var attorneyId int
 		attorneyIdStr := r.FormValue("attorneyId")
 		isEditing := attorneyIdStr != ""
@@ -87,7 +88,7 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 			data.Title = "Update replacement attorney details"
 			data.IsEditing = true
 
-			data.NextAttorneyId = GetNextAttorneyId(attorneyId, lpa.ReplacementAttorneys)
+			data.NextAttorneyId, nextPersonType = GetIdForNextAttorney(attorneyId, true, lpa.TrustCorporations, lpa.ReplacementAttorneys)
 		}
 
 		if r.Method == http.MethodPost {
@@ -136,13 +137,18 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 				return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorId, caseId))
 			}
 
-			if r.FormValue("next-attorney") != "" {
-				if ctx.IsPartial {
-					data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d", donorId, caseId, data.NextAttorneyId)
+			if r.FormValue("update-next-attorney") != "" {
+				redirect := fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d", donorId, caseId, data.NextAttorneyId)
+				if nextPersonType == "Trust Corporation" {
+					redirect = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=true", donorId, caseId, data.NextAttorneyId)
+				}
+
+				if data.IsPartial {
+					data.HtmxRedirect = redirect
 					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
 					return tmpl(w, data)
 				}
-				return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d", donorId, caseId, data.NextAttorneyId))
+				return RedirectError(redirect)
 			}
 
 			if ctx.IsPartial {
