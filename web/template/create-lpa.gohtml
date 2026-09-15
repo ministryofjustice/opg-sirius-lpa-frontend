@@ -552,24 +552,27 @@
                      name="addCertificateProvider" {{ if gt (len .Lpa.CertificateProviders) 1 }}disabled{{ end }} value="Add Certificate Provider"/>
             </div>
 
-            {{ if or (gt (len .Lpa.Attorneys) 0) (gt (len .AttorneyTrustCorporations) 0) }}
+            {{ if gt (len .AttorneyApplicants) 0 }}
               <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible app-section-break--no-top-margin">
               <h3 class="govuk-heading-s">Attorneys</h3>
-              {{ range $attorney := .Lpa.Attorneys }}
-                {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s" .Firstname .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
-              {{ end }}
-              {{ range $trustCorporation := .AttorneyTrustCorporations }}
-                {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) .CompanyName .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
-              {{ end }}
+              {{ range $attorneys := .AttorneyApplicants }}
+                  {{ if eq .PersonType "Trust Corporation" }}
+                    {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) .CompanyName .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
+                  {{ else }}
+                    {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s" .Firstname .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
+                  {{ end }}
+                {{ end }}
             {{ end }}
-            {{ if or (gt (len .Lpa.ReplacementAttorneys) 0) (gt (len .ReplacementAttorneyTrustCorporations) 0) }}
+
+            {{ if gt (len .ReplacementAttorneys) 0 }}
               <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
               <h3 class="govuk-heading-s">Replacement attorneys</h3>
-              {{ range $attorney := .Lpa.ReplacementAttorneys }}
-                {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s" .Firstname .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
-              {{ end }}
-              {{ range $trustCorporation := .ReplacementAttorneyTrustCorporations }}
-                {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) .CompanyName .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
+              {{ range $attorney := .ReplacementAttorneys }}
+                {{ if eq .PersonType "Trust Corporation" }}
+                  {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) .CompanyName .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
+                {{ else }}
+                  {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s" .Firstname .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
+                {{ end }}
               {{ end }}
             {{ end }}
           </div>

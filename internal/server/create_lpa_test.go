@@ -167,6 +167,7 @@ func TestGetCreateLpaEdit(t *testing.T) {
 					IsUpdate:               true,
 					AllowNewNotifiedPerson: true,
 					AttorneyApplicants:     []sirius.Attorney{},
+					ReplacementAttorneys:   []sirius.Attorney{},
 				}).
 				Return(nil)
 
@@ -229,8 +230,11 @@ func TestGetCreateLpaEditWithTrustCorporations(t *testing.T) {
 
 			if tc.isReplacementAttorney {
 				data.ReplacementAttorneyTrustCorporations = []sirius.TrustCorporation{trustCorporation}
+				data.ReplacementAttorneys = []sirius.Attorney{trustCorporation.Attorney}
 			} else {
 				data.AttorneyTrustCorporations = []sirius.TrustCorporation{trustCorporation}
+				data.ReplacementAttorneys = []sirius.Attorney{}
+
 			}
 
 			template := &mockTemplate{}
@@ -1475,9 +1479,10 @@ func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 			attorney := sirius.Attorney{Person: sirius.Person{ID: 999, Firstname: "Rudolph", Surname: "Stotesbury"}}
 			existingLpa := sirius.Lpa{
 				Case: sirius.Case{
-					ID:          456,
-					ReceiptDate: sirius.DateString("2022-01-01"),
-					Attorneys:   []sirius.Attorney{attorney},
+					ID:                   456,
+					ReceiptDate:          sirius.DateString("2022-01-01"),
+					Attorneys:            []sirius.Attorney{attorney},
+					ReplacementAttorneys: []sirius.Attorney{},
 				},
 			}
 
@@ -1528,6 +1533,7 @@ func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 				HtmxSwap:               "innerHTML",
 				IsPartial:              isHtmx,
 				AttorneyApplicants:     []sirius.Attorney{attorney},
+				ReplacementAttorneys:   []sirius.Attorney{},
 			}
 
 			if isHtmx {
@@ -1573,7 +1579,7 @@ func TestPostCreateLpaUpdateAttorneyBadId(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&updateAttorney=not-a-number", nil)
 	w := httptest.NewRecorder()
 
-	err := CreateLpa(client, nil)(w, r)
+	err := CreateLpa(client, nil)(w, r)--
 
 	assert.NotNil(t, err)
 	mock.AssertExpectationsForObjects(t, client)
