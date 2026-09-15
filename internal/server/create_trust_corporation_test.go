@@ -481,6 +481,13 @@ func TestPostEditTrustCorporationUpdateNextAttorney(t *testing.T) {
 			}},
 			expectedRedirect: "/create-attorney?id=1&caseId=2&caseType=lpa&attorneyId=4",
 		},
+		{
+			name: "Redirects to lpa when no next person",
+			lpa: sirius.Lpa{Case: sirius.Case{
+				TrustCorporations: []sirius.TrustCorporation{{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}}},
+			}},
+			expectedRedirect: "/create-lpa?id=1&caseId=2#scroll-to-attorneys-corporation",
+		},
 	}
 
 	for _, tc := range tests {
