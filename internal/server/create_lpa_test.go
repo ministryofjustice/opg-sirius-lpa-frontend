@@ -234,7 +234,6 @@ func TestGetCreateLpaEditWithTrustCorporations(t *testing.T) {
 			} else {
 				data.AttorneyTrustCorporations = []sirius.TrustCorporation{trustCorporation}
 				data.ReplacementAttorneys = []sirius.Attorney{}
-
 			}
 
 			template := &mockTemplate{}
