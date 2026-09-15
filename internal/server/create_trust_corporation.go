@@ -28,6 +28,8 @@ type createTrustCorporationData struct {
 	Title                  string
 	TrustCorporation       sirius.TrustCorporation
 	XSRFToken              string
+	NextPersonId           int
+	NextPersonType         string
 }
 
 func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.Template) Handler {
@@ -88,7 +90,7 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 
 			data.Title = "Update trust corporation details"
 			data.IsEditing = true
-			data.NextTrustCorporationId = GetNextTrustCorporationId(trustCorporationId, data.TrustCorporation.IsReplacementAttorney, lpa.TrustCorporations)
+			data.NextPersonId, data.NextPersonType = GetIdForNextAttorney(trustCorporationId, data.TrustCorporation.IsReplacementAttorney, lpa.TrustCorporations, lpa.Attorneys)
 			data.HtmxPost = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s", donorId, caseId, trustCorporationId, strconv.FormatBool(isReplacementAttorney))
 
 			if data.TrustCorporation.IsReplacementAttorney {
@@ -152,8 +154,13 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 				}
 			}
 
-			if r.FormValue("editNextTrustCorporation") != "" {
-				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s", donorId, caseId, data.NextTrustCorporationId, strconv.FormatBool(trustCorporation.IsReplacementAttorney)))
+			if r.FormValue("update-next-attorney") != "" {
+				switch data.NextPersonType {
+				case "Attorney":
+					return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d", donorId, caseId, data.NextPersonId))
+				case "Trust Corporation":
+					return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s", donorId, caseId, data.NextPersonId, strconv.FormatBool(trustCorporation.IsReplacementAttorney)))
+				}
 			}
 
 			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#scroll-to-attorneys-corporation", donorId, caseId))
@@ -171,4 +178,28 @@ func GetNextTrustCorporationId(id int, isReplacementAttorney bool, trustCorporat
 		}
 	}
 	return nextTrustCorporationId
+}
+
+func GetIdForNextAttorney(id int, isReplacementAttorney bool, trustCorporations []sirius.TrustCorporation, attorneys []sirius.Attorney) (int, string) {
+	nextID := 0
+	personType := ""
+
+	for _, trustCorporation := range trustCorporations {
+		if trustCorporation.IsReplacementAttorney == isReplacementAttorney {
+			if trustCorporation.ID > id && (nextID == 0 || trustCorporation.ID < nextID) {
+				nextID = trustCorporation.ID
+				personType = trustCorporation.PersonType
+			}
+		}
+	}
+
+	for _, attorney := range attorneys {
+		if attorney.SystemStatus != nil && *attorney.SystemStatus == !isReplacementAttorney {
+			if attorney.ID > id && (nextID == 0 || attorney.ID < nextID) {
+				nextID = attorney.ID
+				personType = attorney.PersonType
+			}
+		}
+	}
+	return nextID, personType
 }

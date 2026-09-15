@@ -462,11 +462,11 @@ func TestPostCreateTrustCorporationAddAnotherRedirects(t *testing.T) {
 func TestPostEditTrustCorporationEditNextRedirects(t *testing.T) {
 	lpa := sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{
 		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3}},
+			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}},
 			IsReplacementAttorney: false,
 		},
 		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 4}},
+			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 4, PersonType: "Trust Corporation"}},
 			IsReplacementAttorney: false,
 		},
 	}}}
@@ -493,7 +493,7 @@ func TestPostEditTrustCorporationEditNextRedirects(t *testing.T) {
 		"companyName":              {"ACME"},
 		"isReplacementAttorney":    {"false"},
 		"isTrustCorporationActive": {"true"},
-		"editNextTrustCorporation": {"true"},
+		"update-next-attorney":     {"true"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "create-trust-corporation/?id=1&caseId=2&trustCorporationId=3&replacement=false", strings.NewReader(form.Encode()))
@@ -579,4 +579,41 @@ func TestGetNextTrustCorporationIdWillReturnNextNumberWithSameAppointedType(t *t
 		},
 	})
 	assert.Equal(t, 4, result)
+}
+
+func TestGetIdForNextAttorneyWillReturnNextNumberWithSameAppointedType(t *testing.T) {
+
+	trustCorporations := []sirius.TrustCorporation{
+		{
+			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 1, PersonType: "Trust Corporation"}},
+			IsReplacementAttorney: true,
+		},
+		{
+			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}},
+			IsReplacementAttorney: false,
+		},
+		{
+			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 5, PersonType: "Trust Corporation"}},
+			IsReplacementAttorney: true,
+		},
+	}
+
+	attorneys := []sirius.Attorney{
+		{
+			Person:       sirius.Person{ID: 2, PersonType: "Attorney"},
+			SystemStatus: shared.BoolPtr(true),
+		},
+		{
+			Person:       sirius.Person{ID: 4, PersonType: "Attorney"},
+			SystemStatus: shared.BoolPtr(true),
+		},
+		{
+			Person:       sirius.Person{ID: 6, PersonType: "Attorney"},
+			SystemStatus: shared.BoolPtr(true),
+		},
+	}
+
+	result, personType := GetIdForNextAttorney(2, false, trustCorporations, attorneys)
+	assert.Equal(t, 3, result)
+	assert.Equal(t, "Trust Corporation", personType)
 }
