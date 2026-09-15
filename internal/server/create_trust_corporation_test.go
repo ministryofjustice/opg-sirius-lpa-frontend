@@ -531,7 +531,6 @@ func TestPostEditTrustCorporationUpdateNextAttorney(t *testing.T) {
 }
 
 func TestGetIdForNextAttorneyTrustCorpsAndActiveAttorneys(t *testing.T) {
-
 	trustCorporations := []sirius.TrustCorporation{
 		{
 			Attorney: sirius.Attorney{Person: sirius.Person{ID: 1, PersonType: "Trust Corporation"}},
