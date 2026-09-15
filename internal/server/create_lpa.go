@@ -41,6 +41,7 @@ type createLpaData struct {
 	XSRFToken                            string
 	IsPartial                            bool
 	AttorneyApplicants                   []sirius.Attorney
+	ReplacementAttorneys                 []sirius.Attorney
 }
 
 func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
@@ -93,6 +94,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				}
 			}
 			data.AttorneyApplicants = Applicants(data.Lpa.Attorneys, data.AttorneyTrustCorporations)
+			data.ReplacementAttorneys = Applicants(data.Lpa.ReplacementAttorneys, data.ReplacementAttorneyTrustCorporations)
 		}
 
 		if r.Method == http.MethodPost {
