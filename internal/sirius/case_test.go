@@ -215,26 +215,3 @@ func TestCaseGetApplicantIds(t *testing.T) {
 
 	assert.Equal(t, []int{1, 2}, applicantIds)
 }
-
-func TestGetReplacementsSortedByID(t *testing.T) {
-	attorneys := []Attorney{{Person: Person{ID: 1}}, {Person: Person{ID: 3}}}
-	trustCorporations := []TrustCorporation{
-		{Attorney: Attorney{Person: Person{ID: 2}}, IsReplacementAttorney: true},
-		{Attorney: Attorney{Person: Person{ID: 4}}, IsReplacementAttorney: false},
-	}
-	caseItem := Case{ReplacementAttorneys: attorneys, TrustCorporations: trustCorporations}
-	replacements := caseItem.GetReplacementAttorneysSortedByID()
-
-	var replacementIDs []int
-	for _, replacement := range replacements {
-		replacementIDs = append(replacementIDs, replacement.Person.ID)
-	}
-	expected := []Attorney{
-		{Person: Person{ID: 1}},
-		{Person: Person{ID: 2}},
-		{Person: Person{ID: 3}},
-	}
-
-	assert.Equal(t, expected, replacements)
-	assert.IsIncreasing(t, replacementIDs)
-}

@@ -94,7 +94,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				}
 			}
 			data.AttorneyApplicants = Applicants(data.Lpa.Attorneys, data.AttorneyTrustCorporations)
-			data.ReplacementAttorneys = data.Lpa.GetReplacementAttorneysSortedByID()
+			data.ReplacementAttorneys = Applicants(data.Lpa.ReplacementAttorneys, data.ReplacementAttorneyTrustCorporations)
 		}
 
 		if r.Method == http.MethodPost {
