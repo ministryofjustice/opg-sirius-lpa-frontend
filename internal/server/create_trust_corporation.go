@@ -160,6 +160,7 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 					return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d", donorId, caseId, data.NextPersonId))
 				case "Trust Corporation":
 					return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s", donorId, caseId, data.NextPersonId, strconv.FormatBool(trustCorporation.IsReplacementAttorney)))
+				default:
 				}
 			}
 
@@ -185,20 +186,16 @@ func GetIdForNextAttorney(id int, isReplacementAttorney bool, trustCorporations 
 	personType := ""
 
 	for _, trustCorporation := range trustCorporations {
-		if trustCorporation.IsReplacementAttorney == isReplacementAttorney {
-			if trustCorporation.ID > id && (nextID == 0 || trustCorporation.ID < nextID) {
-				nextID = trustCorporation.ID
-				personType = trustCorporation.PersonType
-			}
+		if trustCorporation.IsReplacementAttorney == isReplacementAttorney && trustCorporation.ID > id && (nextID == 0 || trustCorporation.ID < nextID) {
+			nextID = trustCorporation.ID
+			personType = trustCorporation.PersonType
 		}
 	}
 
 	for _, attorney := range attorneys {
-		if attorney.SystemStatus != nil && *attorney.SystemStatus == !isReplacementAttorney {
-			if attorney.ID > id && (nextID == 0 || attorney.ID < nextID) {
-				nextID = attorney.ID
-				personType = attorney.PersonType
-			}
+		if attorney.SystemStatus != nil && *attorney.SystemStatus == !isReplacementAttorney && attorney.ID > id && (nextID == 0 || attorney.ID < nextID) {
+			nextID = attorney.ID
+			personType = attorney.PersonType
 		}
 	}
 	return nextID, personType
