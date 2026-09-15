@@ -82,6 +82,20 @@
         </div>
     </div>
 
-    {{ template "select" (select "source" "Payment method" .Source .Error.Field.source (options .PaymentSources "filterSelectable" true)) }}
+    <div class="govuk-form-group {{ if .Error.Field.source }}govuk-form-group--error{{ end }}">
+        <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Payment method</legend>
+            {{ template "errors" .Error.Field.source }}
+            <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                {{ range $i, $paymentSource := .PaymentSources }}
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="f-{{ fieldID "source" $i }}" name="source" type="radio" value="{{ $paymentSource.Value }}" {{ if eq $.Source $paymentSource.Value }}checked{{ end }}>
+                        <label class="govuk-label govuk-radios__label" for="f-{{ fieldID "source" $i }}">{{ $paymentSource.Label }}</label>
+                    </div>
+                {{ end }}
+            </div>
+        </fieldset>
+    </div>
+
     {{ template "input-date" (field "paymentDate" "Date of payment" .PaymentDate .Error.Field.paymentDate "max" today "selectToday" true) }}
 {{ end }}

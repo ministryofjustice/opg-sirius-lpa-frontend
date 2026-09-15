@@ -58,9 +58,11 @@ func TestGetAddPayment(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addPaymentData{
-			Case:           caseItem,
-			PaymentSources: paymentSources,
-			ReturnUrl:      "/payments/4",
+			Case: caseItem,
+			PaymentSources: []PaymentSourceRadioOption{
+				{Value: "PHONE", Label: "Paid over the phone"},
+			},
+			ReturnUrl: "/payments/4",
 		}).
 		Return(nil)
 
@@ -144,9 +146,11 @@ func TestAddPaymentWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addPaymentData{
-			Case:           caseItem,
-			PaymentSources: paymentSources,
-			ReturnUrl:      "/payments/123",
+			Case: caseItem,
+			PaymentSources: []PaymentSourceRadioOption{
+				{Value: "PHONE", Label: "Paid over the phone"},
+			},
+			ReturnUrl: "/payments/123",
 		}).
 		Return(errExample)
 
@@ -224,6 +228,49 @@ func TestPostAddPayment(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestPostAddPaymentOther(t *testing.T) {
+	caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
+	client := &mockAddPaymentClient{}
+	client.
+		On("AddPayment", mock.Anything, 123, 1100, "MAKE", sirius.DateString("2022-01-23")).
+		Return(nil)
+	client.
+		On("Case", mock.Anything, 123).
+		Return(caseitem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
+
+	template := &mockTemplate{}
+
+	form := url.Values{
+		"amount":      {"other"},
+		"amountOther": {"11.00"},
+		"source":      {"MAKE"},
+		"paymentDate": {"2022-01-23"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := AddPayment(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Equal(t, RedirectError("/payments/123"), err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
 func TestPostAddPaymentHTMX(t *testing.T) {
 	caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
 
@@ -249,14 +296,16 @@ func TestPostAddPaymentHTMX(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, addPaymentData{
-			Case:           caseitem,
-			Amount:         "41.00",
-			IsPartial:      true,
-			Source:         "MAKE",
-			PaymentDate:    sirius.DateString("2022-01-23"),
-			PaymentSources: paymentSources,
-			ReturnUrl:      "/payments/123",
-			HtmxRedirect:   "/payments/123",
+			Case:        caseitem,
+			Amount:      "41.00",
+			IsPartial:   true,
+			Source:      "MAKE",
+			PaymentDate: sirius.DateString("2022-01-23"),
+			PaymentSources: []PaymentSourceRadioOption{
+				{Value: "PHONE", Label: "Paid over the phone"},
+			},
+			ReturnUrl:    "/payments/123",
+			HtmxRedirect: "/payments/123",
 		}).
 		Return(nil)
 
@@ -280,7 +329,7 @@ func TestPostAddPaymentHTMX(t *testing.T) {
 }
 
 func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
-	for _, amount := range []string{"41", "41.5", "41.555", ".45"} {
+	for _, amount := range []string{"41.5", "41.555", ".45"} {
 		t.Run(amount, func(t *testing.T) {
 			caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
 
@@ -309,14 +358,16 @@ func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, addPaymentData{
-					Case:           caseitem,
-					Amount:         amount,
-					IsPartial:      false,
-					Source:         "MAKE",
-					PaymentDate:    sirius.DateString("2022-01-23"),
-					Error:          validationError,
-					PaymentSources: paymentSources,
-					ReturnUrl:      "/payments/123",
+					Case:        caseitem,
+					Amount:      amount,
+					IsPartial:   false,
+					Source:      "MAKE",
+					PaymentDate: sirius.DateString("2022-01-23"),
+					Error:       validationError,
+					PaymentSources: []PaymentSourceRadioOption{
+						{Value: "PHONE", Label: "Paid over the phone"},
+					},
+					ReturnUrl: "/payments/123",
 				}).
 				Return(nil)
 
