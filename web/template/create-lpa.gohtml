@@ -259,57 +259,46 @@
             </h2>
           </div>
           <div class="govuk-summary-card__content">
-            {{ if or (gt (len .Lpa.ReplacementAttorneys) 0) (gt (len .ReplacementAttorneyTrustCorporations) 0) }}
-              {{ range $attorney := .Lpa.ReplacementAttorneys }}
-                <div class="app-create-lpa__details-row">
-                  <details class="govuk-details">
-                    <summary class="govuk-details__summary app-table__row--half-width">
-                      <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
-                    </summary>
-                    <div class="govuk-details__text">
-                      {{ template "person-details-table" . }}
-                    </div>
-                  </details>
-                  <span class="app-create-lpa__summary-update-link">
-                    <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
-                            id="f-update-replacementAttorney-{{ .ID }}"
-                            name="updateReplacementAttorney"
-                            type="submit"
-                            value="{{ .ID }}"
-                    >
-                      Update
-                      <span class="govuk-visually-hidden">
-                          replacement attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
-                      </span>
-                    </button>
-                  </span>
-                </div>
-              {{ end }}
-              {{ range $trustCorporation := .ReplacementAttorneyTrustCorporations }}
-                <div class="app-create-lpa__details-row">
-                  <details class="govuk-details">
-                    <summary class="govuk-details__summary app-table__row--half-width">
-                      <span class="govuk-details__summary-text">{{ if .CompanyName }}{{ .CompanyName }} {{ end }}(trust corporation)</span>
-                    </summary>
-                    <div class="govuk-details__text">
-                        {{ template "person-details-table" . }}
-                    </div>
-                  </details>
-                  <span class="app-create-lpa__summary-update-link">
+            {{ range $attorneys := .ReplacementAttorneys }}
+              <div class="app-create-lpa__details-row">
+                <details class="govuk-details">
+                  <summary class="govuk-details__summary app-table__row--half-width">
+                    <span class="govuk-details__summary-text">
+                      {{ if eq .PersonType "Trust Corporation" }}
+                        {{ if .CompanyName }}{{ .CompanyName }} {{ end }}(trust corporation)
+                      {{ else }}
+                        {{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                      {{ end }}
+                    </span>
+                  </summary>
+                  <div class="govuk-details__text">
+                    {{ template "person-details-table" . }}
+                  </div>
+                </details>
+                <span class="app-create-lpa__summary-update-link">
+                  {{ if eq .PersonType "Trust Corporation" }}
                     <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
                             id="f-update-trust-corporation-{{ .ID }}"
                             name="updateTrustCorporationReplacementAttorney"
                             type="submit"
-                            value="{{ .ID }}"
-                    >
-                      Update
+                            value="{{ .ID }}">Update
                       <span class="govuk-visually-hidden">
-                          trust corporation appointed as replacement attorney{{ if .CompanyName }} {{ .CompanyName }}{{ end }}
+                        trust corporation appointed as replacment attorney{{ if .CompanyName }} {{ .CompanyName }}{{ end }}
                       </span>
                     </button>
-                  </span>
-                </div>
-              {{ end }}
+                  {{ else }}
+                    <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
+                            id="f-update-replacementAttorney-{{ .ID }}"
+                            name="updateReplacementAttorney"
+                            type="submit"
+                            value="{{ .ID }}">Update
+                    <span class="govuk-visually-hidden">
+                      replacement attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                    </span>
+                  </button>
+                  {{ end }}
+                </span>
+              </div>
             {{ end }}
             <div class="govuk-button-group app-button-group--column">
               <input class="govuk-button govuk-button--secondary" data-module="govuk-button"

@@ -229,6 +229,7 @@ func TestGetCreateLpaEditWithTrustCorporations(t *testing.T) {
 
 			if tc.isReplacementAttorney {
 				data.ReplacementAttorneyTrustCorporations = []sirius.TrustCorporation{trustCorporation}
+				data.ReplacementAttorneys = []sirius.Attorney{trustCorporation.Attorney}
 			} else {
 				data.AttorneyTrustCorporations = []sirius.TrustCorporation{trustCorporation}
 			}
@@ -1672,6 +1673,7 @@ func TestPostCreateLpaUpdateReplacementAttorney(t *testing.T) {
 				HtmxSwap:               "innerHTML",
 				IsPartial:              isHtmx,
 				AttorneyApplicants:     []sirius.Attorney{},
+				ReplacementAttorneys:   existingLpa.ReplacementAttorneys,
 			}
 
 			if isHtmx {

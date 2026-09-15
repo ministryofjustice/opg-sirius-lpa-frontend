@@ -523,83 +523,8 @@ func TestPostEditTrustCorporationUpdateNextAttorney(t *testing.T) {
 	}
 }
 
-func TestGetNextTrustCorporationIdWillReturnNextNumber(t *testing.T) {
-	result := GetNextTrustCorporationId(2, false, []sirius.TrustCorporation{
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 1}},
-			IsReplacementAttorney: false,
-		},
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 2}},
-			IsReplacementAttorney: false,
-		},
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3}},
-			IsReplacementAttorney: false,
-		},
-	})
-	assert.Equal(t, 3, result)
-}
+func TestGetIdForNextAttorneyWillReturnNextNumberWithSameAppointedType(t *testing.T) {
 
-func TestGetNextTrustCorporationIdWillReturnNextHigherIdWhenSequenceHasGaps(t *testing.T) {
-	result := GetNextTrustCorporationId(2, false, []sirius.TrustCorporation{
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 1}},
-			IsReplacementAttorney: false,
-		},
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 5}},
-			IsReplacementAttorney: false,
-		},
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 2}},
-			IsReplacementAttorney: false,
-		},
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 9}},
-			IsReplacementAttorney: false,
-		},
-	})
-	assert.Equal(t, 5, result)
-}
-
-func TestGetNextTrustCorporationIdWillReturnZero(t *testing.T) {
-	result := GetNextTrustCorporationId(3, false, []sirius.TrustCorporation{
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 1}},
-			IsReplacementAttorney: false,
-		},
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 2}},
-			IsReplacementAttorney: false,
-		},
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3}},
-			IsReplacementAttorney: false,
-		},
-	})
-	assert.Equal(t, 0, result)
-}
-
-func TestGetNextTrustCorporationIdWillReturnNextNumberWithSameAppointedType(t *testing.T) {
-	result := GetNextTrustCorporationId(2, false, []sirius.TrustCorporation{
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3}},
-			IsReplacementAttorney: true,
-		},
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 4}},
-			IsReplacementAttorney: false,
-		},
-		{
-			Attorney:              sirius.Attorney{Person: sirius.Person{ID: 5}},
-			IsReplacementAttorney: true,
-		},
-	})
-	assert.Equal(t, 4, result)
-}
-
-func TestGetIdForNextAttorneyTrustCorpsAndActiveAttorneys(t *testing.T) {
 	trustCorporations := []sirius.TrustCorporation{
 		{
 			Attorney: sirius.Attorney{Person: sirius.Person{ID: 1, PersonType: "Trust Corporation"}},
