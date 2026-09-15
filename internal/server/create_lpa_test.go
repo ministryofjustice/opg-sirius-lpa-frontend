@@ -167,6 +167,7 @@ func TestGetCreateLpaEdit(t *testing.T) {
 					IsUpdate:               true,
 					AllowNewNotifiedPerson: true,
 					AttorneyApplicants:     []sirius.Attorney{},
+					ReplacementAttorneys:   []sirius.Attorney{},
 				}).
 				Return(nil)
 
@@ -232,6 +233,7 @@ func TestGetCreateLpaEditWithTrustCorporations(t *testing.T) {
 				data.ReplacementAttorneys = []sirius.Attorney{trustCorporation.Attorney}
 			} else {
 				data.AttorneyTrustCorporations = []sirius.TrustCorporation{trustCorporation}
+				data.ReplacementAttorneys = []sirius.Attorney{}
 			}
 
 			template := &mockTemplate{}
@@ -1529,6 +1531,7 @@ func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 				HtmxSwap:               "innerHTML",
 				IsPartial:              isHtmx,
 				AttorneyApplicants:     []sirius.Attorney{attorney},
+				ReplacementAttorneys:   []sirius.Attorney{},
 			}
 
 			if isHtmx {
