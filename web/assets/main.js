@@ -26,6 +26,8 @@ import initSiriusHeader from "./sirius-header.js";
 import lpaFormSubtype from "./lpa-form-subtype.js";
 import showHideTrustCorpActiveRadios from "./show-hide-trust-corp-active-radios.js";
 import scrollSectionIntoView from "./scroll-section-into-view.js";
+import clearPaymentValue from "./clear-payment-value.js";
+import autoCheckSingleAttorneyApplicant from "./auto-check-single-attorney-applicant.js";
 
 const prefix = document.body.getAttribute("data-prefix");
 
@@ -54,6 +56,8 @@ initSiriusHeader();
 lpaFormSubtype();
 showHideTrustCorpActiveRadios();
 scrollSectionIntoView();
+clearPaymentValue();
+autoCheckSingleAttorneyApplicant();
 
 globalThis.htmx = htmx;
 // Don't include indicator styles as CSP blocks inline styles
@@ -81,6 +85,8 @@ htmx.on("htmx:afterSettle", (event) => {
     lpaFormSubtype(swapDetails.target);
     scrollSectionIntoView(swapDetails.target);
     showHideTrustCorpActiveRadios(swapDetails.target);
+    clearPaymentValue(swapDetails.target);
+    autoCheckSingleAttorneyApplicant(swapDetails.target);
 
     // Update the action panel width if swapping in create-document or edit-document content
     if (swapDetails.target.id === "actions-content") {

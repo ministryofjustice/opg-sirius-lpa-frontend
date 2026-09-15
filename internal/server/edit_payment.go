@@ -27,7 +27,7 @@ type editPaymentData struct {
 	Amount         string
 	Source         string
 	PaymentDate    sirius.DateString
-	PaymentSources []sirius.RefDataItem
+	PaymentSources []PaymentSourceRadioOption
 	ReturnUrl      string
 	HtmxRedirect   string
 	IsPartial      bool
@@ -66,10 +66,20 @@ func EditPayment(client EditPaymentClient, tmpl template.Template) Handler {
 		})
 
 		group.Go(func() error {
-			data.PaymentSources, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.PaymentSourceCategory)
+			paymentSources, err := client.RefDataByCategory(ctx.With(groupCtx), sirius.PaymentSourceCategory)
 			if err != nil {
 				return err
 			}
+
+			for _, paymentSource := range paymentSources {
+				if paymentSource.UserSelectable {
+					data.PaymentSources = append(data.PaymentSources, PaymentSourceRadioOption{
+						Value: paymentSource.Handle,
+						Label: paymentSource.Label,
+					})
+				}
+			}
+
 			return nil
 		})
 
