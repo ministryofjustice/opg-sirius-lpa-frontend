@@ -28,7 +28,7 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"prefix": func(s string) string {
 			return prefix + s
 		},
-		"staticHashPrefix": func() string {
+		"staticHash": func() string {
 			if len(staticHash) < 11 {
 				return ""
 			}
