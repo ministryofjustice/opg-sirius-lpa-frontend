@@ -90,14 +90,17 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 
 			data.Title = "Update trust corporation details"
 			data.IsEditing = true
-			data.NextPersonId, data.NextPersonType = GetIdForNextAttorney(trustCorporationId, data.TrustCorporation.IsReplacementAttorney, lpa.TrustCorporations, lpa.Attorneys)
 			data.HtmxPost = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s", donorId, caseId, trustCorporationId, strconv.FormatBool(isReplacementAttorney))
 
+			attorneys := lpa.Attorneys
 			if data.TrustCorporation.IsReplacementAttorney {
 				data.AppointedAs = "Replacement attorney"
+				attorneys = lpa.ReplacementAttorneys
 			} else {
 				data.AppointedAs = "Attorney"
 			}
+
+			data.NextPersonId, data.NextPersonType = GetIdForNextAttorney(trustCorporationId, data.TrustCorporation.IsReplacementAttorney, lpa.TrustCorporations, attorneys)
 		}
 
 		if r.Method == http.MethodPost {
@@ -158,6 +161,8 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 				switch data.NextPersonType {
 				case "Attorney":
 					return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d", donorId, caseId, data.NextPersonId))
+				case "Replacement Attorney":
+					return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d", donorId, caseId, data.NextPersonId))
 				case "Trust Corporation":
 					return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s", donorId, caseId, data.NextPersonId, strconv.FormatBool(trustCorporation.IsReplacementAttorney)))
 				default:
@@ -169,16 +174,6 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 
 		return tmpl(w, data)
 	}
-}
-
-func GetNextTrustCorporationId(id int, isReplacementAttorney bool, trustCorporations []sirius.TrustCorporation) int {
-	nextTrustCorporationId := 0
-	for _, trustCorporation := range trustCorporations {
-		if trustCorporation.ID > id && (nextTrustCorporationId == 0 || trustCorporation.ID < nextTrustCorporationId) && trustCorporation.IsReplacementAttorney == isReplacementAttorney {
-			nextTrustCorporationId = trustCorporation.ID
-		}
-	}
-	return nextTrustCorporationId
 }
 
 func GetIdForNextAttorney(id int, isReplacementAttorney bool, trustCorporations []sirius.TrustCorporation, attorneys []sirius.Attorney) (int, string) {

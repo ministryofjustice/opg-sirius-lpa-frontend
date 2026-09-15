@@ -2,6 +2,7 @@ package sirius
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 )
@@ -105,4 +106,21 @@ func (c Case) GetApplicantIds() []int {
 		applicantIds = append(applicantIds, applicant.ID)
 	}
 	return applicantIds
+}
+
+func (c Case) GetReplacementAttorneysSortedByID() []Attorney {
+	var attorneys []Attorney
+	attorneys = append(attorneys, c.ReplacementAttorneys...)
+
+	for _, tc := range c.TrustCorporations {
+		if tc.IsReplacementAttorney {
+			attorneys = append(attorneys, tc.Attorney)
+		}
+	}
+
+	slices.SortFunc(attorneys, func(a, b Attorney) int {
+		return a.ID - b.ID
+	})
+
+	return attorneys
 }
