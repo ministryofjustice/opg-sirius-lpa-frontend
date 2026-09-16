@@ -148,21 +148,35 @@ func TestGetEditAttorney(t *testing.T) {
 	}
 }
 
-func TestGetCreateAttorneyBadQuery(t *testing.T) {
-	testCases := map[string]string{
-		"no-id":       "/",
-		"bad-id":      "/?id=test",
-		"bad-case-id": "/?id=123&caseId=test",
+func TestGetCreateAttorneyBadQueries(t *testing.T) {
+	tests := map[string]struct {
+		query  string
+		client bool
+	}{
+		"no-id":                   {"/", false},
+		"bad-id":                  {"/?id=test", false},
+		"bad-case-id":             {"/?id=123&caseId=test", false},
+		"bad-attorney-id-editing": {"/?id=1&caseId=2&attorneyId=bad", true},
 	}
 
-	for name, query := range testCases {
+	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			r, _ := http.NewRequest(http.MethodGet, query, nil)
+			client := &mockCreateAttorneyClient{}
+			if tc.client {
+				client.
+					On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
+					Return(mockRelationshipToDonorCategories, nil)
+			}
+
+			r, _ := http.NewRequest(http.MethodGet, tc.query, nil)
 			w := httptest.NewRecorder()
 
-			err := CreateAttorney(nil, nil)(w, r)
+			err := CreateAttorney(client, nil)(w, r)
 
 			assert.NotNil(t, err)
+			if tc.client {
+				mock.AssertExpectationsForObjects(t, client)
+			}
 		})
 	}
 }
@@ -197,95 +211,21 @@ func TestGetCreateAttorneyWhenLpaErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestPostCreateAttorney(t *testing.T) {
-	for _, isHtmx := range []bool{false, true} {
-		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
-			dateString := "2022-04-05"
-			attorney := sirius.Attorney{
-				Person: sirius.Person{
-					Salutation:        "Rev",
-					Firstname:         "Rudolph",
-					Middlenames:       "Modesto",
-					Surname:           "Stotesbury",
-					DateOfBirth:       sirius.DateString(dateString),
-					AddressLine1:      "Rotonda Gerardo 769",
-					AddressLine2:      "Appartamento 94",
-					AddressLine3:      "Augusto terme",
-					Town:              "San Sabazio",
-					County:            "Benevento",
-					Postcode:          "57797",
-					Country:           "Italy",
-					IsAirmailRequired: true,
-					PhoneNumber:       "079876543345",
-					Email:             "rm2@email.test",
-				},
-				RelationshipToDonor: "no relation",
-				SystemStatus:        shared.BoolPtr(true),
-			}
-			client := &mockCreateAttorneyClient{}
-			client.
-				On("CreateAttorney", mock.Anything, 2, "epa", attorney).
-				Return(nil).
-				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
-				Return(mockRelationshipToDonorCategories, nil)
+func TestGetCreateAttorneyEpaErrors(t *testing.T) {
+	client := &mockCreateAttorneyClient{}
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
+		Return(mockRelationshipToDonorCategories, nil).
+		On("Epa", mock.Anything, 2).
+		Return(sirius.Epa{}, errExample)
 
-			template := &mockTemplate{}
+	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType=epa&attorneyId=3", nil)
+	w := httptest.NewRecorder()
 
-			if isHtmx {
-				template.
-					On("Func", mock.Anything, createAttorneyData{
-						IsPartial:            true,
-						DonorId:              1,
-						CaseId:               2,
-						RelationshipToDonors: mockRelationshipToDonorCategories,
-						Attorney:             attorney,
-						IsEditing:            false,
-						Title:                "Add an attorney",
-						HtmxRedirect:         "/create-epa?id=1&caseId=2",
-						HtmxSwap:             "innerHTML show:#accordion-create-epa-heading-3:top",
-						CaseType:             "epa",
-					}).
-					Return(nil)
-			}
+	err := CreateAttorney(client, nil)(w, r)
 
-			form := url.Values{
-				"salutation":          {"Rev"},
-				"firstname":           {"Rudolph"},
-				"middlenames":         {"Modesto"},
-				"surname":             {"Stotesbury"},
-				"dob":                 {dateString},
-				"addressLine1":        {"Rotonda Gerardo 769"},
-				"addressLine2":        {"Appartamento 94"},
-				"addressLine3":        {"Augusto terme"},
-				"town":                {"San Sabazio"},
-				"county":              {"Benevento"},
-				"postcode":            {"57797"},
-				"country":             {"Italy"},
-				"isAirmailRequired":   {"true"},
-				"phoneNumber":         {"079876543345"},
-				"email":               {"rm2@email.test"},
-				"relationshipToDonor": {"no relation"},
-				"isAttorneyActive":    {"true"},
-			}
-
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType=epa", strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", formUrlEncoded)
-			if isHtmx {
-				r.Header.Add("HX-Request", "true")
-			}
-			w := httptest.NewRecorder()
-
-			err := CreateAttorney(client, template.Func)(w, r)
-			resp := w.Result()
-
-			if !isHtmx {
-				expectedError := RedirectError("/create-epa?id=1&caseId=2#accordion-create-epa-heading-3")
-				assert.Equal(t, err, expectedError)
-			}
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
-		})
-	}
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
 }
 
 func TestPostEditAttorney(t *testing.T) {
@@ -385,95 +325,130 @@ func TestPostEditAttorney(t *testing.T) {
 	}
 }
 
-func TestPostCreateAttorneyAddAnother(t *testing.T) {
-	for _, isHtmx := range []bool{false, true} {
-		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
-			dateString := "2022-04-05"
-			attorney := sirius.Attorney{
-				Person: sirius.Person{
-					Salutation:        "Rev",
-					Firstname:         "Rudolph",
-					Middlenames:       "Modesto",
-					Surname:           "Stotesbury",
-					DateOfBirth:       sirius.DateString(dateString),
-					AddressLine1:      "Rotonda Gerardo 769",
-					AddressLine2:      "Appartamento 94",
-					AddressLine3:      "Augusto terme",
-					Town:              "San Sabazio",
-					County:            "Benevento",
-					Postcode:          "57797",
-					Country:           "Italy",
-					IsAirmailRequired: true,
-					PhoneNumber:       "079876543345",
-					Email:             "rm2@email.test",
-				},
-				RelationshipToDonor: "no relation",
-				SystemStatus:        shared.BoolPtr(true),
+func TestPostCreateAttorneyAddOrNextAnotherEpa(t *testing.T) {
+	tests := []struct {
+		name         string
+		formKey      string
+		htmxSwap     string
+		redirect     string
+		htmxRedirect string
+	}{
+		{
+			name:         "Post create attorney",
+			formKey:      "",
+			htmxSwap:     "innerHTML show:#accordion-create-epa-heading-3:top",
+			redirect:     "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3",
+			htmxRedirect: "/create-epa?id=1&caseId=2",
+		},
+		{
+			name:         "Post create attorney - add another",
+			formKey:      "add-another",
+			htmxSwap:     "innerHTML scroll:.action-panel__content:top",
+			redirect:     "/create-attorney?id=1&caseId=2&caseType=epa",
+			htmxRedirect: "/create-attorney?id=1&caseId=2&caseType=epa",
+		},
+		{
+			name:         "Post create attorney - update next attorney",
+			formKey:      "update-next-attorney",
+			htmxSwap:     "innerHTML scroll:.action-panel__content:top",
+			redirect:     "/create-attorney?id=1&caseId=2&caseType=epa&attorneyId=0",
+			htmxRedirect: "/create-attorney?id=1&caseId=2&caseType=epa&attorneyId=0",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			for _, isHtmx := range []bool{false, true} {
+				t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
+					dateString := "2022-04-05"
+					attorney := sirius.Attorney{
+						Person: sirius.Person{
+							Salutation:        "Rev",
+							Firstname:         "Rudolph",
+							Middlenames:       "Modesto",
+							Surname:           "Stotesbury",
+							DateOfBirth:       sirius.DateString(dateString),
+							AddressLine1:      "Rotonda Gerardo 769",
+							AddressLine2:      "Appartamento 94",
+							AddressLine3:      "Augusto terme",
+							Town:              "San Sabazio",
+							County:            "Benevento",
+							Postcode:          "57797",
+							Country:           "Italy",
+							IsAirmailRequired: true,
+							PhoneNumber:       "079876543345",
+							Email:             "rm2@email.test",
+						},
+						RelationshipToDonor: "no relation",
+						SystemStatus:        shared.BoolPtr(true),
+					}
+					client := &mockCreateAttorneyClient{}
+					client.
+						On("CreateAttorney", mock.Anything, 2, "epa", attorney).
+						Return(nil).
+						On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
+						Return(mockRelationshipToDonorCategories, nil)
+
+					template := &mockTemplate{}
+
+					if isHtmx {
+						template.
+							On("Func", mock.Anything, createAttorneyData{
+								IsPartial:            true,
+								DonorId:              1,
+								CaseId:               2,
+								RelationshipToDonors: mockRelationshipToDonorCategories,
+								Attorney:             attorney,
+								Title:                "Add an attorney",
+								HtmxRedirect:         tc.htmxRedirect,
+								HtmxSwap:             tc.htmxSwap,
+								CaseType:             "epa",
+							}).
+							Return(nil)
+					}
+
+					form := url.Values{
+						"salutation":          {"Rev"},
+						"firstname":           {"Rudolph"},
+						"middlenames":         {"Modesto"},
+						"surname":             {"Stotesbury"},
+						"dob":                 {dateString},
+						"addressLine1":        {"Rotonda Gerardo 769"},
+						"addressLine2":        {"Appartamento 94"},
+						"addressLine3":        {"Augusto terme"},
+						"town":                {"San Sabazio"},
+						"county":              {"Benevento"},
+						"postcode":            {"57797"},
+						"country":             {"Italy"},
+						"isAirmailRequired":   {"true"},
+						"phoneNumber":         {"079876543345"},
+						"email":               {"rm2@email.test"},
+						"relationshipToDonor": {"no relation"},
+						"isAttorneyActive":    {"true"},
+					}
+					if tc.formKey != "" {
+						form.Set(tc.formKey, "true")
+					}
+
+					r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType=epa", strings.NewReader(form.Encode()))
+					r.Header.Add("Content-Type", formUrlEncoded)
+					if isHtmx {
+						r.Header.Add("HX-Request", "true")
+					}
+					w := httptest.NewRecorder()
+
+					err := CreateAttorney(client, template.Func)(w, r)
+					resp := w.Result()
+
+					if !isHtmx {
+						assert.Equal(t, RedirectError(tc.redirect), err)
+					} else {
+						assert.Nil(t, err)
+					}
+					assert.Equal(t, http.StatusOK, resp.StatusCode)
+					mock.AssertExpectationsForObjects(t, client, template)
+				})
 			}
-			client := &mockCreateAttorneyClient{}
-			client.
-				On("CreateAttorney", mock.Anything, 2, "epa", attorney).
-				Return(nil).
-				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
-				Return(mockRelationshipToDonorCategories, nil)
-
-			template := &mockTemplate{}
-
-			if isHtmx {
-				template.
-					On("Func", mock.Anything, createAttorneyData{
-						IsPartial:            true,
-						DonorId:              1,
-						CaseId:               2,
-						RelationshipToDonors: mockRelationshipToDonorCategories,
-						Attorney:             attorney,
-						Title:                "Add an attorney",
-						HtmxRedirect:         "/create-attorney?id=1&caseId=2&caseType=epa",
-						HtmxSwap:             "innerHTML scroll:.action-panel__content:top",
-						CaseType:             "epa",
-					}).
-					Return(nil)
-			}
-
-			form := url.Values{
-				"salutation":          {"Rev"},
-				"firstname":           {"Rudolph"},
-				"middlenames":         {"Modesto"},
-				"surname":             {"Stotesbury"},
-				"dob":                 {dateString},
-				"addressLine1":        {"Rotonda Gerardo 769"},
-				"addressLine2":        {"Appartamento 94"},
-				"addressLine3":        {"Augusto terme"},
-				"town":                {"San Sabazio"},
-				"county":              {"Benevento"},
-				"postcode":            {"57797"},
-				"country":             {"Italy"},
-				"isAirmailRequired":   {"true"},
-				"phoneNumber":         {"079876543345"},
-				"email":               {"rm2@email.test"},
-				"relationshipToDonor": {"no relation"},
-				"isAttorneyActive":    {"true"},
-				"add-another":         {"true"},
-			}
-
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType=epa", strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", formUrlEncoded)
-			if isHtmx {
-				r.Header.Add("HX-Request", "true")
-			}
-			w := httptest.NewRecorder()
-
-			err := CreateAttorney(client, template.Func)(w, r)
-			resp := w.Result()
-
-			if !isHtmx {
-				expectedError := RedirectError("/create-attorney?id=1&caseId=2&caseType=epa")
-				assert.Equal(t, err, expectedError)
-			} else {
-				assert.Nil(t, err)
-			}
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -566,37 +541,56 @@ func TestPostCreateAttorneyWhenValidationError(t *testing.T) {
 	}
 }
 
-func TestPostCreateAttorneyNextAnother(t *testing.T) {
+func TestPostCreateAttorneyNextAnotherLpa(t *testing.T) {
 	for _, isHtmx := range []bool{false, true} {
 		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
 			dateString := "2022-04-05"
-			attorney := sirius.Attorney{
-				Person: sirius.Person{
-					Salutation:        "Rev",
-					Firstname:         "Rudolph",
-					Middlenames:       "Modesto",
-					Surname:           "Stotesbury",
-					DateOfBirth:       sirius.DateString(dateString),
-					AddressLine1:      "Rotonda Gerardo 769",
-					AddressLine2:      "Appartamento 94",
-					AddressLine3:      "Augusto terme",
-					Town:              "San Sabazio",
-					County:            "Benevento",
-					Postcode:          "57797",
-					Country:           "Italy",
-					IsAirmailRequired: true,
-					PhoneNumber:       "079876543345",
-					Email:             "rm2@email.test",
+			trustCorp := sirius.TrustCorporation{
+				Attorney: sirius.Attorney{
+					Person: sirius.Person{
+						ID:               3,
+						CompanyName:      "ACME",
+						CompanyReference: "testing",
+						DateOfBirth:      sirius.DateString(dateString),
+						AddressLine1:     "Rotonda Gerardo 769",
+						Town:             "San Sabazio",
+						County:           "Benevento",
+						Postcode:         "57797",
+						PersonType:       "Trust Corporation",
+					},
+					SystemStatus: shared.BoolPtr(true),
 				},
-				RelationshipToDonor: "no relation",
-				SystemStatus:        shared.BoolPtr(true),
 			}
+			lpa := sirius.Lpa{
+				Case: sirius.Case{
+					Attorneys:         []sirius.Attorney{{Person: sirius.Person{ID: 2}, SystemStatus: shared.BoolPtr(true)}},
+					TrustCorporations: []sirius.TrustCorporation{trustCorp},
+				},
+			}
+			updatedAttorney := sirius.Attorney{
+				Person: sirius.Person{
+					Salutation:   "Rev",
+					Firstname:    "Rudolph",
+					Surname:      "Stotesbury",
+					DateOfBirth:  sirius.DateString(dateString),
+					AddressLine1: "Rotonda Gerardo 769",
+					County:       "Benevento",
+					Postcode:     "57797",
+					Country:      "Italy",
+				},
+				SystemStatus: shared.BoolPtr(true),
+			}
+
 			client := &mockCreateAttorneyClient{}
 			client.
-				On("CreateAttorney", mock.Anything, 2, "epa", attorney).
+				On("UpdateAttorney", mock.Anything, 2, updatedAttorney).
 				Return(nil).
 				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
 				Return(mockRelationshipToDonorCategories, nil)
+
+			client.
+				On("Lpa", mock.Anything, 2).
+				Return(lpa, nil)
 
 			template := &mockTemplate{}
 
@@ -604,41 +598,34 @@ func TestPostCreateAttorneyNextAnother(t *testing.T) {
 				template.
 					On("Func", mock.Anything, createAttorneyData{
 						IsPartial:            true,
+						IsEditing:            true,
 						DonorId:              1,
 						CaseId:               2,
 						RelationshipToDonors: mockRelationshipToDonorCategories,
-						Attorney:             attorney,
-						Title:                "Add an attorney",
-						HtmxRedirect:         "/create-attorney?id=1&caseId=2&caseType=epa&attorneyId=0",
+						Attorney:             updatedAttorney,
+						Title:                "Update attorney details",
+						HtmxRedirect:         "/create-trust-corporation?id=1&caseId=2&trustCorporationId=3&replacement=false",
 						HtmxSwap:             "innerHTML scroll:.action-panel__content:top",
-						CaseType:             "epa",
+						CaseType:             "lpa",
+						NextAttorneyId:       3,
 					}).
 					Return(nil)
 			}
 
 			form := url.Values{
-				"salutation":          {"Rev"},
-				"firstname":           {"Rudolph"},
-				"middlenames":         {"Modesto"},
-				"surname":             {"Stotesbury"},
-				"dob":                 {dateString},
-				"addressLine1":        {"Rotonda Gerardo 769"},
-				"addressLine2":        {"Appartamento 94"},
-				"addressLine3":        {"Augusto terme"},
-				"town":                {"San Sabazio"},
-				"county":              {"Benevento"},
-				"postcode":            {"57797"},
-				"country":             {"Italy"},
-				"isAirmailRequired":   {"true"},
-				"phoneNumber":         {"079876543345"},
-				"email":               {"rm2@email.test"},
-				"relationshipToDonor": {"no relation"},
-				"isAttorneyActive":    {"true"},
-				"add-another":         {""},
-				"next-attorney":       {"true"},
+				"salutation":           {"Rev"},
+				"firstname":            {"Rudolph"},
+				"surname":              {"Stotesbury"},
+				"dob":                  {dateString},
+				"addressLine1":         {"Rotonda Gerardo 769"},
+				"county":               {"Benevento"},
+				"postcode":             {"57797"},
+				"country":              {"Italy"},
+				"isAttorneyActive":     {"true"},
+				"update-next-attorney": {"true"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType=epa", strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType=lpa&attorneyId=2", strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			if isHtmx {
 				r.Header.Add("HX-Request", "true")
@@ -649,7 +636,7 @@ func TestPostCreateAttorneyNextAnother(t *testing.T) {
 			resp := w.Result()
 
 			if !isHtmx {
-				expectedRedirect := RedirectError("/create-attorney?id=1&caseId=2&caseType=epa&attorneyId=0")
+				expectedRedirect := RedirectError("/create-trust-corporation?id=1&caseId=2&trustCorporationId=3&replacement=false")
 				assert.Equal(t, err, expectedRedirect)
 			} else {
 				assert.Nil(t, err)
@@ -660,53 +647,41 @@ func TestPostCreateAttorneyNextAnother(t *testing.T) {
 	}
 }
 
-func TestGetNextAttorneyIdAttorneyWillReturnNextNumber(t *testing.T) {
-	result := GetNextAttorneyId(2, []sirius.Attorney{
-		{
-			Person: sirius.Person{ID: 1},
-		},
-		{
-			Person: sirius.Person{ID: 2},
-		},
-		{
-			Person: sirius.Person{ID: 3},
-		},
-	})
-	expected := 3
-	assert.Equal(t, expected, result)
-}
+func TestGetNextAttorneyId(t *testing.T) {
+	attorneys := []sirius.Attorney{
+		{Person: sirius.Person{ID: 1}},
+		{Person: sirius.Person{ID: 2}},
+		{Person: sirius.Person{ID: 3}},
+		{Person: sirius.Person{ID: 5}},
+		{Person: sirius.Person{ID: 9}},
+	}
 
-func TestGetNextAttorneyIdAttorneyWillReturnNextHigherIdWhenSequenceHasGaps(t *testing.T) {
-	result := GetNextAttorneyId(2, []sirius.Attorney{
+	tests := []struct {
+		name       string
+		currentID  int
+		expectedID int
+	}{
 		{
-			Person: sirius.Person{ID: 1},
+			name:       "Returns next number",
+			currentID:  2,
+			expectedID: 3,
 		},
 		{
-			Person: sirius.Person{ID: 5},
+			name:       "Returns next higher id when sequence has gaps",
+			currentID:  3,
+			expectedID: 5,
 		},
 		{
-			Person: sirius.Person{ID: 2},
+			name:       "Returns zero when on last attorney",
+			currentID:  9,
+			expectedID: 0,
 		},
-		{
-			Person: sirius.Person{ID: 9},
-		},
-	})
-	expected := 5
-	assert.Equal(t, expected, result)
-}
+	}
 
-func TestGetNextAttorneyIdLastAttorneyWillReturnZero(t *testing.T) {
-	result := GetNextAttorneyId(3, []sirius.Attorney{
-		{
-			Person: sirius.Person{ID: 1},
-		},
-		{
-			Person: sirius.Person{ID: 2},
-		},
-		{
-			Person: sirius.Person{ID: 3},
-		},
-	})
-	expected := 0
-	assert.Equal(t, expected, result)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			result := GetNextAttorneyId(tc.currentID, attorneys)
+			assert.Equal(t, tc.expectedID, result)
+		})
+	}
 }
