@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -421,4 +422,102 @@ func TestPostCreateReplacementAttorneyAddAnother(t *testing.T) {
 	assert.Equal(t, err, expectedRedirect)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestPostEditReplacementAttorneyUpdateNext(t *testing.T) {
+	tests := []struct {
+		name     string
+		redirect string
+		lpa      sirius.Lpa
+	}{
+		{
+			name:     "Update next attorney",
+			redirect: "/create-replacement-attorney?id=1&caseId=2&attorneyId=5",
+			lpa: sirius.Lpa{
+				Case: sirius.Case{
+					ReceiptDate: sirius.DateString("2026-08-01"),
+					ReplacementAttorneys: []sirius.Attorney{
+						{Person: sirius.Person{ID: 4}},
+						{Person: sirius.Person{ID: 5, PersonType: "Replacement Attorney"}, SystemStatus: shared.BoolPtr(false)},
+					},
+				},
+			},
+		},
+		{
+			name:     "Update next trust corporation",
+			redirect: "/create-trust-corporation?id=1&caseId=2&trustCorporationId=5&replacement=true",
+			lpa: sirius.Lpa{
+				Case: sirius.Case{
+					ReceiptDate:          sirius.DateString("2026-08-01"),
+					ReplacementAttorneys: []sirius.Attorney{{Person: sirius.Person{ID: 4}}},
+					TrustCorporations: []sirius.TrustCorporation{
+						{Attorney: sirius.Attorney{Person: sirius.Person{ID: 5, PersonType: "Trust Corporation"}}, IsReplacementAttorney: true},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			for _, isHtmx := range []bool{false, true} {
+				t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
+					updatedAttorney := sirius.Attorney{
+						Person: sirius.Person{
+							Firstname: "Rudolph",
+							Surname:   "Stotesbury",
+						},
+					}
+
+					client := &mockCreateReplacementAttorneyClient{}
+					client.
+						On("Lpa", mock.Anything, 2).
+						Return(tc.lpa, nil).
+						On("UpdateReplacementAttorney", mock.Anything, 4, updatedAttorney).
+						Return(nil)
+
+					template := &mockTemplate{}
+
+					if isHtmx {
+						template.
+							On("Func", mock.Anything, createReplacementAttorneyData{
+								DonorId:        1,
+								CaseId:         2,
+								Attorney:       updatedAttorney,
+								IsEditing:      true,
+								Title:          "Update replacement attorney details",
+								HtmxRedirect:   tc.redirect,
+								HtmxSwap:       "innerHTML scroll:.action-panel__content:top",
+								IsPartial:      true,
+								NextAttorneyId: 5,
+							}).
+							Return(nil)
+					}
+
+					form := url.Values{
+						"firstname":            {"Rudolph"},
+						"surname":              {"Stotesbury"},
+						"update-next-attorney": {"true"},
+					}
+
+					r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&attorneyId=4", strings.NewReader(form.Encode()))
+					r.Header.Add("Content-Type", formUrlEncoded)
+					if isHtmx {
+						r.Header.Add("HX-Request", "true")
+					}
+					w := httptest.NewRecorder()
+
+					err := CreateReplacementAttorney(client, template.Func)(w, r)
+					resp := w.Result()
+
+					if !isHtmx {
+						expectedError := RedirectError(tc.redirect)
+						assert.Equal(t, err, expectedError)
+					}
+					assert.Equal(t, http.StatusOK, resp.StatusCode)
+					mock.AssertExpectationsForObjects(t, client, template)
+				})
+			}
+		})
+	}
 }

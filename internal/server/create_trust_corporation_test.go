@@ -461,9 +461,10 @@ func TestPostCreateTrustCorporationAddAnotherRedirects(t *testing.T) {
 
 func TestPostEditTrustCorporationUpdateNextAttorney(t *testing.T) {
 	tests := []struct {
-		name             string
-		lpa              sirius.Lpa
-		expectedRedirect string
+		name                  string
+		lpa                   sirius.Lpa
+		isReplacementAttorney bool
+		expectedRedirect      string
 	}{
 		{
 			name: "Redirects to trust corporation",
@@ -471,7 +472,8 @@ func TestPostEditTrustCorporationUpdateNextAttorney(t *testing.T) {
 				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}},
 				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 4, PersonType: "Trust Corporation"}}},
 			}}},
-			expectedRedirect: "/create-trust-corporation?id=1&caseId=2&trustCorporationId=4&replacement=false",
+			isReplacementAttorney: false,
+			expectedRedirect:      "/create-trust-corporation?id=1&caseId=2&trustCorporationId=4&replacement=false",
 		},
 		{
 			name: "Redirects to attorney",
@@ -479,14 +481,25 @@ func TestPostEditTrustCorporationUpdateNextAttorney(t *testing.T) {
 				TrustCorporations: []sirius.TrustCorporation{{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}}},
 				Attorneys:         []sirius.Attorney{{SystemStatus: shared.BoolPtr(true), Person: sirius.Person{ID: 4, PersonType: "Attorney"}}},
 			}},
-			expectedRedirect: "/create-attorney?id=1&caseId=2&caseType=lpa&attorneyId=4",
+			isReplacementAttorney: false,
+			expectedRedirect:      "/create-attorney?id=1&caseId=2&caseType=lpa&attorneyId=4",
+		},
+		{
+			name: "Redirects to replacement attorney",
+			lpa: sirius.Lpa{Case: sirius.Case{
+				TrustCorporations:    []sirius.TrustCorporation{{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}, IsReplacementAttorney: true}},
+				ReplacementAttorneys: []sirius.Attorney{{SystemStatus: shared.BoolPtr(false), Person: sirius.Person{ID: 4, PersonType: "Replacement Attorney"}}},
+			}},
+			isReplacementAttorney: true,
+			expectedRedirect:      "/create-replacement-attorney?id=1&caseId=2&attorneyId=4",
 		},
 		{
 			name: "Redirects to lpa when no next person",
 			lpa: sirius.Lpa{Case: sirius.Case{
 				TrustCorporations: []sirius.TrustCorporation{{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}}},
 			}},
-			expectedRedirect: "/create-lpa?id=1&caseId=2#scroll-to-attorneys-corporation",
+			isReplacementAttorney: false,
+			expectedRedirect:      "/create-lpa?id=1&caseId=2#scroll-to-attorneys-corporation",
 		},
 	}
 
@@ -499,8 +512,13 @@ func TestPostEditTrustCorporationUpdateNextAttorney(t *testing.T) {
 					},
 					SystemStatus: shared.BoolPtr(true),
 				},
-				IsReplacementAttorney:       false,
+				IsReplacementAttorney:       tc.isReplacementAttorney,
 				TrustCorporationAppointedAs: "Attorney",
+			}
+
+			if tc.isReplacementAttorney {
+				expectedTrustCorporation.TrustCorporationAppointedAs = "Replacement Attorney"
+				expectedTrustCorporation.SystemStatus = shared.BoolPtr(false)
 			}
 
 			client := &mockCreateTrustCorporationClient{}
@@ -518,7 +536,11 @@ func TestPostEditTrustCorporationUpdateNextAttorney(t *testing.T) {
 				"update-next-attorney":     {"true"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "create-trust-corporation/?id=1&caseId=2&trustCorporationId=3&replacement=false", strings.NewReader(form.Encode()))
+			if tc.isReplacementAttorney {
+				form.Set("isReplacementAttorney", "true")
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("create-trust-corporation/?id=1&caseId=2&trustCorporationId=3&replacement=%t", tc.isReplacementAttorney), strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
