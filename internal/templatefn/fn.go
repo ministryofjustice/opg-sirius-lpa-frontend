@@ -28,6 +28,12 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 		"prefix": func(s string) string {
 			return prefix + s
 		},
+		"staticHash": func() string {
+			if len(staticHash) < 11 {
+				return ""
+			}
+			return staticHash[3:11]
+		},
 		"prefixAsset": func(s string) string {
 			if len(staticHash) >= 11 {
 				return prefix + s + "?" + url.QueryEscape(staticHash[3:11])
