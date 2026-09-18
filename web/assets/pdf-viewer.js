@@ -200,13 +200,13 @@ class PDFViewer {
     controls.className = "pdf-viewer-controls";
     controls.innerHTML = `
       <div class="pdf-viewer-controls-group">
-        ${this.createControlButton("icon-letter", "Toggle thumbnails", "toggle-thumbnails", true)}
+        ${this.createControlButton("icon-thumbnail-bar", "Show thumbnails", "toggle-thumbnails", true)}
       </div>
       <div class="pdf-viewer-controls-group">
         <div class="pdf-viewer-button-group">
-          ${this.createControlButton("icon-letter", "Previous page", "prev")}
+          ${this.createControlButton("icon-prev-page", "Previous page", "prev")}
           <div class="pdf-viewer-separator"></div>
-          ${this.createControlButton("icon-letter", "Next page", "next")}
+          ${this.createControlButton("icon-next-page", "Next page", "next")}
         </div>
         <span class="pdf-viewer-page-info">
           <input type="number" class="pdf-viewer-page-input" aria-label="Current page number" value="1" min="1"> of <span class="pdf-viewer-total-pages">-</span>
@@ -214,24 +214,24 @@ class PDFViewer {
       </div>
       <div class="pdf-viewer-controls-group">
         <div class="pdf-viewer-button-group">
-          ${this.createControlButton("icon-letter", "Zoom out", "zoom-out")}
+          ${this.createControlButton("icon-pdf-zoom-out", "Zoom out", "zoom-out")}
           <div class="pdf-viewer-separator"></div>
-          ${this.createControlButton("icon-letter", "Zoom in", "zoom-in")}
+          ${this.createControlButton("icon-pdf-zoom-in", "Zoom in", "zoom-in")}
         </div>
         <input type="text" class="pdf-viewer-zoom-input" aria-label="Zoom level" value="100%">
       </div>
       <div class="pdf-viewer-controls-group">
         <div class="pdf-viewer-button-group">
-          ${this.createControlButton("icon-letter", "Fit to width", "fit-width")}
+          ${this.createControlButton("icon-fit-width", "Fit width", "fit-width")}
           <div class="pdf-viewer-separator"></div>
-          ${this.createControlButton("icon-letter", "Fit to page", "fit-page")}
+          ${this.createControlButton("icon-fit-page", "Fit page", "fit-page")}
         </div>
       </div>
       <div class="pdf-viewer-controls-group">
-        ${this.createControlButton("icon-letter", "Rotate clockwise", "rotate-cw")}
+        ${this.createControlButton("icon-rotate-cw", "Rotate", "rotate-cw")}
       </div>
       <div class="pdf-viewer-controls-group">
-        ${this.createControlButton("icon-letter", "Print", "print-doc")}
+        ${this.createControlButton("icon-print-pdf", "Print", "print-doc")}
       </div>
     `;
 
