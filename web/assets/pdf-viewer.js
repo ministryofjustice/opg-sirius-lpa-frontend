@@ -229,6 +229,8 @@ class PDFViewer {
       </div>
       <div class="pdf-viewer-controls-group">
         ${this.createControlButton("icon-rotate-cw", "Rotate", "rotate-cw")}
+        ${this.createControlButton("icon-rotate-right", "Rotate", "rotate-cw")}
+        ${this.createControlButton("icon-rotate-right2", "Rotate", "rotate-cw")}
       </div>
       <div class="pdf-viewer-controls-group">
         ${this.createControlButton("icon-print-pdf", "Print", "print-doc")}
