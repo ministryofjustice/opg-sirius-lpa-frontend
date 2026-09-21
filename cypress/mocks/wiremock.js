@@ -15,7 +15,7 @@ async function addMock(url, method, response, priority = 1) {
     response.body = JSON.stringify(response.body);
   }
 
-  const mock = fetch(`${Cypress.env("MOCK_SERVER_URI")}/__admin/mappings`, {
+  const mock = fetch(`${Cypress.expose("MOCK_SERVER_URI")}/__admin/mappings`, {
     method: "POST",
     body: JSON.stringify({
       request: {
@@ -33,7 +33,7 @@ async function addMock(url, method, response, priority = 1) {
 }
 
 async function reset() {
-  await fetch(`${Cypress.env("MOCK_SERVER_URI")}/__admin/mappings/reset`, {
+  await fetch(`${Cypress.expose("MOCK_SERVER_URI")}/__admin/mappings/reset`, {
     method: "POST",
   });
 }

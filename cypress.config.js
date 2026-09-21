@@ -5,4 +5,7 @@ module.exports = defineConfig({
     baseUrl: "http://localhost:8888/",
     supportFile: "cypress/support/index.js",
   },
+  expose: {
+    MOCK_SERVER_URI: "http://localhost:8563",
+  },
 });
