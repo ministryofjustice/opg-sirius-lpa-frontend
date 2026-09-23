@@ -78,6 +78,14 @@
             <th scope="row" class="govuk-table__header">Airmail required</th>
             <td class="govuk-table__cell">{{ boolToYesNo .IsAirmailRequired }}</td>
         </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Telephone number</th>
+            <td class="govuk-table__cell">{{ .PhoneNumber }}</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Email address</th>
+            <td class="govuk-table__cell">{{ .Email }}</td>
+        </tr>
         {{ if and (eq .PersonType "Attorney") .RelationshipToDonor }}
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Relationship to donor</th>
