@@ -636,7 +636,7 @@
               <div class="app-create-lpa__details-row">
                 <details class="govuk-details">
                   <summary class="govuk-details__summary app-table__row--half-width">
-                    <span class="govuk-details__summary-text">{{ if .Lpa.Correspondent.Salutation }}{{ .Lpa.Correspondent.Salutation }}{{ end }}{{ if .Lpa.Correspondent.Firstname }} {{ .Lpa.Correspondent.Firstname }}{{ end }}{{ if .Lpa.Correspondent.Middlenames }} {{ .Lpa.Correspondent.Middlenames }}{{ end }}{{ if .Lpa.Correspondent.Surname }} {{ .Lpa.Correspondent.Surname }}{{ end }}</span>
+                    <span class="govuk-details__summary-text">{{ if .Lpa.Correspondent.CompanyName }}{{ .Lpa.Correspondent.CompanyName }}{{ end }}{{ if .Lpa.Correspondent.Salutation }} {{ .Lpa.Correspondent.Salutation }}{{ end }}{{ if .Lpa.Correspondent.Firstname }} {{ .Lpa.Correspondent.Firstname }}{{ end }}{{ if .Lpa.Correspondent.Middlenames }} {{ .Lpa.Correspondent.Middlenames }}{{ end }}{{ if .Lpa.Correspondent.Surname }} {{ .Lpa.Correspondent.Surname }}{{ end }}</span>
                   </summary>
                   <div class="govuk-details__text">
                     {{ template "person-details-table" .Lpa.Correspondent }}
@@ -651,7 +651,7 @@
                   >
                     Update
                     <span class="govuk-visually-hidden">
-                      correspondent{{ if .Lpa.Correspondent.Salutation }} {{ .Lpa.Correspondent.Salutation }}{{ end }}{{ if .Lpa.Correspondent.Firstname }} {{ .Lpa.Correspondent.Firstname }}{{ end }}{{ if .Lpa.Correspondent.Middlenames }} {{ .Lpa.Correspondent.Middlenames }}{{ end }}{{ if .Lpa.Correspondent.Surname }} {{ .Lpa.Correspondent.Surname }}{{ end }}
+                      correspondent{{ if .Lpa.Correspondent.CompanyName }}{{ .Lpa.Correspondent.CompanyName }}{{ end }}{{ if .Lpa.Correspondent.Salutation }} {{ .Lpa.Correspondent.Salutation }}{{ end }}{{ if .Lpa.Correspondent.Firstname }} {{ .Lpa.Correspondent.Firstname }}{{ end }}{{ if .Lpa.Correspondent.Middlenames }} {{ .Lpa.Correspondent.Middlenames }}{{ end }}{{ if .Lpa.Correspondent.Surname }} {{ .Lpa.Correspondent.Surname }}{{ end }}
                     </span>
                   </button>
                 </span>
