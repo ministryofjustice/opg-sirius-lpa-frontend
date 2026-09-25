@@ -52,6 +52,19 @@ describe("Edit a document", () => {
     cy.contains("button", "Delete draft");
     cy.contains("button", "Publish draft");
     cy.contains("button", "Save and exit");
+    cy.contains("span", "Insert blank sections of the LPA");
+  });
+
+  it("does not display the blank sections option on an EPA case", () => {
+    cy.visit("/edit-document?id=800&case=epa");
+    cy.contains("Edit draft document");
+    cy.contains("button", "Save draft");
+    cy.contains("button", "Preview draft");
+    cy.contains("button", "Delete draft");
+    cy.contains("button", "Publish draft");
+    cy.contains("button", "Save and exit");
+    cy.contains("button", "Cancel");
+    cy.contains("span", "Insert blank sections of the LPA").should("not.exist");
   });
 
   it("can select a draft to edit", () => {

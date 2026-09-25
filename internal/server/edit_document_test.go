@@ -46,8 +46,8 @@ func (m *mockEditDocumentClient) DeleteDocument(ctx sirius.Context, uuid string)
 	return args.Error(0)
 }
 
-func (m *mockEditDocumentClient) AddDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string) (sirius.Document, error) {
-	args := m.Called(ctx, caseID, document, docType)
+func (m *mockEditDocumentClient) AddDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string, blankSections []string) (sirius.Document, error) {
+	args := m.Called(ctx, caseID, document, docType, blankSections)
 	return args.Get(0).(sirius.Document), args.Error(1)
 }
 
@@ -322,7 +322,7 @@ func TestPostPublishDocument(t *testing.T) {
 				On("DocumentByUUID", mock.Anything, document.UUID).
 				Return(document, nil)
 			client.
-				On("AddDocument", mock.Anything, 544, document, sirius.TypeSave).
+				On("AddDocument", mock.Anything, 544, document, sirius.TypeSave, []string{}).
 				Return(publishedDocument, nil)
 			client.
 				On("DeleteDocument", mock.Anything, document.UUID).
@@ -407,7 +407,7 @@ func TestPostPreviewDocument(t *testing.T) {
 		On("DocumentByUUID", mock.Anything, document.UUID).
 		Return(document, nil)
 	client.
-		On("AddDocument", mock.Anything, 888, document, sirius.TypePreview).
+		On("AddDocument", mock.Anything, 888, document, sirius.TypePreview, []string{}).
 		Return(previewDocument, nil)
 	client.
 		On("Case", mock.Anything, 888).
@@ -644,5 +644,219 @@ func TestGetEditDocumentWhenTemplateErrors(t *testing.T) {
 	err := EditDocument(client, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostPublishDocumentWithBlankSections(t *testing.T) {
+	caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: "lpa", UID: "700700", SubType: "pfa"}
+
+	document := sirius.Document{
+		ID:      1,
+		UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+		Type:    sirius.TypeDraft,
+		Content: "Test content",
+	}
+
+	documents := []sirius.Document{
+		document,
+	}
+
+	publishedDocument := sirius.Document{
+		ID:      1,
+		UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+		Type:    sirius.TypeSave,
+		Content: "Test content",
+	}
+
+	client := &mockEditDocumentClient{}
+	client.
+		On("EditDocument", mock.Anything, document.UUID, "Test content").
+		Return(document, nil)
+	client.
+		On("DocumentByUUID", mock.Anything, document.UUID).
+		Return(document, nil)
+	client.
+		On("AddDocument", mock.Anything, 544, document, sirius.TypeSave, []string{"pfa-10", "pfa-11", "pfa-11", "pfa-15"}).
+		Return(publishedDocument, nil).
+		Return(publishedDocument, nil)
+	client.
+		On("DeleteDocument", mock.Anything, document.UUID).
+		Return(nil)
+	client.
+		On("Case", mock.Anything, 544).
+		Return(caseItem, nil)
+	client.
+		On("Documents", mock.Anything, sirius.CaseType("lpa"), 544, []string{sirius.TypeDraft}, []string{}).
+		Return(documents, nil)
+	client.
+		On("DocumentTemplates", mock.Anything, sirius.CaseType("lpa")).
+		Return([]sirius.DocumentTemplateData{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, editDocumentData{
+			Case:                  caseItem,
+			DonorId:               1,
+			Documents:             documents,
+			Document:              document,
+			Success:               true,
+			HasBlankSections:      "true",
+			SelectedBlankSections: "10+11+15",
+			Section11Count:        "2",
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"id":                 {"544"},
+		"case":               {"lpa"},
+		"documentControls":   {"publish"},
+		"documentTextEditor": {"Test content"},
+		"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
+		"hasBlankSections":   {"true"},
+		"blankSections":      {"10+11+15"},
+		"section11Count":     {"2"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=544&case=lpa", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := EditDocument(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostPublishDocumentWithBlankSectionsWhenNoSectionsSelected(t *testing.T) {
+	caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: "lpa", UID: "700700", SubType: "pfa"}
+
+	document := sirius.Document{
+		ID:      1,
+		UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+		Type:    sirius.TypeDraft,
+		Content: "Test content",
+	}
+
+	documents := []sirius.Document{
+		document,
+	}
+
+	client := &mockEditDocumentClient{}
+	client.
+		On("DocumentByUUID", mock.Anything, document.UUID).
+		Return(document, nil)
+	client.
+		On("Case", mock.Anything, 544).
+		Return(caseItem, nil)
+	client.
+		On("Documents", mock.Anything, sirius.CaseType("lpa"), 544, []string{sirius.TypeDraft}, []string{}).
+		Return(documents, nil)
+	client.
+		On("DocumentTemplates", mock.Anything, sirius.CaseType("lpa")).
+		Return([]sirius.DocumentTemplateData{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, editDocumentData{
+			Case:             caseItem,
+			DonorId:          1,
+			Documents:        documents,
+			Document:         document,
+			HasBlankSections: "true",
+			Error: sirius.ValidationError{
+				Field: sirius.FieldErrors{
+					"blankSections": {"reason": "Please select sections to insert"},
+				},
+			},
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"id":                 {"544"},
+		"case":               {"lpa"},
+		"documentControls":   {"publish"},
+		"documentTextEditor": {"Test content"},
+		"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
+		"hasBlankSections":   {"true"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=544&case=lpa", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := EditDocument(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostPublishDocumentWithBlankSectionsWhenSection11SelectedButNoCount(t *testing.T) {
+	caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: "lpa", UID: "700700", SubType: "pfa"}
+
+	document := sirius.Document{
+		ID:      1,
+		UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+		Type:    sirius.TypeDraft,
+		Content: "Test content",
+	}
+
+	documents := []sirius.Document{
+		document,
+	}
+
+	client := &mockEditDocumentClient{}
+	client.
+		On("DocumentByUUID", mock.Anything, document.UUID).
+		Return(document, nil)
+	client.
+		On("Case", mock.Anything, 544).
+		Return(caseItem, nil)
+	client.
+		On("Documents", mock.Anything, sirius.CaseType("lpa"), 544, []string{sirius.TypeDraft}, []string{}).
+		Return(documents, nil)
+	client.
+		On("DocumentTemplates", mock.Anything, sirius.CaseType("lpa")).
+		Return([]sirius.DocumentTemplateData{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, editDocumentData{
+			Case:                  caseItem,
+			DonorId:               1,
+			Documents:             documents,
+			Document:              document,
+			HasBlankSections:      "true",
+			SelectedBlankSections: "10+11+15",
+			Error: sirius.ValidationError{
+				Field: sirius.FieldErrors{
+					"section11Count1": {"reason": "Please select how many section 11 to insert"},
+				},
+			},
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"id":                 {"544"},
+		"case":               {"lpa"},
+		"documentControls":   {"publish"},
+		"documentTextEditor": {"Test content"},
+		"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
+		"hasBlankSections":   {"true"},
+		"blankSections":      {"10+11+15"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=544&case=lpa", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := EditDocument(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

@@ -169,6 +169,95 @@
         <textarea id="documentTextEditor" name="documentTextEditor">{{ filterContent .Document.Content }}</textarea>
     </div>
 
+    {{ if eq .Case.CaseType "LPA" }}
+      <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset" aria-describedby="contact-hint">
+          <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+            <div class="govuk-checkboxes__item">
+              <input class="govuk-checkboxes__input" id="insert-blank-sections" name="hasBlankSections" type="checkbox" value="true" data-aria-controls="blank-sections-conditional"{{if eq .HasBlankSections "true"}} checked{{end}}>
+              <label class="govuk-label govuk-checkboxes__label" for="insert-blank-sections">
+                <span class="app-colour-link-blue">Insert blank sections of the LPA</span>
+              </label>
+            </div>
+            <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="blank-sections-conditional">
+              <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                  <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                    Choose sections to insert
+                  </legend>
+                  {{ template "errors" .Error.Field.blankSections }}
+                  <div class="govuk-radios govuk-radios--small{{ if .Error.Field.blankSections }} govuk-radios--error{{ end }}" data-module="govuk-radios">
+                    <div class="govuk-radios__item">
+                      <input class="govuk-radios__input" id="f-blankSections" name="blankSections" type="radio" value="15"{{if eq .SelectedBlankSections "15"}} checked{{end}}>
+                      <label class="govuk-label govuk-radios__label" for="f-blankSections">
+                        Section 15
+                      </label>
+                    </div>
+                    <div class="govuk-radios__item">
+                      <input class="govuk-radios__input" id="f-blankSections-2" name="blankSections" type="radio" value="11+15" data-aria-controls="11+15-conditional"{{if eq .SelectedBlankSections "11+15"}} checked{{end}}>
+                      <label class="govuk-label govuk-radios__label" for="f-blankSections-2">
+                        Section 11 + 15
+                      </label>
+                    </div>
+                    <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="11+15-conditional">
+                      <div class="govuk-form-group">
+                        <fieldset class="govuk-fieldset">
+                          <div class="govuk-hint">
+                            How many section 11?
+                          </div>
+                          {{ template "errors" .Error.Field.section11Count1 }}
+                          <div class="govuk-radios govuk-radios--small govuk-radios--inline{{ if .Error.Field.section11Count1 }} govuk-radios--error{{ end }}" data-module="govuk-radios">
+                            {{ range 4 }}
+                              {{ $count := plusN . 1 }}
+                              <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="f-section11Count{{$count}}" name="section11Count" type="radio" value="{{$count}}"{{if eq $.Section11Count (printf "%d" $count)}} checked{{end}}>
+                                <label class="govuk-label govuk-radios__label" for="section11Count{{$count}}">{{$count}}</label>
+                              </div>
+                            {{ end }}
+                          </div>
+                        </fieldset>
+                      </div>
+                    </div>
+                    <div class="govuk-radios__item">
+                      <input class="govuk-radios__input" id="f-blankSections-3" name="blankSections" type="radio" value="10+11+15" data-aria-controls="10+11+15-conditional"{{if eq .SelectedBlankSections "10+11+15"}} checked{{end}}>
+                      <label class="govuk-label govuk-radios__label" for="f-blankSections-3">
+                        Section 10 + 11 + 15
+                      </label>
+                    </div>
+                    <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="10+11+15-conditional">
+                      <div class="govuk-form-group">
+                        <fieldset class="govuk-fieldset">
+                          <div class="govuk-hint">
+                            How many section 11?
+                          </div>
+                          {{ template "errors" .Error.Field.section11Count1 }}
+                          <div class="govuk-radios govuk-radios--small govuk-radios--inline{{ if .Error.Field.section11Count1 }} govuk-radios--error{{ end }}" data-module="govuk-radios">
+                            {{ range 4}}
+                              {{ $count := plusN . 1 }}
+                              <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="f-section11Count{{$count}}" name="section11Count" type="radio" value="{{$count}}">
+                                <label class="govuk-label govuk-radios__label" for="f-section11Count{{$count}}">{{$count}}</label>
+                              </div>
+                            {{ end }}
+                          </div>
+                        </fieldset>
+                      </div>
+                    </div>
+                    <div class="govuk-radios__item">
+                      <input class="govuk-radios__input" id="f-blankSections-4" name="blankSections" type="radio" value="12+13+15"{{if eq .SelectedBlankSections "12+13+15"}} checked{{end}}>
+                      <label class="govuk-label govuk-radios__label" for="f-blankSections-4">
+                        Section 12 + 13 + 15
+                      </label>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    {{ end }}
+
     {{ if .UsesNotify }}
         <div class="govuk-notification-banner govuk-!-margin-bottom-3" role="region" aria-labelledby="notify-warning" data-module="govuk-notification-banner">
             <div class="govuk-notification-banner__header">
