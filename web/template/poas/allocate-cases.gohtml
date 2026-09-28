@@ -88,7 +88,7 @@
         <fieldset class="govuk-fieldset">
             <legend class="govuk-fieldset__legend">Assign to</legend>
             {{ template "errors" .Error.Field.assignTo }}
-            <div class="govuk-radios" data-module="govuk-radios">
+            <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
                 <div class="govuk-radios__item">
                     <input class="govuk-radios__input" id="f-assignTo" name="assignTo" type="radio" value="user" data-aria-controls="conditional-assignTo" {{ if eq "user" .AssignTo }}checked{{ end }}>
                     <label class="govuk-label govuk-radios__label" for="f-assignTo">
