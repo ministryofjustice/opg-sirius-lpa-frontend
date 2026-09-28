@@ -767,140 +767,148 @@ func TestPostPublishDocumentWithBlankSections(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestPostPublishDocumentWithBlankSectionsWhenNoSectionsSelected(t *testing.T) {
-	caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: "lpa", UID: "700700", SubType: "pfa"}
+func TestPostDocumentWithBlankSectionsWhenNoSectionsSelected(t *testing.T) {
+	for _, postType := range []string{"publish", "preview"} {
+		t.Run(postType, func(t *testing.T) {
+			caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: "lpa", UID: "700700", SubType: "pfa"}
 
-	document := sirius.Document{
-		ID:      1,
-		UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-		Type:    sirius.TypeDraft,
-		Content: "Test content",
+			document := sirius.Document{
+				ID:      1,
+				UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+				Type:    sirius.TypeDraft,
+				Content: "Test content",
+			}
+
+			documents := []sirius.Document{
+				document,
+			}
+
+			client := &mockEditDocumentClient{}
+			client.
+				On("DocumentByUUID", mock.Anything, document.UUID).
+				Return(document, nil)
+			client.
+				On("Case", mock.Anything, 544).
+				Return(caseItem, nil)
+			client.
+				On("Documents", mock.Anything, sirius.CaseType("lpa"), 544, []string{sirius.TypeDraft}, []string{}).
+				Return(documents, nil)
+			client.
+				On("DocumentTemplates", mock.Anything, sirius.CaseType("lpa")).
+				Return([]sirius.DocumentTemplateData{}, nil)
+			client.
+				On("FeatureToggles", mock.Anything).
+				Return(sirius.FeatureToggles{}, nil)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, editDocumentData{
+					Case:             caseItem,
+					DonorId:          1,
+					Documents:        documents,
+					Document:         document,
+					HasBlankSections: "true",
+					Error: sirius.ValidationError{
+						Field: sirius.FieldErrors{
+							"blankSections": {"reason": "Please select sections to insert"},
+						},
+					},
+				}).
+				Return(nil)
+
+			form := url.Values{
+				"id":                 {"544"},
+				"case":               {"lpa"},
+				"documentControls":   {postType},
+				"documentTextEditor": {"Test content"},
+				"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
+				"hasBlankSections":   {"true"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=544&case=lpa", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := EditDocument(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
 	}
-
-	documents := []sirius.Document{
-		document,
-	}
-
-	client := &mockEditDocumentClient{}
-	client.
-		On("DocumentByUUID", mock.Anything, document.UUID).
-		Return(document, nil)
-	client.
-		On("Case", mock.Anything, 544).
-		Return(caseItem, nil)
-	client.
-		On("Documents", mock.Anything, sirius.CaseType("lpa"), 544, []string{sirius.TypeDraft}, []string{}).
-		Return(documents, nil)
-	client.
-		On("DocumentTemplates", mock.Anything, sirius.CaseType("lpa")).
-		Return([]sirius.DocumentTemplateData{}, nil)
-	client.
-		On("FeatureToggles", mock.Anything).
-		Return(sirius.FeatureToggles{}, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, editDocumentData{
-			Case:             caseItem,
-			DonorId:          1,
-			Documents:        documents,
-			Document:         document,
-			HasBlankSections: "true",
-			Error: sirius.ValidationError{
-				Field: sirius.FieldErrors{
-					"blankSections": {"reason": "Please select sections to insert"},
-				},
-			},
-		}).
-		Return(nil)
-
-	form := url.Values{
-		"id":                 {"544"},
-		"case":               {"lpa"},
-		"documentControls":   {"publish"},
-		"documentTextEditor": {"Test content"},
-		"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
-		"hasBlankSections":   {"true"},
-	}
-
-	r, _ := http.NewRequest(http.MethodPost, "/?id=544&case=lpa", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := EditDocument(client, template.Func)(w, r)
-	resp := w.Result()
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestPostPublishDocumentWithBlankSectionsWhenSection11SelectedButNoCount(t *testing.T) {
-	caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: "lpa", UID: "700700", SubType: "pfa"}
+func TestPostDocumentWithBlankSectionsWhenSection11SelectedButNoCount(t *testing.T) {
+	for _, postType := range []string{"publish", "preview"} {
+		t.Run(postType, func(t *testing.T) {
+			caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: "lpa", UID: "700700", SubType: "pfa"}
 
-	document := sirius.Document{
-		ID:      1,
-		UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-		Type:    sirius.TypeDraft,
-		Content: "Test content",
+			document := sirius.Document{
+				ID:      1,
+				UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+				Type:    sirius.TypeDraft,
+				Content: "Test content",
+			}
+
+			documents := []sirius.Document{
+				document,
+			}
+
+			client := &mockEditDocumentClient{}
+			client.
+				On("DocumentByUUID", mock.Anything, document.UUID).
+				Return(document, nil)
+			client.
+				On("Case", mock.Anything, 544).
+				Return(caseItem, nil)
+			client.
+				On("Documents", mock.Anything, sirius.CaseType("lpa"), 544, []string{sirius.TypeDraft}, []string{}).
+				Return(documents, nil)
+			client.
+				On("DocumentTemplates", mock.Anything, sirius.CaseType("lpa")).
+				Return([]sirius.DocumentTemplateData{}, nil)
+			client.
+				On("FeatureToggles", mock.Anything).
+				Return(sirius.FeatureToggles{}, nil)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, editDocumentData{
+					Case:                  caseItem,
+					DonorId:               1,
+					Documents:             documents,
+					Document:              document,
+					HasBlankSections:      "true",
+					SelectedBlankSections: "10+11+15",
+					Error: sirius.ValidationError{
+						Field: sirius.FieldErrors{
+							"section11Count1": {"reason": "Please select how many section 11 to insert"},
+						},
+					},
+				}).
+				Return(nil)
+
+			form := url.Values{
+				"id":                 {"544"},
+				"case":               {"lpa"},
+				"documentControls":   {postType},
+				"documentTextEditor": {"Test content"},
+				"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
+				"hasBlankSections":   {"true"},
+				"blankSections":      {"10+11+15"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=544&case=lpa", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := EditDocument(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
 	}
-
-	documents := []sirius.Document{
-		document,
-	}
-
-	client := &mockEditDocumentClient{}
-	client.
-		On("DocumentByUUID", mock.Anything, document.UUID).
-		Return(document, nil)
-	client.
-		On("Case", mock.Anything, 544).
-		Return(caseItem, nil)
-	client.
-		On("Documents", mock.Anything, sirius.CaseType("lpa"), 544, []string{sirius.TypeDraft}, []string{}).
-		Return(documents, nil)
-	client.
-		On("DocumentTemplates", mock.Anything, sirius.CaseType("lpa")).
-		Return([]sirius.DocumentTemplateData{}, nil)
-	client.
-		On("FeatureToggles", mock.Anything).
-		Return(sirius.FeatureToggles{}, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, editDocumentData{
-			Case:                  caseItem,
-			DonorId:               1,
-			Documents:             documents,
-			Document:              document,
-			HasBlankSections:      "true",
-			SelectedBlankSections: "10+11+15",
-			Error: sirius.ValidationError{
-				Field: sirius.FieldErrors{
-					"section11Count1": {"reason": "Please select how many section 11 to insert"},
-				},
-			},
-		}).
-		Return(nil)
-
-	form := url.Values{
-		"id":                 {"544"},
-		"case":               {"lpa"},
-		"documentControls":   {"publish"},
-		"documentTextEditor": {"Test content"},
-		"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
-		"hasBlankSections":   {"true"},
-		"blankSections":      {"10+11+15"},
-	}
-
-	r, _ := http.NewRequest(http.MethodPost, "/?id=544&case=lpa", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := EditDocument(client, template.Func)(w, r)
-	resp := w.Result()
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
