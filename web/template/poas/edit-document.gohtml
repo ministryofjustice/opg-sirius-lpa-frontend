@@ -169,7 +169,7 @@
         <textarea id="documentTextEditor" name="documentTextEditor">{{ filterContent .Document.Content }}</textarea>
     </div>
 
-    {{ if eq .Case.CaseType "LPA" }}
+    {{ if and (eq .Case.CaseType "LPA") (eq .BlankSectionsEnabled true) }}
       <div class="govuk-form-group">
         <fieldset class="govuk-fieldset" aria-describedby="contact-hint">
           <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">

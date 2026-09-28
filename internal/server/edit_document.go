@@ -21,6 +21,7 @@ type EditDocumentClient interface {
 	DeleteDocument(ctx sirius.Context, uuid string) error
 	AddDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string, blankSections []string) (sirius.Document, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
+	FeatureToggles(ctx sirius.Context) (sirius.FeatureToggles, error)
 }
 
 type editDocumentData struct {
@@ -41,6 +42,7 @@ type editDocumentData struct {
 	HasBlankSections      string
 	SelectedBlankSections string
 	Section11Count        string
+	BlankSectionsEnabled  bool
 }
 
 func publishDraftDocument(
@@ -131,6 +133,11 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 		data := editDocumentData{
 			XSRFToken: ctx.XSRFToken,
 			IsPartial: ctx.IsPartial,
+		}
+
+		featureToggles, err := client.FeatureToggles(ctx)
+		if err == nil {
+			data.BlankSectionsEnabled = featureToggles.Enabled("poasBlankSections")
 		}
 
 		caseItem, err := client.Case(ctx, caseID)

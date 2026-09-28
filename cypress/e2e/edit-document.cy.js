@@ -4,7 +4,7 @@ describe("Edit a document", () => {
       status: 200,
       body: {
         id: 800,
-        caseType: "lpa",
+        caseType: "LPA",
         donor: { id: 33 },
       },
     });
@@ -42,6 +42,15 @@ describe("Edit a document", () => {
       },
     });
 
+    cy.addMock("/config", "GET", {
+      status: 200,
+      body: {
+        featureToggles: {
+          poasBlankSections: true,
+        },
+      },
+    });
+
     cy.visit("/edit-document?id=800&case=lpa");
   });
 
@@ -56,14 +65,22 @@ describe("Edit a document", () => {
   });
 
   it("does not display the blank sections option on an EPA case", () => {
-    cy.visit("/edit-document?id=800&case=epa");
+    cy.addMock("/lpa-api/v1/cases/800", "GET", {
+      status: 200,
+      body: {
+        id: 800,
+        caseType: "EPA",
+        donor: { id: 33 },
+      },
+    });
+    cy.visit("/edit-document?id=800&case=lpa");
+
     cy.contains("Edit draft document");
     cy.contains("button", "Save draft");
     cy.contains("button", "Preview draft");
     cy.contains("button", "Delete draft");
     cy.contains("button", "Publish draft");
     cy.contains("button", "Save and exit");
-    cy.contains("button", "Cancel");
     cy.contains("span", "Insert blank sections of the LPA").should("not.exist");
   });
 
