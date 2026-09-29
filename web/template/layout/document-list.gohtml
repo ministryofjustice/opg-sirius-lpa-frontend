@@ -41,7 +41,7 @@
             <form
                     class="form" id="document-list-form"
                     hx-post="{{ prefix (printf "/donor/%d/documents" .DonorID) }}"
-                    hx-target="#document-list-content"
+                    hx-target="#document-viewer-content"
                     hx-swap="innerHTML"
             >
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
@@ -85,6 +85,10 @@
                                 {{ if .CloseURL }}
                                     <a class="govuk-button govuk-button--secondary moj-button-menu__item"
                                        href="{{ prefix .CloseURL }}"
+                                       hx-get="{{ prefix .CloseURL }}"
+                                       hx-target="#document-viewer-content"
+                                       hx-swap="innerHTML"
+                                       hx-push-url="true"
                                        aria-label="Close list">Close</a>
                                 {{end}}
                             {{ end }}
@@ -129,7 +133,12 @@
                                 <br>
                                 {{ if eq .MimeType "application/pdf"}}
                                     {{ if eq $.Comparing true }}
-                                        <a class="govuk-link" href="{{ prefix ( index $.CompareURLs .UUID )}}">{{ .FriendlyDescription }}</a>
+                                        <a class="govuk-link"
+                                           href="{{ prefix ( index $.CompareURLs .UUID ) }}"
+                                           hx-get="{{ prefix ( index $.CompareURLs .UUID ) }}"
+                                           hx-target="#document-viewer-content"
+                                           hx-swap="innerHTML"
+                                           hx-push-url="true">{{ .FriendlyDescription }}</a>
                                     {{ else }}
                                         <a class="govuk-link"
                                            href="{{ prefix (printf "/view-document/%s/%d" .UUID $.DonorID ) }}"
