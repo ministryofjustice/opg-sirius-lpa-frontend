@@ -3,6 +3,9 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"slices"
+	"strconv"
+	"strings"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -16,25 +19,30 @@ type EditDocumentClient interface {
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 	EditDocument(ctx sirius.Context, uuid string, content string) (sirius.Document, error)
 	DeleteDocument(ctx sirius.Context, uuid string) error
-	AddDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string) (sirius.Document, error)
+	AddDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string, blankSections []string) (sirius.Document, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
+	FeatureToggles(ctx sirius.Context) (sirius.FeatureToggles, error)
 }
 
 type editDocumentData struct {
-	XSRFToken    string
-	IsPartial    bool
-	Success      bool
-	Error        sirius.ValidationError
-	Case         sirius.Case
-	CaseSummary  sirius.CaseSummary
-	Documents    []sirius.Document
-	Document     sirius.Document
-	UsesNotify   bool
-	Download     string
-	SaveAndExit  bool
-	PreviewDraft bool
-	DownloadUUID string
-	DonorId      int
+	XSRFToken             string
+	IsPartial             bool
+	Success               bool
+	Error                 sirius.ValidationError
+	Case                  sirius.Case
+	CaseSummary           sirius.CaseSummary
+	Documents             []sirius.Document
+	Document              sirius.Document
+	UsesNotify            bool
+	Download              string
+	SaveAndExit           bool
+	PreviewDraft          bool
+	DownloadUUID          string
+	DonorId               int
+	HasBlankSections      string
+	SelectedBlankSections string
+	Section11Count        string
+	BlankSectionsEnabled  bool
 }
 
 func publishDraftDocument(
@@ -43,6 +51,7 @@ func publishDraftDocument(
 	caseID int,
 	documentUUID string,
 	content string,
+	blankSections []string,
 ) error {
 	_, err := client.EditDocument(ctx, documentUUID, content)
 	if err != nil {
@@ -55,7 +64,7 @@ func publishDraftDocument(
 		return err
 	}
 
-	_, err = client.AddDocument(ctx, caseID, document, sirius.TypeSave)
+	_, err = client.AddDocument(ctx, caseID, document, sirius.TypeSave, blankSections)
 	if err != nil {
 		return err
 	}
@@ -66,6 +75,45 @@ func publishDraftDocument(
 	}
 
 	return nil
+}
+
+func parseBlankSections(hasBlankSections bool, selectedBlankSections, section11Count, caseSubType string) ([]string, error) {
+	if !hasBlankSections {
+		return []string{}, nil
+	}
+
+	if selectedBlankSections == "" {
+		return nil, sirius.ValidationError{
+			Field: sirius.FieldErrors{
+				"blankSections": {"reason": "Please select sections to insert"},
+			},
+		}
+	}
+
+	var containsSection11 bool
+	blankSections := strings.Split(selectedBlankSections, "+")
+	for i, blankSection := range blankSections {
+		if blankSection == "11" {
+			containsSection11 = true
+		}
+		blankSections[i] = caseSubType + "-" + blankSection
+	}
+
+	if containsSection11 && section11Count == "" {
+		return nil, sirius.ValidationError{
+			Field: sirius.FieldErrors{
+				"section11Count1": {"reason": "Please select how many section 11 to insert"},
+			},
+		}
+	}
+
+	section11CountInt, _ := strconv.Atoi(section11Count)
+	for range section11CountInt - 1 {
+		blankSections = append(blankSections, caseSubType+"-11")
+	}
+	slices.Sort(blankSections)
+
+	return blankSections, nil
 }
 
 func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
@@ -85,6 +133,11 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 		data := editDocumentData{
 			XSRFToken: ctx.XSRFToken,
 			IsPartial: ctx.IsPartial,
+		}
+
+		featureToggles, err := client.FeatureToggles(ctx)
+		if err == nil {
+			data.BlankSectionsEnabled = featureToggles.Enabled("poasBlankSections")
 		}
 
 		caseItem, err := client.Case(ctx, caseID)
@@ -149,6 +202,11 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 			content := r.FormValue("documentTextEditor")
 			documentUUID := r.FormValue("documentUUID")
 
+			data.HasBlankSections = r.FormValue("hasBlankSections")
+			data.SelectedBlankSections = r.FormValue("blankSections")
+			data.Section11Count = r.FormValue("section11Count")
+			hasBlankSections := data.HasBlankSections == "true"
+
 			switch documentControls {
 			case "save":
 				document, err := client.EditDocument(ctx, documentUUID, content)
@@ -158,25 +216,31 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				data.Document = document
 
 			case "preview":
-				_, err := client.EditDocument(ctx, documentUUID, content)
-				if err != nil {
-					return err
-				}
+				blankSections, err := parseBlankSections(hasBlankSections, data.SelectedBlankSections, data.Section11Count, caseItem.SubType)
+				if ve, ok := err.(sirius.ValidationError); ok {
+					w.WriteHeader(http.StatusBadRequest)
+					data.Error = ve
+				} else {
+					_, err = client.EditDocument(ctx, documentUUID, content)
+					if err != nil {
+						return err
+					}
 
-				// need to retrieve for correspondent information
-				document, err := client.DocumentByUUID(ctx, documentUUID)
-				if err != nil {
-					return err
-				}
+					// need to retrieve for correspondent information
+					document, err := client.DocumentByUUID(ctx, documentUUID)
+					if err != nil {
+						return err
+					}
 
-				previewDocument, err := client.AddDocument(ctx, caseID, document, sirius.TypePreview)
-				if err != nil {
-					return err
-				}
+					previewDocument, err := client.AddDocument(ctx, caseID, document, sirius.TypePreview, blankSections)
+					if err != nil {
+						return err
+					}
 
-				data.Document = document
-				data.PreviewDraft = true
-				data.DownloadUUID = previewDocument.UUID
+					data.Document = document
+					data.PreviewDraft = true
+					data.DownloadUUID = previewDocument.UUID
+				}
 
 			case "delete":
 				err := client.DeleteDocument(ctx, documentUUID)
@@ -193,7 +257,10 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				}
 
 			case "publish":
-				err = publishDraftDocument(client, ctx, caseID, documentUUID, content)
+				blankSections, err := parseBlankSections(hasBlankSections, data.SelectedBlankSections, data.Section11Count, caseItem.SubType)
+				if err == nil {
+					err = publishDraftDocument(client, ctx, caseID, documentUUID, content, blankSections)
+				}
 				if ve, ok := err.(sirius.ValidationError); ok {
 					w.WriteHeader(http.StatusBadRequest)
 					data.Error = ve
@@ -262,7 +329,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 					return err
 				}
 
-				if documentControls == "delete" || documentControls == "publish" {
+				if documentControls == "delete" || documentControls == "publish" || documentControls == "preview" {
 					if len(data.Documents) > 0 {
 						defaultDocumentUUID := data.Documents[0].UUID
 						documentToDisplay, err := client.DocumentByUUID(ctx, defaultDocumentUUID)
