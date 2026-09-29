@@ -577,6 +577,8 @@ func TestPostCreateAttorneyNextAnotherLpa(t *testing.T) {
 					County:       "Benevento",
 					Postcode:     "57797",
 					Country:      "Italy",
+					Email:        "hello@example.com",
+					PhoneNumber:  "0123456789",
 				},
 				SystemStatus: shared.BoolPtr(true),
 			}
@@ -621,6 +623,8 @@ func TestPostCreateAttorneyNextAnotherLpa(t *testing.T) {
 				"county":               {"Benevento"},
 				"postcode":             {"57797"},
 				"country":              {"Italy"},
+				"email":                {"hello@example.com"},
+				"phoneNumber":          {"0123456789"},
 				"isAttorneyActive":     {"true"},
 				"update-next-attorney": {"true"},
 			}
