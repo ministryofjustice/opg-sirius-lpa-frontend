@@ -267,6 +267,22 @@ func TestPrefix(t *testing.T) {
 	assert.Equal(t, "URL", val)
 }
 
+func TestStaticHashValidHash(t *testing.T) {
+	fns := All("", "", "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1")
+	fn := fns["staticHash"].(func() string)
+
+	val := fn()
+	assert.Equal(t, "d6a61d20", val)
+}
+
+func TestStaticHashInvalidHash(t *testing.T) {
+	fns := All("", "", "248d")
+	fn := fns["staticHash"].(func() string)
+
+	val := fn()
+	assert.Equal(t, "", val)
+}
+
 func TestPrefixSVGValidHash(t *testing.T) {
 	fns := All("", "prefix", "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1")
 	fn := fns["prefixSVG"].(func(string) string)
