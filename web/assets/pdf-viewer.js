@@ -770,9 +770,12 @@ class PDFViewer {
   }
 }
 
-export default function initPdfViewer() {
+export default function initPdfViewer(scope = document) {
   const viewers = document.querySelectorAll("[data-pdf-viewer]");
   viewers.forEach((container) => {
+    if (container.dataset.pdfInitialised === "true") {
+      return; // already rendered - don't recreate controls/canvases or refetch the PDF
+    }
     const url = container.dataset.pdfUrl;
     const paneId = container.dataset.pdfPane;
     if (url) {

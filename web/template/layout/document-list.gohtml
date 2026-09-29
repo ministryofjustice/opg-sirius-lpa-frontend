@@ -38,7 +38,12 @@
 
             {{ $multiCaseSelected := .MultipleCasesSelected }}
 
-            <form class="form" id="document-list-form" method="POST" action="{{ prefix (printf "/donor/%d/documents" .DonorID) }}">
+            <form
+                    class="form" id="document-list-form"
+                    hx-post="{{ prefix (printf "/donor/%d/documents" .DonorID) }}"
+                    hx-target="#document-list-content"
+                    hx-swap="innerHTML"
+            >
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
                 {{ if .Comparing }}
                     <input type="hidden" name="comparing" value="true">
@@ -125,8 +130,15 @@
                                 {{ if eq .MimeType "application/pdf"}}
                                     {{ if eq $.Comparing true }}
                                         <a class="govuk-link" href="{{ prefix ( index $.CompareURLs .UUID )}}">{{ .FriendlyDescription }}</a>
-                                    {{else}}
-                                        <a class="govuk-link" href="{{ prefix (printf "/view-document/%s/%d" .UUID $.DonorID ) }}">{{ .FriendlyDescription }}</a>
+                                    {{ else }}
+                                        <a class="govuk-link"
+                                           href="{{ prefix (printf "/view-document/%s/%d" .UUID $.DonorID ) }}"
+                                           hx-get="{{ prefix (printf "/view-document/%s/%d" .UUID $.DonorID ) }}"
+                                           hx-target="#document-viewer-content"
+                                           hx-swap="innerHTML"
+                                           hx-push-url="true">
+                                            {{ .FriendlyDescription }}
+                                        </a>
                                     {{ end }}
                                 {{ else }}
                                     <a class="govuk-link" href="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .UUID) }}" download="">{{ .FriendlyDescription }}</a>
