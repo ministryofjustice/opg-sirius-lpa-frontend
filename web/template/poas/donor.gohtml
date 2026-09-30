@@ -137,7 +137,7 @@
     <fieldset class="govuk-fieldset">
       <legend class="govuk-fieldset__legend">Is airmail required</legend>
       {{ template "errors" .Error.Field.isAirmailRequired }}
-      <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+      <div class="govuk-radios govuk-radios--small govuk-radios--inline" data-module="govuk-radios">
         <div class="govuk-radios__item">
           <input class="govuk-radios__input" id="f-isAirmailRequired" name="isAirmailRequired" type="radio" value="Yes" {{ if .Donor.IsAirmailRequired }}checked{{ end }}>
           <label class="govuk-label govuk-radios__label" for="f-isAirmailRequired">
@@ -162,7 +162,7 @@
     <fieldset class="govuk-fieldset">
       <legend class="govuk-fieldset__legend">Correspondence by</legend>
       {{ template "errors" .Error.Field.correspondenceBy }}
-      <div class="govuk-checkboxes govuk-checkboxes--inline" data-module="govuk-checkboxes">
+      <div class="govuk-checkboxes govuk-checkboxes--small govuk-checkboxes--inline" data-module="govuk-checkboxes">
         <div class="govuk-checkboxes__item">
           <input class="govuk-checkboxes__input" id="f-correspondenceBy-post" name="correspondenceBy" type="checkbox" value="post" {{ if .Donor.CorrespondenceByPost }}checked{{ end }}>
           <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-post">
@@ -195,7 +195,7 @@
     <fieldset class="govuk-fieldset">
       <legend class="govuk-fieldset__legend">Research opt-out</legend>
       {{ template "errors" .Error.Field.researchOptOut }}
-      <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+      <div class="govuk-radios govuk-radios--small govuk-radios--inline" data-module="govuk-radios">
         <div class="govuk-radios__item">
           <input class="govuk-radios__input" id="f-researchOptOut" name="researchOptOut" type="radio" value="Yes" {{ if .Donor.ResearchOptOut }}checked{{ end }}>
           <label class="govuk-label govuk-radios__label" for="f-researchOptOut">
