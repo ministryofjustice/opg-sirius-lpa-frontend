@@ -6,6 +6,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `${prefix}/javascript/pdf.worker.min.mj
 
 // Storage key for persisting viewer state across page navigations
 const STORAGE_KEY = "pdfViewerState";
+const viewerRegistry = new Map();
 
 class PDFViewer {
   constructor(container, url, paneId) {
@@ -770,16 +771,32 @@ class PDFViewer {
   }
 }
 
+function saveViewerStates(container) {
+  container.querySelectorAll("[data-pdf-viewer]").forEach((el) => {
+    const viewer = viewerRegistry.get(el);
+    if (viewer) {
+      viewer.saveState();
+      viewerRegistry.delete(el);
+    }
+  });
+}
+
+document.body.addEventListener("htmx:beforeSwap", (event) => {
+  saveViewerStates(event.target);
+});
+
 export default function initPdfViewer(scope = document) {
-  const viewers = document.querySelectorAll("[data-pdf-viewer]");
+  const viewers = scope.querySelectorAll("[data-pdf-viewer]");
   viewers.forEach((container) => {
     if (container.dataset.pdfInitialised === "true") {
-      return; // already rendered - don't recreate controls/canvases or refetch the PDF
+      return;
     }
     const url = container.dataset.pdfUrl;
     const paneId = container.dataset.pdfPane;
     if (url) {
       const pdfViewer = new PDFViewer(container, url, paneId);
+      container.dataset.pdfInitialised = "true";
+      viewerRegistry.set(container, pdfViewer);
       pdfViewer.init();
     }
   });
