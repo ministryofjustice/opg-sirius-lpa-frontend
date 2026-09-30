@@ -352,25 +352,25 @@ class PDFViewer {
     const action = btn.dataset.action;
     switch (action) {
       case "prev":
-        this.prevPage();
+        this.prevPage().catch((err) => console.error(err));
         break;
       case "next":
-        this.nextPage();
+        this.nextPage().catch((err) => console.error(err));
         break;
       case "zoom-in":
-        this.zoomIn();
+        this.zoomIn().catch((err) => console.error(err));
         break;
       case "zoom-out":
-        this.zoomOut();
+        this.zoomOut().catch((err) => console.error(err));
         break;
       case "fit-width":
-        this.fitToWidth();
+        this.fitToWidth().catch((err) => console.error(err));
         break;
       case "fit-page":
-        this.fitToPage();
+        this.fitToPage().catch((err) => console.error(err));
         break;
       case "toggle-thumbnails":
-        this.toggleThumbnails();
+        this.toggleThumbnails().catch((err) => console.error(err));
         break;
       case "print-doc":
         this.printDoc();
