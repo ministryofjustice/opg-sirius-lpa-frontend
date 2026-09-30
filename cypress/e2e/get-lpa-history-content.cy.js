@@ -869,7 +869,7 @@ describe("Show correct event content", () => {
       type: "Activation key used",
       entity: {
         type: "Activation key used",
-        description: "Date used: 2:30PM 15 March 2024\nJane Doe",
+        description: "Jane Doe\nDate used: 2:30PM 15 March 2024",
       },
     });
     cy.visit("/donor/1/history");
