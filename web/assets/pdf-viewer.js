@@ -352,25 +352,25 @@ class PDFViewer {
     const action = btn.dataset.action;
     switch (action) {
       case "prev":
-        this.prevPage();
+        this.prevPage().catch((err) => console.error(err));
         break;
       case "next":
-        this.nextPage();
+        this.nextPage().catch((err) => console.error(err));
         break;
       case "zoom-in":
-        this.zoomIn();
+        this.zoomIn().catch((err) => console.error(err));
         break;
       case "zoom-out":
-        this.zoomOut();
+        this.zoomOut().catch((err) => console.error(err));
         break;
       case "fit-width":
-        this.fitToWidth();
+        this.fitToWidth().catch((err) => console.error(err));
         break;
       case "fit-page":
-        this.fitToPage();
+        this.fitToPage().catch((err) => console.error(err));
         break;
       case "toggle-thumbnails":
-        this.toggleThumbnails();
+        this.toggleThumbnails().catch((err) => console.error(err));
         break;
       case "print-doc":
         this.printDoc();
@@ -746,7 +746,7 @@ class PDFViewer {
     if (e.key === "Enter") {
       const pageNum = Number.parseInt(e.target.value, 10);
       if (!Number.isNaN(pageNum)) {
-        this.goToPage(pageNum);
+        this.goToPage(pageNum).catch((err) => console.error(err));
       }
     } else if (["-", "+", "e", "."].includes(e.key)) {
       e.preventDefault();
@@ -758,7 +758,7 @@ class PDFViewer {
     if (Number.isNaN(pageNum) || pageNum < 1 || pageNum > this.totalPages) {
       e.target.value = this.currentPage;
     } else {
-      this.goToPage(pageNum);
+      this.goToPage(pageNum).catch((err) => console.error(err));
     }
   }
 
@@ -807,7 +807,7 @@ export default function initPdfViewer(scope = document) {
       const pdfViewer = new PDFViewer(container, url, paneId);
       container.dataset.pdfInitialised = "true";
       viewerRegistry.set(container, pdfViewer);
-      pdfViewer.init();
+      pdfViewer.init().catch((err) => console.error(err));
     }
   });
 }
