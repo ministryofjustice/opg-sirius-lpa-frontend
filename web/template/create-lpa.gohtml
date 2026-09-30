@@ -101,7 +101,7 @@
               <fieldset class="govuk-fieldset">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">LPA type</legend>
                 {{ template "errors" .Error.Field.caseSubtype }}
-                <div class="govuk-radios app-!-radios--inline {{ if .Error.Field.caseSubtype }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+                <div class="govuk-radios govuk-radios--small app-!-radios--inline {{ if .Error.Field.caseSubtype }}govuk-radios--error{{ end }}" data-module="govuk-radios">
                   <div class="govuk-radios__item">
                     <input class="govuk-radios__input" id="f-caseSubtype" name="caseSubtype" type="radio"
                            value="pfa" {{ if eq .Lpa.SubType "pfa" }}checked{{ end }} data-module="app-lpa-form-subtype-input">
@@ -120,7 +120,7 @@
               <fieldset class="govuk-fieldset">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Application type</legend>
                 {{ template "errors" .Error.Field.applicationType }}
-                <div class="govuk-radios" data-module="govuk-radios">
+                <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
                   <div class="govuk-radios__item">
                     <input class="govuk-radios__input" id="f-applicationType" name="applicationType" type="radio"
                            value="Online" data-aria-controls="onlineLpaIdReveal"
@@ -226,7 +226,7 @@
               <fieldset class="govuk-fieldset">
                 <legend class="govuk-fieldset__legend govuk-visually-hidden">Appointment type</legend>
                 {{ template "errors" .Error.Field.appointmentType }}
-                <div class="govuk-radios {{ if .Error.Field.appointmentType }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+                <div class="govuk-radios govuk-radios--small{{ if .Error.Field.appointmentType }}govuk-radios--error{{ end }}" data-module="govuk-radios">
                   <div class="govuk-radios__item">
                     <input class="govuk-radios__input" id="f-caseAttorney" name="caseAttorney" type="radio"
                            value="singular" {{ if eq .AppointmentType "singular" }}checked{{ end }}>
@@ -331,7 +331,7 @@
                 <fieldset class="govuk-fieldset">
                   <legend class="govuk-fieldset__legend govuk-visually-hidden">Life sustaining treatment</legend>
                   {{ template "errors" .Error.Field.lifeSustainingTreatment }}
-                  <div class="govuk-radios app-!-radios--inline {{ if .Error.Field.lifeSustainingTreatment }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+                  <div class="govuk-radios govuk-radios--small app-!-radios--inline {{ if .Error.Field.lifeSustainingTreatment }}govuk-radios--error{{ end }}" data-module="govuk-radios">
                     <div class="govuk-radios__item">
                       <input class="govuk-radios__input" id="f-lifeSustainingTreatment" name="lifeSustainingTreatment" type="radio"
                              value="Option A" {{ if eq .Lpa.LifeSustainingTreatment "Option A" }}checked{{ end }}>
@@ -355,7 +355,7 @@
                 <fieldset class="govuk-fieldset">
                   <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Signed and witnessed correctly</legend>
                   {{ template "errors" .Error.Field.lifeSustainingTreatmentSignedAndWitnessed }}
-                  <div class="govuk-radios app-!-radios--inline {{ if .Error.Field.lifeSustainingTreatmentSignedAndWitnessed }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+                  <div class="govuk-radios govuk-radios--small app-!-radios--inline {{ if .Error.Field.lifeSustainingTreatmentSignedAndWitnessed }}govuk-radios--error{{ end }}" data-module="govuk-radios">
                     <div class="govuk-radios__item">
                       <input class="govuk-radios__input" id="f-lifeSustainingTreatmentSignedAndWitnessed" name="lifeSustainingTreatmentSignedAndWitnessed" type="radio"
                              value="true" {{ if compareBoolPointers .Lpa.LifeSustainingTreatmentSignedAndWitnessed true }}checked{{ end }}>
@@ -382,7 +382,7 @@
                 <fieldset class="govuk-fieldset">
                   <legend class="govuk-fieldset__legend govuk-visually-hidden">When can the LPA be used?</legend>
                   {{ template "errors" .Error.Field.attorneyActDecisions }}
-                  <div class="govuk-radios app-!-radios--inline {{ if .Error.Field.attorneyActDecisions }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+                  <div class="govuk-radios govuk-radios--small app-!-radios--inline {{ if .Error.Field.attorneyActDecisions }}govuk-radios--error{{ end }}" data-module="govuk-radios">
                     <div class="govuk-radios__item">
                       <input class="govuk-radios__input" id="f-attorneyActDecisions" name="attorneyActDecisions" type="radio"
                              value="When Registered" {{ if eq .Lpa.AttorneyActDecisions "When Registered" }}checked{{ end }}>
@@ -453,7 +453,7 @@
               <fieldset class="govuk-fieldset">
                 <legend class="govuk-fieldset__legend govuk-visually-hidden">Does the donor have any preferences or instructions?</legend>
                 {{ template "errors" .Error.Field.preferencesAndInstructions }}
-                <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                   <div class="govuk-checkboxes__item">
                     <input class="govuk-checkboxes__input" id="f-preferencesAndInstructions" name="preferencesAndInstructions"
                            type="checkbox" value="guidance"
@@ -589,7 +589,7 @@
               <fieldset class="govuk-fieldset">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Who is applying to register the Lasting Power of Attorney?</legend>
                 {{ template "errors" .Error.Field.applicantType }}
-                <div class="govuk-radios" data-module="govuk-radios">
+                <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
                   <div class="govuk-radios__item">
                     <input class="govuk-radios__input" id="f-applicantType" name="applicantType" type="radio"
                            value="donor" {{ if containsInt .ApplicantIds .DonorId }}checked{{ end }}>
@@ -604,19 +604,21 @@
                   </div>
                    <div class="govuk-radios__conditional {{ if ne .Lpa.ApplicantType "attorney" }}govuk-radios__conditional--hidden{{ end }}"
                        id="applicantAttorneysReveal" data-module="applicant-attorney-checkboxes">
-                    {{ range $applicant := .AttorneyApplicants }}
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="f-applicantIds-{{ .ID }}" name="applicantIds"
-                               type="checkbox" value="{{ .ID }}" {{ if containsInt $.ApplicantIds .ID }}checked{{ end }}>
-                        <label class="govuk-label govuk-checkboxes__label" for="f-applicantIds-{{.ID }}">
-                          {{ if eq .PersonType "Trust Corporation" }}
-                            {{ if .CompanyName }}{{ .CompanyName }}{{ end }}
-                          {{ else }}
-                            {{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
-                          {{ end }}
-                        </label>
-                      </div>
-                    {{ end }}
+                     <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                      {{ range $applicant := .AttorneyApplicants }}
+                        <div class="govuk-checkboxes__item">
+                          <input class="govuk-checkboxes__input" id="f-applicantIds-{{ .ID }}" name="applicantIds"
+                                 type="checkbox" value="{{ .ID }}" {{ if containsInt $.ApplicantIds .ID }}checked{{ end }}>
+                          <label class="govuk-label govuk-checkboxes__label" for="f-applicantIds-{{.ID }}">
+                            {{ if eq .PersonType "Trust Corporation" }}
+                              {{ if .CompanyName }}{{ .CompanyName }}{{ end }}
+                            {{ else }}
+                              {{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                            {{ end }}
+                          </label>
+                        </div>
+                      {{ end }}
+                     </div>
                   </div>
                 </div>
               </fieldset>
@@ -676,7 +678,7 @@
               <fieldset class="govuk-fieldset">
                 <legend class="govuk-fieldset__legend govuk-visually-hidden">How is the application fee being paid?</legend>
                 {{ template "errors" .Error.Field.applicationFee }}
-                <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                   <div class="govuk-checkboxes__item">
                     <input class="govuk-checkboxes__input" id="f-applicationFee" name="applicationFee"
                            type="checkbox" value="card" data-aria-controls="cardPaymentContactReveal"
@@ -716,7 +718,7 @@
                       <fieldset class="govuk-fieldset">
                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Reduced fee type</legend>
                         {{ template "errors" .Error.Field.reducedFeeType }}
-                        <div class="govuk-radios app-!-radios--inline {{ if .Error.Field.reducedFeeType }}govuk-radios--error{{ end }}" data-module="govuk-radios">
+                        <div class="govuk-radios govuk-radios--small app-!-radios--inline {{ if .Error.Field.reducedFeeType }}govuk-radios--error{{ end }}" data-module="govuk-radios">
                           <div class="govuk-radios__item">
                             <input class="govuk-radios__input" id="f-reducedFeeType" name="reducedFeeType" type="radio"
                                    value="exemption" {{ if eq $reducedFeeType "exemption" }}checked{{ end }}>
@@ -760,7 +762,7 @@
           </div>
           <div class="govuk-summary-card__content">
             <div class="govuk-form-group">
-              <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+              <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                 <div class="govuk-checkboxes__item">
                   <input class="govuk-checkboxes__input" id="f-anyOtherInfo" name="anyOtherInfo"
                          type="checkbox" value="true" data-aria-controls="additionalInfoReveal"
