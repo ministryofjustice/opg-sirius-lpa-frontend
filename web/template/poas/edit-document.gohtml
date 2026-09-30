@@ -170,8 +170,8 @@
     </div>
 
     {{ if and (eq .Case.CaseType "LPA") (eq .BlankSectionsEnabled true) }}
-      <div class="govuk-form-group">
-        <fieldset class="govuk-fieldset" aria-describedby="contact-hint">
+      <div class="govuk-form-group"  data-module="app-clear-blank-sections">
+        <fieldset class="govuk-fieldset">
           <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input" id="insert-blank-sections" name="hasBlankSections" type="checkbox" value="true" data-aria-controls="blank-sections-conditional"{{if eq .HasBlankSections "true"}} checked{{end}}>
