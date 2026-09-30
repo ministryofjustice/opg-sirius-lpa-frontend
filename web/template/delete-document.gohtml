@@ -9,7 +9,7 @@
 {{ end }}
 
 {{ define "partial-content" }}
-    <div id="document-viewer-content">
+    <div id="document-panel">
         {{ template "DeleteDocumentConfirm" . }}
     </div>
 {{ end }}
@@ -28,13 +28,13 @@
 
     <form class="form"
           hx-post="{{ prefix (printf "/delete-document/%s" .Document.UUID) }}"
-          hx-target="#document-viewer-content"
+          hx-target="#document-panel"
           hx-swap="innerHTML">
         <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
         <a class="govuk-button govuk-button--secondary"
            href="{{ prefix (printf "/view-document/%s/%d" .Document.UUID .DonorId) }}"
            hx-get="{{ prefix (printf "/view-document/%s/%d" .Document.UUID .DonorId) }}"
-           hx-target="#document-viewer-content" hx-swap="innerHTML">
+           hx-target="#document-panel" hx-swap="innerHTML">
             No, cancel
         </a>
         <button class="govuk-button govuk-button--warning" data-module="govuk-button" type="submit">

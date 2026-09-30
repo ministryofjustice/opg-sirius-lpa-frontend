@@ -1,14 +1,12 @@
 {{ template "page" . }}
 {{ define "main" }}
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
+        <div class="govuk-grid-column-full" id="document-panel">
             {{ template "DocumentViewer" . }}
         </div>
     </div>
 {{ end }}
 
 {{ define "partial-content" }}
-    <div id="document-viewer-content">
-        {{ template "DocumentViewer" . }}
-    </div>
+    {{ template "DocumentViewer" . }}
 {{ end }}

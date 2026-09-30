@@ -12,13 +12,13 @@
 
 {{ define "main" }}
     <h1 class="govuk-visually-hidden">Compare documents</h1>
-    <div id="document-viewer-content" class="govuk-grid-row">
+    <div id="document-panel" class="govuk-grid-row">
         {{ template "CompareContent" . }}
     </div>
 {{ end }}
 
 {{ define "partial-content" }}
-    <div id="document-viewer-content" class="govuk-grid-row">
+    <div id="document-panel" class="govuk-grid-row">
         {{ template "CompareContent" . }}
     </div>
 {{ end }}

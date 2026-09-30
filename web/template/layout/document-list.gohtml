@@ -41,7 +41,7 @@
             <form
                     class="form" id="document-list-form"
                     hx-post="{{ prefix (printf "/donor/%d/documents" .DonorID) }}"
-                    hx-target="#document-viewer-content"
+                    hx-target="#document-panel"
                     hx-swap="innerHTML"
             >
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
@@ -86,7 +86,7 @@
                                     <a class="govuk-button govuk-button--secondary moj-button-menu__item"
                                        href="{{ prefix .CloseURL }}"
                                        hx-get="{{ prefix .CloseURL }}"
-                                       hx-target="#document-viewer-content"
+                                       hx-target="#document-panel"
                                        hx-swap="innerHTML"
                                        hx-push-url="true"
                                        aria-label="Close list">Close</a>
@@ -136,14 +136,14 @@
                                         <a class="govuk-link"
                                            href="{{ prefix ( index $.CompareURLs .UUID ) }}"
                                            hx-get="{{ prefix ( index $.CompareURLs .UUID ) }}"
-                                           hx-target="#document-viewer-content"
+                                           hx-target="#document-panel"
                                            hx-swap="innerHTML"
                                            hx-push-url="true">{{ .FriendlyDescription }}</a>
                                     {{ else }}
                                         <a class="govuk-link"
                                            href="{{ prefix (printf "/view-document/%s/%d" .UUID $.DonorID ) }}"
                                            hx-get="{{ prefix (printf "/view-document/%s/%d" .UUID $.DonorID ) }}"
-                                           hx-target="#document-viewer-content"
+                                           hx-target="#document-panel"
                                            hx-swap="innerHTML"
                                            hx-push-url="true">
                                             {{ .FriendlyDescription }}

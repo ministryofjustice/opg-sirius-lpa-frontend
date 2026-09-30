@@ -110,7 +110,7 @@ htmx.on("htmx:afterSettle", (event) => {
       }
     }
 
-    if (swapDetails.target.id === "document-viewer-content") {
+    if (swapDetails.target.id === "document-panel") {
       initPdfViewer(swapDetails.target);
     }
   }
