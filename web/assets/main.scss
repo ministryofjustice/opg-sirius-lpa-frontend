@@ -1191,3 +1191,7 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
   font-size: 1.1875rem;
   line-height: 1.3157894737;
 }
+
+.app-colour-link-blue {
+  color: govuk-functional-colour(link);
+}
