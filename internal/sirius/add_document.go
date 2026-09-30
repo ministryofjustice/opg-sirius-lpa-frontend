@@ -5,22 +5,24 @@ import (
 )
 
 type addDocumentRequestData struct {
-	CaseId          int    `json:"caseId"`
-	CorrespondentID int    `json:"correspondentId"`
-	Type            string `json:"type"`
-	FileName        string `json:"filename"`
-	SystemType      string `json:"systemType"`
-	Content         string `json:"content"`
+	CaseId            int      `json:"caseId"`
+	CorrespondentID   int      `json:"correspondentId"`
+	Type              string   `json:"type"`
+	FileName          string   `json:"filename"`
+	SystemType        string   `json:"systemType"`
+	Content           string   `json:"content"`
+	AppendLpaSections []string `json:"appendLpaSections"`
 }
 
-func (c *Client) AddDocument(ctx Context, caseID int, document Document, docType string) (Document, error) {
+func (c *Client) AddDocument(ctx Context, caseID int, document Document, docType string, blankSections []string) (Document, error) {
 	data := addDocumentRequestData{
-		CaseId:          caseID,
-		CorrespondentID: document.Correspondent.ID,
-		Type:            docType,
-		FileName:        document.FileName,
-		SystemType:      document.SystemType,
-		Content:         document.Content,
+		CaseId:            caseID,
+		CorrespondentID:   document.Correspondent.ID,
+		Type:              docType,
+		FileName:          document.FileName,
+		SystemType:        document.SystemType,
+		Content:           document.Content,
+		AppendLpaSections: blankSections,
 	}
 
 	var d Document

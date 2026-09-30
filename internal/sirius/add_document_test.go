@@ -38,12 +38,13 @@ func TestAddDocument(t *testing.T) {
 							"Content-Type": matchers.String("application/json"),
 						},
 						Body: matchers.Like(map[string]interface{}{
-							"caseId":          matchers.Like(800),
-							"type":            matchers.String("Save"),
-							"filename":        matchers.String("LP-A.pdf"),
-							"correspondentId": matchers.Like(189),
-							"systemType":      matchers.String("LP-A"),
-							"content":         matchers.String("Test content"),
+							"caseId":            matchers.Like(800),
+							"type":              matchers.String("Save"),
+							"filename":          matchers.String("LP-A.pdf"),
+							"correspondentId":   matchers.Like(189),
+							"systemType":        matchers.String("LP-A"),
+							"content":           matchers.String("Test content"),
+							"appendLpaSections": matchers.Like([]string{"lpa-sections"}),
 						}),
 					}).
 					WithCompleteResponse(consumer.Response{
@@ -99,7 +100,7 @@ func TestAddDocument(t *testing.T) {
 					FileName:            "LP-A.pdf",
 					Content:             "Test content",
 					ChildCount:          0,
-				}, TypeSave)
+				}, TypeSave, []string{"lpa-sections"})
 
 				assert.Equal(t, tc.expectedResponse, document)
 				if tc.expectedError == nil {
