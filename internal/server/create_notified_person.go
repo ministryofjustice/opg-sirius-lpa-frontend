@@ -108,7 +108,6 @@ func CreateNotifiedPerson(client CreateNotifiedPersonClient, tmpl template.Templ
 					Postcode:          postFormString(r, "postcode"),
 					IsAirmailRequired: postFormString(r, "isAirmailRequired") == "true",
 				},
-				NoticeGivenDate: postFormDateString(r, "noticeGivenDate"),
 			}
 			data.NotifiedPerson = notifiedPerson
 
