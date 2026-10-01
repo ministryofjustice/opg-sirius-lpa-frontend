@@ -117,8 +117,10 @@ func parseBlankSections(hasBlankSections bool, selectedBlankSections, section11C
 		}
 	}
 
-	section11Count := section11Count1
-	if selectedBlankSections == "10+11+15" {
+	var section11Count string
+	if selectedBlankSections == "11+15" {
+		section11Count = section11Count1
+	} else if selectedBlankSections == "10+11+15" {
 		section11Count = section11Count2
 	}
 	section11CountInt, _ := strconv.Atoi(section11Count)
