@@ -123,8 +123,6 @@ func parseBlankSections(hasBlankSections bool, selectedBlankSections, section11C
 		section11Count = section11Count1
 	case "10+11+15":
 		section11Count = section11Count2
-	default:
-		section11Count = ""
 	}
 	section11CountInt, _ := strconv.Atoi(section11Count)
 	for range section11CountInt - 1 {
