@@ -4,5 +4,5 @@ ignore:
     - "*":
         reason: "No fixed version available. We don't use the vulnerable component."
         created: "2026-08-30T00:00:00.000Z"
-        expires: "2026-10-01T00:00:00.000Z"
+        expires: "2026-12-01T00:00:00.000Z"
 patch: {}
