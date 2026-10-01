@@ -3,18 +3,18 @@
 {{ define "main" }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            {{ template "DeleteDocumentConfirm" . }}
+            {{ template "deleteDocumentConfirm" . }}
         </div>
     </div>
 {{ end }}
 
 {{ define "partial-content" }}
     <div id="document-panel">
-        {{ template "DeleteDocumentConfirm" . }}
+        {{ template "deleteDocumentConfirm" . }}
     </div>
 {{ end }}
 
-{{ define "DeleteDocumentConfirm" }}
+{{ define "deleteDocumentConfirm" }}
     <div class="govuk-body">
         {{ range .Document.CaseItems }}{{ template "CaseLabel" . }}{{ end }}
         <h1 class="govuk-heading-m">
