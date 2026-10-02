@@ -18,7 +18,7 @@
     "watch": "npm run build:js --watch=forever & npm run build:css --watch"
   },
   "dependencies": {
-    "@ministryofjustice/frontend": "^9.0.0",
+    "@ministryofjustice/frontend": "^11.0.0",
     "accessible-autocomplete": "^3.0.0",
     "cypress": "15.21.0",
     "govuk-frontend": "^6.1.0",
