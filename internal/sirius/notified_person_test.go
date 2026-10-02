@@ -41,7 +41,6 @@ func TestCreateNotifiedPerson(t *testing.T) {
 					Country:           "Canada",
 					IsAirmailRequired: true,
 				},
-				NoticeGivenDate: DateString("2022-04-05"),
 			},
 			setup: func() {
 				pact.
@@ -77,7 +76,6 @@ func TestCreateNotifiedPerson(t *testing.T) {
 							"dateOfDeath":           nil,
 							"email":                 "",
 							"isAirmailRequired":     true,
-							"noticeGivenDate":       "05/04/2022",
 							"personType":            "NotifiedPerson",
 							"phoneNumber":           "",
 							"previousNames":         "",
@@ -143,7 +141,6 @@ func TestUpdateNotifiedPerson(t *testing.T) {
 					Country:           "Canada",
 					IsAirmailRequired: true,
 				},
-				NoticeGivenDate: DateString("2022-04-05"),
 			},
 			setup: func() {
 				pact.
@@ -180,7 +177,6 @@ func TestUpdateNotifiedPerson(t *testing.T) {
 							"dateOfDeath":           nil,
 							"email":                 "",
 							"isAirmailRequired":     true,
-							"noticeGivenDate":       "05/04/2022",
 							"phoneNumber":           "",
 							"previousNames":         "",
 							"researchOptOut":        false,
