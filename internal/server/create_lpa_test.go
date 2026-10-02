@@ -1528,7 +1528,7 @@ func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 				AppointmentType:        "jointly",
 				CaseId:                 456,
 				Lpa:                    existingLpa,
-				HtmxRedirect:           "/create-attorney?id=123&caseId=456&caseType=lpa&attorneyId=999",
+				HtmxRedirect:           "/update-attorney?id=123&caseId=456&caseType=lpa&attorneyId=999",
 				HtmxSwap:               "innerHTML",
 				IsPartial:              isHtmx,
 				AttorneyApplicants:     []sirius.Attorney{attorney},
@@ -1558,7 +1558,7 @@ func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 			resp := w.Result()
 
 			if !isHtmx {
-				expectedRedirect := RedirectError("/create-attorney?id=123&caseId=456&caseType=lpa&attorneyId=999")
+				expectedRedirect := RedirectError("/update-attorney?id=123&caseId=456&caseType=lpa&attorneyId=999")
 				assert.Equal(t, expectedRedirect, err)
 			} else {
 				assert.Nil(t, err)
@@ -1808,7 +1808,7 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			name:        "Update attorney redirects",
 			formKey:     "updateAttorney",
 			formValue:   "999",
-			expectedErr: RedirectError("/create-attorney?id=1&caseId=2&caseType=lpa&attorneyId=999"),
+			expectedErr: RedirectError("/update-attorney?id=1&caseId=2&caseType=lpa&attorneyId=999"),
 		},
 		{
 			name:        "Update attorney with invalid ID errors",

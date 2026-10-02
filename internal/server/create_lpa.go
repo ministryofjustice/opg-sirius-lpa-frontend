@@ -317,11 +317,11 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			}
 
 			if data.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d", donorID, data.CaseId, attorneyID)
+				data.HtmxRedirect = fmt.Sprintf("/update-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d", donorID, data.CaseId, attorneyID)
 				data.HtmxSwap = "innerHTML"
 				return tmpl(w, data)
 			}
-			return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d", donorID, data.CaseId, attorneyID))
+			return RedirectError(fmt.Sprintf("/update-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d", donorID, data.CaseId, attorneyID))
 		}
 
 		if updateReplacementAttorney := r.FormValue("updateReplacementAttorney"); updateReplacementAttorney != "" {
