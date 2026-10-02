@@ -109,6 +109,10 @@ htmx.on("htmx:afterSettle", (event) => {
           .scrollIntoView({ behavior: "instant" });
       }
     }
+
+    if (swapDetails.target.id === "document-panel") {
+      initPdfViewer(swapDetails.target);
+    }
   }
 });
 

@@ -9,14 +9,18 @@
 {{ end }}
 
 {{ define "action-panel-wrapper" }}
-    {{ template "ActionPanelWrapper" . }}
+    {{ template "actionPanelWrapper" . }}
 {{ end }}
 
 {{ define "main" }}
     <h1 class="govuk-visually-hidden">Documents</h1>
     <div class="document-main-wrapper">
-        <div class="document-list-section">
-            {{ template "DocumentList" . }}
+        <div class="document-list-section" id="document-panel">
+            {{ template "documentList" . }}
         </div>
     </div>
+{{ end }}
+
+{{ define "partial-content" }}
+    {{ template "documentList" . }}
 {{ end }}
