@@ -170,8 +170,8 @@
     </div>
 
     {{ if and (eq .Case.CaseType "LPA") (eq .BlankSectionsEnabled true) }}
-      <div class="govuk-form-group">
-        <fieldset class="govuk-fieldset" aria-describedby="contact-hint">
+      <div class="govuk-form-group"  data-module="app-clear-blank-sections">
+        <fieldset class="govuk-fieldset">
           <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input" id="insert-blank-sections" name="hasBlankSections" type="checkbox" value="true" data-aria-controls="blank-sections-conditional"{{if eq .HasBlankSections "true"}} checked{{end}}>
@@ -194,7 +194,8 @@
                       </label>
                     </div>
                     <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="f-blankSections-2" name="blankSections" type="radio" value="11+15" data-aria-controls="11+15-conditional"{{if eq .SelectedBlankSections "11+15"}} checked{{end}}>
+                      <input class="govuk-radios__input" id="f-blankSections-2" name="blankSections" type="radio"
+                             value="11+15" data-aria-controls="11+15-conditional"{{if eq .SelectedBlankSections "11+15"}} checked{{end}}>
                       <label class="govuk-label govuk-radios__label" for="f-blankSections-2">
                         Section 11 + 15
                       </label>
@@ -207,11 +208,12 @@
                           </div>
                           {{ template "errors" .Error.Field.section11Count1 }}
                           <div class="govuk-radios govuk-radios--small govuk-radios--inline{{ if .Error.Field.section11Count1 }} govuk-radios--error{{ end }}" data-module="govuk-radios">
-                            {{ range 4 }}
+                            {{ range .AttorneyCount }}
                               {{ $count := plusN . 1 }}
                               <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="f-section11Count{{$count}}" name="section11Count" type="radio" value="{{$count}}"{{if eq $.Section11Count (printf "%d" $count)}} checked{{end}}>
-                                <label class="govuk-label govuk-radios__label" for="section11Count{{$count}}">{{$count}}</label>
+                                <input class="govuk-radios__input" id="f-section11Count1-{{$count}}" name="section11Count1" type="radio"
+                                       value="{{$count}}"{{if or (eq $.Section11Count1 (printf "%d" $count)) (eq $.AttorneyCount 1)}} checked{{end}}>
+                                <label class="govuk-label govuk-radios__label" for="section11Count1-{{$count}}">{{$count}}</label>
                               </div>
                             {{ end }}
                           </div>
@@ -219,7 +221,8 @@
                       </div>
                     </div>
                     <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="f-blankSections-3" name="blankSections" type="radio" value="10+11+15" data-aria-controls="10+11+15-conditional"{{if eq .SelectedBlankSections "10+11+15"}} checked{{end}}>
+                      <input class="govuk-radios__input" id="f-blankSections-3" name="blankSections" type="radio"
+                             value="10+11+15" data-aria-controls="10+11+15-conditional"{{if eq .SelectedBlankSections "10+11+15"}} checked{{end}}>
                       <label class="govuk-label govuk-radios__label" for="f-blankSections-3">
                         Section 10 + 11 + 15
                       </label>
@@ -230,13 +233,14 @@
                           <div class="govuk-hint">
                             How many section 11?
                           </div>
-                          {{ template "errors" .Error.Field.section11Count1 }}
-                          <div class="govuk-radios govuk-radios--small govuk-radios--inline{{ if .Error.Field.section11Count1 }} govuk-radios--error{{ end }}" data-module="govuk-radios">
-                            {{ range 4}}
+                          {{ template "errors" .Error.Field.section11Count2 }}
+                          <div class="govuk-radios govuk-radios--small govuk-radios--inline{{ if .Error.Field.section11Count2 }} govuk-radios--error{{ end }}" data-module="govuk-radios">
+                            {{ range .AttorneyCount }}
                               {{ $count := plusN . 1 }}
                               <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="f-section11Count{{$count}}" name="section11Count" type="radio" value="{{$count}}">
-                                <label class="govuk-label govuk-radios__label" for="f-section11Count{{$count}}">{{$count}}</label>
+                                <input class="govuk-radios__input" id="f-section11Count2-{{$count}}" name="section11Count2" type="radio"
+                                       value="{{$count}}"{{if or (eq $.Section11Count2 (printf "%d" $count)) (and (eq $.Section11Count2 "") (eq $count $.AttorneyCount ))}} checked{{end}}>
+                                <label class="govuk-label govuk-radios__label" for="f-section11Count2-{{$count}}">{{$count}}</label>
                               </div>
                             {{ end }}
                           </div>
@@ -244,7 +248,8 @@
                       </div>
                     </div>
                     <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="f-blankSections-4" name="blankSections" type="radio" value="12+13+15"{{if eq .SelectedBlankSections "12+13+15"}} checked{{end}}>
+                      <input class="govuk-radios__input" id="f-blankSections-4" name="blankSections" type="radio"
+                             value="12+13+15"{{if eq .SelectedBlankSections "12+13+15"}} checked{{end}}>
                       <label class="govuk-label govuk-radios__label" for="f-blankSections-4">
                         Section 12 + 13 + 15
                       </label>
