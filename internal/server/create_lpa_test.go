@@ -1772,7 +1772,7 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			name:        "Update notified person redirects",
 			formKey:     "updateNotifiedPerson",
 			formValue:   "111",
-			expectedErr: RedirectError("/create-notified-person?id=1&caseId=2&notifiedPersonId=111"),
+			expectedErr: RedirectError("/update-notified-person?id=1&caseId=2&notifiedPersonId=111"),
 		},
 		{
 			name:        "Update certificate provider redirects",
