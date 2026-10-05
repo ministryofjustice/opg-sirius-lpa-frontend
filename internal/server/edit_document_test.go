@@ -109,12 +109,16 @@ func TestGetEditDocument(t *testing.T) {
 
 			template := &mockTemplate{}
 			templateData := editDocumentData{
-				IsPartial:  htmx,
-				Case:       caseItem,
-				DonorId:    1,
-				Documents:  documents,
-				Document:   document,
-				UsesNotify: true,
+				IsPartial:           htmx,
+				Case:                caseItem,
+				DonorId:             1,
+				Documents:           documents,
+				Document:            document,
+				UsesNotify:          true,
+				Section15:           Section15,
+				Section11And15:      Section11And15,
+				Section10And11And15: Section10And11And15,
+				Section12And13And15: Section12And13And15,
 			}
 
 			if caseType == "digital_lpa" {
@@ -183,10 +187,14 @@ func TestPostSaveDocument(t *testing.T) {
 
 			template := &mockTemplate{}
 			templateData := editDocumentData{
-				Case:      caseItem,
-				DonorId:   1,
-				Documents: documents,
-				Document:  document,
+				Case:                caseItem,
+				DonorId:             1,
+				Documents:           documents,
+				Document:            document,
+				Section15:           Section15,
+				Section11And15:      Section11And15,
+				Section10And11And15: Section10And11And15,
+				Section12And13And15: Section12And13And15,
 			}
 
 			if caseType == "digital_lpa" {
@@ -276,10 +284,14 @@ func TestPostDeleteDocument(t *testing.T) {
 
 				template.
 					On("Func", mock.Anything, editDocumentData{
-						Case:      caseItem,
-						DonorId:   1,
-						Documents: documents,
-						Document:  document,
+						Case:                caseItem,
+						DonorId:             1,
+						Documents:           documents,
+						Document:            document,
+						Section15:           Section15,
+						Section11And15:      Section11And15,
+						Section10And11And15: Section10And11And15,
+						Section12And13And15: Section12And13And15,
 					}).
 					Return(nil)
 			}
@@ -364,11 +376,15 @@ func TestPostPublishDocument(t *testing.T) {
 
 				template.
 					On("Func", mock.Anything, editDocumentData{
-						Case:      caseItem,
-						DonorId:   1,
-						Documents: documents,
-						Document:  document,
-						Success:   true,
+						Case:                caseItem,
+						DonorId:             1,
+						Documents:           documents,
+						Document:            document,
+						Success:             true,
+						Section15:           Section15,
+						Section11And15:      Section11And15,
+						Section10And11And15: Section10And11And15,
+						Section12And13And15: Section12And13And15,
 					}).
 					Return(nil)
 
@@ -444,12 +460,16 @@ func TestPostPreviewDocument(t *testing.T) {
 
 	template.
 		On("Func", mock.Anything, editDocumentData{
-			Case:         caseItem,
-			DonorId:      1,
-			Documents:    documents,
-			Document:     document,
-			PreviewDraft: true,
-			DownloadUUID: "efef6714-b4fe-44c2-b26e-90dfe3663e96",
+			Case:                caseItem,
+			DonorId:             1,
+			Documents:           documents,
+			Document:            document,
+			PreviewDraft:        true,
+			DownloadUUID:        "efef6714-b4fe-44c2-b26e-90dfe3663e96",
+			Section15:           Section15,
+			Section11And15:      Section11And15,
+			Section10And11And15: Section10And11And15,
+			Section12And13And15: Section12And13And15,
 		}).
 		Return(nil)
 
@@ -503,9 +523,13 @@ func TestPostSaveDocumentAndExit(t *testing.T) {
 				errExample = nil
 				template.
 					On("Func", mock.Anything, editDocumentData{
-						SaveAndExit: true,
-						Case:        caseItem,
-						DonorId:     1,
+						SaveAndExit:         true,
+						Case:                caseItem,
+						DonorId:             1,
+						Section15:           Section15,
+						Section11And15:      Section11And15,
+						Section10And11And15: Section10And11And15,
+						Section12And13And15: Section12And13And15,
 					}).
 					Return(nil)
 			}
@@ -667,10 +691,14 @@ func TestGetEditDocumentWhenTemplateErrors(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, editDocumentData{
-			Case:      caseItem,
-			DonorId:   1,
-			Document:  document,
-			Documents: documents,
+			Case:                caseItem,
+			DonorId:             1,
+			Document:            document,
+			Documents:           documents,
+			Section15:           Section15,
+			Section11And15:      Section11And15,
+			Section10And11And15: Section10And11And15,
+			Section12And13And15: Section12And13And15,
 		}).
 		Return(errExample)
 
@@ -767,6 +795,10 @@ func TestPostPublishDocumentWithBlankSections(t *testing.T) {
 					SelectedBlankSections: tc.selectedSections,
 					Section11Count1:       tc.section11Count1,
 					Section11Count2:       tc.section11Count2,
+					Section15:             Section15,
+					Section11And15:        Section11And15,
+					Section10And11And15:   Section10And11And15,
+					Section12And13And15:   Section12And13And15,
 				}).
 				Return(nil)
 
@@ -832,11 +864,15 @@ func TestPostDocumentWithBlankSectionsWhenNoSectionsSelected(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, editDocumentData{
-					Case:             caseItem,
-					DonorId:          1,
-					Documents:        documents,
-					Document:         document,
-					HasBlankSections: "true",
+					Case:                caseItem,
+					DonorId:             1,
+					Documents:           documents,
+					Document:            document,
+					HasBlankSections:    "true",
+					Section15:           Section15,
+					Section11And15:      Section11And15,
+					Section10And11And15: Section10And11And15,
+					Section12And13And15: Section12And13And15,
 					Error: sirius.ValidationError{
 						Field: sirius.FieldErrors{
 							"blankSections": {"reason": "Please select sections to insert"},
@@ -910,6 +946,10 @@ func TestPostDocumentWithBlankSectionsWhenSection11SelectedButNoCount(t *testing
 					Document:              document,
 					HasBlankSections:      "true",
 					SelectedBlankSections: "10+11+15",
+					Section15:             Section15,
+					Section11And15:        Section11And15,
+					Section10And11And15:   Section10And11And15,
+					Section12And13And15:   Section12And13And15,
 					Error: sirius.ValidationError{
 						Field: sirius.FieldErrors{
 							"section11Count2": {"reason": "Please select how many section 11 to insert"},
@@ -984,6 +1024,10 @@ func TestPostDocumentWithBlankSectionsWhenSection11And15SelectedButNoCount(t *te
 					Document:              document,
 					HasBlankSections:      "true",
 					SelectedBlankSections: "11+15",
+					Section15:             Section15,
+					Section11And15:        Section11And15,
+					Section10And11And15:   Section10And11And15,
+					Section12And13And15:   Section12And13And15,
 					Error: sirius.ValidationError{
 						Field: sirius.FieldErrors{
 							"section11Count1": {"reason": "Please select how many section 11 to insert"},
@@ -1072,12 +1116,16 @@ func TestGetAttorneyCount(t *testing.T) {
 
 	template := &mockTemplate{}
 	templateData := editDocumentData{
-		Case:          caseItem,
-		DonorId:       1,
-		Documents:     documents,
-		Document:      document,
-		UsesNotify:    true,
-		AttorneyCount: 4,
+		Case:                caseItem,
+		DonorId:             1,
+		Documents:           documents,
+		Document:            document,
+		UsesNotify:          true,
+		AttorneyCount:       4,
+		Section15:           Section15,
+		Section11And15:      Section11And15,
+		Section10And11And15: Section10And11And15,
+		Section12And13And15: Section12And13And15,
 	}
 
 	template.

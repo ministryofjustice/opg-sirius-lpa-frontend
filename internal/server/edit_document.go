@@ -25,20 +25,25 @@ type EditDocumentClient interface {
 }
 
 type editDocumentData struct {
-	XSRFToken             string
-	IsPartial             bool
-	Success               bool
-	Error                 sirius.ValidationError
-	Case                  sirius.Case
-	CaseSummary           sirius.CaseSummary
-	Documents             []sirius.Document
-	Document              sirius.Document
-	UsesNotify            bool
-	Download              string
-	SaveAndExit           bool
-	PreviewDraft          bool
-	DownloadUUID          string
-	DonorId               int
+	XSRFToken    string
+	IsPartial    bool
+	Success      bool
+	Error        sirius.ValidationError
+	Case         sirius.Case
+	CaseSummary  sirius.CaseSummary
+	Documents    []sirius.Document
+	Document     sirius.Document
+	UsesNotify   bool
+	Download     string
+	SaveAndExit  bool
+	PreviewDraft bool
+	DownloadUUID string
+	DonorId      int
+
+	Section15             string
+	Section11And15        string
+	Section10And11And15   string
+	Section12And13And15   string
 	HasBlankSections      string
 	SelectedBlankSections string
 	Section11Count1       string
@@ -79,6 +84,13 @@ func publishDraftDocument(
 	return nil
 }
 
+const (
+	Section15           = "15"
+	Section11And15      = "11+15"
+	Section10And11And15 = "10+11+15"
+	Section12And13And15 = "12+13+15"
+)
+
 func parseBlankSections(hasBlankSections bool, selectedBlankSections, section11Count1, section11Count2, caseSubType string) ([]string, error) {
 	if !hasBlankSections {
 		return []string{}, nil
@@ -101,7 +113,7 @@ func parseBlankSections(hasBlankSections bool, selectedBlankSections, section11C
 		blankSections[i] = caseSubType + "-" + blankSection
 	}
 
-	if containsSection11 && selectedBlankSections == "11+15" && section11Count1 == "" {
+	if containsSection11 && selectedBlankSections == Section11And15 && section11Count1 == "" {
 		return nil, sirius.ValidationError{
 			Field: sirius.FieldErrors{
 				"section11Count1": {"reason": "Please select how many section 11 to insert"},
@@ -109,7 +121,7 @@ func parseBlankSections(hasBlankSections bool, selectedBlankSections, section11C
 		}
 	}
 
-	if containsSection11 && selectedBlankSections == "10+11+15" && section11Count2 == "" {
+	if containsSection11 && selectedBlankSections == Section10And11And15 && section11Count2 == "" {
 		return nil, sirius.ValidationError{
 			Field: sirius.FieldErrors{
 				"section11Count2": {"reason": "Please select how many section 11 to insert"},
@@ -119,9 +131,9 @@ func parseBlankSections(hasBlankSections bool, selectedBlankSections, section11C
 
 	var section11Count string
 	switch selectedBlankSections {
-	case "11+15":
+	case Section11And15:
 		section11Count = section11Count1
-	case "10+11+15":
+	case Section10And11And15:
 		section11Count = section11Count2
 	}
 	section11CountInt, _ := strconv.Atoi(section11Count)
@@ -170,8 +182,12 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 		}
 
 		data := editDocumentData{
-			XSRFToken: ctx.XSRFToken,
-			IsPartial: ctx.IsPartial,
+			XSRFToken:           ctx.XSRFToken,
+			IsPartial:           ctx.IsPartial,
+			Section15:           Section15,
+			Section11And15:      Section11And15,
+			Section10And11And15: Section10And11And15,
+			Section12And13And15: Section12And13And15,
 		}
 
 		featureToggles, err := client.FeatureToggles(ctx)
