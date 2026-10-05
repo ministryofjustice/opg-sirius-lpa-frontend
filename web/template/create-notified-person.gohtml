@@ -32,12 +32,10 @@
       <div class="govuk-button-group govuk-!-padding-top-5">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
           {{if .AllowNewNotifiedPerson }}
-            {{ if not .IsEditing }}
               <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another-notified-person" value="Save and add another notified person" />
-            {{ end }}
-            {{ if ne .NextNotifiedPersonId 0 }}
+          {{ end }}
+          {{ if and (.IsEditing) (ne .NextNotifiedPersonId 0) }}
               <input class="govuk-button" data-module="govuk-button" type="submit" name="next-notified-person" value="Save and edit next notified person" />
-            {{ end }}
           {{ end }}
           <a class="govuk-link govuk-link--no-visited-state"
               href=""

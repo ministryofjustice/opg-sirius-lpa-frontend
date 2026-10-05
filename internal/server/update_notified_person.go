@@ -67,6 +67,7 @@ func UpdateNotifiedPerson(client UpdateNotifiedPersonClient, tmpl template.Templ
 				break
 			}
 		}
+		data.NextNotifiedPersonId = GetNextNotifiedPersonId(notifiedPersonId, lpa.NotifiedPersons)
 
 		if r.Method == http.MethodPost {
 			notifiedPerson := sirius.NotifiedPerson{
