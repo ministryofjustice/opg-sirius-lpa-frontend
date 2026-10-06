@@ -41,13 +41,6 @@ func (m *mockUpdateAttorneyClient) UpdateAttorney(ctx sirius.Context, attorneyId
 	return args.Error(0)
 }
 
-//var mockRelationshipToDonorCategories = []sirius.RefDataItem{
-//	{
-//		Handle: "LPA_DONOR",
-//		Label:  "LPA Donor",
-//	},
-//}
-
 func TestGetEditAttorney(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run("Case Type: "+caseType, func(t *testing.T) {
@@ -77,13 +70,13 @@ func TestGetEditAttorney(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, AttorneyData{
-					DonorId:              1,
-					CaseId:               2,
-					RelationshipToDonors: mockRelationshipToDonorCategories,
 					Attorney:             existingAttorney,
-					IsEditing:            true,
-					Title:                "Update attorney details",
+					CaseId:               2,
 					CaseType:             caseType,
+					DonorId:              1,
+					IsEditing:            true,
+					RelationshipToDonors: mockRelationshipToDonorCategories,
+					Title:                "Update attorney details",
 				}).
 				Return(nil)
 
@@ -184,21 +177,21 @@ func TestPostEditAttorney(t *testing.T) {
 			existingAttorney := sirius.Attorney{Person: sirius.Person{ID: 4}}
 			updatedAttorney := sirius.Attorney{
 				Person: sirius.Person{
-					Salutation:        "Rev",
-					Firstname:         "Rudolph",
-					Middlenames:       "Modesto",
-					Surname:           "Stotesbury",
-					DateOfBirth:       sirius.DateString(dateString),
 					AddressLine1:      "Rotonda Gerardo 769",
 					AddressLine2:      "Appartamento 94",
 					AddressLine3:      "Augusto terme",
-					Town:              "San Sabazio",
-					County:            "Benevento",
-					Postcode:          "57797",
 					Country:           "Italy",
-					IsAirmailRequired: true,
-					PhoneNumber:       "079876543345",
+					County:            "Benevento",
+					DateOfBirth:       sirius.DateString(dateString),
 					Email:             "rm2@email.test",
+					Firstname:         "Rudolph",
+					IsAirmailRequired: true,
+					Middlenames:       "Modesto",
+					PhoneNumber:       "079876543345",
+					Postcode:          "57797",
+					Salutation:        "Rev",
+					Surname:           "Stotesbury",
+					Town:              "San Sabazio",
 				},
 				RelationshipToDonor: "no relation",
 				SystemStatus:        shared.BoolPtr(true),
@@ -218,38 +211,38 @@ func TestPostEditAttorney(t *testing.T) {
 			if isHtmx {
 				template.
 					On("Func", mock.Anything, AttorneyData{
-						IsPartial:            true,
-						DonorId:              1,
-						CaseId:               2,
-						RelationshipToDonors: mockRelationshipToDonorCategories,
 						Attorney:             updatedAttorney,
-						IsEditing:            true,
-						Title:                "Update attorney details",
+						CaseId:               2,
+						CaseType:             "epa",
+						DonorId:              1,
 						HtmxRedirect:         "/create-epa?id=1&caseId=2",
 						HtmxSwap:             "innerHTML show:#accordion-create-epa-heading-3:top",
-						CaseType:             "epa",
+						IsEditing:            true,
+						IsPartial:            true,
+						RelationshipToDonors: mockRelationshipToDonorCategories,
+						Title:                "Update attorney details",
 					}).
 					Return(nil)
 			}
 
 			form := url.Values{
-				"salutation":          {"Rev"},
-				"firstname":           {"Rudolph"},
-				"middlenames":         {"Modesto"},
-				"surname":             {"Stotesbury"},
-				"dob":                 {dateString},
 				"addressLine1":        {"Rotonda Gerardo 769"},
 				"addressLine2":        {"Appartamento 94"},
 				"addressLine3":        {"Augusto terme"},
-				"town":                {"San Sabazio"},
-				"county":              {"Benevento"},
-				"postcode":            {"57797"},
 				"country":             {"Italy"},
-				"isAirmailRequired":   {"true"},
-				"phoneNumber":         {"079876543345"},
+				"county":              {"Benevento"},
+				"dob":                 {dateString},
 				"email":               {"rm2@email.test"},
-				"relationshipToDonor": {"no relation"},
+				"firstname":           {"Rudolph"},
+				"isAirmailRequired":   {"true"},
 				"isAttorneyActive":    {"true"},
+				"middlenames":         {"Modesto"},
+				"phoneNumber":         {"079876543345"},
+				"postcode":            {"57797"},
+				"relationshipToDonor": {"no relation"},
+				"salutation":          {"Rev"},
+				"surname":             {"Stotesbury"},
+				"town":                {"San Sabazio"},
 			}
 
 			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&attorneyId=4&caseType=epa", strings.NewReader(form.Encode()))
@@ -281,15 +274,15 @@ func TestPostUpdateAttorneyNextAnotherLpa(t *testing.T) {
 			trustCorp := sirius.TrustCorporation{
 				Attorney: sirius.Attorney{
 					Person: sirius.Person{
-						ID:               3,
+						AddressLine1:     "Rotonda Gerardo 769",
 						CompanyName:      "ACME",
 						CompanyReference: "testing",
-						DateOfBirth:      sirius.DateString(dateString),
-						AddressLine1:     "Rotonda Gerardo 769",
-						Town:             "San Sabazio",
 						County:           "Benevento",
-						Postcode:         "57797",
+						DateOfBirth:      sirius.DateString(dateString),
+						ID:               3,
 						PersonType:       "Trust Corporation",
+						Postcode:         "57797",
+						Town:             "San Sabazio",
 					},
 					SystemStatus: shared.BoolPtr(true),
 				},
@@ -302,16 +295,16 @@ func TestPostUpdateAttorneyNextAnotherLpa(t *testing.T) {
 			}
 			updatedAttorney := sirius.Attorney{
 				Person: sirius.Person{
-					Salutation:   "Rev",
-					Firstname:    "Rudolph",
-					Surname:      "Stotesbury",
-					DateOfBirth:  sirius.DateString(dateString),
 					AddressLine1: "Rotonda Gerardo 769",
-					County:       "Benevento",
-					Postcode:     "57797",
 					Country:      "Italy",
+					County:       "Benevento",
+					DateOfBirth:  sirius.DateString(dateString),
 					Email:        "hello@example.com",
+					Firstname:    "Rudolph",
 					PhoneNumber:  "0123456789",
+					Postcode:     "57797",
+					Salutation:   "Rev",
+					Surname:      "Stotesbury",
 				},
 				SystemStatus: shared.BoolPtr(true),
 			}
@@ -333,33 +326,33 @@ func TestPostUpdateAttorneyNextAnotherLpa(t *testing.T) {
 			if isHtmx {
 				template.
 					On("Func", mock.Anything, AttorneyData{
-						IsPartial:            true,
-						IsEditing:            true,
-						DonorId:              1,
-						CaseId:               2,
-						RelationshipToDonors: mockRelationshipToDonorCategories,
 						Attorney:             updatedAttorney,
-						Title:                "Update attorney details",
+						CaseId:               2,
+						CaseType:             "lpa",
+						DonorId:              1,
 						HtmxRedirect:         "/create-trust-corporation?id=1&caseId=2&trustCorporationId=3&replacement=false",
 						HtmxSwap:             "innerHTML scroll:.action-panel__content:top",
-						CaseType:             "lpa",
+						IsEditing:            true,
+						IsPartial:            true,
 						NextAttorneyId:       3,
+						RelationshipToDonors: mockRelationshipToDonorCategories,
+						Title:                "Update attorney details",
 					}).
 					Return(nil)
 			}
 
 			form := url.Values{
-				"salutation":           {"Rev"},
-				"firstname":            {"Rudolph"},
-				"surname":              {"Stotesbury"},
-				"dob":                  {dateString},
 				"addressLine1":         {"Rotonda Gerardo 769"},
-				"county":               {"Benevento"},
-				"postcode":             {"57797"},
 				"country":              {"Italy"},
+				"county":               {"Benevento"},
+				"dob":                  {dateString},
 				"email":                {"hello@example.com"},
-				"phoneNumber":          {"0123456789"},
+				"firstname":            {"Rudolph"},
 				"isAttorneyActive":     {"true"},
+				"phoneNumber":          {"0123456789"},
+				"postcode":             {"57797"},
+				"salutation":           {"Rev"},
+				"surname":              {"Stotesbury"},
 				"update-next-attorney": {"true"},
 			}
 

@@ -42,41 +42,38 @@ func UpdateAttorney(client UpdateAttorneyClient, tmpl template.Template) Handler
 		var nextPersonType string
 		var attorneyId int
 		attorneyIdStr := r.FormValue("attorneyId")
-		isEditing := attorneyIdStr != ""
-		if isEditing {
-			attorneyId, err = strToIntOrStatusError(attorneyIdStr)
+		attorneyId, err = strToIntOrStatusError(attorneyIdStr)
+		if err != nil {
+			return err
+		}
+
+		var attorneys []sirius.Attorney
+		if data.CaseType == "epa" {
+			epa, err := client.Epa(ctx, data.CaseId)
 			if err != nil {
 				return err
 			}
 
-			var attorneys []sirius.Attorney
-			if data.CaseType == "epa" {
-				epa, err := client.Epa(ctx, data.CaseId)
-				if err != nil {
-					return err
-				}
-
-				attorneys = epa.Attorneys
-			} else {
-				attorneys = lpa.Attorneys
-			}
-			var existingAttorney sirius.Attorney
-			for _, attorney := range attorneys {
-				if attorney.ID == attorneyId {
-					existingAttorney = attorney
-					break
-				}
-			}
-
-			// Only overwrite for GET requests
-			if r.Method == http.MethodGet {
-				data.Attorney = existingAttorney
-			}
-
-			data.Title = "Update attorney details"
-			data.IsEditing = true
-			data.NextAttorneyId, nextPersonType = GetIdForNextAttorney(attorneyId, false, lpa.TrustCorporations, lpa.Attorneys)
+			attorneys = epa.Attorneys
+		} else {
+			attorneys = lpa.Attorneys
 		}
+		var existingAttorney sirius.Attorney
+		for _, attorney := range attorneys {
+			if attorney.ID == attorneyId {
+				existingAttorney = attorney
+				break
+			}
+		}
+
+		// Only overwrite for GET requests
+		if r.Method == http.MethodGet {
+			data.Attorney = existingAttorney
+		}
+
+		data.Title = "Update attorney details"
+		data.IsEditing = true
+		data.NextAttorneyId, nextPersonType = GetIdForNextAttorney(attorneyId, false, lpa.TrustCorporations, lpa.Attorneys)
 
 		if r.Method == http.MethodPost {
 			err = client.UpdateAttorney(ctx, attorneyId, data.Attorney)

@@ -63,10 +63,10 @@ func TestGetCreateLpa(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createLpaData{
+			AllowNewNotifiedPerson: true,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
 			Title:                  "Create an LPA",
-			AllowNewNotifiedPerson: true,
 		}).
 		Return(nil)
 
@@ -90,11 +90,11 @@ func TestGetCreateLpaHtmxRequest(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createLpaData{
+			AllowNewNotifiedPerson: true,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
-			Title:                  "Create an LPA",
-			AllowNewNotifiedPerson: true,
 			IsPartial:              true,
+			Title:                  "Create an LPA",
 		}).
 		Return(nil)
 
@@ -119,11 +119,11 @@ func TestGetCreateLpaDoesNotSetIsUpdate(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createLpaData{
+			AllowNewNotifiedPerson: true,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
-			Title:                  "Create an LPA",
 			IsUpdate:               false,
-			AllowNewNotifiedPerson: true,
+			Title:                  "Create an LPA",
 		}).
 		Return(nil)
 
@@ -158,16 +158,16 @@ func TestGetCreateLpaEdit(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, createLpaData{
+					AllowNewNotifiedPerson: true,
+					AppointmentType:        tc.formValue,
+					AttorneyApplicants:     []sirius.Attorney{},
+					CaseId:                 456,
 					DonorId:                123,
 					DonorName:              "Firstname Surname",
-					Title:                  "Edit LPA",
-					CaseId:                 456,
-					Lpa:                    tc.lpa,
-					AppointmentType:        tc.formValue,
 					IsUpdate:               true,
-					AllowNewNotifiedPerson: true,
-					AttorneyApplicants:     []sirius.Attorney{},
+					Lpa:                    tc.lpa,
 					ReplacementAttorneys:   []sirius.Attorney{},
+					Title:                  "Edit LPA",
 				}).
 				Return(nil)
 
@@ -218,14 +218,14 @@ func TestGetCreateLpaEditWithTrustCorporations(t *testing.T) {
 				Return(lpa, nil)
 
 			data := createLpaData{
-				DonorId:                123,
-				DonorName:              "Firstname Surname",
-				Title:                  "Edit LPA",
-				CaseId:                 456,
-				Lpa:                    lpa,
-				IsUpdate:               true,
 				AllowNewNotifiedPerson: true,
 				AttorneyApplicants:     tc.AttorneyApplicants,
+				CaseId:                 456,
+				DonorId:                123,
+				DonorName:              "Firstname Surname",
+				IsUpdate:               true,
+				Lpa:                    lpa,
+				Title:                  "Edit LPA",
 			}
 
 			if tc.isReplacementAttorney {
@@ -352,34 +352,34 @@ func TestPostCreateLpa(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createLpaData{
+			AllowNewNotifiedPerson: true,
+			AppointmentType:        "singular",
+			AttorneyApplicants:     nil,
+			CaseId:                 456,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
+			Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
 			Title:                  "Create an LPA",
 			Success:                true,
 			SuccessMessage:         "You have successfully created an LPA.",
-			AppointmentType:        "singular",
-			CaseId:                 456,
-			Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
-			AllowNewNotifiedPerson: true,
-			AttorneyApplicants:     nil,
 		}).
 		Return(nil)
 
 	form := url.Values{
-		"caseSubtype":                      {"pfa"},
-		"applicationType":                  {"Online"},
-		"onlineLpaId":                      {"A12345678901"},
-		"receiptDate":                      {dateString},
-		"lpaDonorSignatureDate":            {dateString},
-		"certificateProviderSignatureDate": {dateString},
-		"caseAttorney":                     {"singular"},
-		"attorneyActDecisions":             {"When Registered"},
-		"preferencesAndInstructions":       {"guidance"},
+		"additionalInfo":                   {"Some extra info"},
+		"anyOtherInfo":                     {"true"},
 		"applicantType":                    {"donor"},
 		"applicationFee":                   {"card"},
+		"applicationType":                  {"Online"},
+		"attorneyActDecisions":             {"When Registered"},
 		"cardPaymentContact":               {"01234 567890"},
-		"anyOtherInfo":                     {"true"},
-		"additionalInfo":                   {"Some extra info"},
+		"caseAttorney":                     {"singular"},
+		"caseSubtype":                      {"pfa"},
+		"certificateProviderSignatureDate": {dateString},
+		"lpaDonorSignatureDate":            {dateString},
+		"onlineLpaId":                      {"A12345678901"},
+		"preferencesAndInstructions":       {"guidance"},
+		"receiptDate":                      {dateString},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
@@ -429,10 +429,10 @@ func TestPostCreateLpaClearsMismatchedSubtypeOnlyFields(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"caseSubtype":             {"hw"},
-		"lifeSustainingTreatment": {"Option A"},
 		"attorneyActDecisions":    {"When Registered"},
 		"caseAttorney":            {"singular"},
+		"caseSubtype":             {"hw"},
+		"lifeSustainingTreatment": {"Option A"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
@@ -525,10 +525,10 @@ func TestPostCreateLpaDropsOnlineLpaIdWhenNotOnline(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"caseSubtype":     {"pfa"},
 		"applicationType": {"Classic"},
-		"onlineLpaId":     {"A12345678901"},
 		"caseAttorney":    {"singular"},
+		"caseSubtype":     {"pfa"},
+		"onlineLpaId":     {"A12345678901"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
@@ -573,8 +573,8 @@ func TestPostCreateLpaDropsCardPaymentContactWhenCardNotSelected(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"caseAttorney":       {"singular"},
 		"applicationFee":     {"cheque"}, // not "card"
+		"caseAttorney":       {"singular"},
 		"cardPaymentContact": {"01234 567890"},
 	}
 
@@ -620,8 +620,8 @@ func TestPostCreateLpaDropsAdditionalInfoWhenAnyOtherInfoNotSelected(t *testing.
 		Return(nil)
 
 	form := url.Values{
-		"caseAttorney":   {"singular"},
 		"additionalInfo": {"Some info the user typed then unchecked yes"},
+		"caseAttorney":   {"singular"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
@@ -666,8 +666,8 @@ func TestPostCreateLpaApplicationFeeReducedFeeExemption(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"caseAttorney":   {"singular"},
 		"applicationFee": {"cheque", "reducedFee", "repeatApplication"},
+		"caseAttorney":   {"singular"},
 		"reducedFeeType": {"exemption"},
 	}
 
@@ -813,14 +813,14 @@ func TestPostCreateLpaApplicantAndLifeSustainingTreatmentFields(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"caseSubtype":                               {"hw"},
+		"applicantIds":                              {"1", "2"},
+		"applicantSignatureDate":                    {"2022-04-06"},
+		"applicantType":                             {"attorney"},
 		"caseAttorney":                              {"jointly"},
+		"caseSubtype":                               {"hw"},
 		"lifeSustainingTreatment":                   {"None"},
 		"lifeSustainingTreatmentSignatureDate":      {"2022-04-05"},
 		"lifeSustainingTreatmentSignedAndWitnessed": {"true"},
-		"applicantType":                             {"attorney"},
-		"applicantSignatureDate":                    {"2022-04-06"},
-		"applicantIds":                              {"1", "2"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
@@ -884,8 +884,8 @@ func TestPostCreateLpaEditAttorneySignatureDates(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"caseSubtype":               {"hw"},
 		"caseAttorney":              {"jointly"},
+		"caseSubtype":               {"hw"},
 		"lpaPartCSignatureDate-876": {"2022-01-02"},
 		"lpaPartCSignatureDate-987": {"2022-01-02"},
 	}
@@ -951,8 +951,8 @@ func TestPostCreateLpaEditReplacementAttorneySignatureDates(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"caseSubtype":               {"hw"},
 		"caseAttorney":              {"jointly"},
+		"caseSubtype":               {"hw"},
 		"lpaPartCSignatureDate-876": {"2022-01-02"},
 		"lpaPartCSignatureDate-987": {"2022-01-02"},
 	}
@@ -1018,8 +1018,8 @@ func TestPostCreateLpaEditTrustCorporationSignatureDates(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"caseSubtype":               {"hw"},
 		"caseAttorney":              {"jointly"},
+		"caseSubtype":               {"hw"},
 		"lpaPartCSignatureDate-876": {"2022-01-02"},
 		"lpaPartCSignatureDate-987": {"2022-01-02"},
 	}
@@ -1080,8 +1080,8 @@ func TestPostCreateLpaEditAttorneySignatureDatesError(t *testing.T) {
 		Return(errExample)
 
 	form := url.Values{
-		"caseSubtype":               {"hw"},
 		"caseAttorney":              {"jointly"},
+		"caseSubtype":               {"hw"},
 		"lpaPartCSignatureDate-876": {"2022-01-02"},
 		"lpaPartCSignatureDate-987": {"2022-01-02"},
 	}
@@ -1142,8 +1142,8 @@ func TestPostCreateLpaEditReplacementAttorneySignatureDatesError(t *testing.T) {
 		Return(errExample)
 
 	form := url.Values{
-		"caseSubtype":               {"hw"},
 		"caseAttorney":              {"jointly"},
+		"caseSubtype":               {"hw"},
 		"lpaPartCSignatureDate-876": {"2022-01-02"},
 		"lpaPartCSignatureDate-987": {"2022-01-02"},
 	}
@@ -1204,8 +1204,8 @@ func TestPostCreateLpaEditTrustCorporationSignatureDatesError(t *testing.T) {
 		Return(errExample)
 
 	form := url.Values{
-		"caseSubtype":               {"hw"},
 		"caseAttorney":              {"jointly"},
+		"caseSubtype":               {"hw"},
 		"lpaPartCSignatureDate-876": {"2022-01-02"},
 		"lpaPartCSignatureDate-987": {"2022-01-02"},
 	}
@@ -1414,17 +1414,17 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 
 			expectedData := createLpaData{
 				AllowNewNotifiedPerson: true,
-				DonorId:                123,
-				DonorName:              "Firstname Surname",
-				Title:                  "Create an LPA",
-				Success:                true,
-				SuccessMessage:         "You have successfully created an LPA.",
 				AppointmentType:        "singular",
 				CaseId:                 456,
-				Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
+				DonorId:                123,
+				DonorName:              "Firstname Surname",
 				HtmxRedirect:           "/create-replacement-attorney?id=123&caseId=456",
 				HtmxSwap:               "innerHTML",
 				IsPartial:              isHtmx,
+				Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
+				Success:                true,
+				SuccessMessage:         "You have successfully created an LPA.",
+				Title:                  "Create an LPA",
 			}
 
 			if isHtmx {
@@ -1434,20 +1434,20 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 			}
 
 			form := url.Values{
-				"caseSubtype":                {"pfa"},
-				"applicationType":            {"Online"},
-				"onlineLpaId":                {"A12345678901"},
-				"receiptDate":                {dateString},
-				"lpaDonorSignatureDate":      {dateString},
-				"caseAttorney":               {"singular"},
-				"attorneyActDecisions":       {"When Registered"},
-				"preferencesAndInstructions": {"guidance"},
-				"applicantType":              {"donor"},
-				"applicationFee":             {"card"},
-				"cardPaymentContact":         {"01234 567890"},
-				"anyOtherInfo":               {"true"},
 				"additionalInfo":             {"Some extra info"},
 				"addReplacementAttorney":     {"Add replacement attorney"},
+				"anyOtherInfo":               {"true"},
+				"applicantType":              {"donor"},
+				"applicationFee":             {"card"},
+				"applicationType":            {"Online"},
+				"attorneyActDecisions":       {"When Registered"},
+				"cardPaymentContact":         {"01234 567890"},
+				"caseAttorney":               {"singular"},
+				"caseSubtype":                {"pfa"},
+				"lpaDonorSignatureDate":      {dateString},
+				"onlineLpaId":                {"A12345678901"},
+				"preferencesAndInstructions": {"guidance"},
+				"receiptDate":                {dateString},
 			}
 
 			r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
@@ -1519,20 +1519,20 @@ func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 
 			expectedData := createLpaData{
 				AllowNewNotifiedPerson: true,
+				AppointmentType:        "jointly",
+				AttorneyApplicants:     []sirius.Attorney{attorney},
+				CaseId:                 456,
 				DonorId:                123,
 				DonorName:              "Firstname Surname",
-				Title:                  "Edit LPA",
-				IsUpdate:               true,
-				Success:                true,
-				SuccessMessage:         "You have successfully updated an LPA.",
-				AppointmentType:        "jointly",
-				CaseId:                 456,
-				Lpa:                    existingLpa,
 				HtmxRedirect:           "/update-attorney?id=123&caseId=456&caseType=lpa&attorneyId=999",
 				HtmxSwap:               "innerHTML",
 				IsPartial:              isHtmx,
-				AttorneyApplicants:     []sirius.Attorney{attorney},
+				IsUpdate:               true,
+				Lpa:                    existingLpa,
 				ReplacementAttorneys:   []sirius.Attorney{},
+				Success:                true,
+				SuccessMessage:         "You have successfully updated an LPA.",
+				Title:                  "Edit LPA",
 			}
 
 			if isHtmx {
@@ -1542,8 +1542,8 @@ func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 			}
 
 			form := url.Values{
-				"caseSubtype":    {"hw"},
 				"caseAttorney":   {"jointly"},
+				"caseSubtype":    {"hw"},
 				"updateAttorney": {"999"},
 			}
 
@@ -1664,22 +1664,22 @@ func TestPostCreateLpaUpdateReplacementAttorney(t *testing.T) {
 
 			expectedData := createLpaData{
 				AllowNewNotifiedPerson: true,
+				AppointmentType:        "jointly",
+				AttorneyApplicants:     []sirius.Attorney{},
+				CaseId:                 456,
 				DonorId:                123,
 				DonorName:              "Firstname Surname",
-				Title:                  "Edit LPA",
-				IsUpdate:               true,
-				Success:                true,
-				SuccessMessage:         "You have successfully updated an LPA.",
-				AppointmentType:        "jointly",
-				CaseId:                 456,
-				Lpa:                    existingLpa,
 				HtmxRedirect:           "/create-replacement-attorney?id=123&caseId=456&attorneyId=999",
 				HtmxSwap:               "innerHTML",
 				IsPartial:              isHtmx,
-				AttorneyApplicants:     []sirius.Attorney{},
+				IsUpdate:               true,
+				Lpa:                    existingLpa,
 				ReplacementAttorneys: []sirius.Attorney{
 					{Person: sirius.Person{ID: 999, Firstname: "Rudolph", Surname: "Stotesbury"}},
 				},
+				Success:        true,
+				SuccessMessage: "You have successfully updated an LPA.",
+				Title:          "Edit LPA",
 			}
 
 			if isHtmx {
@@ -1689,8 +1689,8 @@ func TestPostCreateLpaUpdateReplacementAttorney(t *testing.T) {
 			}
 
 			form := url.Values{
-				"caseSubtype":               {"hw"},
 				"caseAttorney":              {"jointly"},
+				"caseSubtype":               {"hw"},
 				"updateReplacementAttorney": {"999"},
 			}
 
@@ -1914,21 +1914,21 @@ func TestPostErrorWhenAttorneyRadioSelected(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
-		"caseSubtype":                      {"pfa"},
-		"applicationType":                  {"Online"},
+		"additionalInfo":                   {"Some extra info"},
+		"anyOtherInfo":                     {"true"},
 		"applicantIds":                     {},
-		"onlineLpaId":                      {"A12345678901"},
-		"receiptDate":                      {dateString},
-		"lpaDonorSignatureDate":            {dateString},
-		"certificateProviderSignatureDate": {dateString},
-		"caseAttorney":                     {"singular"},
-		"attorneyActDecisions":             {"When Registered"},
-		"preferencesAndInstructions":       {"guidance"},
 		"applicantType":                    {"attorney"},
 		"applicationFee":                   {"card"},
+		"applicationType":                  {"Online"},
+		"attorneyActDecisions":             {"When Registered"},
 		"cardPaymentContact":               {"01234 567890"},
-		"anyOtherInfo":                     {"true"},
-		"additionalInfo":                   {"Some extra info"},
+		"caseAttorney":                     {"singular"},
+		"caseSubtype":                      {"pfa"},
+		"certificateProviderSignatureDate": {dateString},
+		"lpaDonorSignatureDate":            {dateString},
+		"onlineLpaId":                      {"A12345678901"},
+		"preferencesAndInstructions":       {"guidance"},
+		"receiptDate":                      {dateString},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
