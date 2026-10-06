@@ -31,7 +31,7 @@
 
       <div class="govuk-button-group govuk-!-padding-top-5">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
-          {{if .AllowNewNotifiedPerson }}
+          {{if and (not .IsEditing) (.AllowNewNotifiedPerson)  }}
               <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another-notified-person" value="Save and add another notified person" />
           {{ end }}
           {{ if and (.IsEditing) (ne .NextNotifiedPersonId 0) }}
@@ -62,13 +62,11 @@
           {{ template "form-content" . }}
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
-          {{if .AllowNewNotifiedPerson }}
-            {{ if not .IsEditing }}
+          {{ if and (not .IsEditing) (.AllowNewNotifiedPerson) }}
               <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another-notified-person" value="Save and add another notified person" />
-            {{ end }}
-            {{ if ne .NextNotifiedPersonId 0 }}
-              <input class="govuk-button" data-module="govuk-button" type="submit" name="next-notified-person" value="Save and edit next notified person" />
-            {{ end }}
+          {{ end }}
+          {{ if and (.IsEditing) (ne .NextNotifiedPersonId 0) }}
+            <input class="govuk-button" data-module="govuk-button" type="submit" name="next-notified-person" value="Save and edit next notified person" />
           {{ end }}
           <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-notified-person" .DonorId .CaseId) }}">Cancel</a>
         </div>
