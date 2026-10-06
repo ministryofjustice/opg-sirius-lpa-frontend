@@ -24,7 +24,7 @@
 
     <form class="form"
           method="POST"
-          hx-post="{{ if .IsUpdate }}{{ prefix (printf "/create-lpa?id=%d&caseId=%d" .DonorId .CaseId) }}{{ else }}{{ prefix (printf "/create-lpa?id=%d" .DonorId) }}{{ end }}"
+          hx-post="{{ if .IsUpdate }}{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s" .DonorId .CaseId .FlowQuery) }}{{ else }}{{ prefix (printf "/create-lpa?id=%d%s" .DonorId .FlowQuery) }}{{ end }}"
           hx-target=".action-panel__content"
           hx-swap="innerHTML scroll:.action-panel__content:top"
     >

@@ -18,6 +18,7 @@ type CreateAttorneyClient interface {
 }
 
 type createAttorneyData struct {
+	FlowQuery            string
 	XSRFToken            string
 	IsPartial            bool
 	Attorney             sirius.Attorney
@@ -51,6 +52,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 		caseType := r.FormValue("caseType")
 
 		data := createAttorneyData{
+			FlowQuery: getFlowQuery(r),
 			XSRFToken: ctx.XSRFToken,
 			IsPartial: ctx.IsPartial,
 			DonorId:   donorId,
@@ -155,17 +157,17 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 
 			if r.FormValue("add-another") != "" {
 				if data.IsPartial {
-					data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s", donorId, caseId, caseType)
+					data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s%s", donorId, caseId, caseType, getFlowQuery(r))
 					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
 					return tmpl(w, data)
 				}
-				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s", donorId, caseId, caseType))
+				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s%s", donorId, caseId, caseType, getFlowQuery(r)))
 			}
 
 			if r.FormValue("update-next-attorney") != "" {
-				redirect := fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s&attorneyId=%d", donorId, caseId, caseType, data.NextAttorneyId)
+				redirect := fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s&attorneyId=%d%s", donorId, caseId, caseType, data.NextAttorneyId, getFlowQuery(r))
 				if nextPersonType == "Trust Corporation" {
-					redirect = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=false", donorId, caseId, data.NextAttorneyId)
+					redirect = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=false%s", donorId, caseId, data.NextAttorneyId, getFlowQuery(r))
 				}
 
 				if data.IsPartial {
@@ -177,7 +179,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 			}
 
 			if data.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/create-%s?id=%d&caseId=%d", caseType, donorId, caseId)
+				data.HtmxRedirect = fmt.Sprintf("/create-%s?id=%d&caseId=%d%s", caseType, donorId, caseId, getFlowQuery(r))
 				data.HtmxSwap = "innerHTML show:#accordion-create-epa-heading-3:top"
 				return tmpl(w, data)
 			}
@@ -185,7 +187,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 			if caseType == "epa" {
 				return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 			}
-			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#scroll-to-attorneys", donorId, caseId))
+			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys", donorId, caseId, getFlowQuery(r)))
 		}
 
 		return tmpl(w, data)

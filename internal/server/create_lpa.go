@@ -33,6 +33,7 @@ type createLpaData struct {
 	HtmxRedirect                         string
 	HtmxSwap                             string
 	IsUpdate                             bool
+	FlowQuery                            string
 	Lpa                                  sirius.Lpa
 	ReplacementAttorneyTrustCorporations []sirius.TrustCorporation
 	Success                              bool
@@ -68,8 +69,12 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 		}
 
 		caseIdStr := r.FormValue("caseId")
-		isEditing := caseIdStr != ""
-		if isEditing {
+		hasCaseId := caseIdStr != ""
+		isCreating := !hasCaseId || r.FormValue("flow") == "create"
+		if isCreating {
+			data.FlowQuery = "&flow=create"
+		}
+		if hasCaseId {
 			data.CaseId, err = strToIntOrStatusError(caseIdStr)
 			if err != nil {
 				return err
@@ -96,6 +101,9 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			data.AttorneyApplicants = Applicants(data.Lpa.Attorneys, data.AttorneyTrustCorporations)
 			data.ReplacementAttorneys = Applicants(data.Lpa.ReplacementAttorneys, data.ReplacementAttorneyTrustCorporations)
 		}
+		if isCreating {
+			data.Title = "Create an LPA"
+		}
 
 		if r.Method == http.MethodPost {
 			caseAttorneyValue := r.FormValue("caseAttorney")
@@ -118,6 +126,14 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 					LifeSustainingTreatmentSignatureDateA:     postFormDateString(r, "lifeSustainingTreatmentSignatureDate"),
 					LpaDonorSignatureDate:                     postFormDateString(r, "lpaDonorSignatureDate"),
 				},
+			}
+
+			// set to nil to stop validation error when no appointment type has been selected and still creating a new LPA
+			if isCreating && caseAttorneyValue == "" {
+				lpa.CaseAttorneySingular = nil
+				lpa.CaseAttorneyJointly = nil
+				lpa.CaseAttorneyJointlyAndSeverally = nil
+				lpa.CaseAttorneyJointlyAndJointlyAndSeverally = nil
 			}
 
 			hasAttorneyIdBeenSelected := len(r.PostForm["applicantIds"]) > 0
@@ -193,7 +209,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				return tmpl(w, data)
 			}
 
-			if isEditing {
+			if hasCaseId {
 				err = client.UpdateLpa(ctx, data.CaseId, lpa)
 				if err == nil {
 					data.Lpa, _ = client.Lpa(ctx, data.CaseId)
@@ -244,7 +260,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			}
 
 			if r.FormValue("addAttorney") != "" {
-				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa", donorID, data.CaseId))
+				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa%s", donorID, data.CaseId, data.FlowQuery))
 			}
 			if r.FormValue("addCertificateProvider") != "" {
 				return RedirectError(fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorID, data.CaseId))
@@ -289,7 +305,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			}
 
 			data.Success = true
-			if isEditing {
+			if !isCreating {
 				data.SuccessMessage = "You have successfully updated an LPA."
 			} else {
 				data.SuccessMessage = "You have successfully created an LPA."
@@ -314,11 +330,11 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			}
 
 			if data.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d", donorID, data.CaseId, attorneyID)
+				data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d%s", donorID, data.CaseId, attorneyID, data.FlowQuery)
 				data.HtmxSwap = "innerHTML"
 				return tmpl(w, data)
 			}
-			return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d", donorID, data.CaseId, attorneyID))
+			return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d%s", donorID, data.CaseId, attorneyID, data.FlowQuery))
 		}
 
 		if updateReplacementAttorney := r.FormValue("updateReplacementAttorney"); updateReplacementAttorney != "" {
@@ -337,6 +353,13 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 
 		return tmpl(w, data)
 	}
+}
+
+func getFlowQuery(r *http.Request) string {
+	if r.FormValue("flow") == "create" {
+		return "&flow=create"
+	}
+	return ""
 }
 
 func appointmentTypeFromCase(c sirius.Case) string {
