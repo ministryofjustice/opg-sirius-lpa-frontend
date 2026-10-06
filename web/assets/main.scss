@@ -1077,8 +1077,9 @@ $app-action-panel-height: calc(
 }
 
 .app-case-info {
-  overflow: hidden;
-  padding: 10px 15px 15px;
+  & h2 {
+    color: govuk-colour("white");
+  }
 
   & .govuk-summary-list {
     font-size: 1rem;
@@ -1086,18 +1087,11 @@ $app-action-panel-height: calc(
   }
 
   & .govuk-summary-list__key {
-    width: 20%;
-    padding-bottom: govuk-spacing(2);
     font-weight: 400;
   }
 
   & .govuk-summary-list__value {
-    padding-bottom: govuk-spacing(2);
     font-weight: 700;
-
-    & p {
-      margin: 0;
-    }
   }
 }
 
