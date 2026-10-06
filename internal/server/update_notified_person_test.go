@@ -27,7 +27,7 @@ func (m *mockUpdateNotifiedPersonClient) UpdateNotifiedPerson(ctx sirius.Context
 	return args.Error(0)
 }
 
-func TestGetEditNotifiedPerson(t *testing.T) {
+func TestGetUpdateNotifiedPerson(t *testing.T) {
 	for _, isHtmx := range []bool{false, true} {
 		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
 			existingNotifiedPerson := sirius.NotifiedPerson{
@@ -73,7 +73,27 @@ func TestGetEditNotifiedPerson(t *testing.T) {
 	}
 }
 
-func TestPostEditNotifiedPerson(t *testing.T) {
+func TestGetUpdateNotifiedPersonBadQuery(t *testing.T) {
+	testCases := map[string]string{
+		"no-id":           "/",
+		"bad-id":          "/?id=test",
+		"bad-case-id":     "/?id=123&caseId=test",
+		"bad-notified-id": "/?id=123&caseId=123&notifiedPersonId=test",
+	}
+
+	for name, query := range testCases {
+		t.Run(name, func(t *testing.T) {
+			r, _ := http.NewRequest(http.MethodGet, query, nil)
+			w := httptest.NewRecorder()
+
+			err := UpdateNotifiedPerson(nil, nil)(w, r)
+
+			assert.NotNil(t, err)
+		})
+	}
+}
+
+func TestPostUpdateNotifiedPerson(t *testing.T) {
 	for _, isHtmx := range []bool{false, true} {
 		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
 			dateString := "2022-04-05"
@@ -157,7 +177,7 @@ func TestPostEditNotifiedPerson(t *testing.T) {
 	}
 }
 
-func TestPostEditNotifiedPersonNextAnother(t *testing.T) {
+func TestPostUpdateNotifiedPersonNextAnother(t *testing.T) {
 	for _, isHtmx := range []bool{false, true} {
 		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
 			dateString := "2022-04-05"
