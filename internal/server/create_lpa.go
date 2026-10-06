@@ -107,6 +107,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 
 		if r.Method == http.MethodPost {
 			caseAttorneyValue := r.FormValue("caseAttorney")
+			isSaveAndExit := postFormString(r, "action") == "saveAndExit"
 
 			lpa := sirius.Lpa{
 				OnlineLpaId:                      postFormString(r, "onlineLpaId"),
@@ -128,8 +129,8 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				},
 			}
 
-			// set to nil to stop validation error when no appointment type has been selected and still creating a new LPA
-			if isCreating && caseAttorneyValue == "" {
+			// Omit unanswered appointment fields during creation or intermediate actor saves.
+			if (isCreating || !isSaveAndExit) && caseAttorneyValue == "" {
 				lpa.CaseAttorneySingular = nil
 				lpa.CaseAttorneyJointly = nil
 				lpa.CaseAttorneyJointlyAndSeverally = nil
