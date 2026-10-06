@@ -32,7 +32,7 @@
 
       <div class="govuk-button-group">
         <button class="govuk-button" data-module="govuk-button" type="submit"
-                name="action" value="saveAndExit"
+                name="saveAndExit" value="saveAndExit"
                 data-disable-after-click="true">Save and exit
         </button>
         <a class="govuk-link govuk-link--no-visited-state"
@@ -67,7 +67,7 @@
 
         <div class="govuk-button-group">
           <button class="govuk-button" data-module="govuk-button" type="submit"
-                  name="action" value="saveAndExit"
+                  name="saveAndExit" value="saveAndExit"
                   data-disable-after-click="true">Save and exit
           </button>
           <a data-app-iframe-cancel class="govuk-link govuk-link--no-visited-state" href="#">Cancel</a>
@@ -79,7 +79,7 @@
 
 
 {{ define "form-content" }}
-  <button class="govuk-visually-hidden" tabindex="-1" aria-hidden="true" data-module="govuk-button" type="submit" name="action" value="saveAndExit"></button>
+  <button class="govuk-visually-hidden" tabindex="-1" aria-hidden="true" data-module="govuk-button" type="submit" name="saveAndExit" value="saveAndExit"></button>
   <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
   <div class="govuk-accordion govuk-accordion--scroll-sections" data-module="govuk-accordion" id="accordion-create-lpa">
