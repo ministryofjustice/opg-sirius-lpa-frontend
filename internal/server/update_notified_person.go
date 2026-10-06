@@ -41,6 +41,11 @@ func UpdateNotifiedPerson(client UpdateNotifiedPersonClient, tmpl template.Templ
 			return err
 		}
 
+		notifiedPersonId, err := strToIntOrStatusError(r.FormValue("notifiedPersonId"))
+		if err != nil {
+			return err
+		}
+
 		data := updateNotifiedPersonData{
 			XSRFToken: ctx.XSRFToken,
 			IsPartial: ctx.IsPartial,
@@ -55,12 +60,6 @@ func UpdateNotifiedPerson(client UpdateNotifiedPersonClient, tmpl template.Templ
 			return err
 		}
 
-		var notifiedPersonId int
-		notifiedPersonIdStr := r.FormValue("notifiedPersonId")
-		notifiedPersonId, err = strToIntOrStatusError(notifiedPersonIdStr)
-		if err != nil {
-			return err
-		}
 		for _, notifiedPerson := range lpa.NotifiedPersons {
 			if notifiedPerson.ID == notifiedPersonId {
 				data.NotifiedPerson = notifiedPerson

@@ -93,6 +93,21 @@ func TestGetUpdateNotifiedPersonBadQuery(t *testing.T) {
 	}
 }
 
+func TestGetUpdateNotifiedPersonWhenLpaErrors(t *testing.T) {
+	client := &mockUpdateNotifiedPersonClient{}
+	client.
+		On("Lpa", mock.Anything, 2).
+		Return(sirius.Lpa{}, errExample)
+
+	r, _ := http.NewRequest(http.MethodGet, "update-notified-person?id=1&caseId=2&notifiedPersonId=3", nil)
+	w := httptest.NewRecorder()
+
+	err := UpdateNotifiedPerson(client, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
 func TestPostUpdateNotifiedPerson(t *testing.T) {
 	for _, isHtmx := range []bool{false, true} {
 		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
