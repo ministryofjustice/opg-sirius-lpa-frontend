@@ -2,9 +2,10 @@ import * as pdfjsLib from "pdfjs-dist";
 
 // Set the worker source path - worker file is copied to static/javascript during build
 const prefix = document.body.getAttribute("data-prefix") || "";
+const encodedPrefix = encodeURI(prefix);
 pdfjsLib.GlobalWorkerOptions.workerSrc = `${prefix}/javascript/pdf.worker.min.mjs`;
 
-let svgSpritePrefix = prefix + "/assets/images/icons-sprite.svg";
+let svgSpritePrefix = encodedPrefix + "/assets/images/icons-sprite.svg";
 const staticHash = document.body.getAttribute("data-static-hash") || "";
 if (staticHash) {
   svgSpritePrefix = svgSpritePrefix + "?" + encodeURIComponent(staticHash);
