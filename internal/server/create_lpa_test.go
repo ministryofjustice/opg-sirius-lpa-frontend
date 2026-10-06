@@ -1,4 +1,4 @@
-package server
+git package server
 
 import (
 	"net/http"

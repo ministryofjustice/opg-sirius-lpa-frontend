@@ -96,8 +96,8 @@ describe("Update Attorney on an EPA", () => {
     cy.contains("Edit EPA");
     cy.contains("Rudolph Stotesbury");
     cy.get("#f-update-attorney-3 .govuk-visually-hidden").should(
-        "contain.text",
-        "attorney Rudolph Stotesbury",
+      "contain.text",
+      "attorney Rudolph Stotesbury",
     );
     cy.get("#f-update-attorney-3").click();
 
@@ -112,7 +112,6 @@ describe("Update Attorney on an EPA", () => {
     cy.url().should("include", "create-epa");
   });
 });
-
 
 describe("Create or Update Attorney on an LPA", () => {
   beforeEach(() => {
@@ -229,4 +228,3 @@ describe("Update Attorney on an LPA", () => {
     cy.url().should("include", "create-lpa");
   });
 });
-
