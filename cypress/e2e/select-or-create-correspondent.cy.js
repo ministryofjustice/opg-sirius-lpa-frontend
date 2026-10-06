@@ -82,7 +82,7 @@ describe("Select or create correspondent", () => {
       "contain.text",
       "Steven Munnell",
     );
-    cy.get("label[for=f-certified-provider-1]").should(
+    cy.get("label[for=f-certificate-provider-1]").should(
       "contain.text",
       "Will Oswald",
     );
