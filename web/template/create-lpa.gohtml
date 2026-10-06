@@ -351,24 +351,6 @@
                 </fieldset>
               </div>
               {{ template "input-date" (field "lifeSustainingTreatmentSignatureDate" "Date signed" .Lpa.LifeSustainingTreatmentSignatureDateA .Error.Field.lifeSustainingTreatmentSignatureDate) }}
-              <div class="govuk-form-group {{ if .Error.Field.lifeSustainingTreatmentSignedAndWitnessed }}govuk-form-group--error{{ end }}">
-                <fieldset class="govuk-fieldset">
-                  <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Signed and witnessed correctly</legend>
-                  {{ template "errors" .Error.Field.lifeSustainingTreatmentSignedAndWitnessed }}
-                  <div class="govuk-radios govuk-radios--small app-!-radios--inline {{ if .Error.Field.lifeSustainingTreatmentSignedAndWitnessed }}govuk-radios--error{{ end }}" data-module="govuk-radios">
-                    <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="f-lifeSustainingTreatmentSignedAndWitnessed" name="lifeSustainingTreatmentSignedAndWitnessed" type="radio"
-                             value="true" {{ if compareBoolPointers .Lpa.LifeSustainingTreatmentSignedAndWitnessed true }}checked{{ end }}>
-                      <label class="govuk-label govuk-radios__label" for="f-lifeSustainingTreatmentSignedAndWitnessed">Yes</label>
-                    </div>
-                    <div class="govuk-radios__item">
-                      <input class="govuk-radios__input" id="f-lifeSustainingTreatmentSignedAndWitnessed-2" name="lifeSustainingTreatmentSignedAndWitnessed" type="radio"
-                             value="false" {{ if compareBoolPointers .Lpa.LifeSustainingTreatmentSignedAndWitnessed false }}checked{{ end }}>
-                      <label class="govuk-label govuk-radios__label" for="f-lifeSustainingTreatmentSignedAndWitnessed-2">No</label>
-                    </div>
-                  </div>
-                </fieldset>
-              </div>
             </div>
           </div>
           <div data-module="app-lpa-form-subtype-pfa">

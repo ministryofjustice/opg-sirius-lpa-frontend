@@ -142,8 +142,6 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				lpa.ApplicantIds = nil
 			}
 
-			lpa.LifeSustainingTreatmentSignedAndWitnessed = shared.BoolPtr(postFormString(r, "lifeSustainingTreatmentSignedAndWitnessed") == "true")
-
 			reducedFeeSelected := postFormCheckboxChecked(r, "applicationFee", "reducedFee")
 			reducedFeeType := postFormString(r, "reducedFeeType")
 			lpa.PaymentByCheque = shared.BoolPtr(postFormCheckboxChecked(r, "applicationFee", "cheque"))
@@ -168,7 +166,6 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			if lpa.SubType != "hw" {
 				lpa.LifeSustainingTreatment = ""
 				lpa.LifeSustainingTreatmentSignatureDateA = ""
-				lpa.LifeSustainingTreatmentSignedAndWitnessed = nil
 			}
 
 			preferencesNone := postFormCheckboxChecked(r, "preferencesAndInstructions", "none")

@@ -119,11 +119,11 @@
               </label>
             </div>
           {{ end }}
-          {{ range $num, $certifiedProvider := .Lpa.CertificateProviders }}
+          {{ range $num, $certificateProvider := .Lpa.CertificateProviders }}
             <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="f-certified-provider-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $certifiedProvider.ID }}">
-              <label class="govuk-label govuk-radios__label" for="f-certified-provider-{{ plusN $num 1 }}">
-                  {{ $certifiedProvider.Firstname }} {{ $certifiedProvider.Surname }} (certified provider)
+              <input class="govuk-radios__input" id="f-certificate-provider-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $certificateProvider.ID }}">
+              <label class="govuk-label govuk-radios__label" for="f-certificate-provider-{{ plusN $num 1 }}">
+                  {{ $certificateProvider.Firstname }} {{ $certificateProvider.Surname }} (certificate provider)
               </label>
             </div>
           {{ end }}
