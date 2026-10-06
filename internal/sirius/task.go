@@ -69,3 +69,48 @@ func (c *Client) TasksForCase(ctx Context, caseId int) ([]Task, error) {
 
 	return v.Tasks, err
 }
+
+func (c *Client) TasksForDonor(ctx Context, donorId int) ([]Task, error) {
+	fmt.Printf("TasksForDonor: fetching tasks for donor ID %d\n", donorId)
+
+	path := fmt.Sprintf("/lpa-api/v1/persons/%d/tasks", donorId)
+	fmt.Printf("TasksForDonor: constructed path: %s\n", path)
+
+	querystring := url.Values{}
+	querystring.Set("filter", "status:Not started,active:true")
+	querystring.Set("limit", "99")
+	querystring.Set("sort", "duedate:ASC")
+	fmt.Printf("TasksForDonor: querystring: %s\n", querystring.Encode())
+
+	req, err := c.newRequestWithQuery(ctx, http.MethodGet, path, querystring, nil)
+
+	if err != nil {
+		fmt.Printf("TasksForDonor: error creating request: %v\n", err)
+		return nil, err
+	}
+
+	resp, err := c.http.Do(req)
+	if err != nil {
+		fmt.Printf("TasksForDonor: error executing request: %v\n", err)
+		return nil, err
+	}
+
+	defer resp.Body.Close() //nolint:errcheck // no need to check error when closing body
+
+	fmt.Printf("TasksForDonor: received response with status code: %d\n", resp.StatusCode)
+
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("TasksForDonor: unexpected status code, returning error\n")
+		return nil, newStatusError(resp)
+	}
+
+	var v taskList
+	err = json.NewDecoder(resp.Body).Decode(&v)
+	if err != nil {
+		fmt.Printf("TasksForDonor: error decoding response body: %v\n", err)
+		return nil, err
+	}
+
+	fmt.Printf("TasksForDonor: successfully retrieved %d tasks for donor ID %d\n", len(v.Tasks), donorId)
+	return v.Tasks, err
+}
