@@ -23,7 +23,7 @@
     {{ else }}
       <a class="govuk-back-link"
          href=""
-         hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-attorneys" .DonorId .CaseId) }}"
+         hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys" .DonorId .CaseId .FlowQuery) }}"
          hx-target=".action-panel__content"
          hx-swap="innerHTML show:#scroll-to-attorneys:top">Back</a>
     {{ end }}
@@ -33,7 +33,7 @@
       <div class="govuk-button-group govuk-button-group--row">
         <a class="govuk-link govuk-link--no-visited-state"
            href=""
-           hx-get="{{ prefix (printf "/create-trust-corporation?id=%d&caseId=%d" .DonorId .CaseId) }}"
+           hx-get="{{ prefix (printf "/create-trust-corporation?id=%d&caseId=%d%s" .DonorId .CaseId .FlowQuery) }}"
            hx-target=".action-panel__content"
            hx-swap="innerHTML scroll:.action-panel__content:top">Add a trust corporation as an attorney</a>
       </div>
@@ -41,7 +41,7 @@
 
     <form class="form"
           method="POST"
-          hx-post={{ if .IsEditing }}"{{ prefix (printf "/create-attorney?id=%d&caseId=%d&caseType=%s&attorneyId=%d" .DonorId .CaseId .CaseType .Attorney.ID) }}"{{ else }}"{{ prefix (printf "/create-attorney?id=%d&caseId=%d&caseType=%s" .DonorId .CaseId .CaseType) }}"{{ end }}
+          hx-post={{ if .IsEditing }}"{{ prefix (printf "/update-attorney?id=%d&caseId=%d&caseType=%s&attorneyId=%d%s" .DonorId .CaseId .CaseType .Attorney.ID .FlowQuery) }}"{{ else }}"{{ prefix (printf "/create-attorney?id=%d&caseId=%d&caseType=%s%s" .DonorId .CaseId .CaseType .FlowQuery) }}"{{ end }}
           hx-target=".action-panel__content"
           hx-swap="innerHTML">
 
@@ -65,7 +65,7 @@
           {{ else }}
             <a class="govuk-link govuk-link--no-visited-state"
                href=""
-               hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-attorneys" .DonorId .CaseId) }}"
+               hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys" .DonorId .CaseId .FlowQuery) }}"
                hx-target=".action-panel__content"
                hx-swap="innerHTML show:#scroll-to-attorneys:top">Cancel</a>
           {{ end }}
@@ -84,14 +84,14 @@
       {{ if eq .CaseType "epa" }}
         <a href="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
       {{ else }}
-        <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-attorneys" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+        <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys" .DonorId .CaseId .FlowQuery) }}" class="govuk-back-link">Back</a>
       {{ end }}
 
       <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
       {{ if and (not .IsEditing) (eq .CaseType "lpa") (eq .CaseSubType "pfa") }}
         <div class="govuk-button-group govuk-button-group--row">
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-trust-corporation?id=%d&caseId=%d" .DonorId .CaseId) }}">
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-trust-corporation?id=%d&caseId=%d%s" .DonorId .CaseId .FlowQuery) }}">
             Add a trust corporation as an attorney
           </a>
         </div>
@@ -113,7 +113,7 @@
           {{ if eq .CaseType "epa" }}
             <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}">Cancel</a>
           {{ else }}
-            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-attorneys" .DonorId .CaseId) }}">Cancel</a>
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys" .DonorId .CaseId .FlowQuery) }}">Cancel</a>
           {{ end }}
         </div>
       </form>
