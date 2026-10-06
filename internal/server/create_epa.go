@@ -129,7 +129,7 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 					return err
 				}
 
-				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=epa&attorneyId=%d", donorID, data.CaseId, attorneyID))
+				return RedirectError(fmt.Sprintf("/update-attorney?id=%d&caseId=%d&caseType=epa&attorneyId=%d", donorID, data.CaseId, attorneyID))
 			} else if r.FormValue("addCorrespondent") != "" {
 				if len(data.Epa.Attorneys) > 0 {
 					return RedirectError(fmt.Sprintf("/select-or-create-correspondent?id=%d&caseId=%d&caseType=epa", donorID, data.CaseId))
