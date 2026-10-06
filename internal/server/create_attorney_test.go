@@ -59,15 +59,16 @@ func TestGetCreateAttorney(t *testing.T) {
 				Return(sirius.Lpa{Case: sirius.Case{SubType: "pfa"}}, nil)
 
 			expectedData := AttorneyData{
-				IsPartial:            isHtmx,
-				DonorId:              1,
-				CaseId:               2,
-				RelationshipToDonors: mockRelationshipToDonorCategories,
 				Attorney:             sirius.Attorney{SystemStatus: shared.BoolPtr(true)},
-				Title:                "Add an attorney",
+				CaseId:               2,
 				CaseType:             "lpa",
 				CaseSubType:          "pfa",
+				DonorId:              1,
+				IsPartial:            isHtmx,
+				RelationshipToDonors: mockRelationshipToDonorCategories,
+				Title:                "Add an attorney",
 			}
+
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, expectedData).
@@ -215,37 +216,37 @@ func TestPostCreateAttorneyAddOrNextAnotherEpa(t *testing.T) {
 					if isHtmx {
 						template.
 							On("Func", mock.Anything, AttorneyData{
-								IsPartial:            true,
-								DonorId:              1,
-								CaseId:               2,
-								RelationshipToDonors: mockRelationshipToDonorCategories,
 								Attorney:             attorney,
-								Title:                "Add an attorney",
+								CaseId:               2,
+								CaseType:             "epa",
+								DonorId:              1,
 								HtmxRedirect:         tc.htmxRedirect,
 								HtmxSwap:             tc.htmxSwap,
-								CaseType:             "epa",
+								IsPartial:            true,
+								RelationshipToDonors: mockRelationshipToDonorCategories,
+								Title:                "Add an attorney",
 							}).
 							Return(nil)
 					}
 
 					form := url.Values{
-						"salutation":          {"Rev"},
-						"firstname":           {"Rudolph"},
-						"middlenames":         {"Modesto"},
-						"surname":             {"Stotesbury"},
-						"dob":                 {dateString},
 						"addressLine1":        {"Rotonda Gerardo 769"},
 						"addressLine2":        {"Appartamento 94"},
 						"addressLine3":        {"Augusto terme"},
-						"town":                {"San Sabazio"},
-						"county":              {"Benevento"},
-						"postcode":            {"57797"},
 						"country":             {"Italy"},
-						"isAirmailRequired":   {"true"},
-						"phoneNumber":         {"079876543345"},
+						"county":              {"Benevento"},
+						"dob":                 {dateString},
 						"email":               {"rm2@email.test"},
-						"relationshipToDonor": {"no relation"},
+						"firstname":           {"Rudolph"},
+						"isAirmailRequired":   {"true"},
 						"isAttorneyActive":    {"true"},
+						"middlenames":         {"Modesto"},
+						"phoneNumber":         {"079876543345"},
+						"postcode":            {"57797"},
+						"relationshipToDonor": {"no relation"},
+						"salutation":          {"Rev"},
+						"surname":             {"Stotesbury"},
+						"town":                {"San Sabazio"},
 					}
 					if tc.formKey != "" {
 						form.Set(tc.formKey, "true")
@@ -314,35 +315,35 @@ func TestPostCreateAttorneyWhenValidationError(t *testing.T) {
 			template := &mockTemplate{}
 			template.
 				On("Func", mock.Anything, AttorneyData{
-					IsPartial:            isHtmx,
 					Attorney:             attorney,
-					DonorId:              1,
 					CaseId:               2,
+					CaseType:             "epa",
+					DonorId:              1,
 					Error:                expectedError,
+					IsPartial:            isHtmx,
 					RelationshipToDonors: mockRelationshipToDonorCategories,
 					Title:                "Add an attorney",
-					CaseType:             "epa",
 				}).
 				Return(nil)
 
 			form := url.Values{
-				"salutation":          {"Rev"},
-				"firstname":           {"Rudolph"},
-				"middlenames":         {"Modesto"},
-				"surname":             {"Stotesbury"},
-				"dob":                 {dateString},
 				"addressLine1":        {"Rotonda Gerardo 769"},
 				"addressLine2":        {"Appartamento 94"},
 				"addressLine3":        {"Augusto terme"},
-				"town":                {"San Sabazio"},
-				"county":              {"Benevento"},
-				"postcode":            {"57797"},
 				"country":             {"Italy"},
-				"isAirmailRequired":   {"true"},
-				"phoneNumber":         {"079876543345"},
+				"county":              {"Benevento"},
+				"dob":                 {dateString},
 				"email":               {"rm2@email.test"},
-				"relationshipToDonor": {"no relation"},
+				"firstname":           {"Rudolph"},
+				"isAirmailRequired":   {"true"},
 				"isAttorneyActive":    {"true"},
+				"middlenames":         {"Modesto"},
+				"phoneNumber":         {"079876543345"},
+				"postcode":            {"57797"},
+				"relationshipToDonor": {"no relation"},
+				"salutation":          {"Rev"},
+				"surname":             {"Stotesbury"},
+				"town":                {"San Sabazio"},
 			}
 
 			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType=epa", strings.NewReader(form.Encode()))

@@ -8,20 +8,20 @@ import (
 )
 
 type AttorneyData struct {
-	XSRFToken            string
-	IsPartial            bool
 	Attorney             sirius.Attorney
-	Error                sirius.ValidationError
-	RelationshipToDonors []sirius.RefDataItem
-	DonorId              int
 	CaseId               int
-	CaseType             string
 	CaseSubType          string
-	IsEditing            bool
-	Title                string
-	NextAttorneyId       int
+	CaseType             string
+	DonorId              int
+	Error                sirius.ValidationError
 	HtmxRedirect         string
 	HtmxSwap             string
+	IsEditing            bool
+	IsPartial            bool
+	NextAttorneyId       int
+	RelationshipToDonors []sirius.RefDataItem
+	Title                string
+	XSRFToken            string
 }
 
 func Attorney(r *http.Request, title string) (AttorneyData, error) {
