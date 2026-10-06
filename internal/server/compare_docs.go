@@ -22,6 +22,7 @@ type compareDocsData struct {
 	HasV1PersonsGetPermission      bool
 	HasV1PersonsCasesGetPermission bool
 	HeaderButtons                  SiriusHeaderButtons
+	IsPartial                      bool
 	Pane1                          string
 	Pane2                          string
 	Person                         sirius.Person
@@ -72,6 +73,7 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 			DonorID:                        pageVars.DonorID,
 			HasV1PersonsCasesGetPermission: pageVars.HasV1PersonsCasesGetPermission,
 			HasV1PersonsGetPermission:      pageVars.HasV1PersonsGetPermission,
+			IsPartial:                      ctx.IsPartial,
 			Pane1:                          "list",
 			Pane2:                          "list",
 			Person:                         pageVars.Person,
