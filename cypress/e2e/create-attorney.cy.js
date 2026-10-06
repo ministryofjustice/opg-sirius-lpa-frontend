@@ -23,7 +23,7 @@ const fillInAttorneyDetails = (caseType = "epa") => {
   }
 };
 
-describe("Create or Update Attorney on an EPA", () => {
+describe("Create Attorney on an EPA", () => {
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/epas/2/attorneys", "POST", {
       status: 201,
@@ -56,6 +56,17 @@ describe("Create or Update Attorney on an EPA", () => {
         "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3",
       );
   });
+});
+
+describe("Update Attorney on an EPA", () => {
+  beforeEach(() => {
+    cy.addMock("/lpa-api/v1/epas/2/attorneys", "POST", {
+      status: 201,
+      body: {},
+    });
+
+    cy.visit("/update-attorney?id=1&caseId=2&caseType=epa");
+  });
 
   it("updates an existing attorney on an EPA", () => {
     cy.addMock("/lpa-api/v1/epas/2", "PUT", {
@@ -87,8 +98,8 @@ describe("Create or Update Attorney on an EPA", () => {
     cy.contains("Edit EPA");
     cy.contains("Rudolph Stotesbury");
     cy.get("#f-update-attorney-3 .govuk-visually-hidden").should(
-      "contain.text",
-      "attorney Rudolph Stotesbury",
+        "contain.text",
+        "attorney Rudolph Stotesbury",
     );
     cy.get("#f-update-attorney-3").click();
 
@@ -103,6 +114,7 @@ describe("Create or Update Attorney on an EPA", () => {
     cy.url().should("include", "create-epa");
   });
 });
+
 
 describe("Create or Update Attorney on an LPA", () => {
   beforeEach(() => {
