@@ -56,7 +56,9 @@ describe("Calendars on the header bar", () => {
     cy.get("#header-button-calendars").click();
 
     cy.get(".panel-calendar").should("be.visible");
-    cy.contains("h3", "Difference Calculator").should("be.visible");
+    cy.get("#calc-mode-label")
+      .should("be.visible")
+      .and("contain.text", "Calculate:");
 
     cy.get("#mode-enddate").should("be.checked");
     cy.get("#calc-enddate").should("have.attr", "readonly");
