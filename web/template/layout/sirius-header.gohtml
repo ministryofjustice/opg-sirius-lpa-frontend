@@ -22,7 +22,7 @@
                         {{ end }}
                         {{ if and .HasV1PersonsCasesGetPermission (eq (len .SelectedCases) 1)  (.HeaderButtons.CaseInfo) }}
                             {{ with index .SelectedCases 0 }}
-                                {{ template "header-dropdown-button" headerBarButton "Case information" (prefix (printf "/sirius-header-case-info?id=%d&caseType=%s" .ID .CaseType)) "icon-caseinfo" }}
+                                {{ template "header-dropdown-button" headerBarButton "Case information" (prefix (printf "/sirius-header-case-info?id=%d" .ID)) "icon-caseinfo" }}
                             {{ end }}
                         {{ end }}
                         {{ if and .HasV1PersonsGetPermission (eq (len .SelectedCases) 1) (.HeaderButtons.PersonInfo) }}
