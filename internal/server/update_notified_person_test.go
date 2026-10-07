@@ -109,135 +109,87 @@ func TestGetUpdateNotifiedPersonWhenLpaErrors(t *testing.T) {
 }
 
 func TestPostUpdateNotifiedPerson(t *testing.T) {
-	for _, isHtmx := range []bool{false, true} {
-		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
-			dateString := "2022-04-05"
-			existingNotifiedPerson := sirius.NotifiedPerson{Person: sirius.Person{ID: 4}}
-			updatedNotifiedPerson := sirius.NotifiedPerson{
-				Person: sirius.Person{
-					Salutation:        "Rev",
-					Firstname:         "Rudolph",
-					Middlenames:       "Modesto",
-					Surname:           "Stotesbury",
-					AddressLine1:      "Rotonda Gerardo 769",
-					AddressLine2:      "Appartamento 94",
-					AddressLine3:      "Augusto terme",
-					Town:              "San Sabazio",
-					County:            "Benevento",
-					Postcode:          "57797",
-					Country:           "Italy",
-					IsAirmailRequired: true,
-				},
-				NoticeGivenDate: sirius.DateString(dateString),
-			}
-
-			client := &mockUpdateNotifiedPersonClient{}
-			client.
-				On("Lpa", mock.Anything, 2).
-				Return(sirius.Lpa{Case: sirius.Case{NotifiedPersons: []sirius.NotifiedPerson{existingNotifiedPerson}}}, nil).
-				On("UpdateNotifiedPerson", mock.Anything, 4, updatedNotifiedPerson).
-				Return(nil)
-
-			template := &mockTemplate{}
-			if isHtmx {
-				template.
-					On("Func", mock.Anything, updateNotifiedPersonData{
-						IsPartial:      true,
-						DonorId:        1,
-						CaseId:         2,
-						NotifiedPerson: updatedNotifiedPerson,
-						IsEditing:      true,
-						Title:          "Update notified person details",
-						HtmxRedirect:   "/create-lpa?id=1&caseId=2",
-						HtmxSwap:       "innerHTML show:#scroll-to-notified-person:top",
-					}).
-					Return(nil)
-			}
-
-			form := url.Values{
-				"salutation":        {"Rev"},
-				"firstname":         {"Rudolph"},
-				"middlenames":       {"Modesto"},
-				"surname":           {"Stotesbury"},
-				"noticeGivenDate":   {dateString},
-				"addressLine1":      {"Rotonda Gerardo 769"},
-				"addressLine2":      {"Appartamento 94"},
-				"addressLine3":      {"Augusto terme"},
-				"town":              {"San Sabazio"},
-				"county":            {"Benevento"},
-				"postcode":          {"57797"},
-				"country":           {"Italy"},
-				"isAirmailRequired": {"true"},
-			}
-
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&notifiedPersonId=4", strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", formUrlEncoded)
-			if isHtmx {
-				r.Header.Add("HX-Request", "true")
-			}
-			w := httptest.NewRecorder()
-
-			err := UpdateNotifiedPerson(client, template.Func)(w, r)
-			resp := w.Result()
-
-			if !isHtmx {
-				expectedError := RedirectError("/create-lpa?id=1&caseId=2#scroll-to-notified-person")
-				assert.Equal(t, expectedError, err)
-			} else {
-				assert.Nil(t, err)
-			}
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
-		})
+	dateString := "2022-04-05"
+	existingNotifiedPersons := []sirius.NotifiedPerson{{Person: sirius.Person{ID: 4}}, {Person: sirius.Person{ID: 5}}}
+	updatedNotifiedPerson := sirius.NotifiedPerson{
+		Person: sirius.Person{
+			Salutation:        "Rev",
+			Firstname:         "Rudolph",
+			Middlenames:       "Modesto",
+			Surname:           "Stotesbury",
+			AddressLine1:      "Rotonda Gerardo 769",
+			AddressLine2:      "Appartamento 94",
+			AddressLine3:      "Augusto terme",
+			Town:              "San Sabazio",
+			County:            "Benevento",
+			Postcode:          "57797",
+			Country:           "Italy",
+			IsAirmailRequired: true,
+		},
+		NoticeGivenDate: sirius.DateString(dateString),
 	}
-}
 
-func TestPostUpdateNotifiedPersonNextAnother(t *testing.T) {
-	for _, isHtmx := range []bool{false, true} {
-		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
-			dateString := "2022-04-05"
-			existingNotifiedPerson := sirius.NotifiedPerson{Person: sirius.Person{ID: 4}}
-			updatedNotifiedPerson := sirius.NotifiedPerson{
-				Person: sirius.Person{
-					Salutation:        "Rev",
-					Firstname:         "Rudolph",
-					Middlenames:       "Modesto",
-					Surname:           "Stotesbury",
-					AddressLine1:      "Rotonda Gerardo 769",
-					AddressLine2:      "Appartamento 94",
-					AddressLine3:      "Augusto terme",
-					Town:              "San Sabazio",
-					County:            "Benevento",
-					Postcode:          "57797",
-					Country:           "Italy",
-					IsAirmailRequired: true,
-				},
-				NoticeGivenDate: sirius.DateString(dateString),
-			}
+	tests := []struct {
+		name               string
+		nextNotifiedPerson string
+		htmxRequest        bool
+		htmxRedirect       string
+		htmxSwap           string
+		error              error
+		expectedErr        error
+	}{
+		{
+			name:        "Submit",
+			expectedErr: RedirectError("/create-lpa?id=1&caseId=2#scroll-to-notified-person"),
+		},
+		{
+			name:        "Submit API Failure",
+			error:       errExample,
+			expectedErr: errExample,
+		},
+		{
+			name:         "Submit htmx request",
+			htmxRequest:  true,
+			htmxRedirect: "/create-lpa?id=1&caseId=2",
+			htmxSwap:     "innerHTML show:#scroll-to-notified-person:top",
+		},
+		{
+			name:               "Submit and edit next notified person",
+			nextNotifiedPerson: "true",
+			expectedErr:        RedirectError("/update-notified-person?id=1&caseId=2&notifiedPersonId=5"),
+		},
+		{
+			name:               "Submit and edit next notified person htmx request",
+			nextNotifiedPerson: "true",
+			htmxRequest:        true,
+			htmxRedirect:       "/update-notified-person?id=1&caseId=2&notifiedPersonId=5",
+			htmxSwap:           "innerHTML scroll:.action-panel__content:top",
+		},
+	}
 
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
 			client := &mockUpdateNotifiedPersonClient{}
 			client.
 				On("Lpa", mock.Anything, 2).
-				Return(sirius.Lpa{Case: sirius.Case{NotifiedPersons: []sirius.NotifiedPerson{
-					existingNotifiedPerson,
-					{Person: sirius.Person{ID: 5}},
-				}}}, nil).
+				Return(sirius.Lpa{Case: sirius.Case{NotifiedPersons: existingNotifiedPersons}}, nil)
+			client.
 				On("UpdateNotifiedPerson", mock.Anything, 4, updatedNotifiedPerson).
-				Return(nil)
+				Return(tc.error)
 
 			template := &mockTemplate{}
-			if isHtmx {
+			if tc.htmxRequest {
 				template.
 					On("Func", mock.Anything, updateNotifiedPersonData{
 						IsPartial:            true,
 						DonorId:              1,
 						CaseId:               2,
 						NotifiedPerson:       updatedNotifiedPerson,
+						NextNotifiedPersonId: 5,
 						IsEditing:            true,
 						Title:                "Update notified person details",
-						NextNotifiedPersonId: 5,
-						HtmxRedirect:         "/update-notified-person?id=1&caseId=2&notifiedPersonId=5",
-						HtmxSwap:             "innerHTML scroll:.action-panel__content:top",
+						HtmxRedirect:         tc.htmxRedirect,
+						HtmxSwap:             tc.htmxSwap,
 					}).
 					Return(nil)
 			}
@@ -256,12 +208,12 @@ func TestPostUpdateNotifiedPersonNextAnother(t *testing.T) {
 				"postcode":             {"57797"},
 				"country":              {"Italy"},
 				"isAirmailRequired":    {"true"},
-				"next-notified-person": {"true"},
+				"next-notified-person": {tc.nextNotifiedPerson},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&notifiedPersonId=4", strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/update-notified-person?id=1&caseId=2&notifiedPersonId=4", strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
-			if isHtmx {
+			if tc.htmxRequest {
 				r.Header.Add("HX-Request", "true")
 			}
 			w := httptest.NewRecorder()
@@ -269,12 +221,7 @@ func TestPostUpdateNotifiedPersonNextAnother(t *testing.T) {
 			err := UpdateNotifiedPerson(client, template.Func)(w, r)
 			resp := w.Result()
 
-			if !isHtmx {
-				expectedRedirect := RedirectError("/update-notified-person?id=1&caseId=2&notifiedPersonId=5")
-				assert.Equal(t, expectedRedirect, err)
-			} else {
-				assert.Nil(t, err)
-			}
+			assert.Equal(t, tc.expectedErr, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
