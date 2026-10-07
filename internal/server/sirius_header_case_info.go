@@ -9,14 +9,12 @@ import (
 
 type SiriusHeaderCaseInfoClient interface {
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
-	Lpa(ctx sirius.Context, id int) (sirius.Lpa, error)
 }
 
 type siriusHeaderCaseInfoData struct {
-	XSRFToken                    string
-	CaseID                       int
-	Case                         sirius.Case
-	HasInstructionsOrPreferences bool
+	XSRFToken string
+	CaseID    int
+	Case      sirius.Case
 }
 
 func SiriusHeaderCaseInfo(client SiriusHeaderCaseInfoClient, tmpl template.Template) Handler {
@@ -26,28 +24,17 @@ func SiriusHeaderCaseInfo(client SiriusHeaderCaseInfoClient, tmpl template.Templ
 			return err
 		}
 
-		caseType := r.FormValue("caseType")
-
 		ctx := getContext(r)
 		data := siriusHeaderCaseInfoData{
 			XSRFToken: ctx.XSRFToken,
 			CaseID:    caseId,
 		}
 
-		if caseType == "LPA" {
-			caseItem, err := client.Lpa(ctx, caseId)
-			if err != nil {
-				return err
-			}
-			data.Case = caseItem.Case
-			data.HasInstructionsOrPreferences = (caseItem.ApplicationHasGuidance != nil && *caseItem.ApplicationHasGuidance) || (caseItem.ApplicationHasRestrictions != nil && *caseItem.ApplicationHasRestrictions)
-		} else {
-			caseItem, err := client.Case(ctx, caseId)
-			if err != nil {
-				return err
-			}
-			data.Case = caseItem
+		caseItem, err := client.Case(ctx, caseId)
+		if err != nil {
+			return err
 		}
+		data.Case = caseItem
 
 		return tmpl(w, data)
 	}
