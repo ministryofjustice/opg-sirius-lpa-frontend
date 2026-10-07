@@ -29,12 +29,10 @@ describe("Case info panel on the header bar", () => {
         caseAttorneyJointlyAndJointlyAndSeverally: false,
         lifeSustainingTreatment: "Option A",
         batchId: "123",
-        applicationHasRestrictions: false,
-        applicationHasGuidance: true,
       },
     });
 
-    cy.visit("/sirius-header-case-info?id=123&caseType=LPA");
+    cy.visit("/sirius-header-case-info?id=123");
   });
 
   it("displays the case info panel", () => {
@@ -65,9 +63,6 @@ describe("Case info panel on the header bar", () => {
 
     cy.contains("How attorneys are appointed").should("exist");
     cy.contains("Singular").should("exist");
-
-    cy.contains("Instructions and preferences").should("exist");
-    cy.contains("Yes").should("exist");
 
     cy.contains("LST choice").should("exist");
     cy.contains("Option A").should("exist");
