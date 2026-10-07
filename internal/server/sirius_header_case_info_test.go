@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -17,6 +18,11 @@ type mockSiriusHeaderCaseInfoClient struct {
 func (m *mockSiriusHeaderCaseInfoClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(sirius.Case), args.Error(1)
+}
+
+func (m *mockSiriusHeaderCaseInfoClient) Lpa(ctx sirius.Context, id int) (sirius.Lpa, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.Lpa), args.Error(1)
 }
 
 func TestGetSiriusHeaderCaseInfo(t *testing.T) {
@@ -39,6 +45,41 @@ func TestGetSiriusHeaderCaseInfo(t *testing.T) {
 		Return(nil)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1", nil)
+	w := httptest.NewRecorder()
+
+	err := SiriusHeaderCaseInfo(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetSiriusHeaderCaseInfoForLpa(t *testing.T) {
+	caseItem := sirius.Lpa{
+		Case: sirius.Case{
+			ID:            1,
+			UID:           "7000-0000-0001",
+			CaseRecNumber: "CR123",
+		},
+		ApplicationHasRestrictions: shared.BoolPtr(true),
+		ApplicationHasGuidance:     shared.BoolPtr(true),
+	}
+	client := &mockSiriusHeaderCaseInfoClient{}
+	client.
+		On("Lpa", mock.Anything, 1).
+		Return(caseItem, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, siriusHeaderCaseInfoData{
+			CaseID:                       1,
+			Case:                         caseItem.Case,
+			HasInstructionsOrPreferences: true,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseType=LPA", nil)
 	w := httptest.NewRecorder()
 
 	err := SiriusHeaderCaseInfo(client, template.Func)(w, r)
@@ -76,6 +117,21 @@ func TestGetSiriusHeaderCaseInfoWhenCaseErrors(t *testing.T) {
 		Return(sirius.Case{}, errExample)
 
 	r, _ := http.NewRequest(http.MethodGet, "/?id=1", nil)
+	w := httptest.NewRecorder()
+
+	err := SiriusHeaderCaseInfo(client, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestGetSiriusHeaderCaseInfoWhenLpaErrors(t *testing.T) {
+	client := &mockSiriusHeaderCaseInfoClient{}
+	client.
+		On("Lpa", mock.Anything, 1).
+		Return(sirius.Lpa{}, errExample)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseType=LPA", nil)
 	w := httptest.NewRecorder()
 
 	err := SiriusHeaderCaseInfo(client, nil)(w, r)
