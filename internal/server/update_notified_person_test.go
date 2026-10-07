@@ -280,3 +280,76 @@ func TestPostUpdateNotifiedPersonNextAnother(t *testing.T) {
 		})
 	}
 }
+
+func TestPostUpdateNotifiedPersonWhenValidationError(t *testing.T) {
+	expectedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{"field": {"": "problem"}},
+	}
+
+	dateString := "2022-04-05"
+	notifiedPerson := sirius.NotifiedPerson{
+		Person: sirius.Person{
+			Salutation:        "Rev",
+			Firstname:         "Rudolph",
+			Middlenames:       "Modesto",
+			Surname:           "Stotesbury",
+			AddressLine1:      "Rotonda Gerardo 769",
+			AddressLine2:      "Appartamento 94",
+			AddressLine3:      "Augusto terme",
+			Town:              "San Sabazio",
+			County:            "Benevento",
+			Postcode:          "57797",
+			Country:           "Italy",
+			IsAirmailRequired: true,
+		},
+		NoticeGivenDate: sirius.DateString(dateString),
+	}
+
+	client := &mockUpdateNotifiedPersonClient{}
+	client.
+		On("Lpa", mock.Anything, 2).
+		Return(sirius.Lpa{}, nil).
+		On("UpdateNotifiedPerson", mock.Anything, 3, notifiedPerson).
+		Return(expectedError)
+
+	expectedData := updateNotifiedPersonData{
+		IsEditing:      true,
+		NotifiedPerson: notifiedPerson,
+		DonorId:        1,
+		CaseId:         2,
+		Error:          expectedError,
+		Title:          "Update notified person details",
+	}
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, expectedData).
+		Return(nil)
+
+	form := url.Values{
+		"salutation":        {"Rev"},
+		"firstname":         {"Rudolph"},
+		"middlenames":       {"Modesto"},
+		"surname":           {"Stotesbury"},
+		"noticeGivenDate":   {dateString},
+		"addressLine1":      {"Rotonda Gerardo 769"},
+		"addressLine2":      {"Appartamento 94"},
+		"addressLine3":      {"Augusto terme"},
+		"town":              {"San Sabazio"},
+		"county":            {"Benevento"},
+		"postcode":          {"57797"},
+		"country":           {"Italy"},
+		"isAirmailRequired": {"true"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "update-notified-person/?id=1&caseId=2&notifiedPersonId=3", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := UpdateNotifiedPerson(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
