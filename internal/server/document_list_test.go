@@ -949,6 +949,7 @@ func TestGetDocumentList(t *testing.T) {
 			headerButtons := SiriusHeaderButtons{
 				BackToTimeline: true,
 				Calendar:       true,
+				CaseInfo:       true,
 			}
 
 			template := &mockTemplate{}
@@ -1294,6 +1295,7 @@ func TestDocumentListShowsValidationErrorWhenNoDocumentsSelected(t *testing.T) {
 				HeaderButtons: SiriusHeaderButtons{
 					BackToTimeline: true,
 					Calendar:       true,
+					CaseInfo:       true,
 				},
 			},
 		).
@@ -1534,6 +1536,7 @@ func TestDocumentListDismissValidation(t *testing.T) {
 				HeaderButtons: SiriusHeaderButtons{
 					BackToTimeline: true,
 					Calendar:       true,
+					CaseInfo:       true,
 				},
 			},
 		).
@@ -1949,6 +1952,7 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 				HeaderButtons: SiriusHeaderButtons{
 					BackToTimeline: true,
 					Calendar:       true,
+					CaseInfo:       true,
 				},
 			},
 		).
@@ -2306,6 +2310,7 @@ func TestDocumentListDownloadMultipleInfectedError(t *testing.T) {
 				HeaderButtons: SiriusHeaderButtons{
 					BackToTimeline: true,
 					Calendar:       true,
+					CaseInfo:       true,
 				},
 			},
 		).
