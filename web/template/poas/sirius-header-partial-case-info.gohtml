@@ -83,7 +83,7 @@
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">Instructions and preferences</dt>
           <dd class="govuk-summary-list__value">
-
+            {{ if .HasInstructionsOrPreferences }}Yes{{ else }}None{{ end }}
           </dd>
         </div>
         {{ $isHWCase := or (eq (ToLower .Case.SubType) "hw") (eq (ToLower .Case.SubType) "personal-welfare") }}
