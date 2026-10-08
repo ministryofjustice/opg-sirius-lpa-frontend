@@ -69,7 +69,7 @@ func TestGetEditAttorney(t *testing.T) {
 
 			template := &mockTemplate{}
 			template.
-				On("Func", mock.Anything, AttorneyData{
+				On("Func", mock.Anything, createAttorneyData{
 					Attorney:             existingAttorney,
 					CaseId:               2,
 					CaseType:             caseType,
@@ -210,7 +210,7 @@ func TestPostEditAttorney(t *testing.T) {
 
 			if isHtmx {
 				template.
-					On("Func", mock.Anything, AttorneyData{
+					On("Func", mock.Anything, createAttorneyData{
 						Attorney:             updatedAttorney,
 						CaseId:               2,
 						CaseType:             "epa",
@@ -325,7 +325,7 @@ func TestPostUpdateAttorneyNextAnotherLpa(t *testing.T) {
 
 			if isHtmx {
 				template.
-					On("Func", mock.Anything, AttorneyData{
+					On("Func", mock.Anything, createAttorneyData{
 						Attorney:             updatedAttorney,
 						CaseId:               2,
 						CaseType:             "lpa",

@@ -58,7 +58,7 @@ func TestGetCreateAttorney(t *testing.T) {
 			client.On("Lpa", mock.Anything, 2).
 				Return(sirius.Lpa{Case: sirius.Case{SubType: "pfa"}}, nil)
 
-			expectedData := AttorneyData{
+			expectedData := createAttorneyData{
 				Attorney:             sirius.Attorney{SystemStatus: shared.BoolPtr(true)},
 				CaseId:               2,
 				CaseType:             "lpa",
@@ -215,7 +215,7 @@ func TestPostCreateAttorneyAddOrNextAnotherEpa(t *testing.T) {
 
 					if isHtmx {
 						template.
-							On("Func", mock.Anything, AttorneyData{
+							On("Func", mock.Anything, createAttorneyData{
 								Attorney:             attorney,
 								CaseId:               2,
 								CaseType:             "epa",
@@ -314,7 +314,7 @@ func TestPostCreateAttorneyWhenValidationError(t *testing.T) {
 
 			template := &mockTemplate{}
 			template.
-				On("Func", mock.Anything, AttorneyData{
+				On("Func", mock.Anything, createAttorneyData{
 					Attorney:             attorney,
 					CaseId:               2,
 					CaseType:             "epa",

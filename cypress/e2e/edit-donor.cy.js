@@ -18,6 +18,7 @@ describe("Create donor", () => {
     cy.get("#f-dob").type("1995-07-01");
     cy.get("#f-previousNames").type("Will Macphail");
     cy.get("#f-otherNames").type("Bill");
+    cy.get(".govuk-details__summary").click();
     cy.get("#f-addressLine1").type("47209 Stacey Plain");
     cy.get("#f-addressLine2").type("Suite 113");
     cy.get("#f-addressLine3").type("Devonburgh");
