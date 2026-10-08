@@ -178,7 +178,7 @@ describe("create an LPA", () => {
       "#f-update-correspondent-25 .govuk-visually-hidden",
       "correspondent Mr Correspondent Correspondent",
     );
-    
+
     cy.contains("button", "Save and exit").click();
   });
 });
