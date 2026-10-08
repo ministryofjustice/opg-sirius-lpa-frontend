@@ -47,8 +47,6 @@ describe("create an LPA", () => {
     cy.get("#f-applicantSignatureDate").type("2026-06-19");
     cy.get("#f-applicationFee").click();
     cy.get("#f-cardPaymentContact").type("07700 900000");
-    cy.get("#f-anyOtherInfo").click();
-    cy.get("#f-additionalInfo").type("None");
 
     cy.contains("button", "Save and exit").click();
   });
@@ -171,8 +169,6 @@ describe("create an LPA", () => {
     cy.get("#f-applicantSignatureDate").should("have.value", "2026-06-19");
     cy.get("#f-applicationFee").should("be.checked");
     cy.get("#f-cardPaymentContact").should("have.value", "07700 900000");
-    cy.get("#f-anyOtherInfo").should("be.checked");
-    cy.get("#f-additionalInfo").should("have.value", "None");
 
     cy.contains(
       ".govuk-details__summary-text",
@@ -182,9 +178,7 @@ describe("create an LPA", () => {
       "#f-update-correspondent-25 .govuk-visually-hidden",
       "correspondent Mr Correspondent Correspondent",
     );
-
-    cy.get("#f-additionalInfo").clear().type("Updated info");
-
+    
     cy.contains("button", "Save and exit").click();
   });
 });
