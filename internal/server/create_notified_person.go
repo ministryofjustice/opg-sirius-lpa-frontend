@@ -21,6 +21,7 @@ type CreateNotifiedPersonClient interface {
 
 type createNotifiedPersonData struct {
 	XSRFToken              string
+	FlowQuery              string
 	IsPartial              bool
 	NotifiedPerson         sirius.NotifiedPerson
 	Error                  sirius.ValidationError
@@ -49,6 +50,7 @@ func CreateNotifiedPerson(client CreateNotifiedPersonClient, tmpl template.Templ
 
 		data := createNotifiedPersonData{
 			XSRFToken: ctx.XSRFToken,
+			FlowQuery: getFlowQuery(r),
 			IsPartial: ctx.IsPartial,
 			DonorId:   donorId,
 			CaseId:    caseId,
@@ -97,19 +99,19 @@ func CreateNotifiedPerson(client CreateNotifiedPersonClient, tmpl template.Templ
 
 			if r.FormValue("add-another-notified-person") != "" {
 				if data.IsPartial {
-					data.HtmxRedirect = fmt.Sprintf("/create-notified-person?id=%d&caseId=%d", donorId, caseId)
+					data.HtmxRedirect = fmt.Sprintf("/create-notified-person?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery)
 					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
 					return tmpl(w, data)
 				}
-				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d", donorId, caseId))
+				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery))
 			}
 
 			if data.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId)
+				data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery)
 				data.HtmxSwap = "innerHTML show:#scroll-to-notified-person:top"
 				return tmpl(w, data)
 			}
-			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#scroll-to-notified-person", donorId, caseId))
+			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#scroll-to-notified-person", donorId, caseId, data.FlowQuery))
 
 		}
 

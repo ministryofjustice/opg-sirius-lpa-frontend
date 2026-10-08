@@ -419,14 +419,13 @@ func TestPostUpdateLpaAttorneyNextActor(t *testing.T) {
 
 							client := &mockUpdateAttorneyClient{}
 							client.
-								On("UpdateAttorney", mock.Anything, 2, updatedAttorney).
-								Return(nil).
-								On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
-								Return(mockRelationshipToDonorCategories, nil)
-
-							client.
 								On("Lpa", mock.Anything, 2).
 								Return(lpa, nil)
+							client.
+								On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
+								Return(mockRelationshipToDonorCategories, nil).
+								On("UpdateAttorney", mock.Anything, 2, updatedAttorney).
+								Return(nil)
 
 							template := &mockTemplate{}
 
