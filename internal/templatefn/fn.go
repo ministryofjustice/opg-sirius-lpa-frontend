@@ -349,6 +349,10 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
 						context.CompensationTypes = v
 					}
+				case "decisionTypes":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.DecisionTypes = v
+					}
 				case "donorID":
 					if v, ok := values[i+1].(string); ok {
 						context.DonorID = v
@@ -409,6 +413,7 @@ type EventContext struct {
 	ComplainantCategories  []sirius.RefDataItem
 	ComplaintOrigins       []sirius.RefDataItem
 	CompensationTypes      []sirius.RefDataItem
+	DecisionTypes          []sirius.RefDataItem
 	DonorID                string
 	EventFieldOrder        []string
 }
