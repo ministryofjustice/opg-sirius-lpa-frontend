@@ -107,7 +107,8 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 
 		if r.Method == http.MethodPost {
 			caseAttorneyValue := r.FormValue("caseAttorney")
-			isSaveAndExit := postFormString(r, "action") == "saveAndExit"
+			isSaveAndExit := postFormString(r, "saveAndExit") == "saveAndExit"
+			isActorAction := isLpaActorAction(r)
 
 			lpa := sirius.Lpa{
 				OnlineLpaId:                      postFormString(r, "onlineLpaId"),
@@ -130,7 +131,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			}
 
 			// Omit unanswered appointment fields during creation or intermediate actor saves.
-			if (isCreating || !isSaveAndExit) && caseAttorneyValue == "" {
+			if (isCreating || (isActorAction && !isSaveAndExit)) && caseAttorneyValue == "" {
 				lpa.CaseAttorneySingular = nil
 				lpa.CaseAttorneyJointly = nil
 				lpa.CaseAttorneyJointlyAndSeverally = nil
@@ -361,6 +362,23 @@ func getFlowQuery(r *http.Request) string {
 		return "&flow=create"
 	}
 	return ""
+}
+
+func isLpaActorAction(r *http.Request) bool {
+	for _, name := range []string{
+		"addAttorney", "updateAttorney",
+		"addReplacementAttorney", "updateReplacementAttorney",
+		"updateTrustCorporationAttorney",
+		"updateTrustCorporationReplacementAttorney",
+		"addCertificateProvider", "updateCertificateProvider",
+		"addNotifiedPerson", "updateNotifiedPerson",
+		"addCorrespondent", "updateCorrespondent",
+	} {
+		if postFormString(r, name) != "" {
+			return true
+		}
+	}
+	return false
 }
 
 func appointmentTypeFromCase(c sirius.Case) string {
