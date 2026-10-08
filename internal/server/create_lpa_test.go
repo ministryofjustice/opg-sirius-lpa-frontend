@@ -63,6 +63,7 @@ func TestGetCreateLpa(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createLpaData{
+			FlowQuery:              "&flow=create",
 			AllowNewNotifiedPerson: true,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
@@ -90,6 +91,7 @@ func TestGetCreateLpaHtmxRequest(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createLpaData{
+			FlowQuery:              "&flow=create",
 			AllowNewNotifiedPerson: true,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
@@ -119,6 +121,7 @@ func TestGetCreateLpaDoesNotSetIsUpdate(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createLpaData{
+			FlowQuery:              "&flow=create",
 			AllowNewNotifiedPerson: true,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
@@ -352,6 +355,7 @@ func TestPostCreateLpa(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createLpaData{
+			FlowQuery:              "&flow=create",
 			AllowNewNotifiedPerson: true,
 			AppointmentType:        "singular",
 			AttorneyApplicants:     nil,
@@ -1404,6 +1408,7 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 			template := &mockTemplate{}
 
 			expectedData := createLpaData{
+				FlowQuery:              "&flow=create",
 				AllowNewNotifiedPerson: true,
 				AppointmentType:        "singular",
 				CaseId:                 456,
@@ -1731,7 +1736,7 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			name:        "Add attorney redirects",
 			formKey:     "addAttorney",
 			formValue:   "true",
-			expectedErr: RedirectError("/create-attorney?id=1&caseId=2&caseType=lpa"),
+			expectedErr: RedirectError("/create-attorney?id=1&caseId=2&caseType=lpa&flow=create"),
 		},
 		{
 			name:        "Add certificate provider redirects",
@@ -1797,7 +1802,7 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			name:        "Update attorney redirects",
 			formKey:     "updateAttorney",
 			formValue:   "999",
-			expectedErr: RedirectError("/update-attorney?id=1&caseId=2&caseType=lpa&attorneyId=999"),
+			expectedErr: RedirectError("/update-attorney?id=1&caseId=2&caseType=lpa&attorneyId=999&flow=create"),
 		},
 		{
 			name:        "Update attorney with invalid ID errors",
@@ -1861,6 +1866,7 @@ func TestPostErrorWhenAttorneyRadioSelected(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, createLpaData{
+			FlowQuery:              "&flow=create",
 			AllowNewNotifiedPerson: true,
 			AppointmentType:        "singular",
 			AttorneyApplicants:     nil,
