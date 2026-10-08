@@ -41,41 +41,53 @@ func (m *mockCreateNotifiedPersonClient) UpdateNotifiedPerson(ctx sirius.Context
 }
 
 func TestGetCreateNotifiedPerson(t *testing.T) {
-	for _, isHtmx := range []bool{false, true} {
-		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
-			client := &mockCreateNotifiedPersonClient{}
-			client.
-				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
-				Return(mockRelationshipToDonorCategories, nil).
-				On("Lpa", mock.Anything, 2).
-				Return(sirius.Lpa{}, nil)
+	flowCases := []struct {
+		name      string
+		flowQuery string
+	}{
+		{name: "Without flow"},
+		{name: "Create flow", flowQuery: "&flow=create"},
+	}
+	for _, flowCase := range flowCases {
+		t.Run(flowCase.name, func(t *testing.T) {
+			for _, isHtmx := range []bool{false, true} {
+				t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
+					client := &mockCreateNotifiedPersonClient{}
+					client.
+						On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
+						Return(mockRelationshipToDonorCategories, nil).
+						On("Lpa", mock.Anything, 2).
+						Return(sirius.Lpa{}, nil)
 
-			expectedData := createNotifiedPersonData{
-				IsPartial:              isHtmx,
-				DonorId:                1,
-				CaseId:                 2,
-				RelationshipToDonors:   mockRelationshipToDonorCategories,
-				Title:                  "Add a notified person",
-				AllowNewNotifiedPerson: true,
+					expectedData := createNotifiedPersonData{
+						FlowQuery:              flowCase.flowQuery,
+						IsPartial:              isHtmx,
+						DonorId:                1,
+						CaseId:                 2,
+						RelationshipToDonors:   mockRelationshipToDonorCategories,
+						Title:                  "Add a notified person",
+						AllowNewNotifiedPerson: true,
+					}
+					template := &mockTemplate{}
+					template.
+						On("Func", mock.Anything, expectedData).
+						Return(nil)
+
+					r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2"+flowCase.flowQuery, nil)
+					w := httptest.NewRecorder()
+
+					if isHtmx {
+						r.Header.Add("HX-Request", "true")
+					}
+
+					err := CreateNotifiedPerson(client, template.Func)(w, r)
+					resp := w.Result()
+
+					assert.Nil(t, err)
+					assert.Equal(t, http.StatusOK, resp.StatusCode)
+					mock.AssertExpectationsForObjects(t, client, template)
+				})
 			}
-			template := &mockTemplate{}
-			template.
-				On("Func", mock.Anything, expectedData).
-				Return(nil)
-
-			r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
-			w := httptest.NewRecorder()
-
-			if isHtmx {
-				r.Header.Add("HX-Request", "true")
-			}
-
-			err := CreateNotifiedPerson(client, template.Func)(w, r)
-			resp := w.Result()
-
-			assert.Nil(t, err)
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -181,354 +193,262 @@ func TestGetCreateNotifiedPersonWhenLpaErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestPostCreateNotifiedPerson(t *testing.T) {
-	for _, isHtmx := range []bool{false, true} {
-		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
-			dateString := "2022-04-05"
-			notifiedPerson := sirius.NotifiedPerson{
-				Person: sirius.Person{
-					Salutation:        "Rev",
-					Firstname:         "Rudolph",
-					Middlenames:       "Modesto",
-					Surname:           "Stotesbury",
-					AddressLine1:      "Rotonda Gerardo 769",
-					AddressLine2:      "Appartamento 94",
-					AddressLine3:      "Augusto terme",
-					Town:              "San Sabazio",
-					County:            "Benevento",
-					Postcode:          "57797",
-					Country:           "Italy",
-					IsAirmailRequired: true,
-				},
-				NoticeGivenDate: sirius.DateString(dateString),
-			}
-			client := &mockCreateNotifiedPersonClient{}
-			client.
-				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
-				Return(mockRelationshipToDonorCategories, nil).
-				On("Lpa", mock.Anything, 2).
-				Return(sirius.Lpa{}, nil).
-				On("CreateNotifiedPerson", mock.Anything, 2, notifiedPerson).
-				Return(nil)
+func TestPostCreateNotifiedPersonTransitions(t *testing.T) {
+	transitions := []struct {
+		name         string
+		formKey      string
+		redirect     string
+		fragment     string
+		htmxRedirect string
+		htmxSwap     string
+	}{
+		{
+			name:         "Save and return to LPA",
+			redirect:     "/create-lpa?id=1&caseId=2",
+			fragment:     "#scroll-to-notified-person",
+			htmxRedirect: "/create-lpa?id=1&caseId=2",
+			htmxSwap:     "innerHTML show:#scroll-to-notified-person:top",
+		},
+		{
+			name:         "Save and add another notified person",
+			formKey:      "add-another-notified-person",
+			redirect:     "/create-notified-person?id=1&caseId=2",
+			htmxRedirect: "/create-notified-person?id=1&caseId=2",
+			htmxSwap:     "innerHTML scroll:.action-panel__content:top",
+		},
+	}
+	flowCases := []struct {
+		name      string
+		flowQuery string
+	}{
+		{name: "Without flow"},
+		{name: "Create flow", flowQuery: "&flow=create"},
+	}
 
-			template := &mockTemplate{}
-			if isHtmx {
-				template.
-					On("Func", mock.Anything, createNotifiedPersonData{
-						IsPartial:              true,
-						DonorId:                1,
-						CaseId:                 2,
-						RelationshipToDonors:   mockRelationshipToDonorCategories,
-						NotifiedPerson:         notifiedPerson,
-						Title:                  "Add a notified person",
-						AllowNewNotifiedPerson: true,
-						HtmxRedirect:           "/create-lpa?id=1&caseId=2",
-						HtmxSwap:               "innerHTML show:#scroll-to-notified-person:top",
-					}).
-					Return(nil)
-			}
+	for _, transition := range transitions {
+		t.Run(transition.name, func(t *testing.T) {
+			for _, flowCase := range flowCases {
+				t.Run(flowCase.name, func(t *testing.T) {
+					for _, isHtmx := range []bool{false, true} {
+						t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
+							dateString := "2022-04-05"
+							notifiedPerson := sirius.NotifiedPerson{
+								Person: sirius.Person{
+									Salutation:        "Rev",
+									Firstname:         "Rudolph",
+									Middlenames:       "Modesto",
+									Surname:           "Stotesbury",
+									AddressLine1:      "Rotonda Gerardo 769",
+									AddressLine2:      "Appartamento 94",
+									AddressLine3:      "Augusto terme",
+									Town:              "San Sabazio",
+									County:            "Benevento",
+									Postcode:          "57797",
+									Country:           "Italy",
+									IsAirmailRequired: true,
+								},
+								NoticeGivenDate: sirius.DateString(dateString),
+							}
 
-			form := url.Values{
-				"salutation":        {"Rev"},
-				"firstname":         {"Rudolph"},
-				"middlenames":       {"Modesto"},
-				"surname":           {"Stotesbury"},
-				"noticeGivenDate":   {dateString},
-				"addressLine1":      {"Rotonda Gerardo 769"},
-				"addressLine2":      {"Appartamento 94"},
-				"addressLine3":      {"Augusto terme"},
-				"town":              {"San Sabazio"},
-				"county":            {"Benevento"},
-				"postcode":          {"57797"},
-				"country":           {"Italy"},
-				"isAirmailRequired": {"true"},
-			}
+							client := &mockCreateNotifiedPersonClient{}
+							client.
+								On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
+								Return(mockRelationshipToDonorCategories, nil).
+								On("Lpa", mock.Anything, 2).
+								Return(sirius.Lpa{}, nil).
+								On("CreateNotifiedPerson", mock.Anything, 2, notifiedPerson).
+								Return(nil)
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", formUrlEncoded)
-			if isHtmx {
-				r.Header.Add("HX-Request", "true")
-			}
-			w := httptest.NewRecorder()
+							template := &mockTemplate{}
+							if isHtmx {
+								template.
+									On("Func", mock.Anything, createNotifiedPersonData{
+										FlowQuery:              flowCase.flowQuery,
+										IsPartial:              true,
+										DonorId:                1,
+										CaseId:                 2,
+										RelationshipToDonors:   mockRelationshipToDonorCategories,
+										NotifiedPerson:         notifiedPerson,
+										Title:                  "Add a notified person",
+										AllowNewNotifiedPerson: true,
+										HtmxRedirect:           transition.htmxRedirect + flowCase.flowQuery,
+										HtmxSwap:               transition.htmxSwap,
+									}).
+									Return(nil)
+							}
 
-			err := CreateNotifiedPerson(client, template.Func)(w, r)
-			resp := w.Result()
+							form := url.Values{
+								"salutation":        {"Rev"},
+								"firstname":         {"Rudolph"},
+								"middlenames":       {"Modesto"},
+								"surname":           {"Stotesbury"},
+								"noticeGivenDate":   {dateString},
+								"addressLine1":      {"Rotonda Gerardo 769"},
+								"addressLine2":      {"Appartamento 94"},
+								"addressLine3":      {"Augusto terme"},
+								"town":              {"San Sabazio"},
+								"county":            {"Benevento"},
+								"postcode":          {"57797"},
+								"country":           {"Italy"},
+								"isAirmailRequired": {"true"},
+							}
+							if transition.formKey != "" {
+								form.Set(transition.formKey, "true")
+							}
 
-			if !isHtmx {
-				expectedError := RedirectError("/create-lpa?id=1&caseId=2#scroll-to-notified-person")
-				assert.Equal(t, expectedError, err)
-			} else {
-				assert.Nil(t, err)
+							r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2"+flowCase.flowQuery, strings.NewReader(form.Encode()))
+							r.Header.Add("Content-Type", formUrlEncoded)
+							if isHtmx {
+								r.Header.Add("HX-Request", "true")
+							}
+							w := httptest.NewRecorder()
+
+							err := CreateNotifiedPerson(client, template.Func)(w, r)
+							resp := w.Result()
+
+							if isHtmx {
+								assert.Nil(t, err)
+							} else {
+								assert.Equal(t, RedirectError(transition.redirect+flowCase.flowQuery+transition.fragment), err)
+							}
+							assert.Equal(t, http.StatusOK, resp.StatusCode)
+							mock.AssertExpectationsForObjects(t, client, template)
+						})
+					}
+				})
 			}
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
 
-func TestPostEditNotifiedPerson(t *testing.T) {
-	for _, isHtmx := range []bool{false, true} {
-		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
-			dateString := "2022-04-05"
-			existingNotifiedPerson := sirius.NotifiedPerson{Person: sirius.Person{ID: 4}}
-			updatedNotifiedPerson := sirius.NotifiedPerson{
-				Person: sirius.Person{
-					Salutation:        "Rev",
-					Firstname:         "Rudolph",
-					Middlenames:       "Modesto",
-					Surname:           "Stotesbury",
-					AddressLine1:      "Rotonda Gerardo 769",
-					AddressLine2:      "Appartamento 94",
-					AddressLine3:      "Augusto terme",
-					Town:              "San Sabazio",
-					County:            "Benevento",
-					Postcode:          "57797",
-					Country:           "Italy",
-					IsAirmailRequired: true,
-				},
-				NoticeGivenDate: sirius.DateString(dateString),
-			}
-
-			client := &mockCreateNotifiedPersonClient{}
-			client.
-				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
-				Return(mockRelationshipToDonorCategories, nil).
-				On("Lpa", mock.Anything, 2).
-				Return(sirius.Lpa{Case: sirius.Case{NotifiedPersons: []sirius.NotifiedPerson{existingNotifiedPerson}}}, nil).
-				On("UpdateNotifiedPerson", mock.Anything, 4, updatedNotifiedPerson).
-				Return(nil)
-
-			template := &mockTemplate{}
-			if isHtmx {
-				template.
-					On("Func", mock.Anything, createNotifiedPersonData{
-						IsPartial:              true,
-						DonorId:                1,
-						CaseId:                 2,
-						RelationshipToDonors:   mockRelationshipToDonorCategories,
-						NotifiedPerson:         updatedNotifiedPerson,
-						IsEditing:              true,
-						Title:                  "Update notified person details",
-						AllowNewNotifiedPerson: true,
-						HtmxRedirect:           "/create-lpa?id=1&caseId=2",
-						HtmxSwap:               "innerHTML show:#scroll-to-notified-person:top",
-					}).
-					Return(nil)
-			}
-
-			form := url.Values{
-				"salutation":        {"Rev"},
-				"firstname":         {"Rudolph"},
-				"middlenames":       {"Modesto"},
-				"surname":           {"Stotesbury"},
-				"noticeGivenDate":   {dateString},
-				"addressLine1":      {"Rotonda Gerardo 769"},
-				"addressLine2":      {"Appartamento 94"},
-				"addressLine3":      {"Augusto terme"},
-				"town":              {"San Sabazio"},
-				"county":            {"Benevento"},
-				"postcode":          {"57797"},
-				"country":           {"Italy"},
-				"isAirmailRequired": {"true"},
-			}
-
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&notifiedPersonId=4", strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", formUrlEncoded)
-			if isHtmx {
-				r.Header.Add("HX-Request", "true")
-			}
-			w := httptest.NewRecorder()
-
-			err := CreateNotifiedPerson(client, template.Func)(w, r)
-			resp := w.Result()
-
-			if !isHtmx {
-				expectedError := RedirectError("/create-lpa?id=1&caseId=2#scroll-to-notified-person")
-				assert.Equal(t, expectedError, err)
-			} else {
-				assert.Nil(t, err)
-			}
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
-		})
+func TestPostEditNotifiedPersonTransitions(t *testing.T) {
+	transitions := []struct {
+		name               string
+		formKey            string
+		notifiedPersons    []sirius.NotifiedPerson
+		nextNotifiedPerson int
+		redirect           string
+		fragment           string
+		htmxSwap           string
+	}{
+		{
+			name:            "Save and return to LPA",
+			notifiedPersons: []sirius.NotifiedPerson{{Person: sirius.Person{ID: 4}}},
+			redirect:        "/create-lpa?id=1&caseId=2",
+			fragment:        "#scroll-to-notified-person",
+			htmxSwap:        "innerHTML show:#scroll-to-notified-person:top",
+		},
+		{
+			name:               "Edit next notified person",
+			formKey:            "next-notified-person",
+			notifiedPersons:    []sirius.NotifiedPerson{{Person: sirius.Person{ID: 4}}, {Person: sirius.Person{ID: 5}}},
+			nextNotifiedPerson: 5,
+			redirect:           "/create-notified-person?id=1&caseId=2&notifiedPersonId=5",
+			htmxSwap:           "innerHTML scroll:.action-panel__content:top",
+		},
 	}
-}
-
-func TestPostCreateNotifiedPersonAddAnother(t *testing.T) {
-	for _, isHtmx := range []bool{false, true} {
-		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
-			dateString := "2022-04-05"
-			notifiedPerson := sirius.NotifiedPerson{
-				Person: sirius.Person{
-					Salutation:        "Rev",
-					Firstname:         "Rudolph",
-					Middlenames:       "Modesto",
-					Surname:           "Stotesbury",
-					AddressLine1:      "Rotonda Gerardo 769",
-					AddressLine2:      "Appartamento 94",
-					AddressLine3:      "Augusto terme",
-					Town:              "San Sabazio",
-					County:            "Benevento",
-					Postcode:          "57797",
-					Country:           "Italy",
-					IsAirmailRequired: true,
-				},
-				NoticeGivenDate: sirius.DateString(dateString),
-			}
-			client := &mockCreateNotifiedPersonClient{}
-			client.
-				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
-				Return(mockRelationshipToDonorCategories, nil).
-				On("Lpa", mock.Anything, 2).
-				Return(sirius.Lpa{}, nil).
-				On("CreateNotifiedPerson", mock.Anything, 2, notifiedPerson).
-				Return(nil)
-
-			template := &mockTemplate{}
-			if isHtmx {
-				template.
-					On("Func", mock.Anything, createNotifiedPersonData{
-						IsPartial:              true,
-						DonorId:                1,
-						CaseId:                 2,
-						RelationshipToDonors:   mockRelationshipToDonorCategories,
-						NotifiedPerson:         notifiedPerson,
-						Title:                  "Add a notified person",
-						AllowNewNotifiedPerson: true,
-						HtmxRedirect:           "/create-notified-person?id=1&caseId=2",
-						HtmxSwap:               "innerHTML scroll:.action-panel__content:top",
-					}).
-					Return(nil)
-			}
-
-			form := url.Values{
-				"salutation":                  {"Rev"},
-				"firstname":                   {"Rudolph"},
-				"middlenames":                 {"Modesto"},
-				"surname":                     {"Stotesbury"},
-				"noticeGivenDate":             {dateString},
-				"addressLine1":                {"Rotonda Gerardo 769"},
-				"addressLine2":                {"Appartamento 94"},
-				"addressLine3":                {"Augusto terme"},
-				"town":                        {"San Sabazio"},
-				"county":                      {"Benevento"},
-				"postcode":                    {"57797"},
-				"country":                     {"Italy"},
-				"isAirmailRequired":           {"true"},
-				"add-another-notified-person": {"true"},
-			}
-
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2", strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", formUrlEncoded)
-			if isHtmx {
-				r.Header.Add("HX-Request", "true")
-			}
-			w := httptest.NewRecorder()
-
-			err := CreateNotifiedPerson(client, template.Func)(w, r)
-			resp := w.Result()
-
-			if !isHtmx {
-				expectedError := RedirectError("/create-notified-person?id=1&caseId=2")
-				assert.Equal(t, expectedError, err)
-			} else {
-				assert.Nil(t, err)
-			}
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
-		})
+	flowCases := []struct {
+		name      string
+		flowQuery string
+	}{
+		{name: "Without flow"},
+		{name: "Create flow", flowQuery: "&flow=create"},
 	}
-}
 
-func TestPostEditNotifiedPersonNextAnother(t *testing.T) {
-	for _, isHtmx := range []bool{false, true} {
-		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
-			dateString := "2022-04-05"
-			existingNotifiedPerson := sirius.NotifiedPerson{Person: sirius.Person{ID: 4}}
-			updatedNotifiedPerson := sirius.NotifiedPerson{
-				Person: sirius.Person{
-					Salutation:        "Rev",
-					Firstname:         "Rudolph",
-					Middlenames:       "Modesto",
-					Surname:           "Stotesbury",
-					AddressLine1:      "Rotonda Gerardo 769",
-					AddressLine2:      "Appartamento 94",
-					AddressLine3:      "Augusto terme",
-					Town:              "San Sabazio",
-					County:            "Benevento",
-					Postcode:          "57797",
-					Country:           "Italy",
-					IsAirmailRequired: true,
-				},
-				NoticeGivenDate: sirius.DateString(dateString),
+	for _, transition := range transitions {
+		t.Run(transition.name, func(t *testing.T) {
+			for _, flowCase := range flowCases {
+				t.Run(flowCase.name, func(t *testing.T) {
+					for _, isHtmx := range []bool{false, true} {
+						t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
+							dateString := "2022-04-05"
+							updatedNotifiedPerson := sirius.NotifiedPerson{
+								Person: sirius.Person{
+									Salutation:        "Rev",
+									Firstname:         "Rudolph",
+									Middlenames:       "Modesto",
+									Surname:           "Stotesbury",
+									AddressLine1:      "Rotonda Gerardo 769",
+									AddressLine2:      "Appartamento 94",
+									AddressLine3:      "Augusto terme",
+									Town:              "San Sabazio",
+									County:            "Benevento",
+									Postcode:          "57797",
+									Country:           "Italy",
+									IsAirmailRequired: true,
+								},
+								NoticeGivenDate: sirius.DateString(dateString),
+							}
+
+							client := &mockCreateNotifiedPersonClient{}
+							client.
+								On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
+								Return(mockRelationshipToDonorCategories, nil).
+								On("Lpa", mock.Anything, 2).
+								Return(sirius.Lpa{Case: sirius.Case{NotifiedPersons: transition.notifiedPersons}}, nil).
+								On("UpdateNotifiedPerson", mock.Anything, 4, updatedNotifiedPerson).
+								Return(nil)
+
+							template := &mockTemplate{}
+							if isHtmx {
+								template.
+									On("Func", mock.Anything, createNotifiedPersonData{
+										FlowQuery:              flowCase.flowQuery,
+										IsPartial:              true,
+										DonorId:                1,
+										CaseId:                 2,
+										RelationshipToDonors:   mockRelationshipToDonorCategories,
+										NotifiedPerson:         updatedNotifiedPerson,
+										IsEditing:              true,
+										Title:                  "Update notified person details",
+										NextNotifiedPersonId:   transition.nextNotifiedPerson,
+										AllowNewNotifiedPerson: true,
+										HtmxRedirect:           transition.redirect + flowCase.flowQuery,
+										HtmxSwap:               transition.htmxSwap,
+									}).
+									Return(nil)
+							}
+
+							form := url.Values{
+								"salutation":        {"Rev"},
+								"firstname":         {"Rudolph"},
+								"middlenames":       {"Modesto"},
+								"surname":           {"Stotesbury"},
+								"noticeGivenDate":   {dateString},
+								"addressLine1":      {"Rotonda Gerardo 769"},
+								"addressLine2":      {"Appartamento 94"},
+								"addressLine3":      {"Augusto terme"},
+								"town":              {"San Sabazio"},
+								"county":            {"Benevento"},
+								"postcode":          {"57797"},
+								"country":           {"Italy"},
+								"isAirmailRequired": {"true"},
+							}
+							if transition.formKey != "" {
+								form.Set(transition.formKey, "true")
+							}
+
+							r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&notifiedPersonId=4"+flowCase.flowQuery, strings.NewReader(form.Encode()))
+							r.Header.Add("Content-Type", formUrlEncoded)
+							if isHtmx {
+								r.Header.Add("HX-Request", "true")
+							}
+							w := httptest.NewRecorder()
+
+							err := CreateNotifiedPerson(client, template.Func)(w, r)
+							resp := w.Result()
+
+							if isHtmx {
+								assert.Nil(t, err)
+							} else {
+								assert.Equal(t, RedirectError(transition.redirect+flowCase.flowQuery+transition.fragment), err)
+							}
+							assert.Equal(t, http.StatusOK, resp.StatusCode)
+							mock.AssertExpectationsForObjects(t, client, template)
+						})
+					}
+				})
 			}
-
-			client := &mockCreateNotifiedPersonClient{}
-			client.
-				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
-				Return(mockRelationshipToDonorCategories, nil).
-				On("Lpa", mock.Anything, 2).
-				Return(sirius.Lpa{Case: sirius.Case{NotifiedPersons: []sirius.NotifiedPerson{
-					existingNotifiedPerson,
-					{Person: sirius.Person{ID: 5}},
-				}}}, nil).
-				On("UpdateNotifiedPerson", mock.Anything, 4, updatedNotifiedPerson).
-				Return(nil)
-
-			template := &mockTemplate{}
-			if isHtmx {
-				template.
-					On("Func", mock.Anything, createNotifiedPersonData{
-						IsPartial:              true,
-						DonorId:                1,
-						CaseId:                 2,
-						RelationshipToDonors:   mockRelationshipToDonorCategories,
-						NotifiedPerson:         updatedNotifiedPerson,
-						IsEditing:              true,
-						Title:                  "Update notified person details",
-						NextNotifiedPersonId:   5,
-						AllowNewNotifiedPerson: true,
-						HtmxRedirect:           "/create-notified-person?id=1&caseId=2&notifiedPersonId=5",
-						HtmxSwap:               "innerHTML scroll:.action-panel__content:top",
-					}).
-					Return(nil)
-			}
-
-			form := url.Values{
-				"salutation":           {"Rev"},
-				"firstname":            {"Rudolph"},
-				"middlenames":          {"Modesto"},
-				"surname":              {"Stotesbury"},
-				"noticeGivenDate":      {dateString},
-				"addressLine1":         {"Rotonda Gerardo 769"},
-				"addressLine2":         {"Appartamento 94"},
-				"addressLine3":         {"Augusto terme"},
-				"town":                 {"San Sabazio"},
-				"county":               {"Benevento"},
-				"postcode":             {"57797"},
-				"country":              {"Italy"},
-				"isAirmailRequired":    {"true"},
-				"next-notified-person": {"true"},
-			}
-
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&notifiedPersonId=4", strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", formUrlEncoded)
-			if isHtmx {
-				r.Header.Add("HX-Request", "true")
-			}
-			w := httptest.NewRecorder()
-
-			err := CreateNotifiedPerson(client, template.Func)(w, r)
-			resp := w.Result()
-
-			if !isHtmx {
-				expectedRedirect := RedirectError("/create-notified-person?id=1&caseId=2&notifiedPersonId=5")
-				assert.Equal(t, expectedRedirect, err)
-			} else {
-				assert.Nil(t, err)
-			}
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }

@@ -16,14 +16,14 @@
 
     <a class="govuk-back-link"
        href=""
-       hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-2" .DonorId .CaseId) }}"
+      hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-2" .DonorId .CaseId .FlowQuery) }}"
        hx-target=".action-panel__content"
        hx-swap="innerHTML show:#accordion-create-lpa-heading-2:top">Back</a>
 
     <h1 class="govuk-heading-m">{{ .Title }}</h1>
 
     <form class="form" method="POST"
-          hx-post={{ if .IsEditing }}"{{ prefix (printf "/create-notified-person?id=%d&caseId=%d&notifiedPersonId=%d" .DonorId .CaseId .NotifiedPerson.ID) }}"{{ else }}"{{ prefix (printf "/create-notified-person?id=%d&caseId=%d" .DonorId .CaseId) }}"{{ end }}
+          hx-post={{ if .IsEditing }}"{{ prefix (printf "/create-notified-person?id=%d&caseId=%d&notifiedPersonId=%d%s" .DonorId .CaseId .NotifiedPerson.ID .FlowQuery) }}"{{ else }}"{{ prefix (printf "/create-notified-person?id=%d&caseId=%d%s" .DonorId .CaseId .FlowQuery) }}"{{ end }}
           hx-target=".action-panel__content"
           hx-swap="innerHTML">
 
@@ -41,7 +41,7 @@
           {{ end }}
           <a class="govuk-link govuk-link--no-visited-state"
               href=""
-              hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-2" .DonorId .CaseId) }}"
+              hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-2" .DonorId .CaseId .FlowQuery) }}"
               hx-target=".action-panel__content"
               hx-swap="innerHTML show:#accordion-create-lpa-heading-2:top">Cancel</a>
       </div>
@@ -56,7 +56,7 @@
     <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {{ template "error-summary" .Error }}
-      <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-2" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+      <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-2" .DonorId .CaseId .FlowQuery) }}" class="govuk-back-link">Back</a>
 
       <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
@@ -72,7 +72,7 @@
               <input class="govuk-button" data-module="govuk-button" type="submit" name="next-notified-person" value="Save and edit next notified person" />
             {{ end }}
           {{ end }}
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-notified-person" .DonorId .CaseId) }}">Cancel</a>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-notified-person" .DonorId .CaseId .FlowQuery) }}">Cancel</a>
         </div>
       </form>
     </div>

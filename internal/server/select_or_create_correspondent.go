@@ -16,6 +16,7 @@ type SelectOrCreateCorrespondentClient interface {
 
 type selectOrCreateCorrespondentData struct {
 	XSRFToken     string
+	FlowQuery     string
 	IsPartial     bool
 	DonorId       int
 	CaseId        int
@@ -42,6 +43,7 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 
 		data := selectOrCreateCorrespondentData{
 			XSRFToken: ctx.XSRFToken,
+			FlowQuery: getFlowQuery(r),
 			DonorId:   donorId,
 			CaseId:    caseId,
 			CaseType:  r.FormValue("caseType"),
@@ -114,11 +116,11 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 					if data.CaseType == "epa" {
 						return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 					}
-					return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-4", donorId, caseId))
+					return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-4", donorId, caseId, data.FlowQuery))
 				}
 			}
 
-			return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d&caseType=%s", donorId, caseId, data.CaseType))
+			return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d&caseType=%s%s", donorId, caseId, data.CaseType, data.FlowQuery))
 		}
 
 		return tmpl(w, data)

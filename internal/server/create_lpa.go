@@ -265,37 +265,37 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa%s", donorID, data.CaseId, data.FlowQuery))
 			}
 			if r.FormValue("addCertificateProvider") != "" {
-				return RedirectError(fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorID, data.CaseId))
+				return RedirectError(fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d%s", donorID, data.CaseId, data.FlowQuery))
 			}
 			if r.FormValue("addCorrespondent") != "" {
-				return RedirectError(fmt.Sprintf("/select-or-create-correspondent?id=%d&caseId=%d&caseType=lpa", donorID, data.CaseId))
+				return RedirectError(fmt.Sprintf("/select-or-create-correspondent?id=%d&caseId=%d&caseType=lpa%s", donorID, data.CaseId, data.FlowQuery))
 			}
 
 			if r.FormValue("updateCorrespondent") != "" {
-				return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d&caseType=lpa", donorID, data.CaseId))
+				return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d&caseType=lpa%s", donorID, data.CaseId, data.FlowQuery))
 			}
 			if r.FormValue("addNotifiedPerson") != "" {
-				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d", donorID, data.CaseId))
+				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d%s", donorID, data.CaseId, data.FlowQuery))
 			} else if updateNotifiedPerson := r.FormValue("updateNotifiedPerson"); updateNotifiedPerson != "" {
 				notifiedPersonID, err := strToIntOrStatusError(updateNotifiedPerson)
 				if err != nil {
 					return err
 				}
-				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d&notifiedPersonId=%d", donorID, data.CaseId, notifiedPersonID))
+				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d&notifiedPersonId=%d%s", donorID, data.CaseId, notifiedPersonID, data.FlowQuery))
 			}
 			if trustCorporationIdStr := r.FormValue("updateTrustCorporationAttorney"); trustCorporationIdStr != "" {
 				trustCorporationId, err := strToIntOrStatusError(trustCorporationIdStr)
 				if err != nil {
 					return err
 				}
-				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=false", donorID, data.CaseId, trustCorporationId))
+				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=false%s", donorID, data.CaseId, trustCorporationId, data.FlowQuery))
 			}
 			if trustCorporationIdStr := r.FormValue("updateTrustCorporationReplacementAttorney"); trustCorporationIdStr != "" {
 				trustCorporationId, err := strToIntOrStatusError(trustCorporationIdStr)
 				if err != nil {
 					return err
 				}
-				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=true", donorID, data.CaseId, trustCorporationId))
+				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=true%s", donorID, data.CaseId, trustCorporationId, data.FlowQuery))
 			}
 
 			if r.FormValue("updateCertificateProvider") != "" {
@@ -303,7 +303,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				if err != nil {
 					return err
 				}
-				return RedirectError(fmt.Sprintf("/edit-certificate-provider?id=%d&caseId=%d&personId=%d", donorID, data.CaseId, personID))
+				return RedirectError(fmt.Sprintf("/edit-certificate-provider?id=%d&caseId=%d&personId=%d%s", donorID, data.CaseId, personID, data.FlowQuery))
 			}
 
 			data.Success = true
@@ -318,11 +318,11 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 
 		if r.FormValue("addReplacementAttorney") != "" {
 			if data.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorID, data.CaseId)
+				data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d%s", donorID, data.CaseId, data.FlowQuery)
 				data.HtmxSwap = "innerHTML"
 				return tmpl(w, data)
 			}
-			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorID, data.CaseId))
+			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d%s", donorID, data.CaseId, data.FlowQuery))
 		}
 
 		if updateAttorney := r.FormValue("updateAttorney"); updateAttorney != "" {
@@ -346,11 +346,11 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			}
 
 			if data.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d", donorID, data.CaseId, attorneyID)
+				data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorID, data.CaseId, attorneyID, data.FlowQuery)
 				data.HtmxSwap = "innerHTML"
 				return tmpl(w, data)
 			}
-			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d", donorID, data.CaseId, attorneyID))
+			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorID, data.CaseId, attorneyID, data.FlowQuery))
 		}
 
 		return tmpl(w, data)
