@@ -116,32 +116,6 @@
               </fieldset>
             </div>
 
-            <div class="govuk-form-group {{ if .Error.Field.applicationType }}govuk-form-group--error{{ end }}">
-              <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Application type</legend>
-                {{ template "errors" .Error.Field.applicationType }}
-                <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
-                  <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="f-applicationType" name="applicationType" type="radio"
-                           value="Online" data-aria-controls="onlineLpaIdReveal"
-                           {{ if eq .Lpa.ApplicationType "Online" }}checked{{ end }}>
-                    <label class="govuk-label govuk-radios__label" for="f-applicationType">Online</label>
-                  </div>
-                  <div class="govuk-radios__conditional {{ if ne .Lpa.ApplicationType "Online" }}govuk-radios__conditional--hidden{{ end }}"
-                       id="onlineLpaIdReveal">
-                    <div class="govuk-form-group">
-                      {{ template "input" (field "onlineLpaId" "A-reference" .Lpa.OnlineLpaId .Error.Field.onlineLpaId) }}
-                    </div>
-                  </div>
-                  <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="f-applicationType-2" name="applicationType" type="radio"
-                           value="Classic" {{ if eq .Lpa.ApplicationType "Classic" }}checked{{ end }}>
-                    <label class="govuk-label govuk-radios__label" for="f-applicationType-2">Classic</label>
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-
             {{ if not .IsUpdate }}
               {{ template "input-date" (field "receiptDate" "Receipt date" .Lpa.ReceiptDate .Error.Field.receiptDate "max" today "boldLabel" true) }}
             {{ else }}
@@ -739,26 +713,35 @@
         <div class="govuk-summary-card">
           <div class="govuk-summary-card__title-wrapper">
             <h2 class="govuk-summary-card__title">
-              Any other information
+              Other information
             </h2>
           </div>
           <div class="govuk-summary-card__content">
             <div class="govuk-form-group">
-              <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-                <div class="govuk-checkboxes__item">
-                  <input class="govuk-checkboxes__input" id="f-anyOtherInfo" name="anyOtherInfo"
-                         type="checkbox" value="true" data-aria-controls="additionalInfoReveal"
-                         {{ if compareBoolPointers .Lpa.AnyOtherInfo true }}checked{{ end }}>
-                  <label class="govuk-label govuk-checkboxes__label" for="f-anyOtherInfo">
-                    Yes
-                  </label>
-                </div>
-                <div class="govuk-checkboxes__conditional {{ if not (compareBoolPointers .Lpa.AnyOtherInfo true) }}govuk-checkboxes__conditional--hidden{{ end }}"
-                     id="additionalInfoReveal">
-                  <div class="govuk-form-group">
-                    {{ template "textarea" (field "additionalInfo" "Give details" .Lpa.AdditionalInfo .Error.Field.additionalInfo) }}
+              <div class="govuk-form-group {{ if .Error.Field.applicationType }}govuk-form-group--error{{ end }}">
+                <fieldset class="govuk-fieldset">
+                  <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Application type</legend>
+                  {{ template "errors" .Error.Field.applicationType }}
+                  <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                    <div class="govuk-radios__item">
+                      <input class="govuk-radios__input" id="f-applicationType" name="applicationType" type="radio"
+                             value="Online" data-aria-controls="onlineLpaIdReveal"
+                             {{ if eq .Lpa.ApplicationType "Online" }}checked{{ end }}>
+                      <label class="govuk-label govuk-radios__label" for="f-applicationType">Online</label>
+                    </div>
+                    <div class="govuk-radios__conditional {{ if ne .Lpa.ApplicationType "Online" }}govuk-radios__conditional--hidden{{ end }}"
+                         id="onlineLpaIdReveal">
+                      <div class="govuk-form-group">
+                        {{ template "input" (field "onlineLpaId" "A-reference" .Lpa.OnlineLpaId .Error.Field.onlineLpaId) }}
+                      </div>
+                    </div>
+                    <div class="govuk-radios__item">
+                      <input class="govuk-radios__input" id="f-applicationType-2" name="applicationType" type="radio"
+                             value="Classic" {{ if eq .Lpa.ApplicationType "Classic" }}checked{{ end }}>
+                      <label class="govuk-label govuk-radios__label" for="f-applicationType-2">Classic</label>
+                    </div>
                   </div>
-                </div>
+                </fieldset>
               </div>
             </div>
           </div>
