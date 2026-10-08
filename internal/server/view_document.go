@@ -22,6 +22,7 @@ type viewDocumentData struct {
 	HasV1PersonsCasesGetPermission bool
 	HasV1PersonsGetPermission      bool
 	HeaderButtons                  SiriusHeaderButtons
+	IsPartial                      bool
 	IsSysAdminUser                 bool
 	Pane                           int
 	Person                         sirius.Person
@@ -76,6 +77,7 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			DonorID:                        pageVars.DonorID,
 			HasV1PersonsCasesGetPermission: pageVars.HasV1PersonsCasesGetPermission,
 			HasV1PersonsGetPermission:      pageVars.HasV1PersonsGetPermission,
+			IsPartial:                      ctx.IsPartial,
 			IsSysAdminUser:                 isSysAdminUser,
 			Pane:                           pane,
 			Person:                         pageVars.Person,
