@@ -16,13 +16,46 @@ type CreateAttorneyClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
+type createAttorneyData struct {
+	XSRFToken            string
+	IsPartial            bool
+	Attorney             sirius.Attorney
+	Error                sirius.ValidationError
+	RelationshipToDonors []sirius.RefDataItem
+	DonorId              int
+	CaseId               int
+	CaseType             string
+	CaseSubType          string
+	IsEditing            bool
+	Title                string
+	NextAttorneyId       int
+	HtmxRedirect         string
+	HtmxSwap             string
+}
+
 func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
-		data, err := Attorney(r, "Add an attorney")
+		donorId, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
 			return err
+		}
+
+		caseId, err := strToIntOrStatusError(r.FormValue("caseId"))
+		if err != nil {
+			return err
+		}
+
+		caseType := r.FormValue("caseType")
+
+		data := createAttorneyData{
+			XSRFToken: ctx.XSRFToken,
+			IsPartial: ctx.IsPartial,
+			DonorId:   donorId,
+			CaseId:    caseId,
+			CaseType:  caseType,
+			Title:     "Add an attorney",
 		}
 
 		var lpa sirius.Lpa
@@ -44,7 +77,34 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 		data.Attorney.SystemStatus = shared.BoolPtr(true)
 
 		if r.Method == http.MethodPost {
-			err = client.CreateAttorney(ctx, data.CaseId, data.CaseType, data.Attorney)
+			attorney := sirius.Attorney{
+				Person: sirius.Person{
+					Salutation:        postFormString(r, "salutation"),
+					Firstname:         postFormString(r, "firstname"),
+					Middlenames:       postFormString(r, "middlenames"),
+					Surname:           postFormString(r, "surname"),
+					DateOfBirth:       postFormDateString(r, "dob"),
+					PhoneNumber:       postFormString(r, "phoneNumber"),
+					Email:             postFormString(r, "email"),
+					AddressLine1:      postFormString(r, "addressLine1"),
+					AddressLine2:      postFormString(r, "addressLine2"),
+					AddressLine3:      postFormString(r, "addressLine3"),
+					Town:              postFormString(r, "town"),
+					County:            postFormString(r, "county"),
+					Country:           postFormString(r, "country"),
+					Postcode:          postFormString(r, "postcode"),
+					IsAirmailRequired: postFormString(r, "isAirmailRequired") == "true",
+				},
+				SystemStatus: shared.BoolPtr(postFormString(r, "isAttorneyActive") == "true"),
+			}
+
+			if caseType == "epa" {
+				attorney.CompanyName = postFormString(r, "companyName")
+				attorney.RelationshipToDonor = postFormString(r, "relationshipToDonor")
+			}
+			data.Attorney = attorney
+
+			err = client.CreateAttorney(ctx, data.CaseId, data.CaseType, attorney)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)

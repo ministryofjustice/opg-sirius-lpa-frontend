@@ -23,40 +23,40 @@ const fillInAttorneyDetails = (caseType = "epa") => {
   }
 };
 
-// describe("Create Attorney on an EPA", () => {
-//   beforeEach(() => {
-//     cy.addMock("/lpa-api/v1/epas/2/attorneys", "POST", {
-//       status: 201,
-//       body: {},
-//     });
-//
-//     cy.visit("/create-attorney?id=1&caseId=2&caseType=epa");
-//   });
-//
-//   it("creates an attorney on an EPA", () => {
-//     fillInAttorneyDetails();
-//     cy.contains("Add an attorney");
-//     cy.get("button[type=submit]").click();
-//     cy.url().should("include", "create-epa");
-//   });
-//
-//   it("creates an attorney on an EPA and add another attorney", () => {
-//     fillInAttorneyDetails();
-//     cy.contains("Add an attorney");
-//     cy.get("input[type=submit][name=add-another]").click();
-//     cy.url().should("include", "create-attorney");
-//   });
-//
-//   it("has a back link to the EPA form", () => {
-//     cy.get(".govuk-back-link")
-//       .should("exist")
-//       .and("have.attr", "href")
-//       .and(
-//         "include",
-//         "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3",
-//       );
-//   });
-// });
+describe("Create Attorney on an EPA", () => {
+  beforeEach(() => {
+    cy.addMock("/lpa-api/v1/epas/2/attorneys", "POST", {
+      status: 201,
+      body: {},
+    });
+
+    cy.visit("/create-attorney?id=1&caseId=2&caseType=epa");
+  });
+
+  it("creates an attorney on an EPA", () => {
+    fillInAttorneyDetails();
+    cy.contains("Add an attorney");
+    cy.get("button[type=submit]").click();
+    cy.url().should("include", "create-epa");
+  });
+
+  it("creates an attorney on an EPA and add another attorney", () => {
+    fillInAttorneyDetails();
+    cy.contains("Add an attorney");
+    cy.get("input[type=submit][name=add-another]").click();
+    cy.url().should("include", "create-attorney");
+  });
+
+  it("has a back link to the EPA form", () => {
+    cy.get(".govuk-back-link")
+      .should("exist")
+      .and("have.attr", "href")
+      .and(
+        "include",
+        "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3",
+      );
+  });
+});
 
 describe("Update Attorney on an EPA", () => {
   beforeEach(() => {
