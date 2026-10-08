@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -11,6 +12,11 @@ import (
 
 type mockGetPayments struct {
 	mock.Mock
+}
+
+func (m *mockGetPayments) DeclineFeeReductions(ctx sirius.Context, id int) ([]sirius.DeclineFeeReductions, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]sirius.DeclineFeeReductions), args.Error(1)
 }
 
 func (m *mockGetPayments) Payments(ctx sirius.Context, id int) ([]sirius.Payment, error) {
@@ -95,6 +101,15 @@ func TestGetPayments(t *testing.T) {
 		},
 	}
 
+	declineFeeReductions := []sirius.DeclineFeeReductions{
+		{
+			ID:             1,
+			DecisionDate:   "2022-08-23",
+			DecisionType:   shared.DecisionTypeExemption,
+			DecisionReason: "Cant have it sorry",
+		},
+	}
+
 	client := &mockGetPayments{}
 	client.
 		On("Payments", mock.Anything, 901).
@@ -108,20 +123,23 @@ func TestGetPayments(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return(feeReductionTypes, nil).
 		On("GetUserDetails", mock.Anything).
-		Return(user, nil)
+		Return(user, nil).
+		On("DeclineFeeReductions", mock.Anything, 901).
+		Return(declineFeeReductions, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getPaymentsData{
-			PaymentSources:    paymentSources,
-			ReferenceTypes:    referenceTypes,
-			Payments:          nonReductionPayments,
-			FeeReductionTypes: feeReductionTypes,
-			Case:              caseItem,
-			TotalPaid:         5538,
-			IsReducedFeesUser: true,
-			IsSysAdminUser:    false,
-			OutstandingFee:    expectedPaymentTotal - 5538,
+			PaymentSources:       paymentSources,
+			ReferenceTypes:       referenceTypes,
+			Payments:             nonReductionPayments,
+			FeeReductionTypes:    feeReductionTypes,
+			Case:                 caseItem,
+			TotalPaid:            5538,
+			IsReducedFeesUser:    true,
+			IsSysAdminUser:       false,
+			OutstandingFee:       expectedPaymentTotal - 5538,
+			DeclineFeeReductions: declineFeeReductions,
 		}).
 		Return(nil)
 
@@ -202,22 +220,25 @@ func TestGetPaymentsHtmx(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return(feeReductionTypes, nil).
 		On("GetUserDetails", mock.Anything).
-		Return(user, nil)
+		Return(user, nil).
+		On("DeclineFeeReductions", mock.Anything, 901).
+		Return([]sirius.DeclineFeeReductions{}, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getPaymentsData{
-			PaymentSources:    paymentSources,
-			ReferenceTypes:    referenceTypes,
-			Payments:          nonReductionPayments,
-			FeeReductionTypes: feeReductionTypes,
-			Case:              caseItem,
-			TotalPaid:         5538,
-			IsReducedFeesUser: true,
-			IsSysAdminUser:    false,
-			OutstandingFee:    expectedPaymentTotal - 5538,
-			InActionPanel:     true,
-			IsPartial:         true,
+			PaymentSources:       paymentSources,
+			ReferenceTypes:       referenceTypes,
+			Payments:             nonReductionPayments,
+			FeeReductionTypes:    feeReductionTypes,
+			Case:                 caseItem,
+			TotalPaid:            5538,
+			IsReducedFeesUser:    true,
+			IsSysAdminUser:       false,
+			OutstandingFee:       expectedPaymentTotal - 5538,
+			InActionPanel:        true,
+			IsPartial:            true,
+			DeclineFeeReductions: []sirius.DeclineFeeReductions{},
 		}).
 		Return(nil)
 
@@ -348,7 +369,9 @@ func TestGetPaymentsWhenFailureOnGetPayments(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil).
 		On("Payments", mock.Anything, 9).
-		Return([]sirius.Payment{}, errExample)
+		Return([]sirius.Payment{}, errExample).
+		On("DeclineFeeReductions", mock.Anything, 901).
+		Return([]sirius.DeclineFeeReductions{}, nil)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
@@ -403,7 +426,9 @@ func TestGetPaymentsWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return(feeReductionTypes, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
-		Return([]sirius.RefDataItem{}, errExample)
+		Return([]sirius.RefDataItem{}, errExample).
+		On("DeclineFeeReductions", mock.Anything, 901).
+		Return([]sirius.DeclineFeeReductions{}, nil)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
@@ -458,7 +483,9 @@ func TestGetPaymentsWhenFailureOnGetReferenceTypeRefData(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
-		Return([]sirius.RefDataItem{}, errExample)
+		Return([]sirius.RefDataItem{}, errExample).
+		On("DeclineFeeReductions", mock.Anything, 901).
+		Return([]sirius.DeclineFeeReductions{}, nil)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
@@ -513,7 +540,9 @@ func TestGetPaymentsWhenFailureOnFeeReductionTypesRefData(t *testing.T) {
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil).
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
-		Return([]sirius.RefDataItem{}, errExample)
+		Return([]sirius.RefDataItem{}, errExample).
+		On("DeclineFeeReductions", mock.Anything, 901).
+		Return([]sirius.DeclineFeeReductions{}, nil)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
@@ -578,20 +607,23 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return(feeReductionTypes, nil).
 		On("GetUserDetails", mock.Anything).
-		Return(user, nil)
+		Return(user, nil).
+		On("DeclineFeeReductions", mock.Anything, 901).
+		Return([]sirius.DeclineFeeReductions{}, nil)
 
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, getPaymentsData{
-			Payments:          payments,
-			PaymentSources:    paymentSources,
-			ReferenceTypes:    referenceTypes,
-			Case:              caseItem,
-			TotalPaid:         4100,
-			IsReducedFeesUser: false,
-			IsSysAdminUser:    true,
-			FeeReductionTypes: feeReductionTypes,
-			OutstandingFee:    expectedPaymentTotal - 4100,
+			Payments:             payments,
+			PaymentSources:       paymentSources,
+			ReferenceTypes:       referenceTypes,
+			Case:                 caseItem,
+			TotalPaid:            4100,
+			IsReducedFeesUser:    false,
+			IsSysAdminUser:       true,
+			FeeReductionTypes:    feeReductionTypes,
+			OutstandingFee:       expectedPaymentTotal - 4100,
+			DeclineFeeReductions: []sirius.DeclineFeeReductions{},
 		}).
 		Return(errExample)
 
@@ -684,21 +716,24 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return(feeReductionTypes, nil).
 		On("GetUserDetails", mock.Anything).
-		Return(user, nil)
+		Return(user, nil).
+		On("DeclineFeeReductions", mock.Anything, 901).
+		Return([]sirius.DeclineFeeReductions{}, nil)
 
 	template1 := &mockTemplate{}
 	template1.
 		On("Func", mock.Anything, getPaymentsData{
-			PaymentSources:    paymentSources,
-			ReferenceTypes:    referenceTypes,
-			Payments:          nonReductionPayments,
-			FeeReductions:     feeReductions,
-			FeeReductionTypes: feeReductionTypes,
-			Case:              caseItem,
-			TotalPaid:         5000,
-			IsReducedFeesUser: true,
-			IsSysAdminUser:    false,
-			RefundAmount:      (expectedPaymentTotal - 4100 - 5000) * -1,
+			PaymentSources:       paymentSources,
+			ReferenceTypes:       referenceTypes,
+			Payments:             nonReductionPayments,
+			FeeReductions:        feeReductions,
+			FeeReductionTypes:    feeReductionTypes,
+			Case:                 caseItem,
+			TotalPaid:            5000,
+			IsReducedFeesUser:    true,
+			IsSysAdminUser:       false,
+			RefundAmount:         (expectedPaymentTotal - 4100 - 5000) * -1,
+			DeclineFeeReductions: []sirius.DeclineFeeReductions{},
 		}).
 		Return(nil)
 
@@ -734,22 +769,25 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return(feeReductionTypes, nil).
 		On("GetUserDetails", mock.Anything).
-		Return(user, nil)
+		Return(user, nil).
+		On("DeclineFeeReductions", mock.Anything, 901).
+		Return([]sirius.DeclineFeeReductions{}, nil)
 
 	template2 := &mockTemplate{}
 	template2.
 		On("Func", mock.Anything, getPaymentsData{
-			PaymentSources:    paymentSources,
-			ReferenceTypes:    referenceTypes,
-			Payments:          nonReductionPayments,
-			FeeReductions:     feeReductions,
-			FeeReductionTypes: feeReductionTypes,
-			Case:              caseItem,
-			CaseSummary:       caseSummary,
-			TotalPaid:         5000,
-			IsReducedFeesUser: true,
-			IsSysAdminUser:    false,
-			RefundAmount:      (expectedPaymentTotal - 4100 - 5000) * -1,
+			PaymentSources:       paymentSources,
+			ReferenceTypes:       referenceTypes,
+			Payments:             nonReductionPayments,
+			FeeReductions:        feeReductions,
+			FeeReductionTypes:    feeReductionTypes,
+			Case:                 caseItem,
+			CaseSummary:          caseSummary,
+			TotalPaid:            5000,
+			IsReducedFeesUser:    true,
+			IsSysAdminUser:       false,
+			RefundAmount:         (expectedPaymentTotal - 4100 - 5000) * -1,
+			DeclineFeeReductions: []sirius.DeclineFeeReductions{},
 		}).
 		Return(nil)
 
@@ -857,24 +895,27 @@ func TestGetPaymentsCalculations(t *testing.T) {
 			On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 			Return(feeReductionTypes, nil).
 			On("GetUserDetails", mock.Anything).
-			Return(user, nil)
+			Return(user, nil).
+			On("DeclineFeeReductions", mock.Anything, 901).
+			Return([]sirius.DeclineFeeReductions{}, nil)
 
 		template := &mockTemplate{}
 		template.
 			On("Func", mock.Anything, getPaymentsData{
-				PaymentSources:    paymentSources,
-				ReferenceTypes:    referenceTypes,
-				FeeReductionTypes: feeReductionTypes,
-				Payments:          tc.payments,
-				FeeReductions:     tc.feeReductions,
-				Refunds:           tc.refunds,
-				Case:              caseItem,
-				TotalPaid:         tc.totalPaid,
-				TotalRefunds:      tc.totalRefunds,
-				OutstandingFee:    tc.outstandingFee,
-				RefundAmount:      tc.refundAmount,
-				IsReducedFeesUser: true,
-				IsSysAdminUser:    false,
+				PaymentSources:       paymentSources,
+				ReferenceTypes:       referenceTypes,
+				FeeReductionTypes:    feeReductionTypes,
+				Payments:             tc.payments,
+				FeeReductions:        tc.feeReductions,
+				Refunds:              tc.refunds,
+				Case:                 caseItem,
+				TotalPaid:            tc.totalPaid,
+				TotalRefunds:         tc.totalRefunds,
+				OutstandingFee:       tc.outstandingFee,
+				RefundAmount:         tc.refundAmount,
+				IsReducedFeesUser:    true,
+				IsSysAdminUser:       false,
+				DeclineFeeReductions: []sirius.DeclineFeeReductions{},
 			}).
 			Return(nil)
 
