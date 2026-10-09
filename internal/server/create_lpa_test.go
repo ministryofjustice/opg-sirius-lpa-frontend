@@ -398,6 +398,72 @@ func TestPostCreateLpa(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
+func TestPostCreateLpaAppointmentFieldsWhenCaseAttorneyIsUnanswered(t *testing.T) {
+	tests := []struct {
+		name                  string
+		saveAndExit           bool
+		wantAppointmentFields bool
+	}{
+		{
+			name:                  "omits fields during an actor action",
+			wantAppointmentFields: false,
+		},
+		{
+			name:                  "preserves fields on save and exit",
+			saveAndExit:           true,
+			wantAppointmentFields: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			existingLpa := sirius.Lpa{Case: sirius.Case{ID: 456}}
+			client := &mockCreateLpaClient{}
+			client.
+				On("Person", mock.Anything, 123).
+				Return(sirius.Person{}, nil)
+			client.
+				On("Lpa", mock.Anything, 456).
+				Return(existingLpa, nil).
+				Twice()
+			client.
+				On("UpdateLpa", mock.Anything, 456, mock.MatchedBy(func(lpa sirius.Lpa) bool {
+					appointmentFields := []*bool{
+						lpa.CaseAttorneySingular,
+						lpa.CaseAttorneyJointly,
+						lpa.CaseAttorneyJointlyAndSeverally,
+						lpa.CaseAttorneyJointlyAndJointlyAndSeverally,
+					}
+					for _, field := range appointmentFields {
+						if tc.wantAppointmentFields {
+							if field == nil || *field {
+								return false
+							}
+						} else if field != nil {
+							return false
+						}
+					}
+					return true
+				})).
+				Return(nil)
+
+			form := url.Values{"addAttorney": {"true"}}
+			if tc.saveAndExit {
+				form.Set("saveAndExit", "saveAndExit")
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=123&caseId=456", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := CreateLpa(client, nil)(w, r)
+
+			assert.Equal(t, RedirectError("/create-attorney?id=123&caseId=456&caseType=lpa"), err)
+			mock.AssertExpectationsForObjects(t, client)
+		})
+	}
+}
+
 func TestPostCreateLpaClearsMismatchedSubtypeOnlyFields(t *testing.T) {
 	lpa := sirius.Lpa{
 		ApplicationHasGuidance:     shared.BoolPtr(false),
