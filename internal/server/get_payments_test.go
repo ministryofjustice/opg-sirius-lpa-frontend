@@ -13,6 +13,11 @@ type mockGetPayments struct {
 	mock.Mock
 }
 
+func (m *mockGetPayments) DeclineFeeReductions(ctx sirius.Context, id int) ([]sirius.DeclineFeeReductions, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).([]sirius.DeclineFeeReductions), args.Error(1)
+}
+
 func (m *mockGetPayments) Payments(ctx sirius.Context, id int) ([]sirius.Payment, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).([]sirius.Payment), args.Error(1)

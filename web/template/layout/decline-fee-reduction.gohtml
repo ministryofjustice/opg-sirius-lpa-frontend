@@ -1,0 +1,65 @@
+{{ define "decline-fee-reduction" }}
+    <details class="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text" id="f-decline-fee-reductions-tab">
+                Decline fee reductions
+            </span>
+        </summary>
+        <div class="govuk-details__text">
+            {{ range $p := .DeclineFeeReductions }}
+                <table class="govuk-table table__no-border">
+                    <tbody class="govuk-table__body">
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">Reduction declined:</th>
+                            <td class="govuk-table__cell">
+                                <strong>
+                                    {{$p.DecisionType.Translation}}
+                                </strong>
+                            </td>
+                        </tr>
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">Date declined:</th>
+                            <td class="govuk-table__cell">{{ formatDate $p.DecisionDate }}</td>
+                        </tr>
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">Reason:</th>
+                            <td class="govuk-table__cell app-!-pre-wrap">{{ $p.DecisionReason }}</td>
+                        </tr>
+{{/*                        <tr class="govuk-table__row">*/}}
+{{/*                            <th scope="row" class="govuk-table__header app-!-table-row__no-border"*/}}
+{{/*                                colspan="2">*/}}
+{{/*                                <a class="govuk-link"*/}}
+{{/*                                   {{ if $.InActionPanel }}*/}}
+{{/*                                   href=""*/}}
+{{/*                                   hx-get="{{ prefix (printf "/update-decline-fee-reduction?id=%d" .ID) }}"*/}}
+{{/*                                   hx-target=".action-panel__content"*/}}
+{{/*                                   hx-swap="innerHTML"*/}}
+{{/*                                   {{ else }}*/}}
+{{/*                                   href="{{ prefix (printf "/update-decline-fee-reduction?id=%d" .ID) }}"*/}}
+{{/*                                   {{ end }}>*/}}
+{{/*                                    Edit decline fee reduction*/}}
+{{/*                                </a>*/}}
+{{/*                            </th>*/}}
+{{/*                        </tr>*/}}
+{{/*                        <tr class="govuk-table__row">*/}}
+{{/*                            <th scope="row" class="govuk-table__header app-!-table-row__no-border"*/}}
+{{/*                                colspan="2">*/}}
+{{/*                                <a class="govuk-link govuk-link--no-visited-state app-!-colour-text-red"*/}}
+{{/*                                   {{ if $.InActionPanel }}*/}}
+{{/*                                   href=""*/}}
+{{/*                                   hx-get="{{ prefix (printf "/delete-decline-fee-reduction?id=%d" .ID) }}"*/}}
+{{/*                                   hx-target=".action-panel__content"*/}}
+{{/*                                   hx-swap="innerHTML"*/}}
+{{/*                                   {{ else }}*/}}
+{{/*                                   href="{{ prefix (printf "/delete-decline-fee-reduction?id=%d" .ID) }}"*/}}
+{{/*                                   {{ end }}>*/}}
+{{/*                                    Delete decline fee reduction*/}}
+{{/*                                </a>*/}}
+{{/*                            </th>*/}}
+{{/*                        </tr>*/}}
+                    </tbody>
+                </table>
+            {{ end }}
+        </div>
+    </details>
+{{end}}
