@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -442,4 +443,48 @@ func TestPostCreateCorrespondentCreationFails(t *testing.T) {
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestGetActorsForLpa(t *testing.T) {
+	lpa := sirius.Lpa{
+		Case: sirius.Case{
+			Donor:                &sirius.Person{ID: 1, Firstname: "John", Surname: "Smith"},
+			Attorneys:            []sirius.Attorney{{Person: sirius.Person{ID: 2, Firstname: "Melanie", Surname: "Vanvolkenburg"}}},
+			ReplacementAttorneys: []sirius.Attorney{{Person: sirius.Person{ID: 3, Firstname: "John", Surname: "Doe"}}},
+			CertificateProviders: []sirius.Person{{ID: 4, Firstname: "Steven", Surname: "Munnell"}},
+			NotifiedPersons:      []sirius.NotifiedPerson{{Person: sirius.Person{ID: 5, Firstname: "Katheryn", Surname: "Collins"}}},
+			TrustCorporations:    []sirius.TrustCorporation{{Attorney: sirius.Attorney{Person: sirius.Person{ID: 6, CompanyName: "ACME"}}}},
+		},
+	}
+	actors := GetActorsForLpa(lpa)
+
+	type actor struct {
+		ID     int
+		Name   string
+		Label  string
+		Fields string
+	}
+
+	donorFields, _ := json.Marshal(lpa.Donor)
+	attorneyFields, _ := json.Marshal(lpa.Attorneys[0])
+	replacementAttorneyFields, _ := json.Marshal(lpa.ReplacementAttorneys[0])
+	certificateProviderFields, _ := json.Marshal(lpa.CertificateProviders[0])
+	notifiedPersonFields, _ := json.Marshal(lpa.NotifiedPersons[0])
+	trustCorporationFields, _ := json.Marshal(lpa.TrustCorporations[0])
+
+	expectedActors := []actor{
+		{ID: 1, Name: "John Smith", Label: "donor", Fields: string(donorFields)},
+		{ID: 2, Name: "Melanie Vanvolkenburg", Label: "attorney", Fields: string(attorneyFields)},
+		{ID: 3, Name: "John Doe", Label: "replacement attorney", Fields: string(replacementAttorneyFields)},
+		{ID: 4, Name: "Steven Munnell", Label: "certificate provider", Fields: string(certificateProviderFields)},
+		{ID: 5, Name: "Katheryn Collins", Label: "notified person", Fields: string(notifiedPersonFields)},
+		{ID: 6, Name: "ACME", Label: "trust corporation", Fields: string(trustCorporationFields)},
+	}
+
+	for i, actualActor := range actors {
+		assert.Equal(t, expectedActors[i].ID, actualActor.ID)
+		assert.Equal(t, expectedActors[i].Name, actualActor.Name)
+		assert.Equal(t, expectedActors[i].Label, actualActor.Label)
+		assert.JSONEq(t, expectedActors[i].Fields, actualActor.Fields)
+	}
 }

@@ -1,12 +1,20 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
+
+type actor struct {
+	ID     int
+	Name   string
+	Label  string
+	Fields string
+}
 
 type CreateCorrespondentClient interface {
 	Epa(ctx sirius.Context, id int) (sirius.Epa, error)
@@ -22,6 +30,7 @@ type createCorrespondentData struct {
 	CaseId        int
 	CaseType      string
 	Correspondent sirius.Correspondent
+	Actors        []actor
 	Error         sirius.ValidationError
 	IsEditing     bool
 	Title         string
@@ -63,6 +72,7 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 				return err
 			}
 			correspondent = lpa.Correspondent
+			data.Actors = GetActorsForLpa(lpa)
 		}
 
 		if correspondent != nil {
@@ -123,4 +133,87 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 
 		return tmpl(w, data)
 	}
+}
+
+func GetActorsForLpa(lpa sirius.Lpa) []actor {
+	var actors []actor
+
+	if lpa.Donor != nil {
+		fields, err := json.Marshal(lpa.Donor)
+		if err == nil {
+			actors = append(actors, actor{
+				ID:     lpa.Donor.ID,
+				Name:   lpa.Donor.Firstname + " " + lpa.Donor.Surname,
+				Label:  "donor",
+				Fields: string(fields),
+			})
+		}
+	}
+
+	for _, attorney := range lpa.Attorneys {
+		fields, err := json.Marshal(attorney)
+		if err != nil {
+			continue
+		}
+		actors = append(actors, actor{
+			ID:     attorney.ID,
+			Name:   attorney.Firstname + " " + attorney.Surname,
+			Label:  "attorney",
+			Fields: string(fields),
+		})
+	}
+
+	for _, attorney := range lpa.ReplacementAttorneys {
+		fields, err := json.Marshal(attorney)
+		if err != nil {
+			continue
+		}
+		actors = append(actors, actor{
+			ID:     attorney.ID,
+			Name:   attorney.Firstname + " " + attorney.Surname,
+			Label:  "replacement attorney",
+			Fields: string(fields),
+		})
+	}
+
+	for _, certificateProvider := range lpa.CertificateProviders {
+		fields, err := json.Marshal(certificateProvider)
+		if err != nil {
+			continue
+		}
+		actors = append(actors, actor{
+			ID:     certificateProvider.ID,
+			Name:   certificateProvider.Firstname + " " + certificateProvider.Surname,
+			Label:  "certificate provider",
+			Fields: string(fields),
+		})
+	}
+
+	for _, notifiedPerson := range lpa.NotifiedPersons {
+		fields, err := json.Marshal(notifiedPerson)
+		if err != nil {
+			continue
+		}
+		actors = append(actors, actor{
+			ID:     notifiedPerson.ID,
+			Name:   notifiedPerson.Firstname + " " + notifiedPerson.Surname,
+			Label:  "notified person",
+			Fields: string(fields),
+		})
+	}
+
+	for _, trustCorporation := range lpa.TrustCorporations {
+		fields, err := json.Marshal(trustCorporation)
+		if err != nil {
+			continue
+		}
+		actors = append(actors, actor{
+			ID:     trustCorporation.ID,
+			Name:   trustCorporation.CompanyName,
+			Label:  "trust corporation",
+			Fields: string(fields),
+		})
+	}
+
+	return actors
 }
