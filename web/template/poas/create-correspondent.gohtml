@@ -80,6 +80,28 @@
 {{ define "form-content" }}
   <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
+  {{ if and .IsEditing (eq .CaseType "lpa") (ne (len .Actors) 0) }}
+    <details class="govuk-details" data-module="app-fill-correspondent-details">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          Or select a person named on this LPA
+        </span>
+      </summary>
+      <div class="govuk-details__text">
+        <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+          {{ range $num, $actor := .Actors }}
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input" id="f-actor-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $actor.ID }}" data-fields="{{$actor.Fields}}">
+              <label class="govuk-label govuk-radios__label" for="f-actor-{{ plusN $num 1 }}">
+                  {{ printf "%s (%s)" $actor.Name $actor.Label }}
+              </label>
+            </div>
+          {{ end }}
+        </div>
+      </div>
+    </details>
+  {{ end }}
+
   {{ template "input" (field "salutation" "Title" .Correspondent.Salutation .Error.Field.salutation) }}
   {{ template "input" (field "firstname" "First name" .Correspondent.Firstname .Error.Field.firstname) }}
   {{ template "input" (field "middlenames" "Middle names" .Correspondent.Middlenames .Error.Field.middlenames) }}
