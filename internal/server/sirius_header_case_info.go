@@ -34,7 +34,6 @@ func SiriusHeaderCaseInfo(client SiriusHeaderCaseInfoClient, tmpl template.Templ
 		if err != nil {
 			return err
 		}
-
 		data.Case = caseItem
 
 		return tmpl(w, data)
