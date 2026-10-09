@@ -66,6 +66,7 @@ func TestGetCreateLpa(t *testing.T) {
 			AllowNewNotifiedPerson: true,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
+			FlowQuery:              "&flow=create",
 			Title:                  "Create an LPA",
 		}).
 		Return(nil)
@@ -93,6 +94,7 @@ func TestGetCreateLpaHtmxRequest(t *testing.T) {
 			AllowNewNotifiedPerson: true,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
+			FlowQuery:              "&flow=create",
 			IsPartial:              true,
 			Title:                  "Create an LPA",
 		}).
@@ -122,6 +124,7 @@ func TestGetCreateLpaDoesNotSetIsUpdate(t *testing.T) {
 			AllowNewNotifiedPerson: true,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
+			FlowQuery:              "&flow=create",
 			IsUpdate:               false,
 			Title:                  "Create an LPA",
 		}).
@@ -358,10 +361,11 @@ func TestPostCreateLpa(t *testing.T) {
 			CaseId:                 456,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
+			FlowQuery:              "&flow=create",
 			Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
-			Title:                  "Create an LPA",
 			Success:                true,
 			SuccessMessage:         "You have successfully created an LPA.",
+			Title:                  "Create an LPA",
 		}).
 		Return(nil)
 
@@ -392,6 +396,72 @@ func TestPostCreateLpa(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateLpaAppointmentFieldsWhenCaseAttorneyIsUnanswered(t *testing.T) {
+	tests := []struct {
+		name                  string
+		saveAndExit           bool
+		wantAppointmentFields bool
+	}{
+		{
+			name:                  "omits fields during an actor action",
+			wantAppointmentFields: false,
+		},
+		{
+			name:                  "preserves fields on save and exit",
+			saveAndExit:           true,
+			wantAppointmentFields: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			existingLpa := sirius.Lpa{Case: sirius.Case{ID: 456}}
+			client := &mockCreateLpaClient{}
+			client.
+				On("Person", mock.Anything, 123).
+				Return(sirius.Person{}, nil)
+			client.
+				On("Lpa", mock.Anything, 456).
+				Return(existingLpa, nil).
+				Twice()
+			client.
+				On("UpdateLpa", mock.Anything, 456, mock.MatchedBy(func(lpa sirius.Lpa) bool {
+					appointmentFields := []*bool{
+						lpa.CaseAttorneySingular,
+						lpa.CaseAttorneyJointly,
+						lpa.CaseAttorneyJointlyAndSeverally,
+						lpa.CaseAttorneyJointlyAndJointlyAndSeverally,
+					}
+					for _, field := range appointmentFields {
+						if tc.wantAppointmentFields {
+							if field == nil || *field {
+								return false
+							}
+						} else if field != nil {
+							return false
+						}
+					}
+					return true
+				})).
+				Return(nil)
+
+			form := url.Values{"addAttorney": {"true"}}
+			if tc.saveAndExit {
+				form.Set("saveAndExit", "saveAndExit")
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=123&caseId=456", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := CreateLpa(client, nil)(w, r)
+
+			assert.Equal(t, RedirectError("/create-attorney?id=123&caseId=456&caseType=lpa"), err)
+			mock.AssertExpectationsForObjects(t, client)
+		})
+	}
 }
 
 func TestPostCreateLpaClearsMismatchedSubtypeOnlyFields(t *testing.T) {
@@ -1409,7 +1479,8 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 				CaseId:                 456,
 				DonorId:                123,
 				DonorName:              "Firstname Surname",
-				HtmxRedirect:           "/create-replacement-attorney?id=123&caseId=456",
+				FlowQuery:              "&flow=create",
+				HtmxRedirect:           "/create-replacement-attorney?id=123&caseId=456&flow=create",
 				HtmxSwap:               "innerHTML",
 				IsPartial:              isHtmx,
 				Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
@@ -1452,7 +1523,7 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 			resp := w.Result()
 
 			if !isHtmx {
-				expectedRedirect := RedirectError("/create-replacement-attorney?id=123&caseId=456")
+				expectedRedirect := RedirectError("/create-replacement-attorney?id=123&caseId=456&flow=create")
 				assert.Equal(t, expectedRedirect, err)
 			} else {
 				assert.Nil(t, err)
@@ -1819,33 +1890,63 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 		},
 	}
 
+	flowCases := []struct {
+		name      string
+		query     string
+		flowQuery string
+		hasCaseID bool
+	}{
+		{name: "New LPA", flowQuery: "&flow=create"},
+		{name: "LPA creation flow", query: "&caseId=2&flow=create", flowQuery: "&flow=create", hasCaseID: true},
+		{name: "Edit LPA", query: "&caseId=2", hasCaseID: true},
+	}
+
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			client := &mockCreateLpaClient{}
-			client.
-				On("Person", mock.Anything, 1).
-				Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
-			client.
-				On("CreateLpa", mock.Anything, 1, mock.Anything).
-				Return(sirius.Lpa{Case: sirius.Case{ID: 2}}, nil)
+			for _, flowCase := range flowCases {
+				t.Run(flowCase.name, func(t *testing.T) {
+					client := &mockCreateLpaClient{}
+					client.
+						On("Person", mock.Anything, 1).
+						Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
 
-			template := &mockTemplate{}
+					if flowCase.hasCaseID {
+						client.
+							On("Lpa", mock.Anything, 2).
+							Return(sirius.Lpa{Case: sirius.Case{ID: 2}}, nil).
+							Twice()
+						client.
+							On("UpdateLpa", mock.Anything, 2, mock.Anything).
+							Return(nil)
+					} else {
+						client.
+							On("CreateLpa", mock.Anything, 1, mock.Anything).
+							Return(sirius.Lpa{Case: sirius.Case{ID: 2}}, nil)
+					}
 
-			form := url.Values{
-				"caseSubtype": {"pfa"},
-				tc.formKey:    {tc.formValue},
+					template := &mockTemplate{}
+
+					form := url.Values{
+						"caseSubtype": {"pfa"},
+						tc.formKey:    {tc.formValue},
+					}
+
+					r, _ := http.NewRequest(http.MethodPost, "/create-lpa?id=1"+flowCase.query, strings.NewReader(form.Encode()))
+					r.Header.Add("Content-Type", formUrlEncoded)
+					w := httptest.NewRecorder()
+
+					err := CreateLpa(client, template.Func)(w, r)
+					resp := w.Result()
+
+					expectedErr := tc.expectedErr
+					if redirectErr, ok := expectedErr.(RedirectError); ok {
+						expectedErr = RedirectError(string(redirectErr) + flowCase.flowQuery)
+					}
+					assert.Equal(t, expectedErr, err)
+					assert.Equal(t, http.StatusOK, resp.StatusCode)
+					mock.AssertExpectationsForObjects(t, client, template)
+				})
 			}
-
-			r, _ := http.NewRequest(http.MethodPost, "/create-lpa?id=1", strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", formUrlEncoded)
-			w := httptest.NewRecorder()
-
-			err := CreateLpa(client, template.Func)(w, r)
-			resp := w.Result()
-
-			assert.Equal(t, tc.expectedErr, err)
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -1869,7 +1970,8 @@ func TestPostErrorWhenAttorneyRadioSelected(t *testing.T) {
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{"applicantType": {"": "Select an applicant"}},
 			},
-			IsUpdate: false,
+			FlowQuery: "&flow=create",
+			IsUpdate:  false,
 			Lpa: sirius.Lpa{
 				Case: sirius.Case{
 					ApplicationType:                           "Online",

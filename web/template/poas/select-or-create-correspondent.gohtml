@@ -13,7 +13,7 @@
     {{ else }}
       <a class="govuk-back-link"
          href=""
-         hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-4" .DonorId .CaseId) }}"
+         hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-4" .DonorId .CaseId .FlowQuery) }}"
          hx-target=".action-panel__content"
          hx-swap="innerHTML show:#accordion-create-lpa-heading-4:top">Back</a>
     {{ end }}
@@ -22,7 +22,7 @@
 
     <form class="form"
           method="POST"
-          hx-post="{{ prefix (printf "/select-or-create-correspondent?id=%d&caseId=%d&caseType=%s" .DonorId .CaseId .CaseType) }}"
+          hx-post="{{ prefix (printf "/select-or-create-correspondent?id=%d&caseId=%d&caseType=%s%s" .DonorId .CaseId .CaseType .FlowQuery) }}"
           hx-target=".action-panel__content"
           hx-swap="innerHTML">
       {{ template "form-content" . }}
@@ -38,7 +38,7 @@
         {{ else }}
           <a class="govuk-link govuk-link--no-visited-state"
              href=""
-             hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-4" .DonorId .CaseId) }}"
+             hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-4" .DonorId .CaseId .FlowQuery) }}"
              hx-target=".action-panel__content"
              hx-swap="innerHTML show:#accordion-create-lpa-heading-4:top">Cancel</a>
         {{ end }}
@@ -57,7 +57,7 @@
       {{ if eq .CaseType "epa" }}
         <a href="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
       {{ else }}
-        <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-4" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+        <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-4" .DonorId .CaseId .FlowQuery) }}" class="govuk-back-link">Back</a>
       {{ end }}
 
       <h1 class="govuk-heading-l">Add a correspondent</h1>
@@ -66,7 +66,7 @@
         {{ template "form-content" . }}
         <div class="govuk-button-group govuk-!-padding-top-5">
           <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-%s?id=%d&caseId=%d" .CaseType .DonorId .CaseId) }}">Cancel</a>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-%s?id=%d&caseId=%d%s" .CaseType .DonorId .CaseId .FlowQuery) }}">Cancel</a>
         </div>
       </form>
     </div>

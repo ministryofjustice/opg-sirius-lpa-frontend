@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -43,85 +44,53 @@ var mockCertificateProvider = sirius.Person{
 	PersonType:   "Certificate Provider",
 }
 
-func TestGetEditCertificateProvidersTest(t *testing.T) {
-	tests := []struct {
-		name          string
-		isHtmxRequest bool
+func TestGetEditCertificateProviders(t *testing.T) {
+	flowCases := []struct {
+		name      string
+		flowQuery string
 	}{
-		{
-			name:          "HTMX Request",
-			isHtmxRequest: true,
-		},
-		{
-			name:          "Non HTMX Request",
-			isHtmxRequest: false,
-		},
+		{name: "Without flow"},
+		{name: "Create flow", flowQuery: "&flow=create"},
 	}
+	for _, flowCase := range flowCases {
+		t.Run(flowCase.name, func(t *testing.T) {
+			for _, isHtmxRequest := range []bool{false, true} {
+				t.Run("Is Htmx: "+strconv.FormatBool(isHtmxRequest), func(t *testing.T) {
+					client := &mockEditCertificateProviderClient{}
+					client.
+						On("Person", mock.Anything, 3).
+						Return(mockCertificateProvider, nil)
 
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			client := &mockEditCertificateProviderClient{}
-			client.
-				On("Person", mock.Anything, 3).
-				Return(mockCertificateProvider, nil)
+					template := &mockTemplate{}
+					template.
+						On("Func", mock.Anything, CertificateProviderData{
+							FlowQuery:           flowCase.flowQuery,
+							DonorId:             1,
+							CaseId:              2,
+							CanAddActor:         false,
+							CertificateProvider: mockCertificateProvider,
+							Title:               "Edit a certificate provider",
+							PostURL:             "/edit-certificate-provider?id=1&caseId=2&personId=3" + flowCase.flowQuery,
+							IsPartial:           isHtmxRequest,
+						}).
+						Return(nil)
 
-			template := &mockTemplate{}
-			template.
-				On("Func", mock.Anything, CertificateProviderData{
-					DonorId:             1,
-					CaseId:              2,
-					CanAddActor:         false,
-					CertificateProvider: mockCertificateProvider,
-					Title:               "Edit a certificate provider",
-					PostURL:             "/edit-certificate-provider?id=1&caseId=2&personId=3",
-					IsPartial:           tc.isHtmxRequest,
-				}).
-				Return(nil)
+					r, _ := http.NewRequest(http.MethodGet, "/edit-certificate-provider/?id=1&caseId=2&personId=3"+flowCase.flowQuery, nil)
+					if isHtmxRequest {
+						r.Header.Add("HX-Request", "true")
+					}
+					w := httptest.NewRecorder()
 
-			r, _ := http.NewRequest(http.MethodGet, "/edit-certificate-provider/?id=1&caseId=2&personId=3", nil)
-			if tc.isHtmxRequest {
-				r.Header.Add("HX-Request", "true")
+					err := EditCertificateProvider(client, template.Func)(w, r)
+					resp := w.Result()
+
+					assert.Nil(t, err)
+					assert.Equal(t, http.StatusOK, resp.StatusCode)
+					mock.AssertExpectationsForObjects(t, client, template)
+				})
 			}
-			w := httptest.NewRecorder()
-
-			err := EditCertificateProvider(client, template.Func)(w, r)
-			resp := w.Result()
-
-			assert.Nil(t, err)
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
-}
-
-func TestGetEditCertificateProviders(t *testing.T) {
-	client := &mockEditCertificateProviderClient{}
-	client.
-		On("Person", mock.Anything, 3).
-		Return(mockCertificateProvider, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, CertificateProviderData{
-			DonorId:             1,
-			CaseId:              2,
-			CanAddActor:         false,
-			CertificateProvider: mockCertificateProvider,
-			Title:               "Edit a certificate provider",
-			PostURL:             "/edit-certificate-provider?id=1&caseId=2&personId=3",
-		}).
-		Return(nil)
-
-	r, _ := http.NewRequest(http.MethodGet, "/edit-certificate-provider?id=1&caseId=2&personId=3", nil)
-	w := httptest.NewRecorder()
-
-	err := EditCertificateProvider(client, template.Func)(w, r)
-	resp := w.Result()
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
-
 }
 
 func TestGetEditCertificateProviderPersonFail(t *testing.T) {
@@ -166,95 +135,111 @@ func TestPostEditCertificateProvider(t *testing.T) {
 		htmxRequest bool
 		swap        string
 		error       error
-		expectedErr error
+		redirect    string
+		fragment    string
 	}{
 		{
 			name:        "Submit",
 			htmxRequest: false,
-			error:       nil,
-			expectedErr: RedirectError("/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-3"),
+			redirect:    "/create-lpa?id=1&caseId=2",
+			fragment:    "#accordion-create-lpa-heading-3",
 		},
 		{
 			name:        "Submit API Failure",
 			htmxRequest: false,
 			error:       errExample,
-			expectedErr: errExample,
 		},
 		{
 			name:        "Submit htmx request",
 			htmxRequest: true,
 			swap:        "innerHTML show:#accordion-create-lpa-heading-3:top",
-			error:       nil,
-			expectedErr: nil,
+			redirect:    "/create-lpa?id=1&caseId=2",
+			fragment:    "#accordion-create-lpa-heading-3",
 		},
+	}
+	flowCases := []struct {
+		name      string
+		flowQuery string
+	}{
+		{name: "Without flow"},
+		{name: "Create flow", flowQuery: "&flow=create"},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			client := &mockEditCertificateProviderClient{}
-			client.
-				On("Person", mock.Anything, 3).
-				Return(mockCertificateProvider, nil)
-			client.
-				On("UpdateCertificateProvider", mock.Anything, 3, sirius.Person{
-					Salutation:   "Dr",
-					Firstname:    "John",
-					Middlenames:  "",
-					Surname:      "Watson",
-					AddressLine1: "221B",
-					AddressLine2: "Baker Street",
-					AddressLine3: "Marylebone",
-					Town:         "London",
-					Postcode:     "NW1 6XE",
-					County:       "Greater London",
-					Country:      "United Kingdom",
-				}).
-				Return(tc.error)
+			for _, flowCase := range flowCases {
+				t.Run(flowCase.name, func(t *testing.T) {
+					client := &mockEditCertificateProviderClient{}
+					client.
+						On("Person", mock.Anything, 3).
+						Return(mockCertificateProvider, nil)
+					client.
+						On("UpdateCertificateProvider", mock.Anything, 3, sirius.Person{
+							Salutation:   "Dr",
+							Firstname:    "John",
+							Middlenames:  "",
+							Surname:      "Watson",
+							AddressLine1: "221B",
+							AddressLine2: "Baker Street",
+							AddressLine3: "Marylebone",
+							Town:         "London",
+							Postcode:     "NW1 6XE",
+							County:       "Greater London",
+							Country:      "United Kingdom",
+						}).
+						Return(tc.error)
 
-			template := &mockTemplate{}
-			if tc.htmxRequest {
-				template.
-					On("Func", mock.Anything, CertificateProviderData{
-						DonorId:             1,
-						CaseId:              2,
-						CanAddActor:         false,
-						CertificateProvider: mockCertificateProvider,
-						HtmxRedirect:        "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-3",
-						HtmxSwap:            tc.swap,
-						Title:               "Edit a certificate provider",
-						PostURL:             "/edit-certificate-provider?id=1&caseId=2&personId=3",
-						IsPartial:           true,
-					}).
-					Return(nil)
+					template := &mockTemplate{}
+					if tc.htmxRequest {
+						template.
+							On("Func", mock.Anything, CertificateProviderData{
+								FlowQuery:           flowCase.flowQuery,
+								DonorId:             1,
+								CaseId:              2,
+								CanAddActor:         false,
+								CertificateProvider: mockCertificateProvider,
+								HtmxRedirect:        tc.redirect + flowCase.flowQuery + tc.fragment,
+								HtmxSwap:            tc.swap,
+								Title:               "Edit a certificate provider",
+								PostURL:             "/edit-certificate-provider?id=1&caseId=2&personId=3" + flowCase.flowQuery,
+								IsPartial:           true,
+							}).
+							Return(nil)
+					}
+
+					form := url.Values{
+						"salutation":   {"Dr"},
+						"firstname":    {"John"},
+						"middlenames":  {""},
+						"surname":      {"Watson"},
+						"addressLine1": {"221B"},
+						"addressLine2": {"Baker Street"},
+						"addressLine3": {"Marylebone"},
+						"town":         {"London"},
+						"county":       {"Greater London"},
+						"postcode":     {"NW1 6XE"},
+						"country":      {"United Kingdom"},
+					}
+
+					r, _ := http.NewRequest(http.MethodPost, "/edit-certificate-provider?id=1&caseId=2&personId=3"+flowCase.flowQuery, strings.NewReader(form.Encode()))
+					r.Header.Add("Content-Type", formUrlEncoded)
+					if tc.htmxRequest {
+						r.Header.Add("HX-Request", "true")
+					}
+					w := httptest.NewRecorder()
+
+					err := EditCertificateProvider(client, template.Func)(w, r)
+					resp := w.Result()
+
+					expectedErr := tc.error
+					if expectedErr == nil && !tc.htmxRequest {
+						expectedErr = RedirectError(tc.redirect + flowCase.flowQuery + tc.fragment)
+					}
+					assert.Equal(t, expectedErr, err)
+					assert.Equal(t, http.StatusOK, resp.StatusCode)
+					mock.AssertExpectationsForObjects(t, client, template)
+				})
 			}
-
-			form := url.Values{
-				"salutation":   {"Dr"},
-				"firstname":    {"John"},
-				"middlenames":  {""},
-				"surname":      {"Watson"},
-				"addressLine1": {"221B"},
-				"addressLine2": {"Baker Street"},
-				"addressLine3": {"Marylebone"},
-				"town":         {"London"},
-				"county":       {"Greater London"},
-				"postcode":     {"NW1 6XE"},
-				"country":      {"United Kingdom"},
-			}
-
-			r, _ := http.NewRequest(http.MethodPost, "/edit-certificate-provider?id=1&caseId=2&personId=3", strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", formUrlEncoded)
-			if tc.htmxRequest {
-				r.Header.Add("HX-Request", "true")
-			}
-			w := httptest.NewRecorder()
-
-			err := EditCertificateProvider(client, template.Func)(w, r)
-			resp := w.Result()
-
-			assert.Equal(t, tc.expectedErr, err)
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }

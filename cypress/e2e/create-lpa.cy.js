@@ -187,4 +187,146 @@ describe("create an LPA", () => {
 
     cy.contains("button", "Save and exit").click();
   });
+
+  it("creates an LPA and does not set appointment type, adds an attorney and submits with no validation errors", () => {
+    cy.addMock("/lpa-api/v1/donors/1/lpas", "POST", {
+      status: 201,
+      body: { id: 2 },
+    });
+    cy.addMock("/lpa-api/v1/lpas/2", "PUT", {
+      status: 200,
+      body: {},
+    });
+    cy.addMock("/lpa-api/v1/cases/2", "GET", {
+      status: 200,
+      body: {
+        id: 2,
+        caseSubtype: "pfa",
+        receiptDate: "19/06/2026",
+        attorneys: [],
+      },
+    });
+    cy.addMock("/lpa-api/v1/lpas/2/attorneys", "POST", {
+      status: 201,
+      body: {},
+    });
+
+    cy.visit("/create-lpa?id=1");
+    cy.get(".govuk-accordion__show-all").click();
+    cy.get("#f-caseSubtype").click();
+    cy.get("#f-applicationType").click();
+    cy.get("#f-receiptDate").type("2026-06-19");
+    cy.get('[name="caseAttorney"]:checked').should("not.exist");
+    cy.get('input[name="addAttorney"]').click();
+
+    cy.url().should("include", "/create-attorney?");
+    cy.get(".govuk-error-summary").should("not.exist");
+
+    cy.get("#f-firstname").type("Wilma");
+    cy.get("#f-surname").type("Bird");
+
+    cy.addMock("/lpa-api/v1/cases/2", "GET", {
+      status: 200,
+      body: {
+        id: 2,
+        caseSubtype: "pfa",
+        receiptDate: "19/06/2026",
+        attorneys: [
+          {
+            id: 3,
+            firstname: "Wilma",
+            surname: "Bird",
+            personType: "Attorney",
+            systemStatus: true,
+          },
+        ],
+      },
+    });
+    cy.contains("button", /^Save$/).click();
+
+    cy.url().should("include", "/create-lpa?id=1&caseId=2&flow=create");
+    cy.contains(".govuk-details__summary-text", "Wilma Bird");
+    cy.get('[name="caseAttorney"]:checked').should("not.exist");
+    cy.get(".govuk-error-summary").should("not.exist");
+    cy.contains("button", "Save and exit").click();
+
+    cy.contains("You have successfully created an LPA.");
+    cy.get(".govuk-error-summary").should("not.exist");
+  });
+
+  it("updates an LPA does not set appointment type, adds an attorney with no validation errors, submits and gets expected validation error", () => {
+    cy.addMock("/lpa-api/v1/lpas/2", "PUT", {
+      status: 200,
+      body: {},
+    });
+    cy.addMock("/lpa-api/v1/cases/2", "GET", {
+      status: 200,
+      body: {
+        id: 2,
+        caseSubtype: "pfa",
+        receiptDate: "19/06/2026",
+        attorneys: [],
+      },
+    });
+    cy.addMock("/lpa-api/v1/lpas/2/attorneys", "POST", {
+      status: 201,
+      body: {},
+    });
+
+    cy.visit("/create-lpa?id=1&caseId=2");
+    cy.get(".govuk-accordion__show-all").click();
+    cy.get('[name="caseAttorney"]:checked').should("not.exist");
+    cy.get('input[name="addAttorney"]').click();
+
+    cy.url().should("include", "/create-attorney?");
+    cy.get(".govuk-error-summary").should("not.exist");
+
+    cy.get("#f-firstname").type("Wilma");
+    cy.get("#f-surname").type("Bird");
+
+    cy.addMock("/lpa-api/v1/cases/2", "GET", {
+      status: 200,
+      body: {
+        id: 2,
+        caseSubtype: "pfa",
+        receiptDate: "19/06/2026",
+        attorneys: [
+          {
+            id: 3,
+            firstname: "Wilma",
+            surname: "Bird",
+            personType: "Attorney",
+            systemStatus: true,
+          },
+        ],
+      },
+    });
+    cy.contains("button", /^Save$/).click();
+
+    cy.url().should("include", "/create-lpa?id=1&caseId=2");
+    cy.location("search").should("not.include", "flow=create");
+    cy.contains(".govuk-details__summary-text", "Wilma Bird");
+    cy.get('[name="caseAttorney"]:checked').should("not.exist");
+    cy.get(".govuk-error-summary").should("not.exist");
+
+    cy.addMock("/lpa-api/v1/lpas/2", "PUT", {
+      status: 400,
+      body: {
+        validation_errors: {
+          appointmentType: { "": "Select an appointment type" },
+        },
+      },
+    });
+    cy.contains("button", "Save and exit").click();
+
+    cy.get(".govuk-error-summary").should(
+      "contain.text",
+      "Select an appointment type",
+    );
+    cy.get(".govuk-error-message").should(
+      "contain.text",
+      "Select an appointment type",
+    );
+    cy.contains("You have successfully updated an LPA.").should("not.exist");
+  });
 });

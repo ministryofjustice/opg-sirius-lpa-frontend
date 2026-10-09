@@ -15,6 +15,7 @@ type CreateCertificateProviderClient interface {
 
 type CertificateProviderData struct {
 	XSRFToken           string
+	FlowQuery           string
 	CanAddActor         bool
 	CaseId              int
 	CertificateProvider sirius.Person
@@ -48,11 +49,12 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 
 		data := CertificateProviderData{
 			XSRFToken:   ctx.XSRFToken,
+			FlowQuery:   getFlowQuery(r),
 			DonorId:     donorId,
 			CaseId:      caseId,
 			CanAddActor: len(caseItem.CertificateProviders) < 1,
 			Title:       "Add a certificate provider",
-			PostURL:     fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorId, caseId),
+			PostURL:     fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d%s", donorId, caseId, getFlowQuery(r)),
 			IsPartial:   ctx.IsPartial,
 		}
 
@@ -83,10 +85,10 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 				var redirect, swap string
 
 				if r.FormValue("add-another") != "" {
-					redirect = fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d", donorId, caseId)
+					redirect = fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery)
 					swap = "innerHTML scroll:.action-panel__content:top"
 				} else {
-					redirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-3", donorId, caseId)
+					redirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-3", donorId, caseId, data.FlowQuery)
 					swap = "innerHTML show:#accordion-create-lpa-heading-3:top"
 				}
 

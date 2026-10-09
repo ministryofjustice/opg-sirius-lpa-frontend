@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -32,63 +33,61 @@ func (m *mockSelectOrCreateCorrespondentClient) Lpa(ctx sirius.Context, id int) 
 }
 
 func TestGetSelectOrCreateCorrespondent(t *testing.T) {
-	epa := sirius.Epa{Case: sirius.Case{ID: 2}}
+	cases := []struct {
+		name      string
+		caseType  string
+		flowQuery string
+	}{
+		{name: "EPA", caseType: "epa"},
+		{name: "LPA without flow", caseType: "lpa"},
+		{name: "LPA create flow", caseType: "lpa", flowQuery: "&flow=create"},
+	}
 
-	client := &mockSelectOrCreateCorrespondentClient{}
-	client.
-		On("Epa", mock.Anything, 2).
-		Return(epa, nil)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			for _, isHtmx := range []bool{false, true} {
+				t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
+					client := &mockSelectOrCreateCorrespondentClient{}
+					data := selectOrCreateCorrespondentData{
+						FlowQuery: tc.flowQuery,
+						DonorId:   1,
+						CaseId:    2,
+						CaseType:  tc.caseType,
+						IsPartial: isHtmx,
+					}
+					if tc.caseType == "epa" {
+						data.Epa = sirius.Epa{Case: sirius.Case{ID: 2}}
+						client.
+							On("Epa", mock.Anything, 2).
+							Return(data.Epa, nil)
+					} else {
+						data.Lpa = sirius.Lpa{Case: sirius.Case{ID: 2}}
+						client.
+							On("Lpa", mock.Anything, 2).
+							Return(data.Lpa, nil)
+					}
 
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, selectOrCreateCorrespondentData{
-			DonorId:  1,
-			CaseId:   2,
-			CaseType: "epa",
-			Epa:      epa,
-		}).
-		Return(nil)
+					template := &mockTemplate{}
+					template.
+						On("Func", mock.Anything, data).
+						Return(nil)
 
-	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType=epa", nil)
-	w := httptest.NewRecorder()
+					r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType="+tc.caseType+tc.flowQuery, nil)
+					if isHtmx {
+						r.Header.Add("HX-Request", "true")
+					}
+					w := httptest.NewRecorder()
 
-	err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
-	resp := w.Result()
+					err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
+					resp := w.Result()
 
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
-}
-
-func TestGetSelectOrCreateCorrespondentHtmxRequest(t *testing.T) {
-	epa := sirius.Epa{Case: sirius.Case{ID: 2}}
-
-	client := &mockSelectOrCreateCorrespondentClient{}
-	client.
-		On("Epa", mock.Anything, 2).
-		Return(epa, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, selectOrCreateCorrespondentData{
-			DonorId:   1,
-			CaseId:    2,
-			CaseType:  "epa",
-			Epa:       epa,
-			IsPartial: true,
-		}).
-		Return(nil)
-
-	r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType=epa", nil)
-	r.Header.Add("HX-Request", "true")
-	w := httptest.NewRecorder()
-
-	err := SelectOrCreateCorrespondent(client, template.Func)(w, r)
-	resp := w.Result()
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
+					assert.Nil(t, err)
+					assert.Equal(t, http.StatusOK, resp.StatusCode)
+					mock.AssertExpectationsForObjects(t, client, template)
+				})
+			}
+		})
+	}
 }
 
 func TestGetSelectOrCreateCorrespondentBadQuery(t *testing.T) {
@@ -141,13 +140,23 @@ func TestGetSelectOrCreateCorrespondentWhenLpaErrors(t *testing.T) {
 }
 
 func TestPostSelectOrCreateCorrespondentNew(t *testing.T) {
-	for _, caseType := range []string{"lpa", "epa"} {
-		t.Run(caseType, func(t *testing.T) {
-			expectedError := RedirectError("/create-correspondent?id=1&caseId=2&caseType=" + caseType)
+	cases := []struct {
+		name      string
+		caseType  string
+		flowQuery string
+	}{
+		{name: "EPA", caseType: "epa"},
+		{name: "LPA without flow", caseType: "lpa"},
+		{name: "LPA create flow", caseType: "lpa", flowQuery: "&flow=create"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			expectedRedirect := RedirectError("/create-correspondent?id=1&caseId=2&caseType=" + tc.caseType + tc.flowQuery)
 
 			client := &mockSelectOrCreateCorrespondentClient{}
 
-			if caseType == "epa" {
+			if tc.caseType == "epa" {
 				client.
 					On("Epa", mock.Anything, 2).
 					Return(sirius.Epa{}, nil)
@@ -161,14 +170,14 @@ func TestPostSelectOrCreateCorrespondentNew(t *testing.T) {
 				"actorId": {"new"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType="+caseType, strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType="+tc.caseType+tc.flowQuery, strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
 			err := SelectOrCreateCorrespondent(client, nil)(w, r)
 			resp := w.Result()
 
-			assert.Equal(t, err, expectedError)
+			assert.Equal(t, expectedRedirect, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client)
 		})
@@ -176,14 +185,32 @@ func TestPostSelectOrCreateCorrespondentNew(t *testing.T) {
 }
 
 func TestPostSelectOrCreateCorrespondentFromAttorney(t *testing.T) {
-	for _, caseType := range []string{"lpa", "epa"} {
-		t.Run(caseType, func(t *testing.T) {
-			var expectedError error
-			if caseType == "epa" {
-				expectedError = RedirectError("/create-epa?id=1&caseId=2#accordion-create-epa-heading-3")
-			} else {
-				expectedError = RedirectError("/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-4")
-			}
+	cases := []struct {
+		name      string
+		caseType  string
+		flowQuery string
+		redirect  string
+	}{
+		{
+			name:     "EPA",
+			caseType: "epa",
+			redirect: "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3",
+		},
+		{
+			name:     "LPA without flow",
+			caseType: "lpa",
+			redirect: "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-4",
+		},
+		{
+			name:      "LPA create flow",
+			caseType:  "lpa",
+			flowQuery: "&flow=create",
+			redirect:  "/create-lpa?id=1&caseId=2&flow=create#accordion-create-lpa-heading-4",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
 
 			correspondent := sirius.Correspondent{Person: sirius.Person{Firstname: "Rudolph", Surname: "Stotesbury"}}
 
@@ -192,7 +219,7 @@ func TestPostSelectOrCreateCorrespondentFromAttorney(t *testing.T) {
 				On("CreateCorrespondent", mock.Anything, 2, correspondent).
 				Return(nil)
 
-			if caseType == "epa" {
+			if tc.caseType == "epa" {
 				epa := sirius.Epa{
 					Case: sirius.Case{
 						Attorneys: []sirius.Attorney{
@@ -223,14 +250,14 @@ func TestPostSelectOrCreateCorrespondentFromAttorney(t *testing.T) {
 				"actorId": {"4"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType="+caseType, strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType="+tc.caseType+tc.flowQuery, strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
 			err := SelectOrCreateCorrespondent(client, nil)(w, r)
 			resp := w.Result()
 
-			assert.Equal(t, err, expectedError)
+			assert.Equal(t, RedirectError(tc.redirect), err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client)
 		})
