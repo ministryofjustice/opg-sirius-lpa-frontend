@@ -75,10 +75,12 @@ InsertSelector.prototype.populateSelector = function (insertLists) {
   if (!insertLists.all) {
     const all = [];
 
-    Object.values(insertLists).forEach((inserts) => {
-      inserts.forEach((insert) => {
-        if (!all.includes(insert)) all.push(insert);
-      });
+    Object.entries(insertLists).forEach(([key, inserts]) => {
+      if (key !== "old") {
+        inserts.forEach((insert) => {
+          if (!all.includes(insert)) all.push(insert);
+        });
+      }
     });
 
     insertLists = { all, ...insertLists };
