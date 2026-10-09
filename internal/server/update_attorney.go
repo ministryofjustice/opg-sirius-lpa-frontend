@@ -9,31 +9,14 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-type CreateAttorneyClient interface {
+type UpdateAttorneyClient interface {
 	Epa(ctx sirius.Context, id int) (sirius.Epa, error)
 	Lpa(ctx sirius.Context, id int) (sirius.Lpa, error)
-	CreateAttorney(ctx sirius.Context, caseId int, caseTyp string, attorney sirius.Attorney) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
+	UpdateAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
 }
 
-type createAttorneyData struct {
-	XSRFToken            string
-	IsPartial            bool
-	Attorney             sirius.Attorney
-	Error                sirius.ValidationError
-	RelationshipToDonors []sirius.RefDataItem
-	DonorId              int
-	CaseId               int
-	CaseType             string
-	CaseSubType          string
-	IsEditing            bool
-	Title                string
-	NextAttorneyId       int
-	HtmxRedirect         string
-	HtmxSwap             string
-}
-
-func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler {
+func UpdateAttorney(client UpdateAttorneyClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
@@ -55,7 +38,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 			DonorId:   donorId,
 			CaseId:    caseId,
 			CaseType:  caseType,
-			Title:     "Add an attorney",
+			Title:     "Update attorney details",
 		}
 
 		var lpa sirius.Lpa
@@ -73,8 +56,41 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 			return err
 		}
 
-		// Default the active status to true for new attorneys
-		data.Attorney.SystemStatus = shared.BoolPtr(true)
+		var nextPersonType string
+		var attorneyId int
+		attorneyIdStr := r.FormValue("attorneyId")
+		attorneyId, err = strToIntOrStatusError(attorneyIdStr)
+		if err != nil {
+			return err
+		}
+
+		var attorneys []sirius.Attorney
+		if data.CaseType == "epa" {
+			epa, err := client.Epa(ctx, data.CaseId)
+			if err != nil {
+				return err
+			}
+
+			attorneys = epa.Attorneys
+		} else {
+			attorneys = lpa.Attorneys
+		}
+		var existingAttorney sirius.Attorney
+		for _, attorney := range attorneys {
+			if attorney.ID == attorneyId {
+				existingAttorney = attorney
+				break
+			}
+		}
+
+		// Only overwrite for GET requests
+		if r.Method == http.MethodGet {
+			data.Attorney = existingAttorney
+		}
+
+		data.Title = "Update attorney details"
+		data.IsEditing = true
+		data.NextAttorneyId, nextPersonType = GetIdForNextAttorney(attorneyId, false, lpa.TrustCorporations, lpa.Attorneys)
 
 		if r.Method == http.MethodPost {
 			attorney := sirius.Attorney{
@@ -103,8 +119,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 				attorney.RelationshipToDonor = postFormString(r, "relationshipToDonor")
 			}
 			data.Attorney = attorney
-
-			err = client.CreateAttorney(ctx, data.CaseId, data.CaseType, attorney)
+			err = client.UpdateAttorney(ctx, attorneyId, attorney)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
@@ -114,13 +129,18 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 				return err
 			}
 
-			if r.FormValue("add-another") != "" {
+			if r.FormValue("update-next-attorney") != "" {
+				redirect := fmt.Sprintf("/update-attorney?id=%d&caseId=%d&caseType=%s&attorneyId=%d", data.DonorId, data.CaseId, data.CaseType, data.NextAttorneyId)
+				if nextPersonType == "Trust Corporation" {
+					redirect = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=false", data.DonorId, data.CaseId, data.NextAttorneyId)
+				}
+
 				if data.IsPartial {
-					data.HtmxRedirect = fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s", data.DonorId, data.CaseId, data.CaseType)
+					data.HtmxRedirect = redirect
 					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
 					return tmpl(w, data)
 				}
-				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=%s", data.DonorId, data.CaseId, data.CaseType))
+				return RedirectError(redirect)
 			}
 
 			if data.IsPartial {

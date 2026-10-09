@@ -23,7 +23,7 @@ const fillInAttorneyDetails = (caseType = "epa") => {
   }
 };
 
-describe("Create or Update Attorney on an EPA", () => {
+describe("Create Attorney on an EPA", () => {
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/epas/2/attorneys", "POST", {
       status: 201,
@@ -55,6 +55,15 @@ describe("Create or Update Attorney on an EPA", () => {
         "include",
         "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3",
       );
+  });
+});
+
+describe("Update Attorney on an EPA", () => {
+  beforeEach(() => {
+    cy.addMock("/lpa-api/v1/epas/2/attorneys", "POST", {
+      status: 201,
+      body: {},
+    });
   });
 
   it("updates an existing attorney on an EPA", () => {
@@ -151,23 +160,6 @@ describe("Create or Update Attorney on an LPA", () => {
       .and("include", "/create-lpa?id=1&caseId=2#scroll-to-attorneys");
   });
 
-  it("updates an existing attorney on an LPA", () => {
-    cy.addMock("/lpa-api/v1/attorneys/3", "PUT", {
-      status: 200,
-      body: {},
-    });
-
-    cy.visit("/create-attorney?id=1&caseId=2&attorneyId=3&caseType=lpa");
-    cy.contains("Update attorney details");
-    cy.get("#f-firstname").should("have.value", "Rudolph");
-    cy.get("#f-surname").should("have.value", "Stotesbury");
-    cy.get("input[type=submit][name=add-another]").should("not.exist");
-
-    cy.get("#f-firstname").clear().type("Rafael");
-    cy.get("button[type=submit]").click();
-    cy.url().should("include", "create-lpa");
-  });
-
   it("should show the trust corporation link on a pfa lpa", () => {
     cy.contains("Add a trust corporation as an attorney");
   });
@@ -192,5 +184,47 @@ describe("Create or Update Attorney on an LPA", () => {
     cy.visit("/create-attorney?id=1&caseId=2&caseType=lpa");
 
     cy.contains("Add a trust corporation as an attorney").should("not.exist");
+  });
+});
+
+describe("Update Attorney on an LPA", () => {
+  beforeEach(() => {
+    cy.addMock("/lpa-api/v1/lpas/2/attorneys", "POST", {
+      status: 201,
+      body: {},
+    });
+
+    cy.addMock("/lpa-api/v1/cases/2", "GET", {
+      status: 200,
+      body: {
+        id: 2,
+        caseSubtype: "pfa",
+        attorneys: [
+          {
+            id: 3,
+            firstname: "Rudolph",
+            surname: "Stotesbury",
+            relationshipToDonor: "NO RELATION",
+          },
+        ],
+      },
+    });
+  });
+
+  it("updates an existing attorney on an LPA", () => {
+    cy.addMock("/lpa-api/v1/attorneys/3", "PUT", {
+      status: 200,
+      body: {},
+    });
+
+    cy.visit("/update-attorney?id=1&caseId=2&attorneyId=3&caseType=lpa");
+    cy.contains("Update attorney details");
+    cy.get("#f-firstname").should("have.value", "Rudolph");
+    cy.get("#f-surname").should("have.value", "Stotesbury");
+    cy.get("input[type=submit][name=add-another]").should("not.exist");
+
+    cy.get("#f-firstname").clear().type("Rafael");
+    cy.get("button[type=submit]").click();
+    cy.url().should("include", "create-lpa");
   });
 });
