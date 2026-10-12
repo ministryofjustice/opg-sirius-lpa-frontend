@@ -3,7 +3,7 @@
     <h2 class="govuk-heading-s govuk-!-margin-3">
       Case information
     </h2>
-    <div class="govuk-grid-column-one-third">
+    <div class="app-case-info__details">
       <dl class="govuk-summary-list govuk-!-margin-bottom-4">
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">Case owner</dt>
@@ -34,8 +34,6 @@
           </dd>
         </div>
       </dl>
-    </div>
-    <div class="govuk-grid-column-one-third">
       <dl class="govuk-summary-list govuk-!-margin-bottom-4">
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">Filing date</dt>
@@ -44,7 +42,7 @@
           </dd>
         </div>
         <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">Reg due date / Reg date</dt>
+          <dt class="govuk-summary-list__key">Reg due date</dt>
           <dd class="govuk-summary-list__value">
               {{ if .Case.RegistrationDueDate }}
                   {{ formatDate .Case.RegistrationDueDate }}
@@ -66,8 +64,6 @@
           </dd>
         </div>
       </dl>
-    </div>
-    <div class="govuk-grid-column-one-third">
       <dl class="govuk-summary-list govuk-!-margin-bottom-4">
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">Applicant</dt>
