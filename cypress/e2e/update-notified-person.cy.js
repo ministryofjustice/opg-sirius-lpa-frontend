@@ -1,4 +1,4 @@
-describe("Create notified person form", () => {
+describe("Update notified person form", () => {
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/persons", "POST", {
       status: 201,
@@ -23,7 +23,6 @@ describe("Create notified person form", () => {
             county: "Saskatchewan",
             postcode: "S7R 9F9",
             country: "Canada",
-            noticeGivenDate: "01/01/2023",
           },
           {
             id: 12,
@@ -48,7 +47,6 @@ describe("Create notified person form", () => {
     cy.get("#f-county").should("have.value", "Saskatchewan");
     cy.get("#f-postcode").should("have.value", "S7R 9F9");
     cy.get("#f-country").should("have.value", "Canada");
-    cy.get("#f-noticeGivenDate").should("have.value", "2023-01-01");
     cy.get("input[type=submit][name=next-notified-person]").click();
     cy.url().should("include", "update-notified-person");
   });

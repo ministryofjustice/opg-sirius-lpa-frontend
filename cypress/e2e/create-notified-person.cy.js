@@ -29,7 +29,6 @@ describe("Create notified person form", () => {
     cy.get("#f-county").type("Saskatchewan");
     cy.get("#f-postcode").type("S7R 9F9");
     cy.get("#f-country").type("Canada");
-    cy.get("#f-noticeGivenDate").type("2023-01-01");
     cy.get("button[type=submit]").click();
     cy.url().should("include", "create-lpa");
   });
