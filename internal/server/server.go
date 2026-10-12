@@ -113,6 +113,7 @@ type Client interface {
 	SiriusHeaderPeopleInfoClient
 	TaskClient
 	UnlinkPersonClient
+	UpdateAttorneyClient
 	UpdateDecisionsClient
 	UpdateObjectionClient
 	ViewDocumentClient
@@ -177,6 +178,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate-cases.gohtml"))))
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change-status.gohtml"))))
 	mux.Handle("/create-attorney", wrap(CreateAttorney(client, templates.Get("create-attorney.gohtml"))))
+	mux.Handle("/update-attorney", wrap(UpdateAttorney(client, templates.Get("create-attorney.gohtml"))))
 	mux.Handle("/create-certificate-provider", wrap(CreateCertificateProvider(client, templates.Get("certificate-provider.gohtml"))))
 	mux.Handle("/create-correspondent", wrap(CreateCorrespondent(client, templates.Get("create-correspondent.gohtml"))))
 	mux.Handle("/create-donor", wrap(CreateDonor(client, templates.Get("donor.gohtml"))))
