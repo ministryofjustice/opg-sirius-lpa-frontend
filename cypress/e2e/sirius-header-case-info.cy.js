@@ -49,7 +49,7 @@ describe("Case info panel on the header bar", () => {
     cy.contains("Filing date").should("exist");
     cy.contains("22/06/2026").should("exist");
 
-    cy.contains("Reg due date / Reg date").should("exist");
+    cy.contains("Reg due date").should("exist");
     cy.contains("23/06/2026").should("exist");
 
     cy.contains("Dispatch date").should("exist");
@@ -61,7 +61,7 @@ describe("Case info panel on the header bar", () => {
     cy.contains("Applicant").should("exist");
     cy.contains("Melanie Vanvolkenburg").should("exist");
 
-    cy.contains("How attorneys are appointed").should("exist");
+    cy.contains("Appointment type").should("exist");
     cy.contains("Singular").should("exist");
 
     cy.contains("LST choice").should("exist");
