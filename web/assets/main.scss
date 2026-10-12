@@ -1077,6 +1077,13 @@ $app-action-panel-height: calc(
 }
 
 .app-case-info {
+  & .app-case-info__details {
+    display: flex;
+    margin: 0 15px;
+    justify-content: space-between;
+    gap: govuk-spacing(7);
+  }
+
   & h2 {
     color: govuk-colour("white");
   }
@@ -1084,10 +1091,12 @@ $app-action-panel-height: calc(
   & .govuk-summary-list {
     font-size: 1rem;
     color: govuk-colour("white");
+    height: fit-content;
   }
 
   & .govuk-summary-list__key {
     font-weight: 400;
+    width: 35%;
   }
 
   & .govuk-summary-list__value {
