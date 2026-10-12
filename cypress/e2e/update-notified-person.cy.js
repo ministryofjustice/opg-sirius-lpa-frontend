@@ -1,4 +1,4 @@
-describe("Create notified person form", () => {
+describe("Update notified person form", () => {
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/persons", "POST", {
       status: 201,

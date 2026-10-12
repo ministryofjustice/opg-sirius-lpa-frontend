@@ -36,7 +36,6 @@ func TestGetUpdateNotifiedPerson(t *testing.T) {
 					Firstname: "Rudolph",
 					Surname:   "Stotesbury",
 				},
-				NoticeGivenDate: sirius.DateString("2022-04-05"),
 			}
 
 			client := &mockUpdateNotifiedPersonClient{}
@@ -109,7 +108,6 @@ func TestGetUpdateNotifiedPersonWhenLpaErrors(t *testing.T) {
 }
 
 func TestPostUpdateNotifiedPerson(t *testing.T) {
-	dateString := "2022-04-05"
 	existingNotifiedPersons := []sirius.NotifiedPerson{{Person: sirius.Person{ID: 4}}, {Person: sirius.Person{ID: 5}}}
 	updatedNotifiedPerson := sirius.NotifiedPerson{
 		Person: sirius.Person{
@@ -126,7 +124,6 @@ func TestPostUpdateNotifiedPerson(t *testing.T) {
 			Country:           "Italy",
 			IsAirmailRequired: true,
 		},
-		NoticeGivenDate: sirius.DateString(dateString),
 	}
 
 	tests := []struct {
@@ -199,7 +196,6 @@ func TestPostUpdateNotifiedPerson(t *testing.T) {
 				"firstname":            {"Rudolph"},
 				"middlenames":          {"Modesto"},
 				"surname":              {"Stotesbury"},
-				"noticeGivenDate":      {dateString},
 				"addressLine1":         {"Rotonda Gerardo 769"},
 				"addressLine2":         {"Appartamento 94"},
 				"addressLine3":         {"Augusto terme"},
@@ -233,7 +229,6 @@ func TestPostUpdateNotifiedPersonWhenValidationError(t *testing.T) {
 		Field: sirius.FieldErrors{"field": {"": "problem"}},
 	}
 
-	dateString := "2022-04-05"
 	notifiedPerson := sirius.NotifiedPerson{
 		Person: sirius.Person{
 			Salutation:        "Rev",
@@ -249,7 +244,6 @@ func TestPostUpdateNotifiedPersonWhenValidationError(t *testing.T) {
 			Country:           "Italy",
 			IsAirmailRequired: true,
 		},
-		NoticeGivenDate: sirius.DateString(dateString),
 	}
 
 	client := &mockUpdateNotifiedPersonClient{}
@@ -278,7 +272,6 @@ func TestPostUpdateNotifiedPersonWhenValidationError(t *testing.T) {
 		"firstname":         {"Rudolph"},
 		"middlenames":       {"Modesto"},
 		"surname":           {"Stotesbury"},
-		"noticeGivenDate":   {dateString},
 		"addressLine1":      {"Rotonda Gerardo 769"},
 		"addressLine2":      {"Appartamento 94"},
 		"addressLine3":      {"Augusto terme"},

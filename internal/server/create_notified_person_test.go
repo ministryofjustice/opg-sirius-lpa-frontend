@@ -106,7 +106,6 @@ func TestGetCreateNotifiedPersonWhenLpaErrors(t *testing.T) {
 func TestPostCreateNotifiedPerson(t *testing.T) {
 	for _, isHtmx := range []bool{false, true} {
 		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
-			dateString := "2022-04-05"
 			notifiedPerson := sirius.NotifiedPerson{
 				Person: sirius.Person{
 					Salutation:        "Rev",
@@ -122,7 +121,6 @@ func TestPostCreateNotifiedPerson(t *testing.T) {
 					Country:           "Italy",
 					IsAirmailRequired: true,
 				},
-				NoticeGivenDate: sirius.DateString(dateString),
 			}
 			client := &mockCreateNotifiedPersonClient{}
 			client.
@@ -152,7 +150,6 @@ func TestPostCreateNotifiedPerson(t *testing.T) {
 				"firstname":         {"Rudolph"},
 				"middlenames":       {"Modesto"},
 				"surname":           {"Stotesbury"},
-				"noticeGivenDate":   {dateString},
 				"addressLine1":      {"Rotonda Gerardo 769"},
 				"addressLine2":      {"Appartamento 94"},
 				"addressLine3":      {"Augusto terme"},
@@ -188,7 +185,6 @@ func TestPostCreateNotifiedPerson(t *testing.T) {
 func TestPostCreateNotifiedPersonAddAnother(t *testing.T) {
 	for _, isHtmx := range []bool{false, true} {
 		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
-			dateString := "2022-04-05"
 			notifiedPerson := sirius.NotifiedPerson{
 				Person: sirius.Person{
 					Salutation:        "Rev",
@@ -204,7 +200,6 @@ func TestPostCreateNotifiedPersonAddAnother(t *testing.T) {
 					Country:           "Italy",
 					IsAirmailRequired: true,
 				},
-				NoticeGivenDate: sirius.DateString(dateString),
 			}
 			client := &mockCreateNotifiedPersonClient{}
 			client.
@@ -234,7 +229,6 @@ func TestPostCreateNotifiedPersonAddAnother(t *testing.T) {
 				"firstname":                   {"Rudolph"},
 				"middlenames":                 {"Modesto"},
 				"surname":                     {"Stotesbury"},
-				"noticeGivenDate":             {dateString},
 				"addressLine1":                {"Rotonda Gerardo 769"},
 				"addressLine2":                {"Appartamento 94"},
 				"addressLine3":                {"Augusto terme"},
@@ -275,7 +269,6 @@ func TestPostCreateNotifiedPersonWhenValidationError(t *testing.T) {
 				Field: sirius.FieldErrors{"field": {"": "problem"}},
 			}
 
-			dateString := "2022-04-05"
 			notifiedPerson := sirius.NotifiedPerson{
 				Person: sirius.Person{
 					Salutation:        "Rev",
@@ -291,7 +284,6 @@ func TestPostCreateNotifiedPersonWhenValidationError(t *testing.T) {
 					Country:           "Italy",
 					IsAirmailRequired: true,
 				},
-				NoticeGivenDate: sirius.DateString(dateString),
 			}
 
 			client := &mockCreateNotifiedPersonClient{}
@@ -321,7 +313,6 @@ func TestPostCreateNotifiedPersonWhenValidationError(t *testing.T) {
 				"firstname":         {"Rudolph"},
 				"middlenames":       {"Modesto"},
 				"surname":           {"Stotesbury"},
-				"noticeGivenDate":   {dateString},
 				"addressLine1":      {"Rotonda Gerardo 769"},
 				"addressLine2":      {"Appartamento 94"},
 				"addressLine3":      {"Augusto terme"},
