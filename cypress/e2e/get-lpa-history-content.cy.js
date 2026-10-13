@@ -949,6 +949,25 @@ describe("Show correct event content", () => {
       .should("contain.text", "Notifications Inc");
   });
 
+  it("can view fee decision added event", () => {
+    mockEventHistory({
+      sourceType: "FeeDecision",
+      type: "INS",
+      entity: {
+        id: 10,
+        caseId: 36,
+        decisionType: "DECLINED_EXEMPTION",
+        decisionReason: "Not eligible for exemption",
+        decisionDate: "15/01/2024",
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item")
+        .eq(0)
+        .should("contain.text", "Declined exemption on 15/01/2024")
+        .should("contain.text", "Not eligible for exemption");
+  });
+
   it("can view notified person updated event with prior values", () => {
     mockEventHistory({
       sourceType: "NotifiedPerson",

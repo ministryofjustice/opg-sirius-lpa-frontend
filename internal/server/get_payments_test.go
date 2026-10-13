@@ -370,7 +370,7 @@ func TestGetPaymentsWhenFailureOnGetPayments(t *testing.T) {
 		Return(user, nil).
 		On("Payments", mock.Anything, 9).
 		Return([]sirius.Payment{}, errExample).
-		On("DeclineFeeReductions", mock.Anything, 901).
+		On("DeclineFeeReductions", mock.Anything, 9).
 		Return([]sirius.DeclineFeeReductions{}, nil)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
@@ -425,10 +425,10 @@ func TestGetPaymentsWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 		Return(user, nil).
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return(feeReductionTypes, nil).
+		On("DeclineFeeReductions", mock.Anything, 111).
+		Return([]sirius.DeclineFeeReductions{}, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
-		Return([]sirius.RefDataItem{}, errExample).
-		On("DeclineFeeReductions", mock.Anything, 901).
-		Return([]sirius.DeclineFeeReductions{}, nil)
+		Return([]sirius.RefDataItem{}, errExample)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
 
@@ -484,7 +484,7 @@ func TestGetPaymentsWhenFailureOnGetReferenceTypeRefData(t *testing.T) {
 		Return(user, nil).
 		On("RefDataByCategory", mock.Anything, sirius.PaymentReferenceType).
 		Return([]sirius.RefDataItem{}, errExample).
-		On("DeclineFeeReductions", mock.Anything, 901).
+		On("DeclineFeeReductions", mock.Anything, 4).
 		Return([]sirius.DeclineFeeReductions{}, nil)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
@@ -541,7 +541,7 @@ func TestGetPaymentsWhenFailureOnFeeReductionTypesRefData(t *testing.T) {
 		Return(user, nil).
 		On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).
 		Return([]sirius.RefDataItem{}, errExample).
-		On("DeclineFeeReductions", mock.Anything, 901).
+		On("DeclineFeeReductions", mock.Anything, 876).
 		Return([]sirius.DeclineFeeReductions{}, nil)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))
@@ -608,7 +608,7 @@ func TestGetPaymentsWhenTemplateErrors(t *testing.T) {
 		Return(feeReductionTypes, nil).
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil).
-		On("DeclineFeeReductions", mock.Anything, 901).
+		On("DeclineFeeReductions", mock.Anything, 554).
 		Return([]sirius.DeclineFeeReductions{}, nil)
 
 	template := &mockTemplate{}
@@ -717,7 +717,7 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 		Return(feeReductionTypes, nil).
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil).
-		On("DeclineFeeReductions", mock.Anything, 901).
+		On("DeclineFeeReductions", mock.Anything, 742).
 		Return([]sirius.DeclineFeeReductions{}, nil)
 
 	template1 := &mockTemplate{}
@@ -770,7 +770,7 @@ func TestGetPaymentWhenRefundDue(t *testing.T) {
 		Return(feeReductionTypes, nil).
 		On("GetUserDetails", mock.Anything).
 		Return(user, nil).
-		On("DeclineFeeReductions", mock.Anything, 901).
+		On("DeclineFeeReductions", mock.Anything, 742).
 		Return([]sirius.DeclineFeeReductions{}, nil)
 
 	template2 := &mockTemplate{}
@@ -896,7 +896,7 @@ func TestGetPaymentsCalculations(t *testing.T) {
 			Return(feeReductionTypes, nil).
 			On("GetUserDetails", mock.Anything).
 			Return(user, nil).
-			On("DeclineFeeReductions", mock.Anything, 901).
+			On("DeclineFeeReductions", mock.Anything, 929).
 			Return([]sirius.DeclineFeeReductions{}, nil)
 
 		template := &mockTemplate{}
