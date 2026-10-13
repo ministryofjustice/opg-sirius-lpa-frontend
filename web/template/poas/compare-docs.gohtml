@@ -18,6 +18,7 @@
 {{ end }}
 
 {{ define "partial-content" }}
+    {{ template "siriusHeader" . }}
     <div id="document-panel" class="govuk-grid-row">
         {{ template "CompareContent" . }}
     </div>
