@@ -370,7 +370,7 @@ func TestGetPaymentsWhenFailureOnGetPayments(t *testing.T) {
 		Return(user, nil).
 		On("Payments", mock.Anything, 9).
 		Return([]sirius.Payment{}, errExample).
-		On("DeclineFeeReductions", mock.Anything, 901).
+		On("DeclineFeeReductions", mock.Anything, 9).
 		Return([]sirius.DeclineFeeReductions{}, nil)
 
 	server := newMockServer("/payments/{id}", GetPayments(client, nil))

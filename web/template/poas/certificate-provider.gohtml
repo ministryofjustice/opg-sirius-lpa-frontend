@@ -37,7 +37,7 @@
                 {{ end }}
                 <a class="govuk-link govuk-link--no-visited-state"
                    href=""
-                   hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-3" .DonorId .CaseId) }}"
+                   hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-3" .DonorId .CaseId .FlowQuery) }}"
                    hx-target=".action-panel__content"
                    hx-swap="innerHTML show:#accordion-create-lpa-heading-3:top">Cancel</a>
             </div>
@@ -52,7 +52,7 @@
         <div class="govuk-grid-column-two-thirds">
             {{ template "error-summary" .Error }}
 
-            <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-3" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+            <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-3" .DonorId .CaseId .FlowQuery) }}" class="govuk-back-link">Back</a>
 
             <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
@@ -65,7 +65,7 @@
                     {{ if .CanAddActor }}
                         <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add a second certificate provider" />
                     {{ end }}
-                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-3" .DonorId .CaseId) }}">Cancel</a>
+                    <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-3" .DonorId .CaseId .FlowQuery) }}">Cancel</a>
                 </div>
             </form>
         </div>
