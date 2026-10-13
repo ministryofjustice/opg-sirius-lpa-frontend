@@ -107,7 +107,7 @@ func TestGetUpdateNotifiedPersonWhenLpaErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestPostUpdateNotifiedPerson(t *testing.T) {
+func TestPostUpdateNotifiedPersonTransitions(t *testing.T) {
 	existingNotifiedPersons := []sirius.NotifiedPerson{{Person: sirius.Person{ID: 4}}, {Person: sirius.Person{ID: 5}}}
 	updatedNotifiedPerson := sirius.NotifiedPerson{
 		Person: sirius.Person{
@@ -128,6 +128,7 @@ func TestPostUpdateNotifiedPerson(t *testing.T) {
 
 	tests := []struct {
 		name               string
+		flowQuery          string
 		nextNotifiedPerson string
 		htmxRequest        bool
 		htmxRedirect       string
@@ -138,6 +139,11 @@ func TestPostUpdateNotifiedPerson(t *testing.T) {
 		{
 			name:        "Submit",
 			expectedErr: RedirectError("/create-lpa?id=1&caseId=2#scroll-to-notified-person"),
+		},
+		{
+			name:        "Submit with create flow",
+			flowQuery:   "&flow=create",
+			expectedErr: RedirectError("/create-lpa?id=1&caseId=2&flow=create#scroll-to-notified-person"),
 		},
 		{
 			name:        "Submit API Failure",
@@ -151,15 +157,36 @@ func TestPostUpdateNotifiedPerson(t *testing.T) {
 			htmxSwap:     "innerHTML show:#scroll-to-notified-person:top",
 		},
 		{
+			name:         "Submit htmx request with create flow",
+			flowQuery:    "&flow=create",
+			htmxRequest:  true,
+			htmxRedirect: "/create-lpa?id=1&caseId=2&flow=create",
+			htmxSwap:     "innerHTML show:#scroll-to-notified-person:top",
+		},
+		{
 			name:               "Submit and edit next notified person",
 			nextNotifiedPerson: "true",
 			expectedErr:        RedirectError("/update-notified-person?id=1&caseId=2&notifiedPersonId=5"),
+		},
+		{
+			name:               "Submit and edit next notified person with create flow",
+			flowQuery:          "&flow=create",
+			nextNotifiedPerson: "true",
+			expectedErr:        RedirectError("/update-notified-person?id=1&caseId=2&notifiedPersonId=5&flow=create"),
 		},
 		{
 			name:               "Submit and edit next notified person htmx request",
 			nextNotifiedPerson: "true",
 			htmxRequest:        true,
 			htmxRedirect:       "/update-notified-person?id=1&caseId=2&notifiedPersonId=5",
+			htmxSwap:           "innerHTML scroll:.action-panel__content:top",
+		},
+		{
+			name:               "Submit and edit next notified person htmx request with create flow",
+			flowQuery:          "&flow=create",
+			nextNotifiedPerson: "true",
+			htmxRequest:        true,
+			htmxRedirect:       "/update-notified-person?id=1&caseId=2&notifiedPersonId=5&flow=create",
 			htmxSwap:           "innerHTML scroll:.action-panel__content:top",
 		},
 	}
@@ -178,6 +205,7 @@ func TestPostUpdateNotifiedPerson(t *testing.T) {
 			if tc.htmxRequest {
 				template.
 					On("Func", mock.Anything, updateNotifiedPersonData{
+						FlowQuery:            tc.flowQuery,
 						IsPartial:            true,
 						DonorId:              1,
 						CaseId:               2,
@@ -207,7 +235,7 @@ func TestPostUpdateNotifiedPerson(t *testing.T) {
 				"next-notified-person": {tc.nextNotifiedPerson},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/update-notified-person?id=1&caseId=2&notifiedPersonId=4", strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/update-notified-person?id=1&caseId=2&notifiedPersonId=4"+tc.flowQuery, strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			if tc.htmxRequest {
 				r.Header.Add("HX-Request", "true")
