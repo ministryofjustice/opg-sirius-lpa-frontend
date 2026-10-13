@@ -219,6 +219,19 @@ func TestInStringArray(t *testing.T) {
 	assert.Equal(t, false, val)
 }
 
+func TestIsMap(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["isMap"].(func(interface{}) bool)
+
+	var val bool
+
+	val = fn("123")
+	assert.Equal(t, false, val)
+
+	val = fn(map[string]interface{}{"key": "value"})
+	assert.Equal(t, true, val)
+}
+
 func TestIsDateMap(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["isDateMap"].(func(interface{}) bool)
