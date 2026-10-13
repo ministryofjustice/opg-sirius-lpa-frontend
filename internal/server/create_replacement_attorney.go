@@ -16,6 +16,7 @@ type CreateReplacementAttorneyClient interface {
 
 type createReplacementAttorneyData struct {
 	XSRFToken      string
+	FlowQuery      string
 	Attorney       sirius.Attorney
 	Error          sirius.ValidationError
 	DonorId        int
@@ -50,6 +51,7 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 
 		data := createReplacementAttorneyData{
 			XSRFToken:   ctx.XSRFToken,
+			FlowQuery:   getFlowQuery(r),
 			DonorId:     donorId,
 			CaseId:      caseId,
 			CaseSubType: lpa.SubType,
@@ -130,17 +132,17 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 
 			if r.FormValue("add-another") != "" {
 				if ctx.IsPartial {
-					data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorId, caseId)
+					data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery)
 					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
 					return tmpl(w, data)
 				}
-				return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorId, caseId))
+				return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery))
 			}
 
 			if r.FormValue("update-next-attorney") != "" {
-				redirect := fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d", donorId, caseId, data.NextAttorneyId)
+				redirect := fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorId, caseId, data.NextAttorneyId, data.FlowQuery)
 				if nextPersonType == "Trust Corporation" {
-					redirect = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=true", donorId, caseId, data.NextAttorneyId)
+					redirect = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=true%s", donorId, caseId, data.NextAttorneyId, data.FlowQuery)
 				}
 
 				if data.IsPartial {
@@ -152,11 +154,11 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 			}
 
 			if ctx.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId)
+				data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery)
 				data.HtmxSwap = "innerHTML show:#scroll-to-replacement-attorneys:top"
 				return tmpl(w, data)
 			}
-			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#scroll-to-replacement-attorneys", donorId, caseId))
+			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#scroll-to-replacement-attorneys", donorId, caseId, data.FlowQuery))
 		}
 
 		return tmpl(w, data)
