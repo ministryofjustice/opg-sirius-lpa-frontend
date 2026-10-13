@@ -29,7 +29,12 @@
                             <li>{{ camelcaseToSentence $k }}: {{ $oldValue }} changed to: {{ $newValue }}</li>
                         {{ end }}
                     {{ else }}
-                        {{ $newValue := index $v "1" }}
+                        {{ $newValue := "" }}
+                        {{ if isMap $v }}
+                          {{ $newValue = index $v "1" }}
+                        {{ else }}
+                          {{ $newValue = index $v 0 }}
+                        {{ end }}
 
                         {{ if eq $k "dob" }}
                             <li>Date of birth: {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006"  }}</li>
