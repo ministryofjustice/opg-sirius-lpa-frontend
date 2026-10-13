@@ -1092,6 +1092,14 @@ $app-action-panel-height: calc(
     font-size: 1rem;
     color: govuk-colour("white");
     height: fit-content;
+
+    & .govuk-summary-list__row {
+      border-bottom: 1px solid govuk-colour("black", $variant: "tint-95");
+    }
+
+    & .govuk-summary-list__row:nth-of-type(4) {
+      border: none;
+    }
   }
 
   & .govuk-summary-list__key {
