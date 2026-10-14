@@ -187,7 +187,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 				} else if err != nil {
 					return err
 				} else {
-					return RedirectError(fmt.Sprintf("/edit-document?id=%d&case=%s", caseID, caseType))
+					return RedirectError(fmt.Sprintf("/update-document?id=%d&case=%s", caseID, caseType))
 				}
 			case "addNewRecipient":
 				contact := sirius.Person{

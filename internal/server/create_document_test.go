@@ -161,7 +161,7 @@ func TestPostCreateDocument(t *testing.T) {
 			err := CreateDocument(client, template.Func)(w, r)
 			resp := w.Result()
 
-			assert.Equal(t, RedirectError("/edit-document?id=123&case="+caseType), err)
+			assert.Equal(t, RedirectError("/update-document?id=123&case="+caseType), err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
@@ -283,7 +283,7 @@ func TestPostCreateDocumentPrioritiseInvalidInserts(t *testing.T) {
 			err := CreateDocument(client, template.Func)(w, r)
 			resp := w.Result()
 
-			assert.Equal(t, RedirectError("/edit-document?id=123&case="+caseType), err)
+			assert.Equal(t, RedirectError("/update-document?id=123&case="+caseType), err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
