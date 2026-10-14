@@ -1,23 +1,27 @@
 {{ define "calendarMonth" }}
-    <div class="opg-calendar">
-        <div class="calendar" role="grid" aria-label="{{ .Name }}" id="calendar-month-{{ .Year }}-{{ .Month }}">
+    <div class="opg-calendar" id="calendar-month-{{ .Year }}-{{ .Month }}">
+        <div class="calendar" role="grid" aria-label="{{ .Name }}">
             <div class="current-month">
                 <button class="move-month prev-month-{{ .Year }}-{{ .Month }}"
-                    hx-get="{{ prefix .PrevMonthURL }}"
-                    hx-target="#calendar-month-{{ .Year }}-{{ .Month }}"
-                    hx-swap="outerHTML"
-                    type="button"
-                    aria-label="Previous month">
-                    ←
+                        hx-get="{{ prefix .PrevMonthURL }}"
+                        hx-target="#calendar-month-{{ .Year }}-{{ .Month }}"
+                        hx-swap="outerHTML"
+                        type="button"
+                        aria-label="Previous month">
+                    <svg class="move-month__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16" focusable="false" aria-hidden="true">
+                        <path d="M8 2L2 8l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </button>
-                <span>{{ .Name }}</span>
+                <span class="current-month__name">{{ .Name }}</span>
                 <button class="move-month next-month-{{ .Year }}-{{ .Month }}"
-                    hx-get="{{ prefix .NextMonthURL }}"
-                    hx-target="#calendar-month-{{ .Year }}-{{ .Month }}"
-                    hx-swap="outerHTML"
-                    type="button"
-                    aria-label="Next month">
-                    →
+                        hx-get="{{ prefix .NextMonthURL }}"
+                        hx-target="#calendar-month-{{ .Year }}-{{ .Month }}"
+                        hx-swap="outerHTML"
+                        type="button"
+                        aria-label="Next month">
+                    <svg class="move-month__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16" focusable="false" aria-hidden="true">
+                        <path d="M2 2l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </button>
             </div>
             <div class="weekday">Mon</div>
@@ -30,13 +34,13 @@
             {{ range .Weeks }}
                 {{ range . }}
                     {{ if .Date }}
-                        <div class="day {{ if .IsToday }}today{{ else if .IsBankHoliday}}disabled{{ else }}default{{ end }}"
-                            data-date="{{ .Date }}"
-                            role="gridcell">
+                        <div class="day {{ if .IsToday }}today{{ else if or .IsWeekend .IsBankHoliday }}non-working{{ else }}default{{ end }}"
+                             data-date="{{ .Date }}"
+                             role="gridcell">
                             <span class="day-number">{{ .Day }}</span>
                         </div>
                     {{ else }}
-                        <div class="day disabled" role="gridcell" aria-hidden="true"></div>
+                        <div class="day empty" role="gridcell" aria-hidden="true"></div>
                     {{ end }}
                 {{ end }}
             {{ end }}
