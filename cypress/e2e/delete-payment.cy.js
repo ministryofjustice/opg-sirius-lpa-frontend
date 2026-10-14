@@ -1,6 +1,10 @@
 describe("Delete a payment", () => {
   beforeEach(() => {
     cy.visit("/delete-payment?id=123");
+    cy.addMock("/lpa-api/v1/cases/800/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
   });
 
   it("deletes a payment on a case", () => {
