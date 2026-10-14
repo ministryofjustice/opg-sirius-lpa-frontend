@@ -410,7 +410,7 @@ func TestAddPayment(t *testing.T) {
 	}
 }
 
-func TestEditPayment(t *testing.T) {
+func TestUpdatePayment(t *testing.T) {
 	t.Parallel()
 
 	pact, err := newPact()
@@ -455,7 +455,7 @@ func TestEditPayment(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				err := client.EditPayment(Context{Context: context.Background()}, 123, Payment{Amount: 2550, Source: "PHONE", PaymentDate: DateString("2022-04-27")})
+				err := client.UpdatePayment(Context{Context: context.Background()}, 123, Payment{Amount: 2550, Source: "PHONE", PaymentDate: DateString("2022-04-27")})
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
@@ -468,7 +468,7 @@ func TestEditPayment(t *testing.T) {
 	}
 }
 
-func TestEditFeeReduction(t *testing.T) {
+func TestUpdateFeeReduction(t *testing.T) {
 	t.Parallel()
 
 	pact, err := newPact()
@@ -521,7 +521,7 @@ func TestEditFeeReduction(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				err := client.EditPayment(Context{Context: context.Background()},
+				err := client.UpdatePayment(Context{Context: context.Background()},
 					124,
 					Payment{
 						ID:               124,
