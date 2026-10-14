@@ -1,6 +1,10 @@
 describe("Edit a fee reduction", () => {
   beforeEach(() => {
     cy.visit("/edit-fee-reduction?id=124");
+    cy.addMock("/lpa-api/v1/cases/802/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
   });
 
   it("edits an existing fee reduction", () => {
