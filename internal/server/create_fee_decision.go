@@ -65,7 +65,9 @@ func CreateFeeDecision(client CreateFeeDecisionClient, tmpl template.Template) H
 			return err
 		}
 
-		if data.Case.CaseType == "DIGITAL_LPA" {
+		isDigitalLpa := data.Case.CaseType == "DIGITAL_LPA"
+
+		if isDigitalLpa {
 			data.ReturnUrl = fmt.Sprintf("/lpa/%s/payments", data.Case.UID)
 		} else {
 			data.ReturnUrl = fmt.Sprintf("/payments/%d", caseID)
@@ -79,8 +81,15 @@ func CreateFeeDecision(client CreateFeeDecisionClient, tmpl template.Template) H
 			} else if err != nil {
 				return err
 			} else {
+
+				title := "Decline a fee reduction recorded"
+
+				if isDigitalLpa {
+					title = "Fee decision added"
+				}
+
 				SetFlash(w, FlashNotification{
-					Title: "Fee decision added",
+					Title: title,
 				})
 
 				return RedirectError(data.ReturnUrl)
