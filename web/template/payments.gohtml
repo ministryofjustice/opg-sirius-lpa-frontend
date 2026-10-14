@@ -20,14 +20,14 @@
                    hx-swap="innerHTML">
                     Apply fee reduction
                 </a>
+                <a class="govuk-button govuk-button--secondary" id="f-decline-fee-reduction-button"
+                   href=""
+                   hx-get="{{ prefix (printf "/decline-fee-reduction?id=%d" .Case.ID) }}"
+                   hx-target=".action-panel__content"
+                   hx-swap="innerHTML">
+                    Decline fee reduction
+                </a>
             {{ end }}
-            <a class="govuk-button govuk-button--secondary" id="f-decline-fee-reduction-button"
-               href=""
-               hx-get="{{ prefix (printf "/decline-fee-reduction?id=%d" .Case.ID) }}"
-               hx-target=".action-panel__content"
-               hx-swap="innerHTML">
-                Decline fee reduction
-            </a>
             <div class="govuk-body">
                 <a class="govuk-link govuk-link--no-visited-state"
                    href=""
@@ -56,10 +56,12 @@
                     Apply fee reduction
                 </a>
             {{ end }}
+            {{ if and (.IsReducedFeesUser) }}
             <a class="govuk-button govuk-button--secondary" id="f-decline-fee-reduction-button"
                href="{{ prefix (printf "/create-decline-fee-decision?id=%d" .Case.ID) }}">
                 Decline fee reduction
             </a>
+            {{ end }}
         </div>
     </div>
 {{ end }}
