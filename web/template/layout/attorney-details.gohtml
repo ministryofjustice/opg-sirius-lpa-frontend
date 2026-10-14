@@ -34,7 +34,7 @@
                         <dt class="govuk-summary-list__key"></dt>
                         <dd class="govuk-summary-list__value"></dd>
                         <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link" id="f-change-attorney-details" href="{{ prefix (printf "/lpa/%s/attorney/%s/change-details" $caseUID $attorney.Uid) }}">Update</a>
+                            <a class="govuk-link" id="f-change-attorney-details" href="{{ prefix (printf "/lpa/%s/attorney/%s/update-details" $caseUID $attorney.Uid) }}">Update</a>
                         </dd>
                     </div>
 
@@ -145,7 +145,7 @@
                         <dt class="govuk-summary-list__key"></dt>
                         <dd class="govuk-summary-list__value"></dd>
                         <dd class="govuk-summary-list__actions">
-                            <a class="govuk-link" id="f-change-trust-corporation-details" href="{{ prefix (printf "/lpa/%s/trust-corporation/%s/change-details" $caseUID $trustCorporation.Uid) }}">Update</a>
+                            <a class="govuk-link" id="f-change-trust-corporation-details" href="{{ prefix (printf "/lpa/%s/trust-corporation/%s/update-details" $caseUID $trustCorporation.Uid) }}">Update</a>
                         </dd>
                     </div>
 

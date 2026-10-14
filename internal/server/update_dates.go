@@ -1,0 +1,105 @@
+package server
+
+import (
+	"net/http"
+
+	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+)
+
+type UpdateDatesClient interface {
+	Case(sirius.Context, int) (sirius.Case, error)
+	UpdateDates(sirius.Context, int, sirius.CaseType, sirius.Dates) error
+}
+
+type updateDatesData struct {
+	XSRFToken string
+	Entity    string
+	Success   bool
+	Error     sirius.ValidationError
+	IsPartial bool
+
+	Dates    sirius.Dates
+	DonorId  int
+	CaseUid  string
+	CaseType string
+	CaseId   int
+}
+
+func UpdateDates(client UpdateDatesClient, tmpl template.Template) Handler {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		caseID, err := strToIntOrStatusError(r.FormValue("id"))
+		if err != nil {
+			return err
+		}
+
+		caseType, err := sirius.ParseCaseType(r.FormValue("case"))
+		if err != nil {
+			return err
+		}
+
+		ctx := getContext(r)
+		data := updateDatesData{
+			XSRFToken: ctx.XSRFToken,
+			CaseId:    caseID,
+			IsPartial: ctx.IsPartial,
+		}
+
+		if r.Method == http.MethodPost {
+			dates := sirius.Dates{
+				CancellationDate: postFormDateString(r, "cancellationDate"),
+				DispatchDate:     postFormDateString(r, "dispatchDate"),
+				DueDate:          postFormDateString(r, "dueDate"),
+				FilingDate:       postFormDateString(r, "filingDate"),
+				InvalidDate:      postFormDateString(r, "invalidDate"),
+				PaymentDate:      postFormDateString(r, "paymentDate"),
+				ReceiptDate:      postFormDateString(r, "receiptDate"),
+				RegistrationDate: postFormDateString(r, "registrationDate"),
+				RejectedDate:     postFormDateString(r, "rejectedDate"),
+				RevokedDate:      postFormDateString(r, "revokedDate"),
+				WithdrawnDate:    postFormDateString(r, "withdrawnDate"),
+			}
+
+			err = client.UpdateDates(ctx, caseID, caseType, dates)
+			if ve, ok := err.(sirius.ValidationError); ok {
+				w.WriteHeader(http.StatusBadRequest)
+				data.Error = ve
+				data.Dates = dates
+			} else if err != nil {
+				return err
+			} else {
+				data.Success = true
+			}
+		}
+
+		caseitem, err := client.Case(ctx, caseID)
+		if err != nil {
+			return err
+		}
+
+		data.CaseUid = caseitem.UID
+		data.CaseType = caseitem.CaseType
+		if caseitem.Donor != nil {
+			data.DonorId = caseitem.Donor.ID
+		}
+
+		if r.Method != http.MethodPost || data.Success {
+			data.Dates = sirius.Dates{
+				CancellationDate: caseitem.CancellationDate,
+				DispatchDate:     caseitem.DispatchDate,
+				DueDate:          caseitem.DueDate,
+				InvalidDate:      caseitem.InvalidDate,
+				PaymentDate:      caseitem.PaymentDate,
+				FilingDate:       caseitem.FilingDate,
+				ReceiptDate:      caseitem.ReceiptDate,
+				RegistrationDate: caseitem.RegistrationDate,
+				RejectedDate:     caseitem.RejectedDate,
+				RevokedDate:      caseitem.RevokedDate,
+				WithdrawnDate:    caseitem.WithdrawnDate,
+			}
+		}
+		data.Entity = caseitem.Summary()
+
+		return tmpl(w, data)
+	}
+}
