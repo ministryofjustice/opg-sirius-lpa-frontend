@@ -146,7 +146,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/edit-document", wrap(EditDocument(client, templates.Get("edit-document.gohtml"))))
 
 	//modernise
-	mux.Handle("/add-fee-decision", wrap(AddFeeDecision(client, templates.Get("add_fee_decision.gohtml"))))
+	mux.Handle("/add-fee-decision", wrap(AddFeeDecision(client, templates.Get("create-fee-decision.gohtml"))))
 	mux.Handle("/add-objection", wrap(AddObjection(client, templates.Get("objection.gohtml"))))
 	mux.Handle("/change-case-status", wrap(ChangeCaseStatus(client, templates.Get("change_case_status.gohtml"))))
 	mux.Handle("/change-donor-details", wrap(ChangeDonorDetails(client, templates.Get("change-donor-details.gohtml"))))
@@ -175,7 +175,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 
 	//LPA
 	mux.Handle("/action-panel", wrap(ActionPanel(client, templates.Get("action-panel-wrapper.gohtml"))))
-	mux.Handle("/add-complaint", wrap(AddComplaint(client, templates.Get("add-complaint.gohtml"))))
+	mux.Handle("/add-complaint", wrap(AddComplaint(client, templates.Get("create-complaint.gohtml"))))
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate-cases.gohtml"))))
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change-status.gohtml"))))
 	mux.Handle("/create-attorney", wrap(CreateAttorney(client, templates.Get("create-attorney.gohtml"))))
