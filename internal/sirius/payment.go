@@ -36,7 +36,7 @@ func (c *Client) AddPayment(ctx Context, caseID int, amount int, source string, 
 	return c.post(ctx, fmt.Sprintf("/lpa-api/v1/cases/%d/payments", caseID), data, nil)
 }
 
-func (c *Client) EditPayment(ctx Context, paymentID int, payment Payment) error {
+func (c *Client) UpdatePayment(ctx Context, paymentID int, payment Payment) error {
 	path := fmt.Sprintf("/lpa-api/v1/payments/%d", paymentID)
 	if payment.Source == "FEE_REDUCTION" {
 		path += "/reduction"
