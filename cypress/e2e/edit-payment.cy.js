@@ -1,6 +1,10 @@
 describe("Edit a payment", () => {
   beforeEach(() => {
     cy.visit("/edit-payment?id=123");
+    cy.addMock("/lpa-api/v1/cases/800/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
   });
 
   it("edits a payment on the case", () => {

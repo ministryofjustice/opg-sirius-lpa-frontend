@@ -1,6 +1,10 @@
 describe("Add a fee decision to a non-digital LPA", () => {
   beforeEach(() => {
     cy.visit("/add-fee-decision?id=801");
+    cy.addMock("/lpa-api/v1/cases/801/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
   });
 
   it("adds a fee decision to the case", () => {
