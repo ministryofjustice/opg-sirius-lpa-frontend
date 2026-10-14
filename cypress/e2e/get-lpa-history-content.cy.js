@@ -963,9 +963,9 @@ describe("Show correct event content", () => {
     });
     cy.visit("/donor/1/history");
     cy.get(".moj-timeline__item")
-        .eq(0)
-        .should("contain.text", "Declined exemption on 15/01/2024")
-        .should("contain.text", "Not eligible for exemption");
+      .eq(0)
+      .should("contain.text", "Declined exemption on 15/01/2024")
+      .should("contain.text", "Not eligible for exemption");
   });
 
   it("can view notified person updated event with prior values", () => {

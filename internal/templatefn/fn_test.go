@@ -797,6 +797,7 @@ func TestEventWithContext(t *testing.T) {
 
 	event := sirius.LpaEvent{}
 	donorID := "123"
+	decisionTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	feeReductionTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	complaintCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	complaintSubcategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
@@ -809,6 +810,7 @@ func TestEventWithContext(t *testing.T) {
 		LpaEvent: event,
 		Context: EventContext{
 			DonorID:                donorID,
+			DecisionTypes:          decisionTypes,
 			FeeReductionTypes:      feeReductionTypes,
 			ComplaintCategories:    complaintCategories,
 			ComplaintSubcategories: complaintSubcategories,
@@ -821,6 +823,7 @@ func TestEventWithContext(t *testing.T) {
 	result := fn(
 		event,
 		"donorID", donorID,
+		"decisionTypes", decisionTypes,
 		"feeReductionTypes", feeReductionTypes,
 		"complaintCategories", complaintCategories,
 		"complaintSubcategories", complaintSubcategories,
