@@ -58,7 +58,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 	warningUrl := fmt.Sprintf("/create-warning?id=%d&entity=person%s", donorId, caseUids)
 	eventUrl := fmt.Sprintf("/create-event?id=%d&entity=person%s", donorId, caseUids)
 	createDonorUrl := fmt.Sprintf("/create-donor?id=%d&entity=person%s", donorId, caseUids)
-	editDonorUrl := fmt.Sprintf("/edit-donor?id=%d&entity=person%s", donorId, caseUids)
+	editDonorUrl := fmt.Sprintf("/update-donor?id=%d&entity=person%s", donorId, caseUids)
 	miReportingUrl := fmt.Sprintf("/mi-reporting?donorId=%d%s", donorId, caseUids)
 	linkPersonUrl := fmt.Sprintf("/link-person?id=%d%s", donorId, caseUids)
 	unlinkPersonUrl := fmt.Sprintf("/unlink-person?id=%d%s", donorId, caseUids)
@@ -86,10 +86,10 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		warningUrl = fmt.Sprintf("/create-warning?id=%d&entity=%s%s", donorId, caseType, caseUids)
 		complaintUrl = fmt.Sprintf("/add-complaint?id=%d&case=%s", id, caseType)
 		createDocumentUrl = fmt.Sprintf("/create-document?id=%d&case=%s", id, caseType)
-		changeStatusUrl = fmt.Sprintf("/change-status?id=%d&case=%s&donorId=%d%s", id, caseType, donorId, caseUids)
+		changeStatusUrl = fmt.Sprintf("/update-status?id=%d&case=%s&donorId=%d%s", id, caseType, donorId, caseUids)
 		paymentsUrl = fmt.Sprintf("/payments/%d", id)
 		newTaskUrl = fmt.Sprintf("/create-task?id=%d&entity=%s%s", id, caseType, caseUids)
-		editDatesUrl = fmt.Sprintf("/edit-dates?id=%d&case=%s", id, caseType)
+		editDatesUrl = fmt.Sprintf("/update-dates?id=%d&case=%s", id, caseType)
 		allocateCasesUrl = fmt.Sprintf("/allocate-cases?id=%d&entity=%s%s", id, caseType, caseUids)
 		createInvestigationUrl = fmt.Sprintf("/create-investigation?id=%d&case=%s%s", id, caseType, caseUids)
 
@@ -100,7 +100,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		}
 
 		if hasDrafts {
-			editDocumentUrl = fmt.Sprintf("/edit-document?id=%d&case=%s", id, caseType)
+			editDocumentUrl = fmt.Sprintf("/update-document?id=%d&case=%s", id, caseType)
 		}
 
 		if len(taskIDs) > 0 {
