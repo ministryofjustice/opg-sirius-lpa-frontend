@@ -222,7 +222,7 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 				} else if err != nil {
 					return err
 				} else {
-					return RedirectError(fmt.Sprintf("/edit-document?id=%d&case=%s", lpa.SiriusData.ID, sirius.CaseTypeDigitalLpa))
+					return RedirectError(fmt.Sprintf("/update-document?id=%d&case=%s", lpa.SiriusData.ID, sirius.CaseTypeDigitalLpa))
 				}
 			}
 		}
