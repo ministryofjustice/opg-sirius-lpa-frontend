@@ -1,0 +1,456 @@
+package server
+
+import (
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"strings"
+	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
+
+type mockUpdatePaymentClient struct {
+	mock.Mock
+}
+
+func (m *mockUpdatePaymentClient) PaymentByID(ctx sirius.Context, id int) (sirius.Payment, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.Payment), args.Error(1)
+}
+
+func (m *mockUpdatePaymentClient) UpdatePayment(ctx sirius.Context, paymentID int, payment sirius.Payment) error {
+	return m.Called(ctx, paymentID, payment).Error(0)
+}
+
+func (m *mockUpdatePaymentClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.Case), args.Error(1)
+}
+
+func (m *mockUpdatePaymentClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
+	args := m.Called(ctx, category)
+	if args.Get(0) != nil {
+		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
+func TestGetUpdatePayment(t *testing.T) {
+	caseItem := sirius.Case{
+		UID:     "7000-0000-0021",
+		SubType: "pfa",
+	}
+
+	payment := sirius.Payment{
+		ID:          123,
+		Amount:      8200,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-07-23"),
+		Case:        &sirius.Case{ID: 4},
+	}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
+	client := &mockUpdatePaymentClient{}
+	client.
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil)
+	client.
+		On("PaymentByID", mock.Anything, 123).
+		Return(payment, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, UpdatePaymentData{
+			Case:        caseItem,
+			PaymentID:   123,
+			Amount:      "82.00",
+			Source:      "PHONE",
+			PaymentDate: sirius.DateString("2022-07-23"),
+			PaymentSources: []PaymentSourceRadioOption{
+				{Value: "PHONE", Label: "Paid over the phone"},
+			},
+			ReturnUrl: "/payments/0",
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := UpdatePayment(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestUpdatePaymentWhenFailureOnGetPaymentByID(t *testing.T) {
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+	client := &mockUpdatePaymentClient{}
+	client.
+		On("PaymentByID", mock.Anything, 123).
+		Return(sirius.Payment{}, errExample).
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := UpdatePayment(client, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestUpdatePaymentWhenFailureOnGetCase(t *testing.T) {
+	payment := sirius.Payment{
+		ID:          123,
+		Amount:      8200,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-07-23"),
+		Case:        &sirius.Case{ID: 4},
+	}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
+	client := &mockUpdatePaymentClient{}
+	client.
+		On("PaymentByID", mock.Anything, 123).
+		Return(payment, nil).
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil).
+		On("Case", mock.Anything, 4).
+		Return(sirius.Case{}, errExample)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := UpdatePayment(client, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestUpdatePaymentWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
+	caseItem := sirius.Case{
+		UID:     "7000-0000-0021",
+		SubType: "pfa",
+	}
+
+	payment := sirius.Payment{
+		ID:          123,
+		Amount:      8200,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-07-23"),
+		Case:        &sirius.Case{ID: 4},
+	}
+
+	client := &mockUpdatePaymentClient{}
+	client.
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil)
+	client.
+		On("PaymentByID", mock.Anything, 123).
+		Return(payment, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return([]sirius.RefDataItem{}, errExample)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := UpdatePayment(client, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestUpdatePaymentWhenTemplateErrors(t *testing.T) {
+	caseItem := sirius.Case{
+		UID:     "7000-0000-0021",
+		SubType: "pfa",
+	}
+
+	payment := sirius.Payment{
+		ID:          123,
+		Amount:      8200,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-07-23"),
+		Case:        &sirius.Case{ID: 4},
+	}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
+	client := &mockUpdatePaymentClient{}
+	client.
+		On("PaymentByID", mock.Anything, 123).
+		Return(payment, nil)
+	client.
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, UpdatePaymentData{
+			Case:        caseItem,
+			PaymentID:   123,
+			Amount:      "82.00",
+			Source:      "PHONE",
+			PaymentDate: sirius.DateString("2022-07-23"),
+			PaymentSources: []PaymentSourceRadioOption{
+				{Value: "PHONE", Label: "Paid over the phone"},
+			},
+			ReturnUrl: "/payments/0",
+		}).
+		Return(errExample)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := UpdatePayment(client, template.Func)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostUpdatePaymentAmountIncorrectFormat(t *testing.T) {
+	for _, amount := range []string{"41.5", "41.555", ".45"} {
+		t.Run(amount, func(t *testing.T) {
+			caseItem := sirius.Case{CaseType: "lpa", UID: "700700"}
+
+			payment := sirius.Payment{
+				ID:          123,
+				Amount:      8200,
+				Source:      "PHONE",
+				PaymentDate: sirius.DateString("2022-07-23"),
+				Case:        &sirius.Case{ID: 4},
+			}
+
+			paymentSources := []sirius.RefDataItem{
+				{
+					Handle:         "PHONE",
+					Label:          "Paid over the phone",
+					UserSelectable: true,
+				},
+			}
+
+			client := &mockUpdatePaymentClient{}
+			client.
+				On("PaymentByID", mock.Anything, 123).
+				Return(payment, nil)
+			client.
+				On("Case", mock.Anything, 4).
+				Return(caseItem, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+				Return(paymentSources, nil)
+
+			validationError := sirius.ValidationError{
+				Field: sirius.FieldErrors{
+					"amount": {"reason": "Please enter the amount to 2 decimal places"},
+				},
+			}
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, UpdatePaymentData{
+					Case:        caseItem,
+					PaymentID:   123,
+					Amount:      amount,
+					Source:      "MAKE",
+					PaymentDate: sirius.DateString("2022-01-23"),
+					PaymentSources: []PaymentSourceRadioOption{
+						{Value: "PHONE", Label: "Paid over the phone"},
+					},
+					Error:     validationError,
+					ReturnUrl: "/payments/0",
+				}).
+				Return(nil)
+
+			form := url.Values{
+				"amount":      {amount},
+				"source":      {"MAKE"},
+				"paymentDate": {"2022-01-23"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := UpdatePayment(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
+func TestPostUpdatePayment(t *testing.T) {
+	caseItem := sirius.Case{CaseType: "lpa", UID: "700700", ID: 4}
+
+	payment := sirius.Payment{
+		ID:          123,
+		Amount:      8200,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-02-18"),
+		Case:        &sirius.Case{ID: 4},
+	}
+
+	editedPayment := sirius.Payment{
+		Amount:      3300,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-02-18"),
+	}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
+	client := &mockUpdatePaymentClient{}
+	client.
+		On("PaymentByID", mock.Anything, 123).
+		Return(payment, nil)
+	client.
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
+	client.
+		On("UpdatePayment", mock.Anything, 123, editedPayment).
+		Return(nil)
+
+	template := &mockTemplate{}
+
+	form := url.Values{
+		"amount":      {"33.00"},
+		"source":      {"PHONE"},
+		"paymentDate": {"2022-02-18"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := UpdatePayment(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Equal(t, RedirectError("/payments/4"), err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostUpdatePaymentHtmx(t *testing.T) {
+	caseItem := sirius.Case{CaseType: "lpa", UID: "700700", ID: 4}
+
+	payment := sirius.Payment{
+		ID:          123,
+		Amount:      8200,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-02-18"),
+		Case:        &sirius.Case{ID: 4},
+	}
+
+	editedPayment := sirius.Payment{
+		Amount:      3300,
+		Source:      "PHONE",
+		PaymentDate: sirius.DateString("2022-02-18"),
+	}
+
+	paymentSources := []sirius.RefDataItem{
+		{
+			Handle:         "PHONE",
+			Label:          "Paid over the phone",
+			UserSelectable: true,
+		},
+	}
+
+	client := &mockUpdatePaymentClient{}
+	client.
+		On("PaymentByID", mock.Anything, 123).
+		Return(payment, nil)
+	client.
+		On("Case", mock.Anything, 4).
+		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.PaymentSourceCategory).
+		Return(paymentSources, nil)
+	client.
+		On("UpdatePayment", mock.Anything, 123, editedPayment).
+		Return(nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, UpdatePaymentData{
+			Case:        caseItem,
+			PaymentID:   123,
+			Amount:      "33.00",
+			Source:      "PHONE",
+			PaymentDate: "2022-02-18",
+			PaymentSources: []PaymentSourceRadioOption{
+				{Value: "PHONE", Label: "Paid over the phone"},
+			},
+			ReturnUrl:    "/payments/4",
+			HtmxRedirect: "/payments/4",
+			IsPartial:    true,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"amount":      {"33.00"},
+		"source":      {"PHONE"},
+		"paymentDate": {"2022-02-18"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := UpdatePayment(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
