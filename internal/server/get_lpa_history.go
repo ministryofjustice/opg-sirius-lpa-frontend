@@ -249,7 +249,7 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 			data.Events = eventsData.Events
 			data.IsFiltered = true
 		}
-		fmt.Println("data.Events", data.Events)
+
 		return tmpl(w, data)
 	}
 }
