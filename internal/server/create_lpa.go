@@ -303,7 +303,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				if err != nil {
 					return err
 				}
-				return RedirectError(fmt.Sprintf("/edit-certificate-provider?id=%d&caseId=%d&personId=%d%s", donorID, data.CaseId, personID, data.FlowQuery))
+				return RedirectError(fmt.Sprintf("/update-certificate-provider?id=%d&caseId=%d&personId=%d%s", donorID, data.CaseId, personID, data.FlowQuery))
 			}
 
 			data.Success = true

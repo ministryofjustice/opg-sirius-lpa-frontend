@@ -160,7 +160,7 @@ func TestGetActionPanel(t *testing.T) {
 				},
 				{
 					Label:    "Edit donor",
-					URL:      "/edit-donor?id=123&entity=person",
+					URL:      "/update-donor?id=123&entity=person",
 					IconName: "aw-edit-person",
 					Disabled: false,
 				},
@@ -305,13 +305,13 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 				},
 				{
 					Label:    "Retrieve draft",
-					URL:      "/edit-document?id=1&case=lpa",
+					URL:      "/update-document?id=1&case=lpa",
 					IconName: "aw-new-template",
 					Disabled: false,
 				},
 				{
 					Label:    "Change status",
-					URL:      "/change-status?id=1&case=lpa&donorId=123&uid[]=7000-0000-0001",
+					URL:      "/update-status?id=1&case=lpa&donorId=123&uid[]=7000-0000-0001",
 					IconName: "aw-change-status",
 					Disabled: false,
 				},
@@ -341,13 +341,13 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 				},
 				{
 					Label:    "Edit donor",
-					URL:      "/edit-donor?id=123&entity=person&uid[]=7000-0000-0001",
+					URL:      "/update-donor?id=123&entity=person&uid[]=7000-0000-0001",
 					IconName: "aw-edit-person",
 					Disabled: false,
 				},
 				{
 					Label:    "Edit dates",
-					URL:      "/edit-dates?id=1&case=lpa",
+					URL:      "/update-dates?id=1&case=lpa",
 					IconName: "calendar-open",
 					Disabled: false,
 				},
@@ -549,7 +549,7 @@ func TestGetActionPanelNoDonorID(t *testing.T) {
 				},
 				{
 					Label:    "Edit donor",
-					URL:      "/edit-donor?id=0&entity=person",
+					URL:      "/update-donor?id=0&entity=person",
 					IconName: "aw-edit-person",
 					Disabled: false,
 				},
