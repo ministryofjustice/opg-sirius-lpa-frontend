@@ -49,13 +49,13 @@ type Client interface {
 	ApplyFeeReductionClient
 	AssignTaskClient
 	AttorneyDecisionsClient
-	ChangeAttorneyDetailsClient
-	ChangeCaseStatusClient
-	ChangeCertificateProviderDetailsClient
-	ChangeDonorDetailsClient
-	ChangeDraftClient
-	ChangeStatusClient
-	ChangeTrustCorporationDetailsClient
+	UpdateAttorneyDetailsClient
+	UpdateCaseStatusClient
+	UpdateCertificateProviderDetailsClient
+	UpdateDonorDetailsClient
+	UpdateDraftClient
+	UpdateStatusClient
+	UpdateTrustCorporationDetailsClient
 	ClearTaskClient
 	CompareDocsClient
 	CreateAdditionalDraftClient
@@ -78,14 +78,14 @@ type Client interface {
 	DeleteRelationshipClient
 	DocumentListClient
 	DonorDetailsClient
-	EditCertificateProviderClient
-	EditComplaintClient
-	EditDatesClient
-	EditDocumentClient
-	EditDonorClient
-	EditFeeReductionClient
-	EditInvestigationClient
-	EditPaymentClient
+	UpdateCertificateProviderClient
+	UpdateComplaintClient
+	UpdateDatesClient
+	UpdateDocumentClient
+	UpdateDonorClient
+	UpdateFeeReductionClient
+	UpdateInvestigationClient
+	UpdatePaymentClient
 	EventClient
 	GetApplicationProgressClient
 	GetDocumentsClient
@@ -143,20 +143,21 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"))))
 	mux.Handle("/create-task", wrap(Task(client, templates.Get("create-task.gohtml"))))
 	mux.Handle("/create-warning", wrap(Warning(client, templates.Get("warning.gohtml"))))
-	mux.Handle("/edit-document", wrap(EditDocument(client, templates.Get("edit-document.gohtml"))))
+	mux.Handle("/update-document", wrap(UpdateDocument(client, templates.Get("update-document.gohtml"))))
+	mux.Handle("/edit-document", wrap(UpdateDocument(client, templates.Get("update-document.gohtml"))))
 
 	//modernise
 	mux.Handle("/create-fee-decision", wrap(CreateFeeDecision(client, templates.Get("create-fee-decision.gohtml"))))
 	mux.Handle("/create-objection", wrap(CreateObjection(client, templates.Get("objection.gohtml"))))
-	mux.Handle("/change-case-status", wrap(ChangeCaseStatus(client, templates.Get("change_case_status.gohtml"))))
-	mux.Handle("/change-donor-details", wrap(ChangeDonorDetails(client, templates.Get("change-donor-details.gohtml"))))
+	mux.Handle("/update-case-status", wrap(UpdateCaseStatus(client, templates.Get("update-case-status.gohtml"))))
+	mux.Handle("/update-donor-details", wrap(UpdateDonorDetails(client, templates.Get("update-donor-details.gohtml"))))
 	mux.Handle("/clear-task", wrap(ClearTask(client, templates.Get("clear_task.gohtml"))))
 	mux.Handle("/create-additional-draft-lpa", wrap(CreateAdditionalDraft(client, templates.Get("create_additional_draft.gohtml"))))
 	mux.Handle("/digital-lpa/create", wrap(CreateDraft(client, templates.Get("create_draft.gohtml"))))
 	mux.Handle("/lpa/{uid}", wrap(GetApplicationProgressDetails(client, templates.Get("mlpa-application-progress.gohtml"))))
-	mux.Handle("/lpa/{uid}/attorney/{attorneyUID}/change-details", wrap(ChangeAttorneyDetails(client, templates.Get("change-attorney-details.gohtml"))))
-	mux.Handle("/lpa/{uid}/certificate-provider/change-details", wrap(ChangeCertificateProviderDetails(client, templates.Get("change-certificate-provider-details.gohtml"))))
-	mux.Handle("/lpa/{uid}/change-draft", wrap(ChangeDraft(client, templates.Get("change-draft.gohtml"))))
+	mux.Handle("/lpa/{uid}/attorney/{attorneyUID}/update-details", wrap(UpdateAttorneyDetails(client, templates.Get("update-attorney-details.gohtml"))))
+	mux.Handle("/lpa/{uid}/certificate-provider/update-details", wrap(UpdateCertificateProviderDetails(client, templates.Get("update-certificate-provider-details.gohtml"))))
+	mux.Handle("/lpa/{uid}/update-draft", wrap(UpdateDraft(client, templates.Get("update-draft.gohtml"))))
 	mux.Handle("/lpa/{uid}/documents", wrap(GetDocuments(client, templates.Get("mlpa-documents.gohtml"))))
 	mux.Handle("/lpa/{uid}/documents/new", wrap(CreateDocumentDigitalLpa(client, templates.Get("mlpa-create_document.gohtml"))))
 	mux.Handle("/lpa/{uid}/history", wrap(GetHistory(client, templates.Get("mlpa-history.gohtml"))))
@@ -169,7 +170,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/lpa/{uid}/manage-restrictions", wrap(ManageRestrictions(client, templates.Get("manage-restrictions.gohtml"), templates.Get("confirm-restrictions.gohtml"))))
 	mux.Handle("/lpa/{uid}/payments", wrap(GetPayments(client, templates.Get("mlpa-payments.gohtml"))))
 	mux.Handle("/lpa/{uid}/remove-an-attorney", wrap(RemoveAnAttorney(client, templates.Get("mlpa-remove-attorney.gohtml"), templates.Get("mlpa-confirm-attorney-removal.gohtml"), templates.Get("mlpa-attorney-decisions.gohtml"))))
-	mux.Handle("/lpa/{uid}/trust-corporation/{trustCorporationUID}/change-details", wrap(ChangeTrustCorporationDetails(client, templates.Get("change-trust-corporation-details.gohtml"))))
+	mux.Handle("/lpa/{uid}/trust-corporation/{trustCorporationUID}/update-details", wrap(UpdateTrustCorporationDetails(client, templates.Get("update-trust-corporation-details.gohtml"))))
 	mux.Handle("/lpa/{uid}/update-decisions", wrap(UpdateDecisions(client, templates.Get("mlpa-update-decisions.gohtml"))))
 	mux.Handle("/manage-fees", wrap(CreateFeeDecision(client, templates.Get("manage_fees.gohtml"))))
 
@@ -178,7 +179,8 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-complaint", wrap(CreateComplaint(client, templates.Get("create-complaint.gohtml"))))
 	mux.Handle("/add-complaint", wrap(CreateComplaint(client, templates.Get("create-complaint.gohtml"))))
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate-cases.gohtml"))))
-	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change-status.gohtml"))))
+	mux.Handle("/update-status", wrap(UpdateStatus(client, templates.Get("update-status.gohtml"))))
+	mux.Handle("/change-status", wrap(UpdateStatus(client, templates.Get("update-status.gohtml"))))
 	mux.Handle("/create-attorney", wrap(CreateAttorney(client, templates.Get("create-attorney.gohtml"))))
 	mux.Handle("/update-attorney", wrap(UpdateAttorney(client, templates.Get("create-attorney.gohtml"))))
 	mux.Handle("/create-certificate-provider", wrap(CreateCertificateProvider(client, templates.Get("certificate-provider.gohtml"))))
@@ -202,13 +204,17 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/donor/{donorId}/history", wrap(GetLpaHistory(client, templates.Get("lpa-history.gohtml"))))
 	mux.Handle("/view-document/{uuid}/{id}", wrap(ViewDocument(client, templates.Get("view-document.gohtml"))))
 	mux.Handle("/delete-document/{uuid}", wrap(DeleteDocument(client, templates.Get("delete-document.gohtml"))))
-	mux.Handle("/edit-certificate-provider", wrap(EditCertificateProvider(client, templates.Get("certificate-provider.gohtml"))))
-	mux.Handle("/edit-complaint", wrap(EditComplaint(client, templates.Get("edit_complaint.gohtml"))))
-	mux.Handle("/edit-dates", wrap(EditDates(client, templates.Get("edit-dates.gohtml"))))
-	mux.Handle("/edit-donor", wrap(EditDonor(client, templates.Get("donor.gohtml"))))
-	mux.Handle("/edit-fee-reduction", wrap(EditFeeReduction(client, templates.Get("edit-fee-reduction.gohtml"))))
-	mux.Handle("/edit-investigation", wrap(EditInvestigation(client, templates.Get("edit_investigation.gohtml"))))
-	mux.Handle("/edit-payment", wrap(EditPayment(client, templates.Get("edit-payment.gohtml"))))
+	mux.Handle("/update-certificate-provider", wrap(UpdateCertificateProvider(client, templates.Get("certificate-provider.gohtml"))))
+	mux.Handle("/update-complaint", wrap(UpdateComplaint(client, templates.Get("edit_complaint.gohtml"))))
+	mux.Handle("/edit-complaint", wrap(UpdateComplaint(client, templates.Get("edit_complaint.gohtml"))))
+	mux.Handle("/update-dates", wrap(UpdateDates(client, templates.Get("update-dates.gohtml"))))
+	mux.Handle("/edit-dates", wrap(UpdateDates(client, templates.Get("update-dates.gohtml"))))
+	mux.Handle("/update-donor", wrap(UpdateDonor(client, templates.Get("donor.gohtml"))))
+	mux.Handle("/edit-donor", wrap(UpdateDonor(client, templates.Get("donor.gohtml"))))
+	mux.Handle("/update-fee-reduction", wrap(UpdateFeeReduction(client, templates.Get("update-fee-reduction.gohtml"))))
+	mux.Handle("/update-investigation", wrap(UpdateInvestigation(client, templates.Get("edit_investigation.gohtml"))))
+	mux.Handle("/edit-investigation", wrap(UpdateInvestigation(client, templates.Get("edit_investigation.gohtml"))))
+	mux.Handle("/update-payment", wrap(UpdatePayment(client, templates.Get("update-payment.gohtml"))))
 	mux.Handle("/investigation-hold", wrap(InvestigationHold(client, templates.Get("investigation_hold.gohtml"))))
 	mux.Handle("/link-person", wrap(LinkPerson(client, templates.Get("link-person.gohtml"))))
 	mux.Handle("/mi-reporting", wrap(MiReporting(client, templates.Get("mi-reporting.gohtml"))))

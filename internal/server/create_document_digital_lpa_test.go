@@ -438,7 +438,7 @@ func TestPostCreateDocumentDigitalLpa(t *testing.T) {
 	req.Header.Add("Content-Type", formUrlEncoded)
 	_, err := server.serve(req)
 
-	assert.Equal(t, RedirectError("/edit-document?id=1344&case=digital_lpa"), err)
+	assert.Equal(t, RedirectError("/update-document?id=1344&case=digital_lpa"), err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 

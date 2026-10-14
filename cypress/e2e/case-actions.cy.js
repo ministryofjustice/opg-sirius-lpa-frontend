@@ -76,7 +76,7 @@ describe("Case actions drop down", () => {
     cy.contains("Case actions").click();
     cy.contains("Change case status").click();
 
-    cy.url().should("include", "/change-case-status?uid=M-1111-1111-1111");
+    cy.url().should("include", "/update-case-status?uid=M-1111-1111-1111");
     cy.contains("Change case status");
     cy.get(".govuk-button-group").contains("Cancel").click();
 

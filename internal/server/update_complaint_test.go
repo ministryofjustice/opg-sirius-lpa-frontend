@@ -1,0 +1,357 @@
+package server
+
+import (
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"strings"
+	"testing"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
+
+type mockUpdateComplaintClient struct {
+	mock.Mock
+}
+
+func (m *mockUpdateComplaintClient) UpdateComplaint(ctx sirius.Context, id int, complaint sirius.Complaint) error {
+	args := m.Called(ctx, id, complaint)
+	return args.Error(0)
+}
+
+func (m *mockUpdateComplaintClient) Complaint(ctx sirius.Context, id int) (sirius.Complaint, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.Complaint), args.Error(1)
+}
+
+func (m *mockUpdateComplaintClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(sirius.Case), args.Error(1)
+}
+
+func (m *mockUpdateComplaintClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
+	args := m.Called(ctx, category)
+	if args.Get(0) != nil {
+		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
+var demoCompensationTypes = []sirius.RefDataItem{
+	{
+		Handle: "COMPENSATORY",
+		Label:  "Compensatory",
+	},
+}
+
+func TestGetUpdateComplaint(t *testing.T) {
+	complaint := sirius.Complaint{
+		Category: "01",
+	}
+
+	client := &mockUpdateComplaintClient{}
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
+	client.
+		On("Complaint", mock.Anything, 123).
+		Return(complaint, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, updateComplaintData{
+			Complaint:             complaint,
+			Categories:            demoComplaintCategories,
+			ComplainantCategories: demoComplainantCategories,
+			Origins:               demoComplaintOrigins,
+			CompensationTypes:     demoCompensationTypes,
+		}).
+		Return(nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := UpdateComplaint(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestGetUpdateComplaintNoID(t *testing.T) {
+	r, _ := http.NewRequest(http.MethodGet, "/", nil)
+	w := httptest.NewRecorder()
+
+	err := UpdateComplaint(nil, nil)(w, r)
+
+	assert.NotNil(t, err)
+}
+
+func TestGetUpdateComplaintWhenRefDataErrors(t *testing.T) {
+	complaint := sirius.Complaint{
+		Category: "01",
+	}
+
+	client := &mockUpdateComplaintClient{}
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, errExample)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
+	client.
+		On("Complaint", mock.Anything, 123).
+		Return(complaint, nil)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := UpdateComplaint(client, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestGetUpdateComplaintWhenComplaintErrors(t *testing.T) {
+	client := &mockUpdateComplaintClient{}
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
+	client.
+		On("Complaint", mock.Anything, 123).
+		Return(sirius.Complaint{}, errExample)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := UpdateComplaint(client, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestGetUpdateComplaintWhenTemplateErrors(t *testing.T) {
+	client := &mockUpdateComplaintClient{}
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
+	client.
+		On("Complaint", mock.Anything, 123).
+		Return(sirius.Complaint{}, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, updateComplaintData{
+			Categories:            demoComplaintCategories,
+			ComplainantCategories: demoComplainantCategories,
+			Origins:               demoComplaintOrigins,
+			CompensationTypes:     demoCompensationTypes,
+		}).
+		Return(errExample)
+
+	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
+	w := httptest.NewRecorder()
+
+	err := UpdateComplaint(client, template.Func)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostUpdateComplaint(t *testing.T) {
+	complaint := sirius.Complaint{
+		Category:             "01",
+		Description:          "This is a complaint",
+		ReceivedDate:         sirius.DateString("2022-04-05"),
+		Severity:             shared.ComplaintSeverityMinor,
+		InvestigatingOfficer: "Test Officer",
+		SubCategory:          "07",
+		Title:                "In summary...",
+		Resolution:           "complaint upheld",
+		ResolutionInfo:       "This is what we did",
+		ResolutionDate:       sirius.DateString("2022-05-06"),
+		CompensationType:     "COMPENSATORY",
+		CompensationAmount:   "150.00",
+	}
+
+	client := &mockUpdateComplaintClient{}
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
+	client.
+		On("Complaint", mock.Anything, 123).
+		Return(complaint, nil)
+	client.
+		On("UpdateComplaint", mock.Anything, 123, complaint).
+		Return(nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, updateComplaintData{
+			Success:               true,
+			Complaint:             complaint,
+			Categories:            demoComplaintCategories,
+			ComplainantCategories: demoComplainantCategories,
+			Origins:               demoComplaintOrigins,
+			CompensationTypes:     demoCompensationTypes,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"category":                       {"01"},
+		"description":                    {"This is a complaint"},
+		"receivedDate":                   {"2022-04-05"},
+		"severity":                       {"Minor"},
+		"investigatingOfficer":           {"Test Officer"},
+		"subCategory":                    {"07"},
+		"title":                          {"In summary..."},
+		"resolution":                     {"complaint upheld"},
+		"resolutionInfo":                 {"This is what we did"},
+		"resolutionDate":                 {"2022-05-06"},
+		"compensationType":               {"COMPENSATORY"},
+		"compensationAmountCOMPENSATORY": {"150.00"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := UpdateComplaint(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostUpdateComplaintWhenUpdateComplaintValidationError(t *testing.T) {
+	expectedError := sirius.ValidationError{
+		Field: sirius.FieldErrors{"field": {"": "problem"}},
+	}
+
+	complaint := sirius.Complaint{Description: "This is a complaint", Severity: shared.ComplaintSeverityNotRecognised}
+
+	client := &mockUpdateComplaintClient{}
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
+	client.
+		On("Complaint", mock.Anything, 123).
+		Return(complaint, nil)
+	client.
+		On("UpdateComplaint", mock.Anything, 123, complaint).
+		Return(expectedError)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, updateComplaintData{
+			Success:               false,
+			Error:                 expectedError,
+			Complaint:             complaint,
+			Categories:            demoComplaintCategories,
+			ComplainantCategories: demoComplainantCategories,
+			Origins:               demoComplaintOrigins,
+			CompensationTypes:     demoCompensationTypes,
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"description": {"This is a complaint"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := UpdateComplaint(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostUpdateComplaintWhenUpdateComplaintOtherError(t *testing.T) {
+	complaint := sirius.Complaint{Description: "This is a complaint", Severity: shared.ComplaintSeverityNotRecognised}
+
+	client := &mockUpdateComplaintClient{}
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).
+		Return(demoComplainantCategories, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).
+		Return(demoComplaintOrigins, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CompensationType).
+		Return(demoCompensationTypes, nil).
+		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
+		Return(demoComplaintCategories, nil)
+	client.
+		On("Complaint", mock.Anything, 123).
+		Return(complaint, nil)
+	client.
+		On("UpdateComplaint", mock.Anything, 123, complaint).
+		Return(errExample)
+
+	form := url.Values{
+		"description": {"This is a complaint"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := UpdateComplaint(client, nil)(w, r)
+
+	assert.Equal(t, errExample, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
