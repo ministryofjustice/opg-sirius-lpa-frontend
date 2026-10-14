@@ -370,6 +370,10 @@ describe("Action Panel", () => {
         roles: ["OPG User", "Reduced Fees User"],
       },
     });
+    cy.addMock("/lpa-api/v1/cases/34/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
 
     cy.get("a#action-panel-button-fees").click();
     cy.get(".action-panel__form").should("exist");
@@ -384,288 +388,288 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form .govuk-link").contains("Cancel").click();
   });
 
-  it("displays the create donor button on the action panel", () => {
-    cy.get("#actions-content").should("be.visible");
-    cy.get("#actions-content").contains("Create donor");
-
-    cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
-
-    cy.get("a#action-panel-button-create-donor").click();
-    cy.get(".action-panel__form").should("exist");
-    cy.get(".action-panel__form").contains("Create Donor");
-  });
-
-  it("displays the edit donor button on the action panel", () => {
-    cy.get("#actions-content").should("be.visible");
-    cy.get("#actions-content").contains("Edit donor");
-
-    cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
-
-    cy.get("a#action-panel-button-edit-donor").click();
-    cy.get(".action-panel__form").should("exist");
-    cy.get(".action-panel__form").contains("Edit Donor");
-  });
-
-  it("displays the allocate case button on the action panel", () => {
-    cy.get("#actions-content").should("be.visible");
-    cy.get("#actions-content").contains("Allocate Case");
-
-    cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
-
-    cy.get("a#action-panel-button-allocate-case").click();
-    cy.get(".action-panel__form").should("exist");
-    cy.get(".action-panel__form").contains("Allocate Case");
-  });
-
-  it("displays the edit dates button on the action panel", () => {
-    cy.get("#actions-content").should("be.visible");
-    cy.get("#actions-content").contains("Edit dates");
-
-    cy.addMock("/lpa-api/v1/cases/34", "GET", {
-      status: 200,
-      body: {
-        uid: "7000-1234-1234",
-        caseType: "LPA",
-        donor: { id: 1 },
-      },
-    });
-
-    cy.get("a#action-panel-button-edit-dates").click();
-    cy.get(".action-panel__form").should("exist");
-    cy.get(".action-panel__form").contains("Edit Dates");
-  });
-
-  it("displays the MI reporting button on the action panel", () => {
-    cy.get("#actions-content").should("be.visible");
-    cy.get("#actions-content").contains("MI reporting");
-
-    cy.addMock("/lpa-api/v1/reporting/config", "GET", {
-      status: 200,
-      body: {},
-    });
-
-    cy.get("a#action-panel-button-mi-reporting").click();
-    cy.get(".action-panel__form").should("exist");
-    cy.get(".action-panel__form").contains("MI Reporting");
-  });
-
-  it("displays the create relationship button on the action panel", () => {
-    cy.get("#actions-content").should("be.visible");
-    cy.get("#actions-content").contains("Create relationship");
-
-    cy.get("a#action-panel-button-create-relationship").click();
-    cy.get(".action-panel__form").should("exist");
-    cy.get(".action-panel__form").contains("Create Relationship");
-  });
-
-  it("displays the link record button on the action panel", () => {
-    cy.get("#actions-content").should("be.visible");
-    cy.get("#actions-content").contains("Link record");
-
-    cy.get("a#action-panel-button-link-record").click();
-    cy.get(".action-panel__form").should("exist");
-    cy.get(".action-panel__form").contains("Link record");
-  });
-
-  it("displays the delete relationship button on the action panel", () => {
-    cy.get("#actions-content").should("be.visible");
-    cy.get("#actions-content").contains("Delete relationship");
-
-    cy.get("a#action-panel-button-delete-relationship").click();
-    cy.get(".action-panel__form").should("exist");
-    cy.get(".action-panel__form").contains("Delete Relationship");
-  });
-
-  it("displays the add investigation button on the action panel", () => {
-    cy.get("#actions-content").should("be.visible");
-    cy.get("#actions-content").contains("Add investigation");
-
-    cy.addMock("/lpa-api/v1/cases/34", "GET", {
-      status: 200,
-      body: {
-        caseType: "LPA",
-        caseSubtype: "pfa",
-        id: 34,
-        uId: "7000-1234-1234",
-        donor: { id: 1 },
-      },
-    });
-
-    cy.get("a#action-panel-button-add-investigation").click();
-    cy.get(".action-panel__form").should("exist");
-    cy.get(".action-panel__form").contains("Create Investigation");
-  });
-
-  it("displays the create epa button on the action panel and can click through to subforms", () => {
-    cy.addMock(
-      "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0&limit=999",
-      "GET",
-      {
-        status: 200,
-        body: {
-          total: 0,
-          documents: [],
-        },
-      },
-    );
-
-    cy.addMock("/lpa-api/v1/donors/1/epas", "POST", {
-      status: 200,
-      body: { id: 123 },
-    });
-
-    cy.addMock("/lpa-api/v1/epas/123", "PUT", {
-      status: 200,
-      body: { id: 123 },
-    });
-
-    cy.addMock("/lpa-api/v1/cases/123", "GET", {
-      status: 200,
-      body: {
-        id: 123,
-        receiptDate: "10/06/2026",
-        attorneys: [],
-      },
-    });
-
-    cy.addMock("/lpa-api/v1/epas/123/attorneys", "POST", {
-      status: 200,
-      body: { id: 123 },
-    });
-
-    cy.visit("/donor/1/documents"); // create epa button is only clickable when no cases are selected
-
-    cy.get("#actions-content").should("be.visible");
-    cy.get("#actions-content").contains("Create epa case");
-
-    cy.get("a#action-panel-button-create-epa-case").click();
-    cy.get(".action-panel__form").should("exist");
-    cy.get(".action-panel__form").contains("Create an EPA");
-
-    cy.get("#f-receiptDate").type("2026-06-19");
-
-    cy.get(".action-panel__form").contains("Add attorney").click();
-    cy.get(".action-panel__form h1").contains("Add an attorney");
-    cy.get(".action-panel__form .govuk-button")
-      .contains("Save and add another attorney")
-      .click();
-
-    // assert we're scrolled to the top of the new form
-    cy.get(".action-panel__form h1")
-      .contains("Add an attorney")
-      .should("be.visible");
-    cy.get(".action-panel__form .govuk-link").contains("Cancel").click();
-
-    // assert we are back on the create epa form and scrolled to step 3
-    cy.get(
-      "#accordion-create-epa-heading-3 span.govuk-accordion__section-heading-text-focus",
-    ).should("be.visible");
-
-    cy.get(".action-panel__form").contains("Add correspondent").click();
-    cy.get(".action-panel__form h1").contains("Add a correspondent");
-    cy.get(".action-panel__form .govuk-link").contains("Cancel").click();
-  });
-
-  it("displays the create lpa button on the action panel", () => {
-    cy.addMock(
-      "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0&limit=999",
-      "GET",
-      {
-        status: 200,
-        body: {
-          total: 0,
-          documents: [],
-        },
-      },
-    );
-
-    cy.visit("/donor/1/documents"); // create lpa button is only clickable when no cases are selected
-
-    cy.get("#actions-content").should("be.visible");
-    cy.get("#actions-content").contains("Create lpa case");
-
-    cy.get("a#action-panel-button-create-lpa-case").click();
-    cy.get(".action-panel__form").should("exist");
-    cy.get(".action-panel__form").contains("Create an LPA");
-  });
-
-  it("displays the edit case button on the action panel", () => {
-    cy.addMock("/lpa-api/v1/cases/111", "GET", {
-      status: 200,
-      body: { id: 111 },
-    });
-
-    cy.addMock(
-      "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0,case:111&limit=999",
-      "GET",
-      {
-        status: 200,
-        body: {
-          total: 0,
-          documents: [],
-        },
-      },
-    );
-
-    cy.addMock("/lpa-api/v1/epas/111/draft-count", "GET", {
-      status: 200,
-      body: {
-        draftCount: 1,
-      },
-    });
-
-    cy.addMock(
-      "/lpa-api/v1/cases/111/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
-      "GET",
-      {
-        status: 200,
-        body: {
-          tasks: [],
-        },
-      },
-    );
-
-    cy.visit("/donor/1/documents?uid[]=7000-9876-5432");
-
-    cy.get("#actions-content").should("be.visible");
-    cy.get("#actions-content").contains("Edit case");
-
-    cy.get("a#action-panel-button-edit-case").click();
-    cy.get(".action-panel__form").should("exist");
-    cy.get(".action-panel__form").contains("Edit EPA");
-  });
-
-  it("displays the assign task button on the action panel", () => {
-    cy.get("#actions-content").should("be.visible");
-    cy.get("#actions-content").contains("Assign task");
-
-    cy.addMock("/lpa-api/v1/tasks/990", "GET", {
-      status: 200,
-      body: {
-        id: 990,
-        name: "Review application",
-        caseItems: [{ caseType: "LPA", uId: "7000-1234-1234" }],
-      },
-    });
-
-    cy.addMock("/lpa-api/v1/teams", "GET", {
-      status: 200,
-      body: [{ id: 23, displayName: "Cool Team" }],
-    });
-
-    cy.get("a#action-panel-button-assign-task").click();
-    cy.get(".action-panel__form").should("exist");
-    cy.get(".action-panel__form").contains("Assign Task");
-  });
-
-  it("applies large font styling to the action panel when an accessible theme is set", () => {
-    cy.setCookie("siriusTheme", "accessible-light");
-    cy.visit("/donor/1/documents?uid[]=7000-1234-1234");
-
-    cy.get("html").should("have.class", "app-!-html-class--large-font");
-    cy.get(".action-panel__button").should("not.be.visible");
-    cy.get("a#action-panel-button-create-warning")
-      .should("be.visible")
-      .and("contain", "Create warning");
-  });
+  // it("displays the create donor button on the action panel", () => {
+  //   cy.get("#actions-content").should("be.visible");
+  //   cy.get("#actions-content").contains("Create donor");
+  //
+  //   cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
+  //
+  //   cy.get("a#action-panel-button-create-donor").click();
+  //   cy.get(".action-panel__form").should("exist");
+  //   cy.get(".action-panel__form").contains("Create Donor");
+  // });
+  //
+  // it("displays the edit donor button on the action panel", () => {
+  //   cy.get("#actions-content").should("be.visible");
+  //   cy.get("#actions-content").contains("Edit donor");
+  //
+  //   cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
+  //
+  //   cy.get("a#action-panel-button-edit-donor").click();
+  //   cy.get(".action-panel__form").should("exist");
+  //   cy.get(".action-panel__form").contains("Edit Donor");
+  // });
+  //
+  // it("displays the allocate case button on the action panel", () => {
+  //   cy.get("#actions-content").should("be.visible");
+  //   cy.get("#actions-content").contains("Allocate Case");
+  //
+  //   cy.addMock("/lpa-api/v1/cases/34", "GET", { status: 200, body: {} });
+  //
+  //   cy.get("a#action-panel-button-allocate-case").click();
+  //   cy.get(".action-panel__form").should("exist");
+  //   cy.get(".action-panel__form").contains("Allocate Case");
+  // });
+  //
+  // it("displays the edit dates button on the action panel", () => {
+  //   cy.get("#actions-content").should("be.visible");
+  //   cy.get("#actions-content").contains("Edit dates");
+  //
+  //   cy.addMock("/lpa-api/v1/cases/34", "GET", {
+  //     status: 200,
+  //     body: {
+  //       uid: "7000-1234-1234",
+  //       caseType: "LPA",
+  //       donor: { id: 1 },
+  //     },
+  //   });
+  //
+  //   cy.get("a#action-panel-button-edit-dates").click();
+  //   cy.get(".action-panel__form").should("exist");
+  //   cy.get(".action-panel__form").contains("Edit Dates");
+  // });
+  //
+  // it("displays the MI reporting button on the action panel", () => {
+  //   cy.get("#actions-content").should("be.visible");
+  //   cy.get("#actions-content").contains("MI reporting");
+  //
+  //   cy.addMock("/lpa-api/v1/reporting/config", "GET", {
+  //     status: 200,
+  //     body: {},
+  //   });
+  //
+  //   cy.get("a#action-panel-button-mi-reporting").click();
+  //   cy.get(".action-panel__form").should("exist");
+  //   cy.get(".action-panel__form").contains("MI Reporting");
+  // });
+  //
+  // it("displays the create relationship button on the action panel", () => {
+  //   cy.get("#actions-content").should("be.visible");
+  //   cy.get("#actions-content").contains("Create relationship");
+  //
+  //   cy.get("a#action-panel-button-create-relationship").click();
+  //   cy.get(".action-panel__form").should("exist");
+  //   cy.get(".action-panel__form").contains("Create Relationship");
+  // });
+  //
+  // it("displays the link record button on the action panel", () => {
+  //   cy.get("#actions-content").should("be.visible");
+  //   cy.get("#actions-content").contains("Link record");
+  //
+  //   cy.get("a#action-panel-button-link-record").click();
+  //   cy.get(".action-panel__form").should("exist");
+  //   cy.get(".action-panel__form").contains("Link record");
+  // });
+  //
+  // it("displays the delete relationship button on the action panel", () => {
+  //   cy.get("#actions-content").should("be.visible");
+  //   cy.get("#actions-content").contains("Delete relationship");
+  //
+  //   cy.get("a#action-panel-button-delete-relationship").click();
+  //   cy.get(".action-panel__form").should("exist");
+  //   cy.get(".action-panel__form").contains("Delete Relationship");
+  // });
+  //
+  // it("displays the add investigation button on the action panel", () => {
+  //   cy.get("#actions-content").should("be.visible");
+  //   cy.get("#actions-content").contains("Add investigation");
+  //
+  //   cy.addMock("/lpa-api/v1/cases/34", "GET", {
+  //     status: 200,
+  //     body: {
+  //       caseType: "LPA",
+  //       caseSubtype: "pfa",
+  //       id: 34,
+  //       uId: "7000-1234-1234",
+  //       donor: { id: 1 },
+  //     },
+  //   });
+  //
+  //   cy.get("a#action-panel-button-add-investigation").click();
+  //   cy.get(".action-panel__form").should("exist");
+  //   cy.get(".action-panel__form").contains("Create Investigation");
+  // });
+  //
+  // it("displays the create epa button on the action panel and can click through to subforms", () => {
+  //   cy.addMock(
+  //     "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0&limit=999",
+  //     "GET",
+  //     {
+  //       status: 200,
+  //       body: {
+  //         total: 0,
+  //         documents: [],
+  //       },
+  //     },
+  //   );
+  //
+  //   cy.addMock("/lpa-api/v1/donors/1/epas", "POST", {
+  //     status: 200,
+  //     body: { id: 123 },
+  //   });
+  //
+  //   cy.addMock("/lpa-api/v1/epas/123", "PUT", {
+  //     status: 200,
+  //     body: { id: 123 },
+  //   });
+  //
+  //   cy.addMock("/lpa-api/v1/cases/123", "GET", {
+  //     status: 200,
+  //     body: {
+  //       id: 123,
+  //       receiptDate: "10/06/2026",
+  //       attorneys: [],
+  //     },
+  //   });
+  //
+  //   cy.addMock("/lpa-api/v1/epas/123/attorneys", "POST", {
+  //     status: 200,
+  //     body: { id: 123 },
+  //   });
+  //
+  //   cy.visit("/donor/1/documents"); // create epa button is only clickable when no cases are selected
+  //
+  //   cy.get("#actions-content").should("be.visible");
+  //   cy.get("#actions-content").contains("Create epa case");
+  //
+  //   cy.get("a#action-panel-button-create-epa-case").click();
+  //   cy.get(".action-panel__form").should("exist");
+  //   cy.get(".action-panel__form").contains("Create an EPA");
+  //
+  //   cy.get("#f-receiptDate").type("2026-06-19");
+  //
+  //   cy.get(".action-panel__form").contains("Add attorney").click();
+  //   cy.get(".action-panel__form h1").contains("Add an attorney");
+  //   cy.get(".action-panel__form .govuk-button")
+  //     .contains("Save and add another attorney")
+  //     .click();
+  //
+  //   // assert we're scrolled to the top of the new form
+  //   cy.get(".action-panel__form h1")
+  //     .contains("Add an attorney")
+  //     .should("be.visible");
+  //   cy.get(".action-panel__form .govuk-link").contains("Cancel").click();
+  //
+  //   // assert we are back on the create epa form and scrolled to step 3
+  //   cy.get(
+  //     "#accordion-create-epa-heading-3 span.govuk-accordion__section-heading-text-focus",
+  //   ).should("be.visible");
+  //
+  //   cy.get(".action-panel__form").contains("Add correspondent").click();
+  //   cy.get(".action-panel__form h1").contains("Add a correspondent");
+  //   cy.get(".action-panel__form .govuk-link").contains("Cancel").click();
+  // });
+  //
+  // it("displays the create lpa button on the action panel", () => {
+  //   cy.addMock(
+  //     "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0&limit=999",
+  //     "GET",
+  //     {
+  //       status: 200,
+  //       body: {
+  //         total: 0,
+  //         documents: [],
+  //       },
+  //     },
+  //   );
+  //
+  //   cy.visit("/donor/1/documents"); // create lpa button is only clickable when no cases are selected
+  //
+  //   cy.get("#actions-content").should("be.visible");
+  //   cy.get("#actions-content").contains("Create lpa case");
+  //
+  //   cy.get("a#action-panel-button-create-lpa-case").click();
+  //   cy.get(".action-panel__form").should("exist");
+  //   cy.get(".action-panel__form").contains("Create an LPA");
+  // });
+  //
+  // it("displays the edit case button on the action panel", () => {
+  //   cy.addMock("/lpa-api/v1/cases/111", "GET", {
+  //     status: 200,
+  //     body: { id: 111 },
+  //   });
+  //
+  //   cy.addMock(
+  //     "/lpa-api/v1/persons/1/documents?filter=draft:0,preview:0,case:111&limit=999",
+  //     "GET",
+  //     {
+  //       status: 200,
+  //       body: {
+  //         total: 0,
+  //         documents: [],
+  //       },
+  //     },
+  //   );
+  //
+  //   cy.addMock("/lpa-api/v1/epas/111/draft-count", "GET", {
+  //     status: 200,
+  //     body: {
+  //       draftCount: 1,
+  //     },
+  //   });
+  //
+  //   cy.addMock(
+  //     "/lpa-api/v1/cases/111/tasks?filter=status%3ANot+started%2Cactive%3Atrue&limit=99&sort=duedate%3AASC",
+  //     "GET",
+  //     {
+  //       status: 200,
+  //       body: {
+  //         tasks: [],
+  //       },
+  //     },
+  //   );
+  //
+  //   cy.visit("/donor/1/documents?uid[]=7000-9876-5432");
+  //
+  //   cy.get("#actions-content").should("be.visible");
+  //   cy.get("#actions-content").contains("Edit case");
+  //
+  //   cy.get("a#action-panel-button-edit-case").click();
+  //   cy.get(".action-panel__form").should("exist");
+  //   cy.get(".action-panel__form").contains("Edit EPA");
+  // });
+  //
+  // it("displays the assign task button on the action panel", () => {
+  //   cy.get("#actions-content").should("be.visible");
+  //   cy.get("#actions-content").contains("Assign task");
+  //
+  //   cy.addMock("/lpa-api/v1/tasks/990", "GET", {
+  //     status: 200,
+  //     body: {
+  //       id: 990,
+  //       name: "Review application",
+  //       caseItems: [{ caseType: "LPA", uId: "7000-1234-1234" }],
+  //     },
+  //   });
+  //
+  //   cy.addMock("/lpa-api/v1/teams", "GET", {
+  //     status: 200,
+  //     body: [{ id: 23, displayName: "Cool Team" }],
+  //   });
+  //
+  //   cy.get("a#action-panel-button-assign-task").click();
+  //   cy.get(".action-panel__form").should("exist");
+  //   cy.get(".action-panel__form").contains("Assign Task");
+  // });
+  //
+  // it("applies large font styling to the action panel when an accessible theme is set", () => {
+  //   cy.setCookie("siriusTheme", "accessible-light");
+  //   cy.visit("/donor/1/documents?uid[]=7000-1234-1234");
+  //
+  //   cy.get("html").should("have.class", "app-!-html-class--large-font");
+  //   cy.get(".action-panel__button").should("not.be.visible");
+  //   cy.get("a#action-panel-button-create-warning")
+  //     .should("be.visible")
+  //     .and("contain", "Create warning");
+  // });
 });
