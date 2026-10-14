@@ -1077,27 +1077,38 @@ $app-action-panel-height: calc(
 }
 
 .app-case-info {
-  overflow: hidden;
-  padding: 10px 15px 15px;
+  & .app-case-info__details {
+    display: flex;
+    margin: 0 15px;
+    justify-content: space-between;
+    gap: govuk-spacing(7);
+  }
+
+  & h2 {
+    color: govuk-colour("white");
+  }
 
   & .govuk-summary-list {
     font-size: 1rem;
     color: govuk-colour("white");
+    height: fit-content;
+
+    & .govuk-summary-list__row {
+      border-bottom: 1px solid govuk-colour("black", $variant: "tint-50");
+    }
+
+    & .govuk-summary-list__row:nth-of-type(4) {
+      border: none;
+    }
   }
 
   & .govuk-summary-list__key {
-    width: 20%;
-    padding-bottom: govuk-spacing(2);
     font-weight: 400;
+    width: 35%;
   }
 
   & .govuk-summary-list__value {
-    padding-bottom: govuk-spacing(2);
     font-weight: 700;
-
-    & p {
-      margin: 0;
-    }
   }
 }
 
