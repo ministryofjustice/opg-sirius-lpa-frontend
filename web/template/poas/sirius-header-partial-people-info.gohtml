@@ -34,7 +34,7 @@
 
           {{ if gt (len .Case.NotifiedPersons) 0 }}
             {{ range $index, $notifiedPerson := .Case.NotifiedPersons }}
-                {{ template "person-row" personInfoRow "Notified Person" $notifiedPerson $.CaseID $.SelectedID (plusN $index 1) false false }}
+                {{ template "person-row" personInfoRow "Notified Person" $notifiedPerson.Person $.CaseID $.SelectedID (plusN $index 1) false false }}
             {{ end }}
           {{ end }}
 

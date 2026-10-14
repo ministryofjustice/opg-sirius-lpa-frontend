@@ -299,6 +299,10 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return false
 		},
+		"isMap": func(value interface{}) bool {
+			_, ok := value.(map[string]interface{})
+			return ok
+		},
 		"isDateMap": func(value interface{}) bool {
 			dateMap, ok := value.(map[string]interface{})
 			if !ok {
