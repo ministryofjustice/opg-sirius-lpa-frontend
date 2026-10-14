@@ -3,17 +3,18 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"testing"
+
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
 )
 
-func TestAddFeeDecisionBadJSON(t *testing.T) {
+func TestCreateFeeDecisionBadJSON(t *testing.T) {
 	client := NewClient(http.DefaultClient, "http://not/real/server")
 
-	err := client.AddFeeDecision(
+	err := client.CreateFeeDecision(
 		Context{Context: context.Background()},
 		0,
 		"DECLINED_REMISSION",
@@ -24,7 +25,7 @@ func TestAddFeeDecisionBadJSON(t *testing.T) {
 	assert.ErrorContains(t, err, "failed to format non-date")
 }
 
-func TestAddFeeDecision(t *testing.T) {
+func TestCreateFeeDecision(t *testing.T) {
 	t.Parallel()
 
 	pact, err := newPact()
@@ -115,7 +116,7 @@ func TestAddFeeDecision(t *testing.T) {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
 				// ctx Context, caseID int, decisionType string, decisionReason string, decisionDate DateString
-				err := client.AddFeeDecision(
+				err := client.CreateFeeDecision(
 					Context{Context: context.Background()},
 					1,
 					tc.request["decisionType"],

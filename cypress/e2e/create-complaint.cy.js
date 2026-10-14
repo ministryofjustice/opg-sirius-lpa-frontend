@@ -1,6 +1,6 @@
 describe("Add a complaint", () => {
   beforeEach(() => {
-    cy.visit("/add-complaint?id=800&case=lpa");
+    cy.visit("/create-complaint?id=800&case=lpa");
   });
 
   it("adds a complaint to the case", () => {

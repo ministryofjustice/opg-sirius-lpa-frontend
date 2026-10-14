@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func (c *Client) AddFeeDecision(ctx Context, caseID int, decisionType string, decisionReason string, decisionDate DateString) error {
+func (c *Client) CreateFeeDecision(ctx Context, caseID int, decisionType string, decisionReason string, decisionDate DateString) error {
 	data := struct {
 		DecisionType   string     `json:"decisionType"`
 		DecisionReason string     `json:"decisionReason"`

@@ -11,9 +11,9 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-type AddPaymentClient interface {
+type CreatePaymentClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
-	AddPayment(ctx sirius.Context, caseID int, amount int, source string, paymentDate sirius.DateString) error
+	CreatePayment(ctx sirius.Context, caseID int, amount int, source string, paymentDate sirius.DateString) error
 	Case(sirius.Context, int) (sirius.Case, error)
 }
 
@@ -23,7 +23,7 @@ type PaymentSourceRadioOption struct {
 	Attrs map[string]interface{}
 }
 
-type addPaymentData struct {
+type createPaymentData struct {
 	XSRFToken string
 	Error     sirius.ValidationError
 
@@ -38,7 +38,7 @@ type addPaymentData struct {
 	HtmxRedirect   string
 }
 
-func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
+func CreatePayment(client CreatePaymentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -47,7 +47,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 
 		ctx := getContext(r)
 
-		data := addPaymentData{
+		data := createPaymentData{
 			XSRFToken:   ctx.XSRFToken,
 			IsPartial:   ctx.IsPartial,
 			Source:      postFormString(r, "source"),
@@ -127,7 +127,7 @@ func AddPayment(client AddPaymentClient, tmpl template.Template) Handler {
 
 			amountInPence := sirius.PoundsToPence(amountFloat)
 
-			err = client.AddPayment(ctx, caseID, amountInPence, data.Source, data.PaymentDate)
+			err = client.CreatePayment(ctx, caseID, amountInPence, data.Source, data.PaymentDate)
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve

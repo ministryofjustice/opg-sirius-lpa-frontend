@@ -19,7 +19,7 @@
 
         <form class="form"
               method="POST"
-              hx-post="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}"
+              hx-post="{{ prefix (printf "/create-payment?id=%d" .Case.ID) }}"
               hx-target=".action-panel__content"
               hx-swap="innerHTML">
             <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>

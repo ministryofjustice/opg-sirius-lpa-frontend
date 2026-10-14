@@ -12,20 +12,20 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type mockAddFeeDecisionClient struct {
+type mockCreateFeeDecisionClient struct {
 	mock.Mock
 }
 
-func (m *mockAddFeeDecisionClient) AddFeeDecision(ctx sirius.Context, caseID int, decisionType string, decisionReason string, decisionDate sirius.DateString) error {
+func (m *mockCreateFeeDecisionClient) CreateFeeDecision(ctx sirius.Context, caseID int, decisionType string, decisionReason string, decisionDate sirius.DateString) error {
 	return m.Called(ctx, caseID, decisionType, decisionReason, decisionDate).Error(0)
 }
 
-func (m *mockAddFeeDecisionClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
+func (m *mockCreateFeeDecisionClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(sirius.Case), args.Error(1)
 }
 
-func (m *mockAddFeeDecisionClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
+func (m *mockCreateFeeDecisionClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
 	args := m.Called(ctx, category)
 	if args.Get(0) != nil {
 		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
@@ -40,12 +40,12 @@ var feeDecisionTypes = []sirius.RefDataItem{
 	},
 }
 
-func TestGetAddFeeDecision(t *testing.T) {
+func TestGetCreateFeeDecision(t *testing.T) {
 	caseItem := sirius.Case{
 		UID: "7000-0000-0021",
 	}
 
-	client := &mockAddFeeDecisionClient{}
+	client := &mockCreateFeeDecisionClient{}
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
@@ -55,7 +55,7 @@ func TestGetAddFeeDecision(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, addFeeDecisionData{
+		On("Func", mock.Anything, createFeeDecisionData{
 			Case:          caseItem,
 			DecisionTypes: feeDecisionTypes,
 			ReturnUrl:     "/payments/4",
@@ -65,7 +65,7 @@ func TestGetAddFeeDecision(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
 	w := httptest.NewRecorder()
 
-	err := AddFeeDecision(client, template.Func)(w, r)
+	err := CreateFeeDecision(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -73,7 +73,7 @@ func TestGetAddFeeDecision(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestAddFeeDecisionNoID(t *testing.T) {
+func TestCreateFeeDecisionNoID(t *testing.T) {
 	testCases := map[string]string{
 		"no-id":  "/",
 		"bad-id": "/?id=test",
@@ -84,18 +84,18 @@ func TestAddFeeDecisionNoID(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, testUrl, nil)
 			w := httptest.NewRecorder()
 
-			err := AddFeeDecision(nil, nil)(w, r)
+			err := CreateFeeDecision(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
 	}
 }
 
-func TestAddFeeDecisionInvalidPostData(t *testing.T) {
+func TestCreateFeeDecisionInvalidPostData(t *testing.T) {
 	testCases := []struct {
 		name                    string
 		postData                url.Values
-		expectedTemplateData    addFeeDecisionData
+		expectedTemplateData    createFeeDecisionData
 		expectedValidationError sirius.ValidationError
 	}{
 		{
@@ -104,7 +104,7 @@ func TestAddFeeDecisionInvalidPostData(t *testing.T) {
 				"decisionReason": {"Invalid evidence"},
 				"decisionDate":   {"2023-10-10"},
 			},
-			expectedTemplateData: addFeeDecisionData{
+			expectedTemplateData: createFeeDecisionData{
 				DecisionReason: "Invalid evidence",
 				DecisionType:   "",
 				DecisionDate:   "2023-10-10",
@@ -121,7 +121,7 @@ func TestAddFeeDecisionInvalidPostData(t *testing.T) {
 				"decisionReason": {"Invalid evidence"},
 				"decisionType":   {"DECLINED_REMISSION"},
 			},
-			expectedTemplateData: addFeeDecisionData{
+			expectedTemplateData: createFeeDecisionData{
 				DecisionReason: "Invalid evidence",
 				DecisionType:   "DECLINED_REMISSION",
 				DecisionDate:   "",
@@ -135,7 +135,7 @@ func TestAddFeeDecisionInvalidPostData(t *testing.T) {
 	}
 
 	caseItem := sirius.Case{CaseType: "DIGITAL_LPA", UID: "M-AAAA-BBBB-DDDD"}
-	client := &mockAddFeeDecisionClient{}
+	client := &mockCreateFeeDecisionClient{}
 	template := &mockTemplate{}
 
 	for _, test := range testCases {
@@ -147,7 +147,7 @@ func TestAddFeeDecisionInvalidPostData(t *testing.T) {
 				On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
 				Return(feeDecisionTypes, nil)
 			client.
-				On("AddFeeDecision",
+				On("CreateFeeDecision",
 					mock.Anything,
 					22222,
 					test.expectedTemplateData.DecisionType,
@@ -168,7 +168,7 @@ func TestAddFeeDecisionInvalidPostData(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := AddFeeDecision(client, template.Func)(w, r)
+			err := CreateFeeDecision(client, template.Func)(w, r)
 
 			resp := w.Result()
 			mock.AssertExpectationsForObjects(t, client, template)
@@ -178,8 +178,8 @@ func TestAddFeeDecisionInvalidPostData(t *testing.T) {
 	}
 }
 
-func TestAddFeeDecisionWhenFailureOnGetCase(t *testing.T) {
-	client := &mockAddFeeDecisionClient{}
+func TestCreateFeeDecisionWhenFailureOnGetCase(t *testing.T) {
+	client := &mockCreateFeeDecisionClient{}
 	client.
 		On("Case", mock.Anything, 75757).
 		Return(sirius.Case{}, errExample)
@@ -190,19 +190,19 @@ func TestAddFeeDecisionWhenFailureOnGetCase(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=75757", nil)
 	w := httptest.NewRecorder()
 
-	err := AddFeeDecision(client, nil)(w, r)
+	err := CreateFeeDecision(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestAddFeeDecisionWhenTemplateErrors(t *testing.T) {
+func TestCreateFeeDecisionWhenTemplateErrors(t *testing.T) {
 	caseItem := sirius.Case{
 		UID:     "7000-0000-0021",
 		SubType: "pfa",
 	}
 
-	client := &mockAddFeeDecisionClient{}
+	client := &mockCreateFeeDecisionClient{}
 	client.
 		On("Case", mock.Anything, 111).
 		Return(caseItem, nil)
@@ -212,7 +212,7 @@ func TestAddFeeDecisionWhenTemplateErrors(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, addFeeDecisionData{
+		On("Func", mock.Anything, createFeeDecisionData{
 			Case:          caseItem,
 			DecisionTypes: feeDecisionTypes,
 			ReturnUrl:     "/payments/111",
@@ -222,19 +222,19 @@ func TestAddFeeDecisionWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=111", nil)
 	w := httptest.NewRecorder()
 
-	err := AddFeeDecision(client, template.Func)(w, r)
+	err := CreateFeeDecision(client, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestAddFeeDecisionWhenFailureOnGetRefData(t *testing.T) {
+func TestCreateFeeDecisionWhenFailureOnGetRefData(t *testing.T) {
 	caseItem := sirius.Case{
 		UID:     "7000-0000-0021",
 		SubType: "pfa",
 	}
 
-	client := &mockAddFeeDecisionClient{}
+	client := &mockCreateFeeDecisionClient{}
 	client.
 		On("Case", mock.Anything, 232).
 		Return(caseItem, nil)
@@ -245,16 +245,16 @@ func TestAddFeeDecisionWhenFailureOnGetRefData(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=232", nil)
 	w := httptest.NewRecorder()
 
-	err := AddFeeDecision(client, nil)(w, r)
+	err := CreateFeeDecision(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestAddFeeDecisionNonValidationClientError(t *testing.T) {
+func TestCreateFeeDecisionNonValidationClientError(t *testing.T) {
 	caseItem := sirius.Case{CaseType: "DIGITAL_LPA", UID: "M-AAAA-BBBB-ZZEE"}
 
-	client := &mockAddFeeDecisionClient{}
+	client := &mockCreateFeeDecisionClient{}
 	client.
 		On("Case", mock.Anything, 765).
 		Return(caseItem, nil)
@@ -270,7 +270,7 @@ func TestAddFeeDecisionNonValidationClientError(t *testing.T) {
 		CorrelationId: "Uncorrelated",
 	}
 	client.
-		On("AddFeeDecision", mock.Anything, 765, "DECLINED_REMISSION", "Invalid evidence", sirius.DateString("2023-10-10")).
+		On("CreateFeeDecision", mock.Anything, 765, "DECLINED_REMISSION", "Invalid evidence", sirius.DateString("2023-10-10")).
 		Return(serverError)
 
 	template := &mockTemplate{}
@@ -285,18 +285,18 @@ func TestAddFeeDecisionNonValidationClientError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AddFeeDecision(client, template.Func)(w, r)
+	err := CreateFeeDecision(client, template.Func)(w, r)
 
 	assert.Equal(t, serverError, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestAddFeeDecisionToDigitalLpaPostSuccess(t *testing.T) {
+func TestCreateFeeDecisionToDigitalLpaPostSuccess(t *testing.T) {
 	caseItem := sirius.Case{CaseType: "DIGITAL_LPA", UID: "M-AAAA-BBBB-DDDD"}
 
-	client := &mockAddFeeDecisionClient{}
+	client := &mockCreateFeeDecisionClient{}
 	client.
-		On("AddFeeDecision", mock.Anything, 454, "DECLINED_REMISSION", "Invalid evidence", sirius.DateString("2023-10-10")).
+		On("CreateFeeDecision", mock.Anything, 454, "DECLINED_REMISSION", "Invalid evidence", sirius.DateString("2023-10-10")).
 		Return(nil)
 	client.
 		On("Case", mock.Anything, 454).
@@ -317,7 +317,7 @@ func TestAddFeeDecisionToDigitalLpaPostSuccess(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AddFeeDecision(client, template.Func)(w, r)
+	err := CreateFeeDecision(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/lpa/M-AAAA-BBBB-DDDD/payments"), err)
