@@ -14,5 +14,5 @@ type UpdateDraft struct {
 }
 
 func (c *Client) UpdateDraft(ctx Context, caseUID string, draftDetails UpdateDraft) error {
-	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/update-draft", caseUID), draftDetails, nil)
+	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/change-draft", caseUID), draftDetails, nil)
 }

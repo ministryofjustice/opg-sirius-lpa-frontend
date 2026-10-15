@@ -48,7 +48,7 @@ func TestUpdateTrustCorporationDetails(t *testing.T) {
 					UponReceiving("A request for changing trust corporation details").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
-						Path:   matchers.String("/lpa-api/v1/digital-lpas/M-1111-2222-3333/trust-corporation/" + trustCorporationUid + "/update-details"),
+						Path:   matchers.String("/lpa-api/v1/digital-lpas/M-1111-2222-3333/trust-corporation/" + trustCorporationUid + "/change-details"),
 						Headers: matchers.MapMatcher{
 							"Content-Type": matchers.String("application/json"),
 						},

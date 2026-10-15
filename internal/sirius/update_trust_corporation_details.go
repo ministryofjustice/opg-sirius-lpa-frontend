@@ -13,7 +13,7 @@ type UpdateTrustCorporationDetails struct {
 }
 
 func (c *Client) UpdateTrustCorporationDetails(ctx Context, caseUID string, trustCorpUID string, trustCorpDetails UpdateTrustCorporationDetails) error {
-	path := fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/trust-corporation/%s/update-details", caseUID, trustCorpUID)
+	path := fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/trust-corporation/%s/change-details", caseUID, trustCorpUID)
 
 	return c.put(ctx, path, trustCorpDetails, nil)
 }
