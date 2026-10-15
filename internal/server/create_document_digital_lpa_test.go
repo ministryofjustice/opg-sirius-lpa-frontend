@@ -37,7 +37,7 @@ func (m *mockCreateDocumentDigitalLpaClient) CreateContact(ctx sirius.Context, c
 	return args.Get(0).(sirius.Person), args.Error(1)
 }
 
-func (m *mockCreateDocumentDigitalLpaClient) CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error) {
+func (m *mockCreateDocumentDigitalLpaClient) CreateDraftDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error) {
 	args := m.Called(ctx, caseID, correspondentID, templateID, inserts)
 	return args.Get(0).(sirius.Document), args.Error(1)
 }
