@@ -19,7 +19,7 @@ type EditDocumentClient interface {
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 	EditDocument(ctx sirius.Context, uuid string, content string) (sirius.Document, error)
 	DeleteDocument(ctx sirius.Context, uuid string) error
-	AddDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string, blankSections []string) (sirius.Document, error)
+	CreateDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string, blankSections []string) (sirius.Document, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
 	FeatureToggles(ctx sirius.Context) (sirius.FeatureToggles, error)
 }
@@ -71,7 +71,7 @@ func publishDraftDocument(
 		return err
 	}
 
-	_, err = client.AddDocument(ctx, caseID, document, sirius.TypeSave, blankSections)
+	_, err = client.CreateDocument(ctx, caseID, document, sirius.TypeSave, blankSections)
 	if err != nil {
 		return err
 	}
@@ -289,7 +289,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 						return err
 					}
 
-					previewDocument, err := client.AddDocument(ctx, caseID, document, sirius.TypePreview, blankSections)
+					previewDocument, err := client.CreateDocument(ctx, caseID, document, sirius.TypePreview, blankSections)
 					if err != nil {
 						return err
 					}

@@ -32,7 +32,7 @@ func (m *mockCreateDocumentClient) CreateContact(ctx sirius.Context, contact sir
 	return args.Get(0).(sirius.Person), args.Error(1)
 }
 
-func (m *mockCreateDocumentClient) CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error) {
+func (m *mockCreateDocumentClient) CreateDraftDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error) {
 	args := m.Called(ctx, caseID, correspondentID, templateID, inserts)
 	return args.Get(0).(sirius.Document), args.Error(1)
 }
@@ -140,7 +140,7 @@ func TestPostCreateDocument(t *testing.T) {
 				On("Case", mock.Anything, 123).
 				Return(caseItem, nil)
 			client.
-				On("CreateDocument", mock.Anything, 123, 1, "DD", []string{"DDINSERT"}).
+				On("CreateDraftDocument", mock.Anything, 123, 1, "DD", []string{"DDINSERT"}).
 				Return(sirius.Document{}, nil)
 
 			template := &mockTemplate{}
@@ -262,7 +262,7 @@ func TestPostCreateDocumentPrioritiseInvalidInserts(t *testing.T) {
 				On("Case", mock.Anything, 123).
 				Return(caseItem, nil)
 			client.
-				On("CreateDocument", mock.Anything, 123, 1, "DD", []string{"IN-5", "IN-8", "IM-1", "P-35", "P-17", "IM-3"}).
+				On("CreateDraftDocument", mock.Anything, 123, 1, "DD", []string{"IN-5", "IN-8", "IM-1", "P-35", "P-17", "IM-3"}).
 				Return(sirius.Document{}, nil)
 
 			template := &mockTemplate{}

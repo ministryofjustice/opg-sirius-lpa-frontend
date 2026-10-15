@@ -176,6 +176,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	//LPA
 	mux.Handle("/action-panel", wrap(ActionPanel(client, templates.Get("action-panel-wrapper.gohtml"))))
 	mux.Handle("/create-complaint", wrap(CreateComplaint(client, templates.Get("create-complaint.gohtml"))))
+	mux.Handle("/add-complaint", wrap(CreateComplaint(client, templates.Get("create-complaint.gohtml"))))
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate-cases.gohtml"))))
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change-status.gohtml"))))
 	mux.Handle("/create-attorney", wrap(CreateAttorney(client, templates.Get("create-attorney.gohtml"))))
