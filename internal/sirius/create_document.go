@@ -14,7 +14,7 @@ type createDocumentRequestData struct {
 	AppendLpaSections []string `json:"appendLpaSections"`
 }
 
-func (c *Client) AddDocument(ctx Context, caseID int, document Document, docType string, blankSections []string) (Document, error) {
+func (c *Client) CreateDocument(ctx Context, caseID int, document Document, docType string, blankSections []string) (Document, error) {
 	data := createDocumentRequestData{
 		CaseId:            caseID,
 		CorrespondentID:   document.Correspondent.ID,

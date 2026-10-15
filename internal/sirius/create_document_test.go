@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAddDocument(t *testing.T) {
+func TestCreateDocument(t *testing.T) {
 	t.Parallel()
 
 	pact, err := newPact()
@@ -88,7 +88,7 @@ func TestAddDocument(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				document, err := client.AddDocument(Context{Context: context.Background()}, 800, Document{
+				document, err := client.CreateDocument(Context{Context: context.Background()}, 800, Document{
 					ID:                  1,
 					UUID:                "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
 					Type:                "Draft",

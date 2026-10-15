@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func (c *Client) CreateDocument(ctx Context, caseID, correspondentID int, templateID string, inserts []string) (Document, error) {
+func (c *Client) CreateDraftDocument(ctx Context, caseID, correspondentID int, templateID string, inserts []string) (Document, error) {
 	var d Document
 
 	data := struct {
