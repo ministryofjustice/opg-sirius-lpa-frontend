@@ -32,6 +32,7 @@ type createLpaData struct {
 	Error                                sirius.ValidationError
 	HtmxRedirect                         string
 	HtmxSwap                             string
+	IsCreating                           bool
 	IsUpdate                             bool
 	FlowQuery                            string
 	Lpa                                  sirius.Lpa
@@ -71,6 +72,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 		caseIdStr := r.FormValue("caseId")
 		hasCaseId := caseIdStr != ""
 		isCreating := !hasCaseId || r.FormValue("flow") == "create"
+		data.IsCreating = isCreating
 		if isCreating {
 			data.FlowQuery = "&flow=create"
 		}
@@ -139,14 +141,14 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			}
 
 			hasAttorneyIdBeenSelected := len(r.PostForm["applicantIds"]) > 0
+			fieldErrors := sirius.FieldErrors{}
 
 			switch lpa.ApplicantType {
 			case "donor":
 				lpa.ApplicantIds = append(lpa.ApplicantIds, donorID)
 			case "attorney":
 				if !hasAttorneyIdBeenSelected {
-					data.Error.Field = make(sirius.FieldErrors)
-					data.Error.Field["applicantType"] = map[string]string{
+					fieldErrors["applicantType"] = map[string]string{
 						"": "Select an applicant",
 					}
 				} else {
@@ -170,6 +172,23 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 
 			if !*lpa.PaymentByDebitCreditCard {
 				lpa.CardPaymentContact = ""
+			}
+
+			if !hasCaseId {
+				applicationFeeSelected := *lpa.PaymentByDebitCreditCard ||
+					*lpa.PaymentByCheque ||
+					reducedFeeSelected ||
+					*lpa.RepeatApplication
+
+				if !applicationFeeSelected {
+					fieldErrors["applicationFee"] = map[string]string{
+						"": "Select how the application fee is being paid",
+					}
+				} else if reducedFeeSelected && reducedFeeType == "" {
+					fieldErrors["reducedFeeType"] = map[string]string{
+						"": "Select a reduced fee type",
+					}
+				}
 			}
 
 			lpa.AnyOtherInfo = shared.BoolPtr(postFormString(r, "anyOtherInfo") == "true")
@@ -200,11 +219,15 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 
 			data.AppointmentType = caseAttorneyValue
 
-			if !hasAttorneyIdBeenSelected && lpa.ApplicantType == "attorney" {
+			if len(fieldErrors) > 0 {
+				data.Error.Field = fieldErrors
 				lpa.Attorneys = data.Lpa.Attorneys
 				lpa.ReplacementAttorneys = data.Lpa.ReplacementAttorneys
-				data.ApplicantIds = data.Lpa.GetApplicantIds()
-				data.AppointmentType = caseAttorneyValue
+				if len(lpa.ApplicantIds) > 0 {
+					data.ApplicantIds = lpa.ApplicantIds
+				} else {
+					data.ApplicantIds = data.Lpa.GetApplicantIds()
+				}
 				data.Lpa = lpa
 
 				w.WriteHeader(http.StatusBadRequest)
