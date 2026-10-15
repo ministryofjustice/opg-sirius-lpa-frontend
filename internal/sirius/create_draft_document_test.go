@@ -3,14 +3,15 @@ package sirius
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"testing"
+
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
 )
 
-func TestCreateDocument(t *testing.T) {
+func TestCreateDraftDocument(t *testing.T) {
 	t.Parallel()
 
 	pact, err := newPact()
@@ -62,7 +63,7 @@ func TestCreateDocument(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				result, err := client.CreateDocument(Context{Context: context.Background()}, 800, 189, "DD", []string{"DD1"})
+				result, err := client.CreateDraftDocument(Context{Context: context.Background()}, 800, 189, "DD", []string{"DD1"})
 
 				assert.Equal(t, tc.expectedResult, result)
 				if tc.expectedError == nil {
