@@ -47,7 +47,7 @@ func TestUpdateDraft(t *testing.T) {
 					UponReceiving("A request for changing draft").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
-						Path:   matchers.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567/update-draft"),
+						Path:   matchers.String("/lpa-api/v1/digital-lpas/M-1234-9876-4567/change-draft"),
 						Headers: matchers.MapMatcher{
 							"Content-Type": matchers.String("application/json"),
 						},

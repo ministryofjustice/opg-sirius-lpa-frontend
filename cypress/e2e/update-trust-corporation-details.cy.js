@@ -138,7 +138,7 @@ describe("Change trust corporation details form", () => {
 
   it("can edit all attorney details and redirect to lpa details", () => {
     cy.addMock(
-      "/lpa-api/v1/digital-lpas/M-1111-1111-1110/trust-corporation/active-trust-corp-1/update-details",
+      "/lpa-api/v1/digital-lpas/M-1111-1111-1110/trust-corporation/active-trust-corp-1/change-details",
       "PUT",
       {
         status: 204,

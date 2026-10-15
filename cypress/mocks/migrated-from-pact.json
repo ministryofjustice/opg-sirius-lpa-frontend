@@ -265,10 +265,7 @@
     },
     {
       "name": "A request to edit the dates",
-      "request": {
-        "method": "PUT",
-        "url": "/lpa-api/v1/lpas/800/update-dates"
-      },
+      "request": { "method": "PUT", "url": "/lpa-api/v1/lpas/800/edit-dates" },
       "response": {
         "status": 200,
         "headers": { "Content-Type": "application/json" }

@@ -198,7 +198,7 @@ describe("Change donor details form", () => {
 
   it("can edit all donor details", () => {
     cy.addMock(
-      "/lpa-api/v1/digital-lpas/M-0000-0000-0001/update-donor-details",
+      "/lpa-api/v1/digital-lpas/M-0000-0000-0001/change-donor-details",
       "PUT",
       {
         status: 204,

@@ -22,5 +22,5 @@ type UpdateDonorDetails struct {
 }
 
 func (c *Client) UpdateDonorDetails(ctx Context, caseUID string, donorDetails UpdateDonorDetails) error {
-	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/update-donor-details", caseUID), donorDetails, nil)
+	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/change-donor-details", caseUID), donorDetails, nil)
 }

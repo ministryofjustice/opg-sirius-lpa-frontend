@@ -138,7 +138,7 @@ describe("Change draft form", () => {
 
   it("can edit all draft details and redirect to lpa details", () => {
     cy.addMock(
-      "/lpa-api/v1/digital-lpas/M-1111-2222-1111/update-draft",
+      "/lpa-api/v1/digital-lpas/M-1111-2222-1111/change-draft",
       "PUT",
       {
         status: 204,

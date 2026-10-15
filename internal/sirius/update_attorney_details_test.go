@@ -50,7 +50,7 @@ func TestUpdateAttorneyDetails(t *testing.T) {
 					UponReceiving("A request for changing attorney details").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
-						Path:   matchers.String("/lpa-api/v1/digital-lpas/M-1111-2222-3333/attorney/" + attorneyUid + "/update-details"),
+						Path:   matchers.String("/lpa-api/v1/digital-lpas/M-1111-2222-3333/attorney/" + attorneyUid + "/change-details"),
 						Headers: matchers.MapMatcher{
 							"Content-Type": matchers.String("application/json"),
 						},

@@ -19,5 +19,5 @@ type Dates struct {
 }
 
 func (c *Client) UpdateDates(ctx Context, caseID int, caseType CaseType, dates Dates) error {
-	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/%ss/%d/update-dates", caseType, caseID), dates, nil)
+	return c.put(ctx, fmt.Sprintf("/lpa-api/v1/%ss/%d/edit-dates", caseType, caseID), dates, nil)
 }

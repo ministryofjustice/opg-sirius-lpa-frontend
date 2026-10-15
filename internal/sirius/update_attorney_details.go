@@ -15,7 +15,7 @@ type UpdateAttorneyDetails struct {
 }
 
 func (c *Client) UpdateAttorneyDetails(ctx Context, caseUID string, attorneyUID string, attorneyDetails UpdateAttorneyDetails) error {
-	path := fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/attorney/%s/update-details", caseUID, attorneyUID)
+	path := fmt.Sprintf("/lpa-api/v1/digital-lpas/%s/attorney/%s/change-details", caseUID, attorneyUID)
 
 	return c.put(ctx, path, attorneyDetails, nil)
 }
