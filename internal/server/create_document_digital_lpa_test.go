@@ -37,7 +37,7 @@ func (m *mockCreateDocumentDigitalLpaClient) CreateContact(ctx sirius.Context, c
 	return args.Get(0).(sirius.Person), args.Error(1)
 }
 
-func (m *mockCreateDocumentDigitalLpaClient) CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error) {
+func (m *mockCreateDocumentDigitalLpaClient) CreateDraftDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error) {
 	args := m.Called(ctx, caseID, correspondentID, templateID, inserts)
 	return args.Get(0).(sirius.Document), args.Error(1)
 }
@@ -421,7 +421,7 @@ func TestPostCreateDocumentDigitalLpa(t *testing.T) {
 		On("CreateContact", mock.Anything, donorRecipient).
 		Return(contactData, nil)
 	client.
-		On("CreateDocument", mock.Anything, 1344, 12, "DL-EXAMPLE", []string{"DL_INS_01", "DL_INS_02"}).
+		On("CreateDraftDocument", mock.Anything, 1344, 12, "DL-EXAMPLE", []string{"DL_INS_01", "DL_INS_02"}).
 		Return(sirius.Document{}, nil)
 
 	template := &mockTemplate{}
