@@ -267,7 +267,7 @@
       "name": "A request to edit the dates",
       "request": {
         "method": "PUT",
-        "url": "/lpa-api/v1/lpas/800/update-dates"
+        "url": "/lpa-api/v1/lpas/800/edit-dates"
       },
       "response": {
         "status": 200,
