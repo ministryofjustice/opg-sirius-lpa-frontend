@@ -32,7 +32,7 @@ func (m *mockCreateDocumentClient) CreateContact(ctx sirius.Context, contact sir
 	return args.Get(0).(sirius.Person), args.Error(1)
 }
 
-func (m *mockCreateDocumentClient) CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error) {
+func (m *mockCreateDocumentClient) CreateDraftDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error) {
 	args := m.Called(ctx, caseID, correspondentID, templateID, inserts)
 	return args.Get(0).(sirius.Document), args.Error(1)
 }
