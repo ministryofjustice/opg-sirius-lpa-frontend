@@ -17,6 +17,7 @@ type DeleteDocumentClient interface {
 type deleteDocumentData struct {
 	XSRFToken      string
 	Document       sirius.Document
+	IsPartial      bool
 	IsSysAdminUser bool
 	DonorId        int
 }
@@ -41,6 +42,7 @@ func DeleteDocument(client DeleteDocumentClient, tmpl template.Template) Handler
 		data := deleteDocumentData{
 			XSRFToken:      ctx.XSRFToken,
 			Document:       documentData,
+			IsPartial:      ctx.IsPartial,
 			IsSysAdminUser: isSysAdminUser,
 			DonorId:        donorId,
 		}

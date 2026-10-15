@@ -30,6 +30,7 @@ type documentPageData struct {
 	HasV1PersonsCasesGetPermission bool
 	HasV1PersonsGetPermission      bool
 	HeaderButtons                  SiriusHeaderButtons
+	IsPartial                      bool
 	MultipleCasesSelected          bool
 	Person                         sirius.Person
 	SelectedCaseIds                string
@@ -106,6 +107,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			Error:                          validationErr,
 			HasV1PersonsCasesGetPermission: pageVars.HasV1PersonsCasesGetPermission,
 			HasV1PersonsGetPermission:      pageVars.HasV1PersonsGetPermission,
+			IsPartial:                      ctx.IsPartial,
 			MultipleCasesSelected:          len(pageVars.CaseUidsCollection) > 1 || (len(pageVars.CaseUidsCollection) == 0 && len(pageVars.CasesOnDonor) > 1),
 			Person:                         pageVars.Person,
 			SelectedCases:                  pageVars.SelectedCases,

@@ -1,4 +1,4 @@
-{{ define "DocumentList" }}
+{{ define "documentList" }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             {{ if .Success }}
@@ -38,7 +38,12 @@
 
             {{ $multiCaseSelected := .MultipleCasesSelected }}
 
-            <form class="form" id="document-list-form" method="POST" action="{{ prefix (printf "/donor/%d/documents" .DonorID) }}">
+            <form
+                    class="form" id="document-list-form"
+                    hx-post="{{ prefix (printf "/donor/%d/documents" .DonorID) }}"
+                    hx-target="#document-panel"
+                    hx-swap="innerHTML"
+            >
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
                 {{ if .Comparing }}
                     <input type="hidden" name="comparing" value="true">
@@ -80,6 +85,10 @@
                                 {{ if .CloseURL }}
                                     <a class="govuk-button govuk-button--secondary moj-button-menu__item"
                                        href="{{ prefix .CloseURL }}"
+                                       hx-get="{{ prefix .CloseURL }}"
+                                       hx-target="#document-panel"
+                                       hx-swap="innerHTML"
+                                       hx-push-url="true"
                                        aria-label="Close list">Close</a>
                                 {{end}}
                             {{ end }}
@@ -124,9 +133,21 @@
                                 <br>
                                 {{ if eq .MimeType "application/pdf"}}
                                     {{ if eq $.Comparing true }}
-                                        <a class="govuk-link" href="{{ prefix ( index $.CompareURLs .UUID )}}">{{ .FriendlyDescription }}</a>
-                                    {{else}}
-                                        <a class="govuk-link" href="{{ prefix (printf "/view-document/%s/%d" .UUID $.DonorID ) }}">{{ .FriendlyDescription }}</a>
+                                        <a class="govuk-link"
+                                           href="{{ prefix ( index $.CompareURLs .UUID ) }}"
+                                           hx-get="{{ prefix ( index $.CompareURLs .UUID ) }}"
+                                           hx-target="#document-panel"
+                                           hx-swap="innerHTML"
+                                           hx-push-url="true">{{ .FriendlyDescription }}</a>
+                                    {{ else }}
+                                        <a class="govuk-link"
+                                           href="{{ prefix (printf "/view-document/%s/%d" .UUID $.DonorID ) }}"
+                                           hx-get="{{ prefix (printf "/view-document/%s/%d" .UUID $.DonorID ) }}"
+                                           hx-target="#document-panel"
+                                           hx-swap="innerHTML"
+                                           hx-push-url="true">
+                                            {{ .FriendlyDescription }}
+                                        </a>
                                     {{ end }}
                                 {{ else }}
                                     <a class="govuk-link" href="{{ sirius (printf "/lpa-api/v1/documents/%s/download" .UUID) }}" download="">{{ .FriendlyDescription }}</a>

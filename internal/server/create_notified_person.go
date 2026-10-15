@@ -17,21 +17,18 @@ func allowNewNotifiedPerson(currentCount int) bool {
 type CreateNotifiedPersonClient interface {
 	CreateNotifiedPerson(ctx sirius.Context, caseId int, notifiedPerson sirius.NotifiedPerson) error
 	Lpa(ctx sirius.Context, caseId int) (sirius.Lpa, error)
-	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
-	UpdateNotifiedPerson(ctx sirius.Context, notifiedPersonId int, notifiedPerson sirius.NotifiedPerson) error
 }
 
 type createNotifiedPersonData struct {
 	XSRFToken              string
+	FlowQuery              string
 	IsPartial              bool
 	NotifiedPerson         sirius.NotifiedPerson
-	RelationshipToDonors   []sirius.RefDataItem
 	Error                  sirius.ValidationError
 	DonorId                int
 	CaseId                 int
 	IsEditing              bool
 	Title                  string
-	NextNotifiedPersonId   int
 	AllowNewNotifiedPerson bool
 	HtmxRedirect           string
 	HtmxSwap               string
@@ -53,15 +50,12 @@ func CreateNotifiedPerson(client CreateNotifiedPersonClient, tmpl template.Templ
 
 		data := createNotifiedPersonData{
 			XSRFToken: ctx.XSRFToken,
+			FlowQuery: getFlowQuery(r),
 			IsPartial: ctx.IsPartial,
 			DonorId:   donorId,
 			CaseId:    caseId,
 			Title:     "Add a notified person",
-		}
-
-		data.RelationshipToDonors, err = client.RefDataByCategory(ctx, sirius.RelationshipToDonorCategory)
-		if err != nil {
-			return err
+			IsEditing: false,
 		}
 
 		lpa, err := client.Lpa(ctx, caseId)
@@ -71,26 +65,6 @@ func CreateNotifiedPerson(client CreateNotifiedPersonClient, tmpl template.Templ
 
 		// +1 because this is before we save the final allowed notified person
 		data.AllowNewNotifiedPerson = allowNewNotifiedPerson(len(lpa.NotifiedPersons) + 1)
-
-		var notifiedPersonId int
-		notifiedPersonIdStr := r.FormValue("notifiedPersonId")
-		isEditing := notifiedPersonIdStr != ""
-		if isEditing {
-			notifiedPersonId, err = strToIntOrStatusError(notifiedPersonIdStr)
-			if err != nil {
-				return err
-			}
-			for _, notifiedPerson := range lpa.NotifiedPersons {
-				if notifiedPerson.ID == notifiedPersonId {
-					data.NotifiedPerson = notifiedPerson
-					break
-				}
-			}
-
-			data.Title = "Update notified person details"
-			data.IsEditing = true
-			data.NextNotifiedPersonId = GetNextNotifiedPersonId(notifiedPersonId, lpa.NotifiedPersons)
-		}
 
 		if r.Method == http.MethodPost {
 			notifiedPerson := sirius.NotifiedPerson{
@@ -111,11 +85,7 @@ func CreateNotifiedPerson(client CreateNotifiedPersonClient, tmpl template.Templ
 			}
 			data.NotifiedPerson = notifiedPerson
 
-			if isEditing {
-				err = client.UpdateNotifiedPerson(ctx, notifiedPersonId, notifiedPerson)
-			} else {
-				err = client.CreateNotifiedPerson(ctx, caseId, notifiedPerson)
-			}
+			err = client.CreateNotifiedPerson(ctx, caseId, notifiedPerson)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
@@ -128,41 +98,22 @@ func CreateNotifiedPerson(client CreateNotifiedPersonClient, tmpl template.Templ
 
 			if r.FormValue("add-another-notified-person") != "" {
 				if data.IsPartial {
-					data.HtmxRedirect = fmt.Sprintf("/create-notified-person?id=%d&caseId=%d", donorId, caseId)
+					data.HtmxRedirect = fmt.Sprintf("/create-notified-person?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery)
 					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
 					return tmpl(w, data)
 				}
-				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d", donorId, caseId))
-			}
-
-			if r.FormValue("next-notified-person") != "" {
-				if data.IsPartial {
-					data.HtmxRedirect = fmt.Sprintf("/create-notified-person?id=%d&caseId=%d&notifiedPersonId=%d", donorId, caseId, data.NextNotifiedPersonId)
-					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
-					return tmpl(w, data)
-				}
-				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d&notifiedPersonId=%d", donorId, caseId, data.NextNotifiedPersonId))
+				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery))
 			}
 
 			if data.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, caseId)
+				data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery)
 				data.HtmxSwap = "innerHTML show:#scroll-to-notified-person:top"
 				return tmpl(w, data)
 			}
-			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#scroll-to-notified-person", donorId, caseId))
+			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#scroll-to-notified-person", donorId, caseId, data.FlowQuery))
 
 		}
 
 		return tmpl(w, data)
 	}
-}
-
-func GetNextNotifiedPersonId(id int, notifiedPersons []sirius.NotifiedPerson) int {
-	nextNotifiedPersonId := 0
-	for _, notifiedPerson := range notifiedPersons {
-		if notifiedPerson.ID > id && (nextNotifiedPersonId == 0 || notifiedPerson.ID < nextNotifiedPersonId) {
-			nextNotifiedPersonId = notifiedPerson.ID
-		}
-	}
-	return nextNotifiedPersonId
 }

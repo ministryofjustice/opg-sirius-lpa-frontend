@@ -2,9 +2,10 @@ import * as pdfjsLib from "pdfjs-dist";
 
 // Set the worker source path - worker file is copied to static/javascript during build
 const prefix = document.body.getAttribute("data-prefix") || "";
+const encodedPrefix = encodeURI(prefix);
 pdfjsLib.GlobalWorkerOptions.workerSrc = `${prefix}/javascript/pdf.worker.min.mjs`;
 
-let svgSpritePrefix = prefix + "/assets/images/icons-sprite.svg";
+let svgSpritePrefix = encodedPrefix + "/assets/images/icons-sprite.svg";
 const staticHash = document.body.getAttribute("data-static-hash") || "";
 if (staticHash) {
   svgSpritePrefix = svgSpritePrefix + "?" + encodeURIComponent(staticHash);
@@ -12,6 +13,7 @@ if (staticHash) {
 
 // Storage key for persisting viewer state across page navigations
 const STORAGE_KEY = "pdfViewerState";
+const viewerRegistry = new Map();
 
 class PDFViewer {
   constructor(container, url, paneId) {
@@ -351,25 +353,25 @@ class PDFViewer {
     const action = btn.dataset.action;
     switch (action) {
       case "prev":
-        this.prevPage();
+        this.prevPage().catch((err) => console.error(err));
         break;
       case "next":
-        this.nextPage();
+        this.nextPage().catch((err) => console.error(err));
         break;
       case "zoom-in":
-        this.zoomIn();
+        this.zoomIn().catch((err) => console.error(err));
         break;
       case "zoom-out":
-        this.zoomOut();
+        this.zoomOut().catch((err) => console.error(err));
         break;
       case "fit-width":
-        this.fitToWidth();
+        this.fitToWidth().catch((err) => console.error(err));
         break;
       case "fit-page":
-        this.fitToPage();
+        this.fitToPage().catch((err) => console.error(err));
         break;
       case "toggle-thumbnails":
-        this.toggleThumbnails();
+        this.toggleThumbnails().catch((err) => console.error(err));
         break;
       case "print-doc":
         this.printDoc();
@@ -745,7 +747,7 @@ class PDFViewer {
     if (e.key === "Enter") {
       const pageNum = Number.parseInt(e.target.value, 10);
       if (!Number.isNaN(pageNum)) {
-        this.goToPage(pageNum);
+        this.goToPage(pageNum).catch((err) => console.error(err));
       }
     } else if (["-", "+", "e", "."].includes(e.key)) {
       e.preventDefault();
@@ -757,7 +759,7 @@ class PDFViewer {
     if (Number.isNaN(pageNum) || pageNum < 1 || pageNum > this.totalPages) {
       e.target.value = this.currentPage;
     } else {
-      this.goToPage(pageNum);
+      this.goToPage(pageNum).catch((err) => console.error(err));
     }
   }
 
@@ -780,14 +782,33 @@ class PDFViewer {
   }
 }
 
-export default function initPdfViewer() {
-  const viewers = document.querySelectorAll("[data-pdf-viewer]");
+function saveViewerStates(container) {
+  container.querySelectorAll("[data-pdf-viewer]").forEach((el) => {
+    const viewer = viewerRegistry.get(el);
+    if (viewer) {
+      viewer.saveState();
+      viewerRegistry.delete(el);
+    }
+  });
+}
+
+document.body.addEventListener("htmx:beforeSwap", (event) => {
+  saveViewerStates(event.target);
+});
+
+export default function initPdfViewer(scope = document) {
+  const viewers = scope.querySelectorAll("[data-pdf-viewer]");
   viewers.forEach((container) => {
+    if (container.dataset.pdfInitialised === "true") {
+      return;
+    }
     const url = container.dataset.pdfUrl;
     const paneId = container.dataset.pdfPane;
     if (url) {
       const pdfViewer = new PDFViewer(container, url, paneId);
-      pdfViewer.init();
+      container.dataset.pdfInitialised = "true";
+      viewerRegistry.set(container, pdfViewer);
+      pdfViewer.init().catch((err) => console.error(err));
     }
   });
 }

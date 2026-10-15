@@ -6,7 +6,7 @@
 
     <a class="govuk-back-link"
        href=""
-       hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-attorneys-corporation" .DonorId .CaseId) }}"
+      hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys-corporation" .DonorId .CaseId .FlowQuery) }}"
        hx-target=".action-panel__content"
        hx-swap="innerHTML show:#scroll-to-attorneys-corporation:top">Back</a>
 
@@ -17,13 +17,13 @@
         {{ if .TrustCorporation.IsReplacementAttorney }}
           <a class="govuk-link govuk-link--no-visited-state"
              href=""
-             hx-get="{{ prefix (printf "/create-replacement-attorney?id=%d&caseId=%d" .DonorId .CaseId) }}"
+             hx-get="{{ prefix (printf "/create-replacement-attorney?id=%d&caseId=%d%s" .DonorId .CaseId .FlowQuery) }}"
              hx-target=".action-panel__content"
              hx-swap="innerHTML scroll:.action-panel__content:top">Add a person as a replacement attorney</a>
         {{ else }}
           <a class="govuk-link govuk-link--no-visited-state"
              href=""
-             hx-get="{{ prefix (printf "/create-attorney?id=%d&caseId=%d&caseType=lpa" .DonorId .CaseId) }}"
+             hx-get="{{ prefix (printf "/create-attorney?id=%d&caseId=%d&caseType=lpa%s" .DonorId .CaseId .FlowQuery) }}"
              hx-target=".action-panel__content"
              hx-swap="innerHTML scroll:.action-panel__content:top">Add a person as an attorney</a>
         {{ end }}
@@ -47,7 +47,7 @@
         {{ end }}
         <a class="govuk-link govuk-link--no-visited-state"
            href=""
-           hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-attorneys-corporation" .DonorId .CaseId) }}"
+           hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys-corporation" .DonorId .CaseId .FlowQuery) }}"
            hx-target=".action-panel__content"
            hx-swap="innerHTML show:#scroll-to-attorneys-corporation:top">Cancel</a>
       </div>
@@ -61,18 +61,18 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {{ template "error-summary" .Error }}
-      <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-attorneys-corporation" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
+      <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys-corporation" .DonorId .CaseId .FlowQuery) }}" class="govuk-back-link">Back</a>
 
       <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
       {{ if not .IsEditing }}
         <div class="govuk-button-group govuk-button-group--row">
           {{ if .TrustCorporation.IsReplacementAttorney }}
-            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-replacement-attorney?id=%d&caseId=%d" .DonorId .CaseId) }}">
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-replacement-attorney?id=%d&caseId=%d%s" .DonorId .CaseId .FlowQuery) }}">
               Add a person as a replacement attorney
             </a>
           {{ else }}
-            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-attorney?id=%d&caseId=%d&caseType=lpa" .DonorId .CaseId) }}">
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-attorney?id=%d&caseId=%d&caseType=lpa%s" .DonorId .CaseId .FlowQuery) }}">
               Add a person as an attorney
             </a>
           {{ end }}
@@ -91,7 +91,7 @@
               <input class="govuk-button" data-module="govuk-button" type="submit" name="update-next-attorney" value="Save and update next {{ ToLower .AppointedAs }}" />
             {{ end }}
           {{ end }}
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d#scroll-to-attorneys-corporation" .DonorId .CaseId) }}">Cancel</a>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys-corporation" .DonorId .CaseId .FlowQuery) }}">Cancel</a>
         </div>
       </form>
     </div>

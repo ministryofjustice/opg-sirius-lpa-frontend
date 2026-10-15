@@ -113,8 +113,10 @@ type Client interface {
 	SiriusHeaderPeopleInfoClient
 	TaskClient
 	UnlinkPersonClient
+	UpdateAttorneyClient
 	UpdateDecisionsClient
 	UpdateObjectionClient
+	UpdateNotifiedPersonClient
 	ViewDocumentClient
 	WarningClient
 }
@@ -177,6 +179,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate-cases.gohtml"))))
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change-status.gohtml"))))
 	mux.Handle("/create-attorney", wrap(CreateAttorney(client, templates.Get("create-attorney.gohtml"))))
+	mux.Handle("/update-attorney", wrap(UpdateAttorney(client, templates.Get("create-attorney.gohtml"))))
 	mux.Handle("/create-certificate-provider", wrap(CreateCertificateProvider(client, templates.Get("certificate-provider.gohtml"))))
 	mux.Handle("/create-correspondent", wrap(CreateCorrespondent(client, templates.Get("create-correspondent.gohtml"))))
 	mux.Handle("/create-donor", wrap(CreateDonor(client, templates.Get("donor.gohtml"))))
@@ -213,6 +216,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/sirius-header-calendars", wrap(SiriusHeaderCalendars(client, templates.Get("sirius-header-partial-calendars.gohtml"))))
 	mux.Handle("/sirius-header-case-info", wrap(SiriusHeaderCaseInfo(client, templates.Get("sirius-header-partial-case-info.gohtml"))))
 	mux.Handle("/sirius-header-people-info", wrap(SiriusHeaderPeopleInfo(client, templates.Get("sirius-header-partial-people-info.gohtml"))))
+	mux.Handle("/update-notified-person", wrap(UpdateNotifiedPerson(client, templates.Get("create-notified-person.gohtml"))))
 	mux.Handle("/unlink-person", wrap(UnlinkPerson(client, templates.Get("unlink-person.gohtml"))))
 	mux.Handle("/view-document/{uuid}", wrap(ViewDocument(client, templates.Get("view-document.gohtml"))))
 	mux.Handle("/working-days", wrap(WorkingDays(client, templates.Get("working-days-partial.gohtml"))))

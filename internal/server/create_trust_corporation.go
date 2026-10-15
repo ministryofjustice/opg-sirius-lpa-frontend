@@ -18,6 +18,7 @@ type CreateTrustCorporationClient interface {
 
 type createTrustCorporationData struct {
 	AppointedAs            string
+	FlowQuery              string
 	CaseId                 int
 	DonorId                int
 	Error                  sirius.ValidationError
@@ -50,11 +51,12 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 
 		data := createTrustCorporationData{
 			XSRFToken: ctx.XSRFToken,
+			FlowQuery: getFlowQuery(r),
 			IsPartial: r.Header.Get("HX-Request") == "true",
 			DonorId:   donorId,
 			CaseId:    caseId,
 			Title:     "Add a trust corporation",
-			HtmxPost:  fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&replacement=%s", donorId, caseId, strconv.FormatBool(isReplacementAttorney)),
+			HtmxPost:  fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&replacement=%s%s", donorId, caseId, strconv.FormatBool(isReplacementAttorney), getFlowQuery(r)),
 			TrustCorporation: sirius.TrustCorporation{
 				IsReplacementAttorney: isReplacementAttorney,
 				Attorney:              sirius.Attorney{SystemStatus: shared.BoolPtr(true)},
@@ -90,7 +92,7 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 
 			data.Title = "Update trust corporation details"
 			data.IsEditing = true
-			data.HtmxPost = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s", donorId, caseId, trustCorporationId, strconv.FormatBool(isReplacementAttorney))
+			data.HtmxPost = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s%s", donorId, caseId, trustCorporationId, strconv.FormatBool(isReplacementAttorney), data.FlowQuery)
 
 			attorneys := lpa.Attorneys
 			if data.TrustCorporation.IsReplacementAttorney {
@@ -151,25 +153,25 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 
 			if r.FormValue("add-another") != "" {
 				if trustCorporation.IsReplacementAttorney {
-					return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d", donorId, caseId))
+					return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery))
 				} else {
-					return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa", donorId, caseId))
+					return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa%s", donorId, caseId, data.FlowQuery))
 				}
 			}
 
 			if r.FormValue("update-next-attorney") != "" {
 				switch data.NextPersonType {
 				case "Attorney":
-					return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d", donorId, caseId, data.NextPersonId))
+					return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d%s", donorId, caseId, data.NextPersonId, data.FlowQuery))
 				case "Replacement Attorney":
-					return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d", donorId, caseId, data.NextPersonId))
+					return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorId, caseId, data.NextPersonId, data.FlowQuery))
 				case "Trust Corporation":
-					return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s", donorId, caseId, data.NextPersonId, strconv.FormatBool(trustCorporation.IsReplacementAttorney)))
+					return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s%s", donorId, caseId, data.NextPersonId, strconv.FormatBool(trustCorporation.IsReplacementAttorney), data.FlowQuery))
 				default:
 				}
 			}
 
-			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#scroll-to-attorneys-corporation", donorId, caseId))
+			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys-corporation", donorId, caseId, data.FlowQuery))
 		}
 
 		return tmpl(w, data)

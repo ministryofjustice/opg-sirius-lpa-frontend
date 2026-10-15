@@ -35,7 +35,10 @@ $app-fixed-headers-height: $app-moj-header-height + $app-sirius-header-height;
 $app-sirius-header-z-index: 15;
 $app-sirius-header-dropdown-z-index: $app-sirius-header-z-index - 1;
 $app-action-panel-top: $app-moj-header-height + $app-sirius-header-height + 15px;
-$app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
+$app-action-panel-height: calc(
+  100vh -
+    $app-action-panel-top - var(--app-sirius-header-dropdown-height, 0px) - 1rem
+);
 
 // Define HTMX indicator styles here to avoid inline styles which are blocked by CSP
 .htmx-indicator {
@@ -596,7 +599,9 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
 .action-panel {
   --action-panel-width: 400px;
   position: fixed;
-  top: $app-action-panel-top;
+  top: calc(
+    $app-action-panel-top + var(--app-sirius-header-dropdown-height, 0px)
+  );
   right: 0;
   width: 0;
   min-height: $app-action-panel-height;
@@ -920,7 +925,9 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
 }
 
 .sirius-header + .govuk-width-container {
-  padding-top: $app-sirius-header-height;
+  padding-top: calc(
+    $app-sirius-header-height + var(--app-sirius-header-dropdown-height, 0px)
+  );
 }
 
 .sirius-header__dropdown-panel > .govuk-width-container {
@@ -1070,27 +1077,38 @@ $app-action-panel-height: calc(100vh - $app-action-panel-top - 1rem);
 }
 
 .app-case-info {
-  overflow: hidden;
-  padding: 10px 15px 15px;
+  & .app-case-info__details {
+    display: flex;
+    margin: 0 15px;
+    justify-content: space-between;
+    gap: govuk-spacing(7);
+  }
+
+  & h2 {
+    color: govuk-colour("white");
+  }
 
   & .govuk-summary-list {
     font-size: 1rem;
     color: govuk-colour("white");
+    height: fit-content;
+
+    & .govuk-summary-list__row {
+      border-bottom: 1px solid govuk-colour("black", $variant: "tint-50");
+    }
+
+    & .govuk-summary-list__row:nth-of-type(4) {
+      border: none;
+    }
   }
 
   & .govuk-summary-list__key {
-    width: 20%;
-    padding-bottom: govuk-spacing(2);
     font-weight: 400;
+    width: 35%;
   }
 
   & .govuk-summary-list__value {
-    padding-bottom: govuk-spacing(2);
     font-weight: 700;
-
-    & p {
-      margin: 0;
-    }
   }
 }
 

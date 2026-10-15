@@ -25,24 +25,35 @@ type EditDocumentClient interface {
 }
 
 type editDocumentData struct {
-	XSRFToken             string
-	IsPartial             bool
-	Success               bool
-	Error                 sirius.ValidationError
-	Case                  sirius.Case
-	CaseSummary           sirius.CaseSummary
-	Documents             []sirius.Document
-	Document              sirius.Document
-	UsesNotify            bool
-	Download              string
-	SaveAndExit           bool
-	PreviewDraft          bool
-	DownloadUUID          string
-	DonorId               int
+	XSRFToken    string
+	IsPartial    bool
+	Success      bool
+	Error        sirius.ValidationError
+	Case         sirius.Case
+	CaseSummary  sirius.CaseSummary
+	Documents    []sirius.Document
+	Document     sirius.Document
+	UsesNotify   bool
+	Download     string
+	SaveAndExit  bool
+	PreviewDraft bool
+	DownloadUUID string
+	DonorId      int
+
+	Section11             string
+	Section10And11        string
+	Section15             string
+	Section11And15        string
+	Section10And11And15   string
+	Section12And13And15   string
 	HasBlankSections      string
 	SelectedBlankSections string
-	Section11Count        string
+	Section11Count1       string
+	Section11Count2       string
+	Section11Count3       string
+	Section11Count4       string
 	BlankSectionsEnabled  bool
+	AttorneyCount         int
 }
 
 func publishDraftDocument(
@@ -77,7 +88,23 @@ func publishDraftDocument(
 	return nil
 }
 
-func parseBlankSections(hasBlankSections bool, selectedBlankSections, section11Count, caseSubType string) ([]string, error) {
+const (
+	Section11           = "11"
+	Section10And11      = "10+11"
+	Section15           = "15"
+	Section11And15      = "11+15"
+	Section10And11And15 = "10+11+15"
+	Section12And13And15 = "12+13+15"
+)
+
+type section11Counts struct {
+	count1 string
+	count2 string
+	count3 string
+	count4 string
+}
+
+func parseBlankSections(hasBlankSections bool, selectedBlankSections string, counts section11Counts, caseSubType string) ([]string, error) {
 	if !hasBlankSections {
 		return []string{}, nil
 	}
@@ -90,19 +117,28 @@ func parseBlankSections(hasBlankSections bool, selectedBlankSections, section11C
 		}
 	}
 
-	var containsSection11 bool
 	blankSections := strings.Split(selectedBlankSections, "+")
 	for i, blankSection := range blankSections {
-		if blankSection == "11" {
-			containsSection11 = true
-		}
 		blankSections[i] = caseSubType + "-" + blankSection
 	}
 
-	if containsSection11 && section11Count == "" {
+	var section11Count string
+	var section11CountField string
+	switch selectedBlankSections {
+	case Section11:
+		section11Count, section11CountField = counts.count1, "section11Count1"
+	case Section10And11:
+		section11Count, section11CountField = counts.count2, "section11Count2"
+	case Section11And15:
+		section11Count, section11CountField = counts.count3, "section11Count3"
+	case Section10And11And15:
+		section11Count, section11CountField = counts.count4, "section11Count4"
+	}
+
+	if section11CountField != "" && section11Count == "" {
 		return nil, sirius.ValidationError{
 			Field: sirius.FieldErrors{
-				"section11Count1": {"reason": "Please select how many section 11 to insert"},
+				section11CountField: {"reason": "Please select how many section 11 to insert"},
 			},
 		}
 	}
@@ -114,6 +150,28 @@ func parseBlankSections(hasBlankSections bool, selectedBlankSections, section11C
 	slices.Sort(blankSections)
 
 	return blankSections, nil
+}
+
+func getAttorneyCount(caseItem sirius.Case) int {
+	var count int
+
+	for _, attorney := range caseItem.Attorneys {
+		if attorney.SystemStatus != nil && *attorney.SystemStatus {
+			count++
+		}
+	}
+
+	for range caseItem.ReplacementAttorneys {
+		count++
+	}
+
+	for _, trustCorporation := range caseItem.TrustCorporations {
+		if trustCorporation.IsReplacementAttorney || (trustCorporation.SystemStatus != nil && *trustCorporation.SystemStatus) {
+			count++
+		}
+	}
+
+	return count
 }
 
 func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
@@ -131,8 +189,14 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 		}
 
 		data := editDocumentData{
-			XSRFToken: ctx.XSRFToken,
-			IsPartial: ctx.IsPartial,
+			XSRFToken:           ctx.XSRFToken,
+			IsPartial:           ctx.IsPartial,
+			Section11:           Section11,
+			Section10And11:      Section10And11,
+			Section15:           Section15,
+			Section11And15:      Section11And15,
+			Section10And11And15: Section10And11And15,
+			Section12And13And15: Section12And13And15,
 		}
 
 		featureToggles, err := client.FeatureToggles(ctx)
@@ -146,6 +210,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 		}
 		data.Case = caseItem
 		data.DonorId = caseItem.Donor.ID
+		data.AttorneyCount = getAttorneyCount(caseItem)
 
 		var documentTemplates []sirius.DocumentTemplateData
 
@@ -204,8 +269,17 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 
 			data.HasBlankSections = r.FormValue("hasBlankSections")
 			data.SelectedBlankSections = r.FormValue("blankSections")
-			data.Section11Count = r.FormValue("section11Count")
+			data.Section11Count1 = r.FormValue("section11Count1")
+			data.Section11Count2 = r.FormValue("section11Count2")
+			data.Section11Count3 = r.FormValue("section11Count3")
+			data.Section11Count4 = r.FormValue("section11Count4")
 			hasBlankSections := data.HasBlankSections == "true"
+			counts := section11Counts{
+				count1: data.Section11Count1,
+				count2: data.Section11Count2,
+				count3: data.Section11Count3,
+				count4: data.Section11Count4,
+			}
 
 			switch documentControls {
 			case "save":
@@ -216,7 +290,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				data.Document = document
 
 			case "preview":
-				blankSections, err := parseBlankSections(hasBlankSections, data.SelectedBlankSections, data.Section11Count, caseItem.SubType)
+				blankSections, err := parseBlankSections(hasBlankSections, data.SelectedBlankSections, counts, caseItem.SubType)
 				if ve, ok := err.(sirius.ValidationError); ok {
 					w.WriteHeader(http.StatusBadRequest)
 					data.Error = ve
@@ -257,7 +331,7 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				}
 
 			case "publish":
-				blankSections, err := parseBlankSections(hasBlankSections, data.SelectedBlankSections, data.Section11Count, caseItem.SubType)
+				blankSections, err := parseBlankSections(hasBlankSections, data.SelectedBlankSections, counts, caseItem.SubType)
 				if err == nil {
 					err = publishDraftDocument(client, ctx, caseID, documentUUID, content, blankSections)
 				}
