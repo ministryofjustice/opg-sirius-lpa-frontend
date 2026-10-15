@@ -32,7 +32,7 @@ func TestUpdateDates(t *testing.T) {
 					UponReceiving("A request to edit the dates").
 					WithCompleteRequest(consumer.Request{
 						Method: http.MethodPut,
-						Path:   matchers.String("/lpa-api/v1/lpas/800/update-dates"),
+						Path:   matchers.String("/lpa-api/v1/lpas/800/edit-dates"),
 						Headers: matchers.MapMatcher{
 							"Content-Type": matchers.String("application/json"),
 						},
