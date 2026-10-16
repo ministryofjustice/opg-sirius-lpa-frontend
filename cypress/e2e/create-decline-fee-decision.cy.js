@@ -16,6 +16,6 @@ describe("Add a fee decline decision to a non-digital LPA", () => {
     cy.get("#f-decisionDate").type("2023-10-09");
     cy.get("button[type=submit]").click();
     cy.get(".moj-alert").should("exist");
-    cy.get(".moj-alert").contains("Fee decision added");
+    cy.get(".moj-alert").contains("Decline a fee reduction recorded");
   });
 });
