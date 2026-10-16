@@ -7,7 +7,7 @@
         <div class="govuk-button-group">
             <a class="govuk-button govuk-button--secondary"
                href=""
-               hx-get="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}"
+               hx-get="{{ prefix (printf "/create-payment?id=%d" .Case.ID) }}"
                hx-target=".action-panel__content"
                hx-swap="innerHTML">
                 Add payment
@@ -40,7 +40,7 @@
         <div class="govuk-grid-column-two-thirds">
             {{ template "payments" . }}
 
-            <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}">
+            <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/create-payment?id=%d" .Case.ID) }}">
                 Add payment
             </a>
             {{ if and (.IsReducedFeesUser) (not .FeeReductions) }}

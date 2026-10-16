@@ -41,10 +41,10 @@ func getContext(r *http.Request) sirius.Context {
 
 type Client interface {
 	ActionPanelClient
-	AddComplaintClient
-	AddFeeDecisionClient
-	AddObjectionClient
-	AddPaymentClient
+	CreateComplaintClient
+	CreateFeeDecisionClient
+	CreateObjectionClient
+	CreatePaymentClient
 	AllocateCasesClient
 	ApplyFeeReductionClient
 	AssignTaskClient
@@ -137,7 +137,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/search", wrap(Search(client, templates.Get("search.gohtml"))))
 
 	//shared templates (Used in both modernise and LPA)
-	mux.Handle("/add-payment", wrap(AddPayment(client, templates.Get("add-payment.gohtml"))))
+	mux.Handle("/create-payment", wrap(CreatePayment(client, templates.Get("create-payment.gohtml"))))
 	mux.Handle("/apply-fee-reduction", wrap(ApplyFeeReduction(client, templates.Get("apply-fee-reduction.gohtml"))))
 	mux.Handle("/assign-task", wrap(AssignTask(client, templates.Get("assign-task.gohtml"))))
 	mux.Handle("/create-event", wrap(Event(client, templates.Get("event.gohtml"))))
@@ -146,8 +146,8 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/edit-document", wrap(EditDocument(client, templates.Get("edit-document.gohtml"))))
 
 	//modernise
-	mux.Handle("/add-fee-decision", wrap(AddFeeDecision(client, templates.Get("add_fee_decision.gohtml"))))
-	mux.Handle("/add-objection", wrap(AddObjection(client, templates.Get("objection.gohtml"))))
+	mux.Handle("/create-fee-decision", wrap(CreateFeeDecision(client, templates.Get("create-fee-decision.gohtml"))))
+	mux.Handle("/create-objection", wrap(CreateObjection(client, templates.Get("objection.gohtml"))))
 	mux.Handle("/change-case-status", wrap(ChangeCaseStatus(client, templates.Get("change_case_status.gohtml"))))
 	mux.Handle("/change-donor-details", wrap(ChangeDonorDetails(client, templates.Get("change-donor-details.gohtml"))))
 	mux.Handle("/clear-task", wrap(ClearTask(client, templates.Get("clear_task.gohtml"))))
@@ -171,11 +171,12 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/lpa/{uid}/remove-an-attorney", wrap(RemoveAnAttorney(client, templates.Get("mlpa-remove-attorney.gohtml"), templates.Get("mlpa-confirm-attorney-removal.gohtml"), templates.Get("mlpa-attorney-decisions.gohtml"))))
 	mux.Handle("/lpa/{uid}/trust-corporation/{trustCorporationUID}/change-details", wrap(ChangeTrustCorporationDetails(client, templates.Get("change-trust-corporation-details.gohtml"))))
 	mux.Handle("/lpa/{uid}/update-decisions", wrap(UpdateDecisions(client, templates.Get("mlpa-update-decisions.gohtml"))))
-	mux.Handle("/manage-fees", wrap(AddFeeDecision(client, templates.Get("manage_fees.gohtml"))))
+	mux.Handle("/manage-fees", wrap(CreateFeeDecision(client, templates.Get("manage_fees.gohtml"))))
 
 	//LPA
 	mux.Handle("/action-panel", wrap(ActionPanel(client, templates.Get("action-panel-wrapper.gohtml"))))
-	mux.Handle("/add-complaint", wrap(AddComplaint(client, templates.Get("add-complaint.gohtml"))))
+	mux.Handle("/create-complaint", wrap(CreateComplaint(client, templates.Get("create-complaint.gohtml"))))
+	mux.Handle("/add-complaint", wrap(CreateComplaint(client, templates.Get("create-complaint.gohtml"))))
 	mux.Handle("/allocate-cases", wrap(AllocateCases(client, templates.Get("allocate-cases.gohtml"))))
 	mux.Handle("/change-status", wrap(ChangeStatus(client, templates.Get("change-status.gohtml"))))
 	mux.Handle("/create-attorney", wrap(CreateAttorney(client, templates.Get("create-attorney.gohtml"))))

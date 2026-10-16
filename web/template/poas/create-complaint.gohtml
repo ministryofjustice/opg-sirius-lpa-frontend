@@ -14,7 +14,7 @@
     <h1 class="govuk-heading-m">Add Complaint</h1>
 
     <form class="form" method="POST"
-          hx-post="{{ prefix (printf "/add-complaint?id=%d&case=%s" .CaseId .CaseType) }}"
+          hx-post="{{ prefix (printf "/create-complaint?id=%d&case=%s" .CaseId .CaseType) }}"
           hx-target=".action-panel__content"
           hx-swap="innerHTML"
     >

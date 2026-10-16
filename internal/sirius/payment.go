@@ -22,7 +22,7 @@ type Payment struct {
 	References       []PaymentReference `json:"references,omitempty"`
 }
 
-func (c *Client) AddPayment(ctx Context, caseID int, amount int, source string, paymentDate DateString) error {
+func (c *Client) CreatePayment(ctx Context, caseID int, amount int, source string, paymentDate DateString) error {
 	data := struct {
 		Amount      int        `json:"amount"`
 		Source      string     `json:"source"`

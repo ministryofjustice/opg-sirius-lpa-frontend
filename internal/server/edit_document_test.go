@@ -47,7 +47,7 @@ func (m *mockEditDocumentClient) DeleteDocument(ctx sirius.Context, uuid string)
 	return args.Error(0)
 }
 
-func (m *mockEditDocumentClient) AddDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string, blankSections []string) (sirius.Document, error) {
+func (m *mockEditDocumentClient) CreateDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string, blankSections []string) (sirius.Document, error) {
 	args := m.Called(ctx, caseID, document, docType, blankSections)
 	return args.Get(0).(sirius.Document), args.Error(1)
 }
@@ -355,7 +355,7 @@ func TestPostPublishDocument(t *testing.T) {
 				On("DocumentByUUID", mock.Anything, document.UUID).
 				Return(document, nil)
 			client.
-				On("AddDocument", mock.Anything, 544, document, sirius.TypeSave, []string{}).
+				On("CreateDocument", mock.Anything, 544, document, sirius.TypeSave, []string{}).
 				Return(publishedDocument, nil)
 			client.
 				On("DeleteDocument", mock.Anything, document.UUID).
@@ -449,7 +449,7 @@ func TestPostPreviewDocument(t *testing.T) {
 		On("DocumentByUUID", mock.Anything, document.UUID).
 		Return(document, nil)
 	client.
-		On("AddDocument", mock.Anything, 888, document, sirius.TypePreview, []string{}).
+		On("CreateDocument", mock.Anything, 888, document, sirius.TypePreview, []string{}).
 		Return(previewDocument, nil)
 	client.
 		On("Case", mock.Anything, 888).
@@ -790,7 +790,7 @@ func TestPostPublishDocumentWithBlankSections(t *testing.T) {
 				On("DocumentByUUID", mock.Anything, document.UUID).
 				Return(document, nil)
 			client.
-				On("AddDocument", mock.Anything, 544, document, sirius.TypeSave, tc.blankSections).
+				On("CreateDocument", mock.Anything, 544, document, sirius.TypeSave, tc.blankSections).
 				Return(publishedDocument, nil).
 				Return(publishedDocument, nil)
 			client.

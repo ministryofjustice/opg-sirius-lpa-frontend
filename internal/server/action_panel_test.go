@@ -293,7 +293,7 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 				},
 				{
 					Label:    "Add complaint",
-					URL:      "/add-complaint?id=1&case=lpa",
+					URL:      "/create-complaint?id=1&case=lpa",
 					IconName: "aw-log-complaint",
 					Disabled: false,
 				},

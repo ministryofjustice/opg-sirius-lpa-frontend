@@ -176,7 +176,7 @@ describe("Add objections form", () => {
 
     cy.wrap(mocks);
 
-    cy.visit("/add-objection?uid=M-0000-0000-0008");
+    cy.visit("/create-objection?uid=M-0000-0000-0008");
   });
 
   it("can be visited from the LPA details Change link", () => {
@@ -184,7 +184,7 @@ describe("Add objections form", () => {
       cy.contains("Update donor's record").click();
       cy.contains("Add an objection").click();
 
-      cy.url().should("include", "/add-objection?uid=M-0000-0000-0008");
+      cy.url().should("include", "/create-objection?uid=M-0000-0000-0008");
       cy.contains("Add Objection");
     });
   });

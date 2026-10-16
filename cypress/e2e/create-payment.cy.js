@@ -2,7 +2,7 @@ import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("Add a payment to a non-digital LPA", () => {
   beforeEach(() => {
-    cy.visit("/add-payment?id=800");
+    cy.visit("/create-payment?id=800");
   });
 
   it("adds a payment to the case using a predefined amount", () => {
@@ -41,7 +41,7 @@ describe("Add a payment to a non-digital LPA", () => {
 describe("Add a payment to a digital LPA", () => {
   it("adds a payment to the case", () => {
     cy.wrap(digitalLpas.objections.empty("M-9999-4567-AAAA"));
-    cy.visit("/add-payment?id=900");
+    cy.visit("/create-payment?id=900");
     cy.contains("Add a payment");
     cy.contains("M-9999-4567-AAAA");
     cy.get(".moj-alert").should("not.exist");

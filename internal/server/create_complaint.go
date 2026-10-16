@@ -10,13 +10,13 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type AddComplaintClient interface {
-	AddComplaint(ctx sirius.Context, caseID int, caseType sirius.CaseType, complaint sirius.Complaint) error
+type CreateComplaintClient interface {
+	CreateComplaint(ctx sirius.Context, caseID int, caseType sirius.CaseType, complaint sirius.Complaint) error
 	Case(ctx sirius.Context, id int) (sirius.Case, error)
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
-type addComplaintData struct {
+type createComplaintData struct {
 	XSRFToken string
 	IsPartial bool
 	Entity    string
@@ -35,7 +35,7 @@ type addComplaintData struct {
 	CaseUID  string
 }
 
-func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
+func CreateComplaint(client CreateComplaintClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -50,7 +50,7 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 		ctx := getContext(r)
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 
-		data := addComplaintData{
+		data := createComplaintData{
 			XSRFToken: ctx.XSRFToken,
 			IsPartial: ctx.IsPartial,
 			CaseId:    caseID,
@@ -116,7 +116,7 @@ func AddComplaint(client AddComplaintClient, tmpl template.Template) Handler {
 				Title:                postFormString(r, "title"),
 			}
 
-			err = client.AddComplaint(ctx, caseID, caseType, complaint)
+			err = client.CreateComplaint(ctx, caseID, caseType, complaint)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)

@@ -352,7 +352,7 @@ func TestFeeReductionByID(t *testing.T) {
 	}
 }
 
-func TestAddPayment(t *testing.T) {
+func TestCreatePayment(t *testing.T) {
 	t.Parallel()
 
 	pact, err := newPact()
@@ -397,7 +397,7 @@ func TestAddPayment(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				err := client.AddPayment(Context{Context: context.Background()}, 800, 4100, "PHONE", DateString("2022-04-25"))
+				err := client.CreatePayment(Context{Context: context.Background()}, 800, 4100, "PHONE", DateString("2022-04-25"))
 
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
