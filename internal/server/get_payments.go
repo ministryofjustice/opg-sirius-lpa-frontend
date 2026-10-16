@@ -12,6 +12,7 @@ import (
 type GetPaymentsClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	Payments(ctx sirius.Context, id int) ([]sirius.Payment, error)
+	DeclineFeeReductions(ctx sirius.Context, id int) ([]sirius.DeclineFeeReductions, error)
 	Case(sirius.Context, int) (sirius.Case, error)
 	GetUserDetails(sirius.Context) (sirius.User, error)
 	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
@@ -20,23 +21,24 @@ type GetPaymentsClient interface {
 type getPaymentsData struct {
 	XSRFToken string
 
-	CaseSummary       sirius.CaseSummary
-	Case              sirius.Case
-	Payments          []sirius.Payment
-	FeeReductions     []sirius.Payment
-	Refunds           []sirius.Payment
-	PaymentSources    []sirius.RefDataItem
-	ReferenceTypes    []sirius.RefDataItem
-	FeeReductionTypes []sirius.RefDataItem
-	IsReducedFeesUser bool
-	IsSysAdminUser    bool
-	TotalPaid         int
-	TotalRefunds      int
-	OutstandingFee    int
-	RefundAmount      int
-	FlashMessage      FlashNotification
-	InActionPanel     bool
-	IsPartial         bool
+	CaseSummary          sirius.CaseSummary
+	Case                 sirius.Case
+	Payments             []sirius.Payment
+	FeeReductions        []sirius.Payment
+	Refunds              []sirius.Payment
+	PaymentSources       []sirius.RefDataItem
+	ReferenceTypes       []sirius.RefDataItem
+	FeeReductionTypes    []sirius.RefDataItem
+	IsReducedFeesUser    bool
+	IsSysAdminUser       bool
+	TotalPaid            int
+	TotalRefunds         int
+	OutstandingFee       int
+	RefundAmount         int
+	FlashMessage         FlashNotification
+	InActionPanel        bool
+	IsPartial            bool
+	DeclineFeeReductions []sirius.DeclineFeeReductions
 }
 
 func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
@@ -68,6 +70,11 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 
 		group.Go(func() error {
 			data.Case, err = client.Case(ctx.With(groupCtx), caseID)
+			if err != nil {
+				return err
+			}
+
+			data.DeclineFeeReductions, err = client.DeclineFeeReductions(ctx.With(groupCtx), caseID)
 			if err != nil {
 				return err
 			}

@@ -3,6 +3,10 @@ import * as digitalLpas from "../mocks/digitalLpas";
 describe("Apply a fee reduction to a non-digital LPA", () => {
   beforeEach(() => {
     cy.visit("/apply-fee-reduction?id=801");
+    cy.addMock("/lpa-api/v1/cases/801/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
   });
 
   it("adds a fee reduction to the case", () => {

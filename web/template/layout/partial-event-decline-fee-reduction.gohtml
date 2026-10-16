@@ -1,0 +1,5 @@
+{{ define "partial-event-decline-fee-reduction" }}
+    {{ $decisionTypes := $.Context.DecisionTypes }}
+    {{ translateRefData $decisionTypes .Entity.decisionType }} on {{ .Entity.decisionDate }}<br/>
+    {{ .Entity.decisionReason }}
+{{ end }}
