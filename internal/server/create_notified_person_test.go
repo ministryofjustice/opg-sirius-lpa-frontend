@@ -150,7 +150,6 @@ func TestPostCreateNotifiedPersonTransitions(t *testing.T) {
 				t.Run(flowCase.name, func(t *testing.T) {
 					for _, isHtmx := range []bool{false, true} {
 						t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
-							dateString := "2022-04-05"
 							notifiedPerson := sirius.NotifiedPerson{
 								Person: sirius.Person{
 									Salutation:        "Rev",
@@ -166,7 +165,6 @@ func TestPostCreateNotifiedPersonTransitions(t *testing.T) {
 									Country:           "Italy",
 									IsAirmailRequired: true,
 								},
-								NoticeGivenDate: sirius.DateString(dateString),
 							}
 
 							client := &mockCreateNotifiedPersonClient{}
@@ -198,7 +196,6 @@ func TestPostCreateNotifiedPersonTransitions(t *testing.T) {
 								"firstname":         {"Rudolph"},
 								"middlenames":       {"Modesto"},
 								"surname":           {"Stotesbury"},
-								"noticeGivenDate":   {dateString},
 								"addressLine1":      {"Rotonda Gerardo 769"},
 								"addressLine2":      {"Appartamento 94"},
 								"addressLine3":      {"Augusto terme"},
