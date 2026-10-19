@@ -58,6 +58,7 @@ type CalendarMonth struct {
 	Month        int
 	PrevMonthURL string
 	NextMonthURL string
+	CalendarID   string
 }
 
 type WorkingDaysData struct {
@@ -213,7 +214,7 @@ func calculateWorkingDays(startDate time.Time, endDate time.Time, numWorkingDays
 	return output
 }
 
-func buildCalendarMonth(year int, month time.Month, bankHolidays sirius.BankHolidays, todayStr string) CalendarMonth {
+func buildCalendarMonth(year int, month time.Month, bankHolidays sirius.BankHolidays, todayStr string, calendarID string) CalendarMonth {
 	// Build a map of bank holiday dates for quick lookup
 	bhSet := make(map[string]bool)
 	for _, years := range bankHolidays {
@@ -263,8 +264,8 @@ func buildCalendarMonth(year int, month time.Month, bankHolidays sirius.BankHoli
 	// Calculate previous and next month
 	prevMonth := first.AddDate(0, -1, 0)
 	nextMonth := first.AddDate(0, 1, 0)
-	prevMonthURL := fmt.Sprintf("/calendar-month?year=%d&month=%d", prevMonth.Year(), prevMonth.Month())
-	nextMonthURL := fmt.Sprintf("/calendar-month?year=%d&month=%d", nextMonth.Year(), nextMonth.Month())
+	prevMonthURL := fmt.Sprintf("/calendar-month?calendarId=%s&year=%d&month=%d", calendarID, prevMonth.Year(), prevMonth.Month())
+	nextMonthURL := fmt.Sprintf("/calendar-month?calendarId=%s&year=%d&month=%d", calendarID, nextMonth.Year(), nextMonth.Month())
 
 	return CalendarMonth{
 		Name:         first.Format("January 2006"),
@@ -273,6 +274,7 @@ func buildCalendarMonth(year int, month time.Month, bankHolidays sirius.BankHoli
 		Month:        int(month),
 		PrevMonthURL: prevMonthURL,
 		NextMonthURL: nextMonthURL,
+		CalendarID:   calendarID,
 	}
 }
 
@@ -281,9 +283,9 @@ func buildCalendarMonths(bankHolidays sirius.BankHolidays, today time.Time) [3]C
 	prev := today.AddDate(0, -1, 0)
 	next := today.AddDate(0, 1, 0)
 	return [3]CalendarMonth{
-		buildCalendarMonth(prev.Year(), prev.Month(), bankHolidays, todayStr),
-		buildCalendarMonth(today.Year(), today.Month(), bankHolidays, todayStr),
-		buildCalendarMonth(next.Year(), next.Month(), bankHolidays, todayStr),
+		buildCalendarMonth(prev.Year(), prev.Month(), bankHolidays, todayStr, "prev"),
+		buildCalendarMonth(today.Year(), today.Month(), bankHolidays, todayStr, "current"),
+		buildCalendarMonth(next.Year(), next.Month(), bankHolidays, todayStr, "next"),
 	}
 }
 
@@ -294,6 +296,7 @@ func CalendarMonthPartial(client SiriusHeaderCalendarClient, tmpl template.Templ
 		// Parse year and month from query parameters
 		yearStr := r.URL.Query().Get("year")
 		monthStr := r.URL.Query().Get("month")
+		calendarID := r.URL.Query().Get("calendarId")
 
 		if yearStr == "" || monthStr == "" {
 			// If not provided, use current date
@@ -326,7 +329,7 @@ func CalendarMonthPartial(client SiriusHeaderCalendarClient, tmpl template.Templ
 		todayStr := today.Format("2006-01-02")
 
 		// Build the calendar month for the requested date
-		calMonth := buildCalendarMonth(year, time.Month(month), bankHolidays, todayStr)
+		calMonth := buildCalendarMonth(year, time.Month(month), bankHolidays, todayStr, calendarID)
 
 		return tmpl(w, calMonth)
 	}
