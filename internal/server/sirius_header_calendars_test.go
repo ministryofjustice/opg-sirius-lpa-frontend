@@ -598,15 +598,16 @@ func TestBuildCalendarMonth(t *testing.T) {
 	}
 
 	todayStr := "2026-04-15"
-	result := buildCalendarMonth(2026, time.April, bankHolidays, todayStr)
+	result := buildCalendarMonth(2026, time.April, bankHolidays, todayStr, "current")
 
 	assert.Equal(t, "April 2026", result.Name)
 	assert.Equal(t, 2026, result.Year)
 	assert.Equal(t, 4, result.Month)
+	assert.Equal(t, "current", result.CalendarID)
 	assert.NotEmpty(t, result.Weeks)
 
-	assert.Equal(t, "/calendar-month?year=2026&month=3", result.PrevMonthURL)
-	assert.Equal(t, "/calendar-month?year=2026&month=5", result.NextMonthURL)
+	assert.Equal(t, "/calendar-month?calendarId=current&year=2026&month=3", result.PrevMonthURL)
+	assert.Equal(t, "/calendar-month?calendarId=current&year=2026&month=5", result.NextMonthURL)
 
 	for _, week := range result.Weeks {
 		assert.Equal(t, 7, len(week), "each week should have exactly 7 days")
@@ -657,7 +658,7 @@ func TestBuildCalendarMonth(t *testing.T) {
 func TestBuildCalendarMonthFebruary(t *testing.T) {
 	bankHolidays := sirius.BankHolidays{}
 	todayStr := "2026-02-14"
-	result := buildCalendarMonth(2026, time.February, bankHolidays, todayStr)
+	result := buildCalendarMonth(2026, time.February, bankHolidays, todayStr, "current")
 
 	assert.Equal(t, "February 2026", result.Name)
 	assert.Equal(t, 2026, result.Year)
@@ -685,7 +686,7 @@ func TestBuildCalendarMonthFebruary(t *testing.T) {
 func TestBuildCalendarMonthLeapYear(t *testing.T) {
 	bankHolidays := sirius.BankHolidays{}
 	todayStr := "2024-02-29"
-	result := buildCalendarMonth(2024, time.February, bankHolidays, todayStr)
+	result := buildCalendarMonth(2024, time.February, bankHolidays, todayStr, "current")
 
 	// Verify February in leap year
 	assert.Equal(t, "February 2024", result.Name)
@@ -712,7 +713,7 @@ func TestBuildCalendarMonthLeapYear(t *testing.T) {
 func TestBuildCalendarMonthWithoutBankHolidays(t *testing.T) {
 	bankHolidays := sirius.BankHolidays{}
 	todayStr := "2026-06-15"
-	result := buildCalendarMonth(2026, time.June, bankHolidays, todayStr)
+	result := buildCalendarMonth(2026, time.June, bankHolidays, todayStr, "current")
 
 	for _, week := range result.Weeks {
 		for _, day := range week {
@@ -724,19 +725,19 @@ func TestBuildCalendarMonthWithoutBankHolidays(t *testing.T) {
 func TestBuildCalendarMonthYearChange(t *testing.T) {
 	bankHolidays := sirius.BankHolidays{}
 
-	decemberResult := buildCalendarMonth(2025, time.December, bankHolidays, "2025-12-15")
-	assert.Equal(t, "/calendar-month?year=2025&month=11", decemberResult.PrevMonthURL)
-	assert.Equal(t, "/calendar-month?year=2026&month=1", decemberResult.NextMonthURL)
+	decemberResult := buildCalendarMonth(2025, time.December, bankHolidays, "2025-12-15", "current")
+	assert.Equal(t, "/calendar-month?calendarId=current&year=2025&month=11", decemberResult.PrevMonthURL)
+	assert.Equal(t, "/calendar-month?calendarId=current&year=2026&month=1", decemberResult.NextMonthURL)
 
-	januaryResult := buildCalendarMonth(2026, time.January, bankHolidays, "2026-01-15")
-	assert.Equal(t, "/calendar-month?year=2025&month=12", januaryResult.PrevMonthURL)
-	assert.Equal(t, "/calendar-month?year=2026&month=2", januaryResult.NextMonthURL)
+	januaryResult := buildCalendarMonth(2026, time.January, bankHolidays, "2026-01-15", "current")
+	assert.Equal(t, "/calendar-month?calendarId=current&year=2025&month=12", januaryResult.PrevMonthURL)
+	assert.Equal(t, "/calendar-month?calendarId=current&year=2026&month=2", januaryResult.NextMonthURL)
 }
 
 func TestBuildCalendarMonthDayOfWeekAlignment(t *testing.T) {
 	bankHolidays := sirius.BankHolidays{}
 	todayStr := "2026-06-01"
-	result := buildCalendarMonth(2026, time.June, bankHolidays, todayStr)
+	result := buildCalendarMonth(2026, time.June, bankHolidays, todayStr, "current")
 
 	firstWeek := result.Weeks[0]
 	assert.Equal(t, 1, firstWeek[0].Day, "June 1 should be on Monday (first position in week)")
@@ -766,7 +767,7 @@ func TestBuildCalendarMonthAllMonths(t *testing.T) {
 	bankHolidays := sirius.BankHolidays{}
 
 	for month, expectedCount := range expectedDays {
-		result := buildCalendarMonth(2026, month, bankHolidays, "2026-01-01")
+		result := buildCalendarMonth(2026, month, bankHolidays, "2026-01-01", "current")
 
 		totalDays := 0
 		for _, week := range result.Weeks {
@@ -791,7 +792,7 @@ func TestBuildCalendarMonthBankHolidayFromPreviousYear(t *testing.T) {
 	}
 
 	todayStr := "2026-01-15"
-	result := buildCalendarMonth(2026, time.January, bankHolidays, todayStr)
+	result := buildCalendarMonth(2026, time.January, bankHolidays, todayStr, "current")
 
 	for _, week := range result.Weeks {
 		for _, day := range week {
