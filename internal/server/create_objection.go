@@ -8,12 +8,12 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-type AddObjectionClient interface {
+type CreateObjectionClient interface {
 	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
-	AddObjection(sirius.Context, sirius.ObjectionRequest) error
+	CreateObjection(sirius.Context, sirius.ObjectionRequest) error
 }
 
-type addObjectionData struct {
+type createObjectionData struct {
 	XSRFToken  string
 	Title      string
 	Success    bool
@@ -30,7 +30,7 @@ type formObjection struct {
 	Notes         string   `form:"notes"`
 }
 
-func AddObjection(client AddObjectionClient, tmpl template.Template) Handler {
+func CreateObjection(client CreateObjectionClient, tmpl template.Template) Handler {
 
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseUID := r.FormValue("uid")
@@ -53,7 +53,7 @@ func AddObjection(client AddObjectionClient, tmpl template.Template) Handler {
 			}
 		}
 
-		data := addObjectionData{
+		data := createObjectionData{
 			XSRFToken:  ctx.XSRFToken,
 			Title:      "Add Objection",
 			CaseUID:    caseUID,
@@ -73,7 +73,7 @@ func AddObjection(client AddObjectionClient, tmpl template.Template) Handler {
 				Notes:         data.Form.Notes,
 			}
 
-			err = client.AddObjection(ctx, objection)
+			err = client.CreateObjection(ctx, objection)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)

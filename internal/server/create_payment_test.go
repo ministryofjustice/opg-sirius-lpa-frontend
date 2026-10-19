@@ -12,20 +12,20 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type mockAddPaymentClient struct {
+type mockCreatePaymentClient struct {
 	mock.Mock
 }
 
-func (m *mockAddPaymentClient) AddPayment(ctx sirius.Context, caseID int, amount int, source string, paymentDate sirius.DateString) error {
+func (m *mockCreatePaymentClient) CreatePayment(ctx sirius.Context, caseID int, amount int, source string, paymentDate sirius.DateString) error {
 	return m.Called(ctx, caseID, amount, source, paymentDate).Error(0)
 }
 
-func (m *mockAddPaymentClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
+func (m *mockCreatePaymentClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(sirius.Case), args.Error(1)
 }
 
-func (m *mockAddPaymentClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
+func (m *mockCreatePaymentClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
 	args := m.Called(ctx, category)
 	if args.Get(0) != nil {
 		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
@@ -33,7 +33,7 @@ func (m *mockAddPaymentClient) RefDataByCategory(ctx sirius.Context, category st
 	return nil, args.Error(1)
 }
 
-func TestGetAddPayment(t *testing.T) {
+func TestGetCreatePayment(t *testing.T) {
 	caseItem := sirius.Case{
 		UID:     "7000-0000-0021",
 		SubType: "pfa",
@@ -47,7 +47,7 @@ func TestGetAddPayment(t *testing.T) {
 		},
 	}
 
-	client := &mockAddPaymentClient{}
+	client := &mockCreatePaymentClient{}
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil)
@@ -57,7 +57,7 @@ func TestGetAddPayment(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, addPaymentData{
+		On("Func", mock.Anything, createPaymentData{
 			Case: caseItem,
 			PaymentSources: []PaymentSourceRadioOption{
 				{Value: "PHONE", Label: "Paid over the phone"},
@@ -69,7 +69,7 @@ func TestGetAddPayment(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, template.Func)(w, r)
+	err := CreatePayment(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -77,7 +77,7 @@ func TestGetAddPayment(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestAddPaymentNoID(t *testing.T) {
+func TestCreatePaymentNoID(t *testing.T) {
 	testCases := map[string]string{
 		"no-id":  "/",
 		"bad-id": "/?id=test",
@@ -88,14 +88,14 @@ func TestAddPaymentNoID(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, testUrl, nil)
 			w := httptest.NewRecorder()
 
-			err := AddPayment(nil, nil)(w, r)
+			err := CreatePayment(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
 	}
 }
 
-func TestAddPaymentWhenFailureOnGetCase(t *testing.T) {
+func TestCreatePaymentWhenFailureOnGetCase(t *testing.T) {
 	paymentSources := []sirius.RefDataItem{
 		{
 			Handle:         "PHONE",
@@ -104,7 +104,7 @@ func TestAddPaymentWhenFailureOnGetCase(t *testing.T) {
 		},
 	}
 
-	client := &mockAddPaymentClient{}
+	client := &mockCreatePaymentClient{}
 	client.
 		On("Case", mock.Anything, 4).
 		Return(sirius.Case{}, errExample)
@@ -115,13 +115,13 @@ func TestAddPaymentWhenFailureOnGetCase(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=4", nil)
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, nil)(w, r)
+	err := CreatePayment(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestAddPaymentWhenTemplateErrors(t *testing.T) {
+func TestCreatePaymentWhenTemplateErrors(t *testing.T) {
 	caseItem := sirius.Case{
 		UID:     "7000-0000-0021",
 		SubType: "pfa",
@@ -135,7 +135,7 @@ func TestAddPaymentWhenTemplateErrors(t *testing.T) {
 		},
 	}
 
-	client := &mockAddPaymentClient{}
+	client := &mockCreatePaymentClient{}
 	client.
 		On("Case", mock.Anything, 123).
 		Return(caseItem, nil)
@@ -145,7 +145,7 @@ func TestAddPaymentWhenTemplateErrors(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, addPaymentData{
+		On("Func", mock.Anything, createPaymentData{
 			Case: caseItem,
 			PaymentSources: []PaymentSourceRadioOption{
 				{Value: "PHONE", Label: "Paid over the phone"},
@@ -157,19 +157,19 @@ func TestAddPaymentWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, template.Func)(w, r)
+	err := CreatePayment(client, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestAddPaymentWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
+func TestCreatePaymentWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 	caseItem := sirius.Case{
 		UID:     "7000-0000-0021",
 		SubType: "pfa",
 	}
 
-	client := &mockAddPaymentClient{}
+	client := &mockCreatePaymentClient{}
 	client.
 		On("Case", mock.Anything, 123).
 		Return(caseItem, nil)
@@ -180,13 +180,13 @@ func TestAddPaymentWhenFailureOnGetPaymentSourceRefData(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123", nil)
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, nil)(w, r)
+	err := CreatePayment(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestPostAddPayment(t *testing.T) {
+func TestPostCreatePayment(t *testing.T) {
 	caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
 
 	paymentSources := []sirius.RefDataItem{
@@ -197,9 +197,9 @@ func TestPostAddPayment(t *testing.T) {
 		},
 	}
 
-	client := &mockAddPaymentClient{}
+	client := &mockCreatePaymentClient{}
 	client.
-		On("AddPayment", mock.Anything, 123, 4100, "MAKE", sirius.DateString("2022-01-23")).
+		On("CreatePayment", mock.Anything, 123, 4100, "MAKE", sirius.DateString("2022-01-23")).
 		Return(nil)
 	client.
 		On("Case", mock.Anything, 123).
@@ -220,7 +220,7 @@ func TestPostAddPayment(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, template.Func)(w, r)
+	err := CreatePayment(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/payments/123"), err)
@@ -228,7 +228,7 @@ func TestPostAddPayment(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestPostAddPaymentOther(t *testing.T) {
+func TestPostCreatePaymentOther(t *testing.T) {
 	caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
 
 	paymentSources := []sirius.RefDataItem{
@@ -239,9 +239,9 @@ func TestPostAddPaymentOther(t *testing.T) {
 		},
 	}
 
-	client := &mockAddPaymentClient{}
+	client := &mockCreatePaymentClient{}
 	client.
-		On("AddPayment", mock.Anything, 123, 1100, "MAKE", sirius.DateString("2022-01-23")).
+		On("CreatePayment", mock.Anything, 123, 1100, "MAKE", sirius.DateString("2022-01-23")).
 		Return(nil)
 	client.
 		On("Case", mock.Anything, 123).
@@ -263,7 +263,7 @@ func TestPostAddPaymentOther(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, template.Func)(w, r)
+	err := CreatePayment(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/payments/123"), err)
@@ -271,7 +271,7 @@ func TestPostAddPaymentOther(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestPostAddPaymentHTMX(t *testing.T) {
+func TestPostCreatePaymentHTMX(t *testing.T) {
 	caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
 
 	paymentSources := []sirius.RefDataItem{
@@ -282,9 +282,9 @@ func TestPostAddPaymentHTMX(t *testing.T) {
 		},
 	}
 
-	client := &mockAddPaymentClient{}
+	client := &mockCreatePaymentClient{}
 	client.
-		On("AddPayment", mock.Anything, 123, 4100, "MAKE", sirius.DateString("2022-01-23")).
+		On("CreatePayment", mock.Anything, 123, 4100, "MAKE", sirius.DateString("2022-01-23")).
 		Return(nil)
 	client.
 		On("Case", mock.Anything, 123).
@@ -295,7 +295,7 @@ func TestPostAddPaymentHTMX(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, addPaymentData{
+		On("Func", mock.Anything, createPaymentData{
 			Case:        caseitem,
 			Amount:      "41.00",
 			IsPartial:   true,
@@ -320,7 +320,7 @@ func TestPostAddPaymentHTMX(t *testing.T) {
 	r.Header.Add("HX-Request", "true")
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, template.Func)(w, r)
+	err := CreatePayment(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -328,7 +328,7 @@ func TestPostAddPaymentHTMX(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
+func TestPostCreatePaymentAmountIncorrectFormat(t *testing.T) {
 	for _, amount := range []string{"41.5", "41.555", ".45"} {
 		t.Run(amount, func(t *testing.T) {
 			caseitem := sirius.Case{CaseType: "lpa", UID: "700700"}
@@ -341,7 +341,7 @@ func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
 				},
 			}
 
-			client := &mockAddPaymentClient{}
+			client := &mockCreatePaymentClient{}
 			client.
 				On("Case", mock.Anything, 123).
 				Return(caseitem, nil)
@@ -357,7 +357,7 @@ func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
 
 			template := &mockTemplate{}
 			template.
-				On("Func", mock.Anything, addPaymentData{
+				On("Func", mock.Anything, createPaymentData{
 					Case:        caseitem,
 					Amount:      amount,
 					IsPartial:   false,
@@ -381,7 +381,7 @@ func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := AddPayment(client, template.Func)(w, r)
+			err := CreatePayment(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -391,7 +391,7 @@ func TestPostAddPaymentAmountIncorrectFormat(t *testing.T) {
 	}
 }
 
-func TestPostAddPaymentToDigitalLpa(t *testing.T) {
+func TestPostCreatePaymentToDigitalLpa(t *testing.T) {
 	caseitem := sirius.Case{CaseType: "DIGITAL_LPA", UID: "M-AAAA-BBBB-CCCC"}
 
 	paymentSources := []sirius.RefDataItem{
@@ -402,9 +402,9 @@ func TestPostAddPaymentToDigitalLpa(t *testing.T) {
 		},
 	}
 
-	client := &mockAddPaymentClient{}
+	client := &mockCreatePaymentClient{}
 	client.
-		On("AddPayment", mock.Anything, 444, 5200, "PHONE", sirius.DateString("2023-08-31")).
+		On("CreatePayment", mock.Anything, 444, 5200, "PHONE", sirius.DateString("2023-08-31")).
 		Return(nil)
 	client.
 		On("Case", mock.Anything, 444).
@@ -425,7 +425,7 @@ func TestPostAddPaymentToDigitalLpa(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AddPayment(client, template.Func)(w, r)
+	err := CreatePayment(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/lpa/M-AAAA-BBBB-CCCC/payments"), err)

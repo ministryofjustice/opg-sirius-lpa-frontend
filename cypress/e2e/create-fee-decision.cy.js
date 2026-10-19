@@ -1,6 +1,6 @@
 describe("Add a fee decision to a non-digital LPA", () => {
   beforeEach(() => {
-    cy.visit("/add-fee-decision?id=801");
+    cy.visit("/create-fee-decision?id=801");
   });
 
   it("adds a fee decision to the case", () => {
@@ -24,7 +24,7 @@ describe("Add a fee decision to a non-digital LPA", () => {
 
 describe("Add a fee decision to a digital LPA", () => {
   it("adds a fee decision to the case", () => {
-    cy.visit("/add-fee-decision?id=9456");
+    cy.visit("/create-fee-decision?id=9456");
     cy.contains("M-9999-4567-AAAA");
     cy.get("#f-decisionType").select("Declined remission");
     cy.get("#f-decisionReason").type("Insufficient evidence");

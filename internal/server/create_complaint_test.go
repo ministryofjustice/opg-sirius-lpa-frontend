@@ -13,21 +13,21 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type mockAddComplaintClient struct {
+type mockCreateComplaintClient struct {
 	mock.Mock
 }
 
-func (m *mockAddComplaintClient) AddComplaint(ctx sirius.Context, caseID int, caseType sirius.CaseType, complaint sirius.Complaint) error {
+func (m *mockCreateComplaintClient) CreateComplaint(ctx sirius.Context, caseID int, caseType sirius.CaseType, complaint sirius.Complaint) error {
 	args := m.Called(ctx, caseID, caseType, complaint)
 	return args.Error(0)
 }
 
-func (m *mockAddComplaintClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
+func (m *mockCreateComplaintClient) Case(ctx sirius.Context, id int) (sirius.Case, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(sirius.Case), args.Error(1)
 }
 
-func (m *mockAddComplaintClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
+func (m *mockCreateComplaintClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
 	args := m.Called(ctx, category)
 	if args.Get(0) != nil {
 		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
@@ -62,11 +62,11 @@ var demoComplaintCategories = []sirius.RefDataItem{
 	},
 }
 
-func TestGetAddComplaint(t *testing.T) {
+func TestGetCreateComplaint(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
 			donor := sirius.Person{ID: 1}
-			client := &mockAddComplaintClient{}
+			client := &mockCreateComplaintClient{}
 			client.
 				On("Case", mock.Anything, 123).
 				Return(sirius.Case{CaseType: caseType, UID: "7000", Donor: &donor}, nil).
@@ -79,7 +79,7 @@ func TestGetAddComplaint(t *testing.T) {
 
 			template := &mockTemplate{}
 			template.
-				On("Func", mock.Anything, addComplaintData{
+				On("Func", mock.Anything, createComplaintData{
 					Entity:                caseType + " 7000",
 					Categories:            demoComplaintCategories,
 					ComplainantCategories: demoComplainantCategories,
@@ -94,7 +94,7 @@ func TestGetAddComplaint(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "/?id=123&case="+caseType, nil)
 			w := httptest.NewRecorder()
 
-			err := AddComplaint(client, template.Func)(w, r)
+			err := CreateComplaint(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -104,9 +104,9 @@ func TestGetAddComplaint(t *testing.T) {
 	}
 }
 
-func TestGetAddComplaintHTMX(t *testing.T) {
+func TestGetCreateComplaintHTMX(t *testing.T) {
 	donor := sirius.Person{ID: 1}
-	client := &mockAddComplaintClient{}
+	client := &mockCreateComplaintClient{}
 	client.
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{CaseType: "lpa", UID: "7000", Donor: &donor}, nil).
@@ -119,7 +119,7 @@ func TestGetAddComplaintHTMX(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, addComplaintData{
+		On("Func", mock.Anything, createComplaintData{
 			IsPartial:             true,
 			Entity:                "lpa 7000",
 			Categories:            demoComplaintCategories,
@@ -137,7 +137,7 @@ func TestGetAddComplaintHTMX(t *testing.T) {
 
 	w := httptest.NewRecorder()
 
-	err := AddComplaint(client, template.Func)(w, r)
+	err := CreateComplaint(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -145,7 +145,7 @@ func TestGetAddComplaintHTMX(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestGetAddComplaintBadQuery(t *testing.T) {
+func TestGetCreateComplaintBadQuery(t *testing.T) {
 	testCases := map[string]string{
 		"no-id":    "/?case=lpa",
 		"no-case":  "/?id=123",
@@ -157,15 +157,15 @@ func TestGetAddComplaintBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, url, nil)
 			w := httptest.NewRecorder()
 
-			err := AddComplaint(nil, nil)(w, r)
+			err := CreateComplaint(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
 	}
 }
 
-func TestGetAddComplaintWhenCaseErrors(t *testing.T) {
-	client := &mockAddComplaintClient{}
+func TestGetCreateComplaintWhenCaseErrors(t *testing.T) {
+	client := &mockCreateComplaintClient{}
 	client.
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{}, errExample)
@@ -181,14 +181,14 @@ func TestGetAddComplaintWhenCaseErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := AddComplaint(client, nil)(w, r)
+	err := CreateComplaint(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestGetAddComplaintWhenRefDataErrors(t *testing.T) {
-	client := &mockAddComplaintClient{}
+func TestGetCreateComplaintWhenRefDataErrors(t *testing.T) {
+	client := &mockCreateComplaintClient{}
 	client.
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{CaseType: "LPA", UID: "7000"}, nil)
@@ -204,14 +204,14 @@ func TestGetAddComplaintWhenRefDataErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := AddComplaint(client, nil)(w, r)
+	err := CreateComplaint(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestGetAddComplaintWhenTemplateErrors(t *testing.T) {
-	client := &mockAddComplaintClient{}
+func TestGetCreateComplaintWhenTemplateErrors(t *testing.T) {
+	client := &mockCreateComplaintClient{}
 	client.
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{CaseType: "LPA", UID: "7000"}, nil)
@@ -226,7 +226,7 @@ func TestGetAddComplaintWhenTemplateErrors(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, addComplaintData{
+		On("Func", mock.Anything, createComplaintData{
 			Entity:                "LPA 7000",
 			Categories:            demoComplaintCategories,
 			ComplainantCategories: demoComplainantCategories,
@@ -240,16 +240,16 @@ func TestGetAddComplaintWhenTemplateErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "/?id=123&case=lpa", nil)
 	w := httptest.NewRecorder()
 
-	err := AddComplaint(client, template.Func)(w, r)
+	err := CreateComplaint(client, template.Func)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestPostAddComplaint(t *testing.T) {
+func TestPostCreateComplaint(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa"} {
 		t.Run(caseType, func(t *testing.T) {
-			client := &mockAddComplaintClient{}
+			client := &mockCreateComplaintClient{}
 			client.
 				On("Case", mock.Anything, 123).
 				Return(sirius.Case{CaseType: caseType, UID: "7000"}, nil)
@@ -262,7 +262,7 @@ func TestPostAddComplaint(t *testing.T) {
 				On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
 				Return(demoComplaintCategories, nil)
 			client.
-				On("AddComplaint", mock.Anything, 123, sirius.CaseType(caseType), sirius.Complaint{
+				On("CreateComplaint", mock.Anything, 123, sirius.CaseType(caseType), sirius.Complaint{
 					Category:             "01",
 					Description:          "This is a complaint",
 					ReceivedDate:         sirius.DateString("2022-04-05"),
@@ -275,7 +275,7 @@ func TestPostAddComplaint(t *testing.T) {
 
 			template := &mockTemplate{}
 			template.
-				On("Func", mock.Anything, addComplaintData{
+				On("Func", mock.Anything, createComplaintData{
 					Success:               true,
 					Entity:                caseType + " 7000",
 					Categories:            demoComplaintCategories,
@@ -301,7 +301,7 @@ func TestPostAddComplaint(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := AddComplaint(client, template.Func)(w, r)
+			err := CreateComplaint(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -311,14 +311,14 @@ func TestPostAddComplaint(t *testing.T) {
 	}
 }
 
-func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
+func TestPostCreateComplaintWhenCreateComplaintValidationError(t *testing.T) {
 	expectedError := sirius.ValidationError{
 		Field: sirius.FieldErrors{"field": {"": "problem"}},
 	}
 
 	complaint := sirius.Complaint{Description: "This is a complaint", Severity: shared.ComplaintSeverityNotRecognised}
 
-	client := &mockAddComplaintClient{}
+	client := &mockCreateComplaintClient{}
 	client.
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{CaseType: "LPA", UID: "7000"}, nil)
@@ -331,12 +331,12 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
 		Return(demoComplaintCategories, nil)
 	client.
-		On("AddComplaint", mock.Anything, 123, sirius.CaseTypeLpa, complaint).
+		On("CreateComplaint", mock.Anything, 123, sirius.CaseTypeLpa, complaint).
 		Return(expectedError)
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, addComplaintData{
+		On("Func", mock.Anything, createComplaintData{
 			Success:               false,
 			Error:                 expectedError,
 			Entity:                "LPA 7000",
@@ -358,7 +358,7 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AddComplaint(client, template.Func)(w, r)
+	err := CreateComplaint(client, template.Func)(w, r)
 	resp := w.Result()
 
 	assert.Nil(t, err)
@@ -366,10 +366,10 @@ func TestPostAddComplaintWhenAddComplaintValidationError(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, template)
 }
 
-func TestPostAddComplaintWhenAddComplaintOtherError(t *testing.T) {
+func TestPostCreateComplaintWhenCreateComplaintOtherError(t *testing.T) {
 	complaint := sirius.Complaint{Description: "This is a complaint", Severity: shared.ComplaintSeverityNotRecognised}
 
-	client := &mockAddComplaintClient{}
+	client := &mockCreateComplaintClient{}
 	client.
 		On("Case", mock.Anything, 123).
 		Return(sirius.Case{CaseType: "LPA", UID: "7000"}, nil)
@@ -382,7 +382,7 @@ func TestPostAddComplaintWhenAddComplaintOtherError(t *testing.T) {
 		On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).
 		Return(demoComplaintCategories, nil)
 	client.
-		On("AddComplaint", mock.Anything, 123, sirius.CaseTypeLpa, complaint).
+		On("CreateComplaint", mock.Anything, 123, sirius.CaseTypeLpa, complaint).
 		Return(errExample)
 
 	form := url.Values{
@@ -393,7 +393,7 @@ func TestPostAddComplaintWhenAddComplaintOtherError(t *testing.T) {
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AddComplaint(client, nil)(w, r)
+	err := CreateComplaint(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)

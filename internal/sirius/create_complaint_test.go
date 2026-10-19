@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAddComplaint(t *testing.T) {
+func TestCreateComplaint(t *testing.T) {
 	t.Parallel()
 
 	pact, err := newPact()
@@ -65,7 +65,7 @@ func TestAddComplaint(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				err := client.AddComplaint(Context{Context: context.Background()}, 800, CaseTypeLpa, Complaint{
+				err := client.CreateComplaint(Context{Context: context.Background()}, 800, CaseTypeLpa, Complaint{
 					Category:             "02",
 					Description:          "A description",
 					ReceivedDate:         DateString("2022-04-05"),
