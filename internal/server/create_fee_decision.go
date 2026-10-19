@@ -10,13 +10,13 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-type AddFeeDecisionClient interface {
+type CreateFeeDecisionClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
-	AddFeeDecision(ctx sirius.Context, caseID int, decisionType string, decisionReason string, decisionDate sirius.DateString) error
+	CreateFeeDecision(ctx sirius.Context, caseID int, decisionType string, decisionReason string, decisionDate sirius.DateString) error
 	Case(sirius.Context, int) (sirius.Case, error)
 }
 
-type addFeeDecisionData struct {
+type createFeeDecisionData struct {
 	XSRFToken      string
 	Error          sirius.ValidationError
 	Case           sirius.Case
@@ -27,7 +27,7 @@ type addFeeDecisionData struct {
 	ReturnUrl      string
 }
 
-func AddFeeDecision(client AddFeeDecisionClient, tmpl template.Template) Handler {
+func CreateFeeDecision(client CreateFeeDecisionClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("id"))
 		if err != nil {
@@ -36,7 +36,7 @@ func AddFeeDecision(client AddFeeDecisionClient, tmpl template.Template) Handler
 
 		ctx := getContext(r)
 		group, groupCtx := errgroup.WithContext(ctx.Context)
-		data := addFeeDecisionData{
+		data := createFeeDecisionData{
 			XSRFToken:      ctx.XSRFToken,
 			DecisionType:   postFormString(r, "decisionType"),
 			DecisionReason: postFormString(r, "decisionReason"),
@@ -72,7 +72,7 @@ func AddFeeDecision(client AddFeeDecisionClient, tmpl template.Template) Handler
 		}
 
 		if r.Method == http.MethodPost {
-			err = client.AddFeeDecision(ctx, caseID, data.DecisionType, data.DecisionReason, data.DecisionDate)
+			err = client.CreateFeeDecision(ctx, caseID, data.DecisionType, data.DecisionReason, data.DecisionDate)
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve

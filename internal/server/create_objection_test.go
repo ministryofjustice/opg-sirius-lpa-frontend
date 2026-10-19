@@ -13,21 +13,21 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type mockAddObjectionClient struct {
+type mockCreateObjectionClient struct {
 	mock.Mock
 }
 
-func (m *mockAddObjectionClient) AddObjection(ctx sirius.Context, objection sirius.ObjectionRequest) error {
+func (m *mockCreateObjectionClient) CreateObjection(ctx sirius.Context, objection sirius.ObjectionRequest) error {
 	args := m.Called(ctx, objection)
 	return args.Error(0)
 }
 
-func (m *mockAddObjectionClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
+func (m *mockCreateObjectionClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
 	args := m.Called(ctx, uid)
 	return args.Get(0).(sirius.CaseSummary), args.Error(1)
 }
 
-var testAddObjectionsCaseSummary = sirius.CaseSummary{
+var testCreateObjectionsCaseSummary = sirius.CaseSummary{
 	DigitalLpa: sirius.DigitalLpa{
 		UID: "M-9898-9898-9898",
 		SiriusData: sirius.SiriusData{
@@ -51,7 +51,7 @@ var testAddObjectionsCaseSummary = sirius.CaseSummary{
 	},
 }
 
-func TestGetAddObjectionsTemplate(t *testing.T) {
+func TestGetCreateObjectionsTemplate(t *testing.T) {
 	tests := []struct {
 		name           string
 		errorReturned  error
@@ -69,14 +69,14 @@ func TestGetAddObjectionsTemplate(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			client := &mockAddObjectionClient{}
+			client := &mockCreateObjectionClient{}
 			client.
 				On("CaseSummary", mock.Anything, "M-9898-9898-9898").
-				Return(testAddObjectionsCaseSummary, nil)
+				Return(testCreateObjectionsCaseSummary, nil)
 
 			template := &mockTemplate{}
 			template.
-				On("Func", mock.Anything, addObjectionData{
+				On("Func", mock.Anything, createObjectionData{
 					Title:   "Add Objection",
 					CaseUID: "M-9898-9898-9898",
 					LinkedLpas: []sirius.SiriusData{
@@ -110,7 +110,7 @@ func TestGetAddObjectionsTemplate(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "add-objection?uid=M-9898-9898-9898", nil)
 			w := httptest.NewRecorder()
 
-			err := AddObjection(client, template.Func)(w, r)
+			err := CreateObjection(client, template.Func)(w, r)
 
 			if tc.errorReturned != nil {
 				assert.Equal(t, tc.errorReturned, err)
@@ -125,8 +125,8 @@ func TestGetAddObjectionsTemplate(t *testing.T) {
 	}
 }
 
-func TestGetAddObjectionWhenCaseSummaryErrors(t *testing.T) {
-	client := &mockAddObjectionClient{}
+func TestGetCreateObjectionWhenCaseSummaryErrors(t *testing.T) {
+	client := &mockCreateObjectionClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-9898-9898-9898").
 		Return(sirius.CaseSummary{}, errExample)
@@ -134,13 +134,13 @@ func TestGetAddObjectionWhenCaseSummaryErrors(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, "add-objection?uid=M-9898-9898-9898", nil)
 	w := httptest.NewRecorder()
 
-	err := AddObjection(client, nil)(w, r)
+	err := CreateObjection(client, nil)(w, r)
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestPostAddObjection(t *testing.T) {
+func TestPostCreateObjection(t *testing.T) {
 	tests := []struct {
 		name          string
 		apiError      error
@@ -159,12 +159,12 @@ func TestPostAddObjection(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			client := &mockAddObjectionClient{}
+			client := &mockCreateObjectionClient{}
 			client.
 				On("CaseSummary", mock.Anything, "M-9898-9898-9898").
-				Return(testAddObjectionsCaseSummary, nil)
+				Return(testCreateObjectionsCaseSummary, nil)
 			client.
-				On("AddObjection", mock.Anything, sirius.ObjectionRequest{
+				On("CreateObjection", mock.Anything, sirius.ObjectionRequest{
 					LpaUids:       []string{"M-9898-9898-9898", "M-9999-9999-9999"},
 					ReceivedDate:  "2025-01-01",
 					ObjectionType: "factual",
@@ -183,24 +183,24 @@ func TestPostAddObjection(t *testing.T) {
 				"notes":              {"Test"},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, "/add-objection?uid=M-9898-9898-9898", strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/create-objection?uid=M-9898-9898-9898", strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := AddObjection(client, template.Func)(w, r)
+			err := CreateObjection(client, template.Func)(w, r)
 			assert.Equal(t, tc.expectedError, err)
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
 
-func TestPostAddObjectionWhenValidationError(t *testing.T) {
-	client := &mockAddObjectionClient{}
+func TestPostCreateObjectionWhenValidationError(t *testing.T) {
+	client := &mockCreateObjectionClient{}
 	client.
 		On("CaseSummary", mock.Anything, "M-9898-9898-9898").
-		Return(testAddObjectionsCaseSummary, nil)
+		Return(testCreateObjectionsCaseSummary, nil)
 	client.
-		On("AddObjection", mock.Anything, sirius.ObjectionRequest{
+		On("CreateObjection", mock.Anything, sirius.ObjectionRequest{
 			LpaUids:      []string{"M-9898-9898-9898"},
 			ReceivedDate: "2025-01-01",
 			Notes:        "Test",
@@ -212,7 +212,7 @@ func TestPostAddObjectionWhenValidationError(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything,
-			mock.MatchedBy(func(data addObjectionData) bool {
+			mock.MatchedBy(func(data createObjectionData) bool {
 				return data.Error.Field["objectionType"]["required"] == "Value required and can't be empty"
 			}),
 		).
@@ -227,11 +227,11 @@ func TestPostAddObjectionWhenValidationError(t *testing.T) {
 		"notes":              {"Test"},
 	}
 
-	r, _ := http.NewRequest(http.MethodPost, "/add-objection?uid=M-9898-9898-9898", strings.NewReader(form.Encode()))
+	r, _ := http.NewRequest(http.MethodPost, "/create-objection?uid=M-9898-9898-9898", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
-	err := AddObjection(client, template.Func)(w, r)
+	err := CreateObjection(client, template.Func)(w, r)
 	assert.Nil(t, err)
 	mock.AssertExpectationsForObjects(t, client, template)
 }
