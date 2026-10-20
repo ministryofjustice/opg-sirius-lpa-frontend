@@ -1,13 +1,17 @@
 package server
 
 import (
+	"io"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
 
+	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/templatefn"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -535,4 +539,140 @@ func TestPostFiltersLpaHistoryWhenFailureOnGetEvents(t *testing.T) {
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestGetLPAHistoryContentComplaintUpdated(t *testing.T) {
+	tests := []struct {
+		name     string
+		event    sirius.LpaEvent
+		expected string
+	}{
+		{
+			name: "Complaint updated - title updated",
+			event: sirius.LpaEvent{
+				SourceType: shared.LpaEventSourceTypeComplaint,
+				Type:       "UPD",
+				Changes: map[string]interface{}{
+					"title": []interface{}{
+						"Old title",
+						"New title",
+					},
+				},
+				Entity: map[string]interface{}{
+					"_class":      `Opg\Core\Model\Entity\PowerOfAttorney\Complaint\Complaint`,
+					"summary":     "Test Complaint",
+					"severity":    "Medium",
+					"description": "123",
+				},
+			},
+			expected: "Title: Old title changed to: New title",
+		},
+		{
+			name: "Complaint updated - title removed",
+			event: sirius.LpaEvent{
+				SourceType: shared.LpaEventSourceTypeComplaint,
+				Type:       "UPD",
+				Changes: map[string]interface{}{
+					"title": []interface{}{
+						"Old title",
+					},
+				},
+				Entity: map[string]interface{}{
+					"_class":      `Opg\Core\Model\Entity\PowerOfAttorney\Complaint\Complaint`,
+					"summary":     "Test Complaint",
+					"severity":    "Medium",
+					"description": "123",
+				},
+			},
+			expected: "Title: Old title changed to:",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			templates, err := template.Parse("../../web/template", templatefn.All("sirius-public-url", "url-prefix", "static-hash"))
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			tmpl := templates.Get("lpa-history.gohtml")
+
+			events := []sirius.LpaEvent{tc.event}
+			normaliseComplaintTitleChanges(events)
+
+			w := httptest.NewRecorder()
+			if err := tmpl(w, getLpaHistory{Events: []sirius.LpaEvent{tc.event}}); err != nil {
+				t.Fatalf("template execution failed: %v", err)
+			}
+
+			res := w.Result()
+			defer func(Body io.ReadCloser) {
+				err := Body.Close()
+				if err != nil {
+					t.Fatal(err)
+				}
+			}(res.Body)
+			data, err := io.ReadAll(w.Result().Body)
+			if err != nil {
+				t.Fatalf("reading body: %v", err)
+			}
+
+			assert.Contains(t, string(data), tc.expected)
+		})
+	}
+}
+
+func TestGetLPAHistoryContent(t *testing.T) {
+	templates, err := template.Parse("../../web/template", templatefn.All("sirius-public-url", "url-prefix", "static-hash"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tmpl := templates.Get("lpa-history.gohtml")
+
+	w := httptest.NewRecorder()
+	if err := tmpl(w, getLpaHistory{
+		Events: []sirius.LpaEvent{
+			{
+				SourceType: shared.LpaEventSourceTypeDonor,
+				Type:       "UPD",
+				Changes: map[string]interface{}{
+					"parent": []interface{}{
+						map[string]interface{}{
+							"class": `Opg\Core\Model\Entity\CaseActor\Donor`,
+							"identifier": map[string]interface{}{
+								"id": 1,
+							},
+						},
+					},
+				},
+				Entity: map[string]interface{}{
+					"_class":    `Opg\Core\Model\Entity\CaseActor\Donor`,
+					"id":        2,
+					"firstname": "Beth",
+					"surname":   "Bennett",
+				},
+			},
+		},
+	}); err != nil {
+		t.Fatalf("template execution failed: %v", err)
+	}
+
+	res := w.Result()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}(res.Body)
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		t.Errorf("expected error to be nil got %v", err)
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Contains(t, string(data), "Beth Bennett was unlinked from")
 }
