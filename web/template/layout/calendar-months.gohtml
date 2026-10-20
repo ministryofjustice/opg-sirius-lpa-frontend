@@ -24,26 +24,30 @@
                     </svg>
                 </button>
             </div>
-            <div class="weekday">Mon</div>
-            <div class="weekday">Tue</div>
-            <div class="weekday">Wed</div>
-            <div class="weekday">Thu</div>
-            <div class="weekday">Fri</div>
-            <div class="weekday">Sat</div>
-            <div class="weekday">Sun</div>
-            {{ range .Weeks }}
-                {{ range . }}
-                    {{ if .Date }}
-                        <div class="day {{ if .IsToday }}today{{ else if or .IsWeekend .IsBankHoliday }}non-working{{ else }}default{{ end }}"
-                             data-date="{{ .Date }}"
-                             role="gridcell">
-                            <span class="day-number">{{ .Day }}</span>
-                        </div>
-                    {{ else }}
-                        <div class="day empty" role="gridcell" aria-hidden="true"></div>
+            <div class="weekdays">
+                <div class="weekday">Mon</div>
+                <div class="weekday">Tue</div>
+                <div class="weekday">Wed</div>
+                <div class="weekday">Thu</div>
+                <div class="weekday">Fri</div>
+                <div class="weekday">Sat</div>
+                <div class="weekday">Sun</div>
+            </div>
+            <div class="days">
+                {{ range .Weeks }}
+                    {{ range . }}
+                        {{ if .Date }}
+                            <div class="day {{ if .IsToday }}today{{ else if or .IsWeekend .IsBankHoliday }}non-working{{ else }}default{{ end }}"
+                                 data-date="{{ .Date }}"
+                                 role="gridcell">
+                                <span class="day-number">{{ .Day }}</span>
+                            </div>
+                        {{ else }}
+                            <div class="day empty" role="gridcell" aria-hidden="true"></div>
+                        {{ end }}
                     {{ end }}
                 {{ end }}
-            {{ end }}
+            </div>
         </div>
     </div>
 {{ end }}
