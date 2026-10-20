@@ -1,10 +1,10 @@
 {{ define "calendarMonth" }}
     <div class="opg-calendar">
-        <div class="calendar" role="grid" aria-label="{{ .Name }}" id="calendar-month-{{ .Year }}-{{ .Month }}">
+        <div class="calendar" role="grid" aria-label="{{ .Name }}" id="calendar-month-{{ .CalendarID }}-{{ .Year }}-{{ .Month }}">
             <div class="current-month">
                 <button class="move-month prev-month-{{ .Year }}-{{ .Month }}"
                     hx-get="{{ prefix .PrevMonthURL }}"
-                    hx-target="#calendar-month-{{ .Year }}-{{ .Month }}"
+                    hx-target="#calendar-month-{{ .CalendarID }}-{{ .Year }}-{{ .Month }}"
                     hx-swap="outerHTML"
                     type="button"
                     aria-label="Previous month">
@@ -13,7 +13,7 @@
                 <span>{{ .Name }}</span>
                 <button class="move-month next-month-{{ .Year }}-{{ .Month }}"
                     hx-get="{{ prefix .NextMonthURL }}"
-                    hx-target="#calendar-month-{{ .Year }}-{{ .Month }}"
+                    hx-target="#calendar-month-{{ .CalendarID }}-{{ .Year }}-{{ .Month }}"
                     hx-swap="outerHTML"
                     type="button"
                     aria-label="Next month">
