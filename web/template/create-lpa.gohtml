@@ -746,6 +746,25 @@
                 </fieldset>
               </div>
             </div>
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+            <div class="govuk-form-group">
+              <div class="govuk-form-group {{ if .Error.Field.continuationSheets }}govuk-form-group--error{{ end }}">
+                <fieldset class="govuk-fieldset">
+                  <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Continuation sheets</legend>
+                  {{ template "errors" .Error.Field.continuationSheets }}
+                  <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                    <div class="govuk-checkboxes__item">
+                      <input class="govuk-checkboxes__input" id="f-continuationSheets" name="continuationSheets"
+                             type="checkbox" value="continuationSheets"
+                             {{ if eq (stringifyBoolPointer .Lpa.ApplicationHasContinuationSheets) "true" }}checked{{ end }}>
+                      <label class="govuk-label govuk-checkboxes__label" for="f-continuationSheets">
+                        This LPA includes continuation sheets
+                      </label>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
           </div>
         </div>
       </div>
