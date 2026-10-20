@@ -4,22 +4,32 @@ import (
 	"fmt"
 )
 
-func (c *Client) CreateDocument(ctx Context, caseID, correspondentID int, templateID string, inserts []string) (Document, error) {
-	var d Document
+type createDocumentRequestData struct {
+	CaseId            int      `json:"caseId"`
+	CorrespondentID   int      `json:"correspondentId"`
+	Type              string   `json:"type"`
+	FileName          string   `json:"filename"`
+	SystemType        string   `json:"systemType"`
+	Content           string   `json:"content"`
+	AppendLpaSections []string `json:"appendLpaSections"`
+}
 
-	data := struct {
-		TemplateID      string   `json:"templateId"`
-		Inserts         []string `json:"inserts"`
-		CorrespondentID int      `json:"correspondentId"`
-	}{
-		TemplateID:      templateID,
-		Inserts:         inserts,
-		CorrespondentID: correspondentID,
+func (c *Client) CreateDocument(ctx Context, caseID int, document Document, docType string, blankSections []string) (Document, error) {
+	data := createDocumentRequestData{
+		CaseId:            caseID,
+		CorrespondentID:   document.Correspondent.ID,
+		Type:              docType,
+		FileName:          document.FileName,
+		SystemType:        document.SystemType,
+		Content:           document.Content,
+		AppendLpaSections: blankSections,
 	}
 
-	err := c.post(ctx, fmt.Sprintf("/lpa-api/v1/lpas/%d/documents/draft", caseID), data, &d)
+	var d Document
+
+	err := c.post(ctx, fmt.Sprintf("/lpa-api/v1/lpas/%d/documents", caseID), data, &d)
 	if err != nil {
-		return Document{}, nil
+		return Document{}, err
 	}
 
 	return d, nil

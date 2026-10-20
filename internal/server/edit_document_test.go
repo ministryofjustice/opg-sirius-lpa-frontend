@@ -47,7 +47,7 @@ func (m *mockEditDocumentClient) DeleteDocument(ctx sirius.Context, uuid string)
 	return args.Error(0)
 }
 
-func (m *mockEditDocumentClient) AddDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string, blankSections []string) (sirius.Document, error) {
+func (m *mockEditDocumentClient) CreateDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string, blankSections []string) (sirius.Document, error) {
 	args := m.Called(ctx, caseID, document, docType, blankSections)
 	return args.Get(0).(sirius.Document), args.Error(1)
 }
@@ -115,6 +115,8 @@ func TestGetEditDocument(t *testing.T) {
 				Documents:           documents,
 				Document:            document,
 				UsesNotify:          true,
+				Section11:           Section11,
+				Section10And11:      Section10And11,
 				Section15:           Section15,
 				Section11And15:      Section11And15,
 				Section10And11And15: Section10And11And15,
@@ -191,6 +193,8 @@ func TestPostSaveDocument(t *testing.T) {
 				DonorId:             1,
 				Documents:           documents,
 				Document:            document,
+				Section11:           Section11,
+				Section10And11:      Section10And11,
 				Section15:           Section15,
 				Section11And15:      Section11And15,
 				Section10And11And15: Section10And11And15,
@@ -288,6 +292,8 @@ func TestPostDeleteDocument(t *testing.T) {
 						DonorId:             1,
 						Documents:           documents,
 						Document:            document,
+						Section11:           Section11,
+						Section10And11:      Section10And11,
 						Section15:           Section15,
 						Section11And15:      Section11And15,
 						Section10And11And15: Section10And11And15,
@@ -349,7 +355,7 @@ func TestPostPublishDocument(t *testing.T) {
 				On("DocumentByUUID", mock.Anything, document.UUID).
 				Return(document, nil)
 			client.
-				On("AddDocument", mock.Anything, 544, document, sirius.TypeSave, []string{}).
+				On("CreateDocument", mock.Anything, 544, document, sirius.TypeSave, []string{}).
 				Return(publishedDocument, nil)
 			client.
 				On("DeleteDocument", mock.Anything, document.UUID).
@@ -381,6 +387,8 @@ func TestPostPublishDocument(t *testing.T) {
 						Documents:           documents,
 						Document:            document,
 						Success:             true,
+						Section11:           Section11,
+						Section10And11:      Section10And11,
 						Section15:           Section15,
 						Section11And15:      Section11And15,
 						Section10And11And15: Section10And11And15,
@@ -441,7 +449,7 @@ func TestPostPreviewDocument(t *testing.T) {
 		On("DocumentByUUID", mock.Anything, document.UUID).
 		Return(document, nil)
 	client.
-		On("AddDocument", mock.Anything, 888, document, sirius.TypePreview, []string{}).
+		On("CreateDocument", mock.Anything, 888, document, sirius.TypePreview, []string{}).
 		Return(previewDocument, nil)
 	client.
 		On("Case", mock.Anything, 888).
@@ -466,6 +474,8 @@ func TestPostPreviewDocument(t *testing.T) {
 			Document:            document,
 			PreviewDraft:        true,
 			DownloadUUID:        "efef6714-b4fe-44c2-b26e-90dfe3663e96",
+			Section11:           Section11,
+			Section10And11:      Section10And11,
 			Section15:           Section15,
 			Section11And15:      Section11And15,
 			Section10And11And15: Section10And11And15,
@@ -526,6 +536,8 @@ func TestPostSaveDocumentAndExit(t *testing.T) {
 						SaveAndExit:         true,
 						Case:                caseItem,
 						DonorId:             1,
+						Section11:           Section11,
+						Section10And11:      Section10And11,
 						Section15:           Section15,
 						Section11And15:      Section11And15,
 						Section10And11And15: Section10And11And15,
@@ -695,6 +707,8 @@ func TestGetEditDocumentWhenTemplateErrors(t *testing.T) {
 			DonorId:             1,
 			Document:            document,
 			Documents:           documents,
+			Section11:           Section11,
+			Section10And11:      Section10And11,
 			Section15:           Section15,
 			Section11And15:      Section11And15,
 			Section10And11And15: Section10And11And15,
@@ -718,20 +732,32 @@ func TestPostPublishDocumentWithBlankSections(t *testing.T) {
 		blankSections    []string
 		section11Count1  string
 		section11Count2  string
+		section11Count3  string
+		section11Count4  string
 	}{
+		{
+			name:             "Section 11",
+			selectedSections: Section11,
+			blankSections:    []string{"pfa-11", "pfa-11"},
+			section11Count1:  "2",
+		},
+		{
+			name:             "Section 10 and 11",
+			selectedSections: Section10And11,
+			blankSections:    []string{"pfa-10", "pfa-11", "pfa-11", "pfa-11"},
+			section11Count2:  "3",
+		},
 		{
 			name:             "Section 11 and 15",
 			selectedSections: "11+15",
 			blankSections:    []string{"pfa-11", "pfa-11", "pfa-11", "pfa-15"},
-			section11Count1:  "3",
-			section11Count2:  "",
+			section11Count3:  "3",
 		},
 		{
 			name:             "Section 10, 11 and 15",
 			selectedSections: "10+11+15",
 			blankSections:    []string{"pfa-10", "pfa-11", "pfa-11", "pfa-15"},
-			section11Count1:  "",
-			section11Count2:  "2",
+			section11Count4:  "2",
 		},
 	}
 	for _, tc := range tests {
@@ -764,7 +790,7 @@ func TestPostPublishDocumentWithBlankSections(t *testing.T) {
 				On("DocumentByUUID", mock.Anything, document.UUID).
 				Return(document, nil)
 			client.
-				On("AddDocument", mock.Anything, 544, document, sirius.TypeSave, tc.blankSections).
+				On("CreateDocument", mock.Anything, 544, document, sirius.TypeSave, tc.blankSections).
 				Return(publishedDocument, nil).
 				Return(publishedDocument, nil)
 			client.
@@ -795,6 +821,10 @@ func TestPostPublishDocumentWithBlankSections(t *testing.T) {
 					SelectedBlankSections: tc.selectedSections,
 					Section11Count1:       tc.section11Count1,
 					Section11Count2:       tc.section11Count2,
+					Section11Count3:       tc.section11Count3,
+					Section11Count4:       tc.section11Count4,
+					Section11:             Section11,
+					Section10And11:        Section10And11,
 					Section15:             Section15,
 					Section11And15:        Section11And15,
 					Section10And11And15:   Section10And11And15,
@@ -812,6 +842,8 @@ func TestPostPublishDocumentWithBlankSections(t *testing.T) {
 				"blankSections":      {tc.selectedSections},
 				"section11Count1":    {tc.section11Count1},
 				"section11Count2":    {tc.section11Count2},
+				"section11Count3":    {tc.section11Count3},
+				"section11Count4":    {tc.section11Count4},
 			}
 
 			r, _ := http.NewRequest(http.MethodPost, "/?id=544&case=lpa", strings.NewReader(form.Encode()))
@@ -869,6 +901,8 @@ func TestPostDocumentWithBlankSectionsWhenNoSectionsSelected(t *testing.T) {
 					Documents:           documents,
 					Document:            document,
 					HasBlankSections:    "true",
+					Section11:           Section11,
+					Section10And11:      Section10And11,
 					Section15:           Section15,
 					Section11And15:      Section11And15,
 					Section10And11And15: Section10And11And15,
@@ -946,13 +980,15 @@ func TestPostDocumentWithBlankSectionsWhenSection11SelectedButNoCount(t *testing
 					Document:              document,
 					HasBlankSections:      "true",
 					SelectedBlankSections: "10+11+15",
+					Section11:             Section11,
+					Section10And11:        Section10And11,
 					Section15:             Section15,
 					Section11And15:        Section11And15,
 					Section10And11And15:   Section10And11And15,
 					Section12And13And15:   Section12And13And15,
 					Error: sirius.ValidationError{
 						Field: sirius.FieldErrors{
-							"section11Count2": {"reason": "Please select how many section 11 to insert"},
+							"section11Count4": {"reason": "Please select how many section 11 to insert"},
 						},
 					},
 				}).
@@ -1024,13 +1060,15 @@ func TestPostDocumentWithBlankSectionsWhenSection11And15SelectedButNoCount(t *te
 					Document:              document,
 					HasBlankSections:      "true",
 					SelectedBlankSections: "11+15",
+					Section11:             Section11,
+					Section10And11:        Section10And11,
 					Section15:             Section15,
 					Section11And15:        Section11And15,
 					Section10And11And15:   Section10And11And15,
 					Section12And13And15:   Section12And13And15,
 					Error: sirius.ValidationError{
 						Field: sirius.FieldErrors{
-							"section11Count1": {"reason": "Please select how many section 11 to insert"},
+							"section11Count3": {"reason": "Please select how many section 11 to insert"},
 						},
 					},
 				}).
@@ -1056,6 +1094,30 @@ func TestPostDocumentWithBlankSectionsWhenSection11And15SelectedButNoCount(t *te
 			assert.Nil(t, err)
 			assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
+func TestParseBlankSectionsRequiresSection11Count(t *testing.T) {
+	tests := []struct {
+		selectedSections string
+		field            string
+	}{
+		{selectedSections: Section11, field: "section11Count1"},
+		{selectedSections: Section10And11, field: "section11Count2"},
+		{selectedSections: Section11And15, field: "section11Count3"},
+		{selectedSections: Section10And11And15, field: "section11Count4"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.selectedSections, func(t *testing.T) {
+			_, err := parseBlankSections(true, tc.selectedSections, section11Counts{}, "pfa")
+
+			assert.Equal(t, sirius.ValidationError{
+				Field: sirius.FieldErrors{
+					tc.field: {"reason": "Please select how many section 11 to insert"},
+				},
+			}, err)
 		})
 	}
 }
@@ -1122,6 +1184,8 @@ func TestGetAttorneyCount(t *testing.T) {
 		Document:            document,
 		UsesNotify:          true,
 		AttorneyCount:       4,
+		Section11:           Section11,
+		Section10And11:      Section10And11,
 		Section15:           Section15,
 		Section11And15:      Section11And15,
 		Section10And11And15: Section10And11And15,

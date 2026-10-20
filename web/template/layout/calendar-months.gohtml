@@ -1,53 +1,339 @@
-{{ define "calendarMonth" }}
-    <div class="opg-calendar" id="calendar-month-{{ .Year }}-{{ .Month }}">
-        <div class="calendar" role="grid" aria-label="{{ .Name }}">
-            <div class="current-month">
-                <button class="move-month prev-month-{{ .Year }}-{{ .Month }}"
-                        hx-get="{{ prefix .PrevMonthURL }}"
-                        hx-target="#calendar-month-{{ .Year }}-{{ .Month }}"
-                        hx-swap="outerHTML"
-                        type="button"
-                        aria-label="Previous month">
-                    <svg class="move-month__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16" focusable="false" aria-hidden="true">
-                        <path d="M8 2L2 8l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-                <span class="current-month__name">{{ .Name }}</span>
-                <button class="move-month next-month-{{ .Year }}-{{ .Month }}"
-                        hx-get="{{ prefix .NextMonthURL }}"
-                        hx-target="#calendar-month-{{ .Year }}-{{ .Month }}"
-                        hx-swap="outerHTML"
-                        type="button"
-                        aria-label="Next month">
-                    <svg class="move-month__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16" focusable="false" aria-hidden="true">
-                        <path d="M2 2l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="weekdays">
-                <div class="weekday">Mon</div>
-                <div class="weekday">Tue</div>
-                <div class="weekday">Wed</div>
-                <div class="weekday">Thu</div>
-                <div class="weekday">Fri</div>
-                <div class="weekday">Sat</div>
-                <div class="weekday">Sun</div>
-            </div>
-            <div class="days">
-                {{ range .Weeks }}
-                    {{ range . }}
-                        {{ if .Date }}
-                            <div class="day {{ if .IsToday }}today{{ else if or .IsWeekend .IsBankHoliday }}non-working{{ else }}default{{ end }}"
-                                 data-date="{{ .Date }}"
-                                 role="gridcell">
-                                <span class="day-number">{{ .Day }}</span>
-                            </div>
-                        {{ else }}
-                            <div class="day empty" role="gridcell" aria-hidden="true"></div>
-                        {{ end }}
-                    {{ end }}
-                {{ end }}
-            </div>
-        </div>
-    </div>
-{{ end }}
+package server
+
+import (
+	"fmt"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+)
+
+type SiriusHeaderCalendarClient interface {
+	BankHolidays(ctx sirius.Context) (sirius.BankHolidays, error)
+}
+
+type WorkingDaysMode string
+
+const (
+	WorkingDaysModeNumWorkingDays WorkingDaysMode = "numworkingdays"
+	WorkingDaysModeStartDate      WorkingDaysMode = "startdate"
+	WorkingDaysModeEndDate        WorkingDaysMode = "enddate"
+)
+
+func parseWorkingDaysMode(value string) WorkingDaysMode {
+	switch WorkingDaysMode(strings.ToLower(value)) {
+	case WorkingDaysModeNumWorkingDays, WorkingDaysModeStartDate, WorkingDaysModeEndDate:
+		return WorkingDaysMode(strings.ToLower(value))
+	default:
+		return WorkingDaysModeNumWorkingDays
+	}
+}
+
+func (WorkingDaysData) ModeStartDate() WorkingDaysMode {
+	return WorkingDaysModeStartDate
+}
+
+func (WorkingDaysData) ModeEndDate() WorkingDaysMode {
+	return WorkingDaysModeEndDate
+}
+
+func (WorkingDaysData) ModeNumWorkingDays() WorkingDaysMode {
+	return WorkingDaysModeNumWorkingDays
+}
+
+type CalendarDay struct {
+	Day           int
+	Date          string
+	IsToday       bool
+	IsBankHoliday bool
+	IsWeekend     bool
+}
+
+type CalendarMonth struct {
+	Name         string
+	Weeks        [][]CalendarDay
+	Year         int
+	Month        int
+	PrevMonthURL string
+	NextMonthURL string
+	CalendarID   string
+}
+
+type WorkingDaysData struct {
+	XSRFToken      string
+	StartDate      string
+	EndDate        string
+	NumWorkingDays int
+	Mode           WorkingDaysMode
+	PreviousMode   WorkingDaysMode
+}
+
+type siriusHeaderCalendarData struct {
+	XSRFToken  string
+	Calculator WorkingDaysData
+	Months     [3]CalendarMonth
+}
+
+func SiriusHeaderCalendars(client SiriusHeaderCalendarClient, tmpl template.Template) Handler {
+	return siriusHeaderCalendarsWithNow(client, tmpl, time.Now)
+}
+
+func siriusHeaderCalendarsWithNow(client SiriusHeaderCalendarClient, tmpl template.Template, now func() time.Time) Handler {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		ctx := getContext(r)
+
+		bankHolidays, err := client.BankHolidays(ctx)
+		if err != nil {
+			bankHolidays = sirius.BankHolidays{}
+		}
+
+		today := now().UTC().Truncate(24 * time.Hour)
+
+		calculator := calculateWorkingDays(today, time.Time{}, 20, WorkingDaysModeEndDate, bankHolidays)
+		calculator.XSRFToken = ctx.XSRFToken
+
+		data := siriusHeaderCalendarData{
+			XSRFToken:  ctx.XSRFToken,
+			Calculator: calculator,
+			Months:     buildCalendarMonths(bankHolidays, today),
+		}
+
+		return tmpl(w, data)
+	}
+}
+
+func WorkingDays(client SiriusHeaderCalendarClient, tmpl template.Template) Handler {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		if err := r.ParseForm(); err != nil {
+			return err
+		}
+
+		ctx := getContext(r)
+
+		numWorkingDays, _ := strconv.Atoi(r.FormValue("numworkingdays"))
+		startDate, _ := time.Parse(time.DateOnly, r.FormValue("startdate"))
+		endDate, _ := time.Parse(time.DateOnly, r.FormValue("enddate"))
+		mode := parseWorkingDaysMode(r.FormValue("mode"))
+		previousMode := parseWorkingDaysMode(r.FormValue("previousmode"))
+
+		bankHolidays, err := client.BankHolidays(ctx)
+		if err != nil {
+			bankHolidays = sirius.BankHolidays{}
+		}
+
+		data := calculateWorkingDays(startDate, endDate, numWorkingDays, mode, bankHolidays)
+		data.PreviousMode = previousMode
+		data.XSRFToken = ctx.XSRFToken
+
+		return tmpl(w, data)
+	}
+}
+
+func isWorkingDay(day time.Time, bankHolidaySet map[time.Time]bool) bool {
+	weekendDays := map[time.Weekday]bool{
+		time.Saturday: true,
+		time.Sunday:   true,
+	}
+	if weekendDays[day.Weekday()] {
+		return false
+	}
+	return !bankHolidaySet[day]
+}
+
+func calculateWorkingDays(startDate time.Time, endDate time.Time, numWorkingDays int, mode WorkingDaysMode, bankHolidays sirius.BankHolidays) WorkingDaysData {
+	bankHolidaySet := make(map[time.Time]bool)
+	for _, years := range bankHolidays {
+		for _, date := range years {
+			parsedDate, err := time.Parse(time.RFC3339, date)
+			if err == nil {
+				y, m, d := parsedDate.In(time.UTC).Date()
+				bankHolidaySet[time.Date(y, m, d, 0, 0, 0, 0, time.UTC)] = true
+			}
+		}
+	}
+
+	output := WorkingDaysData{
+		StartDate:      startDate.Format(time.DateOnly),
+		EndDate:        endDate.Format(time.DateOnly),
+		NumWorkingDays: numWorkingDays,
+		Mode:           mode,
+	}
+
+	switch mode {
+	case WorkingDaysModeNumWorkingDays:
+		if !startDate.Before(endDate) {
+			output.StartDate = endDate.AddDate(0, 0, -1).Format(time.DateOnly)
+			output.NumWorkingDays = 1
+			break
+		}
+		workingDaysCount, d := 0, startDate
+		for d.Before(endDate) {
+			if isWorkingDay(d, bankHolidaySet) {
+				workingDaysCount++
+			}
+			d = d.AddDate(0, 0, 1)
+		}
+		output.NumWorkingDays = workingDaysCount
+
+	case WorkingDaysModeStartDate:
+		if numWorkingDays < 0 {
+			output.StartDate = endDate.Format(time.DateOnly)
+			output.NumWorkingDays = 0
+			break
+		}
+		remaining, d := numWorkingDays, endDate
+		for remaining > 0 {
+			d = d.AddDate(0, 0, -1)
+			if isWorkingDay(d, bankHolidaySet) {
+				remaining--
+			}
+		}
+		output.StartDate = d.Format(time.DateOnly)
+
+	case WorkingDaysModeEndDate:
+		if numWorkingDays < 0 {
+			output.EndDate = startDate.Format(time.DateOnly)
+			output.NumWorkingDays = 0
+			break
+		}
+		remaining, d := numWorkingDays, startDate
+		for remaining > 0 {
+			d = d.AddDate(0, 0, 1)
+			if isWorkingDay(d, bankHolidaySet) {
+				remaining--
+			}
+		}
+		output.EndDate = d.Format(time.DateOnly)
+
+	default:
+
+	}
+
+	return output
+}
+
+func buildCalendarMonth(year int, month time.Month, bankHolidays sirius.BankHolidays, todayStr string, calendarID string) CalendarMonth {
+	// Build a map of bank holiday dates for quick lookup
+	bhSet := make(map[string]bool)
+	for _, years := range bankHolidays {
+		for _, dateStr := range years {
+			parsedDate, err := time.Parse(time.RFC3339, dateStr)
+			if err == nil {
+				y, m, d := parsedDate.In(time.UTC).Date()
+				bhSet[fmt.Sprintf("%04d-%02d-%02d", y, int(m), d)] = true
+			}
+		}
+	}
+
+	first := time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
+	last := time.Date(year, month+1, 0, 0, 0, 0, 0, time.UTC)
+
+	// ISO weekday Mon=1…Sun=7; convert to 0-based Monday offset for grid.
+	startOffset := int(first.Weekday())
+	if startOffset == 0 {
+		startOffset = 7
+	}
+	startOffset--
+
+	var days []CalendarDay
+	for i := 0; i < startOffset; i++ {
+		days = append(days, CalendarDay{})
+	}
+	for d := 1; d <= last.Day(); d++ {
+		dateStr := fmt.Sprintf("%04d-%02d-%02d", year, int(month), d)
+		weekday := time.Date(year, month, d, 0, 0, 0, 0, time.UTC).Weekday()
+		days = append(days, CalendarDay{
+			Day:           d,
+			Date:          dateStr,
+			IsToday:       dateStr == todayStr,
+			IsBankHoliday: bhSet[dateStr],
+			IsWeekend:     weekday == time.Saturday || weekday == time.Sunday,
+		})
+	}
+	for len(days)%7 != 0 {
+		days = append(days, CalendarDay{})
+	}
+
+	var weeks [][]CalendarDay
+	for i := 0; i < len(days); i += 7 {
+		row := make([]CalendarDay, 7)
+		copy(row, days[i:i+7])
+		weeks = append(weeks, row)
+	}
+
+	// Calculate previous and next month
+	prevMonth := first.AddDate(0, -1, 0)
+	nextMonth := first.AddDate(0, 1, 0)
+	prevMonthURL := fmt.Sprintf("/calendar-month?calendarId=%s&year=%d&month=%d", calendarID, prevMonth.Year(), prevMonth.Month())
+	nextMonthURL := fmt.Sprintf("/calendar-month?calendarId=%s&year=%d&month=%d", calendarID, nextMonth.Year(), nextMonth.Month())
+
+	return CalendarMonth{
+		Name:         first.Format("January 2006"),
+		Weeks:        weeks,
+		Year:         year,
+		Month:        int(month),
+		PrevMonthURL: prevMonthURL,
+		NextMonthURL: nextMonthURL,
+		CalendarID:   calendarID,
+	}
+}
+
+func buildCalendarMonths(bankHolidays sirius.BankHolidays, today time.Time) [3]CalendarMonth {
+	todayStr := today.Format("2006-01-02")
+	prev := today.AddDate(0, -1, 0)
+	next := today.AddDate(0, 1, 0)
+	return [3]CalendarMonth{
+		buildCalendarMonth(prev.Year(), prev.Month(), bankHolidays, todayStr, "prev"),
+		buildCalendarMonth(today.Year(), today.Month(), bankHolidays, todayStr, "current"),
+		buildCalendarMonth(next.Year(), next.Month(), bankHolidays, todayStr, "next"),
+	}
+}
+
+func CalendarMonthPartial(client SiriusHeaderCalendarClient, tmpl template.Template) Handler {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		ctx := getContext(r)
+
+		// Parse year and month from query parameters
+		yearStr := r.URL.Query().Get("year")
+		monthStr := r.URL.Query().Get("month")
+		calendarID := r.URL.Query().Get("calendarId")
+
+		if yearStr == "" || monthStr == "" {
+			// If not provided, use current date
+			now := time.Now().UTC()
+			yearStr = fmt.Sprintf("%d", now.Year())
+			monthStr = fmt.Sprintf("%d", now.Month())
+		}
+
+		year, err := strconv.Atoi(yearStr)
+		if err != nil {
+			return err
+		}
+
+		month, err := strconv.Atoi(monthStr)
+		if err != nil {
+			return err
+		}
+
+		// Validate month (1-12)
+		if month < 1 || month > 12 {
+			return fmt.Errorf("invalid month: %d", month)
+		}
+
+		bankHolidays, err := client.BankHolidays(ctx)
+		if err != nil {
+			bankHolidays = sirius.BankHolidays{}
+		}
+
+		today := time.Now().UTC().Truncate(24 * time.Hour)
+		todayStr := today.Format("2006-01-02")
+
+		// Build the calendar month for the requested date
+		calMonth := buildCalendarMonth(year, time.Month(month), bankHolidays, todayStr, calendarID)
+
+		return tmpl(w, calMonth)
+	}
+}

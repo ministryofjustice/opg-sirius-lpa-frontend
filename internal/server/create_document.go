@@ -17,7 +17,7 @@ type CreateDocumentClient interface {
 	Person(ctx sirius.Context, id int) (sirius.Person, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
 	CreateContact(ctx sirius.Context, contact sirius.Person) (sirius.Person, error)
-	CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error)
+	CreateDraftDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error)
 }
 
 type createDocumentData struct {
@@ -174,7 +174,7 @@ func CreateDocument(client CreateDocumentClient, tmpl template.Template) Handler
 				})
 
 				for _, recipientID := range selectedRecipientIDs {
-					document, err := client.CreateDocument(ctx, caseID, recipientID, templateId, uniqueInserts)
+					document, err := client.CreateDraftDocument(ctx, caseID, recipientID, templateId, uniqueInserts)
 					if err != nil {
 						return err
 					}
