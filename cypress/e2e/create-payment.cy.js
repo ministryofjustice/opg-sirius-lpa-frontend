@@ -2,7 +2,7 @@ import * as digitalLpas from "../mocks/digitalLpas";
 
 describe("Add a payment to a non-digital LPA", () => {
   beforeEach(() => {
-    cy.visit("/add-payment?id=800");
+    cy.visit("/create-payment?id=800");
     cy.addMock("/lpa-api/v1/cases/800/fee-decisions", "GET", {
       status: 200,
       body: [],
