@@ -1,4 +1,4 @@
-{{ define "donor-details" }}
+{{ define "mlpa-donor-details" }}
     {{ $anomaliesForSection := .AnomalyDisplay.GetAnomaliesForSection "donor" }}
     {{ $donorUID := .CaseSummary.DigitalLpa.LpaStoreData.Donor.Uid  }}
     {{ $donorAnomalies := $anomaliesForSection.GetAnomaliesForObject $donorUID }}
