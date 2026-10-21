@@ -39,13 +39,13 @@ $app-action-panel-height: calc(
   100vh -
     $app-action-panel-top - var(--app-sirius-header-dropdown-height, 0px) - 1rem
 );
-$app-case-page-person-info-panel-height: 160px;
+$app-case-page-header-height: 160px;
 $app-case-page-action-panel-top: calc(
-  $app-action-panel-top + $app-case-page-person-info-panel-height +
+  $app-action-panel-top + $app-case-page-header-height +
     max(
       (
         var(--app-sirius-header-dropdown-height, 0px) -
-          $app-case-page-person-info-panel-height
+          $app-case-page-header-height
       ),
       0px
     )
@@ -1264,7 +1264,7 @@ $app-case-page-action-panel-height: calc(
   background: white;
   box-shadow: 0px 8px 8px $color-sirius-mid-grey;
   z-index: $app-sirius-header-z-index - 2;
-  height: $app-case-page-person-info-panel-height;
+  height: $app-case-page-header-height;
   width: 100vw;
   top: $app-fixed-headers-height;
   padding: 10px 25px;
@@ -1284,11 +1284,11 @@ $app-case-page-action-panel-height: calc(
 
 .app-case-page__header + .govuk-width-container {
   padding-top: calc(
-    $app-sirius-header-height + $app-case-page-person-info-panel-height +
+    $app-sirius-header-height + $app-case-page-header-height +
       max(
         (
           var(--app-sirius-header-dropdown-height, 0px) -
-            $app-case-page-person-info-panel-height
+            $app-case-page-header-height
         ),
         0px
       )
