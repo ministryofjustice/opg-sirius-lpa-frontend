@@ -144,6 +144,29 @@ func TestGetCasePageWhenFeatureTogglesNotEnabled(t *testing.T) {
 	assert.Equal(t, sirius.StatusError{Code: http.StatusForbidden}, err)
 }
 
+func TestGetCasePageWhenGetPageVarsErrors(t *testing.T) {
+	client := &mockCasePageClient{}
+	client.
+		On("CasesByDonor", mock.Anything, 123).
+		Return([]sirius.Case{}, errExample)
+	client.
+		On("PersonReferences", mock.Anything, 123).
+		Return([]sirius.PersonReference{}, nil)
+	client.
+		On("Person", mock.Anything, 123).
+		Return(sirius.Person{ID: 123}, nil)
+	client.
+		On("FeatureToggles", mock.Anything).
+		Return(sirius.FeatureToggles{"poasNewCasePage": true}, nil)
+
+	server := newMockServer("/donor/{id}", CasePage(client, nil))
+
+	r, _ := http.NewRequest(http.MethodGet, "/donor/123?uid[]=7000-0000-0001", nil)
+	_, err := server.serve(r)
+
+	assert.Equal(t, errExample, err)
+}
+
 func TestGetCasePageWhenNoDonor(t *testing.T) {
 	client := &mockCasePageClient{}
 	client.
