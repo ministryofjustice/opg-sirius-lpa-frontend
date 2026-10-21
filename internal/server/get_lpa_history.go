@@ -22,6 +22,7 @@ type getLpaHistory struct {
 	Events                 []sirius.LpaEvent
 	EventFilterData        []sirius.SourceType
 	Form                   FilterLpaEventsForm
+	IsPartial              bool
 	TotalEvents            int
 	TotalFilteredEvents    int
 	IsFiltered             bool
@@ -131,6 +132,7 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 				Sort: "desc",
 			},
 			IsFiltered:      false,
+			IsPartial:       ctx.IsPartial,
 			DonorFieldOrder: donorFieldOrder,
 			LpaFieldOrder:   lpaFieldOrder,
 			EpaFieldOrder:   epaFieldOrder,
