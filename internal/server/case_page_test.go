@@ -2,6 +2,8 @@ package server
 
 import (
 	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
@@ -142,6 +144,21 @@ func TestGetCasePageWhenFeatureTogglesNotEnabled(t *testing.T) {
 	_, err := server.serve(r)
 
 	assert.Equal(t, sirius.StatusError{Code: http.StatusForbidden}, err)
+}
+
+func TestGetCasePageParseFormError(t *testing.T) {
+	client := &mockCasePageClient{}
+	client.
+		On("FeatureToggles", mock.Anything).
+		Return(sirius.FeatureToggles{"poasNewCasePage": true}, nil)
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader("%zz"))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := CasePage(client, nil)(w, r)
+
+	assert.NotNil(t, err)
 }
 
 func TestGetCasePageWhenGetPageVarsErrors(t *testing.T) {
