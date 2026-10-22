@@ -18,6 +18,7 @@ const (
 	LpaEventSourceTypeDeputy
 	LpaEventSourceTypeDonor
 	LpaEventSourceTypeEpa
+	LpaEventSourceTypeFeeDecision
 	LpaEventSourceTypeHoldPeriod
 	LpaEventSourceTypeIncomingDocument
 	LpaEventSourceTypeInvestigation
@@ -51,6 +52,7 @@ var lpaEventSourceTypeMap = map[string]LpaEventSourceType{
 	"Deputy":              LpaEventSourceTypeDeputy,
 	"Donor":               LpaEventSourceTypeDonor,
 	"Epa":                 LpaEventSourceTypeEpa,
+	"FeeDecision":         LpaEventSourceTypeFeeDecision,
 	"HoldPeriod":          LpaEventSourceTypeHoldPeriod,
 	"IncomingDocument":    LpaEventSourceTypeIncomingDocument,
 	"Investigation":       LpaEventSourceTypeInvestigation,
@@ -100,6 +102,8 @@ func (l LpaEventSourceType) Translation() string {
 		return "Person (Create / Edit)"
 	case LpaEventSourceTypeEpa:
 		return "EPA (Create / Edit)"
+	case LpaEventSourceTypeFeeDecision:
+		return "Fee Decision"
 	case LpaEventSourceTypeHoldPeriod:
 		return "Hold Period"
 	case LpaEventSourceTypeIncomingDocument:
@@ -163,6 +167,8 @@ func (l LpaEventSourceType) Key() string {
 		return "Donor"
 	case LpaEventSourceTypeEpa:
 		return "Epa"
+	case LpaEventSourceTypeFeeDecision:
+		return "FeeDecision"
 	case LpaEventSourceTypeHoldPeriod:
 		return "HoldPeriod"
 	case LpaEventSourceTypeIncomingDocument:

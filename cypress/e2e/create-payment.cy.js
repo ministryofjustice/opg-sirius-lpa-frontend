@@ -3,6 +3,10 @@ import * as digitalLpas from "../mocks/digitalLpas";
 describe("Add a payment to a non-digital LPA", () => {
   beforeEach(() => {
     cy.visit("/create-payment?id=800");
+    cy.addMock("/lpa-api/v1/cases/800/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
   });
 
   it("adds a payment to the case using a predefined amount", () => {
@@ -40,6 +44,10 @@ describe("Add a payment to a non-digital LPA", () => {
 
 describe("Add a payment to a digital LPA", () => {
   it("adds a payment to the case", () => {
+    cy.addMock("/lpa-api/v1/cases/900/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
     cy.wrap(digitalLpas.objections.empty("M-9999-4567-AAAA"));
     cy.visit("/create-payment?id=900");
     cy.contains("Add a payment");
