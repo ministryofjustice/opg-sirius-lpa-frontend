@@ -370,6 +370,10 @@ describe("Action Panel", () => {
         roles: ["OPG User", "Reduced Fees User"],
       },
     });
+    cy.addMock("/lpa-api/v1/cases/34/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
 
     cy.get("a#action-panel-button-fees").click();
     cy.get(".action-panel__form").should("exist");
