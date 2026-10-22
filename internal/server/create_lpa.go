@@ -272,7 +272,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			}
 
 			if r.FormValue("updateCorrespondent") != "" {
-				return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d&caseType=lpa%s", donorID, data.CaseId, data.FlowQuery))
+				return RedirectError(fmt.Sprintf("/edit-correspondent?id=%d&caseId=%d&caseType=lpa%s", donorID, data.CaseId, data.FlowQuery))
 			}
 			if r.FormValue("addNotifiedPerson") != "" {
 				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d%s", donorID, data.CaseId, data.FlowQuery))
