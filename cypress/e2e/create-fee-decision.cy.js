@@ -1,6 +1,10 @@
 describe("Add a fee decision to a non-digital LPA", () => {
   beforeEach(() => {
     cy.visit("/create-fee-decision?id=801");
+    cy.addMock("/lpa-api/v1/cases/801/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
   });
 
   it("adds a fee decision to the case", () => {
@@ -12,7 +16,7 @@ describe("Add a fee decision to a non-digital LPA", () => {
     cy.get("#f-decisionDate").type("2023-10-09");
     cy.get("button[type=submit]").click();
     cy.get(".moj-alert").should("exist");
-    cy.get(".moj-alert").contains("Fee decision added");
+    cy.get(".moj-alert").contains("Decline a fee reduction recorded");
   });
 
   it("sets the applied date to today", () => {
