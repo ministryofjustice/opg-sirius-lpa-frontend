@@ -410,9 +410,9 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				if documentControls == "delete" || documentControls == "publish" || documentControls == "preview" {
 					if len(data.Documents) > 0 {
 						if data.CreatedDocument.NotifyStatus == "page-limit-exceeded" {
+							data.Success = true
 							data.NotifyWarning = "The published document has more than 10 pages and will not be sent automatically via GOV.UK,Notify. It must be manually uploaded to Xerox for sending."
 						}
-						data.Success = true
 						defaultDocumentUUID := data.Documents[0].UUID
 						documentToDisplay, err := client.DocumentByUUID(ctx, defaultDocumentUUID)
 						if err != nil {
