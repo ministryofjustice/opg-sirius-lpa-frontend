@@ -1754,7 +1754,7 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			name:        "Update correspondent",
 			formKey:     "updateCorrespondent",
 			formValue:   "true",
-			expectedErr: RedirectError("/create-correspondent?id=1&caseId=2&caseType=lpa"),
+			expectedErr: RedirectError("/edit-correspondent?id=1&caseId=2&caseType=lpa"),
 		},
 		{
 			name:        "Add notified person redirects",
