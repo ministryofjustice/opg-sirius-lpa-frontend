@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -17,10 +16,7 @@ type actor struct {
 }
 
 type CreateCorrespondentClient interface {
-	Epa(ctx sirius.Context, id int) (sirius.Epa, error)
-	Lpa(ctx sirius.Context, id int) (sirius.Lpa, error)
 	CreateCorrespondent(ctx sirius.Context, caseId int, correspondent sirius.Correspondent) error
-	UpdateCorrespondent(ctx sirius.Context, correspondentId int, correspondent sirius.Correspondent) error
 }
 
 type createCorrespondentData struct {
@@ -61,30 +57,8 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 			Title:     "Add a correspondent",
 		}
 
-		var correspondent *sirius.Correspondent
-		if data.CaseType == "epa" {
-			epa, err := client.Epa(ctx, caseId)
-			if err != nil {
-				return err
-			}
-			correspondent = epa.Correspondent
-		} else {
-			lpa, err := client.Lpa(ctx, caseId)
-			if err != nil {
-				return err
-			}
-			correspondent = lpa.Correspondent
-			data.Actors = GetActorsForLpa(lpa)
-		}
-
-		if correspondent != nil {
-			data.Correspondent = *correspondent
-			data.Title = "Update correspondent details"
-			data.IsEditing = true
-		}
-
 		if r.Method == http.MethodPost {
-			updatedCorrespondent := sirius.Correspondent{
+			data.Correspondent = sirius.Correspondent{
 				Person: sirius.Person{
 					AddressLine1:          postFormString(r, "addressLine1"),
 					AddressLine2:          postFormString(r, "addressLine2"),
@@ -108,15 +82,8 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 				},
 				CompanyNumber: postFormString(r, "companyNumber"),
 			}
-			data.Correspondent = updatedCorrespondent
 
-			if data.IsEditing {
-				updatedCorrespondent.ID = correspondent.ID
-				data.Correspondent = updatedCorrespondent
-				err = client.UpdateCorrespondent(ctx, data.Correspondent.ID, updatedCorrespondent)
-			} else {
-				err = client.CreateCorrespondent(ctx, caseId, updatedCorrespondent)
-			}
+			err = client.CreateCorrespondent(ctx, caseId, data.Correspondent)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
@@ -135,87 +102,4 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 
 		return tmpl(w, data)
 	}
-}
-
-func GetActorsForLpa(lpa sirius.Lpa) []actor {
-	var actors []actor
-
-	if lpa.Donor != nil {
-		fields, err := json.Marshal(lpa.Donor)
-		if err == nil {
-			actors = append(actors, actor{
-				ID:     lpa.Donor.ID,
-				Name:   lpa.Donor.Firstname + " " + lpa.Donor.Surname,
-				Label:  "donor",
-				Fields: string(fields),
-			})
-		}
-	}
-
-	for _, attorney := range lpa.Attorneys {
-		fields, err := json.Marshal(attorney)
-		if err != nil {
-			continue
-		}
-		actors = append(actors, actor{
-			ID:     attorney.ID,
-			Name:   attorney.Firstname + " " + attorney.Surname,
-			Label:  "attorney",
-			Fields: string(fields),
-		})
-	}
-
-	for _, attorney := range lpa.ReplacementAttorneys {
-		fields, err := json.Marshal(attorney)
-		if err != nil {
-			continue
-		}
-		actors = append(actors, actor{
-			ID:     attorney.ID,
-			Name:   attorney.Firstname + " " + attorney.Surname,
-			Label:  "replacement attorney",
-			Fields: string(fields),
-		})
-	}
-
-	for _, certificateProvider := range lpa.CertificateProviders {
-		fields, err := json.Marshal(certificateProvider)
-		if err != nil {
-			continue
-		}
-		actors = append(actors, actor{
-			ID:     certificateProvider.ID,
-			Name:   certificateProvider.Firstname + " " + certificateProvider.Surname,
-			Label:  "certificate provider",
-			Fields: string(fields),
-		})
-	}
-
-	for _, notifiedPerson := range lpa.NotifiedPersons {
-		fields, err := json.Marshal(notifiedPerson)
-		if err != nil {
-			continue
-		}
-		actors = append(actors, actor{
-			ID:     notifiedPerson.ID,
-			Name:   notifiedPerson.Firstname + " " + notifiedPerson.Surname,
-			Label:  "notified person",
-			Fields: string(fields),
-		})
-	}
-
-	for _, trustCorporation := range lpa.TrustCorporations {
-		fields, err := json.Marshal(trustCorporation)
-		if err != nil {
-			continue
-		}
-		actors = append(actors, actor{
-			ID:     trustCorporation.ID,
-			Name:   trustCorporation.CompanyName,
-			Label:  "trust corporation",
-			Fields: string(fields),
-		})
-	}
-
-	return actors
 }
