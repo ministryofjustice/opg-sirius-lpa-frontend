@@ -10,13 +10,11 @@ import (
 
 type CreateCertificateProviderClient interface {
 	CreateCertificateProvider(ctx sirius.Context, caseId int, certificateProvider sirius.Person) error
-	Lpa(sirius.Context, int) (sirius.Lpa, error)
 }
 
 type CertificateProviderData struct {
 	XSRFToken           string
 	FlowQuery           string
-	CanAddActor         bool
 	CaseId              int
 	CertificateProvider sirius.Person
 	DonorId             int
@@ -42,20 +40,14 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 			return err
 		}
 
-		caseItem, err := client.Lpa(ctx, caseId)
-		if err != nil {
-			return err
-		}
-
 		data := CertificateProviderData{
-			XSRFToken:   ctx.XSRFToken,
-			FlowQuery:   getFlowQuery(r),
-			DonorId:     donorId,
-			CaseId:      caseId,
-			CanAddActor: len(caseItem.CertificateProviders) < 1,
-			Title:       "Add a certificate provider",
-			PostURL:     fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d%s", donorId, caseId, getFlowQuery(r)),
-			IsPartial:   ctx.IsPartial,
+			XSRFToken: ctx.XSRFToken,
+			FlowQuery: getFlowQuery(r),
+			DonorId:   donorId,
+			CaseId:    caseId,
+			Title:     "Add a certificate provider",
+			PostURL:   fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d%s", donorId, caseId, getFlowQuery(r)),
+			IsPartial: ctx.IsPartial,
 		}
 
 		if r.Method == http.MethodPost {
@@ -82,19 +74,12 @@ func CreateCertificateProvider(client CreateCertificateProviderClient, tmpl temp
 			} else if err != nil {
 				return err
 			} else {
-				var redirect, swap string
-
-				if r.FormValue("add-another") != "" {
-					redirect = fmt.Sprintf("/create-certificate-provider?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery)
-					swap = "innerHTML scroll:.action-panel__content:top"
-				} else {
-					redirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-3", donorId, caseId, data.FlowQuery)
-					swap = "innerHTML show:#accordion-create-lpa-heading-3:top"
-				}
+				var redirect string
+				redirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-3", donorId, caseId, data.FlowQuery)
 
 				if data.IsPartial {
 					data.HtmxRedirect = redirect
-					data.HtmxSwap = swap
+					data.HtmxSwap = "innerHTML show:#accordion-create-lpa-heading-3:top"
 					return tmpl(w, data)
 				}
 

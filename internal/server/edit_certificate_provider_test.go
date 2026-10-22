@@ -67,7 +67,6 @@ func TestGetEditCertificateProviders(t *testing.T) {
 							FlowQuery:           flowCase.flowQuery,
 							DonorId:             1,
 							CaseId:              2,
-							CanAddActor:         false,
 							CertificateProvider: mockCertificateProvider,
 							Title:               "Edit a certificate provider",
 							PostURL:             "/edit-certificate-provider?id=1&caseId=2&personId=3" + flowCase.flowQuery,
@@ -196,7 +195,6 @@ func TestPostEditCertificateProvider(t *testing.T) {
 								FlowQuery:           flowCase.flowQuery,
 								DonorId:             1,
 								CaseId:              2,
-								CanAddActor:         false,
 								CertificateProvider: mockCertificateProvider,
 								HtmxRedirect:        tc.redirect + flowCase.flowQuery + tc.fragment,
 								HtmxSwap:            tc.swap,
@@ -265,7 +263,6 @@ func TestPostEditCertificateProviderValidationError(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, CertificateProviderData{
-			CanAddActor:         false,
 			CaseId:              2,
 			CertificateProvider: mockCertificateProvider,
 			DonorId:             1,
