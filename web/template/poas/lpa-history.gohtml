@@ -5,6 +5,14 @@
 {{ define "container-classes" }} app-!-max-full-width govuk-!-margin-0{{ end }}
 
 {{ define "main" }}
+    {{ template "lpa-history" . }}
+{{ end }}
+
+{{ define "partial-content" }}
+    {{ template "lpa-history" . }}
+{{ end }}
+
+{{ define "lpa-history" }}
     <div class="app-timeline-container">
         <h2 class="govuk-heading-m colour-govuk-white colour-sirius-dark-blue govuk-!-padding-1 govuk-!-padding-left-2 govuk-!-margin-bottom-0">
             History</h2>
