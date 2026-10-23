@@ -54,6 +54,8 @@ type editDocumentData struct {
 	Section11Count4       string
 	BlankSectionsEnabled  bool
 	AttorneyCount         int
+	CreatedDocument       sirius.Document
+	NotifyWarning         string
 }
 
 func publishDraftDocument(
@@ -63,29 +65,28 @@ func publishDraftDocument(
 	documentUUID string,
 	content string,
 	blankSections []string,
-) error {
+) (sirius.Document, error) {
 	_, err := client.EditDocument(ctx, documentUUID, content)
 	if err != nil {
-		return err
+		return sirius.Document{}, err
 	}
 
-	// need to retrieve for correspondent information
 	document, err := client.DocumentByUUID(ctx, documentUUID)
 	if err != nil {
-		return err
+		return sirius.Document{}, err
 	}
 
-	_, err = client.CreateDocument(ctx, caseID, document, sirius.TypeSave, blankSections)
+	createdDocument, err := client.CreateDocument(ctx, caseID, document, sirius.TypeSave, blankSections)
 	if err != nil {
-		return err
+		return sirius.Document{}, err
 	}
 
 	err = client.DeleteDocument(ctx, documentUUID)
 	if err != nil {
-		return err
+		return sirius.Document{}, err
 	}
 
-	return nil
+	return createdDocument, nil
 }
 
 const (
@@ -331,9 +332,12 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 				}
 
 			case "publish":
+				//var createdDocument sirius.Document
 				blankSections, err := parseBlankSections(hasBlankSections, data.SelectedBlankSections, counts, caseItem.SubType)
 				if err == nil {
-					err = publishDraftDocument(client, ctx, caseID, documentUUID, content, blankSections)
+					data.CreatedDocument, err = publishDraftDocument(client, ctx, caseID, documentUUID, content, blankSections)
+
+					fmt.Println("Document CREATED PAGE Count successfully:", data.CreatedDocument.PageCount)
 				}
 				if ve, ok := err.(sirius.ValidationError); ok {
 					w.WriteHeader(http.StatusBadRequest)
@@ -405,13 +409,22 @@ func EditDocument(client EditDocumentClient, tmpl template.Template) Handler {
 
 				if documentControls == "delete" || documentControls == "publish" || documentControls == "preview" {
 					if len(data.Documents) > 0 {
+						if data.CreatedDocument.NotifyStatus == "page-limit-exceeded" {
+							data.Success = true
+							data.NotifyWarning = "The published document has more than 10 pages and will not be sent automatically via GOV.UK,Notify. It must be manually uploaded to Xerox for sending."
+						}
 						defaultDocumentUUID := data.Documents[0].UUID
 						documentToDisplay, err := client.DocumentByUUID(ctx, defaultDocumentUUID)
 						if err != nil {
 							return err
 						}
 						data.Document = documentToDisplay
+					} else {
+						if documentControls == "publish" {
+							return RedirectError(fmt.Sprintf("/notify-error/%d/%s/%s/%s", data.DonorId, data.CreatedDocument.UUID, data.Case.CaseType, data.Case.UID))
+						}
 					}
+
 				}
 			}
 		}

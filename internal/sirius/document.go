@@ -30,6 +30,7 @@ type Document struct {
 	NotifyStatus        string                   `json:"notifyStatus,omitempty"`
 	Persons             []Person                 `json:"persons,omitempty"`
 	IsInfected          bool                     `json:"infected"`
+	PageCount           int                      `json:"pageCount"`
 }
 
 type DocumentList struct {
