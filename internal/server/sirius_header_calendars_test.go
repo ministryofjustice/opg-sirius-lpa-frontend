@@ -722,6 +722,24 @@ func TestBuildCalendarMonthWithoutBankHolidays(t *testing.T) {
 	}
 }
 
+func TestBuildCalendarMonthWeekends(t *testing.T) {
+	bankHolidays := sirius.BankHolidays{}
+	result := buildCalendarMonth(2026, time.April, bankHolidays, "2026-04-15", "current")
+
+	expectedWeekends := map[int]bool{4: true, 5: true, 11: true, 12: true, 18: true, 19: true, 25: true, 26: true}
+
+	for _, week := range result.Weeks {
+		for i, day := range week {
+			if day.Day == 0 {
+				assert.False(t, day.IsWeekend, "empty padding cells should not be marked as weekend")
+				continue
+			}
+			assert.Equal(t, expectedWeekends[day.Day], day.IsWeekend, fmt.Sprintf("April %d weekend flag", day.Day))
+			assert.Equal(t, i >= 5, day.IsWeekend, fmt.Sprintf("April %d should sit in the correct column", day.Day))
+		}
+	}
+}
+
 func TestBuildCalendarMonthYearChange(t *testing.T) {
 	bankHolidays := sirius.BankHolidays{}
 
