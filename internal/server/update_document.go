@@ -54,6 +54,8 @@ type updateDocumentData struct {
 	Section11Count4       string
 	BlankSectionsEnabled  bool
 	AttorneyCount         int
+	CreatedDocument       sirius.Document
+	NotifyWarning         string
 }
 
 func publishDraftDocument(
@@ -63,29 +65,29 @@ func publishDraftDocument(
 	documentUUID string,
 	content string,
 	blankSections []string,
-) error {
-	_, err := client.UpdateDocument(ctx, documentUUID, content)
+) (sirius.Document, error) {
+		_, err := client.UpdateDocument(ctx, documentUUID, content)
 	if err != nil {
-		return err
+		return sirius.Document{}, err
 	}
 
 	// need to retrieve for correspondent information
 	document, err := client.DocumentByUUID(ctx, documentUUID)
 	if err != nil {
-		return err
+		return sirius.Document{}, err
 	}
 
-	_, err = client.CreateDocument(ctx, caseID, document, sirius.TypeSave, blankSections)
+	createdDocument, err := client.CreateDocument(ctx, caseID, document, sirius.TypeSave, blankSections)
 	if err != nil {
-		return err
+		return sirius.Document{}, err
 	}
 
 	err = client.DeleteDocument(ctx, documentUUID)
 	if err != nil {
-		return err
+		return sirius.Document{}, err
 	}
 
-	return nil
+	return createdDocument, nil
 }
 
 const (
@@ -333,7 +335,7 @@ func UpdateDocument(client UpdateDocumentClient, tmpl template.Template) Handler
 			case "publish":
 				blankSections, err := parseBlankSections(hasBlankSections, data.SelectedBlankSections, counts, caseItem.SubType)
 				if err == nil {
-					err = publishDraftDocument(client, ctx, caseID, documentUUID, content, blankSections)
+					data.CreatedDocument, err = publishDraftDocument(client, ctx, caseID, documentUUID, content, blankSections)
 				}
 				if ve, ok := err.(sirius.ValidationError); ok {
 					w.WriteHeader(http.StatusBadRequest)
@@ -406,11 +408,20 @@ func UpdateDocument(client UpdateDocumentClient, tmpl template.Template) Handler
 				if documentControls == "delete" || documentControls == "publish" || documentControls == "preview" {
 					if len(data.Documents) > 0 {
 						defaultDocumentUUID := data.Documents[0].UUID
+						if data.CreatedDocument.NotifyStatus == "page-limit-exceeded" {
+							if documentControls == "publish" {
+								return RedirectError(fmt.Sprintf("/notify-error/%d/%s/%s/%d/%s?defaultDocumentUUID=%s", data.DonorId, data.CreatedDocument.UUID, data.Case.CaseType, data.Case.ID, data.Case.UID, defaultDocumentUUID))
+							}
+						}
 						documentToDisplay, err := client.DocumentByUUID(ctx, defaultDocumentUUID)
 						if err != nil {
 							return err
 						}
 						data.Document = documentToDisplay
+					} else {
+						if documentControls == "publish" && data.CreatedDocument.NotifyStatus == "page-limit-exceeded" {
+							return RedirectError(fmt.Sprintf("/notify-error/%d/%s/%s/%d/%s?defaultDocumentUUID=%s", data.DonorId, data.CreatedDocument.UUID, data.Case.CaseType, data.Case.ID, data.Case.UID, ""))
+						}
 					}
 				}
 			}
