@@ -1,0 +1,10 @@
+{{ template "page" . }}
+
+{{ define "main" }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l app-!-embedded-hide">Donor details</h1>
+      {{ template "poas-donor-details" . }}
+    </div>
+  </div>
+{{ end }}
