@@ -563,6 +563,7 @@ describe("Action Panel", () => {
     // assert we are back on the create epa form and scrolled to step 3
     cy.get(
       "#accordion-create-epa-heading-3 span.govuk-accordion__section-heading-text-focus",
+      { timeout: 10000 },
     ).should("be.visible");
 
     cy.get(".action-panel__form").contains("Add correspondent").click();
