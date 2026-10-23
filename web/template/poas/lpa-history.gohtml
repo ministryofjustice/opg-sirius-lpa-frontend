@@ -5,6 +5,14 @@
 {{ define "container-classes" }} app-!-max-full-width govuk-!-margin-0{{ end }}
 
 {{ define "main" }}
+    {{ template "lpa-history" . }}
+{{ end }}
+
+{{ define "partial-content" }}
+    {{ template "lpa-history" . }}
+{{ end }}
+
+{{ define "lpa-history" }}
     <div class="app-timeline-container">
         <h2 class="govuk-heading-m colour-govuk-white colour-sirius-dark-blue govuk-!-padding-1 govuk-!-padding-left-2 govuk-!-margin-bottom-0">
             History</h2>
@@ -40,7 +48,13 @@
                         </div>
                         <div class="moj-filter__content">
                             <div class="moj-filter__options">
-                                <form class="form" method="POST">
+                                <form class="form" method="POST"
+                                      {{ if .IsPartial }}
+                                          hx-post="{{ prefix (printf "/donor/%s/history" .DonorID) }}"
+                                          hx-target="#case-page-history-container"
+                                          hx-trigger="click from:input[data-module='app-auto-apply-filter'] throttle:1000ms"
+                                      {{ end }}
+                                >
                                     <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
                                     <button type="submit" class="govuk-button moj-filter__search-button"
                                             data-module="govuk-button"

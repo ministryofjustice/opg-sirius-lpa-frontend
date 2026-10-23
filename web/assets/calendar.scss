@@ -1,16 +1,40 @@
+$calendar-panel-blue: #38669e;
+$calendar-dark-blue: #003078;
+$calendar-text: #ffffff;
+$calendar-line: #afc2d8;
+$calendar-control-border: #b1b4b6;
+$calendar-focus: #ffdd00;
+$calendar-focus-text: #0b0c0c;
+$calendar-header-height: 2rem;
+$calendar-row-height: 2rem;
+$calendar-max-weeks: 6;
+$calendar-month-name-width: 9.5rem;
+
+.sirius-header__dropdown-panel:has(.panel-calendar) {
+  background: $calendar-panel-blue;
+}
+
 .panel-calendar {
-  padding: 15px;
+  padding: 15px 25px;
   height: auto;
   overflow: visible;
+  background: $calendar-panel-blue;
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  justify-content: center;
+  gap: 3rem;
   align-items: flex-start;
 
   .opg-calendar {
     flex: 1 1 0;
     min-width: 14rem;
+    max-width: 20rem;
+    min-height: calc(
+      #{$calendar-header-height} + #{$calendar-max-weeks + 1} *
+        #{$calendar-row-height} + 8px
+    );
     margin-right: 0;
+    color: $calendar-text;
 
     * {
       user-select: none;
@@ -18,72 +42,108 @@
 
     .calendar {
       padding: 0;
-      border: 1px solid #dddddd;
-      user-select: none;
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 0;
-    }
-
-    .move-month {
-      cursor: pointer;
-    }
-
-    [class*="prev-month-"] {
-      float: left;
-    }
-
-    [class*="next-month-"] {
-      float: right;
+      border: 1px solid $calendar-line;
+      display: flex;
+      flex-direction: column;
     }
 
     .current-month {
+      height: $calendar-header-height;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .current-month__name {
+      flex: 0 1 $calendar-month-name-width;
+      min-width: 0;
+      overflow: hidden;
       text-align: center;
-      padding: 20px 0;
-      margin: 0 8px;
-      grid-column: 1 / -1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .move-month {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.75rem;
+      height: 1.75rem;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: $calendar-text;
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+      }
+
+      &:focus {
+        outline: 3px solid transparent;
+      }
+
+      &:focus-visible {
+        background-color: $calendar-focus;
+        color: $calendar-focus-text;
+        box-shadow:
+          0 -2px $calendar-focus,
+          0 4px $calendar-focus-text;
+      }
+    }
+
+    .move-month__icon {
+      width: 0.6rem;
+      height: 1rem;
+    }
+
+    .weekdays,
+    .days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-auto-rows: $calendar-row-height;
+      column-gap: 1px;
+    }
+
+    .days {
+      row-gap: 1px;
+      background-color: $calendar-line;
+      border-top: 1px solid $calendar-line;
     }
 
     .weekday,
     .day {
-      display: block;
-      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
     }
 
     .weekday {
-      text-align: center;
+      font-weight: 700;
     }
 
     .day {
-      height: 2em;
-      outline: 1px solid #dddddd;
-      vertical-align: top;
-
-      .day-number {
-        margin-left: 6px;
-      }
+      cursor: default;
+      color: $calendar-text;
+      background-color: $calendar-panel-blue;
 
       .event-title {
         display: none;
       }
 
-      &.default {
-        cursor: default;
-        color: #00326e;
-        background-color: #ffffff;
+      &.non-working {
+        background-color: $calendar-dark-blue;
       }
 
       &.today {
-        cursor: default;
-        color: #ffffff;
-        background-color: #00326e;
-        font-weight: bold;
-      }
-
-      &.disabled {
-        cursor: default;
-        color: darken(#ffffff, 20%);
-        background-color: darken(#00326e, 10%);
+        color: $calendar-dark-blue;
+        background-color: #ffffff;
+        font-weight: 700;
       }
     }
   }
@@ -127,6 +187,7 @@
 
       &::before {
         background-color: #ffffff;
+        border: 1px solid $calendar-control-border;
       }
 
       &::after {
@@ -152,11 +213,12 @@
 
     .govuk-input {
       font-size: 16px;
+      border: 1px solid $calendar-control-border;
     }
 
     .govuk-input[type="date"],
     .govuk-input[type="number"] {
-      width: 90% !important;
+      width: 9.5rem !important;
       max-width: none;
     }
 
@@ -166,6 +228,11 @@
       font-weight: 700;
       opacity: 1;
       border: none;
+
+      &:focus {
+        outline: none;
+        box-shadow: none;
+      }
     }
 
     .govuk-form-group::after {

@@ -39,6 +39,20 @@ $app-action-panel-height: calc(
   100vh -
     $app-action-panel-top - var(--app-sirius-header-dropdown-height, 0px) - 1rem
 );
+$app-case-page-header-height: 160px;
+$app-case-page-action-panel-top: calc(
+  $app-action-panel-top + $app-case-page-header-height +
+    max(
+      (
+        var(--app-sirius-header-dropdown-height, 0px) -
+          $app-case-page-header-height
+      ),
+      0px
+    )
+);
+$app-case-page-action-panel-height: calc(
+  100vh - $app-case-page-action-panel-top - 1rem
+);
 
 // Define HTMX indicator styles here to avoid inline styles which are blocked by CSP
 .htmx-indicator {
@@ -924,7 +938,7 @@ $app-action-panel-height: calc(
   align-items: center;
 }
 
-.sirius-header + .govuk-width-container {
+.sirius-header ~ .govuk-width-container {
   padding-top: calc(
     $app-sirius-header-height + var(--app-sirius-header-dropdown-height, 0px)
   );
@@ -1212,4 +1226,84 @@ $app-action-panel-height: calc(
 
 .app-colour-link-blue {
   color: govuk-functional-colour(link);
+}
+
+.app-case-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  & .app-case-page__tiles {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+
+    & .app-case-page__tile {
+      flex: 1;
+      background: $color-sirius-light-blue-20;
+      border: 1px solid $sirius-dark-blue;
+      box-shadow: none;
+      -moz-box-shadow: none;
+      -webkit-box-shadow: none;
+      border-radius: 5px;
+      color: govuk-functional-colour(text);
+    }
+  }
+
+  & h2 {
+    font-size: 1.25rem;
+  }
+}
+
+.app-case-page__header {
+  box-sizing: border-box;
+  position: fixed;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: white;
+  box-shadow: 0px 8px 8px $color-sirius-mid-grey;
+  z-index: $app-sirius-header-z-index - 2;
+  height: $app-case-page-header-height;
+  width: 100vw;
+  top: $app-fixed-headers-height;
+  padding: 10px 25px;
+
+  & .app-case-page__person-info {
+    flex: 1;
+    & table {
+      font-size: 1rem;
+    }
+  }
+
+  & .app-case-page__case-tiles {
+    flex: 2;
+    text-align: end;
+  }
+}
+
+.app-case-page__header + .govuk-width-container {
+  padding-top: calc(
+    $app-sirius-header-height + $app-case-page-header-height +
+      max(
+        (
+          var(--app-sirius-header-dropdown-height, 0px) -
+            $app-case-page-header-height
+        ),
+        0px
+      )
+  );
+
+  & .action-panel {
+    top: $app-case-page-action-panel-top;
+    min-height: $app-case-page-action-panel-height;
+
+    & .action-panel__content {
+      height: $app-case-page-action-panel-height;
+    }
+  }
+}
+
+.govuk-main-wrapper:has(> .app-case-page) {
+  padding-top: 0;
 }

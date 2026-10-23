@@ -49,6 +49,7 @@ type CalendarDay struct {
 	Date          string
 	IsToday       bool
 	IsBankHoliday bool
+	IsWeekend     bool
 }
 
 type CalendarMonth struct {
@@ -243,11 +244,13 @@ func buildCalendarMonth(year int, month time.Month, bankHolidays sirius.BankHoli
 	}
 	for d := 1; d <= last.Day(); d++ {
 		dateStr := fmt.Sprintf("%04d-%02d-%02d", year, int(month), d)
+		weekday := time.Date(year, month, d, 0, 0, 0, 0, time.UTC).Weekday()
 		days = append(days, CalendarDay{
 			Day:           d,
 			Date:          dateStr,
 			IsToday:       dateStr == todayStr,
 			IsBankHoliday: bhSet[dateStr],
+			IsWeekend:     weekday == time.Saturday || weekday == time.Sunday,
 		})
 	}
 	for len(days)%7 != 0 {
