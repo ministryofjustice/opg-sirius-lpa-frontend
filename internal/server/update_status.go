@@ -1,0 +1,108 @@
+package server
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+)
+
+type UpdateStatusClient interface {
+	Case(sirius.Context, int) (sirius.Case, error)
+	CreateNote(sirius.Context, int, sirius.EntityType, string, string, string, *sirius.NoteFile) error
+	EditCase(sirius.Context, int, sirius.CaseType, sirius.Case) error
+	AvailableStatuses(sirius.Context, int, sirius.CaseType) ([]string, error)
+}
+
+type updateStatusData struct {
+	XSRFToken string
+	Entity    string
+	Success   bool
+	Error     sirius.ValidationError
+	IsPartial bool
+
+	AvailableStatuses []string
+	NewStatus         string
+	CaseID            int
+	CaseType          string
+	DonorID           int
+	CaseUids          string
+	Notes             string
+}
+
+func UpdateStatus(client UpdateStatusClient, tmpl template.Template) Handler {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		if err := r.ParseForm(); err != nil {
+			return err
+		}
+
+		caseID, err := strToIntOrStatusError(r.FormValue("id"))
+		if err != nil {
+			return err
+		}
+
+		caseType, err := sirius.ParseCaseType(r.FormValue("case"))
+		if err != nil {
+			return err
+		}
+
+		ctx := getContext(r)
+
+		caseItem, err := client.Case(ctx, caseID)
+		if err != nil {
+			return err
+		}
+
+		availableStatuses, err := client.AvailableStatuses(ctx, caseID, caseType)
+		if err != nil {
+			return err
+		}
+
+		donorID := 0
+		if caseItem.Donor != nil {
+			donorID = caseItem.Donor.ID
+		}
+
+		data := updateStatusData{
+			XSRFToken:         ctx.XSRFToken,
+			Entity:            fmt.Sprintf("%s %s", caseItem.CaseType, caseItem.UID),
+			AvailableStatuses: availableStatuses,
+			NewStatus:         postFormString(r, "status"),
+			CaseID:            caseID,
+			CaseType:          string(caseType),
+			DonorID:           donorID,
+			CaseUids:          buildUIDQueryString(r.Form["uid[]"]),
+			Notes:             postFormString(r, "notes"),
+			IsPartial:         ctx.IsPartial,
+		}
+
+		if r.Method == http.MethodPost {
+			caseDetails := sirius.Case{
+				Status: shared.ParseCaseStatusType(data.NewStatus),
+			}
+
+			noteEntityType := sirius.EntityTypeLpa
+			if caseType == sirius.CaseTypeEpa {
+				noteEntityType = sirius.EntityTypeEpa
+			}
+
+			err = client.EditCase(ctx, caseID, sirius.CaseType(caseItem.CaseType), caseDetails)
+			if err == nil && data.Notes != "" {
+				err = client.CreateNote(ctx, caseID, noteEntityType, "Status change - Notes", fmt.Sprintf("Status changed to %s", data.NewStatus), data.Notes, nil)
+			}
+
+			if ve, ok := err.(sirius.ValidationError); ok {
+				w.WriteHeader(http.StatusBadRequest)
+				data.Error = ve
+			} else if err != nil {
+				return err
+			} else {
+				data.Success = true
+			}
+		}
+
+		return tmpl(w, data)
+	}
+}
