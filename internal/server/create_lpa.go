@@ -190,6 +190,8 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			lpa.ApplicationHasGuidance = shared.BoolPtr(!preferencesNone && postFormCheckboxChecked(r, "preferencesAndInstructions", "guidance"))
 			lpa.ApplicationHasRestrictions = shared.BoolPtr(!preferencesNone && postFormCheckboxChecked(r, "preferencesAndInstructions", "restrictions"))
 
+			lpa.ApplicationHasContinuationSheets = shared.BoolPtr(postFormCheckboxChecked(r, "continuationSheets", "continuationSheets"))
+
 			if !data.IsUpdate {
 				lpa.ReceiptDate = postFormDateString(r, "receiptDate")
 			}
