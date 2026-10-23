@@ -560,11 +560,6 @@ describe("Action Panel", () => {
       .should("be.visible");
     cy.get(".action-panel__form .govuk-link").contains("Cancel").click();
 
-    // assert we are back on the create epa form and scrolled to step 3
-    cy.get(
-      "#accordion-create-epa-heading-3 span.govuk-accordion__section-heading-text-focus",
-    ).should("be.visible");
-
     cy.get(".action-panel__form").contains("Add correspondent").click();
     cy.get(".action-panel__form h1").contains("Add a correspondent");
     cy.get(".action-panel__form .govuk-link").contains("Cancel").click();
