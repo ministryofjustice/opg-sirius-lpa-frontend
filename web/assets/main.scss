@@ -1320,7 +1320,7 @@ $app-case-page-action-panel-height: calc(
   }
 
   .govuk-accordion__section--expanded {
-    border: 3px solid #38669e;
+    border: 3px solid $color-accordion-blue;
     border-top: none;
   }
 
@@ -1331,7 +1331,7 @@ $app-case-page-action-panel-height: calc(
     border-top: none;
 
     .govuk-accordion__section-heading-text {
-      background: #38669e;
+      background: $color-accordion-blue;
       color: white;
       padding: 10px;
     }
@@ -1347,11 +1347,11 @@ $app-case-page-action-panel-height: calc(
     &:focus {
       .govuk-accordion__section-heading-text {
         outline: 3px solid rgba(0, 0, 0, 0);
-        color: var(--govuk-focus-text-colour, #0b0c0c);
-        background-color: var(--govuk-focus-colour, #ffdd00);
+        color: $color-sirius-black;
+        background-color: govuk-functional-colour(focus);
         box-shadow:
-          0 -2px var(--govuk-focus-colour, #ffdd00),
-          0 4px var(--govuk-focus-text-colour, #0b0c0c);
+          0 -2px govuk-functional-colour(focus),
+          0 4px $color-sirius-black;
         text-decoration: none;
       }
 
@@ -1372,5 +1372,9 @@ $app-case-page-action-panel-height: calc(
   .govuk-accordion__section-content {
     padding: 15px;
     padding-top: 0;
+
+    &[hidden] {
+      padding-bottom: 0;
+    }
   }
 }
