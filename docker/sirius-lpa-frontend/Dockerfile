@@ -36,7 +36,7 @@ COPY --from=asset-env /app/web/static web/static
 
 ENTRYPOINT ["go", "tool", "air"]
 
-FROM golang:1.27.3@sha256:cb45cf739cf6bc9eaeacf75d3cd7c157e7d39b757216d813d8115d026ee32e75 AS build-env
+FROM golang:1.27.3@sha256:f20d83a83e18dbd2a4714b8ffd4b30b287b6243962dd75608e86abcc63ba4efc AS build-env
 
 RUN adduser \
     --disabled-password \
