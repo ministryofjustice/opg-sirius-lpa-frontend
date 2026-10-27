@@ -19,6 +19,7 @@ type CreateFeeDecisionClient interface {
 type createFeeDecisionData struct {
 	XSRFToken      string
 	Error          sirius.ValidationError
+	IsEditing      bool
 	Case           sirius.Case
 	DecisionTypes  []sirius.RefDataItem
 	DecisionType   string
