@@ -19,7 +19,7 @@ type CreateCorrespondentClient interface {
 	CreateCorrespondent(ctx sirius.Context, caseId int, correspondent sirius.Correspondent) error
 }
 
-type createCorrespondentData struct {
+type correspondentData struct {
 	XSRFToken     string
 	FlowQuery     string
 	IsPartial     bool
@@ -47,7 +47,7 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 			return err
 		}
 
-		data := createCorrespondentData{
+		data := correspondentData{
 			XSRFToken: ctx.XSRFToken,
 			FlowQuery: getFlowQuery(r),
 			IsPartial: ctx.IsPartial,

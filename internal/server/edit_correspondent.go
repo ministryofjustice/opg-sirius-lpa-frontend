@@ -15,20 +15,6 @@ type EditCorrespondentClient interface {
 	UpdateCorrespondent(ctx sirius.Context, correspondentId int, correspondent sirius.Correspondent) error
 }
 
-type editCorrespondentData struct {
-	XSRFToken     string
-	FlowQuery     string
-	IsPartial     bool
-	DonorId       int
-	CaseId        int
-	CaseType      string
-	Correspondent sirius.Correspondent
-	Actors        []actor
-	Error         sirius.ValidationError
-	IsEditing     bool
-	Title         string
-}
-
 func EditCorrespondent(client EditCorrespondentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
@@ -43,7 +29,7 @@ func EditCorrespondent(client EditCorrespondentClient, tmpl template.Template) H
 			return err
 		}
 
-		data := editCorrespondentData{
+		data := correspondentData{
 			XSRFToken: ctx.XSRFToken,
 			FlowQuery: getFlowQuery(r),
 			IsPartial: ctx.IsPartial,

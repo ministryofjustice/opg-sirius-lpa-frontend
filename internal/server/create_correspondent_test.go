@@ -41,7 +41,7 @@ func TestGetCreateCorrespondent(t *testing.T) {
 					client := &mockCreateCorrespondentClient{}
 					template := &mockTemplate{}
 					template.
-						On("Func", mock.Anything, createCorrespondentData{
+						On("Func", mock.Anything, correspondentData{
 							FlowQuery: tc.flowQuery,
 							IsPartial: isHtmx,
 							DonorId:   1,
@@ -202,7 +202,7 @@ func TestPostCreateCorrespondentWhenValidationError(t *testing.T) {
 
 	template := &mockTemplate{}
 	template.
-		On("Func", mock.Anything, createCorrespondentData{
+		On("Func", mock.Anything, correspondentData{
 			DonorId:       1,
 			CaseId:        2,
 			CaseType:      "epa",

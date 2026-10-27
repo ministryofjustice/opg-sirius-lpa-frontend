@@ -66,7 +66,7 @@ func TestGetEditCorrespondent(t *testing.T) {
 
 			template := &mockTemplate{}
 			template.
-				On("Func", mock.Anything, editCorrespondentData{
+				On("Func", mock.Anything, correspondentData{
 					FlowQuery:     tc.flowQuery,
 					DonorId:       1,
 					CaseId:        2,
@@ -288,7 +288,7 @@ func TestPostEditCorrespondentValidationErrors(t *testing.T) {
 
 			template := &mockTemplate{}
 			template.
-				On("Func", mock.Anything, editCorrespondentData{
+				On("Func", mock.Anything, correspondentData{
 					DonorId:       1,
 					CaseId:        2,
 					CaseType:      tc.caseType,
