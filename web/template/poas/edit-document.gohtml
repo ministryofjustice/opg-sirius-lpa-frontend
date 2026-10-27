@@ -6,6 +6,7 @@
 
         {{ if .Success }}
             {{ template "success-banner" "Draft document published" }}
+            <meta http-equiv="Refresh" content="0" />
         {{ else if .SaveAndExit }}
             <meta http-equiv="Refresh" content="0" />
         {{ else if .PreviewDraft }}
