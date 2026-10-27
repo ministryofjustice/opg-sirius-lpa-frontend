@@ -1,16 +1,15 @@
 {{ template "page" . }}
 
 {{ define "partial-content" }}
+  {{ if .HtmxRedirect }}
+    <span class="govuk-!-display-none"
+          hx-get="{{ prefix .HtmxRedirect }}"
+          hx-target=".action-panel__content"
+          hx-swap="{{ .HtmxSwap }}"
+          hx-trigger="load"
+    ></span>
+  {{ else }}
   <div class="action-panel__form">
-
-    {{ if .HtmxRedirect }}
-        <span class="govuk-!-display-none"
-              hx-get="{{ prefix .HtmxRedirect }}"
-              hx-target=".action-panel__content"
-              hx-swap="{{ .HtmxSwap }}"
-              hx-trigger="load"
-        ></span>
-    {{ end }}
 
     {{ template "error-summary" .Error }}
 
@@ -72,6 +71,7 @@
       </div>
     </form>
   </div>
+ {{ end }}
 {{ end }}
 
 {{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ .Title }}{{ end }}
