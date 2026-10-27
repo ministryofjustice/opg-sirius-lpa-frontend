@@ -19,6 +19,7 @@ type CreateFeeDecisionClient interface {
 type createFeeDecisionData struct {
 	XSRFToken      string
 	Error          sirius.ValidationError
+	IsPartial      bool
 	IsEditing      bool
 	Case           sirius.Case
 	DecisionTypes  []sirius.RefDataItem
@@ -26,6 +27,7 @@ type createFeeDecisionData struct {
 	DecisionReason string
 	DecisionDate   sirius.DateString
 	ReturnUrl      string
+	HtmxRedirect   string
 }
 
 func CreateFeeDecision(client CreateFeeDecisionClient, tmpl template.Template) Handler {
@@ -39,6 +41,7 @@ func CreateFeeDecision(client CreateFeeDecisionClient, tmpl template.Template) H
 		group, groupCtx := errgroup.WithContext(ctx.Context)
 		data := createFeeDecisionData{
 			XSRFToken:      ctx.XSRFToken,
+			IsPartial:      ctx.IsPartial,
 			DecisionType:   postFormString(r, "decisionType"),
 			DecisionReason: postFormString(r, "decisionReason"),
 			DecisionDate:   postFormDateString(r, "decisionDate"),
@@ -92,6 +95,11 @@ func CreateFeeDecision(client CreateFeeDecisionClient, tmpl template.Template) H
 				SetFlash(w, FlashNotification{
 					Title: title,
 				})
+
+				if ctx.IsPartial {
+					data.HtmxRedirect = data.ReturnUrl
+					return tmpl(w, data)
+				}
 
 				return RedirectError(data.ReturnUrl)
 			}
