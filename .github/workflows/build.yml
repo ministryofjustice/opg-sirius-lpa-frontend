@@ -87,6 +87,9 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     needs: ["identify", "create-tag"]
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -101,6 +104,17 @@ jobs:
       - name: Run Tests
         run: make unit-test
 
+      - name: Configure OIDC AWS credentials for ECR pull
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: arn:aws:iam::311462405659:role/sirius-component-ecr-role
+          role-session-name: opg-sirius-lpa-frontend-github-actions-ecr-pull
+          role-duration-seconds: 900
+          aws-region: eu-west-1
+      - name: ECR Login
+        uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2.1.7
+        with:
+          registries: 311462405659
       - name: Publish pacts
         env:
           BRANCH_NAME: ${{ needs.identify.outputs.branch }}
