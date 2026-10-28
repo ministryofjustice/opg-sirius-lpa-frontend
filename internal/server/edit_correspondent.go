@@ -61,7 +61,7 @@ func EditCorrespondent(client EditCorrespondentClient, tmpl template.Template) H
 		}
 
 		if r.Method == http.MethodPost {
-			updatedCorrespondent := sirius.Correspondent{
+			data.Correspondent = sirius.Correspondent{
 				Person: sirius.Person{
 					AddressLine1:          postFormString(r, "addressLine1"),
 					AddressLine2:          postFormString(r, "addressLine2"),
@@ -85,11 +85,9 @@ func EditCorrespondent(client EditCorrespondentClient, tmpl template.Template) H
 				},
 				CompanyNumber: postFormString(r, "companyNumber"),
 			}
-			data.Correspondent = updatedCorrespondent
 
-			updatedCorrespondent.ID = correspondent.ID
-			data.Correspondent = updatedCorrespondent
-			err = client.UpdateCorrespondent(ctx, data.Correspondent.ID, updatedCorrespondent)
+			data.Correspondent.ID = correspondent.ID
+			err = client.UpdateCorrespondent(ctx, data.Correspondent.ID, data.Correspondent)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
