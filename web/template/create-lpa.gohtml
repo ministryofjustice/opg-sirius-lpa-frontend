@@ -465,39 +465,39 @@
             <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
 
             <h3 class="govuk-heading-s">Certificate provider</h3>
-            {{ if gt (len .Lpa.CertificateProviders) 0 }}
-              {{ range $cp := .Lpa.CertificateProviders }}
-                <div class="app-create-lpa__details-row">
-                  <details class="govuk-details">
-                    <summary class="govuk-details__summary">
-                      <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
-                    </summary>
-                    <div class="govuk-details__text">
-                      {{ template "person-details-table" . }}
-                    </div>
-                  </details>
-                  <span class="app-create-lpa__summary-update-link">
-                    <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
-                            id="f-update-certificate-provider-{{ .ID }}"
-                            name="updateCertificateProvider"
-                            type="submit"
-                            value="{{ .ID }}"
-                    >Update
-                      <span class="govuk-visually-hidden">
-                        certificate provider{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
-                      </span>
-                    </button>
-                  </span>
-                  {{ template "input-signed-date" (field "certificateProviderSignatureDate" "" $.Lpa.CertificateProviderSignatureDate $.Error.Field.certificateProviderSignatureDate) }}
-                </div>
-              {{ end }}
+            {{ range $cp := .Lpa.CertificateProviders }}
+              <div class="app-create-lpa__details-row">
+                <details class="govuk-details">
+                  <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
+                  </summary>
+                  <div class="govuk-details__text">
+                    {{ template "person-details-table" . }}
+                  </div>
+                </details>
+                <span class="app-create-lpa__summary-update-link">
+                  <button class="app-create-lpa__summary-update-button govuk-link govuk-link--no-visited-state"
+                          id="f-update-certificate-provider-{{ .ID }}"
+                          name="updateCertificateProvider"
+                          type="submit"
+                          value="{{ .ID }}"
+                  >Update
+                    <span class="govuk-visually-hidden">
+                      certificate provider{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                    </span>
+                  </button>
+                </span>
+              </div>
             {{ end }}
-            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-            <div class="govuk-button-group app-button-group--column">
-              <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
-                     type="submit" data-disable-after-click="true"
-                     name="addCertificateProvider" {{ if gt (len .Lpa.CertificateProviders) 1 }}disabled{{ end }} value="Add Certificate Provider"/>
-            </div>
+            {{ template "input-signed-date" (field "certificateProviderSignatureDate" "Signed" .Lpa.CertificateProviderSignatureDate .Error.Field.certificateProviderSignatureDate) }}
+            {{ if eq (len .Lpa.CertificateProviders) 0 }}
+              <div class="govuk-button-group app-button-group--column">
+                <input class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                       type="submit" data-disable-after-click="true"
+                       name="addCertificateProvider" {{ if gt (len .Lpa.CertificateProviders) 1 }}disabled{{ end }} value="Add Certificate Provider"
+                />
+              </div>
+            {{ end }}
 
             {{ if gt (len .AttorneyApplicants) 0 }}
               <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible app-section-break--no-top-margin">
