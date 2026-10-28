@@ -1313,15 +1313,11 @@ $app-case-page-action-panel-height: calc(
 
   .govuk-accordion__section {
     margin-bottom: 15px;
+    border: 1px solid $color-accordion-blue;
 
-    &:not(.govuk-accordion__section--expanded) {
-      border: 2px solid rgba(0, 0, 0, 0);
-      border-bottom: 1px solid govuk-functional-colour(border);
+    &:not(.govuk-accordion__section--expanded):hover {
+      background: $color-app-bg;
     }
-  }
-
-  .govuk-accordion__section--expanded {
-    border: 2px solid $color-accordion-blue;
   }
 
   .govuk-accordion__section-button {
