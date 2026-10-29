@@ -223,7 +223,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/investigation-hold", wrap(InvestigationHold(client, templates.Get("investigation_hold.gohtml"))))
 	mux.Handle("/link-person", wrap(LinkPerson(client, templates.Get("link-person.gohtml"))))
 	mux.Handle("/mi-reporting", wrap(MiReporting(client, templates.Get("mi-reporting.gohtml"))))
-	mux.Handle("/notify-error/{donorId}/{createdDocumentUUID}/{caseType}/{caseID}/{caseUUID}", wrap(NotifyPageLimit(client, templates.Get("notify-page-limit.gohtml"))))
+	mux.Handle("/notify-error/{donorId}/{createdDocumentUUID}/{caseType}/{caseID}/{caseUUID}", wrap(NotifyPageLimit(templates.Get("notify-page-limit.gohtml"))))
 	mux.Handle("/payments/{id}", wrap(GetPayments(client, templates.Get("payments.gohtml"))))
 	mux.Handle("/select-or-create-correspondent", wrap(SelectOrCreateCorrespondent(client, templates.Get("select-or-create-correspondent.gohtml"))))
 	mux.Handle("/sirius-header-calendars", wrap(SiriusHeaderCalendars(client, templates.Get("sirius-header-partial-calendars.gohtml"))))
