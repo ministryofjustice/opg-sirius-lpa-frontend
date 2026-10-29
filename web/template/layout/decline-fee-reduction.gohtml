@@ -41,22 +41,22 @@
 {{/*                                </a>*/}}
 {{/*                            </th>*/}}
 {{/*                        </tr>*/}}
-{{/*                        <tr class="govuk-table__row">*/}}
-{{/*                            <th scope="row" class="govuk-table__header app-!-table-row__no-border"*/}}
-{{/*                                colspan="2">*/}}
-{{/*                                <a class="govuk-link govuk-link--no-visited-state app-!-colour-text-red"*/}}
-{{/*                                   {{ if $.InActionPanel }}*/}}
-{{/*                                   href=""*/}}
-{{/*                                   hx-get="{{ prefix (printf "/delete-decline-fee-reduction?id=%d" .ID) }}"*/}}
-{{/*                                   hx-target=".action-panel__content"*/}}
-{{/*                                   hx-swap="innerHTML"*/}}
-{{/*                                   {{ else }}*/}}
-{{/*                                   href="{{ prefix (printf "/delete-decline-fee-reduction?id=%d" .ID) }}"*/}}
-{{/*                                   {{ end }}>*/}}
-{{/*                                    Delete decline fee reduction*/}}
-{{/*                                </a>*/}}
-{{/*                            </th>*/}}
-{{/*                        </tr>*/}}
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header app-!-table-row__no-border"
+                                colspan="2">
+                                <a class="govuk-link govuk-link--no-visited-state app-!-colour-text-red"
+                                   {{ if $.InActionPanel }}
+                                   href=""
+                                   hx-get="{{ prefix (printf "/delete-decline-fee-decision?caseId=%d&feeDecisionId=%d" $.Case.ID .ID) }}"
+                                   hx-target=".action-panel__content"
+                                   hx-swap="innerHTML"
+                                   {{ else }}
+                                   href="{{ prefix (printf "/delete-decline-fee-decision?caseId=%d&feeDecisionId=%d" $.Case.ID .ID) }}"
+                                   {{ end }}>
+                                    Delete decline fee reduction
+                                </a>
+                            </th>
+                        </tr>
                     </tbody>
                 </table>
             {{ end }}
