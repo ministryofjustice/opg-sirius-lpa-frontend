@@ -73,6 +73,7 @@ type Client interface {
 	CreateNotifiedPersonClient
 	CreateReplacementAttorneyClient
 	CreateTrustCorporationClient
+	DeleteFeeDecisionClient
 	DeleteDocumentClient
 	DeleteNoteClient
 	DeletePaymentClient
@@ -195,6 +196,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-replacement-attorney", wrap(CreateReplacementAttorney(client, templates.Get("create-replacement-attorney.gohtml"))))
 	mux.Handle("/create-trust-corporation", wrap(CreateTrustCorporation(client, templates.Get("create-trust-corporation.gohtml"))))
 	mux.Handle("/compare/{id}/{caseUid}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
+	mux.Handle("/delete-decline-fee-decision", wrap(DeleteFeeDecision(client, templates.Get("delete-decline-fee-decision.gohtml"))))
 	mux.Handle("/delete-fee-reduction", wrap(DeletePayment(client, templates.Get("delete-fee-reduction.gohtml"))))
 	mux.Handle("/delete-note", wrap(DeleteNote(client, templates.Get("delete-note.gohtml"))))
 	mux.Handle("/delete-payment", wrap(DeletePayment(client, templates.Get("delete-payment.gohtml"))))
