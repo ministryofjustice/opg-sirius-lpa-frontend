@@ -32,6 +32,7 @@ type createLpaData struct {
 	Error                                sirius.ValidationError
 	HtmxRedirect                         string
 	HtmxSwap                             string
+	IsCreating                           bool
 	IsUpdate                             bool
 	FlowQuery                            string
 	Lpa                                  sirius.Lpa
@@ -71,6 +72,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 		caseIdStr := r.FormValue("caseId")
 		hasCaseId := caseIdStr != ""
 		isCreating := !hasCaseId || r.FormValue("flow") == "create"
+		data.IsCreating = isCreating
 		if isCreating {
 			data.FlowQuery = "&flow=create"
 		}
@@ -160,12 +162,9 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				lpa.ApplicantIds = nil
 			}
 
-			reducedFeeSelected := postFormCheckboxChecked(r, "applicationFee", "reducedFee")
-			reducedFeeType := postFormString(r, "reducedFeeType")
 			lpa.PaymentByCheque = shared.BoolPtr(postFormCheckboxChecked(r, "applicationFee", "cheque"))
 			lpa.PaymentByDebitCreditCard = shared.BoolPtr(postFormCheckboxChecked(r, "applicationFee", "card"))
-			lpa.PaymentExemption = shared.BoolPtr(reducedFeeSelected && reducedFeeType == "exemption")
-			lpa.PaymentRemission = shared.BoolPtr(reducedFeeSelected && reducedFeeType == "remission")
+			lpa.PaymentRemission = shared.BoolPtr(postFormCheckboxChecked(r, "applicationFee", "reducedFee"))
 			lpa.RepeatApplication = shared.BoolPtr(postFormCheckboxChecked(r, "applicationFee", "repeatApplication"))
 
 			if !*lpa.PaymentByDebitCreditCard {
