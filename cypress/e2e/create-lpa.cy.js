@@ -33,6 +33,8 @@ describe("create an LPA", () => {
     cy.get("#f-applicationType").click();
     cy.get("#f-onlineLpaId").type("A12345678901");
     cy.get("#f-receiptDate").type("2026-06-19");
+    cy.get("#f-applicationFee").click();
+    cy.get("#f-cardPaymentContact").type("07700 900000");
     cy.get("#f-caseAttorney").click();
 
     // section 2
@@ -45,8 +47,6 @@ describe("create an LPA", () => {
     // section 4
     cy.get("#f-applicantType").click();
     cy.get("#f-applicantSignatureDate").type("2026-06-19");
-    cy.get("#f-applicationFee").click();
-    cy.get("#f-cardPaymentContact").type("07700 900000");
 
     cy.contains("button", "Save and exit").click();
   });
