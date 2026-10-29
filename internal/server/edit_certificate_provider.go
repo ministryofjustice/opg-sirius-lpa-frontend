@@ -42,7 +42,6 @@ func EditCertificateProvider(client EditCertificateProviderClient, tmpl template
 			FlowQuery:           getFlowQuery(r),
 			DonorId:             donorId,
 			CaseId:              caseId,
-			CanAddActor:         false,
 			CertificateProvider: certificateProvider,
 			Title:               "Edit a certificate provider",
 			PostURL:             fmt.Sprintf("/edit-certificate-provider?id=%d&caseId=%d&personId=%d%s", donorId, caseId, personId, getFlowQuery(r)),
@@ -73,13 +72,15 @@ func EditCertificateProvider(client EditCertificateProviderClient, tmpl template
 			} else if err != nil {
 				return err
 			} else {
+				redirect := fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-3", donorId, caseId, data.FlowQuery)
+
 				if data.IsPartial {
-					data.HtmxRedirect = fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-3", donorId, caseId, data.FlowQuery)
+					data.HtmxRedirect = redirect
 					data.HtmxSwap = "innerHTML show:#accordion-create-lpa-heading-3:top"
 					return tmpl(w, data)
 				}
 
-				return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-3", donorId, caseId, data.FlowQuery))
+				return RedirectError(redirect)
 			}
 		}
 

@@ -82,6 +82,7 @@ type Client interface {
 	DonorDetailsClient
 	EditCertificateProviderClient
 	EditComplaintClient
+	EditCorrespondentClient
 	EditDatesClient
 	EditDocumentClient
 	EditDonorClient
@@ -209,6 +210,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/delete-document/{uuid}", wrap(DeleteDocument(client, templates.Get("delete-document.gohtml"))))
 	mux.Handle("/edit-certificate-provider", wrap(EditCertificateProvider(client, templates.Get("certificate-provider.gohtml"))))
 	mux.Handle("/edit-complaint", wrap(EditComplaint(client, templates.Get("edit_complaint.gohtml"))))
+	mux.Handle("/edit-correspondent", wrap(EditCorrespondent(client, templates.Get("create-correspondent.gohtml"))))
 	mux.Handle("/edit-dates", wrap(EditDates(client, templates.Get("edit-dates.gohtml"))))
 	mux.Handle("/edit-donor", wrap(EditDonor(client, templates.Get("donor.gohtml"))))
 	mux.Handle("/edit-fee-reduction", wrap(EditFeeReduction(client, templates.Get("edit-fee-reduction.gohtml"))))
