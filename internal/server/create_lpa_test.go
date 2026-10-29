@@ -67,6 +67,7 @@ func TestGetCreateLpa(t *testing.T) {
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
 			FlowQuery:              "&flow=create",
+			IsCreating:             true,
 			Title:                  "Create an LPA",
 		}).
 		Return(nil)
@@ -95,6 +96,7 @@ func TestGetCreateLpaHtmxRequest(t *testing.T) {
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
 			FlowQuery:              "&flow=create",
+			IsCreating:             true,
 			IsPartial:              true,
 			Title:                  "Create an LPA",
 		}).
@@ -125,6 +127,7 @@ func TestGetCreateLpaDoesNotSetIsUpdate(t *testing.T) {
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
 			FlowQuery:              "&flow=create",
+			IsCreating:             true,
 			IsUpdate:               false,
 			Title:                  "Create an LPA",
 		}).
@@ -363,6 +366,7 @@ func TestPostCreateLpa(t *testing.T) {
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
 			FlowQuery:              "&flow=create",
+			IsCreating:             true,
 			Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
 			Success:                true,
 			SuccessMessage:         "You have successfully created an LPA.",
@@ -416,7 +420,7 @@ func TestPostCreateLpaClearsMismatchedSubtypeOnlyFields(t *testing.T) {
 			CaseAttorneyJointly:                       shared.BoolPtr(false),
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(true),
 			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
@@ -435,6 +439,7 @@ func TestPostCreateLpaClearsMismatchedSubtypeOnlyFields(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
+		"applicationFee":          {"cheque"},
 		"attorneyActDecisions":    {"When Registered"},
 		"caseAttorney":            {"singular"},
 		"caseSubtype":             {"hw"},
@@ -465,7 +470,7 @@ func TestPostCreateLpaPreferencesNoneClearsOtherSelections(t *testing.T) {
 			CaseAttorneyJointly:                       shared.BoolPtr(false),
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(true),
 			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
@@ -484,6 +489,7 @@ func TestPostCreateLpaPreferencesNoneClearsOtherSelections(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
+		"applicationFee":             {"cheque"},
 		"caseAttorney":               {"singular"},
 		"preferencesAndInstructions": {"guidance", "restrictions", "none"},
 	}
@@ -514,7 +520,7 @@ func TestPostCreateLpaDropsOnlineLpaIdWhenNotOnline(t *testing.T) {
 			CaseAttorneyJointly:                       shared.BoolPtr(false),
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(true),
 			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
@@ -533,6 +539,7 @@ func TestPostCreateLpaDropsOnlineLpaIdWhenNotOnline(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
+		"applicationFee":  {"cheque"},
 		"applicationType": {"Classic"},
 		"caseAttorney":    {"singular"},
 		"caseSubtype":     {"pfa"},
@@ -611,7 +618,7 @@ func TestPostCreateLpaDropsAdditionalInfoWhenAnyOtherInfoNotSelected(t *testing.
 			CaseAttorneyJointly:                       shared.BoolPtr(false),
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(true),
 			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
@@ -630,6 +637,7 @@ func TestPostCreateLpaDropsAdditionalInfoWhenAnyOtherInfoNotSelected(t *testing.
 		Return(nil)
 
 	form := url.Values{
+		"applicationFee": {"cheque"},
 		"additionalInfo": {"Some info the user typed then unchecked yes"},
 		"caseAttorney":   {"singular"},
 	}
@@ -754,7 +762,7 @@ func TestPostCreateLpaApplicationFeeReducedFeeTypeIgnoredWhenNotSelected(t *test
 			CaseAttorneyJointly:                       shared.BoolPtr(false),
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(true),
 			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
@@ -773,6 +781,7 @@ func TestPostCreateLpaApplicationFeeReducedFeeTypeIgnoredWhenNotSelected(t *test
 		Return(nil)
 
 	form := url.Values{
+		"applicationFee": {"cheque"},
 		"caseAttorney":   {"singular"},
 		"reducedFeeType": {"exemption"},
 	}
@@ -807,7 +816,7 @@ func TestPostCreateLpaApplicantAndLifeSustainingTreatmentFields(t *testing.T) {
 			CaseAttorneyJointly:                       shared.BoolPtr(true),
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(true),
 			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
@@ -826,6 +835,7 @@ func TestPostCreateLpaApplicantAndLifeSustainingTreatmentFields(t *testing.T) {
 		Return(nil)
 
 	form := url.Values{
+		"applicationFee":                       {"cheque"},
 		"caseSubtype":                          {"hw"},
 		"caseAttorney":                         {"jointly"},
 		"lifeSustainingTreatment":              {"None"},
@@ -1252,7 +1262,7 @@ func TestPostCreateLpaWhenValidationError(t *testing.T) {
 		})).
 		Return(nil)
 
-	form := url.Values{"caseAttorney": {"singular"}}
+	form := url.Values{"applicationFee": {"cheque"}, "caseAttorney": {"singular"}}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
@@ -1286,7 +1296,7 @@ func TestPostCreateLpaWhenValidationErrorHtmxRequest(t *testing.T) {
 		})).
 		Return(nil)
 
-	form := url.Values{"caseAttorney": {"singular"}}
+	form := url.Values{"applicationFee": {"cheque"}, "caseAttorney": {"singular"}}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
@@ -1372,7 +1382,7 @@ func TestPostCreateLpaWhenGenericError(t *testing.T) {
 		On("CreateLpa", mock.Anything, 123, mock.Anything).
 		Return(sirius.Lpa{}, errExample)
 
-	form := url.Values{"caseAttorney": {"singular"}}
+	form := url.Values{"applicationFee": {"cheque"}, "caseAttorney": {"singular"}}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
@@ -1433,6 +1443,7 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 				DonorId:                123,
 				DonorName:              "Firstname Surname",
 				FlowQuery:              "&flow=create",
+				IsCreating:             true,
 				HtmxRedirect:           "/create-replacement-attorney?id=123&caseId=456&flow=create",
 				HtmxSwap:               "innerHTML",
 				IsPartial:              isHtmx,
@@ -1611,7 +1622,8 @@ func TestPostCreateLpaUpdateTrustCorporationBadId(t *testing.T) {
 				Return(sirius.Lpa{Case: sirius.Case{ID: 2}}, nil)
 
 			form := url.Values{
-				"caseSubtype": {"pfa"},
+				"applicationFee": {"cheque"},
+				"caseSubtype":    {"pfa"},
 			}
 
 			if isReplacementAttorney {
@@ -1882,8 +1894,9 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 					template := &mockTemplate{}
 
 					form := url.Values{
-						"caseSubtype": {"pfa"},
-						tc.formKey:    {tc.formValue},
+						"applicationFee": {"cheque"},
+						"caseSubtype":    {"pfa"},
+						tc.formKey:       {tc.formValue},
 					}
 
 					r, _ := http.NewRequest(http.MethodPost, "/create-lpa?id=1"+flowCase.query, strings.NewReader(form.Encode()))
@@ -1925,8 +1938,9 @@ func TestPostErrorWhenAttorneyRadioSelected(t *testing.T) {
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{"applicantType": {"": "Select an applicant"}},
 			},
-			FlowQuery: "&flow=create",
-			IsUpdate:  false,
+			FlowQuery:  "&flow=create",
+			IsCreating: true,
+			IsUpdate:   false,
 			Lpa: sirius.Lpa{
 				Case: sirius.Case{
 					ApplicationType:                           "Online",
@@ -1988,4 +2002,161 @@ func TestPostErrorWhenAttorneyRadioSelected(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateLpaApplicationFeeValidation(t *testing.T) {
+	dateString := "2022-04-05"
+
+	tests := []struct {
+		name                 string
+		form                 url.Values
+		expectedFieldErrors  sirius.FieldErrors
+		expectedApplicantIds []int
+	}{
+		{
+			name: "No application fee selected",
+			form: url.Values{
+				"applicantType": {"donor"},
+				"caseSubtype":   {"pfa"},
+				"receiptDate":   {dateString},
+			},
+			expectedFieldErrors: sirius.FieldErrors{
+				"applicationFee": {"": "Select how the application fee is being paid"},
+			},
+			expectedApplicantIds: []int{123},
+		},
+		{
+			name: "Reduced fee selected without a reduced fee type",
+			form: url.Values{
+				"applicationFee": {"reducedFee"},
+				"caseSubtype":    {"pfa"},
+				"receiptDate":    {dateString},
+			},
+			expectedFieldErrors: sirius.FieldErrors{
+				"reducedFeeType": {"": "Select a reduced fee type"},
+			},
+		},
+		{
+			name: "No application fee and attorney applicant without attorneys selected",
+			form: url.Values{
+				"applicantType": {"attorney"},
+				"caseSubtype":   {"pfa"},
+				"receiptDate":   {dateString},
+			},
+			expectedFieldErrors: sirius.FieldErrors{
+				"applicantType":  {"": "Select an applicant"},
+				"applicationFee": {"": "Select how the application fee is being paid"},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &mockCreateLpaClient{}
+			client.
+				On("Person", mock.Anything, 123).
+				Return(sirius.Person{Firstname: "Firstname", Surname: "Surname"}, nil)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, mock.MatchedBy(func(d createLpaData) bool {
+					return reflect.DeepEqual(d.Error.Field, tc.expectedFieldErrors) &&
+						reflect.DeepEqual(d.ApplicantIds, tc.expectedApplicantIds) &&
+						d.Lpa.SubType == "pfa" &&
+						d.Lpa.ReceiptDate == sirius.DateString(dateString) &&
+						!d.Success
+				})).
+				Return(nil)
+
+			r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(tc.form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := CreateLpa(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+			client.AssertNotCalled(t, "CreateLpa", mock.Anything, mock.Anything, mock.Anything)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
+func TestPostCreateLpaApplicationFeeNotRequiredOnceLpaExists(t *testing.T) {
+	for _, query := range []string{"/?id=123&caseId=456", "/?id=123&caseId=456&flow=create"} {
+		t.Run(query, func(t *testing.T) {
+			client := &mockCreateLpaClient{}
+			client.
+				On("Person", mock.Anything, 123).
+				Return(sirius.Person{}, nil)
+			client.
+				On("Lpa", mock.Anything, 456).
+				Return(sirius.Lpa{Case: sirius.Case{ID: 456}}, nil)
+			client.
+				On("UpdateLpa", mock.Anything, 456, mock.Anything).
+				Return(nil)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, mock.MatchedBy(func(d createLpaData) bool {
+					return !d.Error.Any() && d.Success
+				})).
+				Return(nil)
+
+			form := url.Values{"caseSubtype": {"pfa"}}
+
+			r, _ := http.NewRequest(http.MethodPost, query, strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := CreateLpa(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
+func TestGetCreateLpaIsCreating(t *testing.T) {
+	tests := []struct {
+		name               string
+		url                string
+		expectedIsCreating bool
+		expectedIsUpdate   bool
+	}{
+		{name: "New LPA", url: "/?id=123", expectedIsCreating: true, expectedIsUpdate: false},
+		{name: "LPA creation flow", url: "/?id=123&caseId=456&flow=create", expectedIsCreating: true, expectedIsUpdate: true},
+		{name: "Edit LPA", url: "/?id=123&caseId=456", expectedIsCreating: false, expectedIsUpdate: true},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &mockCreateLpaClient{}
+			client.
+				On("Person", mock.Anything, 123).
+				Return(sirius.Person{}, nil)
+			client.
+				On("Lpa", mock.Anything, 456).
+				Return(sirius.Lpa{Case: sirius.Case{ID: 456}}, nil).
+				Maybe()
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, mock.MatchedBy(func(d createLpaData) bool {
+					return d.IsCreating == tc.expectedIsCreating && d.IsUpdate == tc.expectedIsUpdate
+				})).
+				Return(nil)
+
+			r, _ := http.NewRequest(http.MethodGet, tc.url, nil)
+			w := httptest.NewRecorder()
+
+			err := CreateLpa(client, template.Func)(w, r)
+
+			assert.Nil(t, err)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
 }
