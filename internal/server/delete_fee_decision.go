@@ -51,10 +51,13 @@ func DeleteFeeDecision(client DeleteFeeDecisionClient, tmpl template.Template) H
 			return err
 		}
 
-		if data.FeeDecision.DecisionType == shared.DecisionTypeExemption {
+		switch data.FeeDecision.DecisionType {
+		case shared.DecisionTypeExemption:
 			data.FeeDecisionType = "declined exemption"
-		} else if data.FeeDecision.DecisionType == shared.DecisionTypeRemission {
+		case shared.DecisionTypeRemission:
 			data.FeeDecisionType = "declined remission"
+		default:
+			data.FeeDecisionType = ""
 		}
 
 		if r.Method == http.MethodPost {
