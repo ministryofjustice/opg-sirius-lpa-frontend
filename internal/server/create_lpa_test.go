@@ -67,6 +67,7 @@ func TestGetCreateLpa(t *testing.T) {
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
 			FlowQuery:              "&flow=create",
+			IsCreating:             true,
 			Title:                  "Create an LPA",
 		}).
 		Return(nil)
@@ -95,6 +96,7 @@ func TestGetCreateLpaHtmxRequest(t *testing.T) {
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
 			FlowQuery:              "&flow=create",
+			IsCreating:             true,
 			IsPartial:              true,
 			Title:                  "Create an LPA",
 		}).
@@ -125,6 +127,7 @@ func TestGetCreateLpaDoesNotSetIsUpdate(t *testing.T) {
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
 			FlowQuery:              "&flow=create",
+			IsCreating:             true,
 			IsUpdate:               false,
 			Title:                  "Create an LPA",
 		}).
@@ -340,8 +343,7 @@ func TestPostCreateLpa(t *testing.T) {
 			CaseAttorneyJointly:             shared.BoolPtr(false),
 			CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque:  shared.BoolPtr(false),
-			PaymentExemption: shared.BoolPtr(false),
+			PaymentByCheque: shared.BoolPtr(false),
 		},
 	}
 
@@ -362,6 +364,7 @@ func TestPostCreateLpa(t *testing.T) {
 			CaseId:                 456,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
+			IsCreating:             true,
 			FlowQuery:              "&flow=create",
 			Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
 			Success:                true,
@@ -417,7 +420,6 @@ func TestPostCreateLpaClearsMismatchedSubtypeOnlyFields(t *testing.T) {
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
 			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
 
@@ -466,7 +468,6 @@ func TestPostCreateLpaPreferencesNoneClearsOtherSelections(t *testing.T) {
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
 			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
 
@@ -515,7 +516,6 @@ func TestPostCreateLpaDropsOnlineLpaIdWhenNotOnline(t *testing.T) {
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
 			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
 
@@ -564,7 +564,6 @@ func TestPostCreateLpaDropsCardPaymentContactWhenCardNotSelected(t *testing.T) {
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
 			PaymentByCheque:                           shared.BoolPtr(true),
-			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
 
@@ -612,7 +611,6 @@ func TestPostCreateLpaDropsAdditionalInfoWhenAnyOtherInfoNotSelected(t *testing.
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
 			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
 
@@ -632,149 +630,6 @@ func TestPostCreateLpaDropsAdditionalInfoWhenAnyOtherInfoNotSelected(t *testing.
 	form := url.Values{
 		"additionalInfo": {"Some info the user typed then unchecked yes"},
 		"caseAttorney":   {"singular"},
-	}
-
-	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := CreateLpa(client, template.Func)(w, r)
-
-	assert.Nil(t, err)
-	mock.AssertExpectationsForObjects(t, client, template)
-}
-
-func TestPostCreateLpaApplicationFeeReducedFeeExemption(t *testing.T) {
-	lpa := sirius.Lpa{
-		ApplicationHasContinuationSheets: shared.BoolPtr(false),
-		ApplicationHasGuidance:           shared.BoolPtr(false),
-		ApplicationHasRestrictions:       shared.BoolPtr(false),
-		PaymentByDebitCreditCard:         shared.BoolPtr(false),
-		PaymentRemission:                 shared.BoolPtr(false),
-		RepeatApplication:                shared.BoolPtr(true),
-		AnyOtherInfo:                     shared.BoolPtr(false),
-		Case: sirius.Case{
-			CaseAttorneySingular:                      shared.BoolPtr(true),
-			CaseAttorneyJointly:                       shared.BoolPtr(false),
-			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
-			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque:                           shared.BoolPtr(true),
-			PaymentExemption:                          shared.BoolPtr(true),
-		},
-	}
-
-	client := &mockCreateLpaClient{}
-	client.
-		On("Person", mock.Anything, 123).
-		Return(sirius.Person{}, nil)
-	client.
-		On("CreateLpa", mock.Anything, 123, lpa).
-		Return(sirius.Lpa{}, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, mock.Anything).
-		Return(nil)
-
-	form := url.Values{
-		"applicationFee": {"cheque", "reducedFee", "repeatApplication"},
-		"caseAttorney":   {"singular"},
-		"reducedFeeType": {"exemption"},
-	}
-
-	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := CreateLpa(client, template.Func)(w, r)
-
-	assert.Nil(t, err)
-	mock.AssertExpectationsForObjects(t, client, template)
-}
-
-func TestPostCreateLpaApplicationFeeReducedFeeRemission(t *testing.T) {
-	lpa := sirius.Lpa{
-		ApplicationHasContinuationSheets: shared.BoolPtr(false),
-		ApplicationHasGuidance:           shared.BoolPtr(false),
-		ApplicationHasRestrictions:       shared.BoolPtr(false),
-		PaymentByDebitCreditCard:         shared.BoolPtr(false),
-		PaymentRemission:                 shared.BoolPtr(true),
-		RepeatApplication:                shared.BoolPtr(false),
-		AnyOtherInfo:                     shared.BoolPtr(false),
-		Case: sirius.Case{
-			CaseAttorneySingular:                      shared.BoolPtr(true),
-			CaseAttorneyJointly:                       shared.BoolPtr(false),
-			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
-			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
-		},
-	}
-
-	client := &mockCreateLpaClient{}
-	client.
-		On("Person", mock.Anything, 123).
-		Return(sirius.Person{}, nil)
-	client.
-		On("CreateLpa", mock.Anything, 123, lpa).
-		Return(sirius.Lpa{}, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, mock.Anything).
-		Return(nil)
-
-	form := url.Values{
-		"caseAttorney":   {"singular"},
-		"applicationFee": {"reducedFee"},
-		"reducedFeeType": {"remission"},
-	}
-
-	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := CreateLpa(client, template.Func)(w, r)
-
-	assert.Nil(t, err)
-	mock.AssertExpectationsForObjects(t, client, template)
-}
-
-func TestPostCreateLpaApplicationFeeReducedFeeTypeIgnoredWhenNotSelected(t *testing.T) {
-	lpa := sirius.Lpa{
-		ApplicationHasContinuationSheets: shared.BoolPtr(false),
-		ApplicationHasGuidance:           shared.BoolPtr(false),
-		ApplicationHasRestrictions:       shared.BoolPtr(false),
-		PaymentByDebitCreditCard:         shared.BoolPtr(false),
-		PaymentRemission:                 shared.BoolPtr(false),
-		RepeatApplication:                shared.BoolPtr(false),
-		AnyOtherInfo:                     shared.BoolPtr(false),
-		Case: sirius.Case{
-			CaseAttorneySingular:                      shared.BoolPtr(true),
-			CaseAttorneyJointly:                       shared.BoolPtr(false),
-			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
-			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
-		},
-	}
-
-	client := &mockCreateLpaClient{}
-	client.
-		On("Person", mock.Anything, 123).
-		Return(sirius.Person{}, nil)
-	client.
-		On("CreateLpa", mock.Anything, 123, lpa).
-		Return(sirius.Lpa{}, nil)
-
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, mock.Anything).
-		Return(nil)
-
-	form := url.Values{
-		"caseAttorney":   {"singular"},
-		"reducedFeeType": {"exemption"},
 	}
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
@@ -808,7 +663,6 @@ func TestPostCreateLpaApplicantAndLifeSustainingTreatmentFields(t *testing.T) {
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
 			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
 
@@ -872,7 +726,6 @@ func TestPostCreateLpaEditAttorneySignatureDates(t *testing.T) {
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
 			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
 
@@ -939,7 +792,6 @@ func TestPostCreateLpaEditReplacementAttorneySignatureDates(t *testing.T) {
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
 			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
 
@@ -1006,7 +858,6 @@ func TestPostCreateLpaEditTrustCorporationSignatureDates(t *testing.T) {
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
 			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
 
@@ -1073,7 +924,6 @@ func TestPostCreateLpaEditAttorneySignatureDatesError(t *testing.T) {
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
 			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
 
@@ -1135,7 +985,6 @@ func TestPostCreateLpaEditReplacementAttorneySignatureDatesError(t *testing.T) {
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
 			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
 
@@ -1197,7 +1046,6 @@ func TestPostCreateLpaEditTrustCorporationSignatureDatesError(t *testing.T) {
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
 			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
 
@@ -1322,7 +1170,6 @@ func TestPostCreateLpaEditWhenValidationError(t *testing.T) {
 			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
 			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
 		},
 	}
 
@@ -1411,8 +1258,7 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 					CaseAttorneyJointly:             shared.BoolPtr(false),
 					CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
 					CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-					PaymentByCheque:  shared.BoolPtr(false),
-					PaymentExemption: shared.BoolPtr(false),
+					PaymentByCheque: shared.BoolPtr(false),
 				},
 			}
 
@@ -1435,6 +1281,7 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 				FlowQuery:              "&flow=create",
 				HtmxRedirect:           "/create-replacement-attorney?id=123&caseId=456&flow=create",
 				HtmxSwap:               "innerHTML",
+				IsCreating:             true,
 				IsPartial:              isHtmx,
 				Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
 				Success:                true,
@@ -1515,7 +1362,6 @@ func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 					CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 					CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
 					PaymentByCheque:                           shared.BoolPtr(false),
-					PaymentExemption:                          shared.BoolPtr(false),
 				},
 			}
 
@@ -1660,7 +1506,6 @@ func TestPostCreateLpaUpdateReplacementAttorney(t *testing.T) {
 					CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 					CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
 					PaymentByCheque:                           shared.BoolPtr(false),
-					PaymentExemption:                          shared.BoolPtr(false),
 				},
 			}
 
@@ -1925,8 +1770,9 @@ func TestPostErrorWhenAttorneyRadioSelected(t *testing.T) {
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{"applicantType": {"": "Select an applicant"}},
 			},
-			FlowQuery: "&flow=create",
-			IsUpdate:  false,
+			FlowQuery:  "&flow=create",
+			IsCreating: true,
+			IsUpdate:   false,
 			Lpa: sirius.Lpa{
 				Case: sirius.Case{
 					ApplicationType:                           "Online",
@@ -1936,7 +1782,6 @@ func TestPostErrorWhenAttorneyRadioSelected(t *testing.T) {
 					CaseAttorneySingular:                      shared.BoolPtr(true),
 					LpaDonorSignatureDate:                     sirius.DateString(dateString),
 					PaymentByCheque:                           shared.BoolPtr(false),
-					PaymentExemption:                          shared.BoolPtr(false),
 					ReceiptDate:                               sirius.DateString(dateString),
 					SubType:                                   "pfa",
 				},
