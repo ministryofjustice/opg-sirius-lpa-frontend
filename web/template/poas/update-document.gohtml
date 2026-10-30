@@ -335,6 +335,11 @@
         <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="saveAndExit" id="saveAndExit">Save and exit</button>
         <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="delete">Delete draft</button>
         <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="preview">Preview draft</button>
-        <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit" value="publish">{{ if .UsesNotify }}Publish and Send{{ else }}Publish draft{{ end }}</button>
+        {{ if and .SendingLettersViaNotify .UsesNotify }}
+          <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit" value="publish">Publish draft</button>
+          <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit" value="publishAndSend">Publish and post via Notify</button>
+        {{ else }}
+          <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit" value={{ if .UsesNotify }}"publishAndSend"{{ else }}"publish"{{ end }}>{{ if .UsesNotify }}Publish and Send{{ else }}Publish draft{{ end }}</button>
+        {{ end }}
     </div>
 {{ end }}
