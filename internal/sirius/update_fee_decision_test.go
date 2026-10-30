@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEditFeeDecision(t *testing.T) {
+func TestUpdateFeeDecision(t *testing.T) {
 	t.Parallel()
 
 	pact, err := newPact()
@@ -48,7 +48,7 @@ func TestEditFeeDecision(t *testing.T) {
 	assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 		client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-		err := client.EditFeeDecision(
+		err := client.UpdateFeeDecision(
 			Context{Context: context.Background()},
 			8521,
 			1245,

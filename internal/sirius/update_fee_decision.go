@@ -2,7 +2,7 @@ package sirius
 
 import "fmt"
 
-func (c *Client) EditFeeDecision(ctx Context, caseID int, feeDecisionID int, decisionType string, decisionReason string, decisionDate DateString) error {
+func (c *Client) UpdateFeeDecision(ctx Context, caseID int, feeDecisionID int, decisionType string, decisionReason string, decisionDate DateString) error {
 	data := struct {
 		DecisionType   string     `json:"decisionType"`
 		DecisionReason string     `json:"decisionReason"`

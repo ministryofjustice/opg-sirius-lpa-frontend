@@ -10,14 +10,14 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-type EditFeeDecisionClient interface {
+type UpdateFeeDecisionClient interface {
 	Case(sirius.Context, int) (sirius.Case, error)
 	DeclineFeeReductions(ctx sirius.Context, id int) ([]sirius.DeclineFeeReductions, error)
-	EditFeeDecision(ctx sirius.Context, caseID int, feeDecisionID int, decisionType string, decisionReason string, decisionDate sirius.DateString) error
+	UpdateFeeDecision(ctx sirius.Context, caseID int, feeDecisionID int, decisionType string, decisionReason string, decisionDate sirius.DateString) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
 
-type editFeeDecisionData struct {
+type updateFeeDecisionData struct {
 	XSRFToken      string
 	Error          sirius.ValidationError
 	IsPartial      bool
@@ -32,7 +32,7 @@ type editFeeDecisionData struct {
 	HtmxRedirect   string
 }
 
-func EditFeeDecision(client EditFeeDecisionClient, tmpl template.Template) Handler {
+func UpdateFeeDecision(client UpdateFeeDecisionClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		caseID, err := strToIntOrStatusError(r.FormValue("caseId"))
 		if err != nil {
@@ -46,7 +46,7 @@ func EditFeeDecision(client EditFeeDecisionClient, tmpl template.Template) Handl
 
 		ctx := getContext(r)
 		group, groupCtx := errgroup.WithContext(ctx.Context)
-		data := editFeeDecisionData{
+		data := updateFeeDecisionData{
 			XSRFToken:      ctx.XSRFToken,
 			IsPartial:      ctx.IsPartial,
 			IsEditing:      true,
@@ -103,7 +103,7 @@ func EditFeeDecision(client EditFeeDecisionClient, tmpl template.Template) Handl
 		}
 
 		if r.Method == http.MethodPost {
-			err := client.EditFeeDecision(
+			err := client.UpdateFeeDecision(
 				ctx,
 				caseID,
 				feeDecisionID,
