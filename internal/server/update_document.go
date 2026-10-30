@@ -407,7 +407,7 @@ func UpdateDocument(client UpdateDocumentClient, tmpl template.Template) Handler
 					return err
 				}
 
-				if documentControls == "delete" || documentControls == "publish" || documentControls == "preview" {
+				if documentControls == "delete" || documentControls == "publish" || documentControls == "publishAndSend" || documentControls == "preview" {
 					if len(data.Documents) > 0 {
 						defaultDocumentUUID := data.Documents[0].UUID
 						documentToDisplay, err := client.DocumentByUUID(ctx, defaultDocumentUUID)

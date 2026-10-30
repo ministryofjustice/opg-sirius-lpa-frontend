@@ -1,4 +1,29 @@
 describe("Edit a document", () => {
+  const visitWithNotifySettings = (sendingLettersViaNotify, usesNotify) => {
+    cy.addMock("/lpa-api/v1/templates/lpa", "GET", {
+      status: 200,
+      body: {
+        "LP-A": {
+          label: "LPA Registered Notification",
+          inserts: {},
+          govukNotify: usesNotify,
+        },
+      },
+    });
+
+    cy.addMock("/config", "GET", {
+      status: 200,
+      body: {
+        featureToggles: {
+          poasBlankSections: true,
+          poasSendingLettersViaNotify: sendingLettersViaNotify,
+        },
+      },
+    });
+
+    cy.visit("/edit-document?id=800&case=lpa");
+  };
+
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/cases/800", "GET", {
       status: 200,
@@ -35,9 +60,10 @@ describe("Edit a document", () => {
     cy.addMock("/lpa-api/v1/templates/lpa", "GET", {
       status: 200,
       body: {
-        DD: {
+        "LP-A": {
           label: "LPA Registered Notification",
           inserts: {},
+          govukNotify: false,
         },
       },
     });
@@ -47,6 +73,7 @@ describe("Edit a document", () => {
       body: {
         featureToggles: {
           poasBlankSections: true,
+          poasSendingLettersViaNotify: false,
         },
       },
     });
@@ -60,8 +87,44 @@ describe("Edit a document", () => {
     cy.contains("button", "Preview draft");
     cy.contains("button", "Delete draft");
     cy.contains("button", "Publish draft");
+    cy.contains("button", "Publish and post via Notify").should("not.exist");
+    cy.contains("button", "Publish and Send").should("not.exist");
+    cy.contains(
+      "When you publish this letter it will automatically be sent via GOV.UK Notify",
+    ).should("not.exist");
     cy.contains("button", "Save and exit");
     cy.contains("span", "Insert blank sections of the LPA");
+  });
+
+  it("shows the send warning and button when the template uses Notify but the toggle is off", () => {
+    visitWithNotifySettings(false, true);
+
+    cy.contains(
+      "When you publish this letter it will automatically be sent via GOV.UK Notify",
+    ).should("exist");
+    cy.contains("button", "Publish and Send").should("exist");
+    cy.contains("button", "Publish draft").should("not.exist");
+    cy.contains("button", "Publish and post via Notify").should("not.exist");
+  });
+
+  it("shows the publish button without a warning when the toggle is on but the template does not use Notify", () => {
+    visitWithNotifySettings(true, false);
+
+    cy.contains("button", "Publish draft").should("exist");
+    cy.contains("button", "Publish and post via Notify").should("not.exist");
+    cy.contains("button", "Publish and Send").should("not.exist");
+    cy.contains("When you publish this letter").should("not.exist");
+  });
+
+  it("shows separate publish and send buttons when the toggle is on and the template uses Notify", () => {
+    visitWithNotifySettings(true, true);
+
+    cy.contains(
+      "When you publish this letter it will automatically be sent via GOV.UK Notify",
+    ).should("exist");
+    cy.contains("button", "Publish draft").should("exist");
+    cy.contains("button", "Publish and post via Notify").should("exist");
+    cy.contains("button", "Publish and Send").should("not.exist");
   });
 
   it("does not display the blank sections option on an EPA case", () => {
