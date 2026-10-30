@@ -222,9 +222,9 @@ $color-dark-bg-grey: #363639;
   .action-panel__button {
     span {
       background: linear-gradient(
-              to top,
-              govuk-colour("black") 0%,
-              $color-dark-bg-grey 100%
+        to top,
+        govuk-colour("black") 0%,
+        $color-dark-bg-grey 100%
       );
       border: 2px solid $sirius-bg-color;
     }
