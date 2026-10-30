@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
 	"github.com/pact-foundation/pact-go/v2/consumer"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
@@ -124,6 +125,119 @@ func TestCreateFeeDecision(t *testing.T) {
 					DateString("2023-10-18"),
 				)
 
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(config.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}
+
+func TestDeleteFeeDecision(t *testing.T) {
+	t.Parallel()
+
+	pact, err := newPact()
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		name          string
+		setup         func()
+		expectedError func(int) error
+	}{
+		{
+			name: "OK",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have a case with declined fee reductions").
+					UponReceiving("A request to delete a fee decision").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodDelete,
+						Path:   matchers.String("/lpa-api/v1/fee-decisions/1245"),
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status: http.StatusNoContent,
+					})
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
+
+				err := client.DeleteFeeDecision(Context{Context: context.Background()}, 1245)
+
+				if tc.expectedError == nil {
+					assert.Nil(t, err)
+				} else {
+					assert.Equal(t, tc.expectedError(config.Port), err)
+				}
+				return nil
+			}))
+		})
+	}
+}
+
+func TestGetFeeDecision(t *testing.T) {
+	t.Parallel()
+
+	pact, err := newPact()
+	assert.NoError(t, err)
+
+	testCases := []struct {
+		name             string
+		setup            func()
+		expectedError    func(int) error
+		expectedResponse FeeDecision
+	}{
+		{
+			name: "OK",
+			setup: func() {
+				pact.
+					AddInteraction().
+					Given("I have a case with declined fee reductions").
+					UponReceiving("A request to get a declined fee decision").
+					WithCompleteRequest(consumer.Request{
+						Method: http.MethodGet,
+						Path:   matchers.String("/lpa-api/v1/fee-decisions/1245"),
+					}).
+					WithCompleteResponse(consumer.Response{
+						Status: http.StatusOK,
+						Body: matchers.Like(map[string]interface{}{
+							"id":             matchers.Like(1245),
+							"decisionType":   matchers.String("DECLINED_EXEMPTION"),
+							"decisionReason": matchers.String("Test"),
+							"decisionDate":   matchers.String("01/03/2026"),
+						}),
+						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
+					})
+			},
+			expectedResponse: FeeDecision{
+				ID:             1245,
+				DecisionType:   shared.DecisionTypeExemption,
+				DecisionReason: "Test",
+				DecisionDate:   "01/03/2026",
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
+				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
+
+				feeDecision, err := client.GetFeeDecision(Context{Context: context.Background()}, 1245)
+
+				assert.Equal(t, tc.expectedResponse, feeDecision)
 				if tc.expectedError == nil {
 					assert.Nil(t, err)
 				} else {
