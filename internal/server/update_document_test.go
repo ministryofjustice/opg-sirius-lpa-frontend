@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -47,8 +48,8 @@ func (m *mockUpdateDocumentClient) DeleteDocument(ctx sirius.Context, uuid strin
 	return args.Error(0)
 }
 
-func (m *mockUpdateDocumentClient) CreateDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string, blankSections []string) (sirius.Document, error) {
-	args := m.Called(ctx, caseID, document, docType, blankSections)
+func (m *mockUpdateDocumentClient) CreateDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string, blankSections []string, sendViaNotify bool) (sirius.Document, error) {
+	args := m.Called(ctx, caseID, document, docType, blankSections, sendViaNotify)
 	return args.Get(0).(sirius.Document), args.Error(1)
 }
 
@@ -65,91 +66,97 @@ func (m *mockUpdateDocumentClient) FeatureToggles(ctx sirius.Context) (sirius.Fe
 func TestGetUpdateDocument(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa", "digital_lpa", "lpa_htmx"} {
 		t.Run(caseType, func(t *testing.T) {
-			htmx := false
-			if caseType == "lpa_htmx" {
-				htmx = true
-				caseType = "lpa"
+			for _, sendingLettersViaNotify := range []bool{false, true} {
+				t.Run(fmt.Sprintf("SendingLettersViaNotify=%t", sendingLettersViaNotify), func(t *testing.T) {
+					htmx := false
+					actualCaseType := caseType
+					if actualCaseType == "lpa_htmx" {
+						htmx = true
+						actualCaseType = "lpa"
+					}
+					caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: actualCaseType, UID: "7000"}
+
+					document := sirius.Document{
+						ID:         1,
+						UUID:       "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+						SystemType: "LP-LETTER",
+						Type:       sirius.TypeDraft,
+					}
+
+					documents := []sirius.Document{
+						document,
+					}
+
+					documentTemplates := []sirius.DocumentTemplateData{
+						{
+							TemplateId: "LP-LETTER",
+							UsesNotify: true,
+						},
+					}
+
+					client := &mockUpdateDocumentClient{}
+					client.
+						On("Case", mock.Anything, 155).
+						Return(caseItem, nil)
+					client.
+						On("Documents", mock.Anything, sirius.CaseType(actualCaseType), 155, []string{sirius.TypeDraft}, []string{}).
+						Return(documents, nil)
+					client.
+						On("DocumentByUUID", mock.Anything, document.UUID).
+						Return(document, nil)
+					client.
+						On("DocumentTemplates", mock.Anything, sirius.CaseType(actualCaseType)).
+						Return(documentTemplates, nil)
+					client.
+						On("FeatureToggles", mock.Anything).
+						Return(sirius.FeatureToggles{"poasSendingLettersViaNotify": sendingLettersViaNotify}, nil)
+
+					template := &mockTemplate{}
+					templateData := updateDocumentData{
+						IsPartial:               htmx,
+						SendingLettersViaNotify: sendingLettersViaNotify,
+						Case:                    caseItem,
+						DonorId:                 1,
+						Documents:               documents,
+						Document:                document,
+						UsesNotify:              true,
+						Section11:               Section11,
+						Section10And11:          Section10And11,
+						Section15:               Section15,
+						Section11And15:          Section11And15,
+						Section10And11And15:     Section10And11And15,
+						Section12And13And15:     Section12And13And15,
+					}
+
+					if actualCaseType == "digital_lpa" {
+						caseSummary := sirius.CaseSummary{DigitalLpa: sirius.DigitalLpa{}, TaskList: []sirius.Task{}}
+
+						client.
+							On("CaseSummary", mock.Anything, "7000").
+							Return(caseSummary, nil)
+
+						templateData.CaseSummary = caseSummary
+					}
+
+					template.
+						On("Func", mock.Anything, templateData).
+						Return(nil)
+
+					r, _ := http.NewRequest(http.MethodGet, "/?id=155&case="+actualCaseType, nil)
+					w := httptest.NewRecorder()
+
+					if htmx {
+						r.Header.Add("HX-Request", "true")
+					}
+
+					err := UpdateDocument(client, template.Func)(w, r)
+					resp := w.Result()
+
+					assert.Nil(t, err)
+					assert.Equal(t, http.StatusOK, resp.StatusCode)
+					mock.AssertExpectationsForObjects(t, client, template)
+				})
 			}
-			caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: caseType, UID: "7000"}
-
-			document := sirius.Document{
-				ID:         1,
-				UUID:       "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-				SystemType: "LP-LETTER",
-				Type:       sirius.TypeDraft,
-			}
-
-			documents := []sirius.Document{
-				document,
-			}
-
-			documentTemplates := []sirius.DocumentTemplateData{
-				{
-					TemplateId: "LP-LETTER",
-					UsesNotify: true,
-				},
-			}
-
-			client := &mockUpdateDocumentClient{}
-			client.
-				On("Case", mock.Anything, 155).
-				Return(caseItem, nil)
-			client.
-				On("Documents", mock.Anything, sirius.CaseType(caseType), 155, []string{sirius.TypeDraft}, []string{}).
-				Return(documents, nil)
-			client.
-				On("DocumentByUUID", mock.Anything, document.UUID).
-				Return(document, nil)
-			client.
-				On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
-				Return(documentTemplates, nil)
-			client.
-				On("FeatureToggles", mock.Anything).
-				Return(sirius.FeatureToggles{}, nil)
-
-			template := &mockTemplate{}
-			templateData := updateDocumentData{
-				IsPartial:           htmx,
-				Case:                caseItem,
-				DonorId:             1,
-				Documents:           documents,
-				Document:            document,
-				UsesNotify:          true,
-				Section11:           Section11,
-				Section10And11:      Section10And11,
-				Section15:           Section15,
-				Section11And15:      Section11And15,
-				Section10And11And15: Section10And11And15,
-				Section12And13And15: Section12And13And15,
-			}
-
-			if caseType == "digital_lpa" {
-				caseSummary := sirius.CaseSummary{DigitalLpa: sirius.DigitalLpa{}, TaskList: []sirius.Task{}}
-
-				client.
-					On("CaseSummary", mock.Anything, "7000").
-					Return(caseSummary, nil)
-
-				templateData.CaseSummary = caseSummary
-			}
-
-			template.
-				On("Func", mock.Anything, templateData).
-				Return(nil)
-
-			r, _ := http.NewRequest(http.MethodGet, "/?id=155&case="+caseType, nil)
-			w := httptest.NewRecorder()
-
-			if htmx {
-				r.Header.Add("HX-Request", "true")
-			}
-
-			err := UpdateDocument(client, template.Func)(w, r)
-			resp := w.Result()
-
-			assert.Nil(t, err)
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -328,94 +335,105 @@ func TestPostDeleteDocument(t *testing.T) {
 func TestPostPublishDocument(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa", "digital_lpa"} {
 		t.Run(caseType, func(t *testing.T) {
-			caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: caseType, UID: "700700"}
+			for _, tc := range []struct {
+				name            string
+				documentControl string
+				sendViaNotify   bool
+			}{
+				{name: "publish", documentControl: "publish"},
+				{name: "publishAndSend", documentControl: "publishAndSend", sendViaNotify: true},
+			} {
+				t.Run(tc.name, func(t *testing.T) {
+					caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: caseType, UID: "700700"}
 
-			document := sirius.Document{
-				ID:      1,
-				UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-				Type:    sirius.TypeDraft,
-				Content: "Test content",
+					document := sirius.Document{
+						ID:      1,
+						UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+						Type:    sirius.TypeDraft,
+						Content: "Test content",
+					}
+
+					documents := []sirius.Document{
+						document,
+					}
+
+					publishedDocument := sirius.Document{
+						ID:      1,
+						UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+						Type:    sirius.TypeSave,
+						Content: "Test content",
+					}
+					client := &mockUpdateDocumentClient{}
+					client.
+						On("UpdateDocument", mock.Anything, document.UUID, "Test content").
+						Return(document, nil)
+					client.
+						On("DocumentByUUID", mock.Anything, document.UUID).
+						Return(document, nil)
+					client.
+						On("CreateDocument", mock.Anything, 544, document, sirius.TypeSave, []string{}, tc.sendViaNotify).
+						Return(publishedDocument, nil)
+					client.
+						On("DeleteDocument", mock.Anything, document.UUID).
+						Return(nil)
+					client.
+						On("Case", mock.Anything, 544).
+						Return(caseItem, nil)
+					client.
+						On("FeatureToggles", mock.Anything).
+						Return(sirius.FeatureToggles{}, nil)
+
+					template := &mockTemplate{}
+					errExample = nil
+
+					if caseType == "digital_lpa" {
+						errExample = RedirectError("/lpa/700700/documents")
+					} else {
+						client.
+							On("Documents", mock.Anything, sirius.CaseType(caseType), 544, []string{sirius.TypeDraft}, []string{}).
+							Return(documents, nil)
+						client.
+							On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
+							Return([]sirius.DocumentTemplateData{}, nil)
+
+						template.
+							On("Func", mock.Anything, updateDocumentData{
+								Case:                caseItem,
+								DonorId:             1,
+								Documents:           documents,
+								Document:            document,
+								Success:             true,
+								Section11:           Section11,
+								Section10And11:      Section10And11,
+								Section15:           Section15,
+								Section11And15:      Section11And15,
+								Section10And11And15: Section10And11And15,
+								Section12And13And15: Section12And13And15,
+							}).
+							Return(nil)
+
+					}
+
+					form := url.Values{
+						"id":                 {"544"},
+						"case":               {caseType},
+						"documentControls":   {tc.documentControl},
+						"documentTextEditor": {"Test content"},
+						"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
+					}
+
+					r, _ := http.NewRequest(http.MethodPost, "/?id=544&case="+caseType, strings.NewReader(form.Encode()))
+					r.Header.Add("Content-Type", formUrlEncoded)
+					w := httptest.NewRecorder()
+
+					err := UpdateDocument(client, template.Func)(w, r)
+					resp := w.Result()
+
+					assert.Equal(t, errExample, err)
+					assert.Equal(t, http.StatusOK, resp.StatusCode)
+					mock.AssertExpectationsForObjects(t, client, template)
+				})
 			}
-
-			documents := []sirius.Document{
-				document,
-			}
-
-			publishedDocument := sirius.Document{
-				ID:      1,
-				UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-				Type:    sirius.TypeSave,
-				Content: "Test content",
-			}
-			client := &mockUpdateDocumentClient{}
-			client.
-				On("UpdateDocument", mock.Anything, document.UUID, "Test content").
-				Return(document, nil)
-			client.
-				On("DocumentByUUID", mock.Anything, document.UUID).
-				Return(document, nil)
-			client.
-				On("CreateDocument", mock.Anything, 544, document, sirius.TypeSave, []string{}).
-				Return(publishedDocument, nil)
-			client.
-				On("DeleteDocument", mock.Anything, document.UUID).
-				Return(nil)
-			client.
-				On("Case", mock.Anything, 544).
-				Return(caseItem, nil)
-			client.
-				On("FeatureToggles", mock.Anything).
-				Return(sirius.FeatureToggles{}, nil)
-
-			template := &mockTemplate{}
-			errExample = nil
-
-			if caseType == "digital_lpa" {
-				errExample = RedirectError("/lpa/700700/documents")
-			} else {
-				client.
-					On("Documents", mock.Anything, sirius.CaseType(caseType), 544, []string{sirius.TypeDraft}, []string{}).
-					Return(documents, nil)
-				client.
-					On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
-					Return([]sirius.DocumentTemplateData{}, nil)
-
-				template.
-					On("Func", mock.Anything, updateDocumentData{
-						Case:                caseItem,
-						DonorId:             1,
-						Documents:           documents,
-						Document:            document,
-						Success:             true,
-						Section11:           Section11,
-						Section10And11:      Section10And11,
-						Section15:           Section15,
-						Section11And15:      Section11And15,
-						Section10And11And15: Section10And11And15,
-						Section12And13And15: Section12And13And15,
-					}).
-					Return(nil)
-
-			}
-
-			form := url.Values{
-				"id":                 {"544"},
-				"case":               {caseType},
-				"documentControls":   {"publish"},
-				"documentTextEditor": {"Test content"},
-				"documentUUID":       {"dfef6714-b4fe-44c2-b26e-90dfe3663e95"},
-			}
-
-			r, _ := http.NewRequest(http.MethodPost, "/?id=544&case="+caseType, strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", formUrlEncoded)
-			w := httptest.NewRecorder()
-
-			err := UpdateDocument(client, template.Func)(w, r)
-			resp := w.Result()
-
-			assert.Equal(t, errExample, err)
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -790,7 +808,7 @@ func TestPostPublishDocumentWithBlankSections(t *testing.T) {
 				On("DocumentByUUID", mock.Anything, document.UUID).
 				Return(document, nil)
 			client.
-				On("CreateDocument", mock.Anything, 544, document, sirius.TypeSave, tc.blankSections).
+				On("CreateDocument", mock.Anything, 544, document, sirius.TypeSave, tc.blankSections, false).
 				Return(publishedDocument, nil).
 				Return(publishedDocument, nil)
 			client.
