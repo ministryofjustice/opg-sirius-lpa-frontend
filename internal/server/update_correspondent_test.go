@@ -13,26 +13,26 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type mockEditCorrespondentClient struct {
+type mockUpdateCorrespondentClient struct {
 	mock.Mock
 }
 
-func (m *mockEditCorrespondentClient) Epa(ctx sirius.Context, id int) (sirius.Epa, error) {
+func (m *mockUpdateCorrespondentClient) Epa(ctx sirius.Context, id int) (sirius.Epa, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(sirius.Epa), args.Error(1)
 }
 
-func (m *mockEditCorrespondentClient) Lpa(ctx sirius.Context, id int) (sirius.Lpa, error) {
+func (m *mockUpdateCorrespondentClient) Lpa(ctx sirius.Context, id int) (sirius.Lpa, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(sirius.Lpa), args.Error(1)
 }
 
-func (m *mockEditCorrespondentClient) UpdateCorrespondent(ctx sirius.Context, correspondentId int, correspondent sirius.Correspondent) error {
+func (m *mockUpdateCorrespondentClient) UpdateCorrespondent(ctx sirius.Context, correspondentId int, correspondent sirius.Correspondent) error {
 	args := m.Called(ctx, correspondentId, correspondent)
 	return args.Error(0)
 }
 
-func TestGetEditCorrespondent(t *testing.T) {
+func TestGetUpdateCorrespondent(t *testing.T) {
 	cases := []struct {
 		name      string
 		caseType  string
@@ -53,7 +53,7 @@ func TestGetEditCorrespondent(t *testing.T) {
 				},
 			}
 
-			client := &mockEditCorrespondentClient{}
+			client := &mockUpdateCorrespondentClient{}
 			if tc.caseType == "epa" {
 				client.
 					On("Epa", mock.Anything, 2).
@@ -80,7 +80,7 @@ func TestGetEditCorrespondent(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "/edit-correspondent?id=1&caseId=2&caseType="+tc.caseType+tc.flowQuery, nil)
 			w := httptest.NewRecorder()
 
-			err := EditCorrespondent(client, template.Func)(w, r)
+			err := UpdateCorrespondent(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -90,10 +90,10 @@ func TestGetEditCorrespondent(t *testing.T) {
 	}
 }
 
-func TestGetEditCorrespondentWhenFetchCaseFails(t *testing.T) {
+func TestGetUpdateCorrespondentWhenFetchCaseFails(t *testing.T) {
 	for _, caseType := range []string{"epa", "lpa"} {
 		t.Run(caseType, func(t *testing.T) {
-			client := &mockEditCorrespondentClient{}
+			client := &mockUpdateCorrespondentClient{}
 			if caseType == "epa" {
 				client.
 					On("Epa", mock.Anything, 2).
@@ -107,7 +107,7 @@ func TestGetEditCorrespondentWhenFetchCaseFails(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "/edit-correspondent?id=1&caseId=2&caseType="+caseType, nil)
 			w := httptest.NewRecorder()
 
-			err := EditCorrespondent(client, nil)(w, r)
+			err := UpdateCorrespondent(client, nil)(w, r)
 
 			assert.Equal(t, errExample, err)
 			mock.AssertExpectationsForObjects(t, client)
@@ -115,7 +115,7 @@ func TestGetEditCorrespondentWhenFetchCaseFails(t *testing.T) {
 	}
 }
 
-func TestGetEditCorrespondentBadQuery(t *testing.T) {
+func TestGetUpdateCorrespondentBadQuery(t *testing.T) {
 	testCases := map[string]string{
 		"no-id":       "/",
 		"bad-id":      "/?id=test",
@@ -127,14 +127,14 @@ func TestGetEditCorrespondentBadQuery(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, query, nil)
 			w := httptest.NewRecorder()
 
-			err := EditCorrespondent(nil, nil)(w, r)
+			err := UpdateCorrespondent(nil, nil)(w, r)
 
 			assert.NotNil(t, err)
 		})
 	}
 }
 
-func TestPostEditCorrespondent(t *testing.T) {
+func TestPostUpdateCorrespondent(t *testing.T) {
 	cases := []struct {
 		name      string
 		caseType  string
@@ -182,7 +182,7 @@ func TestPostEditCorrespondent(t *testing.T) {
 				},
 			}
 
-			client := &mockEditCorrespondentClient{}
+			client := &mockUpdateCorrespondentClient{}
 			if tc.caseType == "epa" {
 				client.
 					On("Epa", mock.Anything, 2).
@@ -217,7 +217,7 @@ func TestPostEditCorrespondent(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := EditCorrespondent(client, nil)(w, r)
+			err := UpdateCorrespondent(client, nil)(w, r)
 			resp := w.Result()
 
 			assert.Equal(t, RedirectError(tc.redirect), err)
@@ -227,7 +227,7 @@ func TestPostEditCorrespondent(t *testing.T) {
 	}
 }
 
-func TestPostEditCorrespondentValidationErrors(t *testing.T) {
+func TestPostUpdateCorrespondentValidationErrors(t *testing.T) {
 	cases := []struct {
 		name        string
 		caseType    string
@@ -272,7 +272,7 @@ func TestPostEditCorrespondentValidationErrors(t *testing.T) {
 				},
 			}
 
-			client := &mockEditCorrespondentClient{}
+			client := &mockUpdateCorrespondentClient{}
 			if tc.caseType == "epa" {
 				client.
 					On("Epa", mock.Anything, 2).
@@ -320,7 +320,7 @@ func TestPostEditCorrespondentValidationErrors(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := EditCorrespondent(client, template.Func)(w, r)
+			err := UpdateCorrespondent(client, template.Func)(w, r)
 			resp := w.Result()
 
 			assert.Nil(t, err)
@@ -330,7 +330,7 @@ func TestPostEditCorrespondentValidationErrors(t *testing.T) {
 	}
 }
 
-func TestPostEditCorrespondentApiErrors(t *testing.T) {
+func TestPostUpdateCorrespondentApiErrors(t *testing.T) {
 	cases := []struct {
 		name        string
 		caseType    string
@@ -371,7 +371,7 @@ func TestPostEditCorrespondentApiErrors(t *testing.T) {
 				},
 			}
 
-			client := &mockEditCorrespondentClient{}
+			client := &mockUpdateCorrespondentClient{}
 			if tc.caseType == "epa" {
 				client.
 					On("Epa", mock.Anything, 2).
@@ -406,7 +406,7 @@ func TestPostEditCorrespondentApiErrors(t *testing.T) {
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
-			err := EditCorrespondent(client, nil)(w, r)
+			err := UpdateCorrespondent(client, nil)(w, r)
 
 			assert.Equal(t, tc.expectedErr, err)
 			mock.AssertExpectationsForObjects(t, client)

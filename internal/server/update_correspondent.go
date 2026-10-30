@@ -9,13 +9,13 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-type EditCorrespondentClient interface {
+type UpdateCorrespondentClient interface {
 	Epa(ctx sirius.Context, id int) (sirius.Epa, error)
 	Lpa(ctx sirius.Context, id int) (sirius.Lpa, error)
 	UpdateCorrespondent(ctx sirius.Context, correspondentId int, correspondent sirius.Correspondent) error
 }
 
-func EditCorrespondent(client EditCorrespondentClient, tmpl template.Template) Handler {
+func UpdateCorrespondent(client UpdateCorrespondentClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
