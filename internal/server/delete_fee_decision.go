@@ -22,7 +22,6 @@ type deleteFeeDecisionData struct {
 	ReturnUrl       string
 	IsPartial       bool
 	HtmxRedirect    string
-	FeeDecisionID   int
 	FeeDecisionType string
 }
 
@@ -62,20 +61,17 @@ func DeleteFeeDecision(client DeleteFeeDecisionClient, tmpl template.Template) H
 
 		if r.Method == http.MethodPost {
 			err = client.DeleteFeeDecision(ctx, feeDecisionID)
-			if ve, ok := err.(sirius.ValidationError); ok {
-				w.WriteHeader(http.StatusBadRequest)
-				data.Error = ve
-			} else if err != nil {
+			if err != nil {
 				return err
-			} else {
-				SetFlash(w, FlashNotification{Title: "Successfully  deleted a declined fee reduction"})
-
-				if ctx.IsPartial {
-					data.HtmxRedirect = data.ReturnUrl
-					return tmpl(w, data)
-				}
-				return RedirectError(data.ReturnUrl)
 			}
+
+			SetFlash(w, FlashNotification{Title: "Successfully  deleted a declined fee reduction"})
+
+			if ctx.IsPartial {
+				data.HtmxRedirect = data.ReturnUrl
+				return tmpl(w, data)
+			}
+			return RedirectError(data.ReturnUrl)
 		}
 
 		return tmpl(w, data)
