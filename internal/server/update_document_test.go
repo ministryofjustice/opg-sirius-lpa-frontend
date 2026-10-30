@@ -393,6 +393,7 @@ func TestPostPublishDocument(t *testing.T) {
 						Section11And15:      Section11And15,
 						Section10And11And15: Section10And11And15,
 						Section12And13And15: Section12And13And15,
+						CreatedDocument:     publishedDocument,
 					}).
 					Return(nil)
 
@@ -829,6 +830,7 @@ func TestPostPublishDocumentWithBlankSections(t *testing.T) {
 					Section11And15:        Section11And15,
 					Section10And11And15:   Section10And11And15,
 					Section12And13And15:   Section12And13And15,
+					CreatedDocument:       publishedDocument,
 				}).
 				Return(nil)
 

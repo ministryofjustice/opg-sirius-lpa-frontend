@@ -1375,4 +1375,8 @@ $app-case-page-action-panel-height: calc(
   .govuk-accordion-nav__chevron::after {
     left: 0.37rem;
   }
+
+  .moj-alert__content--multiline {
+    white-space: pre-line;
+  }
 }
