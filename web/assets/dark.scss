@@ -181,6 +181,7 @@ $color-dark-bg-grey: #363639;
       stroke: $sirius-bg-color;
       fill: $sirius-bg-color;
     }
+
     [data-svg-elt="border"] {
       fill: govuk-colour("white");
     }
@@ -191,6 +192,7 @@ $color-dark-bg-grey: #363639;
       stroke: $sirius-bg-color;
       fill: $sirius-bg-color;
     }
+
     [data-svg-elt="border"],
     [data-svg-elt="tick"] {
       fill: govuk-colour("white");
@@ -220,14 +222,19 @@ $color-dark-bg-grey: #363639;
   .action-panel__button {
     span {
       background: linear-gradient(
-        to top,
-        govuk-colour("black") 0%,
-        $color-dark-bg-grey 100%
+              to top,
+              govuk-colour("black") 0%,
+              $color-dark-bg-grey 100%
       );
       border: 2px solid $sirius-bg-color;
     }
+
     svg {
       color: govuk-colour("white");
     }
+  }
+
+  .moj-alert__content--multiline {
+    white-space: pre-line;
   }
 }
