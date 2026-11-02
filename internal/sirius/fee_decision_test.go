@@ -213,8 +213,8 @@ func TestGetFeeDecision(t *testing.T) {
 						Body: matchers.Like(map[string]interface{}{
 							"id":             matchers.Like(1245),
 							"decisionType":   matchers.String("DECLINED_EXEMPTION"),
-							"decisionReason": matchers.String("Test"),
-							"decisionDate":   matchers.String("01/03/2026"),
+							"decisionReason": matchers.String("Cant have it sorry"),
+							"decisionDate":   matchers.String("23/08/2022"),
 						}),
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
@@ -222,8 +222,8 @@ func TestGetFeeDecision(t *testing.T) {
 			expectedResponse: FeeDecision{
 				ID:             1245,
 				DecisionType:   shared.DecisionTypeExemption,
-				DecisionReason: "Test",
-				DecisionDate:   DateString("2026-03-01"),
+				DecisionReason: "Cant have it sorry",
+				DecisionDate:   DateString("2022-08-23"),
 			},
 		},
 	}
