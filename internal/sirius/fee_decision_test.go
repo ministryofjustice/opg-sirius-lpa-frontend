@@ -223,7 +223,7 @@ func TestGetFeeDecision(t *testing.T) {
 				ID:             1245,
 				DecisionType:   shared.DecisionTypeExemption,
 				DecisionReason: "Test",
-				DecisionDate:   "2026-03-01",
+				DecisionDate:   "01/03/2026",
 			},
 		},
 	}
