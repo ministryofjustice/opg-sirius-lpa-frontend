@@ -139,42 +139,48 @@ func TestCreateFeeDecisionInvalidPostData(t *testing.T) {
 	template := &mockTemplate{}
 
 	for _, test := range testCases {
-		t.Run(test.name, func(t *testing.T) {
-			client.
-				On("Case", mock.Anything, 22222).
-				Return(caseItem, nil)
-			client.
-				On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
-				Return(feeDecisionTypes, nil)
-			client.
-				On("CreateFeeDecision",
-					mock.Anything,
-					22222,
-					test.expectedTemplateData.DecisionType,
-					test.expectedTemplateData.DecisionReason,
-					sirius.DateString(test.expectedTemplateData.DecisionDate)).
-				Return(test.expectedValidationError)
+		for _, isHtmx := range []bool{false, true} {
+			t.Run(test.name, func(t *testing.T) {
+				client.
+					On("Case", mock.Anything, 22222).
+					Return(caseItem, nil)
+				client.
+					On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
+					Return(feeDecisionTypes, nil)
+				client.
+					On("CreateFeeDecision",
+						mock.Anything,
+						22222,
+						test.expectedTemplateData.DecisionType,
+						test.expectedTemplateData.DecisionReason,
+						sirius.DateString(test.expectedTemplateData.DecisionDate)).
+					Return(test.expectedValidationError)
 
-			test.expectedTemplateData.Case = caseItem
-			test.expectedTemplateData.DecisionTypes = feeDecisionTypes
-			test.expectedTemplateData.ReturnUrl = "/lpa/M-AAAA-BBBB-DDDD/payments"
-			test.expectedTemplateData.Error = test.expectedValidationError
+				test.expectedTemplateData.Case = caseItem
+				test.expectedTemplateData.DecisionTypes = feeDecisionTypes
+				test.expectedTemplateData.ReturnUrl = "/lpa/M-AAAA-BBBB-DDDD/payments"
+				test.expectedTemplateData.Error = test.expectedValidationError
+				test.expectedTemplateData.IsPartial = isHtmx
 
-			template.
-				On("Func", mock.Anything, test.expectedTemplateData).
-				Return(nil)
+				template.
+					On("Func", mock.Anything, test.expectedTemplateData).
+					Return(nil)
 
-			r, _ := http.NewRequest(http.MethodPost, "/?id=22222", strings.NewReader(test.postData.Encode()))
-			r.Header.Add("Content-Type", formUrlEncoded)
-			w := httptest.NewRecorder()
+				r, _ := http.NewRequest(http.MethodPost, "/?id=22222", strings.NewReader(test.postData.Encode()))
+				r.Header.Add("Content-Type", formUrlEncoded)
+				if isHtmx {
+					r.Header.Add("HX-Request", "true")
+				}
+				w := httptest.NewRecorder()
 
-			err := CreateFeeDecision(client, template.Func)(w, r)
+				err := CreateFeeDecision(client, template.Func)(w, r)
 
-			resp := w.Result()
-			mock.AssertExpectationsForObjects(t, client, template)
-			assert.Nil(t, err)
-			assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-		})
+				resp := w.Result()
+				mock.AssertExpectationsForObjects(t, client, template)
+				assert.Nil(t, err)
+				assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+			})
+		}
 	}
 }
 
@@ -321,6 +327,53 @@ func TestCreateFeeDecisionToDigitalLpaPostSuccess(t *testing.T) {
 	resp := w.Result()
 
 	assert.Equal(t, RedirectError("/lpa/M-AAAA-BBBB-DDDD/payments"), err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestPostCreateFeeDecisionHTMX(t *testing.T) {
+	caseItem := sirius.Case{ID: 454, UID: "M-AAAA-BBBB-DDDD", CaseType: "DIGITAL_LPA"}
+
+	client := &mockCreateFeeDecisionClient{}
+	client.
+		On("CreateFeeDecision", mock.Anything, 454, "DECLINED_REMISSION", "Invalid evidence", sirius.DateString("2023-10-10")).
+		Return(nil)
+	client.
+		On("Case", mock.Anything, 454).
+		Return(caseItem, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
+		Return(feeDecisionTypes, nil)
+
+	template := &mockTemplate{}
+	template.
+		On("Func", mock.Anything, createFeeDecisionData{
+			Case:           caseItem,
+			DecisionTypes:  feeDecisionTypes,
+			DecisionType:   "DECLINED_REMISSION",
+			DecisionReason: "Invalid evidence",
+			DecisionDate:   "2023-10-10",
+			IsPartial:      true,
+			ReturnUrl:      "/lpa/M-AAAA-BBBB-DDDD/payments",
+			HtmxRedirect:   "/lpa/M-AAAA-BBBB-DDDD/payments",
+		}).
+		Return(nil)
+
+	form := url.Values{
+		"decisionReason": {"Invalid evidence"},
+		"decisionType":   {"DECLINED_REMISSION"},
+		"decisionDate":   {"2023-10-10"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=454", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	r.Header.Add("HX-Request", "true")
+	w := httptest.NewRecorder()
+
+	err := CreateFeeDecision(client, template.Func)(w, r)
+	resp := w.Result()
+
+	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
 }

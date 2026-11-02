@@ -15,11 +15,11 @@
             ></span>
         {{ end }}
 
-        <h1 class="govuk-heading-m">Decline a fee reduction</h1>
+        <h1 class="govuk-heading-m">{{ if .IsEditing }}Edit a declined fee reduction{{ else }}Decline a fee reduction{{ end }}</h1>
 
         <form class="form"
                 method="POST"
-                hx-post="{{ prefix (printf "/create-decline-fee-decision?id=%d" .Case.ID) }}"
+                hx-post="{{ if .IsEditing }}{{ prefix (printf "/update-decline-fee-reduction?caseId=%d&feeDecisionId=%d" .Case.ID .FeeDecisionID) }}{{ else }}{{ prefix (printf "/create-decline-fee-decision?id=%d" .Case.ID) }}{{ end }}"
                 hx-target=".action-panel__content"
                 hx-swap="innerHTML">
             <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
@@ -38,7 +38,7 @@
     </div>
 {{ end }}
 
-{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}Decline a fee reduction{{ end }}
+{{ define "title" }}{{ if .Error.Any }}Error: {{ end }}{{ if .IsEditing }}Edit a declined fee reduction{{ else }}Decline a fee reduction{{ end }}{{ end }}
 
 {{ define "main" }}
     <div class="govuk-grid-row">
@@ -47,9 +47,9 @@
 
             {{ template "error-summary" .Error }}
 
-            <h1 class="govuk-heading-l">Decline a fee reduction</h1>
+            <h1 class="govuk-heading-l">{{ if .IsEditing }}Edit a declined fee reduction{{ else }}Decline a fee reduction{{ end }}</h1>
 
-            <form class="form" method="POST">
+            <form class="form" method="POST" {{ if .IsEditing }}action="{{ prefix (printf "/update-decline-fee-reduction?caseId=%d&feeDecisionId=%d" .Case.ID .FeeDecisionID) }}"{{ end }}>
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
 
                 {{ template "form-content" . }}
