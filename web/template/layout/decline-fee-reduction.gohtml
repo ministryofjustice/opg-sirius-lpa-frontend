@@ -25,21 +25,21 @@
                             <th scope="row" class="govuk-table__header">Reason:</th>
                             <td class="govuk-table__cell app-!-pre-wrap">{{ $p.DecisionReason }}</td>
                         </tr>
-{{/*                        <tr class="govuk-table__row">*/}}
-{{/*                            <th scope="row" class="govuk-table__header app-!-table-row__no-border"*/}}
-{{/*                                colspan="2">*/}}
-{{/*                                <a class="govuk-link"*/}}
-{{/*                                   {{ if $.InActionPanel }}*/}}
-{{/*                                   href=""*/}}
-{{/*                                   hx-get="{{ prefix (printf "/update-decline-fee-reduction?id=%d" .ID) }}"*/}}
-{{/*                                   hx-target=".action-panel__content"*/}}
-{{/*                                   hx-swap="innerHTML"*/}}
-{{/*                                   {{ else }}*/}}
-{{/*                                   href="{{ prefix (printf "/update-decline-fee-reduction?id=%d" .ID) }}"*/}}
-{{/*                                   {{ end }}>*/}}
-{{/*                                    Edit decline fee reduction*/}}
-{{/*                                </a>*/}}
-{{/*                            </th>*/}}
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header app-!-table-row__no-border"
+                                colspan="2">
+                                <a class="govuk-link"
+                                   {{ if $.InActionPanel }}
+                                   href=""
+                                   hx-get="{{ prefix (printf "/update-decline-fee-reduction?caseId=%d&feeDecisionId=%d" $.Case.ID .ID) }}"
+                                   hx-target=".action-panel__content"
+                                   hx-swap="innerHTML"
+                                   {{ else }}
+                                   href="{{ prefix (printf "/update-decline-fee-reduction?caseId=%d&feeDecisionId=%d" $.Case.ID .ID) }}"
+                                   {{ end }}>
+                                    Edit declined fee reduction
+                                </a>
+                            </th>
 {{/*                        </tr>*/}}
 {{/*                        <tr class="govuk-table__row">*/}}
 {{/*                            <th scope="row" class="govuk-table__header app-!-table-row__no-border"*/}}
