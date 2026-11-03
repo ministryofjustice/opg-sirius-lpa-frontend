@@ -310,7 +310,7 @@ func TestFeeDecisionsByCase(t *testing.T) {
 		name             string
 		id               int
 		setup            func()
-		expectedResponse []DeclineFeeReductions
+		expectedResponse []FeeDecision
 		expectedError    func(int) error
 	}{
 		{
@@ -336,7 +336,7 @@ func TestFeeDecisionsByCase(t *testing.T) {
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
-			expectedResponse: []DeclineFeeReductions{
+			expectedResponse: []FeeDecision{
 				{
 					ID:             1245,
 					DecisionDate:   "2022-08-23",

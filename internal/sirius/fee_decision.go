@@ -7,10 +7,10 @@ import (
 )
 
 type FeeDecision struct {
-	ID             int                 `json:"id"`
-	DecisionType   shared.DecisionType `json:"decisionType"`
-	DecisionReason string              `json:"decisionReason"`
-	DecisionDate   DateString          `json:"decisionDate"`
+	ID             int                 `json:"id,omitempty"`
+	DecisionDate   DateString          `json:"decisionDate,omitempty"`
+	DecisionType   shared.DecisionType `json:"decisionType,omitempty"`
+	DecisionReason string              `json:"decisionReason,omitempty"`
 }
 
 func (c *Client) CreateFeeDecision(ctx Context, caseID int, decisionType string, decisionReason string, decisionDate DateString) error {
@@ -54,20 +54,13 @@ func (c *Client) UpdateFeeDecision(ctx Context, caseID int, feeDecisionID int, d
 	return c.put(ctx, path, data, nil)
 }
 
-type DeclineFeeReductions struct {
-	ID             int                 `json:"id,omitempty"`
-	DecisionDate   DateString          `json:"decisionDate,omitempty"`
-	DecisionType   shared.DecisionType `json:"decisionType,omitempty"`
-	DecisionReason string              `json:"decisionReason,omitempty"`
-}
+func (c *Client) FeeDecisionsByCase(ctx Context, id int) ([]FeeDecision, error) {
+	var feeDecisions []FeeDecision
 
-func (c *Client) FeeDecisionsByCase(ctx Context, id int) ([]DeclineFeeReductions, error) {
-	var declineFeeReductions []DeclineFeeReductions
-
-	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/cases/%d/fee-decisions", id), &declineFeeReductions)
+	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/cases/%d/fee-decisions", id), &feeDecisions)
 	if err != nil {
 		return nil, err
 	}
 
-	return declineFeeReductions, nil
+	return feeDecisions, nil
 }

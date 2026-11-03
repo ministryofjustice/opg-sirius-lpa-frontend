@@ -12,7 +12,7 @@ import (
 type GetPaymentsClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	Payments(ctx sirius.Context, id int) ([]sirius.Payment, error)
-	FeeDecisionsByCase(ctx sirius.Context, id int) ([]sirius.DeclineFeeReductions, error)
+	FeeDecisionsByCase(ctx sirius.Context, id int) ([]sirius.FeeDecision, error)
 	Case(sirius.Context, int) (sirius.Case, error)
 	GetUserDetails(sirius.Context) (sirius.User, error)
 	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
@@ -38,7 +38,7 @@ type getPaymentsData struct {
 	FlashMessage         FlashNotification
 	InActionPanel        bool
 	IsPartial            bool
-	DeclineFeeReductions []sirius.DeclineFeeReductions
+	DeclineFeeReductions []sirius.FeeDecision
 }
 
 func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {

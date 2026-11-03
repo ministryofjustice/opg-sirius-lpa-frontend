@@ -22,10 +22,10 @@ func (m *mockUpdateFeeDecisionClient) Case(ctx sirius.Context, id int) (sirius.C
 	return args.Get(0).(sirius.Case), args.Error(1)
 }
 
-func (m *mockUpdateFeeDecisionClient) FeeDecisionsByCase(ctx sirius.Context, id int) ([]sirius.DeclineFeeReductions, error) {
+func (m *mockUpdateFeeDecisionClient) FeeDecisionsByCase(ctx sirius.Context, id int) ([]sirius.FeeDecision, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) != nil {
-		return args.Get(0).([]sirius.DeclineFeeReductions), args.Error(1)
+		return args.Get(0).([]sirius.FeeDecision), args.Error(1)
 	}
 	return nil, args.Error(1)
 }
@@ -44,7 +44,7 @@ func (m *mockUpdateFeeDecisionClient) RefDataByCategory(ctx sirius.Context, cate
 
 func TestGetUpdateFeeDecision(t *testing.T) {
 	caseItem := sirius.Case{ID: 4, UID: "7000-0000-0021"}
-	decisions := []sirius.DeclineFeeReductions{
+	decisions := []sirius.FeeDecision{
 		{
 			ID:             123,
 			DecisionDate:   "2022-08-23",
@@ -89,7 +89,7 @@ func TestGetUpdateFeeDecision(t *testing.T) {
 
 func TestUpdateFeeDecisionOnPostSuccess(t *testing.T) {
 	caseItem := sirius.Case{ID: 4, UID: "M-AAAA-BBBB-DDDD", CaseType: "DIGITAL_LPA"}
-	decisions := []sirius.DeclineFeeReductions{{ID: 123, DecisionType: shared.DecisionTypeExemption}}
+	decisions := []sirius.FeeDecision{{ID: 123, DecisionType: shared.DecisionTypeExemption}}
 
 	client := &mockUpdateFeeDecisionClient{}
 	client.
@@ -119,7 +119,7 @@ func TestUpdateFeeDecisionOnPostSuccess(t *testing.T) {
 
 func TestUpdateFeeDecisionOnValidationError(t *testing.T) {
 	caseItem := sirius.Case{ID: 4, UID: "7000-0000-0021"}
-	decisions := []sirius.DeclineFeeReductions{{ID: 123, DecisionType: shared.DecisionTypeExemption}}
+	decisions := []sirius.FeeDecision{{ID: 123, DecisionType: shared.DecisionTypeExemption}}
 	validationError := sirius.ValidationError{
 		Field: sirius.FieldErrors{
 			"decisionReason": {"isInvalid": "Reason is invalid"},
@@ -169,7 +169,7 @@ func TestUpdateFeeDecisionOnValidationError(t *testing.T) {
 
 func TestPostUpdateFeeDecisionHTMX(t *testing.T) {
 	caseItem := sirius.Case{ID: 4, UID: "M-AAAA-BBBB-DDDD", CaseType: "DIGITAL_LPA"}
-	decisions := []sirius.DeclineFeeReductions{{ID: 123, DecisionType: shared.DecisionTypeExemption}}
+	decisions := []sirius.FeeDecision{{ID: 123, DecisionType: shared.DecisionTypeExemption}}
 
 	client := &mockUpdateFeeDecisionClient{}
 	client.
@@ -222,7 +222,7 @@ func TestUpdateFeeDecisionNotFound(t *testing.T) {
 		On("Case", mock.Anything, 4).
 		Return(sirius.Case{ID: 4}, nil).
 		On("FeeDecisionsByCase", mock.Anything, 4).
-		Return([]sirius.DeclineFeeReductions{}, nil).
+		Return([]sirius.FeeDecision{}, nil).
 		On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
 		Return(feeDecisionTypes, nil)
 
@@ -243,7 +243,7 @@ func TestUpdateFeeDecisionWhenRequestFails(t *testing.T) {
 				On("Case", mock.Anything, 4).
 				Return(sirius.Case{ID: 4}, errorForRequest(failedRequest, "Case")).
 				On("FeeDecisionsByCase", mock.Anything, 4).
-				Return([]sirius.DeclineFeeReductions{}, errorForRequest(failedRequest, "DeclineFeeReductions")).
+				Return([]sirius.FeeDecision{}, errorForRequest(failedRequest, "DeclineFeeReductions")).
 				On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
 				Return(feeDecisionTypes, errorForRequest(failedRequest, "RefDataByCategory"))
 

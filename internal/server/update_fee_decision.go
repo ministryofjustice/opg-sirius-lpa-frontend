@@ -12,7 +12,7 @@ import (
 
 type UpdateFeeDecisionClient interface {
 	Case(sirius.Context, int) (sirius.Case, error)
-	FeeDecisionsByCase(ctx sirius.Context, id int) ([]sirius.DeclineFeeReductions, error)
+	FeeDecisionsByCase(ctx sirius.Context, id int) ([]sirius.FeeDecision, error)
 	UpdateFeeDecision(ctx sirius.Context, caseID int, feeDecisionID int, decisionType string, decisionReason string, decisionDate sirius.DateString) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
@@ -56,7 +56,7 @@ func UpdateFeeDecision(client UpdateFeeDecisionClient, tmpl template.Template) H
 			DecisionDate:   postFormDateString(r, "decisionDate"),
 		}
 
-		var decisions []sirius.DeclineFeeReductions
+		var decisions []sirius.FeeDecision
 
 		group.Go(func() error {
 			var err error
