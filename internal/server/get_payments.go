@@ -12,7 +12,7 @@ import (
 type GetPaymentsClient interface {
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 	Payments(ctx sirius.Context, id int) ([]sirius.Payment, error)
-	DeclineFeeReductions(ctx sirius.Context, id int) ([]sirius.DeclineFeeReductions, error)
+	FeeDecisionsByCase(ctx sirius.Context, id int) ([]sirius.DeclineFeeReductions, error)
 	Case(sirius.Context, int) (sirius.Case, error)
 	GetUserDetails(sirius.Context) (sirius.User, error)
 	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
@@ -74,7 +74,7 @@ func GetPayments(client GetPaymentsClient, tmpl template.Template) Handler {
 				return err
 			}
 
-			data.DeclineFeeReductions, err = client.DeclineFeeReductions(ctx.With(groupCtx), caseID)
+			data.DeclineFeeReductions, err = client.FeeDecisionsByCase(ctx.With(groupCtx), caseID)
 			if err != nil {
 				return err
 			}
