@@ -11,16 +11,14 @@ describe("Edit a declined fee reduction", () => {
       },
     });
 
-    cy.addMock("/lpa-api/v1/cases/801/fee-decisions", "GET", {
+    cy.addMock("/lpa-api/v1/fee-decisions/123", "GET", {
       status: 200,
-      body: [
-        {
+      body: {
           id: 123,
           decisionDate: "09/10/2023",
           decisionType: "DECLINED_EXEMPTION",
           decisionReason: "Invalid evidence",
         },
-      ],
     });
 
     cy.addMock("/lpa-api/v1/cases/801/payments", "GET", {

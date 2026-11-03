@@ -22,12 +22,9 @@ func (m *mockUpdateFeeDecisionClient) Case(ctx sirius.Context, id int) (sirius.C
 	return args.Get(0).(sirius.Case), args.Error(1)
 }
 
-func (m *mockUpdateFeeDecisionClient) FeeDecisionsByCase(ctx sirius.Context, id int) ([]sirius.FeeDecision, error) {
-	args := m.Called(ctx, id)
-	if args.Get(0) != nil {
-		return args.Get(0).([]sirius.FeeDecision), args.Error(1)
-	}
-	return nil, args.Error(1)
+func (m *mockUpdateFeeDecisionClient) GetFeeDecision(ctx sirius.Context, feeDecisionID int) (sirius.FeeDecision, error) {
+	args := m.Called(ctx, feeDecisionID)
+	return args.Get(0).(sirius.FeeDecision), args.Error(1)
 }
 
 func (m *mockUpdateFeeDecisionClient) UpdateFeeDecision(ctx sirius.Context, caseID int, feeDecisionID int, decisionType string, decisionReason string, decisionDate sirius.DateString) error {
@@ -44,13 +41,11 @@ func (m *mockUpdateFeeDecisionClient) RefDataByCategory(ctx sirius.Context, cate
 
 func TestGetUpdateFeeDecision(t *testing.T) {
 	caseItem := sirius.Case{ID: 4, UID: "7000-0000-0021"}
-	decisions := []sirius.FeeDecision{
-		{
-			ID:             123,
-			DecisionDate:   "2022-08-23",
-			DecisionType:   shared.DecisionTypeExemption,
-			DecisionReason: "Insufficient evidence",
-		},
+	decision := sirius.FeeDecision{
+		ID:             123,
+		DecisionDate:   "2022-08-23",
+		DecisionType:   shared.DecisionTypeExemption,
+		DecisionReason: "Insufficient evidence",
 	}
 	decisionTypes := []sirius.RefDataItem{{Handle: "DECLINED_EXEMPTION", Label: "Declined exemption"}}
 
@@ -58,8 +53,8 @@ func TestGetUpdateFeeDecision(t *testing.T) {
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil).
-		On("FeeDecisionsByCase", mock.Anything, 4).
-		Return(decisions, nil).
+		On("GetFeeDecision", mock.Anything, 123).
+		Return(decision, nil).
 		On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
 		Return(decisionTypes, nil)
 
@@ -89,14 +84,14 @@ func TestGetUpdateFeeDecision(t *testing.T) {
 
 func TestUpdateFeeDecisionOnPostSuccess(t *testing.T) {
 	caseItem := sirius.Case{ID: 4, UID: "M-AAAA-BBBB-DDDD", CaseType: "DIGITAL_LPA"}
-	decisions := []sirius.FeeDecision{{ID: 123, DecisionType: shared.DecisionTypeExemption}}
+	decision := sirius.FeeDecision{ID: 123, DecisionType: shared.DecisionTypeExemption}
 
 	client := &mockUpdateFeeDecisionClient{}
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil).
-		On("FeeDecisionsByCase", mock.Anything, 4).
-		Return(decisions, nil).
+		On("GetFeeDecision", mock.Anything, 123).
+		Return(decision, nil).
 		On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
 		Return(feeDecisionTypes, nil).
 		On("UpdateFeeDecision", mock.Anything, 4, 123, "DECLINED_REMISSION", "Updated reason", sirius.DateString("2023-10-10")).
@@ -107,7 +102,7 @@ func TestUpdateFeeDecisionOnPostSuccess(t *testing.T) {
 		"decisionReason": {"Updated reason"},
 		"decisionDate":   {"2023-10-10"},
 	}
-	r, _ := http.NewRequest(http.MethodPost, "/?caseId=4&feeDecisionId=123", strings.NewReader(form.Encode()))
+	r, _ := http.NewRequest(http.MethodPost, "/update-decline-fee-reduction?caseId=4&feeDecisionId=123", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
 	w := httptest.NewRecorder()
 
@@ -119,7 +114,7 @@ func TestUpdateFeeDecisionOnPostSuccess(t *testing.T) {
 
 func TestUpdateFeeDecisionOnValidationError(t *testing.T) {
 	caseItem := sirius.Case{ID: 4, UID: "7000-0000-0021"}
-	decisions := []sirius.FeeDecision{{ID: 123, DecisionType: shared.DecisionTypeExemption}}
+	decision := sirius.FeeDecision{ID: 123, DecisionType: shared.DecisionTypeExemption}
 	validationError := sirius.ValidationError{
 		Field: sirius.FieldErrors{
 			"decisionReason": {"isInvalid": "Reason is invalid"},
@@ -130,8 +125,8 @@ func TestUpdateFeeDecisionOnValidationError(t *testing.T) {
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil).
-		On("FeeDecisionsByCase", mock.Anything, 4).
-		Return(decisions, nil).
+		On("GetFeeDecision", mock.Anything, 123).
+		Return(decision, nil).
 		On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
 		Return(feeDecisionTypes, nil).
 		On("UpdateFeeDecision", mock.Anything, 4, 123, "DECLINED_REMISSION", "Updated reason", sirius.DateString("2023-10-10")).
@@ -169,14 +164,14 @@ func TestUpdateFeeDecisionOnValidationError(t *testing.T) {
 
 func TestPostUpdateFeeDecisionHTMX(t *testing.T) {
 	caseItem := sirius.Case{ID: 4, UID: "M-AAAA-BBBB-DDDD", CaseType: "DIGITAL_LPA"}
-	decisions := []sirius.FeeDecision{{ID: 123, DecisionType: shared.DecisionTypeExemption}}
+	decision := sirius.FeeDecision{ID: 123, DecisionType: shared.DecisionTypeExemption}
 
 	client := &mockUpdateFeeDecisionClient{}
 	client.
 		On("Case", mock.Anything, 4).
 		Return(caseItem, nil).
-		On("FeeDecisionsByCase", mock.Anything, 4).
-		Return(decisions, nil).
+		On("GetFeeDecision", mock.Anything, 123).
+		Return(decision, nil).
 		On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
 		Return(feeDecisionTypes, nil).
 		On("UpdateFeeDecision", mock.Anything, 4, 123, "DECLINED_REMISSION", "Updated reason", sirius.DateString("2023-10-10")).
@@ -216,25 +211,6 @@ func TestPostUpdateFeeDecisionHTMX(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client, tmpl)
 }
 
-func TestUpdateFeeDecisionNotFound(t *testing.T) {
-	client := &mockUpdateFeeDecisionClient{}
-	client.
-		On("Case", mock.Anything, 4).
-		Return(sirius.Case{ID: 4}, nil).
-		On("FeeDecisionsByCase", mock.Anything, 4).
-		Return([]sirius.FeeDecision{}, nil).
-		On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
-		Return(feeDecisionTypes, nil)
-
-	r, _ := http.NewRequest(http.MethodGet, "/?caseId=4&feeDecisionId=123", nil)
-	w := httptest.NewRecorder()
-
-	err := UpdateFeeDecision(client, nil)(w, r)
-
-	assert.Equal(t, sirius.StatusError{Code: http.StatusNotFound}, err)
-	mock.AssertExpectationsForObjects(t, client)
-}
-
 func TestUpdateFeeDecisionWhenRequestFails(t *testing.T) {
 	for _, failedRequest := range []string{"Case", "DeclineFeeReductions", "RefDataByCategory"} {
 		t.Run(failedRequest, func(t *testing.T) {
@@ -242,8 +218,8 @@ func TestUpdateFeeDecisionWhenRequestFails(t *testing.T) {
 			client.
 				On("Case", mock.Anything, 4).
 				Return(sirius.Case{ID: 4}, errorForRequest(failedRequest, "Case")).
-				On("FeeDecisionsByCase", mock.Anything, 4).
-				Return([]sirius.FeeDecision{}, errorForRequest(failedRequest, "DeclineFeeReductions")).
+				On("GetFeeDecision", mock.Anything, 123).
+				Return(sirius.FeeDecision{}, errorForRequest(failedRequest, "DeclineFeeReductions")).
 				On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).
 				Return(feeDecisionTypes, errorForRequest(failedRequest, "RefDataByCategory"))
 
