@@ -121,9 +121,10 @@ describe("Edit a document", () => {
 
     cy.contains(
       "When you publish this letter it will automatically be sent via GOV.UK Notify",
-    ).should("exist");
-    cy.contains("button", "Publish draft").should("exist");
+    ).should("not.exist");
+    cy.contains("button", "Publish").should("exist");
     cy.contains("button", "Publish and post via Notify").should("exist");
+    cy.contains("button", "Publish draft").should("not.exist");
     cy.contains("button", "Publish and Send").should("not.exist");
   });
 
