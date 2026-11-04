@@ -508,14 +508,14 @@ func TestPostCreateLpaDropsOnlineLpaIdWhenNotOnline(t *testing.T) {
 		RepeatApplication:                shared.BoolPtr(false),
 		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
-			SubType:                                   "pfa",
-			ApplicationType:                           "Classic",
-			CaseAttorneySingular:                      shared.BoolPtr(true),
-			CaseAttorneyJointly:                       shared.BoolPtr(false),
-			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
+			SubType:                         "pfa",
+			ApplicationType:                 "Classic",
+			CaseAttorneySingular:            shared.BoolPtr(true),
+			CaseAttorneyJointly:             shared.BoolPtr(false),
+			CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
+			PaymentByCheque:  shared.BoolPtr(false),
+			PaymentExemption: shared.BoolPtr(false),
 		},
 	}
 
@@ -1835,13 +1835,13 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			name:        "Update attorney trust corporation redirects",
 			formKey:     "updateTrustCorporationAttorney",
 			formValue:   "111",
-			expectedErr: RedirectError("/create-trust-corporation?id=1&caseId=2&trustCorporationId=111&replacement=false"),
+			expectedErr: RedirectError("/update-trust-corporation?id=1&caseId=2&trustCorporationId=111&replacement=false"),
 		},
 		{
 			name:        "Update replacement attorney trust corporation redirects",
 			formKey:     "updateTrustCorporationReplacementAttorney",
 			formValue:   "111",
-			expectedErr: RedirectError("/create-trust-corporation?id=1&caseId=2&trustCorporationId=111&replacement=true"),
+			expectedErr: RedirectError("/update-trust-corporation?id=1&caseId=2&trustCorporationId=111&replacement=true"),
 		},
 	}
 
