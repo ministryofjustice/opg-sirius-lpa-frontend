@@ -336,15 +336,34 @@ func TestPostPublishDocument(t *testing.T) {
 	for _, caseType := range []string{"lpa", "epa", "digital_lpa"} {
 		t.Run(caseType, func(t *testing.T) {
 			for _, tc := range []struct {
-				name            string
-				documentControl string
-				sendViaNotify   bool
+				name              string
+				documentControl   string
+				sendViaNotify     bool
+				notifyStatus      string
+				noRemainingDrafts bool
 			}{
 				{name: "publish", documentControl: "publish"},
 				{name: "publishAndSend", documentControl: "publishAndSend", sendViaNotify: true},
+				{
+					name:            "publishAndSendPageLimitExceededWithRemainingDraft",
+					documentControl: "publishAndSend",
+					sendViaNotify:   true,
+					notifyStatus:    "page-limit-exceeded",
+				},
+				{
+					name:              "publishAndSendPageLimitExceededWithoutRemainingDraft",
+					documentControl:   "publishAndSend",
+					sendViaNotify:     true,
+					notifyStatus:      "page-limit-exceeded",
+					noRemainingDrafts: true,
+				},
 			} {
+				if caseType == "digital_lpa" && tc.notifyStatus != "" {
+					continue
+				}
+
 				t.Run(tc.name, func(t *testing.T) {
-					caseItem := sirius.Case{Donor: &sirius.Person{ID: 1}, CaseType: caseType, UID: "700700"}
+					caseItem := sirius.Case{ID: 544, Donor: &sirius.Person{ID: 1}, CaseType: caseType, UID: "700700"}
 
 					document := sirius.Document{
 						ID:      1,
@@ -356,12 +375,16 @@ func TestPostPublishDocument(t *testing.T) {
 					documents := []sirius.Document{
 						document,
 					}
+					if tc.noRemainingDrafts {
+						documents = []sirius.Document{}
+					}
 
 					publishedDocument := sirius.Document{
-						ID:      1,
-						UUID:    "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
-						Type:    sirius.TypeSave,
-						Content: "Test content",
+						ID:           1,
+						UUID:         "dfef6714-b4fe-44c2-b26e-90dfe3663e95",
+						Type:         sirius.TypeSave,
+						Content:      "Test content",
+						NotifyStatus: tc.notifyStatus,
 					}
 					client := &mockUpdateDocumentClient{}
 					client.
@@ -396,22 +419,35 @@ func TestPostPublishDocument(t *testing.T) {
 							On("DocumentTemplates", mock.Anything, sirius.CaseType(caseType)).
 							Return([]sirius.DocumentTemplateData{}, nil)
 
-						template.
-							On("Func", mock.Anything, updateDocumentData{
-								Case:                caseItem,
-								DonorId:             1,
-								Documents:           documents,
-								Document:            document,
-								Success:             true,
-								Section11:           Section11,
-								Section10And11:      Section10And11,
-								Section15:           Section15,
-								Section11And15:      Section11And15,
-								Section10And11And15: Section10And11And15,
-								Section12And13And15: Section12And13And15,
-								CreatedDocument:     publishedDocument,
-							}).
-							Return(nil)
+						if tc.notifyStatus == "" {
+							template.
+								On("Func", mock.Anything, updateDocumentData{
+									Case:                caseItem,
+									DonorId:             1,
+									Documents:           documents,
+									Document:            document,
+									Success:             true,
+									Section11:           Section11,
+									Section10And11:      Section10And11,
+									Section15:           Section15,
+									Section11And15:      Section11And15,
+									Section10And11And15: Section10And11And15,
+									Section12And13And15: Section12And13And15,
+									CreatedDocument:     publishedDocument,
+								}).
+								Return(nil)
+						} else {
+							defaultDocumentUUID := document.UUID
+							if tc.noRemainingDrafts {
+								defaultDocumentUUID = ""
+							}
+							errExample = RedirectError(fmt.Sprintf(
+								"/notify-error/1/%s/%s/544/700700?defaultDocumentUUID=%s",
+								publishedDocument.UUID,
+								caseType,
+								defaultDocumentUUID,
+							))
+						}
 
 					}
 
