@@ -1,0 +1,461 @@
+package server
+
+import (
+	"net/http"
+	"net/url"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
+
+type mockUpdateAttorneyDetailsClient struct {
+	mock.Mock
+}
+
+func (m *mockUpdateAttorneyDetailsClient) CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error) {
+	args := m.Called(ctx, uid)
+	return args.Get(0).(sirius.CaseSummary), args.Error(1)
+}
+
+func (m *mockUpdateAttorneyDetailsClient) RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error) {
+	args := m.Called(ctx, category)
+	if args.Get(0) != nil {
+		return args.Get(0).([]sirius.RefDataItem), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
+func (m *mockUpdateAttorneyDetailsClient) UpdateAttorneyDetails(ctx sirius.Context, caseUID string, attorneyUID string, attorneyDetailsData sirius.UpdateAttorneyDetails) error {
+	return m.Called(ctx, caseUID, attorneyUID, attorneyDetailsData).Error(0)
+}
+
+var testUpdateAttorneyDetailsCaseSummary = sirius.CaseSummary{
+	DigitalLpa: sirius.DigitalLpa{
+		UID: "M-DDDD-DDDD-DDDD",
+		LpaStoreData: sirius.LpaStoreData{
+			Attorneys: []sirius.LpaStoreAttorney{
+				{
+					LpaStorePerson: sirius.LpaStorePerson{
+						Uid:        "302b05c7-896c-4290-904e-2005e4f1e81e",
+						FirstNames: "Jack",
+						LastName:   "Black",
+						Address: sirius.LpaStoreAddress{
+							Line1:    "9 Mount Pleasant Drive",
+							Town:     "East Harling",
+							Postcode: "NR16 2GB",
+							Country:  "UK",
+						},
+					},
+					DateOfBirth:     "1990-02-22",
+					Status:          shared.ActiveAttorneyStatus.String(),
+					AppointmentType: shared.OriginalAppointmentType.String(),
+					Email:           "a@example.com",
+					Mobile:          "077577575757",
+					SignedAt:        "2024-01-12T10:09:09Z",
+				},
+				{
+					LpaStorePerson: sirius.LpaStorePerson{
+						Uid:        "123a01b1-456d-5391-813d-2010d3e2d72d",
+						FirstNames: "Jack",
+						LastName:   "White",
+						Address: sirius.LpaStoreAddress{
+							Line1:    "29 Grange Road",
+							Town:     "Birmingham",
+							Postcode: "B29 6BL",
+							Country:  "UK",
+						},
+					},
+					DateOfBirth:     "1990-02-22",
+					Status:          shared.InactiveAttorneyStatus.String(),
+					AppointmentType: shared.ReplacementAppointmentType.String(),
+					Email:           "b@example.com",
+					Mobile:          "07122121212",
+					SignedAt:        "2024-11-28T19:22:11Z",
+				},
+				{
+					LpaStorePerson: sirius.LpaStorePerson{
+						Uid:        "638f049f-c01f-4ab2-973a-2ea763b3cf7a",
+						FirstNames: "Consuelo",
+						LastName:   "Swaniawski",
+						Address: sirius.LpaStoreAddress{
+							Line1:    "14 Meadow Close",
+							Town:     "Kutch Court",
+							Postcode: "AT28 7WM",
+							Country:  "UK",
+						},
+					},
+					DateOfBirth:     "1990-04-15",
+					Status:          shared.RemovedAttorneyStatus.String(),
+					AppointmentType: shared.OriginalAppointmentType.String(),
+					Email:           "Consuelo.Swaniawski@example.com",
+					Mobile:          "07004369909",
+					SignedAt:        "2024-10-21T13:42:16Z",
+				},
+			},
+		},
+	},
+}
+
+func TestGetUpdateAttorneyDetails(t *testing.T) {
+	tests := []struct {
+		name                    string
+		caseUID                 string
+		attorneyUID             string
+		attorneyStatus          string
+		attorneyAppointmentType string
+		form                    formAttorneyDetails
+		errorReturned           error
+	}{
+		{
+			name:                    "Change Active Original Attorney Details",
+			caseUID:                 "M-DDDD-DDDD-DDDD",
+			attorneyUID:             "302b05c7-896c-4290-904e-2005e4f1e81e",
+			attorneyStatus:          shared.ActiveAttorneyStatus.String(),
+			attorneyAppointmentType: shared.OriginalAppointmentType.String(),
+			form: formAttorneyDetails{
+				FirstNames:  "Jack",
+				LastName:    "Black",
+				DateOfBirth: dob{Day: 22, Month: 2, Year: 1990},
+				Address: sirius.Address{
+					Line1:    "9 Mount Pleasant Drive",
+					Town:     "East Harling",
+					Postcode: "NR16 2GB",
+					Country:  "UK",
+				},
+				Email:       "a@example.com",
+				PhoneNumber: "077577575757",
+				SignedAt:    dob{Day: 12, Month: 1, Year: 2024},
+			},
+			errorReturned: nil,
+		},
+		{
+			name:                    "Change Inactive Replacement Attorney Details",
+			caseUID:                 "M-DDDD-DDDD-DDDD",
+			attorneyUID:             "123a01b1-456d-5391-813d-2010d3e2d72d",
+			attorneyStatus:          shared.InactiveAttorneyStatus.String(),
+			attorneyAppointmentType: shared.ReplacementAppointmentType.String(),
+			form: formAttorneyDetails{
+				FirstNames:  "Jack",
+				LastName:    "White",
+				DateOfBirth: dob{Day: 22, Month: 2, Year: 1990},
+				Address: sirius.Address{
+					Line1:    "29 Grange Road",
+					Town:     "Birmingham",
+					Postcode: "B29 6BL",
+					Country:  "UK",
+				},
+				Email:       "b@example.com",
+				PhoneNumber: "07122121212",
+				SignedAt:    dob{Day: 28, Month: 11, Year: 2024},
+			},
+			errorReturned: nil,
+		},
+		{
+			name:                    "Change Removed Original Attorney Details",
+			caseUID:                 "M-DDDD-DDDD-DDDD",
+			attorneyUID:             "638f049f-c01f-4ab2-973a-2ea763b3cf7a",
+			attorneyStatus:          shared.RemovedAttorneyStatus.String(),
+			attorneyAppointmentType: shared.OriginalAppointmentType.String(),
+			form: formAttorneyDetails{
+				FirstNames:  "Consuelo",
+				LastName:    "Swaniawski",
+				DateOfBirth: dob{Day: 15, Month: 4, Year: 1990},
+				Address: sirius.Address{
+					Line1:    "14 Meadow Close",
+					Town:     "Kutch Court",
+					Postcode: "AT28 7WM",
+					Country:  "UK",
+				},
+				Email:       "Consuelo.Swaniawski@example.com",
+				PhoneNumber: "07004369909",
+				SignedAt:    dob{Day: 21, Month: 10, Year: 2024},
+			},
+			errorReturned: nil,
+		},
+		{
+			name:                    "Template Error Returned",
+			caseUID:                 "M-DDDD-DDDD-DDDD",
+			attorneyUID:             "302b05c7-896c-4290-904e-2005e4f1e81e",
+			attorneyStatus:          shared.ActiveAttorneyStatus.String(),
+			attorneyAppointmentType: shared.OriginalAppointmentType.String(),
+			form: formAttorneyDetails{
+				FirstNames:  "Jack",
+				LastName:    "Black",
+				DateOfBirth: dob{Day: 22, Month: 2, Year: 1990},
+				Address: sirius.Address{
+					Line1:    "9 Mount Pleasant Drive",
+					Town:     "East Harling",
+					Postcode: "NR16 2GB",
+					Country:  "UK",
+				},
+				Email:       "a@example.com",
+				PhoneNumber: "077577575757",
+				SignedAt:    dob{Day: 12, Month: 1, Year: 2024},
+			},
+			errorReturned: errExample,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &mockUpdateAttorneyDetailsClient{}
+			client.
+				On("CaseSummary", mock.Anything, tc.caseUID).
+				Return(testUpdateAttorneyDetailsCaseSummary, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+				Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything,
+					updateAttorneyDetailsData{
+						Countries:               []sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}},
+						CaseUID:                 tc.caseUID,
+						Form:                    tc.form,
+						AttorneyStatus:          tc.attorneyStatus,
+						AttorneyAppointmentType: tc.attorneyAppointmentType,
+					}).
+				Return(tc.errorReturned)
+
+			server := newMockServer("/lpa/{uid}/attorney/{attorneyUID}/update-details", UpdateAttorneyDetails(client, template.Func))
+
+			r, _ := http.NewRequest(http.MethodGet, "/lpa/"+tc.caseUID+"/attorney/"+tc.attorneyUID+"/update-details", nil)
+			_, err := server.serve(r)
+
+			if tc.errorReturned != nil {
+				assert.Equal(t, tc.errorReturned, err)
+			} else {
+				assert.Nil(t, err)
+			}
+
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
+func TestGetUpdateAttorneyDetailsWhenCaseSummaryErrors(t *testing.T) {
+
+	client := &mockUpdateAttorneyDetailsClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-EEEE-EEEE-EEEE").
+		Return(sirius.CaseSummary{}, errExample)
+
+	assertUpdateAttorneyDetailsErrors(t, client, "M-EEEE-EEEE-EEEE", errExample)
+}
+
+func TestGetUpdateAttorneyDetailsWhenRefDataByCategoryErrors(t *testing.T) {
+	client := &mockUpdateAttorneyDetailsClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-DDDD-DDDD-DDDD").
+		Return(testUpdateAttorneyDetailsCaseSummary, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{}, errExample)
+
+	assertUpdateAttorneyDetailsErrors(t, client, "M-DDDD-DDDD-DDDD", errExample)
+}
+
+func assertUpdateAttorneyDetailsErrors(t *testing.T, client *mockUpdateAttorneyDetailsClient, uid string, expectedError error) {
+	server := newMockServer("/lpa/{uid}/attorney/{attorneyUID}/update-details", UpdateAttorneyDetails(client, nil))
+
+	r, _ := http.NewRequest(http.MethodGet, "/lpa/"+uid+"/attorney/123a01b1-456d-5391-813d-2010d3e2d72d/update-details", nil)
+	_, err := server.serve(r)
+
+	assert.Equal(t, expectedError, err)
+	mock.AssertExpectationsForObjects(t, client)
+}
+
+func TestPostUpdateAttorneyDetails(t *testing.T) {
+	tests := []struct {
+		name          string
+		apiError      error
+		expectedError error
+	}{
+		{
+			name:          "Post form successfully submits",
+			apiError:      nil,
+			expectedError: RedirectError("/lpa/M-DDDD-DDDD-DDDD/lpa-details"),
+		},
+		{
+			name:          "Post form returns an API failure",
+			apiError:      errExample,
+			expectedError: errExample,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &mockUpdateAttorneyDetailsClient{}
+			client.
+				On("CaseSummary", mock.Anything, "M-DDDD-DDDD-DDDD").
+				Return(testUpdateAttorneyDetailsCaseSummary, nil)
+			client.
+				On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+				Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+			client.
+				On("UpdateAttorneyDetails", mock.Anything, "M-DDDD-DDDD-DDDD", "302b05c7-896c-4290-904e-2005e4f1e81e", sirius.UpdateAttorneyDetails{
+					FirstNames:  "Samuel",
+					LastName:    "Smith",
+					DateOfBirth: "1991-01-01",
+					Address: sirius.Address{
+						Line1:    "9 Mount",
+						Line2:    "Pleasant Drive",
+						Line3:    "Norwich",
+						Town:     "East Harling",
+						Postcode: "NR16 2GB",
+						Country:  "GB",
+					},
+					Phone:    "123456789",
+					Email:    "test@test.com",
+					SignedAt: "2024-10-09",
+				}).
+				Return(tc.apiError)
+
+			template := &mockTemplate{}
+
+			server := newMockServer("/lpa/{uid}/attorney/{attorneyUID}/update-details", UpdateAttorneyDetails(client, template.Func))
+
+			form := url.Values{
+				"firstNames":       {"Samuel"},
+				"lastName":         {"Smith"},
+				"dob.day":          {"1"},
+				"dob.month":        {"1"},
+				"dob.year":         {"1991"},
+				"address.Line1":    {"9 Mount"},
+				"address.Line2":    {"Pleasant Drive"},
+				"address.Line3":    {"Norwich"},
+				"address.Town":     {"East Harling"},
+				"address.Postcode": {"NR16 2GB"},
+				"address.Country":  {"GB"},
+				"phoneNumber":      {"123456789"},
+				"email":            {"test@test.com"},
+				"signedAt.day":     {"9"},
+				"signedAt.month":   {"10"},
+				"signedAt.year":    {"2024"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/lpa/M-DDDD-DDDD-DDDD/attorney/302b05c7-896c-4290-904e-2005e4f1e81e/update-details", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			_, err := server.serve(r)
+
+			assert.Equal(t, tc.expectedError, err)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
+func TestPostUpdateAttorneyDetailsWhenValidationError(t *testing.T) {
+	client := &mockUpdateAttorneyDetailsClient{}
+	client.
+		On("CaseSummary", mock.Anything, "M-DDDD-DDDD-DDDD").
+		Return(testUpdateAttorneyDetailsCaseSummary, nil)
+	client.
+		On("RefDataByCategory", mock.Anything, sirius.CountryCategory).
+		Return([]sirius.RefDataItem{{Handle: "GB", Label: "Great Britain"}}, nil)
+	client.
+		On("UpdateAttorneyDetails", mock.Anything, "M-DDDD-DDDD-DDDD", "302b05c7-896c-4290-904e-2005e4f1e81e", sirius.UpdateAttorneyDetails{
+			LastName:    "Black",
+			DateOfBirth: "1990-02-22",
+			Address: sirius.Address{
+				Line1:    "9 Mount Pleasant Drive",
+				Town:     "East Harling",
+				Postcode: "NR16 2GB",
+				Country:  "UK",
+			},
+			Phone:    "077577575757",
+			Email:    "a@example.com",
+			SignedAt: "2024-01-12",
+		}).
+		Return(sirius.ValidationError{Field: sirius.FieldErrors{
+			"firstNames": {"required": "Value required and can't be empty"},
+		}})
+
+	template := &mockTemplate{}
+
+	template.
+		On("Func", mock.Anything,
+			mock.MatchedBy(func(data updateAttorneyDetailsData) bool {
+				return data.Error.Field["firstNames"]["required"] == "Value required and can't be empty"
+			}),
+		).
+		Return(nil)
+
+	server := newMockServer("/lpa/{uid}/attorney/{attorneyUID}/update-details", UpdateAttorneyDetails(client, template.Func))
+
+	form := url.Values{
+		"firstNames": {""},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/lpa/M-DDDD-DDDD-DDDD/attorney/302b05c7-896c-4290-904e-2005e4f1e81e/update-details", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	_, err := server.serve(r)
+
+	assert.Nil(t, err)
+	mock.AssertExpectationsForObjects(t, client, template)
+}
+
+func TestDOBToDateString(t *testing.T) {
+	tests := []struct {
+		name     string
+		dob      dob
+		expected sirius.DateString
+	}{
+		{
+			name:     "all zero returns empty string",
+			dob:      dob{},
+			expected: "",
+		},
+		{
+			name:     "single digit month and day are zero padded",
+			dob:      dob{Year: 2025, Month: 1, Day: 2},
+			expected: "2025-01-02",
+		},
+		{
+			name:     "double digit month and day unchanged",
+			dob:      dob{Year: 2025, Month: 11, Day: 12},
+			expected: "2025-11-12",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			r := (&tc.dob).toDateString()
+			assert.Equal(t, tc.expected, r)
+		})
+	}
+}
+
+func TestDOBToTime(t *testing.T) {
+	tests := []struct {
+		name     string
+		dob      dob
+		expected time.Time
+	}{
+		{
+			name:     "all zero returns zero time",
+			dob:      dob{},
+			expected: time.Time{},
+		},
+		{
+			name:     "valid date returns midnight UTC",
+			dob:      dob{Year: 2025, Month: 1, Day: 2},
+			expected: time.Date(2025, time.January, 2, 0, 0, 0, 0, time.UTC),
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			r := tc.dob.toTime()
+			if tc.expected.IsZero() {
+				assert.True(t, r.IsZero())
+			} else {
+				assert.Equal(t, tc.expected, r)
+			}
+		})
+	}
+}

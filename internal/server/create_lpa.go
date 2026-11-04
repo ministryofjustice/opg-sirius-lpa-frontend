@@ -190,6 +190,8 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			lpa.ApplicationHasGuidance = shared.BoolPtr(!preferencesNone && postFormCheckboxChecked(r, "preferencesAndInstructions", "guidance"))
 			lpa.ApplicationHasRestrictions = shared.BoolPtr(!preferencesNone && postFormCheckboxChecked(r, "preferencesAndInstructions", "restrictions"))
 
+			lpa.ApplicationHasContinuationSheets = shared.BoolPtr(postFormCheckboxChecked(r, "continuationSheets", "continuationSheets"))
+
 			if !data.IsUpdate {
 				lpa.ReceiptDate = postFormDateString(r, "receiptDate")
 			}
@@ -272,7 +274,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			}
 
 			if r.FormValue("updateCorrespondent") != "" {
-				return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d&caseType=lpa%s", donorID, data.CaseId, data.FlowQuery))
+				return RedirectError(fmt.Sprintf("/edit-correspondent?id=%d&caseId=%d&caseType=lpa%s", donorID, data.CaseId, data.FlowQuery))
 			}
 			if r.FormValue("addNotifiedPerson") != "" {
 				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d%s", donorID, data.CaseId, data.FlowQuery))
@@ -303,7 +305,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				if err != nil {
 					return err
 				}
-				return RedirectError(fmt.Sprintf("/edit-certificate-provider?id=%d&caseId=%d&personId=%d%s", donorID, data.CaseId, personID, data.FlowQuery))
+				return RedirectError(fmt.Sprintf("/update-certificate-provider?id=%d&caseId=%d&personId=%d%s", donorID, data.CaseId, personID, data.FlowQuery))
 			}
 
 			data.Success = true

@@ -139,6 +139,10 @@ describe("View digital LPA details", () => {
   });
 
   it("shows payment information", () => {
+    cy.addMock("/lpa-api/v1/cases/333/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
     cy.contains("Fees").click();
     cy.contains("£41.00 expected");
   });

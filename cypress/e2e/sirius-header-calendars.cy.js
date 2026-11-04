@@ -51,6 +51,62 @@ describe("Calendars on the header bar", () => {
     cy.get('[id^="calendar-month-"]').should("have.length", 3);
   });
 
+  it("highlights today, weekends and leaves padding cells unhighlighted", () => {
+    cy.visit("/donor/1/documents");
+    cy.get("#header-button-calendars").click();
+    cy.get(".panel-calendar").should("be.visible");
+
+    cy.get(".opg-calendar .day.today").should("have.length", 1);
+
+    cy.get(".opg-calendar").each(($calendar) => {
+      cy.wrap($calendar)
+        .find(".day.non-working")
+        .should("have.length.at.least", 8);
+      cy.wrap($calendar)
+        .find(".day.empty")
+        .should("not.have.class", "non-working");
+      cy.wrap($calendar).find(".day.empty .day-number").should("not.exist");
+    });
+  });
+
+  it("moves a calendar to the next and previous month without nesting", () => {
+    cy.visit("/donor/1/documents");
+    cy.get("#header-button-calendars").click();
+    cy.get(".panel-calendar").should("be.visible");
+
+    cy.get(".opg-calendar")
+      .first()
+      .find(".current-month__name")
+      .invoke("text")
+      .then((originalMonth) => {
+        cy.get(".opg-calendar")
+          .first()
+          .find('button[aria-label="Next month"]')
+          .click();
+
+        cy.get(".opg-calendar")
+          .first()
+          .find(".current-month__name")
+          .should("not.have.text", originalMonth);
+
+        cy.get('[id^="calendar-month-"]').should("have.length", 3);
+        cy.get(".opg-calendar .opg-calendar").should("not.exist");
+
+        cy.get(".opg-calendar")
+          .first()
+          .find('button[aria-label="Previous month"]')
+          .click();
+
+        cy.get(".opg-calendar")
+          .first()
+          .find(".current-month__name")
+          .should("have.text", originalMonth);
+
+        cy.get('[id^="calendar-month-"]').should("have.length", 3);
+        cy.get(".opg-calendar .opg-calendar").should("not.exist");
+      });
+  });
+
   it("shows the working-days calculator and updates readonly fields by mode", () => {
     cy.visit("/donor/1/documents");
     cy.get("#header-button-calendars").click();

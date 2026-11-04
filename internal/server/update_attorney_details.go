@@ -1,0 +1,145 @@
+package server
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"golang.org/x/sync/errgroup"
+)
+
+type UpdateAttorneyDetailsClient interface {
+	CaseSummary(sirius.Context, string) (sirius.CaseSummary, error)
+	UpdateAttorneyDetails(sirius.Context, string, string, sirius.UpdateAttorneyDetails) error
+	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
+}
+
+type updateAttorneyDetailsData struct {
+	XSRFToken               string
+	Countries               []sirius.RefDataItem
+	Success                 bool
+	Error                   sirius.ValidationError
+	CaseUID                 string
+	Form                    formAttorneyDetails
+	AttorneyStatus          string
+	AttorneyAppointmentType string
+}
+
+type formAttorneyDetails struct {
+	FirstNames  string         `form:"firstNames"`
+	LastName    string         `form:"lastName"`
+	DateOfBirth dob            `form:"dob"`
+	Address     sirius.Address `form:"address"`
+	PhoneNumber string         `form:"phoneNumber"`
+	Email       string         `form:"email"`
+	SignedAt    dob            `form:"signedAt"`
+}
+
+func UpdateAttorneyDetails(client UpdateAttorneyDetailsClient, tmpl template.Template) Handler {
+
+	return func(w http.ResponseWriter, r *http.Request) error {
+		caseUID := r.PathValue("uid")
+		attorneyUID := r.PathValue("attorneyUID")
+
+		ctx := getContext(r)
+
+		cs, err := client.CaseSummary(ctx, caseUID)
+		if err != nil {
+			return err
+		}
+
+		attorneys := cs.DigitalLpa.LpaStoreData.Attorneys
+
+		var attorney sirius.LpaStoreAttorney
+		for i, att := range attorneys {
+			if att.Uid == attorneyUID {
+				attorney = attorneys[i]
+			}
+		}
+
+		attorneyDob, err := parseDate(attorney.DateOfBirth)
+		if err != nil {
+			return err
+		}
+
+		data := updateAttorneyDetailsData{
+			XSRFToken: ctx.XSRFToken,
+			CaseUID:   caseUID,
+			Form: formAttorneyDetails{
+				FirstNames:  attorney.FirstNames,
+				LastName:    attorney.LastName,
+				DateOfBirth: attorneyDob,
+				Address: sirius.Address{
+					Line1:    attorney.Address.Line1,
+					Line2:    attorney.Address.Line2,
+					Line3:    attorney.Address.Line3,
+					Town:     attorney.Address.Town,
+					Postcode: attorney.Address.Postcode,
+					Country:  attorney.Address.Country,
+				},
+				PhoneNumber: attorney.Mobile,
+				Email:       attorney.Email,
+			},
+			AttorneyStatus:          attorney.Status,
+			AttorneyAppointmentType: attorney.AppointmentType,
+		}
+
+		signedAt, err := parseDateTime(attorney.SignedAt)
+		if err != nil {
+			return err
+		}
+		data.Form.SignedAt = signedAt
+
+		group, groupCtx := errgroup.WithContext(ctx.Context)
+
+		group.Go(func() error {
+			var err error
+			data.Countries, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.CountryCategory)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
+			return err
+		}
+
+		if r.Method == http.MethodPost {
+			err := decoder.Decode(&data.Form, r.PostForm)
+			if err != nil {
+				return err
+			}
+
+			attorneyDetailsData := sirius.UpdateAttorneyDetails{
+				FirstNames:  data.Form.FirstNames,
+				LastName:    data.Form.LastName,
+				DateOfBirth: data.Form.DateOfBirth.toDateString(),
+				Address:     data.Form.Address,
+				Phone:       data.Form.PhoneNumber,
+				Email:       data.Form.Email,
+				SignedAt:    data.Form.SignedAt.toDateString(),
+			}
+
+			err = client.UpdateAttorneyDetails(ctx, caseUID, attorneyUID, attorneyDetailsData)
+
+			if ve, ok := err.(sirius.ValidationError); ok {
+				w.WriteHeader(http.StatusBadRequest)
+				data.Error = ve
+			} else if err != nil {
+				return err
+			} else {
+				data.Success = true
+
+				SetFlash(w, FlashNotification{
+					Title: "Update saved",
+				})
+
+				return RedirectError(fmt.Sprintf("/lpa/%s/lpa-details", caseUID))
+			}
+		}
+
+		return tmpl(w, data)
+	}
+}

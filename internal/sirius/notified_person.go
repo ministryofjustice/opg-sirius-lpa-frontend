@@ -6,8 +6,7 @@ import (
 
 type NotifiedPerson struct {
 	Person
-	NoticeGivenDate DateString `json:"noticeGivenDate,omitempty"`
-	CaseId          int        `json:"caseId,omitempty"`
+	CaseId int `json:"caseId,omitempty"`
 }
 
 func (c *Client) CreateNotifiedPerson(ctx Context, caseId int, notifiedPerson NotifiedPerson) error {

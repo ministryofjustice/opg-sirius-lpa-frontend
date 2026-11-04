@@ -5,11 +5,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/pact-foundation/pact-go/v2/consumer"
-	"github.com/pact-foundation/pact-go/v2/matchers"
 	"io"
 	"net/http"
 	"testing"
+
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -149,7 +150,7 @@ func TestObjectionsForCase(t *testing.T) {
 	}
 }
 
-func TestAddObjection(t *testing.T) {
+func TestCreateObjection(t *testing.T) {
 	t.Parallel()
 
 	pact, err := newPact()
@@ -202,7 +203,7 @@ func TestAddObjection(t *testing.T) {
 			assert.Nil(t, pact.ExecuteTest(t, func(config consumer.MockServerConfig) error {
 				client := NewClient(http.DefaultClient, fmt.Sprintf("http://127.0.0.1:%d", config.Port))
 
-				err := client.AddObjection(Context{Context: context.Background()}, tc.objectionsData)
+				err := client.CreateObjection(Context{Context: context.Background()}, tc.objectionsData)
 				if (tc.expectedError) == nil {
 					assert.Nil(t, err)
 				} else {

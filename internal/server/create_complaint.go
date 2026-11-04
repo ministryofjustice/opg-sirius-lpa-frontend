@@ -1,0 +1,134 @@
+package server
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/ministryofjustice/opg-go-common/template"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
+	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
+	"golang.org/x/sync/errgroup"
+)
+
+type CreateComplaintClient interface {
+	CreateComplaint(ctx sirius.Context, caseID int, caseType sirius.CaseType, complaint sirius.Complaint) error
+	Case(ctx sirius.Context, id int) (sirius.Case, error)
+	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
+}
+
+type createComplaintData struct {
+	XSRFToken string
+	IsPartial bool
+	Entity    string
+	Success   bool
+	Error     sirius.ValidationError
+
+	Categories            []sirius.RefDataItem
+	ComplainantCategories []sirius.RefDataItem
+	Origins               []sirius.RefDataItem
+
+	Complaint sirius.Complaint
+
+	DonorId  int
+	CaseId   int
+	CaseType string
+	CaseUID  string
+}
+
+func CreateComplaint(client CreateComplaintClient, tmpl template.Template) Handler {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		caseID, err := strToIntOrStatusError(r.FormValue("id"))
+		if err != nil {
+			return err
+		}
+
+		caseType, err := sirius.ParseCaseType(r.FormValue("case"))
+		if err != nil {
+			return err
+		}
+
+		ctx := getContext(r)
+		group, groupCtx := errgroup.WithContext(ctx.Context)
+
+		data := createComplaintData{
+			XSRFToken: ctx.XSRFToken,
+			IsPartial: ctx.IsPartial,
+			CaseId:    caseID,
+			CaseType:  r.FormValue("case"),
+		}
+
+		group.Go(func() error {
+			caseitem, err := client.Case(ctx.With(groupCtx), caseID)
+			if err != nil {
+				return err
+			}
+
+			data.Entity = fmt.Sprintf("%s %s", caseitem.CaseType, caseitem.UID)
+			data.CaseUID = caseitem.UID
+			if caseitem.Donor != nil {
+				data.DonorId = caseitem.Donor.ID
+			}
+			return nil
+		})
+
+		group.Go(func() error {
+			data.ComplainantCategories, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.ComplainantCategory)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		group.Go(func() error {
+			data.Origins, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.ComplaintOrigin)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		group.Go(func() error {
+			data.Categories, err = client.RefDataByCategory(ctx.With(groupCtx), sirius.ComplaintCategory)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		if err := group.Wait(); err != nil {
+			return err
+		}
+
+		if r.Method == http.MethodPost {
+			complaint := sirius.Complaint{
+				Category:             postFormString(r, "category"),
+				Description:          postFormString(r, "description"),
+				ReceivedDate:         postFormDateString(r, "receivedDate"),
+				Severity:             shared.ParseComplaintSeverity(postFormString(r, "severity")),
+				InvestigatingOfficer: postFormString(r, "investigatingOfficer"),
+				ComplainantName:      postFormString(r, "complainantName"),
+				SubCategory:          postFormString(r, "subCategory"),
+				ComplainantCategory:  postFormString(r, "complainantCategory"),
+				Origin:               postFormString(r, "origin"),
+				Title:                postFormString(r, "title"),
+			}
+
+			err = client.CreateComplaint(ctx, caseID, caseType, complaint)
+
+			if ve, ok := err.(sirius.ValidationError); ok {
+				w.WriteHeader(http.StatusBadRequest)
+				data.Error = ve
+				data.Complaint = complaint
+			} else if err != nil {
+				return err
+			} else {
+				data.Success = true
+			}
+		}
+
+		return tmpl(w, data)
+	}
+}

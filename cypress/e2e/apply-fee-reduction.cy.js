@@ -3,6 +3,10 @@ import * as digitalLpas from "../mocks/digitalLpas";
 describe("Apply a fee reduction to a non-digital LPA", () => {
   beforeEach(() => {
     cy.visit("/apply-fee-reduction?id=801");
+    cy.addMock("/lpa-api/v1/cases/801/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
   });
 
   it("adds a fee reduction to the case", () => {
@@ -31,13 +35,17 @@ describe("Apply a fee reduction to a non-digital LPA", () => {
 
 describe("Apply a fee reduction to a digital LPA", () => {
   it("adds a fee reduction to the case", () => {
-    cy.addMock("/lpa-api/v1/cases/9456/payments/reduction", "POST", {
+    cy.addMock("/lpa-api/v1/cases/900/payments/reduction", "POST", {
       status: 201,
       body: {},
     });
+    cy.addMock("/lpa-api/v1/cases/900/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
 
     cy.wrap(digitalLpas.objections.empty("M-9999-4567-AAAA"));
-    cy.visit("/apply-fee-reduction?id=9456");
+    cy.visit("/apply-fee-reduction?id=900");
     cy.contains("Apply a fee reduction");
     cy.contains("M-9999-4567-AAAA");
     cy.get(".moj-alert").should("not.exist");

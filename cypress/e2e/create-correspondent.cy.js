@@ -1,4 +1,4 @@
-describe("Create or update correspondent", () => {
+describe("Create correspondent", () => {
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/persons", "POST", {
       status: 201,
@@ -58,43 +58,6 @@ describe("Create or update correspondent", () => {
       );
   });
 
-  it("updates a correspondent on an EPA", () => {
-    cy.addMock("/lpa-api/v1/epas/2", "PUT", {
-      status: 200,
-      body: {},
-    });
-
-    cy.addMock("/lpa-api/v1/cases/2", "GET", {
-      status: 200,
-      body: {
-        id: 2,
-        correspondent: {
-          id: 3,
-          firstName: "Melanie",
-          surname: "Vanvolkenburg",
-        },
-      },
-    });
-
-    cy.visit("/create-epa?id=2&caseId=2");
-    cy.contains("Edit EPA");
-    cy.contains("Melanie Vanvolkenburg");
-    cy.get("#f-update-correspondent-3 .govuk-visually-hidden").should(
-      "contain.text",
-      "correspondent Melanie Vanvolkenburg",
-    );
-    cy.get("#f-update-correspondent-3").click();
-
-    cy.contains("Update correspondent details");
-    cy.get("#f-firstname").should("have.value", "Melanie");
-    cy.get("#f-surname").should("have.value", "Vanvolkenburg");
-    cy.get("input[type=submit][name=add-another]").should("not.exist");
-
-    cy.get("#f-firstname").clear().type("Mindy");
-    cy.get("button[type=submit]").click();
-    cy.url().should("include", "create-epa");
-  });
-
   it("creates a correspondent on an LPA", () => {
     cy.addMock("/lpa-api/v1/cases/2", "GET", {
       status: 200,
@@ -126,31 +89,6 @@ describe("Create or update correspondent", () => {
     cy.get("label[for=f-correspondenceBy-email]").click();
     cy.get("label[for=f-correspondenceBy-phone]").click();
     cy.get("label[for=f-correspondenceBy-welsh]").click();
-    cy.get("button[type=submit]").click();
-    cy.url().should("include", "/create-lpa");
-  });
-
-  it("updates a correspondent on an LPA", () => {
-    cy.addMock("/lpa-api/v1/cases/2", "GET", {
-      status: 200,
-      body: {
-        id: 2,
-        correspondent: {
-          id: 3,
-          firstName: "Melanie",
-          surname: "Vanvolkenburg",
-        },
-      },
-    });
-
-    cy.visit("/create-correspondent?id=1&caseId=2&caseType=lpa");
-
-    cy.contains("Update correspondent details");
-    cy.get("#f-firstname").should("have.value", "Melanie");
-    cy.get("#f-surname").should("have.value", "Vanvolkenburg");
-    cy.get("input[type=submit][name=add-another]").should("not.exist");
-
-    cy.get("#f-firstname").clear().type("Mindy");
     cy.get("button[type=submit]").click();
     cy.url().should("include", "/create-lpa");
   });

@@ -11,6 +11,7 @@ type Lpa struct {
 	ApplicantType                             string     `json:"applicantType,omitempty"`
 	ApplicationHasGuidance                    *bool      `json:"applicationHasGuidance,omitempty"`
 	ApplicationHasRestrictions                *bool      `json:"applicationHasRestrictions,omitempty"`
+	ApplicationHasContinuationSheets          *bool      `json:"applicationHasContinuationSheets,omitempty"`
 	AttorneyActDecisions                      string     `json:"attorneyActDecisions,omitempty"`
 	CardPaymentContact                        string     `json:"cardPaymentContact,omitempty"`
 	CertificateProviderSignature              *bool      `json:"certificateProviderSignature,omitempty"`

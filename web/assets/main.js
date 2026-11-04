@@ -92,6 +92,8 @@ htmx.on("htmx:afterSettle", (event) => {
     clearPaymentValue(swapDetails.target);
     autoCheckSingleAttorneyApplicant(swapDetails.target);
     clearBlankSections(swapDetails.target);
+    initSiriusHeader();
+    showHideFilter(swapDetails.target);
 
     // Update the action panel width if swapping in create-document or edit-document content
     if (swapDetails.target.id === "actions-content") {

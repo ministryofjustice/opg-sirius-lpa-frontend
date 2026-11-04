@@ -1,0 +1,64 @@
+import * as digitalLpas from "../mocks/digitalLpas";
+
+describe("Add a payment to a non-digital LPA", () => {
+  beforeEach(() => {
+    cy.visit("/create-payment?id=800");
+    cy.addMock("/lpa-api/v1/cases/800/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
+  });
+
+  it("adds a payment to the case using a predefined amount", () => {
+    cy.contains("Add a payment");
+    cy.contains("7000-0000-0000");
+    cy.get(".moj-alert").should("not.exist");
+    cy.get("#f-amount-92").click();
+    cy.get("#f-source").click();
+    cy.get("#f-paymentDate").type("2022-04-25");
+    cy.get("button[type=submit]").click();
+    cy.get(".moj-alert").should("exist");
+  });
+
+  it("adds a payment to the case using a custom amount", () => {
+    cy.contains("Add a payment");
+    cy.contains("7000-0000-0000");
+    cy.get(".moj-alert").should("not.exist");
+    cy.get("#f-amount-other").click();
+    cy.get("#f-amount").type("11.50");
+    cy.get("#f-source").click();
+    cy.get("#f-paymentDate").type("2022-04-25");
+    cy.get("button[type=submit]").click();
+    cy.get(".moj-alert").should("exist");
+  });
+
+  it("sets the payment date to today", () => {
+    cy.clock(Date.UTC(2022, 1, 25), ["Date"]); // months in Date starts from 0 so February = 1
+    cy.contains("Add a payment");
+    cy.contains("7000-0000-0000");
+    cy.get(".moj-alert").should("not.exist");
+    cy.get('[data-module="select-todays-date"]').click();
+    cy.get("#f-paymentDate").should("have.value", "2022-02-25");
+  });
+});
+
+describe("Add a payment to a digital LPA", () => {
+  it("adds a payment to the case", () => {
+    cy.addMock("/lpa-api/v1/cases/900/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
+    cy.wrap(digitalLpas.objections.empty("M-9999-4567-AAAA"));
+    cy.visit("/create-payment?id=900");
+    cy.contains("Add a payment");
+    cy.contains("M-9999-4567-AAAA");
+    cy.get(".moj-alert").should("not.exist");
+    cy.get("#f-amount-92").click();
+    cy.get("#f-source").click();
+    cy.get("#f-paymentDate").type("2023-08-31");
+    cy.get("button[type=submit]").click();
+    cy.get(".moj-alert").should("exist");
+    cy.get(".moj-alert").contains("Payment added");
+    cy.url().should("include", "/lpa/M-9999-4567-AAAA/payments");
+  });
+});

@@ -44,11 +44,11 @@
                                 <a class="govuk-link"
                                    {{ if $.InActionPanel }}
                                    href=""
-                                   hx-get="{{ prefix (printf "/edit-payment?id=%d" .ID) }}"
+                                   hx-get="{{ prefix (printf "/update-payment?id=%d" .ID) }}"
                                    hx-target=".action-panel__content"
                                    hx-swap="innerHTML"
                                    {{ else }}
-                                   href="{{ prefix (printf "/edit-payment?id=%d" .ID) }}"
+                                   href="{{ prefix (printf "/update-payment?id=%d" .ID) }}"
                                    {{ end }}>
                                     Edit payment
                                 </a>
