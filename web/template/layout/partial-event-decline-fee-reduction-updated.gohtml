@@ -1,0 +1,32 @@
+{{ define "partial-event-decline-fee-reduction-updated" }}
+    {{ $decisionTypes := $.Context.DecisionTypes }}
+    {{ $typeChange := index .Changes "decisionType" }}
+    {{ $dateChange := index .Changes "decisionDate" }}
+    {{ $reasonChange := index .Changes "decisionReason" }}
+    <ul class="govuk-list">
+        {{ with $typeChange }}
+            <li>
+                Declined reduced fee type changed from:
+                {{ if .OldValue }}{{ translateRefData $decisionTypes .OldValue }}{{ else }}Not provided{{ end }}
+                changed to:
+                {{ if .NewValue }}{{ translateRefData $decisionTypes .NewValue }}{{ else }}Not provided{{ end }}
+            </li>
+        {{ end }}
+        {{ with $dateChange }}
+            <li>
+                Date declined changed from:
+                {{ if .OldValue }}{{ .OldValue }}{{ else }}Not provided{{ end }}
+                changed to:
+                {{ if .NewValue }}{{ .NewValue }}{{ else }}Not provided{{ end }}
+            </li>
+        {{ end }}
+        {{ with $reasonChange }}
+            <li>
+                Reason changed from:
+                {{ if .OldValue }}{{ .OldValue }}{{ else }}Not provided{{ end }}
+                changed to:
+                {{ if .NewValue }}{{ .NewValue }}{{ else }}Not provided{{ end }}
+            </li>
+        {{ end }}
+    </ul>
+{{ end }}
