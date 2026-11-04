@@ -131,7 +131,6 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 
 		data.HeaderButtons = SiriusHeaderButtons{
 			BackToTimeline: true,
-			PersonInfo:     true,
 			Calendar:       true,
 		}
 
