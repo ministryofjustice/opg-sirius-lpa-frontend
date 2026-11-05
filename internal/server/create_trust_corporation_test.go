@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -84,72 +83,12 @@ func TestGetCreateTrustCorporation(t *testing.T) {
 	}
 }
 
-func TestGetEditTrustCorporation(t *testing.T) {
-	flowCases := []struct {
-		name      string
-		flowQuery string
-	}{
-		{name: "Without flow"},
-		{name: "Create flow", flowQuery: "&flow=create"},
-	}
-	for _, flowCase := range flowCases {
-		t.Run(flowCase.name, func(t *testing.T) {
-			for _, isReplacementAttorney := range []string{"false", "true"} {
-				t.Run("Is Replacement Attorney: "+isReplacementAttorney, func(t *testing.T) {
-					expectedTrustCorporation := sirius.TrustCorporation{
-						Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3}},
-						IsReplacementAttorney: isReplacementAttorney == "true",
-					}
-					expectedData := createTrustCorporationData{
-						FlowQuery:        flowCase.flowQuery,
-						DonorId:          1,
-						CaseId:           2,
-						TrustCorporation: expectedTrustCorporation,
-						Title:            "Update trust corporation details",
-						HtmxPost:         "/create-trust-corporation?id=1&caseId=2&trustCorporationId=3&replacement=" + isReplacementAttorney + flowCase.flowQuery,
-						IsEditing:        true,
-					}
-
-					if isReplacementAttorney == "true" {
-						expectedData.AppointedAs = "Replacement attorney"
-					} else {
-						expectedData.AppointedAs = "Attorney"
-					}
-
-					client := &mockCreateTrustCorporationClient{}
-					client.
-						On("Lpa", mock.Anything, 2).
-						Return(sirius.Lpa{Case: sirius.Case{
-							TrustCorporations: []sirius.TrustCorporation{expectedTrustCorporation},
-						}}, nil)
-
-					template := &mockTemplate{}
-					template.
-						On("Func", mock.Anything, expectedData).
-						Return(nil)
-
-					r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&trustCorporationId=3&replacement="+isReplacementAttorney+flowCase.flowQuery, nil)
-					w := httptest.NewRecorder()
-
-					err := CreateTrustCorporation(client, template.Func)(w, r)
-					resp := w.Result()
-
-					assert.Nil(t, err)
-					assert.Equal(t, http.StatusOK, resp.StatusCode)
-					mock.AssertExpectationsForObjects(t, client, template)
-				})
-			}
-		})
-	}
-}
-
 func TestGetCreateTrustCorporationBadQuery(t *testing.T) {
 	testCases := map[string]string{
-		"no-id":                    "/",
-		"bad-id":                   "/?id=test",
-		"no-case-id":               "/?id=123",
-		"bad-case-id":              "/?id=123&caseId=test",
-		"bad-trust-corporation-id": "/?id=123&caseId=123&trustCorporationId=test",
+		"no-id":       "/",
+		"bad-id":      "/?id=test",
+		"no-case-id":  "/?id=123",
+		"bad-case-id": "/?id=123&caseId=test",
 	}
 
 	for name, query := range testCases {
@@ -162,19 +101,6 @@ func TestGetCreateTrustCorporationBadQuery(t *testing.T) {
 			assert.NotNil(t, err)
 		})
 	}
-}
-
-func TestGetEditTrustCorporationWhenLpaFails(t *testing.T) {
-	client := &mockCreateTrustCorporationClient{}
-	client.
-		On("Lpa", mock.Anything, 2).
-		Return(sirius.Lpa{}, errExample)
-
-	r, _ := http.NewRequest(http.MethodGet, "/create-trust-corporation/?id=1&caseId=2&trustCorporationId=3", nil)
-	w := httptest.NewRecorder()
-
-	err := CreateTrustCorporation(client, nil)(w, r)
-	assert.Equal(t, errExample, err)
 }
 
 func TestPostCreateTrustCorporationTransitions(t *testing.T) {
@@ -324,45 +250,6 @@ func TestPostCreateTrustCorporationWhenCreateFails(t *testing.T) {
 	assert.Equal(t, errExample, err)
 }
 
-func TestPostEditTrustCorporationWhenUpdateFails(t *testing.T) {
-	existingTrustCorporation := sirius.TrustCorporation{
-		Attorney:              sirius.Attorney{Person: sirius.Person{ID: 3}},
-		IsReplacementAttorney: false,
-	}
-	expectedTrustCorporation := sirius.TrustCorporation{
-		Attorney: sirius.Attorney{
-			Person: sirius.Person{
-				CompanyName: "ACME",
-			},
-			SystemStatus: shared.BoolPtr(true),
-		},
-		IsReplacementAttorney:       false,
-		TrustCorporationAppointedAs: "Attorney",
-	}
-
-	client := &mockCreateTrustCorporationClient{}
-	client.
-		On("Lpa", mock.Anything, 2).
-		Return(sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{existingTrustCorporation}}}, nil)
-	client.
-		On("UpdateTrustCorporation", mock.Anything, 3, expectedTrustCorporation).
-		Return(errExample)
-
-	form := url.Values{
-		"companyName":              {"ACME"},
-		"isReplacementAttorney":    {"false"},
-		"isTrustCorporationActive": {"true"},
-	}
-
-	r, _ := http.NewRequest(http.MethodPost, "create-trust-corporation/?id=1&caseId=2&trustCorporationId=3&replacement=false", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := CreateTrustCorporation(client, nil)(w, r)
-
-	assert.Equal(t, errExample, err)
-}
-
 func TestPostCreateTrustCorporationWhenValidationError(t *testing.T) {
 	expectedError := sirius.ValidationError{
 		Field: sirius.FieldErrors{"field": {"": "problem"}},
@@ -411,121 +298,6 @@ func TestPostCreateTrustCorporationWhenValidationError(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client, template)
-}
-
-func TestPostEditTrustCorporationTransitions(t *testing.T) {
-	transitions := []struct {
-		name                  string
-		lpa                   sirius.Lpa
-		isReplacementAttorney bool
-		formKey               string
-		redirect              string
-		fragment              string
-	}{
-		{
-			name: "Save and return to LPA",
-			lpa: sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{
-				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}},
-			}}},
-			redirect: "/create-lpa?id=1&caseId=2",
-			fragment: "#scroll-to-attorneys-corporation",
-		},
-		{
-			name:    "Update next trust corporation",
-			formKey: "update-next-attorney",
-			lpa: sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{
-				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}},
-				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 4, PersonType: "Trust Corporation"}}},
-			}}},
-			redirect: "/create-trust-corporation?id=1&caseId=2&trustCorporationId=4&replacement=false",
-		},
-		{
-			name:    "Update next attorney",
-			formKey: "update-next-attorney",
-			lpa: sirius.Lpa{Case: sirius.Case{
-				TrustCorporations: []sirius.TrustCorporation{{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}}},
-				Attorneys:         []sirius.Attorney{{SystemStatus: shared.BoolPtr(true), Person: sirius.Person{ID: 4, PersonType: "Attorney"}}},
-			}},
-			redirect: "/create-attorney?id=1&caseId=2&caseType=lpa&attorneyId=4",
-		},
-		{
-			name:                  "Update next replacement attorney",
-			formKey:               "update-next-attorney",
-			isReplacementAttorney: true,
-			lpa: sirius.Lpa{Case: sirius.Case{
-				TrustCorporations:    []sirius.TrustCorporation{{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}, IsReplacementAttorney: true}},
-				ReplacementAttorneys: []sirius.Attorney{{SystemStatus: shared.BoolPtr(false), Person: sirius.Person{ID: 4, PersonType: "Replacement Attorney"}}},
-			}},
-			redirect: "/create-replacement-attorney?id=1&caseId=2&attorneyId=4",
-		},
-		{
-			name:     "Update next with no following actor",
-			formKey:  "update-next-attorney",
-			lpa:      sirius.Lpa{Case: sirius.Case{TrustCorporations: []sirius.TrustCorporation{{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}}}}},
-			redirect: "/create-lpa?id=1&caseId=2",
-			fragment: "#scroll-to-attorneys-corporation",
-		},
-	}
-	flowCases := []struct {
-		name      string
-		flowQuery string
-	}{
-		{name: "Without flow"},
-		{name: "Create flow", flowQuery: "&flow=create"},
-	}
-
-	for _, transition := range transitions {
-		t.Run(transition.name, func(t *testing.T) {
-			for _, flowCase := range flowCases {
-				t.Run(flowCase.name, func(t *testing.T) {
-					isReplacementAttorney := transition.isReplacementAttorney
-					attorneyType := "Attorney"
-					systemStatus := shared.BoolPtr(true)
-					if isReplacementAttorney {
-						attorneyType = "Replacement Attorney"
-						systemStatus = shared.BoolPtr(false)
-					}
-					expectedTrustCorporation := sirius.TrustCorporation{
-						Attorney: sirius.Attorney{
-							Person: sirius.Person{
-								CompanyName: "ACME",
-							},
-							SystemStatus: systemStatus,
-						},
-						IsReplacementAttorney:       isReplacementAttorney,
-						TrustCorporationAppointedAs: attorneyType,
-					}
-
-					client := &mockCreateTrustCorporationClient{}
-					client.
-						On("Lpa", mock.Anything, 2).
-						Return(transition.lpa, nil)
-					client.
-						On("UpdateTrustCorporation", mock.Anything, 3, expectedTrustCorporation).
-						Return(nil)
-
-					form := url.Values{
-						"companyName":              {"ACME"},
-						"isReplacementAttorney":    {strconv.FormatBool(isReplacementAttorney)},
-						"isTrustCorporationActive": {"true"},
-					}
-					if transition.formKey != "" {
-						form.Set(transition.formKey, "true")
-					}
-
-					r, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("create-trust-corporation/?id=1&caseId=2&trustCorporationId=3&replacement=%t%s", isReplacementAttorney, flowCase.flowQuery), strings.NewReader(form.Encode()))
-					r.Header.Add("Content-Type", formUrlEncoded)
-					w := httptest.NewRecorder()
-
-					err := CreateTrustCorporation(client, nil)(w, r)
-
-					assert.Equal(t, RedirectError(transition.redirect+flowCase.flowQuery+transition.fragment), err)
-					assert.Equal(t, http.StatusOK, w.Result().StatusCode)
-					mock.AssertExpectationsForObjects(t, client)
-				})
-			}
-		})
-	}
 }
 
 func TestGetIdForNextAttorneyTrustCorpsAndActiveAttorneys(t *testing.T) {

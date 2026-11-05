@@ -118,11 +118,11 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				CardPaymentContact:               postFormString(r, "cardPaymentContact"),
 				CertificateProviderSignatureDate: postFormDateString(r, "certificateProviderSignatureDate"),
 				Case: sirius.Case{
-					SubType:                                   postFormString(r, "caseSubtype"),
-					ApplicationType:                           postFormString(r, "applicationType"),
-					CaseAttorneySingular:                      shared.BoolPtr(caseAttorneyValue == "singular"),
-					CaseAttorneyJointly:                       shared.BoolPtr(caseAttorneyValue == "jointly"),
-					CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(caseAttorneyValue == "jointly-and-severally"),
+					SubType:                         postFormString(r, "caseSubtype"),
+					ApplicationType:                 postFormString(r, "applicationType"),
+					CaseAttorneySingular:            shared.BoolPtr(caseAttorneyValue == "singular"),
+					CaseAttorneyJointly:             shared.BoolPtr(caseAttorneyValue == "jointly"),
+					CaseAttorneyJointlyAndSeverally: shared.BoolPtr(caseAttorneyValue == "jointly-and-severally"),
 					CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(caseAttorneyValue == "jointly-and-jointly-and-severally"),
 					LifeSustainingTreatment:                   postFormString(r, "lifeSustainingTreatment"),
 					LifeSustainingTreatmentSignatureDateA:     postFormDateString(r, "lifeSustainingTreatmentSignatureDate"),
@@ -290,14 +290,14 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				if err != nil {
 					return err
 				}
-				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=false%s", donorID, data.CaseId, trustCorporationId, data.FlowQuery))
+				return RedirectError(fmt.Sprintf("/update-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=false%s", donorID, data.CaseId, trustCorporationId, data.FlowQuery))
 			}
 			if trustCorporationIdStr := r.FormValue("updateTrustCorporationReplacementAttorney"); trustCorporationIdStr != "" {
 				trustCorporationId, err := strToIntOrStatusError(trustCorporationIdStr)
 				if err != nil {
 					return err
 				}
-				return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=true%s", donorID, data.CaseId, trustCorporationId, data.FlowQuery))
+				return RedirectError(fmt.Sprintf("/update-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=true%s", donorID, data.CaseId, trustCorporationId, data.FlowQuery))
 			}
 
 			if r.FormValue("updateCertificateProvider") != "" {
