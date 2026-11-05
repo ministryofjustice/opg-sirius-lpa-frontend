@@ -1001,13 +1001,13 @@ describe("Show correct event content", () => {
       const text = Cypress.$($items[0]).text().replaceAll(/\s+/g, " ").trim();
 
       expect(text).to.include(
-        "Declined reduced fee type changed from: Declined remission changed to: Declined exemption",
+        "Declined reduced fee type: Declined remission changed to: Declined exemption",
       );
       expect(text).to.include(
-        "Date declined changed from: 04/11/2026 changed to: 02/11/2026",
+        "Date declined: 04/11/2026 changed to: 02/11/2026",
       );
       expect(text).to.include(
-        "Reason changed from: Invalid evidence changed to: Updated evidence",
+        "Reason: Invalid evidence changed to: Updated evidence",
       );
       expect(text).not.to.include("declined on");
     });
@@ -1032,11 +1032,9 @@ describe("Show correct event content", () => {
     cy.get(".moj-timeline__item").then(($items) => {
       const text = Cypress.$($items[0]).text().replaceAll(/\s+/g, " ").trim();
 
-      expect(text).to.include(
-        "Reason changed from: Not provided changed to: New reason",
-      );
-      expect(text).not.to.include("Declined reduced fee type changed");
-      expect(text).not.to.include("Date declined changed");
+      expect(text).to.include("Reason: Not provided changed to: New reason");
+      expect(text).not.to.include("Declined reduced fee type:");
+      expect(text).not.to.include("Date declined:");
     });
   });
 

@@ -6,7 +6,7 @@
     <ul class="govuk-list">
         {{ with $typeChange }}
             <li>
-                Declined reduced fee type changed from:
+                Declined reduced fee type:
                 {{ if .OldValue }}{{ translateRefData $decisionTypes .OldValue }}{{ else }}Not provided{{ end }}
                 changed to:
                 {{ if .NewValue }}{{ translateRefData $decisionTypes .NewValue }}{{ else }}Not provided{{ end }}
@@ -14,7 +14,7 @@
         {{ end }}
         {{ with $dateChange }}
             <li>
-                Date declined changed from:
+                Date declined:
                 {{ if .OldValue }}{{ .OldValue }}{{ else }}Not provided{{ end }}
                 changed to:
                 {{ if .NewValue }}{{ .NewValue }}{{ else }}Not provided{{ end }}
@@ -22,7 +22,7 @@
         {{ end }}
         {{ with $reasonChange }}
             <li>
-                Reason changed from:
+                Reason:
                 {{ if .OldValue }}{{ .OldValue }}{{ else }}Not provided{{ end }}
                 changed to:
                 {{ if .NewValue }}{{ .NewValue }}{{ else }}Not provided{{ end }}
