@@ -74,10 +74,12 @@
             <th scope="row" class="govuk-table__header">Country</th>
             <td class="govuk-table__cell">{{ .Country }}</td>
         </tr>
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">Airmail required</th>
-            <td class="govuk-table__cell">{{ boolToYesNo .IsAirmailRequired }}</td>
-        </tr>
+        {{ if and (ne .PersonType "Certificate Provider") (ne .PersonType "Notified Person") }}
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Airmail required</th>
+                <td class="govuk-table__cell">{{ boolToYesNo .IsAirmailRequired }}</td>
+            </tr>
+        {{ end }}
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">Telephone number</th>
             <td class="govuk-table__cell">{{ .PhoneNumber }}</td>
