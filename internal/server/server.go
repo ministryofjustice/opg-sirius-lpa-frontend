@@ -92,6 +92,7 @@ type Client interface {
 	UpdateTrustCorporationClient
 	EventClient
 	GetApplicationProgressClient
+	GetCaseSummaryClient
 	GetDocumentsClient
 	GetHistoryClient
 	GetLpaDetailsClient
@@ -209,6 +210,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/donor/{id}", wrap(CasePage(client, templates.Get("case-page.gohtml"))))
 	mux.Handle("/donor/{donorId}/details", wrap(DonorDetails(client, templates.Get("donor-details.gohtml"))))
 	mux.Handle("/donor/{id}/documents", wrap(DocumentList(client, templates.Get("documents.gohtml"))))
+	mux.Handle("/donor/{donorId}/case-summary", wrap(GetCaseSummary(client, templates.Get("case-summary.gohtml"))))
 	mux.Handle("/donor/{donorId}/history", wrap(GetLpaHistory(client, templates.Get("lpa-history.gohtml"))))
 	mux.Handle("/view-document/{uuid}/{id}", wrap(ViewDocument(client, templates.Get("view-document.gohtml"))))
 	mux.Handle("/delete-document/{uuid}", wrap(DeleteDocument(client, templates.Get("delete-document.gohtml"))))
