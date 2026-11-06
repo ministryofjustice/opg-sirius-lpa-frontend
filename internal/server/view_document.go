@@ -36,7 +36,7 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 		uuid := r.PathValue("uuid")
 		ctx := getContext(r)
 
-		pageVars, err := GetPageValues(client, r)
+		pageVars, err := GetPageValues(client, r, true)
 		if err != nil {
 			return err
 		}
@@ -69,6 +69,7 @@ func ViewDocument(client ViewDocumentClient, tmpl template.Template) Handler {
 			selectedCases = []sirius.Case{selectedCase}
 			caseUidsStr = "&uid[]=" + selectedCase.UID
 			selectedCaseIds = strconv.Itoa(selectedCase.ID)
+			SetSelectedCaseUids([]string{selectedCase.UID})
 		}
 
 		data := viewDocumentData{

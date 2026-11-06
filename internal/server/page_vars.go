@@ -37,7 +37,7 @@ type PageVarsClient interface {
 	TasksForCase(ctx sirius.Context, id int) ([]sirius.Task, error)
 }
 
-func GetPageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
+func GetPageValues(client PageVarsClient, r *http.Request, selectedCasesFromURL bool) (PageVars, error) {
 	ctx := getContext(r)
 
 	donorID, _ := strToIntOrStatusError(r.PathValue("id"))
@@ -59,6 +59,12 @@ func GetPageValues(client PageVarsClient, r *http.Request) (PageVars, error) {
 			caseUIDs = []string{caseUID}
 		}
 	}
+
+	if !selectedCasesFromURL {
+		caseUIDs = GetSelectedCaseUids()
+	}
+
+	SetSelectedCaseUids(caseUIDs)
 
 	var userPermissions sirius.Permissions
 	var casesOnDonor []sirius.Case

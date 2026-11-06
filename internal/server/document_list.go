@@ -84,7 +84,7 @@ func DocumentList(client DocumentListClient, tmpl template.Template) Handler {
 			validationErr.Detail = "Select one or more documents and try again."
 		}
 
-		pageVars, err := GetPageValues(client, r)
+		pageVars, err := GetPageValues(client, r, true)
 		if err != nil {
 			return err
 		}
