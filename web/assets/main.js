@@ -69,6 +69,14 @@ htmx.config.includeIndicatorStyles = false;
 // Allow responses with 400 error codes to be swapped in
 htmx.config.responseHandling.unshift({ code: "400", swap: true, error: false });
 
+htmx.on("htmx:oobBeforeSwap", (event) => {
+  // Don't OOB swap the action panel when a form is already open to avoid the
+  // form closing.
+  if (event.detail.target.querySelector(".action-panel__form")) {
+    event.detail.shouldSwap = false;
+  }
+});
+
 htmx.on("htmx:afterSettle", (event) => {
   const swapDetails = event.detail;
 

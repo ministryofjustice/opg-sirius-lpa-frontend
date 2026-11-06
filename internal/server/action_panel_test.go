@@ -252,6 +252,9 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 		{ID: 2, UID: "7000-0000-0002", CaseType: "LPA"},
 	}
 
+	SetSelectedCaseUids([]string{"7000-0000-0001"})
+	defer ClearSelectedCaseUids()
+
 	client := &mockActionPanelClient{}
 	client.
 		On("CasesByDonor", mock.Anything, 123).
@@ -644,6 +647,9 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 		{ID: 3, UID: "7000-0000-0003", CaseType: "EPA"},
 	}
 
+	SetSelectedCaseUids([]string{"7000-0000-0003"})
+	defer ClearSelectedCaseUids()
+
 	client := &mockActionPanelClient{}
 	client.
 		On("CasesByDonor", mock.Anything, 123).
@@ -698,6 +704,9 @@ func TestGetActionPanelEditLpaOnlyEnabledWhenSingleLpaCaseSelected(t *testing.T)
 		{ID: 2, UID: "7000-0000-0002", CaseType: "LPA"},
 		{ID: 3, UID: "7000-0000-0003", CaseType: "EPA"},
 	}
+
+	SetSelectedCaseUids([]string{"7000-0000-0002"})
+	defer ClearSelectedCaseUids()
 
 	client := &mockActionPanelClient{}
 	client.
@@ -812,6 +821,9 @@ func TestGetActionPanelWhenGetDraftCountErrors(t *testing.T) {
 		{ID: 2, UID: "7000-0000-0002", CaseType: "LPA"},
 	}
 
+	SetSelectedCaseUids([]string{"7000-0000-0001"})
+	defer ClearSelectedCaseUids()
+
 	client := &mockActionPanelClient{}
 	client.
 		On("CasesByDonor", mock.Anything, 123).
@@ -851,6 +863,9 @@ func TestGetActionPanelWhenTasksForCaseErrors(t *testing.T) {
 		{ID: 1, UID: "7000-0000-0001", CaseType: "LPA"},
 		{ID: 2, UID: "7000-0000-0002", CaseType: "LPA"},
 	}
+
+	SetSelectedCaseUids([]string{"7000-0000-0001"})
+	defer ClearSelectedCaseUids()
 
 	client := &mockActionPanelClient{}
 	client.

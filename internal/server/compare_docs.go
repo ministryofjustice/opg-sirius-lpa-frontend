@@ -43,7 +43,7 @@ func CompareDocs(client CompareDocsClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
 
-		pageVars, err := GetPageValues(client, r)
+		pageVars, err := GetPageValues(client, r, true)
 		if err != nil {
 			return err
 		}
