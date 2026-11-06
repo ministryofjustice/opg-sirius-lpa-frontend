@@ -317,7 +317,7 @@
         </div>
     {{ end }}
 
-    {{ if .UsesNotify }}
+    {{ if and .UsesNotify (not .SendingLettersViaNotify) }}
         <div class="govuk-notification-banner govuk-!-margin-bottom-3" role="region" aria-labelledby="notify-warning" data-module="govuk-notification-banner">
             <div class="govuk-notification-banner__header">
                 <h2 class="govuk-notification-banner__title" id="notify-warning">
@@ -335,6 +335,11 @@
         <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="saveAndExit" id="saveAndExit">Save and exit</button>
         <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="delete">Delete draft</button>
         <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="preview">Preview draft</button>
-        <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit" value="publish">{{ if .UsesNotify }}Publish and Send{{ else }}Publish draft{{ end }}</button>
+        {{ if and .SendingLettersViaNotify .UsesNotify }}
+          <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit" value="publishAndSend">Publish and post via Notify</button>
+          <button class="govuk-button govuk-button--secondary" data-module="govuk-button" name="documentControls" type="submit" value="publish">Publish</button>
+        {{ else }}
+          <button class="govuk-button" data-module="govuk-button" name="documentControls" type="submit" value={{ if .UsesNotify }}"publishAndSend"{{ else }}"publish"{{ end }}>{{ if .UsesNotify }}Publish and Send{{ else }}Publish draft{{ end }}</button>
+        {{ end }}
     </div>
 {{ end }}
