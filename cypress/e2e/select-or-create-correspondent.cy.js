@@ -56,7 +56,7 @@ describe("Select or create correspondent", () => {
     });
   });
 
-  it("can select an existing attorney to create a correspondent", () => {
+  it("can select an existing attorney to create a correspondent on an epa", () => {
     cy.visit("/select-or-create-correspondent?id=1&caseId=2&caseType=epa");
     cy.contains("Add a correspondent");
     cy.get("label[for=f-actor-1]").should(
@@ -73,27 +73,19 @@ describe("Select or create correspondent", () => {
   it("displays the correct actors for an lpa", () => {
     cy.visit("/select-or-create-correspondent?id=1&caseId=2&caseType=lpa");
     cy.contains("Add a correspondent");
-    cy.get("label[for=f-actor-donor]").should("contain.text", "Sarah Jones");
-    cy.get("label[for=f-attorney-1]").should(
+    cy.get("label[for=f-actor-1]").should("contain.text", "Sarah Jones");
+    cy.get("label[for=f-actor-2]").should(
       "contain.text",
       "Melanie Vanvolkenburg",
     );
-    cy.get("label[for=f-replacement-1]").should(
-      "contain.text",
-      "Steven Munnell",
-    );
-    cy.get("label[for=f-certificate-provider-1]").should(
-      "contain.text",
-      "Will Oswald",
-    );
-    cy.get("label[for=f-notified-person-1]").should(
-      "contain.text",
-      "James Rubin",
-    );
-    cy.get("label[for=f-trust-corporation-1]").should("contain.text", "ACME");
+    cy.get("label[for=f-actor-3]").should("contain.text", "Will Niesborella");
+    cy.get("label[for=f-actor-4]").should("contain.text", "Steven Munnell");
+    cy.get("label[for=f-actor-5]").should("contain.text", "Will Oswald");
+    cy.get("label[for=f-actor-6]").should("contain.text", "James Rubin");
+    cy.get("label[for=f-actor-7]").should("contain.text", "ACME");
   });
 
-  it("select create a new correspondent by default", () => {
+  it("select create a new correspondent by default on an epa", () => {
     cy.visit("/select-or-create-correspondent?id=1&caseId=2&caseType=epa");
     cy.contains("Add a correspondent");
     cy.get("input#f-actor-new").should("be.checked");

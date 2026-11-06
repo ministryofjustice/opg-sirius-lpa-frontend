@@ -144,15 +144,33 @@ func TestPostSelectOrCreateCorrespondentNew(t *testing.T) {
 		name      string
 		caseType  string
 		flowQuery string
+		redirect  string
 	}{
-		{name: "EPA", caseType: "epa"},
-		{name: "LPA without flow", caseType: "lpa"},
-		{name: "LPA create flow", caseType: "lpa", flowQuery: "&flow=create"},
+		{name: "EPA", caseType: "epa", redirect: "/create-correspondent?id=1&caseId=2&caseType=epa"},
+		{name: "LPA without flow", caseType: "lpa", redirect: "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-4"},
+		{name: "LPA create flow", caseType: "lpa", flowQuery: "&flow=create", redirect: "/create-lpa?id=1&caseId=2&flow=create#accordion-create-lpa-heading-4"},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			expectedRedirect := RedirectError("/create-correspondent?id=1&caseId=2&caseType=" + tc.caseType + tc.flowQuery)
+			correspondent := sirius.Correspondent{
+				Person: sirius.Person{
+					Salutation:        "Rev",
+					Firstname:         "Rudolph",
+					Middlenames:       "Modesto",
+					Surname:           "Stotesbury",
+					AddressLine1:      "Rotonda Gerardo 769",
+					AddressLine2:      "Appartamento 94",
+					AddressLine3:      "Augusto terme",
+					Town:              "San Sabazio",
+					County:            "Benevento",
+					Postcode:          "57797",
+					Country:           "Italy",
+					IsAirmailRequired: true,
+					PhoneNumber:       "079876543345",
+					Email:             "rm2@email.test",
+				},
+			}
 
 			client := &mockSelectOrCreateCorrespondentClient{}
 
@@ -162,92 +180,29 @@ func TestPostSelectOrCreateCorrespondentNew(t *testing.T) {
 					Return(sirius.Epa{}, nil)
 			} else {
 				client.
+					On("CreateCorrespondent", mock.Anything, 2, correspondent).
+					Return(nil)
+				client.
 					On("Lpa", mock.Anything, 2).
 					Return(sirius.Lpa{}, nil)
 			}
 
 			form := url.Values{
-				"actorId": {"new"},
-			}
-
-			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType="+tc.caseType+tc.flowQuery, strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", formUrlEncoded)
-			w := httptest.NewRecorder()
-
-			err := SelectOrCreateCorrespondent(client, nil)(w, r)
-			resp := w.Result()
-
-			assert.Equal(t, expectedRedirect, err)
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client)
-		})
-	}
-}
-
-func TestPostSelectOrCreateCorrespondentFromAttorney(t *testing.T) {
-	cases := []struct {
-		name      string
-		caseType  string
-		flowQuery string
-		redirect  string
-	}{
-		{
-			name:     "EPA",
-			caseType: "epa",
-			redirect: "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3",
-		},
-		{
-			name:     "LPA without flow",
-			caseType: "lpa",
-			redirect: "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-4",
-		},
-		{
-			name:      "LPA create flow",
-			caseType:  "lpa",
-			flowQuery: "&flow=create",
-			redirect:  "/create-lpa?id=1&caseId=2&flow=create#accordion-create-lpa-heading-4",
-		},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-
-			correspondent := sirius.Correspondent{Person: sirius.Person{Firstname: "Rudolph", Surname: "Stotesbury"}}
-
-			client := &mockSelectOrCreateCorrespondentClient{}
-			client.
-				On("CreateCorrespondent", mock.Anything, 2, correspondent).
-				Return(nil)
-
-			if tc.caseType == "epa" {
-				epa := sirius.Epa{
-					Case: sirius.Case{
-						Attorneys: []sirius.Attorney{
-							{Person: sirius.Person{ID: 4, Firstname: "Rudolph", Surname: "Stotesbury"}},
-						},
-					},
-				}
-
-				client.
-					On("Epa", mock.Anything, 2).
-					Return(epa, nil)
-			} else {
-				lpa := sirius.Lpa{
-					Case: sirius.Case{
-						Attorneys: []sirius.Attorney{
-							{Person: sirius.Person{ID: 4, Firstname: "Rudolph", Surname: "Stotesbury"}},
-						},
-						Donor: &sirius.Person{ID: 876},
-					},
-				}
-
-				client.
-					On("Lpa", mock.Anything, 2).
-					Return(lpa, nil)
-			}
-
-			form := url.Values{
-				"actorId": {"4"},
+				"actorId":           {"new"},
+				"salutation":        {"Rev"},
+				"firstname":         {"Rudolph"},
+				"middlenames":       {"Modesto"},
+				"surname":           {"Stotesbury"},
+				"addressLine1":      {"Rotonda Gerardo 769"},
+				"addressLine2":      {"Appartamento 94"},
+				"addressLine3":      {"Augusto terme"},
+				"town":              {"San Sabazio"},
+				"county":            {"Benevento"},
+				"postcode":          {"57797"},
+				"country":           {"Italy"},
+				"isAirmailRequired": {"true"},
+				"phoneNumber":       {"079876543345"},
+				"email":             {"rm2@email.test"},
 			}
 
 			r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType="+tc.caseType+tc.flowQuery, strings.NewReader(form.Encode()))
@@ -262,6 +217,40 @@ func TestPostSelectOrCreateCorrespondentFromAttorney(t *testing.T) {
 			mock.AssertExpectationsForObjects(t, client)
 		})
 	}
+}
+
+func TestPostSelectOrCreateCorrespondentFromAttorney(t *testing.T) {
+	correspondent := sirius.Correspondent{Person: sirius.Person{Firstname: "Rudolph", Surname: "Stotesbury"}}
+	epa := sirius.Epa{
+		Case: sirius.Case{
+			Attorneys: []sirius.Attorney{
+				{Person: sirius.Person{ID: 4, Firstname: "Rudolph", Surname: "Stotesbury"}},
+			},
+		},
+	}
+
+	client := &mockSelectOrCreateCorrespondentClient{}
+	client.
+		On("CreateCorrespondent", mock.Anything, 2, correspondent).
+		Return(nil)
+	client.
+		On("Epa", mock.Anything, 2).
+		Return(epa, nil)
+
+	form := url.Values{
+		"actorId": {"4"},
+	}
+
+	r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType=epa", strings.NewReader(form.Encode()))
+	r.Header.Add("Content-Type", formUrlEncoded)
+	w := httptest.NewRecorder()
+
+	err := SelectOrCreateCorrespondent(client, nil)(w, r)
+	resp := w.Result()
+
+	assert.Equal(t, RedirectError("/create-epa?id=1&caseId=2#accordion-create-epa-heading-3"), err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	mock.AssertExpectationsForObjects(t, client)
 }
 
 func TestPostSelectOrCreateCorrespondentBadActorId(t *testing.T) {
@@ -311,11 +300,12 @@ func TestPostSelectOrCreateCorrespondentValidationError(t *testing.T) {
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, selectOrCreateCorrespondentData{
-			DonorId:  1,
-			CaseId:   2,
-			CaseType: "epa",
-			Epa:      epa,
-			Error:    expectedError,
+			DonorId:       1,
+			CaseId:        2,
+			CaseType:      "epa",
+			Epa:           epa,
+			Error:         expectedError,
+			Correspondent: correspondent,
 		}).
 		Return(nil)
 
@@ -359,12 +349,13 @@ func TestPostSelectOrCreateCorrespondentValidationErrorHtmxRequest(t *testing.T)
 	template := &mockTemplate{}
 	template.
 		On("Func", mock.Anything, selectOrCreateCorrespondentData{
-			DonorId:   1,
-			CaseId:    2,
-			CaseType:  "epa",
-			Epa:       epa,
-			Error:     expectedError,
-			IsPartial: true,
+			DonorId:       1,
+			CaseId:        2,
+			CaseType:      "epa",
+			Epa:           epa,
+			Error:         expectedError,
+			IsPartial:     true,
+			Correspondent: correspondent,
 		}).
 		Return(nil)
 
@@ -416,43 +407,4 @@ func TestPostSelectOrCreateCorrespondentCreationFails(t *testing.T) {
 
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client, template)
-}
-
-func TestGetSelectedActorForLpa(t *testing.T) {
-	lpa := sirius.Lpa{
-		Case: sirius.Case{
-			Donor: &sirius.Person{ID: 1},
-			Attorneys: []sirius.Attorney{
-				{Person: sirius.Person{ID: 2}},
-			},
-			ReplacementAttorneys: []sirius.Attorney{
-				{Person: sirius.Person{ID: 3}},
-			},
-			CertificateProviders: []sirius.Person{
-				{ID: 4},
-			},
-			NotifiedPersons: []sirius.NotifiedPerson{
-				{Person: sirius.Person{ID: 5}},
-			},
-			TrustCorporations: []sirius.TrustCorporation{
-				{Attorney: sirius.Attorney{Person: sirius.Person{ID: 6}}},
-			},
-		},
-	}
-
-	testCases := []struct {
-		actorId        int
-		expectedPerson sirius.Person
-	}{
-		{actorId: 1, expectedPerson: *lpa.Donor},
-		{actorId: 2, expectedPerson: lpa.Attorneys[0].Person},
-		{actorId: 3, expectedPerson: lpa.ReplacementAttorneys[0].Person},
-		{actorId: 4, expectedPerson: lpa.CertificateProviders[0]},
-		{actorId: 5, expectedPerson: lpa.NotifiedPersons[0].Person},
-		{actorId: 6, expectedPerson: lpa.TrustCorporations[0].Person},
-	}
-
-	for _, tc := range testCases {
-		assert.Equal(t, tc.expectedPerson, GetSelectedActorForLpa(lpa, tc.actorId))
-	}
 }
