@@ -13,7 +13,6 @@ import (
 type CreateTrustCorporationClient interface {
 	CreateTrustCorporation(ctx sirius.Context, caseId int, trustCorporation sirius.TrustCorporation) error
 	Lpa(ctx sirius.Context, caseId int) (sirius.Lpa, error)
-	UpdateTrustCorporation(ctx sirius.Context, trustCorporationId int, trustCorporation sirius.TrustCorporation) error
 }
 
 type createTrustCorporationData struct {
@@ -69,42 +68,6 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 			data.AppointedAs = "Attorney"
 		}
 
-		var trustCorporationId int
-		trustCorporationIdStr := r.FormValue("trustCorporationId")
-		isEditing := trustCorporationIdStr != ""
-		if isEditing {
-			trustCorporationId, err = strToIntOrStatusError(trustCorporationIdStr)
-			if err != nil {
-				return err
-			}
-
-			lpa, err := client.Lpa(ctx, caseId)
-			if err != nil {
-				return err
-			}
-
-			for _, trustCorporation := range lpa.TrustCorporations {
-				if trustCorporation.ID == trustCorporationId {
-					data.TrustCorporation = trustCorporation
-					break
-				}
-			}
-
-			data.Title = "Update trust corporation details"
-			data.IsEditing = true
-			data.HtmxPost = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s%s", donorId, caseId, trustCorporationId, strconv.FormatBool(isReplacementAttorney), data.FlowQuery)
-
-			attorneys := lpa.Attorneys
-			if data.TrustCorporation.IsReplacementAttorney {
-				data.AppointedAs = "Replacement attorney"
-				attorneys = lpa.ReplacementAttorneys
-			} else {
-				data.AppointedAs = "Attorney"
-			}
-
-			data.NextPersonId, data.NextPersonType = GetIdForNextAttorney(trustCorporationId, data.TrustCorporation.IsReplacementAttorney, lpa.TrustCorporations, attorneys)
-		}
-
 		if r.Method == http.MethodPost {
 			trustCorporation := sirius.TrustCorporation{
 				Attorney: sirius.Attorney{
@@ -135,12 +98,7 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 			}
 
 			data.TrustCorporation = trustCorporation
-
-			if isEditing {
-				err = client.UpdateTrustCorporation(ctx, trustCorporationId, trustCorporation)
-			} else {
-				err = client.CreateTrustCorporation(ctx, caseId, trustCorporation)
-			}
+			err = client.CreateTrustCorporation(ctx, caseId, trustCorporation)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
@@ -156,18 +114,6 @@ func CreateTrustCorporation(client CreateTrustCorporationClient, tmpl template.T
 					return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery))
 				} else {
 					return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa%s", donorId, caseId, data.FlowQuery))
-				}
-			}
-
-			if r.FormValue("update-next-attorney") != "" {
-				switch data.NextPersonType {
-				case "Attorney":
-					return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d%s", donorId, caseId, data.NextPersonId, data.FlowQuery))
-				case "Replacement Attorney":
-					return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorId, caseId, data.NextPersonId, data.FlowQuery))
-				case "Trust Corporation":
-					return RedirectError(fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s%s", donorId, caseId, data.NextPersonId, strconv.FormatBool(trustCorporation.IsReplacementAttorney), data.FlowQuery))
-				default:
 				}
 			}
 
