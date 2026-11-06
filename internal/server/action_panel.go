@@ -28,7 +28,7 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 		ctx := getContext(r)
 		data := ActionPanelData{XSRFToken: ctx.XSRFToken}
 
-		pageVars, err := GetPageValues(client, r)
+		pageVars, err := GetPageValues(client, r, false)
 		if err != nil {
 			return err
 		}
