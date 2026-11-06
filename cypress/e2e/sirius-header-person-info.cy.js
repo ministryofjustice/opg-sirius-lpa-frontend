@@ -118,7 +118,7 @@ describe("Person info panel on the header bar", () => {
     });
 
     cy.contains("tr", "Replacement attorney 1").within(() => {
-      cy.contains("Inactive");
+      cy.contains("Inactive").should("not.exist");
     });
 
     cy.contains("tr", "Certificate provider").within(() => {
@@ -179,6 +179,28 @@ describe("Person info panel on the header bar", () => {
       ].forEach((label) => {
         cy.contains("dt", label).next().invoke("text").should("match", /^\s*$/);
       });
+    });
+  });
+
+  it("hides date of birth for the certificate provider and correspondent", () => {
+    cy.visit("/sirius-header-people-info?id=123&selected=6");
+    cy.get(".app-person-info__details-heading").should(
+      "contain.text",
+      "Certificate provider: Ms Cora Provider",
+    );
+    cy.get(".app-person-info__details").within(() => {
+      cy.contains("dt", "Date of birth").should("not.exist");
+      cy.contains("dt", "Address").should("exist");
+    });
+
+    cy.visit("/sirius-header-people-info?id=123&selected=4");
+    cy.get(".app-person-info__details-heading").should(
+      "contain.text",
+      "Correspondent: Mr Test J Name",
+    );
+    cy.get(".app-person-info__details").within(() => {
+      cy.contains("dt", "Date of birth").should("not.exist");
+      cy.contains("dt", "Address").should("exist");
     });
   });
 });

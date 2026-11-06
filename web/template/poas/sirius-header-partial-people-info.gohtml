@@ -55,6 +55,8 @@
             </div>
 
             {{ $person := .SelectedPerson }}
+            {{ $selectedLabel := "" }}{{ with $selected }}{{ $selectedLabel = .Label }}{{ end }}
+            {{ $showDateOfBirth := not (or (eq $selectedLabel "Certificate provider") (eq $selectedLabel "Correspondent")) }}
             <div class="app-person-info__details">
                 {{ with $selected }}
                     <h3 class="app-person-info__details-heading">{{ template "person-label" . }}: {{ template "person-name" .Person }}</h3>
@@ -66,10 +68,12 @@
                             <dd class="govuk-summary-list__value">{{ $person.CompanyName }}</dd>
                         </div>
                     {{ end }}
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Date of birth</dt>
-                        <dd class="govuk-summary-list__value">{{ if $person.DateOfBirth }}{{ formatDate $person.DateOfBirth }}{{ end }}</dd>
-                    </div>
+                    {{ if $showDateOfBirth }}
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">Date of birth</dt>
+                            <dd class="govuk-summary-list__value">{{ if $person.DateOfBirth }}{{ formatDate $person.DateOfBirth }}{{ end }}</dd>
+                        </div>
+                    {{ end }}
                     {{ if $person.DateOfDeath }}
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">Date of death</dt>
@@ -166,7 +170,7 @@
             {{ if $hasStatus }}
                 {{ if .SystemStatus }}
                     {{ template "status-tag" (statusTag "Active" "green") }}
-                {{ else }}
+                {{ else if ne .Label "Replacement attorney" }}
                     {{ template "status-tag" (statusTag "Inactive" "red") }}
                 {{ end }}
             {{ end }}
