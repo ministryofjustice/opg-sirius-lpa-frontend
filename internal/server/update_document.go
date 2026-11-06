@@ -19,7 +19,7 @@ type UpdateDocumentClient interface {
 	DocumentByUUID(ctx sirius.Context, uuid string) (sirius.Document, error)
 	UpdateDocument(ctx sirius.Context, uuid string, content string) (sirius.Document, error)
 	DeleteDocument(ctx sirius.Context, uuid string) error
-	CreateDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string, blankSections []string) (sirius.Document, error)
+	CreateDocument(ctx sirius.Context, caseID int, document sirius.Document, docType string, blankSections []string, sendViaNotify bool) (sirius.Document, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
 	FeatureToggles(ctx sirius.Context) (sirius.FeatureToggles, error)
 }
@@ -40,22 +40,23 @@ type updateDocumentData struct {
 	DownloadUUID string
 	DonorId      int
 
-	Section11             string
-	Section10And11        string
-	Section15             string
-	Section11And15        string
-	Section10And11And15   string
-	Section12And13And15   string
-	HasBlankSections      string
-	SelectedBlankSections string
-	Section11Count1       string
-	Section11Count2       string
-	Section11Count3       string
-	Section11Count4       string
-	BlankSectionsEnabled  bool
-	AttorneyCount         int
-	CreatedDocument       sirius.Document
-	NotifyWarning         string
+	Section11               string
+	Section10And11          string
+	Section15               string
+	Section11And15          string
+	Section10And11And15     string
+	Section12And13And15     string
+	HasBlankSections        string
+	SelectedBlankSections   string
+	Section11Count1         string
+	Section11Count2         string
+	Section11Count3         string
+	Section11Count4         string
+	BlankSectionsEnabled    bool
+	SendingLettersViaNotify bool
+	AttorneyCount           int
+	CreatedDocument         sirius.Document
+	NotifyWarning           string
 }
 
 func publishDraftDocument(
@@ -65,8 +66,9 @@ func publishDraftDocument(
 	documentUUID string,
 	content string,
 	blankSections []string,
+	sendViaNotify bool,
 ) (sirius.Document, error) {
-		_, err := client.UpdateDocument(ctx, documentUUID, content)
+	_, err := client.UpdateDocument(ctx, documentUUID, content)
 	if err != nil {
 		return sirius.Document{}, err
 	}
@@ -77,7 +79,7 @@ func publishDraftDocument(
 		return sirius.Document{}, err
 	}
 
-	createdDocument, err := client.CreateDocument(ctx, caseID, document, sirius.TypeSave, blankSections)
+	createdDocument, err := client.CreateDocument(ctx, caseID, document, sirius.TypeSave, blankSections, sendViaNotify)
 	if err != nil {
 		return sirius.Document{}, err
 	}
@@ -204,6 +206,7 @@ func UpdateDocument(client UpdateDocumentClient, tmpl template.Template) Handler
 		featureToggles, err := client.FeatureToggles(ctx)
 		if err == nil {
 			data.BlankSectionsEnabled = featureToggles.Enabled("poasBlankSections")
+			data.SendingLettersViaNotify = featureToggles.Enabled("poasSendingLettersViaNotify")
 		}
 
 		caseItem, err := client.Case(ctx, caseID)
@@ -308,7 +311,7 @@ func UpdateDocument(client UpdateDocumentClient, tmpl template.Template) Handler
 						return err
 					}
 
-					previewDocument, err := client.CreateDocument(ctx, caseID, document, sirius.TypePreview, blankSections)
+					previewDocument, err := client.CreateDocument(ctx, caseID, document, sirius.TypePreview, blankSections, false)
 					if err != nil {
 						return err
 					}
@@ -332,10 +335,11 @@ func UpdateDocument(client UpdateDocumentClient, tmpl template.Template) Handler
 					return RedirectError(fmt.Sprintf("/lpa/%s/documents", caseItem.UID))
 				}
 
-			case "publish":
+			case "publish", "publishAndSend":
 				blankSections, err := parseBlankSections(hasBlankSections, data.SelectedBlankSections, counts, caseItem.SubType)
+				sendViaNotify := documentControls == "publishAndSend"
 				if err == nil {
-					data.CreatedDocument, err = publishDraftDocument(client, ctx, caseID, documentUUID, content, blankSections)
+					data.CreatedDocument, err = publishDraftDocument(client, ctx, caseID, documentUUID, content, blankSections, sendViaNotify)
 				}
 				if ve, ok := err.(sirius.ValidationError); ok {
 					w.WriteHeader(http.StatusBadRequest)
@@ -405,11 +409,11 @@ func UpdateDocument(client UpdateDocumentClient, tmpl template.Template) Handler
 					return err
 				}
 
-				if documentControls == "delete" || documentControls == "publish" || documentControls == "preview" {
+				if documentControls == "delete" || documentControls == "publish" || documentControls == "publishAndSend" || documentControls == "preview" {
 					if len(data.Documents) > 0 {
 						defaultDocumentUUID := data.Documents[0].UUID
 						if data.CreatedDocument.NotifyStatus == "page-limit-exceeded" {
-							if documentControls == "publish" {
+							if documentControls == "publishAndSend" {
 								return RedirectError(fmt.Sprintf("/notify-error/%d/%s/%s/%d/%s?defaultDocumentUUID=%s", data.DonorId, data.CreatedDocument.UUID, data.Case.CaseType, data.Case.ID, data.Case.UID, defaultDocumentUUID))
 							}
 						}
@@ -419,7 +423,7 @@ func UpdateDocument(client UpdateDocumentClient, tmpl template.Template) Handler
 						}
 						data.Document = documentToDisplay
 					} else {
-						if documentControls == "publish" && data.CreatedDocument.NotifyStatus == "page-limit-exceeded" {
+						if documentControls == "publishAndSend" && data.CreatedDocument.NotifyStatus == "page-limit-exceeded" {
 							return RedirectError(fmt.Sprintf("/notify-error/%d/%s/%s/%d/%s?defaultDocumentUUID=%s", data.DonorId, data.CreatedDocument.UUID, data.Case.CaseType, data.Case.ID, data.Case.UID, ""))
 						}
 					}
