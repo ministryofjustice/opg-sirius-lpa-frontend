@@ -12,7 +12,7 @@ import (
 
 type UpdateFeeDecisionClient interface {
 	Case(sirius.Context, int) (sirius.Case, error)
-	DeclineFeeReductions(ctx sirius.Context, id int) ([]sirius.DeclineFeeReductions, error)
+	GetFeeDecision(ctx sirius.Context, feeDecisionID int) (sirius.FeeDecision, error)
 	UpdateFeeDecision(ctx sirius.Context, caseID int, feeDecisionID int, decisionType string, decisionReason string, decisionDate sirius.DateString) error
 	RefDataByCategory(ctx sirius.Context, category string) ([]sirius.RefDataItem, error)
 }
@@ -51,12 +51,9 @@ func UpdateFeeDecision(client UpdateFeeDecisionClient, tmpl template.Template) H
 			IsPartial:      ctx.IsPartial,
 			IsEditing:      true,
 			FeeDecisionID:  feeDecisionID,
-			DecisionType:   postFormString(r, "decisionType"),
-			DecisionReason: postFormString(r, "decisionReason"),
-			DecisionDate:   postFormDateString(r, "decisionDate"),
 		}
 
-		var decisions []sirius.DeclineFeeReductions
+		var feeDecision sirius.FeeDecision
 
 		group.Go(func() error {
 			var err error
@@ -66,7 +63,7 @@ func UpdateFeeDecision(client UpdateFeeDecisionClient, tmpl template.Template) H
 
 		group.Go(func() error {
 			var err error
-			decisions, err = client.DeclineFeeReductions(ctx.With(groupCtx), caseID)
+			feeDecision, err = client.GetFeeDecision(ctx.With(groupCtx), feeDecisionID)
 			return err
 		})
 
@@ -80,21 +77,9 @@ func UpdateFeeDecision(client UpdateFeeDecisionClient, tmpl template.Template) H
 			return err
 		}
 
-		var found bool
-		for _, decision := range decisions {
-			if decision.ID == feeDecisionID {
-				if r.Method != http.MethodPost {
-					data.DecisionType = decision.DecisionType.Key()
-					data.DecisionReason = decision.DecisionReason
-					data.DecisionDate = decision.DecisionDate
-				}
-				found = true
-				break
-			}
-		}
-		if !found {
-			return sirius.StatusError{Code: http.StatusNotFound}
-		}
+		data.DecisionType = feeDecision.DecisionType.Key()
+		data.DecisionReason = feeDecision.DecisionReason
+		data.DecisionDate = feeDecision.DecisionDate
 
 		if data.Case.CaseType == "DIGITAL_LPA" {
 			data.ReturnUrl = fmt.Sprintf("/lpa/%s/payments", data.Case.UID)
@@ -103,6 +88,10 @@ func UpdateFeeDecision(client UpdateFeeDecisionClient, tmpl template.Template) H
 		}
 
 		if r.Method == http.MethodPost {
+			data.DecisionType = postFormString(r, "decisionType")
+			data.DecisionReason = postFormString(r, "decisionReason")
+			data.DecisionDate = postFormDateString(r, "decisionDate")
+
 			err := client.UpdateFeeDecision(
 				ctx,
 				caseID,
