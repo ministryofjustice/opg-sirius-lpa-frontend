@@ -129,7 +129,7 @@ describe("View a payment", () => {
 
     it("displays decline fee reduction information", () => {
       cy.visit("/payments/801");
-      cy.contains("Decline fee reductions");
+      cy.contains("Declined fee reductions");
       cy.get("#f-decline-fee-reductions-tab").click();
       cy.contains("Reduction declined:").should("be.visible");
       cy.contains("Remission declined");
