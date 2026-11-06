@@ -33,6 +33,7 @@ func TestCreateLpa(t *testing.T) {
 					SubType:              "pfa",
 					ExpectedPaymentTotal: 0,
 					Status:               shared.CaseStatusTypePending,
+					PaymentByCheque:      shared.BoolPtr(true),
 				},
 			},
 			setup: func() {
@@ -51,6 +52,7 @@ func TestCreateLpa(t *testing.T) {
 							"caseSubtype":          matchers.String("pfa"),
 							"expectedPaymentTotal": matchers.Integer(0),
 							"status":               matchers.String("Pending"),
+							"paymentByCheque":      matchers.Like(true),
 						},
 					}).
 					WithCompleteResponse(consumer.Response{
