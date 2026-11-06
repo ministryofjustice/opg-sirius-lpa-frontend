@@ -28,14 +28,15 @@
       {{ template "form-content" . }}
 
       <div class="govuk-button-group govuk-!-padding-top-5">
-        <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
         {{ if eq .CaseType "epa" }}
+          <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
           <a class="govuk-link govuk-link--no-visited-state"
              href=""
              hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
              hx-target=".action-panel__content"
              hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Cancel</a>
         {{ else }}
+          <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
           <a class="govuk-link govuk-link--no-visited-state"
              href=""
              hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-4" .DonorId .CaseId .FlowQuery) }}"
@@ -65,7 +66,7 @@
       <form class="form" method="POST">
         {{ template "form-content" . }}
         <div class="govuk-button-group govuk-!-padding-top-5">
-          <button class="govuk-button" data-module="govuk-button" type="submit">Continue</button>
+          <button class="govuk-button" data-module="govuk-button" type="submit">{{ if eq .CaseType "epa" }}Continue{{ else }}Save{{ end }}</button>
           <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-%s?id=%d&caseId=%d%s" .CaseType .DonorId .CaseId .FlowQuery) }}">Cancel</a>
         </div>
       </form>
@@ -75,13 +76,13 @@
 
 {{ define "form-content" }}
   <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
-  <div class="govuk-form-group{{ if .Error.Field.attorney }} govuk-form-group--error{{ end }}">
+  <div class="govuk-form-group{{ if .Error.Field.attorney }} govuk-form-group--error{{ end }}" {{if eq .CaseType "lpa"}}data-module="app-fill-correspondent-details"{{end}}>
     <fieldset class="govuk-fieldset">
       {{ template "errors" .Error.Field.attorney }}
 
       <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
         <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="f-actor-new" name="actorId" type="radio" value="new" checked>
+          <input class="govuk-radios__input" id="f-actor-new" name="actorId" type="radio" value="new" {{if eq .CaseType "epa"}}checked{{end}}>
           <label class="govuk-label govuk-radios__label" for="f-actor-new">
             Create a new correspondent
           </label>
@@ -97,49 +98,11 @@
             </div>
           {{ end }}
         {{ else }}
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="f-actor-donor" name="actorId" type="radio" value="{{ .Lpa.Donor.ID }}">
-            <label class="govuk-label govuk-radios__label" for="f-actor-donor">
-                {{ .Lpa.Donor.Firstname }} {{ .Lpa.Donor.Surname }} (donor)
-            </label>
-          </div>
-          {{ range $num, $attorney := .Lpa.Attorneys }}
+          {{ range $num, $actor := .Actors }}
             <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="f-attorney-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $attorney.ID }}">
-              <label class="govuk-label govuk-radios__label" for="f-attorney-{{ plusN $num 1 }}">
-                  {{ $attorney.Firstname }} {{ $attorney.Surname }} (attorney)
-              </label>
-            </div>
-          {{ end }}
-          {{ range $num, $attorney := .Lpa.ReplacementAttorneys }}
-            <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="f-replacement-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $attorney.ID }}">
-              <label class="govuk-label govuk-radios__label" for="f-replacement-{{ plusN $num 1 }}">
-                  {{ $attorney.Firstname }} {{ $attorney.Surname }} (replacement attorney)
-              </label>
-            </div>
-          {{ end }}
-          {{ range $num, $certificateProvider := .Lpa.CertificateProviders }}
-            <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="f-certificate-provider-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $certificateProvider.ID }}">
-              <label class="govuk-label govuk-radios__label" for="f-certificate-provider-{{ plusN $num 1 }}">
-                  {{ $certificateProvider.Firstname }} {{ $certificateProvider.Surname }} (certificate provider)
-              </label>
-            </div>
-          {{ end }}
-          {{ range $num, $notifiedPerson := .Lpa.NotifiedPersons }}
-            <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="f-notified-person-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $notifiedPerson.ID }}">
-              <label class="govuk-label govuk-radios__label" for="f-notified-person-{{ plusN $num 1 }}">
-                  {{ $notifiedPerson.Firstname }} {{ $notifiedPerson.Surname }} (notified person)
-              </label>
-            </div>
-          {{ end }}
-          {{ range $num, $trustCorporation := .Lpa.TrustCorporations }}
-            <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="f-trust-corporation-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $trustCorporation.ID }}">
-              <label class="govuk-label govuk-radios__label" for="f-trust-corporation-{{ plusN $num 1 }}">
-                  {{ $trustCorporation.CompanyName }} (trust corporation)
+              <input class="govuk-radios__input" id="f-actor-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $actor.ID }}" data-fields="{{$actor.Fields}}">
+              <label class="govuk-label govuk-radios__label" for="f-actor-{{ plusN $num 1 }}">
+                {{ printf "%s (%s)" $actor.Name $actor.Label }}
               </label>
             </div>
           {{ end }}
@@ -147,4 +110,65 @@
       </div>
     </fieldset>
   </div>
+
+  {{ if eq .CaseType "lpa" }}
+    <div class="govuk-!-display-none" data-module="app-fill-correspondent-details--fields">
+      {{ template "input" (field "salutation" "Title" .Correspondent.Salutation .Error.Field.salutation) }}
+      {{ template "input" (field "firstname" "First name" .Correspondent.Firstname .Error.Field.firstname) }}
+      {{ template "input" (field "middlenames" "Middle names" .Correspondent.Middlenames .Error.Field.middlenames) }}
+      {{ template "input" (field "surname" "Last name" .Correspondent.Surname .Error.Field.surname) }}
+      {{ template "input" (field "companyName" "Company name" .Correspondent.CompanyName .Error.Field.companyName) }}
+      {{ template "input" (field "companyNumber" "Company reference" .Correspondent.CompanyNumber .Error.Field.companyNumber) }}
+
+      <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Address" data-app-address-finder-fill-country="false">
+        {{ template "input" (field "addressLine1" "Address line 1" .Correspondent.AddressLine1 .Error.Field.addressLine1 "data-app-address-finder-map" "addressLine1") }}
+        {{ template "input" (field "addressLine2" "Address line 2" .Correspondent.AddressLine2 .Error.Field.addressLine2 "data-app-address-finder-map" "addressLine2") }}
+        {{ template "input" (field "addressLine3" "Address line 3" .Correspondent.AddressLine3 .Error.Field.addressLine3 "data-app-address-finder-map" "addressLine3") }}
+        {{ template "input" (field "town" "Town" .Correspondent.Town .Error.Field.town "data-app-address-finder-map" "town" "class" "govuk-!-width-two-thirds") }}
+        {{ template "input" (field "county" "County" .Correspondent.County .Error.Field.county) }}
+        {{ template "input" (field "postcode" "Postcode" .Correspondent.Postcode .Error.Field.postcode "data-app-address-finder-map" "postcode" "class" "govuk-!-width-two-thirds") }}
+        {{ template "input" (field "country" "Country" .Correspondent.Country .Error.Field.country "data-app-address-finder-map" "country") }}
+        {{ template "radios" (radios "isAirmailRequired" "Airmail required" (stringifyBool .Correspondent.IsAirmailRequired) .Error.Field.isAirmailRequired true
+        (item "true" "Yes")
+        (item "false" "No")
+        ) }}
+      </div>
+
+      {{ template "input" (field "phoneNumber" "Telephone number" .Correspondent.PhoneNumber .Error.Field.phoneNumber) }}
+      {{ template "input" (field "email" "Email address" .Correspondent.Email .Error.Field.email) }}
+
+      <div class="govuk-form-group {{ if .Error.Field.correspondenceBy }}govuk-form-group--error{{ end }}">
+        <fieldset class="govuk-fieldset">
+          <legend class="govuk-fieldset__legend">Correspondence by</legend>
+            {{ template "errors" .Error.Field.correspondenceBy }}
+          <div class="govuk-checkboxes govuk-checkboxes--small govuk-checkboxes--inline" data-module="govuk-checkboxes">
+            <div class="govuk-checkboxes__item">
+              <input class="govuk-checkboxes__input" id="f-correspondenceBy-post" name="correspondenceBy" type="checkbox" value="post" {{ if .Correspondent.CorrespondenceByPost }}checked{{ end }}>
+              <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-post">
+                Post
+              </label>
+            </div>
+            <div class="govuk-checkboxes__item">
+              <input class="govuk-checkboxes__input" id="f-correspondenceBy-email" name="correspondenceBy" type="checkbox" value="email" {{ if .Correspondent.CorrespondenceByEmail }}checked{{ end }}>
+              <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-email">
+                Email
+              </label>
+            </div>
+            <div class="govuk-checkboxes__item">
+              <input class="govuk-checkboxes__input" id="f-correspondenceBy-phone" name="correspondenceBy" type="checkbox" value="phone" {{ if .Correspondent.CorrespondenceByPhone }}checked{{ end }}>
+              <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-phone">
+                Phone
+              </label>
+            </div>
+            <div class="govuk-checkboxes__item">
+              <input class="govuk-checkboxes__input" id="f-correspondenceBy-welsh" name="correspondenceBy" type="checkbox" value="welsh" {{ if .Correspondent.CorrespondenceByWelsh }}checked{{ end }}>
+              <label class="govuk-label govuk-checkboxes__label" for="f-correspondenceBy-welsh">
+                Welsh
+              </label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  {{ end }}
 {{ end }}
