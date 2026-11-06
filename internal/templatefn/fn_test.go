@@ -219,6 +219,19 @@ func TestInStringArray(t *testing.T) {
 	assert.Equal(t, false, val)
 }
 
+func TestIsMap(t *testing.T) {
+	fns := All("", "", "")
+	fn := fns["isMap"].(func(interface{}) bool)
+
+	var val bool
+
+	val = fn("123")
+	assert.Equal(t, false, val)
+
+	val = fn(map[string]interface{}{"key": "value"})
+	assert.Equal(t, true, val)
+}
+
 func TestIsDateMap(t *testing.T) {
 	fns := All("", "", "")
 	fn := fns["isDateMap"].(func(interface{}) bool)
@@ -784,6 +797,7 @@ func TestEventWithContext(t *testing.T) {
 
 	event := sirius.LpaEvent{}
 	donorID := "123"
+	decisionTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	feeReductionTypes := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	complaintCategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
 	complaintSubcategories := []sirius.RefDataItem{{Handle: "test", Label: "Test"}}
@@ -796,6 +810,7 @@ func TestEventWithContext(t *testing.T) {
 		LpaEvent: event,
 		Context: EventContext{
 			DonorID:                donorID,
+			DecisionTypes:          decisionTypes,
 			FeeReductionTypes:      feeReductionTypes,
 			ComplaintCategories:    complaintCategories,
 			ComplaintSubcategories: complaintSubcategories,
@@ -808,6 +823,7 @@ func TestEventWithContext(t *testing.T) {
 	result := fn(
 		event,
 		"donorID", donorID,
+		"decisionTypes", decisionTypes,
 		"feeReductionTypes", feeReductionTypes,
 		"complaintCategories", complaintCategories,
 		"complaintSubcategories", complaintSubcategories,

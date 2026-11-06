@@ -1,0 +1,49 @@
+{{ template "page" . }}
+
+{{ define "title" }}Case Page{{ end }}
+
+{{ define "container-classes" }} app-!-max-full-width govuk-!-padding-left-5{{ end }}
+
+{{ define "sirius-header" }}
+  {{ template "siriusHeader" . }}
+{{ end }}
+
+{{ define "case-page-header" }}
+  <div class="app-case-page__header">
+    <div class="app-case-page__person-info">
+      {{ template "poas-donor-details" . }}
+    </div>
+    <div class="app-case-page__case-tiles">
+      <p class="govuk-body govuk-!-margin-bottom-0">Case tiles go here</p>
+    </div>
+  </div>
+{{ end }}
+
+{{ define "action-panel-wrapper" }}
+  {{ template "actionPanelWrapper" . }}
+{{ end }}
+
+{{ define "main" }}
+  <div class="app-case-page">
+    <div class="app-case-page__tiles">
+      <div class="app-case-page__tile">
+        <h2 class="govuk-heading-m colour-govuk-white colour-sirius-dark-blue govuk-!-padding-1 govuk-!-padding-left-2 govuk-!-margin-bottom-0">Case Summary</h2>
+        <div class="govuk-!-margin-4">
+          <p class="govuk-body">Case summary go here</p>
+        </div>
+      </div>
+      <div class="app-case-page__tile">
+        <h2 class="govuk-heading-m colour-govuk-white colour-sirius-dark-blue govuk-!-padding-1 govuk-!-padding-left-2 govuk-!-margin-bottom-0">Tasks</h2>
+        <div class="govuk-!-margin-4">
+          <p class="govuk-body">Case tasks go here</p>
+        </div>
+      </div>
+    </div>
+    <div id="case-page-history-container"
+         hx-get="{{ prefix (printf "/donor/%d/history" .DonorID) }}"
+         hx-target="#case-page-history-container"
+         hx-swap="innerHTML"
+         hx-trigger="load"
+    ></div>
+  </div>
+{{ end }}

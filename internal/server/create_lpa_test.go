@@ -66,6 +66,7 @@ func TestGetCreateLpa(t *testing.T) {
 			AllowNewNotifiedPerson: true,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
+			FlowQuery:              "&flow=create",
 			Title:                  "Create an LPA",
 		}).
 		Return(nil)
@@ -93,6 +94,7 @@ func TestGetCreateLpaHtmxRequest(t *testing.T) {
 			AllowNewNotifiedPerson: true,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
+			FlowQuery:              "&flow=create",
 			IsPartial:              true,
 			Title:                  "Create an LPA",
 		}).
@@ -122,6 +124,7 @@ func TestGetCreateLpaDoesNotSetIsUpdate(t *testing.T) {
 			AllowNewNotifiedPerson: true,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
+			FlowQuery:              "&flow=create",
 			IsUpdate:               false,
 			Title:                  "Create an LPA",
 		}).
@@ -320,6 +323,7 @@ func TestPostCreateLpa(t *testing.T) {
 		ApplicantIds:                     []int{123},
 		AnyOtherInfo:                     shared.BoolPtr(true),
 		AdditionalInfo:                   "Some extra info",
+		ApplicationHasContinuationSheets: shared.BoolPtr(true),
 		ApplicationHasGuidance:           shared.BoolPtr(true),
 		ApplicationHasRestrictions:       shared.BoolPtr(false),
 		PaymentByDebitCreditCard:         shared.BoolPtr(true),
@@ -358,10 +362,11 @@ func TestPostCreateLpa(t *testing.T) {
 			CaseId:                 456,
 			DonorId:                123,
 			DonorName:              "Firstname Surname",
+			FlowQuery:              "&flow=create",
 			Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
-			Title:                  "Create an LPA",
 			Success:                true,
 			SuccessMessage:         "You have successfully created an LPA.",
+			Title:                  "Create an LPA",
 		}).
 		Return(nil)
 
@@ -379,6 +384,7 @@ func TestPostCreateLpa(t *testing.T) {
 		"lpaDonorSignatureDate":            {dateString},
 		"onlineLpaId":                      {"A12345678901"},
 		"preferencesAndInstructions":       {"guidance"},
+		"continuationSheets":               {"continuationSheets"},
 		"receiptDate":                      {dateString},
 	}
 
@@ -396,12 +402,13 @@ func TestPostCreateLpa(t *testing.T) {
 
 func TestPostCreateLpaClearsMismatchedSubtypeOnlyFields(t *testing.T) {
 	lpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		AnyOtherInfo:               shared.BoolPtr(false),
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(false),
+		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
 			SubType:                                   "hw",
 			LifeSustainingTreatment:                   "Option A",
@@ -446,12 +453,13 @@ func TestPostCreateLpaClearsMismatchedSubtypeOnlyFields(t *testing.T) {
 
 func TestPostCreateLpaPreferencesNoneClearsOtherSelections(t *testing.T) {
 	lpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		AnyOtherInfo:               shared.BoolPtr(false),
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(false),
+		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
 			CaseAttorneySingular:                      shared.BoolPtr(true),
 			CaseAttorneyJointly:                       shared.BoolPtr(false),
@@ -492,21 +500,22 @@ func TestPostCreateLpaPreferencesNoneClearsOtherSelections(t *testing.T) {
 
 func TestPostCreateLpaDropsOnlineLpaIdWhenNotOnline(t *testing.T) {
 	lpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		AnyOtherInfo:               shared.BoolPtr(false),
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(false),
+		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
-			SubType:                                   "pfa",
-			ApplicationType:                           "Classic",
-			CaseAttorneySingular:                      shared.BoolPtr(true),
-			CaseAttorneyJointly:                       shared.BoolPtr(false),
-			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
+			SubType:                         "pfa",
+			ApplicationType:                 "Classic",
+			CaseAttorneySingular:            shared.BoolPtr(true),
+			CaseAttorneyJointly:             shared.BoolPtr(false),
+			CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque:                           shared.BoolPtr(false),
-			PaymentExemption:                          shared.BoolPtr(false),
+			PaymentByCheque:  shared.BoolPtr(false),
+			PaymentExemption: shared.BoolPtr(false),
 		},
 	}
 
@@ -542,12 +551,13 @@ func TestPostCreateLpaDropsOnlineLpaIdWhenNotOnline(t *testing.T) {
 
 func TestPostCreateLpaDropsCardPaymentContactWhenCardNotSelected(t *testing.T) {
 	lpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		AnyOtherInfo:               shared.BoolPtr(false),
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(false),
+		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
 			CaseAttorneySingular:                      shared.BoolPtr(true),
 			CaseAttorneyJointly:                       shared.BoolPtr(false),
@@ -589,12 +599,13 @@ func TestPostCreateLpaDropsCardPaymentContactWhenCardNotSelected(t *testing.T) {
 
 func TestPostCreateLpaDropsAdditionalInfoWhenAnyOtherInfoNotSelected(t *testing.T) {
 	lpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		AnyOtherInfo:               shared.BoolPtr(false),
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(false),
+		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
 			CaseAttorneySingular:                      shared.BoolPtr(true),
 			CaseAttorneyJointly:                       shared.BoolPtr(false),
@@ -635,12 +646,13 @@ func TestPostCreateLpaDropsAdditionalInfoWhenAnyOtherInfoNotSelected(t *testing.
 
 func TestPostCreateLpaApplicationFeeReducedFeeExemption(t *testing.T) {
 	lpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(true),
-		AnyOtherInfo:               shared.BoolPtr(false),
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(true),
+		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
 			CaseAttorneySingular:                      shared.BoolPtr(true),
 			CaseAttorneyJointly:                       shared.BoolPtr(false),
@@ -682,12 +694,13 @@ func TestPostCreateLpaApplicationFeeReducedFeeExemption(t *testing.T) {
 
 func TestPostCreateLpaApplicationFeeReducedFeeRemission(t *testing.T) {
 	lpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(true),
-		RepeatApplication:          shared.BoolPtr(false),
-		AnyOtherInfo:               shared.BoolPtr(false),
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(true),
+		RepeatApplication:                shared.BoolPtr(false),
+		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
 			CaseAttorneySingular:                      shared.BoolPtr(true),
 			CaseAttorneyJointly:                       shared.BoolPtr(false),
@@ -729,12 +742,13 @@ func TestPostCreateLpaApplicationFeeReducedFeeRemission(t *testing.T) {
 
 func TestPostCreateLpaApplicationFeeReducedFeeTypeIgnoredWhenNotSelected(t *testing.T) {
 	lpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		AnyOtherInfo:               shared.BoolPtr(false),
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(false),
+		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
 			CaseAttorneySingular:                      shared.BoolPtr(true),
 			CaseAttorneyJointly:                       shared.BoolPtr(false),
@@ -775,15 +789,16 @@ func TestPostCreateLpaApplicationFeeReducedFeeTypeIgnoredWhenNotSelected(t *test
 
 func TestPostCreateLpaApplicantAndLifeSustainingTreatmentFields(t *testing.T) {
 	lpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		AnyOtherInfo:               shared.BoolPtr(false),
-		ApplicantType:              "attorney",
-		ApplicantSignatureDate:     "2022-04-06",
-		ApplicantIds:               []int{1, 2},
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(false),
+		AnyOtherInfo:                     shared.BoolPtr(false),
+		ApplicantType:                    "attorney",
+		ApplicantSignatureDate:           "2022-04-06",
+		ApplicantIds:                     []int{1, 2},
 		Case: sirius.Case{
 			SubType:                                   "hw",
 			LifeSustainingTreatment:                   "None",
@@ -843,12 +858,13 @@ func TestPostCreateLpaEditAttorneySignatureDates(t *testing.T) {
 		},
 	}
 	submittedLpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		AnyOtherInfo:               shared.BoolPtr(false),
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(false),
+		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
 			SubType:                                   "hw",
 			CaseAttorneySingular:                      shared.BoolPtr(false),
@@ -909,12 +925,13 @@ func TestPostCreateLpaEditReplacementAttorneySignatureDates(t *testing.T) {
 		},
 	}
 	submittedLpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		AnyOtherInfo:               shared.BoolPtr(false),
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(false),
+		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
 			SubType:                                   "hw",
 			CaseAttorneySingular:                      shared.BoolPtr(false),
@@ -975,12 +992,13 @@ func TestPostCreateLpaEditTrustCorporationSignatureDates(t *testing.T) {
 		},
 	}
 	submittedLpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		AnyOtherInfo:               shared.BoolPtr(false),
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(false),
+		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
 			SubType:                                   "hw",
 			CaseAttorneySingular:                      shared.BoolPtr(false),
@@ -1041,12 +1059,13 @@ func TestPostCreateLpaEditAttorneySignatureDatesError(t *testing.T) {
 		},
 	}
 	submittedLpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		AnyOtherInfo:               shared.BoolPtr(false),
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(false),
+		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
 			SubType:                                   "hw",
 			CaseAttorneySingular:                      shared.BoolPtr(false),
@@ -1102,12 +1121,13 @@ func TestPostCreateLpaEditReplacementAttorneySignatureDatesError(t *testing.T) {
 		},
 	}
 	submittedLpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		AnyOtherInfo:               shared.BoolPtr(false),
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(false),
+		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
 			SubType:                                   "hw",
 			CaseAttorneySingular:                      shared.BoolPtr(false),
@@ -1163,12 +1183,13 @@ func TestPostCreateLpaEditTrustCorporationSignatureDatesError(t *testing.T) {
 		},
 	}
 	submittedLpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		AnyOtherInfo:               shared.BoolPtr(false),
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(false),
+		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
 			SubType:                                   "hw",
 			CaseAttorneySingular:                      shared.BoolPtr(false),
@@ -1288,12 +1309,13 @@ func TestPostCreateLpaEditWhenValidationError(t *testing.T) {
 	existingLpa := sirius.Lpa{Case: sirius.Case{ID: 456, ReceiptDate: sirius.DateString("2022-01-01")}}
 
 	submittedLpa := sirius.Lpa{
-		ApplicationHasGuidance:     shared.BoolPtr(false),
-		ApplicationHasRestrictions: shared.BoolPtr(false),
-		PaymentByDebitCreditCard:   shared.BoolPtr(false),
-		PaymentRemission:           shared.BoolPtr(false),
-		RepeatApplication:          shared.BoolPtr(false),
-		AnyOtherInfo:               shared.BoolPtr(false),
+		ApplicationHasContinuationSheets: shared.BoolPtr(false),
+		ApplicationHasGuidance:           shared.BoolPtr(false),
+		ApplicationHasRestrictions:       shared.BoolPtr(false),
+		PaymentByDebitCreditCard:         shared.BoolPtr(false),
+		PaymentRemission:                 shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(false),
+		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
 			CaseAttorneySingular:                      shared.BoolPtr(true),
 			CaseAttorneyJointly:                       shared.BoolPtr(false),
@@ -1367,18 +1389,19 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
 			dateString := "2022-04-05"
 			lpa := sirius.Lpa{
-				OnlineLpaId:                "A12345678901",
-				AttorneyActDecisions:       "When Registered",
-				ApplicantType:              "donor",
-				ApplicantIds:               []int{123},
-				AnyOtherInfo:               shared.BoolPtr(true),
-				AdditionalInfo:             "Some extra info",
-				ApplicationHasGuidance:     shared.BoolPtr(true),
-				ApplicationHasRestrictions: shared.BoolPtr(false),
-				PaymentByDebitCreditCard:   shared.BoolPtr(true),
-				PaymentRemission:           shared.BoolPtr(false),
-				RepeatApplication:          shared.BoolPtr(false),
-				CardPaymentContact:         "01234 567890",
+				OnlineLpaId:                      "A12345678901",
+				AttorneyActDecisions:             "When Registered",
+				ApplicantType:                    "donor",
+				ApplicantIds:                     []int{123},
+				AnyOtherInfo:                     shared.BoolPtr(true),
+				AdditionalInfo:                   "Some extra info",
+				ApplicationHasContinuationSheets: shared.BoolPtr(false),
+				ApplicationHasGuidance:           shared.BoolPtr(true),
+				ApplicationHasRestrictions:       shared.BoolPtr(false),
+				PaymentByDebitCreditCard:         shared.BoolPtr(true),
+				PaymentRemission:                 shared.BoolPtr(false),
+				RepeatApplication:                shared.BoolPtr(false),
+				CardPaymentContact:               "01234 567890",
 				Case: sirius.Case{
 					SubType:                         "pfa",
 					ApplicationType:                 "Online",
@@ -1409,7 +1432,8 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 				CaseId:                 456,
 				DonorId:                123,
 				DonorName:              "Firstname Surname",
-				HtmxRedirect:           "/create-replacement-attorney?id=123&caseId=456",
+				FlowQuery:              "&flow=create",
+				HtmxRedirect:           "/create-replacement-attorney?id=123&caseId=456&flow=create",
 				HtmxSwap:               "innerHTML",
 				IsPartial:              isHtmx,
 				Lpa:                    sirius.Lpa{Case: sirius.Case{ID: 456}},
@@ -1452,7 +1476,7 @@ func TestPostCreateLpaAddReplacementAttorney(t *testing.T) {
 			resp := w.Result()
 
 			if !isHtmx {
-				expectedRedirect := RedirectError("/create-replacement-attorney?id=123&caseId=456")
+				expectedRedirect := RedirectError("/create-replacement-attorney?id=123&caseId=456&flow=create")
 				assert.Equal(t, expectedRedirect, err)
 			} else {
 				assert.Nil(t, err)
@@ -1477,12 +1501,13 @@ func TestPostCreateLpaUpdateAttorney(t *testing.T) {
 			}
 
 			submittedLpa := sirius.Lpa{
-				ApplicationHasGuidance:     shared.BoolPtr(false),
-				ApplicationHasRestrictions: shared.BoolPtr(false),
-				PaymentByDebitCreditCard:   shared.BoolPtr(false),
-				PaymentRemission:           shared.BoolPtr(false),
-				RepeatApplication:          shared.BoolPtr(false),
-				AnyOtherInfo:               shared.BoolPtr(false),
+				ApplicationHasContinuationSheets: shared.BoolPtr(false),
+				ApplicationHasGuidance:           shared.BoolPtr(false),
+				ApplicationHasRestrictions:       shared.BoolPtr(false),
+				PaymentByDebitCreditCard:         shared.BoolPtr(false),
+				PaymentRemission:                 shared.BoolPtr(false),
+				RepeatApplication:                shared.BoolPtr(false),
+				AnyOtherInfo:                     shared.BoolPtr(false),
 				Case: sirius.Case{
 					SubType:                                   "hw",
 					CaseAttorneySingular:                      shared.BoolPtr(false),
@@ -1621,12 +1646,13 @@ func TestPostCreateLpaUpdateReplacementAttorney(t *testing.T) {
 			}
 
 			submittedLpa := sirius.Lpa{
-				ApplicationHasGuidance:     shared.BoolPtr(false),
-				ApplicationHasRestrictions: shared.BoolPtr(false),
-				PaymentByDebitCreditCard:   shared.BoolPtr(false),
-				PaymentRemission:           shared.BoolPtr(false),
-				RepeatApplication:          shared.BoolPtr(false),
-				AnyOtherInfo:               shared.BoolPtr(false),
+				ApplicationHasContinuationSheets: shared.BoolPtr(false),
+				ApplicationHasGuidance:           shared.BoolPtr(false),
+				ApplicationHasRestrictions:       shared.BoolPtr(false),
+				PaymentByDebitCreditCard:         shared.BoolPtr(false),
+				PaymentRemission:                 shared.BoolPtr(false),
+				RepeatApplication:                shared.BoolPtr(false),
+				AnyOtherInfo:                     shared.BoolPtr(false),
 				Case: sirius.Case{
 					SubType:                                   "hw",
 					CaseAttorneySingular:                      shared.BoolPtr(false),
@@ -1749,7 +1775,7 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			name:        "Update correspondent",
 			formKey:     "updateCorrespondent",
 			formValue:   "true",
-			expectedErr: RedirectError("/create-correspondent?id=1&caseId=2&caseType=lpa"),
+			expectedErr: RedirectError("/edit-correspondent?id=1&caseId=2&caseType=lpa"),
 		},
 		{
 			name:        "Add notified person redirects",
@@ -1761,13 +1787,13 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			name:        "Update notified person redirects",
 			formKey:     "updateNotifiedPerson",
 			formValue:   "111",
-			expectedErr: RedirectError("/create-notified-person?id=1&caseId=2&notifiedPersonId=111"),
+			expectedErr: RedirectError("/update-notified-person?id=1&caseId=2&notifiedPersonId=111"),
 		},
 		{
 			name:        "Update certificate provider redirects",
 			formKey:     "updateCertificateProvider",
 			formValue:   "3",
-			expectedErr: RedirectError("/edit-certificate-provider?id=1&caseId=2&personId=3"),
+			expectedErr: RedirectError("/update-certificate-provider?id=1&caseId=2&personId=3"),
 		},
 		{
 			name:        "Update notified person with invalid ID errors",
@@ -1809,43 +1835,73 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			name:        "Update attorney trust corporation redirects",
 			formKey:     "updateTrustCorporationAttorney",
 			formValue:   "111",
-			expectedErr: RedirectError("/create-trust-corporation?id=1&caseId=2&trustCorporationId=111&replacement=false"),
+			expectedErr: RedirectError("/update-trust-corporation?id=1&caseId=2&trustCorporationId=111&replacement=false"),
 		},
 		{
 			name:        "Update replacement attorney trust corporation redirects",
 			formKey:     "updateTrustCorporationReplacementAttorney",
 			formValue:   "111",
-			expectedErr: RedirectError("/create-trust-corporation?id=1&caseId=2&trustCorporationId=111&replacement=true"),
+			expectedErr: RedirectError("/update-trust-corporation?id=1&caseId=2&trustCorporationId=111&replacement=true"),
 		},
+	}
+
+	flowCases := []struct {
+		name      string
+		query     string
+		flowQuery string
+		hasCaseID bool
+	}{
+		{name: "New LPA", flowQuery: "&flow=create"},
+		{name: "LPA creation flow", query: "&caseId=2&flow=create", flowQuery: "&flow=create", hasCaseID: true},
+		{name: "Edit LPA", query: "&caseId=2", hasCaseID: true},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			client := &mockCreateLpaClient{}
-			client.
-				On("Person", mock.Anything, 1).
-				Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
-			client.
-				On("CreateLpa", mock.Anything, 1, mock.Anything).
-				Return(sirius.Lpa{Case: sirius.Case{ID: 2}}, nil)
+			for _, flowCase := range flowCases {
+				t.Run(flowCase.name, func(t *testing.T) {
+					client := &mockCreateLpaClient{}
+					client.
+						On("Person", mock.Anything, 1).
+						Return(sirius.Person{Firstname: "John", Surname: "Doe"}, nil)
 
-			template := &mockTemplate{}
+					if flowCase.hasCaseID {
+						client.
+							On("Lpa", mock.Anything, 2).
+							Return(sirius.Lpa{Case: sirius.Case{ID: 2}}, nil).
+							Twice()
+						client.
+							On("UpdateLpa", mock.Anything, 2, mock.Anything).
+							Return(nil)
+					} else {
+						client.
+							On("CreateLpa", mock.Anything, 1, mock.Anything).
+							Return(sirius.Lpa{Case: sirius.Case{ID: 2}}, nil)
+					}
 
-			form := url.Values{
-				"caseSubtype": {"pfa"},
-				tc.formKey:    {tc.formValue},
+					template := &mockTemplate{}
+
+					form := url.Values{
+						"caseSubtype": {"pfa"},
+						tc.formKey:    {tc.formValue},
+					}
+
+					r, _ := http.NewRequest(http.MethodPost, "/create-lpa?id=1"+flowCase.query, strings.NewReader(form.Encode()))
+					r.Header.Add("Content-Type", formUrlEncoded)
+					w := httptest.NewRecorder()
+
+					err := CreateLpa(client, template.Func)(w, r)
+					resp := w.Result()
+
+					expectedErr := tc.expectedErr
+					if redirectErr, ok := expectedErr.(RedirectError); ok {
+						expectedErr = RedirectError(string(redirectErr) + flowCase.flowQuery)
+					}
+					assert.Equal(t, expectedErr, err)
+					assert.Equal(t, http.StatusOK, resp.StatusCode)
+					mock.AssertExpectationsForObjects(t, client, template)
+				})
 			}
-
-			r, _ := http.NewRequest(http.MethodPost, "/create-lpa?id=1", strings.NewReader(form.Encode()))
-			r.Header.Add("Content-Type", formUrlEncoded)
-			w := httptest.NewRecorder()
-
-			err := CreateLpa(client, template.Func)(w, r)
-			resp := w.Result()
-
-			assert.Equal(t, tc.expectedErr, err)
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -1869,7 +1925,8 @@ func TestPostErrorWhenAttorneyRadioSelected(t *testing.T) {
 			Error: sirius.ValidationError{
 				Field: sirius.FieldErrors{"applicantType": {"": "Select an applicant"}},
 			},
-			IsUpdate: false,
+			FlowQuery: "&flow=create",
+			IsUpdate:  false,
 			Lpa: sirius.Lpa{
 				Case: sirius.Case{
 					ApplicationType:                           "Online",
@@ -1886,6 +1943,7 @@ func TestPostErrorWhenAttorneyRadioSelected(t *testing.T) {
 				AdditionalInfo:                   "Some extra info",
 				AnyOtherInfo:                     shared.BoolPtr(true),
 				ApplicantType:                    "attorney",
+				ApplicationHasContinuationSheets: shared.BoolPtr(false),
 				ApplicationHasGuidance:           shared.BoolPtr(true),
 				ApplicationHasRestrictions:       shared.BoolPtr(false),
 				AttorneyActDecisions:             "When Registered",

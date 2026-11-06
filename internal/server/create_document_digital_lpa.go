@@ -15,7 +15,7 @@ import (
 type CreateDocumentDigitalLpaClient interface {
 	CaseSummary(ctx sirius.Context, uid string) (sirius.CaseSummary, error)
 	DocumentTemplates(ctx sirius.Context, caseType sirius.CaseType) ([]sirius.DocumentTemplateData, error)
-	CreateDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error)
+	CreateDraftDocument(ctx sirius.Context, caseID, correspondentID int, templateID string, inserts []string) (sirius.Document, error)
 	CreateContact(ctx sirius.Context, contact sirius.Person) (sirius.Person, error)
 }
 
@@ -211,7 +211,7 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 					}
 				}
 
-				_, err = client.CreateDocument(ctx, lpa.SiriusData.ID, recipient.ID, data.SelectedTemplateId, data.SelectedInserts)
+				_, err = client.CreateDraftDocument(ctx, lpa.SiriusData.ID, recipient.ID, data.SelectedTemplateId, data.SelectedInserts)
 				if err != nil {
 					return err
 				}
@@ -222,7 +222,7 @@ func CreateDocumentDigitalLpa(client CreateDocumentDigitalLpaClient, tmpl templa
 				} else if err != nil {
 					return err
 				} else {
-					return RedirectError(fmt.Sprintf("/edit-document?id=%d&case=%s", lpa.SiriusData.ID, sirius.CaseTypeDigitalLpa))
+					return RedirectError(fmt.Sprintf("/update-document?id=%d&case=%s", lpa.SiriusData.ID, sirius.CaseTypeDigitalLpa))
 				}
 			}
 		}

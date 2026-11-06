@@ -43,7 +43,7 @@
 
       <form class="form"
             method="POST"
-            hx-post="{{ if .IsNew }}{{ prefix (printf "/create-donor?id=%d&entity=%s%s" .DonorId .EntityType .CaseUids) }}{{ else }}{{ prefix (printf "/edit-donor?id=%d&entity=%s%s" .DonorId .EntityType .CaseUids) }}{{ end }}"
+            hx-post="{{ if .IsNew }}{{ prefix (printf "/create-donor?id=%d&entity=%s%s" .DonorId .EntityType .CaseUids) }}{{ else }}{{ prefix (printf "/update-donor?id=%d&entity=%s%s" .DonorId .EntityType .CaseUids) }}{{ end }}"
             hx-target=".action-panel__content"
             hx-swap="innerHTML">
         {{ template "form-content" . }}

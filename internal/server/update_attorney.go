@@ -33,6 +33,7 @@ func UpdateAttorney(client UpdateAttorneyClient, tmpl template.Template) Handler
 		caseType := r.FormValue("caseType")
 
 		data := createAttorneyData{
+			FlowQuery: getFlowQuery(r),
 			XSRFToken: ctx.XSRFToken,
 			IsPartial: ctx.IsPartial,
 			DonorId:   donorId,
@@ -130,9 +131,9 @@ func UpdateAttorney(client UpdateAttorneyClient, tmpl template.Template) Handler
 			}
 
 			if r.FormValue("update-next-attorney") != "" {
-				redirect := fmt.Sprintf("/update-attorney?id=%d&caseId=%d&caseType=%s&attorneyId=%d", data.DonorId, data.CaseId, data.CaseType, data.NextAttorneyId)
+				redirect := fmt.Sprintf("/update-attorney?id=%d&caseId=%d&caseType=%s&attorneyId=%d%s", data.DonorId, data.CaseId, data.CaseType, data.NextAttorneyId, data.FlowQuery)
 				if nextPersonType == "Trust Corporation" {
-					redirect = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=false", data.DonorId, data.CaseId, data.NextAttorneyId)
+					redirect = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=false%s", data.DonorId, data.CaseId, data.NextAttorneyId, data.FlowQuery)
 				}
 
 				if data.IsPartial {
@@ -144,7 +145,7 @@ func UpdateAttorney(client UpdateAttorneyClient, tmpl template.Template) Handler
 			}
 
 			if data.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/create-%s?id=%d&caseId=%d", data.CaseType, data.DonorId, data.CaseId)
+				data.HtmxRedirect = fmt.Sprintf("/create-%s?id=%d&caseId=%d%s", data.CaseType, data.DonorId, data.CaseId, data.FlowQuery)
 				data.HtmxSwap = "innerHTML show:#accordion-create-epa-heading-3:top"
 				return tmpl(w, data)
 			}
@@ -152,7 +153,7 @@ func UpdateAttorney(client UpdateAttorneyClient, tmpl template.Template) Handler
 			if data.CaseType == "epa" {
 				return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", data.DonorId, data.CaseId))
 			}
-			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#scroll-to-attorneys", data.DonorId, data.CaseId))
+			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys", data.DonorId, data.CaseId, data.FlowQuery))
 		}
 
 		return tmpl(w, data)

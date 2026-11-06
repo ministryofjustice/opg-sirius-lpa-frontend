@@ -49,45 +49,55 @@ var mockRelationshipToDonorCategories = []sirius.RefDataItem{
 }
 
 func TestGetCreateAttorney(t *testing.T) {
-	for _, isHtmx := range []bool{false, true} {
-		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
-			client := &mockCreateAttorneyClient{}
-			client.
-				On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
-				Return(mockRelationshipToDonorCategories, nil)
-			client.On("Lpa", mock.Anything, 2).
-				Return(sirius.Lpa{Case: sirius.Case{SubType: "pfa"}}, nil)
+	flowCases := []struct {
+		name      string
+		flowQuery string
+	}{
+		{name: "Without flow"},
+		{name: "Create flow", flowQuery: "&flow=create"},
+	}
 
-			expectedData := createAttorneyData{
-				Attorney:             sirius.Attorney{SystemStatus: shared.BoolPtr(true)},
-				CaseId:               2,
-				CaseType:             "lpa",
-				CaseSubType:          "pfa",
-				DonorId:              1,
-				IsPartial:            isHtmx,
-				RelationshipToDonors: mockRelationshipToDonorCategories,
-				Title:                "Add an attorney",
+	for _, flowCase := range flowCases {
+		t.Run(flowCase.name, func(t *testing.T) {
+			for _, isHtmx := range []bool{false, true} {
+				t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
+					client := &mockCreateAttorneyClient{}
+					client.
+						On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
+						Return(mockRelationshipToDonorCategories, nil)
+					client.On("Lpa", mock.Anything, 2).
+						Return(sirius.Lpa{Case: sirius.Case{SubType: "pfa"}}, nil)
+
+					expectedData := createAttorneyData{
+						FlowQuery:            flowCase.flowQuery,
+						IsPartial:            isHtmx,
+						DonorId:              1,
+						CaseId:               2,
+						RelationshipToDonors: mockRelationshipToDonorCategories,
+						Attorney:             sirius.Attorney{SystemStatus: shared.BoolPtr(true)},
+						Title:                "Add an attorney",
+						CaseType:             "lpa",
+						CaseSubType:          "pfa",
+					}
+					template := &mockTemplate{}
+					template.
+						On("Func", mock.Anything, expectedData).
+						Return(nil)
+
+					r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType=lpa"+flowCase.flowQuery, nil)
+					w := httptest.NewRecorder()
+					if isHtmx {
+						r.Header.Add("HX-Request", "true")
+					}
+
+					err := CreateAttorney(client, template.Func)(w, r)
+					resp := w.Result()
+
+					assert.Nil(t, err)
+					assert.Equal(t, http.StatusOK, resp.StatusCode)
+					mock.AssertExpectationsForObjects(t, client, template)
+				})
 			}
-
-			template := &mockTemplate{}
-			template.
-				On("Func", mock.Anything, expectedData).
-				Return(nil)
-
-			r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2&caseType=lpa", nil)
-			w := httptest.NewRecorder()
-
-			if isHtmx {
-
-				r.Header.Add("HX-Request", "true")
-			}
-
-			err := CreateAttorney(client, template.Func)(w, r)
-			resp := w.Result()
-
-			assert.Nil(t, err)
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -154,27 +164,67 @@ func TestGetCreateAttorneyWhenLpaErrors(t *testing.T) {
 	mock.AssertExpectationsForObjects(t, client)
 }
 
-func TestPostCreateAttorneyAddOrNextAnotherEpa(t *testing.T) {
+func TestPostCreateAttorneyTransitions(t *testing.T) {
 	tests := []struct {
 		name         string
+		caseType     string
+		caseSubType  string
 		formKey      string
-		htmxSwap     string
+		flowQuery    string
 		redirect     string
 		htmxRedirect string
+		htmxSwap     string
 	}{
 		{
-			name:         "Post create attorney",
-			formKey:      "",
-			htmxSwap:     "innerHTML show:#accordion-create-epa-heading-3:top",
+			name:         "EPA save",
+			caseType:     "epa",
 			redirect:     "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3",
 			htmxRedirect: "/create-epa?id=1&caseId=2",
+			htmxSwap:     "innerHTML show:#accordion-create-epa-heading-3:top",
 		},
 		{
-			name:         "Post create attorney - add another",
+			name:         "EPA add another",
+			caseType:     "epa",
 			formKey:      "add-another",
-			htmxSwap:     "innerHTML scroll:.action-panel__content:top",
 			redirect:     "/create-attorney?id=1&caseId=2&caseType=epa",
 			htmxRedirect: "/create-attorney?id=1&caseId=2&caseType=epa",
+			htmxSwap:     "innerHTML scroll:.action-panel__content:top",
+		},
+		{
+			name:         "LPA save without flow",
+			caseType:     "lpa",
+			caseSubType:  "pfa",
+			redirect:     "/create-lpa?id=1&caseId=2#scroll-to-attorneys",
+			htmxRedirect: "/create-lpa?id=1&caseId=2",
+			htmxSwap:     "innerHTML show:#accordion-create-epa-heading-3:top",
+		},
+		{
+			name:         "LPA save with create flow",
+			caseType:     "lpa",
+			caseSubType:  "pfa",
+			flowQuery:    "&flow=create",
+			redirect:     "/create-lpa?id=1&caseId=2&flow=create#scroll-to-attorneys",
+			htmxRedirect: "/create-lpa?id=1&caseId=2&flow=create",
+			htmxSwap:     "innerHTML show:#accordion-create-epa-heading-3:top",
+		},
+		{
+			name:         "LPA add another without flow",
+			caseType:     "lpa",
+			caseSubType:  "pfa",
+			formKey:      "add-another",
+			redirect:     "/create-attorney?id=1&caseId=2&caseType=lpa",
+			htmxRedirect: "/create-attorney?id=1&caseId=2&caseType=lpa",
+			htmxSwap:     "innerHTML scroll:.action-panel__content:top",
+		},
+		{
+			name:         "LPA add another with create flow",
+			caseType:     "lpa",
+			caseSubType:  "pfa",
+			formKey:      "add-another",
+			flowQuery:    "&flow=create",
+			redirect:     "/create-attorney?id=1&caseId=2&caseType=lpa&flow=create",
+			htmxRedirect: "/create-attorney?id=1&caseId=2&caseType=lpa&flow=create",
+			htmxSwap:     "innerHTML scroll:.action-panel__content:top",
 		},
 	}
 
@@ -201,12 +251,19 @@ func TestPostCreateAttorneyAddOrNextAnotherEpa(t *testing.T) {
 							PhoneNumber:       "079876543345",
 							Email:             "rm2@email.test",
 						},
-						RelationshipToDonor: "no relation",
-						SystemStatus:        shared.BoolPtr(true),
+						SystemStatus: shared.BoolPtr(true),
+					}
+					if tc.caseType == "epa" {
+						attorney.RelationshipToDonor = "no relation"
 					}
 					client := &mockCreateAttorneyClient{}
+					if tc.caseType == "lpa" {
+						client.
+							On("Lpa", mock.Anything, 2).
+							Return(sirius.Lpa{Case: sirius.Case{SubType: tc.caseSubType}}, nil)
+					}
 					client.
-						On("CreateAttorney", mock.Anything, 2, "epa", attorney).
+						On("CreateAttorney", mock.Anything, 2, tc.caseType, attorney).
 						Return(nil).
 						On("RefDataByCategory", mock.Anything, sirius.RelationshipToDonorCategory).
 						Return(mockRelationshipToDonorCategories, nil)
@@ -216,15 +273,17 @@ func TestPostCreateAttorneyAddOrNextAnotherEpa(t *testing.T) {
 					if isHtmx {
 						template.
 							On("Func", mock.Anything, createAttorneyData{
-								Attorney:             attorney,
-								CaseId:               2,
-								CaseType:             "epa",
+								FlowQuery:            tc.flowQuery,
+								IsPartial:            true,
 								DonorId:              1,
+								CaseId:               2,
+								RelationshipToDonors: mockRelationshipToDonorCategories,
+								Attorney:             attorney,
 								HtmxRedirect:         tc.htmxRedirect,
 								HtmxSwap:             tc.htmxSwap,
-								IsPartial:            true,
-								RelationshipToDonors: mockRelationshipToDonorCategories,
 								Title:                "Add an attorney",
+								CaseType:             tc.caseType,
+								CaseSubType:          tc.caseSubType,
 							}).
 							Return(nil)
 					}
@@ -252,7 +311,7 @@ func TestPostCreateAttorneyAddOrNextAnotherEpa(t *testing.T) {
 						form.Set(tc.formKey, "true")
 					}
 
-					r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType=epa", strings.NewReader(form.Encode()))
+					r, _ := http.NewRequest(http.MethodPost, "/?id=1&caseId=2&caseType="+tc.caseType+tc.flowQuery, strings.NewReader(form.Encode()))
 					r.Header.Add("Content-Type", formUrlEncoded)
 					if isHtmx {
 						r.Header.Add("HX-Request", "true")
@@ -262,10 +321,10 @@ func TestPostCreateAttorneyAddOrNextAnotherEpa(t *testing.T) {
 					err := CreateAttorney(client, template.Func)(w, r)
 					resp := w.Result()
 
-					if !isHtmx {
-						assert.Equal(t, RedirectError(tc.redirect), err)
-					} else {
+					if isHtmx {
 						assert.Nil(t, err)
+					} else {
+						assert.Equal(t, RedirectError(tc.redirect), err)
 					}
 					assert.Equal(t, http.StatusOK, resp.StatusCode)
 					mock.AssertExpectationsForObjects(t, client, template)

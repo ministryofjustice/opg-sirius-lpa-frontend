@@ -299,6 +299,10 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 			}
 			return false
 		},
+		"isMap": func(value interface{}) bool {
+			_, ok := value.(map[string]interface{})
+			return ok
+		},
 		"isDateMap": func(value interface{}) bool {
 			dateMap, ok := value.(map[string]interface{})
 			if !ok {
@@ -348,6 +352,10 @@ func All(siriusPublicURL, prefix, staticHash string) map[string]interface{} {
 				case "compensationTypes":
 					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
 						context.CompensationTypes = v
+					}
+				case "decisionTypes":
+					if v, ok := values[i+1].([]sirius.RefDataItem); ok {
+						context.DecisionTypes = v
 					}
 				case "donorID":
 					if v, ok := values[i+1].(string); ok {
@@ -409,6 +417,7 @@ type EventContext struct {
 	ComplainantCategories  []sirius.RefDataItem
 	ComplaintOrigins       []sirius.RefDataItem
 	CompensationTypes      []sirius.RefDataItem
+	DecisionTypes          []sirius.RefDataItem
 	DonorID                string
 	EventFieldOrder        []string
 }

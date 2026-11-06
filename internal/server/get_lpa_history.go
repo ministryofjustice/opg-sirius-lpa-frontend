@@ -22,6 +22,7 @@ type getLpaHistory struct {
 	Events                 []sirius.LpaEvent
 	EventFilterData        []sirius.SourceType
 	Form                   FilterLpaEventsForm
+	IsPartial              bool
 	TotalEvents            int
 	TotalFilteredEvents    int
 	IsFiltered             bool
@@ -31,6 +32,7 @@ type getLpaHistory struct {
 	ComplainantCategories  []sirius.RefDataItem
 	ComplaintOrigins       []sirius.RefDataItem
 	CompensationTypes      []sirius.RefDataItem
+	DecisionTypes          []sirius.RefDataItem
 	DonorFieldOrder        []string
 	LpaFieldOrder          []string
 	EpaFieldOrder          []string
@@ -131,6 +133,7 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 				Sort: "desc",
 			},
 			IsFiltered:      false,
+			IsPartial:       ctx.IsPartial,
 			DonorFieldOrder: donorFieldOrder,
 			LpaFieldOrder:   lpaFieldOrder,
 			EpaFieldOrder:   epaFieldOrder,
@@ -214,6 +217,16 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 				return nil
 			}
 			data.CompensationTypes = compensationType
+			return nil
+		})
+
+		group.Go(func() error {
+			decisionTypes, err := client.RefDataByCategory(ctx.With(groupCtx), sirius.FeeDecisionTypeCategory)
+			if err != nil {
+				data.DecisionTypes = []sirius.RefDataItem(nil)
+				return nil
+			}
+			data.DecisionTypes = decisionTypes
 			return nil
 		})
 

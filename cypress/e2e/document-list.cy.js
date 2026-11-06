@@ -701,6 +701,8 @@ describe("View documents", () => {
   });
 
   it("downloads selected document", () => {
+    const filename = `selected-single-document-${Date.now()}.pdf`;
+
     cy.addMock(
       "/lpa-api/v1/documents/download-multiple?id%5B%5D=5b4f0ad3-1e4a-4a55-b4a7-3f8e3d2bc3b9",
       "GET",
@@ -708,7 +710,7 @@ describe("View documents", () => {
         status: 200,
         headers: {
           "Content-Type": "application/pdf",
-          "Content-Disposition": "attachment; filename=document.pdf",
+          "Content-Disposition": `attachment; filename=${filename}`,
         },
         body: "document",
       },
@@ -729,9 +731,16 @@ describe("View documents", () => {
       expect(response.statusCode).to.eq(200);
       expect(response.headers["content-type"]).to.contain("application/pdf");
     });
+
+    cy.readFile(`${Cypress.config("downloadsFolder")}/${filename}`).should(
+      "eq",
+      "document",
+    );
   });
 
   it("downloads multiple selected documents", () => {
+    const filename = `selected-multiple-documents-${Date.now()}.pdf`;
+
     cy.addMock(
       "/lpa-api/v1/documents/download-multiple?id%5B%5D=5b4f0ad3-1e4a-4a55-b4a7-3f8e3d2bc3b9&id%5B%5D=c8e3a1df-7b9b-4d45-94d9-2b8fc0d9e0fd",
       "GET",
@@ -739,7 +748,7 @@ describe("View documents", () => {
         status: 200,
         headers: {
           "Content-Type": "application/pdf",
-          "Content-Disposition": "attachment; filename=document.pdf",
+          "Content-Disposition": `attachment; filename=${filename}`,
         },
         body: "document",
       },
@@ -763,6 +772,11 @@ describe("View documents", () => {
       );
       expect(response.statusCode).to.eq(200);
     });
+
+    cy.readFile(`${Cypress.config("downloadsFolder")}/${filename}`).should(
+      "eq",
+      "document",
+    );
   });
 
   it("shows a validation error when nothing is selected", () => {

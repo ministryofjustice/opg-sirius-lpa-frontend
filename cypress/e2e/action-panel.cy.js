@@ -370,6 +370,10 @@ describe("Action Panel", () => {
         roles: ["OPG User", "Reduced Fees User"],
       },
     });
+    cy.addMock("/lpa-api/v1/cases/34/fee-decisions", "GET", {
+      status: 200,
+      body: [],
+    });
 
     cy.get("a#action-panel-button-fees").click();
     cy.get(".action-panel__form").should("exist");
@@ -382,6 +386,9 @@ describe("Action Panel", () => {
     cy.get(".action-panel__form").contains("Apply fee reduction").click();
     cy.get(".action-panel__form h1").contains("Apply a fee reduction");
     cy.get(".action-panel__form .govuk-link").contains("Cancel").click();
+
+    cy.get(".action-panel__form").contains("Decline fee reduction").click();
+    cy.get(".action-panel__form h1").contains("Decline a fee reduction");
   });
 
   it("displays the create donor button on the action panel", () => {

@@ -373,7 +373,7 @@ func TestPostCreateEpaRedirects(t *testing.T) {
 			query:         "/?id=123&caseId=456",
 			formField:     "updateCorrespondent",
 			formValue:     "1",
-			expectedError: RedirectError("/create-correspondent?id=123&caseId=456&caseType=epa"),
+			expectedError: RedirectError("/edit-correspondent?id=123&caseId=456&caseType=epa"),
 			setupMocks: func(client *mockCreateEpaClient, epa sirius.Epa) {
 				client.
 					On("Epa", mock.Anything, 456).

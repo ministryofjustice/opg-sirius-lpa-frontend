@@ -7,7 +7,7 @@
         <div class="govuk-button-group">
             <a class="govuk-button govuk-button--secondary"
                href=""
-               hx-get="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}"
+               hx-get="{{ prefix (printf "/create-payment?id=%d" .Case.ID) }}"
                hx-target=".action-panel__content"
                hx-swap="innerHTML">
                 Add payment
@@ -19,6 +19,15 @@
                    hx-target=".action-panel__content"
                    hx-swap="innerHTML">
                     Apply fee reduction
+                </a>
+            {{ end }}
+            {{ if and (.IsReducedFeesUser) }}
+                <a class="govuk-button govuk-button--secondary" id="f-decline-fee-reduction-button"
+                   href=""
+                   hx-get="{{ prefix (printf "/create-decline-fee-decision?id=%d" .Case.ID) }}"
+                   hx-target=".action-panel__content"
+                   hx-swap="innerHTML">
+                    Decline fee reduction
                 </a>
             {{ end }}
             <div class="govuk-body">
@@ -40,7 +49,7 @@
         <div class="govuk-grid-column-two-thirds">
             {{ template "payments" . }}
 
-            <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/add-payment?id=%d" .Case.ID) }}">
+            <a class="govuk-button govuk-button--secondary" href="{{ prefix (printf "/create-payment?id=%d" .Case.ID) }}">
                 Add payment
             </a>
             {{ if and (.IsReducedFeesUser) (not .FeeReductions) }}
@@ -48,6 +57,12 @@
                    href="{{ prefix (printf "/apply-fee-reduction?id=%d" .Case.ID) }}">
                     Apply fee reduction
                 </a>
+            {{ end }}
+            {{ if and (.IsReducedFeesUser) }}
+            <a class="govuk-button govuk-button--secondary" id="f-decline-fee-reduction-button"
+               href="{{ prefix (printf "/create-decline-fee-decision?id=%d" .Case.ID) }}">
+                Decline fee reduction
+            </a>
             {{ end }}
         </div>
     </div>
@@ -60,7 +75,7 @@
         {{ template "success-banner" .FlashMessage.Title }}
     {{ end }}
 
-    {{ if and (not .Payments) (not .FeeReductions) (not .Refunds)}}
+    {{ if and (not .Payments) (not .FeeReductions) (not .Refunds) (not .DeclineFeeReductions)}}
         <p class="govuk-body govuk-!-padding-top-7 govuk-!-padding-bottom-7"><strong>There is currently no fee
                 data available to display.</strong></p>
     {{ else }}
@@ -104,12 +119,14 @@
         </table>
 
         <h2 class="govuk-heading-m govuk-!-padding-top-3 govuk-!-padding-bottom-2">Fee details</h2>
-
         {{ if .Payments }}
             {{ template "payment" . }}
         {{ end }}
         {{ if .FeeReductions }}
             {{ template "fee-reduction" . }}
+        {{ end }}
+        {{ if .DeclineFeeReductions }}
+            {{ template "decline-fee-reduction" . }}
         {{ end }}
         {{ if .Refunds }}
             {{ template "refund" . }}

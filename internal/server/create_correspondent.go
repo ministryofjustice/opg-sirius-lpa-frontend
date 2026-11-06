@@ -8,20 +8,26 @@ import (
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/sirius"
 )
 
-type CreateCorrespondentClient interface {
-	Epa(ctx sirius.Context, id int) (sirius.Epa, error)
-	Lpa(ctx sirius.Context, id int) (sirius.Lpa, error)
-	CreateCorrespondent(ctx sirius.Context, caseId int, correspondent sirius.Correspondent) error
-	UpdateCorrespondent(ctx sirius.Context, correspondentId int, correspondent sirius.Correspondent) error
+type actor struct {
+	ID     int
+	Name   string
+	Label  string
+	Fields string
 }
 
-type createCorrespondentData struct {
+type CreateCorrespondentClient interface {
+	CreateCorrespondent(ctx sirius.Context, caseId int, correspondent sirius.Correspondent) error
+}
+
+type correspondentData struct {
 	XSRFToken     string
+	FlowQuery     string
 	IsPartial     bool
 	DonorId       int
 	CaseId        int
 	CaseType      string
 	Correspondent sirius.Correspondent
+	Actors        []actor
 	Error         sirius.ValidationError
 	IsEditing     bool
 	Title         string
@@ -41,8 +47,9 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 			return err
 		}
 
-		data := createCorrespondentData{
+		data := correspondentData{
 			XSRFToken: ctx.XSRFToken,
+			FlowQuery: getFlowQuery(r),
 			IsPartial: ctx.IsPartial,
 			DonorId:   donorId,
 			CaseId:    caseId,
@@ -50,29 +57,8 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 			Title:     "Add a correspondent",
 		}
 
-		var correspondent *sirius.Correspondent
-		if data.CaseType == "epa" {
-			epa, err := client.Epa(ctx, caseId)
-			if err != nil {
-				return err
-			}
-			correspondent = epa.Correspondent
-		} else {
-			lpa, err := client.Lpa(ctx, caseId)
-			if err != nil {
-				return err
-			}
-			correspondent = lpa.Correspondent
-		}
-
-		if correspondent != nil {
-			data.Correspondent = *correspondent
-			data.Title = "Update correspondent details"
-			data.IsEditing = true
-		}
-
 		if r.Method == http.MethodPost {
-			updatedCorrespondent := sirius.Correspondent{
+			data.Correspondent = sirius.Correspondent{
 				Person: sirius.Person{
 					AddressLine1:          postFormString(r, "addressLine1"),
 					AddressLine2:          postFormString(r, "addressLine2"),
@@ -96,15 +82,8 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 				},
 				CompanyNumber: postFormString(r, "companyNumber"),
 			}
-			data.Correspondent = updatedCorrespondent
 
-			if data.IsEditing {
-				updatedCorrespondent.ID = correspondent.ID
-				data.Correspondent = updatedCorrespondent
-				err = client.UpdateCorrespondent(ctx, data.Correspondent.ID, updatedCorrespondent)
-			} else {
-				err = client.CreateCorrespondent(ctx, caseId, updatedCorrespondent)
-			}
+			err = client.CreateCorrespondent(ctx, caseId, data.Correspondent)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
@@ -115,7 +94,7 @@ func CreateCorrespondent(client CreateCorrespondentClient, tmpl template.Templat
 				if data.CaseType == "epa" {
 					return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 				} else {
-					return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d#accordion-create-lpa-heading-4", donorId, caseId))
+					return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-4", donorId, caseId, data.FlowQuery))
 				}
 			}
 

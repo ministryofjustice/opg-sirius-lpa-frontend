@@ -32,7 +32,7 @@ type ResolutionRequest struct {
 	Notes      string `json:"resolutionNotes"`
 }
 
-func (c *Client) AddObjection(ctx Context, objectionDetails ObjectionRequest) error {
+func (c *Client) CreateObjection(ctx Context, objectionDetails ObjectionRequest) error {
 	return c.post(ctx, "/lpa-api/v1/objections", objectionDetails, nil)
 }
 

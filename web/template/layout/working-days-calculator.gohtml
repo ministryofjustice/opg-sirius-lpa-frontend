@@ -39,21 +39,21 @@
                 <input class="govuk-input govuk-input--width-10"
                        type="date" id="calc-startdate" name="startdate" value="{{ .StartDate }}"
                        placeholder="DD/MM/YYYY"
-                       {{ if eq .Mode .ModeStartDate }}aria-label="Start date (calculated)" readonly aria-readonly="true"{{ end }}
+                       {{ if eq .Mode .ModeStartDate }}aria-label="Start date (calculated)" readonly aria-readonly="true" tabindex="-1"{{ end }}
                         {{ if and (eq .Mode .PreviousMode) (ne .Mode .ModeStartDate) }}hx-preserve{{ end }}>
 
                 <label class="govuk-label" for="calc-enddate">End date:</label>
                 <input class="govuk-input govuk-input--width-10"
                        type="date" id="calc-enddate" name="enddate" value="{{ .EndDate }}"
                        placeholder="DD/MM/YYYY"
-                       {{ if eq .Mode .ModeEndDate }}aria-label="End date (calculated)" readonly aria-readonly="true"{{ end }}
+                       {{ if eq .Mode .ModeEndDate }}aria-label="End date (calculated)" readonly aria-readonly="true" tabindex="-1"{{ end }}
                         {{ if and (eq .Mode .PreviousMode) (ne .Mode .ModeEndDate) }}hx-preserve{{ end }}>
 
                 <label class="govuk-label" for="calc-numworkingdays">Working days:</label>
                 <input class="govuk-input govuk-input--width-10"
                        type="number" id="calc-numworkingdays" name="numworkingdays" value="{{ .NumWorkingDays }}"
                        min="0"
-                       {{ if eq .Mode .ModeNumWorkingDays }}aria-label="Working days (calculated)" readonly aria-readonly="true"{{ end }}
+                       {{ if eq .Mode .ModeNumWorkingDays }}aria-label="Working days (calculated)" readonly aria-readonly="true" tabindex="-1"{{ end }}
                         {{ if and (eq .Mode .PreviousMode) (ne .Mode .ModeNumWorkingDays) }}hx-preserve{{ end }}>
             </div>
         </form>
