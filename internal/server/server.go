@@ -90,6 +90,7 @@ type Client interface {
 	UpdateFeeReductionClient
 	UpdateInvestigationClient
 	UpdatePaymentClient
+	UpdateTrustCorporationClient
 	EventClient
 	GetApplicationProgressClient
 	GetDocumentsClient
@@ -200,6 +201,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/create-notified-person", wrap(CreateNotifiedPerson(client, templates.Get("create-notified-person.gohtml"))))
 	mux.Handle("/create-replacement-attorney", wrap(CreateReplacementAttorney(client, templates.Get("create-replacement-attorney.gohtml"))))
 	mux.Handle("/create-trust-corporation", wrap(CreateTrustCorporation(client, templates.Get("create-trust-corporation.gohtml"))))
+	mux.Handle("/update-trust-corporation", wrap(UpdateTrustCorporation(client, templates.Get("create-trust-corporation.gohtml"))))
 	mux.Handle("/compare/{id}/{caseUid}", wrap(CompareDocs(client, templates.Get("compare-docs.gohtml"))))
 	mux.Handle("/delete-decline-fee-decision", wrap(DeleteFeeDecision(client, templates.Get("delete-decline-fee-decision.gohtml"))))
 	mux.Handle("/delete-fee-reduction", wrap(DeletePayment(client, templates.Get("delete-fee-reduction.gohtml"))))
@@ -227,6 +229,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/investigation-hold", wrap(InvestigationHold(client, templates.Get("investigation_hold.gohtml"))))
 	mux.Handle("/link-person", wrap(LinkPerson(client, templates.Get("link-person.gohtml"))))
 	mux.Handle("/mi-reporting", wrap(MiReporting(client, templates.Get("mi-reporting.gohtml"))))
+	mux.Handle("/notify-error/{donorId}/{createdDocumentUUID}/{caseType}/{caseID}/{caseUUID}", wrap(NotifyPageLimit(templates.Get("notify-page-limit.gohtml"))))
 	mux.Handle("/payments/{id}", wrap(GetPayments(client, templates.Get("payments.gohtml"))))
 	mux.Handle("/select-or-create-correspondent", wrap(SelectOrCreateCorrespondent(client, templates.Get("select-or-create-correspondent.gohtml"))))
 	mux.Handle("/sirius-header-calendars", wrap(SiriusHeaderCalendars(client, templates.Get("sirius-header-partial-calendars.gohtml"))))

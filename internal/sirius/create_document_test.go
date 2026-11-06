@@ -45,6 +45,7 @@ func TestCreateDocument(t *testing.T) {
 							"systemType":        matchers.String("LP-A"),
 							"content":           matchers.String("Test content"),
 							"appendLpaSections": matchers.Like([]string{"lpa-sections"}),
+							"sendViaNotify":     matchers.Like(true),
 						}),
 					}).
 					WithCompleteResponse(consumer.Response{
@@ -100,7 +101,7 @@ func TestCreateDocument(t *testing.T) {
 					FileName:            "LP-A.pdf",
 					Content:             "Test content",
 					ChildCount:          0,
-				}, TypeSave, []string{"lpa-sections"})
+				}, TypeSave, []string{"lpa-sections"}, true)
 
 				assert.Equal(t, tc.expectedResponse, document)
 				if tc.expectedError == nil {
