@@ -556,3 +556,143 @@ func TestPostFiltersLpaHistoryWhenFailureOnGetEvents(t *testing.T) {
 	assert.Equal(t, errExample, err)
 	mock.AssertExpectationsForObjects(t, client)
 }
+
+func TestGetLpaHistoryNormalisesFeeDecisionChanges(t *testing.T) {
+	remission := "DECLINED_REMISSION"
+	exemption := "DECLINED_EXEMPTION"
+	oldReason := "Old reason"
+	newReason := "New reason"
+	oldDate := "01/11/2026"
+	newDate := "04/11/2026"
+
+	tests := []struct {
+		name            string
+		eventType       string
+		inputChanges    interface{}
+		expectedChanges interface{}
+	}{
+		{
+			name:      "Decision type change",
+			eventType: "UPD",
+			inputChanges: map[string]interface{}{
+				"decisionType": []interface{}{"DECLINED_REMISSION", "DECLINED_EXEMPTION"},
+			},
+			expectedChanges: map[string]interface{}{
+				"decisionType": FieldChange{OldValue: &remission, NewValue: &exemption},
+			},
+		},
+		{
+			name:      "Decision type and reason change together",
+			eventType: "UPD",
+			inputChanges: map[string]interface{}{
+				"decisionType":   []interface{}{"DECLINED_REMISSION", "DECLINED_EXEMPTION"},
+				"decisionReason": []interface{}{"Old reason", "New reason"},
+			},
+			expectedChanges: map[string]interface{}{
+				"decisionType":   FieldChange{OldValue: &remission, NewValue: &exemption},
+				"decisionReason": FieldChange{OldValue: &oldReason, NewValue: &newReason},
+			},
+		},
+		{
+			name:      "Reason changes from empty string to text",
+			eventType: "UPD",
+			inputChanges: map[string]interface{}{
+				"decisionReason": []interface{}{"", "New reason"},
+			},
+			expectedChanges: map[string]interface{}{
+				"decisionReason": FieldChange{OldValue: nil, NewValue: &newReason},
+			},
+		},
+		{
+			name:      "Reason changes from null to text (map with new value only)",
+			eventType: "UPD",
+			inputChanges: map[string]interface{}{
+				"decisionReason": map[string]interface{}{"1": "New reason"},
+			},
+			expectedChanges: map[string]interface{}{
+				"decisionReason": FieldChange{OldValue: nil, NewValue: &newReason},
+			},
+		},
+		{
+			name:      "Decision date change",
+			eventType: "UPD",
+			inputChanges: map[string]interface{}{
+				"decisionDate": []interface{}{
+					map[string]interface{}{"date": "2026-11-01 00:00:00.000000", "timezone_type": float64(3), "timezone": "UTC"},
+					map[string]interface{}{"date": "2026-11-04 00:00:00.000000", "timezone_type": float64(3), "timezone": "UTC"},
+				},
+			},
+			expectedChanges: map[string]interface{}{
+				"decisionDate": FieldChange{OldValue: &oldDate, NewValue: &newDate},
+			},
+		},
+		{
+			name:      "Insert events are not normalised",
+			eventType: "INS",
+			inputChanges: map[string]interface{}{
+				"decisionType": []interface{}{"DECLINED_REMISSION", "DECLINED_EXEMPTION"},
+			},
+			expectedChanges: map[string]interface{}{
+				"decisionType": []interface{}{"DECLINED_REMISSION", "DECLINED_EXEMPTION"},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			response := sirius.LpaEventsResponse{
+				Events: []sirius.LpaEvent{
+					{
+						ID:         99,
+						CreatedOn:  "2026-11-04T18:17:47+00:00",
+						Type:       tc.eventType,
+						Hash:       "a",
+						SourceType: shared.LpaEventSourceTypeFeeDecision,
+						OwningCase: sirius.OwningCase{ID: 1, CaseType: "LPA"},
+						Changes:    tc.inputChanges,
+					},
+				},
+				Total: 1,
+				Metadata: sirius.EventMetaData{
+					SourceTypes: []sirius.SourceType{{SourceType: shared.LpaEventSourceTypeFeeDecision, Total: 1}},
+				},
+			}
+
+			expectedEvents := []sirius.LpaEvent{
+				{
+					ID:         99,
+					CreatedOn:  "2026-11-04T18:17:47+00:00",
+					Type:       tc.eventType,
+					Hash:       "a",
+					SourceType: shared.LpaEventSourceTypeFeeDecision,
+					OwningCase: sirius.OwningCase{ID: 1, CaseType: "LPA"},
+					Changes:    tc.expectedChanges,
+				},
+			}
+
+			client := &mockGetLpaHistory{}
+			client.On("RefDataByCategory", mock.Anything, sirius.FeeReductionTypeCategory).Return([]sirius.RefDataItem(nil), nil)
+			client.On("RefDataByCategory", mock.Anything, sirius.ComplaintCategory).Return([]sirius.RefDataItem(nil), nil)
+			client.On("RefDataByCategory", mock.Anything, sirius.ComplainantCategory).Return([]sirius.RefDataItem(nil), nil)
+			client.On("RefDataByCategory", mock.Anything, sirius.ComplaintOrigin).Return([]sirius.RefDataItem(nil), nil)
+			client.On("RefDataByCategory", mock.Anything, sirius.CompensationType).Return([]sirius.RefDataItem(nil), nil)
+			client.On("RefDataByCategory", mock.Anything, sirius.FeeDecisionTypeCategory).Return([]sirius.RefDataItem(nil), nil)
+			client.On("GetUserDetails", mock.Anything).Return(sirius.User{}, nil)
+			client.On("GetEvents", mock.Anything, "123", []string(nil), []string{}, []string{}, "desc").Return(response, nil)
+
+			template := &mockTemplate{}
+			template.On("Func", mock.Anything, mock.MatchedBy(func(data getLpaHistory) bool {
+				return assert.Equal(t, expectedEvents, data.Events)
+			})).Return(nil)
+
+			server := newMockServer("/lpa-api/v1/persons/{donorId}/events", GetLpaHistory(client, template.Func))
+
+			req, _ := http.NewRequest(http.MethodGet, "/lpa-api/v1/persons/123/events", nil)
+			resp, err := server.serve(req)
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.Code)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}

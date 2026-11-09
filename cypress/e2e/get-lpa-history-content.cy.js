@@ -968,6 +968,76 @@ describe("Show correct event content", () => {
       .should("contain.text", "Not eligible for exemption");
   });
 
+  it("can view fee decision updated event", () => {
+    mockEventHistory({
+      sourceType: "FeeDecision",
+      type: "UPD",
+      entity: {
+        id: 10,
+        caseId: 36,
+        decisionType: "DECLINED_EXEMPTION",
+        decisionReason: "Updated evidence",
+        decisionDate: "02/11/2026",
+      },
+      changeSet: {
+        decisionType: ["DECLINED_REMISSION", "DECLINED_EXEMPTION"],
+        decisionDate: [
+          {
+            date: "2026-11-04 00:00:00.000000",
+            timezone_type: 3,
+            timezone: "UTC",
+          },
+          {
+            date: "2026-11-02 00:00:00.000000",
+            timezone_type: 3,
+            timezone: "UTC",
+          },
+        ],
+        decisionReason: ["Invalid evidence", "Updated evidence"],
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item").then(($items) => {
+      const text = Cypress.$($items[0]).text().replaceAll(/\s+/g, " ").trim();
+
+      expect(text).to.include(
+        "Declined reduced fee type: Declined remission changed to: Declined exemption",
+      );
+      expect(text).to.include(
+        "Date declined: 04/11/2026 changed to: 02/11/2026",
+      );
+      expect(text).to.include(
+        "Reason: Invalid evidence changed to: Updated evidence",
+      );
+      expect(text).not.to.include("declined on");
+    });
+  });
+
+  it("can view fee decision updated event without prior values", () => {
+    mockEventHistory({
+      sourceType: "FeeDecision",
+      type: "UPD",
+      entity: {
+        id: 10,
+        caseId: 36,
+        decisionType: "DECLINED_REMISSION",
+        decisionReason: "New reason",
+        decisionDate: "04/11/2026",
+      },
+      changeSet: {
+        decisionReason: { 1: "New reason" },
+      },
+    });
+    cy.visit("/donor/1/history");
+    cy.get(".moj-timeline__item").then(($items) => {
+      const text = Cypress.$($items[0]).text().replaceAll(/\s+/g, " ").trim();
+
+      expect(text).to.include("Reason: Not provided changed to: New reason");
+      expect(text).not.to.include("Declined reduced fee type:");
+      expect(text).not.to.include("Date declined:");
+    });
+  });
+
   it("can view notified person updated event with prior values", () => {
     mockEventHistory({
       sourceType: "NotifiedPerson",
