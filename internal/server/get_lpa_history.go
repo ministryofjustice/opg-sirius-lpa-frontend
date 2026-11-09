@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
@@ -155,6 +156,7 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 			}
 
 			normaliseComplaintTitleChanges(eventsData.Events)
+			normaliseFeeDecisionChanges(eventsData.Events)
 
 			data.Events = eventsData.Events
 			data.EventFilterData = eventsData.Metadata.SourceTypes
@@ -246,6 +248,7 @@ func GetLpaHistory(client GetLpaHistoryClient, tmpl template.Template) Handler {
 			}
 
 			normaliseComplaintTitleChanges(eventsData.Events)
+			normaliseFeeDecisionChanges(eventsData.Events)
 
 			data.TotalFilteredEvents = eventsData.Total
 			data.Events = eventsData.Events
@@ -296,4 +299,81 @@ func normaliseChange(v interface{}) FieldChange {
 	}
 
 	return change
+}
+
+var feeDecisionChangeFields = []string{"decisionType", "decisionDate", "decisionReason"}
+
+func normaliseFeeDecisionChanges(events []sirius.LpaEvent) {
+	for i, event := range events {
+		if event.SourceType != shared.LpaEventSourceTypeFeeDecision || event.Type != "UPD" {
+			continue
+		}
+
+		changes, isMap := event.Changes.(map[string]interface{})
+		if !isMap {
+			continue
+		}
+
+		for _, field := range feeDecisionChangeFields {
+			value, hasField := changes[field]
+			if hasField {
+				changes[field] = normaliseFeeDecisionChange(value)
+			}
+		}
+
+		events[i].Changes = changes
+	}
+}
+
+func normaliseFeeDecisionChange(v interface{}) FieldChange {
+	var change FieldChange
+
+	list, isList := v.([]interface{})
+	if isList {
+		if len(list) >= 1 {
+			change.OldValue = formatFeeDecisionValue(list[0])
+		}
+		if len(list) >= 2 {
+			change.NewValue = formatFeeDecisionValue(list[1])
+		}
+	}
+
+	keyed, isMap := v.(map[string]interface{})
+	if isMap {
+		oldValue, hasOldValue := keyed["0"]
+		if hasOldValue {
+			change.OldValue = formatFeeDecisionValue(oldValue)
+		}
+		newValue, hasNewValue := keyed["1"]
+		if hasNewValue {
+			change.NewValue = formatFeeDecisionValue(newValue)
+		}
+	}
+
+	return change
+}
+
+func formatFeeDecisionValue(v interface{}) *string {
+	switch value := v.(type) {
+	case nil:
+		return nil
+	case string:
+		if value == "" {
+			return nil
+		}
+		return &value
+	case map[string]interface{}:
+		date, isDate := value["date"].(string)
+		if isDate {
+			parsed, err := time.Parse("2006-01-02 15:04:05.000000", date)
+			if err != nil {
+				return &date
+			}
+			formatted := parsed.Format("02/01/2006")
+			return &formatted
+		}
+	}
+
+	s := fmt.Sprintf("%v", v)
+	return &s
 }
