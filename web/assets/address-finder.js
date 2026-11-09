@@ -15,7 +15,12 @@ function AddressFinder($module, options) {
   this.results = [];
   this.baseUrl = options.prefix;
 
+  this.$startInEditMode =
+    this.$module.getAttribute("data-app-address-finder-start-in-edit-mode") ===
+    "true";
+
   this.$editMode =
+    this.$startInEditMode ||
     this.$module.querySelectorAll(
       'input[value]:not([type=radio]):not([value=""])',
     ).length > 0;

@@ -25,6 +25,7 @@ type selectOrCreateCorrespondentData struct {
 	Lpa           sirius.Lpa
 	Correspondent sirius.Correspondent
 	Error         sirius.ValidationError
+	Actors        []actor
 }
 
 func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl template.Template) Handler {
@@ -62,28 +63,50 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 				return err
 			}
 			data.Lpa = caseItem
+			data.Actors = GetActorsForLpa(caseItem)
 		}
 
 		if r.Method == http.MethodPost {
-			if postFormString(r, "actorId") != "new" {
+			if data.CaseType == "lpa" {
+				data.Correspondent = sirius.Correspondent{
+					Person: sirius.Person{
+						AddressLine1:          postFormString(r, "addressLine1"),
+						AddressLine2:          postFormString(r, "addressLine2"),
+						AddressLine3:          postFormString(r, "addressLine3"),
+						CompanyName:           postFormString(r, "companyName"),
+						Country:               postFormString(r, "country"),
+						County:                postFormString(r, "county"),
+						Email:                 postFormString(r, "email"),
+						Firstname:             postFormString(r, "firstname"),
+						IsAirmailRequired:     postFormString(r, "isAirmailRequired") == "true",
+						Middlenames:           postFormString(r, "middlenames"),
+						PhoneNumber:           postFormString(r, "phoneNumber"),
+						Postcode:              postFormString(r, "postcode"),
+						Salutation:            postFormString(r, "salutation"),
+						Surname:               postFormString(r, "surname"),
+						Town:                  postFormString(r, "town"),
+						CorrespondenceByPost:  postFormCheckboxChecked(r, "correspondenceBy", "post"),
+						CorrespondenceByEmail: postFormCheckboxChecked(r, "correspondenceBy", "email"),
+						CorrespondenceByPhone: postFormCheckboxChecked(r, "correspondenceBy", "phone"),
+						CorrespondenceByWelsh: postFormCheckboxChecked(r, "correspondenceBy", "welsh"),
+					},
+					CompanyNumber: postFormString(r, "companyNumber"),
+				}
+			} else if postFormString(r, "actorId") != "new" {
 				actorId, err := strToIntOrStatusError(postFormString(r, "actorId"))
 				if err != nil {
 					return err
 				}
 
 				var person sirius.Person
-				if data.CaseType == "epa" {
-					for _, caseAttorney := range data.Epa.Attorneys {
-						if caseAttorney.ID == actorId {
-							person = caseAttorney.Person
-							break
-						}
+				for _, caseAttorney := range data.Epa.Attorneys {
+					if caseAttorney.ID == actorId {
+						person = caseAttorney.Person
+						break
 					}
-				} else {
-					person = GetSelectedActorForLpa(data.Lpa, actorId)
 				}
 
-				correspondent := sirius.Correspondent{
+				data.Correspondent = sirius.Correspondent{
 					Person: sirius.Person{
 						Salutation:        person.Salutation,
 						Firstname:         person.Firstname,
@@ -103,64 +126,26 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 						IsAirmailRequired: person.IsAirmailRequired,
 					},
 				}
-
-				err = client.CreateCorrespondent(ctx, caseId, correspondent)
-
-				if ve, ok := err.(sirius.ValidationError); ok {
-					w.WriteHeader(http.StatusBadRequest)
-					data.Error = ve
-					return tmpl(w, data)
-				} else if err != nil {
-					return err
-				} else {
-					if data.CaseType == "epa" {
-						return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
-					}
-					return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-4", donorId, caseId, data.FlowQuery))
-				}
+			} else {
+				return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d&caseType=%s%s", donorId, caseId, data.CaseType, data.FlowQuery))
 			}
 
-			return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d&caseType=%s%s", donorId, caseId, data.CaseType, data.FlowQuery))
+			err = client.CreateCorrespondent(ctx, caseId, data.Correspondent)
+
+			if ve, ok := err.(sirius.ValidationError); ok {
+				w.WriteHeader(http.StatusBadRequest)
+				data.Error = ve
+				return tmpl(w, data)
+			} else if err != nil {
+				return err
+			} else {
+				if data.CaseType == "epa" {
+					return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
+				}
+				return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-4", donorId, caseId, data.FlowQuery))
+			}
 		}
 
 		return tmpl(w, data)
 	}
-}
-
-func GetSelectedActorForLpa(lpa sirius.Lpa, actorId int) sirius.Person {
-	if actorId == lpa.Donor.ID {
-		return *lpa.Donor
-	}
-
-	for _, attorney := range lpa.Attorneys {
-		if attorney.ID == actorId {
-			return attorney.Person
-		}
-	}
-
-	for _, attorney := range lpa.ReplacementAttorneys {
-		if attorney.ID == actorId {
-			return attorney.Person
-		}
-	}
-
-	for _, certifiedProvider := range lpa.CertificateProviders {
-		if certifiedProvider.ID == actorId {
-			return certifiedProvider
-		}
-	}
-
-	for _, notifiedPerson := range lpa.NotifiedPersons {
-		if notifiedPerson.ID == actorId {
-			return notifiedPerson.Person
-		}
-	}
-
-	for _, trustCorporation := range lpa.TrustCorporations {
-		if trustCorporation.ID == actorId {
-			return trustCorporation.Person
-		}
-	}
-
-	return sirius.Person{}
 }
