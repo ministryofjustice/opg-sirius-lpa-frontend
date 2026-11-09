@@ -16,10 +16,7 @@ export default function fillCorrespondentDetails(scope) {
   });
 
   function handleSubmitOnRadioChange(event) {
-    if (
-      fieldsContainer &&
-      fieldsContainer.classList.contains("govuk-!-display-none")
-    ) {
+    if (fieldsContainer?.classList.contains("govuk-!-display-none")) {
       fieldsContainer.classList.remove("govuk-!-display-none");
     }
 
