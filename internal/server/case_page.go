@@ -38,7 +38,7 @@ func CasePage(client CasePageClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		pageVars, err := GetPageValues(client, r)
+		pageVars, err := GetPageValues(client, r, true)
 		if err != nil {
 			return err
 		}

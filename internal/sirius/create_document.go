@@ -12,9 +12,10 @@ type createDocumentRequestData struct {
 	SystemType        string   `json:"systemType"`
 	Content           string   `json:"content"`
 	AppendLpaSections []string `json:"appendLpaSections"`
+	SendViaNotify     bool     `json:"sendViaNotify"`
 }
 
-func (c *Client) CreateDocument(ctx Context, caseID int, document Document, docType string, blankSections []string) (Document, error) {
+func (c *Client) CreateDocument(ctx Context, caseID int, document Document, docType string, blankSections []string, sendViaNotify bool) (Document, error) {
 	data := createDocumentRequestData{
 		CaseId:            caseID,
 		CorrespondentID:   document.Correspondent.ID,
@@ -23,6 +24,7 @@ func (c *Client) CreateDocument(ctx Context, caseID int, document Document, docT
 		SystemType:        document.SystemType,
 		Content:           document.Content,
 		AppendLpaSections: blankSections,
+		SendViaNotify:     sendViaNotify,
 	}
 
 	var d Document

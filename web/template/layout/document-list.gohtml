@@ -40,9 +40,7 @@
 
             <form
                     class="form" id="document-list-form"
-                    hx-post="{{ prefix (printf "/donor/%d/documents" .DonorID) }}"
-                    hx-target="#document-panel"
-                    hx-swap="innerHTML"
+                    method="post" action="{{ prefix (printf "/donor/%d/documents" .DonorID) }}"
             >
                 <input type="hidden" name="xsrfToken" value="{{ .XSRFToken }}"/>
                 {{ if .Comparing }}
