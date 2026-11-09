@@ -5,6 +5,10 @@ export default function fillCorrespondentDetails(scope) {
     '[data-module="app-fill-correspondent-details"] input[type="radio"]',
   );
 
+  const fieldsContainer = scope.querySelector(
+    '[data-module="app-fill-correspondent-details--fields"]',
+  );
+
   if (!radios.length) return;
 
   radios.forEach((radio) => {
@@ -12,9 +16,20 @@ export default function fillCorrespondentDetails(scope) {
   });
 
   function handleSubmitOnRadioChange(event) {
-    const data = JSON.parse(event.target.dataset.fields);
+    if (fieldsContainer?.classList.contains("govuk-!-display-none")) {
+      fieldsContainer.classList.remove("govuk-!-display-none");
+    }
+
+    const form = event.target.form;
+    const fields = event.target.dataset.fields;
+    if (!fields) {
+      form.reset();
+      return;
+    }
+
+    const data = JSON.parse(fields);
     for (const [key, value] of Object.entries(data)) {
-      const field = event.target.form.elements.namedItem(key);
+      const field = form.elements.namedItem(key);
       field && (field.value = value);
     }
   }
