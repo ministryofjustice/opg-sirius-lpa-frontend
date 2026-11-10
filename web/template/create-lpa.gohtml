@@ -36,10 +36,10 @@
                 data-disable-after-click="true">Save and exit
         </button>
         <a class="govuk-link govuk-link--no-visited-state"
-            href=""
-            hx-get="{{ if .IsUpdate }}{{ prefix (printf "/action-panel?donorId=%d&uid[]=%s" .DonorId .Lpa.UID) }}{{ else }}{{ prefix (printf "/action-panel?donorId=%d" .DonorId) }}{{ end }}"
-            hx-target=".action-panel__content"
-            hx-swap="innerHTML scroll:.action-panel__content:top">Cancel</a>
+           href=""
+           hx-get="{{ if .IsUpdate }}{{ prefix (printf "/action-panel?donorId=%d&uid[]=%s" .DonorId .Lpa.UID) }}{{ else }}{{ prefix (printf "/action-panel?donorId=%d" .DonorId) }}{{ end }}"
+           hx-target=".action-panel__content"
+           hx-swap="innerHTML scroll:.action-panel__content:top">Cancel</a>
       </div>
     </form>
   </div>
@@ -128,9 +128,9 @@
             {{ end }}
           </div>
         </div>
-          {{ if .IsCreating }}
-            {{ template "create-lpa-application-fee" . }}
-          {{ end }}
+        {{ if .IsCreating }}
+          {{ template "create-lpa-application-fee" . }}
+        {{ end }}
         <div class="govuk-summary-card">
           <div class="govuk-summary-card__title-wrapper">
             <h2 class="govuk-summary-card__title" id="scroll-to-attorneys">
@@ -147,7 +147,7 @@
                         {{ if eq .PersonType "Trust Corporation" }}
                           {{ if .CompanyName }}{{ .CompanyName }} {{ end }}(trust corporation)
                         {{ else }}
-                          {{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                          {{ if .Firstname }}{{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
                         {{ end }}
                       </span>
                     </summary>
@@ -178,7 +178,7 @@
                               type="submit"
                               value="{{ .ID }}">Update
                         <span class="govuk-visually-hidden">
-                            attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                            attorney{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
                         </span>
                       </button>
                     {{ end }}
@@ -246,7 +246,7 @@
                       {{ if eq .PersonType "Trust Corporation" }}
                         {{ if .CompanyName }}{{ .CompanyName }} {{ end }}(trust corporation)
                       {{ else }}
-                        {{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                        {{ if .Firstname }}{{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
                       {{ end }}
                     </span>
                   </summary>
@@ -272,7 +272,7 @@
                             type="submit"
                             value="{{ .ID }}">Update
                     <span class="govuk-visually-hidden">
-                      replacement attorney{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                      replacement attorney{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
                     </span>
                   </button>
                   {{ end }}
@@ -372,7 +372,7 @@
                 <div class="app-create-lpa__details-row">
                   <details class="govuk-details">
                     <summary class="govuk-details__summary">
-                      <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
+                      <span class="govuk-details__summary-text">{{ if .Firstname }}{{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
                     </summary>
                     <div class="govuk-details__text">
                       {{ template "person-details-table" . }}
@@ -387,7 +387,7 @@
                     >
                       Update
                       <span class="govuk-visually-hidden">
-                          notified person{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                          notified person{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
                       </span>
                     </button>
                 </span>
@@ -472,7 +472,7 @@
               <div class="app-create-lpa__details-row">
                 <details class="govuk-details">
                   <summary class="govuk-details__summary">
-                    <span class="govuk-details__summary-text">{{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
+                    <span class="govuk-details__summary-text">{{ if .Firstname }}{{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
                   </summary>
                   <div class="govuk-details__text">
                     {{ template "person-details-table" . }}
@@ -486,7 +486,7 @@
                           value="{{ .ID }}"
                   >Update
                     <span class="govuk-visually-hidden">
-                      certificate provider{{ if .Salutation }} {{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                      certificate provider{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
                     </span>
                   </button>
                 </span>
@@ -506,12 +506,12 @@
               <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible app-section-break--no-top-margin">
               <h3 class="govuk-heading-s">Attorneys</h3>
               {{ range $attorneys := .AttorneyApplicants }}
-                  {{ if eq .PersonType "Trust Corporation" }}
-                    {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) .CompanyName .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
-                  {{ else }}
-                    {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s" .Firstname .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
-                  {{ end }}
+                {{ if eq .PersonType "Trust Corporation" }}
+                  {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) .CompanyName .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
+                {{ else }}
+                  {{ template "input-signed-date" (field (printf "lpaPartCSignatureDate-%d" .ID) (printf "%s %s" .Firstname .Surname) .LpaPartCSignatureDate $.Error.Field.lpaPartCSignatureDate "max" today) }}
                 {{ end }}
+              {{ end }}
             {{ end }}
 
             {{ if gt (len .ReplacementAttorneys) 0 }}
@@ -560,12 +560,12 @@
                     <input class="govuk-radios__input" id="f-applicantType-2" name="applicantType" type="radio"
                            value="attorney" data-aria-controls="applicantAttorneysReveal"
                            {{ if and (ne (len .ApplicantIds) 0) (eq (containsInt .ApplicantIds .DonorId) false) }}checked{{ end }}
-                           {{ if eq (len .Lpa.Attorneys) 0 }}disabled{{ end }}>
+                            {{ if eq (len .Lpa.Attorneys) 0 }}disabled{{ end }}>
                     <label class="govuk-label govuk-radios__label" for="f-applicantType-2">Attorney</label>
                   </div>
-                   <div class="govuk-radios__conditional {{ if ne .Lpa.ApplicantType "attorney" }}govuk-radios__conditional--hidden{{ end }}"
+                  <div class="govuk-radios__conditional {{ if ne .Lpa.ApplicantType "attorney" }}govuk-radios__conditional--hidden{{ end }}"
                        id="applicantAttorneysReveal" data-module="applicant-attorney-checkboxes">
-                     <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                       {{ range $applicant := .AttorneyApplicants }}
                         <div class="govuk-checkboxes__item">
                           <input class="govuk-checkboxes__input" id="f-applicantIds-{{ .ID }}" name="applicantIds"
@@ -574,12 +574,12 @@
                             {{ if eq .PersonType "Trust Corporation" }}
                               {{ if .CompanyName }}{{ .CompanyName }}{{ end }}
                             {{ else }}
-                              {{ if .Salutation }}{{ .Salutation }}{{ end }}{{ if .Firstname }} {{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
+                              {{ if .Firstname }}{{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}
                             {{ end }}
                           </label>
                         </div>
                       {{ end }}
-                     </div>
+                    </div>
                   </div>
                 </div>
               </fieldset>
@@ -599,7 +599,7 @@
               <div class="app-create-lpa__details-row">
                 <details class="govuk-details">
                   <summary class="govuk-details__summary app-table__row--half-width">
-                    <span class="govuk-details__summary-text">{{ if .Lpa.Correspondent.CompanyName }}{{ .Lpa.Correspondent.CompanyName }}{{ end }}{{ if .Lpa.Correspondent.Salutation }} {{ .Lpa.Correspondent.Salutation }}{{ end }}{{ if .Lpa.Correspondent.Firstname }} {{ .Lpa.Correspondent.Firstname }}{{ end }}{{ if .Lpa.Correspondent.Middlenames }} {{ .Lpa.Correspondent.Middlenames }}{{ end }}{{ if .Lpa.Correspondent.Surname }} {{ .Lpa.Correspondent.Surname }}{{ end }}</span>
+                    <span class="govuk-details__summary-text">{{ if .Lpa.Correspondent.CompanyName }}{{ .Lpa.Correspondent.CompanyName }}{{ end }}{{ if .Lpa.Correspondent.Firstname }} {{ .Lpa.Correspondent.Firstname }}{{ end }}{{ if .Lpa.Correspondent.Middlenames }} {{ .Lpa.Correspondent.Middlenames }}{{ end }}{{ if .Lpa.Correspondent.Surname }} {{ .Lpa.Correspondent.Surname }}{{ end }}</span>
                   </summary>
                   <div class="govuk-details__text">
                     {{ template "person-details-table" .Lpa.Correspondent }}
@@ -614,7 +614,7 @@
                   >
                     Update
                     <span class="govuk-visually-hidden">
-                      correspondent{{ if .Lpa.Correspondent.CompanyName }}{{ .Lpa.Correspondent.CompanyName }}{{ end }}{{ if .Lpa.Correspondent.Salutation }} {{ .Lpa.Correspondent.Salutation }}{{ end }}{{ if .Lpa.Correspondent.Firstname }} {{ .Lpa.Correspondent.Firstname }}{{ end }}{{ if .Lpa.Correspondent.Middlenames }} {{ .Lpa.Correspondent.Middlenames }}{{ end }}{{ if .Lpa.Correspondent.Surname }} {{ .Lpa.Correspondent.Surname }}{{ end }}
+                      correspondent{{ if .Lpa.Correspondent.CompanyName }} {{ .Lpa.Correspondent.CompanyName }}{{ end }}{{ if .Lpa.Correspondent.Firstname }} {{ .Lpa.Correspondent.Firstname }}{{ end }}{{ if .Lpa.Correspondent.Middlenames }} {{ .Lpa.Correspondent.Middlenames }}{{ end }}{{ if .Lpa.Correspondent.Surname }} {{ .Lpa.Correspondent.Surname }}{{ end }}
                     </span>
                   </button>
                 </span>
@@ -702,12 +702,12 @@
       <div class="govuk-form-group {{ if .Error.Field.applicationFee }}govuk-form-group--error{{ end }}">
         <fieldset class="govuk-fieldset">
           <legend class="govuk-fieldset__legend govuk-visually-hidden">How is the application fee being paid?</legend>
-            {{ template "errors" .Error.Field.applicationFee }}
+          {{ template "errors" .Error.Field.applicationFee }}
           <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
             <div class="govuk-checkboxes__item">
               <input class="govuk-checkboxes__input" id="f-applicationFee" name="applicationFee"
                      type="checkbox" value="card" data-aria-controls="cardPaymentContactReveal"
-                {{ if compareBoolPointers .Lpa.PaymentByDebitCreditCard true }}checked{{ end }}
+                     {{ if compareBoolPointers .Lpa.PaymentByDebitCreditCard true }}checked{{ end }}
               >
               <label class="govuk-label govuk-checkboxes__label" for="f-applicationFee">
                 Pay fee by credit or debit card
