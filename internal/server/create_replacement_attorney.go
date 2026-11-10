@@ -11,7 +11,6 @@ import (
 type CreateReplacementAttorneyClient interface {
 	Lpa(ctx sirius.Context, id int) (sirius.Lpa, error)
 	CreateReplacementAttorney(ctx sirius.Context, caseId int, attorney sirius.Attorney) (sirius.Attorney, error)
-	UpdateReplacementAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
 }
 
 type createReplacementAttorneyData struct {
@@ -70,29 +69,6 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 			return tmpl(w, data)
 		}
 
-		var nextPersonType string
-		var attorneyId int
-		attorneyIdStr := r.FormValue("attorneyId")
-		isEditing := attorneyIdStr != ""
-		if isEditing {
-			attorneyId, err = strToIntOrStatusError(attorneyIdStr)
-			if err != nil {
-				return err
-			}
-
-			for _, attorney := range lpa.ReplacementAttorneys {
-				if attorney.ID == attorneyId {
-					data.Attorney = attorney
-					break
-				}
-			}
-
-			data.Title = "Update replacement attorney details"
-			data.IsEditing = true
-
-			data.NextAttorneyId, nextPersonType = GetIdForNextAttorney(attorneyId, true, lpa.TrustCorporations, lpa.ReplacementAttorneys)
-		}
-
 		if r.Method == http.MethodPost {
 			attorney := sirius.Attorney{
 				Person: sirius.Person{
@@ -115,11 +91,7 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 			}
 			data.Attorney = attorney
 
-			if isEditing {
-				err = client.UpdateReplacementAttorney(ctx, attorneyId, attorney)
-			} else {
-				_, err = client.CreateReplacementAttorney(ctx, caseId, attorney)
-			}
+			_, err = client.CreateReplacementAttorney(ctx, caseId, attorney)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
@@ -137,20 +109,6 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 					return tmpl(w, data)
 				}
 				return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery))
-			}
-
-			if r.FormValue("update-next-attorney") != "" {
-				redirect := fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorId, caseId, data.NextAttorneyId, data.FlowQuery)
-				if nextPersonType == "Trust Corporation" {
-					redirect = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=true%s", donorId, caseId, data.NextAttorneyId, data.FlowQuery)
-				}
-
-				if data.IsPartial {
-					data.HtmxRedirect = redirect
-					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
-					return tmpl(w, data)
-				}
-				return RedirectError(redirect)
 			}
 
 			if ctx.IsPartial {
