@@ -7,6 +7,7 @@ $person-info-row-height: 2.5625rem;
 $person-info-row-padding: 10px;
 $person-info-column-gap: 20px;
 $person-info-edge: 25px;
+$person-info-tag-width: 4.75rem;
 $person-info-visible-rows: 10.5;
 $person-info-list-max-height: $person-info-row-height *
   $person-info-visible-rows;
@@ -31,7 +32,7 @@ $person-info-list-max-height: $person-info-row-height *
 
 .app-person-info__container {
   display: grid;
-  grid-template-columns: max-content 1fr;
+  grid-template-columns: minmax(30rem, max-content) 1fr;
 }
 
 .app-person-info__people {
@@ -53,35 +54,36 @@ $person-info-list-max-height: $person-info-row-height *
   & td {
     box-sizing: border-box;
     height: $person-info-row-height;
-    padding: $person-info-row-padding 0 $person-info-row-padding 1
+    padding: $person-info-row-padding 0 $person-info-row-padding
       $person-info-column-gap;
     border: 0;
     color: inherit;
-    vertical-align: middle;
+    vertical-align: top;
   }
 
   & .app-person-info__label {
-    width: 15rem;
+    width: 1%;
     padding-left: $person-info-edge;
-    padding-right: $person-info-column-gap;
+    padding-right: 40px;
     font-weight: 400;
     white-space: nowrap;
   }
 
   & .app-person-info__name {
-    width: 20rem;
     padding-left: 0;
     font-weight: 700;
+  }
+
+  & .app-person-info__name-text {
+    display: block;
+    width: max-content;
+    max-width: 20rem;
     overflow-wrap: anywhere;
   }
 
-  & .app-person-info__icons-cell {
-    width: 5rem;
-  }
-
   & .app-person-info__status-cell {
-    padding-left: $person-info-edge;
-    padding-right: $person-info-edge;
+    width: 100%;
+    padding: 10px $person-info-edge 6px;
   }
 
   & tr {
@@ -130,7 +132,7 @@ $person-info-list-max-height: $person-info-row-height *
 
 .app-person-info__status-cell .govuk-tag {
   box-sizing: border-box;
-  min-width: 4.75rem;
+  min-width: $person-info-tag-width;
   padding: 2px govuk-spacing(2) 3px;
   font-size: 1rem;
   line-height: 1.25;
@@ -138,7 +140,7 @@ $person-info-list-max-height: $person-info-row-height *
 
 .app-person-info__details {
   min-width: 0;
-  padding: 0 45px 0 $person-info-edge;
+  padding: 0 $person-info-edge;
   background-color: $person-info-selected-blue;
 
   & .app-person-info__details-heading {
@@ -157,6 +159,7 @@ $person-info-list-max-height: $person-info-row-height *
   }
 
   & .govuk-summary-list {
+    table-layout: auto;
     color: $person-info-text;
     font-size: inherit;
     line-height: inherit;
@@ -169,8 +172,10 @@ $person-info-list-max-height: $person-info-row-height *
   }
 
   & .govuk-summary-list__key {
-    width: 11rem;
+    width: 1%;
+    padding-right: 40px;
     font-weight: 400;
+    white-space: nowrap;
   }
 
   & .govuk-summary-list__value {

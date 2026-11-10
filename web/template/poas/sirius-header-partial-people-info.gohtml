@@ -149,7 +149,7 @@
             {{ end }}
     >
         <th class="govuk-table__header app-person-info__label" scope="row">{{ template "person-label" . }}</th>
-        <td class="govuk-table__cell app-person-info__name">{{ template "person-name" .Person }}</td>
+        <td class="govuk-table__cell app-person-info__name"><span class="app-person-info__name-text">{{ template "person-name" .Person }}</span></td>
         <td class="govuk-table__cell app-person-info__icons-cell">
             <div class="app-person-info__icons">
                 {{ if .IsApplicant }}
