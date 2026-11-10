@@ -33,6 +33,7 @@ func TestCreateLpa(t *testing.T) {
 					SubType:              "pfa",
 					ExpectedPaymentTotal: 0,
 					Status:               shared.CaseStatusTypePending,
+					PaymentByCheque:      shared.BoolPtr(true),
 				},
 			},
 			setup: func() {
@@ -47,10 +48,12 @@ func TestCreateLpa(t *testing.T) {
 							"Content-Type": matchers.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"receiptDate":          matchers.Term("05/03/2015", `^\d{1,2}/\d{1,2}/\d{4}$`),
-							"caseSubtype":          matchers.String("pfa"),
-							"expectedPaymentTotal": matchers.Integer(0),
-							"status":               matchers.String("Pending"),
+							"receiptDate":                  matchers.Term("05/03/2015", `^\d{1,2}/\d{1,2}/\d{4}$`),
+							"caseSubtype":                  matchers.String("pfa"),
+							"expectedPaymentTotal":         matchers.Integer(0),
+							"status":                       matchers.String("Pending"),
+							"paymentByCheque":              matchers.Like(true),
+							"validateApplicationFeeFields": matchers.Like(true),
 						},
 					}).
 					WithCompleteResponse(consumer.Response{
