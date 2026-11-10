@@ -255,7 +255,6 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				data.Error = ve
 				lpa.Attorneys = data.Lpa.Attorneys
 				lpa.ReplacementAttorneys = data.Lpa.ReplacementAttorneys
-				data.ApplicantIds = lpa.ApplicantIds
 				data.Lpa = lpa
 
 				return tmpl(w, data)
