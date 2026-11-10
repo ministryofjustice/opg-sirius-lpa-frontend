@@ -132,7 +132,7 @@
     {{- with .Firstname }}{{ $sep }}{{ . }}{{ $sep = " " }}{{ end -}}
     {{- with .Middlenames }}{{ $sep }}{{ . }}{{ $sep = " " }}{{ end -}}
     {{- with .Surname }}{{ $sep }}{{ . }}{{ $sep = " " }}{{ end -}}
-    {{- with .CompanyName }}{{ $sep }}{{ . }}{{ end -}}
+    {{- with .CompanyName }}{{ if $sep }}, {{ end }}{{ . }}{{ end -}}
 {{- end }}
 
 {{ define "person-row" }}

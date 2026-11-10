@@ -6,7 +6,7 @@ $person-info-text: govuk-colour("white");
 $person-info-row-height: 2.5625rem;
 $person-info-row-padding: 10px;
 $person-info-column-gap: 20px;
-$person-info-edge: 25px;
+$person-info-edge: 15px;
 $person-info-tag-width: 4.75rem;
 $person-info-visible-rows: 10.5;
 $person-info-list-max-height: $person-info-row-height *
@@ -17,7 +17,7 @@ $person-info-list-max-height: $person-info-row-height *
 }
 
 .app-person-info {
-  padding: $person-info-edge 0;
+  padding: 15px 0 25px;
   color: $person-info-text;
   font-family: $govuk-font-family;
   font-size: 1rem;
@@ -25,8 +25,8 @@ $person-info-list-max-height: $person-info-row-height *
 }
 
 .app-person-info__heading {
-  @include govuk-font($size: 24, $weight: bold);
-  margin: 0 0 govuk-spacing(4) $person-info-edge;
+  @include govuk-font($size: 19, $weight: bold);
+  margin: 0 0 govuk-spacing(3) $person-info-edge;
   color: $person-info-text;
 }
 
@@ -83,7 +83,7 @@ $person-info-list-max-height: $person-info-row-height *
 
   & .app-person-info__status-cell {
     width: 100%;
-    padding: 10px $person-info-edge 6px;
+    padding: 10px $person-info-edge 6px 25px;
   }
 
   & tr {
@@ -122,7 +122,7 @@ $person-info-list-max-height: $person-info-row-height *
   width: 1.25rem;
   height: 1.25rem;
   border-radius: 50%;
-  background-color: govuk-colour("black", $variant: "tint-80");
+  background-color: govuk-colour("white");
   color: govuk-colour("black");
   cursor: help;
   font-size: 0.875rem;

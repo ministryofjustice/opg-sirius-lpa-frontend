@@ -77,7 +77,7 @@ describe("Person info panel on the header bar", () => {
 
     cy.contains("tr", "Donor").should(
       "contain.text",
-      "Prof Melanie Josefina Vanvolkenburg",
+      "Prof Melanie Josefina Vanvolkenburg, ACME",
     );
     cy.contains("tr", "Attorney 1").should(
       "contain.text",
@@ -134,7 +134,7 @@ describe("Person info panel on the header bar", () => {
     cy.get("tr.selected").should("contain.text", "Donor");
     cy.get(".app-person-info__details-heading").should(
       "contain.text",
-      "Donor: Prof Melanie Josefina Vanvolkenburg",
+      "Donor: Prof Melanie Josefina Vanvolkenburg, ACME",
     );
 
     cy.get(".app-person-info__details").within(() => {
