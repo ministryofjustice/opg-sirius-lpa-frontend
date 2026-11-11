@@ -371,7 +371,7 @@
               {{ range $notifiedPerson := .Lpa.NotifiedPersons }}
                 <div class="app-create-lpa__details-row">
                   <details class="govuk-details">
-                    <summary class="govuk-details__summary">
+                    <summary class="govuk-details__summary app-table__row--half-width">
                       <span class="govuk-details__summary-text">{{ if .Firstname }}{{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
                     </summary>
                     <div class="govuk-details__text">
@@ -471,7 +471,7 @@
             {{ range $cp := .Lpa.CertificateProviders }}
               <div class="app-create-lpa__details-row">
                 <details class="govuk-details">
-                  <summary class="govuk-details__summary">
+                  <summary class="govuk-details__summary app-table__row--half-width">
                     <span class="govuk-details__summary-text">{{ if .Firstname }}{{ .Firstname }}{{ end }}{{ if .Middlenames }} {{ .Middlenames }}{{ end }}{{ if .Surname }} {{ .Surname }}{{ end }}</span>
                   </summary>
                   <div class="govuk-details__text">
