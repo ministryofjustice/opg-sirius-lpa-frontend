@@ -27,6 +27,11 @@ type Lpa struct {
 	RepeatApplicationReference                string     `json:"repeatApplicationReference,omitempty"`
 }
 
+type LpaRequest struct {
+	Lpa
+	ValidateApplicationFeeFields bool `json:"validateApplicationFeeFields,omitempty"`
+}
+
 func (c *Client) Lpa(ctx Context, id int) (Lpa, error) {
 	var v Lpa
 	err := c.get(ctx, fmt.Sprintf("/lpa-api/v1/cases/%d", id), &v)
@@ -42,7 +47,8 @@ func (c *Client) Lpa(ctx Context, id int) (Lpa, error) {
 
 func (c *Client) CreateLpa(ctx Context, donorID int, lpa Lpa) (Lpa, error) {
 	var v Lpa
-	err := c.post(ctx, fmt.Sprintf("/lpa-api/v1/donors/%d/lpas", donorID), lpa, &v)
+	lpaRequest := LpaRequest{Lpa: lpa, ValidateApplicationFeeFields: true}
+	err := c.post(ctx, fmt.Sprintf("/lpa-api/v1/donors/%d/lpas", donorID), lpaRequest, &v)
 	return v, err
 }
 
