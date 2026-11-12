@@ -69,5 +69,6 @@ describe("Fill correspondent details", () => {
     radios[0].dispatchEvent(new Event("change"));
     expect(firstname.value).toBe("");
     expect(lastname.value).toBe("");
+    expect(radios[0].checked).toBe(true);
   });
 });
