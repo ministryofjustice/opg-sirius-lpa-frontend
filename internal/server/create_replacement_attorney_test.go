@@ -52,7 +52,7 @@ func TestGetCreateReplacementAttorney(t *testing.T) {
 						On("Lpa", mock.Anything, 2).
 						Return(lpa, nil)
 
-					expectedData := createReplacementAttorneyData{
+					expectedData := replacementAttorneyData{
 						FlowQuery:   flowCase.flowQuery,
 						DonorId:     1,
 						CaseId:      2,
@@ -80,47 +80,6 @@ func TestGetCreateReplacementAttorney(t *testing.T) {
 					mock.AssertExpectationsForObjects(t, client, template)
 				})
 			}
-		})
-	}
-}
-
-func TestGetCreateReplacementAttorneyNoReceiptDate(t *testing.T) {
-	for _, isHtmx := range []bool{false, true} {
-		t.Run("Is Htmx: "+strconv.FormatBool(isHtmx), func(t *testing.T) {
-			client := &mockCreateReplacementAttorneyClient{}
-			client.
-				On("Lpa", mock.Anything, 2).
-				Return(sirius.Lpa{}, nil)
-
-			expectedData := createReplacementAttorneyData{
-				DonorId: 1,
-				CaseId:  2,
-				Title:   "Add a replacement attorney",
-				Error: sirius.ValidationError{
-					Field: sirius.FieldErrors{
-						"receiptDate": {"receiptDate": "A receipt date must be added to the LPA before a replacement attorney can be added"},
-					},
-				},
-				IsPartial: isHtmx,
-			}
-			template := &mockTemplate{}
-			template.
-				On("Func", mock.Anything, expectedData).
-				Return(nil)
-
-			r, _ := http.NewRequest(http.MethodGet, "/?id=1&caseId=2", nil)
-			w := httptest.NewRecorder()
-
-			if isHtmx {
-				r.Header.Add("HX-Request", "true")
-			}
-
-			err := CreateReplacementAttorney(client, template.Func)(w, r)
-			resp := w.Result()
-
-			assert.Nil(t, err)
-			assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
 }
@@ -226,7 +185,7 @@ func TestPostCreateReplacementAttorneyTransitions(t *testing.T) {
 							template := &mockTemplate{}
 							if isHtmx {
 								template.
-									On("Func", mock.Anything, createReplacementAttorneyData{
+									On("Func", mock.Anything, replacementAttorneyData{
 										FlowQuery:    flowCase.flowQuery,
 										DonorId:      1,
 										CaseId:       2,
@@ -305,7 +264,7 @@ func TestPostCreateReplacementAttorneyWhenValidationError(t *testing.T) {
 
 	template := &mockTemplate{}
 
-	expectedData := createReplacementAttorneyData{
+	expectedData := replacementAttorneyData{
 		Attorney: attorney,
 		DonorId:  1,
 		CaseId:   2,

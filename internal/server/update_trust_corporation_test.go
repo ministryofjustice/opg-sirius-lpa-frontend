@@ -131,7 +131,7 @@ func TestPostEditTrustCorporationTransitions(t *testing.T) {
 				TrustCorporations: []sirius.TrustCorporation{{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}}},
 				Attorneys:         []sirius.Attorney{{SystemStatus: shared.BoolPtr(true), Person: sirius.Person{ID: 4, PersonType: "Attorney"}}},
 			}},
-			redirect: "/create-attorney?id=1&caseId=2&caseType=lpa&attorneyId=4",
+			redirect: "/update-attorney?id=1&caseId=2&caseType=lpa&attorneyId=4",
 		},
 		{
 			name:                  "Update next replacement attorney",
@@ -141,7 +141,7 @@ func TestPostEditTrustCorporationTransitions(t *testing.T) {
 				TrustCorporations:    []sirius.TrustCorporation{{Attorney: sirius.Attorney{Person: sirius.Person{ID: 3, PersonType: "Trust Corporation"}}, IsReplacementAttorney: true}},
 				ReplacementAttorneys: []sirius.Attorney{{SystemStatus: shared.BoolPtr(false), Person: sirius.Person{ID: 4, PersonType: "Replacement Attorney"}}},
 			}},
-			redirect: "/create-replacement-attorney?id=1&caseId=2&attorneyId=4",
+			redirect: "/update-replacement-attorney?id=1&caseId=2&attorneyId=4",
 		},
 		{
 			name:     "Update next with no following actor",

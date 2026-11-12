@@ -515,7 +515,7 @@ func TestPostCreateLpaDropsOnlineLpaIdWhenNotOnline(t *testing.T) {
 			CaseAttorneyJointly:             shared.BoolPtr(false),
 			CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque:                           shared.BoolPtr(false),
+			PaymentByCheque: shared.BoolPtr(false),
 		},
 	}
 
@@ -1529,7 +1529,7 @@ func TestPostCreateLpaUpdateReplacementAttorney(t *testing.T) {
 				CaseId:                 456,
 				DonorId:                123,
 				DonorName:              "Firstname Surname",
-				HtmxRedirect:           "/create-replacement-attorney?id=123&caseId=456&attorneyId=999",
+				HtmxRedirect:           "/update-replacement-attorney?id=123&caseId=456&attorneyId=999",
 				HtmxSwap:               "innerHTML",
 				IsPartial:              isHtmx,
 				IsUpdate:               true,
@@ -1565,7 +1565,7 @@ func TestPostCreateLpaUpdateReplacementAttorney(t *testing.T) {
 			resp := w.Result()
 
 			if !isHtmx {
-				expectedRedirect := RedirectError("/create-replacement-attorney?id=123&caseId=456&attorneyId=999")
+				expectedRedirect := RedirectError("/update-replacement-attorney?id=123&caseId=456&attorneyId=999")
 				assert.Equal(t, expectedRedirect, err)
 			} else {
 				assert.Nil(t, err)
@@ -1656,7 +1656,7 @@ func TestPostCreateLpaRedirects(t *testing.T) {
 			name:        "Update replacement attorney redirects",
 			formKey:     "updateReplacementAttorney",
 			formValue:   "999",
-			expectedErr: RedirectError("/create-replacement-attorney?id=1&caseId=2&attorneyId=999"),
+			expectedErr: RedirectError("/update-replacement-attorney?id=1&caseId=2&attorneyId=999"),
 		},
 		{
 			name:        "Update replacement attorney with invalid ID errors",

@@ -13,22 +13,6 @@ type UpdateReplacementAttorneyClient interface {
 	UpdateReplacementAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
 }
 
-type updateReplacementAttorneyData struct {
-	XSRFToken      string
-	FlowQuery      string
-	Attorney       sirius.Attorney
-	Error          sirius.ValidationError
-	DonorId        int
-	CaseId         int
-	CaseSubType    string
-	IsEditing      bool
-	Title          string
-	NextAttorneyId int
-	HtmxRedirect   string
-	HtmxSwap       string
-	IsPartial      bool
-}
-
 func UpdateReplacementAttorney(client UpdateReplacementAttorneyClient, tmpl template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		ctx := getContext(r)
@@ -43,54 +27,37 @@ func UpdateReplacementAttorney(client UpdateReplacementAttorneyClient, tmpl temp
 			return err
 		}
 
+		attorneyId, err := strToIntOrStatusError(r.FormValue("attorneyId"))
+		if err != nil {
+			return err
+		}
+
 		lpa, err := client.Lpa(ctx, caseId)
 		if err != nil {
 			return err
 		}
 
-		data := updateReplacementAttorneyData{
+		data := replacementAttorneyData{
 			XSRFToken:   ctx.XSRFToken,
 			FlowQuery:   getFlowQuery(r),
 			DonorId:     donorId,
 			CaseId:      caseId,
 			CaseSubType: lpa.SubType,
-			Title:       "Add a replacement attorney",
+			Title:       "Update replacement attorney details",
 			IsPartial:   ctx.IsPartial,
-		}
-
-		if lpa.ReceiptDate == "" {
-			data.Error = sirius.ValidationError{
-				Field: sirius.FieldErrors{
-					"receiptDate": {"receiptDate": "A receipt date must be added to the LPA before a replacement attorney can be added"},
-				},
-			}
-
-			w.WriteHeader(http.StatusBadRequest)
-			return tmpl(w, data)
+			IsEditing:   true,
 		}
 
 		var nextPersonType string
-		var attorneyId int
-		attorneyIdStr := r.FormValue("attorneyId")
-		isEditing := attorneyIdStr != ""
-		if isEditing {
-			attorneyId, err = strToIntOrStatusError(attorneyIdStr)
-			if err != nil {
-				return err
+
+		for _, attorney := range lpa.ReplacementAttorneys {
+			if attorney.ID == attorneyId {
+				data.Attorney = attorney
+				break
 			}
-
-			for _, attorney := range lpa.ReplacementAttorneys {
-				if attorney.ID == attorneyId {
-					data.Attorney = attorney
-					break
-				}
-			}
-
-			data.Title = "Update replacement attorney details"
-			data.IsEditing = true
-
-			data.NextAttorneyId, nextPersonType = GetIdForNextAttorney(attorneyId, true, lpa.TrustCorporations, lpa.ReplacementAttorneys)
 		}
+
+		data.NextAttorneyId, nextPersonType = GetIdForNextAttorney(attorneyId, true, lpa.TrustCorporations, lpa.ReplacementAttorneys)
 
 		if r.Method == http.MethodPost {
 			attorney := sirius.Attorney{
@@ -114,11 +81,7 @@ func UpdateReplacementAttorney(client UpdateReplacementAttorneyClient, tmpl temp
 			}
 			data.Attorney = attorney
 
-			if isEditing {
-				err = client.UpdateReplacementAttorney(ctx, attorneyId, attorney)
-			} else {
-				//_, err = client.CreateReplacementAttorney(ctx, caseId, attorney)
-			}
+			err = client.UpdateReplacementAttorney(ctx, attorneyId, attorney)
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
@@ -129,22 +92,13 @@ func UpdateReplacementAttorney(client UpdateReplacementAttorneyClient, tmpl temp
 				return err
 			}
 
-			if r.FormValue("add-another") != "" {
-				if ctx.IsPartial {
-					data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery)
-					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
-					return tmpl(w, data)
-				}
-				return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d%s", donorId, caseId, data.FlowQuery))
-			}
-
 			if r.FormValue("update-next-attorney") != "" {
-				redirect := fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorId, caseId, data.NextAttorneyId, data.FlowQuery)
+				redirect := fmt.Sprintf("/update-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorId, caseId, data.NextAttorneyId, data.FlowQuery)
 				if nextPersonType == "Trust Corporation" {
-					redirect = fmt.Sprintf("/create-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=true%s", donorId, caseId, data.NextAttorneyId, data.FlowQuery)
+					redirect = fmt.Sprintf("/update-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=true%s", donorId, caseId, data.NextAttorneyId, data.FlowQuery)
 				}
 
-				if data.IsPartial {
+				if ctx.IsPartial {
 					data.HtmxRedirect = redirect
 					data.HtmxSwap = "innerHTML scroll:.action-panel__content:top"
 					return tmpl(w, data)

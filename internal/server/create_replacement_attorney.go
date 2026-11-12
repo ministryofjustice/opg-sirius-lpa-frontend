@@ -13,7 +13,7 @@ type CreateReplacementAttorneyClient interface {
 	CreateReplacementAttorney(ctx sirius.Context, caseId int, attorney sirius.Attorney) (sirius.Attorney, error)
 }
 
-type createReplacementAttorneyData struct {
+type replacementAttorneyData struct {
 	XSRFToken      string
 	FlowQuery      string
 	Attorney       sirius.Attorney
@@ -48,7 +48,7 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 			return err
 		}
 
-		data := createReplacementAttorneyData{
+		data := replacementAttorneyData{
 			XSRFToken:   ctx.XSRFToken,
 			FlowQuery:   getFlowQuery(r),
 			DonorId:     donorId,
@@ -56,17 +56,6 @@ func CreateReplacementAttorney(client CreateReplacementAttorneyClient, tmpl temp
 			CaseSubType: lpa.SubType,
 			Title:       "Add a replacement attorney",
 			IsPartial:   ctx.IsPartial,
-		}
-
-		if lpa.ReceiptDate == "" {
-			data.Error = sirius.ValidationError{
-				Field: sirius.FieldErrors{
-					"receiptDate": {"receiptDate": "A receipt date must be added to the LPA before a replacement attorney can be added"},
-				},
-			}
-
-			w.WriteHeader(http.StatusBadRequest)
-			return tmpl(w, data)
 		}
 
 		if r.Method == http.MethodPost {
