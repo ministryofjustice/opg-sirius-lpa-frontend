@@ -44,32 +44,6 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			IsPartial: ctx.IsPartial,
 		}
 
-		caseIdStr := r.FormValue("caseId")
-		isEditing := caseIdStr != ""
-		if isEditing {
-			data.CaseId, err = strToIntOrStatusError(caseIdStr)
-			if err != nil {
-				return err
-			}
-
-			caseItem, err := client.Epa(ctx, data.CaseId)
-			if err != nil {
-				return err
-			}
-			data.Epa = caseItem
-			data.Title = "Edit EPA"
-
-			if caseItem.CaseAttorneyJointly != nil && *caseItem.CaseAttorneyJointly {
-				data.AppointmentType = "jointly"
-			} else if caseItem.CaseAttorneySingular != nil && *caseItem.CaseAttorneySingular {
-				data.AppointmentType = "singular"
-			} else if caseItem.CaseAttorneyJointlyAndSeverally != nil && *caseItem.CaseAttorneyJointlyAndSeverally {
-				data.AppointmentType = "jointly-and-severally"
-			}
-
-			data.IsUpdate = true
-		}
-
 		if r.Method == http.MethodPost {
 			caseAttorneyValue := r.FormValue("caseAttorney")
 
@@ -94,17 +68,12 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 				epa.OtherEpaInfo = ""
 			}
 
-			if isEditing {
-				err = client.UpdateEpa(ctx, data.CaseId, epa)
-				data.Epa, _ = client.Epa(ctx, data.CaseId)
-			} else {
-				epa, err = client.CreateEpa(ctx, donorID, epa)
-				if err == nil {
-					data.Epa = epa
-					data.CaseId = epa.ID
-				}
+			epa, err = client.CreateEpa(ctx, donorID, epa)
+			if err == nil {
+				data.Epa = epa
+				data.CaseId = epa.ID
 			}
-
+			
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
