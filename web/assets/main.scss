@@ -1305,7 +1305,9 @@ $app-case-page-action-panel-height: calc(
   }
 }
 
-.govuk-main-wrapper:has(> .app-case-page) {
+.govuk-main-wrapper:has(> .app-case-page),
+.govuk-main-wrapper:has(> .document-main-wrapper),
+.govuk-main-wrapper.document-main-wrapper {
   padding-top: 0;
 }
 
