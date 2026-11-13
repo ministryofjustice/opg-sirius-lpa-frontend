@@ -47,53 +47,54 @@
                     <input type="hidden" name="comparing" value="true">
                 {{ end }}
 
-                <table class="govuk-table" data-module="moj-sortable-table">
-                    <caption class="govuk-table__caption">
-                        Documents ({{ .DocumentList.Total }})
-                        <span class="govuk-body" id="viewing-selected-cases">
+                <div class="govuk-body govuk-!-margin-bottom-0">
+                    <span class="govuk-!-font-weight-bold" id="document-list-title">Documents ({{ .DocumentList.Total }})</span>
+                    <span id="viewing-selected-cases">
                         Viewing {{ len .SelectedCases }} POA{{ if $multiCaseSelected }}s{{ end }}:
-                            {{ range .SelectedCases }}
-                                {{ template "CaseLabel" . }}
-                            {{ end }}
+                        {{ range .SelectedCases }}
+                            {{ template "CaseLabel" . }}
+                        {{ end }}
                     </span>
-                        <div class="govuk-grid-row govuk-!-margin-top-2">
-                            <div class="govuk-grid-column-one-half moj-button-group--inline">
-                                <button class="govuk-button govuk-button--secondary moj-button-menu__item" data-module="govuk-button" type="submit" name="actionDownload" value="true">Download</button>
-                                {{ if eq $.Comparing true }}
-                                    {{ if .CloseURL }}
-                                        <a class="govuk-button govuk-button--secondary moj-button-menu__item"
-                                           href="{{ prefix .CloseURL }}"
-                                           hx-get="{{ prefix .CloseURL }}"
-                                           hx-target="#document-panel"
-                                           hx-swap="innerHTML"
-                                           hx-push-url="true"
-                                           aria-label="Close list">Close</a>
-                                    {{end}}
-                                {{ end }}
-                            </div>
-                            <div class="govuk-grid-column-one-half govuk-!-text-align-right">
-                                <label class="govuk-label govuk-!-display-inline govuk-!-margin-right-2" for="document-sort">
-                                    Sort by
-                                </label>
-                                <select class="govuk-select" id="document-sort" data-document-sort>
-                                    <option value="">Select an option</option>
-                                    <option value="date-new-old">Date Created (New-Old)</option>
-                                    <option value="date-old-new">Date Created (Old-New)</option>
-                                    <option value="direction-incoming">Direction (Incoming)</option>
-                                    <option value="direction-outgoing">Direction (Outgoing)</option>
-                                    <option value="type-az">Document Type (A-Z)</option>
-                                    <option value="type-za">Document Type (Z-A)</option>
-                                    <option value="name-az">Name (A-Z)</option>
-                                    <option value="name-za">Name (Z-A)</option>
-                                    {{ if $multiCaseSelected }}
-                                        <option value="case-low-high">Case number (Low-High)</option>
-                                        <option value="case-high-low">Case number (High-Low)</option>
-                                    {{ end }}
-                                </select>
-                            </div>
-                        </div>
+                </div>
 
-                    </caption>
+                <div class="app-document-list__controls govuk-!-margin-top-2">
+                    <div class="moj-button-group--inline">
+                        <button class="govuk-button govuk-button--secondary moj-button-menu__item" data-module="govuk-button" type="submit" name="actionDownload" value="true">Download</button>
+                        {{ if eq $.Comparing true }}
+                            {{ if .CloseURL }}
+                                <a class="govuk-button govuk-button--secondary moj-button-menu__item"
+                                   href="{{ prefix .CloseURL }}"
+                                   hx-get="{{ prefix .CloseURL }}"
+                                   hx-target="#document-panel"
+                                   hx-swap="innerHTML"
+                                   hx-push-url="true"
+                                   aria-label="Close list">Close</a>
+                            {{end}}
+                        {{ end }}
+                    </div>
+                    <div>
+                        <label class="govuk-label govuk-!-display-inline govuk-!-margin-right-2" for="document-sort">
+                            Sort by
+                        </label>
+                        <select class="govuk-select" id="document-sort" data-document-sort>
+                            <option value="">Select an option</option>
+                            <option value="date-new-old">Date Created (New-Old)</option>
+                            <option value="date-old-new">Date Created (Old-New)</option>
+                            <option value="direction-incoming">Direction (Incoming)</option>
+                            <option value="direction-outgoing">Direction (Outgoing)</option>
+                            <option value="type-az">Document Type (A-Z)</option>
+                            <option value="type-za">Document Type (Z-A)</option>
+                            <option value="name-az">Name (A-Z)</option>
+                            <option value="name-za">Name (Z-A)</option>
+                            {{ if $multiCaseSelected }}
+                                <option value="case-low-high">Case number (Low-High)</option>
+                                <option value="case-high-low">Case number (High-Low)</option>
+                            {{ end }}
+                        </select>
+                    </div>
+                </div>
+
+                <table class="govuk-table" data-module="moj-sortable-table" aria-labelledby="document-list-title">
 
                     <thead class="govuk-table__head">
                     <tr class="govuk-table__row">

@@ -592,6 +592,14 @@ $app-case-page-action-panel-height: calc(
   overflow-y: auto;
 }
 
+.app-document-list__controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: govuk-spacing(3);
+}
+
 .govuk-width-container:has(> .action-panel) {
   display: grid;
   grid-template-columns: 1fr 1.5rem;
