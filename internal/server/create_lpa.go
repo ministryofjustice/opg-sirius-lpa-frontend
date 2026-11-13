@@ -348,11 +348,11 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			}
 
 			if data.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorID, data.CaseId, attorneyID, data.FlowQuery)
+				data.HtmxRedirect = fmt.Sprintf("/update-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorID, data.CaseId, attorneyID, data.FlowQuery)
 				data.HtmxSwap = "innerHTML"
 				return tmpl(w, data)
 			}
-			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorID, data.CaseId, attorneyID, data.FlowQuery))
+			return RedirectError(fmt.Sprintf("/update-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorID, data.CaseId, attorneyID, data.FlowQuery))
 		}
 
 		return tmpl(w, data)

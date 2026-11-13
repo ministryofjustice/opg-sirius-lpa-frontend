@@ -17,7 +17,7 @@ const fillInAttorneyDetails = () => {
   cy.get("#f-email").type("m.vancolkenburg@ca.test");
 };
 
-describe("Create or Update Replacement Attorney on an LPA", () => {
+describe("Create Replacement Attorney on an LPA", () => {
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/persons", "POST", {
       status: 201,
@@ -65,23 +65,6 @@ describe("Create or Update Replacement Attorney on an LPA", () => {
         "include",
         "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-1",
       );
-  });
-
-  it("updates an existing replacement attorney on an LPA", () => {
-    cy.addMock("/lpa-api/v1/replacement-attorneys/3", "PUT", {
-      status: 200,
-      body: {},
-    });
-
-    cy.visit("/create-replacement-attorney?id=1&caseId=2&attorneyId=3");
-    cy.contains("Update replacement attorney details");
-    cy.get("#f-firstname").should("have.value", "Rudolph");
-    cy.get("#f-surname").should("have.value", "Stotesbury");
-    cy.get("input[type=submit][name=add-another]").should("not.exist");
-
-    cy.get("#f-firstname").clear().type("Rafael");
-    cy.get("button[type=submit]").click();
-    cy.url().should("include", "create-lpa");
   });
 
   it("should show the trust corporation link on a pfa lpa", () => {

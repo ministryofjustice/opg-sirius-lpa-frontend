@@ -33,7 +33,7 @@
 
     <form class="form"
           method="POST"
-          hx-post={{if .IsEditing}}"{{ prefix (printf "/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s" .DonorId .CaseId .Attorney.ID .FlowQuery) }}"{{else}}"{{ prefix (printf "/create-replacement-attorney?id=%d&caseId=%d%s" .DonorId .CaseId .FlowQuery) }}"{{end}}
+          hx-post={{if .IsEditing}}"{{ prefix (printf "/update-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s" .DonorId .CaseId .Attorney.ID .FlowQuery) }}"{{else}}"{{ prefix (printf "/create-replacement-attorney?id=%d&caseId=%d%s" .DonorId .CaseId .FlowQuery) }}"{{end}}
           hx-target=".action-panel__content"
           hx-swap="innerHTML">
 
