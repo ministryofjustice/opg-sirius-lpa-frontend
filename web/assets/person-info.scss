@@ -1,0 +1,198 @@
+$person-info-panel-blue: #38669e;
+$person-info-selected-blue: govuk-colour("blue", $variant: "shade-50");
+$person-info-hover-background: govuk-colour("black", $variant: "tint-95");
+$person-info-hover-text: govuk-colour("black");
+$person-info-text: govuk-colour("white");
+$person-info-row-height: 2.5625rem;
+$person-info-row-padding: 10px;
+$person-info-column-gap: 20px;
+$person-info-edge: 15px;
+$person-info-tag-width: 4.75rem;
+$person-info-visible-rows: 10.5;
+$person-info-list-max-height: $person-info-row-height *
+  $person-info-visible-rows;
+
+.sirius-header__dropdown-panel:has(.app-person-info) {
+  background: $person-info-panel-blue;
+}
+
+.app-person-info {
+  padding: 15px 0 25px;
+  color: $person-info-text;
+  font-family: $govuk-font-family;
+  font-size: 1rem;
+  line-height: 1.3125;
+}
+
+.app-person-info__heading {
+  @include govuk-font($size: 19, $weight: bold);
+  margin: 0 0 govuk-spacing(3) $person-info-edge;
+  color: $person-info-text;
+}
+
+.app-person-info__container {
+  display: grid;
+  grid-template-columns: minmax(30rem, max-content) 1fr;
+}
+
+.app-person-info__people {
+  max-height: $person-info-list-max-height;
+  overflow-y: auto;
+
+  &:focus-visible {
+    outline: 3px solid $govuk-focus-colour;
+    outline-offset: 0;
+  }
+
+  & .govuk-table {
+    color: $person-info-text;
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  & th,
+  & td {
+    box-sizing: border-box;
+    height: $person-info-row-height;
+    padding: $person-info-row-padding 0 $person-info-row-padding
+      $person-info-column-gap;
+    border: 0;
+    color: inherit;
+    vertical-align: top;
+  }
+
+  & .app-person-info__label {
+    width: 1%;
+    padding-left: $person-info-edge;
+    padding-right: 40px;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  & .app-person-info__name {
+    padding-left: 0;
+    font-weight: 700;
+  }
+
+  & .app-person-info__name-text {
+    display: block;
+    width: max-content;
+    max-width: 20rem;
+    overflow-wrap: anywhere;
+  }
+
+  & .app-person-info__status-cell {
+    width: 100%;
+    padding: 10px $person-info-edge 6px 25px;
+  }
+
+  & tr {
+    cursor: pointer;
+
+    &.selected {
+      background-color: $person-info-selected-blue;
+      cursor: default;
+    }
+
+    &:not(.selected):hover {
+      background-color: $person-info-hover-background;
+      color: $person-info-hover-text;
+    }
+  }
+}
+
+.app-person-info__icons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: $person-info-column-gap;
+}
+
+.app-person-info__icon {
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: help;
+}
+
+.app-person-info__applicant {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background-color: govuk-colour("white");
+  color: govuk-colour("black");
+  cursor: help;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.app-person-info__status-cell .govuk-tag {
+  box-sizing: border-box;
+  min-width: $person-info-tag-width;
+  padding: 2px govuk-spacing(2) 3px;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.app-person-info__details {
+  min-width: 0;
+  padding: 0 $person-info-edge;
+  background-color: $person-info-selected-blue;
+
+  & .app-person-info__details-heading {
+    box-sizing: border-box;
+    height: $person-info-row-height;
+    margin: 0;
+    padding: $person-info-row-padding 0;
+    border-bottom: 1px solid $person-info-text;
+    color: $person-info-text;
+    font-size: inherit;
+    font-weight: 700;
+    line-height: inherit;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  & .govuk-summary-list {
+    table-layout: auto;
+    color: $person-info-text;
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  & .govuk-summary-list__key,
+  & .govuk-summary-list__value {
+    padding-top: $person-info-row-padding;
+    padding-bottom: $person-info-row-padding;
+  }
+
+  & .govuk-summary-list__key {
+    width: 1%;
+    padding-right: 40px;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  & .govuk-summary-list__value {
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  & a {
+    color: $person-info-text;
+    text-decoration: underline;
+
+    &:hover {
+      text-decoration-thickness: 3px;
+    }
+
+    &:focus {
+      color: govuk-colour("black");
+    }
+  }
+}
