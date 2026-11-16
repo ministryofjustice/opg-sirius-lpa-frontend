@@ -1,8 +1,10 @@
-export default function dateInputClipboard(scope) {
+// Converts the date input to a text input on double click to allow for copying
+// and pasting the date values. Converts the text input back to a date input on focus out.
+export default function dateInputToText(scope) {
   scope = scope || document;
 
   const dateInputs = scope.querySelectorAll(
-    'input[type="date"][data-module="app-date-input-clipboard"]',
+    'input[type="date"][data-module="app-date-input-to-text"]',
   );
 
   if (!dateInputs.length) return;
