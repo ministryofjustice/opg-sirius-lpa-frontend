@@ -13,9 +13,9 @@
     {{ else }}
       <a class="govuk-back-link"
          href=""
-         hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-4" .DonorId .CaseId .FlowQuery) }}"
+         hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-correspondent" .DonorId .CaseId .FlowQuery) }}"
          hx-target=".action-panel__content"
-         hx-swap="innerHTML show:#accordion-create-lpa-heading-4:top">Back</a>
+         hx-swap="innerHTML show:#scroll-to-correspondent:top">Back</a>
     {{ end }}
 
     <h1 class="govuk-heading-m">Add a correspondent</h1>
@@ -39,9 +39,9 @@
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
           <a class="govuk-link govuk-link--no-visited-state"
              href=""
-             hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-4" .DonorId .CaseId .FlowQuery) }}"
+             hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-correspondent" .DonorId .CaseId .FlowQuery) }}"
              hx-target=".action-panel__content"
-             hx-swap="innerHTML show:#accordion-create-lpa-heading-4:top">Cancel</a>
+             hx-swap="innerHTML show:#scroll-to-correspondent:top">Cancel</a>
         {{ end }}
       </div>
     </form>
@@ -58,7 +58,7 @@
       {{ if eq .CaseType "epa" }}
         <a href="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
       {{ else }}
-        <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-4" .DonorId .CaseId .FlowQuery) }}" class="govuk-back-link">Back</a>
+        <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-correspondent" .DonorId .CaseId .FlowQuery) }}" class="govuk-back-link">Back</a>
       {{ end }}
 
       <h1 class="govuk-heading-l">Add a correspondent</h1>
@@ -67,7 +67,11 @@
         {{ template "form-content" . }}
         <div class="govuk-button-group govuk-!-padding-top-5">
           <button class="govuk-button" data-module="govuk-button" type="submit">{{ if eq .CaseType "epa" }}Continue{{ else }}Save{{ end }}</button>
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ prefix (printf "/create-%s?id=%d&caseId=%d%s" .CaseType .DonorId .CaseId .FlowQuery) }}">Cancel</a>
+            {{ if eq .CaseType "epa" }}
+              <a href="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+            {{ else }}
+              <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-correspondent" .DonorId .CaseId .FlowQuery) }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+            {{ end }}
         </div>
       </form>
     </div>
