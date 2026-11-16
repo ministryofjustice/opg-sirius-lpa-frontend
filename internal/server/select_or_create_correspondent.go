@@ -142,7 +142,7 @@ func SelectOrCreateCorrespondent(client SelectOrCreateCorrespondentClient, tmpl 
 				if data.CaseType == "epa" {
 					return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", donorId, caseId))
 				}
-				return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#accordion-create-lpa-heading-4", donorId, caseId, data.FlowQuery))
+				return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#scroll-to-correspondent", donorId, caseId, data.FlowQuery))
 			}
 		}
 
