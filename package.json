@@ -20,7 +20,7 @@
   "dependencies": {
     "@ministryofjustice/frontend": "^11.1.0",
     "accessible-autocomplete": "^3.0.0",
-    "cypress": "16.2.0",
+    "cypress": "16.2.1",
     "govuk-frontend": "^6.1.0",
     "htmx.org": "^2.0.10",
     "hugerte": "^1.0.15",
