@@ -40,6 +40,24 @@ describe("Person info panel on the header bar", () => {
             systemStatus: true,
           },
         ],
+        replacementAttorneys: [
+          {
+            id: 5,
+            salutation: "Mr",
+            firstname: "Rupert",
+            surname: "Replacement",
+            systemStatus: false,
+          },
+        ],
+        certificateProviders: [
+          {
+            id: 6,
+            salutation: "Ms",
+            firstname: "Cora",
+            surname: "Provider",
+            isAirmailRequired: true,
+          },
+        ],
         correspondent: {
           id: 4,
           salutation: "Mr",
@@ -50,31 +68,139 @@ describe("Person info panel on the header bar", () => {
         applicants: [{ id: 2 }],
       },
     });
-
-    cy.visit("/sirius-header-people-info?id=123");
   });
 
-  it("displays the person info panel", () => {
-    cy.contains("Donor:");
-    cy.contains("Prof Melanie Josefina Vanvolkenburg");
-    cy.contains("Attorney 1:");
-    cy.contains("Miss Amanda Percy Jenkins");
-    cy.contains("Attorney 2:");
-    cy.contains("Dr Will Oswald Niesborella");
-    cy.contains("Correspondent:");
-    cy.contains("Mr Test J Name");
-    cy.contains("Company Name:");
-    cy.contains("ACME");
-    cy.contains("DOB:");
-    cy.contains("19/04/1978");
-    cy.contains("Address:");
-    cy.contains(
-      "AIRMAIL 29737 Andrew Plaza, Apt. 814, Gislasonside, Hirthehaven, Saskatchewan, S7R 9F9, Canada",
+  it("lists the people involved in the case", () => {
+    cy.visit("/sirius-header-people-info?id=123");
+
+    cy.contains("h2", "Details on the people involved in this case");
+
+    cy.contains("tr", "Donor").should(
+      "contain.text",
+      "Prof Melanie Josefina Vanvolkenburg, ACME",
     );
-    cy.contains("Tel:");
-    cy.contains("072345678");
-    cy.contains("Email:");
-    cy.contains("m.vancolkenburg@ca.test");
-    cy.get("abbr").should("exist");
+    cy.contains("tr", "Attorney 1").should(
+      "contain.text",
+      "Miss Amanda Percy Jenkins",
+    );
+    cy.contains("tr", "Attorney 2").should(
+      "contain.text",
+      "Dr Will Oswald Niesborella",
+    );
+    cy.contains("tr", "Replacement attorney 1").should(
+      "contain.text",
+      "Mr Rupert Replacement",
+    );
+    cy.contains("tr", "Certificate provider").should(
+      "contain.text",
+      "Ms Cora Provider",
+    );
+    cy.contains("tr", "Correspondent").should("contain.text", "Mr Test J Name");
+  });
+
+  it("shows status, applicant and airmail indicators", () => {
+    cy.visit("/sirius-header-people-info?id=123");
+
+    cy.contains("tr", "Donor").within(() => {
+      cy.get('svg[aria-label="Airmail"]').should("exist");
+      cy.contains("Active").should("not.exist");
+      cy.contains("Inactive").should("not.exist");
+    });
+
+    cy.contains("tr", "Attorney 1").within(() => {
+      cy.get('[title="Applicant"]').should("exist");
+      cy.contains("Active");
+    });
+
+    cy.contains("tr", "Attorney 2").within(() => {
+      cy.get('[title="Applicant"]').should("not.exist");
+      cy.contains("Active");
+    });
+
+    cy.contains("tr", "Replacement attorney 1").within(() => {
+      cy.contains("Inactive").should("not.exist");
+    });
+
+    cy.contains("tr", "Certificate provider").within(() => {
+      cy.get('svg[aria-label="Airmail"]').should("not.exist");
+      cy.contains("Active").should("not.exist");
+      cy.contains("Inactive").should("not.exist");
+    });
+  });
+
+  it("shows the donor's details by default", () => {
+    cy.visit("/sirius-header-people-info?id=123");
+
+    cy.get("tr.selected").should("contain.text", "Donor");
+    cy.get(".app-person-info__details-heading").should(
+      "contain.text",
+      "Donor: Prof Melanie Josefina Vanvolkenburg, ACME",
+    );
+
+    cy.get(".app-person-info__details").within(() => {
+      cy.contains("dt", "Company name").next().should("have.text", "ACME");
+      cy.contains("dt", "Date of birth")
+        .next()
+        .should("have.text", "19/04/1978");
+      cy.contains("dt", "Address")
+        .next()
+        .should(
+          "have.text",
+          "29737 Andrew Plaza, Apt. 814, Gislasonside, Hirthehaven, Saskatchewan, Canada",
+        );
+      cy.contains("dt", "Postcode").next().should("have.text", "S7R 9F9");
+      cy.contains("dt", "Telephone number")
+        .next()
+        .should("have.text", "072345678");
+      cy.contains("dt", "Email address")
+        .next()
+        .find("a")
+        .should("have.attr", "href", "mailto:m.vancolkenburg@ca.test");
+      cy.contains("AIRMAIL").should("not.exist");
+    });
+  });
+
+  it("shows the selected person's details with empty rows still labelled", () => {
+    cy.visit("/sirius-header-people-info?id=123&selected=2");
+
+    cy.get("tr.selected").should("contain.text", "Attorney 1");
+    cy.get(".app-person-info__details-heading").should(
+      "contain.text",
+      "Attorney 1: Miss Amanda Percy Jenkins",
+    );
+
+    cy.get(".app-person-info__details").within(() => {
+      [
+        "Date of birth",
+        "Address",
+        "Postcode",
+        "Telephone number",
+        "Email address",
+      ].forEach((label) => {
+        cy.contains("dt", label).next().invoke("text").should("match", /^\s*$/);
+      });
+    });
+  });
+
+  it("hides date of birth for the certificate provider and correspondent", () => {
+    cy.visit("/sirius-header-people-info?id=123&selected=6");
+    cy.get(".app-person-info__details-heading").should(
+      "contain.text",
+      "Certificate provider: Ms Cora Provider",
+    );
+    cy.get(".app-person-info__details").within(() => {
+      cy.contains("dt", "Date of birth").should("not.exist");
+      cy.contains("dt", "Address").should("exist");
+    });
+
+    cy.visit("/sirius-header-people-info?id=123&selected=4");
+    cy.get(".app-person-info__details-heading").should(
+      "contain.text",
+      "Correspondent: Mr Test J Name",
+    );
+    cy.get(".app-person-info__details").within(() => {
+      cy.contains("dt", "Date of birth").should("not.exist");
+      cy.contains("dt", "Address").should("exist");
+    });
   });
 });

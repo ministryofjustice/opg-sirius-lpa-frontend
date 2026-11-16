@@ -1,6 +1,6 @@
 /**
  * Header module
- * Handles search relocation and dropdown page offset
+ * Handles search relocation, dropdown page offset and people list scroll position
  */
 
 const DROPDOWN_OFFSET_PROPERTY = "--app-sirius-header-dropdown-height";
@@ -58,7 +58,49 @@ const offsetPageForOpenDropdown = () => {
   update();
 };
 
+const PEOPLE_LIST_SELECTOR = ".app-person-info__people";
+
+let peopleListScrollInitialised = false;
+
+const preservePeopleListScroll = () => {
+  if (peopleListScrollInitialised) {
+    return;
+  }
+  peopleListScrollInitialised = true;
+
+  document.addEventListener("htmx:beforeSwap", (event) => {
+    const target = event.detail.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    const list = target.querySelector(PEOPLE_LIST_SELECTOR);
+    if (list instanceof HTMLElement) {
+      target.dataset.peopleListScrollTop = String(list.scrollTop);
+    }
+  });
+
+  document.addEventListener("htmx:afterSettle", (event) => {
+    const target = event.detail.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    const savedScrollTop = target.dataset.peopleListScrollTop;
+    if (savedScrollTop === undefined) {
+      return;
+    }
+    delete target.dataset.peopleListScrollTop;
+
+    const list = target.querySelector(PEOPLE_LIST_SELECTOR);
+    if (list instanceof HTMLElement) {
+      list.scrollTop = Number(savedScrollTop);
+    }
+  });
+};
+
 export default function initSiriusHeader() {
   moveSearchIntoSiriusHeader();
   offsetPageForOpenDropdown();
+  preservePeopleListScroll();
 }

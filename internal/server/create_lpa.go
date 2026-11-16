@@ -120,11 +120,11 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				CardPaymentContact:               postFormString(r, "cardPaymentContact"),
 				CertificateProviderSignatureDate: postFormDateString(r, "certificateProviderSignatureDate"),
 				Case: sirius.Case{
-					SubType:                         postFormString(r, "caseSubtype"),
-					ApplicationType:                 postFormString(r, "applicationType"),
-					CaseAttorneySingular:            shared.BoolPtr(caseAttorneyValue == "singular"),
-					CaseAttorneyJointly:             shared.BoolPtr(caseAttorneyValue == "jointly"),
-					CaseAttorneyJointlyAndSeverally: shared.BoolPtr(caseAttorneyValue == "jointly-and-severally"),
+					SubType:                                   postFormString(r, "caseSubtype"),
+					ApplicationType:                           postFormString(r, "applicationType"),
+					CaseAttorneySingular:                      shared.BoolPtr(caseAttorneyValue == "singular"),
+					CaseAttorneyJointly:                       shared.BoolPtr(caseAttorneyValue == "jointly"),
+					CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(caseAttorneyValue == "jointly-and-severally"),
 					CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(caseAttorneyValue == "jointly-and-jointly-and-severally"),
 					LifeSustainingTreatment:                   postFormString(r, "lifeSustainingTreatment"),
 					LifeSustainingTreatmentSignatureDateA:     postFormDateString(r, "lifeSustainingTreatmentSignatureDate"),
@@ -255,6 +255,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				data.Error = ve
 				lpa.Attorneys = data.Lpa.Attorneys
 				lpa.ReplacementAttorneys = data.Lpa.ReplacementAttorneys
+				data.ApplicantIds = lpa.ApplicantIds
 				data.Lpa = lpa
 
 				return tmpl(w, data)

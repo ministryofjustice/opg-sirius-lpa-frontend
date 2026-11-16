@@ -1,4 +1,22 @@
 describe("create an LPA", () => {
+  const assertTrimmedText = (selector, expected) => {
+    cy.get(selector)
+      .invoke("text")
+      .then((text) => expect(text.trim()).to.equal(expected));
+  };
+
+  const assertActorDisplay = (updateButtonId, name, hiddenText, title) => {
+    cy.get(`#${updateButtonId}`)
+      .closest(".app-create-lpa__details-row")
+      .within(() => {
+        assertTrimmedText(".govuk-details__summary-text", name);
+        cy.get(".govuk-details__summary").click();
+        cy.contains("th", "Title").siblings("td").should("have.text", title);
+      });
+
+    assertTrimmedText(`#${updateButtonId} .govuk-visually-hidden`, hiddenText);
+  };
+
   beforeEach(() => {
     cy.addMock("/lpa-api/v1/persons/1", "GET", {
       status: 200,
@@ -133,35 +151,38 @@ describe("create an LPA", () => {
     cy.get("#f-receiptDate-readonly").should("have.text", "19/06/2026");
     cy.get("#f-caseAttorney").should("be.checked");
 
-    cy.contains(".govuk-details__summary-text", "Mr Active Attorney");
-    cy.contains(
-      "#f-update-attorney-21 .govuk-visually-hidden",
-      "attorney Mr Active Attorney",
+    assertActorDisplay(
+      "f-update-attorney-21",
+      "Active Attorney",
+      "attorney Active Attorney",
+      "Mr",
     );
-
-    cy.contains(".govuk-details__summary-text", "Mrs Replacement Attorney");
-    cy.contains(
-      "#f-update-replacementAttorney-22 .govuk-visually-hidden",
-      "replacement attorney Mrs Replacement Attorney",
+    assertActorDisplay(
+      "f-update-replacementAttorney-22",
+      "Replacement Attorney",
+      "replacement attorney Replacement Attorney",
+      "Mrs",
     );
 
     // section 2
     cy.get("#f-attorneyActDecisions").should("be.checked");
     cy.get("#f-preferencesAndInstructions-3").should("be.checked");
 
-    cy.contains(".govuk-details__summary-text", "Ms Notified Person");
-    cy.contains(
-      "#f-update-notifiedPerson-24 .govuk-visually-hidden",
-      "notified person Ms Notified Person",
+    assertActorDisplay(
+      "f-update-notifiedPerson-24",
+      "Notified Person",
+      "notified person Notified Person",
+      "Ms",
     );
 
     // section 3 tested separately in create-attorney and create-correspondent
     cy.get("#f-lpaDonorSignatureDate").should("have.value", "2026-06-19");
 
-    cy.contains(".govuk-details__summary-text", "Dr Certificate Provider");
-    cy.contains(
-      "#f-update-certificate-provider-23 .govuk-visually-hidden",
-      "certificate provider Dr Certificate Provider",
+    assertActorDisplay(
+      "f-update-certificate-provider-23",
+      "Certificate Provider",
+      "certificate provider Certificate Provider",
+      "Dr",
     );
 
     // section 4
@@ -170,13 +191,13 @@ describe("create an LPA", () => {
     cy.get("#f-applicationFee").should("be.checked");
     cy.get("#f-cardPaymentContact").should("have.value", "07700 900000");
 
-    cy.contains(
-      ".govuk-details__summary-text",
-      "Mr Correspondent Correspondent",
-    );
-    cy.contains(
-      "#f-update-correspondent-25 .govuk-visually-hidden",
-      "correspondent Mr Correspondent Correspondent",
+    assertTrimmedText('label[for="f-applicantIds-21"]', "Active Attorney");
+
+    assertActorDisplay(
+      "f-update-correspondent-25",
+      "Correspondent Correspondent",
+      "correspondent Correspondent Correspondent",
+      "Mr",
     );
 
     cy.contains("button", "Save and exit").click();
