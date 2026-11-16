@@ -147,8 +147,8 @@ func TestPostSelectOrCreateCorrespondentNew(t *testing.T) {
 		redirect  string
 	}{
 		{name: "EPA", caseType: "epa", redirect: "/create-correspondent?id=1&caseId=2&caseType=epa"},
-		{name: "LPA without flow", caseType: "lpa", redirect: "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-4"},
-		{name: "LPA create flow", caseType: "lpa", flowQuery: "&flow=create", redirect: "/create-lpa?id=1&caseId=2&flow=create#accordion-create-lpa-heading-4"},
+		{name: "LPA without flow", caseType: "lpa", redirect: "/create-lpa?id=1&caseId=2#scroll-to-correspondent"},
+		{name: "LPA create flow", caseType: "lpa", flowQuery: "&flow=create", redirect: "/create-lpa?id=1&caseId=2&flow=create#scroll-to-correspondent"},
 	}
 
 	for _, tc := range cases {
