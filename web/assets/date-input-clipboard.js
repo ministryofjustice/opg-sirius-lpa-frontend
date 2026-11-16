@@ -9,19 +9,30 @@ export default function dateInputClipboard(scope) {
 
   dateInputs.forEach((dateInput) => {
     dateInput.addEventListener("dblclick", () => handleDoubleClick(dateInput));
-
     dateInput.addEventListener("focusout", () => handleFocusOut(dateInput));
+    dateInput.addEventListener("keydown", (e) =>
+      handlePreventSubmit(e, dateInput),
+    );
   });
 
   function handleDoubleClick(dateInput) {
-    console.log("Double click on date input: ", dateInput);
     dateInput.type = "text";
+    dateInput.value = dateInput.value.split("-").reverse().join("/");
+
     setTimeout(() => {
       dateInput.select();
     });
   }
 
   function handleFocusOut(dateInput) {
+    dateInput.value = dateInput.value.split("/").reverse().join("-");
     dateInput.type = "date";
+  }
+
+  function handlePreventSubmit(e, dateInput) {
+    if (e.key === "Enter" && dateInput.type === "text") {
+      e.preventDefault();
+      dateInput.dispatchEvent(new Event("focusout"));
+    }
   }
 }
