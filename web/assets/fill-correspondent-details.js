@@ -24,6 +24,8 @@ export default function fillCorrespondentDetails(scope) {
     const fields = event.target.dataset.fields;
     if (!fields) {
       form.reset();
+      // Resetting the form will uncheck the selected radio button, so we need to re-check it
+      event.target.checked = true;
       return;
     }
 
