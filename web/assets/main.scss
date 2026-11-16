@@ -377,8 +377,7 @@ $app-case-page-action-panel-height: calc(
 
 @media (min-width: 1024px) {
   .app-search-below-phase-banner,
-  body:has(.document-main-wrapper)
-  .govuk-phase-banner:has(> .app-search-below-phase-banner) {
+  body:has(.document-main-wrapper) .govuk-phase-banner:not(:has(form)) {
     display: none;
   }
 
