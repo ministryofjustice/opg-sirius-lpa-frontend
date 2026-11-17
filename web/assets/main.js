@@ -30,6 +30,7 @@ import clearPaymentValue from "./clear-payment-value.js";
 import autoCheckSingleAttorneyApplicant from "./auto-check-single-attorney-applicant.js";
 import clearBlankSections from "./clear-blank-sections";
 import fillCorrespondentDetails from "./fill-correspondent-details.js";
+import actionPanelTabs from "./action-panel-tabs.js";
 
 const prefix = document.body.getAttribute("data-prefix");
 
@@ -62,6 +63,7 @@ clearPaymentValue();
 autoCheckSingleAttorneyApplicant();
 clearBlankSections();
 fillCorrespondentDetails();
+actionPanelTabs();
 
 globalThis.htmx = htmx;
 // Don't include indicator styles as CSP blocks inline styles
