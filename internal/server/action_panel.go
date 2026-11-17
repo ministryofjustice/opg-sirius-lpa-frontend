@@ -46,12 +46,35 @@ func ActionPanel(client ActionPanelClient, tmpl template.Template) Handler {
 	}
 }
 
+const (
+	ActionPanelTabTimeline = "timeline"
+	ActionPanelTabWorkflow = "workflow"
+)
+
+var actionPanelWorkflowLabels = map[string]bool{
+	"Allocate Case":       true,
+	"Assign task":         true,
+	"Create relationship": true,
+	"Delete relationship": true,
+	"Edit dates":          true,
+	"Link record":         true,
+	"MI reporting":        true,
+	"Unlink record":       true,
+}
+
 type ActionPanelButton struct {
 	Label    string
 	URL      string
 	IconName string
 	Disabled bool
 	Hidden   bool
+}
+
+func (b ActionPanelButton) Tab() string {
+	if actionPanelWorkflowLabels[b.Label] {
+		return ActionPanelTabWorkflow
+	}
+	return ActionPanelTabTimeline
 }
 
 func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids string, hasDrafts bool, hasReferences bool, hasLinks bool, taskIDs []int, userPermissions sirius.Permissions) []ActionPanelButton {
