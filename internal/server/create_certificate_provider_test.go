@@ -126,7 +126,7 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 								FlowQuery:    flowCase.flowQuery,
 								DonorId:      1,
 								CaseId:       2,
-								HtmxRedirect: "/create-lpa?id=1&caseId=2" + flowCase.flowQuery + "#accordion-create-lpa-heading-3",
+								HtmxRedirect: "/update-lpa?id=1&caseId=2" + flowCase.flowQuery + "#accordion-create-lpa-heading-3",
 								HtmxSwap:     "innerHTML show:#accordion-create-lpa-heading-3:top",
 								Title:        "Add a certificate provider",
 								PostURL:      "/create-certificate-provider?id=1&caseId=2" + flowCase.flowQuery,
@@ -161,7 +161,7 @@ func TestPostCreateCertificateProvider(t *testing.T) {
 					if isHtmx {
 						assert.Nil(t, err)
 					} else {
-						assert.Equal(t, RedirectError("/create-lpa?id=1&caseId=2"+flowCase.flowQuery+"#accordion-create-lpa-heading-3"), err)
+						assert.Equal(t, RedirectError("/update-lpa?id=1&caseId=2"+flowCase.flowQuery+"#accordion-create-lpa-heading-3"), err)
 					}
 					assert.Equal(t, http.StatusOK, resp.StatusCode)
 					mock.AssertExpectationsForObjects(t, client, template)

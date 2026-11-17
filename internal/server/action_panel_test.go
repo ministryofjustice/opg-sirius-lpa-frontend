@@ -404,7 +404,7 @@ func TestGetActionPanelWithUIDFilter(t *testing.T) {
 				},
 				{
 					Label:    "Edit case",
-					URL:      "/create-lpa?id=123&caseId=1",
+					URL:      "/update-lpa?id=123&caseId=1",
 					IconName: "aw-edit-case",
 					Disabled: false,
 				},
@@ -736,7 +736,7 @@ func TestGetActionPanelEditLpaOnlyEnabledWhenSingleLpaCaseSelected(t *testing.T)
 		On("Func", mock.Anything, mock.MatchedBy(func(data ActionPanelData) bool {
 			for _, btn := range data.ActionPanelButtons {
 				if btn.Label == "Edit case" {
-					return btn.URL == "/create-lpa?id=123&caseId=2" && btn.Disabled == false
+					return btn.URL == "/update-lpa?id=123&caseId=2" && btn.Disabled == false
 				}
 			}
 			return false

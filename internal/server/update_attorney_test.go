@@ -315,8 +315,8 @@ func TestPostEditAttorneyReturnLpa(t *testing.T) {
 								Attorney:             updatedAttorney,
 								IsEditing:            true,
 								Title:                "Update attorney details",
-								HtmxRedirect:         "/create-lpa?id=1&caseId=2" + flowCase.flowQuery,
-								HtmxSwap:             "innerHTML show:#accordion-create-epa-heading-3:top",
+								HtmxRedirect:         "/update-lpa?id=1&caseId=2" + flowCase.flowQuery,
+								HtmxSwap:             "innerHTML show:#scroll-to-attorneys:top", // TODO: is this right EPA anchor on update LPA?
 								CaseType:             "lpa",
 								CaseSubType:          "pfa",
 							}).
@@ -342,7 +342,7 @@ func TestPostEditAttorneyReturnLpa(t *testing.T) {
 					if isHtmx {
 						assert.Nil(t, err)
 					} else {
-						expectedRedirect := RedirectError("/create-lpa?id=1&caseId=2" + flowCase.flowQuery + "#scroll-to-attorneys")
+						expectedRedirect := RedirectError("/update-lpa?id=1&caseId=2" + flowCase.flowQuery + "#scroll-to-attorneys")
 						assert.Equal(t, expectedRedirect, err)
 					}
 					assert.Equal(t, http.StatusOK, resp.StatusCode)

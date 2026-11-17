@@ -561,7 +561,7 @@ func TestGetDocumentList(t *testing.T) {
 				},
 				{
 					Label:    "Edit case",
-					URL:      "/create-lpa?id=82&caseId=1",
+					URL:      "/update-lpa?id=82&caseId=1",
 					IconName: "aw-edit-case",
 					Disabled: false,
 					Hidden:   true,
@@ -729,7 +729,7 @@ func TestGetDocumentList(t *testing.T) {
 				},
 				{
 					Label:    "Edit case",
-					URL:      "/create-lpa?id=82&caseId=1",
+					URL:      "/update-lpa?id=82&caseId=1",
 					IconName: "aw-edit-case",
 					Disabled: false,
 					Hidden:   true,
@@ -1933,7 +1933,7 @@ func TestGetDocumentListWhenTemplateErrors(t *testing.T) {
 					},
 					{
 						Label:    "Edit case",
-						URL:      "/create-lpa?id=82&caseId=1",
+						URL:      "/update-lpa?id=82&caseId=1",
 						IconName: "aw-edit-case",
 						Disabled: false,
 						Hidden:   true,
