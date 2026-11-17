@@ -52,7 +52,11 @@ $action-panel-bar-light: #2c5a96;
   top: 3rem;
   z-index: 1;
   min-height: 2rem;
-  background: linear-gradient(to bottom, $action-panel-bar-light 0%, $sirius-dark-blue 100%);
+  background: linear-gradient(
+    to bottom,
+    $action-panel-bar-light 0%,
+    $sirius-dark-blue 100%
+  );
 }
 
 .action-panel__back {
