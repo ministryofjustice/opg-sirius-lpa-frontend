@@ -162,6 +162,90 @@ describe("Action Panel", () => {
     cy.get("#actions-content").should("not.be.visible");
   });
 
+  it("shows the timeline tab by default and switches to workflow", () => {
+    cy.get("#action-panel-tab-timeline").should(
+      "have.attr",
+      "aria-selected",
+      "true",
+    );
+    cy.get("#action-panel-pane-timeline").should("be.visible");
+    cy.get("#action-panel-pane-workflow").should("not.be.visible");
+    cy.get("#action-panel-pane-timeline").contains("Create warning");
+    cy.get("#action-panel-pane-workflow").contains("Link record");
+
+    cy.get("#action-panel-tab-workflow").click();
+    cy.get("#action-panel-tab-workflow").should(
+      "have.attr",
+      "aria-selected",
+      "true",
+    );
+    cy.get("#action-panel-pane-workflow").should("be.visible");
+    cy.get("#action-panel-pane-timeline").should("not.be.visible");
+  });
+
+  it("supports arrow key navigation between tabs", () => {
+    cy.get("#action-panel-tab-timeline")
+      .focus()
+      .trigger("keydown", { key: "ArrowRight" });
+    cy.get("#action-panel-tab-workflow")
+      .should("have.focus")
+      .and("have.attr", "aria-selected", "true");
+    cy.focused().trigger("keydown", { key: "ArrowLeft" });
+    cy.get("#action-panel-tab-timeline")
+      .should("have.focus")
+      .and("have.attr", "aria-selected", "true");
+  });
+
+  it("shows the form label and a back arrow when a form is open, and goes back to the buttons", () => {
+    cy.get("a#action-panel-button-create-warning").click();
+    cy.get("#action-panel-timeline-form .action-panel__form").should("exist");
+    cy.get("#action-panel-pane-timeline [data-action-panel-heading]").should(
+      "have.text",
+      "Create warning",
+    );
+    cy.get("#action-panel-timeline-buttons").should("not.be.visible");
+
+    cy.get("#action-panel-pane-timeline [data-action-panel-back]")
+      .should("be.visible")
+      .click();
+    cy.get("#action-panel-timeline-form").should("be.empty");
+    cy.get("#action-panel-timeline-buttons").should("be.visible");
+    cy.get("#action-panel-pane-timeline [data-action-panel-heading]").should(
+      "have.text",
+      "Timeline",
+    );
+  });
+
+  it("keeps an open form in each tab when switching between tabs", () => {
+    cy.get("a#action-panel-button-create-warning").click();
+    cy.get("#action-panel-timeline-form .action-panel__form").should("exist");
+
+    cy.get("#action-panel-tab-workflow").click();
+    cy.get("a#action-panel-button-link-record").click();
+    cy.get("#action-panel-workflow-form .action-panel__form").should("exist");
+
+    cy.get("#action-panel-tab-timeline").click();
+    cy.get("#action-panel-timeline-form .action-panel__form")
+      .should("be.visible")
+      .contains("Create Warning");
+
+    cy.get("#action-panel-tab-workflow").click();
+    cy.get("#action-panel-workflow-form .action-panel__form")
+      .should("be.visible")
+      .contains("Link record");
+  });
+
+  it("remembers the active tab across page loads", () => {
+    cy.get("#action-panel-tab-workflow").click();
+    cy.reload();
+    cy.get("#action-panel-tab-workflow").should(
+      "have.attr",
+      "aria-selected",
+      "true",
+    );
+    cy.get("#action-panel-pane-workflow").should("be.visible");
+  });
+
   it("does not display any buttons on the action panel without permissions", () => {
     cy.addMock("/lpa-api/v1/permissions", "GET", {
       status: 200,
@@ -414,6 +498,7 @@ describe("Action Panel", () => {
   });
 
   it("displays the allocate case button on the action panel", () => {
+    cy.get("#action-panel-tab-workflow").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Allocate Case");
 
@@ -425,6 +510,7 @@ describe("Action Panel", () => {
   });
 
   it("displays the edit dates button on the action panel", () => {
+    cy.get("#action-panel-tab-workflow").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Edit dates");
 
@@ -443,6 +529,7 @@ describe("Action Panel", () => {
   });
 
   it("displays the MI reporting button on the action panel", () => {
+    cy.get("#action-panel-tab-workflow").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("MI reporting");
 
@@ -457,6 +544,7 @@ describe("Action Panel", () => {
   });
 
   it("displays the create relationship button on the action panel", () => {
+    cy.get("#action-panel-tab-workflow").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Create relationship");
 
@@ -466,6 +554,7 @@ describe("Action Panel", () => {
   });
 
   it("displays the link record button on the action panel", () => {
+    cy.get("#action-panel-tab-workflow").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Link record");
 
@@ -475,6 +564,7 @@ describe("Action Panel", () => {
   });
 
   it("displays the delete relationship button on the action panel", () => {
+    cy.get("#action-panel-tab-workflow").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Delete relationship");
 
@@ -643,6 +733,7 @@ describe("Action Panel", () => {
   });
 
   it("displays the assign task button on the action panel", () => {
+    cy.get("#action-panel-tab-workflow").click();
     cy.get("#actions-content").should("be.visible");
     cy.get("#actions-content").contains("Assign task");
 
