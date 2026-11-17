@@ -87,6 +87,7 @@ type Client interface {
 	UpdateDatesClient
 	UpdateDocumentClient
 	UpdateDonorClient
+	UpdateEpaClient
 	UpdateFeeReductionClient
 	UpdateInvestigationClient
 	UpdatePaymentClient
@@ -223,6 +224,7 @@ func New(logger *slog.Logger, client Client, templates template.Templates, prefi
 	mux.Handle("/edit-dates", wrap(UpdateDates(client, templates.Get("update-dates.gohtml"))))
 	mux.Handle("/update-donor", wrap(UpdateDonor(client, templates.Get("donor.gohtml"))))
 	mux.Handle("/edit-donor", wrap(UpdateDonor(client, templates.Get("donor.gohtml"))))
+	mux.Handle("/update-epa", wrap(UpdateEpa(client, templates.Get("create-epa.gohtml"))))
 	mux.Handle("/update-fee-reduction", wrap(UpdateFeeReduction(client, templates.Get("update-fee-reduction.gohtml"))))
 	mux.Handle("/update-investigation", wrap(UpdateInvestigation(client, templates.Get("edit_investigation.gohtml"))))
 	mux.Handle("/edit-investigation", wrap(UpdateInvestigation(client, templates.Get("edit_investigation.gohtml"))))
