@@ -35,6 +35,20 @@ describe("Convert date input to text", () => {
     expect(dateInput.value).toBe("16/11/2026");
   });
 
+  test("it should convert the input type to text and format the value correctly on control keypress", async () => {
+    expect(dateInput.type).toBe("date");
+    dateInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Control" }));
+    expect(dateInput.type).toBe("text");
+    expect(dateInput.value).toBe("16/11/2026");
+  });
+
+  test("it should convert the input type to text and format the value correctly on meta key press", async () => {
+    expect(dateInput.type).toBe("date");
+    dateInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Meta" }));
+    expect(dateInput.type).toBe("text");
+    expect(dateInput.value).toBe("16/11/2026");
+  });
+
   test("it should convert the input type back to text and format the value correctly when losing focus", async () => {
     dateInput.dispatchEvent(new Event("dblclick"));
     dateInput.dispatchEvent(new Event("focusout"));
