@@ -157,7 +157,7 @@ describe("Create or Update Attorney on an LPA", () => {
     cy.get(".govuk-back-link")
       .should("exist")
       .and("have.attr", "href")
-      .and("include", "/create-lpa?id=1&caseId=2#scroll-to-attorneys");
+      .and("include", "/update-lpa?id=1&caseId=2#scroll-to-attorneys");
   });
 
   it("should show the trust corporation link on a pfa lpa", () => {

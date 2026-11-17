@@ -63,7 +63,7 @@ describe("Create Replacement Attorney on an LPA", () => {
       .and("have.attr", "href")
       .and(
         "include",
-        "/create-lpa?id=1&caseId=2#accordion-create-lpa-heading-1",
+        "/update-lpa?id=1&caseId=2#accordion-create-lpa-heading-1",
       );
   });
 

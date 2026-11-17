@@ -3,8 +3,6 @@ package server
 import (
 	"fmt"
 	"net/http"
-	"sort"
-	"strconv"
 
 	"github.com/ministryofjustice/opg-go-common/template"
 	"github.com/ministryofjustice/opg-sirius-lpa-frontend/internal/shared"
@@ -15,13 +13,9 @@ type CreateLpaClient interface {
 	Person(sirius.Context, int) (sirius.Person, error)
 	Lpa(sirius.Context, int) (sirius.Lpa, error)
 	CreateLpa(ctx sirius.Context, donorID int, lpa sirius.Lpa) (sirius.Lpa, error)
-	UpdateLpa(ctx sirius.Context, caseID int, lpa sirius.Lpa) error
-	UpdateAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
-	UpdateReplacementAttorney(ctx sirius.Context, attorneyId int, attorney sirius.Attorney) error
-	UpdateTrustCorporation(ctx sirius.Context, trustCorporationId int, trustCorporation sirius.TrustCorporation) error
 }
 
-type createLpaData struct {
+type lpaData struct {
 	AllowNewNotifiedPerson               bool
 	AppointmentType                      string
 	ApplicantIds                         []int
@@ -60,126 +54,68 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data := createLpaData{
-			XSRFToken:              ctx.XSRFToken,
-			IsPartial:              ctx.IsPartial,
+		data := lpaData{
+			AllowNewNotifiedPerson: allowNewNotifiedPerson(0),
 			DonorId:                donorID,
 			DonorName:              donor.Firstname + " " + donor.Surname,
+			FlowQuery:              "&flow=create",
+			IsCreating:             true,
+			IsPartial:              ctx.IsPartial,
 			Title:                  "Create an LPA",
-			AllowNewNotifiedPerson: allowNewNotifiedPerson(0),
-		}
-
-		caseIdStr := r.FormValue("caseId")
-		hasCaseId := caseIdStr != ""
-		isCreating := !hasCaseId || r.FormValue("flow") == "create"
-		data.IsCreating = isCreating
-		if isCreating {
-			data.FlowQuery = "&flow=create"
-		}
-		if hasCaseId {
-			data.CaseId, err = strToIntOrStatusError(caseIdStr)
-			if err != nil {
-				return err
-			}
-
-			data.Lpa, err = client.Lpa(ctx, data.CaseId)
-			if err != nil {
-				return err
-			}
-
-			data.AppointmentType = appointmentTypeFromCase(data.Lpa.Case)
-			data.AllowNewNotifiedPerson = allowNewNotifiedPerson(len(data.Lpa.NotifiedPersons))
-			data.Title = "Edit LPA"
-			data.IsUpdate = true
-			data.ApplicantIds = data.Lpa.GetApplicantIds()
-
-			for _, trustCorporation := range data.Lpa.TrustCorporations {
-				if trustCorporation.IsReplacementAttorney {
-					data.ReplacementAttorneyTrustCorporations = append(data.ReplacementAttorneyTrustCorporations, trustCorporation)
-				} else {
-					data.AttorneyTrustCorporations = append(data.AttorneyTrustCorporations, trustCorporation)
-				}
-			}
-			data.AttorneyApplicants = Applicants(data.Lpa.Attorneys, data.AttorneyTrustCorporations)
-			data.ReplacementAttorneys = Applicants(data.Lpa.ReplacementAttorneys, data.ReplacementAttorneyTrustCorporations)
-		}
-		if isCreating {
-			data.Title = "Create an LPA"
+			XSRFToken:              ctx.XSRFToken,
 		}
 
 		if r.Method == http.MethodPost {
 			caseAttorneyValue := r.FormValue("caseAttorney")
-			isSaveAndExit := postFormString(r, "saveAndExit") == "saveAndExit"
-			isActorAction := isLpaActorAction(r)
+			preferencesNone := postFormCheckboxChecked(r, "preferencesAndInstructions", "none")
 
 			lpa := sirius.Lpa{
-				OnlineLpaId:                      postFormString(r, "onlineLpaId"),
-				AttorneyActDecisions:             postFormString(r, "attorneyActDecisions"),
-				ApplicantType:                    postFormString(r, "applicantType"),
+				AdditionalInfo:                   postFormString(r, "additionalInfo"),
 				ApplicantSignatureDate:           postFormDateString(r, "applicantSignatureDate"),
+				ApplicantType:                    postFormString(r, "applicantType"),
+				ApplicationHasContinuationSheets: shared.BoolPtr(postFormCheckboxChecked(r, "continuationSheets", "continuationSheets")),
+				ApplicationHasGuidance:           shared.BoolPtr(!preferencesNone && postFormCheckboxChecked(r, "preferencesAndInstructions", "guidance")),
+				ApplicationHasRestrictions:       shared.BoolPtr(!preferencesNone && postFormCheckboxChecked(r, "preferencesAndInstructions", "restrictions")),
+				AnyOtherInfo:                     shared.BoolPtr(postFormString(r, "anyOtherInfo") == "true"),
+				AttorneyActDecisions:             postFormString(r, "attorneyActDecisions"),
 				CardPaymentContact:               postFormString(r, "cardPaymentContact"),
 				CertificateProviderSignatureDate: postFormDateString(r, "certificateProviderSignatureDate"),
-				RepeatApplicationReference:       postFormString(r, "repeatApplicationReference"),
 				Case: sirius.Case{
-					SubType:                                   postFormString(r, "caseSubtype"),
 					ApplicationType:                           postFormString(r, "applicationType"),
-					CaseAttorneySingular:                      shared.BoolPtr(caseAttorneyValue == "singular"),
 					CaseAttorneyJointly:                       shared.BoolPtr(caseAttorneyValue == "jointly"),
-					CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(caseAttorneyValue == "jointly-and-severally"),
 					CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(caseAttorneyValue == "jointly-and-jointly-and-severally"),
+					CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(caseAttorneyValue == "jointly-and-severally"),
+					CaseAttorneySingular:                      shared.BoolPtr(caseAttorneyValue == "singular"),
 					LifeSustainingTreatment:                   postFormString(r, "lifeSustainingTreatment"),
 					LifeSustainingTreatmentSignatureDateA:     postFormDateString(r, "lifeSustainingTreatmentSignatureDate"),
 					LpaDonorSignatureDate:                     postFormDateString(r, "lpaDonorSignatureDate"),
+					PaymentByCheque:                           shared.BoolPtr(postFormCheckboxChecked(r, "applicationFee", "cheque")),
+					ReceiptDate:                               postFormDateString(r, "receiptDate"),
+					SubType:                                   postFormString(r, "caseSubtype"),
 				},
+				OnlineLpaId:                postFormString(r, "onlineLpaId"),
+				PaymentByDebitCreditCard:   shared.BoolPtr(postFormCheckboxChecked(r, "applicationFee", "card")),
+				PaymentRemission:           shared.BoolPtr(postFormCheckboxChecked(r, "applicationFee", "reducedFee")),
+				RepeatApplication:          shared.BoolPtr(postFormCheckboxChecked(r, "applicationFee", "repeatApplication")),
+				RepeatApplicationReference: postFormString(r, "repeatApplicationReference"),
 			}
 
 			// Omit unanswered appointment fields during creation or intermediate actor saves.
-			if (isCreating || (isActorAction && !isSaveAndExit)) && caseAttorneyValue == "" {
+			if caseAttorneyValue == "" {
 				lpa.CaseAttorneySingular = nil
 				lpa.CaseAttorneyJointly = nil
 				lpa.CaseAttorneyJointlyAndSeverally = nil
 				lpa.CaseAttorneyJointlyAndJointlyAndSeverally = nil
 			}
 
-			hasAttorneyIdBeenSelected := len(r.PostForm["applicantIds"]) > 0
-
-			switch lpa.ApplicantType {
-			case "donor":
+			if lpa.ApplicantType == "donor" {
 				lpa.ApplicantIds = append(lpa.ApplicantIds, donorID)
-			case "attorney":
-				if !hasAttorneyIdBeenSelected {
-					data.Error.Field = make(sirius.FieldErrors)
-					data.Error.Field["applicantType"] = map[string]string{
-						"": "Select an applicant",
-					}
-				} else {
-					for _, idStr := range r.PostForm["applicantIds"] {
-						if id, err := strconv.Atoi(idStr); err == nil {
-							lpa.ApplicantIds = append(lpa.ApplicantIds, id)
-						}
-					}
-				}
-			default:
+			} else {
 				lpa.ApplicantIds = nil
 			}
 
-			lpa.PaymentByCheque = shared.BoolPtr(postFormCheckboxChecked(r, "applicationFee", "cheque"))
-			lpa.PaymentByDebitCreditCard = shared.BoolPtr(postFormCheckboxChecked(r, "applicationFee", "card"))
-			lpa.PaymentRemission = shared.BoolPtr(postFormCheckboxChecked(r, "applicationFee", "reducedFee"))
-			lpa.RepeatApplication = shared.BoolPtr(postFormCheckboxChecked(r, "applicationFee", "repeatApplication"))
-
-			if !*lpa.PaymentByDebitCreditCard {
-				lpa.CardPaymentContact = ""
-			}
-
-			if !*lpa.RepeatApplication {
-				lpa.RepeatApplicationReference = ""
-			}
-
-			lpa.AnyOtherInfo = shared.BoolPtr(postFormString(r, "anyOtherInfo") == "true")
-			lpa.AdditionalInfo = postFormString(r, "additionalInfo")
-			if !*lpa.AnyOtherInfo {
-				lpa.AdditionalInfo = ""
+			if lpa.ApplicationType != "Online" {
+				lpa.OnlineLpaId = ""
 			}
 
 			if lpa.SubType != "pfa" {
@@ -190,76 +126,29 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				lpa.LifeSustainingTreatmentSignatureDateA = ""
 			}
 
-			preferencesNone := postFormCheckboxChecked(r, "preferencesAndInstructions", "none")
-			lpa.ApplicationHasGuidance = shared.BoolPtr(!preferencesNone && postFormCheckboxChecked(r, "preferencesAndInstructions", "guidance"))
-			lpa.ApplicationHasRestrictions = shared.BoolPtr(!preferencesNone && postFormCheckboxChecked(r, "preferencesAndInstructions", "restrictions"))
-
-			lpa.ApplicationHasContinuationSheets = shared.BoolPtr(postFormCheckboxChecked(r, "continuationSheets", "continuationSheets"))
-
-			if !data.IsUpdate {
-				lpa.ReceiptDate = postFormDateString(r, "receiptDate")
+			if !*lpa.PaymentByDebitCreditCard {
+				lpa.CardPaymentContact = ""
 			}
 
-			if lpa.ApplicationType != "Online" {
-				lpa.OnlineLpaId = ""
+			if !*lpa.RepeatApplication {
+				lpa.RepeatApplicationReference = ""
 			}
 
-			data.AppointmentType = caseAttorneyValue
-
-			if !hasAttorneyIdBeenSelected && lpa.ApplicantType == "attorney" {
-				lpa.Attorneys = data.Lpa.Attorneys
-				lpa.ReplacementAttorneys = data.Lpa.ReplacementAttorneys
-				data.ApplicantIds = data.Lpa.GetApplicantIds()
-				data.AppointmentType = caseAttorneyValue
-				data.Lpa = lpa
-
-				w.WriteHeader(http.StatusBadRequest)
-				return tmpl(w, data)
+			if !*lpa.AnyOtherInfo {
+				lpa.AdditionalInfo = ""
 			}
 
-			if hasCaseId {
-				err = client.UpdateLpa(ctx, data.CaseId, lpa)
-				if err == nil {
-					data.Lpa, _ = client.Lpa(ctx, data.CaseId)
-				}
-			} else {
-				var createdLpa sirius.Lpa
-				createdLpa, err = client.CreateLpa(ctx, donorID, lpa)
-				if err == nil {
-					data.Lpa = createdLpa
-					data.CaseId = createdLpa.ID
-				}
-			}
-
+			var createdLpa sirius.Lpa
+			createdLpa, err = client.CreateLpa(ctx, donorID, lpa)
 			if err == nil {
-				for _, attorney := range data.Lpa.Attorneys {
-					formValue := postFormString(r, fmt.Sprintf("lpaPartCSignatureDate-%d", attorney.ID))
-					if formValue != "" && formValue != string(attorney.LpaPartCSignatureDate) {
-						attorney.LpaPartCSignatureDate = sirius.DateString(formValue)
-						err = client.UpdateAttorney(ctx, attorney.ID, attorney)
-					}
-				}
-				for _, replacementAttorney := range data.Lpa.ReplacementAttorneys {
-					formValue := postFormString(r, fmt.Sprintf("lpaPartCSignatureDate-%d", replacementAttorney.ID))
-					if formValue != "" && formValue != string(replacementAttorney.LpaPartCSignatureDate) {
-						replacementAttorney.LpaPartCSignatureDate = sirius.DateString(formValue)
-						err = client.UpdateReplacementAttorney(ctx, replacementAttorney.ID, replacementAttorney)
-					}
-				}
-				for _, trustCorporation := range data.Lpa.TrustCorporations {
-					formValue := postFormString(r, fmt.Sprintf("lpaPartCSignatureDate-%d", trustCorporation.ID))
-					if formValue != "" && formValue != string(trustCorporation.LpaPartCSignatureDate) {
-						trustCorporation.LpaPartCSignatureDate = sirius.DateString(formValue)
-						err = client.UpdateTrustCorporation(ctx, trustCorporation.ID, trustCorporation)
-					}
-				}
+				data.Lpa = createdLpa
+				data.CaseId = createdLpa.ID
 			}
 
 			if ve, ok := err.(sirius.ValidationError); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				data.Error = ve
-				lpa.Attorneys = data.Lpa.Attorneys
-				lpa.ReplacementAttorneys = data.Lpa.ReplacementAttorneys
+				data.AppointmentType = caseAttorneyValue
 				data.ApplicantIds = lpa.ApplicantIds
 				data.Lpa = lpa
 
@@ -277,144 +166,16 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 			if r.FormValue("addCorrespondent") != "" {
 				return RedirectError(fmt.Sprintf("/select-or-create-correspondent?id=%d&caseId=%d&caseType=lpa%s", donorID, data.CaseId, data.FlowQuery))
 			}
-
-			if r.FormValue("updateCorrespondent") != "" {
-				return RedirectError(fmt.Sprintf("/edit-correspondent?id=%d&caseId=%d&caseType=lpa%s", donorID, data.CaseId, data.FlowQuery))
-			}
 			if r.FormValue("addNotifiedPerson") != "" {
 				return RedirectError(fmt.Sprintf("/create-notified-person?id=%d&caseId=%d%s", donorID, data.CaseId, data.FlowQuery))
-			} else if updateNotifiedPerson := r.FormValue("updateNotifiedPerson"); updateNotifiedPerson != "" {
-				notifiedPersonID, err := strToIntOrStatusError(updateNotifiedPerson)
-				if err != nil {
-					return err
-				}
-				return RedirectError(fmt.Sprintf("/update-notified-person?id=%d&caseId=%d&notifiedPersonId=%d%s", donorID, data.CaseId, notifiedPersonID, data.FlowQuery))
 			}
-			if trustCorporationIdStr := r.FormValue("updateTrustCorporationAttorney"); trustCorporationIdStr != "" {
-				trustCorporationId, err := strToIntOrStatusError(trustCorporationIdStr)
-				if err != nil {
-					return err
-				}
-				return RedirectError(fmt.Sprintf("/update-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=false%s", donorID, data.CaseId, trustCorporationId, data.FlowQuery))
+			if r.FormValue("addReplacementAttorney") != "" {
+				return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d%s", donorID, data.CaseId, data.FlowQuery))
 			}
-			if trustCorporationIdStr := r.FormValue("updateTrustCorporationReplacementAttorney"); trustCorporationIdStr != "" {
-				trustCorporationId, err := strToIntOrStatusError(trustCorporationIdStr)
-				if err != nil {
-					return err
-				}
-				return RedirectError(fmt.Sprintf("/update-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=true%s", donorID, data.CaseId, trustCorporationId, data.FlowQuery))
-			}
-
-			if r.FormValue("updateCertificateProvider") != "" {
-				personID, err := strToIntOrStatusError(r.FormValue("updateCertificateProvider"))
-				if err != nil {
-					return err
-				}
-				return RedirectError(fmt.Sprintf("/update-certificate-provider?id=%d&caseId=%d&personId=%d%s", donorID, data.CaseId, personID, data.FlowQuery))
-			}
-
 			data.Success = true
-			if !isCreating {
-				data.SuccessMessage = "You have successfully updated an LPA."
-			} else {
-				data.SuccessMessage = "You have successfully created an LPA."
-			}
-			data.AllowNewNotifiedPerson = allowNewNotifiedPerson(len(data.Lpa.NotifiedPersons))
-
-		}
-
-		if r.FormValue("addReplacementAttorney") != "" {
-			if data.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d%s", donorID, data.CaseId, data.FlowQuery)
-				data.HtmxSwap = "innerHTML"
-				return tmpl(w, data)
-			}
-			return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d%s", donorID, data.CaseId, data.FlowQuery))
-		}
-
-		if updateAttorney := r.FormValue("updateAttorney"); updateAttorney != "" {
-			attorneyID, err := strToIntOrStatusError(updateAttorney)
-			if err != nil {
-				return err
-			}
-
-			if data.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/update-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d%s", donorID, data.CaseId, attorneyID, data.FlowQuery)
-				data.HtmxSwap = "innerHTML"
-				return tmpl(w, data)
-			}
-			return RedirectError(fmt.Sprintf("/update-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d%s", donorID, data.CaseId, attorneyID, data.FlowQuery))
-		}
-
-		if updateReplacementAttorney := r.FormValue("updateReplacementAttorney"); updateReplacementAttorney != "" {
-			attorneyID, err := strToIntOrStatusError(updateReplacementAttorney)
-			if err != nil {
-				return err
-			}
-
-			if data.IsPartial {
-				data.HtmxRedirect = fmt.Sprintf("/update-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorID, data.CaseId, attorneyID, data.FlowQuery)
-				data.HtmxSwap = "innerHTML"
-				return tmpl(w, data)
-			}
-			return RedirectError(fmt.Sprintf("/update-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorID, data.CaseId, attorneyID, data.FlowQuery))
+			data.SuccessMessage = "You have successfully created an LPA."
 		}
 
 		return tmpl(w, data)
 	}
-}
-
-func getFlowQuery(r *http.Request) string {
-	if r.FormValue("flow") == "create" {
-		return "&flow=create"
-	}
-	return ""
-}
-
-func isLpaActorAction(r *http.Request) bool {
-	for _, name := range []string{
-		"addAttorney", "updateAttorney",
-		"addReplacementAttorney", "updateReplacementAttorney",
-		"updateTrustCorporationAttorney",
-		"updateTrustCorporationReplacementAttorney",
-		"addCertificateProvider", "updateCertificateProvider",
-		"addNotifiedPerson", "updateNotifiedPerson",
-		"addCorrespondent", "updateCorrespondent",
-	} {
-		if postFormString(r, name) != "" {
-			return true
-		}
-	}
-	return false
-}
-
-func appointmentTypeFromCase(c sirius.Case) string {
-	switch {
-	case c.CaseAttorneySingular != nil && *c.CaseAttorneySingular:
-		return "singular"
-	case c.CaseAttorneyJointly != nil && *c.CaseAttorneyJointly:
-		return "jointly"
-	case c.CaseAttorneyJointlyAndSeverally != nil && *c.CaseAttorneyJointlyAndSeverally:
-		return "jointly-and-severally"
-	case c.CaseAttorneyJointlyAndJointlyAndSeverally != nil && *c.CaseAttorneyJointlyAndJointlyAndSeverally:
-		return "jointly-and-jointly-and-severally"
-	default:
-		return ""
-	}
-}
-
-func Applicants(attorneys []sirius.Attorney, trustCorporations []sirius.TrustCorporation) []sirius.Attorney {
-	applicants := make([]sirius.Attorney, 0, len(attorneys)+len(trustCorporations))
-
-	applicants = append(applicants, attorneys...)
-
-	for _, tc := range trustCorporations {
-		applicants = append(applicants, tc.Attorney)
-	}
-
-	sort.Slice(applicants, func(i, j int) bool {
-		return applicants[i].ID < applicants[j].ID
-	})
-
-	return applicants
 }

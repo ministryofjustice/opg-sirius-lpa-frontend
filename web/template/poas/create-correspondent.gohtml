@@ -14,7 +14,7 @@
     {{ else }}
       <a class="govuk-back-link"
          href=""
-         hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-correspondent" .DonorId .CaseId .FlowQuery) }}"
+         hx-get="{{ prefix (printf "/update-lpa?id=%d&caseId=%d%s#scroll-to-correspondent" .DonorId .CaseId .FlowQuery) }}"
          hx-target=".action-panel__content"
          hx-swap="innerHTML show:#scroll-to-correspondent:top">Back</a>
     {{ end }}
@@ -40,7 +40,7 @@
           {{ else }}
             <a class="govuk-link govuk-link--no-visited-state"
                href=""
-               hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-correspondent" .DonorId .CaseId .FlowQuery) }}"
+               hx-get="{{ prefix (printf "/update-lpa?id=%d&caseId=%d%s#scroll-to-correspondent" .DonorId .CaseId .FlowQuery) }}"
                hx-target=".action-panel__content"
                hx-swap="innerHTML show:#scroll-to-correspondent:top">Cancel</a>
           {{ end }}
@@ -59,7 +59,7 @@
       {{ if eq .CaseType "epa" }}
         <a href="{{ prefix (printf "/update-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}" class="govuk-back-link">Back</a>
       {{ else }}
-        <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-correspondent" .DonorId .CaseId .FlowQuery) }}" class="govuk-back-link">Back</a>
+        <a href="{{ prefix (printf "/update-lpa?id=%d&caseId=%d%s#scroll-to-correspondent" .DonorId .CaseId .FlowQuery) }}" class="govuk-back-link">Back</a>
       {{ end }}
 
       <h1 class="govuk-heading-l">{{ .Title }}</h1>
@@ -73,7 +73,7 @@
           {{ if eq .CaseType "epa" }}
             <a href="{{ prefix (printf "/update-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
           {{ else }}
-            <a href="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-correspondent" .DonorId .CaseId .FlowQuery) }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+            <a href="{{ prefix (printf "/update-lpa?id=%d&caseId=%d%s#scroll-to-correspondent" .DonorId .CaseId .FlowQuery) }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
           {{ end }}
         </div>
       </form>
