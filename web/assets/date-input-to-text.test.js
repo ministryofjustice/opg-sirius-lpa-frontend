@@ -42,6 +42,13 @@ describe("Convert date input to text", () => {
     expect(dateInput.value).toBe("2026-11-16");
   });
 
+  test("it restore to the original value if the new value is not a valid date", async () => {
+    dateInput.dispatchEvent(new Event("dblclick"));
+    dateInput.value = "invalid";
+    dateInput.dispatchEvent(new Event("focusout"));
+    expect(dateInput.value).toBe("2026-11-16");
+  });
+
   test("it should not submit the form when pressing enter while the input is in text mode", async () => {
     dateInput.dispatchEvent(new Event("dblclick"));
     dateInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));

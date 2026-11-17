@@ -34,7 +34,7 @@ export default function dateInputToText(scope) {
 
   function handleFocusOut(dateInput) {
     dateInput.value = dateInput.value.split("/").reverse().join("-");
-    if (!regExp.test(dateInput.value)) {
+    if (dateInput.value !== "" && !regExp.test(dateInput.value)) {
       dateInput.value = currentValue;
       currentValue = "";
     }
