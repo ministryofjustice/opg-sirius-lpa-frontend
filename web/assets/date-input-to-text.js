@@ -1,7 +1,12 @@
 // Converts the date input to a text input on double click to allow for copying
 // and pasting the date values. Converts the text input back to a date input on focus out.
+// Restores the original value if the date is invalid.
 export default function dateInputToText(scope) {
   scope = scope || document;
+
+  const regExp = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
+
+  let currentValue = "";
 
   const dateInputs = scope.querySelectorAll(
     'input[type="date"][data-module="app-date-input-to-text"]',
@@ -19,6 +24,7 @@ export default function dateInputToText(scope) {
 
   function handleDoubleClick(dateInput) {
     dateInput.type = "text";
+    currentValue = dateInput.value;
     dateInput.value = dateInput.value.split("-").reverse().join("/");
 
     setTimeout(() => {
@@ -28,6 +34,11 @@ export default function dateInputToText(scope) {
 
   function handleFocusOut(dateInput) {
     dateInput.value = dateInput.value.split("/").reverse().join("-");
+    if (!regExp.test(dateInput.value)) {
+      dateInput.value = currentValue;
+      currentValue = "";
+    }
+
     dateInput.type = "date";
   }
 
