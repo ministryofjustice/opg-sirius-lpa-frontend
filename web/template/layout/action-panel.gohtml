@@ -1,7 +1,81 @@
 {{ define "actionPanel" }}
-  <div class="action-panel__inner">
-    {{ range .ActionPanelButtons }}
+  <div class="action-panel__tabs" role="tablist" aria-label="Actions" data-action-panel-tablist>
+    <button type="button"
+            role="tab"
+            class="action-panel__tab-button"
+            id="action-panel-tab-timeline"
+            aria-controls="action-panel-pane-timeline"
+            aria-selected="true"
+            data-action-panel-tab="timeline">Timeline</button>
+    <button type="button"
+            role="tab"
+            class="action-panel__tab-button"
+            id="action-panel-tab-workflow"
+            aria-controls="action-panel-pane-workflow"
+            aria-selected="false"
+            tabindex="-1"
+            data-action-panel-tab="workflow">Workflow</button>
+  </div>
+
+  <div class="action-panel__pane"
+       role="tabpanel"
+       id="action-panel-pane-timeline"
+       aria-labelledby="action-panel-tab-timeline"
+       data-action-panel-pane="timeline"
+       data-action-panel-title="Timeline">
+    <div class="action-panel__header">
+      <button type="button" class="action-panel__back" data-action-panel-back hidden>
+        <span class="govuk-visually-hidden">Back to timeline actions</span>
+      </button>
+      <h2 class="action-panel__heading" tabindex="-1" data-action-panel-heading>Timeline</h2>
+    </div>
+    <div class="action-panel__inner" id="action-panel-timeline-buttons" data-action-panel-buttons>
+      {{ template "actionPanelTimelineButtons" . }}
+    </div>
+    <div class="action-panel__form-container" id="action-panel-timeline-form" data-action-panel-form hidden></div>
+  </div>
+
+  <div class="action-panel__pane"
+       role="tabpanel"
+       id="action-panel-pane-workflow"
+       aria-labelledby="action-panel-tab-workflow"
+       data-action-panel-pane="workflow"
+       data-action-panel-title="Workflow"
+       hidden>
+    <div class="action-panel__header">
+      <button type="button" class="action-panel__back" data-action-panel-back hidden>
+        <span class="govuk-visually-hidden">Back to workflow actions</span>
+      </button>
+      <h2 class="action-panel__heading" tabindex="-1" data-action-panel-heading>Workflow</h2>
+    </div>
+    <div class="action-panel__inner" id="action-panel-workflow-buttons" data-action-panel-buttons>
+      {{ template "actionPanelWorkflowButtons" . }}
+    </div>
+    <div class="action-panel__form-container" id="action-panel-workflow-form" data-action-panel-form hidden></div>
+  </div>
+{{ end }}
+
+{{ define "actionPanelTimelineButtons" }}
+  {{ range .ActionPanelButtons }}
+    {{ if eq .Tab "timeline" }}
       {{ template "action-panel-button" actionPanelButton .Label .URL .IconName .Disabled .Hidden }}
     {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ define "actionPanelWorkflowButtons" }}
+  {{ range .ActionPanelButtons }}
+    {{ if eq .Tab "workflow" }}
+      {{ template "action-panel-button" actionPanelButton .Label .URL .IconName .Disabled .Hidden }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ define "actionPanelOob" }}
+  <div id="action-panel-timeline-buttons" hx-swap-oob="innerHTML">
+    {{ template "actionPanelTimelineButtons" . }}
+  </div>
+  <div id="action-panel-workflow-buttons" hx-swap-oob="innerHTML">
+    {{ template "actionPanelWorkflowButtons" . }}
   </div>
 {{ end }}
