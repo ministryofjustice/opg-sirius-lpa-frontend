@@ -256,7 +256,7 @@ func TestPostEditAttorney(t *testing.T) {
 			resp := w.Result()
 
 			if !isHtmx {
-				expectedError := RedirectError("/create-epa?id=1&caseId=2#accordion-create-epa-heading-3")
+				expectedError := RedirectError("/update-epa?id=1&caseId=2#accordion-create-epa-heading-3")
 				assert.Equal(t, err, expectedError)
 			} else {
 				assert.Nil(t, err)
