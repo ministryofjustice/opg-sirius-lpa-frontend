@@ -144,9 +144,9 @@ func UpdateTrustCorporation(client UpdateTrustCorporationClient, tmpl template.T
 			if r.FormValue("update-next-attorney") != "" {
 				switch data.NextPersonType {
 				case "Attorney":
-					return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d%s", donorId, caseId, data.NextPersonId, data.FlowQuery))
+					return RedirectError(fmt.Sprintf("/update-attorney?id=%d&caseId=%d&caseType=lpa&attorneyId=%d%s", donorId, caseId, data.NextPersonId, data.FlowQuery))
 				case "Replacement Attorney":
-					return RedirectError(fmt.Sprintf("/create-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorId, caseId, data.NextPersonId, data.FlowQuery))
+					return RedirectError(fmt.Sprintf("/update-replacement-attorney?id=%d&caseId=%d&attorneyId=%d%s", donorId, caseId, data.NextPersonId, data.FlowQuery))
 				case "Trust Corporation":
 					return RedirectError(fmt.Sprintf("/update-trust-corporation?id=%d&caseId=%d&trustCorporationId=%d&replacement=%s%s", donorId, caseId, data.NextPersonId, strconv.FormatBool(trustCorporation.IsReplacementAttorney), data.FlowQuery))
 				default:
