@@ -54,6 +54,7 @@ func TestCreateLpa(t *testing.T) {
 							"status":                       matchers.String("Pending"),
 							"paymentByCheque":              matchers.Like(true),
 							"validateApplicationFeeFields": matchers.Like(true),
+							"repeatApplicationReference":   matchers.String(""),
 						},
 					}).
 					WithCompleteResponse(consumer.Response{
@@ -65,7 +66,7 @@ func TestCreateLpa(t *testing.T) {
 						},
 					})
 			},
-			expectedResponse: Lpa{Case: Case{ID: 1, UID: "7000-0000-0000"}},
+			expectedResponse: Lpa{Case: Case{ID: 1, UID: "7000-0000-0000"}, RepeatApplicationReference: ""},
 		},
 	}
 
@@ -123,10 +124,11 @@ func TestUpdateLpa(t *testing.T) {
 							"Content-Type": matchers.String("application/json"),
 						},
 						Body: map[string]interface{}{
-							"receiptDate":          matchers.Term("05/03/2015", `^\d{1,2}/\d{1,2}/\d{4}$`),
-							"caseSubtype":          matchers.String("pfa"),
-							"expectedPaymentTotal": matchers.Integer(0),
-							"status":               matchers.String("Pending"),
+							"receiptDate":                matchers.Term("05/03/2015", `^\d{1,2}/\d{1,2}/\d{4}$`),
+							"caseSubtype":                matchers.String("pfa"),
+							"expectedPaymentTotal":       matchers.Integer(0),
+							"status":                     matchers.String("Pending"),
+							"repeatApplicationReference": matchers.String(""),
 						},
 					}).
 					WithCompleteResponse(consumer.Response{
@@ -190,11 +192,12 @@ func TestLpa(t *testing.T) {
 							"donor": matchers.Like(map[string]interface{}{
 								"id": matchers.Like(189),
 							}),
+							"repeatApplicationReference": matchers.String(""),
 						}),
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
 			},
-			expectedResponse: Lpa{Case: Case{ID: 800, UID: "7000-0000-0000", CaseType: "LPA", SubType: "pfa", Status: shared.CaseStatusTypePending, Donor: &Person{ID: 189}}},
+			expectedResponse: Lpa{Case: Case{ID: 800, UID: "7000-0000-0000", CaseType: "LPA", SubType: "pfa", Status: shared.CaseStatusTypePending, Donor: &Person{ID: 189}}, RepeatApplicationReference: ""},
 		},
 	}
 

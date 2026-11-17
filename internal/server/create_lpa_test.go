@@ -331,7 +331,8 @@ func TestPostCreateLpa(t *testing.T) {
 		ApplicationHasRestrictions:       shared.BoolPtr(false),
 		PaymentByDebitCreditCard:         shared.BoolPtr(true),
 		PaymentRemission:                 shared.BoolPtr(false),
-		RepeatApplication:                shared.BoolPtr(false),
+		RepeatApplication:                shared.BoolPtr(true),
+		RepeatApplicationReference:       "Some reference",
 		CardPaymentContact:               "01234 567890",
 		CertificateProviderSignatureDate: sirius.DateString(dateString),
 		Case: sirius.Case{
@@ -389,7 +390,10 @@ func TestPostCreateLpa(t *testing.T) {
 		"preferencesAndInstructions":       {"guidance"},
 		"continuationSheets":               {"continuationSheets"},
 		"receiptDate":                      {dateString},
+		"repeatApplicationReference":       {"Some reference"},
 	}
+
+	form.Add("applicationFee", "repeatApplication")
 
 	r, _ := http.NewRequest(http.MethodPost, "/?id=123", strings.NewReader(form.Encode()))
 	r.Header.Add("Content-Type", formUrlEncoded)
@@ -509,13 +513,13 @@ func TestPostCreateLpaDropsOnlineLpaIdWhenNotOnline(t *testing.T) {
 		RepeatApplication:                shared.BoolPtr(false),
 		AnyOtherInfo:                     shared.BoolPtr(false),
 		Case: sirius.Case{
-			SubType:                         "pfa",
-			ApplicationType:                 "Classic",
-			CaseAttorneySingular:            shared.BoolPtr(true),
-			CaseAttorneyJointly:             shared.BoolPtr(false),
-			CaseAttorneyJointlyAndSeverally: shared.BoolPtr(false),
+			SubType:                                   "pfa",
+			ApplicationType:                           "Classic",
+			CaseAttorneySingular:                      shared.BoolPtr(true),
+			CaseAttorneyJointly:                       shared.BoolPtr(false),
+			CaseAttorneyJointlyAndSeverally:           shared.BoolPtr(false),
 			CaseAttorneyJointlyAndJointlyAndSeverally: shared.BoolPtr(false),
-			PaymentByCheque: shared.BoolPtr(false),
+			PaymentByCheque:                           shared.BoolPtr(false),
 		},
 	}
 

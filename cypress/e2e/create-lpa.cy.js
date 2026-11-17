@@ -87,6 +87,8 @@ describe("create an LPA", () => {
         applicantSignatureDate: "19/06/2026",
         paymentByDebitCreditCard: true,
         cardPaymentContact: "07700 900000",
+        repeatApplication: true,
+        repeatApplicationReference: "7000-0000-0001",
         anyOtherInfo: true,
         additionalInfo: "None",
         attorneys: [
@@ -190,6 +192,11 @@ describe("create an LPA", () => {
     cy.get("#f-applicantSignatureDate").should("have.value", "2026-06-19");
     cy.get("#f-applicationFee").should("be.checked");
     cy.get("#f-cardPaymentContact").should("have.value", "07700 900000");
+    cy.get("#f-applicationFee-4").should("be.checked");
+    cy.get("#f-repeatApplicationReference").should(
+      "have.value",
+      "7000-0000-0001",
+    );
 
     assertTrimmedText('label[for="f-applicantIds-21"]', "Active Attorney");
 
