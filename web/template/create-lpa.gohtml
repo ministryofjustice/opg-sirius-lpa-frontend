@@ -548,7 +548,6 @@
           <div class="govuk-summary-card__content">
             <div class="govuk-form-group {{ if .Error.Field.applicantType }}govuk-form-group--error{{ end }}">
               <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Who is applying to register the Lasting Power of Attorney?</legend>
                 {{ template "errors" .Error.Field.applicantType }}
                 <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
                   <div class="govuk-radios__item">
@@ -595,7 +594,6 @@
           </div>
           <div class="govuk-summary-card__content">
             {{ if .Lpa.Correspondent }}
-              <p class="govuk-heading-s">Correspondent:</p>
               <div class="app-create-lpa__details-row">
                 <details class="govuk-details">
                   <summary class="govuk-details__summary app-table__row--half-width">
