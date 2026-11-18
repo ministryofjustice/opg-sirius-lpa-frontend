@@ -6,7 +6,7 @@
 
     <a class="govuk-back-link"
        href=""
-      hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys-corporation" .DonorId .CaseId .FlowQuery) }}"
+       hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys-corporation" .DonorId .CaseId .FlowQuery) }}"
        hx-target=".action-panel__content"
        hx-swap="innerHTML show:#scroll-to-attorneys-corporation:top">Back</a>
 
@@ -30,13 +30,13 @@
       </div>
     {{ end }}
 
-    <form class="form" method="POST"
+    <form class="form app-form--compact" method="POST"
           hx-post="{{ prefix .HtmxPost }}"
           hx-target=".action-panel__content" hx-swap="innerHTML"
     >
       {{ template "form-content" . }}
 
-      <div class="govuk-button-group govuk-!-padding-top-5">
+      <div class="govuk-button-group govuk-!-padding-top-2">
         <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
         {{ if not .IsEditing }}
           <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add another {{ ToLower .AppointedAs }}" />
@@ -79,10 +79,10 @@
         </div>
       {{ end }}
 
-      <form class="form" method="POST">
+      <form class="form app-form--compact" method="POST">
         {{ template "form-content" . }}
 
-        <div class="govuk-button-group govuk-!-padding-top-5">
+        <div class="govuk-button-group govuk-!-padding-top-2">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
           {{ if not .IsEditing }}
             <input class="govuk-button" data-module="govuk-button" type="submit" name="add-another" value="Save and add another {{ ToLower .AppointedAs }}" />

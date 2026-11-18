@@ -21,7 +21,7 @@
 
     <h1 class="govuk-heading-m">{{ .Title }}</h1>
 
-    <form class="form"
+    <form class="form app-form--compact"
           method="POST"
           hx-post="{{ prefix (printf "/create-correspondent?id=%d&caseId=%d&caseType=%s%s" .DonorId .CaseId .CaseType .FlowQuery) }}"
           hx-target=".action-panel__content"
@@ -29,21 +29,21 @@
 
       {{ template "form-content" . }}
 
-      <div class="govuk-button-group govuk-!-padding-top-5">
+      <div class="govuk-button-group govuk-!-padding-top-2">
         <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
-          {{ if eq .CaseType "epa" }}
-            <a class="govuk-link govuk-link--no-visited-state"
-               href=""
-               hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
-               hx-target=".action-panel__content"
-               hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Cancel</a>
-          {{ else }}
-            <a class="govuk-link govuk-link--no-visited-state"
-               href=""
-               hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-correspondent" .DonorId .CaseId .FlowQuery) }}"
-               hx-target=".action-panel__content"
-               hx-swap="innerHTML show:#scroll-to-correspondent:top">Cancel</a>
-          {{ end }}
+        {{ if eq .CaseType "epa" }}
+          <a class="govuk-link govuk-link--no-visited-state"
+             href=""
+             hx-get="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}"
+             hx-target=".action-panel__content"
+             hx-swap="innerHTML show:#accordion-create-epa-heading-3:top">Cancel</a>
+        {{ else }}
+          <a class="govuk-link govuk-link--no-visited-state"
+             href=""
+             hx-get="{{ prefix (printf "/create-lpa?id=%d&caseId=%d%s#scroll-to-correspondent" .DonorId .CaseId .FlowQuery) }}"
+             hx-target=".action-panel__content"
+             hx-swap="innerHTML show:#scroll-to-correspondent:top">Cancel</a>
+        {{ end }}
       </div>
     </form>
   </div>
@@ -64,11 +64,11 @@
 
       <h1 class="govuk-heading-l">{{ .Title }}</h1>
 
-      <form class="form" method="POST">
+      <form class="form app-form--compact" method="POST">
 
         {{ template "form-content" . }}
 
-        <div class="govuk-button-group govuk-!-padding-top-5">
+        <div class="govuk-button-group govuk-!-padding-top-2">
           <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
           {{ if eq .CaseType "epa" }}
             <a href="{{ prefix (printf "/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3" .DonorId .CaseId) }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
@@ -97,7 +97,7 @@
             <div class="govuk-radios__item">
               <input class="govuk-radios__input" id="f-actor-{{ plusN $num 1 }}" name="actorId" type="radio" value="{{ $actor.ID }}" data-fields="{{$actor.Fields}}">
               <label class="govuk-label govuk-radios__label" for="f-actor-{{ plusN $num 1 }}">
-                  {{ printf "%s (%s)" $actor.Name $actor.Label }}
+                {{ printf "%s (%s)" $actor.Name $actor.Label }}
               </label>
             </div>
           {{ end }}
@@ -134,7 +134,7 @@
     <div class="govuk-form-group {{ if .Error.Field.correspondenceBy }}govuk-form-group--error{{ end }}">
       <fieldset class="govuk-fieldset">
         <legend class="govuk-fieldset__legend">Correspondence by</legend>
-          {{ template "errors" .Error.Field.correspondenceBy }}
+        {{ template "errors" .Error.Field.correspondenceBy }}
         <div class="govuk-checkboxes govuk-checkboxes--small govuk-checkboxes--inline" data-module="govuk-checkboxes">
           <div class="govuk-checkboxes__item">
             <input class="govuk-checkboxes__input" id="f-correspondenceBy-post" name="correspondenceBy" type="checkbox" value="post" {{ if .Correspondent.CorrespondenceByPost }}checked{{ end }}>
