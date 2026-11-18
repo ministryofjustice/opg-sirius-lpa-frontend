@@ -835,6 +835,20 @@ $app-case-page-action-panel-height: calc(
   }
 }
 
+.app-form--compact {
+  .govuk-form-group {
+    margin-bottom: govuk-spacing(3);
+  }
+
+  .govuk-fieldset__legend {
+    margin-bottom: govuk-spacing(1);
+  }
+
+  .govuk-details {
+    margin-bottom: govuk-spacing(3);
+  }
+}
+
 .action-panel__button {
   background: linear-gradient(
     to bottom,
@@ -1240,8 +1254,13 @@ $app-case-page-action-panel-height: calc(
   padding-top: $app-action-panel-top - $app-fixed-headers-height;
 }
 
-.app-\!-embedded .govuk-main-wrapper:has(#accordion-create-lpa) {
+.app-\!-embedded .govuk-main-wrapper:has(#accordion-create-lpa),
+.app-\!-embedded .govuk-main-wrapper:has(.app-form--compact) {
   padding-top: govuk-spacing(1);
+}
+
+.app-\!-embedded .govuk-main-wrapper:has(.app-form--compact) .govuk-back-link {
+  margin-top: govuk-spacing(1);
 }
 
 #accordion-create-lpa {
