@@ -125,64 +125,72 @@ func TestPostUpdateEpa(t *testing.T) {
 			PaymentDate:                     sirius.DateString(dateString),
 		},
 	}
-	newEpa := sirius.Epa{
-		EpaDonorSignatureDate:   sirius.DateString(dateString),
-		EpaDonorNoticeGivenDate: sirius.DateString(dateString),
-		DonorHasOtherEpas:       truePtr,
-		OtherEpaInfo:            "More info 2",
-		Case: sirius.Case{
-			ReceiptDate:                     sirius.DateString(dateString),
-			CaseAttorneySingular:            truePtr,
-			CaseAttorneyJointlyAndSeverally: falsePtr,
-			CaseAttorneyJointly:             falsePtr,
-			PaymentByCheque:                 falsePtr,
-			PaymentExemption:                truePtr,
-			PaymentDate:                     sirius.DateString(dateString),
+	newEpa := epa
+	newEpa.DonorHasOtherEpas = truePtr
+	newEpa.OtherEpaInfo = "More info 2"
+
+	tests := []struct {
+		name          string
+		expectedError error
+	}{
+		{
+			name:          "Update EPA post form success",
+			expectedError: nil,
+		},
+		{
+			name:          "Update EPA returns an API failure",
+			expectedError: errExample,
 		},
 	}
-	client := &mockUpdateEpaClient{}
-	client.
-		On("Epa", mock.Anything, 234).
-		Return(epa, nil)
-	client.
-		On("UpdateEpa", mock.Anything, 234, newEpa).
-		Return(nil)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			client := &mockUpdateEpaClient{}
+			client.
+				On("Epa", mock.Anything, 234).
+				Return(epa, nil)
+			client.
+				On("UpdateEpa", mock.Anything, 234, newEpa).
+				Return(tc.expectedError)
 
-	template := &mockTemplate{}
-	template.
-		On("Func", mock.Anything, epaData{
-			DonorId:         123,
-			Title:           "Edit EPA",
-			Success:         true,
-			Epa:             epa,
-			AppointmentType: "singular",
-			CaseId:          234,
-			IsUpdate:        true,
-		}).
-		Return(nil)
+			template := &mockTemplate{}
+			if tc.expectedError == nil {
+				template.
+					On("Func", mock.Anything, epaData{
+						DonorId:         123,
+						Title:           "Edit EPA",
+						Success:         true,
+						Epa:             epa,
+						AppointmentType: "singular",
+						CaseId:          234,
+						IsUpdate:        true,
+					}).
+					Return(nil)
+			}
 
-	form := url.Values{
-		"epaDonorSignatureDate":   {dateString},
-		"epaDonorNoticeGivenDate": {dateString},
-		"donorHasOtherEpas":       {"true"},
-		"otherEpaInfo":            {"More info 2"},
-		"receiptDate":             {dateString},
-		"caseAttorney":            {"singular"},
-		"paymentByCheque":         {"false"},
-		"paymentExemption":        {"true"},
-		"paymentDate":             {dateString},
+			form := url.Values{
+				"epaDonorSignatureDate":   {dateString},
+				"epaDonorNoticeGivenDate": {dateString},
+				"donorHasOtherEpas":       {"true"},
+				"otherEpaInfo":            {"More info 2"},
+				"receiptDate":             {dateString},
+				"caseAttorney":            {"singular"},
+				"paymentByCheque":         {"false"},
+				"paymentExemption":        {"true"},
+				"paymentDate":             {dateString},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/update-epa?id=123&caseId=234", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := UpdateEpa(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Equal(t, tc.expectedError, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
 	}
-
-	r, _ := http.NewRequest(http.MethodPost, "/update-epa?id=123&caseId=234", strings.NewReader(form.Encode()))
-	r.Header.Add("Content-Type", formUrlEncoded)
-	w := httptest.NewRecorder()
-
-	err := UpdateEpa(client, template.Func)(w, r)
-	resp := w.Result()
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	mock.AssertExpectationsForObjects(t, client, template)
 }
 
 func TestPostUpdateEpaRedirects(t *testing.T) {
@@ -250,14 +258,13 @@ func TestPostUpdateEpaRedirects(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			epa := baseEpa
 			client := &mockUpdateEpaClient{}
 			template := &mockTemplate{}
 			client.
 				On("Epa", mock.Anything, 456).
 				Return(tc.epa, nil)
 			client.
-				On("UpdateEpa", mock.Anything, 456, epa).
+				On("UpdateEpa", mock.Anything, 456, baseEpa).
 				Return(nil)
 
 			form := url.Values{
@@ -273,6 +280,81 @@ func TestPostUpdateEpaRedirects(t *testing.T) {
 
 			assert.Equal(t, tc.expectedError, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			mock.AssertExpectationsForObjects(t, client, template)
+		})
+	}
+}
+
+func TestPostUpdateEpaReturnsValidationError(t *testing.T) {
+	for _, actorType := range []string{"addAttorney", "addCorrespondent"} {
+		t.Run(actorType, func(t *testing.T) {
+			returnedError := sirius.ValidationError{
+				Field: sirius.FieldErrors{"receiptDate": {"receiptDate": "problem"}},
+			}
+			expectedError := sirius.ValidationError{
+				Field: sirius.FieldErrors{"receiptDate": {"receiptDate": "Enter or select a receipt date to continue to step 3"}},
+			}
+
+			truePtr := shared.BoolPtr(true)
+			falsePtr := shared.BoolPtr(false)
+			dateString := "2022-04-05"
+			epa := sirius.Epa{
+				EpaDonorSignatureDate:   sirius.DateString(dateString),
+				EpaDonorNoticeGivenDate: sirius.DateString(dateString),
+				DonorHasOtherEpas:       truePtr,
+				OtherEpaInfo:            "More info",
+				Case: sirius.Case{
+					CaseAttorneySingular:            truePtr,
+					CaseAttorneyJointlyAndSeverally: falsePtr,
+					CaseAttorneyJointly:             falsePtr,
+					PaymentByCheque:                 falsePtr,
+					PaymentExemption:                truePtr,
+					PaymentDate:                     sirius.DateString(dateString),
+				},
+			}
+
+			client := &mockUpdateEpaClient{}
+			client.
+				On("Epa", mock.Anything, 456).
+				Return(sirius.Epa{}, nil)
+			client.
+				On("UpdateEpa", mock.Anything, 456, epa).
+				Return(returnedError)
+
+			template := &mockTemplate{}
+			template.
+				On("Func", mock.Anything, epaData{
+					DonorId:         123,
+					CaseId:          456,
+					Title:           "Edit EPA",
+					IsUpdate:        true,
+					Success:         false,
+					Error:           expectedError,
+					AppointmentType: "singular",
+				}).
+				Return(nil)
+
+			form := url.Values{
+				"epaDonorSignatureDate":   {dateString},
+				"epaDonorNoticeGivenDate": {dateString},
+				"donorHasOtherEpas":       {"true"},
+				"otherEpaInfo":            {"More info"},
+				"caseAttorney":            {"singular"},
+				"paymentByCheque":         {"false"},
+				"paymentExemption":        {"true"},
+				"paymentDate":             {dateString},
+				actorType:                 {"true"},
+			}
+
+			r, _ := http.NewRequest(http.MethodPost, "/update-epa?id=123&caseId=456", strings.NewReader(form.Encode()))
+			r.Header.Add("Content-Type", formUrlEncoded)
+			w := httptest.NewRecorder()
+
+			err := UpdateEpa(client, template.Func)(w, r)
+			resp := w.Result()
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 			mock.AssertExpectationsForObjects(t, client, template)
 		})
 	}
