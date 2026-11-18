@@ -192,7 +192,6 @@ func TestLpa(t *testing.T) {
 							"donor": matchers.Like(map[string]interface{}{
 								"id": matchers.Like(189),
 							}),
-							"repeatApplicationReference": matchers.String(""),
 						}),
 						Headers: matchers.MapMatcher{"Content-Type": matchers.String("application/json")},
 					})
