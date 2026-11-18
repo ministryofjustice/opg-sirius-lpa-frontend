@@ -23,7 +23,7 @@ describe("Update correspondent", () => {
       .and("have.attr", "href")
       .and(
         "include",
-        "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3",
+        "/update-epa?id=1&caseId=2#accordion-create-epa-heading-3",
       );
   });
 
@@ -45,7 +45,7 @@ describe("Update correspondent", () => {
       },
     });
 
-    cy.visit("/create-epa?id=2&caseId=2");
+    cy.visit("/update-epa?id=2&caseId=2");
     cy.contains("Edit EPA");
     cy.contains("Melanie Vanvolkenburg");
     cy.get("#f-update-correspondent-3 .govuk-visually-hidden").should(
