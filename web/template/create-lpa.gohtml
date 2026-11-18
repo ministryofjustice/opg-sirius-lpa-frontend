@@ -101,7 +101,7 @@
           <div class="govuk-summary-card__content">
             <div class="govuk-form-group {{ if .Error.Field.caseSubtype }}govuk-form-group--error{{ end }}">
               <fieldset class="govuk-fieldset">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">LPA type</legend>
+                <legend class="govuk-fieldset__legend govuk-visually-hidden">LPA type</legend>
                 {{ template "errors" .Error.Field.caseSubtype }}
                 <div class="govuk-radios govuk-radios--small app-!-radios--inline {{ if .Error.Field.caseSubtype }}govuk-radios--error{{ end }}" data-module="govuk-radios">
                   <div class="govuk-radios__item">
