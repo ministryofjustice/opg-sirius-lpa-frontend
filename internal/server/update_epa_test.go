@@ -207,6 +207,8 @@ func TestPostUpdateEpaRedirects(t *testing.T) {
 		},
 	}
 
+	_, invalidIDErr := strToIntOrStatusError("bad-id")
+
 	testCases := map[string]struct {
 		query         string
 		formField     string
@@ -215,28 +217,30 @@ func TestPostUpdateEpaRedirects(t *testing.T) {
 		epa           sirius.Epa
 	}{
 		"add attorney": {
-			query:         "/update-epa?id=123&caseId=456",
 			formField:     "addAttorney",
 			formValue:     "true",
 			expectedError: RedirectError("/create-attorney?id=123&caseId=456&caseType=epa"),
 			epa:           sirius.Epa{Case: sirius.Case{ID: 456}},
 		},
 		"update attorney": {
-			query:         "/update-epa?id=123&caseId=456",
 			formField:     "updateAttorney",
 			formValue:     "789",
 			expectedError: RedirectError("/update-attorney?id=123&caseId=456&caseType=epa&attorneyId=789"),
 			epa:           sirius.Epa{Case: sirius.Case{ID: 456}},
 		},
+		"update attorney with bad id": {
+			formField:     "updateAttorney",
+			formValue:     "bad-id",
+			expectedError: invalidIDErr,
+			epa:           sirius.Epa{Case: sirius.Case{ID: 456}},
+		},
 		"add correspondent": {
-			query:         "/update-epa?id=123&caseId=456",
 			formField:     "addCorrespondent",
 			formValue:     "true",
 			expectedError: RedirectError("/create-correspondent?id=123&caseId=456&caseType=epa"),
 			epa:           sirius.Epa{Case: sirius.Case{ID: 456}},
 		},
 		"add correspondent with attorney on case": {
-			query:         "/update-epa?id=123&caseId=456",
 			formField:     "addCorrespondent",
 			formValue:     "true",
 			expectedError: RedirectError("/select-or-create-correspondent?id=123&caseId=456&caseType=epa"),
@@ -248,7 +252,6 @@ func TestPostUpdateEpaRedirects(t *testing.T) {
 			},
 		},
 		"update correspondent": {
-			query:         "/update-epa?id=123&caseId=456",
 			formField:     "updateCorrespondent",
 			formValue:     "1",
 			expectedError: RedirectError("/edit-correspondent?id=123&caseId=456&caseType=epa"),
@@ -271,7 +274,7 @@ func TestPostUpdateEpaRedirects(t *testing.T) {
 				tc.formField: {tc.formValue},
 			}
 
-			r, _ := http.NewRequest(http.MethodPost, tc.query, strings.NewReader(form.Encode()))
+			r, _ := http.NewRequest(http.MethodPost, "/update-epa?id=123&caseId=456", strings.NewReader(form.Encode()))
 			r.Header.Add("Content-Type", formUrlEncoded)
 			w := httptest.NewRecorder()
 
@@ -286,13 +289,33 @@ func TestPostUpdateEpaRedirects(t *testing.T) {
 }
 
 func TestPostUpdateEpaReturnsValidationError(t *testing.T) {
-	for _, actorType := range []string{"addAttorney", "addCorrespondent"} {
-		t.Run(actorType, func(t *testing.T) {
+	tests := []struct {
+		name      string
+		formField string
+		message   string
+	}{
+		{
+			name:      "when selecting add attorney",
+			formField: "addAttorney",
+			message:   "Enter or select a receipt date to continue to step 3",
+		},
+		{
+			name:      "when selecting add correspondent",
+			formField: "addCorrespondent",
+			message:   "Enter or select a receipt date to continue to step 3",
+		},
+		{
+			name:    "when selecting save and exit",
+			message: "Enter or select a receipt date to save and exit",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
 			returnedError := sirius.ValidationError{
 				Field: sirius.FieldErrors{"receiptDate": {"receiptDate": "problem"}},
 			}
 			expectedError := sirius.ValidationError{
-				Field: sirius.FieldErrors{"receiptDate": {"receiptDate": "Enter or select a receipt date to continue to step 3"}},
+				Field: sirius.FieldErrors{"receiptDate": {"receiptDate": tc.message}},
 			}
 
 			truePtr := shared.BoolPtr(true)
@@ -328,7 +351,6 @@ func TestPostUpdateEpaReturnsValidationError(t *testing.T) {
 					CaseId:          456,
 					Title:           "Edit EPA",
 					IsUpdate:        true,
-					Success:         false,
 					Error:           expectedError,
 					AppointmentType: "singular",
 				}).
@@ -343,7 +365,9 @@ func TestPostUpdateEpaReturnsValidationError(t *testing.T) {
 				"paymentByCheque":         {"false"},
 				"paymentExemption":        {"true"},
 				"paymentDate":             {dateString},
-				actorType:                 {"true"},
+			}
+			if tc.formField != "" {
+				form.Set(tc.formField, "true")
 			}
 
 			r, _ := http.NewRequest(http.MethodPost, "/update-epa?id=123&caseId=456", strings.NewReader(form.Encode()))
