@@ -34,9 +34,14 @@ export default function dateInputToText(scope) {
   }
 
   function handleFocusOut(dateInput) {
+    let manuallyDeleted = false;
+    if (dateInput.value === "") {
+      manuallyDeleted = true;
+    }
+
     dateInput.value = dateInput.value.split("/").reverse().join("-");
     dateInput.type = "date";
-    if (dateInput.value === "") {
+    if (!manuallyDeleted && dateInput.value === "") {
       dateInput.value = currentValue;
       currentValue = "";
     }
