@@ -248,7 +248,7 @@ func TestPostSelectOrCreateCorrespondentFromAttorney(t *testing.T) {
 	err := SelectOrCreateCorrespondent(client, nil)(w, r)
 	resp := w.Result()
 
-	assert.Equal(t, RedirectError("/create-epa?id=1&caseId=2#accordion-create-epa-heading-3"), err)
+	assert.Equal(t, RedirectError("/update-epa?id=1&caseId=2#accordion-create-epa-heading-3"), err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	mock.AssertExpectationsForObjects(t, client)
 }

@@ -98,7 +98,7 @@ func TestPostCreateCorrespondent(t *testing.T) {
 		{
 			name:     "EPA",
 			caseType: "epa",
-			redirect: "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3",
+			redirect: "/update-epa?id=1&caseId=2#accordion-create-epa-heading-3",
 		},
 		{
 			name:     "LPA without flow",
