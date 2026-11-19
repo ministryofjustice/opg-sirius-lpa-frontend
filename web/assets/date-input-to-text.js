@@ -1,50 +1,65 @@
-// Converts the date input to a text input on double click or on pressing the
-// control/meta key to allow for copying and pasting the date values.
-// Converts the text input back to a date input on loss of focus.
-// Restores the original value if the date is invalid.
 export default function dateInputToText(scope) {
   scope = scope || document;
-
-  let currentValue = "";
 
   const dateInputs = scope.querySelectorAll(
     'input[type="date"][data-module="app-date-input-to-text"]',
   );
 
-  if (!dateInputs.length) return;
-
   dateInputs.forEach((dateInput) => {
+    if (dateInput.dataset.dateInputToTextInit) return;
+    dateInput.dataset.dateInputToTextInit = "true";
+
     dateInput.addEventListener("dblclick", () =>
-      switchToTextInputAndSelect(dateInput),
+      switchToTextInput(dateInput, { deferSelect: true }),
     );
     dateInput.addEventListener("focusout", () => handleFocusOut(dateInput));
     dateInput.addEventListener("keydown", (e) => handleKeydown(e, dateInput));
   });
 
-  function switchToTextInputAndSelect(dateInput) {
+  function toDisplayFormat(isoValue) {
+    return isoValue.split("-").reverse().join("/");
+  }
+
+  function toIsoFormat(displayValue) {
+    return displayValue.split("/").reverse().join("-");
+  }
+
+  function switchToTextInput(dateInput, { deferSelect = false } = {}) {
     if (dateInput.type === "text") return;
 
+    dateInput.dataset.originalValue = dateInput.value;
     dateInput.type = "text";
-    currentValue = dateInput.value;
-    dateInput.value = dateInput.value.split("-").reverse().join("/");
+    dateInput.value = toDisplayFormat(dateInput.dataset.originalValue);
 
-    setTimeout(() => {
+    if (deferSelect) {
+      setTimeout(() => dateInput.select());
+    } else {
       dateInput.select();
-    });
+    }
   }
 
   function handleFocusOut(dateInput) {
-    let manuallyDeleted = false;
-    if (dateInput.value === "") {
-      manuallyDeleted = true;
-    }
+    if (dateInput.type !== "text") return;
 
-    dateInput.value = dateInput.value.split("/").reverse().join("-");
+    const originalValue = dateInput.dataset.originalValue ?? "";
+    const enteredValue = dateInput.value.trim();
+    delete dateInput.dataset.originalValue;
+
+    dateInput.value = toIsoFormat(enteredValue);
     dateInput.type = "date";
-    if (!manuallyDeleted && dateInput.value === "") {
-      dateInput.value = currentValue;
-      currentValue = "";
+
+    if (enteredValue !== "" && dateInput.value === "") {
+      dateInput.value = originalValue;
     }
+  }
+
+  function copyToClipboard(e, dateInput) {
+    if (!dateInput.value || !navigator.clipboard) return;
+
+    e.preventDefault();
+    navigator.clipboard
+      .writeText(toDisplayFormat(dateInput.value))
+      .catch(() => {});
   }
 
   function handleKeydown(e, dateInput) {
@@ -54,8 +69,14 @@ export default function dateInputToText(scope) {
       return;
     }
 
-    if (e.key === "Control" || e.key === "Meta") {
-      switchToTextInputAndSelect(dateInput);
+    if (!(e.ctrlKey || e.metaKey) || dateInput.type === "text") return;
+
+    const key = e.key.toLowerCase();
+
+    if (key === "c") {
+      copyToClipboard(e, dateInput);
+    } else if (key === "v") {
+      switchToTextInput(dateInput);
     }
   }
 }
