@@ -79,6 +79,8 @@ var lpaFieldOrder = []string{
 	"paymentExemption",
 	"paymentRemission",
 	"haveAppliedForFeeRemission",
+	"repeatApplication",
+	"repeatApplicationReference",
 	"anyOtherInfo",
 	"additionalInfo",
 	"assignee",

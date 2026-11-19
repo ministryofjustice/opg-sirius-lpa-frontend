@@ -67,7 +67,7 @@ describe("Select or create correspondent", () => {
       .should("contain.text", "Will Niesborella")
       .click();
     cy.get("button[type=submit]").click();
-    cy.url().should("include", "/create-epa");
+    cy.url().should("include", "/update-epa");
   });
 
   it("displays the correct actors for an lpa", () => {
