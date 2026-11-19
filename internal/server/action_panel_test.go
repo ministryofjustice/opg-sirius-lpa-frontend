@@ -975,3 +975,39 @@ func TestGetActionPanelWhenPersonErrors(t *testing.T) {
 
 	assert.Equal(t, expectedError, err)
 }
+
+func TestActionPanelButtonTab(t *testing.T) {
+	expected := map[string]string{
+		"Add complaint":       ActionPanelTabTimeline,
+		"Add investigation":   ActionPanelTabTimeline,
+		"Change status":       ActionPanelTabTimeline,
+		"Create document":     ActionPanelTabTimeline,
+		"Create donor":        ActionPanelTabTimeline,
+		"Create epa case":     ActionPanelTabTimeline,
+		"Create event":        ActionPanelTabTimeline,
+		"Create lpa case":     ActionPanelTabTimeline,
+		"Create warning":      ActionPanelTabTimeline,
+		"Edit case":           ActionPanelTabTimeline,
+		"Edit donor":          ActionPanelTabTimeline,
+		"Fees":                ActionPanelTabTimeline,
+		"New task":            ActionPanelTabTimeline,
+		"Retrieve draft":      ActionPanelTabTimeline,
+		"Allocate Case":       ActionPanelTabWorkflow,
+		"Assign task":         ActionPanelTabWorkflow,
+		"Create relationship": ActionPanelTabWorkflow,
+		"Delete relationship": ActionPanelTabWorkflow,
+		"Edit dates":          ActionPanelTabWorkflow,
+		"Link record":         ActionPanelTabWorkflow,
+		"MI reporting":        ActionPanelTabWorkflow,
+		"Unlink record":       ActionPanelTabWorkflow,
+	}
+
+	buttons := GetActionPanelButtons(nil, 0, "", false, false, false, nil, sirius.Permissions{})
+
+	assert.Len(t, buttons, len(expected))
+	for _, btn := range buttons {
+		tab, ok := expected[btn.Label]
+		assert.True(t, ok, "unexpected button %q", btn.Label)
+		assert.Equal(t, tab, btn.Tab(), btn.Label)
+	}
+}

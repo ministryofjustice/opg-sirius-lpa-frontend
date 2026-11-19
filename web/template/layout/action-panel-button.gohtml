@@ -2,10 +2,11 @@
   <a id="action-panel-button-{{ replace (ToLower .Label) " " "-" }}"
      class="govuk-body govuk-!-margin-bottom-0{{ if .Disabled }} disabled{{ end }}{{ if .Hidden }} hidden{{ end }}"
      hx-get="{{ prefix .URL }}"
-     hx-target=".action-panel__content"
+     hx-target="next [data-action-panel-form]"
      hx-swap="innerHTML"
+     data-action-panel-label="{{ .Label }}"
      {{ if .Disabled }}aria-disabled="true"{{ end }}
-     {{ if .Hidden }}hidden{{ end }}
+          {{ if .Hidden }}hidden{{ end }}
   >
     <div class="action-panel__button">
       <span>
