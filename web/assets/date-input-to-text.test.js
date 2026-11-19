@@ -1,9 +1,13 @@
 import dateInputToText from "./date-input-to-text";
 
+Object.assign(navigator, {
+  clipboard: {
+    writeText: jest.fn().mockImplementation(() => Promise.resolve()),
+  },
+});
+
 describe("Convert date input to text", () => {
   let dateInput;
-  let form;
-  const submitMock = jest.fn();
 
   beforeEach(async () => {
     document.body.innerHTML = `
@@ -16,15 +20,11 @@ describe("Convert date input to text", () => {
       'input[type="date"][data-module="app-date-input-to-text"]',
     );
 
-    form = document.querySelector("form");
-    form.onsubmit = submitMock;
-
     dateInputToText();
   });
 
   afterEach(() => {
     dateInput = null;
-    form = null;
     document.body.innerHTML = "";
   });
 
@@ -35,39 +35,40 @@ describe("Convert date input to text", () => {
     expect(dateInput.value).toBe("16/11/2026");
   });
 
-  test("it should convert the input type to text and format the value correctly on control keypress", async () => {
+  test("it should convert the input type to text and format the value correctly when pressing control + v", async () => {
     expect(dateInput.type).toBe("date");
-    dateInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Control" }));
+    dateInput.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "V", ctrlKey: true }),
+    );
     expect(dateInput.type).toBe("text");
     expect(dateInput.value).toBe("16/11/2026");
   });
 
-  test("it should convert the input type to text and format the value correctly on meta key press", async () => {
-    expect(dateInput.type).toBe("date");
-    dateInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Meta" }));
-    expect(dateInput.type).toBe("text");
-    expect(dateInput.value).toBe("16/11/2026");
-  });
-
-  test("it should convert the input type back to text and format the value correctly when losing focus", async () => {
+  test("it should convert the input type back to date and format the value correctly when losing focus", async () => {
     dateInput.dispatchEvent(new Event("dblclick"));
     dateInput.dispatchEvent(new Event("focusout"));
     expect(dateInput.type).toBe("date");
     expect(dateInput.value).toBe("2026-11-16");
   });
 
-  test("it restore to the original value if the new value is not a valid date", async () => {
+  test("it should convert the input type back to date and format the value correctly pressing enter", async () => {
+    dateInput.dispatchEvent(new Event("dblclick"));
+    dateInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect(dateInput.type).toBe("date");
+    expect(dateInput.value).toBe("2026-11-16");
+  });
+
+  test("it should restore to the original value if the new value is not a valid date", async () => {
     dateInput.dispatchEvent(new Event("dblclick"));
     dateInput.value = "invalid";
     dateInput.dispatchEvent(new Event("focusout"));
     expect(dateInput.value).toBe("2026-11-16");
   });
 
-  test("it should not submit the form when pressing enter while the input is in text mode", async () => {
-    dateInput.dispatchEvent(new Event("dblclick"));
-    dateInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
-    expect(submitMock).not.toHaveBeenCalled();
-    expect(dateInput.type).toBe("date");
-    expect(dateInput.value).toBe("2026-11-16");
+  test("it should copy the date input value to the clipboard when pressing control + c", async () => {
+    dateInput.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "C", ctrlKey: true }),
+    );
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith("16/11/2026");
   });
 });
