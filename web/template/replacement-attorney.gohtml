@@ -102,7 +102,7 @@
   {{ template "input" (field "firstname" "First name" .Attorney.Firstname .Error.Field.firstname) }}
   {{ template "input" (field "middlenames" "Middle names" .Attorney.Middlenames .Error.Field.middlenames) }}
   {{ template "input" (field "surname" "Last name" .Attorney.Surname .Error.Field.surname) }}
-  {{ template "input-signed-date" (field "dob" "Date of birth" .Attorney.DateOfBirth .Error.Field.dob "max" today) }}
+  {{ template "input-date" (field "dob" "Date of birth" .Attorney.DateOfBirth .Error.Field.dob "max" today "fullWidth" true) }}
 
   <div class="govuk-form-group" data-module="app-address-finder" data-app-address-finder-label="Address" data-app-address-finder-fill-country="false">
     {{ template "input" (field "addressLine1" "Address line 1" .Attorney.AddressLine1 .Error.Field.addressLine1 "data-app-address-finder-map" "addressLine1") }}
