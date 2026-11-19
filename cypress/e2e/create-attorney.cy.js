@@ -53,7 +53,7 @@ describe("Create Attorney on an EPA", () => {
       .and("have.attr", "href")
       .and(
         "include",
-        "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3",
+        "/update-epa?id=1&caseId=2#accordion-create-epa-heading-3",
       );
   });
 });
@@ -92,7 +92,7 @@ describe("Update Attorney on an EPA", () => {
       body: {},
     });
 
-    cy.visit("/create-epa?id=2&caseId=2&caseType=epa");
+    cy.visit("/update-epa?id=2&caseId=2&caseType=epa");
     cy.contains("Edit EPA");
     cy.contains("Rudolph Stotesbury");
     cy.get("#f-update-attorney-3 .govuk-visually-hidden").should(

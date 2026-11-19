@@ -178,8 +178,8 @@ func TestPostCreateAttorneyTransitions(t *testing.T) {
 		{
 			name:         "EPA save",
 			caseType:     "epa",
-			redirect:     "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3",
-			htmxRedirect: "/create-epa?id=1&caseId=2",
+			redirect:     "/update-epa?id=1&caseId=2#accordion-create-epa-heading-3",
+			htmxRedirect: "/update-epa?id=1&caseId=2",
 			htmxSwap:     "innerHTML show:#accordion-create-epa-heading-3:top",
 		},
 		{

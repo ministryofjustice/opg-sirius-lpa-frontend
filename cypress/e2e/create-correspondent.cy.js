@@ -39,7 +39,7 @@ describe("Create correspondent", () => {
     cy.get("#f-phoneNumber").type("072345678");
     cy.get("#f-email").type("m.vancolkenburg@ca.test");
     cy.get("button[type=submit]").click();
-    cy.url().should("include", "/create-epa");
+    cy.url().should("include", "/update-epa");
   });
 
   it("has a back link to the EPA form", () => {
@@ -54,7 +54,7 @@ describe("Create correspondent", () => {
       .and("have.attr", "href")
       .and(
         "include",
-        "/create-epa?id=1&caseId=2#accordion-create-epa-heading-3",
+        "/update-epa?id=1&caseId=2#accordion-create-epa-heading-3",
       );
   });
 
