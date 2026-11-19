@@ -86,6 +86,6 @@ describe("Update correspondent", () => {
 
     cy.get("#f-firstname").clear().type("Mindy");
     cy.get("button[type=submit]").click();
-    cy.url().should("include", "/create-lpa");
+    cy.url().should("include", "/update-lpa");
   });
 });

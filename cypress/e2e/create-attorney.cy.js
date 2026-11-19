@@ -143,7 +143,7 @@ describe("Create or Update Attorney on an LPA", () => {
     fillInAttorneyDetails("lpa");
     cy.contains("Add an attorney");
     cy.get("button[type=submit]").click();
-    cy.url().should("include", "create-lpa");
+    cy.url().should("include", "update-lpa");
   });
 
   it("creates an attorney on an LPA and add another attorney", () => {
@@ -225,6 +225,6 @@ describe("Update Attorney on an LPA", () => {
 
     cy.get("#f-firstname").clear().type("Rafael");
     cy.get("button[type=submit]").click();
-    cy.url().should("include", "create-lpa");
+    cy.url().should("include", "update-lpa");
   });
 });
