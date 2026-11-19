@@ -119,6 +119,7 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 				ApplicantSignatureDate:           postFormDateString(r, "applicantSignatureDate"),
 				CardPaymentContact:               postFormString(r, "cardPaymentContact"),
 				CertificateProviderSignatureDate: postFormDateString(r, "certificateProviderSignatureDate"),
+				RepeatApplicationReference:       postFormString(r, "repeatApplicationReference"),
 				Case: sirius.Case{
 					SubType:                                   postFormString(r, "caseSubtype"),
 					ApplicationType:                           postFormString(r, "applicationType"),
@@ -169,6 +170,10 @@ func CreateLpa(client CreateLpaClient, tmpl template.Template) Handler {
 
 			if !*lpa.PaymentByDebitCreditCard {
 				lpa.CardPaymentContact = ""
+			}
+
+			if !*lpa.RepeatApplication {
+				lpa.RepeatApplicationReference = ""
 			}
 
 			lpa.AnyOtherInfo = shared.BoolPtr(postFormString(r, "anyOtherInfo") == "true")
