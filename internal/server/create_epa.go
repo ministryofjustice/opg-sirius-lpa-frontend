@@ -10,9 +10,7 @@ import (
 )
 
 type CreateEpaClient interface {
-	Epa(ctx sirius.Context, id int) (sirius.Epa, error)
 	CreateEpa(ctx sirius.Context, donorID int, epa sirius.Epa) (sirius.Epa, error)
-	UpdateEpa(ctx sirius.Context, caseID int, epa sirius.Epa) error
 }
 
 type epaData struct {
@@ -44,32 +42,6 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			IsPartial: ctx.IsPartial,
 		}
 
-		caseIdStr := r.FormValue("caseId")
-		isEditing := caseIdStr != ""
-		if isEditing {
-			data.CaseId, err = strToIntOrStatusError(caseIdStr)
-			if err != nil {
-				return err
-			}
-
-			caseItem, err := client.Epa(ctx, data.CaseId)
-			if err != nil {
-				return err
-			}
-			data.Epa = caseItem
-			data.Title = "Edit EPA"
-
-			if caseItem.CaseAttorneyJointly != nil && *caseItem.CaseAttorneyJointly {
-				data.AppointmentType = "jointly"
-			} else if caseItem.CaseAttorneySingular != nil && *caseItem.CaseAttorneySingular {
-				data.AppointmentType = "singular"
-			} else if caseItem.CaseAttorneyJointlyAndSeverally != nil && *caseItem.CaseAttorneyJointlyAndSeverally {
-				data.AppointmentType = "jointly-and-severally"
-			}
-
-			data.IsUpdate = true
-		}
-
 		if r.Method == http.MethodPost {
 			caseAttorneyValue := r.FormValue("caseAttorney")
 
@@ -94,15 +66,10 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 				epa.OtherEpaInfo = ""
 			}
 
-			if isEditing {
-				err = client.UpdateEpa(ctx, data.CaseId, epa)
-				data.Epa, _ = client.Epa(ctx, data.CaseId)
-			} else {
-				epa, err = client.CreateEpa(ctx, donorID, epa)
-				if err == nil {
-					data.Epa = epa
-					data.CaseId = epa.ID
-				}
+			epa, err = client.CreateEpa(ctx, donorID, epa)
+			if err == nil {
+				data.Epa = epa
+				data.CaseId = epa.ID
 			}
 
 			if ve, ok := err.(sirius.ValidationError); ok {
@@ -123,20 +90,11 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 
 			if r.FormValue("addAttorney") != "" {
 				return RedirectError(fmt.Sprintf("/create-attorney?id=%d&caseId=%d&caseType=epa", donorID, data.CaseId))
-			} else if updateAttorney := r.FormValue("updateAttorney"); updateAttorney != "" {
-				attorneyID, err := strToIntOrStatusError(updateAttorney)
-				if err != nil {
-					return err
-				}
-
-				return RedirectError(fmt.Sprintf("/update-attorney?id=%d&caseId=%d&caseType=epa&attorneyId=%d", donorID, data.CaseId, attorneyID))
 			} else if r.FormValue("addCorrespondent") != "" {
 				if len(data.Epa.Attorneys) > 0 {
 					return RedirectError(fmt.Sprintf("/select-or-create-correspondent?id=%d&caseId=%d&caseType=epa", donorID, data.CaseId))
 				}
 				return RedirectError(fmt.Sprintf("/create-correspondent?id=%d&caseId=%d&caseType=epa", donorID, data.CaseId))
-			} else if r.FormValue("updateCorrespondent") != "" {
-				return RedirectError(fmt.Sprintf("/edit-correspondent?id=%d&caseId=%d&caseType=epa", donorID, data.CaseId))
 			} else {
 				data.Success = true
 			}
