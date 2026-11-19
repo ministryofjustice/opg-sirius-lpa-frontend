@@ -128,7 +128,7 @@ func CreateAttorney(client CreateAttorneyClient, tmpl template.Template) Handler
 			if data.IsPartial {
 				data.HtmxRedirect = fmt.Sprintf("/create-%s?id=%d&caseId=%d%s", data.CaseType, data.DonorId, data.CaseId, data.FlowQuery)
 				if data.CaseType == "epa" {
-					data.HtmxRedirect = fmt.Sprintf("/update-%s?id=%d&caseId=%d%s", data.CaseType, data.DonorId, data.CaseId, data.FlowQuery)
+					data.HtmxRedirect = fmt.Sprintf("/update-epa?id=%d&caseId=%d%s", data.DonorId, data.CaseId, data.FlowQuery)
 				}
 				data.HtmxSwap = "innerHTML show:#accordion-create-epa-heading-3:top"
 				return tmpl(w, data)
