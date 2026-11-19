@@ -743,9 +743,7 @@
             <div class="govuk-checkboxes__conditional {{ if not (compareBoolPointers .Lpa.RepeatApplication true) }}govuk-checkboxes__conditional--hidden{{ end }}"
                  id="repeatApplicationReferenceReveal">
               <div class="govuk-form-group">
-                <label class="govuk-label" for="f-repeatApplicationReference">Repeat application reference</label>
-                <input class="govuk-input" id="f-repeatApplicationReference" name="repeatApplicationReference"
-                       value="{{ .Lpa.RepeatApplicationReference }}" disabled="disabled"/>
+                {{ template "input" (field "repeatApplicationReference" "Repeat application reference" .Lpa.RepeatApplicationReference .Error.Field.repeatApplicationReference) }}
               </div>
             </div>
           </div>
