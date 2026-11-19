@@ -151,7 +151,7 @@ func UpdateAttorney(client UpdateAttorneyClient, tmpl template.Template) Handler
 			}
 
 			if data.CaseType == "epa" {
-				return RedirectError(fmt.Sprintf("/create-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", data.DonorId, data.CaseId))
+				return RedirectError(fmt.Sprintf("/update-epa?id=%d&caseId=%d#accordion-create-epa-heading-3", data.DonorId, data.CaseId))
 			}
 			return RedirectError(fmt.Sprintf("/create-lpa?id=%d&caseId=%d%s#scroll-to-attorneys", data.DonorId, data.CaseId, data.FlowQuery))
 		}

@@ -15,7 +15,7 @@ type CreateEpaClient interface {
 	UpdateEpa(ctx sirius.Context, caseID int, epa sirius.Epa) error
 }
 
-type createEpaData struct {
+type epaData struct {
 	XSRFToken       string
 	Success         bool
 	IsUpdate        bool
@@ -37,7 +37,7 @@ func CreateEpa(client CreateEpaClient, tmpl template.Template) Handler {
 			return err
 		}
 
-		data := createEpaData{
+		data := epaData{
 			XSRFToken: ctx.XSRFToken,
 			DonorId:   donorID,
 			Title:     "Create an EPA",
