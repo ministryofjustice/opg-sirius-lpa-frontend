@@ -24,7 +24,7 @@ type Lpa struct {
 	PaymentByDebitCreditCard                  *bool      `json:"paymentByDebitCreditCard,omitempty"`
 	PaymentRemission                          *bool      `json:"paymentRemission,omitempty"`
 	RepeatApplication                         *bool      `json:"repeatApplication,omitempty"`
-	RepeatApplicationReference                string     `json:"repeatApplicationReference,omitempty"`
+	RepeatApplicationReference                string     `json:"repeatApplicationReference"`
 }
 
 type LpaRequest struct {
