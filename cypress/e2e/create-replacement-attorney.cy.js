@@ -47,7 +47,7 @@ describe("Create Replacement Attorney on an LPA", () => {
     fillInAttorneyDetails();
     cy.contains("Add a replacement attorney");
     cy.get("button[type=submit]").click();
-    cy.url().should("include", "create-lpa");
+    cy.url().should("include", "update-lpa");
   });
 
   it("creates a replacement attorney on an LPA and add another replacement attorney", () => {

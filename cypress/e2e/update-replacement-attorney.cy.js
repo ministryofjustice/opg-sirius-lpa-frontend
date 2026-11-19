@@ -32,6 +32,6 @@ describe("Update Replacement Attorney form on an LPA", () => {
 
     cy.get("#f-firstname").clear().type("Rafael");
     cy.get("button[type=submit]").click();
-    cy.url().should("include", "create-lpa");
+    cy.url().should("include", "update-lpa");
   });
 });
