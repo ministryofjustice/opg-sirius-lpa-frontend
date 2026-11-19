@@ -94,7 +94,7 @@ func GetActionPanelButtons(selectedCases []sirius.Case, donorId int, caseUids st
 		createInvestigationUrl = fmt.Sprintf("/create-investigation?id=%d&case=%s%s", id, caseType, caseUids)
 
 		if strings.ToLower(selectedCase.CaseType) == "epa" {
-			editCaseUrl = fmt.Sprintf("/create-epa?id=%d&caseId=%d", donorId, selectedCases[0].ID)
+			editCaseUrl = fmt.Sprintf("/update-epa?id=%d&caseId=%d", donorId, selectedCases[0].ID)
 		} else if strings.ToLower(selectedCase.CaseType) == "lpa" {
 			editCaseUrl = fmt.Sprintf("/create-lpa?id=%d&caseId=%d", donorId, selectedCases[0].ID)
 		}

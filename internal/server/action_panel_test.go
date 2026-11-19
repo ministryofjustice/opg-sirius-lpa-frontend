@@ -678,7 +678,7 @@ func TestGetActionPanelEditEpaOnlyEnabledWhenSingleEpaCaseSelected(t *testing.T)
 		On("Func", mock.Anything, mock.MatchedBy(func(data ActionPanelData) bool {
 			for _, btn := range data.ActionPanelButtons {
 				if btn.Label == "Edit case" {
-					return btn.URL == "/create-epa?id=123&caseId=3" && btn.Disabled == false
+					return btn.URL == "/update-epa?id=123&caseId=3" && btn.Disabled == false
 				}
 			}
 			return false

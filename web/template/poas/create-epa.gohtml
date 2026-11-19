@@ -22,7 +22,7 @@
 
       <form class="form"
             method="POST"
-            hx-post="{{ if .IsUpdate }}{{ prefix (printf "/create-epa?id=%d&caseId=%d" .DonorId .CaseId) }}{{ else }}{{ prefix (printf "/create-epa?id=%d" .DonorId) }}{{ end }}"
+            hx-post="{{ if .IsUpdate }}{{ prefix (printf "/update-epa?id=%d&caseId=%d" .DonorId .CaseId) }}{{ else }}{{ prefix (printf "/create-epa?id=%d" .DonorId) }}{{ end }}"
             hx-target=".action-panel__content"
             hx-swap="innerHTML scroll:.action-panel__content:top">
 
