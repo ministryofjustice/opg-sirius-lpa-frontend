@@ -29,7 +29,7 @@
                         {{ $newValue = index $v 1 }}
 
                         {{ if or (eq $k "receivedDate") (eq $k "resolutionDate") }}
-                            <li>{{ complaintProperty $k }}: {{ parseAndFormatDate (index $oldValue "date") "2006-01-02 00:00:00.000000" "02/01/2006" }} changed to: {{ parseAndFormatDate (index $newValue "date") "2006-01-02 00:00:00.000000" "02/01/2006" }}</li>
+                            <li>{{ complaintProperty $k }}: {{ parseAndFormatDate (index $oldValue "date") "2006-01-02 15:04:05" "02/01/2006" }} changed to: {{ parseAndFormatDate (index $newValue "date") "2006-01-02 15:04:05" "02/01/2006" }}</li>
                         {{ else if eq $k "category" }}
                             <li>{{ complaintProperty $k }}: {{ translateRefData $complaintCategories $oldValue}} changed to: {{ translateRefData $complaintCategories $newValue }}</li>
                         {{ else if eq $k "subCategory" }}
@@ -47,7 +47,7 @@
                         {{ $newValue = index $v "1" }}
 
                         {{ if or (eq $k "receivedDate") (eq $k "resolutionDate") }}
-                            <li>{{ complaintProperty $k }}: {{ parseAndFormatDate (index $newValue "date") "2006-01-02 00:00:00.000000" "02/01/2006" }}</li>
+                            <li>{{ complaintProperty $k }}: {{ parseAndFormatDate (index $newValue "date") "2006-01-02 15:04:05" "02/01/2006" }}</li>
                         {{ else if eq $k "category" }}
                             <li>{{ complaintProperty $k }}: {{ translateRefData $complaintCategories $newValue }}</li>
                         {{ else if eq $k "subCategory" }}

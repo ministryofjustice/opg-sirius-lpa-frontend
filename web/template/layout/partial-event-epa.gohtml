@@ -11,24 +11,24 @@
                         {{ $newValue := index $changeValues 1 }}
                         {{ if isDateMap $oldValue }}
                             <li>
-                                {{ camelcaseToSentence $fieldName }}: 
-                                {{ parseAndFormatDate $oldValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }}
-                                changed to: 
-                                {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }}
+                                {{ camelcaseToSentence $fieldName }}:
+                                {{ parseAndFormatDate $oldValue.date "2006-01-02 15:04:05" "02/01/2006" }}
+                                changed to:
+                                {{ parseAndFormatDate $newValue.date "2006-01-02 15:04:05" "02/01/2006" }}
                             </li>
                         {{ else if isNumber $oldValue}}
                             <li>
-                                {{ camelcaseToSentence $fieldName }}: 
+                                {{ camelcaseToSentence $fieldName }}:
                                 {{ translateNumberEventValue $fieldName $oldValue }} changed to: {{ translateNumberEventValue $fieldName $newValue }}
                             </li>
                         {{ else if eq $fieldName "assignee" }}
                             <li>
-                                Assignee: 
+                                Assignee:
                                 {{ index $oldValue "details" "displayName" }} changed to: {{ index $newValue "details" "displayName" }}
                             </li>
                         {{ else }}
                             <li>
-                                {{ camelcaseToSentence $fieldName }}: 
+                                {{ camelcaseToSentence $fieldName }}:
                                 {{ $oldValue }} changed to: {{ $newValue }}
                             </li>
                         {{ end }}
@@ -36,8 +36,8 @@
                         {{ $newValue := index $changeValues "1" }}
                         {{ if isDateMap $newValue }}
                             <li>
-                                {{ camelcaseToSentence $fieldName }}: 
-                                {{ parseAndFormatDate $newValue.date "2006-01-02 00:00:00.000000" "02/01/2006" }}
+                                {{ camelcaseToSentence $fieldName }}:
+                                {{ parseAndFormatDate $newValue.date "2006-01-02 15:04:05" "02/01/2006" }}
                             </li>
                         {{ else if isNumber $newValue}}
                             <li>{{ camelcaseToSentence $fieldName }}: {{ translateNumberEventValue $fieldName $newValue }}</li>
